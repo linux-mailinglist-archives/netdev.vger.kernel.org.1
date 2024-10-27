@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-139400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE689B206D
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:38:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45ACF9B2078
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D481C208CE
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:38:08 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 91246B20F86
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F9017CA09;
-	Sun, 27 Oct 2024 20:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02ED17E010;
+	Sun, 27 Oct 2024 20:41:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O08X3fuW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a0LooTd2"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f177.google.com (mail-oi1-f177.google.com [209.85.167.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580E8538A;
-	Sun, 27 Oct 2024 20:38:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E19A5558BB;
+	Sun, 27 Oct 2024 20:41:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730061484; cv=none; b=rl6r8DfUL1d485mu1msvS7glIv7kUhzpa5g/n4+uNWFtyConwg+IXec3IMqsJ/znztN0xfCc+bgj0+Qhzfkl66EeWT7uo7DxOrJ8iLi0jC63QizTSfCqgHH7iAD41ybjU4/HAJYNxvTU6gSfCPz+wXC8X9jc12TOMe5gYQuNbFw=
+	t=1730061668; cv=none; b=awx3UaWhDIijCNhqV62eU2bw/LI9NqFKEg8tQcSXo+9pVXcGFh6q+iv3lJa4UJePVx1GN45QilQTQt/QCSvAQavxNNvD3b0BtuTtmQL/wpnRo09AvaTkok+b6FXndA3syy9wX8u2US3DJvNWj8zfb10dEMXa4GJ5fcbuQsdNpK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730061484; c=relaxed/simple;
-	bh=XVAi1sk2jxjCgto2tP/Cdm3jLw9qfp50pYIUjyARnkM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fxMe863yDiyM0MkWa9XWEESkBGRkd6a/ueFvTcZR3WWr2pflUa755c7d1YszdNCkeGVvv12FNmXypXwLmIf+k5AO+v2og9Yuo3aElan8/gN6p/3OrytQJefct5EZmTOasYhC7PsOip6zNUxtGDuNch6KU9tpOx3sBOTyGyAiANk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O08X3fuW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2625AC4CEC3;
-	Sun, 27 Oct 2024 20:38:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730061483;
-	bh=XVAi1sk2jxjCgto2tP/Cdm3jLw9qfp50pYIUjyARnkM=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O08X3fuW1WWmGgVpPvq2rZy29QwVueFD7a87JA3OxX4D4cRxu9+xwVslSvAXnbiwE
-	 dXJ8CBYNDujLFINfeo/3UlJyt6dBeu+qE70+vIVbnCdNRnA0WIn68vwwtSPDoZFUuj
-	 kftqEQ6MaHWbfJhOF6El0+nmBUFJV7dVxmZz+wWfu4WzAj3GMhSxRshUir1PCEKH40
-	 ps5GPx9F6fh2HpunAKbUVDJKrdW4Lids+mBUejeutozM4enLwwFp1NvskHkoIBVLQi
-	 BESj+1NwAsaV4pEwXPcoK7y9+1im0zrI7VWe8yEdFozd4Z463W8rpuH67YLdBixZyK
-	 zN/ArJWIPszeA==
-Date: Sun, 27 Oct 2024 21:38:00 +0100
-From: Krzysztof Kozlowski <krzk@kernel.org>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Chen Wang <unicorn_wang@outlook.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
-	Inochi Amaoto <inochiama@outlook.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
-	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 2/4] dt-bindings: net: Add support for Sophgo SG2044
- dwmac
-Message-ID: <4avwff7m4puralnaoh6pat62nzpovre2usqkmp3q4r4bk5ujjf@j3jzr4p74v4a>
-References: <20241025011000.244350-1-inochiama@gmail.com>
- <20241025011000.244350-3-inochiama@gmail.com>
+	s=arc-20240116; t=1730061668; c=relaxed/simple;
+	bh=j6zZJd27rgLbrZ5NTRtCJlGPSSgjUXBSM6i4ASNcR1A=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=N8nT32acNWg6MoGIKMlcA7J/73eB4oYlFGvexAexGUqo2nn9/lU30On6WwyKdHnNbjpQR411AU8QXhbYe8v8iWidXGXcLfho6sgEPykPoxn32soVHdbM6l4vePunlB3Z+n7Tum176uc41dI4kezPR6uiXIbuF3Nlf1TqL0Q4bHc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a0LooTd2; arc=none smtp.client-ip=209.85.167.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f177.google.com with SMTP id 5614622812f47-3e601b6a33aso2149239b6e.0;
+        Sun, 27 Oct 2024 13:41:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730061666; x=1730666466; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=tVOMgAe3RRwdAR+xhS/ahUABlt9WYQ00kCmXKennVJo=;
+        b=a0LooTd2er3ZY4S5SmB6GGN4+DfSCer4XDFnYKqwEq1tLFHArItCdUrPNxVT2gUbAw
+         hk0Q8Fhugt90U9w4gwBkqDnbi2Zr6oxOs7a4en1F284y66Bqb+0IJseD+quAYL32SM3B
+         bCjJo4jThAPYjrFqg3fcH8yG4nXYu0tHudzuHYlE9CrsaxgPA4f5ZC1Vp/+3VSp/lwnf
+         1xQ/hHckJCgnCVRXhkvC/MLKAg5mW5U0bKUAzhKEjabrVwxYVCD+sSDS0gJoD0u+kF+y
+         mE7Vr8401KzJSAO2rD0YmuGhxUm51MGrMZngdGUWNPgDVkSQX7ngzqt5e/yUGpvOEL//
+         gDmQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730061666; x=1730666466;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=tVOMgAe3RRwdAR+xhS/ahUABlt9WYQ00kCmXKennVJo=;
+        b=TFUM60YgGLGjZOuXb7ce6xsAZKHHHX4/NlCcozJImjP/0C75PdZ1fdKGA6coJ7F1uB
+         X0LBuYA3Qd6N5JHnP1YWmx78jtQPTWNBYNl1n9QbFWsPZyMo5A5YI33MbHOGy6AMa0kr
+         N6G5xMhMdW4XsYnsaqedIOtzcUKS/4FQBBcYk1CKJQZ5TmxfzRtvCDk6e3O1M3mNpPj6
+         TEw26UsvPGyJEq1tVgr93XQq8C5R6mF+f39E6Cx38qZeYj0Ygrg4+FjSYOZHL8uOciSS
+         SkLPmtTfMKtyt/p9rH6UgJG+OPqyyfhpffbXOzkHTufba3iK/Bao9hLDYpkp8ludT0gB
+         Vymg==
+X-Forwarded-Encrypted: i=1; AJvYcCV2uByCxh7qaNdcqSbXwd/jMEv7v0yop4ejgY1ZP0kuuPefuhy0WVcoMZhpGyIlHX6MpsRPZvuwO4eSuVlL@vger.kernel.org, AJvYcCV526IcZgZKXcId3zjmEg4UBQytYU8gDWB9irb7Mpe4daysHh0Q++Ig8Vcq4HBQNsY0kGsRm1rQ@vger.kernel.org, AJvYcCWzgicvB8eZcQVZ5Ax04UeCfdTVEgk/5d2bxtLt+Rkv94u46OK+x974vXQhyWi2j5O6zxx0ZDCeITjU@vger.kernel.org
+X-Gm-Message-State: AOJu0YxlGhxjq1PoKt5WrqDXFv/zH67PWbfaEg36ghD7nn07NON4CwOJ
+	S0NheYQ10nvafT6+Iqz3W4IJ28fdG1V4+6dqGAOY+WViOSIFR49BB61l6aMA+3+kZYUHG5/5AHM
+	m1QxZgLg+vGYTkTwyfptLRSV0EGk=
+X-Google-Smtp-Source: AGHT+IH+JxOFEQ+kqwejAXVzFqiU5acSuZcO22SFIm9cfV1KUI4DKv5HE7yFAFL/l0kl3yq2Zo6FvD7AK4hJebj41T0=
+X-Received: by 2002:a05:6870:450b:b0:277:df58:1647 with SMTP id
+ 586e51a60fabf-29051da0aa4mr4481229fac.35.1730061666001; Sun, 27 Oct 2024
+ 13:41:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241025011000.244350-3-inochiama@gmail.com>
+References: <20241011224736.236863-1-linux@treblig.org>
+In-Reply-To: <20241011224736.236863-1-linux@treblig.org>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Sun, 27 Oct 2024 21:40:53 +0100
+Message-ID: <CAOi1vP9au=SqKfmyD79YA3gCGOCj1FjLNJxtF9N_k0cafCJ3uw@mail.gmail.com>
+Subject: Re: [PATCH] libceph: Remove crush deadcode
+To: linux@treblig.org
+Cc: xiubli@redhat.com, ceph-devel@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Oct 25, 2024 at 09:09:58AM +0800, Inochi Amaoto wrote:
-> The GMAC IP on SG2044 is almost a standard Synopsys DesignWare MAC
-> with some extra clock.
-> 
-> Add necessary compatible string for this device.
-> 
-> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
-> ---
+On Sat, Oct 12, 2024 at 12:47=E2=80=AFAM <linux@treblig.org> wrote:
+>
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+>
+> crush_bucket_alg_name(), crush_get_bucket_item_weight(), crush_hash32(),
+> and crush_hash32_5() were added by commit
+> 5ecc0a0f8128 ("ceph: CRUSH mapping algorithm")
+> in 2009 but never used.
+>
+> crush_hash_name() was added a little later by commit
+> fb690390e305 ("ceph: make CRUSH hash function a bucket property")
+> and also not used.
+>
+> Remove them.
 
-This should be squashed with a corrected previous patch (why do you need
-to select snps,dwmac-5.30a?), so we clearly see which the fallback and
-specific compatibles being added.
+Hi David,
 
->  .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
->  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 124 ++++++++++++++++++
->  2 files changed, 125 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
+The implementation of the CRUSH algorithm is shared with userspace and
+these functions are used there (except for crush_hash32_5() perhaps).
+They are all trivial code, so I'd prefer to keep them for convenience.
 
-Best regards,
-Krzysztof
+Thanks,
 
+                Ilya
 
