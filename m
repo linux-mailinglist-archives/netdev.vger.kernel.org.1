@@ -1,47 +1,47 @@
-Return-Path: <netdev+bounces-139399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B3199B2066
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:36:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BE689B206D
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:38:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C09E1F21A26
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:36:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 41D481C208CE
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8272617C7C4;
-	Sun, 27 Oct 2024 20:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82F9017CA09;
+	Sun, 27 Oct 2024 20:38:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdvjmXHB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O08X3fuW"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56656B640;
-	Sun, 27 Oct 2024 20:36:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580E8538A;
+	Sun, 27 Oct 2024 20:38:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730061360; cv=none; b=oUBJWv7akzZqzG6wz4A/HDE7fu0X1SK4CRCc7kqLwlkMHnYwj8BWE4r+Bgw/9DaKtyak1Ef6zhHSvVprUFCyS8/1IJwh4vPQ/mAI5BagnSYEZ1QhMHabkxRpb5lleL3euCWlSC1qcpW7GjesiYLXiCmbKwCj8UG02PwEfZ38BeE=
+	t=1730061484; cv=none; b=rl6r8DfUL1d485mu1msvS7glIv7kUhzpa5g/n4+uNWFtyConwg+IXec3IMqsJ/znztN0xfCc+bgj0+Qhzfkl66EeWT7uo7DxOrJ8iLi0jC63QizTSfCqgHH7iAD41ybjU4/HAJYNxvTU6gSfCPz+wXC8X9jc12TOMe5gYQuNbFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730061360; c=relaxed/simple;
-	bh=6Pmsfn3UxhCWmSXYNuTtCkIJ/1rryCxBFsSk1I6wK2E=;
+	s=arc-20240116; t=1730061484; c=relaxed/simple;
+	bh=XVAi1sk2jxjCgto2tP/Cdm3jLw9qfp50pYIUjyARnkM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XVYePxvbT+iKnQZ0lyw8eI9nmWcNkwzi80EQ6M5HHjAGs0FPttrCYaBEsBS2Y8nM9OaV/WW7E6Hr7mrcrSTjqDoVwi3e6nTrXr2YgfGXkdpl/+nbQwj0oL1UWx+HW4JGkOMRl5UZzgIOuMK08px2OulmRxkaMgrRlovH0I0BjEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GdvjmXHB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D846DC4CEC3;
-	Sun, 27 Oct 2024 20:35:58 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=fxMe863yDiyM0MkWa9XWEESkBGRkd6a/ueFvTcZR3WWr2pflUa755c7d1YszdNCkeGVvv12FNmXypXwLmIf+k5AO+v2og9Yuo3aElan8/gN6p/3OrytQJefct5EZmTOasYhC7PsOip6zNUxtGDuNch6KU9tpOx3sBOTyGyAiANk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O08X3fuW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2625AC4CEC3;
+	Sun, 27 Oct 2024 20:38:03 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730061359;
-	bh=6Pmsfn3UxhCWmSXYNuTtCkIJ/1rryCxBFsSk1I6wK2E=;
+	s=k20201202; t=1730061483;
+	bh=XVAi1sk2jxjCgto2tP/Cdm3jLw9qfp50pYIUjyARnkM=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=GdvjmXHBclQ+H8qDqDMxr5h/OZYeOxS82/fn0aRZvoXukCGft7x+1LDtIQUayJ/hs
-	 aO5+GssudxAnfBqG4biD7EdXt4Jm6YMCb/CW8qi0GKkJfEJJnom0yhuzQbl3SRp7IB
-	 DbajJdz3LcCQ/Y6RaUbWKFnC1dy4JOrZnGoqBW4JLqMQPiWebtF/n2xq8ZAp91afbU
-	 BWI+cUyQ0bfW4HllsfTAQrhdQ4upyKhCx41mZFuxSkyO1vZt5ZIMNnM+mcu1J9TZEx
-	 hrNRM1YcwCKjgd12r3Zd0qkxfGq03GZFokyls7HNHDhUI6Qp/z1OapcYekJzcroe6j
-	 rE0uJrB+65LBA==
-Date: Sun, 27 Oct 2024 21:35:56 +0100
+	b=O08X3fuW1WWmGgVpPvq2rZy29QwVueFD7a87JA3OxX4D4cRxu9+xwVslSvAXnbiwE
+	 dXJ8CBYNDujLFINfeo/3UlJyt6dBeu+qE70+vIVbnCdNRnA0WIn68vwwtSPDoZFUuj
+	 kftqEQ6MaHWbfJhOF6El0+nmBUFJV7dVxmZz+wWfu4WzAj3GMhSxRshUir1PCEKH40
+	 ps5GPx9F6fh2HpunAKbUVDJKrdW4Lids+mBUejeutozM4enLwwFp1NvskHkoIBVLQi
+	 BESj+1NwAsaV4pEwXPcoK7y9+1im0zrI7VWe8yEdFozd4Z463W8rpuH67YLdBixZyK
+	 zN/ArJWIPszeA==
+Date: Sun, 27 Oct 2024 21:38:00 +0100
 From: Krzysztof Kozlowski <krzk@kernel.org>
 To: Inochi Amaoto <inochiama@gmail.com>
 Cc: Chen Wang <unicorn_wang@outlook.com>, 
@@ -57,11 +57,11 @@ Cc: Chen Wang <unicorn_wang@outlook.com>,
 	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
 	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
 	linux-riscv@lists.infradead.org
-Subject: Re: [PATCH v2 1/4] dt-bindings: net: snps,dwmac: Add dwmac-5.30a
- version
-Message-ID: <c7ue72h3wvzgpcr3joqrtchoy4352ibsp63cpqps2y77oek6k4@5nd54nyk6mpx>
+Subject: Re: [PATCH v2 2/4] dt-bindings: net: Add support for Sophgo SG2044
+ dwmac
+Message-ID: <4avwff7m4puralnaoh6pat62nzpovre2usqkmp3q4r4bk5ujjf@j3jzr4p74v4a>
 References: <20241025011000.244350-1-inochiama@gmail.com>
- <20241025011000.244350-2-inochiama@gmail.com>
+ <20241025011000.244350-3-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,29 +70,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241025011000.244350-2-inochiama@gmail.com>
+In-Reply-To: <20241025011000.244350-3-inochiama@gmail.com>
 
-On Fri, Oct 25, 2024 at 09:09:57AM +0800, Inochi Amaoto wrote:
-> Add compatible string for dwmac-5.30a IP.
+On Fri, Oct 25, 2024 at 09:09:58AM +0800, Inochi Amaoto wrote:
+> The GMAC IP on SG2044 is almost a standard Synopsys DesignWare MAC
+> with some extra clock.
+> 
+> Add necessary compatible string for this device.
 > 
 > Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
 > ---
->  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
->  1 file changed, 3 insertions(+)
-> 
-> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> index 4e2ba1bf788c..3c4007cb65f8 100644
-> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
-> @@ -31,6 +31,7 @@ select:
->            - snps,dwmac-4.20a
->            - snps,dwmac-5.10a
->            - snps,dwmac-5.20
-> +          - snps,dwmac-5.30a
 
-Same as for Enclustra patchset... this is incomplete approach. These are
-just fallbacks, visible by "contains" keyword and you should come with
-proper specific compatible. Look how other compatibles are arranged.
+This should be squashed with a corrected previous patch (why do you need
+to select snps,dwmac-5.30a?), so we clearly see which the fallback and
+specific compatibles being added.
+
+>  .../devicetree/bindings/net/snps,dwmac.yaml   |   1 +
+>  .../bindings/net/sophgo,sg2044-dwmac.yaml     | 124 ++++++++++++++++++
+>  2 files changed, 125 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/net/sophgo,sg2044-dwmac.yaml
 
 Best regards,
 Krzysztof
