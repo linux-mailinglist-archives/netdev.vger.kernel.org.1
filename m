@@ -1,123 +1,100 @@
-Return-Path: <netdev+bounces-139398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E70F29B205D
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:31:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3199B2066
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 21:36:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD2D12813D7
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:31:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8C09E1F21A26
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70AB3762E0;
-	Sun, 27 Oct 2024 20:31:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8272617C7C4;
+	Sun, 27 Oct 2024 20:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NmCZo5iF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GdvjmXHB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43578538A;
-	Sun, 27 Oct 2024 20:30:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56656B640;
+	Sun, 27 Oct 2024 20:36:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730061061; cv=none; b=j0tko1hJPeYlmYhAhGSrwBC1KGr6A+KzDDf8DYZpbUMjMd5jCFHvu0kLLMfq6GKE4eM3zKfTfZj4KkCRKkmiw5bUsjwgWnWWMtYC7b4m23SmqyHWBWQiFXV1DdeFGBGaj+Ubu5C5cciFzPjKUt1nNHNOlWyW5hPS9moC3Zg7jao=
+	t=1730061360; cv=none; b=oUBJWv7akzZqzG6wz4A/HDE7fu0X1SK4CRCc7kqLwlkMHnYwj8BWE4r+Bgw/9DaKtyak1Ef6zhHSvVprUFCyS8/1IJwh4vPQ/mAI5BagnSYEZ1QhMHabkxRpb5lleL3euCWlSC1qcpW7GjesiYLXiCmbKwCj8UG02PwEfZ38BeE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730061061; c=relaxed/simple;
-	bh=g0qOuu9oBMe1flwJbOj0ETqlrVdC6doUvyj6Y4MWIJU=;
+	s=arc-20240116; t=1730061360; c=relaxed/simple;
+	bh=6Pmsfn3UxhCWmSXYNuTtCkIJ/1rryCxBFsSk1I6wK2E=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KxR9T6Cf8NhMXSKTuByRYZOOTsn1KL8RtmT80REs88fBd8vAVByGtg5OlBD0jGimrgCdpw0aOmOt8FCDi44Bh4hweS1D1kW2FdJUzNW0Vjaa6StGv4MsRhNnaASnZZQE4ZVBa00f7e5jNxR2ooSBlVW/hvL4koAdtX36eSmAWHs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NmCZo5iF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AA11C4CEC3;
-	Sun, 27 Oct 2024 20:30:59 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=XVYePxvbT+iKnQZ0lyw8eI9nmWcNkwzi80EQ6M5HHjAGs0FPttrCYaBEsBS2Y8nM9OaV/WW7E6Hr7mrcrSTjqDoVwi3e6nTrXr2YgfGXkdpl/+nbQwj0oL1UWx+HW4JGkOMRl5UZzgIOuMK08px2OulmRxkaMgrRlovH0I0BjEI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GdvjmXHB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D846DC4CEC3;
+	Sun, 27 Oct 2024 20:35:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730061059;
-	bh=g0qOuu9oBMe1flwJbOj0ETqlrVdC6doUvyj6Y4MWIJU=;
+	s=k20201202; t=1730061359;
+	bh=6Pmsfn3UxhCWmSXYNuTtCkIJ/1rryCxBFsSk1I6wK2E=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=NmCZo5iFGA1y+uL3wW/0bcrnhx1UBxEVoEJpLLcF6HTtG2VUBSjSbG3NzcEqzMKA0
-	 k8chJH5+oGGqHo+I7nZNxn1dud9nhRvQqo+jqsU/Zh4FxAWWbJfLc1wyTiuyaTNcVb
-	 PD+tXn3iIzdRyQJ/QmHMGIsShKIMA6k9wJatpXHVeBJmFjTpyk0VITjmsfp7GKuuED
-	 l9HaDBCa8SjI0qty5uX7/ykAVZA4JQDcUrWnO3E3jNE9/5FnP6R+kF7OTGkkaqkpwC
-	 i5j0wkoefJKYLi8ZrexHXbW5uGiKfILdA8ttSdF65bzOLVVc76CYIfx/gJiiP4kzWA
-	 8Y7WOBQDlzHNw==
-Date: Sun, 27 Oct 2024 22:30:54 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: Wen Gu <guwen@linux.alibaba.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	David Miller <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Nils Hoppmann <niho@linux.ibm.com>,
-	Niklas Schnell <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-Message-ID: <20241027203054.GB1615717@unreal>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
- <20241027201857.GA1615717@unreal>
+	b=GdvjmXHBclQ+H8qDqDMxr5h/OZYeOxS82/fn0aRZvoXukCGft7x+1LDtIQUayJ/hs
+	 aO5+GssudxAnfBqG4biD7EdXt4Jm6YMCb/CW8qi0GKkJfEJJnom0yhuzQbl3SRp7IB
+	 DbajJdz3LcCQ/Y6RaUbWKFnC1dy4JOrZnGoqBW4JLqMQPiWebtF/n2xq8ZAp91afbU
+	 BWI+cUyQ0bfW4HllsfTAQrhdQ4upyKhCx41mZFuxSkyO1vZt5ZIMNnM+mcu1J9TZEx
+	 hrNRM1YcwCKjgd12r3Zd0qkxfGq03GZFokyls7HNHDhUI6Qp/z1OapcYekJzcroe6j
+	 rE0uJrB+65LBA==
+Date: Sun, 27 Oct 2024 21:35:56 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Chen Wang <unicorn_wang@outlook.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Inochi Amaoto <inochiama@outlook.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Yixun Lan <dlan@gentoo.org>, Longbin Li <looong.bin@gmail.com>, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, 
+	linux-riscv@lists.infradead.org
+Subject: Re: [PATCH v2 1/4] dt-bindings: net: snps,dwmac: Add dwmac-5.30a
+ version
+Message-ID: <c7ue72h3wvzgpcr3joqrtchoy4352ibsp63cpqps2y77oek6k4@5nd54nyk6mpx>
+References: <20241025011000.244350-1-inochiama@gmail.com>
+ <20241025011000.244350-2-inochiama@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241027201857.GA1615717@unreal>
+In-Reply-To: <20241025011000.244350-2-inochiama@gmail.com>
 
-On Sun, Oct 27, 2024 at 10:18:57PM +0200, Leon Romanovsky wrote:
-> On Fri, Oct 25, 2024 at 09:23:55AM +0200, Wenjia Zhang wrote:
-> > Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
-> > alternative to get_netdev") introduced an API ib_device_get_netdev.
-> > The SMC-R variant of the SMC protocol continued to use the old API
-> > ib_device_ops.get_netdev() to lookup netdev. 
+On Fri, Oct 25, 2024 at 09:09:57AM +0800, Inochi Amaoto wrote:
+> Add compatible string for dwmac-5.30a IP.
 > 
-> I would say that calls to ibdev ops from ULPs was never been right
-> thing to do. The ib_device_set_netdev() was introduced for the drivers.
+> Signed-off-by: Inochi Amaoto <inochiama@gmail.com>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> So the whole commit message is not accurate and better to be rewritten.
-> 
-> > As this commit 8d159eb2117b
-> > ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
-> > get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
-> > ib_device_ops.get_netdev didn't work any more at least by using a mlx5
-> > device driver.
-> 
-> It is not a correct statement too. All modern drivers (for last 5 years)
-> don't have that .get_netdev() ops, so it is not mlx5 specific, but another
-> justification to say that SMC-R was doing it wrong.
-> 
-> > Thus, using ib_device_set_netdev() now became mandatory.
-> 
-> ib_device_set_netdev() is mandatory for the drivers, it is nothing to do
-> with ULPs.
-> 
-> > 
-> > Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
-> 
-> It is too late for me to do proper review for today, but I would say
-> that it is worth to pay attention to multiple dev_put() calls in the
-> functions around the ib_device_get_netdev().
-> 
-> > 
-> > Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+> diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> index 4e2ba1bf788c..3c4007cb65f8 100644
+> --- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+> @@ -31,6 +31,7 @@ select:
+>            - snps,dwmac-4.20a
+>            - snps,dwmac-5.10a
+>            - snps,dwmac-5.20
+> +          - snps,dwmac-5.30a
 
-Honestly, this patch in Fixes line doesn't look right to me. It pokes inside
-of ib_device to get netdev index. For example call to smc_ib_ndev_change()
-will return completely unpredictable results, due to races.
+Same as for Enclustra patchset... this is incomplete approach. These are
+just fallbacks, visible by "contains" keyword and you should come with
+proper specific compatible. Look how other compatibles are arranged.
 
-It is bad that RDMA ML wasn't even CCed back then, we would say NAK to
-this patch.
-https://lore.kernel.org/netdev/20201201192049.53517-6-kgraul@linux.ibm.com/
+Best regards,
+Krzysztof
 
-Thanks
 
