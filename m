@@ -1,249 +1,227 @@
-Return-Path: <netdev+bounces-139391-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139392-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC5B09B1EF9
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 15:46:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1DCC49B1FDD
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 20:28:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CFF5C1C2248C
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 14:46:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E1181C20AE0
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 19:28:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C43482CD;
-	Sun, 27 Oct 2024 14:46:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B02D17B50A;
+	Sun, 27 Oct 2024 19:28:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b="MpYlCmCH"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="H90EGbWT"
 X-Original-To: netdev@vger.kernel.org
-Received: from natrix.sarinay.com (natrix.sarinay.com [159.100.251.32])
+Received: from out-181.mta1.migadu.com (out-181.mta1.migadu.com [95.215.58.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D38D168497
-	for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 14:46:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.251.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCA31BF37
+	for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 19:28:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730040394; cv=none; b=J5R8UMrZXVVoZuPljvDiyNSU9n7EaYcLa4Imf9a9rh9rG8lo9HWNQub5IQ/h/LJDlagjIEgl28ze76b5I5kshsUaiwA/x6l0xbdrRenB8Roamn+rkeoo+l2RvZDDA/SKj1iND5R0O4hKyF6DrWDAtV4lTso+GByu0fUNetL/ftQ=
+	t=1730057329; cv=none; b=lAzN2CeTAVsRXLt0wlaS2ogGZwg/jFNq4UCLANDonzwWqJEkAFi8Rd4FTslXTa0f4EkR1ASu3qG0rG14IEnrupqVrnXvYjBGxalWZ3Pj2bALCuEJ7nqVO8lrpdSewq33K4ae1f5CFkmN2v7MuLUvfQZrRsyN7wtBtjXXFkrbd1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730040394; c=relaxed/simple;
-	bh=r5PY9bVlWulUR62TcAHZ0bJOd00p78BNAdxHMaTMQDY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=dEvAQK+CG015NuC6X6A5kmCeUUBD24pcOwkPa5mXuVVONKEGCN5kYxw+mHbDSBWwP9HusTymUjlD6NXcsZisN5SiUSOzdrR9NV7k3tMDwPUudplhOyuNSEZMHvSBD/yr5OMXl1KeogRTe1J3rBOt6h4xuGlSuqnhDFxZW3egdkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com; spf=pass smtp.mailfrom=sarinay.com; dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b=MpYlCmCH; arc=none smtp.client-ip=159.100.251.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sarinay.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sarinay.com; s=2023;
-	t=1730039849; bh=r5PY9bVlWulUR62TcAHZ0bJOd00p78BNAdxHMaTMQDY=;
-	h=From:To:Cc:Subject:Date;
-	b=MpYlCmCH3BkBXQMLxA24FKamvlb8D+N0kStoPCqeHBFAeM21uk9MyZYooGGm5r+xz
-	 gbi3HHAR8CZAhvMu7C8oq3Je5HoknKwRB8hK6+0wd9mlaqc6Q8xB08zmlS1trj00oi
-	 4NyN7BQy9KinTHMJQ9y+H4Y4Czci3MyVVsX41Kl6ft4Y0tmOR/FDEMX33KKzL4Ulk5
-	 LPfxWop8zxhlzn9oT6/hg+89ggZwiO7MVgaegpF3+vII3bRrLThBTa2Ycu+x7DZbc6
-	 Iwrev+YikOAByng/5aB9FqMMbOl2egzcySIAQE/yat7FSbpZVsXRMKccL4WnZgWTKd
-	 IxaUec9+TVCIQ==
-From: =?UTF-8?q?Juraj=20=C5=A0arinay?= <juraj@sarinay.com>
-To: netdev@vger.kernel.org
-Cc: =?UTF-8?q?Juraj=20=C5=A0arinay?= <juraj@sarinay.com>,
-	krzk@kernel.org
-Subject: [PATCH net-next] net: nfc: Propagate ISO14443 type A target ATS to userspace via netlink
-Date: Sun, 27 Oct 2024 15:37:10 +0100
-Message-Id: <20241027143710.5345-1-juraj@sarinay.com>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1730057329; c=relaxed/simple;
+	bh=na5RqGkEZnfKl/taVAsW55k5aIMm/HhhoP69JHNVo4w=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ZBU0z59/NrvZ4q7q4me1jkTkyuiuWQIfzhomFnBTqYu24mzOSRnqUlzsUHoE267fQTpHs3Lj88P6X2eE3jnarIPx7xuVdDcSLoYEDd6FwkeHlN+PsEvC1TFg3jHcHxYbljbbXV684PIKoeFYjUkoR5YGyYSUB/9ShH0qLzfZ8Ss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=H90EGbWT; arc=none smtp.client-ip=95.215.58.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2a7dca47-4107-4bd9-b539-aacdf733f3d4@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730057320;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=DdZnJKOedTRWsKA+yx0HzasB5LXG8yplTAt8DgncFdU=;
+	b=H90EGbWT8vyu3mmQdhIE9QE94gB2tyisxF8QP1UqGSfgy0MeZ6ipltvC8V1+RCDybZwpaq
+	ELSfA3gNVfzNx51ZEWBJI4c9btqWcSLNI1XRtt5wEpHC3Vg0mP7tAcfHtZsQ0Ufg/LdQtM
+	x+m+1T/xdu1cFRcXpDbSZ4IJfxIht20=
+Date: Sun, 27 Oct 2024 20:28:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
+ ib_device_get_netdev()
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+ "D. Wythe" <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+ Alexandra Winter <wintera@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
+ Nils Hoppmann <niho@linux.ibm.com>, Niklas Schnell <schnelle@linux.ibm.com>,
+ Thorsten Winkler <twinkler@linux.ibm.com>,
+ Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>,
+ Aswin K <aswin@linux.ibm.com>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <20241025072356.56093-1-wenjia@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-Add a 20-byte field ats to struct nfc_target and expose it as
-NFC_ATTR_TARGET_ATS via the netlink interface. The payload contains
-'historical bytes' that help to distinguish cards from one another.
-The information is commonly used to assemble an emulated ATR similar
-to that reported by smart cards with contacts.
+在 2024/10/25 9:23, Wenjia Zhang 写道:
+> Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
+> alternative to get_netdev") introduced an API ib_device_get_netdev.
+> The SMC-R variant of the SMC protocol continued to use the old API
+> ib_device_ops.get_netdev() to lookup netdev. As this commit 8d159eb2117b
+> ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
+> get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
 
-Add a 20-byte field target_ats to struct nci_dev to hold the payload
-obtained in nci_rf_intf_activated_ntf_packet() and copy it to over to
-nfc_target.ats in nci_activate_target(). The approach is similar
-to the handling of 'general bytes' within ATR_RES.
+Thanks a lot.
 
-Within NCI, the information corresponds to the 'RATS Response' activation
-parameter that omits the initial length byte TL. This loses no
-information and is consistent with our handling of SENSB_RES that
-also drops the first (constant) byte.
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
 
-Tested with nxp_nci_i2c on a few type A targets including an
-ICAO 9303 compliant passport.
+Because the commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and 
+get_netdev functions") removes the get_netdev callback from 
+mlx5_ib_dev_common_roce_ops, in mlx4, get_netdev is still in 
+mlx4_ib_dev_ops. So the following commit will follow mlx5 to remove 
+get_netdev from mlx4 driver.
 
-I refrain from the corresponding change to digital_in_recv_ats()
-to have the few drivers based on digital.h fill nfc_target.ats,
-as I have no way to test it. That class of drivers appear not to set
-NFC_ATTR_TARGET_SENSB_RES either. Consider a separate patch to propagate
-(all) the parameters.
+ From a59f2e01428640a332a51b8d910ec166704aa441 Mon Sep 17 00:00:00 2001
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+Date: Sun, 27 Oct 2024 20:21:27 +0100
+Subject: [PATCH 1/1] RDMA/mlx4: Use IB get_netdev functions and remove
+  get_netdev callback
 
-Signed-off-by: Juraj Šarinay <juraj@sarinay.com>
+In the commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev
+functions") removed the get_netdev callback from
+mlx5_ib_dev_common_roce_ops, in mlx4, get_netdev callback should also
+be removed.
+
+Signed-off-by: Zhu Yanjun <yanjun.zhu@linux.dev>
 ---
- include/net/nfc/nci_core.h |  4 ++++
- include/net/nfc/nfc.h      |  2 ++
- include/uapi/linux/nfc.h   |  3 +++
- net/nfc/nci/core.c         | 13 ++++++++++++-
- net/nfc/nci/ntf.c          | 30 ++++++++++++++++++++++++++++++
- net/nfc/netlink.c          |  5 +++++
- 6 files changed, 56 insertions(+), 1 deletion(-)
+compile successfully only
+---
+  drivers/infiniband/hw/mlx4/main.c | 35 -------------------------------
+  1 file changed, 35 deletions(-)
 
-diff --git a/include/net/nfc/nci_core.h b/include/net/nfc/nci_core.h
-index ea8595651c38..e180bdf2f82b 100644
---- a/include/net/nfc/nci_core.h
-+++ b/include/net/nfc/nci_core.h
-@@ -265,6 +265,10 @@ struct nci_dev {
- 	/* stored during intf_activated_ntf */
- 	__u8 remote_gb[NFC_MAX_GT_LEN];
- 	__u8 remote_gb_len;
-+
-+	/* stored during intf_activated_ntf */
-+	__u8 target_ats[NFC_ATS_MAXSIZE];
-+	__u8 target_ats_len;
- };
- 
- /* ----- NCI Devices ----- */
-diff --git a/include/net/nfc/nfc.h b/include/net/nfc/nfc.h
-index 3a3781838c67..72be94e5ecb1 100644
---- a/include/net/nfc/nfc.h
-+++ b/include/net/nfc/nfc.h
-@@ -105,6 +105,8 @@ struct nfc_target {
- 	u8 is_iso15693;
- 	u8 iso15693_dsfid;
- 	u8 iso15693_uid[NFC_ISO15693_UID_MAXSIZE];
-+	u8 ats_len;
-+	u8 ats[NFC_ATS_MAXSIZE];
- };
- 
- /**
-diff --git a/include/uapi/linux/nfc.h b/include/uapi/linux/nfc.h
-index 4fa4e979e948..2f5b4be25261 100644
---- a/include/uapi/linux/nfc.h
-+++ b/include/uapi/linux/nfc.h
-@@ -164,6 +164,7 @@ enum nfc_commands {
-  * @NFC_ATTR_VENDOR_SUBCMD: Vendor specific sub command
-  * @NFC_ATTR_VENDOR_DATA: Vendor specific data, to be optionally passed
-  *	to a vendor specific command implementation
-+ * @NFC_ATTR_TARGET_ATS: ISO 14443 type A target Answer To Select
-  */
- enum nfc_attrs {
- 	NFC_ATTR_UNSPEC,
-@@ -198,6 +199,7 @@ enum nfc_attrs {
- 	NFC_ATTR_VENDOR_ID,
- 	NFC_ATTR_VENDOR_SUBCMD,
- 	NFC_ATTR_VENDOR_DATA,
-+	NFC_ATTR_TARGET_ATS,
- /* private: internal use only */
- 	__NFC_ATTR_AFTER_LAST
- };
-@@ -225,6 +227,7 @@ enum nfc_sdp_attr {
- #define NFC_GB_MAXSIZE			48
- #define NFC_FIRMWARE_NAME_MAXSIZE	32
- #define NFC_ISO15693_UID_MAXSIZE	8
-+#define NFC_ATS_MAXSIZE			20
- 
- /* NFC protocols */
- #define NFC_PROTO_JEWEL		1
-diff --git a/net/nfc/nci/core.c b/net/nfc/nci/core.c
-index f456a5911e7d..1ec5955fe469 100644
---- a/net/nfc/nci/core.c
-+++ b/net/nfc/nci/core.c
-@@ -757,6 +757,14 @@ int nci_core_conn_close(struct nci_dev *ndev, u8 conn_id)
- }
- EXPORT_SYMBOL(nci_core_conn_close);
- 
-+static void nci_set_target_ats(struct nfc_target *target, struct nci_dev *ndev)
-+{
-+	if (ndev->target_ats_len > 0) {
-+		target->ats_len = ndev->target_ats_len;
-+		memcpy(target->ats, ndev->target_ats, target->ats_len);
-+	}
-+}
-+
- static int nci_set_local_general_bytes(struct nfc_dev *nfc_dev)
- {
- 	struct nci_dev *ndev = nfc_get_drvdata(nfc_dev);
-@@ -939,8 +947,11 @@ static int nci_activate_target(struct nfc_dev *nfc_dev,
- 				 msecs_to_jiffies(NCI_RF_DISC_SELECT_TIMEOUT));
- 	}
- 
--	if (!rc)
-+	if (!rc) {
- 		ndev->target_active_prot = protocol;
-+		if (protocol == NFC_PROTO_ISO14443)
-+			nci_set_target_ats(target, ndev);
-+	}
- 
- 	return rc;
- }
-diff --git a/net/nfc/nci/ntf.c b/net/nfc/nci/ntf.c
-index 994a0a1efb58..9259a30964cd 100644
---- a/net/nfc/nci/ntf.c
-+++ b/net/nfc/nci/ntf.c
-@@ -531,6 +531,28 @@ static int nci_store_general_bytes_nfc_dep(struct nci_dev *ndev,
- 	return NCI_STATUS_OK;
- }
- 
-+static int nci_store_ats_nfc_iso_dep(struct nci_dev *ndev,
-+				     const struct nci_rf_intf_activated_ntf *ntf)
-+{
-+	ndev->target_ats_len = 0;
-+
-+	if (ntf->activation_params_len <= 0)
-+		return NCI_STATUS_OK;
-+
-+	if (ntf->activation_params.nfca_poll_iso_dep.rats_res_len > NFC_ATS_MAXSIZE) {
-+		pr_debug("ATS too long\n");
-+		return NCI_STATUS_RF_PROTOCOL_ERROR;
-+	}
-+
-+	if (ntf->activation_params.nfca_poll_iso_dep.rats_res_len > 0) {
-+		ndev->target_ats_len = ntf->activation_params.nfca_poll_iso_dep.rats_res_len;
-+		memcpy(ndev->target_ats, ntf->activation_params.nfca_poll_iso_dep.rats_res,
-+		       ndev->target_ats_len);
-+	}
-+
-+	return NCI_STATUS_OK;
-+}
-+
- static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
- 					     const struct sk_buff *skb)
- {
-@@ -660,6 +682,14 @@ static void nci_rf_intf_activated_ntf_packet(struct nci_dev *ndev,
- 			if (err != NCI_STATUS_OK)
- 				pr_err("unable to store general bytes\n");
- 		}
-+
-+		/* store ATS to be reported later in nci_activate_target */
-+		if (ntf.rf_interface == NCI_RF_INTERFACE_ISO_DEP &&
-+		    ntf.activation_rf_tech_and_mode == NCI_NFC_A_PASSIVE_POLL_MODE) {
-+			err = nci_store_ats_nfc_iso_dep(ndev, &ntf);
-+			if (err != NCI_STATUS_OK)
-+				pr_err("unable to store ATS\n");
-+		}
- 	}
- 
- 	if (!(ntf.activation_rf_tech_and_mode & NCI_RF_TECH_MODE_LISTEN_MASK)) {
-diff --git a/net/nfc/netlink.c b/net/nfc/netlink.c
-index dd2ce73a24fb..6a40b8d0350d 100644
---- a/net/nfc/netlink.c
-+++ b/net/nfc/netlink.c
-@@ -96,6 +96,11 @@ static int nfc_genl_send_target(struct sk_buff *msg, struct nfc_target *target,
- 			goto nla_put_failure;
- 	}
- 
-+	if (target->ats_len > 0 &&
-+	    nla_put(msg, NFC_ATTR_TARGET_ATS, target->ats_len,
-+		    target->ats))
-+		goto nla_put_failure;
-+
- 	genlmsg_end(msg, hdr);
- 	return 0;
- 
--- 
-2.39.5
+diff --git a/drivers/infiniband/hw/mlx4/main.c 
+b/drivers/infiniband/hw/mlx4/main.c
+index 529db874d67c..cf34d92de7b1 100644
+--- a/drivers/infiniband/hw/mlx4/main.c
++++ b/drivers/infiniband/hw/mlx4/main.c
+@@ -123,40 +123,6 @@ static int num_ib_ports(struct mlx4_dev *dev)
+         return ib_ports;
+  }
+
+-static struct net_device *mlx4_ib_get_netdev(struct ib_device *device,
+-                                            u32 port_num)
+-{
+-       struct mlx4_ib_dev *ibdev = to_mdev(device);
+-       struct net_device *dev, *ret = NULL;
+-
+-       rcu_read_lock();
+-       for_each_netdev_rcu(&init_net, dev) {
+-               if (dev->dev.parent != ibdev->ib_dev.dev.parent ||
+-                   dev->dev_port + 1 != port_num)
+-                       continue;
+-
+-               if (mlx4_is_bonded(ibdev->dev)) {
+-                       struct net_device *upper;
+-
+-                       upper = netdev_master_upper_dev_get_rcu(dev);
+-                       if (upper) {
+-                               struct net_device *active;
+-
+-                               active = 
+bond_option_active_slave_get_rcu(netdev_priv(upper));
+-                               if (active)
+-                                       dev = active;
+-                       }
+-               }
+-
+-               dev_hold(dev);
+-               ret = dev;
+-               break;
+-       }
+-
+-       rcu_read_unlock();
+-       return ret;
+-}
+-
+  static int mlx4_ib_update_gids_v1(struct gid_entry *gids,
+                                   struct mlx4_ib_dev *ibdev,
+                                   u32 port_num)
+@@ -2544,7 +2510,6 @@ static const struct ib_device_ops mlx4_ib_dev_ops = {
+         .get_dev_fw_str = get_fw_ver_str,
+         .get_dma_mr = mlx4_ib_get_dma_mr,
+         .get_link_layer = mlx4_ib_port_link_layer,
+-       .get_netdev = mlx4_ib_get_netdev,
+         .get_port_immutable = mlx4_port_immutable,
+         .map_mr_sg = mlx4_ib_map_mr_sg,
+         .mmap = mlx4_ib_mmap,
+--
+2.34.1
+
+Zhu Yanjun
+
+> ib_device_ops.get_netdev didn't work any more at least by using a mlx5
+> device driver. Thus, using ib_device_set_netdev() now became mandatory.
+> 
+> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
+> 
+> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
+> Reported-by: Aswin K <aswin@linux.ibm.com>
+> Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
+> Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> ---
+>   net/smc/smc_ib.c   | 8 ++------
+>   net/smc/smc_pnet.c | 4 +---
+>   2 files changed, 3 insertions(+), 9 deletions(-)
+> 
+> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+> index 9297dc20bfe2..9c563cdbea90 100644
+> --- a/net/smc/smc_ib.c
+> +++ b/net/smc/smc_ib.c
+> @@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
+>   	struct ib_device *ibdev = smcibdev->ibdev;
+>   	struct net_device *ndev;
+>   
+> -	if (!ibdev->ops.get_netdev)
+> -		return;
+> -	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
+> +	ndev = ib_device_get_netdev(ibdev, port + 1);
+>   	if (ndev) {
+>   		smcibdev->ndev_ifidx[port] = ndev->ifindex;
+>   		dev_put(ndev);
+> @@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
+>   		port_cnt = smcibdev->ibdev->phys_port_cnt;
+>   		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
+>   			libdev = smcibdev->ibdev;
+> -			if (!libdev->ops.get_netdev)
+> -				continue;
+> -			lndev = libdev->ops.get_netdev(libdev, i + 1);
+> +			lndev = ib_device_get_netdev(libdev, i + 1);
+>   			dev_put(lndev);
+>   			if (lndev != ndev)
+>   				continue;
+> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+> index 1dd362326c0a..8566937c8903 100644
+> --- a/net/smc/smc_pnet.c
+> +++ b/net/smc/smc_pnet.c
+> @@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
+>   		for (i = 1; i <= SMC_MAX_PORTS; i++) {
+>   			if (!rdma_is_port_valid(ibdev->ibdev, i))
+>   				continue;
+> -			if (!ibdev->ibdev->ops.get_netdev)
+> -				continue;
+> -			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
+> +			ndev = ib_device_get_netdev(ibdev->ibdev, i);
+>   			if (!ndev)
+>   				continue;
+>   			dev_put(ndev);
 
 
