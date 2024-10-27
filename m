@@ -1,141 +1,93 @@
-Return-Path: <netdev+bounces-139387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6069B1D5B
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 12:18:25 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BB969B1D8E
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 13:00:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 89A29B21169
-	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 11:18:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7E73B20D44
+	for <lists+netdev@lfdr.de>; Sun, 27 Oct 2024 12:00:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5ACC113D601;
-	Sun, 27 Oct 2024 11:18:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="YJffDRJL"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46B16145A0B;
+	Sun, 27 Oct 2024 12:00:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA278161;
-	Sun, 27 Oct 2024 11:18:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51277152E1C
+	for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 12:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730027897; cv=none; b=cEnDxyGHDwRuXQHDACKLqP5RjMtpDvWHLXs27u5F5ZTiJv6zwE1p9kBog9t8UWGUOeP6GSa8onG9QoL8hNie0lnBxQCDAZhXJcy3PFq9C5kgf3x6XtoHehY/spXbWP244ePnDd5n8I5+B/5sVe7m2r5ueTCap6gUvQLuSlG+h78=
+	t=1730030406; cv=none; b=YEzWIN0KmVnC34+NvRR5g0LVH5BpHi+kiRLAU3lUyQzZ40OHk87LKSECjq9FcBDEOOIAXt/IGu6S3pLgBG1e/n7IHMlHWiVe848LUgQiGHnfx0xCl3hVWinpYL60Ts1YHjpL6I/F39r7PmIDFBg2ZjlmQ8g0D0+bnocvyRhuVfg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730027897; c=relaxed/simple;
-	bh=1t0hPj5j/GoJWCB+D9JDiK6Ur3FebwDE732vMCkQfas=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=jGeFpVRzE56z7MwWPpQVd8RwktPSxquCGcKh5PxmhEIzFCuTiX7V7sm6Ydzxaw3r+p53U/Iv5MMf1dsrpl3APrUAdcDg9KMxJiE8aTqRITQnN+o4d2vFPZq8W8PvYMe92QHJ8BZZ01MKMgJ0ALPIWG0+6u8fAzvEE/HyuBV01/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=YJffDRJL; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730027883; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=SMAOEmNZAtuLgKjy34T7btJXdrvMUuoF7jRJ7UBb9Zg=;
-	b=YJffDRJLNzncT9zQNakw9VLtciuvTQcZ+vwEoqYpv91SgNkz0m8BAEwCpmWDOYEYbZIwUggEngXiKbta2skKrxNxlyeeh6NeJcyxzi4cWJ64lotCCex4kR9MIdBo0vyYRav2a4JeFd9sJekxtGteURedN4NzaB6nQeE38l4uHx8=
-Received: from 30.212.186.15(mailfrom:guwen@linux.alibaba.com fp:SMTPD_---0WHxbQlB_1730027880 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Sun, 27 Oct 2024 19:18:03 +0800
-Message-ID: <456e2ab1-d137-45e0-a130-eef1ffb582a4@linux.alibaba.com>
-Date: Sun, 27 Oct 2024 19:18:00 +0800
+	s=arc-20240116; t=1730030406; c=relaxed/simple;
+	bh=XO1lGRkxLeB+9+Bplf2WMXDq+XPLUt8XczjTuzuUnQ8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=CMbR8xHeAOyRHKJK4kTMx4VJ1z/8SRK4zZ6R0JNoYe3fHBIdKyNAlimdp49wIO3vSuUBcrcm2mltSPfQoCtlzilrQgFct8lQgZnsweKkr1k6t6qecXh6TzAR8U4HLD+9TPPRS0UlLc2/XWuwcOibrkQzxUp2cjmFxc761QlQL30=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a3c90919a2so33746355ab.0
+        for <netdev@vger.kernel.org>; Sun, 27 Oct 2024 05:00:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730030403; x=1730635203;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=no1ZFOGLUySkY+ghDrsyWwT3pLKnG1CnPDNFguvuHe0=;
+        b=IWxE33uXYql82iao3q+xYFN4oNUIhgHNxpUeB+Jl3/nty2fWkeHxcrgDwByV+8AGZ7
+         zx60PFLszibQfAhIC8fqganA5aqiDUc7rGu3mj77n1vaokJH7H8LQK0iImMiVHWyjPwx
+         BSueE77+QJcD5pd7fQ+J3mhKYOAJVMRDVeX2bLdyn9osSZ3xAqaQpPDWqeDRY/is42iY
+         Zudj9Z5xQcR3LT9xKe0Nile2tKWuALUhCVcLDHPbYEr/XwCq8rKIF5KeVlsYPbX4GjeS
+         yNSIq/t96fGScE+4UQ9i9ByO5FlQIr4TZb3LOTGCtCzQvoeDW6sWyGzj19iIY6sD2CYG
+         jziw==
+X-Forwarded-Encrypted: i=1; AJvYcCV0y7J1Spnvx1SZhMXudO7T/0hZlqMQ5ixlHhzuu7Iikloj3mL78Ik96KocP/ukSKfU1kbzRO8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxBzmiSTvT4mjODQeQWkOVjqVi3MbayqevnejAmEgnhv/M+iz7Q
+	Sk8MfnR6zyV/7x4HQZxshhhjEa3qjBPL2rAJR5FbYklmA5kuhgHsP69rgDfgFEfjcsisZ5cGZT1
+	Co4Oyc8yDjXWo6N81Ak5LYYI50ZYrOIRiOSzqf04hMsezHr+saYiYCG4=
+X-Google-Smtp-Source: AGHT+IHN18d5nvGLfk1zOtpizfizKtdkWBBv3m/+dQNMHigd0YvrEMcYJQnZmE4RBIDiNkwypEIJqmOf467eaXwhojoR4OTkPxAl
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-To: Wenjia Zhang <wenjia@linux.ibm.com>, "D. Wythe"
- <alibuda@linux.alibaba.com>, Tony Lu <tonylu@linux.alibaba.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
- Nils Hoppmann <niho@linux.ibm.com>, Niklas Schnell <schnelle@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>,
- Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>,
- Aswin K <aswin@linux.ibm.com>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
-From: Wen Gu <guwen@linux.alibaba.com>
-In-Reply-To: <20241025072356.56093-1-wenjia@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a92:ca08:0:b0:3a0:4e2b:9ab9 with SMTP id
+ e9e14a558f8ab-3a4ed26642amr35233065ab.5.1730030403309; Sun, 27 Oct 2024
+ 05:00:03 -0700 (PDT)
+Date: Sun, 27 Oct 2024 05:00:03 -0700
+In-Reply-To: <66fdd08c.050a0220.40bef.0026.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <671e2b43.050a0220.2b8c0f.01d5.GAE@google.com>
+Subject: Re: [syzbot] [net?] INFO: task hung in genl_rcv_msg (4)
+From: syzbot <syzbot+85d0bec020d805014a3a@syzkaller.appspotmail.com>
+To: bigeasy@linutronix.de, davem@davemloft.net, edumazet@google.com, 
+	kerneljasonxing@gmail.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com, 
+	tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
 
+syzbot has bisected this issue to:
 
+commit d15121be7485655129101f3960ae6add40204463
+Author: Paolo Abeni <pabeni@redhat.com>
+Date:   Mon May 8 06:17:44 2023 +0000
 
-On 2024/10/25 15:23, Wenjia Zhang wrote:
-> Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
-> alternative to get_netdev") introduced an API ib_device_get_netdev.
-> The SMC-R variant of the SMC protocol continued to use the old API
-> ib_device_ops.get_netdev() to lookup netdev. As this commit 8d159eb2117b
-> ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
-> get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
-> ib_device_ops.get_netdev didn't work any more at least by using a mlx5
-> device driver. Thus, using ib_device_set_netdev() now became mandatory.
-> 
-> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
-> 
-> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
-> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
-> Reported-by: Aswin K <aswin@linux.ibm.com>
-> Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
-> Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+    Revert "softirq: Let ksoftirqd do its job"
 
-LGTM!
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1492cca7980000
+start commit:   c2ee9f594da8 KVM: selftests: Fix build on on non-x86 archi..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=1292cca7980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=fd919c0fc1af4272
+dashboard link: https://syzkaller.appspot.com/bug?extid=85d0bec020d805014a3a
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12d40230580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=16d40230580000
 
-Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+Reported-by: syzbot+85d0bec020d805014a3a@syzkaller.appspotmail.com
+Fixes: d15121be7485 ("Revert "softirq: Let ksoftirqd do its job"")
 
-> ---
->   net/smc/smc_ib.c   | 8 ++------
->   net/smc/smc_pnet.c | 4 +---
->   2 files changed, 3 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 9297dc20bfe2..9c563cdbea90 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
->   	struct ib_device *ibdev = smcibdev->ibdev;
->   	struct net_device *ndev;
->   
-> -	if (!ibdev->ops.get_netdev)
-> -		return;
-> -	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
-> +	ndev = ib_device_get_netdev(ibdev, port + 1);
->   	if (ndev) {
->   		smcibdev->ndev_ifidx[port] = ndev->ifindex;
->   		dev_put(ndev);
-> @@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
->   		port_cnt = smcibdev->ibdev->phys_port_cnt;
->   		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
->   			libdev = smcibdev->ibdev;
-> -			if (!libdev->ops.get_netdev)
-> -				continue;
-> -			lndev = libdev->ops.get_netdev(libdev, i + 1);
-> +			lndev = ib_device_get_netdev(libdev, i + 1);
->   			dev_put(lndev);
->   			if (lndev != ndev)
->   				continue;
-> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-> index 1dd362326c0a..8566937c8903 100644
-> --- a/net/smc/smc_pnet.c
-> +++ b/net/smc/smc_pnet.c
-> @@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
->   		for (i = 1; i <= SMC_MAX_PORTS; i++) {
->   			if (!rdma_is_port_valid(ibdev->ibdev, i))
->   				continue;
-> -			if (!ibdev->ibdev->ops.get_netdev)
-> -				continue;
-> -			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
-> +			ndev = ib_device_get_netdev(ibdev->ibdev, i);
->   			if (!ndev)
->   				continue;
->   			dev_put(ndev);
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
