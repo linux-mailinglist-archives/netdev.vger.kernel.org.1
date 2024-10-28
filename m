@@ -1,136 +1,267 @@
-Return-Path: <netdev+bounces-139445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F529B28D5
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 08:35:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 263F69B2901
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 08:43:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 13B341F21F8D
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 07:35:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AC43C1F217E9
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 07:43:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7187A1D934B;
-	Mon, 28 Oct 2024 07:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F19198836;
+	Mon, 28 Oct 2024 07:33:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c9F/kH/S"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bz6Zd+Sk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 671BE1D7E4A
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 07:30:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB919190696;
+	Mon, 28 Oct 2024 07:33:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730100643; cv=none; b=u+mJDMdOe5FHvyiiYCKPM/28Ygak1YRQFrpGU6ATSe7NTBf9cDyf0b53/gKayhEJ9Pje95IXgRQzM7DxvorAa6QVrFJL0pzWi9CJuNpUuB/DcdfYIq4Zykm0pXhtuQ0GVl8HdHEv6hYCaQC60tZpbsX/Aozmff6ZjACnqFZnu8Q=
+	t=1730100803; cv=none; b=N5WQamEbWM/oBgujfv6eZDdXo2aNshJQ6ZmUiw8lv2a6qrh8bzpdN6k1pxzsb549BeHWuyeuLOkGzRzHtZGv6qQaCrLDbeJbmKBHd9U3pCQAe/35TwqSXWPyU5WYMBRBpMD7DQwauxXprlPBCdIQl8Oga0EnTipnbURLjcOzOtA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730100643; c=relaxed/simple;
-	bh=vgc1Ys9QkOqUWQKYHzFMYSA3Go6hm/nnPiQ2TU1a1TM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=QGa8HUs8awUIFjDne3t2iCZMAPvR6JMGAyUZegpSnyMUbe359vvSLjWIn25utD4InmLz4JD5JwQOU/NxIwI6Y0pL99YKI/zZ7ggRXEulZWAw1E/66V5qTQs5IvhQ9xwqt9DSadVgAQYyTdKGZUtTuzlG8C+CQuU+QV1lY2aTLIY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c9F/kH/S; arc=none smtp.client-ip=209.85.214.174
+	s=arc-20240116; t=1730100803; c=relaxed/simple;
+	bh=RviHbXVg4aARHNlWk9U+W3hQID5NFafUc/tc+ztHxK8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=GIlHTYOv78vY338cbktV+bEh6SYECrCu8TqY+P8CPj8LschbIUGBOjYfKSWDAtEe9YyJUSiLodibEkTZR1aWD9uVbXKLQlgJNbOaafmJlpSg3o/JrA9Pu9VpHczwhcx1DZh95jc/ePfou/0PYgRwqJJK2ADpZnEAftP6PCO6kVw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bz6Zd+Sk; arc=none smtp.client-ip=209.85.219.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20b5affde14so27363445ad.3
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 00:30:41 -0700 (PDT)
+Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e291f1d659aso4294899276.3;
+        Mon, 28 Oct 2024 00:33:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730100640; x=1730705440; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=vQpKY05JOYjPURTPx5+mIgiP69yD+/zLK9ykR+kpvfU=;
-        b=c9F/kH/S7zVyP027ApRdKiIvuErkqAH0uS4f9YEdoPqxVd6BHVKKetFsVcIxx7emDF
-         zL/Gn7PUt4A2ywAU4NshdlgUodReR1d1JHbCJ/752s87LO7nNx5IKq9ktqS3LuZKnBwr
-         7VMYqBCtMmN4l19SM1U0+CZ7uyKc2ShX4mJxI3zc3GXqsQNlwq61hLG3IrSVEI/pz9jZ
-         pYQ+ehQRu7/2ffPYYauddS/pdHOyZqedmEcVsxFRNFsMb1CnAL7gRQgMVScEw4TKlQ7B
-         +gluJUH8JiA6aeNSB0hlE6VOl6WzXBRe5zu64FZ7k+fkh9b0DMQLK2UjHoOe1Y+iyeob
-         M22Q==
+        d=gmail.com; s=20230601; t=1730100800; x=1730705600; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=EmD4Y6Va5h86h4YozU3etDyKxL8PIyLAaGGMpTw61LM=;
+        b=Bz6Zd+SknoB3AK3as/QmeVMSfPYULcIpiLzsdhj3cgJHPM0qu+UPsK4aNw5AqihNp6
+         36oH33EHHBmGROWuXx5BzOlkYYNX/79Ld9d/eMcjhxJDho2dSyfee3WAIArjrkJ4AS3s
+         /Az0Z9xc3btgKeH7ZHxHHA7UNbBMuYsCplNHIMwvDJ4XBnJDN6iZGB3WlKHupg9cgZuL
+         sxwdUIU7O8owWCUlp7RU60TS6fLFfR/pN6iMlLZ9ibPNc9qxGFblGZX43AaAIWzNewvq
+         2/VaiHO9403Y4acl9N02H3Eobc0QPc36S/GtQOlEf3v0DyApiwXiS7RSEH2hcbGOPwdj
+         UmAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730100640; x=1730705440;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=vQpKY05JOYjPURTPx5+mIgiP69yD+/zLK9ykR+kpvfU=;
-        b=jWX4w412IljcKPhMYW9r72mie3mJVP3U++Tg5N+PGLSkRIJjcOdGslttWnl97TwMqQ
-         7qqA90IK2a3M3NhZCiZRzN7l9BxjLFDT2UaSNdyJcrIrtqgU+svthQ23JG3cRjSEzhos
-         k5vCEYFUfDd4ZxODTQK2WXwsQGPB4dt8++3GJoHQsrv3fXzIXieSJfQhCntP85H5T1bv
-         kmEzvk+Zn6BlcZEXelilXt6Tkx/1eh37C3eA8GgIv7AngxA93NhrE51qx3sTCcVUvcMm
-         cUbHHyNOvrmMpaPqG91uhPsk+iWKjrbi0caUa6vU19b27JqB0vjvgnrmjN3RC9jLeFSq
-         Wlzw==
-X-Gm-Message-State: AOJu0Yz9M4Wo3+hRUrFCJ5e/lE4FeCZfosMYUzELThUTuBI3qWqJmnkq
-	mUjgvvIa1a/e3h1gclWIXWCwqynWPpNADTrrZEBjGxRSKGNihT8a+0G9bchA
-X-Google-Smtp-Source: AGHT+IG6Z7wprymZITZX9ht6+gTXW4oYosIHVkICug2xUmTPYybbwDluebNPlHjwGju13EkHTSJBCw==
-X-Received: by 2002:a17:903:41c4:b0:20c:6b11:deef with SMTP id d9443c01a7336-210c6c3692dmr101371385ad.48.1730100640505;
-        Mon, 28 Oct 2024 00:30:40 -0700 (PDT)
-Received: from localhost ([2402:7500:488:6621:2441:dc7a:ff1b:984a])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc08883esm45645735ad.301.2024.10.28.00.30.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 00:30:40 -0700 (PDT)
-From: wojackbb@gmail.com
-To: netdev@vger.kernel.org
-Cc: chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org,
-	ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org,
-	matthias.bgg@gmail.com,
-	Jack Wu <wojackbb@gmail.com>
-Subject: [PATCH] [net] net: wwan: t7xx: Change PM_AUTOSUSPEND_MS to 5000
-Date: Mon, 28 Oct 2024 15:30:15 +0800
-Message-Id: <20241028073015.692794-1-wojackbb@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20230601; t=1730100800; x=1730705600;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=EmD4Y6Va5h86h4YozU3etDyKxL8PIyLAaGGMpTw61LM=;
+        b=agb+i/2TNS52JnoEtsQZ8ejN6T2MccUo1jJij7riLDF5hIV9pQ/ovU2YKzy7MdHzrG
+         3wzrPQJZVjksIckW3QuSd03nadcuaRDQvOjgAmfD2js6c8scCWg2wcoM+KqANN3qeAfi
+         WhPjQtwjlPZ0NB/+VWhnKb0jKXYVRyDvQr3HOV0xzQTLt1kNQ4tj86F2zq0PFoBPmlPv
+         jVQSZyV390us+QzxAV7WWA96n+5WzMqiIxEYTt0kSTmnAIzh7nJUP7IzZN597Kvqh9o8
+         I3XmWoJaQJadOEqYUnbJ/oNmOjkAMG0uvNYY7rpscmfimZkeAQmA4SUww6hoA/yhdGn/
+         VHAA==
+X-Forwarded-Encrypted: i=1; AJvYcCUD7CKzCU/dPzPDhAvMCJin1GwxVkrXDgHewm/e57uLAeXJ44+HkCHP17s+fo1bSpG5xsUbxT4u8C2n@vger.kernel.org, AJvYcCUT4C5Yr7IU2Qukg6CJMS2ROR+nTSzkV9HwacyYOWwGQdmBdCARFslON3tJhkc2Umsjyx/Q2RCzjvQoIxjH8vI=@vger.kernel.org, AJvYcCUbF8rLDEX0+UfySXiieYklUpCxj9HT39OTLMVztluGaNRvW0j38bDeKhVBQU9khGTUX6R0ezpvsbpLqA==@vger.kernel.org, AJvYcCVNx4UpMpywMAUAUFI3E2B7viZa7AJRmETEkOIzpPHTlKg+R/CtEVm9pfYbQMTFbwNNq/nYUUUJJ2/u@vger.kernel.org, AJvYcCWL5jEFt6GlOnso7d4G6rkSpxqbZpvJ3qk0zEhU2BWeBBG56u1oIRriLmnwVyAW9TR1HbSe3M47r3S4@vger.kernel.org, AJvYcCWLEQvGuLbbK3zbphkwiAsmXkLBHS0tIgGqGaQX0mR1Tz+ZsUajEsFxdFS8R8PFcGtpC35sv5C/wZ5V0Jlp@vger.kernel.org, AJvYcCWLvS4B6RH49SYc83AjSRPkotR+rHbQ+n6lrvNOvwP5ylXYbz46HUORD/yijJZwb3p6QLweXyjn@vger.kernel.org, AJvYcCX+Krirz/ol0gIQ+S268Sx90+rOrYd9wIMfZQWPavaPFNTpbloB94r6i4n4DJTSe0/zXbq1hitcq2g=@vger.kernel.org, AJvYcCXestpztd0JqOL6KlenZgRiBxQ+uITi9gXLvZVYV70WzUUus4W5VDiJipczL0e/3NZLDTjaKtlN1h+JIMY=@vger.kernel.org, AJvYcCXivYBnulxGzmepTusxdD7LMq4t3uAz
+ laax3gv6QCw4AY7fxJkLDmQa9hglx29q/vb5ik3Dfg8z7Us2@vger.kernel.org
+X-Gm-Message-State: AOJu0YxOh2B2AriiLxF0zJpAFUtNuETLcAO61D2EYnANwBA74i7EnI5q
+	2GtAMApREzraOZsqAGlfHQpM4XHNUlX3h161HG/oi6lU3pJbaYREe7nyQa+FZp9PI5QroT77Z41
+	+A3JZ2hhfWHmbcF5mnVIG9Ya3ZmI=
+X-Google-Smtp-Source: AGHT+IGWKJrn++YBgDCSaI8RtF5NbSOLRBnLLd6z4rf2/IzbB7PGrSfzjRdpWTjZWr4Bqwzd+4ahYyocYMMp0nS+UFs=
+X-Received: by 2002:a05:6902:2101:b0:e29:310a:6878 with SMTP id
+ 3f1490d57ef6-e3087a46b97mr4570767276.3.1730100799666; Mon, 28 Oct 2024
+ 00:33:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-2-tmyu0@nuvoton.com>
+ <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
+ <CAOoeyxUhnyYG3p+DQJG-tvU5vc5WYQZLLqCXW=uPcXTjq2gVfw@mail.gmail.com>
+ <20241025-truthful-honest-newt-c371c8-mkl@pengutronix.de> <CAOoeyxUEf5vjqL67WjR-DbrhE0==2hqHLEyZ5XEBhEfMfQ5pag@mail.gmail.com>
+ <20241025-spirited-nocturnal-antelope-ce93dd-mkl@pengutronix.de>
+In-Reply-To: <20241025-spirited-nocturnal-antelope-ce93dd-mkl@pengutronix.de>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Mon, 28 Oct 2024 15:33:08 +0800
+Message-ID: <CAOoeyxW5QwPMGAYCWhQDtZwJJLG5xj9HXpL3-cduRSgF+4VHhg@mail.gmail.com>
+Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
+	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
+	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Jack Wu <wojackbb@gmail.com>
+Dear Marc,
 
-Because optimizing the power consumption of t7XX,
-change auto suspend time to 5000.
+Thank you for your comments,
 
-The Tests uses a script to loop through the power_state
-of t7XX.
-(for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
+Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=8825=
+=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=888:24=E5=AF=AB=E9=81=93=EF=BC=
+=9A
+>
+> On 25.10.2024 19:03:55, Ming Yu wrote:
+> > Oh! I'm sorry about that I confused the packet size.
+> > The NCT6694 bulk maximum packet size is 256 bytes,
+> > and USB High speed bulk maximum packet size is 512 bytes.
+> >
+> > Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=
+=8825=E6=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=886:08=E5=AF=AB=E9=81=93=
+=EF=BC=9A
+> > >
+> > > On 25.10.2024 16:08:10, Ming Yu wrote:
+> > > > > > +int nct6694_read_msg(struct nct6694 *nct6694, u8 mod, u16 offs=
+et, u16 length,
+> > > > > > +                  u8 rd_idx, u8 rd_len, unsigned char *buf)
+> > > > >
+> > > > > why not make buf a void *?
+> > > >
+> > > > [Ming] I'll change the type in the next patch.
+> > > >
+> > > > >
+> > > > > > +{
+> > > > > > +     struct usb_device *udev =3D nct6694->udev;
+> > > > > > +     unsigned char err_status;
+> > > > > > +     int len, packet_len, tx_len, rx_len;
+> > > > > > +     int i, ret;
+> > > > > > +
+> > > > > > +     mutex_lock(&nct6694->access_lock);
+> > > > > > +
+> > > > > > +     /* Send command packet to USB device */
+> > > > > > +     nct6694->cmd_buffer[REQUEST_MOD_IDX] =3D mod;
+> > > > > > +     nct6694->cmd_buffer[REQUEST_CMD_IDX] =3D offset & 0xFF;
+> > > > > > +     nct6694->cmd_buffer[REQUEST_SEL_IDX] =3D (offset >> 8) & =
+0xFF;
+> > > > > > +     nct6694->cmd_buffer[REQUEST_HCTRL_IDX] =3D HCTRL_GET;
+> > > > > > +     nct6694->cmd_buffer[REQUEST_LEN_L_IDX] =3D length & 0xFF;
+> > > > > > +     nct6694->cmd_buffer[REQUEST_LEN_H_IDX] =3D (length >> 8) =
+& 0xFF;
+> > > > > > +
+> > > > > > +     ret =3D usb_bulk_msg(udev, usb_sndbulkpipe(udev, BULK_OUT=
+_ENDPOINT),
+> > > > > > +                        nct6694->cmd_buffer, CMD_PACKET_SZ, &t=
+x_len,
+> > > > > > +                        nct6694->timeout);
+> > > > > > +     if (ret)
+> > > > > > +             goto err;
+> > > > > > +
+> > > > > > +     /* Receive response packet from USB device */
+> > > > > > +     ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, BULK_IN_=
+ENDPOINT),
+> > > > > > +                        nct6694->rx_buffer, CMD_PACKET_SZ, &rx=
+_len,
+> > > > > > +                        nct6694->timeout);
+> > > > > > +     if (ret)
+> > > > > > +             goto err;
+> > > > > > +
+> > > > > > +     err_status =3D nct6694->rx_buffer[RESPONSE_STS_IDX];
+> > > > > > +
+> > > > > > +     /*
+> > > > > > +      * Segmented reception of messages that exceed the size o=
+f USB bulk
+> > > > > > +      * pipe packets.
+> > > > > > +      */
+> > > > >
+> > > > > The Linux USB stack can receive bulk messages longer than the max=
+ packet size.
+> > > >
+> > > > [Ming] Since NCT6694's bulk pipe endpoint size is 128 bytes for thi=
+s MFD device.
+> > > > The core will divide packet 256 bytes for high speed USB device, bu=
+t
+> > > > it is exceeds
+> > > > the hardware limitation, so I am dividing it manually.
+> > >
+> > > You say the endpoint descriptor is correctly reporting it's max packe=
+t
+> > > size of 128, but the Linux USB will send packets of 256 bytes?
+> >
+> > [Ming] The endpoint descriptor is correctly reporting it's max packet
+> > size of 256, but the Linux USB may send more than 256 (max is 512)
+> > https://elixir.bootlin.com/linux/v6.11.5/source/drivers/usb/host/xhci-m=
+em.c#L1446
+>
+> AFAIK according to the USB-2.0 spec the maximum packet size for
+> high-speed bulk transfers is fixed set to 512 bytes. Does this mean that
+> your device is a non-compliant USB device?
 
-* If Auto suspend is 20 seconds,
-  test script show power_state have 0~5% of the time was in D3 state
-  when host don't have data packet transmission.
+We will reduce the endpoint size of other interfaces to ensure that MFD dev=
+ice
+meets the USB2.0 spec. In other words, I will remove the code for manual
+unpacking in the next patch.
 
-* Changed auto suspend time to 5 seconds,
-  test script show power_state have 50%~80% of the time was in D3 state
-  when host don't have data packet transmission.
+>
+> > > > > > +     for (i =3D 0, len =3D length; len > 0; i++, len -=3D pack=
+et_len) {
+> > > > > > +             if (len > nct6694->maxp)
+> > > > > > +                     packet_len =3D nct6694->maxp;
+> > > > > > +             else
+> > > > > > +                     packet_len =3D len;
+> > > > > > +
+> > > > > > +             ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(udev, =
+BULK_IN_ENDPOINT),
+> > > > > > +                                nct6694->rx_buffer + nct6694->=
+maxp * i,
+> > > > > > +                                packet_len, &rx_len, nct6694->=
+timeout);
+> > > > > > +             if (ret)
+> > > > > > +                     goto err;
+> > > > > > +     }
+> > > > > > +
+> > > > > > +     for (i =3D 0; i < rd_len; i++)
+> > > > > > +             buf[i] =3D nct6694->rx_buffer[i + rd_idx];
+> > > > >
+> > > > > memcpy()?
+> > > > >
+> > > > > Or why don't you directly receive data into the provided buffer? =
+Copying
+> > > > > of the data doesn't make it faster.
+> > > > >
+> > > > > On the other hand, receiving directly into the target buffer mean=
+s the
+> > > > > target buffer must not live on the stack.
+> > > >
+> > > > [Ming] Okay! I'll change it to memcpy().
+> > >
+> > > fine!
+> > >
+> > > > This is my perspective: the data is uniformly received by the rx_bf=
+fer held
+> > > > by the MFD device. does it need to be changed?
+> > >
+> > > My question is: Why do you first receive into the nct6694->rx_buffer =
+and
+> > > then memcpy() to the buffer provided by the caller, why don't you
+> > > directly receive into the memory provided by the caller?
+> >
+> > [Ming] Due to the bulk pipe maximum packet size limitation, I think con=
+sistently
+> > using the MFD'd dynamically allocated buffer to submit URBs will better
+> > manage USB-related operations
+>
+> The non-compliant max packet size limitation is unrelated to the
+> question which RX or TX buffer to use.
 
-Signed-off-by: Jack Wu <wojackbb@gmail.com>
----
- drivers/net/wwan/t7xx/t7xx_pci.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I think these two USB functions can be easily called using the buffer
+dynamically
+allocated by the MFD. However, if they transfer data directly to the
+target buffer,
+they must ensure that it is not located on the stack.
 
-diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
-index e556e5bd49ab..dcadd615a025 100644
---- a/drivers/net/wwan/t7xx/t7xx_pci.c
-+++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-@@ -48,7 +48,7 @@
- #define T7XX_INIT_TIMEOUT		20
- #define PM_SLEEP_DIS_TIMEOUT_MS		20
- #define PM_ACK_TIMEOUT_MS		1500
--#define PM_AUTOSUSPEND_MS		20000
-+#define PM_AUTOSUSPEND_MS		5000
- #define PM_RESOURCE_POLL_TIMEOUT_US	10000
- #define PM_RESOURCE_POLL_STEP_US	100
- 
--- 
-2.34.1
+>
+> regards,
+> Marc
+>
+> --
+> Pengutronix e.K.                 | Marc Kleine-Budde          |
+> Embedded Linux                   | https://www.pengutronix.de |
+> Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
 
+Ming
 
