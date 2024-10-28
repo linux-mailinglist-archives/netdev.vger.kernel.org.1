@@ -1,92 +1,89 @@
-Return-Path: <netdev+bounces-139726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139725-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD54B9B3E89
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:36:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C588E9B3E88
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:35:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5869A1F232D2
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:36:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70F2C1F232C8
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:35:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C61F1F9AB8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 371791F4297;
 	Mon, 28 Oct 2024 23:35:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="prgVaey4"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eARBvlbQ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DE61DEFF3;
-	Mon, 28 Oct 2024 23:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D871925B3
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 23:35:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730158557; cv=none; b=QdOzEXNYWdfAI+01YL+PS9/M7LG0xW3isrP8sZHMWb3TDDPrzZXmb1mS3k1y4+P/VVVXnsqS6YM84G0MXj7lA4lI7C40R1eW1Kx56zb/T+L/YOlUFM6c9z/wV8xyjUdqEp3EHZGCUrT7hPb5C18jeSVEv8V+H/EOEU6ZefhJmDA=
+	t=1730158557; cv=none; b=bKcH0rAmqSU7Bvi2zMizHlXZYgdFrDTa9xbIxEDStHhSggJW6roxy7y+73Mf4X3WDppMB+oRfSyRoPuPsdnIOlLWtF6JAxKrBxV1eSaVaaHMfHo7RYPJgPZvVcmp8LhROcsP69G2/foFgCrH2eZCpKpXn0os+Cfaq7o+MNm0ypk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730158557; c=relaxed/simple;
-	bh=W8pfZA6viHHs7pAzU1HH7Szrm0NhNriF9ySxCegfBKU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTmMgTycpNnPZQKtx0Q8pQ7WAlpTUoOaIWoNl11htUZMHalTenbez0nnUuuhao1zD7Hq60eVjWkPVdfdaF75Lgbe9Gaj40oO8hlsvDsH63hXCR7YNMCixMrShB8UoVK5GTS3fwfZpZNugFp0WMmcijyeGxisUib0zYzBkEMSdoE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=prgVaey4; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFB3FC4CEE4;
-	Mon, 28 Oct 2024 23:35:56 +0000 (UTC)
+	bh=fkLMbkIxAejWolRuV1tnlNKnWWmQN/5nlOolceYpGuw=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QbXZB3IK7YcSV9dNPCQI/HxDiEQRShAIQg6UOQVBJv5LU53joVx+ebYdfXllYbCU/n1JOf9nohR5/JlC1cpDDaSJrN9Xbxe+BS3n2gMblw4DmM9VAR8LpubEV5Hxd9vDGw/n7Xwm91buxJFZHkKAbUYA++Hih8OxOZG6NeX7k68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eARBvlbQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F148AC4CEC3;
+	Mon, 28 Oct 2024 23:35:55 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1730158556;
-	bh=W8pfZA6viHHs7pAzU1HH7Szrm0NhNriF9ySxCegfBKU=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=prgVaey474iHPt6HYLMSg2uJPxffSYIyIZvoqws18LwgAOyM2w7xP8dnzqK0mpYyt
-	 2SS9A5yjZIcn62mKMJc9vkfX2by1wXDsETO1LtO72QKZ4E/DF2HK2ETYS7y9GLea5J
-	 SAOldJdTRA8fBh46bBLA5gLLg222gcFFK3lerTx3qyytVOP1llYDUo8CCovsAG42N/
-	 RVZKlT43LETpa/eolyNkatl4rgz4Eb//Zla5rk/ChxPvxBQA83KboP8cZUej/d0g+n
-	 lN5h/AaZGzV9cHdItsW76mgIncNEQAjJS4ImO6LY6aIeEdnrwhj8yQU1/PgZLioHbZ
-	 JVBvTLAJupwoA==
-Date: Mon, 28 Oct 2024 16:35:53 -0700
-From: Kees Cook <kees@kernel.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v2 3/4][next] uapi: net: arp: Avoid
- -Wflex-array-member-not-at-end warnings
-Message-ID: <202410281635.3BC028D@keescook>
-References: <cover.1729802213.git.gustavoars@kernel.org>
- <903f37962945fe0aa46e1d05c2a05f39571a53fa.1729802213.git.gustavoars@kernel.org>
+	bh=fkLMbkIxAejWolRuV1tnlNKnWWmQN/5nlOolceYpGuw=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=eARBvlbQbmiHnLKPcsC6o4Wn26OZd0KfV7B9LSH4cRi7ntd2wfYgBz6KPVujOxd0y
+	 GkpIMQxNa2o9bccy4Z6z82cVXFKmvFFKX+kkW4hyFpXEQuVsW+zM4AqoFe5+qzWX1f
+	 edOxyhlB6pU36KitT5cN4DvOrqUpDM7QiZGhirtN7BBRRfkAsUKAVq0Py6/Ktil3j1
+	 32owmWN34e7kRtQ+rFwvkDoSSScEaJ1buzbcCbZ7l7p2LaNQYSKgvfTEj+mnyxWuaa
+	 8I/ovJ3jVBv4czWX4sCxnrH4Q96+tnmbvhJNcIsopE0cssVA/DvAwA+qWXgRl8/OBN
+	 qtuE+Ah2asw5g==
+Date: Mon, 28 Oct 2024 16:35:54 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, <netdev@vger.kernel.org>,
+ <alexanderduyck@fb.com>, <andrew@lunn.ch>, <andrew+netdev@lunn.ch>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <kernel-team@meta.com>, <sanmanpradhan@meta.com>, <sdf@fomichev.me>,
+ <vadim.fedorenko@linux.dev>
+Subject: Re: [PATCH net-next v2] eth: fbnic: Add support to write TCE TCAM
+ entries
+Message-ID: <20241028163554.7dddff8b@kernel.org>
+In-Reply-To: <5a640b00-2ab2-472f-b713-1bb97ceac6ca@intel.com>
+References: <20241024223135.310733-1-mohsin.bashr@gmail.com>
+	<5a640b00-2ab2-472f-b713-1bb97ceac6ca@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <903f37962945fe0aa46e1d05c2a05f39571a53fa.1729802213.git.gustavoars@kernel.org>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 24, 2024 at 03:13:45PM -0600, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
+On Fri, 25 Oct 2024 17:19:03 +0200 Alexander Lobakin wrote:
+> > +static void fbnic_clear_tce_tcam_entry(struct fbnic_dev *fbd, unsigned int idx)
+> > +{
+> > +	int i;
+> > +
+> > +	/* Invalidate entry and clear addr state info */
+> > +	for (i = 0; i <= FBNIC_TCE_TCAM_WORD_LEN; i++)  
 > 
-> Address the following warnings by changing the type of the middle struct
-> members in a couple of composite structs, which are currently causing
-> trouble, from `struct sockaddr` to `struct __kernel_sockaddr_legacy`.
+> Please declare loop iterators right in loop declarations, we're GNU11
+> for a couple years already.
 > 
-> include/uapi/linux/if_arp.h:118:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:119:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:121:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:126:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/if_arp.h:127:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> Also, refactor some related code, accordingly.
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> 	for (u32 i = 0; ...
 
-Reviewed-by: Kees Cook <kees@kernel.org>
+Why?
 
--- 
-Kees Cook
+Please avoid giving people subjective stylistic feedback, especially
+when none of the maintainers have given such feedback in the past.
+
+> (+ don't use signed when it can't be < 0)
+
+Again, why. int is the most basic type in C, why is using a fixed side
+kernel type necessary here?
 
