@@ -1,101 +1,94 @@
-Return-Path: <netdev+bounces-139707-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139708-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C95D39B3E0B
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:53:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B312A9B3E2B
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:00:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 80B591F23001
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 22:53:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 753BB282ECE
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:00:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5381EE015;
-	Mon, 28 Oct 2024 22:53:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 51A501CCEE6;
+	Mon, 28 Oct 2024 23:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="W7BBxUbC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ViC3EG1l"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4424B18C02D;
-	Mon, 28 Oct 2024 22:53:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18D58188CDC;
+	Mon, 28 Oct 2024 23:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730155996; cv=none; b=IB2TderYuoHrZnFarcsifN+FFfeW0wXhxJk+xUWnfTtKgvjBZ2RGB2qKxVE2XfK25X3xDLRmUEfMgWAojfvHNIKdAp1nFmYAckD9Eoxboww2rHOQ14PQfoFIDT0hx5YuTNQWcgG+bJntv/8ZHQbdv2q7li7ZTdnogTn0pBkk4vQ=
+	t=1730156425; cv=none; b=sbDytxEJ/Yfrl+xQ484gUmJNYqjGPHySBlhvLM4xXepZSmQUbTvpF3Zj+rtqfWWr6Te1ZaR1xyVgXJtsBEwgOPqbLu/dL7H3F4KvtmQ2+kpfIc1h/oU4Ok/CtKtyFhWl6E0bsFM4Fc88jkYxwVRIVYdI5kwFjs/ybocEFFVpo9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730155996; c=relaxed/simple;
-	bh=HSm7l+dIvXw5CpFH9RjYr70BRYS7SglQogW4EmAuIbg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gjTgjWwbyWXYsMetmJ+rlMNgEmw7j2b/qb9WqWzbh/fCqSwh5ZLe6YK9gQGtKfOjej951tGO2T/T2ZsP3CAdbzM6QL+luTPb7QriAdW8SKv4BNpjSEbspydfPEuBHGQgRzLPHStowpTwaJ7PFa7eh/AFI4RzhYxSPTSpQ9zPLTk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=W7BBxUbC; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 19080C4CECD;
-	Mon, 28 Oct 2024 22:53:15 +0000 (UTC)
+	s=arc-20240116; t=1730156425; c=relaxed/simple;
+	bh=CDr4ELMyn9OTolcpMiUCK+CxqHERk5vYWT0PXeKjM9o=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=FN6oIVedhzAFnlQCU9+SE80CHdvpEjPutYcfqp1Y38tvqwhZ6Y33HbfQ50RqlyqSBnyD0aXVP/x5zeErtED+ZjoOhk3YleG/qTBBp/gnsTr0LoeNCApnxmN8CmM1OT9VFnXeoTy7knlfHP2RQTEjAUGRnjOs+Ga5izs/ij1CAnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ViC3EG1l; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D98DC4CEC3;
+	Mon, 28 Oct 2024 23:00:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730155995;
-	bh=HSm7l+dIvXw5CpFH9RjYr70BRYS7SglQogW4EmAuIbg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W7BBxUbCUrpS1iA89avK18t+SK0ADv78ODLgmI54adILN5wvAAJVYJybo+/S0hL2f
-	 RZsX9vVZN2k1yUROABIxWJkyZvyjSw/3FKX3Szs4lwGgdlSdopCs/198Sv1kDxiLnp
-	 +UHpZk8GJMUbhcsk7z2latVFM/yF6i0bS0SFMMkLxVY9lMwdhx9BtuveqECxhc3jJ3
-	 I2lr9iTGr4PpHojDmiwszyLUo1XigcWGUeuwUNN4kGZABsguU+bSMck91rBaNuKbYU
-	 fRI+h1qqMRKi2+DndcTcELVb8Pi7bPMaClCB7ALR1nW9X/JbbnoG61FP7/T2PU0EKn
-	 eEsV/9WhutF/A==
-Date: Mon, 28 Oct 2024 15:53:14 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: Simon Horman <horms@kernel.org>, mptcp@lists.linux.dev, Mat Martineau
- <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Gregory Detal <gregory.detal@gmail.com>, Shuah
- Khan <shuah@kernel.org>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- stable@vger.kernel.org
-Subject: Re: [PATCH net 2/3] mptcp: remove unneeded lock when listing scheds
-Message-ID: <20241028155314.006f9063@kernel.org>
-In-Reply-To: <4ca239db-6a05-4735-916c-73cee0ee22a0@kernel.org>
-References: <20241021-net-mptcp-sched-lock-v1-0-637759cf061c@kernel.org>
-	<20241021-net-mptcp-sched-lock-v1-2-637759cf061c@kernel.org>
-	<20241023122128.GT402847@kernel.org>
-	<4ca239db-6a05-4735-916c-73cee0ee22a0@kernel.org>
+	s=k20201202; t=1730156424;
+	bh=CDr4ELMyn9OTolcpMiUCK+CxqHERk5vYWT0PXeKjM9o=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ViC3EG1lFiNLhF9YSxd3PqfOSLsA88kO/4/JXIwiZJ82OKIEHLwtd+dsNBmKi5hhN
+	 QCN67HPsGtbezNTQYFkmJhi9bXhhHwCLrFwSp/9FeVEvFP46Ykp5YPprbcDfMkMXtq
+	 yr2irfN85uik0guZbjSfjZRPBNtR+zAmzJvZZ8FMlAHF3N38Ac0rQVRbgu+PHx+Leq
+	 641+d3woXg1gikQdM44yGnl6OPD+vUV+2kG+aCirQLytUzUdsLrJ3iaom1hNPS0jb7
+	 VHOEpfCSsp/CcOlyNrJKOUNxv3GV2gQyvdkSb5c03+0CeIy9bs4ZqpRlqLbB9nMLx0
+	 h3u9pXnsj319w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33FDE380AC1C;
+	Mon, 28 Oct 2024 23:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] docs: networking: packet_mmap: replace dead links with
+ archive.org links
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173015643203.206744.9313387806866726484.git-patchwork-notify@kernel.org>
+Date: Mon, 28 Oct 2024 23:00:32 +0000
+References: <20241021-packet_mmap_fix_link-v1-1-dffae4a174c0@outlook.com>
+In-Reply-To: <20241021-packet_mmap_fix_link-v1-1-dffae4a174c0@outlook.com>
+To: Levi Zim via B4 Relay <devnull+rsworktech.outlook.com@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org, corbet@lwn.net, netdev@vger.kernel.org,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ rsworktech@outlook.com
 
-On Wed, 23 Oct 2024 16:13:36 +0200 Matthieu Baerts wrote:
-> On 23/10/2024 14:21, Simon Horman wrote:
-> > On Mon, Oct 21, 2024 at 12:25:27PM +0200, Matthieu Baerts (NGI0) wrote:  
-> >> mptcp_get_available_schedulers() needs to iterate over the schedulers'
-> >> list only to read the names: it doesn't modify anything there.
-> >>
-> >> In this case, it is enough to hold the RCU read lock, no need to combine
-> >> this with the associated spin lock.
-> >>
-> >> Fixes: 73c900aa3660 ("mptcp: add net.mptcp.available_schedulers")
-> >> Cc: stable@vger.kernel.org
-> >> Suggested-by: Paolo Abeni <pabeni@redhat.com>
-> >> Reviewed-by: Geliang Tang <geliang@kernel.org>
-> >> Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>  
-> > 
-> > I do wonder if it would be more appropriate to route this via net-next
-> > (without a fixes tag) rather than via net. But either way this looks good
-> > to me.  
-> Good point. On one hand, I marked it as a fix, because when working on
-> the patch 1/3, we noticed these spin_(un)lock() were not supposed to be
-> there in the first place. On the other hand, even it's fixing a small
-> performance issue, it is not fixing a regression.
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Mon, 21 Oct 2024 21:55:49 +0800 you wrote:
+> From: Levi Zim <rsworktech@outlook.com>
 > 
-> I think it is easier to route this via -net, but I'm fine if it is
-> applied in net-next.
+> The original link returns 404 now. This commit replaces the dead google
+> site link with archive.org link.
+> 
+> Signed-off-by: Levi Zim <rsworktech@outlook.com>
+> 
+> [...]
 
-I agree with Simon's initial response. Let's not blur the lines.
-Please re-queue for net-next, I'll apply the rest.
+Here is the summary with links:
+  - [net] docs: networking: packet_mmap: replace dead links with archive.org links
+    https://git.kernel.org/netdev/net/c/b935252cc298
 
-BTW thanks a lot for proactively fixing the CONFIG_PROVE_RCU_LIST
-splats!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
