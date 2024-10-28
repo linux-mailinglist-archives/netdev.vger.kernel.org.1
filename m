@@ -1,572 +1,285 @@
-Return-Path: <netdev+bounces-139470-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139471-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74DA29B2BDA
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 10:49:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0500C9B2C16
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 10:55:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98B381C21F1C
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 09:49:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0265282D0A
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 09:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAA881CCB54;
-	Mon, 28 Oct 2024 09:49:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2C041D222B;
+	Mon, 28 Oct 2024 09:55:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W4+xPrEc"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="enZR3ad/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7684F199247;
-	Mon, 28 Oct 2024 09:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730108982; cv=none; b=ZqCoRjjCwy0xj2zegNkAY7IEp4LCetmATgqyz99dARh/2VDlz55tt3w8vbWuF6w69+gB4ggpRUCMBONLXb3OEkbP0LH7kelsgf24FLMgBZUSVmaeQBLA3+kFXI5aa2Ufx9V/aOkbJEtNFNisYbvqVyNK5uustlF+fIuNnsWizbc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730108982; c=relaxed/simple;
-	bh=Li/zX1NMGiQvayP1B1aJKA3UADp1/9nYihQP1djZBfc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EldwzIeUqUVxkudzSfKBbb2RvsZ+5SjzjkImeY4rJP6SAWW6lHsCmjmc/7IrtnoiFFRkNXwZKa6CmC6xcJU8/FfZSKcIEhiSM3bD70exX/GwRyNx1UGLmBRK2TxWgh87z/pxZfFuQQYnJGk6XxGNW71h6P2f5mHaNm+rPXdxhJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W4+xPrEc; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e308038caf9so2387400276.0;
-        Mon, 28 Oct 2024 02:49:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730108978; x=1730713778; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PhpScoTjsoE4TEraqLIv4xYHR/WULjEZZgJExIMyL3k=;
-        b=W4+xPrEcjDUUvVck1IxXN2mA/lK33yjsitef4xvdc8GkskceNwG5bmaiP/ViKDv408
-         r4VagANpXCkS+in+5UF9dZm8SXdULp8gTUqBtQFCKw08OUiemr3+DQa5Z2y4AL1q40il
-         1DSGoyw9uxP2lrwmN5oNWIrGdJnxueeV7zulx35hHF17D0aqNotQy4wirIJJNK6CUBPI
-         ZRGmXctCWs9SKiuTmqWegTlxwNbxFbNbXnNJV+8caworLTO64A+PiYYGJ/bRpbAbNBBz
-         V5Gxz8VW0bTw3YJeX7IMDxAIisQx73RysHTektRTcKf1XCB64/26y/2QfwC75atgSvq2
-         setQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730108978; x=1730713778;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PhpScoTjsoE4TEraqLIv4xYHR/WULjEZZgJExIMyL3k=;
-        b=vV4Ti3giEpInAksHMLro7GzprGFGJ25TDHbKbHe8tKHmy4PHFxpnuxgq3wToByKHh9
-         eVjMRJ95BNUm1wUvCqDQxU1aX/RvF8yWR5Db4wlJtJg/fZGqKRwdHv3uMmqGpLfEhl8/
-         cSMEBVyfjlUQkLRSsBjlzGHGCeGBD0YNM6tI1atZCVh/m1YsYVG0DDLLnzYj++evs0oc
-         JbGvHrmKVom4OPVnia6RQ6R1BxAkUJ1eJZ5eI3KamLx+QS//zb2JQbq8tpC11CmpugEu
-         zgej1qEIypWC2sVEFV2Y+FoCpc1l55mv7izfu/jQ2xY/EUlCB+CmrvDKTL80WzFIN38G
-         rS1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUfJLxDcbbXsBEbOq/97A6dRt3BTjusEhkaUWPlDAu1K/J8xXXaTa/LY4N8GqOci7xBAtwBC4Nk@vger.kernel.org, AJvYcCUgKQgTkNSCTHMzpEtFxeJiLADOkwF7OHyTHzi9Ubkz9MWEDMlNN+cFKTN19rktSQq1L+CzQFkOEoXtrw3j@vger.kernel.org, AJvYcCV9clnBxlmm0uwKdB3a92PmWZABJ8YDY0WHYCHA4Gjqb86l7uVTLKexjPNJLuRe5Ovg5Z6JEvViBdBp@vger.kernel.org, AJvYcCW1MedrU6B50gTGf+EYFZ0aoIyIs32C5iMIJEtQb+qsw/YjV4Z1GSfWbAD0JIMJvfA7mq07+j+zPcc=@vger.kernel.org, AJvYcCWxTz8Vc3KO9fEQtKSiCyAB0O8PowYuu4qf9aiedZAgB77tfyNwPP02ww4ZCdUglZg4b4ZLM/HV4v+Z@vger.kernel.org, AJvYcCX6g/TcIzSOtWN7ozDIZaRLRjekh/6ZIGk80/cz2webSlhnMrloAOf2EGTPtw5bPvupXrMVv8iVVKmqCQ==@vger.kernel.org, AJvYcCXNzDyru1JtBWLrx/IKYOtJhwE+Y/HqaO+EsAyEf2kSjf+zPkHUKpNxaXuim4zPLuGzeytXrUE5q6bN38I=@vger.kernel.org, AJvYcCXjQJrzNOUJtaXJN01WUjl+dceVYoM8oM0+8U6e+79J3wLCXLzUw9LuDsn0ZzyoKkNqwXhNsCDmZtdi@vger.kernel.org, AJvYcCXlxphkzVE7iM8ne3tH5/hKqcRlnAxcKyDI+pH4UBJr4gVH+zhq6BF0fISlW9EHuEpXXpMHUrvceGub@vger.kernel.org, AJvYcCXvKa2RAA25F+MiDivpxfQbBi8jxG5YZI5HlTwu
- 7hcqusahduXX1Zzjg1+dJF3bDdJ4wBWav9JIXFAzXZHligI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsbGQC2nmQU5ozBq8h+LPmA0HJNVqzc/1VQis61Nrq/x9RUkHU
-	uJOb1PGpWzcVVA1lrO/b/FxHPbB6vHiFdccSExNNnsqX1YJBGQevaehTVzHG/CBOJbkcHQdng/C
-	lHN96NdN2cIxmkrggFh9MEazX4yU=
-X-Google-Smtp-Source: AGHT+IGv/kQg5QwmYKV2g9AhyVpVmbcIttPyRL1Tcppmw9+CvLPoQ9tbgFB7KPK9h0QIakEEHmpKcrw3aHRnIlz8Afo=
-X-Received: by 2002:a05:6902:724:b0:e30:84f1:999a with SMTP id
- 3f1490d57ef6-e3087a6e9a8mr6374575276.20.1730108978166; Mon, 28 Oct 2024
- 02:49:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B2F11D0F56;
+	Mon, 28 Oct 2024 09:55:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730109316; cv=fail; b=RH7HNg7Tllw310oCQZLOeM/qz3SXxhfQ+Cg7vD8813RCKeaHLpnPVaeAFzggyHBI6Poa6wbrxtMm5q7iMR8xy8HVyNm1xIb49mVA03pvfROlmmSc+kMWB9IpxxGV6WwiHr5Eee3D7sS0I+ZjXULH6XCbnxJj2DsUEBk8XWi/Gws=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730109316; c=relaxed/simple;
+	bh=n+SUzXT6CGBt+RfB3QjAupDPBxaOOH77FHP1+rHGRSU=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=CjDN5UU5OIAJEzQDun07Z1eSwnDQJJAJJ9aDG1YCSpNmzL7T2wFoxxXkIEtplwbB7wvzv0iBl8/GtZnuvgFWch0P0KF7QC3XhF/xYLhGYVRMXB1waw7PnJVXDVgh+LCNUn8+baXnCON8BTnWACPotw+psGiTg68fLOizA7w+LPI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=enZR3ad/; arc=fail smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730109315; x=1761645315;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=n+SUzXT6CGBt+RfB3QjAupDPBxaOOH77FHP1+rHGRSU=;
+  b=enZR3ad/E8j3N0gk4RKYuxvohyVMHK6kd4CyywdrjxEJYlnKg4DQa+nP
+   G+Slv7NhjhDe7pE/FjH10pLZBaYk4LoF1AFQ5AJbNGgw/OEFGWn1wWogC
+   3fMjIJHOcjGWF43fl2nkXXQ+go+AhlhkdLr6/qtXHCZvdiYqjJbU0yG7e
+   c/9bHmaCb1AoVGp2NquhBgj/AA6pChR8030Vs3IW6YddX0BWKWCXYCHZK
+   dGyOeWe5beTFN+ewq98TGltw4naN4DtsR4YcUACaBOENAGGOZSJ3bPris
+   16yafY5pDXS/dyowrDiYCg+TcLE/WOyiQp9043ZoVqO65E5esSPG3/kWq
+   w==;
+X-CSE-ConnectionGUID: ZGxVCvrVQn6+dZ/6emmusg==
+X-CSE-MsgGUID: qHJdZilESoajHFb3slOblw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="33494828"
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="33494828"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 02:55:14 -0700
+X-CSE-ConnectionGUID: rYAiW8nNRuutupTr7b3Djw==
+X-CSE-MsgGUID: V9cOXkcoT9iJefNm2vhvnA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="81473387"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 28 Oct 2024 02:55:12 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 28 Oct 2024 02:54:42 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 28 Oct 2024 02:54:42 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.47) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 28 Oct 2024 02:54:41 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=rcUlftPswGVH5SYT7a94ys9ReET4KCsavii1miHqCw9FFdvwkHzdqo8sD2N2ZjG+wGKjsbFSpzyMiR5vMi31LHRaHPH1OcOrrmBEGfxq+/vYKcY8C8B/Cl+dZftx2xg8tTjnEjH9envt1RVaEjLJyk7RZnmXXQCoJbS9b/EMPxhgayDyU7/Xpif8WugC+M4v/qchGHs/MBmOBsjJ+rQQdULXegqtN6uyivCcgNjmAyd8kWdOeUhVEtJ8/6IPaG55zN60OvRhDR/OpFjTBnutScZvc061e2pWo4Y8dnwYwLMO0gEUp9HVlG/6/gjt4iE7LjuuEGVjtWt1ULacY8tD5w==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7YTqEH4q1HM15eQ3stoblAuE4FbD9LPXJu34K/WaAP0=;
+ b=h0fBoFjYNzW4yAUI4sPuReTrfGOu7EVUeuhLuT9JAuqQedrFdrTSpudAFt2dbU1N9v4ar6vK264QnngAQX3w1Kpr5RvRctCj8yatc8FIhPdJRcG1IPv7DQ/zlpPQHlqeNvmtvBCc2K6lKjjpm3B8Adua4PUGkby03c/Gdn2Nbs3A8uAWtYLUp3VTg1fqsHx8DVbIdpF/k4LAFCsqFx2L9XLYiAYR6KjB1qZFkpMhOlW6otgMahYJsO4OMLRhMkBEWVZX64MES8J1yhM+zALuvwtyYWlLYi1PBwbRPS0uwEQBPqZBNZWLIMamWXTpi3TedUMqJLtk0zokhH9AoXgwTg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by IA1PR11MB7679.namprd11.prod.outlook.com (2603:10b6:208:3f1::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.25; Mon, 28 Oct
+ 2024 09:54:39 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8093.024; Mon, 28 Oct 2024
+ 09:54:39 +0000
+Message-ID: <ca4f7990-16c4-42ef-b0ae-12e64a100f5e@intel.com>
+Date: Mon, 28 Oct 2024 10:54:33 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH linux-next] ice: use string choice helpers
+To: R Sundar <prosunofficial@gmail.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <karol.kolacinski@intel.com>,
+	<arkadiusz.kubalewski@intel.com>, <jacob.e.keller@intel.com>, "kernel test
+ robot" <lkp@intel.com>, Julia Lawall <julia.lawall@inria.fr>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>
+References: <20241027141907.503946-1-prosunofficial@gmail.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <20241027141907.503946-1-prosunofficial@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA2P291CA0009.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1e::6) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-6-tmyu0@nuvoton.com>
- <5fa97399-25b8-4877-be6e-69ba1ae1837d@roeck-us.net>
-In-Reply-To: <5fa97399-25b8-4877-be6e-69ba1ae1837d@roeck-us.net>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Mon, 28 Oct 2024 17:49:26 +0800
-Message-ID: <CAOoeyxX1TS0u0qE+W3xD0gQWmC7nZWURNpOS-z0_j07uHmXmQQ@mail.gmail.com>
-Subject: Re: [PATCH v1 5/9] watchdog: Add Nuvoton NCT6694 WDT support
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|IA1PR11MB7679:EE_
+X-MS-Office365-Filtering-Correlation-Id: 02f4ace3-a2c2-4b9c-975d-08dcf73689d6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?Q2JzQ1dJdk1NZU9Ea0M3T1lqWjRqeFoxTldhWDdqMXBLTDVHbUViRVM0RzVh?=
+ =?utf-8?B?Qy82MFlUa2JOV0sxRnlxMFg0QkNiY3huRnBzcGM3amszZ2F1Z3huTmtXOU9z?=
+ =?utf-8?B?cnR2bTIrQXJCakNWd2xobUpnbWNWeG8vbmNueWhDWjRMeEQxdFgyLzhsN0RU?=
+ =?utf-8?B?dzM4NVJWVnZhUklhWHNpVHdhQyt1ek5BVC9oRnlGcVhHTFduaEIxVkNBM3Av?=
+ =?utf-8?B?ZE1QK21kWGM1c0hkUFRNc0dqL3dmaTZNand3Z0lGWHY5eWhVbitJTkxOM3hU?=
+ =?utf-8?B?L1k5NnVMSnAwcC9VLzFSZWRJSURzQjZ3bjRhWFhsS3IycTBsVWZ2alN5N1BK?=
+ =?utf-8?B?b29YenJIcEpRbzRpaWZQdDhneDNWLzUra0xOUFp5MWorQmEyUW9NOEpnaW1H?=
+ =?utf-8?B?aWVCZlRqZTVRb3l3NUV4dlNYbFdCRUZvSXlJUGFrcHRLcUc0cmtkcjczUFQ3?=
+ =?utf-8?B?WU56eGZDZzV6Mmw2ZjZmV2lmU3RtbG1paTFub01NalQ2Vk9ZMy91N1ZuZklo?=
+ =?utf-8?B?aisvdm9rQVdLTmhpblplKzNUbjlOMFRpTjc4QUJGTFZmazNIUk5HMk0zM2Zp?=
+ =?utf-8?B?ak1VZ0k1YStYTlJFNkx5bHBaUFNnVW81VTFqazFsTjQvbk9sTzlmaUtmRFl2?=
+ =?utf-8?B?a1RNUmEzV0FZSi9jN0RRMGpEaTRvTlJxcE5xc0ROcVVWWnVzK2hrdHorMkRm?=
+ =?utf-8?B?MUgrdlBxWC9wZkhhYjVEaU5KVks3WTRWRkg4NHN6aWV5VDJUZ01jbUZ2K1Jt?=
+ =?utf-8?B?VDVCTkR0N1lUdDNqMHJRQ2pmOXJSOHloRUptVnhwSlFIdVhTcHpJRWpuZFl3?=
+ =?utf-8?B?RTlmQUJ3MDcyVkJCRVBLS2Rtc3BwMklad01hNVB6clYxeFJVNzlWK1Y1Z1d5?=
+ =?utf-8?B?VCtHWWNubldkck04MmRha0JJanloNnlNNjh2ejlwNy9TWXZ4dXZDU1ZkNHRx?=
+ =?utf-8?B?NC84VEViMUNLcU9yZFJHcmtyUm4wU2I2Z2p6ZUk0cEpVZ2x0Q1k5Q1l0UldJ?=
+ =?utf-8?B?ZHBSbUh4Vm40N2RvUjJwclJMTnEwbGFkMXJPNDk2aUdSR0plUjBQQ0MxRHhz?=
+ =?utf-8?B?Z3VtYks5b0JoclJDYmRjanEvRUltdUVub28zODBqMTNVc2l3SkIyejAxdVk3?=
+ =?utf-8?B?S0NybVdYNzZBYUJHRXBqL3ljK0lmeFdkWTM2LzZiRE05aXhxM1FlRExBckZF?=
+ =?utf-8?B?bmVFQWNRSmZ0QXVsZ3JwSEJ6OXpMR0VYSVJwUUlUUmxLNEZwRnZkZXZxeWZ2?=
+ =?utf-8?B?cncra0JUQjJpeUtnYzhBMlpDdWV5emsxY2wrZm54a0ZaNVU1RnhuSnhaeFV1?=
+ =?utf-8?B?NHdMdEUwZVJscjhjbHRMbzA2WlNWV2ZjM0tRWGZOd1lXVFhNUDhsNWk2MzVO?=
+ =?utf-8?B?Q29ndGpobDV0dDBDVllDMzNEZU5HTzU5Z0xsa0ErM1JrMlRKYWxENk9WTVlG?=
+ =?utf-8?B?M29BMTRVTU1LaEFLYlg2ekM5Tm1xR0lScHZndkFGOGRGL2l0aFV5Vk1xN3Zk?=
+ =?utf-8?B?dWFGT01XTlk1NEZKZ2xnWGdQU2hmYVROUVlrN2E0MTl1ZUlLR0tHdUpCZW9h?=
+ =?utf-8?B?bXVGMFN4RTVyZ01nN1BzdldYR0dXc1pIRjRrSjU3dEdNQzB1MUNEM2ZUQm5k?=
+ =?utf-8?B?czVYbFRncFZWdTBma3FHdXFLZVBCd2h0amlRM0czUnQrcGUvRDhYQjJyUVhX?=
+ =?utf-8?B?Vk9JVGZvNnVVYUpCR3VoazU1Y2tkK0tqVW1ObHRqZXIrWHRaTFlhbUJWOVF5?=
+ =?utf-8?Q?lYPinfsNC0sK2ezmepNc/PvNgiRp8S/zGp1z9Gx?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MmIwbXBLaWdSMHFRbXBEcjAydzl4a2RGUG95SHhvaUo4WitlQmFJZGdoNlBY?=
+ =?utf-8?B?aUw2WGlNOFZrdmRWRkQ3RTBpYksvVlBJWlBQMzVkR0laNDRsRmJqUjEzQ1JD?=
+ =?utf-8?B?aUZTNXZCNURBMCt0dkxsb0x4bDVBVVVGbWNIbi8vNm5HQm5TeUt4TnFWWjRy?=
+ =?utf-8?B?OE1tUWQybjEzS0JZRG0zWWUyNHUxWnNYOGNab05RVUFBbU50dTloMW80UkVx?=
+ =?utf-8?B?RnJXaytqb2UvZ2VKd2FsSlQzNGZKSlIrUWEvK3NJWDNDdWJVb2RENXhrd1Br?=
+ =?utf-8?B?cGR4cFZrY1p4UmtKVElzenZkb1hSVmdZWURUd1hmNmg2THB3cFdRNjQ2dmgx?=
+ =?utf-8?B?T1YxMHp5NFNKdlNhYWV4Mi9zeElUQ3hrOUIrNjdub3VFNFNLQldtNCt4cjlm?=
+ =?utf-8?B?ZWgvVjdjNGhsa2VzWE9aM2E2WVYvM0NNd2JHcENZTmxkZ081Y3ZBZzJjUjJ4?=
+ =?utf-8?B?UG1xakxoOVhXS2k1QmV6aHNuK2huRUtVYUV2a3ZtZFRGajE3UHV2R3BxN2E5?=
+ =?utf-8?B?bXRKbkJ5d2xaazVJQmJ5dDV2cXNGTlZ4bHBVT0ZjUnZBaXB3bGFLR0VDUFVZ?=
+ =?utf-8?B?SFE0Y09wWjZEcHBFRnBPdlFIanpzWmZ1dUJDL3Z1M09CNThZR3J4SXZkQmRP?=
+ =?utf-8?B?enA5ck13SElidUpwQVlHT2svUGNVYVZwODBFMVF4VU9td1o2dWV0NDFXdldH?=
+ =?utf-8?B?THZ3OWZzSFVnZW1XZ29sNklnL3YvcnlpbDRlVzJpdFlsMHJIc3V4TFBId2hL?=
+ =?utf-8?B?SW5ONVJxeG1wZVRZVHVmb1kzN0VxcE1BOG1kY1VwaGZXdmJROWZZWi9rU203?=
+ =?utf-8?B?cG9XQ3R6eDc1ZEdmUk1xS29ab093UjhicTVVb1EyOW5ESTA1VnViYUxrOURC?=
+ =?utf-8?B?MHAwMDdhdzlPS05GMVVmZWhUaWM2dGpsNTBrazAvaTdNZkI4M0hKNS9BUTVV?=
+ =?utf-8?B?ZVN4cWszZTVJUXJ2TDM5NkZlTUg1bUNFSnNKdmJld1VzVnBTS29IRUhaTnZQ?=
+ =?utf-8?B?QjBZb2x1QjlGV2d0U1hwNFlRUnViRzQrZTU5R2p1aHV2SmVsblRmdzEvdUZY?=
+ =?utf-8?B?UzhiOUZoUHlFSUFobXBncGdHR2lCN1laSmtDRVJianJRemE4Ykx5VTZFYytJ?=
+ =?utf-8?B?VkFaZUQ4Y0pvYjJ1MDhPVXowa2VxZmNubHVVUlhQdHVnczhTSzZSRWdjR3lL?=
+ =?utf-8?B?SzhDQzVHZmQ3RzZIZjQzSWZ1R1RLQ2ZGMEVmd2d5bmlOcHRVaVBHOE4xbFlG?=
+ =?utf-8?B?Nk11S1ZFb3Jpa25zY2RhQ0s2VFpNM1VmRU53Z1pFU2xsQjlpUHFRSEcvazhC?=
+ =?utf-8?B?Z1p5aGVNYTFoT2REUUFWNnlJcmV3V2xlT3F4d3RsVUpJa0hRVThiSm5rQmZq?=
+ =?utf-8?B?WjEvTFFxZFRQMDFXSVlaTEpXMlgwclFpTkt3d2RkWXpQeWNCMk1kT2RNVzFR?=
+ =?utf-8?B?ZzlIalRVTERwdmNwdTdsT1BZakgycWVxNExzcWFNOGRkZmFKcW5Cc2pzeC81?=
+ =?utf-8?B?L093ZnhPaVRWVVZVd2hZYkozb3cvSlB0blRiaVpxOHQzNHFnUnhiM0lzcWZh?=
+ =?utf-8?B?ME90YjZTd3E5NnpvT0xycHVjTTdneS9kM3VHbjFKdDlURCsvN2gxYXFzZGJZ?=
+ =?utf-8?B?Q254ZEIvQWxqY1oxSnJuM3grQjI1eko2Tyt4dDZTazBzQ0Q0NFYwWlB4WHIr?=
+ =?utf-8?B?N3d0NHloOHNjSjhaNjVncWhpRXZabjVPQnp6MDE1WEcyRXByS0hlY3B1T3Vt?=
+ =?utf-8?B?ODhqR2p5UTZSd3ZFdXRMWkZITGJ0RGZZNk9qYy9YeitweFAxRnlFZXJOSWgw?=
+ =?utf-8?B?a1lDdmtWY3N0Z1pidWthUDN3NG9LaWUrTkVTSkxOZmdmbUFuTUN5c08xK3VJ?=
+ =?utf-8?B?ZCtiaDU1RWhMMHRHdm84dlJKSTVJRjk5aEk1MGZGR1FwL2FweitINUJ6UXFO?=
+ =?utf-8?B?c1JGbjg3Skg5NVoyeE9EWWtmK3NqSmRodjNwQTIxWjkxTVRPT3ZrcU44aXc4?=
+ =?utf-8?B?dmVEeWpJRkh2YUw4eDE1UXJ5eWhSdmlDNzhnV3haM05acWZhU1M2dUxObllz?=
+ =?utf-8?B?b0d0UldsN1Rzdklhb291UGtWV0ZyZWtXODZ0aGRBRm1yRjhZQkRQQkpYUTB1?=
+ =?utf-8?B?ckdocjFKOHlBd3VRVmt2MUJ4S0hSaW80eUNvcURaY2hROWpEME9CMURiNytj?=
+ =?utf-8?B?aUE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 02f4ace3-a2c2-4b9c-975d-08dcf73689d6
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2024 09:54:39.3947
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: kcb1jSbjphm+/6arLf9WslKfPtDD3rqJFlzq4OTtCH6AZd0Vou/kMgS9nMHyvezNcC2/uIXvwtLRIs0yjXgD+Ot/+krQuzJKRTCYXZHA3K0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR11MB7679
+X-OriginatorOrg: intel.com
 
-Dear Guenter,
+On 10/27/24 15:19, R Sundar wrote:
+> Use string choice helpers for better readability.
+> 
+> Reported-by: kernel test robot <lkp@intel.com>
+> Reported-by: Julia Lawall <julia.lawall@inria.fr>
+> Closes: https://lore.kernel.org/r/202410121553.SRNFzc2M-lkp@intel.com/
+> Signed-off-by: R Sundar <prosunofficial@gmail.com>
+> ---
 
-Thank you for your comments,
-I will remove the unnecessary logs in the next patch.
+thanks, this indeed covers all "enabled/disabled" cases, so:
+Acked-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 
-Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B410=E6=9C=8824=E6=
-=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8B=E5=8D=8811:33=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> On 10/24/24 01:59, Ming Yu wrote:
-> > This driver supports Watchdog timer functionality for NCT6694 MFD
-> > device based on USB interface.
-> >
-> > Signed-off-by: Ming Yu <tmyu0@nuvoton.com>
-> > ---
-> >   MAINTAINERS                    |   1 +
-> >   drivers/watchdog/Kconfig       |  11 ++
-> >   drivers/watchdog/Makefile      |   1 +
-> >   drivers/watchdog/nct6694_wdt.c | 329 ++++++++++++++++++++++++++++++++=
-+
-> >   4 files changed, 342 insertions(+)
-> >   create mode 100644 drivers/watchdog/nct6694_wdt.c
-> >
-> > diff --git a/MAINTAINERS b/MAINTAINERS
-> > index eccd5e795daa..63387c0d4ab6 100644
-> > --- a/MAINTAINERS
-> > +++ b/MAINTAINERS
-> > @@ -16442,6 +16442,7 @@ F:    drivers/gpio/gpio-nct6694.c
-> >   F:  drivers/i2c/busses/i2c-nct6694.c
-> >   F:  drivers/mfd/nct6694.c
-> >   F:  drivers/net/can/nct6694_canfd.c
-> > +F:   drivers/watchdog/nct6694_wdt.c
-> >   F:  include/linux/mfd/nct6694.h
-> >
-> >   NVIDIA (rivafb and nvidiafb) FRAMEBUFFER DRIVER
-> > diff --git a/drivers/watchdog/Kconfig b/drivers/watchdog/Kconfig
-> > index 684b9fe84fff..bc9d63d69204 100644
-> > --- a/drivers/watchdog/Kconfig
-> > +++ b/drivers/watchdog/Kconfig
-> > @@ -739,6 +739,17 @@ config MAX77620_WATCHDOG
-> >         MAX77620 chips. To compile this driver as a module,
-> >         choose M here: the module will be called max77620_wdt.
-> >
-> > +config NCT6694_WATCHDOG
-> > +     tristate "Nuvoton NCT6694 watchdog support"
-> > +     depends on MFD_NCT6694
-> > +     select WATCHDOG_CORE
-> > +     help
-> > +     If you say yes to this option, support will be included for Nuvot=
-on
-> > +     NCT6694, a USB device to watchdog timer.
-> > +
-> > +     This driver can also be built as a module. If so, the module
-> > +     will be called nct6694_wdt.
-> > +
-> >   config IMX2_WDT
-> >       tristate "IMX2+ Watchdog"
-> >       depends on ARCH_MXC || ARCH_LAYERSCAPE || COMPILE_TEST
-> > diff --git a/drivers/watchdog/Makefile b/drivers/watchdog/Makefile
-> > index ab6f2b41e38e..453ceacd43ab 100644
-> > --- a/drivers/watchdog/Makefile
-> > +++ b/drivers/watchdog/Makefile
-> > @@ -231,6 +231,7 @@ obj-$(CONFIG_WM831X_WATCHDOG) +=3D wm831x_wdt.o
-> >   obj-$(CONFIG_WM8350_WATCHDOG) +=3D wm8350_wdt.o
-> >   obj-$(CONFIG_MAX63XX_WATCHDOG) +=3D max63xx_wdt.o
-> >   obj-$(CONFIG_MAX77620_WATCHDOG) +=3D max77620_wdt.o
-> > +obj-$(CONFIG_NCT6694_WATCHDOG)       +=3D nct6694_wdt.o
-> >   obj-$(CONFIG_ZIIRAVE_WATCHDOG) +=3D ziirave_wdt.o
-> >   obj-$(CONFIG_SOFT_WATCHDOG) +=3D softdog.o
-> >   obj-$(CONFIG_MENF21BMC_WATCHDOG) +=3D menf21bmc_wdt.o
-> > diff --git a/drivers/watchdog/nct6694_wdt.c b/drivers/watchdog/nct6694_=
-wdt.c
-> > new file mode 100644
-> > index 000000000000..68e2926ec504
-> > --- /dev/null
-> > +++ b/drivers/watchdog/nct6694_wdt.c
-> > @@ -0,0 +1,329 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +/*
-> > + * Nuvoton NCT6694 WDT driver based on USB interface.
-> > + *
-> > + * Copyright (C) 2024 Nuvoton Technology Corp.
-> > + */
-> > +
-> > +#include <linux/watchdog.h>
-> > +#include <linux/slab.h>
-> > +#include <linux/kernel.h>
-> > +#include <linux/module.h>
-> > +#include <linux/mfd/core.h>
-> > +#include <linux/platform_device.h>
-> > +#include <linux/mfd/nct6694.h>
-> > +
-> > +#define DRVNAME "nct6694-wdt"
-> > +
-> > +#define WATCHDOG_TIMEOUT     10
-> > +#define WATCHDOG_PRETIMEOUT  0
-> > +
-> > +/* Host interface */
-> > +#define REQUEST_WDT_MOD              0x07
-> > +
-> > +/* Message Channel*/
-> > +/* Command 00h */
-> > +#define REQUEST_WDT_CMD0_LEN 0x0F
-> > +#define REQUEST_WDT_CMD0_OFFSET(idx) (idx ? 0x0100 : 0x0000) /* OFFSET=
- =3D SEL|CMD */
-> > +#define WDT_PRETIMEOUT_IDX   0x00
-> > +#define WDT_PRETIMEOUT_LEN   0x04    /* PRETIMEOUT(3byte) | ACT(1byte)=
- */
-> > +#define WDT_TIMEOUT_IDX              0x04
-> > +#define WDT_TIMEOUT_LEN              0x04    /* TIMEOUT(3byte) | ACT(1=
-byte) */
-> > +#define WDT_COUNTDOWN_IDX    0x0C
-> > +#define WDT_COUNTDOWN_LEN    0x03
-> > +
-> > +#define WDT_PRETIMEOUT_ACT   BIT(1)
-> > +#define WDT_TIMEOUT_ACT              BIT(1)
-> > +
-> > +/* Command 01h */
-> > +#define REQUEST_WDT_CMD1_LEN         0x04
-> > +#define REQUEST_WDT_CMD1_OFFSET(idx) (idx ? 0x0101 : 0x0001) /* OFFSET=
- =3D SEL|CMD */
-> > +#define WDT_CMD_IDX                  0x00
-> > +#define WDT_CMD_LEN                  0x04
-> > +
-> > +static unsigned int timeout;
-> > +module_param(timeout, int, 0);
-> > +MODULE_PARM_DESC(timeout, "Watchdog timeout in seconds");
-> > +
-> > +static unsigned int pretimeout;
-> > +module_param(pretimeout, int, 0);
-> > +MODULE_PARM_DESC(pretimeout, "Watchdog pre-timeout in seconds");
-> > +
-> > +static bool nowayout =3D WATCHDOG_NOWAYOUT;
-> > +module_param(nowayout, bool, 0);
-> > +MODULE_PARM_DESC(nowayout, "Watchdog cannot be stopped once started (d=
-efault=3D"
-> > +                        __MODULE_STRING(WATCHDOG_NOWAYOUT) ")");
-> > +
-> > +struct nct6694_wdt_data {
-> > +     struct nct6694 *nct6694;
-> > +     struct watchdog_device wdev;
-> > +     unsigned int wdev_idx;
-> > +};
-> > +
-> > +static inline void set_buf32(void *buf, u32 u32_val)
-> > +{
-> > +     u8 *p =3D (u8 *)buf;
-> > +
-> > +     p[0] =3D u32_val & 0xFF;
-> > +     p[1] =3D (u32_val >> 8) & 0xFF;
-> > +     p[2] =3D (u32_val >> 16) & 0xFF;
-> > +     p[3] =3D (u32_val >> 24) & 0xFF;
-> > +}
-> > +
-> > +static int nct6694_wdt_start(struct watchdog_device *wdev)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +
-> > +     pr_debug("%s: WDT(%d) Start\n", __func__, data->wdev_idx);
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static int nct6694_wdt_stop(struct watchdog_device *wdev)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned char buf[REQUEST_WDT_CMD1_LEN] =3D {'W', 'D', 'T', 'C'};
-> > +     int ret;
-> > +
-> > +     pr_debug("%s: WDT(%d) Close\n", __func__, data->wdev_idx);
-> > +     ret =3D nct6694_write_msg(nct6694, REQUEST_WDT_MOD,
-> > +                             REQUEST_WDT_CMD1_OFFSET(data->wdev_idx),
-> > +                             REQUEST_WDT_CMD1_LEN, buf);
-> > +     if (ret)
-> > +             pr_err("%s: Failed to start WDT device!\n", __func__);
->
-> Please refrain from logging noise. Besides, the message is wrong:
-> the watchdog is stopped here, not started.
->
-> Also, all messages should use dev_, not pr_ functions.
+for future submissions for Intel Ethernet drivers please use the
+iwl-next (or iwl-net) target trees.
 
-[Ming] Okay! I will change it.
+There are also other cases that we could cover ON/OFF etc
 
->
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +static int nct6694_wdt_ping(struct watchdog_device *wdev)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned char buf[REQUEST_WDT_CMD1_LEN] =3D {'W', 'D', 'T', 'S'};
-> > +     int ret;
-> > +
-> > +     pr_debug("%s: WDT(%d) Ping\n", __func__, data->wdev_idx);
-> > +     ret =3D nct6694_write_msg(nct6694, REQUEST_WDT_MOD,
-> > +                             REQUEST_WDT_CMD1_OFFSET(data->wdev_idx),
-> > +                             REQUEST_WDT_CMD1_LEN, buf);
-> > +     if (ret)
-> > +             pr_err("%s: Failed to ping WDT device!\n", __func__);
->
-> Same as above and everywhere else.
->
-> > +
-> > +     return ret;
-> > +}
-> > +
-> > +static int nct6694_wdt_set_timeout(struct watchdog_device *wdev,
-> > +                                unsigned int timeout)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned int timeout_fmt, pretimeout_fmt;
-> > +     unsigned char buf[REQUEST_WDT_CMD0_LEN];
-> > +     int ret;
-> > +
-> > +     if (timeout < wdev->pretimeout) {
-> > +             pr_err("%s: 'timeout' must be greater than 'pre timeout'!=
-\n",
-> > +                    __func__);
-> > +             return -EINVAL;
->
-> the driver is supposed to adjust pretimeout in this case. And please,
-> again, refrain from logging noise.
+> 
+> Reported in linux repository.
+> 
+> tree:   https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
+> 
+> cocci warnings: (new ones prefixed by >>)
+>>> drivers/net/ethernet/intel/ice/ice_ptp_hw.c:396:4-22: opportunity for str_enabled_disabled(dw24 . ts_pll_enable)
+>     drivers/net/ethernet/intel/ice/ice_ptp_hw.c:474:4-22: opportunity for str_enabled_disabled(dw24 . ts_pll_enable)
+> 
+> vim +396 drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> 
+> 
+>   drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 8 ++++----
+>   1 file changed, 4 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> index da88c6ccfaeb..d8d3395e49c3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+> @@ -393,7 +393,7 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
+>   
+>   	/* Log the current clock configuration */
+>   	ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+> -		  dw24.ts_pll_enable ? "enabled" : "disabled",
+> +		  str_enabled_disabled(dw24.ts_pll_enable),
+>   		  ice_clk_src_str(dw24.time_ref_sel),
+>   		  ice_clk_freq_str(dw9.time_ref_freq_sel),
+>   		  bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
 
-[Ming] Excuse me, is any recommendation about pretimeout value?
+perhaps locked/unlocked could be added into string_choices.h
 
-> > +     }
-> > +
-> > +     timeout_fmt =3D timeout * 1000 | (WDT_TIMEOUT_ACT << 24);
-> > +     pretimeout_fmt =3D wdev->pretimeout * 1000 | (WDT_PRETIMEOUT_ACT =
-<< 24);
-> > +     set_buf32(&buf[WDT_TIMEOUT_IDX], le32_to_cpu(timeout_fmt));
-> > +     set_buf32(&buf[WDT_PRETIMEOUT_IDX], le32_to_cpu(pretimeout_fmt));
-> > +
-> > +     ret =3D nct6694_write_msg(nct6694, REQUEST_WDT_MOD,
-> > +                             REQUEST_WDT_CMD0_OFFSET(data->wdev_idx),
-> > +                             REQUEST_WDT_CMD0_LEN, buf);
-> > +     if (ret) {
-> > +             pr_err("%s: Don't write the setup command in Start stage!=
-\n",
-> > +                    __func__);
-> > +             return ret;
-> > +     }
-> > +
-> > +     wdev->timeout =3D timeout;
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static int nct6694_wdt_set_pretimeout(struct watchdog_device *wdev,
-> > +                                   unsigned int pretimeout)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned int timeout_fmt, pretimeout_fmt;
-> > +     unsigned char buf[REQUEST_WDT_CMD0_LEN];
-> > +     int ret;
-> > +
-> > +     if (pretimeout > wdev->timeout) {
-> > +             pr_err("%s: 'pre timeout' must be less than 'timeout'!\n"=
-,
-> > +                    __func__);
-> > +             return -EINVAL;
->
-> Already checked by the watchdog core.
+> @@ -471,7 +471,7 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
+>   
+>   	/* Log the current clock configuration */
+>   	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+> -		  dw24.ts_pll_enable ? "enabled" : "disabled",
+> +		  str_enabled_disabled(dw24.ts_pll_enable),
+>   		  ice_clk_src_str(dw24.time_ref_sel),
+>   		  ice_clk_freq_str(dw9.time_ref_freq_sel),
+>   		  bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
+> @@ -548,7 +548,7 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
+>   
+>   	/* Log the current clock configuration */
+>   	ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+> -		  dw24.ts_pll_enable ? "enabled" : "disabled",
+> +		  str_enabled_disabled(dw24.ts_pll_enable),
+>   		  ice_clk_src_str(dw23.time_ref_sel),
+>   		  ice_clk_freq_str(dw9.time_ref_freq_sel),
+>   		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
+> @@ -653,7 +653,7 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
+>   
+>   	/* Log the current clock configuration */
+>   	ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, clk_src %s, clk_freq %s, PLL %s\n",
+> -		  dw24.ts_pll_enable ? "enabled" : "disabled",
+> +		  str_enabled_disabled(dw24.ts_pll_enable),
+>   		  ice_clk_src_str(dw23.time_ref_sel),
+>   		  ice_clk_freq_str(dw9.time_ref_freq_sel),
+>   		  ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
 
-[Ming] I understand. I will remove it.
-
->
-> > +     }
-> > +     timeout_fmt =3D wdev->timeout * 1000 | (WDT_TIMEOUT_ACT << 24);
-> > +     pretimeout_fmt =3D pretimeout * 1000 | (WDT_PRETIMEOUT_ACT << 24)=
-;
-> > +     set_buf32(&buf[WDT_TIMEOUT_IDX], le32_to_cpu(timeout_fmt));
-> > +     set_buf32(&buf[WDT_PRETIMEOUT_IDX], le32_to_cpu(pretimeout_fmt));
-> > +
-> > +     ret =3D nct6694_write_msg(nct6694, REQUEST_WDT_MOD,
-> > +                             REQUEST_WDT_CMD0_OFFSET(data->wdev_idx),
-> > +                             REQUEST_WDT_CMD0_LEN, buf);
-> > +     if (ret) {
-> > +             pr_err("%s: Don't write the setup command in Start stage!=
-\n", __func__);
->
-> Besides it being noise, I don't even understand what this message is
-> supposed to mean, and neither would anyone else.
->
-> > +             return ret;
-> > +     }
-> > +
-> > +     wdev->pretimeout =3D pretimeout;
-> > +     return 0;
-> > +}
-> > +
-> > +static unsigned int nct6694_wdt_get_time(struct watchdog_device *wdev)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned char buf[WDT_COUNTDOWN_LEN];
-> > +     unsigned int timeleft_ms;
-> > +     int ret;
-> > +
-> > +     ret =3D nct6694_read_msg(nct6694, REQUEST_WDT_MOD,
-> > +                            REQUEST_WDT_CMD0_OFFSET(data->wdev_idx),
-> > +                            REQUEST_WDT_CMD0_LEN, WDT_COUNTDOWN_IDX,
-> > +                            WDT_COUNTDOWN_LEN, buf);
-> > +     if (ret)
-> > +             pr_err("%s: Failed to get WDT device!\n", __func__);
-> > +
-> > +     timeleft_ms =3D ((buf[2] << 16) | (buf[1] << 8) | buf[0]) & 0xFFF=
-FFF;
->
-> If the above command failed this will be a random number.
-
-[Ming] Okay! I will update error handling about return value.
-
->
-> > +
-> > +     return timeleft_ms / 1000;
-> > +}
-> > +
-> > +static int nct6694_wdt_setup(struct watchdog_device *wdev)
-> > +{
-> > +     struct nct6694_wdt_data *data =3D watchdog_get_drvdata(wdev);
-> > +     struct nct6694 *nct6694 =3D data->nct6694;
-> > +     unsigned char buf[REQUEST_WDT_CMD0_LEN] =3D {0};
-> > +     unsigned int timeout_fmt, pretimeout_fmt;
-> > +     int ret;
-> > +
-> > +     if (timeout)
-> > +             wdev->timeout =3D timeout;
-> > +
-> Already set.
->
-> > +     if (pretimeout) {
-> > +             wdev->pretimeout =3D pretimeout;
->
-> Pretimeout is already set in the probe function. Do it completely there.
->
-> > +             pretimeout_fmt =3D wdev->pretimeout * 1000 | (WDT_PRETIME=
-OUT_ACT << 24);
-> > +     } else {
-> > +             pretimeout_fmt =3D 0;
-> > +     }
-> > +
-> > +     timeout_fmt =3D wdev->timeout * 1000 | (WDT_TIMEOUT_ACT << 24);
-> > +     set_buf32(&buf[WDT_TIMEOUT_IDX], le32_to_cpu(timeout_fmt));
-> > +     set_buf32(&buf[WDT_PRETIMEOUT_IDX], le32_to_cpu(pretimeout_fmt));
-> > +
-> > +     ret =3D nct6694_write_msg(nct6694, REQUEST_WDT_MOD,
-> > +                             REQUEST_WDT_CMD0_OFFSET(data->wdev_idx),
-> > +                             REQUEST_WDT_CMD0_LEN, buf);
->
->
-> This seems pretty pointless at this time. Why not do it in the watchdog
-> start function ?
-
-[Ming] Yes, I will remove it and do it in the start callback in the next pa=
-tch.
-
->
-> > +     if (ret)
-> > +             return ret;
-> > +
-> > +     pr_info("Setting WDT(%d): timeout =3D %d, pretimeout =3D %d\n",
-> > +             data->wdev_idx, wdev->timeout, wdev->pretimeout);
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static const struct watchdog_info nct6694_wdt_info =3D {
-> > +     .options =3D WDIOF_SETTIMEOUT     |
-> > +                WDIOF_KEEPALIVEPING  |
-> > +                WDIOF_MAGICCLOSE     |
-> > +                WDIOF_PRETIMEOUT,
-> > +     .identity =3D DRVNAME,
-> > +};
-> > +
-> > +static const struct watchdog_ops nct6694_wdt_ops =3D {
-> > +     .owner =3D THIS_MODULE,
-> > +     .start =3D nct6694_wdt_start,
-> > +     .stop =3D nct6694_wdt_stop,
-> > +     .set_timeout =3D nct6694_wdt_set_timeout,
-> > +     .set_pretimeout =3D nct6694_wdt_set_pretimeout,
-> > +     .get_timeleft =3D nct6694_wdt_get_time,
-> > +     .ping =3D nct6694_wdt_ping,
-> > +};
-> > +
-> > +static int nct6694_wdt_probe(struct platform_device *pdev)
-> > +{
-> > +     const struct mfd_cell *cell =3D mfd_get_cell(pdev);
-> > +     struct nct6694 *nct6694 =3D dev_get_drvdata(pdev->dev.parent);
-> > +     struct nct6694_wdt_data *data;
-> > +     struct watchdog_device *wdev;
-> > +     int ret;
-> > +
-> > +     data =3D devm_kzalloc(&pdev->dev, sizeof(*data), GFP_KERNEL);
-> > +     if (!data)
-> > +             return -ENOMEM;
-> > +
-> > +     data->nct6694 =3D nct6694;
-> > +     data->wdev_idx =3D cell->id;
-> > +
-> > +     wdev =3D &data->wdev;
-> > +     wdev->info =3D &nct6694_wdt_info;
-> > +     wdev->ops =3D &nct6694_wdt_ops;
-> > +     wdev->timeout =3D WATCHDOG_TIMEOUT;
-> > +     wdev->pretimeout =3D WATCHDOG_PRETIMEOUT;
-> > +     wdev->min_timeout =3D 1;
-> > +     wdev->max_timeout =3D 255;
-> > +
-> > +     platform_set_drvdata(pdev, data);
-> > +
-> > +     /* Register watchdog timer device to WDT framework */
-> > +     watchdog_set_drvdata(&data->wdev, data);
-> > +     watchdog_init_timeout(&data->wdev, timeout, &pdev->dev);
-> > +     watchdog_set_nowayout(&data->wdev, nowayout);
-> > +     watchdog_stop_on_reboot(&data->wdev);
-> > +
-> > +     ret =3D devm_watchdog_register_device(&pdev->dev, &data->wdev);
-> > +     if (ret) {
-> > +             dev_err(&pdev->dev, "%s: Failed to register watchdog devi=
-ce: %d\n",
-> > +                     __func__, ret);
-> > +             return ret;
-> > +     }
-> > +
-> > +     ret =3D nct6694_wdt_setup(&data->wdev);
->
-> This is too late. It needs to be done before registering the watchdog.
->
-> > +     if (ret) {
-> > +             dev_err(&pdev->dev, "Failed to setup WDT device!\n");
-> > +             return ret;
-> > +     }
-> > +
-> > +     return 0;
-> > +}
-> > +
-> > +static struct platform_driver nct6694_wdt_driver =3D {
-> > +     .driver =3D {
-> > +             .name   =3D DRVNAME,
-> > +     },
-> > +     .probe          =3D nct6694_wdt_probe,
-> > +};
-> > +
-> > +static int __init nct6694_init(void)
-> > +{
-> > +     int err;
-> > +
-> > +     err =3D platform_driver_register(&nct6694_wdt_driver);
-> > +     if (!err) {
-> > +             if (err)
-> > +                     platform_driver_unregister(&nct6694_wdt_driver);
-> > +     }
-> > +
-> > +     return err;
-> > +}
-> > +subsys_initcall(nct6694_init);
-> > +
-> > +static void __exit nct6694_exit(void)
-> > +{
-> > +     platform_driver_unregister(&nct6694_wdt_driver);
-> > +}
-> > +module_exit(nct6694_exit);
-> > +
-> > +MODULE_DESCRIPTION("USB-WDT driver for NCT6694");
-> > +MODULE_AUTHOR("Ming Yu <tmyu0@nuvoton.com>");
-> > +MODULE_LICENSE("GPL");
->
-
-Best regards,
-Ming
 
