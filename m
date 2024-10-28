@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-139686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71EE19B3CED
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 22:37:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A27349B3CEE
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 22:38:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 321B72830CC
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:37:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31DF31F23054
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E126F1E25F8;
-	Mon, 28 Oct 2024 21:37:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99DBA1E1C2E;
+	Mon, 28 Oct 2024 21:37:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="XbF5FJAX"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="PyclYmAg"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 101591EE009
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 21:37:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639871EE01E
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 21:37:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730151463; cv=none; b=liGZF4+kG52DCVa7VVCKOomi7+Hx9W5QXVY7NKbbUeX3hRmAJ0JzqBkj2q3H4FuX1bNilElnrFBeGo2sXND/5K//wFKB+QnzX/1EKI1cyhgYisVG7fEdsCdiqQbkyyuf3JD5bpJAzq/M97TddSmxthkBUp8pF7JpmV/LHq3I/rg=
+	t=1730151468; cv=none; b=RVmzmicH9lLZFE4RFd7s9lJgH8xjaNwa40e8WOHdFxMgI5mrg4H523BPRGSPfEhZQaEdvK8OzhWryb6SuM1OBiDsTsDw0D0gQsmi7N3OXgPqQhIoE/aYHHz7IPcjcnU5eWOGlOfNiE8fOi4BFko31fHN5Qnw9+8KLn4MTXX2OUw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730151463; c=relaxed/simple;
-	bh=zlnLUOim/QaHKJc9UofPvMKXSv0FNklj9ig6zWE++P8=;
+	s=arc-20240116; t=1730151468; c=relaxed/simple;
+	bh=OcMowhOyQt7JlKediIU8DY4J52dv0GEXJ/jhxK9Ga/Q=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZnSl1XmTRS+1bOMeYLMgqbpVRM7SgYU89DIj2pVokbp1SzATDXD8j60eLMWhjnx0Df82OOrlKhmTh/wT7fm7kMQHbipkmv61SlDkZyRIkDVRJAz0uBI9cN1lIYhtJoqmxwC83TFUKyz0fGSLrGEExbpJhvox/fDdF51pYH/kH9k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=XbF5FJAX; arc=none smtp.client-ip=171.64.64.25
+	 MIME-Version; b=XHQ/UbkUWwRqZvbA0rQPnfKQt9VRrPCsyWW+p+05844Wgvchm1SRnKDUDDNY4MJnPDGev3fHYtAES13jQUH0Y4aXBeB6aC0GO11TLkt1VFNNrhjlaI5/GlC0MNOtJ78xttjBwKMVZ166fhzUX8/CDQOKc2fFZGSsH2Tv2313WP4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=PyclYmAg; arc=none smtp.client-ip=171.64.64.25
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,23 +37,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=i1+hFTKpDJbk7fQaYfHZF1/cNOl8KtR9xjMKGxdgykY=; t=1730151461; x=1731015461; 
-	b=XbF5FJAX2d2qiS8WhCCFFP09/fagY0M2KMipOz0KcmAkxoKGsts9RvvEw4wrO3qgO2+Y3IJKJtR
-	3+zUPKiVrIvLiFC6a6V7XWHNliDK+AB1B4/L93IjUlgg30MSgoHRg7LuZfJmx0VdhdBvhGLV0/LjN
-	cbl//pf8zUwVlNR6MEZ9ok3GNnyZgyhNOKASf9gV83BoTUeumg+bnXpY3UyTQYj1Pqk4V6VYkIrfd
-	RLMW82KSH6fvgN3cqbJ17zCOeYU7jOzpLTOmQOlfufImYStdc1NSPKdGgKJVV0tpLJ1C1UJ//qPVs
-	w27qnkZ6o/t9Lme5S6Mwau1QT8iU83dWsEHg==;
+	bh=wxTN3YwJ0oEW+7cJBBBlVXfsAWBU/ChLDi0s/AlWrMw=; t=1730151464; x=1731015464; 
+	b=PyclYmAgoFzg6Tvf9NbD4PNVMoYOmfYeTNVmaNQW2ihmHkz7TnG3TT/SWFgiPbcEsOULTgfXYgw
+	BF3xParEmD1CO2OTeavjsC5CAxPtNHvAn9LO+o61fFqJLCxBCH0ZE5r23vhZz0WakgzcfpuMyBZ6w
+	ur31Cgo4q7uoyV28iFPKxz7D67sSoBaJQYUhw4xb6HVUO5hUkJpsIFllmMDjWRGtohCwfn1dtRrV/
+	k3Oqx2UmmITMQJSF28FtwLnhZZm6okgiaOMV+cTt2LTIzqVu8xDZprYsiRjkVo1liueuULdSQ+vhh
+	WOkbHBVUxiuhLZwNqfP31Cz7j3NIsytjCd3g==;
 Received: from ouster2016.stanford.edu ([172.24.72.71]:54106 helo=localhost.localdomain)
 	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <ouster@cs.stanford.edu>)
-	id 1t5XPJ-0005xj-WF; Mon, 28 Oct 2024 14:36:14 -0700
+	id 1t5XPK-0005xj-P7; Mon, 28 Oct 2024 14:36:16 -0700
 From: John Ousterhout <ouster@cs.stanford.edu>
 To: netdev@vger.kernel.org
 Cc: John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next 02/12] net: homa: define Homa packet formats
-Date: Mon, 28 Oct 2024 14:35:29 -0700
-Message-ID: <20241028213541.1529-3-ouster@cs.stanford.edu>
+Subject: [PATCH net-next 03/12] net: homa: create shared Homa header files
+Date: Mon, 28 Oct 2024 14:35:30 -0700
+Message-ID: <20241028213541.1529-4-ouster@cs.stanford.edu>
 X-Mailer: git-send-email 2.45.1
 In-Reply-To: <20241028213541.1529-1-ouster@cs.stanford.edu>
 References: <20241028213541.1529-1-ouster@cs.stanford.edu>
@@ -65,398 +65,917 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Score: -101.0
-X-Scan-Signature: a4197552717df0bd80eeda27cbeae713
+X-Scan-Signature: 9eb37da18be5e863a6692c7c13a337d1
+
+homa_impl.h defines "struct homa", which contains overall information
+about the Homa transport, plus various odds and ends that are used
+throughout the Homa implementation.
+
+homa_stub.h is a temporary header file that provides stubs for
+facilities that have omitted for this first patch series. This file
+will go away once Home is fully upstreamed.
 
 Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
 ---
- net/homa/homa_wire.h | 378 +++++++++++++++++++++++++++++++++++++++++++
- 1 file changed, 378 insertions(+)
- create mode 100644 net/homa/homa_wire.h
+ net/homa/homa_impl.h | 801 +++++++++++++++++++++++++++++++++++++++++++
+ net/homa/homa_stub.h |  80 +++++
+ 2 files changed, 881 insertions(+)
+ create mode 100644 net/homa/homa_impl.h
+ create mode 100644 net/homa/homa_stub.h
 
-diff --git a/net/homa/homa_wire.h b/net/homa/homa_wire.h
+diff --git a/net/homa/homa_impl.h b/net/homa/homa_impl.h
 new file mode 100644
-index 000000000000..d7b87dc88cc1
+index 000000000000..0c8676726ce7
 --- /dev/null
-+++ b/net/homa/homa_wire.h
-@@ -0,0 +1,378 @@
++++ b/net/homa/homa_impl.h
+@@ -0,0 +1,801 @@
 +/* SPDX-License-Identifier: BSD-2-Clause */
 +
-+/* This file defines the on-the-wire format of Homa packets. */
++/* This file contains definitions that are shared across the files
++ * that implement Homa for Linux.
++ */
 +
-+#ifndef _HOMA_WIRE_H
-+#define _HOMA_WIRE_H
++#ifndef _HOMA_IMPL_H
++#define _HOMA_IMPL_H
 +
++#include <linux/bug.h>
++
++#include <linux/audit.h>
++#include <linux/icmp.h>
++#include <linux/init.h>
++#include <linux/list.h>
++#include <linux/module.h>
++#include <linux/kernel.h>
++#include <linux/kthread.h>
++#include <linux/completion.h>
++#include <linux/proc_fs.h>
++#include <linux/sched/signal.h>
 +#include <linux/skbuff.h>
++#include <linux/socket.h>
++#include <linux/version.h>
++#include <linux/vmalloc.h>
++#include <net/icmp.h>
++#include <net/ip.h>
++#include <net/protocol.h>
++#include <net/inet_common.h>
++#include <net/gro.h>
++#include <net/rps.h>
++#include <uapi/linux/homa.h>
++#include "homa_wire.h"
++
++/* Forward declarations. */
++struct homa_peer;
++struct homa_sock;
++struct homa;
++
++/* Declarations used in this file, so they can't be made at the end. */
++void     homa_throttle_lock_slow(struct homa *homa);
++
++#define sizeof32(type) ((int)(sizeof(type)))
 +
 +/**
-+ * enum homa_packet_type - Defines the possible types of Homa packets.
-+ *
-+ * See the xxx_header structs below for more information about each type.
++ * struct homa_interest - Contains various information used while waiting
++ * for incoming messages (indicates what kinds of messages a particular
++ * thread is interested in receiving).
 + */
-+enum homa_packet_type {
-+	DATA               = 0x10,
-+	RESEND             = 0x12,
-+	UNKNOWN            = 0x13,
-+	BUSY               = 0x14,
-+	NEED_ACK           = 0x17,
-+	ACK                = 0x18,
-+	BOGUS              = 0x19,      /* Used only in unit tests. */
-+	/* If you add a new type here, you must also do the following:
-+	 * 1. Change BOGUS so it is the highest opcode
-+	 * 2. Add support for the new opcode in homa_print_packet,
-+	 *    homa_print_packet_short, homa_symbol_for_type, and mock_skb_new.
-+	 * 3. Add the header length to header_lengths in homa_plumbing.c.
++struct homa_interest {
++	/**
++	 * @thread: Thread that would like to receive a message. Will get
++	 * woken up when a suitable message becomes available.
 +	 */
++	struct task_struct *thread;
++
++	/**
++	 * @ready_rpc: This is actually a (struct homa_rpc *) identifying the
++	 * RPC that was found; NULL if no RPC has been found yet. This
++	 * variable is used for synchronization to handoff the RPC, and
++	 * must be set only after @locked is set.
++	 */
++	atomic_long_t ready_rpc;
++
++	/**
++	 * @locked: Nonzero means that @ready_rpc is locked; only valid
++	 * if @ready_rpc is non-NULL.
++	 */
++	int locked;
++
++	/**
++	 * @core: Core on which @thread was executing when it registered
++	 * its interest.  Used for load balancing (see balance.txt).
++	 */
++	int core;
++
++	/**
++	 * @reg_rpc: RPC whose @interest field points here, or
++	 * NULL if none.
++	 */
++	struct homa_rpc *reg_rpc;
++
++	/**
++	 * @request_links: For linking this object into
++	 * &homa_sock.request_interests. The interest must not be linked
++	 * on either this list or @response_links if @id is nonzero.
++	 */
++	struct list_head request_links;
++
++	/**
++	 * @response_links: For linking this object into
++	 * &homa_sock.request_interests.
++	 */
++	struct list_head response_links;
 +};
 +
-+/** define HOMA_IPV6_HEADER_LENGTH - Size of IP header (V6). */
-+#define HOMA_IPV6_HEADER_LENGTH 40
-+
-+/** define HOMA_IPV4_HEADER_LENGTH - Size of IP header (V4). */
-+#define HOMA_IPV4_HEADER_LENGTH 20
-+
 +/**
-+ * define HOMA_SKB_EXTRA - How many bytes of additional space to allow at the
-+ * beginning of each sk_buff, before the IP header. This includes room for a
-+ * VLAN header and also includes some extra space, "just to be safe" (not
-+ * really sure if this is needed).
++ * homa_interest_init() - Fill in default values for all of the fields
++ * of a struct homa_interest.
++ * @interest:   Struct to initialize.
 + */
-+#define HOMA_SKB_EXTRA 40
-+
-+/**
-+ * define HOMA_ETH_OVERHEAD - Number of bytes per Ethernet packet for Ethernet
-+ * header, CRC, preamble, and inter-packet gap.
-+ */
-+#define HOMA_ETH_OVERHEAD 42
-+
-+/**
-+ * define HOMA_MIN_PKT_LENGTH - Every Homa packet must be padded to at least
-+ * this length to meet Ethernet frame size limitations. This number includes
-+ * Homa headers and data, but not IP or Ethernet headers.
-+ */
-+#define HOMA_MIN_PKT_LENGTH 26
-+
-+/**
-+ * define HOMA_MAX_HEADER - Number of bytes in the largest Homa header.
-+ */
-+#define HOMA_MAX_HEADER 90
-+
-+/**
-+ * define ETHERNET_MAX_PAYLOAD - Maximum length of an Ethernet packet,
-+ * excluding preamble, frame delimeter, VLAN header, CRC, and interpacket gap;
-+ * i.e. all of this space is available for Homa.
-+ */
-+#define ETHERNET_MAX_PAYLOAD 1500
-+
-+/**
-+ * define HOMA_MAX_PRIORITIES - The maximum number of priority levels that
-+ * Homa can use (the actual number can be restricted to less than this at
-+ * runtime). Changing this value will affect packet formats.
-+ */
-+#define HOMA_MAX_PRIORITIES 8
-+
-+/**
-+ * struct common_header - Wire format for the first bytes in every Homa
-+ * packet. This must (mostly) match the format of a TCP header to enable
-+ * Homa packets to actually be transmitted as TCP packets (and thereby
-+ * take advantage of TSO and other features).
-+ */
-+struct common_header {
-+	/**
-+	 * @sport: Port on source machine from which packet was sent.
-+	 * Must be in the same position as in a TCP header.
-+	 */
-+	__be16 sport;
-+
-+	/**
-+	 * @dport: Port on destination that is to receive packet. Must be
-+	 * in the same position as in a TCP header.
-+	 */
-+	__be16 dport;
-+
-+	/**
-+	 * @sequence: corresponds to the sequence number field in TCP headers;
-+	 * used in DATA packets to hold the offset in the message of the first
-+	 * byte of data. This value will only be correct in the first segment
-+	 * of a GSO packet.
-+	 */
-+	__be32 sequence;
-+
-+	/**
-+	 * The fields below correspond to the acknowledgment field in TCP
-+	 * headers; not used by Homa, except for the low-order 8 bits, which
-+	 * specify the Homa packet type (one of the values in the
-+	 * homa_packet_type enum).
-+	 */
-+	__be16 ack1;
-+	__u8 ack2;
-+	__u8 type;
-+
-+	/**
-+	 * @doff: High order 4 bits holds the number of 4-byte chunks in a
-+	 * data_header (low-order bits unused). Used only for DATA packets;
-+	 * must be in the same position as the data offset in a TCP header.
-+	 * Used by TSO to determine where the replicated header portion ends.
-+	 */
-+	__u8 doff;
-+
-+	__u8 dummy1;
-+
-+	/**
-+	 * @window: Corresponds to the window field in TCP headers. Not used
-+	 * by HOMA.
-+	 */
-+	__be16 window;
-+
-+	/**
-+	 * @checksum: not used by Homa, but must occupy the same bytes as
-+	 * the checksum in a TCP header (TSO may modify this?).
-+	 */
-+	__be16 checksum;
-+
-+	__be16 dummy2;
-+
-+	/**
-+	 * @sender_id: the identifier of this RPC as used on the sender (i.e.,
-+	 * if the low-order bit is set, then the sender is the server for
-+	 * this RPC).
-+	 */
-+	__be64 sender_id;
-+} __packed;
-+
-+/**
-+ * struct homa_ack - Identifies an RPC that can be safely deleted by its
-+ * server. After sending the response for an RPC, the server must retain its
-+ * state for the RPC until it knows that the client has successfully
-+ * received the entire response. An ack indicates this. Clients will
-+ * piggyback acks on future data packets, but if a client doesn't send
-+ * any data to the server, the server will eventually request an ack
-+ * explicitly with a NEED_ACK packet, in which case the client will
-+ * return an explicit ACK.
-+ */
-+struct homa_ack {
-+	/**
-+	 * @id: The client's identifier for the RPC. 0 means this ack
-+	 * is invalid.
-+	 */
-+	__be64 client_id;
-+
-+	/** @client_port: The client-side port for the RPC. */
-+	__be16 client_port;
-+
-+	/** @server_port: The server-side port for the RPC. */
-+	__be16 server_port;
-+} __packed;
-+
-+/* struct data_header - Contains data for part or all of a Homa message.
-+ * An incoming packet consists of a data_header followed by message data.
-+ * An outgoing packet can have this simple format as well, or it can be
-+ * structured as a GSO packet. GSO packets look like this:
-+ *
-+ *    No hijacking:
-+ *
-+ *    |-----------------------|
-+ *    |                       |
-+ *    |     data_header       |
-+ *    |                       |
-+ *    |---------------------- |
-+ *    |                       |
-+ *    |                       |
-+ *    |     segment data      |
-+ *    |                       |
-+ *    |                       |
-+ *    |-----------------------|
-+ *    |      seg_header       |
-+ *    |-----------------------|
-+ *    |                       |
-+ *    |                       |
-+ *    |     segment data      |
-+ *    |                       |
-+ *    |                       |
-+ *    |-----------------------|
-+ *    |      seg_header       |
-+ *    |-----------------------|
-+ *    |                       |
-+ *    |                       |
-+ *    |     segment data      |
-+ *    |                       |
-+ *    |                       |
-+ *    |-----------------------|
-+ *
-+ * TSO will not adjust @common.sequence in the segments, so Homa sprinkles
-+ * correct offsets (in seg_headers) throughout the segment data; TSO/GSO
-+ * will include a different seg_header in each generated packet.
-+ */
-+
-+struct seg_header {
-+	/**
-+	 * @offset: Offset within message of the first byte of data in
-+	 * this segment.
-+	 */
-+	__be32 offset;
-+} __packed;
-+
-+struct data_header {
-+	struct common_header common;
-+
-+	/** @message_length: Total #bytes in the message. */
-+	__be32 message_length;
-+
-+	/**
-+	 * @incoming: The receiver can expect the sender to send all of the
-+	 * bytes in the message up to at least this offset (exclusive),
-+	 * even without additional grants. This includes unscheduled
-+	 * bytes, granted bytes, plus any additional bytes the sender
-+	 * transmits unilaterally (e.g., to round up to a full GSO batch).
-+	 */
-+	__be32 incoming;
-+
-+	/** @ack: If the @client_id field of this is nonzero, provides info
-+	 * about an RPC that the recipient can now safely free. Note: in
-+	 * TSO packets this will get duplicated in each of the segments;
-+	 * in order to avoid repeated attempts to ack the same RPC,
-+	 * homa_gro_receive will clear this field in all segments but the
-+	 * first.
-+	 */
-+	struct homa_ack ack;
-+
-+	__be16 dummy;
-+
-+	/**
-+	 * @retransmit: 1 means this packet was sent in response to a RESEND
-+	 * (it has already been sent previously).
-+	 */
-+	__u8 retransmit;
-+
-+	__u8 pad;
-+
-+	/** @seg: First of possibly many segments. */
-+	struct seg_header seg;
-+} __packed;
-+_Static_assert(sizeof(struct data_header) <= HOMA_MAX_HEADER,
-+	       "data_header too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
-+_Static_assert(sizeof(struct data_header) >= HOMA_MIN_PKT_LENGTH,
-+	       "data_header too small: Homa doesn't currently have codeto pad data packets");
-+_Static_assert(((sizeof(struct data_header) - sizeof(struct seg_header)) & 0x3) == 0,
-+	       " data_header length not a multiple of 4 bytes (required for TCP/TSO compatibility");
-+
-+/**
-+ * homa_data_len() - Returns the total number of bytes in a DATA packet
-+ * after the data_header. Note: if the packet is a GSO packet, the result
-+ * may include metadata as well as packet data.
-+ */
-+static inline int homa_data_len(struct sk_buff *skb)
++static inline void homa_interest_init(struct homa_interest *interest)
 +{
-+	return skb->len - skb_transport_offset(skb) - sizeof(struct data_header);
++	interest->thread = current;
++	atomic_long_set(&interest->ready_rpc, 0);
++	interest->locked = 0;
++	interest->core = raw_smp_processor_id();
++	interest->reg_rpc = NULL;
++	interest->request_links.next = LIST_POISON1;
++	interest->response_links.next = LIST_POISON1;
 +}
 +
 +/**
-+ * struct resend_header - Wire format for RESEND packets.
++ * struct homa - Overall information about the Homa protocol implementation.
 + *
-+ * A RESEND is sent by the receiver when it believes that message data may
-+ * have been lost in transmission (or if it is concerned that the sender may
-+ * have crashed). The receiver should resend the specified portion of the
-+ * message, even if it already sent it previously.
++ * There will typically only exist one of these at a time, except during
++ * unit tests.
 + */
-+struct resend_header {
-+	/** @common: Fields common to all packet types. */
-+	struct common_header common;
++struct homa {
++	/**
++	 * @next_outgoing_id: Id to use for next outgoing RPC request.
++	 * This is always even: it's used only to generate client-side ids.
++	 * Accessed without locks.
++	 */
++	atomic64_t next_outgoing_id;
 +
 +	/**
-+	 * @offset: Offset within the message of the first byte of data that
-+	 * should be retransmitted.
++	 * @link_idle_time: The time, measured by get_cycles() at which we
++	 * estimate that all of the packets we have passed to Linux for
++	 * transmission will have been transmitted. May be in the past.
++	 * This estimate assumes that only Homa is transmitting data, so
++	 * it could be a severe underestimate if there is competing traffic
++	 * from, say, TCP. Access only with atomic ops.
 +	 */
-+	__be32 offset;
++	atomic64_t link_idle_time __aligned(L1_CACHE_BYTES);
 +
 +	/**
-+	 * @length: Number of bytes of data to retransmit; this could specify
-+	 * a range longer than the total message size. Zero is a special case
-+	 * used by servers; in this case, there is no need to actually resend
-+	 * anything; the purpose of this packet is to trigger an UNKNOWN
-+	 * response if the client no longer cares about this RPC.
++	 * @pacer_mutex: Ensures that only one instance of homa_pacer_xmit
++	 * runs at a time. Only used in "try" mode: never block on this.
 +	 */
-+	__be32 length;
-+} __packed;
-+_Static_assert(sizeof(struct resend_header) <= HOMA_MAX_HEADER,
-+	       "resend_header too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++	spinlock_t pacer_mutex __aligned(L1_CACHE_BYTES);
++
++	/**
++	 * @pacer_fifo_fraction: The fraction of time (in thousandths) when
++	 * the pacer should transmit next from the oldest message, rather
++	 * than the highest-priority message. Set externally via sysctl.
++	 */
++	int pacer_fifo_fraction;
++
++	/**
++	 * @pacer_fifo_count: When this becomes <= zero, it's time for the
++	 * pacer to allow the oldest RPC to transmit.
++	 */
++	int pacer_fifo_count;
++
++	/**
++	 * @pacer_start: get_cycles() time when the pacer last woke up
++	 * (if the pacer is running) or 0 if the pacer is sleeping.
++	 */
++	__u64 pacer_wake_time;
++
++	/**
++	 * @throttle_lock: Used to synchronize access to @throttled_rpcs. To
++	 * insert or remove an RPC from throttled_rpcs, must first acquire
++	 * the RPC's socket lock, then this lock.
++	 */
++	spinlock_t throttle_lock;
++
++	/**
++	 * @throttled_rpcs: Contains all homa_rpcs that have bytes ready
++	 * for transmission, but which couldn't be sent without exceeding
++	 * the queue limits for transmission. Manipulate only with "_rcu"
++	 * functions.
++	 */
++	struct list_head throttled_rpcs;
++
++	/**
++	 * @throttle_add: The get_cycles() time when the most recent RPC
++	 * was added to @throttled_rpcs.
++	 */
++	__u64 throttle_add;
++
++	/**
++	 * @throttle_min_bytes: If a packet has fewer bytes than this, then it
++	 * bypasses the throttle mechanism and is transmitted immediately.
++	 * We have this limit because for very small packets we can't keep
++	 * up with the NIC (we're limited by CPU overheads); there's no
++	 * need for throttling and going through the throttle mechanism
++	 * adds overhead, which slows things down. At least, that's the
++	 * hypothesis (needs to be verified experimentally!). Set externally
++	 * via sysctl.
++	 */
++	int throttle_min_bytes;
++
++	/**
++	 * @next_client_port: A client port number to consider for the
++	 * next Homa socket; increments monotonically. Current value may
++	 * be in the range allocated for servers; must check before using.
++	 * This port may also be in use already; must check.
++	 */
++	__u16 next_client_port __aligned(L1_CACHE_BYTES);
++
++	/**
++	 * @port_map: Information about all open sockets. Dynamically
++	 * allocated; must be kfreed.
++	 */
++	struct homa_socktab *port_map __aligned(L1_CACHE_BYTES);
++
++	/**
++	 * @peertab: Info about all the other hosts we have communicated with.
++	 * Dynamically allocated; must be kfreed.
++	 */
++	struct homa_peertab *peers;
++
++	/** @max_numa: Highest NUMA node id in use by any core. */
++	int max_numa;
++
++	/**
++	 * @unsched_bytes: The number of bytes that may be sent in a
++	 * new message without receiving any grants. There used to be a
++	 * variable rtt_bytes that served this purpose, and was also used
++	 * for window.  Historically, rtt_bytes was intended to be the amount
++	 * of data that can be transmitted over the wire in the time it
++	 * takes to send a full-size data packet and receive back a grant.
++	 * But, for fast networks that value could result in too much
++	 * buffer utilization (and, we wanted to have separate values for
++	 * @unsched_bytes and @window). Set externally via sysctl.
++	 */
++	int unsched_bytes;
++
++	/**
++	 * @window_param: Set externally via sysctl to select a policy for
++	 * computing homa-grant_window. If 0 then homa->grant_window is
++	 * computed dynamically based on the number of RPCs we're currently
++	 * granting to. If nonzero then homa->grant_window will always be the
++	 * same as @window_param.
++	 */
++	int window_param;
++
++	/**
++	 * @link_bandwidth: The raw bandwidth of the network uplink, in
++	 * units of 1e06 bits per second.  Set externally via sysctl.
++	 */
++	int link_mbps;
++
++	/**
++	 * @poll_cycles: The value of @poll_usecs in the units returned
++	 * by get_cycles().
++	 */
++	int poll_cycles;
++
++	/**
++	 * @fifo_grant_increment: how many additional bytes to grant in
++	 * a "pity" grant sent to the oldest outstanding message. Set
++	 * externally via sysctl.
++	 */
++	int fifo_grant_increment;
++
++	/**
++	 * @grant_fifo_fraction: The fraction (in thousandths) of granted
++	 * bytes that should go to the *oldest* incoming message, rather
++	 * than the highest priority ones. Set externally via sysctl.
++	 */
++	int grant_fifo_fraction;
++
++	/**
++	 * @max_overcommit: The maximum number of messages to which Homa will
++	 * send grants at any given point in time.  Set externally via sysctl.
++	 */
++	int max_overcommit;
++
++	/**
++	 * @max_incoming: Homa will try to ensure that the total number of
++	 * bytes senders have permission to send to this host (either
++	 * unscheduled bytes or granted bytes) does not exceeds this value.
++	 * Set externally via sysctl.
++	 */
++	int max_incoming;
++
++	/**
++	 * @max_rpcs_per_peer: If there are multiple incoming messages from
++	 * the same peer, Homa will only issue grants to this many of them
++	 * at a time.  Set externally via sysctl.
++	 */
++	int max_rpcs_per_peer;
++
++	/**
++	 * @resend_ticks: When an RPC's @silent_ticks reaches this value,
++	 * start sending RESEND requests.
++	 */
++	int resend_ticks;
++
++	/**
++	 * @resend_interval: minimum number of homa timer ticks between
++	 * RESENDs for the same RPC.
++	 */
++	int resend_interval;
++
++	/**
++	 * @timeout_ticks: abort an RPC if its silent_ticks reaches this value.
++	 */
++	int timeout_ticks;
++
++	/**
++	 * @timeout_resends: Assume that a server is dead if it has not
++	 * responded after this many RESENDs have been sent to it.
++	 */
++	int timeout_resends;
++
++	/**
++	 * @request_ack_ticks: How many timer ticks we'll wait for the
++	 * client to ack an RPC before explicitly requesting an ack.
++	 * Set externally via sysctl.
++	 */
++	int request_ack_ticks;
++
++	/**
++	 * @reap_limit: Maximum number of packet buffers to free in a
++	 * single call to home_rpc_reap.
++	 */
++	int reap_limit;
++
++	/**
++	 * @dead_buffs_limit: If the number of packet buffers in dead but
++	 * not yet reaped RPCs is less than this number, then Homa reaps
++	 * RPCs in a way that minimizes impact on performance but may permit
++	 * dead RPCs to accumulate. If the number of dead packet buffers
++	 * exceeds this value, then Homa switches to a more aggressive approach
++	 * to reaping RPCs. Set externally via sysctl.
++	 */
++	int dead_buffs_limit;
++
++	/**
++	 * @max_dead_buffs: The largest aggregate number of packet buffers
++	 * in dead (but not yet reaped) RPCs that has existed so far in a
++	 * single socket.  Readable via sysctl, and may be reset via sysctl
++	 * to begin recalculating.
++	 */
++	int max_dead_buffs;
++
++	/**
++	 * @pacer_kthread: Kernel thread that transmits packets from
++	 * throttled_rpcs in a way that limits queue buildup in the
++	 * NIC.
++	 */
++	struct task_struct *pacer_kthread;
++
++	/**
++	 * @pacer_exit: true means that the pacer thread should exit as
++	 * soon as possible.
++	 */
++	bool pacer_exit;
++
++	/**
++	 * @max_nic_queue_ns: Limits the NIC queue length: we won't queue
++	 * up a packet for transmission if link_idle_time is this many
++	 * nanoseconds in the future (or more). Set externally via sysctl.
++	 */
++	int max_nic_queue_ns;
++
++	/**
++	 * @max_nic_queue_cycles: Same as max_nic_queue_ns, except in units
++	 * of get_cycles().
++	 */
++	int max_nic_queue_cycles;
++
++	/**
++	 * @cycles_per_kbyte: the number of cycles, as measured by get_cycles(),
++	 * that it takes to transmit 1000 bytes on our uplink. This is actually
++	 * a slight overestimate of the value, to ensure that we don't
++	 * underestimate NIC queue length and queue too many packets.
++	 */
++	__u32 cycles_per_kbyte;
++
++	/**
++	 * @max_gso_size: Maximum number of bytes that will be included
++	 * in a single output packet that Homa passes to Linux. Can be set
++	 * externally via sysctl to lower the limit already enforced by Linux.
++	 */
++	int max_gso_size;
++
++	/**
++	 * @gso_force_software: A non-zero value will cause Home to perform
++	 * segmentation in software using GSO; zero means ask the NIC to
++	 * perform TSO. Set externally via sysctl.
++	 */
++	int gso_force_software;
++
++	/**
++	 * @max_gro_skbs: Maximum number of socket buffers that can be
++	 * aggregated by the GRO mechanism.  Set externally via sysctl.
++	 */
++	int max_gro_skbs;
++
++	/**
++	 * @gro_policy: An OR'ed together collection of bits that determine
++	 * how Homa packets should be steered for SoftIRQ handling.  A value
++	 * of zero will eliminate any Homa-specific behaviors, reverting
++	 * to the Linux defaults. Set externally via sysctl (but modifying
++	 * it is almost certainly a bad idea; see below).
++	 */
++	int gro_policy;
++
++	/* Bits that can be specified for gro_policy. These were created for
++	 * testing, in order to evaluate various possible policies; you almost
++	 * certainly should not use any value other than HOMA_GRO_NORMAL.
++	 * HOMA_GRO_SAME_CORE         If isolated packets arrive (not part of
++	 *                            a batch) use the GRO core for SoftIRQ also.
++	 * HOMA_GRO_IDLE              Use old mechanism for selecting an idle
++	 *                            core for SoftIRQ (deprecated).
++	 * HOMA_GRO_NEXT              Always use the next core in circular
++	 *                            order for SoftIRQ (deprecated).
++	 * HOMA_GRO_GEN2              Use the new mechanism for selecting an
++	 *                            idle core for SoftIRQ.
++	 * HOMA_GRO_SHORT_BYPASS      Pass all single-packet messages directly
++	 *                            to homa_softirq during GRO (only if the
++	 *                            core isn't overloaded).
++	 * HOMA_GRO_GEN3              Use the "Gen3" mechanisms for load
++	 *                            balancing.
++	 */
++	#define HOMA_GRO_SAME_CORE         2
++	#define HOMA_GRO_IDLE              4
++	#define HOMA_GRO_NEXT              8
++	#define HOMA_GRO_GEN2           0x10
++	#define HOMA_GRO_SHORT_BYPASS   0x40
++	#define HOMA_GRO_GEN3           0x80
++	#define HOMA_GRO_NORMAL      (HOMA_GRO_SAME_CORE | HOMA_GRO_GEN2 | \
++				      HOMA_GRO_SHORT_BYPASS)
++
++	/*
++	 * @busy_usecs: if there has been activity on a core within the
++	 * last @busy_usecs, it is considered to be busy and Homa will
++	 * try to avoid scheduling other activities on the core. See
++	 * balance.txt for more on load balancing. Set externally via sysctl.
++	 */
++	int busy_usecs;
++
++	/** @busy_cycles: Same as busy_usecs except in get_cycles() units. */
++	int busy_cycles;
++
++	/*
++	 * @gro_busy_usecs: if the gap between the completion of
++	 * homa_gro_receive and the next call to homa_gro_receive on the same
++	 * core is less than this, then GRO on that core is considered to be
++	 * "busy", and optimizations such as HOMA_GRO_SHORT_BYPASS will not be
++	 * done because they risk overloading the core. Set externally via
++	 * sysctl.
++	 */
++	int gro_busy_usecs;
++
++	/** @gro_busy_cycles: Same as busy_usecs except in get_cycles() units. */
++	int gro_busy_cycles;
++
++	/**
++	 * @timer_ticks: number of times that homa_timer has been invoked
++	 * (may wraparound, which is safe).
++	 */
++	__u32 timer_ticks;
++
++	/**
++	 * @flags: a collection of bits that can be set using sysctl
++	 * to trigger various behaviors.
++	 */
++	int flags;
++
++	/**
++	 * @bpage_lease_usecs: how long a core can own a bpage (microseconds)
++	 * before its ownership can be revoked to reclaim the page.
++	 */
++	int bpage_lease_usecs;
++
++	/**
++	 * @bpage_lease_cycles: The value of @bpage_lease_usecs in get_cycles
++	 * units.
++	 */
++	int bpage_lease_cycles;
++
++	/**
++	 * @next_id: Set via sysctl; causes next_outgoing_id to be set to
++	 * this value; always reads as zero. Typically used while debugging to
++	 * ensure that different nodes use different ranges of ids.
++	 */
++	int next_id;
++
++	/**
++	 * @temp: the values in this array can be read and written with sysctl.
++	 * They have no officially defined purpose, and are available for
++	 * short-term use during testing.
++	 */
++	int temp[4];
++};
 +
 +/**
-+ * struct unknown_header - Wire format for UNKNOWN packets.
-+ *
-+ * An UNKNOWN packet is sent by either server or client when it receives a
-+ * packet for an RPC that is unknown to it. When a client receives an
-+ * UNKNOWN packet it will typically restart the RPC from the beginning;
-+ * when a server receives an UNKNOWN packet it will typically discard its
-+ * state for the RPC.
++ * struct homa_skb_info - Additional information needed by Homa for each
++ * outbound DATA packet. Space is allocated for this at the very end of the
++ * linear part of the skb.
 + */
-+struct unknown_header {
-+	/** @common: Fields common to all packet types. */
-+	struct common_header common;
-+} __packed;
-+_Static_assert(sizeof(struct unknown_header) <= HOMA_MAX_HEADER,
-+	       "unknown_header too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
++struct homa_skb_info {
++	/**
++	 * @next_skb: used to link together all of the skb's for a Homa
++	 * message (in order of offset).
++	 */
++	struct sk_buff *next_skb;
++
++	/**
++	 * @wire_bytes: total number of bytes of network bandwidth that
++	 * will be consumed by this packet. This includes everything,
++	 * including additional headers added by GSO, IP header, Ethernet
++	 * header, CRC, preamble, and inter-packet gap.
++	 */
++	int wire_bytes;
++
++	/**
++	 * @data_bytes: total bytes of message data across all of the
++	 * segments in this packet.
++	 */
++	int data_bytes;
++
++	/** @seg_length: maximum number of data bytes in each GSO segment. */
++	int seg_length;
++
++	/**
++	 * @offset: offset within the message of the first byte of data in
++	 * this packet.
++	 */
++	int offset;
++};
 +
 +/**
-+ * struct busy_header - Wire format for BUSY packets.
-+ *
-+ * These packets tell the recipient that the sender is still alive (even if
-+ * it isn't sending data expected by the recipient).
++ * homa_get_skb_info() - Return the address of Homa's private information
++ * for an sk_buff.
++ * @skb:     Socket buffer whose info is needed.
 + */
-+struct busy_header {
-+	/** @common: Fields common to all packet types. */
-+	struct common_header common;
-+} __packed;
-+_Static_assert(sizeof(struct busy_header) <= HOMA_MAX_HEADER,
-+	       "busy_header too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
-+
-+/**
-+ * struct need_ack_header - Wire format for NEED_ACK packets.
-+ *
-+ * These packets ask the recipient (a client) to return an ACK message if
-+ * the packet's RPC is no longer active.
-+ */
-+struct need_ack_header {
-+	/** @common: Fields common to all packet types. */
-+	struct common_header common;
-+} __packed;
-+_Static_assert(sizeof(struct need_ack_header) <= HOMA_MAX_HEADER,
-+	       "need_ack_header too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
-+
-+/**
-+ * struct ack_header - Wire format for ACK packets.
-+ *
-+ * These packets are sent from a client to a server to indicate that
-+ * a set of RPCs is no longer active on the client, so the server can
-+ * free any state it may have for them.
-+ */
-+struct ack_header {
-+	/** @common: Fields common to all packet types. */
-+	struct common_header common;
-+
-+	/** @num_acks: number of (leading) elements in @acks that are valid. */
-+	__be16 num_acks;
-+
-+#define HOMA_MAX_ACKS_PER_PKT 5
-+	struct homa_ack acks[HOMA_MAX_ACKS_PER_PKT];
-+} __packed;
-+_Static_assert(sizeof(struct ack_header) <= HOMA_MAX_HEADER,
-+	       "ack_header too large for HOMA_MAX_HEADER; must adjust HOMA_MAX_HEADER");
-+
-+/**
-+ * homa_local_id(): given an RPC identifier from an input packet (which
-+ * is network-encoded), return the decoded id we should use for that
-+ * RPC on this machine.
-+ * @sender_id:  RPC id from an incoming packet, such as h->common.sender_id
-+ */
-+static inline __u64 homa_local_id(__be64 sender_id)
++static inline struct homa_skb_info *homa_get_skb_info(struct sk_buff *skb)
 +{
-+	/* If the client bit was set on the sender side, it needs to be
-+	 * removed here, and conversely.
-+	 */
-+	return be64_to_cpu(sender_id) ^ 1;
++	return (struct homa_skb_info *)(skb_end_pointer(skb)
++			- sizeof(struct homa_skb_info));
 +}
 +
-+#endif /* _HOMA_WIRE_H */
++/**
++ * homa_next_skb() - Compute address of Homa's private link field in @skb.
++ * @skb:     Socket buffer containing private link field.
++ *
++ * Homa needs to keep a list of buffers in a message, but it can't use the
++ * links built into sk_buffs because Homa wants to retain its list even
++ * after sending the packet, and the built-in links get used during sending.
++ * Thus we allocate extra space at the very end of the packet's data
++ * area to hold a forward pointer for a list.
++ */
++static inline struct sk_buff **homa_next_skb(struct sk_buff *skb)
++{
++	return (struct sk_buff **)(skb_end_pointer(skb) - sizeof(char *));
++}
++
++/**
++ * homa_set_doff() - Fills in the doff TCP header field for a Homa packet.
++ * @h:     Packet header whose doff field is to be set.
++ * @size:  Size of the "header", bytes (must be a multiple of 4). This
++ *         information is used only for TSO; it's the number of bytes
++ *         that should be replicated in each segment. The bytes after
++ *         this will be distributed among segments.
++ */
++static inline void homa_set_doff(struct data_header *h, int size)
++{
++	h->common.doff = size << 2;
++}
++
++/**
++ * homa_throttle_lock() - Acquire the throttle lock. If the lock
++ * isn't immediately available, record stats on the waiting time.
++ * @homa:    Overall data about the Homa protocol implementation.
++ */
++static inline void homa_throttle_lock(struct homa *homa)
++{
++	if (!spin_trylock_bh(&homa->throttle_lock))
++		homa_throttle_lock_slow(homa);
++}
++
++/**
++ * homa_throttle_unlock() - Release the throttle lock.
++ * @homa:    Overall data about the Homa protocol implementation.
++ */
++static inline void homa_throttle_unlock(struct homa *homa)
++{
++	spin_unlock_bh(&homa->throttle_lock);
++}
++
++/** skb_is_ipv6() - Return true if the packet is encapsulated with IPv6,
++ *  false otherwise (presumably it's IPv4).
++ */
++static inline bool skb_is_ipv6(const struct sk_buff *skb)
++{
++	return ipv6_hdr(skb)->version == 6;
++}
++
++/**
++ * Given an IPv4 address, return an equivalent IPv6 address (an IPv4-mapped
++ * one)
++ * @ip4: IPv4 address, in network byte order.
++ */
++static inline struct in6_addr ipv4_to_ipv6(__be32 ip4)
++{
++	struct in6_addr ret = {};
++
++	if (ip4 == INADDR_ANY)
++		return in6addr_any;
++	ret.in6_u.u6_addr32[2] = htonl(0xffff);
++	ret.in6_u.u6_addr32[3] = ip4;
++	return ret;
++}
++
++/**
++ * ipv6_to_ipv4() - Given an IPv6 address produced by ipv4_to_ipv6, return
++ * the original IPv4 address (in network byte order).
++ * @ip6:  IPv6 address; assumed to be a mapped IPv4 address.
++ */
++static inline __be32 ipv6_to_ipv4(const struct in6_addr ip6)
++{
++	return ip6.in6_u.u6_addr32[3];
++}
++
++/**
++ * skb_canonical_ipv6_addr() - Convert a socket address to the "standard"
++ * form used in Homa, which is always an IPv6 address; if the original address
++ * was IPv4, convert it to an IPv4-mapped IPv6 address.
++ * @addr:   Address to canonicalize.
++ */
++static inline struct in6_addr canonical_ipv6_addr(const union sockaddr_in_union *addr)
++{
++	if (addr) {
++		return (addr->sa.sa_family == AF_INET6)
++			? addr->in6.sin6_addr
++			: ipv4_to_ipv6(addr->in4.sin_addr.s_addr);
++	} else {
++		return in6addr_any;
++	}
++}
++
++/**
++ * skb_canonical_ipv6_saddr() - Given a packet buffer, return its source
++ * address in the "standard" form used in Homa, which is always an IPv6
++ * address; if the original address was IPv4, convert it to an IPv4-mapped
++ * IPv6 address.
++ * @skb:   The source address will be extracted from this packet buffer.
++ */
++static inline struct in6_addr skb_canonical_ipv6_saddr(struct sk_buff *skb)
++{
++	return skb_is_ipv6(skb) ? ipv6_hdr(skb)->saddr
++				: ipv4_to_ipv6(ip_hdr(skb)->saddr);
++}
++
++/**
++ * is_mapped_ipv4() - Return true if an IPv6 address is actually an
++ * IPv4-mapped address, false otherwise.
++ * @x:  The address to check.
++ */
++static inline bool is_mapped_ipv4(const struct in6_addr x)
++{
++	return ((x.in6_u.u6_addr32[0] == 0) &&
++		(x.in6_u.u6_addr32[1] == 0) &&
++		(x.in6_u.u6_addr32[2] == htonl(0xffff)));
++}
++
++/**
++ * tt_addr() - Given an address, return a 4-byte id that will (hopefully)
++ * provide a unique identifier for the address in a timetrace record.
++ * @x:  Address (either IPv6 or IPv4-mapped IPv6)
++ */
++static inline __be32 tt_addr(const struct in6_addr x)
++{
++	return is_mapped_ipv4(x) ? ntohl(x.in6_u.u6_addr32[3])
++			: (x.in6_u.u6_addr32[3] ? ntohl(x.in6_u.u6_addr32[3])
++			: ntohl(x.in6_u.u6_addr32[1]));
++}
++
++#ifdef __UNIT_TEST__
++void unit_log_printf(const char *separator, const char *format, ...)
++		__printf(2, 3);
++#define UNIT_LOG unit_log_printf
++void unit_hook(char *id);
++#define UNIT_HOOK(msg) unit_hook(msg)
++#else
++#define UNIT_LOG(...)
++#define UNIT_HOOK(...)
++#endif
++
++void     homa_abort_rpcs(struct homa *homa, const struct in6_addr *addr,
++			 int port, int error);
++void     homa_abort_sock_rpcs(struct homa_sock *hsk, int error);
++void     homa_ack_pkt(struct sk_buff *skb, struct homa_sock *hsk,
++		      struct homa_rpc *rpc);
++void     homa_add_packet(struct homa_rpc *rpc, struct sk_buff *skb);
++void     homa_add_to_throttled(struct homa_rpc *rpc);
++int      homa_backlog_rcv(struct sock *sk, struct sk_buff *skb);
++int      homa_bind(struct socket *sk, struct sockaddr *addr,
++		   int addr_len);
++int      homa_check_nic_queue(struct homa *homa, struct sk_buff *skb,
++			      bool force);
++struct homa_interest *homa_choose_interest(struct homa *homa,
++					   struct list_head *head,
++					   int offset);
++void     homa_close(struct sock *sock, long timeout);
++int      homa_copy_to_user(struct homa_rpc *rpc);
++void     homa_data_from_server(struct sk_buff *skb,
++			       struct homa_rpc *crpc);
++void     homa_data_pkt(struct sk_buff *skb, struct homa_rpc *rpc);
++void     homa_destroy(struct homa *homa);
++int      homa_disconnect(struct sock *sk, int flags);
++void     homa_dispatch_pkts(struct sk_buff *skb, struct homa *homa);
++int      homa_err_handler_v4(struct sk_buff *skb, u32 info);
++int      homa_err_handler_v6(struct sk_buff *skb,
++			     struct inet6_skb_parm *opt, u8 type,  u8 code,
++			     int offset, __be32 info);
++int      homa_fill_data_interleaved(struct homa_rpc *rpc,
++				    struct sk_buff *skb, struct iov_iter *iter);
++struct homa_gap *homa_gap_new(struct list_head *next, int start, int end);
++void     homa_gap_retry(struct homa_rpc *rpc);
++int      homa_get_port(struct sock *sk, unsigned short snum);
++int      homa_getsockopt(struct sock *sk, int level, int optname,
++			 char __user *optval, int __user *option);
++int      homa_hash(struct sock *sk);
++enum hrtimer_restart homa_hrtimer(struct hrtimer *timer);
++int      homa_init(struct homa *homa);
++void     homa_incoming_sysctl_changed(struct homa *homa);
++int      homa_ioctl(struct sock *sk, int cmd, int *karg);
++int      homa_message_in_init(struct homa_rpc *rpc, int length);
++int      homa_message_out_fill(struct homa_rpc *rpc,
++			       struct iov_iter *iter, int xmit);
++void     homa_message_out_init(struct homa_rpc *rpc, int length);
++void     homa_need_ack_pkt(struct sk_buff *skb, struct homa_sock *hsk,
++			   struct homa_rpc *rpc);
++struct sk_buff *homa_new_data_packet(struct homa_rpc *rpc,
++				     struct iov_iter *iter, int offset,
++				     int length, int max_seg_data);
++void     homa_outgoing_sysctl_changed(struct homa *homa);
++int      homa_pacer_main(void *transport);
++void     homa_pacer_stop(struct homa *homa);
++void     homa_pacer_xmit(struct homa *homa);
++__poll_t homa_poll(struct file *file, struct socket *sock,
++		   struct poll_table_struct *wait);
++int      homa_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
++		      int flags, int *addr_len);
++int      homa_register_interests(struct homa_interest *interest,
++				 struct homa_sock *hsk, int flags, __u64 id);
++void     homa_remove_from_throttled(struct homa_rpc *rpc);
++void     homa_resend_data(struct homa_rpc *rpc, int start, int end);
++void     homa_resend_pkt(struct sk_buff *skb, struct homa_rpc *rpc,
++			 struct homa_sock *hsk);
++void     homa_rpc_abort(struct homa_rpc *crpc, int error);
++void     homa_rpc_acked(struct homa_sock *hsk,
++			const struct in6_addr *saddr, struct homa_ack *ack);
++void     homa_rpc_free(struct homa_rpc *rpc);
++void     homa_rpc_handoff(struct homa_rpc *rpc);
++int      homa_sendmsg(struct sock *sk, struct msghdr *msg, size_t len);
++int      homa_setsockopt(struct sock *sk, int level, int optname,
++			 sockptr_t __user optval, unsigned int optlen);
++int      homa_shutdown(struct socket *sock, int how);
++int      homa_softirq(struct sk_buff *skb);
++void     homa_spin(int ns);
++char    *homa_symbol_for_type(uint8_t type);
++void     homa_timer(struct homa *homa);
++int      homa_timer_main(void *transport);
++void     homa_unhash(struct sock *sk);
++void     homa_unknown_pkt(struct sk_buff *skb, struct homa_rpc *rpc);
++struct homa_rpc *homa_wait_for_message(struct homa_sock *hsk, int flags,
++				       __u64 id);
++int      homa_xmit_control(enum homa_packet_type type, void *contents,
++			   size_t length, struct homa_rpc *rpc);
++int      __homa_xmit_control(void *contents, size_t length,
++			     struct homa_peer *peer, struct homa_sock *hsk);
++void     homa_xmit_data(struct homa_rpc *rpc, bool force);
++void     __homa_xmit_data(struct sk_buff *skb, struct homa_rpc *rpc);
++void     homa_xmit_unknown(struct sk_buff *skb, struct homa_sock *hsk);
++
++/**
++ * homa_check_pacer() - This method is invoked at various places in Homa to
++ * see if the pacer needs to transmit more packets and, if so, transmit
++ * them. It's needed because the pacer thread may get descheduled by
++ * Linux, result in output stalls.
++ * @homa:    Overall data about the Homa protocol implementation. No locks
++ *           should be held when this function is invoked.
++ * @softirq: Nonzero means this code is running at softirq (bh) level;
++ *           zero means it's running in process context.
++ */
++static inline void homa_check_pacer(struct homa *homa, int softirq)
++{
++	if (list_empty(&homa->throttled_rpcs))
++		return;
++
++	/* The "/2" in the line below gives homa_pacer_main the first chance
++	 * to queue new packets; if the NIC queue becomes more than half
++	 * empty, then we will help out here.
++	 */
++	if ((get_cycles() + homa->max_nic_queue_cycles / 2) <
++			atomic64_read(&homa->link_idle_time))
++		return;
++	homa_pacer_xmit(homa);
++}
++
++extern struct completion homa_pacer_kthread_done;
++#endif /* _HOMA_IMPL_H */
+diff --git a/net/homa/homa_stub.h b/net/homa/homa_stub.h
+new file mode 100644
+index 000000000000..fb2ba4195dd2
+--- /dev/null
++++ b/net/homa/homa_stub.h
+@@ -0,0 +1,80 @@
++/* SPDX-License-Identifier: BSD-2-Clause */
++
++/* This file contains stripped-down replacements that have been
++ * temporarily removed from Homa during the Linux upstreaming
++ * process. By the time upstreaming is complete this file will
++ * have gone away.
++ */
++
++#ifndef _HOMA_STUB_H
++#define _HOMA_STUB_H
++
++#include "homa_impl.h"
++
++static inline int homa_skb_append_from_iter(struct homa *homa,
++					    struct sk_buff *skb,
++					    struct iov_iter *iter, int length)
++{
++	char *dst = skb_put(skb, length);
++
++	if (copy_from_iter(dst, length, iter) != length)
++		return -EFAULT;
++	return 0;
++}
++
++static inline int homa_skb_append_to_frag(struct homa *homa, struct sk_buff *skb,
++					  void *buf, int length)
++{
++	char *dst = skb_put(skb, length);
++
++	memcpy(dst, buf, length);
++	return 0;
++}
++
++static inline int  homa_skb_append_from_skb(struct homa *homa,
++					    struct sk_buff *dst_skb,
++					    struct sk_buff *src_skb,
++					    int offset, int length)
++{
++	return homa_skb_append_to_frag(homa, dst_skb,
++			skb_transport_header(src_skb) + offset, length);
++}
++
++static inline void homa_skb_free_tx(struct homa *homa, struct sk_buff *skb)
++{
++	kfree_skb(skb);
++}
++
++static inline void homa_skb_free_many_tx(struct homa *homa,
++					 struct sk_buff **skbs, int count)
++{
++	int i;
++
++	for (i = 0; i < count; i++)
++		kfree_skb(skbs[i]);
++}
++
++static inline void homa_skb_get(struct sk_buff *skb, void *dest, int offset,
++				int length)
++{
++	memcpy(dest, skb_transport_header(skb) + offset, length);
++}
++
++static inline struct sk_buff *homa_skb_new_tx(int length)
++{
++	struct sk_buff *skb;
++
++	skb = alloc_skb(HOMA_SKB_EXTRA + HOMA_IPV6_HEADER_LENGTH +
++			sizeof(struct homa_skb_info) + length,
++			GFP_KERNEL);
++	if (likely(skb)) {
++		skb_reserve(skb, HOMA_SKB_EXTRA + HOMA_IPV6_HEADER_LENGTH);
++		skb_reset_transport_header(skb);
++	}
++	return skb;
++}
++
++static inline void homa_skb_stash_pages(struct homa *homa, int length)
++{}
++
++#endif /* _HOMA_STUB_H */
 -- 
 2.34.1
 
