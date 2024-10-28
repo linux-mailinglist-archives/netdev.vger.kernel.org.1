@@ -1,190 +1,211 @@
-Return-Path: <netdev+bounces-139460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE5C9B2AAE
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 09:47:26 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80D849B2AFD
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 10:08:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DFE11C214E9
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 08:47:25 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08E59B21ED2
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 09:08:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71E911925AF;
-	Mon, 28 Oct 2024 08:47:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDDAB192D70;
+	Mon, 28 Oct 2024 09:08:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="UKPKOqbc"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="Vpm95E5F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR03-VI1-obe.outbound.protection.outlook.com (mail-vi1eur03on2078.outbound.protection.outlook.com [40.107.103.78])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B67AC19049A
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 08:47:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730105242; cv=none; b=TTn/tScXU03k8Hi18Gq3LR6nJ4HVa+wqCIKG55EM541ZDwlgB7GWz6s9QMI03KzBR0BipcNEQKr9srePjWv7fqhP6+MQRYLmpvpPQaYB7RZsJD+Iop80QIhLElB4nNrchr0yyhMpaCGLu+qUXYoya+Ro2jFCt91HCJQih6Wt37c=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730105242; c=relaxed/simple;
-	bh=njnWG0K8KmElAsg3GtSVx4MGRnTG4hORKk/QVzoFZPg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=rANFyWrrJaMLrdl8FGilJeJcQxNcrFIUQai4oSzYdRDfzDF2Yv8b5ceqXNRywIpcONoTDJGYFDv6K0EKW51Rv1EUyiJOTtw91IvM/3k2/DJGu4nQ+k850/eD+D7AeKB9fHCB1TwdMuiPsOc6T9d+QSEOSyXxgIA/C8st1FC84qQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=UKPKOqbc; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37d4c482844so2692722f8f.0
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 01:47:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1730105238; x=1730710038; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=dQpxxEorCaC54I/E/d76w9ruRK2/NSSTmUB/SeU0xA0=;
-        b=UKPKOqbc/fgDalQ4tMNscCpk904I2MagViYxOClFJAlhUim4uoFbyCBc2gCNSPTKVn
-         kbZv/ZLHQWCCmMcsmUlGWpKM++RzBhVn9X9CTZ+3wxlzbJLrQ47zByMn7QHgBNg7Pdvx
-         iHz+5D4dtYWGKJB1/+aJcQs5pz1BcP8r4Tvzfp61s2RuGEtnTMN8xV4o6BNS+jHbG4la
-         m1FBWhz6pVE/0bDIJtVL0zncFA4PlNuEJHAsJpNc4Wu7HLivDa6kYxsyahmrWuS0kosz
-         qaggKAvHCAvsK90xnrMhPld4Tz3yB+7hmoZk7Tf2/tVV4IJj7psrjZFBfo8MtdpAGkT4
-         luDQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730105238; x=1730710038;
-        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
-         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dQpxxEorCaC54I/E/d76w9ruRK2/NSSTmUB/SeU0xA0=;
-        b=A2g24o+7W302yUF6PiV6yC5LVbKPh64S/R2gFChefBNPMI4IWloT7QfOFuMa/KDjPC
-         YmUpRP1nt+xwrz43Jl8heZHfpw2wvVRu3SghnJZLr9XXErh7W3h2iRT2tphENZVPqXtV
-         SqU39Oer1bmkscw9cH9gJEkw2KWlQ4rslU3qpIH2xgEHS/MPBDXkk7YH1bGZNXv/k8SB
-         xWVAcR8H29i/M1RypbugMuGMMte+607NYTV6t+QzR3v440Asn5WGutIdK7kf+oDET5Qy
-         C2te4gLvTlScGC7UHXxvY7ymbs3wuwQQyhwqCjTe+KyF46+ygKo8ydzbHeswTIkXnuOQ
-         zo8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVB3jAGPnnE6cbUUggMv12Dro1DLDaByeNi18sbv8zCywZMGFWKaPzn/Q5tguHUXux8AaHM0Mc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLmzYRafIxj31PfCGtNlL1FCP41iQbZtmvOfa4AYWUU5eTGbl5
-	E65FtQSCsDIx0sAwQOyz1qwOGnkHGWlpBTNy8GwRRU24btDr/RXiUwLRwh3eUhE=
-X-Google-Smtp-Source: AGHT+IG2t0dSOV9asrka5oPrm2z358/r92i5q+Ouvdn8AKmm/swXDcwzRiW8ilfEO772hmMSoFc9yA==
-X-Received: by 2002:adf:a450:0:b0:37d:4ebe:1644 with SMTP id ffacd0b85a97d-380611e34b4mr4999920f8f.43.1730105237991;
-        Mon, 28 Oct 2024 01:47:17 -0700 (PDT)
-Received: from localhost ([196.207.164.177])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b71231sm8824106f8f.66.2024.10.28.01.47.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 01:47:17 -0700 (PDT)
-Date: Mon, 28 Oct 2024 11:47:14 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Christian Marangi <ansuelsmth@gmail.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Antoine Tenart <atenart@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
-	Waiman Long <longman@redhat.com>, Boqun Feng <boqun.feng@gmail.com>,
-	Nathan Chancellor <nathan@kernel.org>,
-	Nick Desaulniers <ndesaulniers@google.com>,
-	Bill Wendling <morbo@google.com>,
-	Justin Stitt <justinstitt@google.com>, linux-crypto@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	llvm@lists.linux.dev, upstream@airoha.com
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	Richard van Schagen <vschagen@icloud.com>
-Subject: Re: [PATCH v4 3/3] crypto: Add Mediatek EIP-93 crypto engine support
-Message-ID: <8011818d-bdc1-433a-a348-648955c55535@stanley.mountain>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41F60192B7A;
+	Mon, 28 Oct 2024 09:08:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.103.78
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730106491; cv=fail; b=uR3RP90VgzCiUwvRZqvvqhOnm5I6xmDbvIDftZR9WrTQA3jjrzV62gGjJiM0ZfFVQeVVI4nZombNmR9A83BmAmEnyiVk6dPktpOOdEEXzJaxp2f6MpDxyGDRFP4mlOyvCeWqpevYXwXYWm3ApyoK4dhzuF4sebDaFweh1jvRUbA=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730106491; c=relaxed/simple;
+	bh=5GgFHuwb4sJqRpXWbsAUqxri0laIKklNEQrJaVvGiv8=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=TP0p9uJIDYfXYh/ze6k1IE+ChZrXrUwKBcLEtgslKwmdEQ7sAycB0mkkJcK3x32HU+L6QH6zhxtpQhkYmFUiclv/CKsuOyCVLH+GUMREcXvg8rSc6tXL/O2If+7+eOtw0hxIpMbYWI9MjkfbIhlvNbxYCVzVMc5R2Vq7s1ip2sw=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=Vpm95E5F; arc=fail smtp.client-ip=40.107.103.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=uP2MZc7M6Qa64TNTO5+hQUltK3rDVcusqxPaJauDqasLUZD96on0rbqh13TR3LzY+1N5Yu9C6fDiZAeu8G9rnwkGojX57R3xg77mGoRqdAZAeubjhHcT1Yo3oOAeSpi+T4WEzQNDaRcHNX1fwSgQ07wFuZFGCkSy47OZpHRhNhsf8TghdqlKumgU9wKEv+76CU3cUgYYuW2P3VSQxyrFgD1eoVsSZXtXezCHJ2HG40i1FRmdHN5UfBnYNasOnqWN17CBMzldsoFPqnepvNaRoaBQqbVIHfNqDoj13Abr9HjujPGe3gAznXfBz7iPeusUqU7OC9AWiwreMsZZebOhUw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Qk6ThNSqKzj6ZB65rHIlgg/MRlXL3XwHS/Owh8MvgcA=;
+ b=gsJTjKQJABD9Gn+jQaEXRsfNT1GFO2wZWHsE7MG1bVSmh8RBp53IDGXJ8aHMlfzy70N3fbWzcgfGdjgFTNScxL7/0Vrjn79L05vkHJWhhdZRpX8qg9EJt20CWx7KT38Nil5T81JiFGEfqJ+K7d0/u4dlaiKZgs1qdCVURjMBivjbZyN5/XNoal/n2UNUuzIP72TYVFDYchyl9GC92TgGgFeXctthh4yPJvC16o/QU6l9DJ688LfILcCcJmE3pnYoXBDcdfRvI3yVAZuOVT/rCRXABHn1ZWGAclZSCoe2RbKG1VZAbL04F2kbf+STmsghzol++lPFiKJa4Y/Z0gn0Jw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Qk6ThNSqKzj6ZB65rHIlgg/MRlXL3XwHS/Owh8MvgcA=;
+ b=Vpm95E5Fa9umL07Bx6FiTERE9vZSWN4VrgS8OXJpAWgO4V3oWw5lpgeD5g6fKvxJHLT2L3rTO/riOfWI4InKqoUyQ89PpjFNOrvECq/5a+TTs8I5w6qYrNl7z8ET/TNRT7FjxoFujy+DGtfW4sS/dk1/JGIU0tAEWpO/huQ6CFZ4TviHrJu43BXJpdpXNR5U6UeEdvLHnT4LGs/kBQupsfD2acQKyn/dW4VeghE5t0r1DL/Jxj3Cj1c3BE3qeOh8nrvcKrDWw2K1dMkrsBLdsr2U7auwZwhFTQ+H3uIl+sOLLaZlpi9N9/tOJJcdyYdyR5Qj1NDUQOEr9wBMLy+rTw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by VI2PR04MB10642.eurprd04.prod.outlook.com (2603:10a6:800:27f::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.24; Mon, 28 Oct
+ 2024 09:08:05 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8093.024; Mon, 28 Oct 2024
+ 09:08:05 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
+	claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: [PATCH net] net: enetc: set MAC address to the VF net_device
+Date: Mon, 28 Oct 2024 16:52:42 +0800
+Message-Id: <20241028085242.710250-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR01CA0145.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:8f::25) To PAXPR04MB8510.eurprd04.prod.outlook.com
+ (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241025094734.1614-3-ansuelsmth@gmail.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|VI2PR04MB10642:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1c69b3b0-90fb-4dd8-5fea-08dcf7300879
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|52116014|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?3XqrXoQcq+0RITuvdErYdy5+ZDYrBHKK8/B1WCksdYUlNnycrKk8zBXQ/AuL?=
+ =?us-ascii?Q?9YmNWqkMeAMuxAmes62cYOn7ORp2I00dPftE7zXaHVAKE6AL9oqo7OuEE3n8?=
+ =?us-ascii?Q?U/33EGHBh48L2ATpVXFJ+Oai1Cth2XzczG6O7fYJd2T8D4ulIyw+YsKzxpco?=
+ =?us-ascii?Q?SeMjViXqP3iUOxgKDGCHvYXiQEf2sEEbohG4BhzOH8kxZygEjgjj3CD5H8lR?=
+ =?us-ascii?Q?SYqKbI24XYIOh1AFIrEoZCnEsPboZEbf/DzectF9YHcTylknMhgxzXCIfltR?=
+ =?us-ascii?Q?ofCM7dn4O7khY2Ul655mmVA/CWPfcSHIm+IR11blECvdCPmsCQz59iFEdGfx?=
+ =?us-ascii?Q?cbKnP7bC5cQ9WtYTtxsXkdy7byfOu/fJFlgTYkQ/0ByaMgR4rZl1Tr9Iv8HH?=
+ =?us-ascii?Q?r4Yi85QVoTUm0BZAEpzI0dfHndyqq9KvhnWwik8fvekE5gcAqgMckWHt5TWE?=
+ =?us-ascii?Q?C55vfeg9o0fREZW0jfcSh8d5rmaA/dT3DkPVNf28DCFt7oCvyTNnoUsDw+dH?=
+ =?us-ascii?Q?SLg10Qc1OVKKCXYF1bpR6V4UIN/r3xHJ4mNCd6pxon5QrMgv3AEVmmG9GzYP?=
+ =?us-ascii?Q?fdJG7v9wRIQGe39RjelLHsqlpoLZpNTuGJ99eeDv70fZmKUIIWWv7Xqm42UX?=
+ =?us-ascii?Q?dFOwDoUbWaccdv4fEtvC6gtcfmnSwXlSAlECAkV7AE1ZLT0i17r0uCjn36Ht?=
+ =?us-ascii?Q?HmbzlnIJOO1kgG1mphytKc/lHa0chvx/MQunQRzOVtHJDnvZzMKjBnYnqLzq?=
+ =?us-ascii?Q?xb476PMFDOq3DT/5BlvjPp9Z3uvSIa1sFaAYX7jIGUtMI7VE6qP2qMRXrGRk?=
+ =?us-ascii?Q?Q1ZbH2FjcAm1Ot8Y1nwcL+2EXjQ79EJWTPLVaNsIzwcJ43gHLgBU/NoelXwG?=
+ =?us-ascii?Q?Egx2+B8+aLf1VVarzGVBaX7xb7lodJTf4NBjxzehH+uFFuKEBGWpohtwXdZK?=
+ =?us-ascii?Q?Gb6wEAowW214xfKRawY0+voArwVLDXye7cXYrh0O9RSrlxugeFy4TgIAizwq?=
+ =?us-ascii?Q?wHRDNClq7kF5fT9jS48Rs4n3Mfd2ixhdE66WF/QrQVg2v1M9cLJOmAPey3dH?=
+ =?us-ascii?Q?4xkK8ptCEiEBPr5SE58IrryV0VoHUDLyli31oZkB2dRTim1iCthoW3Qoa3s9?=
+ =?us-ascii?Q?nTTUAIRlA35Hb5VL8RNviJ3/1lh6DWNHOvsczAMP+AacVpckZuR/lileIfvz?=
+ =?us-ascii?Q?BzCHLUpQMM4vR2enwE4jXGVqzttsjP6SGv4zwRUIge2rl04MyrH+f+J4GxTD?=
+ =?us-ascii?Q?ljYrRtPz51x8FSixlrzB3sS9Bagbgzc6+2M4IS2ULNBwFsPJZTaUXrJ/QwXy?=
+ =?us-ascii?Q?6RDredDRSs6V1K+X0nCIWo5F3BUR1VBSTrmy6rVHHBc7AC07h4K+qyZvligm?=
+ =?us-ascii?Q?InC0bT8=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(52116014)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?udBH5vXinPz6Ma0lQLiyojt7HjqeOwkFNIRVQ38Lbe2cN/YdauVPOiNnpNBn?=
+ =?us-ascii?Q?tb4Lw3x0h/VyO+5gexQ24diSR5zZsY1WIL7tYDr+0N+GofCFAxaeFayTHMJ+?=
+ =?us-ascii?Q?K3I5p3FA8ijIMaAIGITSIEnJ6sxJm/tl9u0qF8QIIyQ1+MLQ+H177fDtEceM?=
+ =?us-ascii?Q?XGEIjAst1tWw8HIW9HTa7GOQajSw5zKoUGzENV9tCbpYEDAdByERb3CiiGrs?=
+ =?us-ascii?Q?5n2/P4+Gh/SYRiwXYD+l974RFsqQJtXsiA4mCewPrUGqljl5ieRLbEYpZ6x4?=
+ =?us-ascii?Q?NtLWbHAmzZ9+fCuJmS/EFTZoJ0CEyH2bu7u1JceFL17FZVJuzt3udorO4/SK?=
+ =?us-ascii?Q?2oskuXWa+L4s/099SqY98YDOyZ56hCoUmVhV5U+ntV79h+6AZLGEWEXu8zrf?=
+ =?us-ascii?Q?afevtQT0WmcLUsTMFUnDFXo73q+fosdO8lpA7C8X7kGtqZ8unGPNeXap7J/O?=
+ =?us-ascii?Q?u/AllvBBBFTFdXO4Yncu968pBTi5emRzCogprlYVFXEEv3R4hUItDPQDVbUq?=
+ =?us-ascii?Q?d6IoGfFr0LVBe4Vlb1qtNGr1pxLOttMSSUDtCNW7AHc0ZOSox1KB2aFY4rXC?=
+ =?us-ascii?Q?VUCy62yl5EfJcpblAyh6IRrcn7Xjna0mWuT9uht7AI/QvXl2wqig4Kj3Dpxk?=
+ =?us-ascii?Q?wcQK7Z/mSQ1/Y4P7KUvzdF+Rbjw5NkeFrjBP3pEdDzIwsSAwHTJcTiNGQMF7?=
+ =?us-ascii?Q?5qBFf+RamygdxEFWnammOVFdIzv+zYk5NSm4zbWGrxchZen4z+XPhVrxaALt?=
+ =?us-ascii?Q?Qwlsp1/F9FxnC2/DYrD1iyxnGT6UyFl16B0oqp2saRwaX2MTX6lxuNAwYNrW?=
+ =?us-ascii?Q?xAClOLEr9L4LIXDbp7Owz7o9UhfY5yZwSftUiugDiyxg/tlgFo7nvtkoc1Hs?=
+ =?us-ascii?Q?ZylBq6t5i8gpxPdxmYn3+R4wZjjBZ4jsi06Iet3odgseR70h/Mg9RW3gR2kN?=
+ =?us-ascii?Q?NPkm7G1vOEFzeSvW/B+d91TJnw78RSZS1D7XwhxZ6O5w8eFHn2O+xPBi8fpb?=
+ =?us-ascii?Q?dZhfwuEBzvAEanO4Xo5e9mdbNEKY5ESlYuu1ivQcwIrXiCwPeCqVC2Jh05c+?=
+ =?us-ascii?Q?ZPWvbZw6dlnrcF/ekTMuLsaQ0TDD2syL94Ve6Dqgk49yR8ZytSHrk+x+g7CV?=
+ =?us-ascii?Q?a/eCYwkeUN5o4JkEomxbuM7dYgrKiCPYg/a43DubS3SkEyTTqm38vLSM3+qP?=
+ =?us-ascii?Q?+pQxktJi6Sk5lb42exPjJGjnNjTj4PXm1U90y6cKXpTQDdIKhfj7cHf9ZAFn?=
+ =?us-ascii?Q?qh/9a6evC6iQiEBqqVHzvSyF0oCWSbhm0GUEiTh+CV3VtmU4EME0pK6CZcgu?=
+ =?us-ascii?Q?nMB7/ERrAjqgAL2yVKXVcikYH2JjovDplwWc10FJeKxNTTkQrD5JHCblk9G1?=
+ =?us-ascii?Q?KmctpntbJEh+FRut6mA3HtPu99MIpOMb7aoSHvyPkpW8zPywtyNYKR9cyUza?=
+ =?us-ascii?Q?1fu9lB9AH/fFSMfReLXyeE3pzp1dftpriDdVonlI5WxtoqeLJSTBqC4ycGUE?=
+ =?us-ascii?Q?4I+RJbIBbQKn7pUbAQIBjlMzxIucei/s5DOolOgVP0a6LAUQwSRpDw21tBcB?=
+ =?us-ascii?Q?JmphQP6kU4OYXrvGsepjYPBhGktIZKvTj6GjYh3W?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1c69b3b0-90fb-4dd8-5fea-08dcf7300879
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2024 09:08:05.4701
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 98UGRf3Uz2MkRMTww3Bm7t0MLADRkjWtnph2vNoWVCuh4/rTD1KUD2vUNxIKR/oRQhUm6dcNcH/1l5RE3vnndg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: VI2PR04MB10642
 
-Hi Christian,
+The MAC address of VF can be configured through the mailbox mechanism of
+ENETC, but the previous implementation forgot to set the MAC address in
+net_device, resulting in the SMAC of the sent frames still being the old
+MAC address. Since the MAC address in the hardware has been changed, Rx
+cannot receive frames with the DMAC address as the new MAC address. The
+most obvious phenomenon is that after changing the MAC address, we can
+see that the MAC address of eno0vf0 has not changed through the "ifconfig
+eno0vf0" commandand the IP address cannot be obtained .
 
-kernel test robot noticed the following build warnings:
+root@ls1028ardb:~# ifconfig eno0vf0 down
+root@ls1028ardb:~# ifconfig eno0vf0 hw ether 00:04:9f:3a:4d:56 up
+root@ls1028ardb:~# ifconfig eno0vf0
+eno0vf0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
+        ether 66:36:2c:3b:87:76  txqueuelen 1000  (Ethernet)
+        RX packets 794  bytes 69239 (69.2 KB)
+        RX errors 0  dropped 0  overruns 0  frame 0
+        TX packets 11  bytes 2226 (2.2 KB)
+        TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
 
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+Fixes: beb74ac878c8 ("enetc: Add vf to pf messaging support")
+Signed-off-by: Wei Fang <wei.fang@nxp.com>
+---
+ drivers/net/ethernet/freescale/enetc/enetc_vf.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/dt-bindings-crypto-Add-Inside-Secure-SafeXcel-EIP-93-crypto-engine/20241025-175032
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/herbert/cryptodev-2.6.git master
-patch link:    https://lore.kernel.org/r/20241025094734.1614-3-ansuelsmth%40gmail.com
-patch subject: [PATCH v4 3/3] crypto: Add Mediatek EIP-93 crypto engine support
-config: csky-randconfig-r071-20241028 (https://download.01.org/0day-ci/archive/20241028/202410281155.jEN0wSbS-lkp@intel.com/config)
-compiler: csky-linux-gcc (GCC) 14.1.0
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-| Closes: https://lore.kernel.org/r/202410281155.jEN0wSbS-lkp@intel.com/
-
-New smatch warnings:
-drivers/crypto/inside-secure/eip93/eip93-cipher.c:118 eip93_skcipher_setkey() error: uninitialized symbol 'ret'.
-drivers/crypto/inside-secure/eip93/eip93-aead.c:125 eip93_aead_setkey() error: uninitialized symbol 'ret'.
-drivers/crypto/inside-secure/eip93/eip93-hash.c:26 eip93_hash_free_data_blocks() error: dereferencing freed memory 'block'
-drivers/crypto/inside-secure/eip93/eip93-hash.c:162 _eip93_hash_init() error: uninitialized symbol 'sa_record_hmac'.
-
-Old smatch warnings:
-drivers/crypto/inside-secure/eip93/eip93-hash.c:285 eip93_send_hash_req() error: uninitialized symbol 'crypto_async_idr'.
-
-vim +/ret +118 drivers/crypto/inside-secure/eip93/eip93-cipher.c
-
-883ad7684f17d2 Christian Marangi 2024-10-25   78  static int eip93_skcipher_setkey(struct crypto_skcipher *ctfm, const u8 *key,
-883ad7684f17d2 Christian Marangi 2024-10-25   79  				 unsigned int len)
-883ad7684f17d2 Christian Marangi 2024-10-25   80  {
-883ad7684f17d2 Christian Marangi 2024-10-25   81  	struct crypto_tfm *tfm = crypto_skcipher_tfm(ctfm);
-883ad7684f17d2 Christian Marangi 2024-10-25   82  	struct eip93_crypto_ctx *ctx = crypto_tfm_ctx(tfm);
-883ad7684f17d2 Christian Marangi 2024-10-25   83  	struct eip93_alg_template *tmpl = container_of(tfm->__crt_alg,
-883ad7684f17d2 Christian Marangi 2024-10-25   84  						     struct eip93_alg_template,
-883ad7684f17d2 Christian Marangi 2024-10-25   85  						     alg.skcipher.base);
-883ad7684f17d2 Christian Marangi 2024-10-25   86  	struct sa_record *sa_record = ctx->sa_record;
-883ad7684f17d2 Christian Marangi 2024-10-25   87  	unsigned int keylen = len;
-883ad7684f17d2 Christian Marangi 2024-10-25   88  	u32 flags = tmpl->flags;
-883ad7684f17d2 Christian Marangi 2024-10-25   89  	u32 nonce = 0;
-883ad7684f17d2 Christian Marangi 2024-10-25   90  	int ret;
-883ad7684f17d2 Christian Marangi 2024-10-25   91  
-883ad7684f17d2 Christian Marangi 2024-10-25   92  	if (!key || !keylen)
-883ad7684f17d2 Christian Marangi 2024-10-25   93  		return -EINVAL;
-883ad7684f17d2 Christian Marangi 2024-10-25   94  
-883ad7684f17d2 Christian Marangi 2024-10-25   95  	if (IS_RFC3686(flags)) {
-883ad7684f17d2 Christian Marangi 2024-10-25   96  		if (len < CTR_RFC3686_NONCE_SIZE)
-883ad7684f17d2 Christian Marangi 2024-10-25   97  			return -EINVAL;
-883ad7684f17d2 Christian Marangi 2024-10-25   98  
-883ad7684f17d2 Christian Marangi 2024-10-25   99  		keylen = len - CTR_RFC3686_NONCE_SIZE;
-883ad7684f17d2 Christian Marangi 2024-10-25  100  		memcpy(&nonce, key + keylen, CTR_RFC3686_NONCE_SIZE);
-883ad7684f17d2 Christian Marangi 2024-10-25  101  	}
-883ad7684f17d2 Christian Marangi 2024-10-25  102  
-883ad7684f17d2 Christian Marangi 2024-10-25  103  	if (flags & EIP93_ALG_DES) {
-883ad7684f17d2 Christian Marangi 2024-10-25  104  		ctx->blksize = DES_BLOCK_SIZE;
-883ad7684f17d2 Christian Marangi 2024-10-25  105  		ret = verify_skcipher_des_key(ctfm, key);
-883ad7684f17d2 Christian Marangi 2024-10-25  106  	}
-883ad7684f17d2 Christian Marangi 2024-10-25  107  	if (flags & EIP93_ALG_3DES) {
-883ad7684f17d2 Christian Marangi 2024-10-25  108  		ctx->blksize = DES3_EDE_BLOCK_SIZE;
-883ad7684f17d2 Christian Marangi 2024-10-25  109  		ret = verify_skcipher_des3_key(ctfm, key);
-883ad7684f17d2 Christian Marangi 2024-10-25  110  	}
-883ad7684f17d2 Christian Marangi 2024-10-25  111  
-883ad7684f17d2 Christian Marangi 2024-10-25  112  	if (flags & EIP93_ALG_AES) {
-883ad7684f17d2 Christian Marangi 2024-10-25  113  		struct crypto_aes_ctx aes;
-883ad7684f17d2 Christian Marangi 2024-10-25  114  
-883ad7684f17d2 Christian Marangi 2024-10-25  115  		ctx->blksize = AES_BLOCK_SIZE;
-883ad7684f17d2 Christian Marangi 2024-10-25  116  		ret = aes_expandkey(&aes, key, keylen);
-883ad7684f17d2 Christian Marangi 2024-10-25  117  	}
-
-What about if none the flags are set?
-
-883ad7684f17d2 Christian Marangi 2024-10-25 @118  	if (ret)
-883ad7684f17d2 Christian Marangi 2024-10-25  119  		return ret;
-883ad7684f17d2 Christian Marangi 2024-10-25  120  
-883ad7684f17d2 Christian Marangi 2024-10-25  121  	eip93_set_sa_record(sa_record, keylen, flags);
-883ad7684f17d2 Christian Marangi 2024-10-25  122  
-883ad7684f17d2 Christian Marangi 2024-10-25  123  	memcpy(sa_record->sa_key, key, keylen);
-883ad7684f17d2 Christian Marangi 2024-10-25  124  	ctx->sa_nonce = nonce;
-883ad7684f17d2 Christian Marangi 2024-10-25  125  	sa_record->sa_nonce = nonce;
-883ad7684f17d2 Christian Marangi 2024-10-25  126  
-883ad7684f17d2 Christian Marangi 2024-10-25  127  	return 0;
-883ad7684f17d2 Christian Marangi 2024-10-25  128  }
-
+diff --git a/drivers/net/ethernet/freescale/enetc/enetc_vf.c b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+index dfcaac302e24..b15db70769e5 100644
+--- a/drivers/net/ethernet/freescale/enetc/enetc_vf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_vf.c
+@@ -78,11 +78,18 @@ static int enetc_vf_set_mac_addr(struct net_device *ndev, void *addr)
+ {
+ 	struct enetc_ndev_priv *priv = netdev_priv(ndev);
+ 	struct sockaddr *saddr = addr;
++	int err;
+ 
+ 	if (!is_valid_ether_addr(saddr->sa_data))
+ 		return -EADDRNOTAVAIL;
+ 
+-	return enetc_msg_vsi_set_primary_mac_addr(priv, saddr);
++	err = enetc_msg_vsi_set_primary_mac_addr(priv, saddr);
++	if (err)
++		return err;
++
++	eth_hw_addr_set(ndev, saddr->sa_data);
++
++	return 0;
+ }
+ 
+ static int enetc_vf_set_features(struct net_device *ndev,
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.34.1
 
 
