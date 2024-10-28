@@ -1,161 +1,157 @@
-Return-Path: <netdev+bounces-139416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 352059B22C1
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 03:32:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D989B235F
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 04:07:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DFBC61F21C0B
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 02:32:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF038281341
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 03:07:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71B01547F0;
-	Mon, 28 Oct 2024 02:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 950A4185B77;
+	Mon, 28 Oct 2024 03:07:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b="TdF522ug"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Lqb7Buil"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E0B28837;
-	Mon, 28 Oct 2024 02:32:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27941B815;
+	Mon, 28 Oct 2024 03:07:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730082723; cv=none; b=BV1Oo90ZT3N3mF6FpzD/0ofrA5+KW1vWy5LoOe8bcLMyyWwhZqRAjPyLkKNfCP+3pEE5XGR/iZQwipveVOLaZzz8T03E/63YrTx9kWVDwvBZpVaqF9R3r5ZHnBM6mVUhjk1r8fYn6/sOwN0T3hQ0WJNGQRrfNjamkR/dSTjCyzE=
+	t=1730084870; cv=none; b=WX0lQA5QdacAkVJmg919gH/E2zej72eYKogm+T5ZdaZ51mOZfg7FhDlnV832DcEijba4o/S4Vd6ag9OwNQJHOSj1Q5M/5rCPdQwZpRaYqiXf44/CY+Fp2KFqfDBHv1RxSLp5o+VhejeNtz2l8RcrewXRjMy3QOCFpmBBfS4OQMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730082723; c=relaxed/simple;
-	bh=IbccNuStDk2QzA/azvvqRXzui79cx3VGOeLgXEfgBQ8=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=mi0Io2V9cnEHe6cgt41TgsEd11qrByZlcCa3J9EQUH/AW0imXmKJYLQewWbPzqg4AHvpcZizyCYzlGvfwgHSk0Bq8AJyev+knuqCbUCTSOk1chQkRzHyLrxWNwFf5Kh5XPblcwknmRIF+YP1Wfc4Bkp91JXSrM/6lKUlODF4hC4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au; spf=pass smtp.mailfrom=ellerman.id.au; dkim=pass (2048-bit key) header.d=ellerman.id.au header.i=@ellerman.id.au header.b=TdF522ug; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ellerman.id.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ellerman.id.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ellerman.id.au;
-	s=201909; t=1730082717;
-	bh=akZfa4aGK9EQ5cduCJCgwynTCyBliCAq7gIFjV4NH30=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=TdF522ug+3gW8cmYOk+/ZAjjjG+WOfWMV2jSQEF+A+/zEys1VXWINkJNcK8FUKeoj
-	 wdv58PU3zWDJlTkU0suSUsiKBxSH9U5l1l3olFE1t6V2JaXUEfsUEhZGAM/5wf47WR
-	 vxqX8Wgr3/RT85Lcl23VXMv3s63+/AWiZOHNUcAuNs9Emhql6TE17s2PyT04smlHil
-	 aeY4HUOXJImGhdkqumhfukTggocpXV3bhgXKCTfMgdPkngqvc5U/okQQrqVW0LgRPO
-	 jqjld6cZFIeLaYsh79Wq5h0gPNCZ01zKqhtIi8h3sPLUFINBBJYFe0z7F2UpGCVrby
-	 jYF3tCSg8YznQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XcHTS49Plz4x6k;
-	Mon, 28 Oct 2024 13:31:56 +1100 (AEDT)
-From: Michael Ellerman <mpe@ellerman.id.au>
-To: Rosen Penev <rosenp@gmail.com>, Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Madalin Bucur <madalin.bucur@nxp.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Ioana Ciornei <ioana.ciornei@nxp.com>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, Vladimir Oltean
- <vladimir.oltean@nxp.com>, open list <linux-kernel@vger.kernel.org>, "open
- list:FREESCALE QUICC ENGINE UCC ETHERNET DRIVER"
- <linuxppc-dev@lists.ozlabs.org>
-Subject: Re: [PATCH net-next] net: freescale: use ethtool string helpers
-In-Reply-To: <CAKxU2N98hnVAE9WF72HhxzVEfhnRAgMykVgBErL9b3gupqqrxQ@mail.gmail.com>
-References: <20241024205257.574836-1-rosenp@gmail.com>
- <20241025125704.GT1202098@kernel.org>
- <CAKxU2N98hnVAE9WF72HhxzVEfhnRAgMykVgBErL9b3gupqqrxQ@mail.gmail.com>
-Date: Mon, 28 Oct 2024 13:31:57 +1100
-Message-ID: <87ttcxrm8y.fsf@mpe.ellerman.id.au>
+	s=arc-20240116; t=1730084870; c=relaxed/simple;
+	bh=GSkNEOFhNaUTv/2kT3b4fFMm5I3C8TWYznb8hMiyrqM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=TgiKHaqdnWn774Fr3/q2fBZX1QzoPUq+v21DX81mx4DZpM48rco3vzPCaFbMBvB2jEkL2q8cXUH/neaD6FavzYJoKpK8OjdPaH+fUa3oWhMUeWHJ3SqjmivwuhwEps2deV2Ts7R1zWmwAELdIBv6++krm/0VK8zaNEm6mLmX20U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Lqb7Buil; arc=none smtp.client-ip=209.85.214.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-20c8c50fdd9so29634295ad.0;
+        Sun, 27 Oct 2024 20:07:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730084867; x=1730689667; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=oyZ5oeJxWBOMpUrNuWphCAJQozS0spzFlvL2/Btoo5A=;
+        b=Lqb7BuilZJnutgjWIxN6Fd9rYrLg96nryzc+bfEDbwwVum84WyvuQvsOhvbVkjeSjo
+         K/YTcXJiazu/IsQEDS9zmxrSdo7ic+i+T4paoNOLXNKLMDZutPCTl5h96W9honTZVSrL
+         XsWRyC2OPQ6IWbrQepQy8x6SoeXx0kHRFL5WT9+gNTcznMex24uhTjqeKKght+qdC1Vj
+         YvdqxJ4vtCc+wJP4/gGv1M/9OfAleedlzqlxdVPZNpHZQ/cRTcGo89mEwfu5SZObThrT
+         weRIp+JahtbQAAVJnlDIRaJUN8rJ1iMZqCFiJpIoKksblAfMyQmbh3RCYHfoIS3DYXVl
+         xK/g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730084867; x=1730689667;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=oyZ5oeJxWBOMpUrNuWphCAJQozS0spzFlvL2/Btoo5A=;
+        b=aqjDzRo3BkXyCYAyidkMhcMnMGsvZPJwbrAMnxIcxn2xFqehirZoL3m2wQEfN5YNAU
+         sU0BFhNsFNpQNfvj++l86XHaMeaie1BJRr9n5PMw2aTeCC274ddwXAu36cLRhtcelcUf
+         Oflo3fkPOWaOJPKxs4WT8M2WENggWQtEjxNYmSGe+6VumuZaqfcay2nSk94olw1CAlC0
+         mdzK0m/SI6+xI8iXY1gNkdYKfDwD1CWtaE54kRXcwu47A3QA8ib/9f/4ID8tx8La1Hu5
+         HEbdrQGEUnY8uORypBmJBN1Zv/B8fK7U47/OGHhB7P30DBDs690qJzVRgobZCyMtVCnI
+         EyAw==
+X-Forwarded-Encrypted: i=1; AJvYcCUpa+Fly0BLe5xTg0rU699udrPzzJffobMELuY9cCgXVJNi/aN7jN9xIu97SK2mHGIjUdoPKQBI8oTvkPo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyyld0D9HOfvxKLZtZno+k4wUvKPr6JTkt0jVIaPtcMVeCOPkIm
+	pUwuO58zt2qK7SFen+7eT5xTrjgPSS8x6gYGQjF0Uei3UcK+NCDpeLRMIA==
+X-Google-Smtp-Source: AGHT+IGjTJH6FP5Q/Rq9jlV590Kh1CRuN6iXAYc28hlY0HjvVjt90JpayXD0vSxAoJRyO87DxJokiA==
+X-Received: by 2002:a17:902:f64a:b0:20b:a73b:3f5 with SMTP id d9443c01a7336-210c59c6d8cmr111903495ad.14.1730084866834;
+        Sun, 27 Oct 2024 20:07:46 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id d9443c01a7336-210bbf6d327sm41414155ad.67.2024.10.27.20.07.41
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 27 Oct 2024 20:07:46 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v5 0/6] net: stmmac: Refactor FPE as a separate module
+Date: Mon, 28 Oct 2024 11:07:23 +0800
+Message-Id: <cover.1730084449.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Rosen Penev <rosenp@gmail.com> writes:
-> On Fri, Oct 25, 2024 at 5:57=E2=80=AFAM Simon Horman <horms@kernel.org> w=
-rote:
->>
->> On Thu, Oct 24, 2024 at 01:52:57PM -0700, Rosen Penev wrote:
->> > The latter is the preferred way to copy ethtool strings.
->> >
->> > Avoids manually incrementing the pointer. Cleans up the code quite wel=
-l.
->> >
->> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
->>
->> ...
->>
->> > diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c b/driv=
-ers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
->> > index b0060cf96090..10c5fa4d23d2 100644
->> > --- a/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
->> > +++ b/drivers/net/ethernet/freescale/dpaa/dpaa_ethtool.c
->> > @@ -243,38 +243,24 @@ static void dpaa_get_ethtool_stats(struct net_de=
-vice *net_dev,
->> >  static void dpaa_get_strings(struct net_device *net_dev, u32 stringse=
-t,
->> >                            u8 *data)
->> >  {
->> > -     unsigned int i, j, num_cpus, size;
->> > -     char string_cpu[ETH_GSTRING_LEN];
->> > -     u8 *strings;
->> > +     unsigned int i, j, num_cpus;
->> >
->> > -     memset(string_cpu, 0, sizeof(string_cpu));
->> > -     strings   =3D data;
->> > -     num_cpus  =3D num_online_cpus();
->> > -     size      =3D DPAA_STATS_GLOBAL_LEN * ETH_GSTRING_LEN;
->> > +     num_cpus =3D num_online_cpus();
->> >
->> >       for (i =3D 0; i < DPAA_STATS_PERCPU_LEN; i++) {
->> > -             for (j =3D 0; j < num_cpus; j++) {
->> > -                     snprintf(string_cpu, ETH_GSTRING_LEN, "%s [CPU %=
-d]",
->> > -                              dpaa_stats_percpu[i], j);
->> > -                     memcpy(strings, string_cpu, ETH_GSTRING_LEN);
->> > -                     strings +=3D ETH_GSTRING_LEN;
->> > -             }
->> > -             snprintf(string_cpu, ETH_GSTRING_LEN, "%s [TOTAL]",
->> > -                      dpaa_stats_percpu[i]);
->> > -             memcpy(strings, string_cpu, ETH_GSTRING_LEN);
->> > -             strings +=3D ETH_GSTRING_LEN;
->> > -     }
->> > -     for (j =3D 0; j < num_cpus; j++) {
->> > -             snprintf(string_cpu, ETH_GSTRING_LEN,
->> > -                      "bpool [CPU %d]", j);
->> > -             memcpy(strings, string_cpu, ETH_GSTRING_LEN);
->> > -             strings +=3D ETH_GSTRING_LEN;
->> > +             for (j =3D 0; j < num_cpus; j++)
->> > +                     ethtool_sprintf(&data, "%s [CPU %d]",
->> > +                                     dpaa_stats_percpu[i], j);
->> > +
->> > +             ethtool_sprintf(&data, "%s [TOTAL]", dpaa_stats_percpu[i=
-]);
->> >       }
->> > -     snprintf(string_cpu, ETH_GSTRING_LEN, "bpool [TOTAL]");
->> > -     memcpy(strings, string_cpu, ETH_GSTRING_LEN);
->> > -     strings +=3D ETH_GSTRING_LEN;
->> > +     for (i =3D 0; j < num_cpus; i++)
->>
->> Perhaps this should consistently use i, rather than i and j:
->>
->>         for (i =3D 0; i < num_cpus; i++)
->>
->> Flagged by W=3D1 builds with clang-18.
+Refactor FPE implementation by moving common code for DWMAC4 and
+DWXGMAC into a separate FPE module.
 
-> I really need to compile test this on a PPC system.
+FPE implementation for DWMAC4 and DWXGMAC differs only for:
+1) Offset address of MAC_FPE_CTRL_STS and MTL_FPE_CTRL_STS
+2) FPRQ(Frame Preemption Residue Queue) field in MAC_RxQ_Ctrl1
+3) Bit offset of Frame Preemption Interrupt Enable
 
-Cross compiling should be sufficient.
+Tested on DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
 
-There's some pointers here:
-  https://github.com/linuxppc/wiki/wiki/Building-powerpc-kernels
+Changes in v5:
+  1. Fix build errors reported by kernel test robot:
+  https://lore.kernel.org/oe-kbuild-all/202410260025.sME33DwY-lkp@intel.com/
 
-Or there's also libc-less cross compilers on kernel.org, eg:
-  https://mirrors.edge.kernel.org/pub/tools/crosstool/files/bin/x86_64/14.2=
-.0/x86_64-gcc-14.2.0-nolibc-powerpc64-linux.tar.xz
+Changes in v4:
+  1. Update FPE IRQ handling
+  2. Check fpesel bit and stmmac_fpe_reg pointer to guarantee that driver
+  does not crash on a certain platform that FPE is to be implemented
 
+Changes in v3:
+  1. Drop stmmac_fpe_ops and refactor FPE functions to generic version to
+  avoid function pointers
+  2. Drop the _SHIFT macro definitions
 
-cheers
+Changes in v2:
+  1. Split patches to easily review
+  2. Use struct as function param to keep param list short
+  3. Typo fixes in commit message and title
+
+Furong Xu (6):
+  net: stmmac: Introduce separate files for FPE implementation
+  net: stmmac: Rework macro definitions for gmac4 and xgmac
+  net: stmmac: Refactor FPE functions to generic version
+  net: stmmac: xgmac: Rename XGMAC_RQ to XGMAC_FPRQ
+  net: stmmac: xgmac: Complete FPE support
+  net: stmmac: xgmac: Enable FPE for tc-mqprio/tc-taprio
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h  |   1 -
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  | 150 -------
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  26 --
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |   6 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  31 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   7 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  20 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  11 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   6 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 412 ++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |  44 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 157 +------
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   4 +-
+ 15 files changed, 481 insertions(+), 407 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+
+-- 
+2.34.1
+
 
