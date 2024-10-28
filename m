@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-139660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32BB29B3BFC
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:38:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id CBB519B3BFB
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:38:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E954A285C92
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:38:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 90ED4285C27
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:38:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6895A1DFE2B;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A6E41DFE12;
 	Mon, 28 Oct 2024 20:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="QRE+P0H+"
+	dkim=fail reason="signature verification failed" (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b="susNEU02"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx17lb.world4you.com (mx17lb.world4you.com [81.19.149.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5685018E76F
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 568A51DE4DC
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=81.19.149.127
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730147910; cv=none; b=mVr0kdRX1POemiIEYwYfvxkdZLdbRheEXhFpaOLjoYThoQkw/eVNPF5L0tSrg23m+QDx91+QlQ/f4TTR9xeht9PzyKuZB2to8SQ0bzxaCrQBulP2N74iNOWhaWzHxSahRMbVwo8SbIJ2Cep/vO8nUmrF7RMq0tx+sjcbiujDb9g=
+	t=1730147910; cv=none; b=k36t4kQf404zWsU5enc4J1FzZj3dCqnsYKWjBdPw+5B+KJU1m29QkPB5r5oytmzSJFXMDxUYMD3rrMP3OP//1CAY2dB9/z56H0/aGdOnatdKvpmNNiR/x7/cvx5gH8tuHvAMYNaM2T6r9zTnv0RZPHSKgxvp/EC13+O5T6qsEko=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730147910; c=relaxed/simple;
-	bh=Gu0f++Y1buYbjq2XeMlS7hfvZHhvWdE4z4GSyY+LEvQ=;
+	bh=VYywl7+jDIEkSocZe7yZ9FhHl4qRHs86YTfNNDvpIrQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=gVy15g/y+bXAtkk+e4jMjclDPB9esm3ydu7aPXiBIHFDQwdN4L5cM03jPfnLNiRQqie1S5+INRxMbkeKryfkt8bpDoUBpCxzKp9J2scXYdBfmHIgkNzEjHK2YyiOGlCM9OjlELuH9tT7bJ2dK5lIX6drGcjsG9pomiVYe0Ru9kI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=QRE+P0H+; arc=none smtp.client-ip=81.19.149.127
+	 MIME-Version; b=j0Yqgvy2H0pAqNh6Kwa2eEXDgZKdbiWhUAMrDK7v6SL/rt5Q/FB+afKwI/YpcgW533yraya3smDl2TtJwSHWZFyRr9sWEc8lX6scVj7ScyOElLlmJMLdvbHfVc62s2ATOdDIlKXnR+5GdeWTU+VSZyj01y9/K0iaakYygBzlupM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com; spf=pass smtp.mailfrom=engleder-embedded.com; dkim=pass (1024-bit key) header.d=engleder-embedded.com header.i=@engleder-embedded.com header.b=susNEU02; arc=none smtp.client-ip=81.19.149.127
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=engleder-embedded.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=engleder-embedded.com
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,15 +37,15 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=HZREiFQf5R44he02JNkvnaf1vB0lV0+xrGaWK/Oh2dQ=; b=QRE+P0H+7X/VaCVc5W4TCaOY76
-	LfN5NUyVTuCPb/tglzoLHppHecpUTBSjisG9PZzjmAtOFU0xgLC7wDg4r5lFmDRtpyPeXckeJ3ZRB
-	C9R1Wn4QeNuqUFyGBR1PPsZgcZpRr4y7N0a4MiO80r5aRKj9alQ7fDRJKEQyGmH63qxk=;
+	bh=BLVkBYLlUD6VGWPS1Os8sFBTDUFRIdtADoJqHLXLFxU=; b=susNEU02EQtFIm/hOr+YSrKTUx
+	w0IQIvQzMmoAuT0bXFcizTLx776G8DiYeQjMJbVGFULorNUnXXaaDpqZD4q9kLHb1/U9Yw7eCRflZ
+	XnWryWzajeSw4Rizsdb3WLQEFo9vqL2yXG9qzvTF64fQLJdpiLsGdchKEdMzbExtvqi0=;
 Received: from 88-117-52-189.adsl.highway.telekom.at ([88.117.52.189] helo=hornet.engleder.at)
 	by mx17lb.world4you.com with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.97.1)
 	(envelope-from <gerhard@engleder-embedded.com>)
-	id 1t5WVL-0000000077v-1SdK;
-	Mon, 28 Oct 2024 21:38:23 +0100
+	id 1t5WVM-0000000077v-3Lpw;
+	Mon, 28 Oct 2024 21:38:24 +0100
 From: Gerhard Engleder <gerhard@engleder-embedded.com>
 To: andrew@lunn.ch,
 	hkallweit1@gmail.com,
@@ -56,9 +56,9 @@ To: andrew@lunn.ch,
 	pabeni@redhat.com
 Cc: netdev@vger.kernel.org,
 	Gerhard Engleder <gerhard@engleder-embedded.com>
-Subject: [PATCH net-next 3/4] net: phy: micrel: Add loopback support
-Date: Mon, 28 Oct 2024 21:38:03 +0100
-Message-Id: <20241028203804.41689-4-gerhard@engleder-embedded.com>
+Subject: [PATCH net-next 4/4] tsnep: Select speed for loopback
+Date: Mon, 28 Oct 2024 21:38:04 +0100
+Message-Id: <20241028203804.41689-5-gerhard@engleder-embedded.com>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20241028203804.41689-1-gerhard@engleder-embedded.com>
 References: <20241028203804.41689-1-gerhard@engleder-embedded.com>
@@ -72,60 +72,38 @@ Content-Transfer-Encoding: 8bit
 X-AV-Do-Run: Yes
 X-ACL-Warn: X-W4Y-Internal
 
-The KSZ9031 PHYs requires full duplex for loopback mode. Add PHY
-specific set_loopback() to ensure this.
+Use 100 Mbps only if the PHY is configured to this speed. Otherwise use
+always the maximum speed of 1000 Mbps.
 
 Signed-off-by: Gerhard Engleder <gerhard@engleder-embedded.com>
 ---
- drivers/net/phy/micrel.c | 28 ++++++++++++++++++++++++++++
- 1 file changed, 28 insertions(+)
+ drivers/net/ethernet/engleder/tsnep_main.c | 12 +++++++++++-
+ 1 file changed, 11 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/micrel.c b/drivers/net/phy/micrel.c
-index 65b0a3115e14..41b92d4e1d17 100644
---- a/drivers/net/phy/micrel.c
-+++ b/drivers/net/phy/micrel.c
-@@ -1028,6 +1028,33 @@ static int ksz9021_config_init(struct phy_device *phydev)
- #define MII_KSZ9031RN_EDPD		0x23
- #define MII_KSZ9031RN_EDPD_ENABLE	BIT(0)
+diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
+index 5c501e4f9e3e..7a89dc87b7a4 100644
+--- a/drivers/net/ethernet/engleder/tsnep_main.c
++++ b/drivers/net/ethernet/engleder/tsnep_main.c
+@@ -229,8 +229,18 @@ static void tsnep_phy_link_status_change(struct net_device *netdev)
+ static int tsnep_phy_loopback(struct tsnep_adapter *adapter, bool enable)
+ {
+ 	int retval;
++	int speed;
  
-+static int ksz9031_set_loopback(struct phy_device *phydev, bool enable,
-+				int speed)
-+{
-+	u16 ctl = BMCR_LOOPBACK;
-+	int ret, val;
+-	retval = phy_loopback(adapter->phydev, enable, 0);
++	if (enable) {
++		if (adapter->phydev->speed == SPEED_100)
++			speed = SPEED_100;
++		else
++			speed = SPEED_1000;
++	} else {
++		speed = 0;
++	}
 +
-+	if (!enable)
-+		return genphy_loopback(phydev, enable, 0);
-+
-+	if (speed == SPEED_10 || speed == SPEED_100 || speed == SPEED_1000)
-+		phydev->speed = speed;
-+	else if (speed)
-+		return -EINVAL;
-+	phydev->duplex = DUPLEX_FULL;
-+
-+	ctl |= mii_bmcr_encode_fixed(phydev->speed, phydev->duplex);
-+
-+	phy_modify(phydev, MII_BMCR, ~0, ctl);
-+
-+	ret = phy_read_poll_timeout(phydev, MII_BMSR, val, val & BMSR_LSTATUS,
-+				    5000, 500000, true);
-+	if (ret)
-+		return ret;
-+
-+	return 0;
-+}
-+
- static int ksz9031_of_load_skew_values(struct phy_device *phydev,
- 				       const struct device_node *of_node,
- 				       u16 reg, size_t field_sz,
-@@ -5478,6 +5505,7 @@ static struct phy_driver ksphy_driver[] = {
- 	.resume		= kszphy_resume,
- 	.cable_test_start	= ksz9x31_cable_test_start,
- 	.cable_test_get_status	= ksz9x31_cable_test_get_status,
-+	.set_loopback	= ksz9031_set_loopback,
- }, {
- 	.phy_id		= PHY_ID_LAN8814,
- 	.phy_id_mask	= MICREL_PHY_ID_MASK,
++	retval = phy_loopback(adapter->phydev, enable, speed);
+ 
+ 	/* PHY link state change is not signaled if loopback is enabled, it
+ 	 * would delay a working loopback anyway, let's ensure that loopback
 -- 
 2.39.2
 
