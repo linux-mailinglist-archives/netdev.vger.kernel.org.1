@@ -1,53 +1,52 @@
-Return-Path: <netdev+bounces-139656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6F69B3B94
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:28:45 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E5089B3B8C
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:27:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F9C2283241
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:28:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BC1CDB21CFA
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:27:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B72200CA6;
-	Mon, 28 Oct 2024 20:25:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA8FA1F7549;
+	Mon, 28 Oct 2024 20:25:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mXiL75m+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jlxIgtu7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38BBB1EE009;
-	Mon, 28 Oct 2024 20:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 709721E0DB2;
+	Mon, 28 Oct 2024 20:25:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730147129; cv=none; b=fZxT+Uu6qS6OULZtyuZLnfCWMaD/si5UbjCFJyRtWDpv9yrmyxVcomrqFEM4b9CIQOzGsXAQciP6lEingsPiOsxMPRtVFo3dubpE4RMZpmsPZhEg+b7go9zEcbhnDMKICVULEyv7CFrKhJAOzX21yWgtf1yyoxs7qYTac7CZuIQ=
+	t=1730147128; cv=none; b=PngdWeS1mkaZ2CXULAzjtXjgQ0TQIyXUE/j9NeoUoLcAteIPNbcbfExLze2b1k5Ujq9JzTCndVk4R559HQ//aaauhleqDb1439Uc9FAw7OHbWmYBbnqKFaV89GvElC7oz0t2KaxJjzB9tr1tqRFeUL3PaYcKlRw1yc4IDV7b3Co=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730147129; c=relaxed/simple;
-	bh=GkMDbekZjB413spSTR0VjgfWteczHDggEgGysKXOZNM=;
+	s=arc-20240116; t=1730147128; c=relaxed/simple;
+	bh=JRUUT/tVaHw7QrNHAqa5N8/R1Mo2990bjnD9KKasxCA=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=TyFOZrGRK7SntoZ/rLNjoM3MRYzTV9ZZYeT1O2Qne48iopp6aMwbKQ6nOr5x3U/3epTEP0Feugq0XWaE0H5XyhIvXZO+kvT5G7ZqR8TF5eVZDCZwmwhWf7WNAwI5u0si66LjwKHAZLVJpchcXJ56u2Ad4OIitouXrloTRUO1cJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mXiL75m+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 01E3BC4CEE7;
-	Mon, 28 Oct 2024 20:25:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=MsX1TCgRYZTpfryxeMjmM791pxfq2QsWWDj3XTkyMfkBlqqATin00xI1M5RGuJzhOqi+oOx2e5UbfpBDTNePNVLKnds6hemHxZAYK16/ZFo+DiU8fNd7qmpm/kgsjrwD1NfyrJUfSUrRo1mLr+dfGB1YmaaRZalsAgqDGSsJaRI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jlxIgtu7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 96BEDC4CEF7;
+	Mon, 28 Oct 2024 20:25:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730147129;
-	bh=GkMDbekZjB413spSTR0VjgfWteczHDggEgGysKXOZNM=;
+	s=k20201202; t=1730147127;
+	bh=JRUUT/tVaHw7QrNHAqa5N8/R1Mo2990bjnD9KKasxCA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:Reply-To:From;
-	b=mXiL75m+E7K8jMEWIDyuSqebPihtWwF+37c9GSBFVphIYJPXs7Hls4umuBzGO8xyp
-	 oOrUAycEYWUGuIovCuxndtWC8li5P5iTkne29rKP4C2cQrbnP2JmOXfXvSDLrl7i3b
-	 3aM0ScUt04nmfnsv395mwpuXHtoLucOqQXN1mH20WZty17vT1Rs/0vSAdWE3Rh4Sy4
-	 48lTbgc5FcKseURg5PFklQ+RZPNOuctBxBKDdjHsM9MhCXQhF49QgwkFt0Z1+WQp+1
-	 WdJDX47zBffGlkj9cWvRsPxi9irNqLwVln3pi0+I+FNGlDOud17aF0d8fDKRZw1bwZ
-	 y0GSB/mArNVPw==
+	b=jlxIgtu7V3cPBsySzGHkIQt2Pkpvu7zLFd+Sa//8HjxDN33wfX+tLPfl2Kh3smzyY
+	 F3gc/xFON//NvqVkzU3rHdwnuHLd8lNTRdHdy37WzKIGIM/L5sJ9YRFQrE6+vcn8c6
+	 xyq/MG97S5pep1MSvjvyj0UPnQ2K1QzV09fXD/0lDdFr+sKLoh9PXwSN1FNYqdrEo1
+	 Hy0iG1kPtJPr95Ok0jX21rVclqjlJPZIzGARF4WCXjpka+FQ1q7TNMCTMx2XztO9h6
+	 a8wQ0+HbXcOwW4dQknRx1hALSYLUsgeEkJ1oah3Q/YPJIPq8kt2zD+16Y1xpBgggov
+	 djzUH3nAaghOQ==
 Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id E3279D5B154;
-	Mon, 28 Oct 2024 20:25:28 +0000 (UTC)
+	by smtp.lore.kernel.org (Postfix) with ESMTP id 89E78D5B14E;
+	Mon, 28 Oct 2024 20:25:27 +0000 (UTC)
 From: Jan Petrous via B4 Relay <devnull+jan.petrous.oss.nxp.com@kernel.org>
-Date: Mon, 28 Oct 2024 21:24:58 +0100
-Subject: [PATCH v4 16/16] net: stmmac: dwmac-s32: Read PTP clock rate when
- ready
+Date: Mon, 28 Oct 2024 21:24:47 +0100
+Subject: [PATCH v4 05/16] net: dwmac-dwc-qos-eth: Use helper rgmii_clock
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241028-upstream_s32cc_gmac-v4-16-03618f10e3e2@oss.nxp.com>
+Message-Id: <20241028-upstream_s32cc_gmac-v4-5-03618f10e3e2@oss.nxp.com>
 References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
 In-Reply-To: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
 To: Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
@@ -83,15 +82,13 @@ Cc: linux-stm32@st-md-mailman.stormreply.com,
  linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
  netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev, 
  devicetree@vger.kernel.org, NXP S32 Linux Team <s32@nxp.com>, 
- "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>, 
- Andrei Botila <andrei.botila@nxp.org>, 
- Jacob Keller <jacob.e.keller@intel.com>
+ "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1730147124; l=1605;
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1730147124; l=1182;
  i=jan.petrous@oss.nxp.com; s=20240922; h=from:subject:message-id;
- bh=LsZsEsLk0S5TfmlHZCV6HTyBWNimPqjm1epTUQoYEEY=;
- b=UQ0dGVjkzm5GF1d8SPLrApbJm5eP1wcEFzCOmIZsO2S6Axeju/ihEdVNgR5Ymfi+y/1JYAjtu
- 8gaokdVXYkrAPmWNLUbafaETbKpSQPUHkt0TuYOSgaxtqsEpslpq/0U
+ bh=o1k5Wm20ojlSERI184m4AqWRyn2wXW8vdr8AE9UuluE=;
+ b=oQtSE7tZW80kMP1GQFVE/VJ3DQXVdxUvernNfz8S7tts1H1pzWxYq+pY4H/6cFR/3t/mgQzwK
+ VU83o71HrGlDIwsxQJOrzQktrXXZKJkOmQfQ/PQPEbE1cI0wF88D7Jz
 X-Developer-Key: i=jan.petrous@oss.nxp.com; a=ed25519;
  pk=Ke3wwK7rb2Me9UQRf6vR8AsfJZfhTyoDaxkUCqmSWYY=
 X-Endpoint-Received: by B4 Relay for jan.petrous@oss.nxp.com/20240922 with
@@ -101,49 +98,45 @@ Reply-To: jan.petrous@oss.nxp.com
 
 From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 
-The PTP clock is read by stmmac_platform during DT parse.
-On S32G/R the clock is not ready and returns 0. Postpone
-reading of the clock on PTP init.
+Utilize a new helper function rgmii_clock().
 
-Co-developed-by: Andrei Botila <andrei.botila@nxp.org>
-Signed-off-by: Andrei Botila <andrei.botila@nxp.org>
 Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c | 13 +++++++++++++
- 1 file changed, 13 insertions(+)
+ drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c | 11 +++--------
+ 1 file changed, 3 insertions(+), 8 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-index fba221c37594..da2cdcfd0529 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-s32.c
-@@ -140,6 +140,18 @@ static void s32_fix_mac_speed(void *priv, unsigned int speed, unsigned int mode)
- 		dev_err(gmac->dev, "Can't set tx clock\n");
- }
- 
-+static void s32_dwmac_ptp_clk_freq_config(struct stmmac_priv *priv)
-+{
-+	struct plat_stmmacenet_data *plat = priv->plat;
-+
-+	if (!plat->clk_ptp_ref)
-+		return;
-+
-+	plat->clk_ptp_rate = clk_get_rate(plat->clk_ptp_ref);
-+
-+	netdev_dbg(priv->dev, "PTP rate %lu\n", plat->clk_ptp_rate);
-+}
-+
- static int s32_dwmac_probe(struct platform_device *pdev)
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+index ec924c6c76c6..5080891c33e0 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-dwc-qos-eth.c
+@@ -181,24 +181,19 @@ static void dwc_qos_remove(struct platform_device *pdev)
+ static void tegra_eqos_fix_speed(void *priv, unsigned int speed, unsigned int mode)
  {
- 	struct plat_stmmacenet_data *plat;
-@@ -195,6 +207,7 @@ static int s32_dwmac_probe(struct platform_device *pdev)
- 	plat->init = s32_gmac_init;
- 	plat->exit = s32_gmac_exit;
- 	plat->fix_mac_speed = s32_fix_mac_speed;
-+	plat->ptp_clk_freq_config = s32_dwmac_ptp_clk_freq_config;
+ 	struct tegra_eqos *eqos = priv;
+-	unsigned long rate = 125000000;
++	long rate = 125000000;
+ 	bool needs_calibration = false;
+ 	u32 value;
+ 	int err;
  
- 	plat->bsp_priv = gmac;
+ 	switch (speed) {
+ 	case SPEED_1000:
+-		needs_calibration = true;
+-		rate = 125000000;
+-		break;
+-
+ 	case SPEED_100:
+ 		needs_calibration = true;
+-		rate = 25000000;
+-		break;
++		fallthrough;
  
+ 	case SPEED_10:
+-		rate = 2500000;
++		rate = rgmii_clock(speed);
+ 		break;
+ 
+ 	default:
 
 -- 
 2.46.0
