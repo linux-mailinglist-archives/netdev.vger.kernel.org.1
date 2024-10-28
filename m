@@ -1,92 +1,83 @@
-Return-Path: <netdev+bounces-139557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45D2F9B3057
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 13:34:59 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E4AB99B307B
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 13:38:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 554A01F221A3
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:34:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 90F041F2259B
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:38:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 370B71DA0E3;
-	Mon, 28 Oct 2024 12:34:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 222761DA0ED;
+	Mon, 28 Oct 2024 12:38:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="AmydIm7Y"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="AUuZ2c0V"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718491D88A4
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 12:34:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3842218FDBE;
+	Mon, 28 Oct 2024 12:38:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730118891; cv=none; b=W6vxHWd/lK9F+70gOLUAPVxFwnlf1NQP/J5uHqMOaNUQiJJUQFrrANv8kk0aXpGCdZCmhNJh/kjH1tOU8DyXOS3KYXhgg5tuqHTIPZr5nv2ltXpDtL1/Eq5dFIleWUTEPh7uRf9ctj8444noFmqjw4Y/qbOU/nwHVc3skAknWbI=
+	t=1730119113; cv=none; b=E5HA9joRTxEcuONqsS2mfdOtqYmjeR0K6aTIFHeUBrQqa4IxUnEQh9i41D6jbuHGoBN2sJVi6NX4JeF6yjuKkN7WqQHROcNa75wsafSMWqT9dIsnk0AYPCUG1yKqMcX+LKXTzV+prJdB9up57eUm2LWnTjUw9Ye5AsLj3AlVZnI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730118891; c=relaxed/simple;
-	bh=54620GN/b8tzXBU3NRajAw15Isqlyf4C7qPxGP7Pq/M=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iExhNQSU/SBcyeS6CULjTn5DqLPZIP7HikOG3+q4i18maV07SKco/8dwLntGiTft+n2/ILRs5mB5sgnEYC3jBuIX+065nZUNJvz+RFKQWF/XWEI7fgGgo+zkV2KyXeVxghZY7GIK/f1h04+yyyksiqugggMPTfwl9n9dhXPpinY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=AmydIm7Y; arc=none smtp.client-ip=91.218.175.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730118886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=MREqdIhMV696ufnyoHe89T22c4ii2X74R+5suzL/X8U=;
-	b=AmydIm7Ypwe3nC3I/+piTl+Jlavhxf+BB9uIb5scDerBELhPUKMK4qxWEEYXwawXaeS3+K
-	ROVi3t3mpejBh4vFbRLLVLfPWkPVd6oK6rLevZw2HgnFVh82GF3QoWoEuGsDkcrVE5RcEw
-	FLkkbfGRITjGgur0ZkGWoKF1tim3UUY=
-From: George Guo <dongtai.guo@linux.dev>
-To: horms@kernel.org,
-	paul@paul-moore.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linux-security-module@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	George Guo <guodongtai@kylinos.cn>
-Subject: [PATCH net-next v2] netlabel: document doi_remove field of struct netlbl_calipso_ops
-Date: Mon, 28 Oct 2024 20:34:35 +0800
-Message-Id: <20241028123435.3495916-1-dongtai.guo@linux.dev>
+	s=arc-20240116; t=1730119113; c=relaxed/simple;
+	bh=l57zkt31ysNXbU5Beb1POJfXYxsAs1C0+JtNN0Z5Qww=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=R0yrCbXR2v1Jx7ArimlUI6U3vfF6FBIy2WebyqRL7BUMFTb4a6qX9I5Bt5NMRHFFFNICVvVPiHqxfyTDO8lGpwEaaqen0qzfT+JyKoOj4WeOSZc/BUpKECO/4e7ET2+ip04iZlLOBvSa+rq9oQrAHrec5qlZJ5GCPXELKWjwl7A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=AUuZ2c0V; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=U3TgRywqxilRRFAt5rH162dOH+tv6SvlcFTqOEAK1N8=; b=AUuZ2c0VAqFrfvrVHH5PIbRfWM
+	+PxNwbgBA5ln9p3yYdYRDdgVSzIboTrkHvQmR8r2FKJ48n7bmTionKoeQ1UyuLx9YFBEpD5KL76Ii
+	xiYxGgSkT7Py0zG2S3PAuyo1f7nPrVIEhECLoDYYlUK+YkbS3k156eSLr0OSJ4p8l0mQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5P0j-00BRe7-Rg; Mon, 28 Oct 2024 13:38:17 +0100
+Date: Mon, 28 Oct 2024 13:38:17 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Fabian Benschuh <Fabi.Benschuh@fau.de>
+Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org
+Subject: Re: [PATCH] Add LAN78XX OTP_ACCESS flag support
+Message-ID: <c4503364-78c7-4bd5-9a77-0d98ae1786bf@lunn.ch>
+References: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
 
-From: George Guo <guodongtai@kylinos.cn>
+On Sat, Oct 26, 2024 at 01:05:46AM +0200, Fabian Benschuh wrote:
+> With this flag we can now use ethtool to access the OTP:
+> ethtool --set-priv-flags eth0 OTP_ACCESS on
+> ethtool -e eth0  # this will read OTP if OTP_ACCESS is on, else EEPROM
+> 
+> When writing to OTP we need to set OTP_ACCESS on and write with the correct magic 0x7873 for OTP
 
-Add documentation of doi_remove field to Kernel doc for struct netlbl_calipso_ops.
 
-Flagged by ./scripts/kernel-doc -none.
+Please can you tell us more about OTP vs EEPROM? Is the OTP internal
+while the EEPROM is external? What is contained in each? How does the
+device decide which to use when it finds it has both?
 
-Signed-off-by: George Guo <guodongtai@kylinos.cn>
----
- include/net/netlabel.h | 1 +
- 1 file changed, 1 insertion(+)
+I'm just wondering if we even need a private flag, if the hardware
+will use one or the other exclusively?
 
-diff --git a/include/net/netlabel.h b/include/net/netlabel.h
-index 529160f76cac..4afd934b1238 100644
---- a/include/net/netlabel.h
-+++ b/include/net/netlabel.h
-@@ -208,6 +208,7 @@ struct netlbl_lsm_secattr {
-  * struct netlbl_calipso_ops - NetLabel CALIPSO operations
-  * @doi_add: add a CALIPSO DOI
-  * @doi_free: free a CALIPSO DOI
-+ * @doi_remove: remove a CALIPSO DOI
-  * @doi_getdef: returns a reference to a DOI
-  * @doi_putdef: releases a reference of a DOI
-  * @doi_walk: enumerate the DOI list
--- 
-2.39.2
-
+	Andrew
 
