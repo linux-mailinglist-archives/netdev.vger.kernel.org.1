@@ -1,101 +1,121 @@
-Return-Path: <netdev+bounces-139662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 490389B3C26
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:46:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CF21D9B3C33
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:48:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AA641C216D0
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:46:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61856B218E3
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:48:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 854BD1E1327;
-	Mon, 28 Oct 2024 20:45:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B249C1DE2DF;
+	Mon, 28 Oct 2024 20:48:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TkLseHLO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DF2F1DFE2B
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:45:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9046E18D649
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:48:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730148337; cv=none; b=T/Is00vX9NLrJy9hC6uxbgqKpmu88L/IrYZXb3rs/BphEcRn6pnpRDjrYUPIACRbJEAQ5wQ236qWwBcb8uShjOaonvwlUNNMcg4nlnrhZQb+SsA8r4mg1++Bxk+b0Fv/88ycDBhR4GrrLQBD7O8PSuN6Kyp/BPBNM+reMNllQOM=
+	t=1730148510; cv=none; b=bNLpw7YjkQ7n/+nP1FnRNjRM24waaUftrOxKP6tp7IVk0wdu/f3aVwV1s4QWiaAll05zG2u8xqeSjZSRnIEYRPFRNb0XBtIcwTz5g8G60mnPF9N5IUKNoAUlcmTSjzmIZyS5gRzsk6Ul2V4xejG1WMyxzNIs4gAhW/1o0v3ERzA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730148337; c=relaxed/simple;
-	bh=JlSTUzkhOJrT5VFcvOPsjv667t7ku0zyTga+DMVjXaM=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=a/5KKoGlqiFOttmdTUBqGLHxF2n0nLSC5swUC4nXV4UF4U9p4da1AAPr+h3zWMTkPpk86HrzDqdoBxG9C6ifuZhM6rm4f7kjmRGx5vKQG9OUlfDnLKaT8wqZw32hTyn+fisPygJL3Gle6aKEqhUVcu73L37mmK3jrSwxDiZ0tgo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a3cb771556so41585865ab.3
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 13:45:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730148333; x=1730753133;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Gm9HIUjtIgm+D7gqVN7uBVlVAbtiOD76ZVg8RQFmbeg=;
-        b=CssxVuKV8QBzL7zkcS8RLIcsJWtQEqW9t0dN8LGm3B7d34fwoHMi2ndvgqzYxigm98
-         HAjqi/OWqktH1zhz1Hnbr6l5zlkCa8VlQJ43ntvz+nh1o20KAKhEXTehdxxY/SusJl8l
-         HmRs7MBhqBC/ypoSMrwuBp5p6wx6AMqXeEwRHoA9Os5HaoWarhgS1OCTa09kolAXI0Fi
-         xu450I84cOeHgmt6OGqYOHY2IM/++LYB84eZQbfLblcLCZeJrVzzUhvqVuMuybopB73U
-         tw6fXm3lTzUMcIhjCvH9u9ArOdV9AdH78SbLKlMIMR1XxpA4eniwoQ7pYrHg4FmtNp/i
-         0qTQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXXPqvTMJNdgiv55UrU61L6k4zBmlwXwyfZ1uIhjjwsIZ5kvGoOGgfmzoFtk+Od0glDCOoIUnk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyDWInpxM8aDSAr/XliL83ah9eYdwy6jEMk2hBIbIVkzTzOuXdY
-	vMX6rywBcZzJpF6lbuqbPMFnPQo3bOaysDSjRG71xVr+fCbavYKnyqN1wYDUnnXzcdbP1Ljz8fl
-	KarifWLjsyzNeDnONSTsZPQZk2lMv2di7Fwi20Arn+PjnusulxMTEMDc=
-X-Google-Smtp-Source: AGHT+IGZzVyntIeyX/gZ5yaDPioEdLlL7du5r6uZZi31yylONzfTAyJa0yATwAh/BOFzUE7mZXZlsTnS5exUluxtxolLDOBU84EI
+	s=arc-20240116; t=1730148510; c=relaxed/simple;
+	bh=SvRvHWEPkL1s1/bhNIhAxLbUg0uF/huboOQbYt9COnI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YQ9r1PuR3pliY/MVs7Xia4cRHiVChyq0XceCJsaq7vdI+AhuUAor4GFfSofQ883UrpSeza+rsnAB2LAsnc0YEz4+jmWBkdYWGEVFprn8d03XthIhSgk4CVy7MS5c8TskvLyF3TiYdGPNgGbp2RPHItmWnryyKge1Gb9QSQYXzdo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TkLseHLO; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730148508; x=1761684508;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=SvRvHWEPkL1s1/bhNIhAxLbUg0uF/huboOQbYt9COnI=;
+  b=TkLseHLOGl0XMALjSd0nvhsfWGTQefHSxXPP6YrJ6ipMgVq51VRpbRqQ
+   4vu7GtLiiTLu9h4gEmp8gJd7p/5zBc19h6U7E7c3mgN9Og0TqH0VzqDQo
+   F7+eBm0IvfqoKVJxmyDboOLBfTwmTTazniuft2ym0YzJKV+3Tg4Ygrh2j
+   yEuN1AFKPk4+NGItY9nwCHczz30vG5LpA//uglRQKFGsmr2NXxA4gKvUc
+   +/vrVzGVJKGqAYlW3dVBXHj2IDVCq0HVGkdFuiFp8ZibfC6yQN/kSiIrd
+   ZXbroLjf2NueVwB24jwRC+BwlkWbpzmhqVFOUIw4bXxOB8SzzTGMfuH+f
+   w==;
+X-CSE-ConnectionGUID: wtnZt6/vRz+IJRMFmgBFBw==
+X-CSE-MsgGUID: L7zjMj4nS7aOsn2VbgnhPg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11239"; a="33685463"
+X-IronPort-AV: E=Sophos;i="6.11,240,1725346800"; 
+   d="scan'208";a="33685463"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 13:48:28 -0700
+X-CSE-ConnectionGUID: GS9LcOXoQBWErAqTgD1Sxw==
+X-CSE-MsgGUID: plqjDdVbRYuw60lBlggk0Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,240,1725346800"; 
+   d="scan'208";a="86529740"
+Received: from unknown (HELO gklab-003-001.igk.intel.com) ([10.211.3.1])
+  by orviesa005.jf.intel.com with ESMTP; 28 Oct 2024 13:48:26 -0700
+From: Grzegorz Nitka <grzegorz.nitka@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Grzegorz Nitka <grzegorz.nitka@intel.com>
+Subject: [PATCH v3 iwl-net 0/4] Fix E825 initialization
+Date: Mon, 28 Oct 2024 21:45:39 +0100
+Message-Id: <20241028204543.606371-1-grzegorz.nitka@intel.com>
+X-Mailer: git-send-email 2.39.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:16cf:b0:3a0:9cd5:931c with SMTP id
- e9e14a558f8ab-3a4ed33225bmr96405405ab.20.1730148333472; Mon, 28 Oct 2024
- 13:45:33 -0700 (PDT)
-Date: Mon, 28 Oct 2024 13:45:33 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <671ff7ed.050a0220.4735a.0251.GAE@google.com>
-Subject: [syzbot] Monthly rdma report (Oct 2024)
-From: syzbot <syzbot+list1a9e20eb3cc9c246ba85@syzkaller.appspotmail.com>
-To: linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello rdma maintainers/developers,
+E825 products have incorrect initialization procedure, which may lead to
+initialization failures and register values.
 
-This is a 31-day syzbot report for the rdma subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/rdma
+Fix E825 products initialization by adding correct sync delay, checking
+the PHY revision only for current PHY and adding proper destination
+device when reading port/quad.
 
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 7 issues are still open and 61 have been fixed so far.
+In addition, E825 uses PF ID for indexing per PF registers and as
+a primary PHY lane number, which is incorrect.
 
-Some of the still happening issues:
+Karol Kolacinski (4):
+  ice: Fix E825 initialization
+  ice: Fix quad registers read on E825
+  ice: Fix ETH56G FC-FEC Rx offset value
+  ice: Add correct PHY lane assignment
 
-Ref Crashes Repro Title
-<1> 295     No    INFO: task hung in disable_device
-                  https://syzkaller.appspot.com/bug?extid=4d0c396361b5dc5d610f
-<2> 186     No    INFO: task hung in rdma_dev_change_netns
-                  https://syzkaller.appspot.com/bug?extid=73c5eab674c7e1e7012e
-<3> 33      No    WARNING in rxe_pool_cleanup
-                  https://syzkaller.appspot.com/bug?extid=221e213bf17f17e0d6cd
-<4> 5       No    possible deadlock in sock_set_reuseaddr
-                  https://syzkaller.appspot.com/bug?extid=af5682e4f50cd6bce838
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_common.c   |  47 ++-
+ drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  23 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |   4 +-
+ .../net/ethernet/intel/ice/ice_ptp_consts.h   |  77 +----
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 281 ++++++++++--------
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  37 ++-
+ drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |   7 +-
+ drivers/net/ethernet/intel/ice/ice_type.h     |   2 -
+ 11 files changed, 247 insertions(+), 239 deletions(-)
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+V2 -> V3: Removed net-next hunks from "ice: Fix E825 initialization",
+          replaced lower/upper_32_bits calls with lower/upper_16_bits
+          in "ice: Fix quad registers read on E825",
+          improved ice_get_phy_lane_number function in "ice: Add correct
+          PHY lane assignment"
+V1 -> V2: Removed net-next hunks from "ice: Fix E825 initialization",
+          whole "ice: Remove unnecessary offset calculation for PF
+          scoped registers" patch and fixed kdoc in "ice: Fix quad
+          registers read on E825"
 
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
+base-commit: 19acd6818aa7404d96cd5d0e4373d4ebe71448c2
+-- 
+2.39.3
 
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
