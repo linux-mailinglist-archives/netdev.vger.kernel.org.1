@@ -1,125 +1,140 @@
-Return-Path: <netdev+bounces-139438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58C89B2538
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 07:25:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 15EF79B253D
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 07:26:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1290E1C20F6A
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 06:25:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37D7E1C20F62
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 06:26:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F49218DF8B;
-	Mon, 28 Oct 2024 06:25:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EAFE18E03D;
+	Mon, 28 Oct 2024 06:26:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="M5UadF+U"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AYhsybgE"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A95B1142E86;
-	Mon, 28 Oct 2024 06:25:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.5
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333991885BE;
+	Mon, 28 Oct 2024 06:26:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730096715; cv=none; b=vGo3cPzZMlQJy8nTthJfKmVdFvZan/lzLKMRAK+FmFYkxyurSBoLFLEKe50W8FPQpY63NN7Cq/SJNZH11pTOHdODcJpBMOMPf/IY79kmG7FbI5YOYtoKxJ8ExHHVbPkTRui5VIS5NobGRYf7tTfahpQWx1nhtLBp/4KdtppXHEM=
+	t=1730096784; cv=none; b=bdc9Rn1UFvOTrUeLIEq1OWz8tebwMDWUn8YEjFhNx+bZJrl1al+JauZx/u4+9XL+OBV0x3fxeF9BenvYU2GSlJ8JnLZg+GkyP4OetHbvfFbhiE5h/yZlDv4et/Yo0Vw/SQfW8sNZWEz6M0b/nVZgSgqPO2FjChAaZZAdcKBTheU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730096715; c=relaxed/simple;
-	bh=V4+xfa194CBFp5q3Inlgr8aVzHzK5NZ5xiP0OuJVVKQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tFcTPqlVjRvZitxhuMgDJe++SqedsRKVcBjoA7vOkHxx0Bxc5YQXxi7H341Dv0cOG2nWTUhxFq44hXqbjD3Kh0QL3OPZMs6pkSbSm6ONykfuS3AEWPzBCc8T2I8Mw7qAsv6WQqqJhhB6fAOPU1KSQPCLdVBD153gdWLcVMuWr0o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=M5UadF+U; arc=none smtp.client-ip=220.197.31.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=MnCJU
-	2J3pJ6fwUvA85VlD1sdw0N2m8tj2xG8I7tc5pg=; b=M5UadF+UJiIiYXpJuOvA8
-	xaDhrgCah03hkeerzByUdAGNoXhmsfL8ZZrSNMUl8QvFgc5j+TORgOK29Zv6zd7N
-	+BTr36Wb69mVOViai8nsvVF2zZCEVrMD6pLmaayOlAJmj8JqmnCHyvauyO5F70Hr
-	VStn42LJUl6OPJejqzegxI=
-Received: from localhost.localdomain (unknown [47.252.33.72])
-	by gzga-smtp-mtada-g0-0 (Coremail) with SMTP id _____wDnDzAfLh9nUZxTBw--.19283S2;
-	Mon, 28 Oct 2024 14:24:36 +0800 (CST)
-From: mrpre <mrpre@163.com>
-To: xiyou.wangcong@gmail.com
-Cc: edumazet@google.com,
-	jakub@cloudflare.com,
-	davem@davemloft.net,
-	dsahern@kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	mrpre <mrpre@163.com>
-Subject: [PATCH v2] bpf: fix filed access without lock
-Date: Mon, 28 Oct 2024 14:23:34 +0800
-Message-ID: <20241028062334.35488-1-mrpre@163.com>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241021013705.14105-1-mrpre@163.com>
-References: <20241021013705.14105-1-mrpre@163.com>
+	s=arc-20240116; t=1730096784; c=relaxed/simple;
+	bh=1InsdEhVvlUlq9Xpg7bElsz6OR8ydGLFjk8W/ghjfV0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=QuwhXxRwHaBmJFXB6ejsdJ7Xjq7DlpiYsJIMav2pdnq0rH42dCOIE82WEwZmRS2znwyIxlrnE7FIR31vMuXZiPJpoboAfsea28I/UQnvxn7QR3NFI3xCEcQcUEbV8pv5siTPLIuHLlSWvhaMQGabxIR0+uWqLvbEB5b2CYBzHss=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AYhsybgE; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49RNafas024838;
+	Mon, 28 Oct 2024 06:26:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	D1xOgtuO0S3fe5QauXOXwWuKHL0NjkPFZoFxUlUTjso=; b=AYhsybgE7yU3+LS3
+	FTwJC5gjJStCBriAGbnCs7YGz3HwZ0tsPgtaGZIFiUiKp6bOgmD+wni41S0loytc
+	WP3xRZIZUdBr89oojp1zqY2klvsOZd50mEtwkIq8IGYLDfZfOVc+aqZlA8AXCVU4
+	Rf8d9hFX/PodAoj6gVtPdnZHC67PRaQu29EVcM29t4tVbjKAQA3uDs588Ku8YJrf
+	n3f+77hm79ogDPUA9BRCsHUb4E2vzcKL+P9Mf5nvGbQ5gK7wwyBN5tkWISsdHIym
+	GB0+AQGFCKj6YF6KqAgdSDOONUybWV9A1MJuAGBV3mzAcp52M/viT7MGzub55/uT
+	bgCasg==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42grgubumb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 06:26:04 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49S6Q3ae005840
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 06:26:03 GMT
+Received: from [10.152.195.140] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Sun, 27 Oct
+ 2024 23:25:55 -0700
+Message-ID: <21365836-aa06-4269-885c-591f43e2e5fc@quicinc.com>
+Date: Mon, 28 Oct 2024 11:55:45 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wDnDzAfLh9nUZxTBw--.19283S2
-X-Coremail-Antispam: 1Uf129KBjvJXoW7Kr1rCFy7WFWfXr43KFy5CFg_yoW8CFy3pF
-	ZrGw109a1DJFWDAr4vyFZ7JF13W3ySka4Uurn5uayfArsI9r1fKFWvkw4ayF1YgF4vvw1a
-	qrWjqr1q93WDA3JanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piX_-PUUUUU=
-X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiDxyGp2cfJbW6RwAAsn
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 5/7] clk: qcom: Add NSS clock Controller driver for
+ IPQ9574
+To: Dmitry Baryshkov <dmitry.baryshkov@linaro.org>
+CC: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <angelogioacchino.delregno@collabora.com>,
+        <neil.armstrong@linaro.org>, <arnd@arndb.de>,
+        <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
+References: <20241025035520.1841792-1-quic_mmanikan@quicinc.com>
+ <20241025035520.1841792-6-quic_mmanikan@quicinc.com>
+ <jhykmuvgltvuqf74evvenbagmftam2gaeoknuq5msxop4mkh65@dya6vvqytfcx>
+Content-Language: en-US
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+In-Reply-To: <jhykmuvgltvuqf74evvenbagmftam2gaeoknuq5msxop4mkh65@dya6vvqytfcx>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: bnY34kVo7iP_b84pRXnPvvGaTbPl5pPa
+X-Proofpoint-GUID: bnY34kVo7iP_b84pRXnPvvGaTbPl5pPa
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 clxscore=1015
+ lowpriorityscore=0 adultscore=0 mlxscore=0 bulkscore=0 suspectscore=0
+ phishscore=0 spamscore=0 malwarescore=0 mlxlogscore=536 priorityscore=1501
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2410280052
 
-The tcp_bpf_recvmsg_parser() function, running in user context,
-retrieves seq_copied from tcp_sk without holding the socket lock, and
-stores it in a local variable seq. However, the softirq context can
-modify tcp_sk->seq_copied concurrently, for example, n tcp_read_sock().
 
-As a result, the seq value is stale when it is assigned back to
-tcp_sk->copied_seq at the end of tcp_bpf_recvmsg_parser(), leading to
-incorrect behavior.
 
-Due to concurrency, the copied_seq field in tcp_bpf_recvmsg_parser()
-might be set to an incorrect value (less than the actual copied_seq) at
-the end of function: 'WRITE_ONCE(tcp->copied_seq, seq)'. This causes the
-'offset' to be negative in tcp_read_sock()->tcp_recv_skb() when
-processing new incoming packets (sk->copied_seq - skb->seq becomes less
-than 0), and all subsequent packets will be dropped.
+On 10/25/2024 11:21 AM, Dmitry Baryshkov wrote:
+> On Fri, Oct 25, 2024 at 09:25:18AM +0530, Manikanta Mylavarapu wrote:
+>> From: Devi Priya <quic_devipriy@quicinc.com>
+>>
+>> Add Networking Sub System Clock Controller(NSSCC) driver for ipq9574 based
+>> devices.
+>>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Closes: https://lore.kernel.org/oe-kbuild-all/202410101431.tjpSRNTY-lkp@intel.com/
+> 
+> These tags are incorrect. Please read the text of the email that you've
+> got.
 
-Signed-off-by: Jiayuan Chen <mrpre@163.com>
----
-V1 -> V2: add more commit message to describle the issue
----
- net/ipv4/tcp_bpf.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
-index e7658c5d6b79..7b44d4ece8b2 100644
---- a/net/ipv4/tcp_bpf.c
-+++ b/net/ipv4/tcp_bpf.c
-@@ -221,9 +221,9 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 				  int flags,
- 				  int *addr_len)
- {
--	struct tcp_sock *tcp = tcp_sk(sk);
-+	struct tcp_sock *tcp;
-+	u32 seq;
- 	int peek = flags & MSG_PEEK;
--	u32 seq = tcp->copied_seq;
- 	struct sk_psock *psock;
- 	int copied = 0;
+Added these tags since the dependent patch [1] was included in v8.
+Please let me know if this should be removed.
  
-@@ -238,7 +238,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
- 		return tcp_recvmsg(sk, msg, len, flags, addr_len);
- 
- 	lock_sock(sk);
--
-+	tcp = tcp_sk(sk);
-+	seq = tcp->copied_seq;
- 	/* We may have received data on the sk_receive_queue pre-accept and
- 	 * then we can not use read_skb in this context because we haven't
- 	 * assigned a sk_socket yet so have no link to the ops. The work-around
--- 
-2.43.5
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>> Signed-off-by: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+>> ---
+>> Changes in V8:
+>> 	- Remove DT_BIAS_PLL_NSS_NOC_CLK and P_BIAS_PLL_NSS_NOC_CLK
+>> 	  because these are not required
+> 
+> What was changed to overcome the LKP error?
 
+The dependent patch was not included and hence got the error.
+In v8 included the dependent patch [1] also and added this info in cover letter as well.
+
+[1] https://lore.kernel.org/linux-arm-msm/20241025035520.1841792-2-quic_mmanikan@quicinc.com/
+
+
+Thanks & Regards,
+Manikanta.
 
