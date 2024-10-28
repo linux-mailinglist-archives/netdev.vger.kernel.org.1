@@ -1,119 +1,60 @@
-Return-Path: <netdev+bounces-139626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C4669B39D4
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 19:59:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 451559B3A50
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:19:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6A7928282D
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:59:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0902B282077
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 19:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B681DF728;
-	Mon, 28 Oct 2024 18:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A6B1DF96A;
+	Mon, 28 Oct 2024 19:19:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="YDxXyY6v"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="buZIfPtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E89CE1D8E16
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 18:59:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBA711DED5D;
+	Mon, 28 Oct 2024 19:19:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730141973; cv=none; b=nKAmp9YB9WCpDYEWlxgPwavUEm9KURoQV82IZorjSQ+8M3JUAC8pxbzigcU1/z0z35sYbSTf/8el+O2S+gtA7j7Ar8fltvwX/6BMgg1UkYB4hYYPfqcAHIoBf/pwMm95k5b8Lp1qjpvbyHgcGFCBeorniAAMSUPwX5F2O39PB7k=
+	t=1730143165; cv=none; b=GWVDgZmTIn3RIJR9b8BEGc/k4U/Ts2KF6hfEFdEhBCFs3Si4b8JmIHD9SRTq8A/1nLMLVdF3D4KUHcg989CiGwbaccbzs1OZxboKbBVqrQl/n8ZwDCrOxJfN9qdQZcPpuHfMHgNxdawZPHTjfctWFWJHwWrEUNmDHaxsLasrrnY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730141973; c=relaxed/simple;
-	bh=f7jCv518i3r2DmaD2jR4yg1phCBC6+krsahdbsKRe+o=;
+	s=arc-20240116; t=1730143165; c=relaxed/simple;
+	bh=YOhFJudoWKITSumFA9L1MS25O6AQWfwCQtZmUQt+/nQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NwG7FfzjdjYrheAoPKz+RwQ+CVh9NX3F2LMv70V4je/Y51TnSbhEOyQOp8VGQyQn1Li7cUlxTgZ6dSAR8iiwDSdaph4fEi6XCsmiQEgvIpn6hgBAxGpe0LpLyuIw+2owgPbv3bAbACOBlRgUc5nY/G9bJmrwS+6Bqi98x/CqHS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=YDxXyY6v; arc=none smtp.client-ip=209.85.214.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20ce5e3b116so31197325ad.1
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 11:59:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730141971; x=1730746771; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qeCldZNN0uQOZMpedqS7Oua78AnyCHE6/huQVyFkvbY=;
-        b=YDxXyY6vXCC9BbgYD5Jr8qrdQe9mPTWj90+kgVZ1KVfX0fVSEl95U7goCVw1wjSzUu
-         VWjMUQnnlPAs5uIPIV4FD3/miDd7lXPpOirJbl6X6Lj0qRS3AP26VWTIh4ig592R40cC
-         K0qIhI87pReApToH/HKCVgLvz+AqFB1TrckQA=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730141971; x=1730746771;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=qeCldZNN0uQOZMpedqS7Oua78AnyCHE6/huQVyFkvbY=;
-        b=Ua7R7wM1Hz9n7MS6LYx755s8RNi5+ImzhAFFBkQ2Qlf5XYW8XZifpJZlBH2LwfLtBb
-         C/MmKQK0z0ZLXvaZrcljlOUcU1z0Q8IyGFipr4+NW2q6SwJhI2l926PKmAvWx99GC7Z1
-         c5QmUbUWnD2HeCn3ZdxxYpaUy/AehTKrCffhCEmN70rA7C0nt1qhJYrJtP9BmS2KqIgu
-         E+K1+rrTD/CLGaUygI1438kuk0ku8yUANFRUUebbJBe2uzck63gIakjkdhylHpPJIKrb
-         x0/zfr4TeIihpqMFU6ttrBhkuXQO9y/0hrbvBrGyFhvBUXNa6+2AZrMfA/vTXiiBZ3X9
-         bAPQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUlrvvsXHPZReXTvvTNUd4hYQ7HHO/xhDvA2HTZQgN0wBYq3MeiifKYLDJXCjkzDwzMH/yeJfw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwabwaVUF/jUkcVDysZGkIu12GGnNgDQVS4EW72k6mlAal1ysZ7
-	stHC7E0ck+tfgzqZ6zIccAVtCtufzyv/wro/kN3QkaNvec2KFIaG4IayIFhchS4=
-X-Google-Smtp-Source: AGHT+IHUdnN8IaS4uaqWrdTjg4xrewbchje8khIGQ1Drr+enMS0lfIciArKhVhl88XNPN1+fZdpMbg==
-X-Received: by 2002:a17:902:ce12:b0:20c:7898:a8f4 with SMTP id d9443c01a7336-210c6ccfc15mr125345945ad.60.1730141971225;
-        Mon, 28 Oct 2024 11:59:31 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf434adsm53854335ad.10.2024.10.28.11.59.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 11:59:30 -0700 (PDT)
-Date: Mon, 28 Oct 2024 11:59:27 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jacob Keller <jacob.e.keller@intel.com>
-Cc: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"kurt@linutronix.de" <kurt@linutronix.de>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-	stanislaw.gruszka@linux.intel.com
-Subject: Re: [Intel-wired-lan] [iwl-next v4 2/2] igc: Link queues to NAPI
- instances
-Message-ID: <Zx_fD72US_Jhq1oL@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	"Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"kurt@linutronix.de" <kurt@linutronix.de>,
-	"Gomes, Vinicius" <vinicius.gomes@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>,
-	stanislaw.gruszka@linux.intel.com
-References: <20241022215246.307821-1-jdamato@fastly.com>
- <20241022215246.307821-3-jdamato@fastly.com>
- <d7799132-7e4a-0ac2-cbda-c919ce434fe2@intel.com>
- <Zx-yzhq4unv0gsVX@LQ3V64L9R2>
- <Zx-1BhZlXRQCImex@LQ3V64L9R2>
- <529d08d7-94ee-43da-904e-cf89823a59fb@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=Tga11SQ+x01ga3nSQBKG16rtdrXWMzOWva5CPVgZrIJYT5ZiB1EEAqoLgbmrEG1Kv1lci4qPQzp1shV3Hba+K9ZguDgPrb6xXfvkE1gEWokIR7N9lHE3H3BtujNu3djuDmaHgPCYN+dP2MdUe5wFlhN5HKpvyDoNux4baPsgVN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=buZIfPtd; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=j5Hm+cdKOPmGk6I+GthLiMX+5qze8QN9PBg+oM0pU7k=; b=buZIfPtdaRSu8VgAlbDO1Kibxr
+	syA5y3dx/dt06CUBDmRKqSHgHJ0v8o8vw8a3OCzypKVcW6/SfxJhXnvhfUBIn/u0qEODLX38rnzv5
+	UJ0aC8R8R9fa58IIt0UriftsgZfi6OQcl35b/vR8q3NHczdzznFUt3+UWA/epTzyVZOs=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5VGa-00BTkR-1h; Mon, 28 Oct 2024 20:19:04 +0100
+Date: Mon, 28 Oct 2024 20:19:04 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Ronnie.Kunin@microchip.com
+Cc: Fabi.Benschuh@fau.de, Woojung.Huh@microchip.com,
+	UNGLinuxDriver@microchip.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH] Add LAN78XX OTP_ACCESS flag support
+Message-ID: <a0d6ef0c-5615-40fd-964d-11844389dc29@lunn.ch>
+References: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
+ <c4503364-78c7-4bd5-9a77-0d98ae1786bf@lunn.ch>
+ <PH8PR11MB796575D608575FAA5233DBD4954A2@PH8PR11MB7965.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -122,45 +63,65 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <529d08d7-94ee-43da-904e-cf89823a59fb@intel.com>
+In-Reply-To: <PH8PR11MB796575D608575FAA5233DBD4954A2@PH8PR11MB7965.namprd11.prod.outlook.com>
 
-On Mon, Oct 28, 2024 at 11:53:55AM -0700, Jacob Keller wrote:
+On Mon, Oct 28, 2024 at 03:02:44PM +0000, Ronnie.Kunin@microchip.com wrote:
+> > From: Andrew Lunn <andrew@lunn.ch>
+> > Sent: Monday, October 28, 2024 8:38 AM
+> > 
+> > On Sat, Oct 26, 2024 at 01:05:46AM +0200, Fabian Benschuh wrote:
+> > > With this flag we can now use ethtool to access the OTP:
+> > > ethtool --set-priv-flags eth0 OTP_ACCESS on ethtool -e eth0  # this
+> > > will read OTP if OTP_ACCESS is on, else EEPROM
+> > >
+> > > When writing to OTP we need to set OTP_ACCESS on and write with the
+> > > correct magic 0x7873 for OTP
+> > 
+> > Please can you tell us more about OTP vs EEPROM? Is the OTP internal while the EEPROM is external?
+> > What is contained in each? How does the device decide which to use when it finds it has both?
+> > 
+> >         Andrew
 > 
-> 
-> On 10/28/2024 9:00 AM, Joe Damato wrote:
-> > 
-> > I see, so it looks like there is:
-> >    - resume
-> >    - runtime_resume
-> > 
-> > The bug I am reintroducing is runtime_resume already holding RTNL
-> > before my added call to rtnl_lock.
-> > 
-> > OK.
-> > 
-> > Does resume also hold rtnl before the driver's igc_resume is called?
-> > I am asking because I don't know much about how PM works.
-> > 
-> > If resume does not hold RTNL (but runtime resume does, as the bug
-> > you pointed out shows), it seems like a wrapper can be added to tell
-> > the code whether rtnl should be held or not based on which resume is
-> > happening.
-> > 
-> > Does anyone know if: resume (not runtime_resume) already holds RTNL?
-> > I'll try to take a look and see, but I am not very familiar with PM.
-> 
-> I believe the resume doesn't hold RTNL, as its part of the core device
-> code, which is not networking specific. It shouldn't be acquiring RTNL
-> since that is a network specific lock.
-> 
-> I believe the code you posted as v5 should resolve this, and makes sense
-> to me.
-> 
-> Thanks for digging into this :)
 
-No problem; sorry for all the back and forth on this one and I
-really appreciate your patience and reviews.
+> This is pretty much the same implementation that is already in place
+> for the Linux driver of the LAN743x PCIe device.
 
-Thanks,
-Joe
+That is good, it gives some degree of consistency. But i wounder if we
+should go further. I doubt these are the only two devices which
+support both EEPROM and OTP. It would be nicer to extend ethtool:
+
+       ethtool -e|--eeprom-dump devname [raw on|off] [offset N] [length N] [otp] [eeprom]
+
+There does not appear to be a netlink implementation of this ethtool
+call. If we add one, we can add an additional optional attribute,
+indicating OTP or EEPROM. We have done similar in the past. It
+probably means within the kernel you replace struct ethtool_eeprom
+with struct kernel_ethtool_eeprom which has the additional
+parameter. The ioctl interface then never sees the new parameter,
+which keeps with the kAPI. get_eeprom() and set_eeprom() probably have
+all they need. get_eeprom_len() is more complex since it currently
+only takes netdev. I think get_eeprom_len() needs its functionality
+extended to indicate if the driver actually looks at the additional
+parameter. We want the kAPI calls for get and set to failed with
+-EOPNOTSUPP when otp or eeprom is not supported, which will initially
+be 99% of the drivers. And we don't want to have to make proper code
+changes to every driver. So maybe an additional parameter
+
+	int	(*get_eeprom_len)(struct net_device *,
+	                          struct kernel_eeprom_len *eeprom_len);
+
+struct kernel_eeprom_len {
+	int otp;
+	int eeprom;
+}
+
+Have the core zero this. After the call, if they are still zero, they
+are not supported.
+
+I know this is a lot more work than your current patch, but it is a
+better solution, should be well documented, easy to find and should
+work for everybody, against a device private parameter which is not
+obvious and unlikely to be consistent across drivers.
+
+	Andrew
 
