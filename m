@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-139681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56D69B3CE8
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 22:37:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 429819B3D6D
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:04:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8181F1F22F7B
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:37:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B81AEB21124
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 22:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517B71F427A;
-	Mon, 28 Oct 2024 21:36:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3781D1EE026;
+	Mon, 28 Oct 2024 22:02:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="UY6630/y"
+	dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b="2tkZUdAg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from serv108.segi.ulg.ac.be (serv108.segi.ulg.ac.be [139.165.32.111])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2222C1EBA14
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 21:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6FC81EF0AC;
+	Mon, 28 Oct 2024 22:02:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.165.32.111
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730151388; cv=none; b=gViMPZvh8++qeMnqFvyTyZKDE/lKxPnE+6DK9t+3R6nVREyBMRufaic5Z8mYw3AJEaIsYJP1aa/rV0Y3Ux7ZJsvWRmkqwDrt6Iald/121HfycBkPLVJAtvJD1+xk5lfHuEXY7gxuhjtpbQWC1kJd5tj1dDQX2wjYDBtVAepfiQU=
+	t=1730152965; cv=none; b=G+6fjRuElQS56eUKHnmbw02/Kq75jkRH3D1/qCUuxvj+g6IPp9/VG36D4+b2NDRzSZSX+x8oPQqwybe65ndfl0yQWkMIRHzm1py2ik8dbQV8kAwT8OVC8oyx8OcoYCFMVB89CtyhM/tN7FoBVFAxtjRuVVUm4Vi5AExcbuoGkTg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730151388; c=relaxed/simple;
-	bh=3FoIrL1BYiboyneRffpsHNS19haySGrc5oudXrSMnTk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Kbr7Oo7U2fKfbpMLYQJwgmP7piPMR/2A/CTjW8YnfT4i1JKiGjnihUilAk/06DyhoKsy0dEVS2oO4vp4J6FCQA7bktbIUBcSr9YGmev/KWHrHfjh9NbaSnoo8pHoOFder4TYRHUhvr9JuQM4TX1mx52OJhfjdD9Qd/VuE+QB0V0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=UY6630/y; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:MIME-Version:
-	References:In-Reply-To:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:
-	Content-Type:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
-	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=81hCTWFa1xsaHq5MhPO4AD1lFB4/xda8wfjd7lC8EH4=; t=1730151386; x=1731015386; 
-	b=UY6630/yrd7lUtP3e2jtUMQPjwnIcb47WQWPvXVmKg0VgLaM+CwIkjOQA/2qMZTNbVyC8kMZ16p
-	09GXQAlcA4JgcQo8jVuz7oBv1/Zj5Tb+1jQXRJOPfrnq8VKDH9VyjUnol+KinGqorLOF1lBo4ScVH
-	QhygpOYbJVO3PYBXdaWj+uJtBkHb1wWvwhG3Om7vMFwZ5Kte61Ygo2RD8OMD/AfGC8tvBToBnkTbk
-	h67CEKdWT3/jriKguK+CJq1IKcx4h37zyRWzaTA9w9O+pom1wYFHlttrqzwG+uddfgw052M52z/z/
-	WQOK7dhMK5l+APKPV6TBNzV10o5rYF+Do7MA==;
-Received: from ouster2016.stanford.edu ([172.24.72.71]:54106 helo=localhost.localdomain)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1t5XPU-0005xj-TN; Mon, 28 Oct 2024 14:36:25 -0700
-From: John Ousterhout <ouster@cs.stanford.edu>
+	s=arc-20240116; t=1730152965; c=relaxed/simple;
+	bh=ujp1/jKeDc5NDfVkWom7tc8Ol4j64Ig2kDBcViWgXNA=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=mwo8qsIUQAF1VDhZHBK89XvG5DJLQOAFiSHeOEafsSIbnY5IeWpL1fNuGhbnkh6xbhjjJeTUqhT1+VzmnxPUo743wIeDklMVdESVzWG8Kq4QYN5Kq3A+ZZCniiu59XfpkOs6NpOp2oYLDFUhuZ8Mfe+rExsY+hQvyCCzwzRKyQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be; spf=pass smtp.mailfrom=uliege.be; dkim=pass (2048-bit key) header.d=uliege.be header.i=@uliege.be header.b=2tkZUdAg; arc=none smtp.client-ip=139.165.32.111
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=uliege.be
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=uliege.be
+Received: from localhost.localdomain (modemcable174.147-130-66.mc.videotron.ca [66.130.147.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by serv108.segi.ulg.ac.be (Postfix) with ESMTPSA id 7250420167D1;
+	Mon, 28 Oct 2024 23:02:32 +0100 (CET)
+DKIM-Filter: OpenDKIM Filter v2.11.0 serv108.segi.ulg.ac.be 7250420167D1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=uliege.be;
+	s=ulg20190529; t=1730152954;
+	bh=xhgerrHTTO59y44c3Jm6bkvSuMQT6i0Ogkew4CBYgPY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=2tkZUdAgWnqA2nOi0QIrOp4trdaaEWkL77Wdwch3Do+9HAh8hM3Pagi06gXSQDdw8
+	 3BmZcf/bp8cqLR3yHbEAILnGiwswomzEGwPW8/AHvD4B9Sbk26voAgdVNR1sBTSkJW
+	 nPBl8O2BOdVUNl6xI7GyTilKXejQBycGNZBy9o6vYwIUpvOWeIcZikFxVgQzY2uTtv
+	 jwrCXvVVPaAOf4ppLjOylbiZ6yBHeexaYHPM0Mcoa9B36FWvm4RA98+DU8WhrqGx9Q
+	 ScDCfdJPPZVhOEq+HM31DG818Dz2mDIptEUXYfgf/rcnPReQkIhGx+n03NR+DUPBc9
+	 hFbQrYY1RzX4A==
+From: Justin Iurman <justin.iurman@uliege.be>
 To: netdev@vger.kernel.org
-Cc: John Ousterhout <ouster@cs.stanford.edu>
-Subject: [PATCH net-next 12/12] net: homa: create Makefile and Kconfig
-Date: Mon, 28 Oct 2024 14:35:39 -0700
-Message-ID: <20241028213541.1529-13-ouster@cs.stanford.edu>
-X-Mailer: git-send-email 2.45.1
-In-Reply-To: <20241028213541.1529-1-ouster@cs.stanford.edu>
-References: <20241028213541.1529-1-ouster@cs.stanford.edu>
+Cc: davem@davemloft.net,
+	dsahern@kernel.org,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	linux-kernel@vger.kernel.org,
+	justin.iurman@uliege.be
+Subject: [PATCH net-next v2 0/3] Mitigate the two-reallocations issue for iptunnels
+Date: Mon, 28 Oct 2024 23:02:09 +0100
+Message-Id: <20241028220212.24132-1-justin.iurman@uliege.be>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,113 +67,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Score: -101.0
-X-Scan-Signature: f3ece08579cbcd970dc3d33c6519ba8c
 
-Before this commit the Homa code is "inert": it won't be compiled
-in kernel builds. This commit adds Homa's Makefile and Kconfig, and
-also links Homa into net/Makefile and net/Kconfig, so that Homa
-will be built during kernel builds if enabled (it is disabled by
-default).
+v2:
+- add missing "static" keywords in seg6_iptunnel
+- use a static-inline function to return the dev overhead (as suggested
+  by Olek, thanks)
 
-This commit also adds an entry in the MAINTAINERS file.
+The same pattern is found in ioam6, rpl6, and seg6. Basically, it first
+makes sure there is enough room for inserting a new header:
 
-Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
----
- MAINTAINERS       |  7 +++++++
- net/Kconfig       |  1 +
- net/Makefile      |  1 +
- net/homa/Kconfig  | 17 +++++++++++++++++
- net/homa/Makefile | 14 ++++++++++++++
- 5 files changed, 40 insertions(+)
- create mode 100644 net/homa/Kconfig
- create mode 100644 net/homa/Makefile
+(1) err = skb_cow_head(skb, len + skb->mac_len);
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1389704c7d8d..935d1e995018 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -10391,6 +10391,13 @@ F:	lib/test_hmm*
- F:	mm/hmm*
- F:	tools/testing/selftests/mm/*hmm*
- 
-+HOMA TRANSPORT PROTOCOL
-+M:	John Ousterhout <ouster@cs.stanford.edu>
-+S:	Maintained
-+W:	https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
-+F:	include/uapi/linux/homa.h
-+F:	net/homa/
-+
- HONEYWELL HSC030PA PRESSURE SENSOR SERIES IIO DRIVER
- M:	Petre Rodan <petre.rodan@subdimension.ro>
- L:	linux-iio@vger.kernel.org
-diff --git a/net/Kconfig b/net/Kconfig
-index a629f92dc86b..ca8551c1a226 100644
---- a/net/Kconfig
-+++ b/net/Kconfig
-@@ -244,6 +244,7 @@ endif
- 
- source "net/dccp/Kconfig"
- source "net/sctp/Kconfig"
-+source "net/homa/Kconfig"
- source "net/rds/Kconfig"
- source "net/tipc/Kconfig"
- source "net/atm/Kconfig"
-diff --git a/net/Makefile b/net/Makefile
-index 65bb8c72a35e..18fa3c323187 100644
---- a/net/Makefile
-+++ b/net/Makefile
-@@ -44,6 +44,7 @@ obj-y				+= 8021q/
- endif
- obj-$(CONFIG_IP_DCCP)		+= dccp/
- obj-$(CONFIG_IP_SCTP)		+= sctp/
-+obj-$(CONFIG_HOMA)              += homa/
- obj-$(CONFIG_RDS)		+= rds/
- obj-$(CONFIG_WIRELESS)		+= wireless/
- obj-$(CONFIG_MAC80211)		+= mac80211/
-diff --git a/net/homa/Kconfig b/net/homa/Kconfig
-new file mode 100644
-index 000000000000..bb98e96d8f66
---- /dev/null
-+++ b/net/homa/Kconfig
-@@ -0,0 +1,17 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Homa transport protocol
-+#
-+
-+menuconfig HOMA
-+	tristate "The Homa transport protocol"
-+
-+	help
-+	Homa is a network transport protocol for communication within
-+	a datacenter. It provides significantly lower latency than TCP,
-+	particularly for workloads containing a mixture of large and small
-+	messages operating at high network utilization. For more information
-+	see the homa(7) man page or checkout the Homa Wiki at
-+	https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview.
-+
-+	If unsure, say N.
-diff --git a/net/homa/Makefile b/net/homa/Makefile
-new file mode 100644
-index 000000000000..3eb192a6ffa6
---- /dev/null
-+++ b/net/homa/Makefile
-@@ -0,0 +1,14 @@
-+# SPDX-License-Identifier: BSD-2-Clause
-+#
-+# Makefile for the Linux implementation of the Homa transport protocol.
-+
-+obj-$(CONFIG_HOMA) := homa.o
-+homa-y:=        homa_incoming.o \
-+		homa_outgoing.o \
-+		homa_peer.o \
-+		homa_pool.o \
-+		homa_plumbing.o \
-+		homa_rpc.o \
-+		homa_sock.o \
-+		homa_timer.o \
-+		homa_utils.o
+Then, when the insertion (encap or inline) is performed, the input and
+output handlers respectively make sure there is enough room for layer 2:
+
+(2) err = skb_cow_head(skb, LL_RESERVED_SPACE(dst->dev));
+
+skb_cow_head() does nothing when there is enough room. Otherwise, it
+reallocates more room, which depends on the architecture. Briefly,
+skb_cow_head() calls __skb_cow() which then calls pskb_expand_head() as
+follows:
+
+pskb_expand_head(skb, ALIGN(delta, NET_SKB_PAD), 0, GFP_ATOMIC);
+
+"delta" represents the number of bytes to be added. This value is
+aligned with NET_SKB_PAD, which is defined as follows:
+
+NET_SKB_PAD = max(32, L1_CACHE_BYTES)
+
+... where L1_CACHE_BYTES also depends on the architecture. In our case
+(x86), it is defined as follows:
+
+L1_CACHE_BYTES = (1 << CONFIG_X86_L1_CACHE_SHIFT)
+
+... where (again, in our case) CONFIG_X86_L1_CACHE_SHIFT equals 6
+(=X86_GENERIC).
+
+All this to say, skb_cow_head() would reallocate to the next multiple of
+NET_SKB_PAD (in our case a 64-byte multiple) when there is not enough
+room.
+
+Back to the main issue with the pattern: in some cases, two
+reallocations are triggered, resulting in a performance drop (i.e.,
+lines (1) and (2) would both trigger an implicit reallocation). How's
+that possible? Well, this is kind of bad luck as we hit an exact
+NET_SKB_PAD boundary and when skb->mac_len (=14) is smaller than
+LL_RESERVED_SPACE(dst->dev) (=16 in our case). For an x86 arch, it
+happens in the following cases (with the default needed_headroom):
+
+- ioam6:
+ - (inline mode) pre-allocated data trace of 236 or 240 bytes
+ - (encap mode) pre-allocated data trace of 196 or 200 bytes
+- seg6:
+ - (encap mode) for 13, 17, 21, 25, 29, 33, ...(+4)... prefixes
+
+Let's illustrate the problem, i.e., when we fall on the exact
+NET_SKB_PAD boundary. In the case of ioam6, for the above problematic
+values, the total overhead is 256 bytes for both modes. Based on line
+(1), skb->mac_len (=14) is added, therefore passing 270 bytes to
+skb_cow_head(). At that moment, the headroom has 206 bytes available (in
+our case). Since 270 > 206, skb_cow_head() performs a reallocation and
+the new headroom is now 206 + 64 (NET_SKB_PAD) = 270. Which is exactly
+the room we needed. After the insertion, the headroom has 0 byte
+available. But, there's line (2) where 16 bytes are still needed. Which,
+again, triggers another reallocation.
+
+The same logic is applied to seg6 (although it does not happen with the
+inline mode, i.e., -40 bytes). It happens with other L1 cache shifts too
+(the larger the cache shift, the less often it happens). For example,
+with a +32 cache shift (instead of +64), the following number of
+segments would trigger two reallocations: 11, 15, 19, ... With a +128
+cache shift, the following number of segments would trigger two
+reallocations: 17, 25, 33, ... And so on and so forth. Note that it is
+the same for both the "encap" and "l2encap" modes. For the "encap.red"
+and "l2encap.red" modes, it is the same logic but with "segs+1" (e.g.,
+14, 18, 22, 26, etc for a +64 cache shift). Note also that it may happen
+with rpl6 (based on some calculations), although it did not in our case.
+
+This series provides a solution to mitigate the aforementioned issue for
+ioam6, seg6, and rpl6. It provides the dst_entry (in the cache) to
+skb_cow_head() **before** the insertion (line (1)). As a result, the
+very first iteration would still trigger two reallocations (i.e., empty
+cache), while next iterations would only trigger a single reallocation.
+
+Justin Iurman (3):
+  net: ipv6: ioam6_iptunnel: mitigate 2-realloc issue
+  net: ipv6: seg6_iptunnel: mitigate 2-realloc issue
+  net: ipv6: rpl_iptunnel: mitigate 2-realloc issue
+
+ net/ipv6/ioam6_iptunnel.c |  90 ++++++++++++++++---------------
+ net/ipv6/rpl_iptunnel.c   |  67 +++++++++++++----------
+ net/ipv6/seg6_iptunnel.c  | 108 ++++++++++++++++++++++----------------
+ 3 files changed, 150 insertions(+), 115 deletions(-)
+
 -- 
 2.34.1
 
