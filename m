@@ -1,217 +1,135 @@
-Return-Path: <netdev+bounces-139606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9D5B9B3847
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:54:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 068EE9B385A
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:57:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AA695282EC1
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:54:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C09ED281975
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:57:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AEFE1DED40;
-	Mon, 28 Oct 2024 17:54:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC151DF25C;
+	Mon, 28 Oct 2024 17:57:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hIjmyJ86"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOWIRcf6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024B91552FC;
-	Mon, 28 Oct 2024 17:54:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E585221106;
+	Mon, 28 Oct 2024 17:57:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730138054; cv=none; b=TIgNi3cQkaKqQ9AaQsVwiqs/0NOVE70higEmmOQ9a8WZntb8BqNRiBtmZm/vX3qLiR3+gf9a0wyt2rSgeVUYZTZ2MA/4nblb+u1ktDR9ptMZKnxnIA6GSiaILrc4wzCWMYl2caVNXUQ1egSyjbHFxJcfQRzq+6h5sJaZ+TJoO+c=
+	t=1730138263; cv=none; b=MHkpE2Q5HRSp7LESN4k1umnce6ySaGiUuY/Xj0GXO3NDDG80PlC/X7K9mmGVHQXBaMBVzWH81rW5xDyJ4BRmdxOE6rPFf7kIM10DYjjpP51eaXBZBqkgRH0heUlyolrj7orql3wzvBJ3WNZKF6Q5PZXBgNx78zu07KaDeog+MkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730138054; c=relaxed/simple;
-	bh=bPbqg2WP1InrE9RdXlMFH+zAOsQwV3DQCbqjQzAlBpg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kbI/CLm7Cdn/K/x8NUOWL9aGdGgLQgHlFgmj+eILRV4IeojvG0mEx6LJCTwC136rz2FZUju+mOqooifr1W7XA1+zuyGY4xIJn89RZVKZjaFeCFdV8RjanFF1Cqjezd4kIWAXBU97D1HUNhzuT72+3ooPvhC5v81DrI6ICsLwdpo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hIjmyJ86; arc=none smtp.client-ip=209.85.128.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4316a44d1bbso42605915e9.3;
-        Mon, 28 Oct 2024 10:54:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730138050; x=1730742850; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=u6UuyopKZ4h5skfASyHzs29ZguAavZNLDhMYIlEaFJI=;
-        b=hIjmyJ865ci8KGChEfOpTHPC2V0ADRIohTUun9nsomMHlBFDrIascJ5MZIKlcKOYfW
-         bGF90bWunxzhGGWOTmJSYnrUXCDsqAwQLNaLoE3kFTBFaEpKJSWejcDX9sTE43yopC0o
-         fg1Q9tJSl3k/HdwKAd0hlxnKyfSEHPvCi3/bHdFKOJONoaVDA3pF9YNO216XaRtzYZx2
-         cSzbW4lP6QvWMLASErdBdAafI+Z4sx5iCOHlqVx0bQYMCcseYm4K4IPMY+oOQZZq1q8K
-         M8bBwsrBaGj/B0afLWHLecKSz8AeP0Eel/xU0c95iIqnh/w7ak4QU4+ccNtZGSIK/lVZ
-         xaMQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730138050; x=1730742850;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=u6UuyopKZ4h5skfASyHzs29ZguAavZNLDhMYIlEaFJI=;
-        b=rxLBW/rcuSxlXhnw/Zb3MIhwmcb8TFK4QQg/WptFuKoCy4tl6DVtxmTHK2rPX+2G46
-         RHFIM3F/HMNMVckoOhtXwekieKhluXLCNG/mEEUpQOHCYgazWEWnduG+tvnIXIV0nVRp
-         KhcTNQEcUcWjr3UIWuqUMfAyHvDJawhMHmCsboC2SHQ+vRVqTXzeXAVyqKDw+9DZrShz
-         CzChSyK5eyGO+djHvfFvFplQ4Q0vOaRdrMTIvuybXzgB0PRNcI17LNfi9zVBqAZqgLIz
-         v9Vbg4IfsOiQAIAVfLhH2gv2xJcD2yuarF8F3H4LxKtB2DhzBIIzg0P2PLMnpBoNszXl
-         YYbQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUTDMIQvNehiyXsqR9h39zQHVRAyoWg5ahUHX2iVHIEYe36SuUseSGrB6+vDflvjbEZ6PoYpNMDZSw=@vger.kernel.org, AJvYcCVn+WSOegPk8LTnoPqF1mng5UIEmP9nn1kBElAmvh5qGsihUX4wPoq5lFGpdTQFoLBbVrfKOBs5@vger.kernel.org, AJvYcCXQCivsCCiJYR7DC/P0GPlJz2UWJTDmfPAQ8o7n7wl3+IqK2hBIN0+TUxTz6b54i7docLMKb+6I6VJZ1xp6@vger.kernel.org
-X-Gm-Message-State: AOJu0YzrjYEWkVVC4UnK6nVvJTXJbajTRn0bUnuoPGKtxkSAM6v+3uor
-	zkbGyPJn6b8MJieYxd8VW/U9Cc0DtB1fsG674HJs04jhY2q/eXSuoXNVzRR6C/rqGmF/tXB0wJO
-	KjdXPO/rQ+wex76tvERxbwM3BtxvQRQ==
-X-Google-Smtp-Source: AGHT+IHDF4FKUdkCw3jvLqzaE+MRg8G7+oBY30wWy8t6CmWPzpsWrLHilSvHlQUUJLdmkQ9yX3dPsu9z4QHqCFKcAWo=
-X-Received: by 2002:adf:cf06:0:b0:37d:4afe:8c98 with SMTP id
- ffacd0b85a97d-38061159506mr6015970f8f.26.1730138050108; Mon, 28 Oct 2024
- 10:54:10 -0700 (PDT)
+	s=arc-20240116; t=1730138263; c=relaxed/simple;
+	bh=U6WYDMeT3X6Fc0vu9KGp38q+fAgGQDfoSSz5io5BqFI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=IrSoq7/0ynZgG7fNHUHQCq1hirK/4JnPrc/dtiReFLhj08u9U7ydAAPKHRGQCeykDRrf0fiG4hUvmeyNE3j7JlXURpWf0hH5WB7SOG4/owpFlST5wO75qUO23LqVmUu3REfXzGybk1pjfi4wLkhioLSjjVhw9jzX30EAIL8XsHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOWIRcf6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D41B9C4CEC3;
+	Mon, 28 Oct 2024 17:57:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730138262;
+	bh=U6WYDMeT3X6Fc0vu9KGp38q+fAgGQDfoSSz5io5BqFI=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=mOWIRcf6tCa/l/ZPuKWCi66PtS4pL/hIFBYmQ1EO73fLhgS6mkZmgLEROmT5Xm/EG
+	 ViDVcU8nEFZ8+b2Z21nadT09uVEXSEx6umpJzh1YiIeleRcuU+RA+/zlFWF5oh24EE
+	 KMSeRnGOKExuYss/1873Qn9SFDDP/jqLj5YEmSQiL3SvpFn9a5k+/DnlN6YahZWADN
+	 HwHOQSgmPdvRXo9BnYqu/JMXQB9JSvgz0uBFppASiluCMkfq0MqsLwEsXQQoAgeGc2
+	 9EXaqVM7Unc/lkSfZ3RBmJ/CwzMpQ2qJkP+9nwRyJpkTN23m7VkIWJ7JlHJklOXcaI
+	 2WUoFK22/9oQQ==
+Message-ID: <ce2892c4-f759-40ca-a188-11a83b0164b3@kernel.org>
+Date: Mon, 28 Oct 2024 18:57:29 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028115850.3409893-1-linyunsheng@huawei.com> <20241028115850.3409893-5-linyunsheng@huawei.com>
-In-Reply-To: <20241028115850.3409893-5-linyunsheng@huawei.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Mon, 28 Oct 2024 10:53:33 -0700
-Message-ID: <CAKgT0UfouCZpX04yzvCrB_UBmy47p+=xm5qViYowerR9dPcCbg@mail.gmail.com>
-Subject: Re: [PATCH RFC 04/10] mm: page_frag: introduce page_frag_alloc_abort()
- related API
-To: Yunsheng Lin <linyunsheng@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, 
-	Jonathan Corbet <corbet@lwn.net>, linux-doc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net-next 1/2] net: netconsole: selftests: Change the IP
+ subnet
+Content-Language: en-GB
+To: Breno Leitao <leitao@debian.org>, kuba@kernel.org, horms@kernel.org,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
+Cc: thepacketgeek@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davej@codemonkey.org.uk, vlad.wing@gmail.com,
+ max@kutsevol.com, kernel-team@meta.com, aehkn@xenhub.one,
+ Petr Machata <petrm@nvidia.com>,
+ "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+References: <20241028154805.1394611-1-leitao@debian.org>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20241028154805.1394611-1-leitao@debian.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 28, 2024 at 5:05=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
-m> wrote:
->
-> For some case as tun_build_skb() without the needing of
-> using complicated prepare & commit API, add the abort API to
-> abort the operation of page_frag_alloc_*() related API for
-> error handling knowing that no one else is taking extra
-> reference to the just allocated fragment, and add abort_ref
-> API to only abort the reference counting of the allocated
-> fragment if it is already referenced by someone else.
->
-> CC: Alexander Duyck <alexander.duyck@gmail.com>
-> CC: Andrew Morton <akpm@linux-foundation.org>
-> CC: Linux-MM <linux-mm@kvack.org>
-> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
-> ---
->  Documentation/mm/page_frags.rst |  7 +++++--
->  include/linux/page_frag_cache.h | 20 ++++++++++++++++++++
->  mm/page_frag_cache.c            | 21 +++++++++++++++++++++
->  3 files changed, 46 insertions(+), 2 deletions(-)
->
-> diff --git a/Documentation/mm/page_frags.rst b/Documentation/mm/page_frag=
-s.rst
-> index 34e654c2956e..339e641beb53 100644
-> --- a/Documentation/mm/page_frags.rst
-> +++ b/Documentation/mm/page_frags.rst
-> @@ -114,9 +114,10 @@ fragsz if there is an alignment requirement for the =
-size of the fragment.
->  .. kernel-doc:: include/linux/page_frag_cache.h
->     :identifiers: page_frag_cache_init page_frag_cache_is_pfmemalloc
->                  __page_frag_alloc_align page_frag_alloc_align page_frag_=
-alloc
-> +                page_frag_alloc_abort
->
->  .. kernel-doc:: mm/page_frag_cache.c
-> -   :identifiers: page_frag_cache_drain page_frag_free
-> +   :identifiers: page_frag_cache_drain page_frag_free page_frag_alloc_ab=
-ort_ref
->
->  Coding examples
->  =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> @@ -143,8 +144,10 @@ Allocation & freeing API
->          goto do_error;
->
->      err =3D do_something(va, size);
-> -    if (err)
-> +    if (err) {
-> +        page_frag_alloc_abort(nc, va, size);
->          goto do_error;
-> +    }
->
->      ...
->
-> diff --git a/include/linux/page_frag_cache.h b/include/linux/page_frag_ca=
-che.h
-> index a2b1127e8ac8..c3347c97522c 100644
-> --- a/include/linux/page_frag_cache.h
-> +++ b/include/linux/page_frag_cache.h
-> @@ -141,5 +141,25 @@ static inline void *page_frag_alloc(struct page_frag=
-_cache *nc,
->  }
->
->  void page_frag_free(void *addr);
-> +void page_frag_alloc_abort_ref(struct page_frag_cache *nc, void *va,
-> +                              unsigned int fragsz);
-> +
-> +/**
-> + * page_frag_alloc_abort - Abort the page fragment allocation.
-> + * @nc: page_frag cache to which the page fragment is aborted back
-> + * @va: virtual address of page fragment to be aborted
-> + * @fragsz: size of the page fragment to be aborted
-> + *
-> + * It is expected to be called from the same context as the allocation A=
-PI.
-> + * Mostly used for error handling cases to abort the fragment allocation=
- knowing
-> + * that no one else is taking extra reference to the just aborted fragme=
-nt, so
-> + * that the aborted fragment can be reused.
-> + */
-> +static inline void page_frag_alloc_abort(struct page_frag_cache *nc, voi=
-d *va,
-> +                                        unsigned int fragsz)
-> +{
-> +       page_frag_alloc_abort_ref(nc, va, fragsz);
-> +       nc->offset -=3D fragsz;
-> +}
->
->  #endif
-> diff --git a/mm/page_frag_cache.c b/mm/page_frag_cache.c
-> index d014130fb893..4d5626da42ed 100644
-> --- a/mm/page_frag_cache.c
-> +++ b/mm/page_frag_cache.c
-> @@ -201,3 +201,24 @@ void page_frag_free(void *addr)
->                 free_unref_page(page, compound_order(page));
->  }
->  EXPORT_SYMBOL(page_frag_free);
-> +
-> +/**
-> + * page_frag_alloc_abort_ref - Abort the reference of allocated fragment=
-.
-> + * @nc: page_frag cache to which the page fragment is aborted back
-> + * @va: virtual address of page fragment to be aborted
-> + * @fragsz: size of the page fragment to be aborted
-> + *
-> + * It is expected to be called from the same context as the allocation A=
-PI.
-> + * Mostly used for error handling cases to abort the reference of alloca=
-ted
-> + * fragment if the fragment has been referenced for other usages, to aov=
-id the
-> + * atomic operation of page_frag_free() API.
-> + */
-> +void page_frag_alloc_abort_ref(struct page_frag_cache *nc, void *va,
-> +                              unsigned int fragsz)
-> +{
-> +       VM_BUG_ON(va + fragsz !=3D
-> +                 encoded_page_decode_virt(nc->encoded_page) + nc->offset=
-);
-> +
-> +       nc->pagecnt_bias++;
-> +}
-> +EXPORT_SYMBOL(page_frag_alloc_abort_ref);
+Hi Breno,
 
-It isn't clear to me why you split this over two functions. It seems
-like you could just update the offset in this lower function rather
-than do it in the upper one since you are passing all the arguments
-here anyway.
+On 28/10/2024 16:48, Breno Leitao wrote:
+> Use a less populated IP range to run the tests, as suggested by Petr in
+> Link: https://lore.kernel.org/netdev/87ikvukv3s.fsf@nvidia.com/.
+
+It looks like this is the same version as the one you sent on Friday,
+without the modification suggested by Petr:
+
+  https://lore.kernel.org/20241025161415.238215-1-leitao@debian.org
+
+I supposed these new patches have been sent by accident, right?
+
+(BTW: it is often better to include a cover letter when there is more
+than one patch: some CIs might not take patches sent without it.)
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
