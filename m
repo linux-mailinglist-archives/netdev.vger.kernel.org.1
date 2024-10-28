@@ -1,95 +1,116 @@
-Return-Path: <netdev+bounces-139728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CEE99B3E93
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:40:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EA719B3E95
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:41:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F0521C216D1
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:40:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 505251C216D9
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:41:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907231FAC30;
-	Mon, 28 Oct 2024 23:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79711F9ED6;
+	Mon, 28 Oct 2024 23:41:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CKHCl6rs"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="AZRkCe/w"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619111925B3;
-	Mon, 28 Oct 2024 23:40:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE7E1F8EE8
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 23:40:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730158820; cv=none; b=MvfFzVD0UJcW6doxPYtmAzfDrkwn5SH5TL3xSKCKOgR7KpczUAeGXFNizz+p3lRBx5JL+ZLBDxc4vde91OWXe4eaX6kT6Lj8eEseF7VNAhMwM2ljnr2MtCY+RaheKqWRF2hKVmV6z3yFqj6QAvFv9Un+VuoaCVB7gUF4JqQ6274=
+	t=1730158860; cv=none; b=RDrfFrg0Q5u0kgRpNFx+x6REYvfnyqBYDHdrL6oynM4Ua+6tp6O7UEBEQyOVPLj3n8Zwjn1sLtZ5sFfyFZFYP4geErZKBuZl96dFpZBotxdx36dpj2gQUnZsbCSyeIF4dsBwvGrlUbVqh182k6/axQffs/+G3gv6KLctZLsjIl4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730158820; c=relaxed/simple;
-	bh=pQzl1y9h2xsU92uZtxx7jqh2VQjUzwEVlkfCH4GvCD0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vhyu6Iu9T6Rm4NLOQ3Q/BrX/3mT8+81kaLcKfuRkvvekIGOAry3/OafRSq3FToqcSz54Ky4Y7YaEILMbb297+xTc5+1b8YNSRXoBBcwjI00hQKrof8+RPCOAyqxFWtqcDLo5psPKxQTmSD3JN2BTnWCXo3vsqJ3sEo8khIHthc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CKHCl6rs; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3837C4CEC3;
-	Mon, 28 Oct 2024 23:40:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730158819;
-	bh=pQzl1y9h2xsU92uZtxx7jqh2VQjUzwEVlkfCH4GvCD0=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=CKHCl6rs42Z1Ijgn7WEAnUb20e/btZs665SvomSIANBuBXzlHA1HjIBtgIEfLVUQq
-	 nwPVOZWGKEwWueNFd3wzc6DFjIgvT/9/X7FTpB+fRcpLcTrvjywW/6AjZJBcD6Fwme
-	 4QeUyVjjk+LbLu4aTpAS57AcEKNBSvtoagvkxoOk6c1RT2y8hqLicXf37HX+yEqSEy
-	 B6wg7WTzGHH5UXSP+YGwEPC0BP0C32H78AKuawPmUUGbAmGpZMiT+q5GUIbr7TLapy
-	 BkgZVzCtUyJYPzJptHCtzqIhTC/snZBuAa5zoLDHS8Uqag0uIG+DGpL//bPUp1XXgh
-	 AdRmlfVQKTv1Q==
-Date: Mon, 28 Oct 2024 16:40:16 -0700
-From: Kees Cook <kees@kernel.org>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH v2 1/4][next] uapi: socket: Introduce struct
- sockaddr_legacy
-Message-ID: <202410281637.8CF1EA8AE7@keescook>
-References: <cover.1729802213.git.gustavoars@kernel.org>
- <23bd38a4bf024d4a92a8a634ddf4d5689cd3a67e.1729802213.git.gustavoars@kernel.org>
- <66641c32-a9fb-4cd6-b910-52d2872fad3d@lunn.ch>
- <bc7d77fdbe97edc3481f9f73a438742651bd4b8b.camel@sipsolutions.net>
+	s=arc-20240116; t=1730158860; c=relaxed/simple;
+	bh=JxZm8tFue+h4RS3xueX9NqjMx3IVkcN9YUHvCUnYZCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mnNtU3UnPFQg6Z0pxzVvR2xHFb6O+Mjf0m67+ePUB9eOhFsgldHZEFfb+NNJZwKBI7POc/vS4ovo+dZeEvEtfqtV18ZnVpXtADHzuD5v2B1LrjkL1Lz3vGZEEqNLkdkg57o8mj9g6tcKWKYOmXmqg2jxD4iO6Vuw08+F5CFHqkg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=AZRkCe/w; arc=none smtp.client-ip=209.85.216.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2e2e2d09decso4144059a91.1
+        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 16:40:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730158858; x=1730763658; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ybW9FjJisEH4l8TV+uKRPO2i8Pxbi6QqWneavCQWPU0=;
+        b=AZRkCe/wPRxBu8KSTcPebUvnd7CCF3H06YkNBYAlJz5gD5HlCOyCJIgcOTgXxR+7a2
+         dgmVo2uEgRjir9OFrsA6b0uOtVQoAiSa8v0jQFcdgfEo8UXSiKkg2qag/tmqX6Ke5mlG
+         vXpTc8LawSboHD6fUuFEMbrq5xFaMwoSaQjl3cn+Pl1tIF7r1sDaioADuuO9w7oUJdjk
+         bcj6byktosE2/w1gd8aSsksfPYAVtVrbFGWhdB+ds28loLNmKCiU5KisyHl+fEdb0mMF
+         91wBrtdZi72ADQSXzRmZih8rp3fUDU5u1yl0W1CJ1PKGlkh8Qc4RUnbC9M1C17z8PJm6
+         N0eg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730158858; x=1730763658;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ybW9FjJisEH4l8TV+uKRPO2i8Pxbi6QqWneavCQWPU0=;
+        b=MBKdXPIno8zrpUBbUlK+LpM6VvyQD8XwXaqcTp9hiX2reL+fOznEWUZ7znWv6G1wut
+         y2RmGX3GZRRUZlm+kT40WzGYpVc1uPodd0O6eWrp9UeukO16IcfEqipAbIi3e8H8kfDu
+         372MHo9VAgdy8wcJ0LOReG3Olf9wcR2xw0gq7Tu2p0/kszFuvk2lbuwY0OuyeUdDXRsV
+         jk9eGKXvkVf7W6J0Ar1q51VU9X6MWIoAmB7tc98WoaAXa5YhDYxRbeiD8s+U3L0Y2tVd
+         WM70Puqj0iZTnLV/IKT6SAJjemZtax1wsdlMptZLAx2TWc99/FhtR9cGEJ7DgZCIfvwk
+         xULQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXzU6baL2ivL6CZG5Tn4YD3QQMGqaPaUmC5ZBx3vAj/0nbLtF+rzUKcLyBvNKnmGShr4GQptNg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5Qzctj/pRYEsNkyNA71pwFGYzo3KWvFSTwvWUDUbYynBEGXdv
+	i9ulF9+0GdwZnBby95ssfJqUic1lfS2ctc8V65VbFZizGIFlYurYH+ZRyj3KUG0=
+X-Google-Smtp-Source: AGHT+IHKJfVLreUgz0FhYQfyC3XWz4CgkdpZsDky2uxdFxwniUUKfUSilmsHxj99hhPy4NooyenEaQ==
+X-Received: by 2002:a17:90a:db8d:b0:2d8:a744:a81c with SMTP id 98e67ed59e1d1-2e92204d48cmr377396a91.1.1730158857823;
+        Mon, 28 Oct 2024 16:40:57 -0700 (PDT)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7edc8a4780esm6405935a12.86.2024.10.28.16.40.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 28 Oct 2024 16:40:57 -0700 (PDT)
+Date: Mon, 28 Oct 2024 16:40:55 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Joe
+ Damato <jdamato@fastly.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: yaml gen NL families support in iproute2?
+Message-ID: <20241028164055.3059fad4@hermes.local>
+In-Reply-To: <20241028151534.1ef5cbb5@kernel.org>
+References: <ce719001-3b87-4556-938d-17b4271e1530@redhat.com>
+	<61184cdf-6afc-4b9b-a3d2-b5f8478e3cbb@kernel.org>
+	<ZxbAdVsf5UxbZ6Jp@LQ3V64L9R2>
+	<42743fe6-476a-4b88-b6f4-930d048472f9@redhat.com>
+	<20241028135852.2f224820@kernel.org>
+	<845f8156-e7f5-483f-9e07-439808bde7a2@kernel.org>
+	<20241028151534.1ef5cbb5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <bc7d77fdbe97edc3481f9f73a438742651bd4b8b.camel@sipsolutions.net>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 28, 2024 at 09:47:08PM +0100, Johannes Berg wrote:
-> On Mon, 2024-10-28 at 21:38 +0100, Andrew Lunn wrote:
-> > > As this new struct will live in UAPI, to avoid breaking user-space code
-> > > that expects `struct sockaddr`, the `__kernel_sockaddr_legacy` macro is
-> > > introduced. This macro allows us to use either `struct sockaddr` or
-> > > `struct sockaddr_legacy` depending on the context in which the code is
-> > > used: kernel-space or user-space.
+On Mon, 28 Oct 2024 15:15:34 -0700
+Jakub Kicinski <kuba@kernel.org> wrote:
+
+> On Mon, 28 Oct 2024 15:29:35 -0600 David Ahern wrote:
+> > On 10/28/24 2:58 PM, Jakub Kicinski wrote:  
+> > > I was hoping for iproute2 integration a couple of years ago, but
+> > > David Ahern convinced me that it's not necessary. Apparently he 
+> > > changed his mind now, but I remain convinced that packaging 
+> > > YNL CLI is less effort and will ensure complete coverage with
+> > > no manual steps.    
 > > 
-> > Are there cases of userspace API structures where the flexiable array
-> > appears in the middle?
+> > I not recall any comment about it beyond cli.py in its current form 
+> > is a total PITA to use as it lacks help and a man page.  
 > 
-> Clearly, it's the case for all the three other patches in this series.
+> I can only find this thread now:
+> https://lore.kernel.org/all/20240302193607.36d7a015@kernel.org/
+> Could be a misunderstanding, but either way, documenting an existing
+> tool seems like strictly less work than recreating it from scratch.
 
-The issue is that the kernel uses these structures, and the kernel's view
-of sockaddr is that it (correctly) has a flexible array.  Userspace's view
-of sockaddr is the old struct (which comes from the libc, not the kernel)
-which ends with a fake flexible array. We need to correct the kernel's
-view of these structures to use the introduced legacy struct to avoid
-lying to the compiler about what's going on. :)
-
--- 
-Kees Cook
+Is the toolset willing to maintain the backward compatibility guarantees
+that iproute2 has now? Bpf support was an example of how not to do it.
 
