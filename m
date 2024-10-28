@@ -1,94 +1,92 @@
-Return-Path: <netdev+bounces-139718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D751F9B3E6A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:30:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 758E19B3E7A
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:32:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F320F1C20F9A
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:30:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2156B1F23278
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79117190679;
-	Mon, 28 Oct 2024 23:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499F9201023;
+	Mon, 28 Oct 2024 23:31:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d4xAyje0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="itL+QjNz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51FEF18FDD8
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 23:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D784201014;
+	Mon, 28 Oct 2024 23:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730158225; cv=none; b=N/9m9tQFIBGhyGUKlvb3VOYq3wGCvzx8ldixPqIHWHDt922pexcNyeXlqsbPaEpnMwNJOp4MXeELoylim9zmgdRjv25q0CWn7Q4C62En1lkjP07BiyQA+cP2Ow9rBVOO8epUKRaYZvB/gSI49aPNO/Sjhto3R4B5oWrw2dEbHI0=
+	t=1730158272; cv=none; b=pOMKhWbVXOCHwmNDE3eR/MrRLYHv3I5/4C61n08zofDM5nOef03kPVPvcf2iJSWXpDqtoAyRpSTeq8JjHOtHp7yX/Yxwa8Gg7YhyHTJTnxY26culL7NHOJzpxU43RV0geuQWm4NaMF/3Xfiq0qDyXkQ2pWrHdTaHlD/FiAn9a/U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730158225; c=relaxed/simple;
-	bh=gTBtL/ex7jxveq6ta4PIW3b0KtAqTbtbzOW4AHpgbE4=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=jMwZfc0rBfe6NfuI/DoDbhNUXS+ToLhp+vqzbshJmiyIV/MQJm/Mf8nXFAIJ2dAQ+gf+oGi8DJr23gJvh7sOCtSzqYUw7QdxwB7526RZJ3VOhNG5OXtsWMlkjTGaQJthcTiZfnekh4fXLXlwtiVXtNEecWkAgyj4TkdGDAkIunQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d4xAyje0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC522C4CEC3;
-	Mon, 28 Oct 2024 23:30:24 +0000 (UTC)
+	s=arc-20240116; t=1730158272; c=relaxed/simple;
+	bh=ZekJULxH2QK01D+KA9q5CLX82NrXZ1COQ0EanY2xtGo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=khxKe1le+Ysc3+RkNDQir7aZlJtqJky2fO2DOYJ55Xaj7TWfyXOCHBty7c0BGV0cFF+02BygQACC3jz+X/T+w+NDXq8cVBp/P3NF6ivS8Niu3LR/OtwpIjuexMQnKxw71cYnjw+zRewj/LyFmtPyjFnf+YSufB6LCmrBF/3sL5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=itL+QjNz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B9A7EC4CEC3;
+	Mon, 28 Oct 2024 23:31:11 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730158224;
-	bh=gTBtL/ex7jxveq6ta4PIW3b0KtAqTbtbzOW4AHpgbE4=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=d4xAyje0LzdkkVwJyCQy5tR9tZveFG06qIoS6/vdBcRbodRS+Kob4wxtwWzpHFMQM
-	 O9Vc2kHqV1HBUAWbYxUmMmaH0Ky8uMfOFk6De5spnz7NJHyc2i4q7FLM9ivGYVjf6s
-	 ld1iJ2naeavYopfZXcX58n4u+bToqkxqTxufzyQ1aXxVo2IJ8bG5U99tZtSHAf6NfX
-	 MEiG+N1oMQoaMRhhLbe/LnTKu24Zz0elU7p3BjKvnfaKEBAsjRmPveh67/5+Te4+ja
-	 PmrzpbFkUSLDJhDg6HdrqN0VmCJD1iI+I3it0T1Za30zGpLV/B6SAL6WWypCPL9VLG
-	 gkm+dvm2I5G8A==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713B2380AC1C;
-	Mon, 28 Oct 2024 23:30:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730158271;
+	bh=ZekJULxH2QK01D+KA9q5CLX82NrXZ1COQ0EanY2xtGo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=itL+QjNzL9DqbYeTlb6ziph/7Br5MPyniA/MUhWtlsXJp0QYAb9sPIxLw4c7FI+Gp
+	 PIlACMYYw6nsHCme1gWm5oqu/Bifzx6+pjAjf5QFrNnKSKPMOd7885jhHjxcwqu6Id
+	 fRpgwe9dd7kOHt7q26lRSsHBgLGaEfRluQCbbZ+DCACiUr1g5ROdEz9lQhPj6EtdNx
+	 ETjleWckyEsZwsDwUyNOKvt8e7RnPVi2Yr/vebxr1O16T41XLFaY/FUienVKdVb5jU
+	 6itXc2Mf2kRDi+la2ODLq0esM2mBnNCexN3yeNIVSXV5zK0OmlOKv+YB+z3pP4ONkK
+	 bdVc7yCU0IQpQ==
+Date: Mon, 28 Oct 2024 16:31:08 -0700
+From: Kees Cook <kees@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2 1/4][next] uapi: socket: Introduce struct
+ sockaddr_legacy
+Message-ID: <202410281629.487F7CFE@keescook>
+References: <cover.1729802213.git.gustavoars@kernel.org>
+ <23bd38a4bf024d4a92a8a634ddf4d5689cd3a67e.1729802213.git.gustavoars@kernel.org>
+ <66641c32-a9fb-4cd6-b910-52d2872fad3d@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net V2] macsec: Fix use-after-free while sending the
- offloading packet
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173015823226.212000.8120352168152068818.git-patchwork-notify@kernel.org>
-Date: Mon, 28 Oct 2024 23:30:32 +0000
-References: <20241021100309.234125-1-tariqt@nvidia.com>
-In-Reply-To: <20241021100309.234125-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, sd@queasysnail.net, netdev@vger.kernel.org,
- saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com, jianbol@nvidia.com,
- phaddad@nvidia.com, cmi@nvidia.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66641c32-a9fb-4cd6-b910-52d2872fad3d@lunn.ch>
 
-Hello:
-
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 21 Oct 2024 13:03:09 +0300 you wrote:
-> From: Jianbo Liu <jianbol@nvidia.com>
+On Mon, Oct 28, 2024 at 09:38:46PM +0100, Andrew Lunn wrote:
+> > As this new struct will live in UAPI, to avoid breaking user-space code
+> > that expects `struct sockaddr`, the `__kernel_sockaddr_legacy` macro is
+> > introduced. This macro allows us to use either `struct sockaddr` or
+> > `struct sockaddr_legacy` depending on the context in which the code is
+> > used: kernel-space or user-space.
 > 
-> KASAN reports the following UAF. The metadata_dst, which is used to
-> store the SCI value for macsec offload, is already freed by
-> metadata_dst_free() in macsec_free_netdev(), while driver still use it
-> for sending the packet.
-> 
-> [...]
+> Are there cases of userspace API structures where the flexiable array
+> appears in the middle? I assume this new compiler flag is not only for
+> use in the kernel? When it gets turned on in user space, will the
+> kernel headers will again produce warnings? Should we be considering
+> allowing user space to opt in to using sockaddr_legacy?
 
-Here is the summary with links:
-  - [net,V2] macsec: Fix use-after-free while sending the offloading packet
-    https://git.kernel.org/netdev/net/c/f1e54d11b210
+I expect that the userspace usage of -Wflex-array-member-not-at-end will
+be driven by the libc projects, as it'll need to happen there before it
+can be done anywhere else. We'll be able to coordinate with them at that
+time, but I'm not aware of any plans by any libc to use this flag yet.
 
-You are awesome, thank you!
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Kees Cook
 
