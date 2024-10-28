@@ -1,121 +1,300 @@
-Return-Path: <netdev+bounces-139429-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0BB89B23F6
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 05:54:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B533B9B23F9
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 05:55:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEEA91C212CB
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 04:54:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D59DC1C210F6
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 04:55:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7743B18C333;
-	Mon, 28 Oct 2024 04:54:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F3118BC3F;
+	Mon, 28 Oct 2024 04:55:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="edU9txhZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="A2ZbdPkn"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14D84170A14
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 04:54:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1988E171658;
+	Mon, 28 Oct 2024 04:55:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730091275; cv=none; b=VSXAwmS7dfUrWzjxzrF+4tOLW2eCaJ7YGf1h2YnANp5Thde93ZVxMwePtc6SRxS1T4YlyO9nf92Kol/Jbm4PHrSDN63H/h64XOSQDjmngov8eeCpZfy4od2op3a36YE/YRxSO9i/osJtwMzdUPNIuYPUHEY6e4Hj42vHWaDAnwI=
+	t=1730091317; cv=none; b=QsflY7/Q6Oc3JN0DYmqVRvAU7e4asJ32E0lvLUXN+N4q7v/nbq2a1btgu7jpdiKsKyb7lystX53Op2/Ceh75dX/Dpg86d9YhCrfxEH99dk++ER8sWcFxf/xe0alTAycemwEZKAe2yJtwIE0Gjtd2RdP9mzk1Nhsvn4kh3p8xgm8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730091275; c=relaxed/simple;
-	bh=5juCU2MwtuD51rNl0JO8kPZe7YEa8A4xnB3tTZeQ1MM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=jbOKwrFDgQknVTJaPPZ9uWyI9quZdjerQFihJCy6mIcwITdUGymSs7QGWmSW3QUPENbjUIMNgjuwqLXfcn2dncX6hjUOJr6Fl23aExeTiKQP62H/K7dons50DV2rLHzT4eohGQI29dWxYAZGUCkyrrPQl+oTp8t3xd6Y7DHA7ps=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=edU9txhZ; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1730091265;
-	bh=rwhNeX6ImQzf0CSAGecHyjNYMwLmkAVQobWFnz2mboY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=edU9txhZWR+2m1gdM+ex0o7kttHzuyVchX5hI9i3+TTjpRvC6XVexJYZftnVlYsKs
-	 LBC9p1+qVGL8UZiPoiSKda5nvZzC6Lg1jdSI2H/WsYQ6KzQ+BhREk4EjQEwO4g0usL
-	 fcUNFN12Qj19ubu0aQEXk30m2rQRuCePpIf51ueqkgFJLAINlSnpoF0tIvs8dsXdvY
-	 wE0o6GNiwYHXsEDpxnPts0UZxENyu1ySjFxdai+rH9kwMUNHr3s9B5lhBIgYYTiTSi
-	 aadr0iGGLbdUiCHotqFFbtyk7G9jxXS9NdAyHS+HHo/lslRIixCoTTNPgy4GSDKvHf
-	 RDxkSYO3Mk2Lg==
-Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 1835469EB2; Mon, 28 Oct 2024 12:54:25 +0800 (AWST)
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Mon, 28 Oct 2024 12:54:11 +0800
-Subject: [PATCH net 2/2] net: ethernet: ftgmac100: fix NULL phy usage on
- device remove
+	s=arc-20240116; t=1730091317; c=relaxed/simple;
+	bh=iRHL8XKfHxqoDYgz3WooPtySrWMOp6WF3ds0fcqiVxY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LUeSu7xVp548aU8vQ6JORQXC5IVQVujGHFgCOE+X9aQJxMZYZ+aVxITBXOlRCsYGCJ/vDugL3Cwpwr3Qx4TVZNFsuLqQMVN2e2YkZBuJJqtCF+w0aKo2zvGZgdle1Kw178b+shnV97Oe3/Pr5dC+eAMcKn7XPbqQUoXI5BD7DJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=A2ZbdPkn; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730091314; x=1761627314;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=iRHL8XKfHxqoDYgz3WooPtySrWMOp6WF3ds0fcqiVxY=;
+  b=A2ZbdPknWKNiB8zZDkxrihINQz8YDf89pc/ijn3+XZrG4fV4KbI2Vidv
+   CEt7pHAej/XotfQ6KnIbQu0AHfX9nax7ZmBoViwSgmk+ODWo1QNF0/cvl
+   7MEXWrSjKXi1HLLs2x2wjfNmq4SAGgYtmzIteyVZ6Ynxz2LSXhQwlsfWD
+   pckFBf/GJbsUSbD5RNK/eCEAf0tKXzK4SfDFI8arBTRnjNfoO9PXgjZ7U
+   OYqKzPtSBUhWUyltEnN4x3VarqC/6UHSDHICM58Mc1yH8Hd9bQnP7X1uL
+   WA1yvjB9//KRfJWzc9o9+0O0mKzUHOFUooJsCmyTdGY/jODvSUwIPIQMo
+   Q==;
+X-CSE-ConnectionGUID: 9h7yOQzcT7GmSdI3ORnljA==
+X-CSE-MsgGUID: zVNJp431SJKnZaZlj5nLqw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="40297136"
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="40297136"
+Received: from fmviesa003.fm.intel.com ([10.60.135.143])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 21:55:13 -0700
+X-CSE-ConnectionGUID: eV6AvVw2RPG4ddqrjwWtdA==
+X-CSE-MsgGUID: hwCniIgKRnmSheukQrgWdg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="85445722"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa003.fm.intel.com with ESMTP; 27 Oct 2024 21:55:10 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t5HmV-000bGa-33;
+	Mon, 28 Oct 2024 04:55:07 +0000
+Date: Mon, 28 Oct 2024 12:54:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Antonio Quartulli <antonio@openvpn.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <skhan@linuxfoundation.org>, sd@queasysnail.net,
+	ryazanov.s.a@gmail.com, Andrew Lunn <andrew@lunn.ch>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v10 09/23] ovpn: implement basic RX path (UDP)
+Message-ID: <202410281248.ZHbto77a-lkp@intel.com>
+References: <20241025-b4-ovpn-v10-9-b87530777be7@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241028-ftgmac-fixes-v1-2-b334a507be6c@codeconstruct.com.au>
-References: <20241028-ftgmac-fixes-v1-0-b334a507be6c@codeconstruct.com.au>
-In-Reply-To: <20241028-ftgmac-fixes-v1-0-b334a507be6c@codeconstruct.com.au>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Joel Stanley <joel@jms.id.au>, Jacky Chou <jacky_chou@aspeedtech.com>, 
- Jacob Keller <jacob.e.keller@intel.com>
-Cc: netdev@vger.kernel.org
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241025-b4-ovpn-v10-9-b87530777be7@openvpn.net>
 
-Commit e24a6c874601 ("net: ftgmac100: Get link speed and duplex for
-NC-SI") introduced a fixed phydev attached to the ftgmac netdev for ncsi
-configurations, cleaned up on remove as:
+Hi Antonio,
 
-    phy_disconnect(netdev->phydev);
+kernel test robot noticed the following build errors:
 
-    /* ... */
+[auto build test ERROR on 03fc07a24735e0be8646563913abf5f5cb71ad19]
 
-    if (priv->use_ncsi)
-        fixed_phy_unregister(netdev->phydev);
+url:    https://github.com/intel-lab-lkp/linux/commits/Antonio-Quartulli/netlink-add-NLA_POLICY_MAX_LEN-macro/20241025-173611
+base:   03fc07a24735e0be8646563913abf5f5cb71ad19
+patch link:    https://lore.kernel.org/r/20241025-b4-ovpn-v10-9-b87530777be7%40openvpn.net
+patch subject: [PATCH net-next v10 09/23] ovpn: implement basic RX path (UDP)
+config: powerpc-randconfig-r064-20241028 (https://download.01.org/0day-ci/archive/20241028/202410281248.ZHbto77a-lkp@intel.com/config)
+compiler: clang version 17.0.6 (https://github.com/llvm/llvm-project 6009708b4367171ccdbf4b5905cb6a803753fe18)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241028/202410281248.ZHbto77a-lkp@intel.com/reproduce)
 
-However, phy_disconnect() will clear the netdev's ->phydev pointer, so
-the fixed_phy_unregister() will always be invoked with a null pointer.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410281248.ZHbto77a-lkp@intel.com/
 
-Use a temporary for the phydev, rather than expecting the netdev->phydev
-point to be valid over the phy_disconnect().
+All errors (new ones prefixed by >>):
 
-Fixes: e24a6c874601 ("net: ftgmac100: Get link speed and duplex for NC-SI")
-Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
----
- drivers/net/ethernet/faraday/ftgmac100.c | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+>> drivers/net/ovpn/socket.c:84:25: error: call to undeclared function 'udp_sk'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:484:10: note: expanded from macro '__native_word'
+     484 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                 ^
+   note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:505:23: note: expanded from macro '_compiletime_assert'
+     505 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:497:9: note: expanded from macro '__compiletime_assert'
+     497 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:484:39: note: expanded from macro '__native_word'
+     484 |         (sizeof(t) == sizeof(char) || sizeof(t) == sizeof(short) || \
+         |                                              ^
+   note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:505:23: note: expanded from macro '_compiletime_assert'
+     505 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:497:9: note: expanded from macro '__compiletime_assert'
+     497 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:485:10: note: expanded from macro '__native_word'
+     485 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                 ^
+   note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:505:23: note: expanded from macro '_compiletime_assert'
+     505 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:497:9: note: expanded from macro '__compiletime_assert'
+     497 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:35: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                          ^
+   include/linux/compiler_types.h:485:38: note: expanded from macro '__native_word'
+     485 |          sizeof(t) == sizeof(int) || sizeof(t) == sizeof(long))
+         |                                             ^
+   note: (skipping 1 expansions in backtrace; use -fmacro-backtrace-limit=0 to see all)
+   include/linux/compiler_types.h:505:23: note: expanded from macro '_compiletime_assert'
+     505 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:497:9: note: expanded from macro '__compiletime_assert'
+     497 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:49:33: note: expanded from macro 'READ_ONCE'
+      49 |         compiletime_assert_rwonce_type(x);                              \
+         |                                        ^
+   include/asm-generic/rwonce.h:36:48: note: expanded from macro 'compiletime_assert_rwonce_type'
+      36 |         compiletime_assert(__native_word(t) || sizeof(t) == sizeof(long long),  \
+         |                                                       ^
+   include/linux/compiler_types.h:517:22: note: expanded from macro 'compiletime_assert'
+     517 |         _compiletime_assert(condition, msg, __compiletime_assert_, __COUNTER__)
+         |                             ^~~~~~~~~
+   include/linux/compiler_types.h:505:23: note: expanded from macro '_compiletime_assert'
+     505 |         __compiletime_assert(condition, msg, prefix, suffix)
+         |                              ^~~~~~~~~
+   include/linux/compiler_types.h:497:9: note: expanded from macro '__compiletime_assert'
+     497 |                 if (!(condition))                                       \
+         |                       ^~~~~~~~~
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:25: error: call to undeclared function 'udp_sk'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:65: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                  ^
+   include/linux/compiler_types.h:473:13: note: expanded from macro '__unqual_scalar_typeof'
+     473 |                 _Generic((x),                                           \
+         |                           ^
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:65: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                  ^
+   include/linux/compiler_types.h:480:15: note: expanded from macro '__unqual_scalar_typeof'
+     480 |                          default: (x)))
+         |                                    ^
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:37: error: member reference type 'int' is not a pointer
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                ~~~~~~~~~~  ^
+   include/asm-generic/rwonce.h:50:14: note: expanded from macro 'READ_ONCE'
+      50 |         __READ_ONCE(x);                                                 \
+         |                     ^
+   include/asm-generic/rwonce.h:44:72: note: expanded from macro '__READ_ONCE'
+      44 | #define __READ_ONCE(x)  (*(const volatile __unqual_scalar_typeof(x) *)&(x))
+         |                                                                         ^
+   include/linux/compiler.h:77:42: note: expanded from macro 'unlikely'
+      77 | # define unlikely(x)    __builtin_expect(!!(x), 0)
+         |                                             ^
+>> drivers/net/ovpn/socket.c:84:52: error: use of undeclared identifier 'UDP_ENCAP_OVPNINUDP'
+      84 |         if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+         |                                                           ^
+   11 errors generated.
 
-diff --git a/drivers/net/ethernet/faraday/ftgmac100.c b/drivers/net/ethernet/faraday/ftgmac100.c
-index 9caee68468ff5f71d7ea63a0c8c9ec2be4a718bc..c6ed7ed0e2389a45a671b85ae60936df99458cd1 100644
---- a/drivers/net/ethernet/faraday/ftgmac100.c
-+++ b/drivers/net/ethernet/faraday/ftgmac100.c
-@@ -1730,16 +1730,17 @@ static int ftgmac100_setup_mdio(struct net_device *netdev)
- static void ftgmac100_phy_disconnect(struct net_device *netdev)
- {
- 	struct ftgmac100 *priv = netdev_priv(netdev);
-+	struct phy_device *phydev = netdev->phydev;
- 
--	if (!netdev->phydev)
-+	if (!phydev)
- 		return;
- 
--	phy_disconnect(netdev->phydev);
-+	phy_disconnect(phydev);
- 	if (of_phy_is_fixed_link(priv->dev->of_node))
- 		of_phy_deregister_fixed_link(priv->dev->of_node);
- 
- 	if (priv->use_ncsi)
--		fixed_phy_unregister(netdev->phydev);
-+		fixed_phy_unregister(phydev);
- }
- 
- static void ftgmac100_destroy_mdio(struct net_device *netdev)
+
+vim +/udp_sk +84 drivers/net/ovpn/socket.c
+
+    76	
+    77	/* Retrieve the corresponding ovpn object from a UDP socket
+    78	 * rcu_read_lock must be held on entry
+    79	 */
+    80	struct ovpn_struct *ovpn_from_udp_sock(struct sock *sk)
+    81	{
+    82		struct ovpn_socket *ovpn_sock;
+    83	
+  > 84		if (unlikely(READ_ONCE(udp_sk(sk)->encap_type) != UDP_ENCAP_OVPNINUDP))
+    85			return NULL;
+    86	
+    87		ovpn_sock = rcu_dereference_sk_user_data(sk);
+    88		if (unlikely(!ovpn_sock))
+    89			return NULL;
+    90	
+    91		/* make sure that sk matches our stored transport socket */
+    92		if (unlikely(!ovpn_sock->sock || sk != ovpn_sock->sock->sk))
+    93			return NULL;
+    94	
+    95		return ovpn_sock->ovpn;
+    96	}
+    97	
 
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
