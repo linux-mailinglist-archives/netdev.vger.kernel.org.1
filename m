@@ -1,135 +1,141 @@
-Return-Path: <netdev+bounces-139448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58ECB9B2988
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 09:01:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AABD59B299F
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 09:03:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7AE9B20F76
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 08:01:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 586E61F25CEB
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 08:03:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB361DC1BF;
-	Mon, 28 Oct 2024 07:42:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A67AE1D0E24;
+	Mon, 28 Oct 2024 07:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KMQckb+5"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="Bi3RkSbD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A8A11DBB1D;
-	Mon, 28 Oct 2024 07:42:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B96F1CCEE5;
+	Mon, 28 Oct 2024 07:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730101365; cv=none; b=uEIzJotUBfb7C/BLwZeT7s/NGVDaVldxUx0nVxdbWWzOZKNgOHs3mvH8k4PomgWB9UrFL07+QNXYwFao66/dz0zBxsX4sgloFkE5thwJXEao86lFxAHjHMshRGppgHKKFVlPSGSxKmRn45bC2AYvnG53G9umgDHvgokhNPyVhPQ=
+	t=1730101587; cv=none; b=Y7mmIiSCubXZWkEUkLN/9eoLXbvkqXhObbrBjwl15EQAkbP8Y0Rih80XVhO40WE2AS2D81M/r7RbX8W6jSx4JG044VK8tjyW7TYYiCNemCRRLHaHfBvdX0c2oEQ4ZUmR2/thVgUTFlCVIC1UX9wrTqGBNlG+KLY6/1wMdw+6Zs4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730101365; c=relaxed/simple;
-	bh=JXKFC5VpBEHlPtIfVygRx6UJGuI4jfPDIOIO3j1t/UI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MPC4bpXeNC3JaKQ4k0lXMjANUl0jl/g8eMGo/IzI+1cJtSBgYUVz/thFu9pulK2r+4lOe0jGf3g/K3pDTi+c6RkHbDLMdeLo061v7ZMu1r2WZYLPA5mMyVke8hgHKBnRyt4x+v4xKNmhB05Wy5ja1PsnqmDOV4JZoubJUVXWuEs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KMQckb+5; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e2bdbdee559so4013304276.1;
-        Mon, 28 Oct 2024 00:42:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730101362; x=1730706162; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VfSo/759X3OS9N787muqObE8V5tHxeovvU61U0ecmlE=;
-        b=KMQckb+5T6gK2NSrN17OK8Xcm6Qj4tgxaLsZqEBhC2DtYsOcS52bpqDzxX71pMAOOg
-         4Sz1sEECWyIslcTdkkgaNPmpCb00fAR1Ur7zZxjYhpr8wtphrbUuCMzO4TX+eUWufDLx
-         b1Buy6GKmpuXuI4gP9BNRD18blCWwipi8BiWw9qcoIJypThNw8AeGqTyALrLfabQcrN6
-         SlxapW3jmEqeAv/CqcK0cQMqFAQ6IDl/Uc4Tbe1rCYUdVAWKB9QC04vn74GEfQl6JT6G
-         Lfyl3nmfzanlCpQaq+SkuSTr/VY+r6J2O2pV0gIJL4hTNJ+6kMFI+6CoqUp8GyEj7ysQ
-         NsFw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730101362; x=1730706162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VfSo/759X3OS9N787muqObE8V5tHxeovvU61U0ecmlE=;
-        b=ssFxPa5qD9uq/hkVwONu1DUzuMaEjygNOcudiGDAoSjKpq1Dt6xlyXrlwJabveIUfC
-         Wzjswe2S+TPOxNdGbxNz8b6BBXAQqQ7+kLfMd19ooC0cB991Sk4vbk+TQSSupMGEvSlN
-         MwQvBjoZJD0TlsacUsnbwaa4nLPrip1Jk8z+9TtOBxAsoIDPUQHSwGHFALo2T2wwPjcx
-         WM/QpKGFwQ97yY1QMJhLG1GJQuxL4tUvtuYHL94MEjCfca2RgbmPOjIRJAICXLemtqmw
-         ULk7tOx2rn0yPCPX3gI9RH1hm3EldmvMdLn55zbtEDs/hd40Glpn8mcjNO4rMQBoWMM5
-         SDFA==
-X-Forwarded-Encrypted: i=1; AJvYcCU5VySnwaZk0UH+8rwIwzZwOxX3MpvSA/wB4xCgEEDmLMq+hMZk8H3SR+pJNl/PJYyl6JeUYMYk1/iLCn4zlrA=@vger.kernel.org, AJvYcCUNlLwLlOzJLMFftHDNmKY0YkBdLEM6dOuOyJ0EkkNP4IWCwKEgQynZ49Mpavmf3FELCC++BWFpLtnnmYW4@vger.kernel.org, AJvYcCUZRMLqTqR2K3Bkhaneg3fxcibV6oZrC43kWR7Q9cBoMWGyBKMXfw6E7ezTITQIXNYqXHxMws3pXI+xkm8=@vger.kernel.org, AJvYcCUud7YTywR2UfyJ8rmdPcGSm2zbd8s0cA0tRL3K9RVgGhlMZvZtPktcw49OWZ089MG8FyfMr1Sa@vger.kernel.org, AJvYcCUwFZoubqJHO65zruExH4E16s1yriVYNPut8js34NhPeYo5OmyWzYaf0JpqQj+A7hURI0IlEMVr/krD@vger.kernel.org, AJvYcCVG3NvXhj9tyxd45MjRiuamZAcsx3KZwQhyQvWCnv0Hb0QG0xU8waXC82IHKrOxHDu83c5BaFIEnqI=@vger.kernel.org, AJvYcCVLlnGkX6tc64QONhAHSCXK5JmHXHbSw98HcDg2a3JxBnxiTJ1yVBqxnjRwhwbIUMe/iUphsPPodRsR@vger.kernel.org, AJvYcCVeLpdHLOVyR/jkQnnVolYJXJJE2d1054dykJwKQQ5R1Iv8alQJo328bPYgWPi1mVJ1VbplSdLHqvVnmA==@vger.kernel.org, AJvYcCWzQmEsks6gGXeEBN3/xrNYin0mT2C2JmxUYLu1DJo6CAnUVK0L0dC4e6l5UeWkwMFu7oDsbK2P+5Fz@vger.kernel.org, AJvYcCXbKqO0Nj5w5SbEMTnI+WcQvEMpQFgV
- GlPYFBS0N/B9fuoys5bKe/fiLoKaic69WNIiRb9miyPo5C/F@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGK6k9K8KaaZ2bs445ksmiQSY2km5+SKM9K3DeoTyb74Qqm3OV
-	t82PA10igC8c3nezB25h98gg9d76ThKfi9vHdODT/Drn31vJHYjYaDEfJQXOzk2ueq7wTLrCW5O
-	p7EdoWfxlqkvxRtsA9HrblkiHDt4=
-X-Google-Smtp-Source: AGHT+IE7sSyqDVHOJ/jdGq64MHZ+33bDq+P02VTEX3r+LWDoPL8/lqvTrSpBYuxjao1IdyrL/sL8NYhH1E5VS7+KILg=
-X-Received: by 2002:a25:2611:0:b0:e2b:ade5:b925 with SMTP id
- 3f1490d57ef6-e3087becb3amr4891484276.43.1730101362407; Mon, 28 Oct 2024
- 00:42:42 -0700 (PDT)
+	s=arc-20240116; t=1730101587; c=relaxed/simple;
+	bh=0nzgBNDrmE7kW4KbM11lBzWym2g/ZRqGgQBcfHojSFM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=GXHq02gkMUZWCAkWcKVLljHOSob7+V3nbZ7yJSwZmLkW5htDjjUet4iTGpYq33R8d3lyOWYYysWC6VKcIamWO6APoDQGjXw4DB4EkOaIwrM8UfArY1u/UQsYIQDnp617snzZcnbtd0H1Do6iCdMc2qyUbjJ7OsTMg+/kHKmNgzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=Bi3RkSbD; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49RN0OG6010456;
+	Mon, 28 Oct 2024 07:45:54 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	PobXzPGGnjLtxgHS3B4nk270t4SMrzqU1Y+YvIFP7Vw=; b=Bi3RkSbDc7A892gc
+	pyMeJPC3Hob/hxOxDhrNLvf1wvhb8uFzE0CkC8DKjY6+zEr9acONf12+AXYH9NmC
+	PBReXXGYoOBT5wIneCkKCZU6LmP7nm3HtN/CbA3yESqUsHbLTlPNyY1KZ5x0iOZh
+	XkZJ1VyWT8XbEdLtpsWRJ4JxbQpqdSIVidTC3umUgEI1n+lMX0I+CG3DXLUQjCHq
+	/Rb7bTnM/5d8cyRJDgX+8Okm1X6c5pLW4RBnwkgos8oNvs6mGubIO+2q21qBJlXK
+	0KIYFAKCuB6JLAdnC7JgRuehPmNDNmtQLnc+1gqYsbCiZI3cj2qSfohcNOpDT/Iz
+	fauHuQ==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gr0x40xn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 07:45:54 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49S7jqO9014587
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 28 Oct 2024 07:45:52 GMT
+Received: from [10.152.195.140] (10.80.80.8) by nalasex01a.na.qualcomm.com
+ (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 28 Oct
+ 2024 00:45:43 -0700
+Message-ID: <5862062c-8c52-421d-94b3-6b6000b53616@quicinc.com>
+Date: Mon, 28 Oct 2024 13:15:40 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-7-tmyu0@nuvoton.com>
- <CAH-L+nPGGhgDFge0Ov4rX_7vUyLN8uu51cks80=kt38h22N7zQ@mail.gmail.com>
- <62ea5a91-816f-4600-bfec-8f70798051db@roeck-us.net> <CAOoeyxX=A5o5PhxpniPwPgMCBv1VwMstt=wXCxHiGPF59gm5wQ@mail.gmail.com>
- <817d24e1-6fdd-4ce2-9408-eccc94134559@roeck-us.net>
-In-Reply-To: <817d24e1-6fdd-4ce2-9408-eccc94134559@roeck-us.net>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Mon, 28 Oct 2024 15:42:31 +0800
-Message-ID: <CAOoeyxXiihVEbCri5=0xdQ2EWO=NJv2Y5a-nRLFEez391Lnmbg@mail.gmail.com>
-Subject: Re: [PATCH v1 6/9] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Guenter Roeck <linux@roeck-us.net>
-Cc: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>, tmyu0@nuvoton.com, lee@kernel.org, 
-	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
-	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, jdelvare@suse.com, jic23@kernel.org, lars@metafoo.de, 
-	ukleinek@kernel.org, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v8 4/7] dt-bindings: clock: Add ipq9574 NSSCC clock and
+ reset definitions
+To: Krzysztof Kozlowski <krzk@kernel.org>
+CC: <andersson@kernel.org>, <mturquette@baylibre.com>, <sboyd@kernel.org>,
+        <robh@kernel.org>, <krzk+dt@kernel.org>, <conor+dt@kernel.org>,
+        <konradybcio@kernel.org>, <catalin.marinas@arm.com>, <will@kernel.org>,
+        <p.zabel@pengutronix.de>, <richardcochran@gmail.com>,
+        <geert+renesas@glider.be>, <dmitry.baryshkov@linaro.org>,
+        <angelogioacchino.delregno@collabora.com>, <neil.armstrong@linaro.org>,
+        <arnd@arndb.de>, <nfraprado@collabora.com>, <quic_anusha@quicinc.com>,
+        <linux-arm-msm@vger.kernel.org>, <linux-clk@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <netdev@vger.kernel.org>,
+        <quic_srichara@quicinc.com>, <quic_varada@quicinc.com>
+References: <20241025035520.1841792-1-quic_mmanikan@quicinc.com>
+ <20241025035520.1841792-5-quic_mmanikan@quicinc.com>
+ <lyafg7jwbwoe3j7voecgd5tnhrb65utc3vkc5qqxoqug3qd47m@iudkp4w2mrso>
+Content-Language: en-US
+From: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+In-Reply-To: <lyafg7jwbwoe3j7voecgd5tnhrb65utc3vkc5qqxoqug3qd47m@iudkp4w2mrso>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: 2B14fMh6JTJ678YrLvHL2MnvQnTUs5Ax
+X-Proofpoint-GUID: 2B14fMh6JTJ678YrLvHL2MnvQnTUs5Ax
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 suspectscore=0
+ clxscore=1011 bulkscore=0 adultscore=0 impostorscore=0 mlxscore=0
+ malwarescore=0 mlxlogscore=703 priorityscore=1501 spamscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410280063
 
-Understood,
-Thank you.
 
-Best regards,
-Ming
 
-Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B410=E6=9C=8825=E6=
-=97=A5 =E9=80=B1=E4=BA=94 =E4=B8=8B=E5=8D=8811:44=E5=AF=AB=E9=81=93=EF=BC=
-=9A
->
-> On 10/25/24 08:22, Ming Yu wrote:
-> [ ... ]
->
-> >>>> +static int nct6694_fan_write(struct device *dev, u32 attr, int chan=
-nel,
-> >>>> +                            long val)
-> >>>> +{
-> >>>> +       struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev);
-> >>>> +       unsigned char enable_buf[REQUEST_HWMON_CMD0_LEN] =3D {0};
-> >>> [Kalesh] Please try to maintain RCT order for variable declaration
-> >>
-> >> Ok, but that is already the case here ?
-> >
-> > [Ming] Is there anything that needs to be changed?
-> >
->
-> I don't think so, If two lines have the same length, the order is up
-> to the developer to decide.
->
-> Question though is if the buffer needs to be initialized. You should drop
-> the initialization if it is not necessary. In that case the second line
-> would be shorter anyway, and the order question would not arise.
->
-> Thanks,
-> Guenter
->
+On 10/25/2024 5:30 PM, Krzysztof Kozlowski wrote:
+> On Fri, Oct 25, 2024 at 09:25:17AM +0530, Manikanta Mylavarapu wrote:
+>> From: Devi Priya <quic_devipriy@quicinc.com>
+>>
+>> Add NSSCC clock and reset definitions for ipq9574.
+>>
+>> Signed-off-by: Devi Priya <quic_devipriy@quicinc.com>
+>> Signed-off-by: Manikanta Mylavarapu <quic_mmanikan@quicinc.com>
+>> ---
+>> Changes in V8:
+>> 	- Replace bias_pll_cc_clk, bias_pll_ubi_nc_clk with CMN_PLL
+>> 	  NSS_1200MHZ_CLK and PPE_353MHZ_CLK
+>> 	- Remove bias_pll_nss_noc_clk because it's not required.
+>> 	- Drop R-b tag
+> 
+> That's not really a change waranting re-review.
+> 
+> I wished you did not create here dependency, skipped the header and just
+> use some number for the clock. Having dependencies does not help anyone:
+> neither you to get this merged, nor us to see that it was tested.
+> 
+> Please confirm that this patch was fully tested.
+> 
+> Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> 
+> Best regards,
+> Krzysztof
+> 
+> 
+
+Yes, it's fully tested.
+
+Thanks & Regards,
+Manikanta.
 
