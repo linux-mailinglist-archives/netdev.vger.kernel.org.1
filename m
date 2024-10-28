@@ -1,132 +1,158 @@
-Return-Path: <netdev+bounces-139733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EF0A9B3EB2
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:55:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42ECD9B3EC0
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:57:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9DA3C1F231E0
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:55:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02DD8283A8A
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:57:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897931F4261;
-	Mon, 28 Oct 2024 23:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Kxp6uBow"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529DD1FAC27;
+	Mon, 28 Oct 2024 23:57:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 802DD18130D;
-	Mon, 28 Oct 2024 23:55:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107001F9ED4
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 23:57:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730159708; cv=none; b=EFlmi1IAcMWJPiezHAAvURwXADuUp/i0e+MgwEzT3JG2BbSS53MA/QGObeuZ1P4y+KbcBXXJCtT4coSzWZ2Hb0JO0m7iwa4lwslcNfvQy0o44W19pkWwvC1E1sRmpLik5gBNkkUe/2YZuvbhJtNK+Ny6+oIFVHFdZJ0u6xpdQLg=
+	t=1730159844; cv=none; b=AiPlbwh8QabuiVuc0QqAhAkPwht7n3xdqaymhN6VmPkBE1L1Z4N63ZriE0ev6cI+P0lT0ETabsEVV/JKm0l6WL6njSw6iul4vG+k0nyPTm+5MrabA96suyuXiKbvrOxozwYsJVuMPlDR1Jz27rkWjeOt83kKpDnOjpcU5GgEha0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730159708; c=relaxed/simple;
-	bh=jXuNapBKxnt0vtqD6mgvhwwHIVj2R/3axufv96ykCbQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=Eq6YvIa8TyjJ2ytAUdOXXjupTqmct0emKi9Hxib+CyAIzXvXYGTf9L3cT6PT6C+ZnaO4k0jwmD5hD+Gae6rxRTPKtcGrgSjY7g7kYrGiRBnEX+v+UUIvfJm/OtN1nHnbJcR6bhMEpPeVAai57DFM3uArEB9I8kjSR+9Q+T/FYsY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Kxp6uBow; arc=none smtp.client-ip=209.85.128.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4316a44d1bbso45008475e9.3;
-        Mon, 28 Oct 2024 16:55:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730159705; x=1730764505; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=jCSAb7w1GmldJWVOCxKoC0Mkn/M+7pIQZRhKt7cP6N8=;
-        b=Kxp6uBowYG9AoFpYzltZuWyROK6FticcsKV6fyli8GvSVXdd3emTyqgtj/6PYIXNyz
-         HOQhQ9Zdy2CIIuDBG1P2eih1atxK7LX/bHJcS/sfNUv7ljS0/Z9PNW9zhJUGstUBAxR1
-         MbDb0D5ujNAA1zqSXBKZNEBmEZ3UUqXq7E/F+/CW320EZlrhxhgGoHvvuE7w9+ckNCsS
-         okHrVdt7l3tIcZ1+lCFsogGEdkrez7VLeENlGFwcVLCgLrgsp3LtJgRNdhmOlcpmKoIu
-         o9pD9sq5Km+Glmc80SWpaAXsCYuKdwPWZcEMUcgiZNWtLa3tbKQMhZtH9K6mVSZm+nNc
-         NjPg==
+	s=arc-20240116; t=1730159844; c=relaxed/simple;
+	bh=JSAgChZeD4Eb9IozTJE80b3eyOBu7xOBALYknD+8rkQ=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=c0TW+OzsqT9vjEsHL57o/lwxyL8IvfCKvi9gVdWAFtd9RmFokGd5uE8dMDR6/eFbpCjnTObCuKIaWZo3QoAWKlnv1HfrNpQc7YdmgN9/Rk3q6TMHsun6plGMIee5A7WNpK3KgckuKPAT4O6TtoJCptPj6FmhPV9cI7pcofNCy5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a4f113d2c8so22810235ab.1
+        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 16:57:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730159705; x=1730764505;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1730159841; x=1730764641;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jCSAb7w1GmldJWVOCxKoC0Mkn/M+7pIQZRhKt7cP6N8=;
-        b=dNn0RHFJiTYNnSzUVjMVluPDFDW+YfqJvFNIyG7kslFgaczrkVD/Usp7Cab22RX2PD
-         tXNlfk1OyFN3k4PTzgdKiB819nRnenJUnvuvFuL8+FjnsvjcqT4nlrJ9ldSIaAdTyIqD
-         pnGpz1ziCl4kD/i6JJYS2VyT+9BhWw8G+hv4r7BR33d0fO7y19niQ5S2epVn++8s+yP6
-         ApbsQMOMNtve32glax7jTmwZ45iZPJKyyd74cynx2/GXoiYhYOuTylc6XzUqKsmJ8qse
-         fRJ0PePRh7CpvyO7UJOx1kPaugwR7c5skS1EKmaqd89N5Nqaw0pbaypWDP5NflirFNwC
-         EotQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVkDk9zEgULO+cwQrwTt1ksvpm/s03XwqdoiZE81jV9uu8Cth6eE+v4okvX1bW0PcXntyxVzRuLYCUOd4I=@vger.kernel.org, AJvYcCW2MenY2+sVvkPWGi+OhlExuURpeGVukizwkH51eYXh7systrKE2pa/qJ+Vjwvlv5wFPXD0VrBV@vger.kernel.org
-X-Gm-Message-State: AOJu0YzQtD5rg/IKmPSgwZdaOxjb7o5oRYqiHkT/kUM6VBygZIwS/Jc3
-	6EURy7HiDsStKWpTb+n0J0JJof7TeOGuTtTYnUBs+AdBzD8gsvNd
-X-Google-Smtp-Source: AGHT+IFlXOEKPWixM2CbBX4WfD114h41yRBeY/Sc/ldzOy807Z0Q7Ks0vBcHB52l5tm9G+aXMKALfA==
-X-Received: by 2002:a05:600c:3542:b0:42c:bae0:f05b with SMTP id 5b1f17b1804b1-4319ac7425cmr93676285e9.1.1730159704661;
-        Mon, 28 Oct 2024 16:55:04 -0700 (PDT)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4318b58b79esm158332975e9.47.2024.10.28.16.55.02
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 28 Oct 2024 16:55:04 -0700 (PDT)
-Message-ID: <34589bdb-8cbd-455d-9e5b-a237d5c2cd0c@gmail.com>
-Date: Tue, 29 Oct 2024 01:55:29 +0200
+        bh=xnvBNJ94FOi5B5HFHo9/CsJQbRxCRr0sZ6M9tNoPcrI=;
+        b=XH7NAD1IXwlYgg22DnBCrr6NL+IYyFH9IBKqCuQGAwfPa92d/BG1MkZru8qcP4txVv
+         DcrvSsY6FESR48MxVpYGqZ7tHjXGSncDwlvswSmdqFfx3rNWhXGU5G9SGXtRKUcGcCsX
+         n4op7HytEX5zAI6an5qgvpUbPIKCl1LoVbAxc24PHS2V1VC6vgt1oH/S8lapf7tza16w
+         nP4hszL3CaZQuBNzD6tUpG/DWZGgYdtvSnnDXht+Ha0L8zTXZxzAschjUlro0NqtIOmY
+         gvhFxzY7GfnzaybmRZd8y5sENZUk5rcJsUX6zvN07gIreEOJm2q58RM8l3t+NN14g+BM
+         XdwA==
+X-Forwarded-Encrypted: i=1; AJvYcCUBPyx/gylNYvee/mg16TeMNwagmLX33rYhz6PQjL6EKrnuAlaQl2PSlFpglztfKZok4tKtJr4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxa+Ll18yTi1FCw4MJ0IA28/gFkZVI5Zc6bm8jQyeEYrJ6gDguC
+	ZW1KJt/qwqy2abQuGDrnJa2F9bowIUNKo6uJpZE3MHEKeEgUwUpcIHs6WCCK+LLSbeNgV51Mf23
+	QB2zeP/adFOXCv9+SizovKQII9ieFRUn8WOiMPIBh+thxTOy0wn1ru88=
+X-Google-Smtp-Source: AGHT+IHmbQm1FfjPhMFLh6Itg5JiirSNsMI9Ut/PpvACE/Gl5hXO1q/6lII1qUk3DDqmozVtfdIrtSYETil57NqA6wgVi++H3FyL
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: wwan: t7xx: off-by-one error in
- t7xx_dpmaif_rx_buf_alloc()
-To: Jinjie Ruan <ruanjinjie@huawei.com>, chandrashekar.devegowda@intel.com,
- chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
- m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
- loic.poulain@linaro.org, johannes@sipsolutions.net, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, ilpo.jarvinen@linux.intel.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241028080618.3540907-1-ruanjinjie@huawei.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20241028080618.3540907-1-ruanjinjie@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1528:b0:3a2:7651:9846 with SMTP id
+ e9e14a558f8ab-3a4ed295a05mr89773055ab.13.1730159841172; Mon, 28 Oct 2024
+ 16:57:21 -0700 (PDT)
+Date: Mon, 28 Oct 2024 16:57:21 -0700
+In-Reply-To: <00000000000044832c06209859bd@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672024e1.050a0220.11b624.04b7.GAE@google.com>
+Subject: Re: [syzbot] [sctp?] KMSAN: uninit-value in sctp_sf_ootb
+From: syzbot <syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
+	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Jinjie,
+syzbot has found a reproducer for the following issue on:
 
-On 28.10.2024 10:06, Jinjie Ruan wrote:
-> The error path in t7xx_dpmaif_rx_buf_alloc(), free and unmap the already
-> allocated and mapped skb in a loop, but the loop condition terminates when
-> the index reaches zero, which fails to free the first allocated skb at
-> index zero.
-> 
-> Check for >= 0 so that skb at index 0 is freed as well.
+HEAD commit:    819837584309 Linux 6.12-rc5
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=1211e940580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4d4311df74eee96f
+dashboard link: https://syzkaller.appspot.com/bug?extid=f0cbb34d39392f2746ca
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11eb3230580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11f36ca7980000
 
-Nice catch! Still implementation needs some improvements, see below.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/dfa054090a8f/disk-81983758.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/54edfdbd151e/vmlinux-81983758.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/d63a317b80f9/bzImage-81983758.xz
 
-> 
-> Fixes: d642b012df70 ("net: wwan: t7xx: Add data path interface")
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> ---
->   drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
-> index 210d84c67ef9..f2298330e05b 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
-> +++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
-> @@ -226,7 +226,7 @@ int t7xx_dpmaif_rx_buf_alloc(struct dpmaif_ctrl *dpmaif_ctrl,
->   	return 0;
->   
->   err_unmap_skbs:
-> -	while (--i > 0)
-> +	while (--i >= 0)
->   		t7xx_unmap_bat_skb(dpmaif_ctrl->dev, bat_req->bat_skb, i);
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com
 
-The index variable declared as unsigned so changing the condition alone 
-will cause the endless loop. Can you change the variable type to signed 
-as well?
+syz-executor341 uses obsolete (PF_INET,SOCK_PACKET)
+=====================================================
+BUG: KMSAN: uninit-value in sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
+ sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
+ sctp_do_sm+0x181/0x93d0 net/sctp/sm_sideeffect.c:1166
+ sctp_endpoint_bh_rcv+0xc38/0xf90 net/sctp/endpointola.c:407
+ sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
+ sctp_rcv+0x3831/0x3b20 net/sctp/input.c:243
+ sctp4_rcv+0x42/0x50 net/sctp/protocol.c:1159
+ ip_protocol_deliver_rcu+0xb51/0x13d0 net/ipv4/ip_input.c:205
+ ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
+ dst_input include/net/dst.h:460 [inline]
+ ip_rcv_finish+0x4a2/0x520 net/ipv4/ip_input.c:449
+ NF_HOOK include/linux/netfilter.h:314 [inline]
+ ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:569
+ __netif_receive_skb_one_core net/core/dev.c:5666 [inline]
+ __netif_receive_skb+0x319/0xa00 net/core/dev.c:5779
+ netif_receive_skb_internal net/core/dev.c:5865 [inline]
+ netif_receive_skb+0x58/0x660 net/core/dev.c:5924
+ tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1550
+ tun_get_user+0x5783/0x6c60 drivers/net/tun.c:2007
+ tun_chr_write_iter+0x3ac/0x5d0 drivers/net/tun.c:2053
+ new_sync_write fs/read_write.c:590 [inline]
+ vfs_write+0xb2b/0x1540 fs/read_write.c:683
+ ksys_write+0x24f/0x4c0 fs/read_write.c:736
+ __do_sys_write fs/read_write.c:748 [inline]
+ __se_sys_write fs/read_write.c:745 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:745
+ x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
 
---
-Sergey
+Uninit was created at:
+ slab_post_alloc_hook mm/slub.c:4091 [inline]
+ slab_alloc_node mm/slub.c:4134 [inline]
+ kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
+ kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
+ __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
+ alloc_skb include/linux/skbuff.h:1322 [inline]
+ alloc_skb_with_frags+0xc8/0xd00 net/core/skbuff.c:6612
+ sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2883
+ tun_alloc_skb drivers/net/tun.c:1526 [inline]
+ tun_get_user+0x20f4/0x6c60 drivers/net/tun.c:1851
+ tun_chr_write_iter+0x3ac/0x5d0 drivers/net/tun.c:2053
+ new_sync_write fs/read_write.c:590 [inline]
+ vfs_write+0xb2b/0x1540 fs/read_write.c:683
+ ksys_write+0x24f/0x4c0 fs/read_write.c:736
+ __do_sys_write fs/read_write.c:748 [inline]
+ __se_sys_write fs/read_write.c:745 [inline]
+ __x64_sys_write+0x93/0xe0 fs/read_write.c:745
+ x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+CPU: 0 UID: 0 PID: 5818 Comm: syz-executor341 Not tainted 6.12.0-rc5-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+=====================================================
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
