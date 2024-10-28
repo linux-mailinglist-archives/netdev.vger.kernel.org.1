@@ -1,244 +1,200 @@
-Return-Path: <netdev+bounces-139572-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139573-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E7B99B342A
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:59:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 13E1E9B3442
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3B561281A78
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 14:59:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 981E11F22598
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:03:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BC851DE2B1;
-	Mon, 28 Oct 2024 14:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A8B81DD54E;
+	Mon, 28 Oct 2024 15:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b="NJ/QgNkw"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="YhTB2+85"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2054.outbound.protection.outlook.com [40.107.20.54])
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2052.outbound.protection.outlook.com [40.107.243.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A74D18E354;
-	Mon, 28 Oct 2024 14:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05ED515E5B8;
+	Mon, 28 Oct 2024 15:02:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.243.52
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730127567; cv=fail; b=NfgpDEnsGKoGJXMLe2gCxGw+S+c0f8OtgxATx2fgmmgNdBeBhKJTO77dP+FpMzQu3VrZeFVi3CbfXfoXrM4eYaaT1STAoBIOZVy7is1L67vwzQpVDlaQ9tze2GmqrBUkhpg/GgW31EGaBsyYCxkhADev8yqsUR2vTR+jc1i6aL0=
+	t=1730127770; cv=fail; b=mPl8ciraIVqf4+Alj+8TuQK2oegMnNa8XtkWVMzgzgT/4aMqnT0UdMsOYUB2YtK35W/ZjwtnVvHGHVrEF0Q+MJMIkSh6vWrFQ1DGSjWw4TW1MTNqa8kMC8no19VAZbipdjzrsudZKhoRmRX5Ksude9K6e0Q67YicAMm7gLSMlXE=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730127567; c=relaxed/simple;
-	bh=leB1+sqgbXX6QZSCuX2NhBvJ8I6amVBhYT2rM3HrLY0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=cCiVW1bPE/fhNm2hKxBxh/9qMnWj/yd5OJm28FmbNI2OpuwoOKoT4o+jecCIPqxCfJoAYrUgMmJqukyRsSs+ejqErmhI40RwdkCTHlK3thrgERH0mNPGnrcEVgNBSFYWf6hPmLiV1Z/Io40v1X6xybECaURhRtV8pKmGNjphQU0=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com; spf=fail smtp.mailfrom=leica-geosystems.com; dkim=pass (1024-bit key) header.d=leica-geosystems.com header.i=@leica-geosystems.com header.b=NJ/QgNkw; arc=fail smtp.client-ip=40.107.20.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=leica-geosystems.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=leica-geosystems.com
+	s=arc-20240116; t=1730127770; c=relaxed/simple;
+	bh=xWGcP24+JavjYYhWTP4w3CLbMBg0XsdbT2nLJ9a57BU=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=BTfrI2Z1Dfj5yPOEPeKtn4pYx1Y6bJjLCeqKBNSC3yce/229HiCLD/JGbpP31rg9SZp/trZ1+j/5SgwGNWWIcpyaKWOQxCfn3yjRb8XuKB6qUuwTJRVsN5/llvj9nKrXJNRU4kKQL+3jrkNRWOMsMzVn73jyPkOVJc2TxpjKBd8=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=YhTB2+85; arc=fail smtp.client-ip=40.107.243.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ddMzC1vkIROGKH3J8RctMR0X20EqjmHfsociYS+1ROM+Ay3fdT3xE/jKwwnF+Dg/4hrXy5mQmvZU+0FFQlH/0lu+FRFWTabzMuM33iSDwqhflfDP8+MuAZy1kgtb4r32xzdvM3viLkAeaSwbcpyGFLSGGh1VZth+YP+gPgbOgbfkclEgSzexuD19RBJQtz8oyk5MXOefipGvPF/xyklnrTyjsKo24JdUCMsGB3o4lWUUWiRUcOlqUBsTyJjo1tDfH8w5A6KNfBf6JTr44MC83bhyjGLzyvhwe3dYFz8uyO+0r0Y75nBiRVdRCIIhjdmBjLnPsIAJx4v1VM62Qtr82w==
+ b=EkJ3rjw5S/y8lujZMRh7lQRWp3ei5mWRH+IWJ9FzUTBwOwOar3fOJTVPkO9nYx0SEZ1+jU5O52gHivHg07xDSbL+OOtCkkFlrY0ZimoSRQ7IG2odVR8QiqD03wQ+4GkW/Lbzf83HERU21lTUce7wtb+DBmJ0yGaaiUPZqGcPTkYjd5osBg87/t1/XVLwkaZ1v0Gqa49WlBbnx1e06PBsGxvaDzmoifB+WkC+svRfibe87yVlXKdsi28DaZe4qNrPiuley6FHfA4ZMwgcxzjyBMsixY8B3AhRLspcyxM/iEwBqUKEcQUn0NiGEx4S7CJiBQQuwb1J4Eg7svIZ19eYsw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=30rG/7YxDBbuHOl7//qMEkeVkEZ72lzZkZHeP/aTPAg=;
- b=ChvbZOvIrLZmIoD81EemYWitxWvj2Ew9CCZnOuY9CbV3kmec+p5Df7gQxhIMl76pAPIM/jGXxMRz7TSYTlqUYR+QoMDhF5JlTyWFYwghF+/PyQMbupSSKYIEhh7AWYbiIED0WZXwScezP67EvuJyqRWPtizYt0NzpOnPxiM9WSumz9jTnfNvNJ6ZMWjrhnrqjN2T+uTQ2CxNCWRN4PPTHw6yqzkjLx45gHd8tw4LS/VRMPC6dPSmaXHSdU6hTG9qsFtwgxAoxpze9lhjUyLa9b24eR5VV/+XQRA4V+5pqVVNDdTLhxAC8h6iOJ3zPYlhTHmi/lhHuKzeZL+57MhKdw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 193.8.40.94) smtp.rcpttodomain=vger.kernel.org
- smtp.mailfrom=leica-geosystems.com; dmarc=pass (p=reject sp=reject pct=100)
- action=none header.from=leica-geosystems.com; dkim=none (message not signed);
- arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=leica-geosystems.com;
+ bh=c9FfRB/BQC40ZK1DpO6exywd6GUaL9P3JhOsVAig8No=;
+ b=ZNC4VSVgazBngz2h2+oKm26ZrfrBWjyES9otgLw4tM+wJrFv2q1WjlKWesytcxae42WeCqwU793RxBEqbB2shUQDwe21PNYbeYH6SyFavm4tR3kt5u/UnX640ko4d3K555JzKkS9OnqxwSiXaMNVoCfVUwHhqBpzqLIBgk9OUPHHuJ+JG16G7frIDqZuX650yz0jOvinpeZimsPMCXZvidRAedsd6XT7PR6+cfIwsDDFo5aWvUBorw+l3FhqEJAhzut2/kTz+qq5QZH1NIyYdLo71E2Jp2wn7CIy0le+BcGkS7JlnFPJdwUCSz/bG+QqdarU33jeZ19O8t8+6h5ldA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=microchip.com;
  s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=30rG/7YxDBbuHOl7//qMEkeVkEZ72lzZkZHeP/aTPAg=;
- b=NJ/QgNkwvrxZqeI5QzuG3oF/p4/gWEZvZ4GVUMuvY5UYrPYXgqJWUoXmRKPjbNyMyL6SQelyyUXer02cxh6vsRyGJc1RP+o+XNPmQq2TzzzvbNoMRz1fW0/AshvgA960bYvO/QN7rbom7QhDF6YRuYyx8qukNCu+GIYJaV+Re9Y=
-Received: from AS8PR04CA0092.eurprd04.prod.outlook.com (2603:10a6:20b:31e::7)
- by DU4PR06MB9681.eurprd06.prod.outlook.com (2603:10a6:10:55d::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.25; Mon, 28 Oct
- 2024 14:59:22 +0000
-Received: from AM4PEPF00025F96.EURPRD83.prod.outlook.com
- (2603:10a6:20b:31e:cafe::88) by AS8PR04CA0092.outlook.office365.com
- (2603:10a6:20b:31e::7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.26 via Frontend
- Transport; Mon, 28 Oct 2024 14:59:22 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 193.8.40.94)
- smtp.mailfrom=leica-geosystems.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=leica-geosystems.com;
-Received-SPF: Pass (protection.outlook.com: domain of leica-geosystems.com
- designates 193.8.40.94 as permitted sender) receiver=protection.outlook.com;
- client-ip=193.8.40.94; helo=hexagon.com; pr=C
-Received: from hexagon.com (193.8.40.94) by
- AM4PEPF00025F96.mail.protection.outlook.com (10.167.16.5) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.0 via Frontend Transport; Mon, 28 Oct 2024 14:59:21 +0000
-Received: from aherlnxbspsrv01.lgs-net.com ([10.60.34.116]) by hexagon.com with Microsoft SMTPSVC(10.0.17763.1697);
-	 Mon, 28 Oct 2024 15:59:21 +0100
-From: Mamta Shukla <mamta.shukla@leica-geosystems.com>
-To: dinguyen@kernel.org,
-	alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	mcoquelin.stm32@gmail.com,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	a.fatoum@pengutronix.de
-Cc: bsp-development.geo@leica-geosystems.com,
-	Mamta Shukla <mamta.shukla@leica-geosystems.com>
-Subject: [PATCH net v2] arm: dts: socfpga: use reset-name "stmmaceth-ocp" instead of "ahb"
-Date: Mon, 28 Oct 2024 15:59:07 +0100
-Message-Id: <20241028145907.1698960-1-mamta.shukla@leica-geosystems.com>
-X-Mailer: git-send-email 2.34.1
+ bh=c9FfRB/BQC40ZK1DpO6exywd6GUaL9P3JhOsVAig8No=;
+ b=YhTB2+85YdjGuoy05WzJYjbLgU1k+dchHotTg3Q/7YCrY+UOKtM41wsNHRSklklQIAsH6B4yzvZVvHKrEafqKbQ3ttpYl/bxLHErkIo1jv9k6pUOdadL7sQuBfjBRIJBQP6I0xitmOgnwcJad8gNVyjRnzW6orNS1uakTdDncP4/msYPhW93MLb87eRiiBqaUvqOaHrHV8GAKfkwAZJ/9J96DKjwUm96FkngqrQluyXOnv26TeHVDb+PT+XIoTMd5o5lE/SY28/RV+tg0Au7fCgeREvri3BDUWUjBmNsD0h3GODBLn94yJxBRf5b1O1rQwrF87kDe6ujwABZdzMNrQ==
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com (2603:10b6:510:25c::13)
+ by DM4PR11MB6552.namprd11.prod.outlook.com (2603:10b6:8:8f::7) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8093.25; Mon, 28 Oct 2024 15:02:44 +0000
+Received: from PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739]) by PH8PR11MB7965.namprd11.prod.outlook.com
+ ([fe80::ad6c:cf56:3c3d:4739%6]) with mapi id 15.20.8093.024; Mon, 28 Oct 2024
+ 15:02:44 +0000
+From: <Ronnie.Kunin@microchip.com>
+To: <andrew@lunn.ch>, <Fabi.Benschuh@fau.de>
+CC: <Woojung.Huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-usb@vger.kernel.org>
+Subject: RE: [PATCH] Add LAN78XX OTP_ACCESS flag support
+Thread-Topic: [PATCH] Add LAN78XX OTP_ACCESS flag support
+Thread-Index: AQHbJzJ+R5s7yeWnsEOPGdRw8jsjK7KcHiGAgAAlo8A=
+Disposition-Notification-To: <Ronnie.Kunin@microchip.com>
+Date: Mon, 28 Oct 2024 15:02:44 +0000
+Message-ID:
+ <PH8PR11MB796575D608575FAA5233DBD4954A2@PH8PR11MB7965.namprd11.prod.outlook.com>
+References: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
+ <c4503364-78c7-4bd5-9a77-0d98ae1786bf@lunn.ch>
+In-Reply-To: <c4503364-78c7-4bd5-9a77-0d98ae1786bf@lunn.ch>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH8PR11MB7965:EE_|DM4PR11MB6552:EE_
+x-ms-office365-filtering-correlation-id: c5734949-e940-46a2-2cf4-08dcf76193de
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH8PR11MB7965.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info:
+ =?us-ascii?Q?6DWQFnOGCK7MJIlTPOz3V+ZDNkSYO+8tN5XzBVzcbeN/we5jFyAfnvAXZTs9?=
+ =?us-ascii?Q?MnMF4ZSNXqvBcdMfNhPplyO+sX1EWjbQH3FgIIj3osOflevTFieYDfLa+5XK?=
+ =?us-ascii?Q?sGsep1mw3i05r8JE4ft/lwKNHvjNEkqruoLgbi0GEsJCqipr/hhodckptqSN?=
+ =?us-ascii?Q?Yjf27f6sebldwkBslbWtVeJcx7jd6V5QIht+3W5yHDbMboPSNiJdBrEvO8MM?=
+ =?us-ascii?Q?vN5dnXRjSXszx7JPtwgcAyaIiIZFeaZmKAzLaDsVDNRtSJn8QcrdFB5lS+2f?=
+ =?us-ascii?Q?2rTnL3SG+2t2ZXkNoMWT9VtINDAOtSpF4W4+rz+v9WpWsfmLnu3TvPFSjUfF?=
+ =?us-ascii?Q?CaBf+krJf1VY2IEKlNGwpbzZCT0J7WxuKRYkjKB6znI9VAwFBr42AGAk/Qo2?=
+ =?us-ascii?Q?RXyrDsKAptJEDhdiOLWHiIaKOcBtrSnVz0LMFt3k+HyFrrql9ooTOShPuj4f?=
+ =?us-ascii?Q?C7c0j4BxRIpAvCIoY+gylWI2BsqpJp1XQKAmyxv1H6PPDwWk9bLCtWVU0Olv?=
+ =?us-ascii?Q?t3ZRh8xNewxkhDJe7gSyApRyTGMXvHXi6k4bqdwleCyKf1+9t1bfmRlKgIdn?=
+ =?us-ascii?Q?FM89LwdBLj3GXSz405fVFbbeqTH/7c2qNtOjmdXvjBPS0Cni1CqI+cCs1Pyx?=
+ =?us-ascii?Q?r9eJ9v59YVU+U1jw1+/g5/awBAIKwZyYLeC/4TAUo+u8QBLey2KWkS/ODhNX?=
+ =?us-ascii?Q?Zt9yF1VWvMX7oHwktfa1lFbwU0ZCvuyrNFYyc1Z+tfynztamVNgUo2gMBHoq?=
+ =?us-ascii?Q?QvBmksRUD3IMQiJ4kKNhhZR9jdvuNePG00R789P2x/Yhw29zFfhMr5t4hhg8?=
+ =?us-ascii?Q?l+M9LR8fhjkncMKlJs7YzVWDy/ejxaQtdS6myIcXMq2/s+l+KqcSjTR5kSGI?=
+ =?us-ascii?Q?B7jbaP4AIax4ghLsU8lffs9LixMHj5PNRooUbgLKq9Z1ocK/5Am5Io6/HXzs?=
+ =?us-ascii?Q?7rwmoQW3wg3GsPZa1a0YoWJrHWJiWHYFYPFfS9IAbTXXsxtyGKtwJYrUi/9u?=
+ =?us-ascii?Q?OB+qqg9mJ5Uv7BfUUqx27d20x2OfpoJq8GMnR4Z8Uv7erd6270bnT0qchPVa?=
+ =?us-ascii?Q?DKkEE7wJVtRH6HE7GoNagmFu+a1lPx/KTJHH72s4HClVjCnzpOk/LrhDHIoH?=
+ =?us-ascii?Q?3CuBviFZzWstxWghUFsXhjFvgGVLp2Rr+SNA4wBc3lR1mZ+qgSyRG2HN7M1B?=
+ =?us-ascii?Q?AgUn/efH89UBKJUP3L6BZ4IsNcidOhvhKVwEYdsOB3SXr5DKxEzk46MC4IUK?=
+ =?us-ascii?Q?1aD5F76e4tq0JLS7uFQljmklWp1GNylJKEnPve4ZBYvsCWJVra3qaXoFmgC9?=
+ =?us-ascii?Q?P77kRZJoJYMDW8/V18Cqikf2akYa4ZP+H446E+Akl0TEYLFTpY1jSv9nBkiQ?=
+ =?us-ascii?Q?UcgXjfE7a0LDYyucpOZR0wxtEqif?=
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?CrP6xclDGKix2MrmRNKLtX7kIg7L6qm4EzFvt1avNO84mGNkUacedt839h8G?=
+ =?us-ascii?Q?04cpGraqUrrIRjvh6Ilj7dpSMYMhD4X6FIndw3JBKdNN/klwr4Ic7AdSv13U?=
+ =?us-ascii?Q?mGvh40qg3q0NFiv5rgbUqi4ZqGTy+go43ck7dXvifowqz1LFz6xpNwwZJLHT?=
+ =?us-ascii?Q?WCnfbr3OE+jOdvpsYB/XlZZBXMNVgxB0jvurRy2Z9Skc0peOFNU+kdC3O24a?=
+ =?us-ascii?Q?LHo1DiwfFAYfkmL89fO+0Ti0oy+vj6xA/6dDaFRt+vcoVWFFrWP/ftmcsb1F?=
+ =?us-ascii?Q?zDe0Hae2ekCTJf/vRuf+pRM+dHHw5niVa05y5VtdCZj6DpdNtb4XHAylv17u?=
+ =?us-ascii?Q?4YR/gvsziQrzzRSTsxhuiFxZyocw9SeVdE2tJkgjlVXN2VZN0nJufVVA5s+g?=
+ =?us-ascii?Q?bn+fD70VNhpQI6Ctmn0BCiZXeSghPzWz1zbkBVsq5szUWNkwyHb+HracuVAm?=
+ =?us-ascii?Q?PY5arXAoknEXQujG329IFjvCxXrQux/x7aPAgpmk0o2hvlcWriPz+2d5u5fU?=
+ =?us-ascii?Q?Vk1B1xvXDvQs1/e5n0PZh8RRXNtsm91xMbPaVrvhiYduZgm1gMs2GTZ8d7mL?=
+ =?us-ascii?Q?GLTVDplTKzQcNGKMRkZYPMF/9YMIC6v7Np3MBRpVnebsguXSRYDF4ckVHtgo?=
+ =?us-ascii?Q?XUtl9htAWTsZ/WfJ0nL7EZF9yexidw6QRG9c/Nrgwuqrmfa849P/ctFattbX?=
+ =?us-ascii?Q?tRjbtpMHHw2lh3R7BD6Yo9K6epB9l+RXnB6EApASDnQyMozjSmWTPvo/Ns++?=
+ =?us-ascii?Q?ycbSjKGG+eRUp4z03JBjZvtnr1Sr5T2SKVWBD/ydQMRUuL1Qr0a3EvoLGLcK?=
+ =?us-ascii?Q?aLqIZ5LYzYJ65BAVVtBJRmARGQ94qEdhro5s3xZfbB1cl6uhvShBNcvqGlh/?=
+ =?us-ascii?Q?zZugXMTZC3qUgjOZi4SQRAYcwBXf4krH3c9WDYz1fxu1UHKQaQiq5zpVfhY5?=
+ =?us-ascii?Q?KdpgIazMkVamgR4jlhwxBqqP39qo76LZcsi/xE17emt6+pQ+g+UAoKuzBlYK?=
+ =?us-ascii?Q?/KlO1USqAfrkJJ/wdSvJg/fp/e6W1T6H5B6U5VkS0W74UVkQy2kO0k8J///s?=
+ =?us-ascii?Q?WwHyUvQvz1b5kiCa3LzNeYFIsdcHwZ7SOObb1Gn1u1jaVId55q/mF9Lg656t?=
+ =?us-ascii?Q?dulHAY1ocJOPid/u5VWQKzdJMboOOoBgjAZ754aFX7IreenVdNm3rvArgz/h?=
+ =?us-ascii?Q?DK+UlehrrSCWwzn2GMIHK++0baneDZXfH/wq2BQpwOJzBIDnT/HNgn9NQKFd?=
+ =?us-ascii?Q?jh4L+Ao9JC450w92gdpBA5UqPmJlck0aFKnBLlNCi/nNoETFWs4ULgvm8Ym3?=
+ =?us-ascii?Q?vWk7lihW5p1lRZ2cQBypYwTOZ5UDRirw5zha3rVA7pIDaDfgEcObQINr77Pd?=
+ =?us-ascii?Q?pYhMnq7Vd2hnrbeTL1rTcJcxYJwvq7AIOk8WaRJBYQOhqLKZB+wwSSTdPtof?=
+ =?us-ascii?Q?xYWm/zPCcTWq9iK1vHt59XZS1CwArJwQNn1PtkQU/H/Ts+hXkpH44t4YjYiz?=
+ =?us-ascii?Q?4VstSOJ6Vc3Re04H1SFf4MmDtWimfRUa/aVP6ntnfBkom+fCoQJ0NERm/81d?=
+ =?us-ascii?Q?gUn0hRP7TD1oNhfXMCe02JBLnn/Zq5VFcFf45Z5o?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-OriginalArrivalTime: 28 Oct 2024 14:59:21.0649 (UTC) FILETIME=[F886B210:01DB2949]
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM4PEPF00025F96:EE_|DU4PR06MB9681:EE_
-Content-Type: text/plain
-X-MS-Office365-Filtering-Correlation-Id: d754728f-0599-4490-e223-08dcf7611b26
-X-SET-LOWER-SCL-SCANNER: YES
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026|921020;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?1EXpAB1Fn33xi2Rp797xr0rsFHE+ehhDVIAkp6/BDJCxz2ep7RILENKIbdYU?=
- =?us-ascii?Q?eNp/XLvyPeASBKznpqosHJtLeFXscWQaDCk2Ge1mf4HhcazBfTySLT4h0UF6?=
- =?us-ascii?Q?1sN3XENRmARTR2nY3a/3EVpxod5JbO5YDOU9zbooiDTtY27UqTgehWlynk0z?=
- =?us-ascii?Q?WOR51B+7kKwxzddx8RW9wPHz8rfidZRg4BAVczW6u5jMFZP5MWWO4Ly2UUJt?=
- =?us-ascii?Q?5nAv1YS13ZWHo/oM1rCGNBOtruzSZoZw+e59GWfJONbHB8e5aB4oPIDXinb3?=
- =?us-ascii?Q?8rgSm4JfadX2vt32nvuNFTWfT+CoF+xukl6zvDoeLkhha4NeggRuNPWd+/I4?=
- =?us-ascii?Q?2f4YGGXB1z5+zwLZp1tcxLOXdkQPc58v7hf/QauymdI2qNbRGTz4Ll6xFc9d?=
- =?us-ascii?Q?IneQ19UDzWOuTYM9hlh/7KbOr0NmGHwCJ2nZ8HS3hRjyhXvkNYGfAiYZTYrQ?=
- =?us-ascii?Q?M6I04Eqa22pxQCHehQPf7bjc+voZm2c2724jTufnv/+fvqOpEpDGZvcaIAJ3?=
- =?us-ascii?Q?0cPDY/TW1Foz7QMuSMs1qvyTCH8/axYgnUA6dOyxthe0oHXfijqdv/CQ+55l?=
- =?us-ascii?Q?Kbqum3Bgv3FOk9pK5jC3jlDR9s4yrN7RrA93uaAZHOvmSAuU1893osCzVd7J?=
- =?us-ascii?Q?Fa0kNL7/1IdQi6x02TImcgzhIM3qskVe1ky1W5T34+84Bky718awGIHSczTT?=
- =?us-ascii?Q?FQK5EaVXt+QiH9/m0/N2qY/7+KcvNmhNxmfGUHzSQLto5PxKm326PAzosGhR?=
- =?us-ascii?Q?DPRkkQ28fB4Vqu/azitzO9CknZjvjXecrUvAa5pnuW2+qdIjyASfFwqfkPTa?=
- =?us-ascii?Q?ey633VQOQ1GMEKu5ujouSFyUY9q0cETU+EW5KTmfhYbLpus8iGv6QM/vD9NX?=
- =?us-ascii?Q?Twvj/YGQe5eMWL9pchHDZ5bJXOOZKbGQfkqTw4QYRsT/lSTXfvBEwUkz16OA?=
- =?us-ascii?Q?K80Mm4f9GbZNJmu7oz744MccfHb61VMUkenFusHCCFJPCi0fLey4et3ocelP?=
- =?us-ascii?Q?Dzu6C3+a5+BrSWRrEu14tent9YJJMsEz7zWtjHkwdtGRSPOvcxIiDiKhnlJl?=
- =?us-ascii?Q?kCX/Ep/nQPw8Il20w0ZQF1D6q84Ki9nLt2HMaiJ6wO3qhrZ9fF+Nu+uC5C4G?=
- =?us-ascii?Q?b3ey1PNHD78F3rbPccih3EZGnboZLm5BUtvnCHyq26U7zgjAuSc7qj/xUQAV?=
- =?us-ascii?Q?+PZ09+wqUikeaS7+FIQ82WkrY7G5Cs+sDGsOkuZTE/104H4HQkCqNkGB3vMj?=
- =?us-ascii?Q?cKsWkRFyOP3JZO0KfMDuApw4iQXQ65RpUzk/2OeVdo+dfcXCC5dYTv6Z5jQI?=
- =?us-ascii?Q?BZ5sNvdU+1DEbuMgwYzg/FddGCKhrxLSqqZlXLA6wo0MovmGwVT7AODPe2dG?=
- =?us-ascii?Q?3b7/U9HUu32ZfR92M1vX90YRtjUAb4Pic+kVKQcRKUX/irFPEyU57pDl2obT?=
- =?us-ascii?Q?0iBcaI7SocQ=3D?=
-X-Forefront-Antispam-Report:
-	CIP:193.8.40.94;CTRY:CH;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:hexagon.com;PTR:ahersrvdom50.leica-geosystems.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026)(921020);DIR:OUT;SFP:1101;
-X-OriginatorOrg: leica-geosystems.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2024 14:59:21.8408
+X-OriginatorOrg: microchip.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH8PR11MB7965.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5734949-e940-46a2-2cf4-08dcf76193de
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Oct 2024 15:02:44.4266
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: d754728f-0599-4490-e223-08dcf7611b26
-X-MS-Exchange-CrossTenant-Id: 1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=1b16ab3e-b8f6-4fe3-9f3e-2db7fe549f6a;Ip=[193.8.40.94];Helo=[hexagon.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	AM4PEPF00025F96.EURPRD83.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU4PR06MB9681
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: s77GhSU1Olx/R4DsAhWKetvYR7SmPbL0WaUD2HODOriv/RsfPvDOut+ThNMKpNDNT1PkAB9tRxovItWhEc7bKHddLI4X1v8AgRPhxCkObdw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB6552
 
-The ahb reset is deasserted in probe before first register access, while the
-stmmacheth-ocp reset needs to be asserted every time before changing the phy
-mode in Arria10[1].
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Monday, October 28, 2024 8:38 AM
+>=20
+> On Sat, Oct 26, 2024 at 01:05:46AM +0200, Fabian Benschuh wrote:
+> > With this flag we can now use ethtool to access the OTP:
+> > ethtool --set-priv-flags eth0 OTP_ACCESS on ethtool -e eth0  # this
+> > will read OTP if OTP_ACCESS is on, else EEPROM
+> >
+> > When writing to OTP we need to set OTP_ACCESS on and write with the
+> > correct magic 0x7873 for OTP
+>=20
+> Please can you tell us more about OTP vs EEPROM? Is the OTP internal whil=
+e the EEPROM is external?
+> What is contained in each? How does the device decide which to use when i=
+t finds it has both?
+>=20
+>         Andrew
 
-Changed in Upstream to "ahb"(331085a423b  arm64: dts: socfpga: change the
-reset-name of "stmmaceth-ocp" to "ahb" ).This change was intended for arm64
-socfpga and it is not applicable to Arria10.
+This is pretty much the same implementation that is already in place for th=
+e Linux driver of the LAN743x PCIe device.
 
-Further with STMMAC-SELFTEST Driver enabled, ethtool test also FAILS.
-$ ethtool -t eth0
-[  322.946709] socfpga-dwmac ff800000.ethernet eth0: entered promiscuous mode
-[  323.374558] socfpga-dwmac ff800000.ethernet eth0: left promiscuous mode
-The test result is FAIL
-The test extra info:
- 1. MAC Loopback                 0
- 2. PHY Loopback                 -110
- 3. MMC Counters                 -110
- 4. EEE                          -95
- 5. Hash Filter MC               0
- 6. Perfect Filter UC            -110
- 7. MC Filter                    -110
- 8. UC Filter                    0
- 9. Flow Control                 -110
-10. RSS                          -95
-11. VLAN Filtering               -95
-12. VLAN Filtering (perf)        -95
-13. Double VLAN Filter           -95
-14. Double VLAN Filter (perf)    -95
-15. Flexible RX Parser           -95
-16. SA Insertion (desc)          -95
-17. SA Replacement (desc)        -95
-18. SA Insertion (reg)           -95
-19. SA Replacement (reg)         -95
-20. VLAN TX Insertion            -95
-21. SVLAN TX Insertion           -95
-22. L3 DA Filtering              -95
-23. L3 SA Filtering              -95
-24. L4 DA TCP Filtering          -95
-25. L4 SA TCP Filtering          -95
-26. L4 DA UDP Filtering          -95
-27. L4 SA UDP Filtering          -95
-28. ARP Offload                  -95
-29. Jumbo Frame                  -110
-30. Multichannel Jumbo           -95
-31. Split Header                 -95
-32. TBS (ETF Scheduler)          -95
+OTP (one time programmable) is a configuration memory internal to the devic=
+e. EEPROM is external.
+The internal OTP memory always exists but it may not be programmed. The EEP=
+ROM is optional, and if present can also be programmed or not.
+A signature byte at offset 0 indicates whether the OTP or EEPROM device is =
+programmed.=20
+If present, EEPROM has higher priority.
+More info @ Chapter 10 here;
+https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocum=
+ents/DataSheets/LAN7800-Data-Sheet-DS00001992H.pdf
 
-[  324.881327] socfpga-dwmac ff800000.ethernet eth0: Link is Down
-[  327.995360] socfpga-dwmac ff800000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
+> I'm just wondering if we even need a private flag, if the hardware will u=
+se one or the other exclusively?
+>
+Yes, both can be present/used, so we need the flag so we can tell the desti=
+nation of a write or source of a read.
 
-Link:[1] https://www.intel.com/content/www/us/en/docs/programmable/683711/21-2/functional-description-of-the-emac.html
-Fixes: 331085a423b ("arm64: dts: socfpga: change the reset-name of "stmmaceth-ocp" to "ahb")
-Signed-off-by: Mamta Shukla <mamta.shukla@leica-geosystems.com>
-Tested-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
----
-Changes in v2:
-- Fix subject prefix
-- Reword commit message.
-
- arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-index f36063c57c7f..72c55e5187ca 100644
---- a/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-+++ b/arch/arm/boot/dts/intel/socfpga/socfpga_arria10.dtsi
-@@ -440,7 +440,7 @@ gmac0: ethernet@ff800000 {
- 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
- 			clock-names = "stmmaceth", "ptp_ref";
- 			resets = <&rst EMAC0_RESET>, <&rst EMAC0_OCP_RESET>;
--			reset-names = "stmmaceth", "ahb";
-+			reset-names = "stmmaceth", "stmmaceth-ocp";
- 			snps,axi-config = <&socfpga_axi_setup>;
- 			status = "disabled";
- 		};
-@@ -460,7 +460,7 @@ gmac1: ethernet@ff802000 {
- 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
- 			clock-names = "stmmaceth", "ptp_ref";
- 			resets = <&rst EMAC1_RESET>, <&rst EMAC1_OCP_RESET>;
--			reset-names = "stmmaceth", "ahb";
-+			reset-names = "stmmaceth", "stmmaceth-ocp";
- 			snps,axi-config = <&socfpga_axi_setup>;
- 			status = "disabled";
- 		};
-@@ -480,7 +480,7 @@ gmac2: ethernet@ff804000 {
- 			clocks = <&l4_mp_clk>, <&peri_emac_ptp_clk>;
- 			clock-names = "stmmaceth", "ptp_ref";
- 			resets = <&rst EMAC2_RESET>, <&rst EMAC2_OCP_RESET>;
--			reset-names = "stmmaceth", "ahb";
-+			reset-names = "stmmaceth", "stmmaceth-ocp";
- 			snps,axi-config = <&socfpga_axi_setup>;
- 			status = "disabled";
- 		};
--- 
-2.25.1
+Ronnie
 
