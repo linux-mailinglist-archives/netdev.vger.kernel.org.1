@@ -1,180 +1,388 @@
-Return-Path: <netdev+bounces-139524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAF129B2F44
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:51:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DEAE89B2F79
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 13:00:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F59A1F211F9
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:51:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C57E282279
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6541F1D0E38;
-	Mon, 28 Oct 2024 11:51:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="H0/5+iD1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2BF51D79BB;
+	Mon, 28 Oct 2024 12:00:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2067.outbound.protection.outlook.com [40.107.22.67])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA6F1D3648;
-	Mon, 28 Oct 2024 11:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.67
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730116278; cv=fail; b=mjcSgjFC+iWxP8ChHjT7t0ZF6igIJZ7q6oryLaS8xaqw8Uugq3SdzT3O/W2Njp9nTONBooi+RHbbIv8mWpqYAlwh+Jup+4/7Tom0m/6tUDb+pebAIi8C5H1Ax4aZt/AJFaONQORT1KdUVxgMZvmovSBk1X3+oC5v9CNC3m2buD4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730116278; c=relaxed/simple;
-	bh=B4lqmFvewEe0COhxHk1Sg5C4GiH9Ge0lSnejzwkMlhA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=LvZ7rk+tc96dBH19Uro3QWCDL1roXikoLv4W2uZ8TnUTwjb92J1ZhYtvUjRLogMKGoqTt7kgYIrABYrc9Oc6TCP6U9mSXE2xGWHS1iA8S0IG9AVQLrWW/pFGb4IutbCm95gFiSEhoC28uqqSTFTdyDuR4Zr3AIA6dOcpRlJJdjw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=H0/5+iD1; arc=fail smtp.client-ip=40.107.22.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=WLjO4v5e1VoWVNXEqyTIhLozw3JC+UuNZLUXtaA8D+rwaBf9TVg5f9gT7R6A0iDLRiHtUAI2NyQ7pNvUmTy8XhhbqPyEhyyj2Zo09KS0gZye2xMfKlmyA963yE9na3KpBOZRqeh5Yr20vPBiOH4C3qhoJRTXJx3wO9IYlfykDAE0afmDofxreBYNShI+46nWHg8qo2O2KJhe6ek0eaztJrp9TJ9aJUe9niUl7wSjYr4QH5/F1YzhynK+SiX9CG9RXYAD0WWwfq1SID1Q7S/If9IWudT+JConidlllAQrdqyoo6PXV36V8EfvMudOWszxee3Wkqk6xfYbkUtEgI2fPA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RwhaiktcemK24ZksOWKKCOz2aM1eU1UhFxIt4l3dijE=;
- b=Ut75/SdlUYW0FrUm1xOKPfk6ltubjj0lF487ikdk9LDsaMjUgYlWgoJxQ3lVW1htZqRF+8E29YqMT4+5L2xl/AHxT8b3cbukOyJHWjfvTJT4EHKpnGSvTzU3Hfizy09B1pkNdsphMhVcJMdAlBFP/cP2dwOcTrQaY+kDYPtAG83FXSooAEVwVkwlkgcbqzAtWCnHPaF7B67zurebiHxsUAN2739P5kDZVVa2Y8iJSNioPR/zTdY9qMUGQ/HdenfmDMi1uwmcPURQItdoclNFY3rVvDWUUv0hEpqF4ew/ElByN4k+o38KSLImGm8XYBJJwo0hhE5w4vUHN7v5ibPtmw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RwhaiktcemK24ZksOWKKCOz2aM1eU1UhFxIt4l3dijE=;
- b=H0/5+iD1MyzQD/yX1wUpZOqJXgi0cnly53wqDfEJ0/tphRISp1rNg1xZN3jXOxRN4a1gkIE4UE4GqjjYE2RL9SbAt+/ePOXX6ibBObek0JCoDfWvYNPqfdfyAhIsej6npgfRqTQfxZTH+XKt8+lTIzQzQpSar742YhIAlUhV8/f0Vud4SJKf56+uPz/qrnbnr8PkvQmx5+b3GRjUQOPKhhthgL97jMr9RzLlSTf9yGlBa+csp371e7F/rhE07+ziabGvGxrTEhoG3IOPPsmzqXI0FoZz3vr4w/XmexsVwCGlpQKN4kUxiomlwcN6PZhHWkRaefsyxX1sTIJbvM2sCg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by DBAPR04MB7238.eurprd04.prod.outlook.com (2603:10a6:10:1aa::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.25; Mon, 28 Oct
- 2024 11:51:12 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.024; Mon, 28 Oct 2024
- 11:51:12 +0000
-Date: Mon, 28 Oct 2024 13:51:08 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, andrew+netdev@lunn.ch, claudiu.manoil@nxp.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: Re: [PATCH net] net: enetc: set MAC address to the VF net_device
-Message-ID: <20241028115108.b4wzjsdxketvfehl@skbuf>
-References: <20241028085242.710250-1-wei.fang@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241028085242.710250-1-wei.fang@nxp.com>
-X-ClientProxiedBy: VI1PR07CA0222.eurprd07.prod.outlook.com
- (2603:10a6:802:58::25) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29E21D6DA9;
+	Mon, 28 Oct 2024 12:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730116809; cv=none; b=qC0RZtERs+irZY0xXhOKBOlpHRkZTa7h+/dNXjE+0hv0eW0AYz26rYYcnIfdFMdN3EQlK2EtpAeRaHgIU5Yw1D6M4axWf4ssItde/JWyRSmEj5IJA4wJ/5/RETSDyNnKkRf/XeoO5tGbl9xzgrDBXYAfmOd5gC91bB+zDDjwnPs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730116809; c=relaxed/simple;
+	bh=Px8Y4/ZVcRnQtp3gfqFbDAiVHWZOMgND4tUTdZ8wmaE=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=GpumIbSruHIWseB70Xhr53KVNt/oOtkuJVpMoDpcALaNPdKVc32fV67VaOtaiaO9bRT4dDEfks+bLHBqcCLankysu5KnLeo8axSuWccw67UD144jpIfWSNz2IDnr2+mcnkG+7tCR6+J0jIlMGgGZRxIfTbtJEPPXA+SOzCermXA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XcX2S2sNdz10P7R;
+	Mon, 28 Oct 2024 19:57:52 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id EBD89180064;
+	Mon, 28 Oct 2024 20:00:00 +0800 (CST)
+Received: from localhost.localdomain (10.90.30.45) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Mon, 28 Oct 2024 20:00:00 +0800
+From: Yunsheng Lin <linyunsheng@huawei.com>
+To: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexander.duyck@gmail.com>, Shuah
+ Khan <skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>,
+	Linux-MM <linux-mm@kvack.org>
+Subject: [PATCH net-next v23 0/7] Replace page_frag with page_frag_cache (Part-1)
+Date: Mon, 28 Oct 2024 19:53:35 +0800
+Message-ID: <20241028115343.3405838-1-linyunsheng@huawei.com>
+X-Mailer: git-send-email 2.30.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DBAPR04MB7238:EE_
-X-MS-Office365-Filtering-Correlation-Id: 22c71427-988e-47fe-c56a-08dcf746d211
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?YPT5iKmV2y6Ur8LCuG7zZBC/xKS446g7jvNtlOAxLAze+AOg4yg3gzbhfqDV?=
- =?us-ascii?Q?bzTq/HtYdxYp/9ifS2UwXjSUx4OqoVi4UdZ1U+I84KgYOYmxdPB+c4l0ojja?=
- =?us-ascii?Q?wSV63BP+JAM5K2xpNUp16Wu3GOrgpsR1xLYR0ZxXBt7UoxYJh4sP28HV2Pw+?=
- =?us-ascii?Q?Xg+mSCupqo87c8kMjpzkb+5khdl5gzoFOi8atPerIP/9Q+sOOFHN0CYPdLFq?=
- =?us-ascii?Q?Ju+73J30HTavyw3dyhKDYU9jFDRFQuFVMZM7szR/VGOCCCLeQ92D3sD7rByx?=
- =?us-ascii?Q?GXtmrQmbR5FmHM35UyJob8Eqh9ehr0xYnOE9hN+VSBAQplB5EliC7RSqbv3h?=
- =?us-ascii?Q?wo8G075tg+WXC7V8r5b42Nu4YtVqvrYhFuqG3wC1ks7utDbK5aV3cF3wxBJb?=
- =?us-ascii?Q?s094orphpTjEjMq6ZIrUhQgJnQjc2VgCQg8V1XLILKgtRo17wDOvOTV28Xvo?=
- =?us-ascii?Q?XphCkDgLY5ux36yId8e8wZIlKz7DJFey9xZY6YVKPeXc/auuxTbb4fduSbZx?=
- =?us-ascii?Q?FJ5s1BxNAHqZ6jGPVL7Vyuims7i0gC322T50GmBj+IQi+Z1i3pCpj2ZprkPD?=
- =?us-ascii?Q?l6qQyKWGvuNxg63yhkKZ7IicUMb10yRt7G59FDvSPaeMt8t4Fv0IhrRvG8wB?=
- =?us-ascii?Q?egcmF6MmwpxEn0V/7v6SCXyQIUpjKP/SEjALwrz4WvVskmCdvIzvUtEFmjms?=
- =?us-ascii?Q?TtPH+JNrdXjRIwwaNlJrxo2tad1mKI8iS8eXz8gbMCZ+ERqtTgEMITEGeOVD?=
- =?us-ascii?Q?b/1fDhF0M5YVV+CdwClatSQVE4JV5XTxaVB74AbjxlakgOJd5p2EDN3IeQ4a?=
- =?us-ascii?Q?9vVL9BgitPh/Mw/PXTsCl78D0AYPIqMxxFjLuEuP393XEZg3ovznc1Xdv75U?=
- =?us-ascii?Q?OUYAKvFXGaHPnP4YEFuayP6EOlSViDZ82nblshIoNe1EFAKru/NVxV5BfyAw?=
- =?us-ascii?Q?a+T0fmbBJ4/LlO1uQGfvC/WqQEDUJ55iunPoClJJUvadx7z+56/myUEmMoB4?=
- =?us-ascii?Q?bIKJCV8OXs7Ph6s/Fu8Wj8m2nRY0Z+POhUFdIlbrTFOuCP8ujTteBVtc0/F+?=
- =?us-ascii?Q?BTS2Tf6EUCFCtA8xccrOh+K24gwqyUExzOKHWy0J617qSW8HrLl67REmfmQn?=
- =?us-ascii?Q?fPkUlC2BfZeFp2i4L/i0YDytYDKm8VfZZzDKb6gClqMksAcWZ77pdw0F93my?=
- =?us-ascii?Q?anUYhhqUJAFvRl/ec0hZdCZ8HX36ppQ5OK3zkd5khjSphPgrjhM/yeLTOgZK?=
- =?us-ascii?Q?ch60sKJKpd6oOTuqotGyU9+mVBYIxrAKk1u0kt6qCRz84N4smXRCHS30pDa4?=
- =?us-ascii?Q?9jHStVgoXnSeRXCKMADDVBNP?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rBHsoKOeU25nGHqxzMHORyjWQT0vaJ+AgiBBwXRBOHOoZHPHaMuiJczMGXFC?=
- =?us-ascii?Q?ptj7J+AAWQVavv5Le3e4xsjxbvPSQcdQVMz9emuDuaK0Krzt+ZmWmSloWrZW?=
- =?us-ascii?Q?qRm2LXp8cSpfHmZUcT/ThObtBQlf6OIFf3A8ifSQ+PtBzLa6taFQQlA23Dkc?=
- =?us-ascii?Q?yD54QKarb0vgFhtfTgioxzsAo0VmBSLv2wHdAMrn6V0yBtkty9LHeDF80FUy?=
- =?us-ascii?Q?2x1AmqUzOry6q/wYsFQ9KO4UxGcuFb81ZMWx3epCHyGroQE1GEk3Wuxb6XoZ?=
- =?us-ascii?Q?gjkzd7Ab9cCKHmtWvaZTF7PmN5HdWXEezet1NG8d0kZ7ruvg1XF7Jk3uL4dM?=
- =?us-ascii?Q?OCs0FCRWe8xHFPzpjRRgMetwEQ6o3DP/SfNPV57/DVz86A1QY345XB0zA5T1?=
- =?us-ascii?Q?SSCqY7pV+Tw7sTHkoca3/sT5rvVtdkeF4fENGyp8uZ8RUgKVQ25EFpK45Fom?=
- =?us-ascii?Q?RjGcehDiYRI7ACW9w10W6yIg9/2wK+QMTOPej2fcEc/x5dVpgHcNGcrlWWfA?=
- =?us-ascii?Q?PAQaRilTH+bGUJUEqdpC7565yC3wy4Zbgh0xWMFLiidFtEtd3TH9xa/rd37I?=
- =?us-ascii?Q?SySVfP/dKCmPCXyP/LDDiDMIhPy7aHLNoUkkOEPU1gv/14W2Ga6MuYDBBTGg?=
- =?us-ascii?Q?giVpWduxKRkTyLG1RhWanHytV8rNszDHPHiH2h5f2P48oXIVF7f67fG5EkEr?=
- =?us-ascii?Q?WRWwQK/DajCYqvyk+KX3XBngwYmOo1p1MO9OVJ0QD3sM0T7XMaMWgYFs6+sP?=
- =?us-ascii?Q?nshtGfR3fji0NuRFOip+eN7mRwH/Q06bjL4n4V8X+NTvqhnZece8h3qRXk/U?=
- =?us-ascii?Q?2smlcc/VmiVife4S0qV8A4vB+npvyMUX363XLRw5pel27r41CJf3QJDEvzkn?=
- =?us-ascii?Q?XV5ANplk2eXTqldQk2u0xjvtjikxX2XQJT97NJRQmWYnQU/Ltjl0CS6WkZy8?=
- =?us-ascii?Q?Bjv3Wc+9wZOJZK4yYb5NgX63oMty5wf0TvJyVXLCDGDh/MdxgLBIouEhywXe?=
- =?us-ascii?Q?/psRe/+v3F90+Zx2Pr6AnEhnq93VrCoKiFDKi1K+IYJ8zxnhXSju3XlcWj5y?=
- =?us-ascii?Q?SgpQ7u4zQg6yMU1ClXVuhTP2iv26RsXGLwfVNZe8SUBSWbXKL777yUs3TApS?=
- =?us-ascii?Q?2bvw7NtF0w3qtMZaj2JVoYdhgMPpACBvMC0cr6SddtlnLn3fwfzl5Bg9Fq47?=
- =?us-ascii?Q?HSHd+MvY7bvMVcZlIo1TPvgeB9yjV9XgHdoaJLGpGhTdOxLrEXJRWRGk93AG?=
- =?us-ascii?Q?HxTdfr/4ptZf+t0KDpS7nMmyQtQUKm1lofEPh7Y9lpFmMmDogtZIk6iN9mIW?=
- =?us-ascii?Q?RXb5RdJaygKOFWT/QZ6+KSvQpibk4xfIPrQdY4NWjmKpILhro/cptTPLLKb2?=
- =?us-ascii?Q?iOtToPgnvNjHe23qjHfvZM3vB+zHyhkOcaPd/JhXoGkd7bQHqcC7MCFEquw/?=
- =?us-ascii?Q?VyA7cNKwgNz/fVncFt0lCd83QfJlgIcCs0jFfbhcT15fGBCfv5dEC7M+wsRo?=
- =?us-ascii?Q?4u5vxONX1904MRHuhzDgn5Qqs/AoVvk8lu4qH0hhy2UC1OFr6uodcde8rsAW?=
- =?us-ascii?Q?lhT2BicpLwhb0wPWCa/i8Zz+7BWsxzlfGA0A6Cf5ocas7L8DXYRosE2S59tv?=
- =?us-ascii?Q?CA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 22c71427-988e-47fe-c56a-08dcf746d211
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Oct 2024 11:51:12.5677
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3TlbDr8/rox4dNeMxh2dRYsEARnAsQVKIBDSlntC7o1CtUXXlg24bVii3V4EwmGZNYzIE0cxXC2DbszIDEU6EA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBAPR04MB7238
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-On Mon, Oct 28, 2024 at 04:52:42PM +0800, Wei Fang wrote:
-> The MAC address of VF can be configured through the mailbox mechanism of
-> ENETC, but the previous implementation forgot to set the MAC address in
-> net_device, resulting in the SMAC of the sent frames still being the old
-> MAC address. Since the MAC address in the hardware has been changed, Rx
-> cannot receive frames with the DMAC address as the new MAC address. The
-> most obvious phenomenon is that after changing the MAC address, we can
-> see that the MAC address of eno0vf0 has not changed through the "ifconfig
-> eno0vf0" commandand the IP address cannot be obtained .
-> 
-> root@ls1028ardb:~# ifconfig eno0vf0 down
-> root@ls1028ardb:~# ifconfig eno0vf0 hw ether 00:04:9f:3a:4d:56 up
-> root@ls1028ardb:~# ifconfig eno0vf0
-> eno0vf0: flags=4163<UP,BROADCAST,RUNNING,MULTICAST>  mtu 1500
->         ether 66:36:2c:3b:87:76  txqueuelen 1000  (Ethernet)
->         RX packets 794  bytes 69239 (69.2 KB)
->         RX errors 0  dropped 0  overruns 0  frame 0
->         TX packets 11  bytes 2226 (2.2 KB)
->         TX errors 0  dropped 0 overruns 0  carrier 0  collisions 0
-> 
-> Fixes: beb74ac878c8 ("enetc: Add vf to pf messaging support")
-> Signed-off-by: Wei Fang <wei.fang@nxp.com>
-> ---
+This is part 1 of "Replace page_frag with page_frag_cache",
+which mainly contain refactoring and optimization for the
+implementation of page_frag API before the replacing.
 
-Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+As the discussion in [1], it would be better to target net-next
+tree to get more testing as all the callers page_frag API are
+in networking, and the chance of conflicting with MM tree seems
+low as implementation of page_frag API seems quite self-contained.
+
+After [2], there are still two implementations for page frag:
+
+1. mm/page_alloc.c: net stack seems to be using it in the
+   rx part with 'struct page_frag_cache' and the main API
+   being page_frag_alloc_align().
+2. net/core/sock.c: net stack seems to be using it in the
+   tx part with 'struct page_frag' and the main API being
+   skb_page_frag_refill().
+
+This patchset tries to unfiy the page frag implementation
+by replacing page_frag with page_frag_cache for sk_page_frag()
+first. net_high_order_alloc_disable_key for the implementation
+in net/core/sock.c doesn't seems matter that much now as pcp
+is also supported for high-order pages:
+commit 44042b449872 ("mm/page_alloc: allow high-order pages to
+be stored on the per-cpu lists")
+
+As the related change is mostly related to networking, so
+targeting the net-next. And will try to replace the rest
+of page_frag in the follow patchset.
+
+After this patchset:
+1. Unify the page frag implementation by taking the best out of
+   two the existing implementations: we are able to save some space
+   for the 'page_frag_cache' API user, and avoid 'get_page()' for
+   the old 'page_frag' API user.
+2. Future bugfix and performance can be done in one place, hence
+   improving maintainability of page_frag's implementation.
+
+Kernel Image changing:
+    Linux Kernel   total |      text      data        bss
+    ------------------------------------------------------
+    after     45250307 |   27274279   17209996     766032
+    before    45254134 |   27278118   17209984     766032
+    delta        -3827 |      -3839        +12         +0
+
+Performance validation:
+1. Using micro-benchmark ko added in patch 1 to test aligned and
+   non-aligned API performance impact for the existing users, there
+   is no notiable performance degradation. Instead we seems to have
+   some major performance boot for both aligned and non-aligned API
+   after switching to ptr_ring for testing, respectively about 200%
+   and 10% improvement in arm64 server as below.
+
+2. Use the below netcat test case, we also have some minor
+   performance boot for replacing 'page_frag' with 'page_frag_cache'
+   after this patchset.
+   server: taskset -c 32 nc -l -k 1234 > /dev/null
+   client: perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
+
+In order to avoid performance noise as much as possible, the testing
+is done in system without any other load and have enough iterations to
+prove the data is stable enough, complete log for testing is below:
+
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000
+perf stat -r 200 -- insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1
+taskset -c 32 nc -l -k 1234 > /dev/null
+perf stat -r 200 -- taskset -c 0 head -c 20G /dev/zero | taskset -c 1 nc 127.0.0.1 1234
+
+*After* this patchset:
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000' (200 runs):
+
+         17.758393      task-clock (msec)         #    0.004 CPUs utilized            ( +-  0.51% )
+                 5      context-switches          #    0.293 K/sec                    ( +-  0.65% )
+                 0      cpu-migrations            #    0.008 K/sec                    ( +- 17.21% )
+                74      page-faults               #    0.004 M/sec                    ( +-  0.12% )
+          46128650      cycles                    #    2.598 GHz                      ( +-  0.51% )
+          60810511      instructions              #    1.32  insn per cycle           ( +-  0.04% )
+          14764914      branches                  #  831.433 M/sec                    ( +-  0.04% )
+             19281      branch-misses             #    0.13% of all branches          ( +-  0.13% )
+
+       4.240273854 seconds time elapsed                                          ( +-  0.13% )
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1' (200 runs):
+
+         17.348690      task-clock (msec)         #    0.019 CPUs utilized            ( +-  0.66% )
+                 5      context-switches          #    0.310 K/sec                    ( +-  0.84% )
+                 0      cpu-migrations            #    0.009 K/sec                    ( +- 16.55% )
+                74      page-faults               #    0.004 M/sec                    ( +-  0.11% )
+          45065287      cycles                    #    2.598 GHz                      ( +-  0.66% )
+          60755389      instructions              #    1.35  insn per cycle           ( +-  0.05% )
+          14747865      branches                  #  850.085 M/sec                    ( +-  0.05% )
+             19272      branch-misses             #    0.13% of all branches          ( +-  0.13% )
+
+       0.935251375 seconds time elapsed                                          ( +-  0.07% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      16626.042731      task-clock (msec)         #    0.607 CPUs utilized            ( +-  0.03% )
+           3291020      context-switches          #    0.198 M/sec                    ( +-  0.05% )
+                 1      cpu-migrations            #    0.000 K/sec                    ( +-  0.50% )
+                85      page-faults               #    0.005 K/sec                    ( +-  0.16% )
+       30581044838      cycles                    #    1.839 GHz                      ( +-  0.05% )
+       34962744631      instructions              #    1.14  insn per cycle           ( +-  0.01% )
+        6483883671      branches                  #  389.984 M/sec                    ( +-  0.02% )
+          99624551      branch-misses             #    1.54% of all branches          ( +-  0.17% )
+
+      27.370305077 seconds time elapsed                                          ( +-  0.01% )
+
+
+*Before* this patchset:
+
+Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000' (200 runs):
+
+         21.587934      task-clock (msec)         #    0.005 CPUs utilized            ( +-  0.72% )
+                 6      context-switches          #    0.281 K/sec                    ( +-  0.28% )
+                 1      cpu-migrations            #    0.047 K/sec                    ( +-  0.50% )
+                73      page-faults               #    0.003 M/sec                    ( +-  0.12% )
+          56080697      cycles                    #    2.598 GHz                      ( +-  0.72% )
+          61605150      instructions              #    1.10  insn per cycle           ( +-  0.05% )
+          14950196      branches                  #  692.526 M/sec                    ( +-  0.05% )
+             19410      branch-misses             #    0.13% of all branches          ( +-  0.18% )
+
+       4.603530546 seconds time elapsed                                          ( +-  0.11% )
+
+ Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=16 test_pop_cpu=17 test_alloc_len=12 nr_test=51200000 test_align=1' (200 runs):
+
+         20.988297      task-clock (msec)         #    0.006 CPUs utilized            ( +-  0.81% )
+                 7      context-switches          #    0.316 K/sec                    ( +-  0.54% )
+                 1      cpu-migrations            #    0.048 K/sec                    ( +-  0.70% )
+                73      page-faults               #    0.003 M/sec                    ( +-  0.11% )
+          54512166      cycles                    #    2.597 GHz                      ( +-  0.81% )
+          61440941      instructions              #    1.13  insn per cycle           ( +-  0.08% )
+          14906043      branches                  #  710.207 M/sec                    ( +-  0.08% )
+             19927      branch-misses             #    0.13% of all branches          ( +-  0.17% )
+
+       3.438041238 seconds time elapsed                                          ( +-  1.11% )
+
+ Performance counter stats for 'taskset -c 0 head -c 20G /dev/zero' (200 runs):
+
+      17364.040855      task-clock (msec)         #    0.624 CPUs utilized            ( +-  0.02% )
+           3340375      context-switches          #    0.192 M/sec                    ( +-  0.06% )
+                 1      cpu-migrations            #    0.000 K/sec
+                85      page-faults               #    0.005 K/sec                    ( +-  0.15% )
+       32077623335      cycles                    #    1.847 GHz                      ( +-  0.03% )
+       35121047596      instructions              #    1.09  insn per cycle           ( +-  0.01% )
+        6519872824      branches                  #  375.481 M/sec                    ( +-  0.02% )
+         101877022      branch-misses             #    1.56% of all branches          ( +-  0.14% )
+
+      27.842745343 seconds time elapsed                                          ( +-  0.02% )
+
+
+Note, ipv4-udp, ipv6-tcp and ipv6-udp is also tested with the below script:
+nc -u -l -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -N -u 127.0.0.1 1234
+
+nc -l6 -k 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -N ::1 1234
+
+nc -l6 -k -u 1234 > /dev/null
+perf stat -r 4 -- head -c 51200000000 /dev/zero | nc -u -N ::1 1234
+
+CC: Alexander Duyck <alexander.duyck@gmail.com>
+CC: Shuah Khan <skhan@linuxfoundation.org>
+CC: Andrew Morton <akpm@linux-foundation.org>
+CC: Linux-MM <linux-mm@kvack.org>
+
+1. https://lore.kernel.org/all/add10dd4-7f5d-4aa1-aa04-767590f944e0@redhat.com/
+2. https://lore.kernel.org/all/20240228093013.8263-1-linyunsheng@huawei.com/
+
+Change log:
+V23:
+   1. CC Andrew and MM ML explicitly.
+   2. Split into two parts according to the discussion in v22, and this is
+      the part-1.
+
+V22:
+   1. Fix some typo as noted by Bagas.
+   2. Remove page_frag_cache_page_offset() as it is not really related to
+      this patchset.
+
+V21:
+   1. Do renaming as suggested by Alexander.
+   2. Filter out the test results of dmesg in script as suggested by
+      Shuah.
+
+V20:
+   1. Rename skb_copy_to_page_nocache() to skb_add_frag_nocache().
+   2. Define the PFMEMALLOC_BIT as the ORDER_MASK + 1 as suggested by
+      Alexander.
+
+V19:
+   1. Rebased on latest net-next.
+   2. Use wait_for_completion_timeout() instead of wait_for_completion()
+      in page_frag_test.c
+
+V18:
+   1. Fix a typo in test_page_frag.sh pointed out by Alexander.
+   2. Move some inline helper into c file, use ternary operator and
+      move the getting of the size as suggested by Alexander.
+
+V17:
+   1. Add TEST_FILES in Makefile for test_page_frag.sh.
+
+V16:
+   1. Add test_page_frag.sh to handle page_frag_test.ko and add testing
+      for prepare API.
+   2. Move inline helper unneeded outside of the page_frag_cache.c to
+      page_frag_cache.c.
+   3. Reset nc->offset when reusing an old page.
+
+V15:
+   1. Fix the compile error pointed out by Simon.
+   2. Fix Other mistakes when using new API naming and refactoring.
+
+V14:
+   1. Drop '_va' Renaming patch and use new API naming.
+   2. Use new refactoring to enable more codes to be reusable.
+   3. And other minor suggestions from Alexander.
+
+V13:
+   1. Move page_frag_test from mm/ to tools/testing/selftest/mm
+   2. Use ptr_ring to replace ptr_pool for page_frag_test.c
+   3. Retest based on the new testing ko, which shows a big different
+      result than using ptr_pool.
+
+V12:
+   1. Do not treat page_frag_test ko as DEBUG feature.
+   2. Make some improvement for the refactoring in patch 8.
+   3. Some other minor improvement as Alexander's comment.
+
+RFC v11:
+   1. Fold 'page_frag_cache' moving change into patch 2.
+   2. Optimizate patch 3 according to discussion in v9.
+
+V10:
+   1. Change Subject to "Replace page_frag with page_frag_cache for sk_page_frag()".
+   2. Move 'struct page_frag_cache' to sched.h as suggested by Alexander.
+   3. Rename skb_copy_to_page_nocache().
+   4. Adjust change between patches to make it more reviewable as Alexander's comment.
+   5. Use 'aligned_remaining' variable to generate virtual address as Alexander's
+      comment.
+   6. Some included header and typo fix as Alexander's comment.
+   7. Add back the get_order() opt patch for xtensa arch
+
+V9:
+   1. Add check for test_alloc_len and change perm of module_param()
+      to 0 as Wang Wei' comment.
+   2. Rebased on latest net-next.
+
+V8: Remove patch 2 & 3 in V7, as free_unref_page() is changed to call
+    pcp_allowed_order() and used in page_frag API recently in:
+    commit 5b8d75913a0e ("mm: combine free_the_page() and free_unref_page()")
+
+V7: Fix doc build warning and error.
+
+V6:
+   1. Fix some typo and compiler error for x86 pointed out by Jakub and
+      Simon.
+   2. Add two refactoring and optimization patches.
+
+V5:
+   1. Add page_frag_alloc_pg() API for tls_device.c case and refactor
+      some implementation, update kernel bin size changing as bin size
+      is increased after that.
+   2. Add ack from Mat.
+
+RFC v4:
+   1. Update doc according to Randy and Mat's suggestion.
+   2. Change probe API to "probe" for a specific amount of available space,
+      rather than "nonzero" space according to Mat's suggestion.
+   3. Retest and update the test result.
+
+v3:
+   1. Use new layout for 'struct page_frag_cache' as the discussion
+      with Alexander and other sugeestions from Alexander.
+   2. Add probe API to address Mat' comment about mptcp use case.
+   3. Some doc updating according to Bagas' suggestion.
+
+v2:
+   1. reorder test module to patch 1.
+   2. split doc and maintainer updating to two patches.
+   3. refactor the page_frag before moving.
+   4. fix a type and 'static' warning in test module.
+   5. add a patch for xtensa arch to enable using get_order() in
+      BUILD_BUG_ON().
+   6. Add test case and performance data for the socket code.
+
+Yunsheng Lin (7):
+  mm: page_frag: add a test module for page_frag
+  mm: move the page fragment allocator from page_alloc into its own file
+  mm: page_frag: use initial zero offset for page_frag_alloc_align()
+  mm: page_frag: avoid caller accessing 'page_frag_cache' directly
+  xtensa: remove the get_order() implementation
+  mm: page_frag: reuse existing space for 'size' and 'pfmemalloc'
+  mm: page_frag: use __alloc_pages() to replace alloc_pages_node()
+
+ arch/xtensa/include/asm/page.h                |  18 --
+ drivers/vhost/net.c                           |   2 +-
+ include/linux/gfp.h                           |  22 --
+ include/linux/mm_types.h                      |  18 --
+ include/linux/mm_types_task.h                 |  21 ++
+ include/linux/page_frag_cache.h               |  61 ++++++
+ include/linux/skbuff.h                        |   1 +
+ mm/Makefile                                   |   1 +
+ mm/page_alloc.c                               | 136 ------------
+ mm/page_frag_cache.c                          | 171 +++++++++++++++
+ net/core/skbuff.c                             |   6 +-
+ net/rxrpc/conn_object.c                       |   4 +-
+ net/rxrpc/local_object.c                      |   4 +-
+ net/sunrpc/svcsock.c                          |   6 +-
+ tools/testing/selftests/mm/Makefile           |   3 +
+ tools/testing/selftests/mm/page_frag/Makefile |  18 ++
+ .../selftests/mm/page_frag/page_frag_test.c   | 198 ++++++++++++++++++
+ tools/testing/selftests/mm/run_vmtests.sh     |   8 +
+ tools/testing/selftests/mm/test_page_frag.sh  | 175 ++++++++++++++++
+ 19 files changed, 665 insertions(+), 208 deletions(-)
+ create mode 100644 include/linux/page_frag_cache.h
+ create mode 100644 mm/page_frag_cache.c
+ create mode 100644 tools/testing/selftests/mm/page_frag/Makefile
+ create mode 100644 tools/testing/selftests/mm/page_frag/page_frag_test.c
+ create mode 100755 tools/testing/selftests/mm/test_page_frag.sh
+
+-- 
+2.33.0
+
 
