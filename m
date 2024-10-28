@@ -1,159 +1,104 @@
-Return-Path: <netdev+bounces-139503-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4BAC09B2E48
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:13:04 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73C759B2EEF
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:32:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0FB8D281138
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:13:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37A3928319A
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:32:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 870791D8A04;
-	Mon, 28 Oct 2024 10:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B408E1D31B2;
+	Mon, 28 Oct 2024 11:32:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oGr09lNp"
+	dkim=pass (1024-bit key) header.d=mvista.com header.i=@mvista.com header.b="NjXd1y07"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f53.google.com (mail-ot1-f53.google.com [209.85.210.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B061D88CA
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 10:59:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE29418FC89
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 11:32:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730113166; cv=none; b=kshRoCmbzph0xW9KjxQ/VPudQH7KrqnH+z/JVXj8XvfrYK6KIdjEt/oKUz/pU2epco4IHulmxYthiz/kVfHK9vjvIoroT5nlWzN+m29raqs14auz5fgI+3lCZ5Mh6S1U4lytcVyQr9alSyuocmLBHzFXMYM84SX/5iehk1oHXJ4=
+	t=1730115152; cv=none; b=DkGCH3VHMrZjKdvk88h2JdmNdhdfoGORNqUNkPJHlWIdR6SSDAKJfVTzu8pOO6ce/tXZlX277m2Qj6zcv0HbqyKJWq1y0wqtm+k+MvmSSGCs1tf75cfs6ZSA4Gvg+lks7dzb7ANwVycN2Vxt7jrSHqvkq3+8lqPSGZB/gIfBr2g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730113166; c=relaxed/simple;
-	bh=3WNIz9CBumBGYrQn3zQyAt8oGW5m6Cywud9YFlm003Q=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jQtSl+MVf6HvWnwb5pC+Ibjioii5rmodG5xhBXFP76XFLQfCOxT+Y8jJQhE12Ktg7YW42va1KUTPn9VE9iAf+EumohoQqs5Ki9Cb7IZd7GMeElEn0De0AC/ktTANZ+9ixG6KzScUAmjEItswvSc3KRUbdDudnHXvv17elOyFkQI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oGr09lNp; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730113164; x=1761649164;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=3WNIz9CBumBGYrQn3zQyAt8oGW5m6Cywud9YFlm003Q=;
-  b=oGr09lNpW9FXRROcTB9GhcUP3fi5Y5/+lTvQ+TuoDnFiasFGBHA8m8aE
-   X+il/8eQrGEsaRIhExlbvVLZo9W7PQEoSMSAO9GX5OiF5oes65QZCdVhj
-   9o4PzIo0+jwLFmDphQze8zwognDtCvFW2lDwo6Q7tShISWhYP80nVIgug
-   4ZlijNNPxubW7dnbgqa1cbiG560Ixaxd+f6JSuoDdVNPnhiJIq2S0hJp7
-   fuz89bAjhIkOVT/LAPifDS6sUvDBD8C4JzNN/VxN6ljF88Qe2V6HPHe8B
-   fJCzpUd2t2eGNw1T3bC9BYewlCRhWXByokMlUiPS+olVFOZOk+SgFFPuL
-   Q==;
-X-CSE-ConnectionGUID: QtXKDLslTR6XKgfucXO26A==
-X-CSE-MsgGUID: kb8G5tJyQb2q1lkw3hxpwg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11238"; a="17339466"
-X-IronPort-AV: E=Sophos;i="6.11,239,1725346800"; 
-   d="scan'208";a="17339466"
-Received: from fmviesa010.fm.intel.com ([10.60.135.150])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 03:59:23 -0700
-X-CSE-ConnectionGUID: lUAShk6GSrG4Pop881gKpg==
-X-CSE-MsgGUID: Vbf0X2bAQGW+xsLHFWU2tw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,239,1725346800"; 
-   d="scan'208";a="81904693"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by fmviesa010.fm.intel.com with ESMTP; 28 Oct 2024 03:59:22 -0700
-Received: from fedora.igk.intel.com (Metan_eth.igk.intel.com [10.123.220.124])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 7F3D527BC4;
-	Mon, 28 Oct 2024 10:59:20 +0000 (GMT)
-From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: david.m.ertman@intel.com,
-	netdev@vger.kernel.org,
-	Mateusz Polchlopek <mateusz.polchlopek@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [Intel-wired-lan] [PATCH iwl-net] ice: change q_index variable type to s16 to store -1 value
-Date: Mon, 28 Oct 2024 12:59:22 -0400
-Message-Id: <20241028165922.7188-1-mateusz.polchlopek@intel.com>
-X-Mailer: git-send-email 2.38.1
+	s=arc-20240116; t=1730115152; c=relaxed/simple;
+	bh=L2bXbq3PIxh7Zm3SHa0cpC0fOa4pqViT0QVnHxOBQcg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YHkVNXm4Da734u7fACBelWfAfuuHuMRnh6BKAtIXsdfTJRaFS/VgBQOfgLTRneZQffSrZB74R4+oSoOYybw/8KZV4ikYv4CZwG3pV+Y6MwB+0nLHBHeplv11YKDHJ+Ertr1aO532TmttSzIxAyE9J5OwYnew2tJuHxwCOCamxhs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mvista.com; spf=pass smtp.mailfrom=mvista.com; dkim=pass (1024-bit key) header.d=mvista.com header.i=@mvista.com header.b=NjXd1y07; arc=none smtp.client-ip=209.85.210.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=mvista.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mvista.com
+Received: by mail-ot1-f53.google.com with SMTP id 46e09a7af769-7181c0730ddso1655871a34.2
+        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 04:32:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mvista.com; s=google; t=1730115150; x=1730719950; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=q/DR918lxz2xV2iocC5zSbeuPsDzY0FXd6yi6ZYmadw=;
+        b=NjXd1y07Cq4ceq1+fYrsKgbDb3MQStdhHRp5NOrf5w+BEqzjZXYOjqfr+xkZwTf3vC
+         6raSWOuLvY2e07JLK/KNYCIrURO+hg4cH3PgRL03N5c1QBEZPvMnJoFYd+dJTXSIQzJd
+         NEtKw30TKH1k+tWA1f2m3xt182s0TB2mwiJFE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730115150; x=1730719950;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q/DR918lxz2xV2iocC5zSbeuPsDzY0FXd6yi6ZYmadw=;
+        b=rkPRgUSKr1+Z6V3Z7i5T5xPIPs1AkiHEFM2JdwWXkb7tFnBZA8TQaWgygWuODho/iN
+         pyCz2Y895+yhDR1NH/tBQ0eQrgx7ROK/UF/AFCsZ6MldG+RuSby2nrdIZD+Cpx6cY+NQ
+         /UY5HNYSUrANr++yYd0Ap3H+IL5TWNdbuajK9R+ukUbS9OMT/sNeyZHPXATYb1IeVufn
+         ncnuHH2Oq1OPLoajWz3me9ZsfkIxWFhlevE+avFv/0oYd37VMBeMzn1lA1G1SAg6pN8e
+         BrS+Rt0vEpGA9LJhkK2+8PdIoiVsMjbk6E09lUcGq1xv35zRDYRkx0E37gSEjfMlB4uw
+         A5IQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuxA5VTX1xOtvRFp/ILYiyQTpp67LSc5Nu4exGS12eI+BEJwYkXTosFGTGL9SqwuSWeHkXi4s=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxx8LdkOxF1MEeQCmpjDi8n9qvXA7Qp+Rm1CThg0DH4Rz0RMW74
+	EBFShYSFpVU6VNKylROgTJaUr1FSq/L6ugV72F6mFYEoeibXOTgdQ/vHqb9Nqps05c+gcGtof2M
+	ihiWp2W1vne1wi9kL6z9RSlB1WFEj3E6jaxJTMw==
+X-Google-Smtp-Source: AGHT+IFjImVBhmJ8dxS5xkN0jdCuK5nMHGWj0G72Dd2XGbFptWIit1vsNfbMq6ubR0LUFbnUWGrNiUL1xyvI3FLAcTM=
+X-Received: by 2002:a05:6870:e0cb:b0:288:5f71:4e71 with SMTP id
+ 586e51a60fabf-29051db63ffmr5822247fac.44.1730115149780; Mon, 28 Oct 2024
+ 04:32:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <1729316200-15234-1-git-send-email-hgohil@mvista.com> <2024102147-paralyses-roast-0cec@gregkh>
+In-Reply-To: <2024102147-paralyses-roast-0cec@gregkh>
+From: Hardik Gohil <hgohil@mvista.com>
+Date: Mon, 28 Oct 2024 17:02:19 +0530
+Message-ID: <CAH+zgeFzURTdg5n9kxXb-yMcAqC1rp6Y8t426YeG19YwWayXfg@mail.gmail.com>
+Subject: Re: [PATCH v5.10.277] wifi: mac80211: Avoid address calculations via
+ out of bounds array indexing
+To: Greg KH <gregkh@linuxfoundation.org>
+Cc: stable@vger.kernel.org, netdev@vger.kernel.org, 
+	Kenton Groombridge <concord@gentoo.org>, Kees Cook <kees@kernel.org>, 
+	Johannes Berg <johannes.berg@intel.com>, Xiangyu Chen <xiangyu.chen@windriver.com>, 
+	Sasha Levin <sashal@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix Flow Director not allowing to re-map traffic to 0th queue when action
-is configured to drop (and vice versa).
+On Mon, Oct 21, 2024 at 3:10=E2=80=AFPM Greg KH <gregkh@linuxfoundation.org=
+> wrote:
+>
+> On Sat, Oct 19, 2024 at 11:06:40AM +0530, Hardik Gohil wrote:
+> > From: Kenton Groombridge <concord@gentoo.org>
+> >
+> > [ Upstream commit 2663d0462eb32ae7c9b035300ab6b1523886c718 ]
+>
+> We can't take patches for 5.10 that are not already in 5.15.  Please fix
+> up and resend for ALL relevent trees.
+>
+> thanks,
+>
+> greg k-h
 
-The current implementation of ethtool callback in the ice driver forbids
-change Flow Director action from 0 to -1 and from -1 to 0 with an error,
-e.g:
+I have just confirmed those are applicable to v5.15 and v5.10.
 
- # ethtool -U eth2 flow-type tcp4 src-ip 1.1.1.1 loc 1 action 0
- # ethtool -U eth2 flow-type tcp4 src-ip 1.1.1.1 loc 1 action -1
- rmgr: Cannot insert RX class rule: Invalid argument
-
-We set the value of `u16 q_index = 0` at the beginning of the function
-ice_set_fdir_input_set(). In case of "drop traffic" action (which is
-equal to -1 in ethtool) we store the 0 value. Later, when want to change
-traffic rule to redirect to queue with index 0 it returns an error
-caused by duplicate found.
-
-Fix this behaviour by change of the type of field `q_index` from u16 to s16
-in `struct ice_fdir_fltr`. This allows to store -1 in the field in case
-of "drop traffic" action. What is more, change the variable type in the
-function ice_set_fdir_input_set() and assign at the beginning the new
-`#define ICE_FDIR_NO_QUEUE_IDX` which is -1. Later, if the action is set
-to another value (point specific queue index) the variable value is
-overwritten in the function.
-
-Fixes: cac2a27cd9ab ("ice: Support IPv4 Flow Director filters")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c | 3 ++-
- drivers/net/ethernet/intel/ice/ice_fdir.h         | 4 +++-
- 2 files changed, 5 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-index 5412eff8ef23..ee9862ddfe15 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
-@@ -1830,11 +1830,12 @@ static int
- ice_set_fdir_input_set(struct ice_vsi *vsi, struct ethtool_rx_flow_spec *fsp,
- 		       struct ice_fdir_fltr *input)
- {
--	u16 dest_vsi, q_index = 0;
-+	s16 q_index = ICE_FDIR_NO_QUEUE_IDX;
- 	u16 orig_q_index = 0;
- 	struct ice_pf *pf;
- 	struct ice_hw *hw;
- 	int flow_type;
-+	u16 dest_vsi;
- 	u8 dest_ctl;
- 
- 	if (!vsi || !fsp || !input)
-diff --git a/drivers/net/ethernet/intel/ice/ice_fdir.h b/drivers/net/ethernet/intel/ice/ice_fdir.h
-index ab5b118daa2d..820023c0271f 100644
---- a/drivers/net/ethernet/intel/ice/ice_fdir.h
-+++ b/drivers/net/ethernet/intel/ice/ice_fdir.h
-@@ -53,6 +53,8 @@
-  */
- #define ICE_FDIR_IPV4_PKT_FLAG_MF		0x20
- 
-+#define ICE_FDIR_NO_QUEUE_IDX			-1
-+
- enum ice_fltr_prgm_desc_dest {
- 	ICE_FLTR_PRGM_DESC_DEST_DROP_PKT,
- 	ICE_FLTR_PRGM_DESC_DEST_DIRECT_PKT_QINDEX,
-@@ -186,7 +188,7 @@ struct ice_fdir_fltr {
- 	u16 flex_fltr;
- 
- 	/* filter control */
--	u16 q_index;
-+	s16 q_index;
- 	u16 orig_q_index;
- 	u16 dest_vsi;
- 	u8 dest_ctl;
-
-base-commit: 93e5920e5193241cb05caaa6421365fd8800f1b4
--- 
-2.38.1
-
+Request to add those patches.
 
