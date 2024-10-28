@@ -1,48 +1,62 @@
-Return-Path: <netdev+bounces-139504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AF4C9B2E60
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:15:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B80249B2E66
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 12:16:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 41E631F20FC7
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:15:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6EFE61F21877
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:16:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A9D6C1DE8BA;
-	Mon, 28 Oct 2024 11:04:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A1B1DED7F;
+	Mon, 28 Oct 2024 11:05:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ggIuTCoo"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="V0PV4PaS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lelv0143.ext.ti.com (lelv0143.ext.ti.com [198.47.23.248])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7951B1DE8AA;
-	Mon, 28 Oct 2024 11:04:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB771DA0EB;
+	Mon, 28 Oct 2024 11:05:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.248
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730113480; cv=none; b=umKDlGQ87u0DZJYw4niabiIQdndy9Cr4KTybU9AUiqkFzh+vRZO0l5hE3q4ZdNx2+qeyoKFcbawz0oQRk52soWfXPZeZbwvd1Uu1s6CBCDSVbLutL/+aGVIKrGfwHut1Hws/RluV0JIqHSB+4uJM+cqyWdZ7Rgsc+bBpEKWDqG0=
+	t=1730113554; cv=none; b=pZ3tqqXs9X3+vJ1oSlCFcDLzD7ps6wBvDEQ0W355Ij3rUY8h/N//lYXcrj6Os7XX2pyotX2kQVrzu89eMbmkZRxHusY8+Ahdl773whmTNwbwUB1WXCEZvXZwDeRc7afPSCC30WB+m5X+L1Evu/ekKLP6lK81NroGf3Qf1pyY06g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730113480; c=relaxed/simple;
-	bh=b4TEZdETLDYWyvOUYFUJi18Ghxgk8/rSYNJMVKTyZ1U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Q29L/wUOmA/rzJtqPiO/nNmmIRb0syyfdGxPTNWROpz/pZFfKts0C3yG9WLz2jQZY7ZBHeKHJEGHxsdzgxY88fhWcdHfx9a4d7pXKwXMdXB+o79NfaEd8YY7RxaXNrp8+6+usue1xnMJuibuDZkRKU3lJ6A6LJdvmgG8EUo09R0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ggIuTCoo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 72B5CC4CEC3;
-	Mon, 28 Oct 2024 11:04:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730113479;
-	bh=b4TEZdETLDYWyvOUYFUJi18Ghxgk8/rSYNJMVKTyZ1U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=ggIuTCooCPjlPMlb2aNQJuOsce2gw8ihiiwSDe34Y+l1KDi5STVkuulc2Xf26I3St
-	 pOODGU+rVOKWCWJ7F7tOcNlKq+qL5OE4C/F3lyXLohio7OruEWjzN8c8YmghojGuf5
-	 oHRl7eVFYEH/jI4Ch44WJ0i/Eg6G8VwiiY+KyT8o/yUJCvqL91FSprIpr/n7ndGwEq
-	 Hv3wEAVY25fEuiNB+teasn2MzvMeMaSMPR3ycObFRecuSHZQfwxyK+aZi5ACgcbTBq
-	 ElPaG0crlf0Z2F6ubKAeHP3Mj1B+Z5kdCzUzoRpPPSB4hYSDr4pTsbjw3clpOlGniF
-	 z+ruYV8OUAUYQ==
-Message-ID: <132a8e29-3be7-422a-bc83-d6be00fac3e8@kernel.org>
-Date: Mon, 28 Oct 2024 12:04:30 +0100
+	s=arc-20240116; t=1730113554; c=relaxed/simple;
+	bh=D0wS5lVtp7RHP8hKc6v5AFVgNs86gujc2DVkFKviJpg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=NshFy5Ym/Esa9PJtBJwaF0cfFq5wH54rm8GNhny08eNTf2ROQvFAJEImQupkifnVcVkFKF2nalrQ2YBoK+/7x7fWSTR7ouDJ1vbUa8pzEKg9tOMvt6Ps+Mz/MrNjID6ULbaVE8Qid4hQnEvK/qbbFhFkDT/xicX4pBGmI0azHPg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=V0PV4PaS; arc=none smtp.client-ip=198.47.23.248
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by lelv0143.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49SB5DfL072486;
+	Mon, 28 Oct 2024 06:05:13 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1730113513;
+	bh=ptxN7UQx680+8Nep+cFTxjI9+zmvMwutLIQwIT3A9BA=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=V0PV4PaS1bEc3epVawS7wXANJouMPBMRniKiFy0N/XG6H0nFPJGCYx12UiCL/ICi9
+	 B1iLpaq4Z61Om8O5zNFPkeHgU+oaUjhLpI+LxfUhhT0wf1cLkrY1C5pNYVeaQrPd2D
+	 xe1BJzF7i0bCZ+z138UQYrQd9Jgekoik9MCv+PfQ=
+Received: from DFLE113.ent.ti.com (dfle113.ent.ti.com [10.64.6.34])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49SB5DDZ047842;
+	Mon, 28 Oct 2024 06:05:13 -0500
+Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE113.ent.ti.com
+ (10.64.6.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 28
+ Oct 2024 06:05:12 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 28 Oct 2024 06:05:13 -0500
+Received: from [10.24.69.13] (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49SB58Ln020827;
+	Mon, 28 Oct 2024 06:05:08 -0500
+Message-ID: <a2848e9f-028e-4d58-87e4-50848fe4bca1@ti.com>
+Date: Mon, 28 Oct 2024 16:35:07 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,90 +64,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] Add ethernet dts schema for qcs615/qcs8300
-To: Yijie Yang <quic_yijiyang@quicinc.com>, Vinod Koul <vkoul@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
- Conor Dooley <conor+dt@kernel.org>,
- Bhupesh Sharma <bhupesh.sharma@linaro.org>,
- Kishon Vijay Abraham I <kishon@kernel.org>,
- Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Cc: netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-phy@lists.infradead.org, quic_tingweiz@quicinc.com,
- quic_aiquny@quicinc.com, Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-References: <20241017-schema-v2-0-2320f68dc126@quicinc.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net v2] net: ti: icssg-prueth: Fix 1 PPS sync
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <vigneshr@ti.com>, <horms@kernel.org>, <jan.kiszka@siemens.com>,
+        <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <linux-kernel@vger.kernel.org>, <vadim.fedorenko@linux.dev>,
+        <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+        <srk@ti.com>, Roger Quadros <rogerq@kernel.org>, <danishanwar@ti.com>
+References: <20241024113140.973928-1-m-malladi@ti.com>
+ <1a0a632e-0b3c-4192-8d00-51d23c15c97e@lunn.ch>
+ <060c298c-5961-467a-80dd-947c85207eea@ti.com>
+ <2288a9a9-f9d0-4414-80a2-e11ba66fad50@lunn.ch>
 Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <20241017-schema-v2-0-2320f68dc126@quicinc.com>
-Content-Type: text/plain; charset=UTF-8
+From: Meghana Malladi <m-malladi@ti.com>
+In-Reply-To: <2288a9a9-f9d0-4414-80a2-e11ba66fad50@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On 17/10/2024 11:52, Yijie Yang wrote:
-> Document the ethernet and SerDes compatible for qcs8300. This platform
-> shares the same EMAC and SerDes as sa8775p, so the compatible fallback to
-> it.
-> Document the ethernet compatible for qcs615. This platform shares the
-> same EMAC as sm8150, so the compatible fallback to it.
-> Document the compatible for revision 2 of the qcs8300-ride board.
+
+
+On 25/10/24 18:52, Andrew Lunn wrote:
+> On Fri, Oct 25, 2024 at 11:17:44AM +0530, Meghana Malladi wrote:
+>>
+>>
+>> On 25/10/24 01:25, Andrew Lunn wrote:
+>>>> +static inline u64 icssg_readq(const void __iomem *addr)
+>>>> +{
+>>>> +	return readl(addr) + ((u64)readl(addr + 4) << 32);
+>>>> +}
+>>>> +
+>>>> +static inline void icssg_writeq(u64 val, void __iomem *addr)
+>>>> +{
+>>>> +	writel(lower_32_bits(val), addr);
+>>>> +	writel(upper_32_bits(val), addr + 4);
+>>>> +}
+>>>
+>>> Could readq() and writeq() be used, rather than your own helpers?
+>>>
+>>> 	Andrew
+>>>
+>> The addresses we are trying to read here are not 64-bit aligned, hence using
+>> our own helpers to read the 64-bit value.
 > 
-> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
-> ---
-> This patch series depends on below patch series:
-> https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/
-> https://lore.kernel.org/all/20240926-add_initial_support_for_qcs615-v3-0-e37617e91c62@quicinc.com/
+> Ah, you should document this, because somebody might do a drive by
+> patch converting this to readq()/write(q).
+> 
+> Alternatively, i think hi_lo_writeq() would work.
+> 
+> 	Andrew
+I tried hi_lo_readq() and hi_lo_writeq(), and it is fitting my 
+requirement. Thanks, I will update it.
 
-So it cannot be merged...
-
-Instead please decouple your works. I don't get why do you claim there
-is dependency in the first place, but anyway. Fix up your patchsets to
-fix that (if there is something to fix).
-
-Best regards,
-Krzysztof
-
+Regards,
+Meghana
 
