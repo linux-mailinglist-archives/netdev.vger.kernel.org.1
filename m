@@ -1,236 +1,122 @@
-Return-Path: <netdev+bounces-139574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA50D9B3463
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:05:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E8CC9B34A6
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:20:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD7A11C21D99
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:05:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5693F1C21F25
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B4881DE4C4;
-	Mon, 28 Oct 2024 15:05:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA5B1DE3B3;
+	Mon, 28 Oct 2024 15:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Iyiae9qP"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cq73vevG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3BB1DE3AA
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 15:05:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B422C1DDC05
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 15:20:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730127929; cv=none; b=J5S8IAPmMIsOKzMPkAsAiKu9MG7TcztbdSZMauFnhr5uXsRHGRuxm/R4j1rE7IyJlt5TdYV23huXuyZlVe5iWS6KXmNtij6ao5e6e++t0uLbYih6U9W+oneglV4IXvb2DXIc/+GJ966jUrXPEEz1pSk8Vsi6H8OaIcYW3f0mMDo=
+	t=1730128839; cv=none; b=Tf405QHDP2gmfE20UxY0Q10G8396Qa3PKk62punqcQxjtpV3e1BsIqUb5oi3dwhaOv0vTg13zsZCGQfZeFEQ2ZQFvu7QVlE9K8w0mDVVBLm/IK/jqRaW4iyCwMiLsuB8n/Dp8bgcVc/AcR/unokmmcs8JLn/6hUgxfzegSKLbQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730127929; c=relaxed/simple;
-	bh=H4+ylYQ1hEj3PJm4OyIODNElBXSkUCICb1o0jm3z+jQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=h2n+kAdPHc+rWul5IzvYA5NlgrT7cNx5DUp4EJphq7B+fUiZJRqvNwuUalupOdCLUBZ3A/XKAtQhNwPiHDCkFAaofO+zgQEmvgrCujnuNQYtMW1nSUPc8zycNJVof9C6z8NLeep+WUsat2/K8kecDy0DXESZufDxyvnx+wq/8cw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Iyiae9qP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730127925;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=H4+ylYQ1hEj3PJm4OyIODNElBXSkUCICb1o0jm3z+jQ=;
-	b=Iyiae9qPUztR9+ij3Ga2WHdU1pjjCR5FTO7XbBdM10IS4niLdh/S+fs2foUBOBR5OuGlRo
-	drsg/+Fi/9BgYeX/igbgwuW65hPlEiH5OJg5naNyv8a2FPG+1grPfFgLUzv7O9WMWKHd0M
-	ngUg9KMkH5dQFny1v/bs5xZ4i4vgYPg=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-556-1hgztf-ZNkupBQe2z7dn9Q-1; Mon, 28 Oct 2024 11:05:24 -0400
-X-MC-Unique: 1hgztf-ZNkupBQe2z7dn9Q-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-7b1473a4640so837915885a.0
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 08:05:24 -0700 (PDT)
+	s=arc-20240116; t=1730128839; c=relaxed/simple;
+	bh=9vOfV1nv3dJamdMcGcAvkjeuuuehU7scnrXHevP4JGE=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=g2CLySIgOpMewd2C7Tl3TqOPkyfu/625g+DuAiGiOP4AhQAYa1Udnmm97weM5zheV5LfQ3BpOBeIu9+OEJaLBHc4YGKYQDYf7lnAS3ZegWTvbxbZInYWDESKYAZ9+RydEbC1vLIoRIregxka0zhmqSsGJMj9qYagy7Kj3lxoQj4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cq73vevG; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c9454f3bfaso5219500a12.2
+        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 08:20:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730128835; x=1730733635; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8A7Y1smH5iLgDTBZI8wqoHylFq2drR/RaP5ssz22jRY=;
+        b=cq73vevGHyRwIo3onMOUSZCq/5fCVwCwI2Zmq0CVeeGcSLFkUdjS5Qazhx88arGFIh
+         chMDQfnHa6zZAQP9XT3v0lG1nrh31OHKeQi/nqZz5ha0rycIj54kdb5NC7mL7Fn/qHCU
+         TN+aaNfFPjvYE16QHs56zBOwg8zO/qP9YRt1OBkOygIxWt0ZERRLNrq5DIHGg2ZGceHj
+         XAHyYElaU7xHbQnm15tzBL0VFiFBjK9E1o2zHlnqyREtVReJobRG3ubgJ1zW4nc4BoZp
+         V0WWW1DBVwdh5d5SeYJtMm8w4JOjAXBLUqKvEgq9ntHQYZpKUPnfGMuRIEV/emBqD/Cm
+         WCZA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730127922; x=1730732722;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=H4+ylYQ1hEj3PJm4OyIODNElBXSkUCICb1o0jm3z+jQ=;
-        b=dmfcmldwozIWFICSdLoU3wA57zNuBwfvo2xWvTfR0+PfQ9U7FlnOGaxpdFsZ1PeKdj
-         cFOP9+0qlneoT2ySeXHIq3a8bBpQpg+BM3PclLtBh16yQ8Z9duFCxZH1VZXPSLyFEtrc
-         ttWX70tYmBS6Tce+/ygdojqasDmVwozHM+A7rorivqgmV2tr0yGHRMt5JmgEzi1GF778
-         s7WXHIflV3eV+nuDHtOTcl6T1e994958UPwJSADu352DUrFi2E6v7p+vCETFMHXMCnBE
-         0nlYjMjzLP7AfKDlkFrX/0R7/L++GHt/Ineg18PGxSJkMDVL4zkbRVrlsN9qTn/vBnZI
-         WYWw==
-X-Forwarded-Encrypted: i=1; AJvYcCVHhmtXhZR2bVfUAOVL1wKh+ywktHIU8NZydXpXTvQSWxaORJT8vyB0EZ39Xve5Ms91KT4/GDU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyClEGM4+F5GFV0mG2pPicUYJY76URWmuVwtxdMMnO4H/ILFJP5
-	Lf9W4/GedeS1cu1Wt7tiIL7YWEpS3sojqxBFYOQnhxPKfLEhmlWBiY4+mpRDzTkBKtwW7uIlpnG
-	JypmAXmzl0I0s7UyDXY+ID1RQH7VFLL42IlZxd9h6LOMsfVNVe8k5lOzFXGiqvg==
-X-Received: by 2002:a05:620a:3913:b0:7a1:e37c:bde0 with SMTP id af79cd13be357-7b1a7dfc0aemr24170485a.24.1730127922578;
-        Mon, 28 Oct 2024 08:05:22 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFcOyMqz9vSNaECCD5Jog/jP+S1JE0g9vBbOaYmAJuZixiPu4F1kf2Bp8UpkY+b+0W9NOOMaA==
-X-Received: by 2002:a05:6214:3c8c:b0:6d1:6fae:6451 with SMTP id 6a1803df08f44-6d19e8862f8mr2136586d6.10.1730127910992;
-        Mon, 28 Oct 2024 08:05:10 -0700 (PDT)
-Received: from dhcp-64-113.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d179a0c4f2sm32929126d6.95.2024.10.28.08.05.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 08:05:10 -0700 (PDT)
-Message-ID: <f1ecab3f7703cd251275ecb141cbb4a24acafa2b.camel@redhat.com>
-Subject: Re: [PATCH v8 0/6] PCI: Remove most pcim_iounmap_regions() users
-From: Philipp Stanner <pstanner@redhat.com>
-To: Jens Axboe <axboe@kernel.dk>, Wu Hao <hao.wu@intel.com>, Tom Rix
- <trix@redhat.com>, Moritz Fischer <mdf@kernel.org>, Xu Yilun
- <yilun.xu@intel.com>,  Andy Shevchenko <andy@kernel.org>, Linus Walleij
- <linus.walleij@linaro.org>, Bartosz Golaszewski <brgl@bgdev.pl>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,  Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Richard Cochran <richardcochran@gmail.com>, Damien
- Le Moal <dlemoal@kernel.org>, Hannes Reinecke <hare@suse.de>, Chaitanya
- Kulkarni <kch@nvidia.com>,  Al Viro <viro@zeniv.linux.org.uk>, Li Zetao
- <lizetao1@huawei.com>
-Cc: linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-fpga@vger.kernel.org, linux-gpio@vger.kernel.org,
- netdev@vger.kernel.org,  linux-pci@vger.kernel.org
-Date: Mon, 28 Oct 2024 16:05:06 +0100
-In-Reply-To: <20241016094911.24818-2-pstanner@redhat.com>
-References: <20241016094911.24818-2-pstanner@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        d=1e100.net; s=20230601; t=1730128835; x=1730733635;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8A7Y1smH5iLgDTBZI8wqoHylFq2drR/RaP5ssz22jRY=;
+        b=Z1zi/2T3faMtTNrnSQG10AypY1M1txvK2o5PGMbfsjnc+OHN1JcNdfp5iUOksvJ9/W
+         qTUwN5fOrCQgcQNH+lhTCC0y1FgnUC/sFuNy1lQNyysfw8Kl8wAWYTvtbOPxg75ZtjXn
+         4awwRPZLQ/ewa7VIhq20kTEl8TgLRZrR9H2Ik89SJN+jJyICtTH35xr+KaJUXul84oWi
+         5oIuxbyC8njT0JxmivhTdplesZ9zK75xE6w60MCuvwVDHgNoyDRSBr3KAf6gP4w5d1+e
+         taQDXk/cv1CM0ILQzLBHR4qahN0b4wv7gNVQr4e/QIsOqT5tATuJrTZhgz017rsECJeK
+         nipQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXdJw+6dBH2Y3Cjpoqv7c6UFGnyQEt8cpIE6AkWzpswrN7iX6qY/uQskIx7r0yTVqVuFCl38B0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxH46ssZq0OH3aXfbOTzdgZYuyvh2qZNDxpAO+U3OqGB/6yYsd5
+	ObaWCDZyJiNlQWGyoncV4B10iKJw6P9MpewmmUHL4W+tokFz6/5YKhVP5Sgd4IS2KN49jHs29Iv
+	mQhavj0IC8fL7qtvBI0/W+IIocCqmn75k5EO5
+X-Google-Smtp-Source: AGHT+IGQlWvncSWyRjU0MqLvkzq7zgdmh8ci7LTfgESO71eUgRKbiRnKH3tfmeMsJw+1nj1dpvpgLjvAzpaqngtva14=
+X-Received: by 2002:a05:6402:40d5:b0:5c9:4022:872d with SMTP id
+ 4fb4d7f45d1cf-5cbbfa66f3dmr7608343a12.32.1730128834716; Mon, 28 Oct 2024
+ 08:20:34 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <20241028080515.3540779-1-ruanjinjie@huawei.com>
+In-Reply-To: <20241028080515.3540779-1-ruanjinjie@huawei.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 28 Oct 2024 16:20:20 +0100
+Message-ID: <CANn89iJCshHRan=w_YMp7bEeBadOjNS7PU392q2K4qNTRtz=Ow@mail.gmail.com>
+Subject: Re: [PATCH net] netlink: Fix off-by-one error in netlink_proto_init()
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
+	kuniyu@amazon.com, a.kovaleva@yadro.com, lirongqing@baidu.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-@Bjorn:
-Are you OK with taking this?
-
-Regards,
-P.
-
-On Wed, 2024-10-16 at 11:49 +0200, Philipp Stanner wrote:
-> Merge plan for this is the PCI-Tree.
->=20
-> After this series, only two users (net/ethernet/stmicro and
-> vdpa/solidrun) will remain to be ported in the subsequent merge
-> window.
-> Doing them right now proved very difficult because of various
-> conflicts
-> as they are currently also being reworked.
->=20
-> Changes in v8:
-> =C2=A0 - Patch "gpio: ..": Fix a bug: don't print the wrong error code.
-> (Simon)
-> =C2=A0 - Split patch 1 into two patches to make adding of the new public
-> API
-> =C2=A0=C2=A0=C2=A0 obvious (Bartosz)
-> =C2=A0 - Patch "ethernet: cavium: ...": Remove outdated sentences from th=
-e
-> =C2=A0=C2=A0=C2=A0 commit message.
->=20
-> Changes in v7:
-> =C2=A0 - Add Paolo's Acked-by.
-> =C2=A0 - Rebase on current master; drop patch No.1 which made
-> =C2=A0=C2=A0=C2=A0 pcim_request_region() public.
->=20
-> Changes in v6:
-> =C2=A0 - Remove the patches for "vdpa: solidrun" since the maintainer
-> seems
-> =C2=A0=C2=A0=C2=A0 unwilling to review and discuss, not to mention approv=
-e, anything
-> =C2=A0=C2=A0=C2=A0 that is part of a wider patch series across other subs=
-ystems.
-> =C2=A0 - Change series's name to highlight that not all callers are
-> removed
-> =C2=A0=C2=A0=C2=A0 by it.
->=20
-> Changes in v5:
-> =C2=A0 - Patch "ethernet: cavium": Re-add accidentally removed
-> =C2=A0=C2=A0=C2=A0 pcim_iounmap_region(). (Me)
-> =C2=A0 - Add Jens's Reviewed-by to patch "block: mtip32xx". (Jens)
->=20
-> Changes in v4:
-> =C2=A0 - Drop the "ethernet: stmicro: [...] patch since it doesn't apply
-> to
-> =C2=A0=C2=A0=C2=A0 net-next, and making it apply to that prevents it from=
- being
-> =C2=A0=C2=A0=C2=A0 applyable to PCI ._. (Serge, me)
-> =C2=A0 - Instead, deprecate pcim_iounmap_regions() and keep "ethernet:
-> =C2=A0=C2=A0=C2=A0 stimicro" as the last user for now.
-> =C2=A0 - ethernet: cavium: Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - vdpa: solidrun (Bugfix) Correct wrong printf string (was "psnet"
-> instead of
-> =C2=A0=C2=A0=C2=A0 "snet"). (Christophe)
-> =C2=A0 - vdpa: solidrun (Bugfix): Add missing blank line. (Andy)
-> =C2=A0 - vdpa: solidrun (Portation): Use PTR_ERR_OR_ZERO(). (Andy)
-> =C2=A0 - Apply Reviewed-by's from Andy and Xu Yilun.
->=20
-> Changes in v3:
-> =C2=A0 - fpga/dfl-pci.c: remove now surplus wrapper around
-> =C2=A0=C2=A0=C2=A0 pcim_iomap_region(). (Andy)
-> =C2=A0 - block: mtip32xx: remove now surplus label. (Andy)
-> =C2=A0 - vdpa: solidrun: Bugfix: Include forgotten place where stack UB
-> =C2=A0=C2=A0=C2=A0 occurs. (Andy, Christophe)
-> =C2=A0 - Some minor wording improvements in commit messages. (Me)
->=20
-> Changes in v2:
-> =C2=A0 - Add a fix for the UB stack usage bug in vdap/solidrun. Separate
-> =C2=A0=C2=A0=C2=A0 patch, put stable kernel on CC. (Christophe, Andy).
-> =C2=A0 - Drop unnecessary pcim_release_region() in mtip32xx (Andy)
-> =C2=A0 - Consequently, drop patch "PCI: Make pcim_release_region() a
-> public
-> =C2=A0=C2=A0=C2=A0 function", since there's no user anymore. (obsoletes t=
-he squash
-> =C2=A0=C2=A0=C2=A0 requested by Damien).
-> =C2=A0 - vdap/solidrun:
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 make 'i' an 'unsigned short' (Andy, me)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Use 'continue' to simplify loop (Andy)
-> =C2=A0=C2=A0=C2=A0 =E2=80=A2 Remove leftover blank line
-> =C2=A0 - Apply given Reviewed- / acked-bys (Andy, Damien, Bartosz)
->=20
->=20
-> Important things first:
-> This series is based on [1] and [2] which Bjorn Helgaas has currently
-> queued for v6.12 in the PCI tree.
->=20
-> This series shall remove pcim_iounmap_regions() in order to make way
-> to
-> remove its brother, pcim_iomap_regions().
->=20
-> Regards,
-> P.
->=20
-> [1]
-> https://lore.kernel.org/all/20240729093625.17561-4-pstanner@redhat.com/
-> [2]
-> https://lore.kernel.org/all/20240807083018.8734-2-pstanner@redhat.com/
->=20
-> Philipp Stanner (6):
-> =C2=A0 PCI: Make pcim_iounmap_region() a public function
-> =C2=A0 PCI: Deprecate pcim_iounmap_regions()
-> =C2=A0 fpga/dfl-pci.c: Replace deprecated PCI functions
-> =C2=A0 block: mtip32xx: Replace deprecated PCI functions
-> =C2=A0 gpio: Replace deprecated PCI functions
-> =C2=A0 ethernet: cavium: Replace deprecated PCI functions
->=20
-> =C2=A0drivers/block/mtip32xx/mtip32xx.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 18 ++++++++--------
+On Mon, Oct 28, 2024 at 9:05=E2=80=AFAM Jinjie Ruan <ruanjinjie@huawei.com>=
+ wrote:
+>
+> In the error path of netlink_proto_init(), frees the already allocated
+> bucket table for new hash tables in a loop, but the loop condition
+> terminates when the index reaches zero, which fails to free the first
+> bucket table at index zero.
+>
+> Check for >=3D 0 so that nl_table[0].hash is freed as well.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> ---
+>  net/netlink/af_netlink.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>
+> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+> index 0a9287fadb47..9601b85dda95 100644
+> --- a/net/netlink/af_netlink.c
+> +++ b/net/netlink/af_netlink.c
+> @@ -2936,7 +2936,7 @@ static int __init netlink_proto_init(void)
+>         for (i =3D 0; i < MAX_LINKS; i++) {
+>                 if (rhashtable_init(&nl_table[i].hash,
+>                                     &netlink_rhashtable_params) < 0) {
+> -                       while (--i > 0)
+> +                       while (--i >=3D 0)
+>                                 rhashtable_destroy(&nl_table[i].hash);
+>                         kfree(nl_table);
+>                         goto panic;
 > --
-> =C2=A0drivers/fpga/dfl-pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 | 16 ++++------------
-> =C2=A0drivers/gpio/gpio-merrifield.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 15 ++++++++-=
-------
-> =C2=A0.../net/ethernet/cavium/common/cavium_ptp.c=C2=A0=C2=A0=C2=A0 |=C2=
-=A0 7 +++----
-> =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 8 ++++++--
-> =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> =C2=A06 files changed, 30 insertions(+), 35 deletions(-)
->=20
 
+Note that the host is going to panic, many other pieces of memory are
+left behind.
+
+A Fixes: tag seems unnecessary.
 
