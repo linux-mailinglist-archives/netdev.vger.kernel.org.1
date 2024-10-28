@@ -1,183 +1,237 @@
-Return-Path: <netdev+bounces-139568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8E1D9B320D
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 14:46:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2CB09B32C3
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:09:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB8361C21C7D
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 13:46:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80C602822FC
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 14:09:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7918F1DDA00;
-	Mon, 28 Oct 2024 13:45:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="BrQepBxB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BEC31DED56;
+	Mon, 28 Oct 2024 14:07:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C7281DD533
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 13:45:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20A2E1DE4E3
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 14:07:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730123103; cv=none; b=RmAKEYjLJm+QyRF5LRAeNKguuoZ97FsDXV4ZNju08UHLB+zUpQTh08sHEZoGML8+w7Fqw3xppV0QPpJCdSDj5t1eIY+TLGjvAXEQFpLZHZYd9XRy32FTKU8Gz9iXgm3BkPQUzsA+IBnLoqfphm2ZjzthC1nyWVg4Pn8tAdfnlAA=
+	t=1730124455; cv=none; b=hPXGP8sg8v+JY5XZUOHaZITMiGpeHYI6RwEx8EiCb0lvjaeJ4x+cfQkDORZGzk16Cf0zzww1z+vc2viWAj7e7iaGcaYv05bL2aOcYbVnX1ZlYVd9FwEDem86pPQgakqt099U+Z3jpSuY0qdbvLKb2ZOUPZ9zMGYOZKa9tytTKnU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730123103; c=relaxed/simple;
-	bh=aEs7wkOs/9Tmtuzmg6k86fkOGprpHMB9+QFgot8mjSE=;
+	s=arc-20240116; t=1730124455; c=relaxed/simple;
+	bh=cphWtKkhhPCR0SL0T9ODiGPD3s6cDdHQ8iEsC3GcO3g=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=OKaMVelC9OzYB4I4f/dPd40k8plAfckJdHSU5mbtqrNbC8XylRpApCeNiXv3g1MAh1EiKAxwfTTKJbbCuM6MRb2MtJ4DbtZMeqbrXulaCYpVgdO2IRWs8tMY9l1wQ+8Ae4wJGX+GuM4GrVBRMIEMohbv1Og+u7T+nzbAlNV2Bis=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=BrQepBxB; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730123100;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=2vGL1SVZq+LgfXtvaR3j6jeveiqx6XHBU95MSTDGVg4=;
-	b=BrQepBxBEfqeIeeoAXz6Qe4kdRgcRe33fWkBWk+JCgTZ3IYuNIgO2djpR6Bbim1l67r7xx
-	S/1dyV9YfwLknbh3tvexPW6stvgiuEVhs2+CuJjc9PeY7gPPFgqAF8vMAEzMXPNOhnktdn
-	hPJbEMW2UeuBQIUQ+lLBm0MSWz/QJTY=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-622-UksBqTIoOq-UMRhyjBjzaw-1; Mon, 28 Oct 2024 09:44:58 -0400
-X-MC-Unique: UksBqTIoOq-UMRhyjBjzaw-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-7b15d3cd6dcso823414785a.0
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 06:44:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730123098; x=1730727898;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2vGL1SVZq+LgfXtvaR3j6jeveiqx6XHBU95MSTDGVg4=;
-        b=Mwk8HYAu5EFmGxEY1WvXmey34JBUJktx9qnG+oEd9W6lYs6gm6YU7Mf5QLo5GQiXn8
-         yphwW756Q5vFUJngdFy3OwpirE4RMrDucdDDoN3U5qhy9SS+c4XsDeKrMqhf5Xxqo15u
-         IYqFfD65DhI0qj3PKSgvIcEobPa1K9u6oOA9jz5ZUrYvRPb4xuzjZ16fHL+KFuhpzSc8
-         mtxJmhmLsRfIu+x+W/0Fa8uAcfa7UT9ABZclBaCLt4ICJQsPKYSM9m1leXnYDJEjXUXQ
-         16Ke1xwz+kK8yruN9jgJ71hkBcukmdGtIBkL+LzjgVsvnvZdK44gKJv9AuAtptIX8/0i
-         HNgg==
-X-Forwarded-Encrypted: i=1; AJvYcCUtvMC/Jdykf5dWRwLLUe+d882uFOQQfgz71XQ2qESS4nQhuIalJ28H/sbrwFdj55Eqd3eVsk8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJHyoMtHaVD6gdzWpQ5p3Lsgnv9qVpz/pmKFbduDw5WjMkEwmd
-	VLr8O+SErSGFyLR061IQUyjD2ynaWYvVomdD+BGf2K7eFWWBwzTCwguHtNyjySR7tjOMw6uTNg/
-	oc5m/ICQPMfI+GuO7BG7xm2SXlEFnK1v+Z2h+Zn17eEroBWcnRqd5V8h0p9dOOQ==
-X-Received: by 2002:a05:620a:1a1c:b0:7b1:44f1:cb6d with SMTP id af79cd13be357-7b193f3f2d4mr1447475185a.42.1730123097798;
-        Mon, 28 Oct 2024 06:44:57 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGYDCoi09rdBp6AbuPJnFmwQMjbUbwDykG7M6wD0fUANXJfHN4wHVrUUk5Lqyj/Lt6o3xbXOQ==
-X-Received: by 2002:a05:620a:1a1c:b0:7b1:44f1:cb6d with SMTP id af79cd13be357-7b193f3f2d4mr1447469985a.42.1730123097245;
-        Mon, 28 Oct 2024 06:44:57 -0700 (PDT)
-Received: from sgarzare-redhat (host-79-46-200-231.retail.telecomitalia.it. [79.46.200.231])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d17973d8bdsm32521456d6.18.2024.10.28.06.44.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 06:44:56 -0700 (PDT)
-Date: Mon, 28 Oct 2024 14:44:53 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Konstantin Shkolnyy <kshk@linux.ibm.com>
-Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
-Subject: Re: [PATCH v3] vsock/test: fix failures due to wrong SO_RCVLOWAT
- parameter
-Message-ID: <s5mhlz5szowwse52t6u44u3despluqb2ucudmmolx55vmtvs2l@eptqoed2qwmv>
-References: <20241025154124.732008-1-kshk@linux.ibm.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MrMLkrvUuqjw/HDEKgie6vJWgyGY6BxxfUklvHRWG3JB5UKwjltmz9LkneIsBfUYvbOlKv1+3KZF0BRRUprDH/Wekckaf9qMV7fKaMYSKVqgPihkJhGnt2tvYb6mubcY3FKnt98z314luE1l5OaY5WDPhc/VAKhf8e7lZ5dYL00=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t5QOJ-0001De-10; Mon, 28 Oct 2024 15:06:43 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t5QOG-000rfn-1t;
+	Mon, 28 Oct 2024 15:06:40 +0100
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 174A6360944;
+	Mon, 28 Oct 2024 14:06:40 +0000 (UTC)
+Date: Mon, 28 Oct 2024 15:06:39 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20241028-observant-gentle-doberman-0a2baa-mkl@pengutronix.de>
+References: <20241024085922.133071-1-tmyu0@nuvoton.com>
+ <20241024085922.133071-2-tmyu0@nuvoton.com>
+ <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
+ <CAOoeyxUhnyYG3p+DQJG-tvU5vc5WYQZLLqCXW=uPcXTjq2gVfw@mail.gmail.com>
+ <20241025-truthful-honest-newt-c371c8-mkl@pengutronix.de>
+ <CAOoeyxUEf5vjqL67WjR-DbrhE0==2hqHLEyZ5XEBhEfMfQ5pag@mail.gmail.com>
+ <20241025-spirited-nocturnal-antelope-ce93dd-mkl@pengutronix.de>
+ <CAOoeyxW5QwPMGAYCWhQDtZwJJLG5xj9HXpL3-cduRSgF+4VHhg@mail.gmail.com>
+ <20241028-uptight-modest-puffin-0556e7-mkl@pengutronix.de>
+ <CAOoeyxU1r3ayhNWrbE_muDhA0imfZYX3-UHxSen9TqsTrSsxyA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="2vg3oknj3uphvbvf"
 Content-Disposition: inline
-In-Reply-To: <20241025154124.732008-1-kshk@linux.ibm.com>
+In-Reply-To: <CAOoeyxU1r3ayhNWrbE_muDhA0imfZYX3-UHxSen9TqsTrSsxyA@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Fri, Oct 25, 2024 at 10:41:24AM -0500, Konstantin Shkolnyy wrote:
->This happens on 64-bit big-endian machines.
->SO_RCVLOWAT requires an int parameter. However, instead of int, the test
->uses unsigned long in one place and size_t in another. Both are 8 bytes
->long on 64-bit machines. The kernel, having received the 8 bytes, doesn't
->test for the exact size of the parameter, it only cares that it's >=
->sizeof(int), and casts the 4 lower-addressed bytes to an int, which, on
->a big-endian machine, contains 0. 0 doesn't trigger an error, SO_RCVLOWAT
->returns with success and the socket stays with the default SO_RCVLOWAT = 1,
->which results in vsock_test failures, while vsock_perf doesn't even notice
->that it's failed to change it.
->
->Fixes: b1346338fbae ("vsock_test: POLLIN + SO_RCVLOWAT test")
->Fixes: 542e893fbadc ("vsock/test: two tests to check credit update logic")
->Fixes: 8abbffd27ced ("test/vsock: vsock_perf utility")
->Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
->---
->
->Notes:
->    The problem was found on s390 (big endian), while x86-64 didn't show it. After this fix, all tests pass on s390.
->Changes for v3:
->- fix the same problem in vsock_perf and update commit message
->Changes for v2:
->- add "Fixes:" lines to the commit message
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+--2vg3oknj3uphvbvf
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
+MIME-Version: 1.0
 
->
-> tools/testing/vsock/vsock_perf.c | 6 +++---
-> tools/testing/vsock/vsock_test.c | 4 ++--
-> 2 files changed, 5 insertions(+), 5 deletions(-)
->
->diff --git a/tools/testing/vsock/vsock_perf.c b/tools/testing/vsock/vsock_perf.c
->index 4e8578f815e0..22633c2848cc 100644
->--- a/tools/testing/vsock/vsock_perf.c
->+++ b/tools/testing/vsock/vsock_perf.c
->@@ -133,7 +133,7 @@ static float get_gbps(unsigned long bits, time_t ns_delta)
-> 	       ((float)ns_delta / NSEC_PER_SEC);
-> }
->
->-static void run_receiver(unsigned long rcvlowat_bytes)
->+static void run_receiver(int rcvlowat_bytes)
-> {
-> 	unsigned int read_cnt;
-> 	time_t rx_begin_ns;
->@@ -163,7 +163,7 @@ static void run_receiver(unsigned long rcvlowat_bytes)
-> 	printf("Listen port %u\n", port);
-> 	printf("RX buffer %lu bytes\n", buf_size_bytes);
-> 	printf("vsock buffer %lu bytes\n", vsock_buf_bytes);
->-	printf("SO_RCVLOWAT %lu bytes\n", rcvlowat_bytes);
->+	printf("SO_RCVLOWAT %d bytes\n", rcvlowat_bytes);
->
-> 	fd = socket(AF_VSOCK, SOCK_STREAM, 0);
->
->@@ -439,7 +439,7 @@ static long strtolx(const char *arg)
-> int main(int argc, char **argv)
-> {
-> 	unsigned long to_send_bytes = DEFAULT_TO_SEND_BYTES;
->-	unsigned long rcvlowat_bytes = DEFAULT_RCVLOWAT_BYTES;
->+	int rcvlowat_bytes = DEFAULT_RCVLOWAT_BYTES;
-> 	int peer_cid = -1;
-> 	bool sender = false;
->
->diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
->index f851f8961247..30857dd4ca97 100644
->--- a/tools/testing/vsock/vsock_test.c
->+++ b/tools/testing/vsock/vsock_test.c
->@@ -833,7 +833,7 @@ static void test_stream_poll_rcvlowat_server(const struct test_opts *opts)
->
-> static void test_stream_poll_rcvlowat_client(const struct test_opts *opts)
-> {
->-	unsigned long lowat_val = RCVLOWAT_BUF_SIZE;
->+	int lowat_val = RCVLOWAT_BUF_SIZE;
-> 	char buf[RCVLOWAT_BUF_SIZE];
-> 	struct pollfd fds;
-> 	short poll_flags;
->@@ -1282,7 +1282,7 @@ static void test_stream_rcvlowat_def_cred_upd_client(const struct test_opts *opt
-> static void test_stream_credit_update_test(const struct test_opts *opts,
-> 					   bool low_rx_bytes_test)
-> {
->-	size_t recv_buf_size;
->+	int recv_buf_size;
-> 	struct pollfd fds;
-> 	size_t buf_size;
-> 	void *buf;
->-- 
->2.34.1
->
+On 28.10.2024 16:31:25, Ming Yu wrote:
+> > > > > > > > The Linux USB stack can receive bulk messages longer than t=
+he max packet size.
+> > > > > > >
+> > > > > > > [Ming] Since NCT6694's bulk pipe endpoint size is 128 bytes f=
+or this MFD device.
+> > > > > > > The core will divide packet 256 bytes for high speed USB devi=
+ce, but
+> > > > > > > it is exceeds
+> > > > > > > the hardware limitation, so I am dividing it manually.
+> > > > > >
+> > > > > > You say the endpoint descriptor is correctly reporting it's max=
+ packet
+> > > > > > size of 128, but the Linux USB will send packets of 256 bytes?
+> > > > >
+> > > > > [Ming] The endpoint descriptor is correctly reporting it's max pa=
+cket
+> > > > > size of 256, but the Linux USB may send more than 256 (max is 512)
+> > > > > https://elixir.bootlin.com/linux/v6.11.5/source/drivers/usb/host/=
+xhci-mem.c#L1446
+> > > >
+> > > > AFAIK according to the USB-2.0 spec the maximum packet size for
+> > > > high-speed bulk transfers is fixed set to 512 bytes. Does this mean=
+ that
+> > > > your device is a non-compliant USB device?
+> > >
+> > > We will reduce the endpoint size of other interfaces to ensure that M=
+FD device
+> > > meets the USB2.0 spec. In other words, I will remove the code for man=
+ual
+> > > unpacking in the next patch.
+> >
+> > I was not talking about the driver, but your USB device. According to
+> > the USB2.0 spec, the packet size is fixed to 512 for high-speed bulk
+> > transfers. So your device must be able to handle 512 byte transfers or
+> > it's a non-compliant USB device.
+>=20
+> I understand. Therefore, the USB device's firmware will be modified to su=
+pport
+> bulk pipe size of 512 bytes to comply with the USB 2.0 spec.
 
+Then you don't need manual segmentation of bulk transfers anymore!
+
+> > > > > > > > > +     for (i =3D 0, len =3D length; len > 0; i++, len -=
+=3D packet_len) {
+> > > > > > > > > +             if (len > nct6694->maxp)
+> > > > > > > > > +                     packet_len =3D nct6694->maxp;
+> > > > > > > > > +             else
+> > > > > > > > > +                     packet_len =3D len;
+> > > > > > > > > +
+> > > > > > > > > +             ret =3D usb_bulk_msg(udev, usb_rcvbulkpipe(=
+udev, BULK_IN_ENDPOINT),
+> > > > > > > > > +                                nct6694->rx_buffer + nct=
+6694->maxp * i,
+> > > > > > > > > +                                packet_len, &rx_len, nct=
+6694->timeout);
+> > > > > > > > > +             if (ret)
+> > > > > > > > > +                     goto err;
+> > > > > > > > > +     }
+> > > > > > > > > +
+> > > > > > > > > +     for (i =3D 0; i < rd_len; i++)
+> > > > > > > > > +             buf[i] =3D nct6694->rx_buffer[i + rd_idx];
+> > > > > > > >
+> > > > > > > > memcpy()?
+> > > > > > > >
+> > > > > > > > Or why don't you directly receive data into the provided bu=
+ffer? Copying
+> > > > > > > > of the data doesn't make it faster.
+> > > > > > > >
+> > > > > > > > On the other hand, receiving directly into the target buffe=
+r means the
+> > > > > > > > target buffer must not live on the stack.
+> > > > > > >
+> > > > > > > [Ming] Okay! I'll change it to memcpy().
+> > > > > >
+> > > > > > fine!
+> > > > > >
+> > > > > > > This is my perspective: the data is uniformly received by the=
+ rx_bffer held
+> > > > > > > by the MFD device. does it need to be changed?
+> > > > > >
+> > > > > > My question is: Why do you first receive into the nct6694->rx_b=
+uffer and
+> > > > > > then memcpy() to the buffer provided by the caller, why don't y=
+ou
+> > > > > > directly receive into the memory provided by the caller?
+> > > > >
+> > > > > [Ming] Due to the bulk pipe maximum packet size limitation, I thi=
+nk consistently
+> > > > > using the MFD'd dynamically allocated buffer to submit URBs will =
+better
+> > > > > manage USB-related operations
+> > > >
+> > > > The non-compliant max packet size limitation is unrelated to the
+> > > > question which RX or TX buffer to use.
+> > >
+> > > I think these two USB functions can be easily called using the buffer
+> > > dynamically
+> > > allocated by the MFD. However, if they transfer data directly to the
+> > > target buffer,
+> > > they must ensure that it is not located on the stack.
+> >
+> > You have a high coupling between the MFD driver and the individual
+> > drivers anyways, so why not directly use the dynamically allocated
+> > buffer provided by the caller and get rid of the memcpy()?
+>=20
+> Okay! I will provide a function to request and free buffer for child devi=
+ces,
+> and update the caller's variables to use these two functions in the next =
+patch.
+
+I don't see a need to provide dedicated function to allocate and free
+the buffers. The caller can allocate them as part of their private data,
+or allocate them during probe().
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--2vg3oknj3uphvbvf
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcfmm0ACgkQKDiiPnot
+vG/OvQf+OF2IzP8yZ65Ke0Cq9hXkJZCpDCF4vKc3f2pLJQ/RjGNeubOY0v36mFwD
+5tZBs5Y7Md645uvjFh9VNg8YzW45+0dnzgzjGC28wj7hZpAW+yxnjNJ0zdpfBOPF
+pdwcIa8OLdqZ6exM1yGAyzV/en/klaL3oHu6RB8TmEMig/NQljdIF9nyslaqIAa4
+T1f+B7NmyH4nauAdBBhAOheqdJiO+eciscoFtxmOh4U5PQqGqR7VoBhkWrkx3JD1
+CqF6D9sNT+SP91/wuNPin6n85l/YDxSFkiKBG59p2do0l/vcwcWQ0denp4PT0dhk
+ZBpf0j8jPbNWS+ad8NpEyLE42beDRw==
+=o2YF
+-----END PGP SIGNATURE-----
+
+--2vg3oknj3uphvbvf--
 
