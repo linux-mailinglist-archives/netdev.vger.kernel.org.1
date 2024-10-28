@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-139607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 068EE9B385A
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:57:47 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4142B9B38AE
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 19:04:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C09ED281975
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:57:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 060BE2846E2
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:04:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EC151DF25C;
-	Mon, 28 Oct 2024 17:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A6021DE8AE;
+	Mon, 28 Oct 2024 18:04:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mOWIRcf6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hEC6N3od"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E585221106;
-	Mon, 28 Oct 2024 17:57:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DAE21534E9;
+	Mon, 28 Oct 2024 18:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730138263; cv=none; b=MHkpE2Q5HRSp7LESN4k1umnce6ySaGiUuY/Xj0GXO3NDDG80PlC/X7K9mmGVHQXBaMBVzWH81rW5xDyJ4BRmdxOE6rPFf7kIM10DYjjpP51eaXBZBqkgRH0heUlyolrj7orql3wzvBJ3WNZKF6Q5PZXBgNx78zu07KaDeog+MkY=
+	t=1730138672; cv=none; b=t5it4RD3cruR3FHxJXlBrH9ieY3vYUaJptg+3yd6ZlnQJEysDbN4g1N6LGA2pxqXLQrJgjopzLdxZQw25YMQ6KDCiQvvNgCC0SORi/8dzzdTSuBbsYEtYO2yk6As2El9N/JQ0upqKTtlNF1MLKJxxbMzWsnwxJNFU2xJ/FjUPxI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730138263; c=relaxed/simple;
-	bh=U6WYDMeT3X6Fc0vu9KGp38q+fAgGQDfoSSz5io5BqFI=;
+	s=arc-20240116; t=1730138672; c=relaxed/simple;
+	bh=24pGe552vWygi7BBuuBU+XwE9AGnpzt06Eu++NVNKeQ=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=IrSoq7/0ynZgG7fNHUHQCq1hirK/4JnPrc/dtiReFLhj08u9U7ydAAPKHRGQCeykDRrf0fiG4hUvmeyNE3j7JlXURpWf0hH5WB7SOG4/owpFlST5wO75qUO23LqVmUu3REfXzGybk1pjfi4wLkhioLSjjVhw9jzX30EAIL8XsHQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mOWIRcf6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D41B9C4CEC3;
-	Mon, 28 Oct 2024 17:57:38 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=aWOb64CDzgnepIA5uvmkhLevQEBpwINOIRYUFPOh/A6X+JsUEDG8qhzq4tc95ZTjOZnirNX2yY7Fcmn2X8HI2YTrrdRccXLT61i+ELRzKbdYTLkRfl7q8t61Arv3wBweDwtbk5z6mG3n3AhlBZIUupjK7dz5m7n3Y6FIq+GVtVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hEC6N3od; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBEEFC4CEC3;
+	Mon, 28 Oct 2024 18:04:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730138262;
-	bh=U6WYDMeT3X6Fc0vu9KGp38q+fAgGQDfoSSz5io5BqFI=;
+	s=k20201202; t=1730138671;
+	bh=24pGe552vWygi7BBuuBU+XwE9AGnpzt06Eu++NVNKeQ=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=mOWIRcf6tCa/l/ZPuKWCi66PtS4pL/hIFBYmQ1EO73fLhgS6mkZmgLEROmT5Xm/EG
-	 ViDVcU8nEFZ8+b2Z21nadT09uVEXSEx6umpJzh1YiIeleRcuU+RA+/zlFWF5oh24EE
-	 KMSeRnGOKExuYss/1873Qn9SFDDP/jqLj5YEmSQiL3SvpFn9a5k+/DnlN6YahZWADN
-	 HwHOQSgmPdvRXo9BnYqu/JMXQB9JSvgz0uBFppASiluCMkfq0MqsLwEsXQQoAgeGc2
-	 9EXaqVM7Unc/lkSfZ3RBmJ/CwzMpQ2qJkP+9nwRyJpkTN23m7VkIWJ7JlHJklOXcaI
-	 2WUoFK22/9oQQ==
-Message-ID: <ce2892c4-f759-40ca-a188-11a83b0164b3@kernel.org>
-Date: Mon, 28 Oct 2024 18:57:29 +0100
+	b=hEC6N3odzYViJLNl8zlg26xzIbpoIYX2cFKz1owP3pRMbR/Vms5cEfXmlJ0lmzn01
+	 mNoI3sReZFHFbhfDl5Oe/OhoxW8GvLONrFO9nbCSYJSnR1TcXagRZI714+gejHvPLL
+	 crmbM8EdfAzx9XBegP5xUoyUiM5Hf2pQuSkHFsJVmwG32iERCcldlQXjM/oKsP1rew
+	 WAwcTklhHfe8c5d+W+lS9/A2jtgphhuFvQzJ8OYLFTwYsUIDlVHRBDdpPvDLrD4tdx
+	 UJDOrPUr8LBizJ/YLJ1vR2p0cTMxg5KcQyxpEUnGiw+Hdfr/vSLhN1CInJpDkwyPNe
+	 3vMTrY9NfwW+w==
+Message-ID: <52a79aa8-5b69-4950-a0f6-b6439e1944d4@kernel.org>
+Date: Mon, 28 Oct 2024 19:04:27 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,18 +50,16 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH net-next 1/2] net: netconsole: selftests: Change the IP
- subnet
+Subject: Re: [PATCH rcu] configs/debug: make sure PROVE_RCU_LIST=y takes
+ effect
 Content-Language: en-GB
-To: Breno Leitao <leitao@debian.org>, kuba@kernel.org, horms@kernel.org,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- Andrew Lunn <andrew+netdev@lunn.ch>, Shuah Khan <shuah@kernel.org>
-Cc: thepacketgeek@gmail.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, davej@codemonkey.org.uk, vlad.wing@gmail.com,
- max@kutsevol.com, kernel-team@meta.com, aehkn@xenhub.one,
- Petr Machata <petrm@nvidia.com>,
- "open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-References: <20241028154805.1394611-1-leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, frederic@kernel.org, neeraj.upadhyay@kernel.org,
+ joel@joelfernandes.org, rcu@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kees@kernel.org, paulmck@kernel.org
+References: <20241016011144.3058445-1-kuba@kernel.org>
+ <22df18fd-4db4-4bf6-94e2-5a45aad91680@kernel.org>
+ <20241028102258.3bd81eeb@kernel.org>
 From: Matthieu Baerts <matttbe@kernel.org>
 Autocrypt: addr=matttbe@kernel.org; keydata=
  xsFNBFXj+ekBEADxVr99p2guPcqHFeI/JcFxls6KibzyZD5TQTyfuYlzEp7C7A9swoK5iCvf
@@ -107,25 +105,37 @@ Autocrypt: addr=matttbe@kernel.org; keydata=
  JY6dglzGKnCi/zsmp2+1w559frz4+IC7j/igvJGX4KDDKUs0mlld8J2u2sBXv7CGxdzQoHaz
  lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
 Organization: NGI0 Core
-In-Reply-To: <20241028154805.1394611-1-leitao@debian.org>
+In-Reply-To: <20241028102258.3bd81eeb@kernel.org>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi Breno,
+Hi Jakub,
 
-On 28/10/2024 16:48, Breno Leitao wrote:
-> Use a less populated IP range to run the tests, as suggested by Petr in
-> Link: https://lore.kernel.org/netdev/87ikvukv3s.fsf@nvidia.com/.
+On 28/10/2024 18:22, Jakub Kicinski wrote:
+> On Wed, 16 Oct 2024 17:18:47 +0200 Matthieu Baerts wrote:
+>> https://patchwork.kernel.org/project/netdevbpf/patch/20241016011144.3058445-1-kuba@kernel.org/
+>>
+>> If the impact is important, it might be better to target linux-next
+>> first, no?
+> 
+> Thanks for testing! I didn't anticipate it to be so effective.
+> 
+> Looks like it's not in -next, yet, and we got an Ack from Paul 
+> and co. so I'll toss it into net-next.
 
-It looks like this is the same version as the one you sent on Friday,
-without the modification suggested by Petr:
+Thanks!
 
-  https://lore.kernel.org/20241025161415.238215-1-leitao@debian.org
+Please note that the 3 issues I mentioned have been fixed somewhere:
 
-I supposed these new patches have been sent by accident, right?
+- MPTCP: patches have been sent to the Netdev ML [1]
+- Netfilter: patches have been sent to the Netfilter ML [2]
+- perf (VM shutdown): patches have been applied in perf/urgent [3]
 
-(BTW: it is often better to include a cover letter when there is more
-than one patch: some CIs might not take patches sent without it.)
+[1]
+https://lore.kernel.org/20241021-net-mptcp-sched-lock-v1-1-637759cf061c@kernel.org
+[2] https://lore.kernel.org/20241025133230.22491-2-fw@strlen.de
+[3]
+https://lore.kernel.org/20240913162340.2142976-1-kan.liang@linux.intel.com
 
 Cheers,
 Matt
