@@ -1,146 +1,108 @@
-Return-Path: <netdev+bounces-139604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5C7F9B3808
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:44:16 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD839B3833
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 18:50:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02DD41C2208D
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:44:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9BAAC1C222D3
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:50:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1131F428C;
-	Mon, 28 Oct 2024 17:40:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8B371DE8BC;
+	Mon, 28 Oct 2024 17:49:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b="iMV3DoKR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TR8zCYpd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
+Received: from mail-wm1-f41.google.com (mail-wm1-f41.google.com [209.85.128.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E441E1A2F
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 17:40:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BA571684AE;
+	Mon, 28 Oct 2024 17:49:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730137235; cv=none; b=P6h7PGNF5+aa+98Nz7XFy/Zt/ZhRq7wWtLvJVE8TVu0aaEtR3K7+Zl4IuOPOcrUxLwEWHJX/iTgdnzK2CavYNmpQzcWjWEwwI48NwnDa2Iy9jWeEv0T36M38vYX2SsLqFvaB42rWHvYXj/TbquCGDCuKrB64M2O2sUt+VYoCu50=
+	t=1730137793; cv=none; b=fw4g0Q3vZnw+CPdwILhqHZnLw4yFBTvn0oL0jB7KKx8H86b8/G5I9/88bQ8bkb6QIBjwWBl3lsGviPlegNO1t5NKJ3Pm93ua5TeM0rrFNIXDQojNnaUt9AbVpPwOaHn2Slbrz2ti+2zxczyAEXxXDsvb+WBqekFmJg9BLuS9jzQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730137235; c=relaxed/simple;
-	bh=Mzxbq0cogQNrwowj1zfIE0DVBGY5w4Uyxw7H3xobrQ4=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=nXzu7QLkVANbsmisk7SQ3i+2kBs5tJttPHtodpmOc7KmJ3aqhhRBKPYmsNtKcgc0fSWVScOdb9pzkC70aIT5Kw4kB1JGUnZ2HWV/fLnsaRICmvRoLRGp+ymANmJsX149Wnm13ToCfCrhoEwpwlhGOipTBruNPFzkkbkp9+O4PnE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com; spf=pass smtp.mailfrom=baylibre.com; dkim=pass (2048-bit key) header.d=baylibre-com.20230601.gappssmtp.com header.i=@baylibre-com.20230601.gappssmtp.com header.b=iMV3DoKR; arc=none smtp.client-ip=209.85.221.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=baylibre.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=baylibre.com
-Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37d4ba20075so3169988f8f.0
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 10:40:32 -0700 (PDT)
+	s=arc-20240116; t=1730137793; c=relaxed/simple;
+	bh=E//W8m4YIl+8TPawrXItaAVzCM6WdsT2a+xP/caSd88=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Umrs/dU4ep8LiJMgJyfhRjzvKoxQggJdCfRieEjIhXtFLeNfc9EzR7c3m6oS+cuvi1mtkE820QbmYdFv+FAQSCJjlqOVzI3ajbYRIX7oeIz6MYFrVcdjEZ8sTALwyJiWCcUX3IVAEW36jqKbangsAgktoUl5a5Lj5nMmuHGqK5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TR8zCYpd; arc=none smtp.client-ip=209.85.128.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f41.google.com with SMTP id 5b1f17b1804b1-431ac30d379so9710815e9.1;
+        Mon, 28 Oct 2024 10:49:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20230601.gappssmtp.com; s=20230601; t=1730137231; x=1730742031; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U0ITVZ/ruKG/TLGpfGAwzLMygWSysjucbld18q4vTYY=;
-        b=iMV3DoKRRpNIDMkkiEPWeH3jb/6MZNHLIgdXXdlzGCch6dojvGlvgGl4FQ25DaTccN
-         ErzNPrxgA1s6jhvc4YL0FdX/Npy/ww0uZLTgZSLkYd7h2MqT+u10oIjZYOHt7A/Acsox
-         p40gyd07Oj/T7MGuEf634+hqbJdXF4f+1Py1yL4bGvytQWRWVrXJlqusYDL59+BvKiiD
-         E5jEDSHh02oQgPrssuqwerJb//SLcyoviABZN81ZaQJTQh+uf4DS47B6mTuNDxerrAIb
-         m24EqqpZ3OCE/nuPbAka5/iaDdxoCBRjL4ndvgXhycMKwkjvTJw1VhAxvvU6QzJAoZpV
-         ir6A==
+        d=gmail.com; s=20230601; t=1730137790; x=1730742590; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dS+CDaRqLDX9OzIJihQbnIilfInW0I2/bW/aL1LjTwM=;
+        b=TR8zCYpdqaV7iV72k6m5LHctycktex7XJxjR1odaivTXBjOl3u3UssvEN52bflzOLV
+         IYrS3xgP+vkkciGWdz/0+f91uTaNs9dYc9C+yLsetDKwZJJobZN6IlFOr3eAhZFL9MBy
+         N53xEwzzxiXwUAeLKfpeKom71VDwnVOf4ivAE4ISSlDZcSDNLQgaUbcyG/YpWnMI/zA6
+         a2S/j5c9mS/H9ck55glqMr8N93WIQP2dUIZFsEOyn5lTVWK9JbgqunZOsdPOKrAVuNFa
+         ZVnDZML6NwXcjQ2Xs70RluJHn0c2QAFAJpxXG2NfPuD+ku2K4YCT9oYPqg/Ia7Us9YYP
+         hN/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730137231; x=1730742031;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1730137790; x=1730742590;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U0ITVZ/ruKG/TLGpfGAwzLMygWSysjucbld18q4vTYY=;
-        b=drYEioXPWqBrBJ/QdFx4M0mmgcJ2b9fALTRtHLyRxP+23X20ADU27iedColYWgkPVH
-         GhdHZodDdVczNDTCAXpe50I/y25hArteTYWriFCFFNYbt61Ul/dDEXWKSxbVzHhd7/ni
-         OYMHCQYFm0CtfojZD/q/P1UAJFI23eJ3RPXANWieG1C0G8jopQG1Ii3l+tc6b6uJZ5v+
-         ALMrh21zWdqyKJGgyXrgUUQB+YchV/vi2LcsfajCAjRusHrig+BHLJ3ltKIE/sO2fgUH
-         o5P1cb4p/BX4iuzrYWTE80bUnumQQtBx6u7yGDLLmp0PHu9kngx/scYcZOXIVm43xLaK
-         SnXw==
-X-Forwarded-Encrypted: i=1; AJvYcCVPPUrJu+vEj8OEUPOxE8UUfT2TukriPwpjVCm05OZhCm62Z1Cikp8T0BrU3K8OWkkw+VOwYkY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmLhMMEgxKUbDSTZDyfxweeR5MA1JwyCymijELZOcdu/64j4C/
-	ZYURb/9q242NACiIBV4frar3p0eZDASjx2VfJ4iGTgBL1layv4x9x09/VRnvbqQ=
-X-Google-Smtp-Source: AGHT+IFLz+kMolvcZZxnHsJqfE4G0Nz/GW/Zkf9/d2T203wI1tYzTYM+qzVyQH5oPcQLAmMdMoEp/g==
-X-Received: by 2002:a05:6000:dcc:b0:37c:cd71:2b96 with SMTP id ffacd0b85a97d-380612008f1mr6773135f8f.36.1730137230728;
-        Mon, 28 Oct 2024 10:40:30 -0700 (PDT)
-Received: from localhost ([2001:4091:a245:81f4:340d:1a9d:1fa6:531f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b928cesm10176299f8f.102.2024.10.28.10.40.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 28 Oct 2024 10:40:30 -0700 (PDT)
-From: Markus Schneider-Pargmann <msp@baylibre.com>
-Date: Mon, 28 Oct 2024 18:38:15 +0100
-Subject: [PATCH v5 9/9] arm64: dts: ti: k3-am62p-mcu: Mark mcu_mcan0/1 as
- wakeup-source
+        bh=dS+CDaRqLDX9OzIJihQbnIilfInW0I2/bW/aL1LjTwM=;
+        b=Agx9ddz7ecnxmmdOa3/LSPP5a44S1y+LX+kvOElrmhKk8UTewBx2S4iVQHNUfcQj2D
+         YkDW3rKkabVWlbzAvqXLRr1HYaxORfWVagMh8IyzxNSdjYrJCXjTwpYo71zyIPdLQooB
+         4CRiJyqoyuzA/GI+I3+YnKkvtDl/H6MSmy/+Ha6jI3h3bj4hVLNDgOS66AM507pC8xDE
+         EMpJzi+0mWg69fr3411XLJRyMLspP1+gPwWcyZhw0TXW1aFG+Ns7XKevf7tsA0fbj1OY
+         My9x9g5NQMk7/dODDXgEpKPgjhQmKobXN2IT0v1xWezpoCqDa26/wyTeHh0rUG7CIOEV
+         ClPA==
+X-Forwarded-Encrypted: i=1; AJvYcCX2jWcicPsxv4P8I9zW6i7mLLTFMiEyCO62OirJfJlzLYDmd3T1jf04wU3LEZ/dpxY6by4uz8q3@vger.kernel.org, AJvYcCX9C1sANcrsD/ix0Cf2UHwlsiA706bZwAA0Zm8EMVFlKhosyZ0hlPJ1YdylG+wmwHQ+4KbkeP58MWoR+XI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzHcLDsBdiV6Hq7H+EJHZzOakIAjwR6DZLJl0XkET/kdlD/9dfc
+	RqJMfhmdNofGz184sXqt106x2LmPsfgK9gAFGqYKgpn15IlqFwlStm5WbxvUiSPeYUivO4JIbV6
+	3QPhu0VUSKDTXX5ISDbCpKqssjt8=
+X-Google-Smtp-Source: AGHT+IEZiLVIqCI0cfYUlRzU/AbFdJ9mVCLjbS6yx75u6/19fy5sdAACVuuh5PZYe5RJd1iUMLtWWGteS29/GiRwVks=
+X-Received: by 2002:a05:600c:3593:b0:430:54a4:5ad7 with SMTP id
+ 5b1f17b1804b1-4319ac76449mr84448105e9.1.1730137789737; Mon, 28 Oct 2024
+ 10:49:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241028-topic-mcan-wakeup-source-v6-12-v5-9-33edc0aba629@baylibre.com>
-References: <20241028-topic-mcan-wakeup-source-v6-12-v5-0-33edc0aba629@baylibre.com>
-In-Reply-To: <20241028-topic-mcan-wakeup-source-v6-12-v5-0-33edc0aba629@baylibre.com>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>, 
- Marc Kleine-Budde <mkl@pengutronix.de>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, Nishanth Menon <nm@ti.com>, 
- Vignesh Raghavendra <vigneshr@ti.com>, Tero Kristo <kristo@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-arm-kernel@lists.infradead.org, 
- Matthias Schiffer <matthias.schiffer@ew.tq-group.com>, 
- Vishal Mahaveer <vishalm@ti.com>, Kevin Hilman <khilman@baylibre.com>, 
- Dhruva Gole <d-gole@ti.com>, Simon Horman <horms@kernel.org>, 
- Vincent MAILHOL <mailhol.vincent@wanadoo.fr>, 
- Markus Schneider-Pargmann <msp@baylibre.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1170; i=msp@baylibre.com;
- h=from:subject:message-id; bh=Tq/fbr0WhZHR5UVyg7x0DcqyPJVYjETLUN6TQAqpB5E=;
- b=owGbwMvMwCGm0rPl0RXRdfaMp9WSGNLlz1QyzdQW6Wafxrhl8zL7h8zPPz36vakyx5n/FdNag
- zg23n+SHaUsDGIcDLJiiix3Pyx8Vyd3fUHEukeOMHNYmUCGMHBxCsBEZvAwMpz8YVn959dP51+C
- HlPT9itpm33meOze4jNJ5GlLaqamVgPDb7a0zuifaQx+cmx6H6u+cz6a+NKj7M6J5R/Yog3PWBc
- 85AMA
-X-Developer-Key: i=msp@baylibre.com; a=openpgp;
- fpr=BADD88DB889FDC3E8A3D5FE612FA6A01E0A45B41
+References: <20241028115850.3409893-1-linyunsheng@huawei.com> <20241028115850.3409893-3-linyunsheng@huawei.com>
+In-Reply-To: <20241028115850.3409893-3-linyunsheng@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Mon, 28 Oct 2024 10:49:13 -0700
+Message-ID: <CAKgT0UfAyx54KW-Fx7_+DRx2sspYci21XvuL0MmwZ4c+Cpe2nQ@mail.gmail.com>
+Subject: Re: [PATCH RFC 02/10] net: rename skb_copy_to_page_nocache() helper
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>, 
+	Eric Dumazet <edumazet@google.com>, Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Vibhore Vardhan <vibhore@ti.com>
+On Mon, Oct 28, 2024 at 5:05=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
+>
+> Rename skb_copy_to_page_nocache() to skb_copy_to_frag_nocache()
+> to avoid calling virt_to_page() as we are about to pass virtual
+> address directly.
+>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> CC: Andrew Morton <akpm@linux-foundation.org>
+> CC: Linux-MM <linux-mm@kvack.org>
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> ---
+>  include/net/sock.h | 9 ++++-----
+>  net/ipv4/tcp.c     | 7 +++----
+>  net/kcm/kcmsock.c  | 7 +++----
+>  3 files changed, 10 insertions(+), 13 deletions(-)
 
-mcu_mcan0 and mcu_mcan1 can be wakeup sources for the SoC. Mark them
-accordingly in the devicetree. Based on the patch for AM62a.
+Looks good to me.
 
-Signed-off-by: Vibhore Vardhan <vibhore@ti.com>
-Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
----
- arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi | 2 ++
- 1 file changed, 2 insertions(+)
-
-diff --git a/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi b/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi
-index b33aff0d65c9def755f8dda9eb9feda7bc74e5c8..3afa17e6592f39387a667547835c90f95a9af351 100644
---- a/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi
-+++ b/arch/arm64/boot/dts/ti/k3-am62p-j722s-common-mcu.dtsi
-@@ -173,6 +173,7 @@ mcu_mcan0: can@4e08000 {
- 		interrupts = <GIC_SPI 26 IRQ_TYPE_LEVEL_HIGH>,
- 			     <GIC_SPI 27 IRQ_TYPE_LEVEL_HIGH>;
- 		interrupt-names = "int0", "int1";
-+		wakeup-source;
- 		status = "disabled";
- 	};
- 
-@@ -188,6 +189,7 @@ mcu_mcan1: can@4e18000 {
- 		interrupts = <GIC_SPI 28 IRQ_TYPE_LEVEL_HIGH>,
- 			     <GIC_SPI 29 IRQ_TYPE_LEVEL_HIGH>;
- 		interrupt-names = "int0", "int1";
-+		wakeup-source;
- 		status = "disabled";
- 	};
- 
-
--- 
-2.45.2
-
+Reviewed-by: Alexander Duyck <alexanderduyck@fb.com>
 
