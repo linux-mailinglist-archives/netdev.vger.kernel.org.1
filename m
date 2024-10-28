@@ -1,117 +1,131 @@
-Return-Path: <netdev+bounces-139436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DA69B24C8
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 06:59:14 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 549379B251E
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 07:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9852B209C3
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 05:59:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C75E2B20C5B
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 06:12:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D230918D620;
-	Mon, 28 Oct 2024 05:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05CA18CC12;
+	Mon, 28 Oct 2024 06:12:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WVu/3owU"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eZEk9UsC"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-184.mta1.migadu.com (out-184.mta1.migadu.com [95.215.58.184])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E16021885BE
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 05:59:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CFA117A596
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 06:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730095147; cv=none; b=RpffdJgLSIP0n+z3uyyWJ9ktUn3ZpjcKlzEe9eDQYzFy6uclkU1KDzf9Rqz+JDyPyPih+whD3jfiAXe0B61g0QVsB6qC57iJJfDXE2CI9FSF3E+3/nV9gBAYzeMazNXzmF3tv1G6lfFD3vGGAKGbkwEK0Ks1Tc8co6y4KEo/OfE=
+	t=1730095976; cv=none; b=l1NS8c/oGLQwce/8+peY5eO7jCDw08gn9j7Y3kUiGrmPx+ViMh8Ud2G5Ng7p2AWUaYz2o8XOBAieaRnJ6bcTuqrDXIWgVGek0o0F2siWUwpHY26Y+9ScZBbaSPSICKZymvzzg4vYS86suJx7DYZanCsyUtcDQTlEygLkTwfR7Yw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730095147; c=relaxed/simple;
-	bh=GyHy2ehMiq0kSfxmRoAo1MH2MwYdvN/RRAYfkPXzTwQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=e8cmKGNoxwwfmUnhxTl9Ix70ZfBo/U+pQ0UKxrYnqVcUVIoL2JPpXXRcTOEYRQSKBl9RkyR41hPfDTX1YgeioCvx6eF8+tm1fYng3cDTZpLjz4Oa/IuklEwxxlsX7KnD36AWsBey2BRLvKmWW2xzdeOPkntAl4j4e1PZtlUZyHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WVu/3owU; arc=none smtp.client-ip=95.215.58.184
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <9117f014-3ad3-4d9a-9357-4b57d376c660@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730095142;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xFVZGR7EERaxw8wCgEoCpv+J0X7JC4VBGETy3usqJSY=;
-	b=WVu/3owUA3h9p48LY+zfyilS6UtV9vUVknKJc8gkGgURcTNPLMJhfaw2Baqq9CE1p0fSUK
-	bL6MTKKhlKD7Z+xgzdjQG7y4Hi0/z5mnOoqz3pyLv6AhRf2HmpwAhktq3PAu7Re9aQ+KOu
-	4NL67pe6ZMj7KxukFQPImEGAjMG+dmc=
-Date: Sun, 27 Oct 2024 22:58:55 -0700
+	s=arc-20240116; t=1730095976; c=relaxed/simple;
+	bh=aFKuH9nVbtC0ZkRrh/M9jpQfvq12RJ+0LBd5hje0Xbo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=seX1o2fLj/tL9f+Cac0XSSOp2TKYU5lJw2sZ5c+KYzWV34UbOFEp6TnIiQN8q/NJDis99uwyKsD9KJkvIfgOocOLUDKqXUGFRnUpSKHK0vWHLpBPRXUlMdXaEw/m/beXxu8Tg8cnGB1GaZQXz2+KtVCXOVSEmmVrbrVNgGSyNYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eZEk9UsC; arc=none smtp.client-ip=198.175.65.21
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730095975; x=1761631975;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=aFKuH9nVbtC0ZkRrh/M9jpQfvq12RJ+0LBd5hje0Xbo=;
+  b=eZEk9UsClkUH3GGXcHM1bUwubEW6QC/YUGwkH1gcC+aFubgoclVqcp2O
+   ClkP/IXF21px7rmMYi0XPDoVDQWxLyZa1bR020CkI4xi6un90zQjbA5Tu
+   IhA4bl61FrznPOJsVZi7OfEH2RWatvK4wfv9FwONJVqnJC62EfINBG8Tw
+   CtF3R0xPYfMUSfm3p+8otb4S9eR+KS5jPBxshhT/Q7KJDb9MQHZ2+RrUG
+   1jcINxWwXiIi5m8ICxBHD21lhYRkvM/y8jzo4yiym49oPyfbvEqShSxOs
+   qeEYq92xhbySdlAldlsGma27VHNPBXzJ5LK5sbI8afaMLnTzq+JQ9v0Go
+   A==;
+X-CSE-ConnectionGUID: LTYAHiToT6WVk2dnBGVUQQ==
+X-CSE-MsgGUID: VzYUolitSIqGSa8qWM1qqQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="29642072"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="29642072"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 23:12:54 -0700
+X-CSE-ConnectionGUID: kyV8Tj/gQymNQvf+2pFy9A==
+X-CSE-MsgGUID: rgK1zgujTC6xK1nXNcH8vg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,238,1725346800"; 
+   d="scan'208";a="81462453"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa009-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Oct 2024 23:12:51 -0700
+Date: Mon, 28 Oct 2024 07:10:12 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org, pawel.chmielewski@intel.com,
+	sridhar.samudrala@intel.com, jacob.e.keller@intel.com,
+	pio.raczynski@gmail.com, konrad.knitter@intel.com,
+	marcin.szycik@intel.com, wojciech.drewek@intel.com,
+	nex.sw.ncis.nat.hpm.dev@intel.com, przemyslaw.kitszel@intel.com,
+	jiri@resnulli.us, horms@kernel.org, David.Laight@aculab.com
+Subject: Re: [iwl-next v5 2/9] ice: devlink PF MSI-X max and min parameter
+Message-ID: <Zx8qxF+4EPQZnO0k@mev-dev.igk.intel.com>
+References: <20241024121230.5861-1-michal.swiatkowski@linux.intel.com>
+ <20241024121230.5861-3-michal.swiatkowski@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Patch bpf] sock_map: fix a NULL pointer dereference in
- sock_map_link_update_prog()
-Content-Language: en-GB
-To: Cong Wang <xiyou.wangcong@gmail.com>, netdev@vger.kernel.org
-Cc: bpf@vger.kernel.org, Cong Wang <cong.wang@bytedance.com>,
- Ruan Bonan <bonan.ruan@u.nus.edu>, John Fastabend
- <john.fastabend@gmail.com>, Jakub Sitnicki <jakub@cloudflare.com>
-References: <20241026185522.338562-1-xiyou.wangcong@gmail.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <20241026185522.338562-1-xiyou.wangcong@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241024121230.5861-3-michal.swiatkowski@linux.intel.com>
 
-
-On 10/26/24 11:55 AM, Cong Wang wrote:
-> From: Cong Wang <cong.wang@bytedance.com>
->
-> The following race condition could trigger a NULL pointer dereference:
->
-> sock_map_link_detach():		sock_map_link_update_prog():
->     mutex_lock(&sockmap_mutex);
->     ...
->     sockmap_link->map = NULL;
->     mutex_unlock(&sockmap_mutex);
->     				   mutex_lock(&sockmap_mutex);
-> 				   ...
-> 				   sock_map_prog_link_lookup(sockmap_link->map);
-> 				   mutex_unlock(&sockmap_mutex);
->     <continue>
->
-> Fix it by adding a NULL pointer check. In this specific case, it makes
-> no sense to update a link which is being released.
->
-> Reported-by: Ruan Bonan <bonan.ruan@u.nus.edu>
-> Fixes: 699c23f02c65 ("bpf: Add bpf_link support for sk_msg and sk_skb progs")
-> Cc: Yonghong Song <yonghong.song@linux.dev>
-> Cc: John Fastabend <john.fastabend@gmail.com>
-> Cc: Jakub Sitnicki <jakub@cloudflare.com>
-> Signed-off-by: Cong Wang <cong.wang@bytedance.com>
+On Thu, Oct 24, 2024 at 02:12:23PM +0200, Michal Swiatkowski wrote:
+> Use generic devlink PF MSI-X parameter to allow user to change MSI-X
+> range.
+> 
+> Add notes about this parameters into ice devlink documentation.
+> 
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 > ---
->   net/core/sock_map.c | 4 ++++
->   1 file changed, 4 insertions(+)
->
-> diff --git a/net/core/sock_map.c b/net/core/sock_map.c
-> index 07d6aa4e39ef..9fca4db52f57 100644
-> --- a/net/core/sock_map.c
-> +++ b/net/core/sock_map.c
-> @@ -1760,6 +1760,10 @@ static int sock_map_link_update_prog(struct bpf_link *link,
->   		ret = -EINVAL;
->   		goto out;
->   	}
-> +	if (!sockmap_link->map) {
-> +		ret = -EINVAL;
+>  Documentation/networking/devlink/ice.rst      | 11 +++
+>  .../net/ethernet/intel/ice/devlink/devlink.c  | 83 ++++++++++++++++++-
+>  drivers/net/ethernet/intel/ice/ice.h          |  7 ++
+>  drivers/net/ethernet/intel/ice/ice_irq.c      |  7 ++
+>  4 files changed, 107 insertions(+), 1 deletion(-)
+> 
 
-Thanks for the fix. Maybe we should use -ENOENT as the return error code?
-In this case, update_prog failed due to sockmap_link->map == NULL which is
-equivalent to no 'entry' to update.
+[...]
 
-> +		goto out;
-> +	}
->   
->   	ret = sock_map_prog_link_lookup(sockmap_link->map, &pprog, &plink,
->   					sockmap_link->attach_type);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_irq.c b/drivers/net/ethernet/intel/ice/ice_irq.c
+> index ad82ff7d1995..0659b96b9b8c 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_irq.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_irq.c
+> @@ -254,6 +254,13 @@ int ice_init_interrupt_scheme(struct ice_pf *pf)
+>  	int total_vectors = pf->hw.func_caps.common_cap.num_msix_vectors;
+>  	int vectors, max_vectors;
+>  
+> +	/* load default PF MSI-X range */
+> +	if (!pf->msix.min)
+> +		pf->msix.min = ICE_MIN_MSIX;
+> +
+> +	if (!pf->msix.max)
+> +		pf->msix.max = total_vectors / 2;
+
+Probably it will be better to set max to the value that PF needs after
+calling ice_ena_msix_range(). I will send next version with that change,
+please not pull.
+
+Thanks,
+Michal
+
+> +
+>  	vectors = ice_ena_msix_range(pf);
+>  
+>  	if (vectors < 0)
+> -- 
+> 2.42.0
+> 
 
