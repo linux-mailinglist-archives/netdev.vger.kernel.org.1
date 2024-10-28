@@ -1,72 +1,76 @@
-Return-Path: <netdev+bounces-139664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF21D9B3C33
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:48:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40BDC9B3C35
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 21:49:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61856B218E3
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:48:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01F49281085
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 20:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B249C1DE2DF;
-	Mon, 28 Oct 2024 20:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6001DEFC6;
+	Mon, 28 Oct 2024 20:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TkLseHLO"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TQkCpjVf"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9046E18D649
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:48:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90B02185B54
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:49:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730148510; cv=none; b=bNLpw7YjkQ7n/+nP1FnRNjRM24waaUftrOxKP6tp7IVk0wdu/f3aVwV1s4QWiaAll05zG2u8xqeSjZSRnIEYRPFRNb0XBtIcwTz5g8G60mnPF9N5IUKNoAUlcmTSjzmIZyS5gRzsk6Ul2V4xejG1WMyxzNIs4gAhW/1o0v3ERzA=
+	t=1730148562; cv=none; b=rKpvGal0ZHVH7XDWQugelzFP0dNnivHBLjgOsPnUAqVDmEWRo37O9ltG5SIG6N/0BxAmmQggPNHYaBWA4Da1mH6B1zyolMKqsu5XxrbcJ4f2Ka6PI3sjA4IqSIOx+PH/8fdnwkYw0FMp3+ch9lm4j78J/PfJByHTj6QeQCBWlAI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730148510; c=relaxed/simple;
-	bh=SvRvHWEPkL1s1/bhNIhAxLbUg0uF/huboOQbYt9COnI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=YQ9r1PuR3pliY/MVs7Xia4cRHiVChyq0XceCJsaq7vdI+AhuUAor4GFfSofQ883UrpSeza+rsnAB2LAsnc0YEz4+jmWBkdYWGEVFprn8d03XthIhSgk4CVy7MS5c8TskvLyF3TiYdGPNgGbp2RPHItmWnryyKge1Gb9QSQYXzdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TkLseHLO; arc=none smtp.client-ip=192.198.163.12
+	s=arc-20240116; t=1730148562; c=relaxed/simple;
+	bh=7ghW+xE+c9QLCqFh2ZVaOVAhXdPDBirVKjPLZGFGUE0=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=d7uvqlsb+3q0KPMoBlwV64NzyNRzyNNrom/SASIJ+2pO0blP6nmUUIQO9Z5meqXVNcPUeucl1rOQVE4kHUUpqsHQlvDelSzd/zCuz9vAiXPYQd1a+wyvwlR+5n3d556ITh1a7hxerKCU3uUxtmZyTX8PKjoEX44FNVYMzH2uiCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TQkCpjVf; arc=none smtp.client-ip=192.198.163.12
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730148508; x=1761684508;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=SvRvHWEPkL1s1/bhNIhAxLbUg0uF/huboOQbYt9COnI=;
-  b=TkLseHLOGl0XMALjSd0nvhsfWGTQefHSxXPP6YrJ6ipMgVq51VRpbRqQ
-   4vu7GtLiiTLu9h4gEmp8gJd7p/5zBc19h6U7E7c3mgN9Og0TqH0VzqDQo
-   F7+eBm0IvfqoKVJxmyDboOLBfTwmTTazniuft2ym0YzJKV+3Tg4Ygrh2j
-   yEuN1AFKPk4+NGItY9nwCHczz30vG5LpA//uglRQKFGsmr2NXxA4gKvUc
-   +/vrVzGVJKGqAYlW3dVBXHj2IDVCq0HVGkdFuiFp8ZibfC6yQN/kSiIrd
-   ZXbroLjf2NueVwB24jwRC+BwlkWbpzmhqVFOUIw4bXxOB8SzzTGMfuH+f
-   w==;
-X-CSE-ConnectionGUID: wtnZt6/vRz+IJRMFmgBFBw==
-X-CSE-MsgGUID: L7zjMj4nS7aOsn2VbgnhPg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11239"; a="33685463"
+  t=1730148561; x=1761684561;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=7ghW+xE+c9QLCqFh2ZVaOVAhXdPDBirVKjPLZGFGUE0=;
+  b=TQkCpjVfrU713Da6u9nVJHVDpaJcxayEd41kGnuo9J/fQCbFu5fBtfuS
+   a2BP0x6vVtsT0UHAthNqCL/i6JOyXXW5hEOjUpixDw3YlMqV/Er3JYZmx
+   X1QFNkAmtNKV3f1JxY6UWlXGfUK7Zd2anJK7XOKSJp/Tyy1PRahBA79X+
+   391E+n9NsmhEpNGjeaGSbBUwJkXTBfi4qEY+X59jc7qT+ZNZVOLL9PLpy
+   iR0Yo6iqqox1KHxGQN5xXPomt8bYo6PYIBkB/3gq5fi+0TCwQaAiVrKSL
+   ny7LX7slmhtxVkxGVqvA0UlaO1NWd5FiPi57PA13cXInKZNihm1qQ/mah
+   Q==;
+X-CSE-ConnectionGUID: S6zxBth3TTG2Vv3x/G418Q==
+X-CSE-MsgGUID: HPO4QksCQYeO+6s47CclFw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11239"; a="33685551"
 X-IronPort-AV: E=Sophos;i="6.11,240,1725346800"; 
-   d="scan'208";a="33685463"
+   d="scan'208";a="33685551"
 Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 13:48:28 -0700
-X-CSE-ConnectionGUID: GS9LcOXoQBWErAqTgD1Sxw==
-X-CSE-MsgGUID: plqjDdVbRYuw60lBlggk0Q==
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Oct 2024 13:49:20 -0700
+X-CSE-ConnectionGUID: b3UvyK7mQHWPi5/6i+/kfA==
+X-CSE-MsgGUID: ddxUVmhqT6aroPde34E2fQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,240,1725346800"; 
-   d="scan'208";a="86529740"
+   d="scan'208";a="86529899"
 Received: from unknown (HELO gklab-003-001.igk.intel.com) ([10.211.3.1])
-  by orviesa005.jf.intel.com with ESMTP; 28 Oct 2024 13:48:26 -0700
+  by orviesa005.jf.intel.com with ESMTP; 28 Oct 2024 13:49:18 -0700
 From: Grzegorz Nitka <grzegorz.nitka@intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	anthony.l.nguyen@intel.com,
 	przemyslaw.kitszel@intel.com,
-	Grzegorz Nitka <grzegorz.nitka@intel.com>
-Subject: [PATCH v3 iwl-net 0/4] Fix E825 initialization
-Date: Mon, 28 Oct 2024 21:45:39 +0100
-Message-Id: <20241028204543.606371-1-grzegorz.nitka@intel.com>
+	Karol Kolacinski <karol.kolacinski@intel.com>,
+	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Subject: [PATCH v3 iwl-net 1/4] ice: Fix E825 initialization
+Date: Mon, 28 Oct 2024 21:45:40 +0100
+Message-Id: <20241028204543.606371-2-grzegorz.nitka@intel.com>
 X-Mailer: git-send-email 2.39.3
+In-Reply-To: <20241028204543.606371-1-grzegorz.nitka@intel.com>
+References: <20241028204543.606371-1-grzegorz.nitka@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,46 +79,75 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-E825 products have incorrect initialization procedure, which may lead to
-initialization failures and register values.
+From: Karol Kolacinski <karol.kolacinski@intel.com>
 
-Fix E825 products initialization by adding correct sync delay, checking
-the PHY revision only for current PHY and adding proper destination
-device when reading port/quad.
+Current implementation checks revision of all PHYs on all PFs, which is
+incorrect and may result in initialization failure. Check only the
+revision of the current PHY.
 
-In addition, E825 uses PF ID for indexing per PF registers and as
-a primary PHY lane number, which is incorrect.
+Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
+---
+V1 -> V2: Removed net-next hunks,
+	  add 'return' on PHY revision read failure
+V1 -> V2: Removed net-next hunks
 
-Karol Kolacinski (4):
-  ice: Fix E825 initialization
-  ice: Fix quad registers read on E825
-  ice: Fix ETH56G FC-FEC Rx offset value
-  ice: Add correct PHY lane assignment
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 22 +++++++++------------
+ 1 file changed, 9 insertions(+), 13 deletions(-)
 
- .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   1 +
- drivers/net/ethernet/intel/ice/ice_common.c   |  47 ++-
- drivers/net/ethernet/intel/ice/ice_common.h   |   1 +
- drivers/net/ethernet/intel/ice/ice_main.c     |   6 +-
- drivers/net/ethernet/intel/ice/ice_ptp.c      |  23 +-
- drivers/net/ethernet/intel/ice/ice_ptp.h      |   4 +-
- .../net/ethernet/intel/ice/ice_ptp_consts.h   |  77 +----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 281 ++++++++++--------
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  37 ++-
- drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |   7 +-
- drivers/net/ethernet/intel/ice/ice_type.h     |   2 -
- 11 files changed, 247 insertions(+), 239 deletions(-)
-
-V2 -> V3: Removed net-next hunks from "ice: Fix E825 initialization",
-          replaced lower/upper_32_bits calls with lower/upper_16_bits
-          in "ice: Fix quad registers read on E825",
-          improved ice_get_phy_lane_number function in "ice: Add correct
-          PHY lane assignment"
-V1 -> V2: Removed net-next hunks from "ice: Fix E825 initialization",
-          whole "ice: Remove unnecessary offset calculation for PF
-          scoped registers" patch and fixed kdoc in "ice: Fix quad
-          registers read on E825"
-
-base-commit: 19acd6818aa7404d96cd5d0e4373d4ebe71448c2
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index ec8db830ac73..d27b2f52b5ce 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -2663,14 +2663,15 @@ static bool ice_is_muxed_topo(struct ice_hw *hw)
+ }
+ 
+ /**
+- * ice_ptp_init_phy_e825c - initialize PHY parameters
++ * ice_ptp_init_phy_e825 - initialize PHY parameters
+  * @hw: pointer to the HW struct
+  */
+-static void ice_ptp_init_phy_e825c(struct ice_hw *hw)
++static void ice_ptp_init_phy_e825(struct ice_hw *hw)
+ {
+ 	struct ice_ptp_hw *ptp = &hw->ptp;
+ 	struct ice_eth56g_params *params;
+-	u8 phy;
++	u32 phy_rev;
++	int err;
+ 
+ 	ptp->phy_model = ICE_PHY_ETH56G;
+ 	params = &ptp->phy.eth56g;
+@@ -2684,15 +2685,10 @@ static void ice_ptp_init_phy_e825c(struct ice_hw *hw)
+ 	ptp->num_lports = params->num_phys * ptp->ports_per_phy;
+ 
+ 	ice_sb_access_ena_eth56g(hw, true);
+-	for (phy = 0; phy < params->num_phys; phy++) {
+-		u32 phy_rev;
+-		int err;
+-
+-		err = ice_read_phy_eth56g(hw, phy, PHY_REG_REVISION, &phy_rev);
+-		if (err || phy_rev != PHY_REVISION_ETH56G) {
+-			ptp->phy_model = ICE_PHY_UNSUP;
+-			return;
+-		}
++	err = ice_read_phy_eth56g(hw, hw->pf_id, PHY_REG_REVISION, &phy_rev);
++	if (err || phy_rev != PHY_REVISION_ETH56G) {
++		ptp->phy_model = ICE_PHY_UNSUP;
++		return;
+ 	}
+ 
+ 	ptp->is_2x50g_muxed_topo = ice_is_muxed_topo(hw);
+@@ -5394,7 +5390,7 @@ void ice_ptp_init_hw(struct ice_hw *hw)
+ 	else if (ice_is_e810(hw))
+ 		ice_ptp_init_phy_e810(ptp);
+ 	else if (ice_is_e825c(hw))
+-		ice_ptp_init_phy_e825c(hw);
++		ice_ptp_init_phy_e825(hw);
+ 	else
+ 		ptp->phy_model = ICE_PHY_UNSUP;
+ }
 -- 
 2.39.3
 
