@@ -1,92 +1,108 @@
-Return-Path: <netdev+bounces-139584-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5591E9B35AB
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:03:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 859AD9B362A
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 17:15:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 862381C21FFD
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:03:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D9222821F5
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8FFB1DE4D5;
-	Mon, 28 Oct 2024 16:03:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A59A71DF744;
+	Mon, 28 Oct 2024 16:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="LnDS4jMo"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="C0q+lkSK"
 X-Original-To: netdev@vger.kernel.org
-Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56FF81DE2D7;
-	Mon, 28 Oct 2024 16:03:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6383C1DED4F;
+	Mon, 28 Oct 2024 16:12:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730131409; cv=none; b=PIdKn2Imf8R9cQpFOO6ZvDLKY4/xhKfMSjK1YBibX/tGi/i4eIiNVBYu6Yv0gbdZLO501Sty9QO2enC2XqQUQxpoj3YVw7/K85lZPvXdvO173KlZzoK+DlHphclSVns0NGTh0FuQpdRWGTrYqenqg4L/V05d1RdH9lyMTa0zQNc=
+	t=1730131979; cv=none; b=ABjNfRRe6WpvwB3rd7Yz/ffbaDXqU/vADN13n7D3yDuV/F+qRfziFGurIP2aU9B0MkG2/ZCc/rOOqtywEArJdOkhiiubu7XtyJkHHeh9c5Z0JQqtOLI4O7pAe76cM740nFONaLHeKOjuZ5VHUBSjYCWLezv13zIlRGf5+/LN05o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730131409; c=relaxed/simple;
-	bh=UAtXx8qAoDQ9W+4K7wOWE4RA1ILQKmo8M8HZpFnFRl4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=N8FnAuX67LSeRd14xSfh1qiyoFQwn0E0L3zLgfrLE9Zn5PQUX9nJ8KkbzV0Xt1AwXYau1qVcfeRPgqaMwf7r3/Kbh+6E81U3BEpjECHqVOH0khNTKQYWGPp2li8+YQ3ZlzXHyogltHjBYWA5/4J+yNIRqhJ8Zzp53/IqrO/5rcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=LnDS4jMo; arc=none smtp.client-ip=148.251.105.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
-	s=mail; t=1730131405;
-	bh=UAtXx8qAoDQ9W+4K7wOWE4RA1ILQKmo8M8HZpFnFRl4=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=LnDS4jMoeFC0t2aQWoYE+GGV+R+znjtyR+I4fqlUdFzXDENxMbydGAO+2AYQ6JujI
-	 Nrus3ld2aPMBWrL5IK+hiwv9Tnf+UHNun5BVByxU/cV+zj0JHd0Hw+j9vvSTrxXdpT
-	 d2OpMK9x5FqyOO43J5pNqMvU76QPmJPNVnHEWVlfvD5vjgwMzGoj5CxXAyAw8KqGG8
-	 dH2YpEjOQA6U6uk1o8H1U8pU6CiS27rQp8orw6Y5FsVx1PmRQl+mpNz/h5l/vmGvAu
-	 MiiioBuJJugeblyO4DOgrLb4dM9hYf4Me0vc8rapDwJf+qj6lFA7V7oEdt7pAo5Dka
-	 KOIOWXVeIi8hA==
-Received: from [192.168.1.100] (2-237-20-237.ip236.fastwebnet.it [2.237.20.237])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: kholk11)
-	by bali.collaboradmins.com (Postfix) with ESMTPSA id 95C2517E3662;
-	Mon, 28 Oct 2024 17:03:24 +0100 (CET)
-Message-ID: <45d10ac1-6c00-47a2-8024-ab97ebe6a6bc@collabora.com>
-Date: Mon, 28 Oct 2024 17:03:24 +0100
+	s=arc-20240116; t=1730131979; c=relaxed/simple;
+	bh=xuzSVIC+24hcvUH3Uu6IJyxDoI8NF9z/u0YhE9kqbOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JNVP7hAqgExtXzxI3tlfkFXEQ2r0Oh9VSkcLoHN6QV+2RQCU6kL3CW+ZAP/NxVW14yT9xT0dmL9dKEgVRLYLbS8DHPjoPv+Z+Tpjruwq9rEhOBkjiE0niCqhpShKnshaYzgFDRP+drXMRIipma+Z8ZaiegD/BQozJXkLFlMxVrA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=C0q+lkSK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC1B6C4CEC3;
+	Mon, 28 Oct 2024 16:12:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730131979;
+	bh=xuzSVIC+24hcvUH3Uu6IJyxDoI8NF9z/u0YhE9kqbOY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=C0q+lkSKR1cXdmfA70QriKxNHoGAVcH+ZKCc+Zox4ygDHb48qTdn8VuHT2A4+o5V2
+	 zoili6j4ZeZdYddsbvCBmzv4/WQgpSj7kTlw06ahaK4hCP3zTRP9o3R85+DvpU2GYF
+	 JOfOD4cd4nqkmkIlo1feNr7WS5I7Lq9w9Ag0huIfm0H86flbsmELoeR1CWqpKwnAA6
+	 NYQH1pJbxeuWuW0ou07d6MW7v+ovxkDt0VgRA/OeSEyVzpisDjPRrKkn0IRURMLEiE
+	 huG9vkW7i5jsybC0co+F32KJLuGZov4R0mWfhQFuXfe18nE4zlmADox5tRHMwhBpHw
+	 r+wobvKfES9+g==
+Date: Mon, 28 Oct 2024 09:12:56 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
+ <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
+ David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
+ <abuehaze@amazon.com>, Paolo Abeni <pabeni@redhat.com>, "Christopher S .
+ Hall" <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>,
+ John Stultz <jstultz@google.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier
+ <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, qemu-devel
+ <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next v7] ptp: Add support for the AMZNC10C 'vmclock'
+ device
+Message-ID: <20241028091256.1b0752b4@kernel.org>
+In-Reply-To: <c1eb33ffd66d45af77dea58db8bdca3dcd2468c4.camel@infradead.org>
+References: <78969a39b51ec00e85551b752767be65f6794b46.camel@infradead.org>
+	<20241009173253.5eb545db@kernel.org>
+	<c20d5f27c9106f3cb49e2d8467ade680f0092f91.camel@infradead.org>
+	<20241014131238.405c1e58@kernel.org>
+	<c1eb33ffd66d45af77dea58db8bdca3dcd2468c4.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: mtk_wed: fix path of MT7988 WO
- firmware
-To: Daniel Golle <daniel@makrotopia.org>, linux-mediatek@lists.infradead.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, Sujuan Chen <sujuan.chen@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- "David S. Miller" <davem@davemloft.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Mark Lee <Mark-MC.Lee@mediatek.com>, Sean Wang <sean.wang@mediatek.com>,
- Felix Fietkau <nbd@nbd.name>, John Crispin <john@phrozen.org>
-References: <Zxz0GWTR5X5LdWPe@pidgin.makrotopia.org>
-From: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Content-Language: en-US
-In-Reply-To: <Zxz0GWTR5X5LdWPe@pidgin.makrotopia.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Il 26/10/24 15:52, Daniel Golle ha scritto:
-> linux-firmware commit 808cba84 ("mtk_wed: add firmware for mt7988
-> Wireless Ethernet Dispatcher") added mt7988_wo_{0,1}.bin in the
-> 'mediatek/mt7988' directory while driver current expects the files in
-> the 'mediatek' directory.
+On Sat, 19 Oct 2024 18:49:24 +0100 David Woodhouse wrote:
+> > Yes please and thank you! We gotta straighten it out before 
+> > the merge window.  
 > 
-> Change path in the driver header now that the firmware has been added.
-> 
-> Fixes: e2f64db13aa1 ("net: ethernet: mtk_wed: introduce WED support for MT7988")
-> Signed-off-by: Daniel Golle <daniel@makrotopia.org>
+> Hm, as I (finally) come to do that, I realise that many of the others
+> defined in drivers/ptp/Kconfig are also 'default y'. Which is only
+> really 'default PTP_1588_CLOCK' in practice since they all depend on
+> that.
 
-Reviewed-by: AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+AFAICT nothing defaulted to enabled since 2017, so I'd chalk it up
+to us getting better at catching mistakes over time.
 
+> Most importantly, PTP_1588_CLOCK_KVM is 'default y'. And that one is
+> fundamentally broken (at least in the presence of live migration if
+> guests care about their clock suddenly being wrong) which is why it's
+> being superseded by the new VMCLOCK thing. We absolutely don't want to
+> leave the _KVM one enabled by default and not its _VMCLOCK replacement.
 
+You can default to .._CLOCK_KVM, and provide the explanation in
+the commit message and Kconfig help.
+Or if you feel strongly even make CLOCK_KVM depend on the new one?
+
+> Please advise... I suspect the best answer is to leave it as it is? 
+
+I'd really rather not. Linus has complained to us about Kconfig symbols
+appearing / getting enabled by default multiple times in the past.
+
+Sorry for the delay, vacation time.
 
