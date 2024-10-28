@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-139490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AE539B2D98
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:56:25 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 075639B2DA7
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 11:58:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9643FB23C32
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 10:56:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 78005B2405B
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 10:58:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30001DE2CD;
-	Mon, 28 Oct 2024 10:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889ED1DED4D;
+	Mon, 28 Oct 2024 10:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JTWVyZa9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ua0SD3my"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7787D1DE2C9;
-	Mon, 28 Oct 2024 10:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599491DED47;
+	Mon, 28 Oct 2024 10:51:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730112704; cv=none; b=hS3ESSONUvJlbbwZyb2wLB0k/CSrnwjSGuwI1UAVrRxWTT0sriqyTdsAjvSzz0q+N/XKFljB1zH6hY+IMW3o8n61PaDyAF3HPoGK5Qx9OSNLNs4nF+FQHCn7mIo3Tukfm/P5s6JqqtT9iL9uQQA3jQleDQWQhUKHWr9iFSkITWM=
+	t=1730112716; cv=none; b=Q7T/wedKMEagLqnMjwOK4YAUMUCaDh286CLNRF01ee6Us+Z/Cv/prF+x30eIi1kHOxjDIu/KsK75DQ2WzW1xymax31rob9bLVsxbrmTLyGDMfM4l7TNULSdIO55UZlY7bLOqDx0ySxpz9MlYtqyGRZ7i/A1QzHdzeC3lLO9i0CY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730112704; c=relaxed/simple;
-	bh=InZ238puoPKl41A74fGH2wgXn+4jChPfsPt7LKEcKr4=;
+	s=arc-20240116; t=1730112716; c=relaxed/simple;
+	bh=bTDJbkidu2AHkisvua6Gnnv0DFKZ72/Vz61qoxw9XYc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Z4WkBnvUAwhaulePsK5EQ6XrOjwu8kGS8iPOhMWRBPH27CqaRu+nqwaFHkKi/RX7EBin8nQYibNtQox477HMawb9WkLeTgvWqjnlw05RFwVJztx596fmidVyzBZcjhI23Tgol806KDM/qUbE8ExPW4yshxvDfb5uS+BTV8qw1d0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JTWVyZa9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EF79AC4CEE3;
-	Mon, 28 Oct 2024 10:51:42 +0000 (UTC)
+	 MIME-Version; b=U4WMC3Lrw/7J3zaeEKl/kdUFLw3R2sjrDw6PGsp60QwrQemzcHdcc1moAXUNbwNB+dLLEIh5XTdLH88Wd9uD0V0wTQxgUOV57hNN6DtH/WosRemI3EevD+69qipnDhHyrL2OenboeX0tDc8wNGpQ3JpDAYZKbFe6PLE4dLr4ir4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ua0SD3my; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D6936C4CEE4;
+	Mon, 28 Oct 2024 10:51:54 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730112704;
-	bh=InZ238puoPKl41A74fGH2wgXn+4jChPfsPt7LKEcKr4=;
+	s=k20201202; t=1730112716;
+	bh=bTDJbkidu2AHkisvua6Gnnv0DFKZ72/Vz61qoxw9XYc=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=JTWVyZa92xhqWkta+tMxZ4EcsHMG0WTw4xvjvC7Tp9u7tY0Hkfp58qO6S5UFIU+pq
-	 2a5z/xlG26BE0bOxERYSTwrqassTBs0AvDNj4yA/yfuIbYTLMncDE2GNwIPJY9PoeP
-	 zAAqvScywB89QZwZBvLyIhCVnQDZGfW79rRgtlQr+VwaPGZULWSimeK1kd83GtpDBM
-	 UtazdfWo2IoO1TvTa9gOOMyD1vBgcdZm1scdGmCDD88HVy8yRw7EVltPZaKYSPU15I
-	 yxYCzbgHz/0KNucImOYE8j5mK1xu4y+4qiskJM+QK5VmO+NRUExMYMtnIuIjEm6JJd
-	 4HayZ8J5y3q4Q==
+	b=ua0SD3my89JjYOM6U+oB33syY1K3c2AEyh0OntWyij5jsbFL1A/BtcRiZRR+MOTs8
+	 TjUYC8RzLx7HtZZUOtcaZVrJOPSszLUUCTDynt4UJTpPuSXY8OpVssZS1qK6z6fF91
+	 rEdjNRgLbx96dEAcGzrwIXqTm+9H4m0c2GvszJBbeYQhMU5ig1AI8iBl7Hy4G+btK7
+	 jvcDb/YODGrqGVbRMB+MiSBGiaOrmuhrDdeXZUq0hCm/c9JpflmK2ghRtn9kzkj+Z+
+	 XXWQ/gQqDFn1Ex9RLjTGMzFMoCTeZS1eSwXUjuF0JnnTyiOdOmnr4vfYmA5pGQvyNZ
+	 JYBnWLPHW1cOw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Aleksandr Mishin <amishin@t-argos.ru>,
+Cc: Reinhard Speyerer <rspmn@arcor.de>,
 	Paolo Abeni <pabeni@redhat.com>,
 	Sasha Levin <sashal@kernel.org>,
-	madalin.bucur@nxp.com,
+	bjorn@mork.no,
 	andrew+netdev@lunn.ch,
 	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
-	linux@armlinux.org.uk,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.11 20/32] fsl/fman: Save device references taken in mac_probe()
-Date: Mon, 28 Oct 2024 06:50:02 -0400
-Message-ID: <20241028105050.3559169-20-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	linux-usb@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.11 26/32] net: usb: qmi_wwan: add Fibocom FG132 0x0112 composition
+Date: Mon, 28 Oct 2024 06:50:08 -0400
+Message-ID: <20241028105050.3559169-26-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241028105050.3559169-1-sashal@kernel.org>
 References: <20241028105050.3559169-1-sashal@kernel.org>
@@ -71,88 +71,55 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.11.5
 Content-Transfer-Encoding: 8bit
 
-From: Aleksandr Mishin <amishin@t-argos.ru>
+From: Reinhard Speyerer <rspmn@arcor.de>
 
-[ Upstream commit efeddd552ec6767e4c8884caa516ac80b65f8823 ]
+[ Upstream commit 64761c980cbf71fb7a532a8c7299907ea972a88c ]
 
-In mac_probe() there are calls to of_find_device_by_node() which takes
-references to of_dev->dev. These references are not saved and not released
-later on error path in mac_probe() and in mac_remove().
+Add Fibocom FG132 0x0112 composition:
 
-Add new fields into mac_device structure to save references taken for
-future use in mac_probe() and mac_remove().
+T:  Bus=03 Lev=02 Prnt=06 Port=01 Cnt=02 Dev#= 10 Spd=12   MxCh= 0
+D:  Ver= 2.01 Cls=00(>ifc ) Sub=00 Prot=00 MxPS=64 #Cfgs=  1
+P:  Vendor=2cb7 ProdID=0112 Rev= 5.15
+S:  Manufacturer=Fibocom Wireless Inc.
+S:  Product=Fibocom Module
+S:  SerialNumber=xxxxxxxx
+C:* #Ifs= 4 Cfg#= 1 Atr=a0 MxPwr=500mA
+I:* If#= 0 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=50 Driver=qmi_wwan
+E:  Ad=82(I) Atr=03(Int.) MxPS=   8 Ivl=32ms
+E:  Ad=81(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=01(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
+E:  Ad=02(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=83(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=40 Driver=option
+E:  Ad=85(I) Atr=03(Int.) MxPS=  10 Ivl=32ms
+E:  Ad=84(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=03(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+I:* If#= 3 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
+E:  Ad=86(I) Atr=02(Bulk) MxPS=  64 Ivl=0ms
+E:  Ad=04(O) Atr=02(Bulk) MxPS=  64 Ivl=0ms
 
-This is a preparation for further reference leaks fix.
+Signed-off-by: Reinhard Speyerer <rspmn@arcor.de>
 
-Signed-off-by: Aleksandr Mishin <amishin@t-argos.ru>
+Link: https://patch.msgid.link/ZxLKp5YZDy-OM0-e@arcor.de
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ethernet/freescale/fman/mac.c | 6 ++++--
- drivers/net/ethernet/freescale/fman/mac.h | 6 +++++-
- 2 files changed, 9 insertions(+), 3 deletions(-)
+ drivers/net/usb/qmi_wwan.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/drivers/net/ethernet/freescale/fman/mac.c b/drivers/net/ethernet/freescale/fman/mac.c
-index 9767586b4eb32..9b863db0bf087 100644
---- a/drivers/net/ethernet/freescale/fman/mac.c
-+++ b/drivers/net/ethernet/freescale/fman/mac.c
-@@ -197,6 +197,7 @@ static int mac_probe(struct platform_device *_of_dev)
- 		err = -EINVAL;
- 		goto _return_of_node_put;
- 	}
-+	mac_dev->fman_dev = &of_dev->dev;
- 
- 	/* Get the FMan cell-index */
- 	err = of_property_read_u32(dev_node, "cell-index", &val);
-@@ -208,7 +209,7 @@ static int mac_probe(struct platform_device *_of_dev)
- 	/* cell-index 0 => FMan id 1 */
- 	fman_id = (u8)(val + 1);
- 
--	priv->fman = fman_bind(&of_dev->dev);
-+	priv->fman = fman_bind(mac_dev->fman_dev);
- 	if (!priv->fman) {
- 		dev_err(dev, "fman_bind(%pOF) failed\n", dev_node);
- 		err = -ENODEV;
-@@ -284,8 +285,9 @@ static int mac_probe(struct platform_device *_of_dev)
- 			err = -EINVAL;
- 			goto _return_of_node_put;
- 		}
-+		mac_dev->fman_port_devs[i] = &of_dev->dev;
- 
--		mac_dev->port[i] = fman_port_bind(&of_dev->dev);
-+		mac_dev->port[i] = fman_port_bind(mac_dev->fman_port_devs[i]);
- 		if (!mac_dev->port[i]) {
- 			dev_err(dev, "dev_get_drvdata(%pOF) failed\n",
- 				dev_node);
-diff --git a/drivers/net/ethernet/freescale/fman/mac.h b/drivers/net/ethernet/freescale/fman/mac.h
-index fe747915cc737..8b5b43d50f8ef 100644
---- a/drivers/net/ethernet/freescale/fman/mac.h
-+++ b/drivers/net/ethernet/freescale/fman/mac.h
-@@ -19,12 +19,13 @@
- struct fman_mac;
- struct mac_priv_s;
- 
-+#define PORT_NUM 2
- struct mac_device {
- 	void __iomem		*vaddr;
- 	struct device		*dev;
- 	struct resource		*res;
- 	u8			 addr[ETH_ALEN];
--	struct fman_port	*port[2];
-+	struct fman_port	*port[PORT_NUM];
- 	struct phylink		*phylink;
- 	struct phylink_config	phylink_config;
- 	phy_interface_t		phy_if;
-@@ -52,6 +53,9 @@ struct mac_device {
- 
- 	struct fman_mac		*fman_mac;
- 	struct mac_priv_s	*priv;
-+
-+	struct device		*fman_dev;
-+	struct device		*fman_port_devs[PORT_NUM];
- };
- 
- static inline struct mac_device
+diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
+index 4823dbdf54656..f137c82f1c0f7 100644
+--- a/drivers/net/usb/qmi_wwan.c
++++ b/drivers/net/usb/qmi_wwan.c
+@@ -1426,6 +1426,7 @@ static const struct usb_device_id products[] = {
+ 	{QMI_FIXED_INTF(0x2c7c, 0x0296, 4)},	/* Quectel BG96 */
+ 	{QMI_QUIRK_SET_DTR(0x2c7c, 0x030e, 4)},	/* Quectel EM05GV2 */
+ 	{QMI_QUIRK_SET_DTR(0x2cb7, 0x0104, 4)},	/* Fibocom NL678 series */
++	{QMI_QUIRK_SET_DTR(0x2cb7, 0x0112, 0)},	/* Fibocom FG132 */
+ 	{QMI_FIXED_INTF(0x0489, 0xe0b4, 0)},	/* Foxconn T77W968 LTE */
+ 	{QMI_FIXED_INTF(0x0489, 0xe0b5, 0)},	/* Foxconn T77W968 LTE with eSIM support*/
+ 	{QMI_FIXED_INTF(0x2692, 0x9025, 4)},    /* Cellient MPL200 (rebranded Qualcomm 05c6:9025) */
 -- 
 2.43.0
 
