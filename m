@@ -1,62 +1,65 @@
-Return-Path: <netdev+bounces-139727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A1C9B3E8C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:37:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1CEE99B3E93
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:40:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9F6B71F21F40
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:37:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F0521C216D1
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B94B1F9AB8;
-	Mon, 28 Oct 2024 23:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 907231FAC30;
+	Mon, 28 Oct 2024 23:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="oLZqu6YZ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CKHCl6rs"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F3271E0B62;
-	Mon, 28 Oct 2024 23:37:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 619111925B3;
+	Mon, 28 Oct 2024 23:40:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730158637; cv=none; b=OFhFSa5sUaLTbJKii3ms2puFnDNu6KHWk1iUrD82LnbaglHNW3V0us+nGCo/YjImIbUuXq3pA41hfTGdILlkthR4kDeYeTatZ0btnjAMVv9kDZJsOV7OZ3M5jP3R8TjtKIz5wsdvPgbComaba+Wjt/WQlBpbo7F6OC5G58IsFyM=
+	t=1730158820; cv=none; b=MvfFzVD0UJcW6doxPYtmAzfDrkwn5SH5TL3xSKCKOgR7KpczUAeGXFNizz+p3lRBx5JL+ZLBDxc4vde91OWXe4eaX6kT6Lj8eEseF7VNAhMwM2ljnr2MtCY+RaheKqWRF2hKVmV6z3yFqj6QAvFv9Un+VuoaCVB7gUF4JqQ6274=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730158637; c=relaxed/simple;
-	bh=S47lYuLvJr2byEk7lZ68+wZXEnpqqU3QlilyzPP2pTQ=;
+	s=arc-20240116; t=1730158820; c=relaxed/simple;
+	bh=pQzl1y9h2xsU92uZtxx7jqh2VQjUzwEVlkfCH4GvCD0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=UtbY041V7S5HIB2xh448GbZph7AOpAh/HA3rwP/oeH8U90g3GVRaP5f34jICxgzKRJ6ZfoGmjsnvzq2E1w8SQFox+W7B275lSabGyjsrccNrXTTF1G5rOnPpAHw/30rYsQ0VPIPQ3F9Yw57e+a+D2J4sBFGQPhtg6uB4hiHOIp8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=oLZqu6YZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1313C4CEC3;
-	Mon, 28 Oct 2024 23:37:16 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=Vhyu6Iu9T6Rm4NLOQ3Q/BrX/3mT8+81kaLcKfuRkvvekIGOAry3/OafRSq3FToqcSz54Ky4Y7YaEILMbb297+xTc5+1b8YNSRXoBBcwjI00hQKrof8+RPCOAyqxFWtqcDLo5psPKxQTmSD3JN2BTnWCXo3vsqJ3sEo8khIHthc8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CKHCl6rs; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D3837C4CEC3;
+	Mon, 28 Oct 2024 23:40:19 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730158637;
-	bh=S47lYuLvJr2byEk7lZ68+wZXEnpqqU3QlilyzPP2pTQ=;
+	s=k20201202; t=1730158819;
+	bh=pQzl1y9h2xsU92uZtxx7jqh2VQjUzwEVlkfCH4GvCD0=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=oLZqu6YZKO6pIOVA84u2CXTBq/CHtCq7is5wPbCe6aEDMmS5kdRP6uXbjz0u9+Fwo
-	 P3ofV5oNNwlSvahrN2hCm+M7mWgv0NwNu112S5CWcRp2osulnb33UVoFVO/mvIqa+9
-	 Sc9/vfMJCLfS29o7yCvvPlU+eaSNQvGmOgkjJVPHIOdIJhQWX/nI4LLp8NXpH9Cq2z
-	 4vliL78nJRLeRV3A9MgXLpPhF8VojI3vbelczSz2RXq/rtSedS2WLNvf+Ko1T3n1BX
-	 MA9bHIBBARLbzpOnLFNcCUjmzuMpbbhoNKmUJahb2f6qVJ6fpQK6hr1lVqD+kNcpcK
-	 ZDeD1Hfb9Z4yQ==
-Date: Mon, 28 Oct 2024 16:37:14 -0700
+	b=CKHCl6rs42Z1Ijgn7WEAnUb20e/btZs665SvomSIANBuBXzlHA1HjIBtgIEfLVUQq
+	 nwPVOZWGKEwWueNFd3wzc6DFjIgvT/9/X7FTpB+fRcpLcTrvjywW/6AjZJBcD6Fwme
+	 4QeUyVjjk+LbLu4aTpAS57AcEKNBSvtoagvkxoOk6c1RT2y8hqLicXf37HX+yEqSEy
+	 B6wg7WTzGHH5UXSP+YGwEPC0BP0C32H78AKuawPmUUGbAmGpZMiT+q5GUIbr7TLapy
+	 BkgZVzCtUyJYPzJptHCtzqIhTC/snZBuAa5zoLDHS8Uqag0uIG+DGpL//bPUp1XXgh
+	 AdRmlfVQKTv1Q==
+Date: Mon, 28 Oct 2024 16:40:16 -0700
 From: Kees Cook <kees@kernel.org>
-To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
-	Johannes Berg <johannes@sipsolutions.net>,
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
 	David Ahern <dsahern@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH v2 4/4][next] uapi: net: Avoid
- -Wflex-array-member-not-at-end warnings
-Message-ID: <202410281637.68A4BCF7@keescook>
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2 1/4][next] uapi: socket: Introduce struct
+ sockaddr_legacy
+Message-ID: <202410281637.8CF1EA8AE7@keescook>
 References: <cover.1729802213.git.gustavoars@kernel.org>
- <cc80c778ce791f3f0a873b01aecb90934d6fd17a.1729802213.git.gustavoars@kernel.org>
+ <23bd38a4bf024d4a92a8a634ddf4d5689cd3a67e.1729802213.git.gustavoars@kernel.org>
+ <66641c32-a9fb-4cd6-b910-52d2872fad3d@lunn.ch>
+ <bc7d77fdbe97edc3481f9f73a438742651bd4b8b.camel@sipsolutions.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -65,30 +68,27 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <cc80c778ce791f3f0a873b01aecb90934d6fd17a.1729802213.git.gustavoars@kernel.org>
+In-Reply-To: <bc7d77fdbe97edc3481f9f73a438742651bd4b8b.camel@sipsolutions.net>
 
-On Thu, Oct 24, 2024 at 03:14:31PM -0600, Gustavo A. R. Silva wrote:
-> -Wflex-array-member-not-at-end was introduced in GCC-14, and we are
-> getting ready to enable it, globally.
+On Mon, Oct 28, 2024 at 09:47:08PM +0100, Johannes Berg wrote:
+> On Mon, 2024-10-28 at 21:38 +0100, Andrew Lunn wrote:
+> > > As this new struct will live in UAPI, to avoid breaking user-space code
+> > > that expects `struct sockaddr`, the `__kernel_sockaddr_legacy` macro is
+> > > introduced. This macro allows us to use either `struct sockaddr` or
+> > > `struct sockaddr_legacy` depending on the context in which the code is
+> > > used: kernel-space or user-space.
+> > 
+> > Are there cases of userspace API structures where the flexiable array
+> > appears in the middle?
 > 
-> Address the following warnings by changing the type of the middle struct
-> members in a couple of composite structs, which are currently causing
-> trouble, from `struct sockaddr` to `struct __kernel_sockaddr_legacy` in 
-> UAPI, and `struct sockaddr_legacy` for the rest of the kernel code.
-> 
-> include/uapi/linux/route.h:33:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/route.h:34:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/uapi/linux/route.h:35:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end
-> include/net/compat.h:34:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> include/net/compat.h:35:25: warning: structure containing a flexible array member is not at the end of another structure [-Wflex-array-member-not-at-end]
-> 
-> Also, update some related code, accordingly.
-> 
-> Signed-off-by: Gustavo A. R. Silva <gustavoars@kernel.org>
+> Clearly, it's the case for all the three other patches in this series.
 
-Looks right, including the helper prototype update.
-
-Reviewed-by: Kees Cook <kees@kernel.org>
+The issue is that the kernel uses these structures, and the kernel's view
+of sockaddr is that it (correctly) has a flexible array.  Userspace's view
+of sockaddr is the old struct (which comes from the libc, not the kernel)
+which ends with a fake flexible array. We need to correct the kernel's
+view of these structures to use the introduced legacy struct to avoid
+lying to the compiler about what's going on. :)
 
 -- 
 Kees Cook
