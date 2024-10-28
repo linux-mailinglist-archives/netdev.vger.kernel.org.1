@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-139432-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1257B9B2404
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A9DD9B2405
 	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 06:07:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C227BB21346
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 05:07:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 334481F21244
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 05:07:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F7518C01E;
-	Mon, 28 Oct 2024 05:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 010F218C903;
+	Mon, 28 Oct 2024 05:07:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="lLy5zi6d"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Doq+oLm5"
 X-Original-To: netdev@vger.kernel.org
 Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D05B156960
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE09815B10D
 	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 05:07:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730092070; cv=none; b=jSkbXacjvZHFOxenAiy0PaiYS8rLuPQ7DXFlOUaVcmCWAzLaa1mUzQHQg1G3phTtemMU15wLuE9ognWdISw2iJc455K7DPi33POt7jtnj6uvVJvrJNWUBNwSw4o+uxfaf1UNOChOu6h1c2Ljp2f+q1sRk61F62JuzBFDX4Dq2JM=
+	t=1730092070; cv=none; b=GoGDDEN5adKcnprKz0dQOpQTiEMrABN/ocBBkBlPaPfcPCZ6OVsQIdzOYeEEyEOkBcsPMEsWxG4m2wgO2Uso/iyjv+c9n9atTkIb0siogJUYVaRFxPHeEbioAP/MS4rpvu5rUqCuUBlbAJ4O9mgXpKiQBGgKwqRlCDv6C2wVIes=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730092070; c=relaxed/simple;
-	bh=N4dhZ6JzUE4CLYN+aQVEtmv40sF6OkYDclUPKfC4LFA=;
+	bh=oyPLf17Iwv3aGdvjOQ/Zucpf0l1SWbVR5lm95upvBxM=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=dTWf5cSdPxpU5TiRv5mI0k6oWIWMRI0bhwyDxYLyJvkIlx9LVheeiXgSwLlVimf6OWuhEn3loaQyfjrW8KYQvxlMQqG0oiDYBsUjqiOwlwSZuQDiyQtljQsbofK7z7HEWOzmW4nPHjWIkVrBnKnF29WWrnYW6cRqiFGf14RJpko=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=lLy5zi6d; arc=none smtp.client-ip=203.29.241.158
+	 In-Reply-To:To:Cc; b=bbVFGKnwZbypyKBjxUUyme83BHFHIOKSKxRPGFNgAzpap85Bpdw776q4MA9E+G0jfORM2bRrLwrti8zcxVFN7F0NzokbDlAJs+hBpScGNF4IPnzq9yCbzaa+M2Rn5MM/Ftq64BOKZgAdB9sQFKJ6Eh1BDAmcqijQ4pGGeW5J7Fg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Doq+oLm5; arc=none smtp.client-ip=203.29.241.158
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=codeconstruct.com.au; s=2022a; t=1730092066;
-	bh=f2Wgny9VTAMDRmRU3TpQm16omarWfJleZ7QkQ1mowLI=;
+	bh=friYgHxcHFCpKwFUOVsqQZO9DMHIz/whwCAryidTIt4=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc;
-	b=lLy5zi6dcFViGM7MKVEG810QfkNCOm62jvOfz3K0F5rx0d5L5bn4ii53qaBq0w42/
-	 7l/6jRl0/GqviML5Yjv6tvHj4uIa7Owu0ibutBGOlpePTYI+yqPcphF0f24XPCjigV
-	 b95D7sacxPbHh9DV/qLFSrjK5vG3cqWHLpjrH/N6UAUfKPM0XK86re3r3bSZbltB4A
-	 JrGvcmBa5MM41gZNK6AnlyJ9j4WigyrVkjBClb8E0gMNpK9Z3tKo2/4YEr9TPoZszz
-	 ijBvq2207RxOdcfsVV//Iu73JCKSwXDNe/bCqNcRJfY1V0LV4k/8N3yOjQmTHSxiVz
-	 3/ol5aVQcdFSQ==
+	b=Doq+oLm5MuHK0JGP/f+oW2wBanyLp7bAEeb5OAAnTJrBUTpUjksOPLpBdrkczgS3H
+	 0aueNh0yPcxkgRH8/HKeP2YyA7iCjHpQRfjDK0h1MUeNMf8yJ8sHAp+Lbv2q2QwTZ5
+	 /LdvDHCbU9jTqF29Ncmk7/NzuHpzvPAh/g+UqBAyr24qSRhZpLMJNgLY8Vocn22I7S
+	 jRgEhrcElEFEW4sfqwboS5AxL8PvHAzgNkMulDMiitey5tOgPycuGIOkvatpTVwda+
+	 Umy1/GqOl/1LhdX3g23f8N9GoVGNEtFKgpJfX90nPyPAd4DHZT8etO2J5fLKbjbxeJ
+	 kCC3ZwBEebdig==
 Received: by codeconstruct.com.au (Postfix, from userid 10000)
-	id 667BB69E9A; Mon, 28 Oct 2024 13:07:46 +0800 (AWST)
+	id E265169EAB; Mon, 28 Oct 2024 13:07:46 +0800 (AWST)
 From: Jeremy Kerr <jk@codeconstruct.com.au>
-Date: Mon, 28 Oct 2024 13:06:56 +0800
-Subject: [PATCH 1/2] net: ncsi: don't assume associated netdev has a
- platform_device parent
+Date: Mon, 28 Oct 2024 13:06:57 +0800
+Subject: [PATCH 2/2] net: ncsi: restrict version sizes when hardware
+ doesn't nul-terminate
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,7 +55,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241028-ncsi-fixes-v1-1-f0bcfaf6eb88@codeconstruct.com.au>
+Message-Id: <20241028-ncsi-fixes-v1-2-f0bcfaf6eb88@codeconstruct.com.au>
 References: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
 In-Reply-To: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
 To: Samuel Mendoza-Jonas <sam@mendozajonas.com>, 
@@ -65,38 +65,48 @@ To: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
 Cc: netdev@vger.kernel.org
 X-Mailer: b4 0.14.2
 
-The ncsi driver currently does a:
+When constructing a netlink NCSI channel info message, we assume that
+the hardware version field is nul-terminated, which may not be the case
+for version name strings that are exactly 12 bytes.
 
-       pdev = to_platform_device(dev->dev.parent);
-       if (pdev) {
+Build a proper nul-terminated buffer to use in nla_put_string()
+instead.
 
-However, dev->dev.parent may be null, and to_platform_device() will not
-catch this case as intended by the conditional.
-
-Instead, check that dev->dev.parent is present, and is a
-platform_device, before converting.
-
-Fixes: 5e0fcc16e5c5 ("net/ncsi: Support for multi host mellanox card")
+Fixes: 955dc68cb9b2 ("net/ncsi: Add generic netlink family")
 Signed-off-by: Jeremy Kerr <jk@codeconstruct.com.au>
 ---
- net/ncsi/ncsi-manage.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ net/ncsi/ncsi-netlink.c | 11 ++++++++++-
+ 1 file changed, 10 insertions(+), 1 deletion(-)
 
-diff --git a/net/ncsi/ncsi-manage.c b/net/ncsi/ncsi-manage.c
-index 5cf55bde366d1813865ac5da17d232b5eadb2a3e..647d12fde693114cfe3970e75546df48ad4c335e 100644
---- a/net/ncsi/ncsi-manage.c
-+++ b/net/ncsi/ncsi-manage.c
-@@ -1789,8 +1789,8 @@ struct ncsi_dev *ncsi_register_dev(struct net_device *dev,
- 	ndp->ptype.dev = dev;
- 	dev_add_pack(&ndp->ptype);
+diff --git a/net/ncsi/ncsi-netlink.c b/net/ncsi/ncsi-netlink.c
+index 2f872d064396df55c2e213c525bae7740c12f62e..f2ba74537061ff616ce48a587969fd2270fb44c9 100644
+--- a/net/ncsi/ncsi-netlink.c
++++ b/net/ncsi/ncsi-netlink.c
+@@ -58,6 +58,8 @@ static int ncsi_write_channel_info(struct sk_buff *skb,
+ 				   struct ncsi_dev_priv *ndp,
+ 				   struct ncsi_channel *nc)
+ {
++	const unsigned int fw_name_len = sizeof(nc->version.fw_name);
++	char fw_name[sizeof(nc->version.fw_name) + 1];
+ 	struct ncsi_channel_vlan_filter *ncf;
+ 	struct ncsi_channel_mode *m;
+ 	struct nlattr *vid_nest;
+@@ -73,7 +75,14 @@ static int ncsi_write_channel_info(struct sk_buff *skb,
  
--	pdev = to_platform_device(dev->dev.parent);
--	if (pdev) {
-+	if (dev->dev.parent && dev_is_platform(dev->dev.parent)) {
-+		pdev = to_platform_device(dev->dev.parent);
- 		np = pdev->dev.of_node;
- 		if (np && (of_property_read_bool(np, "mellanox,multi-host") ||
- 			   of_property_read_bool(np, "mlx,multi-host")))
+ 	nla_put_u32(skb, NCSI_CHANNEL_ATTR_VERSION_MAJOR, nc->version.major);
+ 	nla_put_u32(skb, NCSI_CHANNEL_ATTR_VERSION_MINOR, nc->version.minor);
+-	nla_put_string(skb, NCSI_CHANNEL_ATTR_VERSION_STR, nc->version.fw_name);
++
++	/* the fw_name string will only be nul-terminated if it is shorter
++	 * than the 12-bytes available in the packet definition; ensure we have
++	 * the correct terminator here.
++	 */
++	memcpy(fw_name, nc->version.fw_name, fw_name_len);
++	fw_name[fw_name_len] = '\0';
++	nla_put_string(skb, NCSI_CHANNEL_ATTR_VERSION_STR, fw_name);
+ 
+ 	vid_nest = nla_nest_start_noflag(skb, NCSI_CHANNEL_ATTR_VLAN_LIST);
+ 	if (!vid_nest)
 
 -- 
 2.39.2
