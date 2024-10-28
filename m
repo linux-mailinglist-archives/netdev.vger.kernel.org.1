@@ -1,122 +1,144 @@
-Return-Path: <netdev+bounces-139575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E8CC9B34A6
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:20:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 04CDC9B34E4
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 16:30:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5693F1C21F25
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:20:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBC6E281CE0
+	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 15:30:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CA5B1DE3B3;
-	Mon, 28 Oct 2024 15:20:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cq73vevG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2B411DE8BE;
+	Mon, 28 Oct 2024 15:29:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B422C1DDC05
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 15:20:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E9C21DE889
+	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 15:29:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730128839; cv=none; b=Tf405QHDP2gmfE20UxY0Q10G8396Qa3PKk62punqcQxjtpV3e1BsIqUb5oi3dwhaOv0vTg13zsZCGQfZeFEQ2ZQFvu7QVlE9K8w0mDVVBLm/IK/jqRaW4iyCwMiLsuB8n/Dp8bgcVc/AcR/unokmmcs8JLn/6hUgxfzegSKLbQ0=
+	t=1730129353; cv=none; b=FL8nknBvUMHUnL9oeUHao6kB3Dvaci3RNdXAxPXXLYytsdAGz14zeI0o6RjX5tksfiD9KHa3Pv22YCZoir/xZTWcuQEkGBRKEPLLoB8VGr0XOtG74KWU9VouJ6/pf4UPVnMYhW66e0XpOPAjyra8L4u3CV19W5lfd8b1P8k/6qI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730128839; c=relaxed/simple;
-	bh=9vOfV1nv3dJamdMcGcAvkjeuuuehU7scnrXHevP4JGE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=g2CLySIgOpMewd2C7Tl3TqOPkyfu/625g+DuAiGiOP4AhQAYa1Udnmm97weM5zheV5LfQ3BpOBeIu9+OEJaLBHc4YGKYQDYf7lnAS3ZegWTvbxbZInYWDESKYAZ9+RydEbC1vLIoRIregxka0zhmqSsGJMj9qYagy7Kj3lxoQj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cq73vevG; arc=none smtp.client-ip=209.85.208.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5c9454f3bfaso5219500a12.2
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 08:20:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730128835; x=1730733635; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8A7Y1smH5iLgDTBZI8wqoHylFq2drR/RaP5ssz22jRY=;
-        b=cq73vevGHyRwIo3onMOUSZCq/5fCVwCwI2Zmq0CVeeGcSLFkUdjS5Qazhx88arGFIh
-         chMDQfnHa6zZAQP9XT3v0lG1nrh31OHKeQi/nqZz5ha0rycIj54kdb5NC7mL7Fn/qHCU
-         TN+aaNfFPjvYE16QHs56zBOwg8zO/qP9YRt1OBkOygIxWt0ZERRLNrq5DIHGg2ZGceHj
-         XAHyYElaU7xHbQnm15tzBL0VFiFBjK9E1o2zHlnqyREtVReJobRG3ubgJ1zW4nc4BoZp
-         V0WWW1DBVwdh5d5SeYJtMm8w4JOjAXBLUqKvEgq9ntHQYZpKUPnfGMuRIEV/emBqD/Cm
-         WCZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730128835; x=1730733635;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8A7Y1smH5iLgDTBZI8wqoHylFq2drR/RaP5ssz22jRY=;
-        b=Z1zi/2T3faMtTNrnSQG10AypY1M1txvK2o5PGMbfsjnc+OHN1JcNdfp5iUOksvJ9/W
-         qTUwN5fOrCQgcQNH+lhTCC0y1FgnUC/sFuNy1lQNyysfw8Kl8wAWYTvtbOPxg75ZtjXn
-         4awwRPZLQ/ewa7VIhq20kTEl8TgLRZrR9H2Ik89SJN+jJyICtTH35xr+KaJUXul84oWi
-         5oIuxbyC8njT0JxmivhTdplesZ9zK75xE6w60MCuvwVDHgNoyDRSBr3KAf6gP4w5d1+e
-         taQDXk/cv1CM0ILQzLBHR4qahN0b4wv7gNVQr4e/QIsOqT5tATuJrTZhgz017rsECJeK
-         nipQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXdJw+6dBH2Y3Cjpoqv7c6UFGnyQEt8cpIE6AkWzpswrN7iX6qY/uQskIx7r0yTVqVuFCl38B0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH46ssZq0OH3aXfbOTzdgZYuyvh2qZNDxpAO+U3OqGB/6yYsd5
-	ObaWCDZyJiNlQWGyoncV4B10iKJw6P9MpewmmUHL4W+tokFz6/5YKhVP5Sgd4IS2KN49jHs29Iv
-	mQhavj0IC8fL7qtvBI0/W+IIocCqmn75k5EO5
-X-Google-Smtp-Source: AGHT+IGQlWvncSWyRjU0MqLvkzq7zgdmh8ci7LTfgESO71eUgRKbiRnKH3tfmeMsJw+1nj1dpvpgLjvAzpaqngtva14=
-X-Received: by 2002:a05:6402:40d5:b0:5c9:4022:872d with SMTP id
- 4fb4d7f45d1cf-5cbbfa66f3dmr7608343a12.32.1730128834716; Mon, 28 Oct 2024
- 08:20:34 -0700 (PDT)
+	s=arc-20240116; t=1730129353; c=relaxed/simple;
+	bh=SKtyNgIFZEZ0qXXkIJhRGSixVdUEa0UAdc/hwiPYEOM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=axqwKWJatXFUBfspT79geO7N0RlyihxeZpGygT2zM3KuZ/wnq2wOtUwRIMEuMBxM8bzOs8PV9Xo2ls2+N9KHY+blC/oiAJ3fet12n+TpADw63flJ244K3+5vkSayLYUDNkMcaPja9HVXIW+oJx/BWFd5RTa18KdQV+6EAvyuhuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t5Rfj-0001p6-UH; Mon, 28 Oct 2024 16:28:47 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t5Rfg-000sdb-1p;
+	Mon, 28 Oct 2024 16:28:44 +0100
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 2C35A360A41;
+	Mon, 28 Oct 2024 15:28:44 +0000 (UTC)
+Date: Mon, 28 Oct 2024 16:28:43 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Hal Feng <hal.feng@starfivetech.com>
+Cc: Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
+	Albert Ou <aou@eecs.berkeley.edu>, Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
+	William Qiu <william.qiu@starfivetech.com>, "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
+	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-riscv@lists.infradead.org" <linux-riscv@lists.infradead.org>, "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Subject: Re: RE: [PATCH v2 3/4] can: Add driver for CAST CAN Bus Controller
+Message-ID: <20241028-delectable-fantastic-swine-3ab4dd-mkl@pengutronix.de>
+References: <20240922-inquisitive-stingray-of-philosophy-b725d3-mkl@pengutronix.de>
+ <ZQ2PR01MB1307D96BB8AC0B6BB78C97C9E64F2@ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028080515.3540779-1-ruanjinjie@huawei.com>
-In-Reply-To: <20241028080515.3540779-1-ruanjinjie@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 28 Oct 2024 16:20:20 +0100
-Message-ID: <CANn89iJCshHRan=w_YMp7bEeBadOjNS7PU392q2K4qNTRtz=Ow@mail.gmail.com>
-Subject: Re: [PATCH net] netlink: Fix off-by-one error in netlink_proto_init()
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	kuniyu@amazon.com, a.kovaleva@yadro.com, lirongqing@baidu.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="bayufuaqihhp4puc"
+Content-Disposition: inline
+In-Reply-To: <ZQ2PR01MB1307D96BB8AC0B6BB78C97C9E64F2@ZQ2PR01MB1307.CHNPR01.prod.partner.outlook.cn>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+
+--bayufuaqihhp4puc
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
+Subject: Re: RE: [PATCH v2 3/4] can: Add driver for CAST CAN Bus Controller
+MIME-Version: 1.0
 
-On Mon, Oct 28, 2024 at 9:05=E2=80=AFAM Jinjie Ruan <ruanjinjie@huawei.com>=
- wrote:
->
-> In the error path of netlink_proto_init(), frees the already allocated
-> bucket table for new hash tables in a loop, but the loop condition
-> terminates when the index reaches zero, which fails to free the first
-> bucket table at index zero.
->
-> Check for >=3D 0 so that nl_table[0].hash is freed as well.
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> ---
->  net/netlink/af_netlink.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-> index 0a9287fadb47..9601b85dda95 100644
-> --- a/net/netlink/af_netlink.c
-> +++ b/net/netlink/af_netlink.c
-> @@ -2936,7 +2936,7 @@ static int __init netlink_proto_init(void)
->         for (i =3D 0; i < MAX_LINKS; i++) {
->                 if (rhashtable_init(&nl_table[i].hash,
->                                     &netlink_rhashtable_params) < 0) {
-> -                       while (--i > 0)
-> +                       while (--i >=3D 0)
->                                 rhashtable_destroy(&nl_table[i].hash);
->                         kfree(nl_table);
->                         goto panic;
-> --
+On 25.10.2024 01:45:30, Hal Feng wrote:
+> On 9/23/2024 5:14 AM, Marc Kleine-Budde wrote:=20
+> > On 22.09.2024 22:51:49, Hal Feng wrote:
+> > > From: William Qiu <william.qiu@starfivetech.com>
+> > >
+> > > Add driver for CAST CAN Bus Controller used on StarFive JH7110 SoC.
+> >=20
+> > Have you read me review of the v1 of this series?
+> >=20
+> > https://lore.kernel.org/all/20240129-zone-defame-c5580e596f72-
+> > mkl@pengutronix.de/
+>=20
+> Yes, I modify accordingly except using FIELD_GET() / FIELD_PREP(), using
+> rx_offload helper and the shared interrupt flag. I found FIELD_GET() / FI=
+ELD_PREP()
+> can only be used when the mask is a constant,
 
-Note that the host is going to panic, many other pieces of memory are
-left behind.
+Do you have a non constant mask?
 
-A Fixes: tag seems unnecessary.
+> and the CAN module won't
+> work normally if I change the interrupt flag to 0.
+
+What do you mean by "won't work normally"?
+It makes no sense to claim that you support shared interrupts, but
+print an error message, if your IP core had no active interrupt.
+
+> I will try to using rx_offload helper
+> in the next version.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--bayufuaqihhp4puc
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcfragACgkQKDiiPnot
+vG85Ygf9GrLJf5wV7bdgz9vs/sx2rKcJlxRbC5pFv5ebTX6WbvM9DlF2hVFYLukY
+OVR12GIkefiKCKDW1cEYxZhba1VifqSaayUs8heOrhUjm8W4gq7/258tWSMuwDVS
+OcRyTkEP/1UrCB78AHAFtUML+doEqstQArznjSIuzPbytCVQfbNAkrIwagtqLeiR
+Xsj4tXKjJQcoIDNBwtMRGJAgNMLSWwt2y7JRj98ygicPFhcPSZVB+CwvXPA2XxqM
+ipRmtWdT+pBJtZ3jdD4uhSKP46ROV9ggtZksy8v00ElJG/lu48rQHvKU4pKGkEK1
+FwAZIHUmjawWlux4wTT8gRgosM4fcA==
+=vCRm
+-----END PGP SIGNATURE-----
+
+--bayufuaqihhp4puc--
 
