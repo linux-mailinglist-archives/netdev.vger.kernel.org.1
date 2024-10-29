@@ -1,84 +1,84 @@
-Return-Path: <netdev+bounces-140074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B710C9B52CD
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:34:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 378FC9B52D1
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:36:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6E63C1F23276
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:34:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA442282F43
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:36:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 341E71FF5F3;
-	Tue, 29 Oct 2024 19:34:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC6602071FC;
+	Tue, 29 Oct 2024 19:35:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="sUAB/mXc"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="A5eXiE57"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A0C3197A93
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 19:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27E25190486
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 19:35:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730230456; cv=none; b=PYAls8z18HU72DU40nzWkIbokhd4/ET0Kekz1Bh6/Pfz+fiS6lmwmlYLm2/U53a3gu9lroq4457Fp4SodaXjYlf+laEY4PIYzhhj08EvpsaSuJKK0YUyVzyxU5hYasXw4AG0EG9jou8vr3FrAA8vfol9ugRFgQtfuNsAEW4kkzU=
+	t=1730230554; cv=none; b=ipiFB4gbVQVWuMJPtlBkdjvvMe0uFBtSWAKW8rs8vMAue65eHC9lVWtD0az/BCxKu7q6elvobsWqHNYAyne/2pq1fqJQF4CguiZNDmX9z3FxaQI6CbnrkcTANMoVupITis5o0e/MQ07WxPJfUPkK42FgxFr85Y/Sh7pVGUhBGww=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730230456; c=relaxed/simple;
-	bh=P1tTgThqsFt8vz3y1hINdezDy9kQs/Hjazrj1pHsIHI=;
+	s=arc-20240116; t=1730230554; c=relaxed/simple;
+	bh=l97u7AD85Vr+jSAuDtGnAXLN3oFK5lQIbSKv/kprs9A=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ba80+ZRysC3908zzDDDrYc2xIdWFigVRgEcdo2wErnIwgmDfw3uGnaqtEmiQ2O2Z5Ow4Pi+tNfo/RmvYj8i5i6u7UGFaGf0ybGmAjeLaGVIgCdlTCswQGHnXQEuJj6M4sDIkTaAhHueBbk0fPV3Wtr1OTErKAiKFQz4DwyFyXWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=sUAB/mXc; arc=none smtp.client-ip=209.85.214.171
+	 Content-Type:Content-Disposition:In-Reply-To; b=pib/5+2R1WXnQ9zZza21xKhbflJxNvTpuTf4H3wcwiooT0oDAj/As1xzKqNanMjbPzj3QgObIimCgwmF5ZQZLHOogPG3Yom24j2H5zWPICDHjn3JdP1/IV32WmYHZKq+8ySKsAC5/G5sfsqe+M+A6d0Pf6nyRsKWTL/o7G/79Y8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=A5eXiE57; arc=none smtp.client-ip=209.85.215.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20c714cd9c8so61466975ad.0
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:34:13 -0700 (PDT)
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7c1324be8easo134887a12.1
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:35:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730230453; x=1730835253; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1730230551; x=1730835351; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=y4y/Kbg2zk2qv1FAw8TAeS+rHVEscF8RSLkGI3p/h6A=;
-        b=sUAB/mXcA2UYkHuxknTb57qjcGQFCktuZB/Ey5Mn8rXt81bK38STyAgWKFTWT/wp2w
-         TxdRRQkavTrHy8FUmwRpWtIpdPLVGcLGcDzrvYJdkIB5xLgWD5nv1AbEbfE1w7v6aMVD
-         RJbLzym1Tbku3WSzLL2HVm01liNnDcFwBxLKU=
+        bh=2Zcs4o+8nn0iIRd8I2+/9Q9KReeiO44oWp58nygwPzE=;
+        b=A5eXiE57StiQAghyP/TJOgEMRTRlSTWciQMsc1DxX7kytnMCdD6SUAz5qny1qvVPQw
+         6EmX71GEpo1u4QBeHWT0Rjl0NLtY8HWzv2vfV/qAltYmv6nSosEQfA/tqwmAltSuyAVp
+         WHUnQJ6zA10RczXTfBh9qouz1VGshkeNNPSyI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730230453; x=1730835253;
+        d=1e100.net; s=20230601; t=1730230551; x=1730835351;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=y4y/Kbg2zk2qv1FAw8TAeS+rHVEscF8RSLkGI3p/h6A=;
-        b=N8Fk841qTch2o5+6Cl+dJsphQJ5Wd8NhpBBPk119eQUBFQy2uSepL3Qh1znQdnvxW3
-         ir1oLY9lKjJ6spU8BTN8w1qwfJ69kfkjmkDAH6Y7UNfwQA+YaWhrVnjHWLEx27RGefBb
-         Qv4fuVtXdSDvhtv/J5YaKAfZQqqoG8NK8+unTwK56RtQuCKXZcBzY4gXIcBJgKxhgpRj
-         s3VHXISWsaNnbmGHZqYIM73IyaT2pybqa008nY4BnyNPMQMGijtyu+Bv7sV7ElIGaIkp
-         q4Ofq3qjMKGb6zuWrkSgt85a8U5bEigTdxyUfw+1Aby2TYd+bNpziBQ+kR9WyVE6neBj
-         K1AQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXUnhyqFi4xBBBEs6fqtyLrb53YTTwuTEcbGKIa4JyaZW0rHaLCzQjdQnuzLf6QKe2WRWHA7WQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQEr2DSfxVlD5uMDzhkdq3URTMS4YiLnar0kaNJ5/Ivk4gfZNF
-	tQH+qZlO6BqR0kAqb/FsDVu08JdlbM4zvOox8QR4ZiLxQBHyZn8xaLxh6uW1uMc=
-X-Google-Smtp-Source: AGHT+IFuXX0/BRVn3mHp56P2x5uaD9pSJn37K6qs8/t/0oJ5dVn8ecbgaKt+s8G6X1fiYkvZsSgPIg==
-X-Received: by 2002:a17:902:e84f:b0:20b:6d82:acb with SMTP id d9443c01a7336-210c68cec13mr186903775ad.23.1730230453508;
-        Tue, 29 Oct 2024 12:34:13 -0700 (PDT)
+        bh=2Zcs4o+8nn0iIRd8I2+/9Q9KReeiO44oWp58nygwPzE=;
+        b=SXKLxJpM9VOjtvB/zapjRUtDYeDtNpfQRL3lNagCHIlCZO/BQNEos1GME89hu9Pr1R
+         ytUf86VrMhrwnWlZI8dpz7suOZ/Fc7Qp82WrlymJBg46VZv+MdekBKDJEMMZLPCnOERJ
+         GTHnad23nC0wMXpcz5rg41v31fBicejuekrJeFmJ9vYBKBBHtaZhuBFFtNKsMmI3cSGJ
+         UEWsX8tAKvrxNInyLpBuRTZiz58UFKocIhelzcYUnD+T3oXr/AFqN3UmZl2RHnn4sI5u
+         dI0hlAtvwX9oObQ5aZM3GVDJ/s8Nh2IKG2l9HtJb3xBVsoUMWRuFwZY+dVNCrf6iqUPy
+         EDjQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZKwH5+OMdpIoU+pWkkxOg4b8wPzvzt7qaer5S+E5LDhm3r6m1hJyuYiatv2q9y7HwIWn5pXc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9jsPkrn9rkZflflSG47E9eEg04Qo2dnJyUKT6CG2F6HO0UYc1
+	MX9VVQpY3zHVX94gFHfZNz3U1GEErORnSOUCVbeq19QR3L+Hsxl8dnhLPq7/kYs=
+X-Google-Smtp-Source: AGHT+IHxuosv81KXF0Kia30ocKL+gRC+ueg02iUmaAs4LNtAl5SZZm8KQcTtCNiPhmT/l0f9qmLBvA==
+X-Received: by 2002:a17:90a:3986:b0:2e2:ad14:e467 with SMTP id 98e67ed59e1d1-2e92204cd1dmr4813267a91.3.1730230551489;
+        Tue, 29 Oct 2024 12:35:51 -0700 (PDT)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc013477sm69811895ad.175.2024.10.29.12.34.12
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e77e48ed34sm13193552a91.9.2024.10.29.12.35.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 12:34:12 -0700 (PDT)
-Date: Tue, 29 Oct 2024 12:34:10 -0700
+        Tue, 29 Oct 2024 12:35:51 -0700 (PDT)
+Date: Tue, 29 Oct 2024 12:35:48 -0700
 From: Joe Damato <jdamato@fastly.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next] dql: annotate data-races around
- dql->last_obj_cnt
-Message-ID: <ZyE4sn-F0ed9YQFQ@LQ3V64L9R2>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, petrm@nvidia.com
+Subject: Re: [PATCH net-next] selftests: netdevsim: add fib_notifications to
+ Makefile
+Message-ID: <ZyE5FHwhbU9V9-GG@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Eric Dumazet <edumazet@google.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, eric.dumazet@gmail.com
-References: <20241029191425.2519085-1-edumazet@google.com>
+	Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
+	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com,
+	andrew+netdev@lunn.ch, shuah@kernel.org,
+	linux-kselftest@vger.kernel.org, petrm@nvidia.com
+References: <20241029192603.509295-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,50 +87,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241029191425.2519085-1-edumazet@google.com>
+In-Reply-To: <20241029192603.509295-1-kuba@kernel.org>
 
-On Tue, Oct 29, 2024 at 07:14:25PM +0000, Eric Dumazet wrote:
-> dql->last_obj_cnt is read/written from different contexts,
-> without any lock synchronization.
+On Tue, Oct 29, 2024 at 12:26:03PM -0700, Jakub Kicinski wrote:
+> Commit 19d36d2971e6 ("selftests: netdevsim: Add fib_notifications test")
+> added the test but didn't include it in the Makefile.
 > 
-> Use READ_ONCE()/WRITE_ONCE() to avoid load/store tearing.
-> 
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 > ---
->  include/linux/dynamic_queue_limits.h | 2 +-
->  lib/dynamic_queue_limits.c           | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
+> CC: andrew+netdev@lunn.ch
+> CC: shuah@kernel.org
+> CC: linux-kselftest@vger.kernel.org
+> CC: petrm@nvidia.com
+> ---
+>  tools/testing/selftests/drivers/net/netdevsim/Makefile | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/include/linux/dynamic_queue_limits.h b/include/linux/dynamic_queue_limits.h
-> index 281298e77a1579cba1f92a3b3f03b8be089fd38f..808b1a5102e7c0bbbcd9676b0dacadad2f0ee49a 100644
-> --- a/include/linux/dynamic_queue_limits.h
-> +++ b/include/linux/dynamic_queue_limits.h
-> @@ -127,7 +127,7 @@ static inline void dql_queued(struct dql *dql, unsigned int count)
->  	if (WARN_ON_ONCE(count > DQL_MAX_OBJECT))
->  		return;
->  
-> -	dql->last_obj_cnt = count;
-> +	WRITE_ONCE(dql->last_obj_cnt, count);
->  
->  	/* We want to force a write first, so that cpu do not attempt
->  	 * to get cache line containing last_obj_cnt, num_queued, adj_limit
-> diff --git a/lib/dynamic_queue_limits.c b/lib/dynamic_queue_limits.c
-> index e49deddd3de9fe9e98d6712559cf48d12a0a2537..c1b7638a594ac43f947e00decabbd3468dcb53de 100644
-> --- a/lib/dynamic_queue_limits.c
-> +++ b/lib/dynamic_queue_limits.c
-> @@ -179,7 +179,7 @@ void dql_completed(struct dql *dql, unsigned int count)
->  
->  	dql->adj_limit = limit + completed;
->  	dql->prev_ovlimit = ovlimit;
-> -	dql->prev_last_obj_cnt = dql->last_obj_cnt;
-> +	dql->prev_last_obj_cnt = READ_ONCE(dql->last_obj_cnt);
->  	dql->num_completed = completed;
->  	dql->prev_num_queued = num_queued;
->  
-
-This looks fine to me. I noted that dql_reset writes last_obj_cnt,
-but AFAIU that write is not a problem (from the 1 driver I looked
-at).
+> diff --git a/tools/testing/selftests/drivers/net/netdevsim/Makefile b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> index 5bace0b7fb57..cc08b220323f 100644
+> --- a/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> +++ b/tools/testing/selftests/drivers/net/netdevsim/Makefile
+> @@ -8,6 +8,7 @@ TEST_PROGS = devlink.sh \
+>  	ethtool-pause.sh \
+>  	ethtool-ring.sh \
+>  	fib.sh \
+> +	fib_notifications.sh \
+>  	hw_stats_l3.sh \
+>  	nexthop.sh \
+>  	peer.sh \
+> -- 
+> 2.47.0
 
 Reviewed-by: Joe Damato <jdamato@fastly.com>
 
