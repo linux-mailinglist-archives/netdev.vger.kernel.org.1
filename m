@@ -1,144 +1,98 @@
-Return-Path: <netdev+bounces-139764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D39449B404A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:17:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73ADB9B4056
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:20:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 488C51F233B2
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:17:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4AF21C2135B
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E2E2629C;
-	Tue, 29 Oct 2024 02:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA3C12FF70;
+	Tue, 29 Oct 2024 02:20:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AdYbSrOD"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e9SA5Afl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36D2B661;
-	Tue, 29 Oct 2024 02:17:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8647B40855
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 02:20:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730168252; cv=none; b=elvSs0Qk28FtXDvnuCsdvjb2D+i8kCtLFjL1fyoLi0+cb/tKctnk1qQcSdITOPTYUHsGM2ClW++0GS52vrLz3/ereFNSa3DxIc3ZdB6CZ9do8g1vuwLddqpYTlHhZb7PhQ417Pp7IM44QojvgKZVcDQlgNvtglpFxHAHKZavYug=
+	t=1730168447; cv=none; b=WHGUFaJqY6fWXUcWFBl79FPAUwJWl4vEPL8aBXFgWpk4xWRWr4pFeW8j9V5rSq0rAcny2K8SkNDUAoJfBAm1saVOTReYxbDAdrKuKMicO5gbsbYIO4Khk+pU0amJyigVUZRc0WXEa2dJj6M1R1p7uiBtdEiKVRxtcDmV83jNvHQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730168252; c=relaxed/simple;
-	bh=WOnSUIQBuKzoLwrYxUnZ9DsMMoO3e7npDC5vAp/163o=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=qtU50EY4X2t4JaTyWz7cstlcxQg2p3vWuUM4mt2lGgsWpQPzHCIhfXUZGe4rE+yvx4x9fKV6foF2hshPOLskGPK4xI7FMxjyXYObOL6ELOvXLsmaGfNDByV1XNSM9WYejbmiepzRfYlE80EhzIJHXaLOMdVwh8JB7w639a2+CCo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AdYbSrOD; arc=none smtp.client-ip=205.220.168.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49SIfaK7022936;
-	Tue, 29 Oct 2024 02:17:19 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	DlKmic9dACLOMQPRMfL+5WmhlfgUgYve9EN1vzHwzxQ=; b=AdYbSrODo7mPPIJm
-	j7M7oC9uEVphz2GLWjswi1TD9qIkRkKCQMrs478DHo9nga8I1nO1eWQxiqQYu8uM
-	RzN+P/pANTorjmk0NSH/S8of2+UZ9sdFwiMx6ECHO3GqoYT5liB5P2vgrFP94DQl
-	XOoY+Bt7HzV3p1vamlAlsWAxHHFfItbitW8vYPWUYT2VR3z2XEl7KlIQWJxYFNr7
-	eaO0QlkPhkZfxaYBmoKGBCZ0KtW/TweHuZWiqLl6NRE4zFMezeihVIJajfNUf9lQ
-	H2OmsJvMB8XK907ApDFOCFKTEugVvbDiLfAQN52iLBUsaFK0alP7cfmFnqPL1myi
-	v7a8+Q==
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42grn4xxh3-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 02:17:18 +0000 (GMT)
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49T2HId1021983
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 02:17:18 GMT
-Received: from [10.253.11.110] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 28 Oct
- 2024 19:17:12 -0700
-Message-ID: <3d717bdc-4b8a-4e85-9bcf-e25b75d9fecf@quicinc.com>
-Date: Tue, 29 Oct 2024 10:17:09 +0800
+	s=arc-20240116; t=1730168447; c=relaxed/simple;
+	bh=6XdSS5BtQ1UOsg90BK1P99rhGpo+WXf3iLt3yimZMMY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KuqPKLwZzS/l5/36sWn09S9pMCM6daQnaLl1LliSREfNAYDCRsSUsYeXs9DbwHXwqBxZP2yIVtceSGFksJ8OZ+nT4L+cqRHTYSLBmbn1YUta8Jpl1IkMSjnwuXw+Y96108JJsH0rp2tQPX3vEroIvmP5jaDqfVc8wIA3gp276x8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=e9SA5Afl; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=GRyTga+eGvUsVS4/lAWBi7iJQQEGdXza0+W/Q3vo1Go=; b=e9SA5Aflv/RTqCUT2vlixIPX3z
+	u46ZR2eZ+L813Qf02xbpfykJM0kLcjeTrrbILGCiM2WcHoFIpVimkZuDbDAQzZ1MWbLatLbhfKus/
+	ZUKSU7iWZr4JS0xi03+EF+/+FVUDIoRxUdcQRXQWMNoBh6P8rUmfGoNu6l2mtW8bvbiU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5bqN-00BW8Y-BR; Tue, 29 Oct 2024 03:20:27 +0100
+Date: Tue, 29 Oct 2024 03:20:27 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Vijay Khemka <vijaykhemka@fb.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: ncsi: restrict version sizes when hardware
+ doesn't nul-terminate
+Message-ID: <4f56a2d0-eb1b-4952-a845-92610515082a@lunn.ch>
+References: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
+ <20241028-ncsi-fixes-v1-2-f0bcfaf6eb88@codeconstruct.com.au>
+ <286f2724-2810-4a07-a82e-c6668cdbf690@lunn.ch>
+ <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 0/3] Add ethernet dts schema for qcs615/qcs8300
-To: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, "Rob
- Herring" <robh@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        "Conor
- Dooley" <conor+dt@kernel.org>,
-        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
-        Kishon Vijay Abraham I <kishon@kernel.org>,
-        Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>
-CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-phy@lists.infradead.org>, <quic_tingweiz@quicinc.com>,
-        <quic_aiquny@quicinc.com>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski@linaro.org>
-References: <20241017-schema-v2-0-2320f68dc126@quicinc.com>
- <132a8e29-3be7-422a-bc83-d6be00fac3e8@kernel.org>
-Content-Language: en-US
-From: Yijie Yang <quic_yijiyang@quicinc.com>
-In-Reply-To: <132a8e29-3be7-422a-bc83-d6be00fac3e8@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: cXPft-qHqazelOYVa8i5wIudbMRB9Q1I
-X-Proofpoint-ORIG-GUID: cXPft-qHqazelOYVa8i5wIudbMRB9Q1I
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
- impostorscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
- malwarescore=0 clxscore=1015 bulkscore=0 suspectscore=0 adultscore=0
- spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2410290016
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
 
-
-
-On 2024-10-28 19:04, Krzysztof Kozlowski wrote:
-> On 17/10/2024 11:52, Yijie Yang wrote:
->> Document the ethernet and SerDes compatible for qcs8300. This platform
->> shares the same EMAC and SerDes as sa8775p, so the compatible fallback to
->> it.
->> Document the ethernet compatible for qcs615. This platform shares the
->> same EMAC as sm8150, so the compatible fallback to it.
->> Document the compatible for revision 2 of the qcs8300-ride board.
->>
->> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
->> ---
->> This patch series depends on below patch series:
->> https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/
->> https://lore.kernel.org/all/20240926-add_initial_support_for_qcs615-v3-0-e37617e91c62@quicinc.com/
+On Tue, Oct 29, 2024 at 08:31:55AM +0800, Jeremy Kerr wrote:
+> Hi Andrew,
+> Thanks for checking this out.
 > 
-> So it cannot be merged...
 > 
-> Instead please decouple your works. I don't get why do you claim there
-> is dependency in the first place, but anyway. Fix up your patchsets to
-> fix that (if there is something to fix).
+> > Is this defined by a standard? Does the standard allow non
+> > nul-terminated strings? 
 > 
-
-Actually, the dependency is unnecessary here. I will remove it together 
-with the merged patch in the upcoming version.
-
-> Best regards,
-> Krzysztof
 > 
+> Yes and yes. The pertinent wording of the spec is:
+> 
+>    The string is null terminated if the string is smaller than the
+>    field size
+> 
+> However, regardless of what the spec says, we still don't want the
+> strlen() in nla_put_string() to continue into arbitrary memory in the
+> case there was no nul in the fw_name reported by the device.
 
--- 
-Best Regards,
-Yijie
+I agree with that, but i was thinking that if it was not allowed, we
+should be printing a warning telling the user to upgrade their buggy
+firmware.
 
+However, its not a bug.
+
+Are there any other strings which will need similar treatment?
+
+	Andrew
 
