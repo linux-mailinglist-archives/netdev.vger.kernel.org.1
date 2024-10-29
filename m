@@ -1,181 +1,150 @@
-Return-Path: <netdev+bounces-140036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96C539B5176
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:58:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AD16C9B5189
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:07:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA57E1C22E46
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:58:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64C9D1F232FA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02B801EF92F;
-	Tue, 29 Oct 2024 17:58:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="kLJLCihj"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22ED51DCB31;
+	Tue, 29 Oct 2024 18:07:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85A9A1DC739;
-	Tue, 29 Oct 2024 17:58:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE1E196D9D
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 18:07:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730224708; cv=none; b=pLJCf6tuMswnRkzb3/ILohzkMmazG21UpQdQ2fL4O4RKwHLltJlNtTGBwMAb0QMEhDE8morsfo/CdFXw4lb4h+4WNKP+hzxZh1ydM6mFzW18H3cIan0tG03RawIEuWJGjx3KMjMlCeKvXP3McGlvQq/94c5RPbszM+R61w3WjsU=
+	t=1730225257; cv=none; b=qUEDjCSe/7hlsIPef7IXbLbU98hhOi/q8qMAZYCijvn7dBn88HkRDmUsGgxLhOPha/mQ9g0rbpKpfGFI61xsA63/fWk3XENmFnzRjABvwipw9FXxxUzyVd6tJ7aLHIiWjuuWBArO1s+HZ9EXoKccBkbaFtPBJyYYJEagkuSwu54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730224708; c=relaxed/simple;
-	bh=7aaGphVstemt+LrVYO8eRhyN+SIXqmyHmB8xIhK98Ho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=emjeSrCNtcqqMTV+/Rzf4a+B6FADX5GxFc37wzZmsGSvCN66iiODC/KUjT9NZ1xmLt8qSpkoIC9vE9zoGYa+W3ZxFpLLjaQmMCo5UHcxq37UIRIYYUYJLVAexLerlR+qhnROaQUW/IhUHZ7LBbNao7GWsAt+Lgi9Jd2Fs4RlPWE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=kLJLCihj; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730224705; x=1761760705;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=7aaGphVstemt+LrVYO8eRhyN+SIXqmyHmB8xIhK98Ho=;
-  b=kLJLCihjHS8ePjj6TSDqc69xWQYDXqH93lqT6+ztdQxAts2vPSGTJhzD
-   0+Fb3bjeXOowlKjmdEhHK3LyTI2+uiDqT4SIP8r1mYsa3ClMRxlAff2pJ
-   kerJfseNYpb1zqJnqwCr1JKceb7JREJLiq2bTWihqME+J51rSogEP01NO
-   dxf8I1IaMWFR2N6lET0/sxbrp8b27XhbWhhSag/wdD8Vvn+J8ZO8RKXbD
-   NHDeu6a6VCZRJBuZSTfZFcVX33G1Y8OQIunMV+TkF/GbXRvkQFT9aWwKj
-   KBzacXMBbxh88guOdlYswQ9yvMUVZFEeb3sXEqFjxdNsgGcywH31stRK3
-   A==;
-X-CSE-ConnectionGUID: tCPrBOloS66kwyRsF85hFw==
-X-CSE-MsgGUID: OWiJ2MrXQzSF22xng3PITQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40985310"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="40985310"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 10:58:25 -0700
-X-CSE-ConnectionGUID: PKc316V0TH6oGzyT5au3Vw==
-X-CSE-MsgGUID: DT6jGl/DQxyIZ+oWVUrmTA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
-   d="scan'208";a="82147331"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa008.fm.intel.com with ESMTP; 29 Oct 2024 10:58:19 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t5qTx-000dxg-0l;
-	Tue, 29 Oct 2024 17:58:17 +0000
-Date: Wed, 30 Oct 2024 01:57:29 +0800
-From: kernel test robot <lkp@intel.com>
-To: Romain Gantois <romain.gantois@bootlin.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Dan Murphy <dmurphy@ti.com>,
-	Florian Fainelli <f.fainelli@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	linux-kernel@vger.kernel.org, stable@vger.kernel.org,
-	Romain Gantois <romain.gantois@bootlin.com>
-Subject: Re: [PATCH net] net: phy: dp83869: fix status reporting for
- 1000base-x autonegotiation
-Message-ID: <202410300125.K125vk3f-lkp@intel.com>
-References: <20241029-dp83869-1000base-x-v1-1-fcafe360bd98@bootlin.com>
+	s=arc-20240116; t=1730225257; c=relaxed/simple;
+	bh=lyc//tRZ3h5BN3hUpjX0thNYWX5LvgJTypVOx8uWeZo=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=D7vWco5V8fruBngw9F1mNJGCm+HgCyUOdn1RVFGaKQi/zc+fKw4SNuk5dgDF7q0EBWygIXW6v787Z/dOtLMDynRmOS8ZngvcnHgjBXCVwYk70F3YsKMn5AT4tfTWJYUWIle7nZlhf9TavFmI6NeCu+2iG3etMDOCfIhL97w2Z9I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a4e77be28dso41800915ab.1
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 11:07:34 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730225254; x=1730830054;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Bx2vTST5OInC4SnAK0To7h7zrS6Xfw6UVx9K6oh8eEI=;
+        b=lgJ/gf/LmMciXm2BOKakZdcM1aZum/A53iuzQ25kZmqWQ7itq1tgtZSyp+SdiYBijP
+         Oz57jP/Dt03JlY7aqBvRtnBdm8bQbWXPPflvghN8QgSvkUBL4Wnqv9uJ0dr3bLC7KQ8K
+         T9lE2xrPD+8rVmpIxszkbrJT/T54VsIZRjYsx/QWzt987oqFn1BFMd5w+aW9OdVdfjzU
+         9tQm4KeX788LwHplwyJW/hH0VCdcwTaOxblSl7dtpDr4lk862FBF7A364W2Qb3vOCV27
+         CddkdjuVYWkPNQVnWrgnM7meM/5RpFcuFNXdClz2+mFrg+t00byjqXhqIq9mRW2GLgsi
+         cIQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUm4tE5JsXGd6bVFD9BEvSO23Qq8xbx88rAy1pRPsx7QDMKUss+Vt12fBlyIfksq3UFDehrSjs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwabZZOSOn1oC2NZvCaz7DZAZzyr4tnAyAVFaOCRH+oPUoUxmv6
+	HnQxxEsTNCwgLl8odpfHX4QEZU7GW8Nmq8liyGe57aN+MHerxaXUqtkpSH7uyWxPMgPZlmwCUua
+	CiUeljOAboAqhdMaM4NcV+MJRuT66udpZrNFQxH61yTJRuVxiaQ6GbQ4=
+X-Google-Smtp-Source: AGHT+IE1nuVQz2gIc/wBO7ngKXOwNm6k9OG5oUitV2Yh5laZVwloKwjqxfMg6wMpdCt2Lch93tG1yiDkqHLwtQb7SPTZ1RY6bXKw
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029-dp83869-1000base-x-v1-1-fcafe360bd98@bootlin.com>
+X-Received: by 2002:a05:6e02:17cf:b0:3a0:9238:d38 with SMTP id
+ e9e14a558f8ab-3a4ed293143mr120662855ab.10.1730225254109; Tue, 29 Oct 2024
+ 11:07:34 -0700 (PDT)
+Date: Tue, 29 Oct 2024 11:07:34 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67212466.050a0220.4735a.0261.GAE@google.com>
+Subject: [syzbot] [wireless?] WARNING in ieee80211_mark_sta_auth
+From: syzbot <syzbot+542f74e8fc8361630178@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hi Romain,
+Hello,
 
-kernel test robot noticed the following build warnings:
+syzbot found the following issue on:
 
-[auto build test WARNING on 94c11e852955b2eef5c4f0b36cfeae7dcf11a759]
+HEAD commit:    94c11e852955 usb: add support for new USB device ID 0x17EF..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=1112615f980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=309bb816d40abc28
+dashboard link: https://syzkaller.appspot.com/bug?extid=542f74e8fc8361630178
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17914540580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1512615f980000
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Romain-Gantois/net-phy-dp83869-fix-status-reporting-for-1000base-x-autonegotiation/20241029-173146
-base:   94c11e852955b2eef5c4f0b36cfeae7dcf11a759
-patch link:    https://lore.kernel.org/r/20241029-dp83869-1000base-x-v1-1-fcafe360bd98%40bootlin.com
-patch subject: [PATCH net] net: phy: dp83869: fix status reporting for 1000base-x autonegotiation
-config: arm-randconfig-004-20241029 (https://download.01.org/0day-ci/archive/20241030/202410300125.K125vk3f-lkp@intel.com/config)
-compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241030/202410300125.K125vk3f-lkp@intel.com/reproduce)
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/86f5604d3b74/disk-94c11e85.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/8be1f807098d/vmlinux-94c11e85.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/c343d3004f40/bzImage-94c11e85.xz
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410300125.K125vk3f-lkp@intel.com/
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+542f74e8fc8361630178@syzkaller.appspotmail.com
 
-All warnings (new ones prefixed by >>):
+------------[ cut here ]------------
+wlan1: STA 08:02:11:00:00:00 not found
+WARNING: CPU: 1 PID: 3541 at net/mac80211/mlme.c:4264 ieee80211_mark_sta_auth+0x36c/0x400 net/mac80211/mlme.c:4264
+Modules linked in:
+CPU: 1 UID: 0 PID: 3541 Comm: kworker/u8:12 Not tainted 6.12.0-rc4-syzkaller-00174-g94c11e852955 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: events_unbound cfg80211_wiphy_work
+RIP: 0010:ieee80211_mark_sta_auth+0x36c/0x400 net/mac80211/mlme.c:4264
+Code: 90 0f 0b 90 e9 8a fd ff ff e8 d0 6c 46 f6 c6 05 f0 66 b8 04 01 90 48 c7 c7 c0 39 2b 8d 48 8b 34 24 4c 89 fa e8 65 66 07 f6 90 <0f> 0b 90 90 eb 8e 48 c7 c1 7c 32 1d 90 80 e1 07 80 c1 03 38 c1 0f
+RSP: 0018:ffffc9000ceaf5a0 EFLAGS: 00010246
+RAX: c531a4dfe0f61700 RBX: 00000000ffffa569 RCX: ffff8880328f0000
+RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
+RBP: 00000000ffffa755 R08: ffffffff8155d402 R09: fffffbfff1cf9fe0
+R10: dffffc0000000000 R11: fffffbfff1cf9fe0 R12: ffff8880300e8cc0
+R13: 00000000ffffa755 R14: dffffc0000000000 R15: ffff888021b19bb0
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005555876caca8 CR3: 0000000034b10000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ieee80211_rx_mgmt_auth net/mac80211/mlme.c:4370 [inline]
+ ieee80211_sta_rx_queued_mgmt+0x2527/0x4d40 net/mac80211/mlme.c:7475
+ ieee80211_iface_process_skb net/mac80211/iface.c:1600 [inline]
+ ieee80211_iface_work+0x762/0xf20 net/mac80211/iface.c:1657
+ cfg80211_wiphy_work+0x2db/0x490 net/wireless/core.c:440
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f0/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
 
->> drivers/net/phy/dp83869.c:197:3: warning: variable 'adv' is uninitialized when used here [-Wuninitialized]
-                   adv |= DP83869_BP_FULL_DUPLEX;
-                   ^~~
-   drivers/net/phy/dp83869.c:174:9: note: initialize the variable 'adv' to silence this warning
-           u32 adv;
-                  ^
-                   = 0
-   1 warning generated.
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-vim +/adv +197 drivers/net/phy/dp83869.c
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-   168	
-   169	static int dp83869_config_aneg(struct phy_device *phydev)
-   170	{
-   171		struct dp83869_private *dp83869 = phydev->priv;
-   172		unsigned long *advertising;
-   173		int err, changed = false;
-   174		u32 adv;
-   175	
-   176		if (dp83869->mode != DP83869_RGMII_1000_BASE)
-   177			return genphy_config_aneg(phydev);
-   178	
-   179		/* Forcing speed or duplex isn't supported in 1000base-x mode */
-   180		if (phydev->autoneg != AUTONEG_ENABLE)
-   181			return 0;
-   182	
-   183		/* In fiber modes, register locations 0xc0... get mapped to offset 0.
-   184		 * Unfortunately, the fiber-specific autonegotiation advertisement
-   185		 * register at address 0xc04 does not have the same bit layout as the
-   186		 * corresponding standard MII_ADVERTISE register. Thus, functions such
-   187		 * as genphy_config_advert() will write the advertisement register
-   188		 * incorrectly.
-   189		 */
-   190		advertising = phydev->advertising;
-   191	
-   192		/* Only allow advertising what this PHY supports */
-   193		linkmode_and(advertising, advertising,
-   194			     phydev->supported);
-   195	
-   196		if (linkmode_test_bit(ETHTOOL_LINK_MODE_1000baseX_Full_BIT, advertising))
- > 197			adv |= DP83869_BP_FULL_DUPLEX;
-   198		if (linkmode_test_bit(ETHTOOL_LINK_MODE_Pause_BIT, advertising))
-   199			adv |= DP83869_BP_PAUSE;
-   200		if (linkmode_test_bit(ETHTOOL_LINK_MODE_Asym_Pause_BIT, advertising))
-   201			adv |= DP83869_BP_ASYMMETRIC_PAUSE;
-   202	
-   203		err = phy_modify_changed(phydev, DP83869_FX_ANADV,
-   204					 DP83869_BP_FULL_DUPLEX | DP83869_BP_PAUSE |
-   205					 DP83869_BP_ASYMMETRIC_PAUSE,
-   206					 adv);
-   207	
-   208		if (err < 0)
-   209			return err;
-   210		else if (err)
-   211			changed = true;
-   212	
-   213		return genphy_check_and_restart_aneg(phydev, changed);
-   214	}
-   215	
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
