@@ -1,89 +1,118 @@
-Return-Path: <netdev+bounces-140124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3F2E59B54C8
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:14:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 658A39B54CA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:14:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00EBE284378
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:14:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 296C4284DB3
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9347C20721D;
-	Tue, 29 Oct 2024 21:14:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="q35c2Tff"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD506207A22;
+	Tue, 29 Oct 2024 21:14:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FFC81991CD;
-	Tue, 29 Oct 2024 21:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73D6120721D;
+	Tue, 29 Oct 2024 21:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730236469; cv=none; b=Q2vnWIp4TC7axDWUwAw96ttrfGHouVLjP/BsY28rYZcDKwTPwK01U+fYfZ9To4+g8Y8svItwNGdu1I8AUCGpCLqG5Ge1zYxYtwpZaynvDoLC1ai1FS6lRBKYdJhef1q8+O+lmmDbDV6dC1ci+6cHyPHCzEUtXWjKNjxStMMp0RI=
+	t=1730236493; cv=none; b=pf5yV+w8kzZy3AdjKRn66yNMXsxx46rG+1xkH4///3ny+dOjqY7TfBDM6B4KxjqzHLIEnsAjD9/cMcdhRWIIYlTYbqtA/p6ZAY91HwOiHrVTk6keStx5N9/QqQiYL+aEesYGFMIv5HqKxtsQBvXaBufN4HzwGVoIoYoXaPmQKEI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730236469; c=relaxed/simple;
-	bh=NKg6PorLv+WO9NJ4+ZZWyzkwrKPt3rtHmRknFRQmC5Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Zir53SA9yUbUwNWIaa+/YU1ZIJ0L/9FmbGPypccQhJLTxEaTX+8ALvYS3FguqsftM1ZiNVvb1iLVxhbnojuofFE1K5RSXVsvp6NkDxA0XF+e1GVB06ZiUxER8NZdeSKcJFTADaI6JLgtAyr7bS25owoO5Qg0IG+g+ntpS2LKGvg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=q35c2Tff; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6u7F8TreOI0FGCD/HZibohizO/SbnUPvos91dHB797A=; b=q35c2TffZBt6+QRqybI4Tz7zci
-	0O2JJYeWDqh3WSuD7PXO24JSsakfs9ak5fQ2Xw7rlba/I6qoUPKJNlup9MS3YKi0F7J2+/7U/g+eo
-	Vc8nsg4h/O0QG/GGIhbV6dkPbnQb4EG75urGdNU9pTrD0J4QpErvSgkzkvH6S+UKJvN0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5tXY-00Bd3V-Ff; Tue, 29 Oct 2024 22:14:12 +0100
-Date: Tue, 29 Oct 2024 22:14:12 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Ronnie.Kunin@microchip.com, Fabi.Benschuh@fau.de,
-	Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH] Add LAN78XX OTP_ACCESS flag support
-Message-ID: <75302a2c-f13e-4a5c-ac46-2a8da98a7b7c@lunn.ch>
-References: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
- <c4503364-78c7-4bd5-9a77-0d98ae1786bf@lunn.ch>
- <PH8PR11MB796575D608575FAA5233DBD4954A2@PH8PR11MB7965.namprd11.prod.outlook.com>
- <a0d6ef0c-5615-40fd-964d-11844389dc29@lunn.ch>
- <20241029104313.6d15fd08@kernel.org>
+	s=arc-20240116; t=1730236493; c=relaxed/simple;
+	bh=0Hmfu0Dmd+ONojT8fbkDPeqhboxJBVmLmMSWyx58uPM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=B8UjwCwZ3P8lDl92Z9eE/OhrS1rIqcKAkOrYmHuyWAkWlBvxU4It3xD+RNFbTO2wkqbMOt9K8ATVAv8TX4P8f2UYtWCKkf+8R89oxFjci/yA/Hdvggw2ScU2QJkpXOO2cUTjeqqJrnfeHf3eL5Z99uRZPTHkCQQGSoVxoBpSkh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49THNuUr024976;
+	Tue, 29 Oct 2024 21:14:29 GMT
+Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 42gqd8m43p-2
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Tue, 29 Oct 2024 21:14:29 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 29 Oct 2024 14:14:28 -0700
+Received: from pop-os.wrs.com (172.25.44.6) by ala-exchng01.corp.ad.wrs.com
+ (147.11.82.252) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Tue, 29 Oct 2024 14:14:27 -0700
+From: <Randy.MacLeod@windriver.com>
+To: <sherry.yang@oracle.com>
+CC: <bridge@lists.linux-foundation.org>, <davem@davemloft.net>,
+        <gregkh@linuxfoundation.org>, <kuba@kernel.org>,
+        <netdev@vger.kernel.org>, <nikolay@nvidia.com>, <roopa@nvidia.com>,
+        <sashal@kernel.org>, <stable@vger.kernel.org>,
+        <randy.macleod@windriver.com>
+Subject: [PATCH 5.15.y] net: bridge: xmit: make sure we have at least eth header len bytes
+Date: Tue, 29 Oct 2024 17:14:26 -0400
+Message-ID: <20241029211426.3046219-1-Randy.MacLeod@windriver.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241004170328.10819-3-sherry.yang@oracle.com>
+References: <20241004170328.10819-3-sherry.yang@oracle.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029104313.6d15fd08@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: I5g67KRVeGwd-XnB4L0ZUcMFU6Y4VrpW
+X-Authority-Analysis: v=2.4 cv=dKj0m/Zb c=1 sm=1 tr=0 ts=67215035 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=eMPNgDwjIQXpT8XC:21 a=DAUX931o1VcA:10 a=t7CeM3EgAAAA:8 a=hSkVLCK3AAAA:8 a=edf1wS77AAAA:8 a=IJ2IFIBGmV0-FWXsoRQA:9
+ a=FdTzh2GWekK77mhwV6Dw:22 a=cQPPKAXgyycSBL8etih5:22 a=DcSpbTIhAlouE1Uv7lRv:22
+X-Proofpoint-GUID: I5g67KRVeGwd-XnB4L0ZUcMFU6Y4VrpW
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-29_16,2024-10-29_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 lowpriorityscore=0 phishscore=0 mlxlogscore=999
+ adultscore=0 impostorscore=0 malwarescore=0 bulkscore=0 clxscore=1011
+ spamscore=0 mlxscore=0 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.21.0-2409260000 definitions=main-2410290159
 
-On Tue, Oct 29, 2024 at 10:43:13AM -0700, Jakub Kicinski wrote:
-> On Mon, 28 Oct 2024 20:19:04 +0100 Andrew Lunn wrote:
-> > > This is pretty much the same implementation that is already in place
-> > > for the Linux driver of the LAN743x PCIe device.  
-> > 
-> > That is good, it gives some degree of consistency. But i wounder if we
-> > should go further. I doubt these are the only two devices which
-> > support both EEPROM and OTP. It would be nicer to extend ethtool:
-> > 
-> >        ethtool -e|--eeprom-dump devname [raw on|off] [offset N] [length N] [otp] [eeprom]
-> 
-> After a cursory look at the conversation I wonder if it wouldn't 
-> be easier to register devlink regions for eeprom and otp?
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
 
-Hi Jakub
+[ Upstream commit 8bd67ebb50c0145fd2ca8681ab65eb7e8cde1afc ]
 
-devlink regions don't allow write. ethtool does.
+Based on above commit but simplified since pskb_may_pull_reason()
+does not exist until 6.1.
 
-	Andrew
+syzbot triggered an uninit value[1] error in bridge device's xmit path
+by sending a short (less than ETH_HLEN bytes) skb. To fix it check if
+we can actually pull that amount instead of assuming.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzbot+a63a1f6a062033cf0f40@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=a63a1f6a062033cf0f40
+Signed-off-by: Randy MacLeod <Randy.MacLeod@windriver.com>
+---
+ net/bridge/br_device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+diff --git a/net/bridge/br_device.c b/net/bridge/br_device.c
+index 8d6bab244c4a..b2fa4ca28102 100644
+--- a/net/bridge/br_device.c
++++ b/net/bridge/br_device.c
+@@ -38,6 +38,11 @@ netdev_tx_t br_dev_xmit(struct sk_buff *skb, struct net_device *dev)
+ 	const unsigned char *dest;
+ 	u16 vid = 0;
+ 
++	if (unlikely(!pskb_may_pull(skb, ETH_HLEN))) {
++		kfree_skb(skb);
++		return NETDEV_TX_OK;
++	}
++
+ 	memset(skb->cb, 0, sizeof(struct br_input_skb_cb));
+ 
+ 	rcu_read_lock();
+-- 
+2.34.1
+
 
