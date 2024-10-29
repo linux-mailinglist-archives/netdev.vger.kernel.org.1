@@ -1,48 +1,50 @@
-Return-Path: <netdev+bounces-139891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD89C9B48B6
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:54:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 661FF9B48B8
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:54:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7051C227F1
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:54:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DF049B22845
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:54:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC02205AB1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56A84205AC1;
 	Tue, 29 Oct 2024 11:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EBAqimTT"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="Uj/zZ6Rl"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CE5193436;
-	Tue, 29 Oct 2024 11:54:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5D441E0DF4;
+	Tue, 29 Oct 2024 11:54:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730202874; cv=none; b=Hmtn2EQPu8IyIpkSYxbQ0nakHlL7+vz7r0X5De4m6/n830y1GpIS+5RwVntAWXFuKO97QyVOTOGCTijaj8WFV6umBk8sk+4VNqU0r3YLop3pGSiXv8fyiZViOhsZyAeT1+fOniS62bqfs+jFRpB8OrFYwtcsQxYHIGXCbFwKTL0=
+	t=1730202874; cv=none; b=BGSSEBacANCw5NTLba9lKO6Lnp0BiRdE6Y2tHCjFJMlXbnI6cImJwVxiP7ZMgO6UBxjjFQQMO/gQu2taRmRMLNj67/wM0KmMAf+9mCUf0vASjuyxMaqKsfy9QPw3FT0NbZknOwAjIfbE9kMo+1PU741S5CuvRsejCsTTY6iGLNc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730202874; c=relaxed/simple;
-	bh=UcUxy1IH/tmxGDJJnCenAJWVix1uTow0kRuzSJ6rw5E=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rHsMrR3zUL4LIChKGNgMzFV2tw35zmTauYpqizynqWccHELKvkDQBu/9rscpCF9Ndv+XDzVnUhbdd0zJYiMxkJmF286qlALYONmITYE9PVqJfhUgoo9jBzBdRFWNs/RaVG5D2rnfxroGQMlBbBcI7NwFl/GsIuWhMtnVPvwiU2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EBAqimTT; arc=none smtp.client-ip=217.70.183.197
+	bh=RFedb7d1yVzyHiGwdyMHJM8bG3GO/6BXjfejl8KlpAg=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=LGhv5K59i3vnAF9hMug7ZiL+GDVlMEDLN8QGRkcTjvIE/+kzQUtSUEFhJ9REfry1t0E+qxVaPuXTbI1N38E2kw9e97wNpzy2W5663M6Ev5aUpnnCILiWJLE/KiERWOdLtyGCcQ02NqAg6VkmkoZNgoBtLFmGhMcvTHVVa7yfcdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=Uj/zZ6Rl; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id EFE3A1C0002;
-	Tue, 29 Oct 2024 11:54:20 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id D65541C000A;
+	Tue, 29 Oct 2024 11:54:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730202862;
+	t=1730202863;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=lJpykFaYI1xkl+2h37OQVMMCDwoLFpotNWfg5DS8+W8=;
-	b=EBAqimTTsliRJJCA4biH2rIBJLlKYw9TfFmBjIsErWLNjRJs5JfIWGGlchaFpSvbbSohgj
-	4QMozgMOL/uUSh183b0LMH57cqD2OsdiUZVRaMKzDWsWfE45KqoakQxeM2cTEU2iKCaAN6
-	t0bYztiTvQURcoiOXepIAcKhRT8lCZKpaydkj4cglLeGUYtWvSdZnn9X988mdRBOl0P021
-	7tWGM4kSy1rk90+2bf72Sv3vmjm5gW04rZ36HDVatNMUjT6qqWj7Tck0226b778xWB+AZj
-	9sTN1s9XFFSxgXPPpjYk45H4kMWrR3jBNiwIJQVOtsc5013jhUyIbMA4P97OYw==
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eGCWRSOQMmjS9ZFY7AhKJ0VNqkvKkp9FxTzYgROnlPc=;
+	b=Uj/zZ6Rl3V4q/IJ6WB/HHZutLTeFS1axCbwn50wEuAeNuxJNuViSCjiCNRUu6k+FY3XAM6
+	BvVqKw1NqcEjRtLhEUaaV17nma4xx26/wvwFuDzOuc8W5VaiOImCbY9xxuM1Q1h2dAvxCD
+	4bqyKXDedHQG67rVYSFgnxrtERGXWXUeI3aWYIBRxHdNUP9wIaWgdS5vN9MHmhv4g2H7vv
+	hnLM66SRFtFVFkoAOnmLsSEnCe6qWzFisCQfO2we6xv9mptZidTcCAUh5KvpoiSVQh6Dwd
+	TcVyF3pkhh/FRFNxY3OfkTPoZSGfSXcm+jklgGIhtUVglZG5rQFMOmJ0lIeQAQ==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -60,114 +62,65 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 0/7] Support external snapshots on dwmac1000
-Date: Tue, 29 Oct 2024 12:54:08 +0100
-Message-ID: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 1/7] net: stmmac: Don't modify the global ptp ops directly
+Date: Tue, 29 Oct 2024 12:54:09 +0100
+Message-ID: <20241029115419.1160201-2-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
+References: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi,
+The stmmac_ptp_clock_ops are copied into the stmmac_priv structure
+before being registered to the PTP core. Some adjustments are made prior
+to that, such as the number of snapshots or max adjustment parameters.
 
-This series is another take on the pervious work [1] done by
-Alexis Lothoré, that fixes the support for external snapshots
-timestamping in GMAC3-based devices.
+Instead of modifying the global definition, then copying into the local
+private data, let's first copy then modify the local parameters.
 
-The registers that are used to configure this don't have the same layout
-in the dwmac1000 compared to dwmac4 and others.
+Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 13 +++++++------
+ 1 file changed, 7 insertions(+), 6 deletions(-)
 
-One example would be the TS seconds/nanoseconds registet for snapshots,
-which aren't mapped at the 0x48/0x4c but rather at 0x30/0x34.
-
-Another example is the was the snapshots are enabled. DWMAC4 has a
-dedicated auxiliary control register (PTP_ACR at 0x40) while on
-DWMAC1000, this is controled through the PTP Timestamp Control Reg using
-fields maked as reserved on DWMAC4.
-
-Interrupts are also not handled the same way, as on dwmac1000 they are
-cleared by reading the Auxiliary Status Reg, which simply doesn't exist
-on dwmac4.
-
-All of this means that with the current state of the code, auxiliary
-timestamps simply don't work on dwmac1000.
-
-Besides that, there are some limitations in the number of external
-snapshot channels. It was also found that the PPS out configuration is
-also not done the same way, but fixing PPS out isn't in the scope of
-this series.
-
-To address that hardware difference, we introduce dedicated
-ptp_clock_info ops and parameters as well as dedicated hwtstamp_ops for
-the dwmac100/dwmac1000. This allows simplifying the code for these
-platforms, and avoids the introduction of other sets of stmmac internal
-callbacks.
-
-The naming for the non-dwmac1000 ops wasn't changed, so we have :
- - dwmac1000_ptp & stmmac_ptp
- - dwmac1000_ptp_clock_ops & stmmac_ptp_clock_ops
-
-where the "stmmac_*" ops use the dwmac4-or-later behaviour.
-
-I have converted dwmac100 along the way to these ops, however that's
-hasn't been tested nor fully confirmed that this is correct, as I don't
-have datasheets for devices that uses dwmac100.
-
-I've converted dwmac100 just on the hypothesis that the GMAC3_X PTP offset
-being used in both dwmac1000 and dwmac100 means that they share these same
-register layouts as well.
-
-Patch 1 prepares the use of per-hw interface ptp_clock_info by avoiding
-the modification of the global parameters. This allows making the
-stmmac_ptp_clock_ops const.
-
-Patch 2 adds the ptp_clock_info as an hwif parameter.
-
-Patch 3 addresses the autodiscovery of the timestamping features, as
-dwmac1000 doesn't provide these parameters
-
-Patch 4 introduces the ptp_clock_info specific to dwmac1000 platforms,
-and Patch 5 the hwtstamping info.
-
-Patch 6 enables the timestamping interrupt for external snapshot
-
-Patch 7 removes a non-necessary include from stmmac_ptp.c.
-
-This was tested on dwmac_socfpga, however this wasn't tested on a
-dwmac4-based platform.
-
-[1]: https://lore.kernel.org/netdev/20230616100409.164583-1-alexis.lothore@bootlin.com/
-
-Thanks Alexis for laying the groundwork for this,
-
-Best regards,
-
-Maxime
-
-Maxime Chevallier (7):
-  net: stmmac: Don't modify the global ptp ops directly
-  net: stmmac: Use per-hw ptp clock ops
-  net: stmmac: Only update the auto-discovered PTP clock features
-  net: stmmac: Introduce dwmac1000 ptp_clock_info and operations
-  net: stmmac: Introduce dwmac1000 timestamping operations
-  net: stmmac: Enable timestamping interrupt on dwmac1000
-  net: stmmac: Don't include dwmac4 definitions in stmmac_ptp
-
- drivers/net/ethernet/stmicro/stmmac/common.h  |  4 +
- .../net/ethernet/stmicro/stmmac/dwmac1000.h   | 15 +++-
- .../ethernet/stmicro/stmmac/dwmac1000_core.c  | 85 +++++++++++++++++++
- drivers/net/ethernet/stmicro/stmmac/hwif.c    | 14 ++-
- .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c | 11 +++
- .../net/ethernet/stmicro/stmmac/stmmac_ptp.c  | 38 +++++++--
- .../net/ethernet/stmicro/stmmac/stmmac_ptp.h  | 10 +++
- 7 files changed, 165 insertions(+), 12 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+index a6b1de9a251d..11ab1d6b916a 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+@@ -298,20 +298,21 @@ void stmmac_ptp_register(struct stmmac_priv *priv)
+ 		priv->pps[i].available = true;
+ 	}
+ 
+-	if (priv->plat->ptp_max_adj)
+-		stmmac_ptp_clock_ops.max_adj = priv->plat->ptp_max_adj;
+-
+ 	/* Calculate the clock domain crossing (CDC) error if necessary */
+ 	priv->plat->cdc_error_adj = 0;
+ 	if (priv->plat->has_gmac4 && priv->plat->clk_ptp_rate)
+ 		priv->plat->cdc_error_adj = (2 * NSEC_PER_SEC) / priv->plat->clk_ptp_rate;
+ 
+-	stmmac_ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
+-	stmmac_ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
++	priv->ptp_clock_ops = stmmac_ptp_clock_ops;
++
++	priv->ptp_clock_ops.n_per_out = priv->dma_cap.pps_out_num;
++	priv->ptp_clock_ops.n_ext_ts = priv->dma_cap.aux_snapshot_n;
++
++	if (priv->plat->ptp_max_adj)
++		priv->ptp_clock_ops.max_adj = priv->plat->ptp_max_adj;
+ 
+ 	rwlock_init(&priv->ptp_lock);
+ 	mutex_init(&priv->aux_ts_lock);
+-	priv->ptp_clock_ops = stmmac_ptp_clock_ops;
+ 
+ 	priv->ptp_clock = ptp_clock_register(&priv->ptp_clock_ops,
+ 					     priv->device);
 -- 
 2.47.0
 
