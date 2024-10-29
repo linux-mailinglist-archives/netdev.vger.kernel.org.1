@@ -1,288 +1,196 @@
-Return-Path: <netdev+bounces-139992-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139993-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F059B4F5C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:32:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 884769B4F67
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:35:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C021F240CB
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:32:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABC111C20E97
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:35:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DB61CC16A;
-	Tue, 29 Oct 2024 16:32:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 460E5199E84;
+	Tue, 29 Oct 2024 16:35:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Zvu7y8Ku"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dVO0ccWV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+Received: from mail-wr1-f47.google.com (mail-wr1-f47.google.com [209.85.221.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC7C199FA2
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 16:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED95E1953BD;
+	Tue, 29 Oct 2024 16:34:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730219548; cv=none; b=M/YTxz98Y38kSsvxYUj3pD38DdWjVVAjgzQ/bdEjP3p/bp2Wl+HkwnQisXYEfR4Mh0ZPw4GJUrIf0QdFVUPOZCr+XWFN2dNLyARk4jgm3lp66yJmBBXx1MBmkGxUxJFX3x7sj7WR8IcZ1NFnHdcn+4LT15dELxhZiWeQ37eayfs=
+	t=1730219702; cv=none; b=Z3C/0KUdbBljWqu1pSC9YLYeyef4VfxNxYoGA/9ySCymwoR57Kev5x9Qdv+fg7jTXOJyA7XrkO/zYMlKjg9G+1jYcdm/tUTHrJgipB1Ud/Bk2T//pulzE/k/zdYvLep82pR1f3VoZCHVa2kgSFpms6/vAH3AVeywAdxh8PpHWzI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730219548; c=relaxed/simple;
-	bh=kFGL+if3/xwjjMNeXcV0G9jxEMBEzcmboI/K66wzIbI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fyXORoPLTUC5GallJssve/KQbi/9DYvNFbJZOa0fDJ5vHy8YKdjpm7MJfzvVzS26zLel7kH5k0vzC6t83Ma/XUd/9WiBcb/7yM3vSFfXtChMcPKnc+koiyLOqQdlYkz8MOpg5bL8F8wn3ILUGQmzZt73gf9RZRKgwDWD37IvBBY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Zvu7y8Ku; arc=none smtp.client-ip=209.85.210.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71e4eb91228so419549b3a.2
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 09:32:25 -0700 (PDT)
+	s=arc-20240116; t=1730219702; c=relaxed/simple;
+	bh=9UFLjkptR6QNpx3fZ3XKEoB+h3bv0CqqhrhXETuwvTY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=RdMCtTEsJytmYYKr3eRAhyTQzJztKD96t7WAHAkNgA7RM1PKhNul8PGBhHWH9hMJ08xNSW3Mvyz9vPhQT1DCdvvMxweZdP6HDSGs6ZrtjRdjKo5+3Gca7H4hf2z2L7a8hUWnvTs4BFT5gHwGBLVrgQ2ow19bp/moIEMfivxY80g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dVO0ccWV; arc=none smtp.client-ip=209.85.221.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f47.google.com with SMTP id ffacd0b85a97d-37d4b0943c7so3781937f8f.1;
+        Tue, 29 Oct 2024 09:34:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1730219545; x=1730824345; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Gp2bPRmIZGXK74UCf6LU4Vct82RL32V7HDLFUkfsc1Q=;
-        b=Zvu7y8KuuysMtauu1v5K5v+nrP+IwgkkIbiBgYMenjS1HxfXon4Y8i77wVchWHoJAM
-         XC/gFqEmlRblqANjnbm5gyGx1kxU2PdR7xsSS9kZ9Vy17zV8LDLSI9FpxT4U+tXeWenp
-         aq8CwqaW5I3bu/x3biVrX5BVI2+J9XMcD30w4hmNro92a2LLed9cABZFVMomfKrXCaOG
-         nuLlSL5+DOH3ublRYLOrOSvr+gRXILS2xVehbSpsPItSRQ9qKUmUj1qBLeb2QrlPsjap
-         49Yu1cPeuovuRjgMFEtrb/vzIq9R1xIWGD/wWs0rI3uZCsgqOJ4DLjqMiQ9B7WYcx4Q5
-         94wQ==
+        d=gmail.com; s=20230601; t=1730219698; x=1730824498; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=+u5Ty9K6ARrub3VQWTBAHNUC9+t1wfrSDcH0T/9nwt8=;
+        b=dVO0ccWVEAGXEHSrJvqnraQksNIzM83IH+g+NWIMd0BRpEmaxpDNfee3CVIZfwQ8sk
+         O5xCTy99DjZ6kChIawvSGkAIIKiWgjTM52rpkDi8uaoVjrFQ0fN9/vUFJ0kvU+53ld4a
+         RKDiH7R52y4teURUiB04Jt2mtz+Z2Oc90HBULxQRe8E8uwCG9kkzrWHUf9HyGC93kw9V
+         hzcdStrhMhrXUbZkDnYaLw2L9mA9cyNzlRZGu75rDuxIaxTATPeAWa3qTxVfU569AqA+
+         +gjCop/yGdJw5F1bWzS201FbUz0ZEZGB6bL8MiPODnaHjzT1/hW0eKHlklIGUvqSxu2Y
+         dHLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730219545; x=1730824345;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Gp2bPRmIZGXK74UCf6LU4Vct82RL32V7HDLFUkfsc1Q=;
-        b=GTLzx105m262Pvyt0dmiQ87nbBlEYiTUKTKCNXlEmedjvqyMubfoi9H+FmmmVLfV2J
-         M8dfWlaFB0Utlggz4PaNXJY+AWQp986RJRJGzYze0ri0x871jqVazVc2GgwW4Rs1r31I
-         h6DosZ6cTae8xwXL/w1GR8QRZDqQfiXklvJrKrUDUZJfsmpTna+S7ZVNc+SythYg5JVH
-         BHz355CQIZfPGzSM5/InXOgWB04uU0FqewsyY0fBjG4JE5NEegXT06osobjbTbmvk+Ep
-         gjUFP8vpcbEDT7lON7uoJ797dNKdFM65+89nriKrhuNGZZQnBw628mz/5p4UfIA/ySUh
-         UoYQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXfokiOB7c7dNafORe3zsU2Yhzs3QbAsc+AMML8Ypqjln13IB6kHrWqfi1VskW1EfekGJBI0Hg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxsj7+8lHHJhsN9tHB0TwpF7CQ76LnwV6/sqtcSpUIXFWpOoUMG
-	Dni70e5szA3WJ1yoa4oI8CdGwNVJMJTVWas5v+UdD5YJU8eis3KepVpaN9W5K1/N6qankVCA2eN
-	qO4Kr2ez4/g+FpCiN3anCgw427Hk632ynFP/U1g==
-X-Google-Smtp-Source: AGHT+IHKCbM1cYCtX219ubq/3oNT4yYLJDHESaG5BrVKKjk8PLnkRjcgUVnhxZo4ARKjwaqQViSzLtyJEGHHEaclMFc=
-X-Received: by 2002:a05:6a00:2da4:b0:71e:6895:fe9e with SMTP id
- d2e1a72fcca58-72063059e84mr7299787b3a.6.1730219544956; Tue, 29 Oct 2024
- 09:32:24 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730219698; x=1730824498;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+u5Ty9K6ARrub3VQWTBAHNUC9+t1wfrSDcH0T/9nwt8=;
+        b=qxm3kY6MzuLU/BMUCxFHi3+u/FcWjEyRKO5MOoAQJAkXulfWimanqxRgWQ0fdmacaa
+         pAJ2t7xUUQMLNmXbf2OT8OLa0uDRdAbX9cANgb737zkRNX5iwO1OTngAkei14+dG6yyr
+         TkO4iVCVYbG7X9JeRqM/vgIeu3nBdnWCPz9L+lzgxyC2xnwCXRWU13aDGySVz/EMVudk
+         bS22MRxKPKvUuhwkyIXGwfYQ99dZ27V8Rf2gHs+0Vja3jvHxKE2dF9OQTS+dLM2iPlXF
+         Vsi9co0+PhBqxyDLrBjCk3tQlK8Ylk2ZEm3jJwCAJSfxV2LGjO7y1Yx/EpEP1law2zsI
+         AvIQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUBnGe11rFEIm9L/U8ab70so3kzLqpwTsbxWOXmsnbPV7R8tnrmjH1aKzZapT2ZK9bIRF1qGHtwjQ==@vger.kernel.org, AJvYcCUVni0PYtD9YfHkIHKryy9WdrjUPgh/eYDjn4VjHjY1YBWwGfPh7T+iKv4CSzQyNsgpvElUiBPvwe/6wWk=@vger.kernel.org, AJvYcCVsRJ0NHegNHot37QH+4P5bZrPsAPKCD7NVfikpP3MAAC0uVLecmhgjnLTKhUS1kosVk10q7LHp@vger.kernel.org
+X-Gm-Message-State: AOJu0YyfuAXMwKeUhwUBGgVJMNICIPuBhAPAsQq6hiCMAqJQJ/SGLXdi
+	8eI7vD47Hh00f16Q/XrtYO0B8gmtMFzFyyrx8UcCTLTW9tSzccS2
+X-Google-Smtp-Source: AGHT+IFGeVvWfs2GbjjZ9Xw4mTo06zaHYge/2mupAU5QXpyOurso+KUqnM1MIi7YA6r0q9wC6cUBrQ==
+X-Received: by 2002:a5d:5146:0:b0:37d:5496:290c with SMTP id ffacd0b85a97d-380610f255fmr9152980f8f.7.1730219698083;
+        Tue, 29 Oct 2024 09:34:58 -0700 (PDT)
+Received: from [192.168.42.53] ([148.252.132.209])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b7124csm13055685f8f.81.2024.10.29.09.34.55
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 09:34:57 -0700 (PDT)
+Message-ID: <9a14e132-6a13-4077-973d-b1eca417e563@gmail.com>
+Date: Tue, 29 Oct 2024 16:35:16 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241027040700.1616307-1-csander@purestorage.com> <CY8PR12MB7195E405C3EC9F43619231CCDC4B2@CY8PR12MB7195.namprd12.prod.outlook.com>
-In-Reply-To: <CY8PR12MB7195E405C3EC9F43619231CCDC4B2@CY8PR12MB7195.namprd12.prod.outlook.com>
-From: Caleb Sander <csander@purestorage.com>
-Date: Tue, 29 Oct 2024 09:32:13 -0700
-Message-ID: <CADUfDZq_hsHDxi0uyxUY-PLJQm9CNYnnxjqWUXsx0ssuh6ee-A@mail.gmail.com>
-Subject: Re: [PATCH] mlx5: only schedule EQ comp tasklet if necessary
-To: Parav Pandit <parav@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 02/15] net: generalise net_iov chunk owners
+To: Christoph Hellwig <hch@infradead.org>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>,
+ Sumit Semwal <sumit.semwal@linaro.org>,
+ =?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>,
+ linux-media@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ linaro-mm-sig@lists.linaro.org
+References: <20241016185252.3746190-1-dw@davidwei.uk>
+ <20241016185252.3746190-3-dw@davidwei.uk> <ZxijxiqNGONin3IY@infradead.org>
+ <264c8f95-2a69-4d49-8af6-d035fa890ef1@gmail.com>
+ <ZxoSBhC6sMEbXQi8@infradead.org>
+ <a6864bf1-dd88-4ae0-bc67-b88bb4c17b44@gmail.com>
+ <ZxpwgLRNsrTBmJEr@infradead.org>
+ <de9ae678-258d-4f68-86e1-59d5eb4b70a4@gmail.com>
+ <Zx9_iYLVnkyE05Hh@infradead.org>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <Zx9_iYLVnkyE05Hh@infradead.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 28, 2024 at 9:08=E2=80=AFPM Parav Pandit <parav@nvidia.com> wro=
-te:
->
-> Hi
->
-> > From: Caleb Sander Mateos <csander@purestorage.com>
-> > Sent: Sunday, October 27, 2024 9:37 AM
-> >
-> > Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet=
- to call
-> > mlx5_cq_tasklet_cb() if it processes any completions. For CQs whose
-> > completions don't need to be processed in tasklet context, this overhea=
-d is
-> > unnecessary. Atomic operations are needed to schedule, lock, and clear =
-the
-> > tasklet. And when mlx5_cq_tasklet_cb() runs, it acquires a spin lock to=
- access
-> > the list of CQs enqueued for processing.
-> >
-> > Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
-> > overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs=
- to
-> > be processed in tasklet context, so it can schedule the tasklet. CQs th=
-at need
-> > tasklet processing have their interrupt comp handler set to
-> > mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that d=
-on't
-> > need tasklet processing won't schedule the tasklet. To avoid scheduling=
- the
-> > tasklet multiple times during the same interrupt, only schedule the tas=
-klet in
-> > mlx5_add_cq_to_tasklet() if the tasklet work queue was empty before the
-> > new CQ was pushed to it.
-> >
-> > Note that the mlx4 driver works the same way: it schedules the tasklet =
-in
-> > mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > ---
-> >  drivers/net/ethernet/mellanox/mlx5/core/cq.c | 5 +++++
-> > drivers/net/ethernet/mellanox/mlx5/core/eq.c | 5 +----
-> >  2 files changed, 6 insertions(+), 4 deletions(-)
-> >
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
-> > b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
-> > index 4caa1b6f40ba..25f3b26db729 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
-> > @@ -69,22 +69,27 @@ void mlx5_cq_tasklet_cb(struct tasklet_struct *t)
-> > static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
-> >                                  struct mlx5_eqe *eqe)
-> >  {
-> >       unsigned long flags;
-> >       struct mlx5_eq_tasklet *tasklet_ctx =3D cq->tasklet_ctx.priv;
-> > +     bool schedule_tasklet =3D false;
-> >
-> >       spin_lock_irqsave(&tasklet_ctx->lock, flags);
-> >       /* When migrating CQs between EQs will be implemented, please not=
-e
-> >        * that you need to sync this point. It is possible that
-> >        * while migrating a CQ, completions on the old EQs could
-> >        * still arrive.
-> >        */
-> >       if (list_empty_careful(&cq->tasklet_ctx.list)) {
-> >               mlx5_cq_hold(cq);
-> > +             schedule_tasklet =3D list_empty(&tasklet_ctx->list);
-> >               list_add_tail(&cq->tasklet_ctx.list, &tasklet_ctx->list);
-> >       }
-> >       spin_unlock_irqrestore(&tasklet_ctx->lock, flags);
-> > +
-> > +     if (schedule_tasklet)
-> > +             tasklet_schedule(&tasklet_ctx->task);
-> >  }
-> >
-> >  /* Callers must verify outbox status in case of err */  int mlx5_creat=
-e_cq(struct
-> > mlx5_core_dev *dev, struct mlx5_core_cq *cq,
-> >                  u32 *in, int inlen, u32 *out, int outlen) diff --git
-> > a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > index 68cb86b37e56..66fc17d9c949 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > @@ -112,17 +112,17 @@ static int mlx5_eq_comp_int(struct notifier_block
-> > *nb,
-> >       struct mlx5_eq_comp *eq_comp =3D
-> >               container_of(nb, struct mlx5_eq_comp, irq_nb);
-> >       struct mlx5_eq *eq =3D &eq_comp->core;
-> >       struct mlx5_eqe *eqe;
-> >       int num_eqes =3D 0;
-> > -     u32 cqn =3D -1;
-> >
-> >       eqe =3D next_eqe_sw(eq);
-> >       if (!eqe)
-> >               goto out;
-> >
-> >       do {
-> > +             u32 cqn;
-> >               struct mlx5_core_cq *cq;
-> >
-> A small nit, cqn should be declared after cq to follow the netdev coding =
-guidelines of [1].
+On 10/28/24 12:11, Christoph Hellwig wrote:
+> On Thu, Oct 24, 2024 at 05:40:02PM +0100, Pavel Begunkov wrote:
+>> On 10/24/24 17:06, Christoph Hellwig wrote:
+>>> On Thu, Oct 24, 2024 at 03:23:06PM +0100, Pavel Begunkov wrote:
+>>>>> That's not what this series does.  It adds the new memory_provider_ops
+>>>>> set of hooks, with once implementation for dmabufs, and one for
+>>>>> io_uring zero copy.
+>>>>
+>>>> First, it's not a _new_ abstraction over a buffer as you called it
+>>>> before, the abstraction (net_iov) is already merged.
+>>>
+>>> Umm, it is a new ops vector.
+>>
+>> I don't understand what you mean. Callback?
+> 
+> struct memory_provider_ops.  It's a method table or ops vetor, no
+> callbacks involved.
 
-Sure, will fix. Thanks for the reference.
+I see, the reply is about your phrase about additional memory
+abstractions:
 
->
-> >               /* Make sure we read EQ entry contents after we've
-> >                * checked the ownership bit.
-> >                */
-> > @@ -145,13 +145,10 @@ static int mlx5_eq_comp_int(struct notifier_block
-> > *nb,
-> >       } while ((++num_eqes < MLX5_EQ_POLLING_BUDGET) && (eqe =3D
-> > next_eqe_sw(eq)));
-> >
-> >  out:
-> >       eq_update_ci(eq, 1);
-> >
-> > -     if (cqn !=3D -1)
-> > -             tasklet_schedule(&eq_comp->tasklet_ctx.task);
-> > -
-> Current code processes many EQEs and performs the check for tasklet_sched=
-ule only once in the cqn check.
-> While this change, on every EQE, the additional check will be done.
-> This will marginally make the interrupt handler slow.
-> Returning a bool from comp() wont be good either, and we cannot inline th=
-ings here due to function pointer.
->
-> The cost of scheduling null tasklet is higher than this if (schedule_task=
-let) check.
-> In other series internally, I am working to reduce the cost of comp() its=
-elf unrelated to this change.
-> so it ok to have the additional check introduced here.
+"... don't really need to build memory buffer abstraction over
+memory buffer abstraction."
 
-Right, there's definitely a tradeoff here.
-From what I could tell, there is only one CQ type that processes
-completions in tasklet context (user Infiniband CQs, running
-mlx5_ib_cq_comp()). All others handle their completions in interrupt
-context. Ideally the CQ types that don't need it would not pay the
-cost of the tasklet schedule and execution. There are several atomic
-operations involved in the tasklet path which are fairly expensive. In
-our TCP-heavy workload, we see 4% of the CPU time spent on the
-tasklet_trylock() in tasklet_action_common.constprop.0, with a smaller
-amount spent on the atomic operations in tasklet_schedule(),
-tasklet_clear_sched(), and acquiring the spinlock in
-mlx5_cq_tasklet_cb().
-I agree the additional branch per EQE should be cheaper than
-scheduling the unused tasklet, but the cost would be paid by
-Infiniband workloads while non-Infiniband workloads see the benefit.
-How about instead scheduling the tasklet in mlx5_eq_comp_int() if any
-of the CQs have a tasklet completion handler? That should get the best
-of both worlds: skipping the tasklet schedule for CQs that don't need
-it while ensuring the tasklet is only scheduled once per interrupt.
-Something like this:
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index 68cb86b37e56..f0ba3725b8e9 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -112,9 +112,9 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
-        struct mlx5_eq_comp *eq_comp =3D
-                container_of(nb, struct mlx5_eq_comp, irq_nb);
-        struct mlx5_eq *eq =3D &eq_comp->core;
-+       bool schedule_tasklet =3D false;
-        struct mlx5_eqe *eqe;
-        int num_eqes =3D 0;
--       u32 cqn =3D -1;
+>> Then please go ahead and take a look at the patchset in question
+>> and see how much of dmabuf handling is there comparing to pure
+>> networking changes. The point that it's a new set of API and lots
+>> of changes not related directly to dmabufs stand. dmabufs is useful
+>> there as an abstraction there, but it's a very long stretch saying
+>> that the series is all about it.
+> 
+> I did take a look, that's why I replied.
+> 
+>>>> on an existing network specific abstraction, which are not restricted to
+>>>> pages or anything specific in the long run, but the flow of which from
+>>>> net stack to user and back is controlled by io_uring. If you worry about
+>>>> abuse, io_uring can't even sanely initialise those buffers itself and
+>>>> therefore asking the page pool code to do that.
+>>>
+>>> No, I worry about trying to io_uring for not good reason. This
+>>
+>> It sounds that the argument is that you just don't want any
+>> io_uring APIs, I don't think you'd be able to help you with
+>> that.
+> 
+> No, that's complete misinterpreting what I'm saying.  Of course an
+> io_uring API is fine.  But tying low-level implementation details to
+> to is not.
 
-        eqe =3D next_eqe_sw(eq);
-        if (!eqe)
-@@ -122,6 +122,7 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+It works with low level concepts, i.e. private NIC queues, but it does
+that through well established abstractions (page pool) already extended
+for such cases. There is no directly going into a driver / hardware and
+hard coding queue allocation, some memory injection or anything similar.
+The user api has to embrace the hardware limitations, right, there is no
+way around it without completely changing the approach and performance
+and/or applicability. And queues as first class citizens is not a new
+concept in general.
 
-        do {
-                struct mlx5_core_cq *cq;
-+               u32 cqn;
+>>> pre-cludes in-kernel uses which would be extremly useful for
+>>
+>> Uses of what? devmem TCP is merged, I'm not removing it,
+>> and the net_iov abstraction is in there, which can be potentially
+>> be reused by other in-kernel users if that'd even make sense.
+> 
+> How when you are hardcoding io uring memory registrations instead
+> of making them a generic dmabuf?  Which btw would also really help
 
-                /* Make sure we read EQ entry contents after we've
-                 * checked the ownership bit.
-@@ -134,6 +135,7 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
-                if (likely(cq)) {
-                        ++cq->arm_sn;
-                        cq->comp(cq, eqe);
-+                       schedule_tasklet |=3D !!cq->tasklet_ctx.comp;
-                        mlx5_cq_put(cq);
-                } else {
-                        dev_dbg_ratelimited(eq->dev->device,
-@@ -147,7 +149,7 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
- out:
-        eq_update_ci(eq, 1);
+If you mean internals, making up a dmabuf that has never existed in the
+picture in the first place is not cleaner or easier in any way. If that
+changes, e.g. there is more code to reuse in the future, we can unify it
+then.
 
--       if (cqn !=3D -1)
-+       if (schedule_tasklet)
-                tasklet_schedule(&eq_comp->tasklet_ctx.task);
+If that's about user api, you've just mentioned before that it can be
+pages / user pointers. As to why it goes through io_uring, I explained
+it before, but in short, it gives a better api for io_uring users, we
+can avoid creating a yet another file (netlink socket) and keeping it
+around, that way we don't need to synchronise with the nl socket and/or
+trying to steal memory from it, and the devmem api is also too
+monolithic for such purposes, so even that would need to change, i.e.
+splitting queue and memory registration.
 
-        return 0;
+> with pre-registering the memry with the iommu to get good performance
+> in IOMMU-enabled setups.
 
-Thanks,
-Caleb
+The page pool already does that just like it handles the normal
+path without providers.
+
+-- 
+Pavel Begunkov
 
