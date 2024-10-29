@@ -1,273 +1,337 @@
-Return-Path: <netdev+bounces-139979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id F09C19B4E5B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:45:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDCCF9B4E5D
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:45:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8125E1F233A0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:45:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4360B1F2320F
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:45:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0276192D84;
-	Tue, 29 Oct 2024 15:45:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC94194A52;
+	Tue, 29 Oct 2024 15:45:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+Sjnigd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BxSOE+Tk"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D39B802;
-	Tue, 29 Oct 2024 15:45:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C92F7802;
+	Tue, 29 Oct 2024 15:45:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730216730; cv=none; b=h5jxsRd77fPvp3JMIU8SSFTBtS746LDiU3pwR68IVzYz6XcJVJWlu5FjOM75ZTa4ymheUFI8xXZ2OwLXhq516mShG2XpK1x2rjGz3AlMhGDHQnUIL/3kTjJBCXlkn15tspL/f7B9CJDcGAYpTZEwurWQoZ2rlLdrJsSZui8lXRM=
+	t=1730216753; cv=none; b=oFae4WHjNZxtkCFR+esW8EvsIkam2fT/TpB6HLOsuTnQzh7oIRv0P1G6qJdKv+Gk3RtyajO4fN0crCwx+zPCngQD2eV5F1jUHoN/QcIF6eQRd5DZGwQRM9cTVoiVaS9Gi3cUka1EpbrrmhfBNTOAf5+9OpgMkIDOoM/F1ektqhs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730216730; c=relaxed/simple;
-	bh=/i4dWK4F6hJbqpi2maBmqWq0OsrRFCA6YHam80TbJs8=;
+	s=arc-20240116; t=1730216753; c=relaxed/simple;
+	bh=fuX65lgpFRP3KkR50Ce9GsTOs636jzdyePmpIEh81jM=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=s7BaeyxptPAogKtOyHulrtc4+GMEibCBcanyjp7vVYJhUGNGJkJbzvjaj2+YR2d4Q5GGNm09H+6LocK1Ex1niG3aYdZI+m5RSnwWiGo48xynM+NhqqHMM103SfC1z2Fhm8bMlNruvd8YcD1l+PUE5g7AxWu/fdnLsmVeAnygbGA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+Sjnigd; arc=none smtp.client-ip=209.85.166.178
+	 To:Cc:Content-Type; b=esTFz/32wHNAs88cBmZo7KUWqSb6ntwbQ0AMFYKA8F8WnEgpLScVBHhJYne1BPYkgSZkmrlS9k1HXJ2xWRqxAw29Vz0A3I8jM5/p6G+yZ9QybWEqcHgCqJGElyF+aiJAMQcOCmU3sjhkhMAlQRSzTRfZyTagaULmJs/cyFjCZKI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BxSOE+Tk; arc=none smtp.client-ip=209.85.128.44
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a3b6b281d4so22686745ab.0;
-        Tue, 29 Oct 2024 08:45:28 -0700 (PDT)
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4316f3d3c21so53521455e9.3;
+        Tue, 29 Oct 2024 08:45:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730216727; x=1730821527; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730216749; x=1730821549; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=R+WNbS8D2cwcZw0GFjyFt+6WwJRj0UVyPushyS97O0E=;
-        b=g+SjnigdJ78H0EthOf6xGNbRuPg8tQ1b92fShBPvjGUy9ry4Qdufgc9aW4yn7zKDON
-         vIHr/ICpc0HUpzeZdA5ZELYZMO+I1645nMf89pBSruukT1bTXrE1FMo78T1fZw/g/Buf
-         XVRPPI9PGe0QYVn0IIqCs97LF70MMpJ2+F9xm5OpaNXbM+LE7ptmaSbWzjy5KvR8s8xT
-         kXbnuslrbVkYGGAUzx//5bgayr2MaPObxvOBVJRBNZiIhB7YCjTLijTuSx/FF1QzHCgw
-         BUul2f20F4jcjXzaq3syIMjTIWCIkkJ+iZJrx0ixONnIpuQaCDKdButQmSk378NUZ+UC
-         bNuQ==
+        bh=66bPwhKpwBfWPtZQFUTRwh4k/Kr/jGoFRaplIb/urhQ=;
+        b=BxSOE+TkgXQFrAgLOSV5jssr5GYYm7wVl//U1nxTGsEj0g302++gRaG16v8/HQzSEs
+         Mleea5PDvOBAoDy+Cfhm4FRhvByYoqJtx3KSMRltiuOtxjzr6V63ndDqG6PFM8P1F0Mf
+         +Xg99mZnYTe4CU0I+ifU/sFDRyWtPA+JCbQXuQgCLcfqxwIDeos+UzDvWvFqtT1VgL1T
+         8rh0SwAR07VQthwFjGl5nReG+46CAQqhi+xhu7leqWySUrc3xujdCI+LRqBsYEkeiF7E
+         5LOfcOEmGqk/dV4nZ/GVgRxUq3I7UrN1nAM1M1uPwBay+hAWzzzDhBk1V+G5f6yXZawV
+         v3yA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730216727; x=1730821527;
+        d=1e100.net; s=20230601; t=1730216749; x=1730821549;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=R+WNbS8D2cwcZw0GFjyFt+6WwJRj0UVyPushyS97O0E=;
-        b=GtTYT/Sw99fQDDed56lWVZZSa8FVEO8GcTaOhtatmOpMEas0vsCc9HF6pt4U9TRyBq
-         qAiZgwPC4yYr0JS5zqvTyQ6L2/iFU6GfXAP2TL4f+6AJAujzExJLF0mJDSFS4uMLtpbq
-         tpObFksSweQVL4wCxAobyWwQK3cnR7RhC5l1WQ/aN8/F/boDtORvl+tZrzwcwJWwZUE0
-         JwiwDT5qYz68nyN38bsKK9CoFk39AOUOaQakYd1LQooXT2cpkpREol25Oiq3q7UOtAHe
-         WOmYzK/nVWg8CUaS8C9Xv5wl8O6JAFXRXmacVpM5XFGOcUuKQnswMoN+0XVHUje3H00q
-         Iacg==
-X-Forwarded-Encrypted: i=1; AJvYcCU/UHz21hCyRh737zE8etVlonhf0j+M4INl6+bHvBqpwlEN7NZ5O8NqINS2oyImFLpJrxibLZSu@vger.kernel.org, AJvYcCUD8JVe5pMFM52mz3/4fZRLFNUuST6N9GMsOyzGgNjTFPGEisR/BwVIMRDZenGIJDMl/DY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyTElOejYDgujbrMYvgyFJ4ZOmwxykFm8m82uBSj+jxlbo8G7Ip
-	Hjio8nswRcyEzXJqQghD+mhKRF/n6Qvsb7MlXya5t/8yPy0mEo7EFFHHbvK29OGlVcBAck3hzcq
-	U2CXGrmnl5FeYrZmK91lcJkkxkKM=
-X-Google-Smtp-Source: AGHT+IEqB8GrvJMCkNUHYeILnq8Ks2VaUDMaDt+xGTdtGjtwOsJPBLul5EJ2rYERtfWxTzrOk5MOp6NtnvgpjxxJkOw=
-X-Received: by 2002:a05:6e02:2183:b0:3a3:4391:24e9 with SMTP id
- e9e14a558f8ab-3a4ed2dfafdmr122935655ab.20.1730216727323; Tue, 29 Oct 2024
- 08:45:27 -0700 (PDT)
+        bh=66bPwhKpwBfWPtZQFUTRwh4k/Kr/jGoFRaplIb/urhQ=;
+        b=n1e+Fr4Wd6gEki7xTEQ4x138fllPMCTjK0qcZHyFaTS2c8Bv/EK22yiHVszH8vGHPj
+         i0ZOjI3hAshuaSqD9BC67kduYnpGhi0/+pRz4YFam8n8BdBC4wxIdO4S1ClAyLr4ku4c
+         pM3GORKdQ0gQam73OJVk5E+D14Ci1vz/4XBVN9Y28DNuwp0mPzGDznUC4MkIsjpGKcom
+         1RNSrjjhVT5BPcvJUPXs3dfMHRlek3HbRRwem0br6F6A7dnSrRnEWAvP6LKtQdf20bN1
+         m5RBYrr/dCbuGjRY6yEFWJ+Z953kwrA+cEr/7g1BdQY6tM7/3k0iK3ffNs6UcGSAO2dW
+         BTpw==
+X-Forwarded-Encrypted: i=1; AJvYcCWJdvJdj4JjWZ4Do+MrJO3VGuNc1uNh2Cnbnykl3RaqrnVuaVCNC1NyJj++jai5tAW7nhDZMMdOzdZ9KCI=@vger.kernel.org, AJvYcCXBiF587DAh4iyDvvSsoIJNiDW0UrRGmwzUnBWTK51hZYIs+h6QnyXmxf74VfkoBGqsBBgiYRPW@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz2Jyeic6q131u/WHlOjX+MnEm/O3FTQxWPLwytSkwX9YcVfD3h
+	3oCNWlfDDZa64dbF77LZW1j96pwOFvZZXrScrBeoBxz2hIEJm6qwEW9IBIpVy2wvNxm9Ug5spI0
+	Wh85aYjVpntnJSkQHQvyOIt96414Q0g==
+X-Google-Smtp-Source: AGHT+IHjdP0h77G5PKkwY5FAMADMzotz+qaNx7ZVIir4IUyDNtdiKXwpdMqyd4HrTmzhtUJc+f5ugwaBXjqng2JEcRc=
+X-Received: by 2002:a05:600c:4fd3:b0:431:52b7:a485 with SMTP id
+ 5b1f17b1804b1-431bb98fc9fmr1818785e9.19.1730216748967; Tue, 29 Oct 2024
+ 08:45:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-8-kerneljasonxing@gmail.com> <6720356328c26_24dce6294ce@willemb.c.googlers.com.notmuch>
- <CAL+tcoCBxTUU9mPUTC=9LmGLsrUrjVDVk-982M-TjewSW-hjzQ@mail.gmail.com>
- <67203b50af9ba_25812829436@willemb.c.googlers.com.notmuch>
- <CAL+tcoAid3eSbnu-h8PR9o-_pr4bOdsKAxsT=WT-d_GD91pVuQ@mail.gmail.com> <6720f97f43603_2bcd7f294fb@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6720f97f43603_2bcd7f294fb@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 29 Oct 2024 23:44:51 +0800
-Message-ID: <CAL+tcoDeMgugDs66+qsoh025+KL34qyya_xT5+=oWL3FDq_wOA@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 07/14] net-timestamp: add a new triggered
- point to set sk_tsflags_bpf in UDP layer
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <20241028115343.3405838-1-linyunsheng@huawei.com>
+ <CAKgT0UdUVo6ujupoo-hdrW95XOGQLCDzd+rHGUVB6_SEmvqFHg@mail.gmail.com> <472a7a09-387f-480d-b66c-761e0b6192ef@huawei.com>
+In-Reply-To: <472a7a09-387f-480d-b66c-761e0b6192ef@huawei.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Tue, 29 Oct 2024 08:45:11 -0700
+Message-ID: <CAKgT0UdzFYyWjku=RfD7QXjTGeBFiBKQcKPXJW-Jx8YYuxePxA@mail.gmail.com>
+Subject: Re: [PATCH net-next v23 0/7] Replace page_frag with page_frag_cache (Part-1)
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shuah Khan <skhan@linuxfoundation.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Linux-MM <linux-mm@kvack.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 29, 2024 at 11:04=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Tue, Oct 29, 2024 at 2:36=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
 >
-> Jason Xing wrote:
-> > On Tue, Oct 29, 2024 at 9:33=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > On Tue, Oct 29, 2024 at 9:07=E2=80=AFAM Willem de Bruijn
-> > > > <willemdebruijn.kernel@gmail.com> wrote:
-> > > > >
-> > > > > Jason Xing wrote:
-> > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > >
-> > > > > > This patch behaves like how cmsg feature works, that is to say,
-> > > > > > check and set on each call of udp_sendmsg before passing sk_tsf=
-lags_bpf
-> > > > > > to cork tsflags.
-> > > > > >
-> > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > > ---
-> > > > > >  include/net/sock.h             | 1 +
-> > > > > >  include/uapi/linux/bpf.h       | 3 +++
-> > > > > >  net/core/skbuff.c              | 2 +-
-> > > > > >  net/ipv4/udp.c                 | 1 +
-> > > > > >  tools/include/uapi/linux/bpf.h | 3 +++
-> > > > > >  5 files changed, 9 insertions(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/include/net/sock.h b/include/net/sock.h
-> > > > > > index 062f405c744e..cf7fea456455 100644
-> > > > > > --- a/include/net/sock.h
-> > > > > > +++ b/include/net/sock.h
-> > > > > > @@ -2828,6 +2828,7 @@ static inline bool sk_listener_or_tw(cons=
-t struct sock *sk)
-> > > > > >  }
-> > > > > >
-> > > > > >  void sock_enable_timestamp(struct sock *sk, enum sock_flags fl=
-ag);
-> > > > > > +void timestamp_call_bpf(struct sock *sk, int op, u32 nargs, u3=
-2 *args);
-> > > > > >  int sock_recv_errqueue(struct sock *sk, struct msghdr *msg, in=
-t len, int level,
-> > > > > >                      int type);
-> > > > > >
-> > > > > > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.=
-h
-> > > > > > index 6fc3bd12b650..055ffa7c965c 100644
-> > > > > > --- a/include/uapi/linux/bpf.h
-> > > > > > +++ b/include/uapi/linux/bpf.h
-> > > > > > @@ -7028,6 +7028,9 @@ enum {
-> > > > > >                                        * feature is on. It indi=
-cates the
-> > > > > >                                        * recorded timestamp.
-> > > > > >                                        */
-> > > > > > +     BPF_SOCK_OPS_TS_UDP_SND_CB,     /* Called when every udp_=
-sendmsg
-> > > > > > +                                      * syscall is triggered
-> > > > > > +                                      */
-> > > > > >  };
-> > > > > >
-> > > > > >  /* List of TCP states. There is a build check in net/ipv4/tcp.=
-c to detect
-> > > > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > > > > > index 8b2a79c0fe1c..0b571306f7ea 100644
-> > > > > > --- a/net/core/skbuff.c
-> > > > > > +++ b/net/core/skbuff.c
-> > > > > > @@ -5622,7 +5622,7 @@ static void skb_tstamp_tx_output(struct s=
-k_buff *orig_skb,
-> > > > > >       __skb_complete_tx_timestamp(skb, sk, tstype, opt_stats);
-> > > > > >  }
-> > > > > >
-> > > > > > -static void timestamp_call_bpf(struct sock *sk, int op, u32 na=
-rgs, u32 *args)
-> > > > > > +void timestamp_call_bpf(struct sock *sk, int op, u32 nargs, u3=
-2 *args)
-> > > > > >  {
-> > > > > >       struct bpf_sock_ops_kern sock_ops;
-> > > > > >
-> > > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> > > > > > index 9a20af41e272..e768421abc37 100644
-> > > > > > --- a/net/ipv4/udp.c
-> > > > > > +++ b/net/ipv4/udp.c
-> > > > > > @@ -1264,6 +1264,7 @@ int udp_sendmsg(struct sock *sk, struct m=
-sghdr *msg, size_t len)
-> > > > > >       if (!corkreq) {
-> > > > > >               struct inet_cork cork;
-> > > > > >
-> > > > > > +             timestamp_call_bpf(sk, BPF_SOCK_OPS_TS_UDP_SND_CB=
-, 0, NULL);
-> > > > > >               skb =3D ip_make_skb(sk, fl4, getfrag, msg, ulen,
-> > > > > >                                 sizeof(struct udphdr), &ipc, &r=
-t,
-> > > > > >                                 &cork, msg->msg_flags);
-> > > > > > diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uap=
-i/linux/bpf.h
-> > > > > > index 6fc3bd12b650..055ffa7c965c 100644
-> > > > > > --- a/tools/include/uapi/linux/bpf.h
-> > > > > > +++ b/tools/include/uapi/linux/bpf.h
-> > > > > > @@ -7028,6 +7028,9 @@ enum {
-> > > > > >                                        * feature is on. It indi=
-cates the
-> > > > > >                                        * recorded timestamp.
-> > > > > >                                        */
-> > > > > > +     BPF_SOCK_OPS_TS_UDP_SND_CB,     /* Called when every udp_=
-sendmsg
-> > > > > > +                                      * syscall is triggered
-> > > > > > +                                      */
-> > > > >
-> > > > > If adding a timestamp as close to syscall entry as possible, give=
- it a
-> > > > > generic name, not specific to UDP.
-> > > >
-> > > > Good suggestion, then it will also solve the remaining issue for TC=
-P type:
-> > > > __when__ we should record the user timestamp which exists in the
-> > > > application SO_TIMESTAMPING feature.
-> > > >
-> > > > >
-> > > > > And please explain in the commit message the reason for a new
-> > > > > timestamp recording point: with existing timestamping the applica=
-tion
-> > > > > can call clock_gettime before (and optionally after) the send cal=
-l.
-> > > > > An admin using BPF does not have this option, so needs this as pa=
-rt of
-> > > > > the BPF timestamping API.
-> > > >
-> > > > Will revise this part. Thanks for your description!
-> > >
-> > > Actually, I may have misunderstood the intention of this new hook.
-> > >
-> > > I thought it was to record an additional timestamp.
-> >
-> > I planned to do it after this series. For now, without the new hook,
-> > it will not work for UDP type.
+> On 2024/10/28 23:30, Alexander Duyck wrote:
 >
-> Why not? This is something specific to the SK BPF hooks, I suppose?
-
-I mean both hooks (one for UDP, one for USR time) are significant.
-
+> ...
 >
-> As soon as bpf_setsockopt is called, the timestamp callbacks should
-> start getting called?
-
-Right, but the question is when we trigger the call of
-bpf_setsockopt() for the UDP proto? The current patch is trying to
-deal with it.
-
+> >>
+> >>
+> >
+> > Is this actually the numbers for this patch set? Seems like you have
+> > been using the same numbers for the last several releases. I can
 >
-> > >
-> > > But it is (also?) to program skb_shared_info.tx_flags based on
-> > > instructions parsed from cmsg in __sock_cmsg_send.
-> >
-> > I'm not sure if I grasp the key point you said.
-> >
-> > For UDP, skb_shared_info.tx_flags will finally be initialized in
-> > __ip_append_data() based on cork->tx_flags.
-> >
-> > cork->tx_flags is computed by sock_tx_timestamp() based on
-> > ipc->sockc.tsflags if cmsg feature is turned on.
-> >
-> > __sock_tx_timestamp() uses "flags |=3D xxx" to initialize the
-> > cork->tx_flags, so that the cork->tx_flags will not be completely
-> > overridden by either the cmsg method or bpf program, that is to say,
-> > the cork->tx_flags can combine both of them.
-> >
-> > Then another key point is that we do the check to see which one
-> > actually works in sk_tstamp_tx_flags() by testing sk->sk_tsflags or
-> > sk->sk_tsflags_bpf in patch [2/14]. It guarantees that.
+> Yes, as recent refactoring doesn't seems big enough that the perf data is
+> reused for the last several releases.
 >
-> Ack, thanks. So I was mistaken the second time around.
+> > understand the "before" being mostly the same, but since we have
+>
+> As there is rebasing for the latest net-next tree, even the 'before'
+> might not be the same as the testing seems sensitive to other changing,
+> like binary size changing and page allocator changing during different
+> version.
+>
+> So it might need both the same kernel and config for 'before' and 'after'=
+.
+>
+> > factored out the refactor portion of it the numbers for the "after"
+> > should have deviated as I find it highly unlikely the numbers are
+> > exactly the same down to the nanosecond. from the previous patch set.
+> Below is the the performance data for Part-1 with the latest net-next:
+>
+> Before this patchset:
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D16 test_pop_cpu=3D17 test_alloc_len=3D12 nr_test=3D51200000' (200 runs):
+>
+>          17.990790      task-clock (msec)         #    0.003 CPUs utilize=
+d            ( +-  0.19% )
+>                  8      context-switches          #    0.444 K/sec       =
+             ( +-  0.09% )
+>                  0      cpu-migrations            #    0.000 K/sec       =
+             ( +-100.00% )
+>                 81      page-faults               #    0.004 M/sec       =
+             ( +-  0.09% )
+>           46712295      cycles                    #    2.596 GHz         =
+             ( +-  0.19% )
+>           34466157      instructions              #    0.74  insn per cyc=
+le           ( +-  0.01% )
+>            8011755      branches                  #  445.325 M/sec       =
+             ( +-  0.01% )
+>              39913      branch-misses             #    0.50% of all branc=
+hes          ( +-  0.07% )
+>
+>        6.382252558 seconds time elapsed                                  =
+        ( +-  0.07% )
+>
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D16 test_pop_cpu=3D17 test_alloc_len=3D12 nr_test=3D51200000 test_align=
+=3D1' (200 runs):
+>
+>          17.638466      task-clock (msec)         #    0.003 CPUs utilize=
+d            ( +-  0.01% )
+>                  8      context-switches          #    0.451 K/sec       =
+             ( +-  0.20% )
+>                  0      cpu-migrations            #    0.001 K/sec       =
+             ( +- 70.53% )
+>                 81      page-faults               #    0.005 M/sec       =
+             ( +-  0.08% )
+>           45794305      cycles                    #    2.596 GHz         =
+             ( +-  0.01% )
+>           34435077      instructions              #    0.75  insn per cyc=
+le           ( +-  0.00% )
+>            8004416      branches                  #  453.805 M/sec       =
+             ( +-  0.00% )
+>              39758      branch-misses             #    0.50% of all branc=
+hes          ( +-  0.06% )
+>
+>        5.328976590 seconds time elapsed                                  =
+        ( +-  0.60% )
+>
+>
+> After this patchset:
+> Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D16 test_pop_cpu=3D17 test_alloc_len=3D12 nr_test=3D51200000' (200 runs):
+>
+>          18.647432      task-clock (msec)         #    0.003 CPUs utilize=
+d            ( +-  1.11% )
+>                  8      context-switches          #    0.422 K/sec       =
+             ( +-  0.36% )
+>                  0      cpu-migrations            #    0.005 K/sec       =
+             ( +- 22.54% )
+>                 81      page-faults               #    0.004 M/sec       =
+             ( +-  0.08% )
+>           48418108      cycles                    #    2.597 GHz         =
+             ( +-  1.11% )
+>           35889299      instructions              #    0.74  insn per cyc=
+le           ( +-  0.11% )
+>            8318363      branches                  #  446.086 M/sec       =
+             ( +-  0.11% )
+>              19263      branch-misses             #    0.23% of all branc=
+hes          ( +-  0.13% )
+>
+>        5.624666079 seconds time elapsed                                  =
+        ( +-  0.07% )
+>
+>
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D16 test_pop_cpu=3D17 test_alloc_len=3D12 nr_test=3D51200000 test_align=
+=3D1' (200 runs):
+>
+>          18.466768      task-clock (msec)         #    0.007 CPUs utilize=
+d            ( +-  1.23% )
+>                  8      context-switches          #    0.428 K/sec       =
+             ( +-  0.26% )
+>                  0      cpu-migrations            #    0.002 K/sec       =
+             ( +- 34.73% )
+>                 81      page-faults               #    0.004 M/sec       =
+             ( +-  0.09% )
+>           47949220      cycles                    #    2.597 GHz         =
+             ( +-  1.23% )
+>           35859039      instructions              #    0.75  insn per cyc=
+le           ( +-  0.12% )
+>            8309086      branches                  #  449.948 M/sec       =
+             ( +-  0.11% )
+>              19246      branch-misses             #    0.23% of all branc=
+hes          ( +-  0.08% )
+>
+>        2.573546035 seconds time elapsed                                  =
+        ( +-  0.04% )
+>
 
-Thanks for your review :)
+Interesting. It doesn't look like too much changed in terms of most of
+the metrics other than the fact that we reduced the number of branch
+misses by just over half.
 
-Thanks,
-Jason
+> >
+> > Also it wouldn't hurt to have an explanation for the 3.4->0.9 second
+> > performance change as it seems like the samples don't seem to match up
+> > with the elapsed time data.
+>
+> As there is also a 4.6->3.4 second performance change for the 'before'
+> part, I am not really thinking much at that.
+>
+> I am guessing some timing for implementation of ptr_ring or cpu cache
+> cause the above performance change?
+>
+> I used the same cpu for both pop and push thread, the performance change
+> doesn't seems to exist anymore, and the performance improvement doesn't
+> seems to exist anymore either:
+>
+> After this patchset:
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D0 test_pop_cpu=3D0 test_alloc_len=3D12 nr_test=3D512000' (10 runs):
+>
+>          13.293402      task-clock (msec)         #    0.002 CPUs utilize=
+d            ( +-  5.05% )
+>                  7      context-switches          #    0.534 K/sec       =
+             ( +-  1.41% )
+>                  0      cpu-migrations            #    0.015 K/sec       =
+             ( +-100.00% )
+>                 80      page-faults               #    0.006 M/sec       =
+             ( +-  0.38% )
+>           34494793      cycles                    #    2.595 GHz         =
+             ( +-  5.05% )
+>            9663299      instructions              #    0.28  insn per cyc=
+le           ( +-  1.45% )
+>            1767284      branches                  #  132.944 M/sec       =
+             ( +-  1.70% )
+>              19798      branch-misses             #    1.12% of all branc=
+hes          ( +-  1.18% )
+>
+>        8.119681413 seconds time elapsed                                  =
+        ( +-  0.01% )
+>
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D0 test_pop_cpu=3D0 test_alloc_len=3D12 nr_test=3D512000 test_align=3D1' =
+(10 runs):
+>
+>          12.289096      task-clock (msec)         #    0.002 CPUs utilize=
+d            ( +-  0.07% )
+>                  7      context-switches          #    0.570 K/sec       =
+             ( +-  2.13% )
+>                  0      cpu-migrations            #    0.033 K/sec       =
+             ( +- 66.67% )
+>                 81      page-faults               #    0.007 M/sec       =
+             ( +-  0.43% )
+>           31886319      cycles                    #    2.595 GHz         =
+             ( +-  0.07% )
+>            9468850      instructions              #    0.30  insn per cyc=
+le           ( +-  0.06% )
+>            1723487      branches                  #  140.245 M/sec       =
+             ( +-  0.05% )
+>              19263      branch-misses             #    1.12% of all branc=
+hes          ( +-  0.47% )
+>
+>        8.119686950 seconds time elapsed                                  =
+        ( +-  0.01% )
+>
+> Before this patchset:
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D0 test_pop_cpu=3D0 test_alloc_len=3D12 nr_test=3D512000' (10 runs):
+>
+>          13.320328      task-clock (msec)         #    0.002 CPUs utilize=
+d            ( +-  5.00% )
+>                  7      context-switches          #    0.541 K/sec       =
+             ( +-  1.85% )
+>                  0      cpu-migrations            #    0.008 K/sec       =
+             ( +-100.00% )
+>                 80      page-faults               #    0.006 M/sec       =
+             ( +-  0.36% )
+>           34572091      cycles                    #    2.595 GHz         =
+             ( +-  5.01% )
+>            9664910      instructions              #    0.28  insn per cyc=
+le           ( +-  1.51% )
+>            1768276      branches                  #  132.750 M/sec       =
+             ( +-  1.80% )
+>              19592      branch-misses             #    1.11% of all branc=
+hes          ( +-  1.33% )
+>
+>        8.119686381 seconds time elapsed                                  =
+        ( +-  0.01% )
+>
+>  Performance counter stats for 'insmod ./page_frag_test.ko test_push_cpu=
+=3D0 test_pop_cpu=3D0 test_alloc_len=3D12 nr_test=3D512000 test_align=3D1' =
+(10 runs):
+>
+>          12.306471      task-clock (msec)         #    0.002 CPUs utilize=
+d            ( +-  0.08% )
+>                  7      context-switches          #    0.585 K/sec       =
+             ( +-  1.85% )
+>                  0      cpu-migrations            #    0.000 K/sec
+>                 80      page-faults               #    0.007 M/sec       =
+             ( +-  0.28% )
+>           31937686      cycles                    #    2.595 GHz         =
+             ( +-  0.08% )
+>            9462218      instructions              #    0.30  insn per cyc=
+le           ( +-  0.08% )
+>            1721989      branches                  #  139.925 M/sec       =
+             ( +-  0.07% )
+>              19114      branch-misses             #    1.11% of all branc=
+hes          ( +-  0.31% )
+>
+>        8.118897296 seconds time elapsed                                  =
+        ( +-  0.00% )
+
+That isn't too surprising. Most likely you are at the mercy of the
+scheduler and you are just waiting for it to cycle back and forth from
+producer to consumer and back in order to allow you to complete the
+test.
 
