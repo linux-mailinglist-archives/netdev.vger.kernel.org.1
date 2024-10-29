@@ -1,168 +1,110 @@
-Return-Path: <netdev+bounces-139756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 292DB9B3FBC
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:30:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 99DD89B3FC2
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:31:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D629128310C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 01:30:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B00B28335C
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 01:31:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DF2D17548;
-	Tue, 29 Oct 2024 01:30:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JVrOQjgT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7DBD73477;
+	Tue, 29 Oct 2024 01:31:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D472D268;
-	Tue, 29 Oct 2024 01:30:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3E5D126BE6;
+	Tue, 29 Oct 2024 01:31:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730165439; cv=none; b=bwHq1yaUEuidT5U903wU3fSndPiJ3Efh/XVD/0dwf7Hu34SVQaPDdOb9MA4EhWpkNOeHqkzNeENGU0ulPPhT9ZdWYaLdyBdMFnbhY1HAjVpMN99aeHLDhWk/wjavSRCVIx6f4Dsyc1PGJQ6AApbmMOLI7lpGCoiccbEkzFGB/ko=
+	t=1730165471; cv=none; b=TEYMpGxBR15g8+qxDQVX9rvYFWVBW2F9v8jLB5/iqPgLSDP3T6PGimxXskdr5zcsUasDxQoubW6bWk8TVM1NxcCdg+Y13GDscUU5wxpvDXkhmRGh0ubx8yWbbrFn2Lmf1a2W6afQu5hZDXXNaih0N/mt6hpZU+GtBI4y9EJy+1w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730165439; c=relaxed/simple;
-	bh=zx/lLIimrjADakyt5z4cjr6YX/VRcrUQTqU0XNBJ8W4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ekg/bd/qqKRxWgeafxdRShelB2r1O4VVEij8fZuGcuV7DTYSmmE7hTsz/C8LL1CTkg6vI1gGKk0Tn9BqYOPqN64xRZLxb7eMYf7/OZbk3jHBBv6/q19mEung/yY0/Qio1YyOZA1Dj5XIVhMhgk7dJM7Of2V28RWXaoJhR4qqJOA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JVrOQjgT; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a3c00f2c75so18678595ab.2;
-        Mon, 28 Oct 2024 18:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730165436; x=1730770236; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NuorJQOgYHb6wOtLSgpuOH01iDW0mm5P6mp4e7T09yk=;
-        b=JVrOQjgTlB4JE7SuhkNzUAqrr7AGn86pohlvMK1/Fywz/bSk9Ato9j4Einx/lzYmZi
-         WxbV3wFWT2+k8ir62aVbz+g4VVVX0LpjkqmgQIYggyYZe/l5IouL66OhImDYzzjMEspb
-         3BNy+HvrTIeBuuuDy3Qw8sg5su8PGbbhj9rNANrANxqjhN+aemEIubRV1CJoqVMKxV7Y
-         93YiqO2KGbgovg7ur6w/APE1tenPH43CKhB416OncKIJRSQkvK6G/l9jo32E0i+JfNxY
-         e8PHbTAJ3UhqssDFVw7ET6sB7zoWq2C+WoxIq7BXiiBDbf/N7B1A/pjqD/2Aquj6lD0b
-         BfCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730165436; x=1730770236;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NuorJQOgYHb6wOtLSgpuOH01iDW0mm5P6mp4e7T09yk=;
-        b=t7KIPa80Nmed42fma36n1tMIy0QWdAAAGQwEL25TILD6jTCQHOe+wJaWcab0EZXBSk
-         0tFNcyXVEqqJw80Fy5/Z7iAbd+Oe25bE57kFzjyLieDM8tpN4auEY8yy29rbWX4lNHUQ
-         kmyZbLWWjr1P524yT9zObBn3djhIsFN3QKqT6yQJMeFHba3tFGnfUWo99UnYLwVWlgc1
-         u3RyVs1DiFe3jYpzEsZOesGBodEou+27+VVl1CraNxabwENlWKgseZxp0JKcFLQVlbkL
-         ACYNxYAYKOjnmE+sfSchlzATon/S8/Tr11cgCbeBAJHSXwSoUhGKeWJv/gAtPSCQVSpP
-         qODA==
-X-Forwarded-Encrypted: i=1; AJvYcCWnxGB6wjnyc2dvgOhyAZ9yQEq9XWFdq18flA5+YHQPFn42CO2MRE8+p/nDmMiwzzk1+IA=@vger.kernel.org, AJvYcCWumtwd+dCK7uJb619H/MbPUswpSVmC47vwd78MoIDPOWPEax7VA7bl8u0AYixvmxwnMFS+NmTv@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmfGGy5SPnd37qTosvkz0ONCvrduLrEjV1qwgNX53Vu/Y53pzD
-	FnDw2lQlyh+y9i3FrXkVd3uh1eD5uEqqjfOVX1b9+29aI11ivG3kTzpOo6oMqGHiC7Ox33+al8U
-	Z4V9VPTM2zx7nMUSblhyMfbnpgLU=
-X-Google-Smtp-Source: AGHT+IHrNciNr8wSOoQ9+7QV8tSmgWDc2es7IRxHkLNxv6s6eDa+PTW8cjutfSM0Hlh7RvVyGg9AOhsvraKaVxelfew=
-X-Received: by 2002:a05:6e02:1523:b0:3a0:bc39:2d8c with SMTP id
- e9e14a558f8ab-3a4ed307092mr97724065ab.25.1730165436597; Mon, 28 Oct 2024
- 18:30:36 -0700 (PDT)
+	s=arc-20240116; t=1730165471; c=relaxed/simple;
+	bh=JAqAv0C+GuV/zTwM4dv+mBDukOTwjKtbkYEQ/98gOPA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=IF5R1Lrsurl62k37QXM9UslkVvULVXIVGFQK9fSMoopZrX5x2cMK+9R/XwzZ34TfijX3wY8yKp+vtZVoUjbWaufEoXYgOv6YfrKF5TYEZAmag3IgSWSbr9Ep37NkLQHlsaxO9nIrpSdO1Ni15Xl/4nVR9VkBeAuAlZ3QJfDrMM8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Xct1l36V4zfdDM;
+	Tue, 29 Oct 2024 09:28:27 +0800 (CST)
+Received: from kwepemg200008.china.huawei.com (unknown [7.202.181.35])
+	by mail.maildlp.com (Postfix) with ESMTPS id 626F8180064;
+	Tue, 29 Oct 2024 09:31:00 +0800 (CST)
+Received: from [10.67.109.254] (10.67.109.254) by
+ kwepemg200008.china.huawei.com (7.202.181.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Tue, 29 Oct 2024 09:30:59 +0800
+Message-ID: <a88119f3-3968-e072-6caa-8229e2e470bf@huawei.com>
+Date: Tue, 29 Oct 2024 09:30:58 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-5-kerneljasonxing@gmail.com> <67203418aa886_24dce62949@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67203418aa886_24dce62949@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 29 Oct 2024 09:30:00 +0800
-Message-ID: <CAL+tcoCtg7Yu3dAWMM4EY4ARE-Lg33CKEoVned6G9MnA0QuVUg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 04/14] net-timestamp: introduce
- TS_SCHED_OPT_CB to generate dev xmit timestamp
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.2.0
+Subject: Re: [PATCH net] netlink: Fix off-by-one error in netlink_proto_init()
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: <a.kovaleva@yadro.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<lirongqing@baidu.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+References: <20241028080515.3540779-1-ruanjinjie@huawei.com>
+ <20241028182421.6692-1-kuniyu@amazon.com>
+Content-Language: en-US
+From: Jinjie Ruan <ruanjinjie@huawei.com>
+In-Reply-To: <20241028182421.6692-1-kuniyu@amazon.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemg200008.china.huawei.com (7.202.181.35)
 
-On Tue, Oct 29, 2024 at 9:02=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > Introduce BPF_SOCK_OPS_TS_SCHED_OPT_CB flag so that we can decide to
-> > print timestamps when the skb just passes the dev layer.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >  include/uapi/linux/bpf.h       |  5 +++++
-> >  net/core/skbuff.c              | 31 ++++++++++++++++++++++++++++++-
-> >  tools/include/uapi/linux/bpf.h |  5 +++++
-> >  3 files changed, 40 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> > index e8241b320c6d..324e9e40969c 100644
-> > --- a/include/uapi/linux/bpf.h
-> > +++ b/include/uapi/linux/bpf.h
-> > @@ -7013,6 +7013,11 @@ enum {
-> >                                        * by the kernel or the
-> >                                        * earlier bpf-progs.
-> >                                        */
-> > +     BPF_SOCK_OPS_TS_SCHED_OPT_CB,   /* Called when skb is passing thr=
-ough
-> > +                                      * dev layer when SO_TIMESTAMPING
-> > +                                      * feature is on. It indicates th=
-e
-> > +                                      * recorded timestamp.
-> > +                                      */
-> >  };
-> >
-> >  /* List of TCP states. There is a build check in net/ipv4/tcp.c to det=
-ect
-> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> > index 39309f75e105..e6a5c883bdc6 100644
-> > --- a/net/core/skbuff.c
-> > +++ b/net/core/skbuff.c
-> > @@ -64,6 +64,7 @@
-> >  #include <linux/mpls.h>
-> >  #include <linux/kcov.h>
-> >  #include <linux/iov_iter.h>
-> > +#include <linux/bpf-cgroup.h>
-> >
-> >  #include <net/protocol.h>
-> >  #include <net/dst.h>
-> > @@ -5621,13 +5622,41 @@ static void skb_tstamp_tx_output(struct sk_buff=
- *orig_skb,
-> >       __skb_complete_tx_timestamp(skb, sk, tstype, opt_stats);
-> >  }
-> >
-> > +static void timestamp_call_bpf(struct sock *sk, int op, u32 nargs, u32=
- *args)
-> > +{
-> > +     struct bpf_sock_ops_kern sock_ops;
-> > +
-> > +     memset(&sock_ops, 0, offsetof(struct bpf_sock_ops_kern, temp));
-> > +     if (sk_fullsock(sk)) {
-> > +             sock_ops.is_fullsock =3D 1;
-> > +             sock_owned_by_me(sk);
->
-> Why this check?
 
-I imitated the use of BPF_CGROUP_RUN_PROG_SOCK_OPS.
 
->
-> This will usually be false, as timestamps are taken outside the
-> protocol layers.
+On 2024/10/29 2:24, Kuniyuki Iwashima wrote:
+> From: Jinjie Ruan <ruanjinjie@huawei.com>
+> Date: Mon, 28 Oct 2024 16:05:15 +0800
+>> In the error path of netlink_proto_init(), frees the already allocated
+>> bucket table for new hash tables in a loop, but the loop condition
+>> terminates when the index reaches zero, which fails to free the first
+>> bucket table at index zero.
+>>
+>> Check for >= 0 so that nl_table[0].hash is freed as well.
+>>
+>> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+>> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+>> ---
+>>  net/netlink/af_netlink.c | 2 +-
+>>  1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+>> index 0a9287fadb47..9601b85dda95 100644
+>> --- a/net/netlink/af_netlink.c
+>> +++ b/net/netlink/af_netlink.c
+>> @@ -2936,7 +2936,7 @@ static int __init netlink_proto_init(void)
+>>  	for (i = 0; i < MAX_LINKS; i++) {
+>>  		if (rhashtable_init(&nl_table[i].hash,
+>>  				    &netlink_rhashtable_params) < 0) {
+>> -			while (--i > 0)
+>> +			while (--i >= 0)
+>>  				rhashtable_destroy(&nl_table[i].hash);
+>>  			kfree(nl_table);
+>>  			goto panic;
+> 
+> I remember the same question was posted in the past.
+> https://lore.kernel.org/netdev/ZfOalln%2FmyRNOkH6@cy-server/
+> 
+> As Eric alreday pointed out (and as mentioned in the thread above too),
+> it's going to panic, and we need not clean up resources here, so let's
+> remove rhashtable_destroy() and kfree() instead of adjusting the loop
+> condition.
 
-I will remove this if branch.
+Thank you very much, remove it is fine.
 
-Thanks,
-Jason
+> 
 
