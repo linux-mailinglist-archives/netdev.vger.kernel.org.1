@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-139896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139890-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20D7B9B48C0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:55:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF1199B48B5
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:54:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8337283D51
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:55:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E108D1C220BD
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:54:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 859E9206979;
-	Tue, 29 Oct 2024 11:54:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4FF20514F;
+	Tue, 29 Oct 2024 11:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GNwaBCtE"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="huzUNewi"
 X-Original-To: netdev@vger.kernel.org
 Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37C6A205E26;
-	Tue, 29 Oct 2024 11:54:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C897464;
+	Tue, 29 Oct 2024 11:54:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730202877; cv=none; b=EMRbkdvlU7HS9ioEnxqKgyDzewWR19Rr8ayTsmP+7wOFzRpNHgKKL6WW9fBwDn9mHLoKwaf/GIalhDhfbivrz+qilwMAmoxr0+DUt6mSu5SY+SSTGsHLhzPC4WsOtCMdUNH2Uhv1tjtWc7ZzLiQTxR+nIv9OhcNGGIV9ijN8ico=
+	t=1730202873; cv=none; b=JfYi/TD+99HGKsPqgv7vGajB3coqxmFP/83KpycfHR8v6kwy1v7o4iTh+U1B1GlI4RvYMuk48jbXBFYJQYyz+nPZhdB88xILDXyFtC9Xw7+2lVSIBvmxgI2JisLJyArRz5faW4ItEtGQI4WNFovRbm5CzGimyqO212xJQkWdgqw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730202877; c=relaxed/simple;
-	bh=gMvH0XNmkM3xvVyxhMszpLwJEXLT7j2FVIrMLp76smw=;
+	s=arc-20240116; t=1730202873; c=relaxed/simple;
+	bh=1gVOx7nJBT2hbmD/H6fKlrhljqTLUC8tKX9QCyRhVqc=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=BJycKWHiKUSb5O7EK8vv6gwaslAS9dtkx9bxIatYdIQj+zgD2FAthmb9mA2sPXviqqyfNiA1bX0CFDDxespP74y/sG0Sn82CiOakPhqbGt2GncLwHAzsZfEQdDj0wyOhsbp5CU0DqvP2yIawW9SraCXE9DVgAQTG13kvNUCoiDI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GNwaBCtE; arc=none smtp.client-ip=217.70.183.197
+	 MIME-Version; b=hTdTaB2x/yVDx79PQDlVLcVggdbfYyvpeqExY/r3r4L3jVlx22yOP066P0nXddlruoMN/1xSJyYbdrK+ob5Ge5qgSX5Xptd29/MLR1v3V6XTIAaexVBEgv3AHjV3Kk7vFu6xeWx5KgpQdQQLhTPfRYRsv2nEv4aoDjv6D8P5sxM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=huzUNewi; arc=none smtp.client-ip=217.70.183.197
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B18B71C000E;
-	Tue, 29 Oct 2024 11:54:27 +0000 (UTC)
+Received: by mail.gandi.net (Postfix) with ESMTPSA id ABEE71C000F;
+	Tue, 29 Oct 2024 11:54:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730202868;
+	t=1730202869;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=cUD7v1wm0Jg5VpltZUrd0TSJuZblbrkqsBeqp691CjA=;
-	b=GNwaBCtEDNN5Vtvtqfbwo/7F8ONXzQ6v5nt0z2SdjKzWqPCJq1/aIlYovSp1dCy2uNc1JS
-	kfXhxirXXt81klReWhrCRVPXaDM7CCPuGVTUFPZJQo9evFC2rK5/5ru5vVMA8cxvR5/WdQ
-	g/KV7QTTx0PmM8+OujqpratJ504Lac0vquiWKyIae9BupmCrtsXdUAo/Wp6fx3sstme784
-	voTA6xpCtPPq17SlBn4s4DcxR63Slur0haH7BKFkWvhhzT1iWDIDPX5DjAOzkXmS+30JXt
-	yKyxoJg1c5IHfja6KdLPe0HyabP2lRhZYeFNVCuT/w3VW4Xr6PtD43WQj0EH+Q==
+	bh=+tS5coFjCL1GpMVLn+Jt4VDJfqi7WRWtEsSocGUBw08=;
+	b=huzUNewiNqRNpYVxzTQz2brPQBEvqJ336v2olcaL11JZm6/5Fv4aL5763Yhrc8kFLuC/TV
+	ZPwh6Ha646K5kOCSinR1GdTqimRx6oiEr+rvXtFIDx0vr8XNq9B106KDfjbbAoEsb4ZBv/
+	Vdr9j9WDpHWWFT7FO+QrHOZsGomBO5uurm5r50HLfeBlny1ATcMK6MEyecw8dqVBQJ6ZbJ
+	CcS8SoHfGm0/j51F26uWN9Naou2W4aPojedCDaVyyEYOy/NWvnoRvbA4CrVq2H3OoUG4Qm
+	BNKCsvWzLUJfhr+bIAQbybLsE96hJaOUrPQ9Y+8pAEmcJ9ECWPS+1mUaktiutA==
 From: Maxime Chevallier <maxime.chevallier@bootlin.com>
 To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
@@ -62,9 +62,9 @@ Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
 	linux-arm-kernel@lists.infradead.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 6/7] net: stmmac: Enable timestamping interrupt on dwmac1000
-Date: Tue, 29 Oct 2024 12:54:14 +0100
-Message-ID: <20241029115419.1160201-7-maxime.chevallier@bootlin.com>
+Subject: [PATCH net-next 7/7] net: stmmac: Don't include dwmac4 definitions in stmmac_ptp
+Date: Tue, 29 Oct 2024 12:54:15 +0100
+Message-ID: <20241029115419.1160201-8-maxime.chevallier@bootlin.com>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
 References: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
@@ -77,30 +77,26 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The default configuration for the interrupts on dwmac1000 have the
-timestamping interrupt masked. Now that the timestamping has been
-adapted to dwmac1000, enable the timestamping interrupt on these
-platforms.
+The stmmac_ptp code doesn't need the dwmac4 register definitions, remove
+the inclusion.
 
 Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac1000.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 1 -
+ 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h b/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-index 600fea8f712f..9cc98f21a83f 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac1000.h
-@@ -41,8 +41,7 @@
- #define	GMAC_INT_DISABLE_PCS	(GMAC_INT_DISABLE_RGMII | \
- 				 GMAC_INT_DISABLE_PCSLINK | \
- 				 GMAC_INT_DISABLE_PCSAN)
--#define	GMAC_INT_DEFAULT_MASK	(GMAC_INT_DISABLE_TIMESTAMP | \
--				 GMAC_INT_DISABLE_PCS)
-+#define	GMAC_INT_DEFAULT_MASK	GMAC_INT_DISABLE_PCS
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+index 430905f591b2..429b2d357813 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
+@@ -9,7 +9,6 @@
+ *******************************************************************************/
+ #include "stmmac.h"
+ #include "stmmac_ptp.h"
+-#include "dwmac4.h"
  
- /* PMT Control and Status */
- #define GMAC_PMT		0x0000002c
+ /**
+  * stmmac_adjust_freq
 -- 
 2.47.0
 
