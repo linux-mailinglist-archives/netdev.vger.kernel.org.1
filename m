@@ -1,247 +1,270 @@
-Return-Path: <netdev+bounces-139782-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139783-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE1A39B412C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:45:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E335F9B4158
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:47:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 574A128316E
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:45:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FB401F22C84
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2B241FF612;
-	Tue, 29 Oct 2024 03:45:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB8E5200BA5;
+	Tue, 29 Oct 2024 03:47:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Gtowu2h4"
+	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="CCMkJF3w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f175.google.com (mail-yb1-f175.google.com [209.85.219.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sg2apc01on2116.outbound.protection.outlook.com [40.107.215.116])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AC34282FB;
-	Tue, 29 Oct 2024 03:45:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.175
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730173545; cv=none; b=cU7VKgyN9Tbvo4XaXV/Z9jcFkjBu/61ZvBF71HWbW2+z2ElSZ3zPizBqzwhtni4HG87khRIMTjkAyUyFtQJdsbMJpfzChO9VgjovyiioqkMgcRxaVn6Fpe/TLMcL0y+77SsK7jwMe2T1saPLDxsa2QKH/CK6Vov0kjv0pQ36C6Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730173545; c=relaxed/simple;
-	bh=XYnM6DX+CYxWd6ljUMrgeFtnN/QrAB98BtTRnD5Ohn8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MiR/hcCUb0gDngSvQhBeGQPD+IZPoTW4Xq9DDjwYwu9NUQ/h/AG4qCdlLjGD+UJyudlbaMZZztjdpOeXGBx1ieFPpGM11lRP5sRV+oQ2/vIgyo+dO1IgY+C0l60yFiqIj+cQuWjvkhEjAGd/PkrNe1JtXRx7Mn2cBi2dhZVHQnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Gtowu2h4; arc=none smtp.client-ip=209.85.219.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f175.google.com with SMTP id 3f1490d57ef6-e2974743675so4472896276.1;
-        Mon, 28 Oct 2024 20:45:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F351DFE26;
+	Tue, 29 Oct 2024 03:47:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.116
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730173649; cv=fail; b=ojaWytZWfQ9W0KZ8yIeBX9XLCjC1ArXIIHxuUufVjoMJyJyh6azqZtzkffdk7TcSIYpCsEQMVZfm4nobK0osgnqBCyRns5aVdKDuVVVDokFlX3qqHLJ2JQrL1Qm8CPiZqkQqOnPhhEMHFdHWr3UuyisMRuaDXlMZIxm1jHXw1tM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730173649; c=relaxed/simple;
+	bh=bJ5MoD1R5CfewBQUIxXOfWIHsanDtDH4sp6nd00Lbrc=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=AgK4vLRjiU3DCG9bcRcJzRa3VKQu5u/1RIDnryfKOYOo//mFoIKFzug9is9GWyexZWN8SSCKz2DmZEcWWP0UjWcRmYFmnu5LErrvtb5L46QNsmHruQqWxbHgfQK1DV5HMeMkmeQ7nTbFs+jPYvyr4j+uHDLpp9QPelxWKvu2BgA=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=CCMkJF3w; arc=fail smtp.client-ip=40.107.215.116
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=QJM39a0uD3jNgwmY5ZF334CHoi98wAj8L5CKaWW2d7wmS1sPpR9TQES4RYrab1lup8IyjjZnFN18FBm9AlpQ9WUzLK770rvKDk9u54NR1hy0XqyW4ut2rQFcpT8c13FoIsLR/maM3Mq1IPmQu8UL05wUSedHurojkZMQ9gaJ5voe2GEua3cwVQCYE/HIeCtM9Wu+Ru3JLQ35taTcLqVGM1+g+Wl/Yt4HhnseJEQr31Sz+GxjgCpUg7NX/cBokLW0G1t1YZUrUyDmLkvqHvSx1ZaI5NyX1wg/cSlEgjwosF+oPEmWd5LpmWRU3XeatwG8Q163/13YtrNQCGjL1zZC1g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fUn0evHQMOaRmLeF6eoaGr28aTNzKDKDtqObF044U4A=;
+ b=edP1P7YkQkbS346jt8nFiBwGApVMNRYsaiXlvrydVLJy2BJ4l/Qi/zpikHNMmi7Y/QuKmYJ8YeDTINfTsV30+f6HERl9yQspcf1hvwFiLGjRktHBNafAksWiENj+j5jVEZY2Uw36oqgsCLQPo5+Z+1drbnlITxVYAAnjl6PWXA065SK5UC60uIBCEH8tY4I+1ELUIlTwuNngl/9MunrI84mdVE9Ta2rEGpJZUZRPaBjnqboVDOKPZWscTLmY7QPgizSE8sNMBB7/77HRhNjgdOQIkhYn6f0sPBhRHmSA+Ju8hXsRbyoAi+lUrlBkSAE/TM3m9TYNzw2xGouKeCI71g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
+ dkim=pass header.d=fibocom.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730173542; x=1730778342; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T/CTs5K1y1Wb1h73no9mebagu5POeGng1N3JgW2OuRU=;
-        b=Gtowu2h4SGC7DktSemUBNe3r4C20PuuQUK1Gu13xI6e/FzBpc6IK+U5Xtv2IntjXSo
-         E/mdfhK58XXJ6Nmo511UJF8+qnTHJ3QvrtDdBQirngGPLaK4iv/qJx9re8QSbQ3XYhtt
-         W4Hm8gNlTjDjX3FZ7MxCSx4KJGQXa/hsQQpTuDwUN89K5E4Hi9QagrHiuifwTOTtI6gA
-         +b1QLEEATwH7r0iBWRsC+hHQyPqtchS6ycs94PG2YO3inqkwSVolknfWdGjfQduQbhZS
-         4qutj6pb2Gpa/EOuXiHiuEH4iPTSaH29O+HQflMy0BvcFUB0bYmsC10NCYE5SGNy3OWo
-         ifbA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730173542; x=1730778342;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=T/CTs5K1y1Wb1h73no9mebagu5POeGng1N3JgW2OuRU=;
-        b=t5i8r6dSCwm8eh0UCn896urLAM+3epkSM9lcBqYB6b3P1aoI4KXVqFRjR1O/cqW2je
-         BMgH5cLTwqJ+cvnGbmwJBrrPWbpL0spBB2RAd5XZmbkyU7RKtpRIPTbQ2U3l9xbFl4KU
-         Gw253pZRTdsSQSMNQHMIR6hValDX6getVKGCKPMYFUz4UYS6I7u+RUe4+9Pl5nJuQTt4
-         ut/fjBngAFYXY4XD5OejU+3fbotvFmv6pJPMP8DXRpRNKcjC1oqiZ44/JW9tdO10l6Qt
-         Y5HVHmiouDUp7qhhJtgmO8cLpWpOinM/H5faPk7oR3yS4BRzk7JntSlAcyFjd2HxFU1A
-         ubdA==
-X-Forwarded-Encrypted: i=1; AJvYcCURcLGxst1+NU9cIT5bXYzfKvq1OhgGIkaKyW7Ri6MdUap5aSYEpgl7z8GnVuiNu0hp96JUC34I@vger.kernel.org, AJvYcCVLpI+LIcNFeJPFqtgZIQ2tsbWzTQ7YWsnaPoLNBB2vBBlnLNjri45qawrDzCh0urB8T24MSogosFlGCg==@vger.kernel.org, AJvYcCVXEz+IAHGrePm4MZiwdutlNHBRGkpnm5G1vcZWgRH68ka4v13M4aCe9iM5LepavSF4ciqqVSpVNG8=@vger.kernel.org, AJvYcCW0hbK0CU9DKLaZRoRV1/cDBjvrfeDOwlaiZZYpiSlQ3nTWMZvFG/nK28Iv3FTuiQxN8Du0nRVq9L3TQJaF@vger.kernel.org, AJvYcCWAPdNVkHsOdMKm82yQiPuJodMGvS9cLfznjib4cu/RpZoHf3DAXM4NfnVy8R9XPN80OWxKjQ5/lyGX/sGDzxU=@vger.kernel.org, AJvYcCWZkA/Ebsvrsm1nzQqmVI2QoA1ZLgpgTRitgXjN8jvi04UxfTJXUSdvJJZBI29dEHCW19EocshcjMsD@vger.kernel.org, AJvYcCWkG26bwOBYdHuWuIx/w2ArSIw3v87kU1Y4rlaRyWYjU2BOAb7kM0cLziyhhTStxp9nn8JjpB2oIZmG@vger.kernel.org, AJvYcCWuMZkQ6fiBJUd6dKzdOqopu9ee/4dLre2VnjOYGotjP8a2gaFhmngHb70e9lgWIL+Kf7t2PCK6twu8@vger.kernel.org, AJvYcCXQ9JdtvqAXoRNx/prs/2BJ1/R5lr+9AN9OJrqABJIqbhtaB8GOL7kBwuXkw12C7k2tW+FfHJPkHZTMyXg=@vger.kernel.org, AJvYcCXWHd0MgKNNBFnsAHuLjCoPlYuEUNEx
- lw2sttxwdG7itDJKcHe38WKblEkalUz8d8Ebu0alXzNU+97Y@vger.kernel.org
-X-Gm-Message-State: AOJu0YxXuBDcQF97Vo9aOSBY2QbzEN1iEoyEskfpXMznDbVuFeJHiGq2
-	JIRFRrYrFA/4rwSxWfoURJb/LvIvvRHnE8HDCUl65E04W88xv3VvrwGjfWotcyiVg7ZrPX+Smna
-	jUxy+V7JjyNEx1npWxMvPC9R4Rek=
-X-Google-Smtp-Source: AGHT+IGfm8i1NTOjdK59ar/oHoMjiqsPSqbc0JD5K9R4kxYreI+daaN7dVKfGowPbsaVFEJzyIlEL4zXfN95OO4rnFY=
-X-Received: by 2002:a05:6902:12cc:b0:e28:faf8:5cd7 with SMTP id
- 3f1490d57ef6-e3087a6c107mr8166564276.15.1730173542428; Mon, 28 Oct 2024
- 20:45:42 -0700 (PDT)
+ d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=fUn0evHQMOaRmLeF6eoaGr28aTNzKDKDtqObF044U4A=;
+ b=CCMkJF3wimytDwEUIGBRaoKK78H4GUJpNK4AmvPxHj8bPFB9S7wKjptD5qd8i4SQY9ekMioIYoqtMHfLKJpOscq76YxqRysgyrXkqqiMp9VkRHgXpApdRUd92Uw9gcVlpemWbXU1EB/PMNEqo8OlMZ1ERmQzdpfwk8GCEl/Nqv0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=fibocom.com;
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
+ by SEZPR02MB5735.apcprd02.prod.outlook.com (2603:1096:101:42::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.24; Tue, 29 Oct
+ 2024 03:47:19 +0000
+Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
+ ([fe80::f53d:47b:3b04:9a8b%4]) with mapi id 15.20.8093.021; Tue, 29 Oct 2024
+ 03:47:18 +0000
+From: Jinjian Song <jinjian.song@fibocom.com>
+To: ryazanov.s.a@gmail.com,
+	Jinjian Song <jinjian.song@fibocom.com>,
+	chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com,
+	haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com,
+	ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org,
+	johannes@sipsolutions.net,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: angelogioacchino.delregno@collabora.com,
+	corbet@lwn.net,
+	danielwinkler@google.com,
+	helgaas@kernel.org,
+	korneld@google.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	matthias.bgg@gmail.com,
+	netdev@vger.kernel.org
+Subject: Re: [net-next v2] net: wwan: t7xx: reset device if suspend fails
+Date: Tue, 29 Oct 2024 11:46:57 +0800
+Message-Id: <20241029034657.6937-1-jinjian.song@fibocom.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <11e25027-6987-4c88-ac06-c1ba60c0d113@gmail.com>
+References: <20241022084348.4571-1-jinjian.song@fibocom.com>
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SG2PR01CA0197.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:189::8) To TY0PR02MB5766.apcprd02.prod.outlook.com
+ (2603:1096:400:1b5::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-2-tmyu0@nuvoton.com>
- <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
- <CAOoeyxUhnyYG3p+DQJG-tvU5vc5WYQZLLqCXW=uPcXTjq2gVfw@mail.gmail.com>
- <20241025-truthful-honest-newt-c371c8-mkl@pengutronix.de> <CAOoeyxUEf5vjqL67WjR-DbrhE0==2hqHLEyZ5XEBhEfMfQ5pag@mail.gmail.com>
- <20241025-spirited-nocturnal-antelope-ce93dd-mkl@pengutronix.de>
- <CAOoeyxW5QwPMGAYCWhQDtZwJJLG5xj9HXpL3-cduRSgF+4VHhg@mail.gmail.com>
- <20241028-uptight-modest-puffin-0556e7-mkl@pengutronix.de>
- <CAOoeyxU1r3ayhNWrbE_muDhA0imfZYX3-UHxSen9TqsTrSsxyA@mail.gmail.com> <20241028-observant-gentle-doberman-0a2baa-mkl@pengutronix.de>
-In-Reply-To: <20241028-observant-gentle-doberman-0a2baa-mkl@pengutronix.de>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Tue, 29 Oct 2024 11:45:30 +0800
-Message-ID: <CAOoeyxWh1-=NVQdmNp5HBzf1YPo9tQdh=OzUUVFmvC-F7sCHWg@mail.gmail.com>
-Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl, 
-	andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, 
-	linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|SEZPR02MB5735:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4dde31b2-eb93-4734-ddd3-08dcf7cc62e5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|7416014|376014|52116014|366016|1800799024|921020|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?TWxDYmczdVViMGZlY21QRjErZkxQMW4rcnc1QjJuaGVSRTFMTWs4TjVHV0Zp?=
+ =?utf-8?B?NFdWVm8xZElrM1ZJK3R2dXhyQWFrMksrTkI2Ym5aVlVsVW9tejVialh0YlRN?=
+ =?utf-8?B?cnduOXhnK3k5Q2tDM1lhYkN4MndqYkxMb2xBK0R3VkpMWnFEWnJOZU9kVVR6?=
+ =?utf-8?B?bXlabkRmc2h6dXF2d2VtVGZFQitXdHJoSE5CT29mTzFzREQ1ckRvSzc5b2l4?=
+ =?utf-8?B?SEpGN1pVZXVWdXhTRlBvWW1YVzdDSHBHcFEyZG1SSWEyVCtCTW16NmZYaXBp?=
+ =?utf-8?B?ZlBJd1RNR1oycUJpcXNyRloxNStQdFY2OXFLdUtvdElzRElKZXZNMkRNYVNx?=
+ =?utf-8?B?bzRPYUM2T3dnT1E3MjFqY0hIQmp5d2lUVm1FMGdoN2t5b3hnRmh0U2JTazh4?=
+ =?utf-8?B?MU9OSm9OaDFod2svSFdLL2lVUDFzRkJoOFNMak00TEtNbkErKy9uWUZVendZ?=
+ =?utf-8?B?VDVJalZibktTZ01CeTlLVE5MMHBOTUlTdTd3T3Y3cnlDSjlUT1JabnlBRWZO?=
+ =?utf-8?B?VEFzeTBKQ2RsUThpQ3Mza3pCN2R5ZXNkelpheUlMeXNwQXRYSGdXdk1qTDEy?=
+ =?utf-8?B?OWQydnhNUy9PY21vTXo3eXZCdGJlMGtiUWhqUmxkSjN4cHl2azE2bHFKQ2lu?=
+ =?utf-8?B?SHBja1VZa1BwNWZ2R3NtbEJ3MlVaR2M3UU1ENHA0QUZ4TXM2TGNZb0toWi9N?=
+ =?utf-8?B?TXR1ZlRhYklXZGhhY1ZvQzBWdUdZeGVXL0xpaWFMZEZsVDhNRy9MNjlNQmdP?=
+ =?utf-8?B?bVVSdjlIUFp0RkRrV1FFanRwLzlCTVNvTThWWloram9sV2xNcjlKVWdFVkpT?=
+ =?utf-8?B?ZTlWVlJ0Qkx2V2MzVEh6ZmN6WVVZSlJINGUvN3o2TENyKzduUHVUNEdXamd4?=
+ =?utf-8?B?QXcwMUgzSmdFdFF4a1dSOUlOTFhnUEZQK0FsRDFTZ2t2NmZwSzQxZTVrVXNs?=
+ =?utf-8?B?dXExWllwTVRvUTZaKzRUTThQZTRsdzhYVS8xMW8vSVhCQ3dnU2t6NGhJNDFF?=
+ =?utf-8?B?TmNDd0xjTzdydFNNdytzQkQzZGlYV1FvbTNHY1I5akg1TmpIeDdrQUE5bHFu?=
+ =?utf-8?B?NlZLeXdxdlExdUZYUElkREkwd1lQOFY2c3RTWlhBSHJKZGRPeHBYaW5naUJG?=
+ =?utf-8?B?OStiZWNnVkpCdUZkc0UrblNaMUtjZGwvbkNvbW0vNFpMN3VhcEFzeHVRcGd5?=
+ =?utf-8?B?SXB5UW5qNHl6ZFBGMzUxd2NCaHpkbUF6c1kxU1VGQUlXOEEvYzMvcE9SeElq?=
+ =?utf-8?B?VVBmR3YrTEkwZWc0MVNvUWhkQmNaS2xpOWpidUh5NzFwTUhMR0w2ZXc4L3p5?=
+ =?utf-8?B?eTZXcmE2M1grWHRHNUVBTncrL1dQcTNudW9NWnhmYXZ2SFpLWS9XWlI1UTFx?=
+ =?utf-8?B?ZFdOWGRlYVB1MTZaMXpRNmFNZzl3MlUrUi9vbmVzVENBVVAwdk00YThicWpa?=
+ =?utf-8?B?M3hTRDFObHdxaVBDVkc3ckdxTE8yUEZlQWgxRGtmRnpweFp0ZXdYOUNHbTFq?=
+ =?utf-8?B?QzNML0ZEWDdIQm5SUFlJQXNJRjl3UExCM21CNTRvYlJuSmpRbUxGSDErbm9p?=
+ =?utf-8?B?ZzlqQ0E3YnhaL09YbUNJTFZHbXNrZ05UUDdjQ0tFSGVqR0dFODYvYXlZV3Yv?=
+ =?utf-8?B?aE83TlFndzZiQi9yeHVJLzhCRityaUFhdXRuUDFnUCsramRlOW1LdEFOVlUw?=
+ =?utf-8?B?ZkV3elNUTGhQMUp5S0dvdVE3alJsUzU1cXRIeDVTMzZyMjIwemRMYlVWaDdO?=
+ =?utf-8?B?TFN5em5GQ2xRM3BjNERpeUJpOVJIRm1QZnlKNC82Ni9KTThSQmkxdWZvbmt4?=
+ =?utf-8?B?K2l2aDIxcHJRMXlZLzBJSjVuMGNsRGQvbCsvQ0x4TnovOTNXWk5hdkJCWUhi?=
+ =?utf-8?Q?h1QJ7by4VwHg3?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(52116014)(366016)(1800799024)(921020)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?eVV4Qnc5M3dJMVFzRVdxenV0Rm5zVHhUcXQ1N1I2ZjJuN2dldUdXK00rQnR6?=
+ =?utf-8?B?dyt6MHdMN29HeFQ5NnhQcGlPREdJZVJXK1gxNTNPRG1hMUVZemFScFkyQXNK?=
+ =?utf-8?B?aDZ3bGt0a2syWCtqV20vdU5BWE9rU1QralU4cGtFYlFxWDZjS0lnQnpRYXJr?=
+ =?utf-8?B?eTBpRzM5VyszZTJSZVA0bnh5b3ozSUtSd3p5a3NwNDNRZ1ZUbm4ySDRCenhv?=
+ =?utf-8?B?eStYdldFcHYyU0lva2RuWGxLb25NQW8yQ29uNE9ubitnRXBiTzROb0hxYjlL?=
+ =?utf-8?B?clQ1Sk1OQ1JyU3AraVRYbVlPcnZRcEc0S2tiZjlIQnlYVTQ0MU9IaGY3QlY5?=
+ =?utf-8?B?cE9YdHJBTExUK2RjRWIrRk9iVWEwcTB6K0dGbjgyQm11ZExFM3Y5REQ1R1dh?=
+ =?utf-8?B?M3FyaDR4aXpRZVR4WGwyRUNLZzBTTUFQOVd3R2J2SFBRYVBDY1d1S2tBZXg4?=
+ =?utf-8?B?cjhhc2lVZzE4T1hKWHJDYUdBQ0NKTERKbFFlWmkwRUhUVDJtS2dXYzBnaUx3?=
+ =?utf-8?B?MVlYaUY2dzduZFdrYmxMcnFRdHRHMnRiVEVyZ1dXSGg3VEp5SkQxZ2RSbHI2?=
+ =?utf-8?B?L2s5emhHMTB0ZkFSU0xkSVRsYmptang0Sm02T1pjdlozWWhrcEoxYTNha0p2?=
+ =?utf-8?B?czN3M2YzVTlrZmhBcEwwZFNmYmkzNG5sWmNWREQvT0V6dUFJa0o3TmRSY3Rm?=
+ =?utf-8?B?QktXN2NRRlFTOFhlNGlnQSttejF2L080RFJLK2VoSGxFY3Q0bVVkR0l4RHNG?=
+ =?utf-8?B?RUhmRy9LZGVpZlhsaEUyZm1keG5yN3E0cmhoUWg5emJpeVpqQThUMVhuZkZl?=
+ =?utf-8?B?K1hZL2hTYzRRMVRUSGRSRTloRGI5cGh4YmtVVlVGN0dHakhnaDN5K09CS1Y4?=
+ =?utf-8?B?a0hSaVZTY2U0TEpMZXVYdFBNd01lZFRXZXl2eC8wbXJoQXVLTTd5SlFxY051?=
+ =?utf-8?B?Y1VFeGY0Z2UyZkZNN3pRVXlIa0s4VTFoMTlydzZObHJESzU3TThlaytxKzBr?=
+ =?utf-8?B?TXJyWVJ6bU1oSTRhVlZ1L2FDZVRBMy81R2V4S1dFSDJzeUhwblRpZVY5cjFx?=
+ =?utf-8?B?WkNHRVR0VTREK2YvMTdRNHJwYm1lbVo2eW9wUmhrOWY3d2tYb1R4KzlyZHVX?=
+ =?utf-8?B?bXFRWFN2Rk8wTnI3S0xrSnhpMXNzU0JnelZIYWFIVjZ0aGZpOWNvWHFTY3NY?=
+ =?utf-8?B?SDFHOVQ4UjcwUEt3OXhnNXNIODhLNkNoc2ZIdURXKzluTXZmTzRBTHFsVWR4?=
+ =?utf-8?B?SUZvaHFJV1o5eksrb1Bmc2g1ejNSbXBSWm82TXBIZVYvUzQ0VW0wV0lTWG9X?=
+ =?utf-8?B?bnMyQ09adVI1bkpFS0hzbm15b2N5ZEYya0Nnek81a1hvLzBWZUZkOVNJSE5T?=
+ =?utf-8?B?VVFlMGI0dHhQUlFvVXRKMkFFS3hYZ3hTNXd6LzJGeFN1OTFLRzB6c0VWL2Jv?=
+ =?utf-8?B?eHJnNHdObmtaclNEUi9VMWo4N0RVU0VaQnZ5S2RnM0dmRkczeUUzZFJnUFJK?=
+ =?utf-8?B?a3BxbUVsb3pGNDRLd0JCL3g4MEdTUHRmM3FVR0JqTm9uU1U3bWl2Yzlya0Jp?=
+ =?utf-8?B?OXhrTm1iQ29GcTQwRDhSKzdtMm54cmVlbmI5N045M0cwY2FzcDUrbmFnRG1J?=
+ =?utf-8?B?Z1BzL2h5bm0wNFVzcjlHY1hjeHFQTlQzY2RPUDN1NGR2OFAyUldDS2FPdURO?=
+ =?utf-8?B?WUc4THc4eEh3dXkrMGNPaTBUbXdGNFE1SkdXQVpjeldHWFZQbjNFTEFyNlpE?=
+ =?utf-8?B?R2ljblJrRnJRSHhmUHBpL1RQL0dQcS90dVYxZU50aWZ0NWQzZEUrMG1hNHVr?=
+ =?utf-8?B?aEZyTFhudjBkV0JEZEVHcERBVWFiYTBuSkF0YlUyV0FiOStYcW9NNHdyM1FD?=
+ =?utf-8?B?bENOeUtXVG01bjcvckpMZk9BT2lkYUt2QzlKRGVCMXVCQk9ReUQ5U2lodWpW?=
+ =?utf-8?B?Yk9OdW9SRW5PbUxBWit6Ui9nY0VrNUE0MkpxendpQjNMdGdEbGJKNER6Tzhq?=
+ =?utf-8?B?bWQ4RzQzTThiekJhUUU2OU42STBqVE9jQkQybHFSR2RuUk1od3o1UU80cWI4?=
+ =?utf-8?B?QXJPV3ZlQnBheWJsd2h1ODVzcGdmRk5pK1BEQVJxemQrdG4rcE5XZDRpZlNw?=
+ =?utf-8?B?eXZ1a29Zd256NzY4d0FSaHhUUjdrdUNISjVkam9Ga2xROUNGcDZFaVQvbHdZ?=
+ =?utf-8?B?Wnc9PQ==?=
+X-OriginatorOrg: fibocom.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4dde31b2-eb93-4734-ddd3-08dcf7cc62e5
+X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 03:47:18.7939
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: NnNhCZLDbNG0dOG2bfO22lYJPYfBM6V4Y0gpqH/Lq5eY6S1dqZ4TU3MeV2F8aRlmHxaZi9QYDNLVd2CV1xBJtjxgtgxM/UYL7QAmW6yiE1w=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR02MB5735
 
-Marc Kleine-Budde <mkl@pengutronix.de> =E6=96=BC 2024=E5=B9=B410=E6=9C=8828=
-=E6=97=A5 =E9=80=B1=E4=B8=80 =E4=B8=8B=E5=8D=8810:06=E5=AF=AB=E9=81=93=EF=
-=BC=9A
->
-> On 28.10.2024 16:31:25, Ming Yu wrote:
-> > > > > > > > > The Linux USB stack can receive bulk messages longer than=
- the max packet size.
-> > > > > > > >
-> > > > > > > > [Ming] Since NCT6694's bulk pipe endpoint size is 128 bytes=
- for this MFD device.
-> > > > > > > > The core will divide packet 256 bytes for high speed USB de=
-vice, but
-> > > > > > > > it is exceeds
-> > > > > > > > the hardware limitation, so I am dividing it manually.
-> > > > > > >
-> > > > > > > You say the endpoint descriptor is correctly reporting it's m=
-ax packet
-> > > > > > > size of 128, but the Linux USB will send packets of 256 bytes=
-?
-> > > > > >
-> > > > > > [Ming] The endpoint descriptor is correctly reporting it's max =
-packet
-> > > > > > size of 256, but the Linux USB may send more than 256 (max is 5=
-12)
-> > > > > > https://elixir.bootlin.com/linux/v6.11.5/source/drivers/usb/hos=
-t/xhci-mem.c#L1446
-> > > > >
-> > > > > AFAIK according to the USB-2.0 spec the maximum packet size for
-> > > > > high-speed bulk transfers is fixed set to 512 bytes. Does this me=
-an that
-> > > > > your device is a non-compliant USB device?
-> > > >
-> > > > We will reduce the endpoint size of other interfaces to ensure that=
- MFD device
-> > > > meets the USB2.0 spec. In other words, I will remove the code for m=
-anual
-> > > > unpacking in the next patch.
-> > >
-> > > I was not talking about the driver, but your USB device. According to
-> > > the USB2.0 spec, the packet size is fixed to 512 for high-speed bulk
-> > > transfers. So your device must be able to handle 512 byte transfers o=
-r
-> > > it's a non-compliant USB device.
-> >
-> > I understand. Therefore, the USB device's firmware will be modified to =
-support
-> > bulk pipe size of 512 bytes to comply with the USB 2.0 spec.
->
-> Then you don't need manual segmentation of bulk transfers anymore!
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
 
-Understood, thank you very much.
-
+>Hello Jinjian,
 >
-> > > > > > > > > > +     for (i =3D 0, len =3D length; len > 0; i++, len -=
-=3D packet_len) {
-> > > > > > > > > > +             if (len > nct6694->maxp)
-> > > > > > > > > > +                     packet_len =3D nct6694->maxp;
-> > > > > > > > > > +             else
-> > > > > > > > > > +                     packet_len =3D len;
-> > > > > > > > > > +
-> > > > > > > > > > +             ret =3D usb_bulk_msg(udev, usb_rcvbulkpip=
-e(udev, BULK_IN_ENDPOINT),
-> > > > > > > > > > +                                nct6694->rx_buffer + n=
-ct6694->maxp * i,
-> > > > > > > > > > +                                packet_len, &rx_len, n=
-ct6694->timeout);
-> > > > > > > > > > +             if (ret)
-> > > > > > > > > > +                     goto err;
-> > > > > > > > > > +     }
-> > > > > > > > > > +
-> > > > > > > > > > +     for (i =3D 0; i < rd_len; i++)
-> > > > > > > > > > +             buf[i] =3D nct6694->rx_buffer[i + rd_idx]=
-;
-> > > > > > > > >
-> > > > > > > > > memcpy()?
-> > > > > > > > >
-> > > > > > > > > Or why don't you directly receive data into the provided =
-buffer? Copying
-> > > > > > > > > of the data doesn't make it faster.
-> > > > > > > > >
-> > > > > > > > > On the other hand, receiving directly into the target buf=
-fer means the
-> > > > > > > > > target buffer must not live on the stack.
-> > > > > > > >
-> > > > > > > > [Ming] Okay! I'll change it to memcpy().
-> > > > > > >
-> > > > > > > fine!
-> > > > > > >
-> > > > > > > > This is my perspective: the data is uniformly received by t=
-he rx_bffer held
-> > > > > > > > by the MFD device. does it need to be changed?
-> > > > > > >
-> > > > > > > My question is: Why do you first receive into the nct6694->rx=
-_buffer and
-> > > > > > > then memcpy() to the buffer provided by the caller, why don't=
- you
-> > > > > > > directly receive into the memory provided by the caller?
-> > > > > >
-> > > > > > [Ming] Due to the bulk pipe maximum packet size limitation, I t=
-hink consistently
-> > > > > > using the MFD'd dynamically allocated buffer to submit URBs wil=
-l better
-> > > > > > manage USB-related operations
-> > > > >
-> > > > > The non-compliant max packet size limitation is unrelated to the
-> > > > > question which RX or TX buffer to use.
-> > > >
-> > > > I think these two USB functions can be easily called using the buff=
-er
-> > > > dynamically
-> > > > allocated by the MFD. However, if they transfer data directly to th=
-e
-> > > > target buffer,
-> > > > they must ensure that it is not located on the stack.
-> > >
-> > > You have a high coupling between the MFD driver and the individual
-> > > drivers anyways, so why not directly use the dynamically allocated
-> > > buffer provided by the caller and get rid of the memcpy()?
-> >
-> > Okay! I will provide a function to request and free buffer for child de=
-vices,
-> > and update the caller's variables to use these two functions in the nex=
-t patch.
+>On 22.10.2024 11:43, Jinjian Song wrote:
+>> If driver fails to set the device to suspend, it means that the
+>> device is abnormal. In this case, reset the device to recover
+>> when PCIe device is offline.
 >
-> I don't see a need to provide dedicated function to allocate and free
-> the buffers. The caller can allocate them as part of their private data,
-> or allocate them during probe().
-
-Okay, so each child device may allocate a buffer like this during probe():
-priv->xmit_buf =3D devm_kcalloc(dev, MAX_PACKET_SZ, sizeof(unsigned char),
-GFP_KERNEL), right?
-
+>Is it a reproducible or a speculative issue? Does the fix recover modem 
+>from a problematic state?
 >
-> regards,
-> Marc
->
-> --
-> Pengutronix e.K.                 | Marc Kleine-Budde          |
-> Embedded Linux                   | https://www.pengutronix.de |
-> Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-> Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+>Anyway we need someone more familiar with this hardware (Intel or 
+>MediaTek engineer) to Ack the change to make sure we are not going to 
+>put a system in a more complicated state.
 
-Thanks,
-Ming
+Hi Sergey,
+
+This is a very difficult issue to replicate onece occured and fixed.
+
+The issue occured when driver and device lost the connection. I have
+encountered this problem twice so far:
+1. During suspend/resume stress test, there was a probabilistic D3L2
+time sequence issue with the BIOS, result in PCIe link down, driver
+read and write the register of device invalid, so suspend failed.
+This issue was eventually fixed in the BIOS and I was able to restore
+it through the reset module after reproducing the problem.
+
+2. During idle test, the modem probabilistic hang up, result in PCIe
+link down, driver read and write the register of device invalid, so
+suspend failed. This issue was eventually fiex in device modem firmware
+by adjust a certain power supply voltage, and reset modem as a workround
+to restore when the MBIM port command timeout in userspace applycations.
+
+Hardware reset modem to recover was discussed with MTK, and they said
+that if we don't want to keep the on-site problem location in case of
+suspend failure, we can use the recover solution. 
+
+Both the ocurred issues result in the PCIe link issue, driver can't 
+read and writer the register of WWAN device, so I want to add this path
+to restore, hardware reset modem can recover modem, but using the 
+pci_channle_offline() as the judgment is my inference.
+
+Thanks.
+
+>> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
+>> ---
+>> V2:
+>>   * Add judgment, reset when device is offline
+>> ---
+>>   drivers/net/wwan/t7xx/t7xx_pci.c | 4 ++++
+>>   1 file changed, 4 insertions(+)
+>> 
+>> diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/t7xx/t7xx_pci.c
+>> index e556e5bd49ab..4f89a353588b 100644
+>> --- a/drivers/net/wwan/t7xx/t7xx_pci.c
+>> +++ b/drivers/net/wwan/t7xx/t7xx_pci.c
+>> @@ -427,6 +427,10 @@ static int __t7xx_pci_pm_suspend(struct pci_dev *pdev)
+>>   	iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) + ENABLE_ASPM_LOWPWR);
+>>   	atomic_set(&t7xx_dev->md_pm_state, MTK_PM_RESUMED);
+>>   	t7xx_pcie_mac_set_int(t7xx_dev, SAP_RGU_INT);
+>> +	if (pci_channel_offline(pdev)) {
+>> +		dev_err(&pdev->dev, "Device offline, reset to recover\n");
+>> +		t7xx_reset_device(t7xx_dev, PLDR);
+>> +	}
+>>   	return ret;
+>>   }
+>
+>--
+>Sergey
+>
+
+Best Regards,
+Jinjian.
 
