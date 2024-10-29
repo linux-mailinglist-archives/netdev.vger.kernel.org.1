@@ -1,93 +1,94 @@
-Return-Path: <netdev+bounces-140049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6455C9B51F7
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:40:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CB4A9B51FC
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:41:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F02DDB2151C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:40:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1177328542E
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:41:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56B63203719;
-	Tue, 29 Oct 2024 18:39:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D70C62071EA;
+	Tue, 29 Oct 2024 18:40:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VQT5BhnN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="p/VCZh1+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5B41DA305;
-	Tue, 29 Oct 2024 18:39:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B29DF20513C
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 18:40:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730227198; cv=none; b=QDyPRfA6ZhdpZuFNtqXWXPQlpSLyWmIVbw6LigLH5sW/l3oRyBOgoJWKrhaQy2OqH7eXNcpm4XleyRURYi4OX+mQrusUrJ2Y7EhzdamXiEKsXsZjev23SWhhT3gAV/kcJRnWoQACWerZzttf2VXgVoSrX4q7iX7eMwDJuv4TRzY=
+	t=1730227228; cv=none; b=aqEo7Ll8cZcrNkd/oiaS6MMn9sujLcMttcBHIKx2frhckQ5nWoS9KTtAjqvA3VxagKGJ/sLBXga7G9zX52+i1lFjv5S4f7kHf2o4YQMiZitTxX0CuJ+L8acenWTJ9cPfpHxmWoUSCa5xV4Pxuc3auT8cOPZKlz2/uYEnHEdpql4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730227198; c=relaxed/simple;
-	bh=RgfT3pIpqebkN83jwo/3I6MPLEG4c72/urpViXRIzUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m1HYNhYQStWrWCpOuqeOEokhSLEYPw4WKcIEXMeAhiNSJ/em8pZCqCpPZvlfikStx37LFjHmVL9BgQs90zSeJO4t5bNGI9ni8es2PEyBhoe1wvK3ROiwNeB9Uhzvdjb4vIFpGdMRJuNP99SU3myCGllwo35J46TMKmBxqGKPXT8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VQT5BhnN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DD4EC4CECD;
-	Tue, 29 Oct 2024 18:39:56 +0000 (UTC)
+	s=arc-20240116; t=1730227228; c=relaxed/simple;
+	bh=m0lwmNQTDVvoyeWvHVowKOrqJBf+VfnAycukgGK+nQ4=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=KTYJDPyRyacagksZstKlLaSJrsGfj8OAUO3k32YRNAxNSCnCBMUwB6nNiTbmXS4kbjEHmSFnfMU8afy7FCNTSgy8lE+n7EoTjqdHHpnjzKeIzHbtrCGmMqyULs5/hhbXer++VDNjcWCguVmguIkD3ZSBUCiPuCyGicBzE5sAdK0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=p/VCZh1+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2896FC4CEE4;
+	Tue, 29 Oct 2024 18:40:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730227197;
-	bh=RgfT3pIpqebkN83jwo/3I6MPLEG4c72/urpViXRIzUs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VQT5BhnNblfYueiFYe754q42gLqBJXsSGvkq2WJ8MZyeyJt8xQDOods+rgBK+5dEX
-	 dr6Zt3SUXxijuO3O2KE+LFQrQ33+fcC3XZrhWPcOMC73Vf0xpjG464M6YICkxmvZEK
-	 wIJtH3OJxZSe6HB1uTB5MJxPXLXJiHtHwHXZLdQpcdpBiIjwAAa3BaBkjJkUevzDZB
-	 cgilj7ZqQZ960J2fEkC/fhNw+kD2gKZudxvic/49Iz48qJhEwkSVM0ruNMV7gu8F5r
-	 QTqMBplCrgRd/8WhohGQRXvCFbK+DnPa8RmJz2SSVIcUsDELWgZOlCbwsoOL+AtDkv
-	 XHYE4NQKti7ow==
-Date: Tue, 29 Oct 2024 11:39:55 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
-Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Michael Chan
- <michael.chan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
- Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
- Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
-Subject: Re: [PATCH 2/2][next] net: ethtool: Avoid thousands of
- -Wflex-array-member-not-at-end warnings
-Message-ID: <20241029113955.145d2a2f@kernel.org>
-In-Reply-To: <7d227ced-0202-4f6e-9bc5-c2411d8224be@embeddedor.com>
-References: <cover.1729536776.git.gustavoars@kernel.org>
-	<f4f8ca5cd7f039bcab816194342c7b6101e891fe.1729536776.git.gustavoars@kernel.org>
-	<20241029065824.670f14fc@kernel.org>
-	<f6c90a57-0cd6-4e26-9250-8a63d043e252@embeddedor.com>
-	<20241029110845.0f9bb1cc@kernel.org>
-	<7d227ced-0202-4f6e-9bc5-c2411d8224be@embeddedor.com>
+	s=k20201202; t=1730227227;
+	bh=m0lwmNQTDVvoyeWvHVowKOrqJBf+VfnAycukgGK+nQ4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p/VCZh1+DORzvVZVV8HIfGQuC1Ml6y3XoSX/cibatrNHzN53YINb+hZzePM16Sqq8
+	 URlhOCo8vlcOGBi5zXZrz5ow3Po5DcHGYDlKI02vNklCVU56PPu/HQkyEHr8jXKu+L
+	 1Pd/JL74BHVTQ1REQEoiGbBONnVmDPdp695+rtVSrtpJCHWqm0zdKA7O+Mq8bDFi0j
+	 B4GOWwdwnAMAfR+20HivIXXc0RpHc+WaPaUqBNyYEl8e1TA8BIXKBswL5WpTi6Op5l
+	 ue9dirgPsVRdXmKBautBd2hNyhoeq3ue9RcbR2ls1TbOlckqF3RE/lA8AyKmes3XWO
+	 ywbG5h+JwHsYA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADCF380AC08;
+	Tue, 29 Oct 2024 18:40:35 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-n] net/sched: stop qdisc_tree_reduce_backlog on TC_H_ROOT
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173022723476.784474.8433648139537058569.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Oct 2024 18:40:34 +0000
+References: <20241024165547.418570-1-jhs@mojatatu.com>
+In-Reply-To: <20241024165547.418570-1-jhs@mojatatu.com>
+To: Jamal Hadi Salim <jhs@mojatatu.com>
+Cc: netdev@vger.kernel.org, markovicbudimir@gmail.com, victor@mojatatu.com,
+ pctammela@mojatatu.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us
 
-On Tue, 29 Oct 2024 12:18:56 -0600 Gustavo A. R. Silva wrote:
-> >> I don't think you want to change this. `lsettings` is based on `ksettings`. So,
-> >> `ksettings` should go first. The same scenario for the one below.  
-> > 
-> > In which case you need to move the init out of line.  
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Thu, 24 Oct 2024 12:55:47 -0400 you wrote:
+> From: Pedro Tammela <pctammela@mojatatu.com>
 > 
-> So, the same applies to the case below?
+> In qdisc_tree_reduce_backlog, Qdiscs with major handle ffff: are assumed
+> to be either root or ingress. This assumption is bogus since it's valid
+> to create egress qdiscs with major handle ffff:
+> Budimir Markovic found that for qdiscs like DRR that maintain an active
+> class list, it will cause a UAF with a dangling class pointer.
 > 
-> 	const struct ethtool_link_settings_hdr *base = &lk_ksettings->base;
-> 	struct bnxt *bp = netdev_priv(dev);
-> 	struct bnxt_link_info *link_info = &bp->link_info;
+> [...]
 
-Do you mean the bp and bp->link_info lines?
-You're not touching them, so leave them be.
+Here is the summary with links:
+  - [net-n] net/sched: stop qdisc_tree_reduce_backlog on TC_H_ROOT
+    https://git.kernel.org/netdev/net/c/2e95c4384438
 
-> Is this going to be a priority for any other netdev patches in the future?
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-It's been the preferred formatting for a decade or more.
-Which is why the net/ethtool/ code you're touching follows
-this convention. We're less strict about driver code.
+
 
