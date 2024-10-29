@@ -1,101 +1,144 @@
-Return-Path: <netdev+bounces-139763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 837069B400A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:00:28 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id D39449B404A
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:17:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47FCD282B69
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:00:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 488C51F233B2
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:17:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 072EF2B2F2;
-	Tue, 29 Oct 2024 02:00:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E2E2629C;
+	Tue, 29 Oct 2024 02:17:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tesI8sCA"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="AdYbSrOD"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D266D20DF4;
-	Tue, 29 Oct 2024 02:00:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36D2B661;
+	Tue, 29 Oct 2024 02:17:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730167223; cv=none; b=AZcPlzZU1jFE979xSJxf34MN9YUl7iUM9kQl6oGacRaqSpmiL9+BsOcIPmQggcnvyDzVKsyAn+0KEivkqSxLMrwW/NGflvcb764mRLg6hqHNSMvfKLQYqjrCzUJemj+I2i//VCtODvbstxDZBwHb9i+UB/a7C8Z1NhOmDrkGjHs=
+	t=1730168252; cv=none; b=elvSs0Qk28FtXDvnuCsdvjb2D+i8kCtLFjL1fyoLi0+cb/tKctnk1qQcSdITOPTYUHsGM2ClW++0GS52vrLz3/ereFNSa3DxIc3ZdB6CZ9do8g1vuwLddqpYTlHhZb7PhQ417Pp7IM44QojvgKZVcDQlgNvtglpFxHAHKZavYug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730167223; c=relaxed/simple;
-	bh=GoCp+K+udVefo0sh8gu/9ecVv80XDC+dnCdLzJ4dmg0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Zct4bXllchp3rXXCBLNvY+IMVcXeWbnCYiBM9CHh98DhMmF+3GgEwYwhsgxa9+Y8KccQege+MvmnYpgClJ3u7I9ufrvqSW6u0LqFR0Npd1lIMriWcWccHYr/kJUy1m8XoR/dVkIGcDI0+oBoSNIFlghRbZ8bYY3M4Ng8ODKptqk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tesI8sCA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A77EC4CEC3;
-	Tue, 29 Oct 2024 02:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730167223;
-	bh=GoCp+K+udVefo0sh8gu/9ecVv80XDC+dnCdLzJ4dmg0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=tesI8sCAulRWF20ztjYGguvPI3KSdBSO1ZeYKTYdgBSSLBqXW8MhVZrOOwdculUK2
-	 zrynba7tkCJ1rNs0w3Z8UeESc7tu1aelAr6d9PTYriodQli6LZHvsexwRfg3/5SrjE
-	 KX/nJGXxUortzaDvPHsasO9KPL8HWEgUmvGEIMdH8TCyxZMQE3/mNPNPUqoSSWCB7z
-	 esrmQll0mU/wZhM2g5Lzn9lVAy7kCuGrvtkMjmhhbyP1ELaZ06ZlZ1BBIYGBpcL2pT
-	 nokem1xfrVNARaLHWAvq8w9KHQlhy4afu9QUC2XE0J7Gn05bbvl5C2H/aFDkGUvLkM
-	 OomLlgMlanqxA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB063380AC1F;
-	Tue, 29 Oct 2024 02:00:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730168252; c=relaxed/simple;
+	bh=WOnSUIQBuKzoLwrYxUnZ9DsMMoO3e7npDC5vAp/163o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=qtU50EY4X2t4JaTyWz7cstlcxQg2p3vWuUM4mt2lGgsWpQPzHCIhfXUZGe4rE+yvx4x9fKV6foF2hshPOLskGPK4xI7FMxjyXYObOL6ELOvXLsmaGfNDByV1XNSM9WYejbmiepzRfYlE80EhzIJHXaLOMdVwh8JB7w639a2+CCo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=AdYbSrOD; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279863.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49SIfaK7022936;
+	Tue, 29 Oct 2024 02:17:19 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	DlKmic9dACLOMQPRMfL+5WmhlfgUgYve9EN1vzHwzxQ=; b=AdYbSrODo7mPPIJm
+	j7M7oC9uEVphz2GLWjswi1TD9qIkRkKCQMrs478DHo9nga8I1nO1eWQxiqQYu8uM
+	RzN+P/pANTorjmk0NSH/S8of2+UZ9sdFwiMx6ECHO3GqoYT5liB5P2vgrFP94DQl
+	XOoY+Bt7HzV3p1vamlAlsWAxHHFfItbitW8vYPWUYT2VR3z2XEl7KlIQWJxYFNr7
+	eaO0QlkPhkZfxaYBmoKGBCZ0KtW/TweHuZWiqLl6NRE4zFMezeihVIJajfNUf9lQ
+	H2OmsJvMB8XK907ApDFOCFKTEugVvbDiLfAQN52iLBUsaFK0alP7cfmFnqPL1myi
+	v7a8+Q==
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42grn4xxh3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 02:17:18 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49T2HId1021983
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 02:17:18 GMT
+Received: from [10.253.11.110] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 28 Oct
+ 2024 19:17:12 -0700
+Message-ID: <3d717bdc-4b8a-4e85-9bcf-e25b75d9fecf@quicinc.com>
+Date: Tue, 29 Oct 2024 10:17:09 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [Patch bpf] sock_map: fix a NULL pointer dereference in
- sock_map_link_update_prog()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173016723076.241400.15764382647149470728.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Oct 2024 02:00:30 +0000
-References: <20241026185522.338562-1-xiyou.wangcong@gmail.com>
-In-Reply-To: <20241026185522.338562-1-xiyou.wangcong@gmail.com>
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, cong.wang@bytedance.com,
- bonan.ruan@u.nus.edu, yonghong.song@linux.dev, john.fastabend@gmail.com,
- jakub@cloudflare.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 0/3] Add ethernet dts schema for qcs615/qcs8300
+To: Krzysztof Kozlowski <krzk@kernel.org>, Vinod Koul <vkoul@kernel.org>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, "Rob
+ Herring" <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        "Conor
+ Dooley" <conor+dt@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+        Kishon Vijay Abraham I <kishon@kernel.org>,
+        Bartosz Golaszewski
+	<bartosz.golaszewski@linaro.org>
+CC: <netdev@vger.kernel.org>, <linux-arm-msm@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <linux-phy@lists.infradead.org>, <quic_tingweiz@quicinc.com>,
+        <quic_aiquny@quicinc.com>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+References: <20241017-schema-v2-0-2320f68dc126@quicinc.com>
+ <132a8e29-3be7-422a-bc83-d6be00fac3e8@kernel.org>
+Content-Language: en-US
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+In-Reply-To: <132a8e29-3be7-422a-bc83-d6be00fac3e8@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: cXPft-qHqazelOYVa8i5wIudbMRB9Q1I
+X-Proofpoint-ORIG-GUID: cXPft-qHqazelOYVa8i5wIudbMRB9Q1I
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 phishscore=0
+ impostorscore=0 lowpriorityscore=0 priorityscore=1501 mlxlogscore=999
+ malwarescore=0 clxscore=1015 bulkscore=0 suspectscore=0 adultscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410290016
 
-Hello:
 
-This patch was applied to bpf/bpf.git (master)
-by Martin KaFai Lau <martin.lau@kernel.org>:
 
-On Sat, 26 Oct 2024 11:55:22 -0700 you wrote:
-> From: Cong Wang <cong.wang@bytedance.com>
+On 2024-10-28 19:04, Krzysztof Kozlowski wrote:
+> On 17/10/2024 11:52, Yijie Yang wrote:
+>> Document the ethernet and SerDes compatible for qcs8300. This platform
+>> shares the same EMAC and SerDes as sa8775p, so the compatible fallback to
+>> it.
+>> Document the ethernet compatible for qcs615. This platform shares the
+>> same EMAC as sm8150, so the compatible fallback to it.
+>> Document the compatible for revision 2 of the qcs8300-ride board.
+>>
+>> Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+>> ---
+>> This patch series depends on below patch series:
+>> https://lore.kernel.org/all/20240925-qcs8300_initial_dtsi-v2-0-494c40fa2a42@quicinc.com/
+>> https://lore.kernel.org/all/20240926-add_initial_support_for_qcs615-v3-0-e37617e91c62@quicinc.com/
 > 
-> The following race condition could trigger a NULL pointer dereference:
+> So it cannot be merged...
 > 
-> sock_map_link_detach():		sock_map_link_update_prog():
->    mutex_lock(&sockmap_mutex);
->    ...
->    sockmap_link->map = NULL;
->    mutex_unlock(&sockmap_mutex);
->    				   mutex_lock(&sockmap_mutex);
-> 				   ...
-> 				   sock_map_prog_link_lookup(sockmap_link->map);
-> 				   mutex_unlock(&sockmap_mutex);
->    <continue>
+> Instead please decouple your works. I don't get why do you claim there
+> is dependency in the first place, but anyway. Fix up your patchsets to
+> fix that (if there is something to fix).
 > 
-> [...]
 
-Here is the summary with links:
-  - [bpf] sock_map: fix a NULL pointer dereference in sock_map_link_update_prog()
-    https://git.kernel.org/bpf/bpf/c/740be3b9a6d7
+Actually, the dependency is unnecessary here. I will remove it together 
+with the merged patch in the upcoming version.
 
-You are awesome, thank you!
+> Best regards,
+> Krzysztof
+> 
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+Best Regards,
+Yijie
 
 
