@@ -1,378 +1,199 @@
-Return-Path: <netdev+bounces-139778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C8DE9B40E8
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:15:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1885A9B40F3
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:17:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 709981C21EDD
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:15:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8B46CB21B30
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B7E200C8D;
-	Tue, 29 Oct 2024 03:13:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MIehrEt3"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EB0417DE2D;
+	Tue, 29 Oct 2024 03:17:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8DA317D355;
-	Tue, 29 Oct 2024 03:13:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54058FC0B
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 03:17:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730171625; cv=none; b=THYTp/rLo69OC7cLJYahBcpiZ5+FgGg4kYpvd1np+v3Fkz4uP8JyOr33i/K/XxvildqxmqNI0jK97mgqK4U8jYpMhB9eblr6hFtl06M3nleaL1OWkDAE1sZhtGeO+g0XBd2+7mrEhLAQRbbeNBJ2mu6Svi57Ox9Jmgxc2L5k00g=
+	t=1730171848; cv=none; b=PE1/SDccWSwSM6/HzZ++TU9JvLam1WwpYs7+CiCfCLx8EbhWzLI4WdxaQG4P4a1q6DiW+torSeXGxDl3b2okG7QgRnz6Bg3enbf4zgk9Y76HIghhQkRJ4H0MSpRCfxgrswTrWzIE/a0BBE8S3ui0dr5aarogblSxisaSHeDGuaI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730171625; c=relaxed/simple;
-	bh=FyDdN4oIKW8eZClC9C6LO8DO53fA/M2N5c4qKbKMyok=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ie+EVy4ZzkLGuKx36uYEOxz/2bB0+gWsGdjxc7h9RgOcvzawXT6HR5wfvrRBeBe/AcJbUEt5KrnBd4xxY0TovEmg4BVOIWkcz2x7NyRfnPXwhBLPTmQB1V+LBcCoUktRIvVyx4z3SsUtAti9cfV/IY7iRP2X8FpfymO/D2J/M1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MIehrEt3; arc=none smtp.client-ip=209.85.166.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a3b7442db5so18060445ab.2;
-        Mon, 28 Oct 2024 20:13:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730171622; x=1730776422; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6aJwpExdrNgvw5rIPgLbD0Q7fz6eKFtUIRkijgBTS4s=;
-        b=MIehrEt3MuCDN5rSrcNeRD3P1mnWynEtRlyxITVnUV9Ctf3UWgvY8bN+rldZWvGhyw
-         XW5utt8aGxCNQQ/ETO0x+c0YnTcz1QipGYMrQTngwFNRa6d6JkZyGCg/hC+NU5PKrXqf
-         O7r0STdNKZ6qh3SkviuFRICUwwiNVQGHmIMoSGmsDNldjmYuL1xZ6p2w+MQpTbRRWud6
-         DpZoNkYe3ThS8Hhny0EZi7H2ypoDuj9dBtDhhQam42PTB3BsFVfSzp3Gbr1I/54OYJQO
-         XmndUKpjBrSsz+slarAjYe6PTO53rJ7vKdOSYGIk56o/Gc80YXFmwzNJZYZxqq8JGZMV
-         MTvQ==
+	s=arc-20240116; t=1730171848; c=relaxed/simple;
+	bh=OwfSmkkVyCvraqQFejhw+w9tO/CJpKxcARE/C273ZGM=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=COnMuRvYt3nrH/S6eFuE3TuKyh8JKJGy2HyMzuB+Dub9jQgqFYZPwQ7TQ7ozyvXGkRm0gs1wE3VHOztzujXaJ9YvowtdMrbzg0tdsry/j2bZt5I95wGbhawHfSofRUoWDOfXCR1La7e/bfQWImVS2ovTOSzvy2C+GwwMtmb0z78=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a3b2aee1a3so46670195ab.1
+        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 20:17:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730171622; x=1730776422;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=6aJwpExdrNgvw5rIPgLbD0Q7fz6eKFtUIRkijgBTS4s=;
-        b=Ze/Xb/Ni2QyWRYtL5rBD/OMAhbXG9TQfTY7VpMldouh6Mk+jfdRYcjRZWtEMtUosdp
-         0515I4NNXVa3zX/inung3RDQSaHBcoV8f+2Gq5gLQFfLL+YyoSgWbULhv/0u+I+UiVTk
-         8LE1qTZUbCteXmnahAJPjsubDGLBmHiXGcpv9hhSC5wYE1vuTEU8ZFYQ1HP+GbTNaBYP
-         jqxtFIFRci4y/RmESKYHdIDG3wBZ1pLGAMmtynrBBs0pX693h7RVLZnHtpgt4e4KbyMi
-         5TNyeSuhsMpPFW+ggFHqGCEhXb9oxUImLia1rh/JYDI25wkWW4ddzuN+tSeUPTwkPd5U
-         ADlQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVoptmslIq59SWVof4zwnEAWgZf4aLhEikGfkj1uJNn6l5dmd5z0Hj+yKQ0r97+5+lkHbo=@vger.kernel.org, AJvYcCWNBzb8NlH3UQ37gIvv4nn/TWot98+Meknn5jPpsClZZCuNuB5jKfoIc/T21Nzs+7oHCeBBkYc2@vger.kernel.org
-X-Gm-Message-State: AOJu0YzNI0diw9GbXc8zvHjm3LPxkuid9ZDVmMbeq39jzyfcJv6fc4r0
-	m/FZZNucn3CoGGIZ9J84whmb7GFCNnYJIsHROlqE5uFmLi9MgTYXBdk8WHYB3xMZcWR25pPgtOh
-	8Mkxf8i4nXMqecEe5POPjDLIp7Mk=
-X-Google-Smtp-Source: AGHT+IGn4C/yzt+zzrndquYyimqexBh7+Yx4avMxOppI0chPfWnpkG3cpajJrim40RvWg2zS1butXOeJYzO7G4uVb50=
-X-Received: by 2002:a05:6e02:16cf:b0:3a3:da4f:79ec with SMTP id
- e9e14a558f8ab-3a4ed295ba9mr95422915ab.7.1730171621853; Mon, 28 Oct 2024
- 20:13:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730171845; x=1730776645;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Y6Ml5xdrk/GoPF1iZ/ESHoejXkMsJvq1MYGagAZX4ZA=;
+        b=G75Ak+/2fQUf3Mxv134u86bpaDetIZtS3noWPoTtVcu4fukMMYn+KpC6pZKfkj/YYS
+         +q/BSPlr8aV+FfE0/DyJHPDPW+R4ruDWzE5G/fGBuupCeCKO9EUuy9r1Ranj81ZRI1Wp
+         xH18JZ3ex81Wls8c9txAeBDlNqC8e5N67RqLcYNUmkYQ98ZYoPW9p48NnCwv1kYCMTGy
+         Rpn3FWiy5n+BntfhaE5BeO0O20/1gZDhcIaPcLzdDIuzbC+789MuAT3FGYyi6kmCmJZa
+         o5tGrFHIxneBty7xREJzOkd7MT5dIiLVhS6KiOVxmxNyWUwNLyC6uT+R2fGdhBr1Tf4o
+         5oZg==
+X-Forwarded-Encrypted: i=1; AJvYcCX/Y08kkdwZnNZSBmb+hkoq5tXGaH72M83kAN/6ryNV201k41qVFCfPWGAzsv48pHQlBe4ts3w=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxrS859+XcPY1U/ybcyWFPbV7vSY5m2ha7U24ejAonpM1CH02S7
+	VuonheQtKvVRk7CITVdw8UFE4KCfOFVZl8vY95rneeRsNnbyUqs7Ucy7rXkWy/YvXMAhy/+lRwz
+	kHoo6xi68GrcdpIZ9UCRMA3S+VFAe+bkyqL9zwJG3/MHsyeQLpvNL+lA=
+X-Google-Smtp-Source: AGHT+IH3tPT/58yajoM3oZAvZdllgr5kIVgqKBYc73Y6XyAyLZrKhpPJXZj2rMy3bZn2SB9xgGRbfyqStG5gMgStWcgS66VVCDYA
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-15-kerneljasonxing@gmail.com> <672039e3cec10_24dce629448@willemb.c.googlers.com.notmuch>
- <CAL+tcoC61L8Kq9uhgUNArawzZNfi4wH1CRWy42dLq9KVcJigHQ@mail.gmail.com> <67203cf9b9c11_2599232948a@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67203cf9b9c11_2599232948a@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 29 Oct 2024 11:13:05 +0800
-Message-ID: <CAL+tcoASvU6poRCDj-DvjnkLyK6jHPuokqM+CT6SK2FTGMaHAg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 14/14] bpf: add simple bpf tests in the tx
- path for so_timstamping feature
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+X-Received: by 2002:a05:6e02:1d85:b0:3a3:445d:f711 with SMTP id
+ e9e14a558f8ab-3a4ed1c2ea6mr104166235ab.0.1730171845559; Mon, 28 Oct 2024
+ 20:17:25 -0700 (PDT)
+Date: Mon, 28 Oct 2024 20:17:25 -0700
+In-Reply-To: <671cedcb.050a0220.2b8c0f.01b1.GAE@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672053c5.050a0220.11b624.04bb.GAE@google.com>
+Subject: Re: [syzbot] [wireless?] WARNING in __rate_control_send_low (3)
+From: syzbot <syzbot+34463a129786910405dd@syzkaller.appspotmail.com>
+To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
+	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 29, 2024 at 9:40=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Tue, Oct 29, 2024 at 9:27=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Only check if we pass those three key points after we enable the
-> > > > bpf extension for so_timestamping. During each point, we can choose
-> > > > whether to print the current timestamp.
-> > > >
-> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > ---
-> > > >  .../bpf/prog_tests/so_timestamping.c          |  98 ++++++++++++++
-> > > >  .../selftests/bpf/progs/so_timestamping.c     | 123 ++++++++++++++=
-++++
-> > > >  2 files changed, 221 insertions(+)
-> > > >  create mode 100644 tools/testing/selftests/bpf/prog_tests/so_times=
-tamping.c
-> > > >  create mode 100644 tools/testing/selftests/bpf/progs/so_timestampi=
-ng.c
-> > > >
-> > > > diff --git a/tools/testing/selftests/bpf/prog_tests/so_timestamping=
-.c b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
-> > > > new file mode 100644
-> > > > index 000000000000..dfb7588c246d
-> > > > --- /dev/null
-> > > > +++ b/tools/testing/selftests/bpf/prog_tests/so_timestamping.c
-> > > > @@ -0,0 +1,98 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > +/* Copyright (c) 2024 Tencent */
-> > > > +
-> > > > +#define _GNU_SOURCE
-> > > > +#include <sched.h>
-> > > > +#include <linux/socket.h>
-> > > > +#include <linux/tls.h>
-> > > > +#include <net/if.h>
-> > > > +
-> > > > +#include "test_progs.h"
-> > > > +#include "cgroup_helpers.h"
-> > > > +#include "network_helpers.h"
-> > > > +
-> > > > +#include "so_timestamping.skel.h"
-> > > > +
-> > > > +#define CG_NAME "/so-timestamping-test"
-> > > > +
-> > > > +static const char addr4_str[] =3D "127.0.0.1";
-> > > > +static const char addr6_str[] =3D "::1";
-> > > > +static struct so_timestamping *skel;
-> > > > +static int cg_fd;
-> > > > +
-> > > > +static int create_netns(void)
-> > > > +{
-> > > > +     if (!ASSERT_OK(unshare(CLONE_NEWNET), "create netns"))
-> > > > +             return -1;
-> > > > +
-> > > > +     if (!ASSERT_OK(system("ip link set dev lo up"), "set lo up"))
-> > > > +             return -1;
-> > > > +
-> > > > +     return 0;
-> > > > +}
-> > > > +
-> > > > +static void test_tcp(int family)
-> > > > +{
-> > > > +     struct so_timestamping__bss *bss =3D skel->bss;
-> > > > +     char buf[] =3D "testing testing";
-> > > > +     int sfd =3D -1, cfd =3D -1;
-> > > > +     int n;
-> > > > +
-> > > > +     memset(bss, 0, sizeof(*bss));
-> > > > +
-> > > > +     sfd =3D start_server(family, SOCK_STREAM,
-> > > > +                        family =3D=3D AF_INET6 ? addr6_str : addr4=
-_str, 0, 0);
-> > > > +     if (!ASSERT_GE(sfd, 0, "start_server"))
-> > > > +             goto out;
-> > > > +
-> > > > +     cfd =3D connect_to_fd(sfd, 0);
-> > > > +     if (!ASSERT_GE(cfd, 0, "connect_to_fd_server")) {
-> > > > +             close(sfd);
-> > > > +             goto out;
-> > > > +     }
-> > > > +
-> > > > +     n =3D write(cfd, buf, sizeof(buf));
-> > > > +     if (!ASSERT_EQ(n, sizeof(buf), "send to server"))
-> > > > +             goto out;
-> > > > +
-> > > > +     ASSERT_EQ(bss->nr_active, 1, "nr_active");
-> > > > +     ASSERT_EQ(bss->nr_passive, 1, "nr_passive");
-> > > > +     ASSERT_EQ(bss->nr_sched, 1, "nr_sched");
-> > > > +     ASSERT_EQ(bss->nr_txsw, 1, "nr_txsw");
-> > > > +     ASSERT_EQ(bss->nr_ack, 1, "nr_ack");
-> > > > +
-> > > > +out:
-> > > > +     if (sfd >=3D 0)
-> > > > +             close(sfd);
-> > > > +     if (cfd >=3D 0)
-> > > > +             close(cfd);
-> > > > +}
-> > > > +
-> > > > +void test_so_timestamping(void)
-> > > > +{
-> > > > +     cg_fd =3D test__join_cgroup(CG_NAME);
-> > > > +     if (cg_fd < 0)
-> > > > +             return;
-> > > > +
-> > > > +     if (create_netns())
-> > > > +             goto done;
-> > > > +
-> > > > +     skel =3D so_timestamping__open();
-> > > > +     if (!ASSERT_OK_PTR(skel, "open skel"))
-> > > > +             goto done;
-> > > > +
-> > > > +     if (!ASSERT_OK(so_timestamping__load(skel), "load skel"))
-> > > > +             goto done;
-> > > > +
-> > > > +     skel->links.skops_sockopt =3D
-> > > > +             bpf_program__attach_cgroup(skel->progs.skops_sockopt,=
- cg_fd);
-> > > > +     if (!ASSERT_OK_PTR(skel->links.skops_sockopt, "attach cgroup"=
-))
-> > > > +             goto done;
-> > > > +
-> > > > +     test_tcp(AF_INET6);
-> > > > +     test_tcp(AF_INET);
-> > > > +
-> > > > +done:
-> > > > +     so_timestamping__destroy(skel);
-> > > > +     close(cg_fd);
-> > > > +}
-> > > > diff --git a/tools/testing/selftests/bpf/progs/so_timestamping.c b/=
-tools/testing/selftests/bpf/progs/so_timestamping.c
-> > > > new file mode 100644
-> > > > index 000000000000..a15317951786
-> > > > --- /dev/null
-> > > > +++ b/tools/testing/selftests/bpf/progs/so_timestamping.c
-> > > > @@ -0,0 +1,123 @@
-> > > > +// SPDX-License-Identifier: GPL-2.0
-> > > > +/* Copyright (c) 2024 Tencent */
-> > > > +
-> > > > +#include "vmlinux.h"
-> > > > +#include "bpf_tracing_net.h"
-> > > > +#include <bpf/bpf_core_read.h>
-> > > > +#include <bpf/bpf_helpers.h>
-> > > > +#include <bpf/bpf_tracing.h>
-> > > > +#include "bpf_misc.h"
-> > > > +
-> > > > +#define SO_TIMESTAMPING 37
-> > > > +#define SOF_TIMESTAMPING_BPF_SUPPPORTED_MASK (SOF_TIMESTAMPING_SOF=
-TWARE | \
-> > > > +                                           SOF_TIMESTAMPING_TX_SCH=
-ED | \
-> > > > +                                           SOF_TIMESTAMPING_TX_SOF=
-TWARE | \
-> > > > +                                           SOF_TIMESTAMPING_TX_ACK=
- | \
-> > > > +                                           SOF_TIMESTAMPING_OPT_ID=
- | \
-> > > > +                                           SOF_TIMESTAMPING_OPT_ID=
-_TCP)
-> > > > +
-> > > > +extern unsigned long CONFIG_HZ __kconfig;
-> > > > +
-> > > > +int nr_active;
-> > > > +int nr_passive;
-> > > > +int nr_sched;
-> > > > +int nr_txsw;
-> > > > +int nr_ack;
-> > > > +
-> > > > +struct sockopt_test {
-> > > > +     int opt;
-> > > > +     int new;
-> > > > +     int expected;
-> > > > +};
-> > > > +
-> > > > +static const struct sockopt_test sol_socket_tests[] =3D {
-> > > > +     { .opt =3D SO_TIMESTAMPING, .new =3D SOF_TIMESTAMPING_TX_SCHE=
-D, .expected =3D 256, },
-> > > > +     { .opt =3D SO_TIMESTAMPING, .new =3D SOF_TIMESTAMPING_BPF_SUP=
-PPORTED_MASK, .expected =3D 66450, },
-> > > > +     { .opt =3D 0, },
-> > > > +};
-> > > > +
-> > > > +struct loop_ctx {
-> > > > +     void *ctx;
-> > > > +     struct sock *sk;
-> > > > +};
-> > > > +
-> > > > +static int bpf_test_sockopt_int(void *ctx, struct sock *sk,
-> > > > +                             const struct sockopt_test *t,
-> > > > +                             int level)
-> > > > +{
-> > > > +     int tmp, new, expected, opt;
-> > > > +
-> > > > +     opt =3D t->opt;
-> > > > +     new =3D t->new;
-> > > > +     expected =3D t->expected;
-> > > > +
-> > > > +     if (bpf_setsockopt(ctx, level, opt, &new, sizeof(new)))
-> > > > +             return 1;
-> > > > +     if (bpf_getsockopt(ctx, level, opt, &tmp, sizeof(tmp)) ||
-> > > > +         tmp !=3D expected)
-> > > > +             return 1;
-> > > > +
-> > > > +     return 0;
-> > > > +}
-> > > > +
-> > > > +static int bpf_test_socket_sockopt(__u32 i, struct loop_ctx *lc)
-> > > > +{
-> > > > +     const struct sockopt_test *t;
-> > > > +
-> > > > +     if (i >=3D ARRAY_SIZE(sol_socket_tests))
-> > > > +             return 1;
-> > > > +
-> > > > +     t =3D &sol_socket_tests[i];
-> > > > +     if (!t->opt)
-> > > > +             return 1;
-> > > > +
-> > > > +     return bpf_test_sockopt_int(lc->ctx, lc->sk, t, SOL_SOCKET);
-> > > > +}
-> > > > +
-> > > > +static int bpf_test_sockopt(void *ctx, struct sock *sk)
-> > > > +{
-> > > > +     struct loop_ctx lc =3D { .ctx =3D ctx, .sk =3D sk, };
-> > > > +     int n;
-> > > > +
-> > > > +     n =3D bpf_loop(ARRAY_SIZE(sol_socket_tests), bpf_test_socket_=
-sockopt, &lc, 0);
-> > > > +     if (n !=3D ARRAY_SIZE(sol_socket_tests))
-> > > > +             return -1;
-> > > > +
-> > > > +     return 0;
-> > > > +}
-> > > > +
-> > > > +SEC("sockops")
-> > > > +int skops_sockopt(struct bpf_sock_ops *skops)
-> > > > +{
-> > > > +     struct bpf_sock *bpf_sk =3D skops->sk;
-> > > > +     struct sock *sk;
-> > > > +
-> > > > +     if (!bpf_sk)
-> > > > +             return 1;
-> > > > +
-> > > > +     sk =3D (struct sock *)bpf_skc_to_tcp_sock(bpf_sk);
-> > > > +     if (!sk)
-> > > > +             return 1;
-> > > > +
-> > > > +     switch (skops->op) {
-> > > > +     case BPF_SOCK_OPS_ACTIVE_ESTABLISHED_CB:
-> > > > +             nr_active +=3D !bpf_test_sockopt(skops, sk);
-> > > > +             break;
-> > > > +     case BPF_SOCK_OPS_PASSIVE_ESTABLISHED_CB:
-> > > > +             nr_passive +=3D !bpf_test_sockopt(skops, sk);
-> > > > +             break;
-> > > > +     case BPF_SOCK_OPS_TS_SCHED_OPT_CB:
-> > > > +             nr_sched +=3D 1;
-> > > > +             break;
-> > > > +     case BPF_SOCK_OPS_TS_SW_OPT_CB:
-> > > > +             nr_txsw +=3D 1;
-> > > > +             break;
-> > > > +     case BPF_SOCK_OPS_TS_ACK_OPT_CB:
-> > > > +             nr_ack +=3D 1;
-> > > > +             break;
-> > >
-> > > Perhaps demonstrate what to do with the args on the new
-> > > TS_*_OPT_CB.
-> >
-> > Roger that.
-> >
-> > I would like to know if the current patch is too big to review? Should
-> > I split it into a few patches? But this series has 14 patches right
-> > now which could possibly exceed the maximum limit.
->
-> For a test patch, this looks fine to me. They often are a longer than
-> feature patches. But much of it is easy to grasp.
+syzbot has found a reproducer for the following issue on:
 
-Got it, I will do it as you said.
+HEAD commit:    b5abbf612092 Merge branch 'mptcp-sched-fix-some-lock-issues'
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13f0ee40580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=309bb816d40abc28
+dashboard link: https://syzkaller.appspot.com/bug?extid=34463a129786910405dd
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17a76ebb980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17f0ee40580000
 
-Thanks,
-Jason
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8d59668d3a54/disk-b5abbf61.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5c6420513b58/vmlinux-b5abbf61.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/1ba41cff1dda/bzImage-b5abbf61.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+34463a129786910405dd@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+no supported rates for sta (null) (0xffffffff, band 0) in rate_mask 0xfff with flags 0x40
+WARNING: CPU: 0 PID: 0 at net/mac80211/rate.c:385 __rate_control_send_low+0x659/0x890 net/mac80211/rate.c:380
+Modules linked in:
+CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-syzkaller-00172-gb5abbf612092 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:__rate_control_send_low+0x659/0x890 net/mac80211/rate.c:380
+Code: 8b 14 24 0f 85 de 01 00 00 8b 0a 48 c7 c7 00 71 2a 8d 48 8b 74 24 10 44 89 f2 44 8b 44 24 1c 44 8b 4c 24 0c e8 08 a8 1e f6 90 <0f> 0b 90 90 e9 71 fe ff ff 89 d9 80 e1 07 80 c1 03 38 c1 0f 8c db
+RSP: 0018:ffffc90000007520 EFLAGS: 00010246
+RAX: 81ccced86469a000 RBX: 000000000000000c RCX: ffffffff8e694640
+RDX: 0000000000000100 RSI: 0000000000000000 RDI: 0000000000000000
+RBP: ffff88802eeb5a28 R08: ffffffff8155d402 R09: fffffbfff1cf9fe0
+R10: dffffc0000000000 R11: fffffbfff1cf9fe0 R12: 0000000000000800
+R13: 000000000000000c R14: 00000000ffffffff R15: dffffc0000000000
+FS:  0000000000000000(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f5c64b9bde3 CR3: 0000000034822000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <IRQ>
+ rate_control_send_low+0x1a8/0x770 net/mac80211/rate.c:405
+ rate_control_get_rate+0x20e/0x5e0 net/mac80211/rate.c:921
+ ieee80211_beacon_get_finish+0x49e/0x870 net/mac80211/tx.c:5253
+ ieee80211_beacon_get_ap+0x14e8/0x1990 net/mac80211/tx.c:5356
+ __ieee80211_beacon_get+0x109e/0x15c0 net/mac80211/tx.c:5452
+ ieee80211_beacon_get_tim+0xb4/0x320 net/mac80211/tx.c:5594
+ ieee80211_beacon_get include/net/mac80211.h:5607 [inline]
+ mac80211_hwsim_beacon_tx+0x39d/0x850 drivers/net/wireless/virtual/mac80211_hwsim.c:2311
+ __iterate_interfaces+0x222/0x510 net/mac80211/util.c:774
+ ieee80211_iterate_active_interfaces_atomic+0xd8/0x170 net/mac80211/util.c:810
+ mac80211_hwsim_beacon+0xd4/0x1f0 drivers/net/wireless/virtual/mac80211_hwsim.c:2345
+ __run_hrtimer kernel/time/hrtimer.c:1691 [inline]
+ __hrtimer_run_queues+0x59b/0xd50 kernel/time/hrtimer.c:1755
+ hrtimer_run_softirq+0x19a/0x2c0 kernel/time/hrtimer.c:1772
+ handle_softirqs+0x2c5/0x980 kernel/softirq.c:554
+ __do_softirq kernel/softirq.c:588 [inline]
+ invoke_softirq kernel/softirq.c:428 [inline]
+ __irq_exit_rcu+0xf4/0x1c0 kernel/softirq.c:637
+ irq_exit_rcu+0x9/0x30 kernel/softirq.c:649
+ instr_sysvec_apic_timer_interrupt arch/x86/kernel/apic/apic.c:1049 [inline]
+ sysvec_apic_timer_interrupt+0xa6/0xc0 arch/x86/kernel/apic/apic.c:1049
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:702
+RIP: 0010:native_irq_disable arch/x86/include/asm/irqflags.h:37 [inline]
+RIP: 0010:arch_local_irq_disable arch/x86/include/asm/irqflags.h:92 [inline]
+RIP: 0010:acpi_safe_halt+0x21/0x30 drivers/acpi/processor_idle.c:112
+Code: 90 90 90 90 90 90 90 90 90 65 48 8b 04 25 c0 d7 03 00 48 f7 00 08 00 00 00 75 10 66 90 0f 00 2d 35 b2 a3 00 f3 0f 1e fa fb f4 <fa> c3 cc cc cc cc 66 0f 1f 84 00 00 00 00 00 90 90 90 90 90 90 90
+RSP: 0018:ffffffff8e607ca8 EFLAGS: 00000246
+RAX: ffffffff8e694640 RBX: ffff888020ee0864 RCX: 0000000000013f11
+RDX: 0000000000000001 RSI: ffff888020ee0800 RDI: ffff888020ee0864
+RBP: 000000000003a9b8 R08: ffff8880b8637e9b R09: 1ffff110170c6fd3
+R10: dffffc0000000000 R11: ffffffff8bc719c0 R12: ffff88801ef8c000
+R13: 0000000000000001 R14: 0000000000000001 R15: ffffffff8f12e1c0
+ acpi_idle_enter+0xe4/0x140 drivers/acpi/processor_idle.c:702
+ cpuidle_enter_state+0x109/0x470 drivers/cpuidle/cpuidle.c:264
+ cpuidle_enter+0x5d/0xa0 drivers/cpuidle/cpuidle.c:385
+ call_cpuidle kernel/sched/idle.c:155 [inline]
+ cpuidle_idle_call kernel/sched/idle.c:230 [inline]
+ do_idle+0x375/0x5d0 kernel/sched/idle.c:326
+ cpu_startup_entry+0x42/0x60 kernel/sched/idle.c:424
+ rest_init+0x2dc/0x300 init/main.c:747
+ start_kernel+0x47f/0x500 init/main.c:1105
+ x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
+ x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
+ common_startup_64+0x13e/0x147
+ </TASK>
+----------------
+Code disassembly (best guess):
+   0:	90                   	nop
+   1:	90                   	nop
+   2:	90                   	nop
+   3:	90                   	nop
+   4:	90                   	nop
+   5:	90                   	nop
+   6:	90                   	nop
+   7:	90                   	nop
+   8:	90                   	nop
+   9:	65 48 8b 04 25 c0 d7 	mov    %gs:0x3d7c0,%rax
+  10:	03 00
+  12:	48 f7 00 08 00 00 00 	testq  $0x8,(%rax)
+  19:	75 10                	jne    0x2b
+  1b:	66 90                	xchg   %ax,%ax
+  1d:	0f 00 2d 35 b2 a3 00 	verw   0xa3b235(%rip)        # 0xa3b259
+  24:	f3 0f 1e fa          	endbr64
+  28:	fb                   	sti
+  29:	f4                   	hlt
+* 2a:	fa                   	cli <-- trapping instruction
+  2b:	c3                   	ret
+  2c:	cc                   	int3
+  2d:	cc                   	int3
+  2e:	cc                   	int3
+  2f:	cc                   	int3
+  30:	66 0f 1f 84 00 00 00 	nopw   0x0(%rax,%rax,1)
+  37:	00 00
+  39:	90                   	nop
+  3a:	90                   	nop
+  3b:	90                   	nop
+  3c:	90                   	nop
+  3d:	90                   	nop
+  3e:	90                   	nop
+  3f:	90                   	nop
+
+
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
