@@ -1,74 +1,97 @@
-Return-Path: <netdev+bounces-140147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB2859B5609
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:49:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 41DD49B560B
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:50:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 63B651F23659
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:49:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2BC5B20BEA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 658012038C1;
-	Tue, 29 Oct 2024 22:49:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CE420969B;
+	Tue, 29 Oct 2024 22:50:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LUgh9rXI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CftWwSUt"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D65218FDC5;
-	Tue, 29 Oct 2024 22:49:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1981518FDC5;
+	Tue, 29 Oct 2024 22:50:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730242185; cv=none; b=Mm5iWoW/A6dExO3cELAyyZ7DHzIXD+5gB5vzwbuuPBFGGO7AF2Cy5q4Il82ViDRx0i2qO5JFGFz5Lf6yA/6VNVbut1hVL2m2z3ijx6JAyIRkmEuSeewmwXaL1Ci2WOu1Um3DZey8oU+W/hpW1qcpv4QDT1xth2pOyK1Uf2JLVo0=
+	t=1730242224; cv=none; b=sHYREOVL6+q62wdbkRxwfraBv4XBr+oVP0s110fOUSVdU3IPeLsBD5Jv0VYiHYNc4BqnnOYj5BgMj0LJjq7djZN9fb3JHbG1QM5i1Tt6xw4KmDamdfp1ZVixFr3VaCoRkoy+U5PHLVWgJOrwoOD9G9NsMtho485TBsQM1qJfWho=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730242185; c=relaxed/simple;
-	bh=eH3h7yYOUEPtNn00/HkZI+Oxk26Jms4MbXgkp7ud8hg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=V/0VXmsT0bwPCtmd5NFKtgxhriUatS+DdYoy4FWWrfRn0vg4TagEFRNiLLQjuMTsvKR+xBPKQbQyUveVun9TULdF+aVy9Lt43lNG/dgnPjI+v3mZ+tSdt5Jq9FVn0cCKoa4TugvfUQkpjVN8tJ+ys/lI/4V8MI7Gm0CSxJKHSpY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LUgh9rXI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4D1DDC4CEE3;
-	Tue, 29 Oct 2024 22:49:44 +0000 (UTC)
+	s=arc-20240116; t=1730242224; c=relaxed/simple;
+	bh=krniV51Ko7jZpV+ajgbFgC9UweWVT9ARQMWOdJf6Euk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=m8vRIsszPp6jdAwmCd6wsLWAYocezgbUFmR8gc/IJYMdoHUaA9nWqC3C95sPT8O26glJA50njWAC7gLNlpb8Mm3JzG1hGj76kzyFCPE4WPi+v3ZoCA8ccR+hruSl0/7ZUYQTOf8RMQ3ACFnUVAljTMemUQSLmDA8IfboivP4c/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CftWwSUt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F2FC4CECD;
+	Tue, 29 Oct 2024 22:50:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730242184;
-	bh=eH3h7yYOUEPtNn00/HkZI+Oxk26Jms4MbXgkp7ud8hg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LUgh9rXI6tkXQY8RxmFUi5Nrzqv4NRvHAzMzh37EASpnU0FheRV5LbxnmQa2W4dro
-	 hTjYysymEMZgt1lOolxxXHfkOKlj85lm2lISBkJ8qPOQUXmGwAX3BGrfpnlGgapcbm
-	 uqM6tOCs5m1j2rJ7FAGzvR+g1WVpU/MccctH42BFgE/dk+ftC2A801UqprqoSgn6Jr
-	 APtDRpcHCbt4wAyK8GsLwJR995xkdBEzO3IMm2pjztwfqu8u08yKzVoC9iiNwsdGuQ
-	 AVmuR6Sw6oVGqyDsJx/0wtki/IP3X98+SnRk7KH4hIWylE504Koksi/Hf1yv4/T2my
-	 NTQBCYWg2razw==
-Date: Tue, 29 Oct 2024 15:49:43 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, Andrew
- Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCHv2 net-next] net: bnxt: use ethtool string helpers
-Message-ID: <20241029154943.381c105d@kernel.org>
-In-Reply-To: <20241022193737.123079-1-rosenp@gmail.com>
-References: <20241022193737.123079-1-rosenp@gmail.com>
+	s=k20201202; t=1730242223;
+	bh=krniV51Ko7jZpV+ajgbFgC9UweWVT9ARQMWOdJf6Euk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=CftWwSUtLUKiR7SQfyF99kPtt5bB1JWo2DAJypOk95j6dwNVkrGDpfzsqHGlOwpDi
+	 8apb8hNu9ZltEg+cy8dupQifgUgbZz98eaaO0xVJF/qEht6Xh9zpeXgzpbTX76Jlfr
+	 IKwuN+pGLiMc6MMFrjXJsty6KABqMlVY2nmY0kyf8kh9ZthsxDacq2Al/AJ15/+xG7
+	 QzZIXPZZLhp9lwvo2zY6L5221sDmdASTSDpa+Hddsc9p/S0qN8IxeETAFEJz5n+vfI
+	 6F207nFXwpyC2o3Pu1zXnBw0DgblsBPk/465gCgUOG377LMYsEiJytF0l518kIPjR2
+	 lHf6LNRMbtlMQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713B9380AC00;
+	Tue, 29 Oct 2024 22:50:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [net-next v3] net: ftgmac100: refactor getting phy device handle
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173024223125.844299.5349038134200267566.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Oct 2024 22:50:31 +0000
+References: <20241022084214.1261174-1-jacky_chou@aspeedtech.com>
+In-Reply-To: <20241022084214.1261174-1-jacky_chou@aspeedtech.com>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, u.kleine-koenig@baylibre.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Tue, 22 Oct 2024 12:37:37 -0700 Rosen Penev wrote:
->  	struct bnxt *bp = netdev_priv(dev);
-> -	static const char * const *str;
-> +	const char *str;
->  	u32 i, j, num_str;
+Hello:
 
-please respect reverse xmas tree variable declaration ordering
-Since the line declaring str is now shortest it should go to the end.
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 22 Oct 2024 16:42:14 +0800 you wrote:
+> Consolidate the handling of dedicated PHY and fixed-link phy by taking
+> advantage of logic in of_phy_get_and_connect() which handles both of
+> these cases, rather than open coding the same logic in ftgmac100_probe().
+> 
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+> ---
+> v2:
+>   - enable mac asym pause support for fixed-link PHY
+>   - remove fixes information
+> v3:
+>   - Adjust the commit message
+> 
+> [...]
+
+Here is the summary with links:
+  - [net-next,v3] net: ftgmac100: refactor getting phy device handle
+    https://git.kernel.org/netdev/net-next/c/4dbc8d6d05b7
+
+You are awesome, thank you!
 -- 
-pw-bot: cr
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
