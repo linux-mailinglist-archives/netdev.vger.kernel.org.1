@@ -1,99 +1,151 @@
-Return-Path: <netdev+bounces-139803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 32C559B4396
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:56:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D9AAA9B43FC
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:16:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DBC881F235B2
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 07:55:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 71640281BB8
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:16:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F35DE202F65;
-	Tue, 29 Oct 2024 07:55:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="MpuUnnZQ";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="hQw02PqO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BA102038CB;
+	Tue, 29 Oct 2024 08:15:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169791DE3C5;
-	Tue, 29 Oct 2024 07:55:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26BFE201254
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:15:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730188554; cv=none; b=KYy78oBEiVFrNtblqBw4tCUasyE0CUwyA7y4FVj3K2FWUWI++jXG71UEBcWO8EgW22MwrHi3dSrxlkpNlwDeVPx1n/cPjZZFfcVOpysdGau7Sis4S9+X2x8kAd6xb2WbzKWzr/hjci/lQ1Mk827EG2cX1vq/Xf2+Yno3tLuzsFY=
+	t=1730189745; cv=none; b=lot8NW9GXmH8wPHdjmAC+246mmwlTOUTcQbvrid+2rBjU0ph+opQx/KbMqaMqx1Y4o94IO5xV3hxfPEGIjR0Fm4dhYKHQbfvFDs50CVK5E/CMyFI/sBU/VGFzTfACTNxqn6lipVn7meuvmGE+pGZbf6X6aDMlbcJC5yWqXyYfgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730188554; c=relaxed/simple;
-	bh=cW9s2dHTlaDkI8QhhBu//NGLNVZBurjcsG25s9INS3U=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=tnrjDBI38eWbZwxrlI5zrvMMuuCqlQRucVzDKj6gta2aCjmhI3dKZHNzIWe7NhkeNtTx4sl0TMx2DQis6vDrIrsDRpNDf34S2RQDmPamozT3XoAvUrFyU7tRl82TeVnleczT1o2+Bz733qEVd9eKfmerc1vtwKXN2mrD70tpW74=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=MpuUnnZQ; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=hQw02PqO; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-From: Thomas Gleixner <tglx@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1730188551;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KyvdhUfZSHeeKnvfzCZQJk5wLqHskMwbV1UXrfOwkQE=;
-	b=MpuUnnZQRXxH+ZSgeoFBJg0UjCSANjGPCjS+GYPojwmrQic+6zOTwCN1EYWiJPNalIB16m
-	sQFe+NEjyvRuzGNHwf+WlHsje3Y3dbTpCPLiNYiPylbfz242rEAe0dxkssD/SLdxkVlIxS
-	5NChoNkpP9z/LtNQWfzpQclXnOhDiVBojlRlafvEjyde+Xw4HYt/QsfTMFOqemkaZPsYFJ
-	lfKr5Ohj0GBbZineAhf8gGZE1qOLKI8cAJcj6qeaEdYXvfmmCyR7VyOjRS6Gtyr8x9788I
-	5I664Z0T9ILrf/7bL3WxFZw0kjE4fSI6QWth7zm5gD2WWq2yCBwdaVibdM+DRQ==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1730188551;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KyvdhUfZSHeeKnvfzCZQJk5wLqHskMwbV1UXrfOwkQE=;
-	b=hQw02PqOxo1iGJETpQaXoxQFx2pg24ffujGHL3kOxGrPfqs2GFr3EYGlo4iVWKDmH0kKOf
-	uIPzC1ikjhHlMlCw==
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>, boqun.feng@gmail.com
-Cc: fujita.tomonori@gmail.com, anna-maria@linutronix.de,
- frederic@kernel.org, jstultz@google.com, sboyd@kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- rust-for-linux@vger.kernel.org, andrew@lunn.ch, hkallweit1@gmail.com,
- tmgross@umich.edu, ojeda@kernel.org, alex.gaynor@gmail.com,
- gary@garyguo.net, bjorn3_gh@protonmail.com, benno.lossin@proton.me,
- a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
-Subject: Re: [PATCH v4 4/7] rust: time: Add wrapper for fsleep function
-In-Reply-To: <20241029.083029.72679397436968362.fujita.tomonori@gmail.com>
-References: <ZxwVuceNORRAI7FV@Boquns-Mac-mini.local>
- <20241028.095030.2023085589483262207.fujita.tomonori@gmail.com>
- <Zx8VUety0BTpDGAL@Boquns-Mac-mini.local>
- <20241029.083029.72679397436968362.fujita.tomonori@gmail.com>
-Date: Tue, 29 Oct 2024 08:55:50 +0100
-Message-ID: <87cyjj2vi1.ffs@tglx>
+	s=arc-20240116; t=1730189745; c=relaxed/simple;
+	bh=YggC+Qxo+NVcOErzTUXjBABSyADwrdnokU2LGl0F+fs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=hgc/kcYmHsWV4VYnsrtJRWbKLSV7xBTJda7E80crHmsZ+PR0AEzGQe5sNb6hUx9Sr5s7/Rfni184Hd2vk1ADkdQR0S8OZInCLjzy7+lg2BgROFlj2GrCWdL9vwVr5ilRIC1Cr7apEPEIG0VmR/71LwfCU4Rz3lXHVQVNxbd/CiM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t5hNJ-0006Vu-Og; Tue, 29 Oct 2024 09:14:49 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t5hNG-000zSr-0D;
+	Tue, 29 Oct 2024 09:14:46 +0100
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 885EA361330;
+	Tue, 29 Oct 2024 08:14:45 +0000 (UTC)
+Date: Tue, 29 Oct 2024 09:14:45 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
+Message-ID: <20241029-fresh-dinosaur-of-penetration-d695ff-mkl@pengutronix.de>
+References: <20241024-adventurous-imaginary-hornet-4d5c46-mkl@pengutronix.de>
+ <CAOoeyxUhnyYG3p+DQJG-tvU5vc5WYQZLLqCXW=uPcXTjq2gVfw@mail.gmail.com>
+ <20241025-truthful-honest-newt-c371c8-mkl@pengutronix.de>
+ <CAOoeyxUEf5vjqL67WjR-DbrhE0==2hqHLEyZ5XEBhEfMfQ5pag@mail.gmail.com>
+ <20241025-spirited-nocturnal-antelope-ce93dd-mkl@pengutronix.de>
+ <CAOoeyxW5QwPMGAYCWhQDtZwJJLG5xj9HXpL3-cduRSgF+4VHhg@mail.gmail.com>
+ <20241028-uptight-modest-puffin-0556e7-mkl@pengutronix.de>
+ <CAOoeyxU1r3ayhNWrbE_muDhA0imfZYX3-UHxSen9TqsTrSsxyA@mail.gmail.com>
+ <20241028-observant-gentle-doberman-0a2baa-mkl@pengutronix.de>
+ <CAOoeyxWh1-=NVQdmNp5HBzf1YPo9tQdh=OzUUVFmvC-F7sCHWg@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="l2xctpm5dxyfmd5l"
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxWh1-=NVQdmNp5HBzf1YPo9tQdh=OzUUVFmvC-F7sCHWg@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Tue, Oct 29 2024 at 08:30, FUJITA Tomonori wrote:
-> On Sun, 27 Oct 2024 21:38:41 -0700
-> Boqun Feng <boqun.feng@gmail.com> wrote:
->> That also works for me, but an immediate question is: do we put
->> #[must_use] on `fsleep()` to enforce the use of the return value? If
->> yes, then the normal users would need to explicitly ignore the return
->> value:
->> 
->> 	let _ = fsleep(1sec);
->> 
->> The "let _ =" would be a bit annoying for every user that just uses a
->> constant duration.
->
-> Yeah, but I don't think that we have enough of an excuse here to break
-> the rule "Do not crash the kernel".
->
-> Another possible option is to convert an invalid argument to a safe
-> value (e.g., the maximum), possibly with WARN_ON_ONCE().
 
-That makes sense.
+--l2xctpm5dxyfmd5l
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 1/9] mfd: Add core driver for Nuvoton NCT6694
+MIME-Version: 1.0
+
+On 29.10.2024 11:45:30, Ming Yu wrote:
+> > > > You have a high coupling between the MFD driver and the individual
+> > > > drivers anyways, so why not directly use the dynamically allocated
+> > > > buffer provided by the caller and get rid of the memcpy()?
+> > >
+> > > Okay! I will provide a function to request and free buffer for child =
+devices,
+> > > and update the caller's variables to use these two functions in the n=
+ext patch.
+> >
+> > I don't see a need to provide dedicated function to allocate and free
+> > the buffers. The caller can allocate them as part of their private data,
+> > or allocate them during probe().
+>=20
+> Okay, so each child device may allocate a buffer like this during probe():
+> priv->xmit_buf =3D devm_kcalloc(dev, MAX_PACKET_SZ, sizeof(unsigned char),
+> GFP_KERNEL), right?
+
+basically yes, probably devm_kzalloc() or embed it into the priv struct
+directly with ____cacheline_aligned:
+
+| https://elixir.bootlin.com/linux/v6.11.5/source/drivers/net/can/spi/mcp25=
+1xfd/mcp251xfd.h#L498
+
+The size of the driver's RX and TX buffers depend on what they want to
+send and expect to receive. The next step would be to create structs the
+describe the RX and TX buffers for each driver. If you have a common
+header between each driver, create that first.
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--l2xctpm5dxyfmd5l
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcgmXIACgkQKDiiPnot
+vG+LsQf+O4zJwfuGycNIY6uZPaHVz1IAgaeC/v2Jtznp51yqr0WvDVOcdhOLHKtG
+8Rbd+lDgWhPK2WCiBnwj6fhpBzTIZSZHbVlIqX2668gYpCvRr4YTSydt1HYDNoHA
+/G2k1g8rCdtTWiynu5+P2CUdaolzZEdq+lOnCLoOkbWD1cDT/lMdHPYoyBLbLNZ8
+b7IbbBc1D6jVlBd9Om1Zn7Ev9cQQ9UGp9QY1fUWdv+KwJz76NCIMgGK93Hf5kDFy
+/5AIztMNibr+sFbwkZ7ypmag3icRiF750TOECdq0LEUPXM2eVXkQ+pIGkIcgXTQL
+p1zN+c2H8FwJZIvGgdCLxDQc2B+uLw==
+=2AiX
+-----END PGP SIGNATURE-----
+
+--l2xctpm5dxyfmd5l--
 
