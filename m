@@ -1,191 +1,206 @@
-Return-Path: <netdev+bounces-140126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78CF39B54CD
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:15:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADB159B54D8
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:17:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EAFA61F2396C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:15:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D4A52864EC
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:17:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3A8320821D;
-	Tue, 29 Oct 2024 21:15:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD55C209693;
+	Tue, 29 Oct 2024 21:17:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="f+8cK0yC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="P30V+QNU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEACC183CD1;
-	Tue, 29 Oct 2024 21:15:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B061E207A25;
+	Tue, 29 Oct 2024 21:17:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730236533; cv=none; b=YQiI48TekZv3NXETC6boManY+z1XkwOWKQZHULfw+SV6WslXaYc+vo8Djzmst7w0VvptLgFK4LQwUDjDgAO9I0Pw1rTA2l1Q9hhspwfLXcwMcSAmrJu2E2fqy9ysHTX2E5lFeRmJ3QYBdeKPMpq5EMLzd2mDvY1y9Eh5tDDHZh4=
+	t=1730236666; cv=none; b=lPRlSS27KAxw83aZbAkSHzuom+oEtJ/+WMLIsTU+vpC+jOuo5AAcUcZIdlCO62ezoiHmfRn8LtwAJOmkh1FK57BDjneuKV4dG9IPx52AK3LT8eXtKnUyYoe/o8K4u2grmmpP4dVdPv4g//0lCVQZq7qfXe0bPKD7Tc3zBl8nkRU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730236533; c=relaxed/simple;
-	bh=g1jEdbLV6aZ5vrSeCtCKjDXncliCBAz1Tl/5g483z48=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bTw+/K5MomQ74q3a1hAFlMw2tnTP0EWypHCdVEjJJGEGQi0l3BUAIUwxJJpuqnpUbBXY+Iqb6rnjGeaITdoZDrxsN6vaEaLSupTTNDuZ2CX7qoHPdawH12dsOB3twfXi+Gt6Rd90ZlJ4ex7zgbGNy3ZlW6rPhUFOcvP0qeWGvRY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=f+8cK0yC; arc=none smtp.client-ip=212.227.15.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
-	s=s31663417; t=1730236516; x=1730841316; i=wahrenst@gmx.net;
-	bh=RG1i4lQ78d9OJfsfAWh3U/u88YT5CuUOUixW0R8cyLM=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=f+8cK0yCVZKsJX1GXHavfPT1wHTqSbqYIk4txHriKUic6jDUvXT2fhr/EnwwEKu5
-	 KwTSfaYt5tYSyMyJVPXSNGaY1+4Zt+Fsm0T90EAkopF8iAX+He7H7f63FBUAtL2wc
-	 3frMksd17zJxY6QnDVkZfTJXLG/A94GLCl3S8EKiZgjoZ4N7BhL/t2IJ5Z05x9msg
-	 OGBvDCS4gYY+gLgwA+TOExD0wieaSCGpVbrnUyI3mgqoDrXOCCjprUtE/VoXKUU3F
-	 W+ySUeobKh8BwJiU9/7X4uyyUe9/dwlChIXg9dpKRZw3k9zX51OBecmtjTs7nT8Hm
-	 rTJz6CUzQTcOLu27/w==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.105] ([37.4.248.43]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MvK4Z-1twUFB377B-00wRP9; Tue, 29
- Oct 2024 22:15:16 +0100
-Message-ID: <10adcc89-6039-4b68-9206-360b7c3fff52@gmx.net>
-Date: Tue, 29 Oct 2024 22:15:15 +0100
+	s=arc-20240116; t=1730236666; c=relaxed/simple;
+	bh=Uy2rhskes1k9g4A72PgKCwm0Xyttbcyas7EVeUXJtB8=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=dTcd+iBcQeOXRGhySiIPCQ3Ndg2p+4GmtEs2t6BPp4z0hqSFcMQoN9q0S+UiKFbIa+fwh9XBmdqhPXPTFdVbTZ7r7T1/+b9jQpJRXRBgS1H5GIqfLcnLMhtr1TkBvGRVhPOrfXslfpAt+kRv5PPjDYtEauoRVZ9Y+E31XHCf6Yw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=P30V+QNU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0E3EC4CEE4;
+	Tue, 29 Oct 2024 21:17:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730236666;
+	bh=Uy2rhskes1k9g4A72PgKCwm0Xyttbcyas7EVeUXJtB8=;
+	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
+	b=P30V+QNU86ZCAR3UMWTLe4vw1ZT9euWjguXRN/lQRxjnR4+Kk2ccYyZXcYgGroFpt
+	 Og3LgVq9/hBCQozdd3P+G+9GoSXl+U5xeqI2iO7YDPTcp3Z8O21Iv9ve8jEK5ktNsD
+	 CCYJk87siEgjM8EtoNFB/Z3rn2j9jKar8NANSjMbb0PVpSANobo0T3WAlZpPhVeQKC
+	 YZGVgm4dgjgq2ATqvn47V6L7UFjqMI2e6qaAji3059NZT1AcOsFb18VYgxxhuWo63O
+	 1Ia2ZqVuC5kzmAZIq6L3eWlPEOUNoV1Kayz372vlSi+GYO0wZywqxXl60+8JTdADbr
+	 UfE4nPhqxdNNw==
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
+Date: Tue, 29 Oct 2024 23:17:40 +0200 (EET)
+To: Paolo Abeni <pabeni@redhat.com>
+cc: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org, 
+    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+    dsahern@kernel.org, netfilter-devel@vger.kernel.org, kadlec@netfilter.org, 
+    coreteam@netfilter.org, pablo@netfilter.org, bpf@vger.kernel.org, 
+    joel.granados@kernel.org, linux-fsdevel@vger.kernel.org, kees@kernel.org, 
+    mcgrof@kernel.org, ncardwell@google.com, 
+    koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com, 
+    ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
+    cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
+    vidhi_goel@apple.com
+Subject: Re: [PATCH v4 net-next 09/14] gro: prevent ACE field corruption &
+ better AccECN handling
+In-Reply-To: <eb04ddfd-6e17-464b-a629-09aed99e2e95@redhat.com>
+Message-ID: <4b3ede21-27cf-bc17-be71-4c388e670f2c@kernel.org>
+References: <20241021215910.59767-1-chia-yu.chang@nokia-bell-labs.com> <20241021215910.59767-10-chia-yu.chang@nokia-bell-labs.com> <eb04ddfd-6e17-464b-a629-09aed99e2e95@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: vertexcom: mse102x: Fix possible double free of
- TX skb
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- stable@vger.kernel.org, Simon Horman <horms@kernel.org>
-References: <20241022155242.33729-1-wahrenst@gmx.net>
- <20241029121028.127f89b3@kernel.org>
-Content-Language: en-US
-From: Stefan Wahren <wahrenst@gmx.net>
-In-Reply-To: <20241029121028.127f89b3@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:2s+4FthblCjweeWPqCC45CSJDqCnUnZMCKae43F6COH6ujmDsym
- ETdXlHwLPPOX0katbq7gMXVcqsDCnXzBHiWhoHEHIwWJ6rP+6StOgE+GtqRhNx9AW8JiBB6
- McYXzapF/WBv8Gw8B1hjLCz6Q7IFXYVa6ZLqCRYYWcbzMTVoE3dEFqxfUVE9Atjd9Srmu9s
- Tqqlw1sFFEmGFwQm2/S6w==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:1zR6FLu8518=;y+ZgU9K3lvgFmd+wvm6BnsFGbVI
- rGMizsMW0tk2jMSHmXBvDpEjt3P1pVujhV2ORkyt9DnKv7cQKMMuxDGoGO2yMU/xRNlUaDV5k
- alEqCL9DojWxWkmUJlbFX1II1nJnT1xlG4l84EDFENI4mSt1mTMuIEl0eOKXd4ytxuL2NFrcO
- iJd4EsCb8Yjl6Ke7X/rogb6wi6i3iTtbwsJaJAM2U6p2hwaxzmB5VFp5uQyIlMt8xep0QDUkN
- BK1vsXNQ/SPdHv4ShVq64DBTPPg875RX2E7tnF9s7Cknz/MqqWg9PQ0G+gF0MiKQ22HWXN99Z
- lPo3V37fvgfsxCQp5nWHoKJUWLNo2IUrD3sFDAQCMSQalj1O1CFP5XHxLGPduFTMyUgsZ+ruO
- G80WSplaOeLESpTjt7FEnL/0ZZZCWf9wBUv3dIJP32OL4GXpHjjsIAyQRVEG3SGSUAEbUVeah
- 6bYXOp0w3XFX28RsIwXMEwI3VfosM8atXsn2S3bTmeEwvkDlpfQH1l9dM8VeZifWpbpVns3mB
- ZWMtU+VUUvJqryHx7c02tYD2w0p4G4bwIqFLO2wBoOLtfqiW2bN9OcUXghuwOinfEs4AAIdYy
- t5AMucH4MYfawI3xW/3h1uYUtuCaikPWejt9avbNihHa4nEubRAR4x+UNhWD/ae6IMlelJmIx
- sVH6rbZcZ6FXZEPTDB3c6sVH+nf+M/WBldZrIYg6LWqa+jtPsXpRzllpm5OH7eYhYh9LOvxzM
- hACW2iCl92oe30kdEYcpgkEIdOsDS0dknJBuppRqK5t9bcAD1s8BJ+B6gDwYR3jlkYHaM+Jmt
- P2LCcHQtwQyXDO/aCSO29SQQ==
+Content-Type: multipart/mixed; boundary="8323328-2002160427-1730236660=:995"
 
-Hi Jakub,
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-Am 29.10.24 um 20:10 schrieb Jakub Kicinski:
-> On Tue, 22 Oct 2024 17:52:42 +0200 Stefan Wahren wrote:
->> -static int mse102x_tx_frame_spi(struct mse102x_net *mse, struct sk_buf=
-f *txp,
->> +static int mse102x_tx_frame_spi(struct mse102x_net *mse, struct sk_buf=
-f **txp,
->>   				unsigned int pad)
->>   {
->>   	struct mse102x_net_spi *mses =3D to_mse102x_spi(mse);
->> @@ -226,29 +226,29 @@ static int mse102x_tx_frame_spi(struct mse102x_ne=
-t *mse, struct sk_buff *txp,
->>   	int ret;
->>
->>   	netif_dbg(mse, tx_queued, mse->ndev, "%s: skb %p, %d@%p\n",
->> -		  __func__, txp, txp->len, txp->data);
->> +		  __func__, *txp, (*txp)->len, (*txp)->data);
->>
->> -	if ((skb_headroom(txp) < DET_SOF_LEN) ||
->> -	    (skb_tailroom(txp) < DET_DFT_LEN + pad)) {
->> -		tskb =3D skb_copy_expand(txp, DET_SOF_LEN, DET_DFT_LEN + pad,
->> +	if ((skb_headroom(*txp) < DET_SOF_LEN) ||
->> +	    (skb_tailroom(*txp) < DET_DFT_LEN + pad)) {
->> +		tskb =3D skb_copy_expand(*txp, DET_SOF_LEN, DET_DFT_LEN + pad,
->>   				       GFP_KERNEL);
->>   		if (!tskb)
->>   			return -ENOMEM;
->>
->> -		dev_kfree_skb(txp);
->> -		txp =3D tskb;
->> +		dev_kfree_skb(*txp);
->> +		*txp =3D tskb;
->>   	}
->>
->> -	mse102x_push_header(txp);
->> +	mse102x_push_header(*txp);
->>
->>   	if (pad)
->> -		skb_put_zero(txp, pad);
->> +		skb_put_zero(*txp, pad);
->>
->> -	mse102x_put_footer(txp);
->> +	mse102x_put_footer(*txp);
->>
->> -	xfer->tx_buf =3D txp->data;
->> +	xfer->tx_buf =3D (*txp)->data;
->>   	xfer->rx_buf =3D NULL;
->> -	xfer->len =3D txp->len;
->> +	xfer->len =3D (*txp)->len;
->>
->>   	ret =3D spi_sync(mses->spidev, msg);
->>   	if (ret < 0) {
->> @@ -368,7 +368,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *=
-mse)
->>   	mse->ndev->stats.rx_bytes +=3D rxlen;
-> Isn't it easier to change this function to free the copy rather than
-> the original? That way the original will remain valid for the callers.
-You mean something like this?
+--8323328-2002160427-1730236660=:995
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-diff --git a/drivers/net/ethernet/vertexcom/mse102x.c
-b/drivers/net/ethernet/vertexcom/mse102x.c
-index a04d4073def9..2c37957478fb 100644
-=2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
-+++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -222,7 +222,7 @@ static int mse102x_tx_frame_spi(struct mse102x_net
-*mse, struct sk_buff *txp,
- =C2=A0=C2=A0=C2=A0=C2=A0 struct mse102x_net_spi *mses =3D to_mse102x_spi(=
-mse);
- =C2=A0=C2=A0=C2=A0=C2=A0 struct spi_transfer *xfer =3D &mses->spi_xfer;
- =C2=A0=C2=A0=C2=A0=C2=A0 struct spi_message *msg =3D &mses->spi_msg;
--=C2=A0=C2=A0=C2=A0 struct sk_buff *tskb;
-+=C2=A0=C2=A0=C2=A0 struct sk_buff *tskb =3D NULL;
- =C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+On Tue, 29 Oct 2024, Paolo Abeni wrote:
+> On 10/21/24 23:59, chia-yu.chang@nokia-bell-labs.com wrote:
+> > From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> >=20
+> > There are important differences in how the CWR field behaves
+> > in RFC3168 and AccECN. With AccECN, CWR flag is part of the
+> > ACE counter and its changes are important so adjust the flags
+> > changed mask accordingly.
+> >=20
+> > Also, if CWR is there, set the Accurate ECN GSO flag to avoid
+> > corrupting CWR flag somewhere.
+> >=20
+> > Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> > ---
+> >  net/ipv4/tcp_offload.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >=20
+> > diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> > index 0b05f30e9e5f..f59762d88c38 100644
+> > --- a/net/ipv4/tcp_offload.c
+> > +++ b/net/ipv4/tcp_offload.c
+> > @@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *h=
+ead, struct sk_buff *skb,
+> >  =09th2 =3D tcp_hdr(p);
+> >  =09flush =3D (__force int)(flags & TCP_FLAG_CWR);
+> >  =09flush |=3D (__force int)((flags ^ tcp_flag_word(th2)) &
+> > -=09=09  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> > +=09=09  ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
+>=20
+> If I read correctly, if the peer is using RFC3168 and TSO_ECN, GRO will
+> now pump into the stack twice the number of packets it was doing prior
+> to this patch, am I correct?
+>=20
+> That is likely causing measurable performance regressions.
 
- =C2=A0=C2=A0=C2=A0=C2=A0 netif_dbg(mse, tx_queued, mse->ndev, "%s: skb %p=
-, %d@%p\n",
-@@ -235,7 +235,6 @@ static int mse102x_tx_frame_spi(struct mse102x_net
-*mse, struct sk_buff *txp,
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (!tskb)
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return -EN=
-OMEM;
+Hi Paolo,
 
--=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 dev_kfree_skb(txp);
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 txp =3D tskb;
- =C2=A0=C2=A0=C2=A0=C2=A0 }
+Thanks for taking a look!
 
-@@ -257,6 +256,8 @@ static int mse102x_tx_frame_spi(struct mse102x_net
-*mse, struct sk_buff *txp,
- =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 mse->stats.xfer_err++;
- =C2=A0=C2=A0=C2=A0=C2=A0 }
+While it's true on surface that this might cause some more packets with=20
+RFC3168 (by design, as network cannot know if the sender is using RFC3168=
+=20
+or not), the important question is the scale how many of extra packets=20
+will occur in practice.
 
-+=C2=A0=C2=A0=C2=A0 dev_kfree_skb(tskb);
-+
- =C2=A0=C2=A0=C2=A0=C2=A0 return ret;
- =C2=A0}
+First of all, RFC3168 requires CWR flag to be sent no more frequently=20
+than once per window of data, or in other words, once per RTT. And that
+means just one packet, not e.g. all packets of a super-skb (the RFC3168
+signalling will lose its integrity if this is violated by the sender).
+
+Secondly, the TCP sender uses CWR flag to indicate it just halved its=20
+congestion window which mean it is sending half the amount of packets in=20
+this window than in the previous window (analoguous to halving sending=20
+rate). 2 RTTs with CWR each means two window reductions (this behavior=20
+is spec'ed in RFC3168).
+
+So lets say the sender was using 100 packets congestion window, this=20
+change will add one packet to 50 packets on this next RTT. Note those are
+raw numbers of packets on wire and do not tell how many packets GRO=20
+combined into each super-skb which will wary case-by-case basis.=20
+Regardless, I suspect the extra packet added to the half of the packets=20
+will be hard/impossible to measure to cause a performance regression.
+
+This change would double the number of packets only if the congestion=20
+window is 1 or 2 packets and in that case TSO/GSO/GRO benefits will be=20
+pretty small to begin with (or even counterproductive). Also, the=20
+traditional TCP congestion control (RFC3168 included) has many issues=20
+anyway with that small windows because it doesn't deal with fractional=20
+congestion windows well.
+
+> >  =09flush |=3D (__force int)(th->ack_seq ^ th2->ack_seq);
+> >  =09for (i =3D sizeof(*th); i < thlen; i +=3D 4)
+> >  =09=09flush |=3D *(u32 *)((u8 *)th + i) ^
+> > @@ -405,7 +405,7 @@ void tcp_gro_complete(struct sk_buff *skb)
+> >  =09shinfo->gso_segs =3D NAPI_GRO_CB(skb)->count;
+> > =20
+> >  =09if (th->cwr)
+> > -=09=09shinfo->gso_type |=3D SKB_GSO_TCP_ECN;
+> > +=09=09shinfo->gso_type |=3D SKB_GSO_TCP_ACCECN;
+>=20
+> If this packet is forwarded, it will not leverage TSO anymore - with
+> current H/W.
+>=20
+> I think we need a way to enable this feature conditionally, but I fear
+> another sysctl will be ugly and the additional conditionals will not be
+> good for GRO.
+>
+> Smarter suggestions welcome ;)
+
+Well, it is already very selectively _conditional_, SKB_GSO_TCP_ACCECN is=
+=20
+only set for the skb when CWR is set. That is, once per RTT (data window)=
+=20
+when it comes to RFC3168.=20
+
+I don't have any source for this (other than reading many many tcpdumps=20
+in the past) but I believe the percentage of packets with CWR set (due to=
+=20
+RFC3168 signalling) is going to be very small overall.
+
+Do you think that is not good enough?
+
+To answer more generally to your suggestion on making it conditional based=
+=20
+on some other logic, it would mean you accept network middleboxes are=20
+allowed to corrupt AccECN ACE field when forwarding. If RFC3168 TSO/GSO=20
+trickery remains in use (without a middlebox explicitly tracking the=20
+connection had negotiated RFC3168), a forwarder won't be able to reproduce=
+=20
+the exactly same stream of TCP packets headers thus corrupting non-RFC3168=
+=20
+use of CWR flag. It's not something any middlebox should be doing (I hope=
+=20
+we agree on this as a general principle)!
+
+--=20
+ i.
+=20
+> Cheers,
+>=20
+> Paolo
+>=20
+> >  }
+> >  EXPORT_SYMBOL(tcp_gro_complete);
+> > =20
+>=20
+>=20
+--8323328-2002160427-1730236660=:995--
 
