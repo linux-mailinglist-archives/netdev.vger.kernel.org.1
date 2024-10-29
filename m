@@ -1,44 +1,44 @@
-Return-Path: <netdev+bounces-139819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26F969B44BF
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:48:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDBD39B44C1
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:48:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F34001C2224B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:48:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9893C1F24C83
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:48:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F718205AA3;
-	Tue, 29 Oct 2024 08:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B3F8205ABE;
+	Tue, 29 Oct 2024 08:46:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="L7phQ52a"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="TT+42A09"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+Received: from out30-110.freemail.mail.aliyun.com (out30-110.freemail.mail.aliyun.com [115.124.30.110])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 414061DFE3C
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:46:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.112
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8145920494E
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:46:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.110
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730191589; cv=none; b=E5JcYEuO7zjao2/Sfhw+wUmrE8q9jQgC0sYQGJInZ2yJfF4LTK9XfSJmMChqi31Wfs75VSVqkx0fzeR0oEpjAsUybYI4rKa67Cyy0gyNMiju2ng6meK7dTPwerJalW5U7V1dOxk/ro0GVdKluhXfqZBMkLKmjqjnVj7yzAXjC+A=
+	t=1730191589; cv=none; b=EzPRyL6V5Xc1USBXgAECSL9wFa9IzwqO34KOoKDiu4eY5AHexzpZE8OcZ0Ss9PZQIlI87PeP1chJTsyDZOuFxXRO6H4M4NHHID91pqFTrkqA7L0mg3QUVEjpTpFtf3WhpRLu3RNlQrH+dbl0A71rl9e7mHEqpKFCVv0aStcSMMs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730191589; c=relaxed/simple;
-	bh=P2c7LxZXQrJRecWyHq0eLcetewJNr61UfLHD5iBGOFw=;
+	bh=tLayIPhAFs4aevN7QDSWDSVqF4NHjBOAVESNKWt5heQ=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VBJiHZVSECN91wLjTnbV/+tibQ68/b/4jwJlN80wl/TKIXy3rgAv95po1msUQtM5DilffQtxaPSVP+6+ItsU5QQtySluzDhnuYc9UWxfBqXWpuXjw/wYOq6B7gEgCbU/IdbigREDcaX0KJ4kCy6gpqTqnXbn4szuNlS9Y8RIQak=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=L7phQ52a; arc=none smtp.client-ip=115.124.30.112
+	 MIME-Version; b=j12CviyG+Qf+d0HIatK0UFenH9QXTsRzBlNnWGExfycxRqL9X0WV8mHtD76KOV02SLIVCuvrWQ+30Jha5+EOxREE/5bJQp+zgqILYXqcvMUgX2ORxKztPx3zDuO8uaK+vhp5D8v6Sxk4aaYFSl1LHmmU3AzIA8B6oVGJAct8qkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=TT+42A09; arc=none smtp.client-ip=115.124.30.110
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
 DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
 	d=linux.alibaba.com; s=default;
-	t=1730191578; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=VCqPISeZfYcaXdcvh6yVHHXg+YVB/qLvdu3aEXx9Qao=;
-	b=L7phQ52aciHgbAlfIToiJf5x1vaZafIoxNaLsbs27J7wMS1ViNLXVt5VP3TWf8cJwZ4yyh/+RQipDzC2UhbnlkgwossfRfCEsm+702wcH8+NnyeTSY4whs6j6Sy85BnAtTkQOZHzE/4+sVw8jwjAL95GvtBru7lWhoSUST/vpMA=
-Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WI9drjB_1730191576 cluster:ay36)
+	t=1730191579; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=C6wOnS9hID7035sURlfUXbTKbV7jOWOgQEJEnU/CjSM=;
+	b=TT+42A09J7FElfpjXoYJNZq54DfZubYyWQ1wMVk4r+qYtdYi07xLpqQIjcXjvZwWopwaB/FohsX/FMtkJIJ0tK82p2LKIO2Q5JP2BDpZ7fEDpAbO0ISI98TU/zgyf19UEgsCYYwn6Qjg1wyc4Rkpf1haZvGck178tZys3Vecnrk=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WI9W1FN_1730191577 cluster:ay36)
           by smtp.aliyun-inc.com;
-          Tue, 29 Oct 2024 16:46:17 +0800
+          Tue, 29 Oct 2024 16:46:18 +0800
 From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 To: netdev@vger.kernel.org
 Cc: "Michael S. Tsirkin" <mst@redhat.com>,
@@ -51,11 +51,10 @@ Cc: "Michael S. Tsirkin" <mst@redhat.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	virtualization@lists.linux.dev,
-	"Si-Wei Liu" <si-wei.liu@oracle.com>,
 	Darren Kenny <darren.kenny@oracle.com>
-Subject: [PATCH net-next v1 1/4] virtio-net: fix overflow inside virtnet_rq_alloc
-Date: Tue, 29 Oct 2024 16:46:12 +0800
-Message-Id: <20241029084615.91049-2-xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net-next v1 2/4] virtio_net: big mode skip the unmap check
+Date: Tue, 29 Oct 2024 16:46:13 +0800
+Message-Id: <20241029084615.91049-3-xuanzhuo@linux.alibaba.com>
 X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 In-Reply-To: <20241029084615.91049-1-xuanzhuo@linux.alibaba.com>
 References: <20241029084615.91049-1-xuanzhuo@linux.alibaba.com>
@@ -68,71 +67,41 @@ MIME-Version: 1.0
 X-Git-Hash: df8220a5376e
 Content-Transfer-Encoding: 8bit
 
-When the frag just got a page, then may lead to regression on VM.
-Specially if the sysctl net.core.high_order_alloc_disable value is 1,
-then the frag always get a page when do refill.
+The virtio-net big mode did not enable premapped mode,
+so we did not need to check the unmap. And the subsequent
+commit will remove the failover code for failing enable
+premapped for merge and small mode. So we need to remove
+the checking do_dma code in the big mode path.
 
-Which could see reliable crashes or scp failure (scp a file 100M in size
-to VM).
-
-The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
-of a new frag. When the frag size is larger than PAGE_SIZE,
-everything is fine. However, if the frag is only one page and the
-total size of the buffer and virtnet_rq_dma is larger than one page, an
-overflow may occur.
-
-The commit f9dac92ba908 ("virtio_ring: enable premapped mode whatever
-use_dma_api") introduced this problem. And we reverted some commits to
-fix this in last linux version. Now we try to enable it and fix this
-bug directly.
-
-Here, when the frag size is not enough, we reduce the buffer len to fix
-this problem.
-
-Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
 Tested-by: Darren Kenny <darren.kenny@oracle.com>
 Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Acked-by: Jason Wang <jasowang@redhat.com>
 ---
- drivers/net/virtio_net.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
+ drivers/net/virtio_net.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
 diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 792e9eadbfc3..d50c1940eb23 100644
+index d50c1940eb23..7557808e8c1f 100644
 --- a/drivers/net/virtio_net.c
 +++ b/drivers/net/virtio_net.c
-@@ -926,9 +926,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
- 	void *buf, *head;
- 	dma_addr_t addr;
+@@ -987,7 +987,7 @@ static void virtnet_rq_unmap_free_buf(struct virtqueue *vq, void *buf)
+ 		return;
+ 	}
  
--	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
--		return NULL;
--
- 	head = page_address(alloc_frag->page);
+-	if (rq->do_dma)
++	if (!vi->big_packets || vi->mergeable_rx_bufs)
+ 		virtnet_rq_unmap(rq, buf, 0);
  
- 	if (rq->do_dma) {
-@@ -2423,6 +2420,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
- 	len = SKB_DATA_ALIGN(len) +
- 	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
- 
-+	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
-+		return -ENOMEM;
-+
- 	buf = virtnet_rq_alloc(rq, len, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
-@@ -2525,6 +2525,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
- 	 */
- 	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
- 
-+	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
-+		return -ENOMEM;
-+
-+	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
-+		len -= sizeof(struct virtnet_rq_dma);
-+
- 	buf = virtnet_rq_alloc(rq, len + room, gfp);
- 	if (unlikely(!buf))
- 		return -ENOMEM;
+ 	virtnet_rq_free_buf(vi, rq, buf);
+@@ -2712,7 +2712,7 @@ static int virtnet_receive_packets(struct virtnet_info *vi,
+ 		}
+ 	} else {
+ 		while (packets < budget &&
+-		       (buf = virtnet_rq_get_buf(rq, &len, NULL)) != NULL) {
++		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
+ 			receive_buf(vi, rq, buf, len, NULL, xdp_xmit, stats);
+ 			packets++;
+ 		}
 -- 
 2.32.0.3.g01195cf9f
 
