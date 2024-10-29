@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-139901-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139903-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 04B9F9B48EF
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:04:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE309B48F8
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6ACB2B22DFE
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:04:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FED21C2295E
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3285C205ACD;
-	Tue, 29 Oct 2024 12:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4581205E26;
+	Tue, 29 Oct 2024 12:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="h8nRttEB"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LPkpE9UT"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5068204F69;
-	Tue, 29 Oct 2024 12:03:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B3C205E2F;
+	Tue, 29 Oct 2024 12:03:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730203421; cv=none; b=bqlelIxFkKuBszAAlrd7nN2YGfzfr6E9uhswJZ9J4ILa3qeA2NLRrrW/ZoJ0Gcy84i/F/usxSg3+eS0HXKQbjX+xV45vpe8oFuJKC2mBaYCScoAWYn8ta3jM7t1g81KodaO3qwxZX8lxPipyyy1adLb0J6o9xG8rSYL9Z21vRLk=
+	t=1730203439; cv=none; b=aNSrZurX2cri7xKSTl9+G/e0AbZzYvGhmI82dJrI33B9wCI6Z1uvD5jWwyAaGGiPBqGGBub1l/bW5kHSgtWEMUwdVuqoEoarwVs3AaL3s/MTa2ZybVTdyklOPQNxLGx7beRwxyNrCsN50nFDwFrIYGqJjdhm8BQG1ige19xS44s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730203421; c=relaxed/simple;
-	bh=oTQ6+/Hhvne9TbG5XIcFUafsa7xx4wC3k2j1RxlmHnI=;
+	s=arc-20240116; t=1730203439; c=relaxed/simple;
+	bh=JDYkg13S/c7ai/2MYOiSlsEvW04aAle9yzcB8DLIoQM=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FctUZ2+gDsxlkW71RUw7orgJAGsZ6QSCoyvyPqXVxTCKwHUO9yBsOzqE/WKfQXq0CrbnhQS3sdgfXC9rHaW6BbhZozEzQx2hN1PfTm/e9U+qEzNaaquKkpDvv9eQDbczjI6yHV4futHE04NTPHxCOEjPMYJhSWl//9jMp3HuhBA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=h8nRttEB; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=Sf3rREcjaShqqNNxGfzKjCHfNpcXPjI94tT0NVgR3O0bAr8iluZpih5FfdwpfWU6i6bXhqY8NZq8DXkfQ2T1V+QHkyJCEMbUXiTGmxMGouLl2OOmmlzrubbaf2zkAu/VQ5JrrXHE875d7Mo9T14WVzK7DsrRY9c3yt819GU2VF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LPkpE9UT; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=KupOqAzsYXukwswboaiOBlWFrDT6DI3qWoTJMJpC5Gg=; b=h8nRttEBchVKm3tvCx6PUVkmyo
-	JLfVJ4SfjG+AEwvsi26SScysE0BQ9sDI0Lh5zp2mgRWPAI8uhOv9Kwr6Cf3XYajAXVk7qhzU11Ioc
-	bUTJrn/SVOpzJcNXI8hzBNqJQzGD3tnttbTbbtg1PepxFUWx/R8Nvp5WKampSxeuJi0I=;
+	bh=owzbnVknbJVYVJNxafU0ATgST6EL+Zjh6YcPqEYII+c=; b=LPkpE9UT9q6USF1tKGDcsid2kO
+	ioRKc4K2xEufm8mD9AST0L18lKix8oWzUV+eRxNLwIUwO514+9gpvGbGBieaiT+hY2MN68e4F2bhH
+	VoAorThisHcAKqarCVcSSec+7lthVxzcxqYmX2I+XrzzpkgZYSFvQAgaDLvdHLPoLKHg=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t5kwQ-00BZCi-06; Tue, 29 Oct 2024 13:03:18 +0100
-Date: Tue, 29 Oct 2024 13:03:17 +0100
+	id 1t5kwg-00BZE5-Pl; Tue, 29 Oct 2024 13:03:34 +0100
+Date: Tue, 29 Oct 2024 13:03:34 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: jan.petrous@oss.nxp.com
 Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
@@ -75,10 +75,10 @@ Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
 	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
 	imx@lists.linux.dev, devicetree@vger.kernel.org,
 	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v4 07/16] net: dwmac-intel-plat: Use helper rgmii_clock
-Message-ID: <15b4da3e-9456-46e1-9f49-0aac979925d8@lunn.ch>
+Subject: Re: [PATCH v4 08/16] net: dwmac-rk: Use helper rgmii_clock
+Message-ID: <9c18bff7-9142-4805-882b-44d00ebd5923@lunn.ch>
 References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
- <20241028-upstream_s32cc_gmac-v4-7-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-8-03618f10e3e2@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,9 +87,9 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241028-upstream_s32cc_gmac-v4-7-03618f10e3e2@oss.nxp.com>
+In-Reply-To: <20241028-upstream_s32cc_gmac-v4-8-03618f10e3e2@oss.nxp.com>
 
-On Mon, Oct 28, 2024 at 09:24:49PM +0100, Jan Petrous via B4 Relay wrote:
+On Mon, Oct 28, 2024 at 09:24:50PM +0100, Jan Petrous via B4 Relay wrote:
 > From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
 > 
 > Utilize a new helper function rgmii_clock().
