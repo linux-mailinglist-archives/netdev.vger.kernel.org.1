@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-140064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 634279B524F
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:00:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D29F89B5250
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:00:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 990F8B21AA0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:00:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96543286C41
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:00:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83A5E207214;
-	Tue, 29 Oct 2024 19:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9C542076A5;
+	Tue, 29 Oct 2024 19:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="m6ncj07F"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="a/kCWXpJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 599C0207212
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 19:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6F632076A4
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 19:00:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730228432; cv=none; b=BehT65zeNr6XfZKcI7q3cjQvcS9u+TNTaKUf5On+ZKHs3ziNuydZM7YuwDiU26CiXSW0tJraVY13QVhIb/se6qjbYbK92gLGjCVHBZ4Aja3QC2W+GsoucftlDsHKPzwL04RWPqJuf/T4U7bHsp2ayVFDEFqvFalPpfjO46wOsdQ=
+	t=1730228433; cv=none; b=ls89wgW5IDDn4SOIAhid60ELyn3n7Qa57j3+bx5NkJTZsRxtKIlxEX7TD82od5qeS+R7XN8OWmcASlGKW8W/ZlPAF5drNFmacxOdPCTO/xYWmuEexMTBvPh7y2O6cI7U34eRl73AjXBvyhtAQ6HS11s0IEoSppCjbGDBFwv8mZs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730228432; c=relaxed/simple;
-	bh=hr54iaOXzXc73j2jtDwCoKf72W5Hy01aPZ4C82ylQoY=;
+	s=arc-20240116; t=1730228433; c=relaxed/simple;
+	bh=bkKndJn7XIkhmYLdiOQqsdhPc/z38bfThzkiyz8pkUE=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=cSkWoi6xT506YACQOeN7uSfjwkn+JkKksUKSPq2jYJhFpI0ahE8NrtdgffRvCfm7OfUp5LV3nGEKrYEwbvEQhUvcc/dBV6X7CUiHoHPK6dDkk/sHfz6CSzm62UNSY3i3+Xloh+3CYkm/EqMi60uIr5d/Sem1HK/3CWpMXSVGIws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=m6ncj07F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D9DD9C4CEE4;
-	Tue, 29 Oct 2024 19:00:31 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=UjWmn2JR+Kq+dXFFwHjJQGoXtUiZ6wVVaCVyqUqmupFw1Zfoho7JP6g9rkcJg0L80gIokpdf85Kv/+sU/dd4CA9XrO8VlKccyadKYKvOrD6yOaeJ9iph7g0u3Re9zO/X+uTwPI88xzrACzs7sEMiNkD+D+xcQr5N+xS5HOqK6rU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=a/kCWXpJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5A5E0C4CECD;
+	Tue, 29 Oct 2024 19:00:33 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730228431;
-	bh=hr54iaOXzXc73j2jtDwCoKf72W5Hy01aPZ4C82ylQoY=;
+	s=k20201202; t=1730228433;
+	bh=bkKndJn7XIkhmYLdiOQqsdhPc/z38bfThzkiyz8pkUE=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=m6ncj07FdZrK1peQsXs5CbPXeEwTbYGsamB8OPfhauFGNKjA8iYddA6+r2LZ8JMUw
-	 eVl+KKcD5KGl2gzDBlIWxbAjFUbtSMGBSS1Vb+e8EbTKGbmBwPFtWCVGWnf0ykn8CS
-	 qEeMKoOGKsuGXL3NrcV9wOr+YF7HHi9Rnkf30ouLHb6j98+SNoL+XU9dejluMCla9G
-	 5jPioCKHIkwPNeVwOM0CQelnPApv7eiYCqaLlemkgvdeRJeSDwIuDnXL5uaLRs3pho
-	 Z8Gl2eCfoc7Yo4WGzlgKOcpf/q3PuHviGx3r0Z6mFXHAl6Q36sU5XR3w+a6jvhMr8j
-	 FUAeKGgldU+EQ==
+	b=a/kCWXpJNH2q8IuPHi0RhDMdXIaZguef2Bit3sDZPUkFZjiOCxmLB9EEUnQPtoH2u
+	 uAqo7cr8M6plDFIrmVJswzPwZXLdRWN4Xa5VjqE/Z+9873kjUrkbthHSo4FMka9jmF
+	 pm2CqckoxXwtmsF107bfYjIgj0ymT/TrBwujWkD05SWn0NWtHHZz40lSwp9iYCGIP6
+	 v6Q8A4KDdHjZ2rnmAVJdv/RJad+pnSbo0/kgR0/8LKDuq4eLp1WM4La5cj0Xayx29Q
+	 1W6l7+YkBhkWnwEl2CjN+nxGQDa97zP0/Q2GZzxsXdomp9Y+J/cUDUYeNfXpM3/K/k
+	 XkkNjwVmQl4VQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE02A380AC08;
-	Tue, 29 Oct 2024 19:00:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D25380AC08;
+	Tue, 29 Oct 2024 19:00:42 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,39 +52,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/2] mlx5e update features on config changes
+Subject: Re: [PATCH net-next v2 0/3] net: phylink: simplify SFP PHY attachment
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173022843923.790671.8221557596485555324.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Oct 2024 19:00:39 +0000
-References: <20241024164134.299646-1-tariqt@nvidia.com>
-In-Reply-To: <20241024164134.299646-1-tariqt@nvidia.com>
-To: Tariq Toukan <tariqt@nvidia.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, andrew+netdev@lunn.ch, netdev@vger.kernel.org,
- saeedm@nvidia.com, gal@nvidia.com, leonro@nvidia.com
+ <173022844073.790671.7512388845260359270.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Oct 2024 19:00:40 +0000
+References: <Zxj8_clRmDA_G7uH@shell.armlinux.org.uk>
+In-Reply-To: <Zxj8_clRmDA_G7uH@shell.armlinux.org.uk>
+To: Russell King (Oracle) <linux@armlinux.org.uk>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netdev@vger.kernel.org,
+ pabeni@redhat.com
 
 Hello:
 
 This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 24 Oct 2024 19:41:31 +0300 you wrote:
+On Wed, 23 Oct 2024 14:41:17 +0100 you wrote:
 > Hi,
 > 
-> This small patchset by Dragos adds a call to netdev_update_features()
-> in configuration changes that could impact the features status.
+> These two patches simplify how we attach SFP PHYs.
 > 
-> Series generated against:
-> commit 81bc949f640f ("selftests: tls: add a selftest for wrapping rec_seq")
+> The first patch notices that at the two sites where we call
+> sfp_select_interface(), if that fails, we always print the same error.
+> Move this into its own function.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,1/2] net/mlx5e: Update features on MTU change
-    https://git.kernel.org/netdev/net-next/c/7999da12a670
-  - [net-next,2/2] net/mlx5e: Update features on ring size change
-    https://git.kernel.org/netdev/net-next/c/a7b6c074e42d
+  - [net-next,v2,1/3] net: phylink: add common validation for sfp_select_interface()
+    https://git.kernel.org/netdev/net-next/c/280ed44982ff
+  - [net-next,v2,2/3] net: phylink: validate sfp_select_interface() returned interface
+    https://git.kernel.org/netdev/net-next/c/41caa7e81b97
+  - [net-next,v2,3/3] net: phylink: simplify how SFP PHYs are attached
+    https://git.kernel.org/netdev/net-next/c/25391e82ffe2
 
 You are awesome, thank you!
 -- 
