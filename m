@@ -1,135 +1,137 @@
-Return-Path: <netdev+bounces-140110-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140111-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90E379B5435
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:43:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C79E59B543B
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C0F51F24614
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:43:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DEA3D1C22378
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:44:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40277209695;
-	Tue, 29 Oct 2024 20:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 743762076CE;
+	Tue, 29 Oct 2024 20:41:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="TftYdxWE"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Ww1vF0jl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-172.mta0.migadu.com (out-172.mta0.migadu.com [91.218.175.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA4FC208230
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 20:38:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38D7A19A2A2
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 20:41:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730234332; cv=none; b=i5rlC3/+L2CZW2og6wQE97Ib8fOOEAkGcVq4/TbtQYGjilWsjdfp5/WTfXDRlBWlO6r63kOTltihY8rN05OFXtr9cSfpGF51HMfEwdMlccztc/zi6v+SHpSxnDC+PXvzwDXYXL3PZ6c1DnySbqkJDTPC/CpnKStStP1iVuCtsgM=
+	t=1730234508; cv=none; b=McH30VrzIdGeT6ES4ts65w3oYSIYr786AIxlNzql88h3KM6QHqbgEuBk0SgzeQfHDvTLhEowF/PJk7O7+b309U7cv5yvT8dPKK2jxYuHhLEou6E2FibqclnUKFtxRUjdLpbUL54r4ExYDT2cevWZ06T7OYJgEGE7/GBMd198uYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730234332; c=relaxed/simple;
-	bh=rxX4tl6h4/IVnKLPvQdszEOE7LTI8m5gBDI4nKRji6M=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=UpYYkztWxcz25dEh7fZikjh5HVvW2M25Zz7V/9w22Y0onPyzUfdzrNOGrlA+roE3Oio266sPvEJCQSFqn/vT7PFx8U/CmKw/tcfQSZGcvIhrAZD+vrhKWhYSgm6r0xUMR3z+XFaWReeWRmFhDA+eBbnY07j6gJKzzdO/fvMVcTE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=TftYdxWE; arc=none smtp.client-ip=209.85.210.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-7202e1a0209so473125b3a.0
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 13:38:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1730234329; x=1730839129; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rxX4tl6h4/IVnKLPvQdszEOE7LTI8m5gBDI4nKRji6M=;
-        b=TftYdxWEXrBh1Y+WDvRjT/BzGMGEQPImSYvHbctXruuVA6E8JFE1DyBWRlVcRWZtUL
-         kXeqs4q9Sd3IWx4ueJqgEJgPAfncZa8HnJTRwNYE1RH6hjCzZGUNm4H/dhP4bPsFdfRI
-         4FhlrUAgFW4kzzcXdGqOQGNXcRnVxq7cc0QTk7BBneqoCeN5zC7WPx/AuIW88rMDxvq7
-         vKjlcfYcAJrpMa1UsV58DdOG0IdAh9rB7L7oZCyFJN1yxL8+ODQB18c/z0ClNazdkJRF
-         nVIgPpK54bLK7jBAfNce11BpP5up6iaKCs9e88O8pSIyd2Yd9XlO8ja3K63ei9YaTtTP
-         WUBg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730234329; x=1730839129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rxX4tl6h4/IVnKLPvQdszEOE7LTI8m5gBDI4nKRji6M=;
-        b=LnwSJai+02hPb70yM4z7HWehvr6DPfxMh7KBg5Kq/lbSsFAraPQ8S4lLCl/xqsbgbK
-         GVqin0zzJCk2dIfvljOj+ob0Ux9AnOJzoALRjLJYPJS73evN8pLj0K+IP1mjGkgHCNTw
-         HG9FQcrYvK3lHItJ5eyxkXZVhUtafNrfvW5vFC9fW4GFQTN+21LEAfbSvLtQ+cEkocOC
-         hdLWo++hcRKNMr8jqGn5bnyis2UuMOFTRuQnfTkENwrUVyALwmJCi5CK85Nti4MfFYZj
-         oKm4FUkA/Dv9s8XXt0RSgaoBSocRWBSfmDJSAYOUGskaSOD5oDw6KWqahjQSq9hrMQNQ
-         HtKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWVQNWe32ZTzh+QO6odUeS3Sgp306q+WulJhPvtpCoEmkfZA5cqUdTWdRPkxG9mrYex3BC99RY=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw08s0rW2kvlAJmWdFZmf5tM9QPV8oMStsc29rX5XDJe/6PZ9Zl
-	S3kl5zhOQHysG/BLJv7CQxysOeUwRPgPkn+RBr66Q2Ji5U0o5Or6r3cu2Z+yeo8Ht663bmfu8zS
-	t8X0OvSZ5fO5IcxzhDTkleJ8W8IVLGA3X/MQGU9qtkJJrG243DNmKuA==
-X-Google-Smtp-Source: AGHT+IET98qsSjNOjsfBxs4fNBfxl9mkBrcuSKEy0ssdSSQ0hphNvrIm7EngLn9PbwFPzWUn3YzOuODt/EHr1kPOdGQ=
-X-Received: by 2002:a05:6a20:2444:b0:1d9:ddf:b087 with SMTP id
- adf61e73a8af0-1d9a84d970amr8215310637.8.1730234329089; Tue, 29 Oct 2024
- 13:38:49 -0700 (PDT)
+	s=arc-20240116; t=1730234508; c=relaxed/simple;
+	bh=kTzbU6ETHAvLuzBySXO+cuBVPMHnm/kJqVL+rpbolfI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=ljL9BxedNsvFZkhhfJwg/UjhdgHvNbiKp7afI6N0dAu2pym4rzXzSbO+p5VN3T8aUUOZr1Qu8FX3tH9tf6xHXugikLg5lD47UF9UNkB4mvBZxwrdxFW51f/c8k9e21lN01fcNf1eQ6U00y3TwTZP/HbjxgAoowC67mWg/vXELPk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Ww1vF0jl; arc=none smtp.client-ip=91.218.175.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <2a538f3b-d66f-4fe2-a08e-0f852befb350@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730234503;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Qd/YeWYgCCFiw+ssPRNplrMtnQCmKC+iT84HL4A0XnY=;
+	b=Ww1vF0jlF+Gqf7xoj1PL/FbwuJ2YEdWsnQ+GEfGQbwGze+YMmKP7dpPVqYq7PT5VQC+cpC
+	KU92KVQAW8u7V8hjh7Sj4ySGzSkYOuzAqh5rFbqd4NbG1c6tfMGwyYlFQ2EMgv6AVDjDPe
+	i92pwKbvWRmmStHAIK5fYNXjcSKnQI4=
+Date: Tue, 29 Oct 2024 20:41:37 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029182703.2698171-1-csander@purestorage.com> <CANn89iLx-4dTB9fFgfrsXQ8oA0Z+TpBWNk4b91PPS1o=oypuBQ@mail.gmail.com>
-In-Reply-To: <CANn89iLx-4dTB9fFgfrsXQ8oA0Z+TpBWNk4b91PPS1o=oypuBQ@mail.gmail.com>
-From: Caleb Sander <csander@purestorage.com>
-Date: Tue, 29 Oct 2024 13:38:37 -0700
-Message-ID: <CADUfDZrSUNu7nym9dC1_yFUqhC8tUPYjv-ZKHofU9Q8Uv4Jvhw@mail.gmail.com>
-Subject: Re: [PATCH] net: skip RPS if packet is already on target CPU
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH net-next v3 2/2] bnxt_en: replace PTP spinlock with
+ seqlock
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Pavan Chebbi <pavan.chebbi@broadcom.com>, Jakub Kicinski
+ <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>
+References: <20241028185723.4065146-1-vadfed@meta.com>
+ <20241028185723.4065146-2-vadfed@meta.com>
+ <CACKFLimm96szzQd5AowWy-sQyfCKdoBCLgr5P68vOn6n0WKjWQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <CACKFLimm96szzQd5AowWy-sQyfCKdoBCLgr5P68vOn6n0WKjWQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 29, 2024 at 12:02=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Tue, Oct 29, 2024 at 7:27=E2=80=AFPM Caleb Sander Mateos
-> <csander@purestorage.com> wrote:
-> >
-> > If RPS is enabled, all packets with a CPU flow hint are enqueued to the
-> > target CPU's input_pkt_queue and process_backlog() is scheduled on that
-> > CPU to dequeue and process the packets. If ARFS has already steered the
-> > packets to the correct CPU, this additional queuing is unnecessary and
-> > the spinlocks involved incur significant CPU overhead.
-> >
-> > In netif_receive_skb_internal() and netif_receive_skb_list_internal(),
-> > check if the CPU flow hint get_rps_cpu() returns is the current CPU. If
-> > so, bypass input_pkt_queue and immediately process the packet(s) on the
-> > current CPU.
-> >
-> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
->
-> Current implementation was a conscious choice. This has been discussed
-> several times.
->
-> By processing packets inline, you are actually increasing latencies of
-> packets queued to other cpus.
+On 29/10/2024 20:34, Michael Chan wrote:
+> On Mon, Oct 28, 2024 at 11:57 AM Vadim Fedorenko <vadfed@meta.com> wrote:
+>>
+>> We can see high contention on ptp_lock while doing RX timestamping
+>> on high packet rates over several queues. Spinlock is not effecient
+>> to protect timecounter for RX timestamps when reads are the most
+>> usual operations and writes are only occasional. It's better to use
+>> seqlock in such cases.
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>> v3:
+>> - remove unused variable
+>> v2:
+>> - use read_excl lock to serialize reg access with FW reset
+>> ---
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 19 +++--
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 73 ++++++-------------
+>>   drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.h | 14 +++-
+>>   3 files changed, 46 insertions(+), 60 deletions(-)
+>>
+> 
+>> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>> index 820c7e83e586..5ab52f7a282d 100644
+>> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+>> @@ -67,19 +67,21 @@ static int bnxt_ptp_settime(struct ptp_clock_info *ptp_info,
+>>          if (BNXT_PTP_USE_RTC(ptp->bp))
+>>                  return bnxt_ptp_cfg_settime(ptp->bp, ns);
+>>
+>> -       spin_lock_irqsave(&ptp->ptp_lock, flags);
+>> +       write_seqlock_irqsave(&ptp->ptp_lock, flags);
+>>          timecounter_init(&ptp->tc, &ptp->cc, ns);
+>> -       spin_unlock_irqrestore(&ptp->ptp_lock, flags);
+>> +       write_sequnlock_irqrestore(&ptp->ptp_lock, flags);
+>>          return 0;
+>>   }
+>>
+>> -/* Caller holds ptp_lock */
+>>   static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp *sts,
+>>                              u64 *ns)
+>>   {
+>>          struct bnxt_ptp_cfg *ptp = bp->ptp_cfg;
+>>          u32 high_before, high_now, low;
+>> +       unsigned long flags;
+>>
+>> +       /* We have to serialize reg access and FW reset */
+>> +       read_seqlock_excl_irqsave(&ptp->ptp_lock, flags);
+>>          if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
+> 
+> I think we need read_sequnlock_excl_irqrestore() here before returning.
 
-Sorry, I wasn't aware of these prior discussions. I take it you are
-referring to threads like
-https://lore.kernel.org/netdev/20230322072142.32751-1-xu.xin16@zte.com.cn/T=
-/
-? I see what you mean about the latency penalty for packets that do
-require cross-CPU steering.
+Yes, you are right, we need to unlock seqlock in case of error. I'll
+post v4 soon, thanks!
 
-Do you have an alternate suggestion for how to avoid the overhead of
-acquiring a spinlock for every packet? The atomic instruction in
-rps_lock_irq_disable() called from process_backlog() is consuming 5%
-of our CPU time. For our use case, we don't really want software RPS;
-we are expecting ARFS to steer all high-bandwidth traffic to the
-desired CPUs. We would happily turn off software RPS entirely if we
-could, which seems like it would avoid the concerns about higher
-latency for packets that need to be steering to a different CPU. But
-my understanding is that using ARFS requires RPS to be enabled
-(rps_sock_flow_entries set globally and rps_flow_cnt set on each
-queue), which enables these rps_needed static branches. Is that
-correct? If so, would you be open to adding a sysctl that disables
-software RPS and relies upon ARFS to do the packet steering?
+> 
+>>                  return -EIO;
+>>
+>> @@ -93,6 +95,7 @@ static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp *sts,
+>>                  low = readl(bp->bar0 + ptp->refclk_mapped_regs[0]);
+>>                  ptp_read_system_postts(sts);
+>>          }
+>> +       read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
+>>          *ns = ((u64)high_now << 32) | low;
+>>
+>>          return 0;
 
-Thanks,
-Caleb
 
