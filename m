@@ -1,65 +1,66 @@
-Return-Path: <netdev+bounces-139934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10F769B4B52
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:51:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0640B9B4B69
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:56:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17D11F24282
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:51:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 379BA1C2219F
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:56:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FF3206051;
-	Tue, 29 Oct 2024 13:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3561F206956;
+	Tue, 29 Oct 2024 13:56:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vf3ZIlS6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="D0f9vfjY"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FE3205ADA
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 13:51:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05AC2206066;
+	Tue, 29 Oct 2024 13:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730209891; cv=none; b=AAUVTVCBOVlQD73CoSXDyGhG9NxiuKwxZa3ZSfuX+6lU3BMgJJYBMvr5SjJRA2CZEpgPTHPyk2P1tpt3cdVM1mMeXpRSkVnWGv2XL0eBPpMNq3DCCKaa6q75cxpdubR/trY3hg2KseV7kXbkHat9VIYKeXDv74MW/lpe5dlDgAE=
+	t=1730210176; cv=none; b=MZ2H9RIATpdly52lvrXZmq7Ic4z7FQ+OFUTE69asMwP2IpqWBzpNu9IsQjYTrE0MYBr1x5QGAW9LR9NWC7Sf9ph/JAHnLmcqScKDSlOoOnYrTf29q86MFoWa5zOq4eYhhMdH1uDIrSEweq+DzwIO1SH5RJG8OQ9OWMnkEuNN2gE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730209891; c=relaxed/simple;
-	bh=6BSlgiXv1N2zCZBJU0HEg+laUPY+B7fCTNkKl6VjbKM=;
+	s=arc-20240116; t=1730210176; c=relaxed/simple;
+	bh=Omhk+6bzE563DEqVrxai9r68DZuEFQ0N24D4UaTyCso=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bsxEX+qo1e664Y2nZn49CvjieU/CIAPiDhSyTW/rw3iSYRXNOr03MCChE4L+8KmJNrt/0WS+2CAk4f9Zl7u9F9ouNE9TUqWvOu4A85TVsUECgwPNgyNmiVW69G5VmuujGZ7UHjU394PjP2E+bdE6mFAk7wnDdhpPA4I2Oh6sbdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vf3ZIlS6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 068A8C4CEE3;
-	Tue, 29 Oct 2024 13:51:29 +0000 (UTC)
+	 MIME-Version:Content-Type; b=j6Ccsw2TeyGjgLfwd1Lw6ihbIhTz5nJaUs4NvDCELDz8eC8GGFZWk54PBBI6TFB82L4zglK7gSQpx/tZGxJP9Ucc0Bj7RlgjVU+8czc4Dl0vKo/C/0d9T4t0HTrn2a/O/+UoWftLHd0d36k5Lfs0b+32d9mOvgmLjG9xmT5fm6E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=D0f9vfjY; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2698C4CECD;
+	Tue, 29 Oct 2024 13:56:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730209890;
-	bh=6BSlgiXv1N2zCZBJU0HEg+laUPY+B7fCTNkKl6VjbKM=;
+	s=k20201202; t=1730210175;
+	bh=Omhk+6bzE563DEqVrxai9r68DZuEFQ0N24D4UaTyCso=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Vf3ZIlS6Jjwh7eii8DO8Cq1m5AM2i+wgTj0kYrBpOKVImBqxR/wfGMuCwtkSCldI2
-	 pVmOC8XNPAuvU2gsKaRIT6NdgN3cax+45PwwnHil76ifsz+HL0IeXpspKxgZ3mFtYw
-	 vzw2b7KG61sIdbfhPmnj5cUeBC9s4hWEySWmHt+RuxZuMBsG2ItVXqA0hBpKx0W4lP
-	 hDa7Y6mxPtrinYrk9sgFXtdkaINMEkDBviBkwJwk7FMdCmoN40uECl0BrMtpManoZn
-	 8FENAsPOJrw0ZaFYg4zknpvdObLzbeAEsttFfc8J++kWBqEZeaJj0RVLUvt4idZ5HB
-	 HLy03aAAtQoLg==
-Date: Tue, 29 Oct 2024 06:51:29 -0700
+	b=D0f9vfjYGZzHbNOVqFFa8Xtgy3daCLGh1XnyJH7rQbwBFV/lJO7IJwwcltcO+boxM
+	 Ap3GMPsIhzq3QWVLum1Q3zmtW7NTLNWj0rlCM+6jlt/muN+FUDmnp4w5WCjenYkxGr
+	 S2ACCQgyVX3Ls9BRWz3FWS2LGd8A5e0Sosn4E3TE6R4Mj+3ebvDeqSWleAc0IuoXbi
+	 /aiohecPvbNE2opvRcIRlGh/zjTkhQZtWWgF9zPn78XvnAcbkAORBFzh6usu6ciEe5
+	 wSh8lm2HT4TF8bNcXk+JKzN4cXXcEZWDxCEBpOOGpNIhU2D2oquAEkkheqz/lI8nzF
+	 +z2Ag3kbdaglg==
+Date: Tue, 29 Oct 2024 06:56:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, donald.hunter@gmail.com, vadim.fedorenko@linux.dev,
- arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
- tariqt@nvidia.com, maciejm@nvidia.com
-Subject: Re: [PATCH net-next v3 1/2] dpll: add clock quality level attribute
- and op
-Message-ID: <20241029065129.503f51cb@kernel.org>
-In-Reply-To: <ZyDafILiX4bFEfBI@nanopsycho.orion>
-References: <20241014081133.15366-1-jiri@resnulli.us>
-	<20241014081133.15366-2-jiri@resnulli.us>
-	<20241015072638.764fb0da@kernel.org>
-	<Zw5-fNY2_vqWFSJp@nanopsycho.orion>
-	<20241015080108.7ea119a6@kernel.org>
-	<Zw93LS5X5PXXgb8-@nanopsycho.orion>
-	<20241028101403.67577dd9@kernel.org>
-	<ZyDafILiX4bFEfBI@nanopsycho.orion>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Michael Chan
+ <michael.chan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
+ Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
+ Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 2/2][next] net: ethtool: Avoid thousands of
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <20241029065613.043fa9d6@kernel.org>
+In-Reply-To: <0bc27725-cd55-493b-8844-ee2c5baca5f0@embeddedor.com>
+References: <cover.1729536776.git.gustavoars@kernel.org>
+	<f4f8ca5cd7f039bcab816194342c7b6101e891fe.1729536776.git.gustavoars@kernel.org>
+	<20241028162131.39e280bd@kernel.org>
+	<158eb222-d875-4f96-b027-83854e5f4275@embeddedor.com>
+	<20241028173248.582080ae@kernel.org>
+	<0bc27725-cd55-493b-8844-ee2c5baca5f0@embeddedor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,26 +70,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 29 Oct 2024 13:52:12 +0100 Jiri Pirko wrote:
-> >I thought clock-id is basically clockid_t, IOW a reference.
-> >I wish that the information about timekeepers was exposed 
-> >by the time subsystem rather than DPLL. Something like clock_getres().  
+On Mon, 28 Oct 2024 20:37:13 -0600 Gustavo A. R. Silva wrote:
+> The rest will essentially remain the same as the change in
+> include/linux/ethtool.h triggers a cascade of changes across
+> the rest of the files in this patch.
 > 
-> Hmm. From what I understand, the quality of the clock as it is defined
-> by the ITU standard is an attribute of the DPLL device. DPLL device
-> in our model is basically a board, which might combine oscillator,
-> synchronizer and possibly other devices. The clock quality is determined
-> by this combination and I understand that the ITU certification is also
-> applied to this device.
-> 
-> That's why it makes sense to have the clock quality as the DPLL
-> attribute. Makes sense?
+> So, you tell me if you still want me to split this patch. In any case
+> I'll update the changelog text.
 
-Hm, reading more carefully sounds like it's the quality of the holdover
-clock. Can we say that in the documentation? "This mainly applies when
-the dpll lock-status is not DPLL_LOCK_STATUS_LOCKED" is a bit of a mouthful.
-I think I missed the "not" first time reading it.
-
-Is it marked as multi-attr in case non-ITU clock quality is defined
-later? Or is it legit to set to ITU bits at once?
+Unpleasantness. Okay. Update the commit message and I'll give you a few
+more nit picks related to variable ordering.
 
