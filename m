@@ -1,95 +1,93 @@
-Return-Path: <netdev+bounces-139815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139818-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F8229B44B0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:47:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7883C9B44B9
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:47:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C215A1C20C48
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:47:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA2561C22262
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:47:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB09204033;
-	Tue, 29 Oct 2024 08:46:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA40820494F;
+	Tue, 29 Oct 2024 08:46:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="CxNak1L5"
+	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="eCzuHOiV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173DF204035
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:46:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EAAF204945
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:46:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730191568; cv=none; b=V14oS4vhNpXUjUIL13iluZXHudtJTi+Hs//ZQ/+Q5toNU6HX0J7gROCsIGwnE/vwf1XTTTaxAvpsYqR+kGP/V3xfFD4ndYHsbCwqFX1V+yEafKboSI1kI+zsh9q1luZtkFYvudJahpcrRtvLWAk+eq/o3Zog/W91NaXcbypd2TU=
+	t=1730191587; cv=none; b=As938vq5I+PJbvq46/1XSmoqKE9efAQ6x+OcA+2SmzOZTYGE46EVH9ATWYaYGFHgG3+dP5G1ZawWTsKjtiaqU+Qs5/4lFZt+6MbuwRECBISi2cDWszSlXCNelonyFiggQl24nyBfsI1TnfktDmg09G80ajs3GnZhdBPobSxkVvI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730191568; c=relaxed/simple;
-	bh=oMsPeNDPYjX24/xrsdIKUnroAYKkElkCjISZqScZwOw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pHQGERw5YPqPdYM+ZqAUDwQx/xw/VZF0MzIFizeUVcdJK7+rdh9tylRFUNBdw51yeghJo1UIWg7vbCG/w9WMV93JCfQGr4g34FBCemw6cQCpmYVhmBLpi+CgrSgE7ykLtnho57TG1oZLl562UCoerF+axlEVdL4E94TSZm1qVkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=CxNak1L5; arc=none smtp.client-ip=209.85.218.43
+	s=arc-20240116; t=1730191587; c=relaxed/simple;
+	bh=7jZErEgYAUH8xk9j5Uoe+tHYPD+nw3TS+qHbiMcKb80=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nx9kJ1m7XQ80H8SCife4cLWVlT4dvXJn4f5rBqMo/wGnnuuHoiDv6RT29EWQDxFwcCTQjq/0Wrf30DirGnLwIBVOJgFXTe/idMZM0hhrGUjya5jp1DDrrPC5oknlzVFwmAp3yA1R1nnZVhZo8VUFEi3nCvBJATBpJSBVTE+1x/o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=eCzuHOiV; arc=none smtp.client-ip=209.85.208.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
-Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a99ebb390a5so1138553066b.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 01:46:05 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c9454f3bfaso6156386a12.2
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 01:46:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google; t=1730191564; x=1730796364; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=FgWCepazzfo33UdtIIMN3k0wsxQsDr435va3n4Xr8tQ=;
-        b=CxNak1L5JQf0Yt56A7ip3UAPeRZSXzEMbKxHWHOR0H7db/CrB8pYS/Y3PYLtDo0mmK
-         a5eBiGMuoMqqLPh1iLfAhycSWZXgC29Po0z62ifisHe89n3SbtNEO1oW/IPz5IcaC2Qi
-         jVWOLkMDuraD04+Adjqh3GXhzxOTjY1W/Cxlc=
+        d=amarulasolutions.com; s=google; t=1730191584; x=1730796384; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zDcquMlQbBV3XN4Io8qW6xdqDAgSIub1vLoIuhz6Z10=;
+        b=eCzuHOiVtY2ZJD4owOG5zMGPhLDlJK3w008p7yR+ZGSJYLK19d5O+ylnP5iij8uGLX
+         6nfWFoDmDmPT6cX8Qv/YIxbRIrM6uw1EsXPp9rIvp83RY/30wu0MSmd/J1NsqM4q3YaR
+         au2CeflwBhByh/bIP3kdmyU9ERTonRhuUnlfM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730191564; x=1730796364;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=FgWCepazzfo33UdtIIMN3k0wsxQsDr435va3n4Xr8tQ=;
-        b=HhkwjG3DlRF5fYNRxz0s9cPQa3oNUPtIiasDNWQTVs17JMubpm34QWIvXVEzwUUxUj
-         DsWHsqEbBlAaC1vzlCJ76bkji7TOp+Y4CA33eX4NZQXkCfOMPcK6hUa5mt0PdTsezgRp
-         77FuN2oVqNh26Gs5HsMPHcKgmedeUAHgOyRm1SQlOJ4y30srsp9A+7Igb/pAntnycqYK
-         1Ba51PAXP+GiGBqsP+tiBSemhhJmJvc/xrq6RD5oEdYe/37In5INvcqvmGaLH6dmeHPY
-         HzoUkm1IVeW6yIOP0P2H/GUl5/oMssmBwAk/Xev2orERQnE2/wPmykTXENlDbJ0XIn/i
-         iI2w==
-X-Forwarded-Encrypted: i=1; AJvYcCUYJ76Yj0VNASgqAVLPzYzBtL5ytIZpfrzsaH4DyjJT+I761bVbZoWFKTRhmy5OCd3wydrLIGU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyXCQa7noPRZq5b2Auk6h0jA0aWp9WZQCVD4XPaEm5CVKVqcRqC
-	pTfM9NiVdbhwILw0i1Cq9COBG6t9MpN7SEivPxClo2DuClkWSusop66dM2vv2U0=
-X-Google-Smtp-Source: AGHT+IEPwkX0IhV+bKZax/ZDnKCtE6vuHXhCdpPupl5TYU7s9VlSPImd24020c4tF67SdJTKa0gPiw==
-X-Received: by 2002:a17:907:1b98:b0:a9a:8263:d2c7 with SMTP id a640c23a62f3a-a9e2b347278mr87267966b.7.1730191564353;
-        Tue, 29 Oct 2024 01:46:04 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730191584; x=1730796384;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zDcquMlQbBV3XN4Io8qW6xdqDAgSIub1vLoIuhz6Z10=;
+        b=ijdGzCo2QgMoL3dMjuajRigYK3JLM1jF6E5+FmJVLZ3RMOHNo+FL8iVSdso+NMVNhz
+         ikYMon4LdDdqU7nKVt071JuT4VLYRtq1fA0SVPqlTNznnITKn0HqVNXHlv/WVCFbZVhN
+         DKJXiXlue4MlpkzFy1Ix92B7m/rtZiCIvRmR2Y4nIZO8g06haBFb/Evrl8pZjf6TYRJz
+         J/WSMXAaa/B4kyvv+JQ7s8GGhukz/RtCVT04W8XKEj3esTv7F1GEykojL1QvevrrN/Qm
+         NoDPsoh0sYt8DnbJiZP3pHCJUVZhDIBh3+DdcQpV9DDyOSvF0hwuAZUutH50/tGOU6tS
+         uIxg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9eZOgKBshsUQejgy4fnxVBKw8JD8dUkQ34Gqb4oZlMhuR1liVtSVuk4TuerBZ45j7CZgsXkI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt5K3CJlkzmqqi2H4XwTsWQ8ILA3tYfu5hQj409vRbb171HV4H
+	SS4izK8Dr6F6KNU683d8NSAMCzfMq2Sx0w66C4MM8amVos+VwT89n5mqkkKGQAI=
+X-Google-Smtp-Source: AGHT+IGQHk3b2V3qEBkaWlzGQYJYEEX9sbx1ZZHVJ7DYIM2F1SK1zV1W2kZaoYuPp8TXT2xduyix0A==
+X-Received: by 2002:a17:906:c10d:b0:a9a:37fe:e7d0 with SMTP id a640c23a62f3a-a9de6199186mr1046662666b.64.1730191583525;
+        Tue, 29 Oct 2024 01:46:23 -0700 (PDT)
 Received: from dario-ThinkPad-T14s-Gen-2i.homenet.telecomitalia.it (host-79-40-68-117.business.telecomitalia.it. [79.40.68.117])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b1dec7dacsm450134166b.9.2024.10.29.01.45.39
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b1dec7dacsm450134166b.9.2024.10.29.01.46.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 01:46:04 -0700 (PDT)
+        Tue, 29 Oct 2024 01:46:23 -0700 (PDT)
 From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
 To: linux-kernel@vger.kernel.org
 Cc: linux-amarula@amarulasolutions.com,
 	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Frank Li <Frank.Li@nxp.com>,
 	Gal Pressman <gal@nvidia.com>,
-	Haibo Chen <haibo.chen@nxp.com>,
-	Han Xu <han.xu@nxp.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Kory Maincent <kory.maincent@bootlin.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
 	Sabrina Dubroca <sd@queasysnail.net>,
 	Shannon Nelson <shannon.nelson@amd.com>,
 	Simon Horman <horms@kernel.org>,
-	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [RFC PATCH v2 0/6] can: dev: add generic function can_update_bus_error_stats()
-Date: Tue, 29 Oct 2024 09:44:44 +0100
-Message-ID: <20241029084525.2858224-1-dario.binacchi@amarulasolutions.com>
+Subject: [RFC PATCH v2 1/6] can: dev: add generic function can_update_bus_error_stats()
+Date: Tue, 29 Oct 2024 09:44:45 +0100
+Message-ID: <20241029084525.2858224-2-dario.binacchi@amarulasolutions.com>
 X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241029084525.2858224-1-dario.binacchi@amarulasolutions.com>
+References: <20241029084525.2858224-1-dario.binacchi@amarulasolutions.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -98,55 +96,71 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-This series originates from some tests I ran on a CAN communication for
-one of my clients that reports sporadic errors. After enabling BERR
-reporting, I was surprised that the command:
+The function aims to generalize the statistics update by centralizing
+the related code, thus avoiding code duplication.
 
-ip -details -statistics link show can0
+Signed-off-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
+---
 
-did not display the occurrence of different types of errors, but only the
-generic ones for reception and transmission. In trying to export this
-information, I felt that the code related to managing statistics and handling
-CAN errors (CRC, STUF, BIT, ACK, and FORM) was quite duplicated in the
-implementation of various drivers, and there wasn't a generic function like
-in the case of state changes (i. e. can_change_state). This led to the idea
-of adding can_update_bus_error_stats() and the helpers for setting up the
-CAN error frame.
+(no changes since v1)
 
-Regarding patch 5/6 ("can: netlink: extend stats to the error types (ack,
-CRC, form, ..."), I ran
+ drivers/net/can/dev/dev.c | 30 ++++++++++++++++++++++++++++++
+ include/linux/can/dev.h   |  1 +
+ 2 files changed, 31 insertions(+)
 
-./scripts/check-uapi.sh
-
-which found
-
-"error - 1/934 UAPI headers compatible with x86 appear _not_ to be backwards
-compatible."
-
-I included it in the series because I am currently interested in understanding
-whether the idea behind each of the submitted patches makes sense, and I can
-adjust them later if the response is positive, following your suggestions.
-
-Changes in v2:
-- Replace macros with static inline functions
-- Update the commit message
-- Replace the macros with static inline funcions calls.
-- Update the commit message
-
-Dario Binacchi (6):
-  can: dev: add generic function can_update_bus_error_stats()
-  can: flexcan: use can_update_bus_error_stats()
-  can: dev: add helpers to setup an error frame
-  can: flexcan: use helpers to setup the error frame
-  can: netlink: extend stats to the error types (ack, CRC, form, ...)
-  can: dev: update the error types stats (ack, CRC, form, ...)
-
- drivers/net/can/dev/dev.c              | 45 ++++++++++++++++++++++++
- drivers/net/can/flexcan/flexcan-core.c | 29 +++++-----------
- include/linux/can/dev.h                | 47 ++++++++++++++++++++++++++
- include/uapi/linux/can/netlink.h       |  6 ++++
- 4 files changed, 106 insertions(+), 21 deletions(-)
-
+diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
+index 6792c14fd7eb..0a3b1aad405b 100644
+--- a/drivers/net/can/dev/dev.c
++++ b/drivers/net/can/dev/dev.c
+@@ -16,6 +16,36 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/of.h>
+ 
++void can_update_bus_error_stats(struct net_device *dev, struct can_frame *cf)
++{
++	struct can_priv *priv = netdev_priv(dev);
++	bool rx_errors = false, tx_errors = false;
++
++	if (!cf || !(cf->can_id & (CAN_ERR_PROT | CAN_ERR_BUSERROR)))
++		return;
++
++	priv = netdev_priv(dev);
++	priv->can_stats.bus_error++;
++
++	if ((cf->can_id & CAN_ERR_ACK) && cf->data[3] == CAN_ERR_PROT_LOC_ACK)
++		tx_errors = true;
++	else if (cf->data[2] & (CAN_ERR_PROT_BIT1 | CAN_ERR_PROT_BIT0))
++		tx_errors = true;
++
++	if (cf->data[2] & (CAN_ERR_PROT_FORM | CAN_ERR_PROT_STUFF))
++		rx_errors = true;
++	else if ((cf->data[2] & CAN_ERR_PROT_BIT) &&
++		 (cf->data[3] == CAN_ERR_PROT_LOC_CRC_SEQ))
++		rx_errors = true;
++
++	if (rx_errors)
++		dev->stats.rx_errors++;
++
++	if (tx_errors)
++		dev->stats.tx_errors++;
++}
++EXPORT_SYMBOL_GPL(can_update_bus_error_stats);
++
+ static void can_update_state_error_stats(struct net_device *dev,
+ 					 enum can_state new_state)
+ {
+diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
+index 23492213ea35..0977656b366d 100644
+--- a/include/linux/can/dev.h
++++ b/include/linux/can/dev.h
+@@ -201,6 +201,7 @@ void can_state_get_by_berr_counter(const struct net_device *dev,
+ 				   enum can_state *rx_state);
+ void can_change_state(struct net_device *dev, struct can_frame *cf,
+ 		      enum can_state tx_state, enum can_state rx_state);
++void can_update_bus_error_stats(struct net_device *dev, struct can_frame *cf);
+ 
+ #ifdef CONFIG_OF
+ void of_can_transceiver(struct net_device *dev);
 -- 
 2.43.0
 
