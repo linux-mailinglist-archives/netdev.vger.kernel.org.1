@@ -1,169 +1,156 @@
-Return-Path: <netdev+bounces-139937-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139938-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20AB19B4B93
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:58:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 575989B4B9D
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:01:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 91A0F1F23CE2
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:58:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7138C1C22C13
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:01:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 738FA206E77;
-	Tue, 29 Oct 2024 13:58:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80B1E20696B;
+	Tue, 29 Oct 2024 14:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="jTBc4hu5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Bc44QJdV"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B2A206962
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 13:58:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68FC342A92
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 14:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.11
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730210323; cv=none; b=kdgk0s98lg5dJaFVbat4hkJXKYdNtZqczz+UB2/rjw8nXHNMBHPnyQgq+Fma6c5iafNknaaZc/i0Q4Dv8P+s2wlUUFkYpKyZrIiU93aTCQQ921BoCanWecPY1wOIQCyhGtH+055cY9lMk5GlP2CWIDs1/0HvhxjJ2SXrhN0d4+A=
+	t=1730210468; cv=none; b=nzuvmtOn1Tpdrrwvoa6oNzAB8wVVcCFX/o3YHZBVH6QNohQGOOT0RckXgIi23utwWigXJVDLQgCjGo2VhF33a7SrQ0A5BEeO6bGlp0KmP8EMHzvlz0kpogD9BW/oPAKdQy0+9NKs76t8DAs/tvWftco3ZeB1ZXJ48s/tHysCtPE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730210323; c=relaxed/simple;
-	bh=x2jNO/kTA0H/Vj2uIn8nBbf6CkfW1gy043bvjGQVrwU=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=RPWhNRCyXAvWXYpgfAiQaHI72pYSFRSbTEDFealuD/dJEs+yL5cUVNWeg8zYqj87dDFRHBEUx6BN7Yj4IOJ7ob6oN549zc1HQNv7e9waKZkfAm5e3fO6uewWC1xWJfK6IrUjQsUwQg6RPuoxH2gyEzshkUCGpsSJ3SirsZOcRkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=jTBc4hu5; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730210320;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=G1jV1/Yzm8C7w0dHBYs7ihPXUdLAMbLSEy37RaAfnIE=;
-	b=jTBc4hu5RKNV1jvvqd4EymrbI7GY9i577w7WmB5QiY/WhQC6fYxcZK4Uo9/WWMMze0Aeag
-	cOQgyIB2NcFx+atXlMfqEcOmVRYBhreVZ1EZpB91i0HlFTFpCDTPKn5eoEAsGBj++5hTJU
-	SSpesqLxSTYQBaDUOVZ5etgUdKHPr44=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-403-CjUejjskOqOW_jIofdewYQ-1; Tue, 29 Oct 2024 09:58:36 -0400
-X-MC-Unique: CjUejjskOqOW_jIofdewYQ-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315ad4938fso39114825e9.0
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 06:58:35 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730210315; x=1730815115;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=G1jV1/Yzm8C7w0dHBYs7ihPXUdLAMbLSEy37RaAfnIE=;
-        b=GCQOWmksyPB8w+egrCitDZ/glEVtAl3K+ahFUlPuLCHWEVTshFprmYIesRj1wiw81S
-         Q4Aq9VZvuh1fGuO1lbryzdhSJJoyIEBkmUiMGNHso/dy2E2xhK249gQ52EuGGERB3QTC
-         QKTXtvn8aLHyWY41pCOy2EZk2yF2pOkmJqkjK96oZu5TRAINGGN+9pw3oHkZqVfpT1RH
-         kGc4zR6HoTOmE1EhxK/LbKcUzd13ALaqXZ+9Jmm9cLRtov7c7p04S0/oEKhpRJbuJ4Ns
-         og3gFOfy1iogzGzqQh/vsBMyLkSpaRSZ/ziflCHuPze6F4kEfNdde8yPkzrF2X6JMaIF
-         knEw==
-X-Forwarded-Encrypted: i=1; AJvYcCUrZaLxX2xsK3q4qptlfKAm4ubtfOIcBhd5rHt8b6b2h2nHK+1uktq8jxgWdttOcWILc5bgLyI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx0MsPd+mab18nyETB33VLniNQwjCjR9C0xwBazIu9TxhjCcH5
-	Vfsgy5tcuA1X5Rapa6iQpo7uiiHSa2KqIN7fjEEgu7FChDTtM6UYZ0VUqOfHUZHoJmhc3HvoCY8
-	fxBK+Uf3TWBPQZ3OLNCimQKKXqUh9PAPI0+FCducTL5m5KCg4e1LdiQ==
-X-Received: by 2002:a05:600c:4fcb:b0:425:7bbf:fd07 with SMTP id 5b1f17b1804b1-4319ac6fb93mr108811445e9.5.1730210314926;
-        Tue, 29 Oct 2024 06:58:34 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGmjNhzuq00pUPaKiJbsibQab44XUqMBzjhRGWk84vFKvwkmvCnitvIW369yK4nhBxXErWTvQ==
-X-Received: by 2002:a05:600c:4fcb:b0:425:7bbf:fd07 with SMTP id 5b1f17b1804b1-4319ac6fb93mr108811095e9.5.1730210314561;
-        Tue, 29 Oct 2024 06:58:34 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4318b567e18sm173445365e9.26.2024.10.29.06.58.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 06:58:34 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 1A9D9164B204; Tue, 29 Oct 2024 14:58:33 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Yunsheng Lin <linyunsheng@huawei.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc: zhangkun09@huawei.com, fanghaiqing@huawei.com, liuyonglong@huawei.com,
- Robin Murphy <robin.murphy@arm.com>, Alexander Duyck
- <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Andrew Morton
- <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org, kernel-team
- <kernel-team@cloudflare.com>
-Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
- has already unbound
-In-Reply-To: <cf1911c5-622f-484c-9ee5-11e1ac83da24@huawei.com>
-References: <20241022032214.3915232-1-linyunsheng@huawei.com>
- <20241022032214.3915232-4-linyunsheng@huawei.com>
- <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
- <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
- <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
- <cf1911c5-622f-484c-9ee5-11e1ac83da24@huawei.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Tue, 29 Oct 2024 14:58:33 +0100
-Message-ID: <878qu7c8om.fsf@toke.dk>
+	s=arc-20240116; t=1730210468; c=relaxed/simple;
+	bh=9ZJTsG8lRG8BvG9jQcA5w06trFne16YwpHIHqY8L2Tk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OuamJYrnFCgan9fxPJtYXr66DNX7aQsKHROiacafVO7mAMhVA9uN2xTKeEVTEaCCa1Fm5vEoNpYhA7oUxEPLDhtbJGvx/bAETy/KpjgQeEcmboU+f5T9nzZ8U8ENWyUwWXEROSsxd4DPnK/C4KQRraLl7SaWOLsaeCsK/Z44Lmw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Bc44QJdV; arc=none smtp.client-ip=192.198.163.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730210466; x=1761746466;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9ZJTsG8lRG8BvG9jQcA5w06trFne16YwpHIHqY8L2Tk=;
+  b=Bc44QJdVe6puaK3Ey7X79Qnlc0j8AOyQE1TNGRl2X/ggCu9AVbfEs8Ex
+   tYcOgtkbfiiEMjzBMfLVLIuvewsMlCO0W4goQ9IuK6QLVlOxQ3o4zZUUU
+   9eN+Jb4MbuSDRUWbZgrffXHWC77XBj7y5LIgALVIYQkfO7UdkGDpdS81k
+   kQYwGHZoeRezxgJHhAuV+lOtcOCn2g1V6xlHXEgf5P3HKWFz2IBa3Pm3K
+   tSR1o3KDlBeH1+zk8rFxE7bTHt7ZBcx6w2ufIeYsNGlHWMNrNHmOzkMJH
+   VNKK7g5CXSxvzhcnz8iXMrhJ6pOI/dLg0TwPktdOMfV8qgWKhoD5p4I7O
+   g==;
+X-CSE-ConnectionGUID: 4wNQgBopRXG5iQQC2Gdzhw==
+X-CSE-MsgGUID: xe95dYvSTW+nGne0KyB1Pw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11240"; a="40434770"
+X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
+   d="scan'208";a="40434770"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 07:01:05 -0700
+X-CSE-ConnectionGUID: 7ljc5z6CTV+p2ixm683YkQ==
+X-CSE-MsgGUID: 3P1/p2zzRWym7OK4v1yRFA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
+   d="scan'208";a="82064223"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 29 Oct 2024 07:01:03 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t5mmL-000djg-1n;
+	Tue, 29 Oct 2024 14:01:01 +0000
+Date: Tue, 29 Oct 2024 22:00:48 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, John Ousterhout <ouster@cs.stanford.edu>
+Subject: Re: [PATCH net-next 12/12] net: homa: create Makefile and Kconfig
+Message-ID: <202410292151.ozZhCbRL-lkp@intel.com>
+References: <20241028213541.1529-13-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028213541.1529-13-ouster@cs.stanford.edu>
 
-Yunsheng Lin <linyunsheng@huawei.com> writes:
+Hi John,
 
->>> I would prefer the waiting too if simple waiting fixed the test cases that
->>> Youglong and Haiqing were reporting and I did not look into the rabbit hole
->>> of possible caching in networking.
->>>
->>> As mentioned in commit log and [1]:
->>> 1. ipv4 packet defragmentation timeout: this seems to cause delay up to 30
->>>    secs, which was reported by Haiqing.
->>> 2. skb_defer_free_flush(): this may cause infinite delay if there is no
->>>    triggering for net_rx_action(), which was reported by Yonglong.
->>>
->>> For case 1, is it really ok to stall the driver unbound up to 30 secs for the
->>> default setting of defragmentation timeout?
->>>
->>> For case 2, it is possible to add timeout for those kind of caching like the
->>> defragmentation timeout too, but as mentioned in [2], it seems to be a normal
->>> thing for this kind of caching in networking:
->> 
->> Both 1 and 2 seem to be cases where the netdev teardown code can just
->> make sure to kick the respective queues and make sure there's nothing
->> outstanding (for (1), walk the defrag cache and clear out anything
->> related to the netdev going away, for (2) make sure to kick
->> net_rx_action() as part of the teardown).
->
-> It would be good to be more specific about the 'kick' here, does it mean
-> taking the lock and doing one of below action for each cache instance?
-> 1. flush all the cache of each cache instance.
-> 2. scan for the page_pool owned page and do the finegrained flushing.
+kernel test robot noticed the following build errors:
 
-Depends on the context. The page pool is attached to a device, so it
-should be possible to walk the skb frags queue and just remove any skbs
-that refer to that netdevice, or something like that.
+[auto build test ERROR on net-next/main]
 
-As for the lack of net_rx_action(), this is related to the deferred
-freeing of skbs, so it seems like just calling skb_defer_free_flush() on
-teardown could be an option.
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20241029-095137
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241028213541.1529-13-ouster%40cs.stanford.edu
+patch subject: [PATCH net-next 12/12] net: homa: create Makefile and Kconfig
+config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20241029/202410292151.ozZhCbRL-lkp@intel.com/config)
+compiler: alpha-linux-gcc (GCC) 13.3.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241029/202410292151.ozZhCbRL-lkp@intel.com/reproduce)
 
->>> "Eric pointed out/predicted there's no guarantee that applications will
->>> read / close their sockets so a page pool page may be stuck in a socket
->>> (but not leaked) forever."
->> 
->> As for this one, I would put that in the "well, let's see if this
->> becomes a problem in practice" bucket.
->
-> As the commit log in [2], it seems it is already happening.
->
-> Those cache are mostly per-cpu and per-socket, and there may be hundreds of
-> CPUs and thousands of sockets in one system, are you really sure we need
-> to take the lock of each cache instance, which may be thousands of them,
-> and do the flushing/scaning of memory used in networking, which may be as
-> large as '24 GiB' mentioned by Jesper?
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410292151.ozZhCbRL-lkp@intel.com/
 
-Well, as above, the two issues you mentioned are per-netns (or possibly
-per-CPU), so those seem to be manageable to do on device teardown if the
-wait is really a problem.
+All errors (new ones prefixed by >>):
 
-But, well, I'm not sure it is? You seem to be taking it as axiomatic
-that the wait in itself is bad. Why? It's just a bit memory being held
-on to while it is still in use, and so what?
+   net/homa/homa_incoming.c: In function 'homa_incoming_sysctl_changed':
+>> net/homa/homa_incoming.c:1078:22: error: 'cpu_khz' undeclared (first use in this function)
+    1078 |         tmp = (tmp * cpu_khz) / 1000;
+         |                      ^~~~~~~
+   net/homa/homa_incoming.c:1078:22: note: each undeclared identifier is reported only once for each function it appears in
+--
+   net/homa/homa_outgoing.c: In function 'homa_outgoing_sysctl_changed':
+>> net/homa/homa_outgoing.c:579:46: error: 'cpu_khz' undeclared (first use in this function)
+     579 |         homa->cycles_per_kbyte = (8 * (__u64)cpu_khz) / homa->link_mbps;
+         |                                              ^~~~~~~
+   net/homa/homa_outgoing.c:579:46: note: each undeclared identifier is reported only once for each function it appears in
+--
+   net/homa/homa_peer.c: In function 'homa_dst_refresh':
+>> net/homa/homa_peer.c:189:48: error: 'cpu_khz' undeclared (first use in this function)
+     189 |                         dead->gc_time = now + (cpu_khz << 7);
+         |                                                ^~~~~~~
+   net/homa/homa_peer.c:189:48: note: each undeclared identifier is reported only once for each function it appears in
+--
+   net/homa/homa_plumbing.c: In function 'homa_softirq':
+>> net/homa/homa_plumbing.c:712:61: error: 'cpu_khz' undeclared (first use in this function)
+     712 |                 int scaled_ms = (int)(10 * (start - last) / cpu_khz);
+         |                                                             ^~~~~~~
+   net/homa/homa_plumbing.c:712:61: note: each undeclared identifier is reported only once for each function it appears in
+--
+   net/homa/homa_utils.c: In function 'homa_spin':
+>> net/homa/homa_utils.c:122:36: error: 'cpu_khz' undeclared (first use in this function)
+     122 |         end = get_cycles() + (ns * cpu_khz) / 1000000;
+         |                                    ^~~~~~~
+   net/homa/homa_utils.c:122:36: note: each undeclared identifier is reported only once for each function it appears in
 
--Toke
 
+vim +/cpu_khz +1078 net/homa/homa_incoming.c
+
+223bab41c36796 John Ousterhout 2024-10-28  1063  
+223bab41c36796 John Ousterhout 2024-10-28  1064  /**
+223bab41c36796 John Ousterhout 2024-10-28  1065   * homa_incoming_sysctl_changed() - Invoked whenever a sysctl value is changed;
+223bab41c36796 John Ousterhout 2024-10-28  1066   * any input-related parameters that depend on sysctl-settable values.
+223bab41c36796 John Ousterhout 2024-10-28  1067   * @homa:    Overall data about the Homa protocol implementation.
+223bab41c36796 John Ousterhout 2024-10-28  1068   */
+223bab41c36796 John Ousterhout 2024-10-28  1069  void homa_incoming_sysctl_changed(struct homa *homa)
+223bab41c36796 John Ousterhout 2024-10-28  1070  {
+223bab41c36796 John Ousterhout 2024-10-28  1071  	__u64 tmp;
+223bab41c36796 John Ousterhout 2024-10-28  1072  
+223bab41c36796 John Ousterhout 2024-10-28  1073  	/* Code below is written carefully to avoid integer underflow or
+223bab41c36796 John Ousterhout 2024-10-28  1074  	 * overflow under expected usage patterns. Be careful when changing!
+223bab41c36796 John Ousterhout 2024-10-28  1075  	 */
+223bab41c36796 John Ousterhout 2024-10-28  1076  
+223bab41c36796 John Ousterhout 2024-10-28  1077  	tmp = homa->busy_usecs;
+223bab41c36796 John Ousterhout 2024-10-28 @1078  	tmp = (tmp * cpu_khz) / 1000;
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
