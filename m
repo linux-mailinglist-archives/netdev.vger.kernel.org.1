@@ -1,108 +1,118 @@
-Return-Path: <netdev+bounces-140067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E615A9B525B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:02:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DF5359B526F
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:10:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 913F41F2400B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:02:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 89ABF1F24037
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:10:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D4E3206E92;
-	Tue, 29 Oct 2024 19:02:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C1E1206E8C;
+	Tue, 29 Oct 2024 19:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="VfIurEp/"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGsqxFfw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05E8320604D
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 19:02:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD961FBF50;
+	Tue, 29 Oct 2024 19:10:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730228543; cv=none; b=AgPabD2wpmtUDfKmQGAtUabKlRdmZmKSjtT6biA03xzkkcxiQzrhpoP58iZZMemaplfs/OWAIyCU1fnUg7SCfBW+WEtG/rq+YpJOUx99Lqaxux7ZPoC0KSHa//87vWNE4LGsqL17ZBG5sa2YUHzCKu20vzLg2IXSo7+C8EJ9aPc=
+	t=1730229030; cv=none; b=qE9uHnHQjuk5charl+JRw0zYVXkfWmxbwA5bvOBaWNMrFn3PrvWsZie0dSZynh6Ny7qmAK2hpHCyHziqDI+1UIAicT/s2yHjrau7N4LZlLb/o0/oUD3tcmdlJHjl1+w0gFD+GHr4DyinEAPyLFsFnH+mzZ7P02Gw1TzMA71NDH0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730228543; c=relaxed/simple;
-	bh=KjlQZ1Gv1yL4gXu1X6hUwgK6fbUlX4cKS6CmWEbCjrs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ADfkXFQRnGtKeh6+14bYMZiJvdMrY3mPnYi8/YZm1+6q6eZ7bLa7XqgFrODlBgSVudDLZMsX/kUHLVJlMyCUQAEbZweSRxlVFek6ZgZiacBgLL7reeYUweWx2f4wTs9vvtczSKaJPfuw65RhOo/GVFfKOqTk7hACPe9GI+Kd6IA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=VfIurEp/; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2fb50e84ec7so43136391fa.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:02:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730228539; x=1730833339; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=KjlQZ1Gv1yL4gXu1X6hUwgK6fbUlX4cKS6CmWEbCjrs=;
-        b=VfIurEp/KD3/rCOMK/p8S5PSlK8lainQvKjjzI+8v+bX2AJfEATWYR9xjHaSTx6XZo
-         fv0o2+BT+a66tDaxuot5XJCdEA2STuNtTbCbFBPJNW1XuzGVYWUfDvk9ePGS/E1wWsL/
-         X9QTjUwJT/yfek7r+VcaCJBkPB0EBl7HTq9UsefyaiIay5t25rQk5KgWCXMQ1fle7NyS
-         z5QqFr0JRVEhSPBZXorE+COJyJRQ5zKru8cK+qjxk4R5IKvNXcP08WmRQb90ia11DWuu
-         a9JjABttiWg6nEpENZXmZUuSSB6SPMzDdcwdoNDQh2XvUqRGrkdjzmsM1w6J+pnYbwDO
-         wcXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730228539; x=1730833339;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=KjlQZ1Gv1yL4gXu1X6hUwgK6fbUlX4cKS6CmWEbCjrs=;
-        b=V0U6pPoH8jrFPY2JJX9ZtR/a6QSLYhfJdhnYWaU+Df/S8/tvgU5253TQuos4eEGKXr
-         DNq34ufYbIjPRdJDk27myYgZFN/O/ubr6kGFUc+RhJySu8WpBTL44X+F7j3N20WNDHN7
-         y8e43/gAEIBprF2YgDVw3aA1DsNRzux87zaJv87IIca6HRuE77VG81aFJTq4DqtHbY0U
-         m1hUm2O+MjTEpbpV2IdDuOgzwEh8+urVy+e5Uf1drVpxZLmpnaKXppuIIFaTP/hp/D0T
-         c+1Msbtin2n45th2aV2sChLj1W6HvWhxJ4XEm00OA/mBatLMjneHGQrbQDCHdx4iAINb
-         SDkg==
-X-Forwarded-Encrypted: i=1; AJvYcCWypavrn4Wpmwq4moRCASPdGb99J3H1fHMffhE9sg1qYuv/wj8qWs1e48pcJdBc7cBrAA7+Vzg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyq3nZmPeN7s9KTlBcOS9tysozL8Y4qFYzbhlnSLKUb/BHPt9eS
-	3RaooxOR0iDrbQ7fTn9fhSb/6hb+tYsMiWi44KNcjSf2pCwszQGEebgZQ/qgNh/SXw9Ct3nUZls
-	9vUGoYktYUa04JT1y8kdUFW4PbboE7dmUfvKG
-X-Google-Smtp-Source: AGHT+IGlQKynFIg/6AkltXaZedQLOizW/ZHUaW4WVMStWQrf/UL6qsSkWEP1jKmIeAetbQS4AUGF+zYaT9Jbv5qPkEE=
-X-Received: by 2002:a2e:811:0:b0:2fa:bb65:801f with SMTP id
- 38308e7fff4ca-2fcbdf76eaemr49678631fa.10.1730228537367; Tue, 29 Oct 2024
- 12:02:17 -0700 (PDT)
+	s=arc-20240116; t=1730229030; c=relaxed/simple;
+	bh=HFiLuGlngAfz+xf8i/WvPUJKfDvtzPbIjebkk6c4+Hc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uD/qVI0FQN9PaXKULVbVV2+89tqj1xTZG9VrbWlkIC/Q8uPuTdveG16pgoS/pcXDqD7YQE8DQsFEGTRnP229TN7yrg1sgzteYLi5oXZk5MX+F2OB/598Emdtb3R1RrfUceYprDB+O7zvFfnmaDgfFk+4EtXAOZeBfZg4YGSrIEQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGsqxFfw; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8EA14C4CECD;
+	Tue, 29 Oct 2024 19:10:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730229030;
+	bh=HFiLuGlngAfz+xf8i/WvPUJKfDvtzPbIjebkk6c4+Hc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gGsqxFfwL1x5C8hV42EFGSrG9tP9C4I0MnqdKQhhPe5RE1ZK25Y+voaXvECNt3Orf
+	 aKx/EBosNl6MBzcg3kMCbQM0IdxKEZmL2I/PdH68D+ICAPWuoGpw2ns06v/Rmdf/rR
+	 O0Q5UBu2KwZLvDNIGF/okDZsZlwMz7FnQC8+dASVOeQL7WzKKQ11ATerUxYh1VTdC/
+	 vecdWVTHukOX50AMJtLpmDOPAPz6Fp+dqIy/Arv044NGvNsvqDl1vyP4EBuaEyx2aW
+	 OIJ05gT3u33J7mu8DoVbwYozhZkTm16l4xOhQ1oofv81OLaD2CrlBEEaymLlLokLu0
+	 9PG1ueZgrETSg==
+Date: Tue, 29 Oct 2024 12:10:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stefan Wahren <wahrenst@gmx.net>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org
+Subject: Re: [PATCH net] net: vertexcom: mse102x: Fix possible double free
+ of TX skb
+Message-ID: <20241029121028.127f89b3@kernel.org>
+In-Reply-To: <20241022155242.33729-1-wahrenst@gmx.net>
+References: <20241022155242.33729-1-wahrenst@gmx.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029182703.2698171-1-csander@purestorage.com>
-In-Reply-To: <20241029182703.2698171-1-csander@purestorage.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 29 Oct 2024 20:02:03 +0100
-Message-ID: <CANn89iLx-4dTB9fFgfrsXQ8oA0Z+TpBWNk4b91PPS1o=oypuBQ@mail.gmail.com>
-Subject: Re: [PATCH] net: skip RPS if packet is already on target CPU
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 29, 2024 at 7:27=E2=80=AFPM Caleb Sander Mateos
-<csander@purestorage.com> wrote:
->
-> If RPS is enabled, all packets with a CPU flow hint are enqueued to the
-> target CPU's input_pkt_queue and process_backlog() is scheduled on that
-> CPU to dequeue and process the packets. If ARFS has already steered the
-> packets to the correct CPU, this additional queuing is unnecessary and
-> the spinlocks involved incur significant CPU overhead.
->
-> In netif_receive_skb_internal() and netif_receive_skb_list_internal(),
-> check if the CPU flow hint get_rps_cpu() returns is the current CPU. If
-> so, bypass input_pkt_queue and immediately process the packet(s) on the
-> current CPU.
->
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+On Tue, 22 Oct 2024 17:52:42 +0200 Stefan Wahren wrote:
+> -static int mse102x_tx_frame_spi(struct mse102x_net *mse, struct sk_buff *txp,
+> +static int mse102x_tx_frame_spi(struct mse102x_net *mse, struct sk_buff **txp,
+>  				unsigned int pad)
+>  {
+>  	struct mse102x_net_spi *mses = to_mse102x_spi(mse);
+> @@ -226,29 +226,29 @@ static int mse102x_tx_frame_spi(struct mse102x_net *mse, struct sk_buff *txp,
+>  	int ret;
+> 
+>  	netif_dbg(mse, tx_queued, mse->ndev, "%s: skb %p, %d@%p\n",
+> -		  __func__, txp, txp->len, txp->data);
+> +		  __func__, *txp, (*txp)->len, (*txp)->data);
+> 
+> -	if ((skb_headroom(txp) < DET_SOF_LEN) ||
+> -	    (skb_tailroom(txp) < DET_DFT_LEN + pad)) {
+> -		tskb = skb_copy_expand(txp, DET_SOF_LEN, DET_DFT_LEN + pad,
+> +	if ((skb_headroom(*txp) < DET_SOF_LEN) ||
+> +	    (skb_tailroom(*txp) < DET_DFT_LEN + pad)) {
+> +		tskb = skb_copy_expand(*txp, DET_SOF_LEN, DET_DFT_LEN + pad,
+>  				       GFP_KERNEL);
+>  		if (!tskb)
+>  			return -ENOMEM;
+> 
+> -		dev_kfree_skb(txp);
+> -		txp = tskb;
+> +		dev_kfree_skb(*txp);
+> +		*txp = tskb;
+>  	}
+> 
+> -	mse102x_push_header(txp);
+> +	mse102x_push_header(*txp);
+> 
+>  	if (pad)
+> -		skb_put_zero(txp, pad);
+> +		skb_put_zero(*txp, pad);
+> 
+> -	mse102x_put_footer(txp);
+> +	mse102x_put_footer(*txp);
+> 
+> -	xfer->tx_buf = txp->data;
+> +	xfer->tx_buf = (*txp)->data;
+>  	xfer->rx_buf = NULL;
+> -	xfer->len = txp->len;
+> +	xfer->len = (*txp)->len;
+> 
+>  	ret = spi_sync(mses->spidev, msg);
+>  	if (ret < 0) {
+> @@ -368,7 +368,7 @@ static void mse102x_rx_pkt_spi(struct mse102x_net *mse)
+>  	mse->ndev->stats.rx_bytes += rxlen;
 
-Current implementation was a conscious choice. This has been discussed
-several times.
-
-By processing packets inline, you are actually increasing latencies of
-packets queued to other cpus.
+Isn't it easier to change this function to free the copy rather than
+the original? That way the original will remain valid for the callers.
 
