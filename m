@@ -1,158 +1,87 @@
-Return-Path: <netdev+bounces-139734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42ECD9B3EC0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:57:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0BA149B3ED5
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 01:06:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02DD8283A8A
-	for <lists+netdev@lfdr.de>; Mon, 28 Oct 2024 23:57:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A5E4CB221FA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 00:06:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529DD1FAC27;
-	Mon, 28 Oct 2024 23:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88ADC624;
+	Tue, 29 Oct 2024 00:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mrV0EHnS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 107001F9ED4
-	for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 23:57:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6481D621
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 00:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730159844; cv=none; b=AiPlbwh8QabuiVuc0QqAhAkPwht7n3xdqaymhN6VmPkBE1L1Z4N63ZriE0ev6cI+P0lT0ETabsEVV/JKm0l6WL6njSw6iul4vG+k0nyPTm+5MrabA96suyuXiKbvrOxozwYsJVuMPlDR1Jz27rkWjeOt83kKpDnOjpcU5GgEha0=
+	t=1730160409; cv=none; b=dP+P6nZJ9yvfglJa06xSWVx6lg7TG4/wGFApLk7ZolqLSXxPxC/StzThPAdrS/sGRT9nKT7hovpy9rNMPsHSpfUDvI1CGu7DdowI0OLAIhjMNFt1tAyJItlJ7CIwBJnZXT5grsv4aWSI/oS0Lr5Ko6KjzEjRj55IovYWzF6tboc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730159844; c=relaxed/simple;
-	bh=JSAgChZeD4Eb9IozTJE80b3eyOBu7xOBALYknD+8rkQ=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=c0TW+OzsqT9vjEsHL57o/lwxyL8IvfCKvi9gVdWAFtd9RmFokGd5uE8dMDR6/eFbpCjnTObCuKIaWZo3QoAWKlnv1HfrNpQc7YdmgN9/Rk3q6TMHsun6plGMIee5A7WNpK3KgckuKPAT4O6TtoJCptPj6FmhPV9cI7pcofNCy5A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a4f113d2c8so22810235ab.1
-        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 16:57:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730159841; x=1730764641;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xnvBNJ94FOi5B5HFHo9/CsJQbRxCRr0sZ6M9tNoPcrI=;
-        b=XH7NAD1IXwlYgg22DnBCrr6NL+IYyFH9IBKqCuQGAwfPa92d/BG1MkZru8qcP4txVv
-         DcrvSsY6FESR48MxVpYGqZ7tHjXGSncDwlvswSmdqFfx3rNWhXGU5G9SGXtRKUcGcCsX
-         n4op7HytEX5zAI6an5qgvpUbPIKCl1LoVbAxc24PHS2V1VC6vgt1oH/S8lapf7tza16w
-         nP4hszL3CaZQuBNzD6tUpG/DWZGgYdtvSnnDXht+Ha0L8zTXZxzAschjUlro0NqtIOmY
-         gvhFxzY7GfnzaybmRZd8y5sENZUk5rcJsUX6zvN07gIreEOJm2q58RM8l3t+NN14g+BM
-         XdwA==
-X-Forwarded-Encrypted: i=1; AJvYcCUBPyx/gylNYvee/mg16TeMNwagmLX33rYhz6PQjL6EKrnuAlaQl2PSlFpglztfKZok4tKtJr4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxa+Ll18yTi1FCw4MJ0IA28/gFkZVI5Zc6bm8jQyeEYrJ6gDguC
-	ZW1KJt/qwqy2abQuGDrnJa2F9bowIUNKo6uJpZE3MHEKeEgUwUpcIHs6WCCK+LLSbeNgV51Mf23
-	QB2zeP/adFOXCv9+SizovKQII9ieFRUn8WOiMPIBh+thxTOy0wn1ru88=
-X-Google-Smtp-Source: AGHT+IHmbQm1FfjPhMFLh6Itg5JiirSNsMI9Ut/PpvACE/Gl5hXO1q/6lII1qUk3DDqmozVtfdIrtSYETil57NqA6wgVi++H3FyL
+	s=arc-20240116; t=1730160409; c=relaxed/simple;
+	bh=whapr0AT47w17oHuLDGhDO4PwQbQXaDJ01PJ7w8zslA=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Qn0Qyo0dTSzqfiwEwTthyNmRKTKq+lTNwatR+Pc0549kbAIdIn8hN6zE0dG1KemfQFvO2IpkF9CJJGWXIi6vrG55p99c29yQZS8+vkKgdXF8bIcBrgnbrAP4btUOxRnH2+6G3dOvfuIBF/WYfNvV/0qAfAvN2CC+B4ByXCkN9xE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mrV0EHnS; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D5EDC4CEC3;
+	Tue, 29 Oct 2024 00:06:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730160408;
+	bh=whapr0AT47w17oHuLDGhDO4PwQbQXaDJ01PJ7w8zslA=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mrV0EHnSIYwLU5JyCeO1wQ6T7Saej3xWHwdYU8I02s1s5rtz/C6+Q8GE4mctfIfSd
+	 aUwbSpFmJi4GwKH7ChycNmVboVp1ErB2HB01Fskfs8VjFOYjpDmBYsaJKFegleY2J1
+	 fOYN0l7DI9JDJJroJvi9Vv1XU4foBJd6IXqw3vxwh8PWwCDafug4pThKnWBe518NmK
+	 wIRnhjfs8rghRZWpgnaWioh856mu6kyGgytCuOr+NpaXYWTImwtGXjdutC6JtVae0q
+	 Rxujhdhl9zXwDz6zva24VOIky4CKOCCCefvCFSHLbf8CLh9FFDCDHEI58NCAgZJlt5
+	 iL4NA7oeOBeFg==
+Date: Mon, 28 Oct 2024 17:06:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: David Ahern <dsahern@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Joe
+ Damato <jdamato@fastly.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>
+Subject: Re: yaml gen NL families support in iproute2?
+Message-ID: <20241028170647.65357d64@kernel.org>
+In-Reply-To: <20241028164055.3059fad4@hermes.local>
+References: <ce719001-3b87-4556-938d-17b4271e1530@redhat.com>
+	<61184cdf-6afc-4b9b-a3d2-b5f8478e3cbb@kernel.org>
+	<ZxbAdVsf5UxbZ6Jp@LQ3V64L9R2>
+	<42743fe6-476a-4b88-b6f4-930d048472f9@redhat.com>
+	<20241028135852.2f224820@kernel.org>
+	<845f8156-e7f5-483f-9e07-439808bde7a2@kernel.org>
+	<20241028151534.1ef5cbb5@kernel.org>
+	<20241028164055.3059fad4@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1528:b0:3a2:7651:9846 with SMTP id
- e9e14a558f8ab-3a4ed295a05mr89773055ab.13.1730159841172; Mon, 28 Oct 2024
- 16:57:21 -0700 (PDT)
-Date: Mon, 28 Oct 2024 16:57:21 -0700
-In-Reply-To: <00000000000044832c06209859bd@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672024e1.050a0220.11b624.04b7.GAE@google.com>
-Subject: Re: [syzbot] [sctp?] KMSAN: uninit-value in sctp_sf_ootb
-From: syzbot <syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-sctp@vger.kernel.org, 
-	lucien.xin@gmail.com, marcelo.leitner@gmail.com, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-syzbot has found a reproducer for the following issue on:
+On Mon, 28 Oct 2024 16:40:55 -0700 Stephen Hemminger wrote:
+> > I can only find this thread now:
+> > https://lore.kernel.org/all/20240302193607.36d7a015@kernel.org/
+> > Could be a misunderstanding, but either way, documenting an existing
+> > tool seems like strictly less work than recreating it from scratch.  
+> 
+> Is the toolset willing to maintain the backward compatibility guarantees
+> that iproute2 has now? Bpf support was an example of how not to do it.
 
-HEAD commit:    819837584309 Linux 6.12-rc5
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1211e940580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4d4311df74eee96f
-dashboard link: https://syzkaller.appspot.com/bug?extid=f0cbb34d39392f2746ca
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11eb3230580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=11f36ca7980000
+The specs are UAPI.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/dfa054090a8f/disk-81983758.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/54edfdbd151e/vmlinux-81983758.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d63a317b80f9/bzImage-81983758.xz
+The Python and CLI tooling are a very thin layer of code basically
+converting between JSON and netlink using the specs, so by virtue 
+of specs being UAPI they should be fully backward compatible.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com
-
-syz-executor341 uses obsolete (PF_INET,SOCK_PACKET)
-=====================================================
-BUG: KMSAN: uninit-value in sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
- sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
- sctp_do_sm+0x181/0x93d0 net/sctp/sm_sideeffect.c:1166
- sctp_endpoint_bh_rcv+0xc38/0xf90 net/sctp/endpointola.c:407
- sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
- sctp_rcv+0x3831/0x3b20 net/sctp/input.c:243
- sctp4_rcv+0x42/0x50 net/sctp/protocol.c:1159
- ip_protocol_deliver_rcu+0xb51/0x13d0 net/ipv4/ip_input.c:205
- ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_local_deliver+0x21f/0x490 net/ipv4/ip_input.c:254
- dst_input include/net/dst.h:460 [inline]
- ip_rcv_finish+0x4a2/0x520 net/ipv4/ip_input.c:449
- NF_HOOK include/linux/netfilter.h:314 [inline]
- ip_rcv+0xcd/0x380 net/ipv4/ip_input.c:569
- __netif_receive_skb_one_core net/core/dev.c:5666 [inline]
- __netif_receive_skb+0x319/0xa00 net/core/dev.c:5779
- netif_receive_skb_internal net/core/dev.c:5865 [inline]
- netif_receive_skb+0x58/0x660 net/core/dev.c:5924
- tun_rx_batched+0x3ee/0x980 drivers/net/tun.c:1550
- tun_get_user+0x5783/0x6c60 drivers/net/tun.c:2007
- tun_chr_write_iter+0x3ac/0x5d0 drivers/net/tun.c:2053
- new_sync_write fs/read_write.c:590 [inline]
- vfs_write+0xb2b/0x1540 fs/read_write.c:683
- ksys_write+0x24f/0x4c0 fs/read_write.c:736
- __do_sys_write fs/read_write.c:748 [inline]
- __se_sys_write fs/read_write.c:745 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:745
- x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-Uninit was created at:
- slab_post_alloc_hook mm/slub.c:4091 [inline]
- slab_alloc_node mm/slub.c:4134 [inline]
- kmem_cache_alloc_node_noprof+0x6bf/0xb80 mm/slub.c:4186
- kmalloc_reserve+0x13d/0x4a0 net/core/skbuff.c:587
- __alloc_skb+0x363/0x7b0 net/core/skbuff.c:678
- alloc_skb include/linux/skbuff.h:1322 [inline]
- alloc_skb_with_frags+0xc8/0xd00 net/core/skbuff.c:6612
- sock_alloc_send_pskb+0xa81/0xbf0 net/core/sock.c:2883
- tun_alloc_skb drivers/net/tun.c:1526 [inline]
- tun_get_user+0x20f4/0x6c60 drivers/net/tun.c:1851
- tun_chr_write_iter+0x3ac/0x5d0 drivers/net/tun.c:2053
- new_sync_write fs/read_write.c:590 [inline]
- vfs_write+0xb2b/0x1540 fs/read_write.c:683
- ksys_write+0x24f/0x4c0 fs/read_write.c:736
- __do_sys_write fs/read_write.c:748 [inline]
- __se_sys_write fs/read_write.c:745 [inline]
- __x64_sys_write+0x93/0xe0 fs/read_write.c:745
- x64_sys_call+0x306a/0x3ba0 arch/x86/include/generated/asm/syscalls_64.h:2
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xcd/0x1e0 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-CPU: 0 UID: 0 PID: 5818 Comm: syz-executor341 Not tainted 6.12.0-rc5-syzkaller #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-=====================================================
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+The C library is intended to be fully backward compatible, but right
+now only supports static linking.
 
