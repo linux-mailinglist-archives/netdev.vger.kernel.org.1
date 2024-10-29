@@ -1,388 +1,163 @@
-Return-Path: <netdev+bounces-139962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B94B69B4CEB
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:05:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4301C9B4CFA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:06:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1FCE1C2260F
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:05:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 075892842AD
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:06:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D6D11925AE;
-	Tue, 29 Oct 2024 15:05:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7DD518FC8F;
+	Tue, 29 Oct 2024 15:06:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uNJacqaX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FvXhbC4z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF4D191F98;
-	Tue, 29 Oct 2024 15:05:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5A6A19306F;
+	Tue, 29 Oct 2024 15:06:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730214342; cv=none; b=q74bjALQEOjL/vE8w6XdzxSk3HWBRtYlbRWMx8a2NRs+ZoxiMQkWBpUE25c5tHJoul3Bgl1zzga2d9RdMIxDKvwiq2ulxgaFuIrNA8uhL1rL1A1RLLKLzqkpj/UKDtzSyuVjGIsMPCp89+AyBhEZUG3kk8aleITl+noLzRyl+bk=
+	t=1730214376; cv=none; b=k5EHopTA2CYFewf5I8I0HrVrccDq/SSSpyhyigPe1Q7DzR3jqG6M7IMB52aqA+uDHEW2+q7cDfi/l4x+hHw8mMFFBMuis9YXUPbkhu6CX4wOedBrNE4Hbt5X6CaKBrc66SsM7YphXDw7X23i5Lp3HGQ2qgeLMaGVRgiT2J4RCZ8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730214342; c=relaxed/simple;
-	bh=JMfPmRSJ24sW8RtpCOVTfks3gqkTlZ3rN5ZS3NtVCbc=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=g+Nyxq1qV43SsRgdxj1GvflUcbqz/gJw+h4jkvVSZKmoYQt6ozTeSZ+S6swA00AtbdCNVLbWIEVHKD7NUZdnhs6K7hbZnJHfr7Ew3UT9wO8Mx/sSwHw3rGUQhbzlUrERlMN9u5Kx5t+FOM9MO2Q7+PrpQ13nGY1SvR5PYAlEuFc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uNJacqaX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F7B5C4CECD;
-	Tue, 29 Oct 2024 15:05:35 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730214339;
-	bh=JMfPmRSJ24sW8RtpCOVTfks3gqkTlZ3rN5ZS3NtVCbc=;
-	h=From:Date:Subject:To:Cc:From;
-	b=uNJacqaXXEAxrcQMF7VJtmKRLi/wvzyKPJxCUmKqQyfCTW4dYgf1JYYihjcZF7OMH
-	 yqq+/Cv6ZUBm0EkQJJQR6kE7YuSCjwIbzRmQ2jAkVii9cmZqDY0NRrCgjuFR1I8tXv
-	 3mjY8Ty+I7qNRHhCX/SQQbuPH9EES9vQGerQ0Zp07LuakYG93ZxqacKEJF/ifub4VH
-	 +sixq3H6ttL3BvhYEZrWxnRdI1yiehl0pQHIu8kAYiU+4DK/iTuO8m5qvLSIjl6+V2
-	 ftTBGOj3JuPiXR3IhSbqXzfdel/lYsOcDnjGl0OmqxGEkIANtwRchl53IeMcB+wdhU
-	 /8I9QBJ5Zb1zQ==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Tue, 29 Oct 2024 17:05:29 +0200
-Subject: [PATCH net] net: ethernet: ti: am65-cpsw: Fix multi queue Rx on J7
+	s=arc-20240116; t=1730214376; c=relaxed/simple;
+	bh=OtqMbGEK7ANuRQtRM2dsZgPAopTCBrySCzVv68vLxQI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fnGE9fNQJImvus2VQGSVez2xqpTp/yEssZPS81m9yT09hRRxSYuyTLkONvEHo7pNT/THXqW1K2zr3VMQ0zw10VMqZlC3pLA7C7SDGnreX3AdJXsOYtjFEfKY4ILvj+spEAPsWPHIEVoTTukXnF3jAQwWSo2JmS8bNMG516Cpdu8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FvXhbC4z; arc=none smtp.client-ip=209.85.166.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a3b7d95a11so18749505ab.2;
+        Tue, 29 Oct 2024 08:06:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730214373; x=1730819173; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=oFKhKFT9IwpEW5k50b87P0zH8/cUwcz2zc0dijus744=;
+        b=FvXhbC4zvVizxPMP5DIzyuvZ9WXQ5WGZqzdMxfp2sTIh4N1stbq+WQHGdb2eLuwucw
+         4ObjWZtBXwBsy7HmHWBqqSovr9dO/XK1PvwvPq82IM4/o5fKpAcUAW8nDCXsHn1X3SC/
+         dN5kl8W/LwJXtoKAAmwQnNGM+nb6cYBs+Azo9YEtqORc2ONCuiS/OJm1xfcFeVzNTA8d
+         sdMPdLlzsoSnddlp3duDJ+gV5+rIQFuhHk+LlKfsC7rCiXQczwPoxjzzghVZtqYX0hFQ
+         SqS4xROdK90I9gadrB51owvHxgJdD8WUpc6v8kkL7LRXdncpZ0dEMcQ2vxhEvbZF/Qq6
+         MwnA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730214373; x=1730819173;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=oFKhKFT9IwpEW5k50b87P0zH8/cUwcz2zc0dijus744=;
+        b=tIXYUZwJ2muIv59YsFhpVXAS3bKGILX7tWMeZcHgt+h9I7kOYhzbmlyPPFKYRhXX3T
+         /Xn+Kx+m2Cg2bwc63DDXQau8FLp8vfe7W6tWARqTzRkxzKlKq1MxBnXu9ojZxS0qc70e
+         D2ppL/7uuCkORfGZdbVcb5XMfQFAHfEFoezMADIps/IR3+SWwii6AgJ60tuzZ2oXFJ37
+         1kcI+ygWwDuxzjoEFq+OYpGwPZNzlrNkWcUHBoYbmPvJSg6UcWJbM+sFK4WXfxUXcIA3
+         SYhYjFjaDED0XYsdMQRNX3MQb8V7pvN/HEZlSN0XhVB8rMYuThbibf4/Oi7heyUWuSH7
+         blRQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUNWBr1J2yPPvQ9LtqkKhZnzTh1YsuJGPrmS8UhQh0ENn7ZJV748lDCaeqHhZVQuqbbgEM8oTk0qj/a@vger.kernel.org, AJvYcCX+3vkKkt3p7lJC59VFs7J81ZtdRzYST2bLVW5UF8sKP0JOKpjFyHj/VJaqDl2tWc/GW+YEfGq2@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWdnne9Ls5XH5vQPqZeu5KirxFc8wGYThpaWNz6yWOQ9DMqleo
+	v6YfLcY741f1iVD/AZ3mX6+E35a5k+s65XI3YwPrxdCjRo9qRa8Is8xpZAHRwcPWacmsnKFy0Gn
+	XuZR4X+amFx0mc+f0sdlTElw56ijGJILT
+X-Google-Smtp-Source: AGHT+IEtId3Xh1qbzSGoLnduAkX75TeiPCnwGNjI4NvMq/8AWkTjxBY8ZrNKLjXdnNfJebWMgA5p3bsI/GlSN+wT2ws=
+X-Received: by 2002:a05:6e02:188c:b0:39b:330b:bb25 with SMTP id
+ e9e14a558f8ab-3a4ed2944dbmr114901065ab.12.1730214372590; Tue, 29 Oct 2024
+ 08:06:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241029-am65-cpsw-multi-rx-j7-fix-v1-1-426ca805918c@kernel.org>
-X-B4-Tracking: v=1; b=H4sIALj5IGcC/x2MWw5AMBAAryL7bROtV7iK+ChdrFDS1iMRd9f4n
- ElmHnBkmRzU0QOWTna8mQAijqCflBkJWQcGmchMJDJFtRY59ru7cD0Wz2hvnEsc+MahUlJkVUe
- F1hD63VLQ/7sBQx7a9/0AvZ+FbXAAAAA=
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>, 
- Vignesh Raghavendra <vigneshr@ti.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Govindarajan Sriramakrishnan <srk@ti.com>, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=11058; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=JMfPmRSJ24sW8RtpCOVTfks3gqkTlZ3rN5ZS3NtVCbc=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnIPm8ugTRHW57eTVp39CdfAeZEvvPwQ1sv2Gho
- GX1afq4VbKJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZyD5vAAKCRDSWmvTvnYw
- k8hREACUmXMarqcGkiHe9l5vAryK9zCrOHRxfUNR/umzK9usmvh8scSVcvtWFC/Wl9KoyVq3l+E
- CGTcW8ZqGYCDUnigrulLHQfN8fpau9kw4g7IQJn4Tn3KI4JoC+mLD01W8rrtFuV/6vAT39BrCfu
- eEaipJ0rBf+qQOz/sfpF+Wnuy50jgmIhu/H645TZU4LNUyUPzeaS1I7U62bft+0ShDza4djFLxj
- 4S7EMVqsI+DVDXty4kA+n6BzxY36rLXjhC+hNzRf2OXq/4gSI151l9huvWV1dCYM4lTXYlEBYUn
- 3Gw+HTr/pIRNjdNr/pj0kohnWalFyGNjAMjif1QPxF4RPm79vFyKnXQyj4rYP6oPDgqKIoexaq8
- Yo3g8T3K2KCvXDTSBoa2LhaFRjG8OxPcD0X7Wx90ZINtAtY/OfIs6/NLbDn9OSvcoHV0RAYcNS2
- smm/CNOU2sj1WOqlmKqhWoXUAoCGKpScaKCFWNaYJirY0nH40F8gFz0UKdLjcPEBlSvhBmPVtiL
- eVJC56+rqRIG3Qcw8CnvurHXR0IpDF4VcLRj8TQlBnIsUAUnW3jwYq1zVBVe39GM1pymkRzoA94
- BW6j9hfTTL0fmC36uyrHut0dgqipFEG5oyuWuCIRS3OBbhdPKrhAwL8AmFHue+i44y6Xorx81uk
- hU4+wpGLib8FJGw==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+References: <20241028124845.3866469-1-gnaaman@drivenets.com>
+In-Reply-To: <20241028124845.3866469-1-gnaaman@drivenets.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Tue, 29 Oct 2024 11:06:00 -0400
+Message-ID: <CADvbK_c5jNywSZOwSb-qcfxoNwauG1vkQFg6a8h4QOq50Q9uSQ@mail.gmail.com>
+Subject: Re: Solving address deletion bottleneck in SCTP
+To: Gilad Naaman <gnaaman@drivenets.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, linux-sctp@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On J7 platforms, setting up multiple RX flows was failing
-as the RX free descriptor ring 0 is shared among all flows
-and we did not allocate enough elements in the RX free descriptor
-ring 0 to accommodate for all RX flows.
+On Mon, Oct 28, 2024 at 8:49=E2=80=AFAM Gilad Naaman <gnaaman@drivenets.com=
+> wrote:
+>
+> Hello,
+>
+> We've noticed that when a namespace has a large amount of IP addresses,
+> the list `net->sctp.local_addr_list` gets obscenely long.
+>
+> This list contains both IPv4 and IPv6 addresses, of all scopes, and it is
+> a single long list, instead of a hashtable.
+>
+> In our case we had 12K interfaces, each with an IPv4 and 2 IPv6 addresses
+> (GUA+LLA), which made deletion of a single address pretty expensive, sinc=
+e
+> it requires a linear search through 36K addresses.
+>
+> Internally we solved it pretty naively by turning the list into hashmap, =
+which
+> helped us avoid this bottleneck:
+>
+>     + #define SCTP_ADDR_HSIZE_SHIFT     8
+>     + #define SCTP_ADDR_HSIZE           (1 << SCTP_ADDR_HSIZE_SHIFT)
+>
+>     -   struct list_head local_addr_list;
+>     +   struct list_head local_addr_list[SCTP_ADDR_HSIZE];
+>
+>
+> I've used the same factor used by the IPv6 & IPv4 address tables.
+>
+> I am not entirely sure this patch solves a big enough problem for the gre=
+ater
+> general kernel community to warrant the increased memory usage (~2KiB-p-n=
+etns),
+> so I'll avoid sending it.
+>
+> Recently, though, both IPv4 and IPv6 tables were namespacified, which mak=
+es
+> me think that maybe local_addr_list is no longer necessary, enabling us t=
+o
+> them directly instead of maintaining a separate list.
+>
+> As far as I could tell, the only field of `struct sctp_sockaddr_entry` th=
+at
+> are used for items of this list, aside from the address itself, is the `v=
+alid`
+> bit, which can probably be folded into `struct in_ifaddr` and `struct ine=
+t6_ifaddr`.
+>
+> What I'm suggesting, in short is:
+>  - Represent `valid` inside the original address structs.
+>  - Replace iteration of `local_addr_list` with iteration of ns addr table=
+s
+>  - Eliminate `local_addr_list`
+>
+> Is this a reasonable proposal?
+This would simplify sctp_inet6addr_event() and sctp_inetaddr_event(),
+but complicate sctp_copy_laddrs() and sctp_copy_local_addr_list().
 
-This issue is not present on AM62 as separate pair of
-rings are used for free and completion rings for each flow.
+Would you like to create a patch for this and let's see how it looks?
 
-Fix this by allocating enough elements for RX free descriptor
-ring 0.
+Note I don't think that that 'valid' bit is useful:
 
-However, we can no longer rely on desc_idx (descriptor based
-offsets) to identify the pages in the respective flows as
-free descriptor ring includes elements for all flows.
-To solve this, introduce a new swdata data structure to store
-flow_id and page. This can be used to identify which flow (page_pool)
-and page the descriptor belonged to when popped out of the
-RX rings.
+               if (addr->a.sa.sa_family =3D=3D AF_INET &&
+                               addr->a.v4.sin_addr.s_addr =3D=3D
+                               ifa->ifa_local) {
+                       sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DEL);
+                       found =3D 1;
+                                      <-------- [1]
+                       addr->valid =3D 0;
+                       list_del_rcu(&addr->list);
+                       break;
+               }
 
-Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 73 +++++++++++++++-----------------
- drivers/net/ethernet/ti/am65-cpsw-nuss.h |  6 ++-
- 2 files changed, 38 insertions(+), 41 deletions(-)
+'addr' can be copied before "addr->valid =3D 0;" with addr->valid =3D1 in
+another thread anyway. I think you can ignore this 'valid' bit.
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 0520e9f4bea7..4c46574e111c 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -339,7 +339,7 @@ static int am65_cpsw_nuss_rx_push(struct am65_cpsw_common *common,
- 	struct device *dev = common->dev;
- 	dma_addr_t desc_dma;
- 	dma_addr_t buf_dma;
--	void *swdata;
-+	struct am65_cpsw_swdata *swdata;
- 
- 	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
- 	if (!desc_rx) {
-@@ -363,7 +363,8 @@ static int am65_cpsw_nuss_rx_push(struct am65_cpsw_common *common,
- 	cppi5_hdesc_attach_buf(desc_rx, buf_dma, AM65_CPSW_MAX_PACKET_SIZE,
- 			       buf_dma, AM65_CPSW_MAX_PACKET_SIZE);
- 	swdata = cppi5_hdesc_get_swdata(desc_rx);
--	*((void **)swdata) = page_address(page);
-+	swdata->page = page;
-+	swdata->flow_id = flow_idx;
- 
- 	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, flow_idx,
- 					desc_rx, desc_dma);
-@@ -519,36 +520,31 @@ static enum am65_cpsw_tx_buf_type am65_cpsw_nuss_buf_type(struct am65_cpsw_tx_ch
- 
- static inline void am65_cpsw_put_page(struct am65_cpsw_rx_flow *flow,
- 				      struct page *page,
--				      bool allow_direct,
--				      int desc_idx)
-+				      bool allow_direct)
- {
- 	page_pool_put_full_page(flow->page_pool, page, allow_direct);
--	flow->pages[desc_idx] = NULL;
- }
- 
- static void am65_cpsw_nuss_rx_cleanup(void *data, dma_addr_t desc_dma)
- {
--	struct am65_cpsw_rx_flow *flow = data;
-+	struct am65_cpsw_rx_chn *rx_chn = data;
- 	struct cppi5_host_desc_t *desc_rx;
--	struct am65_cpsw_rx_chn *rx_chn;
-+	struct am65_cpsw_swdata *swdata;
- 	dma_addr_t buf_dma;
- 	u32 buf_dma_len;
--	void *page_addr;
--	void **swdata;
--	int desc_idx;
-+	struct page *page;
-+	u32 flow_id;
- 
--	rx_chn = &flow->common->rx_chns;
- 	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
- 	swdata = cppi5_hdesc_get_swdata(desc_rx);
--	page_addr = *swdata;
-+	page = swdata->page;
-+	flow_id = swdata->flow_id;
- 	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
- 	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
- 	dma_unmap_single(rx_chn->dma_dev, buf_dma, buf_dma_len, DMA_FROM_DEVICE);
- 	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
- 
--	desc_idx = am65_cpsw_nuss_desc_idx(rx_chn->desc_pool, desc_rx,
--					   rx_chn->dsize_log2);
--	am65_cpsw_put_page(flow, virt_to_page(page_addr), false, desc_idx);
-+	am65_cpsw_put_page(&rx_chn->flows[flow_id], page, false);
- }
- 
- static void am65_cpsw_nuss_xmit_free(struct am65_cpsw_tx_chn *tx_chn,
-@@ -703,14 +699,13 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 				ret = -ENOMEM;
- 				goto fail_rx;
- 			}
--			flow->pages[i] = page;
- 
- 			ret = am65_cpsw_nuss_rx_push(common, page, flow_idx);
- 			if (ret < 0) {
- 				dev_err(common->dev,
- 					"cannot submit page to rx channel flow %d, error %d\n",
- 					flow_idx, ret);
--				am65_cpsw_put_page(flow, page, false, i);
-+				am65_cpsw_put_page(flow, page, false);
- 				goto fail_rx;
- 			}
- 		}
-@@ -764,8 +759,8 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
- 
- fail_rx:
- 	for (i = 0; i < common->rx_ch_num_flows; i++)
--		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
--					  am65_cpsw_nuss_rx_cleanup, 0);
-+		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
-+					  am65_cpsw_nuss_rx_cleanup, !!i);
- 
- 	am65_cpsw_destroy_xdp_rxqs(common);
- 
-@@ -777,6 +772,7 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- 	struct am65_cpsw_rx_chn *rx_chn = &common->rx_chns;
- 	struct am65_cpsw_tx_chn *tx_chn = common->tx_chns;
- 	int i;
-+	struct am65_cpsw_rx_flow *flow;
- 
- 	if (common->usage_count != 1)
- 		return 0;
-@@ -817,11 +813,12 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
- 			dev_err(common->dev, "rx teardown timeout\n");
- 	}
- 
--	for (i = 0; i < common->rx_ch_num_flows; i++) {
-+	for (i = common->rx_ch_num_flows - 1; i >= 0; i--) {
-+		flow = &rx_chn->flows[i];
- 		napi_disable(&rx_chn->flows[i].napi_rx);
- 		hrtimer_cancel(&rx_chn->flows[i].rx_hrtimer);
--		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
--					  am65_cpsw_nuss_rx_cleanup, 0);
-+		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
-+					  am65_cpsw_nuss_rx_cleanup, !!i);
- 	}
- 
- 	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
-@@ -1028,7 +1025,7 @@ static int am65_cpsw_xdp_tx_frame(struct net_device *ndev,
- static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
- 			     struct am65_cpsw_port *port,
- 			     struct xdp_buff *xdp,
--			     int desc_idx, int cpu, int *len)
-+			     int cpu, int *len)
- {
- 	struct am65_cpsw_common *common = flow->common;
- 	struct am65_cpsw_ndev_priv *ndev_priv;
-@@ -1101,7 +1098,7 @@ static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
- 	}
- 
- 	page = virt_to_head_page(xdp->data);
--	am65_cpsw_put_page(flow, page, true, desc_idx);
-+	am65_cpsw_put_page(flow, page, true);
- 
- out:
- 	return ret;
-@@ -1150,6 +1147,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- 	struct am65_cpsw_ndev_stats *stats;
- 	struct cppi5_host_desc_t *desc_rx;
- 	struct device *dev = common->dev;
-+	struct am65_cpsw_swdata *swdata;
- 	struct page *page, *new_page;
- 	dma_addr_t desc_dma, buf_dma;
- 	struct am65_cpsw_port *port;
-@@ -1159,7 +1157,6 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- 	struct sk_buff *skb;
- 	struct xdp_buff	xdp;
- 	void *page_addr;
--	void **swdata;
- 	u32 *psdata;
- 
- 	*xdp_state = AM65_CPSW_XDP_PASS;
-@@ -1182,8 +1179,8 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- 		__func__, flow_idx, &desc_dma);
- 
- 	swdata = cppi5_hdesc_get_swdata(desc_rx);
--	page_addr = *swdata;
--	page = virt_to_page(page_addr);
-+	page = swdata->page;
-+	page_addr = page_address(page);
- 	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
- 	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
- 	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
-@@ -1201,7 +1198,6 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- 
- 	desc_idx = am65_cpsw_nuss_desc_idx(rx_chn->desc_pool, desc_rx,
- 					   rx_chn->dsize_log2);
--
- 	skb = am65_cpsw_build_skb(page_addr, ndev,
- 				  AM65_CPSW_MAX_PACKET_SIZE);
- 	if (unlikely(!skb)) {
-@@ -1213,7 +1209,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- 		xdp_init_buff(&xdp, PAGE_SIZE, &port->xdp_rxq[flow->id]);
- 		xdp_prepare_buff(&xdp, page_addr, AM65_CPSW_HEADROOM,
- 				 pkt_len, false);
--		*xdp_state = am65_cpsw_run_xdp(flow, port, &xdp, desc_idx,
-+		*xdp_state = am65_cpsw_run_xdp(flow, port, &xdp,
- 					       cpu, &pkt_len);
- 		if (*xdp_state != AM65_CPSW_XDP_PASS)
- 			goto allocate;
-@@ -1247,10 +1243,8 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- 		return -ENOMEM;
- 	}
- 
--	flow->pages[desc_idx] = new_page;
--
- 	if (netif_dormant(ndev)) {
--		am65_cpsw_put_page(flow, new_page, true, desc_idx);
-+		am65_cpsw_put_page(flow, new_page, true);
- 		ndev->stats.rx_dropped++;
- 		return 0;
- 	}
-@@ -1258,7 +1252,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
- requeue:
- 	ret = am65_cpsw_nuss_rx_push(common, new_page, flow_idx);
- 	if (WARN_ON(ret < 0)) {
--		am65_cpsw_put_page(flow, new_page, true, desc_idx);
-+		am65_cpsw_put_page(flow, new_page, true);
- 		ndev->stats.rx_errors++;
- 		ndev->stats.rx_dropped++;
- 	}
-@@ -2402,10 +2396,6 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 	for (i = 0; i < common->rx_ch_num_flows; i++) {
- 		flow = &rx_chn->flows[i];
- 		flow->page_pool = NULL;
--		flow->pages = devm_kcalloc(dev, AM65_CPSW_MAX_RX_DESC,
--					   sizeof(*flow->pages), GFP_KERNEL);
--		if (!flow->pages)
--			return -ENOMEM;
- 	}
- 
- 	rx_chn->rx_chn = k3_udma_glue_request_rx_chn(dev, "rx", &rx_cfg);
-@@ -2455,10 +2445,12 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 		flow = &rx_chn->flows[i];
- 		flow->id = i;
- 		flow->common = common;
-+		flow->irq = -EINVAL;
- 
- 		rx_flow_cfg.ring_rxfdq0_id = fdqring_id;
- 		rx_flow_cfg.rx_cfg.size = max_desc_num;
--		rx_flow_cfg.rxfdq_cfg.size = max_desc_num;
-+		/* share same FDQ for all flows */
-+		rx_flow_cfg.rxfdq_cfg.size = max_desc_num * rx_cfg.flow_id_num;
- 		rx_flow_cfg.rxfdq_cfg.mode = common->pdata.fdqring_mode;
- 
- 		ret = k3_udma_glue_rx_flow_init(rx_chn->rx_chn,
-@@ -2496,6 +2488,7 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
- 		if (ret) {
- 			dev_err(dev, "failure requesting rx %d irq %u, %d\n",
- 				i, flow->irq, ret);
-+			flow->irq = -EINVAL;
- 			goto err;
- 		}
- 	}
-@@ -3349,8 +3342,8 @@ static int am65_cpsw_nuss_register_ndevs(struct am65_cpsw_common *common)
- 
- 	for (i = 0; i < common->rx_ch_num_flows; i++)
- 		k3_udma_glue_reset_rx_chn(rx_chan->rx_chn, i,
--					  &rx_chan->flows[i],
--					  am65_cpsw_nuss_rx_cleanup, 0);
-+					  rx_chan,
-+					  am65_cpsw_nuss_rx_cleanup, !!i);
- 
- 	k3_udma_glue_disable_rx_chn(rx_chan->rx_chn);
- 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-index dc8d544230dc..92a27ba4c601 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-@@ -101,10 +101,14 @@ struct am65_cpsw_rx_flow {
- 	struct hrtimer rx_hrtimer;
- 	unsigned long rx_pace_timeout;
- 	struct page_pool *page_pool;
--	struct page **pages;
- 	char name[32];
- };
- 
-+struct am65_cpsw_swdata {
-+	u32 flow_id;
-+	struct page *page;
-+};
-+
- struct am65_cpsw_rx_chn {
- 	struct device *dev;
- 	struct device *dma_dev;
-
----
-base-commit: 42f7652d3eb527d03665b09edac47f85fb600924
-change-id: 20241023-am65-cpsw-multi-rx-j7-fix-f9a2149be6dd
-
-Best regards,
--- 
-Roger Quadros <rogerq@kernel.org>
-
+Thanks.
 
