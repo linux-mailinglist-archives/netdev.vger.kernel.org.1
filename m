@@ -1,194 +1,106 @@
-Return-Path: <netdev+bounces-139913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139915-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F4FC9B4979
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:17:52 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59E349B4986
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:19:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24680282E87
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:17:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB1C3B23706
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:19:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF7DE205AD7;
-	Tue, 29 Oct 2024 12:17:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 433F8206065;
+	Tue, 29 Oct 2024 12:19:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ce2LSR3S"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="hgnZALp1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6BC1DF960
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:17:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655EE205E08;
+	Tue, 29 Oct 2024 12:19:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730204262; cv=none; b=mWNysuwlIwZorpyQveQtol6CDjseTM+U7ooG25vP9jfyojj6CrCXC3pPdq4IUGvohFyI82GQg+NzF8fU36YCx5mzv0D/yj0TzBIzHo9v2+AZlSDKtBMfqxp0QnnauSr7EHnq0G07/w3IaoQdDzFk4jqHIatQ/srcX2B1Xlpsbjo=
+	t=1730204349; cv=none; b=hZWmDa2ltZGDrwn974E6WWvnWTtbl9GogqnrYEv2eQp9Veume8UqWfDtvdaUPKxMOmHNDxGb4q7hIZN02POVjlh3VLYoP+EGyM5xTxmc6qAA64/c6MQsm7lxCii+pmt1x9qRVCGP4ZFlfmYndkFCjVfNAPvCucZdEobKxxriw60=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730204262; c=relaxed/simple;
-	bh=tDkCaSGHNwLmvBZ1sIOYlpYZET0YJNWlUhpzReHjttw=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=q4eKOJuoIAUVo83ZJ7Y+Q0sMagCeOQY1v4MRXUTOd/m9lYXfdgkVlFcSfXaoH7N3BLOYbAsr4OGPN87PmGd2WJyZAAfkq1r0X6N613UVurBroSNOcSLYnr60mKPr8DPUK4StpIS44TpJ2blvUoeeAoBj+iC7mjcKlqHn73I55LA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ce2LSR3S; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FA1DC4CECD;
-	Tue, 29 Oct 2024 12:17:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730204262;
-	bh=tDkCaSGHNwLmvBZ1sIOYlpYZET0YJNWlUhpzReHjttw=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=Ce2LSR3SW+LRk8THt1OeL4bpr+mNwqDl0mPzdmsISqGfIPtUBe83bur1Ygs9dJ35w
-	 gx7NWDaEaKeESZzZkQ6ceNbW8LH4F7CM8EVuuvqXEg8mYx56v7TyktNXWbNA+RNJD+
-	 UCbD7hvACBiZs/27X7JKPOnKPmlK4Fo4HWGoMmV88DbK0vkfGhLU6XmMIjh9ugU1Y2
-	 UOjHMRMTrHnj0cK8pmjYH+jO2UK+iSQRor3dhhpeG7TRcLCwIeXsSUEL2bcHOZlIMB
-	 JidWfF7VevZwn89oYrl0wFKIeuWx740m7iSZOUlq0c7Bjyd3SSfuMUc3dgqfkCUIWH
-	 CcjSTnP6TlpWw==
-From: Lorenzo Bianconi <lorenzo@kernel.org>
-Date: Tue, 29 Oct 2024 13:17:10 +0100
-Subject: [PATCH net-next 2/2] net: airoha: Simplify Tx napi logic
+	s=arc-20240116; t=1730204349; c=relaxed/simple;
+	bh=MAAeXKa/2Ts6pTym+TPupzG+OR33ZFevQVxOgUuwQdk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FwspM8LpdnHcT7RfPrXBsim9eamM0ZyGo2rxfBU8LR/ERnSWPTccppmniK8gFM35IC4r634eEXPhs4RR/Dg/TQumE71j7S6Ache5f+3f+NT0+QkqgeDLf5mUeqFlmTap4APujmSi2NdqRkyFoVJ2YYvDJ3PvKqinGez41w3j6Xk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=hgnZALp1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6jVzrS/dv8I737x17bUvfsxtTXmLoqjV6On8HBWDM70=; b=hgnZALp1rshuOUnKj9DMO1vbGc
+	X7BAH5/T9P0tgk5BXqbHmpQ0KDFVgI94gf74+iYr4PcgfrXdRz4AtwH8kUce84V0KbqwA7Lrx4gHc
+	lynpQoYesEIit/bM+G8CldhXzpd8zoDn4VvmmlCccLeP/a+mQnG8fRBaThxNaBqagxb8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5lBL-00BZUT-Hm; Tue, 29 Oct 2024 13:18:43 +0100
+Date: Tue, 29 Oct 2024 13:18:43 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: jan.petrous@oss.nxp.com
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>,
+	Andrei Botila <andrei.botila@nxp.org>,
+	Jacob Keller <jacob.e.keller@intel.com>
+Subject: Re: [PATCH v4 16/16] net: stmmac: dwmac-s32: Read PTP clock rate
+ when ready
+Message-ID: <9154cc5f-a330-4f6d-b161-827e64231e35@lunn.ch>
+References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-16-03618f10e3e2@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241029-airoha-en7581-tx-napi-work-v1-2-96ad1686b946@kernel.org>
-References: <20241029-airoha-en7581-tx-napi-work-v1-0-96ad1686b946@kernel.org>
-In-Reply-To: <20241029-airoha-en7581-tx-napi-work-v1-0-96ad1686b946@kernel.org>
-To: Felix Fietkau <nbd@nbd.name>, Sean Wang <sean.wang@mediatek.com>, 
- Mark Lee <Mark-MC.Lee@mediatek.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Matthias Brugger <matthias.bgg@gmail.com>, 
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Cc: linux-arm-kernel@lists.infradead.org, 
- linux-mediatek@lists.infradead.org, netdev@vger.kernel.org, 
- Lorenzo Bianconi <lorenzo@kernel.org>
-X-Mailer: b4 0.14.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028-upstream_s32cc_gmac-v4-16-03618f10e3e2@oss.nxp.com>
 
-Simplify Tx napi logic relying just on the packet index provided by
-completion queue indicating the completed packet that can be removed
-from the Tx DMA ring.
-This is a preliminary patch to add Qdisc offload for airoha_eth driver.
+On Mon, Oct 28, 2024 at 09:24:58PM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> 
+> The PTP clock is read by stmmac_platform during DT parse.
+> On S32G/R the clock is not ready and returns 0. Postpone
+> reading of the clock on PTP init.
 
-Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
----
- drivers/net/ethernet/mediatek/airoha_eth.c | 73 +++++++++++++++++-------------
- 1 file changed, 41 insertions(+), 32 deletions(-)
+This needs more explanation as to why this is a feature, not a bug,
+for the PTP clock.
 
-diff --git a/drivers/net/ethernet/mediatek/airoha_eth.c b/drivers/net/ethernet/mediatek/airoha_eth.c
-index 6cd8901ed38f0640a8a8f72174c120668b364045..6c683a12d5aa52dd9d966df123509075a989c0b3 100644
---- a/drivers/net/ethernet/mediatek/airoha_eth.c
-+++ b/drivers/net/ethernet/mediatek/airoha_eth.c
-@@ -1670,8 +1670,12 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
- 	irq_queued = FIELD_GET(IRQ_ENTRY_LEN_MASK, status);
- 
- 	while (irq_queued > 0 && done < budget) {
--		u32 qid, last, val = irq_q->q[head];
-+		u32 qid, val = irq_q->q[head];
-+		struct airoha_qdma_desc *desc;
-+		struct airoha_queue_entry *e;
- 		struct airoha_queue *q;
-+		u32 index, desc_ctrl;
-+		struct sk_buff *skb;
- 
- 		if (val == 0xff)
- 			break;
-@@ -1681,9 +1685,7 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
- 		irq_queued--;
- 		done++;
- 
--		last = FIELD_GET(IRQ_DESC_IDX_MASK, val);
- 		qid = FIELD_GET(IRQ_RING_IDX_MASK, val);
--
- 		if (qid >= ARRAY_SIZE(qdma->q_tx))
- 			continue;
- 
-@@ -1691,46 +1693,53 @@ static int airoha_qdma_tx_napi_poll(struct napi_struct *napi, int budget)
- 		if (!q->ndesc)
- 			continue;
- 
-+		index = FIELD_GET(IRQ_DESC_IDX_MASK, val);
-+		if (index >= q->ndesc)
-+			continue;
-+
- 		spin_lock_bh(&q->lock);
- 
--		while (q->queued > 0) {
--			struct airoha_qdma_desc *desc = &q->desc[q->tail];
--			struct airoha_queue_entry *e = &q->entry[q->tail];
--			u32 desc_ctrl = le32_to_cpu(desc->ctrl);
--			struct sk_buff *skb = e->skb;
--			u16 index = q->tail;
-+		if (!q->queued)
-+			goto unlock;
- 
--			if (!(desc_ctrl & QDMA_DESC_DONE_MASK) &&
--			    !(desc_ctrl & QDMA_DESC_DROP_MASK))
--				break;
-+		desc = &q->desc[index];
-+		desc_ctrl = le32_to_cpu(desc->ctrl);
- 
--			q->tail = (q->tail + 1) % q->ndesc;
--			q->queued--;
-+		if (!(desc_ctrl & QDMA_DESC_DONE_MASK) &&
-+		    !(desc_ctrl & QDMA_DESC_DROP_MASK))
-+			goto unlock;
- 
--			dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
--					 DMA_TO_DEVICE);
-+		e = &q->entry[index];
-+		skb = e->skb;
- 
--			WRITE_ONCE(desc->msg0, 0);
--			WRITE_ONCE(desc->msg1, 0);
-+		dma_unmap_single(eth->dev, e->dma_addr, e->dma_len,
-+				 DMA_TO_DEVICE);
-+		memset(e, 0, sizeof(*e));
-+		WRITE_ONCE(desc->msg0, 0);
-+		WRITE_ONCE(desc->msg1, 0);
-+		q->queued--;
- 
--			if (skb) {
--				u16 queue = skb_get_queue_mapping(skb);
--				struct netdev_queue *txq;
-+		/* completion ring can report out-of-order indexes if hw QoS
-+		 * is enabled and packets with different priority are queued
-+		 * to same DMA ring. Take into account possible out-of-order
-+		 * reports incrementing DMA ring tail pointer
-+		 */
-+		while (q->tail != q->head && !q->entry[q->tail].dma_addr)
-+			q->tail = (q->tail + 1) % q->ndesc;
- 
--				txq = netdev_get_tx_queue(skb->dev, queue);
--				netdev_tx_completed_queue(txq, 1, skb->len);
--				if (netif_tx_queue_stopped(txq) &&
--				    q->ndesc - q->queued >= q->free_thr)
--					netif_tx_wake_queue(txq);
-+		if (skb) {
-+			u16 queue = skb_get_queue_mapping(skb);
-+			struct netdev_queue *txq;
- 
--				dev_kfree_skb_any(skb);
--				e->skb = NULL;
--			}
-+			txq = netdev_get_tx_queue(skb->dev, queue);
-+			netdev_tx_completed_queue(txq, 1, skb->len);
-+			if (netif_tx_queue_stopped(txq) &&
-+			    q->ndesc - q->queued >= q->free_thr)
-+				netif_tx_wake_queue(txq);
- 
--			if (index == last)
--				break;
-+			dev_kfree_skb_any(skb);
- 		}
--
-+unlock:
- 		spin_unlock_bh(&q->lock);
- 	}
- 
-
--- 
-2.47.0
-
+	Andrew
 
