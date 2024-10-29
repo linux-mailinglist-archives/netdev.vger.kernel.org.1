@@ -1,97 +1,95 @@
-Return-Path: <netdev+bounces-140082-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140083-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9900A9B5325
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:13:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 275549B534F
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:24:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB9EC1C2284F
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:13:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A812A1F23E99
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:24:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45BF208201;
-	Tue, 29 Oct 2024 20:12:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 719272076D6;
+	Tue, 29 Oct 2024 20:23:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="UiZG0AuF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Bizggs0p"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f174.google.com (mail-pl1-f174.google.com [209.85.214.174])
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A577207A11
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 20:12:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5434192B74;
+	Tue, 29 Oct 2024 20:23:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730232760; cv=none; b=c1fUlRcltP6Y9BSYPwovRjKxrYp/DsO+8U1EmYo/MXQBdx22Pexm+PvrZuLrnhblRE2C2puLK7WdeiRhNr0sq/0PnT6ffr22lnx0W7peFDRq71iR4wYFrAMWlvrnny/yJYljJezrrTkIlY9R3dpa8PXrLJzFHUDfGw47HcTFK10=
+	t=1730233436; cv=none; b=HH/UeXmoIRfUEirS3vlq5JkMWuAU6WU3bE0PS7XVwcB805POsB5ybG798tbpxaWAxXp0GnsGwFUfhf5IXoRsnt3kwsmHG4+OImR+gvC9a4K4s0yUJU0iwXPiQXn9hWPjRYaxoOxzz7xPWy3dvm2StBuJxG+fPKd+FI6IiIQ9gUI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730232760; c=relaxed/simple;
-	bh=a4uvxfcTk50IPf5JO0yQLnYMCdVRNOSqdTojlJrQQFc=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Gp7NQD4fij2A+SUNtqupZPWFdluX36F4Ki4F3vfuZTY1+WV1Z0DvxPvyg+KfcKR9qKlEKR4Zaj9bxN20NEhSN22RIqE5LRQyhx1UfiWI4IYDPoTvz0jg/CpfG8/5WeZaEBHsVXAyRTmEkVYJ9EFM440RH2S2qQVgn2JrJvbyFEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=UiZG0AuF; arc=none smtp.client-ip=209.85.214.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f174.google.com with SMTP id d9443c01a7336-20cdbe608b3so48221835ad.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 13:12:37 -0700 (PDT)
+	s=arc-20240116; t=1730233436; c=relaxed/simple;
+	bh=/7wyiogOSmw3I9TDee9Zv17VHrKk7/JF3y8QrE9pGsk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hxgTeCBEasELaYNrMUoZzzhMIMMesVCdcFVltK/uONhYOra3TU6kr481eeagli7t9M+GLNxvon08C+F7zoUK+miNq1+shhMHRIRit1NOtKFlyrqR6WgCAB56X9r4na5KKS3mxSloBGGqAu1BzgZDEkwYU6xNxcoGWmSMRe9B67E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Bizggs0p; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-3807e72c468so244871f8f.3;
+        Tue, 29 Oct 2024 13:23:53 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730232757; x=1730837557; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=DzMJEaxCO1+wmU1/AuWmTveVbLGsSMtHqkQuk6DiNZk=;
-        b=UiZG0AuFzcDbMpw6WJCK/8LaukjcmLx9QYcrTWQQ8e2JAEaXVXgQOlO3jnjCT8zBFd
-         O17rfZ5qieHUdkg9t5ghz+U8+U/EbmdpnCocFacfQGwaozsv7URzolcueJH9bC4JefFq
-         t2XtPuJiO4OtgE8GxjYjKm6uQnNOyeeB1gAM8=
+        d=gmail.com; s=20230601; t=1730233432; x=1730838232; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fmaJ2cGgy9S2swZZo1UerLLaJvJoBIutdhI6IzAFbxA=;
+        b=Bizggs0pwb01tCljfY8nWAnemulr65PDpPUp8fc7e4u6+R8SZpuWU7k8DAJXWJAiCU
+         EcAKZ+hOGwyVfD1/TqGLcDfKFN1qQPy9v0V2KWeAxvBwmb6gTwOruGYNFz2PyhqORpyZ
+         kkTBsWdXkTSWkN7xmRmo/fMPQ58qurNjUx/fcsQRaWuQK7reVpve0jqwF10cMXK2ot84
+         TtMVT1eG/RPQKuqvX7DLVyQQxHA2WBvfIQPxjJitOp5kye5wZQ9KHRpIBvgcC8cVNQS7
+         hQVpW2L69kaUXaPbmltjHFk2Cljf6uMkQJlKXyb0cD7/zJcMWoiAfIdA1p5N50ayepQm
+         6XXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730232757; x=1730837557;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=DzMJEaxCO1+wmU1/AuWmTveVbLGsSMtHqkQuk6DiNZk=;
-        b=LwfEsg1iU+klXya4YpOJ/dBjEiLZ6qtVPKAGvddUHZlgqCd762TPIlySvCLpPNTUjm
-         f+/pQ7CNA6BVR5EL5S/c/QS9spFLGDSYUHqwrzO9wQ3gCPbpOFk78G2sQlpklF0E1wn0
-         hwGg3tS1wUW3JhB+YFee6WSGfMHpog66rk2Y3ClWXQGof/AsmdPjOEKfBd+jICrvncbT
-         RaqDNLwmLNeZjMhomncRUF3BWB5qL1tS9IdSSIDSVFR7WPGfR26tmrLC6P1dP7+Sv1sQ
-         8p7ayK7XzE1KDcbqxdp2trGLZRH1AJxRTClB4uN+A09Yv6zCRC1cXsWAN0s66qHE4Jqv
-         qWUQ==
-X-Gm-Message-State: AOJu0Yw8hhCyEULMSLuwjieQ4OZd0G2ZpwOHPjpxJQa/+p8g616cYm8M
-	gMNM12aPsmpE4Zd4c6faRx3B5w0+5ULGcd4kio9mDP7tKK6R2KGf5ifQRQclJXA01U6v1YfrOFW
-	3WO7Xpb1FakI47mBiLDYrZOTWALjFGNJEZAIXUt41Oy2lbGTaeNYh8KucoGGvsHnTEuoVq2RwaN
-	TEcfo81+u4KQgMNe2+ppVzrmBJ8qn4jBUSEUQ=
-X-Google-Smtp-Source: AGHT+IEcDa3yfUr/14JeA6MP7LuqXP/cHig8sm/AVY4d6K3uKFZW7sucMTGgImCKA0F3kud8IkJxew==
-X-Received: by 2002:a17:902:d511:b0:20c:bea0:8d10 with SMTP id d9443c01a7336-210f751ae6emr9748955ad.20.1730232756892;
-        Tue, 29 Oct 2024 13:12:36 -0700 (PDT)
-Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bc0864d7sm70113735ad.303.2024.10.29.13.12.35
+        d=1e100.net; s=20230601; t=1730233432; x=1730838232;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fmaJ2cGgy9S2swZZo1UerLLaJvJoBIutdhI6IzAFbxA=;
+        b=gGbS4xSoeMGyY6UcNLMobQ25Ak4Yfj5EOmGd2yb399dYQZdE0XJnIHWeZ7++2c6lpT
+         tpFZn37oxq0EH17Ko6p0aCl+QkUOrugkRIjkC78+Xni6NGx5iuAT2fC+Lcy9EZc90GVi
+         i3IBR5F7wpqA34fIri/qHSMjw4avwI0Wl3IrFthMB++C397JaPJBUp0MhpXNBZTPNHr9
+         a6+hx4jB4UoHmtEWDpnJlN3MCZ4gwxl7WCSmt9oWuQ9wc0tyQhiRjwlNoldiKOyoV3j7
+         HRjCdOnlyGFuMRMS/k3nKwfAnzF8950ppYVcZi+FRczsQwOtqxmtMFO8dSo8vKNLTf55
+         TAmw==
+X-Forwarded-Encrypted: i=1; AJvYcCV6jch1GfxfRrwdvzKNaH1zUKA3MAPXqvgFNPF/e6klUdE/6w94M4mTZg2MGFHrngCWDlMNuizd35z3@vger.kernel.org, AJvYcCVJujYTwP9F28jmhHP3gb176vRe0VVJhC64u43pxx3x/Y1PQm5F/GN+eHvo03FExibnYczpj3DIxHqohdpg@vger.kernel.org, AJvYcCVbSptSwdCVsUt+KaLVo6NiMFAKhN9tFxZE+H+uSSJqIF5H7ZmvRB5JhcoNZTB/I+Ijj6jUhF3k@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywbh6OjDFjM6bxaMq4opMm05QDZ7cguLNh0Mij7QAgd38lS4YgA
+	Z1ihokUE/c3WK/LCUaRgcdwTrrtmzCtG/FgpEZzPnuLjMxIi9kWS
+X-Google-Smtp-Source: AGHT+IE4eVnaZPidUHeSY1WAuGOgaGW6tLvUl8un5Y9u46tplJhMw2SpOUD20rey7JdzrkLSVHdpYg==
+X-Received: by 2002:a05:6000:156a:b0:37d:5313:ee45 with SMTP id ffacd0b85a97d-3806100755dmr4716128f8f.0.1730233431682;
+        Tue, 29 Oct 2024 13:23:51 -0700 (PDT)
+Received: from 6c1d2e1f4cf4.v.cablecom.net (84-72-156-211.dclient.hispeed.ch. [84.72.156.211])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b3bf85sm13619976f8f.42.2024.10.29.13.23.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 13:12:36 -0700 (PDT)
-From: Joe Damato <jdamato@fastly.com>
-To: netdev@vger.kernel.org
-Cc: vitaly.lifshits@intel.com,
-	jacob.e.keller@intel.com,
-	kurt@linutronix.de,
-	vinicius.gomes@intel.com,
-	Joe Damato <jdamato@fastly.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	bpf@vger.kernel.org (open list:XDP (eXpress Data Path))
-Subject: [PATCH iwl-next v6 2/2] igc: Link queues to NAPI instances
-Date: Tue, 29 Oct 2024 20:12:17 +0000
-Message-Id: <20241029201218.355714-3-jdamato@fastly.com>
+        Tue, 29 Oct 2024 13:23:51 -0700 (PDT)
+From: Lothar Rubusch <l.rubusch@gmail.com>
+To: robh@kernel.org,
+	krzk+dt@kernel.org,
+	a.fatoum@pengutronix.de
+Cc: conor+dt@kernel.org,
+	dinguyen@kernel.org,
+	marex@denx.de,
+	s.trumtrar@pengutronix.de,
+	alexandre.torgue@foss.st.com,
+	joabreu@synopsys.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	mcoquelin.stm32@gmail.com,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	l.rubusch@gmail.com,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v4 00/23] Add Enclustra Arria10 and Cyclone5 SoMs
+Date: Tue, 29 Oct 2024 20:23:26 +0000
+Message-Id: <20241029202349.69442-1-l.rubusch@gmail.com>
 X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241029201218.355714-1-jdamato@fastly.com>
-References: <20241029201218.355714-1-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,306 +98,161 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Link queues to NAPI instances via netdev-genl API so that users can
-query this information with netlink. Handle a few cases in the driver:
-  1. Link/unlink the NAPIs when XDP is enabled/disabled
-  2. Handle IGC_FLAG_QUEUE_PAIRS enabled and disabled
+Add device-tree support for the following SoMs:
 
-Example output when IGC_FLAG_QUEUE_PAIRS is enabled:
+- Mercury SA1 (cyclone5)
+- Mercury+ SA2 (cyclone5)
+- Mercury+ AA1 (arria10)
 
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump queue-get --json='{"ifindex": 2}'
+Further add device-tree support for the corresponding carrier boards:
 
-[{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
- {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
- {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+- Mercury+ PE1
+- Mercury+ PE3
+- Mercury+ ST1
 
-Since IGC_FLAG_QUEUE_PAIRS is enabled, you'll note that the same NAPI ID
-is present for both rx and tx queues at the same index, for example
-index 0:
+Finally, provide generic support for combinations of the above with
+one of the boot-modes
+- SD
+- eMMC
+- QSPI
 
-{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
-{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+Almost all of the above can be freely combined. Combinations are
+covered by the provided .dts files. This makes an already existing
+.dts file obsolete. Further minor fixes of the dtbs_checks are
+added separtely.
 
-To test IGC_FLAG_QUEUE_PAIRS disabled, a test system was booted using
-the grub command line option "maxcpus=2" to force
-igc_set_interrupt_capability to disable IGC_FLAG_QUEUE_PAIRS.
+The current approach shall be partly useful also for corresponding
+bootloader integration using dts/upstream. That's also one of the
+reasons for the .dtsi split.
 
-Example output when IGC_FLAG_QUEUE_PAIRS is disabled:
-
-$ lscpu | grep "On-line CPU"
-On-line CPU(s) list:      0,2
-
-$ ethtool -l enp86s0  | tail -5
-Current hardware settings:
-RX:		n/a
-TX:		n/a
-Other:		1
-Combined:	2
-
-$ cat /proc/interrupts  | grep enp
- 144: [...] enp86s0
- 145: [...] enp86s0-rx-0
- 146: [...] enp86s0-rx-1
- 147: [...] enp86s0-tx-0
- 148: [...] enp86s0-tx-1
-
-1 "other" IRQ, and 2 IRQs for each of RX and Tx, so we expect netlink to
-report 4 IRQs with unique NAPI IDs:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump napi-get --json='{"ifindex": 2}'
-[{'id': 8196, 'ifindex': 2, 'irq': 148},
- {'id': 8195, 'ifindex': 2, 'irq': 147},
- {'id': 8194, 'ifindex': 2, 'irq': 146},
- {'id': 8193, 'ifindex': 2, 'irq': 145}]
-
-Now we examine which queues these NAPIs are associated with, expecting
-that since IGC_FLAG_QUEUE_PAIRS is disabled each RX and TX queue will
-have its own NAPI instance:
-
-$ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
-                         --dump queue-get --json='{"ifindex": 2}'
-[{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
- {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
- {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
-
-Signed-off-by: Joe Damato <jdamato@fastly.com>
+Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- v6:
-   - Rename __igc_do_resume to __igc_resume and rename the boolean
-     argument "need_rtnl" to "rpm" as seen in igb, as per Vitaly's
-     feedback to make the code look more like commit ac8c58f5b535 ("igb:
-     fix deadlock caused by taking RTNL in RPM resume path").
+v3 -> v4:
+- add separate patch to match "snps,dwmac" compatible in corresponding
+  driver, required by binding check
+- replace non-standard node names in .dtsi files by node names recommended
+  by the device tree standard v0.4
 
- v5:
-   - Rename igc_resume to __igc_do_resume and pass in a boolean
-     "need_rtnl" to signal whether or not rtnl should be held before
-     caling __igc_open. Call this new function from igc_runtime_resume
-     and igc_resume passing in false (for igc_runtime_resume) and true
-     (igc_resume), respectively. This is done to avoid reintroducing a
-     bug fixed in commit: 6f31d6b: "igc: Refactor runtime power
-     management flow" where rtnl is held in runtime_resume causing a
-     deadlock.
+v2 -> v3:
+- dropped the patch to add the socfpga clock bindings:
+  Documentation/devicetree/bindings/clock/altr,socfpga-a10.yaml
+  reason: refactoring the "altr,socfpga-" TXT files to .yaml files is a
+  different story involving several other files, thus can be part of a
+  future patch series, not related to the current upstreaming the
+  Enclustra DTS support, so dropped
+- adjust comments on boot mode selection
+- adjust titles to several bindings patches
 
- v4:
-   - Add rtnl_lock/rtnl_unlock in two paths: igc_resume and
-     igc_io_error_detected. The code added to the latter is inspired by
-     a similar implementation in ixgbe's ixgbe_io_error_detected.
+v1 -> v2:
+- split bindings and DT adjustments/additions
+- add several fixes to the socfpga.dtsi and socfpga_arria10.dtsi where
+  bindings did not match
+- extend existing bindings by properties and nods from arria10 setup
+- implement the clock binding altr,socfpga-a10.yaml based on existing
+  text file, rudimentary datasheet study and requirements of the
+  particular DT setup
+---
+Lothar Rubusch (23):
+  ARM: dts: socfpga: fix typo
+  ARM: dts: socfpga: align bus name with bindings
+  ARM: dts: socfpga: align dma name with binding
+  ARM: dts: socfpga: align fpga-region name
+  ARM: dts: socfpga: add label to clock manager
+  ARM: dts: socfpga: add missing cells properties
+  ARM: dts: socfpga: fix missing ranges
+  ARM: dts: socfpga: add clock-frequency property
+  ARM: dts: socfpga: add ranges property to sram
+  ARM: dts: socfpga: remove arria10 reset-names
+  net: stmmac: add support for dwmac 3.72a
+  dt-bindings: net: snps,dwmac: add support for Arria10
+  ARM: dts: socfpga: add Enclustra boot-mode dtsi
+  ARM: dts: socfpga: add Enclustra base-board dtsi
+  ARM: dts: socfpga: add Enclustra Mercury SA1
+  dt-bindings: altera: add Enclustra Mercury SA1
+  ARM: dts: socfpga: add Enclustra Mercury+ SA2
+  dt-bindings: altera: add binding for Mercury+ SA2
+  ARM: dts: socfpga: add Mercury AA1 combinations
+  dt-bindings: altera: add Mercury AA1 combinations
+  ARM: dts: socfpga: removal of generic PE1 dts
+  dt-bindings: altera: removal of generic PE1 dts
+  ARM: dts: socfpga: add Enclustra SoM dts files
 
- v3:
-   - Replace igc_unset_queue_napi with igc_set_queue_napi(adapater, i,
-     NULL), as suggested by Vinicius Costa Gomes
-   - Simplify implemention of igc_set_queue_napi as suggested by Kurt
-     Kanzenbach, with a tweak to use ring->queue_index
+ .../devicetree/bindings/arm/altera.yaml       |  24 ++-
+ .../devicetree/bindings/net/snps,dwmac.yaml   |   2 +
+ arch/arm/boot/dts/intel/socfpga/Makefile      |  25 ++-
+ arch/arm/boot/dts/intel/socfpga/socfpga.dtsi  |   6 +-
+ .../dts/intel/socfpga/socfpga_arria10.dtsi    |  26 ++--
+ .../socfpga/socfpga_arria10_mercury_aa1.dtsi  | 141 ++++++++++++++---
+ .../socfpga_arria10_mercury_aa1_pe1_emmc.dts  |  16 ++
+ .../socfpga_arria10_mercury_aa1_pe1_qspi.dts  |  16 ++
+ .../socfpga_arria10_mercury_aa1_pe1_sdmmc.dts |  16 ++
+ .../socfpga_arria10_mercury_aa1_pe3_emmc.dts  |  16 ++
+ .../socfpga_arria10_mercury_aa1_pe3_qspi.dts  |  16 ++
+ .../socfpga_arria10_mercury_aa1_pe3_sdmmc.dts |  16 ++
+ .../socfpga_arria10_mercury_aa1_st1_emmc.dts  |  16 ++
+ .../socfpga_arria10_mercury_aa1_st1_qspi.dts  |  16 ++
+ .../socfpga_arria10_mercury_aa1_st1_sdmmc.dts |  16 ++
+ .../socfpga/socfpga_arria10_mercury_pe1.dts   |  55 -------
+ .../socfpga/socfpga_cyclone5_mercury_sa1.dtsi | 143 +++++++++++++++++
+ .../socfpga_cyclone5_mercury_sa1_pe1_emmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa1_pe1_qspi.dts |  16 ++
+ ...socfpga_cyclone5_mercury_sa1_pe1_sdmmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa1_pe3_emmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa1_pe3_qspi.dts |  16 ++
+ ...socfpga_cyclone5_mercury_sa1_pe3_sdmmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa1_st1_emmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa1_st1_qspi.dts |  16 ++
+ ...socfpga_cyclone5_mercury_sa1_st1_sdmmc.dts |  16 ++
+ .../socfpga/socfpga_cyclone5_mercury_sa2.dtsi | 146 ++++++++++++++++++
+ .../socfpga_cyclone5_mercury_sa2_pe1_qspi.dts |  16 ++
+ ...socfpga_cyclone5_mercury_sa2_pe1_sdmmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa2_pe3_qspi.dts |  16 ++
+ ...socfpga_cyclone5_mercury_sa2_pe3_sdmmc.dts |  16 ++
+ .../socfpga_cyclone5_mercury_sa2_st1_qspi.dts |  16 ++
+ ...socfpga_cyclone5_mercury_sa2_st1_sdmmc.dts |  16 ++
+ ...cfpga_enclustra_mercury_bootmode_emmc.dtsi |  12 ++
+ ...cfpga_enclustra_mercury_bootmode_qspi.dtsi |   8 +
+ ...fpga_enclustra_mercury_bootmode_sdmmc.dtsi |   8 +
+ .../socfpga_enclustra_mercury_pe1.dtsi        |  33 ++++
+ .../socfpga_enclustra_mercury_pe3.dtsi        |  55 +++++++
+ .../socfpga_enclustra_mercury_st1.dtsi        |  15 ++
+ .../ethernet/stmicro/stmmac/dwmac-generic.c   |   1 +
+ .../ethernet/stmicro/stmmac/stmmac_platform.c |   1 +
+ 41 files changed, 992 insertions(+), 93 deletions(-)
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_pe1_emmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_pe1_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_pe1_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_pe3_emmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_pe3_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_pe3_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_st1_emmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_st1_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_aa1_st1_sdmmc.dts
+ delete mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_arria10_mercury_pe1.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_pe1_emmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_pe1_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_pe1_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_pe3_emmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_pe3_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_pe3_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_st1_emmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_st1_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa1_st1_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2_pe1_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2_pe1_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2_pe3_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2_pe3_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2_st1_qspi.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_cyclone5_mercury_sa2_st1_sdmmc.dts
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_enclustra_mercury_bootmode_emmc.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_enclustra_mercury_bootmode_qspi.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_enclustra_mercury_bootmode_sdmmc.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_enclustra_mercury_pe1.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_enclustra_mercury_pe3.dtsi
+ create mode 100644 arch/arm/boot/dts/intel/socfpga/socfpga_enclustra_mercury_st1.dtsi
 
- v2:
-   - Update commit message to include tests for IGC_FLAG_QUEUE_PAIRS
-     disabled
-   - Refactored code to move napi queue mapping and unmapping to helper
-     functions igc_set_queue_napi and igc_unset_queue_napi
-   - Adjust the code to handle IGC_FLAG_QUEUE_PAIRS disabled
-   - Call helpers to map/unmap queues to NAPIs in igc_up, __igc_open,
-     igc_xdp_enable_pool, and igc_xdp_disable_pool
-
- drivers/net/ethernet/intel/igc/igc.h      |  2 +
- drivers/net/ethernet/intel/igc/igc_main.c | 56 +++++++++++++++++++----
- drivers/net/ethernet/intel/igc/igc_xdp.c  |  2 +
- 3 files changed, 51 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index eac0f966e0e4..b8111ad9a9a8 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -337,6 +337,8 @@ struct igc_adapter {
- 	struct igc_led_classdev *leds;
- };
- 
-+void igc_set_queue_napi(struct igc_adapter *adapter, int q_idx,
-+			struct napi_struct *napi);
- void igc_up(struct igc_adapter *adapter);
- void igc_down(struct igc_adapter *adapter);
- int igc_open(struct net_device *netdev);
-diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
-index 7964bbedb16c..9a5ece12e9d4 100644
---- a/drivers/net/ethernet/intel/igc/igc_main.c
-+++ b/drivers/net/ethernet/intel/igc/igc_main.c
-@@ -4948,6 +4948,22 @@ static int igc_sw_init(struct igc_adapter *adapter)
- 	return 0;
- }
- 
-+void igc_set_queue_napi(struct igc_adapter *adapter, int vector,
-+			struct napi_struct *napi)
-+{
-+	struct igc_q_vector *q_vector = adapter->q_vector[vector];
-+
-+	if (q_vector->rx.ring)
-+		netif_queue_set_napi(adapter->netdev,
-+				     q_vector->rx.ring->queue_index,
-+				     NETDEV_QUEUE_TYPE_RX, napi);
-+
-+	if (q_vector->tx.ring)
-+		netif_queue_set_napi(adapter->netdev,
-+				     q_vector->tx.ring->queue_index,
-+				     NETDEV_QUEUE_TYPE_TX, napi);
-+}
-+
- /**
-  * igc_up - Open the interface and prepare it to handle traffic
-  * @adapter: board private structure
-@@ -4955,6 +4971,7 @@ static int igc_sw_init(struct igc_adapter *adapter)
- void igc_up(struct igc_adapter *adapter)
- {
- 	struct igc_hw *hw = &adapter->hw;
-+	struct napi_struct *napi;
- 	int i = 0;
- 
- 	/* hardware has been reset, we need to reload some things */
-@@ -4962,8 +4979,11 @@ void igc_up(struct igc_adapter *adapter)
- 
- 	clear_bit(__IGC_DOWN, &adapter->state);
- 
--	for (i = 0; i < adapter->num_q_vectors; i++)
--		napi_enable(&adapter->q_vector[i]->napi);
-+	for (i = 0; i < adapter->num_q_vectors; i++) {
-+		napi = &adapter->q_vector[i]->napi;
-+		napi_enable(napi);
-+		igc_set_queue_napi(adapter, i, napi);
-+	}
- 
- 	if (adapter->msix_entries)
- 		igc_configure_msix(adapter);
-@@ -5192,6 +5212,7 @@ void igc_down(struct igc_adapter *adapter)
- 	for (i = 0; i < adapter->num_q_vectors; i++) {
- 		if (adapter->q_vector[i]) {
- 			napi_synchronize(&adapter->q_vector[i]->napi);
-+			igc_set_queue_napi(adapter, i, NULL);
- 			napi_disable(&adapter->q_vector[i]->napi);
- 		}
- 	}
-@@ -6021,6 +6042,7 @@ static int __igc_open(struct net_device *netdev, bool resuming)
- 	struct igc_adapter *adapter = netdev_priv(netdev);
- 	struct pci_dev *pdev = adapter->pdev;
- 	struct igc_hw *hw = &adapter->hw;
-+	struct napi_struct *napi;
- 	int err = 0;
- 	int i = 0;
- 
-@@ -6056,8 +6078,11 @@ static int __igc_open(struct net_device *netdev, bool resuming)
- 
- 	clear_bit(__IGC_DOWN, &adapter->state);
- 
--	for (i = 0; i < adapter->num_q_vectors; i++)
--		napi_enable(&adapter->q_vector[i]->napi);
-+	for (i = 0; i < adapter->num_q_vectors; i++) {
-+		napi = &adapter->q_vector[i]->napi;
-+		napi_enable(napi);
-+		igc_set_queue_napi(adapter, i, napi);
-+	}
- 
- 	/* Clear any pending interrupts. */
- 	rd32(IGC_ICR);
-@@ -7342,7 +7367,7 @@ static void igc_deliver_wake_packet(struct net_device *netdev)
- 	netif_rx(skb);
- }
- 
--static int igc_resume(struct device *dev)
-+static int __igc_resume(struct device *dev, bool rpm)
- {
- 	struct pci_dev *pdev = to_pci_dev(dev);
- 	struct net_device *netdev = pci_get_drvdata(pdev);
-@@ -7385,7 +7410,11 @@ static int igc_resume(struct device *dev)
- 	wr32(IGC_WUS, ~0);
- 
- 	if (netif_running(netdev)) {
-+		if (!rpm)
-+			rtnl_lock();
- 		err = __igc_open(netdev, true);
-+		if (!rpm)
-+			rtnl_unlock();
- 		if (!err)
- 			netif_device_attach(netdev);
- 	}
-@@ -7393,9 +7422,14 @@ static int igc_resume(struct device *dev)
- 	return err;
- }
- 
-+static int igc_resume(struct device *dev)
-+{
-+	return __igc_resume(dev, false);
-+}
-+
- static int igc_runtime_resume(struct device *dev)
- {
--	return igc_resume(dev);
-+	return __igc_resume(dev, true);
- }
- 
- static int igc_suspend(struct device *dev)
-@@ -7440,14 +7474,18 @@ static pci_ers_result_t igc_io_error_detected(struct pci_dev *pdev,
- 	struct net_device *netdev = pci_get_drvdata(pdev);
- 	struct igc_adapter *adapter = netdev_priv(netdev);
- 
-+	rtnl_lock();
- 	netif_device_detach(netdev);
- 
--	if (state == pci_channel_io_perm_failure)
-+	if (state == pci_channel_io_perm_failure) {
-+		rtnl_unlock();
- 		return PCI_ERS_RESULT_DISCONNECT;
-+	}
- 
- 	if (netif_running(netdev))
- 		igc_down(adapter);
- 	pci_disable_device(pdev);
-+	rtnl_unlock();
- 
- 	/* Request a slot reset. */
- 	return PCI_ERS_RESULT_NEED_RESET;
-@@ -7458,7 +7496,7 @@ static pci_ers_result_t igc_io_error_detected(struct pci_dev *pdev,
-  *  @pdev: Pointer to PCI device
-  *
-  *  Restart the card from scratch, as if from a cold-boot. Implementation
-- *  resembles the first-half of the igc_resume routine.
-+ *  resembles the first-half of the __igc_resume routine.
-  **/
- static pci_ers_result_t igc_io_slot_reset(struct pci_dev *pdev)
- {
-@@ -7497,7 +7535,7 @@ static pci_ers_result_t igc_io_slot_reset(struct pci_dev *pdev)
-  *
-  *  This callback is called when the error recovery driver tells us that
-  *  its OK to resume normal operation. Implementation resembles the
-- *  second-half of the igc_resume routine.
-+ *  second-half of the __igc_resume routine.
-  */
- static void igc_io_resume(struct pci_dev *pdev)
- {
-diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
-index e27af72aada8..4da633430b80 100644
---- a/drivers/net/ethernet/intel/igc/igc_xdp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
-@@ -84,6 +84,7 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
- 		napi_disable(napi);
- 	}
- 
-+	igc_set_queue_napi(adapter, queue_id, NULL);
- 	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
- 	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
- 
-@@ -133,6 +134,7 @@ static int igc_xdp_disable_pool(struct igc_adapter *adapter, u16 queue_id)
- 	xsk_pool_dma_unmap(pool, IGC_RX_DMA_ATTR);
- 	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
- 	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
-+	igc_set_queue_napi(adapter, queue_id, napi);
- 
- 	if (needs_reset) {
- 		napi_enable(napi);
 -- 
 2.25.1
 
