@@ -1,79 +1,125 @@
-Return-Path: <netdev+bounces-140030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id E40BF9B512F
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:43:19 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE0E9B5146
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:46:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99E691F2198E
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:43:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9B646B22412
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:46:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E290197A77;
-	Tue, 29 Oct 2024 17:43:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA23C196D9D;
+	Tue, 29 Oct 2024 17:46:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CH+OUyb0"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JUmht5d5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f51.google.com (mail-qv1-f51.google.com [209.85.219.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAAEBBE49;
-	Tue, 29 Oct 2024 17:43:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE54192589;
+	Tue, 29 Oct 2024 17:46:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730223796; cv=none; b=juZwktExjA0QjS6LV6Zrs6DD/kVGwggGQs7vxRnRt564DxAhGjwJeQt9H2F85EMv46QlEgsL+RWHh/Rr3908vQRtQanFlFBbf/UgparmZhZQgfNKtJdpuwml+Zk0ikv0otBC0IJ3u9/Hq/n8CujCGCW+dNZK9tYdbKZUQPy1dIE=
+	t=1730223985; cv=none; b=Ia5r9t0GVfCKJHFI9abdFEuogWwc7VRtRmYNT+Xce/P7x21xt6wNgchHdt3KY3FWqnwLqibo+DiPesJ477oFyIxeaL0FZ1DlTdB8mLIsPIynPg9y4iuQiP7RaeFx52PIrpuPK/BCkFgdoZrFSCHiJwuGMqTV5iKDQWDqrDS7A9s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730223796; c=relaxed/simple;
-	bh=MEWueq953fw1zDzFBUMOVC49e5stRv6Mz3wEG9Gq52s=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bMk9guupqZp3n3o/QoXzQ4gfHq1o/5K7Yg+fzQ0KXczqrz+t+CMuIakHJs2R5qAgC7meqMAqDh4ObdbcQPN0p73A1Ep7FnwDDOVOrkgFwLZRtVuNzK70NdF87hgmtS06KbCvmSNFvz/7ddVbFP1oaxy4iSLDW44pe/CPF44O+b0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CH+OUyb0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E37CBC4CEE4;
-	Tue, 29 Oct 2024 17:43:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730223795;
-	bh=MEWueq953fw1zDzFBUMOVC49e5stRv6Mz3wEG9Gq52s=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=CH+OUyb0qnKd1xh+UBSd4baG2vqOazVdpicyFokB5/yyErlFGs6Lwge2RBX5etLoU
-	 B6muPEsILjUGd0Oo8VSt4u5PwFHwJEb+TNxBf8MkGMLEz7ILEok5r1pJfpe5TWrYAg
-	 eU0wiOXceV2wk397T6ESTzTYpoii4RsuvDD/DbbXLKGbM7M2wLJF9f/w9edCtyTNr3
-	 FHczFW7Awlqiuom9dW0WvCSUxkNV8huc83m+gDNN8HbUnRhYiumhQmp7WPoih/6c1c
-	 q7y4NL/trInpkc657uCJdcSIAXhv5UjwlY+oowWvkZ002XBSk0ZKFp2rLcul0ZMUvp
-	 Jwp13FYEM0aIA==
-Date: Tue, 29 Oct 2024 10:43:13 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Ronnie.Kunin@microchip.com, Fabi.Benschuh@fau.de,
- Woojung.Huh@microchip.com, UNGLinuxDriver@microchip.com,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-usb@vger.kernel.org
-Subject: Re: [PATCH] Add LAN78XX OTP_ACCESS flag support
-Message-ID: <20241029104313.6d15fd08@kernel.org>
-In-Reply-To: <a0d6ef0c-5615-40fd-964d-11844389dc29@lunn.ch>
-References: <20241025230550.25536-1-Fabi.Benschuh@fau.de>
-	<c4503364-78c7-4bd5-9a77-0d98ae1786bf@lunn.ch>
-	<PH8PR11MB796575D608575FAA5233DBD4954A2@PH8PR11MB7965.namprd11.prod.outlook.com>
-	<a0d6ef0c-5615-40fd-964d-11844389dc29@lunn.ch>
+	s=arc-20240116; t=1730223985; c=relaxed/simple;
+	bh=R7trcbfArRuPy5MCLW/VxV8JzRUNecwkntxMoDb0i30=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=o4oaStPcg0yAUcrvUAmU2o50lUQ/YYm4vT4pQar5Wn8DJxxH/DxMov0VzN/lQJid0KWYn2a3BSlCUuIiMt4a1jeiO0IQtAo4vhftYfHVakQN8bs4MecW97d8+64gG2GnBjdic/1KipHQVOLvM3vVnihX+uWofrTZ62ubogXVq8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JUmht5d5; arc=none smtp.client-ip=209.85.219.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6cbf0e6414aso28271116d6.1;
+        Tue, 29 Oct 2024 10:46:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730223982; x=1730828782; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=I0Fvm44WesuRZGxBh/x6Fxq8sMFr4yLcHaDCmXukXME=;
+        b=JUmht5d5bsKWcOtrqlRd8djphGoLZrQAaojfBd892dgjl7si5xcknjS6CTkjNckJHG
+         QLkIoVt9ftBh5nf53m1L8L25Y2jO0VHU1btS8nti+XQD6j7Mp0dzsivDUp2s1mVwKIg/
+         m6yYzqjBtD7Tr+gn96DKRxWp2QfGgK3XS7BLkfazwtOZztY1ygPujsY2UOnUz4VEL+OI
+         NDzM8LutCv6RkLk0M8JUSWYNeb5yTqpvY9F2NR9BLw/qb+aHcbDG2vRbfn0gLNR45+tm
+         cICKK0rTfAoyxlpokGilb5UIDueTus5qMyd3rc9TgNSKyXXN+EtdSXPSHUTxMxNx/RKP
+         q6Zw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730223982; x=1730828782;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=I0Fvm44WesuRZGxBh/x6Fxq8sMFr4yLcHaDCmXukXME=;
+        b=Emfcb5KWIqSgRvoiT+XmfydF6M7/alw4B2Uj4/5ecR91SsOQRLRBipdZ+j/aCaGtL+
+         nctUlwNnw5L3NIgiHCsjEoEd7BWIai9dlmA2uzAL/Iiv06fMwWS3VvyMkW7SH2/NktRw
+         jRJ00pgWUCbSO9IM7zAHuBLAnfbd5HB7vfdI3I84TWI7lq8bRg7+p7yMaedujPFrWk+C
+         4oXE/UdSJJIKxxAIsKpbJA5sgI5UI8lCVHS7pPBPokDs5csT0Et9BIx86XTQxd/qVU8W
+         weL3BjpZoBRIrcrZb/TA1hcBWq9JSRcsGgtjKILqycW/75hgTuwZJ0mqu2C9DI5lIeDx
+         W1iA==
+X-Forwarded-Encrypted: i=1; AJvYcCUT+XwlAsr7t66jw+a8ga+K3rEQWvW90bMvhHK/1YNVRLpwiIAefZeaJuyXDa8qrEexePPFrQY58UsF@vger.kernel.org
+X-Gm-Message-State: AOJu0YwJVqv+7ehxBRs272grZe4B195E83ykLG2nHgx6YvfbgKXW84pG
+	LmmHl1BfJWrWL71VHoKBHD4rCJDGsi7gJzYVgVURAe5yW31ZPelHOLifWA==
+X-Google-Smtp-Source: AGHT+IETudjIYwsjMzeCzW2jBIpSZ1wEMT60ec949/fqPCGdmRIGDNd6Wr914SSWJaUtzVjX90G9xQ==
+X-Received: by 2002:a05:6214:3d11:b0:6cb:f6de:3d11 with SMTP id 6a1803df08f44-6d18584fcfbmr207737236d6.41.1730223982544;
+        Tue, 29 Oct 2024 10:46:22 -0700 (PDT)
+Received: from wsfd-netdev15.anl.eng.rdu2.dc.redhat.com ([66.187.232.140])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d17972f68bsm44133626d6.15.2024.10.29.10.46.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 10:46:22 -0700 (PDT)
+From: Xin Long <lucien.xin@gmail.com>
+To: network dev <netdev@vger.kernel.org>,
+	linux-sctp@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Subject: [PATCH net] sctp: properly validate chunk size in sctp_sf_ootb()
+Date: Tue, 29 Oct 2024 13:46:21 -0400
+Message-ID: <a29ebb6d8b9f8affd0f9abb296faafafe10c17d8.1730223981.git.lucien.xin@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Mon, 28 Oct 2024 20:19:04 +0100 Andrew Lunn wrote:
-> > This is pretty much the same implementation that is already in place
-> > for the Linux driver of the LAN743x PCIe device.  
-> 
-> That is good, it gives some degree of consistency. But i wounder if we
-> should go further. I doubt these are the only two devices which
-> support both EEPROM and OTP. It would be nicer to extend ethtool:
-> 
->        ethtool -e|--eeprom-dump devname [raw on|off] [offset N] [length N] [otp] [eeprom]
+A size validation fix similar to that in Commit 50619dbf8db7 ("sctp: add
+size validation when walking chunks") is also required in sctp_sf_ootb()
+to address a crash reported by syzbot:
 
-After a cursory look at the conversation I wonder if it wouldn't 
-be easier to register devlink regions for eeprom and otp?
+  BUG: KMSAN: uninit-value in sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
+  sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
+  sctp_do_sm+0x181/0x93d0 net/sctp/sm_sideeffect.c:1166
+  sctp_endpoint_bh_rcv+0xc38/0xf90 net/sctp/endpointola.c:407
+  sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
+  sctp_rcv+0x3831/0x3b20 net/sctp/input.c:243
+  sctp4_rcv+0x42/0x50 net/sctp/protocol.c:1159
+  ip_protocol_deliver_rcu+0xb51/0x13d0 net/ipv4/ip_input.c:205
+  ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
+
+Reported-by: syzbot+f0cbb34d39392f2746ca@syzkaller.appspotmail.com
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Xin Long <lucien.xin@gmail.com>
+---
+ net/sctp/sm_statefuns.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/sctp/sm_statefuns.c b/net/sctp/sm_statefuns.c
+index 7d315a18612b..a0524ba8d787 100644
+--- a/net/sctp/sm_statefuns.c
++++ b/net/sctp/sm_statefuns.c
+@@ -3751,7 +3751,7 @@ enum sctp_disposition sctp_sf_ootb(struct net *net,
+ 		}
+ 
+ 		ch = (struct sctp_chunkhdr *)ch_end;
+-	} while (ch_end < skb_tail_pointer(skb));
++	} while (ch_end + sizeof(*ch) < skb_tail_pointer(skb));
+ 
+ 	if (ootb_shut_ack)
+ 		return sctp_sf_shut_8_4_5(net, ep, asoc, type, arg, commands);
+-- 
+2.43.0
+
 
