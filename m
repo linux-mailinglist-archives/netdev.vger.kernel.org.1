@@ -1,228 +1,149 @@
-Return-Path: <netdev+bounces-140171-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140173-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 42D859B567B
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:07:58 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B7829B5681
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:08:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C78C41F23E06
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:07:57 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B6CA7B223E0
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:08:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20FDF20E002;
-	Tue, 29 Oct 2024 23:06:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3906C20B201;
+	Tue, 29 Oct 2024 23:07:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="R+YYehnA"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="MaN2mMHf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.17.20])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5D720B21B
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 23:06:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E90B20C33B;
+	Tue, 29 Oct 2024 23:07:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.17.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730243181; cv=none; b=kqzI0i8sy0sZp9oQ0x9YmlOznUQpKVZGD0vjn5KolzpjYQoQy1OYHc/7nid6oyUel9MB76jsPMuPQuqB7q7YFqN+QnylzHko/u3oCQZJZZh3++J7uHPDF5QgrYlUapqsB/beBEnIUaxVSpCIEXleuqvjKDAS056nhc38KzzQtws=
+	t=1730243228; cv=none; b=cJM506wIMatalKOsV+tRO1gL0xRRwk6yGpCQIwb/DaQED/QeTCudlYXD1ZSfmIqYOS/gGtMjw86gtDMu9oyQQk6tqPK1E2IhoAnVZQY/cjCOwPtxXUaFl/HtfJCI6Cga9t77VB75hoFocmG5gm4qiDG7L+d40px7MFUmB9W1prQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730243181; c=relaxed/simple;
-	bh=Au6AN8yfyazUUk9v9fcNH1YO+69ADNVrgDbw4mvV8HA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=FPHHHmn2rbZSH+rEFt7LJ+SDCSLxCF7fW358zbS/iicKaTN2GFfcLhv7i/Tr3BuSKMuOCPSlmDohZc01/cxZyj7ph4xMW+u60ZFhctwzKwAYXSUfbAw9ZNj87OTpWR+T+QBwuJve2aqbSzNLwZ1BZOM64ABhMcQZJdGecLzVwQw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=R+YYehnA; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-71e953f4e7cso4440337b3a.3
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 16:06:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1730243178; x=1730847978; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pqXTZJWkdTVEgjeilhHk8BZ1ynAufoDLVRHn5o54aOg=;
-        b=R+YYehnAbk2uA9/FfplEwmAwpxoe2wTqzgvT9SF9mtwbNEVnH7RUuoM26KA+rAb+Gr
-         VwL3MojnLbaCvUeEssqk3ZMtESUwXRBpazlmHLB/VGRFO/4slPGtCGqHbArw/IgIps4b
-         yyHO6evNVcGZQPvAk+HtMlv8/aKu41iwEbIVplm3S/oVQ6B5RToVjHwqMPL3JJmhsLtZ
-         jXnkhfnnzhuULP+seiGcTdtzF6jpJkLRvpTUJfyDqrMNAM91QRsguHvn/RiDHea0r2OQ
-         w8PhedHab0zw0htlrshAnEAxYb4upNrgEFJM+Nm4rEyKiku78dFx1vP61YbMDSyiMzf8
-         jrGg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730243178; x=1730847978;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pqXTZJWkdTVEgjeilhHk8BZ1ynAufoDLVRHn5o54aOg=;
-        b=P3czLbpNo3sTne943WITrI33gN6aXOiPZVGgHEmwHyOp8fmh+Hkj5qH0iZB47UHnpQ
-         Kwv+SHf+rmFAVTsM6lubbi3nfyPV0SehqBP4iXGPHVWlGjYkZnq3A7yfH8m5Xb4JZ9JS
-         D6qKeMCAlsF8rFXHsUKGD8S8X3JN23wGLCBTwRCDJKmyjLUOOcZDLEY0cDY428wgSL0R
-         Cz145iLHREiToIv8ERW25GzGDzA+RsLDiqSHKuY0viif/wr66BwSB0lRQVIa4r9iGUQq
-         LtpQIkVqYCnl9dUlbaJWkgSKqEdwqO22pedUb0R6ar/0dlYteDaxvXvDXIGYcZ5Xdl2S
-         9N0g==
-X-Forwarded-Encrypted: i=1; AJvYcCVRsPgKPph9FAOpCJwLQVUkFZ3wxuw0nCipkCZH30zydLtaEFwN+4Zk92/R/QLBixjCDNeitc4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwiRavjK6B/mPmBFWGuJmmWp6yYcFC8RV36Cn+ebL9RFNYOEn3E
-	r0f3IELEo6UbiEp8M0BDMoN0C/LK6MAyJGyjokhnW2cLNUC/ZPVR3b1HvRPZiTo=
-X-Google-Smtp-Source: AGHT+IFc1nfMHIuQ/hIQC+POg1TOelh10OutJBD3En13JXkTOjNIXlnvIzpbP9gO8BUDMJIRGuOdbQ==
-X-Received: by 2002:a05:6a00:3e1f:b0:720:36c5:b548 with SMTP id d2e1a72fcca58-72062fb8112mr17944813b3a.16.1730243178116;
-        Tue, 29 Oct 2024 16:06:18 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-017.fbsv.net. [2a03:2880:ff:11::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057921619sm8136813b3a.4.2024.10.29.16.06.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 16:06:17 -0700 (PDT)
-From: David Wei <dw@davidwei.uk>
-To: io-uring@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	David Ahern <dsahern@kernel.org>,
-	Mina Almasry <almasrymina@google.com>,
-	Stanislav Fomichev <stfomichev@gmail.com>,
-	Joe Damato <jdamato@fastly.com>,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH v7 15/15] io_uring/zcrx: throttle receive requests
-Date: Tue, 29 Oct 2024 16:05:18 -0700
-Message-ID: <20241029230521.2385749-16-dw@davidwei.uk>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <20241029230521.2385749-1-dw@davidwei.uk>
-References: <20241029230521.2385749-1-dw@davidwei.uk>
+	s=arc-20240116; t=1730243228; c=relaxed/simple;
+	bh=LS0YRJHu3A8iH7JzTPwiZAZ+EhA61ZxRflL9vEOtVmM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fJhEZmP7VsgyYQRk0yxmRyuma1Htytfnnrb43NJ6L0K5+WXl+tinvcVMnpRKSJv3cAIh2vOIrpaBfsVWk4H16udY+gM/OwkyqmPF6du2UBL6B1YLMJXTcG7wUOinwpaZBYgudCYeaBg+EquIRJudAIRJqzQ3LFI6UuINRTBE9n8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=MaN2mMHf; arc=none smtp.client-ip=212.227.17.20
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
+	s=s31663417; t=1730243208; x=1730848008; i=wahrenst@gmx.net;
+	bh=r+KwVTsesl4ttQu80egOPD9HHxdn/eJS50zewzoUDf8=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=MaN2mMHfFFdIHzCmLobfG4sbJyNOlWbv3oiH8f+sBpVdKyQS60fStgoPs0EqcdVK
+	 G/2E72tOav65bAUoHJe8/US0PbnJBLr9c1/+PF2pIRxG+h+sd0HM8IibwpCwR4N1G
+	 lge0D0J8JNIuHBTU/WHp5w20gogn7ATDqMLCaaHARdoVveurCh4d9ySoKGb33ZmiR
+	 4UGPzSgjlo8USJLsh8M+OnWEfX5rx7CQhffJRYA5Owno6+hzvXuCgzLTpgsxnuwYU
+	 5WXEyO3IY9CB/l+nuS/OcFCbBgX/NnS8FGtBvw0XGOVic8XJaQGBXAbPHVTDVJ0wm
+	 czerNiy99uy4kKSA6Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.105] ([37.4.248.43]) by mail.gmx.net (mrgmx105
+ [212.227.17.168]) with ESMTPSA (Nemesis) id 1M26r3-1t7qAj1INt-00FTPv; Wed, 30
+ Oct 2024 00:06:48 +0100
+Message-ID: <ea4842c2-7c65-4d45-9964-1a1274d29ea4@gmx.net>
+Date: Wed, 30 Oct 2024 00:06:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net: vertexcom: mse102x: Fix possible double free of
+ TX skb
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, Dan Carpenter <dan.carpenter@linaro.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ stable@vger.kernel.org, Simon Horman <horms@kernel.org>
+References: <20241022155242.33729-1-wahrenst@gmx.net>
+ <20241029121028.127f89b3@kernel.org>
+ <10adcc89-6039-4b68-9206-360b7c3fff52@gmx.net>
+ <20241029150137.20dc8aab@kernel.org>
+Content-Language: en-US
+From: Stefan Wahren <wahrenst@gmx.net>
+In-Reply-To: <20241029150137.20dc8aab@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:RbgypJ/eQcQqQ2v+0ap98pZEGXQnozJHh8a24hlbBKSR4BLY30d
+ B+G9k5qumGJD52gYrEJWV/jrPwUhaWZrSgp/QyivUhCacfXIGKbQCnWo92EP/SLmJNTBtQH
+ kliMHveXFX+a6x3Jc5pm1Mr/ijjIP2xlkuRicB0jYNea5KceHPeRVvIBFQUTpRdkFEYkbpq
+ pB0R+xiDiK/Dmmxn3MOLA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:ejx3F0vDcbI=;jcDdBVKAqfs4nq8UddL/nwcw0p1
+ qRYSGBqZh9o3aNt94olvvGpJVm9L0HX8gtK8ktRqsI+2EdUJh8DBguFqkKM/gSKj9Xxbv4cRz
+ XkHR5KmGn9K34bN5b/ErnaUUMkInAI7Suv9xapvQvpvcIQE9Zh8rzP/B1PPdWxudgiAbjSXxi
+ OtEOiFWEaIaqtGLlr4gHv4XtXsaz8n2sg1TSs6gMRtEA0fjmU8gkhDg2P3D5pF0n7zcOGdoPU
+ hpcsa5PpKsA5R5Bck71lx/0e+WKXCFkjzGDglH2FltbR77+E6i4sYxrBeD43+jAVOoZ2S8713
+ O6h8JVJII7XINH7iaUNMfjJfh2zVpH8c7dz2vRD4CGS/yQ+Zk4dOg5bmppyF8gQeQFaZsrJnP
+ 0l2JspNkTy7TeMQkL2pGjfblk7lY2tPfx8lmpN3YUfKv6Hp83G8yyn0ibvDSHnUDBBwOvgqh2
+ D5tpqIb9xtF3Sg6bRU5YB11eWTfhWz5Q3BGHGYuBVNWyPU1Lgw9ZEE+2mo/gka9TQR6Aw3ccx
+ QAuue+pcD/AKDjMXo8s1tKg1rkkW3Iik2e1HC+kZjYqCouldEo12K2ORS10nd6tYnjIUqBc7c
+ kaMEGI5i7JIovjsUoVsIJpslKCy8VmjObBnMShg4qxDW9aGAH0ctuGu2X/xPsnKwwtjl7D5JY
+ Nv70jap6YmKs9lUqtV7VRl0kIRAGxpO3dblHHpNhazoJJGdZLThYkR34ohwtQQUCl59L85qOK
+ xP84xBat15/Sl913s7DoEylb4Ee1uIcK3kGEkQBEOkNKWRM2iNUNHrImRqRpPJEhV5DmHBE08
+ hOKnFQH1up4Z4X/xlI7yJ1XA==
 
-From: Pavel Begunkov <asml.silence@gmail.com>
+Am 29.10.24 um 23:01 schrieb Jakub Kicinski:
+> On Tue, 29 Oct 2024 22:15:15 +0100 Stefan Wahren wrote:
+>>> Isn't it easier to change this function to free the copy rather than
+>>> the original? That way the original will remain valid for the callers.
+>> You mean something like this?
+>>
+>> diff --git a/drivers/net/ethernet/vertexcom/mse102x.c
+>> b/drivers/net/ethernet/vertexcom/mse102x.c
+>> index a04d4073def9..2c37957478fb 100644
+>> --- a/drivers/net/ethernet/vertexcom/mse102x.c
+>> +++ b/drivers/net/ethernet/vertexcom/mse102x.c
+>> @@ -222,7 +222,7 @@ static int mse102x_tx_frame_spi(struct mse102x_net
+>> *mse, struct sk_buff *txp,
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 struct mse102x_net_spi *mses =3D to_mse102x_=
+spi(mse);
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 struct spi_transfer *xfer =3D &mses->spi_xfe=
+r;
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 struct spi_message *msg =3D &mses->spi_msg;
+>> -=C2=A0=C2=A0=C2=A0 struct sk_buff *tskb;
+>> +=C2=A0=C2=A0=C2=A0 struct sk_buff *tskb =3D NULL;
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 int ret;
+>>
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 netif_dbg(mse, tx_queued, mse->ndev, "%s: sk=
+b %p, %d@%p\n",
+>> @@ -235,7 +235,6 @@ static int mse102x_tx_frame_spi(struct mse102x_net
+>> *mse, struct sk_buff *txp,
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 if (!tskb)
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 return=
+ -ENOMEM;
+>>
+>> -=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 dev_kfree_skb(txp);
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 txp =3D tskb;
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> @@ -257,6 +256,8 @@ static int mse102x_tx_frame_spi(struct mse102x_net
+>> *mse, struct sk_buff *txp,
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 =C2=A0=C2=A0=C2=A0 mse->stats.xfer_err++;
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 }
+>>
+>> +=C2=A0=C2=A0=C2=A0 dev_kfree_skb(tskb);
+>> +
+>>   =C2=A0=C2=A0=C2=A0=C2=A0 return ret;
+>>   =C2=A0}
+> Exactly, I think it would work and it feels simpler.
+I didn't test it yet, i need access to evaluation board before. But this
+change will behave differently regarding stats of tx_bytes [1]. The
+first version will include the padding, while the second does not.
 
-io_zc_rx_tcp_recvmsg() continues until it fails or there is nothing to
-receive. If the other side sends fast enough, we might get stuck in
-io_zc_rx_tcp_recvmsg() producing more and more CQEs but not letting the
-user to handle them leading to unbound latencies.
-
-Break out of it based on an arbitrarily chosen limit, the upper layer
-will either return to userspace or requeue the request.
-
-Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-Signed-off-by: David Wei <dw@davidwei.uk>
----
- io_uring/net.c  |  5 ++++-
- io_uring/zcrx.c | 17 ++++++++++++++---
- io_uring/zcrx.h |  6 ++++--
- 3 files changed, 22 insertions(+), 6 deletions(-)
-
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 5c015b47582f..f44344942d32 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -1261,10 +1261,13 @@ int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
- 	if (unlikely(!sock))
- 		return -ENOTSOCK;
- 
--	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT);
-+	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT,
-+			   issue_flags);
- 	if (unlikely(ret <= 0) && ret != -EAGAIN) {
- 		if (ret == -ERESTARTSYS)
- 			ret = -EINTR;
-+		if (ret == IOU_REQUEUE)
-+			return IOU_REQUEUE;
- 
- 		req_set_fail(req);
- 		io_req_set_res(req, ret, 0);
-diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index 1f4db70e3370..a2c753e8e46e 100644
---- a/io_uring/zcrx.c
-+++ b/io_uring/zcrx.c
-@@ -24,10 +24,13 @@
- 
- #define IO_RQ_MAX_ENTRIES		32768
- 
-+#define IO_SKBS_PER_CALL_LIMIT	20
-+
- struct io_zcrx_args {
- 	struct io_kiocb		*req;
- 	struct io_zcrx_ifq	*ifq;
- 	struct socket		*sock;
-+	unsigned		nr_skbs;
- };
- 
- struct io_zc_refill_data {
-@@ -701,6 +704,9 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- 	int i, copy, end, off;
- 	int ret = 0;
- 
-+	if (unlikely(args->nr_skbs++ > IO_SKBS_PER_CALL_LIMIT))
-+		return -EAGAIN;
-+
- 	if (unlikely(offset < skb_headlen(skb))) {
- 		ssize_t copied;
- 		size_t to_copy;
-@@ -778,7 +784,8 @@ io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
- }
- 
- static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--				struct sock *sk, int flags)
-+				struct sock *sk, int flags,
-+				unsigned int issue_flags)
- {
- 	struct io_zcrx_args args = {
- 		.req = req,
-@@ -804,6 +811,9 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 			ret = -ENOTCONN;
- 		else
- 			ret = -EAGAIN;
-+	} else if (unlikely(args.nr_skbs > IO_SKBS_PER_CALL_LIMIT) &&
-+		   (issue_flags & IO_URING_F_MULTISHOT)) {
-+		ret = IOU_REQUEUE;
- 	} else if (sock_flag(sk, SOCK_DONE)) {
- 		/* Make it to retry until it finally gets 0. */
- 		ret = -EAGAIN;
-@@ -814,7 +824,8 @@ static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- }
- 
- int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--		 struct socket *sock, unsigned int flags)
-+		 struct socket *sock, unsigned int flags,
-+		 unsigned int issue_flags)
- {
- 	struct sock *sk = sock->sk;
- 	const struct proto *prot = READ_ONCE(sk->sk_prot);
-@@ -823,5 +834,5 @@ int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
- 		return -EPROTONOSUPPORT;
- 
- 	sock_rps_record_flow(sk);
--	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags);
-+	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags, issue_flags);
- }
-diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-index 5d7920972e95..45485bdce61a 100644
---- a/io_uring/zcrx.h
-+++ b/io_uring/zcrx.h
-@@ -48,7 +48,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx);
- void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx);
- int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--		 struct socket *sock, unsigned int flags);
-+		 struct socket *sock, unsigned int flags,
-+		 unsigned int issue_flags);
- #else
- static inline int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 					struct io_uring_zcrx_ifq_reg __user *arg)
-@@ -62,7 +63,8 @@ static inline void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
- {
- }
- static inline int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
--			       struct socket *sock, unsigned int flags)
-+				struct socket *sock, unsigned int flags,
-+				unsigned int issue_flags)
- {
- 	return -EOPNOTSUPP;
- }
--- 
-2.43.5
+[1] -
+https://elixir.bootlin.com/linux/v6.12-rc5/source/drivers/net/ethernet/ver=
+texcom/mse102x.c#L445
 
 
