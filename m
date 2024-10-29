@@ -1,98 +1,91 @@
-Return-Path: <netdev+bounces-139939-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78DBB9B4BC2
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:10:37 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F6859B4BD9
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:14:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA3591C22721
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:10:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52D5E284E4E
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:14:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3A5B206E80;
-	Tue, 29 Oct 2024 14:10:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D72A6206E93;
+	Tue, 29 Oct 2024 14:14:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="IgQurlvF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fHwHMPit"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BD1021345
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 14:10:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5ED2206E8B;
+	Tue, 29 Oct 2024 14:14:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730211034; cv=none; b=kuI8Q1HLoeJ+7TCsXn/EKMxxg0cn2LTn5btr0XWlK34FVI1HVHtQfMRRCOvYcB5GadXg8uHCo6ZJNNIjNO/+TrbQV0i9FUX3evm8roLH4GCBNMlmkuyMBfhtSSUwiCMTfjnP+Evb+b4ZIJqH4QAAz+BjwDVRlkbt59OjZ5IM+gM=
+	t=1730211279; cv=none; b=tFU9ik5XK43jU27WZLKeVee6GsWIIO6CiknS8+9zxyo4Wtjyxjd0Zc1omebWa2UDNs2Ed8C1p2LzzVP82wlbXSNS2S2wPFnCCU4aTnqIVn5fqx89lz6MZk7+yjyB9QRae8z/pUVFIcHkEd3MeEEeulle5Y2l0p4OJorGZSc0guE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730211034; c=relaxed/simple;
-	bh=AJTK+6/kMKORkTlvqrVf83EFCPr2LaZhC6uKdi4hEVg=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=sG2Mf7Rd3CL0Kr4fB+ko71jJ4ZY0/c0dFEw+7jC80E+BY3WB5Un9Vu3h8TovXhQI1iIiy7CmLlDUQL/h2C9mqtq1VuZ7xuapLa4GbQaeZevUdCDE1IX4s2qq7npoSJ2/0iC0xrK2jLtoorUWOfHxrk2LyRvi3lrnQDYTuhVkQAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=IgQurlvF; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1730211023;
-	bh=AJTK+6/kMKORkTlvqrVf83EFCPr2LaZhC6uKdi4hEVg=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=IgQurlvFtSejd84FS0p0sKYNdPN3IRW7URguksHC2pHLKBhY7Bi3N93Hn3JIdPZbZ
-	 u2QYQdSYXhTKIASas0TOF2CtBomFxpbC0g2Dg8w0T5JS2XbkYaU+vAxAeEVPLHH09v
-	 /Yx+UFqz9mNI8GNmujqs0R5IvfNzMQJ/daIaMuu5mt0srI2rPXpbY/tirNPXDlXMb+
-	 iIvR7wG92s+Nkis6CRHwpf+JlCuW2rknzgmKewwFJNAWE7ISLZpAlutQ8WnShNIWt7
-	 x63MsNBq7gvv9Kqi9+zd8W3MIlAdXGCkVuRNJkZ9gg/FGbsTuvTt3aGZvn0hxV0oRc
-	 FUhwQ+7VS1gTQ==
-Received: from sparky.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id E3FB66A28C;
-	Tue, 29 Oct 2024 22:10:20 +0800 (AWST)
-Message-ID: <f241ba4c7b57ec5142648de2b14cc070b0708823.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net 1/2] net: ethernet: ftgmac100: prevent use after
- free on unregister when using NCSI
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,  Joel Stanley
- <joel@jms.id.au>, Jacky Chou <jacky_chou@aspeedtech.com>, Jacob Keller
- <jacob.e.keller@intel.com>,  netdev@vger.kernel.org
-Date: Tue, 29 Oct 2024 22:10:24 +0800
-In-Reply-To: <29efcfe2-852d-4df2-9b9c-a06b4fd2deed@lunn.ch>
-References: <20241028-ftgmac-fixes-v1-0-b334a507be6c@codeconstruct.com.au>
-	 <20241028-ftgmac-fixes-v1-1-b334a507be6c@codeconstruct.com.au>
-	 <fe5630d4-1502-45eb-a6fb-6b5bc33506a9@lunn.ch>
-	 <0123d308bb8577e7ccb5d99c504cec389ba8fe15.camel@codeconstruct.com.au>
-	 <29efcfe2-852d-4df2-9b9c-a06b4fd2deed@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1730211279; c=relaxed/simple;
+	bh=C9rPKReirZqEE6tK4eWfd9om5uA5nAukJuBcx5n2FLY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QZFgz89JFnzrtd/YvnYu/FKoVgImqPtmSkuc+WWZpq3C4Gs54GgG4pu64tqoQKqDNUKReDm6Tp+beAkyXW35cXQevq1N+m/mydheup6KpetZtH/Wd9X45EUDvijI461a/YCTk51yTypmQvbEtt1i346CUlsexR6xhr3D1rZzIuw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fHwHMPit; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0253FC4CECD;
+	Tue, 29 Oct 2024 14:14:37 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730211279;
+	bh=C9rPKReirZqEE6tK4eWfd9om5uA5nAukJuBcx5n2FLY=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=fHwHMPit1hXLDMidzDlppOTPxn+FAPqf7cxdv3Tsx/Bv8ovLXgNFf/ga7MSHCzNP2
+	 5gUBZ9Tkq9tTUgIyhgW70/TA1tMqendHQpTJB6E0FJ9Ue1G2QgtRL7d2GFJzckplwQ
+	 qP6tZw8cmmEdgax4DRRWZGl6ix7EtMEd6A4OsWtdC9kR6BjO6JfGHzPWvO6/DHKYsh
+	 pY5FDEkQGTAJ3c7EzO7KgqCgMThyPYOS7qbKsWYzQUvqquvUaVuWiSRgmOU16jcpbn
+	 hOyJb99oBM8ZG6stA/6HO7Duqtu5naAkeOLzntZ6Hr8qtkm0dbRnBBiNNQre+ZI1xV
+	 Fy67Sj1qi/iow==
+Date: Tue, 29 Oct 2024 07:14:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Li Li <dualli@chromium.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com,
+ gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
+ maco@android.com, joel@joelfernandes.org, brauner@kernel.org,
+ cmllamas@google.com, surenb@google.com, arnd@arndb.de,
+ masahiroy@kernel.org, bagasdotme@gmail.com, horms@kernel.org,
+ linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org,
+ netdev@vger.kernel.org, hridya@google.com, smoreland@google.com,
+ kernel-team@android.com
+Subject: Re: [PATCH net-next v6 1/1] binder: report txn errors via generic
+ netlink
+Message-ID: <20241029071437.2381adea@kernel.org>
+In-Reply-To: <20241028101952.775731-2-dualli@chromium.org>
+References: <20241028101952.775731-1-dualli@chromium.org>
+	<20241028101952.775731-2-dualli@chromium.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Andrew,
+On Mon, 28 Oct 2024 03:19:51 -0700 Li Li wrote:
+> +			report.err = BR_ONEWAY_SPAM_SUSPECT;
+> +			report.from_pid = proc->pid;
+> +			report.from_tid = thread->pid;
+> +			report.to_pid = target_proc ? target_proc->pid : 0;
+> +			report.to_tid = target_thread ? target_thread->pid : 0;
+> +			report.reply = reply;
+> +			report.flags = tr->flags;
+> +			report.code = tr->code;
+> +			report.data_size = tr->data_size;
+> +			binder_genl_send_report(context, &report, sizeof(report));
 
+Could you break this struct apart into individual attributes?
+Carrying binary structs in netlink has been done historically 
+but we moved away from it. It undermines the ability to extend
+the output and do automatic error checking.
 
-> The order should be reversed, you undo in the opposite order to what
-> you do. This is probably not the issue you are having,
-
-No, it's not - the crash occurs before the introduction of the phydev
-for ncsi configurations, so the order didn't matter in that case.
-
-> but it does show this driver has ordering issues. If you solve the
-> ordering issues, i expect your problem goes away.
-
-"solving the ordering issues" is probably best done by the driver's
-maintainers; I have very few facilities for testing the various
-configurations that this driver supports.
-
-I'm just sending a couple of minimal patches for crashes I have seen.
-All good if you'd like to explore some further driver surgery, but I'm
-not the one to do that.
-
-Cheers,
-
-
-Jeremy
+BTW if you would like to keep using the uapi/linux/android directory
+feel free to add this as the first patch of the series:
+https://github.com/kuba-moo/linux/commit/73fde49060cd89714029ccee5d37dcc37b8291f6
 
