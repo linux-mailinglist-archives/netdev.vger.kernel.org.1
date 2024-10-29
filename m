@@ -1,130 +1,97 @@
-Return-Path: <netdev+bounces-139787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D5E69B4171
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:59:00 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11B3E9B4179
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 05:07:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBF011C20430
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:58:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7E41AB21731
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:07:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1E4E2010E8;
-	Tue, 29 Oct 2024 03:58:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25AF1E883F;
+	Tue, 29 Oct 2024 04:07:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="AITu+Rjp"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="AyiMrZSt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F662010E0;
-	Tue, 29 Oct 2024 03:58:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 725DDFC0B
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 04:07:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730174296; cv=none; b=Y7pUX+i7FKQmTeBMjZAY5tU9ru8vtJhyM2lCWDywwOiEXxK0WIFd9rHO6hzjoAyf2klpIr5heNo8iUH7pJSkzjy1H/HuXWVnUx0vKZNuc7qpgs5k4i3M27aDuCeSjlia7n7y3PpTgyF0vgYbY9EaLo7IeT/Nj+mK9t0/VoHJYS0=
+	t=1730174824; cv=none; b=p1+Mr4snoHQI9bb7WeombKuGAFi9bxwD29Y4Zfj3vVsljTMPP/ZNcfJIPNEnZro4YSPCXx14n4AKKoXvCKiUNgDweaa+VyTjmvVuEbfAdK9R0q2BlkIvpfT7hJy0qYztZ5jUIAkpVcqlASEUmfBhS0FPLKb+BAZK3uU/zjDpGSs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730174296; c=relaxed/simple;
-	bh=F2u3cl2SjWcs3OjghOgsxJYL8VpiRf/JhfUKtn4kDwQ=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ixoaW8PHqZyV1+vEMUozBxx/PtE+21srN3g5gMHeThVXR98HWM15PSnikxp/w9Zstp2lM9MDnkthck2BIjHU4rzi0/CTpa1JQ5JoHZ9zZywU72JN+O6MFn6lERz3s1dlrHdYtkKF7HbqJWSDDT+V8aEj5/W69MZc1n30/OBzz30=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=AITu+Rjp; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49T0ABte014722;
-	Mon, 28 Oct 2024 20:58:08 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=/
-	sDZ1ethO15plh1blqFEQBc1mrttvUCmt9BDT2Yu4Rs=; b=AITu+RjpGFvVvxSAg
-	djOXHk2QWpOILA2opgcg4Sx/Ar2PwtzDgrjDK81oMKKJp+78apCWIy5SZ6BQ9HAF
-	ZCC1o0H4wG69/xKIXW7hvjmU22XyRuUJXkR/6WT6Vj2+J7wj2DG6br4uU2HNj8k0
-	8oYe7VqMSOPChGAp4g7bdUNdLebl1TPnIFqK6YJpXR119frU7Xn90Vhc3buSsvdP
-	Hxff5dxcFLL372azL8WDpbGofoguGWWfKVFKAg0jO+JQ68KPcX9+ml2MdkeuhXRX
-	dLLIsCRbchdBXnJ9wVVbWBQszcoFYikj+0ObPva22wh+0XHBU7jXaJ9/+ascmf++
-	F07/g==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 42jmx40ggd-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 28 Oct 2024 20:58:08 -0700 (PDT)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Mon, 28 Oct 2024 20:58:07 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Mon, 28 Oct 2024 20:58:07 -0700
-Received: from virtx40.. (unknown [10.28.34.196])
-	by maili.marvell.com (Postfix) with ESMTP id 64A163F7054;
-	Mon, 28 Oct 2024 20:58:03 -0700 (PDT)
-From: Linu Cherian <lcherian@marvell.com>
-To: <davem@davemloft.net>, <sgoutham@marvell.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: <gakula@marvell.com>, <hkelam@marvell.com>, <sbhatta@marvell.com>,
-        <jerinj@marvell.com>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.comi>, <jiri@resnulli.us>, <corbet@lwn.net>,
-        <linux-doc@vger.kernel.org>, Linu Cherian <lcherian@marvell.com>
-Subject: [PATCH v4 net-next 3/3] devlink: Add documenation for OcteonTx2 AF
-Date: Tue, 29 Oct 2024 09:27:39 +0530
-Message-ID: <20241029035739.1981839-4-lcherian@marvell.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241029035739.1981839-1-lcherian@marvell.com>
-References: <20241029035739.1981839-1-lcherian@marvell.com>
+	s=arc-20240116; t=1730174824; c=relaxed/simple;
+	bh=uNS0ycjbfPv2iXZYalIkjnOcHGYRixJ7gcMpwq5EKWM=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=IfRP8XXgbfxmASqMgvXm7TxgrzUcZGoZy1pH3zbgOtLDemcivbW9hTIT/ibrcK9VOugQa2P+RjFK/8ZJ7DnSXzDjlAZuP5yClxFOghTzeicRRyk5/JIjH2rfuvYuFRrpu6rzvFEz9EdPGzfxB7rFO972/AyFPt4zjcBKDTakgS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=AyiMrZSt; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1730174819;
+	bh=uNS0ycjbfPv2iXZYalIkjnOcHGYRixJ7gcMpwq5EKWM=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=AyiMrZStwyqVSinfmrETkqjfVRBXynyLo3V+KGtKRVAuCQn1cixiYWPp17omk5qe2
+	 uF19xDfY6FAK9zKxi9b9MQW09VyHTa3cNP5JWOB8wGMeFMMvbB1VDaps0myeMwMTyw
+	 tlQhH6o6uyj0agk+hPQ04Nm2pV8yrS0Zkg0Koe/nB7uRk4vRTq/+BxHZC8sB79lQAx
+	 1OBZx5LBmC9oaUbJeX71MKWBcpoOEBIOXlgJ1oEu4TT2/WbUG0tLeJjCoB0yLL7qYJ
+	 OZxG0SiLFNubXCEf7CNG1yU/JaiRAwX1SN7UZ1Vq3xuWxXhKWlZRsmjfdqULlTurS6
+	 bltp5/5uufqgw==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 93A2869353;
+	Tue, 29 Oct 2024 12:06:58 +0800 (AWST)
+Message-ID: <f3d0cafe11000fe1cad7b4ad13865b3bcfd2ad27.camel@codeconstruct.com.au>
+Subject: Re: [PATCH 2/2] net: ncsi: restrict version sizes when hardware
+ doesn't nul-terminate
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Vijay Khemka <vijaykhemka@fb.com>,
+ netdev@vger.kernel.org
+Date: Tue, 29 Oct 2024 12:06:58 +0800
+In-Reply-To: <4f56a2d0-eb1b-4952-a845-92610515082a@lunn.ch>
+References: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
+	 <20241028-ncsi-fixes-v1-2-f0bcfaf6eb88@codeconstruct.com.au>
+	 <286f2724-2810-4a07-a82e-c6668cdbf690@lunn.ch>
+	 <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
+	 <4f56a2d0-eb1b-4952-a845-92610515082a@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: I-XO5X8Xjcx0pKkDNmzNJ-VE3Ac3rchC
-X-Proofpoint-GUID: I-XO5X8Xjcx0pKkDNmzNJ-VE3Ac3rchC
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
 
-Add documenation for the following devlink params
-- npc_mcam_high_zone_percent
-- npc_def_rule_cntr
-- nix_maxlf
+Hi Andrew,
 
-Signed-off-by: Linu Cherian <lcherian@marvell.com>
----
-Changelog from v3:
-Newly added patch
+> > However, regardless of what the spec says, we still don't want the
+> > strlen() in nla_put_string() to continue into arbitrary memory in
+> > the
+> > case there was no nul in the fw_name reported by the device.
+>=20
+> I agree with that, but i was thinking that if it was not allowed, we
+> should be printing a warning telling the user to upgrade their buggy
+> firmware.
 
- Documentation/networking/devlink/octeontx2.rst | 15 +++++++++++++++
- 1 file changed, 15 insertions(+)
+Gotchya. All fine there.
 
-diff --git a/Documentation/networking/devlink/octeontx2.rst b/Documentation/networking/devlink/octeontx2.rst
-index d33a90dd44bf..7808ab361692 100644
---- a/Documentation/networking/devlink/octeontx2.rst
-+++ b/Documentation/networking/devlink/octeontx2.rst
-@@ -40,6 +40,21 @@ The ``octeontx2 AF`` driver implements the following driver-specific parameters.
-      - runtime
-      - Use to set the quantum which hardware uses for scheduling among transmit queues.
-        Hardware uses weighted DWRR algorithm to schedule among all transmit queues.
-+   * - ``npc_mcam_high_zone_percent``
-+     - u8
-+     - runtime
-+     - Use to set the number of high priority zone entries in NPC MCAM that can be allocated
-+       by a user, out of the three priority zone categories high, mid and low.
-+   * - ``npc_def_rule_cntr``
-+     - bool
-+     - runtime
-+     - Use to enable or disable hit counters for the default rules in NPC MCAM.
-+   * - ``nix_maxlf``
-+     - u16
-+     - runtime
-+     - Use to set the maximum number of LFs in NIX hardware block. This would be useful
-+       to increase the availability of default resources allocated to enabled LFs like
-+       MCAM entries for example.
- 
- The ``octeontx2 PF`` driver implements the following driver-specific parameters.
- 
--- 
-2.34.1
+> Are there any other strings which will need similar treatment?
 
+This is the only nla_put_string() in the ncsi code, and there are no
+other string-adjacent components of data represented in the spec (that
+I have come across, at least).
+
+Cheers,
+
+
+Jeremy
 
