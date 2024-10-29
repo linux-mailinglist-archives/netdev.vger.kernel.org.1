@@ -1,399 +1,228 @@
-Return-Path: <netdev+bounces-140008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 824FF9B5043
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:21:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5EA39B5073
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A56A91C22951
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:21:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C525D1C2291F
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B091D356C;
-	Tue, 29 Oct 2024 17:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0B3E1DA305;
+	Tue, 29 Oct 2024 17:24:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="ed0NIJQK"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="yJdP1jFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-16.smtpout.orange.fr [80.12.242.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82EBC199947;
-	Tue, 29 Oct 2024 17:21:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7341DC04A;
+	Tue, 29 Oct 2024 17:24:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.142
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730222471; cv=none; b=bUCP+RNYQzG65E67iy4LhrvMumzf/JuqNujK4D2wDc6Pk8OnfFiWPP+Miht/zCu3LZ8c1BaIg+FDtYDnP9SfQT+JJjlqfZjN5eeeWCRu7dOclUhhsA17U9yQJL+9sfGW0varJAAtJTXPjaAaEN31iTD9WITRDCg2gKk6Wwk7g60=
+	t=1730222672; cv=none; b=OdMm140a/Xw76EbSVys/GipPdUWmW3N7oxn+keVCL28Rk+8gdZ7lgC1qIwdOdQWBvPBSniIIuF1bUwpNZarWKig4oUDq/n5MDgyy0CnYalWylmqaokyrinebY3CzUB0EdJDJx7DBsdS/KsVt+f7GN5JbtmehV8tboSas+vaXZls=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730222471; c=relaxed/simple;
-	bh=aZoSnhIYYGfzQEcndVUH53Dtr6Dv7M8RstKAy0UmYvk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gsqN9qvDGxyb9CNNfBnab3V84SgEYKh9mNi4qem7XXv0OgOQIC04j6fNKqoSNihOBB5w3blEURH+WKYdL5uT6Vwyi0+KfGUhFEjAfSmC3u1opzL7LcLIGOYxnU1MvpYQy8AFOMkcFBV229B1tTX4EXBHK9qVjr2/UsaJKNPgVvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=ed0NIJQK; arc=none smtp.client-ip=80.12.242.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id 5psqtypMIhwv35psqt8BUl; Tue, 29 Oct 2024 18:19:57 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1730222397;
-	bh=A1ipq0+eL7tHuEVwett4pkXKganRU63kOI3vJXzeeWc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=ed0NIJQKTL+P2upxbWMHO0auzbSV9RzRVB0u6H7QBWvuAMEJHaN7D27zzxhv8UtGl
-	 f9WBKYQUpxKylSMmZvk9ONwoBw4NT3oRwB0VV2x88tZAnnp1nDDdZwetxX49ziY4mi
-	 HtQp3uyljQ6pMBUD9OwN1N3WPaQA+OmsqobNDv18k3LbOtLlQMTwJuIGOX6Ugh32uO
-	 LUowdTBC/AIydclyN/CVYTJBvWEzlHeO1pOKO0RfyD8h8tFCcyKnu7w2fAWRtfv49S
-	 HS2S7ymxNHwwmsd8AJXBjpKe057o+WC626Uop20YwsSMePQ8WKOML6EmvGNQHjAJk1
-	 V790/COl27DZQ==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Tue, 29 Oct 2024 18:19:57 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <76147be2-9320-45a1-919c-4b41992fd7d9@wanadoo.fr>
-Date: Tue, 29 Oct 2024 18:19:55 +0100
+	s=arc-20240116; t=1730222672; c=relaxed/simple;
+	bh=Dx4YYRhL4Lf8ercZPaTWdof6s3DfvtavTZQBUAFt4CU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=r+e+tjea1gxi9q+Z6Ta9LRwx0rE5XFj4RNgUHFji89y4Kr/Z5AcLHhTb+eGdL2+nuZAOtBfbES1rRyQy+SCH+32sdf2uW8NY1mK9IrcIkzXvCaq/k+5sm7pkMePY0DWnpZ8Au0hSPjZ43lzx9QuIsY0CSpN8f7U6RNQvPMHldFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=yJdP1jFu; arc=none smtp.client-ip=198.47.19.142
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49THOLnT014489;
+	Tue, 29 Oct 2024 12:24:21 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1730222661;
+	bh=DYo5+KZZMTowwgFKQttLBPNWQ8brI9bPcbi9Aj8e2MA=;
+	h=From:To:CC:Subject:Date;
+	b=yJdP1jFuu1FqhLtRSnJUAzhb3fqn7R2y3uMyOYhBjLD4OToKVx1NPPBGs9OXOMLKf
+	 ePbWEmxytXqBiWQ0I2gty/8xcBuNLD3MSUafaTprytF7XHqgzJ+a1OJu6An/iD8zgD
+	 01+kuaBwStuhRkuDXPRwp6+THYJ6qxo0cGj7yDAo=
+Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49THOLWS072485
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 29 Oct 2024 12:24:21 -0500
+Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE104.ent.ti.com
+ (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 29
+ Oct 2024 12:24:21 -0500
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE106.ent.ti.com
+ (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 29 Oct 2024 12:24:21 -0500
+Received: from localhost (udb0389739.dhcp.ti.com [137.167.1.149])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49THOKHt065600;
+	Tue, 29 Oct 2024 12:24:20 -0500
+From: Michael Nemanov <michael.nemanov@ti.com>
+To: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo
+ Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Sabeeh Khan <sabeeh-khan@ti.com>, Michael Nemanov <michael.nemanov@ti.com>
+Subject: [PATCH v4 00/17] wifi: cc33xx: Add driver for new TI CC33xx wireless device family
+Date: Tue, 29 Oct 2024 19:23:37 +0200
+Message-ID: <20241029172354.4027886-1-michael.nemanov@ti.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH 2/2] net: selpcimac: Add driver for SEL PCIe network
- adapter
-To: Robert Joslyn <robert_joslyn@selinc.com>, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: lee@kernel.org
-References: <20241028223509.935-1-robert_joslyn@selinc.com>
- <20241028223509.935-3-robert_joslyn@selinc.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241028223509.935-3-robert_joslyn@selinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Le 28/10/2024 à 23:35, Robert Joslyn a écrit :
-> Add support for SEL FPGA based network adapters. The network device is
-> implemented as an FPGA IP core and enumerated by the selpvmf driver.
-> This is used on multiple devices, including:
->   - SEL-3350 mainboard
->   - SEL-3390E4 card
->   - SEL-3390T card
-> 
-> Signed-off-by: Robert Joslyn <robert_joslyn@selinc.com>
-> ---
+Hello everyone,
 
-Hi,
+This series adds support for CC33xx which is a new family of WLAN IEEE802.11 a/b/g/n/ax
+and BLE 5.4 transceivers by Texas Instruments. These devices are 20MHz single spatial stream
+enabling STA (IEEE802.11ax) and AP (IEEE802.11n only) roles as well as both roles simultaneously.
+Communication to the CC33xx is done via 4-bit SDIO with two extra GPIOs: Enable and Interrupt.
 
-a few nitpicks below, should it help.
+This driver's architecture is a soft-MAC and derivative of existing wl18xx + wlcore code [1].
+It has been tested with the AM335x, AM625x, and i.MX8-MP evaluation kits.
+
+Data sheet: https://www.ti.com/lit/gpn/cc3301
+
+All code passes sparse, smatch, coccicheck and checkpatch with very few pragmatic exceptions.
+
+Driver is split on file boundary as required by Linux-wireless wiki:
+https://wireless.wiki.kernel.org/en/developers/documentation/submittingpatches#new_driver
 
 
-> +/**
-> + * selpcimac_rx_alloc_page() - Allocate a network fragment page.
-> + */
-> +static struct page *selpcimac_rx_alloc_page(struct selpcimac_rx_ring *ring)
-> +{
-> +	struct page *page = dev_alloc_page();
-> +
-> +	return page;
+Change log:
+v4:
+* Fixed DT compatibility for all CC33xx variants. Improved general formatting
+* Refactored sdio.c to better align with other SDIO drivers
+* Removed multiple debug traces
 
-return dev_alloc_page()?
+v3:
+* Added missing sign-offs
+* Fixed multiple warnings for memcpy overflow
+* Fixed commit message and description of device-tree bindings
+Link: https://lore.kernel.org/linux-wireless/20240806170018.638585-1-michael.nemanov@ti.com/
 
-> +}
+v2:
+* Fixed build bug on non-ARM architectures
+* Removed driver version
+* Removed trivial debug traces
+* Removed debug parameters for cc33xx module
+* Fixed multiple type compatibility warnings
+* Minor fixes
+Link: https://lore.kernel.org/linux-wireless/20240609182102.2950457-1-michael.nemanov@ti.com/
 
-...
+v1:
+* Added dt-bindings
+* Removed debugfs to ease review
+* Fix build issue with CONFIG_CFG80211_CERTIFICATION_ONUS
+* Fix multiple build warnings found with Clang 18 and W=12
+Link: https://lore.kernel.org/linux-wireless/20240521171841.884576-1-michael.nemanov@ti.com/
 
-> +/**
-> + * selpcimac_cleanup_rxbd() - Remove an RXBD from hardware control.
-> + *
-> + * This is only safely called if RSTAT[RX_EN] == 0
-> + *
-> + * @desc: Pointer to the buffer descriptor to cleanup
-> + */
-> +static void selpcimac_cleanup_rxbd(struct sel_rx_bd *desc)
-> +{
-> +	desc->rxbd_ctrl &= (cpu_to_le32(~(RXBD_CTRL_EMT)));
 
-Un-needed outer ().
+Test log:
+https://0x0.st/X0gn.log
 
-> +}
-> +
-> +/**
-> + * selpcimac_alloc_mapped_page() - Allocate a new page and map it for DMA.
-> + *
-> + * This function will ensure the passed in rx_buffer has a valid page to
-> + * give to the hardware.  A new page will be allocated only if the page
-> + * pointer in the RX buffer is NULL.  If the page pointer is not NULL, the
-> + * page is already allocated and we are reusing it.
-> + *
-> + * @ring: Pointer to the ring that owns the RX buffer.
-> + * @bi:   Pointer to the RX buffer structure to allocate for.
-> + *
-> + * Returns:  true if a page was successfully allocated, false otherwise.
-> + */
-> +static bool selpcimac_alloc_mapped_page(struct selpcimac_rx_ring *ring,
-> +					struct selpcimac_rx_buffer *bi)
-> +{
-> +	struct page *page = bi->page;
-> +	dma_addr_t dma;
-> +
-> +	/* Already allocated, nothing to do */
-> +	if (page)
-> +		return true;
-> +
-> +	page = selpcimac_rx_alloc_page(ring);
-> +	if (likely(page)) {
-> +		dma = dma_map_page(ring->dev, page, 0,
-> +				   PAGE_SIZE, DMA_FROM_DEVICE);
-> +		if (dma_mapping_error(ring->dev, dma)) {
-> +			selpcimac_rx_free_page(ring, page);
-> +			page = NULL;
-> +		} else {
-> +			bi->dma = dma;
-> +			bi->page = page;
-> +			bi->page_offset = 0;
-> +		}
-> +	}
-> +	return (page);
+[1] It was considered implementing CC33xx as another user of wlcore but The
+differences in HW, host interface, IRQ functionality, Rx/Tx behavior and supported features
+were too significant so this was abandoned.
 
-No need for ()
+Michael Nemanov
+Texas Instruments
 
-> +}
+Michael Nemanov (17):
+  dt-bindings: net: wireless: cc33xx: Add ti,cc33xx.yaml
+  wifi: cc33xx: Add cc33xx.h, cc33xx_i.h
+  wifi: cc33xx: Add debug.h
+  wifi: cc33xx: Add sdio.c, io.c, io.h
+  wifi: cc33xx: Add cmd.c, cmd.h
+  wifi: cc33xx: Add acx.c, acx.h
+  wifi: cc33xx: Add event.c, event.h
+  wifi: cc33xx: Add boot.c, boot.h
+  wifi: cc33xx: Add main.c
+  wifi: cc33xx: Add rx.c, rx.h
+  wifi: cc33xx: Add tx.c, tx.h
+  wifi: cc33xx: Add init.c, init.h
+  wifi: cc33xx: Add scan.c, scan.h
+  wifi: cc33xx: Add conf.h
+  wifi: cc33xx: Add ps.c, ps.h
+  wifi: cc33xx: Add testmode.c, testmode.h
+  wifi: cc33xx: Add Kconfig, Makefile
 
-...
+ .../bindings/net/wireless/ti,cc33xx.yaml      |   59 +
+ drivers/net/wireless/ti/Kconfig               |    1 +
+ drivers/net/wireless/ti/Makefile              |    1 +
+ drivers/net/wireless/ti/cc33xx/Kconfig        |   24 +
+ drivers/net/wireless/ti/cc33xx/Makefile       |   10 +
+ drivers/net/wireless/ti/cc33xx/acx.c          |  931 +++
+ drivers/net/wireless/ti/cc33xx/acx.h          |  835 +++
+ drivers/net/wireless/ti/cc33xx/boot.c         |  345 +
+ drivers/net/wireless/ti/cc33xx/boot.h         |   24 +
+ drivers/net/wireless/ti/cc33xx/cc33xx.h       |  483 ++
+ drivers/net/wireless/ti/cc33xx/cc33xx_i.h     |  459 ++
+ drivers/net/wireless/ti/cc33xx/cmd.c          | 1920 ++++++
+ drivers/net/wireless/ti/cc33xx/cmd.h          |  700 ++
+ drivers/net/wireless/ti/cc33xx/conf.h         | 1246 ++++
+ drivers/net/wireless/ti/cc33xx/debug.h        |   92 +
+ drivers/net/wireless/ti/cc33xx/event.c        |  363 ++
+ drivers/net/wireless/ti/cc33xx/event.h        |   71 +
+ drivers/net/wireless/ti/cc33xx/init.c         |  231 +
+ drivers/net/wireless/ti/cc33xx/init.h         |   15 +
+ drivers/net/wireless/ti/cc33xx/io.c           |  129 +
+ drivers/net/wireless/ti/cc33xx/io.h           |   26 +
+ drivers/net/wireless/ti/cc33xx/main.c         | 5689 +++++++++++++++++
+ drivers/net/wireless/ti/cc33xx/ps.c           |  108 +
+ drivers/net/wireless/ti/cc33xx/ps.h           |   16 +
+ drivers/net/wireless/ti/cc33xx/rx.c           |  388 ++
+ drivers/net/wireless/ti/cc33xx/rx.h           |   86 +
+ drivers/net/wireless/ti/cc33xx/scan.c         |  735 +++
+ drivers/net/wireless/ti/cc33xx/scan.h         |  385 ++
+ drivers/net/wireless/ti/cc33xx/sdio.c         |  530 ++
+ drivers/net/wireless/ti/cc33xx/testmode.c     |  349 +
+ drivers/net/wireless/ti/cc33xx/testmode.h     |   12 +
+ drivers/net/wireless/ti/cc33xx/tx.c           | 1409 ++++
+ drivers/net/wireless/ti/cc33xx/tx.h           |  160 +
+ 33 files changed, 17832 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+ create mode 100644 drivers/net/wireless/ti/cc33xx/Kconfig
+ create mode 100644 drivers/net/wireless/ti/cc33xx/Makefile
+ create mode 100644 drivers/net/wireless/ti/cc33xx/acx.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/acx.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/boot.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/boot.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/cc33xx.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/cc33xx_i.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/cmd.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/cmd.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/conf.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/debug.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/event.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/event.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/init.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/init.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/io.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/io.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/main.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/ps.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/ps.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/rx.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/rx.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/scan.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/scan.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/sdio.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/testmode.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/testmode.h
+ create mode 100644 drivers/net/wireless/ti/cc33xx/tx.c
+ create mode 100644 drivers/net/wireless/ti/cc33xx/tx.h
 
-> +/**
-> + * selpcimac_initialize_rx_ring() - Initialize the receive ring.
-> + *
-> + * This function allocates the buffer descriptor ring for the hardware,
-> + * initializes it, and programs it to the hardware.  It also starts the
-> + * receive buffer allocation process.
-> + *
-> + * @ring: RX ring to initialize
-> + *
-> + * Returns: 0 if successful, -ENOMEM if we couldn't initialize the ring.
-> + */
-> +static int selpcimac_initialize_rx_ring(struct selpcimac_rx_ring *ring)
-> +{
-> +	/* Allocation is an array of the currently configured number
-> +	 * of RX buffer descriptors rounded up to the nearest 4k.
-> +	 */
-> +	ring->size = (sizeof(struct sel_rx_bd) * ring->count);
-> +	ring->size = ALIGN(ring->size, 4096);
-> +
-> +	ring->desc = dma_alloc_coherent(ring->dev,
-> +					ring->size,
-> +					&ring->dma,
-> +					GFP_KERNEL);
-> +	if (!ring->desc)
-> +		goto err;
-
-return directly and avoid the 'err' label?
-
-> +
-> +	WARN_ON_ONCE((ring->dma % SEL_DATA_ALIGN) != 0);
-> +
-> +	memset(ring->desc, 0, ring->size);
-
-If I recollect correctly, dma_alloc_coherent() returns some zeroed memory.
-
-> +	ring->last_bd = ring->dma +
-> +		(ring->count - 1) * sizeof(struct sel_rx_bd);
-> +	ring->next_to_use = 0;
-> +	ring->next_to_clean = 0;
-> +
-> +	if (selpcimac_init_rx_buffers(ring))
-> +		goto err_free;
-
-Why no simply propagate the error code from selpcimac_init_rx_buffers()?
-Won't change anything, but more standard.
-
-> +
-> +	return 0;
-> +
-> +err_free:
-> +	dma_free_coherent(ring->dev, ring->size, ring->desc, ring->dma);
-> +	ring->desc = NULL;
-> +	ring->dma = 0;
-> +	ring->last_bd = 0;
-> +	ring->size = 0;
-> +err:
-> +	return -ENOMEM;
-> +}
-
-...
-
-> +/**
-> + * dump_sfp_id() - Print the id values for this ports SFP
-> + *
-> + * @mac:	SEL MAC device
-> + * @buff:	Buffer to write id values to
-> + * @size:	The size of the buffer to write to
-> + *
-> + * @returns: Number of bytes written to buff
-> + */
-> +static ssize_t dump_sfp_id(struct sel_pci_mac *mac, char *buff, int size)
-> +{
-> +	struct sel_sfp_id id;
-> +	ssize_t rc = 0;
-> +
-> +	if (sfp_read_id(mac, &id) < 0)
-> +		return 0;
-> +
-> +	if (id.sel_part[0] != 0) {
-> +		rc += snprintf(buff + rc, size - rc,
-> +			       "SELPartNumber: %.4s-%.2s\n",
-> +			       id.sel_part, id.sel_part_option);
-
-I think that sysfs_emit_at() should be preferred in this function.
-
-> +		rc += snprintf(buff + rc, size - rc,
-> +			       "SELSerialNumber: %.15s\n", id.sel_sn);
-> +	}
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Manufacturer: %.16s\n", id.name);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "PartNumber: %.16s\n", id.part);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Version: %.4s\n", id.rev);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "SerialNumber: %.16s\n", id.sernum);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "DateCode: %.8s\n", id.datecode);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Wavelength: %u nm\n", id.wavelength);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "LengthSingleMode: %u m\n", id.length_smf_km);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Length50umOM2: %u m\n", id.length_om2);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Length62p5umOM1: %u m\n", id.length_om1);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "LengthCopper: %u m\n", id.length_copper);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Length50umOM3: %u m\n", id.length_om3);
-> +
-> +	return rc;
-> +}
-> +
-> +/**
-> + * dump_sfp_diag() - Print the diag values for this ports SFP
-> + *
-> + * @mac:	SEL MAC device
-> + * @buff:	Buffer to write diag values to
-> + * @size:	The size of the buffer to write to
-> + *
-> + * @returns: Number of bytes written to buff
-> + */
-> +static ssize_t dump_sfp_diag(struct sel_pci_mac *mac, char *buff, int size)
-> +{
-> +	struct sel_sfp_diag diag;
-> +	ssize_t rc = 0;
-> +
-> +	if (sfp_read_diag(mac, &diag) < 0)
-> +		return 0;
-> +
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "Temperature: %d C\n", diag.temp);
-
-I think that sysfs_emit_at() should be preferred in this function.
-
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "SupplyVoltage: %u uV\n", diag.vcc);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "TxBiasCurrent: %u uA\n", diag.tx_bias);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "TxPower: %u nW\n", diag.tx_power);
-> +	rc += snprintf(buff + rc, size - rc,
-> +		       "RxPower: %u nW\n", diag.rx_power);
-> +
-> +	return rc;
-> +}
-> +
-> +/**
-> + * __show_attr() - Return data for a specific attribute
-> + *
-> + * @dev:            device object
-> + * @attr:           device attribute to show info for
-> + * @buff:           buffer to store output
-> + * @attribute_type: the type of attribute to return information for
-> + *
-> + * Return: number of bytes stored in the buffer
-> + */
-> +static ssize_t __show_attr(struct device *dev,
-> +			   struct device_attribute *attr,
-> +			   char *buff,
-> +			   enum sel_dev_attributes attribute_type)
-> +{
-> +	struct selpcimac_platform_private *priv = dev_get_drvdata(dev->parent);
-> +	struct sel_pci_mac *mac = priv->priv;
-> +	ssize_t bytes_written = 0;
-> +	int length = 0;
-> +
-> +	switch (attribute_type) {
-> +	case SFP_CONFIGURATION:
-> +		bytes_written =	sprintf(buff, "%d\n",
-> +					(u32)mac->sfp_configuration);
-> +		break;
-> +
-> +	case INTR_MOD_RATE:
-> +		bytes_written =	sprintf(buff, "%d\n",
-> +					(u8)mac->interrupt_moderation_rate);
-> +		break;
-> +
-> +	case INTR_RX_ABS:
-> +		bytes_written =	sprintf(buff, "%d\n",
-> +					ioread32(&mac->hw_mac->intr_moderation.rxabs));
-> +		break;
-> +
-> +	case INTR_RX_PACKET:
-> +		bytes_written =	sprintf(buff, "%d\n",
-> +					ioread32(&mac->hw_mac->intr_moderation.rxpacket));
-> +		break;
-> +
-> +	case INTR_TX_ABS:
-> +		bytes_written =	sprintf(buff, "%d\n",
-> +					ioread32(&mac->hw_mac->intr_moderation.txabs));
-> +		break;
-> +
-> +	case INTR_TX_PACKET:
-> +		bytes_written =	sprintf(buff, "%d\n",
-> +					ioread32(&mac->hw_mac->intr_moderation.txpacket));
-> +		break;
-> +
-> +	case INTR_THROTTLE:
-> +		bytes_written = sprintf(buff, "%d\n",
-> +					ioread32(&mac->hw_mac->intr_moderation.throttle));
-> +		break;
-> +
-> +	case ETH_REGISTERED:
-> +		length += snprintf(buff + length,
-
-You could remove 'lenght', as in all other cases.
-
-I also think that sysfs_emit() should be preferred.
-
-> +				   PAGE_SIZE - length,
-> +				   "%s\n",
-> +				   mac->netdev->name);
-> +		bytes_written = length;
-> +		break;
-> +
-> +	case SFP_ID:
-> +		bytes_written = dump_sfp_id(mac, buff, PAGE_SIZE);
-> +		break;
-> +
-> +	case SFP_DIAG:
-> +		bytes_written = dump_sfp_diag(mac, buff, PAGE_SIZE);
-> +		break;
-> +
-> +	default:
-> +		break;
-> +	}
-> +
-> +	return bytes_written;
-> +}
-
-...
-
-CJ
+-- 
+2.34.1
 
 
