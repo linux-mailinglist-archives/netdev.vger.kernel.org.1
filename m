@@ -1,123 +1,97 @@
-Return-Path: <netdev+bounces-139914-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139916-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D45B69B4981
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:19:10 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 308E79B4990
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:22:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 03BF61C2210A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:19:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD5C1F237AC
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:22:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F7FF205E25;
-	Tue, 29 Oct 2024 12:19:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09FA4205E24;
+	Tue, 29 Oct 2024 12:22:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YuyTlG44"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dkEhVsL1"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D8ED205E08
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:19:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C938BEA
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:21:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730204345; cv=none; b=Zm/5OGM9Bw7pwuGatxRYbjaHhjCHkU4ynEplmztEI1kyj0Q65bivwR+iwWT5/XpGTFHdr8kAoOs7n26s2MSCuNqv1yT5Jn0CjcEQfTyuPsyXfq1wKuBE8QqeZmIntAiPs78UGLTYqp7obn4e2fDighcJpMGIvALKnTua6nHpkZ8=
+	t=1730204519; cv=none; b=GWpvPyNCAuVBKeyEQf6tmSz/kcfn75Y61CvrolyiXfOhYP8FPueubJzYgVlgfZt1joOzUIOoovjZMeZSvXgfBBW5eLvZJgd/R8OPj173jvOwyY5+2d6LBbrK6qIt/ipCTgr+IT0UhvBvn/PSrY+MFqjfLWPX5ZvHsnutmoA9P30=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730204345; c=relaxed/simple;
-	bh=0I7kvJtFLDqQM0siDKT0j8ymg14gRFLwbFQ5gaEXjw8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=U/ZV1iMX/pdVx+m+LC7TDMKFMN2DtjVwgSRAtrqNp2T8l8D6rLnhnr0xnDL1kDX0mYVjPKCn22R58KeZ2yiVpvEN0AvLQeBvJa8orpP7n13/q/gPZUn2VRfl+T77CFZ23a4K6KW9a9hiQ5L2holjQns/d6eyJ4QCPxcAlNjQoO0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YuyTlG44; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730204342;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vfuf4xyKDvT9u1kPEhld7930e8myJyX3Zvs5SawIvSg=;
-	b=YuyTlG44rGdGOTGNMYOmP7O4m4uLkLMn+8UHTndNLpN/lAHsUpJAMWwvuBJM5IsouhxHX/
-	x0LwU71GKh9sUK63OKZbfVXUcQgqRMLlnSsLs9CLRyjzrJvPMoSoF2GBUgerm2BTaKLAjW
-	+4J9jA1btXqasr+JoAiG+dLbbmcOEBw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-124-JOTm7S_jOYCwmeLqK6LGGg-1; Tue, 29 Oct 2024 08:19:01 -0400
-X-MC-Unique: JOTm7S_jOYCwmeLqK6LGGg-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315e8e9b1cso30784055e9.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 05:19:00 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730204340; x=1730809140;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=vfuf4xyKDvT9u1kPEhld7930e8myJyX3Zvs5SawIvSg=;
-        b=jANlPYs8j9b6HYyemVVjW8zQxfTUO3n0ML+8r0YJFY/MMU3A2Z9/lefFpmbVLz0IM2
-         bPQOMpKB3syWXdjgmnA/coSVfBj/Iy6xIPxLOcg+cs+SAMpvPiYaNIjdU8v2I0nbEYmT
-         CUaxXIPR//bdsi7Mg0vuoWLDYhlV+UoZB5lvhYZaqL/WwfZf5IjMa66C2z+oiCBXFLtU
-         rpc8XbqVGxiH/lWNjBWvZKxCE0h3GKUh7945pXPu+WFgSXjeFkbJNe69DIVBNZxXYxyk
-         Tkr0MnEoErFKZ963iwdzgK47ljBaNv8zDWo7AadJfP3SBnaxlEEIF3ErkYKOG/agHoeI
-         SKjg==
-X-Forwarded-Encrypted: i=1; AJvYcCXp5i3DBQem2Sq1CmbOUhZL0++P4wo/d1XTb2Bl/vr9iI6Rigex7fP7tqqRI6D5YtUn+KgmByI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSVs7j9gKhqszWwSBDLMPjJTQJ9ElaKv/R8ddrzzE0SpuNqh4/
-	tM4Y5g2e/Z/aXh1uUm9jHvaTTvRhf7pJw8pq8+2lIOThI6Ta4IaAdNyq4BAYgwIwmVbk4r94+VN
-	0O8AVOnZym3wHFmUCBRUhxr1fA2d7kNA//frEELWUFZli52Xmdb/QFA==
-X-Received: by 2002:a05:600c:3555:b0:42c:b166:913 with SMTP id 5b1f17b1804b1-431b5727f7fmr14851875e9.11.1730204339710;
-        Tue, 29 Oct 2024 05:18:59 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFmrOsa0Gr67Yj5/cS+/SQl29FfUNpizydNLzGmFEG+bAVc4wyWPLsRt8+pgyP6z3kTKadvOg==
-X-Received: by 2002:a05:600c:3555:b0:42c:b166:913 with SMTP id 5b1f17b1804b1-431b5727f7fmr14851665e9.11.1730204339372;
-        Tue, 29 Oct 2024 05:18:59 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4318b5430edsm173654585e9.2.2024.10.29.05.18.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 05:18:59 -0700 (PDT)
-Message-ID: <c0a4d1ad-cb3a-4d61-93b5-471c1033d67d@redhat.com>
-Date: Tue, 29 Oct 2024 13:18:56 +0100
+	s=arc-20240116; t=1730204519; c=relaxed/simple;
+	bh=gYzIoqdSwekIU6bdXNiROsHGwypLK3Enyq4cn6vyFWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bxdcQRYLjW7fRFC9X1I/kL2H8obpxdS//cC1atsupkp5ASiz9GytjVlZieNk7xbUIpRsSy+ivhb+uNTJqBd4R+tZ1jKrB5qp6ZZY+WmWv9UgUWcPzaBZ2o7CBa4WRX5cnLaIYCHkwxUVLnxzCnYKdaUPRh+6Pqrm2EnUOMI0Dv0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dkEhVsL1; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=HzQ1z+1DbL3z/C63wYQzQP0dbfy7JZgtq9MdE3mHlNE=; b=dkEhVsL11GHDyrM4q0hZSyx9It
+	BTQ1HfXOYJfMWembK79uWDiCL/tthrJjOwVais9X4v6t5aShPtVsOMjZNtBoandjIhtV3A2A06g/8
+	HlXHNUue9Kl1m/DGDOkmSYPpCv8emFat115E7pBNCuAr9Ijsi/K8uJVPVRoaBLh3pNkg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5lEE-00BZXE-LH; Tue, 29 Oct 2024 13:21:42 +0100
+Date: Tue, 29 Oct 2024 13:21:42 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>, Vijay Khemka <vijaykhemka@fb.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] net: ncsi: restrict version sizes when hardware
+ doesn't nul-terminate
+Message-ID: <30b946f2-bfb8-4938-8f12-1b10bf81972a@lunn.ch>
+References: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
+ <20241028-ncsi-fixes-v1-2-f0bcfaf6eb88@codeconstruct.com.au>
+ <286f2724-2810-4a07-a82e-c6668cdbf690@lunn.ch>
+ <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
+ <4f56a2d0-eb1b-4952-a845-92610515082a@lunn.ch>
+ <f3d0cafe11000fe1cad7b4ad13865b3bcfd2ad27.camel@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 11/14] tcp: allow ECN bits in TOS/traffic
- class
-To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- dsahern@kernel.org, netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
- coreteam@netfilter.org, pablo@netfilter.org, bpf@vger.kernel.org,
- joel.granados@kernel.org, linux-fsdevel@vger.kernel.org, kees@kernel.org,
- mcgrof@kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-References: <20241021215910.59767-1-chia-yu.chang@nokia-bell-labs.com>
- <20241021215910.59767-12-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241021215910.59767-12-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f3d0cafe11000fe1cad7b4ad13865b3bcfd2ad27.camel@codeconstruct.com.au>
 
-On 10/21/24 23:59, chia-yu.chang@nokia-bell-labs.com wrote:
-> @@ -2178,6 +2185,7 @@ static void tcp_v4_fill_cb(struct sk_buff *skb, const struct iphdr *iph,
->  int tcp_v4_rcv(struct sk_buff *skb)
->  {
->  	struct net *net = dev_net(skb->dev);
-> +	enum tcp_tw_status tw_status;
->  	enum skb_drop_reason drop_reason;
->  	int sdif = inet_sdif(skb);
->  	int dif = inet_iif(skb);
+On Tue, Oct 29, 2024 at 12:06:58PM +0800, Jeremy Kerr wrote:
+> Hi Andrew,
+> 
+> > > However, regardless of what the spec says, we still don't want the
+> > > strlen() in nla_put_string() to continue into arbitrary memory in
+> > > the
+> > > case there was no nul in the fw_name reported by the device.
+> > 
+> > I agree with that, but i was thinking that if it was not allowed, we
+> > should be printing a warning telling the user to upgrade their buggy
+> > firmware.
+> 
+> Gotchya. All fine there.
+> 
+> > Are there any other strings which will need similar treatment?
+> 
+> This is the only nla_put_string() in the ncsi code, and there are no
+> other string-adjacent components of data represented in the spec (that
+> I have come across, at least).
 
-Minor nit: please respect the reverse x-mas tree order.
+It is worth mentioning all this in the commit message. It answers
+questions from reviewers before they ask the questions...
 
-More instances below.
-
-Cheers,
-
-Paolo
-
+	Andrew
 
