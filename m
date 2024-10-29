@@ -1,102 +1,166 @@
-Return-Path: <netdev+bounces-139903-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139902-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DE309B48F8
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:05:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A9A329B48F6
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:05:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FED21C2295E
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:05:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6898B281BA6
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:05:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4581205E26;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B83F2064FE;
 	Tue, 29 Oct 2024 12:03:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LPkpE9UT"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CgtlgiVX"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0B3C205E2F;
-	Tue, 29 Oct 2024 12:03:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F35EF205E24
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:03:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730203439; cv=none; b=aNSrZurX2cri7xKSTl9+G/e0AbZzYvGhmI82dJrI33B9wCI6Z1uvD5jWwyAaGGiPBqGGBub1l/bW5kHSgtWEMUwdVuqoEoarwVs3AaL3s/MTa2ZybVTdyklOPQNxLGx7beRwxyNrCsN50nFDwFrIYGqJjdhm8BQG1ige19xS44s=
+	t=1730203439; cv=none; b=stmDOfH+YKcY2uAxNqJ06/aT5qj2nT5nAJOOdB/7n/piQZywiDHuavA4erbnJkWCMmScBn0uBBP8AQMfypG/d1EGNfjQeU90OyACR0G9zQhVV5M5uzFQ0PK9EXRTyxwmqWlnhri+VhXx3mOQm8/J9wIcE1MeQboBizSYwBkav8M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730203439; c=relaxed/simple;
-	bh=JDYkg13S/c7ai/2MYOiSlsEvW04aAle9yzcB8DLIoQM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Sf3rREcjaShqqNNxGfzKjCHfNpcXPjI94tT0NVgR3O0bAr8iluZpih5FfdwpfWU6i6bXhqY8NZq8DXkfQ2T1V+QHkyJCEMbUXiTGmxMGouLl2OOmmlzrubbaf2zkAu/VQ5JrrXHE875d7Mo9T14WVzK7DsrRY9c3yt819GU2VF4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LPkpE9UT; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=owzbnVknbJVYVJNxafU0ATgST6EL+Zjh6YcPqEYII+c=; b=LPkpE9UT9q6USF1tKGDcsid2kO
-	ioRKc4K2xEufm8mD9AST0L18lKix8oWzUV+eRxNLwIUwO514+9gpvGbGBieaiT+hY2MN68e4F2bhH
-	VoAorThisHcAKqarCVcSSec+7lthVxzcxqYmX2I+XrzzpkgZYSFvQAgaDLvdHLPoLKHg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5kwg-00BZE5-Pl; Tue, 29 Oct 2024 13:03:34 +0100
-Date: Tue, 29 Oct 2024 13:03:34 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: jan.petrous@oss.nxp.com
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v4 08/16] net: dwmac-rk: Use helper rgmii_clock
-Message-ID: <9c18bff7-9142-4805-882b-44d00ebd5923@lunn.ch>
-References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
- <20241028-upstream_s32cc_gmac-v4-8-03618f10e3e2@oss.nxp.com>
+	bh=5GK+Y0dlDBq0HgZlK8ImIyrIBS7uZXbPH4s+H2rROCw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=TBWrTRWn/phnACwnJ5TX8/AeqYXSu1nc8tkcA5RP4MZIWFxXK2AtTscKo/p5v1tyxcVjydRKUmrsc0foQu2v8zFvncS9BiNLw9dwPDq1HhAnhvA0iZSjpFGzHwEgx4la3t5Ca05fSAkTtmGIluN78qN1UphD3H4H9VdubkrBGKE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CgtlgiVX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730203436;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RsrenDUXhbziRmlRR2s/iOkAhRnLqKHn+/ZPEctWEQI=;
+	b=CgtlgiVXKVxrYXe6XbVpCodWnUUj2p6bxJbn/8En12nLKTAtqbmO19u7KPgpbybOMQdOaW
+	qJCSdCYGadTZUtrPzcxtCD5w+o6zyK7E/Dmv1ySA6IPQrnBaoyNTPo/vpjqomUSqRNR2Lv
+	ep9vPv9htxrlXGUxiFvr90c/GZiF2wE=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-653-HaQOXchcNt-ZLk-PE1V5Nw-1; Tue, 29 Oct 2024 08:03:54 -0400
+X-MC-Unique: HaQOXchcNt-ZLk-PE1V5Nw-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d5606250aso2604705f8f.2
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 05:03:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730203433; x=1730808233;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RsrenDUXhbziRmlRR2s/iOkAhRnLqKHn+/ZPEctWEQI=;
+        b=FYr5GD+bD4T6R+b6FEhrI2amSj03jX5AD1MqvMU0fbaEoZy91PqOXWwS2Ipw1fKBzQ
+         NYON2FiijqsTQA8veaaSd8uUKd50ujqrUO8XQdS3x4r71BfS7JokgSLA7KTs0wBXU3jh
+         wnr57b7lCGtncA6zy/Jow/cT2BQbPumtl2YEy6haeg3Vo2wLc43F14Ct9Hji74ySyJJL
+         inf7FNpM1FbZoQar9iSYr2/giW84fMVLQyrJZfJ6lC1UiVtC0EwyaOhHO4tmFZE0l7Jj
+         md/EmGaiZgYclenbtxCcOXYKHa/MA0rJ0Gk8ShshkVRcxLOQVpze4kHcwGYLTMbwFd5f
+         4V4A==
+X-Forwarded-Encrypted: i=1; AJvYcCWa5pO/qTci577Yb2nQ+gkmSzt2C4LvOqmhXIHQ0rTSYwrtxNUak7fqA8Vf9ZFMakrEcmuoC4I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxZdXnc9Qk6+Kw2k5FB5iSloGTu1qJT/ba8GpP5UEpJhv8YphUl
+	IMWKeKV9cCqIZuV7JKbvCyQJIyaYyZzLIhvDFzjxfmdRL7ZxKMTcgsWScBY2JjR2gVRnGhiMxKg
+	37wRktcUag0orHONPE0RXg93E3JuEf3tmsUn0YLKsIK/ntDYkJP0Sig==
+X-Received: by 2002:a05:6000:12c5:b0:37c:c5be:1121 with SMTP id ffacd0b85a97d-380610f7bb8mr7878149f8f.9.1730203433579;
+        Tue, 29 Oct 2024 05:03:53 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IHmcOdbW18dBJkXTSEFyIXIVpI8cKVb7n72/NXV2aGY+gIgo8rSiQfqoqQSTFgNlUVg+xeK6Q==
+X-Received: by 2002:a05:6000:12c5:b0:37c:c5be:1121 with SMTP id ffacd0b85a97d-380610f7bb8mr7878104f8f.9.1730203433096;
+        Tue, 29 Oct 2024 05:03:53 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b3c625sm12331743f8f.37.2024.10.29.05.03.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 05:03:52 -0700 (PDT)
+Message-ID: <eb04ddfd-6e17-464b-a629-09aed99e2e95@redhat.com>
+Date: Tue, 29 Oct 2024 13:03:50 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241028-upstream_s32cc_gmac-v4-8-03618f10e3e2@oss.nxp.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 09/14] gro: prevent ACE field corruption &
+ better AccECN handling
+To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ dsahern@kernel.org, netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
+ coreteam@netfilter.org, pablo@netfilter.org, bpf@vger.kernel.org,
+ joel.granados@kernel.org, linux-fsdevel@vger.kernel.org, kees@kernel.org,
+ mcgrof@kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20241021215910.59767-1-chia-yu.chang@nokia-bell-labs.com>
+ <20241021215910.59767-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241021215910.59767-10-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 28, 2024 at 09:24:50PM +0100, Jan Petrous via B4 Relay wrote:
-> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+On 10/21/24 23:59, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Ilpo Järvinen <ij@kernel.org>
 > 
-> Utilize a new helper function rgmii_clock().
+> There are important differences in how the CWR field behaves
+> in RFC3168 and AccECN. With AccECN, CWR flag is part of the
+> ACE counter and its changes are important so adjust the flags
+> changed mask accordingly.
 > 
-> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+> Also, if CWR is there, set the Accurate ECN GSO flag to avoid
+> corrupting CWR flag somewhere.
+> 
+> Signed-off-by: Ilpo Järvinen <ij@kernel.org>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  net/ipv4/tcp_offload.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 0b05f30e9e5f..f59762d88c38 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *head, struct sk_buff *skb,
+>  	th2 = tcp_hdr(p);
+>  	flush = (__force int)(flags & TCP_FLAG_CWR);
+>  	flush |= (__force int)((flags ^ tcp_flag_word(th2)) &
+> -		  ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> +		  ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+If I read correctly, if the peer is using RFC3168 and TSO_ECN, GRO will
+now pump into the stack twice the number of packets it was doing prior
+to this patch, am I correct?
 
-    Andrew
+That is likely causing measurable performance regressions.
+
+>  	flush |= (__force int)(th->ack_seq ^ th2->ack_seq);
+>  	for (i = sizeof(*th); i < thlen; i += 4)
+>  		flush |= *(u32 *)((u8 *)th + i) ^
+> @@ -405,7 +405,7 @@ void tcp_gro_complete(struct sk_buff *skb)
+>  	shinfo->gso_segs = NAPI_GRO_CB(skb)->count;
+>  
+>  	if (th->cwr)
+> -		shinfo->gso_type |= SKB_GSO_TCP_ECN;
+> +		shinfo->gso_type |= SKB_GSO_TCP_ACCECN;
+
+If this packet is forwarded, it will not leverage TSO anymore - with
+current H/W.
+
+I think we need a way to enable this feature conditionally, but I fear
+another sysctl will be ugly and the additional conditionals will not be
+good for GRO.
+
+Smarter suggestions welcome ;)
+
+Cheers,
+
+Paolo
+
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
+>  
+
 
