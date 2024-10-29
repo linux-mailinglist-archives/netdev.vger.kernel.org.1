@@ -1,239 +1,247 @@
-Return-Path: <netdev+bounces-140195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 026F29B5814
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:58:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F8759B5818
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:58:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25A621C237E7
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:58:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A1F391F23D80
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:58:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3462820CCE7;
-	Tue, 29 Oct 2024 23:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 714C420CCCD;
+	Tue, 29 Oct 2024 23:55:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dEop1uBn"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="VaRuJ6Kc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01F2120C007;
-	Tue, 29 Oct 2024 23:54:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730246068; cv=none; b=vBd66lIIxVAiLlZat/7bQEkRWiYidkx7aIfQVJoDPSa1gcf/IG8F30gJtS2eaG5WA4IaBJc9/WPKoDMhpIBS05qIdlRLwed0+Jvbq97HROt+6seetM7Ju0eCBoa6KE1rBJJzomkewELmhuQlzcEarO3lXa/Fipx0T6P+7559QH4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730246068; c=relaxed/simple;
-	bh=+jk1QMzOTZtBYMP/q2NTsPJzOgFOE9tEIAs05XzVySo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=F20cXAuOvi0yo2IBeDaBF5eh+AV9f1YoP1DaliH2iXuUx+h1fQRv5QxR2xGR5MgxCJfUau4QSyzLJs39cw6s+nDdSb24Mn9LmFbp6/6pvMrVl+G/3n5XV0BBZuLcD5zpa50tpKaZxEJJcp9Q2dgoap0BfuhqgVfmVT/HZoxANkw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dEop1uBn; arc=none smtp.client-ip=209.85.167.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3e5fb8a4e53so3193618b6e.1;
-        Tue, 29 Oct 2024 16:54:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730246065; x=1730850865; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=y70wMBiVAGL9fqgd1kG53Hy+fEJEd58QyxNQyN50KVM=;
-        b=dEop1uBnKypP69t9iovz6hM7VEsJ+ei64etnDxxp2ipl3ybMj0JFUqiwG55Pwsobq8
-         8jlkQ4jrIGHO8rcorQ/0dZ1XaRkZDakRA+S+WTq5dK/0Jjeo3rnXD5jM+ykuO/mP4Pvu
-         irPIEL8tNDHXoL1a8LAudodBemB7t57/ert6h5SkUh8DBkp07TwPUvpliyWWHa1R0jLb
-         v6BfrDKXWYl4mLw7e07nrYPeDzm2A8e2sSU0tYHKR7jBGp/5oJ4OpxK4jSouB69DYebu
-         cMUgZgpSmQY1YAlePGn5finc+EZy2QL9YI0VstUuSQYN72GMC7QYQYrEmZwJz63twTAF
-         tpEw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730246065; x=1730850865;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=y70wMBiVAGL9fqgd1kG53Hy+fEJEd58QyxNQyN50KVM=;
-        b=KHvArxZSbawTMnxSsehjs7ErHm/gIBwtYObJFn1KnNM1xvI3ACdd9Y7uzzGZpRT0lS
-         MRAWs1+adsMXhOix3osR6Hc1e79p2eNZLVtWerSEf6LRvtkytCL8rw9DQlzNI87/l+0R
-         aj3+NGUr775wydmO78qE8FD7WHWdd1D0MDKCUUlXRyxsub89DDVjeT7BUlTqtIueHGJH
-         hc8YLP7hSGBTCf6td+uQ5kxGWXCmVuooySKU7x6PQotxiSy0qrUbEOeRGuB508UOVnXy
-         7+qYezxRuvQQdY6SLCy6FvX3tIwTFC4YDT8LMcp+9FTtvNldl7Njkj61vHUJS7VQ4rnS
-         +Bvw==
-X-Forwarded-Encrypted: i=1; AJvYcCVWhDeJ0oyDbyJ9ExKESOEsMGofwy1WGkBe6EzFpG7XEtipFbQeuLhgg6kyTmmb532tquzlpxiwGmR3zZ4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBaF23pKoMyX33b7j2oPhC7RMErrTyw+iw3oL3utLd5BZ3oRHl
-	ADawJVfjHfOOf57dnczGWhsxA6nck6BEbVf5Ik49wofCgPmqOVvCEB946PGD
-X-Google-Smtp-Source: AGHT+IG5jsW1ZIxd5A20Hy9uTS5baiO6/Icymaefvnasz6tRepiv8jsRGrr+Fak9c31k6PLdTCh76Q==
-X-Received: by 2002:a05:6871:720:b0:278:25d:d473 with SMTP id 586e51a60fabf-29051b193f5mr12284231fac.1.1730246064845;
-        Tue, 29 Oct 2024 16:54:24 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7edc8660f82sm8192972a12.2.2024.10.29.16.54.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 16:54:24 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Ido Schimmel <idosch@nvidia.com>,
-	Petr Machata <petrm@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] net: mellanox: use ethtool string helpers
-Date: Tue, 29 Oct 2024 16:54:22 -0700
-Message-ID: <20241029235422.101202-1-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6281620D4FC;
+	Tue, 29 Oct 2024 23:55:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730246107; cv=fail; b=A/ZCj7LQM0WJDtvkxIms9HV9LIZXmrILqRLk2RCBuPE4ZEMgS6M+56wxQnF3rDfD88LyVA80gTgd1q25l6Ayf1J9B7i0GDY3ZS5YsXyMH8JsNgNoGp3IFlhiJ6L4CXw8erXcKDiXIWq8zSJC1flC3JBrXWs4zA5E99qrlfaPb40=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730246107; c=relaxed/simple;
+	bh=qALW2MU91/SXr8agw0p99RcjrAE21NW4Rmp2deZ+pMc=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=BwGH4DoTmCaDo6JuDWNayRlBtOur5cKPN1fbWA9xqLItLKJvH5csAzpauVWE3nImlx50VPaVCrBt+EPp9VUD4SMuiEEgxB8ln3IibbUA8ozdiJ4oiR7cNLMEfT5maGbxLYzizy+Fm3pV1WysBsMSXKvkwl7wp5CJf4sJ4kgsZyM=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=VaRuJ6Kc; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730246105; x=1761782105;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=qALW2MU91/SXr8agw0p99RcjrAE21NW4Rmp2deZ+pMc=;
+  b=VaRuJ6Kccw6ZFQrVt5hkDaPdIf04v1FUunBQRgTTXy3yrL9bcaCLeurN
+   cwJWhBgBn8Xd7rr+v08yFC4DHnPxJWkJWC0+gXF1hVasaEAL1DgxVAXU2
+   CbGtCpkGiRJDadRGPZXh16D/euNpOCCV1PfxBOLF0FH3KApiO0YcbvE4I
+   6F2mWzVztKhSt+yzMQe3c1lxjxeZy9yoyOtmtsKlVyb3ejyrskyRqXrsM
+   v1KKJuVyutQnkMqWeuBWyo1H4uZDikBOevy6m5+8aPFzcLtPRK92z7hUj
+   sVv7Rwc0aTn+4LUC4QlDBuWyVaHZAJskB7iZWjjafUrvxEIAZCFpcvXRg
+   g==;
+X-CSE-ConnectionGUID: /tyUdrxKRi6iqAVDtOgreQ==
+X-CSE-MsgGUID: 6amygRJ5QsakZvSaAngyzg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40451551"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="40451551"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 16:55:04 -0700
+X-CSE-ConnectionGUID: LTkmuxRGRf68MVKIUDYFdw==
+X-CSE-MsgGUID: oZ6CnjXVQPWSAp+0rGi1eQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,243,1725346800"; 
+   d="scan'208";a="87256360"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa004.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Oct 2024 16:55:04 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 29 Oct 2024 16:55:03 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 29 Oct 2024 16:55:03 -0700
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.172)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 29 Oct 2024 16:55:02 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=UVVGAbBM6lfmBqMh/S6saY+DeSAdlpM+IxzgAPBx4LKK+UFbScCKWWDB1qxwQojuuAHh3E60sx04vTU9frwhWYZM3NMEqHdvv3VGmZEe3rHCEyN1vJZiGfmzcb4d3l38DrM30BZKMIsXKJxfBDd/2tHViXu3JArkD39MIuy/UjnjHRa7Q7sqt9Fu75hdg4cC1MNqiv9VTh1cdo430EVRNBH6wvZ4c5j2ltAEYcWWSPWQJjyYM5RHkYCWdablhetzjjnbDQN8NURmCUP3lTYUL+IFGZ5Ci4x+JpO/5e20SQXt395/tESe093tNXKwiPWbR4YolEBO3jqZBZKxLBuDsg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=W/pn1+QmGFRnhW3NQb7De+lyGD1b0NVa64+/A8pRcEM=;
+ b=Xz5DOtHAvRwr6v7XxGPSnPrQFAKi01wRjIFkmiypSTUzXj6wqTrdrpCqEFLvPqm0sGMD8DBZgW2/DKJPU1jX+iRt86idVZKzHIvo6r97Y6AlmJ1xZIkOTeaDqshZm/yoECVPaq7hLtEAHeLHMRkQDP+EtjH6P1CS7OPCc61eljr+fawibEMUmHdWybFxUTV5/17iRJ2DxPlKln89JHtHzGZqf8nsUJMJUxKuz18i5N/AF0ioCD65GWMyjYgVYMPEzyTX5cVu/ounL1LzwJR+jXttZDeZ4jeOyTYk5WPByQ1fIw79Ho5iXSCiSAp/eHMAwS9ZWhjpXb16y7YjjxQ/Jg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by SJ0PR11MB6816.namprd11.prod.outlook.com (2603:10b6:a03:485::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.25; Tue, 29 Oct
+ 2024 23:54:55 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8093.027; Tue, 29 Oct 2024
+ 23:54:55 +0000
+Message-ID: <b4f4eace-117f-4d55-bcf7-6718d70cbf88@intel.com>
+Date: Tue, 29 Oct 2024 16:54:48 -0700
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: broadcom: use ethtool string helpers
+To: Rosen Penev <rosenp@gmail.com>, Jakub Kicinski <kuba@kernel.org>
+CC: <netdev@vger.kernel.org>, Justin Chen <justin.chen@broadcom.com>, "Florian
+ Fainelli" <florian.fainelli@broadcom.com>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, "Broadcom
+ internal kernel review list" <bcm-kernel-feedback-list@broadcom.com>,
+	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, Sudarsana Kalluru
+	<skalluru@marvell.com>, Manish Chopra <manishc@marvell.com>, Doug Berger
+	<opendmb@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>,
+	=?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>, open list
+	<linux-kernel@vger.kernel.org>
+References: <20241023012734.766789-1-rosenp@gmail.com>
+ <20241029160323.532e573c@kernel.org>
+ <CAKxU2N-5rZ3vi-bgkWA5CMorKEOv6+_a0sVDUz15o8Z7+GFLvQ@mail.gmail.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <CAKxU2N-5rZ3vi-bgkWA5CMorKEOv6+_a0sVDUz15o8Z7+GFLvQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BYAPR06CA0064.namprd06.prod.outlook.com
+ (2603:10b6:a03:14b::41) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|SJ0PR11MB6816:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8510cb39-19dc-4e45-e826-08dcf8751686
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?T1BIRUFsdEkwa0czcmNCTHFVUnFINEg2WE1ZWWdhVEpYNE4vM3cyRkNrbGx4?=
+ =?utf-8?B?UkpmUkdOWTZKajFHOGkrWEk4YUlWYXFOd2dtYkZ2SlJUak14Zlp1cFhBdE5Y?=
+ =?utf-8?B?dy9nbTV5SzFkK2dyQVd3ZXRJZ1ZGQStkVmo1RDNGbXVGOHlBZWFwY0JMWlIy?=
+ =?utf-8?B?K1VXQ1lBT0lYVVJnVDh2S1l4dFZTRWlhMmwvcmtqQ01BakFoWG9md0Uxc2tw?=
+ =?utf-8?B?bWN6TkNxNTlHWlBFOVcvWGJEc2NPT1EwOVRvMTlpVzVhU0wyakp4R0VpUm9E?=
+ =?utf-8?B?RFRrODBIR1JrbUlUNmEzUTJGeFlvNnBwQnVpcmQwNUJ2M2MzdnhxZW5sVHZq?=
+ =?utf-8?B?aG5nZGtPNDhOQjJYV0dQdmt2TGEvcitLZnZWQjVwL1AvMFFQR1Y4NVB4bTN1?=
+ =?utf-8?B?ZGRzRXk1UmJ1Vk9Bd051cTM4NzN2eDBSZmpRZTlOK3pTZy80Q1plWXQyVTgr?=
+ =?utf-8?B?ckdUWlBYMzRkZWJrYzJvalE1c2VWMzVBQzZaT1JNZXVJeGhvVy9VdXptc3VF?=
+ =?utf-8?B?a3hYU1MvM1NrM2E4UXAzdXFDdUpZNm9zenk4WnRjWFVSQWRJSG8xTmVuejM2?=
+ =?utf-8?B?MWdKYVpRMnZ3RmJiVndLdmRUZk1LcDE2aGV4NVRCUC9pL3kxamV6bDRwL2Zv?=
+ =?utf-8?B?QUxRK05rc3B3LzFyR2JvYjBqdTNHelllU3kwQW9DekZQZUNDeHNVMjFhaTRt?=
+ =?utf-8?B?TExOMVcyNTcwdjRFb0o3RmhXTml2MzB5bXo0WVVRaEtjbmFxZFU1SkVQWGlN?=
+ =?utf-8?B?MnhoY1RpSjRhQ0NHQ1QwU2phdS9pajdZL1U4U3FESUdyWnUzWkMzSFNKT2Np?=
+ =?utf-8?B?dGpiMTlTQVp1OUwxbFh0TElva25lSzd6VXk2NXRVRnp2ODV5SVlncmJEdW84?=
+ =?utf-8?B?a2p0UTRXMmhsM0VGQ1pFRmdka1A5V0pUUEg2NVYwcldMakFzOElwYkF3VHhS?=
+ =?utf-8?B?aXZoTVJzZTJvclFZOUpsS3NCblVVcW1kOFAvR01SeTYzSDZQaFJmTDVzMVBa?=
+ =?utf-8?B?b1N6Nnc4RThZWHhPdmx6S0VKOWU0KzAwdWplSU9UVTBKZmpnTlZDVUdBUzlM?=
+ =?utf-8?B?b25RdDVBS1Y0OTY0TjdwWFVQYjAwV3dpRFBQRWJTa0hMOGtSYm1sclVTdUJG?=
+ =?utf-8?B?Rlk4RGhxallCOUZneXBMQVBuWkRRMmVZVFVDQWlLblZtVUxmMVF3djUrdHVU?=
+ =?utf-8?B?cUVnQXZiWms1NW1yTWhUVUZZNzBTZDVNSUcwekVqeUN5M09naUtvbFhkMjQ1?=
+ =?utf-8?B?U3pGY0puYktoSUJUMEJFaUxvRWYxNGVLTHcxY3lVZzFUZEtpSzJoOElacTd2?=
+ =?utf-8?B?TDAwYzhHcGVTY1RMbEQxQkZxays0WWVRdE5EN2NOa0Q4azF4cTc0Z1doc0Yv?=
+ =?utf-8?B?U3JzSEtOOHpOMDRMdndrUFZEVEtWc0toZDl6WmdtMm04bFJjR0lQaDUydlVF?=
+ =?utf-8?B?NThlcVQ4NzRWTzZwOGNFWlJ1K2tzSGFqUkR4M2NjK29pNVk2T3F4RG8vNkxW?=
+ =?utf-8?B?YUdDVnFCbWRFalFrNU9PSW96U2Q4K1JuOWduZEV1cVhHRnJyNnJsc0Y5Y0l1?=
+ =?utf-8?B?ZFZ5TmZNRTF5Rk81NTJLRldTZSt4dEdDZldEVnJhdW1pWVhFTDByR1lrNnFp?=
+ =?utf-8?B?alV4OE01N24vbEttNElXOVJXZFFOVFVTU21yVmFkRDFIckp4d1JHemdFTWhw?=
+ =?utf-8?B?cnF6QVZmUTJKWlI4UFFlTmI1YmpGZ1VBK2hnN3dQZ01hUlZJdmRhaXFxOUE2?=
+ =?utf-8?Q?H/dnxY2D7caDEBj1zeZXMeFVXkIbVlKUDxpl9H9?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?MTNpd2hrQTNhSlVaYXUxUXBHMWQ0MXZsVVN0REIwdjltUEI4dTlLTlB4SlV3?=
+ =?utf-8?B?djcybG4rc1g2MG1pY0dURlhGWnA3YU9LWjFYMzdZK1pMbERwbEk1c2lRRVJT?=
+ =?utf-8?B?M3NsbUZjUHhmRm9hSmZjOW92WTZLMWhGd0ZEN0Z1VmdUbXp4MS9xNjlBQk5m?=
+ =?utf-8?B?NUNmNTVEb2VIQlZVdzNLaHZYNkc3ZEFVR3BPQ0ZCbm9BZVZXN2pjYkt6NS93?=
+ =?utf-8?B?QlpDVGpXRmhyK0VqcDBOc0ZDTUhzdG5ZdGJ2U1JYZ0IwMHpZYVlEVnlOalZM?=
+ =?utf-8?B?THlXaC85MDNCc2JUelNzYzNjR3l2ZzVtOVZ4S0ovRmcrUm41cTZ6dDF6bHFF?=
+ =?utf-8?B?NHhMTnd1T2M5K3E4RlNqN2dYc3ZYcFdMUjNYbFI2UWRqS2JVQjRicWlpT082?=
+ =?utf-8?B?ZU44cTF4cm5OenNZZEpIaXQ2RVI2TTdSNmt3VTU5YWdhRDNmRDI5NVN4ZHVv?=
+ =?utf-8?B?Vi95aUt2VWRDcEtTc2R0S2ZQNC8vbW02ZnB3elhaM0xFRHJ5dHJGMENETSto?=
+ =?utf-8?B?VENnTCsyKzJuT1VJYis5bmxtY2hYZFdQeGxudkZGM1UyYXk0dVVNbFpwOU0z?=
+ =?utf-8?B?UU1XUjVtSGJjMG9DbnNoSjBqVTJxM0RYY0NYQzNLL2kxQnF2RkJibTNjYlNP?=
+ =?utf-8?B?K2dqdmZ5TEZGN1E4bUZaK3BaY2U2bFZxTHNzdVY5aWFvT3pDSEFMNnk2bjJL?=
+ =?utf-8?B?Vkk2SkVCcDdHY1pCZ2VIYXcybGp6ODREbC96Vy9XM0VtUzhtU3NXR2FnMmNq?=
+ =?utf-8?B?L0RDWm8rZWVYUXBXSHRxVC9NZVZSYmh2anVXRjhiY0k3c3FNMHFEVThpMWEz?=
+ =?utf-8?B?cU96VGxQOXZJa3pCb1Q3aFF0VWRTR0VQWVVUQ2dndWZ4dk9nRkpFV3h4UnV2?=
+ =?utf-8?B?STdOOURSNFNiYUxHWVZTWkw3RjZoNitPV0NVMy9Iaks4aUdMUnJGL2ZUQmha?=
+ =?utf-8?B?cnVFK2ZtR3lQcXdMMVRyOXdNMGhhZFhmQ0pMU0JOS08raUkzVFNZK2pXYTZR?=
+ =?utf-8?B?U1ZzY2trUXRlMjQ2NUhQQjd6TzFCUnhqWjYzdVBCaGgvdTN6K2F1QlZ5QzdL?=
+ =?utf-8?B?Y2srSVFiOFNYSDEyb2ptNHJPV0ptTi9UU0Q3TGljR1RTbVZTMytLRnVrVTVu?=
+ =?utf-8?B?REI1dWNuRjJXd3hHNGdXaEFxckkzWm5tNFlxMkZKbk1NZ2FQSXUrOXNrUFA2?=
+ =?utf-8?B?RlZRMVNPa2NwQjR5VnRLWmdlb2kyczkvY0lzYWg0Y2xFZnp3OFd2V3pNZ1dF?=
+ =?utf-8?B?b1FsQ3BId1RqM3QxQlh0bllYMHY1Q3pEdTlvTWR5YWF6d09DZ2MrQXE3L1VH?=
+ =?utf-8?B?VWVrUmRiZmIxbTllWGxtOXVySzZtaXdkQ1R0bW0rUGFFSS9jYVpjNTFMd2ZM?=
+ =?utf-8?B?alN3Y2wyM2ZBNVlIZjB5YU9yZkNlZlpyQ3ptVGxjT0hUZHo1bGRWSGxIdDhr?=
+ =?utf-8?B?T0dDRzRMTGtvSlErWDhhZWwzVFEwT0ZiM2JOMmlYbExiNDM1dlB6elpvZ1pn?=
+ =?utf-8?B?TmNDa3NxY3FRUkI4dVFMMHNXTGttRnhlZTU0eEI4aFpadmVRQnMxZkE1Y2xq?=
+ =?utf-8?B?Uldxd2crRGtIUnpEK29GV2VJd01HeVVvU0tYcGJjOUFFMHgrV09RbmI0dDNG?=
+ =?utf-8?B?OGd3dXhvOGt6b08wdzNpZCsxeU1DZFRjd01nT0xyNDJxYlRKRVltVDlEUEo3?=
+ =?utf-8?B?V3lvZXJXVGpraTQ1M2hESVF4UG9wNERwK3A1S0p1NkRtY1ZvLy84OHJUOWxr?=
+ =?utf-8?B?Z0ZhNHRUVDdtZ2lsbURkMG9IR1ArcnZlQUlRYWhxQzdqQitiZXA2SEsrbGEr?=
+ =?utf-8?B?NFY4T0VOWm9ZOXhPamZ6d1oyRmwwaGtlVHdsME91MzBTUTV0MUE1VHdMbWpy?=
+ =?utf-8?B?VS93L2dDSVBoMjJ0TGpBTk5EQ2o2T205dlFOVnBIdFBVN1J1THFoMjZXMy9I?=
+ =?utf-8?B?VnF3UzBlVHJjZm55WFpkejA5OTZwYzVoZEVhckgwOVJ1MTVwV0t1THlmbkNw?=
+ =?utf-8?B?Q1ZQQXg2MjJuL0dxMGg1Q2FsWDdGNmQvVnhNNnN1RVFpSG1SdUJPTjgzQ1U4?=
+ =?utf-8?B?ZS8xMW1xKzRoUlp6NklaSWY1cVZNK3l5VkRzMUpBQ3lnODlBMjZqT0QxMnlW?=
+ =?utf-8?B?T1d5OHl2eG5WUzUwdDNaOHZsTWkxWnVKUXUyTmN2ckN4djNGZ2s3MkZ1RE43?=
+ =?utf-8?B?eVE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8510cb39-19dc-4e45-e826-08dcf8751686
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 23:54:55.3572
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: GAyRocV+vEXptNl4Q8h4Gfz1UNuVvwo0BIEYZ6xwETnb+FMw92X9Y+jZ2nGmGFBdo++iCK3gwIblp99+NdBFv4YVd0h+3EwZgiJAKC0WeSA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB6816
+X-OriginatorOrg: intel.com
 
-These are the preferred way to copy ethtool strings.
 
-Avoids incrementing pointers all over the place.
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- .../mellanox/mlxsw/spectrum_ethtool.c         | 83 +++++++------------
- .../ethernet/mellanox/mlxsw/spectrum_ptp.c    |  7 +-
- 2 files changed, 30 insertions(+), 60 deletions(-)
+On 10/29/2024 4:43 PM, Rosen Penev wrote:
+> On Tue, Oct 29, 2024 at 4:03 PM Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Tue, 22 Oct 2024 18:27:34 -0700 Rosen Penev wrote:
+>>> @@ -3220,13 +3212,13 @@ static void bnx2x_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
+>>>                       start = 0;
+>>>               else
+>>>                       start = 4;
+>>> -             memcpy(buf, bnx2x_tests_str_arr + start,
+>>> -                    ETH_GSTRING_LEN * BNX2X_NUM_TESTS(bp));
+>>> +             for (i = start; i < BNX2X_NUM_TESTS(bp); i++)
+>>> +                     ethtool_puts(&buf, bnx2x_tests_str_arr[i]);
+>>
+>> I don't think this is equivalent.
+> What's wrong here?
 
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
-index 87a51e7d4390..5189af0da1f4 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
-@@ -607,84 +607,57 @@ static void mlxsw_sp_port_get_prio_strings(u8 **p, int prio)
- {
- 	int i;
- 
--	for (i = 0; i < MLXSW_SP_PORT_HW_PRIO_STATS_LEN; i++) {
--		snprintf(*p, ETH_GSTRING_LEN, "%.29s_%.1d",
--			 mlxsw_sp_port_hw_prio_stats[i].str, prio);
--		*p += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_PRIO_STATS_LEN; i++)
-+		ethtool_sprintf(p, "%.29s_%.1d",
-+				mlxsw_sp_port_hw_prio_stats[i].str, prio);
- }
- 
- static void mlxsw_sp_port_get_tc_strings(u8 **p, int tc)
- {
- 	int i;
- 
--	for (i = 0; i < MLXSW_SP_PORT_HW_TC_STATS_LEN; i++) {
--		snprintf(*p, ETH_GSTRING_LEN, "%.28s_%d",
--			 mlxsw_sp_port_hw_tc_stats[i].str, tc);
--		*p += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_TC_STATS_LEN; i++)
-+		ethtool_sprintf(p, "%.28s_%d", mlxsw_sp_port_hw_tc_stats[i].str,
-+				tc);
- }
- 
- static void mlxsw_sp_port_get_strings(struct net_device *dev,
- 				      u32 stringset, u8 *data)
- {
- 	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
--	u8 *p = data;
- 	int i;
- 
--	switch (stringset) {
--	case ETH_SS_STATS:
--		for (i = 0; i < MLXSW_SP_PORT_HW_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_hw_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+	if (stringset != ETH_SS_STATS)
-+		return;
- 
--		for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2863_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_hw_rfc_2863_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_hw_stats[i].str);
- 
--		for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2819_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_hw_rfc_2819_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2863_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_hw_rfc_2863_stats[i].str);
- 
--		for (i = 0; i < MLXSW_SP_PORT_HW_RFC_3635_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_hw_rfc_3635_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2819_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_hw_rfc_2819_stats[i].str);
- 
--		for (i = 0; i < MLXSW_SP_PORT_HW_EXT_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_hw_ext_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_RFC_3635_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_hw_rfc_3635_stats[i].str);
- 
--		for (i = 0; i < MLXSW_SP_PORT_HW_DISCARD_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_hw_discard_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
-+	for (i = 0; i < MLXSW_SP_PORT_HW_EXT_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_hw_ext_stats[i].str);
- 
--		for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
--			mlxsw_sp_port_get_prio_strings(&data, i);
-+	for (i = 0; i < MLXSW_SP_PORT_HW_DISCARD_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_hw_discard_stats[i].str);
- 
--		for (i = 0; i < TC_MAX_QUEUE; i++)
--			mlxsw_sp_port_get_tc_strings(&data, i);
-+	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
-+		mlxsw_sp_port_get_prio_strings(&data, i);
- 
--		mlxsw_sp_port->mlxsw_sp->ptp_ops->get_stats_strings(&data);
-+	for (i = 0; i < TC_MAX_QUEUE; i++)
-+		mlxsw_sp_port_get_tc_strings(&data, i);
- 
--		for (i = 0; i < MLXSW_SP_PORT_HW_TRANSCEIVER_STATS_LEN; i++) {
--			memcpy(p, mlxsw_sp_port_transceiver_stats[i].str,
--			       ETH_GSTRING_LEN);
--			p += ETH_GSTRING_LEN;
--		}
--		break;
--	}
-+	mlxsw_sp_port->mlxsw_sp->ptp_ops->get_stats_strings(&data);
-+
-+	for (i = 0; i < MLXSW_SP_PORT_HW_TRANSCEIVER_STATS_LEN; i++)
-+		ethtool_puts(&data, mlxsw_sp_port_transceiver_stats[i].str);
- }
- 
- static int mlxsw_sp_port_set_phys_id(struct net_device *dev,
-diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
-index 5b174cb95eb8..72e925558061 100644
---- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
-+++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
-@@ -1326,11 +1326,8 @@ void mlxsw_sp1_get_stats_strings(u8 **p)
- {
- 	int i;
- 
--	for (i = 0; i < MLXSW_SP_PTP_PORT_STATS_LEN; i++) {
--		memcpy(*p, mlxsw_sp_ptp_port_stats[i].str,
--		       ETH_GSTRING_LEN);
--		*p += ETH_GSTRING_LEN;
--	}
-+	for (i = 0; i < MLXSW_SP_PTP_PORT_STATS_LEN; i++)
-+		ethtool_puts(p, mlxsw_sp_ptp_port_stats[i].str);
- }
- 
- void mlxsw_sp1_get_stats(struct mlxsw_sp_port *mlxsw_sp_port,
--- 
-2.47.0
+I was trying to figure that out too...
+
+I guess the memcpy does everything all at once and this does it via
+iteration...?
+
+memcpy would actually result in copying the padding between strings in
+the bnx2x_tests_str_arr, while the ethtool_puts turns into strscpy which
+doesn't pad the tail of the buffer with zeros?
+
+>>
+>> Also, please split bnx2x to a separate patch, the other drivers in this
+>> patch IIUC are small embedded ones, the bnx2x is an "enterprise
+>> product".
+>> --
+>> pw-bot: cr
 
 
