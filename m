@@ -1,124 +1,177 @@
-Return-Path: <netdev+bounces-139917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139918-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B23F9B4998
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:26:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 871D89B49B5
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:31:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCE011C211AC
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:26:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5376281B9D
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2D9205E0A;
-	Tue, 29 Oct 2024 12:26:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03E197F9;
+	Tue, 29 Oct 2024 12:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vt7t35wH"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K8Dhtz41"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f43.google.com (mail-wr1-f43.google.com [209.85.221.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8948BEA
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:26:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9ACD9621;
+	Tue, 29 Oct 2024 12:31:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730204812; cv=none; b=YzQdMotAU7kBslPtqf+gh9fk1SL4sGTOIn8BmOk1Z3U6uRhoEBTLszAixTpSmJwZ2GYRemBFjn+KNhzBRPFUYKrF8kpnCHwdAM1hepBgm4A1RjjzOdLeg4zWj64NyyVt5liFd2+5UVp27nsuh4TWaCFuPnIya20o18SgVzBwDCM=
+	t=1730205074; cv=none; b=osRv0YenbzrkmYYVERy7TTJbJkkDTwXRBpflp0SN+KLxiX2LZJgllcc8JYQ6wHr3zKpqRsLc8LPEFiKKqGTi4f/qufxLo9lLEnrTGnJlbizmN6szQ8ToMd3PwHLBCazrxMlWDba44uPjmuoRH0oLInG3k6yxehKn6qbJWXYiUQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730204812; c=relaxed/simple;
-	bh=OIiNsApqwgm71NjUFM1ADgAthsV5yL2jS8pl3Uc8ZmQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=uuPq6+HdwTbKvnEYL+jP/VyRrCvGR24XEIX8EizuP04xi+YNs+BihFfE9hmo0xmniRtF5yn7yrOUJqn+OHz6Up8Tk/w2f096FHaCPb2zLM2CSAseKKG5M9rOXX0m78XaA7MjObh6Ei1wO3jklx6CKtcE9amC+OYAajRAbZ+i7v4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vt7t35wH; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730204810;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=GOZTaD4SZpZxUnHx9eqNQXCMnDT5MQfWDHUrJEYUGAI=;
-	b=Vt7t35wHnLgvy7vBnA8aqxcVgERbWrFMxWnwQgrGj4imxl/s9ozfpv9tsw9y0+NxYUx7Lq
-	fIJtCFZK7jZeclL4HvRjU2aS02r+f4PCTY82b7zuaK3aI51tt0kZYy/QDpZBcbXA4dy8M+
-	KDwyM7GSgcpB7a+g6Z6wKekYfBbDTMo=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-401-N8JAxcW3Nl6C4IxZJuj1kQ-1; Tue, 29 Oct 2024 08:26:48 -0400
-X-MC-Unique: N8JAxcW3Nl6C4IxZJuj1kQ-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d3e8dccc9so3066362f8f.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 05:26:48 -0700 (PDT)
+	s=arc-20240116; t=1730205074; c=relaxed/simple;
+	bh=TYPIu0SfR+TN4j062E5hryA9cXK0q/3ENU8V6QOjjVE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=HuwFqM9DOhEFGICpuBrjVIRIckbOEmUMTotpmAReIgu/pHFf3isFN7OmELOYp4e9/eqeuesK6F5xUJg44J+p8f98+zo6YhX76kNwGr879oIFDJArl51EUYsjBtNDiHZPkflORB43ptAmghyjVkl4dpXJ9y8SD1b2KUjJCL9mQak=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K8Dhtz41; arc=none smtp.client-ip=209.85.221.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f43.google.com with SMTP id ffacd0b85a97d-37d5045987dso430846f8f.1;
+        Tue, 29 Oct 2024 05:31:12 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730205071; x=1730809871; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fZ7aKdVifpnHdKeUSiwbE32Nz4syIUyUTJuxzmlVQkM=;
+        b=K8Dhtz41Am2MrURjHvRYI7lNcxMk3/iQp2f0loxvcS0uGzO97NKDhOS07Ubdqysz1L
+         46sItM7UJVNYA2BZortNNrGVfiPVrcKMeoQeQ6E0XWzc4L16HQzfcGmn33xsZDdeGriV
+         3YBMwC6yu+sF0zH8UkFs5wqIJt0DUnLxgGHGeok2gx25I9xzFkyZBmzGAA5p6vyf19eE
+         20MUJvuUkt07xqCC8rBEJ7nw1JhmAqI9m8bjff2lxKdk3aHwQ4QMJ417FkxU48XWeEUP
+         3hyrSi1EuYgIO8aXBv6lpTBezEd/04oggDIfenVoNokkm0KmZ9TbQwMZGrWXVG9d1Ls8
+         PASQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730204807; x=1730809607;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GOZTaD4SZpZxUnHx9eqNQXCMnDT5MQfWDHUrJEYUGAI=;
-        b=qn2qvtUcJkQoB90wjY5HwWDdIZOTkwjKp1EF8NSSh16nw+RiQebemQXzpBSgqc6u0f
-         iZ0fx7F8QjLGVN6OEqU+pY3zhIbbfu/c/tnc3WlZnU312i6ofHZiJMgCqvCSlDwlOr61
-         h+1/9lOHqhs1xVDsllL0AuhPQkri35UQJ8oh8nC7eH6dq/YJzsdmmJuK0YYeu62kXK96
-         MX9/DA215s34ysJmmVE2ze8ZOwZeDCa1UENYL9nwKGtadMYLG8u/tlt7n8fK72RTWNMH
-         f3jfHxEfW0nd3V3ymScLjA2nGy9dYSk802UhT+CM0O0nfjG3KF3SqqRwaXQZfex71cX1
-         2nuQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWEGL+XAqdW63MfwiC8ChZ8HbL3EzX/GyMl7BLZBHMVU/m+xNTCyTqi1ZN4Wen6gqA8UwuaFIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwBhI0RA64nDylT1NAQFg7lfynjCx//1Ti5n5jNUPByKDcwMWL+
-	WxtPMfBIUacu/zC1DPbtvzpuGcx3/9m1A9ZHsP6XmFd83pq6aW01N7Camm/R6X92BdMq2pnlCXw
-	KYwi/h7UTQ1OTlxSWhXKI4EfmS7yLRfaMxV8qyg5dqDmQ9dD7Xdo5Cg==
-X-Received: by 2002:a5d:4849:0:b0:37d:4e03:635c with SMTP id ffacd0b85a97d-380611441bbmr8953978f8f.21.1730204807533;
-        Tue, 29 Oct 2024 05:26:47 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IE7KLM8OM21izjqXfNP/B0QCUjjPNIlLTzWnqUD6a68rC1KUBMbMRh54JsB8kR9ClHY4mPX5A==
-X-Received: by 2002:a5d:4849:0:b0:37d:4e03:635c with SMTP id ffacd0b85a97d-380611441bbmr8953961f8f.21.1730204807135;
-        Tue, 29 Oct 2024 05:26:47 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b46bffsm12311553f8f.46.2024.10.29.05.26.45
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 05:26:46 -0700 (PDT)
-Message-ID: <dee9769f-d86b-471f-bbe2-f0165489618c@redhat.com>
-Date: Tue, 29 Oct 2024 13:26:44 +0100
+        d=1e100.net; s=20230601; t=1730205071; x=1730809871;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fZ7aKdVifpnHdKeUSiwbE32Nz4syIUyUTJuxzmlVQkM=;
+        b=k+3HTZ1OVrMwWAUpNFAwP/cEOHmyfJblEc4vivAKYhS/Ui14oVDkE8dGQB2ihrMq2k
+         XGj/F41uIlv3cTUcoFihEG5eUJQTiv6tXBT5XHU5DwlKreMejC51h4FxVRAd7++dq+Qk
+         pq2mzzWg15sqKe4ZMxvd9beZq58yUo7OPcALUTzZS2rijFBjIHLd1paydmFfDZuEQHnf
+         ixI6Hu/YcLL3X+p36qRJpYVlZNYkLaSe4+oH+Z2I8l6F6y/GX7T+JyW0FZt4hdrS8rVn
+         UEKUVcEERWwFP58NdFMsaxA6Wg2T1QhVUr8Z2lyAyZKhHqAswP6zPS0aAtlZnF39QorC
+         c6CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU0KXc705xJuiUUcuRAQ0xcQ6mlR1tTWxx03QQfJGEQEa+nVo/0kucqRI2zJos0EIAKXvRO9YQqkV+w@vger.kernel.org, AJvYcCUhkKYct+tOazFadxZvYdYZKk9Mk1fM8bVASGV8bmM61DVJwCmr0EgWN0VvRTfp6i98RvEgHLDN@vger.kernel.org, AJvYcCX664/cqDnpBogC2Fj1uul4EOI4JXQWePNDydDz/9brxEhZK/DzPHQF8EhmJ5UtLTZE9Ixc9nrxFKy2hjvB@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVNCtqkDs49ogEHkBNFkfqs/H7mhI5vb265xYOujXTm5Teg5nj
+	p6gpSbqzQrIvNplZ/UTe8sJffDlY92zWo4FRLV8K1pRua1Fsgit0
+X-Google-Smtp-Source: AGHT+IF7v8Sw+x2Tqh2kJZeOySvkxMSlwOCzePbp5aDIKfhNrRB639HqLFpTiwIN88Ct1hVS15JJnQ==
+X-Received: by 2002:a05:6000:401f:b0:37d:4517:acfb with SMTP id ffacd0b85a97d-380610eed1amr4037086f8f.2.1730205070555;
+        Tue, 29 Oct 2024 05:31:10 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b1c3absm12446497f8f.21.2024.10.29.05.31.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 05:31:09 -0700 (PDT)
+Date: Tue, 29 Oct 2024 14:31:07 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org, Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH net-next v2 2/5] dt-bindings: net: dsa: ksz: add
+ mdio-parent-bus property for internal MDIO
+Message-ID: <20241029123107.ssvggsn2b5w3ehoy@skbuf>
+References: <20241029110732.1977064-1-o.rempel@pengutronix.de>
+ <20241029110732.1977064-3-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 net-next 14/14] net: sysctl: introduce sysctl
- SYSCTL_FIVE
-To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- dsahern@kernel.org, netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
- coreteam@netfilter.org, pablo@netfilter.org, bpf@vger.kernel.org,
- joel.granados@kernel.org, linux-fsdevel@vger.kernel.org, kees@kernel.org,
- mcgrof@kernel.org, ij@kernel.org, ncardwell@google.com,
- koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
- ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
- cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
- vidhi_goel@apple.com
-References: <20241021215910.59767-1-chia-yu.chang@nokia-bell-labs.com>
- <20241021215910.59767-15-chia-yu.chang@nokia-bell-labs.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241021215910.59767-15-chia-yu.chang@nokia-bell-labs.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241029110732.1977064-3-o.rempel@pengutronix.de>
 
-On 10/21/24 23:59, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+On Tue, Oct 29, 2024 at 12:07:29PM +0100, Oleksij Rempel wrote:
+> Introduce `mdio-parent-bus` property in the ksz DSA bindings to
+> reference the parent MDIO bus when the internal MDIO bus is attached to
+> it, bypassing the main management interface.
 > 
-> Add SYSCTL_FIVE for new AccECN feedback modes of net.ipv4.tcp_ecn.
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+> Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  .../devicetree/bindings/net/dsa/microchip,ksz.yaml       | 9 +++++++++
+>  1 file changed, 9 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> index a4e463819d4d7..121a4bbd147be 100644
+> --- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> +++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+> @@ -84,6 +84,15 @@ properties:
+>    mdio:
+>      $ref: /schemas/net/mdio.yaml#
+>      unevaluatedProperties: false
+> +    properties:
+> +      mdio-parent-bus:
+> +        $ref: /schemas/types.yaml#/definitions/phandle
+> +        description:
+> +          Phandle pointing to the MDIO bus controller connected to the
+> +          secondary MDIO interface. This property should be used when
+> +          the internal MDIO bus is accessed via a secondary MDIO
+> +          interface rather than the primary management interface.
+> +
+>      patternProperties:
+>        "^ethernet-phy@[0-9a-f]$":
+>          type: object
+> -- 
+> 2.39.5
+> 
 
-How many sysctl entries will use such value? If just one you are better
-off not introducing the new sysctl value and instead using a static
-constant in the tcp code.
+I'm not saying whether this is good or bad, I'm just worried about
+mixing quantities having different measurement units into the same
+address space.
 
-Also this patch makes the commit message in the previous one incorrect.
-Please adjust that.
+Just like in the case of an mdio-mux, there is no address space isolation
+between the parent bus and the child bus. AKA you can't have this,
+because there would be clashes:
 
-Side note: on new version, you should include the changelog in the
-affected patches, after a '---' separator, to help the reviewers.
+	host_bus: mdio@abcd {
+		ethernet-phy@2 {
+			reg = <2>;
+		};
+	};
 
-Thanks,
+	child_bus: mdio@efgh {
+		mdio-parent-bus = <&host_bus>;
 
-Paolo
+		ethernet-phy@2 {
+			reg = <2>;
+		};
+	};
 
+But there is a big difference. With an mdio-mux, you could statically
+detect address space clashes by inspecting the PHY addresses on the 2
+buses. But with the lan937x child MDIO bus, in this design, you can't,
+because the "reg" values don't represent MDIO addresses, but switch port
+numbers (this is kind of important, but I don't see it mentioned in the
+dt-binding). These are translated by lan937x_create_phy_addr_map() using
+the CASCADE_ID/VPHY_ADD pin strapping information read over SPI.
+I.e. with the same device tree, you may or may not have address space
+clashes depending on pin strapping. No way to tell.
+
+Have you considered putting the switch's internal PHYs directly under
+the host MDIO bus node, with their 'real' MDIO bus computed statically
+by the DT writer based on the pin straps? Yes, I'm aware that this means
+different pin straps mean different device trees.
+
+Under certain circumstances I could understand this dt-binding design
+with an mdio-parent-bus, like for example if the MDIO addresses at which
+the internal PHYs respond would be configurable over SPI, from the switch
+registers. But I'm not led to believe that here, this is the case.
 
