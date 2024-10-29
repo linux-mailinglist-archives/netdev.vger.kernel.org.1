@@ -1,134 +1,150 @@
-Return-Path: <netdev+bounces-139773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139774-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A78739B40A4
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:51:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2C9B9B40C9
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 04:12:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69921C2249F
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:51:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87ACD2835D0
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:12:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71201E0E1D;
-	Tue, 29 Oct 2024 02:50:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 079911F76B2;
+	Tue, 29 Oct 2024 03:12:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dvKgnwL+"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="EQLUGKtc"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824294400;
-	Tue, 29 Oct 2024 02:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C465149C4F;
+	Tue, 29 Oct 2024 03:12:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.168.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730170257; cv=none; b=qOp7o1XTnUeX4j09bZ+ocCTLs9YhMCL3bmqxVX+ISekuUS+JojlrD9PDpkzQ3ELilayVMEsgaCUY377KJnxUuMAeJwgMQfa7+VqcGz7pBLUjPyuL3qJ5bmh6iAZSr+hfHYc6Xwqu8ZxMDOAwK10Tx0qnoY0dOHpiOhmATRQ6n1U=
+	t=1730171557; cv=none; b=lPvvqhbgJ3clXRoOnqdOhBgYzwe4O7aUMKuJdkmM9Fn0lNq3zmQim+qvRKmlIoNwo9zuKy47GYZ1urgwaOn/Sg9Lj44asbn4o1hdlj5O4LwGzVue6Pto4Ib9noUHHkis1BsJQqKW0ASo0AGyRnmhTxMkxEedHaSMP2Og8AbdFOc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730170257; c=relaxed/simple;
-	bh=rbs6zdmlmEO16BukbbW/kX6BRAgAHqPcAzpnhOyj4wA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pozc/dF0p6jWSRMTvj78GQhtV3BlssBl79YnVQlClRcb0dBLjD84sUdbWflqfv2HZhjYd+k28Fv39+PFQH5nMCIzaAk9dSZXwCkttaEGCrNqcmsSXvvU8IKPfE+AuXcHrvhr4wN5BSP/ZBef3aqGJ9w3LrTLpBGy83h2AzNiJYo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dvKgnwL+; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4x7+NMYuwtDNvuiXxIkan9s38gNFO7jrlobgIQdg9wI=; b=dvKgnwL+xlxDZYgcteGPA7b1b7
-	mLcb/Toa8r1YLBarjgVedww/AUh/e93nYKxJn0MCiIuXh1j8B+aBur60A4HEBBxqIfiLMvlt4rF0O
-	7jPcAv+gcq+yNAuTKebC5HnZ9CB2ptTJoX+sj2mDMLGrqaP5KDvKrRk1CSAhwJWRWCDY=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5cJd-00BWHU-42; Tue, 29 Oct 2024 03:50:41 +0100
-Date: Tue, 29 Oct 2024 03:50:41 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Inochi Amaoto <inochiama@gmail.com>
-Cc: Chen Wang <unicorn_wang@outlook.com>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Inochi Amaoto <inochiama@outlook.com>,
-	Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Jisheng Zhang <jszhang@kernel.org>,
-	Thomas Bonnefille <thomas.bonnefille@bootlin.com>,
-	Liu Gui <kenneth.liu@sophgo.com>, Yixun Lan <dlan@gentoo.org>,
-	Longbin Li <looong.bin@gmail.com>, devicetree@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH] riscv: dts: sophgo: Add ethernet configuration for cv18xx
-Message-ID: <ab0ed945-07ff-4aff-9763-e31f156df25f@lunn.ch>
-References: <20241028011312.274938-1-inochiama@gmail.com>
- <87e215a7-0b27-4336-9f9c-e63ade0772ef@lunn.ch>
- <wgggariprpp2wczsljy3vw6kp7vhnrifg6soxdgiio2seyctym@4owbzlg3ngum>
+	s=arc-20240116; t=1730171557; c=relaxed/simple;
+	bh=AnKGB5qEJmuBsYyFcAMQDGxAzQO/N5iGbBB0ygAtp/c=;
+	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=fuwO6VMUmnpDCNDTyPOfrfVSoz77rhHJF5jpM+vpW3KnzMaxiVU3E532GiUXBaf9r9oLY+wXYFCe9Hb5kCdVdNtAMxZG7H3+U6PlKirgu5yHAacZL8yJnjxTeDUWtyyVAbonU9Yp6zMxZQ3L9wXOP5PQHLdus+EbYIH8FHlwhK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=EQLUGKtc; arc=none smtp.client-ip=205.220.168.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49SLNuRq005754;
+	Tue, 29 Oct 2024 03:12:26 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=5VxwDdM9oNjw9I44/LF8Cm
+	cxos08+pTMMfiAPQ/j2nc=; b=EQLUGKtc00JIwpOLj5uCB6ePshF2AOWfVRdzfw
+	xMkyWwX9bP04xFU0lunjfR1Bo+v0y0pvOhVOzALt+ofsN6OEjfz5wuoQ8M9ce72D
+	9belLdH2DHtn5ju5GIyTbaN9WKE306RmPWbGeIDAUGHEPxtnR3Noffe+b4ysJ2zI
+	OBfWRaFw4kk0b5+5jJBs4pnexXd+R9i8ichwZx6KvKT7c8JEw9loge7WtzD9/SAD
+	0KPgD6q4+alYGc+StsepBfpfi9AsKJc0SSVeqVU2spkpNJ1cMSP+A+7fE+ctKxxm
+	RezXXX9V1H8xedTve4FyAmqU57IKpyCcYT4271M8CVwi7EoA==
+Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42gskjxvwt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 03:12:25 +0000 (GMT)
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA05.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 49T3COLT016954
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 29 Oct 2024 03:12:24 GMT
+Received: from yijiyang-gv.ap.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 28 Oct 2024 20:12:19 -0700
+From: Yijie Yang <quic_yijiyang@quicinc.com>
+Subject: [PATCH v3 0/2] Add ethernet dts schema for qcs615/qcs8300
+Date: Tue, 29 Oct 2024 11:11:54 +0800
+Message-ID: <20241029-schema-v3-0-fbde519eaf00@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <wgggariprpp2wczsljy3vw6kp7vhnrifg6soxdgiio2seyctym@4owbzlg3ngum>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHtSIGcC/zWPwXLCMAxEfyXjc8XYchpcTvwHw8F2ZKJp44CdZ
+ ugw/HudGI4r7a6eHiJTYsri0DxEooUzT7EI/dEIP9h4IeC+aIESWyXxC7IfaLSgbGd6xPazC0E
+ U8zVR4PtWdDoX7WwmcMlGP6zxmlqNA+d5Sn/bwUWtdqE0WkOlWzvaQ4towXmjoe8cSRms12SO3
+ 5Qi/eymdBFr/4JbtGKp/RtrQZCAGmUoeF5hd7z9sufod34axflZSROVaea54lbWsh95PjSR7jO
+ 8vjUl8fwH3svpdSMBAAA=
+X-Change-ID: 20241029-schema-1a68d22456ff
+To: Vinod Koul <vkoul@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David
+ S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Rob Herring
+	<robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor Dooley
+	<conor+dt@kernel.org>,
+        Bhupesh Sharma <bhupesh.sharma@linaro.org>
+CC: <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        Yijie Yang
+	<quic_yijiyang@quicinc.com>,
+        Krzysztof Kozlowski
+	<krzysztof.kozlowski@linaro.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1730171539; l=1370;
+ i=quic_yijiyang@quicinc.com; s=20240408; h=from:subject:message-id;
+ bh=AnKGB5qEJmuBsYyFcAMQDGxAzQO/N5iGbBB0ygAtp/c=;
+ b=v9nIjoiGXBC5VmtJjLtTNk0yb2WdvlN/m5gasihBeK24chrxZ6C3PX1fQyPGkO1tJ1i7xSb+h
+ L5b374nOP2ZBd/kAnz1vXGV2mKSMbx2rSN6q9vzpaMwQLg/5zdJSBQu
+X-Developer-Key: i=quic_yijiyang@quicinc.com; a=ed25519;
+ pk=XvMv0rxjrXLYFdBXoFjTdOdAwDT5SPbQ5uAKGESDihk=
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: VUBW2ZrS1V3F_hLxco_fOZlL3i_TqHAH
+X-Proofpoint-ORIG-GUID: VUBW2ZrS1V3F_hLxco_fOZlL3i_TqHAH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ impostorscore=0 suspectscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=914 bulkscore=0 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2410290024
 
-On Tue, Oct 29, 2024 at 06:43:03AM +0800, Inochi Amaoto wrote:
-> On Mon, Oct 28, 2024 at 02:09:06PM +0100, Andrew Lunn wrote:
-> > > +++ b/arch/riscv/boot/dts/sophgo/cv18xx.dtsi
-> > > @@ -210,6 +210,55 @@ i2c4: i2c@4040000 {
-> > >  			status = "disabled";
-> > >  		};
-> > >  
-> > > +		gmac0: ethernet@4070000 {
-> > > +			compatible = "snps,dwmac-3.70a";
-> > > +			reg = <0x04070000 0x10000>;
-> > > +			clocks = <&clk CLK_AXI4_ETH0>, <&clk CLK_ETH0_500M>;
-> > > +			clock-names = "stmmaceth", "ptp_ref";
-> > > +			interrupts = <31 IRQ_TYPE_LEVEL_HIGH>;
-> > > +			interrupt-names = "macirq";
-> > > +			phy-handle = <&phy0>;
-> > > +			phy-mode = "rmii";
-> > > +			rx-fifo-depth = <8192>;
-> > > +			tx-fifo-depth = <8192>;
-> > > +			snps,multicast-filter-bins = <0>;
-> > > +			snps,perfect-filter-entries = <1>;
-> > > +			snps,aal;
-> > > +			snps,txpbl = <8>;
-> > > +			snps,rxpbl = <8>;
-> > > +			snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
-> > > +			snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
-> > > +			snps,axi-config = <&gmac0_stmmac_axi_setup>;
-> > > +			status = "disabled";
-> > > +
-> > > +			mdio {
-> > > +				compatible = "snps,dwmac-mdio";
-> > > +				#address-cells = <1>;
-> > > +				#size-cells = <0>;
-> > > +
-> > > +				phy0: phy@0 {
-> > > +					compatible = "ethernet-phy-ieee802.3-c22";
-> > > +					reg = <0>;
-> > > +				};
-> > > +			};
-> > 
-> > It is not clear to me what cv18xx.dtsi represents, 
-> 
-> This is a include file to define common ip for the whole
-> cv18xx series SoCs (cv1800b, cv1812h, sg2000, sg2000).
-> 
-> > and where the PHY node should be, here, or in a .dts file. 
-> > Is this a SOM, and the PHY is on the SOM? 
-> 
-> The phy is on the SoC, it is embedded, and no external phy
-> is supported. So I think the phy node should stay here, not 
-> in the dts file.
+Document the ethernet and SerDes compatible for qcs8300. This platform
+shares the same EMAC and SerDes as sa8775p, so the compatible fallback to
+it.
+Document the ethernet compatible for qcs615. This platform shares the
+same EMAC as sm8150, so the compatible fallback to it.
+Document the compatible for revision 2 of the qcs8300-ride board.
 
-So this is correct when the PHY is internal. However, this is normally
-expressed by setting phy-mode to "internal". The stmmac driver might
-however not allow that? If not, please put a comment indicating the
-PHY is part of the SoC.
+Signed-off-by: Yijie Yang <quic_yijiyang@quicinc.com>
+---
+Changes in v3:
+- Remove merged patch from this series: "dt-bindings: phy: describe the Qualcomm SGMII PHY".
+- Remove unnecessary dependency description.
+- Rebase this patchsets on top of 'next-20241028'.
+- Link to v2: https://lore.kernel.org/r/20241017-schema-v2-0-2320f68dc126@quicinc.com
 
-	Andrew
+Changes in v2:
+- Adjust the position of the EMAC compatible fallback for qcs8300 in the YAML file according to the order.
+- Link to v1: https://lore.kernel.org/r/132a8e29-3be7-422a-bc83-d6be00fac3e8@kernel.org
+
+---
+Yijie Yang (2):
+      dt-bindings: net: qcom,ethqos: add description for qcs615
+      dt-bindings: net: qcom,ethqos: add description for qcs8300
+
+ .../devicetree/bindings/net/qcom,ethqos.yaml          | 19 ++++++++++++++-----
+ 1 file changed, 14 insertions(+), 5 deletions(-)
+---
+base-commit: c8f460cd88112a37cbb3321a25ddddba08bb0372
+change-id: 20241029-schema-1a68d22456ff
+
+Best regards,
+-- 
+Yijie Yang <quic_yijiyang@quicinc.com>
+
 
