@@ -1,100 +1,117 @@
-Return-Path: <netdev+bounces-139806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139808-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FC559B4411
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:22:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 277779B441D
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:25:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16AB11F235C2
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:22:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85911B20E22
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:25:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23DE820125B;
-	Tue, 29 Oct 2024 08:22:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2BE8202F64;
+	Tue, 29 Oct 2024 08:24:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="U1T6X1Yx"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="f1zWuYy5"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2107.outbound.protection.outlook.com [40.107.117.107])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4541D5AC7;
-	Tue, 29 Oct 2024 08:22:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.117.107
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B32341DFD96;
+	Tue, 29 Oct 2024 08:24:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.13
 ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730190165; cv=fail; b=OxwGrbLeMPagGEZaxWfP5iukKXU5g753OuwkMvbUA73C9BxHxURfG4kEi670O/Df/HbNpuu0wd4j/RsZ9Y06gY46flIYiotkl24xL1puaaRRbhq48x3tyjvBnXJKCJ0kMchOt3KTeXgjmFiwhXPYzXank1UTVn92ZsBxu2VUTTc=
+	t=1730190296; cv=fail; b=DqGZ//MuJ7NWBTsGMDc7g3XAUWAZrDCqp2VswIu3JZ6+eEMRSIj0On0YcBQtHaGbLfV4w8Tzx5E4W5cWpgd/trIt/FdcAiPYkvyKZjQ8PGyOVNDjNKz9tYrKO13jl5P1uHsXxTIeetOEmLGMuhLv2M7yMlkDcXfDuoDu3+b/6Zc=
 ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730190165; c=relaxed/simple;
-	bh=La7uYPjW5wVeik8Pkpo5cTEfLUUf8EVpjP9r10Y7vyQ=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Zh2W1IcvR+Zr8lmFLqmsxmxVUXCYpPC0a0u0RbBtem2gDzsQkzcf3k3vuIMXtrlKVdDIF5fT+jPzy2LXUSdABnj39YFtCcEIy77kzmgnjO2nUeHTCgiZ39+ODng13umZjNuL1+yoWDMGvpeCRsjD9GPOkmnGFzdCSSYqdk5XOSc=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=U1T6X1Yx; arc=fail smtp.client-ip=40.107.117.107
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
+	s=arc-20240116; t=1730190296; c=relaxed/simple;
+	bh=vokjQBwTtjBE3MTVChtpyqOP3ZrDk8WstpULlogOCmI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=J/Y1x+0lWtd8ypVymlIwRrBsvzGB1Y8ks8feWaZieh8rInaroE2PIUPihY/DbkBZSc2nP+5TWknxqtq8htnzaeobTeGBmGkkKHxWWnxVYD8QzCGstBWs+02JqmTMMuBmn+J7u018CW6G4ZRxTf1sjUjfA8hzWKzuHZh+qbGwZH4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=f1zWuYy5; arc=fail smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730190295; x=1761726295;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=vokjQBwTtjBE3MTVChtpyqOP3ZrDk8WstpULlogOCmI=;
+  b=f1zWuYy596fhze9jfNOjpCeUt2pPIhLa9L6n9/pLrEZvyvEuLA2lQ/CQ
+   PCtK4sqr2tR2eC14Rxe/U2Y1SCPA1zs2D345x6SO0wJiSeAAS6Dua1L5l
+   XNNzULdnrRHipt6qji/OXi9BAWbGAJ0cfRUtZjHM5hJ59/nmDNp9+1apA
+   2bU8l1kscoxXRzNvFjAGV3sRouy5NFNFOLm4qHqCFu7Dgjsc6DxXL1FkQ
+   neUmV8UIG+tTowfpX84MAYcrAyMe662bVvZmOCq22X5VqRFhCv0H9z/ht
+   i+9hCpe5vlqOWZ+I2z9hWS9UYu8gSV2LDSCte8/TDhkwOvrzvWZUN4mkR
+   g==;
+X-CSE-ConnectionGUID: wq6fdyQrQgOHfQhxaDcosw==
+X-CSE-MsgGUID: 6fxZ/SuaTV+m/0O3fMQB2Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40914472"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="40914472"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 01:24:54 -0700
+X-CSE-ConnectionGUID: J5IQDqfPTFahJJtkH2S/UQ==
+X-CSE-MsgGUID: gAsnGWnAR4eZkBMV7MUcvw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
+   d="scan'208";a="82308396"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa007.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Oct 2024 01:24:54 -0700
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Tue, 29 Oct 2024 01:24:53 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Tue, 29 Oct 2024 01:24:53 -0700
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.47) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Tue, 29 Oct 2024 01:24:52 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=mfwgKJk7kRKGUUrGwIUabPgeGPKrl8RjkHlvGbsSZ81R/hhBO6Q3BBlJXHDEN0nwLGTj2gGO8PTSAhw+ZHS4sEBc/VQ8c3jZCc50sPZUq+y01OeVm/4QRJB7AsTbgdHf7zDqePxa5qQt2MbDjgMSP9R7n1CGpItp9fwjYSXNevAHt22aMtLpTaBdy6IrwxhKb9q2P14OvTJEYc4D8tIwBgQbhO4YaDVQnN1CI3Df1MjS20p8i3yjxkjBN7MC+QaqvtwIl/s/DtvLGCl846x4PT7HruAAdizPPL8zeYMvn+Jqkpw6PTd207NJAJIAH0uvAm+0+QfpnIIFMs9bxb031Q==
+ b=dbN1xNnGmay/0PZrbXwwewNcb+Tf/MdBLzcDinOh1YyXAYYfysVR+Mt4HA612jmPiqn9jbIL+1CyPjdc8Di9Ot8sZfFynO1z0jtGkK+7xRDRc080av26OXiJf3RxDtF6h6Wjk5s/0+15WRG6JpY8CCecI0IBl0WXfFEgWj4+wCkJUboM4cq48aTbQ9Qyg7I+xfQLIJKcEWCzE+AccNUBWggFvI13m7kKWAbpptzMI8vCY3x/AW+wki6omKUzh9CiYxiPoyjif5lDBXhiCYBgDb7CfMPJFWWovF1L7lahmZgB2i27b0LNLYLw5/i2EgVjIyimfB6AkB+JyzBotr3FGQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector10001;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=f2zXkB1k96f0cFV7oh8D3tIGindJppO8RN6kzrT2aOQ=;
- b=vDnn9aYNRcE81y/KCrJauEgWCErnoQQrDuo1CmUae0tS9ncOdWx24Qn8XL/NHaE8gmfCv7Ozxf1XuKeGk7bAtqDOxSmIQifEbA2dn3I676UgF9lXxEYFwMHZkULcqrsUM55QzAiRlPZBg7u8sGwCh/nx5uMAAmPzHD5kIg+3NBpb8E4Tp4TIzk6zj8B1JAEGOxr9+1PpVTq48UeGG4Rkq1b3v5F+/pcpzMHgHoIjfAjg5Q9ex4+i+NseogfrckHVqks+AbbNO6L4TxmzAehOyzTvN65SeEqIS4/5Lms/Gpfnd70DZZv6TouOToSg0A7WmGox5Mpz9y+fRFy2eYaBHA==
+ bh=79OdSyluOOWc/9W2NOPq+x1KZlZ499/oVEhgWJbNuRo=;
+ b=QR6d9X2vFj32AkvxbX5KWxO5o0A6vpMhcPL4syzHkKD4jb47kIbnynrjgt/6Uvr6vX83FncrVDF95dWdiDExvhr5tGtCkuYFCtQTbSOXuVnI1DyIKDiHlNye54l4+eGu9dc2B10JzYyI5ucQLrqbYH+E6rqoSNn4xqZH4B0w5FikS+W8ZvG/B3VSrO18U1RJsUWC9ffrZ3A7ymzdWsB4qOcIGfRzwQgJHfInoM4H344yS07LFsqtvVW91WPv0BZz/9kYq/v2uuxxj1khvM1Ql/VUIRHgfWrsdkrlRH2bkr6Vuyhbx+nnWcQJsDQrXO3D10Chj3Pyc9zs7hdct/Kz/Q==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
- dkim=pass header.d=fibocom.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=f2zXkB1k96f0cFV7oh8D3tIGindJppO8RN6kzrT2aOQ=;
- b=U1T6X1Yxswd/4a9x0FSCFcaJoc+jlaFPKBZEDg8bikYR66vqyzZZlsDh2M5A2zTmNwiJUen2T4yldarEFW0mYZQB393gUrjQ5swOBTBNQhdhYYmjSANnVLqxPskQqxM049ehkxzllJjrLwGqrhWPAoflQMKPZDjpWQk5ewVGMoQ=
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=fibocom.com;
-Received: from SEZPR02MB5782.apcprd02.prod.outlook.com (2603:1096:101:4f::8)
- by TYZPR02MB7008.apcprd02.prod.outlook.com (2603:1096:405:2f::7) with
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by SJ0PR11MB5085.namprd11.prod.outlook.com (2603:10b6:a03:2db::10) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.25; Tue, 29 Oct
- 2024 08:22:36 +0000
-Received: from SEZPR02MB5782.apcprd02.prod.outlook.com
- ([fe80::4843:bf84:bd17:827e]) by SEZPR02MB5782.apcprd02.prod.outlook.com
- ([fe80::4843:bf84:bd17:827e%5]) with mapi id 15.20.8093.024; Tue, 29 Oct 2024
- 08:22:35 +0000
-From: Jinjian Song <jinjian.song@fibocom.com>
-To: ryazanov.s.a@gmail.com,
-	Jinjian Song <jinjian.song@fibocom.com>
-Cc: andrew+netdev@lunn.ch,
-	angelogioacchino.delregno@collabora.com,
-	chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	corbet@lwn.net,
-	danielwinkler@google.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	haijun.liu@mediatek.com,
-	helgaas@kernel.org,
-	horms@kernel.org,
-	johannes@sipsolutions.net,
-	korneld@google.com,
-	kuba@kernel.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	loic.poulain@linaro.org,
-	matthias.bgg@gmail.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	ricardo.martinez@linux.intel.com
-Subject: Re: [net-next v7 2/2] net: wwan: t7xx: Add debug port
-Date: Tue, 29 Oct 2024 16:22:18 +0800
-Message-Id: <20241029082218.10820-1-jinjian.song@fibocom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <b3aab30d-7c9a-451a-aea9-6bba72fe986d@gmail.com>
-References: <20241026090921.8008-1-jinjian.song@fibocom.com> <20241026090921.8008-3-jinjian.song@fibocom.com>
+ 2024 08:24:43 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8093.024; Tue, 29 Oct 2024
+ 08:24:43 +0000
+Message-ID: <9b7ccd9e-fca3-4a72-806f-3e99ab5ae4bd@intel.com>
+Date: Tue, 29 Oct 2024 09:24:39 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2 1/2] ptp: add control over HW timestamp latch
+ point
+To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+CC: <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<richardcochran@gmail.com>, Aleksandr Loktionov
+	<aleksandr.loktionov@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <intel-wired-lan@lists.osuosl.org>
+References: <20241028204755.1514189-1-arkadiusz.kubalewski@intel.com>
+ <20241028204755.1514189-2-arkadiusz.kubalewski@intel.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SG2PR01CA0121.apcprd01.prod.exchangelabs.com
- (2603:1096:4:40::25) To SEZPR02MB5782.apcprd02.prod.outlook.com
- (2603:1096:101:4f::8)
+In-Reply-To: <20241028204755.1514189-2-arkadiusz.kubalewski@intel.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: WA1P291CA0014.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:19::22) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -102,299 +119,155 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEZPR02MB5782:EE_|TYZPR02MB7008:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1a52585a-7e8f-4160-e9ea-08dcf7f2d7b4
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|SJ0PR11MB5085:EE_
+X-MS-Office365-Filtering-Correlation-Id: fe759fe3-6c63-499d-ba71-08dcf7f3241c
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|7416014|376014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?a0V5MmQ0eTgwd0NINzBjRldRZlQzL2g1a2k1dTd5WmQ1aFV4ZVJLZ2Z5MDZv?=
- =?utf-8?B?QjNxNWhBU2tnSzRkTFJLeGlKUTdJeFBMMTZHQ0JNZWlnUnhndTF1cGUvVUlU?=
- =?utf-8?B?N3JMbmU4Z3V4TnVqMnFXeEdXcW5LaDhjaUNKNmZTWFNnZnpHbDdQMWsvV0dz?=
- =?utf-8?B?SElaLytBeWpabXA3Q3U0alVOMklwVURpajlOYnFFZGV6Z3dIUHFnQW1vTHFT?=
- =?utf-8?B?U1hwK2VGREZuSUlLd1JZRDVtbFQzb29FT2JSQ3V0NDFhdjkxNEY3VG5STXhU?=
- =?utf-8?B?a3F4T0NtTmh0MDVOQWFpNVJWVTFrbFFodnhlVE05Wk1icEk4TE1NVHlzcTdM?=
- =?utf-8?B?cDZGN3dVWk1YYndyS2hVRHdPZ2NWa1hOLytqQmRjRGVrYXBZUURpNk1rbzZV?=
- =?utf-8?B?bDAzaSt1S1lZWlpWRzIvVHd6NkF1ejlFaVZHcW5EVkJHZTZIQ2c5T24rbjVj?=
- =?utf-8?B?TWNvZEgwZE95OU5VYk9TeDU5dWVIYUJBMHhuUERGbFZEdU5jTTUwUkZ1SXZa?=
- =?utf-8?B?S3BEcE5xNVBBZjQwcDlzRkdLNG1FNWdWckFCc0VXQmF1VFl5WS90bkVZb0o1?=
- =?utf-8?B?WHBsYUpJc0paWUVQejdVdFB1RXVxbEptL2srNDgvNVhRZ3l0NFFhZTRoQzkz?=
- =?utf-8?B?aHFCUXB6QlNldW5RbTNKMTQwaGdHYWpzK2Y5ZjlHVmlpcyt6ellpVjJKQkg4?=
- =?utf-8?B?OEFZaEU5OEt6TGlyWWQxdlhDazJabHpEN3lsdFF3UjBocTBkWSt5ZlhoUElW?=
- =?utf-8?B?WnVzS1JhT1Y5a29pWFJzK0JGdjhiNCtaS1BtWG1YUlkyKzN0UmlreEdib1I0?=
- =?utf-8?B?b2g2YTdkNDVlSDN5M2IzSHZrTDJkUjVMWkwxdWpseVZXMHZaTitqT1ExQzJi?=
- =?utf-8?B?bUEyZzQ0cnNVVUVIMDVBb1I1U1FmbVI3WjB2dFhhT3BpSVdFSHVCcnV6dzhH?=
- =?utf-8?B?Z0oyZDllZFg5WVZjeVM4ZFJqOFRnbHM0eEZnZXIrWlJqdzVDdUZ2SE1XUlpM?=
- =?utf-8?B?blk1aUxQWWlOSUxWVDEyY21OcXh1RUZGSUtGV1hDSkZsTG5CcmFIN3A4citq?=
- =?utf-8?B?ZGptVmZGVm9FaWVPUVA0NmdZbmcwdDVjSFhyTk5icjAwTjZwNWt0REcvN2lR?=
- =?utf-8?B?WnFOWVkrK21ZeXNJUWhCeFBzZFFQMkFiMzh3R2Q4QVY2dzZqQ2VnSHFmeFN6?=
- =?utf-8?B?S2o4ZUM4S1BpRVNPSnhZMXVPWUFwa2tCNitKS3hySmJwQXFwcWRvTjJnRGs2?=
- =?utf-8?B?S1UvZjVqRmwxTXMyRXlFR0YyYkowY2wvbTVOanFaZFpaV3FWUWxRSWJmalhZ?=
- =?utf-8?B?QWYxUldnVTVYQ0lQMitxZ3VEUFdNWWVuMWdOSE43QkhnclMxbXZ3MUlNWWhR?=
- =?utf-8?B?UVdsZHZrdmIwN3NHTlpIVFRmVjZUTHBoK2hPamZ0VmcremhFTXFLb2xXVU1C?=
- =?utf-8?B?VW1hWXBaOTFjREs5U3dnVnc0bmdQVEVXcjJWNSs0VGsrUzBwanVyMTByNUwx?=
- =?utf-8?B?SlY1dFpNZnJ0TU5wMFFwRWxzTFJkRmRkQStjMUlvS3czRG5HSUprTWNIWDkr?=
- =?utf-8?B?QkRSZzd5YkllMjg2bkJZOWIyMWNWWnJtdmZQOFlHbXFsNTliR2dmdk5sZXd1?=
- =?utf-8?B?cnVIcVQ4b09XOXEyeWJSenVzSGxMZEREZjF1VlpuSnpkR1lPS1Z1V09yVWZF?=
- =?utf-8?B?M1JBNVI1bTZ5T1oyMVI1R1R6bkdWUzVzREtIaFdsQmJ1elRCNzI3OTFIeEdH?=
- =?utf-8?B?ZEYwT1gvVXZ6dVVseDV2OTlSWkRSUHdITVBoMitBeEt5VDZDd2dBeE9rVnVS?=
- =?utf-8?Q?InkDYq4ee7AngyqlYffK+DoeBSyHMTbGaDXoA=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR02MB5782.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014)(52116014)(38350700014);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?alhBNGptbm5yNnh0NHY3TlNYVk10dlpVTHI4RlRrWnRPeFl3L2dzT2hNcXhM?=
+ =?utf-8?B?SkxyQm5LQUZWaTgzcE1HbWc4cmVYV1lMSUR1dC8yL05DaDVtM1BUSFNWQnEx?=
+ =?utf-8?B?L1E4Zktxc3pwOUtiVWEwNEJjN2hEay9MUE5PcmRCU3dIZE5WK2VXK1VDN0pa?=
+ =?utf-8?B?TVB0YnhhSTJOUkt4Mkc0dWU5a0dYcFVkakRQL2QrRWNXYjlhRmFwTHZKclFt?=
+ =?utf-8?B?WjB1ZVB6ZEhBRVU3TnZ6elo2aW1EZGlENFFWYitpZXNpdzlSbVdWc1VGcWQ4?=
+ =?utf-8?B?eElRUk4rTkZZU3ZiSnRwVU4wMUZNem41ZTl4UnIzYjZZOGlKa2xHRGJrMzY2?=
+ =?utf-8?B?WDJ3a0VkQTF1SXl3SndIeW1uQml1Q0VKZ2NyTk5jTXNnbk0xbElvRDVEaFky?=
+ =?utf-8?B?T0czL3ZiNGM2UmpvWGpFK1FOY3BuRnFWWFZRM0ZsZXJiSjRRU3FXUXoybFhB?=
+ =?utf-8?B?dEpDOGNLcHN5d2hHeFRSWWppWkNEVXUyMFVrYm9uMzJCQWEzalVWZnhQZ1pQ?=
+ =?utf-8?B?ZWRHaTBzdEloRFRZVkhhZmZ6cVlvTUNFNmlNRTNkK2traWFSbXM1Qk9SZGtS?=
+ =?utf-8?B?cEpWQW1Dcll0OE1qWE5TL3lvZmlJVkdNdXNaMFZGLzRhVmVVNTBiMXBGVG42?=
+ =?utf-8?B?T1JIT3F6dVQzUzFEUzhyRFZMRm1iVHZ5Vk5WeGJSMTlNellKaUhpSHlSWUxw?=
+ =?utf-8?B?ZlplQWpqNHNGN3lnTXhkYTg5dG5nbE5neUlCa1pOVUpWNFJVYkpsSzJmd2R6?=
+ =?utf-8?B?UWpSNGs5V0V4OTlCcGVZS2RQakdzU2l2dHM0QmVOS1NVOTE1VU1KL2dyVlFJ?=
+ =?utf-8?B?c04zU0QxMUdzcHhja1dnL0RXbHc3SE5HM0hQaC81cHdJdXNOWk5TS01vS21V?=
+ =?utf-8?B?VDM1WFFnRjJWR1FEdXNTNXE4V2hCL3Z2S3BQSW44M3k5THdvK1h3OVY1cnh4?=
+ =?utf-8?B?SUNKV0VqNGJvOUZsSm0wSGFnMC9jV2JCb2VNTC9RZlVUQkRqc2FWb2YrUU9D?=
+ =?utf-8?B?UHFsWXNDV3VJYTZmS2J6VG9rN3cwREpOQUdRVDB6cTRCSHU4bHlQVEgwSkRk?=
+ =?utf-8?B?eDBzOXdUbXh0MlpQVVp6VGlqamtTSmJiNU5PVGh4Zy9sUDZUR0xUQkdLYVdE?=
+ =?utf-8?B?M3I0SUxUODdnSkZyaFYwZjZBekZySVN5M2hBQnNNMlpuZjRzdVhtYUt1ZVlq?=
+ =?utf-8?B?blB6NCtkT1J6WmdvdGJsZk1ZV2IvYWFEVE5rZzJleGhBWWhNellLSkI2ekJC?=
+ =?utf-8?B?WlJIejUwZXhLcVFteUsxZVRsQ0t3Umg3NW9DTXpWb2hEMlV2bVNGeWlodVJG?=
+ =?utf-8?B?emFocDFGNVZtSmJOUHRlaUtFZHRIUk1WOGliSWg4REQydWpnMEVwb3V4emtT?=
+ =?utf-8?B?RTZ0VlhQQ0gycit3MUJMMkpvSkZya1BGeVhMdE9Nbys1dFhVN3pRVXhoTlNi?=
+ =?utf-8?B?bU5zZk1zblRrWmF2MGQrYU1QUkpGYXA5MUdSUXI4eEJGWGdDNmhFOC90RGdq?=
+ =?utf-8?B?K0ZzL0REMTBYNnZiU1ZxZjYwZUdyeVdRZFNqTjhlRmVoSko2WFEyVjBTd28y?=
+ =?utf-8?B?SzJ6RjM3dyt5dGl4aENRNDg2Ym1oYU94TmdFNW1nSk9DMDMzYis2bFNMV1NV?=
+ =?utf-8?B?TDdCMUt0MUJaYXUremZWcEYrUFU1MXAyU2xGbmJFOURYUW5oYlRXK3RpVWE4?=
+ =?utf-8?Q?NQusPwdlu4ZNMeAJVUlV?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?V0N5TzBaTFlXVG5NeDlHQUpRem5tYnRjT0xVZ1RCc1hUeElCN3lMRTBvM05W?=
- =?utf-8?B?SSsxb0dYUE5oT3FNWGhsS002eUg3djdUa2w5SmZKMnc5RFJNK3B1bHpGMnJD?=
- =?utf-8?B?Qm13R3crRUcyN1UzY0FBQ2J6WnVvWm1Dbzl6REVobkk4alFiUmtpdzBOWWtG?=
- =?utf-8?B?VUpsVEZpV2JINHg4cGQ3dnhuYlNWVVJLQ2pJYjI0YlE1M1RTaFdsZGdxM2dB?=
- =?utf-8?B?WXV5WUw5YkhXdTdwdC90c21DeGRNOEZxL1dYazhaamtJa2xONS9rb2EyN2VX?=
- =?utf-8?B?TWQ1a2lGcE5JaWVUUm9yMy81UnA2NWtLaTVBejJoblFRTG9LNDRyelRYZzBo?=
- =?utf-8?B?b1o5aE5FSTgxL1pWSnZXdlp6eHI4NEZtdUpkMTR4aVBjbDhYSmJuQTZzclFU?=
- =?utf-8?B?NC9HRTVqOWVTUTB2eFkxeFZvbThBQnZZNjZ2aDJNVDd6RGhtYjRmdkFiNGtZ?=
- =?utf-8?B?WXNjSytjN2tYSmlheU9haHJCV28yK09RbWhYUTNpMi93RUgxRnh4bmhOOFkv?=
- =?utf-8?B?aWs2UGRFcmZ0VkY4eHl6K0tPREJhQkVjUGhRQjJiMlY3cFVmNjJzdlRmSnBZ?=
- =?utf-8?B?bFFnVW10M3ppQjdkNEtKcWVTQUx0Mm5zeWNsdGVFZHgzWkNMVmk5NUdwazdn?=
- =?utf-8?B?L0lOWlVsUWRtNUlaV2NoT2tXVWM0NXU1ZUlNSjlRTU1lS3lCbnozQWZFV245?=
- =?utf-8?B?N0JoWTM4cjg0MG5ZVHFLamUyT0tEVENUWldLN2VydTE0OHRjSzUxdEFwaHRM?=
- =?utf-8?B?UU9iendDOUJIOWNBSUxGOFhoWXk2WktwQTRUYzQxZ1B4ZkNEVUh4c29zQldi?=
- =?utf-8?B?NWY1Ukh1eUZlZ1JjYk9vbjZkRTB4TU9Fa3gxY2JGd1R2U2c1ckQ0Z3F2b1E0?=
- =?utf-8?B?eW04MWtNaTZkUDcra1ZjVENHTjdsZTFlV2R0alVHODNaVVNyWTdHU3AxZ1F4?=
- =?utf-8?B?ZXFQZkNGeTkxTC9VZjFtdFNXcmpQUXR5U0NrNzhueEVKSE4vMGl5TkF2ZGNF?=
- =?utf-8?B?OEhUK3JIS3RtVFZoWDN5TTVTNzM0Y1kxUEdkbVh1bllBT25VK21jVjRBN2dI?=
- =?utf-8?B?M2RwcUx4TUxqcEhWd0RYR0tNVlBvNGdobnNjTURKaFV5VEliVElpcUFwNVZs?=
- =?utf-8?B?dm9nRVRuOWc0QkZKRkFDOXArVHM5ZzZSblAyTUlZaHl2T1NYdHhXcFlFVUZz?=
- =?utf-8?B?UTV4emNVWHVlM0lkMG1qS3lsblpwaVpGY3ZyQVowcER6YlEwUklSTmVuOWhh?=
- =?utf-8?B?dDRmcHNCS0ptbnJHNkFIay9IWEhGRXF0UVFrL2k2N1hLZHVRUmZHckNoSHVG?=
- =?utf-8?B?WHBYQlhNdFlDTHVMbkFxTkVGWEI3SWdDM2dEVFhSMTVFYUdYVzdIbGJSdFhE?=
- =?utf-8?B?TkFPcnU5QU9PS1hqM2JkeFIyanRkV1FkS0N6ekV1K0w3UFhjOEFIOTZ2VHMr?=
- =?utf-8?B?WitpNW9LN2N4elFyUzJyQzNlZm1GRDNuUWpueWNYTnhNMTJyaStFSXVSSE9T?=
- =?utf-8?B?OEdsT0x0Q05JTnUweUVhdEx2T01MWGl6ODliRWd2REZLQU5SSk5jQnB2VEZM?=
- =?utf-8?B?UXBua3NqLytXdVltUjdlMW9MekZVZU1qSzNMb0lzMmR1ZHdwZnpQWE1sRmJw?=
- =?utf-8?B?Z2oyeE5lWGlPM3NZQy9IbTM5WUdVdzNOVGZNRXpFbDFFTmxWZDFqamxvRFcy?=
- =?utf-8?B?empjdHhna3FLelQ4L2V3eHZQMGJpUG5HVXhzc1Ywd1ZUcWVPOG9IdlZyK0Ew?=
- =?utf-8?B?dTBNNk9jUlQ0S0gxZGFaamw4bk9HTVZVODl5MzBFMVA2WFZsNmdpVGFBTWY2?=
- =?utf-8?B?cnFCaTdCQVU5M2VGL1NkOXlBeXlKUm1TSG1NNGh3R2p4Tk9IVDZ2eFFSZDBx?=
- =?utf-8?B?TjJ3aTZYS2xZa09NR0FrTHNLV1BjVC84cnZUbFpVSVZsbTVHZ2gzak50WFhp?=
- =?utf-8?B?bE03S1hFelBkR1I3V0F5MnN5a2Y1RXNneWxIWGRIb3NGMmlVUnJoY0hkeFVG?=
- =?utf-8?B?RkJLWnNlOG1HYjIxM1MwZWRQTnBMUjk3dFpFSk9YVHVFZlFXanBwSE40MnVS?=
- =?utf-8?B?VkNlUFVEWnA2TVNTd0ZsNXNtSGhwQllhNFk0em1Nd2NVeUdURE1tNmFRaWhn?=
- =?utf-8?B?eXR0MHRHeFVqMm4xZExYcU9SbHFwMjBXZzljM1dTSjVMeHJsU2w3MmVmdW1S?=
- =?utf-8?B?UlE9PQ==?=
-X-OriginatorOrg: fibocom.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1a52585a-7e8f-4160-e9ea-08dcf7f2d7b4
-X-MS-Exchange-CrossTenant-AuthSource: SEZPR02MB5782.apcprd02.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QmZ4VFNMQ1lVaGhEMXFzQndDeldrSzMySFBEc2VZeDNteE43WlJRcHZhN1hU?=
+ =?utf-8?B?MkFEcmZzeUQ1ajh0dFFzNnFwTERQY1R6d3pOalc2cUxjZ1ZLSFFzeit4MEhi?=
+ =?utf-8?B?QWNYSS8zZ00xUnZZcnF6L3UxZ0RURk92L1o5UDE0Q2FWWDF3MStYc2tCUFEw?=
+ =?utf-8?B?M2JPSWJFanpnRTZPb216eWhRdEF3U2xoMkR6WWUvNHd2SDg4UWxjZEpPWVVX?=
+ =?utf-8?B?TXhJT0xIU1BQdVJxR1grZlcwTVJqekNsTGhOSVh1bVpoa2dGNVpzd0tqMGxM?=
+ =?utf-8?B?RnFtQWk5WWR5Q1Q5b1FSUGxLUUx3QXlBenNtNm5VTldLQXR6YU1kZU5kZlNE?=
+ =?utf-8?B?UlBsVGdsK3pZZ1JMakNtc3pXZWhBRWZ5dEZsQ05XVXBZQ0s2RTRwTGd4bE5q?=
+ =?utf-8?B?S2FvQmU5VkljeDBVSVJmM1hwWEYxSFNRSHBOZ3BsQnI4eTltUFJoSHRCK2VN?=
+ =?utf-8?B?UFkveUtRVkY4dGM5cjBXUUFmK2dwemhLZElVb3VqTWc2eUt4ZWEwaWg2Q21V?=
+ =?utf-8?B?VmdlVjVXWlJOUGVxbEtyU1FjYms1Yk92YTdsaHZydCt0ZjUxWFk0ejN0VXZJ?=
+ =?utf-8?B?SGJoU1JPTHBhSE05MW5ERzIwWTFONHI5ZlBIU0t2L1dXbnE5SkpoSExzMW9s?=
+ =?utf-8?B?d2pJUGttM3dUUUFoaU1maDVxNVRIeDRaQXJxZVQ4QUwvRHFqZUtNL0lNMHls?=
+ =?utf-8?B?OVNZay9DbDVpVkk0VWlTdWNwbkhkR0FmR3lyWE9JeDRwTTRRNCtIR0xpUkx4?=
+ =?utf-8?B?amtVYmhXNjlrVEYwQUZET3lZTVJhR1NkYlNFZGQ1d0lraU9rSG5iOGV5SXdZ?=
+ =?utf-8?B?NTdkWC85NGUrZEZ4NHVjV1RmRjhSVkt0ZWxwUFB5OGJCbEdIUDUyVHhWWVB2?=
+ =?utf-8?B?dWFzeVprYjg2cWo2ZTBoL3JVNzhrRVV5aEt6dmhUdVlrcTlYaW1FUHpRZWN2?=
+ =?utf-8?B?MGM2bTBYd2NPQzRFb2RpaStlUlFQM2FybHRFdUlyS0Noa2RoN3VETkIydlBp?=
+ =?utf-8?B?UHlyOStESzI3K251T2VsTmo0Y00rYjZyaU9PUlZ2cVhoeUU3VHBDaXVJa3hh?=
+ =?utf-8?B?Q3A5SDVieGdHNE9BeUt4aXdJcmMyRzV4bXNMeXdJb3pKQ2UxcThYMGFzK0lx?=
+ =?utf-8?B?U1pIVy9ObjY2M1VFaEwyMVBxd1AwNHhtT0RvNHRRTStVNmpjZWkzb3FpM2dn?=
+ =?utf-8?B?T3psRC9DOWlvb2dqSWRsVjNqN0JEbnlkSlVHcHlXWWRiT1dkeUlVK0ptSlZr?=
+ =?utf-8?B?M0NKTTVNOUs4Ymo5cmN6N0FBbnJBR2JZUm1YUVAxS2taKzFyTm5xRDdHNDFt?=
+ =?utf-8?B?VHQxUjg4RCtNWGR2Q1RpU0JXWEwwQ1YxVE5vY3dKOForVTdqbGMzdWc0SzZq?=
+ =?utf-8?B?SVkzcDFGM2gxQWlkZkhhQVpzd2dHTE1jK2ZXUmFjYU1ENXV4eURTaDJtY1Iv?=
+ =?utf-8?B?bmpNeTRGMk1tbHFrYks0NW1ld0pVNGR2WnlUcWJEc1JNM213YjF4U1VlWmU5?=
+ =?utf-8?B?aHNoRlcvRWprKzBHQlFnOS9KNjk0WFlrYjZsY29ETUFXeFhWTStFd2FoRFAv?=
+ =?utf-8?B?RWwwbVNCcHQ3K1JhV3N0RWhxNlVxejV3bVBRMVJrMnc5amt4R0lhZm5ZVHlF?=
+ =?utf-8?B?b1phcERGMVhIcFlURnEwUm1wVUNST1g1cExpL3c3bUlmaTgyamxQOUtrSVF4?=
+ =?utf-8?B?cFN4V1NZZXZMYVp2OXBFRXFPNUJ4MlFhMXFrOW5tdmUrV09HTUtXY05QZlpk?=
+ =?utf-8?B?dHMvbHZmKzBhY0UrMWlTTmFZNUp2ZUE3dHpjcnVYcndCUWlsU2RyZUZqOEEr?=
+ =?utf-8?B?Um83SlNwWUY0QmxjQlhKck1wQmVodG8rZ29oOTV0ZGQ1bHFORTNpVG1EK2FK?=
+ =?utf-8?B?MU9KcllITjlPMEtFZVdaNHNYQVVmNlFZSmRacEsrL1J3b2FDYzRIc091cW01?=
+ =?utf-8?B?NVNaYnJENjE2aTN5UFFzM2huRmlOSWJ3eTNpUVdiZFN0L3dFdVM5Z0c5SjFp?=
+ =?utf-8?B?L0lHeGR4aFFXNW9jSGk0blRJeE9zeGJld1Q5S0JKSzRWRDBwNlBOVVFxLzlJ?=
+ =?utf-8?B?MDR0aEphNlg3RzNCclZaV2M5aTM3WEUzdU90Q0ZMYmZaOXcxUXRqOE1NVlhs?=
+ =?utf-8?B?US9CT1JVcnluY296RVRkL0hDNWFuSFpCUTdWbG1UcTRkTUttaW1YMW9jbUtr?=
+ =?utf-8?B?bkE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: fe759fe3-6c63-499d-ba71-08dcf7f3241c
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 08:22:35.6529
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 08:24:43.5615
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c/AbBLtrzOSXqp5UtIVN6jSFTYFwL1yEVJLlxrUVdvkOup03yq4QeFIURvLIu/0UbJEN5M7ba8O5AQ0A1y7qd3ypL1o+NRWnQcgRJtV/apI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR02MB7008
+X-MS-Exchange-CrossTenant-UserPrincipalName: GL3PEdwIl0SxKFtJiaY8m0/kWCrkJX7qyPEJFmSDJRHnwNJymay96P25JuwKTPIWC0onFdYvn9JBzVMZYBvSPy42wtLIIGgGBnv1FH0v9Gk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB5085
+X-OriginatorOrg: intel.com
 
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+On 10/28/24 21:47, Arkadiusz Kubalewski wrote:
+> Currently HW support of PTP/timesync solutions in network PHY chips can be
+> implemented with two different approaches, the timestamp maybe latched
+> either at the beginning or after the Start of Frame Delimiter (SFD) [1].
+> 
+> Allow ptp device drivers to provide user with control over the HW
+> timestamp latch point with ptp sysfs ABI. Provide a new file under sysfs
+> ptp device (/sys/class/ptp/ptp<N>/ts_point). The file is available for the
+> user, if the device driver implements at least one of newly provided
+> callbacks. If the file is not provided the user shall find a PHY timestamp
+> latch point within the HW vendor specification.
+> 
+> The file is designed for root user/group access only, as the read for
+> regular user could impact performance of the ptp device.
+> 
+> Usage, examples:
+> 
+> ** Obtain current state:
+> $ cat /sys/class/ptp/ptp<N>/ts_point
+> Command returns enum/integer:
+> * 0 - timestamp latched by PHY at the beginning of SFD,
+> * 1 - timestamp latched by PHY after the SFD,
+> * None - callback returns error to the user.
+> 
+> ** Configure timestamp latch point at the beginning of SFD:
+> $ echo 0 > /sys/class/ptp/ptp<N>/ts_point
+> 
+> ** Configure timestamp latch point after the SFD:
+> $ echo 1 > /sys/class/ptp/ptp<N>/ts_point
+> 
+> [1] https://www.ieee802.org/3/cx/public/april20/tse_3cx_01_0420.pdf
+> 
+> Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
 
-Hi Sergey,
- 
->Hello Jinjian,
->
->On 26.10.2024 12:09, Jinjian Song wrote:
->[skiped]
->> Application can use MIPC (Modem Information Process Center) port
->> to debug antenna tuner or noise profiling through this MTK modem
->> diagnostic interface.
->> 
->> By default, debug ports are not exposed, so using the command
->> to enable or disable debug ports.
->> 
->> Switch on debug port:
->>   - debug: 'echo debug > /sys/bus/pci/devices/${bdf}/t7xx_mode
->> 
->> Switch off debug port:
->>   - normal: 'echo normal > /sys/bus/pci/devices/${bdf}/t7xx_mode
->
->Looks like this part of the message needs an update. Now driver uses a 
->dedicated file for this operation.
->
+[...]
 
-Yes, please let me update it, thanks.
+> diff --git a/include/linux/ptp_clock_kernel.h b/include/linux/ptp_clock_kernel.h
+> index c892d22ce0a7..ea1bcca7f7f6 100644
+> --- a/include/linux/ptp_clock_kernel.h
+> +++ b/include/linux/ptp_clock_kernel.h
+> @@ -55,6 +55,24 @@ struct ptp_system_timestamp {
+>   	clockid_t clockid;
+>   };
+>   
+> +/**
+> + * enum ptp_ts_point - possible timestamp latch points (IEEE 802.3cx)
+> + *
+> + * @PTP_TS_POINT_SFD: timestamp latched at the beginning of sending Start
+> + *		      of Frame Delimiter (SFD)
+> + * @PTP_TS_POINT_POST_SFD: timestamp latched after the end of sending Start
+> + *			   of Frame Delimiter (SFD)
+> + */
+> +enum ptp_ts_point {
+> +	PTP_TS_POINT_SFD,
+> +	PTP_TS_POINT_POST_SFD,
+> +
+> +	/* private: */
+> +	__PTP_TS_POINT_MAX
+> +};
+> +
+> +#define PTP_TS_POINT_MAX (__PTP_TS_POINT_MAX - 1)
 
->> diff --git a/Documentation/networking/device_drivers/wwan/t7xx.rst b/Documentation/networking/device_drivers/wwan/t7xx.rst
->> index f346f5f85f15..6071dee8c186 100644
->> --- a/Documentation/networking/device_drivers/wwan/t7xx.rst
->> +++ b/Documentation/networking/device_drivers/wwan/t7xx.rst
->> @@ -7,12 +7,13 @@
->>   ============================================
->>   t7xx driver for MTK PCIe based T700 5G modem
->>   ============================================
->> -The t7xx driver is a WWAN PCIe host driver developed for linux or Chrome OS platforms
->> -for data exchange over PCIe interface between Host platform & MediaTek's T700 5G modem.
->> -The driver exposes an interface conforming to the MBIM protocol [1]. Any front end
->> -application (e.g. Modem Manager) could easily manage the MBIM interface to enable
->> -data communication towards WWAN. The driver also provides an interface to interact
->> -with the MediaTek's modem via AT commands.
->> +The t7xx driver is a WWAN PCIe host driver developed for linux or Chrome OS
->> +platforms for data exchange over PCIe interface between Host platform &
->> +MediaTek's T700 5G modem.
->> +The driver exposes an interface conforming to the MBIM protocol [1]. Any front
->> +end application (e.g. Modem Manager) could easily manage the MBIM interface to
->> +enable data communication towards WWAN. The driver also provides an interface
->> +to interact with the MediaTek's modem via AT commands.
->
->Thank you for taking care and unifying documentation, still, I believe, 
->this change doesn't belong to this specific patch, what introduced debug 
->ports toggling knob. Could you factor our these formating updating 
->changes into a dedicated patch? E.g. add a new patch "2/3: unify 
->documentation" and make this patch third in the series.
->
-
-Got it, please let me do it.
-
->> @@ -67,6 +68,28 @@ Write from userspace to set the device mode.
->>   ::
->>     $ echo fastboot_switching > /sys/bus/pci/devices/${bdf}/t7xx_mode
->>   
->> +t7xx_port_mode
->
->I believe we should use the plural form - portS, since this knob 
->controls behaviour of the group of ports.
-
-Fastboot switching is a bit special, this will trigger the WWAN device
-reboot to fastboot mode and only a fastboot port in this mode, How about keep it
-as before?
-
->
->And I have one more suggestion. "mode" sounds too generic, can we 
->consider renaming this option to something, what includes more details 
->about the mode. E.g. can we rename this knob to 't7xx_debug_ports' and 
->make it simple boolean (on/off) option?
-
-Yes, rename to 't7xx_debug_ports' and make it boolean is reasonablei, please let
-me change it.
-
->>
->> -static struct attribute *t7xx_mode_attr[] = {
->> +static ssize_t t7xx_port_mode_store(struct device *dev,
->> +				    struct device_attribute *attr,
->> +				    const char *buf, size_t count)
->> +{
->> +	struct t7xx_pci_dev *t7xx_dev;
->> +	struct pci_dev *pdev;
->> +	int index = 0;
->> +
->> +	pdev = to_pci_dev(dev);
->
->This assignment should be done along the variable declaration to make 
->code shorter:
-
-Yes, please let me modify it.
-
->>
->struct pci_dev *pdev = to_pci_dev(dev);
->
->> +	t7xx_dev = pci_get_drvdata(pdev);
->> +	if (!t7xx_dev)
->> +		return -ENODEV;
->> +
->> +	index = sysfs_match_string(t7xx_port_mode_names, buf);
->> +	if (index == T7XX_DEBUG) {
->> +		t7xx_proxy_port_debug(t7xx_dev, true);
->
->Another one nit picking question. It is unclear what is going to happen 
->after this call. Can we rename this function to something what clearly 
->indicates the desired reaction? E.g. t7xx_proxy_debug_ports_show(...).
-
-After t7xx_proxy_port_debug(t7xx_dev, true) the adb and mipc port will be
-shown directly, let me rename to t7xx_proxy_debug_ports_show more clearly.
-
->> +static ssize_t t7xx_port_mode_show(struct device *dev,
->> +				   struct device_attribute *attr,
->> +				   char *buf)
->> +{
->> +	enum t7xx_port_mode port_mode = T7XX_NORMAL;
->> +	struct t7xx_pci_dev *t7xx_dev;
->> +	struct pci_dev *pdev;
->> +
->> +	pdev = to_pci_dev(dev);
->
->Also should be assigned on declaration.
-
-Yes, please let me modify it.
-
->>
->> +enum t7xx_port_mode {
->> +	T7XX_NORMAL,
->> +	T7XX_DEBUG,
->> +	T7XX_PORT_MODE_LAST, /* must always be last */
->> +};
->> +
->>   /* struct t7xx_pci_dev - MTK device context structure
->>    * @intr_handler: array of handler function for request_threaded_irq
->>    * @intr_thread: array of thread_fn for request_threaded_irq
->> @@ -94,6 +100,7 @@ struct t7xx_pci_dev {
->>   	struct dentry		*debugfs_dir;
->>   #endif
->>   	u32			mode;
->> +	u32			port_mode;
->
->If we agree to rename the sysfs file to 't7xx_debug_ports', this field 
->can be renamed to something more specific like 'debug_ports_show'.
-
-Yes, let me rename sysfs file to 't7xx_debug_ports' and rename this feild
-to 'debug_ports_show'.
-
->>   
->>   struct t7xx_port {
->> diff --git a/drivers/net/wwan/t7xx/t7xx_port_proxy.c b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
->> index 35743e7de0c3..26d3f57732cc 100644
->> --- a/drivers/net/wwan/t7xx/t7xx_port_proxy.c
->> +++ b/drivers/net/wwan/t7xx/t7xx_port_proxy.c
->> @@ -39,6 +39,8 @@
->>   
->>   #define Q_IDX_CTRL			0
->>   #define Q_IDX_MBIM			2
->> +#define Q_IDX_MIPC			2
->
->Are you sure that we should define a new name for the same queue id? Can 
->we just specify Q_IDX_MBIM in the port description or rename Q_IDX_MBIM 
->to Q_IDX_MBIM_MIPC to avoid id names duplication?
-
-Since MBIM and MIPC use the same queue id, please let me rename to Q_IDX_MBIM_MIPC.
-
->>   
->> +void t7xx_proxy_port_debug(struct t7xx_pci_dev *t7xx_dev, bool show)
->> +{
->> +	struct port_proxy *port_prox = t7xx_dev->md->port_prox;
->> +	struct t7xx_port *port;
->> +	int i;
->> +
->> +	for_each_proxy_port(i, port, port_prox) {
->> +		const struct t7xx_port_conf *port_conf = port->port_conf;
->> +
->> +		if (port_conf->debug && port_conf->ops && port_conf->ops->init) {
->> +			if (show)
->> +				port_conf->ops->init(port);
->> +			else
->> +				port_conf->ops->uninit(port);
->
->I still do not like the assumption that if .init method is defined then 
->the .uninit method is defined too. Is it make sense to compose these 
->checks like below. Mmove the check for .init/.uninit inside and add a 
->comment justifying absense of a check of a current port state.
->
->/* NB: it is safe to call init/uninit multiple times */
->if (port_conf->debug && port_conf->ops) {
->	if (show && port_conf->ops->init)
->		port_conf->ops->init(port);
->	else if (!show && port_conf->ops->uninit)
->		port_conf->ops->uninit(port);
->}
+I would move PTP_TS_POINT_MAX into the enum
 
 
-Yes, please let me modify it.
-
-
-Best Regards,
-Jinjian.
 
