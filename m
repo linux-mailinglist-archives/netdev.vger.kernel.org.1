@@ -1,154 +1,174 @@
-Return-Path: <netdev+bounces-139889-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49A769B4899
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:48:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD89C9B48B6
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:54:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 005541F2381B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:48:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B7051C227F1
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:54:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B040F206E6D;
-	Tue, 29 Oct 2024 11:46:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AC02205AB1;
+	Tue, 29 Oct 2024 11:54:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="qevd+j0V"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="EBAqimTT"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83568206953
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 11:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20CE5193436;
+	Tue, 29 Oct 2024 11:54:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730202402; cv=none; b=u9tPEinvxcnmHmjc49/yZYlBeMycLtR754kw1xY/TbG3iu+agj8xnahH2rFM1V64kOKPAW4cpbu8AWHeCMoWQDfyNGy0RWx++MiEaSSgPCI2anmXpmcDslbfxiyBrnExQef2l6UV6IrXySwOzAvPrme8tib/QqXBnlxIJCAMZns=
+	t=1730202874; cv=none; b=Hmtn2EQPu8IyIpkSYxbQ0nakHlL7+vz7r0X5De4m6/n830y1GpIS+5RwVntAWXFuKO97QyVOTOGCTijaj8WFV6umBk8sk+4VNqU0r3YLop3pGSiXv8fyiZViOhsZyAeT1+fOniS62bqfs+jFRpB8OrFYwtcsQxYHIGXCbFwKTL0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730202402; c=relaxed/simple;
-	bh=zGQNeCdJfkEacQEWhKkyV5Ry31CnGCgUtEGDHPY8Ta4=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=eaObVe1ReM3UWQdTnH3J5ex0OAHxyzjM5PsGnfcSsY7Q2UHayiSFk9a7Eq5RS8pgTZytUtWRWdtboBftg/oOO3PnwquhWeNTkYTlqIywad5ZOWIt6e7EY5VkohpfcnrmY0MUxb70ApNslegFJEXKF69JePfKJ9FVDrtzial9Sb8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=qevd+j0V; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c97c7852e8so7624877a12.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 04:46:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=amarulasolutions.com; s=google; t=1730202399; x=1730807199; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=I7zf1SxmTLYYJKdIBWggPPFkkyvCdLLyYv8BJT477vU=;
-        b=qevd+j0VfLZCBEtrY68CFWvqnI32U6jQGkuFLKhVohrN3u084HFOk7u3latWqJPE9p
-         fktwG9TBisZm1INugFL94ydvswjdNbATutcprpDWO1Y56BqNpn438CDkFXonvqxV5Bua
-         r8spWVhzbICqRQ5hxfZYo1S/f/+P/6gduESLY=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730202399; x=1730807199;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=I7zf1SxmTLYYJKdIBWggPPFkkyvCdLLyYv8BJT477vU=;
-        b=rpiwklYmt9ES9sPEq8A/5Akb/3z1OfPEplzgCEqGFqq5num4CMS2BfsZzJFskSjF3N
-         InGqAk9P0jq7l033GZzkPcXFldcLhn6A7s1N8aodUQYOfpegYUgB2QI4iTLnFrBAqi+J
-         e2VphrGTgH2FFLSazFFT6XbeiKoCJuxk3qCY/AVlNqi+vumyHwocrPOSmvtE9CuENMs/
-         n9h2LficDyoZrc/9yghrn0j10teDnIUhxnh5133xwLU+jCxW3Qenza3KxRaEJveUBC7r
-         NTMRM7wMRliXhwyGQ+KTAYPyXJw3Lk9DUhx1MOY4IsIMHHl1m4uuvlw/cNx5fVUsXvUV
-         PXpA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6S+aPqDgTPrW3eEOlcWSSu5Pq8HQJOCuTyiiCnRJ7DTANH+NMK+SQlqx3UHXUCD4XL5oEoa8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz0qN2amwRFFqBXhFph+tHdYlvA2xeE1xVpwFBa9W0Bd34IYzao
-	euM15WN4/gIGOmx3ahFc3IaNQD66hmWVJ+NoR7wt3VA16G71sGvr9bkIphugik4=
-X-Google-Smtp-Source: AGHT+IFQPjRGEu5AzAkALhjbGjgLzCygsqqvVu/v3wZnXp+FNxqihXgz0zlaCUYVkgQ0pA+esg6IPw==
-X-Received: by 2002:a05:6402:40d5:b0:5c9:4022:872d with SMTP id 4fb4d7f45d1cf-5cbbfa66f3dmr9918447a12.32.1730202398864;
-        Tue, 29 Oct 2024 04:46:38 -0700 (PDT)
-Received: from dario-ThinkPad-T14s-Gen-2i.. ([2.196.41.207])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb6297a09sm3869301a12.21.2024.10.29.04.46.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 04:46:38 -0700 (PDT)
-From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-amarula@amarulasolutions.com,
-	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+	s=arc-20240116; t=1730202874; c=relaxed/simple;
+	bh=UcUxy1IH/tmxGDJJnCenAJWVix1uTow0kRuzSJ6rw5E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=rHsMrR3zUL4LIChKGNgMzFV2tw35zmTauYpqizynqWccHELKvkDQBu/9rscpCF9Ndv+XDzVnUhbdd0zJYiMxkJmF286qlALYONmITYE9PVqJfhUgoo9jBzBdRFWNs/RaVG5D2rnfxroGQMlBbBcI7NwFl/GsIuWhMtnVPvwiU2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=EBAqimTT; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id EFE3A1C0002;
+	Tue, 29 Oct 2024 11:54:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730202862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=lJpykFaYI1xkl+2h37OQVMMCDwoLFpotNWfg5DS8+W8=;
+	b=EBAqimTTsliRJJCA4biH2rIBJLlKYw9TfFmBjIsErWLNjRJs5JfIWGGlchaFpSvbbSohgj
+	4QMozgMOL/uUSh183b0LMH57cqD2OsdiUZVRaMKzDWsWfE45KqoakQxeM2cTEU2iKCaAN6
+	t0bYztiTvQURcoiOXepIAcKhRT8lCZKpaydkj4cglLeGUYtWvSdZnn9X988mdRBOl0P021
+	7tWGM4kSy1rk90+2bf72Sv3vmjm5gW04rZ36HDVatNMUjT6qqWj7Tck0226b778xWB+AZj
+	9sTN1s9XFFSxgXPPpjYk45H4kMWrR3jBNiwIJQVOtsc5013jhUyIbMA4P97OYw==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
 	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+	davem@davemloft.net,
 	Eric Dumazet <edumazet@google.com>,
-	Gal Pressman <gal@nvidia.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Kory Maincent <kory.maincent@bootlin.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [RFC PATCH v3 6/6] can: dev: update the error types stats (ack, CRC, form, ...)
-Date: Tue, 29 Oct 2024 12:45:30 +0100
-Message-ID: <20241029114622.2989827-7-dario.binacchi@amarulasolutions.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241029114622.2989827-1-dario.binacchi@amarulasolutions.com>
-References: <20241029114622.2989827-1-dario.binacchi@amarulasolutions.com>
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 0/7] Support external snapshots on dwmac1000
+Date: Tue, 29 Oct 2024 12:54:08 +0100
+Message-ID: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-The patch modifies can_update_bus_error_stats() by also updating the
-counters related to the types of CAN errors.
+Hi,
 
-Signed-off-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
+This series is another take on the pervious work [1] done by
+Alexis Lothoré, that fixes the support for external snapshots
+timestamping in GMAC3-based devices.
 
----
+The registers that are used to configure this don't have the same layout
+in the dwmac1000 compared to dwmac4 and others.
 
-(no changes since v1)
+One example would be the TS seconds/nanoseconds registet for snapshots,
+which aren't mapped at the 0x48/0x4c but rather at 0x30/0x34.
 
- drivers/net/can/dev/dev.c | 25 ++++++++++++++++++++-----
- 1 file changed, 20 insertions(+), 5 deletions(-)
+Another example is the was the snapshots are enabled. DWMAC4 has a
+dedicated auxiliary control register (PTP_ACR at 0x40) while on
+DWMAC1000, this is controled through the PTP Timestamp Control Reg using
+fields maked as reserved on DWMAC4.
 
-diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
-index 4ad0698b0a74..ed2bdc6fe4a1 100644
---- a/drivers/net/can/dev/dev.c
-+++ b/drivers/net/can/dev/dev.c
-@@ -27,16 +27,31 @@ void can_update_bus_error_stats(struct net_device *dev, struct can_frame *cf)
- 	priv = netdev_priv(dev);
- 	priv->can_stats.bus_error++;
- 
--	if ((cf->can_id & CAN_ERR_ACK) && cf->data[3] == CAN_ERR_PROT_LOC_ACK)
-+	if ((cf->can_id & CAN_ERR_ACK) && cf->data[3] == CAN_ERR_PROT_LOC_ACK) {
-+		priv->can_stats.ack_error++;
- 		tx_errors = true;
--	else if (cf->data[2] & (CAN_ERR_PROT_BIT1 | CAN_ERR_PROT_BIT0))
-+	}
-+
-+	if (cf->data[2] & (CAN_ERR_PROT_BIT1 | CAN_ERR_PROT_BIT0)) {
-+		priv->can_stats.bit_error++;
- 		tx_errors = true;
-+	}
- 
--	if (cf->data[2] & (CAN_ERR_PROT_FORM | CAN_ERR_PROT_STUFF))
-+	if (cf->data[2] & CAN_ERR_PROT_FORM) {
-+		priv->can_stats.form_error++;
- 		rx_errors = true;
--	else if ((cf->data[2] & CAN_ERR_PROT_BIT) &&
--		 (cf->data[3] == CAN_ERR_PROT_LOC_CRC_SEQ))
-+	}
-+
-+	if (cf->data[2] & CAN_ERR_PROT_STUFF) {
-+		priv->can_stats.stuff_error++;
- 		rx_errors = true;
-+	}
-+
-+	if ((cf->data[2] & CAN_ERR_PROT_BIT) &&
-+	    cf->data[3] == CAN_ERR_PROT_LOC_CRC_SEQ) {
-+		priv->can_stats.crc_error++;
-+		rx_errors = true;
-+	}
- 
- 	if (rx_errors)
- 		dev->stats.rx_errors++;
+Interrupts are also not handled the same way, as on dwmac1000 they are
+cleared by reading the Auxiliary Status Reg, which simply doesn't exist
+on dwmac4.
+
+All of this means that with the current state of the code, auxiliary
+timestamps simply don't work on dwmac1000.
+
+Besides that, there are some limitations in the number of external
+snapshot channels. It was also found that the PPS out configuration is
+also not done the same way, but fixing PPS out isn't in the scope of
+this series.
+
+To address that hardware difference, we introduce dedicated
+ptp_clock_info ops and parameters as well as dedicated hwtstamp_ops for
+the dwmac100/dwmac1000. This allows simplifying the code for these
+platforms, and avoids the introduction of other sets of stmmac internal
+callbacks.
+
+The naming for the non-dwmac1000 ops wasn't changed, so we have :
+ - dwmac1000_ptp & stmmac_ptp
+ - dwmac1000_ptp_clock_ops & stmmac_ptp_clock_ops
+
+where the "stmmac_*" ops use the dwmac4-or-later behaviour.
+
+I have converted dwmac100 along the way to these ops, however that's
+hasn't been tested nor fully confirmed that this is correct, as I don't
+have datasheets for devices that uses dwmac100.
+
+I've converted dwmac100 just on the hypothesis that the GMAC3_X PTP offset
+being used in both dwmac1000 and dwmac100 means that they share these same
+register layouts as well.
+
+Patch 1 prepares the use of per-hw interface ptp_clock_info by avoiding
+the modification of the global parameters. This allows making the
+stmmac_ptp_clock_ops const.
+
+Patch 2 adds the ptp_clock_info as an hwif parameter.
+
+Patch 3 addresses the autodiscovery of the timestamping features, as
+dwmac1000 doesn't provide these parameters
+
+Patch 4 introduces the ptp_clock_info specific to dwmac1000 platforms,
+and Patch 5 the hwtstamping info.
+
+Patch 6 enables the timestamping interrupt for external snapshot
+
+Patch 7 removes a non-necessary include from stmmac_ptp.c.
+
+This was tested on dwmac_socfpga, however this wasn't tested on a
+dwmac4-based platform.
+
+[1]: https://lore.kernel.org/netdev/20230616100409.164583-1-alexis.lothore@bootlin.com/
+
+Thanks Alexis for laying the groundwork for this,
+
+Best regards,
+
+Maxime
+
+Maxime Chevallier (7):
+  net: stmmac: Don't modify the global ptp ops directly
+  net: stmmac: Use per-hw ptp clock ops
+  net: stmmac: Only update the auto-discovered PTP clock features
+  net: stmmac: Introduce dwmac1000 ptp_clock_info and operations
+  net: stmmac: Introduce dwmac1000 timestamping operations
+  net: stmmac: Enable timestamping interrupt on dwmac1000
+  net: stmmac: Don't include dwmac4 definitions in stmmac_ptp
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  4 +
+ .../net/ethernet/stmicro/stmmac/dwmac1000.h   | 15 +++-
+ .../ethernet/stmicro/stmmac/dwmac1000_core.c  | 85 +++++++++++++++++++
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    | 14 ++-
+ .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c | 11 +++
+ .../net/ethernet/stmicro/stmmac/stmmac_ptp.c  | 38 +++++++--
+ .../net/ethernet/stmicro/stmmac/stmmac_ptp.h  | 10 +++
+ 7 files changed, 165 insertions(+), 12 deletions(-)
+
 -- 
-2.43.0
+2.47.0
 
 
