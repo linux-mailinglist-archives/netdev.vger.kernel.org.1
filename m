@@ -1,173 +1,94 @@
-Return-Path: <netdev+bounces-139933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 987379B4B38
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:48:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10F769B4B52
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 14:51:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFF142847D0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:48:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B17D11F24282
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2419B206051;
-	Tue, 29 Oct 2024 13:48:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FF3206051;
+	Tue, 29 Oct 2024 13:51:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QS0eT6jd"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Vf3ZIlS6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F6C20110B
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 13:48:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FE3205ADA
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 13:51:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730209729; cv=none; b=U8eRF2U0yJHit/+y6vfI7Ehl4qmjealaPzSptdXkzxG0sjxrXJtsQBt/XQHQMxxhJVxIIDRS+y2aEDYafiEFmVkwu1zI0S2fVeva+d+J1r9v4sDn2esBlCdd8z/4VAtV6VYgObhcClSD/FTSGKwLfHAZ0BQx+DY5jvmIBlDIdio=
+	t=1730209891; cv=none; b=AAUVTVCBOVlQD73CoSXDyGhG9NxiuKwxZa3ZSfuX+6lU3BMgJJYBMvr5SjJRA2CZEpgPTHPyk2P1tpt3cdVM1mMeXpRSkVnWGv2XL0eBPpMNq3DCCKaa6q75cxpdubR/trY3hg2KseV7kXbkHat9VIYKeXDv74MW/lpe5dlDgAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730209729; c=relaxed/simple;
-	bh=61dsj1PasILu65UaLrfL0HzWdDbD1vyqbhmC3CX3aJw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZcEms2zibT5StLVxNjdHVnFIOfdon8psR1IEYPZuZXmvcY/6sIrcdpXVqTqmaS7P45NdGyVBL98Xm6Izw9xktVQz1YRH4L7K0oLk2+RKm1e4bFzcbgA8rgvBcLih1zUMDAY/z6ygYiGCktYHsMe9xrFDJx3lJdUxc9qN5WxQf18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QS0eT6jd; arc=none smtp.client-ip=209.85.210.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7180dc76075so2806869a34.3
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 06:48:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1730209726; x=1730814526; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YwPgAMavAEXO6C26tryLIudfVuj8YRS3X4MpACE1QyQ=;
-        b=QS0eT6jdat2wIq/L5NKQH+YMbs8zVtl7e0UYapWT0QF2Dd2fqZVVwB8HA3pbKE401/
-         ia9wZx6w1DvLR0zVHMKiLCCbw1hJ0r3P8EQdFmlsT0uwyHw0Sx/NvkswbIkOBvGKjod+
-         ckIiZa9Ligm41k1Hp28nRn3zP5fLWow28EK7HXFnwmArom1Xq6LTsky2oh4SYjMmsbpE
-         KiPcykQA1/P/R7S3ceL3lmcfIy2XSuYxES8KDod28nYMut3SKamJAlimdHf1mYt/iChI
-         kfh58RVL94JhU8lb1JKU7U4BBUlCxe8iza0430WbBuyb2lmgtvkZGTSlG3wlFkYPk9Q8
-         3E9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730209726; x=1730814526;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YwPgAMavAEXO6C26tryLIudfVuj8YRS3X4MpACE1QyQ=;
-        b=W2I2Yeq6+yYD/k3KjKOISkl1jGzsAx4UR8XkVPCzF4LFO4vkkr6tXvGWB77oi00PoV
-         8AyI9qIUBivdnH01x7ZNXK3TJbZ/khbO9t6aUF6FdVfF9ZD1QNp0oOLDkNPw6b1wxXbN
-         xPuQK3rqiKkJ8n9lCTDAQTcww71Z7oNWrJMYLmsiqocQQMX2zn42xPJSSWaFXTrB1ury
-         nwAAe6ju5PjT4ZPYnn98PLk8cxbGLJZUBNnVLsmQ92p3BYFLKTi8vvBZAP9g8wnymaF0
-         7MtGBhtZc2yO4BEF7Zf75QmLec51MWXG386jxqDoSVJZVtoX0S595tVNxpiJk+Ds0e12
-         P3Yw==
-X-Gm-Message-State: AOJu0YyRZyjdujHTT/JjxOogJSYxmm7kljaLyq9PiOFz5Q4Bd5tmaOYl
-	xOTCcNo4eFs1CLwSTCy4E14zXyd2UjyWaiiP7VUSDjm/FzzXAQNmDwv+Geqk2z1WsOsSOBBGhkM
-	REh7Bj+iDwP3UAtPktyiBTb4O0R5l435lfiBVHnk2TLEiDlM=
-X-Google-Smtp-Source: AGHT+IERVKkHC5wJalI3mqRzZ/A5PH2xSU4Bs1ARGGwATY+YubjlmvmeSh/2Up4XIkOrOQ05tH86OxjHKUp+rjKh6jA=
-X-Received: by 2002:a05:6870:1687:b0:287:29a0:cfe4 with SMTP id
- 586e51a60fabf-29051d3e1acmr10332986fac.32.1730209725886; Tue, 29 Oct 2024
- 06:48:45 -0700 (PDT)
+	s=arc-20240116; t=1730209891; c=relaxed/simple;
+	bh=6BSlgiXv1N2zCZBJU0HEg+laUPY+B7fCTNkKl6VjbKM=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=bsxEX+qo1e664Y2nZn49CvjieU/CIAPiDhSyTW/rw3iSYRXNOr03MCChE4L+8KmJNrt/0WS+2CAk4f9Zl7u9F9ouNE9TUqWvOu4A85TVsUECgwPNgyNmiVW69G5VmuujGZ7UHjU394PjP2E+bdE6mFAk7wnDdhpPA4I2Oh6sbdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Vf3ZIlS6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 068A8C4CEE3;
+	Tue, 29 Oct 2024 13:51:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730209890;
+	bh=6BSlgiXv1N2zCZBJU0HEg+laUPY+B7fCTNkKl6VjbKM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Vf3ZIlS6Jjwh7eii8DO8Cq1m5AM2i+wgTj0kYrBpOKVImBqxR/wfGMuCwtkSCldI2
+	 pVmOC8XNPAuvU2gsKaRIT6NdgN3cax+45PwwnHil76ifsz+HL0IeXpspKxgZ3mFtYw
+	 vzw2b7KG61sIdbfhPmnj5cUeBC9s4hWEySWmHt+RuxZuMBsG2ItVXqA0hBpKx0W4lP
+	 hDa7Y6mxPtrinYrk9sgFXtdkaINMEkDBviBkwJwk7FMdCmoN40uECl0BrMtpManoZn
+	 8FENAsPOJrw0ZaFYg4zknpvdObLzbeAEsttFfc8J++kWBqEZeaJj0RVLUvt4idZ5HB
+	 HLy03aAAtQoLg==
+Date: Tue, 29 Oct 2024 06:51:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, donald.hunter@gmail.com, vadim.fedorenko@linux.dev,
+ arkadiusz.kubalewski@intel.com, saeedm@nvidia.com, leon@kernel.org,
+ tariqt@nvidia.com, maciejm@nvidia.com
+Subject: Re: [PATCH net-next v3 1/2] dpll: add clock quality level attribute
+ and op
+Message-ID: <20241029065129.503f51cb@kernel.org>
+In-Reply-To: <ZyDafILiX4bFEfBI@nanopsycho.orion>
+References: <20241014081133.15366-1-jiri@resnulli.us>
+	<20241014081133.15366-2-jiri@resnulli.us>
+	<20241015072638.764fb0da@kernel.org>
+	<Zw5-fNY2_vqWFSJp@nanopsycho.orion>
+	<20241015080108.7ea119a6@kernel.org>
+	<Zw93LS5X5PXXgb8-@nanopsycho.orion>
+	<20241028101403.67577dd9@kernel.org>
+	<ZyDafILiX4bFEfBI@nanopsycho.orion>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241023100541.974362-1-vladimir.oltean@nxp.com>
- <CAM0EoMnV3-o_4L3Vv=TuEqC=iNKhNnW0c4HQiRqrJD5NtjKeOQ@mail.gmail.com> <20241025124023.qp5y67slaac7iqll@skbuf>
-In-Reply-To: <20241025124023.qp5y67slaac7iqll@skbuf>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Tue, 29 Oct 2024 09:48:34 -0400
-Message-ID: <CAM0EoMkBZx0qk5MR4jyeFn5T7eRco2n_Y58hryDtLTBjaOzEfg@mail.gmail.com>
-Subject: Re: [PATCH net] net/sched: sch_api: fix xa_insert() error path in tcf_block_get_ext()
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>, 
-	Pedro Tammela <pctammela@mojatatu.com>, Victor Nogueira <victor@mojatatu.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Oct 25, 2024 at 8:40=E2=80=AFAM Vladimir Oltean <vladimir.oltean@nx=
-p.com> wrote:
->
-> On Thu, Oct 24, 2024 at 11:39:51AM -0400, Jamal Hadi Salim wrote:
-> > On Wed, Oct 23, 2024 at 6:05=C3=A2=E2=82=AC=C2=AFAM Vladimir Oltean <vl=
-adimir.oltean@nxp.com> wrote:
-> > >
-> > > This command:
-> > >
-> > > $ tc qdisc replace dev eth0 ingress_block 1 egress_block 1 clsact
-> > > Error: block dev insert failed: -EBUSY.
-> > >
-> > > fails because user space requests the same block index to be set for
-> > > both ingress and egress.
-> > >
-> > > [ side note, I don't think it even failed prior to commit 913b47d3424=
-e
-> > >   ("net/sched: Introduce tc block netdev tracking infra"), because th=
-is
-> > >   is a command from an old set of notes of mine which used to work, b=
-ut
-> > >   alas, I did not scientifically bisect this ]
-> > >
-> >
-> > What would be the use case for having both share the same index?
-> > Mirror action for example could be used to target a group of ports
-> > grouped by blockid in which case a unique blockid simplifies.
-> >
-> > > The problem is not that it fails
->
-> As mentioned, I don't have a use case for sharing block indices between
-> ingress and egress. I did have old commands which used to not fail
-> (incorrectly, one might say), but they stopped working without notice,
-> and the kernel was not being very obvious about it. Had the kernel
-> behavior in this case been more clear/consistent, and not failed any
-> subsequent command I would type in, even if valid, it would have taken
-> me less time to find out. Hence this patch, and also another one I have
-> prepared for net-next which improves the error message.
->
-> > Fix makes  sense.
-> > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
->
-> Thanks.
->
-> > I am also hoping you did run the tdc tests (despite this not looking
-> > like it breaks any existing feature)
->
-> To be honest, I had not, because I had doubts that this error path would
-> be exercised in any of the tests (and I still don't think it is).
->
-> But I did run them now, they seem to pass, except for the last 11 of
-> them which seem to be skipped, and I really do not have the patience
-> right now to debug and see why.
->
+On Tue, 29 Oct 2024 13:52:12 +0100 Jiri Pirko wrote:
+> >I thought clock-id is basically clockid_t, IOW a reference.
+> >I wish that the information about timekeepers was exposed 
+> >by the time subsystem rather than DPLL. Something like clock_getres().  
+> 
+> Hmm. From what I understand, the quality of the clock as it is defined
+> by the ITU standard is an attribute of the DPLL device. DPLL device
+> in our model is basically a board, which might combine oscillator,
+> synchronizer and possibly other devices. The clock quality is determined
+> by this combination and I understand that the ITU certification is also
+> applied to this device.
+> 
+> That's why it makes sense to have the clock quality as the DPLL
+> attribute. Makes sense?
 
-You did fine, more below...
+Hm, reading more carefully sounds like it's the quality of the holdover
+clock. Can we say that in the documentation? "This mainly applies when
+the dpll lock-status is not DPLL_LOCK_STATUS_LOCKED" is a bit of a mouthful.
+I think I missed the "not" first time reading it.
 
-> ~/selftests/tc-testing# ./tdc.py
->  -- scapy/SubPlugin.__init__
->  -- ns/SubPlugin.__init__
-
-[..]
->
-> ok 1159 4cbd - Try to add filter with duplicate key # skipped - Tests usi=
-ng the DEV2 variable must define the name of a physical NIC with the -d opt=
-ion when running tdc.
-> Test has been skipped.
->
-> ok 1160 7c65 - Add flower filter and then terse dump it # skipped - Tests=
- using the DEV2 variable must define the name of a physical NIC with the -d=
- option when running tdc.
-> Test has been skipped.
->
-> ok 1161 d45e - Add flower filter and verify that terse dump doesn't outpu=
-t filter key # skipped - Tests using the DEV2 variable must define the name=
- of a physical NIC with the -d option when
-> running tdc.
-> Test has been skipped.
-
-These were skipped because it would require real hardware (typically
-also for testing offload).
-
-cheers,
-jamal
+Is it marked as multi-attr in case non-ITU clock quality is defined
+later? Or is it legit to set to ITU bits at once?
 
