@@ -1,117 +1,105 @@
-Return-Path: <netdev+bounces-140133-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140134-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5E2CE9B5527
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:35:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A7129B555E
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:55:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D059286AA1
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:35:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E91E283CC4
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:55:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02F220822C;
-	Tue, 29 Oct 2024 21:35:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F043209F24;
+	Tue, 29 Oct 2024 21:55:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoCG6/nU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Iel0o12Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E620820A;
-	Tue, 29 Oct 2024 21:35:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4127520823D;
+	Tue, 29 Oct 2024 21:55:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730237752; cv=none; b=F+yxsJtqr8gRNSVYMLlI+fm+M8tR0Q/5r80YKM+kXZtUM9alYwA7uvbhJRLxucF2PJll4fxzTm/CUYIriB5cKFpW1FBJAMQaMtwbCyyDYqlaXMCjio863t5Ph6msn75IZUN+bLPU3GlApS0W/rcAW3ZKWpN8yTIulQb2ZvqrcOo=
+	t=1730238906; cv=none; b=RRBqgkcpHg0Pj4KQMAMC+0OWARkFMdopapxjyI36V97ln6m/Y9QbDdqxNWKWJOQRLeVSXRZ3oTpcEhQzRoWJlX8JZzgtXhu00fzpHVRc+cNiG3xeSvRMD+hxcRLvynX4bsh5TPz45gZyn46GVo/XlScHMnbwzJ6gJ2gzISFOrAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730237752; c=relaxed/simple;
-	bh=2hdEGImrtIWyPZpvykwCLVFsfsDtbtJ26Dc/FC7TOCY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DfpFMsNhGFdABwSqepIYYCAjb3myEnJyDCn9ZoZewl99QLrtojbCJReIc08L4x7eqRMgyNOg0nBL9m+SYr/EY3VI0/Ub44zsLZzNZ8k8ZQQCQkTtkce0ubCDkCdR8SRyXMhSj4jkpzsL7jv6R8NUogddY/XDc061GxiMUJVQrtE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SoCG6/nU; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ea051d04caso23367917b3.0;
-        Tue, 29 Oct 2024 14:35:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730237750; x=1730842550; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/FifTdZFU+NbYPEQufcgUJzwkx+ETBVCZzNVdM2zITc=;
-        b=SoCG6/nU1RZBMTL+Kgd3S8VrhspDAl48/4W4IR7+19mA7+yQWJiWczzKcdW3opqH2j
-         bfbuPmS9vlcJS1uJsrinLMDSi5OMtiOissE5357H+lBP04jlvnjtVTJOUUfjYaUe1iZG
-         ay+Q1r1E+fghBnW8tO4N3t+OimakPc6KDphYr+VyY/fp7UDkC3LdkGN6/ZKJNVB7GUR/
-         cKcogphbtZ6+PgTUqjQ3iaeGZ8j5XWV2zuFHV6nZrPsgrO63Aw8v8UmOq8ukI0P8fb1/
-         ZTq2Ahc/QAzVEmir7J2EiXvfAs05AqR1UYADLwNr99Fx3PMvD2hxh7cpIqRO+NYGESey
-         bzhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730237750; x=1730842550;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/FifTdZFU+NbYPEQufcgUJzwkx+ETBVCZzNVdM2zITc=;
-        b=YZTEqycxAp+3fQ39NS4O9GekBwwQ/W4Q7gPgyShYsmuItrG3UBHPf46H2ap4oNkx0y
-         7uh3IIlbQ4mPsIx5TCVd6uIaZMqsgx3nQviYb+OEhc0NGnaeGoJru9QEUD/YhVlXG6KT
-         J8JwBxffnuWRw4uX298lg0E6m5yJgsRnG3RTh6aX7uQp/I7KBB74QejrUqcF0gbnecXV
-         vlNwkDEtkeYyQn6F0VIhVSTL9FWlk8pXEFFO7tj4nL3Kc0ChIMRIlJku2qZYjESThj6x
-         qGeXVRguBQ5z7vNsEeB2nTxuF7H5mIq8gfevPu0V35l1cK/KWnXcpyNyv9cQ7j0yGXmO
-         jV3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUsfVqnxme+ZQkKRsrArs0RUFoa0/J1e6Wl6z50xVw+YzECfHctZYsJN/RekSXvDcTxuUu6i+QkFP7yCbsY@vger.kernel.org, AJvYcCW5HKJUZH391v0pG2pRNZyzN8wb2uKSwRAQZ81gEyrJSWmwrqDY5VFNl2GOcgaGqhPDHenQG7nw@vger.kernel.org, AJvYcCWanuwyqcnowiPuKAHA8yO0OplZNcI/o8sEq6Z7GGo4m2U9bjtIctin7rFnAaT9kE3uRHc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymuMbT3gMzXWTeDaLFYhjn2W5Tk4Afh/dVyK4MIBA1TBJTcKyf
-	Nj2Vd1ADMJkH8PfICQHlM8yDBcElrGq7bA9HB9awkRMLHKxWQiDLiZNwGiY5DXoWBWKhps3+UA7
-	u2X4/xd0csDDF65YFbLezcsRuSHo=
-X-Google-Smtp-Source: AGHT+IERNHe6GdQDhUCH/QMI4NVanUrXn/lehSJw9XrUiMRCfwRofHTRr8xbL8Y1Qc7SUaaYl1TpEH0vK6m4xhiyiHE=
-X-Received: by 2002:a05:690c:fc7:b0:6dd:ce14:a245 with SMTP id
- 00721157ae682-6e9d891bd97mr137336927b3.6.1730237749882; Tue, 29 Oct 2024
- 14:35:49 -0700 (PDT)
+	s=arc-20240116; t=1730238906; c=relaxed/simple;
+	bh=W3V1cUMtwprKr9to4tQBjItpnObSfwcOm0CgaH3waOI=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=YoTLYPjihq6zsS/vscWUs17woUvNwgXycPDn/lbDJQ7qHZWT/2cuqyfmEzatMgXtDYQ3+8IcEJ+YBQb4t5bUmuVwINmC/9gLHRLWc/GN+rSN7VJczpC8Ut+ZrujYqbSMaDuz0r7cnktCX8TD2+yf7g9x3b6TL8Lc0GvtYeOrcZw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Iel0o12Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CE6CFC4CECD;
+	Tue, 29 Oct 2024 21:55:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730238906;
+	bh=W3V1cUMtwprKr9to4tQBjItpnObSfwcOm0CgaH3waOI=;
+	h=Date:From:To:Cc:Subject:From;
+	b=Iel0o12ZEpVz/mtTpAQcdwMDA+pB9XV0hEyiGtqsSUEMeSjANgmnXhD1RajtCQPOm
+	 /iA4T+qD/SwzKM+ATD3PW8rObrItIWCRxC3dptmG1pIKSpsfZUrQw+Eq7yAVOdZ98v
+	 Dq2DZKXnZmkCQILk9D9A1NGSWWRE9XMtlGgZXB6we5Sr/7bSW3N81RC+AxRgoU5ipC
+	 ZGVYcmF2NmG8Chv5aExgY+2imr5P7lOe4n3CA/dYa2icTC7glYK2Cd+msfVEzy/NZd
+	 RGKO6JTxM/lc7XpiuDU+Temba6WtIlEC1mSvAz7uZx/CWLb1a6lEUB89fx54pZxYBN
+	 0a/wpcXCqNJcQ==
+Date: Tue, 29 Oct 2024 15:55:02 -0600
+From: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+To: Michael Chan <michael.chan@broadcom.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Potnuri Bharat Teja <bharat@chelsio.com>,
+	Christian Benvenuti <benve@cisco.com>,
+	Satish Kharat <satishkh@cisco.com>,
+	Manish Chopra <manishc@marvell.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH v2 0/2][next] UAPI: net/ethtool: Avoid thousands of
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <cover.1730238285.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241019071149.81696-1-danielyangkang@gmail.com> <9b6bc5f1-9e10-4bf1-a6b0-bb6178d771b0@intel.com>
-In-Reply-To: <9b6bc5f1-9e10-4bf1-a6b0-bb6178d771b0@intel.com>
-From: Daniel Yang <danielyangkang@gmail.com>
-Date: Tue, 29 Oct 2024 14:34:55 -0700
-Message-ID: <CAGiJo8RzhDgfP9hcND4fGjtA4RRGhZVdxWmJmXas_azuxwqZaA@mail.gmail.com>
-Subject: Re: [PATCH net] Drop packets with invalid headers to prevent KMSAN infoleak
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
-	John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
-	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <bpf@vger.kernel.org>, 
-	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
-	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On Tue, Oct 29, 2024 at 9:41=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
-> > +     if (unlikely(skb->len < dev->min_header_len ||
-> > +                  skb_mac_header_len(skb) < dev->min_header_len ||
-> > +                  skb_mac_header_len(skb) > dev->hard_header_len)) {
-> > +             kfree_skb(skb);
-> > +             return -ERANGE;
-> > +     }
->
-> I believe this should go under IS_ENABLED(CONFIG_KMSAN) or
-> CONFIG_DEBUG_NET or so to not affect the regular configurations.
-> Or does this fix some real bug?
+Small patch series aimed at fixing thousands of -Wflex-array-member-not-at-end
+warnings by creating a new tagged struct within a flexible structure. We then
+use this new struct type to fix problematic middle-flex-array declarations in
+multiple composite structs, as well as to update the type of some variables in
+various functions.
 
-Well in my opinion, an infoleak is still an infoleak. But, this would
-likely not get triggered as long as an skb with a properly initialized
-eth header is passed into the bpf_clone_redirect function. We could
-initialize the memory to 0 but the performance hit would be too much.
-If the bpf_clone_redirect() function cannot be called from user space
-with user-crafted skbs as input, I don't think this is really an issue
-and we can just put it under the macros to get rid of the syzbot
-error.
+Changes in v2:
+ - Update changelog text in patch 2/2 to better reflect the changes
+   made. (Jakub)
+ - Adjust variable declarations to follow the reverse xmas tree
+   convention. (Jakub)
 
-- Daniel
+v1:
+ - Link: https://lore.kernel.org/linux-hardening/cover.1729536776.git.gustavoars@kernel.org
+
+Gustavo A. R. Silva (2):
+  UAPI: ethtool: Use __struct_group() in struct ethtool_link_settings
+  net: ethtool: Avoid thousands of -Wflex-array-member-not-at-end
+    warnings
+
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c |  6 ++--
+ .../ethernet/chelsio/cxgb4/cxgb4_ethtool.c    |  4 +--
+ .../ethernet/chelsio/cxgb4vf/cxgb4vf_main.c   |  2 +-
+ .../net/ethernet/cisco/enic/enic_ethtool.c    |  2 +-
+ .../net/ethernet/qlogic/qede/qede_ethtool.c   |  4 +--
+ include/linux/ethtool.h                       |  2 +-
+ include/uapi/linux/ethtool.h                  | 33 ++++++++++---------
+ net/ethtool/ioctl.c                           |  2 +-
+ net/ethtool/linkinfo.c                        |  8 ++---
+ net/ethtool/linkmodes.c                       | 18 ++++++----
+ 10 files changed, 44 insertions(+), 37 deletions(-)
+
+-- 
+2.43.0
+
 
