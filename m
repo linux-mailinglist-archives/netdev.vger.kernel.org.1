@@ -1,90 +1,117 @@
-Return-Path: <netdev+bounces-140132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5FA19B551C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:33:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E2CE9B5527
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:35:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23C591C2291E
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:33:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D059286AA1
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:35:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 982AB208991;
-	Tue, 29 Oct 2024 21:33:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C02F220822C;
+	Tue, 29 Oct 2024 21:35:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SoCG6/nU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A306E207A0B
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 21:33:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D52E620820A;
+	Tue, 29 Oct 2024 21:35:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730237585; cv=none; b=lH2FolNqGejZI4fRVmK4XPQ/REm2kUeDknm4GYjFQtFD72y0DW3zp+VQMQCbemcWPgYeImCDsBZNPp8sYl6PiK9VqRVScEPGza3S8/pA93kA6ZyFnbVOY5vYgNdxDL1XfQ9TnmOLlzGJCyOapel7g1HrbcOExAzniL8xRhznXXc=
+	t=1730237752; cv=none; b=F+yxsJtqr8gRNSVYMLlI+fm+M8tR0Q/5r80YKM+kXZtUM9alYwA7uvbhJRLxucF2PJll4fxzTm/CUYIriB5cKFpW1FBJAMQaMtwbCyyDYqlaXMCjio863t5Ph6msn75IZUN+bLPU3GlApS0W/rcAW3ZKWpN8yTIulQb2ZvqrcOo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730237585; c=relaxed/simple;
-	bh=VeJvu9Pkvz0Q1axoDH8qBwoYMovix4Mi5VeqyHoqBSw=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=efHZNBUX6FIsxu9LgKnTGdhdEkM5t6yBsYsNwKEIXRNuFBdQWwGOmROWY11CGJg0Uv7hK++v8TqQ1WURnashgw48CecSWXlxPyQr6nts2nrz+/oxxg7LscPGiEtG5fuw6ydeCyVXrXFMaZwztAWIeEVziJDrzoLADGvGPfPoSmQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a4ed20b313so35976355ab.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 14:33:03 -0700 (PDT)
+	s=arc-20240116; t=1730237752; c=relaxed/simple;
+	bh=2hdEGImrtIWyPZpvykwCLVFsfsDtbtJ26Dc/FC7TOCY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DfpFMsNhGFdABwSqepIYYCAjb3myEnJyDCn9ZoZewl99QLrtojbCJReIc08L4x7eqRMgyNOg0nBL9m+SYr/EY3VI0/Ub44zsLZzNZ8k8ZQQCQkTtkce0ubCDkCdR8SRyXMhSj4jkpzsL7jv6R8NUogddY/XDc061GxiMUJVQrtE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SoCG6/nU; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ea051d04caso23367917b3.0;
+        Tue, 29 Oct 2024 14:35:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730237750; x=1730842550; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=/FifTdZFU+NbYPEQufcgUJzwkx+ETBVCZzNVdM2zITc=;
+        b=SoCG6/nU1RZBMTL+Kgd3S8VrhspDAl48/4W4IR7+19mA7+yQWJiWczzKcdW3opqH2j
+         bfbuPmS9vlcJS1uJsrinLMDSi5OMtiOissE5357H+lBP04jlvnjtVTJOUUfjYaUe1iZG
+         ay+Q1r1E+fghBnW8tO4N3t+OimakPc6KDphYr+VyY/fp7UDkC3LdkGN6/ZKJNVB7GUR/
+         cKcogphbtZ6+PgTUqjQ3iaeGZ8j5XWV2zuFHV6nZrPsgrO63Aw8v8UmOq8ukI0P8fb1/
+         ZTq2Ahc/QAzVEmir7J2EiXvfAs05AqR1UYADLwNr99Fx3PMvD2hxh7cpIqRO+NYGESey
+         bzhQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730237582; x=1730842382;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=52dNbTblZKRoHsNeKZM9928ah3VMeTxHPdRndprncPA=;
-        b=KOgeqjI25XO6HBRh1iOJ/fk4GA3lKz1h0t5ELreUpWTLTfc+QkWDhUF/Wo3k0Mih1d
-         1naMEgTBltZJYFlFVAvfck78Bd8pguSu07NbPO31V6+CVlk9GHS3R7mTcDNtzm1Rxs2F
-         d5msaIJWS3+p+dsYILmYBIzdELYu46UM1attAcSWuAJuj1xtnK++bczmbpHwW/zck8Cs
-         ejyXaDdKtm/gorba7yrGj6T2eazebXlSNjBBqu3KZOQBEBwV1xUn7o9J/8rl7bPSJqJo
-         GMB5kNtJxJWzlAStjbtaSg6H/3p9JQStO820v6Z/F7RNyQ8hvGYhv9DqVvVOIrGzbIzX
-         V3Lg==
-X-Forwarded-Encrypted: i=1; AJvYcCXHXa+ivqCBExYQZluvIggnfFEUTjof5zHGUzWPzMTE2DuFYFrL5TWziO46ehE9pRqA/sLqTkU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJwyRhPoiB9Stwc85/cfQDQ/7TU8ksxDHDPXNgEGUaTVDLb3sH
-	yzZ3ZpWRBBLy+xMtgmopoxLgPv2ioQJbvKmTjBJfT1LCB3OkcssuEHUuF3TxRbJexhoglYtTkPi
-	tlXt86O6bZcRG+fo64PawUKYWArukX1T09qcc3+FGG9r/Sz6xA4olJnU=
-X-Google-Smtp-Source: AGHT+IGx9vSpZDlzRqdfZWOjJisS50sBONY+503w7BRzuvqYoBx5Fv8wyyTm6o9zRjIw5Bp7ZuYBCqe+zuqWS3AlEXvMAI4l4vG4
+        d=1e100.net; s=20230601; t=1730237750; x=1730842550;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=/FifTdZFU+NbYPEQufcgUJzwkx+ETBVCZzNVdM2zITc=;
+        b=YZTEqycxAp+3fQ39NS4O9GekBwwQ/W4Q7gPgyShYsmuItrG3UBHPf46H2ap4oNkx0y
+         7uh3IIlbQ4mPsIx5TCVd6uIaZMqsgx3nQviYb+OEhc0NGnaeGoJru9QEUD/YhVlXG6KT
+         J8JwBxffnuWRw4uX298lg0E6m5yJgsRnG3RTh6aX7uQp/I7KBB74QejrUqcF0gbnecXV
+         vlNwkDEtkeYyQn6F0VIhVSTL9FWlk8pXEFFO7tj4nL3Kc0ChIMRIlJku2qZYjESThj6x
+         qGeXVRguBQ5z7vNsEeB2nTxuF7H5mIq8gfevPu0V35l1cK/KWnXcpyNyv9cQ7j0yGXmO
+         jV3w==
+X-Forwarded-Encrypted: i=1; AJvYcCUsfVqnxme+ZQkKRsrArs0RUFoa0/J1e6Wl6z50xVw+YzECfHctZYsJN/RekSXvDcTxuUu6i+QkFP7yCbsY@vger.kernel.org, AJvYcCW5HKJUZH391v0pG2pRNZyzN8wb2uKSwRAQZ81gEyrJSWmwrqDY5VFNl2GOcgaGqhPDHenQG7nw@vger.kernel.org, AJvYcCWanuwyqcnowiPuKAHA8yO0OplZNcI/o8sEq6Z7GGo4m2U9bjtIctin7rFnAaT9kE3uRHc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YymuMbT3gMzXWTeDaLFYhjn2W5Tk4Afh/dVyK4MIBA1TBJTcKyf
+	Nj2Vd1ADMJkH8PfICQHlM8yDBcElrGq7bA9HB9awkRMLHKxWQiDLiZNwGiY5DXoWBWKhps3+UA7
+	u2X4/xd0csDDF65YFbLezcsRuSHo=
+X-Google-Smtp-Source: AGHT+IERNHe6GdQDhUCH/QMI4NVanUrXn/lehSJw9XrUiMRCfwRofHTRr8xbL8Y1Qc7SUaaYl1TpEH0vK6m4xhiyiHE=
+X-Received: by 2002:a05:690c:fc7:b0:6dd:ce14:a245 with SMTP id
+ 00721157ae682-6e9d891bd97mr137336927b3.6.1730237749882; Tue, 29 Oct 2024
+ 14:35:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2188:b0:3a4:ea4f:ac9e with SMTP id
- e9e14a558f8ab-3a4ed30fef7mr128699265ab.26.1730237582732; Tue, 29 Oct 2024
- 14:33:02 -0700 (PDT)
-Date: Tue, 29 Oct 2024 14:33:02 -0700
-In-Reply-To: <8734ked3op.fsf@toke.dk>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <6721548e.050a0220.24951d.0077.GAE@google.com>
-Subject: Re: [syzbot] [net?] BUG: Bad page state in bpf_test_run_xdp_live
-From: syzbot <syzbot+d121e098da06af416d23@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, davem@davemloft.net, edumazet@google.com, 
-	hawk@kernel.org, ilias.apalodimas@linaro.org, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com, toke@redhat.com
+References: <20241019071149.81696-1-danielyangkang@gmail.com> <9b6bc5f1-9e10-4bf1-a6b0-bb6178d771b0@intel.com>
+In-Reply-To: <9b6bc5f1-9e10-4bf1-a6b0-bb6178d771b0@intel.com>
+From: Daniel Yang <danielyangkang@gmail.com>
+Date: Tue, 29 Oct 2024 14:34:55 -0700
+Message-ID: <CAGiJo8RzhDgfP9hcND4fGjtA4RRGhZVdxWmJmXas_azuxwqZaA@mail.gmail.com>
+Subject: Re: [PATCH net] Drop packets with invalid headers to prevent KMSAN infoleak
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yonghong.song@linux.dev>, KP Singh <kpsingh@kernel.org>, 
+	Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <bpf@vger.kernel.org>, 
+	"open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello,
+On Tue, Oct 29, 2024 at 9:41=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+> > +     if (unlikely(skb->len < dev->min_header_len ||
+> > +                  skb_mac_header_len(skb) < dev->min_header_len ||
+> > +                  skb_mac_header_len(skb) > dev->hard_header_len)) {
+> > +             kfree_skb(skb);
+> > +             return -ERANGE;
+> > +     }
+>
+> I believe this should go under IS_ENABLED(CONFIG_KMSAN) or
+> CONFIG_DEBUG_NET or so to not affect the regular configurations.
+> Or does this fix some real bug?
 
-syzbot has tested the proposed patch and the reproducer did not trigger any issue:
+Well in my opinion, an infoleak is still an infoleak. But, this would
+likely not get triggered as long as an skb with a properly initialized
+eth header is passed into the bpf_clone_redirect function. We could
+initialize the memory to 0 but the performance hit would be too much.
+If the bpf_clone_redirect() function cannot be called from user space
+with user-crafted skbs as input, I don't think this is really an issue
+and we can just put it under the macros to get rid of the syzbot
+error.
 
-Reported-by: syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-Tested-by: syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-
-Tested on:
-
-commit:         b6260787 Merge branch 'net-phylink-simplify-sfp-phy-at..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=177d4540580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a787ccf76ca91592
-dashboard link: https://syzkaller.appspot.com/bug?extid=d121e098da06af416d23
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-patch:          https://syzkaller.appspot.com/x/patch.diff?x=13ad1f57980000
-
-Note: testing is done by a robot and is best-effort only.
+- Daniel
 
