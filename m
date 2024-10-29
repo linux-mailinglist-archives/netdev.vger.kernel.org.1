@@ -1,272 +1,122 @@
-Return-Path: <netdev+bounces-139981-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139982-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6306A9B4E8A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:51:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 92EB39B4E8E
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:53:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E6AD61F2375B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:51:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EE941F21AC2
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:53:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D63A195B1A;
-	Tue, 29 Oct 2024 15:51:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB029194C6E;
+	Tue, 29 Oct 2024 15:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U33bWqkz"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="dhTJN25g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 357B0802;
-	Tue, 29 Oct 2024 15:51:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAD6C802
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 15:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730217091; cv=none; b=pzZR9USRyvqw/pkZ9AVveaWqM5VKUBKWH4Wa+LdcZS2Ozqx6mYU4ab4F5nVCnEjGy/BdgkDr5Ecy59Lm5gV0tQbdkk4par/c651fT1CvRFmPTYG8NGpCV9CEMyI88/rUPCAmP/Ede4PKmApc0cY/ZBIkyxVO/vYzjcrIrFLv7B8=
+	t=1730217194; cv=none; b=AOwYY9Z6PLb8LfsMWkWziguKFmZQ5ExO0VwKIJdv3Kvu9qQg9quAYTGMG3T3ZtqTD6nBjtzpfK5Xz8e2i1v0IF/YlBs74dheQ/OlGHMWtXWkg+Oga8tlWwtwJxEugusKjBl2owADcGPGIfSY+Kp+zearb3q7jsElJBiDup1ca5c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730217091; c=relaxed/simple;
-	bh=4Ef1Je1uizyMOUEPXOAIEtr/cV8nbgakg7WgivBjah4=;
+	s=arc-20240116; t=1730217194; c=relaxed/simple;
+	bh=Q82MjAAJzY011abIoj9mr3/lCIvynpDz1KuaP8yYE3w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=asM9p91Q6Ime6X31huHeDs6E6u72h+c0Fd3p7QWJYzr2bjR9jgtRHmrxjMVfz9BHs8APx8UIQtMKLXA8eWeBU4jJYlrgKHhdQ0e0UhD3TgTmZ2bSQkeeLoytmRoj2MSlvUm/32Bfraf5k1oPEp7A1fwh67zQYXXHxiYcRetJzys=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U33bWqkz; arc=none smtp.client-ip=209.85.166.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-83aae6aba1aso189541639f.2;
-        Tue, 29 Oct 2024 08:51:28 -0700 (PDT)
+	 To:Cc:Content-Type; b=kx7gsIhv/Gz8w50YPBNn5YQXLpzlxF+bQ09kM5xJFZwBKupBFFGWJn8A4ItRxZXiMXL9g1vuYFUTFXw7KIGTPVOkWBJ1vLBjgV9rkHkmq6PrCLr5h6+ixZi46Rwxe9I325wJb+sneXDa2sf+LLGExhhQQpdd0lC8id3eC/SY3IM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=dhTJN25g; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-53b13ea6b78so8736621e87.2
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:53:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730217088; x=1730821888; darn=vger.kernel.org;
+        d=chromium.org; s=google; t=1730217191; x=1730821991; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=siw+zOXQennOM+dBt0Vhe84s5MTugPfQlRewQPm0dVQ=;
-        b=U33bWqkzaip1+Z7tEV8areIZNc5pUw5jpItyFQyxKXkMbO/SaTStj4vrjSF7Xm+v0R
-         ZC9QflxAdObHxQFpU5RywCEhDXQMz9iYE1K7Eire0fcXeLv/p/4beRGvsX1Sn5gc7naJ
-         MEZWMWA2IfVY+xV3qmqHTNwUOvexbZP4SD5bMvpDFumOMzCkf5gpGTSsUb3xx44uBh/3
-         OCrak+IEl4qhZ3yizIkSn28Z0cuFS0Ea+CnA8WSUm0LSVhRGlk+DYympls6X5hNLun88
-         1m5If8sR6xCYc3GvfLB2hcJxgPhxvrFFapnVNDnlMYuI29uMgOOUEpwADmGmR+VGx+gF
-         7MSg==
+        bh=Ll51C0PllLi1/aohJqQbI6RPBpDmFIRC+GA4ELQxeFw=;
+        b=dhTJN25gmGQnWVvbZHc8HZzVc5aEPMmtMNvZJLvBmiFgavwUXcHdgbezBKjI/4x9DT
+         1cBxNiLlrLyiJg8N2xdN4TU0WddqxEUkXcw/IHQQCdmuBiL9OzAR2f8lz7kSpN+G9HV6
+         FalKknhrBFfMv2+BNq2IuzeXoQPmZ+HjPFu6c=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730217088; x=1730821888;
+        d=1e100.net; s=20230601; t=1730217191; x=1730821991;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=siw+zOXQennOM+dBt0Vhe84s5MTugPfQlRewQPm0dVQ=;
-        b=BipZ/stM3/M5VBBsKuN84J5p85nhfZn6b3X/AYRJmLW+3Ik3LHlzfABtuWm6RVGf/L
-         vBCo7TKFNaUBAaTvEyPk6gVSKSvlgC7gbwwhMbi06S9lobOuGdMQat6jnTlCINvbD2ZD
-         FB8UkuYkHjzKlUWbZhMm3pi6YNzHC8MJbCMgj8OgN9YobD8kSahieyhZVxgeOMIpFWti
-         90JqvQt7xsa37Uo7IqY5UBv5paESoOwrjPWxIFIHfN0QE8FLT/njD/bT77+lm7pBeKDr
-         eQKUIh0miRIcHgF4XUG+2L96UAKWZq2G6T1NWdsXILCcdyfxs2BzJEIYN3GEgQv+Adbr
-         +41A==
-X-Forwarded-Encrypted: i=1; AJvYcCUbp0nfp28BuXTFs52m79VW5j+8P1EF9NrnpsmIYv4qqT/XCTafg3rmDIcdCyxXCKDIWh8=@vger.kernel.org, AJvYcCVemwsTtYHVYP4nNpv19o+tE+YqyomZhdEjI1S4jL6t40cmAL9aB9g8odYktnvnguVekgmc3sJw@vger.kernel.org
-X-Gm-Message-State: AOJu0YxMcHhGcnuaSCsi+lJW/t4c1i7w3o0YYXYNXHE2dWPvN240gszw
-	3XC/oEOuv2M03ZUHE+Lv8BGiSHDtyTsSdSFlYtK0u/dNTELZ+gEOO2pvtDEA1ik0HnTdQZ0c/T7
-	6UjDaG3xrQxBJRR4eQrfK6gWmLs4=
-X-Google-Smtp-Source: AGHT+IExU9QukJp47ivw7BlcSxTD5zJM3yPwcs+RE9A2F0vx4qoHhl2g57MuOpuQQdp+zYOEPtANbZU5IFa5oGX4jVM=
-X-Received: by 2002:a05:6e02:1c21:b0:3a3:94c5:e178 with SMTP id
- e9e14a558f8ab-3a4ed3180bemr101168075ab.26.1730217088192; Tue, 29 Oct 2024
- 08:51:28 -0700 (PDT)
+        bh=Ll51C0PllLi1/aohJqQbI6RPBpDmFIRC+GA4ELQxeFw=;
+        b=US8VkTbMFBnalvayI0rE32bYbgbztAO00y1gFD/+cz6T7kBHD/L7ERyqM2x823rUUt
+         9k9hvzflmUhR44j2tV40B1myQw7GFBvHykBM0YEppXHTOOu+YhZFEk9zwYCCJO5iVpbf
+         hVKsuqvR0Ilb7WGn8fP0tWIiAWn1H7+qZn+FbkMTHWHUmi99cGiZ4LkKDzoK2VcsVQkk
+         KcgPzS1r4BpjePyUTciIBTgCCSxYyYqG1BpN/NOB9ncnQYjbreZTonm8CM/+My5K1C7M
+         z5piDxU6vKeVjzXHXNnBHO/3JP5jGkcQ+k25m09l+StcPHRm4P/adrFBEDPguzYih+tW
+         RS8w==
+X-Forwarded-Encrypted: i=1; AJvYcCXVWcZlvWu+ntQQqAXwf8RP7n6jBzZE0fsRAL1lHpOdTpR8nqfKy71XLADEdW9gC1nzcGO5k6M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgcO/hA/yFkqAy78TEuChYSsVPq4I3XAHnXDBeqWLEHJ5y+Tw2
+	yWkBnTTbPNXF4D8AA5q+mOJyBopY4DZHVzRSmBzjf70nlQkKj+cKIa2/FWQ1NKtdSIBfXN1aKs/
+	09qLgeNZ/f+Es8n6SUJnoptf6b+j7nzzN4cWJ
+X-Google-Smtp-Source: AGHT+IFq8kVq37MNUAjH9Q6myVE42MB00LVqimrYgoawu+grZEG8upkwKXnNYybcruxqIxH3d1HozSkgBqx+9rgCuS8=
+X-Received: by 2002:a05:6512:1256:b0:535:6a34:b8c3 with SMTP id
+ 2adb3069b0e04-53b348b9fecmr8822368e87.5.1730217190707; Tue, 29 Oct 2024
+ 08:53:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-11-kerneljasonxing@gmail.com> <6720394714070_24dce62944a@willemb.c.googlers.com.notmuch>
- <CAL+tcoBgbA1Q_7UaC0vp-mGHqDHxQ+eMybep0kw=E-T0oJAHfw@mail.gmail.com> <6720f9359d2ef_2bcd7f29458@willemb.c.googlers.com.notmuch>
-In-Reply-To: <6720f9359d2ef_2bcd7f29458@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 29 Oct 2024 23:50:52 +0800
-Message-ID: <CAL+tcoCDN+YSwXDocv9DcvPGW-sLhEfPHHbzcO2+1PBZFRkB0Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
- tskey offset
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <20241028101952.775731-1-dualli@chromium.org> <20241028101952.775731-2-dualli@chromium.org>
+ <20241029071437.2381adea@kernel.org>
+In-Reply-To: <20241029071437.2381adea@kernel.org>
+From: Li Li <dualli@chromium.org>
+Date: Tue, 29 Oct 2024 08:52:59 -0700
+Message-ID: <CANBPYPiYAVDMeBUNRm8_wJojropMSL00UkGGV1ar+E3Y1STYfA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 1/1] binder: report txn errors via generic netlink
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com, 
+	gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com, 
+	maco@android.com, joel@joelfernandes.org, brauner@kernel.org, 
+	cmllamas@google.com, surenb@google.com, arnd@arndb.de, masahiroy@kernel.org, 
+	bagasdotme@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org, hridya@google.com, 
+	smoreland@google.com, kernel-team@android.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 29, 2024 at 11:03=E2=80=AFPM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
+On Tue, Oct 29, 2024 at 7:14=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Jason Xing wrote:
-> > On Tue, Oct 29, 2024 at 9:24=E2=80=AFAM Willem de Bruijn
-> > <willemdebruijn.kernel@gmail.com> wrote:
-> > >
-> > > Jason Xing wrote:
-> > > > From: Jason Xing <kernelxing@tencent.com>
-> > > >
-> > > > Use the offset to record the delta value between current socket key
-> > > > and bpf socket key.
-> > > >
-> > > > 1. If there is only bpf feature running, the socket key is bpf sock=
-et
-> > > > key and the offset is zero;
-> > > > 2. If there is only traditional feature running, and then bpf featu=
-re
-> > > > is turned on, the socket key is still used by the former while the =
-offset
-> > > > is the delta between them;
-> > > > 3. if there is only bpf feature running, and then application uses =
-it,
-> > > > the socket key would be re-init for application and the offset is t=
-he
-> > > > delta.
-> > >
-> > > We need to also figure out the rare conflict when one user sets
-> > > OPT_ID | OPT_ID_TCP while the other only uses OPT_ID.
-> >
-> > I think the current patch handles the case because:
-> > 1. sock_calculate_tskey_offset() gets the final key first whether the
-> > OPT_ID_TCP is set or not.
-> > 2. we will use that tskey to calculate the delta.
+> On Mon, 28 Oct 2024 03:19:51 -0700 Li Li wrote:
+> > +                     report.err =3D BR_ONEWAY_SPAM_SUSPECT;
+> > +                     report.from_pid =3D proc->pid;
+> > +                     report.from_tid =3D thread->pid;
+> > +                     report.to_pid =3D target_proc ? target_proc->pid =
+: 0;
+> > +                     report.to_tid =3D target_thread ? target_thread->=
+pid : 0;
+> > +                     report.reply =3D reply;
+> > +                     report.flags =3D tr->flags;
+> > +                     report.code =3D tr->code;
+> > +                     report.data_size =3D tr->data_size;
+> > +                     binder_genl_send_report(context, &report, sizeof(=
+report));
 >
-> Oh yes of course. Great, then this is resolved.
->
-> > > > +static long int sock_calculate_tskey_offset(struct sock *sk, int v=
-al, int bpf_type)
-> > > > +{
-> > > > +     u32 tskey;
-> > > > +
-> > > > +     if (sk_is_tcp(sk)) {
-> > > > +             if ((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LISTEN))
-> > > > +                     return -EINVAL;
-> > > > +
-> > > > +             if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> > > > +                     tskey =3D tcp_sk(sk)->write_seq;
-> > > > +             else
-> > > > +                     tskey =3D tcp_sk(sk)->snd_una;
-> > > > +     } else {
-> > > > +             tskey =3D 0;
-> > > > +     }
-> > > > +
-> > > > +     if (bpf_type && (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID)) {
-> > > > +             sk->sk_tskey_bpf_offset =3D tskey - atomic_read(&sk->=
-sk_tskey);
-> > > > +             return 0;
-> > > > +     } else if (!bpf_type && (sk->sk_tsflags_bpf & SOF_TIMESTAMPIN=
-G_OPT_ID)) {
-> > > > +             sk->sk_tskey_bpf_offset =3D atomic_read(&sk->sk_tskey=
-) - tskey;
-> > > > +     } else {
-> > > > +             sk->sk_tskey_bpf_offset =3D 0;
-> > > > +     }
-> > > > +
-> > > > +     return tskey;
-> > > > +}
-> > > > +
-> > > >  int sock_set_tskey(struct sock *sk, int val, int bpf_type)
-> > > >  {
-> > > >       u32 tsflags =3D bpf_type ? sk->sk_tsflags_bpf : sk->sk_tsflag=
-s;
-> > > > @@ -901,17 +944,13 @@ int sock_set_tskey(struct sock *sk, int val, =
-int bpf_type)
-> > > >
-> > > >       if (val & SOF_TIMESTAMPING_OPT_ID &&
-> > > >           !(tsflags & SOF_TIMESTAMPING_OPT_ID)) {
-> > > > -             if (sk_is_tcp(sk)) {
-> > > > -                     if ((1 << sk->sk_state) &
-> > > > -                         (TCPF_CLOSE | TCPF_LISTEN))
-> > > > -                             return -EINVAL;
-> > > > -                     if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> > > > -                             atomic_set(&sk->sk_tskey, tcp_sk(sk)-=
->write_seq);
-> > > > -                     else
-> > > > -                             atomic_set(&sk->sk_tskey, tcp_sk(sk)-=
->snd_una);
-> > > > -             } else {
-> > > > -                     atomic_set(&sk->sk_tskey, 0);
-> > > > -             }
-> > > > +             long int ret;
-> > > > +
-> > > > +             ret =3D sock_calculate_tskey_offset(sk, val, bpf_type=
-);
-> > > > +             if (ret <=3D 0)
-> > > > +                     return ret;
-> > > > +
-> > > > +             atomic_set(&sk->sk_tskey, ret);
-> > > >       }
-> > > >
-> > > >       return 0;
-> > > > @@ -956,10 +995,15 @@ static int sock_set_timestamping_bpf(struct s=
-ock *sk,
-> > > >                                    struct so_timestamping timestamp=
-ing)
-> > > >  {
-> > > >       u32 flags =3D timestamping.flags;
-> > > > +     int ret;
-> > > >
-> > > >       if (flags & ~SOF_TIMESTAMPING_BPF_SUPPPORTED_MASK)
-> > > >               return -EINVAL;
-> > > >
-> > > > +     ret =3D sock_set_tskey(sk, flags, 1);
-> > > > +     if (ret)
-> > > > +             return ret;
-> > > > +
-> > > >       WRITE_ONCE(sk->sk_tsflags_bpf, flags);
-> > > >
-> > > >       return 0;
-> > >
-> > > I'm a bit hazy on when this can be called. We can assume that this ne=
-w
-> > > BPF operation cannot race with the existing setsockopt nor with the
-> > > datapath that might touch the atomic fields, right?
-> >
-> > It surely can race with the existing setsockopt.
-> >
-> > 1)
-> > if (only existing setsockopt works) {
-> >         then sk->sk_tskey is set through setsockopt, sk_tskey_bpf_offse=
-t is 0.
-> > }
-> >
-> > 2)
-> > if (only bpf setsockopt works) {
-> >         then sk->sk_tskey is set through bpf_setsockopt,
-> > sk_tskey_bpf_offset is 0.
-> > }
-> >
-> > 3)
-> > if (existing setsockopt already started, here we enable the bpf feature=
-) {
-> >         then sk->sk_tskey will not change, but the sk_tskey_bpf_offset
-> > will be calculated.
-> > }
-> >
-> > 4)
-> > if (bpf setsockopt already started, here we enable the application feat=
-ure) {
-> >         then sk->sk_tskey will re-initialized/overridden by
-> > setsockopt, and the sk_tskey_bpf_offset will be calculated.
-> > }
+> Could you break this struct apart into individual attributes?
+> Carrying binary structs in netlink has been done historically
+> but we moved away from it. It undermines the ability to extend
+> the output and do automatic error checking.
 
-I will copy the above to the commit message next time in order to
-provide a clear design to future readers.
+Sure!
 
-> >
-> > Then the skb tskey will use the sk->sk_tskey like before.
 >
-> I mean race as in the setsockopt and bpf setsockopt and datapath
-> running concurrently.
->
-> As long as both variants of setsockopt hold the socket lock, that
-> won't happen.
->
-> The datapath is lockless for UDP, so atomic_inc sk_tskey can race
-> with calculating the difference. But this is a known issue. A process
-> that cares should not run setsockopt and send concurrently. So this is
-> fine too.
+> BTW if you would like to keep using the uapi/linux/android directory
+> feel free to add this as the first patch of the series:
+> https://github.com/kuba-moo/linux/commit/73fde49060cd89714029ccee5d37dcc3=
+7b8291f6
 
-Oh, now I see. Thanks for the detailed explanation! So Do you feel if
-we need to take care of this in the future, I mean, after this series
-gets merged...?
-
-Thanks,
-Jason
+Awesome. Thank you for the patch!
 
