@@ -1,166 +1,273 @@
-Return-Path: <netdev+bounces-139978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72B299B4E4C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:42:18 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F09C19B4E5B
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:45:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1E5171F216A9
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:42:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8125E1F233A0
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42719194C6A;
-	Tue, 29 Oct 2024 15:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0276192D84;
+	Tue, 29 Oct 2024 15:45:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b="BieAHnzs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="g+Sjnigd"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F37C0194AD5;
-	Tue, 29 Oct 2024 15:42:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.207.212.93
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D39B802;
+	Tue, 29 Oct 2024 15:45:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730216536; cv=none; b=Dc66sMhfjfFMDaXxyWVhd64C4aH4ILQO1LWrIrSM6FoZ3I+lZluGW9fW4F87lTDHtA1+/M4WoejHxBcZCo6Qibl5b1y7s9DQeS6eDwt5cFe7IJA2DsLOt5qa7dmPh5ARm+LJrkP0iEXMxObrtXk91riEoAth3V5nywX1+aLrF2s=
+	t=1730216730; cv=none; b=h5jxsRd77fPvp3JMIU8SSFTBtS746LDiU3pwR68IVzYz6XcJVJWlu5FjOM75ZTa4ymheUFI8xXZ2OwLXhq516mShG2XpK1x2rjGz3AlMhGDHQnUIL/3kTjJBCXlkn15tspL/f7B9CJDcGAYpTZEwurWQoZ2rlLdrJsSZui8lXRM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730216536; c=relaxed/simple;
-	bh=LiEnAEh8Q2vIVB3nkCApVpm/bi7tMMFFKBoNENn+sIk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=OxGlpxApiOgM/d+rhlydDQ0MWXJpb66bkqbVJVqoYi87yqRbIaOz8wcoRyqO3WoSIs5F/Z+CPq+bCEd0tGvsrd7mhPVG+AvBhzq2JGm8X/PNK/N9gXojGKKmS7OkfNipCSLDr/4OyM5f/BQQsiaHIuI4QcgA5es71aoBoDv9hxA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com; spf=pass smtp.mailfrom=foss.st.com; dkim=pass (2048-bit key) header.d=foss.st.com header.i=@foss.st.com header.b=BieAHnzs; arc=none smtp.client-ip=91.207.212.93
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foss.st.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foss.st.com
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 49TC3TTF003918;
-	Tue, 29 Oct 2024 16:41:51 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=selector1; bh=
-	zHF2No7iOZp8TUj0QQhR03fdH9pB3iJrECaVT7vr+7s=; b=BieAHnzsKphMUEH6
-	a/0gYtOzBijwl1r2EFJO4ams2ZnNA4CAEzqbhrWFm6jCw1ZBzgl20tRmeQ7myjpW
-	4mP8Fzov9Pr9Lfop1NyLAc26rVw73mX/8kpiOeJP0K1u6sn2pe+PoCOSofMjhZTa
-	Gi5GbIn4K8iYYP3aytoKhk2yKdVOcEa3CiNmjdxtg3pFdPP6VN/BVPvI5NESlG47
-	Q9UtwuOcglETPhBOhqTv+gvhY8X8U+dOkONbAAQB9wxiAZBNxNun8tVCN4Njiz4N
-	S5IYgugpVrh/PCNM4BUiCeLTaw8u13vJXzK8pv2uEoThDn8gjIwmzEIx3YdAZzpS
-	TByXEw==
-Received: from beta.dmz-ap.st.com (beta.dmz-ap.st.com [138.198.100.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 42gqacqdhh-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 29 Oct 2024 16:41:50 +0100 (CET)
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-ap.st.com (STMicroelectronics) with ESMTP id AEDA040044;
-	Tue, 29 Oct 2024 16:40:31 +0100 (CET)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id CA74426B638;
-	Tue, 29 Oct 2024 16:39:41 +0100 (CET)
-Received: from [10.48.86.79] (10.48.86.79) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.37; Tue, 29 Oct
- 2024 16:39:41 +0100
-Message-ID: <a483fb50-f978-4e48-b38e-6d79632540f1@foss.st.com>
-Date: Tue, 29 Oct 2024 16:39:40 +0100
+	s=arc-20240116; t=1730216730; c=relaxed/simple;
+	bh=/i4dWK4F6hJbqpi2maBmqWq0OsrRFCA6YHam80TbJs8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=s7BaeyxptPAogKtOyHulrtc4+GMEibCBcanyjp7vVYJhUGNGJkJbzvjaj2+YR2d4Q5GGNm09H+6LocK1Ex1niG3aYdZI+m5RSnwWiGo48xynM+NhqqHMM103SfC1z2Fhm8bMlNruvd8YcD1l+PUE5g7AxWu/fdnLsmVeAnygbGA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=g+Sjnigd; arc=none smtp.client-ip=209.85.166.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a3b6b281d4so22686745ab.0;
+        Tue, 29 Oct 2024 08:45:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730216727; x=1730821527; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R+WNbS8D2cwcZw0GFjyFt+6WwJRj0UVyPushyS97O0E=;
+        b=g+SjnigdJ78H0EthOf6xGNbRuPg8tQ1b92fShBPvjGUy9ry4Qdufgc9aW4yn7zKDON
+         vIHr/ICpc0HUpzeZdA5ZELYZMO+I1645nMf89pBSruukT1bTXrE1FMo78T1fZw/g/Buf
+         XVRPPI9PGe0QYVn0IIqCs97LF70MMpJ2+F9xm5OpaNXbM+LE7ptmaSbWzjy5KvR8s8xT
+         kXbnuslrbVkYGGAUzx//5bgayr2MaPObxvOBVJRBNZiIhB7YCjTLijTuSx/FF1QzHCgw
+         BUul2f20F4jcjXzaq3syIMjTIWCIkkJ+iZJrx0ixONnIpuQaCDKdButQmSk378NUZ+UC
+         bNuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730216727; x=1730821527;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=R+WNbS8D2cwcZw0GFjyFt+6WwJRj0UVyPushyS97O0E=;
+        b=GtTYT/Sw99fQDDed56lWVZZSa8FVEO8GcTaOhtatmOpMEas0vsCc9HF6pt4U9TRyBq
+         qAiZgwPC4yYr0JS5zqvTyQ6L2/iFU6GfXAP2TL4f+6AJAujzExJLF0mJDSFS4uMLtpbq
+         tpObFksSweQVL4wCxAobyWwQK3cnR7RhC5l1WQ/aN8/F/boDtORvl+tZrzwcwJWwZUE0
+         JwiwDT5qYz68nyN38bsKK9CoFk39AOUOaQakYd1LQooXT2cpkpREol25Oiq3q7UOtAHe
+         WOmYzK/nVWg8CUaS8C9Xv5wl8O6JAFXRXmacVpM5XFGOcUuKQnswMoN+0XVHUje3H00q
+         Iacg==
+X-Forwarded-Encrypted: i=1; AJvYcCU/UHz21hCyRh737zE8etVlonhf0j+M4INl6+bHvBqpwlEN7NZ5O8NqINS2oyImFLpJrxibLZSu@vger.kernel.org, AJvYcCUD8JVe5pMFM52mz3/4fZRLFNUuST6N9GMsOyzGgNjTFPGEisR/BwVIMRDZenGIJDMl/DY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTElOejYDgujbrMYvgyFJ4ZOmwxykFm8m82uBSj+jxlbo8G7Ip
+	Hjio8nswRcyEzXJqQghD+mhKRF/n6Qvsb7MlXya5t/8yPy0mEo7EFFHHbvK29OGlVcBAck3hzcq
+	U2CXGrmnl5FeYrZmK91lcJkkxkKM=
+X-Google-Smtp-Source: AGHT+IEqB8GrvJMCkNUHYeILnq8Ks2VaUDMaDt+xGTdtGjtwOsJPBLul5EJ2rYERtfWxTzrOk5MOp6NtnvgpjxxJkOw=
+X-Received: by 2002:a05:6e02:2183:b0:3a3:4391:24e9 with SMTP id
+ e9e14a558f8ab-3a4ed2dfafdmr122935655ab.20.1730216727323; Tue, 29 Oct 2024
+ 08:45:27 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1] arm: dts: st: stm32mp151a-prtt1l: Fix QSPI
- configuration
-To: Ahmad Fatoum <a.fatoum@pengutronix.de>,
-        Oleksij Rempel
-	<o.rempel@pengutronix.de>,
-        Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-        Rob
- Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski <krzk+dt@kernel.org>,
-        Conor
- Dooley <conor+dt@kernel.org>
-CC: <devicetree@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <kernel@pengutronix.de>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>
-References: <20240806120517.406714-1-o.rempel@pengutronix.de>
- <20dc2cd4-7684-4894-9db3-23c3f4abd661@pengutronix.de>
-Content-Language: en-US
-From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
-In-Reply-To: <20dc2cd4-7684-4894-9db3-23c3f4abd661@pengutronix.de>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-8-kerneljasonxing@gmail.com> <6720356328c26_24dce6294ce@willemb.c.googlers.com.notmuch>
+ <CAL+tcoCBxTUU9mPUTC=9LmGLsrUrjVDVk-982M-TjewSW-hjzQ@mail.gmail.com>
+ <67203b50af9ba_25812829436@willemb.c.googlers.com.notmuch>
+ <CAL+tcoAid3eSbnu-h8PR9o-_pr4bOdsKAxsT=WT-d_GD91pVuQ@mail.gmail.com> <6720f97f43603_2bcd7f294fb@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6720f97f43603_2bcd7f294fb@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue, 29 Oct 2024 23:44:51 +0800
+Message-ID: <CAL+tcoDeMgugDs66+qsoh025+KL34qyya_xT5+=oWL3FDq_wOA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 07/14] net-timestamp: add a new triggered
+ point to set sk_tsflags_bpf in UDP layer
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Ahmad
+On Tue, Oct 29, 2024 at 11:04=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Tue, Oct 29, 2024 at 9:33=E2=80=AFAM Willem de Bruijn
+> > <willemdebruijn.kernel@gmail.com> wrote:
+> > >
+> > > Jason Xing wrote:
+> > > > On Tue, Oct 29, 2024 at 9:07=E2=80=AFAM Willem de Bruijn
+> > > > <willemdebruijn.kernel@gmail.com> wrote:
+> > > > >
+> > > > > Jason Xing wrote:
+> > > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > > >
+> > > > > > This patch behaves like how cmsg feature works, that is to say,
+> > > > > > check and set on each call of udp_sendmsg before passing sk_tsf=
+lags_bpf
+> > > > > > to cork tsflags.
+> > > > > >
+> > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > > ---
+> > > > > >  include/net/sock.h             | 1 +
+> > > > > >  include/uapi/linux/bpf.h       | 3 +++
+> > > > > >  net/core/skbuff.c              | 2 +-
+> > > > > >  net/ipv4/udp.c                 | 1 +
+> > > > > >  tools/include/uapi/linux/bpf.h | 3 +++
+> > > > > >  5 files changed, 9 insertions(+), 1 deletion(-)
+> > > > > >
+> > > > > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > > > > index 062f405c744e..cf7fea456455 100644
+> > > > > > --- a/include/net/sock.h
+> > > > > > +++ b/include/net/sock.h
+> > > > > > @@ -2828,6 +2828,7 @@ static inline bool sk_listener_or_tw(cons=
+t struct sock *sk)
+> > > > > >  }
+> > > > > >
+> > > > > >  void sock_enable_timestamp(struct sock *sk, enum sock_flags fl=
+ag);
+> > > > > > +void timestamp_call_bpf(struct sock *sk, int op, u32 nargs, u3=
+2 *args);
+> > > > > >  int sock_recv_errqueue(struct sock *sk, struct msghdr *msg, in=
+t len, int level,
+> > > > > >                      int type);
+> > > > > >
+> > > > > > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.=
+h
+> > > > > > index 6fc3bd12b650..055ffa7c965c 100644
+> > > > > > --- a/include/uapi/linux/bpf.h
+> > > > > > +++ b/include/uapi/linux/bpf.h
+> > > > > > @@ -7028,6 +7028,9 @@ enum {
+> > > > > >                                        * feature is on. It indi=
+cates the
+> > > > > >                                        * recorded timestamp.
+> > > > > >                                        */
+> > > > > > +     BPF_SOCK_OPS_TS_UDP_SND_CB,     /* Called when every udp_=
+sendmsg
+> > > > > > +                                      * syscall is triggered
+> > > > > > +                                      */
+> > > > > >  };
+> > > > > >
+> > > > > >  /* List of TCP states. There is a build check in net/ipv4/tcp.=
+c to detect
+> > > > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > > > index 8b2a79c0fe1c..0b571306f7ea 100644
+> > > > > > --- a/net/core/skbuff.c
+> > > > > > +++ b/net/core/skbuff.c
+> > > > > > @@ -5622,7 +5622,7 @@ static void skb_tstamp_tx_output(struct s=
+k_buff *orig_skb,
+> > > > > >       __skb_complete_tx_timestamp(skb, sk, tstype, opt_stats);
+> > > > > >  }
+> > > > > >
+> > > > > > -static void timestamp_call_bpf(struct sock *sk, int op, u32 na=
+rgs, u32 *args)
+> > > > > > +void timestamp_call_bpf(struct sock *sk, int op, u32 nargs, u3=
+2 *args)
+> > > > > >  {
+> > > > > >       struct bpf_sock_ops_kern sock_ops;
+> > > > > >
+> > > > > > diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> > > > > > index 9a20af41e272..e768421abc37 100644
+> > > > > > --- a/net/ipv4/udp.c
+> > > > > > +++ b/net/ipv4/udp.c
+> > > > > > @@ -1264,6 +1264,7 @@ int udp_sendmsg(struct sock *sk, struct m=
+sghdr *msg, size_t len)
+> > > > > >       if (!corkreq) {
+> > > > > >               struct inet_cork cork;
+> > > > > >
+> > > > > > +             timestamp_call_bpf(sk, BPF_SOCK_OPS_TS_UDP_SND_CB=
+, 0, NULL);
+> > > > > >               skb =3D ip_make_skb(sk, fl4, getfrag, msg, ulen,
+> > > > > >                                 sizeof(struct udphdr), &ipc, &r=
+t,
+> > > > > >                                 &cork, msg->msg_flags);
+> > > > > > diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uap=
+i/linux/bpf.h
+> > > > > > index 6fc3bd12b650..055ffa7c965c 100644
+> > > > > > --- a/tools/include/uapi/linux/bpf.h
+> > > > > > +++ b/tools/include/uapi/linux/bpf.h
+> > > > > > @@ -7028,6 +7028,9 @@ enum {
+> > > > > >                                        * feature is on. It indi=
+cates the
+> > > > > >                                        * recorded timestamp.
+> > > > > >                                        */
+> > > > > > +     BPF_SOCK_OPS_TS_UDP_SND_CB,     /* Called when every udp_=
+sendmsg
+> > > > > > +                                      * syscall is triggered
+> > > > > > +                                      */
+> > > > >
+> > > > > If adding a timestamp as close to syscall entry as possible, give=
+ it a
+> > > > > generic name, not specific to UDP.
+> > > >
+> > > > Good suggestion, then it will also solve the remaining issue for TC=
+P type:
+> > > > __when__ we should record the user timestamp which exists in the
+> > > > application SO_TIMESTAMPING feature.
+> > > >
+> > > > >
+> > > > > And please explain in the commit message the reason for a new
+> > > > > timestamp recording point: with existing timestamping the applica=
+tion
+> > > > > can call clock_gettime before (and optionally after) the send cal=
+l.
+> > > > > An admin using BPF does not have this option, so needs this as pa=
+rt of
+> > > > > the BPF timestamping API.
+> > > >
+> > > > Will revise this part. Thanks for your description!
+> > >
+> > > Actually, I may have misunderstood the intention of this new hook.
+> > >
+> > > I thought it was to record an additional timestamp.
+> >
+> > I planned to do it after this series. For now, without the new hook,
+> > it will not work for UDP type.
+>
+> Why not? This is something specific to the SK BPF hooks, I suppose?
 
-On 8/7/24 11:38, Ahmad Fatoum wrote:
-> Hello Oleksij,
-> 
-> On 06.08.24 14:05, Oleksij Rempel wrote:
->> Rename 'pins1' to 'pins' in the qspi_bk1_pins_a node to correct the
->> subnode name. The previous name caused the configuration to be
->> applied to the wrong subnode, resulting in QSPI not working properly.
->>
->> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
->> ---
->>   arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi | 2 +-
->>   1 file changed, 1 insertion(+), 1 deletion(-)
->>
->> diff --git a/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi b/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
->> index 3938d357e198f..4db684478c320 100644
->> --- a/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
->> +++ b/arch/arm/boot/dts/st/stm32mp151a-prtt1l.dtsi
->> @@ -123,7 +123,7 @@ flash@0 {
->>   };
->>   
->>   &qspi_bk1_pins_a {
->> -	pins1 {
->> +	pins {
-> 
-> As you have seen such device tree overriding is error prone and would
-> be entirely avoidable if specifying full board-specific pinctrl groups
-> was allowed for the stm32 platforms instead of override-and-pray.
-> 
-> Anyways, there's better syntax for such overriding now:
-> 
->    &{qspi_blk1_pins_a/pins}
-> 
-> which would cause a compilation error if pins was renamed again.
-> 
->>   		bias-pull-up;
-> 
-> There's bias-disable in stm32mp15-pinctrl.dtsi. You may want to add
-> a /delete-property/ for that to make sure, it's not up to the driver
-> which one has priority.
-> 
->>   		drive-push-pull;
->>   		slew-rate = <1>;
-> 
-> These are already in qspi_bk1_pins_a. If repeating those is ok, why
-> not go a step further and just duplicate the pinmux property and stay
-> clear of this issue altogether, provided Alex is amenable to changing
-> his mind regarding pinctrl groups in board device trees.
+I mean both hooks (one for UDP, one for USR time) are significant.
 
-I still prefer to have pin configuration defined in pinctrl dtsi file 
-and I'll continue like this for ST board. The reason is that we try to 
-reuse as much as possible pins when we create a new board and so it is 
-easier to maintain if we declare them only one time.
+>
+> As soon as bpf_setsockopt is called, the timestamp callbacks should
+> start getting called?
 
-But, I'm not blocked for "other" boards based on STM32 SoC. I mean, if 
-it is simpler for you and above all if it avoid issues/complexities 
-then, you can declare some pin groups in your board dts file. In this 
-case we need to take care of the IO groups label name.
+Right, but the question is when we trigger the call of
+bpf_setsockopt() for the UDP proto? The current patch is trying to
+deal with it.
 
-regards
-alex
+>
+> > >
+> > > But it is (also?) to program skb_shared_info.tx_flags based on
+> > > instructions parsed from cmsg in __sock_cmsg_send.
+> >
+> > I'm not sure if I grasp the key point you said.
+> >
+> > For UDP, skb_shared_info.tx_flags will finally be initialized in
+> > __ip_append_data() based on cork->tx_flags.
+> >
+> > cork->tx_flags is computed by sock_tx_timestamp() based on
+> > ipc->sockc.tsflags if cmsg feature is turned on.
+> >
+> > __sock_tx_timestamp() uses "flags |=3D xxx" to initialize the
+> > cork->tx_flags, so that the cork->tx_flags will not be completely
+> > overridden by either the cmsg method or bpf program, that is to say,
+> > the cork->tx_flags can combine both of them.
+> >
+> > Then another key point is that we do the check to see which one
+> > actually works in sk_tstamp_tx_flags() by testing sk->sk_tsflags or
+> > sk->sk_tsflags_bpf in patch [2/14]. It guarantees that.
+>
+> Ack, thanks. So I was mistaken the second time around.
 
-> 
-> 
-> Cheers,
-> Ahmad
-> 
+Thanks for your review :)
+
+Thanks,
+Jason
 
