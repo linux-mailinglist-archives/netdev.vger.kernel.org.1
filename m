@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-140094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45E379B5371
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:27:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 027B19B5375
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:27:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A94F2826A4
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:27:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BF931F237A8
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:27:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B30A20C002;
-	Tue, 29 Oct 2024 20:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45A1720C031;
+	Tue, 29 Oct 2024 20:24:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="f6Gd2IBq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LnfDhkIh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15B320B1F9;
-	Tue, 29 Oct 2024 20:24:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16A6E20A5FF;
+	Tue, 29 Oct 2024 20:24:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730233455; cv=none; b=JXZYujBz+m/SlYN1EE0VfBDwUuEd3fddb3I01houSzMdOCG8MSmmN+Cc9/FEpVidaG4LekAYZup7dhSZojXXrJMT3QXHi2uh3kxd4wso3GLbEZlOxXf3Js3jGGqmamLJOdT3E6ck4S8MRfUYkNpJ0culxg54WLuO5P/EWYu6T6A=
+	t=1730233457; cv=none; b=TBoXsD9InWLbfzVSfi68mBSTDPka0mn+b0M/dT7VOOZVp8sV6yC+PH0/gzXLTXUJN+8q5uOVnJKHP1FkvB3j3FaOCKrLJ/m0mmGENmStOtrzmnQoJ5oQhDop0YOgXGzb4Z1ilZhi+3Uy5i0M2OUAM4eD6zt3+NHrDN/NKgEJh+g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730233455; c=relaxed/simple;
-	bh=ZAE88CsUYehZ4x7ZfB1SApqPKCTLYYoYKH85vSPILZM=;
+	s=arc-20240116; t=1730233457; c=relaxed/simple;
+	bh=PYawdMcP2GouJZJBJhzUjoIk0OafdBZQzp+rXwkagL0=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=fwgeB0dVB5i/ME7wO1O2EEjR6nLIe0t1Y3IYWfPq8BkFolNJOYA4SRQ211stnwSMOPR7sjiWqv1QhXMDaZuujUr7+wk0A+Cn5fuyU9qCxnvGW+ja/JlWZ4liDcSANEgbocjpb6NufhR39hmr3yOAVJPNYC6iVRa5KL623yAjI/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=f6Gd2IBq; arc=none smtp.client-ip=209.85.221.54
+	 MIME-Version; b=PIktUfmjmbFznLDpSnj3BoTe9IobsjoAGwUFoJ4iHVYlXSSBAutF9Bw0V155LNyiTBcLR7BbRHMeav2XTh7cvttotdUCdyPgC4mHUjzFCoCKXNs6xEIKewrFMbNbuoBnExuR4CcgmHYA8izbEAeCHtJx0MW7siOOIDoubtrcbpI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LnfDhkIh; arc=none smtp.client-ip=209.85.128.47
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37d4ddd7ac1so592478f8f.0;
-        Tue, 29 Oct 2024 13:24:12 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4314c006fa4so4898535e9.0;
+        Tue, 29 Oct 2024 13:24:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730233451; x=1730838251; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730233453; x=1730838253; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=mg56kOzcgZYyfjxOgtlPIecLk2wzzp7fMeuBDM37L6g=;
-        b=f6Gd2IBq8HatuO6huVkBbxLcIJUwERKIhEVEMeK89/bRhIVNi/7jKMjdrtjt0esvMR
-         4lu/Xv3RZUmbYKoldKj5djUZBZbU/78UfWJmz12KuM602QajKrmPgmKLUCr3f2aEmiF5
-         Wf9EealPmg8uhVMdA5iBCtHDNBV3hX3mhEtPX7xUoSpBFR7XlwMJYVmaMLC0meAQ57jg
-         zkAVp1yBXddmhENlhCMLe8rWrTPafsVKHrYCGlTFUeoaMRiUtiTCNZOULXzHBiivemKe
-         5jTCM4gQHjYL+ATojTg5k8EEuGPfCsKefyXUB+FWY3Oh6qW9UWIt5+7x7oajq4DBBvn5
-         AtDw==
+        bh=ozG3F0d45Tc8g66cKQj6Gpf5cSc5WnMCj2YvzIalGjA=;
+        b=LnfDhkIhFRAMGEnnKpwXltUFr2KLQ0F9Knf0K8yI0VYsOQ2sI+cMt3+icWtLgCoBZs
+         iAPUm+88XmvgwuolHe8owWgoVzuu2osLVrD8EwKe5n1hn3lvoG6WgPVZ8dfPLY67m40M
+         0V0iq9dOE+v185x0LcShLbQJn70pRdip8JGHNslHP/ysfayuncrrY14gAkmKQ+mPc8+l
+         QDzAlI9eDpNw8l1tWxb23VyeNiMfyL7pzXciQMbEzJr+iZP6aQ+ZYK7x6lZs5Vy9Qb3a
+         IDd6s8VvaQ+Oup04Ixvu7KS9L/zLPPso/GULt+v4xngJ/Vx8VNTU0tKbWq0dx3Iavzas
+         /GhA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730233451; x=1730838251;
+        d=1e100.net; s=20230601; t=1730233453; x=1730838253;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=mg56kOzcgZYyfjxOgtlPIecLk2wzzp7fMeuBDM37L6g=;
-        b=pXILfGM0auG50c+vIAJBwszoU0TO0/jNfXrAB3/Ly1L1XUy9lpApzHpFpkKN+Nurxn
-         pVAqSxR+FjXK5lYVApWp0Tc7wtnLGP66abDIUEP+hxlw73eSys5p+JqyfnswTb8rCBRj
-         B3aHRhhUlflQRVgYGIKDfdCQ3VxrHMjxVTmZAMAthpPdeiowY1hH161iNvd4qh29PV0/
-         uDvFU+vCcR8ijZIj51QMOaddxWCvUTJqXuXjtcdQMpmpIW5byX6mUqtY7qbj9xi4f07m
-         +XztGhPgJwETqRwP+aHQ5gHJUJK00tOeWA/Ezgc7bxCq6C8JPTKRufhptrnaI85mNBNv
-         6V5A==
-X-Forwarded-Encrypted: i=1; AJvYcCU27oVpfcFAsPKLojR03Filxyh+fWhAdMy2RkWeC0GevLkpwUmC41VxBZglH+i3GB+gsUFxNwIsqqsD@vger.kernel.org, AJvYcCU2LiJKxx3ciG1IyRe74bzVHBo1n1ma3L9FoYt75ZyxV6om/bz2+VfDKgE2/06+Qazlz4ISOxLt/hBGYqWo@vger.kernel.org, AJvYcCXtbyGMf7STqslXk1EUZhDSsoNxqb1+0qLGsmoklX1pPwVCYQQExRJhjGoeRUpvZN+DOO05gmYF@vger.kernel.org
-X-Gm-Message-State: AOJu0YyP02VmEGPf2v+Sxx7mQ0od/zThP9WFjW6Doj9aBQ6sjqQZQEri
-	4m5tNUbtDt0BYkkzombwFrP5qNR9uut8RMWI+WI3yjDNu/tl3cGX
-X-Google-Smtp-Source: AGHT+IE2SE7Pl9hETa2QNaY4l2Zh1J8tx94HJ1BeI0oGFH/nw6C1/hbm9Btnw9C+KXluDRBZKD/PmQ==
-X-Received: by 2002:a05:600c:511b:b0:431:558c:d9e9 with SMTP id 5b1f17b1804b1-4319ad24126mr50500815e9.5.1730233451009;
-        Tue, 29 Oct 2024 13:24:11 -0700 (PDT)
+        bh=ozG3F0d45Tc8g66cKQj6Gpf5cSc5WnMCj2YvzIalGjA=;
+        b=hd0KJ2jA/XcWm9v/vLdNAUFbh2i5DakKM9k+PWTmQ/j8uV5V9RkCj+LDoWJ87rYcLk
+         qKTBAmVawOUN/DuKTbi7DAbZ7DfMGF00fYYxAom//3TCCoss7tX7JLfyZnPOwLuACN/M
+         9+YWN9TfPNbL8pbHZRF73b+XSj0DKZyCNHqlvOHKmwXUtXsPHYjdXZ9QRfp6vCuPZBNR
+         PKciCz0TQBucCM1oGBQBmYaVBndsrWzcJBlxQNbfgsTvA47fHIOMJKSY7AM+GCA4JOjT
+         HWMpg/3xlFawUOLKROGPB1Wvk0/syTjvlEyXDydwvkmtPEFUOOShgUHeUf7oTXvf+xLl
+         ILwA==
+X-Forwarded-Encrypted: i=1; AJvYcCW45K+aEjeN5UUbNI0I/B77+vof3glQUtiHlwj9WVged4AoUTqGR6xfW47LRn2/d4oV/uPjvc/255rT7Weu@vger.kernel.org, AJvYcCXB6GKwEVHoccK5EaSmMth1b5affw0lbINstjead5+HMlo0A01XNZz5FkWGK5HPpZLz9niaWLw0/aZe@vger.kernel.org, AJvYcCXXXXbWfPcjBglFXYqJOhcTIiwpkxr9h+Inb9puqzkVSKQsnMAaLIJbxaP1/JfdB8SeQDEwueEc@vger.kernel.org
+X-Gm-Message-State: AOJu0YyM6UYiRMNLuuSnK8+iE8l/BREfcjHkIRDsepRpmb/N1JrVb5r4
+	aJIp40QXgiqh3zYoG0RfMC8CIifr4pFiVeotfd4HvpipOqmoQNXz
+X-Google-Smtp-Source: AGHT+IGHbXNtpVeRkay6QoXYzvaEQf3MjkyLQHiS5jkm/oeLQ1Uj4ljCcnFMbwCNEC3ab9YAHsxiog==
+X-Received: by 2002:a05:600c:468d:b0:42c:aeee:80c with SMTP id 5b1f17b1804b1-4319ad74341mr49011315e9.9.1730233453136;
+        Tue, 29 Oct 2024 13:24:13 -0700 (PDT)
 Received: from 6c1d2e1f4cf4.v.cablecom.net (84-72-156-211.dclient.hispeed.ch. [84.72.156.211])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b3bf85sm13619976f8f.42.2024.10.29.13.24.09
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b3bf85sm13619976f8f.42.2024.10.29.13.24.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 13:24:10 -0700 (PDT)
+        Tue, 29 Oct 2024 13:24:12 -0700 (PDT)
 From: Lothar Rubusch <l.rubusch@gmail.com>
 To: robh@kernel.org,
 	krzk+dt@kernel.org,
@@ -88,9 +88,9 @@ Cc: conor+dt@kernel.org,
 	l.rubusch@gmail.com,
 	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v4 11/23] net: stmmac: add support for dwmac 3.72a
-Date: Tue, 29 Oct 2024 20:23:37 +0000
-Message-Id: <20241029202349.69442-12-l.rubusch@gmail.com>
+Subject: [PATCH v4 12/23] dt-bindings: net: snps,dwmac: add support for Arria10
+Date: Tue, 29 Oct 2024 20:23:38 +0000
+Message-Id: <20241029202349.69442-13-l.rubusch@gmail.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241029202349.69442-1-l.rubusch@gmail.com>
 References: <20241029202349.69442-1-l.rubusch@gmail.com>
@@ -102,41 +102,41 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The dwmac 3.72a is an ip version that can be found on Intel/Altera Arria10
-SoCs. Going by the hardware features "snps,multicast-filter-bins" and
-"snps,perfect-filter-entries" shall be supported. Thus add a
-compatibility flag, and extend coverage of the driver for the 3.72a.
+The hard processor system (HPS) on the Intel/Altera Arria10 provides
+three Ethernet Media Access Controller (EMAC) peripherals. Each EMAC
+can be used to transmit and receive data at 10/100/1000 Mbps over
+ethernet connections in compliance with the IEEE 802.3 specification.
+The EMACs on the Arria10 are instances of the Synopsis DesignWare
+Universal 10/100/1000 Ethernet MAC, version 3.72a.
+
+Support the Synopsis DesignWare version 3.72a, which is used in Intel's
+Arria10 SoC, since it was missing.
 
 Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c   | 1 +
- drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 1 +
- 2 files changed, 2 insertions(+)
+ Documentation/devicetree/bindings/net/snps,dwmac.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-index 598eff926..b9218c07e 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-@@ -56,6 +56,7 @@ static const struct of_device_id dwmac_generic_match[] = {
- 	{ .compatible = "snps,dwmac-3.610"},
- 	{ .compatible = "snps,dwmac-3.70a"},
- 	{ .compatible = "snps,dwmac-3.710"},
-+	{ .compatible = "snps,dwmac-3.72a"},
- 	{ .compatible = "snps,dwmac-4.00"},
- 	{ .compatible = "snps,dwmac-4.10a"},
- 	{ .compatible = "snps,dwmac"},
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-index 54797edc9..e7e2d6c20 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-@@ -522,6 +522,7 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
- 	if (of_device_is_compatible(np, "st,spear600-gmac") ||
- 		of_device_is_compatible(np, "snps,dwmac-3.50a") ||
- 		of_device_is_compatible(np, "snps,dwmac-3.70a") ||
-+		of_device_is_compatible(np, "snps,dwmac-3.72a") ||
- 		of_device_is_compatible(np, "snps,dwmac")) {
- 		/* Note that the max-frame-size parameter as defined in the
- 		 * ePAPR v1.1 spec is defined as max-frame-size, it's
+diff --git a/Documentation/devicetree/bindings/net/snps,dwmac.yaml b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+index 15073627c..d26bb77eb 100644
+--- a/Documentation/devicetree/bindings/net/snps,dwmac.yaml
++++ b/Documentation/devicetree/bindings/net/snps,dwmac.yaml
+@@ -26,6 +26,7 @@ select:
+           - snps,dwmac-3.610
+           - snps,dwmac-3.70a
+           - snps,dwmac-3.710
++          - snps,dwmac-3.72a
+           - snps,dwmac-4.00
+           - snps,dwmac-4.10a
+           - snps,dwmac-4.20a
+@@ -88,6 +89,7 @@ properties:
+         - snps,dwmac-3.610
+         - snps,dwmac-3.70a
+         - snps,dwmac-3.710
++        - snps,dwmac-3.72a
+         - snps,dwmac-4.00
+         - snps,dwmac-4.10a
+         - snps,dwmac-4.20a
 -- 
 2.25.1
 
