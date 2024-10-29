@@ -1,97 +1,83 @@
-Return-Path: <netdev+bounces-140148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 41DD49B560B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:50:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F2529B561A
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:55:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2BC5B20BEA
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40CE01C21D24
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 22:55:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43CE420969B;
-	Tue, 29 Oct 2024 22:50:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE9320A5F7;
+	Tue, 29 Oct 2024 22:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CftWwSUt"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OgxM+5fz"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1981518FDC5;
-	Tue, 29 Oct 2024 22:50:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 652E11EE021;
+	Tue, 29 Oct 2024 22:55:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730242224; cv=none; b=sHYREOVL6+q62wdbkRxwfraBv4XBr+oVP0s110fOUSVdU3IPeLsBD5Jv0VYiHYNc4BqnnOYj5BgMj0LJjq7djZN9fb3JHbG1QM5i1Tt6xw4KmDamdfp1ZVixFr3VaCoRkoy+U5PHLVWgJOrwoOD9G9NsMtho485TBsQM1qJfWho=
+	t=1730242547; cv=none; b=IyuT5hSyXQVSpa/iVezELVtElucvo8Ft1R2+BORjmcgsBrF4eI0jAMZdUEUcAh6if+Fa5wnxov6gEoH648xeKqSHdnqtbSsjEbtnyKwefFYn+0wOYRioRScP4TE5l2N0kpqDCKZl1wK9a0uQrcBDWIJU1kc4SQfK8j8mrfDVnEY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730242224; c=relaxed/simple;
-	bh=krniV51Ko7jZpV+ajgbFgC9UweWVT9ARQMWOdJf6Euk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=m8vRIsszPp6jdAwmCd6wsLWAYocezgbUFmR8gc/IJYMdoHUaA9nWqC3C95sPT8O26glJA50njWAC7gLNlpb8Mm3JzG1hGj76kzyFCPE4WPi+v3ZoCA8ccR+hruSl0/7ZUYQTOf8RMQ3ACFnUVAljTMemUQSLmDA8IfboivP4c/Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CftWwSUt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3F2FC4CECD;
-	Tue, 29 Oct 2024 22:50:23 +0000 (UTC)
+	s=arc-20240116; t=1730242547; c=relaxed/simple;
+	bh=93E/kZZhkMzWuW9Vt3ZfUV+m8acW3lp/+MlaAWOEx50=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RJHtvJKHOotrx4g/FsRSgwS2zaGTWScoFtDe0XZFBfTAHDoeHx9QAQVCcpMf0LdLSQJ7iEeRKbL6BS1fGd2cwC/i7g8PDXDRCP8Xk0kt1soiL3HmikFomAOp5kdT/AcI8+l0+R5VJ84CJ49qM/om8Vb9fjzd+ou9Nqe1NJXgIy4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OgxM+5fz; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A4F0AC4CECD;
+	Tue, 29 Oct 2024 22:55:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730242223;
-	bh=krniV51Ko7jZpV+ajgbFgC9UweWVT9ARQMWOdJf6Euk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CftWwSUtLUKiR7SQfyF99kPtt5bB1JWo2DAJypOk95j6dwNVkrGDpfzsqHGlOwpDi
-	 8apb8hNu9ZltEg+cy8dupQifgUgbZz98eaaO0xVJF/qEht6Xh9zpeXgzpbTX76Jlfr
-	 IKwuN+pGLiMc6MMFrjXJsty6KABqMlVY2nmY0kyf8kh9ZthsxDacq2Al/AJ15/+xG7
-	 QzZIXPZZLhp9lwvo2zY6L5221sDmdASTSDpa+Hddsc9p/S0qN8IxeETAFEJz5n+vfI
-	 6F207nFXwpyC2o3Pu1zXnBw0DgblsBPk/465gCgUOG377LMYsEiJytF0l518kIPjR2
-	 lHf6LNRMbtlMQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 713B9380AC00;
-	Tue, 29 Oct 2024 22:50:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730242547;
+	bh=93E/kZZhkMzWuW9Vt3ZfUV+m8acW3lp/+MlaAWOEx50=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OgxM+5fzTUnVe/BU9nDms0fgGL6oQtv/37CG+foqAmC3Y29py3OBYQ2UnTHxcTcJz
+	 7d1wVHvZKERaiIRKlEop/5uwkGjK8gJ3u427SnmptaEhjJb1rHcccXECPLLFNJtAHr
+	 RnUUuaCs0FoOchAoD7+3fk1iI2KHWn9jpgo6uMvi/O5H4mWzXcWZ6lKDde2J0Fg7nc
+	 XX+OAeexOcC5UHHZOFe1VfJcvDoqow2TjJnzTk1d4i5+kGJcNKA0C6kRYObGKIp0UY
+	 p6bJhPgITdUCvn59jFD1DLA6JDvJAmDgscpFkwebCXdtprh2ZvxZHlkuUcL3qHXMuE
+	 KOr37HhUl/wFw==
+Date: Tue, 29 Oct 2024 15:55:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next] net: fjes: use ethtool string helpers
+Message-ID: <20241029155545.55ae9e30@kernel.org>
+In-Reply-To: <20241022205431.511859-1-rosenp@gmail.com>
+References: <20241022205431.511859-1-rosenp@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next v3] net: ftgmac100: refactor getting phy device handle
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173024223125.844299.5349038134200267566.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Oct 2024 22:50:31 +0000
-References: <20241022084214.1261174-1-jacky_chou@aspeedtech.com>
-In-Reply-To: <20241022084214.1261174-1-jacky_chou@aspeedtech.com>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, u.kleine-koenig@baylibre.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Tue, 22 Oct 2024 13:54:31 -0700 Rosen Penev wrote:
+> -		for (i = 0; i < ARRAY_SIZE(fjes_gstrings_stats); i++) {
+> -			memcpy(p, fjes_gstrings_stats[i].stat_string,
+> -			       ETH_GSTRING_LEN);
+> -			p += ETH_GSTRING_LEN;
+> -		}
+> +		for (i = 0; i < ARRAY_SIZE(fjes_gstrings_stats); i++)
+> +			ethtool_puts(&p, fjes_gstrings_stats[i].stat_string);
+> +
+>  		for (i = 0; i < hw->max_epid; i++) {
+>  			if (i == hw->my_epid)
+>  				continue;
+> -			sprintf(p, "ep%u_com_regist_buf_exec", i);
+> -			p += ETH_GSTRING_LEN;
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 22 Oct 2024 16:42:14 +0800 you wrote:
-> Consolidate the handling of dedicated PHY and fixed-link phy by taking
-> advantage of logic in of_phy_get_and_connect() which handles both of
-> these cases, rather than open coding the same logic in ftgmac100_probe().
-> 
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
-> ---
-> v2:
->   - enable mac asym pause support for fixed-link PHY
->   - remove fixes information
-> v3:
->   - Adjust the commit message
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next,v3] net: ftgmac100: refactor getting phy device handle
-    https://git.kernel.org/netdev/net-next/c/4dbc8d6d05b7
-
-You are awesome, thank you!
+In some of the other patches you deleted the local variable called p
+and operate on data directly. I think that's better. Plus you can
+remove the indentation here and exit early if stringset != ETH_SS_STATS
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
