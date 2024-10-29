@@ -1,197 +1,154 @@
-Return-Path: <netdev+bounces-140000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7F019B4FAC
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:44:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6F79B4FC4
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:49:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 53554B226DB
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:44:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 487EE283197
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DC291DD53B;
-	Tue, 29 Oct 2024 16:43:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D24CF198A31;
+	Tue, 29 Oct 2024 16:49:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ay2QwBnz"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="CX4RJ8cZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR02-DB5-obe.outbound.protection.outlook.com (mail-db5eur02on2066.outbound.protection.outlook.com [40.107.249.66])
+Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4255E1DBB0D;
-	Tue, 29 Oct 2024 16:43:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.249.66
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730220222; cv=fail; b=AyIbt527/MCn2yoesyi6mJr9irYNNR/Nnk7508lXCs/IPu5W4loHTljSspjhY14o9Ikvh1kiVvDr+OYPpCexC+eObXaFIY8KucJr2ImOLGtn0Q+X2s/1iJsU5KOMS9nv39B1s8bD6diGDis8EDjO+xz0OnHHIpXhie8kmAxGtjE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730220222; c=relaxed/simple;
-	bh=gMTTh6pjMpVO0SRnvd7k4foOALc45+f+sny+9BqC1Mg=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=pjT8JUyW97jnAJbs6bAIVys3F7MXsNlEsk78p3NTEPbFG6gL+PdCg9+KbgP+nj+TTuvUIOSPX/VhQTUSR7RVoNmYdOwmzrw/b2SJ/wZNkb1j6InvYpJMFzXCOo/xk3oM52kAy9TI+q78NvC7TwIhBddKwrx63DRIKz4rKrrxnEU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ay2QwBnz; arc=fail smtp.client-ip=40.107.249.66
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=aTJTdkRUqe2mC5wY15sC+e4tLrLdWTwwy7eOidfeocEJDvdV1ry6Ae7afERh3VdRmCesnxcxJNjBhQYTcF4IKJ9pxEwBn09/XGwFQhAu8o5NA7AIs4Tk5FaJKSmvug3rHNhLx6dorCnscDJu5WrYwRqaMxqKdEtd6p89RQWhMhpjgKRwXnHafP6M8GE/giYcNA0Od8F5jJ3HMMqd2viRPIUqZW1EWzUQ1Fd6PQnPKd/SHxbn7zOy+1x5/TGZEW1Bf4HgrTHRvlepk8ght0kmmRTljrPlcPBcE9QfsZDzmI9tGI9zRsZXomu5ufnQ2tV1O0ThgNWLi9vGvuYOi2lB9Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UlX4tvx4PX6V1MC1MexVEXQxjIgRjTUSiiDURBbT6pc=;
- b=olt/jf3x1wL5eJfdDkZSSwAOPOUzytQINjIiqZY/6NMR4sACqn4Rgp3m/XtpbCE9Oh6IgxJCweYRH5vSVBcaw5rdAHHP0OwYE1Yl5sx0SfQVoVIF4VkaDZiCA+awh0l1A0of3UzryqfdgOvg/QdltDwP1WtF82BdY7PRe6pb999ftcBJwmoHfxxVGESpclEku7fAZ9FxpRpeb/lCegDd6VARyAoK3VdrJ/iSkeHSuVJJ9f8/eNpMnrM7GAnIBlleoqWSmJ/Gn3O77HDOuLmH2C4o1slcXkSLIHIO0F7mKp9q6sOiZbYKsFxM4FLe7vX6iHv5F03dS+tdCI5x5L88Sg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UlX4tvx4PX6V1MC1MexVEXQxjIgRjTUSiiDURBbT6pc=;
- b=ay2QwBnzl8+Fj7g/37bBoKz8vTE9oOzF4YLFv3pAiFVNoil3GJcr87Y97r8Tq+nnxfhyHg9SmlfKbQvh4J3TuUxCgIeLmEGwbOSBbtTQEPOc9qp0EvwtZwX6EB+1B2P1to1Grt/Ker19Rpyfpr6fuO7Gr/1P1RXn0FZMHitDqAtixVrUDR+HCHv2p1uFI0iMtHxVeflXiJoV+pDxNSMs/cMW68f3ucW4HPUx0JmF9MBovMrltN1SLW0quc5uKySZQsdZ2I5BbCHnkxZNJkpsG+H4hKgutlCLrKP7pl1hC/WosDKJlUJmu7WSMSVsOwZ6qvtbzJ7ZW54u9JOf/kqgyQ==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by DUZPR04MB9871.eurprd04.prod.outlook.com (2603:10a6:10:4b1::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.24; Tue, 29 Oct
- 2024 16:43:33 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.027; Tue, 29 Oct 2024
- 16:43:33 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Radu Bulie <radu-andrei.bulie@nxp.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net-next 3/3] net: dpaa_eth: extract hash using __be32 pointer in rx_default_dqrr()
-Date: Tue, 29 Oct 2024 18:43:17 +0200
-Message-Id: <20241029164317.50182-4-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241029164317.50182-1-vladimir.oltean@nxp.com>
-References: <20241029164317.50182-1-vladimir.oltean@nxp.com>
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4PR09CA0010.eurprd09.prod.outlook.com
- (2603:10a6:20b:5e0::14) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6380F7DA81;
+	Tue, 29 Oct 2024 16:49:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730220592; cv=none; b=K7OqScYsGgZeRW6cirZfonKNUsPxAuIJdUt06cod5dSr+APKYQsgp9Y4pFYAlf39+xN/hOwg/uNQ4n7wnYuSCtkU2TFLirPpFVrGZxh/KrVDSSKw3Q7sAjivchoIvahgKLUmYXFXq9x2YoVpZxt0kDpiQ99+sCObFHb1fH8KcBY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730220592; c=relaxed/simple;
+	bh=NUvBGApMTpUXZBtyvuCf09+ZVpOnEgSubz8I3oGHx58=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=H13u8RV3TQ7eLBzuqaCiSfJPHC4JZdKnttE5QTgednr8Zu5CG2dHyHh60QH1jrRxx8TswAo5rxmKRBDZZ8v3X5PzeDa/UxZeqPUxWXf3+aXI1YmDEbSoPj6T1StBY/V5FRcXGlwIqx+gWwaAsRyzcHxJ3RspCpK2jwnw0N5uTDU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=CX4RJ8cZ; arc=none smtp.client-ip=217.70.183.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 39197C000A;
+	Tue, 29 Oct 2024 16:49:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730220581;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Oq/IS9y6GR5X9s4TTxcOReHZgXOpsa/vs1MEDyVylIc=;
+	b=CX4RJ8cZS5ZeBT/6yylQuM+pYRreeVQM6VZwtFBKPx+wENb36vCSJumMhr9qJj29JEBLat
+	rdAl8lxGTT+unSsLghqdj6WuLh+l2GZYk9xfTTrhXS3rBfncOb3jnb8fmpVAtEsizLzhkg
+	XiSdIQJ5ULsE8Pr32t0IE0YWkLgwh4XG+Qtcgu6bBRdImTp+tlXXZK2r3DNc+bOm66oMno
+	ivSbr9IrVGWJ2Wu6E9kfmYIbUdq3721H90h+OC5BHCyLKNayy/qZJesQPYpejhU5uVYgS2
+	c92bDybPZ6rmHeGMcshpIZxFCWvx/VrTPRGLekCe+qd6byS5lANUVP5D4FsD9A==
+Date: Tue, 29 Oct 2024 17:49:39 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Robert Joslyn <robert_joslyn@selinc.com>
+Cc: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <lee@kernel.org>
+Subject: Re: [RFC PATCH 2/2] net: selpcimac: Add driver for SEL PCIe network
+ adapter
+Message-ID: <20241029174939.1f7306df@fedora.home>
+In-Reply-To: <20241028223509.935-3-robert_joslyn@selinc.com>
+References: <20241028223509.935-1-robert_joslyn@selinc.com>
+	<20241028223509.935-3-robert_joslyn@selinc.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DUZPR04MB9871:EE_
-X-MS-Office365-Filtering-Correlation-Id: c3a3d34d-d44c-4574-862c-08dcf838d341
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|7416014|52116014|376014|366016|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?UZ/yN0JVvZX13KsGOwJEeWXkbnGSY4wpBaA/cfCNl4NINaEOtV9uvl4Ona21?=
- =?us-ascii?Q?bfjNY3WS2JXu/M7bHBxFlOKeNAjsRnGPX/qs/ubWWI8NLoeYB+BONqoLA8d4?=
- =?us-ascii?Q?/rCvTdhgoovsDdi/ezt83Pw1GfsdB93/1eySWN8RUcX6Pm+R9LEjbmLLgUiq?=
- =?us-ascii?Q?0hBVTO7L9eJmGEC3RImQ1JhFWlqJXoamAoBJZ6qODFbaHNoYw0dB8gind2kb?=
- =?us-ascii?Q?P3PTYA3VzX1UliTqLbVF2i2FZN2Jqq+D24JBDcjRxsF0/aaCFT6Ku6G7uzVv?=
- =?us-ascii?Q?cBptBq0yiPBAYC9f46NzDJFbaWBXPst931ed/Gau/e2zOmcT/86hYkibM1Em?=
- =?us-ascii?Q?yYuMJl4Z+1CtYA5Qxr9KkqNetrmDpmCrRqXQ/thg+TwRpqxpBqEiqaPgsEFs?=
- =?us-ascii?Q?YRXf1nU9TfMj9k095to1Dnd0sOOZpyAXulSUYuxjPmoZIJEoD462dN+rOX1W?=
- =?us-ascii?Q?zU2/QUSsMWdiDPm1vhba0qXzSHjtcSuzPECe5Beyk3g6q1l6cHIeRHzVVYQi?=
- =?us-ascii?Q?99NdmDgMgyQ2jY/o8N2W79598IKIQsYsZFeYleqawR2A8vezQSCYnKp5g896?=
- =?us-ascii?Q?1uJ/9fRloiqvAVY8VzlmHpmTL5ybo6udPfGKixtZA6vvX9Y1cPFpFXB29ucf?=
- =?us-ascii?Q?gvJKd71BEnNJBd/4I+wGJXnBz1MIY9kAuuqruqj2iVm5iafIc/gaBF9PYhcZ?=
- =?us-ascii?Q?8JdgzL7iz8LFHvKrSo4ZegegAJCNLe9ajQ3/a2oyA78ueZbALe3xMoIS8+Vp?=
- =?us-ascii?Q?FYOXiq31folp2a/weXAkbeSdzMthG/7SiLdBwFJAKblpgaSbEbIIPLJdSPFF?=
- =?us-ascii?Q?/2UKvI5Ei6rCqYibiRlHQM7aniBB7Zb1CuSKSyBYk4h7KEmY6AUfUVEIS4TA?=
- =?us-ascii?Q?YrwAf6z3bgyItoR6H54qNYdm7+2yA2KCwWc0vaZWjZVWZ7JUwfzyFdJazUUt?=
- =?us-ascii?Q?TK/LYycCXhWqYou/O8waWaFHoD+vz3ZH4bCoyJOlsb4WnYzuxD6Fy315eDDR?=
- =?us-ascii?Q?ZM5GJ8Bg5o9c1Cbk/JkoqXdxoNvxcq9fiSjYlI27Zcjet4Wd0cq4mSvEFh71?=
- =?us-ascii?Q?xG0vMqTa+OqP6UKD5cJxW9xqyqFw1dqGnE+0wMVstOmpFfcR3vc5vdVt0uR+?=
- =?us-ascii?Q?N0IxhcD7Y+4XzsNCCjIjn7g8Ge9sZdQGR8eQAD2yMUA2i2LH4cg5SRA/J1in?=
- =?us-ascii?Q?6JN0KgvK8lI1Lvs5aH4iCvpVrwwm78vqF4ZlezagZokaaB+XPs6Lw7cAF2JC?=
- =?us-ascii?Q?nNsh4NUD2BAKUOqCnJhJGK/NFzBaJmS6bIVdr8A7r4REGlbZuPBNPS+5CD9n?=
- =?us-ascii?Q?uYmPXwK5u9jDeE8eJKnCZkrtx0WRWInfwrvcft3i3y95bSpv/QiE2NgYPKLb?=
- =?us-ascii?Q?oJPcfj4=3D?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(52116014)(376014)(366016)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?V/P1oTBXVOMphf3eI3UPuyJVkv+2ohljAcMVb5NOMn9jR1j1V/nuAcwd43JP?=
- =?us-ascii?Q?S5DHyzkw4d0Fo7ux+dlXYmR5E6ilWKiXYIeXm8oibmvUPy0aY2PmOiYgkADP?=
- =?us-ascii?Q?8Ag1wSpFJEUbEmGjIto0LGCaClHXVFr/cpHlr/gBfsmPPrVfhu19nsGiDfeg?=
- =?us-ascii?Q?EU4VbL2nFWV1hkn6CoTni9tVACCci+qnYig0DyygasC339gNnZpueLT3cRE9?=
- =?us-ascii?Q?qRyvZlAcTASqeaYVTZzIWfa1gvJuSTBeWM0AZz9YxoAZuV3L6vfyveJTbp3G?=
- =?us-ascii?Q?MUe3u84V14GsAF5CewW9aM62NOc1YcgGFWjf80/t/qBV1PAtLCXZIfvVphCY?=
- =?us-ascii?Q?cA/durxWhDM/h6cmqGuC1f52EBM0Oz8Iru9Ang8QXMGeZdITlUX2ZeDZ5/+u?=
- =?us-ascii?Q?T8HfJsUr7pjh3BD39XJSjM6qNfZFiKaKh3GPNqNR9dS4jqJb4q0yBrFGxes0?=
- =?us-ascii?Q?D9uLf/LIfYr57/mPtrJU2wU/dnmuUrkrspP9o8YPAKw0rfIK7Zk1avAiTR1c?=
- =?us-ascii?Q?AvMQ1267x8Qc6rZpgJv0AAfByUJFkUSdFJdd9tfp3qo9zfupjNQs70tXpMSq?=
- =?us-ascii?Q?1MhSHVs83GP4AEGlozIxtE9MZNtJOCjGpQ8eQxUaCZguAesoRzks3kY2T2vL?=
- =?us-ascii?Q?nspUq3t07ax5tbfFFXlDcZUi7AskYMfAqpoM/llBegQkBWwNqQcukjs++9mF?=
- =?us-ascii?Q?gw8brnlLVNUDa2SWyOC1sFX4qMX20bKw2qE0CCsYL35ag9wGYbnrCWy2W67T?=
- =?us-ascii?Q?MW7s2b4xTytn+OCgydXXSt3Lh25edZxMg0B/FTiiCKsgKODyaPwY765FNNoI?=
- =?us-ascii?Q?DinVXtQC7lbTi+emvjmcPQGA+D1PZhHsE2fM5LeDVxnTfXUIhN/6iehXkEVn?=
- =?us-ascii?Q?VtPXZ6fe1klzi2hwjdFB+BT7SgMdVjWr5x+/yRv4T2qBfmlL325EbVw1mkfq?=
- =?us-ascii?Q?YYRmMQN/14sHZ2Kb7OckTnHN0K03Xl+v5AG+jSIGNZcC5ZAABfJSwepXrZDq?=
- =?us-ascii?Q?tmdskp35oJOxWwaqlU3A7GSDn6NsiTqEPJBGCc+HIkbtEhSPccoFn16kXYIp?=
- =?us-ascii?Q?3yzuaJC7iw/h8Te6FzDClyc39UvXbrGq9Z7ZpnHcY99mHwpJ9W3N+f1/dn4v?=
- =?us-ascii?Q?oLQdgzpj9JrOuLfMxYAT0yBzkcuq+XYc6p76nheB9QyIIjk8bB3mz7CqgXFl?=
- =?us-ascii?Q?gjPvapgEW47aXljoXx3TCftToUN1Y9l0oR5bjZnjaDCdDyikEUCSjrrIJiwr?=
- =?us-ascii?Q?Zl0aQ/aCPjDXOUEj+cWnLG3o79e9rW4o/HLsFwWCQeMZUNEdQKhHHEegGUvv?=
- =?us-ascii?Q?+3TVhbuT8APMA0PO3lbEreRD9ivsMEwlPxZlqmlrGYZFiRQm1Xz2S9Mb+iBZ?=
- =?us-ascii?Q?bjitBgt/+NLrYtp5cYALzXvk6bJrxq6ths4KDAELX1KaTpTo830bMDKX4/AQ?=
- =?us-ascii?Q?65kAl7DbEQ09QIcb+siZhUO0gIPPKWY2445pz1RlqdnUY+LK39H2BTC+h9+3?=
- =?us-ascii?Q?8eNUvNi5iyU4Q/2j3WmzQ9EPSOV3tZ9lfYM+oT522PmrIATaDsGe8rkKMrb4?=
- =?us-ascii?Q?LA8TCeVr0SmboV2yEbrcUenGxkwS6DvlZLoR2R3f96mjovKpsWvus6FMpA2I?=
- =?us-ascii?Q?hA=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c3a3d34d-d44c-4574-862c-08dcf838d341
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 16:43:32.9899
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: xwx3zVYtpcLVaQjU8lO2kz3576C2gXphFgZfWkCPo98zoEPuNO793D3zxvWOgIKt1d23Srvddbgklmqw9SgCjw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DUZPR04MB9871
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Sparse provides the following output:
+Hello,
 
-warning: cast to restricted __be32
+On Mon, 28 Oct 2024 15:35:08 -0700
+Robert Joslyn <robert_joslyn@selinc.com> wrote:
 
-This is a harmless warning due to the fact that we dereference the hash
-stored in the FD using an incorrect type annotation. Suppress the
-warning by using the correct __be32 type instead of u32. No functional
-change.
+> Add support for SEL FPGA based network adapters. The network device is
+> implemented as an FPGA IP core and enumerated by the selpvmf driver.
+> This is used on multiple devices, including:
+>  - SEL-3350 mainboard
+>  - SEL-3390E4 card
+>  - SEL-3390T card
 
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/ethernet/freescale/dpaa/dpaa_eth.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+Make sure that you get the right people as recipients for this
+patchset. You would need at least the net maintainers, make sure to use
+the scripts/get_maintainers.pl tool to know who to send the patch to.
 
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-index e280013afa63..bf5baef5c3e0 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth.c
-@@ -2772,7 +2772,7 @@ static enum qman_cb_dqrr_result rx_default_dqrr(struct qman_portal *portal,
- 	if (net_dev->features & NETIF_F_RXHASH && priv->keygen_in_use &&
- 	    !fman_port_get_hash_result_offset(priv->mac_dev->port[RX],
- 					      &hash_offset)) {
--		hash = be32_to_cpu(*(u32 *)(vaddr + hash_offset));
-+		hash = be32_to_cpu(*(__be32 *)(vaddr + hash_offset));
- 		hash_valid = true;
- 	}
- 
--- 
-2.34.1
+> 
+> Signed-off-by: Robert Joslyn <robert_joslyn@selinc.com>
+> ---
+>  MAINTAINERS                                  |   1 +
+>  drivers/net/ethernet/Kconfig                 |   1 +
+>  drivers/net/ethernet/Makefile                |   1 +
+>  drivers/net/ethernet/sel/Kconfig             |  31 +
+>  drivers/net/ethernet/sel/Makefile            |  22 +
+>  drivers/net/ethernet/sel/ethtool.c           | 404 ++++++++
+>  drivers/net/ethernet/sel/ethtool.h           |  17 +
+>  drivers/net/ethernet/sel/hw_interface.c      | 410 ++++++++
+>  drivers/net/ethernet/sel/hw_interface.h      |  46 +
+>  drivers/net/ethernet/sel/mac_main.c          | 155 +++
+>  drivers/net/ethernet/sel/mdio.c              | 166 ++++
+>  drivers/net/ethernet/sel/mdio.h              |  15 +
+>  drivers/net/ethernet/sel/mii.c               | 422 +++++++++
+>  drivers/net/ethernet/sel/mii.h               |  21 +
+>  drivers/net/ethernet/sel/mii_interface.c     | 133 +++
+>  drivers/net/ethernet/sel/mii_interface.h     |  23 +
+>  drivers/net/ethernet/sel/netdev.c            | 946 +++++++++++++++++++
+>  drivers/net/ethernet/sel/netdev.h            |  24 +
+>  drivers/net/ethernet/sel/netdev_isr.c        | 245 +++++
+>  drivers/net/ethernet/sel/netdev_isr.h        |  20 +
+>  drivers/net/ethernet/sel/netdev_rx.c         | 785 +++++++++++++++
+>  drivers/net/ethernet/sel/netdev_rx.h         |  17 +
+>  drivers/net/ethernet/sel/netdev_tx.c         | 647 +++++++++++++
+>  drivers/net/ethernet/sel/netdev_tx.h         |  22 +
+>  drivers/net/ethernet/sel/pci_mac.h           | 290 ++++++
+>  drivers/net/ethernet/sel/pci_mac_hw_regs.h   | 370 ++++++++
+>  drivers/net/ethernet/sel/pci_mac_sysfs.c     | 642 +++++++++++++
+>  drivers/net/ethernet/sel/pci_mac_sysfs.h     |  14 +
+>  drivers/net/ethernet/sel/sel_pci_mac_ioctl.h |  25 +
+>  drivers/net/ethernet/sel/sel_phy.h           |  91 ++
+>  drivers/net/ethernet/sel/sel_phy_broadcom.c  | 316 +++++++
+>  drivers/net/ethernet/sel/sel_phy_broadcom.h  |  15 +
+>  drivers/net/ethernet/sel/sel_phy_marvell.c   | 458 +++++++++
+>  drivers/net/ethernet/sel/sel_phy_marvell.h   |  15 +
+>  drivers/net/ethernet/sel/sel_phy_ti.c        | 419 ++++++++
+>  drivers/net/ethernet/sel/sel_phy_ti.h        |  14 +
+>  drivers/net/ethernet/sel/sel_soft_phy.c      |  98 ++
+>  drivers/net/ethernet/sel/sel_soft_phy.h      |  15 +
+>  drivers/net/ethernet/sel/semaphore.h         |  85 ++
+>  drivers/net/ethernet/sel/sfp.c               | 615 ++++++++++++
+>  drivers/net/ethernet/sel/sfp.h               |  61 ++
 
+I haven't reviewed the code itself as this is a biiiiig patch, I
+suggest you try to split it into more digestable patches, focusing on
+individual aspects of the driver.
+
+One thing is the PHY support as you mention in the cover-letter, in the
+current state this driver re-implements PHY drivers from what I
+understand. You definitely need to use the kernel infra for PHY
+handling.
+
+As it seems this driver also re-implements SFP entirely, I suggest you
+look into phylink [1]. This will help you supporting the PHYs and SFPs.
+You can take a look at the mvneta.c and mvpp2 drivers for examples.
+
+Make sure you handle the mdio bus control using the dedicated framework
+(see mii_bus et al.).
+
+I'd be happy to give you more reviews, but this would be a more
+manageable task with smaller patches :)
+
+Best regards,
+
+Maxime
 
