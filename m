@@ -1,150 +1,107 @@
-Return-Path: <netdev+bounces-140037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD16C9B5189
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:07:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 201539B5190
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64C9D1F232FA
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:07:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BB775B21BEF
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:08:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22ED51DCB31;
-	Tue, 29 Oct 2024 18:07:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84BAF1DD539;
+	Tue, 29 Oct 2024 18:08:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tOSSaaia"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE1E196D9D
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 18:07:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 573541DB929;
+	Tue, 29 Oct 2024 18:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730225257; cv=none; b=qUEDjCSe/7hlsIPef7IXbLbU98hhOi/q8qMAZYCijvn7dBn88HkRDmUsGgxLhOPha/mQ9g0rbpKpfGFI61xsA63/fWk3XENmFnzRjABvwipw9FXxxUzyVd6tJ7aLHIiWjuuWBArO1s+HZ9EXoKccBkbaFtPBJyYYJEagkuSwu54=
+	t=1730225327; cv=none; b=Q4r/Xwe0Fp/xNQnx6UC47S2mcEsnWv1KGDmy1h6KxVNdUDUxlvangX8cWPQHit7Ltx31qOYNDHDbob2Az8aZKrjiFFNXnnrnQrh5GjLqjYciYq4+oSqEHUUMEz2uaRJuhLasHafeM6ougm7HexHxm3m3iY2EKFDjyDotUKvFg6I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730225257; c=relaxed/simple;
-	bh=lyc//tRZ3h5BN3hUpjX0thNYWX5LvgJTypVOx8uWeZo=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=D7vWco5V8fruBngw9F1mNJGCm+HgCyUOdn1RVFGaKQi/zc+fKw4SNuk5dgDF7q0EBWygIXW6v787Z/dOtLMDynRmOS8ZngvcnHgjBXCVwYk70F3YsKMn5AT4tfTWJYUWIle7nZlhf9TavFmI6NeCu+2iG3etMDOCfIhL97w2Z9I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a4e77be28dso41800915ab.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 11:07:34 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730225254; x=1730830054;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Bx2vTST5OInC4SnAK0To7h7zrS6Xfw6UVx9K6oh8eEI=;
-        b=lgJ/gf/LmMciXm2BOKakZdcM1aZum/A53iuzQ25kZmqWQ7itq1tgtZSyp+SdiYBijP
-         Oz57jP/Dt03JlY7aqBvRtnBdm8bQbWXPPflvghN8QgSvkUBL4Wnqv9uJ0dr3bLC7KQ8K
-         T9lE2xrPD+8rVmpIxszkbrJT/T54VsIZRjYsx/QWzt987oqFn1BFMd5w+aW9OdVdfjzU
-         9tQm4KeX788LwHplwyJW/hH0VCdcwTaOxblSl7dtpDr4lk862FBF7A364W2Qb3vOCV27
-         CddkdjuVYWkPNQVnWrgnM7meM/5RpFcuFNXdClz2+mFrg+t00byjqXhqIq9mRW2GLgsi
-         cIQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUm4tE5JsXGd6bVFD9BEvSO23Qq8xbx88rAy1pRPsx7QDMKUss+Vt12fBlyIfksq3UFDehrSjs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwabZZOSOn1oC2NZvCaz7DZAZzyr4tnAyAVFaOCRH+oPUoUxmv6
-	HnQxxEsTNCwgLl8odpfHX4QEZU7GW8Nmq8liyGe57aN+MHerxaXUqtkpSH7uyWxPMgPZlmwCUua
-	CiUeljOAboAqhdMaM4NcV+MJRuT66udpZrNFQxH61yTJRuVxiaQ6GbQ4=
-X-Google-Smtp-Source: AGHT+IE1nuVQz2gIc/wBO7ngKXOwNm6k9OG5oUitV2Yh5laZVwloKwjqxfMg6wMpdCt2Lch93tG1yiDkqHLwtQb7SPTZ1RY6bXKw
+	s=arc-20240116; t=1730225327; c=relaxed/simple;
+	bh=iJLj11O4g41SPsxiCL9Pj63IUN3VrnEb2c1RDciZciU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LhBnQVD8m2RPQObH4uMXmasbkU/pd8fQZaI0rUznu2RNDI01Pwo2Km8b24k06KgoEVYUW+CIUsYeyzm2iK3Dn2BZM8q7VmV8pw5VX5Xi9/YL+//C2p+Za+GVcfX+zSX505jSk4pWPnTiubWFSIuCwGu0B5zmaArCoT58XUHABdA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tOSSaaia; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23E05C4CECD;
+	Tue, 29 Oct 2024 18:08:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730225326;
+	bh=iJLj11O4g41SPsxiCL9Pj63IUN3VrnEb2c1RDciZciU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=tOSSaaiaWNoPAl+nKlkGkrJBdelh/1LB7gZ1HgrEAnpXCM4BLsnAIX1xrhOymWEp9
+	 lddeFvmBx0/JHKOx+ze17PmAYvSBntBmR/0wrwoQ1MOyQZxJTJdMfhBYJjZs3/n8pE
+	 nYnI7kHTFSUrtrUM/QYCuNFngoaHDvF+xwdK2xJF5qznxWC756r7fNUW0h9HLJwkT3
+	 WHleKVF23wqifyHtVmmVDQDM31QVvG5MwfXSDv7gOGX6Oq9Roku1J6TrPRuLpr4Fi9
+	 Bk8DzyvroAlbMLRqsqh5UyU3QRP8pzT3I0GZDivtwZ6YnfG56EnmYe3gOexetahgBx
+	 H+DGsGFQB653w==
+Date: Tue, 29 Oct 2024 11:08:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Michael Chan
+ <michael.chan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
+ Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
+ Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 2/2][next] net: ethtool: Avoid thousands of
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <20241029110845.0f9bb1cc@kernel.org>
+In-Reply-To: <f6c90a57-0cd6-4e26-9250-8a63d043e252@embeddedor.com>
+References: <cover.1729536776.git.gustavoars@kernel.org>
+	<f4f8ca5cd7f039bcab816194342c7b6101e891fe.1729536776.git.gustavoars@kernel.org>
+	<20241029065824.670f14fc@kernel.org>
+	<f6c90a57-0cd6-4e26-9250-8a63d043e252@embeddedor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17cf:b0:3a0:9238:d38 with SMTP id
- e9e14a558f8ab-3a4ed293143mr120662855ab.10.1730225254109; Tue, 29 Oct 2024
- 11:07:34 -0700 (PDT)
-Date: Tue, 29 Oct 2024 11:07:34 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67212466.050a0220.4735a.0261.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in ieee80211_mark_sta_auth
-From: syzbot <syzbot+542f74e8fc8361630178@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello,
+On Tue, 29 Oct 2024 10:55:14 -0600 Gustavo A. R. Silva wrote:
+> On 29/10/24 07:58, Jakub Kicinski wrote:
+> > On Mon, 21 Oct 2024 13:02:27 -0600 Gustavo A. R. Silva wrote:  
+> >> @@ -3025,7 +3025,7 @@ static int bnxt_set_link_ksettings(struct net_device *dev,
+> >>   {
+> >>   	struct bnxt *bp = netdev_priv(dev);
+> >>   	struct bnxt_link_info *link_info = &bp->link_info;
+> >> -	const struct ethtool_link_settings *base = &lk_ksettings->base;
+> >> +	const struct ethtool_link_settings_hdr *base = &lk_ksettings->base;  
+> > 
+> > Please improve the variable ordering while at it. Longest list first,
+> > so move the @base definition first.  
+> 
+> OK. This would end up looking like:
+> 
+> 	const struct ethtool_link_settings_hdr *base = &lk_ksettings->base;
+> 	struct bnxt *bp = netdev_priv(dev);
+> 	struct bnxt_link_info *link_info = &bp->link_info;
 
-syzbot found the following issue on:
+Correct, one step at a time.
 
-HEAD commit:    94c11e852955 usb: add support for new USB device ID 0x17EF..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=1112615f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=309bb816d40abc28
-dashboard link: https://syzkaller.appspot.com/bug?extid=542f74e8fc8361630178
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17914540580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1512615f980000
+> >> @@ -62,7 +62,7 @@ static int linkmodes_reply_size(const struct ethnl_req_info *req_base,
+> >>   {
+> >>   	const struct linkmodes_reply_data *data = LINKMODES_REPDATA(reply_base);
+> >>   	const struct ethtool_link_ksettings *ksettings = &data->ksettings;
+> >> -	const struct ethtool_link_settings *lsettings = &ksettings->base;
+> >> +	const struct ethtool_link_settings_hdr *lsettings = &ksettings->base;  
+> > 
+> > here it was correct and now its not  
+> 
+> I don't think you want to change this. `lsettings` is based on `ksettings`. So,
+> `ksettings` should go first. The same scenario for the one below.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/86f5604d3b74/disk-94c11e85.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/8be1f807098d/vmlinux-94c11e85.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/c343d3004f40/bzImage-94c11e85.xz
+In which case you need to move the init out of line.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+542f74e8fc8361630178@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-wlan1: STA 08:02:11:00:00:00 not found
-WARNING: CPU: 1 PID: 3541 at net/mac80211/mlme.c:4264 ieee80211_mark_sta_auth+0x36c/0x400 net/mac80211/mlme.c:4264
-Modules linked in:
-CPU: 1 UID: 0 PID: 3541 Comm: kworker/u8:12 Not tainted 6.12.0-rc4-syzkaller-00174-g94c11e852955 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: events_unbound cfg80211_wiphy_work
-RIP: 0010:ieee80211_mark_sta_auth+0x36c/0x400 net/mac80211/mlme.c:4264
-Code: 90 0f 0b 90 e9 8a fd ff ff e8 d0 6c 46 f6 c6 05 f0 66 b8 04 01 90 48 c7 c7 c0 39 2b 8d 48 8b 34 24 4c 89 fa e8 65 66 07 f6 90 <0f> 0b 90 90 eb 8e 48 c7 c1 7c 32 1d 90 80 e1 07 80 c1 03 38 c1 0f
-RSP: 0018:ffffc9000ceaf5a0 EFLAGS: 00010246
-RAX: c531a4dfe0f61700 RBX: 00000000ffffa569 RCX: ffff8880328f0000
-RDX: 0000000000000000 RSI: 0000000000000001 RDI: 0000000000000000
-RBP: 00000000ffffa755 R08: ffffffff8155d402 R09: fffffbfff1cf9fe0
-R10: dffffc0000000000 R11: fffffbfff1cf9fe0 R12: ffff8880300e8cc0
-R13: 00000000ffffa755 R14: dffffc0000000000 R15: ffff888021b19bb0
-FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00005555876caca8 CR3: 0000000034b10000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- ieee80211_rx_mgmt_auth net/mac80211/mlme.c:4370 [inline]
- ieee80211_sta_rx_queued_mgmt+0x2527/0x4d40 net/mac80211/mlme.c:7475
- ieee80211_iface_process_skb net/mac80211/iface.c:1600 [inline]
- ieee80211_iface_work+0x762/0xf20 net/mac80211/iface.c:1657
- cfg80211_wiphy_work+0x2db/0x490 net/wireless/core.c:440
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa63/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f0/0x390 kernel/kthread.c:389
- ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Thanks.
 
