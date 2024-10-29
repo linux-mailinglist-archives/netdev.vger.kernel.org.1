@@ -1,195 +1,100 @@
-Return-Path: <netdev+bounces-139825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 157A39B44DA
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:50:48 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FD219B44EF
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:53:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 757B4B22BC0
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:50:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55AB5283BEA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:53:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5B282040B5;
-	Tue, 29 Oct 2024 08:49:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4866A2038DD;
+	Tue, 29 Oct 2024 08:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="aqu9yBjf"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B1AC204096
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092BB202F65;
+	Tue, 29 Oct 2024 08:53:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730191786; cv=none; b=SidXKm0MVziYZXxBk8/hhZPJWP6plC5VRyd10Ja37pUrHa1OHD/PA/htG+i9tyaia0AvAgqPpMG5dg5bIPin0OBYGx2Gwl6Lle024RZkny3j629lCf5UjQd50Lmh8IbIb8cifmITYBI3C07cR2NiitNeaYcj+FX4PTV97jEqWY0=
+	t=1730192027; cv=none; b=YIAfnEym/rQXFsYBVISfS7YV7F6u7kPmi77hbG1ADzKRKU/DJfORtLA0v3Or9tltk1ZJA8R5VUH9b2fQ0kKAEpWjxOOaBNKqPIwIJu8ajJsgWIsH9nq650ek937FTLnwbDB7gVGB90g9qo8PTTd/bX8DiPrHEGI5eBOZ/8OmoSU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730191786; c=relaxed/simple;
-	bh=V0gJK34+R44Nxz5p4bEW0/efUib90BQ+rA/46N/6EnY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FO9jWjeeOemCl2COKvK43Pzd0CZATC/FhAHe1f2eciowhriN+WGhySm0yC0E/swiReT5yxCD6DC+zpmm5FToQX6oLpwW7hOVTNu45LnSfJhGRl9wEXJiwW6S7eufhVAwRBOQKp4tPwb5uoBobvmbX+FS9ZZCVdfkmmTUporTAJU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t5hun-0001By-5t; Tue, 29 Oct 2024 09:49:25 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t5hul-000zmf-1H;
-	Tue, 29 Oct 2024 09:49:23 +0100
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 06D593613B3;
-	Tue, 29 Oct 2024 08:49:23 +0000 (UTC)
-Date: Tue, 29 Oct 2024 09:49:22 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Dario Binacchi <dario.binacchi@amarulasolutions.com>
-Cc: linux-kernel@vger.kernel.org, linux-amarula@amarulasolutions.com, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Gal Pressman <gal@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Kory Maincent <kory.maincent@bootlin.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Sabrina Dubroca <sd@queasysnail.net>, Shannon Nelson <shannon.nelson@amd.com>, 
-	Simon Horman <horms@kernel.org>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC PATCH v2 1/6] can: dev: add generic function
- can_update_bus_error_stats()
-Message-ID: <20241029-poised-augmented-binturong-1fde9f-mkl@pengutronix.de>
-References: <20241029084525.2858224-1-dario.binacchi@amarulasolutions.com>
- <20241029084525.2858224-2-dario.binacchi@amarulasolutions.com>
+	s=arc-20240116; t=1730192027; c=relaxed/simple;
+	bh=NUDfHzpgvwtFN8S/aGIOzqeUmw35b48McIqHcpnpjA8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=uEpK95hX8QPdvjkhXR6Xex5+XjNUap9cp9f0aMPjmpa9yTfJY23vwFOg944duSXRSQ7pUFLcAuMeSilDOWM7JwWBuQqtmRXDLSeNZL/FrO6oLXn5N9cZkzoWb++gQIcEL7+3lf277g03+gPifAnPXNXRU6KIcyiHZZfVZSY4Zs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=aqu9yBjf; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730192015; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	bh=C4q6AZ5epUS0ebuNy5NrOSpGSl5KxkoPC+ENG01pkzQ=;
+	b=aqu9yBjfUvfEqNLUhxmXGNW8KGvjRvQpGpm0MaSWP9KC8pd7bFTwgvfnVByFHVitVUzDRmhOIZdjDc9VOre721Etex9oWqX+/AdkQKVMzk3UXIz11r1lceKLs7Gp+y4x2qZeNsTtLMYh7TJDReVGkiduV9INA1iU7xHAVbUt97k=
+Received: from 30.221.150.77(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WI9XYwI_1730192012 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 29 Oct 2024 16:53:33 +0800
+Message-ID: <8ef927a3-050b-4d5f-9298-efc58f6a57bb@linux.alibaba.com>
+Date: Tue, 29 Oct 2024 16:53:31 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="nb27cg7aycdxcprh"
-Content-Disposition: inline
-In-Reply-To: <20241029084525.2858224-2-dario.binacchi@amarulasolutions.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/4] net/smc: Introduce smc_bpf_ops
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: kgraul@linux.ibm.com, wenjia@linux.ibm.com, jaka@linux.ibm.com,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, pabeni@redhat.com,
+ song@kernel.org, sdf@google.com, haoluo@google.com, yhs@fb.com,
+ edumazet@google.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ jolsa@kernel.org, guwen@linux.alibaba.com, kuba@kernel.org,
+ davem@davemloft.net, netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, bpf@vger.kernel.org, dtcccc@linux.alibaba.com
+References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+ <1729737768-124596-4-git-send-email-alibuda@linux.alibaba.com>
+ <74c06b43-095f-414a-b4aa-2addbe610336@linux.dev>
+ <e398770a-1ab5-478b-820d-16c6060e0008@linux.alibaba.com>
+ <0e5712f2-7ecc-457a-afb7-4b304eb1bffa@linux.dev>
+Content-Language: en-US
+From: "D. Wythe" <alibuda@linux.alibaba.com>
+In-Reply-To: <0e5712f2-7ecc-457a-afb7-4b304eb1bffa@linux.dev>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
 
---nb27cg7aycdxcprh
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [RFC PATCH v2 1/6] can: dev: add generic function
- can_update_bus_error_stats()
-MIME-Version: 1.0
 
-Hello Dario,
+On 10/26/24 2:30 AM, Martin KaFai Lau wrote:
+> On 10/25/24 4:05 AM, D. Wythe wrote:
+>> Our main concern is to avoid introducing kfuncs as much as possible. For our subsystem, we might 
+>> need to maintain it in a way that maintains a uapi, as we certainly have user applications 
+>> depending on it.
+> 
+> The smc_bpf_ops can read/write the tp and ireq. In patch 4, there is 'tp->syn_smc = 1'. I assume the 
+> real bpf prog will read something from the tp to make the decision also. Note that tp/ireq is also 
+> not in the uapi but the CO-RE can help in case the tp->syn_smc bool is moved around.
+> 
+>  From looking at the selftest in patch 4 again, I think all it needs is for the bpf prog (i.e. the 
+> ops) to return a bool instead of allowing the bpf prog to write or call a kfunc to change the tp/ireq.
+> 
 
-On 29.10.2024 09:44:45, Dario Binacchi wrote:
-> The function aims to generalize the statistics update by centralizing
-> the related code, thus avoiding code duplication.
->=20
-> Signed-off-by: Dario Binacchi <dario.binacchi@amarulasolutions.com>
-> ---
+Hi Martin,
 
-no proper review, just found that double assignment.
+At the beginning, I did modify it by returning values, but later I wanted to make this ops more 
+universal, so I considered influencing the behavior by modifying the tp without returning any value. 
+But considering we currently do not have any other needs, perhaps modifying it by returning a value 
+would be more appropriate.
 
-Marc
+And If that's the case, we won't need to add new prog parameters to the struct_access anymore. I'll 
+try this in the next series.
 
->=20
-> (no changes since v1)
->=20
->  drivers/net/can/dev/dev.c | 30 ++++++++++++++++++++++++++++++
->  include/linux/can/dev.h   |  1 +
->  2 files changed, 31 insertions(+)
->=20
-> diff --git a/drivers/net/can/dev/dev.c b/drivers/net/can/dev/dev.c
-> index 6792c14fd7eb..0a3b1aad405b 100644
-> --- a/drivers/net/can/dev/dev.c
-> +++ b/drivers/net/can/dev/dev.c
-> @@ -16,6 +16,36 @@
->  #include <linux/gpio/consumer.h>
->  #include <linux/of.h>
-> =20
-> +void can_update_bus_error_stats(struct net_device *dev, struct can_frame=
- *cf)
-> +{
-> +	struct can_priv *priv =3D netdev_priv(dev);
-                                ^^^^^^^^^^^^^^^^
-> +	bool rx_errors =3D false, tx_errors =3D false;
-> +
-> +	if (!cf || !(cf->can_id & (CAN_ERR_PROT | CAN_ERR_BUSERROR)))
-> +		return;
-> +
-> +	priv =3D netdev_priv(dev);
-               ^^^^^^^^^^^^^^^^
-> +	priv->can_stats.bus_error++;
-> +
-> +	if ((cf->can_id & CAN_ERR_ACK) && cf->data[3] =3D=3D CAN_ERR_PROT_LOC_A=
-CK)
-> +		tx_errors =3D true;
-> +	else if (cf->data[2] & (CAN_ERR_PROT_BIT1 | CAN_ERR_PROT_BIT0))
-> +		tx_errors =3D true;
-> +
-> +	if (cf->data[2] & (CAN_ERR_PROT_FORM | CAN_ERR_PROT_STUFF))
-> +		rx_errors =3D true;
-> +	else if ((cf->data[2] & CAN_ERR_PROT_BIT) &&
-> +		 (cf->data[3] =3D=3D CAN_ERR_PROT_LOC_CRC_SEQ))
-> +		rx_errors =3D true;
-> +
-> +	if (rx_errors)
-> +		dev->stats.rx_errors++;
-> +
-> +	if (tx_errors)
-> +		dev->stats.tx_errors++;
-> +}
-> +EXPORT_SYMBOL_GPL(can_update_bus_error_stats);
-> +
->  static void can_update_state_error_stats(struct net_device *dev,
->  					 enum can_state new_state)
->  {
-> diff --git a/include/linux/can/dev.h b/include/linux/can/dev.h
-> index 23492213ea35..0977656b366d 100644
-> --- a/include/linux/can/dev.h
-> +++ b/include/linux/can/dev.h
-> @@ -201,6 +201,7 @@ void can_state_get_by_berr_counter(const struct net_d=
-evice *dev,
->  				   enum can_state *rx_state);
->  void can_change_state(struct net_device *dev, struct can_frame *cf,
->  		      enum can_state tx_state, enum can_state rx_state);
-> +void can_update_bus_error_stats(struct net_device *dev, struct can_frame=
- *cf);
-> =20
->  #ifdef CONFIG_OF
->  void of_can_transceiver(struct net_device *dev);
-> --=20
-> 2.43.0
->=20
->=20
+Thanks,
+D. Wythe
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---nb27cg7aycdxcprh
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcgoZAACgkQKDiiPnot
-vG9DJAf+IjRLKjCVJmbmPHaFHXnHTKmBia/tOnLejXkcSE3gM0yImO4wx/e0/fR9
-xlq+iP4nhtpxNRjSwxsxo+hID2VY/upEB3myC/2X3tqd415vVcjTtGlhUcqE8SZD
-fItDimabq/cKdfOy4nXn3K+zXUNDp47253zMpaS00I/wiKG0hmhFQcYFN0oF1gP+
-semFdCcB6pt4ju4PiSsc4hdszCKa+BCEOH3hlbJlVuc9+Ll0E0Cfc9RE+wk8kW9Y
-qgZHo6kndqMeasM5iKn0k7GfOSObhcK1ti/imvhiu8//EMJd2Tdxa/RHySNiIYT4
-8WtAyaSoQiyhXtHxgeHIql4EDU89Lg==
-=AU70
------END PGP SIGNATURE-----
-
---nb27cg7aycdxcprh--
 
