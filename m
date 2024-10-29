@@ -1,117 +1,103 @@
-Return-Path: <netdev+bounces-139970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B85A9B4D4B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:14:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B953E9B4D56
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:15:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A187128465D
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:14:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7D7A5283206
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:15:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77774194A70;
-	Tue, 29 Oct 2024 15:14:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23E3418FC9D;
+	Tue, 29 Oct 2024 15:15:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Tg7ldVYG"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46329193079;
-	Tue, 29 Oct 2024 15:14:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238FF747F;
+	Tue, 29 Oct 2024 15:15:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730214852; cv=none; b=ALxRfYH2NRmXgM6pHwW0JVFPqO4BydWj7GGdjgv+5d7jf7avYYt1anNmjJKRZXZYNvKIBa6ewB99K6xkdWUCXTekI3ds38acMk+h2jW64jMQzGQUhUpnMwglwDsaX+THRn5xfdv/Ee+8md8kEwqjFbC5BzvvskZGCvc8LfuKa/o=
+	t=1730214929; cv=none; b=Abm3WTx1cwIqi8AtcvNVpBz84jE3d7qqjT1VXZsfrcdVqem9Djn/HGTEQe8/Vr+iXtGvnIJX5Nm2LoQ/xl0mEYRmXkJGeqgsYINvyRvR5avNV3gIwfgrsJjKM2l4ft1cmDFNBu5ELX7Zj7TNVI4Gx4wqtUCJr3SyaTqmGKm2ASg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730214852; c=relaxed/simple;
-	bh=WgGpLyjBU3b3E5OLUPA1vuXbqM43Xq5gfghAo706Pg8=;
-	h=Date:From:To:CC:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IMFUoW9iwv3PNRrqBJ8FuBOt16fE2BOz3BW6QD7IkHJIq5fRVhzEISRBEtu+ImGXZoOUmq/wA7JB9tROv4qBzATpBUmbf4nghmTIbUM/axlu2rW9xvaaS5L8absSbOb05IKFC7t6L9u6fWd0okxs8wrPPnpe5UfcGpLjcyc2jbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=Huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.18.186.231])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XdDJz09xyz6D8Wn;
-	Tue, 29 Oct 2024 23:12:51 +0800 (CST)
-Received: from frapeml500008.china.huawei.com (unknown [7.182.85.71])
-	by mail.maildlp.com (Postfix) with ESMTPS id 94C211404F5;
-	Tue, 29 Oct 2024 23:14:06 +0800 (CST)
-Received: from localhost (10.203.177.66) by frapeml500008.china.huawei.com
- (7.182.85.71) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.1.2507.39; Tue, 29 Oct
- 2024 16:14:05 +0100
-Date: Tue, 29 Oct 2024 15:14:04 +0000
-From: Jonathan Cameron <Jonathan.Cameron@Huawei.com>
-To: Alejandro Lucero Palau <alucerop@amd.com>
-CC: <alejandro.lucero-palau@amd.com>, <linux-cxl@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <dan.j.williams@intel.com>,
-	<martin.habets@xilinx.com>, <edward.cree@amd.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>
-Subject: Re: [PATCH v4 02/26] sfc: add cxl support using new CXL API
-Message-ID: <20241029151404.000034be@Huawei.com>
-In-Reply-To: <b6c1ced9-0038-7819-8e61-7e486da8bd35@amd.com>
-References: <20241017165225.21206-1-alejandro.lucero-palau@amd.com>
-	<20241017165225.21206-3-alejandro.lucero-palau@amd.com>
-	<20241025150314.00007122@Huawei.com>
-	<b6c1ced9-0038-7819-8e61-7e486da8bd35@amd.com>
-Organization: Huawei Technologies Research and Development (UK) Ltd.
-X-Mailer: Claws Mail 4.1.0 (GTK 3.24.33; x86_64-w64-mingw32)
+	s=arc-20240116; t=1730214929; c=relaxed/simple;
+	bh=XTdAOFFPHoByAW0zEX+1bZ8Eb08mn2sn6pazzDy8SQ8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=X++KXxU52lTcxac3rGQX2ZubrPH8tC76ytnShrOGd8Ndl67z/aJHwqmjaBJ/hyvvIZXZHWs9F/O0j7BLCpBcgx3o06CX4i0bdCDpaOWLp5Sklmv4BXdkjq0d85pZsOYn+ewRRb23X7qJisaXj/9D2OzFID2+W4QTxI11Hd4+KAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Tg7ldVYG; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-43167ff0f91so54990605e9.1;
+        Tue, 29 Oct 2024 08:15:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730214924; x=1730819724; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XTdAOFFPHoByAW0zEX+1bZ8Eb08mn2sn6pazzDy8SQ8=;
+        b=Tg7ldVYGvgBn5fKGsXCcm8ZLDh9Iw+JfsRTyO9Lgv+LNV3njQHAJTtT2U8g6ZiOR8F
+         E1KA5Q7JyCJs6aJD/IjgtXahXbtYv795oT5HEGuuob/K9VlOan79YtCGrlvGs2tzt6bY
+         CJhZLS8siPBZLUYv5VGjDnrgLlsrPAVR0VdahVnGc9bsvAkJ3PFyx+/25vIh+cKHAsR7
+         6C2yyTBF7vbiqYWrUzSxDEZ0iEmlfyOdSMT47uuCRUfll6pRTNX1AcVvIak2xrpumVFP
+         TpGscsfwxFcgm9JQVDm6934Mte84klYBZEMnTy6k/Hk+5vkHGpF2/C/GdpX7osoHmo8D
+         pT+Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730214924; x=1730819724;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XTdAOFFPHoByAW0zEX+1bZ8Eb08mn2sn6pazzDy8SQ8=;
+        b=dHh3heFWHUPEkEbYl5AyQEumFfbkw/VCsuW/TZPQtOktoPnj1LvL9MQZ+RmGWGlBba
+         jyJIP/S8Ol5vnONCKJy3mobSO31sAHaektvYbMOCJVNesFjPKxM3YMMIHT5JKe4qX8lw
+         XHnL921vAm+OgSviAoKsKASUlcUSYT97pEYkP/J1XLzN3Gu1NTaUH587IXOrF/ZoCgGn
+         MVXRODjNSxL593KvnETmzw/340sjB0Mh4YI+DFNy1ZpfFs9qeuPtybtyZYAuUls+EpO4
+         yF243uh0xpoXxM62JaG5Oa4A+BGbN2omds/wL0BgwnKLYr02jsZUrEXIOG2eq4rRgSpP
+         Bk5A==
+X-Forwarded-Encrypted: i=1; AJvYcCUBS2f8F07LSQGFOBrl6g2RqMtS68PIAiFuYVVCoiM6qiUBt/nXb0IKZMzcZPnCc6posXgO7wJPrQipDBs=@vger.kernel.org, AJvYcCUhvZEmudXE+7X4zf2ttZR9wExw4acebvMCAG00kWcCd7lSLUgLzIEtm+WqfdxfCgL4+IcN/SVXff0Q5CrRqBIz5Bu3@vger.kernel.org, AJvYcCVCTxzJLB01CHJKFm/TBI/9RryLUIKV1nBQob6Ny6MhENqOt/hKY2+l+BX9qNa8xXljnvDWXXAz@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+djwWjTt75RmsWKmDq2wO5tExJH2MLME8ch5xsWMPbq+OKqMY
+	OsgPkBGvKXKK9ZgDb7+nx0ZEak91/T9AD5kzG/w6eDm4M/tF9wzMjVgD/z+u0m0KWfRcJws9md/
+	vlBW9hBup7bXSJWZvI6eyqNU4CyY=
+X-Google-Smtp-Source: AGHT+IFt3LhIP+T08xuSWl2DD2ktCkrZyc5GBn2EFnoVWOdyMp9q0tyHDl7Px5ZlD2TVQmiWP3R/n24rbjSd9KDMM3M=
+X-Received: by 2002:a05:600c:3c9a:b0:431:5d14:1cae with SMTP id
+ 5b1f17b1804b1-4319acb1d60mr101991675e9.19.1730214924190; Tue, 29 Oct 2024
+ 08:15:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="US-ASCII"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: lhrpeml500010.china.huawei.com (7.191.174.240) To
- frapeml500008.china.huawei.com (7.182.85.71)
+References: <20241029143445.72132-1-technoboy85@gmail.com>
+In-Reply-To: <20241029143445.72132-1-technoboy85@gmail.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 29 Oct 2024 08:15:12 -0700
+Message-ID: <CAADnVQLdcJMddFAxVRRaySeD06eGkU+rt0x8LkSqRak0fHqNEw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2] bpf: use kfunc hooks instead of program types
+To: Matteo Croce <technoboy85@gmail.com>
+Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
+	Andrii Nakryiko <andrii@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	John Fastabend <john.fastabend@gmail.com>, Martin KaFai Lau <martin.lau@linux.dev>, 
+	Network Development <netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>, 
+	linux-trace-kernel <linux-trace-kernel@vger.kernel.org>, Matteo Croce <teknoraver@meta.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> >> +
-> >> +	cxl = kzalloc(sizeof(*cxl), GFP_KERNEL);  
-> > __free magic here.
-> > Assuming later changes don't make that a bad idea - I've not
-> > read the whole set for a while.  
-> 
-> 
-> Remember we are in netdev territory and those free magic things are not 
-> liked ...
+On Tue, Oct 29, 2024 at 7:34=E2=80=AFAM Matteo Croce <technoboy85@gmail.com=
+> wrote:
+>
+> From: Matteo Croce <teknoraver@meta.com>
+>
+> Pass to register_btf_kfunc_id_set() a btf_kfunc_hook directly, instead
+> of a bpf_prog_type.
+> Many program types share the same kfunc hook, so some calls to
+> register_btf_kfunc_id_set() can be removed.
 
-I'll keep forgetting that. Feel free to ignore me when I do!
+Still nack for the same reason: let's avoid churn
+when kfunc registration needs a redesign.
 
-
-
-> >> diff --git a/drivers/net/ethernet/sfc/net_driver.h b/drivers/net/ethernet/sfc/net_driver.h
-> >> index b85c51cbe7f9..77261de65e63 100644
-> >> --- a/drivers/net/ethernet/sfc/net_driver.h
-> >> +++ b/drivers/net/ethernet/sfc/net_driver.h
-> >> @@ -817,6 +817,8 @@ enum efx_xdp_tx_queues_mode {
-> >>   
-> >>   struct efx_mae;
-> >>   
-> >> +struct efx_cxl;
-> >> +
-> >>   /**
-> >>    * struct efx_nic - an Efx NIC
-> >>    * @name: Device name (net device name or bus id before net device registered)
-> >> @@ -963,6 +965,8 @@ struct efx_mae;
-> >>    * @tc: state for TC offload (EF100).
-> >>    * @devlink: reference to devlink structure owned by this device
-> >>    * @dl_port: devlink port associated with the PF
-> >> + * @cxl: details of related cxl objects
-> >> + * @efx_cxl_pio_initialised: clx initialization outcome.  
-> > cxl  
-> 
-> 
-> Well spotted. I'll fix it.
-> 
-> 
-> > Also, it's in a struct called efx_nic, so is the efx_ prefix
-> > useful?  
-> 
-> 
-> I do not like to have the name as the struct ...
-You've lost me.  efx_nic->cxl_pio_initialised was that I was suggesting
-and not setting how this comment applies.
-
-J
+pw-bot: cr
 
