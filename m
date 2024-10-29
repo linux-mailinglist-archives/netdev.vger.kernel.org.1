@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-140046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B20B19B51D7
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:31:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 786AA9B51DA
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5CA851F22B65
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:31:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0D879B23BD1
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 18:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9609206068;
-	Tue, 29 Oct 2024 18:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E61F2071E6;
+	Tue, 29 Oct 2024 18:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZnbWuy/t"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZAl14pdc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C472F200C8B
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 18:30:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C7A206E9D;
+	Tue, 29 Oct 2024 18:30:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730226633; cv=none; b=L9Zcz+urpzDSFuINtw/N+N8hXRKGWKBeiEpHZTLFj+JXEovMNqHw0Cd50E8x1VPi+u9TNorgxwfHcjmCoEGxLKGc+bh9Pww0QziYZkSwxZRGm5bZF6tQiC28DhmoFB44Xxet0Vh/TxfztNhor3gnsPoqzHtFKBmGMNY+mpaRcKY=
+	t=1730226635; cv=none; b=Za0rN7UtsMfA1r2eKbf4OiWDnZqe7GfHDsjoOh8FyI5jVQQksubXSZFUNNEYIdunjuHL8vmQw7MM5T9HUKQf9XuyO7MKX2qqGWt2pTG8zj7o7XzI2Okg1KgAaLD1mWRgA97+bV7G2m5sF2Y3F81WQrJrZty66X1QWHHbFIkXNqg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730226633; c=relaxed/simple;
-	bh=DVYTBes27DgHtPM4ujGGYEBp4CtV6lTEk7Hsn2EP1Zg=;
+	s=arc-20240116; t=1730226635; c=relaxed/simple;
+	bh=Pfc85nbiHEIfgvnySvDgIjQELfRGWpLGUR9MrNG1G6E=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Tr90QykbDebk37oYNSHFE3F9sjU3xu4O/aAIM4VqlJW3cEVbwXfkC9uYIqwxPQQKbo714K70HXhPAPYj2gpiP144E+DRztQPLZTdpTv7c3l8tRvz7rMUTIeJfPmo61Vj5pGwhaX/UqCgWIMrg4KQGwSfkn3fvoNNMZ3Aufp0nOM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZnbWuy/t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64119C4CEE8;
-	Tue, 29 Oct 2024 18:30:33 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=eL+BveaCcpRdY0M8FeE+YHuFxykh4TMTZ397Luh6iM3/0vNb6vVU7WhDPPDxl9hADXqle1OF0wlENddwhd7lbFX6XazJYKk6nG6R4GJxgLfW7dUed4i1ET4k0EAvJeUjGQ+8iS87Jc9YncBunNhredmt9ZeJeMhYxqMka0yfmX0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZAl14pdc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D82DFC4CEE7;
+	Tue, 29 Oct 2024 18:30:34 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730226633;
-	bh=DVYTBes27DgHtPM4ujGGYEBp4CtV6lTEk7Hsn2EP1Zg=;
+	s=k20201202; t=1730226634;
+	bh=Pfc85nbiHEIfgvnySvDgIjQELfRGWpLGUR9MrNG1G6E=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ZnbWuy/tbaL6rW+li6cYSzDpIuhJdObAZ5tqakcbuOiMZTZL2GzMDnwLqnTLXhhCZ
-	 Wae/gLbest4JKVjmy2b+xDIprWid2A6mFGM/gOgFT8/ydHZP1AB/LuXsrkrjOVdHp8
-	 USRDTGQeMB5cXh3whLuuUK5ufYN7KVM7vp17Cxvw3yAxATvmtaHPEaerrQQMxaMYFB
-	 3GD5IxbMa2d7+omADmK4Ei+F8DHLTOZdclQK5KaMDJE/7afoczdaIlU07C7B593qCc
-	 WupkCs0UckCsFet94X2+SELz37sbg1Plcue+yl4JSSaZz3hc985111OxNvt1LFzqYA
-	 bUh042Vowjyqg==
+	b=ZAl14pdcFcQeEwPrMuQ6e51X1VC7exQB/a5u7FjoA/xmbRv/pYNgjrEijzU3/dLMu
+	 hg7vKOpefKkoFGXEP46aSPfGuF0HFME8o+4ztTIeWfxOuUQ01tEBHlNPKqPuwBb3Do
+	 mdV0aWMh44jUUiUG+QtfCHllC2LtPiLcdVEXoex3wSWNv7GRzkEEz+iy0aHgxGpuhp
+	 bCCc6H0R99OYmnQcMELCFUc8fd+Ryhp5KrNj4tAtO2h7AZYsG07MgOF0yRPuZI9dUk
+	 84h984+tDdHE76L7HVm0GrjWWLPZb0ekKDqZwuFBYZlmBa8zoUAbsVOeq3p9Gn+pQy
+	 rRWBo6IcFlHkg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B6D380AC08;
-	Tue, 29 Oct 2024 18:30:42 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD9F380AC08;
+	Tue, 29 Oct 2024 18:30:43 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipv4: ip_tunnel: Fix suspicious RCU usage warning in
- ip_tunnel_find()
+Subject: Re: [PATCH net] selftests: netfilter: nft_flowtable.sh: make first pass
+ deterministic
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173022664074.781637.5915049772260552843.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Oct 2024 18:30:40 +0000
-References: <20241023123009.749764-1-idosch@nvidia.com>
-In-Reply-To: <20241023123009.749764-1-idosch@nvidia.com>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
- pabeni@redhat.com, edumazet@google.com, dsahern@kernel.org, horms@kernel.org,
- pshelar@nicira.com
+ <173022664223.781637.3768453317314234157.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Oct 2024 18:30:42 +0000
+References: <20241022152324.13554-1-fw@strlen.de>
+In-Reply-To: <20241022152324.13554-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, netfilter-devel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 23 Oct 2024 15:30:09 +0300 you wrote:
-> The per-netns IP tunnel hash table is protected by the RTNL mutex and
-> ip_tunnel_find() is only called from the control path where the mutex is
-> taken.
-> 
-> Add a lockdep expression to hlist_for_each_entry_rcu() in
-> ip_tunnel_find() in order to validate that the mutex is held and to
-> silence the suspicious RCU usage warning [1].
+On Tue, 22 Oct 2024 17:23:18 +0200 you wrote:
+> The CI occasionaly encounters a failing test run.  Example:
+>  # PASS: ipsec tunnel mode for ns1/ns2
+>  # re-run with random mtus: -o 10966 -l 19499 -r 31322
+>  # PASS: flow offloaded for ns1/ns2
+> [..]
+>  # FAIL: ipsec tunnel ... counter 1157059 exceeds expected value 878489
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2] ipv4: ip_tunnel: Fix suspicious RCU usage warning in ip_tunnel_find()
-    https://git.kernel.org/netdev/net/c/90e0569dd3d3
+  - [net] selftests: netfilter: nft_flowtable.sh: make first pass deterministic
+    https://git.kernel.org/netdev/net/c/c59d72d0a4fb
 
 You are awesome, thank you!
 -- 
