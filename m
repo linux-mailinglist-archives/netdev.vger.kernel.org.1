@@ -1,140 +1,153 @@
-Return-Path: <netdev+bounces-139814-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D36EB9B4475
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:43:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F8229B44B0
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 09:47:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 109501C221C8
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:43:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C215A1C20C48
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 08:47:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842CA2038D3;
-	Tue, 29 Oct 2024 08:43:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB09204033;
+	Tue, 29 Oct 2024 08:46:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="JcN8I5gm"
+	dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b="CxNak1L5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-132.freemail.mail.aliyun.com (out30-132.freemail.mail.aliyun.com [115.124.30.132])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4A512038B6;
-	Tue, 29 Oct 2024 08:43:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.132
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 173DF204035
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:46:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730191409; cv=none; b=sbPKQ8dIyVE/7rZdmz95j+XnsxRfpqkYI7vBFR/8+gewAnuAuZUfrrJzM3UgL7vgo9uKJh2FEOH8Yqx29ObYjADina22EgMqAVrG2pVkg2/dUb5W+n6yMXetsRt6FYXBJi9cHA5Nb7F939VG9IKNE6/EugzYj5aXAe6vvKO+laQ=
+	t=1730191568; cv=none; b=V14oS4vhNpXUjUIL13iluZXHudtJTi+Hs//ZQ/+Q5toNU6HX0J7gROCsIGwnE/vwf1XTTTaxAvpsYqR+kGP/V3xfFD4ndYHsbCwqFX1V+yEafKboSI1kI+zsh9q1luZtkFYvudJahpcrRtvLWAk+eq/o3Zog/W91NaXcbypd2TU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730191409; c=relaxed/simple;
-	bh=9pIXQSroFyMkz57u3LLI6N54USQGh09zMsjbTe4Lhho=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=tiMq2Sxw9bT1dx6ZlqNBITIuMe/8cpAwDEwaAsUvqxAaGi5AfyXK6NWs0a1J1nq/aqgeUje/VDiObjkHvza8/MNcTDBU7LLhJ3NM7n+qwqe10adzuCxV/MinaICaQoFn0ku8d4DnDlrDdGE1E4TT3FA3D1vharThKuCvgetMahU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=JcN8I5gm; arc=none smtp.client-ip=115.124.30.132
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730191397; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=onLtSB/hgcxxEojP6voGlLYlceuTRFDy1mmlMNNH2/U=;
-	b=JcN8I5gmcBPyiaLQpOGjtRo1l6x2FgD3TqPfPPeTJc/ciHP4Cc10KTak+tWQ+KxDb0SJVIDj01O0oAddiF2EN83ervv6VoBv6Vo9iWnE0ZLtkL24ALearBuJip0sp2lx000/1pElwvrm4e061/UAjVETAqG7Z4n9I3Mi7rJVDA8=
-Received: from 30.221.150.77(mailfrom:alibuda@linux.alibaba.com fp:SMTPD_---0WI9baqP_1730191395 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Tue, 29 Oct 2024 16:43:16 +0800
-Message-ID: <ce9772b0-13a3-4a53-80c2-df5bce6698d7@linux.alibaba.com>
-Date: Tue, 29 Oct 2024 16:43:12 +0800
+	s=arc-20240116; t=1730191568; c=relaxed/simple;
+	bh=oMsPeNDPYjX24/xrsdIKUnroAYKkElkCjISZqScZwOw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pHQGERw5YPqPdYM+ZqAUDwQx/xw/VZF0MzIFizeUVcdJK7+rdh9tylRFUNBdw51yeghJo1UIWg7vbCG/w9WMV93JCfQGr4g34FBCemw6cQCpmYVhmBLpi+CgrSgE7ykLtnho57TG1oZLl562UCoerF+axlEVdL4E94TSZm1qVkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com; spf=pass smtp.mailfrom=amarulasolutions.com; dkim=pass (1024-bit key) header.d=amarulasolutions.com header.i=@amarulasolutions.com header.b=CxNak1L5; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=amarulasolutions.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amarulasolutions.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a99ebb390a5so1138553066b.1
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 01:46:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=amarulasolutions.com; s=google; t=1730191564; x=1730796364; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FgWCepazzfo33UdtIIMN3k0wsxQsDr435va3n4Xr8tQ=;
+        b=CxNak1L5JQf0Yt56A7ip3UAPeRZSXzEMbKxHWHOR0H7db/CrB8pYS/Y3PYLtDo0mmK
+         a5eBiGMuoMqqLPh1iLfAhycSWZXgC29Po0z62ifisHe89n3SbtNEO1oW/IPz5IcaC2Qi
+         jVWOLkMDuraD04+Adjqh3GXhzxOTjY1W/Cxlc=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730191564; x=1730796364;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FgWCepazzfo33UdtIIMN3k0wsxQsDr435va3n4Xr8tQ=;
+        b=HhkwjG3DlRF5fYNRxz0s9cPQa3oNUPtIiasDNWQTVs17JMubpm34QWIvXVEzwUUxUj
+         DsWHsqEbBlAaC1vzlCJ76bkji7TOp+Y4CA33eX4NZQXkCfOMPcK6hUa5mt0PdTsezgRp
+         77FuN2oVqNh26Gs5HsMPHcKgmedeUAHgOyRm1SQlOJ4y30srsp9A+7Igb/pAntnycqYK
+         1Ba51PAXP+GiGBqsP+tiBSemhhJmJvc/xrq6RD5oEdYe/37In5INvcqvmGaLH6dmeHPY
+         HzoUkm1IVeW6yIOP0P2H/GUl5/oMssmBwAk/Xev2orERQnE2/wPmykTXENlDbJ0XIn/i
+         iI2w==
+X-Forwarded-Encrypted: i=1; AJvYcCUYJ76Yj0VNASgqAVLPzYzBtL5ytIZpfrzsaH4DyjJT+I761bVbZoWFKTRhmy5OCd3wydrLIGU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyXCQa7noPRZq5b2Auk6h0jA0aWp9WZQCVD4XPaEm5CVKVqcRqC
+	pTfM9NiVdbhwILw0i1Cq9COBG6t9MpN7SEivPxClo2DuClkWSusop66dM2vv2U0=
+X-Google-Smtp-Source: AGHT+IEPwkX0IhV+bKZax/ZDnKCtE6vuHXhCdpPupl5TYU7s9VlSPImd24020c4tF67SdJTKa0gPiw==
+X-Received: by 2002:a17:907:1b98:b0:a9a:8263:d2c7 with SMTP id a640c23a62f3a-a9e2b347278mr87267966b.7.1730191564353;
+        Tue, 29 Oct 2024 01:46:04 -0700 (PDT)
+Received: from dario-ThinkPad-T14s-Gen-2i.homenet.telecomitalia.it (host-79-40-68-117.business.telecomitalia.it. [79.40.68.117])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b1dec7dacsm450134166b.9.2024.10.29.01.45.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 01:46:04 -0700 (PDT)
+From: Dario Binacchi <dario.binacchi@amarulasolutions.com>
+To: linux-kernel@vger.kernel.org
+Cc: linux-amarula@amarulasolutions.com,
+	Dario Binacchi <dario.binacchi@amarulasolutions.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Frank Li <Frank.Li@nxp.com>,
+	Gal Pressman <gal@nvidia.com>,
+	Haibo Chen <haibo.chen@nxp.com>,
+	Han Xu <han.xu@nxp.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Kory Maincent <kory.maincent@bootlin.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Simon Horman <horms@kernel.org>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	linux-can@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [RFC PATCH v2 0/6] can: dev: add generic function can_update_bus_error_stats()
+Date: Tue, 29 Oct 2024 09:44:44 +0100
+Message-ID: <20241029084525.2858224-1-dario.binacchi@amarulasolutions.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-To: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
- Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
- Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
- Alexandra Winter <wintera@linux.ibm.com>, Halil Pasic <pasic@linux.ibm.com>,
- Nils Hoppmann <niho@linux.ibm.com>, Niklas Schnell <schnelle@linux.ibm.com>,
- Thorsten Winkler <twinkler@linux.ibm.com>,
- Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>,
- Aswin K <aswin@linux.ibm.com>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
-Content-Language: en-US
-From: "D. Wythe" <alibuda@linux.alibaba.com>
-In-Reply-To: <20241025072356.56093-1-wenjia@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This series originates from some tests I ran on a CAN communication for
+one of my clients that reports sporadic errors. After enabling BERR
+reporting, I was surprised that the command:
 
+ip -details -statistics link show can0
 
-On 10/25/24 3:23 PM, Wenjia Zhang wrote:
-> Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
-> alternative to get_netdev") introduced an API ib_device_get_netdev.
-> The SMC-R variant of the SMC protocol continued to use the old API
-> ib_device_ops.get_netdev() to lookup netdev. As this commit 8d159eb2117b
-> ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
-> get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
-> ib_device_ops.get_netdev didn't work any more at least by using a mlx5
-> device driver. Thus, using ib_device_set_netdev() now became mandatory.
-> 
-> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
-> 
-> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
-> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
-> Reported-by: Aswin K <aswin@linux.ibm.com>
-> Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
-> Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> ---
->   net/smc/smc_ib.c   | 8 ++------
->   net/smc/smc_pnet.c | 4 +---
->   2 files changed, 3 insertions(+), 9 deletions(-)
-> 
-> diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
-> index 9297dc20bfe2..9c563cdbea90 100644
-> --- a/net/smc/smc_ib.c
-> +++ b/net/smc/smc_ib.c
-> @@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
->   	struct ib_device *ibdev = smcibdev->ibdev;
->   	struct net_device *ndev;
->   
-> -	if (!ibdev->ops.get_netdev)
-> -		return;
-> -	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
-> +	ndev = ib_device_get_netdev(ibdev, port + 1);
->   	if (ndev) {
->   		smcibdev->ndev_ifidx[port] = ndev->ifindex;
->   		dev_put(ndev);
-> @@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
->   		port_cnt = smcibdev->ibdev->phys_port_cnt;
->   		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
->   			libdev = smcibdev->ibdev;
-> -			if (!libdev->ops.get_netdev)
-> -				continue;
-> -			lndev = libdev->ops.get_netdev(libdev, i + 1);
-> +			lndev = ib_device_get_netdev(libdev, i + 1);
->   			dev_put(lndev);
->   			if (lndev != ndev)
->   				continue;
-> diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
-> index 1dd362326c0a..8566937c8903 100644
-> --- a/net/smc/smc_pnet.c
-> +++ b/net/smc/smc_pnet.c
-> @@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
->   		for (i = 1; i <= SMC_MAX_PORTS; i++) {
->   			if (!rdma_is_port_valid(ibdev->ibdev, i))
->   				continue;
-> -			if (!ibdev->ibdev->ops.get_netdev)
-> -				continue;
-> -			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
-> +			ndev = ib_device_get_netdev(ibdev->ibdev, i);
->   			if (!ndev)
->   				continue;
->   			dev_put(ndev);
+did not display the occurrence of different types of errors, but only the
+generic ones for reception and transmission. In trying to export this
+information, I felt that the code related to managing statistics and handling
+CAN errors (CRC, STUF, BIT, ACK, and FORM) was quite duplicated in the
+implementation of various drivers, and there wasn't a generic function like
+in the case of state changes (i. e. can_change_state). This led to the idea
+of adding can_update_bus_error_stats() and the helpers for setting up the
+CAN error frame.
 
+Regarding patch 5/6 ("can: netlink: extend stats to the error types (ack,
+CRC, form, ..."), I ran
 
-Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
+./scripts/check-uapi.sh
+
+which found
+
+"error - 1/934 UAPI headers compatible with x86 appear _not_ to be backwards
+compatible."
+
+I included it in the series because I am currently interested in understanding
+whether the idea behind each of the submitted patches makes sense, and I can
+adjust them later if the response is positive, following your suggestions.
+
+Changes in v2:
+- Replace macros with static inline functions
+- Update the commit message
+- Replace the macros with static inline funcions calls.
+- Update the commit message
+
+Dario Binacchi (6):
+  can: dev: add generic function can_update_bus_error_stats()
+  can: flexcan: use can_update_bus_error_stats()
+  can: dev: add helpers to setup an error frame
+  can: flexcan: use helpers to setup the error frame
+  can: netlink: extend stats to the error types (ack, CRC, form, ...)
+  can: dev: update the error types stats (ack, CRC, form, ...)
+
+ drivers/net/can/dev/dev.c              | 45 ++++++++++++++++++++++++
+ drivers/net/can/flexcan/flexcan-core.c | 29 +++++-----------
+ include/linux/can/dev.h                | 47 ++++++++++++++++++++++++++
+ include/uapi/linux/can/netlink.h       |  6 ++++
+ 4 files changed, 106 insertions(+), 21 deletions(-)
+
+-- 
+2.43.0
+
 
