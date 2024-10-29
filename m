@@ -1,247 +1,124 @@
-Return-Path: <netdev+bounces-140078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EED5D9B52EA
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:45:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89EE09B5304
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 21:00:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1E62F1C226AF
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 19:45:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 413AC1F23BE5
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 20:00:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E9072010EB;
-	Tue, 29 Oct 2024 19:45:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DBF42076D4;
+	Tue, 29 Oct 2024 20:00:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XHPopEG3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dp5AxGKa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A1D19A2A2;
-	Tue, 29 Oct 2024 19:45:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E44D62076CA;
+	Tue, 29 Oct 2024 20:00:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730231143; cv=none; b=tLBV4Ej9bmuPEX3MvwRolSobz5Cy1fA3kE+HPM3AIcxOYm0WayersxI3tDJZOWPt/J0Fjq8mk0VDtAbE3bxQIQ/oMWfDUQbhErnEMdyFkpGXOKMUCl/rGNyPVfZs3yjXM8lhCZ0PHXCcox4FvXB0I2ZkZ/s/MI5Ue3Fs1tAS9cs=
+	t=1730232039; cv=none; b=ksh48eXD1hVfmui9Y30BQrcDHJmsZiYTC6jJsi2VkVbmn9ZlAbpkrmytYgH9YEVuNqcEWzsuPctDBhMYY0hiGhyj6p5oa9UJzoalfOcTor8WlemiMajZfCEjM08MhIi3ugXq1LY2SWo6mSFMZNMChqk7RubkSuL6LVOSC+iZj8I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730231143; c=relaxed/simple;
-	bh=4hwtZFDfg+dx9ftK8Ab16rSuGce3VQPmw54/oonESl4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=KiyquWifnF9BXdTx4nu8Y9TWoOcjZQ/GIh/IFKASVP7NTupZk+HqcEuJwPqM1D85QCC/BvCgHDw7xlbQqfFcNHfc51jIerCgqjsKxuOdOL6YW7B/p7YsKUME0S4vIf5rRJsX3q6y9Gmp5DrRo1k9PTpeJEFAQnWYUuXXQBu6ZN0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XHPopEG3; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6e38ebcc0abso69358257b3.2;
-        Tue, 29 Oct 2024 12:45:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730231140; x=1730835940; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oz++kog8R11S3FQCFfJ3vXqUAJV3rP07MP62qfhNccM=;
-        b=XHPopEG3pvI3dgjjURAVjd2bDK3bWm1fBM5U7RFQZy2hd+yI9U4g8MOzOFmQws8bn4
-         bCF4E5puGkbiO1n2MlocJtoIsQDLR+cVMEV/wq7YJGj/rvCPvNPPX2uGuheIU8tM3gxi
-         gIRyC9P2sm9BHEsaaDkGKRj9cKJ/bar3YggLWSrWPF2r80umQ/tNfr/nPc3V7c2W9HjH
-         W611Sui3f0nKMHpk20X4cnWQl+dvrjTABmSefZOzjag3uScOsDB71nwwoumflJmRYxa6
-         7ZA58+TcWmeotgsB76u0Rr+7XAt8120avmYaj3Svh+88h/FdJwJDkkKikVNgXa7xmyNv
-         gd1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730231140; x=1730835940;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=oz++kog8R11S3FQCFfJ3vXqUAJV3rP07MP62qfhNccM=;
-        b=vCbZBh8MfMP4WXwa6DgbKCm8qUO+ZlqDT7uBaigunUiomPn/vDyaYRjFv4oA+RNt42
-         FAJnd7LnClgLs9CbU2PKcvO9nqLoYBX2Tq+kZlChmootZDxwmk+61yg4vlwvRVL/g8/I
-         lQ8/fMQTgILnOZZcC0o8jiZNeORX8In8z5Y3c7jKuwkhs4AotmyYuz9hqmlR4RNMv0Fu
-         y9c7c0W8fnwqwNjehMs0hUA2GAJkcFFNUhiLHOt7YJrJaCJEiS4zDlAlXz1cwi6l/lbD
-         3S3v69EqS1Ok53Y1ASCjE7xfi6isRK5nVS9gqaGgp3UJJ8sIkf/vyXY8yojZ127KRj8x
-         eVAQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWtpOAhXiV08YqACcKvE7kTVqZ0OCPL1sQoHbXKOM5lb27oWBV52VU24K44ahYUNHV6QnUMPB3L@vger.kernel.org, AJvYcCX6jdvhpQpsY1lPDVBH4UwgzGsQs9xhwVis7HM6CrrqSvtemi5zR5F52mT3E8DDmtv2d0o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzb+0c4bdgDSAuGLqCBh/vNsaCAL3DTVpsZHWvB3IpZGnUkCIn+
-	6JCqzcngWJegrC07UJMFdkIS7MafwWKOiQOk3176un5qAQHFQnDF
-X-Google-Smtp-Source: AGHT+IGefUc29igJ+8c98f9qeJDl8r1WcdXQSM3Jul9t145O9JP4e+N+g/lecyY1/o+l6jcIXRFPbQ==
-X-Received: by 2002:a05:690c:10c:b0:6e7:de90:315f with SMTP id 00721157ae682-6e9d8aa57d6mr103857007b3.28.1730231139998;
-        Tue, 29 Oct 2024 12:45:39 -0700 (PDT)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d179a2b073sm45095946d6.110.2024.10.29.12.45.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 12:45:39 -0700 (PDT)
-Date: Tue, 29 Oct 2024 15:45:39 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Jason Xing <kerneljasonxing@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- dsahern@kernel.org, 
- willemb@google.com, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- martin.lau@linux.dev, 
- eddyz87@gmail.com, 
- song@kernel.org, 
- yonghong.song@linux.dev, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@fomichev.me, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- shuah@kernel.org, 
- ykolal@fb.com, 
- bpf@vger.kernel.org, 
- netdev@vger.kernel.org, 
- Jason Xing <kernelxing@tencent.com>
-Message-ID: <67213b62f4100_2f188c294b7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAL+tcoCDN+YSwXDocv9DcvPGW-sLhEfPHHbzcO2+1PBZFRkB0Q@mail.gmail.com>
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-11-kerneljasonxing@gmail.com>
- <6720394714070_24dce62944a@willemb.c.googlers.com.notmuch>
- <CAL+tcoBgbA1Q_7UaC0vp-mGHqDHxQ+eMybep0kw=E-T0oJAHfw@mail.gmail.com>
- <6720f9359d2ef_2bcd7f29458@willemb.c.googlers.com.notmuch>
- <CAL+tcoCDN+YSwXDocv9DcvPGW-sLhEfPHHbzcO2+1PBZFRkB0Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
- tskey offset
+	s=arc-20240116; t=1730232039; c=relaxed/simple;
+	bh=pKypalYakTpPySQDkMJhREf+MBtrrJGMKov0teHbvtk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=q2QhVqSQ3Ch/GfNId1lSvaNisWokRPC6DRNEiiU4MlnXLMnCMljIIVQQxPaRe0TIbESaT5HsGr+QhEuQhVNjjrOyCowOtRe09b7InjzcM5PiyJEq3ES2/bOZgJp57IVbXbvxzHSAtYc/IWRdG8dkByvyJLEedVSx0AYVrjc2+7g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dp5AxGKa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B4D0C4CECD;
+	Tue, 29 Oct 2024 20:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730232038;
+	bh=pKypalYakTpPySQDkMJhREf+MBtrrJGMKov0teHbvtk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dp5AxGKaXzmIiJStJRelad+pUYQm4KxqYN4SrWpWXLi6ZuKnGyPo/mQQHUzyqglgb
+	 MhPQZKdDI7Vefl+hJRMia9y41Cn2cBCn9hJljRLpZN7xxPNuMRyCCQ/ibQqKc9JQqw
+	 heYtqN02nBBCPRSiQ/fLrKbx8FGhj50C1psB1jvB0XP2tP0VF74r6nmsNYLclqxBnh
+	 +UMDt7yg2ztjfrFdzV6z9iRpaQtnlMVFIhaPEJdwDMo9Om5FO7iPQR0K2DHXdMn7qZ
+	 4GoN/Rxv6TZYDLgxRufzGvubwKekxoWRk8+pv7yt+7MqkRaTHUGLt2vrFwdCGZhjuy
+	 bhPnHO+3sfgdQ==
+Date: Tue, 29 Oct 2024 13:00:37 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Gustavo A. R. Silva" <gustavo@embeddedor.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>, Michael Chan
+ <michael.chan@broadcom.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Potnuri Bharat Teja <bharat@chelsio.com>,
+ Christian Benvenuti <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>,
+ Manish Chopra <manishc@marvell.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org
+Subject: Re: [PATCH 2/2][next] net: ethtool: Avoid thousands of
+ -Wflex-array-member-not-at-end warnings
+Message-ID: <20241029130037.2c7e96c7@kernel.org>
+In-Reply-To: <5aa93a65-e325-4c77-aaa8-5ef04f3b9697@embeddedor.com>
+References: <cover.1729536776.git.gustavoars@kernel.org>
+	<f4f8ca5cd7f039bcab816194342c7b6101e891fe.1729536776.git.gustavoars@kernel.org>
+	<20241029065824.670f14fc@kernel.org>
+	<f6c90a57-0cd6-4e26-9250-8a63d043e252@embeddedor.com>
+	<20241029110845.0f9bb1cc@kernel.org>
+	<7d227ced-0202-4f6e-9bc5-c2411d8224be@embeddedor.com>
+	<20241029113955.145d2a2f@kernel.org>
+	<26d37815-c652-418c-99b0-9d3e6ab78893@embeddedor.com>
+	<20241029115426.3b0fcaff@kernel.org>
+	<5aa93a65-e325-4c77-aaa8-5ef04f3b9697@embeddedor.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-> > > > > +static long int sock_calculate_tskey_offset(struct sock *sk, int val, int bpf_type)
-> > > > > +{
-> > > > > +     u32 tskey;
-> > > > > +
-> > > > > +     if (sk_is_tcp(sk)) {
-> > > > > +             if ((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LISTEN))
-> > > > > +                     return -EINVAL;
-> > > > > +
-> > > > > +             if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> > > > > +                     tskey = tcp_sk(sk)->write_seq;
-> > > > > +             else
-> > > > > +                     tskey = tcp_sk(sk)->snd_una;
-> > > > > +     } else {
-> > > > > +             tskey = 0;
-> > > > > +     }
-> > > > > +
-> > > > > +     if (bpf_type && (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID)) {
-> > > > > +             sk->sk_tskey_bpf_offset = tskey - atomic_read(&sk->sk_tskey);
-> > > > > +             return 0;
-> > > > > +     } else if (!bpf_type && (sk->sk_tsflags_bpf & SOF_TIMESTAMPING_OPT_ID)) {
-> > > > > +             sk->sk_tskey_bpf_offset = atomic_read(&sk->sk_tskey) - tskey;
-> > > > > +     } else {
-> > > > > +             sk->sk_tskey_bpf_offset = 0;
-> > > > > +     }
-> > > > > +
-> > > > > +     return tskey;
-> > > > > +}
-> > > > > +
-> > > > >  int sock_set_tskey(struct sock *sk, int val, int bpf_type)
-> > > > >  {
-> > > > >       u32 tsflags = bpf_type ? sk->sk_tsflags_bpf : sk->sk_tsflags;
-> > > > > @@ -901,17 +944,13 @@ int sock_set_tskey(struct sock *sk, int val, int bpf_type)
-> > > > >
-> > > > >       if (val & SOF_TIMESTAMPING_OPT_ID &&
-> > > > >           !(tsflags & SOF_TIMESTAMPING_OPT_ID)) {
-> > > > > -             if (sk_is_tcp(sk)) {
-> > > > > -                     if ((1 << sk->sk_state) &
-> > > > > -                         (TCPF_CLOSE | TCPF_LISTEN))
-> > > > > -                             return -EINVAL;
-> > > > > -                     if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> > > > > -                             atomic_set(&sk->sk_tskey, tcp_sk(sk)->write_seq);
-> > > > > -                     else
-> > > > > -                             atomic_set(&sk->sk_tskey, tcp_sk(sk)->snd_una);
-> > > > > -             } else {
-> > > > > -                     atomic_set(&sk->sk_tskey, 0);
-> > > > > -             }
-> > > > > +             long int ret;
-> > > > > +
-> > > > > +             ret = sock_calculate_tskey_offset(sk, val, bpf_type);
-> > > > > +             if (ret <= 0)
-> > > > > +                     return ret;
-> > > > > +
-> > > > > +             atomic_set(&sk->sk_tskey, ret);
-> > > > >       }
-> > > > >
-> > > > >       return 0;
-> > > > > @@ -956,10 +995,15 @@ static int sock_set_timestamping_bpf(struct sock *sk,
-> > > > >                                    struct so_timestamping timestamping)
-> > > > >  {
-> > > > >       u32 flags = timestamping.flags;
-> > > > > +     int ret;
-> > > > >
-> > > > >       if (flags & ~SOF_TIMESTAMPING_BPF_SUPPPORTED_MASK)
-> > > > >               return -EINVAL;
-> > > > >
-> > > > > +     ret = sock_set_tskey(sk, flags, 1);
-> > > > > +     if (ret)
-> > > > > +             return ret;
-> > > > > +
-> > > > >       WRITE_ONCE(sk->sk_tsflags_bpf, flags);
-> > > > >
-> > > > >       return 0;
-> > > >
-> > > > I'm a bit hazy on when this can be called. We can assume that this new
-> > > > BPF operation cannot race with the existing setsockopt nor with the
-> > > > datapath that might touch the atomic fields, right?
-> > >
-> > > It surely can race with the existing setsockopt.
-> > >
-> > > 1)
-> > > if (only existing setsockopt works) {
-> > >         then sk->sk_tskey is set through setsockopt, sk_tskey_bpf_offset is 0.
-> > > }
-> > >
-> > > 2)
-> > > if (only bpf setsockopt works) {
-> > >         then sk->sk_tskey is set through bpf_setsockopt,
-> > > sk_tskey_bpf_offset is 0.
-> > > }
-> > >
-> > > 3)
-> > > if (existing setsockopt already started, here we enable the bpf feature) {
-> > >         then sk->sk_tskey will not change, but the sk_tskey_bpf_offset
-> > > will be calculated.
-> > > }
-> > >
-> > > 4)
-> > > if (bpf setsockopt already started, here we enable the application feature) {
-> > >         then sk->sk_tskey will re-initialized/overridden by
-> > > setsockopt, and the sk_tskey_bpf_offset will be calculated.
-> > > }
+On Tue, 29 Oct 2024 13:18:56 -0600 Gustavo A. R. Silva wrote:
+> By priority I mean if preserving the reverse xmas tree is a most
+> after any changes that mess in some way with it. As in the case below,
+> where things were already messed up:
 > 
-> I will copy the above to the commit message next time in order to
-> provide a clear design to future readers.
+> +       const struct ethtool_link_settings_hdr *base = &lk_ksettings->base;
+>          struct bnxt *bp = netdev_priv(dev);
+>          struct bnxt_link_info *link_info = &bp->link_info;
+> -       const struct ethtool_link_settings *base = &lk_ksettings->base;
+>          bool set_pause = false;
+>          u32 speed, lanes = 0;
+>          int rc = 0;
 > 
-> > >
-> > > Then the skb tskey will use the sk->sk_tskey like before.
-> >
-> > I mean race as in the setsockopt and bpf setsockopt and datapath
-> > running concurrently.
-> >
-> > As long as both variants of setsockopt hold the socket lock, that
-> > won't happen.
-> >
-> > The datapath is lockless for UDP, so atomic_inc sk_tskey can race
-> > with calculating the difference. But this is a known issue. A process
-> > that cares should not run setsockopt and send concurrently. So this is
-> > fine too.
-> 
-> Oh, now I see. Thanks for the detailed explanation! So Do you feel if
-> we need to take care of this in the future, I mean, after this series
-> gets merged...?
+> Should I leave the rest as-is, or should I now have to rearrange the whole
+> thing to accommodate for the convention?
 
-If there is a race condition, then that cannot be fixed up later.
+Don't rearrange the rest. The point is that if you touch a line you end
+up with a delete and an add. So you can as well move it to get it closer
+to the convention. But that's just nice to have, I brought the entire
+thing up because of the net/ethtool/ code which previously followed the
+convention and after changes it wouldn't.
 
-But from my admittedly brief analysis, it seems that there is nothing
-here that needs to be fixed: control plane operations (setsockopt)
-hold the socket lock. A setsockopt that conflicts with a lockless
-datapath update will have a slightly ambiguous offset. It is under
-controlof and up to the user to avoid that if they care.
+> How I see this, we can take a couple of directions:
+> 
+> a) when things are already messed up, just implement your changes and leave
+> the rest as-is.
+
+This is acceptable, moving things closer to convention is nice to have.
+
+> b) when your changes mess things up, clean it up and accommodate for the
+> convention.
+
+Yes, if by "your changes mess things up" you mean that the code follows
+the convention exactly for a given function - then yes, the changes must
+remain complaint. Not sure why you say "clean it up", if the code is
+complaint you shouldn't break it. No touching of pre-existing code
+(other than modified lines) should be necessary.
+
+> extra option:
+> 
+> c) this is probably going to be a case by case thing and we may ask you
+>     to do more changes as we see fit.
+> 
+> To be clear, I have no issue with c) (because it's basically how things
+> usually work), as long as maintainers don't expect v1 of any patch to
+> be in pristine form. In any other case, I would really like to be crystal
+> clear about what's expected and what's not.
 
