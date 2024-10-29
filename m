@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-139772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34FEA9B409A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:45:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A78739B40A4
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:51:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D56911F228FD
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:45:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D69921C2249F
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:51:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB67127453;
-	Tue, 29 Oct 2024 02:45:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B71201E0E1D;
+	Tue, 29 Oct 2024 02:50:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="ld8whNO2"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dvKgnwL+"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA38E4400
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 02:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 824294400;
+	Tue, 29 Oct 2024 02:50:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730169936; cv=none; b=MrS7JCHQgQPhTxD/gMNBgDjhYP15iVGNgl0xCv7S8tPBc158ZAgjpVBE+gsYCcxn3fNfh+ryZcMcBdnNNIJ5qMd4H90PgPrqH6vqTP68WLolDLp7zBPZXQCQPfZoAtu9Q+J7mFVhbdVhfh/QJ93WTllI6BDVCIzNUds8VOMmems=
+	t=1730170257; cv=none; b=qOp7o1XTnUeX4j09bZ+ocCTLs9YhMCL3bmqxVX+ISekuUS+JojlrD9PDpkzQ3ELilayVMEsgaCUY377KJnxUuMAeJwgMQfa7+VqcGz7pBLUjPyuL3qJ5bmh6iAZSr+hfHYc6Xwqu8ZxMDOAwK10Tx0qnoY0dOHpiOhmATRQ6n1U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730169936; c=relaxed/simple;
-	bh=npF8Z8FQPqyeMR+uv5x47P15wv/ciuZ1hSal9F4AMLw=;
+	s=arc-20240116; t=1730170257; c=relaxed/simple;
+	bh=rbs6zdmlmEO16BukbbW/kX6BRAgAHqPcAzpnhOyj4wA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VWkAeMPPZAZgr+IA8bjyGF25ZoffpiYnXrmMRQtCD8CrLjtUgzdPe5TVhEs0WDUpC/K5GVh8yluQ7TIW+CoHfUF5RjYTY/25+F6ce/WbuniU6pyYjCE9Ze0MK75NYsmfh/SalGZJnM3Os0EGufHpN8VIcikcxkn9SYX2xfxY/ow=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=ld8whNO2; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=pozc/dF0p6jWSRMTvj78GQhtV3BlssBl79YnVQlClRcb0dBLjD84sUdbWflqfv2HZhjYd+k28Fv39+PFQH5nMCIzaAk9dSZXwCkttaEGCrNqcmsSXvvU8IKPfE+AuXcHrvhr4wN5BSP/ZBef3aqGJ9w3LrTLpBGy83h2AzNiJYo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dvKgnwL+; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,23 +36,34 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=xV97tYLWnfBrWsu7JCgtdCrJV6DEN3bi7Y6yRSEm6BM=; b=ld8whNO2tIFFkv0huIER7yyRbg
-	1QThCuNOY0/7B2sjx4WcCI94oUs1c72zqZ5Eaz925UcBR6I7tMdmBU8l0xNaNi7anX+rMajHbR+CK
-	Iq1Lbp6AHf+iWo+2VTiFWR0SkQEuI831vi6lyAJhYWOr+1+vA+fLs/GiKbazvwwUKIFQ=;
+	bh=4x7+NMYuwtDNvuiXxIkan9s38gNFO7jrlobgIQdg9wI=; b=dvKgnwL+xlxDZYgcteGPA7b1b7
+	mLcb/Toa8r1YLBarjgVedww/AUh/e93nYKxJn0MCiIuXh1j8B+aBur60A4HEBBxqIfiLMvlt4rF0O
+	7jPcAv+gcq+yNAuTKebC5HnZ9CB2ptTJoX+sj2mDMLGrqaP5KDvKrRk1CSAhwJWRWCDY=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t5cEW-00BWFS-9H; Tue, 29 Oct 2024 03:45:24 +0100
-Date: Tue, 29 Oct 2024 03:45:24 +0100
+	id 1t5cJd-00BWHU-42; Tue, 29 Oct 2024 03:50:41 +0100
+Date: Tue, 29 Oct 2024 03:50:41 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Gerhard Engleder <gerhard@engleder-embedded.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+To: Inochi Amaoto <inochiama@gmail.com>
+Cc: Chen Wang <unicorn_wang@outlook.com>, Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Inochi Amaoto <inochiama@outlook.com>,
+	Paul Walmsley <paul.walmsley@sifive.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Albert Ou <aou@eecs.berkeley.edu>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Jisheng Zhang <jszhang@kernel.org>,
+	Thomas Bonnefille <thomas.bonnefille@bootlin.com>,
+	Liu Gui <kenneth.liu@sophgo.com>, Yixun Lan <dlan@gentoo.org>,
+	Longbin Li <looong.bin@gmail.com>, devicetree@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 1/4] net: phy: Allow loopback speed selection
- for PHY drivers
-Message-ID: <04baac62-ace2-4f44-a32e-640f30b24d96@lunn.ch>
-References: <20241028203804.41689-1-gerhard@engleder-embedded.com>
- <20241028203804.41689-2-gerhard@engleder-embedded.com>
+Subject: Re: [PATCH] riscv: dts: sophgo: Add ethernet configuration for cv18xx
+Message-ID: <ab0ed945-07ff-4aff-9763-e31f156df25f@lunn.ch>
+References: <20241028011312.274938-1-inochiama@gmail.com>
+ <87e215a7-0b27-4336-9f9c-e63ade0772ef@lunn.ch>
+ <wgggariprpp2wczsljy3vw6kp7vhnrifg6soxdgiio2seyctym@4owbzlg3ngum>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -61,59 +72,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241028203804.41689-2-gerhard@engleder-embedded.com>
+In-Reply-To: <wgggariprpp2wczsljy3vw6kp7vhnrifg6soxdgiio2seyctym@4owbzlg3ngum>
 
-> -	int (*set_loopback)(struct phy_device *dev, bool enable);
-> +	/**
-> +	 * @set_loopback: Set the loopback mode of the PHY
-> +	 * enable selects if the loopback mode is enabled or disabled. If the
-> +	 * loopback mode is enabled, then the speed of the loopback mode can be
-> +	 * requested with the speed argument. If the speed argument is zero,
-> +	 * then any speed can be selected. If the speed argument is > 0, then
-> +	 * this speed shall be selected for the loopback mode or EOPNOTSUPP
-> +	 * shall be returned if speed selection is not supported.
-> +	 */
+On Tue, Oct 29, 2024 at 06:43:03AM +0800, Inochi Amaoto wrote:
+> On Mon, Oct 28, 2024 at 02:09:06PM +0100, Andrew Lunn wrote:
+> > > +++ b/arch/riscv/boot/dts/sophgo/cv18xx.dtsi
+> > > @@ -210,6 +210,55 @@ i2c4: i2c@4040000 {
+> > >  			status = "disabled";
+> > >  		};
+> > >  
+> > > +		gmac0: ethernet@4070000 {
+> > > +			compatible = "snps,dwmac-3.70a";
+> > > +			reg = <0x04070000 0x10000>;
+> > > +			clocks = <&clk CLK_AXI4_ETH0>, <&clk CLK_ETH0_500M>;
+> > > +			clock-names = "stmmaceth", "ptp_ref";
+> > > +			interrupts = <31 IRQ_TYPE_LEVEL_HIGH>;
+> > > +			interrupt-names = "macirq";
+> > > +			phy-handle = <&phy0>;
+> > > +			phy-mode = "rmii";
+> > > +			rx-fifo-depth = <8192>;
+> > > +			tx-fifo-depth = <8192>;
+> > > +			snps,multicast-filter-bins = <0>;
+> > > +			snps,perfect-filter-entries = <1>;
+> > > +			snps,aal;
+> > > +			snps,txpbl = <8>;
+> > > +			snps,rxpbl = <8>;
+> > > +			snps,mtl-rx-config = <&gmac0_mtl_rx_setup>;
+> > > +			snps,mtl-tx-config = <&gmac0_mtl_tx_setup>;
+> > > +			snps,axi-config = <&gmac0_stmmac_axi_setup>;
+> > > +			status = "disabled";
+> > > +
+> > > +			mdio {
+> > > +				compatible = "snps,dwmac-mdio";
+> > > +				#address-cells = <1>;
+> > > +				#size-cells = <0>;
+> > > +
+> > > +				phy0: phy@0 {
+> > > +					compatible = "ethernet-phy-ieee802.3-c22";
+> > > +					reg = <0>;
+> > > +				};
+> > > +			};
+> > 
+> > It is not clear to me what cv18xx.dtsi represents, 
+> 
+> This is a include file to define common ip for the whole
+> cv18xx series SoCs (cv1800b, cv1812h, sg2000, sg2000).
+> 
+> > and where the PHY node should be, here, or in a .dts file. 
+> > Is this a SOM, and the PHY is on the SOM? 
+> 
+> The phy is on the SoC, it is embedded, and no external phy
+> is supported. So I think the phy node should stay here, not 
+> in the dts file.
 
-I think we need to take a step back here and think about how this
-currently works.
-
-The MAC and the PHY probably need to agree on the speed. Does an RGMII
-MAC sending at 10Mbps work against a PHY expecting 1000Mbps? The MAC
-is repeating the symbols 100 times to fill the channel, so it might?
-But does a PHY expecting 100 repeats work when actually passed a
-signal instance of a symbol?  What about an SGMII link, 10Mbps one
-side, 1G the other? What about 1000BaseX vs 2500BaseX?
-
-I've never thought about how this actually works today. My _guess_
-would be, you first either have the link perform auto-neg, or you
-force a speed using ethtool. In both cases, the adjust_link callback
-of phylib is called, which for phylink will result in the mac_link_up
-callback being called with the current link mode, etc. So the PHY and
-the MAC know the properties of the link between themselves.
-
-> +	int (*set_loopback)(struct phy_device *dev, bool enable, int speed);
-
-You say:
-
-> +                                    If the speed argument is zero,
-> +	 * then any speed can be selected.
-
-How do the PHY and the MAC agree on the speed? Are you assuming the
-adjust_link/mac_link_up will be called? Phylink has the hard
-assumption the link will go down before coming up at another speed. Is
-that guaranteed here?
-
-What happens when you pass a specific speed? How does the MAC get to
-know?
-
-I think we need to keep as close as possible to the current
-scheme. The problem is >= 1G, where the core will now enable autoneg
-even for forced speeds. If there is a link partner, auto-neg should
-succeed and adjust_link/mac_link_up will be called, and so the PHY and
-MAC will already be in sync when loopback is enabled. If there is no
-link partner, auto-neg will fail. In this case, we need set_loopback
-to trigger link up so that the PHY and MAC get in sync. And then it is
-disabled, the link needs to go down again.
+So this is correct when the PHY is internal. However, this is normally
+expressed by setting phy-mode to "internal". The stmmac driver might
+however not allow that? If not, please put a comment indicating the
+PHY is part of the SoC.
 
 	Andrew
 
