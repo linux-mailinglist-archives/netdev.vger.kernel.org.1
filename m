@@ -1,100 +1,98 @@
-Return-Path: <netdev+bounces-139923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 78EB19B4A0B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:47:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E21679B4A22
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:50:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 20FE1B23D00
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:47:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F4B51F22D52
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:50:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92CC02064FD;
-	Tue, 29 Oct 2024 12:46:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3351EB9E6;
+	Tue, 29 Oct 2024 12:50:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="E4qziFBZ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="g28+V//i"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97153621;
-	Tue, 29 Oct 2024 12:46:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E90B8F6E;
+	Tue, 29 Oct 2024 12:50:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730205999; cv=none; b=dkiC6jSajmUqKqlLbZwRQJ476vSO4YnWdo5Qafu+eOg2B/zRtxeYZz3Ga+cS93n4nFsmX/fqrsWfA6U8qYCF2bj5sxLph9JRX+CKDdQqq5zbjCZ9IhNEVZbqL3hQfYm2G8wfCzURFamZw3GVvWrcr87o6obfeJ9nia/qECELTIA=
+	t=1730206216; cv=none; b=a+AuTkRYpf6G5NImhYtp9emdpSq8wRXVxBFgisBF0ESm9sMSqMgcULJ9wRG8UG8H0uUxbh0xspbNbYEDShJ52k4pC+haX0LKU6TNy+G87oO4F+VZBHO6+RgARty2DfC4KPoJyr6wwoZkKsQAauUvhWjRk5Ol4IJP7kAJVtOH54k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730205999; c=relaxed/simple;
-	bh=VkaHfhcl4iLutH67vvLa9iiBPRXNUS1Ic8sKFpBMfwk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=h4PqseOx1gfB4jM0/Yf1TEuH4UiZkq9YHc2icTspACppHL4pL6JA7w2Vg1JX6GnB4a9OEI3Wo15NbJw2NUFgpl91KdWp/7TwOBA/grPk3kRIJJjHAy1/0igqJz/KFfOis3yiDa5n8cZeKxUFNzBRRsuNPKOasHQAscDYBKbUx/M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=E4qziFBZ; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LY7Fbz/Fi+xKC3ClkbwZw0JUxpl8Rh5O1YgX5ak65zY=; b=E4qziFBZet6GGyRwtWnnIH8NzW
-	tw4gbTG06OaXGpVV3qabxpma9zubRNE+6cX/rT/XpKzBVbMhTwWy4B3A61oyvHCN4HQ5WZv6Z81mT
-	mWZahB8nobf7eayLrxzKB4QGvXONabpryX/RkEc5m3izZSge1lq8f7YzQoVNe5HP9bQo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5lc8-00BZiY-Ox; Tue, 29 Oct 2024 13:46:24 +0100
-Date: Tue, 29 Oct 2024 13:46:24 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andy Yan <andyshrk@163.com>
-Cc: Johan Jonker <jbx6244@gmail.com>, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	david.wu@rock-chips.com, andy.yan@rock-chips.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rockchip@lists.infradead.org
-Subject: Re: Re: [PATCH v1 2/2] net: arc: rockchip: fix emac mdio node support
-Message-ID: <9926fc06-7f64-4902-b933-23b68571db5b@lunn.ch>
-References: <dcb70a05-2607-47dd-8abd-f6cf1b012c51@gmail.com>
- <f04c2cfd-d2d6-4dc6-91a5-0ed1d1155171@gmail.com>
- <250cdfef.1bfc.192cd6a1f72.Coremail.andyshrk@163.com>
- <0a60a838-42cb-4df8-ab1f-91002dcaaa14@lunn.ch>
- <a7c2431.871a.192d75e5631.Coremail.andyshrk@163.com>
+	s=arc-20240116; t=1730206216; c=relaxed/simple;
+	bh=MlzbTF7Jl3zPw6NFycmFTVj7+8NV3jAQh+qkg5T97RI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=skoBDbeXwdjUB4AYdnxopgG7pd2aP9cteEH9/RgujR1TAGb7C6BFrbs8lN7/hrYuIKFbH7GUeJ6bA8WPcydSC/tTyd9tnxUS0FABa4DZe9sLr46HYiVt4L2K+mim9inAWEwGvpYtPbdCw4+ZbB6gTsfJAv5V1929dN7Mi41GImo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=g28+V//i; arc=none smtp.client-ip=217.70.183.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id B976A1C0006;
+	Tue, 29 Oct 2024 12:50:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730206211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gB3WSdXjO7v/Iei9P2xSNx89xruiqhNe99fDC+mG5Po=;
+	b=g28+V//iv+dZW0GMwuHLqnAZLIYhrPMLE/30kYpzXbU7iSDONAE1h8nzDO1/zqxtJ2RP6/
+	aFtkb9n8pfM5Sl8keTKm6+06VRwzs2MjQE59ywRQzU+P8zsG5CkGN/N1OpcHY7zhR91WfZ
+	Ni0W3Frrw1x0asdiWU4VLTLkVC/fNDFhIZ4GVYXBAiu30H9KumYpIInvZaQ5fNzx4ygIoH
+	eCH+gsa74e/NfromDTeQJ9mleEDF4PIoPeBtr3zrvJsUORUof8E/+IZQ/sanSp63RfN7g1
+	mLpzBjNlQ9IpY21e0ABIMQ6S2IhxnwyOR8Co7II0RGjR/eraRfg36zm9ZrE5pA==
+Message-ID: <1ca44f81-8c09-4745-939b-a29699fb937b@bootlin.com>
+Date: Tue, 29 Oct 2024 13:50:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a7c2431.871a.192d75e5631.Coremail.andyshrk@163.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 3/7] net: stmmac: Only update the auto-discovered
+ PTP clock features
+To: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ davem@davemloft.net, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: Thomas Petazzoni <thomas.petazzoni@bootlin.com>, netdev@vger.kernel.org,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+References: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
+ <20241029115419.1160201-4-maxime.chevallier@bootlin.com>
+From: =?UTF-8?Q?Alexis_Lothor=C3=A9?= <alexis.lothore@bootlin.com>
+Content-Language: en-US
+In-Reply-To: <20241029115419.1160201-4-maxime.chevallier@bootlin.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: alexis.lothore@bootlin.com
 
-On Tue, Oct 29, 2024 at 04:22:16PM +0800, Andy Yan wrote:
-> 
-> Hi Andrew,
-> 
-> At 2024-10-28 20:59:18, "Andrew Lunn" <andrew@lunn.ch> wrote:
-> >> Hello Johan,
-> >>     Thanks for your patch.  Maybe we need a Fixes tag here?
-> >
-> >What is actually broken?
-> 
-> The emac failed to probe after bellow patch merged.
-> 
->  [    2.324583] loop: module loaded
->     [    2.328435] SPI driver spidev has no spi_device_id for rockchip,spidev
->     [    2.338688] tun: Universal TUN/TAP device driver, 1.6
->     [    2.345397] rockchip_emac 10200000.ethernet: no regulator found
->     [    2.351892] rockchip_emac 10200000.ethernet: ARC EMAC detected with id: 0x7fd02
->     [    2.359331] rockchip_emac 10200000.ethernet: IRQ is 43
->     [    2.364719] rockchip_emac 10200000.ethernet: MAC address is now e6:58:d6:ec:d9:7c
->     [    2.396993] mdio_bus Synopsys MII Bus: mdio has invalid PHY address
->     [    2.403306] mdio_bus Synopsys MII Bus: scan phy mdio at address 0
->     [    2.508656] rockchip_emac 10200000.ethernet: of_phy_connect() failed
->     [    2.516334] rockchip_emac 10200000.ethernet: failed to probe arc emac (-19)
+Hello Maxime,
+thanks for reviving this !
 
-So it is failing to find the PHY, and given the 'mdio has invalid PHY
-address' it is probably looking in the wrong node.
+On 10/29/24 12:54, Maxime Chevallier wrote:
+> Some DWMAC variants such as dwmac1000 don't support disovering the
+> number of output pps and auxiliary snapshots. Allow these parameters to
+> be defined in default ptp_clock_info, and let them be updated only when
+> the feature discovery yielded a result.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-The commit message should explain this.
+nit: s/disovering/discovering/
 
-	Andrew
+Thanks,
+Alexis
+
+-- 
+Alexis Lothoré, Bootlin
+Embedded Linux and Kernel engineering
+https://bootlin.com
 
