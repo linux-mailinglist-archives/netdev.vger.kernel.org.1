@@ -1,103 +1,113 @@
-Return-Path: <netdev+bounces-139890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139898-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF1199B48B5
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:54:36 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 837209B48DE
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E108D1C220BD
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 11:54:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 173E0B22C3A
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:03:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4FF20514F;
-	Tue, 29 Oct 2024 11:54:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0FF205E01;
+	Tue, 29 Oct 2024 12:02:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="huzUNewi"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="vs8YLYaT"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [217.70.183.197])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C897464;
-	Tue, 29 Oct 2024 11:54:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C1DC2010E0;
+	Tue, 29 Oct 2024 12:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730202873; cv=none; b=JfYi/TD+99HGKsPqgv7vGajB3coqxmFP/83KpycfHR8v6kwy1v7o4iTh+U1B1GlI4RvYMuk48jbXBFYJQYyz+nPZhdB88xILDXyFtC9Xw7+2lVSIBvmxgI2JisLJyArRz5faW4ItEtGQI4WNFovRbm5CzGimyqO212xJQkWdgqw=
+	t=1730203371; cv=none; b=sG69uhXeU6yrmMtmBZjKCnkFXpjJiRoQCJB4nr28ecABlLWuDZIRUXJT5xtmxuwaWj4h2PeqQsy3Cl9PL7P02G8j2KsCcO9dx0H4ttZ40USjonkDso38dAC5L0V0gq+1ZOWQqOGD80eI3q9VxqqrRvyRv1Jb/udMgMn0FC3vuPk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730202873; c=relaxed/simple;
-	bh=1gVOx7nJBT2hbmD/H6fKlrhljqTLUC8tKX9QCyRhVqc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=hTdTaB2x/yVDx79PQDlVLcVggdbfYyvpeqExY/r3r4L3jVlx22yOP066P0nXddlruoMN/1xSJyYbdrK+ob5Ge5qgSX5Xptd29/MLR1v3V6XTIAaexVBEgv3AHjV3Kk7vFu6xeWx5KgpQdQQLhTPfRYRsv2nEv4aoDjv6D8P5sxM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=huzUNewi; arc=none smtp.client-ip=217.70.183.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id ABEE71C000F;
-	Tue, 29 Oct 2024 11:54:28 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730202869;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+tS5coFjCL1GpMVLn+Jt4VDJfqi7WRWtEsSocGUBw08=;
-	b=huzUNewiNqRNpYVxzTQz2brPQBEvqJ336v2olcaL11JZm6/5Fv4aL5763Yhrc8kFLuC/TV
-	ZPwh6Ha646K5kOCSinR1GdTqimRx6oiEr+rvXtFIDx0vr8XNq9B106KDfjbbAoEsb4ZBv/
-	Vdr9j9WDpHWWFT7FO+QrHOZsGomBO5uurm5r50HLfeBlny1ATcMK6MEyecw8dqVBQJ6ZbJ
-	CcS8SoHfGm0/j51F26uWN9Naou2W4aPojedCDaVyyEYOy/NWvnoRvbA4CrVq2H3OoUG4Qm
-	BNKCsvWzLUJfhr+bIAQbybLsE96hJaOUrPQ9Y+8pAEmcJ9ECWPS+1mUaktiutA==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	s=arc-20240116; t=1730203371; c=relaxed/simple;
+	bh=mkUNkwZOKzf/L7j4+ozdug6HRLKHrIEWQmmLtR0CwjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=AWBzMKzqmlNsm7PGHb3Bkbaikme8SuurzYx5/JpoRG+coTX57FGp3fmuS1ZUw+ZMCpapPrk2VKbCHFVNEAY5FVmARV8tOfu3/lW+TWRwz+Mv+M7uNvhJWoZeQQ8wuJwP6bpXHjfAk080jPhn/0dF2Xo5oMT8rkrTeiwvv7ahfEc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=vs8YLYaT; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=MSSENdvMyuzo91ZSJkXGlvut0qguBDSstRfo6W1iEF0=; b=vs8YLYaTD7EC7DDmaI+9D04Lry
+	WDkFRZQrLIEyJjIyx5G9C8b09fOunqRWJxscl30npec/cQWx10fqwvAssc7Lreg/wOCs5p2xRFPUn
+	jfES/jYg44wJP1yZMqcQMs3UZiY6JKNr4NPLzw3bBBJeSOilfPa+pCyc99OTft5ALLG8=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5kvL-00BZ9M-Rt; Tue, 29 Oct 2024 13:02:11 +0100
+Date: Tue, 29 Oct 2024 13:02:11 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: jan.petrous@oss.nxp.com
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
 	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Shawn Guo <shawnguo@kernel.org>,
+	Sascha Hauer <s.hauer@pengutronix.de>,
+	Pengutronix Kernel Team <kernel@pengutronix.de>,
+	Fabio Estevam <festevam@gmail.com>,
+	Emil Renner Berthing <kernel@esmil.dk>,
+	Minda Chen <minda.chen@starfivetech.com>,
+	Nicolas Ferre <nicolas.ferre@microchip.com>,
+	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+	Keyur Chudgar <keyur@os.amperecomputing.com>,
+	Quan Nguyen <quan@os.amperecomputing.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 7/7] net: stmmac: Don't include dwmac4 definitions in stmmac_ptp
-Date: Tue, 29 Oct 2024 12:54:15 +0100
-Message-ID: <20241029115419.1160201-8-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
-References: <20241029115419.1160201-1-maxime.chevallier@bootlin.com>
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
+	imx@lists.linux.dev, devicetree@vger.kernel.org,
+	NXP S32 Linux Team <s32@nxp.com>,
+	"Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Subject: Re: [PATCH v4 04/16] net: phy: Add helper for mapping RGMII link
+ speed to clock rate
+Message-ID: <cf51e433-4622-498a-8754-60b220cb6aab@lunn.ch>
+References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-4-03618f10e3e2@oss.nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028-upstream_s32cc_gmac-v4-4-03618f10e3e2@oss.nxp.com>
 
-The stmmac_ptp code doesn't need the dwmac4 register definitions, remove
-the inclusion.
+On Mon, Oct 28, 2024 at 09:24:46PM +0100, Jan Petrous via B4 Relay wrote:
+> From: "Jan Petrous (OSS)" <jan.petrous@oss.nxp.com>
+> 
+> The RGMII interface supports three data rates: 10/100 Mbps
+> and 1 Gbps. These speeds correspond to clock frequencies
+> of 2.5/25 MHz and 125 MHz, respectively.
+> 
+> Many Ethernet drivers, including glues in stmmac, follow
+> a similar pattern of converting RGMII speed to clock frequency.
+> 
+> To simplify code, define the helper rgmii_clock(speed)
+> to convert connection speed to clock frequency.
+> 
+> Suggested-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c | 1 -
- 1 file changed, 1 deletion(-)
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-index 430905f591b2..429b2d357813 100644
---- a/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_ptp.c
-@@ -9,7 +9,6 @@
- *******************************************************************************/
- #include "stmmac.h"
- #include "stmmac_ptp.h"
--#include "dwmac4.h"
- 
- /**
-  * stmmac_adjust_freq
--- 
-2.47.0
-
+    Andrew
 
