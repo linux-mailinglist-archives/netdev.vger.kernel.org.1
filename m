@@ -1,97 +1,124 @@
-Return-Path: <netdev+bounces-139916-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 308E79B4990
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:22:07 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B23F9B4998
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 13:26:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DAD5C1F237AC
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:22:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCE011C211AC
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 12:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09FA4205E24;
-	Tue, 29 Oct 2024 12:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD2D9205E0A;
+	Tue, 29 Oct 2024 12:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="dkEhVsL1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Vt7t35wH"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10C938BEA
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:21:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE8948BEA
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 12:26:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730204519; cv=none; b=GWpvPyNCAuVBKeyEQf6tmSz/kcfn75Y61CvrolyiXfOhYP8FPueubJzYgVlgfZt1joOzUIOoovjZMeZSvXgfBBW5eLvZJgd/R8OPj173jvOwyY5+2d6LBbrK6qIt/ipCTgr+IT0UhvBvn/PSrY+MFqjfLWPX5ZvHsnutmoA9P30=
+	t=1730204812; cv=none; b=YzQdMotAU7kBslPtqf+gh9fk1SL4sGTOIn8BmOk1Z3U6uRhoEBTLszAixTpSmJwZ2GYRemBFjn+KNhzBRPFUYKrF8kpnCHwdAM1hepBgm4A1RjjzOdLeg4zWj64NyyVt5liFd2+5UVp27nsuh4TWaCFuPnIya20o18SgVzBwDCM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730204519; c=relaxed/simple;
-	bh=gYzIoqdSwekIU6bdXNiROsHGwypLK3Enyq4cn6vyFWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bxdcQRYLjW7fRFC9X1I/kL2H8obpxdS//cC1atsupkp5ASiz9GytjVlZieNk7xbUIpRsSy+ivhb+uNTJqBd4R+tZ1jKrB5qp6ZZY+WmWv9UgUWcPzaBZ2o7CBa4WRX5cnLaIYCHkwxUVLnxzCnYKdaUPRh+6Pqrm2EnUOMI0Dv0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=dkEhVsL1; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HzQ1z+1DbL3z/C63wYQzQP0dbfy7JZgtq9MdE3mHlNE=; b=dkEhVsL11GHDyrM4q0hZSyx9It
-	BTQ1HfXOYJfMWembK79uWDiCL/tthrJjOwVais9X4v6t5aShPtVsOMjZNtBoandjIhtV3A2A06g/8
-	HlXHNUue9Kl1m/DGDOkmSYPpCv8emFat115E7pBNCuAr9Ijsi/K8uJVPVRoaBLh3pNkg=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5lEE-00BZXE-LH; Tue, 29 Oct 2024 13:21:42 +0100
-Date: Tue, 29 Oct 2024 13:21:42 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Vijay Khemka <vijaykhemka@fb.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: ncsi: restrict version sizes when hardware
- doesn't nul-terminate
-Message-ID: <30b946f2-bfb8-4938-8f12-1b10bf81972a@lunn.ch>
-References: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
- <20241028-ncsi-fixes-v1-2-f0bcfaf6eb88@codeconstruct.com.au>
- <286f2724-2810-4a07-a82e-c6668cdbf690@lunn.ch>
- <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
- <4f56a2d0-eb1b-4952-a845-92610515082a@lunn.ch>
- <f3d0cafe11000fe1cad7b4ad13865b3bcfd2ad27.camel@codeconstruct.com.au>
+	s=arc-20240116; t=1730204812; c=relaxed/simple;
+	bh=OIiNsApqwgm71NjUFM1ADgAthsV5yL2jS8pl3Uc8ZmQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=uuPq6+HdwTbKvnEYL+jP/VyRrCvGR24XEIX8EizuP04xi+YNs+BihFfE9hmo0xmniRtF5yn7yrOUJqn+OHz6Up8Tk/w2f096FHaCPb2zLM2CSAseKKG5M9rOXX0m78XaA7MjObh6Ei1wO3jklx6CKtcE9amC+OYAajRAbZ+i7v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Vt7t35wH; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730204810;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GOZTaD4SZpZxUnHx9eqNQXCMnDT5MQfWDHUrJEYUGAI=;
+	b=Vt7t35wHnLgvy7vBnA8aqxcVgERbWrFMxWnwQgrGj4imxl/s9ozfpv9tsw9y0+NxYUx7Lq
+	fIJtCFZK7jZeclL4HvRjU2aS02r+f4PCTY82b7zuaK3aI51tt0kZYy/QDpZBcbXA4dy8M+
+	KDwyM7GSgcpB7a+g6Z6wKekYfBbDTMo=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-401-N8JAxcW3Nl6C4IxZJuj1kQ-1; Tue, 29 Oct 2024 08:26:48 -0400
+X-MC-Unique: N8JAxcW3Nl6C4IxZJuj1kQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d3e8dccc9so3066362f8f.1
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 05:26:48 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730204807; x=1730809607;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=GOZTaD4SZpZxUnHx9eqNQXCMnDT5MQfWDHUrJEYUGAI=;
+        b=qn2qvtUcJkQoB90wjY5HwWDdIZOTkwjKp1EF8NSSh16nw+RiQebemQXzpBSgqc6u0f
+         iZ0fx7F8QjLGVN6OEqU+pY3zhIbbfu/c/tnc3WlZnU312i6ofHZiJMgCqvCSlDwlOr61
+         h+1/9lOHqhs1xVDsllL0AuhPQkri35UQJ8oh8nC7eH6dq/YJzsdmmJuK0YYeu62kXK96
+         MX9/DA215s34ysJmmVE2ze8ZOwZeDCa1UENYL9nwKGtadMYLG8u/tlt7n8fK72RTWNMH
+         f3jfHxEfW0nd3V3ymScLjA2nGy9dYSk802UhT+CM0O0nfjG3KF3SqqRwaXQZfex71cX1
+         2nuQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWEGL+XAqdW63MfwiC8ChZ8HbL3EzX/GyMl7BLZBHMVU/m+xNTCyTqi1ZN4Wen6gqA8UwuaFIM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwBhI0RA64nDylT1NAQFg7lfynjCx//1Ti5n5jNUPByKDcwMWL+
+	WxtPMfBIUacu/zC1DPbtvzpuGcx3/9m1A9ZHsP6XmFd83pq6aW01N7Camm/R6X92BdMq2pnlCXw
+	KYwi/h7UTQ1OTlxSWhXKI4EfmS7yLRfaMxV8qyg5dqDmQ9dD7Xdo5Cg==
+X-Received: by 2002:a5d:4849:0:b0:37d:4e03:635c with SMTP id ffacd0b85a97d-380611441bbmr8953978f8f.21.1730204807533;
+        Tue, 29 Oct 2024 05:26:47 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE7KLM8OM21izjqXfNP/B0QCUjjPNIlLTzWnqUD6a68rC1KUBMbMRh54JsB8kR9ClHY4mPX5A==
+X-Received: by 2002:a5d:4849:0:b0:37d:4e03:635c with SMTP id ffacd0b85a97d-380611441bbmr8953961f8f.21.1730204807135;
+        Tue, 29 Oct 2024 05:26:47 -0700 (PDT)
+Received: from [192.168.88.248] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b46bffsm12311553f8f.46.2024.10.29.05.26.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 05:26:46 -0700 (PDT)
+Message-ID: <dee9769f-d86b-471f-bbe2-f0165489618c@redhat.com>
+Date: Tue, 29 Oct 2024 13:26:44 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f3d0cafe11000fe1cad7b4ad13865b3bcfd2ad27.camel@codeconstruct.com.au>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 net-next 14/14] net: sysctl: introduce sysctl
+ SYSCTL_FIVE
+To: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ dsahern@kernel.org, netfilter-devel@vger.kernel.org, kadlec@netfilter.org,
+ coreteam@netfilter.org, pablo@netfilter.org, bpf@vger.kernel.org,
+ joel.granados@kernel.org, linux-fsdevel@vger.kernel.org, kees@kernel.org,
+ mcgrof@kernel.org, ij@kernel.org, ncardwell@google.com,
+ koen.de_schepper@nokia-bell-labs.com, g.white@CableLabs.com,
+ ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com,
+ cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com,
+ vidhi_goel@apple.com
+References: <20241021215910.59767-1-chia-yu.chang@nokia-bell-labs.com>
+ <20241021215910.59767-15-chia-yu.chang@nokia-bell-labs.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241021215910.59767-15-chia-yu.chang@nokia-bell-labs.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 29, 2024 at 12:06:58PM +0800, Jeremy Kerr wrote:
-> Hi Andrew,
+On 10/21/24 23:59, chia-yu.chang@nokia-bell-labs.com wrote:
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
 > 
-> > > However, regardless of what the spec says, we still don't want the
-> > > strlen() in nla_put_string() to continue into arbitrary memory in
-> > > the
-> > > case there was no nul in the fw_name reported by the device.
-> > 
-> > I agree with that, but i was thinking that if it was not allowed, we
-> > should be printing a warning telling the user to upgrade their buggy
-> > firmware.
-> 
-> Gotchya. All fine there.
-> 
-> > Are there any other strings which will need similar treatment?
-> 
-> This is the only nla_put_string() in the ncsi code, and there are no
-> other string-adjacent components of data represented in the spec (that
-> I have come across, at least).
+> Add SYSCTL_FIVE for new AccECN feedback modes of net.ipv4.tcp_ecn.
 
-It is worth mentioning all this in the commit message. It answers
-questions from reviewers before they ask the questions...
+How many sysctl entries will use such value? If just one you are better
+off not introducing the new sysctl value and instead using a static
+constant in the tcp code.
 
-	Andrew
+Also this patch makes the commit message in the previous one incorrect.
+Please adjust that.
+
+Side note: on new version, you should include the changelog in the
+affected patches, after a '---' separator, to help the reviewers.
+
+Thanks,
+
+Paolo
+
 
