@@ -1,274 +1,193 @@
-Return-Path: <netdev+bounces-140182-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140183-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 425939B56FB
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:33:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B6E39B56FF
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:33:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00C83283444
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:33:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EBEC92846B5
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:33:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0B5C20ADDC;
-	Tue, 29 Oct 2024 23:32:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EdBlSLEG"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAFCC20ADCB;
+	Tue, 29 Oct 2024 23:33:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85AC11DF753;
-	Tue, 29 Oct 2024 23:32:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730244766; cv=fail; b=nZuqsgVL90r8+9A68q6F8WEncRLevie0SUfTWdxOWtxgwf+Wr9vxfDejXKCPfr2Ish54rNK/whBk4rahItoK7CGnBEBNPv45LVqxcEdRu+JcA/1JwlMuoB+feSQVM9w3H5affV3/3qv0iJDNjzyuzuLb16jKqFfDxE2h7cMCxpM=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730244766; c=relaxed/simple;
-	bh=dXFZtceRF4ci57mp2hajgkY6H3H1FKS9cHX7XVh76qc=;
-	h=Message-ID:Date:Subject:From:To:CC:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=mXyErPMOMrK47H31OYdMDAg6Jk8e+86/u/aqf7kJeMpUwdoz4mAXAUM00JzBBq/vXPgO6X2zDl41PkRISq29IKAiJT9uZqtTCoPk8gKlc0LZ9OPPHxtIEdYvuM7H5nPTyyDyGx1dYbOSH5HMp+ZjUxSfCVrFEjgfHEOoqzhvJSY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EdBlSLEG; arc=fail smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730244764; x=1761780764;
-  h=message-id:date:subject:from:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=dXFZtceRF4ci57mp2hajgkY6H3H1FKS9cHX7XVh76qc=;
-  b=EdBlSLEGeUKY9fh6R77BIXFqZxF4sFUjwzwRpp636o0sW+JqrJt6SeYQ
-   0pAPWz8qmsNBG21AmyUOo9iFvTIRgRPCM8n7m0GfFEPIdeZ4xE84lpaLD
-   rescPNvplM5BaKDEY2mxVvtGvjiiMmQz9XNyPmPEoi0JoJyvG3qpMHJyd
-   t8xqDMHAQqao9ba+Ak6fb/1ImdDONE+IGRoIxcSw5rEccLkmDwAZ1fHRh
-   ofFZBW11BUOpyxBBthZ2SRjAIAhxTaB4CBTjYMc4GOOSJtT/dMOZTteio
-   cntBJn3CSN8K0K3X9ytUG8BGClvmFI0PImGC1t7ouDKn1Qu1g1DxE2OkM
-   g==;
-X-CSE-ConnectionGUID: jgyw5xMbRoSzS98TAfRChg==
-X-CSE-MsgGUID: ZVQgbLunTiycc+ap3IJVpg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47382781"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="47382781"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 16:32:43 -0700
-X-CSE-ConnectionGUID: UDfIMvr6T9eN3tqEEMrs7A==
-X-CSE-MsgGUID: jmL9+1PuS7WqMJiAQbjf2g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="86877570"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Oct 2024 16:32:43 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 29 Oct 2024 16:32:43 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 29 Oct 2024 16:32:43 -0700
-Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.47) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 29 Oct 2024 16:32:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=OJono6Lmu0obkUgE3MgQGbSQdL3zpbluFKQxQ3cdEFYPeMZqOoGWUoF8WB53vH+i+6zw8I+folPn+DhsXBaE/5nwzgQqOjPZGM3/USULdKKPIz7VYZj1se/R5HgoxExz8ED4xKnU+6Y6Yt6NHZkpEC/GUzq7km3VzhW3Ug7WRoIoiyI+g3Qu72PReiGQYiGfGxKv6IKke1yOTiJgCjXpMZlSyGHuCfN7D9gV8KHUxxjyMOpWOjNH90EAX7NM8Acn9R9ONFWFlqj2xW3A53v2Y9XziLyw2qMgdoD7RXtlSFvp2gDJkf1fRArPhM8DhMJFCvxDX3ycwVGNrUCTD8dCqA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jpsMJDCjXKiBrKXqEvaobd+aUlNI3ZGv468/PyhocNQ=;
- b=ctTxnP0yAwqyB4FfJR1AbVfu0Rg6kb/1uXTmfuSqUmbGC1WInln6Z9586KXnS/E2AjTvXZeclVYhJhF0oJngcGPcEHzyv1fi2m1XfFMF0IJFNPLd2bqoB6YwucevGe6ja7HGhqAxjchi+aLv5bi9sfKwAx7wMHoPv1/9w6uJOr7kQPvpx1VeXlmOUMfvL084OIFOLZQj9/Ebk/Gwpo00sq1/tEUFbflplKZlO9pbh+TbzAM4wNPdPWKJtEKxXE/6bT/OknSLrt6PVov9D7GmnvwppdAzxKfHfCsoPN2xR8sGEWTa1fvnDIPRQNRINp+Riev4tbIAHiXNZsqAWWOHGw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by BL1PR11MB6052.namprd11.prod.outlook.com (2603:10b6:208:394::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.23; Tue, 29 Oct
- 2024 23:32:39 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8093.027; Tue, 29 Oct 2024
- 23:32:39 +0000
-Message-ID: <62387bab-f42a-4981-9664-76c439e2aadb@intel.com>
-Date: Tue, 29 Oct 2024 16:32:34 -0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 6/9] ice: use <linux/packing.h> for Tx and Rx
- queue context data
-From: Jacob Keller <jacob.e.keller@intel.com>
-To: Daniel Machon <daniel.machon@microchip.com>, Dan Carpenter
-	<dan.carpenter@linaro.org>
-CC: Vladimir Oltean <olteanv@gmail.com>, Andrew Morton
-	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
-	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Masahiro Yamada <masahiroy@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-References: <20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com>
- <20241025-packing-pack-fields-and-ice-implementation-v2-6-734776c88e40@intel.com>
- <20241029145011.4obrgprcaksworlq@DEN-DL-M70577>
- <8e1a742c-380c-4faf-a6c2-3fa67689c57e@intel.com>
-Content-Language: en-US
-In-Reply-To: <8e1a742c-380c-4faf-a6c2-3fa67689c57e@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: SJ0PR13CA0154.namprd13.prod.outlook.com
- (2603:10b6:a03:2c7::9) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27260209691
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 23:33:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730244811; cv=none; b=VGTzVebTQof8yQfooBhz02tqmKLChClyV8BIg3pUSGgXD2aEDtjHsWtkfucDvqvaUn3goQepQiXa3xjwd66rQXseUEVmxsHv+gk6h7XLP6BIywd+j1QaTtvRFPS03AG73yoby0OloD9kMZjbaYyT/nv7m+bpwcvtzX9IWNi50KE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730244811; c=relaxed/simple;
+	bh=lkGFz66Izmi1TwdOfObxU/3HwWsi+KmWRZv5/Wwjws8=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=DHGNRZFe2oj2SsHVbxuxx8xmyJO0NTCa5rwt4CBwWBtoEVUWlThcgeSXkctXyAxU5vOA9pAxol+01Kme7A6/1i2+CjWwfmbnGXQPjK9kZWiftRlzQemsud9YvS5TZQ8sJxtFeyyF+qwrQz6s5G3yih7mRzeYhUnSSaYpulbuYoA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a4ed20b313so36792145ab.1
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 16:33:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730244808; x=1730849608;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=0K3qxZIjQsyUM9E4K+xe2W1RC/TsuCHPYquESVj5rOk=;
+        b=i1D3aGSia9rJ1yBNJiBvzG6GvliN/5YUY4j3R0GgDrRwZyTyaG9Lap7KY1n486Xi+N
+         MVP+kYFzHOd1Zs4h4M6g3xpHILIfdXxkcvb2pzgejD3LRv+ntXYwYMIwocO9+5yArRT0
+         egUQmLjhwJc0r1EYemU7IsKUvp8ivwALLs6XsEzspV08KmEW0iL2FF52cix1g8lXiaox
+         ssyoSDy4ZF0BlB65yULc7sqbY4o8Zr64YaNIr7Qvhp7sGCxPTpMOhvWiL5tdEQ1C842U
+         MeQycuQ0lUsClRfZURtyXVVxJGVkWUiLzE0wcoN7eaXJGzqpDOih0OEXKHLBECkGcX5z
+         vrtw==
+X-Forwarded-Encrypted: i=1; AJvYcCWI786zMylRxoZ06d/s5DYgWKnMoLxLtDfaPOz8GxvrSTfLO5xbWdp7i/+yxqBz08I+ECYOt5Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx99Kg9WLaEVRhcuctqN9a+uu4Yr+LwRLRu6fncLpR2HXfasAie
+	MRLg7R7ExYQAffOoPWEM0LlPiUQhHobBv64hMaMQ+DfQ0bKGcti8YsyUnGT4ziYu9TEvxiCbVKq
+	iBi2ZfdzYNu7tv64+9cwdEW2VPCApPEWvo6SVBhflBE4VqRaGAXrZn5A=
+X-Google-Smtp-Source: AGHT+IFHXvRvSi/wbqVbYgwQWCe+DpQurNEz08PBFbkRm71LC6vYmdCBqjkwQVgPqlorUxvZTXQmo6a+dQxdcZZNcXcUF954UsGc
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|BL1PR11MB6052:EE_
-X-MS-Office365-Filtering-Correlation-Id: b68c77c6-abad-497c-1359-08dcf871f98a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|7416014|376014|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?NlJMOXBaemllalNXRm5FOHVzeFcxYVJLMlBuTkc0YkhmQjBBaENndkZLaTR1?=
- =?utf-8?B?OWZpWmxHVUV5V0FrSWhsT01TczhqMk5sbXBva2dmYU5qaXZGUWIxRUVSak1F?=
- =?utf-8?B?UTdlVUkyRkFGalJobDRUd1pLVW5zalZ2NjV2dTdiSVdTUWdzWTJaZE5aanE0?=
- =?utf-8?B?VkZDSEY5TklZU1FHTXRHTHgvVW5JQXpnR3FHYUNjSVE0R2xhaXhZQ0h6dlFt?=
- =?utf-8?B?UVl3Vm5OdXM4Yk1rT1R0Uy9MUUw4L09xRno3NE1VSTVBU2NYVHFQSGI2dWFU?=
- =?utf-8?B?N2E1eURhd0srbGpqZDNwSjJzOE5BK0ZkSXNnT3NNU2xNRWpBZEdiRXBxYjlZ?=
- =?utf-8?B?MDNQVHNsa2w2bDhWenRMR2ZUaElpdmUwZ25TK0RzV3RYOVVTclBIR3hHMXVh?=
- =?utf-8?B?NWtXT1ZpNU9TVnZWM2RIcE54dE1wbllPZU9wVlBoZVovVUdscklqWGdSOGw1?=
- =?utf-8?B?UEZwbHMxNlM4TE1sS3NmbTQrV1R6SGluSVFOT1dhc2xFVXNZVzJrdEJGUFZi?=
- =?utf-8?B?VWNqTGYraWJUNFpOLy9PWFhEZkhuU0VxbmlTUXpIeGhGcW9VMmdkdVJ3ZWhT?=
- =?utf-8?B?eGFqcDZsZHp0Zmt3SmVpRzNZcXkyOTNQTjJjaW4wVnRQTGhDK3haN0xUbGgz?=
- =?utf-8?B?TVpYNTV5WmZkTkhJUGJtMEMzcTJ1blZaTjUwYnEvUHlibDQ2aU55aG9yRSsz?=
- =?utf-8?B?djZiQnVpcnJlT0NrUGxLNzg3aDdBUzBVaEhncDBIelFjbi8vRFhjalNRUTVo?=
- =?utf-8?B?d21IT3VZcVFHWE5vTnB5TFR3RUJCZkh3MnlxenZIYXZxbHIvVDFtc0RwTUc3?=
- =?utf-8?B?elowY04xZjI4R095djVwQlBVR0dmbEpaRlBJbWVaSkRhNWNHZ2ZNWHdHY2dK?=
- =?utf-8?B?clJtM3ZZdXpCbmh2TGJ5ZmZDbVVSREY0K1pOVmNqMk9ILzdKYStXa0plMkRM?=
- =?utf-8?B?WVRSSmFOU2Vzbzd6aHRhNE1QZDI2ZHY3eForUk90aXRIQll2WnNkWitNN3B5?=
- =?utf-8?B?YzFxQy9xMVNPckZFZ1hvZWhKLzlvYzZkaUlMMnYveUVKRExkZ2JYckdpYU9M?=
- =?utf-8?B?N1UvdVZlQXZlUW4yOFMxalNRN0ZUZFo3WUhiUm1kV3ZEVzl6OEZCcmllY2lj?=
- =?utf-8?B?WlVDQllXcWlqSnJZdndMcFN5Q2RpcEQxVkdlNWpObXVrR0g4c1pwRDhEZ0VK?=
- =?utf-8?B?SERZa0F6STc1U0l5K2NBMUJLUFVYS1J0S0laN2tTanROZVZ3dEMzRkFpRVQ1?=
- =?utf-8?B?N05RQ1lmQVlxOVp4bXV6VlRMRnVlWm14K210VUQ4OWU0U2hQQVdRYW9RSjhT?=
- =?utf-8?B?YjZhL1JuMkY3RDMvRTRuV0ZEZGxvQ1BLTWZCVm5kTXBsRjJWM0k1ZGNlU29S?=
- =?utf-8?B?U01tNWJuVk9sTHNCV1Q0akpIUlFpS1c5YmgvdDNPMlBtMDA0L1BEenN5aGlM?=
- =?utf-8?B?UkxSekliV3dqbjBqeUY1Ujhjcy9ESjFzZ1ErTnA4TG1NL3FidU54T2ZCcjF0?=
- =?utf-8?B?ODEza05ZR3NGUlRwRXVVTUhHcUZ0Wm9GNFpETCtndlBZdHVwY2xORmx3bXg0?=
- =?utf-8?B?ekVOZWUxV0hmcVc4VkFacVorNVJPajhYc0puTGRNcUV1VzluSUM2RDYvYkVs?=
- =?utf-8?B?b3pTRFJvSUxWSW5MWGFwWkhXOFQ3bHd2YlpuckgvK2M5SUhVNiszYmdPei8x?=
- =?utf-8?B?UDh3c20vU2VrRWcyWm9LYTkzT3B3dDh0dGxiWXNxWkdtamFTTTliVVdENy9E?=
- =?utf-8?Q?dfC+GBRAjt/QWFe8qjhUss3oiWk4RGsdW7Q18QS?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(7416014)(376014)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?OU5zdFpJZGNtQm5kWHpTRjhNRll5Si9Gdm44UmJmdThnbVpibERUejFuU1Ax?=
- =?utf-8?B?TlJqNys1MTJ4QlkxWHVHRjBCQVNQMGtQL2ZMUkR2Sm1UeVBqZHpVTnFsYUp1?=
- =?utf-8?B?dlE0OWliMHFQdXZHYk1ZWE5idXMvRzA1bkorNS9Pd0NpaFcvVUhydi8wSDdM?=
- =?utf-8?B?VjBSNDluRVlKakJSL3hPL1hsaWJwZkJCVTViRnEzSkFJbm5LVlhKeVRRR0lQ?=
- =?utf-8?B?QlROTVMzOFZjU0t1VXRidnFhSmNLSUVZUW0zMjJXazdpZHZFc2wyVGgzTFJ1?=
- =?utf-8?B?eFhOWTAwejBSdVlGV1FSeUQ0YlVkWHNpRnBUZ0xhTy9jblBEdGkyRXlITWti?=
- =?utf-8?B?ejZnQ1BJMi82VzR5NkpreVoxenFiQi9NOEhhT0NtbXBjV3RISUQ0UW8xQ0JU?=
- =?utf-8?B?aDBaQmdKakc5dnpXbS9NZWFEaUlUTm9MZU9BR1U4eTYySjc4VXZNNlBrT3Z0?=
- =?utf-8?B?V0g1eVlVK29GbGdLZ2FrVm1BcXlCMWpqVk1seU5VNHJINjZKcVAwb2pkNzMy?=
- =?utf-8?B?dmp1NmJYcWk0b0hYbnpUTWxjWlh1Uk8wWER3ZTY5NGI4S1NrMlZELzRtTTU3?=
- =?utf-8?B?TzhxWEJPZkFLSktMVTAveHhHdHRwaEExbHhpVHhVTzYzdkhab0pNT0xTTjMx?=
- =?utf-8?B?eGV5dHJadkR3c01ubkN5SFFkMFJJV3dHZnJqcGlldzB4c2Z2dysxT1FzNVpj?=
- =?utf-8?B?ZGZpQVIwTmtsbGRJWlJ6UHN3eXJlUkhLSnB5NmFxWHVSWmVrZk5JWmtQMzJQ?=
- =?utf-8?B?Sy9STjlKNlNNOWxZZDR1cmZMbDBJR1J1UVdxRkFXMURVeWpvdEp5WmF0SkYy?=
- =?utf-8?B?Q1RQdHBxcCtvditWMmNKUzNrZllGMnZSTFA2UytCZUVCc1dXQ2sxRWpBN0wy?=
- =?utf-8?B?a1FPNUxJdFhIa05uMEtHcVh3N3dNUnVFTDNaWkhoRlQ0dmQ3WEs5UVR0Ynpu?=
- =?utf-8?B?QVRLMHJYR255MVUxSFlPZ2J2QVdDYTZIZEdwN2hwandpTFV0VTB4bk1NNjdP?=
- =?utf-8?B?V0ZBVVMraHVqYzI3Z2UrT3NNRUtEejhHait2TzhZTDJZblFmNzgyeEpCYVV3?=
- =?utf-8?B?aHMxYmFQYk1FVzZ4dHRhL0s0SDF0aU4xbFhSemlHUHE3RVd6U3QzeDNpUisz?=
- =?utf-8?B?TnRXdmh5ZHdMVVpFajFncEtRdkt6Qk9jS2piZUZ6R2lkbVNUR2JrLzR4dmJM?=
- =?utf-8?B?U3hadWNPNjdVdWw5Y0VaTHFJZ05ZM1UrbnF1eVVpMWw1OFZHcm1UTlQ0V3p3?=
- =?utf-8?B?YzlxNjNPRGh4NktiWVIvdnlJamN5aGN4eVorT1VyZWlpSE1TNG5xZk9Bdy9o?=
- =?utf-8?B?V3FROTljRUlCbkZUV2xqZjA4VUtvZmMzVS9hdHlQUGR3SG0xMnhCVmhTaGhW?=
- =?utf-8?B?RnhycWM1dVJ2ZWRRMFcyUVdUNjNwTVVHMXhYQlJOTHA1Vi8zeUw4Z05FMm5M?=
- =?utf-8?B?Z2cyaDMvaEtFUUxXaXlXcnBQekJ2R0tCdzNJNGNWK0EwV2RGVmpnZG9Kb0lx?=
- =?utf-8?B?TTF4a1lFWmtMTWFpUnhjanI2OXRGQ0JxK2IyZHZGQXFGTFk3UnE4RzczYmp2?=
- =?utf-8?B?aytXc1dTQm5QdTh2TFNDWUhvZ1FDcFhpd0JxVzBHQmc1OHU0N0JMaFg4NHRP?=
- =?utf-8?B?cHVTZ1NpZk4rdDc3ZERTQWlJdTNIQ3A3UHpUNnd6TTR5RHpJN2FOUlpVZE0r?=
- =?utf-8?B?ejRiZCtzVHpIM0xVQlpmUnFidGdDbkgvT25mMjVjTjFKYXk5Ymd4NngvUTll?=
- =?utf-8?B?ZVZXTFlUMXRUWTU3MkR5bkJHODBSY1NEeDFFUmh0ZjcyamZXSm5CK1ZmcWpJ?=
- =?utf-8?B?VWZwZ3VhQTNmaFVrVThzR01xVUlvYVV3SS85NUFDSUtYSXUzM3N0SjlEMlVS?=
- =?utf-8?B?VWE1bFF5ZXplR1h0K0RheFRuWFM2bzZSL25HOXd4MmdYbXQxSXMrOHY2WlVM?=
- =?utf-8?B?Z1FBNXVTWHYwVmlYdEQyaFh3SGp1ZWhJYjlLVXk5ekF6SW9RaWRUUVFiajFs?=
- =?utf-8?B?RnZzdW13VkVMTHc5Z05TTmVuYzlyNGM2ZVI0d0h3VWlqaDdMckt1aWZaT0lB?=
- =?utf-8?B?MW0xTlNOdWUraWQ4b0NodVdhbVBQUkRXeHZMaERPdUpDQzFHU3lhUVdZQk9o?=
- =?utf-8?B?NktRQUJwK1B3MnN1UWdjUzhWREdYZG5vZVBUUjNveUczVmVaVzdHZTNxVWhR?=
- =?utf-8?B?ZUE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: b68c77c6-abad-497c-1359-08dcf871f98a
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 23:32:39.0423
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Bt/1OKf/3Nm0JmCExj9pn+SC3+dhPctFttVkImla1HhNICAfqPIbBzJQ3XRTGmQDE0rF725AfEI/+hVWt2W9eKmakp25U8MXUKQ/engDcXA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR11MB6052
-X-OriginatorOrg: intel.com
+X-Received: by 2002:a05:6e02:16c9:b0:3a0:4250:165f with SMTP id
+ e9e14a558f8ab-3a4ed1ba55emr135378245ab.0.1730244808264; Tue, 29 Oct 2024
+ 16:33:28 -0700 (PDT)
+Date: Tue, 29 Oct 2024 16:33:28 -0700
+In-Reply-To: <000000000000869803061fb207d1@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672170c8.050a0220.24951d.007d.GAE@google.com>
+Subject: Re: [syzbot] [usb?] WARNING: ODEBUG bug in get_taint
+From: syzbot <syzbot+ffe5c7db7c30a0fbb165@syzkaller.appspotmail.com>
+To: andrew+netdev@lunn.ch, andrew@lunn.ch, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org, oneukum@suse.com, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+
+syzbot has found a reproducer for the following issue on:
+
+HEAD commit:    e42b1a9a2557 Merge tag 'spi-fix-v6.12-rc5' of git://git.ke..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=16fb4540580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=59c645aba1a913f
+dashboard link: https://syzkaller.appspot.com/bug?extid=ffe5c7db7c30a0fbb165
+compiler:       arm-linux-gnueabi-gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+userspace arch: arm
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16f7ee40580000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12953687980000
+
+Downloadable assets:
+disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/8ead8862021c/non_bootable_disk-e42b1a9a.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/58af25eb211f/vmlinux-e42b1a9a.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/7c1b9c1d3d1b/zImage-e42b1a9a.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+ffe5c7db7c30a0fbb165@syzkaller.appspotmail.com
+
+dm9601 1-1:47.0 eth1: unregister 'dm9601' usb-dummy_hcd.0-1, Davicom DM96xx USB 10/100 Ethernet
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 1781 at lib/debugobjects.c:514 debug_print_object+0xc4/0xd8 lib/debugobjects.c:514
+ODEBUG: free active (active state 0) object: 8436afcc object type: work_struct hint: usbnet_deferred_kevent+0x0/0x394 drivers/net/usb/usbnet.c:633
+Modules linked in:
+Kernel panic - not syncing: kernel: panic_on_warn set ...
+CPU: 0 UID: 0 PID: 1781 Comm: kworker/0:3 Not tainted 6.12.0-rc5-syzkaller #0
+Hardware name: ARM-Versatile Express
+Workqueue: usb_hub_wq hub_event
+Call trace: 
+[<8199a4d8>] (dump_backtrace) from [<8199a5d4>] (show_stack+0x18/0x1c arch/arm/kernel/traps.c:257)
+ r7:00000000 r6:82622f44 r5:00000000 r4:8203d914
+[<8199a5bc>] (show_stack) from [<819b8a70>] (__dump_stack lib/dump_stack.c:94 [inline])
+[<8199a5bc>] (show_stack) from [<819b8a70>] (dump_stack_lvl+0x54/0x7c lib/dump_stack.c:120)
+[<819b8a1c>] (dump_stack_lvl) from [<819b8ab0>] (dump_stack+0x18/0x1c lib/dump_stack.c:129)
+ r5:00000000 r4:82870d18
+[<819b8a98>] (dump_stack) from [<8199b100>] (panic+0x120/0x374 kernel/panic.c:354)
+[<8199afe0>] (panic) from [<802420e0>] (check_panic_on_warn kernel/panic.c:243 [inline])
+[<8199afe0>] (panic) from [<802420e0>] (get_taint+0x0/0x1c kernel/panic.c:238)
+ r3:8260c5c4 r2:00000001 r1:82025ce8 r0:8202d750
+ r7:808547a0
+[<8024206c>] (check_panic_on_warn) from [<80242244>] (__warn+0x80/0x188 kernel/panic.c:748)
+[<802421c4>] (__warn) from [<80242534>] (warn_slowpath_fmt+0x1e8/0x1f4 kernel/panic.c:783)
+ r8:00000009 r7:8208ca38 r6:eb0b9a8c r5:8357b000 r4:00000000
+[<80242350>] (warn_slowpath_fmt) from [<808547a0>] (debug_print_object+0xc4/0xd8 lib/debugobjects.c:514)
+ r10:00000005 r9:8436a800 r8:81a01c24 r7:820b7828 r6:828dd084 r5:eb0b9b34
+ r4:8260cda4
+[<808546dc>] (debug_print_object) from [<80856030>] (__debug_check_no_obj_freed lib/debugobjects.c:989 [inline])
+[<808546dc>] (debug_print_object) from [<80856030>] (debug_check_no_obj_freed+0x254/0x2a0 lib/debugobjects.c:1019)
+ r8:8436b000 r7:8436afcc r6:00000100 r5:00000003 r4:00000000
+[<80855ddc>] (debug_check_no_obj_freed) from [<804c91c4>] (slab_free_hook mm/slub.c:2273 [inline])
+[<80855ddc>] (debug_check_no_obj_freed) from [<804c91c4>] (slab_free mm/slub.c:4579 [inline])
+[<80855ddc>] (debug_check_no_obj_freed) from [<804c91c4>] (kfree+0x190/0x394 mm/slub.c:4727)
+ r10:8277dc60 r9:844b0c80 r8:8436a800 r7:8046d198 r6:82c023c0 r5:dde90aa0
+ r4:8436a800
+[<804c9034>] (kfree) from [<8046d198>] (kvfree+0x2c/0x30 mm/util.c:701)
+ r10:8277dc60 r9:844b0c80 r8:8436a800 r7:00000000 r6:845e6200 r5:84745e80
+ r4:8436a800
+[<8046d16c>] (kvfree) from [<814fc658>] (netdev_release+0x2c/0x34 net/core/net-sysfs.c:2034)
+ r5:84745e80 r4:8436a800
+[<814fc62c>] (netdev_release) from [<80aa3b24>] (device_release+0x38/0xa8 drivers/base/core.c:2575)
+ r5:84745e80 r4:8436abc0
+[<80aa3aec>] (device_release) from [<8197432c>] (kobject_cleanup lib/kobject.c:689 [inline])
+[<80aa3aec>] (device_release) from [<8197432c>] (kobject_release lib/kobject.c:720 [inline])
+[<80aa3aec>] (device_release) from [<8197432c>] (kref_put include/linux/kref.h:65 [inline])
+[<80aa3aec>] (device_release) from [<8197432c>] (kobject_put+0xa0/0x1f4 lib/kobject.c:737)
+ r5:81b4c9c4 r4:8436abc0
+[<8197428c>] (kobject_put) from [<80aa3d50>] (put_device+0x18/0x1c drivers/base/core.c:3783)
+ r7:844b3800 r6:00000000 r5:8436a800 r4:00000000
+[<80aa3d38>] (put_device) from [<814b0d24>] (free_netdev+0x134/0x1ac net/core/dev.c:11255)
+[<814b0bf0>] (free_netdev) from [<80d88104>] (usbnet_disconnect+0xb8/0xfc drivers/net/usb/usbnet.c:1652)
+ r6:8436af94 r5:8436ae80 r4:00000000
+[<80d8804c>] (usbnet_disconnect) from [<80df0930>] (usb_unbind_interface+0x84/0x2c4 drivers/usb/core/driver.c:461)
+ r8:00000044 r7:844b3830 r6:8277dc60 r5:00000000 r4:844b3800
+[<80df08ac>] (usb_unbind_interface) from [<80aabc14>] (device_remove drivers/base/dd.c:569 [inline])
+[<80df08ac>] (usb_unbind_interface) from [<80aabc14>] (device_remove+0x64/0x6c drivers/base/dd.c:561)
+ r10:00000000 r9:844b0c80 r8:00000044 r7:844b3874 r6:8277dc60 r5:00000000
+ r4:844b3830
+[<80aabbb0>] (device_remove) from [<80aad100>] (__device_release_driver drivers/base/dd.c:1273 [inline])
+[<80aabbb0>] (device_remove) from [<80aad100>] (device_release_driver_internal+0x18c/0x200 drivers/base/dd.c:1296)
+ r5:00000000 r4:844b3830
+[<80aacf74>] (device_release_driver_internal) from [<80aad18c>] (device_release_driver+0x18/0x1c drivers/base/dd.c:1319)
+ r9:844b0c80 r8:83410140 r7:83410138 r6:8341010c r5:844b3830 r4:83410130
+[<80aad174>] (device_release_driver) from [<80aab270>] (bus_remove_device+0xcc/0x120 drivers/base/bus.c:576)
+[<80aab1a4>] (bus_remove_device) from [<80aa55ac>] (device_del+0x148/0x38c drivers/base/core.c:3864)
+ r9:844b0c80 r8:8357b000 r7:04208060 r6:00000000 r5:844b3830 r4:844b3874
+[<80aa5464>] (device_del) from [<80dee34c>] (usb_disable_device+0xdc/0x1f0 drivers/usb/core/message.c:1418)
+ r10:00000000 r9:00000000 r8:844b3800 r7:844b0c00 r6:842e7a48 r5:00000002
+ r4:00000070
+[<80dee270>] (usb_disable_device) from [<80de31b0>] (usb_disconnect+0xec/0x29c drivers/usb/core/hub.c:2304)
+ r10:00000001 r9:8450a000 r8:844b0cc4 r7:83d3a800 r6:844b0c80 r5:844b0c00
+ r4:60000013
+[<80de30c4>] (usb_disconnect) from [<80de5e60>] (hub_port_connect drivers/usb/core/hub.c:5361 [inline])
+[<80de30c4>] (usb_disconnect) from [<80de5e60>] (hub_port_connect_change drivers/usb/core/hub.c:5661 [inline])
+[<80de30c4>] (usb_disconnect) from [<80de5e60>] (port_event drivers/usb/core/hub.c:5821 [inline])
+[<80de30c4>] (usb_disconnect) from [<80de5e60>] (hub_event+0xe78/0x194c drivers/usb/core/hub.c:5903)
+ r10:00000001 r9:00000100 r8:83c7f100 r7:844b0c00 r6:83d3a000 r5:83d3aa10
+ r4:00000001
+[<80de4fe8>] (hub_event) from [<80266034>] (process_one_work+0x1b4/0x4f4 kernel/workqueue.c:3229)
+ r10:82fd8405 r9:8357b000 r8:00800000 r7:dddd00c0 r6:82fd8400 r5:83c7f100
+ r4:83e18e00
+[<80265e80>] (process_one_work) from [<80266c18>] (process_scheduled_works kernel/workqueue.c:3310 [inline])
+[<80265e80>] (process_one_work) from [<80266c18>] (worker_thread+0x1ec/0x3bc kernel/workqueue.c:3391)
+ r10:8357b000 r9:83e18e2c r8:61c88647 r7:dddd00e0 r6:82604d40 r5:dddd00c0
+ r4:83e18e00
+[<80266a2c>] (worker_thread) from [<8026fc94>] (kthread+0x104/0x134 kernel/kthread.c:389)
+ r10:00000000 r9:df839e78 r8:83e16fc0 r7:83e18e00 r6:80266a2c r5:8357b000
+ r4:83e16f40
+[<8026fb90>] (kthread) from [<80200114>] (ret_from_fork+0x14/0x20 arch/arm/kernel/entry-common.S:137)
+Exception stack(0xeb0b9fb0 to 0xeb0b9ff8)
+9fa0:                                     00000000 00000000 00000000 00000000
+9fc0: 00000000 00000000 00000000 00000000 00000000 00000000 00000000 00000000
+9fe0: 00000000 00000000 00000000 00000000 00000013 00000000
+ r9:00000000 r8:00000000 r7:00000000 r6:00000000 r5:8026fb90 r4:83e16f40
+Rebooting in 86400 seconds..
 
 
-
-On 10/29/2024 3:09 PM, Jacob Keller wrote:
-> 
-> 
-> On 10/29/2024 7:50 AM, Daniel Machon wrote:
->> Hi Jacob,
-> 
->>> +/**
->>> + * ice_pack_rxq_ctx - Pack Rx queue context into a HW buffer
->>> + * @ctx: the Rx queue context to pack
->>> + * @buf: the HW buffer to pack into
->>> + *
->>> + * Pack the Rx queue context from the CPU-friendly unpacked buffer into its
->>> + * bit-packed HW layout.
->>> + */
->>> +static void ice_pack_rxq_ctx(const struct ice_rlan_ctx *ctx,
->>> +                            ice_rxq_ctx_buf_t *buf)
->>> +{
->>> +       CHECK_PACKED_FIELDS_20(ice_rlan_ctx_fields, ICE_RXQ_CTX_SZ);
->>> +       BUILD_BUG_ON(sizeof(*buf) != ICE_RXQ_CTX_SZ);
->>> +
->>> +       pack_fields(buf, sizeof(*buf), ctx, ice_rlan_ctx_fields,
->>> +                   QUIRK_LITTLE_ENDIAN | QUIRK_LSW32_IS_FIRST);
->>> +}
->>> +
->>
->> FWIW, I noticed that smatch bails out checking all the CHECK_PACKED_FIELDS_*
->> variants >= 20, with the warning:
->>
->> ice_common.c:1486 ice_pack_txq_ctx() parse error: OOM: 3000148Kb sm_state_count = 413556
->> ice_common.c:1486 ice_pack_txq_ctx() warn: Function too hairy.  No more merges.
->> ice_common.c:1486 ice_pack_txq_ctx() parse error: Function too hairy.  Giving up. 43 second
->>
-> 
-> We might need to wrap these checks to become no-ops when running under
-> such a checker. It looks like the parser doesn't like the size of the
-> macros?
-> 
->> Maybe this can just be ignored .. not sure :-)
->>
-> 
-> I would prefer if we found a way to at least silence it, rather than
-> straight up ignore it.
-> 
-> I am not that familiar with smatch. Let me see if there's an obvious way
-> we can handle this.
-> 
-From the look of this, smatch is running out of memory trying to keep
-track of a number of possible states. Likely the depth of the macro is
-too high once we get beyond 20.
-
-I think the simplest solution would be to disable these macros under
-__CHECKER__, and possibly even write our own checker in smatch which can
-cover this case..
-
-@Dan Carpenter:
-
-Any chance you could provide guidance here?
-
-Thanks,
-Jake
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
