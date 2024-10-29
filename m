@@ -1,276 +1,391 @@
-Return-Path: <netdev+bounces-139968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1B8A9B4D3D
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:13:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0270F9B4D36
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:12:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C49C71C211AA
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:13:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 865841F24365
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 15:12:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB5D41925AA;
-	Tue, 29 Oct 2024 15:13:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2978A192D83;
+	Tue, 29 Oct 2024 15:12:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ifSXvd6R"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="yS/QcW6k"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8340E1917E6
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 15:13:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730214802; cv=fail; b=j+VMlqbgc8mOJfrlZzvunVXhxaFaMseUBV98gabMzyIco7ii73GGdbkMvCOAvTk9lVXqSXR+OpzwZEywO497IEe82+dV+E/bws+wk3a0pbymstUzzwJXjXtIZi9bbwOEKjswnjdwaL8Dx5W/7Wkp6rAwNK9PJl65vmSjRy/hHBA=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730214802; c=relaxed/simple;
-	bh=IJVMZrtytubjGA5h9h1TYweN54jnjGposcLa4VvimOo=;
-	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=CCp9zDqYAZVSXtm2nBXudPrkXkVJ9t0ILfBM6NhD7qAN1nhnc24YQ7vjoiI/ug1i9GI2i1DIF4AwWj4Ep5HViKqFmmCVVN9p0TRlaSO9DTrLoCzaUSdP9JX2FkbRTaN9db718b1gApfA7NiXmdul0m6e+wRg267/hTidZaES3Qk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ifSXvd6R; arc=fail smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730214801; x=1761750801;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=IJVMZrtytubjGA5h9h1TYweN54jnjGposcLa4VvimOo=;
-  b=ifSXvd6R8jCoyY5qr+cCki3ztbdagF78bh7z9kk2B1zmSUlaXPfwvtxw
-   ellkpRBSyc852D59OVCq8kEG5CgjjJPfRcP2TU9imI5AYonRXadXDldOM
-   seysiKDGzIVpAw0OoaBexmeB0kCwZuX4l+v+p9/BDmXHWlMIvE8uUQnmi
-   1Grc9XApFTxGfpC1BLwEZRqVoRbfat075Et8WTR1RWdsnKHyyaCLYXIDN
-   46eO+aI314BlVJES1eWOQdt0zRe/iMULUvMpU9YrrLcicqeA3Ti+K5Wnx
-   icU0qcBNphWWwrxx0GR5U6s5HOPeqFK/eHm1ys5SZslCKgQIb46vMUA9w
-   Q==;
-X-CSE-ConnectionGUID: lCJEUiVITwSmCbeXSoyzeA==
-X-CSE-MsgGUID: sCV4DaXIRTSJa0BEZ0t5hQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11240"; a="17495604"
-X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
-   d="scan'208";a="17495604"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 08:13:17 -0700
-X-CSE-ConnectionGUID: TTAftVgcQEqVanN/3hXLnQ==
-X-CSE-MsgGUID: qwa2FqMzRKSdXUsLJwUgIg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,241,1725346800"; 
-   d="scan'208";a="82802967"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 29 Oct 2024 08:13:16 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 29 Oct 2024 08:13:15 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 29 Oct 2024 08:13:15 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 29 Oct 2024 08:13:15 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=HSVQ9tXZGkDaQ+GlUAtDGA7cgzJWvx7pzNTs9sjj62VF3D1QrPb5mOLDfG43wkypHtCsMWjDZbFZ5bErMRjVteYTD8i7mNqXVPirqQFrcC1hE2H8FnmhzqrjnBE49+BL1/kOaYQmD/ye7P56/r6367I4WR6Ccot2rUNq2YxjrJWf/qCYznPLfy4jI9sL+2UKRxYJ5rtNm1K1Ft5bO4psRlFmVDuzx7DLLCLnZfNKomcDj0LyWVWRVOLgoSOeNlLqIQJ7iJ0kbGd5CBV/+TRX9GcqvgItGjun9vXBOWdx+MRIyKsDurkUqWfrFbCngHY3QS6ZpJOIBVTxa6Vy1JSHjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=54W5+HwvCu+yGaRvO+C0LumvWZcgKwjmK4+/ESmVrCE=;
- b=f7oB2s2vUTqp9H4Ncgrf5vMGJGQm6nJgv5WUGK8YFKfG8oh5NA7q2VdpB+gtn1K5KBW2H0lVVy3AR/Y1UPhJGHj22lni7Wpq74XtMKKFx4e9mOlbZ/fXyVJ5xFHJDEB8CUhL88VbLkT8kiPiS/LhBkKbFTsZ4nwXDmXy7aE+Ug7Vb3h2AYCb1UZfi9vUZ/85jhm8gpHqx+eGqlV0CaD7Ok/PZ232a0XhE3AP2XDrLMnVp9N82ea2981lizRqHi8gUvJ2/u8DQMJG9aD9ycAG0bdlaLJHKKuVwdhrBhJuGc29fA9/7wi/V5B5waPpdwWtvs9KCyUADodyJI4MAL5jnQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from LV8PR11MB8722.namprd11.prod.outlook.com (2603:10b6:408:207::12)
- by CY8PR11MB6988.namprd11.prod.outlook.com (2603:10b6:930:54::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.23; Tue, 29 Oct
- 2024 15:13:05 +0000
-Received: from LV8PR11MB8722.namprd11.prod.outlook.com
- ([fe80::314a:7f31:dfd4:694c]) by LV8PR11MB8722.namprd11.prod.outlook.com
- ([fe80::314a:7f31:dfd4:694c%6]) with mapi id 15.20.8093.023; Tue, 29 Oct 2024
- 15:13:04 +0000
-Message-ID: <54900c18-2acd-42eb-8168-dd600273c33d@intel.com>
-Date: Tue, 29 Oct 2024 16:12:10 +0100
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 3/5] mlxsw: pci: Sync Rx buffers for device
-To: Amit Cohen <amcohen@nvidia.com>
-CC: Petr Machata <petrm@nvidia.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
-	<horms@kernel.org>, Danielle Ratson <danieller@nvidia.com>, Ido Schimmel
-	<idosch@nvidia.com>, mlxsw <mlxsw@nvidia.com>, Jiri Pirko <jiri@resnulli.us>
-References: <cover.1729866134.git.petrm@nvidia.com>
- <92e01f05c4f506a4f0a9b39c10175dcc01994910.1729866134.git.petrm@nvidia.com>
- <a68cedfb-cd9e-4b93-a99e-ae30b9c837eb@intel.com>
- <BL1PR12MB59225E9CAE5C28E915187515CB492@BL1PR12MB5922.namprd12.prod.outlook.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-Content-Language: en-US
-In-Reply-To: <BL1PR12MB59225E9CAE5C28E915187515CB492@BL1PR12MB5922.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: WA2P291CA0036.POLP291.PROD.OUTLOOK.COM
- (2603:10a6:1d0:1f::9) To LV8PR11MB8722.namprd11.prod.outlook.com
- (2603:10b6:408:207::12)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E0A8192B74
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 15:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730214768; cv=none; b=SC+IGE8U0G73WUPpRehnhKD6W5K8XgVeR0HCYQr7FKg+I3pA3Wzz+ij1Ot4oMOFjGBXH4xUefR1w+W9XZPhJKIxHKNXsZygXT7LGxCCt26eTSIC5b5y+9LGBdi8JQc2AYWzgk+N6+Trnt6Z5/cfA/4NlomcoEchBsAeux4UK4aU=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730214768; c=relaxed/simple;
+	bh=b7ww1gj0uzL4LUTrV0ZaY8llXCvd4KuaTu6Ll55TaOY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PZj2GO6zSuTYzaWjgmX8huf4KvQFbPfgxOmMJpYQ8jEfr4HtnBBsmSxzoRA+BZFaiXu279qnp01mfKHgQR/pq8US+udbBOD40GC7sUbyGVR8L1OjO/ueIDrFEg+JJyqDGx4IyYFgcn7o9Ym5dBWg1HKqT34AJvwjiYyPB0Tis6c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=yS/QcW6k; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-7209415ca51so770784b3a.2
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 08:12:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1730214765; x=1730819565; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ex1rmyZkmwqDNLUJxxrioL4AYIw4oAzp5IE6ZWCPO/w=;
+        b=yS/QcW6khvyZLjcbxyCg7u3WaC7ylpymsnEUvQzK6QT83wH1qrjjW2zq8kckThx0Ov
+         4SXmdlUo/EPS+f/vQLFr1T6w7nyFAGhsi5NjBE2RB9GOf/IXfHQmJFj5gaYXaJhmK0w3
+         xLzza/w94WfeKY1/bSW9gYvSZhdiZ45ZMoX8I=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730214765; x=1730819565;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ex1rmyZkmwqDNLUJxxrioL4AYIw4oAzp5IE6ZWCPO/w=;
+        b=vng9vZxZDnNT0qrpHdORfzWGAN9xBXLqbJxtUrXlVUHq1lig0V42sQCN44de/iPnie
+         ZiGx36x708gycRUS6P5Wc/bdXrOObvxmUwYfcz04L9td8jO2xzrrzoPQByCv7GEHGpPa
+         BVWYy18G2mRdV4pOIrWUH586qEcqb2Mky9UficqjwVVtBWaODsQUuxRUcK0MO0pz/azq
+         tmHYRMV1uI34QtDgwuacpAsMBwLT6uFoQrJKy9+KcQMfcNd6j1a8r9NnWcVWexkH8uA5
+         ylxA7wqgVouz6Wv//FGOy5Dyin6IyQ3fpq5tAEH+2XAmquViq294zBC1KVkYMObgHhe6
+         UCEA==
+X-Gm-Message-State: AOJu0YzxsJasVRDu7GWAgQuCTisl/6NPQj6UZ4WFyRc5cqt5jzGpqsKn
+	L3Q0pFe+LFMjmVocjlF54ZRJmKlfGJuG06OjhnbqAXxDlhtwDeVhSIpAbe1zokw=
+X-Google-Smtp-Source: AGHT+IHNpotb0sKenFY/cbENmq1YwjDTtTxVrPeETvhJySYF2srKlpjG2wklHdoFEJG0WDDUCmKrYQ==
+X-Received: by 2002:a05:6a00:39a8:b0:71e:744a:3fbc with SMTP id d2e1a72fcca58-7206306efbemr16239558b3a.21.1730214764577;
+        Tue, 29 Oct 2024 08:12:44 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7205793272bsm7626695b3a.69.2024.10.29.08.12.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 08:12:44 -0700 (PDT)
+Date: Tue, 29 Oct 2024 08:12:41 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: "Lifshits, Vitaly" <vitaly.lifshits@intel.com>
+Cc: netdev@vger.kernel.org, jacob.e.keller@intel.com, kurt@linutronix.de,
+	vinicius.gomes@intel.com, Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH iwl-next v5 2/2] igc: Link queues to NAPI instances
+Message-ID: <ZyD7aUc-tt_v3yda@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	"Lifshits, Vitaly" <vitaly.lifshits@intel.com>,
+	netdev@vger.kernel.org, jacob.e.keller@intel.com,
+	kurt@linutronix.de, vinicius.gomes@intel.com,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:XDP (eXpress Data Path)" <bpf@vger.kernel.org>
+References: <20241028195243.52488-1-jdamato@fastly.com>
+ <20241028195243.52488-3-jdamato@fastly.com>
+ <f02044c0-1d90-49f8-8a2d-00ec84fba27a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV8PR11MB8722:EE_|CY8PR11MB6988:EE_
-X-MS-Office365-Filtering-Correlation-Id: e95866ee-fee6-4bfa-317f-08dcf82c2ff3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|7416014|366016|1800799024;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?ak9LSkxyc3Y3ZDBvV2VCL2hIOWFYQ2wrZkNDVDd6dmRiNG56NnB6Y0VuSlAr?=
- =?utf-8?B?RTlMb0dDM011ekl1MDRLOHByNnNvcjVlUllRUDJVQTUxZEJHWlVaVVR0U2hQ?=
- =?utf-8?B?dnNQQTFFajE5Wm5kN0RiaWpxTDJSQUtHMGZEYjkwVkJUSkxOTXFERS85ZDlW?=
- =?utf-8?B?VjNwK2JyMTZXRmlWVTBKRy9pRGZNOFpKcEFTRGVaSWtVaTlVZkNqQVVhNjlt?=
- =?utf-8?B?eU5HNlYzS1ROdnVZekg2K0RuYVhYWW5OY0ZqM2RnWEl6ajhid0hDN2crL00v?=
- =?utf-8?B?L0w3bkhJTmVKTDAxU2NqZDFaQjRONE5pOTJGS2NhN0JYUm5nV2NvQWg4Slhx?=
- =?utf-8?B?VEhmaFRveWUyT0NTU1hWUkRPRTcremxxWE56aFJmQ2kwNC9ZZXkyVXY3WG5R?=
- =?utf-8?B?dWtwMXBxZFVFcUJ4d3FWV1IwUDZvVUtEMjhmbFRwSGhVVHpKVG81c2hnTWtE?=
- =?utf-8?B?U0FYQUVHVTliVWNWK1laL0VjOFlPbHpBSGdUMEl0a3pZdytLQkphVVBRdjVy?=
- =?utf-8?B?Mm5xam9zUk1sbGF5TmVzMU9mU051MXArZlBSVm9VUDlhU21BdUQyUEl5alhQ?=
- =?utf-8?B?ME1oYXVXMGh5bUxzZUdCb3M4S1hLblBIdFNFc29kalJUcjByakhpK0EyZHJo?=
- =?utf-8?B?OHFLNGt0TnJaNElJMFJWQ203VklxSGhsK01EWVZMK3VmQVZXQnVNelJxbzB0?=
- =?utf-8?B?dnE3NU8zQW0yQWpqd2FjNFo5K0puYkhwRkgwemtDOGliNnQwWklURjI4azZW?=
- =?utf-8?B?bFpkMUhvNmZyckt4VTBRU3Zrc09SRnc3Y2FLdmUxOWNLU01uSjBQWnVuc3ow?=
- =?utf-8?B?RGJhMXlaYllLWTRuVVBPbkxPc2xhYW9vcmVIQUQyYXBVQkJkNE1TdWtNMzZz?=
- =?utf-8?B?NU9JbkxhWk9jSllLTEJ2aytSc0t6UEwvc3Y5TUc1ZTVsOGtWYVo0ME5UcWwy?=
- =?utf-8?B?VEVvMmFjYkhuR1JyVURWNEozR1NmdG0yeWFKSTFNUEEvUzNFOXRpajBtQXVz?=
- =?utf-8?B?MFlzMmJBOXl2UHFYeHJNcHJxTkdQUC8xQ1dsblk4dFFVd0RvbmlnYXQvblBq?=
- =?utf-8?B?TzZaT0VQWldZbXh3WGI4UFFEcnduVU5lci9ZN0ZqeUlXQ3FVZ3k4TW56R3dy?=
- =?utf-8?B?L0xCall2bHlianJRTlRmVURUTkZmV0lNSUxTaTBPQ204Z01GRytReEFQUE9t?=
- =?utf-8?B?eTdLcjEyblZKZURKMXFKSXVYMTJFODAxTXBwbVd3UHNRVXhSOFREOFlwTWpL?=
- =?utf-8?B?ZTZ2UkliMlpJeGFlczh4VFdDakRWY2NIZWMwRnJ1NFc4M2ZLdE9MeHNoNi9G?=
- =?utf-8?B?WUNpVUJxMkUrMGNyc1B1UWNsYjY1UVBhRU9USnpQUmxFckZUNjNSVURuS1Q1?=
- =?utf-8?B?RVl3cTVZYkNBaXgyVXpqQ3c4Vmo5Z2xBNjM0YlNmdktRU0tyR0JMekNiTWtD?=
- =?utf-8?B?cStLbHZ1NWV6ZFdXRTViUzRmWVhBV3IrdHBJckdjRGI5bDVhUytiQWxjK1VC?=
- =?utf-8?B?dTY2Ri9TUHQxOHd2YldYU2tQZlRnQVdMbjAyRVZOeTgreHVucFhBMk9DaUZM?=
- =?utf-8?B?S3E2dENMSXJxWnRCS1MvSERnVk4vbUJVWjREYjhyOVV2eWhuQVYwb3FwNlNn?=
- =?utf-8?B?UGI4MWQ1SDhBWTVaMWNTRStuQW9aR2JxeHVjdUdnVDJiT2l5eGFYTkdlbDRU?=
- =?utf-8?B?ZFNYdS9RWFNMdVZoMUN2SjdYWXQvSHZkNFIxQkhoVVExa0F6NFVuM1VnR1Jh?=
- =?utf-8?Q?Do376geaNfONDLYJBrnVvObno997BISeptTvAPl?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV8PR11MB8722.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(7416014)(366016)(1800799024);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?SFVLS2ZKR0hoeWFzK2RFUkpDUWd3K25mdVRvNzVBUWIwOTl1ZDl4ZUhueFdw?=
- =?utf-8?B?U2R6YVhZd2lublVxUlQ1cElGaXMvdHd2TDZmQ0V6dEdlK3Jjc2hDWXJsRkhX?=
- =?utf-8?B?bWJhN1cyYzFoMHJnMEJvWEZQUnNWMHNrSUlvL0tCR2k1SjZ0akxDZ21HaEpv?=
- =?utf-8?B?YmxuODlwUWxUSGoyRU1zbVRUT1BPSzNvY250aGk3NlFaNFNzWVpFczNmdkdF?=
- =?utf-8?B?M3EzNm9LOGcvL3Y3WTVIWkVBT2JkRk81MkVPeitlQmRmVWd3RHBod2FhV0JL?=
- =?utf-8?B?bnBuNUVERFllLzhTMGlkTllZZDVvWUkvM3ZTQlJuRlBqZHFJNDEvWUtIVzhy?=
- =?utf-8?B?ZDRXcHNhamVVRVdndXdhdzY5OEdZY2hka2dtUjJ3OU1BaHoyY3h3dlRSVUFn?=
- =?utf-8?B?VTFwRUU3SEpDR212VTVDby8rWFFqVUpNNXRIcGI4KzRqZzdsdU5UT1pMaGdl?=
- =?utf-8?B?Mkc5TGVKczRwMnZ0QmUyVGcyVDlIT2VzbjBZcUxjbWh6UGU2YzBYQ29FbGcw?=
- =?utf-8?B?QXEyY3VWZ1o2cm9jNE9GMS9BSmc3TFdzK0hoMEJkNW5CZ0NrdzhzM3ZRM2Nh?=
- =?utf-8?B?eVUvSyt2bWJaWmx1eUR1bVlWc21nTERERk5WT0xNT1k2TXkrZWJwb0wvcHNQ?=
- =?utf-8?B?dkhFTGNDMzB5M21vc016UlVBYzBOZHFBeG90SVRhbnFab0l2bE9POXRPOFlk?=
- =?utf-8?B?VG4vaW9XeXY3bzY2dEZ2RTZDVGoxakR2ZDlvdzZ0cHBVNUo3c0s5Q2Z3VlNL?=
- =?utf-8?B?RXJHakVRajFUNi91VjdMaFdCZUsvRnVIcFFpWjh4RWUydk0xcVkrc2Z6V2tV?=
- =?utf-8?B?blJiVmxMQmhER0JVTlBRM2dEdW5QNWJlQk14VnROMHJnbWxmVmxQYnRyWEls?=
- =?utf-8?B?ZVVXbHFzdm5KaW1mcUxUSU1xTFN2ZGdmSFdwWEtaVWdLQy9NS3NOUVhIaDB1?=
- =?utf-8?B?RFlsKzgwRmJaQVRUa215YmZDOWx6a29yY3hET1NBenppQjk1NkJjVHZlZ0xI?=
- =?utf-8?B?UHIyRVZ6NytOcU81a2QwL25DNFltVHFQdGxyRXBTQ1hFdWVmeVZJSlB6aStD?=
- =?utf-8?B?TDdlaW16U2cvTGxjaTgrV2xzM3JDZDFyaWUwbS9FWU42cTJpQ1FlamhqZXdt?=
- =?utf-8?B?clhyOFdERmdvN3VFZjRncUdEdTEyYmFjWTJRWW1GVE9oNFQ1RFQzQTJpc20z?=
- =?utf-8?B?RWhua1ZaLzJVVXJaTm1MQit1eDlpV2Y5bVh0blExRHlOVnpuOXMxVElSejA0?=
- =?utf-8?B?Q1E1VmJ1anl6V2tKdjFOQ0V0WVdLNCtFRW9BUnpXN20zaW1xNktWWXk2NFRz?=
- =?utf-8?B?ZUszL2pKY0RDVDYxWUg0UlJuQnVJOEwwNFByaWI4dWc1V1RldmlmR1NlL0p5?=
- =?utf-8?B?dXJPV290U3VRVHRXWkpKUElPNDlkb0hTT0JqRGx0eEJXSUExdlc3QkQrNFZT?=
- =?utf-8?B?cEZsc1NHbWFidkpGUmxwRTUxUGl3LzZpTk81S3hRNENnbGgwWFRIanRyaHdP?=
- =?utf-8?B?bFJLYXF5MEh2YTFLZGh4MlN0TFZwNHNEaXNLUFMwVGlua00ram1wa1Nsbzkw?=
- =?utf-8?B?OFV5MGFYWDJUUTNvZnRHVlMyODZWOFlOUTV3RFpDZnNVOE9mRGVXd2E5U0dQ?=
- =?utf-8?B?TTFlbUZFSGVoeHRvbGlvd0RKdlo5b3lqSkxBS1FNTnJucXJiVzBYcXBOZEdH?=
- =?utf-8?B?RktFc01xQ2lWemRtcHhsTXZieFVpa3JIQ2Qxblp4cnhwTmx0MkFMcHZtVUh1?=
- =?utf-8?B?bHFtbnNFbXRhUTJpekIyU1dTY3FLa2VUV0pZekFrckxjTWVUc2R3a2gramZz?=
- =?utf-8?B?Vyt6RThZVWhlQk9oQjN0N2Q0VHlLLzg1WW9GSUlLWGNoaDIzRlpzMlVrVjQ2?=
- =?utf-8?B?N3kyWDh2OGw2M21lNjMwL1lOVTZtZVNWbk95WDR3ZWxCbUlLTW9rZFZORFNV?=
- =?utf-8?B?SGtIM3NuTUhoVWExMFcrcys4cnZJV0U5U1F6d3lBYmVaV2VaaHh4dkc5T1Yx?=
- =?utf-8?B?b0dnb1hHeVQrdFJNWEdKYlArd1BNTDMzcFVQYjBaaFV4SWRoTVhzS2FJcE1r?=
- =?utf-8?B?OW1ONmwzOEhxV3FWUmZkTmhNTENUdlhmRlp6cSt0bTk3QnpSRFJ5MHA0U3FW?=
- =?utf-8?B?QkYzckQzUEJObjNtNCt4WGRLOFlWUXFrYWlmWWRJMWVUNnRLeUFJRE11NHdG?=
- =?utf-8?B?Y2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e95866ee-fee6-4bfa-317f-08dcf82c2ff3
-X-MS-Exchange-CrossTenant-AuthSource: LV8PR11MB8722.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 15:13:04.8321
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: z4/WYHSyZgRdAufF/7ka0d37g/JbCQevQcrVCsxoyUDyc8PjQhaQlu3sxxsFHurFGTGK56eyU54wGcQeJeVrJZTP1zNEodXYR9shdAlFGgo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB6988
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f02044c0-1d90-49f8-8a2d-00ec84fba27a@intel.com>
 
-From: Amit Cohen <amcohen@nvidia.com>
-Date: Sun, 27 Oct 2024 06:51:00 +0000
-
+On Tue, Oct 29, 2024 at 11:49:03AM +0200, Lifshits, Vitaly wrote:
 > 
 > 
->> -----Original Message-----
->> From: Alexander Lobakin <aleksander.lobakin@intel.com>
->> Sent: Friday, 25 October 2024 18:03
->> To: Petr Machata <petrm@nvidia.com>; Amit Cohen <amcohen@nvidia.com>
->> Cc: netdev@vger.kernel.org; Andrew Lunn <andrew+netdev@lunn.ch>; David S. Miller <davem@davemloft.net>; Eric Dumazet
->> <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simon Horman <horms@kernel.org>;
->> Danielle Ratson <danieller@nvidia.com>; Ido Schimmel <idosch@nvidia.com>; mlxsw <mlxsw@nvidia.com>; Jiri Pirko <jiri@resnulli.us>
->> Subject: Re: [PATCH net 3/5] mlxsw: pci: Sync Rx buffers for device
->>
->> From: Petr Machata <petrm@nvidia.com>
->> Date: Fri, 25 Oct 2024 16:26:27 +0200
->>
->>> From: Amit Cohen <amcohen@nvidia.com>
->>>
->>> Non-coherent architectures, like ARM, may require invalidating caches
->>> before the device can use the DMA mapped memory, which means that before
->>> posting pages to device, drivers should sync the memory for device.
->>>
->>> Sync for device can be configured as page pool responsibility. Set the
->>> relevant flag and define max_len for sync.
->>>
->>> Cc: Jiri Pirko <jiri@resnulli.us>
->>> Fixes: b5b60bb491b2 ("mlxsw: pci: Use page pool for Rx buffers allocation")
->>> Signed-off-by: Amit Cohen <amcohen@nvidia.com>
->>> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
->>> Signed-off-by: Petr Machata <petrm@nvidia.com>
->>> ---
->>>  drivers/net/ethernet/mellanox/mlxsw/pci.c | 3 ++-
->>>  1 file changed, 2 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/drivers/net/ethernet/mellanox/mlxsw/pci.c b/drivers/net/ethernet/mellanox/mlxsw/pci.c
->>> index 2320a5f323b4..d6f37456fb31 100644
->>> --- a/drivers/net/ethernet/mellanox/mlxsw/pci.c
->>> +++ b/drivers/net/ethernet/mellanox/mlxsw/pci.c
->>> @@ -996,12 +996,13 @@ static int mlxsw_pci_cq_page_pool_init(struct mlxsw_pci_queue *q,
->>>  	if (cq_type != MLXSW_PCI_CQ_RDQ)
->>>  		return 0;
->>>
->>> -	pp_params.flags = PP_FLAG_DMA_MAP;
->>> +	pp_params.flags = PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV;
->>>  	pp_params.pool_size = MLXSW_PCI_WQE_COUNT * mlxsw_pci->num_sg_entries;
->>>  	pp_params.nid = dev_to_node(&mlxsw_pci->pdev->dev);
->>>  	pp_params.dev = &mlxsw_pci->pdev->dev;
->>>  	pp_params.napi = &q->u.cq.napi;
->>>  	pp_params.dma_dir = DMA_FROM_DEVICE;
->>> +	pp_params.max_len = PAGE_SIZE;
->>
->> max_len is the maximum HW-writable area of a buffer. Headroom and
->> tailroom must be excluded. In your case
->>
->> 	pp_params.max_len = PAGE_SIZE - MLXSW_PCI_RX_BUF_SW_OVERHEAD;
->>
+> On 10/28/2024 9:52 PM, Joe Damato wrote:
+> > Link queues to NAPI instances via netdev-genl API so that users can
+> > query this information with netlink. Handle a few cases in the driver:
+> >    1. Link/unlink the NAPIs when XDP is enabled/disabled
+> >    2. Handle IGC_FLAG_QUEUE_PAIRS enabled and disabled
+> > 
+> > Example output when IGC_FLAG_QUEUE_PAIRS is enabled:
+> > 
+> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> >                           --dump queue-get --json='{"ifindex": 2}'
+> > 
+> > [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+> >   {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+> >   {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'rx'},
+> >   {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'rx'},
+> >   {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+> >   {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'tx'},
+> >   {'id': 2, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
+> >   {'id': 3, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+> > 
+> > Since IGC_FLAG_QUEUE_PAIRS is enabled, you'll note that the same NAPI ID
+> > is present for both rx and tx queues at the same index, for example
+> > index 0:
+> > 
+> > {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+> > {'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'tx'},
+> > 
+> > To test IGC_FLAG_QUEUE_PAIRS disabled, a test system was booted using
+> > the grub command line option "maxcpus=2" to force
+> > igc_set_interrupt_capability to disable IGC_FLAG_QUEUE_PAIRS.
+> > 
+> > Example output when IGC_FLAG_QUEUE_PAIRS is disabled:
+> > 
+> > $ lscpu | grep "On-line CPU"
+> > On-line CPU(s) list:      0,2
+> > 
+> > $ ethtool -l enp86s0  | tail -5
+> > Current hardware settings:
+> > RX:		n/a
+> > TX:		n/a
+> > Other:		1
+> > Combined:	2
+> > 
+> > $ cat /proc/interrupts  | grep enp
+> >   144: [...] enp86s0
+> >   145: [...] enp86s0-rx-0
+> >   146: [...] enp86s0-rx-1
+> >   147: [...] enp86s0-tx-0
+> >   148: [...] enp86s0-tx-1
+> > 
+> > 1 "other" IRQ, and 2 IRQs for each of RX and Tx, so we expect netlink to
+> > report 4 IRQs with unique NAPI IDs:
+> > 
+> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> >                           --dump napi-get --json='{"ifindex": 2}'
+> > [{'id': 8196, 'ifindex': 2, 'irq': 148},
+> >   {'id': 8195, 'ifindex': 2, 'irq': 147},
+> >   {'id': 8194, 'ifindex': 2, 'irq': 146},
+> >   {'id': 8193, 'ifindex': 2, 'irq': 145}]
+> > 
+> > Now we examine which queues these NAPIs are associated with, expecting
+> > that since IGC_FLAG_QUEUE_PAIRS is disabled each RX and TX queue will
+> > have its own NAPI instance:
+> > 
+> > $ ./tools/net/ynl/cli.py --spec Documentation/netlink/specs/netdev.yaml \
+> >                           --dump queue-get --json='{"ifindex": 2}'
+> > [{'id': 0, 'ifindex': 2, 'napi-id': 8193, 'type': 'rx'},
+> >   {'id': 1, 'ifindex': 2, 'napi-id': 8194, 'type': 'rx'},
+> >   {'id': 0, 'ifindex': 2, 'napi-id': 8195, 'type': 'tx'},
+> >   {'id': 1, 'ifindex': 2, 'napi-id': 8196, 'type': 'tx'}]
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > ---
+> >   v5:
+> >     - Rename igc_resume to __igc_do_resume and pass in a boolean
+> >       "need_rtnl" to signal whether or not rtnl should be held before
+> >       caling __igc_open. Call this new function from igc_runtime_resume
+> >       and igc_resume passing in false (for igc_runtime_resume) and true
+> >       (igc_resume), respectively. This is done to avoid reintroducing a
+> >       bug fixed in commit: 6f31d6b: "igc: Refactor runtime power
+> >       management flow" where rtnl is held in runtime_resume causing a
+> >       deadlock.
+> > 
+> >   v4:
+> >     - Add rtnl_lock/rtnl_unlock in two paths: igc_resume and
+> >       igc_io_error_detected. The code added to the latter is inspired by
+> >       a similar implementation in ixgbe's ixgbe_io_error_detected.
+> > 
+> >   v3:
+> >     - Replace igc_unset_queue_napi with igc_set_queue_napi(adapater, i,
+> >       NULL), as suggested by Vinicius Costa Gomes
+> >     - Simplify implemention of igc_set_queue_napi as suggested by Kurt
+> >       Kanzenbach, with a tweak to use ring->queue_index
+> > 
+> >   v2:
+> >     - Update commit message to include tests for IGC_FLAG_QUEUE_PAIRS
+> >       disabled
+> >     - Refactored code to move napi queue mapping and unmapping to helper
+> >       functions igc_set_queue_napi and igc_unset_queue_napi
+> >     - Adjust the code to handle IGC_FLAG_QUEUE_PAIRS disabled
+> >     - Call helpers to map/unmap queues to NAPIs in igc_up, __igc_open,
+> >       igc_xdp_enable_pool, and igc_xdp_disable_pool
+> > 
+> >   drivers/net/ethernet/intel/igc/igc.h      |  2 +
+> >   drivers/net/ethernet/intel/igc/igc_main.c | 52 ++++++++++++++++++++---
+> >   drivers/net/ethernet/intel/igc/igc_xdp.c  |  2 +
+> >   3 files changed, 49 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
+> > index eac0f966e0e4..b8111ad9a9a8 100644
+> > --- a/drivers/net/ethernet/intel/igc/igc.h
+> > +++ b/drivers/net/ethernet/intel/igc/igc.h
+> > @@ -337,6 +337,8 @@ struct igc_adapter {
+> >   	struct igc_led_classdev *leds;
+> >   };
+> > +void igc_set_queue_napi(struct igc_adapter *adapter, int q_idx,
+> > +			struct napi_struct *napi);
+> >   void igc_up(struct igc_adapter *adapter);
+> >   void igc_down(struct igc_adapter *adapter);
+> >   int igc_open(struct net_device *netdev);
+> > diff --git a/drivers/net/ethernet/intel/igc/igc_main.c b/drivers/net/ethernet/intel/igc/igc_main.c
+> > index 7964bbedb16c..051a0cdb1143 100644
+> > --- a/drivers/net/ethernet/intel/igc/igc_main.c
+> > +++ b/drivers/net/ethernet/intel/igc/igc_main.c
+> > @@ -4948,6 +4948,22 @@ static int igc_sw_init(struct igc_adapter *adapter)
+> >   	return 0;
+> >   }
+> > +void igc_set_queue_napi(struct igc_adapter *adapter, int vector,
+> > +			struct napi_struct *napi)
+> > +{
+> > +	struct igc_q_vector *q_vector = adapter->q_vector[vector];
+> > +
+> > +	if (q_vector->rx.ring)
+> > +		netif_queue_set_napi(adapter->netdev,
+> > +				     q_vector->rx.ring->queue_index,
+> > +				     NETDEV_QUEUE_TYPE_RX, napi);
+> > +
+> > +	if (q_vector->tx.ring)
+> > +		netif_queue_set_napi(adapter->netdev,
+> > +				     q_vector->tx.ring->queue_index,
+> > +				     NETDEV_QUEUE_TYPE_TX, napi);
+> > +}
+> > +
+> >   /**
+> >    * igc_up - Open the interface and prepare it to handle traffic
+> >    * @adapter: board private structure
+> > @@ -4955,6 +4971,7 @@ static int igc_sw_init(struct igc_adapter *adapter)
+> >   void igc_up(struct igc_adapter *adapter)
+> >   {
+> >   	struct igc_hw *hw = &adapter->hw;
+> > +	struct napi_struct *napi;
+> >   	int i = 0;
+> >   	/* hardware has been reset, we need to reload some things */
+> > @@ -4962,8 +4979,11 @@ void igc_up(struct igc_adapter *adapter)
+> >   	clear_bit(__IGC_DOWN, &adapter->state);
+> > -	for (i = 0; i < adapter->num_q_vectors; i++)
+> > -		napi_enable(&adapter->q_vector[i]->napi);
+> > +	for (i = 0; i < adapter->num_q_vectors; i++) {
+> > +		napi = &adapter->q_vector[i]->napi;
+> > +		napi_enable(napi);
+> > +		igc_set_queue_napi(adapter, i, napi);
+> > +	}
+> >   	if (adapter->msix_entries)
+> >   		igc_configure_msix(adapter);
+> > @@ -5192,6 +5212,7 @@ void igc_down(struct igc_adapter *adapter)
+> >   	for (i = 0; i < adapter->num_q_vectors; i++) {
+> >   		if (adapter->q_vector[i]) {
+> >   			napi_synchronize(&adapter->q_vector[i]->napi);
+> > +			igc_set_queue_napi(adapter, i, NULL);
+> >   			napi_disable(&adapter->q_vector[i]->napi);
+> >   		}
+> >   	}
+> > @@ -6021,6 +6042,7 @@ static int __igc_open(struct net_device *netdev, bool resuming)
+> >   	struct igc_adapter *adapter = netdev_priv(netdev);
+> >   	struct pci_dev *pdev = adapter->pdev;
+> >   	struct igc_hw *hw = &adapter->hw;
+> > +	struct napi_struct *napi;
+> >   	int err = 0;
+> >   	int i = 0;
+> > @@ -6056,8 +6078,11 @@ static int __igc_open(struct net_device *netdev, bool resuming)
+> >   	clear_bit(__IGC_DOWN, &adapter->state);
+> > -	for (i = 0; i < adapter->num_q_vectors; i++)
+> > -		napi_enable(&adapter->q_vector[i]->napi);
+> > +	for (i = 0; i < adapter->num_q_vectors; i++) {
+> > +		napi = &adapter->q_vector[i]->napi;
+> > +		napi_enable(napi);
+> > +		igc_set_queue_napi(adapter, i, napi);
+> > +	}
+> >   	/* Clear any pending interrupts. */
+> >   	rd32(IGC_ICR);
+> > @@ -7342,7 +7367,7 @@ static void igc_deliver_wake_packet(struct net_device *netdev)
+> >   	netif_rx(skb);
+> >   }
+> > -static int igc_resume(struct device *dev)
+> > +static int __igc_do_resume(struct device *dev, bool need_rtnl)
+> >   {
+> >   	struct pci_dev *pdev = to_pci_dev(dev);
+> >   	struct net_device *netdev = pci_get_drvdata(pdev);
+> > @@ -7385,7 +7410,11 @@ static int igc_resume(struct device *dev)
+> >   	wr32(IGC_WUS, ~0);
+> >   	if (netif_running(netdev)) {
+> > +		if (need_rtnl)
+> > +			rtnl_lock();
+> >   		err = __igc_open(netdev, true);
+> > +		if (need_rtnl)
+> > +			rtnl_unlock();
+> >   		if (!err)
+> >   			netif_device_attach(netdev);
+> >   	}
+> > @@ -7393,9 +7422,14 @@ static int igc_resume(struct device *dev)
+> >   	return err;
+> >   }
+> > +static int igc_resume(struct device *dev)
+> > +{
+> > +	return __igc_do_resume(dev, true);
+> > +}
+> > +
+> >   static int igc_runtime_resume(struct device *dev)
+> >   {
+> > -	return igc_resume(dev);
+> > +	return __igc_do_resume(dev, false);
+> >   }
+> >   static int igc_suspend(struct device *dev)
+> > @@ -7440,14 +7474,18 @@ static pci_ers_result_t igc_io_error_detected(struct pci_dev *pdev,
+> >   	struct net_device *netdev = pci_get_drvdata(pdev);
+> >   	struct igc_adapter *adapter = netdev_priv(netdev);
+> > +	rtnl_lock();
+> >   	netif_device_detach(netdev);
+> > -	if (state == pci_channel_io_perm_failure)
+> > +	if (state == pci_channel_io_perm_failure) {
+> > +		rtnl_unlock();
+> >   		return PCI_ERS_RESULT_DISCONNECT;
+> > +	}
+> >   	if (netif_running(netdev))
+> >   		igc_down(adapter);
+> >   	pci_disable_device(pdev);
+> > +	rtnl_unlock();
+> >   	/* Request a slot reset. */
+> >   	return PCI_ERS_RESULT_NEED_RESET;
+> > diff --git a/drivers/net/ethernet/intel/igc/igc_xdp.c b/drivers/net/ethernet/intel/igc/igc_xdp.c
+> > index e27af72aada8..4da633430b80 100644
+> > --- a/drivers/net/ethernet/intel/igc/igc_xdp.c
+> > +++ b/drivers/net/ethernet/intel/igc/igc_xdp.c
+> > @@ -84,6 +84,7 @@ static int igc_xdp_enable_pool(struct igc_adapter *adapter,
+> >   		napi_disable(napi);
+> >   	}
+> > +	igc_set_queue_napi(adapter, queue_id, NULL);
+> >   	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
+> >   	set_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
+> > @@ -133,6 +134,7 @@ static int igc_xdp_disable_pool(struct igc_adapter *adapter, u16 queue_id)
+> >   	xsk_pool_dma_unmap(pool, IGC_RX_DMA_ATTR);
+> >   	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &rx_ring->flags);
+> >   	clear_bit(IGC_RING_FLAG_AF_XDP_ZC, &tx_ring->flags);
+> > +	igc_set_queue_napi(adapter, queue_id, napi);
+> >   	if (needs_reset) {
+> >   		napi_enable(napi);
 > 
-> mlxsw driver uses fragmented buffers and the page pool is used to allocate the buffers for all scatter/gather entries.
-> For each packet, the HW-writable area of a buffer of the *first* entry is 'PAGE_SIZE - MLXSW_PCI_RX_BUF_SW_OVERHEAD', but for other entries we map PAGE_SIZE to HW.
-> That's why we set page pool to sync PAGE_SIZE and use offset=0.
+> I believe that this fix should work on most cases. I have some concerns that
+> this solution might not be 100% robust as sometimes runtime resume may be
+> triggered without the rtnl being held. For example, if it is initiated by a
+> network wake event. But, for the moment I think that this appoach is good
+> enough.
+>
+> My main comment here is the naming conventions, I prefer using the original
+> parameters/function names for consistency, similarly to what was done in the
+> igb driver:
+> https://github.com/torvalds/linux/commit/ac8c58f5b535d6272324e2b8b4a0454781c9147e
 
-Ooops, I didn't notice this particular configuration has offset == 0, sorry.
+Sorry, can you be more specific on what the naming issue is?
 
-Thanks,
-Olek
+Do you want me to resubmit this with "__igc_do_resume" renamed to
+"__igc_resume" and "bool need_rtnl" renamed to "bool rpm" or
+something else?
 
