@@ -1,98 +1,273 @@
-Return-Path: <netdev+bounces-139765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 73ADB9B4056
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:20:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 418189B406D
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 03:29:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A4AF21C2135B
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:20:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9FD9AB22058
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 02:29:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA3C12FF70;
-	Tue, 29 Oct 2024 02:20:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A685B198A19;
+	Tue, 29 Oct 2024 02:29:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="e9SA5Afl"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="TFfsktKY"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oo1-f47.google.com (mail-oo1-f47.google.com [209.85.161.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8647B40855
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 02:20:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 035A7198857
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 02:29:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730168447; cv=none; b=WHGUFaJqY6fWXUcWFBl79FPAUwJWl4vEPL8aBXFgWpk4xWRWr4pFeW8j9V5rSq0rAcny2K8SkNDUAoJfBAm1saVOTReYxbDAdrKuKMicO5gbsbYIO4Khk+pU0amJyigVUZRc0WXEa2dJj6M1R1p7uiBtdEiKVRxtcDmV83jNvHQ=
+	t=1730168970; cv=none; b=In1LLpJssvCzUXcb8pKjv7imrK2LVg4t2lFeyIMLO2gnAG2H94k3c5EL49I59qVU4lXU8cQ8x1CezlOCa+zHRRaWPpJhygGtKro2PswKODcBTOtkwM+dHaFd0CNuW+jRAm+g/8vUdUSBrUvSDzYivR20AhA3Qjnt0HjFhhTCWAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730168447; c=relaxed/simple;
-	bh=6XdSS5BtQ1UOsg90BK1P99rhGpo+WXf3iLt3yimZMMY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KuqPKLwZzS/l5/36sWn09S9pMCM6daQnaLl1LliSREfNAYDCRsSUsYeXs9DbwHXwqBxZP2yIVtceSGFksJ8OZ+nT4L+cqRHTYSLBmbn1YUta8Jpl1IkMSjnwuXw+Y96108JJsH0rp2tQPX3vEroIvmP5jaDqfVc8wIA3gp276x8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=e9SA5Afl; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GRyTga+eGvUsVS4/lAWBi7iJQQEGdXza0+W/Q3vo1Go=; b=e9SA5Aflv/RTqCUT2vlixIPX3z
-	u46ZR2eZ+L813Qf02xbpfykJM0kLcjeTrrbILGCiM2WcHoFIpVimkZuDbDAQzZ1MWbLatLbhfKus/
-	ZUKSU7iWZr4JS0xi03+EF+/+FVUDIoRxUdcQRXQWMNoBh6P8rUmfGoNu6l2mtW8bvbiU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5bqN-00BW8Y-BR; Tue, 29 Oct 2024 03:20:27 +0100
-Date: Tue, 29 Oct 2024 03:20:27 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jeremy Kerr <jk@codeconstruct.com.au>
-Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Vijay Khemka <vijaykhemka@fb.com>,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 2/2] net: ncsi: restrict version sizes when hardware
- doesn't nul-terminate
-Message-ID: <4f56a2d0-eb1b-4952-a845-92610515082a@lunn.ch>
-References: <20241028-ncsi-fixes-v1-0-f0bcfaf6eb88@codeconstruct.com.au>
- <20241028-ncsi-fixes-v1-2-f0bcfaf6eb88@codeconstruct.com.au>
- <286f2724-2810-4a07-a82e-c6668cdbf690@lunn.ch>
- <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
+	s=arc-20240116; t=1730168970; c=relaxed/simple;
+	bh=XXaZT/CChIW7MIYG+hYAOvmT73RMWkSLXOiRMYINrfE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QAoT1h6lV1KgTTatBUylkm7KTmaH6FYUg7KW2dRNUSO668BgKGP8a6cD2tBuAHTtmPfvzJF2Flg+yDfpmLGaPmkGS7F/DhrpOJ1xA46gy2siJd7JCGJWNYDBu9BwOP+OuJ3LI+FmtlmvyTF0mrStxuP24Ry7r+EaRII39xV3Fts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org; spf=pass smtp.mailfrom=linuxfoundation.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=TFfsktKY; arc=none smtp.client-ip=209.85.161.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linuxfoundation.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linuxfoundation.org
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5ebc1af8f10so2083141eaf.2
+        for <netdev@vger.kernel.org>; Mon, 28 Oct 2024 19:29:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linuxfoundation.org; s=google; t=1730168966; x=1730773766; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=OtRjJzFUnvrxwtpcn9XJc/xdJDx9VYHHtrGlwpyzpKc=;
+        b=TFfsktKYANMpcafgU86o4F+33TArGR3tyoWDvAnc/S5aFom9Yu144A/h4/gEbxoWxM
+         u7TeFcOPtmnpUw1Hd5dTc0CYp+GtBKU3vjF5AaGcsiwnyUO3inT+5hajcqTupBbitZcs
+         OR5yrFNWbtdZEf4+oAYbnhpJohDoFtsMzb8UE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730168966; x=1730773766;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OtRjJzFUnvrxwtpcn9XJc/xdJDx9VYHHtrGlwpyzpKc=;
+        b=LBy8Bbq/FlLhtrdIeZJObKEX8w8sSilo32VC1u+ZwXrcLy5yAYAFKCMfwpdt6J0P/h
+         aBVU3/fG3pud+Jf9y5J56tQDwaP81jxVQpa+hwanWfTi3T+7g3ZCG6bwUw3tj/KG+8GE
+         z0QYvHaZCpCxqL4JQcSVrZOAsnp8vYFbfamWefQV6OuFwcHpPLWErEFmdq/lKrwQOPOy
+         MSVM8NmTh9haLtKSl/KT2HSYhdI8DCsNJxBycJXKr35FtYlWO8f74vKzY0+BaeLl57n2
+         KwSztGvRoaxVzSDOXA3QL8XJzeoza024U7x37duUahf+A5RUfSNZTOVNN6FM5G3qQFUw
+         ee4w==
+X-Gm-Message-State: AOJu0YyylGLQu6Q1dQhsy9quR3SUd1L6TXpyQ30/7NVt1M4p8PDXS58z
+	9afJfrUyN6l37lyUSwf5he/wzDf9WgGowktZ9H6dBH6m5KOCKUup61pZSww1lT0=
+X-Google-Smtp-Source: AGHT+IEhuV07cjeS4LVtoUzAOa1MQj9lnkz7ezBRTnWnZujCXNa+VG8DxmrCFjNULb+Q6rs3HF7TPg==
+X-Received: by 2002:a05:6870:56a7:b0:288:716b:142c with SMTP id 586e51a60fabf-29051b6bb8emr9074339fac.18.1730168965832;
+        Mon, 28 Oct 2024 19:29:25 -0700 (PDT)
+Received: from [10.200.3.216] (p99249-ipoefx.ipoe.ocn.ne.jp. [153.246.134.248])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1f61bsm6686081b3a.144.2024.10.28.19.29.22
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 28 Oct 2024 19:29:25 -0700 (PDT)
+Message-ID: <24edee6f-9f77-43f2-8565-566668e5f697@linuxfoundation.org>
+Date: Mon, 28 Oct 2024 20:29:21 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e6863bfb99c50314d83e2b8a3ab8f1fabe05e912.camel@codeconstruct.com.au>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v10 23/23] testing/selftests: add test tool and
+ scripts for ovpn module
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Donald Hunter <donald.hunter@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ sd@queasysnail.net, Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+ Eric Dumazet <edumazet@google.com>, linux-kselftest@vger.kernel.org,
+ Shuah Khan <skhan@linuxfoundation.org>
+References: <20241025-b4-ovpn-v10-0-b87530777be7@openvpn.net>
+ <20241025-b4-ovpn-v10-23-b87530777be7@openvpn.net>
+ <fe2b641f-a8aa-428c-9f04-f099015e0eb9@linuxfoundation.org>
+ <feef6601-0e68-4913-b305-3be3face4a9e@openvpn.net>
+Content-Language: en-US
+From: Shuah Khan <skhan@linuxfoundation.org>
+In-Reply-To: <feef6601-0e68-4913-b305-3be3face4a9e@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Tue, Oct 29, 2024 at 08:31:55AM +0800, Jeremy Kerr wrote:
-> Hi Andrew,
-> Thanks for checking this out.
+On 10/28/24 04:13, Antonio Quartulli wrote:
+> On 27/10/2024 01:40, Shuah Khan wrote:
+>> On 10/25/24 03:14, Antonio Quartulli wrote:
+>>> The ovpn-cli tool can be compiled and used as selftest for the ovpn
+>>> kernel module.
+>>>
+>>> It implements the netlink API and can thus be integrated in any
+>>> script for more automated testing.
+>>>
+>>> Along with the tool, 4 scripts are added that perform basic
+>>> functionality tests by means of network namespaces.
+>>>
+>>> Cc: shuah@kernel.org
+>>> Cc: linux-kselftest@vger.kernel.org
+>>> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
+>>> ---
+>>>   MAINTAINERS                                        |    1 +
+>>>   tools/testing/selftests/Makefile                   |    1 +
+>>>   tools/testing/selftests/net/ovpn/.gitignore        |    2 +
+>>>   tools/testing/selftests/net/ovpn/Makefile          |   17 +
+>>>   tools/testing/selftests/net/ovpn/config            |   10 +
+>>>   tools/testing/selftests/net/ovpn/data64.key        |    5 +
+>>>   tools/testing/selftests/net/ovpn/ovpn-cli.c        | 2370 ++++++++++ ++++++++++
+>>>   tools/testing/selftests/net/ovpn/tcp_peers.txt     |    5 +
+>>>   .../testing/selftests/net/ovpn/test-chachapoly.sh  |    9 +
+>>>   tools/testing/selftests/net/ovpn/test-float.sh     |    9 +
+>>>   tools/testing/selftests/net/ovpn/test-tcp.sh       |    9 +
+>>>   tools/testing/selftests/net/ovpn/test.sh           |  183 ++
+>>>   tools/testing/selftests/net/ovpn/udp_peers.txt     |    5 +
+>>>   13 files changed, 2626 insertions(+)
+>>>
+>>
+>> What does the test output look like? Add that to the change log.
+> 
+> Hi Shuan,
+> 
+> is there any expected output for kselftest scripts?
+> Right now it just prints a bunch of messages about what is being tested, plus the output from `ping` and `iperf`.
+> 
+> My assumption is that the output would be useful in case of failures, to understand where and what went wrong.
+> 
+> I can document that, but I am not sure it is truly helpful (?).
+> What do you think?
+> 
+> Is there any specific output format I should obey to?
 > 
 > 
-> > Is this defined by a standard? Does the standard allow non
-> > nul-terminated strings? 
+> [...]
 > 
 > 
-> Yes and yes. The pertinent wording of the spec is:
+>>> +
+>>> +static void usage(const char *cmd)
+>>> +{
+>>> +    fprintf(stderr,
+>>> +        "Usage %s <command> <iface> [arguments..]\n",
+>>> +        cmd);
+>>> +    fprintf(stderr, "where <command> can be one of the following\n\n");
+>>> +
+>>> +    fprintf(stderr, "* new_iface <iface> [mode]: create new ovpn interface\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tmode:\n");
+>>> +    fprintf(stderr, "\t\t- P2P for peer-to-peer mode (i.e. client)\n");
+>>> +    fprintf(stderr, "\t\t- MP for multi-peer mode (i.e. server)\n");
+>>> +
+>>> +    fprintf(stderr, "* del_iface <iface>: delete ovpn interface\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* listen <iface> <lport> <peers_file> [ipv6]: listen for incoming peer TCP connections\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tlport: TCP port to listen to\n");
+>>> +    fprintf(stderr,
+>>> +        "\tpeers_file: file containing one peer per line: Line format:\n");
+>>> +    fprintf(stderr, "\t\t<peer_id> <vpnaddr>\n");
+>>> +    fprintf(stderr,
+>>> +        "\tipv6: whether the socket should listen to the IPv6 wildcard address\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* connect <iface> <peer_id> <raddr> <rport> [key_file]: start connecting peer of TCP-based VPN session\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tpeer_id: peer ID of the connecting peer\n");
+>>> +    fprintf(stderr, "\traddr: peer IP address to connect to\n");
+>>> +    fprintf(stderr, "\trport: peer TCP port to connect to\n");
+>>> +    fprintf(stderr,
+>>> +        "\tkey_file: file containing the symmetric key for encryption\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* new_peer <iface> <peer_id> <lport> <raddr> <rport> [vpnaddr]: add new peer\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tlport: local UDP port to bind to\n");
+>>> +    fprintf(stderr,
+>>> +        "\tpeer_id: peer ID to be used in data packets to/from this peer\n");
+>>> +    fprintf(stderr, "\traddr: peer IP address\n");
+>>> +    fprintf(stderr, "\trport: peer UDP port\n");
+>>> +    fprintf(stderr, "\tvpnaddr: peer VPN IP\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* new_multi_peer <iface> <lport> <peers_file>: add multiple peers as listed in the file\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tlport: local UDP port to bind to\n");
+>>> +    fprintf(stderr,
+>>> +        "\tpeers_file: text file containing one peer per line. Line format:\n");
+>>> +    fprintf(stderr, "\t\t<peer_id> <raddr> <rport> <vpnaddr>\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* set_peer <iface> <peer_id> <keepalive_interval> <keepalive_timeout>: set peer attributes\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tpeer_id: peer ID of the peer to modify\n");
+>>> +    fprintf(stderr,
+>>> +        "\tkeepalive_interval: interval for sending ping messages\n");
+>>> +    fprintf(stderr,
+>>> +        "\tkeepalive_timeout: time after which a peer is timed out\n");
+>>> +
+>>> +    fprintf(stderr, "* del_peer <iface> <peer_id>: delete peer\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tpeer_id: peer ID of the peer to delete\n");
+>>> +
+>>> +    fprintf(stderr, "* get_peer <iface> [peer_id]: retrieve peer(s) status\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr,
+>>> +        "\tpeer_id: peer ID of the peer to query. All peers are returned if omitted\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* new_key <iface> <peer_id> <slot> <key_id> <cipher> <key_dir> <key_file>: set data channel key\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr,
+>>> +        "\tpeer_id: peer ID of the peer to configure the key for\n");
+>>> +    fprintf(stderr, "\tslot: either 1 (primary) or 2 (secondary)\n");
+>>> +    fprintf(stderr, "\tkey_id: an ID from 0 to 7\n");
+>>> +    fprintf(stderr,
+>>> +        "\tcipher: cipher to use, supported: aes (AES-GCM), chachapoly (CHACHA20POLY1305)\n");
+>>> +    fprintf(stderr,
+>>> +        "\tkey_dir: key direction, must 0 on one host and 1 on the other\n");
+>>> +    fprintf(stderr, "\tkey_file: file containing the pre-shared key\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* del_key <iface> <peer_id> [slot]: erase existing data channel key\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tpeer_id: peer ID of the peer to modify\n");
+>>> +    fprintf(stderr, "\tslot: slot to erase. PRIMARY if omitted\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* get_key <iface> <peer_id> <slot>: retrieve non sensible key data\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tpeer_id: peer ID of the peer to query\n");
+>>> +    fprintf(stderr, "\tslot: either 1 (primary) or 2 (secondary)\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* swap_keys <iface> <peer_id>: swap content of primary and secondary key slots\n");
+>>> +    fprintf(stderr, "\tiface: ovpn interface name\n");
+>>> +    fprintf(stderr, "\tpeer_id: peer ID of the peer to modify\n");
+>>> +
+>>> +    fprintf(stderr,
+>>> +        "* listen_mcast: listen to ovpn netlink multicast messages\n");
+>>> +}
+>>
+>> If this test is run from "make kselftest" as default run does this usage
+>> output show up in the report?
 > 
->    The string is null terminated if the string is smaller than the
->    field size
-> 
-> However, regardless of what the spec says, we still don't want the
-> strlen() in nla_put_string() to continue into arbitrary memory in the
-> case there was no nul in the fw_name reported by the device.
+> No.
+> This usage is only printed when invoking ovpn-cli with wrong arguments and this can't be the case in the kselftest.
 
-I agree with that, but i was thinking that if it was not allowed, we
-should be printing a warning telling the user to upgrade their buggy
-firmware.
+The usage() is great and much needed. My concern is if this usage would show up
+when we run "make kselftest" - some tests do this by adding wrapper shell script
+to run the test with different options to cover all the cases.
 
-However, its not a bug.
+> 
+> 
+> Other than documenting the output, do you think there is any other critical part to be adjusted in this patch?
 
-Are there any other strings which will need similar treatment?
+No - I don't have any other comments on the test itself. I just want to make
+sure this usage inadvertently doesn't end up in the "make kselftest" run.
 
-	Andrew
+With that
+
+Reviewed-by: Shuah Khan <skhan@linuxfoundation.org>
+
+thanks,
+-- Shuah
 
