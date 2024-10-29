@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-140179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F38AC9B56F2
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:30:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C8709B56F5
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C58828350C
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:30:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 509821F22D01
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D39D205125;
-	Tue, 29 Oct 2024 23:30:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AE620C024;
+	Tue, 29 Oct 2024 23:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R7g3uzD6"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J87KkwkG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDFBE190665;
-	Tue, 29 Oct 2024 23:30:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F6FD190665;
+	Tue, 29 Oct 2024 23:30:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730244625; cv=none; b=F5NEO4itz67XfuVpW8D9ewGg7yxxv/VNaqHhLdv7354qKrm8SjbbHuysY0YMuPBHZAqy3RdYyqUiTBc8XXJVzrDS/hlql8l/Mdyzq2BHKt1BKsAPJFnoqflfYciWPNYYTBFL0W8WByQN80W/Fc1MN2S8/liNYMMNgEf1tcysOUk=
+	t=1730244628; cv=none; b=t4GUHY8saWVaK659pDhMcublNu5bzvZFjSeR0hcl2KoaFl+JX64Zps4nWfG0YMIpe5Gbjzpr2kcqs2JRwqiyeeE+ws3hN5GYJOiNM0PEh7fDbioudRHGaTF8kuR4w5LoLmv5TJKUtlniOLXrnm3p/S1fBQYlWuCSRsUaRGhWibs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730244625; c=relaxed/simple;
-	bh=WW3mdSM3TRIghHeyfr3oDUaW5LxYvDMSqojUnsWX6KU=;
+	s=arc-20240116; t=1730244628; c=relaxed/simple;
+	bh=bMTz5orGXTH+4D0xpkNLWyraHhGfmIrQ9V8w8L61aAo=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=HHGd6zX1h8S9ZAzoJRb6lPCi/HvZ9b9OhLYN3ecXt0/vifWzoUJ3YtGYZp8XoKmFhNWIp4Vn9RfGzjRqXBS0VcDPVVnunfChqlvsmCXZEvigBtC5o67DYClNWG+bOv3q/yyeBlmny/svIZYgEFOmalgVyghZfJZStFB1+sdMDXE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R7g3uzD6; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75345C4CEE6;
-	Tue, 29 Oct 2024 23:30:24 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=EVJA3/62Z+76pcRe6nsewYwwQj0NZlUvBRcCoobsaW1VqOqhMdipO1RdHFkmnQfLXC3KtMAk89IvQowYANmzSAGlpHqv2P4MqVLUhDHNI0tcUjctiVHxhVTiztk5OqiMTGg2SuP0PJvSXVnqasW1sSy4uYdJtiTM2tnIWczsx6w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J87KkwkG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A9B1C4CECD;
+	Tue, 29 Oct 2024 23:30:27 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730244624;
-	bh=WW3mdSM3TRIghHeyfr3oDUaW5LxYvDMSqojUnsWX6KU=;
+	s=k20201202; t=1730244627;
+	bh=bMTz5orGXTH+4D0xpkNLWyraHhGfmIrQ9V8w8L61aAo=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R7g3uzD6Ns+qmTU1Mjt7FtAZxBYqgbyyfpt6ntGNpsEfUCmsUHzTK25G9lNT7DttE
-	 iq0QQVYZCx8udrwva0ai4phjSQKVylglw7M7+BKMV9CjZirzSjQ06lR+ygkPd10UmE
-	 7DaZCh9dSidr0YSv8wb73zkj/LOCmw2D+NCPgg4Ztaz0+2qcXrifFuMyKtdBvMf8mP
-	 LuIcBfNrS438JP0P2zz8xfdAag2coUSlWXTUWLRinNzteANG5bpSRaZY/eW064+09Y
-	 7CboYpby8kFblM9avipC24c67e8AvEp9swkW1+7gdISpQ+FxEDM7GQr2vUNukTS518
-	 cWtnvb7DaJFbw==
+	b=J87KkwkG7MVXPNHosecoEtJkEgpMRasMqXTy8RC9plvJdmZG27ODL8/3smDgMyIEW
+	 EihWAe18UkRi/DqtQzEf3xkHBzFJFkBEd35pMeZk7o3OrOMJyFWZF5nbdtxKL2PL52
+	 GhXCnXf9IFGXl9I9R4tKxDSBc8cGfDW65Q5TulWBBW4tGYiXM4m3tjh3cUUOSYhCBY
+	 FwtTpKru2F8N64SuoAb3J7aLnQVmMXIHK4VDYC20A0oiPhG9TcKvxJQbnapT8x83y3
+	 SaupDKNhlSF4Yyqvx2hlsvny16p06Y2c04JwxWaWZP2hgeCPfH7QAdmdit0hD55Ap2
+	 MkMPk1f2aepHQ==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F1B380AC00;
-	Tue, 29 Oct 2024 23:30:33 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D18380AC00;
+	Tue, 29 Oct 2024 23:30:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,47 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: marvell: use ethtool string helpers
+Subject: Re: [PATCH v4 0/1] vdpa: Add support for setting the MAC address in vDPA
+ tool
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173024463202.852400.15927674620572906785.git-patchwork-notify@kernel.org>
-Date: Tue, 29 Oct 2024 23:30:32 +0000
-References: <20241024195833.176843-1-rosenp@gmail.com>
-In-Reply-To: <20241024195833.176843-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, marcin.s.wojtas@gmail.com, linux@armlinux.org.uk,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, vburru@marvell.com, sedara@marvell.com,
- srasheed@marvell.com, sburla@marvell.com, sgoutham@marvell.com,
- gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
- mlindner@marvell.com, stephen@networkplumber.org, ast@kernel.org,
- daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
- jacob.e.keller@intel.com, sd@queasysnail.net, horms@kernel.org,
- almasrymina@google.com, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+ <173024463498.852400.13607424738542466548.git-patchwork-notify@kernel.org>
+Date: Tue, 29 Oct 2024 23:30:34 +0000
+References: <20241029084144.561035-1-lulu@redhat.com>
+In-Reply-To: <20241029084144.561035-1-lulu@redhat.com>
+To: Cindy Lu <lulu@redhat.com>
+Cc: dtatulea@nvidia.com, mst@redhat.com, jasowang@redhat.com,
+ parav@nvidia.com, dsahern@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
 
-On Thu, 24 Oct 2024 12:58:33 -0700 you wrote:
-> The latter is the preferred way to copy ethtool strings.
+On Tue, 29 Oct 2024 16:40:06 +0800 you wrote:
+> This patch is add support for set MAC address in vdpa tool
 > 
-> Avoids manually incrementing the pointer. Cleans up the code quite well.
+> changset in v4
+> 1. Sync with the latest upstream code.
+> 2. Address the comments in v2 and remove the MTU-related code,
+>    as this part was missed in the previous version.
 > 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  .../net/ethernet/marvell/mvpp2/mvpp2_main.c   | 39 ++++------
->  .../marvell/octeon_ep/octep_ethtool.c         | 31 +++-----
->  .../marvell/octeon_ep_vf/octep_vf_ethtool.c   | 31 +++-----
->  .../marvell/octeontx2/nic/otx2_ethtool.c      | 78 +++++++------------
->  drivers/net/ethernet/marvell/skge.c           |  3 +-
->  drivers/net/ethernet/marvell/sky2.c           |  3 +-
->  6 files changed, 68 insertions(+), 117 deletions(-)
+> [...]
 
 Here is the summary with links:
-  - [net-next] net: marvell: use ethtool string helpers
-    https://git.kernel.org/netdev/net-next/c/2d7dfe2d0ba7
+  - [v4,1/1] vdpa: Add support for setting the MAC address in vDPA tool.
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=9fe68807db20
 
 You are awesome, thank you!
 -- 
