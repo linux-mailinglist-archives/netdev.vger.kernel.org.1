@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-140169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140168-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0A659B5674
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:07:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 91D5B9B5673
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80E042842AD
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:07:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52D67283BC2
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 23:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B732E20C480;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F54920CCC8;
 	Tue, 29 Oct 2024 23:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="ArChvEej"
+	dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b="yWrZZ3ry"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
+Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4B7620C48C
-	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 23:06:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C1BF20C497
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 23:06:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730243178; cv=none; b=ni9w4uq5EZTDz1C+WYA/iWODeAdycqiR8cXpbnYFvuodPHzfp/F0ssZuv9qERMaKGhRNzCyyOX/7Q8JqTx8V0zlJ+U+mFsU/zx0cW0NSYyezVD7TrIjbsFpImgIpO1MjVO9HMjqArkPewaAAyZ6++iRm3G59+ZAJ0x0pLd+TTIY=
+	t=1730243178; cv=none; b=tij/C6x1Rns32EILFov8W6ntTbZ7qADtznyozECNxODkgskCHMvK4zBOqGeP/3ZPnOBB/QbLHjMEi7dIAiuCDFRde+pnPjJv1A3PsnYXWp61BkBy+Q1BAxDq6GJLMGd0PM/UBaBIU8B5iUg8jFi7TTgevuml76jtP2WrP3VpRFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730243178; c=relaxed/simple;
-	bh=6KqqI6HpkdqP+dHS3msm32py47l6WYwdsLXPqtA4fWs=;
+	bh=aa+huor/6qdUs/u5/3W+OBGNv1FL/yOsPwUTTmTQnzg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PF9n28GJwqXPnYccoLV1yzetcBHM/L+cnaBt5WCsS4NZBCR2vdsKphNg0dieiTwAMuQuEhbMM9tVlsG7IGfwBjzefZWY1K5Vkl1RTphbkXsvKWojoXmyJ5cHwSTGt281KEjKIXfps9YHTG1b69QuPY+t0za2JbvS+cp0u461nts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=ArChvEej; arc=none smtp.client-ip=209.85.215.177
+	 MIME-Version; b=rDPVHQIicfwcZdbp3KwE+LrRSEHo3MY6caSrTnvSEXJq/mhLaWOCuffnwVo7Rw5UnIuHbaVMBK8/hd2UrQiadd78Qpu/zEo1x1ioKEnBP29jUZ2wxZOX8d45kW/kE5d8fyIpCVFqb2gzUeAgLqM0oKgNbMPHUA/r+WDxw6SIs7Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk; spf=none smtp.mailfrom=davidwei.uk; dkim=pass (2048-bit key) header.d=davidwei-uk.20230601.gappssmtp.com header.i=@davidwei-uk.20230601.gappssmtp.com header.b=yWrZZ3ry; arc=none smtp.client-ip=209.85.215.181
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=davidwei.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=davidwei.uk
-Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7d4f85766f0so4604638a12.2
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 16:06:14 -0700 (PDT)
+Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ea7e250c54so4515686a12.0
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 16:06:15 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1730243174; x=1730847974; darn=vger.kernel.org;
+        d=davidwei-uk.20230601.gappssmtp.com; s=20230601; t=1730243175; x=1730847975; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A3jXnvBGwgD34LKj/lXhC1UQOFwlPkAGr7WiOARJxsg=;
-        b=ArChvEejnJochzm38HgT0kpQ/Qjfn22LUt9O6kG/l4XuKvKoz/VLMx+Sbtv5Ob1Gzz
-         m2OfPL0TJC3RxHVwNgsvOSqBpAyWZsl5PkgPtt3JZDMQxaTWZHT6tpFZPKeEav5e+xep
-         4nUuovztvKC2psYYFDAe/ZUqcglZRPjtZG3T+p2XfgCs8+QJaJN1wrjBvBU7V48SVuEA
-         DpbHF3w/bStqZYr7jVxvtiNCVSKxlp2RfJx5zFjq+PbVY4m5dXnYoTnWGiJvzKR/p4A1
-         v0lZe1q8MNWjCJnTns4f36mHUyZZAv3gGAAQnA5GoLTAisEM6gDvgL5IQ75uQpLfs5Zt
-         T8mA==
+        bh=infCm4b2+YzvgJNyI1UPPed5lAP0dKTh35zcwGfwOss=;
+        b=yWrZZ3ryCZx+pHmn6jPf28UDn8yzYbefLeNj3WOkZts0ZfivviagXPeMZexFRPkCni
+         CdR4LrBc0D6Ive2es0wscJawJNqKrtu/dcBlCbsUJ1FIzCE6NIOukXtaQtXx3zzbUgJw
+         ID9VkJICqJcIqFnYoVehtJEdLNVlCN3DZVVFHqLcRh/GgY1VhpODAW5riwSJnIhi0vEU
+         4vbEjGN86EoRNJXbUiriRoVn8d25ofs2sBJsdJSNTNyCZ7un4tNRXnk/RFF189Ob/OxV
+         5qTby/bNNHhfjEu186+ncoL7eSITWErKcCet61NxtLOwFhqi+GNfATosJ75fYbKd0S/5
+         NuWw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730243174; x=1730847974;
+        d=1e100.net; s=20230601; t=1730243175; x=1730847975;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A3jXnvBGwgD34LKj/lXhC1UQOFwlPkAGr7WiOARJxsg=;
-        b=AAbTXK3qy39JBcf3ZjdbYgI3CbQDtJc8in/GawsqSkJ7J3Jt2DbkV5Hn+FCrGcaN9Z
-         iy5RVKpsLWfb+SjIgfXR9QK9AjIg1r1OqRIclrEq71toInepeaTHAigKcHS3ViC3QqEK
-         vW2uYtfrinqlupHu7YfVS0KXVSsk4M3clAwkwz9NWMcmLd7wOgLwzZUWkqy32C/QGxB1
-         DtseA7/TWJMr/A8aL6w08AXxdJlFoqNVwhj0jZFzLqPBVr17DJqTGmoNvYTLfCNo+5mB
-         osHI2vOaZkURCgZt2AL5hBA9yhTxBMURfnEqynQDA8sdlE1HRGV0sS3Oy4MWw0VPWqaL
-         VYFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVk0zEzubV+e2z15045+EhD2KctpLUejoYquzlsXnhBXSIyULB4cpD8QpNCBnQ72kqIHzO8zVs=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywfdilh+jpsT/Nwm1CPQmQYYinX8O55TzqdYzwhgpUvAh4N4V9e
-	9B8DO+uneiiFlE6KnA7VpcCzsT9I2eZ63vTjoGwqbw/go4okwDvER5GlyAlVQuM=
-X-Google-Smtp-Source: AGHT+IH8A9D2t0DFrpn8eXcu9JL88l6qY94tIWvNfRgNuhDPmNUkIn+6C8v8mfAwBV/S3XXdcNpXKg==
-X-Received: by 2002:a05:6a21:2d8c:b0:1d9:1823:83bf with SMTP id adf61e73a8af0-1d9a83a92a5mr18147223637.8.1730243174038;
-        Tue, 29 Oct 2024 16:06:14 -0700 (PDT)
-Received: from localhost (fwdproxy-prn-011.fbsv.net. [2a03:2880:ff:b::face:b00c])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a0b7c5sm8169409b3a.139.2024.10.29.16.06.13
+        bh=infCm4b2+YzvgJNyI1UPPed5lAP0dKTh35zcwGfwOss=;
+        b=NIErKjdkvCibBqZNpOIduJ3vFQv+jo396rdKbYtXufC/CYdb9cYBLe/wCiXeOSFWD1
+         fo13LEW725bUiG5G2RUR1GnuBOUN6NKGc6XpAwpDwFRBGjB5xlC7mPEpRQ+2k/fu7O/J
+         4OssV2lKqXeCzR8o8fsHfjIpfqe+AE3FuWzMjhLYKY4hJx4mAZX79VSr9MwX/R12o2+S
+         CQXYHnjzcYjNyUSmFl6NgDKmmFfekKCaG6uM/K9sn21Xu4sJGg4qE2/lXEy0/Dy99Tc1
+         uWJPyQ/olXJYq1ygC3+K73wUmQM/y5nkgY123AlX18PxFUef+HHbDx9hKx/kbaaam4q2
+         y3zg==
+X-Forwarded-Encrypted: i=1; AJvYcCUYHIhfB8lyDdEhIHJivEQSR4ZDaJkL7p7P/G8ZC5mMJiNwgFqH+WYTSytpI/Z3e7EyVwkzGzg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxLhvp18D0fRLfdnKplw0PCs58vmUc1WpoGZGgXK28Cg1JPdVgv
+	9c/9vcY8nbklGmwz4NDdCGfAAN3us5VniuiaQx+yTqxyd6I5WplFuuVZJnNWmJA=
+X-Google-Smtp-Source: AGHT+IEJVa4X+2ORYvpdaPhwQ66uz+tnzb2hz+w6yMyiu/p15C29w2SW5FOpMCCswghJZWZncd3M5g==
+X-Received: by 2002:a17:90b:390f:b0:2e2:b45f:53b4 with SMTP id 98e67ed59e1d1-2e8f11a027bmr14117298a91.25.1730243175383;
+        Tue, 29 Oct 2024 16:06:15 -0700 (PDT)
+Received: from localhost (fwdproxy-prn-005.fbsv.net. [2a03:2880:ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa63967sm225353a91.32.2024.10.29.16.06.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 16:06:13 -0700 (PDT)
+        Tue, 29 Oct 2024 16:06:14 -0700 (PDT)
 From: David Wei <dw@davidwei.uk>
 To: io-uring@vger.kernel.org,
 	netdev@vger.kernel.org
@@ -82,9 +82,9 @@ Cc: Jens Axboe <axboe@kernel.dk>,
 	Stanislav Fomichev <stfomichev@gmail.com>,
 	Joe Damato <jdamato@fastly.com>,
 	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH v7 12/15] io_uring/zcrx: add io_recvzc request
-Date: Tue, 29 Oct 2024 16:05:15 -0700
-Message-ID: <20241029230521.2385749-13-dw@davidwei.uk>
+Subject: [PATCH v7 13/15] io_uring/zcrx: set pp memory provider for an rx queue
+Date: Tue, 29 Oct 2024 16:05:16 -0700
+Message-ID: <20241029230521.2385749-14-dw@davidwei.uk>
 X-Mailer: git-send-email 2.43.5
 In-Reply-To: <20241029230521.2385749-1-dw@davidwei.uk>
 References: <20241029230521.2385749-1-dw@davidwei.uk>
@@ -96,468 +96,185 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add io_uring opcode OP_RECV_ZC for doing zero copy reads out of a
-socket. Only the connection should be land on the specific rx queue set
-up for zero copy, and the socket must be handled by the io_uring
-instance that the rx queue was registered for zero copy with. That's
-because neither net_iovs / buffers from our queue can be read by outside
-applications, nor zero copy is possible if traffic for the zero copy
-connection goes to another queue. This coordination is outside of the
-scope of this patch series. Also, any traffic directed to the zero copy
-enabled queue is immediately visible to the application, which is why
-CAP_NET_ADMIN is required at the registeration step.
+From: David Wei <davidhwei@meta.com>
 
-Of course, no data is actually read out of the socket, it has already
-been copied by the netdev into userspace memory via DMA. OP_RECV_ZC
-reads skbs out of the socket and checks that its frags are indeed
-net_iovs that belong to io_uring. A cqe is queued for each one of these
-frags.
+Set the page pool memory provider for the rx queue configured for zero
+copy to io_uring. Then the rx queue is reset using
+netdev_rx_queue_restart() and netdev core + page pool will take care of
+filling the rx queue from the io_uring zero copy memory provider.
 
-Recall that each cqe is a big cqe, with the top half being an
-io_uring_zcrx_cqe. The cqe res field contains the len or error. The
-lower IORING_ZCRX_AREA_SHIFT bits of the struct io_uring_zcrx_cqe::off
-field contain the offset relative to the start of the zero copy area.
-The upper part of the off field is trivially zero, and will be used
-to carry the area id.
-
-For now, there is no limit as to how much work each OP_RECV_ZC request
-does. It will attempt to drain a socket of all available data. This
-request always operates in multishot mode.
+For now, there is only one ifq so its destruction happens implicitly
+during io_uring cleanup.
 
 Signed-off-by: David Wei <dw@davidwei.uk>
 ---
- include/uapi/linux/io_uring.h |   2 +
- io_uring/io_uring.h           |  10 ++
- io_uring/net.c                |  71 +++++++++++++
- io_uring/opdef.c              |  16 +++
- io_uring/zcrx.c               | 181 +++++++++++++++++++++++++++++++++-
- io_uring/zcrx.h               |  11 +++
- 6 files changed, 290 insertions(+), 1 deletion(-)
+ io_uring/zcrx.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++--
+ io_uring/zcrx.h |  2 ++
+ 2 files changed, 86 insertions(+), 2 deletions(-)
 
-diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-index d43183264dcf..0dcb239ebc59 100644
---- a/include/uapi/linux/io_uring.h
-+++ b/include/uapi/linux/io_uring.h
-@@ -87,6 +87,7 @@ struct io_uring_sqe {
- 	union {
- 		__s32	splice_fd_in;
- 		__u32	file_index;
-+		__u32	zcrx_ifq_idx;
- 		__u32	optlen;
- 		struct {
- 			__u16	addr_len;
-@@ -259,6 +260,7 @@ enum io_uring_op {
- 	IORING_OP_FTRUNCATE,
- 	IORING_OP_BIND,
- 	IORING_OP_LISTEN,
-+	IORING_OP_RECV_ZC,
- 
- 	/* this goes last, obviously */
- 	IORING_OP_LAST,
-diff --git a/io_uring/io_uring.h b/io_uring/io_uring.h
-index 12e8fca73891..f02efae82444 100644
---- a/io_uring/io_uring.h
-+++ b/io_uring/io_uring.h
-@@ -176,6 +176,16 @@ static inline bool io_get_cqe(struct io_ring_ctx *ctx, struct io_uring_cqe **ret
- 	return io_get_cqe_overflow(ctx, ret, false);
- }
- 
-+static inline bool io_defer_get_uncommited_cqe(struct io_ring_ctx *ctx,
-+					       struct io_uring_cqe **cqe_ret)
-+{
-+	io_lockdep_assert_cq_locked(ctx);
-+
-+	ctx->cq_extra++;
-+	ctx->submit_state.cq_flush = true;
-+	return io_get_cqe(ctx, cqe_ret);
-+}
-+
- static __always_inline bool io_fill_cqe_req(struct io_ring_ctx *ctx,
- 					    struct io_kiocb *req)
- {
-diff --git a/io_uring/net.c b/io_uring/net.c
-index 2040195e33ab..5c015b47582f 100644
---- a/io_uring/net.c
-+++ b/io_uring/net.c
-@@ -16,6 +16,7 @@
- #include "net.h"
- #include "notif.h"
- #include "rsrc.h"
-+#include "zcrx.h"
- 
- #if defined(CONFIG_NET)
- struct io_shutdown {
-@@ -88,6 +89,13 @@ struct io_sr_msg {
-  */
- #define MULTISHOT_MAX_RETRY	32
- 
-+struct io_recvzc {
-+	struct file			*file;
-+	unsigned			msg_flags;
-+	u16				flags;
-+	struct io_zcrx_ifq		*ifq;
-+};
-+
- int io_shutdown_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
- {
- 	struct io_shutdown *shutdown = io_kiocb_to_cmd(req, struct io_shutdown);
-@@ -1208,6 +1216,69 @@ int io_recv(struct io_kiocb *req, unsigned int issue_flags)
- 	return ret;
- }
- 
-+int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe)
-+{
-+	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
-+	unsigned ifq_idx;
-+
-+	if (unlikely(sqe->file_index || sqe->addr2 || sqe->addr ||
-+		     sqe->len || sqe->addr3))
-+		return -EINVAL;
-+
-+	ifq_idx = READ_ONCE(sqe->zcrx_ifq_idx);
-+	if (ifq_idx != 0)
-+		return -EINVAL;
-+	zc->ifq = req->ctx->ifq;
-+	if (!zc->ifq)
-+		return -EINVAL;
-+
-+	zc->flags = READ_ONCE(sqe->ioprio);
-+	zc->msg_flags = READ_ONCE(sqe->msg_flags);
-+	if (zc->msg_flags)
-+		return -EINVAL;
-+	if (zc->flags & ~(IORING_RECVSEND_POLL_FIRST | IORING_RECV_MULTISHOT))
-+		return -EINVAL;
-+	/* multishot required */
-+	if (!(zc->flags & IORING_RECV_MULTISHOT))
-+		return -EINVAL;
-+	/* All data completions are posted as aux CQEs. */
-+	req->flags |= REQ_F_APOLL_MULTISHOT;
-+
-+	return 0;
-+}
-+
-+int io_recvzc(struct io_kiocb *req, unsigned int issue_flags)
-+{
-+	struct io_recvzc *zc = io_kiocb_to_cmd(req, struct io_recvzc);
-+	struct socket *sock;
-+	int ret;
-+
-+	if (!(req->flags & REQ_F_POLLED) &&
-+	    (zc->flags & IORING_RECVSEND_POLL_FIRST))
-+		return -EAGAIN;
-+
-+	sock = sock_from_file(req->file);
-+	if (unlikely(!sock))
-+		return -ENOTSOCK;
-+
-+	ret = io_zcrx_recv(req, zc->ifq, sock, zc->msg_flags | MSG_DONTWAIT);
-+	if (unlikely(ret <= 0) && ret != -EAGAIN) {
-+		if (ret == -ERESTARTSYS)
-+			ret = -EINTR;
-+
-+		req_set_fail(req);
-+		io_req_set_res(req, ret, 0);
-+
-+		if (issue_flags & IO_URING_F_MULTISHOT)
-+			return IOU_STOP_MULTISHOT;
-+		return IOU_OK;
-+	}
-+
-+	if (issue_flags & IO_URING_F_MULTISHOT)
-+		return IOU_ISSUE_SKIP_COMPLETE;
-+	return -EAGAIN;
-+}
-+
- void io_send_zc_cleanup(struct io_kiocb *req)
- {
- 	struct io_sr_msg *zc = io_kiocb_to_cmd(req, struct io_sr_msg);
-diff --git a/io_uring/opdef.c b/io_uring/opdef.c
-index a2be3bbca5ff..599eb3ea5ff4 100644
---- a/io_uring/opdef.c
-+++ b/io_uring/opdef.c
-@@ -36,6 +36,7 @@
- #include "waitid.h"
- #include "futex.h"
- #include "truncate.h"
-+#include "zcrx.h"
- 
- static int io_no_issue(struct io_kiocb *req, unsigned int issue_flags)
- {
-@@ -513,6 +514,18 @@ const struct io_issue_def io_issue_defs[] = {
- 		.async_size		= sizeof(struct io_async_msghdr),
- #else
- 		.prep			= io_eopnotsupp_prep,
-+#endif
-+	},
-+	[IORING_OP_RECV_ZC] = {
-+		.needs_file		= 1,
-+		.unbound_nonreg_file	= 1,
-+		.pollin			= 1,
-+		.ioprio			= 1,
-+#if defined(CONFIG_NET)
-+		.prep			= io_recvzc_prep,
-+		.issue			= io_recvzc,
-+#else
-+		.prep			= io_eopnotsupp_prep,
- #endif
- 	},
- };
-@@ -742,6 +755,9 @@ const struct io_cold_def io_cold_defs[] = {
- 	[IORING_OP_LISTEN] = {
- 		.name			= "LISTEN",
- 	},
-+	[IORING_OP_RECV_ZC] = {
-+		.name			= "RECV_ZC",
-+	},
- };
- 
- const char *io_uring_get_opcode(u8 opcode)
 diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-index aad35676207e..477b0d1b7b91 100644
+index 477b0d1b7b91..3f4625730dbd 100644
 --- a/io_uring/zcrx.c
 +++ b/io_uring/zcrx.c
-@@ -8,6 +8,8 @@
+@@ -8,6 +8,7 @@
  #include <net/page_pool/helpers.h>
  #include <net/page_pool/memory_provider.h>
  #include <trace/events/page_pool.h>
-+#include <net/tcp.h>
-+#include <net/rps.h>
++#include <net/netdev_rx_queue.h>
+ #include <net/tcp.h>
+ #include <net/rps.h>
  
- #include <uapi/linux/io_uring.h>
- 
-@@ -19,7 +21,12 @@
- 
- #define IO_RQ_MAX_ENTRIES		32768
- 
--__maybe_unused
-+struct io_zcrx_args {
-+	struct io_kiocb		*req;
-+	struct io_zcrx_ifq	*ifq;
-+	struct socket		*sock;
-+};
-+
- static const struct memory_provider_ops io_uring_pp_zc_ops;
- 
- static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct net_iov *niov)
-@@ -249,6 +256,11 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
- 	lockdep_assert_held(&ctx->uring_lock);
+@@ -36,6 +37,65 @@ static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct net_iov *nio
+ 	return container_of(owner, struct io_zcrx_area, nia);
  }
  
-+static void io_zcrx_get_buf_uref(struct net_iov *niov)
++static int io_open_zc_rxq(struct io_zcrx_ifq *ifq, unsigned ifq_idx)
 +{
-+	atomic_long_add(IO_ZC_RX_UREF, &niov->pp_ref_count);
-+}
-+
- static bool io_zcrx_niov_put(struct net_iov *niov, int nr)
- {
- 	return atomic_long_sub_and_test(nr, &niov->pp_ref_count);
-@@ -445,3 +457,170 @@ static const struct memory_provider_ops io_uring_pp_zc_ops = {
- 	.destroy		= io_pp_zc_destroy,
- 	.scrub			= io_pp_zc_scrub,
- };
-+
-+static bool io_zcrx_queue_cqe(struct io_kiocb *req, struct net_iov *niov,
-+			      struct io_zcrx_ifq *ifq, int off, int len)
-+{
-+	struct io_uring_zcrx_cqe *rcqe;
-+	struct io_zcrx_area *area;
-+	struct io_uring_cqe *cqe;
-+	u64 offset;
-+
-+	if (!io_defer_get_uncommited_cqe(req->ctx, &cqe))
-+		return false;
-+
-+	cqe->user_data = req->cqe.user_data;
-+	cqe->res = len;
-+	cqe->flags = IORING_CQE_F_MORE;
-+
-+	area = io_zcrx_iov_to_area(niov);
-+	offset = off + (net_iov_idx(niov) << PAGE_SHIFT);
-+	rcqe = (struct io_uring_zcrx_cqe *)(cqe + 1);
-+	rcqe->off = offset + ((u64)area->area_id << IORING_ZCRX_AREA_SHIFT);
-+	rcqe->__pad = 0;
-+	return true;
-+}
-+
-+static int io_zcrx_recv_frag(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+			     const skb_frag_t *frag, int off, int len)
-+{
-+	struct net_iov *niov;
-+
-+	off += skb_frag_off(frag);
-+
-+	if (unlikely(!skb_frag_is_net_iov(frag)))
-+		return -EOPNOTSUPP;
-+
-+	niov = netmem_to_net_iov(frag->netmem);
-+	if (niov->pp->mp_ops != &io_uring_pp_zc_ops ||
-+	    niov->pp->mp_priv != ifq)
-+		return -EFAULT;
-+
-+	if (!io_zcrx_queue_cqe(req, niov, ifq, off, len))
-+		return -ENOSPC;
-+	io_zcrx_get_buf_uref(niov);
-+	return len;
-+}
-+
-+static int
-+io_zcrx_recv_skb(read_descriptor_t *desc, struct sk_buff *skb,
-+		 unsigned int offset, size_t len)
-+{
-+	struct io_zcrx_args *args = desc->arg.data;
-+	struct io_zcrx_ifq *ifq = args->ifq;
-+	struct io_kiocb *req = args->req;
-+	struct sk_buff *frag_iter;
-+	unsigned start, start_off;
-+	int i, copy, end, off;
-+	int ret = 0;
-+
-+	start = skb_headlen(skb);
-+	start_off = offset;
-+
-+	if (offset < start)
-+		return -EOPNOTSUPP;
-+
-+	for (i = 0; i < skb_shinfo(skb)->nr_frags; i++) {
-+		const skb_frag_t *frag;
-+
-+		if (WARN_ON(start > offset + len))
-+			return -EFAULT;
-+
-+		frag = &skb_shinfo(skb)->frags[i];
-+		end = start + skb_frag_size(frag);
-+
-+		if (offset < end) {
-+			copy = end - offset;
-+			if (copy > len)
-+				copy = len;
-+
-+			off = offset - start;
-+			ret = io_zcrx_recv_frag(req, ifq, frag, off, copy);
-+			if (ret < 0)
-+				goto out;
-+
-+			offset += ret;
-+			len -= ret;
-+			if (len == 0 || ret != copy)
-+				goto out;
-+		}
-+		start = end;
-+	}
-+
-+	skb_walk_frags(skb, frag_iter) {
-+		if (WARN_ON(start > offset + len))
-+			return -EFAULT;
-+
-+		end = start + frag_iter->len;
-+		if (offset < end) {
-+			copy = end - offset;
-+			if (copy > len)
-+				copy = len;
-+
-+			off = offset - start;
-+			ret = io_zcrx_recv_skb(desc, frag_iter, off, copy);
-+			if (ret < 0)
-+				goto out;
-+
-+			offset += ret;
-+			len -= ret;
-+			if (len == 0 || ret != copy)
-+				goto out;
-+		}
-+		start = end;
-+	}
-+
-+out:
-+	if (offset == start_off)
-+		return ret;
-+	return offset - start_off;
-+}
-+
-+static int io_zcrx_tcp_recvmsg(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+				struct sock *sk, int flags)
-+{
-+	struct io_zcrx_args args = {
-+		.req = req,
-+		.ifq = ifq,
-+		.sock = sk->sk_socket,
-+	};
-+	read_descriptor_t rd_desc = {
-+		.count = 1,
-+		.arg.data = &args,
-+	};
++	struct netdev_rx_queue *rxq;
++	struct net_device *dev = ifq->dev;
 +	int ret;
 +
-+	lock_sock(sk);
-+	ret = tcp_read_sock(sk, &rd_desc, io_zcrx_recv_skb);
-+	if (ret <= 0) {
-+		if (ret < 0 || sock_flag(sk, SOCK_DONE))
-+			goto out;
-+		if (sk->sk_err)
-+			ret = sock_error(sk);
-+		else if (sk->sk_shutdown & RCV_SHUTDOWN)
-+			goto out;
-+		else if (sk->sk_state == TCP_CLOSE)
-+			ret = -ENOTCONN;
-+		else
-+			ret = -EAGAIN;
-+	} else if (sock_flag(sk, SOCK_DONE)) {
-+		/* Make it to retry until it finally gets 0. */
-+		ret = -EAGAIN;
-+	}
-+out:
-+	release_sock(sk);
++	ASSERT_RTNL();
++
++	if (ifq_idx >= dev->num_rx_queues)
++		return -EINVAL;
++	ifq_idx = array_index_nospec(ifq_idx, dev->num_rx_queues);
++
++	rxq = __netif_get_rx_queue(ifq->dev, ifq_idx);
++	if (rxq->mp_params.mp_priv)
++		return -EEXIST;
++
++	ifq->if_rxq = ifq_idx;
++	rxq->mp_params.mp_ops = &io_uring_pp_zc_ops;
++	rxq->mp_params.mp_priv = ifq;
++	ret = netdev_rx_queue_restart(ifq->dev, ifq->if_rxq);
++	if (ret)
++		goto fail;
++	return 0;
++fail:
++	rxq->mp_params.mp_ops = NULL;
++	rxq->mp_params.mp_priv = NULL;
++	ifq->if_rxq = -1;
 +	return ret;
 +}
 +
-+int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+		 struct socket *sock, unsigned int flags)
++static void io_close_zc_rxq(struct io_zcrx_ifq *ifq)
 +{
-+	struct sock *sk = sock->sk;
-+	const struct proto *prot = READ_ONCE(sk->sk_prot);
++	struct netdev_rx_queue *rxq;
++	int err;
 +
-+	if (prot->recvmsg != tcp_recvmsg)
-+		return -EPROTONOSUPPORT;
++	if (ifq->if_rxq == -1)
++		return;
 +
-+	sock_rps_record_flow(sk);
-+	return io_zcrx_tcp_recvmsg(req, ifq, sk, flags);
++	rtnl_lock();
++	if (WARN_ON_ONCE(ifq->if_rxq >= ifq->dev->num_rx_queues)) {
++		rtnl_unlock();
++		return;
++	}
++
++	rxq = __netif_get_rx_queue(ifq->dev, ifq->if_rxq);
++
++	WARN_ON_ONCE(rxq->mp_params.mp_priv != ifq);
++
++	rxq->mp_params.mp_ops = NULL;
++	rxq->mp_params.mp_priv = NULL;
++
++	err = netdev_rx_queue_restart(ifq->dev, ifq->if_rxq);
++	if (err)
++		pr_devel("io_uring: can't restart a queue on zcrx close\n");
++
++	rtnl_unlock();
++	ifq->if_rxq = -1;
 +}
++
+ static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
+ 				 struct io_uring_zcrx_ifq_reg *reg)
+ {
+@@ -156,9 +216,12 @@ static struct io_zcrx_ifq *io_zcrx_ifq_alloc(struct io_ring_ctx *ctx)
+ 
+ static void io_zcrx_ifq_free(struct io_zcrx_ifq *ifq)
+ {
++	io_close_zc_rxq(ifq);
++
+ 	if (ifq->area)
+ 		io_zcrx_free_area(ifq->area);
+-
++	if (ifq->dev)
++		netdev_put(ifq->dev, &ifq->netdev_tracker);
+ 	io_free_rbuf_ring(ifq);
+ 	kfree(ifq);
+ }
+@@ -214,7 +277,18 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 		goto err;
+ 
+ 	ifq->rq_entries = reg.rq_entries;
+-	ifq->if_rxq = reg.if_rxq;
++
++	ret = -ENODEV;
++	rtnl_lock();
++	ifq->dev = netdev_get_by_index(current->nsproxy->net_ns, reg.if_idx,
++				       &ifq->netdev_tracker, GFP_KERNEL);
++	if (!ifq->dev)
++		goto err_rtnl_unlock;
++
++	ret = io_open_zc_rxq(ifq, reg.if_rxq);
++	if (ret)
++		goto err_rtnl_unlock;
++	rtnl_unlock();
+ 
+ 	ring_sz = sizeof(struct io_uring);
+ 	rqes_sz = sizeof(struct io_uring_zcrx_rqe) * ifq->rq_entries;
+@@ -224,15 +298,20 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
+ 	reg.offsets.tail = offsetof(struct io_uring, tail);
+ 
+ 	if (copy_to_user(arg, &reg, sizeof(reg))) {
++		io_close_zc_rxq(ifq);
+ 		ret = -EFAULT;
+ 		goto err;
+ 	}
+ 	if (copy_to_user(u64_to_user_ptr(reg.area_ptr), &area, sizeof(area))) {
++		io_close_zc_rxq(ifq);
+ 		ret = -EFAULT;
+ 		goto err;
+ 	}
+ 	ctx->ifq = ifq;
+ 	return 0;
++
++err_rtnl_unlock:
++	rtnl_unlock();
+ err:
+ 	io_zcrx_ifq_free(ifq);
+ 	return ret;
+@@ -254,6 +333,9 @@ void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
+ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
+ {
+ 	lockdep_assert_held(&ctx->uring_lock);
++
++	if (ctx->ifq)
++		io_close_zc_rxq(ctx->ifq);
+ }
+ 
+ static void io_zcrx_get_buf_uref(struct net_iov *niov)
 diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-index 464b4bd89b64..1f039ad45a63 100644
+index 1f039ad45a63..d3f6b6cdd647 100644
 --- a/io_uring/zcrx.h
 +++ b/io_uring/zcrx.h
-@@ -3,6 +3,7 @@
- #define IOU_ZC_RX_H
- 
+@@ -5,6 +5,7 @@
  #include <linux/io_uring_types.h>
-+#include <linux/socket.h>
+ #include <linux/socket.h>
  #include <net/page_pool/types.h>
++#include <net/net_trackers.h>
  
  #define IO_ZC_RX_UREF			0x10000
-@@ -43,6 +44,8 @@ int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 			 struct io_uring_zcrx_ifq_reg __user *arg);
- void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx);
- void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx);
-+int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+		 struct socket *sock, unsigned int flags);
- #else
- static inline int io_register_zcrx_ifq(struct io_ring_ctx *ctx,
- 					struct io_uring_zcrx_ifq_reg __user *arg)
-@@ -55,6 +58,14 @@ static inline void io_unregister_zcrx_ifqs(struct io_ring_ctx *ctx)
- static inline void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
- {
- }
-+static inline int io_zcrx_recv(struct io_kiocb *req, struct io_zcrx_ifq *ifq,
-+			       struct socket *sock, unsigned int flags)
-+{
-+	return -EOPNOTSUPP;
-+}
- #endif
+ #define IO_ZC_RX_KREF_MASK		(IO_ZC_RX_UREF - 1)
+@@ -37,6 +38,7 @@ struct io_zcrx_ifq {
+ 	struct page			**rqe_pages;
  
-+int io_recvzc(struct io_kiocb *req, unsigned int issue_flags);
-+int io_recvzc_prep(struct io_kiocb *req, const struct io_uring_sqe *sqe);
-+
- #endif
+ 	u32				if_rxq;
++	netdevice_tracker		netdev_tracker;
+ };
+ 
+ #if defined(CONFIG_IO_URING_ZCRX)
 -- 
 2.43.5
 
