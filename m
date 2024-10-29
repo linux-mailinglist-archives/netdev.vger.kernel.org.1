@@ -1,206 +1,288 @@
-Return-Path: <netdev+bounces-139991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-139992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 87C9E9B4F50
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:31:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F059B4F5C
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 17:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4631428177A
-	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:31:43 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72C021F240CB
+	for <lists+netdev@lfdr.de>; Tue, 29 Oct 2024 16:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E49091D356C;
-	Tue, 29 Oct 2024 16:31:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8DB61CC16A;
+	Tue, 29 Oct 2024 16:32:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="ghUsIUbW"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Zvu7y8Ku"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2065.outbound.protection.outlook.com [40.107.20.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4160C199EAD;
-	Tue, 29 Oct 2024 16:31:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.65
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730219499; cv=fail; b=AwgoL2REHKybeekdq7kXnEuZAD44EOawTc59DluK51kj8riFFjOp/xNTf8Q9pMkvzqYRa+gzeyF8mG85AQfNBAxBt/nJvOfr2oNDfsZTRiQeDEn//66INWJK2U/cveulOrD+oZG1zZY1rmk6WjVvoWrl/mtdHGiX+8YtUGuf20c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730219499; c=relaxed/simple;
-	bh=qNgpOKqCmd1qmP4P+j3A5wr6wHSPd0HtciJ/9s9n3+w=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=BRbxgy980J9IfcnnwIwP4JfAzsfmhUcpxjAq02Br4qm5rbxZP79FZLW8iUstJkVSFEybXuDxQqqj1dwEIv/2bUfhCOZnWynUC4QS+0T3rcOHexwjo7O58pbByBw2xdAdkY7Msll4ELMfFXm54nOX1W10n3q28V0Yy9h0irbJxhU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=ghUsIUbW; arc=fail smtp.client-ip=40.107.20.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=UqmtNknw9jX1JDtxaxjDIqt3kEUwyQ+vtRysqdCorBkc/sd36YERzqByD4y2a2wVgLnhbnGk0KaRleLERpxyHMvmPJPMiYnRprn6f/JBpIkPbVjNkYA8clOGvh6Iki+yfGBNcpBF8smdZYD5eROXlgxfvpptmYwAUVfgj+ce1Ak/H8fa08FC3OSrHJi/xah8MGTA3a0p0R5d9IVWM5vy9Shxtu95CeMDkj7KuZFQQnfjlcMy8yVux4zzToaGtT4/r8Y8Xjo39N9e8ms6mRpERVDfqSVuLYrrFmYHRbLSWamRdX9Yed+Zz3s+e3ll5CbhWwIJdt+zuvtUL/zpGZ5Dsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=RjB4Ch/Cad8OWIISs22V/yaCSO1WcXAZCu3R7vlETfY=;
- b=J27/y0TOyVKBFklFMRwupvHpOhor8AnRcnp907/rYhhTJKnygyAJhfe5Zmd0BGtnIMZxNAjP6goFkPoIkFZccJTro6AqHjJ5rlFq74vIo0JVNfG9Wk68WzKQDgXgP3JSpbeOKbCSQAQeusWsfPA9yNLtSYxdlSWPkc9Z/OrBBlLl7iw4yBIFg2qNg5tzXpbYIXO33si8Uqpf51CONQYzuwXXyTlbN6XCQKlfjO2JwGk9iS4n2B9HvhptenYqhci8UJTkzzyxrL3wo27+UxMh59usvU1mfA58G0luSpleYwDgZJgA30I+SHl3a2Jzh62OqrDEZLoeykTOzab9u3ZQrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=RjB4Ch/Cad8OWIISs22V/yaCSO1WcXAZCu3R7vlETfY=;
- b=ghUsIUbWIE/8yZNRZMM6qfWOoR1GT9CXa7oK8vcKM/r5WPMlYm8UsUOfOidvs4vS5/SOe4Pk9sX383FhtiXLJ0MXm66GufgNtcE8EQPb7N8SpKoPrMGYyFdaR8vpHekpYfTJwpbnJhXBH7TZB2ejBhZlCMF6o3DtuxgpTu++oY3zjY1u+KW5B1lSOhYPiiPnonWYjb/4d7xz7JhlSguZlPAMvn6qyQhDGwwpgC5u/KhP+LOWC3HBtAwp+uXfrP1kqWBEwx6nCpK+l9CNCp8oURConuBvE2d9UJnGk46B//zta/FPUP1D7zDrXwbUQyd/muqbjWG8C0+SMJzCaLOKaw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AM7PR04MB6791.eurprd04.prod.outlook.com (2603:10a6:20b:103::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Tue, 29 Oct
- 2024 16:31:29 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.027; Tue, 29 Oct 2024
- 16:31:28 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org,
-	Radu Bulie <radu-andrei.bulie@nxp.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Breno Leitao <leitao@debian.org>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	linux-kernel@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: [PATCH net] net: dpaa_eth: print FD status in CPU endianness in dpaa_eth_fd tracepoint
-Date: Tue, 29 Oct 2024 18:31:05 +0200
-Message-Id: <20241029163105.44135-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: AS4PR10CA0013.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dc::20) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBC7C199FA2
+	for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 16:32:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730219548; cv=none; b=M/YTxz98Y38kSsvxYUj3pD38DdWjVVAjgzQ/bdEjP3p/bp2Wl+HkwnQisXYEfR4Mh0ZPw4GJUrIf0QdFVUPOZCr+XWFN2dNLyARk4jgm3lp66yJmBBXx1MBmkGxUxJFX3x7sj7WR8IcZ1NFnHdcn+4LT15dELxhZiWeQ37eayfs=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730219548; c=relaxed/simple;
+	bh=kFGL+if3/xwjjMNeXcV0G9jxEMBEzcmboI/K66wzIbI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fyXORoPLTUC5GallJssve/KQbi/9DYvNFbJZOa0fDJ5vHy8YKdjpm7MJfzvVzS26zLel7kH5k0vzC6t83Ma/XUd/9WiBcb/7yM3vSFfXtChMcPKnc+koiyLOqQdlYkz8MOpg5bL8F8wn3ILUGQmzZt73gf9RZRKgwDWD37IvBBY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Zvu7y8Ku; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-71e4eb91228so419549b3a.2
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 09:32:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1730219545; x=1730824345; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Gp2bPRmIZGXK74UCf6LU4Vct82RL32V7HDLFUkfsc1Q=;
+        b=Zvu7y8KuuysMtauu1v5K5v+nrP+IwgkkIbiBgYMenjS1HxfXon4Y8i77wVchWHoJAM
+         XC/gFqEmlRblqANjnbm5gyGx1kxU2PdR7xsSS9kZ9Vy17zV8LDLSI9FpxT4U+tXeWenp
+         aq8CwqaW5I3bu/x3biVrX5BVI2+J9XMcD30w4hmNro92a2LLed9cABZFVMomfKrXCaOG
+         nuLlSL5+DOH3ublRYLOrOSvr+gRXILS2xVehbSpsPItSRQ9qKUmUj1qBLeb2QrlPsjap
+         49Yu1cPeuovuRjgMFEtrb/vzIq9R1xIWGD/wWs0rI3uZCsgqOJ4DLjqMiQ9B7WYcx4Q5
+         94wQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730219545; x=1730824345;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Gp2bPRmIZGXK74UCf6LU4Vct82RL32V7HDLFUkfsc1Q=;
+        b=GTLzx105m262Pvyt0dmiQ87nbBlEYiTUKTKCNXlEmedjvqyMubfoi9H+FmmmVLfV2J
+         M8dfWlaFB0Utlggz4PaNXJY+AWQp986RJRJGzYze0ri0x871jqVazVc2GgwW4Rs1r31I
+         h6DosZ6cTae8xwXL/w1GR8QRZDqQfiXklvJrKrUDUZJfsmpTna+S7ZVNc+SythYg5JVH
+         BHz355CQIZfPGzSM5/InXOgWB04uU0FqewsyY0fBjG4JE5NEegXT06osobjbTbmvk+Ep
+         gjUFP8vpcbEDT7lON7uoJ797dNKdFM65+89nriKrhuNGZZQnBw628mz/5p4UfIA/ySUh
+         UoYQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXfokiOB7c7dNafORe3zsU2Yhzs3QbAsc+AMML8Ypqjln13IB6kHrWqfi1VskW1EfekGJBI0Hg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxsj7+8lHHJhsN9tHB0TwpF7CQ76LnwV6/sqtcSpUIXFWpOoUMG
+	Dni70e5szA3WJ1yoa4oI8CdGwNVJMJTVWas5v+UdD5YJU8eis3KepVpaN9W5K1/N6qankVCA2eN
+	qO4Kr2ez4/g+FpCiN3anCgw427Hk632ynFP/U1g==
+X-Google-Smtp-Source: AGHT+IHKCbM1cYCtX219ubq/3oNT4yYLJDHESaG5BrVKKjk8PLnkRjcgUVnhxZo4ARKjwaqQViSzLtyJEGHHEaclMFc=
+X-Received: by 2002:a05:6a00:2da4:b0:71e:6895:fe9e with SMTP id
+ d2e1a72fcca58-72063059e84mr7299787b3a.6.1730219544956; Tue, 29 Oct 2024
+ 09:32:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AM7PR04MB6791:EE_
-X-MS-Office365-Filtering-Correlation-Id: e11a0056-7d9f-4c9f-c9fb-08dcf837235f
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|366016|376014|7416014|52116014|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?KuXckMEpku2gDh2YXNwkKVQZsdy8y0N152Sf5doMFC4P+WQyrWar3uocfFKE?=
- =?us-ascii?Q?6OoXifhRwmp7vMppwdEGeF5m6lyJcNSGCSyO6kUHzuIsBovf2aIUBmSFMg8+?=
- =?us-ascii?Q?vgfApjE/hSVXLxTcjI0vItHJl7xkwJQQClDh3+KE98vQVfRsLALTFUtRbJBP?=
- =?us-ascii?Q?Dvjrot6zckLUfyHlXy1ihHAeoz+5wP/AjPXMmGeCTOddWab7cojn4adEZ7JJ?=
- =?us-ascii?Q?qKUEmFLV/iHGTw3OTCv6fZcSkTb8KRHq4TRhEbTKVf/SLukaFIyr3PmiXD+f?=
- =?us-ascii?Q?ClRgpM7/8UGyE06sLybdQncd6oNP2+qtjBS9A6zFxcONNxep9qC38qpxhS8k?=
- =?us-ascii?Q?Kst5XYVgRWc8zfzELHPcw9mUKj117aafQ1SaOzpU72sXihlSRITJiWu7PDfU?=
- =?us-ascii?Q?HbOe0lLGHBUWefoJdLGkIZBYCFc4hTteSDyKNLJR8bVhh1fUNEI2J6h2h4N9?=
- =?us-ascii?Q?S12zQYDDk9pMXt4LDQe1UTNKQ8Rptg02JD2jBNKBtW2I2JfjDZF4aaAiKed0?=
- =?us-ascii?Q?gayQ/X6nxYIcPBrFxKbpXYvZ6fpEIkBOP19ko1CmcwuE9XZV97Kq+DQR8zPK?=
- =?us-ascii?Q?oFLOdsIyjLebAOTdtJyFoiYfL1U/4B0eksaQzf+JQ3ZP1SclKg3zdxWepvbI?=
- =?us-ascii?Q?VnYLQjm/Rxqf2a0zB0XHcx6j8WN5fw4RIc7u21r+Ue/gvxa3cT7Nvp1swP9k?=
- =?us-ascii?Q?6YGygKt40nwlkHuha1BEyMNM4hwCm5krE1+s09l2+T0ymjeoBqvIWH133253?=
- =?us-ascii?Q?CsWCj3Reds+HR6qgE8RZaptbQrpkSteJZp/IU/rJMSkkEbqTfGirL9pFCrxD?=
- =?us-ascii?Q?oJecIvaPrciKshWTLUEkkqxGDmEwuTW+W4YMAL/mVAX9Y237kaysOrp4uw6y?=
- =?us-ascii?Q?lUNiPkl3VXSfLlRhyJEIok++jRO8BtlJC7eb9Nta1b1zOkr+w244SEDryokZ?=
- =?us-ascii?Q?tA4ME0ErvhSAZyjbKe1Jeq6Ks/wmPs891u/21onZFGtCrRsR+rw4ZX5+hKq1?=
- =?us-ascii?Q?SrjfUBqamzXbA1oQbElW9qZ8bDSXG4Ux5kn77BGmlEdvWKxSBzYTcOC7ucQ1?=
- =?us-ascii?Q?R7KCmp/ZN3L6fk6FH31LnUCHj5/8iKpe+VLYpWbh+DrGwUa+OIrEg76x6Wsf?=
- =?us-ascii?Q?HuCWw/ub4WnRnr1sJEyGwfQdtmTOyDDbdjeJyHiSEIl5b7kKx+3kR8PmHDKW?=
- =?us-ascii?Q?/vpjuXW4cqkTBGn0+HHfzXayFF/H4njIvBZDgd5IciaZboKgISHW9apfbRjX?=
- =?us-ascii?Q?tFYtEsIg+Q1/CmKXHjfwmNT+B87rFezgqLH4u9u1ztFWjRk0QWSx9RBljezy?=
- =?us-ascii?Q?bnWZD48crdl9xii7JvqnJrVgvUPyosBdi+zETGsRmnxGCdyvA5Gp9BjV4hVg?=
- =?us-ascii?Q?7FspWYDx2RdaNyxtK9A8rfx+Sp93?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(52116014)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?1jpRBRxL8mCjqTJTBgzL+HyxtyLH9Wd0U1F5gVhd3o0tiqapRfv8mEalVnyD?=
- =?us-ascii?Q?hBz1xBJEx7K19ntgjFDo5xqNv7uTn3xXQsAFh3Pi7n+CAR+9sFg9Kpfld6pl?=
- =?us-ascii?Q?o06PWyGd397bcy941lnMgOBrNi2IwrV8PrwdF0riNAq2A56oZBh1wqtSKb4m?=
- =?us-ascii?Q?tn9Jt9BgBHIZqn7q+/dI4e9yxhyR93q7BHt0Vfks1mPQp06exuC8F2fXPjtE?=
- =?us-ascii?Q?AsDL3dT5o2DONY42u9S1z+XL5ozBMcNqrCAwvW9XRvlk56ktMaALvZAzbHGZ?=
- =?us-ascii?Q?iND+JtUxlNsv+byIvtVIzFibyEv2DOpK3GRV6hRVpeMxtjQGlgi8QHKgme6m?=
- =?us-ascii?Q?WIYaJeX3M2s+bynTO1DoK+ydoVhW0e/NTDe4CQs50zIsXDG3Qph9uJIHUFOI?=
- =?us-ascii?Q?fv20HIrsk1FU9q+4msOqiuh4oC/C3Rpbl/6R+MozdjfqIALxB2k5a+uyI0No?=
- =?us-ascii?Q?IgZGqV0sOSIyfPHcghK7GmDrbwxnKNoqIWW0ImiFgriHE03sSuMznfLW/Bdv?=
- =?us-ascii?Q?rwm8JD9Vj/I1KOLuIm9IbcgeTjTytiL+r5/rdLtwyYennNklyaupTA5EaSr5?=
- =?us-ascii?Q?q3XV55qKVaYFF/0oiPhdO7tas7waQjdqsEw0pd4EwHq2Dy8NB9Swc0nXGqfv?=
- =?us-ascii?Q?P0symhdUr4c3bQ9bWNdGa5fPdI3j5A8xkuWtj1GSD1oRrXy0bnSeJzKvczuQ?=
- =?us-ascii?Q?uieNPF5Ks3O+aXy1i73DeIJTPwoy5N0/EXUCIRtN3ymCmW7UipNoJyUMIZB8?=
- =?us-ascii?Q?JFTSjaOedsGcgVNWzfqpc1CvcDmQz6n8F5qmCjpgd5OhaubAFzPns/gSWLPL?=
- =?us-ascii?Q?NpDgGFx/vnzX0jJOFVTTt8DdFvaPll0ZLPjPkHtgpAgzWxcPpqq4na5dEsZO?=
- =?us-ascii?Q?jY/3t2fxhpQMf+Df0ucUO7wiID1eKbC+YB0er5RewMM1Oj8MnLtJeJQZS6iH?=
- =?us-ascii?Q?KByM3XEiZQ6Dd1sR9Y+R3CrNtSkbtq15y8gGxhMoMqfFKcChXnlUOqI3qORe?=
- =?us-ascii?Q?zaeZEjHJPiZIL/nitxuW2JGyH708+ehepoYIa5Js6fbjO9JxuGAOrJHEbjBL?=
- =?us-ascii?Q?0E2uXTTmnXT9bsYgIZ22QnWBUxebxqgkkTRy0uRhbRlqwxnUWQVnhbJa05sb?=
- =?us-ascii?Q?FluIXL8SeT849KeRj+kcAq9qougQADNQ/P2Syfu5y9pFNP7+maE1EckVQ1Ru?=
- =?us-ascii?Q?6UUO1aWyJLVeHFyN0/AKAwrRS7lShVFo7n2qME6fWjb5QhPjYK7mpaCzMwLN?=
- =?us-ascii?Q?HeR0tEu0w+6OFzFjBi+tMRXSiKqDgiiYrR3IFBXWQU8q/Yy/mtX0XkgzJkB8?=
- =?us-ascii?Q?Nz1Xt+0MUh27ar5zsojIeCwGdhnPykNojt/MT+t+x2Z58SU4l07LGmRAp1Ax?=
- =?us-ascii?Q?tpxnIDvhtD3TFDomPqCrd/hSd4HoISj1KBoy+FTNbmY6TTIC3rxeIxIBH0PT?=
- =?us-ascii?Q?7fNH1VyLEP3qcn2HdTp864nnoNy3r+hJVGiUtaDnD7S393PkZFmycCtNBeoB?=
- =?us-ascii?Q?PFCT3Cg2kVtn8me9u8bTovwATKDjLNHtaS1smHojby1exEcm+IWgOzdYooFO?=
- =?us-ascii?Q?o+IBet1MqpQ/49LDuAr78mEhfRuDYYpywFqhu+5PWsB1kSK/j02Xh13lBbAT?=
- =?us-ascii?Q?Iw=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: e11a0056-7d9f-4c9f-c9fb-08dcf837235f
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Oct 2024 16:31:28.8355
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: o8fSlAuYImo37C2NE1uRbRmFFVL2YQ4xqijlhfwW44C2mzXPMoAIw8OGSTm8uTkjVCW0lb3v9AC56Eh8w3DY2Q==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6791
+References: <20241027040700.1616307-1-csander@purestorage.com> <CY8PR12MB7195E405C3EC9F43619231CCDC4B2@CY8PR12MB7195.namprd12.prod.outlook.com>
+In-Reply-To: <CY8PR12MB7195E405C3EC9F43619231CCDC4B2@CY8PR12MB7195.namprd12.prod.outlook.com>
+From: Caleb Sander <csander@purestorage.com>
+Date: Tue, 29 Oct 2024 09:32:13 -0700
+Message-ID: <CADUfDZq_hsHDxi0uyxUY-PLJQm9CNYnnxjqWUXsx0ssuh6ee-A@mail.gmail.com>
+Subject: Re: [PATCH] mlx5: only schedule EQ comp tasklet if necessary
+To: Parav Pandit <parav@nvidia.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Sparse warns:
+On Mon, Oct 28, 2024 at 9:08=E2=80=AFPM Parav Pandit <parav@nvidia.com> wro=
+te:
+>
+> Hi
+>
+> > From: Caleb Sander Mateos <csander@purestorage.com>
+> > Sent: Sunday, October 27, 2024 9:37 AM
+> >
+> > Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet=
+ to call
+> > mlx5_cq_tasklet_cb() if it processes any completions. For CQs whose
+> > completions don't need to be processed in tasklet context, this overhea=
+d is
+> > unnecessary. Atomic operations are needed to schedule, lock, and clear =
+the
+> > tasklet. And when mlx5_cq_tasklet_cb() runs, it acquires a spin lock to=
+ access
+> > the list of CQs enqueued for processing.
+> >
+> > Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
+> > overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs=
+ to
+> > be processed in tasklet context, so it can schedule the tasklet. CQs th=
+at need
+> > tasklet processing have their interrupt comp handler set to
+> > mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that d=
+on't
+> > need tasklet processing won't schedule the tasklet. To avoid scheduling=
+ the
+> > tasklet multiple times during the same interrupt, only schedule the tas=
+klet in
+> > mlx5_add_cq_to_tasklet() if the tasklet work queue was empty before the
+> > new CQ was pushed to it.
+> >
+> > Note that the mlx4 driver works the same way: it schedules the tasklet =
+in
+> > mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  drivers/net/ethernet/mellanox/mlx5/core/cq.c | 5 +++++
+> > drivers/net/ethernet/mellanox/mlx5/core/eq.c | 5 +----
+> >  2 files changed, 6 insertions(+), 4 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+> > b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+> > index 4caa1b6f40ba..25f3b26db729 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+> > @@ -69,22 +69,27 @@ void mlx5_cq_tasklet_cb(struct tasklet_struct *t)
+> > static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
+> >                                  struct mlx5_eqe *eqe)
+> >  {
+> >       unsigned long flags;
+> >       struct mlx5_eq_tasklet *tasklet_ctx =3D cq->tasklet_ctx.priv;
+> > +     bool schedule_tasklet =3D false;
+> >
+> >       spin_lock_irqsave(&tasklet_ctx->lock, flags);
+> >       /* When migrating CQs between EQs will be implemented, please not=
+e
+> >        * that you need to sync this point. It is possible that
+> >        * while migrating a CQ, completions on the old EQs could
+> >        * still arrive.
+> >        */
+> >       if (list_empty_careful(&cq->tasklet_ctx.list)) {
+> >               mlx5_cq_hold(cq);
+> > +             schedule_tasklet =3D list_empty(&tasklet_ctx->list);
+> >               list_add_tail(&cq->tasklet_ctx.list, &tasklet_ctx->list);
+> >       }
+> >       spin_unlock_irqrestore(&tasklet_ctx->lock, flags);
+> > +
+> > +     if (schedule_tasklet)
+> > +             tasklet_schedule(&tasklet_ctx->task);
+> >  }
+> >
+> >  /* Callers must verify outbox status in case of err */  int mlx5_creat=
+e_cq(struct
+> > mlx5_core_dev *dev, struct mlx5_core_cq *cq,
+> >                  u32 *in, int inlen, u32 *out, int outlen) diff --git
+> > a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > index 68cb86b37e56..66fc17d9c949 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > @@ -112,17 +112,17 @@ static int mlx5_eq_comp_int(struct notifier_block
+> > *nb,
+> >       struct mlx5_eq_comp *eq_comp =3D
+> >               container_of(nb, struct mlx5_eq_comp, irq_nb);
+> >       struct mlx5_eq *eq =3D &eq_comp->core;
+> >       struct mlx5_eqe *eqe;
+> >       int num_eqes =3D 0;
+> > -     u32 cqn =3D -1;
+> >
+> >       eqe =3D next_eqe_sw(eq);
+> >       if (!eqe)
+> >               goto out;
+> >
+> >       do {
+> > +             u32 cqn;
+> >               struct mlx5_core_cq *cq;
+> >
+> A small nit, cqn should be declared after cq to follow the netdev coding =
+guidelines of [1].
 
-note: in included file (through ../include/trace/trace_events.h,
-../include/trace/define_trace.h,
-../drivers/net/ethernet/freescale/dpaa/dpaa_eth_trace.h):
-warning: incorrect type in assignment (different base types)
-   expected unsigned int [usertype] fd_status
-   got restricted __be32 const [usertype] status
+Sure, will fix. Thanks for the reference.
 
-We take struct qm_fd :: status, store it and print it as an u32,
-though it is a big endian field. We should print the FD status in
-CPU endianness for ease of debug and consistency between PowerPC and
-Arm systems.
+>
+> >               /* Make sure we read EQ entry contents after we've
+> >                * checked the ownership bit.
+> >                */
+> > @@ -145,13 +145,10 @@ static int mlx5_eq_comp_int(struct notifier_block
+> > *nb,
+> >       } while ((++num_eqes < MLX5_EQ_POLLING_BUDGET) && (eqe =3D
+> > next_eqe_sw(eq)));
+> >
+> >  out:
+> >       eq_update_ci(eq, 1);
+> >
+> > -     if (cqn !=3D -1)
+> > -             tasklet_schedule(&eq_comp->tasklet_ctx.task);
+> > -
+> Current code processes many EQEs and performs the check for tasklet_sched=
+ule only once in the cqn check.
+> While this change, on every EQE, the additional check will be done.
+> This will marginally make the interrupt handler slow.
+> Returning a bool from comp() wont be good either, and we cannot inline th=
+ings here due to function pointer.
+>
+> The cost of scheduling null tasklet is higher than this if (schedule_task=
+let) check.
+> In other series internally, I am working to reduce the cost of comp() its=
+elf unrelated to this change.
+> so it ok to have the additional check introduced here.
 
-Though it is a not often used debug feature, it is best to treat it as
-a bug and backport the format change to all supported stable kernels,
-for consistency.
+Right, there's definitely a tradeoff here.
+From what I could tell, there is only one CQ type that processes
+completions in tasklet context (user Infiniband CQs, running
+mlx5_ib_cq_comp()). All others handle their completions in interrupt
+context. Ideally the CQ types that don't need it would not pay the
+cost of the tasklet schedule and execution. There are several atomic
+operations involved in the tasklet path which are fairly expensive. In
+our TCP-heavy workload, we see 4% of the CPU time spent on the
+tasklet_trylock() in tasklet_action_common.constprop.0, with a smaller
+amount spent on the atomic operations in tasklet_schedule(),
+tasklet_clear_sched(), and acquiring the spinlock in
+mlx5_cq_tasklet_cb().
+I agree the additional branch per EQE should be cheaper than
+scheduling the unused tasklet, but the cost would be paid by
+Infiniband workloads while non-Infiniband workloads see the benefit.
+How about instead scheduling the tasklet in mlx5_eq_comp_int() if any
+of the CQs have a tasklet completion handler? That should get the best
+of both worlds: skipping the tasklet schedule for CQs that don't need
+it while ensuring the tasklet is only scheduled once per interrupt.
+Something like this:
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index 68cb86b37e56..f0ba3725b8e9 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -112,9 +112,9 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+        struct mlx5_eq_comp *eq_comp =3D
+                container_of(nb, struct mlx5_eq_comp, irq_nb);
+        struct mlx5_eq *eq =3D &eq_comp->core;
++       bool schedule_tasklet =3D false;
+        struct mlx5_eqe *eqe;
+        int num_eqes =3D 0;
+-       u32 cqn =3D -1;
 
-Fixes: eb11ddf36eb8 ("dpaa_eth: add trace points")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
-Context: https://lore.kernel.org/oe-kbuild-all/20241028-sticky-refined-lionfish-b06c0c@leitao/
+        eqe =3D next_eqe_sw(eq);
+        if (!eqe)
+@@ -122,6 +122,7 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
 
- drivers/net/ethernet/freescale/dpaa/dpaa_eth_trace.h | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+        do {
+                struct mlx5_core_cq *cq;
++               u32 cqn;
 
-diff --git a/drivers/net/ethernet/freescale/dpaa/dpaa_eth_trace.h b/drivers/net/ethernet/freescale/dpaa/dpaa_eth_trace.h
-index 6f0e58a2a58a..9e1d44ae92cc 100644
---- a/drivers/net/ethernet/freescale/dpaa/dpaa_eth_trace.h
-+++ b/drivers/net/ethernet/freescale/dpaa/dpaa_eth_trace.h
-@@ -56,7 +56,7 @@ DECLARE_EVENT_CLASS(dpaa_eth_fd,
- 		__entry->fd_format = qm_fd_get_format(fd);
- 		__entry->fd_offset = qm_fd_get_offset(fd);
- 		__entry->fd_length = qm_fd_get_length(fd);
--		__entry->fd_status = fd->status;
-+		__entry->fd_status = __be32_to_cpu(fd->status);
- 		__assign_str(name);
- 	),
- 
--- 
-2.34.1
+                /* Make sure we read EQ entry contents after we've
+                 * checked the ownership bit.
+@@ -134,6 +135,7 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+                if (likely(cq)) {
+                        ++cq->arm_sn;
+                        cq->comp(cq, eqe);
++                       schedule_tasklet |=3D !!cq->tasklet_ctx.comp;
+                        mlx5_cq_put(cq);
+                } else {
+                        dev_dbg_ratelimited(eq->dev->device,
+@@ -147,7 +149,7 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+ out:
+        eq_update_ci(eq, 1);
 
+-       if (cqn !=3D -1)
++       if (schedule_tasklet)
+                tasklet_schedule(&eq_comp->tasklet_ctx.task);
+
+        return 0;
+
+Thanks,
+Caleb
 
