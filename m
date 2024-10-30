@@ -1,123 +1,103 @@
-Return-Path: <netdev+bounces-140346-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140347-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E41E49B61D7
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:33:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 517FC9B61E2
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:34:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A86272842E5
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:33:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07D061F26066
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:34:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 052631E9081;
-	Wed, 30 Oct 2024 11:31:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Dr2/OAeO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 319901EBFF2;
+	Wed, 30 Oct 2024 11:32:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f65.google.com (mail-pj1-f65.google.com [209.85.216.65])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DAB1E907D;
-	Wed, 30 Oct 2024 11:31:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.65
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A1F1E5737;
+	Wed, 30 Oct 2024 11:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730287872; cv=none; b=CRVNe7dqoEmMM1sIM4B3Ea0VkYbleL1qW925gf8N4T1wcA34ugc+ajg00vTPyl5MtFFtbE8vKIRFXl/G7L3BhzqjjEzYCeyeJKMqTVcTw/uIODrLmdatf7fFpXAECAXNX7gaF0NGIT0b8LItxbFoUxhzdShcY2swDs9C2o7wPrk=
+	t=1730287932; cv=none; b=cL5NtUMTeR+xFYvDalva+fmQfXj+1JwAgoPaqfqKcIl5dDTQlNlNZ4N00OkiXKIGsdBmdQBgyhasskVLJotFZFhGPcCtzN4qeqvRZOgzyB6bTuOmgMpYJfD22BgNDxs4KrkP2YJ+az6ozMDdbR2B2xGPg4HlWggTnINuKEjzp/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730287872; c=relaxed/simple;
-	bh=TuQA7dPpS8bAGcKBW+pbPNP714DcJshUvyM1zp01fAk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=ik9i1uKjtEjvWwrVEh/z5Zb5rxCYXue9jp01n1xiNERq5tEsXM26siSAPGv4icQjZvU40+FfTd5tzb4YA4IQQbpa5GmQpUpA9VJ/y2vJSjaR1OxZuCwi+yAPekPU1bAt7esE5WsDODSxm38Y6QWm87QhksGXieaYQ7X7wC7Ly4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Dr2/OAeO; arc=none smtp.client-ip=209.85.216.65
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f65.google.com with SMTP id 98e67ed59e1d1-2e2bd0e2c4fso5253099a91.3;
-        Wed, 30 Oct 2024 04:31:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730287870; x=1730892670; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=I2pAE1nQgw4jbrmDxYeWEQDTLjgIt/Rez86CyuKC0C0=;
-        b=Dr2/OAeOhyr1OXsxeeFVzxRn2D7FWUJK3wUF8cquJLg0ajlT70er+oL2bIg17XhxGy
-         syZgJfyTrcd826WZau8/9Dfypuj9ipi2JGjBAJ9W0gTGg+1rNAFGHN9mCUdNtS3Z4qPY
-         Hbpz1cHsL/hGoOprpsWlzFm8KNcu+C5zu4C+49L3QGPTSVm5qMsbQ3A64o3UAvs5hJsz
-         F1HvEnuQWCIqcqF9orNo0igITtzBrchykTmEf39VxiR4JfWHXh5ds8zbkjVU7ichtf5U
-         e26U92OfjUlytgdcwhfKQt2MzWGsRKdjqe12l2Sn7y5UkhgurHY+3XvTuhm5ootZw3zB
-         oyyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730287870; x=1730892670;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=I2pAE1nQgw4jbrmDxYeWEQDTLjgIt/Rez86CyuKC0C0=;
-        b=RA9jCwumfhzTdsCDYTZq/m0izJG2MynA7QEDTsQv+r1Byf593TYk7VTCjxVGt05tdR
-         P8KnnRhU6X1GxuOW+A6dhnh0CnF6AFVHcPu+5VsYISn8vCOWqKFHB+whB1v16lwV/oAA
-         FMbI6IBJFfkFYKwkwxi42eC2w4Vth39KR1WwhxNL9EN7Viw6Nerqo8+oOOaV5D8FvNs2
-         jHNemUWLloaVJ4qxThaGEmlNOaEgmn4XhxokBn21rnR3GqxTOacJaKdOV7GB0QdwSb0B
-         XPzLr84U8bRvJHmta2dwOW3tkkYe2Q4nhOhecA0Ona+AeKRlQpqndyda+mn/kg80Tew7
-         dcVg==
-X-Forwarded-Encrypted: i=1; AJvYcCVsVznEEq8zgWLuCfzDo6lkSI5jh1IadvIlBX1Xgpo0CUy7Ad1f4hJjYRxJku/L/1oIqrrAwCM71qbeC4Y=@vger.kernel.org, AJvYcCWvtdXBDM6ZADaTUAqbddOFQdxFACsDYJEUdGITj3l57UWy5G0pOmIgY7cCFJoRZ1+TEZnDiDrC@vger.kernel.org
-X-Gm-Message-State: AOJu0YydBieOdBFV71Pd7DhTx1oCMkrC0glov3JodihrT/2efdY59HEh
-	SW65hGGneqN3iLEZs/3GVKFC1RRTB6W++WXZcmE8bWYr+6hy32zu
-X-Google-Smtp-Source: AGHT+IGpGVKCN90xhTpFCl08VSNFLJNn75cfSQEFN34QoTDwpHEjyS9RmsB2fFr3lggR73yEGDVL0Q==
-X-Received: by 2002:a17:90a:ba8f:b0:2d8:a744:a820 with SMTP id 98e67ed59e1d1-2e8f11b96a2mr17442528a91.36.1730287870112;
-        Wed, 30 Oct 2024 04:31:10 -0700 (PDT)
-Received: from localhost.localdomain ([43.129.25.208])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa63967sm1435129a91.32.2024.10.30.04.31.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 04:31:09 -0700 (PDT)
-From: Menglong Dong <menglong8.dong@gmail.com>
-X-Google-Original-From: Menglong Dong <dongml2@chinatelecom.cn>
-To: edumazet@google.com,
-	lixiaoyan@google.com
-Cc: dsahern@kernel.org,
-	kuba@kernel.org,
-	weiwan@google.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Menglong Dong <dongml2@chinatelecom.cn>
-Subject: [PATCH RESEND net-next] net: tcp: replace the document for "lsndtime" in tcp_sock
-Date: Wed, 30 Oct 2024 19:31:08 +0800
-Message-Id: <20241030113108.2277758-1-dongml2@chinatelecom.cn>
-X-Mailer: git-send-email 2.39.5
+	s=arc-20240116; t=1730287932; c=relaxed/simple;
+	bh=EYK+QPVFPOOzoh3+loCCfe6W6qgl2V6UuS0Rs1sugg0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=u0GNR1fEP4DPfih19Gb2PY4J4gsYgGIs/MjejvB2ybsEpZbo7UpMbRZFrqrmIyvGeEpUm521SaFQrQRhx6tXtyapRPs4/Z3joMHsIFwekCXqx76YCbWiVtF0c/ImXvk9mGDFKRsnUDgfXkXuslpMN/8jogOrDIswbjgHkvKONqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XdlL41MBVz1jvlv;
+	Wed, 30 Oct 2024 19:30:36 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 2E5E41A0188;
+	Wed, 30 Oct 2024 19:32:08 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Wed, 30 Oct 2024 19:32:07 +0800
+Message-ID: <3150691a-c4f9-440e-a1f5-19f01c4a21ff@huawei.com>
+Date: Wed, 30 Oct 2024 19:32:07 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 10/10] mm: page_frag: add an entry in MAINTAINERS for
+ page_frag
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <davem@davemloft.net>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Alexander Duyck <alexander.duyck@gmail.com>,
+	Andrew Morton <akpm@linux-foundation.org>, Linux-MM <linux-mm@kvack.org>
+References: <20241028115850.3409893-1-linyunsheng@huawei.com>
+ <20241028115850.3409893-11-linyunsheng@huawei.com>
+ <20241028162743.75bfd8a1@kernel.org>
+ <06933039-a330-4ed9-9db1-9c75cd7ae9b7@huawei.com>
+ <20241029073359.758d9b84@kernel.org>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <20241029073359.758d9b84@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-The document for "lsndtime" in struct tcp_sock is placed in the wrong
-place, so let's replace it in the proper place.
+On 2024/10/29 22:33, Jakub Kicinski wrote:
+> On Tue, 29 Oct 2024 17:40:08 +0800 Yunsheng Lin wrote:
+>> On 2024/10/29 7:27, Jakub Kicinski wrote:
+>>> On Mon, 28 Oct 2024 19:58:50 +0800 Yunsheng Lin wrote:  
+>>>> +M:	Yunsheng Lin <linyunsheng@huawei.com>  
+>>>
+>>> Why is this line still here? You asked for a second opinion
+>>> and you got one from Paolo.  
+>>
+>> Because of the reason below?
+>> https://lore.kernel.org/all/159495c8-71be-4a11-8c49-d528e8154841@huawei.com/
+> 
+> What is the reason in that link? You try to argue that the convention
+> doesn't exist or that your case is different? The maintainer tells you
+> their opinion in context of the posting.
 
-Fixes: d5fed5addb2b ("tcp: reorganize tcp_sock fast path variables")
-Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
----
- include/linux/tcp.h | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+I just argue that it seems natural and reasonable that someone being willing
+and able to turn page_frag into a subsystem or library might become the
+co-maintainer if she/he is also willing to co-maintain it.
 
-diff --git a/include/linux/tcp.h b/include/linux/tcp.h
-index 6a5e08b937b3..f88daaa76d83 100644
---- a/include/linux/tcp.h
-+++ b/include/linux/tcp.h
-@@ -200,7 +200,6 @@ struct tcp_sock {
- 
- 	/* TX read-mostly hotpath cache lines */
- 	__cacheline_group_begin(tcp_sock_read_tx);
--	/* timestamp of last sent data packet (for restart window) */
- 	u32	max_window;	/* Maximal window ever seen from peer	*/
- 	u32	rcv_ssthresh;	/* Current window clamp			*/
- 	u32	reordering;	/* Packet reordering metric.		*/
-@@ -263,7 +262,7 @@ struct tcp_sock {
- 	u32	chrono_stat[3];	/* Time in jiffies for chrono_stat stats */
- 	u32	write_seq;	/* Tail(+1) of data held in tcp send buffer */
- 	u32	pushed_seq;	/* Last pushed seq, required to talk to windows */
--	u32	lsndtime;
-+	u32	lsndtime;	/* timestamp of last sent data packet (for restart window) */
- 	u32	mdev_us;	/* medium deviation			*/
- 	u32	rtt_seq;	/* sequence number to update rttvar	*/
- 	u64	tcp_wstamp_ns;	/* departure time for next sent data packet */
--- 
-2.39.5
+> 
+> It seems like you're more motivated by getting into MAINTAINERS than
+> by the work itself :/
+For the 'MAINTAINERS ' part, I guess we all want some acknowledge in some
+way for the work if that is the 'motivated ' you are referring to.
 
+For the 'work itself' part, my previous work of supporting frag API, unifying
+frag & non-frag API for page_pool, removing page frag implementation in vhost_net
+and recent trying of fixing IOMMU crash problem all seem to be motivated more by
+getting into MAINTAINERS in your eyes?
+
+With all due respect, it would be good to have less of speculation like
+above and focus on more technical discussion.
 
