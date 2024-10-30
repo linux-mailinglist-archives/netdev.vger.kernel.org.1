@@ -1,180 +1,168 @@
-Return-Path: <netdev+bounces-140417-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82729B65E3
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:31:39 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CE589B65E6
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:32:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4DA311F24D47
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:31:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 85AC91F24E08
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:32:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF8841FA26F;
-	Wed, 30 Oct 2024 14:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEC811F428F;
+	Wed, 30 Oct 2024 14:27:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="C49FTgs2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2069.outbound.protection.outlook.com [40.107.20.69])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C641F9EBB;
-	Wed, 30 Oct 2024 14:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730298462; cv=none; b=mytIsM66lT+8MwoTw3CxY6pvwI6M+0DjA3itQTiZQ+ZetIrhHlHMvHtObvGyBVARII4n1uYmyrwH6pfqzh8kbsTC+aPUGRIEt+u477VI0zILPWx/w19heb9Im96wZCvVtf3nDcSDovbZF9cdxOu3tl1Mv/4ivAE3lnC+5EOuxJs=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730298462; c=relaxed/simple;
-	bh=k3NksgKMGGwSiQjqqQDiIoWxu2o4MtjaGnPwO3kHGQE=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=kFtt4t+Q4WPxNHpNJw1/wK+1xPlY6hFhzTZaGE3R3dCKh2qgH17TwxMMeV08+EcJaOtpzX+l+BMu6VcavXg4da7/zlm8JrdyXNpkqF3uEuI6Czex2zOeXH9J4ML9GtcfinUyqFAY217wiRN3uNjNeHL8THuKvsFHEDVC3EKmA04=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7ea76a12c32so5144035a12.1;
-        Wed, 30 Oct 2024 07:27:40 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730298459; x=1730903259;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=X3YqyV0YwGuilWF+8lpqEcTlB/FpyMoTdw0SNw6nZVo=;
-        b=hBWfQHUe7ygOTl1jFrJirurdos6WzAOSd/MKc/YiyZKZ2ffCNcSfAm2dZuzOFPvyCu
-         P5tctNe6eqBpn0i/Ve4X/RyII3Bu8ICBiX144M4Jf+Jw+t7C3RwaiWicdD7yPq4uS+Bv
-         oD/A1bNXkf42wT3M56fQm3V9R8ifBb2LtPQkNgjYouKBudPcB0fKqAUGTCh/QnXGpvxd
-         3tFaJhllDYUuuwclRbYw5WmBQvrDNeJ2jHOGEpRJX6AxNF8VrSDES9xDb/rFwczsB5sH
-         beLSzgwEOfnebQecLQeu3WztYRJ0NjxGzlO3OCU9Qbz5gu1+Sh6eIjM3NnUf8KDtggRA
-         DhWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVB8bx/Zax0THTk5tQFirphC46sRUjY0de91fjjhYgIeGMBFQif8bxTjbrpOg8X7c0xwASl/2oqqY1pMF9Y8Wel@vger.kernel.org, AJvYcCWDbiv8eSNXEK3zxE4Q1xTqYz5lpGWhP+tWCZw1CPugducTNEJZ620tvcic3Zz/o6QRudX+xmpSD3jJy1c=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyqUdSIf3ttiAdSEbPwlnFHxU0s/geonF8ZMTGzaG7VGUCn41Y9
-	qhAm8VARWliLwC+BTLfEDR/PiDIRkI4djCV9zMT1rUnPoqASQNt9zVQRerc=
-X-Google-Smtp-Source: AGHT+IFa0T3NhLLZTVYB47aMtxMkeD80BrpeKBP22/0bqgcXxhS+vEBtm3n6X1TYaNAhdmXADKD2sQ==
-X-Received: by 2002:a05:6a21:1707:b0:1d9:d8d:d0a4 with SMTP id adf61e73a8af0-1d9a83a913emr19237362637.9.1730298459536;
-        Wed, 30 Oct 2024 07:27:39 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720579397d8sm9346440b3a.86.2024.10.30.07.27.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 07:27:39 -0700 (PDT)
-From: Stanislav Fomichev <sdf@fomichev.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B011F4288;
+	Wed, 30 Oct 2024 14:27:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.20.69
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730298472; cv=fail; b=TBZCiFeK45+b6tRdUbq2AuRUUd3sd9QzC9IoHnrs14E+FuMGeulz/CrYmEzbeXXteEkz63yxRdYW8XOWx6tgJRK3h0LYDtLUTk8gtf2WxGW1xOJ+h3R3+kwTWuoFuwPI99902XbNsofTxa88HqVRQF9nQ/0BrNBBkd2hnvAH6KY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730298472; c=relaxed/simple;
+	bh=pfKgEMX1vmb51ux39nniqld7dR8e9BBLpTa6gc2HtA8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=m+0kq9HxsEq3WKkE9P3eU/qa3S1iNqtHD+rGKG3HvH1UUDj+Nsvcbs1rjw6jg3xpCZjLfCrl1uJrbeaf8fxb5jcKcsGAuPOOTgBaBF+mKnYMtjxxLxyIzNpKupCkmKMXYFLK2WHUJjjaFMLGgO/TSKkGRuyIDSnjs+9lIysi1qo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=C49FTgs2; arc=fail smtp.client-ip=40.107.20.69
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=r2CoJmCHO8d6tPvosPqTEYCrDi966o3c914ysX/6foWZNXpaBHnznussNTjJxnKywjgHz8DsP3nWRkTYJ085oZWyxEW3Y8vKinD1RW0suLIGOUZ+vOcssRJN6ahx4N5e+/wsxDJxT2D+6iS6PB+hkcUbNJ8k3pks20oe/5FhtlndW8DkfNjPlXzvL/lYrvMim9D1OpDKdXUCf/uEB+V6DY21wkHu8y+lt1s2vR9xf8+nvdsILt9zgnC6z54VZ00MOmwwZX/d9hRFcSWBr7hV49ToPkOxau+fTBp1XRDnX6jOC3th7/7KxDlIym13Wo4Ypl5bGnydWzOZAubOygpFVQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=pfKgEMX1vmb51ux39nniqld7dR8e9BBLpTa6gc2HtA8=;
+ b=GYljo1bH/4+kLk+Vr2bShh8uuprDuqDR5jcGkyH/w8E0MkIDLWoemkqfP29KAyl+geFveXsQwS+OXvQbOMXR2FGOMszlv28ELOaPXBYhS5MlQv65nY615ek3aZcdZt507rld4bPzC1ROcfzajn4Am0wcTHK2HvgSJ7etZYppZ8B62UuYNlALfL6BQd4eaYAVgODwzNHBsG3i3o/7HtMOysKaJHEEJQzxhhICmLjtlpDly2/pqVTCaaKqjpLgv7oqhJaPslqSrmwymk4W4bv8C9vB6Lh9cQiNT4HFP5WmgDzVkuPcl/Ds0a9PJz8MEDl5T5U0bxTqLyMJzfG450UJOA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=pfKgEMX1vmb51ux39nniqld7dR8e9BBLpTa6gc2HtA8=;
+ b=C49FTgs2k5pNOiZYi7sL+Xtl0QhdWtZKumEw7joDXOR+gGVP2kVp/kgkr5PhOWMFQZPpXjytfb/EFs4NugywDLuphqT7rjbTi6AwXA86/zRihGLTrUkiGfYqX4BJUIVpnxaNMF+xon0bydWAHbaGM+QYaEfX0B0etvNX+4ArW19D2/QG3XBKmNxN1HMZU+HUKmWhBab/W2r7dTBDkemY1BI52cf7DWyay5unaREhtE73GeJyL+W/XAqRpGZY28CjSzGiOh8e27D15mSyBpgrf3mKIJZMPz8vU+GHvPkqEPlATwSDsvsh+NTZd5zg6tHIeMm24Ys0tpOxUIbNhaOs9w==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by DB9PR04MB8236.eurprd04.prod.outlook.com (2603:10a6:10:245::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Wed, 30 Oct
+ 2024 14:27:47 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.027; Wed, 30 Oct 2024
+ 14:27:47 +0000
+Date: Wed, 30 Oct 2024 16:27:44 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
 To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	andrew+netdev@lunn.ch,
-	shuah@kernel.org,
-	horms@kernel.org,
-	sdf@fomichev.me,
-	almasrymina@google.com,
-	willemb@google.com,
-	petrm@nvidia.com
-Subject: [PATCH net-next v6 12/12] selftests: ncdevmem: Add automated test
-Date: Wed, 30 Oct 2024 07:27:22 -0700
-Message-ID: <20241030142722.2901744-13-sdf@fomichev.me>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241030142722.2901744-1-sdf@fomichev.me>
-References: <20241030142722.2901744-1-sdf@fomichev.me>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Breno Leitao <leitao@debian.org>,
+	Madalin Bucur <madalin.bucur@nxp.com>,
+	Ioana Ciornei <ioana.ciornei@nxp.com>,
+	Radu Bulie <radu-andrei.bulie@nxp.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Sean Anderson <sean.anderson@linux.dev>,
+	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next 2/3] net: dpaa_eth: add assertions about SGT
+ entry offsets in sg_fd_to_skb()
+Message-ID: <20241030142744.lt4vhiayg5gvnbuw@skbuf>
+References: <20241029164317.50182-1-vladimir.oltean@nxp.com>
+ <20241029164317.50182-3-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241029164317.50182-3-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: VI1PR06CA0227.eurprd06.prod.outlook.com
+ (2603:10a6:802:2c::48) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|DB9PR04MB8236:EE_
+X-MS-Office365-Filtering-Correlation-Id: 985bef55-0827-4524-9c13-08dcf8ef06ad
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|7416014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?s14WVn5W3hwXepPzC4tEu9qKTSQbe5mPb7aSD8uDpnxx131HvpV2YDw0SRXD?=
+ =?us-ascii?Q?kSUJgA2kVRZoqy06gkrQiYTgisa4JB4nRnsDbQyiT7b/jpaYmoQMqes28yU5?=
+ =?us-ascii?Q?Afz0HRtTSGiG27XVZ2mukyXUHrlX8H+RVInBR+FYoHkThz8ocU/pYcrloT8K?=
+ =?us-ascii?Q?oQwHcdYGVJs8XT9yvOojcm0Dpg37tU/2qH0oKEStxA8KCAvvVI+BYV+FG8ci?=
+ =?us-ascii?Q?B5Ynzm6Rw5qAirWVK3fAlejtreXYN6wZVFMTAomMU1xbyLnmJeUQdYo15sj2?=
+ =?us-ascii?Q?T3UUiQ0r/kSNR1u72e7G43V6Fo5/R5EL5eBQMtaVjkEu8/DZJ/VeUKMKFXs3?=
+ =?us-ascii?Q?F4RjaL+jk/hqzFHrjKAPnoFwmKgnMMsGVcwg63XfFjSwcdHd5dpQVlYOtrHG?=
+ =?us-ascii?Q?P/suNMKIsrX9lppcVKWrXh7LBeDfvivTFc79Ol5Le918ZTIqV0alNJK8KGMq?=
+ =?us-ascii?Q?M2Ut2UysaY9mNRhmR01TsERckiTTMqJqhgL0AXvBFm84VEnO1TiYTjONaB5n?=
+ =?us-ascii?Q?W0vsdLYh7ho0osj2JiXrRWj3ReO/gr9kqH6aBe7Bwd9NXlW4WxnGfJX61jgC?=
+ =?us-ascii?Q?TXk5F1FRg69Ceh3I+OVs8XvH4WwdsBVMw5Hc9vwkbRH2TUMPXfq3Zbw0BFpZ?=
+ =?us-ascii?Q?d683O/HT9xtfnoY4hI1MLjNLDSRUpKWiyZ6FhfHJMoC10m7E1KxqWnT373Ou?=
+ =?us-ascii?Q?zPuIwAKdp7XnYlRZN6N6gfnkqxM/X38EoAvBDOylazB0RPAf99p22iOCc6bL?=
+ =?us-ascii?Q?RtyLDN1bhZMWH2qPhItBE/Nu0hl7EfGAFBrLXUowu/tnQx5APpCtq7nP32vk?=
+ =?us-ascii?Q?G/WM/4204kV483Cp9T3bLbqjnTPCdAcjxAFQypnk+iSS4OmyUmMsDJQhYdgR?=
+ =?us-ascii?Q?0zhVDvQYbIRu34DvM9VIhSYds7DW63gHKdVkILbrqugA6LOhiqv++CNIKV3u?=
+ =?us-ascii?Q?RnA0t0GqjCmcUX2KMkG3oA0pFXlsKVOGKKfsz3ic1jMWOwdHYVJrNI3pb2JK?=
+ =?us-ascii?Q?vHHqOd0EiSDnwiIGAgDJcJhtK/IJ89Kb/sBXyr6Ln2oZ2JhTFJVJsUji9AKB?=
+ =?us-ascii?Q?NvAfM+sYeaF+2uzAfE2pxCtBNjpB0i3HWtetR3Q+3yETtBdjJV3AJggZztUq?=
+ =?us-ascii?Q?xB35MzKpFpUmewHWGL5wRmJOMGmTaRMENX5zwkKwEXS2pMzIU7wtxtIL8dw/?=
+ =?us-ascii?Q?rrqcj24KliZNIgDi16FCW1Noy7Qnt7iqUQPm+PUZWkDHEVSVyI/VU5Wj4Lvy?=
+ =?us-ascii?Q?r0G9oKPx5seDeK97OHY+5hpxBeqztV4c65op+fO91bPI/XFyXiL4daQMxzkm?=
+ =?us-ascii?Q?1ls=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(7416014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?4nbuDI1urim7IDDbFOeMUrrCyL3ELIHt1YGOQ4UpndDFAMi5/lridHn8ynkc?=
+ =?us-ascii?Q?FyRt0mSNt4PVdSONuYPKnzCUyTAPYEcaFJV00Y4E+K2O6vKvxE1gtt2LZDZx?=
+ =?us-ascii?Q?5Yr+FcQd0mAu99C4mtyybKw6CKay9MC29tK9D0vjqUvPGRqhudxfiwM8hvI7?=
+ =?us-ascii?Q?R9zn9JsQkQ10HVgLAmKLv/OiI/QI6V+p1kxrmmeTZvlF/lC5lFEgk2itlUqt?=
+ =?us-ascii?Q?R4e6aR8V9yRST1smPHzMQjIcnhwb22Q/vFdJqNVu5oAV3ics1/mmI98xL6Rx?=
+ =?us-ascii?Q?y81/8Mzr8Nzqay9jLmTuLkwdyG3/HA10VXh4J/QJFELbla6YOEWkbIDp6hYQ?=
+ =?us-ascii?Q?F7NZt/Q386Jbjb4W3ZhYEdKcevFnt+aM+CP4NtaLzlZ0SkXFmroc1kVihuta?=
+ =?us-ascii?Q?/TLmmWCfEKSLUxSJCPpZ6MEe0zWRqZIYVG390fWDGwqiPXZvHHZcE5RnqBgH?=
+ =?us-ascii?Q?oSEu2xKT1ikt/q+c7oXJjRmTqEAX0eArF+8oWy8iJiH/0X0cr5jSQasmgbC1?=
+ =?us-ascii?Q?7dslBg86zHOwfzTBIaFrLpslyk2s538uNHpDLe8QgyFO/Miz7PEwY2Sr6Y1l?=
+ =?us-ascii?Q?3fFeYvBFpA6h29q1VQZ8krGYhWkZ67nS3nPzlHrnD71q62ILjRYBFftG+gFn?=
+ =?us-ascii?Q?dRc6PcONypcPEamqV/WrK+iuKs76eJc2XMECaIzUZgAOi4eLQ0Rwb1udW+SV?=
+ =?us-ascii?Q?c2hFPu/7V+XhuegZ9K54KPh+lYufrDfxT7iA9T66mfyo8mXwdcjh+XeW5ELu?=
+ =?us-ascii?Q?YN+NnVtI5k9Wvh6qZP/5HyhXuRqeRnMxPJqzYzurQ3M4VDq2EzFSPSpaNek7?=
+ =?us-ascii?Q?ASEBGqw/D66CHSUHVhd1d2Cmg4DNl10GFin7K6xR8SVht2rqgP8uWjWYuCju?=
+ =?us-ascii?Q?9HnZKkvixO+0Eby9sVH68VFWp8QDN1pyTqmWxTM9pxZclT1URG0sDPziKBTj?=
+ =?us-ascii?Q?XY+IneUxVSsXorMXHBojP1lgl2JkCdB8PnH+hWDzqa12qJ+os6UIKd3mlAEJ?=
+ =?us-ascii?Q?lkyjqJ7koD37kesq3Ab1V+KLseKGSYWRiR051PA+ee2lreMCjUAIBqzpzL69?=
+ =?us-ascii?Q?6pGlNbViAbFS3fSuw0GuBVmA3yrpc8jqUTDwIPW2P+HTfXznQ6860yD2nbNY?=
+ =?us-ascii?Q?87Jj3bHYOQrQReiCd2wBbNHc04yiXLHzs2gnPi527gzaOS9Q2vSOVBFOrczt?=
+ =?us-ascii?Q?qg7xOA0npHspQxEpOOoHMxDWlr11+rnFUO2nUPt+4DYmjADX2cAfavmHMTvA?=
+ =?us-ascii?Q?j4u1vWWaEN+oBXZkc785DTTuX2/UE6Wcfn4R7252CPPrhvtCjm+vq2L4nK4/?=
+ =?us-ascii?Q?ZvJ1h662yo5HARfa5vnEVsQ/WlbNuAbEbH8JjwCzEC4fVSkpys1Xd7uImudm?=
+ =?us-ascii?Q?Dh5DKctE0hlC/wSU25S6KGffZF27hP0UpR0gQUfQyTmYygwx++KqMYjGM42a?=
+ =?us-ascii?Q?rhRht4i3Wu2jj0jCH2WOZYYLsAohWtYhANON6SmgbU5syvFkvYJaeDXgJNun?=
+ =?us-ascii?Q?QdbgSgDrhmfXnJsZXN6+Yi6PQrKfM2SvpSbEX/t5GiKr4L1caXXJvg1MCtS+?=
+ =?us-ascii?Q?Mv8Y3T5EFOfQ25Wv9TyhEagEKee2NM/1OXEYdQ3koYzjZ7rcr5gqdRSkGg6q?=
+ =?us-ascii?Q?mA=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 985bef55-0827-4524-9c13-08dcf8ef06ad
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2024 14:27:47.4444
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: seT524JYjOvUPeBWwrVJUX870NoV++0aG2TVL+9DQATn0Xdz6hRm/L8Tahlb4fD8jFLtYdsDD4Bt/IMRN4vuvA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8236
 
-Only RX side for now and small message to test the setup.
-In the future, we can extend it to TX side and to testing
-both sides with a couple of megs of data.
+On Tue, Oct 29, 2024 at 06:43:16PM +0200, Vladimir Oltean wrote:
+> Tested on LS1046A.
 
-  make \
-  	-C tools/testing/selftests \
-  	TARGETS="drivers/hw/net" \
-  	install INSTALL_PATH=~/tmp/ksft
-
-  scp ~/tmp/ksft ${HOST}:
-  scp ~/tmp/ksft ${PEER}:
-
-  cfg+="NETIF=${DEV}\n"
-  cfg+="LOCAL_V6=${HOST_IP}\n"
-  cfg+="REMOTE_V6=${PEER_IP}\n"
-  cfg+="REMOTE_TYPE=ssh\n"
-  cfg+="REMOTE_ARGS=root@${PEER}\n"
-
-  echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
-  ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
-
-Reviewed-by: Mina Almasry <almasrymina@google.com>
-Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
----
- .../testing/selftests/drivers/net/hw/Makefile |  1 +
- .../selftests/drivers/net/hw/devmem.py        | 45 +++++++++++++++++++
- 2 files changed, 46 insertions(+)
- create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
-
-diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-index 182348f4bd40..1c6a77480923 100644
---- a/tools/testing/selftests/drivers/net/hw/Makefile
-+++ b/tools/testing/selftests/drivers/net/hw/Makefile
-@@ -3,6 +3,7 @@
- TEST_PROGS = \
- 	csum.py \
- 	devlink_port_split.py \
-+	devmem.py \
- 	ethtool.sh \
- 	ethtool_extended_state.sh \
- 	ethtool_mm.sh \
-diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
-new file mode 100755
-index 000000000000..1416c31ff81e
---- /dev/null
-+++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-@@ -0,0 +1,45 @@
-+#!/usr/bin/env python3
-+# SPDX-License-Identifier: GPL-2.0
-+
-+from lib.py import ksft_run, ksft_exit
-+from lib.py import ksft_eq, KsftSkipEx
-+from lib.py import NetDrvEpEnv
-+from lib.py import bkg, cmd, rand_port, wait_port_listen
-+from lib.py import ksft_disruptive
-+
-+
-+def require_devmem(cfg):
-+    if not hasattr(cfg, "_devmem_probed"):
-+        port = rand_port()
-+        probe_command = f"./ncdevmem -f {cfg.ifname}"
-+        cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
-+        cfg._devmem_probed = True
-+
-+    if not cfg._devmem_supported:
-+        raise KsftSkipEx("Test requires devmem support")
-+
-+
-+@ksft_disruptive
-+def check_rx(cfg) -> None:
-+    cfg.require_v6()
-+    require_devmem(cfg)
-+
-+    port = rand_port()
-+    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
-+
-+    with bkg(listen_cmd) as nc:
-+        wait_port_listen(port)
-+        cmd(f"echo -e \"hello\\nworld\"| nc {cfg.v6} {port}", host=cfg.remote, shell=True)
-+
-+    ksft_eq(nc.stdout.strip(), "hello\nworld")
-+
-+
-+def main() -> None:
-+    with NetDrvEpEnv(__file__) as cfg:
-+        ksft_run([check_rx],
-+                 args=(cfg, ))
-+    ksft_exit()
-+
-+
-+if __name__ == "__main__":
-+    main()
--- 
-2.47.0
-
+..and now also tested on T2080 (PowerPC), no apparent regressions.
 
