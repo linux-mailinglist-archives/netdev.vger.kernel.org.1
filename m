@@ -1,134 +1,106 @@
-Return-Path: <netdev+bounces-140258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCCF9B5AE0
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:51:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EE3F9B5B07
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:04:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BFEAE1F24A9C
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:51:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43234284285
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:04:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4FEE1974FE;
-	Wed, 30 Oct 2024 04:51:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF3582899;
+	Wed, 30 Oct 2024 05:04:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="di6vNmjI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBQhpRqS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C91717BB21
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 04:51:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7466BA4A
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:04:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730263904; cv=none; b=AkI5wVNxLyqHaMCnKnpKChAmvT/mFgDIgamo5xitSGvrdLK6aRTvbyceD2Eqmfy15Pl6mg5KA2vW3dbU9rd+b8c30qSOW4HA+ygWfWWOZahbmeaaucAvikRC178QA7EOE0p77iYuk0NPXkOQ8bX5eDeZivp4Apx3Lv6xbaJhAPo=
+	t=1730264686; cv=none; b=pB2A2FdIq1NDUI2Gv7wO505TQiPEbZNnsA3AXfh54DAQTy93u4bX7KtslIa7LbKGBzxSdA6txkLdv4FW+VpPCqpYsoOci086QKfZShTFr54l0iabK01/tYKz2ukSdz/8aJY0xKdhpj6G+UiSXMG9fNB+3/bda80Bs5NrXoRf9uA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730263904; c=relaxed/simple;
-	bh=iEoe/dpFSsSYgaQARfbg+umaQiT4fehoYGwQqojoqcs=;
+	s=arc-20240116; t=1730264686; c=relaxed/simple;
+	bh=kENvROmXFOVMy3MzRezX/8fz+65kXsPNPzgmMIAes6A=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=W3j470IrfTjJIPQ5P05xvCVLDVx6VZ1ssc03yPZLNG3YF7zRWk8fh3LQlRGUYTDHm8HnfCBM4mBoo2LAEPZEUJgPlPJYPWpU2JBbtMV5pZgzXJ//vhInqo9FmwWD/ZNuH4J9xUTq4rg03LLmsWl7ZhSq9rnYiDdvGYDM9IBmhuA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=di6vNmjI; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=ebs0TR2J+jkHH1n14ZRY+Ry9J73X6zCMMzABdsgiGFM=; t=1730263902; x=1731127902; 
-	b=di6vNmjIzV7s9UJP7e0MM99nXXPL5b2JB+IrFMw8wn5bHDdveT7LSW+URoZhfGYRM6Ky9ivUPBR
-	fbUlclwMpPJTKX6m9Haq9rq1wsE1RRERCzoGj+SMVPVy3AnFScy9X5fb+XUCNrFreRxx4I8mHPLeB
-	bwbsMYJVDk8euA8Uszl0WrB0uZl4KPjEZjV0vQLOu5Wn1wYitgspUIR/zf+KN8YZBFOLuzb+hK/6t
-	7FYdUY6PGR5Se+oHs7CopeMbP9KQ8dE5jPInwp6WfgEESvFztC7MHT5XBle+lLVctkV0sPe4Li/Oy
-	0SLkl0YMwxu/EWWWsAVtuo9F5TypxXyFP8xQ==;
-Received: from mail-oi1-f173.google.com ([209.85.167.173]:58688)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1t60gG-00010V-Gb
-	for netdev@vger.kernel.org; Tue, 29 Oct 2024 21:51:41 -0700
-Received: by mail-oi1-f173.google.com with SMTP id 5614622812f47-3e607556c83so3619080b6e.1
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 21:51:40 -0700 (PDT)
-X-Gm-Message-State: AOJu0YwCThmPmBp3w2QH48ivVNo4yAFaBLT3jKbeu8wcYe1Lq+Zxt53c
-	K2I2/T8byxS7f7sQ0toU40d/eJcZS/9FUCo2DflQjSxXWRtQi+Co/kgaHsWmFHspdIK19VqbTlc
-	59yUwzkNB+c61Ay6cb6GmNpiGHpo=
-X-Google-Smtp-Source: AGHT+IF6T8CtmSRl/jtALfN8be7uF65AvEoMqSUxfGFn6I/g0DF+PP+4P4yzcdLV61ed8bdhyqTNmkmIS40TxuLOtP0=
-X-Received: by 2002:a05:6808:3a07:b0:3e6:2889:5fa7 with SMTP id
- 5614622812f47-3e63846bc52mr16160289b6e.27.1730263899951; Tue, 29 Oct 2024
- 21:51:39 -0700 (PDT)
+	 To:Cc:Content-Type; b=sTg1KfFS9ALn1RzWsF55zH1rPYx4eiRmhC/IqU5nxhaDmG2yis2Nru0sIOKRn6EPPzbjIBrObPDqEvoZoenyu1HB2kyZTs9T5M8LR8K/moqawA0mmwPL37ui9Q8AM37v7DtCXTihG4Oh1fL+wrx3To+9aUtKFEgVBUoKMlGyGZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YBQhpRqS; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ea9739647bso4457864a12.0
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 22:04:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730264684; x=1730869484; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kENvROmXFOVMy3MzRezX/8fz+65kXsPNPzgmMIAes6A=;
+        b=YBQhpRqSlANll25zBwa4IKjvAw0DfM3mLKX6mZn+b8xCRTkzkMyX36uFLBZVsLKDq5
+         AZPIsvPTEv8qRha4QK33AC2BDOtzFyMcHAO69cnIJZ8U1a3ObYHfiDOA3i65ZPDzNb1n
+         /F31A3xaSpJ60aB0h14Qc1q/YcuSjcAjwEaVC23gRccjMXKorh7kPNdNF5Ke1HpM4OTZ
+         HNqhqnleYR5rhiH05+eYyP3dZHjX2uHPV2O5WtKnLsGiRl/USXvmr04Njij8MTh2Rokw
+         FuJwkHlcy9+wfDMJ7FKDH9XHgxQU55auuiSfcTL0CARRTb4W5ixUlzBTTQFyCx+/9e5L
+         zhOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730264684; x=1730869484;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kENvROmXFOVMy3MzRezX/8fz+65kXsPNPzgmMIAes6A=;
+        b=pN0jAGQGR0u060cHJSdxgUiNCLWS//eN9glPEQpzE18cKAcA34Q3dwAs93jA4OH4JS
+         38g5OBDTWEnBeTQIh298bv1PQ0zq1CqUJZFitpNJ2RKh48TSaTtRs3n33fcqcTeKWrlr
+         8zpqfXKirXJ+RmhdY8N9AB5Bb8Y64C/0yTIvSXbIZ5+ZKu9s5DjXuAlVQNcPaaz9JIuy
+         cE/zBkRLGhF7UynTVkyYtSCoQC2bG6eZFw26y0HX5uXzxUjn2wOcrdP+29V2siuy1dSz
+         ZltPUnVLnanHvEDg44KV4+tRXtjcI10fv4ehAX1U+W06V1Acq8PX5BAqlF6GhZ9cd1AF
+         U4ZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXxJDBb4CIWKC0lh/Bbfh2xC78vo+/4ggYFbRYrfhLYrwlgKu6l/F4tvCGh2mWzmTk4FAyg+q8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6+Hd7inbnf8AOs38q80/wwa6h1n3gVIqRtNpHzSfWkEVQbW2W
+	vlobg7oAEqkOCe86wCrHcPVhIfWooij5YQ0UyyRfm7JQwaJTcoHMxq0D6980wwyU+DuNZMNkKWp
+	8IUBdE7X7vjnYvbbWtVaRY+p2aP9Xqg==
+X-Google-Smtp-Source: AGHT+IF8wNkNXVikoxU3uYTBGNhzGSKbY9D2acpsFQytYhILfTi9dPoWkaPPjl1zpwXjkxWo9FmcXYh8L0DK8SlMCQU=
+X-Received: by 2002:a05:6a21:e88:b0:1d8:f171:dccd with SMTP id
+ adf61e73a8af0-1d9a851e08dmr16053235637.37.1730264684147; Tue, 29 Oct 2024
+ 22:04:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-9-ouster@cs.stanford.edu>
- <1ec74f2a-3a63-4093-bea8-64d3d196eac6@lunn.ch>
-In-Reply-To: <1ec74f2a-3a63-4093-bea8-64d3d196eac6@lunn.ch>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 29 Oct 2024 21:51:02 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmwaqMs12YtHMZRN5bbqOor2gVe+cCo=JqduaoXsErCY=w@mail.gmail.com>
-Message-ID: <CAGXJAmwaqMs12YtHMZRN5bbqOor2gVe+cCo=JqduaoXsErCY=w@mail.gmail.com>
-Subject: Re: [PATCH net-next 08/12] net: homa: create homa_incoming.c
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org
+References: <CAEFUPH2npsz4XKna0KYjOeU_MfYN-bVTw25jn6m2dS+f32RuxQ@mail.gmail.com>
+ <630f1b99-fcf6-4097-888c-3e982c9ab8d0@lunn.ch> <CAEFUPH20oR-dmaAxvpbYw7ehYDRGoA1kiv5Z+Bkiz7H+0XvZeA@mail.gmail.com>
+ <20241029153614.2cdt2kyhn7sb6aqi@skbuf>
+In-Reply-To: <20241029153614.2cdt2kyhn7sb6aqi@skbuf>
+From: SIMON BABY <simonkbaby@gmail.com>
+Date: Tue, 29 Oct 2024 22:04:32 -0700
+Message-ID: <CAEFUPH3gUV3WXY+VEr-9H8Xu3Zva2jiT_WY+Edp=Q9Ja33XwRQ@mail.gmail.com>
+Subject: Re: query on VLAN with linux DSA ports
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 7e839a9fe5d3c1ffc6f045e071031982
 
-On Tue, Oct 29, 2024 at 6:13=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+Thank you Vladimir.
+
+Regards
+Simon
+
+On Tue, Oct 29, 2024 at 8:36=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
+ wrote:
 >
-> > +int homa_copy_to_user(struct homa_rpc *rpc)
-> > +{
-> > +#ifdef __UNIT_TEST__
-> > +#define MAX_SKBS 3
-> > +#else
-> > +#define MAX_SKBS 20
-> > +#endif
+> On Thu, Oct 24, 2024 at 08:15:50AM -0700, SIMON BABY wrote:
+> > Any advantages of using vlan aware bridges?
 >
-> I see you have dropped most of your unit test code. I would remove
-> this all well. I suspect your unit test code is going to result in a
-> lot of discussion. So i think you want to remove it all.
-
-Makes sense; will do.
-
-> > +//           tt_record3("Preparing to poll, socket %d, flags 0x%x, pid=
- %d",
-> > +//                           hsk->client_port, flags, current->pid);
+> Bridges can have more than one lower interface, unlike VLAN (8021q) inter=
+faces.
+> The lower interfaces of a bridge will forward packets between each other
+> according to the destination MAC address (optionally + VLAN ID), which is
+> something VLANs don't do.
 >
-> I also think your tt_record code will be rejected, or at least there
-> will be a lot of push back. I expect you will be asked to look at
-> tracepoints.
-
-Oops, I have a script that strips out all of the tt_record calls, but
-it missed the ones that were commented out. I'll take them out.
-
-BTW, I did some experiments with tracepoints to see if they could
-replace timetraces. Unfortunately, the basic latency for a tracepoint
-is about 100-200 ns, whereas for tt_record it's about 8-10 ns.
-Tracepoints appear to be more flexible than timetracing in some ways,
-slightly worse in others, but a 10-20x performance hit is a
-showstopper for the kinds of performance analysis I do. I can imagine
-people won't want 2 different tracing mechanisms in the kernel, so for
-now I plan to keep timetraces in the GitHub repo but leave them out of
-what's upstreamed. The downside of this is that it will restrict my
-ability to debug problems that occur with the upstreamed version.
-Maybe we can revisit this at some point in the future...
-
-One of the issues I face is that acceptable latencies for Homa are
-often 10x or more smaller than acceptable latencies elsewhere in the
-kernel, so it's hard for Homa to use existing kernel mechanisms
-without sacrificing its latency potential.
-
-> > +             UNIT_HOOK("found_rpc");
->
-> I would also take all such calls out.
-
-Will do.
-
--John-
+> I don't believe that a bridge with a single lower interface (port), as in
+> your example, is exactly "intended use".
 
