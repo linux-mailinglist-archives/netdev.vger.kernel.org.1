@@ -1,199 +1,181 @@
-Return-Path: <netdev+bounces-140372-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140373-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 34DB39B6377
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:56:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 01A6C9B6396
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:59:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A72421F222B4
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:56:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F644282F26
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99C7C1EABB7;
-	Wed, 30 Oct 2024 12:55:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 350FE1EABC0;
+	Wed, 30 Oct 2024 12:58:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4y2kprfe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RA+8LOEf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAED81E8859
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 12:55:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AE5D1E9067;
+	Wed, 30 Oct 2024 12:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730292927; cv=none; b=h6R/MRvs0icrO6unQhankTefZy6WkH7GX80T6+GJGEOuxkVzBp9gIWvphOCiZcikcK5nbnJ7bTNKYxbMws6+mW6+qCoS6RmAKfamAydBfOyNl3KBCCKr97yN6OhSS0dGP/r0EKWHzfh3L1+gE+WC6LpK6AOfdeSKtBnWTiqSjog=
+	t=1730293105; cv=none; b=A+Y3EuQ9qtjuT9EdKSyy0pwPzNlTgTMqFu8VSRPJYBoxCkJZ99nRIbnchrrckT230f4kiRpVxaIPtbMV+CwhidwQv1hm17YrWWMQ+jW4Q3hZIf+IaVDn2EhS4XhdZ2aghIvDkEXyXDZzIXl6kEZ6DtIAoonYUkrfZOACbBW1R/s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730292927; c=relaxed/simple;
-	bh=9HeikSnNtESYGfEHkL/7qmokgovZf7aQSZWo+XWMD84=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oURihXyIuA0SBpqJBqJnstVZBmm0ID/IndaETLidKjuYbe7yPw2rWLPxEbVsrbNREvI7zAG8kz1X10kRANjHqkycrVmDCzAeXHMbaHQlU1XWhl5DKAASr56jCe8616QsplN8TgXwQHbhYPpmjrScu1LKeUrBM4ltBnl5KzHkbM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4y2kprfe; arc=none smtp.client-ip=209.85.208.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1e63so7695924a12.0
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730292922; x=1730897722; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fd0+WXgf+BWTWhA8jygsIOHrOH6t8SMTi55qCk7gJSk=;
-        b=4y2kprfer19VK2xarO0dQHD72YsJUmoTupuYNeTg0Vf8Qv8MdEI7c0MokAkPJBy9xF
-         xdT6XVQv/0Px8Jgmq3oYVaKRsj32YJyKl93+mji5fDLe26hpl7uBgEE44DNW3UrFrLND
-         KmwkCQ90XpaNVor7Uy6bFdR2peMcscVSeT8neBxh9qiJE01cUjVZvYJtp58hgvg2XAEu
-         YCA5B9u5xJsfqU3AT1a92E9YgD9TnKH+vSIbQKGdw+t5Acih9j1JR+iHcdQgGy4kYV7X
-         Xo4A/Izq3FsOrHm/JHpoM5xgKLwufVKcywFfmB1Azxb9bQdRqC21BodeojUZZSP8CY0G
-         CYPg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730292922; x=1730897722;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fd0+WXgf+BWTWhA8jygsIOHrOH6t8SMTi55qCk7gJSk=;
-        b=AUKpXtJoGf3mZJB3TcnMQbejmiwBmHMQpAZ4BDRWO/LZnfusyi2eUPX4YxwuIY4N9C
-         R1gMv9hNfDVQKzu8Y/XNHfjJpkzeb7GKPZ6GKVPI35SVsaDCj6+5P7vbFiRork3mXc3m
-         mRRptJDnwHE6sZZ7XElyQ4IFJM7XaVYioaJr0CQpn36VaGxNEVLhMOwQ8v7vsmVbB3GT
-         vHzcprDR4lK1IvEBM+SCLIEq/Mlv/MWll7vjK6IxTTOOwQYA/ie9uPHkWVeltYzK+zfg
-         tV35Kt+YVKadyXXhNwN0+9BgmHoXr+GPnHPZ17OhQV0geNTP/pViK9oVpuAcvuD7uzDw
-         SOQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXJBW0rvVs3zL/6YJ5gvPRrrQwmosW0RZu52BON3V2zbwuuhAHJkQP9L5Ry9jC7mrHI5WmZb+Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyIl3vP61Keo8260rZuHvHfl56xZpMgw//kAg5TtAWnp11nOitp
-	iMBkTYXZ5xU7eTtsvotuW7zPoJUsz0VAecs++0eDCLPSDw+hAP33KwRWMVe7cP9ajTJ8IjfOhVh
-	u+daFuQg8QnvZDqK/vP2k6/CKRduoFXogA0xQ
-X-Google-Smtp-Source: AGHT+IFAptJsX2O9Az/I1ss64NYWqCPlrPAi6PzQMHPjp6B2tnwmHzxquTjrBDurcpyu96ID/8shmMEe4GTEqlZb9L4=
-X-Received: by 2002:a05:6402:2114:b0:5c8:9f3c:ea01 with SMTP id
- 4fb4d7f45d1cf-5cbbf8923a3mr12315247a12.2.1730292921659; Wed, 30 Oct 2024
- 05:55:21 -0700 (PDT)
+	s=arc-20240116; t=1730293105; c=relaxed/simple;
+	bh=fy/EhC/8o0exDek8z8nglJ/dyarxYaGCj12JxahYLIc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=iFXpCD8GvV95PMnH5qjJP8LLM9Bf1CLgWNaZH7YPVHZE7N3K2WxqoJD9hE8SFwnSQzJeTC2CCWGjU2UHg4bpuxpXaf9KR/tsSep7j0T1XZEa9SlhnBb9ssziZfTMoFltlP5lA90esgpLgeMPiLVkuSU+glXaUB90OeL8Kf5n4jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RA+8LOEf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 00FCDC4CEE5;
+	Wed, 30 Oct 2024 12:58:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730293104;
+	bh=fy/EhC/8o0exDek8z8nglJ/dyarxYaGCj12JxahYLIc=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=RA+8LOEfYcDTvk69kaJ9WPB9j4Gn0OEMDR+/ituO+ibkq3Jq+zUqw22oXelG3siFc
+	 Cm7SbDXYTpdhqxzNRwB4hmf9G5QyK+dOhE8/cidm74X6KYi1kTJEJG7EnPCxG9VVjj
+	 SGR2Qn04t0NBr2ELbKrbrYOQHvTT42XpNdc4kXpVWdAp91g2Znxa8pjrJBLNVbzjm/
+	 hZeSrYD4uHi1vPXOwPsqT3hwk2AoPUJtu/yFGaVRWIF8LvMc25MQSyWb9zkbjb6Bsy
+	 sd8PrU6930icLBk7vMK+ybLhhD+iRBzSWTsc/2gFARmMyNPODjSb2aLvDjBawZoIj1
+	 0l4/gAZPPBAoA==
+Message-ID: <1f927944-30aa-4298-9bd0-d9d3ace3fc78@kernel.org>
+Date: Wed, 30 Oct 2024 14:58:20 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029182703.2698171-1-csander@purestorage.com>
- <CANn89iLx-4dTB9fFgfrsXQ8oA0Z+TpBWNk4b91PPS1o=oypuBQ@mail.gmail.com> <CADUfDZrSUNu7nym9dC1_yFUqhC8tUPYjv-ZKHofU9Q8Uv4Jvhw@mail.gmail.com>
-In-Reply-To: <CADUfDZrSUNu7nym9dC1_yFUqhC8tUPYjv-ZKHofU9Q8Uv4Jvhw@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 30 Oct 2024 13:55:07 +0100
-Message-ID: <CANn89iKQ3g2+nSWaV3BWarpbneRCSoGSXdGP90PF7ScDu4ULEQ@mail.gmail.com>
-Subject: Re: [PATCH] net: skip RPS if packet is already on target CPU
-To: Caleb Sander <csander@purestorage.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: BeagleBone Black Ethernet PHY issues
+To: Geert Uytterhoeven <geert@linux-m68k.org>,
+ ext Tony Lindgren <tony@atomide.com>,
+ Siddharth Vadapalli <s-vadapalli@ti.com>
+Cc: "open list:TI ETHERNET SWITCH DRIVER (CPSW)"
+ <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>,
+ Matti Vaittinen <mazziesaccount@gmail.com>,
+ Linux ARM <linux-arm-kernel@lists.infradead.org>
+References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
+Content-Language: en-US
+From: Roger Quadros <rogerq@kernel.org>
+In-Reply-To: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Oct 29, 2024 at 9:38=E2=80=AFPM Caleb Sander <csander@purestorage.c=
-om> wrote:
->
-> On Tue, Oct 29, 2024 at 12:02=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> >
-> > On Tue, Oct 29, 2024 at 7:27=E2=80=AFPM Caleb Sander Mateos
-> > <csander@purestorage.com> wrote:
-> > >
-> > > If RPS is enabled, all packets with a CPU flow hint are enqueued to t=
-he
-> > > target CPU's input_pkt_queue and process_backlog() is scheduled on th=
-at
-> > > CPU to dequeue and process the packets. If ARFS has already steered t=
-he
-> > > packets to the correct CPU, this additional queuing is unnecessary an=
-d
-> > > the spinlocks involved incur significant CPU overhead.
-> > >
-> > > In netif_receive_skb_internal() and netif_receive_skb_list_internal()=
-,
-> > > check if the CPU flow hint get_rps_cpu() returns is the current CPU. =
-If
-> > > so, bypass input_pkt_queue and immediately process the packet(s) on t=
-he
-> > > current CPU.
-> > >
-> > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> >
-> > Current implementation was a conscious choice. This has been discussed
-> > several times.
-> >
-> > By processing packets inline, you are actually increasing latencies of
-> > packets queued to other cpus.
->
-> Sorry, I wasn't aware of these prior discussions. I take it you are
-> referring to threads like
-> https://lore.kernel.org/netdev/20230322072142.32751-1-xu.xin16@zte.com.cn=
-/T/
-> ? I see what you mean about the latency penalty for packets that do
-> require cross-CPU steering.
->
-> Do you have an alternate suggestion for how to avoid the overhead of
-> acquiring a spinlock for every packet? The atomic instruction in
-> rps_lock_irq_disable() called from process_backlog() is consuming 5%
-> of our CPU time. For our use case, we don't really want software RPS;
-> we are expecting ARFS to steer all high-bandwidth traffic to the
-> desired CPUs. We would happily turn off software RPS entirely if we
-> could, which seems like it would avoid the concerns about higher
-> latency for packets that need to be steering to a different CPU. But
-> my understanding is that using ARFS requires RPS to be enabled
-> (rps_sock_flow_entries set globally and rps_flow_cnt set on each
-> queue), which enables these rps_needed static branches. Is that
-> correct? If so, would you be open to adding a sysctl that disables
-> software RPS and relies upon ARFS to do the packet steering?
+Hi Geert,
 
-A sysctl will not avoid the fundamental issue.
-Why not instead address the past feedback ?
-Can you test the following ?
+On 29/10/2024 19:18, Geert Uytterhoeven wrote:
+> Hi all,
+> 
+> During the last few months, booting kernels on BeagleBone Black
+> sometimes fails with:
+> 
+>     +SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
+> LAN8710/LAN8720 failed with error -5
+>      davinci_mdio 4a101000.mdio: phy[0]: device 4a101000.mdio:00,
+> driver SMSC LAN8710/LAN8720
+>      soc_device_match(cpsw_soc_devices): no match
+>      cpsw-switch 4a100000.switch: initialized cpsw ale version 1.4
+>      ...
+>      am335x-phy-driver 47401300.usb-phy: dummy supplies not allowed
+> for exclusive requests (id=vbus)
+>     +cpsw-125mhz-clkctrl:0014:0: failed to disable
+>      am335x-phy-driver 47401b00.usb-phy: using DT
+> '/ocp/target-module@47400000/usb-phy@1b00' for 'reset' GPIO lookup
+>      ...
+>      cpsw-switch 4a100000.switch: starting ndev. mode: dual_mac
+>     -SMSC LAN8710/LAN8720 4a101000.mdio:00: attached PHY driver
+> (mii_bus:phy_addr=4a101000.mdio:00, irq=POLL)
+>     -cpsw-switch 4a100000.switch eth0: Link is Up - 100Mbps/Full -
+> flow control off
+>     -Sending DHCP requests ., OK
+>     -IP-Config: Complete:
+>     -[...]
+>     +cpsw-switch 4a100000.switch: phy
+> "/ocp/interconnect@4a000000/segment@0/target-module@100000/switch@0/mdio@1000/ethernet-phy@0"
+> not found on slave 0
+>     +[HANG]
+> 
+> Adding debug prints to smsc_phy_probe() makes the issue go away, so it
+> must be timing related.
+> 
+> Adding specific debug prints in the failure case gives:
+> 
+>     SMSC LAN8710/LAN8720 4a101000.mdio:00: genphy_read_abilities:2859:
+> phy_read(MII_BMSR) failed -EIO
+>     SMSC LAN8710/LAN8720 4a101000.mdio:00: phy_probe:3613:
+> genphy_read_abilities() failed -EIO
+>     SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
+> LAN8710/LAN8720 failed with error -5
+> 
+> and later:
+> 
+>     Generic PHY 4a101000.mdio:00: genphy_read_abilities:2859:
+> phy_read(MII_BMSR) failed -EIO
+>     Generic PHY 4a101000.mdio:00: phy_probe:3609:
+> genphy_read_abilities failed -EIO
+>     cpsw-switch 4a100000.switch: phy
+> "/ocp/interconnect@4a000000/segment@0/target-module@100000/switch@0/mdio@1000/ethernet-phy@0"
+> not found on slave 0
+> 
+> Adding debug prints to __mdiobus_read() and davinci_mdio_read() gives:
+> 
+>     mdio_bus 4a101000.mdio: davinci_mdio_read:444:
+> readl(&data->regs->user[0].access) = 0x3a0ffff
+>     mdio_bus 4a101000.mdio: __mdiobus_read:900: davinci_mdio_read failed -EIO
+> 
+> but this is a different (and unimportant?) early failure from
+> smsc_phy_config_intr(), and that debug print actually makes the issue go
+> away, too.
+> 
+> Ignoring the early failure reveals that phy_read(MII_BMSR) failed due
+> to:
+> 
+>     mdio_bus 4a101000.mdio: davinci_mdio_read:446:
+> readl(&data->regs->user[0].access) = 0x20ffff
+> 
+> Anyone with a clue?
 
-diff --git a/net/core/dev.c b/net/core/dev.c
-index c682173a76424d7dadcc8374aa5b11dff44a4b46..7a5a7f1a4b7c3cbd105ecfc0763=
-77f25929729eb
-100644
---- a/net/core/dev.c
-+++ b/net/core/dev.c
-@@ -5842,6 +5842,21 @@ static int generic_xdp_install(struct
-net_device *dev, struct netdev_bpf *xdp)
-        return ret;
- }
+Just wondering if the Reset is happening correctly and it has settled
+before PHY access.
 
-+#ifdef CONFIG_RPS
-+static bool net_must_use_backlog(int tcpu)
-+{
-+       if (tcpu < 0)
-+               return false;
-+       if (tcpu !=3D smp_processor_id())
-+               return true;
-+       /* target cpu is ourself. We must use our backlog
-+        * if we have deferred IPI or packets.
-+        */
-+       return this_cpu_read(softnet_data.rps_ipi_list) !=3D NULL ||
-+              this_cpu_read(softnet_data.input_pkt_queue.qlen) !=3D 0;
-+}
-+#endif
-+
- static int netif_receive_skb_internal(struct sk_buff *skb)
- {
-        int ret;
-@@ -5857,7 +5872,7 @@ static int netif_receive_skb_internal(struct sk_buff =
-*skb)
-                struct rps_dev_flow voidflow, *rflow =3D &voidflow;
-                int cpu =3D get_rps_cpu(skb->dev, skb, &rflow);
+From arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi
 
--               if (cpu >=3D 0) {
-+               if (net_must_use_backlog(cpu)) {
-                        ret =3D enqueue_to_backlog(skb, cpu, &rflow->last_q=
-tail);
-                        rcu_read_unlock();
-                        return ret;
-@@ -5890,7 +5905,7 @@ void netif_receive_skb_list_internal(struct
-list_head *head)
-                        struct rps_dev_flow voidflow, *rflow =3D &voidflow;
-                        int cpu =3D get_rps_cpu(skb->dev, skb, &rflow);
+&davinci_mdio_sw {
+        pinctrl-names = "default", "sleep";
+        pinctrl-0 = <&davinci_mdio_default>;
+        pinctrl-1 = <&davinci_mdio_sleep>;
 
--                       if (cpu >=3D 0) {
-+                       if (net_must_use_backlog(cpu)) {
-                                /* Will be handled, remove from list */
-                                skb_list_del_init(skb);
-                                enqueue_to_backlog(skb, cpu,
-&rflow->last_qtail);
+        ethphy0: ethernet-phy@0 {
+                reg = <0>;
+                /* Support GPIO reset on revision C3 boards */
+                reset-gpios = <&gpio1 8 GPIO_ACTIVE_LOW>;
+                reset-assert-us = <300>;
+                reset-deassert-us = <13000>;
+        };
+};
+
+Do we need to increase reset-deassert-us for some reason?
+
+I couldn't find MII ready time after reset de-assert information form the
+PHY datasheet. except the following line [1].
+"For the first 16us after coming out of reset, the MII/RMII interface will run at 2.5 MHz. After this time, it will
+switch to 25 MHz if auto-negotiation is enabled"
+
+[1] 3.8.5 RESETS
+https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDocuments/DataSheets/LAN8710A-LAN8710Ai-Data-Sheet-DS00002164.pdf
+ 
+> Thanks!
+> 
+> Gr{oetje,eeting}s,
+> 
+>                         Geert
+> 
+
+-- 
+cheers,
+-roger
 
