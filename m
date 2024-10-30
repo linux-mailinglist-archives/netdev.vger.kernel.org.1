@@ -1,93 +1,93 @@
-Return-Path: <netdev+bounces-140444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516969B67B9
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:26:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A6589B67D7
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:30:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 082E11F21AA4
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:26:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 407071C21CFD
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:30:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B6C3213147;
-	Wed, 30 Oct 2024 15:23:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF841EB9F4;
+	Wed, 30 Oct 2024 15:30:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="XR5Qu21Y"
+	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="CGdL8b7y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F8371E3DC2
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:23:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD1F1F4711
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:30:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730301794; cv=none; b=l5fkLTEaHo+oI2pBZX2o2HZNsK8LZPauRHkSL4xMSmH3VAXs1AAxYpv0jhsNfV8SjIW5cRqUv5j7Ltr0aAXVJJ4GPWzFKZG172+2eJf2Mh4j3ZfPCqevqv6RCZFI1s7ikPLHnaHWsb9IgVfHj/0Z3QTDW1Z5ILPGG3gD/P3qc04=
+	t=1730302205; cv=none; b=oj+Hd1Or7FuT1/8ljwoMfULlAzWEuTOwzgS/rdRqneYjvyJ1oqqy5Y9ZANBkEadPXlRMc0UUjmw7Dufgn1yZpHWUxw7wsiJUDcT9Z6/fk/Mjfxi+84dU1yTBLD1xJyaTDlzEFGZaBt9ocJzLmbnmor67ZqzX9qOsiMHHSe9Gweo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730301794; c=relaxed/simple;
-	bh=iu+F0QpBpIymx9Mb8vWJMs1rMDhvYv026jUBdr892qs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=gjgAGEC++rSDbKURGzRuwRGM/2RKBbFGlXit/rjUzgM9zGyL5Y6fWjaeTaupQGBn+V8XJmXHMgOmB6aVfGuYBIhlDUNoJVFd4n8Xqi2DX5yHJWvGY+el4ZiiSAymOn6FNuopkBqby5kxo/Aoaa1Epw7rqH3j+mTh+OvOc6WPLMg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=XR5Qu21Y; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2e3fca72a41so5505408a91.1
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:23:11 -0700 (PDT)
+	s=arc-20240116; t=1730302205; c=relaxed/simple;
+	bh=5CYlU13wxN3pMieiMaGbP1AuRi6+Brw0TcF0hZyJdpU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BAv+3CTdKD6UMOs1PJZ0kuD/ykddjNKhhAMDJ8IuAbupJBvviqHbPGJ0F+FBEyA3loRnWXMgCAZhRQGkx+ZSE4RwXY6M8/UQJTgI3/u2AT5yoGybrcjE1aqno37jxUAQZvwvwwGT5PBQgi+8DrAbnESmNJj4HiGoOhxZrnYgyFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=CGdL8b7y; arc=none smtp.client-ip=209.85.167.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539f84907caso7494748e87.3
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:30:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730301791; x=1730906591; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OP44vKkaZ8TCjJgk08P04GYCIsessEUnYhYzif9jznA=;
-        b=XR5Qu21Y/OePH8uPBmm0HsSxytIiFAGe8+i700LZBy61K0Uz0s2xvJ5Z7mwFYBXQNs
-         ydskd2uKApqmMAYt6DLRFx4i8hDTCsI2uNdAx9Dn9NuN0Kqsiob8eWiqLNZPO5LfpEN3
-         65kuV/9PszI0WypTGuFAd8voarpBoO4StAUhKfPXIyxdu5OtQ43Lg3WbIQy8DSms9iSR
-         +46K1P7KPcgdcbXZN2Hnqjudmu05mTCnqqZ6ne8K6IvfKyfCpMjNE3z5kzzRBzx7GrDY
-         S6lq4dMqNoWc9rpMBpLH2O2+Kn4p/xrEt9yOMuwScsMfqrcgZvpxZvnCX1pPdv0FREUT
-         0Itg==
+        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1730302201; x=1730907001; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KT1Rl3kTS58mylbtqpSpuZe6eBpuGZzkCTqOtOlKpe0=;
+        b=CGdL8b7yfXNVvX9FLsLD7yqG5XX+vZe/51T4JlIMd69G0vJh9mrbzJlH+hJHsBedmf
+         Stgp2iE+7xmiK5Xk8mv/KpHgb4+ZmkPfXd82K2k8J14i8eH9AnXg1+/Ig9hFywmzQj5p
+         zlQdjHo4vt8oERakHsgkWvRMByu34YecTjuMmLUf1MQZLDQk+U/8AD54eL2GRXFjKZJh
+         0chM5OuSq8y+q3G2RvUqL3WQ+sghaXJ0XZ/xgYDhPiHAZFAdHmWfaZw9G88Wt2F/37L7
+         TEhfSTaxPgBRn8Re6v4gGG11GrgQSumTMaA1kTL02r3x5LrUPf2+dsOQxvn3FHSdIKX6
+         O87g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730301791; x=1730906591;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OP44vKkaZ8TCjJgk08P04GYCIsessEUnYhYzif9jznA=;
-        b=JS7KIdZimJt7kUCMaGSwbikrPNV9uQfT+8wzs74NXLzjkvE4bpK5BD70bTB82DKs8U
-         i7Cl5sTchOOSaqfRNK38bEYNqZKVYM2KzGIFx5aNANIPDBDFcN84ftjLlAR6dLCnHI4v
-         2Mm0zkBpgUx+9WERB5g22pKp10KF6fHGx7fIilD1WpevZgv1tM7xhnWaj2C0IQQ+Pbq2
-         IMSw8h6jPDmWowzTK8XND5YgpiHtMcHVyGIwCzWjEtyExN8f7cv3zNrTcI3nlb3H8tUq
-         aECHPaOF10NUCB3IMcW91I+MVOZ9quq9Ke7AdSZ955w0ckHomkVNrj71/r0FOYYDrhxH
-         jbXg==
-X-Gm-Message-State: AOJu0YxI4AOXj9vhN1EqlM71ogadR+bhj343GTfEoPsY6jwnKeZ9NgEy
-	ZT/two9pmeKR2Z4vs7s28ybkKudYKyKrcym9I7g7Z1pxOmzJHikxTQewtU2IRFUyPfrqNmr0HlQ
-	C
-X-Google-Smtp-Source: AGHT+IEiSInTP/WgvB8Iwxew4lGfgEKdPRUEJ92Pl9krgZVcbbPzoI8dAQK1wjwjKybWxRsz8OJ7zQ==
-X-Received: by 2002:a17:90b:360a:b0:2e2:b64e:f501 with SMTP id 98e67ed59e1d1-2e8f10a6d2cmr19546145a91.30.1730301791303;
-        Wed, 30 Oct 2024 08:23:11 -0700 (PDT)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-210bbf6d327sm81955795ad.67.2024.10.30.08.23.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 08:23:11 -0700 (PDT)
-Date: Wed, 30 Oct 2024 08:23:09 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-Cc: netdev@vger.kernel.org, entwicklung@pengutronix.de,
- bridge@lists.linux-foundation.org
-Subject: Re: [PATCH v2 iproute] bridge: dump mcast querier state
-Message-ID: <20241030082309.44fe54d1@hermes.local>
-In-Reply-To: <20241030084622.4141001-1-f.pfitzner@pengutronix.de>
-References: <20241030084622.4141001-1-f.pfitzner@pengutronix.de>
+        d=1e100.net; s=20230601; t=1730302201; x=1730907001;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KT1Rl3kTS58mylbtqpSpuZe6eBpuGZzkCTqOtOlKpe0=;
+        b=Zy4lnDAt667ngyg3UXZFi8J6LSV+jMH23Qtvs6T8+mc5zSpXSonbfKsYziQApT7NhT
+         w0FM7+dix4whxaZgfuQ/EY+sNSLAgSfHHxdWKJ+U1e+AvhZulWHeeocYRXfgFjDwAJFd
+         krTXagH8dgNeGc6kaL/Wa3FFd4QoPmVOrCkuvQRf+8ovDjDBNdaSHQkXfChB0+6p+1ts
+         lQSz9zZShs+ue5CHSy53i0b5VTu6VC8lt4kp+xldSPqIU3g71uyZszwDJXc2bDeStuhk
+         GK7ObzrRadstc4oHqi3NmX+AZCePJLFmQ608VeAqlquXyzROI0zjEdqCQDLQED5ZVZsD
+         oBJg==
+X-Forwarded-Encrypted: i=1; AJvYcCU8s/pbyq10B4Ji9fYd4nPqJPq3Xp9NwoGqaMcFkOsKmvi8GHzmQf+H6KLp7saciaFhPHBWzGc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw/ViR+vKKffTNPzhScbTXF/fCFG1FV+56vWDcBDZRqhJIC7wS7
+	eBNWiSsSz5v+EuZDPSrxnM7MRIr4fK1WGwpEe7sLmFzygpGM59k3gteNS1No3gagvNxGzSUOxjK
+	X
+X-Google-Smtp-Source: AGHT+IF06FD68FGsb9Am/OuTmp644K/y7BVoCARZwD3jKU00IF7Zto5FTyTr2w98MzrHnInXUu2BBw==
+X-Received: by 2002:a05:6512:6801:b0:53c:7652:6c9e with SMTP id 2adb3069b0e04-53c76526f55mr872653e87.53.1730302200793;
+        Wed, 30 Oct 2024 08:30:00 -0700 (PDT)
+Received: from [192.168.0.245] ([62.73.69.208])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd98e7aesm24889075e9.35.2024.10.30.08.29.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Oct 2024 08:30:00 -0700 (PDT)
+Message-ID: <f4efc424-6505-4e20-a9f2-14e973281921@blackwall.org>
+Date: Wed, 30 Oct 2024 17:29:59 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 iproute] bridge: dump mcast querier state
+To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
+Cc: entwicklung@pengutronix.de, bridge@lists.linux-foundation.org
+References: <20241030084622.4141001-1-f.pfitzner@pengutronix.de>
+Content-Language: en-US
+From: Nikolay Aleksandrov <razor@blackwall.org>
+In-Reply-To: <20241030084622.4141001-1-f.pfitzner@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On Wed, 30 Oct 2024 09:46:23 +0100
-Fabian Pfitzner <f.pfitzner@pengutronix.de> wrote:
-
+On 30/10/2024 10:46, Fabian Pfitzner wrote:
 > Kernel support for dumping the multicast querier state was added in this
 > commit [1]. As some people might be interested to get this information
 > from userspace, this commit implements the necessary changes to show it
@@ -113,28 +113,12 @@ Fabian Pfitzner <f.pfitzner@pengutronix.de> wrote:
 >  ip/iplink_bridge.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++
 >  1 file changed, 47 insertions(+)
 > 
-> diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
-> index f01ffe15..f74436d3 100644
-> --- a/ip/iplink_bridge.c
-> +++ b/ip/iplink_bridge.c
-> @@ -661,6 +661,53 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
->  			   "mcast_querier %u ",
->  			   rta_getattr_u8(tb[IFLA_BR_MCAST_QUERIER]));
->  
-> +	if (tb[IFLA_BR_MCAST_QUERIER_STATE]) {
-> +		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
-> +		SPRINT_BUF(other_time);
-> +
-> +		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, tb[IFLA_BR_MCAST_QUERIER_STATE]);
-> +		memset(other_time, 0, sizeof(other_time));
-> +
-> +		open_json_object("mcast_querier_state_ipv4");
-> +		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS])
-> +			print_string(PRINT_ANY,
-> +				"mcast_querier_ipv4_addr",
-> +				"mcast_querier_ipv4_addr %s ",
-> +				format_host_rta(AF_INET, bqtb[BRIDGE_QUERIER_IP_ADDRESS]))
 
-Would be good to use print_color_string here. 
+For the second time(!), please CC maintainers because it's very easy to
+miss a patch. In addition to maintainers, please CC reviewers of previous
+versions as well.
+
+Thank you,
+ Nik
 
 
