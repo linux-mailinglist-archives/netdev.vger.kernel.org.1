@@ -1,108 +1,193 @@
-Return-Path: <netdev+bounces-140527-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 005C39B6CCC
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:22:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 80AF79B6CDE
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:30:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4CE828237D
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 19:22:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 66C8BB21289
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 19:30:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8849C1CEACB;
-	Wed, 30 Oct 2024 19:22:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C754199385;
+	Wed, 30 Oct 2024 19:30:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RRy1aNvv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="j+kSn8N8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ua1-f42.google.com (mail-ua1-f42.google.com [209.85.222.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E038C1F;
-	Wed, 30 Oct 2024 19:22:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4556C15D5D9
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 19:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730316132; cv=none; b=C1LSGHiIZ6ZAb2KbCLccqtiLa2YKM+J9d6qIjuWhA78bycte8Rh1P5K45zAMxLxMAkWorgQX0qbiGGx7DiiTUrsjTHgD94y5jLE5pmcIbdR+TOM9keRZqueeZKbUERaUdXx4SnQe9W5HvM53GcbJjKkhGwXkVvXO6rey6FCd1x4=
+	t=1730316629; cv=none; b=bPbCp17yT4dpIesZdxvktsnulc8W7aIB4H7nYph78Zv9DfMgkq0Ye1DreHGL9rSOspLsRzNfy+mOC3+USQwQKcR6wlelSeYCpCWlXqqAyT+o0M8xJAAaN8rVCFpCcEYL/2n1PbBvXBcO7kSGR6GDxLVAJf9K7MBQIh+zVF9B3zw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730316132; c=relaxed/simple;
-	bh=20YiWshwGqPi6EqRGa2V2wZdThZPQZc7P9R2zk6JTDA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=erbSu1QjZAXSMTocTeeZ5j9AJdjtHVzzJR8dcEQkm1Fu5XQvEO/g72tmQURBeklmuZeA8W5yHAa02V2T/qEvNmirXRyZI3RWzcpaO9AMC1UG1vznI2d+oD0ws8PzRZ++a4K2EgKmMA2FKrHZje1rGPOcoKZkEOsbZyuszeV1NRE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RRy1aNvv; arc=none smtp.client-ip=209.85.222.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ua1-f42.google.com with SMTP id a1e0cc1a2514c-84fdb038aaaso19571241.3;
-        Wed, 30 Oct 2024 12:22:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730316129; x=1730920929; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=7KtXB2ifDIWOa6mGWGS93FJVDdAa3M1hw2PYhtDXBHw=;
-        b=RRy1aNvv/qkCvbTXTImwe0pQFgVvsEQnTZGIU/lx/yw66FtbEiimvsjBZNdjEBl0ha
-         YBc/SGTpHa3cHVwrfucgVMMf2dzCXmdXlGSillkAzVid5l2nCRLAS91/VuQmMSfmT4dC
-         aHntzpzk8pO35yTQNAZ1uuLvDWow3EMLVx9lfioj0eme7WsBXc5gBeWCNd3nNr1TBATG
-         sI5c7JsInMtn7Cq6xB56i4r6odDHdeN9uJd5xa2sA/4SrgNIgVYyzbZaes28eR0kIslr
-         Nv8DwiQR3YWOnHFrcLginC9JNKQbIVOnhUc3pSr7lne64xNmSELPHRX9NWd1V8SZFEdH
-         eOWw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730316129; x=1730920929;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7KtXB2ifDIWOa6mGWGS93FJVDdAa3M1hw2PYhtDXBHw=;
-        b=jL6oBLXT6vKndFvZr8US3J4STDEqiCywIEPxSRu4GxqJiHOZBdH9N466EkhAz+zHIL
-         NJ1B69KujKV/LT2uheJ9lO7ub+f1fyjolRxza16vplv/8WL+YOykRAHYDZnDmWOO7hu/
-         2lHl0D7yT1spFOUKSu/zyB/rBOU2tx8PY7N7gZaKkPGIJLof70XRHhpKsM4e4Y8qaIGs
-         F7oLrlJ8gPggKd0AYEik+uznCcQC0aNqp/5+qhiohUmUKx1iKxhbvtyjcR779nH3ngUP
-         8pyOjHIeQH4ClCW/SMO/D76vZDTGdsQzYgLdhXx/UX0E6Bpv5FPcaoaeO1W3ZNjJKyzr
-         PuIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWjFw+SZ/iZa7x0/LT3szftHNehYlcbG+GZmZHLgicvTbKzcVGw1293wCZ48Z/WAZPYkIQwN+Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkEUDD6E/7Bv6Zp5Cg7zLzJum5LtEFhrCGJ5brguxPSfRRXfBW
-	gur4ZRkQttM8wYc4X8QRmSHbTC8LlVPRC5zbOifNZr+v6sNlgfWfA5mc8w==
-X-Google-Smtp-Source: AGHT+IGhoT1ij29i/Qh8/RPaqQpOkqMiD6/poSiI0uDx4uJIVUeNzsAMD12RAqYQ8uKE+Co1Ewg6tQ==
-X-Received: by 2002:a05:6102:dd2:b0:4a4:8287:6c34 with SMTP id ada2fe7eead31-4a8cfb681c6mr16033541137.17.1730316129462;
-        Wed, 30 Oct 2024 12:22:09 -0700 (PDT)
-Received: from lvondent-mobl5.. (syn-107-146-107-067.res.spectrum.com. [107.146.107.67])
-        by smtp.gmail.com with ESMTPSA id a1e0cc1a2514c-85580ab7a5asm1611661241.23.2024.10.30.12.22.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 12:22:07 -0700 (PDT)
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-To: davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: pull request: bluetooth 2024-10-30
-Date: Wed, 30 Oct 2024 15:22:05 -0400
-Message-ID: <20241030192205.38298-1-luiz.dentz@gmail.com>
-X-Mailer: git-send-email 2.47.0
+	s=arc-20240116; t=1730316629; c=relaxed/simple;
+	bh=CoYyKlKmOSKxrPKi0zvjVFMgQHG2rxkSbzEovk3fD3k=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=nakSmAcmryxcMdyYQHBIYXfY7q++mw6ZcfkX/rJx1PAKWdCgDG8mMvnfMgCQabyaCjmDDO9WIUo4jj3yQtzyGIhjnc6zQabREJx0Ygy/k0kOJeliROPxWbac8sVA8FikH2tYwGsk6CbTZIakDS1wDcrzd9FbUnnBa091oqbCHz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=j+kSn8N8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CB77C4CECE;
+	Wed, 30 Oct 2024 19:30:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730316626;
+	bh=CoYyKlKmOSKxrPKi0zvjVFMgQHG2rxkSbzEovk3fD3k=;
+	h=From:Date:Subject:To:Cc:From;
+	b=j+kSn8N8k3flee47m87qzOJaPDUCR9IfqmjO9FEAy/f27KSHYnbdC7ggeRRYypUKM
+	 +HBafMda4IfNG63cAttYics2sYs75QKFq8FnVod2yIeH5PnPXxvwmAavtidx+i7/IF
+	 1S2LlVmUmpADapAoy1QWkNWFHLGeMjz1Xgor3FP2JtGvVgeodI8QKJHf36GBy7sjav
+	 Oh7SVqWovdKCFJgMm/dxKXjg7d3X9Vg9u2V2MiqJPilnGos/BU2xM+Qr2/o7lBUxib
+	 aLYdF2ls1Y6537wEnR/hl2Z3+9NVqE5dWNkzl2ISt5aBtz+OnUn6bNQKHlyJcbIthS
+	 o8BNqF092VAiw==
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+Date: Wed, 30 Oct 2024 20:29:55 +0100
+Subject: [PATCH net-next] net: dsa: mt7530: Add TBF qdisc offload support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241030-mt7530-tc-offload-v1-1-f7eeffaf3d9e@kernel.org>
+X-B4-Tracking: v=1; b=H4sIADKJImcC/x2MQQqAIBAAvxJ7TlhNCfpKdAhba6EyNCIQ/97Sa
+ ZjDTIFMiSnD0BRI9HDmeIrotgG/zedKihdxMGisxg7VcfdOcHsVQ9jjvCh0ZNBaqx0iSHclCvz
+ +z3Gq9QM2CB49YwAAAA==
+X-Change-ID: 20241030-mt7530-tc-offload-05e204441500
+To: =?utf-8?q?Ar=C4=B1n=C3=A7_=C3=9CNAL?= <arinc.unal@arinc9.com>, 
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>, 
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>, 
+ Florian Fainelli <f.fainelli@gmail.com>, 
+ Vladimir Oltean <olteanv@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Matthias Brugger <matthias.bgg@gmail.com>, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+ linux-mediatek@lists.infradead.org, Lorenzo Bianconi <lorenzo@kernel.org>
+X-Mailer: b4 0.14.2
 
-The following changes since commit c05c62850a8f035a267151dd86ea3daf887e28b8:
+Introduce port_setup_tc callback in mt7530 dsa driver in order to enable
+dsa ports rate shaping via hw Token Bucket Filter (TBF) for hw switched
+traffic. Enable hw TBF just for EN7581 SoC for the moment.
 
-  Merge tag 'wireless-2024-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-10-29 18:57:12 -0700)
+Signed-off-by: Lorenzo Bianconi <lorenzo@kernel.org>
+---
+ drivers/net/dsa/mt7530.c | 54 ++++++++++++++++++++++++++++++++++++++++++++++++
+ drivers/net/dsa/mt7530.h | 12 +++++++++++
+ 2 files changed, 66 insertions(+)
 
-are available in the Git repository at:
+diff --git a/drivers/net/dsa/mt7530.c b/drivers/net/dsa/mt7530.c
+index d84ee1b419a614dda5f440e6571cff5f4f27bf21..0adf69ac8827cd66cdc44f9bc43d27ab8acb785c 100644
+--- a/drivers/net/dsa/mt7530.c
++++ b/drivers/net/dsa/mt7530.c
+@@ -21,6 +21,7 @@
+ #include <linux/gpio/consumer.h>
+ #include <linux/gpio/driver.h>
+ #include <net/dsa.h>
++#include <net/pkt_cls.h>
+ 
+ #include "mt7530.h"
+ 
+@@ -3146,6 +3147,58 @@ mt753x_conduit_state_change(struct dsa_switch *ds,
+ 	mt7530_rmw(priv, MT753X_MFC, MT7530_CPU_EN | MT7530_CPU_PORT_MASK, val);
+ }
+ 
++static int mt753x_tc_setup_qdisc_tbf(struct mt7530_priv *priv, int port,
++				     struct tc_tbf_qopt_offload *qopt)
++{
++	struct tc_tbf_qopt_offload_replace_params *p = &qopt->replace_params;
++	u32 rate = 0;
++
++	switch (qopt->command) {
++	case TC_TBF_REPLACE:
++		rate = div_u64(p->rate.rate_bytes_ps, 1000) << 3; /* kbps */
++		fallthrough;
++	case TC_TBF_DESTROY: {
++		u32 val, tick;
++
++		mt7530_rmw(priv, MT7530_GERLCR, EGR_BC_MASK,
++			   EGR_BC_CRC_IPG_PREAMBLE);
++
++		/* if rate is greater than 10Mbps tick is 1/32 ms,
++		 * 1ms otherwise
++		 */
++		tick = rate > 10000 ? 2 : 7;
++		val = FIELD_PREP(ERLCR_CIR_MASK, (rate >> 5)) |
++		      FIELD_PREP(ERLCR_EXP_MASK, tick) |
++		      ERLCR_TBF_MODE_MASK |
++		      FIELD_PREP(ERLCR_MANT_MASK, 0xf);
++		if (rate)
++			val |= ERLCR_EN_MASK;
++		mt7530_write(priv, MT7530_ERLCR_P(port), val);
++		break;
++	}
++	default:
++		return -EOPNOTSUPP;
++	}
++
++	return 0;
++}
++
++static int mt753x_setup_tc(struct dsa_switch *ds, int port,
++			   enum tc_setup_type type, void *type_data)
++{
++	struct mt7530_priv *priv = ds->priv;
++
++	if (priv->id != ID_EN7581)
++		return -EOPNOTSUPP;
++
++	switch (type) {
++	case TC_SETUP_QDISC_TBF:
++		return mt753x_tc_setup_qdisc_tbf(priv, port, type_data);
++	default:
++		return -EOPNOTSUPP;
++	}
++}
++
+ static int mt7988_setup(struct dsa_switch *ds)
+ {
+ 	struct mt7530_priv *priv = ds->priv;
+@@ -3193,6 +3246,7 @@ const struct dsa_switch_ops mt7530_switch_ops = {
+ 	.get_mac_eee		= mt753x_get_mac_eee,
+ 	.set_mac_eee		= mt753x_set_mac_eee,
+ 	.conduit_state_change	= mt753x_conduit_state_change,
++	.port_setup_tc		= mt753x_setup_tc,
+ };
+ EXPORT_SYMBOL_GPL(mt7530_switch_ops);
+ 
+diff --git a/drivers/net/dsa/mt7530.h b/drivers/net/dsa/mt7530.h
+index 6ad33a9f6b1dff3a423baa668a8a2ca158f72b91..9467f2a3f2bca45b3fce3bace2b3b3205158c4bd 100644
+--- a/drivers/net/dsa/mt7530.h
++++ b/drivers/net/dsa/mt7530.h
+@@ -248,6 +248,18 @@ enum mt7530_vlan_egress_attr {
+ #define  AGE_UNIT_MAX			0xfff
+ #define  AGE_UNIT(x)			(AGE_UNIT_MASK & (x))
+ 
++#define MT7530_ERLCR_P(x)		(0x1040 + ((x) * 0x100))
++#define  ERLCR_CIR_MASK			GENMASK(31, 16)
++#define  ERLCR_EN_MASK			BIT(15)
++#define  ERLCR_EXP_MASK			GENMASK(11, 8)
++#define  ERLCR_TBF_MODE_MASK		BIT(7)
++#define  ERLCR_MANT_MASK		GENMASK(6, 0)
++
++#define MT7530_GERLCR			0x10e0
++#define  EGR_BC_MASK			GENMASK(7, 0)
++#define  EGR_BC_CRC			0x4	/* crc */
++#define  EGR_BC_CRC_IPG_PREAMBLE	0x18	/* crc + ipg + preamble */
++
+ /* Register for port STP state control */
+ #define MT7530_SSP_P(x)			(0x2000 + ((x) * 0x100))
+ #define  FID_PST(fid, state)		(((state) & 0x3) << ((fid) * 2))
 
-  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-30
+---
+base-commit: 668d663989c77fcb2a92748645e4c394b03d5988
+change-id: 20241030-mt7530-tc-offload-05e204441500
 
-for you to fetch changes up to 1e67d8641813f1876a42eeb4f532487b8a7fb0a8:
+Best regards,
+-- 
+Lorenzo Bianconi <lorenzo@kernel.org>
 
-  Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs (2024-10-30 14:49:09 -0400)
-
-----------------------------------------------------------------
-bluetooth pull request for net:
-
- - hci: fix null-ptr-deref in hci_read_supported_codecs
-
-----------------------------------------------------------------
-Sungwoo Kim (1):
-      Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
-
- net/bluetooth/hci_sync.c | 18 +++++++++++-------
- 1 file changed, 11 insertions(+), 7 deletions(-)
 
