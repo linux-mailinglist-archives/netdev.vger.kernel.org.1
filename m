@@ -1,98 +1,115 @@
-Return-Path: <netdev+bounces-140447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140448-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 393B09B67FF
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:38:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7EF09B6851
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:49:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6ACA01C21201
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:38:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B866284714
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F21E2139BF;
-	Wed, 30 Oct 2024 15:38:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD62921314E;
+	Wed, 30 Oct 2024 15:49:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CJHcwzjf"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="sn8dV+UY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 441911F426F
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:38:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3BCC1F4FA0
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:49:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730302684; cv=none; b=jrwBl68lZTYW1ZDFuT3OfTEpjjodmHTKP8BeGm7Y0Mn5kKkO0J5S+PEtdk7ScvwBkSUMwTBu8t0ChXx9UB4qgGJVjobyVkRjrHB135x9N9yYvgc8z3uhcSDz20Dpk906LGTSBB8Bhw/PTEf1G5B1xWzzk8Ad+bEZVv7HSOBxLoc=
+	t=1730303362; cv=none; b=sQ35sjHGahhErubIX6yiNDJghWetxvmacKS9YLdBQBoZRQ/Ar8prwyoAJrBMMAAPDm4RtlpkeHneeLK8OGZ0/C3Z9qfUKp7JpUSA1Hsa+PzO9SElZsdETe09iULPIbenctVQZ4jE6jLoVY9DbhV0MDcCbqsU083FjCHszjjwaT4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730302684; c=relaxed/simple;
-	bh=lWLNB6NauvSC3irEBTZhZs6g8sLTn5D2zaDYEGJJkAk=;
+	s=arc-20240116; t=1730303362; c=relaxed/simple;
+	bh=Io2tbWowQ68Dz1VugryNaBaD3Rn05LkZLQ/yiL5HTJE=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oMnynAToY5wCIOP3If+m3sgb/GsOWsIsxd23MWCn9bu4K6FaHBi78DM7qX8Lfk0xqiFwb2GEwAdasLD7kjrJo9pVoFZ7QcO5zRcqhV+dw8dVnNVKsMMKAbkja/J7yJfzCHf44LLke5kVdcu0a+MZmB/4jba84i5B1JbjXqKdi1U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CJHcwzjf; arc=none smtp.client-ip=209.85.208.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb561f273eso61964141fa.2
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:38:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730302679; x=1730907479; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LrMCWRpczwyRTmnrS6nIF4HKYVkA9torv7EN4XtnnJI=;
-        b=CJHcwzjf1DlXkV6asHilDSL94o/kA4VH8E+t9Z3/aJmTDMv3QkosxlxGhUY3oiy7P8
-         1BchP1MaPyxL8/NOpuRBxxIZwp9L/LYEOIrI/F6yi5FrQdSGN/nzgBVorOxUuME+9T0h
-         fY/J/OzxTysMR5bRb6qXqf+qqaMsyFtRVp7qCvmnTxOuJbc+ZUB16QAIBXKbQiopXRGw
-         Zq6bjabRArF7CszFm2/uhy/Kkrgm6MWCFhwRJUXSlKE2GShG20sCstoubv7tpOOmvZ9g
-         Y2glRGQcAoCCdEoAbWJB00jZbXc425k1sWEkxOfWlbVwBWAbzhz9V6bP4RU2GMIf6yyT
-         r7og==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730302679; x=1730907479;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=LrMCWRpczwyRTmnrS6nIF4HKYVkA9torv7EN4XtnnJI=;
-        b=EQAksb9WFoww7GDYNGkARqgiIKUo0CBh/RMmssB/Bgb0NxwO55HEnW+J5p+4NekJUy
-         DQnk7C31BksTfeStbLAA6lDqDdsfTS9XIUFlRwPvg+fE9TCXjdAdSiRLVqvLcN3pKT6i
-         f7Qw/irKLfNYzkgUVaNpGiRk3wORuBW4w+d0i0NxaSZLLl4M5oyzUasxDFMmntgWnOsu
-         RZZC2zVA0MWOzfSqKn6gjAwZgQPo84JJP0zir1EqVjZVwKLhqmuw0333o1W3+6dWtVYN
-         nlkAVyrOYZNPfIOyCY7/q9lYbFskMWzJqEXO3dhB53RD7jq+J3uThYqQdySI/g+fxUBn
-         dpqA==
-X-Forwarded-Encrypted: i=1; AJvYcCXu7mcq1ev5r+EH67lPSCPewzHZYWLVdWrrFoQTtlm22h8oBJglNnaMGbPBQ0JReszvoQgTbfc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwucK+/sPFeMXKCWU689PTgOpe+8hqHZLU9fpb1ThLUEj1wOAVA
-	/IkHZi3Xu7s90V6J4fVmjli+smNQEbZufPR8jCRmCXTWjtXNvJcujejGuttKo3WCd/N9q3vIEUz
-	/PenfP14d5u4qe1BQuPofo02juN6QKomcuXl2
-X-Google-Smtp-Source: AGHT+IG7DRpQ0VVMTcG6EnMiWykyPu51ceO5M4tUaSNQltNn+7su5SexoUVL9I4k/XDx6ioEftGeQAPKiITlI5Hsoro=
-X-Received: by 2002:a2e:4611:0:b0:2fb:382e:410b with SMTP id
- 38308e7fff4ca-2fd059d31f3mr18514061fa.32.1730302679117; Wed, 30 Oct 2024
- 08:37:59 -0700 (PDT)
+	 To:Cc:Content-Type; b=sd0rmNWenf7Up0l+/HjooplaDsd4WCoFbBBPFEQ69KgqPF990VMpC4dD616Ho8/bTxC6T9ZNNNQWE0h7HyznO4sZpWCBaPc58uFVwO41Xiwyv+tnLLVNWZr1D78fKjusuPPgH6T3X7HwbbhyQAM5Z2WeaVw6kZOCFdJmCtFsBXo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=sn8dV+UY; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=Io2tbWowQ68Dz1VugryNaBaD3Rn05LkZLQ/yiL5HTJE=; t=1730303360; x=1731167360; 
+	b=sn8dV+UYXgVI7E04dpLNTZ4g66UBiHu5cgYg02ubK1tgMTM+B8NmoK1ufFaZr7F6YpalOkx/Ouc
+	MK61GxTR9uDmQRe6AZcH8RRzr378kr8ee18rtBSdMh+waUASo/BPmfY/98OGtGsRPkiY5nLcDGvlb
+	5O9u20GVbOhKTzG4jOQkujAng/Id30LP//D42NJ+20QrZ39PwRhThggW63EpmmV+WrrhKTQDrm7Qe
+	QfpJ7mOAlZEaTD1AhDxrU7gAFZy4YslLNDTgybH7uinBGBhLf0vigxI2C95zsczy8lFBRqYJMV2Y2
+	tiHUkJVMelEDFQAKkVVa4wdKHVcz6ztEdM1g==;
+Received: from mail-oi1-f170.google.com ([209.85.167.170]:42089)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1t6Awf-0006ic-HP
+	for netdev@vger.kernel.org; Wed, 30 Oct 2024 08:49:18 -0700
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e63e5c0c50so4760b6e.0
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:49:17 -0700 (PDT)
+X-Gm-Message-State: AOJu0Yw2q07aY7/1W0vJSh2Vmor5wLkV7bI8zSAjzg5JC2PeYYN0XkGl
+	m24cvua1TLoSYNtVXCi5xZueeQO7t37z5E2RMAf6qWXDaZuEYqP3hni53aw4/55upTVSKECYybH
+	M9legUSruZOlB1qIFTlYN5S5BRcM=
+X-Google-Smtp-Source: AGHT+IE0KbI8bXwoomr7XCOCyqAcSix9INgL+vfjQehma6S5NxvRb+zFZgQYhmpTLOhSq/Kzvhidw4zOIyx6FWD1rx8=
+X-Received: by 2002:a05:6808:2f0e:b0:3e6:5347:8e52 with SMTP id
+ 5614622812f47-3e653478f31mr3309496b6e.11.1730303357058; Wed, 30 Oct 2024
+ 08:49:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030140224.972565-1-leitao@debian.org> <CANn89iLbTAwG-GM-UBFv4fNJ+1RuUZLMFNDCbUumbXx3SxxfBA@mail.gmail.com>
- <20241030-keen-vicugna-of-effort-bd3ab8@leitao>
-In-Reply-To: <20241030-keen-vicugna-of-effort-bd3ab8@leitao>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 30 Oct 2024 16:37:44 +0100
-Message-ID: <CANn89i+1ddxa3aQH=1ev2fX5+T=PBT2C0i0YwqQzWaJuMfVi=A@mail.gmail.com>
-Subject: Re: [PATCH net] mptcp: Ensure RCU read lock is held when calling mptcp_sched_find()
-To: Breno Leitao <leitao@debian.org>
-Cc: kuba@kernel.org, horms@kernel.org, davem@davemloft.net, pabeni@redhat.com, 
-	Matthieu Baerts <matttbe@kernel.org>, Mat Martineau <martineau@kernel.org>, 
-	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	vlad.wing@gmail.com, max@kutsevol.com, kernel-team@meta.com, aehkn@xenhub.one, 
-	stable@vger.kernel.org, 
-	"open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>
+References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-5-ouster@cs.stanford.edu>
+ <dfadfd49-a7ce-4327-94bd-a1a24cbdd5a3@lunn.ch> <CAGXJAmycKLobQxYF6Wm9RLgTFCJkhcW1-4Gzwb1Kzh7RDnt6Zg@mail.gmail.com>
+ <67c42f72-4448-4fab-aa5d-c26dd47da74f@lunn.ch>
+In-Reply-To: <67c42f72-4448-4fab-aa5d-c26dd47da74f@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Wed, 30 Oct 2024 08:48:41 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmyOAEC+d6aM1VQ=w2EYZXB+s4RwuD6TeDiyWpo1bnGE4w@mail.gmail.com>
+Message-ID: <CAGXJAmyOAEC+d6aM1VQ=w2EYZXB+s4RwuD6TeDiyWpo1bnGE4w@mail.gmail.com>
+Subject: Re: [PATCH net-next 04/12] net: homa: create homa_pool.h and homa_pool.c
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 0.8
+X-Spam-Level: 
+X-Scan-Signature: d568c20fab0e2ccae07d583947984559
 
-On Wed, Oct 30, 2024 at 4:05=E2=80=AFPM Breno Leitao <leitao@debian.org> wr=
-ote:
+(resending... forgot to cc netdev in the original response)
 
-> Thanks.  I got the impression that the scheduler list was append-only,
-> and the entries were never freed.
+On Wed, Oct 30, 2024 at 5:54=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
 
-mptcp_unregister_scheduler() is there, and could be used at some point.
+> > I think this is a different problem from what page pools solve. Rather
+> > than the application providing a buffer each time it calls recvmsg, it
+> > provides a large region of memory in its virtual address space in
+> > advance;
+>
+> Ah, O.K. Yes, page pool is for kernel memory. However, is the virtual
+> address space mapped to pages and pinned? Or do you allocate pages
+> into that VM range as you need them? And then free them once the
+> application says it has completed? If you are allocating and freeing
+> pages, the page pool might be useful for these allocations.
+
+Homa doesn't allocate or free pages for this: the application mmap's a
+region and passes the virtual address range to Homa. Homa doesn't need
+to pin the pages. This memory is used in a fashion similar to how a
+buffer passed to recvmsg would be used, except that Homa maintains
+access to the region for the lifetime of the associated socket. When
+the application finishes processing an incoming message, it notifies
+Homa so that Homa can reuse the message's buffer space for future
+messages; there's no page allocation or freeing in this process.
+
+> Taking a step back here, the kernel already has a number of allocators
+> and ideally we don't want to add yet another one unless it is really
+> required. So it would be good to get some reviews from the MM people.
+
+I'm happy to do that if you still think it's necessary; how do I do that?
+
+-John-
 
