@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-140399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D8049B650C
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:00:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AF059B6511
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:01:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F0631C21E74
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:00:43 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 00597B212CE
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:01:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EBAF1EBA08;
-	Wed, 30 Oct 2024 14:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF2D81EE022;
+	Wed, 30 Oct 2024 14:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YDsUK8eA"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LkOfSo/y"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609A61E2603;
-	Wed, 30 Oct 2024 14:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFC301EBFF2;
+	Wed, 30 Oct 2024 14:01:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730296841; cv=none; b=TymtnmvAqW/THdgwfM/FVhbTOJjX5sBANlw8WKKRQGT45HgHb/h5CY8rCxRzn20GejOXt8/VB1nqglB6FNSVlqwX3IhzvmD7K+ArYYkV2j7PZVO4BVT6JjGCCDGik+zaQoLww2Rr3Z2XYxlcEtMt0I9EbcT6ERoVQWMF2R3Xwh0=
+	t=1730296874; cv=none; b=POZIUZ4/TgVEAT3BorshzxRqekn9cx6aUMxwN55j1duPNJOUk38wEZwOOu/k9kegm6fovonoC5JOrdLTMRuxNg9ixRC0DWlcyn/CXcEfWLs39OuV371jnCIFU8SsndNbFSXk/71S9bfvrjee0IEtwNZw7KYS6ml5lZUjc2ssCdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730296841; c=relaxed/simple;
-	bh=4xBqS8UTsumo7sGyTT7vfpP96F4lC1cYm0w4yWSX7zQ=;
+	s=arc-20240116; t=1730296874; c=relaxed/simple;
+	bh=cZyl/pNcW3otfN/m79DGyMQG/9YXXsayTz/r9b6yIhA=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YsvMM0lntExokh7ynN27QJX8A9ywzv/tlBlJIPQeKyZHo9QdrwXgYskp3+hywf+4HxxAEvSN3BfZx1tW79v+WPggSePOUMng7/GYOVIxy97fvtrw06CeikpfmwBonZ820QblR6ga12l520yRCLDTadNRoFoEpB3SLihZsRTcNKU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YDsUK8eA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id ECC0CC4CECF;
-	Wed, 30 Oct 2024 14:00:36 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=EkEFHpSOmwYnjjI3G3sagJngDTVdHKItvNpS6F/PNk5TnFzT2tVGFzuZqhINLbJNHojxBJifFiS6POHq4e586RnraNdHl4LL33sFh8+AoWaGhYO8z/DPNbfnym6tmSaBboMzSZAzo7olprU0oiYMMfQTH03JnPzx4U3jfurZAxk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LkOfSo/y; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A31C0C4CECE;
+	Wed, 30 Oct 2024 14:01:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730296840;
-	bh=4xBqS8UTsumo7sGyTT7vfpP96F4lC1cYm0w4yWSX7zQ=;
+	s=k20201202; t=1730296874;
+	bh=cZyl/pNcW3otfN/m79DGyMQG/9YXXsayTz/r9b6yIhA=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=YDsUK8eAdEsACnU9mIV8HbYnP8wkxIOSR3Vn68cpFuqqS3mfLD22VnYOUU65whf38
-	 eOHHjWkoZzSulomYwoq+BzoGmbsmazvZvnCa/MI8awi93bdCq4RbmVjWwA46nVsugS
-	 GrPKVWeLOotxUxisEdY6caHNP1cFS0LnpePVZhfTXcSAdZmQ0mlDbqBbzN3XHL+B8P
-	 jT8DuY2eq+lEapIage4t5O/o7+RQhmGYyXCinSRlqNPJhJCcD8np1qkfKeSNkBY4gB
-	 oSAVRMhcPko8CeQzdd5N9C6QQjCEw8t494jvRVwTNzmWBiPW+EVXal8XB9AkVHQl+D
-	 /zAnb0GGloYsQ==
-Message-ID: <6f1ae409-93d4-422d-b44b-9d10cd82f3e6@kernel.org>
-Date: Wed, 30 Oct 2024 15:00:34 +0100
+	b=LkOfSo/yWKilkg1Ba1/mfdCdNpDj5hmbfa2HUyCQMWR5oHPsxysWFNMSinsKPGwkm
+	 b959PYpfFQkCzX+y5ocQQS9/I/6fAPJW5Wgko9ltT79MGM+LfJ/RCigiJfjEY1mQQE
+	 NHvFU8DuaW0/JbIodVcvk92BhyWZ8Lr7Gd6HSSnQwZYGL79jMJPnfohMfNXm3EiTEY
+	 6W6LWd/xmw6Xy0+/68K4suxUxj6nIkiwvzLYEbSmO/y6RLeKiHmi0N7fisC7jE2N71
+	 z6Tb8SAJm02w3c3wTNhKC9ZgTh6lz7YsOEYNX91E3xarEdE6aHZCxBVCYQlyXEKutR
+	 bEqXNo+r8dqnw==
+Message-ID: <ae0faee0-d695-4b48-8be8-dfd2e7e08f54@kernel.org>
+Date: Wed, 30 Oct 2024 15:01:08 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,17 +50,23 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 4/4] arm64: dts: agilex5: initial support for Arrow
- AXE5-Eagle
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
- Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
+Subject: Re: [PATCH v4 01/17] dt-bindings: net: wireless: cc33xx: Add
+ ti,cc33xx.yaml
+To: "Nemanov, Michael" <michael.nemanov@ti.com>, Kalle Valo
+ <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Richard Cochran <richardcochran@gmail.com>,
- Michael Turquette <mturquette@baylibre.com>, Stephen Boyd <sboyd@kernel.org>
-Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de
-References: <20241030-v6-12-topic-socfpga-agilex5-v1-0-b2b67780e60e@pengutronix.de>
- <20241030-v6-12-topic-socfpga-agilex5-v1-4-b2b67780e60e@pengutronix.de>
+ <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Cc: Sabeeh Khan <sabeeh-khan@ti.com>
+References: <20241029172354.4027886-1-michael.nemanov@ti.com>
+ <20241029172354.4027886-2-michael.nemanov@ti.com>
+ <936b19eb-cde7-4be8-98cf-e60e32b335cd@kernel.org>
+ <8024aa1c-5bd1-40d8-b0c3-14b5fcd992e2@ti.com>
+ <bda36285-dc70-4dff-85ed-9c04c0f7ba44@kernel.org>
+ <3fc3c670-ce63-4a27-9d12-1c6c996cf914@ti.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -106,121 +112,61 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241030-v6-12-topic-socfpga-agilex5-v1-4-b2b67780e60e@pengutronix.de>
+In-Reply-To: <3fc3c670-ce63-4a27-9d12-1c6c996cf914@ti.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 30/10/2024 13:10, Steffen Trumtrar wrote:
-> The Arrow AXE5-Eagle is an Intel Agilex5 SoCFPGA based board with:
+On 30/10/2024 13:14, Nemanov, Michael wrote:
+> On 10/30/2024 1:09 PM, Krzysztof Kozlowski wrote:
+>> On 30/10/2024 11:59, Nemanov, Michael wrote:
+>>>>
+>>>> Your changelog does not explain these three. "Fixed compatibility" is
+>>>> way too vague, especially that you do not fix anything here.
+>>>>
+>>>
+>>> I was trying to address the feedback from previous patch. You said:
+>>>
+>>>>>>> +static const struct of_device_id cc33xx_sdio_of_match_table[] = {
+>>>>>>> +	{ .compatible = "ti,cc3300", .data = &cc33xx_data },
+>>>>>>> +	{ .compatible = "ti,cc3301", .data = &cc33xx_data },
+>>>>>>> +	{ .compatible = "ti,cc3350", .data = &cc33xx_data },
+>>>>>>> +	{ .compatible = "ti,cc3351", .data = &cc33xx_data },
+>>>>>>> +	{ }
+>>>>>>> +};
+>>>>>>
+>>>>>>
+>>>>>> Eh? What happened here? So devices are compatibles thus make them
+>>>>>> compatible in the bindings.
+>>>>>>
+>>>>>
+>>>>> I thought this is the right way to do it (originally taken from [1]).
+>>>>> How can I solve it via DT bindings?
+>>>>
+>>>> It's all over the bindings (also example-schema). Use fallback and oneOf.
+>>>>
+>>>
+>>> Looking at [2] and [3] as an example I tried to do the same (make cc33xx
+>>> driver compatible with all chip variants).
+>>> How should have I done it?
+>>
+>> qcom-wdt is quite a different device. It's true you should have here
+>> oneOf, but for a purpose. oneOf without purpose does not make sense, right?
+>>
+>> I think other TI bindings would serve you as an example. Or this one:
+>>
+>> https://elixir.bootlin.com/linux/v6.3-rc6/source/Documentation/devicetree/bindings/sound/nvidia,tegra210-ope.yaml#L31
+>>
+>>
+>> Best regards,
+>> Krzysztof
+>>
 > 
->    - 1x PCIe Gen4.0 edge connector
->    - 4-port USB HUB
->    - 2x 1Gb Ethernet
->    - microSD
->    - HDMI output
->    - 2x 10Gb SFP+ cages
+> OK.
+> So I should make one of the variants the base and declare others as 
+> compatible? i.e:
 > 
-> As most devices aren't supported mainline yet, this is only the initial
-> support for the board.
-> 
-> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-> ---
->  arch/arm64/boot/dts/intel/Makefile                 |   1 +
->  .../boot/dts/intel/socfpga_agilex5_axe5_eagle.dts  | 146 +++++++++++++++++++++
->  2 files changed, 147 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/intel/Makefile b/arch/arm64/boot/dts/intel/Makefile
-> index d39cfb723f5b6674a821dfdafb21b12668bb1e0e..3e87d548c532b1a9e38f4489c037c5c4db3a50b8 100644
-> --- a/arch/arm64/boot/dts/intel/Makefile
-> +++ b/arch/arm64/boot/dts/intel/Makefile
-> @@ -3,5 +3,6 @@ dtb-$(CONFIG_ARCH_INTEL_SOCFPGA) += socfpga_agilex_n6000.dtb \
->  				socfpga_agilex_socdk.dtb \
->  				socfpga_agilex_socdk_nand.dtb \
->  				socfpga_agilex5_socdk.dtb \
-> +				socfpga_agilex5_axe5_eagle.dtb \
->  				socfpga_n5x_socdk.dtb
->  dtb-$(CONFIG_ARCH_KEEMBAY) += keembay-evm.dtb
-> diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5_axe5_eagle.dts b/arch/arm64/boot/dts/intel/socfpga_agilex5_axe5_eagle.dts
-> new file mode 100644
-> index 0000000000000000000000000000000000000000..bd5bd8f680c9ade49ac174108beed6828c5a925d
-> --- /dev/null
-> +++ b/arch/arm64/boot/dts/intel/socfpga_agilex5_axe5_eagle.dts
-> @@ -0,0 +1,146 @@
-> +// SPDX-License-Identifier:     GPL-2.0
-> +/*
-> + * Copyright (C) 2024, Arrow Electronics, Inc.
-> + */
-> +#include "socfpga_agilex5.dtsi"
-> +
-> +/ {
-> +	model = "SoCFPGA Agilex5 Arrow AXE5-Eagle";
-> +	compatible = "arrow,socfpga-agilex5-axe5-eagle", "intel,socfpga-agilex";
-> +
-> +	aliases {
-> +		serial0 = &uart0;
-> +	};
-> +
-> +	chosen {
-> +		stdout-path = "serial0:115200n8";
-> +	};
-> +
-> +	leds {
-> +		compatible = "gpio-leds";
-> +
-> +		hps0 {
 
-It does not look like you tested the DTS against bindings. Please run
-`make dtbs_check W=1` (see
-Documentation/devicetree/bindings/writing-schema.rst or
-https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
-for instructions).
-
-I think you are sending some downstream code. I am not sure if Agilex
-was corrected, but usually starting from upstream code is better choice.
-
-> +			label = "hps_led0";
-> +			gpios = <&porta 6 GPIO_ACTIVE_HIGH>;
-> +		};
-> +
-> +		hps1 {
-> +			label = "hps_led1";
-> +			gpios = <&porta 7 GPIO_ACTIVE_HIGH>;
-> +		};
-> +	};
-> +
-> +	gpio-keys {
-> +		compatible = "gpio-keys";
-> +
-> +		hps_sw0 {
-
-So this is copy of old arm stuff. Still needs to be fixed, see DTS
-coding style.
-
-It does not look like you tested the DTS against bindings. Please run
-`make dtbs_check W=1` (see
-Documentation/devicetree/bindings/writing-schema.rst or
-https://www.linaro.org/blog/tips-and-tricks-for-validating-devicetree-sources-with-the-devicetree-schema/
-for instructions).
-
-...
-
-> +&i2c1 {
-> +	status = "okay";
-> +
-> +	tca9544@70 {
-
-Node names should be generic. See also an explanation and list of
-examples (not exhaustive) in DT specification:
-https://devicetree-specification.readthedocs.io/en/latest/chapter2-devicetree-basics.html#generic-names-recommendation
-
-
-> +		compatible = "nxp,pca9544";
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		reg = <0x70>;
-> +		status = "okay";
-> +	};
-
+Yes
 
 Best regards,
 Krzysztof
