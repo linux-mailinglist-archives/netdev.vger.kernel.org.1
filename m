@@ -1,125 +1,128 @@
-Return-Path: <netdev+bounces-140369-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140370-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C78549B633F
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:43:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 87FF99B6356
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:50:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7D98F1F21CF0
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:43:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB6DEB219E5
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:49:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F63F1E8859;
-	Wed, 30 Oct 2024 12:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABCED1E909F;
+	Wed, 30 Oct 2024 12:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HEPcUBjJ"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b="UxbVmpXW"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 942941E411D
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 12:43:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E8B51E9066;
+	Wed, 30 Oct 2024 12:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730292199; cv=none; b=jSP4ANKKU0SNEblfqBBQpfjCUyzar6W8iqXPtIEPbMaNXwajrcV/2kptPkZ1essY4GpR8zPlR641G5zy6QfQYPtjjG0KdSAZdyS9/xYCPsKX9PQ+Q/vBXi6Px7wAJoUic5Mf6ld0tDIgnx/Eso2IXAHRLxiZTbBI/Ib7WgIdHQ0=
+	t=1730292587; cv=none; b=tTBqZdEbrR6j1L0WV7aTvrbcOhp/wn9myBG0TKQ41+VmI7zMf/vLPnnQ3SObAXUxNib8+KZSeq2WwNNb5gaW0B3EWrIXWMvnIWgYe87vsFdynU1jQkUGlhHc8rhruVblYSNNLDzGL6HN/LiSTcBAu0DPFBBKeHW1gEjswYBiS5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730292199; c=relaxed/simple;
-	bh=f8ktNFxxp88fXkwPUJzumSSuZLVrQ0+xUyPRGbJVjzk=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=NzK43q55PkkpdfrmtABkNAhZwjwMAEUf4YLwf7hj4ICYJ8BiOhQfZ3GVYdlSGeSoVZ+Fr/StSeBN63BrJgBaCFIabVhW0I7nWdRm4W9Qvh9sflhmV1CBEN3Hv1Ebo8RyAw9LomKbjt6rJ0MZHqbmE0MHWXCN+LjEbU0mFHgpwD8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HEPcUBjJ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730292196;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=3hGS4eB170lCGb8LEsK8iUL++OVfZqypyg/F5yByD9o=;
-	b=HEPcUBjJNmjda5l1NWUEX02K5ztm32cqLr6TRmREmZ5D9jMk9TEqrBOUXbnlPe5vsd/hnp
-	8QfBNUB02/Aua8uMl3aAQFNEVGSqQSYCxIn7nl9LO8J07MbA0z9OHsoj3VYW8FvKNuiHZH
-	XlBDKbQ1x9KNqLWMlEjxM42HGp7LnS0=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-540-za6qTXeeMciY6ZHFYYvjWw-1; Wed, 30 Oct 2024 08:43:15 -0400
-X-MC-Unique: za6qTXeeMciY6ZHFYYvjWw-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4316e2dde9eso58698095e9.2
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:43:14 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730292194; x=1730896994;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3hGS4eB170lCGb8LEsK8iUL++OVfZqypyg/F5yByD9o=;
-        b=PViymEI6xDnRScSUd14/9DdINdca7k5PET8b6WCOxOsGsOr/QGzq1IywvOuhfJkZMZ
-         dM6nHgRQ1IM1EwcFmfNDmmzdT8sv6XuUQY5P1GtT3NTqo45fVXCwuq2vfUWHTkBzvHLs
-         yiao88ePd+ewZx7mnmkt4GGVFABmlXiwfne/P3fTInZG/cHmEHqGdOtLkDwQWFf1RuPW
-         htU3r1CkxCdFLiJphveGX0z0rGXMPMCmwIS/3bKTDuBfvpUO4SMMa2eYHNutulnfb469
-         9SedICmNexQDGufP87LT03r4TYJoSZnw58qXkOqNTQRZmD2OCLvy7XVRb3OTHUYvzpZT
-         Ij9Q==
-X-Gm-Message-State: AOJu0YyT6j+v6+BQjtY3+aZi6H5FSph55gP2h5+If6ODtTRrvnQm2I4r
-	C6OTcde7F0LMmLua40/yRkdCLd3Q1o4qTbuEIqDxrMlA6RzO7ltJDdrm2ecF5UV/uzdAMrEB8jz
-	ZWpEYKOUM7hjGqFcpUdi/D1oYthbNAz3ICQ21SqRg5pJhNNGeJ+MJdg==
-X-Received: by 2002:a05:600c:3c8c:b0:42b:ac3d:3abc with SMTP id 5b1f17b1804b1-4319ad068f6mr165621965e9.24.1730292193856;
-        Wed, 30 Oct 2024 05:43:13 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IHesBiLWQaMknGJ/FJGzwquRD0voaTPaJMqnCfKTkNpCiPWDwOC+m8WLhSme+2B+tATUEGQ5Q==
-X-Received: by 2002:a05:600c:3c8c:b0:42b:ac3d:3abc with SMTP id 5b1f17b1804b1-4319ad068f6mr165621715e9.24.1730292193469;
-        Wed, 30 Oct 2024 05:43:13 -0700 (PDT)
-Received: from debian (2a01cb058d23d600438d14b4ec9f14b9.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:438d:14b4:ec9f:14b9])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b13246sm15281745f8f.11.2024.10.30.05.43.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 05:43:13 -0700 (PDT)
-Date: Wed, 30 Oct 2024 13:43:11 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH net-next] ipvlan: Prepare ipvlan_process_v4_outbound() to
- future .flowi4_tos conversion.
-Message-ID: <f48335504a05b3587e0081a9b4511e0761571ca5.1730292157.git.gnault@redhat.com>
+	s=arc-20240116; t=1730292587; c=relaxed/simple;
+	bh=+YCnTpHf4kgqcsvGPEJmRwKHA8R5k5OeoiGplCCzf7Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=OwPtEP3D/a3ACyOXZS2HVEF7dK4/AyQzb7VLQfdEEomhe6oS+Wz9o41KmnN58L7qj/wMkMw8u5ZvVbt358Yhv9Zw6qkgwitjzfxDke2GpKYJhYWjgfsw/BeqqrEz3yQsIn5ofkeUQig1lHEeQsLzi6uuc1Xt8nVL0jQS790QoDg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b=UxbVmpXW; arc=none smtp.client-ip=212.227.15.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1730292502; x=1730897302; i=metux@gmx.de;
+	bh=+YCnTpHf4kgqcsvGPEJmRwKHA8R5k5OeoiGplCCzf7Q=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=UxbVmpXWvyWFMdu+GATuiw1ytz1oNpvm5GNdgPbapjupaP25dsmWNYV/SdmkFCpE
+	 VX+3bwgCyi7J1vZWt8hxBFNjCqYXAs/90EF5MTi5XI4T3wPAud49gsLSmSGWAgCFH
+	 L/MlMEdcnBrC3Z6I/Y0EX4qgIzoVFOZM2ueUS8NENLEQofE14R0wXa31OvlhCEm1F
+	 9lgOEB79j/9vjsYX9KbXu2T/UCUxO61Yl+VZqyc98kF/0soDrfczquDVKjoNkb+Qg
+	 C3a2MT2iG3Shr2kXGTjhv+n6z7zTnhYsIVyC7TaB+61rRJr4ZYE9Z0EHkdrRrpF0j
+	 0MTyH7Gn6TRMn1XJ3Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.178] ([95.114.207.188]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MUXpK-1tExqH3yV6-00WDT5; Wed, 30
+ Oct 2024 13:48:22 +0100
+Message-ID: <d769ffcf-95e6-4db9-8f80-fe8a7dae0441@gmx.de>
+Date: Wed, 30 Oct 2024 13:48:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: lore.kernel.org getting senile ? [WAS: [PATCH 1/2] MAINTAINERS:
+ Remove Huawei due to compilance requirements.
+To: Vladimir Vladimirovich Putin <vladimir_putin_rus@kremlin.ru>,
+ torvalds@linux-foundation.org
+Cc: aospan@netup.ru, conor.dooley@microchip.com, ddrokosov@sberdevices.ru,
+ dmaengine@vger.kernel.org, dushistov@mail.ru, fancer.lancer@gmail.com,
+ geert@linux-m68k.org, gregkh@linuxfoundation.org,
+ hoan@os.amperecomputing.com, ink@jurassic.park.msu.ru, jeffbai@aosc.io,
+ kexybiscuit@aosc.io, linux-alpha@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-fpga@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-iio@vger.kernel.org,
+ linux-media@vger.kernel.org, linux-mips@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, linux-spi@vger.kernel.org,
+ manivannan.sadhasivam@linaro.org, mattst88@gmail.com,
+ netdev@vger.kernel.org, nikita@trvn.ru, ntb@lists.linux.dev,
+ patches@lists.linux.dev, richard.henderson@linaro.org, s.shtylyov@omp.ru,
+ serjk@netup.ru, shc_work@mail.ru, torvic9@mailbox.org,
+ tsbogend@alpha.franken.de, v.georgiev@metrotek.ru, wangyuli@uniontech.com,
+ wsa+renesas@sang-engineering.com, xeb@mail.ru,
+ LKML <linux-kernel@vger.kernel.org>, phoronix@phoronix.com,
+ redaktion@golem.de
+References: <CAHk-=whNGNVnYHHSXUAsWds_MoZ-iEgRMQMxZZ0z-jY4uHT+Gg@mail.gmail.com>
+ <20241024140353.384881-1-vladimir_putin_rus@kremlin.ru>
+ <20241024140353.384881-2-vladimir_putin_rus@kremlin.ru>
+Content-Language: tl
+From: metux <metux@gmx.de>
+In-Reply-To: <20241024140353.384881-2-vladimir_putin_rus@kremlin.ru>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:1/p4ha3marvAu2CXeYNmBSD+weQhVbztKCP0nISPKnffRdbsPI3
+ zPctzMmHLcQZTqlh2zjZzgis1SjXx91Sovsuto7k7PtiaIGSg5OcFzLBWgRcu14kWBAZy2V
+ 6iBOO6GAd+WQX6yFBtItp11ISEXll6ojoO2a1WoqxVo2LnaaL9WPMNYPLxG752dUTxTITZF
+ LcInJHKfb0M4bP+h7xstA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:4vaZnIPP94U=;1c9up5UAbh4Ag/QzXUXNQvA2l0p
+ 44Ceg39Q9FQgjnuFRb4ctiEQZ6+ThY3ohI4R7ghaxJvwW9GLmQklj8ELuO6HJZM3haO1kBQuj
+ lPf9DjnCWUfcGZ6Ecr8v4m+aEFlTj6r1/zlhPs8EVJwnS4Pe706PuXTBJpkg5WIn7GxOQO2JW
+ XajGhvRcjBrJhZNk7taO4FNBbp5dLDGkB6UepQiBXV68RMT6oTpFOwswwn3/eBeat+lHalNB/
+ gw+WciTtplBXIMbtRlqxaAJboJIHQLy0eXfzWRe/U26hY4FalvSL6RW63w2giJVSyCEe63Xf2
+ pnU7T294h4NAY+Lk1Uh+0usTGhMn+kqSHhbyz6XuQ9SUym/02iNMzOAUQU4B9rMEU5q6ZVIUd
+ 0PZ3f2zoM/AhE/8kfql73M86UBv0ANHdx6CqwXixMw8ZaIdo+GaFI0OcAUT9fQKIyYZczFTBp
+ AGABaZ971CQOkfqz9ZNcYAdXDG9laz6+7WLmruYJKXEeAyGdx7twTMJrs8FULcTe1ZOzQm3ZB
+ DT9XeRboVEyBNz53wj4/qAD1UsQODVRq/XAMxGruSGXdp9S8U1GLjLvbeblVDHTp4i143RIfc
+ UOHfXVzYXn7bC0uCHBJq1Wwe+j/PPMUEteRmxPqlOJxW/zJnk/+MhQ+nsjD3nQeqM4mO62C+8
+ cGyUVjqqCH9JFck+CUdFeZs+muR6CcuaNof+jRlxFMXiRxLHv+44RU3hyg04PrdKE21G5zjmC
+ EK9fu4IcYIpfrqOOb5TemzZQb0+1b1bsoLkyszrXyxOXZlQryGt702z9+snDKhQG4NhdmMGOd
+ ZwypTOh+SvzsGp5g+0qej1rGVGE9aJPkSwI0X0drGzsuc=
 
-Use ip4h_dscp() to get the DSCP from the IPv4 header, then convert the
-dscp_t value to __u8 with inet_dscp_to_dsfield().
+On 24.10.24 16:03, Vladimir Vladimirovich Putin wrote:
+> Huawei Corp was added to the US Entity List[1] on 08/20/2020.
+>
+> The Entity List is a trade restriction list published by the United
+> States Department of Commerce's Bureau of Industry and Security (BIS),
+> consisting of certain foreign persons, entities, or governments.
+> It is published as Supplement 4 of Part 744 of the Code
+> of Federal Regulations. [2]
 
-Then, when we'll convert .flowi4_tos to dscp_t, we'll just have to drop
-the inet_dscp_to_dsfield() call.
+Interesting to see that this message got removed from lore.kernel.org.
 
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
- drivers/net/ipvlan/ipvlan_core.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+Google still has it in it's index, and marc.info still has the whole threa=
+d.
 
-diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
-index b1afcb8740de..fd591ddb3884 100644
---- a/drivers/net/ipvlan/ipvlan_core.c
-+++ b/drivers/net/ipvlan/ipvlan_core.c
-@@ -3,6 +3,7 @@
-  */
- 
- #include <net/inet_dscp.h>
-+#include <net/ip.h>
- 
- #include "ipvlan.h"
- 
-@@ -422,7 +423,7 @@ static noinline_for_stack int ipvlan_process_v4_outbound(struct sk_buff *skb)
- 	int err, ret = NET_XMIT_DROP;
- 	struct flowi4 fl4 = {
- 		.flowi4_oif = dev->ifindex,
--		.flowi4_tos = ip4h->tos & INET_DSCP_MASK,
-+		.flowi4_tos = inet_dscp_to_dsfield(ip4h_dscp(ip4h)),
- 		.flowi4_flags = FLOWI_FLAG_ANYSRC,
- 		.flowi4_mark = skb->mark,
- 		.daddr = ip4h->daddr,
--- 
-2.39.2
+The internet doesn't forget.
 
+
+=2D-mtx
 
