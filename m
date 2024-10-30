@@ -1,384 +1,260 @@
-Return-Path: <netdev+bounces-140283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C75B79B5CA5
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 08:16:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4525F9B5CBF
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 08:19:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 21175B21723
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 07:15:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8208F1F235F2
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 07:19:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A00AE1DFE3F;
-	Wed, 30 Oct 2024 07:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16BE81DE881;
+	Wed, 30 Oct 2024 07:19:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JaaQnV6t"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="hKA/1vdS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.11])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7573D1DD55B;
-	Wed, 30 Oct 2024 07:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730272463; cv=none; b=iftiVt4QacM1boTCdjdB8Dmrgdk+7TLRsvdKt26W68ZAY28cJ0QNZnKXmmsWWcdoWL42PEna9OIVcye4NOYiTN6DQtZM/i0TrN5O0+//1bsI3sxaQ6+fEIaegNr0RGt+A1HmslCa2+RvJf6GXgpvoHxHTZjSLJ0fUF4AxYlAg7Q=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730272463; c=relaxed/simple;
-	bh=xiFPCQY2L46/2JctLYLs+5hSpDMECa/YhHt7/Yt4PKg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=CHSOGhU/61rGeg2is/40zSU9RYK4RuXtyENvYlyFPvv/syeLoiGYho1NfdhyEDirzs/chbhiT/i1Q9bHhN2eHOfRh+Ptip56ZuQyRekU/wZs4ROn1g9M4vU941TQugJXAldx9d4uP8O2HPeYUBzSp7VBZQnt9FiyNFtI83mE5A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JaaQnV6t; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92AE7C4CEE4;
-	Wed, 30 Oct 2024 07:14:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730272463;
-	bh=xiFPCQY2L46/2JctLYLs+5hSpDMECa/YhHt7/Yt4PKg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=JaaQnV6tA7lYd4mzwid/ZO2hUvNLmfFCqVqTbnjkashL1XC+qhmXvZz1aDLYEw6xe
-	 ogMyKjH1QwPcexQnj3cYWmJcM8o0/b8I/v1/ZeqGwJzS5iXY89RPwJ13aVBxrF9YoU
-	 oPUf4DjY+7iLC+1FKQOlQNl2rQd/lJSlO2XXqHEkyoFMmrEUGUaTZdTbCpQVlc7UQ6
-	 QbDSM676QsC9j3gynv+WFPtdNm4WlB7Pfi1c5QWtZe2EdKUce5WU4CsJtp8DSrX0I/
-	 Lsf95NRm1n1MhRdg9svNS+ayKDP/5V0aLc4aX1G61G+3DO704eXiTkDMEtEXZKF3P1
-	 sXfJx/9WupIBQ==
-Message-ID: <3a4192c3-0c93-4659-9006-e4ce6eed1b2d@kernel.org>
-Date: Wed, 30 Oct 2024 09:14:13 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B9BF1D3578;
+	Wed, 30 Oct 2024 07:19:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.11
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730272777; cv=fail; b=jMOGdehtbU2sVIdvgj4pJvN0bAcdr1y/CJJga/06CeAovD74HFODm1tjj/SPBsMWeBYsAIHl2O+5netmqzU3vsu1a1Y/UO0N+XqhWz3/8s4ukrc9ll9L+Qa6qdGRzlviibgazKYyiReXlbqykms1nHxLoubNSPohpuhYhPfqyfM=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730272777; c=relaxed/simple;
+	bh=ca04b+LpmgcRQTCnkr2mnGpLk4rxUsRSQAqXLvTV+Ys=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=JQHMl4X3HPdyOlP2cRvttzjMb/tVhGCmeYpHJ2+pp+wtNZXzwoPDvXmHBzritvnns/rxwNuUlv6un09FHmAHt3YXMIWxmRUhZp18taXLwBXGgIwlIiyP6L3tMQZdshIDmTq5f/Zo+r8b488pRXYxlNNVw0Binw8QcJiAdPVdhJQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=hKA/1vdS; arc=fail smtp.client-ip=198.175.65.11
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730272775; x=1761808775;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ca04b+LpmgcRQTCnkr2mnGpLk4rxUsRSQAqXLvTV+Ys=;
+  b=hKA/1vdSt6RniLU1d9MCeelQDjMVcXYX4g8S7J6Bf/Zy40TYYjdCwkUG
+   45kHs8Ys1NUjG3DcTfiiejk4cxkf192vB6YfCIq79V92W+acQ6Tvi3INS
+   b2u0YNdEOKcUsAEflxP3zfkbT/S67Ko6PJbaew0TRKE/Ws1XM+nA+M8NF
+   sC+A2olTdR4gw+xDFNNwNWbBnuu14Btxi04z9tSIr8pyyIKFvxBzKA1k2
+   IXmhn/waJS88LSbIAwf8AV1fUX5w0FvegJxe4J2xedr4qsYOoy1rRtXKn
+   8KzXs6HDF+KKJB3Dwg7b3FosOdeXw07jiiSAU1P6VjnBcwrFY67kAYaVT
+   A==;
+X-CSE-ConnectionGUID: CsqDL+A5SGuscBlOpxqDIg==
+X-CSE-MsgGUID: QLfsHOB4QcqTjDwDA2R7Fw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="40490567"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="40490567"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 00:19:34 -0700
+X-CSE-ConnectionGUID: 590tp578RJK+CDxL6ekVLA==
+X-CSE-MsgGUID: rXyc6K//RFWXKqXzF8493w==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,244,1725346800"; 
+   d="scan'208";a="82134427"
+Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
+  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 30 Oct 2024 00:19:34 -0700
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Wed, 30 Oct 2024 00:19:33 -0700
+Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Wed, 30 Oct 2024 00:19:33 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.171)
+ by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Wed, 30 Oct 2024 00:19:32 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ERNsoV/WFDaw7DYrsBMt/QlfTqQLy/N8QsnVZcTZUnqkOPADw8Ia6ZO5JF59teuNmGZecqzcFBXq67MgQ2EgaAkcJqT9uc9tF+2TCCru0he/K+VVdeU0/YFbZ4vublw9Blz/oAFpjxVrm6q+rNGR02BBytQWh3//4r/DjUH9pmDT6kg2Mis9+OnWMyo97coqSLZgclDdzbMwkTCY6tAg2HD/D/XWWDZkTasNhJwqbQZOa0tEKMRAjxE1ffzADIrnsttHm9vnrBH6kJM3GADodiIKyTjrvpPaiyHWmuS4Drfyu7HB6Q9K+yy3oeCa1KjsxkPT19Ew5eiqkV+lMNn35g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JvcjP3ZWVWxS5x0bBUAw1O5KMbk38yZAUDxsnKfJX1Q=;
+ b=KpsSih6wtIhDIy0Si9OYfhCjIYQuhOKtS/cy0qRROO5NhYvt1SDjuEG4Azpmr2prm6D9VazdNuJDJ1cjVH+rldkBkiS0xUEp1miwptiiPaB3E5pX3xPQY3WDo0ZTFyBuWuK9XxfCGK7IbftyAihfX3eCJ4bR7neG+BJBpkQ+m1WafLU4gQ6sWnpXRdTmXYX1QBPoOicvLkx8cTCeoI7TKaP8cyWK0FnCk8zOyACWaUru+a3Pj3c8fkR8ZpssQvx8FOMjyaOjzIchVKCrXDYbCNZAH4sXhtf0rsLuX49GsdQAB46lycd+m+l/cTO5klrhHLChr3hSauxF0a+V7YfRYQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com (2603:10b6:208:46d::9)
+ by CO1PR11MB5123.namprd11.prod.outlook.com (2603:10b6:303:94::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Wed, 30 Oct
+ 2024 07:19:26 +0000
+Received: from MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6]) by MN6PR11MB8102.namprd11.prod.outlook.com
+ ([fe80::15b2:ee05:2ae7:cfd6%6]) with mapi id 15.20.8093.027; Wed, 30 Oct 2024
+ 07:19:26 +0000
+Message-ID: <38770d64-1a9f-4f97-8e10-95dc16e1d9b9@intel.com>
+Date: Wed, 30 Oct 2024 08:19:20 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH linux-next] ice: use string choice helpers
+To: R Sundar <prosunofficial@gmail.com>
+CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <karol.kolacinski@intel.com>,
+	<arkadiusz.kubalewski@intel.com>, <jacob.e.keller@intel.com>, "kernel test
+ robot" <lkp@intel.com>, Julia Lawall <julia.lawall@inria.fr>, Andrew Lunn
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Richard Cochran <richardcochran@gmail.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>
+References: <20241027141907.503946-1-prosunofficial@gmail.com>
+ <ca4f7990-16c4-42ef-b0ae-12e64a100f5e@intel.com>
+ <e9a89d87-d1a7-44cb-aab5-07a61d578c3c@gmail.com>
+From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Content-Language: en-US
+In-Reply-To: <e9a89d87-d1a7-44cb-aab5-07a61d578c3c@gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: WA2P291CA0031.POLP291.PROD.OUTLOOK.COM
+ (2603:10a6:1d0:1f::12) To MN6PR11MB8102.namprd11.prod.outlook.com
+ (2603:10b6:208:46d::9)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] net: ethernet: ti: am65-cpsw: Fix multi queue Rx on
- J7
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- John Fastabend <john.fastabend@gmail.com>, Simon Horman <horms@kernel.org>,
- Vignesh Raghavendra <vigneshr@ti.com>
-Cc: Siddharth Vadapalli <s-vadapalli@ti.com>,
- Govindarajan Sriramakrishnan <srk@ti.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-References: <20241029-am65-cpsw-multi-rx-j7-fix-v1-1-426ca805918c@kernel.org>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <20241029-am65-cpsw-multi-rx-j7-fix-v1-1-426ca805918c@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN6PR11MB8102:EE_|CO1PR11MB5123:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7cd67927-c7e9-4894-7aee-08dcf8b32f72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|376014|7416014|1800799024;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?aitUc3p3Q3ErSjZzbTg2OGlCNElzWWpidnh5Z29aOUYwR2hyRnRHdjk4Q3o4?=
+ =?utf-8?B?ZWdCQ3dQQ0NjM21rb1gxWFA5dVhlelpiV29oSE0wcHc5SXZpc245NkJjTWpZ?=
+ =?utf-8?B?cWRXK0RMRE9Fa0hpSi9kRURwaC9CY0pYRGVSREsvMWtFcFp2NDlrN0pOdzAw?=
+ =?utf-8?B?U0IrWm5lMWxtQTgyL0Z5bG10cTJDbnRHdmFiZkQ5NDdjZ29pQWdkVWtsK0N6?=
+ =?utf-8?B?L1hDRUN0WW9zK3I2ZHg4MStkS0ZIYm9uUjFTUUx5YzNtcTlKZXZ4dGhxMkRQ?=
+ =?utf-8?B?SlV5bnQycG5USWxEOXFNVDBhQW9ocWpvbytCaUdtVHFaY2ovMFhTZ1hLdUI0?=
+ =?utf-8?B?M1JrNUhYMnVHYVJOc2lRZTVoMHkrMmVLdnY4T2hqZ2dUKzRtbFF3bWJLS3ZI?=
+ =?utf-8?B?TSthd0hTRkhZQVNQUndkYVoyMm5oU3NIOXFTYkU0NXg3SnVRaXBTSW9MWU5i?=
+ =?utf-8?B?T2psTFczbk9HV3FVOXRjbHdaV3hwVnI2VFJaaWQzbGREL0NBQUhCK0RodWg3?=
+ =?utf-8?B?Q0FmSXRldnNzZE16Q2U4cnJRUHVPNGpNVkMveGZyMFg5L0N1YWhvK1Y0M3JT?=
+ =?utf-8?B?UkxhcVpPQktCWDBPZk5vakxwYndHRCtrR1BzK3QyVFZLd29hUkF6ZkNZVVVs?=
+ =?utf-8?B?QTVIYmloS2ViditwU0pwSDF1bURXU2NudDlBRkM5UnpGSm1KbDBjUzdnRWhh?=
+ =?utf-8?B?UVpDc080M1VKSlFTVWpVcE9uK0RBM3pjNlpxWVRjc1l1YjlWMVZsRnliblQr?=
+ =?utf-8?B?NW1lSXNFMDRmTTJPKzh0WlhVQnQzNW5Xd2RlOUtndk1iZFhXNTJEMFAvdWhR?=
+ =?utf-8?B?K3JLV1d3TWN4dDVKRC96cCtCLzNyNHVEZ2IvVU9NSlR5M1ArYUZlM2ZRdGtn?=
+ =?utf-8?B?bHJzMm5SQXhnUVBrKzgrT3FDV2FXYkV0OEJDZGJZcnllaGZHdFVPdlIrQ0x4?=
+ =?utf-8?B?amNicVdnNDFCQ3NTbUN2MUpMZ1NZMFpuM3ZDYWZhaWFmWkZldUNOb0RoNzFB?=
+ =?utf-8?B?K1NaRTBQWG5EOG8vd096eVczUDRNNE4rUnh1VGU0YVVQcENXR3U4MGlvaTRl?=
+ =?utf-8?B?V2lEZFUybkQ3Z2lpUEMxeGlXSzVkNzQ1TjZSODRUQjNrOFhaUXk1a2ptWWp2?=
+ =?utf-8?B?Y1VCV1pjeFVxbXRRZGxNdFFYVWVMVlg3TDEyU05ianNtMlNxOFYwWmgwVTAr?=
+ =?utf-8?B?TE01UndnbWZPVXFrb3Q4ck5FWkV4Z1lWeG5LQ2lRSkw5dkwxbGdYdkFaMmJv?=
+ =?utf-8?B?SG1XRUxHVlREL0IvM3pTV1g5YkJoRG9TdWlmQ2NaV2tvU0NJeVRyeTBMVXpt?=
+ =?utf-8?B?dGI4eWpDN0ZqcjNWU2tMU2tTa1h4eUQ1NDJXa1JwdVExZXZ5MGZkb0FuZUox?=
+ =?utf-8?B?SnpMSzcxYkZDb2FKUWFSNUsxbzYzRE93aC9TV1NXdElEVU10ZU1OMTJGNG95?=
+ =?utf-8?B?NG1PNkwyNjM0ZWtqUWFvK2JvK1V0ai94YkZTcGRTTFI1bUgwaUdxazRLV3Bj?=
+ =?utf-8?B?clBzT1hXdzZ1VHZ1SUV4Ti94ejBwb05COWtaR3dsVU5UYUNsZG1jcStsZmpE?=
+ =?utf-8?B?REpyZ2hRSkliT3lSZEZ1cmlSaHNiY3ZKQWVwTlNwbTFJN25zdVgvbHlFN2Qr?=
+ =?utf-8?B?R0hkSmQ5aGdsa3NsUUE2Y0lJekpJWXFwY2hNdlBQaW4wMmx4VUNmTVQzVjRH?=
+ =?utf-8?B?RXFnYjMwSDFjbU55UThHMW4yWXRLK1diWmtxT3NaRU9QdEZla08vUHozTnFD?=
+ =?utf-8?Q?66k3Yekx7DybGJQIZ9SYoDpEHcTtjF2Vqg0Oofo?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN6PR11MB8102.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?Y0Q2MGFZQWFiblIzM2FLZXBJQTdrL0JiSVhocUVyOTlxVHBDQkE5TlUvZHlu?=
+ =?utf-8?B?RWN1a0gwbk5JVitOMG9mUG50OG9vK2RPUDRnd1hNeDVzTExQZGNxUzlwM0Fy?=
+ =?utf-8?B?cWszVm9YZzBmTWhmcVpzQ0IyOGUweTlxSXVaSHAvejZRZFNFQ2xYcUdVZ1RG?=
+ =?utf-8?B?OUNnMEhyVUZnVmQ5ancwd0JPdmxJbWlTZUEvS2dvL0NweWdMcmpTSnZzUkRV?=
+ =?utf-8?B?VkdRZUh4SE5NckdlRHE0MElNNHJSajFEc0xabkdEcERsRzdUWm1QK3pDUzFB?=
+ =?utf-8?B?RDd2UGxzcVhlSS9vaEVadXZCZWRQcG10WFdNaHBwUXpRN3BDK0xNNitZSHR0?=
+ =?utf-8?B?a0hWbW1MZFYzYTQya3liTTFVTjdxSDg3T1dWeXB1Rnd1Q1NnaGw3eXpBczc4?=
+ =?utf-8?B?ZFF6NWNkZ3BFM1hhR1pldEg3VEJ4ZnpKMVN0M1FxSm1BU3lLTVdscnpJd05Y?=
+ =?utf-8?B?bXp0TmIydWJMMFVyQ1FWanp4NFVtNmthZXVuWDlxeW5YQm9zTlpldUFzQTZr?=
+ =?utf-8?B?L3JZU3RaUjQvUTZXdWxiL2lVT0VndHZYQzh3K2ZnS3VLdnBDcDdaNk1DVUJa?=
+ =?utf-8?B?MVp3QklSaHFDZ0lDRXJFTUxNUlFRL2xBemh6c0llUGpuSzdQbWRDdkQ4WDZH?=
+ =?utf-8?B?M1M3bTAzKytnQUFKYzVxcStGd3JlZkFOU2pRL2dtQlA0VXBNSFZNc1lOOWdS?=
+ =?utf-8?B?MmZ3dFBZK1pmUEdQTzZpY0FDU0tnODJTV3VISktIQUlPaFVLbUhnL3NMdmhu?=
+ =?utf-8?B?RXZrZS9lTmtuYWFhaVJZWUxmd0hSM3FuOUgxZzZyNUtrb3RleTA0NzhCa3dJ?=
+ =?utf-8?B?K3B1R1JhblU0dkgxQ2dFdDIxbGd2elNTTmdBanYybkNDMFBVV3pudUVtUHRz?=
+ =?utf-8?B?RXFHUnVrdWlpMXNvaVh4dW9iSHhzTG9GeGY1c3N1V0cwOWtSTWdhcGNHTnlM?=
+ =?utf-8?B?WVBvQmJzYXFZN0hBVEZFRDJ3VFU4OXllSXpEbDA1cTJsQUhRZnRuRkFqaC81?=
+ =?utf-8?B?anRjWURZT2x4aVJpZmxOSFpTMXlycVkyUlMzMUJFb3FMVng2Snh0T0YzQmhJ?=
+ =?utf-8?B?eGNKVkhWYUIvWHMyRjE1Vk05YnZoR2RkZkFzY1EzalRwUHZLYWhOWVdaUlYz?=
+ =?utf-8?B?UU5QN0o4aTJFYmx2Ym1GNE5MQjdhT3I5VkVoSERvd0YzZ1IycThPcktwTStw?=
+ =?utf-8?B?aUFaaDZoZHNZVUNWZGtzSEk5WUlvdkE1ZzBndzdGbWk4MTFQZDBaNW5ka1RG?=
+ =?utf-8?B?SHpzQUs3dHh1cEhTTnZaYlpqblVmWHg0Z2hGWjdwbStURkxmU05LNEgwa2hj?=
+ =?utf-8?B?c01CbS8wT09vUUVLYkdpaExwa2J0QzEzcGFHZjlaVDlHcExSTHJDTGxiVHRV?=
+ =?utf-8?B?QURUdllVRWh0dlF2YlV1K2ZJSnRZLzY0M2JCZ0N4MTV5ZGk3ZGM5NnZaSHp0?=
+ =?utf-8?B?c3FSZkRlUUtRTHk4ckRhdStYUWlGYmJnVTY0QUZ6OGxlODFPMUdlL3lCUkFT?=
+ =?utf-8?B?dmhuYnB0ZENFajNmb0kvMFpCMWdUem41bjR2K0dQZlA2aWE3WVFNT0VGOTdN?=
+ =?utf-8?B?OEtVcHdQTVR6QjZJa2R1S0k3VEUzQzlRc3ZwamNwaU91SG8rQnNyaXNENzQ0?=
+ =?utf-8?B?NWg4SjZvN2xxcFFpY2RseW8xNUxkYytOVEcvOEY3REdJVlV4ZG9uTGxVK3p2?=
+ =?utf-8?B?azZvbzJnbzlnZFZIKy9XamxYaUhEVHAxTmtYdHZsK1pJbVFkRFBHTE1GMnBQ?=
+ =?utf-8?B?U1QyT0RWQWFWSjE5NVVaeklPUnRiMkdFdzBIdm5GM1RYQjVSZVE0ZzlEVnk3?=
+ =?utf-8?B?aG0rZGVuTDFXZVlERTVvSEQ1UWtWWCt1YVArZDVoaXQvY3R3MDl2cHVaU2lj?=
+ =?utf-8?B?RlZ6ZUx4T0dhUHNrZ1lWQTcxQWV1MGhQcTE4dk11VGMvUGl1cWsyL2FQc0Iy?=
+ =?utf-8?B?UHVIbVlPdkRGYlBUbHM1UEtWNENzRnowWTY3aDRubTJCOEJZMTZqRERmcDM4?=
+ =?utf-8?B?RGQwVFdyN0xodGpTSlBqTjZUTWxETjdLbk11cXovSkpxNkVvQ3hhWE1TUGdi?=
+ =?utf-8?B?ZFVTNWwyeFN4SGFGZDlWNjZPRU9uTjlQcWdwZzNPamt5cmZReGxnbW9YZkJL?=
+ =?utf-8?B?UE04Umc0ejU5YlNEdHZVdlVSS0xvYWZxZ0FUWGZFQm1rS3cvWElCT1FDTWJ0?=
+ =?utf-8?B?M0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7cd67927-c7e9-4894-7aee-08dcf8b32f72
+X-MS-Exchange-CrossTenant-AuthSource: MN6PR11MB8102.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Oct 2024 07:19:25.9907
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: rsCR/+pRvCj0jJi6jN7e3fRFnJ+ip3zipDv1FZMilyG4lwCC55Igcu170G9phJKIRWqM204CfGcXwN2X/zJsyt98iLktTUYfaAebCvcbPs4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR11MB5123
+X-OriginatorOrg: intel.com
 
+On 10/29/24 17:37, R Sundar wrote:
+> On 28/10/24 15:24, Przemek Kitszel wrote:
+>> On 10/27/24 15:19, R Sundar wrote:
+>>> Use string choice helpers for better readability.
 
-
-On 29/10/2024 17:05, Roger Quadros wrote:
-> On J7 platforms, setting up multiple RX flows was failing
-> as the RX free descriptor ring 0 is shared among all flows
-> and we did not allocate enough elements in the RX free descriptor
-> ring 0 to accommodate for all RX flows.
+>>>             bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
+>>
+>> perhaps locked/unlocked could be added into string_choices.h
+>>
 > 
-> This issue is not present on AM62 as separate pair of
-> rings are used for free and completion rings for each flow.
-> 
-> Fix this by allocating enough elements for RX free descriptor
-> ring 0.
-> 
-> However, we can no longer rely on desc_idx (descriptor based
-> offsets) to identify the pages in the respective flows as
-> free descriptor ring includes elements for all flows.
-> To solve this, introduce a new swdata data structure to store
-> flow_id and page. This can be used to identify which flow (page_pool)
-> and page the descriptor belonged to when popped out of the
-> RX rings.
-> 
-> Fixes: da70d184a8c3 ("net: ethernet: ti: am65-cpsw: Introduce multi queue Rx")
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 73 +++++++++++++++-----------------
->  drivers/net/ethernet/ti/am65-cpsw-nuss.h |  6 ++-
->  2 files changed, 38 insertions(+), 41 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 0520e9f4bea7..4c46574e111c 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -339,7 +339,7 @@ static int am65_cpsw_nuss_rx_push(struct am65_cpsw_common *common,
->  	struct device *dev = common->dev;
->  	dma_addr_t desc_dma;
->  	dma_addr_t buf_dma;
-> -	void *swdata;
-> +	struct am65_cpsw_swdata *swdata;
->  
->  	desc_rx = k3_cppi_desc_pool_alloc(rx_chn->desc_pool);
->  	if (!desc_rx) {
-> @@ -363,7 +363,8 @@ static int am65_cpsw_nuss_rx_push(struct am65_cpsw_common *common,
->  	cppi5_hdesc_attach_buf(desc_rx, buf_dma, AM65_CPSW_MAX_PACKET_SIZE,
->  			       buf_dma, AM65_CPSW_MAX_PACKET_SIZE);
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	*((void **)swdata) = page_address(page);
-> +	swdata->page = page;
-> +	swdata->flow_id = flow_idx;
->  
->  	return k3_udma_glue_push_rx_chn(rx_chn->rx_chn, flow_idx,
->  					desc_rx, desc_dma);
-> @@ -519,36 +520,31 @@ static enum am65_cpsw_tx_buf_type am65_cpsw_nuss_buf_type(struct am65_cpsw_tx_ch
->  
->  static inline void am65_cpsw_put_page(struct am65_cpsw_rx_flow *flow,
->  				      struct page *page,
-> -				      bool allow_direct,
-> -				      int desc_idx)
-> +				      bool allow_direct)
->  {
->  	page_pool_put_full_page(flow->page_pool, page, allow_direct);
-> -	flow->pages[desc_idx] = NULL;
->  }
->  
->  static void am65_cpsw_nuss_rx_cleanup(void *data, dma_addr_t desc_dma)
->  {
-> -	struct am65_cpsw_rx_flow *flow = data;
-> +	struct am65_cpsw_rx_chn *rx_chn = data;
->  	struct cppi5_host_desc_t *desc_rx;
-> -	struct am65_cpsw_rx_chn *rx_chn;
-> +	struct am65_cpsw_swdata *swdata;
->  	dma_addr_t buf_dma;
->  	u32 buf_dma_len;
-> -	void *page_addr;
-> -	void **swdata;
-> -	int desc_idx;
-> +	struct page *page;
-> +	u32 flow_id;
->  
-> -	rx_chn = &flow->common->rx_chns;
->  	desc_rx = k3_cppi_desc_pool_dma2virt(rx_chn->desc_pool, desc_dma);
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	page_addr = *swdata;
-> +	page = swdata->page;
-> +	flow_id = swdata->flow_id;
->  	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
->  	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
->  	dma_unmap_single(rx_chn->dma_dev, buf_dma, buf_dma_len, DMA_FROM_DEVICE);
->  	k3_cppi_desc_pool_free(rx_chn->desc_pool, desc_rx);
->  
-> -	desc_idx = am65_cpsw_nuss_desc_idx(rx_chn->desc_pool, desc_rx,
-> -					   rx_chn->dsize_log2);
-> -	am65_cpsw_put_page(flow, virt_to_page(page_addr), false, desc_idx);
-> +	am65_cpsw_put_page(&rx_chn->flows[flow_id], page, false);
->  }
->  
->  static void am65_cpsw_nuss_xmit_free(struct am65_cpsw_tx_chn *tx_chn,
-> @@ -703,14 +699,13 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
->  				ret = -ENOMEM;
->  				goto fail_rx;
->  			}
-> -			flow->pages[i] = page;
->  
->  			ret = am65_cpsw_nuss_rx_push(common, page, flow_idx);
->  			if (ret < 0) {
->  				dev_err(common->dev,
->  					"cannot submit page to rx channel flow %d, error %d\n",
->  					flow_idx, ret);
-> -				am65_cpsw_put_page(flow, page, false, i);
-> +				am65_cpsw_put_page(flow, page, false);
->  				goto fail_rx;
->  			}
->  		}
-> @@ -764,8 +759,8 @@ static int am65_cpsw_nuss_common_open(struct am65_cpsw_common *common)
->  
->  fail_rx:
->  	for (i = 0; i < common->rx_ch_num_flows; i++)
-> -		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
-> -					  am65_cpsw_nuss_rx_cleanup, 0);
-> +		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
-> +					  am65_cpsw_nuss_rx_cleanup, !!i);
->  
->  	am65_cpsw_destroy_xdp_rxqs(common);
->  
-> @@ -777,6 +772,7 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
->  	struct am65_cpsw_rx_chn *rx_chn = &common->rx_chns;
->  	struct am65_cpsw_tx_chn *tx_chn = common->tx_chns;
->  	int i;
-> +	struct am65_cpsw_rx_flow *flow;
+> Sure, Can I add locked/unlocked changes in linux-next repository and use 
+> suggested-by Tag?
 
-This is also unused. Will drop it in v2.
+sure, that's way to go
+but please first check if there are any other users (despite this
+driver)
 
->  
->  	if (common->usage_count != 1)
->  		return 0;
-> @@ -817,11 +813,12 @@ static int am65_cpsw_nuss_common_stop(struct am65_cpsw_common *common)
->  			dev_err(common->dev, "rx teardown timeout\n");
->  	}
->  
-> -	for (i = 0; i < common->rx_ch_num_flows; i++) {
-> +	for (i = common->rx_ch_num_flows - 1; i >= 0; i--) {
-> +		flow = &rx_chn->flows[i];
->  		napi_disable(&rx_chn->flows[i].napi_rx);
->  		hrtimer_cancel(&rx_chn->flows[i].rx_hrtimer);
-> -		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, &rx_chn->flows[i],
-> -					  am65_cpsw_nuss_rx_cleanup, 0);
-> +		k3_udma_glue_reset_rx_chn(rx_chn->rx_chn, i, rx_chn,
-> +					  am65_cpsw_nuss_rx_cleanup, !!i);
->  	}
->  
->  	k3_udma_glue_disable_rx_chn(rx_chn->rx_chn);
-> @@ -1028,7 +1025,7 @@ static int am65_cpsw_xdp_tx_frame(struct net_device *ndev,
->  static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
->  			     struct am65_cpsw_port *port,
->  			     struct xdp_buff *xdp,
-> -			     int desc_idx, int cpu, int *len)
-> +			     int cpu, int *len)
->  {
->  	struct am65_cpsw_common *common = flow->common;
->  	struct am65_cpsw_ndev_priv *ndev_priv;
-> @@ -1101,7 +1098,7 @@ static int am65_cpsw_run_xdp(struct am65_cpsw_rx_flow *flow,
->  	}
->  
->  	page = virt_to_head_page(xdp->data);
-> -	am65_cpsw_put_page(flow, page, true, desc_idx);
-> +	am65_cpsw_put_page(flow, page, true);
->  
->  out:
->  	return ret;
-> @@ -1150,6 +1147,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  	struct am65_cpsw_ndev_stats *stats;
->  	struct cppi5_host_desc_t *desc_rx;
->  	struct device *dev = common->dev;
-> +	struct am65_cpsw_swdata *swdata;
->  	struct page *page, *new_page;
->  	dma_addr_t desc_dma, buf_dma;
->  	struct am65_cpsw_port *port;
-> @@ -1159,7 +1157,6 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  	struct sk_buff *skb;
->  	struct xdp_buff	xdp;
->  	void *page_addr;
-> -	void **swdata;
->  	u32 *psdata;
->  
->  	*xdp_state = AM65_CPSW_XDP_PASS;
-> @@ -1182,8 +1179,8 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  		__func__, flow_idx, &desc_dma);
->  
->  	swdata = cppi5_hdesc_get_swdata(desc_rx);
-> -	page_addr = *swdata;
-> -	page = virt_to_page(page_addr);
-> +	page = swdata->page;
-> +	page_addr = page_address(page);
->  	cppi5_hdesc_get_obuf(desc_rx, &buf_dma, &buf_dma_len);
->  	k3_udma_glue_rx_cppi5_to_dma_addr(rx_chn->rx_chn, &buf_dma);
->  	pkt_len = cppi5_hdesc_get_pktlen(desc_rx);
-> @@ -1201,7 +1198,6 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  
->  	desc_idx = am65_cpsw_nuss_desc_idx(rx_chn->desc_pool, desc_rx,
->  					   rx_chn->dsize_log2);
-
-This is no longer required so need to drop it.
-Will send a v2.
-
-> -
->  	skb = am65_cpsw_build_skb(page_addr, ndev,
->  				  AM65_CPSW_MAX_PACKET_SIZE);
->  	if (unlikely(!skb)) {
-> @@ -1213,7 +1209,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  		xdp_init_buff(&xdp, PAGE_SIZE, &port->xdp_rxq[flow->id]);
->  		xdp_prepare_buff(&xdp, page_addr, AM65_CPSW_HEADROOM,
->  				 pkt_len, false);
-> -		*xdp_state = am65_cpsw_run_xdp(flow, port, &xdp, desc_idx,
-> +		*xdp_state = am65_cpsw_run_xdp(flow, port, &xdp,
->  					       cpu, &pkt_len);
->  		if (*xdp_state != AM65_CPSW_XDP_PASS)
->  			goto allocate;
-> @@ -1247,10 +1243,8 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  		return -ENOMEM;
->  	}
->  
-> -	flow->pages[desc_idx] = new_page;
-> -
->  	if (netif_dormant(ndev)) {
-> -		am65_cpsw_put_page(flow, new_page, true, desc_idx);
-> +		am65_cpsw_put_page(flow, new_page, true);
->  		ndev->stats.rx_dropped++;
->  		return 0;
->  	}
-> @@ -1258,7 +1252,7 @@ static int am65_cpsw_nuss_rx_packets(struct am65_cpsw_rx_flow *flow,
->  requeue:
->  	ret = am65_cpsw_nuss_rx_push(common, new_page, flow_idx);
->  	if (WARN_ON(ret < 0)) {
-> -		am65_cpsw_put_page(flow, new_page, true, desc_idx);
-> +		am65_cpsw_put_page(flow, new_page, true);
->  		ndev->stats.rx_errors++;
->  		ndev->stats.rx_dropped++;
->  	}
-> @@ -2402,10 +2396,6 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
->  	for (i = 0; i < common->rx_ch_num_flows; i++) {
->  		flow = &rx_chn->flows[i];
->  		flow->page_pool = NULL;
-> -		flow->pages = devm_kcalloc(dev, AM65_CPSW_MAX_RX_DESC,
-> -					   sizeof(*flow->pages), GFP_KERNEL);
-> -		if (!flow->pages)
-> -			return -ENOMEM;
->  	}
->  
->  	rx_chn->rx_chn = k3_udma_glue_request_rx_chn(dev, "rx", &rx_cfg);
-> @@ -2455,10 +2445,12 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
->  		flow = &rx_chn->flows[i];
->  		flow->id = i;
->  		flow->common = common;
-> +		flow->irq = -EINVAL;
->  
->  		rx_flow_cfg.ring_rxfdq0_id = fdqring_id;
->  		rx_flow_cfg.rx_cfg.size = max_desc_num;
-> -		rx_flow_cfg.rxfdq_cfg.size = max_desc_num;
-> +		/* share same FDQ for all flows */
-> +		rx_flow_cfg.rxfdq_cfg.size = max_desc_num * rx_cfg.flow_id_num;
->  		rx_flow_cfg.rxfdq_cfg.mode = common->pdata.fdqring_mode;
->  
->  		ret = k3_udma_glue_rx_flow_init(rx_chn->rx_chn,
-> @@ -2496,6 +2488,7 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
->  		if (ret) {
->  			dev_err(dev, "failure requesting rx %d irq %u, %d\n",
->  				i, flow->irq, ret);
-> +			flow->irq = -EINVAL;
->  			goto err;
->  		}
->  	}
-> @@ -3349,8 +3342,8 @@ static int am65_cpsw_nuss_register_ndevs(struct am65_cpsw_common *common)
->  
->  	for (i = 0; i < common->rx_ch_num_flows; i++)
->  		k3_udma_glue_reset_rx_chn(rx_chan->rx_chn, i,
-> -					  &rx_chan->flows[i],
-> -					  am65_cpsw_nuss_rx_cleanup, 0);
-> +					  rx_chan,
-> +					  am65_cpsw_nuss_rx_cleanup, !!i);
->  
->  	k3_udma_glue_disable_rx_chn(rx_chan->rx_chn);
->  
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.h b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-> index dc8d544230dc..92a27ba4c601 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.h
-> @@ -101,10 +101,14 @@ struct am65_cpsw_rx_flow {
->  	struct hrtimer rx_hrtimer;
->  	unsigned long rx_pace_timeout;
->  	struct page_pool *page_pool;
-> -	struct page **pages;
->  	char name[32];
->  };
->  
-> +struct am65_cpsw_swdata {
-> +	u32 flow_id;
-> +	struct page *page;
-> +};
-> +
->  struct am65_cpsw_rx_chn {
->  	struct device *dev;
->  	struct device *dma_dev;
 > 
-> ---
-> base-commit: 42f7652d3eb527d03665b09edac47f85fb600924
-> change-id: 20241023-am65-cpsw-multi-rx-j7-fix-f9a2149be6dd
 > 
-> Best regards,
+>>> @@ -471,7 +471,7 @@ static int ice_cfg_cgu_pll_e82x(struct ice_hw *hw,
+>>>       /* Log the current clock configuration */
+>>>       ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, 
+>>> clk_src %s, clk_freq %s, PLL %s\n",
+>>> -          dw24.ts_pll_enable ? "enabled" : "disabled",
+>>> +          str_enabled_disabled(dw24.ts_pll_enable),
+>>>             ice_clk_src_str(dw24.time_ref_sel),
+>>>             ice_clk_freq_str(dw9.time_ref_freq_sel),
+>>>             bwm_lf.plllock_true_lock_cri ? "locked" : "unlocked");
+>>> @@ -548,7 +548,7 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
+>>>       /* Log the current clock configuration */
+>>>       ice_debug(hw, ICE_DBG_PTP, "Current CGU configuration -- %s, 
+>>> clk_src %s, clk_freq %s, PLL %s\n",
+>>> -          dw24.ts_pll_enable ? "enabled" : "disabled",
+>>> +          str_enabled_disabled(dw24.ts_pll_enable),
+>>>             ice_clk_src_str(dw23.time_ref_sel),
+>>>             ice_clk_freq_str(dw9.time_ref_freq_sel),
+>>>             ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
+>>> @@ -653,7 +653,7 @@ static int ice_cfg_cgu_pll_e825c(struct ice_hw *hw,
+>>>       /* Log the current clock configuration */
+>>>       ice_debug(hw, ICE_DBG_PTP, "New CGU configuration -- %s, 
+>>> clk_src %s, clk_freq %s, PLL %s\n",
+>>> -          dw24.ts_pll_enable ? "enabled" : "disabled",
+>>> +          str_enabled_disabled(dw24.ts_pll_enable),
+>>>             ice_clk_src_str(dw23.time_ref_sel),
+>>>             ice_clk_freq_str(dw9.time_ref_freq_sel),
+>>>             ro_lock.plllock_true_lock_cri ? "locked" : "unlocked");
+>>
+> 
 
--- 
-cheers,
--roger
 
