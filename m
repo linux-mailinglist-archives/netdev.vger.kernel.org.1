@@ -1,85 +1,96 @@
-Return-Path: <netdev+bounces-140197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF5329B5820
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:01:36 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A2669B582E
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:03:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 72F921F23FFB
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:01:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4EC61F24005
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:03:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CC8433EC;
-	Wed, 30 Oct 2024 00:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7DAA41;
+	Wed, 30 Oct 2024 00:03:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n85xl9cf"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqQ+w6qX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1643F634;
-	Wed, 30 Oct 2024 00:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3E818D;
+	Wed, 30 Oct 2024 00:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730246491; cv=none; b=qpt/gOj1QvDiD1XueBu/MjUy7qIPJLJyfwjEa5zpkbMiZh7gEOZuw8SFxti2hxVs6uZn70B4pZRisSjsEatnKiqXH/iLiXeO80zy/mZ6+SsI1rCb1mXxpPJKlZX4XFatZ9rlVMt3RXlwaqAa9iH7FzmfUq+VtbY0AF4xbH5OnwQ=
+	t=1730246624; cv=none; b=MV2DnmYrvJvllyK02Su6nQJC0eE5kI3dlGZj5EhVBj8S4c8xka3cavsuhqQCxcoy03jlnOCoBjSIOl/ye4yu9vnBOWzsJxPtc237K2S0DPYjIhd2/Hd2pqvX5pf9bMzhJzFWKbw2IYLuaCaexjc8wBQZurq0T93gUX3hIJfo6P4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730246491; c=relaxed/simple;
-	bh=pR/4O/1pECAg3LGqjUvKrdm+to6brxG6OvUk2kUoGRM=;
+	s=arc-20240116; t=1730246624; c=relaxed/simple;
+	bh=KQN+E3h8B8ti/s3m3iYCrSOSbJumnP+mk8IP7VZgfEY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=IIyQS/uI1rbZgjac1OdrGa4fL9e0dnVPZsMpyqwVN+M7otQPZvfD8mtRHDHDZUQGnSmGDWENlNV04lwpZ90hP5VuSchChyJLXpUhLklYjhazvJr2rSX4oTDznHUQRkQWD/2A2dK7Y1OOMkBa5DzcZv6j0p9pNCW6Ur6OlI2ot+4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n85xl9cf; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 368C9C4CEE3;
-	Wed, 30 Oct 2024 00:01:30 +0000 (UTC)
+	 MIME-Version:Content-Type; b=C91GHWWjeS5l2GVDjEelfKTzVupRuBNS2GflXSfgp7xCIi+1/UGLlmZiH9rYMEzc4GYtfc3qdCH9A3FrlB0+TP943h7Q8Iug9jdlDQ+ZCFhXiM/VDzkGZACpuuDrqN0kEpYWVAs8gIvooP2h1vMybB7thbTkmngl0174jDtrLBc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqQ+w6qX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9811FC4CEE3;
+	Wed, 30 Oct 2024 00:03:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730246490;
-	bh=pR/4O/1pECAg3LGqjUvKrdm+to6brxG6OvUk2kUoGRM=;
+	s=k20201202; t=1730246623;
+	bh=KQN+E3h8B8ti/s3m3iYCrSOSbJumnP+mk8IP7VZgfEY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=n85xl9cfn594k2jUdlnLqJ8nLRKgjn508jk4C0zorfv0982CMKZssdRhIiLz8xI9a
-	 t6xqrKeEwx+a6sl7r/l9dK3RoYLB+rF11Sr6LkDEnwDoQsau5eF5tFR0TMkBC3cyvm
-	 X1BL6J0GFnvbIXnSWDLNRON7qkDB718opLt75HZaVQPVAi898PEQNSbLZK1KWlP1bp
-	 PslQh87VFfX8DghwZ/tnX7rT/8w7AigKgrYI7VN7uvSvHxP1bro9nTnq+rm+VDeZjQ
-	 WRfHc2mteuoLnPT+UKB/+coyx4+JPmmLv5Tqhd0/N3dPPiM0DR01P0finB6zDFf6lO
-	 35ZOqorHYqR8A==
-Date: Tue, 29 Oct 2024 17:01:29 -0700
+	b=GqQ+w6qXYRf02FQF1dsVA8PKReddoiT0tQsJBvQ2EP9QnwUy0NUuKaQ9cHDazAdhs
+	 3XZOD/s+W+4vXjWd3GHabJ6y2xAK35t4TZWF8KnRA0nuZxIPNo/c/RSWq6SkioJOma
+	 2VzW3YmalG6Bx9w9E56+WHr2Cn3dvMlQ3YOR5lXHTFndGGbbqQdr/MYDJEtkFbTv0r
+	 jlTtNthnehDCc15RScCOp2XYi84iORTmqoCYufUPjsOWWjhHt9noM+Hg/BEBMBzka1
+	 YNWZGtgfqzzls8giOYktNg7E3nogFkKWAPXAjXymCS5r70FnO3mDQ2yuhpxm85/wRE
+	 KG45xTvEArHJw==
+Date: Tue, 29 Oct 2024 17:03:41 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org,
- almasrymina@google.com, willemb@google.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v5 03/12] selftests: ncdevmem: Unify error
- handling
-Message-ID: <20241029170129.75e29323@kernel.org>
-In-Reply-To: <20241023154402.441510-4-sdf@fomichev.me>
-References: <20241023154402.441510-1-sdf@fomichev.me>
-	<20241023154402.441510-4-sdf@fomichev.me>
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
+ dsahern@kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
+ roopa@nvidia.com, razor@blackwall.org, gnault@redhat.com,
+ bigeasy@linutronix.de, idosch@nvidia.com, ast@kernel.org,
+ dongml2@chinatelecom.cn, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next v4 0/9] net: ip: add drop reasons to input
+ route
+Message-ID: <20241029170341.1b351225@kernel.org>
+In-Reply-To: <20241024093348.353245-1-dongml2@chinatelecom.cn>
+References: <20241024093348.353245-1-dongml2@chinatelecom.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, 23 Oct 2024 08:43:53 -0700 Stanislav Fomichev wrote:
->  	ret =3D inet_pton(server_sin.sin_family, server_ip, &server_sin.sin_add=
-r);
-> -	if (socket < 0)
-> -		error(79, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
-> +	if (ret < 0)
-> +		error(1, pton, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+On Thu, 24 Oct 2024 17:33:39 +0800 Menglong Dong wrote:
+> In this series, we mainly add some skb drop reasons to the input path of
+> ip routing, and we make the following functions return drop reasons:
+> 
+>   fib_validate_source()
+>   ip_route_input_mc()
+>   ip_mc_validate_source()
+>   ip_route_input_slow()
+>   ip_route_input_rcu()
+>   ip_route_input_noref()
+>   ip_route_input()
+>   ip_mkroute_input()
+>   __mkroute_input()
+>   ip_route_use_hint()
+> 
+> And following new skb drop reasons are added:
+> 
+>   SKB_DROP_REASON_IP_LOCAL_SOURCE
+>   SKB_DROP_REASON_IP_INVALID_SOURCE
+>   SKB_DROP_REASON_IP_LOCALNET
+>   SKB_DROP_REASON_IP_INVALID_DEST
 
-Looks like sched_ext broke our build_tools check, I think I pushed a
-fix, but I also see here:
-
-ncdevmem.c: In function =E2=80=98do_server=E2=80=99:
-ncdevmem.c:343:26: error: =E2=80=98pton=E2=80=99 undeclared (first use in t=
-his function)
-  343 |                 error(1, pton, "%s: [FAIL, create socket]\n", TEST_=
-PREFIX);
-      |                          ^~~~
---=20
+We're "a bit" behind on patches after my vacation, so no real review
+here, but please repost with net-next in the subject. The test
+automation trusts the tree designation and bpf-next is no longer
+based on net-next. So this doesn't apply.
+-- 
 pw-bot: cr
 
