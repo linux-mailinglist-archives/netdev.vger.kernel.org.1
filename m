@@ -1,129 +1,124 @@
-Return-Path: <netdev+bounces-140516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C6CC9B6AF3
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:24:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 242139B6B06
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:31:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC80C1C23AF1
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:24:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C49BD1F21C7B
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592002144CA;
-	Wed, 30 Oct 2024 17:22:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8BC51BD9FE;
+	Wed, 30 Oct 2024 17:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="CN4x54XE"
 X-Original-To: netdev@vger.kernel.org
-Received: from james.theweblords.de (james.theweblords.de [217.11.55.87])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D7E51BD9EC
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 17:22:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.11.55.87
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1D531BD9E2;
+	Wed, 30 Oct 2024 17:31:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730308955; cv=none; b=UYVgi6+Qy2d/x0YvFV9kKu4VEJjr4Av86NY51r+9geYBD7ordhCrwd+yZxMZDT4kJ6CEy/KJKyyy95N9EdHB7YaRkyePuQ9cdcINx8BEU+uzHGmMXm1rF2a0VXOiWtP4woJH6Fqt1CGPxJBtB5CeX2NPTp5k22xIjyECp+Y8tHc=
+	t=1730309501; cv=none; b=qLKMjV4zowEjNl7yJkR1GvBJAZKdyhcHqYbIyBHZVX9SDCj61txIFLYz93x22CWWA3gYERq+gtp1kVCRsybJAiijnwJejOFuZEEpc5KNs2YD9m7+bWPCdRFbKYo3D8e8ch7DxWS7JpEdZBhhvNB5/BHF5XA8+IoT9p19EAZovx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730308955; c=relaxed/simple;
-	bh=WjvKj5wJzVXdeSW3KnKtyT6pe/JpIpkgKoJ3bYtIpGk=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hocwzhJbv0krShKfwAH3taNy1LD9S78+rTH3wA1CcTobY91fiI2s5sQv+z1YBtM7d1AvgA8Yj2wyanaXTWQ75RRmkDSt/NQXNkcLEbS7dhL/4L83otoXq0iBNtfJEHQiELHgNWXrS2QpT+EoGSmB9h7XOUbY8fkVA6awIG4tkM8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=friiks.de; spf=pass smtp.mailfrom=friiks.de; arc=none smtp.client-ip=217.11.55.87
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=friiks.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=friiks.de
-Received: (qmail 21095 invoked by uid 210); 30 Oct 2024 17:22:29 -0000
-X-Qmail-Scanner-Diagnostics: from 129.233.181.227 (petronios@theweblords.de@129.233.181.227) by james (envelope-from <pegro@friiks.de>, uid 201) with qmail-scanner-2.10st 
- (mhr: 1.0. spamassassin: 4.0.0. perlscan: 2.10st.  
- Clear:RC:1(129.233.181.227):. 
- Processed in 0.019699 secs); 30 Oct 2024 17:22:29 -0000
-Received: from unknown (HELO james.theweblords.de) (petronios@theweblords.de@129.233.181.227)
-  by james.theweblords.de with ESMTPA; 30 Oct 2024 17:22:29 -0000
-From: pegro@friiks.de
-To: intel-wired-lan@lists.osuosl.org,
-	Paul Menzel <pmenzel@molgen.mpg.de>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: netdev@vger.kernel.org,
-	=?UTF-8?q?Peter=20Gro=C3=9Fe?= <pegro@friiks.de>
-Subject: [PATCH iwl-net v2] i40e: Fix handling changed priv flags
-Date: Wed, 30 Oct 2024 18:22:24 +0100
-Message-Id: <20241030172224.30548-1-pegro@friiks.de>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <cf6dd743-759e-4db9-8811-fd1520262412@molgen.mpg.de>
-References: <cf6dd743-759e-4db9-8811-fd1520262412@molgen.mpg.de>
+	s=arc-20240116; t=1730309501; c=relaxed/simple;
+	bh=XW7RJZx1sP9q6TXqI9l2Urrnb4a67wAySZqs1jvelWk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=DeCDjbzL7ir3KQ0GM3ylMwCxR+uvHP5Bmotqsk695PaVGHcuX9KBfLru9jt8nOiIo5kgx9npMxvq75+NijgIeqoAZi0JeSJS442haMn2VXjFR4KMX+tZcfpg2FWk2eLzdrfXz2OOlHXMgywvTqFUGzHQkC+EWkILWEbztyFfWK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=CN4x54XE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D30EBC4CECE;
+	Wed, 30 Oct 2024 17:31:36 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730309501;
+	bh=XW7RJZx1sP9q6TXqI9l2Urrnb4a67wAySZqs1jvelWk=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CN4x54XEb9tbYCE19JNWOq0DiqvRyu6hQIAYVkeC1tzgVAJiq6JeFYnKJwXCc6SSG
+	 asTz+gd8+lhB9iFZ0KUUk6umD+UPDl8gFeAjS9E3bSBntnL1M0NFnRr9zrVl5q0W2j
+	 9+2vuFGyLA1vliTh9GPNB2sYiHUhbiN/x9xCCsV1ceARqIrCJ54k1Xa+3Rf2pqwsY8
+	 xh1PFT7qqOhGTHMiVEEH8UX2Ae7uGpj5ICMaTvMn8f07j4LzSJdq7gP75K3c3BO9Uw
+	 EMYSy6WPf/C+Oxn/AydzaqrkuXFWZN+LattnDI9NWmFAQRn6Ntox7NIErn93kgaUB5
+	 hc6hclgSHdNQw==
+Date: Wed, 30 Oct 2024 17:31:34 +0000
+From: Mark Brown <broonie@kernel.org>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v2 11/18] regulator: Add support for power
+ budget description
+Message-ID: <8c5df9b8-2ee9-4baa-a7f3-1d7f633cc908@sirena.org.uk>
+References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
+ <20241030-feature_poe_port_prio-v2-11-9559622ee47a@bootlin.com>
+ <578d2348-9a17-410e-b7c8-772c0d82c10f@sirena.org.uk>
+ <20241030182211.748c216e@kmaincent-XPS-13-7390>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="el+qXin1X1ZKUea9"
+Content-Disposition: inline
+In-Reply-To: <20241030182211.748c216e@kmaincent-XPS-13-7390>
+X-Cookie: I feel partially hydrogenated!
 
-From: Peter Große <pegro@friiks.de>
 
-After assembling the new private flags on a PF, the operation to determine
-the changed flags uses the wrong bitmaps. Instead of xor-ing orig_flags
-with new_flags, it uses the still unchanged pf->flags, thus changed_flags
-is always 0.
+--el+qXin1X1ZKUea9
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Fix it by using the correct bitmaps.
+On Wed, Oct 30, 2024 at 06:22:11PM +0100, Kory Maincent wrote:
+> Mark Brown <broonie@kernel.org> wrote:
+> > On Wed, Oct 30, 2024 at 05:53:13PM +0100, Kory Maincent wrote:
 
-The issue was discovered while debugging why disabling source pruning
-stopped working with release 6.7. Although the new flags will be copied to
-pf->flags later on in that function, disabling source pruning requires
-a reset of the PF, which was skipped due to this bug.
+> > > +int regulator_get_power_budget(struct regulator *regulator)
+> > > +{
+> > > +	return regulator->rdev->constraints->pw_budget;
+> > > +} =20
 
-Disabling source pruning:
-$ sudo ethtool --set-priv-flags eno1 disable-source-pruning on
-$ sudo ethtool --show-priv-flags eno1
-Private flags for eno1:
-MFP                   : off
-total-port-shutdown   : off
-LinkPolling           : off
-flow-director-atr     : on
-veb-stats             : off
-hw-atr-eviction       : off
-link-down-on-close    : off
-legacy-rx             : off
-disable-source-pruning: on
-disable-fw-lldp       : off
-rs-fec                : off
-base-r-fec            : off
-vf-vlan-pruning       : off
+> > This is going to go badly with multiple consumers...
 
-Regarding reproducing:
+> On my series the available power budget of the PIs (which are consumers) =
+is
+> managed in the PSE core in the PSE power domain (patch 13). We could move=
+ it
+> directly to regulator API.
 
-I observed the issue with a rather complicated lab setup, where
- * two VLAN interfaces are created on eno1
- * each with a different MAC address assigned
- * each moved into a separate namespace
- * both VLANs are bridged externally, so they form a single layer 2 network
+It feels like it's going to need joining up at some point.
 
-The external bridge is done via a channel emulator adding packet loss and
-delay and the application in the namespaces tries to send/receive traffic
-and measure the performance. Sender and receiver are separated by
-namespaces, yet the network card "sees its own traffic" send back to it.
-To make that work, source pruning has to be disabled.
+--el+qXin1X1ZKUea9
+Content-Type: application/pgp-signature; name="signature.asc"
 
-Fixes: 70756d0a4727 ("i40e: Use DECLARE_BITMAP for flags and hw_features fields in i40e_pf")
-Signed-off-by: Peter Große <pegro@friiks.de>
----
- drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+-----BEGIN PGP SIGNATURE-----
 
-diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-index c841779713f6..016c0ae6b36f 100644
---- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-+++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-@@ -5306,7 +5306,7 @@ static int i40e_set_priv_flags(struct net_device *dev, u32 flags)
- 	}
- 
- flags_complete:
--	bitmap_xor(changed_flags, pf->flags, orig_flags, I40E_PF_FLAGS_NBITS);
-+	bitmap_xor(changed_flags, new_flags, orig_flags, I40E_PF_FLAGS_NBITS);
- 
- 	if (test_bit(I40E_FLAG_FW_LLDP_DIS, changed_flags))
- 		reset_needed = I40E_PF_RESET_AND_REBUILD_FLAG;
--- 
-2.34.1
+iQEzBAABCgAdFiEEreZoqmdXGLWf4p/qJNaLcl1Uh9AFAmcibXUACgkQJNaLcl1U
+h9ADDgf+K4s+GOUMO5jmJWqeNUJYp+6ocvIZ7QnpOTh37qAM6qG+h8XVM9Oe8f04
+9MtmNBGEle1dyji0jjOyDoBvKALX3Yo6bjt2vAKqNJ5i/9wO1GA8M1DCbazjs9sb
+Mx0nD4PNNMUIAfgLtEJyfK7HrxW91Hp22EucF7t5mBSNlF8gYI61p2RCVSFm5BZE
+YJvSoHOG4A63f3bWwiLTRQHoX0ZO7onl1Ctucog10znV/kp9K9r7EEGPzZWeSoPg
+/Ttdjn8u36c7R/ZvGnEJg3XYYFeQ9njVbAg2YqSU6XYfduaJxfCtYv4263uGbzhi
+RjL+TbbqhPxieaiC/dLE9aVoUd/jZw==
+=rb83
+-----END PGP SIGNATURE-----
 
+--el+qXin1X1ZKUea9--
 
