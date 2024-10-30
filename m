@@ -1,126 +1,182 @@
-Return-Path: <netdev+bounces-140442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140443-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D7AAF9B67A0
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:24:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D46279B67AF
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:25:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 70883B23327
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:24:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 02B3F1C20908
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:25:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EDF921F4D3;
-	Wed, 30 Oct 2024 15:17:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0665D21746C;
+	Wed, 30 Oct 2024 15:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FrhzbvM5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f43.google.com (mail-oa1-f43.google.com [209.85.160.43])
+Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D4C121F4B1;
-	Wed, 30 Oct 2024 15:17:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFC9F21730B
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:19:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730301471; cv=none; b=mP3h2QacmaF0lBNuJ2tbrluwvjUsdo4NHnETyCnuIXUPSk6MlSZu97BRRE/U9qWjwo6NIm2fm18YUBz6ilcSSyrzcNBZfK0yUb/X6hPuwWDnWUE1FdTr5l5gsg6AqGbv2qj24l2YX6etRHU7B4lyA85ISFrHd2exYG/Z4Bp3UUs=
+	t=1730301571; cv=none; b=s0BN87pXMpD0Mj0gOWQwE2kpoZg9yQPkPv2efZ/eRN+y9EwUPa6kMLbpjjN75DOzMXg8QL7KabxMHpggq+C9nMwdhE8TRCug66BEAJzsiEsHE2fXY4WzZTthDek1l4lZW4EdIW7MW8Yp0UvC7WJ0HOJqMPsHFwBTdkgzqLXi6bE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730301471; c=relaxed/simple;
-	bh=PQIxLfHrlNXYMyFR08iVBDPyjUjt5fjiwBkeOt35M9k=;
+	s=arc-20240116; t=1730301571; c=relaxed/simple;
+	bh=lJnGuusQCAELCp7rqkmBqFsUdmlzbjlJEOwppjDChmY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=QRrE73eGSeL4zxeUfb0MpyVrIzOaDI9R9qTB+sH2kSpcOb98BfuwYm5XEK5wgUni7C23qFyLPz5f/JSh8TE5fES5J+O8b0xUaqItz8lXJJhtf6GPRWyKG8Z8BA4hykh3NyMWdw523SXRRKNpguIxMA2xPT+uzhbljYg/AWUd/ms=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.160.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f43.google.com with SMTP id 586e51a60fabf-2689e7a941fso3874993fac.3;
-        Wed, 30 Oct 2024 08:17:49 -0700 (PDT)
+	 To:Cc:Content-Type; b=MhdjYM6eDJYw3nmtb5qtlffBAJKtditsKRWWzMUuO5r70lJx+MWR9jIs4+KWQziWtHkVm6ytiYP5qjEp4+vuUeQorsmJPV3W9X+vzgJaQEgAiXmXhkS8Xs5bhO2OUcM7fRazHKy9sMtCXkktW2R3cpKnJnGG0aB6SRK8Ip98yws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FrhzbvM5; arc=none smtp.client-ip=209.85.160.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-460969c49f2so319991cf.0
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:19:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730301569; x=1730906369; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8svNofplrG2Q6V5+9hfVfJTbtmZizG7D9AXysNLGCE0=;
+        b=FrhzbvM5rX86CvZcNatYjq0eN/6N2MDAodE+TiouLaIKzw55rM2FwitrTsltFdOkzN
+         S43yhjM+f0pL8CEtddnkix8tl9MKpmnTbIa6bDq8YrfLrICONrjjdEsbvoa3Sq6DbaBg
+         NpWkWb3mx/n18ZJvjxutU2XMZJSJPi9UreHKPokG4ahYFgN1Pa6TvnIfzNZ4ro6EYChJ
+         f9vX3DdG7DhzVoZhwuF6/LSxwX+71qw72kHtwQDQqo2ygd7AaF234OhXUgQqVyJPRFh/
+         9q3VMdr0IG30oSoGlXSe5LhZRhFQNlebbl+DW/TSKRU2u6u5SDM6inIYc8b1WSI6o5i+
+         SQng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730301468; x=1730906268;
+        d=1e100.net; s=20230601; t=1730301569; x=1730906369;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=q3SORIHMVqx8TfNrC5y4XM03obScQJi2qO4kv74Sacw=;
-        b=waKVCbRFbx12LRsWri2uEjePLzrmuPVvZxZ1tTGoAkZ6nfjMWu1Dou8qXbaIiyqIkM
-         j6NUvjpUwri0mHwsLd/4TYKnbz6KPtfuuHPUfSnpNlF/VAtr+AxNPcKXbDN7tT9TW7pD
-         ssJU3jM/CHUx1Bg3NwTgYixVPXYijRYT7ZbYJVMnVh59TVqBzAka1RadowUEG0IPDWf1
-         VKBRGd0Kfcq7iBzTJf3Jc/Te1VT+z8Q1eh0RfpRd0+Dxeemz5cE9gnp9OYZ8T7Rw9ijD
-         4plD56vS3PHHx7WH9c0tgio1ta0Oo4w/teHPTV+6GTox4SqG7M4MD8ZUnTfKEw8hrQm1
-         WqLw==
-X-Forwarded-Encrypted: i=1; AJvYcCVF/0TE0IQ/oZDoMIf5VBEpV3WtdUa/CRFKB2SboVeP6bOwVtBU8d8QzRmkSpXO6q6CrlBQ5lDO9a3G@vger.kernel.org, AJvYcCXbgJj9z6HzLAFo33F6DebSc4OhbnyLWtrgRVFBgAIU14h+6+7VWIm+OnwCo/EMQ8sOsZX0rpTe@vger.kernel.org
-X-Gm-Message-State: AOJu0YzwwMJzwAmcSyq+0P6jSWceAWsrHejzApIi/5BKqDB6NMUwCFLl
-	oOIP+r9oGkL41EfUJ9b5FuuCoNPFm0VD15hJCa2/uvPqSspBQfdawWBw57wg
-X-Google-Smtp-Source: AGHT+IFihHGuVxPd3rJ+psGLmp8vPxVsDYHXx3KgPRr4Ni9bmcnX5ahkbpwMw0SPXuqlqrjLrZquSw==
-X-Received: by 2002:a05:6871:208:b0:288:851a:d562 with SMTP id 586e51a60fabf-29051adb4a9mr14443669fac.5.1730301468022;
-        Wed, 30 Oct 2024 08:17:48 -0700 (PDT)
-Received: from mail-oi1-f178.google.com (mail-oi1-f178.google.com. [209.85.167.178])
-        by smtp.gmail.com with ESMTPSA id 586e51a60fabf-290380f4bdasm3427843fac.46.2024.10.30.08.17.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 08:17:47 -0700 (PDT)
-Received: by mail-oi1-f178.google.com with SMTP id 5614622812f47-3e602994635so4143531b6e.0;
-        Wed, 30 Oct 2024 08:17:47 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCVotEpp8cdiKdg7UeDbsPNJdwfEJAbBJV/PtQqqBUUUsNJTFy5Ve1zgpgr6k+b5auHTW8K8Zx+R@vger.kernel.org, AJvYcCXswG85aKuCWbpvcF1RYVn5IiPtpI5/chCH9poLNt+VWU+bsM5EDyouiGLyTlUXZowJ6zKdtQTMISNd@vger.kernel.org
-X-Received: by 2002:a05:6808:2391:b0:3e5:f4fa:5984 with SMTP id
- 5614622812f47-3e63848f05emr14700373b6e.38.1730301467588; Wed, 30 Oct 2024
- 08:17:47 -0700 (PDT)
+        bh=8svNofplrG2Q6V5+9hfVfJTbtmZizG7D9AXysNLGCE0=;
+        b=AJ69av5hCoxy5jGjoS60O1qJsZaK5OsQ9zpPTK14idPpCFA5a4KuV5Bdqy2tafLMht
+         4z5gK4pApn3GC6xpmNo0j7pxugNdFMfC9uyXhzp+W/2NE/sIHA4M9wZODKph7RPFLqxD
+         65qQ675pdaSVWo0j3/5YDiUuLpL/2PDI0uTzTMfoBamZ+MvYgq6x7vWT3JZpyLeK7G31
+         C/DLCmqoTs5qoxWseyT5nfegX34PIMNrn3eNXxyk93yKZczltWXVXa0ye8FRCq73cY5I
+         nlvACqO8WeyCJR7+JuZPiS1gNfMGh5Ft6tPN0bQJuZuU1FdOPZG8miqNwiHjyadJ/oQ0
+         lDQg==
+X-Forwarded-Encrypted: i=1; AJvYcCXIYQTk+0irzZ2+6ammmvlkGamPTaDRUpszDuWia+uu8xn5bWUC236h/1OCnuOCf6YQDpuoc3I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSdYY/gGQ9IRFvQx5H9aYWPDJ0flsRl4caPtruAYwkPEMxgz53
+	8BnfS1gTBrdCH71hsh96B6qGLfFtOl5CkB5cFevalRuKHToeDrdSxLMdWaK1+bV6qEmtnFi+Lw0
+	hBVq6ebfphuAXjKD3aVU6q21pc55wVXYqRLIZ
+X-Gm-Gg: ASbGncuN0CdriSS1k/7W7+hDw4n0Q4bl6gj896LoAbqNSf4fArhUUrsebuhg1rxvRlD
+	mawgz2mqoWZLlhTVdg3nGkiRPBi9sKMw=
+X-Google-Smtp-Source: AGHT+IE/yEH6zX+iddMnL8L5gybyWZzy+HVsRSlydG/ggXxEumZX5LgIE3lQOa8f/K9UZie0EgbC3H5cMcOhq0THBss=
+X-Received: by 2002:ac8:776a:0:b0:461:6727:253f with SMTP id
+ d75a77b69052e-4616727292amr6108901cf.24.1730301568454; Wed, 30 Oct 2024
+ 08:19:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
- <CAOCHtYgRD_HTD1F-5+CQ3H1PK3Lbhb-ZdyqDYp3wN2wRK5vOUA@mail.gmail.com>
-In-Reply-To: <CAOCHtYgRD_HTD1F-5+CQ3H1PK3Lbhb-ZdyqDYp3wN2wRK5vOUA@mail.gmail.com>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Wed, 30 Oct 2024 16:17:35 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdXcJ=Bbm2JF_gWigWwvtPzf-g6VRYy-kd53CBd_0jt+7A@mail.gmail.com>
-Message-ID: <CAMuHMdXcJ=Bbm2JF_gWigWwvtPzf-g6VRYy-kd53CBd_0jt+7A@mail.gmail.com>
-Subject: Re: BeagleBone Black Ethernet PHY issues
-To: Robert Nelson <robertcnelson@gmail.com>
-Cc: ext Tony Lindgren <tony@atomide.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Roger Quadros <rogerq@kernel.org>, 
-	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
-	Matti Vaittinen <mazziesaccount@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
+References: <20241030142722.2901744-1-sdf@fomichev.me> <CAHS8izOBp4yXBg-nOSouD+A7gOGs9MPmdFc9_hB8=Ni0QdeZHg@mail.gmail.com>
+ <ZyJM_dVs1_ys3bFX@mini-arch>
+In-Reply-To: <ZyJM_dVs1_ys3bFX@mini-arch>
+From: Mina Almasry <almasrymina@google.com>
+Date: Wed, 30 Oct 2024 08:19:16 -0700
+Message-ID: <CAHS8izN6-5RJgKX08sgntYDVgETkBGpgoYToq8ezcy+tYHdaSA@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 00/12] selftests: ncdevmem: Add ncdevmem to ksft
+To: Stanislav Fomichev <stfomichev@gmail.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	andrew+netdev@lunn.ch, shuah@kernel.org, horms@kernel.org, willemb@google.com, 
+	petrm@nvidia.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Robert,
-
-On Wed, Oct 30, 2024 at 4:00=E2=80=AFPM Robert Nelson <robertcnelson@gmail.=
-com> wrote:
-> On Tue, Oct 29, 2024 at 12:18=E2=80=AFPM Geert Uytterhoeven
-> <geert@linux-m68k.org> wrote:
-> > During the last few months, booting kernels on BeagleBone Black
-> > sometimes fails with:
-
-> What revision of the board do you have, Bx, Cx, etc.
-
-This particular one is a C3.
-
-> Only C3 has the new PCB with the phy 'reset' gpio line.
-
-Indeed.
-
-> https://openbeagle.org/beagleboard/beaglebone-black/-/blob/master/BBB_SCH=
-.pdf?ref_type=3Dheads
+On Wed, Oct 30, 2024 at 8:13=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
+l.com> wrote:
 >
-> For pre-C3 boards, removing "C24" has fixed a large percentage of my
-> boards in my ci test farm, while it's not a perfect fix as some still
-> fail..
+> On 10/30, Mina Almasry wrote:
+> > On Wed, Oct 30, 2024 at 7:27=E2=80=AFAM Stanislav Fomichev <sdf@fomiche=
+v.me> wrote:
+> > >
+> > > The goal of the series is to simplify and make it possible to use
+> > > ncdevmem in an automated way from the ksft python wrapper.
+> > >
+> > > ncdevmem is slowly mutated into a state where it uses stdout
+> > > to print the payload and the python wrapper is added to
+> > > make sure the arrived payload matches the expected one.
+> > >
+> > > v6:
+> > > - fix compilation issue in 'Unify error handling' patch (Jakub)
+> > >
+> >
+> > Since I saw a compilation failures on a couple of iterations I
+> > cherry-picked this locally and tested compilation. I'm seeing this:
+>
+> Are you cherry picking the whole series or just this patch? It looks
+> too broken.
+>
+> > sudo CFLAGS=3D"-static" make -C ./tools/testing/selftests/drivers/net/h=
+w
+> > TARGETS=3Dncdevmem 2>&1
+> > make: Entering directory
+> > '/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/=
+drivers/net/hw'
+> >   CC       ncdevmem
+> > In file included from ncdevmem.c:63:
+> > /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/.=
+./../../tools/net/ynl/generated/ethtool-user.h:23:43:
+> > warning: =E2=80=98enum ethtool_header_flags=E2=80=99 declared inside pa=
+rameter list
+> > will not be visible outside of this definition or declaration
+> >    23 | const char *ethtool_header_flags_str(enum ethtool_header_flags =
+value);
+> >       |                                           ^~~~~~~~~~~~~~~~~~~~
+> > /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/.=
+./../../tools/net/ynl/generated/ethtool-user.h:25:41:
+> > warning: =E2=80=98enum ethtool_module_fw_flash_status=E2=80=99 declared=
+ inside
+> > parameter list will not be visible outside of this definition or
+> > declaration
+> >    25 | ethtool_module_fw_flash_status_str(enum
+> > ethtool_module_fw_flash_status value);
+> >       |                                         ^~~~~~~~~~~~~~~~~~~~~~~=
+~~~~~~~
+> > /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/.=
+./../../tools/net/ynl/generated/ethtool-user.h:6766:45:
+> > error: field =E2=80=98status=E2=80=99 has incomplete type
+> >  6766 |         enum ethtool_module_fw_flash_status status;
+> >       |                                             ^~~~~~
+>
+> This has been fixed via '#include <linux/ethtool_netlink.h>'
+>
+> > ncdevmem.c: In function =E2=80=98do_server=E2=80=99:
+> > ncdevmem.c:517:37: error: storage size of =E2=80=98token=E2=80=99 isn=
+=E2=80=99t known
+> >   517 |                 struct dmabuf_token token;
+>
+> And this, and the rest, don't make sense at all?
+>
+> I'll double check on my side.
 
-Yeah, C24 affects reset delay, too. But Rev. C3 does not have it
-mounted.  My Rev. C (no known issues) should have it, and Rev. A5C
-(the one that sometimes needs a manual reset after power-up) has only
-1=C2=B5F instead of 2.2=C2=B5F.
+Oh, whoops, I forgot to headers_install first. This works for me:
 
-Gr{oetje,eeting}s,
+=E2=9E=9C  cos-kernel git:(tcpdevmem-fixes-1) =E2=9C=97 sudo make headers_i=
+nstall &&
+sudo CFLAGS=3D"-static" make -C ./tools/testing/selftests/drivers/net/hw
+TARGETS=3Dncdevmem 2>&1
+  INSTALL ./usr/include
+make: Entering directory
+'/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/driv=
+ers/net/hw'
+make: Nothing to be done for 'all'.
+make: Leaving directory
+'/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/driv=
+ers/net/hw'
+=E2=9E=9C  cos-kernel git:(tcpdevmem-fixes-1) =E2=9C=97 find . -iname ncdev=
+mem
+./tools/testing/selftests/drivers/net/hw/ncdevmem
 
-                        Geert
+Sorry for the noise :D
 
 --=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
-
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
+Thanks,
+Mina
 
