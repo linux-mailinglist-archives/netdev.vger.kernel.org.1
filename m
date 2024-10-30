@@ -1,327 +1,182 @@
-Return-Path: <netdev+bounces-140255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 878209B5AA6
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:23:06 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52C769B5AAF
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:26:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA5381C20F20
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:23:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95DBFB23783
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:26:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669FC194151;
-	Wed, 30 Oct 2024 04:23:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5981991DF;
+	Wed, 30 Oct 2024 04:26:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QL63DoW+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWAQXd+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39704125DF;
-	Wed, 30 Oct 2024 04:23:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B8D63CB;
+	Wed, 30 Oct 2024 04:26:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730262181; cv=none; b=A0iRudURmVaJg+pM9h/rG620eHkgeumQrO+eHS5gn5z2CKiDQSXwgPn1a51OaCJkvYakLLqkwBnHjf91DF/LD9lDPHXK+Cr5CborfuoXWf4eMCaZOoTscQAxIEZDIYJo9ThYXGjmrVLUA/pPEZI5LB4w5YXmPfidOUkVaJVD4u8=
+	t=1730262392; cv=none; b=KNizlXkISM8WOb6Hcw5SKSf3V6liI/G3qbIczkXeaLvuEXMBI7zfamH033Gr17QDN0r4VxUXeQg9RwORHCsKyxvXdUHX3lRXCtyT4QHVuM1RXWr6diFsf4LznDRM+UlrjdlQETsZAYmlRS6obOXPPtu9dbVHerFDVcc8lYd7pk4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730262181; c=relaxed/simple;
-	bh=lN2d8rOTEXvuOeuMB2R0cCQfgA+IvSDQZDfiL+ST9l0=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lk+Axsn0+1JlhBnDztI6/Bk6VvVqIyHeGrAYnjk+TrkkmLBfni5elj2U3+JNWuypxIQfx1wtjSRY2zMCgLNV+PVyCYE5X+j3FGjfOqS/BQ+9v3ge/a8Rv3FElyAYdQQxRhR7DF9Qx1Was3ThtjkCYg5tGDJAi+yjXMJEeS9qP+U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QL63DoW+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPS id C78A0C4CEE4;
-	Wed, 30 Oct 2024 04:23:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730262180;
-	bh=lN2d8rOTEXvuOeuMB2R0cCQfgA+IvSDQZDfiL+ST9l0=;
-	h=From:Date:Subject:To:Cc:Reply-To:From;
-	b=QL63DoW+6MkbGHheFMZzYsQaq23qI50VP4HYq9xuriFnVUBvvrM0A2IIqwq6CZ+Pt
-	 3GfwdbjMst2302S/YoTKxvvlHD63JXuV0dMC7nfj5UdcWW7yaVZUZ3EKtEu7ieSQ12
-	 CuNuAiN7I0bNYHZccV8ujJkc2KWw9XSKPZ6kRM2Hhe1vzWidEDWf2SY41J7Jp4iE+k
-	 VdUmLMtNpY2b+o/wUey40FGY2OVsPNCw58ta1o2v/M1D46xz4Wqjovrk6nmmQXs0OR
-	 YIhPXdRDS055wVxI8GVbuv7hFJix7MbcKpfZrxgfOsrnHVPGz+lz7vfVrS/FkwlKGq
-	 aVUdm647EIs4A==
-Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FF3D7495F;
-	Wed, 30 Oct 2024 04:23:00 +0000 (UTC)
-From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
-Date: Wed, 30 Oct 2024 04:22:33 +0000
-Subject: [PATCH] net/tcp: Add missing lockdep annotations for TCP-AO hlist
- traversals
+	s=arc-20240116; t=1730262392; c=relaxed/simple;
+	bh=a+99HrebtQ2MocTLitUdf4M0wR1vKx2d51CbOgiT3bM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Bpj2/yPvmQxCZaROgIf7aUxfl1llK6MofxNf4ndUT2LoLjuvRYDzNZuJwrAn/mfFU4ZOZOaLbn91wEWkV6ktu9VaUHEseknM8nSi6g34bzn76ox2vP6oQhDnyElgJGZfebEpvdwmxazfdN8sxnOd7zj0RSFD9Iw7ru6G6jamWCM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWAQXd+l; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e59746062fso5018575a91.2;
+        Tue, 29 Oct 2024 21:26:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730262389; x=1730867189; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=PeV2eXcuovjuaiVjnDWRIrJxqo8228Qv/HbIFLO8aWQ=;
+        b=PWAQXd+liMkEVHsth9DoIfRpxr9w/v797g4Tq6AaoJZ2pQeYSjdqTf0JxvJYhKbFAw
+         /i39f94BEdnjkbxBmCBt7Xir5nefAitjJgxJILLMbDsCr/qjxn0qmO3nfniumpys9kQD
+         zyaxP8atyyviabcj+alnSLYXEyc7SO2siCNthy0BB59iwb5PIXuAcnTR4yW9y1pGWN0e
+         nzY4ZrFstHfaFGGubeEPsGI6OLw9yM8h3Wo63wclfsu6XTzm5RFEnmkLpCzl/0KqUAB0
+         RlO8TJUAAmkcyZPC87QJJO80EK7E2aMIeVUQf9JZfQZRv/RNsMMNFcyWYHAWgtX23hus
+         pK9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730262389; x=1730867189;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PeV2eXcuovjuaiVjnDWRIrJxqo8228Qv/HbIFLO8aWQ=;
+        b=sfoGveuS5qAdxagz771BCF7VHTOs974tsJgY/1G6dLvDOkEuEUqXGHsKJ9B9c6Nby8
+         4zyAV0quxzCAU8PJ8lHejDCE6UzkGtHRVywdlVVzMxccM3ndMABcEaPWrw6E9xoOf5WU
+         snUsKQyCgs8pwScTLB5YOzR54bm69Iw3Tc/FTqeNUj/vx2t7tCS4wTYi92yEqr8z0v2q
+         lXcu+daTBRynyiIhBDQoqEMI6CH4do2IRE0XgLj/8kDTdQnymiUrCuQl5VG1m4ryLWCs
+         1TSa9wS9ugc2T18wvYiZxV6ysIy5bLMv8oOzOUzju57z7Za58Xvsc2c8b89taTbDwQDL
+         RY1g==
+X-Forwarded-Encrypted: i=1; AJvYcCUTk4oW6gjAuClcUCxqBLMQyDk2nX9q/VA8C0H7BDlnej3ufvhJwe1IcQkQJoJKZ5Ej24U2PwEYEj87oNukJOg=@vger.kernel.org, AJvYcCVCG2c8xLl9+37MYTNh1RlhANh1/nLtCdCqnWuV/K6gMt3qC+khZpdrS1RvFCcoAfbxlJ+b/HR2i/wz@vger.kernel.org, AJvYcCVJ3hdVfB5nbGfcCm7bQYa3zE1biTLy7Ki7f7hawL0BGVEh1c0ATZMxWN/vEAvvN2FHn8KyXlG7Sy3t@vger.kernel.org, AJvYcCVWWhKXlhsZwU2nAKJLGS/slyzqVFLqYlrrlSF6i0/z3EhMGa5GzAyd63cGsW1uRo1hSBaFVjd6W0pl@vger.kernel.org, AJvYcCW7mq4lSek3usi7Hn1FgAyL+iYYmnQo07DeBXDDfE0fzvs+dUCtc82JgyoPItMj9qIwrgLgjSbKe8Vh@vger.kernel.org, AJvYcCWLXXicSwo5XMWDCvOs7HHBA+GziEWhh12oe5E65vNjPpHLSE5u9pC8eyv5gJFFww/uQdjVteim@vger.kernel.org, AJvYcCWfzBh2oeQ4TMAeIQioZHf2IkF72g3quJCJmAj5CV48YRVeDVn0TN/esLI7T8ueruv5c+7607sQaRAKJQ==@vger.kernel.org, AJvYcCWnn4Vp/aQwX1+1EaoijqS9CfWPwpenpwfFmzrsbrdYORQN6aUS/FTY4U14d/8eYECtM4RjN7CU2gg=@vger.kernel.org, AJvYcCX67w5TsDzrBTCKuuKE9fsqQJg1kmaDxNQvg0+w6sRQfRwEQ7pqBXyIJqA61eBimXdmOL/P57A45q6nlr0s@vger.kernel.org, AJvYcCXAMRONShIWVzqNNGl9h0arqfy776P/WcrI
+ iStli78u3VE2Yg/qlPfOwdd/NiuYt4qNt+LM3UKo+S0s13Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyL71KEcLYI1oiXFcXSRnJ0Gg+HcUwBkoAR+sg9Bxaj3JimcXxa
+	fYmONY3+0J134D5cWtatV83lXD/vH33dzVlNoIoSs/sbBXYnbfmD
+X-Google-Smtp-Source: AGHT+IEcLJIjDtbwHlrtoFSWOdzDcSzGC7W/jXCJ/1EpI78fu4G6cQ2qr0//fOch7Jrr4SIkMlnVHA==
+X-Received: by 2002:a17:90b:4b0d:b0:2da:d766:1925 with SMTP id 98e67ed59e1d1-2e8f11b9e12mr16223220a91.37.1730262389557;
+        Tue, 29 Oct 2024 21:26:29 -0700 (PDT)
+Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa9d220sm581019a91.45.2024.10.29.21.26.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 29 Oct 2024 21:26:28 -0700 (PDT)
+Sender: Guenter Roeck <groeck7@gmail.com>
+Message-ID: <fe2a7f2b-6405-4be7-90b5-0490761908db@roeck-us.net>
+Date: Tue, 29 Oct 2024 21:26:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 6/9] hwmon: Add Nuvoton NCT6694 HWMON support
+To: Ming Yu <a0282524688@gmail.com>, Jonathan Cameron <jic23@kernel.org>
+Cc: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
+ tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl,
+ andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
+ jdelvare@suse.com, lars@metafoo.de, ukleinek@kernel.org,
+ alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
+ linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
+ linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
+ linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org,
+ linux-rtc@vger.kernel.org
+References: <20241024085922.133071-1-tmyu0@nuvoton.com>
+ <20241024085922.133071-7-tmyu0@nuvoton.com>
+ <CAH-L+nPGGhgDFge0Ov4rX_7vUyLN8uu51cks80=kt38h22N7zQ@mail.gmail.com>
+ <62ea5a91-816f-4600-bfec-8f70798051db@roeck-us.net>
+ <CAOoeyxX=A5o5PhxpniPwPgMCBv1VwMstt=wXCxHiGPF59gm5wQ@mail.gmail.com>
+ <817d24e1-6fdd-4ce2-9408-eccc94134559@roeck-us.net>
+ <02f05807-77ae-4a3b-8170-93dd7520c719@roeck-us.net>
+ <CAOoeyxX2Jk+76Cedu5_ZGgeRCPmT8Yhczmx7h+K-za7r2WS=Sw@mail.gmail.com>
+ <20241028185414.65456203@jic23-huawei>
+ <CAOoeyxXJa05XxTg0JpZ6GRV7XMMa3Rct4+c5Q3cqCtW9KZzQLw@mail.gmail.com>
+Content-Language: en-US
+From: Guenter Roeck <linux@roeck-us.net>
+Autocrypt: addr=linux@roeck-us.net; keydata=
+ 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
+ mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
+In-Reply-To: <CAOoeyxXJa05XxTg0JpZ6GRV7XMMa3Rct4+c5Q3cqCtW9KZzQLw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241030-tcp-ao-hlist-lockdep-annotate-v1-1-bf641a64d7c6@gmail.com>
-X-B4-Tracking: v=1; b=H4sIAIi0IWcC/x3MQQqDMBBA0avIrDsQYzHYq5Qu4jg2Q+0kJEEK4
- t2bdvn+4h9QOAsXuHUHZN6lSNSG/tIBBa9PRlmawRp77c1gsFJCHzFsUipukV4Lt6Aaq6+Mbhz
- cNBk32pWgPVLmVT7///3RPPvCOGevFH7X+k5wnl9ate2zhQAAAA==
-X-Change-ID: 20241030-tcp-ao-hlist-lockdep-annotate-7637990762fc
-To: "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- David Ahern <dsahern@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Dmitry Safonov <0x7f454c46@gmail.com>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=ed25519-sha256; t=1730262176; l=9743;
- i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
- bh=REoYesXnOZcViXMhTpRDXKCqR3ncq7wNiulbSW1AwT0=;
- b=yMgKLLPNSxtrI65bcm6gqxYwdbKxpRuoP1KLGp/g/Pc/olGveWzUb91MuPbaoyL3oIMILIyF8
- kVcDEGJaDBJDVCSz1ecte2IbPXPv1dTM75nvm2WquSKjWB3tfkKjLQQ
-X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
- pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
-X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
- auth_id=152
-X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
-Reply-To: 0x7f454c46@gmail.com
 
-From: Dmitry Safonov <0x7f454c46@gmail.com>
+On 10/29/24 20:29, Ming Yu wrote:
+> Dear Jonathan,
+> 
+> Thanks you for your comments,
+> I tested your suggestion in both the MFD driver and the IIO driver, and
+> the iio-hwmon bridge worked well.
+> On the other hand, my requirements involve accessing thermal sensors,
+> voltage sensors and tachometers, so I should implement it in this HWMON
+> drive, right?
+> 
 
-Under CONFIG_PROVE_RCU_LIST + CONFIG_RCU_EXPERT
-hlist_for_each_entry_rcu() provides very helpful splats, which help
-to find possible issues. I missed CONFIG_RCU_EXPERT=y in my testing
-config the same as described in
-a3e4bf7f9675 ("configs/debug: make sure PROVE_RCU_LIST=y takes effect").
+Duplicate drivers for the same hardware is not acceptable.
 
-The fix itself is trivial: add the very same lockdep annotations
-as were used to dereference ao_info from the socket.
+I see that so far only pwm and fan control is implemented in the hwmon driver.
+There is no public documentation for NCT6694, so it is difficult to evaluate the
+chip's capabilities. The summary doesn't even mention fan speed readings, meaning
+pretty much everything is guesswork.
 
-Reported-by: Jakub Kicinski <kuba@kernel.org>
-Closes: https://lore.kernel.org/netdev/20241028152645.35a8be66@kernel.org/
-Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
----
- include/net/tcp_ao.h |  3 ++-
- net/ipv4/tcp_ao.c    | 42 +++++++++++++++++++++++-------------------
- net/ipv4/tcp_ipv4.c  |  3 ++-
- net/ipv6/tcp_ipv6.c  |  4 ++--
- 4 files changed, 29 insertions(+), 23 deletions(-)
+Either case, I do see that you also implemented a pwm driver which _does_
+duplicate hwmon functionality. Sorry, that is a no-go. Again, we can not have
+multiple drivers controlling the same hardware. A pwm controller implemented
+in a hwmon device is supposed to be limited to fan control. It looks like
+the pwm controller implemented in the NCT6694 is a generic pwm controller.
+It is not appropriate to have a hwmon driver for such a pwm controller.
 
-diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
-index 1d46460d0fefab10feefa318e4ba579a3aa1f1d0..df655ce6987d3730fea7a6ef0db09c2e27b34f21 100644
---- a/include/net/tcp_ao.h
-+++ b/include/net/tcp_ao.h
-@@ -183,7 +183,8 @@ int tcp_ao_hash_skb(unsigned short int family,
- 		    const u8 *tkey, int hash_offset, u32 sne);
- int tcp_parse_ao(struct sock *sk, int cmd, unsigned short int family,
- 		 sockptr_t optval, int optlen);
--struct tcp_ao_key *tcp_ao_established_key(struct tcp_ao_info *ao,
-+struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
-+					  struct tcp_ao_info *ao,
- 					  int sndid, int rcvid);
- int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
- 			     struct request_sock *req, struct sk_buff *skb,
-diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
-index db6516092daf5b180fb75482fb711f226451a647..bbb8d5f0eae7d3d8887da3fa4d68e248af9060ad 100644
---- a/net/ipv4/tcp_ao.c
-+++ b/net/ipv4/tcp_ao.c
-@@ -109,12 +109,13 @@ bool tcp_ao_ignore_icmp(const struct sock *sk, int family, int type, int code)
-  * it's known that the keys in ao_info are matching peer's
-  * family/address/VRF/etc.
-  */
--struct tcp_ao_key *tcp_ao_established_key(struct tcp_ao_info *ao,
-+struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
-+					  struct tcp_ao_info *ao,
- 					  int sndid, int rcvid)
- {
- 	struct tcp_ao_key *key;
- 
--	hlist_for_each_entry_rcu(key, &ao->head, node) {
-+	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk)) {
- 		if ((sndid >= 0 && key->sndid != sndid) ||
- 		    (rcvid >= 0 && key->rcvid != rcvid))
- 			continue;
-@@ -205,7 +206,7 @@ static struct tcp_ao_key *__tcp_ao_do_lookup(const struct sock *sk, int l3index,
- 	if (!ao)
- 		return NULL;
- 
--	hlist_for_each_entry_rcu(key, &ao->head, node) {
-+	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk)) {
- 		u8 prefixlen = min(prefix, key->prefixlen);
- 
- 		if (!tcp_ao_key_cmp(key, l3index, addr, prefixlen,
-@@ -793,7 +794,7 @@ int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
- 		if (!ao_info)
- 			return -ENOENT;
- 
--		*key = tcp_ao_established_key(ao_info, aoh->rnext_keyid, -1);
-+		*key = tcp_ao_established_key(sk, ao_info, aoh->rnext_keyid, -1);
- 		if (!*key)
- 			return -ENOENT;
- 		*traffic_key = snd_other_key(*key);
-@@ -979,7 +980,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 		 */
- 		key = READ_ONCE(info->rnext_key);
- 		if (key->rcvid != aoh->keyid) {
--			key = tcp_ao_established_key(info, -1, aoh->keyid);
-+			key = tcp_ao_established_key(sk, info, -1, aoh->keyid);
- 			if (!key)
- 				goto key_not_found;
- 		}
-@@ -1003,7 +1004,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
- 						   aoh->rnext_keyid,
- 						   tcp_ao_hdr_maclen(aoh));
- 			/* If the key is not found we do nothing. */
--			key = tcp_ao_established_key(info, aoh->rnext_keyid, -1);
-+			key = tcp_ao_established_key(sk, info, aoh->rnext_keyid, -1);
- 			if (key)
- 				/* pairs with tcp_ao_del_cmd */
- 				WRITE_ONCE(info->current_key, key);
-@@ -1163,7 +1164,7 @@ void tcp_ao_established(struct sock *sk)
- 	if (!ao)
- 		return;
- 
--	hlist_for_each_entry_rcu(key, &ao->head, node)
-+	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
- 		tcp_ao_cache_traffic_keys(sk, ao, key);
- }
- 
-@@ -1180,7 +1181,7 @@ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb)
- 	WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
- 	ao->rcv_sne = 0;
- 
--	hlist_for_each_entry_rcu(key, &ao->head, node)
-+	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
- 		tcp_ao_cache_traffic_keys(sk, ao, key);
- }
- 
-@@ -1256,14 +1257,14 @@ int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
- 	key_head = rcu_dereference(hlist_first_rcu(&new_ao->head));
- 	first_key = hlist_entry_safe(key_head, struct tcp_ao_key, node);
- 
--	key = tcp_ao_established_key(new_ao, tcp_rsk(req)->ao_keyid, -1);
-+	key = tcp_ao_established_key(req_to_sk(req), new_ao, tcp_rsk(req)->ao_keyid, -1);
- 	if (key)
- 		new_ao->current_key = key;
- 	else
- 		new_ao->current_key = first_key;
- 
- 	/* set rnext_key */
--	key = tcp_ao_established_key(new_ao, -1, tcp_rsk(req)->ao_rcv_next);
-+	key = tcp_ao_established_key(req_to_sk(req), new_ao, -1, tcp_rsk(req)->ao_rcv_next);
- 	if (key)
- 		new_ao->rnext_key = key;
- 	else
-@@ -1857,12 +1858,12 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 	 * if there's any.
- 	 */
- 	if (cmd.set_current) {
--		new_current = tcp_ao_established_key(ao_info, cmd.current_key, -1);
-+		new_current = tcp_ao_established_key(sk, ao_info, cmd.current_key, -1);
- 		if (!new_current)
- 			return -ENOENT;
- 	}
- 	if (cmd.set_rnext) {
--		new_rnext = tcp_ao_established_key(ao_info, -1, cmd.rnext);
-+		new_rnext = tcp_ao_established_key(sk, ao_info, -1, cmd.rnext);
- 		if (!new_rnext)
- 			return -ENOENT;
- 	}
-@@ -1902,7 +1903,8 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
- 	 * "It is presumed that an MKT affecting a particular
- 	 * connection cannot be destroyed during an active connection"
- 	 */
--	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
-+	hlist_for_each_entry_rcu(key, &ao_info->head, node,
-+				 lockdep_sock_is_held(sk)) {
- 		if (cmd.sndid != key->sndid ||
- 		    cmd.rcvid != key->rcvid)
- 			continue;
-@@ -2000,14 +2002,14 @@ static int tcp_ao_info_cmd(struct sock *sk, unsigned short int family,
- 	 * if there's any.
- 	 */
- 	if (cmd.set_current) {
--		new_current = tcp_ao_established_key(ao_info, cmd.current_key, -1);
-+		new_current = tcp_ao_established_key(sk, ao_info, cmd.current_key, -1);
- 		if (!new_current) {
- 			err = -ENOENT;
- 			goto out;
- 		}
- 	}
- 	if (cmd.set_rnext) {
--		new_rnext = tcp_ao_established_key(ao_info, -1, cmd.rnext);
-+		new_rnext = tcp_ao_established_key(sk, ao_info, -1, cmd.rnext);
- 		if (!new_rnext) {
- 			err = -ENOENT;
- 			goto out;
-@@ -2101,7 +2103,8 @@ int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen)
-  * The layout of the fields in the user and kernel structures is expected to
-  * be the same (including in the 32bit vs 64bit case).
-  */
--static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
-+static int tcp_ao_copy_mkts_to_user(const struct sock *sk,
-+				    struct tcp_ao_info *ao_info,
- 				    sockptr_t optval, sockptr_t optlen)
- {
- 	struct tcp_ao_getsockopt opt_in, opt_out;
-@@ -2229,7 +2232,8 @@ static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
- 	/* May change in RX, while we're dumping, pre-fetch it */
- 	current_key = READ_ONCE(ao_info->current_key);
- 
--	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
-+	hlist_for_each_entry_rcu(key, &ao_info->head, node,
-+				 lockdep_sock_is_held(sk)) {
- 		if (opt_in.get_all)
- 			goto match;
- 
-@@ -2309,7 +2313,7 @@ int tcp_ao_get_mkts(struct sock *sk, sockptr_t optval, sockptr_t optlen)
- 	if (!ao_info)
- 		return -ENOENT;
- 
--	return tcp_ao_copy_mkts_to_user(ao_info, optval, optlen);
-+	return tcp_ao_copy_mkts_to_user(sk, ao_info, optval, optlen);
- }
- 
- int tcp_ao_get_sock_info(struct sock *sk, sockptr_t optval, sockptr_t optlen)
-@@ -2396,7 +2400,7 @@ int tcp_ao_set_repair(struct sock *sk, sockptr_t optval, unsigned int optlen)
- 	WRITE_ONCE(ao->snd_sne, cmd.snd_sne);
- 	WRITE_ONCE(ao->rcv_sne, cmd.rcv_sne);
- 
--	hlist_for_each_entry_rcu(key, &ao->head, node)
-+	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
- 		tcp_ao_cache_traffic_keys(sk, ao, key);
- 
- 	return 0;
-diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
-index 9d3dd101ea713b14e13afe662baa49d21b3b716c..a38c8b1f44dbd95fcea08bd81e0ceaa70177ac8a 100644
---- a/net/ipv4/tcp_ipv4.c
-+++ b/net/ipv4/tcp_ipv4.c
-@@ -1053,7 +1053,8 @@ static void tcp_v4_timewait_ack(struct sock *sk, struct sk_buff *skb)
- 			}
- 
- 			if (aoh)
--				key.ao_key = tcp_ao_established_key(ao_info, aoh->rnext_keyid, -1);
-+				key.ao_key = tcp_ao_established_key(sk, ao_info,
-+								    aoh->rnext_keyid, -1);
- 		}
- 	}
- 	if (key.ao_key) {
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index 597920061a3a061a878bf0f7a1b03ac4898918a9..c748eeae1453342bab22f0e5cdb450b9827d2d5f 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1172,8 +1172,8 @@ static void tcp_v6_timewait_ack(struct sock *sk, struct sk_buff *skb)
- 			if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
- 				goto out;
- 			if (aoh)
--				key.ao_key = tcp_ao_established_key(ao_info,
--						aoh->rnext_keyid, -1);
-+				key.ao_key = tcp_ao_established_key(sk, ao_info,
-+								    aoh->rnext_keyid, -1);
- 		}
- 	}
- 	if (key.ao_key) {
-
----
-base-commit: 71e0ad345163c150ea15434b37036b0678d5f6f4
-change-id: 20241030-tcp-ao-hlist-lockdep-annotate-7637990762fc
-
-Best regards,
--- 
-Dmitry Safonov <0x7f454c46@gmail.com>
-
+Guenter
 
 
