@@ -1,229 +1,173 @@
-Return-Path: <netdev+bounces-140437-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140438-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537069B6700
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:07:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 37E839B6702
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:09:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8211F2169E
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:07:22 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 596DCB218BC
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DF020ADDA;
-	Wed, 30 Oct 2024 15:07:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cyKqntCY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 476DF213124;
+	Wed, 30 Oct 2024 15:08:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-yw1-f180.google.com (mail-yw1-f180.google.com [209.85.128.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516431F4737;
-	Wed, 30 Oct 2024 15:07:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDE03212F1C;
+	Wed, 30 Oct 2024 15:08:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730300822; cv=none; b=JM/oFXC2z7ib7gBEQ+LaNQ56xwKOgGg3YjhRL6N08tpwVEOtBJZliazX2wNNwDmG/+A+PGyHnVlH1wXPRvlbN9bPMZfu96GLUTEG7tOi9mwP2NvC6hPW3lJ3pt+kxRMwUsqtDBAPQLTj2QA2SNQuwhflJTNzdxOYQUc/pU3gx5g=
+	t=1730300935; cv=none; b=Xg1RI/ZfcoX/+jStD8Gc668Fgfkb7lz5KRW/nUSv4B6OTYA3+aUlc3I03a4k+yQUkzSGWkdBClx2SiX31F0WxeTgRblMpSAHVCfvyDjpvPtuWOeEvf44gRVN1mF0DZrcbL6mrN3sP4MUjPe6X6CJWVIULTltbtog/fe0oplSqf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730300822; c=relaxed/simple;
-	bh=voi/WMWGAYJexGuW4J0qxHijwgOTwDVYv2O9Z9zK46s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rWE9PizQZ6xnT9apn+gnMFU6ZE0+CP9lpWQT1cylZfzN3zUJ85iAXP7ZOFL+wjisdVBaqZCx/ZoH3aOKAKzctz5LSElMOO+KXjRAAf6nCYg1OXrD8fr3qf8TBYE33l+D+Ocjz1OumTL2Zd3cFrWZ0D35MEz76VpAyW4VLy2Oq2k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cyKqntCY; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1730300935; c=relaxed/simple;
+	bh=ejF+LhbN4p+CJJaxM5KezRpQLarvwOeSL14GAdk+D4c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qJdUO3WhBG3lAA4boLO3vkbS8mY/i/CMWKHovaNmirxw+g112zWfRfKQkSieMcS0hNvzo6gmySP+kKFHnNZik+4PBKtbqjZCM4s/9Y1HpHr3yIONJ2rgfr8lkCz1HylUvkg55WRQWUP7fGE5rFfFvh6wh6Ty8b9HyZl9zgYGNno=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e61b47c6cso5500439b3a.2;
-        Wed, 30 Oct 2024 08:07:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730300820; x=1730905620; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MB84HWvBH3NxPapEB0SefI1X/ByDzD9jXGtFhi1lXmQ=;
-        b=cyKqntCYqWa4Wuv75ghJh3/5k5omadFPBjrnJxLOjzbe05Z3dIfNDIB1Mvkcxdojma
-         3Xym7OAJwAEiV28ywilcldB6vdAqhFGcGj1j43P6HT/MI+SmaTMBmjazdkkPlZC0U1xH
-         aMj9w76fLpuEZhKQ5spEKOs3rP3daTJ0vHdSQWNm4WdFMUj/7nvfMsTr9LNOSWD068FH
-         Aw9pES6+TC1dxBJn8xkFkwDZH4CC9hwDx53mTwWIA/xl11W8ubgdf+KQSbNFs/nV5bc0
-         vtiVvSuYE0DUgxLKhXAWu6dJ029WCdmR1g0L+pYNu1dIWi05zKhqfZ5otUgMczR140y0
-         XBOQ==
+Received: by mail-yw1-f180.google.com with SMTP id 00721157ae682-6e330b7752cso7381457b3.1;
+        Wed, 30 Oct 2024 08:08:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730300820; x=1730905620;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MB84HWvBH3NxPapEB0SefI1X/ByDzD9jXGtFhi1lXmQ=;
-        b=Z+IkyylVhvvzkWlGLQPOsvzSZHGWPeth90IPoJGLsE9P8DBLnLLvkuEeEfHYy9rPKQ
-         knlo2S5msTH3/w88GzhArz8ou7ms+bqqw3OAPVq5dNbD7bJooUd9RZUqCEBxRoi8gECJ
-         PRubGiGrVhVk9g1hlw4Al9PUoudN5kDMduDckGlOvQoJRhtpxF5mTRlTQ/K0MsZOvtIk
-         nVeKHU+anxXbb9htvxmyX36m0TetKsW3fhIolbwNsOd7ORY0UCEfdAjiV1m+9iU7mOyh
-         ROxgrc3wxc6YpjuMduqhR3E5MJAJnY5kTOUs4TK5sOY4dcL2fZoJYx8jvSwKek0cOhqg
-         J59Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU/Ok/PZDmOgKfwyf2sfsNsv+pugL+D7HpAjcEsIdey7ITwiPw+sB5JYw6Xn8gwbus7dOOBHkl5DB3jiZh2wf2G@vger.kernel.org, AJvYcCWZW/1IHF7OO6/rsw8ssdaC9J1YHicvXa3x8ByaMh0JRZ5FIb1B/Fku4i2zEwFAvgTm3VlRovW05wSQnYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv2mzWKdVS6DRIcLArLHmas5JBJF3XqSl0okL7ol0RLZ10kTy9
-	I7RuccRJF7lsZAieXw1sO1t9Vx3lntNqx6+L3Mihn9bYjrK2QzQ=
-X-Google-Smtp-Source: AGHT+IHWQsFYQ+/1CjBOC2KuLnSgq+FLfdQk+eaCTU+JoZgp3d066RPg8EvTg7d1ZDBQIPuOzRDRIQ==
-X-Received: by 2002:a05:6a00:3929:b0:71e:2a0:b0d0 with SMTP id d2e1a72fcca58-72062fd4b4bmr22516404b3a.13.1730300819407;
-        Wed, 30 Oct 2024 08:06:59 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1fc16sm9393619b3a.161.2024.10.30.08.06.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 08:06:59 -0700 (PDT)
-Date: Wed, 30 Oct 2024 08:06:58 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Shuah Khan <shuah@kernel.org>, Yi Lai <yi1.lai@linux.intel.com>
-Subject: Re: [PATCH net-next v1 6/7] net: fix SO_DEVMEM_DONTNEED looping too
- long
-Message-ID: <ZyJLkn3uM1Qz6NZn@mini-arch>
-References: <20241029205524.1306364-1-almasrymina@google.com>
- <20241029205524.1306364-2-almasrymina@google.com>
- <ZyJDxK5stZ_RF71O@mini-arch>
- <CAHS8izNKbQHFAHm2Sz=bwwO_A0S_dOLNDff7GTSM=tJiJD2m0A@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1730300931; x=1730905731;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fwJLsP/X3bIPlA750OvhbizLaCKZ63BQRtUHuQ3kd0c=;
+        b=Az+XD+DaKbzOuR/cDLeubj55jfVuQDI9B6U4afvv7TLTSXAUOBUmk6UpD9SxQe0B39
+         fMkc8eUG3PZGU8++FOxtAuViPxxbrH+iZYrrGKQjieaP/utObTjrbIxIpVXQNbMDjUyz
+         gE66FJxJG/gv0ikID+BSCtodjuB+bK0VaoaRJ38+N7vOtO/db4kx4z8llIJB5AAXAdgX
+         xp3Tr26fxThxzkwLSqTpy1/gPcBAROZZU4AACX1P7gO/DVWXkJupn7ZwsLxRGBU7tu3S
+         +5Rvh7scI6M6+JQaxYSuPd7KyslGUcbV4btcath7A/z1x2DIgYZ5uL3EdnMaw+roRNmM
+         iHuA==
+X-Forwarded-Encrypted: i=1; AJvYcCWeom1GYRLN68rN4ZuztX2+2YDuHKl2e9d6MTICI3pqdlWMKJkdutDh324aSeyQBscsvUPoaccf@vger.kernel.org, AJvYcCX4lEyG3kCjA2UEuf16OPr7bMQzEdc3d34H3UguuMpZbgiB9xvC5cv5Vhb+GUULQ5WGqqFSgab9wh8f@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz0SxeR2f9H8afyxqRKwM6ov/YDE23/1Vh2FC0qq10h53hrEjvP
+	yK3jizbuBFzmP6t7uLjtjkW3Bh0r+lJEgV2Vu3ROf+w2blngROFi++iS+VtD
+X-Google-Smtp-Source: AGHT+IGvsBSR45dD3zTrEdwBfs9mL619xmrp5Sbc5ZHexoObE/H4MOU6o2j0QChUTuLHMzPKQhQCHg==
+X-Received: by 2002:a05:690c:380b:b0:6e3:7625:15f7 with SMTP id 00721157ae682-6ea3e8fb1bbmr23594627b3.10.1730300930577;
+        Wed, 30 Oct 2024 08:08:50 -0700 (PDT)
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com. [209.85.128.172])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6e9c6c193b6sm24370397b3.66.2024.10.30.08.08.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Oct 2024 08:08:50 -0700 (PDT)
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6e39bf12830so8991267b3.1;
+        Wed, 30 Oct 2024 08:08:49 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUu8PPaRyFxgl04vSEuavOP45w+IzwuyrgtXgVcWDA3D3y3HwRJesbWLgcPz9RG9hXS3rkma5GYXNl6@vger.kernel.org, AJvYcCXl2FzjvN4Tk9nsemMdoclaaGVc6A7bawPz8enhiPul1fcdBGa1mnhus+F9O8W+d8uFDECVO8nj@vger.kernel.org
+X-Received: by 2002:a05:690c:e07:b0:6db:dee9:f6fb with SMTP id
+ 00721157ae682-6ea3e8fbba7mr22563157b3.11.1730300929652; Wed, 30 Oct 2024
+ 08:08:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izNKbQHFAHm2Sz=bwwO_A0S_dOLNDff7GTSM=tJiJD2m0A@mail.gmail.com>
+References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
+ <1f927944-30aa-4298-9bd0-d9d3ace3fc78@kernel.org>
+In-Reply-To: <1f927944-30aa-4298-9bd0-d9d3ace3fc78@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Wed, 30 Oct 2024 16:08:37 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdVN_xNLTvy9u6FvK=agSAUzSHxEuyBS37sOA7jpGLwddw@mail.gmail.com>
+Message-ID: <CAMuHMdVN_xNLTvy9u6FvK=agSAUzSHxEuyBS37sOA7jpGLwddw@mail.gmail.com>
+Subject: Re: BeagleBone Black Ethernet PHY issues
+To: Roger Quadros <rogerq@kernel.org>
+Cc: ext Tony Lindgren <tony@atomide.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
+	Matti Vaittinen <mazziesaccount@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/30, Mina Almasry wrote:
-> On Wed, Oct 30, 2024 at 7:33 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+Hi Roger,
+
+On Wed, Oct 30, 2024 at 1:58=E2=80=AFPM Roger Quadros <rogerq@kernel.org> w=
+rote:
+> On 29/10/2024 19:18, Geert Uytterhoeven wrote:
+> > During the last few months, booting kernels on BeagleBone Black
+> > sometimes fails with:
 > >
-> > On 10/29, Mina Almasry wrote:
-> > > Check we're going to free a reasonable number of frags in token_count
-> > > before starting the loop, to prevent looping too long.
-> > >
-> > > Also minor code cleanups:
-> > > - Flip checks to reduce indentation.
-> > > - Use sizeof(*tokens) everywhere for consistentcy.
-> > >
-> > > Cc: Yi Lai <yi1.lai@linux.intel.com>
-> > >
-> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > >
-> > > ---
-> > >  net/core/sock.c | 46 ++++++++++++++++++++++++++++------------------
-> > >  1 file changed, 28 insertions(+), 18 deletions(-)
-> > >
-> > > diff --git a/net/core/sock.c b/net/core/sock.c
-> > > index 7f398bd07fb7..8603b8d87f2e 100644
-> > > --- a/net/core/sock.c
-> > > +++ b/net/core/sock.c
-> > > @@ -1047,11 +1047,12 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
-> > >
-> > >  #ifdef CONFIG_PAGE_POOL
-> > >
-> > > -/* This is the number of tokens that the user can SO_DEVMEM_DONTNEED in
-> > > +/* This is the number of frags that the user can SO_DEVMEM_DONTNEED in
-> > >   * 1 syscall. The limit exists to limit the amount of memory the kernel
-> > > - * allocates to copy these tokens.
-> > > + * allocates to copy these tokens, and to prevent looping over the frags for
-> > > + * too long.
-> > >   */
-> > > -#define MAX_DONTNEED_TOKENS 128
-> > > +#define MAX_DONTNEED_FRAGS 1024
-> > >
-> > >  static noinline_for_stack int
-> > >  sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
-> > > @@ -1059,43 +1060,52 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
-> > >       unsigned int num_tokens, i, j, k, netmem_num = 0;
-> > >       struct dmabuf_token *tokens;
-> > >       netmem_ref netmems[16];
-> > > +     u64 num_frags = 0;
-> > >       int ret = 0;
-> > >
-> > >       if (!sk_is_tcp(sk))
-> > >               return -EBADF;
-> > >
-> > > -     if (optlen % sizeof(struct dmabuf_token) ||
-> > > -         optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
-> > > +     if (optlen % sizeof(*tokens) ||
-> > > +         optlen > sizeof(*tokens) * MAX_DONTNEED_FRAGS)
-> > >               return -EINVAL;
-> > >
-> > > -     tokens = kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
-> > > +     num_tokens = optlen / sizeof(*tokens);
-> > > +     tokens = kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
-> > >       if (!tokens)
-> > >               return -ENOMEM;
-> > >
-> > > -     num_tokens = optlen / sizeof(struct dmabuf_token);
-> > >       if (copy_from_sockptr(tokens, optval, optlen)) {
-> > >               kvfree(tokens);
-> > >               return -EFAULT;
-> > >       }
-> > >
-> > > +     for (i = 0; i < num_tokens; i++) {
-> > > +             num_frags += tokens[i].token_count;
-> > > +             if (num_frags > MAX_DONTNEED_FRAGS) {
-> > > +                     kvfree(tokens);
-> > > +                     return -E2BIG;
-> > > +             }
-> > > +     }
-> > > +
-> > >       xa_lock_bh(&sk->sk_user_frags);
-> > >       for (i = 0; i < num_tokens; i++) {
-> > >               for (j = 0; j < tokens[i].token_count; j++) {
-> > >                       netmem_ref netmem = (__force netmem_ref)__xa_erase(
-> > >                               &sk->sk_user_frags, tokens[i].token_start + j);
-> > >
-> > > -                     if (netmem &&
-> > > -                         !WARN_ON_ONCE(!netmem_is_net_iov(netmem))) {
-> > > -                             netmems[netmem_num++] = netmem;
-> > > -                             if (netmem_num == ARRAY_SIZE(netmems)) {
-> > > -                                     xa_unlock_bh(&sk->sk_user_frags);
-> > > -                                     for (k = 0; k < netmem_num; k++)
-> > > -                                             WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-> > > -                                     netmem_num = 0;
-> > > -                                     xa_lock_bh(&sk->sk_user_frags);
-> > > -                             }
-> > > -                             ret++;
-> >
-> > [..]
-> >
-> > > +                     if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
-> > > +                             continue;
-> >
-> > Any reason we are not returning explicit error to the callers here?
-> > That probably needs some mechanism to signal which particular one failed
-> > so the users can restart?
-> 
-> Only because I can't think of a simple way to return an array of frags
-> failed to DONTNEED to the user.
+> >     +SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
+> > LAN8710/LAN8720 failed with error -5
 
-I'd expect the call to return as soon as it hits the invalid frag
-entry (plus the number of entries that it successfully refilled up to
-the invalid one). But too late I guess.
+[...]
 
-> Also, this error should be extremely rare or never hit really. I don't
-> know how we end up not finding a netmem here or the netmem is page.
-> The only way is if the user is malicious (messing with the token ids
-> passed to the kernel) or if a kernel bug is happening.
+> Just wondering if the Reset is happening correctly and it has settled
+> before PHY access.
+>
+> From arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi
+>
+> &davinci_mdio_sw {
+>         pinctrl-names =3D "default", "sleep";
+>         pinctrl-0 =3D <&davinci_mdio_default>;
+>         pinctrl-1 =3D <&davinci_mdio_sleep>;
+>
+>         ethphy0: ethernet-phy@0 {
+>                 reg =3D <0>;
+>                 /* Support GPIO reset on revision C3 boards */
+>                 reset-gpios =3D <&gpio1 8 GPIO_ACTIVE_LOW>;
+>                 reset-assert-us =3D <300>;
+>                 reset-deassert-us =3D <13000>;
+>         };
+> };
+>
+> Do we need to increase reset-deassert-us for some reason?
 
-I do hit this error with 1500 mtu, so it would've been nice to
-understand which particular token triggered that. It might be
-something buggy on the driver side, I need to investigate. (it's
-super low prio because 1500)
+Thanks for the hint!
 
-> Also, the information is useless to the user. If the user sees 'frag
-> 128 failed to free'. There is nothing really the user can do to
-> recover at runtime. Only usefulness that could come is for the user to
-> log the error. We already WARN_ON_ONCE on the error the user would not
-> be able to trigger.
+This is indeed on Rev. C3 (my other boards are Rev. A5C or C, but
+I don't test boot recent kernels on them, as they are in active use).
 
-I'm thinking from the pow of user application. It might have bugs as
-well and try to refill something that should not have been refilled.
-Having info about which particular token has failed (even just for
-the logging purposes) might have been nice.
+Multiplying reset-deassert-us by 10 gives me a booting board.
+More experiments reveal that I need a delay of 14 ms to boot
+successfully, and 15 ms to avoid the early __mdiobus_read()
+failure, too.
+
+> I couldn't find MII ready time after reset de-assert information form the
+> PHY datasheet. except the following line [1].
+> "For the first 16us after coming out of reset, the MII/RMII interface wil=
+l run at 2.5 MHz. After this time, it will
+> switch to 25 MHz if auto-negotiation is enabled"
+>
+> [1] 3.8.5 RESETS
+> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/ProductDoc=
+uments/DataSheets/LAN8710A-LAN8710Ai-Data-Sheet-DS00002164.pdf
+
+3.8.5.1 Hardware Reset
+"A Hardware reset is asserted by driving the nRST input pin low. When
+ driven, nRST should be held low for the minimum time detailed in
+ Section 5.6.3, "Power-On nRST & Configuration Strap Timing," on page
+ 60 to ensure a proper transceiver reset."
+
+5.6.3 POWER-ON NRST & CONFIGURATION STRAP TIMING
+"For proper operation, nRST must be asserted for no less than trstia."
+
+TABLE 5-8: POWER-ON NRST & CONFIGURATION STRAP TIMING VALUES
+"trstia nRST input assertion time min. 100 =C2=B5S"
+
+On Rev. C3, ETH_RESETn is controlled by an open-drain AND gate.
+It is pulled high by a 10K resistor, and has a 4.7=C2=B5F capacitor to
+ground.  That gives an RC constant of 47ms.  As you need 0.7RC to charge
+the capacitor above the threshold voltage of a CMOS input (VDD/2),
+reset-deassert-us should be at least 33ms. Considering the typical
+tolerance of 20% on capacitors, 40ms would be safer. Or perhaps
+even 50ms?
+
+If you agree, I can send a patch.
+Thanks!
+
+Gr{oetje,eeting}s,
+
+                        Geert
+
+--
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
+
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
