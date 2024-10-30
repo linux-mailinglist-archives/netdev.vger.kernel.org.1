@@ -1,118 +1,169 @@
-Return-Path: <netdev+bounces-140459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 537629B693F
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:34:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 883E09B6952
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E6168B20E54
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:34:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47E7E281D9E
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 344031E8850;
-	Wed, 30 Oct 2024 16:34:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACFFE2144CA;
+	Wed, 30 Oct 2024 16:37:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="OjbaD3If";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="IJQStmZb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from flow-a4-smtp.messagingengine.com (flow-a4-smtp.messagingengine.com [103.168.172.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8372426296
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 16:34:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F17B2144BD;
+	Wed, 30 Oct 2024 16:37:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.139
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730306085; cv=none; b=fVHIKjEBAQAcaWoham63Z2B1JWZHFAQrmzjJtun1mn7rBeCH5j5i5wOM11JXMHg820p/VYd4e3PNWAjJOqgOe8LHMTyNwlrQNOZTgvO/fj4pR5Np4dwbuLHs5yDBvuV1Tfq9MVpJdQ+Qsa3NWHWKbEWmRN001t981sLqbm1DLM8=
+	t=1730306237; cv=none; b=HKtwZiyk7yKw/WNVxrSVFkFNMMjwUq+zUdG5x8y3K86kVAAgf0iqSPfbwJqFx7ZUVZz/D6ZKiIfpLOTQ+e2S62bZvA2J0ovnBiFEdlNhyekgtWDIWlorVCMejNfb3VOKnAvWMaxcnCpUnlNDTORzbU7XMq/B1P4dRomdl/SoaK8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730306085; c=relaxed/simple;
-	bh=1wfHv4RiI1MyMZfHai6EgdLgSknD8jPBoP+FgbjXO0M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=XunxYMDtaCteVejTM6ZHhDozw7UBU5yNXHSRUqbR5kvnThyMxzupLdF6fBen6Z2iCAPyP28DmRVjQkvhl7jOTNG51IFQuvh6IeSM2ZOKXAune7PSD7MGsOQQUo4LZA4Yck0KrYbp9vl9B3c3rPfoz1joCcEYT+loEeE+qFl4Snk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id BB557600AA6A1;
-	Wed, 30 Oct 2024 17:34:13 +0100 (CET)
-Message-ID: <fa6a5bf6-5401-48d9-bda6-08d17c0bad68@molgen.mpg.de>
-Date: Wed, 30 Oct 2024 17:34:13 +0100
+	s=arc-20240116; t=1730306237; c=relaxed/simple;
+	bh=RA8564CILpYMfKHe/rxav+joREUWQdjfvWmXA5PdQ6M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V65r1WNKCwq/F13ee/hlkcKpJhKlOsW6InVN5lORBx7lCuJfEZzoZMlk33+7Bj3T6/FsWxpC55C9J17tsdFUyTnxh4vqtywU9eihN7nxOqCOWYDiv0vJQENpmpF21nYRDwIgdzoK5WfSRKLfceKmNdhIOWTRVWd7jKZRbJkiJws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=OjbaD3If; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=IJQStmZb; arc=none smtp.client-ip=103.168.172.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-11.internal (phl-compute-11.phl.internal [10.202.2.51])
+	by mailflow.phl.internal (Postfix) with ESMTP id 6655A200611;
+	Wed, 30 Oct 2024 12:37:12 -0400 (EDT)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-11.internal (MEProxy); Wed, 30 Oct 2024 12:37:12 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1730306232; x=
+	1730309832; bh=jqj8WIPklrVMybUSdAmqzyKauJQM71dsz46etmGUYyw=; b=O
+	jbaD3IfOd8+WFG7evNAYwuGoHha5H0dEdthQWO4uvh8X806k+Ob1ObTyObloT+lu
+	4G21aiDFcFBQAJitOBoHCcOydT6fl7vPQHcPlgvggW7/5XFqGGelxYgzFjdIe7Bv
+	WjbYZFaLw5Ho0/QMcOQwPr1IPij94vraF14cNnzXtwbm/pKGije5dg4ZAlFM8BZL
+	h+fXPVSZOaoncJiwVzNCCeDDVTdW9EHArqMSZ7DT63HQFLXTE054dYZfRWhIDqRS
+	C74clnlkTQOQDeSmV6piLH8jgYLkTAockONbVWggwziiE4Hj2aPZJ+Vi7DSpUTkd
+	S8xW1BV933CsFbPb6ebdw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730306232; x=1730309832; bh=jqj8WIPklrVMybUSdAmqzyKauJQM71dsz46
+	etmGUYyw=; b=IJQStmZbXCBpgB22Vmu8MQkghSjYA2ErPnadjjatE1fZDopcq8e
+	Bo/vHMWquL0huuV15Kz/oMfewtzraitK3XO/8qKOt9gX63kvb/sKGoWxZjZ1zjTE
+	nW79WUxc14ic7F/05lpNzd7azu2L2BGp8kImYh8PM87/lg4KtpTvLhfcM4nAzQV+
+	tb7QzWVoJRXI54CVGMef2TeQfz8MBDds3aBE8sb53ozFW+rk5RuP8oAZSnYCkxfB
+	pyau+KyZrWxzeWEtWj6T2IxkNMALv1kny3DuxJd/rPH97tkCbqjAMc5EleVegn46
+	1Z2GLBpRTS0lDCl9r/Mn2cpFT2oflEP+u3A==
+X-ME-Sender: <xms:t2AiZ9IXWHTtLsSEOiUVfldzThM4lJU7tmfnmw8pmZt-WMC5XFJZUw>
+    <xme:t2AiZ5LsdgihaNnwPIKEjHxF3q8-nB-PEjlJrVjEsoiP8xXrALL_MH6WSewjdSDSk
+    KqKLridOqWCMMujza8>
+X-ME-Received: <xmr:t2AiZ1s-Jh1ydDkzDTOnQjOZ-HUYay4BTb82xwlzTEzvZplyYkhmF0y5UxvT>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdekfedgledtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
+    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
+    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
+    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:t2AiZ-a6FXBUmzj4vB-Q-0QLXh_LlD9tdayaPvTVhQqipwaPx6rCCQ>
+    <xmx:t2AiZ0b8djvpui_Lm7hktwf88zUNijqGcZboewEBaScacFdaEXrPMA>
+    <xmx:t2AiZyDqvv2N1CgxniNbexpjH33ZD4lubBfV5djvhrJ7qthDB85rbA>
+    <xmx:t2AiZyYBwJjgORuTh0C_3WsWfT4rkItkc0SanqyEI_d40a1nX3CmPw>
+    <xmx:uGAiZ6NzHUyuggVl19ndkuPBAPG0HeoOv_xM3DZAmfecmpFQm7DLebBx>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 30 Oct 2024 12:37:11 -0400 (EDT)
+Date: Wed, 30 Oct 2024 17:37:07 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
+Message-ID: <ZyJgs6Vrvzji8qvS@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net] i40e: Fix handling changed priv
- flags
-To: =?UTF-8?Q?Peter_Gro=C3=9Fe?= <pegro@friiks.de>
-Cc: intel-wired-lan@lists.osuosl.org,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>, netdev@vger.kernel.org,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>
-References: <20241030160643.9950-1-pegro@friiks.de>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241030160643.9950-1-pegro@friiks.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
 
-[Cc: +Przemek who succeeded Jesse]
+2024-10-29, 11:47:19 +0100, Antonio Quartulli wrote:
+> +static void ovpn_peer_release(struct ovpn_peer *peer)
+> +{
+> +	ovpn_bind_reset(peer, NULL);
+> +
+> +	dst_cache_destroy(&peer->dst_cache);
 
-Dear Peter,
+Is it safe to destroy the cache at this time? In the same function, we
+use rcu to free the peer, but AFAICT the dst_cache will be freed
+immediately:
 
+void dst_cache_destroy(struct dst_cache *dst_cache)
+{
+[...]
+	free_percpu(dst_cache->cache);
+}
 
-Thank you very much for your patch. Some minor comments.
+(probably no real issue because ovpn_udp_send_skb gets called while we
+hold a reference to the peer?)
 
-Am 30.10.24 um 17:06 schrieb pegro@friiks.de:
-> From: Peter Große <pegro@friiks.de>
-> 
-> After assembling the new private flags on a PF, the operation to determine
-> the changed flags uses the wrong bitmaps. Instead of xor-ing orig_flags with
-> new_flags, it uses the still unchanged pf->flags, thus changed_flags is always 0.
-
-It’d be great if you reflowed for 75 characters per line.
-
-> Fix it by using the corrent bitmaps.
-
-corre*c*t
-
-> The issue was discovered while debugging why disabling source pruning
-> stopped working with release 6.7. Although the new flags will be copied to
-> pf->flags later on in that function, source pruning requires a reset of the PF,
-> which was skipped due to this bug.
-
-If you have the actual commands handy to reproduce it, that’d be great 
-to have in the commit message.
-
-> Fixes: 70756d0a4727 ("i40e: Use DECLARE_BITMAP for flags and hw_features fields in i40e_pf")
-> Signed-off-by: Peter Große <pegro@friiks.de>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> index c841779713f6..016c0ae6b36f 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> @@ -5306,7 +5306,7 @@ static int i40e_set_priv_flags(struct net_device *dev, u32 flags)
->   	}
->   
->   flags_complete:
-> -	bitmap_xor(changed_flags, pf->flags, orig_flags, I40E_PF_FLAGS_NBITS);
-> +	bitmap_xor(changed_flags, new_flags, orig_flags, I40E_PF_FLAGS_NBITS);
->   
->   	if (test_bit(I40E_FLAG_FW_LLDP_DIS, changed_flags))
->   		reset_needed = I40E_PF_RESET_AND_REBUILD_FLAG;
-
-With the style fixes above:
-
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+> +	netdev_put(peer->ovpn->dev, &peer->ovpn->dev_tracker);
+> +	kfree_rcu(peer, rcu);
+> +}
 
 
-Kind regards,
+[...]
+> +static int ovpn_peer_del_p2p(struct ovpn_peer *peer,
+> +			     enum ovpn_del_peer_reason reason)
+> +	__must_hold(&peer->ovpn->lock)
+> +{
+> +	struct ovpn_peer *tmp;
+> +
+> +	tmp = rcu_dereference_protected(peer->ovpn->peer,
+> +					lockdep_is_held(&peer->ovpn->lock));
+> +	if (tmp != peer) {
+> +		DEBUG_NET_WARN_ON_ONCE(1);
+> +		if (tmp)
+> +			ovpn_peer_put(tmp);
 
-Paul
+Does peer->ovpn->peer need to be set to NULL here as well? Or is it
+going to survive this _put?
+
+> +
+> +		return -ENOENT;
+> +	}
+> +
+> +	tmp->delete_reason = reason;
+> +	RCU_INIT_POINTER(peer->ovpn->peer, NULL);
+> +	ovpn_peer_put(tmp);
+> +
+> +	return 0;
+> +}
+
+-- 
+Sabrina
 
