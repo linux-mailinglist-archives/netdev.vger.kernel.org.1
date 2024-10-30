@@ -1,262 +1,272 @@
-Return-Path: <netdev+bounces-140312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140327-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FCE39B5EE3
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:32:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81FA09B5FB8
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:08:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B1E421F22B0D
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 09:32:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03AAB1F21BBA
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:08:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 260101E22E0;
-	Wed, 30 Oct 2024 09:32:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807B81E231C;
+	Wed, 30 Oct 2024 10:08:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="hfL46OIM"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DBB1E1A2B;
-	Wed, 30 Oct 2024 09:32:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB43194151;
+	Wed, 30 Oct 2024 10:08:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730280763; cv=none; b=Rr1jvs4q7BA3e3Wo/vSr1JAnSh5U+Kbc1edG7Hd/bASaYrjXFYSdYgYO0S4o5ciwbnxERONhgtqrYMaR1Oxtr+tUjYpSi+ezaHcSie9RxjjKg1IWSRXXayAyCZmrs0nFLRmSDk9/fgeSvUN5tjb3IUiASOWwHv0B55Ops2HdhUY=
+	t=1730282931; cv=none; b=HmOJq1NJW3IPmm+UEiCB5/VM0MnV0ffV7EQk6933aiGCyaFcdbWTJpo0bz0XIeynggn8VOXj0vP+syYpNgaBcCfvjVJIJzNufkfPr1N/mkgsrXsfPpJ+nSjNVWy2QguIU+NFawZN2Xpue43+DQWqjp3gS6THqi+uwTrZKP25mz8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730280763; c=relaxed/simple;
-	bh=Vz1zeao+5C1Aan/4lWHPC555V7hRfONpgEaV3FUEcZg=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Qwdsns8RkhioFWb/88rTGK8qel8IORo7SR2TrZSnFfZOzX9zvSG6lnXlFXf55eSyZEdHynIsHr1y9Pp1uuIB6UrtPrv/PfiQrWnfYIgitzZV4/xBA5ZpNvN51PLkW4y4qkMLOUKvOGMSnRf9yC1eYrPESBCml+V0CecNfOhIqUI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Xdhhm5r80zQsLr;
-	Wed, 30 Oct 2024 17:31:36 +0800 (CST)
-Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
-	by mail.maildlp.com (Postfix) with ESMTPS id 4D9C21400E3;
-	Wed, 30 Oct 2024 17:32:36 +0800 (CST)
-Received: from huawei.com (10.175.101.6) by kwepemg200003.china.huawei.com
- (7.202.181.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Wed, 30 Oct
- 2024 17:32:35 +0800
-From: Liu Jian <liujian56@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <trondmy@kernel.org>, <anna@kernel.org>,
-	<chuck.lever@oracle.com>, <jlayton@kernel.org>, <neilb@suse.de>,
-	<okorniev@redhat.com>, <Dai.Ngo@oracle.com>, <tom@talpey.com>,
-	<ofir.gal@volumez.com>, <geert+renesas@glider.be>, <ebiederm@xmission.com>
-CC: <netdev@vger.kernel.org>, <linux-nfs@vger.kernel.org>
-Subject: [PATCH net v2] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
-Date: Wed, 30 Oct 2024 17:49:53 +0800
-Message-ID: <20241030094953.1921574-1-liujian56@huawei.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1730282931; c=relaxed/simple;
+	bh=GJjkKtJLGg2c+fpkv6w0zC/tfBrQdQJ3rxaYasuqh38=;
+	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=FhEI6MdN1PkS1QWuP62/gwpH8D431buAGZVUjnP4mGrN0zWLS8DrI/76Pwvy1z6FHjSVHFUXE/IbmP0yKRNdNdXwocbQry2piMIuJOO6tjAYnsS2QvOeofTcbIwIHEctUVxsSg/5PsizxTWWXybVwG3/e7j7V4EPnn6gbwAWKd4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=hfL46OIM; arc=none smtp.client-ip=192.134.164.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=inria.fr; s=dc;
+  h=date:from:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=aoyqYRRkHEEL8sSP+v1UFQCenPsx/7LS5sbiYM0jCV0=;
+  b=hfL46OIM18PcKRsLAxYyS/WxSYD8Ro3TW3AC0/4WXC5MaBxvvy+xN3hB
+   XXKqxYjLwiNlpZgkf+JWhmsYWK7BgcT/4K8e7Q9O+WPv8+wVPmJnMqayd
+   2CiTPAnV5k+TOXBKKvU4T9jqFrdIeEZWEX8LNSQ8d/SXcNL9gx/rvEpSo
+   8=;
+Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
+X-IronPort-AV: E=Sophos;i="6.11,244,1725314400"; 
+   d="scan'208";a="191419412"
+Received: from 089-101-193071.ntlworld.ie (HELO hadrien) ([89.101.193.71])
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 11:08:44 +0100
+Date: Wed, 30 Oct 2024 10:08:43 +0000 (GMT)
+From: Julia Lawall <julia.lawall@inria.fr>
+To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+cc: R Sundar <prosunofficial@gmail.com>, 
+    Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org, 
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+    karol.kolacinski@intel.com, arkadiusz.kubalewski@intel.com, 
+    jacob.e.keller@intel.com, kernel test robot <lkp@intel.com>, 
+    Julia Lawall <julia.lawall@inria.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+    davem@davemloft.net, Eric Dumazet <edumazet@google.com>, 
+    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+    Richard Cochran <richardcochran@gmail.com>
+Subject: Re: [PATCH linux-next] ice: use string choice helpers
+In-Reply-To: <ca4f7990-16c4-42ef-b0ae-12e64a100f5e@intel.com>
+Message-ID: <498a3d58-55e0-4349-bd92-8ce16c6016@inria.fr>
+References: <20241027141907.503946-1-prosunofficial@gmail.com> <ca4f7990-16c4-42ef-b0ae-12e64a100f5e@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemg200003.china.huawei.com (7.202.181.30)
+Content-Type: text/plain; charset=US-ASCII
 
-BUG: KASAN: slab-use-after-free in tcp_write_timer_handler+0x156/0x3e0
-Read of size 1 at addr ffff888111f322cd by task swapper/0/0
 
-CPU: 0 UID: 0 PID: 0 Comm: swapper/0 Not tainted 6.12.0-rc4-dirty #7
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1
-Call Trace:
- <IRQ>
- dump_stack_lvl+0x68/0xa0
- print_address_description.constprop.0+0x2c/0x3d0
- print_report+0xb4/0x270
- kasan_report+0xbd/0xf0
- tcp_write_timer_handler+0x156/0x3e0
- tcp_write_timer+0x66/0x170
- call_timer_fn+0xfb/0x1d0
- __run_timers+0x3f8/0x480
- run_timer_softirq+0x9b/0x100
- handle_softirqs+0x153/0x390
- __irq_exit_rcu+0x103/0x120
- irq_exit_rcu+0xe/0x20
- sysvec_apic_timer_interrupt+0x76/0x90
- </IRQ>
- <TASK>
- asm_sysvec_apic_timer_interrupt+0x1a/0x20
-RIP: 0010:default_idle+0xf/0x20
-Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90
- 90 90 90 90 f3 0f 1e fa 66 90 0f 00 2d 33 f8 25 00 fb f4 <fa> c3 cc cc cc
- cc 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
-RSP: 0018:ffffffffa2007e28 EFLAGS: 00000242
-RAX: 00000000000f3b31 RBX: 1ffffffff4400fc7 RCX: ffffffffa09c3196
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: ffffffff9f00590f
-RBP: 0000000000000000 R08: 0000000000000001 R09: ffffed102360835d
-R10: ffff88811b041aeb R11: 0000000000000001 R12: 0000000000000000
-R13: ffffffffa202d7c0 R14: 0000000000000000 R15: 00000000000147d0
- default_idle_call+0x6b/0xa0
- cpuidle_idle_call+0x1af/0x1f0
- do_idle+0xbc/0x130
- cpu_startup_entry+0x33/0x40
- rest_init+0x11f/0x210
- start_kernel+0x39a/0x420
- x86_64_start_reservations+0x18/0x30
- x86_64_start_kernel+0x97/0xa0
- common_startup_64+0x13e/0x141
- </TASK>
 
-Allocated by task 595:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- __kasan_slab_alloc+0x87/0x90
- kmem_cache_alloc_noprof+0x12b/0x3f0
- copy_net_ns+0x94/0x380
- create_new_namespaces+0x24c/0x500
- unshare_nsproxy_namespaces+0x75/0xf0
- ksys_unshare+0x24e/0x4f0
- __x64_sys_unshare+0x1f/0x30
- do_syscall_64+0x70/0x180
- entry_SYSCALL_64_after_hwframe+0x76/0x7e
+On Mon, 28 Oct 2024, Przemek Kitszel wrote:
 
-Freed by task 100:
- kasan_save_stack+0x24/0x50
- kasan_save_track+0x14/0x30
- kasan_save_free_info+0x3b/0x60
- __kasan_slab_free+0x54/0x70
- kmem_cache_free+0x156/0x5d0
- cleanup_net+0x5d3/0x670
- process_one_work+0x776/0xa90
- worker_thread+0x2e2/0x560
- kthread+0x1a8/0x1f0
- ret_from_fork+0x34/0x60
- ret_from_fork_asm+0x1a/0x30
+> On 10/27/24 15:19, R Sundar wrote:
+> > Use string choice helpers for better readability.
+> >
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Reported-by: Julia Lawall <julia.lawall@inria.fr>
+> > Closes: https://lore.kernel.org/r/202410121553.SRNFzc2M-lkp@intel.com/
+> > Signed-off-by: R Sundar <prosunofficial@gmail.com>
+> > ---
+>
+> thanks, this indeed covers all "enabled/disabled" cases, so:
+> Acked-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>
+> for future submissions for Intel Ethernet drivers please use the
+> iwl-next (or iwl-net) target trees.
+>
+> There are also other cases that we could cover ON/OFF etc
 
-Reproduction script:
+I counted the number of occurrences of various cases.  Here are the
+results for at least 5 occurrences.  I converted everything to lowercase
+and put the two strings in alphabetical order.
 
-mkdir -p /mnt/nfsshare
-mkdir -p /mnt/nfs/netns_1
-mkfs.ext4 /dev/sdb
-mount /dev/sdb /mnt/nfsshare
-systemctl restart nfs-server
-chmod 777 /mnt/nfsshare
-exportfs -i -o rw,no_root_squash *:/mnt/nfsshare
+julia
 
-ip netns add netns_1
-ip link add name veth_1_peer type veth peer veth_1
-ifconfig veth_1_peer 11.11.0.254 up
-ip link set veth_1 netns netns_1
-ip netns exec netns_1 ifconfig veth_1 11.11.0.1
-
-ip netns exec netns_1 /root/iptables -A OUTPUT -d 11.11.0.254 -p tcp \
-	--tcp-flags FIN FIN  -j DROP
-
-(note: In my environment, a DESTROY_CLIENTID operation is always sent
- immediately, breaking the nfs tcp connection.)
-ip netns exec netns_1 timeout -s 9 300 mount -t nfs -o proto=tcp,vers=4.1 \
-	11.11.0.254:/mnt/nfsshare /mnt/nfs/netns_1
-
-ip netns del netns_1
-
-The reason here is that the tcp socket in netns_1 (nfs side) has been
-shutdown and closed (done in xs_destroy), but the FIN message (with ack)
-is discarded, and the nfsd side keeps sending retransmission messages.
-As a result, when the tcp sock in netns_1 processes the received message,
-it sends the message (FIN message) in the sending queue, and the tcp timer
-is re-established. When the network namespace is deleted, the net structure
-accessed by tcp's timer handler function causes problems.
-
-To fix this problem:
-Add the sock_create_kern_getnet() helper function, add the get_net()
- operation for the kernel socket.
-
-Fixes: 26abe14379f8 ("net: Modify sk_alloc to not reference count the netns of kernel sockets.")
-Signed-off-by: Liu Jian <liujian56@huawei.com>
----
-v1: https://lore.kernel.org/all/20241024015543.568476-1-liujian56@huawei.com/
-v1->v2: change to get netns reference count.
- include/linux/net.h   |  1 +
- net/socket.c          | 28 ++++++++++++++++++++++++++++
- net/sunrpc/svcsock.c  |  2 +-
- net/sunrpc/xprtsock.c |  2 +-
- 4 files changed, 31 insertions(+), 2 deletions(-)
-
-diff --git a/include/linux/net.h b/include/linux/net.h
-index b75bc534c1b3..58216da3b62c 100644
---- a/include/linux/net.h
-+++ b/include/linux/net.h
-@@ -255,6 +255,7 @@ int __sock_create(struct net *net, int family, int type, int proto,
- 		  struct socket **res, int kern);
- int sock_create(int family, int type, int proto, struct socket **res);
- int sock_create_kern(struct net *net, int family, int type, int proto, struct socket **res);
-+int sock_create_kern_getnet(struct net *net, int family, int type, int proto, struct socket **res);
- int sock_create_lite(int family, int type, int proto, struct socket **res);
- struct socket *sock_alloc(void);
- void sock_release(struct socket *sock);
-diff --git a/net/socket.c b/net/socket.c
-index 042451f01c65..e64a02445b1a 100644
---- a/net/socket.c
-+++ b/net/socket.c
-@@ -1651,6 +1651,34 @@ int sock_create_kern(struct net *net, int family, int type, int protocol, struct
- }
- EXPORT_SYMBOL(sock_create_kern);
- 
-+int sock_create_kern_getnet(struct net *net, int family, int type, int proto, struct socket **res)
-+{
-+	struct sock *sk;
-+	int ret;
-+
-+	if (!maybe_get_net(net))
-+		return -EINVAL;
-+
-+	ret = sock_create_kern(net, family, type, proto, res);
-+	if (ret < 0) {
-+		put_net(net);
-+		return ret;
-+	}
-+
-+	sk = (*res)->sk;
-+	lock_sock(sk);
-+	/* Update ns_tracker to current stack trace and refcounted tracker */
-+	__netns_tracker_free(net, &sk->ns_tracker, false);
-+
-+	sk->sk_net_refcnt = 1;
-+	netns_tracker_alloc(net, &sk->ns_tracker, GFP_KERNEL);
-+	sock_inuse_add(net, 1);
-+	release_sock(sk);
-+
-+	return ret;
-+}
-+EXPORT_SYMBOL(sock_create_kern_getnet);
-+
- static struct socket *__sys_socket_create(int family, int type, int protocol)
- {
- 	struct socket *sock;
-diff --git a/net/sunrpc/svcsock.c b/net/sunrpc/svcsock.c
-index 825ec5357691..6f272013fd9b 100644
---- a/net/sunrpc/svcsock.c
-+++ b/net/sunrpc/svcsock.c
-@@ -1526,7 +1526,7 @@ static struct svc_xprt *svc_create_socket(struct svc_serv *serv,
- 		return ERR_PTR(-EINVAL);
- 	}
- 
--	error = __sock_create(net, family, type, protocol, &sock, 1);
-+	error = sock_create_kern_getnet(net, family, type, protocol, &sock);
- 	if (error < 0)
- 		return ERR_PTR(error);
- 
-diff --git a/net/sunrpc/xprtsock.c b/net/sunrpc/xprtsock.c
-index 110749b85040..f7734ce5eec9 100644
---- a/net/sunrpc/xprtsock.c
-+++ b/net/sunrpc/xprtsock.c
-@@ -1925,7 +1925,7 @@ static struct socket *xs_create_sock(struct rpc_xprt *xprt,
- 	struct socket *sock;
- 	int err;
- 
--	err = __sock_create(xprt->xprt_net, family, type, protocol, &sock, 1);
-+	err = sock_create_kern_getnet(xprt->xprt_net, family, type, protocol, &sock);
- 	if (err < 0) {
- 		dprintk("RPC:       can't create %d transport socket (%d).\n",
- 				protocol, -err);
--- 
-2.34.1
-
+" " "\n   ": 5
+" (full)" "": 5
+" (last)" "": 5
+" csc" "": 5
+" recoverable" "": 5
+"" ".5": 5
+"" "1": 5
+"" ":" systemlow: 5
+"" "\"": 5
+"" "_backup": 5
+"" "auto-": 5
+"" "non": 5
+"" "t": 5
+"" # x " ": 5
+"->" "<-": 5
+"070701" "070702": 5
+"2.4g" "5g": 5
+"2g" dpk->bp[path][kidx].band == 1 ? "5g" : "6g": 5
+"80m" dpk->bp[path][kidx].bw == rtw89_channel_width_40 ? "40m" : "20m": 5
+"aborted" "completed": 5
+"active" "disabled": 5
+"anode" "sectors": 5
+"assert" "deassert": 5
+"attach" "detach": 5
+"basic rate" "edr rate": 5
+"bulk" "isoc": 5
+"client" "server": 5
+"closed" "open": 5
+"correctable" "uncorrectable": 5
+"dedicated" "shared": 5
+"fcp" "nvme": 5
+"fixed" "roll": 5
+"full duplex" "half duplex": 5
+"full" "high": 5
+"gsi" "smi": 5
+"hit" "not hit": 5
+"ht20" "ht40": 5
+"init" "rt": 5
+"ips off" "ips on": 5
+"lps off" "lps on": 5
+"mc" "uc": 5
+"migration" "recovery": 5
+"none" "tx": 5
+"off!!" "on!!": 5
+"pause" "resume": 5
+"rf_1t1r" "rf_2t2r": 5
+"running" "stopped": 5
+"set" "unset": 5
+"veb" "vepa": 5
+kern_emerg kern_info: 5
+" " "\n": 6
+" -- kernel too old?" "": 6
+" and " "": 6
+" flr" "": 6
+" iaa" "": 6
+" int" "": 6
+" pcd" "": 6
+" periodic" "": 6
+" x4" "": 6
+"" ")": 6
+"" "*not* ": 6
+"" ", ibss": 6
+"" ".": 6
+"" ":": 6
+"" "_flip": 6
+"" "amps, ": 6
+"" "i": 6
+"" "no": 6
+"" "pkgpwrl1, ": 6
+"" "pkgpwrl2, ": 6
+"" "prochot, ": 6
+"" "thermstatus, ": 6
+"" "vr-therm, ": 6
+"(not available)" "(success)": 6
+"1" "2": 6
+"20m" "40m": 6
+"32" "64": 6
+"???" "dma write": 6
+"active/passive" "passive only": 6
+"analog" "digital": 6
+"aura" "pool": 6
+"beacon" "probe response": 6
+"c-vlan" "vlan": 6
+"cancelled" "initiated": 6
+"capture" "playback": 6
+"cc1" "cc2": 6
+"decoder" "encoder": 6
+"downlink" "uplink": 6
+"exmode" "prmode": 6
+"found" "lost": 6
+"gdt" "ldt": 6
+"get" "set": 6
+"group" "user": 6
+"host" "peripheral": 6
+"ipv4" "ipv6": 6
+"is" "not": 6
+"kill" "on": 6
+"ns" "us": 6
+"reading" "writing": 6
+"recv" "send": 6
+" ..." "": 7
+" overflow" "": 7
+" suspend" "": 7
+"" ", nowayout": 7
+"" "...": 7
+"" "c": 7
+"" (#x " "): 7
+"" column_sep: 7
+"active" "idle": 7
+"add" "del": 7
+"add" "remove": 7
+"autodetected" "insmod option": 7
+"capture" "output": 7
+"ce" "ue": 7
+"dual" "single": 7
+"enter" "exit": 7
+"fail:" "pass:": 7
+"gate" "ungate": 7
+"intx" "msi": 7
+"private" "shared": 7
+"read error" "write error": 7
+"read from" "write to": 7
+"ro" "rw": 7
+kern_debug kern_err: 7
+" async" "": 8
+" fatal" "": 8
+" sof" "": 8
+" x16" "": 8
+"" "a": 8
+"" "b": 8
+"10" "100": 8
+"40m" "80m": 8
+"active" "passive": 8
+"bypass" "ram b": 8
+"connected" "disconnected": 8
+"dcs" "generic": 8
+"done" "failed": 8
+"dst" "src": 8
+"entering" "leaving": 8
+"failed" "ok": 8
+"failed" "pass": 8
+"fast" "slow": 8
+"hard" "soft": 8
+"invalid" "valid": 8
+"kernel" "user": 8
+"local" "remote": 8
+"primary" "secondary": 8
+"ram" "unknown": 8
+"restart" "start": 8
+"runtime" "system": 8
+" err" "": 9
+"" "-": 9
+"" "/s": 9
+"" ": ": 9
+"" "[": 9
+"" "]": 9
+"" "d": 9
+"2.4" "5.2": 9
+"absent" "present": 9
+"fail" "pass": 9
+"locked" "unlocked": 9
+"offline" "online": 9
+"r" "w": 9
+"struct" "union": 9
+"failed" "success": 53
+"" "un": 55
+"down" "up": 56
+"high" "low": 57
+"" "s": 65
+"full" "half": 84
+"" ",": 86
+"not supported" "supported": 91
+"" "not ": 96
 
