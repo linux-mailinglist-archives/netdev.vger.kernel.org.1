@@ -1,252 +1,164 @@
-Return-Path: <netdev+bounces-140430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A07519B66BC
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:00:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59FAF9B66C2
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:01:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C4D391C216B7
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:00:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CB3A282624
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:01:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 056321F4FC3;
-	Wed, 30 Oct 2024 15:00:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865D01F4712;
+	Wed, 30 Oct 2024 15:00:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="2FwYuAiT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z2GBuIhe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f171.google.com (mail-qt1-f171.google.com [209.85.160.171])
+Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB29C1F4FA3
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:00:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0F28C0B;
+	Wed, 30 Oct 2024 15:00:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730300405; cv=none; b=D/kQ4AuBHa7LmekvbGo7Mh0Jddz9ZCYfaizp7o+4Gb+/fbO0q44Ea3T0uIS8lfy/XU1TOm0qY/eyfMrScLhdRqLfF6/64hMrDjfbs87FG8vUnpqAqE+divd6UidzITZvUT3j3wEb3yFXLMnpAbIsM9ZpNgvJXxk9w9ER5VqFYfI=
+	t=1730300434; cv=none; b=AwgdCvMc5uQIHkxPQwNk9OaRsNnCWS4LWNMu9/dJxCawbb851G/ScqFOj01GAZ6vtji4bUWGlCeuk5UH0k6AwRsaKIsrH09JYJBbfv0rq9K3KSVHi9yWOwNAIQ0No25y3n1QSrSyKNm/xO0QG9HsJp1myUSyknXbeIcwEemNTms=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730300405; c=relaxed/simple;
-	bh=uoWze0AFqGEBBuJL+IHIOIyHzv7bxNM24tB4dFyRAlU=;
+	s=arc-20240116; t=1730300434; c=relaxed/simple;
+	bh=NSUsPKNIcxxIl25/ie9F75hAbipw9DFEqV26/g+9lQs=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=a6EOyZQ1SG84zYvvZaVSpSwHuUfPt8qhBpbkebyUt4vI243X6PEhGx2hrK16p0KKK8nziAKA8P7KGKRQ38p1qQinCuPrclsJMT+v+nVdwh14jxQnnQXWv1iEBosoqNow7hiS2l2sF8NychqSAuSjzYdbU+sXlsGoiTW/vhK+CiU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=2FwYuAiT; arc=none smtp.client-ip=209.85.160.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f171.google.com with SMTP id d75a77b69052e-460969c49f2so311281cf.0
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:00:01 -0700 (PDT)
+	 To:Cc:Content-Type; b=kVBzWlgozVD1pev9ne9lM2eCCaKwLBghDe03CIIhURlrXXwBRwNYUsYKqXyPb5v0B0xisTn0PwDfBPL/AZcG0c9tFf9K27odWClTA6uHdNl72i7IsQW1z9qSjoDZOgZuaPmfdW2MgRD/QZawN6cCfaVRNRn4GMY5bCY/wv15t2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z2GBuIhe; arc=none smtp.client-ip=209.85.217.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4a46d662fccso2250188137.2;
+        Wed, 30 Oct 2024 08:00:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730300400; x=1730905200; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730300431; x=1730905231; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JW8S8WBlORDTYGL1pb5mR6Fb+1WUMKbWZMEBW0G2lRs=;
-        b=2FwYuAiTPw15hfw1ZxlQqdEXJDNuxI6K/8wgqjY7aNKve07s9scPeGHuwVhZo20SkS
-         +ELZqdD/nUyott9tkJTDx6ZTAO96DwxvSwi+UkPpG4GQYOHg+k4trxYYHxc0OtVSi7ot
-         g4lQcsY91jF1BnzDd/auiHX5CdDCd+MGTEA7UK9NXl2EEK3VatHzOqxMLB51TTMKxLWT
-         cof1Jdf6YPoNXDVLQb7f6/h/wTxhMZwDxNUetdO2StMzvpwGMGfrmoLkIeskJMmo/i8C
-         fjtXhNbLNZGzWN1Kf9OzFG0kTtVchMx36dx5rfHEreAE2j2ouB2XGgfO0Fl5oFLLYcWX
-         gRLw==
+        bh=rULvNichQesAS+BgmPl/sd0NpNj1EoASQ5iS96a/gGA=;
+        b=Z2GBuIheyDVyDXeput23V0l/PAlnOo1GwXjU9KN6EMnjaxtOCk52ZmUWUo6kY+WJuJ
+         Son+whZgToHjKX7D7hIWjs0mMzA9tu2Ye1Rbxz5elLRd1g/o3uPUr+VyNUe6hb+/QydR
+         6AB+SBl8zi5LE8GKdMHcRaYVycxE3EPLjZJvu91Vq8nTyybUY4Oat+SGQTAFJ+AHYvIx
+         cBaC4HlG0ZBjYsaDi1HjUABvWj421TCz98z3HJQGIAFMqXhTdvBvWwVQl6nrH7nVZEYO
+         VfsRRWe/GE/7ScBNhhSzFM9p0QgzV7JmBPQAjJY/tJbxcTKGtHr3Y3KNVtmq6bk4XvD2
+         GAsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730300400; x=1730905200;
+        d=1e100.net; s=20230601; t=1730300431; x=1730905231;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=JW8S8WBlORDTYGL1pb5mR6Fb+1WUMKbWZMEBW0G2lRs=;
-        b=TTjLsF8coTCguIPlRri3Ibsh/YUPJDqhlho2xceGGEbGJDqkKZTsMC6cOu7UYXwscF
-         mJYvONcgNZDnxAcMgjvk4jFrjPIR7/PvmiowcnSK6qLIoM0HJ9E5m+4+CPvEebzTbpU6
-         q0mmKqFoW8u2ySstp4RxlRGuoYtAauzBe/E7ZkmTaIojY1x7721AjXslCI5eLSQgFHhT
-         5MPwO2vKdQzLWXC4CKsWwsyGqau158CWw5yewNNqcd568vh+xYj7eWuvl4sKmHabBFvd
-         5vv/OFxEkf/Mo0wxlZPHMroWHp73WoLQbgB8Wl0bZ85fze/QQR+UKT0LDzLulYtMuWcH
-         1C9g==
-X-Gm-Message-State: AOJu0YwLNujqfqTBep+ZojQMdwLNE2pJcRo9Q/RyNk5D4SctCOL4Kbx5
-	BLGd3x6hGaEIdNiVV4nijarIQgvcJJSa7KjwIUQgtj5mEfaVZrF4vcJTRe6HH/YxUA/ag5Nsrkh
-	whBqCYE946AchNfaQsLUBxG3KSDpWqY/rnM2VTTfukcCE4RIk0FIal2c=
-X-Gm-Gg: ASbGncs1Nt26mXwEZ1XER/wjzozPZqYOjRO0IMWuktBkiVf9zO6s59O5dK0S88qjRLn
-	0la7l63bgbvrH8dpSqL4uA7qtXzTFK78=
-X-Google-Smtp-Source: AGHT+IFwQRC1OM1gOyKoR/O/t02TCtvuvF1tbAha8ccPoXgqMdwrxYU0mf40JkfMIXKC4/9HFpcyjbWJ5vMjBZtQKT0=
-X-Received: by 2002:ac8:5d91:0:b0:460:b4e3:49e with SMTP id
- d75a77b69052e-46166dadbe0mr7711771cf.9.1730300400312; Wed, 30 Oct 2024
- 08:00:00 -0700 (PDT)
+        bh=rULvNichQesAS+BgmPl/sd0NpNj1EoASQ5iS96a/gGA=;
+        b=ji3td4l7aUYyoAECSEGf21AhBjMf5TISnHKpAixsiEAxeI2Jgt+KYpC2EtYLOytApl
+         O90G5vhErSTNi1ONDg82snJ2JwMVh9HXapcEcWt+Ssq7UvKMeUy8AD5aLREFhXZ7bsgD
+         Elnhnpri40+lrA74GmCyDhe/x3Ids4cjDCCOB6XZH1Tf6JLcgyoZcM6Sv72TxZCvqlBt
+         vKHtWp9a98NyBhaIOxpt14VRW8ojOt17hX+My0n0aPgHeyHHJPDaIoqip35ufrWiC4r6
+         alM272QMfztfxmD0FgqWDbbn5EYWzH6wrv4vezMA6sIW+FNkMDuXs4zZtZdRev51Ehf0
+         iQ8Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWIEa3iCAa1edhvtSYhozfZjwoDjMT2oGH05jpVhVpNJ7gf8qu1MQ7lzw7zIUQ16gJ6btIkrt0S@vger.kernel.org, AJvYcCWqqn2WZY3I/kqfhkJlopYE75SXSqAbvIu+668gRQLqy57gdfAz03oFlXBcg3jvbvWAxGJofJGr0giH@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy4coM5rmOqX2UgFn3AwHZd3P/Mauwe4Fjn/wHmlJdTmlbJQIp5
+	IKZVKKhgtvwyVy3s+2komL7AlnX1MUmpOPNZTqzNR8NBUZ3R0McyfnKSGniQq0CbqMcQtJor9tv
+	S6RXShJDz74g8p9egxuFNuNqDFs4=
+X-Google-Smtp-Source: AGHT+IGQPAOAvrDdaWqZtP3lATUixCSPGWfj+d5lffyZ2v6OC+36VZ5Z0Mp2NekS6Gn1XXBZCpriDdcwWyKIc08XnTQ=
+X-Received: by 2002:a05:6102:6c9:b0:497:6bb5:398a with SMTP id
+ ada2fe7eead31-4a8cfb5d0c6mr12909664137.7.1730300431163; Wed, 30 Oct 2024
+ 08:00:31 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030142722.2901744-1-sdf@fomichev.me>
-In-Reply-To: <20241030142722.2901744-1-sdf@fomichev.me>
-From: Mina Almasry <almasrymina@google.com>
-Date: Wed, 30 Oct 2024 07:59:48 -0700
-Message-ID: <CAHS8izOBp4yXBg-nOSouD+A7gOGs9MPmdFc9_hB8=Ni0QdeZHg@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 00/12] selftests: ncdevmem: Add ncdevmem to ksft
-To: Stanislav Fomichev <sdf@fomichev.me>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch, shuah@kernel.org, 
-	horms@kernel.org, willemb@google.com, petrm@nvidia.com
+References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
+In-Reply-To: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
+From: Robert Nelson <robertcnelson@gmail.com>
+Date: Wed, 30 Oct 2024 10:00:03 -0500
+Message-ID: <CAOCHtYgRD_HTD1F-5+CQ3H1PK3Lbhb-ZdyqDYp3wN2wRK5vOUA@mail.gmail.com>
+Subject: Re: BeagleBone Black Ethernet PHY issues
+To: Geert Uytterhoeven <geert@linux-m68k.org>
+Cc: ext Tony Lindgren <tony@atomide.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	Roger Quadros <rogerq@kernel.org>, 
+	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
+	Matti Vaittinen <mazziesaccount@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 30, 2024 at 7:27=E2=80=AFAM Stanislav Fomichev <sdf@fomichev.me=
-> wrote:
+On Tue, Oct 29, 2024 at 12:18=E2=80=AFPM Geert Uytterhoeven
+<geert@linux-m68k.org> wrote:
 >
-> The goal of the series is to simplify and make it possible to use
-> ncdevmem in an automated way from the ksft python wrapper.
+> Hi all,
 >
-> ncdevmem is slowly mutated into a state where it uses stdout
-> to print the payload and the python wrapper is added to
-> make sure the arrived payload matches the expected one.
+> During the last few months, booting kernels on BeagleBone Black
+> sometimes fails with:
 >
-> v6:
-> - fix compilation issue in 'Unify error handling' patch (Jakub)
+>     +SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
+> LAN8710/LAN8720 failed with error -5
+>      davinci_mdio 4a101000.mdio: phy[0]: device 4a101000.mdio:00,
+> driver SMSC LAN8710/LAN8720
+>      soc_device_match(cpsw_soc_devices): no match
+>      cpsw-switch 4a100000.switch: initialized cpsw ale version 1.4
+>      ...
+>      am335x-phy-driver 47401300.usb-phy: dummy supplies not allowed
+> for exclusive requests (id=3Dvbus)
+>     +cpsw-125mhz-clkctrl:0014:0: failed to disable
+>      am335x-phy-driver 47401b00.usb-phy: using DT
+> '/ocp/target-module@47400000/usb-phy@1b00' for 'reset' GPIO lookup
+>      ...
+>      cpsw-switch 4a100000.switch: starting ndev. mode: dual_mac
+>     -SMSC LAN8710/LAN8720 4a101000.mdio:00: attached PHY driver
+> (mii_bus:phy_addr=3D4a101000.mdio:00, irq=3DPOLL)
+>     -cpsw-switch 4a100000.switch eth0: Link is Up - 100Mbps/Full -
+> flow control off
+>     -Sending DHCP requests ., OK
+>     -IP-Config: Complete:
+>     -[...]
+>     +cpsw-switch 4a100000.switch: phy
+> "/ocp/interconnect@4a000000/segment@0/target-module@100000/switch@0/mdio@=
+1000/ethernet-phy@0"
+> not found on slave 0
+>     +[HANG]
 >
+> Adding debug prints to smsc_phy_probe() makes the issue go away, so it
+> must be timing related.
+>
+> Adding specific debug prints in the failure case gives:
+>
+>     SMSC LAN8710/LAN8720 4a101000.mdio:00: genphy_read_abilities:2859:
+> phy_read(MII_BMSR) failed -EIO
+>     SMSC LAN8710/LAN8720 4a101000.mdio:00: phy_probe:3613:
+> genphy_read_abilities() failed -EIO
+>     SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
+> LAN8710/LAN8720 failed with error -5
+>
+> and later:
+>
+>     Generic PHY 4a101000.mdio:00: genphy_read_abilities:2859:
+> phy_read(MII_BMSR) failed -EIO
+>     Generic PHY 4a101000.mdio:00: phy_probe:3609:
+> genphy_read_abilities failed -EIO
+>     cpsw-switch 4a100000.switch: phy
+> "/ocp/interconnect@4a000000/segment@0/target-module@100000/switch@0/mdio@=
+1000/ethernet-phy@0"
+> not found on slave 0
 
-Since I saw a compilation failures on a couple of iterations I
-cherry-picked this locally and tested compilation. I'm seeing this:
+Hey Geert,
 
-sudo CFLAGS=3D"-static" make -C ./tools/testing/selftests/drivers/net/hw
-TARGETS=3Dncdevmem 2>&1
-make: Entering directory
-'/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/driv=
-ers/net/hw'
-  CC       ncdevmem
-In file included from ncdevmem.c:63:
-/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/../..=
-/../tools/net/ynl/generated/ethtool-user.h:23:43:
-warning: =E2=80=98enum ethtool_header_flags=E2=80=99 declared inside parame=
-ter list
-will not be visible outside of this definition or declaration
-   23 | const char *ethtool_header_flags_str(enum ethtool_header_flags valu=
-e);
-      |                                           ^~~~~~~~~~~~~~~~~~~~
-/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/../..=
-/../tools/net/ynl/generated/ethtool-user.h:25:41:
-warning: =E2=80=98enum ethtool_module_fw_flash_status=E2=80=99 declared ins=
-ide
-parameter list will not be visible outside of this definition or
-declaration
-   25 | ethtool_module_fw_flash_status_str(enum
-ethtool_module_fw_flash_status value);
-      |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~=
-~~~
-/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/../..=
-/../tools/net/ynl/generated/ethtool-user.h:6766:45:
-error: field =E2=80=98status=E2=80=99 has incomplete type
- 6766 |         enum ethtool_module_fw_flash_status status;
-      |                                             ^~~~~~
-ncdevmem.c: In function =E2=80=98do_server=E2=80=99:
-ncdevmem.c:517:37: error: storage size of =E2=80=98token=E2=80=99 isn=E2=80=
-=99t known
-  517 |                 struct dmabuf_token token;
-      |                                     ^~~~~
-ncdevmem.c:542:47: error: =E2=80=98SCM_DEVMEM_DMABUF=E2=80=99 undeclared (f=
-irst use in
-this function)
-  542 |                             (cm->cmsg_type !=3D SCM_DEVMEM_DMABUF &=
-&
-      |                                               ^~~~~~~~~~~~~~~~~
-ncdevmem.c:542:47: note: each undeclared identifier is reported only
-once for each function it appears in
-ncdevmem.c:543:47: error: =E2=80=98SCM_DEVMEM_LINEAR=E2=80=99 undeclared (f=
-irst use in
-this function)
-  543 |                              cm->cmsg_type !=3D SCM_DEVMEM_LINEAR))=
- {
-      |                                               ^~~~~~~~~~~~~~~~~
-ncdevmem.c:557:52: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  557 |                                         dmabuf_cmsg->frag_size);
-      |                                                    ^~
-ncdevmem.c:562:56: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  562 |                         token.token_start =3D dmabuf_cmsg->frag_tok=
-en;
-      |                                                        ^~
-ncdevmem.c:566:42: error: =E2=80=98SO_DEVMEM_DONTNEED=E2=80=99 undeclared (=
-first use
-in this function)
-  566 |                                          SO_DEVMEM_DONTNEED, &token=
-,
-      |                                          ^~~~~~~~~~~~~~~~~~
-ncdevmem.c:573:56: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  573 |                         token.token_start =3D dmabuf_cmsg->frag_tok=
-en;
-      |                                                        ^~
-ncdevmem.c:576:54: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  576 |                         total_received +=3D dmabuf_cmsg->frag_size;
-      |                                                      ^~
-ncdevmem.c:579:44: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  579 |                                 dmabuf_cmsg->frag_offset >> PAGE_SH=
-IFT,
-      |                                            ^~
-ncdevmem.c:580:44: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  580 |                                 dmabuf_cmsg->frag_offset %
-getpagesize(),
-      |                                            ^~
-ncdevmem.c:581:44: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  581 |                                 dmabuf_cmsg->frag_offset,
-      |                                            ^~
-ncdevmem.c:582:44: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  582 |                                 dmabuf_cmsg->frag_size,
-dmabuf_cmsg->frag_token,
-      |                                            ^~
-ncdevmem.c:582:68: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  582 |                                 dmabuf_cmsg->frag_size,
-dmabuf_cmsg->frag_token,
-      |                                                                    =
-^~
-ncdevmem.c:583:60: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  583 |                                 total_received, dmabuf_cmsg->dmabuf=
-_id);
-      |                                                            ^~
-ncdevmem.c:585:40: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  585 |                         if (dmabuf_cmsg->dmabuf_id !=3D dmabuf_id)
-      |                                        ^~
-ncdevmem.c:589:40: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  589 |                         if (dmabuf_cmsg->frag_size % getpagesize())
-      |                                        ^~
-ncdevmem.c:595:65: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  595 |
-dmabuf_cmsg->frag_offset,
-      |                                                                 ^~
-ncdevmem.c:596:65: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  596 |
-dmabuf_cmsg->frag_size);
-      |                                                                 ^~
-ncdevmem.c:601:60: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  601 |
-dmabuf_cmsg->frag_offset,
-      |                                                            ^~
-ncdevmem.c:602:52: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  602 |                                         dmabuf_cmsg->frag_size);
-      |                                                    ^~
-ncdevmem.c:604:73: error: invalid use of undefined type =E2=80=98struct dma=
-buf_cmsg=E2=80=99
-  604 |                                 print_nonzero_bytes(tmp_mem,
-dmabuf_cmsg->frag_size);
-      |
-         ^~
-make: *** [../../../lib.mk:222:
-/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/drive=
-rs/net/hw/ncdevmem]
-Error 1
-make: Leaving directory
-'/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/driv=
-ers/net/hw'
+What revision of the board do you have, Bx, Cx, etc.
 
-The errors are still there even without the CFLAGS=3D"-static". Can you
-take a look before merge?
+Only C3 has the new PCB with the phy 'reset' gpio line.
+
+https://openbeagle.org/beagleboard/beaglebone-black/-/blob/master/BBB_SCH.p=
+df?ref_type=3Dheads
+
+For pre-C3 boards, removing "C24" has fixed a large percentage of my
+boards in my ci test farm, while it's not a perfect fix as some still
+fail..
+
+Regards,
+
+--=20
+Robert Nelson
+https://rcn-ee.com/
 
