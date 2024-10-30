@@ -1,252 +1,183 @@
-Return-Path: <netdev+bounces-140250-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140251-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EBE59B5A55
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:28:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 306869B5A5D
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:30:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D606CB222CF
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 03:28:41 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 99FC2B22470
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 03:30:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361E2198A24;
-	Wed, 30 Oct 2024 03:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFF181991DF;
+	Wed, 30 Oct 2024 03:29:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kZe6sVGj"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mvtq13+I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF20315E96;
-	Wed, 30 Oct 2024 03:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBE914F90;
+	Wed, 30 Oct 2024 03:29:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730258916; cv=none; b=XDUgu7Z+xsCD61RqqAogu8jTZ2yW+dXpzc5EUvuoujmgvuRUVwBjTSvSy1xpZhaY6QiL//FV5Oqt684pIkGsxssXrhbVlvx1bK/H1wvmDU2yK4Cx+AMfk2hVvoRxSkdgkQueFVBMUMvbuCME8/SXh9EVMnf6PI5PXIEgkZShMmg=
+	t=1730258997; cv=none; b=ed6ocFOK6lRO3Szymoi7ZRORrcK5FIl4GAT6cHJRmdQ+RAWgIcJZVp7kaiJ8gy+Sa5GnP2WarV+f3Vil1AhMVr6avDZdW6aVENpsjCV3jmY+tbbMqmrixyZV4CUBw3WuT/DstVFyCxFuihsnDdBzT7Zi/qVsec5Wa/+72aYdHrI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730258916; c=relaxed/simple;
-	bh=cXJbaxeXWonrYgxgh+fgAZzdTbkoxoeVYW42plVwIEI=;
+	s=arc-20240116; t=1730258997; c=relaxed/simple;
+	bh=gB6sMqfjocTtVpdzRyKnKZUQ89s5//aBIvoYbkO8htc=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=flGDWhJBEzhRZMRFC3xG5u0W3CMyQ8lKJtJtVl1KGoORjLvEEigFAZtU3aKCeg4MLcP92pTvRsRoAuKIixQQCnQZZ1mEK23eZB1IuclEQB8GApEnsYdbrEGkutF8FInW4BYBuZIOfycflJQgRWJWRueeAA3ktoLdK9eAr/sTvAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kZe6sVGj; arc=none smtp.client-ip=209.85.166.177
+	 To:Cc:Content-Type; b=FJWnkXpw9RkdypNuofLD7LIjrWdJ5QNl/TqB3MJxd9SdmlBfAJAgrYgRPV1PzLfx1ftkWNZMVDqyYYOgNyVDs61peYGge0u2kfHuOvD2wUvC/fY4GK8d1HCaB3T4vuYXNZffhWckXZ6o/xXU3OOiRdTa2RhjQsqwPuUafJrO9RI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mvtq13+I; arc=none smtp.client-ip=209.85.219.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a3b4663e40so22668515ab.2;
-        Tue, 29 Oct 2024 20:28:33 -0700 (PDT)
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e29687f4cc6so6416226276.2;
+        Tue, 29 Oct 2024 20:29:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730258913; x=1730863713; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730258994; x=1730863794; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=A4/B7jYJxsmXi0zwcYVhFehp+FhAEaVOMktEuU/AI3M=;
-        b=kZe6sVGjJ5vX66PKpUpomR0NruFw7TN883ZYSrWFEAm6uRewDJ5emmGa7wJi6SC5BV
-         y9vKYwR0tcufMwXiV88I2X4m4rbg6I7eUA0qk5PPIwKbuVLtbK8g5Co/tbzPICoU8dJE
-         uTP6+mTeq1mwJqSZOz9VuysjozQbqKet7OzIhuPqvx6+j5xdmsAe0j2kTpWzzf0hvFO3
-         IHVR4iCgisDb1b+GzNOoVcdKQrJmb2AqxvbvuKiEKVi8T4kTL8/CDTpb1uyvGBEqMqon
-         Zk/c33YLCaCcCddW/u/ugZFxv7Py2dWW6cybveIZppP7W8SWF3NHcrJL9TbHfO2YRJJB
-         kAmg==
+        bh=JP29SaC0+NjDpQ+Q8kSclFW9qhNXYgN/YI2Vt9caTfw=;
+        b=Mvtq13+Ir2K8UrbaAH2NeinUPkSi9Pefnkri8iKtcgB5GvMbrhSHDb8aOphpnwcsX0
+         PNsLjVAh+lpbH4FFGDZ1EVmpeW24n+QlgCd8EsrR2x+xiSLozXUEYQonmPi36aiHqdJ4
+         bENhdsKn9KSPibuehm9myVWFIxZT6xcVv41McDZ8wxJwjw+lPBwCt/hZZMEXBd5PrJay
+         AX6D6hUs3+a3kFHhPiG9FfpvXPl8K9Z/VE5nPuj5Eoc5ERszHlIS9dUufys06ysqIAar
+         CVm3WvE3IYqz3uwNoEtwvnwCjfPpEMFsZeTwIdR9aoy5MNoc/UEGtFF9wRZ2JewA85cu
+         HU7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730258913; x=1730863713;
+        d=1e100.net; s=20230601; t=1730258994; x=1730863794;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=A4/B7jYJxsmXi0zwcYVhFehp+FhAEaVOMktEuU/AI3M=;
-        b=Panp6Dl2LTykkiUX0V5K/XPfa57N8wzpFQauLH1AMb2kZGQnwWJHhkVcudGg0BXz/A
-         Vtyr+mgaUd43nnCRuVGchhVjYCMBVj7SnNno9Ja8+Fy54tftBvDb3YOxaeDcmyj4NLbt
-         DaVvy09RbbU7x4Fcw3ATO6SayCLgaP+fUfHGbF6tkq7b/vUoEc8nSh1ceJb3PIs2Pp8D
-         TmjztWF4ULXqR6jqjKEM0tkzk0qwACO8pJ23/Yo39UdZYY49qK/u7d+wXDOQ0ecTb9Xy
-         6CFHQCHRfpf4bTXvLaRuFd82emPgl7RG9vn9G8hB3asxer8Feo3lnMfcrz4CkCgpsuFf
-         IBLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCW6wIbCIZtPln+ro9bm0o4NRPlWj+cXEqLHy8eGjUeii+H6OdmOnitXhzIKeM0fPXt2hYGkZySx@vger.kernel.org, AJvYcCWR9hJgLn1Wv222A+Ty5n+JFnNKxYCfYW1qYx2ghQN6mvg6e43tfapAuX1k7J2YiqgTFOU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzYrUoJlw8HLAinl3pAgXsHk3xHmqwgCbgQQ0lr1+sCTbrq6L4K
-	Cuuwe0MR7bT54sNyjHdFb8eeOfovK7W1WgmpKwM61n7g1kkazAIuVWdJe776VvTmbftfrRTL85L
-	I/fDVGY/rdoNzUnSrQK7VPuxnM+A=
-X-Google-Smtp-Source: AGHT+IE9sJRBrHeOTryT6wi93gvj6ZEmCNsXW2HCxRToVtZqzozCKGSSna1yy6oJHQ62nwz5mrFTjl33ddfSg3D2Nb0=
-X-Received: by 2002:a05:6e02:188a:b0:3a1:a20f:c09c with SMTP id
- e9e14a558f8ab-3a4ed34b940mr158792475ab.22.1730258912920; Tue, 29 Oct 2024
- 20:28:32 -0700 (PDT)
+        bh=JP29SaC0+NjDpQ+Q8kSclFW9qhNXYgN/YI2Vt9caTfw=;
+        b=hO89FkEcCQBmYKM5WXVJtzQBJuZob7iKi2pXFhlFY7qsa1W9b9fUuN060Py5OLNUtc
+         ViUKyNV+7zzBnq+pd8Y347WSTPPh/rvjvG5g/Sr24o8h0vIVJgFQ9NdWN3/BRTdc67vV
+         ysRZKwiCW8OUJ30O6VNI+2NkiEmPAfStOEfEh2R6uQvYebAfAIWK+3pk4vzbgbfeMTj6
+         VFSuvd34bjfFpPUIWMvmjdjrn+s9BUxsSew7vvcDW02AnJFJ4EBJi1FveCo5hX5hk5u6
+         gdX5RjITIpXSrLu2lVDzlbw1zhp5bo+LYrJXlHj7vbgSnIsnWZ4M1jp0LhhNNChwjBNY
+         19LA==
+X-Forwarded-Encrypted: i=1; AJvYcCUQNIcwz0ZKLloMTPO4bVeJDbg7yJ73TNR9qfndcn6PbfpOnIiCooFE1GMTi5eeuQhwa6OwTmzDvhse@vger.kernel.org, AJvYcCUay08yr5SFvtOT8GNCeim9ShS6Ic4BL4PvegXrp4TH1PRBIuRqdzsAFktYLhf1yesC8iLDjDteUWeQsQ8=@vger.kernel.org, AJvYcCVN/RKj/C/PSwSdafMvcI80W3aaZe0xXnQyeoOuROW4mw3gANIN5vAuTDkB7vllWwzmVlwRzo7xEdiEZA==@vger.kernel.org, AJvYcCW76l/H+vb7n/2qzi6emWlDis2ADdCDu4PCysuzKIKidgTxGPAshm1DIqbafBpLJYG0SiQtC8it@vger.kernel.org, AJvYcCWKnzObPVU7MCE/ltf8OOmIkNQ2xk3WAZ8vrZhh4daiRwVAnPu5KlAjE9K9cW42QI5IT9XvcaKPlKlwGLZY@vger.kernel.org, AJvYcCWaieWED+EcEew7BvG8wzdWyasreMdzR/AOhi5Cr7eITkGalp9kzOPkeHKqu40bvK3b8tEC+1aNu2wN@vger.kernel.org, AJvYcCWgaTDx0CwAdMNk7TxAncd2ObB23c/n/W+rkQUUVGCB1GeAurY13Od3XJMEqOT1taJsAEt8jZ9IkuCywbseg+s=@vger.kernel.org, AJvYcCWoSO39idEDue/hSZ0xPPoUR8AbUOwKQPvZxxReVU/ia+QigqfmEE30jIJuPROmlErHIwFPNvuYeGM=@vger.kernel.org, AJvYcCXSbIYF6dC1P6qYC0h4JGj+mAOyOzZrdm1KQ+WVcZVXWxmmQbCKvvJnJRhEgLx7D9w0Lr3Z5yRKf12s@vger.kernel.org, AJvYcCXVWD3cvMTo0jBA2awVwJxo2UpF/upb
+ Ya3AEK3C40sYJJmrbDsN9BiXs8whDlhezuYB+QgXTn1FoZ6w@vger.kernel.org
+X-Gm-Message-State: AOJu0YwhNoPPrOQ6nHW1Tr5q6jYM3ZZYT0CZEm7lm0Tm1XaEtU6v9FlZ
+	zu7hLL1jqhbnpWVhzNZgoaqpVfODzFwRbpf13KoziEfbIudN8Oj4dL0E05k632dr4QM6q//vpDu
+	rD2rFOmNj/kkBhT1jZljb0GZ4r8g=
+X-Google-Smtp-Source: AGHT+IHPHivp//5/1F1E+KCfk4ICpoDujCclNjDxmM3AkIl+YaqACUChlZiv6jcz1YluWguSbfgvDGU/q+nvuJeLm/Y=
+X-Received: by 2002:a05:6902:2b8b:b0:e2b:ba9d:64c5 with SMTP id
+ 3f1490d57ef6-e3087c13018mr11188254276.48.1730258994399; Tue, 29 Oct 2024
+ 20:29:54 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-11-kerneljasonxing@gmail.com> <6720394714070_24dce62944a@willemb.c.googlers.com.notmuch>
- <CAL+tcoBgbA1Q_7UaC0vp-mGHqDHxQ+eMybep0kw=E-T0oJAHfw@mail.gmail.com>
- <6720f9359d2ef_2bcd7f29458@willemb.c.googlers.com.notmuch>
- <CAL+tcoCDN+YSwXDocv9DcvPGW-sLhEfPHHbzcO2+1PBZFRkB0Q@mail.gmail.com> <67213b62f4100_2f188c294b7@willemb.c.googlers.com.notmuch>
-In-Reply-To: <67213b62f4100_2f188c294b7@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 30 Oct 2024 11:27:56 +0800
-Message-ID: <CAL+tcoAqvQPw6PXYa-4hz6B=krgOYxw8jdFNCzQRcZnOVT_i+w@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
- tskey offset
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemb@google.com, ast@kernel.org, 
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
+References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-7-tmyu0@nuvoton.com>
+ <CAH-L+nPGGhgDFge0Ov4rX_7vUyLN8uu51cks80=kt38h22N7zQ@mail.gmail.com>
+ <62ea5a91-816f-4600-bfec-8f70798051db@roeck-us.net> <CAOoeyxX=A5o5PhxpniPwPgMCBv1VwMstt=wXCxHiGPF59gm5wQ@mail.gmail.com>
+ <817d24e1-6fdd-4ce2-9408-eccc94134559@roeck-us.net> <02f05807-77ae-4a3b-8170-93dd7520c719@roeck-us.net>
+ <CAOoeyxX2Jk+76Cedu5_ZGgeRCPmT8Yhczmx7h+K-za7r2WS=Sw@mail.gmail.com> <20241028185414.65456203@jic23-huawei>
+In-Reply-To: <20241028185414.65456203@jic23-huawei>
+From: Ming Yu <a0282524688@gmail.com>
+Date: Wed, 30 Oct 2024 11:29:43 +0800
+Message-ID: <CAOoeyxXJa05XxTg0JpZ6GRV7XMMa3Rct4+c5Q3cqCtW9KZzQLw@mail.gmail.com>
+Subject: Re: [PATCH v1 6/9] hwmon: Add Nuvoton NCT6694 HWMON support
+To: Jonathan Cameron <jic23@kernel.org>
+Cc: Guenter Roeck <linux@roeck-us.net>, 
+	Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>, tmyu0@nuvoton.com, lee@kernel.org, 
+	linus.walleij@linaro.org, brgl@bgdev.pl, andi.shyti@kernel.org, 
+	mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, andrew+netdev@lunn.ch, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	wim@linux-watchdog.org, jdelvare@suse.com, lars@metafoo.de, 
+	ukleinek@kernel.org, alexandre.belloni@bootlin.com, 
+	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
+	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
+	linux-rtc@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Oct 30, 2024 at 3:45=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> > > > > > +static long int sock_calculate_tskey_offset(struct sock *sk, i=
-nt val, int bpf_type)
-> > > > > > +{
-> > > > > > +     u32 tskey;
-> > > > > > +
-> > > > > > +     if (sk_is_tcp(sk)) {
-> > > > > > +             if ((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LIST=
-EN))
-> > > > > > +                     return -EINVAL;
-> > > > > > +
-> > > > > > +             if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> > > > > > +                     tskey =3D tcp_sk(sk)->write_seq;
-> > > > > > +             else
-> > > > > > +                     tskey =3D tcp_sk(sk)->snd_una;
-> > > > > > +     } else {
-> > > > > > +             tskey =3D 0;
-> > > > > > +     }
-> > > > > > +
-> > > > > > +     if (bpf_type && (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID=
-)) {
-> > > > > > +             sk->sk_tskey_bpf_offset =3D tskey - atomic_read(&=
-sk->sk_tskey);
-> > > > > > +             return 0;
-> > > > > > +     } else if (!bpf_type && (sk->sk_tsflags_bpf & SOF_TIMESTA=
-MPING_OPT_ID)) {
-> > > > > > +             sk->sk_tskey_bpf_offset =3D atomic_read(&sk->sk_t=
-skey) - tskey;
-> > > > > > +     } else {
-> > > > > > +             sk->sk_tskey_bpf_offset =3D 0;
-> > > > > > +     }
-> > > > > > +
-> > > > > > +     return tskey;
-> > > > > > +}
-> > > > > > +
-> > > > > >  int sock_set_tskey(struct sock *sk, int val, int bpf_type)
-> > > > > >  {
-> > > > > >       u32 tsflags =3D bpf_type ? sk->sk_tsflags_bpf : sk->sk_ts=
-flags;
-> > > > > > @@ -901,17 +944,13 @@ int sock_set_tskey(struct sock *sk, int v=
-al, int bpf_type)
-> > > > > >
-> > > > > >       if (val & SOF_TIMESTAMPING_OPT_ID &&
-> > > > > >           !(tsflags & SOF_TIMESTAMPING_OPT_ID)) {
-> > > > > > -             if (sk_is_tcp(sk)) {
-> > > > > > -                     if ((1 << sk->sk_state) &
-> > > > > > -                         (TCPF_CLOSE | TCPF_LISTEN))
-> > > > > > -                             return -EINVAL;
-> > > > > > -                     if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> > > > > > -                             atomic_set(&sk->sk_tskey, tcp_sk(=
-sk)->write_seq);
-> > > > > > -                     else
-> > > > > > -                             atomic_set(&sk->sk_tskey, tcp_sk(=
-sk)->snd_una);
-> > > > > > -             } else {
-> > > > > > -                     atomic_set(&sk->sk_tskey, 0);
-> > > > > > -             }
-> > > > > > +             long int ret;
-> > > > > > +
-> > > > > > +             ret =3D sock_calculate_tskey_offset(sk, val, bpf_=
-type);
-> > > > > > +             if (ret <=3D 0)
-> > > > > > +                     return ret;
-> > > > > > +
-> > > > > > +             atomic_set(&sk->sk_tskey, ret);
-> > > > > >       }
-> > > > > >
-> > > > > >       return 0;
-> > > > > > @@ -956,10 +995,15 @@ static int sock_set_timestamping_bpf(stru=
-ct sock *sk,
-> > > > > >                                    struct so_timestamping times=
-tamping)
-> > > > > >  {
-> > > > > >       u32 flags =3D timestamping.flags;
-> > > > > > +     int ret;
-> > > > > >
-> > > > > >       if (flags & ~SOF_TIMESTAMPING_BPF_SUPPPORTED_MASK)
-> > > > > >               return -EINVAL;
-> > > > > >
-> > > > > > +     ret =3D sock_set_tskey(sk, flags, 1);
-> > > > > > +     if (ret)
-> > > > > > +             return ret;
-> > > > > > +
-> > > > > >       WRITE_ONCE(sk->sk_tsflags_bpf, flags);
-> > > > > >
-> > > > > >       return 0;
-> > > > >
-> > > > > I'm a bit hazy on when this can be called. We can assume that thi=
-s new
-> > > > > BPF operation cannot race with the existing setsockopt nor with t=
-he
-> > > > > datapath that might touch the atomic fields, right?
-> > > >
-> > > > It surely can race with the existing setsockopt.
-> > > >
-> > > > 1)
-> > > > if (only existing setsockopt works) {
-> > > >         then sk->sk_tskey is set through setsockopt, sk_tskey_bpf_o=
-ffset is 0.
-> > > > }
-> > > >
-> > > > 2)
-> > > > if (only bpf setsockopt works) {
-> > > >         then sk->sk_tskey is set through bpf_setsockopt,
-> > > > sk_tskey_bpf_offset is 0.
-> > > > }
-> > > >
-> > > > 3)
-> > > > if (existing setsockopt already started, here we enable the bpf fea=
-ture) {
-> > > >         then sk->sk_tskey will not change, but the sk_tskey_bpf_off=
-set
-> > > > will be calculated.
-> > > > }
-> > > >
-> > > > 4)
-> > > > if (bpf setsockopt already started, here we enable the application =
-feature) {
-> > > >         then sk->sk_tskey will re-initialized/overridden by
-> > > > setsockopt, and the sk_tskey_bpf_offset will be calculated.
-> > > > }
-> >
-> > I will copy the above to the commit message next time in order to
-> > provide a clear design to future readers.
-> >
-> > > >
-> > > > Then the skb tskey will use the sk->sk_tskey like before.
-> > >
-> > > I mean race as in the setsockopt and bpf setsockopt and datapath
-> > > running concurrently.
-> > >
-> > > As long as both variants of setsockopt hold the socket lock, that
-> > > won't happen.
-> > >
-> > > The datapath is lockless for UDP, so atomic_inc sk_tskey can race
-> > > with calculating the difference. But this is a known issue. A process
-> > > that cares should not run setsockopt and send concurrently. So this i=
-s
-> > > fine too.
-> >
-> > Oh, now I see. Thanks for the detailed explanation! So Do you feel if
-> > we need to take care of this in the future, I mean, after this series
-> > gets merged...?
->
-> If there is a race condition, then that cannot be fixed up later.
->
-> But from my admittedly brief analysis, it seems that there is nothing
-> here that needs to be fixed: control plane operations (setsockopt)
-> hold the socket lock. A setsockopt that conflicts with a lockless
-> datapath update will have a slightly ambiguous offset. It is under
-> controlof and up to the user to avoid that if they care.
+Dear Jonathan,
 
-I got it. Thanks.
+Thanks you for your comments,
+I tested your suggestion in both the MFD driver and the IIO driver, and
+the iio-hwmon bridge worked well.
+On the other hand, my requirements involve accessing thermal sensors,
+voltage sensors and tachometers, so I should implement it in this HWMON
+drive, right?
+
+Best regards
+Ming
+
+Jonathan Cameron <jic23@kernel.org> =E6=96=BC 2024=E5=B9=B410=E6=9C=8829=E6=
+=97=A5 =E9=80=B1=E4=BA=8C =E4=B8=8A=E5=8D=882:54=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Mon, 28 Oct 2024 15:58:00 +0800
+> Ming Yu <a0282524688@gmail.com> wrote:
+>
+> > Dear Guenter,
+> >
+> > The original plan was to use the IIO driver to access the temperature
+> > and voltage sensors, and the HWMON driver to access the tachometers.
+> > However, since the device is a hot-plug USB device, as far as I know,
+> > IIO-HWMON is not applicable. I will merge the IIO driver part into the
+> > HWMON driver in the next patch.
+> > In  other words, the driver will be used to access TIN, VIN and FIN.
+> See drivers/mfd/sun4i-gpadc.c
+> for an example of an mfd using the iio-hwmon bridge.
+>
+> Jonathan
+>
+> >
+> > Best regards
+> > Ming
+> >
+> > Guenter Roeck <linux@roeck-us.net> =E6=96=BC 2024=E5=B9=B410=E6=9C=8826=
+=E6=97=A5 =E9=80=B1=E5=85=AD =E4=B8=8B=E5=8D=8810:50=E5=AF=AB=E9=81=93=EF=
+=BC=9A
+> > >
+> > > On 10/25/24 08:44, Guenter Roeck wrote:
+> > > > On 10/25/24 08:22, Ming Yu wrote:
+> > > > [ ... ]
+> > > >
+> > > >>>>> +static int nct6694_fan_write(struct device *dev, u32 attr, int=
+ channel,
+> > > >>>>> +                            long val)
+> > > >>>>> +{
+> > > >>>>> +       struct nct6694_hwmon_data *data =3D dev_get_drvdata(dev=
+);
+> > > >>>>> +       unsigned char enable_buf[REQUEST_HWMON_CMD0_LEN] =3D {0=
+};
+> > > >>>> [Kalesh] Please try to maintain RCT order for variable declarati=
+on
+> > > >>>
+> > > >>> Ok, but that is already the case here ?
+> > > >>
+> > > >> [Ming] Is there anything that needs to be changed?
+> > > >>
+> > > >
+> > > > I don't think so, If two lines have the same length, the order is u=
+p
+> > > > to the developer to decide.
+> > > >
+> > > > Question though is if the buffer needs to be initialized. You shoul=
+d drop
+> > > > the initialization if it is not necessary. In that case the second =
+line
+> > > > would be shorter anyway, and the order question would not arise.
+> > > >
+> > >
+> > > Actually, I just noticed that you also submitted an IIO driver which
+> > > reports the same data again. If a chip has an IIO driver, there shoul=
+d
+> > > be no HWMON driver since the IIO -> HWMON bridge can then be used if
+> > > necessary. So please drop this driver.
+> > >
+> > > Thanks,
+> > > Guenter
+> > >
+> > >
+> >
+>
 
