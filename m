@@ -1,124 +1,170 @@
-Return-Path: <netdev+bounces-140445-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140446-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A6589B67D7
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:30:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0E1339B67F8
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:37:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 407071C21CFD
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:30:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7A6828151B
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DF841EB9F4;
-	Wed, 30 Oct 2024 15:30:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 500FC1F426F;
+	Wed, 30 Oct 2024 15:37:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b="CGdL8b7y"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qb/12Uin"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDD1F1F4711
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 15:30:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DFEC2C6A3;
+	Wed, 30 Oct 2024 15:37:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730302205; cv=none; b=oj+Hd1Or7FuT1/8ljwoMfULlAzWEuTOwzgS/rdRqneYjvyJ1oqqy5Y9ZANBkEadPXlRMc0UUjmw7Dufgn1yZpHWUxw7wsiJUDcT9Z6/fk/Mjfxi+84dU1yTBLD1xJyaTDlzEFGZaBt9ocJzLmbnmor67ZqzX9qOsiMHHSe9Gweo=
+	t=1730302632; cv=none; b=UizKU9i6a8pJBh2qpk5esHy40es+vqWAZvESeM4WGKiC9CG/c3zXWL8WKGN9DLI220VW1KhkCuwbUwvn7LgNkls+cdKG6AsojMAP7cX0rp0fmyDZlyD5VcKlCS7xCNT9VtxjPcyQpIpCo4GSisBRzFmrJHxZSgkwKPB6+n/yKIs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730302205; c=relaxed/simple;
-	bh=5CYlU13wxN3pMieiMaGbP1AuRi6+Brw0TcF0hZyJdpU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=BAv+3CTdKD6UMOs1PJZ0kuD/ykddjNKhhAMDJ8IuAbupJBvviqHbPGJ0F+FBEyA3loRnWXMgCAZhRQGkx+ZSE4RwXY6M8/UQJTgI3/u2AT5yoGybrcjE1aqno37jxUAQZvwvwwGT5PBQgi+8DrAbnESmNJj4HiGoOhxZrnYgyFg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org; spf=none smtp.mailfrom=blackwall.org; dkim=pass (2048-bit key) header.d=blackwall-org.20230601.gappssmtp.com header.i=@blackwall-org.20230601.gappssmtp.com header.b=CGdL8b7y; arc=none smtp.client-ip=209.85.167.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=blackwall.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=blackwall.org
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539f84907caso7494748e87.3
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 08:30:02 -0700 (PDT)
+	s=arc-20240116; t=1730302632; c=relaxed/simple;
+	bh=jsll4iE1W2vc5wqDh6vKsydyOvjcSPJ7tW7yaYX8bCU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WUMK78Mm0/fXDdou+LwtkerpKDLIxSzkGRIWF0oX/08cfsswjtO48EeS8LC2kIRZOXZJFNfyBIvZwnFUwnZJdRJHXJfYVs+9fwe6d6oSSFbzI6MqzXsxnpQrrk/FIzKlRSIPgsOW9VD8CkYiSeRXgSHVjxs7XbOYem8BEajSsMA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qb/12Uin; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7edb3f93369so21428a12.1;
+        Wed, 30 Oct 2024 08:37:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=blackwall-org.20230601.gappssmtp.com; s=20230601; t=1730302201; x=1730907001; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=KT1Rl3kTS58mylbtqpSpuZe6eBpuGZzkCTqOtOlKpe0=;
-        b=CGdL8b7yfXNVvX9FLsLD7yqG5XX+vZe/51T4JlIMd69G0vJh9mrbzJlH+hJHsBedmf
-         Stgp2iE+7xmiK5Xk8mv/KpHgb4+ZmkPfXd82K2k8J14i8eH9AnXg1+/Ig9hFywmzQj5p
-         zlQdjHo4vt8oERakHsgkWvRMByu34YecTjuMmLUf1MQZLDQk+U/8AD54eL2GRXFjKZJh
-         0chM5OuSq8y+q3G2RvUqL3WQ+sghaXJ0XZ/xgYDhPiHAZFAdHmWfaZw9G88Wt2F/37L7
-         TEhfSTaxPgBRn8Re6v4gGG11GrgQSumTMaA1kTL02r3x5LrUPf2+dsOQxvn3FHSdIKX6
-         O87g==
+        d=gmail.com; s=20230601; t=1730302629; x=1730907429; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=qRgFGBcG9N2scOzZ+x26NTz7+MUkQBjpLYs7QSpsjkc=;
+        b=Qb/12Uin85auYVP7smHFW8Dodn2q7hsHan8IWTHDDJ9IpDYRfk0OwMMRVpxqZWyumw
+         v33YLsZqVGepPrU4s1LZ5F1I+cmgVUXlQjQGEY6WpRfhoWtR6mgEfpKcV8eKlSDQd6V1
+         eMDYipzB6BUUzhFe3xYVgzUn0nwMfuCA+KpClm9O4FKD2aawkxFXhU+0UFuGUKLpDzE9
+         1plX6SMNZclvuJCfetKW79KBJzo2HPOZk4IwPdWI7F6gIbfUni/q+MAHo6yT3WXbhN81
+         KGWGELlQSIqpMS9sFEkiBX1SlBxE1ej27TUUGS7g9mqiRSoRReSgmf16oCBZ7q0b/R5J
+         ue+Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730302201; x=1730907001;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1730302629; x=1730907429;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KT1Rl3kTS58mylbtqpSpuZe6eBpuGZzkCTqOtOlKpe0=;
-        b=Zy4lnDAt667ngyg3UXZFi8J6LSV+jMH23Qtvs6T8+mc5zSpXSonbfKsYziQApT7NhT
-         w0FM7+dix4whxaZgfuQ/EY+sNSLAgSfHHxdWKJ+U1e+AvhZulWHeeocYRXfgFjDwAJFd
-         krTXagH8dgNeGc6kaL/Wa3FFd4QoPmVOrCkuvQRf+8ovDjDBNdaSHQkXfChB0+6p+1ts
-         lQSz9zZShs+ue5CHSy53i0b5VTu6VC8lt4kp+xldSPqIU3g71uyZszwDJXc2bDeStuhk
-         GK7ObzrRadstc4oHqi3NmX+AZCePJLFmQ608VeAqlquXyzROI0zjEdqCQDLQED5ZVZsD
-         oBJg==
-X-Forwarded-Encrypted: i=1; AJvYcCU8s/pbyq10B4Ji9fYd4nPqJPq3Xp9NwoGqaMcFkOsKmvi8GHzmQf+H6KLp7saciaFhPHBWzGc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw/ViR+vKKffTNPzhScbTXF/fCFG1FV+56vWDcBDZRqhJIC7wS7
-	eBNWiSsSz5v+EuZDPSrxnM7MRIr4fK1WGwpEe7sLmFzygpGM59k3gteNS1No3gagvNxGzSUOxjK
-	X
-X-Google-Smtp-Source: AGHT+IF06FD68FGsb9Am/OuTmp644K/y7BVoCARZwD3jKU00IF7Zto5FTyTr2w98MzrHnInXUu2BBw==
-X-Received: by 2002:a05:6512:6801:b0:53c:7652:6c9e with SMTP id 2adb3069b0e04-53c76526f55mr872653e87.53.1730302200793;
-        Wed, 30 Oct 2024 08:30:00 -0700 (PDT)
-Received: from [192.168.0.245] ([62.73.69.208])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd98e7aesm24889075e9.35.2024.10.30.08.29.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 08:30:00 -0700 (PDT)
-Message-ID: <f4efc424-6505-4e20-a9f2-14e973281921@blackwall.org>
-Date: Wed, 30 Oct 2024 17:29:59 +0200
+        bh=qRgFGBcG9N2scOzZ+x26NTz7+MUkQBjpLYs7QSpsjkc=;
+        b=KKUiZrxp2cyLEbnPb2u25pUag+ap+UFYXlw/GT7XPlkj+BOKJtu1+Haq7WQ3Enh+2Y
+         OQ9Wq49XhW7NYNAgmymsxw5PpKH8VjeUfIdvdpaHp5H9KcMq3y+etxVDfb4HFE/t0yE9
+         W4Q4+abck1GtEMltJ/Drsm25tAKeSSiNGdRLT/+LdcnJvslHm0zSfmsOJG8qk/Q0uzIU
+         Vxbp+vMng09U/LEmR8xm7TXZmR0RI8gZtxFoeCk3PFJFTc3od8hg/4+dpqDOEGnwmyG3
+         X5NJSg+p63Pz6XkmHHnavIJ/PQuB8k0l8l8EcIsrA0BbEUPrp0WgeZAbHr4+YbGCQAor
+         LdTw==
+X-Forwarded-Encrypted: i=1; AJvYcCUMp08Jyc9ydDLm31q3WZ0lNzk01TdW/sAvhzqytx6QpeIzGrwZ7slUL/AokwMB9CnM9lnn8CdVy2/QxtxrIxVu@vger.kernel.org, AJvYcCVBT4EM1SNczIPnmBZ0S10Nt2UN29bDefhLODnOTSa4trC95ysgt5GVMCYD3qZDExtmGv7wRlIF@vger.kernel.org, AJvYcCW/RKkWnzkjpu6Nfn7F4nEP/beRUv4U7tOvhVdFtnume0zHDDUhCKWAAkYiK6FbFOPVmXuXTkG/EAbKacU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwmGc2J5sBe4z09FE6rY8hjFbHI/v2IfyWxxwmiTDawhDuoH+9A
+	nYVHN945jglT9r/jdAA9jWBYaWSq34BmfUz53pVXIf8kZdkwP6A=
+X-Google-Smtp-Source: AGHT+IHMgfYhqtG/HeD4IkXQKmRqZBm1ETzBUyPWZsG0ycjcyLfBwQroJVrhMWh2VNGZ4DMQG6jyjQ==
+X-Received: by 2002:a05:6300:4041:b0:1d9:2bed:c7e5 with SMTP id adf61e73a8af0-1d9a84b89bfmr21656776637.40.1730302629584;
+        Wed, 30 Oct 2024 08:37:09 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a0df99sm9405125b3a.118.2024.10.30.08.37.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 08:37:09 -0700 (PDT)
+Date: Wed, 30 Oct 2024 08:37:08 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, willemb@google.com,
+	petrm@nvidia.com
+Subject: Re: [PATCH net-next v6 00/12] selftests: ncdevmem: Add ncdevmem to
+ ksft
+Message-ID: <ZyJSpBrhz7UJ0r7c@mini-arch>
+References: <20241030142722.2901744-1-sdf@fomichev.me>
+ <CAHS8izOBp4yXBg-nOSouD+A7gOGs9MPmdFc9_hB8=Ni0QdeZHg@mail.gmail.com>
+ <ZyJM_dVs1_ys3bFX@mini-arch>
+ <CAHS8izN6-5RJgKX08sgntYDVgETkBGpgoYToq8ezcy+tYHdaSA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 iproute] bridge: dump mcast querier state
-To: Fabian Pfitzner <f.pfitzner@pengutronix.de>, netdev@vger.kernel.org
-Cc: entwicklung@pengutronix.de, bridge@lists.linux-foundation.org
-References: <20241030084622.4141001-1-f.pfitzner@pengutronix.de>
-Content-Language: en-US
-From: Nikolay Aleksandrov <razor@blackwall.org>
-In-Reply-To: <20241030084622.4141001-1-f.pfitzner@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izN6-5RJgKX08sgntYDVgETkBGpgoYToq8ezcy+tYHdaSA@mail.gmail.com>
 
-On 30/10/2024 10:46, Fabian Pfitzner wrote:
-> Kernel support for dumping the multicast querier state was added in this
-> commit [1]. As some people might be interested to get this information
-> from userspace, this commit implements the necessary changes to show it
-> via
+On 10/30, Mina Almasry wrote:
+> On Wed, Oct 30, 2024 at 8:13 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 10/30, Mina Almasry wrote:
+> > > On Wed, Oct 30, 2024 at 7:27 AM Stanislav Fomichev <sdf@fomichev.me> wrote:
+> > > >
+> > > > The goal of the series is to simplify and make it possible to use
+> > > > ncdevmem in an automated way from the ksft python wrapper.
+> > > >
+> > > > ncdevmem is slowly mutated into a state where it uses stdout
+> > > > to print the payload and the python wrapper is added to
+> > > > make sure the arrived payload matches the expected one.
+> > > >
+> > > > v6:
+> > > > - fix compilation issue in 'Unify error handling' patch (Jakub)
+> > > >
+> > >
+> > > Since I saw a compilation failures on a couple of iterations I
+> > > cherry-picked this locally and tested compilation. I'm seeing this:
+> >
+> > Are you cherry picking the whole series or just this patch? It looks
+> > too broken.
+> >
+> > > sudo CFLAGS="-static" make -C ./tools/testing/selftests/drivers/net/hw
+> > > TARGETS=ncdevmem 2>&1
+> > > make: Entering directory
+> > > '/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/drivers/net/hw'
+> > >   CC       ncdevmem
+> > > In file included from ncdevmem.c:63:
+> > > /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/../../../tools/net/ynl/generated/ethtool-user.h:23:43:
+> > > warning: ‘enum ethtool_header_flags’ declared inside parameter list
+> > > will not be visible outside of this definition or declaration
+> > >    23 | const char *ethtool_header_flags_str(enum ethtool_header_flags value);
+> > >       |                                           ^~~~~~~~~~~~~~~~~~~~
+> > > /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/../../../tools/net/ynl/generated/ethtool-user.h:25:41:
+> > > warning: ‘enum ethtool_module_fw_flash_status’ declared inside
+> > > parameter list will not be visible outside of this definition or
+> > > declaration
+> > >    25 | ethtool_module_fw_flash_status_str(enum
+> > > ethtool_module_fw_flash_status value);
+> > >       |                                         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+> > > /usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/../../../tools/net/ynl/generated/ethtool-user.h:6766:45:
+> > > error: field ‘status’ has incomplete type
+> > >  6766 |         enum ethtool_module_fw_flash_status status;
+> > >       |                                             ^~~~~~
+> >
+> > This has been fixed via '#include <linux/ethtool_netlink.h>'
+> >
+> > > ncdevmem.c: In function ‘do_server’:
+> > > ncdevmem.c:517:37: error: storage size of ‘token’ isn’t known
+> > >   517 |                 struct dmabuf_token token;
+> >
+> > And this, and the rest, don't make sense at all?
+> >
+> > I'll double check on my side.
 > 
-> ip -d link show [dev]
+> Oh, whoops, I forgot to headers_install first. This works for me:
 > 
-> The querier state shows the following information for IPv4 and IPv6
-> respectively:
+> ➜  cos-kernel git:(tcpdevmem-fixes-1) ✗ sudo make headers_install &&
+> sudo CFLAGS="-static" make -C ./tools/testing/selftests/drivers/net/hw
+> TARGETS=ncdevmem 2>&1
+>   INSTALL ./usr/include
+> make: Entering directory
+> '/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/drivers/net/hw'
+> make: Nothing to be done for 'all'.
+> make: Leaving directory
+> '/usr/local/google/home/almasrymina/cos-kernel/tools/testing/selftests/drivers/net/hw'
+> ➜  cos-kernel git:(tcpdevmem-fixes-1) ✗ find . -iname ncdevmem
+> ./tools/testing/selftests/drivers/net/hw/ncdevmem
 > 
-> 1) The ip address of the current querier in the network. This could be
->    ourselves or an external querier.
-> 2) The port on which the querier was seen
-> 3) Querier timeout in seconds
-> 
-> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c7fa1d9b1fb179375e889ff076a1566ecc997bfc
-> 
-> Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
-> ---
-> 
-> v1->v2: refactor code
-> 
->  ip/iplink_bridge.c | 47 ++++++++++++++++++++++++++++++++++++++++++++++
->  1 file changed, 47 insertions(+)
-> 
+> Sorry for the noise :D
 
-For the second time(!), please CC maintainers because it's very easy to
-miss a patch. In addition to maintainers, please CC reviewers of previous
-versions as well.
-
-Thank you,
- Nik
-
+Whew, thanks and no worries!
 
