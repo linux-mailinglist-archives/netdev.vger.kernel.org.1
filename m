@@ -1,82 +1,150 @@
-Return-Path: <netdev+bounces-140404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B44529B65B0
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:24:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 468289B65BD
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:27:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26ED728229B
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:24:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AD0ECB22271
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:27:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF1001E411D;
-	Wed, 30 Oct 2024 14:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="K/vSw2VI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81F81F4298;
+	Wed, 30 Oct 2024 14:27:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89332C13C
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 14:24:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65C1E1F1318;
+	Wed, 30 Oct 2024 14:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730298273; cv=none; b=mSWT/MVdFNWNzAYQkGuGozmciwKxVTp6KXGIjmH9foyOfvR4pk60lQLxsPugJB4nTPvIvJmEKTX5SCJD8+0cXaR1puEruL+JNSPXd48pMSWN2f0vqUgCr6MCbnum08W1N1dFqwMjtc67VuimMg/KI0/xyMNSA8G0qTJ9JnPLNmY=
+	t=1730298448; cv=none; b=WH1fbLC+bBcG1EVzd5aXnziT1hiRq38JGeZ/rH8d6pInDiuPSNqq0MRUjJM790xS8j9LaeXtvVi1woLMx+x5zi2ERbkI8xFuQyGPfmiAtJUfEKpDE06t3SCjKMlPjGceu22oBnDjfmDNcO+LVGW3w1F1+cGnVsjOblxUdGATS7w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730298273; c=relaxed/simple;
-	bh=tOvGT5WRdfdgV4pja6W+wIxG0IP3s9fWu9mdLiWmXsk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=aBaeXDaiB68myy90ljnE3cUoUupPQc/mxejISbrbujuq37lRQAME6f273SvDJkTsE/OI4phCjxMWmjkdWSTl+it+3c3uH1G83RSNlDOPPmuAL/OogboYmg0KGw6MXxltN4RWUPuru7FTliTdj+pIq2nKDtoU/wOQrymz++mFwHU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=K/vSw2VI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B34E1C4CECE;
-	Wed, 30 Oct 2024 14:24:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730298273;
-	bh=tOvGT5WRdfdgV4pja6W+wIxG0IP3s9fWu9mdLiWmXsk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=K/vSw2VIeMsLa7uPOKie+CmczNq0PHt8wuuA513gMSZ/XvdludsiiwJuE4CiBqiqt
-	 iTBchqNa4WIhhmdS96pb/369+fqyrwxOPSead69OKBPTkphcXwGwrVzVyGwitZBDlC
-	 YC/bkmMdl+6poLCIjLdzMqGOjfg2v0X91JE/K58MYXwO1Sn2y2sp0sTLGdjaA8j34q
-	 OXyzE4aug215fgmckRZLcy2hLA42dC922fOhzBcqkiRBxc2E5EhhvPKa46edm+3tY8
-	 9Jnp4nudsrOk7N5xaObQpSjOvF6gJRVh/70lEdH/9r5vGmdwNr41BKOkFwFApO9VOq
-	 iUV8qa9IddLoQ==
-Message-ID: <58253e33-1867-479d-a313-68110465f2b0@kernel.org>
-Date: Wed, 30 Oct 2024 08:24:31 -0600
+	s=arc-20240116; t=1730298448; c=relaxed/simple;
+	bh=fdTlufCbZhiUYgshLzgCtmAceM3onaTjAgEf6R64lN4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JKOi/KGOQGeA9B8OFvobmDFKA/oFfbFxypX2FSqrouuBZ2SzXN1yzKR6K10V6NmrBFrvpo9T5TUvtymTYgczk2ZbUjqPZhXSS5Q2iIkOYM6xddyTnO3f9PUo/9Fi0SGPB7WRS3Yw99ZjzXZWiievHlbOvGv82SEHBAPd6CTj6RE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7eb0bc007edso3438576a12.3;
+        Wed, 30 Oct 2024 07:27:26 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730298445; x=1730903245;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ALb0tBs4NDBt4u3K1Ou6MF9SiXOV/Onh0/EFY/ivrUI=;
+        b=UQcbluAHG2wg/M1j5MpWEhCpCfbg1v0NEnQa/9tfViEyNMNgnxQRXKz6esOEpyFNUa
+         RlvefZ212lgwMbpqPRVLrnP9tg7WPSx2I2brHABICnYGkvXmbHZCG6RszQmqEMowtuGT
+         sltV+S6VbFRB3dXf9vLNazQdNFeMnUBDTjYPOac2NFQVgs4JYmpAmiin/PMenMpml/C9
+         QxfNr/HSf4MjgQtj348xP15NrRbr5ciuLh5Durpm5HLwWyk0H2c3YFfrnYOJQAF+NDPJ
+         i8zGy3a0QkG/nYOImD9acIHbJT/F/y1a4stGgc4anCp25dEWCFc3qw091F9U5rwiPWsa
+         B61w==
+X-Forwarded-Encrypted: i=1; AJvYcCUlYO8D6AL8lJ76AvTdklfB+os45vyIeN5d6z4ffVf53HeP0cQDDQOkfpX5s9jr3INQ6zXrIA8iblF7+DY=@vger.kernel.org, AJvYcCWVdWYShCwnwii4YB0BfdTWlYA5bnz+rgyhSW21SKMXUhB5K343q54CQeRXI0PuSjykHJ7P99IfYi7MTZ+T+LgF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzvj0dk5ucZ9jJRa3n9kyGYCytC/NefU67SCGqm2G6CmLrzPpbS
+	PWNd3Qkdedr1EjavTOqsuy8RgnVI2kh1rV0sF5tBEDafPuCpem4BiPlXi5k=
+X-Google-Smtp-Source: AGHT+IF7CE5jtvVBGnU/qez672fRz6aDeNOCseUmK9IyiVNs1IRC6vimUzOVgVduDPxsQ1l8jiXnMA==
+X-Received: by 2002:a05:6a21:3941:b0:1d9:69cd:ae22 with SMTP id adf61e73a8af0-1d9a8431ab7mr16966490637.30.1730298443893;
+        Wed, 30 Oct 2024 07:27:23 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a0b82asm9311008b3a.111.2024.10.30.07.27.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 07:27:23 -0700 (PDT)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	shuah@kernel.org,
+	horms@kernel.org,
+	sdf@fomichev.me,
+	almasrymina@google.com,
+	willemb@google.com,
+	petrm@nvidia.com
+Subject: [PATCH net-next v6 00/12] selftests: ncdevmem: Add ncdevmem to ksft
+Date: Wed, 30 Oct 2024 07:27:10 -0700
+Message-ID: <20241030142722.2901744-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] vrf: Prepare vrf_process_v4_outbound() to future
- .flowi4_tos conversion.
-To: Guillaume Nault <gnault@redhat.com>, David Miller <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew+netdev@lunn.ch>
-References: <6be084229008dcfa7a4e2758befccfd2217a331e.1730294788.git.gnault@redhat.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <6be084229008dcfa7a4e2758befccfd2217a331e.1730294788.git.gnault@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 10/30/24 7:27 AM, Guillaume Nault wrote:
-> Use ip4h_dscp() to get the DSCP from the IPv4 header, then convert the
-> dscp_t value to __u8 with inet_dscp_to_dsfield().
-> 
-> Then, when we'll convert .flowi4_tos to dscp_t, we'll just have to drop
-> the inet_dscp_to_dsfield() call.
-> 
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
-> ---
->  drivers/net/vrf.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
+The goal of the series is to simplify and make it possible to use
+ncdevmem in an automated way from the ksft python wrapper.
 
+ncdevmem is slowly mutated into a state where it uses stdout
+to print the payload and the python wrapper is added to
+make sure the arrived payload matches the expected one.
 
-Reviewed-by: David Ahern <dsahern@kernel.org>
+v6:
+- fix compilation issue in 'Unify error handling' patch (Jakub)
+
+v5:
+- properly handle errors from inet_pton() and socket() (Paolo)
+- remove unneeded import from python selftest (Paolo)
+
+v4:
+- keep usage example with validation (Mina)
+- fix compilation issue in one patch (s/start_queues/start_queue/)
+
+v3:
+- keep and refine the comment about ncdevmem invocation (Mina)
+- add the comment about not enforcing exit status for ntuple reset (Mina)
+- make configure_headersplit more robust (Mina)
+- use num_queues/2 in selftest and let the users override it (Mina)
+- remove memory_provider.memcpy_to_device (Mina)
+- keep ksft as is (don't use -v validate flags): we are gonna
+  need a --debug-disable flag to make it less chatty; otherwise
+  it times out when sending too much data; so leaving it as
+  a separate follow up
+
+v2:
+- don't remove validation (Mina)
+- keep 5-tuple flow steering but use it only when -c is provided (Mina)
+- remove separate flag for probing (Mina)
+- move ncdevmem under drivers/net/hw, not drivers/net (Jakub)
+
+Cc: Mina Almasry <almasrymina@google.com>
+
+Stanislav Fomichev (12):
+  selftests: ncdevmem: Redirect all non-payload output to stderr
+  selftests: ncdevmem: Separate out dmabuf provider
+  selftests: ncdevmem: Unify error handling
+  selftests: ncdevmem: Make client_ip optional
+  selftests: ncdevmem: Remove default arguments
+  selftests: ncdevmem: Switch to AF_INET6
+  selftests: ncdevmem: Properly reset flow steering
+  selftests: ncdevmem: Use YNL to enable TCP header split
+  selftests: ncdevmem: Remove hard-coded queue numbers
+  selftests: ncdevmem: Run selftest when none of the -s or -c has been
+    provided
+  selftests: ncdevmem: Move ncdevmem under drivers/net/hw
+  selftests: ncdevmem: Add automated test
+
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   9 +
+ .../selftests/drivers/net/hw/devmem.py        |  45 +
+ .../selftests/drivers/net/hw/ncdevmem.c       | 773 ++++++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   8 -
+ tools/testing/selftests/net/ncdevmem.c        | 570 -------------
+ 7 files changed, 828 insertions(+), 579 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/.gitignore
+ create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
+ create mode 100644 tools/testing/selftests/drivers/net/hw/ncdevmem.c
+ delete mode 100644 tools/testing/selftests/net/ncdevmem.c
+
+-- 
+2.47.0
 
 
