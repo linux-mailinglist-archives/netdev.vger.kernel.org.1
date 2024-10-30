@@ -1,142 +1,109 @@
-Return-Path: <netdev+bounces-140203-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140204-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103F99B5895
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:26:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E8BB39B5897
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:29:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BD5E283B91
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:26:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DAE6283B80
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:29:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60A6911187;
-	Wed, 30 Oct 2024 00:26:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4927B13FEE;
+	Wed, 30 Oct 2024 00:29:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="AyBpilZw"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="cjFkvgNn"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B590BA4A
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 00:26:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531B0CA64
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 00:29:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730248007; cv=none; b=XxRfGTVLfJ9YBnZuTKJ8BLepD1NXABdEgbA3B3exxt9z+X0docRDbf+1WADSwv9VD+ytl0jWc8iDrZhkqBx48DV6QamNTyQuHKnIFdXAfMbRCu/9tZKxj6j/HxoIXsj1nXNcaRSDCeOUlizmPSz8Ub5KKaEhqw7Ix8V6ANP//yg=
+	t=1730248151; cv=none; b=NJ6uhHahnmcxbnPZtOjX0FGOVQXvL4LbGesqELW6MT7HdBx+mqkhwK6gU69FnQ5SZyc6WtOfiKEU9a8ank2dk0F5KixpRwU02PvtG/ZNvDUkafjCISjUg/R8Vo+eiVmiW5oFVD30XUHYZO3uwnsehPjOFkRFhHjrgeRTi48RTbs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730248007; c=relaxed/simple;
-	bh=zd88StyOhjzjHySQr8kpJEgsrhxqHnjBmx5BjhTdaQw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NH6c6L1PYd50/7yjK561RuQzHPp25pr71ivBugZ2/9KDWpYNIJptTr9kZoB8qrdoCz9UnaDnUrgwivpJMmWQVh5URkEvuGEuv/CJRHCjAiqiep7/KfDiAK20q8ihJtTAHSUp5izvTwWotusC6eDCThFf27fxQk8ggGqfszBhwB4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=AyBpilZw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A3D4C4CECD;
-	Wed, 30 Oct 2024 00:26:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730248006;
-	bh=zd88StyOhjzjHySQr8kpJEgsrhxqHnjBmx5BjhTdaQw=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AyBpilZwajuhqfSjZ+u1HinbpAxGUwsjTK4bHH7n+fZtM78sfu1sJvsIesiR2YDQ+
-	 7AHvoGttfw+WlEq31VszoHmdlBau/m7SbnPv0/xlKnFjoLAKo5USdun6IojrSw6JbQ
-	 G9z/MMjXip5bbiGEZ9UcdojM8uDfu5N1s0fPxhPf3BWT+Flk4TGGznUJJZ/Y74JoRA
-	 KEtL05faxGWmT2Cb209Ob6eMcTWSwmX1RZ/saH1/lm0ZDG3uvH1TFQoHuN3YMRFHp6
-	 aH9uK0i9tTBoSKhBDf/bXYp4dCxLxVAvLdaV5r+RhqnR5KNbQDG9koMDPyA6cPOZIJ
-	 oPZ+M2YU+AEsg==
-Date: Tue, 29 Oct 2024 17:26:45 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Mohsin Bashir <mohsin.bashr@gmail.com>, <netdev@vger.kernel.org>,
- <alexanderduyck@fb.com>, <andrew@lunn.ch>, <andrew+netdev@lunn.ch>,
- <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
- <kernel-team@meta.com>, <sanmanpradhan@meta.com>, <sdf@fomichev.me>,
- <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH net-next v2] eth: fbnic: Add support to write TCE TCAM
- entries
-Message-ID: <20241029172645.61935736@kernel.org>
-In-Reply-To: <b44d50d8-23a2-47d6-99f7-856539e1de69@intel.com>
-References: <20241024223135.310733-1-mohsin.bashr@gmail.com>
-	<5a640b00-2ab2-472f-b713-1bb97ceac6ca@intel.com>
-	<20241028163554.7dddff8b@kernel.org>
-	<b44d50d8-23a2-47d6-99f7-856539e1de69@intel.com>
+	s=arc-20240116; t=1730248151; c=relaxed/simple;
+	bh=CrVP5Ds7sG6Go5mXJBPjBGB9xYccOZwpdusd2f6yilE=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=mAQ2A/z4Vkqq8erMBftYbGiU9iCGVr9fD/E4D2Z0mcPs54Ka/B3fskB1GPpSMX9lIC40FLI/s8tN1La2nzCm1FueP7AjtFLJXYqsdcfx2xaNCrtIlW54iX9s+c41gBzHObBnt4oqfcXuem3q660WpyV5qbaQH8MICBDUMbgpWVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=cjFkvgNn; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=codeconstruct.com.au; s=2022a; t=1730248146;
+	bh=CrVP5Ds7sG6Go5mXJBPjBGB9xYccOZwpdusd2f6yilE=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=cjFkvgNnJPEHqShuPv+lA/gduoUOCcSuqlNOEFNKuFfM5pulh3RAth1m/RFhU9Snc
+	 pPPV6gsfepGHn4EaQ3XbDSYn1fMJfcxKMsYxgbNplOh1pjNtVS7nhtxszrd1IJ/Rh+
+	 DYbFxMXDFYTtXsboMnveOBb4+pIaXYAaGvo/e7e5aT+FMfb192OCSkWJ1e7i4WkQFa
+	 /vUDELVUDVA0NWsyuIe4KMcbOskw9vpNwp6S0seZg5uEhUve4GnG1TR9AWaVPQVq1Q
+	 iIUjg9jroc5vK3VqnK6dCatLkPs53ZJAT7/FB+jy0bYoj9CvnPHSDm0UzfeGuSAdfc
+	 OfWWpTR3X+C6w==
+Received: from pecola.lan (unknown [159.196.93.152])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id EA0786A1CD;
+	Wed, 30 Oct 2024 08:29:05 +0800 (AWST)
+Message-ID: <198a796d5855759ca8561590d848c52028378971.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net 1/2] net: ethernet: ftgmac100: prevent use after
+ free on unregister when using NCSI
+From: Jeremy Kerr <jk@codeconstruct.com.au>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Joel Stanley
+ <joel@jms.id.au>, Jacky Chou <jacky_chou@aspeedtech.com>, Jacob Keller
+ <jacob.e.keller@intel.com>, netdev@vger.kernel.org
+Date: Wed, 30 Oct 2024 08:29:05 +0800
+In-Reply-To: <20241029153619.1743f07e@kernel.org>
+References: <20241028-ftgmac-fixes-v1-0-b334a507be6c@codeconstruct.com.au>
+	 <20241028-ftgmac-fixes-v1-1-b334a507be6c@codeconstruct.com.au>
+	 <fe5630d4-1502-45eb-a6fb-6b5bc33506a9@lunn.ch>
+	 <0123d308bb8577e7ccb5d99c504cec389ba8fe15.camel@codeconstruct.com.au>
+	 <20241029153619.1743f07e@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
 
-On Tue, 29 Oct 2024 16:30:54 +0100 Alexander Lobakin wrote:
-> >> Please declare loop iterators right in loop declarations, we're GNU11
-> >> for a couple years already.
-> >>
-> >> 	for (u32 i = 0; ...  
-> > 
-> > Why?  
-> 
-> Because we usually declare variables only inside the scopes within which
-> they're used, IOW
-> 
-> 	for (...) {
-> 		void *data;
-> 
-> 		data = ...
-> 	}
-> 
-> is preferred over
-> 
-> 	void *data;
-> 
-> 	for (...) {
-> 		data = ...
-> 	}
+Hi Jakub,
 
-Are you actually actively pointing that out in review?
-If it was an important rule why is there no automation
-to catch cases where variable is only used in a single
-basic block but is declared at function scope.
+> > As the ordering in ftgmac100_remove() is:
+> >=20
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (priv->ndev)
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 ncsi_unregister_dev(priv->ndev);
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unregister_netdev(netdev);
+> >=20
+> > which, is (I assume intentionally) symmetric with the _probe, which
+> > does:
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0 priv->ndev =3D ncsi_register_dev(netdev, ftgmac100_nc=
+si_handler);
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* ... */
+> >=20
+> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 register_netdev(netdev)
+>=20
+> To be clear - symmetric means mirror image.
 
-> Here it's the same. `for (int` reduces the scope of the iterator.
-> The iter is not used outside the loop.
-> 
-> > Please avoid giving people subjective stylistic feedback, especially  
-> 
-> I didn't say "You must do X" anywhere, only proposed some stuff, which
-> from my PoV would improve the code.
+Totally agree with you both on the concept, but I had flipped the
+unregister order in my head, sorry!
 
-You said "please do XYZ" which in English is pretty strong.
+So, this worth a try with the _remove sequence reordered with respect
+to the ncsi device. I'll work on a replacement patch to see if that can
+be done without other fallout, and will send a follow-up soon.
 
-> And make the style more consistent. "Avoiding giving people subjective
-> stylistic feedback" led to that it's not really consistent beyond the
-> level of checkpatch's complaints.
+Cheers,
 
-checkpatch is obviously bad at its job but I don't think random people
-giving subjective stylistic feedback will improve the situation.
-We have a handful of reviewers who review maybe 1 in 10 patches.
-The reviews are very much appreciated but since those reviewers are not
-covering substantial portion of the code merged they should not come up
-with guidelines of their own making.
 
-I see plenty of cases where one patch gets nit picked to death on small
-stylistic issues and another gets merged even tho its far below average.
-Doesn't feel very fair.
+Jeremy
 
-> > when none of the maintainers have given such feedback in the past.  
-> 
-> I don't think my mission as a reviewer is to be a parrot?
-
-Not what I'm saying. Please focus on functional review of the code,
-and process / stylistic review only to the extent to which such
-rules are widely applied. We even documented this in the netdev "FAQ".
-
-> >> (+ don't use signed when it can't be < 0)  
-> > 
-> > Again, why. int is the most basic type in C, why is using a fixed side
-> > kernel type necessary here?  
-> 
-> Because the negative part is not used at all here. Why not __u128 or
-> double then if it doesn't matter?
-
-We have plenty of bugs because someone decided to use an unsigned type 
-and then decided to decrement as long as its >= 0..
 
