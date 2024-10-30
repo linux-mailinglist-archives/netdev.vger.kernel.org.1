@@ -1,60 +1,62 @@
-Return-Path: <netdev+bounces-140565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B269B708F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 00:35:09 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D08F89B70A9
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 00:46:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7722B281F33
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 23:35:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9624528295D
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 23:46:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D4661CCB53;
-	Wed, 30 Oct 2024 23:35:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7CD061E47A6;
+	Wed, 30 Oct 2024 23:45:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y16y9rUI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aAZ0+DEf"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC03419CC24
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 23:35:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525961CB532;
+	Wed, 30 Oct 2024 23:45:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730331306; cv=none; b=ZYgXfE2I0f15yFCJN1xZi5ADnFIJPBUH1RlBbDpIInjvXiW3RXhz0FdHPhJDLZ9xacHprCUCvlf3Pp/hRHmNGAJToZhQaJ9qU0pQIz4AIIgCcrQST5qvxBb83z6Z+KSDe6W5VlJtsDvPuuZ4Y3N4LL26B39E/TrdwJAkwZCbdP4=
+	t=1730331958; cv=none; b=bcK+mvMl+J/g6frTS7a1mlsF3b9swjTXG0N9+6hL9VwIAfiryK/md6/CEWHn1y6WiNBbtlPPJgU6Ca2NEHd1NhpHvk+keuXkiobZ0Bk+hp8UTc53INnZhLo3uUwHdPFoIVYO9wLZ5smbdky//XQ8dQtjhO4p8rK8py+vVvxoc4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730331306; c=relaxed/simple;
-	bh=q8eYmhOGsCtwPj/BlxPsFFFQrnAydrOcHFD07ejWSuw=;
+	s=arc-20240116; t=1730331958; c=relaxed/simple;
+	bh=uVKYHCM+Y+Nu5MS3tgRaHVxBWJmGqWzpaCVqVuHRkdU=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I8yXFyqPpZWlbj6wnKxYmSKF8/ogAVQVQosGhNBXCd+YsdJDYgyEkKGRo3LVJbrzsRYcjMV4RrFYHv0YvAf6AwGHov/LYmFIupfogo314vBQC022zvQaI95Ke20uhMid1AMrsvGK5V+0Tuyr/uL8Cj8AkrhqDrGp4S3Pvs9RHnQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y16y9rUI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23E01C4AF0B;
-	Wed, 30 Oct 2024 23:35:05 +0000 (UTC)
+	 MIME-Version:Content-Type; b=fwjG52RYapS9bKc4ic0Rwx/FONN1YXgB6pSUnjCkyfhmDYRatpFBAtLQg7bEKFJ8aANdmG56jjPAbd+H0CerNAxkImGBA6ROwZhCBxLrkU0B+gyzPvVp9QwTLGHGfm2hFb5sF7paRZY0tQAemdzlVZkXxXc6s3IzFBRyp4ATWYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aAZ0+DEf; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8FF94C4DDFC;
+	Wed, 30 Oct 2024 23:45:57 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730331305;
-	bh=q8eYmhOGsCtwPj/BlxPsFFFQrnAydrOcHFD07ejWSuw=;
+	s=k20201202; t=1730331957;
+	bh=uVKYHCM+Y+Nu5MS3tgRaHVxBWJmGqWzpaCVqVuHRkdU=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Y16y9rUIIawMO+jVicq5oUgA51Rufw79+y1/oZz2uKXIdhPXFxx0J8uFpfoINHrAT
-	 Q0feU0QBIt+nI5cGeAKCldkLxXl5K8m3jEd10IP2grIzuSO0eNEI5M8iPZEK2tECu7
-	 YBkYEB3DNtxuIRr7JxPbGLOk9QHlw4ol/FCbNhraQAjXj+PoVLj5hcDGgfCbp1L852
-	 oHnwh4uEe1xjMRSE9o6OiNu/burvCn7sRf8sM9HdWwoYfKmywccKALBE5UlKJsavzt
-	 og3KjraHKd/evdHxaD5WyfVB9iQopgljiFI140qKhMvIqpibtqtIr+Bsp3Z2cYnItA
-	 dx5GZCUipQHeA==
-Date: Wed, 30 Oct 2024 16:35:04 -0700
+	b=aAZ0+DEf2BxcmWkF70tcn+PVE8tYIBcy1bLklkajzODaNrn6ZLgmOtqptWnY3Q5vJ
+	 OYgUgQEGnm2dYcpq/7N2DRky5+DAXaj48Arg6ZPMamCTGOb+UxlmGRA0p8eVFDcqAd
+	 TJ+gYcTdxRau42jY72fpjXSmZ3NctJQIhPShqRlTh5vKrpQEtd8W5N0XBzCv4aylA1
+	 ns7JSE+i494O1O5NYo1u+MPIXhrtBrv8L6hwMs6KqC4w6wmy6UJAEc1o7EY7jPQnZ7
+	 6OxhLKdZdx1VhwSUCuGCnFOfbnItVUvm6oOAOzZ8pxut6obxbwxb0xhezhl4ITdGAT
+	 9fzRy8Rar1F8w==
+Date: Wed, 30 Oct 2024 16:45:56 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, David
- Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Ido Schimmel
- <idosch@nvidia.com>
-Subject: Re: [PATCH net-next 0/5] net: Improve netns handling in RTNL and
- ip_tunnel
-Message-ID: <20241030163504.47a375f5@kernel.org>
-In-Reply-To: <CABAhCOQ60u9Bkatbg6bc7CksMTXDw8v06SDsfv77YpEQW+anZg@mail.gmail.com>
-References: <20241023023146.372653-1-shaw.leon@gmail.com>
-	<20241029161722.51b86c71@kernel.org>
-	<CABAhCOQ60u9Bkatbg6bc7CksMTXDw8v06SDsfv77YpEQW+anZg@mail.gmail.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Vladimir Oltean <olteanv@gmail.com>, netdev@vger.kernel.org,
+ andrew@lunn.ch, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] MAINTAINERS: Remove self from DSA entry
+Message-ID: <20241030164556.6fcd9af9@kernel.org>
+In-Reply-To: <a66b52f3-f755-47ae-858d-ec784c985a06@gmail.com>
+References: <20241029003659.3853796-1-f.fainelli@gmail.com>
+	<20241029104946.epsq2sw54ahkvv26@skbuf>
+	<20241029003659.3853796-1-f.fainelli@gmail.com>
+	<20241029104946.epsq2sw54ahkvv26@skbuf>
+	<d7bc3c5f-2788-4878-b6cc-69657607a34c@gmail.com>
+	<d7bc3c5f-2788-4878-b6cc-69657607a34c@gmail.com>
+	<20241030145318.uoixalp5ty7jv45z@skbuf>
+	<a66b52f3-f755-47ae-858d-ec784c985a06@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,23 +66,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 30 Oct 2024 10:10:32 +0800 Xiao Liang wrote:
-> > Do you think the netns_atomic module param is really necessary?
-> > I doubt anyone cares about the event popping up in the wrong
-> > name space first.  
+On Wed, 30 Oct 2024 09:37:38 -0700 Florian Fainelli wrote:
+> > I kinda wish there was a way for people to get recognition for their work
+> > in CREDITS even if they don't disappear completely from the picture.
+> > Hmm, looking at that file, I do recognize some familiar names who are still
+> > active in other areas: Geert Uytterhoeven, Arnd Bergmann, Marc Zyngier...
+> > Would you be interested in getting moved there? At least I believe that
+> > your contribution is significant enough to deserve that.  
 > 
-> We used FRRouting in our solution which listens to link notifications to
-> set up corresponding objects in userspace. Since the events are sent
-> in different namespaces (thus via different RTNL sockets), we can't
-> guarantee that the events are received in the correct order, and have
-> trouble processing them. The way to solve this problem I can think of is
-> to have a multi-netns RTNL socket where all events are synchronized,
-> or to eliminate the redundant events in the first place. The latter seems
-> easier to implement.
+> OK, if you feel this is deserved, sure why not, thanks!
 
-I think we're on the same page. I'm saying that any potential user 
-will run into a similar problem, and I don't see a clear use case 
-for notifications in both namespaces. So we can try to make the
-behavior of netns_atomic=1 the default one and get rid of the module
-param.
+Makes perfect sense to me FWIW, could you make it part of a v2 patch?
 
