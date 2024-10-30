@@ -1,194 +1,161 @@
-Return-Path: <netdev+bounces-140267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 065DD9B5B5D
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:39:44 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D483D9B5B60
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:40:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8A0E51F24FC2
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:39:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11CE51C241E8
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90D1B1D1E8D;
-	Wed, 30 Oct 2024 05:37:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Mim1FQ9e"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0D11CF7C2;
+	Wed, 30 Oct 2024 05:37:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out-174.mta0.migadu.com (out-174.mta0.migadu.com [91.218.175.174])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA7A21D1E7C
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:37:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F3D1CF5FF
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:37:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730266654; cv=none; b=XDDBS+eWRZEb4FQYhh+uWPqi8TPOSBD0dU83p/RyBvfEHt8HyZsBNAvJ03wh5BOK72bTN/v6VwB+TYKmoBNODpP0etqpUkKwdqamVvD03uYr8ifMY1Fu6TqHH12f1QYSUUGyJrVBs9JentjFNI9pkvnl/N6rxVaG3q+M7DtazTE=
+	t=1730266672; cv=none; b=gsflibA0qu/Qtr5ll16qpigsMDF0LX9ujEpLBFD7DjeCC/s5tvbuGSALVfGAFpMUdegutKArPgQY6RfY4wZpbLm47MJKC0IslT0S/6Z6P+hW4kgl2QgxPvd2pN9WBlFhnIyrxYWMcAz7Ywdxu/lRCr2mto+sjVojCoHxosodPhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730266654; c=relaxed/simple;
-	bh=iLnIhrlG+CozN0nP890uzAxeFT/8VLXW/nYxRDWorpU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=D48600MTl60ATLyYaQLVgIJBKjzwD/8AznDZxOXm77COZG0UJW7ksb4l07/TOR03E5jyPVMdc8hVRWhx4xkfOCKrV0d2SqGZIWyb8Miuset2HV5wzDBDGyrxXdIsOSgw3rOPMKWddEHrsQKT01k3syN8pBEFRBoLrJBCozuj688=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Mim1FQ9e; arc=none smtp.client-ip=91.218.175.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730266649;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=reQcU/j3xncUA/PGDWknFHcvbc/DQLVE0K0ar+e4i5Y=;
-	b=Mim1FQ9ergVEiEXYRPbbepgROHwYIXlw8vsoXxcR41mADW9HYF1UknhTSIYTae28L9AbMm
-	gxxfuh2KBhI5aYdbdEPP1ikRtmsZCjIYak5H+N0g1QQKziPA2ytVM728PQsGL+5I112rNF
-	a+MLUW1IqEPmPlXCKv5LcnH80n0pEDY=
-Date: Tue, 29 Oct 2024 22:37:18 -0700
+	s=arc-20240116; t=1730266672; c=relaxed/simple;
+	bh=PjLHXwrAhoN/Mb365uv5xtjh13ztQTTsoXP7lKVcVNw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N+RcHnoc3HHZBQaXLDrBnT3ihVhyaK8G+mvPhaOLW1Im7BYhnI8iZaQR+VtLWoFNBoeUepSEYAsKv/aN/EjixB4Wpv1eguEG6EQl1hj5//apgX3OpJR2vxGIPBsEbB33rHB6VuuOPU1XSa7qU+hn34o8hwhd6v5m3t4d9r5S15Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t61OU-0004DM-VL; Wed, 30 Oct 2024 06:37:22 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t61OS-00190G-2A;
+	Wed, 30 Oct 2024 06:37:20 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t61OS-004JFG-1l;
+	Wed, 30 Oct 2024 06:37:20 +0100
+Date: Wed, 30 Oct 2024 06:37:20 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	Arun Ramadoss <arun.ramadoss@microchip.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
+	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	devicetree@vger.kernel.org, Marek Vasut <marex@denx.de>
+Subject: Re: [PATCH net-next v2 2/5] dt-bindings: net: dsa: ksz: add
+ mdio-parent-bus property for internal MDIO
+Message-ID: <ZyHGEDfhcRGX_Fzg@pengutronix.de>
+References: <20241029110732.1977064-1-o.rempel@pengutronix.de>
+ <20241029110732.1977064-3-o.rempel@pengutronix.de>
+ <20241029123107.ssvggsn2b5w3ehoy@skbuf>
+ <ZyDe_ObZ-laVk8c2@pengutronix.de>
+ <2b03f429-9ae2-4c7a-9cec-0bc2f3c6e816@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
- work parallelly
-To: Jason Xing <kerneljasonxing@gmail.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: willemb@google.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
- ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
- Jason Xing <kernelxing@tencent.com>
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-3-kerneljasonxing@gmail.com>
- <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
- <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
- <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
- <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
- <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
- <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
-Content-Language: en-US
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-In-Reply-To: <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <2b03f429-9ae2-4c7a-9cec-0bc2f3c6e816@lunn.ch>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On 10/29/24 8:04 PM, Jason Xing wrote:
->>>>>>>    static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
->>>>>>>                                 const struct sk_buff *ack_skb,
->>>>>>>                                 struct skb_shared_hwtstamps *hwtstamps,
->>>>>>> @@ -5549,6 +5575,9 @@ static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
->>>>>>>        u32 tsflags;
->>>>>>>
->>>>>>>        tsflags = READ_ONCE(sk->sk_tsflags);
->>>>>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
->>>>>>
->>>>>> I still don't get this part since v2. How does it work with cmsg only
->>>>>> SOF_TIMESTAMPING_TX_*?
->>>>>>
->>>>>> I tried with "./txtimestamp -6 -c 1 -C -N -L ::1" and it does not return any tx
->>>>>> time stamp after this patch.
->>>>>>
->>>>>> I am likely missing something
->>>>>> or v2 concluded that this behavior change is acceptable?
->>>>>
->>>>> Sorry, I submitted this series accidentally removing one important
->>>>> thing which is similar to what Vadim Fedorenko mentioned in the v1
->>>>> [1]:
->>>>> adding another member like sk_flags_bpf to handle the cmsg case.
->>>>>
->>>>> Willem, would it be acceptable to add another field in struct sock to
->>>>> help us recognise the case where BPF and cmsg works parallelly?
->>>>>
->>>>> [1]: https://lore.kernel.org/all/662873cb-a897-464e-bdb3-edf01363c3b2@linux.dev/
->>>>
->>>> The current timestamp flags don't need a u32. Maybe just reserve a bit
->>>> for this purpose?
->>>
->>> Sure. Good suggestion.
->>>
->>> But I think only using one bit to reflect whether the sk->sk_tsflags
->>> is used by normal or cmsg features is not enough. The existing
->>> implementation in tcp_sendmsg_locked() doesn't override the
->>> sk->sk_tsflags even the normal and cmsg features enabled parallelly.
->>> It only overrides sockc.tsflags in tcp_sendmsg_locked(). Based on
->>> that, even if at some point users suddenly remove the cmsg use and
->>> then the prior normal SO_TIMESTAMPING continues to work.
->>>
->>> How about this, please see below:
->>> For now, sk->sk_tsflags only uses 17 bits (see the last one
->>> SOF_TIMESTAMPING_OPT_RX_FILTER). The cmsg feature only uses 4 flags
->>> (see SOF_TIMESTAMPING_TX_RECORD_MASK in __sock_cmsg_send()). With that
->>> said, we could reserve the highest four bits for cmsg use for the
->>> moment. Four bits represents four points where we can record the
->>> timestamp in the tx case.
->>>
->>> Do you agree on this point?
->>
->> I don't follow.
->>
->> I probably miss the entire point.
->>
->> The goal for sockcm fields is to start with the sk field and
->> optionally override based on cmsg. This is what sockcm_init does for
->> tsflags.
->>
->> This information is for the skb, so these are recording flags.
->>
->> Why does the new datapath need to know whether features are enabled
->> through setsockopt or on a per-call basis with a cmsg?
->>
->> The goal was always to keep the reporting flags per socket, but make
->> the recording flag per packet, mainly for sampling.
+On Tue, Oct 29, 2024 at 09:35:48PM +0100, Andrew Lunn wrote:
+> > > I'm not saying whether this is good or bad, I'm just worried about
+> > > mixing quantities having different measurement units into the same
+> > > address space.
+> > > 
+> > > Just like in the case of an mdio-mux, there is no address space isolation
+> > > between the parent bus and the child bus. AKA you can't have this,
+> > > because there would be clashes:
+> > > 
+> > > 	host_bus: mdio@abcd {
+> > > 		ethernet-phy@2 {
+> > > 			reg = <2>;
+> > > 		};
+> > > 	};
+> > > 
+> > > 	child_bus: mdio@efgh {
+> > > 		mdio-parent-bus = <&host_bus>;
+> > > 
+> > > 		ethernet-phy@2 {
+> > > 			reg = <2>;
+> > > 		};
+> > > 	};
+> > > 
+> > > But there is a big difference. With an mdio-mux, you could statically
+> > > detect address space clashes by inspecting the PHY addresses on the 2
+> > > buses. But with the lan937x child MDIO bus, in this design, you can't,
+> > > because the "reg" values don't represent MDIO addresses, but switch port
+> > > numbers (this is kind of important, but I don't see it mentioned in the
+> > > dt-binding).
+> > 
+> > In current state, the driver still require properly configured addresses
+> > in the devicetree. So, it will be visible in the DT.
 > 
-> If a user uses 1) cmsg feature, 2) bpf feature at the same time, we
-> allow each feature to work independently.
+> This is not what i was expecting, especially from mv88e6xxx
+> perspective. The older generation of devices had the PHYs available on
+> the 'host bus', as well as the 'child bus', using a 1:1 address
+> mapping. You could in theory even skip the 'child bus' and list the
+> PHYs on the 'host bus' and phy-handle would make it work. However i
+> see from a later comment that does not work here, you need some
+> configuration done over SPI, which mv88e6xx does not need. 
 > 
-> How could it work? It relies on sk_tstamp_tx_flags() function in the
-> current patch: when we are in __skb_tstamp_tx(), we cannot know which
-> flags in each feature are set without fetching sk->sk_tsflags and
-> sk->sk_tsflags_bpf. Then we are able to know what timestamp we want to
-> record. To put it in a simple way, we're not sure if the user wants to
-> see a SCHED timestamp by using the cmsg feature in __skb_tstamp_tx()
-> if we hit this test statement "skb_shinfo(skb)->tx_flags &
-> SKBTX_SCHED_TSTAMP)". So we need those two socket tsflag fields to
-> help us.
-
-I also don't see how a new bit/integer in a sk can help to tell the per cmsg 
-on/off. This cmsg may have tx timestamp on while the next cmsg can have it off.
-
-There is still one bit in skb_shinfo(skb)->tx_flags. How about define a 
-SKBTX_BPF for everything. imo, the fine control on 
-SOF_TIMESTAMPING_TX_{SCHED,SOFTWARE} is not useful for bpf. Almost all of the 
-time the bpf program wants all available time stamps (sched, software, and 
-hwtstamp if the NIC has it). Since bpf is in the kernel, it is much cheaper 
-because it does not need to do skb_alloc/clone and queue to the error queue.
-
-I think the bpf prog needs to capture a timestamp at the sendmsg() time, so a 
-bpf prog needs to be called at sendmsg(). Then it may as well allow the bpf 
-prog@sendmsg() to decide if it needs to set the SKBTX_BPF bit in 
-skb_shinfo(skb)->tx_flags or not.
-
-TCP_SKB_CB(skb)->txstamp_ack can also work similarly. There is still unused bit 
-in "struct tcp_skb_cb", so may be adding TCP_SKB_CB(skb)->bpf_txstamp_ack
-
-Then there is no need to control SOF_TIMESTAMPING_TX_* through bpf_setsockopt(). 
-It only needs one bpf specific socket option like bpf_setsockopt(SOL_SOCKET, 
-BPF_TX_TIMESTAMPING) to guard if the bpf-prog@sendmsg() needs to be called or 
-not. There are already other TCP_BPF_IW,TCP_BPF_SNDCWND_CLAMP,... specific 
-socket options.
-
-imo, this is a simpler interface and also gives the bpf prog per packet control 
-at the same time.
-
-[ This user space cmsg-only testing has to be in the selftests/bpf to show how 
-it can work. ]
-
+> > 
+> > > These are translated by lan937x_create_phy_addr_map() using
+> > > the CASCADE_ID/VPHY_ADD pin strapping information read over SPI.
+> > > I.e. with the same device tree, you may or may not have address space
+> > > clashes depending on pin strapping. No way to tell.
+> > 
+> > The PHY address to port mapping in the driver is needed to make the
+> > internal switch interrupt controller assign interrupts to proper PHYs.
 > 
-> Thanks,
-> Jason
+> You are talking about:
+> 
+> 			ds->user_mii_bus->irq[phy] = irq;
+> 
+> in ksz_irq_phy_setup.
+> 
+> I naively expect 'phy' to be the 'reg' value in DT, and the 'dev'
+> value which passed to mdiobus_read_nested(bus, dev, reg) ?
 
+Yes, this is correct. This can be implemented purely by parsing the
+devicetree. Based on previous experience, I expected you to suggest me
+to implement the validation so i jumped directly to a part of this step.
+
+Should I implement it based on the devicetree information and validate
+based on HW strapping?
+
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
