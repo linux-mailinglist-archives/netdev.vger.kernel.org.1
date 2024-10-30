@@ -1,107 +1,104 @@
-Return-Path: <netdev+bounces-140485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F5E79B69EA
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:00:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22D7F9B6A21
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:06:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E07AE1F215F7
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:00:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 469FD1C242E6
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:06:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375FE228B60;
-	Wed, 30 Oct 2024 16:54:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 239CF21833F;
+	Wed, 30 Oct 2024 16:55:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="cb5HEHDd"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="IBZ0FuUO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BFC227398
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 16:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFAA3218330
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 16:55:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730307252; cv=none; b=HoDhR3exyyBfrf6/k9oYxnDimJUfkBLtj/SY15Ca+zU96C/pKh5eCuWifdNd4wZVCwkc7ufsarc6uWoZ+WkNPDM8yZ7k7VB7DTxhRbAQqeWSIH5spWwkpAwNPtoL19mm7w7TnOGDPfCamFeAlhhpk2qilrfO5I+7cpMwKHbKoFc=
+	t=1730307315; cv=none; b=r9l7xiiIkWyxTnGh64ua7bazEQ66j/ZBdws0J7XdQOYRB9XHs7YeJie50RD1PfDPiI1D41IJF+Ru9jNLW69QAwvHgw1FNDkcTYpCY2a0BLljUxX6prhcWLWwKpsBE4KK5LhG4XAKZVd6TbQn4dZt5yymgKVSzrfzmEkZrtXPh70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730307252; c=relaxed/simple;
-	bh=XKA3NeGfMEEQRjUY8PoH0q2brIq/qABlMcat/iukEgA=;
+	s=arc-20240116; t=1730307315; c=relaxed/simple;
+	bh=hvHp1WT35BDFmKskMwF0K7/OQ2TGD8kM2G7wml63NnA=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rrbmYGMeBH2tk/+J4C+RZbK4U5hqjTHm5hYiWsvVU1L+fthORyCyc39mqJtcFf0DjEAr3nM78jt83nLQZ+emaQPMciMR/6ja5Zi6+mFTAvIY98shfe14p1vIs8PHBrMP/bv57rtZpVVF+UIFZV6VNzgk8VZdvRCHwN0qZ7f4NV0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=cb5HEHDd; arc=none smtp.client-ip=209.85.208.50
+	 To:Cc:Content-Type; b=jwEElJdHNtkAUDHPqh9OBAAi/LQXSOCDMss1eszEWNG9L44UkJ3Eum8KV0iTuPGnzusvs7ihqsiRiApLFNWT9rz9du3M1bba5W35ORXyDUZJCx5iHHrVtosadzQVOgOQwKpqxcYD3ZEDC1wJpx8hXK7ZREvrlQVYhoG34EMVn1A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=IBZ0FuUO; arc=none smtp.client-ip=209.85.208.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c40aea5c40so122460a12.0
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 09:54:09 -0700 (PDT)
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c941623a5aso2055791a12.0
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 09:55:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730307248; x=1730912048; darn=vger.kernel.org;
+        d=broadcom.com; s=google; t=1730307311; x=1730912111; darn=vger.kernel.org;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=XKA3NeGfMEEQRjUY8PoH0q2brIq/qABlMcat/iukEgA=;
-        b=cb5HEHDdL0H5s6yWwcmQOrA/47L4HKOF0crvSwnwPOJTAIhSPL7jZnM/+p9AE/3d1d
-         /9GrfTZNjgEdsBoFvvN8s5konFBtySh7/NwwaSXW3iLLqMWP1mprl5POqPx0e0XQMvvT
-         FQTblP/QgD6++LUCNdKl/MHg7uFPbuZgVLXrE=
+        bh=hvHp1WT35BDFmKskMwF0K7/OQ2TGD8kM2G7wml63NnA=;
+        b=IBZ0FuUOk5uZZPgJAzZoPCP522qzFNMbvfkulmM26uCPRdPVy63OICzhyLzsxoZhV2
+         A0TqqTfhnPFTx2ZJ/gG4s063acXqq5jW7ddSdxaN6HwsgLfr8xfLLOyd/QzgNCXZ37/U
+         faBx/s6Zm1adNWDg3mCyNAyNCaJdCNe1fJv3g=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730307248; x=1730912048;
+        d=1e100.net; s=20230601; t=1730307311; x=1730912111;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=XKA3NeGfMEEQRjUY8PoH0q2brIq/qABlMcat/iukEgA=;
-        b=pcgS0I12olv3+fdHlB5mDNKXafImslgr3ftCZhvDEEUHsC4A1lmgYHGz2xpbk9pA23
-         qNRGBPb4kuQGbC8CKiVe0gVYjh7xGXqd+0En7+jlQPzdFyEey7s8WuLZEWcXgqU/6Ssw
-         7M2rZmgSNCr3gjWr9iFP0NYaOFIiyw32hH+OT4Bq1eSrZu1jk97+L0wq2UT5McrO3Hxc
-         PdGUTtdDZHkpBMLJF/8XQRjkt8+yumj9RT3M2I2/MjptF1ACpcznM9BK29eEsORMi79v
-         54+VR92b6PVT4ctK8N8ddZQNcVz65OEu3Yzz2GRqR2cTJtM6dFlq8KDO6Ya9SkFA5eYL
-         8RBg==
-X-Forwarded-Encrypted: i=1; AJvYcCXGxvuIV+b3j8S7dSe5wDJWvjQzewtqCikKm8rIHmJ3V5GwQVOovWjna3UD1pfxTu7hwNOdpKo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwGKUtKaGn5JMggKQ5lX31BP6dbDyY5cKRbkSSBU9xtU89yS5uh
-	yDjcsmKxCuBFowuMvIK13ZftfwvLdvWGk6YhLMTHVGZT7fesBVtDnn+wByYmTe3Vqil4KOrIMqt
-	/xzYA3KEYiAiKKDolOL9XIOK299ztjBEHtW6L
-X-Google-Smtp-Source: AGHT+IGdkug9nmmXghNsE4YDmEQXPdyo7XiYUrxWByU/oqTMh9Ui/VEa87Ertud70KZ/fvaA6U9fRv52kvZ8+uC+xIg=
-X-Received: by 2002:a05:6402:524b:b0:5c9:88d3:b1bd with SMTP id
- 4fb4d7f45d1cf-5cd564afb89mr2685447a12.12.1730307247612; Wed, 30 Oct 2024
- 09:54:07 -0700 (PDT)
+        bh=hvHp1WT35BDFmKskMwF0K7/OQ2TGD8kM2G7wml63NnA=;
+        b=e8D1idpKyXevZtcCFACuwJ6GjsKvIu6FkPy2cLefxR7i5pEfwAlrwMgyw2zkSxgOpU
+         MwJFssFCYFBy8IINXL3rSf0k7YYxPQ+NiYREcRihD3y+v6PKxWS11EtbRi9EmVOiYqmo
+         0b8/bFFCPCgf+VX3aChJBI+9ufVauV2Ne52KBW7w0+zUyr+S+1Cm1i9RF/mVcaU5M9ep
+         mBMIkeaZZ20GOlBS7I6oMUU44tg98H/Spgz7s6goQ2d4aFqCZxO18pvNv3+H26KK6+hn
+         hqN3NKv2JVfBwXDgUGhnOClDPQBHz9yRBdY6NlKzU7dXBEt/GsRGm9NFp+ycwg83kJBU
+         Jhsw==
+X-Forwarded-Encrypted: i=1; AJvYcCUVLrsk5I94dpkxC8z7Nucze4+JIj534A7PooBH0dd4l0YxikqODEfW3MaIp492UcxEg6WoooY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzSvDBww+yFU0KaY6F8I1F0SE0OfFvpuoeOe2XNSryjeG4lx2Gc
+	elSSSN674wc9vqkHvcI4j6i94Yk+eEasF79dWpJ77au7CMZJ15/IY5WenbEllm6V1IwDLdB++bE
+	Lf/QQhPoHZfscp0ssSJWdhbuoaWQ6Jz7dNYEd
+X-Google-Smtp-Source: AGHT+IEWDha+POUfsZo4I+MbzcCXtgyPGNWDQ8R6rB/TtW+dyJoCgk3XOITlNivWkhPE10jSg3z9kmG7ZqLRMYlSQgI=
+X-Received: by 2002:a05:6402:1941:b0:5c4:aea:5833 with SMTP id
+ 4fb4d7f45d1cf-5cd2e356bcdmr5228774a12.18.1730307311142; Wed, 30 Oct 2024
+ 09:55:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029205453.2290688-1-vadfed@meta.com>
-In-Reply-To: <20241029205453.2290688-1-vadfed@meta.com>
+References: <20241029205453.2290688-1-vadfed@meta.com> <20241029205453.2290688-2-vadfed@meta.com>
+In-Reply-To: <20241029205453.2290688-2-vadfed@meta.com>
 From: Michael Chan <michael.chan@broadcom.com>
-Date: Wed, 30 Oct 2024 09:53:55 -0700
-Message-ID: <CACKFLi=q82S9Ks8raZU3_qhS1+Kac-AT1trceiXL4KMJ_tg=dA@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/2] bnxt_en: cache only 24 bits of hw counter
+Date: Wed, 30 Oct 2024 09:54:58 -0700
+Message-ID: <CACKFLikK8jccgHijxaVqrsM_hD-9drxK_rrg=5+Vb-oLtyj0kA@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] bnxt_en: replace PTP spinlock with seqlock
 To: Vadim Fedorenko <vadfed@meta.com>
 Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Pavan Chebbi <pavan.chebbi@broadcom.com>, 
 	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, 
 	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
 	Richard Cochran <richardcochran@gmail.com>
 Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000df35a50625b48c4b"
+	boundary="000000000000a8e4900625b49022"
 
---000000000000df35a50625b48c4b
+--000000000000a8e4900625b49022
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
 On Tue, Oct 29, 2024 at 1:55=E2=80=AFPM Vadim Fedorenko <vadfed@meta.com> w=
 rote:
 >
-> This hardware can provide only 48 bits of cycle counter. We can leave
-> only 24 bits in the cache to extend RX timestamps from 32 bits to 48
-> bits. Lower 8 bits of the cached value will be used to check for
-> roll-over while extending to full 48 bits.
-> This change makes cache writes atomic even on 32 bit platforms and we
-> can simply use READ_ONCE()/WRITE_ONCE() pair and remove spinlock. The
-> configuration structure will be also reduced by 4 bytes.
+> We can see high contention on ptp_lock while doing RX timestamping
+> on high packet rates over several queues. Spinlock is not effecient
+> to protect timecounter for RX timestamps when reads are the most
+> usual operations and writes are only occasional. It's better to use
+> seqlock in such cases.
 >
 > Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
-
 Thanks.
 Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
---000000000000df35a50625b48c4b
+--000000000000a8e4900625b49022
 Content-Type: application/pkcs7-signature; name="smime.p7s"
 Content-Transfer-Encoding: base64
 Content-Disposition: attachment; filename="smime.p7s"
@@ -172,14 +169,14 @@ hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
 E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
 aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
 EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJQnIK4I3mte3mEWjl6LKJbR53dqSffs
-ES04LnDcvkMZMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAz
-MDE2NTQwOFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEID2eBkbx9dvuiGWoIFPS9Cdxnc7wbNvZ
+8ZdTikM3ylOnMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTAz
+MDE2NTUxMVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
 SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCqc7F85d2SBWGn7o1eIf8vcNUi6+hjSQHevaYP9GYO2hxI4l7Y
-XVaMKf+GjJDUexfTUu84OA6C5NcbORVvdRfAPRx/gQqwPEGIUxLfXsmDAHiBKjyd9LjSVQXa+F/T
-IZFUJOhFrDJvqLU/vIYtHJxc7eAjAhhfjCOCq6Y1pVSrqJgAfFew9IjhbdZt/RjaOltnussm8F3y
-vezSybf+hOOnWFywmE4APSu2cCxjDLXTTZqKE8dO2hs4UMmNEIelidnUy4xll8CSMiipMKaxstr1
-2XB+NKOxGIfcpJO88lyavxC2esB/grkyMIlcoQvnxUL+Jqxa/uZujGSkj6ETWYt1
---000000000000df35a50625b48c4b--
+ATANBgkqhkiG9w0BAQEFAASCAQCXpu9/aoBvKXBqq974lL4hUVWO8vSOWAR08dy2PsOVzAIT2wBF
+2jR9Z2TcQ/uY+Y3StxfJAdk8qJ1ayoQ99wo5127FjSW3kkMXMlaFstVzIsGoQlE75gKz/+sGBJA7
+F2cZcOWLz+Tc07kHJW5m5hTYz+YXZ3vAJ8kpyEZ0Aq6AyPKCPrwFUH3h1pCiQM6R5YVRGSCX5kqo
+j97ys0hvYTJvyqM7b672ma2HrzX4u4H8YdIm6plHV7pc55dJeBUHZMZTL7BoxhYRG9adZlcBfSC3
+snaQtwCx3llnSRe9yStrXyIixYb1gWu6EnIv1bhTAVNZ/tGEFYDGp5xBhArbqwsy
+--000000000000a8e4900625b49022--
 
