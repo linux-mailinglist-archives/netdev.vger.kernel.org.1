@@ -1,197 +1,229 @@
-Return-Path: <netdev+bounces-140436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65E489B66F7
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:06:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 537069B6700
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:07:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88F331C21449
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:06:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CD8211F2169E
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:07:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1C220ADD8;
-	Wed, 30 Oct 2024 15:06:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 90DF020ADDA;
+	Wed, 30 Oct 2024 15:07:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b="TG9N5ALq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cyKqntCY"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A471A1F4737;
-	Wed, 30 Oct 2024 15:06:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516431F4737;
+	Wed, 30 Oct 2024 15:07:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730300809; cv=none; b=i482DrGR49i0jjKaHhjGgbF2qQdus04EaH7K8I+RqQ0TmSLabdC5mqCG4Ee2N6R1zwERhHkhpBbPLZA+DFoz09R6h4gUfoyqP7IsO5p0UH8IRzE98W2FKgcnNuTgCGEWykWwXWSQ4qB4ChI0ZLlk0cqfLBuL4LHIwZu7t2arWKs=
+	t=1730300822; cv=none; b=JM/oFXC2z7ib7gBEQ+LaNQ56xwKOgGg3YjhRL6N08tpwVEOtBJZliazX2wNNwDmG/+A+PGyHnVlH1wXPRvlbN9bPMZfu96GLUTEG7tOi9mwP2NvC6hPW3lJ3pt+kxRMwUsqtDBAPQLTj2QA2SNQuwhflJTNzdxOYQUc/pU3gx5g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730300809; c=relaxed/simple;
-	bh=0OkC2dqVnOc6YLiGoIpaD17f5ytIvcdKeU4+B50Wqg0=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=azZpmXthlqJ3YpHvxlC3gmviEAee3ZerN258N9RgnUDa6BzZt0ipd1D14BB6qKboZB+BE90uL+oHVXKoU060KaE4klR5hr6qCdVl1yUuVuNHVYMtAnLaoYwYig0V1S/mSU9NUKJyrmhhhMy2WlTXYjjx2Rf8XZeQBiunY+pdl9Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b=TG9N5ALq; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1730300703; x=1730905503; i=metux@gmx.de;
-	bh=r8NEMTNTCDr0Gy+Y5ltqY96l8Fe98i0aW/ZfvTvRN64=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
-	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
-	 cc:content-transfer-encoding:content-type:date:from:message-id:
-	 mime-version:reply-to:subject:to;
-	b=TG9N5ALqSGxwvwpbjBAJiTanYQmRvOL8ty2SucNrRTSbvbghh3MGGrs2yARUHlgY
-	 Q6QVx6imOFvHivPdrDnNaVWDLC7DqHns9xHr/kj+MAEXKiFnHbw22y0ocFPAc1I6M
-	 pSD2knrJS3PhtPz8aTZl64Htb70C3bnHzSLMHut3qMU/wagdL//cVlES6HvamJA+z
-	 IV/2SEtSinXK+FrXdt+n76oS2X+T5Z9Fh2vs6Raxn702x1w0HpBS5t4C6tQ2pvNcn
-	 oGcefk1uhkkatyXFSBCwLdO81EQttQPjV542ZF57xfMFzPRMErmS6n0AemQHDXmpv
-	 ejWd1C7Jq5AQIthD1Q==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.178] ([77.2.112.201]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MhU9Z-1tjdfQ0rJb-00b4sz; Wed, 30
- Oct 2024 16:05:03 +0100
-Message-ID: <3dd9bf0c-915d-4ef6-b6ba-309ef627e431@gmx.de>
-Date: Wed, 30 Oct 2024 16:05:40 +0100
+	s=arc-20240116; t=1730300822; c=relaxed/simple;
+	bh=voi/WMWGAYJexGuW4J0qxHijwgOTwDVYv2O9Z9zK46s=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rWE9PizQZ6xnT9apn+gnMFU6ZE0+CP9lpWQT1cylZfzN3zUJ85iAXP7ZOFL+wjisdVBaqZCx/ZoH3aOKAKzctz5LSElMOO+KXjRAAf6nCYg1OXrD8fr3qf8TBYE33l+D+Ocjz1OumTL2Zd3cFrWZ0D35MEz76VpAyW4VLy2Oq2k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cyKqntCY; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e61b47c6cso5500439b3a.2;
+        Wed, 30 Oct 2024 08:07:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730300820; x=1730905620; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=MB84HWvBH3NxPapEB0SefI1X/ByDzD9jXGtFhi1lXmQ=;
+        b=cyKqntCYqWa4Wuv75ghJh3/5k5omadFPBjrnJxLOjzbe05Z3dIfNDIB1Mvkcxdojma
+         3Xym7OAJwAEiV28ywilcldB6vdAqhFGcGj1j43P6HT/MI+SmaTMBmjazdkkPlZC0U1xH
+         aMj9w76fLpuEZhKQ5spEKOs3rP3daTJ0vHdSQWNm4WdFMUj/7nvfMsTr9LNOSWD068FH
+         Aw9pES6+TC1dxBJn8xkFkwDZH4CC9hwDx53mTwWIA/xl11W8ubgdf+KQSbNFs/nV5bc0
+         vtiVvSuYE0DUgxLKhXAWu6dJ029WCdmR1g0L+pYNu1dIWi05zKhqfZ5otUgMczR140y0
+         XBOQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730300820; x=1730905620;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=MB84HWvBH3NxPapEB0SefI1X/ByDzD9jXGtFhi1lXmQ=;
+        b=Z+IkyylVhvvzkWlGLQPOsvzSZHGWPeth90IPoJGLsE9P8DBLnLLvkuEeEfHYy9rPKQ
+         knlo2S5msTH3/w88GzhArz8ou7ms+bqqw3OAPVq5dNbD7bJooUd9RZUqCEBxRoi8gECJ
+         PRubGiGrVhVk9g1hlw4Al9PUoudN5kDMduDckGlOvQoJRhtpxF5mTRlTQ/K0MsZOvtIk
+         nVeKHU+anxXbb9htvxmyX36m0TetKsW3fhIolbwNsOd7ORY0UCEfdAjiV1m+9iU7mOyh
+         ROxgrc3wxc6YpjuMduqhR3E5MJAJnY5kTOUs4TK5sOY4dcL2fZoJYx8jvSwKek0cOhqg
+         J59Q==
+X-Forwarded-Encrypted: i=1; AJvYcCU/Ok/PZDmOgKfwyf2sfsNsv+pugL+D7HpAjcEsIdey7ITwiPw+sB5JYw6Xn8gwbus7dOOBHkl5DB3jiZh2wf2G@vger.kernel.org, AJvYcCWZW/1IHF7OO6/rsw8ssdaC9J1YHicvXa3x8ByaMh0JRZ5FIb1B/Fku4i2zEwFAvgTm3VlRovW05wSQnYc=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyv2mzWKdVS6DRIcLArLHmas5JBJF3XqSl0okL7ol0RLZ10kTy9
+	I7RuccRJF7lsZAieXw1sO1t9Vx3lntNqx6+L3Mihn9bYjrK2QzQ=
+X-Google-Smtp-Source: AGHT+IHWQsFYQ+/1CjBOC2KuLnSgq+FLfdQk+eaCTU+JoZgp3d066RPg8EvTg7d1ZDBQIPuOzRDRIQ==
+X-Received: by 2002:a05:6a00:3929:b0:71e:2a0:b0d0 with SMTP id d2e1a72fcca58-72062fd4b4bmr22516404b3a.13.1730300819407;
+        Wed, 30 Oct 2024 08:06:59 -0700 (PDT)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a1fc16sm9393619b3a.161.2024.10.30.08.06.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 08:06:59 -0700 (PDT)
+Date: Wed, 30 Oct 2024 08:06:58 -0700
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Shuah Khan <shuah@kernel.org>, Yi Lai <yi1.lai@linux.intel.com>
+Subject: Re: [PATCH net-next v1 6/7] net: fix SO_DEVMEM_DONTNEED looping too
+ long
+Message-ID: <ZyJLkn3uM1Qz6NZn@mini-arch>
+References: <20241029205524.1306364-1-almasrymina@google.com>
+ <20241029205524.1306364-2-almasrymina@google.com>
+ <ZyJDxK5stZ_RF71O@mini-arch>
+ <CAHS8izNKbQHFAHm2Sz=bwwO_A0S_dOLNDff7GTSM=tJiJD2m0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel maintainer *CENSORED* on LKML [WAS: linux: Goodbye from a
- Linux community volunteer]
-From: metux <metux@gmx.de>
-To: =?UTF-8?Q?Dragan_Milivojevi=C4=87?= <d.milivojevic@gmail.com>,
- Peter Cai <peter@typeblog.net>, phoronix@phoronix.com, Goran <g@odyss3us.net>
-Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
- Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
- Paul Burton <paulburton@kernel.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Arnd Bergmann <arnd@arndb.de>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- linux-mips@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
- <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>,
- netdev@vger.kernel.org, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>,
- linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Andrew Halaney <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
- Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
- Sergey Shtylyov <s.shtylyov@omp.ru>, Evgeniy Dushistov <dushistov@mail.ru>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Sergio Paracuellos <sergio.paracuellos@gmail.com>,
- Nikita Shubin <nikita.shubin@maquefel.me>,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
- Linus Torvalds <torvalds@linux-foundation.org>, "[DNG]"
- <dng@lists.dyne.org>, redaktion@golem.de, dev mail list <dev@suckless.org>
-References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
- <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
- <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
- <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
- <6d37175d-1b0b-4b82-80f0-c5b4e61badbf@metux.net>
- <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
-Content-Language: tl
-In-Reply-To: <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:XIQHZvwV6mgEj8g5tc+iuA/GvWf/P0kkygsyLYq+DvGrrOxfuer
- sKfMhqbrAKrcS6TBA0nV6yxkQAbIg4cHFNC8m22+eV6Tm6ANt0DMxHaiEvORd/1HYzHKMgk
- 0VkQ1IWl+7/dkTu206Bz+t8fa5DvIGbo2j6KILH+5jElO/7LAHib2332uA/Vkm3pSIjLcfc
- rD5dh0FGHSSNfDqMV9JFA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:sMpchn7KEUY=;8/e38SV5rTN/RPg4OmC+sukbTpX
- eEvWu6AFQQYXiwVueoIkWDj4q8T6D25HkBJ4BvlujeEJEMnLxGcVaslg1E2J27gL1zulE1a5C
- EGizaYvlsIws7pj9q/e0zmJJmF5S4DLpWSyvxRJqSRM3NnfIHfl+IWmFeZxaz8YyWYzlCcFed
- ndz38sV2Kah6la3JPLMEDjW5i+keCvZ89U0qCwL1dPBpLVbSJjXgw0rKuYWwEn3LU7BebRZuc
- Qm0+OYYB7JONEEcP7iON0FT3Q08NJuDZGJK9ciNrw9bZ7cYEkpizhb8DL8S2G11XMIY/+KCLq
- DaS6B8UMeROHHR53a+0rGLSzYaS6G8S7uTfp1lOX1L0WA26iAcXwZZHBnv+a4gIRHcJeCvUR/
- UCGvk28KtQVngS29h7uU7uAK7IzLNl1sQF6beW1CJfunjA5m0NoemgiKfXsGPFv0fwv6AwWza
- mlnxZbkXpgyxaImk/n3CJz5ofU1fKBpmB5vhUOAiUZL1+XGwG3QMdIdD4oz9SrlwEQRed+Jbr
- Uq34quzJ15ikB1aTiQIAo+FP9eJ4Mvu+UXt8fqCOH4xFmU3HJ7Wjm2sJ8Dw9SjQ4Pmw7f2eZz
- OWwwTpRHnHmP7tgi568dPeHhQzaYV/VxR4oi/dV2hUQg1lz54KbxtQ46azoN0xPdBGx9yr2HP
- 6SgggRzv4siqhZtxJCAc0GyLT6NKSKMoIw9nezb3VjeywHYXZXR/vwemiI7/XR3Udr86o4YwA
- aCse00M4gjLQnnse5VtWlf1yScvKS/ibZJw4EeXp77qtQkJC99CcUpZrc9f2wHGJat0FijrpP
- w6y5xb9/Mdo9VqpgK0hM8Bxw==
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izNKbQHFAHm2Sz=bwwO_A0S_dOLNDff7GTSM=tJiJD2m0A@mail.gmail.com>
 
-Reposing with a different address, since my domain is hard-blocked
-by kernel.org mail server.
+On 10/30, Mina Almasry wrote:
+> On Wed, Oct 30, 2024 at 7:33 AM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> >
+> > On 10/29, Mina Almasry wrote:
+> > > Check we're going to free a reasonable number of frags in token_count
+> > > before starting the loop, to prevent looping too long.
+> > >
+> > > Also minor code cleanups:
+> > > - Flip checks to reduce indentation.
+> > > - Use sizeof(*tokens) everywhere for consistentcy.
+> > >
+> > > Cc: Yi Lai <yi1.lai@linux.intel.com>
+> > >
+> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
+> > >
+> > > ---
+> > >  net/core/sock.c | 46 ++++++++++++++++++++++++++++------------------
+> > >  1 file changed, 28 insertions(+), 18 deletions(-)
+> > >
+> > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > index 7f398bd07fb7..8603b8d87f2e 100644
+> > > --- a/net/core/sock.c
+> > > +++ b/net/core/sock.c
+> > > @@ -1047,11 +1047,12 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
+> > >
+> > >  #ifdef CONFIG_PAGE_POOL
+> > >
+> > > -/* This is the number of tokens that the user can SO_DEVMEM_DONTNEED in
+> > > +/* This is the number of frags that the user can SO_DEVMEM_DONTNEED in
+> > >   * 1 syscall. The limit exists to limit the amount of memory the kernel
+> > > - * allocates to copy these tokens.
+> > > + * allocates to copy these tokens, and to prevent looping over the frags for
+> > > + * too long.
+> > >   */
+> > > -#define MAX_DONTNEED_TOKENS 128
+> > > +#define MAX_DONTNEED_FRAGS 1024
+> > >
+> > >  static noinline_for_stack int
+> > >  sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> > > @@ -1059,43 +1060,52 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+> > >       unsigned int num_tokens, i, j, k, netmem_num = 0;
+> > >       struct dmabuf_token *tokens;
+> > >       netmem_ref netmems[16];
+> > > +     u64 num_frags = 0;
+> > >       int ret = 0;
+> > >
+> > >       if (!sk_is_tcp(sk))
+> > >               return -EBADF;
+> > >
+> > > -     if (optlen % sizeof(struct dmabuf_token) ||
+> > > -         optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
+> > > +     if (optlen % sizeof(*tokens) ||
+> > > +         optlen > sizeof(*tokens) * MAX_DONTNEED_FRAGS)
+> > >               return -EINVAL;
+> > >
+> > > -     tokens = kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
+> > > +     num_tokens = optlen / sizeof(*tokens);
+> > > +     tokens = kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
+> > >       if (!tokens)
+> > >               return -ENOMEM;
+> > >
+> > > -     num_tokens = optlen / sizeof(struct dmabuf_token);
+> > >       if (copy_from_sockptr(tokens, optval, optlen)) {
+> > >               kvfree(tokens);
+> > >               return -EFAULT;
+> > >       }
+> > >
+> > > +     for (i = 0; i < num_tokens; i++) {
+> > > +             num_frags += tokens[i].token_count;
+> > > +             if (num_frags > MAX_DONTNEED_FRAGS) {
+> > > +                     kvfree(tokens);
+> > > +                     return -E2BIG;
+> > > +             }
+> > > +     }
+> > > +
+> > >       xa_lock_bh(&sk->sk_user_frags);
+> > >       for (i = 0; i < num_tokens; i++) {
+> > >               for (j = 0; j < tokens[i].token_count; j++) {
+> > >                       netmem_ref netmem = (__force netmem_ref)__xa_erase(
+> > >                               &sk->sk_user_frags, tokens[i].token_start + j);
+> > >
+> > > -                     if (netmem &&
+> > > -                         !WARN_ON_ONCE(!netmem_is_net_iov(netmem))) {
+> > > -                             netmems[netmem_num++] = netmem;
+> > > -                             if (netmem_num == ARRAY_SIZE(netmems)) {
+> > > -                                     xa_unlock_bh(&sk->sk_user_frags);
+> > > -                                     for (k = 0; k < netmem_num; k++)
+> > > -                                             WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+> > > -                                     netmem_num = 0;
+> > > -                                     xa_lock_bh(&sk->sk_user_frags);
+> > > -                             }
+> > > -                             ret++;
+> >
+> > [..]
+> >
+> > > +                     if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
+> > > +                             continue;
+> >
+> > Any reason we are not returning explicit error to the callers here?
+> > That probably needs some mechanism to signal which particular one failed
+> > so the users can restart?
+> 
+> Only because I can't think of a simple way to return an array of frags
+> failed to DONTNEED to the user.
 
+I'd expect the call to return as soon as it hits the invalid frag
+entry (plus the number of entries that it successfully refilled up to
+the invalid one). But too late I guess.
 
-On 29.10.24 17:51, Enrico Weigelt, metux IT consult wrote:
-> On 25.10.24 15:21, Enrico Weigelt, metux IT consult wrote:
->
-> Hello folks,
->
->
-> <snip>
->
-> Now they're really gone wild: I'm blocked by vger's spam filter.
->
-> An official Linux maintainer is censored on LKML for critizing his
-> holyness Torvalds.
->
-> First I've thought it's just when replying specific mails, but now
-> turned out *all* my mails are blocked, even totally unrelated things.
-> I can confirm it's not by the message content, but my mail address or
-> domain. I'm blocked from whole kernel.org
->
->
-> Here's some piece of evidece (there's much more, I'm collecting it all)
->
->  >=C2=A0=C2=A0=C2=A0 linux-renesas-soc@vger.kernel.org:
->  >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMTP error from remote serv=
-er for TEXT command, host:
-> smtp.subspace.kernel.org (44.238.234.78) reason: 550 5.7.1 Your message
->  > looked spammy to us. Please check https://subspace.
->  > kernel.org/etiquette.html and resend.
->  >
->  >
->  >=C2=A0=C2=A0=C2=A0 netdev@vger.kernel.org:
->  >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMTP error from remote serv=
-er for TEXT command, host:
-> smtp.subspace.kernel.org (44.238.234.78) reason: 550 5.7.1 Your message
->  > looked spammy to us. Please check https://subspace.
->  > kernel.org/etiquette.html and resend.
->  >
->  >
->  >=C2=A0=C2=A0=C2=A0 linux-kernel@vger.kernel.org:
->  >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMTP error from remote serv=
-er for TEXT command, host:
-> smtp.subspace.kernel.org (44.238.234.78) reason: 550 5.7.1 Your message
->  > looked spammy to us. Please check https://subspace.
->  > kernel.org/etiquette.html and resend.
->
->
-> This is unprecented, yet another dam broken. After silently removing
-> valuable maintainers from the MAINTAINERS file, now they wen't another
-> step further and actively blocking communication.
->
-> Seems that critizing his holyness is even worse than being Russian here.
-> This behaviour is just triggering even more criticism.
->
->
-> Everybody's who's unhappy with this, feel free to bringt that on the
-> table @lkml. Let the Streisand effect kick in.
->
->
->
->
-> --mtx
->
->
->
+> Also, this error should be extremely rare or never hit really. I don't
+> know how we end up not finding a netmem here or the netmem is page.
+> The only way is if the user is malicious (messing with the token ids
+> passed to the kernel) or if a kernel bug is happening.
 
+I do hit this error with 1500 mtu, so it would've been nice to
+understand which particular token triggered that. It might be
+something buggy on the driver side, I need to investigate. (it's
+super low prio because 1500)
+
+> Also, the information is useless to the user. If the user sees 'frag
+> 128 failed to free'. There is nothing really the user can do to
+> recover at runtime. Only usefulness that could come is for the user to
+> log the error. We already WARN_ON_ONCE on the error the user would not
+> be able to trigger.
+
+I'm thinking from the pow of user application. It might have bugs as
+well and try to refill something that should not have been refilled.
+Having info about which particular token has failed (even just for
+the logging purposes) might have been nice.
 
