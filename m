@@ -1,143 +1,197 @@
-Return-Path: <netdev+bounces-140435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140436-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6FA9B66F2
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:05:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65E489B66F7
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:06:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0A1EC1F227E1
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:05:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 88F331C21449
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 619C1205AA3;
-	Wed, 30 Oct 2024 15:05:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1C220ADD8;
+	Wed, 30 Oct 2024 15:06:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b="TG9N5ALq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2476C1FDFA0;
-	Wed, 30 Oct 2024 15:05:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A471A1F4737;
+	Wed, 30 Oct 2024 15:06:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730300725; cv=none; b=p5+xBLSk56xvmDHcfT1iHnShWXen+EjWvVsaX7PwBnf7kMnGMQsZRCCU8KH5NnfAUZwUl0Eh6mFO2SqHo7F8T1rUDPn2Nx5GEIMfvBVM2q3+XLxeMMTMmTiQfkkE+dYLQowPxLYyPbXbfwnpC0xaA7C7VAMGH7URIozXMiLnTuM=
+	t=1730300809; cv=none; b=i482DrGR49i0jjKaHhjGgbF2qQdus04EaH7K8I+RqQ0TmSLabdC5mqCG4Ee2N6R1zwERhHkhpBbPLZA+DFoz09R6h4gUfoyqP7IsO5p0UH8IRzE98W2FKgcnNuTgCGEWykWwXWSQ4qB4ChI0ZLlk0cqfLBuL4LHIwZu7t2arWKs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730300725; c=relaxed/simple;
-	bh=goD+pGiQ0rQVe2pgjoni/ZwmQIGCuuYK5AaP0rfWv34=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fixnNdt5yaD+A7xig2wpzuHiG1dx7dl8OtE0lKCMRqv5qwMArVLn25TSFCQg63PeVREpGiKEDJefZHqZuzTpeQTX7pIPb3dbHhcR6OrS1TII0wtYpRU9W/03sPmbMfEHUaFsxn2Q3yX6mHkeUWUEiw0ZmeVCL+lOMqTt0/RRJM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9a977d6cc7so486360266b.3;
-        Wed, 30 Oct 2024 08:05:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730300721; x=1730905521;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JsliBAqPxcmrKVPgDw8B1SlwFR9KYGJogW4u3jch/nA=;
-        b=dYgdVehC+o9arDyIp1iypWZ7uRhHo3AEdydANQxIq17hyuIK+xRBzfxlc59crIFMc+
-         4/K7B4CK6SqApeuMb7b37hV74yKJ1rNbfOhO2WRBzxO0pP6glpCo/Y6yThr/c11r706Z
-         Ot7uoL1w0WgZFs0BkqnEjpZi18TK3EaqKIyA9s2KfZ2Z+ScKKrsdPo2caY2nXFfpnhdk
-         Kz5PKSvpiNZVMdJNqovPKC/dJMtQI6REf9knKvvmy8Tr3e5w4NoyV1Z0TcnPKwuiiloE
-         mlHn3Qk4slq5CZjilEFo57tbkct0n+BzAq7Koyh7Mqzcx7c5is2jo99053r5BfRiwfyl
-         dJlw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEx+eFE83/1pmhYSnM9euHuCNzRNG+Bu5EYFQ/LFbISVaxyr9Cdm2xvBf3hrjHchgJsjuOiOQdBdLAtaw=@vger.kernel.org, AJvYcCWP0OacbBOJw4bq8Jz8sA4QL9j42VVJHZ6d1/GFy+UwrRHu8nc+/PHMYYbPT0A8jbGc0IKclHpk@vger.kernel.org, AJvYcCXulw7482hpklJkLbUSE5jcED9zGCGVgdouogi5tg3eGl/ebmybDM/RAm7z38lwQwxM87cebQCN@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4iq20uBusHXdDiiqDmz4FMfr1PTdvz6+gCURY42Pgn2P85nlS
-	r++AAEtrEq8PP2BGf+Bwlj61HgiDqbcjqoU33G6vr9rquZVU35yw
-X-Google-Smtp-Source: AGHT+IFwv5tYlaHMsIZ+p3GmjDzFyvvMxeVJcS1ooiACmmXEJ/AH7Zp6UzqKlykAB7fpZidVS9XvLw==
-X-Received: by 2002:a05:6402:1d4c:b0:5cb:e6c3:d2c6 with SMTP id 4fb4d7f45d1cf-5cbe6c3d308mr10047483a12.15.1730300721025;
-        Wed, 30 Oct 2024 08:05:21 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb629c250sm4837003a12.27.2024.10.30.08.05.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 08:05:19 -0700 (PDT)
-Date: Wed, 30 Oct 2024 08:05:16 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: kuba@kernel.org, horms@kernel.org, davem@davemloft.net,
-	pabeni@redhat.com, Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, vlad.wing@gmail.com, max@kutsevol.com,
-	kernel-team@meta.com, aehkn@xenhub.one, stable@vger.kernel.org,
-	"open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>
-Subject: Re: [PATCH net] mptcp: Ensure RCU read lock is held when calling
- mptcp_sched_find()
-Message-ID: <20241030-keen-vicugna-of-effort-bd3ab8@leitao>
-References: <20241030140224.972565-1-leitao@debian.org>
- <CANn89iLbTAwG-GM-UBFv4fNJ+1RuUZLMFNDCbUumbXx3SxxfBA@mail.gmail.com>
+	s=arc-20240116; t=1730300809; c=relaxed/simple;
+	bh=0OkC2dqVnOc6YLiGoIpaD17f5ytIvcdKeU4+B50Wqg0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=azZpmXthlqJ3YpHvxlC3gmviEAee3ZerN258N9RgnUDa6BzZt0ipd1D14BB6qKboZB+BE90uL+oHVXKoU060KaE4klR5hr6qCdVl1yUuVuNHVYMtAnLaoYwYig0V1S/mSU9NUKJyrmhhhMy2WlTXYjjx2Rf8XZeQBiunY+pdl9Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b=TG9N5ALq; arc=none smtp.client-ip=212.227.15.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1730300703; x=1730905503; i=metux@gmx.de;
+	bh=r8NEMTNTCDr0Gy+Y5ltqY96l8Fe98i0aW/ZfvTvRN64=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:From:To:
+	 Cc:References:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=TG9N5ALqSGxwvwpbjBAJiTanYQmRvOL8ty2SucNrRTSbvbghh3MGGrs2yARUHlgY
+	 Q6QVx6imOFvHivPdrDnNaVWDLC7DqHns9xHr/kj+MAEXKiFnHbw22y0ocFPAc1I6M
+	 pSD2knrJS3PhtPz8aTZl64Htb70C3bnHzSLMHut3qMU/wagdL//cVlES6HvamJA+z
+	 IV/2SEtSinXK+FrXdt+n76oS2X+T5Z9Fh2vs6Raxn702x1w0HpBS5t4C6tQ2pvNcn
+	 oGcefk1uhkkatyXFSBCwLdO81EQttQPjV542ZF57xfMFzPRMErmS6n0AemQHDXmpv
+	 ejWd1C7Jq5AQIthD1Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.178] ([77.2.112.201]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MhU9Z-1tjdfQ0rJb-00b4sz; Wed, 30
+ Oct 2024 16:05:03 +0100
+Message-ID: <3dd9bf0c-915d-4ef6-b6ba-309ef627e431@gmx.de>
+Date: Wed, 30 Oct 2024 16:05:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iLbTAwG-GM-UBFv4fNJ+1RuUZLMFNDCbUumbXx3SxxfBA@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel maintainer *CENSORED* on LKML [WAS: linux: Goodbye from a
+ Linux community volunteer]
+From: metux <metux@gmx.de>
+To: =?UTF-8?Q?Dragan_Milivojevi=C4=87?= <d.milivojevic@gmail.com>,
+ Peter Cai <peter@typeblog.net>, phoronix@phoronix.com, Goran <g@odyss3us.net>
+Cc: James Bottomley <James.Bottomley@hansenpartnership.com>,
+ Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
+ Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+ ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
+ Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
+ Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
+ Paul Burton <paulburton@kernel.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Arnd Bergmann <arnd@arndb.de>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ linux-mips@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
+ <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>,
+ netdev@vger.kernel.org, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>,
+ linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andrew Halaney <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+ Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Evgeniy Dushistov <dushistov@mail.ru>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+ Nikita Shubin <nikita.shubin@maquefel.me>,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
+ Linus Torvalds <torvalds@linux-foundation.org>, "[DNG]"
+ <dng@lists.dyne.org>, redaktion@golem.de, dev mail list <dev@suckless.org>
+References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+ <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
+ <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
+ <6d37175d-1b0b-4b82-80f0-c5b4e61badbf@metux.net>
+ <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
+Content-Language: tl
+In-Reply-To: <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:XIQHZvwV6mgEj8g5tc+iuA/GvWf/P0kkygsyLYq+DvGrrOxfuer
+ sKfMhqbrAKrcS6TBA0nV6yxkQAbIg4cHFNC8m22+eV6Tm6ANt0DMxHaiEvORd/1HYzHKMgk
+ 0VkQ1IWl+7/dkTu206Bz+t8fa5DvIGbo2j6KILH+5jElO/7LAHib2332uA/Vkm3pSIjLcfc
+ rD5dh0FGHSSNfDqMV9JFA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:sMpchn7KEUY=;8/e38SV5rTN/RPg4OmC+sukbTpX
+ eEvWu6AFQQYXiwVueoIkWDj4q8T6D25HkBJ4BvlujeEJEMnLxGcVaslg1E2J27gL1zulE1a5C
+ EGizaYvlsIws7pj9q/e0zmJJmF5S4DLpWSyvxRJqSRM3NnfIHfl+IWmFeZxaz8YyWYzlCcFed
+ ndz38sV2Kah6la3JPLMEDjW5i+keCvZ89U0qCwL1dPBpLVbSJjXgw0rKuYWwEn3LU7BebRZuc
+ Qm0+OYYB7JONEEcP7iON0FT3Q08NJuDZGJK9ciNrw9bZ7cYEkpizhb8DL8S2G11XMIY/+KCLq
+ DaS6B8UMeROHHR53a+0rGLSzYaS6G8S7uTfp1lOX1L0WA26iAcXwZZHBnv+a4gIRHcJeCvUR/
+ UCGvk28KtQVngS29h7uU7uAK7IzLNl1sQF6beW1CJfunjA5m0NoemgiKfXsGPFv0fwv6AwWza
+ mlnxZbkXpgyxaImk/n3CJz5ofU1fKBpmB5vhUOAiUZL1+XGwG3QMdIdD4oz9SrlwEQRed+Jbr
+ Uq34quzJ15ikB1aTiQIAo+FP9eJ4Mvu+UXt8fqCOH4xFmU3HJ7Wjm2sJ8Dw9SjQ4Pmw7f2eZz
+ OWwwTpRHnHmP7tgi568dPeHhQzaYV/VxR4oi/dV2hUQg1lz54KbxtQ46azoN0xPdBGx9yr2HP
+ 6SgggRzv4siqhZtxJCAc0GyLT6NKSKMoIw9nezb3VjeywHYXZXR/vwemiI7/XR3Udr86o4YwA
+ aCse00M4gjLQnnse5VtWlf1yScvKS/ibZJw4EeXp77qtQkJC99CcUpZrc9f2wHGJat0FijrpP
+ w6y5xb9/Mdo9VqpgK0hM8Bxw==
 
-Hello Eric,
+Reposing with a different address, since my domain is hard-blocked
+by kernel.org mail server.
 
-On Wed, Oct 30, 2024 at 03:18:14PM +0100, Eric Dumazet wrote:
-> On Wed, Oct 30, 2024 at 3:02 PM Breno Leitao <leitao@debian.org> wrote:
-> >
-> > The mptcp_sched_find() function must be called with the RCU read lock
-> > held, as it accesses RCU-protected data structures. This requirement was
-> > not properly enforced in the mptcp_init_sock() function, leading to a
-> > RCU list traversal in a non-reader section error when
-> > CONFIG_PROVE_RCU_LIST is enabled.
-> >
-> >         net/mptcp/sched.c:44 RCU-list traversed in non-reader section!!
-> >
-> > Fix it by acquiring the RCU read lock before calling the
-> > mptcp_sched_find() function. This ensures that the function is invoked
-> > with the necessary RCU protection in place, as it accesses RCU-protected
-> > data structures.
-> >
-> > Additionally, the patch breaks down the mptcp_init_sched() call into
-> > smaller parts, with the RCU read lock only covering the specific call to
-> > mptcp_sched_find(). This helps minimize the critical section, reducing
-> > the time during which RCU grace periods are blocked.
-> >
-> > The mptcp_sched_list_lock is not held in this case, and it is not clear
-> > if it is necessary.
-> >
-> > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > Fixes: 1730b2b2c5a5 ("mptcp: add sched in mptcp_sock")
-> > Cc: stable@vger.kernel.org
-> > ---
-> >  net/mptcp/protocol.c | 7 +++++--
-> >  1 file changed, 5 insertions(+), 2 deletions(-)
-> >
-> > diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> > index 6d0e201c3eb2..8ece630f80d4 100644
-> > --- a/net/mptcp/protocol.c
-> > +++ b/net/mptcp/protocol.c
-> > @@ -2854,6 +2854,7 @@ static void mptcp_ca_reset(struct sock *sk)
-> >  static int mptcp_init_sock(struct sock *sk)
-> >  {
-> >         struct net *net = sock_net(sk);
-> > +       struct mptcp_sched_ops *sched;
-> >         int ret;
-> >
-> >         __mptcp_init_sock(sk);
-> > @@ -2864,8 +2865,10 @@ static int mptcp_init_sock(struct sock *sk)
-> >         if (unlikely(!net->mib.mptcp_statistics) && !mptcp_mib_alloc(net))
-> >                 return -ENOMEM;
-> >
-> > -       ret = mptcp_init_sched(mptcp_sk(sk),
-> > -                              mptcp_sched_find(mptcp_get_scheduler(net)));
-> > +       rcu_read_lock();
-> > +       sched = mptcp_sched_find(mptcp_get_scheduler(net));
-> > +       rcu_read_unlock();
-> 
-> You are silencing the warning, but a potential UAF remains.
-> 
-> sched could have been freed already, it is illegal to deref it.
 
-Thanks.  I got the impression that the scheduler list was append-only,
-and the entries were never freed.
+On 29.10.24 17:51, Enrico Weigelt, metux IT consult wrote:
+> On 25.10.24 15:21, Enrico Weigelt, metux IT consult wrote:
+>
+> Hello folks,
+>
+>
+> <snip>
+>
+> Now they're really gone wild: I'm blocked by vger's spam filter.
+>
+> An official Linux maintainer is censored on LKML for critizing his
+> holyness Torvalds.
+>
+> First I've thought it's just when replying specific mails, but now
+> turned out *all* my mails are blocked, even totally unrelated things.
+> I can confirm it's not by the message content, but my mail address or
+> domain. I'm blocked from whole kernel.org
+>
+>
+> Here's some piece of evidece (there's much more, I'm collecting it all)
+>
+>  >=C2=A0=C2=A0=C2=A0 linux-renesas-soc@vger.kernel.org:
+>  >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMTP error from remote serv=
+er for TEXT command, host:
+> smtp.subspace.kernel.org (44.238.234.78) reason: 550 5.7.1 Your message
+>  > looked spammy to us. Please check https://subspace.
+>  > kernel.org/etiquette.html and resend.
+>  >
+>  >
+>  >=C2=A0=C2=A0=C2=A0 netdev@vger.kernel.org:
+>  >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMTP error from remote serv=
+er for TEXT command, host:
+> smtp.subspace.kernel.org (44.238.234.78) reason: 550 5.7.1 Your message
+>  > looked spammy to us. Please check https://subspace.
+>  > kernel.org/etiquette.html and resend.
+>  >
+>  >
+>  >=C2=A0=C2=A0=C2=A0 linux-kernel@vger.kernel.org:
+>  >=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 SMTP error from remote serv=
+er for TEXT command, host:
+> smtp.subspace.kernel.org (44.238.234.78) reason: 550 5.7.1 Your message
+>  > looked spammy to us. Please check https://subspace.
+>  > kernel.org/etiquette.html and resend.
+>
+>
+> This is unprecented, yet another dam broken. After silently removing
+> valuable maintainers from the MAINTAINERS file, now they wen't another
+> step further and actively blocking communication.
+>
+> Seems that critizing his holyness is even worse than being Russian here.
+> This behaviour is just triggering even more criticism.
+>
+>
+> Everybody's who's unhappy with this, feel free to bringt that on the
+> table @lkml. Let the Streisand effect kick in.
+>
+>
+>
+>
+> --mtx
+>
+>
+>
+
 
