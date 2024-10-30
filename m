@@ -1,112 +1,327 @@
-Return-Path: <netdev+bounces-140254-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA92D9B5A9E
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:16:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 878209B5AA6
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:23:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB7061F24932
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:15:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA5381C20F20
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:23:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8F1125DF;
-	Wed, 30 Oct 2024 04:15:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 669FC194151;
+	Wed, 30 Oct 2024 04:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="NDj2WF3i"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QL63DoW+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4590063CB
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 04:15:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39704125DF;
+	Wed, 30 Oct 2024 04:23:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730261749; cv=none; b=HgSCvPHPuqdtnUnkWv3lI6cPYK51wXefjpY3Q08PQJpRwjONLXrifPhIJx2C4r32ISCLoix29DgGJeAASGtVHq0YtNV3amfTqmc2gg9XcSBLuzPhDZ3HRY1pLdvWcVq1uB9+f0R41kfzkEOBIQ5I5EWWTMZYX4DaYwkTM/cLNok=
+	t=1730262181; cv=none; b=A0iRudURmVaJg+pM9h/rG620eHkgeumQrO+eHS5gn5z2CKiDQSXwgPn1a51OaCJkvYakLLqkwBnHjf91DF/LD9lDPHXK+Cr5CborfuoXWf4eMCaZOoTscQAxIEZDIYJo9ThYXGjmrVLUA/pPEZI5LB4w5YXmPfidOUkVaJVD4u8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730261749; c=relaxed/simple;
-	bh=3S4h6lYW/FOoq+w+464gqUty1TGhWFUvW37Z8Cglu+o=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=JiQppAFJN1tbRLbQ6r1IT2JAKsdb8yxaJkH3Wt88YDjovbzt43Lsd8n2WaiBOsH3F7LDn/uaCDictdtr3EWOhjgktGZnnCyjqgb/fscABtNBecFQyglgbxknaZP9lbmw/s9tTrt1MhDLb68QBjILwKn/aLBg9BX5XG5v/GPn2pU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=NDj2WF3i; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3S4h6lYW/FOoq+w+464gqUty1TGhWFUvW37Z8Cglu+o=; t=1730261747; x=1731125747; 
-	b=NDj2WF3iW0RUOiHPg5k6N32jZOLElYl2xpZ9cvZw/Js7lf6DexD5OknR+FcUn8fVoQ32CEyhMvq
-	/FlaitVzC6UcdPw5SwtwRFgMUWp6IMUweXfyZuxIiodHpH3/aVS/2JNGJYwzk3NFxvmV9M54QIwDz
-	PyEMeW1ELX/BeQt/mLd1+asfETH36J+IKsSmZGBytVsQn0TUUjskB5ybKMGWbI34BRG/6Ls8OeHlU
-	iy7UHC9rhIB3x71fEyREExrkL2xRoD17pHtG3sAZLFZd9/HMwb1kkPrx8xtiAXznkXwxp6vBAuoMX
-	a50HvXt3Fabp7aYVBIViLyuV6ZYVFIo6MoTg==;
-Received: from mail-oi1-f176.google.com ([209.85.167.176]:60621)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1t607W-0007ah-6x
-	for netdev@vger.kernel.org; Tue, 29 Oct 2024 21:15:46 -0700
-Received: by mail-oi1-f176.google.com with SMTP id 5614622812f47-3e5fcf464ecso4080159b6e.0
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 21:15:46 -0700 (PDT)
-X-Gm-Message-State: AOJu0YyndbEtwmZG3TxO+Aip+V0tRg8FREEAiiMz1Vq9QfaoeZ7N9Z2B
-	aP9pd4hBOyCZmX5mVR8TtSyuddV//tnf9lOKjM/wXjhEuk4VUDcIQhoyHXd4VfPpVJAZr5rn5xv
-	W/PRAWNkLg8L4Ma14Yxj+uoFi8uk=
-X-Google-Smtp-Source: AGHT+IG7eAodidXwQoHoJZT/y+6PyIogdkFzTNAyCp262lt6AFux6nY5AKmBeyEaJ0KJIdmJvQDl1YNjwVkoRwcOY5g=
-X-Received: by 2002:a05:6808:2288:b0:3e3:c86e:94fe with SMTP id
- 5614622812f47-3e638482adcmr10044892b6e.38.1730261745628; Tue, 29 Oct 2024
- 21:15:45 -0700 (PDT)
+	s=arc-20240116; t=1730262181; c=relaxed/simple;
+	bh=lN2d8rOTEXvuOeuMB2R0cCQfgA+IvSDQZDfiL+ST9l0=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=lk+Axsn0+1JlhBnDztI6/Bk6VvVqIyHeGrAYnjk+TrkkmLBfni5elj2U3+JNWuypxIQfx1wtjSRY2zMCgLNV+PVyCYE5X+j3FGjfOqS/BQ+9v3ge/a8Rv3FElyAYdQQxRhR7DF9Qx1Was3ThtjkCYg5tGDJAi+yjXMJEeS9qP+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QL63DoW+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPS id C78A0C4CEE4;
+	Wed, 30 Oct 2024 04:23:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730262180;
+	bh=lN2d8rOTEXvuOeuMB2R0cCQfgA+IvSDQZDfiL+ST9l0=;
+	h=From:Date:Subject:To:Cc:Reply-To:From;
+	b=QL63DoW+6MkbGHheFMZzYsQaq23qI50VP4HYq9xuriFnVUBvvrM0A2IIqwq6CZ+Pt
+	 3GfwdbjMst2302S/YoTKxvvlHD63JXuV0dMC7nfj5UdcWW7yaVZUZ3EKtEu7ieSQ12
+	 CuNuAiN7I0bNYHZccV8ujJkc2KWw9XSKPZ6kRM2Hhe1vzWidEDWf2SY41J7Jp4iE+k
+	 VdUmLMtNpY2b+o/wUey40FGY2OVsPNCw58ta1o2v/M1D46xz4Wqjovrk6nmmQXs0OR
+	 YIhPXdRDS055wVxI8GVbuv7hFJix7MbcKpfZrxgfOsrnHVPGz+lz7vfVrS/FkwlKGq
+	 aVUdm647EIs4A==
+Received: from aws-us-west-2-korg-lkml-1.web.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by smtp.lore.kernel.org (Postfix) with ESMTP id B0FF3D7495F;
+	Wed, 30 Oct 2024 04:23:00 +0000 (UTC)
+From: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>
+Date: Wed, 30 Oct 2024 04:22:33 +0000
+Subject: [PATCH] net/tcp: Add missing lockdep annotations for TCP-AO hlist
+ traversals
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-5-ouster@cs.stanford.edu>
- <dfadfd49-a7ce-4327-94bd-a1a24cbdd5a3@lunn.ch>
-In-Reply-To: <dfadfd49-a7ce-4327-94bd-a1a24cbdd5a3@lunn.ch>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Tue, 29 Oct 2024 21:15:09 -0700
-X-Gmail-Original-Message-ID: <CAGXJAmycKLobQxYF6Wm9RLgTFCJkhcW1-4Gzwb1Kzh7RDnt6Zg@mail.gmail.com>
-Message-ID: <CAGXJAmycKLobQxYF6Wm9RLgTFCJkhcW1-4Gzwb1Kzh7RDnt6Zg@mail.gmail.com>
-Subject: Re: [PATCH net-next 04/12] net: homa: create homa_pool.h and homa_pool.c
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: 126b1dc68df40fcb6eeab1e6794671ae
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241030-tcp-ao-hlist-lockdep-annotate-v1-1-bf641a64d7c6@gmail.com>
+X-B4-Tracking: v=1; b=H4sIAIi0IWcC/x3MQQqDMBBA0avIrDsQYzHYq5Qu4jg2Q+0kJEEK4
+ t2bdvn+4h9QOAsXuHUHZN6lSNSG/tIBBa9PRlmawRp77c1gsFJCHzFsUipukV4Lt6Aaq6+Mbhz
+ cNBk32pWgPVLmVT7///3RPPvCOGevFH7X+k5wnl9ate2zhQAAAA==
+X-Change-ID: 20241030-tcp-ao-hlist-lockdep-annotate-7637990762fc
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ David Ahern <dsahern@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Dmitry Safonov <0x7f454c46@gmail.com>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1730262176; l=9743;
+ i=0x7f454c46@gmail.com; s=20240410; h=from:subject:message-id;
+ bh=REoYesXnOZcViXMhTpRDXKCqR3ncq7wNiulbSW1AwT0=;
+ b=yMgKLLPNSxtrI65bcm6gqxYwdbKxpRuoP1KLGp/g/Pc/olGveWzUb91MuPbaoyL3oIMILIyF8
+ kVcDEGJaDBJDVCSz1ecte2IbPXPv1dTM75nvm2WquSKjWB3tfkKjLQQ
+X-Developer-Key: i=0x7f454c46@gmail.com; a=ed25519;
+ pk=cFSWovqtkx0HrT5O9jFCEC/Cef4DY8a2FPeqP4THeZQ=
+X-Endpoint-Received: by B4 Relay for 0x7f454c46@gmail.com/20240410 with
+ auth_id=152
+X-Original-From: Dmitry Safonov <0x7f454c46@gmail.com>
+Reply-To: 0x7f454c46@gmail.com
 
-On Tue, Oct 29, 2024 at 5:09=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+From: Dmitry Safonov <0x7f454c46@gmail.com>
 
-> > +static inline void set_bpages_needed(struct homa_pool *pool)
->
-> Generally we say no inline functions in .c files, let the compiler
-> decide. If you have some micro benchmark indicating the compiler is
-> getting it wrong, we will then consider allowing it.
+Under CONFIG_PROVE_RCU_LIST + CONFIG_RCU_EXPERT
+hlist_for_each_entry_rcu() provides very helpful splats, which help
+to find possible issues. I missed CONFIG_RCU_EXPERT=y in my testing
+config the same as described in
+a3e4bf7f9675 ("configs/debug: make sure PROVE_RCU_LIST=y takes effect").
 
-I didn't realize that the compiler will inline automatically; I will
-remove "inline" from all of the .c files.
+The fix itself is trivial: add the very same lockdep annotations
+as were used to dereference ao_info from the socket.
 
-> It would be good if somebody who knows about the page pool took a look
-> at this code. Could the page pool be used as a basis?
+Reported-by: Jakub Kicinski <kuba@kernel.org>
+Closes: https://lore.kernel.org/netdev/20241028152645.35a8be66@kernel.org/
+Signed-off-by: Dmitry Safonov <0x7f454c46@gmail.com>
+---
+ include/net/tcp_ao.h |  3 ++-
+ net/ipv4/tcp_ao.c    | 42 +++++++++++++++++++++++-------------------
+ net/ipv4/tcp_ipv4.c  |  3 ++-
+ net/ipv6/tcp_ipv6.c  |  4 ++--
+ 4 files changed, 29 insertions(+), 23 deletions(-)
 
-I think this is a different problem from what page pools solve. Rather
-than the application providing a buffer each time it calls recvmsg, it
-provides a large region of memory in its virtual address space in
-advance; Homa allocates buffer space from that region so that it can
-begin copying data to user space before recvmsg is invoked. More
-precisely, Homa doesn't know which message will be returned as the
-response to a recvmsg until a message actually completes (the first
-one to complete will be returned). Before this mechanism was
-implemented, Homa couldn't start copying data to user space until the
-last packet of the message had been received, which serialized the
-copy with network transmission and reduced throughput dramatically. If
-I understand page pools correctly, I don't think they would be
-beneficial here.
+diff --git a/include/net/tcp_ao.h b/include/net/tcp_ao.h
+index 1d46460d0fefab10feefa318e4ba579a3aa1f1d0..df655ce6987d3730fea7a6ef0db09c2e27b34f21 100644
+--- a/include/net/tcp_ao.h
++++ b/include/net/tcp_ao.h
+@@ -183,7 +183,8 @@ int tcp_ao_hash_skb(unsigned short int family,
+ 		    const u8 *tkey, int hash_offset, u32 sne);
+ int tcp_parse_ao(struct sock *sk, int cmd, unsigned short int family,
+ 		 sockptr_t optval, int optlen);
+-struct tcp_ao_key *tcp_ao_established_key(struct tcp_ao_info *ao,
++struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
++					  struct tcp_ao_info *ao,
+ 					  int sndid, int rcvid);
+ int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
+ 			     struct request_sock *req, struct sk_buff *skb,
+diff --git a/net/ipv4/tcp_ao.c b/net/ipv4/tcp_ao.c
+index db6516092daf5b180fb75482fb711f226451a647..bbb8d5f0eae7d3d8887da3fa4d68e248af9060ad 100644
+--- a/net/ipv4/tcp_ao.c
++++ b/net/ipv4/tcp_ao.c
+@@ -109,12 +109,13 @@ bool tcp_ao_ignore_icmp(const struct sock *sk, int family, int type, int code)
+  * it's known that the keys in ao_info are matching peer's
+  * family/address/VRF/etc.
+  */
+-struct tcp_ao_key *tcp_ao_established_key(struct tcp_ao_info *ao,
++struct tcp_ao_key *tcp_ao_established_key(const struct sock *sk,
++					  struct tcp_ao_info *ao,
+ 					  int sndid, int rcvid)
+ {
+ 	struct tcp_ao_key *key;
+ 
+-	hlist_for_each_entry_rcu(key, &ao->head, node) {
++	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk)) {
+ 		if ((sndid >= 0 && key->sndid != sndid) ||
+ 		    (rcvid >= 0 && key->rcvid != rcvid))
+ 			continue;
+@@ -205,7 +206,7 @@ static struct tcp_ao_key *__tcp_ao_do_lookup(const struct sock *sk, int l3index,
+ 	if (!ao)
+ 		return NULL;
+ 
+-	hlist_for_each_entry_rcu(key, &ao->head, node) {
++	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk)) {
+ 		u8 prefixlen = min(prefix, key->prefixlen);
+ 
+ 		if (!tcp_ao_key_cmp(key, l3index, addr, prefixlen,
+@@ -793,7 +794,7 @@ int tcp_ao_prepare_reset(const struct sock *sk, struct sk_buff *skb,
+ 		if (!ao_info)
+ 			return -ENOENT;
+ 
+-		*key = tcp_ao_established_key(ao_info, aoh->rnext_keyid, -1);
++		*key = tcp_ao_established_key(sk, ao_info, aoh->rnext_keyid, -1);
+ 		if (!*key)
+ 			return -ENOENT;
+ 		*traffic_key = snd_other_key(*key);
+@@ -979,7 +980,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 		 */
+ 		key = READ_ONCE(info->rnext_key);
+ 		if (key->rcvid != aoh->keyid) {
+-			key = tcp_ao_established_key(info, -1, aoh->keyid);
++			key = tcp_ao_established_key(sk, info, -1, aoh->keyid);
+ 			if (!key)
+ 				goto key_not_found;
+ 		}
+@@ -1003,7 +1004,7 @@ tcp_inbound_ao_hash(struct sock *sk, const struct sk_buff *skb,
+ 						   aoh->rnext_keyid,
+ 						   tcp_ao_hdr_maclen(aoh));
+ 			/* If the key is not found we do nothing. */
+-			key = tcp_ao_established_key(info, aoh->rnext_keyid, -1);
++			key = tcp_ao_established_key(sk, info, aoh->rnext_keyid, -1);
+ 			if (key)
+ 				/* pairs with tcp_ao_del_cmd */
+ 				WRITE_ONCE(info->current_key, key);
+@@ -1163,7 +1164,7 @@ void tcp_ao_established(struct sock *sk)
+ 	if (!ao)
+ 		return;
+ 
+-	hlist_for_each_entry_rcu(key, &ao->head, node)
++	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
+ 		tcp_ao_cache_traffic_keys(sk, ao, key);
+ }
+ 
+@@ -1180,7 +1181,7 @@ void tcp_ao_finish_connect(struct sock *sk, struct sk_buff *skb)
+ 	WRITE_ONCE(ao->risn, tcp_hdr(skb)->seq);
+ 	ao->rcv_sne = 0;
+ 
+-	hlist_for_each_entry_rcu(key, &ao->head, node)
++	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
+ 		tcp_ao_cache_traffic_keys(sk, ao, key);
+ }
+ 
+@@ -1256,14 +1257,14 @@ int tcp_ao_copy_all_matching(const struct sock *sk, struct sock *newsk,
+ 	key_head = rcu_dereference(hlist_first_rcu(&new_ao->head));
+ 	first_key = hlist_entry_safe(key_head, struct tcp_ao_key, node);
+ 
+-	key = tcp_ao_established_key(new_ao, tcp_rsk(req)->ao_keyid, -1);
++	key = tcp_ao_established_key(req_to_sk(req), new_ao, tcp_rsk(req)->ao_keyid, -1);
+ 	if (key)
+ 		new_ao->current_key = key;
+ 	else
+ 		new_ao->current_key = first_key;
+ 
+ 	/* set rnext_key */
+-	key = tcp_ao_established_key(new_ao, -1, tcp_rsk(req)->ao_rcv_next);
++	key = tcp_ao_established_key(req_to_sk(req), new_ao, -1, tcp_rsk(req)->ao_rcv_next);
+ 	if (key)
+ 		new_ao->rnext_key = key;
+ 	else
+@@ -1857,12 +1858,12 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
+ 	 * if there's any.
+ 	 */
+ 	if (cmd.set_current) {
+-		new_current = tcp_ao_established_key(ao_info, cmd.current_key, -1);
++		new_current = tcp_ao_established_key(sk, ao_info, cmd.current_key, -1);
+ 		if (!new_current)
+ 			return -ENOENT;
+ 	}
+ 	if (cmd.set_rnext) {
+-		new_rnext = tcp_ao_established_key(ao_info, -1, cmd.rnext);
++		new_rnext = tcp_ao_established_key(sk, ao_info, -1, cmd.rnext);
+ 		if (!new_rnext)
+ 			return -ENOENT;
+ 	}
+@@ -1902,7 +1903,8 @@ static int tcp_ao_del_cmd(struct sock *sk, unsigned short int family,
+ 	 * "It is presumed that an MKT affecting a particular
+ 	 * connection cannot be destroyed during an active connection"
+ 	 */
+-	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
++	hlist_for_each_entry_rcu(key, &ao_info->head, node,
++				 lockdep_sock_is_held(sk)) {
+ 		if (cmd.sndid != key->sndid ||
+ 		    cmd.rcvid != key->rcvid)
+ 			continue;
+@@ -2000,14 +2002,14 @@ static int tcp_ao_info_cmd(struct sock *sk, unsigned short int family,
+ 	 * if there's any.
+ 	 */
+ 	if (cmd.set_current) {
+-		new_current = tcp_ao_established_key(ao_info, cmd.current_key, -1);
++		new_current = tcp_ao_established_key(sk, ao_info, cmd.current_key, -1);
+ 		if (!new_current) {
+ 			err = -ENOENT;
+ 			goto out;
+ 		}
+ 	}
+ 	if (cmd.set_rnext) {
+-		new_rnext = tcp_ao_established_key(ao_info, -1, cmd.rnext);
++		new_rnext = tcp_ao_established_key(sk, ao_info, -1, cmd.rnext);
+ 		if (!new_rnext) {
+ 			err = -ENOENT;
+ 			goto out;
+@@ -2101,7 +2103,8 @@ int tcp_v4_parse_ao(struct sock *sk, int cmd, sockptr_t optval, int optlen)
+  * The layout of the fields in the user and kernel structures is expected to
+  * be the same (including in the 32bit vs 64bit case).
+  */
+-static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
++static int tcp_ao_copy_mkts_to_user(const struct sock *sk,
++				    struct tcp_ao_info *ao_info,
+ 				    sockptr_t optval, sockptr_t optlen)
+ {
+ 	struct tcp_ao_getsockopt opt_in, opt_out;
+@@ -2229,7 +2232,8 @@ static int tcp_ao_copy_mkts_to_user(struct tcp_ao_info *ao_info,
+ 	/* May change in RX, while we're dumping, pre-fetch it */
+ 	current_key = READ_ONCE(ao_info->current_key);
+ 
+-	hlist_for_each_entry_rcu(key, &ao_info->head, node) {
++	hlist_for_each_entry_rcu(key, &ao_info->head, node,
++				 lockdep_sock_is_held(sk)) {
+ 		if (opt_in.get_all)
+ 			goto match;
+ 
+@@ -2309,7 +2313,7 @@ int tcp_ao_get_mkts(struct sock *sk, sockptr_t optval, sockptr_t optlen)
+ 	if (!ao_info)
+ 		return -ENOENT;
+ 
+-	return tcp_ao_copy_mkts_to_user(ao_info, optval, optlen);
++	return tcp_ao_copy_mkts_to_user(sk, ao_info, optval, optlen);
+ }
+ 
+ int tcp_ao_get_sock_info(struct sock *sk, sockptr_t optval, sockptr_t optlen)
+@@ -2396,7 +2400,7 @@ int tcp_ao_set_repair(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ 	WRITE_ONCE(ao->snd_sne, cmd.snd_sne);
+ 	WRITE_ONCE(ao->rcv_sne, cmd.rcv_sne);
+ 
+-	hlist_for_each_entry_rcu(key, &ao->head, node)
++	hlist_for_each_entry_rcu(key, &ao->head, node, lockdep_sock_is_held(sk))
+ 		tcp_ao_cache_traffic_keys(sk, ao, key);
+ 
+ 	return 0;
+diff --git a/net/ipv4/tcp_ipv4.c b/net/ipv4/tcp_ipv4.c
+index 9d3dd101ea713b14e13afe662baa49d21b3b716c..a38c8b1f44dbd95fcea08bd81e0ceaa70177ac8a 100644
+--- a/net/ipv4/tcp_ipv4.c
++++ b/net/ipv4/tcp_ipv4.c
+@@ -1053,7 +1053,8 @@ static void tcp_v4_timewait_ack(struct sock *sk, struct sk_buff *skb)
+ 			}
+ 
+ 			if (aoh)
+-				key.ao_key = tcp_ao_established_key(ao_info, aoh->rnext_keyid, -1);
++				key.ao_key = tcp_ao_established_key(sk, ao_info,
++								    aoh->rnext_keyid, -1);
+ 		}
+ 	}
+ 	if (key.ao_key) {
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index 597920061a3a061a878bf0f7a1b03ac4898918a9..c748eeae1453342bab22f0e5cdb450b9827d2d5f 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1172,8 +1172,8 @@ static void tcp_v6_timewait_ack(struct sock *sk, struct sk_buff *skb)
+ 			if (tcp_parse_auth_options(tcp_hdr(skb), NULL, &aoh))
+ 				goto out;
+ 			if (aoh)
+-				key.ao_key = tcp_ao_established_key(ao_info,
+-						aoh->rnext_keyid, -1);
++				key.ao_key = tcp_ao_established_key(sk, ao_info,
++								    aoh->rnext_keyid, -1);
+ 		}
+ 	}
+ 	if (key.ao_key) {
 
--John-
+---
+base-commit: 71e0ad345163c150ea15434b37036b0678d5f6f4
+change-id: 20241030-tcp-ao-hlist-lockdep-annotate-7637990762fc
+
+Best regards,
+-- 
+Dmitry Safonov <0x7f454c46@gmail.com>
+
+
 
