@@ -1,150 +1,193 @@
-Return-Path: <netdev+bounces-140340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4EC609B6079
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:49:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E0F359B60B7
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:00:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AE5BFB217EB
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D2F01C234B7
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:00:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFE4E1E285C;
-	Wed, 30 Oct 2024 10:48:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD2E1E47AF;
+	Wed, 30 Oct 2024 11:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ArnX0dIz"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="ym7TTSkM"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 88C1B1E32DE
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 10:48:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA26E1E3DFD;
+	Wed, 30 Oct 2024 11:00:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730285321; cv=none; b=gOOCu/9Q/POSZB3WuJ0VR5+cT7iGvL6WbCuhLRd8h6wF3Tkic99axPFoqlKSre0G6hyIRIUF9f1MBPhwgQhnDD0JfoLybcdHyU+B16rU8nM+oXpppMq2ybVo9El8bVxU5Ht7aMAcO1SC0YMw2ZjTOYq9xFIlvcdx29jyNVon8ZI=
+	t=1730286007; cv=none; b=Amf+tgOG3NNhiDVY4OOrpZUxWfIE1tg/elZbNqHRZrEs00F5AZx/+mdnzNHDK1AC8053mHLDYsMVIAZ5iR4QPcZr1uGQyqzInn5HZfur1Rgmc+6oYpXUcIAXkrlnpi3sVaz9cjf4p1B+Ho5YSbYJLeIOO9gnqiRzV5JHQofkVMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730285321; c=relaxed/simple;
-	bh=Pvj8Kjvl9N+9Fewfg0SfTUEiAgAjE0OlNUHkwxCE41c=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=hyBDWEymP+0WN3T7St0Vxa/KaY4DQPQrFWXL5btmeaLKbg28AmtU4SWzTUKXq1EVanGx2Mer5AGlkrvk0JgxI0Ov3rg7nanBB49+Gwe+0GErqEsNpYaal1HP/rqdhaW/qRJyhriyFTb0Aqn6N9Z5+P/OfjXfGlFA3AiEamHwpWk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ArnX0dIz; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730285318;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=Eyu2MVEykt9w1rae/CkawDrbUa0ShMKRyaeX4Ep4x7M=;
-	b=ArnX0dIzAkqGMzcjzyhJ2bTNpPxu2f8npIonVRPL80ACVWsPwgD3IVPORdE+lC3eqowIng
-	s+O8iOAgOmbuZuX4s1Q+Nk9CqSo5mahJkFRQWE9fLwvnxC3PjOZV1s59bKpM62G74ixFfP
-	dMJpMc4OtVYFT+TYAfjc3UYX534Jfso=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-144-fAI0HfBDMVmteyKD2VvBmA-1; Wed, 30 Oct 2024 06:48:37 -0400
-X-MC-Unique: fAI0HfBDMVmteyKD2VvBmA-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-a9a1828916fso92005666b.1
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 03:48:37 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730285316; x=1730890116;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Eyu2MVEykt9w1rae/CkawDrbUa0ShMKRyaeX4Ep4x7M=;
-        b=NJkAbBHDDt1NvOhwhRcF0X3cm+G+fEAqEmS/S4F6XaelASTqN4KXTNh/TSmf8LBKVq
-         8cwEJd/w2RKBSiEiv9CFTy1FZLrDgC8xlJyD0fo9++7Higxzju5wbGzeTvwG0cuvRlC0
-         CB9Iht7fYmrYIjy4sMRCaS3OHOCiQlpPCNpbRjFiY9xtyudyLyn0/3yT0U/CUwd2x4+H
-         yIq9jqypxW358/e/iWpbFQUoGiw03bNmBpJESJWbk9bmlM7nptK2XAiVQa1urUHWGiiz
-         q7Cw06EJKJgNPKeBXS0L1pNC8KK0+ae0+WFP9wc4NaQhD2HoxRiWi/9tljNWdP+nVuFC
-         QNeA==
-X-Forwarded-Encrypted: i=1; AJvYcCWKojufwcIeO7kfIl6XhSngkhP+evUqObrhnfFdb8Za+JeRkZnd7dypbu47qYsDGuqZbAljcH4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxEE6x8gM3mx2B2FMoztEWypBiy2HAoS41WuXLeiRPIP7ImDFB/
-	bS6HwBvWcHlT8qnUuAZZ+f/G7m6XV4YSAsIzkxX4z+jGUsfH7ZPs9rGB5+I3XKHYjAbEXZtn4WG
-	N1jshOeNCl8lrWP6X5FeSonFsawqd9qGHh0rSPl8pNccUvnrtCa86/rDfvDrQ2g==
-X-Received: by 2002:a17:906:478d:b0:a9a:f19:8c2a with SMTP id a640c23a62f3a-a9e40b9920amr192440666b.6.1730285316062;
-        Wed, 30 Oct 2024 03:48:36 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGq8Gbrre41EAAlgW7/PxvavM6X3h6TQKeIKajFcANVfw8aX39AiEdcwMp7UGFX33ps3lmcHw==
-X-Received: by 2002:a17:906:478d:b0:a9a:f19:8c2a with SMTP id a640c23a62f3a-a9e40b9920amr192437166b.6.1730285315707;
-        Wed, 30 Oct 2024 03:48:35 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9b1f029890sm558100866b.56.2024.10.30.03.48.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 03:48:35 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 3AE22164B37A; Wed, 30 Oct 2024 11:48:34 +0100 (CET)
-From: =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Date: Wed, 30 Oct 2024 11:48:26 +0100
-Subject: [PATCH bpf] bpf, test_run: Fix LIVE_FRAME frame update after a
- page has been recycled
+	s=arc-20240116; t=1730286007; c=relaxed/simple;
+	bh=OakBX+RLezysbRjHVFoqGAN0kilo4WleR6cnN3iJ4ds=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=OzE87LgGkWFDiK6uIx/IX74HINAps8uvXmvCQlfdqyyYKkS24GKeRHQyN3O26PzOukRMN+8PoyDmJg7L48piGFwrv7SvpmRw/mDyr7n2YcG/W651VdgCWiDFmB70SMog1F6ggXR6GkLXUErcrOlsDNyiDtByrjnq6Ip4JnTGJ48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=ym7TTSkM; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0265.itg.ti.com ([10.180.67.224])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 49UAxsum113792;
+	Wed, 30 Oct 2024 05:59:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1730285995;
+	bh=l63k3Jhw1oNpvbtOumlKeE3VOY2fol/XMJbv2YlVDLs=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=ym7TTSkMK7JCdrWlrrpPLD0WKp0NFl57xFlQXOUtAkwRcDdZvRr9lN7eW74MMzpQK
+	 p04sGadWJe5qkJs62O7JE3NB7koWoUPWapfP32SYMUVIzjvU6LPf1y8vj13+0xRt1F
+	 8bv9VPBPBvqOi+GD21SC5v0zMQWyFmJMmjUDlBbk=
+Received: from DFLE104.ent.ti.com (dfle104.ent.ti.com [10.64.6.25])
+	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 49UAxs5R012788
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 30 Oct 2024 05:59:54 -0500
+Received: from DFLE106.ent.ti.com (10.64.6.27) by DFLE104.ent.ti.com
+ (10.64.6.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 30
+ Oct 2024 05:59:54 -0500
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE106.ent.ti.com
+ (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 30 Oct 2024 05:59:54 -0500
+Received: from [10.250.202.81] ([10.250.202.81])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 49UAxp7h068380;
+	Wed, 30 Oct 2024 05:59:51 -0500
+Message-ID: <8024aa1c-5bd1-40d8-b0c3-14b5fcd992e2@ti.com>
+Date: Wed, 30 Oct 2024 12:59:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-Id: <20241030-test-run-mem-fix-v1-1-41e88e8cae43@redhat.com>
-X-B4-Tracking: v=1; b=H4sIAPkOImcC/x2MQQqAIBAAvyJ7bkGzKPpKdDBbaw+ZqEUQ/T3pO
- AMzDySKTAkG8UCkixMfvoCqBNjN+JWQl8JQy7pRUkvMlDLG0+NOOzq+0dhet7ZryWoHJQuRiv6
- XI8zBwfS+H6qULmRnAAAA
-X-Change-ID: 20241030-test-run-mem-fix-ac835c75ec3f
-To: Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>, 
- Yonghong Song <yonghong.song@linux.dev>, 
- John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
- Stanislav Fomichev <sdf@fomichev.me>, Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
- Jesper Dangaard Brouer <hawk@kernel.org>, 
- Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
- syzbot+d121e098da06af416d23@syzkaller.appspotmail.com, 
- =?utf-8?q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-X-Mailer: b4 0.14.2
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 01/17] dt-bindings: net: wireless: cc33xx: Add
+ ti,cc33xx.yaml
+To: Krzysztof Kozlowski <krzk@kernel.org>, Kalle Valo <kvalo@kernel.org>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Rob
+ Herring <robh@kernel.org>,
+        Krzysztof Kozlowski <krzk+dt@kernel.org>,
+        Conor
+ Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Sabeeh Khan <sabeeh-khan@ti.com>
+References: <20241029172354.4027886-1-michael.nemanov@ti.com>
+ <20241029172354.4027886-2-michael.nemanov@ti.com>
+ <936b19eb-cde7-4be8-98cf-e60e32b335cd@kernel.org>
+Content-Language: en-US
+From: "Nemanov, Michael" <michael.nemanov@ti.com>
+In-Reply-To: <936b19eb-cde7-4be8-98cf-e60e32b335cd@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-The test_run code detects whether a page has been modified and
-re-initialises the xdp_frame structure if it has, using
-xdp_update_frame_from_buff(). However, xdp_update_frame_from_buff()
-doesn't touch frame->mem, so that wasn't correctly re-initialised, which
-led to the pages from page_pool not being returned correctly. Syzbot
-noticed this as a memory leak.
+On 10/29/2024 7:28 PM, Krzysztof Kozlowski wrote:
+> On 29/10/2024 18:23, Michael Nemanov wrote:
+>> Add device-tree bindings for the CC33xx family.
+>>
+>> Signed-off-by: Michael Nemanov <michael.nemanov@ti.com>
+>> ---
+>>   .../bindings/net/wireless/ti,cc33xx.yaml      | 59 +++++++++++++++++++
+>>   1 file changed, 59 insertions(+)
+>>   create mode 100644 Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+>>
+>> diff --git a/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml b/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+>> new file mode 100644
+>> index 000000000000..12a0a2f52f44
+>> --- /dev/null
+>> +++ b/Documentation/devicetree/bindings/net/wireless/ti,cc33xx.yaml
+>> @@ -0,0 +1,59 @@
+>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>> +%YAML 1.2
+>> +---
+>> +$id: http://devicetree.org/schemas/net/wireless/ti,cc33xx.yaml#
+>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>> +
+>> +title: Texas Instruments CC33xx Wireless LAN Controller
+>> +
+>> +maintainers:
+>> +  - Michael Nemanov <michael.nemanov@ti.com>
+>> +
+>> +description:
+>> +  The CC33xx is a family of IEEE 802.11ax chips from Texas Instruments.
+>> +  These chips must be connected via SDIO and support in-band / out-of-band IRQ.
+>> +
+>> +properties:
+>> +  $nodename:
+>> +    pattern: "^wifi@2"
+> 
+> This wasn't here, please drop.
+ >
 
-Fix this by also copying the frame->mem structure when re-initialising
-the frame, like we do on initialisation of a new page from page_pool.
+In the previous patch you noted there was a mismatch between the reg 
+address in the schema (const: 2) and the used in the example (wifi@1). 
+The dt_binding_check did not flag this because SDIO is not a simple bus. 
+Using this regex seemed like a good alternative. Still drop it?
 
-Reported-by: syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-Tested-by: syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-Fixes: e5995bc7e2ba ("bpf, test_run: fix crashes due to XDP frame overwriting/corruption")
-Fixes: b530e9e1063e ("bpf: Add "live packet" mode for XDP in BPF_PROG_RUN")
-Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
----
- net/bpf/test_run.c | 1 +
- 1 file changed, 1 insertion(+)
+> 
+>> +
+>> +  compatible:
+>> +    oneOf:
+> 
+> Why oneOf appeared? Do you plan to grow it? >
+>> +      - items:
+>> +          - enum:
+>> +              - ti,cc3300
+>> +              - ti,cc3301
+>> +              - ti,cc3350
+>> +              - ti,cc3351
+>> +          - const: ti,cc33xx
+> 
+> And how cc33xx could appear? That's a no. Generic compatibles are not
+> allowed. Please do not introduce some completely different changes than
+> asked for.
+> 
+> Your changelog does not explain these three. "Fixed compatibility" is
+> way too vague, especially that you do not fix anything here.
+> 
 
-diff --git a/net/bpf/test_run.c b/net/bpf/test_run.c
-index 6d7a442ceb89be15501069655a51671d6ddfaf0e..501ec4249fedc3d34fe39aff50eea66f82b88a11 100644
---- a/net/bpf/test_run.c
-+++ b/net/bpf/test_run.c
-@@ -246,6 +246,7 @@ static void reset_ctx(struct xdp_page_head *head)
- 	head->ctx.data_meta = head->orig_ctx.data_meta;
- 	head->ctx.data_end = head->orig_ctx.data_end;
- 	xdp_update_frame_from_buff(&head->ctx, head->frame);
-+	head->frame->mem = head->orig_ctx.rxq->mem;
- }
- 
- static int xdp_recv_frames(struct xdp_frame **frames, int nframes,
+I was trying to address the feedback from previous patch. You said:
 
----
-base-commit: d0b98f6a17a5cb336121302bce0c97eb5fe32d16
-change-id: 20241030-test-run-mem-fix-ac835c75ec3f
+>>>> +static const struct of_device_id cc33xx_sdio_of_match_table[] = {
+>>>> +	{ .compatible = "ti,cc3300", .data = &cc33xx_data },
+>>>> +	{ .compatible = "ti,cc3301", .data = &cc33xx_data },
+>>>> +	{ .compatible = "ti,cc3350", .data = &cc33xx_data },
+>>>> +	{ .compatible = "ti,cc3351", .data = &cc33xx_data },
+>>>> +	{ }
+>>>> +};
+>>>
+>>>
+>>> Eh? What happened here? So devices are compatibles thus make them
+>>> compatible in the bindings.
+>>>
+>>
+>> I thought this is the right way to do it (originally taken from [1]).
+>> How can I solve it via DT bindings?
+> 
+> It's all over the bindings (also example-schema). Use fallback and oneOf.
+> 
 
-Best regards,
--- 
-Toke Høiland-Jørgensen <toke@redhat.com>
+Looking at [2] and [3] as an example I tried to do the same (make cc33xx 
+driver compatible with all chip variants).
+How should have I done it?
 
+Regards,
+Michael.
+
+
+[1] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/wireless/ti/wlcore/sdio.c#n204
+
+[2] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/devicetree/bindings/watchdog/qcom-wdt.yaml
+
+[3] 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/watchdog/qcom-wdt.c
 
