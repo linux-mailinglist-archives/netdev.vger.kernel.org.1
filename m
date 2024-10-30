@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-140397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C99139B6502
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:59:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4100E9B6504
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:59:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BA281F22019
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:59:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 158261C21DE2
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:59:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DAB21EBFF6;
-	Wed, 30 Oct 2024 13:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E90351F1301;
+	Wed, 30 Oct 2024 13:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rnb8lng3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PZK5cVtc"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 576281EBA05;
-	Wed, 30 Oct 2024 13:58:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7C5B1EE038;
+	Wed, 30 Oct 2024 13:58:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730296708; cv=none; b=EzI6IlX4Uj1QKIndY3kjsBZZhrWqA2H89otw481vqPNFaQeF1H61p5WLjWAkpPpih8HZUnRD3DLsqyTDn7I90GbH7g8J5YT+3RlmAGB7E5PkdH90rzBJTBtgf01J0sEZmut+ZTyy8+Olu1dimt57MLGWBZBXhqX5nWP/Y0VHIzg=
+	t=1730296726; cv=none; b=YYq3bIa0icDPzFv0oVrQD+D0S/dsXasydFQh83ikrixq/sUrbmf7A5aL6lkkfVthelvErqh3bJnHLJkutllBS804gwWD+N5pgEr+WcG1uDTCSOvnFBuVxOmNOXmMw4bI9ORxRl9Rp2p5dwW5hmMH/4QJ47OOrUYrCkvijOXEWw0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730296708; c=relaxed/simple;
-	bh=5G4zSZUMRaPrFhaAlSzX1D2NQklHpfcC3lDXqrQ1YVM=;
+	s=arc-20240116; t=1730296726; c=relaxed/simple;
+	bh=MAFrkMdoRf+IUDV/4ZcuYRNjilc/UkjXIbeyBZLke1Y=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=ntddo7gSE6d/98TTHpMeIt/GOdhiEEIT2Ota4yjjqmtDH4ayOhiEJi+BNl2e2/IcFstesv9Z7ketaEJNeNHl26vW+vc/B58xlH5j1jhZXeNbsdrNKUjaiRjZpgVmpIKBYt1hQGmWtoMnPV9ozPBHs9KHFbvG/yckCpMeRnFWWh0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rnb8lng3; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8DB7AC4CECE;
-	Wed, 30 Oct 2024 13:58:23 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=rpzMOkxv8tt7RER2bXh8RSi3xBOlXDu/E/6mgooQ6YmVWr/IM1oHeNcaWT+mtdE8xNn7wB1/+nfLPo6oyVs+2TTmhfrPO5wGlcrscLKKcSn4C5NkN3WgE37QGlH4hWKDVaPQ7Rt9VI3y3RRgzfnec60hE1t6+3R5BN8MiNkcdmk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PZK5cVtc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A56B1C4CECE;
+	Wed, 30 Oct 2024 13:58:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730296707;
-	bh=5G4zSZUMRaPrFhaAlSzX1D2NQklHpfcC3lDXqrQ1YVM=;
+	s=k20201202; t=1730296726;
+	bh=MAFrkMdoRf+IUDV/4ZcuYRNjilc/UkjXIbeyBZLke1Y=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Rnb8lng3/b3r/nCIqjQXmggsdQ+bl8/NfHmumMCA7j4ua2XeCHDnkKvgZVE1mdYHI
-	 vw7Xmn47Ltp3nLYPhummpIE9vwY4ORC1j077fRz+gzrbMosw7njop9vlGPJnPWxE+a
-	 LhkBvrJY6G7m6O7Je82LQPrK2ukErwCZQfP6cQCad/UNbrPWllVRt5f/nyHieBRaCn
-	 BuBjgDmHoD5P3VoDrYrCkiVePM1XW9Usk7P5M2aZGKGEGZmFwdL7QS1zUbWeva+//L
-	 RxgM3Xjh/DicmtLYL7jRC+QVG9X4iwQX1ml9X5STcjG3XxoXG4hoYr+KDZXRuhLhku
-	 Ms2C1r8qEnMmw==
-Message-ID: <6d82f0c4-d4f4-43e2-a74b-29b9d42dacf8@kernel.org>
-Date: Wed, 30 Oct 2024 14:58:21 +0100
+	b=PZK5cVtcZy7BgLBQ5dM2E2w8f+/52EwHyQMnOszNCH+kUf4sScD7Kj3HyriQV/34X
+	 ick/BosUh41vSUV6QQdQ8t9ekGt84ChMOzRmHM07iF00mWtwn5c858PH6lZ3dGviWA
+	 3ympVTI1eRqitYfSN2BLHxmn0+JZ//3ZTaBGdXyC4fel9lj7CHWj6+rmrdYA1LqkL4
+	 GaIEZGUAwOKM34Pk4ikzQ5cur38ftnDWLWFlE/jns6oea/rXk2iB/Aj6KVh8v37Z8q
+	 rcTJpPw81Q7oLPBKE2il+pgt0fNFG4EJwsv6LriPcR94vKFo8O4w1GvUK9IQ62DCdL
+	 J/vAH/6/g6Yig==
+Message-ID: <49702cd9-85ad-48b8-b18f-b27ccf935b63@kernel.org>
+Date: Wed, 30 Oct 2024 14:58:40 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,7 +50,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH 1/4] arm64: dts: agilex5: add gpio0
+Subject: Re: [PATCH 3/4] dt-bindings: intel: add agilex5-based Arrow
+ AXE5-Eagle
 To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
  Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
  Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
@@ -59,7 +60,7 @@ To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
 Cc: devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
  netdev@vger.kernel.org, linux-clk@vger.kernel.org, kernel@pengutronix.de
 References: <20241030-v6-12-topic-socfpga-agilex5-v1-0-b2b67780e60e@pengutronix.de>
- <20241030-v6-12-topic-socfpga-agilex5-v1-1-b2b67780e60e@pengutronix.de>
+ <20241030-v6-12-topic-socfpga-agilex5-v1-3-b2b67780e60e@pengutronix.de>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -105,35 +106,19 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241030-v6-12-topic-socfpga-agilex5-v1-1-b2b67780e60e@pengutronix.de>
+In-Reply-To: <20241030-v6-12-topic-socfpga-agilex5-v1-3-b2b67780e60e@pengutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
 On 30/10/2024 13:10, Steffen Trumtrar wrote:
-> gpio0 is the same as gpio1 with a different base address.
+> Add binding for the Arrow Agilex5-based AXE5-Eagle board.
 > 
 > Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 > ---
->  arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi | 20 ++++++++++++++++++++
->  1 file changed, 20 insertions(+)
-> 
-> diff --git a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-> index 1162978329c1637aa0fd9a4adef16a9ae5017ac3..57c28e284cccdb99ede6cea2bc0e8dd8aaf47fe9 100644
-> --- a/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-> +++ b/arch/arm64/boot/dts/intel/socfpga_agilex5.dtsi
-> @@ -222,6 +222,26 @@ i3c1: i3c@10da1000 {
->  			status = "disabled";
->  		};
->  
-> +		gpio0: gpio@10c03200 {
-> +			compatible = "snps,dw-apb-gpio";
-> +			reg = <0x10c03200 0x100>;
-> +			#address-cells = <1>;
-> +			#size-cells = <0>;
-> +			resets = <&rst GPIO0_RESET>;
-> +			status = "disabled";
+>  Documentation/devicetree/bindings/arm/intel,socfpga.yaml | 1 +
+>  1 file changed, 1 insertion(+)
 
-Why is this node disabled? Any external resources missing?
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
