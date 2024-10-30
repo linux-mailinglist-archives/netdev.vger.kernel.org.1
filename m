@@ -1,176 +1,329 @@
-Return-Path: <netdev+bounces-140513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D6B9B6AC2
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:19:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E005D9B6AD0
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:20:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 681B31C2187D
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:19:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 48DD0B233A9
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:20:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55D31BD9D1;
-	Wed, 30 Oct 2024 17:14:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D957224420;
+	Wed, 30 Oct 2024 17:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="HdM2aA/x";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Jps8Tkd1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T8MITQj7"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-a5-smtp.messagingengine.com (flow-a5-smtp.messagingengine.com [103.168.172.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0119D1BD9C1;
-	Wed, 30 Oct 2024 17:14:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.140
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1504E224410;
+	Wed, 30 Oct 2024 17:15:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730308474; cv=none; b=vE224b1T0n4m2P02aAkTgpIElaspmLxkQbewMo+jaBUsICDSKHZbaQWEGZHDT3zP1YnHb3EbIx8wPQNIiHvuEJdmQ6lUoW7g+UnV1DuvOKVwtgY2BAKL8zcTa2JNxoqEvus/PwOmyP9GbVUcZ+kY/bMJGbEsvb4x1SGnVAF39IU=
+	t=1730308549; cv=none; b=irxDdJP0MEZJNUwUcP6nWp8CTK1XWwOT9VIN6Jt0jH4uzAOBG790uDWledlRK6WkNEfJi5IWQphqlF1+V9yTJsX+xCQaWrfAemQBIH8c/O1P8iQWgunBD9OZv50teyDeqrqnY/KXfThq3h/lIKBnxBDkujZpzq7554jMSWGHTGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730308474; c=relaxed/simple;
-	bh=fR1wu/43Tn/xy2VITfwzgyphiC6mLhU60m+KhVenjRE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nCwZuJdVcy5cOzHPQB36SLbO0nI12YBVY063HmtG/iEWKSyDm8xYij+n4z96bEeUZMEiUMssHs7P0sStkFAL6K6zW/W/puDrInVFPCMdaJCMlEkLMqmw3oiGjyHgZLpaNanVo14RcCdbuvzNxoqHQxCNpJzJ1GZEbnIfffiIEOw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=HdM2aA/x; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Jps8Tkd1; arc=none smtp.client-ip=103.168.172.140
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-07.internal (phl-compute-07.phl.internal [10.202.2.47])
-	by mailflow.phl.internal (Postfix) with ESMTP id A86AD2002B4;
-	Wed, 30 Oct 2024 13:14:29 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-07.internal (MEProxy); Wed, 30 Oct 2024 13:14:29 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1730308469; x=
-	1730312069; bh=YtJGD22t0Esf05b74Px7IXGtR0E9aUFiphweZKoOEkw=; b=H
-	dM2aA/xs7By5VhGk9WShrjhxMdMoqRct9iMQ8VEaO45yg0QfCOn4Fp1iU8gi3QOI
-	Tsc6WekYvLfAevSVArc2OFHYi0o2eIyVLhZqdJ3fOhxOgobKGlvUwchO4Fac1jpg
-	8+F/K4h+z5XFem8APxRiBrWIcp8wo6OefGZ1LyVukaIyl8Seea7U8ai235ANkXzC
-	XMPcwYxYsoTpcOmFLBaWnCUnyZVQ7aSfmFacW2oJm8XV9G/SxP+2YaB9sWnon8yF
-	Z4UE+hbvMuVrL+wBQQg27gdZJ2EoyP3rc4vj4nQpkAL5DitH6dlTKBIBPvZjJq2P
-	REFoYptcuQtvbFRfq6qaQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1730308469; x=1730312069; bh=YtJGD22t0Esf05b74Px7IXGtR0E9aUFiphw
-	eZKoOEkw=; b=Jps8Tkd1eYgklX4OQwoZA9tVyAZfLzm+mO2ziZ0rKY59Y/E6/Yl
-	DxdabEKmVENhQNJQuWfodga2Rr3ZzMJKy1TZMhqYWZ9EttZT3Z/OiEnJy2mIbwF8
-	BQZOIQh9GKPqLUKhLWzkq8JgY0yiWkQRAP1oOjmdbribHZka0MbHaBftva4VpGcv
-	nGe+AfpwkELXguEDahyVTfkpOjPLOQeYwrVIi3vS2PZhn3tUdNEZgyOQqeu2/+ht
-	HN+fnY2LwR/3CJzNgThaNns2ZoRMSEpDVmjSs2mv9gVtk7g6CJWfRZ+jiJNXqNzy
-	u+mDXiWd+yNz1ROGCgGZqhjtdoGTWxKyiyw==
-X-ME-Sender: <xms:dWkiZ1Ui0G0mAaAaRk5Ii1CP490jacLEp3knPEocIHO4H5lQyey5DQ>
-    <xme:dWkiZ1kYyWQ1FQXZHjHver46pUVlQH27WTHlvq2mir9UnRiIO7rWf_SRhwxGLXtvk
-    jLtfY0SdYUlPEd0M6A>
-X-ME-Received: <xmr:dWkiZxas6yzxhMv05RmYjnA6isRr501X2mfY2n7MapBsclvyec5NyHZztCMg>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdekfedgleejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
-    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
-    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
-    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
-    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
-    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:dWkiZ4V1H9rrcDU-HRgMt_XXzOeg8I87vRIOXBMyxRxs4qfZ6GrI0A>
-    <xmx:dWkiZ_lL2gvYv2Rn5fB534z2-70dBtfJKuInDP7XOLuVU3WPi0os0Q>
-    <xmx:dWkiZ1erpqS4WCqi4AiraK3oZS5i9vXU5TFloH7Tyew8Eb3e2sp1Zg>
-    <xmx:dWkiZ5GvuLGoWdoNf4qsrVowttTzTsxhG7dithLtwfFs3doqyRV8UA>
-    <xmx:dWkiZx7G1bDNw4X0LojsHZMB11VBNhxF58igXorRc9dGAHcEmJAUsVw0>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 30 Oct 2024 13:14:28 -0400 (EDT)
-Date: Wed, 30 Oct 2024 18:14:25 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 08/23] ovpn: implement basic TX path (UDP)
-Message-ID: <ZyJpcbHJI5MqZHVB@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net>
+	s=arc-20240116; t=1730308549; c=relaxed/simple;
+	bh=TDr4UyjokH9I9u2XzFFGaVpYFY1sqVtRJAHCqAPdoN8=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=JQ4rasJwUPAH1w3WY8TUTtjYvY86OllHRalga1u25drl0iNx2fn7gog+2F6d/8QiskK3caH4MeweFZtroT8TH8o8nClNpoUw3SKyj+WlJy+VcPuVT1Uf9u6DaADccP3XuNU5AjnqDGrUScRu5U3ClTBzrFBy9+FvRReNePZZNDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T8MITQj7; arc=none smtp.client-ip=209.85.160.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4609c96b2e5so906511cf.0;
+        Wed, 30 Oct 2024 10:15:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730308546; x=1730913346; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=s3TG+CE7b4FbAX66rtHsqzEPwWBN15H3tVxe7XWl/o4=;
+        b=T8MITQj7ZLVTOt3gV53FbuMsQaIQ/3n8iUtnbVDh5YV5cKUsXygUjIVU1ylTGMZEnJ
+         Tknpl8rRjKWU7KXizxa2FEPjv+gEUUMm+NVBJ51kRwrrl/ddLiS7F5tSltxQjuM1F3hL
+         7QX30CnS669OncP3JUZWzOzFK0OpNqWhNRPeLCa9guEQ5jgw9xDLfuK596ieoFjFMgGY
+         JPLFesQp7flGlvH9JGIHGs+0MsPleNDFnTNTNzpyY62o7yM4k1g7UkZv7RSQ804YqCcg
+         bNoCGrkSuzBT5JWb8Oqjk5b8THm3gLdrGnIbmD584ILoHwU5qNOWGrS2eak8DCAsd8Dd
+         fTAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730308546; x=1730913346;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=s3TG+CE7b4FbAX66rtHsqzEPwWBN15H3tVxe7XWl/o4=;
+        b=oo/Oi3WjF9tRjimCxN5x7k+yD9R0hPudJAhf/ULOR4pByac42sO/+LGDxz9zexlNeh
+         zXsbivtzriJYKnfq6AshZ+m9gZecbXSx9yjhadDKKayMT1ok72jZx77bzp/keFYgVx6L
+         afqFacADsMt0Fy+wrEEj61aKD1dA9/J23k9On4HrkxEZGLcb1Cauv5t3VjQDGH6sUONi
+         M3WmQHwTegkJU86LjwobOAoxSo8s9EEF+sQ/4hNMJqC4xq8y1IqvhQwsktlbSytY1suL
+         V/GbzToJY90M7y4JjNY1Wbxk3OaXqekxHn/u/Ilxe72A74PjqtBqmzRKY6Xj2rQAjewF
+         xvvg==
+X-Forwarded-Encrypted: i=1; AJvYcCV8s0WL+ajmrQ3ycqzzhjCQYizmlD9mTx6ypzXfpqwIYINPmyj4Qx8vaI1IzgxrKPo8yE+1khBq@vger.kernel.org, AJvYcCXXVbPfEtu4KxYiyVMVNddefFiE9avvs708noi8yzeK/xZFtY0AIKJdD1AaxkzqLZlZ++0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNvpolN001ALjdqRlldABn/IQXjWwfPBsnjrLO3p1y/ltXinWO
+	xdDklUtbd6KDNp3bZn9S0P+DkyLv1uMJ4R129Zxf3FMptIMQEaCb
+X-Google-Smtp-Source: AGHT+IEsl9jyrLX1CtEzERMX/3Z4GzRYax1i6gl8cY9B6ymzgBmsTdFEH0UqfAGeP79gqqct5tsCTg==
+X-Received: by 2002:a05:6214:4b02:b0:6cb:afe7:1403 with SMTP id 6a1803df08f44-6d185866d2fmr263375426d6.48.1730308545647;
+        Wed, 30 Oct 2024 10:15:45 -0700 (PDT)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d179a2c7b2sm53541276d6.122.2024.10.30.10.15.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 10:15:44 -0700 (PDT)
+Date: Wed, 30 Oct 2024 13:15:44 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ willemb@google.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ shuah@kernel.org, 
+ ykolal@fb.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-3-kerneljasonxing@gmail.com>
+ <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
+ <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
+ <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
+ <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-2024-10-29, 11:47:21 +0100, Antonio Quartulli wrote:
-> +static void ovpn_send(struct ovpn_struct *ovpn, struct sk_buff *skb,
-> +		      struct ovpn_peer *peer)
-> +{
-> +	struct sk_buff *curr, *next;
-> +
-> +	if (likely(!peer))
-> +		/* retrieve peer serving the destination IP of this packet */
-> +		peer = ovpn_peer_get_by_dst(ovpn, skb);
-> +	if (unlikely(!peer)) {
-> +		net_dbg_ratelimited("%s: no peer to send data to\n",
-> +				    ovpn->dev->name);
-> +		dev_core_stats_tx_dropped_inc(ovpn->dev);
-> +		goto drop;
-> +	}
-> +
-> +	/* this might be a GSO-segmented skb list: process each skb
-> +	 * independently
-> +	 */
-> +	skb_list_walk_safe(skb, curr, next)
+Jason Xing wrote:
+> On Wed, Oct 30, 2024 at 1:37=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
+nux.dev> wrote:
+> >
+> > On 10/29/24 8:04 PM, Jason Xing wrote:
+> > >>>>>>>    static void skb_tstamp_tx_output(struct sk_buff *orig_skb,=
 
-nit (if you end up reposting): there should probably be some braces
-around the (multi-line) loop body.
+> > >>>>>>>                                 const struct sk_buff *ack_skb=
+,
+> > >>>>>>>                                 struct skb_shared_hwtstamps *=
+hwtstamps,
+> > >>>>>>> @@ -5549,6 +5575,9 @@ static void skb_tstamp_tx_output(struct=
+ sk_buff *orig_skb,
+> > >>>>>>>        u32 tsflags;
+> > >>>>>>>
+> > >>>>>>>        tsflags =3D READ_ONCE(sk->sk_tsflags);
+> > >>>>>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
+> > >>>>>>
+> > >>>>>> I still don't get this part since v2. How does it work with cm=
+sg only
+> > >>>>>> SOF_TIMESTAMPING_TX_*?
+> > >>>>>>
+> > >>>>>> I tried with "./txtimestamp -6 -c 1 -C -N -L ::1" and it does =
+not return any tx
+> > >>>>>> time stamp after this patch.
+> > >>>>>>
+> > >>>>>> I am likely missing something
+> > >>>>>> or v2 concluded that this behavior change is acceptable?
+> > >>>>>
+> > >>>>> Sorry, I submitted this series accidentally removing one import=
+ant
+> > >>>>> thing which is similar to what Vadim Fedorenko mentioned in the=
+ v1
+> > >>>>> [1]:
+> > >>>>> adding another member like sk_flags_bpf to handle the cmsg case=
+.
+> > >>>>>
+> > >>>>> Willem, would it be acceptable to add another field in struct s=
+ock to
+> > >>>>> help us recognise the case where BPF and cmsg works parallelly?=
 
-> +		if (unlikely(!ovpn_encrypt_one(peer, curr))) {
-> +			dev_core_stats_tx_dropped_inc(ovpn->dev);
-> +			kfree_skb(curr);
-> +		}
+> > >>>>>
+> > >>>>> [1]: https://lore.kernel.org/all/662873cb-a897-464e-bdb3-edf013=
+63c3b2@linux.dev/
+> > >>>>
+> > >>>> The current timestamp flags don't need a u32. Maybe just reserve=
+ a bit
+> > >>>> for this purpose?
+> > >>>
+> > >>> Sure. Good suggestion.
+> > >>>
+> > >>> But I think only using one bit to reflect whether the sk->sk_tsfl=
+ags
+> > >>> is used by normal or cmsg features is not enough. The existing
+> > >>> implementation in tcp_sendmsg_locked() doesn't override the
+> > >>> sk->sk_tsflags even the normal and cmsg features enabled parallel=
+ly.
+> > >>> It only overrides sockc.tsflags in tcp_sendmsg_locked(). Based on=
 
-> +void ovpn_udp_send_skb(struct ovpn_struct *ovpn, struct ovpn_peer *peer,
-> +		       struct sk_buff *skb)
-> +{
-[...]
-> +	/* crypto layer -> transport (UDP) */
-> +	pkt_len = skb->len;
-> +	ret = ovpn_udp_output(ovpn, bind, &peer->dst_cache, sock->sk, skb);
-> +
-> +out_unlock:
-> +	rcu_read_unlock();
-> +out:
-> +	if (unlikely(ret < 0)) {
-> +		dev_core_stats_tx_dropped_inc(ovpn->dev);
-> +		kfree_skb(skb);
-> +		return;
-> +	}
-> +
-> +	dev_sw_netstats_tx_add(ovpn->dev, 1, pkt_len);
+> > >>> that, even if at some point users suddenly remove the cmsg use an=
+d
+> > >>> then the prior normal SO_TIMESTAMPING continues to work.
+> > >>>
+> > >>> How about this, please see below:
+> > >>> For now, sk->sk_tsflags only uses 17 bits (see the last one
+> > >>> SOF_TIMESTAMPING_OPT_RX_FILTER). The cmsg feature only uses 4 fla=
+gs
+> > >>> (see SOF_TIMESTAMPING_TX_RECORD_MASK in __sock_cmsg_send()). With=
+ that
+> > >>> said, we could reserve the highest four bits for cmsg use for the=
 
-If I'm following things correctly, that's already been counted:
+> > >>> moment. Four bits represents four points where we can record the
+> > >>> timestamp in the tx case.
+> > >>>
+> > >>> Do you agree on this point?
+> > >>
+> > >> I don't follow.
+> > >>
+> > >> I probably miss the entire point.
+> > >>
+> > >> The goal for sockcm fields is to start with the sk field and
+> > >> optionally override based on cmsg. This is what sockcm_init does f=
+or
+> > >> tsflags.
+> > >>
+> > >> This information is for the skb, so these are recording flags.
+> > >>
+> > >> Why does the new datapath need to know whether features are enable=
+d
+> > >> through setsockopt or on a per-call basis with a cmsg?
+> > >>
+> > >> The goal was always to keep the reporting flags per socket, but ma=
+ke
+> > >> the recording flag per packet, mainly for sampling.
+> > >
+> > > If a user uses 1) cmsg feature, 2) bpf feature at the same time, we=
 
-ovpn_udp_output -> ovpn_udp4_output -> udp_tunnel_xmit_skb
-                                    -> iptunnel_xmit
-                                    -> iptunnel_xmit_stats
+> > > allow each feature to work independently.
+> > >
+> > > How could it work? It relies on sk_tstamp_tx_flags() function in th=
+e
+> > > current patch: when we are in __skb_tstamp_tx(), we cannot know whi=
+ch
+> > > flags in each feature are set without fetching sk->sk_tsflags and
+> > > sk->sk_tsflags_bpf. Then we are able to know what timestamp we want=
+ to
+> > > record. To put it in a simple way, we're not sure if the user wants=
+ to
+> > > see a SCHED timestamp by using the cmsg feature in __skb_tstamp_tx(=
+)
+> > > if we hit this test statement "skb_shinfo(skb)->tx_flags &
+> > > SKBTX_SCHED_TSTAMP)". So we need those two socket tsflag fields to
+> > > help us.
+> >
+> > I also don't see how a new bit/integer in a sk can help to tell the p=
+er cmsg
+> > on/off. This cmsg may have tx timestamp on while the next cmsg can ha=
+ve it off.
+> =
 
-which does (on success) the same thing as dev_sw_netstats_tx_add. On
-failure it increments a different tx_dropped counter than what
-dev_core_stats_tx_dropped_inc, but they should get summed in the end.
+> It's not hard to use it because we can clear every socket cmsg tsflags
+> when we're done the check in tcp_sendmsg_locked() if the cmsg feature
+> is not enabled. Then we can accurately know which timestamp should we
+> print in the tx path.
+> =
 
-> +}
+> >
+> > There is still one bit in skb_shinfo(skb)->tx_flags. How about define=
+ a
+> > SKBTX_BPF for everything. imo, the fine control on
+> > SOF_TIMESTAMPING_TX_{SCHED,SOFTWARE} is not useful for bpf. Almost al=
+l of the
+> > time the bpf program wants all available time stamps (sched, software=
+, and
+> > hwtstamp if the NIC has it).
 
--- 
-Sabrina
+I like the approach of just calling BPF on every hook. Assuming that
+the call is very cheap, which AFAIK is true.
+
+In that case we don't need complex branching in C to optionally skip
+this step, as we do for reporting to userspace.
+
+All the logic and complexity is in the BPF program itself.
+
+We obviously then let go of the goal to model the BPF API close to the
+existing SO_TIMESTAMPING API. Though I advocated for keeping them
+aligned, I also think we should just tailor it to what makes most
+sense in the BPF space.
+ =
+
+> Sorry, I really doubt that we can lose the fine control. =
+
+
+Since BPF is called at each reporting point, no control is lost,
+actually.
+
+> I still
+> reckon that providing more options to users is a good way to go,
+> especially for some latency sensitive applications, enabling one or
+> two or three tx flags could lead to different performances. For the
+> users of SO_TIMESTAMPING, they use the feature very differently. Not
+> all users prefer to record everything.
+> =
+
+> > Since bpf is in the kernel, it is much cheaper
+> > because it does not need to do skb_alloc/clone and queue to the error=
+ queue.
+> >
+> > I think the bpf prog needs to capture a timestamp at the sendmsg() ti=
+me, so a
+> > bpf prog needs to be called at sendmsg().
+> =
+
+> Agreed, I planned to implement this after this series.
+> =
+
+> > Then it may as well allow the bpf
+> > prog@sendmsg() to decide if it needs to set the SKBTX_BPF bit in
+> > skb_shinfo(skb)->tx_flags or not.
+> >
+> > TCP_SKB_CB(skb)->txstamp_ack can also work similarly. There is still =
+unused bit
+> > in "struct tcp_skb_cb", so may be adding TCP_SKB_CB(skb)->bpf_txstamp=
+_ack
+> >
+> > Then there is no need to control SOF_TIMESTAMPING_TX_* through bpf_se=
+tsockopt().
+> > It only needs one bpf specific socket option like bpf_setsockopt(SOL_=
+SOCKET,
+> > BPF_TX_TIMESTAMPING) to guard if the bpf-prog@sendmsg() needs to be c=
+alled or
+> > not. There are already other TCP_BPF_IW,TCP_BPF_SNDCWND_CLAMP,... spe=
+cific
+> > socket options.
+> >
+> > imo, this is a simpler interface and also gives the bpf prog per pack=
+et control
+> > at the same time.
+> =
+
+> Very interesting idea, but the precondition is that we give up the
+> fine control...
+> =
+
+> Thanks,
+> Jason
+
+
 
