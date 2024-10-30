@@ -1,194 +1,252 @@
-Return-Path: <netdev+bounces-140419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BEB29B6616
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:36:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A19F39B661E
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:37:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFC001C212DD
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:36:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6130E281F80
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5AF71EF94E;
-	Wed, 30 Oct 2024 14:33:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1F1A1F80B6;
+	Wed, 30 Oct 2024 14:34:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ew12GuLe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r41tJhqU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4EB61E7C12;
-	Wed, 30 Oct 2024 14:33:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F0491F80AC;
+	Wed, 30 Oct 2024 14:34:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730298823; cv=none; b=TaT511c9SdOYBc3GfHwn9u5y2rFV6nTqf8v7lbu6cyq1LYX12mzALnVAA3zpd2tn2WGveXeJ+SHV7xPAhOxPIFtFK1EnNjlpli3xz/3JhtxFlbI576uJE3C6T2aFvpcc5ZLUsUCtGV3vTbCx/3QMK/5Llv7mLWrrbQNytohF8Ug=
+	t=1730298896; cv=none; b=Xvay2cqnInV0bRAMaiNnFMlKmklLFj/MmSZ7YJrBTKGhfn6P+ANC08hhmqq6JYCxSsFOrtXEC6G+ogLroSeKJVOufxrJ9zndCvKxjvgCrRxZ60QxyKofKzlVrdOoFTa+5+uKFCZDyMNGHW+F+4mJFGT8UXsfBCCILaYeA5Q0+aQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730298823; c=relaxed/simple;
-	bh=GdrLnAcoyLbuyIkP4M7EWVlAvKcTHkaUfN511LRxwPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Xty+wTzYGywlm2PSuIMg6C00qh8V5XVNAiSWGHuBXz8gC1mhWjY91yKa8tVbQtdlVrn7w++oKg9u2YjYTotvNhNXrqu5YVG5pT6XZ+1BVKJf8uA/7bnwZYMb4t+wf2I4pWaD68MdK2/A0yYgY1w2KNWiLKnTyJhNuSTTKMLJpD0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ew12GuLe; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ee020ec76dso2486901a12.3;
-        Wed, 30 Oct 2024 07:33:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730298821; x=1730903621; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kdt8y8wCusL4+S51EkCSh7l/zTm5/WwfbbuBF+5V9wY=;
-        b=Ew12GuLe1KJgiX5Fh3SwLWcgqGnMDPDHEjYkjYWP2JThQODnTU8tVMDlT0yhJ3Sidb
-         nTXc/mvTNYHGCLySHazgGrCE7KbZHYs9QJbRkUYtmJwSf8PR0VcEMuS29zYqKfAXgMzW
-         THLlzrzq47EpnO1eWMLQ+ifJ9HouiTyyPI9LHA76H5lDGHYt8A8J3u3c+lkGG3CaoaiA
-         3QAP0Sm9l/RMAX8VaEMRzSL0veydKGLLtIwDAbI2VDzaZ8wxIFaL8WatoHmmlhyz0HIA
-         CmqyU0D0szzJQk8k68tRwQz6j4BcVXDGM5j3LTnDBRsbun+Wu6/ghn2SttOUPlqSuQpK
-         qZKg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730298821; x=1730903621;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Kdt8y8wCusL4+S51EkCSh7l/zTm5/WwfbbuBF+5V9wY=;
-        b=AxcOPgH7HMkb9lBVNwdf0r04lOMLrd4LkvoCftKcCm50Z1oY0qRYCdlPPJsyrXoebS
-         l/LIcGxQD08KuG58b/mz1llNrkEOai4fEyYvhNSx8SQNPNlI9RqdgcumZefqFErWhXI3
-         Q5Wv1pvrZ9BPgscvAZ8E9MfWMx0npwQp/FxQjyoMQsGvZkZPtKzLUKMvGlkj3mbBUwSM
-         /Ij1oUXudSeNA75AqpESgkKatCC3l12Y3m5+wimWgEQT+xXfcMdQ2hlOlz3ukN3oad9V
-         zkk5oz76MnHestzpPx+iJmXyI0pRe8l156fQtprQN+eGmgv9ajWuq4ZZgZiVewSN/tgw
-         4y1w==
-X-Forwarded-Encrypted: i=1; AJvYcCUTrPX5Olgw0GYccVRGkrk8IJEjUe0Q6csR+ZQwKk58SmEPO+x7EGQSTHRpOEkULrXrIpCZ6+FEOgPfX0g=@vger.kernel.org, AJvYcCXC8xOotc+U1cPbfpjY0TRIbaEbD7QoPBHBIA44uSQdjm9sS1qMfRdbF/0suXmPDjZvSN1EgF7ebczVd7DrpRqq@vger.kernel.org
-X-Gm-Message-State: AOJu0YxsUVF412BlAE388VdpeEVESi8SJVmPemNDlqUa77HEnp9gJgWd
-	jhzNWTP2g7q6JVK8n7rBAT/KhYvQOhvLt+VVOgDPEnOKyEUlKMc=
-X-Google-Smtp-Source: AGHT+IEve8HxoMBLYPBXREW/IQ8rQr+VlBoXiX0uAQiQOUjrlCCv7vNIOQoUXXJ5gLY/N23zW/Vv6g==
-X-Received: by 2002:a05:6a20:c793:b0:1d8:d613:7d6f with SMTP id adf61e73a8af0-1d9a83a9a56mr20896378637.4.1730298821018;
-        Wed, 30 Oct 2024 07:33:41 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057a20f9asm9627350b3a.170.2024.10.30.07.33.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 07:33:40 -0700 (PDT)
-Date: Wed, 30 Oct 2024 07:33:40 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
-	Shuah Khan <shuah@kernel.org>, Yi Lai <yi1.lai@linux.intel.com>
-Subject: Re: [PATCH net-next v1 6/7] net: fix SO_DEVMEM_DONTNEED looping too
- long
-Message-ID: <ZyJDxK5stZ_RF71O@mini-arch>
-References: <20241029205524.1306364-1-almasrymina@google.com>
- <20241029205524.1306364-2-almasrymina@google.com>
+	s=arc-20240116; t=1730298896; c=relaxed/simple;
+	bh=0voffoZR/9yLaMs/QSdN1vbgkVtNAlW/4s6JXHFS/kY=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fQ5k8HCrdMd1YklSl7F53x3F1mY3bEXnUzIMMIy8bZ5hk7dJACmFQDrZRj74E/T0yYp/MEX+q8x+MnqjINaMaqz7RwnM5aUPxO5VRdUZx2Ja/WpLeUcna92VTr6XWbDlDxRZQqDR+Zrwr06Ga5dnhhMwqpwuGHMfX60M6RqSlPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r41tJhqU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1590C4CED4;
+	Wed, 30 Oct 2024 14:34:51 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730298896;
+	bh=0voffoZR/9yLaMs/QSdN1vbgkVtNAlW/4s6JXHFS/kY=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=r41tJhqUW6DD96Wl0aBg/zf4q11RRPUGIFS4KCQuZ5GvgcbkB1legnQCZR7CmQivt
+	 kpdeAgWL1AwhZHnt81AQSlkQKIVw9fudU8NwiAgyxU64TP+bkuuJg9hO2WafrP0FqE
+	 by+WYOn+TpXNBQfEiJImlxVJIIHUJxasGett6MUf+3WaI/Wo+dh+kfxgY1nA2SlbmK
+	 OrT0/Jl4+thA5gLxH8lakeWYmWrLKyY0tHRzp3RRifeB4qSuqwIDg3az/kI5VNTz1f
+	 TZkeRhUrzP5GouNG17FBLwpE6hgK9dVrE/MXZwKB+rVgwHu87wsXsDw3lnoyZ2aCY5
+	 CAO/F2pwm5/xg==
+Message-ID: <299bd27b-b5bd-492a-9873-447329e60b67@kernel.org>
+Date: Wed, 30 Oct 2024 15:34:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241029205524.1306364-2-almasrymina@google.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/2] dt-bindings: clk: agilex5: Add Agilex5 clock bindings
+To: Steffen Trumtrar <s.trumtrar@pengutronix.de>,
+ Michael Turquette <mturquette@baylibre.com>, Stephen Boyd
+ <sboyd@kernel.org>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Dinh Nguyen <dinguyen@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org,
+ devicetree@vger.kernel.org, netdev@vger.kernel.org,
+ Teh Wen Ping <wen.ping.teh@intel.com>
+References: <20241030-v6-12-topic-socfpga-agilex5-clk-v1-0-e29e57980398@pengutronix.de>
+ <20241030-v6-12-topic-socfpga-agilex5-clk-v1-1-e29e57980398@pengutronix.de>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20241030-v6-12-topic-socfpga-agilex5-clk-v1-1-e29e57980398@pengutronix.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 10/29, Mina Almasry wrote:
-> Check we're going to free a reasonable number of frags in token_count
-> before starting the loop, to prevent looping too long.
+On 30/10/2024 13:02, Steffen Trumtrar wrote:
+> From: Teh Wen Ping <wen.ping.teh@intel.com>
 > 
-> Also minor code cleanups:
-> - Flip checks to reduce indentation.
-> - Use sizeof(*tokens) everywhere for consistentcy.
+> Add Intel SoCFPGA Agilex5 clock definition.
+
+Where is the binding? I see only clock IDs. Your commit msg should
+explain such unusual cases.
+
 > 
-> Cc: Yi Lai <yi1.lai@linux.intel.com>
-> 
-> Signed-off-by: Mina Almasry <almasrymina@google.com>
-> 
+> Signed-off-by: Teh Wen Ping <wen.ping.teh@intel.com>
+> Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
 > ---
->  net/core/sock.c | 46 ++++++++++++++++++++++++++++------------------
->  1 file changed, 28 insertions(+), 18 deletions(-)
+>  include/dt-bindings/clock/agilex5-clock.h | 100 ++++++++++++++++++++++++++++++
+>  1 file changed, 100 insertions(+)
 > 
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 7f398bd07fb7..8603b8d87f2e 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -1047,11 +1047,12 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
-> 
->  #ifdef CONFIG_PAGE_POOL
-> 
-> -/* This is the number of tokens that the user can SO_DEVMEM_DONTNEED in
-> +/* This is the number of frags that the user can SO_DEVMEM_DONTNEED in
->   * 1 syscall. The limit exists to limit the amount of memory the kernel
-> - * allocates to copy these tokens.
-> + * allocates to copy these tokens, and to prevent looping over the frags for
-> + * too long.
->   */
-> -#define MAX_DONTNEED_TOKENS 128
-> +#define MAX_DONTNEED_FRAGS 1024
-> 
->  static noinline_for_stack int
->  sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
-> @@ -1059,43 +1060,52 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
->  	unsigned int num_tokens, i, j, k, netmem_num = 0;
->  	struct dmabuf_token *tokens;
->  	netmem_ref netmems[16];
-> +	u64 num_frags = 0;
->  	int ret = 0;
-> 
->  	if (!sk_is_tcp(sk))
->  		return -EBADF;
-> 
-> -	if (optlen % sizeof(struct dmabuf_token) ||
-> -	    optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
-> +	if (optlen % sizeof(*tokens) ||
-> +	    optlen > sizeof(*tokens) * MAX_DONTNEED_FRAGS)
->  		return -EINVAL;
-> 
-> -	tokens = kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
-> +	num_tokens = optlen / sizeof(*tokens);
-> +	tokens = kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
->  	if (!tokens)
->  		return -ENOMEM;
-> 
-> -	num_tokens = optlen / sizeof(struct dmabuf_token);
->  	if (copy_from_sockptr(tokens, optval, optlen)) {
->  		kvfree(tokens);
->  		return -EFAULT;
->  	}
-> 
-> +	for (i = 0; i < num_tokens; i++) {
-> +		num_frags += tokens[i].token_count;
-> +		if (num_frags > MAX_DONTNEED_FRAGS) {
-> +			kvfree(tokens);
-> +			return -E2BIG;
-> +		}
-> +	}
+> diff --git a/include/dt-bindings/clock/agilex5-clock.h b/include/dt-bindings/clock/agilex5-clock.h
+
+Filename must match compatible.
+
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..661bc8b649adfd6c3ae75dcbaff5dea331f0be52
+> --- /dev/null
+> +++ b/include/dt-bindings/clock/agilex5-clock.h
+> @@ -0,0 +1,100 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+
+Dual license.
+
+> +/*
+> + * Copyright (C) 2022, Intel Corporation
+
+Or if you cannot relicense just create your own binding header.
+
+> + */
 > +
->  	xa_lock_bh(&sk->sk_user_frags);
->  	for (i = 0; i < num_tokens; i++) {
->  		for (j = 0; j < tokens[i].token_count; j++) {
->  			netmem_ref netmem = (__force netmem_ref)__xa_erase(
->  				&sk->sk_user_frags, tokens[i].token_start + j);
+> +#ifndef __AGILEX5_CLOCK_H
+> +#define __AGILEX5_CLOCK_H
+> +
+> +/* fixed rate clocks */
+> +#define AGILEX5_OSC1			0
+> +#define AGILEX5_CB_INTOSC_HS_DIV2_CLK	1
+> +#define AGILEX5_CB_INTOSC_LS_CLK	2
+> +#define AGILEX5_F2S_FREE_CLK		3
+> +
+> +/* PLL clocks */
+> +#define AGILEX5_MAIN_PLL_CLK		4
+> +#define AGILEX5_MAIN_PLL_C0_CLK		5
+> +#define AGILEX5_MAIN_PLL_C1_CLK		6
+> +#define AGILEX5_MAIN_PLL_C2_CLK		7
+> +#define AGILEX5_MAIN_PLL_C3_CLK		8
+> +#define AGILEX5_PERIPH_PLL_CLK		9
+> +#define AGILEX5_PERIPH_PLL_C0_CLK	10
+> +#define AGILEX5_PERIPH_PLL_C1_CLK	11
+> +#define AGILEX5_PERIPH_PLL_C2_CLK	12
+> +#define AGILEX5_PERIPH_PLL_C3_CLK	13
+> +#define AGILEX5_CORE0_FREE_CLK		14
+> +#define AGILEX5_CORE1_FREE_CLK		15
+> +#define AGILEX5_CORE2_FREE_CLK		16
+> +#define AGILEX5_CORE3_FREE_CLK		17
+> +#define AGILEX5_DSU_FREE_CLK		18
+> +#define AGILEX5_BOOT_CLK		19
+> +
+> +/* fixed factor clocks */
+> +#define AGILEX5_L3_MAIN_FREE_CLK	20
+> +#define AGILEX5_NOC_FREE_CLK		21
+> +#define AGILEX5_S2F_USR0_CLK		22
+> +#define AGILEX5_NOC_CLK			23
+> +#define AGILEX5_EMAC_A_FREE_CLK		24
+> +#define AGILEX5_EMAC_B_FREE_CLK		25
+> +#define AGILEX5_EMAC_PTP_FREE_CLK	26
+> +#define AGILEX5_GPIO_DB_FREE_CLK	27
+> +#define AGILEX5_S2F_USER0_FREE_CLK	28
+> +#define AGILEX5_S2F_USER1_FREE_CLK	29
+> +#define AGILEX5_PSI_REF_FREE_CLK	30
+> +#define AGILEX5_USB31_FREE_CLK		31
+> +
+> +/* Gate clocks */
+> +#define AGILEX5_CORE0_CLK		32
+> +#define AGILEX5_CORE1_CLK		33
+> +#define AGILEX5_CORE2_CLK		34
+> +#define AGILEX5_CORE3_CLK		35
+> +#define AGILEX5_MPU_CLK			36
+> +#define AGILEX5_MPU_PERIPH_CLK		37
+> +#define AGILEX5_MPU_CCU_CLK		38
+> +#define AGILEX5_L4_MAIN_CLK		39
+> +#define AGILEX5_L4_MP_CLK		40
+> +#define AGILEX5_L4_SYS_FREE_CLK		41
+> +#define AGILEX5_L4_SP_CLK		42
+> +#define AGILEX5_CS_AT_CLK		43
+> +#define AGILEX5_CS_TRACE_CLK		44
+> +#define AGILEX5_CS_PDBG_CLK		45
+> +#define AGILEX5_EMAC1_CLK		47
+> +#define AGILEX5_EMAC2_CLK		48
+> +#define AGILEX5_EMAC_PTP_CLK		49
+> +#define AGILEX5_GPIO_DB_CLK		50
+> +#define AGILEX5_S2F_USER0_CLK		51
+> +#define AGILEX5_S2F_USER1_CLK		52
+> +#define AGILEX5_PSI_REF_CLK		53
+> +#define AGILEX5_USB31_SUSPEND_CLK	54
+> +#define AGILEX5_EMAC0_CLK		46
+> +#define AGILEX5_USB31_BUS_CLK_EARLY	55
+> +#define AGILEX5_USB2OTG_HCLK		56
+> +#define AGILEX5_SPIM_0_CLK		57
+> +#define AGILEX5_SPIM_1_CLK		58
+> +#define AGILEX5_SPIS_0_CLK		59
+> +#define AGILEX5_SPIS_1_CLK		60
+> +#define AGILEX5_DMA_CORE_CLK		61
+> +#define AGILEX5_DMA_HS_CLK		62
+> +#define AGILEX5_I3C_0_CORE_CLK		63
+> +#define AGILEX5_I3C_1_CORE_CLK		64
+> +#define AGILEX5_I2C_0_PCLK		65
+> +#define AGILEX5_I2C_1_PCLK		66
+> +#define AGILEX5_I2C_EMAC0_PCLK		67
+> +#define AGILEX5_I2C_EMAC1_PCLK		68
+> +#define AGILEX5_I2C_EMAC2_PCLK		69
+> +#define AGILEX5_UART_0_PCLK		70
+> +#define AGILEX5_UART_1_PCLK		71
+> +#define AGILEX5_SPTIMER_0_PCLK		72
+> +#define AGILEX5_SPTIMER_1_PCLK		73
+> +#define AGILEX5_DFI_CLK			74
+> +#define AGILEX5_NAND_NF_CLK		75
+> +#define AGILEX5_NAND_BCH_CLK		76
+> +#define AGILEX5_SDMMC_SDPHY_REG_CLK	77
+> +#define AGILEX5_SDMCLK			78
+> +#define AGILEX5_SOFTPHY_REG_PCLK	79
+> +#define AGILEX5_SOFTPHY_PHY_CLK		80
+> +#define AGILEX5_SOFTPHY_CTRL_CLK	81
+> +#define AGILEX5_NUM_CLKS		82
+
+Drop, not a binding.
+
+> +
+> +#endif	/* __AGILEX5_CLOCK_H */
 > 
-> -			if (netmem &&
-> -			    !WARN_ON_ONCE(!netmem_is_net_iov(netmem))) {
-> -				netmems[netmem_num++] = netmem;
-> -				if (netmem_num == ARRAY_SIZE(netmems)) {
-> -					xa_unlock_bh(&sk->sk_user_frags);
-> -					for (k = 0; k < netmem_num; k++)
-> -						WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
-> -					netmem_num = 0;
-> -					xa_lock_bh(&sk->sk_user_frags);
-> -				}
-> -				ret++;
 
-[..]
+Best regards,
+Krzysztof
 
-> +			if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
-> +				continue;
-
-Any reason we are not returning explicit error to the callers here?
-That probably needs some mechanism to signal which particular one failed
-so the users can restart?
 
