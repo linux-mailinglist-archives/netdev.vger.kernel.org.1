@@ -1,136 +1,118 @@
-Return-Path: <netdev+bounces-140328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B53479B5FCD
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:13:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D4F19B5FD9
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:18:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75C97284774
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:13:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D4FF8B2218C
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0821E260D;
-	Wed, 30 Oct 2024 10:13:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 788A41E32B0;
+	Wed, 30 Oct 2024 10:17:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Hu9cKlyC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out-183.mta0.migadu.com (out-183.mta0.migadu.com [91.218.175.183])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3B41E25F0
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 10:13:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6651E231B
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 10:17:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.183
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730283213; cv=none; b=F683GAvBR1y5X9d9Zx5bAEmeOENfbWs7OBUSg3AFJDzGYKwEFPEBEpCMzP6zBH5mOVfKXjw7hiQqybE9FAoHUDMvgqxP0msG+qS0LaTnKcIn07Vp1xj4emH+5QL9GusFJxv8KsUbK0lVAVZRWWNTJgznWGRr8TRk7dT5CP/UqYE=
+	t=1730283479; cv=none; b=auZ0zQpC0ECNtr1ZS6iH59fL5H3i6gFvyY/1wd6sEyJeX3OVDODj17mK2Pe8V9GOFEC7mQcRGiTqakjgmkssM1g5IbYy0ekaiIdUa1N83rgybdjSOSiYqCyP4iz4LaY3zq4VfD5TJ22YYWMHu93IHh73CsR80eJTa9FS9uC1lJ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730283213; c=relaxed/simple;
-	bh=d5UJW7t9fo/lwYCkIPNEd46l8GiWAIsHzZ3+8jA04tU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LLuCuSsCzWTGpJvl87J8x+4vy/I+/snE0MnzvGMMRMk018Tcjh6Y0T6OAVDEDw0NHBoMWtjBH54O/RrnsQmX+QpqxW917p81lhDwvVjbivylhNhzNdt6DEbARyigFax6jJyVpBooj+ji7FAPjLLWTU7GMT7qaaIaYSmAZ5ftxCw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t65h1-0001bM-Mj; Wed, 30 Oct 2024 11:12:47 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t65gx-001B9S-3A;
-	Wed, 30 Oct 2024 11:12:44 +0100
-Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 837433622F0;
-	Wed, 30 Oct 2024 10:12:43 +0000 (UTC)
-Date: Wed, 30 Oct 2024 11:12:43 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Ming Yu <a0282524688@gmail.com>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
-	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
-	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
-	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
-Subject: Re: [PATCH v1 0/9] Add Nuvoton NCT6694 MFD devices
-Message-ID: <20241030-industrious-sidewinder-of-strength-efbe4a-mkl@pengutronix.de>
-References: <20241024085922.133071-1-tmyu0@nuvoton.com>
- <20241024-eminent-dancing-narwhal-8f25dd-mkl@pengutronix.de>
- <CAOoeyxV4K=jR+tofeQtsMB7+smuu+Ghas5Tqfx4JvhuVK8dXrA@mail.gmail.com>
- <20241025-modest-hasty-angelfish-1e9193-mkl@pengutronix.de>
- <CAOoeyxU9VwsM=mRZy5AtjH=V3iSGQxkKw18qL+yeUxkh1OVHgQ@mail.gmail.com>
+	s=arc-20240116; t=1730283479; c=relaxed/simple;
+	bh=PdxWNT1jcWBWmUB9Z91Kg6NXoTGc/mkTshntdWivX1o=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TWLMK21D6eVZaga3UkdFD6xvDveyoiDf+ZaczwfynaBuq5W6azdnpLsRxAmf9qr2mnNN5VjtJ61qdVD2s/9G9aRWW86qU2ohYqTj0hOp0D2ZxvEIimH4qWlHrho5z6JweeBKPK07vcPvFRTs1qRVAqNsA3OFMbLr+1yYr+CmhAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Hu9cKlyC; arc=none smtp.client-ip=91.218.175.183
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <c8c889b0-828d-48c8-ba0d-47a0fcafc616@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730283475;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=i2yANmFTkkjh+6oMzRT7nI2MJw1gamY3r4/y28tsV7E=;
+	b=Hu9cKlyCs6oZ9W5TZYutoa3lV0PgusecsMkG06VHKf97Ta4ZtTAUXILe0kxYL7/c90tIqR
+	ZTPg5KVqai3vbggzsWBwomQuPAGUCeDkOIsXQEE20BUY9mfKi20Wgba8LSNPhvkffNK562
+	a+/siE/95ysJU2Gw29XyOKHNIaZe3dU=
+Date: Wed, 30 Oct 2024 10:17:47 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="frl5xcswfbpqjn4v"
-Content-Disposition: inline
-In-Reply-To: <CAOoeyxU9VwsM=mRZy5AtjH=V3iSGQxkKw18qL+yeUxkh1OVHgQ@mail.gmail.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] mlx5_en: use read sequence for gettimex64
+To: Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+ Tariq Toukan <tariqt@nvidia.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org
+References: <20241014170103.2473580-1-vadfed@meta.com>
+ <87wmi6njda.fsf@nvidia.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <87wmi6njda.fsf@nvidia.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
+On 18/10/2024 05:08, Rahul Rameshbabu wrote:
+> On Mon, 14 Oct, 2024 10:01:03 -0700 Vadim Fedorenko <vadfed@meta.com> wrote:
+>> The gettimex64() doesn't modify values in timecounter, that's why there
+>> is no need to update sequence counter. Reduce the contention on sequence
+>> lock for multi-thread PHC reading use-case.
+>>
+>> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+>> ---
+>>   drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c | 6 +-----
+>>   1 file changed, 1 insertion(+), 5 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> index b306ae79bf97..4822d01123b4 100644
+>> --- a/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> +++ b/drivers/net/ethernet/mellanox/mlx5/core/lib/clock.c
+>> @@ -402,9 +402,7 @@ static int mlx5_ptp_gettimex(struct ptp_clock_info *ptp, struct timespec64 *ts,
+>>   			     struct ptp_system_timestamp *sts)
+>>   {
+>>   	struct mlx5_clock *clock = container_of(ptp, struct mlx5_clock, ptp_info);
+>> -	struct mlx5_timer *timer = &clock->timer;
+>>   	struct mlx5_core_dev *mdev;
+>> -	unsigned long flags;
+>>   	u64 cycles, ns;
+>>   
+>>   	mdev = container_of(clock, struct mlx5_core_dev, clock);
+>> @@ -413,10 +411,8 @@ static int mlx5_ptp_gettimex(struct ptp_clock_info *ptp, struct timespec64 *ts,
+>>   		goto out;
+>>   	}
+>>   
+>> -	write_seqlock_irqsave(&clock->lock, flags);
+>>   	cycles = mlx5_read_time(mdev, sts, false);
+>> -	ns = timecounter_cyc2time(&timer->tc, cycles);
+>> -	write_sequnlock_irqrestore(&clock->lock, flags);
+>> +	ns = mlx5_timecounter_cyc2time(clock, cycles);
+>>   	*ts = ns_to_timespec64(ns);
+>>   out:
+>>   	return 0;
+> 
+> The patch seems like a good cleanup to me. Like Vadim mentioned, we
+> should not need to update the timecounter since this simply a read
+> operation.
+> 
+> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 
---frl5xcswfbpqjn4v
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH v1 0/9] Add Nuvoton NCT6694 MFD devices
-MIME-Version: 1.0
+Rahul, Tariq,
 
-On 30.10.2024 16:30:37, Ming Yu wrote:
-> I am trying to register interrupt controller for the MFD deivce.
-> I need to queue work to call handle_nested_irq() in the callback
-> of the interrupt pipe, right?
+will you take it through mlx5-next, or should it go directly to
+net-next?
 
-I think you can directly demux the IRQ from the interrupt endpoint
-callback. But handle_nested_irq() only works from threaded IRQ context,
-so you have to use something like generic_handle_domain_irq_safe().
-
-Have a look for how to setup the IRQ domain:
-
-| drivers/net/usb/lan78xx.c
-| drivers/net/usb/smsc95xx.c
-
-But the IRQ demux in the lan78xx only handles the PHY IRQ. The ksz
-driver does proper IRQ demux:
-
-| net/dsa/microchip/ksz_common.c
-
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---frl5xcswfbpqjn4v
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmciBpgACgkQKDiiPnot
-vG8nUQgAjlFmdH0l/1kIMmisd2Oil+MBaXTjGPuahpQda7WUz6pZi56UHxgat+ZF
-Hr/eYxOz73BjWGuXCp3FfL1Mqp5NY66h0ZYdjgItMGN/0Dic5naFg/RnfniUnSUE
-rPYn+MI4K/R/n+O7ZFzg6LTU5isPKsCfmJhD1M4WXpd/QRX7Jv5yo6qdtlfwYFM2
-sDX5CRR4iyfcdaM4kyF/JCfhlzYqDBEQG2tLdJfU8zlqm8SW+CNGLDs7uWOIguaA
-SINbHFo2E4UONkdEhDkgn4seDDr4ykSKfazN/YbvhimF3862GtEUbeK7R8l8SJN6
-r76RxQK4oMaCy7/ydWFpcaOqfWG4qA==
-=BTYV
------END PGP SIGNATURE-----
-
---frl5xcswfbpqjn4v--
+Thanks!
 
