@@ -1,109 +1,73 @@
-Return-Path: <netdev+bounces-140204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8BB39B5897
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:29:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AF8D9B589B
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:29:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DAE6283B80
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:29:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C4121C22BCB
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:29:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4927B13FEE;
-	Wed, 30 Oct 2024 00:29:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6908214A90;
+	Wed, 30 Oct 2024 00:29:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="cjFkvgNn"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="bZ3W39tZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531B0CA64
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 00:29:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4E311CAF;
+	Wed, 30 Oct 2024 00:29:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730248151; cv=none; b=NJ6uhHahnmcxbnPZtOjX0FGOVQXvL4LbGesqELW6MT7HdBx+mqkhwK6gU69FnQ5SZyc6WtOfiKEU9a8ank2dk0F5KixpRwU02PvtG/ZNvDUkafjCISjUg/R8Vo+eiVmiW5oFVD30XUHYZO3uwnsehPjOFkRFhHjrgeRTi48RTbs=
+	t=1730248162; cv=none; b=CybzGzjiHBTLbXBDTpMEamzgK922tlzG+AHZ6KzchLO6KEvUOCvaKFGr23TGG7NX9ggJhdzhz4w3dKonD8USVG3fI/6pSQsuTU9Ocklh93ewzX3JeVsdmyy6yMju6EJk284/4cCsKT4wpFWShh0bx3XROedPOCqLZG9YuL9FUhE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730248151; c=relaxed/simple;
-	bh=CrVP5Ds7sG6Go5mXJBPjBGB9xYccOZwpdusd2f6yilE=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=mAQ2A/z4Vkqq8erMBftYbGiU9iCGVr9fD/E4D2Z0mcPs54Ka/B3fskB1GPpSMX9lIC40FLI/s8tN1La2nzCm1FueP7AjtFLJXYqsdcfx2xaNCrtIlW54iX9s+c41gBzHObBnt4oqfcXuem3q660WpyV5qbaQH8MICBDUMbgpWVA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=cjFkvgNn; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1730248146;
-	bh=CrVP5Ds7sG6Go5mXJBPjBGB9xYccOZwpdusd2f6yilE=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=cjFkvgNnJPEHqShuPv+lA/gduoUOCcSuqlNOEFNKuFfM5pulh3RAth1m/RFhU9Snc
-	 pPPV6gsfepGHn4EaQ3XbDSYn1fMJfcxKMsYxgbNplOh1pjNtVS7nhtxszrd1IJ/Rh+
-	 DYbFxMXDFYTtXsboMnveOBb4+pIaXYAaGvo/e7e5aT+FMfb192OCSkWJ1e7i4WkQFa
-	 /vUDELVUDVA0NWsyuIe4KMcbOskw9vpNwp6S0seZg5uEhUve4GnG1TR9AWaVPQVq1Q
-	 iIUjg9jroc5vK3VqnK6dCatLkPs53ZJAT7/FB+jy0bYoj9CvnPHSDm0UzfeGuSAdfc
-	 OfWWpTR3X+C6w==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id EA0786A1CD;
-	Wed, 30 Oct 2024 08:29:05 +0800 (AWST)
-Message-ID: <198a796d5855759ca8561590d848c52028378971.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net 1/2] net: ethernet: ftgmac100: prevent use after
- free on unregister when using NCSI
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	s=arc-20240116; t=1730248162; c=relaxed/simple;
+	bh=1pq/pDL/Y5H4W0YB257TIBJQI2fBtFz8VjZsvNmGvNk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WfMXEzecPpQnKImma3jLs6ceu3s0P/zr4osL48qAHKvqu1yXsikZhtm7h/YhpmgeWS/vz6pHw/W7BNVEEyLcGedvvs6ttyTPuQP2o5DpP5T0g8raqM3/e3eq1Ndt88VnqZN+fXAtNgp7A7uHXBQ/KNO8XKcd3P8jxs0xVoc6Oc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=bZ3W39tZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F0DDC4CEE3;
+	Wed, 30 Oct 2024 00:29:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730248162;
+	bh=1pq/pDL/Y5H4W0YB257TIBJQI2fBtFz8VjZsvNmGvNk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=bZ3W39tZViMdn/Nwn5Stpkgu235jsEKj6+KJv0jqX2e7Go6bkxM2RJIAvJYL3NK2P
+	 FwuU/W+Opt6iuyH/HIivOwVi5dN8rFZp6x2o+lpI+aPY2/QMaDkrz5V6aVipI8NKkV
+	 qnnVj7dvucq23Kdd+mpPh3nKFQFdlee00ZYc/0Wj1MPeMV+gQNyyQ/83TrvBLqRCNi
+	 6pbBUvcTTAmILsQw+X44VemMUtgaHhROMQsHzmCOIEaoH+UF/4EGaaXPZ/lEzqtQO/
+	 qOf66AZRteSWPAnmrKVvsSzPVLw2NkXnES/aUIIv2mZVNgv3/jYaPiOLvBvv9x4LIG
+	 xV6UbHZOBmiow==
+Date: Tue, 29 Oct 2024 17:29:20 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
  "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Joel Stanley
- <joel@jms.id.au>, Jacky Chou <jacky_chou@aspeedtech.com>, Jacob Keller
- <jacob.e.keller@intel.com>, netdev@vger.kernel.org
-Date: Wed, 30 Oct 2024 08:29:05 +0800
-In-Reply-To: <20241029153619.1743f07e@kernel.org>
-References: <20241028-ftgmac-fixes-v1-0-b334a507be6c@codeconstruct.com.au>
-	 <20241028-ftgmac-fixes-v1-1-b334a507be6c@codeconstruct.com.au>
-	 <fe5630d4-1502-45eb-a6fb-6b5bc33506a9@lunn.ch>
-	 <0123d308bb8577e7ccb5d99c504cec389ba8fe15.camel@codeconstruct.com.au>
-	 <20241029153619.1743f07e@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] mlx5: simplify EQ interrupt polling logic
+Message-ID: <20241029172920.21cee16a@kernel.org>
+In-Reply-To: <20241023205113.255866-1-csander@purestorage.com>
+References: <20241023205113.255866-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hi Jakub,
+On Wed, 23 Oct 2024 14:51:12 -0600 Caleb Sander Mateos wrote:
+> Use a while loop in mlx5_eq_comp_int() and mlx5_eq_async_int() to
+> clarify the EQE polling logic. This consolidates the next_eqe_sw() calls
+> for the first and subequent iterations. It also avoids a goto. Turn the
+> num_eqes < MLX5_EQ_POLLING_BUDGET check into a break condition.
 
-> > As the ordering in ftgmac100_remove() is:
-> >=20
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 if (priv->ndev)
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 ncsi_unregister_dev(priv->ndev);
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 unregister_netdev(netdev);
-> >=20
-> > which, is (I assume intentionally) symmetric with the _probe, which
-> > does:
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0 priv->ndev =3D ncsi_register_dev(netdev, ftgmac100_nc=
-si_handler);
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 /* ... */
-> >=20
-> > =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 register_netdev(netdev)
->=20
-> To be clear - symmetric means mirror image.
-
-Totally agree with you both on the concept, but I had flipped the
-unregister order in my head, sorry!
-
-So, this worth a try with the _remove sequence reordered with respect
-to the ncsi device. I'll work on a replacement patch to see if that can
-be done without other fallout, and will send a follow-up soon.
-
-Cheers,
-
-
-Jeremy
-
+Applied, thanks!
 
