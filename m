@@ -1,96 +1,138 @@
-Return-Path: <netdev+bounces-140198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A2669B582E
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:03:50 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC6C29B5837
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:07:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B4EC61F24005
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:03:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 393BCB213EB
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 00:07:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7DAA41;
-	Wed, 30 Oct 2024 00:03:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A41007489;
+	Wed, 30 Oct 2024 00:07:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GqQ+w6qX"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qw5JAiph"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f170.google.com (mail-qt1-f170.google.com [209.85.160.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3E818D;
-	Wed, 30 Oct 2024 00:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A056C1FB4;
+	Wed, 30 Oct 2024 00:07:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730246624; cv=none; b=MV2DnmYrvJvllyK02Su6nQJC0eE5kI3dlGZj5EhVBj8S4c8xka3cavsuhqQCxcoy03jlnOCoBjSIOl/ye4yu9vnBOWzsJxPtc237K2S0DPYjIhd2/Hd2pqvX5pf9bMzhJzFWKbw2IYLuaCaexjc8wBQZurq0T93gUX3hIJfo6P4=
+	t=1730246835; cv=none; b=JmS5vqnkdd22LSc1Ja6VznWY3br4+ICtWN9kfhRA8bDrfqVHY+0dbyDY40YVNqZK+qtc4APhyEQtlVCDCfhUs5roiTPrLE0Om3NRt+DA2r8rYEcIF8zbgckJMRSBjRkAX6tB2iNfn/Bp3McSVXtjFmz9lR2KO05HsdM3TQqDuog=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730246624; c=relaxed/simple;
-	bh=KQN+E3h8B8ti/s3m3iYCrSOSbJumnP+mk8IP7VZgfEY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=C91GHWWjeS5l2GVDjEelfKTzVupRuBNS2GflXSfgp7xCIi+1/UGLlmZiH9rYMEzc4GYtfc3qdCH9A3FrlB0+TP943h7Q8Iug9jdlDQ+ZCFhXiM/VDzkGZACpuuDrqN0kEpYWVAs8gIvooP2h1vMybB7thbTkmngl0174jDtrLBc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GqQ+w6qX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9811FC4CEE3;
-	Wed, 30 Oct 2024 00:03:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730246623;
-	bh=KQN+E3h8B8ti/s3m3iYCrSOSbJumnP+mk8IP7VZgfEY=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GqQ+w6qXYRf02FQF1dsVA8PKReddoiT0tQsJBvQ2EP9QnwUy0NUuKaQ9cHDazAdhs
-	 3XZOD/s+W+4vXjWd3GHabJ6y2xAK35t4TZWF8KnRA0nuZxIPNo/c/RSWq6SkioJOma
-	 2VzW3YmalG6Bx9w9E56+WHr2Cn3dvMlQ3YOR5lXHTFndGGbbqQdr/MYDJEtkFbTv0r
-	 jlTtNthnehDCc15RScCOp2XYi84iORTmqoCYufUPjsOWWjhHt9noM+Hg/BEBMBzka1
-	 YNWZGtgfqzzls8giOYktNg7E3nogFkKWAPXAjXymCS5r70FnO3mDQ2yuhpxm85/wRE
-	 KG45xTvEArHJw==
-Date: Tue, 29 Oct 2024 17:03:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: pabeni@redhat.com, davem@davemloft.net, edumazet@google.com,
- dsahern@kernel.org, pablo@netfilter.org, kadlec@netfilter.org,
- roopa@nvidia.com, razor@blackwall.org, gnault@redhat.com,
- bigeasy@linutronix.de, idosch@nvidia.com, ast@kernel.org,
- dongml2@chinatelecom.cn, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
- coreteam@netfilter.org, bridge@lists.linux.dev, bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v4 0/9] net: ip: add drop reasons to input
- route
-Message-ID: <20241029170341.1b351225@kernel.org>
-In-Reply-To: <20241024093348.353245-1-dongml2@chinatelecom.cn>
-References: <20241024093348.353245-1-dongml2@chinatelecom.cn>
+	s=arc-20240116; t=1730246835; c=relaxed/simple;
+	bh=S37voPQVDW68N9rTKPE3PrA1vjsOcLJcpFUAj8ajGPI=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Ab2MzY+3HywmYAJl5GvecKJ3lcQB9w7yCTko7Y2WmF1BKhIOIQarfNctN4EgHhO6Zz8eukjZcggl39qLFlBF3gD1ia7AEcZtggk5tOKQLjYaeBPn9HFq6ZFwR76gXqBqebXR/tAEmbwrGXeE1BKSPA5kns/SUnV2xqR+V0RSwNA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qw5JAiph; arc=none smtp.client-ip=209.85.160.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f170.google.com with SMTP id d75a77b69052e-4613162181dso33703981cf.3;
+        Tue, 29 Oct 2024 17:07:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730246832; x=1730851632; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1uI1LGMbJbLYFsIhRBi1cS/8+vbTbIoNQWToq8qf8C0=;
+        b=Qw5JAiph9lRWTP9OHan9430a95slTwePWJ51J11yXNYgnD+74afNFcc4VbVdfpDVj1
+         u4qriWz+Box90xs4Nmh1373sSAPOE6A24OHqr9bXWC/iCrbHxyu0hnwU/5+an7Wom04J
+         0Ri1yVohBqgJzQTO8vbOTMKKLdiZS5CvIOjP/r++8EviwHAoQTRYHunz7pb0hagxeFWD
+         CCG+Q5mjtUq/SpCkI+x5xdwYATSXo30KyinBtT03duMeXeW+PVaFwwecPj5T7YMew9Ln
+         tnYSNTdPuQU3RTYRAi0HznSEdDM1epFH1VP97gqjPlpIGDM7/GXfjECOFXqt9ivuNnYn
+         jpMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730246832; x=1730851632;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1uI1LGMbJbLYFsIhRBi1cS/8+vbTbIoNQWToq8qf8C0=;
+        b=F7i103BjJvAyDFLV+6E49+OaqYgga0mssUXu7nFASUMNIOO7qP9UlRJpT4dUoqb56F
+         23JTpquyy86G6M92qgJcK7X54nFQnOQUFZbgdfiLfXVHBVY8itF270atEuL5d1Keu+Vv
+         K6/xgk7xegPCe1sU4SLhQGzN5PIpaJAqRTmrfvjIJvdy+boSBBimvfngPmtoDp7Aj+Rh
+         S2hhQNNOwtJmwOb4ZKk0FTBZfc/e5niv9MCYiwYHd5Hl2p4hxYyHpMBokP1GFt9297ul
+         5oaa23UeO3T0ac89/5oIwe7JKMkGhUnfiY3vKONxgNgrmWZ+5pkUjhwAXeNevSHDvFKx
+         tyJg==
+X-Forwarded-Encrypted: i=1; AJvYcCVBT9bS/NuMsGWYMty1COFaA+VC8tUCbp/ERcwm2N2+X29Q/iX39N+RIgwcH6AAKMc1S0BxxOHs@vger.kernel.org, AJvYcCVL+lTotKNMp1uXDCcrV4BTQXcy8N4c6XyDLeWGB2dUIYp6sbD/O/PDa1L06Ij/2DGAf9yVX6k7LegK6gk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyc/V2WFYGgA8+svRr7AXfRGJYPGeAvw4EHDSH9nCJnCyaTXXZb
+	js0QLicvmzUxJzbcj3PkurWrH41nK18bQ7fUHDbCpN0WRlgnGjXFaFMIgejV+WITjpLbiJEHpIK
+	q7x0pf9TxmGPEt53D8abpDvfNntQ=
+X-Google-Smtp-Source: AGHT+IEyJngScPS5OHIxi6FIdyEq17NJ5SRuD59LnStEz4kNTb9/OOaPPalri+LndQzJ2YR12dvQPd5oUNPLvZ3nRIA=
+X-Received: by 2002:a05:622a:15d4:b0:460:f34c:12b6 with SMTP id
+ d75a77b69052e-4613c11c0a3mr215403631cf.44.1730246832406; Tue, 29 Oct 2024
+ 17:07:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241023012734.766789-1-rosenp@gmail.com> <20241029160323.532e573c@kernel.org>
+ <CAKxU2N-5rZ3vi-bgkWA5CMorKEOv6+_a0sVDUz15o8Z7+GFLvQ@mail.gmail.com> <b4f4eace-117f-4d55-bcf7-6718d70cbf88@intel.com>
+In-Reply-To: <b4f4eace-117f-4d55-bcf7-6718d70cbf88@intel.com>
+From: Rosen Penev <rosenp@gmail.com>
+Date: Tue, 29 Oct 2024 17:07:01 -0700
+Message-ID: <CAKxU2N8V7EydvrNDgps2-RzCg=gJvc-uHBQ8GFon4MzFKzG8jA@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: broadcom: use ethtool string helpers
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	Justin Chen <justin.chen@broadcom.com>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	=?UTF-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, 
+	Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra <manishc@marvell.com>, 
+	Doug Berger <opendmb@gmail.com>, Sabrina Dubroca <sd@queasysnail.net>, 
+	=?UTF-8?Q?Uwe_Kleine=2DK=C3=B6nig?= <u.kleine-koenig@baylibre.com>, 
+	open list <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 24 Oct 2024 17:33:39 +0800 Menglong Dong wrote:
-> In this series, we mainly add some skb drop reasons to the input path of
-> ip routing, and we make the following functions return drop reasons:
-> 
->   fib_validate_source()
->   ip_route_input_mc()
->   ip_mc_validate_source()
->   ip_route_input_slow()
->   ip_route_input_rcu()
->   ip_route_input_noref()
->   ip_route_input()
->   ip_mkroute_input()
->   __mkroute_input()
->   ip_route_use_hint()
-> 
-> And following new skb drop reasons are added:
-> 
->   SKB_DROP_REASON_IP_LOCAL_SOURCE
->   SKB_DROP_REASON_IP_INVALID_SOURCE
->   SKB_DROP_REASON_IP_LOCALNET
->   SKB_DROP_REASON_IP_INVALID_DEST
+On Tue, Oct 29, 2024 at 4:55=E2=80=AFPM Jacob Keller <jacob.e.keller@intel.=
+com> wrote:
+>
+>
+>
+> On 10/29/2024 4:43 PM, Rosen Penev wrote:
+> > On Tue, Oct 29, 2024 at 4:03=E2=80=AFPM Jakub Kicinski <kuba@kernel.org=
+> wrote:
+> >>
+> >> On Tue, 22 Oct 2024 18:27:34 -0700 Rosen Penev wrote:
+> >>> @@ -3220,13 +3212,13 @@ static void bnx2x_get_strings(struct net_devi=
+ce *dev, u32 stringset, u8 *buf)
+> >>>                       start =3D 0;
+> >>>               else
+> >>>                       start =3D 4;
+> >>> -             memcpy(buf, bnx2x_tests_str_arr + start,
+> >>> -                    ETH_GSTRING_LEN * BNX2X_NUM_TESTS(bp));
+> >>> +             for (i =3D start; i < BNX2X_NUM_TESTS(bp); i++)
+> >>> +                     ethtool_puts(&buf, bnx2x_tests_str_arr[i]);
+> >>
+> >> I don't think this is equivalent.
+> > What's wrong here?
+>
+> I was trying to figure that out too...
+>
+> I guess the memcpy does everything all at once and this does it via
+> iteration...?
+>
+> memcpy would actually result in copying the padding between strings in
+> the bnx2x_tests_str_arr, while the ethtool_puts turns into strscpy which
+> doesn't pad the tail of the buffer with zeros?
+I'll remove the change in the next version.
 
-We're "a bit" behind on patches after my vacation, so no real review
-here, but please repost with net-next in the subject. The test
-automation trusts the tree designation and bpf-next is no longer
-based on net-next. So this doesn't apply.
--- 
-pw-bot: cr
+Still doesn't make much sense.
+>
+> >>
+> >> Also, please split bnx2x to a separate patch, the other drivers in thi=
+s
+> >> patch IIUC are small embedded ones, the bnx2x is an "enterprise
+> >> product".
+> >> --
+> >> pw-bot: cr
+>
 
