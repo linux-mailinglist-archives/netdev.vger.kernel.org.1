@@ -1,161 +1,120 @@
-Return-Path: <netdev+bounces-140268-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D483D9B5B60
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:40:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0438C9B5B6A
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:42:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11CE51C241E8
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:40:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AFEFB1F24FF0
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:42:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0D11CF7C2;
-	Wed, 30 Oct 2024 05:37:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B129F1CF7D6;
+	Wed, 30 Oct 2024 05:42:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="qm2q3ikT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24F3D1CF5FF
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:37:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 657FC198A17
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:42:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730266672; cv=none; b=gsflibA0qu/Qtr5ll16qpigsMDF0LX9ujEpLBFD7DjeCC/s5tvbuGSALVfGAFpMUdegutKArPgQY6RfY4wZpbLm47MJKC0IslT0S/6Z6P+hW4kgl2QgxPvd2pN9WBlFhnIyrxYWMcAz7Ywdxu/lRCr2mto+sjVojCoHxosodPhQ=
+	t=1730266936; cv=none; b=YcOBlDy3zCVdryGffKHPBVx7CbgkZMyvf3Vmzd5eGR2bO27n0MV02Wa2fOAPRcbUQ3Al6mKXHnvlBvG21hp7DE/ioBlAbGF0bDOP/XwFRdj/CSIVa2nE4RcaHUwXxCUaY+P9WgmOMKmzOC4YdyNknOlGSDH4QgTTMWoPLmCOBYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730266672; c=relaxed/simple;
-	bh=PjLHXwrAhoN/Mb365uv5xtjh13ztQTTsoXP7lKVcVNw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N+RcHnoc3HHZBQaXLDrBnT3ihVhyaK8G+mvPhaOLW1Im7BYhnI8iZaQR+VtLWoFNBoeUepSEYAsKv/aN/EjixB4Wpv1eguEG6EQl1hj5//apgX3OpJR2vxGIPBsEbB33rHB6VuuOPU1XSa7qU+hn34o8hwhd6v5m3t4d9r5S15Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t61OU-0004DM-VL; Wed, 30 Oct 2024 06:37:22 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t61OS-00190G-2A;
-	Wed, 30 Oct 2024 06:37:20 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t61OS-004JFG-1l;
-	Wed, 30 Oct 2024 06:37:20 +0100
-Date: Wed, 30 Oct 2024 06:37:20 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>, Rob Herring <robh@kernel.org>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org, Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH net-next v2 2/5] dt-bindings: net: dsa: ksz: add
- mdio-parent-bus property for internal MDIO
-Message-ID: <ZyHGEDfhcRGX_Fzg@pengutronix.de>
-References: <20241029110732.1977064-1-o.rempel@pengutronix.de>
- <20241029110732.1977064-3-o.rempel@pengutronix.de>
- <20241029123107.ssvggsn2b5w3ehoy@skbuf>
- <ZyDe_ObZ-laVk8c2@pengutronix.de>
- <2b03f429-9ae2-4c7a-9cec-0bc2f3c6e816@lunn.ch>
+	s=arc-20240116; t=1730266936; c=relaxed/simple;
+	bh=DXaotLrZvHO7/lZUMHrv9uM/LDut0NoMVmcxjtat8i0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=BwItNboOcKZZYvUstg+M/n1zej1zI1VqJuJSpaVh7sKBXeRDe6yA0QqYzXtU6DbKf5moyQlsRgtNqNd+amrAueDz8KpNPnbh0hRbXkSrYJAuVQSnNEbOjKaGT0PdlS0jWXnuwYC/VeF2GrzqSakqEChq8ggIXR3dwh5F4bJNO4w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=qm2q3ikT; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8fd16b77-b8e8-492c-ab69-8192cafa9fc7@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730266931;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=4ogkFKOEJkxZgIuGKDOrDeb3Unth/rF/JZaFzxLyOtc=;
+	b=qm2q3ikTFDp/ARzgPDOxhfNOhd4Y0R5rqK5BdNmAUt6ieNrRYURc9Ox6t/qmWoYVSgb24x
+	GbITVZbdnIhCDWCH1/P9JdWKJmgyqOJ+RF203pEZ6PXosrAyV/6LJCfBUSQhM8lmDQptQn
+	mb7kf82WvuZsD2aQ0fEeZxkt+dlQGVU=
+Date: Tue, 29 Oct 2024 22:42:01 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <2b03f429-9ae2-4c7a-9cec-0bc2f3c6e816@lunn.ch>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
+ tskey offset
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-11-kerneljasonxing@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <20241028110535.82999-11-kerneljasonxing@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Tue, Oct 29, 2024 at 09:35:48PM +0100, Andrew Lunn wrote:
-> > > I'm not saying whether this is good or bad, I'm just worried about
-> > > mixing quantities having different measurement units into the same
-> > > address space.
-> > > 
-> > > Just like in the case of an mdio-mux, there is no address space isolation
-> > > between the parent bus and the child bus. AKA you can't have this,
-> > > because there would be clashes:
-> > > 
-> > > 	host_bus: mdio@abcd {
-> > > 		ethernet-phy@2 {
-> > > 			reg = <2>;
-> > > 		};
-> > > 	};
-> > > 
-> > > 	child_bus: mdio@efgh {
-> > > 		mdio-parent-bus = <&host_bus>;
-> > > 
-> > > 		ethernet-phy@2 {
-> > > 			reg = <2>;
-> > > 		};
-> > > 	};
-> > > 
-> > > But there is a big difference. With an mdio-mux, you could statically
-> > > detect address space clashes by inspecting the PHY addresses on the 2
-> > > buses. But with the lan937x child MDIO bus, in this design, you can't,
-> > > because the "reg" values don't represent MDIO addresses, but switch port
-> > > numbers (this is kind of important, but I don't see it mentioned in the
-> > > dt-binding).
-> > 
-> > In current state, the driver still require properly configured addresses
-> > in the devicetree. So, it will be visible in the DT.
-> 
-> This is not what i was expecting, especially from mv88e6xxx
-> perspective. The older generation of devices had the PHYs available on
-> the 'host bus', as well as the 'child bus', using a 1:1 address
-> mapping. You could in theory even skip the 'child bus' and list the
-> PHYs on the 'host bus' and phy-handle would make it work. However i
-> see from a later comment that does not work here, you need some
-> configuration done over SPI, which mv88e6xx does not need. 
-> 
-> > 
-> > > These are translated by lan937x_create_phy_addr_map() using
-> > > the CASCADE_ID/VPHY_ADD pin strapping information read over SPI.
-> > > I.e. with the same device tree, you may or may not have address space
-> > > clashes depending on pin strapping. No way to tell.
-> > 
-> > The PHY address to port mapping in the driver is needed to make the
-> > internal switch interrupt controller assign interrupts to proper PHYs.
-> 
-> You are talking about:
-> 
-> 			ds->user_mii_bus->irq[phy] = irq;
-> 
-> in ksz_irq_phy_setup.
-> 
-> I naively expect 'phy' to be the 'reg' value in DT, and the 'dev'
-> value which passed to mdiobus_read_nested(bus, dev, reg) ?
+On 10/28/24 4:05 AM, Jason Xing wrote:
+> +/* Used to track the tskey for bpf extension
+> + *
+> + * @sk_tskey: bpf extension can use it only when no application uses.
+> + *            Application can use it directly regardless of bpf extension.
+> + *
+> + * There are three strategies:
+> + * 1) If we've already set through setsockopt() and here we're going to set
+> + *    OPT_ID for bpf use, we will not re-initialize the @sk_tskey and will
+> + *    keep the record of delta between the current "key" and previous key.
+> + * 2) If we've already set through bpf_setsockopt() and here we're going to
+> + *    set for application use, we will record the delta first and then
+> + *    override/initialize the @sk_tskey.
+> + * 3) other cases, which means only either of them takes effect, so initialize
+> + *    everything simplely.
+> + */
+> +static long int sock_calculate_tskey_offset(struct sock *sk, int val, int bpf_type)
+> +{
+> +	u32 tskey;
+> +
+> +	if (sk_is_tcp(sk)) {
+> +		if ((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LISTEN))
+> +			return -EINVAL;
+> +
+> +		if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
+> +			tskey = tcp_sk(sk)->write_seq;
+> +		else
+> +			tskey = tcp_sk(sk)->snd_una;
+> +	} else {
+> +		tskey = 0;
+> +	}
+> +
+> +	if (bpf_type && (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID)) {
+> +		sk->sk_tskey_bpf_offset = tskey - atomic_read(&sk->sk_tskey);
+> +		return 0;
+> +	} else if (!bpf_type && (sk->sk_tsflags_bpf & SOF_TIMESTAMPING_OPT_ID)) {
+> +		sk->sk_tskey_bpf_offset = atomic_read(&sk->sk_tskey) - tskey;
+> +	} else {
+> +		sk->sk_tskey_bpf_offset = 0;
+> +	}
+> +
+> +	return tskey;
+> +}
 
-Yes, this is correct. This can be implemented purely by parsing the
-devicetree. Based on previous experience, I expected you to suggest me
-to implement the validation so i jumped directly to a part of this step.
-
-Should I implement it based on the devicetree information and validate
-based on HW strapping?
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Before diving into this route, the bpf prog can peek into the tcp seq no in the 
+skb. It can also look at the sk->sk_tskey for UDP socket. Can you explain why 
+those are not enough information for the bpf prog?
 
