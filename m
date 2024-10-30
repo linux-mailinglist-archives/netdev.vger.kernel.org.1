@@ -1,91 +1,157 @@
-Return-Path: <netdev+bounces-140383-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140384-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E8669B645F
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:41:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 44A999B64C9
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:52:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2AE9F1F231C4
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:41:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2799B1C203FF
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:52:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99B4E1EABDA;
-	Wed, 30 Oct 2024 13:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0EE01F4FB9;
+	Wed, 30 Oct 2024 13:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HkDSIqJ5"
+	dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b="Yh3moyUG"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mout.gmx.net (mout.gmx.net [212.227.15.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8230D1EABBE;
-	Wed, 30 Oct 2024 13:41:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7CA11F4FB5;
+	Wed, 30 Oct 2024 13:50:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730295686; cv=none; b=Mj16zx0YkhVwKISZfPcLtIBCk5FoVrjAYTR7/7il7zENvh8WkykA7hgoLNRouUsD/uZluAe+k0asvAacolm+EaEbQtg4X4LVtL1PI0YustJIR+/zNqGcoqS6FSoPZV77GCd4gaKd+hTn+3qunBqf0bMmrbsy88kYb9NP8VQw7GU=
+	t=1730296246; cv=none; b=qghXuSt6HuEzojwTRh973jzdqy7nNtCYkUqx0GaKHENUeFa6JUwW5ALoCOCzd6idfJhKUnEMAipFjos6EuF467fTb3LIIwVmUBNk01AreMlQgEXW+Vy25l9rr/+MJjIrZBQT9o+E+OlYIOZyKKG6zVBcmn+Xi51rcrcU11vL3HI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730295686; c=relaxed/simple;
-	bh=js8OWuVfc+6P59q7r8A9v9QkZPXDdmK4FIK6J0rwO1E=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bVRE0P+GrCPDEZn8PeEU0KYWtrdveLkAXSqeKPV3hm/7mPcdbiIEUirceKRm3jBPwE6tXRoGe49NJrEJ06vgbHGvvHKF596zNsH4eECE0J6RDEobeburMVJMRunF+5IUp7wY2gaVG0xzkZathNKMAuGFr3Nn1sO25gjLCJ/X2lM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HkDSIqJ5; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=HfgxdgiUAQiWmL2DptAL0OS3pzfCdOrkZKQvGdoq9to=; b=HkDSIqJ553XUcVw4+XDX8gX1qO
-	DgV/OjplWvp5ldDWJr/skwTJJ9AlLGwoMCLYctTP5Mzh3a6HLZpLuGU2IwGFVf6FXnzgx6o4FCZG+
-	Fzs6ck6OKrRd01kJfc1/bp4WIscY1Q5y8oD33ekdn/xUVKexvBAKrm7va/SVFbAN4GTk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t68wr-00Bh2o-NW; Wed, 30 Oct 2024 14:41:21 +0100
-Date: Wed, 30 Oct 2024 14:41:21 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Steffen Trumtrar <s.trumtrar@pengutronix.de>
-Cc: Dinh Nguyen <dinguyen@kernel.org>, Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-clk@vger.kernel.org, kernel@pengutronix.de
-Subject: Re: [PATCH 4/4] arm64: dts: agilex5: initial support for Arrow
- AXE5-Eagle
-Message-ID: <3f55a225-7d09-486a-818f-307c1f1ba806@lunn.ch>
-References: <20241030-v6-12-topic-socfpga-agilex5-v1-0-b2b67780e60e@pengutronix.de>
- <20241030-v6-12-topic-socfpga-agilex5-v1-4-b2b67780e60e@pengutronix.de>
+	s=arc-20240116; t=1730296246; c=relaxed/simple;
+	bh=D7AqZoX4gYwteb6RFEF1+ZVpyBKM5MFuI9FZMJjT8pA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=NzjIvZVrBwHJ8xA9b1jflLGbBGbyDeCdBsXczkVTfq6DGWyFDEQUxXMWrLpPYKX8nsF0K4h7egmwlLJOThCGYnehapTRYAOumIsplEJtzqK1R0st3fJI8ksRxhoB7iucIgYOcPoazSrt24PPRFIxx5UqI1jBla8YD0GGDLrrqZQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b=Yh3moyUG; arc=none smtp.client-ip=212.227.15.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
+	s=s31663417; t=1730296100; x=1730900900; i=metux@gmx.de;
+	bh=D7AqZoX4gYwteb6RFEF1+ZVpyBKM5MFuI9FZMJjT8pA=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
+	 References:From:In-Reply-To:Content-Type:
+	 Content-Transfer-Encoding:cc:content-transfer-encoding:
+	 content-type:date:from:message-id:mime-version:reply-to:subject:
+	 to;
+	b=Yh3moyUGQiWIS5M+hsYMxsskv2Uv6AVjW1tdiExk6hc2qFHctV/5S+d5s0VDetbM
+	 ddXzSOgh4H9xiXZWdQQ9p/bxvJbpfC0cdzm2GjGMdqdGKR57jEv3O/HGnXyhdweD7
+	 ccaRv5YiORcBs53mTe9MAMZYMlaZpugACFe7+1ZbAb3e16vRosw+4uqYuCKyFoPSh
+	 ebsVFbcCQx46mA6re4AGlNQES/piXbnlltBhxqaooB41ez9ls791F95cmnbKf5nr/
+	 8wGbqi5BkhpQ516UfzX6Hh0kPqS8AZWmCVzVbglOwE3a8FbBCeynePOSL575ZcOid
+	 Dd1YAX2gyFNCokhe8Q==
+X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
+Received: from [192.168.1.178] ([95.114.207.188]) by mail.gmx.net (mrgmx004
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1M3DO3-1t9iMT01nh-006fzu; Wed, 30
+ Oct 2024 14:48:20 +0100
+Message-ID: <b410a7fb-58c0-4d17-b818-54ec3476833a@gmx.de>
+Date: Wed, 30 Oct 2024 14:48:37 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241030-v6-12-topic-socfpga-agilex5-v1-4-b2b67780e60e@pengutronix.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel maintainer *CENSORED* on LKML [WAS: linux: Goodbye from a
+ Linux community volunteer]
+To: =?UTF-8?Q?Dragan_Milivojevi=C4=87?= <d.milivojevic@gmail.com>,
+ "Enrico Weigelt, metux IT consult" <info@metux.net>
+Cc: Peter Cai <peter@typeblog.net>, phoronix@phoronix.com,
+ Goran <g@odyss3us.net>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
+ Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
+ ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
+ Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+ Kory Maincent <kory.maincent@bootlin.com>,
+ Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
+ Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
+ Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
+ Paul Burton <paulburton@kernel.org>,
+ Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+ Arnd Bergmann <arnd@arndb.de>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
+ linux-mips@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
+ Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
+ Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
+ <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>,
+ netdev@vger.kernel.org, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>,
+ linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
+ Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Andrew Halaney <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>,
+ Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
+ Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
+ Sergey Shtylyov <s.shtylyov@omp.ru>, Evgeniy Dushistov <dushistov@mail.ru>,
+ Geert Uytterhoeven <geert@linux-m68k.org>,
+ Sergio Paracuellos <sergio.paracuellos@gmail.com>,
+ Nikita Shubin <nikita.shubin@maquefel.me>,
+ linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
+ Linus Torvalds <torvalds@linux-foundation.org>, "[DNG]"
+ <dng@lists.dyne.org>, redaktion@golem.de, dev mail list <dev@suckless.org>
+References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+ <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+ <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
+ <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
+ <6d37175d-1b0b-4b82-80f0-c5b4e61badbf@metux.net>
+ <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
+ <CALtW_agiJyX3sTaBKgwPF7X920=+fFrRgXMPt4x_GCDOMfZy_w@mail.gmail.com>
+ <CALtW_aimN531aZKSSG4hVLeQDk6bUoujopkhCh57xsaxfJrYgA@mail.gmail.com>
+Content-Language: tl
+From: metux <metux@gmx.de>
+In-Reply-To: <CALtW_aimN531aZKSSG4hVLeQDk6bUoujopkhCh57xsaxfJrYgA@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:02/JYljBFpt12zmY0Go6Xkn401QYmKavoXnaT8EeSlrAHbRsx8n
+ Zdvv/lLJxVdM8nFQizZfTKEW37UKSRmLg/f7sd3o97CFe9/qm8RP0UtwctZ+qxVObR/jFNw
+ m13fSOqomvd7q+gMqAZ942T8v05wPOrYZpb9mIQDrg5MXcznAOy7aytPmL3VlgdapjHCO2n
+ gp70ijx1LoNifjgVmNeng==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:XMcg9mQEW00=;8p/Sr9f43i/VMDKIw0uuN4zeFJj
+ 4TzNACOpE4r2YbLQxZ5xl1PnYM+gpaKmM07XslwcqNngCXLB/XttSLHNSdEvR8s3B47NjhE4Z
+ gzCXT1FKQIMCgB4RbRzC6MGKa+z4KYaV7xlHwMBOtWQFO7JG1x6IekOpKNRsdDBnGGQUPlX5Q
+ NpiKIH7f7dZZbkUks6KHEL7Cw1yhhM+DDxR9v+J8Y3EbhOl+pqDAa5zkW031TMU6RP1NAEh8L
+ w5W3BMaUImgWK3HjJCuWDQJW/uapa9utlZeZFhk75sKmzP+v1VvDNGawPrYnM7ZqwfhA2BDLH
+ xCLmFjHW61xtNh01x6lEDKLLctnwXP5AGjDyUp+umcxFONS2fffaPA+V8uvn5YPPgJmqGElw7
+ ALecE9QNd4O+9zMnfh5BS1I72wVO3CM0k8ewBwd2TTSh2X2ZZKSjE9eFtU23D8SV6SNHGq3VL
+ hAB1H7fXdigm8b9aLmTxZjJ/1RMDu8ef4YggBoz1+WVG2VnrSKtNta/WWzAI3QtcBoZnsWcrO
+ It2zyC6kJ8mGD8XBqofmwTlL3LP2+cvIE18rL7d36PTROQgvVSW7DFkJU1AspI6covtd35jCZ
+ FXHGPfFDc+r41fAp7tjNc4DHJlUFZ3ga4LaJitNOM1JvBfmrazXfH21sxmaO6nAmN2F7MmKun
+ 5BG2jzR0E2loJkz+FDYujXL4ittyLdbZ0KAQFKHl+5A+k48zyYBpc/peSRZITevB55Kav7VlS
+ TchpkcgA4n3JLFkMgA95jPXj+i2mXrTz9GOVbUHx3l0Nfa7L3hALf6Ni2Zqc97rk3b9xf1z4d
+ 4miKQK+swI7CsaCsEeJgfj+GwJ6elj8XkjCLKiEWjNXvk=
 
-> +&gmac2 {
-> +	status = "okay";
-> +	phy-mode = "rgmii-id";
-> +	phy-handle = <&emac2_phy0>;
-> +
-> +	max-frame-size = <9000>;
-> +
-> +	mdio0 {
-> +		#address-cells = <1>;
-> +		#size-cells = <0>;
-> +		compatible = "snps,dwmac-mdio";
-> +		emac2_phy0: ethernet-phy@1 {
-> +			reg = <0x1>;
-> +			adi,rx-internal-delay-ps = <2000>;
-> +			adi,tx-internal-delay-ps = <2000>;
+On 29.10.24 20:33, Dragan Milivojevi=C4=87 wrote:
 
-You have rgmii-id and 2000ps delay? Are these two lines actually
-required?
+Hi,
 
-	Andrew
+>>> First I've thought it's just when replying specific mails, but now
+>>> turned out *all* my mails are blocked, even totally unrelated things.
+>>> I can confirm it's not by the message content, but my mail address or
+>>> domain. I'm blocked from whole kernel.org
+>>
+>> Same thing on my end, partial sample: https://imgur.com/a/l4Jcfhk
+>
+> And it is spreading, previous message to dng@lists.dyne.org was rejected=
+ with:
+>
+> "Message rejected by filter rule match"
+
+Do you have some evidence that Devuan's mail server is really blocking
+us ?
+
+If so, I'd be exceptionally surprised.
+
+
+=2D-mtx
 
