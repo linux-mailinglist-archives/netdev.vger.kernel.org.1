@@ -1,56 +1,74 @@
-Return-Path: <netdev+bounces-140522-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1019A9B6C35
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 19:34:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B04BB9B6C2B
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 19:33:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32C5A1C21235
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:34:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E278B1C20CEC
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:33:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC8571CCB3B;
-	Wed, 30 Oct 2024 18:34:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58A5B1CB53E;
+	Wed, 30 Oct 2024 18:33:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b="PxEy5NXZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D38t/BjK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.gmx.net (mout.gmx.net [212.227.15.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B3301C8FD6;
-	Wed, 30 Oct 2024 18:34:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA9C41BD9F4;
+	Wed, 30 Oct 2024 18:33:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730313257; cv=none; b=B0KTBEc4E62GdwM7/Up6MXTpJoc1AU4/ArAVkSaWzlR6F2pua3xnNXQSJZVvX4uUnkK0a8IEhs6gCOjX/MJpzrCoipq6OcF2GXl8dfXoi3/MDDz6/xok48hyUBEYRP1xo6o9jLp24oLIZyHZ4z7DxWaiymeHtxc5S2iSEo65xEk=
+	t=1730313186; cv=none; b=FB7E2a0fXT7/xklVT+CUaplIsJkpXktYmrKwyXeFCEoah6DB3aq6XK0wv9EPHaTxNAbM9tkKyjXi+Ln6+d5NrDMZNLzn2TbOohyN6weX2NTRR6SSpgEX0pk2qXzWWXIryQOUFH850K2RWBeIvaiSMe4jXbsSBWzATBtTAGNO2qc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730313257; c=relaxed/simple;
-	bh=qVSlmDSlEDWcfpve3SDrSeg/8UVEvUP9GHMSIPm116o=;
+	s=arc-20240116; t=1730313186; c=relaxed/simple;
+	bh=2RqiUqDobjJb8TzlK86nk9gSLyBgAadi2DM5HjlMjnc=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=pUgiykXD8ZYfHcNKWjA03W96/5PVfA1CbEW4W/CmMvBKPAQuowXgHTTjKYT620nVQN2XXyxrMmc2667x27n9GX47FU3S7/E+9GzaTIucjPxq9qh9AwFRL0WDBYb9uQEEd0uvHGI2CahOPapHrUAGwor3MY6mXKESB7shde+IHMM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de; spf=pass smtp.mailfrom=gmx.de; dkim=pass (2048-bit key) header.d=gmx.de header.i=metux@gmx.de header.b=PxEy5NXZ; arc=none smtp.client-ip=212.227.15.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.de;
-	s=s31663417; t=1730313146; x=1730917946; i=metux@gmx.de;
-	bh=qVSlmDSlEDWcfpve3SDrSeg/8UVEvUP9GHMSIPm116o=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=PxEy5NXZPnL/khf+ZM27BR9NEpxVSB3HZ/B8yIFsHo+4hMZE6ntqAJmMaxw7Xseo
-	 gaIIZIwwVO9VT8D2ZAyDVhi2PZiaScE1eknfpKrAKCIAemHMxOAxaoyTqpoE6Jeu7
-	 2U5iwP9MNWVVH34yc3A/eCCC2GfvO3KMgzMKRz4LtjlKhERpzpOUHDIyJEVFIhMaJ
-	 3r3mGdjZDZfdrTPKDAPGxgg+EXB4TEBE4sp9lE0/MkWyfyC3o93hE/PEShWUOIUZS
-	 sq3039eZOOaH0CEL5pPa8D+gdQAgjz3j5h71lTqlNcOunuwf9c5sdbaOcoAZ/KV7z
-	 GdU/W9tMEPE+WiJERw==
-X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
-Received: from [192.168.1.178] ([77.2.112.201]) by mail.gmx.net (mrgmx004
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1Mr9Bk-1tbeU32akI-00j5Eb; Wed, 30
- Oct 2024 19:32:25 +0100
-Message-ID: <2cf94b06-fbaf-4c04-941a-4de052a5c484@gmx.de>
-Date: Wed, 30 Oct 2024 19:32:59 +0100
+	 In-Reply-To:Content-Type; b=LdgbHlbEHiI0GxCfT+a/p6xF3dkxtYHpKtMow9B2wxL020WKCRNc/uriklQLAyi84pLE3s007a557Nyti8zfXx3IKbo20w/dWZJaPSFrnLECB/Yj2WKD5PxGvjZqG2oftIiyMdhK5zY26A/l6nkvEjmdvPttvVNmMzsTawVv6h8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D38t/BjK; arc=none smtp.client-ip=209.85.221.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37d4fd00574so107858f8f.0;
+        Wed, 30 Oct 2024 11:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730313182; x=1730917982; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UpRP2MsIVMkQvKjqAp60xM5OFj18JwlP60eDqeYPxhc=;
+        b=D38t/BjKst48gAkdZMiGuYGPLc5bc4rRNo2XmVxbPLFgVWK/WE8efRcIXRULqFSpcg
+         3tK438dJf2z5z7MhTZyaMz+Dq8oG//ftPX9qZtxKByPItj9FZMHQkYIOJh+GMMsP4zj6
+         mwvuZdAuhRRQ3vTxCKKxWqoIrSgjm1Npkh5QX44D4d3hgdcVQ35Q62Kqfx4m9DQSBiL2
+         vnRVbT7pxnJ2BroCiSltE3lPZiW9nS7KXNR8kwBeX+7a0fSc8UEsyIWcaQRYk40kbuYB
+         W9QBkcaaJlmBXpcHd+vAqfUteW/pqVMNrOckHHYzV8PoZqVmWDT58c3vLLQQea7zQ1mz
+         xBmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730313182; x=1730917982;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=UpRP2MsIVMkQvKjqAp60xM5OFj18JwlP60eDqeYPxhc=;
+        b=Bz0meVGx6GaYmyQ0ZTXEthYzTVwFjcFLvRK8aVQDq4iOlgMxOgtONoIgldksm88Y6J
+         irWKyY4GE2BJLgUGNnNOZeKtEJRRCPU8lH+5Xfpn+XU1xkfox/ShoO9rFkNDnm3bkGB3
+         HzVbjII6x+d1Bw8o12jjdCLJpAPs6I5NUpq2RDipU4prEaaYZ1AcDJlXbsYgd4ss7i91
+         rXCPo9Qie2Y54c3LgNtgoYESXvP6ZA+Ggiu9PBNOk4Wt7kmI/fH5cA7OepvI9agigP8v
+         UMnw59r6WPqk0a4kwRQfskiqTbHoskd3AXdma1kWAB0WUAIx0SQKEG8Xnwjwhpov2NwW
+         bgFg==
+X-Forwarded-Encrypted: i=1; AJvYcCVY5yLB9DYR6JOb10NagSnMH40M7ToavRUZpZnAENt4LKe7TNlK4lTV5bI12q3gBSLTuGtsaUCJAIE=@vger.kernel.org, AJvYcCW9NE1gMyYtCbP2zKlCM0e4Sg3xl5RVIiPVGWasOaYMyPdNnvjkYuojVvbraFwM8waJq1DBl1Dr5XAhPQI/@vger.kernel.org, AJvYcCWQJcY2QhejS/hcb4RJjCBrs3Aqzzk2dhwqncNppnHjSRX8coQjClYvc6cdmlWcc3a43Njpk7IA@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywg8kXk4iEZcwMoJMyYJd9W8WFw558BaPqO0FoUAnOs7p2/Ny4e
+	In4CytzxA2l8FAPUhHn6Cyf9Mp4wt23XvbKQyoP+EKfq7anjYGVt
+X-Google-Smtp-Source: AGHT+IGUMEiJ5yqJQbqO4xA7/aA59KAvngIQZIC7OTI5GXqXyrK5y8mDR/1ooulIWDi8IfTeYR0uyA==
+X-Received: by 2002:a5d:688b:0:b0:374:c613:7c58 with SMTP id ffacd0b85a97d-381b97c08fbmr2847327f8f.29.1730313181936;
+        Wed, 30 Oct 2024 11:33:01 -0700 (PDT)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-38058b71221sm15888748f8f.68.2024.10.30.11.32.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Oct 2024 11:33:01 -0700 (PDT)
+Message-ID: <e37b9baa-51e5-48f9-a15d-521f29ce5f9c@gmail.com>
+Date: Wed, 30 Oct 2024 20:33:26 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,96 +76,110 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel maintainer *CENSORED* on LKML [WAS: linux: Goodbye from a
- Linux community volunteer]
-To: =?UTF-8?Q?Dragan_Milivojevi=C4=87?= <d.milivojevic@gmail.com>,
- metux <metux@gmx.de>
-Cc: "Enrico Weigelt, metux IT consult" <info@metux.net>,
- Peter Cai <peter@typeblog.net>, phoronix@phoronix.com, Goran
- <g@odyss3us.net>, James Bottomley <James.Bottomley@hansenpartnership.com>,
- Serge Semin <fancer.lancer@gmail.com>, Jon Mason <jdmason@kudzu.us>,
- Dave Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>,
- ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>,
- Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- Kory Maincent <kory.maincent@bootlin.com>,
- Cai Huoqing <cai.huoqing@linux.dev>, dmaengine@vger.kernel.org,
- Mark Brown <broonie@kernel.org>, linux-spi@vger.kernel.org,
- Damien Le Moal <dlemoal@kernel.org>, linux-ide@vger.kernel.org,
- Paul Burton <paulburton@kernel.org>,
- Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
- Arnd Bergmann <arnd@arndb.de>, Jiaxun Yang <jiaxun.yang@flygoat.com>,
- linux-mips@vger.kernel.org, Bjorn Helgaas <bhelgaas@google.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- linux-pci@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andrew Lunn <andrew@lunn.ch>, Russell King <linux@armlinux.org.uk>,
- Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
- <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>,
- netdev@vger.kernel.org, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>,
- linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Andrew Halaney <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>,
- Ivan Kokshaysky <ink@jurassic.park.msu.ru>,
- Alexander Shiyan <shc_work@mail.ru>, Dmitry Kozlov <xeb@mail.ru>,
- Sergey Shtylyov <s.shtylyov@omp.ru>, Evgeniy Dushistov <dushistov@mail.ru>,
- Geert Uytterhoeven <geert@linux-m68k.org>,
- Sergio Paracuellos <sergio.paracuellos@gmail.com>,
- Nikita Shubin <nikita.shubin@maquefel.me>,
- linux-renesas-soc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Kexy Biscuit <kexybiscuit@aosc.io>, jeffbai@aosc.io,
- Linus Torvalds <torvalds@linux-foundation.org>, "[DNG]"
- <dng@lists.dyne.org>, redaktion@golem.de, dev mail list <dev@suckless.org>
-References: <2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
- <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
- <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
- <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
- <6d37175d-1b0b-4b82-80f0-c5b4e61badbf@metux.net>
- <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
- <CALtW_agiJyX3sTaBKgwPF7X920=+fFrRgXMPt4x_GCDOMfZy_w@mail.gmail.com>
- <CALtW_aimN531aZKSSG4hVLeQDk6bUoujopkhCh57xsaxfJrYgA@mail.gmail.com>
- <b410a7fb-58c0-4d17-b818-54ec3476833a@gmx.de>
- <CALtW_ah07h7h6eNHHGNNeKzVkNi7hVOG3q4Pv9DNacpXgve5Sw@mail.gmail.com>
-Content-Language: tl
-From: metux <metux@gmx.de>
-In-Reply-To: <CALtW_ah07h7h6eNHHGNNeKzVkNi7hVOG3q4Pv9DNacpXgve5Sw@mail.gmail.com>
+Subject: Re: [net-next v2] net: wwan: t7xx: reset device if suspend fails
+To: Jinjian Song <jinjian.song@fibocom.com>,
+ chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
+ haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
+ ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: angelogioacchino.delregno@collabora.com, corbet@lwn.net,
+ danielwinkler@google.com, helgaas@kernel.org, korneld@google.com,
+ linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+ matthias.bgg@gmail.com, netdev@vger.kernel.org,
+ Linas Vepstas <linasvepstas@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>
+References: <20241022084348.4571-1-jinjian.song@fibocom.com>
+ <20241029034657.6937-1-jinjian.song@fibocom.com>
+Content-Language: en-US
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+In-Reply-To: <20241029034657.6937-1-jinjian.song@fibocom.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:RwtMXzTkBDRWvHmp0Kk6XRNw8KkUfi9Grj7L3bmCj6cM8b4QBRJ
- nNQyNDflw/d6PbexIox9ShCoDZ/pcYmmDaszMMRbbihXY91rMPHcT/ve1uP86sxKdRx1g1E
- LMIpkJ9atodTw+nhg14XzBrSVxLSAAYObFblsohBrRQc7SmScMKCDm1cN4U3B+pQtjnpw4U
- MI13I3wb6wItEr6vDq2pA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:Ui1bpSsuH8A=;dfPECkdyGYjzvQovpk1mLrv2yHW
- Y6UHJ1D/kuELphaY3MXcMXRxjPPUeT4qliBwr9JiO9sSSiMATtjINoXzJwb//1wKiimLswgG4
- KDUFZoy+92BvMG+CVaIbYt4kN50oREhek7P4SWst1Gq32A+C0vNGj1E/0w6PCHq9Io9ZJfO1Q
- bDgdGgHMkRQP4TDh16fgjvk9XLm73lW1IiLywMwb+NAnzND/V6i9u73hcpclC4sKmB42YfOUP
- 3TDY4n8NPogsIMw+oAxoN3FAdnXbRgR+hiZfdYQdFrgyZNt69oCItyIphSgp9NNsaLpsDQbcd
- sOt72shhxR7lF3e8Pmsrc0osdQVDieXS1+Tf0Tf6tFeVvczmApP8pGBIXdDZe7KHQ0TaIDrSS
- hIa9kkTXO+J03hOC2vgze0XupDmJLEo6lzAXydh63tJyp4+B4Wvw11KH8YG5b09K/aeEMFNIA
- kbjVNCObPDtDfmcW8DVNFkVRzOGX3NgE2DGCtMdkjDXXTlE7C8gwDxeTiHZpfTyRh/ze0/wSh
- 43GBM3VR3f7DfeMf3FYyeUtAIjiLAbpeFjFvY0+0jcuf9YT8kiq6D3OEOkdMZWuirHh11f0Im
- EFP4HsracvNPaXIJAhWnNfwipO+FqRgiOoN5QRpQ/7JREIE5DlZC5k0p5HvwJlNjZpn1En4nH
- rgh9PWpEFZO48or7kZK4TJ4pUAje+KBL4bUX6rqdeVCJI1LGKwf5v9Kcw3fs56EuwMx/T6UBv
- hwxLAiR8QA7f+DL5wb9rPG+vvGcKkAh12qDvjGHGPER7zTudE+IvVxJamN3IX2COy9jQrLqUN
- Z0+GnYzHGDOFp8mvjBuCZmEA==
+Content-Transfer-Encoding: 8bit
 
-On 30.10.24 14:57, Dragan Milivojevi=C4=87 wrote:
-> On Wed, 30 Oct 2024 at 14:48, metux <metux@gmx.de> wrote:
->
->> Do you have some evidence that Devuan's mail server is really blocking
->> us ?
+Hi Jinjian,
+
+On 29.10.2024 05:46, Jinjian Song wrote:
+> From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+>> On 22.10.2024 11:43, Jinjian Song wrote:
+>>> If driver fails to set the device to suspend, it means that the
+>>> device is abnormal. In this case, reset the device to recover
+>>> when PCIe device is offline.
 >>
->> If so, I'd be exceptionally surprised.
->
-> Well it's blocking me that's for sure. Reject message attached.
+>> Is it a reproducible or a speculative issue? Does the fix recover 
+>> modem from a problematic state?
+>>
+>> Anyway we need someone more familiar with this hardware (Intel or 
+>> MediaTek engineer) to Ack the change to make sure we are not going to 
+>> put a system in a more complicated state.
+> 
+> Hi Sergey,
+> 
+> This is a very difficult issue to replicate onece occured and fixed.
+> 
+> The issue occured when driver and device lost the connection. I have
+> encountered this problem twice so far:
+> 1. During suspend/resume stress test, there was a probabilistic D3L2
+> time sequence issue with the BIOS, result in PCIe link down, driver
+> read and write the register of device invalid, so suspend failed.
+> This issue was eventually fixed in the BIOS and I was able to restore
+> it through the reset module after reproducing the problem.
+> 
+> 2. During idle test, the modem probabilistic hang up, result in PCIe
+> link down, driver read and write the register of device invalid, so
+> suspend failed. This issue was eventually fiex in device modem firmware
+> by adjust a certain power supply voltage, and reset modem as a workround
+> to restore when the MBIM port command timeout in userspace applycations.
+> 
+> Hardware reset modem to recover was discussed with MTK, and they said
+> that if we don't want to keep the on-site problem location in case of
+> suspend failure, we can use the recover solution.
+> Both the ocurred issues result in the PCIe link issue, driver can't read 
+> and writer the register of WWAN device, so I want to add this path
+> to restore, hardware reset modem can recover modem, but using the 
+> pci_channle_offline() as the judgment is my inference.
 
-Are you subscribed to this list ?
+Thank you for the clarification. Let me summarize what I've understood 
+from the explanation:
+a) there were hardware (firmware) issues,
+b) issues already were solved,
+c) issues were not directly related to the device suspension procedure,
+d) you want to implement a backup plan to make the modem support robust.
 
-I recall something like it's subscribers-only (once fell into the trap
-and tried to post w/ wrong address).
+If got it right, then I would like to recommend to implement a generic 
+error handling solution for the PCIe interface. You can check this 
+document: Documentation/PCI/pci-error-recovery.rst
 
+Suddenly, I am not an expert in the PCIe link recovery procedure, so 
+I've CCed this message to PCI subsystem maintainers. I hope they can 
+suggest a conceptually correct way to handle these cases.
 
-=2D-mtx
+>>> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
+>>> ---
+>>> V2:
+>>>   * Add judgment, reset when device is offline
+>>> ---
+>>>   drivers/net/wwan/t7xx/t7xx_pci.c | 4 ++++
+>>>   1 file changed, 4 insertions(+)
+>>>
+>>> diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/ 
+>>> t7xx/t7xx_pci.c
+>>> index e556e5bd49ab..4f89a353588b 100644
+>>> --- a/drivers/net/wwan/t7xx/t7xx_pci.c
+>>> +++ b/drivers/net/wwan/t7xx/t7xx_pci.c
+>>> @@ -427,6 +427,10 @@ static int __t7xx_pci_pm_suspend(struct pci_dev 
+>>> *pdev)
+>>>       iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) + 
+>>> ENABLE_ASPM_LOWPWR);
+>>>       atomic_set(&t7xx_dev->md_pm_state, MTK_PM_RESUMED);
+>>>       t7xx_pcie_mac_set_int(t7xx_dev, SAP_RGU_INT);
+>>> +    if (pci_channel_offline(pdev)) {
+>>> +        dev_err(&pdev->dev, "Device offline, reset to recover\n");
+>>> +        t7xx_reset_device(t7xx_dev, PLDR);
+>>> +    }
+>>>       return ret;
+>>>   }
+
+--
+Sergey
 
