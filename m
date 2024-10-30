@@ -1,653 +1,168 @@
-Return-Path: <netdev+bounces-140530-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140531-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 990579B6D1C
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:50:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DE279B6D70
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:15:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC9F61C21289
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 19:50:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 795C31C2348B
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:15:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0FF051D0F5C;
-	Wed, 30 Oct 2024 19:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 070901DE8B1;
+	Wed, 30 Oct 2024 20:13:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ZHPrrKy7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="XlcLz8ZD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f97.google.com (mail-pj1-f97.google.com [209.85.216.97])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B1EB1D0BA6
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 19:50:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB861D1E7C
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 20:13:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730317819; cv=none; b=leKRS7g6S+koSQ/EQBbxkLsPDzUXnarBbm8gXC/SK9uCctrVX07DOOox8Yykfjmq6sq6trCONW9fxsCOR2MB7I7oi/T/ocEdwqKGLLCg0VJywvB7w4I1AJ4M5XiYZINUUNQVX6Vt4bOxdiq4WmSx8WWfK8116Kk71n3riAwu+jc=
+	t=1730319232; cv=none; b=EV3lLfSDd50fxjko4IpfrWwOBNNwcUMDsZysItBMmRQ+r8G/s35zVFSG5vFt+pn7ZlW5o9YyDmQmvt2ZO4VRfSGe6Ykb8mrZ149DghXUVYjQdDRMAT0XWvUKpeir9rPphYw2G+loKvP/8bkeVk+Y4FxcVyGhmwb1UA29RCEQ1wM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730317819; c=relaxed/simple;
-	bh=41F5UOU4jNXOgmxKAqf6XjFoH5crf4BsqOMWHbf38os=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=LEU2ddzo3qayoWKwtym0Hq653gk65r29J7w2XskS+8a6MW8ixev+cAefN7gBQyllZ3fPz2ZvVh9KSwVk08IE2+xKEcaq/1mrFhz1ohnzJqUuYMM95i0tXQEqPJvZoab+E1uzDezl4wKtexhB15WWRjbP2QrZFDvSHcRjqafC4xY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ZHPrrKy7; arc=none smtp.client-ip=209.85.216.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pj1-f97.google.com with SMTP id 98e67ed59e1d1-2e2b4110341so16869a91.1
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 12:50:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1730317815; x=1730922615; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BxTaQzY11T+U6/4qLM4FfUQ0BEPwevvcufdmsyeDobE=;
-        b=ZHPrrKy7aqu0vEuk+t3jbXKCRT+VIBQEexjBg2+6VDH1K210ZEMILLdM49mkjMYQBT
-         bdCasN7lbqTNNLqbNXYm5TX6Yw5azboom4Lvrz35B1oTyW8d1y5bhLr3BtOHpMTJoLi9
-         T+qqdKjvN6gEe2p56LvVqBvn68GwfMAUrs0n3XyKHueMmNltF6AnvnVtDFKPGvaKgpNn
-         W7EPLkRc/yFqAlOq/wyw89p675tpsmwriTuBAIkgfXaip1klaUtF/Y9LaeUzCgTEtP2F
-         zWT5drB+CPsxF089w7PudwURfxzNFiZAPmsyfrduo4D34z+ZM3vcbV2DAsdAexaHAMrA
-         Mmvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730317815; x=1730922615;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BxTaQzY11T+U6/4qLM4FfUQ0BEPwevvcufdmsyeDobE=;
-        b=VWdiBzcu5b6wl1siSRNQJepq48lJgIVbY6VpoOyGeMx7ducfG+uFMUEUV5e0r+BPBO
-         8ZDHGYlr1fTdNvgpNThulIkmgo21LthDJvPCi0l7fnBHGdjj0aF2EU2H12cRsbHzl8t6
-         LXlvWabnEiA0BbIyPuRE5sE8fjUtr/QLyeQ6vsnvUV1XGdsJA0DqGubRBCTIFhcpefYm
-         S4a5BrB5p8dlK8tKMjkSpSlljgMq4SzPWZ1PDAkWYiOetnHHdaXAaZnVF+IEn/g1WD0c
-         hy0OTLQkRhCCgura1ZNu6Du3HJpugzNlGjJ8BGyOL5Wmb/vsDFi5pQS9X8JiGo/9rMJ5
-         9lQA==
-X-Forwarded-Encrypted: i=1; AJvYcCXRBe/oUkoTDtuXSWxxxDbMEuwqa2zvwvStZhiEZq+lslSaP7FC7qHMfFSfETzaRxh8EPEnr5w=@vger.kernel.org
-X-Gm-Message-State: AOJu0YymgCQ5f5SsbyBEo/v1VocL0nHgEfqTv/zvJkeDBpu1Ft3Z16Jp
-	79ggtH7ZdW4yzL+ieQ9xo+Tk3weYqBK2HqYz0+kukM7fkzdeencPKaj4kKbd7qx9DFlzu5w7CMb
-	WKpAZm7VaN479B3YMcbYBzWhPpzonGJAn5GzBqwenFESynD4D
-X-Google-Smtp-Source: AGHT+IFQaoROFpuzvDX//G8M07IK6qlB5k99RqV6eECp/qPbvTpGixta4twoHIarXPJoTiNWjS1DA0gm0B4X
-X-Received: by 2002:a17:90b:3cce:b0:2e2:c414:80a4 with SMTP id 98e67ed59e1d1-2e8f12e1014mr8439127a91.9.1730317814789;
-        Wed, 30 Oct 2024 12:50:14 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id 98e67ed59e1d1-2e92c52ed2dsm43476a91.1.2024.10.30.12.50.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 12:50:14 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 1D794340748;
-	Wed, 30 Oct 2024 13:50:14 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 0D62EE40CE1; Wed, 30 Oct 2024 13:49:44 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Tal Gilboa <talgi@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Felix Fietkau <nbd@nbd.name>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Louis Peens <louis.peens@corigine.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Roy Pledge <Roy.Pledge@nxp.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org,
-	linux-rdma@vger.kernel.org,
-	oss-drivers@corigine.com,
-	virtualization@lists.linux.dev,
-	linuxppc-dev@lists.ozlabs.org
-Subject: [PATCH 2/2] dim: pass dim_sample to net_dim() by reference
-Date: Wed, 30 Oct 2024 13:49:08 -0600
-Message-ID: <20241030194914.3268865-2-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241030194914.3268865-1-csander@purestorage.com>
-References: <20241030194914.3268865-1-csander@purestorage.com>
+	s=arc-20240116; t=1730319232; c=relaxed/simple;
+	bh=Je9nQDNX52HIxtPWVlFTpGYhsPK1UxiFB3ZXot3oK8Q=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Yfqt2cKGTQBQYWauKyTtnne1NGZxEg74MyYyxZ34mw8nOdeWI4oj1t4z9yyfFh3AQk58GTn9kCJYvkcR0eV7a73RZJ3Dgg1l+5Ku2p5Z7DqktIxJoHKu6nO4Vc4UP3G/wLKgxj0knDIAxu4MMl8KeSYJzcXKXTHGjFSc5jCP7Us=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=XlcLz8ZD; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=JCSQPkZeG44XFgf66urjEgFh8I8p1xvqB5kHtqNsrek=; t=1730319230; x=1731183230; 
+	b=XlcLz8ZDAO83ESWN220hDIVI+/Cz57uVp9/RfpRhxgEtiB6gTCZYVZOeWcIznS66K5Y7h2/6kl5
+	GF+HTDHvptcFanRJenPzlk5EOKNxE64EUc4XTzi4czUGZtlylrXiiSk0quv1I3dNMGBRMFAuL3fNG
+	X0ZB2WrEeJHWuq2kCuKsU6IEA1XUIpaZrtDJxRC3nIxgrxHjJIU3FssOz3cNTkQlV1ABgvT4ENMUq
+	xqT1ucS08KVAEkxm8Wr7EYb2cUi0BR/TcEHc3a+8OgDXC+tIqvBJVdRVwQjhu6IOc/NQzEZuC2McJ
+	DFZt45Ylk87G3cNhuOVrmi2MwliY/8yWWKNw==;
+Received: from mail-oo1-f47.google.com ([209.85.161.47]:46209)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1t6F4f-0000m9-6Y
+	for netdev@vger.kernel.org; Wed, 30 Oct 2024 13:13:50 -0700
+Received: by mail-oo1-f47.google.com with SMTP id 006d021491bc7-5eb5be68c7dso201109eaf.0
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 13:13:49 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUDPzi4+nnROnx1l4vpT3tiDHcq80H9p+GBjP7ir+5H9N5R6eNSKD8HoghLaVzeWyxW57Gw/RM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyu4uWHgUUYiB2/+engXsa/LKlMbHhkwChnxc2ROUlj89HBa9c0
+	YlbAegiV+eh9Mdd0UHeF5kJNSBkwk5sF63tVBCDAihmQbGnFzi12PQjfAxIVhNwjXB8Uf8yrQtn
+	yxO2OrHlBWYKawHhHUOx9SHosWZ8=
+X-Google-Smtp-Source: AGHT+IE6BKFc8cv39adwka3c9p4s+C40fetgqbtOyDPm/XpVAgk2hocb3AStyvDYrdxAcWGqyB0MlaFM04UGYqlPgmM=
+X-Received: by 2002:a05:6820:820:b0:5e1:de92:6b66 with SMTP id
+ 006d021491bc7-5ec6da776aamr490769eaf.2.1730319228570; Wed, 30 Oct 2024
+ 13:13:48 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-5-ouster@cs.stanford.edu>
+ <dfadfd49-a7ce-4327-94bd-a1a24cbdd5a3@lunn.ch> <CAGXJAmycKLobQxYF6Wm9RLgTFCJkhcW1-4Gzwb1Kzh7RDnt6Zg@mail.gmail.com>
+ <67c42f72-4448-4fab-aa5d-c26dd47da74f@lunn.ch> <CAGXJAmyLsx9DPGdhZwPxn0wXjFAFV3dqjhFHpaBLtKZ1mtYBSQ@mail.gmail.com>
+ <16f2e9cc-9b5e-4325-b5c7-fe7fd72600a8@lunn.ch>
+In-Reply-To: <16f2e9cc-9b5e-4325-b5c7-fe7fd72600a8@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Wed, 30 Oct 2024 13:13:12 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmzN4_y2fzHdm+tVncbSso4ZMYOV5WmE+A9sUm6by=rhwQ@mail.gmail.com>
+Message-ID: <CAGXJAmzN4_y2fzHdm+tVncbSso4ZMYOV5WmE+A9sUm6by=rhwQ@mail.gmail.com>
+Subject: Re: [PATCH net-next 04/12] net: homa: create homa_pool.h and homa_pool.c
+To: akpm@linux-foundation.org
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: 0.8
+X-Spam-Level: 
+X-Scan-Signature: ae7d61d5ad21aa0d569d6b6c8168eb46
 
-net_dim() is currently passed a struct dim_sample argument by value.
-struct dim_sample is 24 bytes. Since this is greater 16 bytes, x86-64
-passes it on the stack. All callers have already initialized dim_sample
-on the stack, so passing it by value requires pushing a duplicated copy
-to the stack. Either witing to the stack and immediately reading it, or
-perhaps dereferencing addresses relative to the stack pointer in a chain
-of push instructions, seems to perform quite poorly.
+Hi Andrew,
 
-In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
-94% of which is attributed to the first push instruction to copy
-dim_sample on the stack for the call to net_dim():
-// Call ktime_get()
-  0.26 |4ead2:   call   4ead7 <mlx5e_handle_rx_dim+0x47>
-// Pass the address of struct dim in %rdi
-       |4ead7:   lea    0x3d0(%rbx),%rdi
-// Set dim_sample.pkt_ctr
-       |4eade:   mov    %r13d,0x8(%rsp)
-// Set dim_sample.byte_ctr
-       |4eae3:   mov    %r12d,0xc(%rsp)
-// Set dim_sample.event_ctr
-  0.15 |4eae8:   mov    %bp,0x10(%rsp)
-// Duplicate dim_sample on the stack
- 94.16 |4eaed:   push   0x10(%rsp)
-  2.79 |4eaf1:   push   0x10(%rsp)
-  0.07 |4eaf5:   push   %rax
-// Call net_dim()
-  0.21 |4eaf6:   call   4eafb <mlx5e_handle_rx_dim+0x6b>
+Andrew Lunn suggested that I write to you in the hopes that you could
+identify someone to review this patch series from the standpoint of
+memory management:
 
-To allow the caller to reuse the struct dim_sample already on the stack,
-pass the struct dim_sample by reference to net_dim().
+https://patchwork.kernel.org/project/netdevbpf/list/?series=3D903993&state=
+=3D*
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- Documentation/networking/net_dim.rst                   |  2 +-
- drivers/net/ethernet/amazon/ena/ena_netdev.c           |  2 +-
- drivers/net/ethernet/broadcom/bcmsysport.c             |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c              |  4 ++--
- drivers/net/ethernet/broadcom/genet/bcmgenet.c         |  2 +-
- drivers/net/ethernet/freescale/enetc/enetc.c           |  2 +-
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c        |  4 ++--
- drivers/net/ethernet/intel/ice/ice_txrx.c              |  4 ++--
- drivers/net/ethernet/intel/idpf/idpf_txrx.c            |  4 ++--
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  2 +-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c            |  4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c      |  4 ++--
- drivers/net/ethernet/netronome/nfp/nfd3/dp.c           |  4 ++--
- drivers/net/ethernet/netronome/nfp/nfdk/dp.c           |  4 ++--
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c       |  2 +-
- drivers/net/virtio_net.c                               |  2 +-
- drivers/soc/fsl/dpio/dpio-service.c                    |  2 +-
- include/linux/dim.h                                    |  2 +-
- lib/dim/net_dim.c                                      | 10 +++++-----
- 19 files changed, 31 insertions(+), 31 deletions(-)
+The patch series introduces a new transport protocol, Homa, into the
+kernel. Homa uses an unusual approach for managing receive buffers for
+incoming messages. The traditional approach, where the application
+provides a receive buffer in the recvmsg kernel call, results in poor
+performance for Homa because it prevents Homa from overlapping the
+copying of data to user space with receiving data over the network.
+Instead, a Homa application mmaps a large region of memory and passes
+its virtual address range to Homa. Homa associates the memory with a
+particular socket, retains it for the life of the socket, and
+allocates buffer space for incoming messages out of this region. The
+recvmsg kernel call returns the location of the buffer(s), and can
+also be used to return buffers back to Homa once the application has
+finished processing messages. The code for managing this buffer space
+is in the files homa_pool.c and homa_pool.h.
 
-diff --git a/Documentation/networking/net_dim.rst b/Documentation/networking/net_dim.rst
-index 8908fd7b0a8d..4377998e6826 100644
---- a/Documentation/networking/net_dim.rst
-+++ b/Documentation/networking/net_dim.rst
-@@ -154,11 +154,11 @@ usage is not complete but it should make the outline of the usage clear.
- 	dim_update_sample(my_entity->events,
- 		          my_entity->packets,
- 		          my_entity->bytes,
- 		          &dim_sample);
- 	/* Call net DIM */
--	net_dim(&my_entity->dim, dim_sample);
-+	net_dim(&my_entity->dim, &dim_sample);
- 	...
-   }
- 
-   /* My entity's initialization function (my_entity was already allocated) */
-   int my_driver_init_my_entity(struct my_driver_entity *my_entity, ...)
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 96df20854eb9..63c8a2328142 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1381,11 +1381,11 @@ static void ena_adjust_adaptive_rx_intr_moderation(struct ena_napi *ena_napi)
- 	dim_update_sample(rx_ring->non_empty_napi_events,
- 			  rx_ring->rx_stats.cnt,
- 			  rx_ring->rx_stats.bytes,
- 			  &dim_sample);
- 
--	net_dim(&ena_napi->dim, dim_sample);
-+	net_dim(&ena_napi->dim, &dim_sample);
- 
- 	rx_ring->per_napi_packets = 0;
- }
- 
- void ena_unmask_interrupt(struct ena_ring *tx_ring,
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index caff6e87a488..031e9e0cca53 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -1027,11 +1027,11 @@ static int bcm_sysport_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (priv->dim.use_dim) {
- 		dim_update_sample(priv->dim.event_ctr, priv->dim.packets,
- 				  priv->dim.bytes, &dim_sample);
--		net_dim(&priv->dim.dim, dim_sample);
-+		net_dim(&priv->dim.dim, &dim_sample);
- 	}
- 
- 	return work_done;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6dd6541d8619..ca42b81133d7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3100,11 +3100,11 @@ static int bnxt_poll(struct napi_struct *napi, int budget)
- 
- 		dim_update_sample(cpr->event_ctr,
- 				  cpr->rx_packets,
- 				  cpr->rx_bytes,
- 				  &dim_sample);
--		net_dim(&cpr->dim, dim_sample);
-+		net_dim(&cpr->dim, &dim_sample);
- 	}
- 	return work_done;
- }
- 
- static int __bnxt_poll_cqs(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
-@@ -3231,11 +3231,11 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
- 
- 		dim_update_sample(cpr->event_ctr,
- 				  cpr_rx->rx_packets,
- 				  cpr_rx->rx_bytes,
- 				  &dim_sample);
--		net_dim(&cpr->dim, dim_sample);
-+		net_dim(&cpr->dim, &dim_sample);
- 	}
- 	return work_done;
- }
- 
- static void bnxt_free_tx_skbs(struct bnxt *bp)
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 10966ab15373..53a949eb9180 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -2403,11 +2403,11 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (ring->dim.use_dim) {
- 		dim_update_sample(ring->dim.event_ctr, ring->dim.packets,
- 				  ring->dim.bytes, &dim_sample);
--		net_dim(&ring->dim.dim, dim_sample);
-+		net_dim(&ring->dim.dim, &dim_sample);
- 	}
- 
- 	return work_done;
- }
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index c09370eab319..05dedea6185a 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -716,11 +716,11 @@ static void enetc_rx_net_dim(struct enetc_int_vector *v)
- 
- 	dim_update_sample(v->comp_cnt,
- 			  v->rx_ring.stats.packets,
- 			  v->rx_ring.stats.bytes,
- 			  &dim_sample);
--	net_dim(&v->rx_dim, dim_sample);
-+	net_dim(&v->rx_dim, &dim_sample);
- }
- 
- static int enetc_bd_ready_count(struct enetc_bdr *tx_ring, int ci)
- {
- 	int pi = enetc_rd_reg_hot(tx_ring->tcir) & ENETC_TBCIR_IDX_MASK;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 4cbc4d069a1f..43377a7b2426 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -4446,11 +4446,11 @@ static void hns3_update_rx_int_coalesce(struct hns3_enet_tqp_vector *tqp_vector)
- 	if (!rx_group->coal.adapt_enable)
- 		return;
- 
- 	dim_update_sample(tqp_vector->event_cnt, rx_group->total_packets,
- 			  rx_group->total_bytes, &sample);
--	net_dim(&rx_group->dim, sample);
-+	net_dim(&rx_group->dim, &sample);
- }
- 
- static void hns3_update_tx_int_coalesce(struct hns3_enet_tqp_vector *tqp_vector)
- {
- 	struct hns3_enet_ring_group *tx_group = &tqp_vector->tx_group;
-@@ -4459,11 +4459,11 @@ static void hns3_update_tx_int_coalesce(struct hns3_enet_tqp_vector *tqp_vector)
- 	if (!tx_group->coal.adapt_enable)
- 		return;
- 
- 	dim_update_sample(tqp_vector->event_cnt, tx_group->total_packets,
- 			  tx_group->total_bytes, &sample);
--	net_dim(&tx_group->dim, sample);
-+	net_dim(&tx_group->dim, &sample);
- }
- 
- static int hns3_nic_common_poll(struct napi_struct *napi, int budget)
- {
- 	struct hns3_nic_priv *priv = netdev_priv(napi->dev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 8208055d6e7f..5d2d7736fd5f 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -1350,18 +1350,18 @@ static void ice_net_dim(struct ice_q_vector *q_vector)
- 
- 	if (ITR_IS_DYNAMIC(tx)) {
- 		struct dim_sample dim_sample;
- 
- 		__ice_update_sample(q_vector, tx, &dim_sample, true);
--		net_dim(&tx->dim, dim_sample);
-+		net_dim(&tx->dim, &dim_sample);
- 	}
- 
- 	if (ITR_IS_DYNAMIC(rx)) {
- 		struct dim_sample dim_sample;
- 
- 		__ice_update_sample(q_vector, rx, &dim_sample, false);
--		net_dim(&rx->dim, dim_sample);
-+		net_dim(&rx->dim, &dim_sample);
- 	}
- }
- 
- /**
-  * ice_buildreg_itr - build value for writing to the GLINT_DYN_CTL register
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index d4e6f0e10487..da2a5becf62f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3677,11 +3677,11 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
- 		} while (u64_stats_fetch_retry(&txq->stats_sync, start));
- 	}
- 
- 	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->tx_dim,
- 			       packets, bytes);
--	net_dim(&q_vector->tx_dim, dim_sample);
-+	net_dim(&q_vector->tx_dim, &dim_sample);
- 
- check_rx_itr:
- 	if (!IDPF_ITR_IS_DYNAMIC(q_vector->rx_intr_mode))
- 		return;
- 
-@@ -3696,11 +3696,11 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
- 		} while (u64_stats_fetch_retry(&rxq->stats_sync, start));
- 	}
- 
- 	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->rx_dim,
- 			       packets, bytes);
--	net_dim(&q_vector->rx_dim, dim_sample);
-+	net_dim(&q_vector->rx_dim, &dim_sample);
- }
- 
- /**
-  * idpf_vport_intr_update_itr_ena_irq - Update itr and re-enable MSIX interrupt
-  * @q_vector: q_vector for which itr is being updated and interrupt enabled
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 933e18ba2fb2..7aaf32e9aa95 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -525,11 +525,11 @@ static void otx2_adjust_adaptive_coalese(struct otx2_nic *pfvf, struct otx2_cq_p
- 
- 	dim_update_sample(pfvf->napi_events,
- 			  rx_frames + tx_frames,
- 			  rx_bytes + tx_bytes,
- 			  &dim_sample);
--	net_dim(&cq_poll->dim, dim_sample);
-+	net_dim(&cq_poll->dim, &dim_sample);
- }
- 
- int otx2_napi_handler(struct napi_struct *napi, int budget)
- {
- 	struct otx2_cq_queue *rx_cq = NULL;
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index f01ceee5f02d..53485142938c 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2225,11 +2225,11 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 
- 	eth->rx_packets += done;
- 	eth->rx_bytes += bytes;
- 	dim_update_sample(eth->rx_events, eth->rx_packets, eth->rx_bytes,
- 			  &dim_sample);
--	net_dim(&eth->rx_dim, dim_sample);
-+	net_dim(&eth->rx_dim, &dim_sample);
- 
- 	if (xdp_flush)
- 		xdp_do_flush();
- 
- 	return done;
-@@ -2375,11 +2375,11 @@ static int mtk_poll_tx(struct mtk_eth *eth, int budget)
- 	if (state.txq)
- 		netdev_tx_completed_queue(state.txq, state.done, state.bytes);
- 
- 	dim_update_sample(eth->tx_events, eth->tx_packets, eth->tx_bytes,
- 			  &dim_sample);
--	net_dim(&eth->tx_dim, dim_sample);
-+	net_dim(&eth->tx_dim, &dim_sample);
- 
- 	if (mtk_queue_stopped(eth) &&
- 	    (atomic_read(&ring->free_count) > ring->thresh))
- 		mtk_wake_queue(eth);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-index 5873fde65c2e..417098f0b2bb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-@@ -53,11 +53,11 @@ static void mlx5e_handle_tx_dim(struct mlx5e_txqsq *sq)
- 
- 	if (unlikely(!test_bit(MLX5E_SQ_STATE_DIM, &sq->state)))
- 		return;
- 
- 	dim_update_sample(sq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
--	net_dim(sq->dim, dim_sample);
-+	net_dim(sq->dim, &dim_sample);
- }
- 
- static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- {
- 	struct mlx5e_rq_stats *stats = rq->stats;
-@@ -65,11 +65,11 @@ static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- 
- 	if (unlikely(!test_bit(MLX5E_RQ_STATE_DIM, &rq->state)))
- 		return;
- 
- 	dim_update_sample(rq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
--	net_dim(rq->dim, dim_sample);
-+	net_dim(rq->dim, &dim_sample);
- }
- 
- void mlx5e_trigger_irq(struct mlx5e_icosq *sq)
- {
- 	struct mlx5_wq_cyc *wq = &sq->wq;
-diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-index d215efc6cad0..f1c6c47564b1 100644
---- a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-@@ -1177,11 +1177,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->rx_pkts;
- 			bytes = r_vec->rx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->rx_dim, dim_sample);
-+		net_dim(&r_vec->rx_dim, &dim_sample);
- 	}
- 
- 	if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
- 		struct dim_sample dim_sample = {};
- 		unsigned int start;
-@@ -1192,11 +1192,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->tx_pkts;
- 			bytes = r_vec->tx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->tx_dim, dim_sample);
-+		net_dim(&r_vec->tx_dim, &dim_sample);
- 	}
- 
- 	return pkts_polled;
- }
- 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-index dae5af7d1845..ebeb6ab4465c 100644
---- a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-@@ -1287,11 +1287,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->rx_pkts;
- 			bytes = r_vec->rx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->rx_dim, dim_sample);
-+		net_dim(&r_vec->rx_dim, &dim_sample);
- 	}
- 
- 	if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
- 		struct dim_sample dim_sample = {};
- 		unsigned int start;
-@@ -1302,11 +1302,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->tx_pkts;
- 			bytes = r_vec->tx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->tx_dim, dim_sample);
-+		net_dim(&r_vec->tx_dim, &dim_sample);
- 	}
- 
- 	return pkts_polled;
- }
- 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 0eeda7e502db..2ac59564ded1 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -926,11 +926,11 @@ static void ionic_dim_update(struct ionic_qcq *qcq, int napi_mode)
- 	}
- 
- 	dim_update_sample(qcq->cq.bound_intr->rearm_count,
- 			  pkts, bytes, &dim_sample);
- 
--	net_dim(&qcq->dim, dim_sample);
-+	net_dim(&qcq->dim, &dim_sample);
- }
- 
- int ionic_tx_napi(struct napi_struct *napi, int budget)
- {
- 	struct ionic_qcq *qcq = napi_to_qcq(napi);
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 792e9eadbfc3..869586c17ffd 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2802,11 +2802,11 @@ static void virtnet_rx_dim_update(struct virtnet_info *vi, struct receive_queue
- 	dim_update_sample(rq->calls,
- 			  u64_stats_read(&rq->stats.packets),
- 			  u64_stats_read(&rq->stats.bytes),
- 			  &cur_sample);
- 
--	net_dim(&rq->dim, cur_sample);
-+	net_dim(&rq->dim, &cur_sample);
- 	rq->packets_in_napi = 0;
- }
- 
- static int virtnet_poll(struct napi_struct *napi, int budget)
- {
-diff --git a/drivers/soc/fsl/dpio/dpio-service.c b/drivers/soc/fsl/dpio/dpio-service.c
-index b811446e0fa5..0b60ed16297c 100644
---- a/drivers/soc/fsl/dpio/dpio-service.c
-+++ b/drivers/soc/fsl/dpio/dpio-service.c
-@@ -889,10 +889,10 @@ void dpaa2_io_update_net_dim(struct dpaa2_io *d, __u64 frames, __u64 bytes)
- 
- 	d->bytes += bytes;
- 	d->frames += frames;
- 
- 	dim_update_sample(d->event_ctr, d->frames, d->bytes, &dim_sample);
--	net_dim(&d->rx_dim, dim_sample);
-+	net_dim(&d->rx_dim, &dim_sample);
- 
- 	spin_unlock(&d->dim_lock);
- }
- EXPORT_SYMBOL(dpaa2_io_update_net_dim);
-diff --git a/include/linux/dim.h b/include/linux/dim.h
-index 84579a50ae7f..06543fd40fcc 100644
---- a/include/linux/dim.h
-+++ b/include/linux/dim.h
-@@ -423,11 +423,11 @@ struct dim_cq_moder net_dim_get_def_tx_moderation(u8 cq_period_mode);
-  *
-  * Called by the consumer.
-  * This is the main logic of the algorithm, where data is processed in order
-  * to decide on next required action.
-  */
--void net_dim(struct dim *dim, struct dim_sample end_sample);
-+void net_dim(struct dim *dim, const struct dim_sample *end_sample);
- 
- /* RDMA DIM */
- 
- /*
-  * RDMA DIM profile:
-diff --git a/lib/dim/net_dim.c b/lib/dim/net_dim.c
-index d7e7028e9b19..d6aa09a979b3 100644
---- a/lib/dim/net_dim.c
-+++ b/lib/dim/net_dim.c
-@@ -345,33 +345,33 @@ static bool net_dim_decision(struct dim_stats *curr_stats, struct dim *dim)
- 		dim->prev_stats = *curr_stats;
- 
- 	return dim->profile_ix != prev_ix;
- }
- 
--void net_dim(struct dim *dim, struct dim_sample end_sample)
-+void net_dim(struct dim *dim, const struct dim_sample *end_sample)
- {
- 	struct dim_stats curr_stats;
- 	u16 nevents;
- 
- 	switch (dim->state) {
- 	case DIM_MEASURE_IN_PROGRESS:
- 		nevents = BIT_GAP(BITS_PER_TYPE(u16),
--				  end_sample.event_ctr,
-+				  end_sample->event_ctr,
- 				  dim->start_sample.event_ctr);
- 		if (nevents < DIM_NEVENTS)
- 			break;
--		if (!dim_calc_stats(&dim->start_sample, &end_sample, &curr_stats))
-+		if (!dim_calc_stats(&dim->start_sample, end_sample, &curr_stats))
- 			break;
- 		if (net_dim_decision(&curr_stats, dim)) {
- 			dim->state = DIM_APPLY_NEW_PROFILE;
- 			schedule_work(&dim->work);
- 			break;
- 		}
- 		fallthrough;
- 	case DIM_START_MEASURE:
--		dim_update_sample(end_sample.event_ctr, end_sample.pkt_ctr,
--				  end_sample.byte_ctr, &dim->start_sample);
-+		dim_update_sample(end_sample->event_ctr, end_sample->pkt_ctr,
-+				  end_sample->byte_ctr, &dim->start_sample);
- 		dim->state = DIM_MEASURE_IN_PROGRESS;
- 		break;
- 	case DIM_APPLY_NEW_PROFILE:
- 		break;
- 	}
--- 
-2.45.2
+I gave a talk on this mechanism at NetDev last year, which may be
+useful to provide more background. Slides and video are available
+here:
 
+https://netdevconf.info/0x17/sessions/talk/kernel-managed-user-buffers-in-h=
+oma.html
+
+Thanks in advance for any help you can provide.
+
+-John-
+
+On Wed, Oct 30, 2024 at 9:03=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> On Wed, Oct 30, 2024 at 08:46:33AM -0700, John Ousterhout wrote:
+> > On Wed, Oct 30, 2024 at 5:54=E2=80=AFAM Andrew Lunn <andrew@lunn.ch> wr=
+ote:
+> > > > I think this is a different problem from what page pools solve. Rat=
+her
+> > > > than the application providing a buffer each time it calls recvmsg,=
+ it
+> > > > provides a large region of memory in its virtual address space in
+> > > > advance;
+> > >
+> > > Ah, O.K. Yes, page pool is for kernel memory. However, is the virtual
+> > > address space mapped to pages and pinned? Or do you allocate pages
+> > > into that VM range as you need them? And then free them once the
+> > > application says it has completed? If you are allocating and freeing
+> > > pages, the page pool might be useful for these allocations.
+> >
+> > Homa doesn't allocate or free pages for this: the application mmap's a
+> > region and passes the virtual address range to Homa. Homa doesn't need
+> > to pin the pages. This memory is used in a fashion similar to how a
+> > buffer passed to recvmsg would be used, except that Homa maintains
+> > access to the region for the lifetime of the associated socket. When
+> > the application finishes processing an incoming message, it notifies
+> > Homa so that Homa can reuse the message's buffer space for future
+> > messages; there's no page allocation or freeing in this process.
+>
+> I clearly don't know enough about memory management! I would of
+> expected the kernel to do lazy allocation of pages to VM addresses as
+> needed. Maybe it is, and when you actually access one of these missing
+> pages, you get a page fault and the MM code is kicking in to put an
+> actual page there? This could all be hidden inside the copy_to_user()
+> call.
+>
+> > > Taking a step back here, the kernel already has a number of allocator=
+s
+> > > and ideally we don't want to add yet another one unless it is really
+> > > required. So it would be good to get some reviews from the MM people.
+> >
+> > I'm happy to do that if you still think it's necessary; how do I do tha=
+t?
+>
+> Reach out to Andrew Morton <akpm@linux-foundation.org>, the main
+> Memory Management Maintainer. Ask who a good person would be to review
+> this code.
+>
+>         Andrew
 
