@@ -1,117 +1,167 @@
-Return-Path: <netdev+bounces-140427-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140433-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC2349B668B
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:53:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A19749B66D9
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:03:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 629251F21AA1
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:53:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 32AD21F222E5
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:03:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4EF51F4277;
-	Wed, 30 Oct 2024 14:53:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640371F4FD5;
+	Wed, 30 Oct 2024 15:02:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nn1XKgFN"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=odyss3us.net header.i=@odyss3us.net header.b="LGzKhVKJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-relay.contabo.net (mail-relay.contabo.net [207.180.195.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A511E9071;
-	Wed, 30 Oct 2024 14:53:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65D8212D1FA;
+	Wed, 30 Oct 2024 15:02:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.180.195.6
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730300005; cv=none; b=Dv9424s148gQQP9NCtgXpLIyEqioguMtJwZgKvFclRS5rAtNAr/1aNyz57Pl8fNqO5OUWlGnC2w6GRyfe/sa/LA+79ioPughrv5FlWwDnEL5frfhRbxDYEO4M6rGcQcgMPBPwDKh8M+BJaVZvSHpxZtLTwuRtrZu10E3/5Ya7XY=
+	t=1730300563; cv=none; b=RO8EaBEOJB32X2ara0vszYm5sdhIJkV0smNx2SpDLzkyu13FAllpRBZHzSvPmJgtHnWoZSQ+lr80Z8neB+jWJoBrcWHvL/Va53TqnI08Xyidemb53o5927xQcKbzYKA8KaA7Q4O0ge7StmLRjZA5bsFO7Bu8iLCMxdVdNAga4ag=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730300005; c=relaxed/simple;
-	bh=0KmdwmGaHffLEA6SPWvkmiakFdh9J6nLYLces2WeUnA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mH1XST4xYnsDa6BB+JdD+XFS7v1rRc/mi2zri5ovvIwn8XTtBchj0Nx+BVY0pwc0+LF4UDvNxb/jqri5JMwBs5KO7C1dbVqtmGvBtkqM79vyCVSzXLjNN7oGtb9iIyLaTf1TJLrDr9APaj0dTqkbcbxj95y7RE2mJZPrcDa6mwY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nn1XKgFN; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4315855ec58so8215785e9.2;
-        Wed, 30 Oct 2024 07:53:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730300002; x=1730904802; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=JlskkeRUwtNLu3nkD9yQJXhTHloOmWBDLcwuQvdxQuI=;
-        b=nn1XKgFNGkPuYE7PALv0SBEFU/8wZpr2m/Mzu9c83uolimxqRaBLUvZcqgIElWJv7i
-         smuV4X5BEppGS4SMlBaiFXL3Df4GMi8auQ+BOwNAjR+L3aderpXh4zjJI++sHyu1HP6E
-         mdNk/ae5JoGBN64380qrXhc1ubS5z7OtHiw+O5WmEnZ5uZyVZm1unPXFRUAv8qc14FlQ
-         KF0jL2tw/7m69iX2H+KRzfCepbbGZZa/ip4hee5SlQXa4OW/mNIZkSxw+P4Vpx5P744F
-         yQWf/n9DQxUD16Dy2vPBfXk8Hr+K4D/cetsbJkT4te6wwFjS4g+4jHaybNF4NmXiKpLx
-         QKuA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730300002; x=1730904802;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JlskkeRUwtNLu3nkD9yQJXhTHloOmWBDLcwuQvdxQuI=;
-        b=ZWSBt6rpqVI/NcLAOqH+StgzyUNv3jiDTaGDlFZ1rS7jGPrNaT44cPwJy+JZiaSRbD
-         ZpY5+Sxv/Q3gmwJU6tvWdpk2h8IxfRUk3ANY4vYz9gB8Slzv4+wEsdWB1gjuChWTzhUU
-         /8iCn/1CqUpRUS/93o1gmHWSyCk2p+5T+iN10bHLWAVskDgyVJ6yKG2yvRLzLvy/nrBN
-         syu7+dRMzneK77E3kO9sSxsSYPD46gkVo7nMbE4uGHBx4ZlbapNEBl+ES8DXgyLwxwYz
-         VEaQAdu11w2ekvNVQXlcUnfdJQ/hxSV8oWNbLyage7v88nSqRqShXBW6xdciRta3vjvb
-         GdUg==
-X-Forwarded-Encrypted: i=1; AJvYcCWFk+oz6CbkqdfYBv6NoeJHdUerm1n9kt8Mof+L2wMLer1ROuG0OyCLGDZOVkMS5m4MnXFBst1RKFrrpT4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyWql2h+DU7pS9COlFIoukFHfGWC39qzTdyjbGO2to1QetDgdNn
-	xL4YgC7uFCbfVVPZriv5h+kwQc+aO5S00HJjk/5r8fYNBqEFpq/awbS+0JTuaI8=
-X-Google-Smtp-Source: AGHT+IGg3ns6Q36hude1m8Kr+AgT0zYbZ+xfg23M/+7x2R/Akg1gbAmCiIcDBlWMFI0hRGHfSXfWgw==
-X-Received: by 2002:a05:600c:5121:b0:42c:b63d:df3 with SMTP id 5b1f17b1804b1-4319ab9776dmr58381655e9.0.1730300001577;
-        Wed, 30 Oct 2024 07:53:21 -0700 (PDT)
-Received: from skbuf ([188.25.134.29])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd9181e7sm23692315e9.1.2024.10.30.07.53.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 07:53:21 -0700 (PDT)
-Date: Wed, 30 Oct 2024 16:53:18 +0200
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Florian Fainelli <f.fainelli@gmail.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] MAINTAINERS: Remove self from DSA entry
-Message-ID: <20241030145318.uoixalp5ty7jv45z@skbuf>
-References: <20241029003659.3853796-1-f.fainelli@gmail.com>
- <20241029104946.epsq2sw54ahkvv26@skbuf>
- <20241029003659.3853796-1-f.fainelli@gmail.com>
- <20241029104946.epsq2sw54ahkvv26@skbuf>
- <d7bc3c5f-2788-4878-b6cc-69657607a34c@gmail.com>
- <d7bc3c5f-2788-4878-b6cc-69657607a34c@gmail.com>
+	s=arc-20240116; t=1730300563; c=relaxed/simple;
+	bh=tisj9MRLY8sAb+Wz9LAPF3LrcExkszWJ6y5pi5FUEUg=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=WmRDqYp4zOoQ8jXcxiisBIzEj8e4PGgEcDRmvcrxMOT0NoI1g1cBVy227xHaAqkQmz9oZ9g/Kz8N8oaQLO/WC+FlW9nNeWLmzJdBsy4JwV3aZLtSrV9iYEE1ISlNRSM7O0+BuOBdpBFgtSzMuq6BnaC/kGUZxsquBhuF/39i9hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=odyss3us.net; spf=pass smtp.mailfrom=odyss3us.net; dkim=pass (2048-bit key) header.d=odyss3us.net header.i=@odyss3us.net header.b=LGzKhVKJ; arc=none smtp.client-ip=207.180.195.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=odyss3us.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=odyss3us.net
+Received: from pxmg2.contabo.net (localhost.localdomain [127.0.0.1])
+	by mail-relay.contabo.net (Proxmox) with ESMTP id 2BAE07C26B8;
+	Wed, 30 Oct 2024 15:55:02 +0100 (CET)
+Received: from m2712.contaboserver.net (m2712.contaboserver.net [91.194.91.201])
+	by mail-relay.contabo.net (Proxmox) with ESMTPS id F388F7C26D0;
+	Wed, 30 Oct 2024 15:55:01 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=odyss3us.net; s=default; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=tisj9MRLY8sAb+Wz9LAPF3LrcExkszWJ6y5pi5FUEUg=; b=LGzKhVKJ5E2qTIXPvO+Pt4seOR
+	v+FRvs0g0Qs78tpmUIZK5XJUU+aFPDvgMok5z3MHHEkVlym2rq9GGMj8lt3JAPYm4LZs2a7B3A3LU
+	pDngWut3rfZqE9TT4h6b820cX46qywqsBAQTe7RmLUD7w9suHpIagp95n99Xxms17hHknJ+i2rXhe
+	NVxE6Yv3fqQUcL+sdJrQjmBCi2UG86TI9jFo0pkgYp79YPYUahXhhrmyKs5BgkePtk5GcB+z2rX0M
+	248ZHTmFnKH3cf80A+cYxgyHvMQc9M74bVMRM/R76AFcuQ20JKMfFE6sLid7yCieAoOY6G9Z0cFYM
+	Gox1s9bA==;
+Received: from pd95ebe22.dip0.t-ipconnect.de ([217.94.190.34]:53344 helo=void-3.local)
+	by m2712.contaboserver.net with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96.2)
+	(envelope-from <g@odyss3us.net>)
+	id 1t6A67-002j6X-1C;
+	Wed, 30 Oct 2024 15:55:01 +0100
+Message-ID: <47b0f9fe0038baabb3b0c2d489a66a554a021e92.camel@odyss3us.net>
+Subject: Re: Kernel maintainer *CENSORED* on LKML [WAS: linux: Goodbye from
+ a Linux community volunteer]
+From: Goran <g@odyss3us.net>
+To: metux <metux@gmx.de>, Dragan =?UTF-8?Q?Milivojevi=C4=87?=
+ <d.milivojevic@gmail.com>, "Enrico Weigelt, metux IT consult"
+ <info@metux.net>
+Cc: Peter Cai <peter@typeblog.net>, phoronix@phoronix.com, James Bottomley
+ <James.Bottomley@hansenpartnership.com>, Serge Semin
+ <fancer.lancer@gmail.com>,  Jon Mason <jdmason@kudzu.us>, Dave Jiang
+ <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, 
+ ntb@lists.linux.dev, Andy Shevchenko <andy@kernel.org>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Kory Maincent
+ <kory.maincent@bootlin.com>,  Cai Huoqing <cai.huoqing@linux.dev>,
+ dmaengine@vger.kernel.org, Mark Brown <broonie@kernel.org>, 
+ linux-spi@vger.kernel.org, Damien Le Moal <dlemoal@kernel.org>, 
+ linux-ide@vger.kernel.org, Paul Burton <paulburton@kernel.org>, Thomas
+ Bogendoerfer <tsbogend@alpha.franken.de>, Arnd Bergmann <arnd@arndb.de>,
+ Jiaxun Yang <jiaxun.yang@flygoat.com>,  linux-mips@vger.kernel.org, Bjorn
+ Helgaas <bhelgaas@google.com>, Manivannan Sadhasivam
+ <manivannan.sadhasivam@linaro.org>, Yoshihiro Shimoda
+ <yoshihiro.shimoda.uh@renesas.com>,  linux-pci@vger.kernel.org, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, Andrew Lunn <andrew@lunn.ch>, Russell King
+ <linux@armlinux.org.uk>, Vladimir Oltean <olteanv@gmail.com>, Keguang Zhang
+ <keguang.zhang@gmail.com>, Yanteng Si <siyanteng@loongson.cn>, 
+ netdev@vger.kernel.org, Rob Herring <robh@kernel.org>, Krzysztof Kozlowski
+ <krzk@kernel.org>, Guenter Roeck <linux@roeck-us.net>, 
+ linux-hwmon@vger.kernel.org, Borislav Petkov <bp@alien8.de>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Andrew Halaney
+ <ajhalaney@gmail.com>, Nikita Travkin <nikita@trvn.ru>, Ivan Kokshaysky
+ <ink@jurassic.park.msu.ru>, Alexander Shiyan <shc_work@mail.ru>, Dmitry
+ Kozlov <xeb@mail.ru>, Sergey Shtylyov <s.shtylyov@omp.ru>, Evgeniy
+ Dushistov <dushistov@mail.ru>, Geert Uytterhoeven <geert@linux-m68k.org>,
+ Sergio Paracuellos <sergio.paracuellos@gmail.com>,  Nikita Shubin
+ <nikita.shubin@maquefel.me>, linux-renesas-soc@vger.kernel.org,
+ linux-kernel@vger.kernel.org,  Kexy Biscuit <kexybiscuit@aosc.io>,
+ jeffbai@aosc.io, Linus Torvalds <torvalds@linux-foundation.org>, "[DNG]"
+ <dng@lists.dyne.org>, redaktion@golem.de, dev mail list <dev@suckless.org>
+Date: Wed, 30 Oct 2024 15:54:57 +0100
+In-Reply-To: <b410a7fb-58c0-4d17-b818-54ec3476833a@gmx.de>
+References: 
+	<2m53bmuzemamzc4jzk2bj7tli22ruaaqqe34a2shtdtqrd52hp@alifh66en3rj>
+	 <e7d548a7fc835f9f3c9cb2e5ed97dfdfa164813f.camel@HansenPartnership.com>
+	 <6beb4070-1946-4387-bd0e-34608a76b19e@typeblog.net>
+	 <CALtW_agj1rurb3DRrPd9o2mkfku5fq_M3CEKY5sW+Zz7shKYHA@mail.gmail.com>
+	 <6d37175d-1b0b-4b82-80f0-c5b4e61badbf@metux.net>
+	 <2f12ee89-af9f-4af1-8ec8-ede1d5256592@metux.net>
+	 <CALtW_agiJyX3sTaBKgwPF7X920=+fFrRgXMPt4x_GCDOMfZy_w@mail.gmail.com>
+	 <CALtW_aimN531aZKSSG4hVLeQDk6bUoujopkhCh57xsaxfJrYgA@mail.gmail.com>
+	 <b410a7fb-58c0-4d17-b818-54ec3476833a@gmx.de>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <d7bc3c5f-2788-4878-b6cc-69657607a34c@gmail.com>
- <d7bc3c5f-2788-4878-b6cc-69657607a34c@gmail.com>
+X-AntiAbuse: This header was added to track abuse, please include it with any abuse report
+X-AntiAbuse: Primary Hostname - m2712.contaboserver.net
+X-AntiAbuse: Original Domain - vger.kernel.org
+X-AntiAbuse: Originator/Caller UID/GID - [47 12] / [47 12]
+X-AntiAbuse: Sender Address Domain - odyss3us.net
+X-Get-Message-Sender-Via: m2712.contaboserver.net: authenticated_id: g@odyss3us.net
+X-Authenticated-Sender: m2712.contaboserver.net: g@odyss3us.net
+X-Source: 
+X-Source-Args: 
+X-Source-Dir: 
 
-On Tue, Oct 29, 2024 at 09:05:51AM -0700, Florian Fainelli wrote:
-> On 10/29/24 03:49, Vladimir Oltean wrote:
-> > This is unexpected. What has happened?
-> 
-> Nothing, and that's the main motivation, most, if not all of my reviews of
-> DSA patches have been extremely superficial and mostly an additional stamp
-> on top of someone's else review. At this point I don't feel like I am
-> contributing anything to the subsystem that warrants me being listed as a
-> maintainer of that subsystem. There are other factors like having a somewhat
-> different role from when I was working on DSA at the time.
-> -- 
-> Florian
+Widely accepted spam lists are few and once on one it will get hard to
+get cleared.
 
-I see. There's nothing wrong that priorities change. Thank you for the
-benefit you've brought to the DSA subsystem with your journey, starting with
-transitioning non-Marvell switches to it from swconfig, to papers, presentations,
-being nice and patient to newcomers (me at least).
+Maybe Devuan has no clue that your domain is on one or multiple spam
+list. They are just using spam lists to block.
 
-I kinda wish there was a way for people to get recognition for their work
-in CREDITS even if they don't disappear completely from the picture.
-Hmm, looking at that file, I do recognize some familiar names who are still
-active in other areas: Geert Uytterhoeven, Arnd Bergmann, Marc Zyngier...
-Would you be interested in getting moved there? At least I believe that
-your contribution is significant enough to deserve that.
+Spam lists can be used for such nasty things.
+
+Am Mittwoch, dem 30.10.2024 um 14:48 +0100 schrieb metux:
+> On 29.10.24 20:33, Dragan Milivojevi=C4=87 wrote:
+>=20
+> Hi,
+>=20
+> > > > First I've thought it's just when replying specific mails, but
+> > > > now
+> > > > turned out *all* my mails are blocked, even totally unrelated
+> > > > things.
+> > > > I can confirm it's not by the message content, but my mail
+> > > > address or
+> > > > domain. I'm blocked from whole kernel.org
+> > >=20
+> > > Same thing on my end, partial sample: https://imgur.com/a/l4Jcfhk
+> >=20
+> > And it is spreading, previous message to dng@lists.dyne.org=C2=A0was
+> > rejected with:
+> >=20
+> > "Message rejected by filter rule match"
+>=20
+> Do you have some evidence that Devuan's mail server is really
+> blocking
+> us ?
+>=20
+> If so, I'd be exceptionally surprised.
+>=20
+>=20
+> --mtx
+
+
 
