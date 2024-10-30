@@ -1,153 +1,277 @@
-Return-Path: <netdev+bounces-140215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8263E9B58E6
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:00:56 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAECC9B58EC
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:03:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E1F63B224DA
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:00:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0823B1C2272A
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 062C849627;
-	Wed, 30 Oct 2024 01:00:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41268405FB;
+	Wed, 30 Oct 2024 01:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b="GKfHp9Aj"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="URKdCcFo"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa9.hc1455-7.c3s2.iphmx.com (esa9.hc1455-7.c3s2.iphmx.com [139.138.36.223])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3852E3C14;
-	Wed, 30 Oct 2024 01:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=139.138.36.223
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925853C14
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 01:03:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730250046; cv=none; b=RbNOWNfqcjiKVx8615XrDjUszIxYdO+lrzXoGWu3I8II5gXxxfLml2c04jLzyEhtTpyS4XMPOL1hiIHVfWrs9jtNEL0qsH0pkdgU500/OKliW9WgZv1vhJYEiNzKKU4uan+IvOkTadRORDetVWBNJivC6fn6oaaL9IFUwrfrm5Q=
+	t=1730250221; cv=none; b=pB3rVacd+ZNw9iYV/HctzuEF0/vw4qrPoV8va9nY+Nuymr1/Jnw29JC7mim5zvakS8NJUBd6vohBs0aGAw5x+ZA2Nfp8teZoV3tjuhEUGDN42w3SHecBfmFo0sTUAxLxuJh1V5V6vSqxSQ0GyTbDA7NgQio7srVE7H//+Q45HoU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730250046; c=relaxed/simple;
-	bh=od59CaTPcXAt5fo3ZaO6rvMZ1g5AHGLeUgTuhqAeGVU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gVSaGCoNCT4dUU7hI0FkOD27Z86aQMVxOt0BZGc+2Dj78TTRWuSM6BqyF/wiI9oGiIEzv8ZqNvdDI3+ssNxxsSSWG5ZViv/uXi4ZPblcrsT9QJAn74RZMyvTluY0YhGhTeAijmi5g1ZPBxBXrydbu1ql6YUPeC24Q4Lh9WEcAlw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com; spf=pass smtp.mailfrom=fujitsu.com; dkim=pass (2048-bit key) header.d=fujitsu.com header.i=@fujitsu.com header.b=GKfHp9Aj; arc=none smtp.client-ip=139.138.36.223
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fujitsu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fujitsu.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
-  d=fujitsu.com; i=@fujitsu.com; q=dns/txt; s=fj2;
-  t=1730250045; x=1761786045;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=od59CaTPcXAt5fo3ZaO6rvMZ1g5AHGLeUgTuhqAeGVU=;
-  b=GKfHp9AjIz8PZIQt0PT9cdM9dXN1Wqi28z9Qm6n2ilyaBaItpNZiMzK2
-   llKMBWWyf03YtaQLnQvuUiqhw7YyS31dn7/CDFXo6HSiijEHSTuPE0OGt
-   OpvY9ZeJjrMXhpOofdTbuSaQzZw4iRePqui6rnxQfLEwwe7HS1G4tiksE
-   zSvMxK2iDrSkhqUQqqv7VNDQ33HxbVNkel/PW5XyJWsVHTsHhAAImvsc8
-   /Ng8DGh9NFFYkbZhFbOsF5qYTB3afABOjRck2+adLiriHp5BKCzLpZHh2
-   J+nfJ449O8qhPpx5VXLS3EydjK6siW8RlnfnUmygLL4JS3zWOzhCa/+9x
-   A==;
-X-CSE-ConnectionGUID: Il4evkucS4KFMvK1w5c3WA==
-X-CSE-MsgGUID: Q2HKdES+RmWdjNZp+7dWRA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11240"; a="166793493"
-X-IronPort-AV: E=Sophos;i="6.11,243,1725289200"; 
-   d="scan'208";a="166793493"
-Received: from unknown (HELO yto-r2.gw.nic.fujitsu.com) ([218.44.52.218])
-  by esa9.hc1455-7.c3s2.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 09:59:32 +0900
-Received: from yto-m4.gw.nic.fujitsu.com (yto-nat-yto-m4.gw.nic.fujitsu.com [192.168.83.67])
-	by yto-r2.gw.nic.fujitsu.com (Postfix) with ESMTP id E8E89C68E8;
-	Wed, 30 Oct 2024 09:59:29 +0900 (JST)
-Received: from kws-ab3.gw.nic.fujitsu.com (kws-ab3.gw.nic.fujitsu.com [192.51.206.21])
-	by yto-m4.gw.nic.fujitsu.com (Postfix) with ESMTP id 36B5DD5047;
-	Wed, 30 Oct 2024 09:59:29 +0900 (JST)
-Received: from edo.cn.fujitsu.com (edo.cn.fujitsu.com [10.167.33.5])
-	by kws-ab3.gw.nic.fujitsu.com (Postfix) with ESMTP id CF0D220079562;
-	Wed, 30 Oct 2024 09:59:28 +0900 (JST)
-Received: from iaas-rdma.. (unknown [10.167.135.44])
-	by edo.cn.fujitsu.com (Postfix) with ESMTP id 9D78F1A000A;
-	Wed, 30 Oct 2024 08:59:27 +0800 (CST)
-From: Li Zhijian <lizhijian@fujitsu.com>
-To: linux-kselftest@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: shuah@kernel.org,
-	linux-kernel@vger.kernel.org,
-	Li Zhijian <lizhijian@fujitsu.com>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org
-Subject: [PATCH v3] selftests/net: Add missing gitignore file
-Date: Wed, 30 Oct 2024 09:00:02 +0800
-Message-ID: <20241030010002.400238-1-lizhijian@fujitsu.com>
-X-Mailer: git-send-email 2.44.0
+	s=arc-20240116; t=1730250221; c=relaxed/simple;
+	bh=RJvpBE5S9nxx5+G3sW9WzZfSOwWw5uzZ/mHZ88ZqlPw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bLyLXbbot8oGpDASJxnzl4SHsuNWXU9oF4hql1q4jwZUV1QQI2Gf8k14e7njFJMtvHytxVUbxvLUJTcQy2ebNWbAs88uJDpRTCstXrCbEEjXndJgs/UKbWYPNFf+kp9jYw+bosyspZ86gLKH88lmmZybT46q+v2t+DnJenE/5Gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=URKdCcFo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=6dNRFzSlX3feZ30aQZAj097bOFbSH8w7kCnwdztI2NE=; b=URKdCcFogno0pYBpHiiWMSjZuT
+	wtIn50fxvCGZZyC+e3OYHRFy6fe2LsrwxQQO+tYb23b8iDxazkK3GUOzMzxRtNpzZZFSvKIg5mUKJ
+	+6Av2YxX4Qz8wJz7wr1e3T7Mfz9n3AVlSskvRGR/9iWNl+SNDpyb7YrzD60cqkTpx/W0=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t5x7Y-00Bdza-FN; Wed, 30 Oct 2024 02:03:36 +0100
+Date: Wed, 30 Oct 2024 02:03:36 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 11/12] net: homa: create homa_plumbing.c
+ homa_utils.c
+Message-ID: <a109d5c6-76d6-47c5-834d-9f263f254b5c@lunn.ch>
+References: <20241028213541.1529-1-ouster@cs.stanford.edu>
+ <20241028213541.1529-12-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-TM-AS-Product-Ver: IMSS-9.1.0.1417-9.0.0.1002-28762.003
-X-TM-AS-User-Approved-Sender: Yes
-X-TMASE-Version: IMSS-9.1.0.1417-9.0.1002-28762.003
-X-TMASE-Result: 10--10.200800-10.000000
-X-TMASE-MatchedRID: a3KJLn6RIiIhiKpapiFQUqoXHZz/dXlxTJDl9FKHbrmwcSh5kytY+Wlr
-	rhfytIG3ue7scXXMXXbOw1q4IOi+g+VaI0j/eUAP9Ib/6w+1lWTVBDonH99+VkYUijfAB7a8Sdp
-	3nQlC6CvONlqzU5N8TV5k1j3tRqCQZB7FaQ6KQ99O5y1KmK5bJTZlY6a4lRLZSGcP+0SEjFBAPN
-	HJ6d1lGx63ztJ0rJm/nagtny7ZPcQfE8yM4pjsD67rlQMPRoOCxEHRux+uk8h+ICquNi0WJKxPa
-	V9/KHBB+Z6nLjaSWHAwVhpxqsrjNJRD0+ifpY+DftwZ3X11IV0=
-X-TMASE-SNAP-Result: 1.821001.0001-0-1-22:0,33:0,34:0-0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028213541.1529-12-ouster@cs.stanford.edu>
 
-Compiled binary files should be added to .gitignore
-'git status' complains:
-   Untracked files:
-   (use "git add <file>..." to include in what will be committed)
-         net/netfilter/conntrack_reverse_clash
+> +static int __init homa_load(void)
+> +{
+> +	int status;
+> +
+> +	pr_notice("Homa module loading\n");
+> +	pr_notice("Homa structure sizes: data_header %u, seg_header %u, ack %u, peer %u, ip_hdr %u flowi %u ipv6_hdr %u, flowi6 %u tcp_sock %u homa_rpc %u sk_buff %u rcvmsg_control %u union sockaddr_in_union %u HOMA_MAX_BPAGES %u NR_CPUS %u nr_cpu_ids %u, MAX_NUMNODES %d\n",
+> +		  sizeof32(struct data_header),
+> +		  sizeof32(struct seg_header),
+> +		  sizeof32(struct homa_ack),
+> +		  sizeof32(struct homa_peer),
+> +		  sizeof32(struct iphdr),
+> +		  sizeof32(struct flowi),
+> +		  sizeof32(struct ipv6hdr),
+> +		  sizeof32(struct flowi6),
+> +		  sizeof32(struct tcp_sock),
+> +		  sizeof32(struct homa_rpc),
+> +		  sizeof32(struct sk_buff),
+> +		  sizeof32(struct homa_recvmsg_args),
+> +		  sizeof32(union sockaddr_in_union),
+> +		  HOMA_MAX_BPAGES,
+> +		  NR_CPUS,
+> +		  nr_cpu_ids,
+> +		  MAX_NUMNODES);
 
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: Jozsef Kadlecsik <kadlec@netfilter.org>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
-Cc: Shuah Khan <shuah@kernel.org>
-Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
----
-Cc: netfilter-devel@vger.kernel.org
-Cc: coreteam@netfilter.org
-Cc: netdev@vger.kernel.org
----
-Hello,
-Cover letter is here.
+We generally don't want kernel modules spamming the log. I would
+suggest dropping these the pr_dbg(), or removing them altogether.
 
-This patch set aims to make 'git status' clear after 'make' and 'make
-run_tests' for kselftests.
----
-V3:
-  sort the files
+> +	status = proto_register(&homa_prot, 1);
+> +	if (status != 0) {
+> +		pr_err("proto_register failed for homa_prot: %d\n", status);
+> +		goto out;
+> +	}
+> +	status = proto_register(&homav6_prot, 1);
+> +	if (status != 0) {
+> +		pr_err("proto_register failed for homav6_prot: %d\n", status);
+> +		goto out;
+> +	}
+> +	inet_register_protosw(&homa_protosw);
+> +	inet6_register_protosw(&homav6_protosw);
+> +	status = inet_add_protocol(&homa_protocol, IPPROTO_HOMA);
+> +	if (status != 0) {
+> +		pr_err("inet_add_protocol failed in %s: %d\n", __func__,
+> +		       status);
+> +		goto out_cleanup;
+> +	}
+> +	status = inet6_add_protocol(&homav6_protocol, IPPROTO_HOMA);
+> +	if (status != 0) {
+> +		pr_err("inet6_add_protocol failed in %s: %d\n",  __func__,
+> +		       status);
+> +		goto out_cleanup;
+> +	}
+> +
+> +	status = homa_init(homa);
+> +	if (status)
+> +		goto out_cleanup;
+> +
+> +	timer_kthread = kthread_run(homa_timer_main, homa, "homa_timer");
+> +	if (IS_ERR(timer_kthread)) {
+> +		status = PTR_ERR(timer_kthread);
+> +		pr_err("couldn't create homa pacer thread: error %d\n",
+> +		       status);
+> +		timer_kthread = NULL;
+> +		goto out_cleanup;
+> +	}
+> +
+> +	return 0;
+> +
+> +out_cleanup:
+> +	homa_destroy(homa);
+> +	inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
+> +	inet_unregister_protosw(&homa_protosw);
+> +	inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
+> +	inet6_unregister_protosw(&homav6_protosw);
+> +	proto_unregister(&homa_prot);
+> +	proto_unregister(&homav6_prot);
+> +out:
+> +	return status;
+> +}
+> +
+> +/**
+> + * homa_unload() - invoked when this module is unloaded from the Linux kernel.
+> + */
+> +static void __exit homa_unload(void)
+> +{
+> +	pr_notice("Homa module unloading\n");
+> +	exiting = true;
+> +
+> +	if (timer_kthread)
+> +		wake_up_process(timer_kthread);
+> +	wait_for_completion(&timer_thread_done);
+> +	homa_destroy(homa);
+> +	inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
+> +	inet_unregister_protosw(&homa_protosw);
+> +	inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
+> +	inet6_unregister_protosw(&homav6_protosw);
+> +	proto_unregister(&homa_prot);
+> +	proto_unregister(&homav6_prot);
+> +}
+> +
+> +module_init(homa_load);
+> +module_exit(homa_unload);
+> +
+> +/**
+> + * homa_bind() - Implements the bind system call for Homa sockets: associates
+> + * a well-known service port with a socket. Unlike other AF_INET6 protocols,
+> + * there is no need to invoke this system call for sockets that are only
+> + * used as clients.
+> + * @sock:     Socket on which the system call was invoked.
+> + * @addr:    Contains the desired port number.
+> + * @addr_len: Number of bytes in uaddr.
+> + * Return:    0 on success, otherwise a negative errno.
+> + */
+> +int homa_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+> +{
+> +	struct homa_sock *hsk = homa_sk(sock->sk);
+> +	union sockaddr_in_union *addr_in = (union sockaddr_in_union *)addr;
+> +	int port = 0;
+> +
+> +	if (unlikely(addr->sa_family != sock->sk->sk_family))
+> +		return -EAFNOSUPPORT;
+> +	if (addr_in->in6.sin6_family == AF_INET6) {
+> +		if (addr_len < sizeof(struct sockaddr_in6))
+> +			return -EINVAL;
+> +		port = ntohs(addr_in->in4.sin_port);
+> +	} else if (addr_in->in4.sin_family == AF_INET) {
+> +		if (addr_len < sizeof(struct sockaddr_in))
+> +			return -EINVAL;
+> +		port = ntohs(addr_in->in6.sin6_port);
+> +	}
+> +	return homa_sock_bind(homa->port_map, hsk, port);
+> +}
+> +
+> +/**
+> + * homa_close() - Invoked when close system call is invoked on a Homa socket.
+> + * @sk:      Socket being closed
+> + * @timeout: ??
+> + */
+> +void homa_close(struct sock *sk, long timeout)
+> +{
+> +	struct homa_sock *hsk = homa_sk(sk);
+> +
+> +	homa_sock_destroy(hsk);
+> +	sk_common_release(sk);
+> +}
+> +
+> +/**
+> + * homa_shutdown() - Implements the shutdown system call for Homa sockets.
+> + * @sock:    Socket to shut down.
+> + * @how:     Ignored: for other sockets, can independently shut down
+> + *           sending and receiving, but for Homa any shutdown will
+> + *           shut down everything.
+> + *
+> + * Return: 0 on success, otherwise a negative errno.
+> + */
+> +int homa_shutdown(struct socket *sock, int how)
+> +{
+> +	homa_sock_shutdown(homa_sk(sock->sk));
+> +	return 0;
+> +}
+> +
+> +/**
+> + * homa_disconnect() - Invoked when disconnect system call is invoked on a
+> + * Homa socket.
+> + * @sk:    Socket to disconnect
+> + * @flags: ??
+> + *
+> + * Return: 0 on success, otherwise a negative errno.
+> + */
+> +int homa_disconnect(struct sock *sk, int flags)
+> +{
+> +	pr_warn("unimplemented disconnect invoked on Homa socket\n");
+> +	return -EINVAL;
 
-V2:
-  split as a separate patch from a small one [0]
-  [0] https://lore.kernel.org/linux-kselftest/20241015010817.453539-1-lizhijian@fujitsu.com/
+Can this be used to DoS the system, spam the log? At minimum rate
+limit the message, but it might be better to just remove the message.
 
-Signed-off-by: Li Zhijian <lizhijian@fujitsu.com>
----
- tools/testing/selftests/net/netfilter/.gitignore | 1 +
- 1 file changed, 1 insertion(+)
+> +}
+> +
+> +/**
+> + * homa_ioctl() - Implements the ioctl system call for Homa sockets.
+> + * @sk:    Socket on which the system call was invoked.
+> + * @cmd:   Identifier for a particular ioctl operation.
+> + * @karg:  Operation-specific argument; typically the address of a block
+> + *         of data in user address space.
+> + *
+> + * Return: 0 on success, otherwise a negative errno.
+> + */
+> +int homa_ioctl(struct sock *sk, int cmd, int *karg)
+> +{
+> +	return -EINVAL;
+> +}
 
-diff --git a/tools/testing/selftests/net/netfilter/.gitignore b/tools/testing/selftests/net/netfilter/.gitignore
-index 0a64d6d0e29a..64c4f8d9aa6c 100644
---- a/tools/testing/selftests/net/netfilter/.gitignore
-+++ b/tools/testing/selftests/net/netfilter/.gitignore
-@@ -2,5 +2,6 @@
- audit_logread
- connect_close
- conntrack_dump_flush
-+conntrack_reverse_clash
- sctp_collision
- nf_queue
--- 
-2.44.0
+Is this actually needed? Core code will generally test to see if the
+op is not NULL before calling it.
 
+> +/**
+> + * homa_getsockopt() - Implements the getsockopt system call for Homa sockets.
+> + * @sk:      Socket on which the system call was invoked.
+> + * @level:   ??
+> + * @optname: Identifies a particular setsockopt operation.
+> + * @optval:  Address in user space where the option's value should be stored.
+> + * @option:  ??.
+> + * Return:   0 on success, otherwise a negative errno.
+> + */
+> +int homa_getsockopt(struct sock *sk, int level, int optname,
+> +		    char __user *optval, int __user *option)
+> +{
+> +	pr_warn("unimplemented getsockopt invoked on Homa socket: level %d, optname %d\n",
+> +		level, optname);
+
+Another way to spam the log.
+
+	Andrew
 
