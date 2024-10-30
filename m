@@ -1,144 +1,148 @@
-Return-Path: <netdev+bounces-140217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 509819B58EE
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:05:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0577A9B58F5
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:09:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEDD61F24052
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:05:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A57A2283EE9
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:09:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249B87EF09;
-	Wed, 30 Oct 2024 01:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C1BD126BF7;
+	Wed, 30 Oct 2024 01:09:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="g9yqBDQP"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="huQWjN89"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78EB3C14;
-	Wed, 30 Oct 2024 01:05:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D0803C14
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 01:09:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730250336; cv=none; b=TugpjQhKXTL3dd9qXQFWFquuyitQjhyYjKyojVzrfzmfGS0oeOQ1pSi+ZxJv9/IoF9WcKFEQOXt/NuSe0VVbyZS9+A8/stPtfcg4btkLRij8e1s+TKNFH/EaqTuGN9eJjD0ebIyid2FnIRVIrXnbds7oGhltEY2AJGqanGyX8E4=
+	t=1730250584; cv=none; b=awxc6G8EtJpetAo1Cte4SjSEc8mTLGPaF6LWTeFDWyxMZx8wnTUP/03L0bdc80xdbPjwFanX18qjJvqPNzqFdmNTfK+uVSJxRRBjujHuRjEnSifWqQe44P+zP+Gp7KaMLETWi2KIIPBWTTv02qDHeDdujqi+ixRtKtblLIq3IsQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730250336; c=relaxed/simple;
-	bh=O3eyHCxMcdQ467ALRIumPj1rNupJxrZMOTcaSjzwyvA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=XLPo5YOg6rIxR+1X85aOioCtNybE+w66jCT03mfOlBNRCxTbIFl/FuJCWpzkK1wx3xZ4T7nU+kfx/k6e3ZgVV7EV8+oAEZd3Jp2hSDEdH3iiiDd9+Y+iIBMUi/jDEJuH3QrYKqnj35O66JBxUlcYOuG3gupgV+sLeJ9FhP0gRJY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=g9yqBDQP; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1730250326;
-	bh=rJ+zeOXAOkv0gwsLv1luKB4UBmUC3jKRnaMznn+sZ54=;
-	h=Date:From:To:Cc:Subject:From;
-	b=g9yqBDQPWwHheAUZ1cogWboY7xJXsw0x2PmCquxMdLczVOBfdPD73Ost6vd7EQpcF
-	 2fmWJ1esTB317UqFZQ6c6MbFa72Z/uAir43LY2oMfy43sw5H/+vSQd8WtgCpQOosoU
-	 gQUj40PmZ+2q8kIL/Xxd0kMUCyvu+sZsE7rN56uWWy3u7U4HCyQ6MgpCMF+S+8ktHs
-	 WBYeIZnYLKLZi7K61dsJ92CnsXNYrR4uj96oqZ5WzF5OS90hjNmaJHTbWeoibGJXPy
-	 XWliswlp3jibsoaqpSF58fn3p2puWWx6SkwKiWCx12UMzu8/H2z3ZMaSOENShyNBO8
-	 XXQ1mGBuV/dpg==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XdTSj0Xl7z4xFt;
-	Wed, 30 Oct 2024 12:05:23 +1100 (AEDT)
-Date: Wed, 30 Oct 2024 12:05:24 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Networking <netdev@vger.kernel.org>, Arkadiusz Kubalewski
- <arkadiusz.kubalewski@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
- Karol Kolacinski <karol.kolacinski@intel.com>, Linux Kernel Mailing List
- <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Yochai Hagvi <yochai.hagvi@intel.com>, Yue Haibing <yuehaibing@huawei.com>
-Subject: linux-next: manual merge of the net-next tree with the net tree
-Message-ID: <20241030120524.1ee1af18@canb.auug.org.au>
+	s=arc-20240116; t=1730250584; c=relaxed/simple;
+	bh=kOpppAgcjKffUoV/4Sr67QwhaAVhvZ0Y3r860MP5374=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Uzo3kthGBGxiZmbMBZRuLVcVZf9Y14ohCHhI6uFwdJb7YZIOwuG+tK3y4GVK3II1xoszl6umGzAw69zuv7rl4xjjQTU6TLz/aJs9OYMGcBCiPJPAFK4SRK3PiWmIHM+MHa/lF3ZxcRl7vkVW0bTHWrnwYdaRF0VIyv3fSygX/v4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=huQWjN89; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730250581; x=1761786581;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=kOpppAgcjKffUoV/4Sr67QwhaAVhvZ0Y3r860MP5374=;
+  b=huQWjN89MJlXhL0rUTv1y+7zLUxCb+F3EqntIIJB4/XNSLEIK6hsCgIJ
+   vxbpim1qsrNsUwLEeaAcsfxK4uC02RSakqeaDY+/j/Pw8g64Mxhr1kiBA
+   0waNu9UY1AF74C7GcQAKZDugnyPSOBi11WvuqEpcOfrSW0zRBBcWB+7rk
+   a1jT602fgzlHMzj+9oiuKbNmxjSEd0Wrx4Qrf2uZQNgFaMS9ABsnfVOOL
+   71yeeEN2cbya5j+QqVTTxp1WM1zB+CPVKaOy5tAjAkJkvLF1Emj1eJmKi
+   8ZnKooXwy3YkFSObZjDLmEIWaiQCnVYG3dab3bT9mlreAH71xBk2ZL7o5
+   w==;
+X-CSE-ConnectionGUID: QIxEKdsCTTKdhlXWOAgzyA==
+X-CSE-MsgGUID: LteniXjFSKGCInPdti7LiQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11240"; a="30140057"
+X-IronPort-AV: E=Sophos;i="6.11,243,1725346800"; 
+   d="scan'208";a="30140057"
+Received: from fmviesa001.fm.intel.com ([10.60.135.141])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Oct 2024 18:09:40 -0700
+X-CSE-ConnectionGUID: bPB/FKJoSwe4RFw9I7PRRw==
+X-CSE-MsgGUID: AHCtC4K4T6Kx8RtBf0029Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,243,1725346800"; 
+   d="scan'208";a="112979480"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa001.fm.intel.com with ESMTP; 29 Oct 2024 18:09:38 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t5xDM-000eM2-1l;
+	Wed, 30 Oct 2024 01:09:36 +0000
+Date: Wed, 30 Oct 2024 09:09:11 +0800
+From: kernel test robot <lkp@intel.com>
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, John Ousterhout <ouster@cs.stanford.edu>
+Subject: Re: [PATCH net-next 12/12] net: homa: create Makefile and Kconfig
+Message-ID: <202410300823.rFSVqCH5-lkp@intel.com>
+References: <20241028213541.1529-13-ouster@cs.stanford.edu>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/qQcC7M9W10_+AKldn1crROG";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241028213541.1529-13-ouster@cs.stanford.edu>
 
---Sig_/qQcC7M9W10_+AKldn1crROG
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hi John,
 
-Hi all,
+kernel test robot noticed the following build warnings:
 
-Today's linux-next merge of the net-next tree got a conflict in:
+[auto build test WARNING on net-next/main]
 
-  drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+url:    https://github.com/intel-lab-lkp/linux/commits/John-Ousterhout/net-homa-define-user-visible-API-for-Homa/20241029-095137
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241028213541.1529-13-ouster%40cs.stanford.edu
+patch subject: [PATCH net-next 12/12] net: homa: create Makefile and Kconfig
+config: arc-randconfig-r132-20241029 (https://download.01.org/0day-ci/archive/20241030/202410300823.rFSVqCH5-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20241030/202410300823.rFSVqCH5-lkp@intel.com/reproduce)
 
-between commit:
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410300823.rFSVqCH5-lkp@intel.com/
 
-  6e58c3310622 ("ice: fix crash on probe for DPLL enabled E810 LOM")
+sparse warnings: (new ones prefixed by >>)
+   net/homa/homa_rpc.c: note: in included file:
+>> net/homa/homa_impl.h:605:13: sparse: sparse: restricted __be32 degrades to integer
+   net/homa/homa_rpc.c: note: in included file (through include/linux/smp.h, include/linux/lockdep.h, include/linux/spinlock.h, ...):
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   net/homa/homa_rpc.c:84:9: sparse: sparse: context imbalance in 'homa_rpc_new_client' - different lock contexts for basic block
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   net/homa/homa_rpc.c:104:17: sparse: sparse: context imbalance in 'homa_rpc_new_server' - wrong count at exit
+   net/homa/homa_rpc.c: note: in included file (through include/linux/rculist.h, include/linux/sched/signal.h, include/linux/ptrace.h, ...):
+   include/linux/rcupdate.h:881:9: sparse: sparse: context imbalance in 'homa_rpc_acked' - unexpected unlock
+   net/homa/homa_rpc.c: note: in included file (through include/linux/smp.h, include/linux/lockdep.h, include/linux/spinlock.h, ...):
+   include/linux/list.h:83:21: sparse: sparse: self-comparison always evaluates to true
+   net/homa/homa_rpc.c:235:6: sparse: sparse: context imbalance in 'homa_rpc_free' - different lock contexts for basic block
+   net/homa/homa_rpc.c:311:5: sparse: sparse: context imbalance in 'homa_rpc_reap' - wrong count at exit
+   net/homa/homa_rpc.c:448:17: sparse: sparse: context imbalance in 'homa_find_client_rpc' - wrong count at exit
+   net/homa/homa_rpc.c:474:17: sparse: sparse: context imbalance in 'homa_find_server_rpc' - wrong count at exit
+--
+>> net/homa/homa_sock.c:85:39: sparse: sparse: cast removes address space '__rcu' of expression
+   net/homa/homa_sock.c:91:31: sparse: sparse: cast removes address space '__rcu' of expression
+   net/homa/homa_sock.c:165:6: sparse: sparse: context imbalance in 'homa_sock_shutdown' - wrong count at exit
+   net/homa/homa_sock.c:243:5: sparse: sparse: context imbalance in 'homa_sock_bind' - different lock contexts for basic block
+   net/homa/homa_sock.c:312:6: sparse: sparse: context imbalance in 'homa_sock_lock_slow' - wrong count at exit
+   net/homa/homa_sock.c:326:6: sparse: sparse: context imbalance in 'homa_bucket_lock_slow' - wrong count at exit
 
-from the net tree and commits:
+vim +605 net/homa/homa_impl.h
 
-  e4291b64e118 ("ice: Align E810T GPIO to other products")
-  ebb2693f8fbd ("ice: Read SDP section from NVM for pin definitions")
-  ac532f4f4251 ("ice: Cleanup unused declarations")
+1416f12d4ea455 John Ousterhout 2024-10-28  595  
+1416f12d4ea455 John Ousterhout 2024-10-28  596  /**
+1416f12d4ea455 John Ousterhout 2024-10-28  597   * Given an IPv4 address, return an equivalent IPv6 address (an IPv4-mapped
+1416f12d4ea455 John Ousterhout 2024-10-28  598   * one)
+1416f12d4ea455 John Ousterhout 2024-10-28  599   * @ip4: IPv4 address, in network byte order.
+1416f12d4ea455 John Ousterhout 2024-10-28  600   */
+1416f12d4ea455 John Ousterhout 2024-10-28  601  static inline struct in6_addr ipv4_to_ipv6(__be32 ip4)
+1416f12d4ea455 John Ousterhout 2024-10-28  602  {
+1416f12d4ea455 John Ousterhout 2024-10-28  603  	struct in6_addr ret = {};
+1416f12d4ea455 John Ousterhout 2024-10-28  604  
+1416f12d4ea455 John Ousterhout 2024-10-28 @605  	if (ip4 == INADDR_ANY)
+1416f12d4ea455 John Ousterhout 2024-10-28  606  		return in6addr_any;
+1416f12d4ea455 John Ousterhout 2024-10-28  607  	ret.in6_u.u6_addr32[2] = htonl(0xffff);
+1416f12d4ea455 John Ousterhout 2024-10-28  608  	ret.in6_u.u6_addr32[3] = ip4;
+1416f12d4ea455 John Ousterhout 2024-10-28  609  	return ret;
+1416f12d4ea455 John Ousterhout 2024-10-28  610  }
+1416f12d4ea455 John Ousterhout 2024-10-28  611  
 
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 6cedc1a906af,656daff3447e..000000000000
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@@ -400,11 -402,10 +402,11 @@@ int ice_phy_cfg_rx_offset_e82x(struct i
-  int ice_phy_cfg_intr_e82x(struct ice_hw *hw, u8 quad, bool ena, u8 thresh=
-old);
- =20
-  /* E810 family functions */
-- int ice_read_sma_ctrl_e810t(struct ice_hw *hw, u8 *data);
-- int ice_write_sma_ctrl_e810t(struct ice_hw *hw, u8 data);
-- int ice_read_pca9575_reg_e810t(struct ice_hw *hw, u8 offset, u8 *data);
-- bool ice_is_pca9575_present(struct ice_hw *hw);
-+ int ice_read_sma_ctrl(struct ice_hw *hw, u8 *data);
-+ int ice_write_sma_ctrl(struct ice_hw *hw, u8 data);
-+ int ice_read_pca9575_reg(struct ice_hw *hw, u8 offset, u8 *data);
-+ int ice_ptp_read_sdp_ac(struct ice_hw *hw, __le16 *entries, uint *num_ent=
-ries);
- +int ice_cgu_get_num_pins(struct ice_hw *hw, bool input);
-  enum dpll_pin_type ice_cgu_get_pin_type(struct ice_hw *hw, u8 pin, bool i=
-nput);
-  struct dpll_pin_frequency *
-  ice_cgu_get_pin_freq_supp(struct ice_hw *hw, u8 pin, bool input, u8 *num);
-
---Sig_/qQcC7M9W10_+AKldn1crROG
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmchhlQACgkQAVBC80lX
-0GzxWQf/Z3ukUS5tXbrpV+AFp0cF9uL7oxqvq3A/tmSCOBBFnBT8GrbSPyn9Iggq
-RBgNBOnMX3dc3gCxF62IQphDRwMm/OXHtW568uRhJPdMKC/BVtXXD9/GbUo907il
-IwqOBo9Bhk9iZrFnr00kYTwMfj4f5lyLcfxW9lInXioyGttMhDnotthzwrTxNHsZ
-HPB7vHmK0nVLxdEXHM52jdnzQdDpfYYnkRsThm8lSujvvJaulgeew0teZkc7Yr7e
-986Wa5x1kNd24bbX1Ma3RxkAUsLB2WIqBit36maNIHgyCk+Hi8NWvVrwfpFI10do
-vmFQ+s2oOKvDF4n4/NBMaCb08l8QMQ==
-=n2/n
------END PGP SIGNATURE-----
-
---Sig_/qQcC7M9W10_+AKldn1crROG--
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
