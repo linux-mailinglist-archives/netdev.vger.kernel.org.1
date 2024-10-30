@@ -1,262 +1,140 @@
-Return-Path: <netdev+bounces-140220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 717D89B58FC
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:15:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B431F9B58FF
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:17:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFB931C21099
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:15:51 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69FC61F24051
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EE4A2940B;
-	Wed, 30 Oct 2024 01:15:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bE3PHcyX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CB9842A8B;
+	Wed, 30 Oct 2024 01:17:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEE274437;
-	Wed, 30 Oct 2024 01:15:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D8C61773A
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 01:17:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730250948; cv=none; b=sG/Uq/+WDPJ4dGo6dcfm0H+jFA5plTMjOtLTJBgtVR5kld5vnPYLwZoOQ9u5d2aI/wUsdJz/IGGLfm+09jzQhfmp7DA6q10jmE1yfQ1q05J38KEJkrY6TL//TJ0r+aF79tBxp4EdAwo2iaz44EWfQ/nOTRKoorJW9C11Z5Wq0TY=
+	t=1730251030; cv=none; b=WSibsISEwE0S1ITHqtmFNPEMM9/Wbiq03ughXETPnkgFwRks/3ZWwa999OzFhagDi+UzryTPsLskVXPgJJn6JF+inBH3H+35/kzLVAtZ/cXiEjGZOFbVE87/f+20xVgy0RUQ/0yz6HXipkGK1gZqZomG7FcMJAo50pI6USo1mMo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730250948; c=relaxed/simple;
-	bh=QgqUgcYGZkRlhU2FqTS9P781gKUtznP6nM1UW6ypGYY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=NmSj+7D9BEtCb3eRIGtQxwlHnefIYRk+46fx7JxElpSmUwK28c90rMVJD32UDBxbeOdq/AzUg4sIq2Ban2Tp0t30lMHcEt5N5L6FcTIJpwXCMu5tDrSqlfSA6hHW/wUhcfstabC3m+Kyyx780dbryKCht3V9rmgxDFeu/RDVk54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bE3PHcyX; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-83abcfb9fd4so228057139f.3;
-        Tue, 29 Oct 2024 18:15:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730250945; x=1730855745; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=lCe5NnDJ75DgpaC8JAhWP+T7vuUeHDxLd+JD+seGgm0=;
-        b=bE3PHcyXk6P51/yigGp+e8r5EqQL/Cuv6x4x9U8JuPeF+TeALydGFAdSCWWqPqbSiE
-         WjEnje+mrC3vCPyTTpzVnr1lp97HcvyvtgyeT74o6j1Iv9+Ter9g0ehfIqZ+2jz4ufH+
-         eviDjEO7YmDcn4fkyR3YygvZwY5mU1iWDbQm/Rc1I8DHN3CMlsoiT+s6Agb0MvUQwSg5
-         Iv4sGAkoRKYHNTA3pEmlW69L2I1veJIjsGhCIl1l9v3SjHE/EqNOKxm9rDPs7JV7FfdK
-         DninrjC7TbfhG2Pd2mefQ1zDRgU/cGWv8LiKu35ogaSamN+R/IXZM2fTR1MfmALRWpX0
-         rb1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730250945; x=1730855745;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=lCe5NnDJ75DgpaC8JAhWP+T7vuUeHDxLd+JD+seGgm0=;
-        b=n0oBbLIjvlmE/u1ciZ/ORYtj2vL7bnUsSEHqUo1X/3NNSJh1V2fdOC9tMqctlcVL+e
-         +B7gzXHU+3OxegoSAPwoTmlBNxc4yLW7QErnd17mPO+/UB6h4+7yrxHKhswi22S2eJ70
-         Ry4ikLwwlPpeolk6u3fs/KMUhsI2cTgLBjy5Z2qWG3X8h6jp9XHEds2PEew+5rUiAQeJ
-         wGXx2YkMAvPc8fvWy0t53U3BwJg9V/ey8H1dE+BDjuCziP/5vnuoAB9LOt0W+plbxuT2
-         wWTQLO29QgkBv7O6FmvACXmbHytBV0bZd9BwgoSt+S3rXDp65PszC5t6rOJ+OtUBcyBx
-         3xEg==
-X-Forwarded-Encrypted: i=1; AJvYcCUnJwWf2dT2iqHOhGg5CLwPuDu5t78T6u9i4ddFGiIs229wokaboNVSqYU+Bd7hN3KEvl4=@vger.kernel.org, AJvYcCVn6sutYe+VSunsc6QMWVPzNBZCXft/EvpR0z7xYKGL6r84MUHUb1gdyZjhiEX+dSa/7yHJEfWH@vger.kernel.org
-X-Gm-Message-State: AOJu0YzpH84dx9+ML3/J+AHOYrwM0jP7X9hRPk6XCD58yI+VvWG9TG/L
-	Er7NQmTrFuGQTVHo1CoNdHRnyIpOMwfaJJxNgx4KyBVSfKId4gb22M/ITbbWBFC9iwoWjtfn/vu
-	KpJd8GNfEcss9JynEB1c2/hpm4ws=
-X-Google-Smtp-Source: AGHT+IFBD8rLgrxMvNJWCt1fxUXDc7WY9UbezqG6oe+8o7KRD8aPRbO8QyKV+sdvWm+z4WhaT+9adI7LvGg0kRtxI0Y=
-X-Received: by 2002:a92:c544:0:b0:3a4:e62b:4e20 with SMTP id
- e9e14a558f8ab-3a4ed2e1ce8mr118376795ab.9.1730250944753; Tue, 29 Oct 2024
- 18:15:44 -0700 (PDT)
+	s=arc-20240116; t=1730251030; c=relaxed/simple;
+	bh=c23u1baf7tNUISYymO0T7ibON/nMCMzKfZj7UGOE/lk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JoVAYmJ+a+OqWEXqDsB/PY/mM6q59P/3wKgAmSJZkNBas6j4FJmL8/xfnsjo599rYhdxak9R3CZzAWy05waIc0vQQlSjUe4MaYFQ5LyiUkYr0dl5AmDj+YjDubxxYZhqoQSET40C11Yopdz0lHPMKO7qvlXHnKGidW8ke7WwyxA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.163.235])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4XdTjs3JJXz4f3jqW
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 09:16:49 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 0E6501A0568
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 09:17:02 +0800 (CST)
+Received: from [10.67.109.79] (unknown [10.67.109.79])
+	by APP1 (Coremail) with SMTP id cCh0CgBH8LEMiSFniytFAQ--.9126S2;
+	Wed, 30 Oct 2024 09:17:01 +0800 (CST)
+Message-ID: <400ccdf8-9574-4481-b1ad-bc6dca63cffc@huaweicloud.com>
+Date: Wed, 30 Oct 2024 09:17:00 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-4-kerneljasonxing@gmail.com> <9a821495-cac7-48d8-a2bc-1bd7ebeef23c@linux.dev>
-In-Reply-To: <9a821495-cac7-48d8-a2bc-1bd7ebeef23c@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 30 Oct 2024 09:15:08 +0800
-Message-ID: <CAL+tcoC41NwjMmjzHz+76-sLbBVRzEzECwFArSe3FFidMcmB=A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 03/14] net-timestamp: open gate for bpf_setsockopt/_getsockopt
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] qed/qed_sriov: avoid null-ptr-deref
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: manishc@marvell.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, wangweiyang2@huawei.com
+References: <20241025093135.1053121-1-chenridong@huaweicloud.com>
+ <116b608e-1ef5-4cc8-95ac-a0a90a8f485f@intel.com>
+ <43c68803-89c4-431f-b016-62a6ad68313f@huaweicloud.com>
+ <61611603-4dd0-4d75-a0b7-d21299d4610c@intel.com>
+Content-Language: en-US
+From: Chen Ridong <chenridong@huaweicloud.com>
+In-Reply-To: <61611603-4dd0-4d75-a0b7-d21299d4610c@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-CM-TRANSID:cCh0CgBH8LEMiSFniytFAQ--.9126S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxJrWfCr1kAr4DCr15Aw1kZrb_yoW8WF43pa
+	15W3Wj9F4DWr18Ar1Iv3W7KFy5tFW8JFyUX3WkJ34FyrnIqry7KFWxK3WUu3W3JF1xC3s0
+	qayagFyxta4UXa7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUylb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JMxkF7I0En4kS14v26r1q6r43MxAIw28IcxkI7VAK
+	I48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7
+	xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xII
+	jxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267AKxVWUJVW8JwCI42IY6xAIw2
+	0EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_Gr1lIxAIcVC2z280aVCY1x02
+	67AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjxUF1v3UUUUU
+X-CM-SenderInfo: hfkh02xlgr0w46kxt4xhlfz01xgou0bp/
 
-On Wed, Oct 30, 2024 at 8:32=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 10/28/24 4:05 AM, Jason Xing wrote:
-> > From: Jason Xing <kernelxing@tencent.com>
-> >
-> > For now, we support bpf_setsockopt to set or clear timestamps flags.
-> >
-> > Users can use something like this in bpf program to turn on the feature=
-:
-> > flags =3D SOF_TIMESTAMPING_TX_SCHED;
-> > bpf_setsockopt(skops, SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags=
-));
-> > The specific use cases can be seen in the bpf selftest in this series.
-> >
-> > Later, I will support each flags one by one based on this.
-> >
-> > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > ---
-> >   include/net/sock.h              |  4 ++--
-> >   include/uapi/linux/net_tstamp.h |  7 +++++++
-> >   net/core/filter.c               |  7 +++++--
-> >   net/core/sock.c                 | 34 ++++++++++++++++++++++++++------=
--
-> >   net/ipv4/udp.c                  |  2 +-
-> >   net/mptcp/sockopt.c             |  2 +-
-> >   net/socket.c                    |  2 +-
-> >   7 files changed, 44 insertions(+), 14 deletions(-)
-> >
-> > diff --git a/include/net/sock.h b/include/net/sock.h
-> > index 5384f1e49f5c..062f405c744e 100644
-> > --- a/include/net/sock.h
-> > +++ b/include/net/sock.h
-> > @@ -1775,7 +1775,7 @@ static inline void skb_set_owner_edemux(struct sk=
-_buff *skb, struct sock *sk)
-> >   #endif
-> >
-> >   int sk_setsockopt(struct sock *sk, int level, int optname,
-> > -               sockptr_t optval, unsigned int optlen);
-> > +               sockptr_t optval, unsigned int optlen, bool bpf_timetam=
-ping);
-> >   int sock_setsockopt(struct socket *sock, int level, int op,
-> >                   sockptr_t optval, unsigned int optlen);
-> >   int do_sock_setsockopt(struct socket *sock, bool compat, int level,
-> > @@ -1784,7 +1784,7 @@ int do_sock_getsockopt(struct socket *sock, bool =
-compat, int level,
-> >                      int optname, sockptr_t optval, sockptr_t optlen);
-> >
-> >   int sk_getsockopt(struct sock *sk, int level, int optname,
-> > -               sockptr_t optval, sockptr_t optlen);
-> > +               sockptr_t optval, sockptr_t optlen, bool bpf_timetampin=
-g);
-> >   int sock_gettstamp(struct socket *sock, void __user *userstamp,
-> >                  bool timeval, bool time32);
-> >   struct sk_buff *sock_alloc_send_pskb(struct sock *sk, unsigned long h=
-eader_len,
-> > diff --git a/include/uapi/linux/net_tstamp.h b/include/uapi/linux/net_t=
-stamp.h
-> > index 858339d1c1c4..0696699cf964 100644
-> > --- a/include/uapi/linux/net_tstamp.h
-> > +++ b/include/uapi/linux/net_tstamp.h
-> > @@ -49,6 +49,13 @@ enum {
-> >                                        SOF_TIMESTAMPING_TX_SCHED | \
-> >                                        SOF_TIMESTAMPING_TX_ACK)
-> >
-> > +#define SOF_TIMESTAMPING_BPF_SUPPPORTED_MASK (SOF_TIMESTAMPING_SOFTWAR=
-E | \
->
-> hmm... so we are allowing it but SOF_TIMESTAMPING_SOFTWARE won't do anyth=
-ing
-> (meaning set and not-set are both no-op) ?
 
-I was thinking of writing a separate patch to control the output
-function by using this flag. Apparently, I didn't do that, so I think
-I can remove it from this series.
 
->
-> > +                                           SOF_TIMESTAMPING_TX_SCHED |=
- \
-> > +                                           SOF_TIMESTAMPING_TX_SOFTWAR=
-E | \
-> > +                                           SOF_TIMESTAMPING_TX_ACK | \
-> > +                                           SOF_TIMESTAMPING_OPT_ID | \
-> > +                                           SOF_TIMESTAMPING_OPT_ID_TCP=
-)
-> > +
-> >   /**
-> >    * struct so_timestamping - SO_TIMESTAMPING parameter
-> >    *
-> > diff --git a/net/core/filter.c b/net/core/filter.c
-> > index 58761263176c..dc8ecf899ced 100644
-> > --- a/net/core/filter.c
-> > +++ b/net/core/filter.c
-> > @@ -5238,6 +5238,9 @@ static int sol_socket_sockopt(struct sock *sk, in=
-t optname,
-> >               break;
-> >       case SO_BINDTODEVICE:
-> >               break;
-> > +     case SO_TIMESTAMPING_NEW:
->
-> How about only allow bpf_setsockopt(SO_TIMESTAMPING_NEW) instead of
-> bpf_setsockopt(SO_TIMESTAMPING). Does it solve the issue reported in v2?
-
-No, it doesn't. Sorry, I will handle it in a proper way.
-
->
-> > +     case SO_TIMESTAMPING_OLD:
-> > +             break;
-> >       default:
-> >               return -EINVAL;
-> >       }
-> > @@ -5247,11 +5250,11 @@ static int sol_socket_sockopt(struct sock *sk, =
-int optname,
-> >                       return -EINVAL;
-> >               return sk_getsockopt(sk, SOL_SOCKET, optname,
-> >                                    KERNEL_SOCKPTR(optval),
-> > -                                  KERNEL_SOCKPTR(optlen));
-> > +                                  KERNEL_SOCKPTR(optlen), true);
-> >       }
-> >
-> >       return sk_setsockopt(sk, SOL_SOCKET, optname,
-> > -                          KERNEL_SOCKPTR(optval), *optlen);
-> > +                          KERNEL_SOCKPTR(optval), *optlen, true);
-> >   }
-> >
-> >   static int bpf_sol_tcp_setsockopt(struct sock *sk, int optname,
-> > diff --git a/net/core/sock.c b/net/core/sock.c
-> > index 7f398bd07fb7..7e05748b1a06 100644
-> > --- a/net/core/sock.c
-> > +++ b/net/core/sock.c
-> > @@ -941,6 +941,19 @@ int sock_set_timestamping(struct sock *sk, int opt=
-name,
-> >       return 0;
-> >   }
-> >
-> > +static int sock_set_timestamping_bpf(struct sock *sk,
-> > +                                  struct so_timestamping timestamping)
-> > +{
-> > +     u32 flags =3D timestamping.flags;
-> > +
-> > +     if (flags & ~SOF_TIMESTAMPING_BPF_SUPPPORTED_MASK)
-> > +             return -EINVAL;
-> > +
-> > +     WRITE_ONCE(sk->sk_tsflags_bpf, flags);
->
-> I think it is cleaner to directly "WRITE_ONCE(sk->sk_tsflags_bpf, flags);=
-" in
-> sol_socket_sockopt() instead of adding "bool bpf_timestamping" to sk_sets=
-ockopt.
-> sk_tsflags_bpf is a separate u32 anyway, so not a lot of code to share. T=
-he same
-> for getsockopt.
-
-As I replied to Willem, I feel this way (that is also the same as v2)
-[1] introduces more extra duplicated code and returns earlier compared
-to other use cases of SO_xxx, which do you think is a bit weird?
-
-[1]: https://lore.kernel.org/all/20241012040651.95616-3-kerneljasonxing@gma=
-il.com/
-
-Surely, I can write it like how v2 works. Which one would you prefer :) ?
-
->
-> [ will continue the remaining patches a little later ]
-
-Thanks!
+On 2024/10/29 23:15, Alexander Lobakin wrote:
+> From: Chen Ridong <chenridong@huaweicloud.com>
+> Date: Tue, 29 Oct 2024 09:42:11 +0800
+> 
+>>
+>>
+>> On 2024/10/25 23:28, Alexander Lobakin wrote:
+>>> From: Chen Ridong <chenridong@huaweicloud.com>
+>>> Date: Fri, 25 Oct 2024 09:31:35 +0000
+>>>
+>>>> [PATCH] qed/qed_sriov: avoid null-ptr-deref
+>>>
+>>> Use the correct tree prefix, [PATCH net] in your case.
+>>>
+>>
+>> Thanks, will update
+>>
+>>>> From: Chen Ridong <chenridong@huawei.com>
+>>>
+>>> Why do you commit from @huawei.com, but send from @huaweicloud.com?
+>>>
+>> The @huawei.com is the email I am actually using. But if I use it to
+>> send email, my patches may not appear in maintainers's inbox list. This
+>> won't be happened when I use 'huaweicloud.com' to send emails. So I am
+>> using 'huaweicloud.com' to communicate with community. However, I would
+>> like to maintain the same author identity.
+>>
+>>>>
+>>>> The qed_iov_get_public_vf_info may return NULL, which may lead to
+>>>> null-ptr-deref. To avoid possible null-ptr-deref, check vf_info
+>>>
+>>> Do you have a repro for this or it's purely hypothetical?
+>>>
+>>
+>> I read the code and found that calling qed_iov_get_public_vf_info
+>> without checking whether the 'vfid' is valid  may result in a null
+>> pointer, which may lead to a null pointer dereference.
+> 
+> If you want to submit a fix, you need to have a step-by-step manual how
+> to reproduce the bug you're fixing.
+> 
+>>
+>>>> before accessing its member.
+>>>>
+>>>
+>>> Here you should have a "Fixes:" tag if you believe this is a fix.
+> 
+> Thanks,
+> Olek
 
 Thanks,
-Jason
+I will try to reproduce this bug.
+
+Best regards,
+Ridong
+
 
