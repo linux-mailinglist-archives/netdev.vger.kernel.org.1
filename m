@@ -1,182 +1,133 @@
-Return-Path: <netdev+bounces-140256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52C769B5AAF
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:26:44 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 536299B5AB6
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:31:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95DBFB23783
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:26:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DCDE285005
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 04:31:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5981991DF;
-	Wed, 30 Oct 2024 04:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA511991D7;
+	Wed, 30 Oct 2024 04:31:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PWAQXd+l"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="tqFYDU6R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66B8D63CB;
-	Wed, 30 Oct 2024 04:26:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA0B91865E0
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 04:31:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730262392; cv=none; b=KNizlXkISM8WOb6Hcw5SKSf3V6liI/G3qbIczkXeaLvuEXMBI7zfamH033Gr17QDN0r4VxUXeQg9RwORHCsKyxvXdUHX3lRXCtyT4QHVuM1RXWr6diFsf4LznDRM+UlrjdlQETsZAYmlRS6obOXPPtu9dbVHerFDVcc8lYd7pk4=
+	t=1730262675; cv=none; b=TINmTKLAP4Y260tWEw2m2wrzv51h8xyCLDlNzFQvulRc2y8Ta1Fp2GQCw5Hk0aEMZWFRf1/GG42US2F5nK13NkTddr5gD7wGkdJi5AwmexMt2V0zEDTuF96CVd6hpJQV6i1G5r6VMTEdUBYfHm+N0xLnTNmesU2zbdUXeZknoNk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730262392; c=relaxed/simple;
-	bh=a+99HrebtQ2MocTLitUdf4M0wR1vKx2d51CbOgiT3bM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Bpj2/yPvmQxCZaROgIf7aUxfl1llK6MofxNf4ndUT2LoLjuvRYDzNZuJwrAn/mfFU4ZOZOaLbn91wEWkV6ktu9VaUHEseknM8nSi6g34bzn76ox2vP6oQhDnyElgJGZfebEpvdwmxazfdN8sxnOd7zj0RSFD9Iw7ru6G6jamWCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PWAQXd+l; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=roeck-us.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e59746062fso5018575a91.2;
-        Tue, 29 Oct 2024 21:26:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730262389; x=1730867189; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=PeV2eXcuovjuaiVjnDWRIrJxqo8228Qv/HbIFLO8aWQ=;
-        b=PWAQXd+liMkEVHsth9DoIfRpxr9w/v797g4Tq6AaoJZ2pQeYSjdqTf0JxvJYhKbFAw
-         /i39f94BEdnjkbxBmCBt7Xir5nefAitjJgxJILLMbDsCr/qjxn0qmO3nfniumpys9kQD
-         zyaxP8atyyviabcj+alnSLYXEyc7SO2siCNthy0BB59iwb5PIXuAcnTR4yW9y1pGWN0e
-         nzY4ZrFstHfaFGGubeEPsGI6OLw9yM8h3Wo63wclfsu6XTzm5RFEnmkLpCzl/0KqUAB0
-         RlO8TJUAAmkcyZPC87QJJO80EK7E2aMIeVUQf9JZfQZRv/RNsMMNFcyWYHAWgtX23hus
-         pK9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730262389; x=1730867189;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PeV2eXcuovjuaiVjnDWRIrJxqo8228Qv/HbIFLO8aWQ=;
-        b=sfoGveuS5qAdxagz771BCF7VHTOs974tsJgY/1G6dLvDOkEuEUqXGHsKJ9B9c6Nby8
-         4zyAV0quxzCAU8PJ8lHejDCE6UzkGtHRVywdlVVzMxccM3ndMABcEaPWrw6E9xoOf5WU
-         snUsKQyCgs8pwScTLB5YOzR54bm69Iw3Tc/FTqeNUj/vx2t7tCS4wTYi92yEqr8z0v2q
-         lXcu+daTBRynyiIhBDQoqEMI6CH4do2IRE0XgLj/8kDTdQnymiUrCuQl5VG1m4ryLWCs
-         1TSa9wS9ugc2T18wvYiZxV6ysIy5bLMv8oOzOUzju57z7Za58Xvsc2c8b89taTbDwQDL
-         RY1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUTk4oW6gjAuClcUCxqBLMQyDk2nX9q/VA8C0H7BDlnej3ufvhJwe1IcQkQJoJKZ5Ej24U2PwEYEj87oNukJOg=@vger.kernel.org, AJvYcCVCG2c8xLl9+37MYTNh1RlhANh1/nLtCdCqnWuV/K6gMt3qC+khZpdrS1RvFCcoAfbxlJ+b/HR2i/wz@vger.kernel.org, AJvYcCVJ3hdVfB5nbGfcCm7bQYa3zE1biTLy7Ki7f7hawL0BGVEh1c0ATZMxWN/vEAvvN2FHn8KyXlG7Sy3t@vger.kernel.org, AJvYcCVWWhKXlhsZwU2nAKJLGS/slyzqVFLqYlrrlSF6i0/z3EhMGa5GzAyd63cGsW1uRo1hSBaFVjd6W0pl@vger.kernel.org, AJvYcCW7mq4lSek3usi7Hn1FgAyL+iYYmnQo07DeBXDDfE0fzvs+dUCtc82JgyoPItMj9qIwrgLgjSbKe8Vh@vger.kernel.org, AJvYcCWLXXicSwo5XMWDCvOs7HHBA+GziEWhh12oe5E65vNjPpHLSE5u9pC8eyv5gJFFww/uQdjVteim@vger.kernel.org, AJvYcCWfzBh2oeQ4TMAeIQioZHf2IkF72g3quJCJmAj5CV48YRVeDVn0TN/esLI7T8ueruv5c+7607sQaRAKJQ==@vger.kernel.org, AJvYcCWnn4Vp/aQwX1+1EaoijqS9CfWPwpenpwfFmzrsbrdYORQN6aUS/FTY4U14d/8eYECtM4RjN7CU2gg=@vger.kernel.org, AJvYcCX67w5TsDzrBTCKuuKE9fsqQJg1kmaDxNQvg0+w6sRQfRwEQ7pqBXyIJqA61eBimXdmOL/P57A45q6nlr0s@vger.kernel.org, AJvYcCXAMRONShIWVzqNNGl9h0arqfy776P/WcrI
- iStli78u3VE2Yg/qlPfOwdd/NiuYt4qNt+LM3UKo+S0s13Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyL71KEcLYI1oiXFcXSRnJ0Gg+HcUwBkoAR+sg9Bxaj3JimcXxa
-	fYmONY3+0J134D5cWtatV83lXD/vH33dzVlNoIoSs/sbBXYnbfmD
-X-Google-Smtp-Source: AGHT+IEcLJIjDtbwHlrtoFSWOdzDcSzGC7W/jXCJ/1EpI78fu4G6cQ2qr0//fOch7Jrr4SIkMlnVHA==
-X-Received: by 2002:a17:90b:4b0d:b0:2da:d766:1925 with SMTP id 98e67ed59e1d1-2e8f11b9e12mr16223220a91.37.1730262389557;
-        Tue, 29 Oct 2024 21:26:29 -0700 (PDT)
-Received: from ?IPV6:2600:1700:e321:62f0:329c:23ff:fee3:9d7c? ([2600:1700:e321:62f0:329c:23ff:fee3:9d7c])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa9d220sm581019a91.45.2024.10.29.21.26.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 29 Oct 2024 21:26:28 -0700 (PDT)
-Sender: Guenter Roeck <groeck7@gmail.com>
-Message-ID: <fe2a7f2b-6405-4be7-90b5-0490761908db@roeck-us.net>
-Date: Tue, 29 Oct 2024 21:26:26 -0700
+	s=arc-20240116; t=1730262675; c=relaxed/simple;
+	bh=J1jzOaDaiBtZVIJ0t3sQB6ULHBIKEAz3/3qoaL+qHo4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KWsyoz2C/0to8NXm0ty5WWDb7U3on8U332lagdDo4Jac29NH9faCV0pYyLMZY7CIhsCmT/89FdfdZ8HOT+deY9WG39Se3Wpw6pNRrYCwUm0/6zOE3FtXf6RpiBStNxGEflesORq5X0IOI+QD8jDwp9NLDLODi93S9va+NBVlyxo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=tqFYDU6R; arc=none smtp.client-ip=171.64.64.25
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
+	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
+	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
+	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=XFe6aDoitI1PBZsZXYiRGpiaoh0pD4KNAclD1EPvAZc=; t=1730262673; x=1731126673; 
+	b=tqFYDU6RnpwpW+w78+mrBUwsjk5allC9cCYT2sUuqNUMwD1yrB7XxHtrMBa7uNiLUk4JNSv4ZL7
+	KT/rrIiWl57++nrp5RxBH14Af5WcYSlqjyL9ZsJ968eakhx68I7Ph2drisx4J3bP+s4y1KlZmHGNx
+	8d/ZtxxLF4IyE+Q6uytsv0wmkyeyCuoDvz1iXV+e1276fj8id3OHLk3Sxfd0FGI4RGtag2Q2s6Tty
+	mL9QGLnKkmZ7lnkEcaAcH+pMpHjGVUIHTsP1Oft4+x1lWd4k3MpUfT2rpqYlkB1owZRBNZEnlb9nY
+	VASZIl7YAaWUanDoagmI3rjb1lrLtD26CDxA==;
+Received: from mail-oo1-f46.google.com ([209.85.161.46]:61466)
+	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.94.2)
+	(envelope-from <ouster@cs.stanford.edu>)
+	id 1t60MQ-0008P9-Vc
+	for netdev@vger.kernel.org; Tue, 29 Oct 2024 21:31:13 -0700
+Received: by mail-oo1-f46.google.com with SMTP id 006d021491bc7-5ebc04d495aso3520896eaf.2
+        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 21:31:10 -0700 (PDT)
+X-Gm-Message-State: AOJu0YyGzAMSoiXInYAAwE8u7n7rY2EWwRSu06NFBPVGaOv5RbVVA+J1
+	FAYpe9yr7o6HxkRS4ZR09UzsMdOo8I4vt8XqZWWo2qyPuc/44xb3epo/WRX40TUvz8HlRkTyw0v
+	nELVXJ4BRG2IxoAij2Q+zWLMDjHw=
+X-Google-Smtp-Source: AGHT+IHHv+PDUdCBCUsOYW4TNFtfZd/nvqmxEx90pUBDAyQK4bu9Ytjd0aGrwfBGByK18LOWx6M91wPxwTCKzThtHwA=
+X-Received: by 2002:a05:6820:160a:b0:5e8:3b4:ac22 with SMTP id
+ 006d021491bc7-5ec23a2838bmr10032095eaf.4.1730262670358; Tue, 29 Oct 2024
+ 21:31:10 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v1 6/9] hwmon: Add Nuvoton NCT6694 HWMON support
-To: Ming Yu <a0282524688@gmail.com>, Jonathan Cameron <jic23@kernel.org>
-Cc: Kalesh Anakkur Purayil <kalesh-anakkur.purayil@broadcom.com>,
- tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, brgl@bgdev.pl,
- andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org,
- jdelvare@suse.com, lars@metafoo.de, ukleinek@kernel.org,
- alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org,
- linux-gpio@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org,
- linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org,
- linux-rtc@vger.kernel.org
-References: <20241024085922.133071-1-tmyu0@nuvoton.com>
- <20241024085922.133071-7-tmyu0@nuvoton.com>
- <CAH-L+nPGGhgDFge0Ov4rX_7vUyLN8uu51cks80=kt38h22N7zQ@mail.gmail.com>
- <62ea5a91-816f-4600-bfec-8f70798051db@roeck-us.net>
- <CAOoeyxX=A5o5PhxpniPwPgMCBv1VwMstt=wXCxHiGPF59gm5wQ@mail.gmail.com>
- <817d24e1-6fdd-4ce2-9408-eccc94134559@roeck-us.net>
- <02f05807-77ae-4a3b-8170-93dd7520c719@roeck-us.net>
- <CAOoeyxX2Jk+76Cedu5_ZGgeRCPmT8Yhczmx7h+K-za7r2WS=Sw@mail.gmail.com>
- <20241028185414.65456203@jic23-huawei>
- <CAOoeyxXJa05XxTg0JpZ6GRV7XMMa3Rct4+c5Q3cqCtW9KZzQLw@mail.gmail.com>
-Content-Language: en-US
-From: Guenter Roeck <linux@roeck-us.net>
-Autocrypt: addr=linux@roeck-us.net; keydata=
- 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
- mDW4+i+XlNFUPUYMrIKi9joBhu18ssf5i5Q=
-In-Reply-To: <CAOoeyxXJa05XxTg0JpZ6GRV7XMMa3Rct4+c5Q3cqCtW9KZzQLw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-10-ouster@cs.stanford.edu>
+ <55bc21b1-2f37-4ade-8233-b30a9e0274c7@lunn.ch>
+In-Reply-To: <55bc21b1-2f37-4ade-8233-b30a9e0274c7@lunn.ch>
+From: John Ousterhout <ouster@cs.stanford.edu>
+Date: Tue, 29 Oct 2024 21:30:33 -0700
+X-Gmail-Original-Message-ID: <CAGXJAmypjTj1udx4x5i1Y0mxrTeWQJKUuGmR=4qiE-ky3Tc-ow@mail.gmail.com>
+Message-ID: <CAGXJAmypjTj1udx4x5i1Y0mxrTeWQJKUuGmR=4qiE-ky3Tc-ow@mail.gmail.com>
+Subject: Re: [PATCH net-next 09/12] net: homa: create homa_outgoing.c
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Score: -1.0
+X-Spam-Level: 
+X-Scan-Signature: 127ff6e1eac6b45a32dc112250ed777d
 
-On 10/29/24 20:29, Ming Yu wrote:
-> Dear Jonathan,
-> 
-> Thanks you for your comments,
-> I tested your suggestion in both the MFD driver and the IIO driver, and
-> the iio-hwmon bridge worked well.
-> On the other hand, my requirements involve accessing thermal sensors,
-> voltage sensors and tachometers, so I should implement it in this HWMON
-> drive, right?
-> 
+On Tue, Oct 29, 2024 at 5:42=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > +/**
+> > + * homa_check_nic_queue() - This function is invoked before passing a =
+packet
+> > + * to the NIC for transmission. It serves two purposes. First, it main=
+tains
+> > + * an estimate of the NIC queue length. Second, it indicates to the ca=
+ller
+> > + * whether the NIC queue is so full that no new packets should be queu=
+ed
+> > + * (Homa's SRPT depends on keeping the NIC queue short).
+> > + * @homa:     Overall data about the Homa protocol implementation.
+> > + * @skb:      Packet that is about to be transmitted.
+> > + * @force:    True means this packet is going to be transmitted
+> > + *            regardless of the queue length.
+> > + * Return:    Nonzero is returned if either the NIC queue length is
+> > + *            acceptably short or @force was specified. 0 means that t=
+he
+> > + *            NIC queue is at capacity or beyond, so the caller should=
+ delay
+> > + *            the transmission of @skb. If nonzero is returned, then t=
+he
+> > + *            queue estimate is updated to reflect the transmission of=
+ @skb.
+>
+> You might want to look into BQL. What you have here i assume only
+> takes into account homa traffic. BQL, being in the NIC itself, will
+> tell you about all other traffic as well.
 
-Duplicate drivers for the same hardware is not acceptable.
+Thanks for the pointer; I hadn't heard of BQL before, but I found this
+page on it:
 
-I see that so far only pwm and fan control is implemented in the hwmon driver.
-There is no public documentation for NCT6694, so it is difficult to evaluate the
-chip's capabilities. The summary doesn't even mention fan speed readings, meaning
-pretty much everything is guesswork.
+https://lwn.net/Articles/469652/
 
-Either case, I do see that you also implemented a pwm driver which _does_
-duplicate hwmon functionality. Sorry, that is a no-go. Again, we can not have
-multiple drivers controlling the same hardware. A pwm controller implemented
-in a hwmon device is supposed to be limited to fan control. It looks like
-the pwm controller implemented in the NCT6694 is a generic pwm controller.
-It is not appropriate to have a hwmon driver for such a pwm controller.
+It sounds like this is the same mechanism that includes dynamic queue
+limits and the NETDEV_TX_BUSY return value from drivers? If so, I am
+familiar with that mechanism, though I hadn't heard the name "BQL".
+Unfortunately, it isn't very accurate: it treats data as queued until
+skbs are returned from the NIC back to Linux, which can take 100 us or
+more. In contrast, homa_check_nic_queue has a time granularity of a
+few microseconds (delays of 100 us for short Homa messages would be
+cause for concern).
 
-Guenter
+But you are right that this doesn't consider non-Homa traffic, and
+that is a problem when Homa runs concurrently with TCP. I am just
+starting work on a new qdisc that will replace this mechanism and
+incorporate traffic from non-Homa sources as well as Homa.
 
+-John-
 
