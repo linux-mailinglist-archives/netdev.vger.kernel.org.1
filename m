@@ -1,215 +1,240 @@
-Return-Path: <netdev+bounces-140554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AB309B6E39
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:58:07 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2434D9B6E3C
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DED9D281EB0
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:58:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 87436B2189C
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4386120E31C;
-	Wed, 30 Oct 2024 20:58:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADD571EF94E;
+	Wed, 30 Oct 2024 20:58:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="Xl95dUNS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fl+WA3wy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 830481EF94E
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 20:58:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8422D1FF606;
+	Wed, 30 Oct 2024 20:58:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730321884; cv=none; b=ovKIdMr0ICcXJAaVXDU2KiQvkv1AEy1JFZBpTvma4c9ERx0mWSIuymD9+D6TgVCv58Bw342c+DvX9rtCVf4jl0FyS02TQw5+Fw5Mda58PBQUdhyBcqFZKqXsfLg5CVfQVLYE4f0n8ioM5nFkXzXPH0kRfzpzTA3i09r4iMbEOIE=
+	t=1730321909; cv=none; b=IhQfiqQGrml2bJJQn5uYA/sIRAIOXQPt7KRA1UV5y30kiYM5f9FOykGwWdKb4oaLNFZa4r4vaTiI5LVwIdtYOhSOM8WiZWbsxxW6KxS1Kflc22JRMM3dZbmZmOyqFljpFwHBG4GbAqIuOhKvZW9v4m5ML0gkS1DTOMYqrd1n9n4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730321884; c=relaxed/simple;
-	bh=i/1Qa3FWUpi7jl8R5KZcjwqYnJSOvQSdA04yPxmOGE4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=oLcxLqTdi6ZmQwn0DFOh1HLSCrkAjGax+n5gWOIjQZGqU8cw644Y4yhGbbQYGIjgZP6UkcgVKxEz5ekeBX5t7nJ424Gkar/Gy+QSFpA/j05vNktbP+NXOUY9LnG57BAItAQAhzoQDpvGudpjij8a1YHcWoRJE6NSw9R9gvsEVAc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=Xl95dUNS; arc=none smtp.client-ip=209.85.128.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-4315839a7c9so2213685e9.3
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 13:58:01 -0700 (PDT)
+	s=arc-20240116; t=1730321909; c=relaxed/simple;
+	bh=OlvKS2bUJ7r/ZJgfIDvz8otcdxUz5EEhxEyCrGKXhag=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=lfv3cSju0eZRuZlXXcyg9b46p0RFI2CsM6HglV0DnLM6FPom0InOSoDLsidQX7jAEI1c5IhHHD3TBcLB8rqPfDvjTZ0/AeKb6WVFyEUSm/p5bt0vP+B8ovrVSoYtw2tQuhZlKep1GaP3vh1R7yjsbIEPF+mgstixuQ1m6rEqpYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fl+WA3wy; arc=none smtp.client-ip=209.85.214.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20cdb889222so2808715ad.3;
+        Wed, 30 Oct 2024 13:58:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=openvpn.net; s=google; t=1730321880; x=1730926680; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=SN5iKKgACryua0sxDhTtQQnF+tdLag5QxV/KT7cwFRQ=;
-        b=Xl95dUNSarL/gzjZhlas13cLJwLrLNu9imiWk14vVTLYbmK7SosWJ9x993dDnVGoFz
-         wGNSe2UOZ3cAovw4sfIQN1h3AQnFjcpxOwhLOsRZeDHN007wYudWkRjRE6CKrA+uD11v
-         fHzM0ljcATb1Rvwvx+VxZRDtfinJG8zk43amyRgLAA/6RAAY+l5UwENHbcCdvXSUCK1N
-         sVqMnwRo+VtD9vxIBr597OLjvVeVxjUMB1Fg5Ob+hwIw5YsWbX0+bQih7JicLKAbf+c7
-         jZKKkDwIuGB03EtM0dhRD2swv20/tvROQxKK1yAFl9S7fhzRruVWnrj8fVPhiYD5YYwQ
-         SzrQ==
+        d=gmail.com; s=20230601; t=1730321906; x=1730926706; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=lRYYm8hMI3bj7Uwgo7AT5/wMKTZHng/kylBpdKw3Kfs=;
+        b=Fl+WA3wyJYxChYn3hzsuvlq1bhncxr94J6Vv/NjMppqLOy7jwx2p1VRKL8t0D7dx/+
+         vQmh00b9krIZ5bAU8vi2eGsLTvxj+2NVndzEjE9zuCW7TCJour50GHmoZG1k2Y5LZNdQ
+         L3Ffj3adBci8Dlhw+BleQKc9qfmA0bbS96kYCwRhy80j4Rl4mJaYZvx8x+y1jZhCEU7K
+         A6mQBVSFNuwem2bMT+ERI8SlarTXEZKyP0K7WxNUuTDeiHN6fyzzWtuhr40T6PeR4ea3
+         yLXLMRpv7nGrLbsCATAW7jX2h4VIACGPY2eUbk5Qb0yICiU09I7Omf+PJmiSxSJa6B1n
+         +qsg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730321880; x=1730926680;
-        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SN5iKKgACryua0sxDhTtQQnF+tdLag5QxV/KT7cwFRQ=;
-        b=OFbVv0McO6glFcgCBT44Pq/uVmqJLiuF5s/AT5L5M4x3JKtezkaZwi6+GDu4X8XLde
-         1+CBHuNBrcJRkkowehCgNNtzzmQMowrl63x1xtHHXZusVqLce6nM+Y8blJrM7TYUZNqL
-         Yb+1s3MM1cSQZO7+AnS0PFNo8dvOy1gz9IurTLS2opPadquxNLvcpWwrq5EkDEq1G9Mz
-         Jaqt01Dy3GK1W9EKCVlxxU9LaG7VgibGhI2+plqz/4YimzWh6vjdZnWGZaLsOvGS5rMo
-         oXbn6+SqOGC0kpn4+aaKEkE964n8rdYmDLFMJloVJwnWdfmVSIgTjqPGyopV9itS6cKT
-         xsow==
-X-Forwarded-Encrypted: i=1; AJvYcCVpXg2zb2pZqSne84GI4FVRupt+ubYAE+NvkzsH04OMMmzi8otKTp9gkfApv5Nvd3Pvr9qlwiY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzxAI3O6CDnhmcCr6q8YnFjBiZrglm5gZjhq+WECYuHqxAgep0D
-	lwDTRewO3dFHsfUcBN8V8XdCADNzi98o0N7a/ICfG9bCC0LLsPzmjd0PzKLmMnk=
-X-Google-Smtp-Source: AGHT+IEUhyR6K6nh/IDmkibbUslakzmYM2gD9Wm2X3s1io2zDV4LvwzM6GwKXLhz9+LmWUz6Igz7hA==
-X-Received: by 2002:a05:600c:19d3:b0:431:46fe:4cad with SMTP id 5b1f17b1804b1-4319ac9b4bbmr145381885e9.9.1730321879800;
-        Wed, 30 Oct 2024 13:57:59 -0700 (PDT)
-Received: from ?IPV6:2001:67c:2fbc:1:3ca3:4955:91d7:e8e1? ([2001:67c:2fbc:1:3ca3:4955:91d7:e8e1])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d685278sm1532275e9.36.2024.10.30.13.57.58
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 30 Oct 2024 13:57:59 -0700 (PDT)
-Message-ID: <33aa1e2c-37e8-48ff-9589-f5cd7f4914ea@openvpn.net>
-Date: Wed, 30 Oct 2024 21:58:15 +0100
+        d=1e100.net; s=20230601; t=1730321906; x=1730926706;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=lRYYm8hMI3bj7Uwgo7AT5/wMKTZHng/kylBpdKw3Kfs=;
+        b=Un6lZTtisJQor1trMlZp8iazP46QYVlZinEsF7i+KWqZTf6rulKB0ae9V2fYmq2the
+         thjvsBiELbSoA6J335+DV5pqhwpaN9O4G8Up0tYKzG3mbNktTbQ5ZEeFZnipTQNSsdFg
+         F2/FQfZ61p03ebqwGm4tATdRhlj1cvWSQjpkTh1Kwu8Sd+Vy3Yrg92JKb8FdcjMuixRF
+         L4nMDGgBsVvBU6cHZNez/8VVSFDyV9cVE1YPu9xzd4Ix26ccFrk0ZRZW5a48DmSOgKqJ
+         QfWdooHNlLx/D5j7F/PyMWAWc6uYHvdDg/FNSoK1T4BfPVurbsZkVA9m7pbs8Y+P4eM+
+         CZYA==
+X-Forwarded-Encrypted: i=1; AJvYcCVshxKJSfU13h5JUUnZCTBHqz+tOKlo7vhNr5h+rbfC97Z6THOFeLGDTHklJW5UpzD6qW2O8wtz2BN3mQM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzdKKY9bdYtc68VW0Pa+eshLg9a7/Q6ob61WCpwgzqQzuXZaVQd
+	j+lq5xQTSXXFCTCMccYlFC4oF2j3z5JKRj0nQ0SCd2NRIUdDYKVXjyGMXLHZ
+X-Google-Smtp-Source: AGHT+IEpoEpLj67ThlPqsHmDjG3KCBfKEuKbfliF+BLlqdxNPnA4pyYR7S0sCJZf+iyIgESqcBqfew==
+X-Received: by 2002:a17:903:943:b0:205:68a4:b2d8 with SMTP id d9443c01a7336-21103aaa063mr10535175ad.11.1730321906556;
+        Wed, 30 Oct 2024 13:58:26 -0700 (PDT)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057d8ae2sm114895ad.274.2024.10.30.13.58.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 13:58:26 -0700 (PDT)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Ido Schimmel <idosch@nvidia.com>,
+	Petr Machata <petrm@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2 net-next] net: mellanox: use ethtool string helpers
+Date: Wed, 30 Oct 2024 13:58:24 -0700
+Message-ID: <20241030205824.9061-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v11 08/23] ovpn: implement basic TX path (UDP)
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
- Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
- Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-8-de4698c73a25@openvpn.net> <ZyJpcbHJI5MqZHVB@hog>
-Content-Language: en-US
-From: Antonio Quartulli <antonio@openvpn.net>
-Autocrypt: addr=antonio@openvpn.net; keydata=
- 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
-Organization: OpenVPN Inc.
-In-Reply-To: <ZyJpcbHJI5MqZHVB@hog>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 30/10/2024 18:14, Sabrina Dubroca wrote:
-> 2024-10-29, 11:47:21 +0100, Antonio Quartulli wrote:
->> +static void ovpn_send(struct ovpn_struct *ovpn, struct sk_buff *skb,
->> +		      struct ovpn_peer *peer)
->> +{
->> +	struct sk_buff *curr, *next;
->> +
->> +	if (likely(!peer))
->> +		/* retrieve peer serving the destination IP of this packet */
->> +		peer = ovpn_peer_get_by_dst(ovpn, skb);
->> +	if (unlikely(!peer)) {
->> +		net_dbg_ratelimited("%s: no peer to send data to\n",
->> +				    ovpn->dev->name);
->> +		dev_core_stats_tx_dropped_inc(ovpn->dev);
->> +		goto drop;
->> +	}
->> +
->> +	/* this might be a GSO-segmented skb list: process each skb
->> +	 * independently
->> +	 */
->> +	skb_list_walk_safe(skb, curr, next)
-> 
-> nit (if you end up reposting): there should probably be some braces
-> around the (multi-line) loop body.
+These are the preferred way to copy ethtool strings.
 
-ACK
+Avoids incrementing pointers all over the place.
 
-> 
->> +		if (unlikely(!ovpn_encrypt_one(peer, curr))) {
->> +			dev_core_stats_tx_dropped_inc(ovpn->dev);
->> +			kfree_skb(curr);
->> +		}
-> 
->> +void ovpn_udp_send_skb(struct ovpn_struct *ovpn, struct ovpn_peer *peer,
->> +		       struct sk_buff *skb)
->> +{
-> [...]
->> +	/* crypto layer -> transport (UDP) */
->> +	pkt_len = skb->len;
->> +	ret = ovpn_udp_output(ovpn, bind, &peer->dst_cache, sock->sk, skb);
->> +
->> +out_unlock:
->> +	rcu_read_unlock();
->> +out:
->> +	if (unlikely(ret < 0)) {
->> +		dev_core_stats_tx_dropped_inc(ovpn->dev);
->> +		kfree_skb(skb);
->> +		return;
->> +	}
->> +
->> +	dev_sw_netstats_tx_add(ovpn->dev, 1, pkt_len);
-> 
-> If I'm following things correctly, that's already been counted:
-> 
-> ovpn_udp_output -> ovpn_udp4_output -> udp_tunnel_xmit_skb
->                                      -> iptunnel_xmit
->                                      -> iptunnel_xmit_stats
-> 
-> which does (on success) the same thing as dev_sw_netstats_tx_add. On
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: rebase to make it apply.
+ .../mellanox/mlxsw/spectrum_ethtool.c         | 83 +++++++------------
+ .../ethernet/mellanox/mlxsw/spectrum_ptp.c    |  7 +-
+ 2 files changed, 30 insertions(+), 60 deletions(-)
 
-Right. This means we can remove that call to tx_add().
-
-> failure it increments a different tx_dropped counter than what
-> dev_core_stats_tx_dropped_inc, but they should get summed in the end.
-
-It seems they are summed up in dev_get_tstats64(), therefore I should 
-remove the tx_dropped_inc() call to avoid double counting.
-
-Thanks!
-
-Cheers,
-
-> 
->> +}
-> 
-
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
+index 2bed8c86b7cf..5189af0da1f4 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ethtool.c
+@@ -607,84 +607,57 @@ static void mlxsw_sp_port_get_prio_strings(u8 **p, int prio)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < MLXSW_SP_PORT_HW_PRIO_STATS_LEN; i++) {
+-		snprintf(*p, ETH_GSTRING_LEN, "%.29s_%.1d",
+-			 mlxsw_sp_port_hw_prio_stats[i].str, prio);
+-		*p += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < MLXSW_SP_PORT_HW_PRIO_STATS_LEN; i++)
++		ethtool_sprintf(p, "%.29s_%.1d",
++				mlxsw_sp_port_hw_prio_stats[i].str, prio);
+ }
+ 
+ static void mlxsw_sp_port_get_tc_strings(u8 **p, int tc)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < MLXSW_SP_PORT_HW_TC_STATS_LEN; i++) {
+-		snprintf(*p, ETH_GSTRING_LEN, "%.28s_%d",
+-			 mlxsw_sp_port_hw_tc_stats[i].str, tc);
+-		*p += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < MLXSW_SP_PORT_HW_TC_STATS_LEN; i++)
++		ethtool_sprintf(p, "%.28s_%d", mlxsw_sp_port_hw_tc_stats[i].str,
++				tc);
+ }
+ 
+ static void mlxsw_sp_port_get_strings(struct net_device *dev,
+ 				      u32 stringset, u8 *data)
+ {
+ 	struct mlxsw_sp_port *mlxsw_sp_port = netdev_priv(dev);
+-	u8 *p = data;
+ 	int i;
+ 
+-	switch (stringset) {
+-	case ETH_SS_STATS:
+-		for (i = 0; i < MLXSW_SP_PORT_HW_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_hw_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
++	if (stringset != ETH_SS_STATS)
++		return;
+ 
+-		for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2863_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_hw_rfc_2863_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
++	for (i = 0; i < MLXSW_SP_PORT_HW_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_hw_stats[i].str);
+ 
+-		for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2819_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_hw_rfc_2819_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
++	for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2863_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_hw_rfc_2863_stats[i].str);
+ 
+-		for (i = 0; i < MLXSW_SP_PORT_HW_RFC_3635_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_hw_rfc_3635_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
++	for (i = 0; i < MLXSW_SP_PORT_HW_RFC_2819_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_hw_rfc_2819_stats[i].str);
+ 
+-		for (i = 0; i < MLXSW_SP_PORT_HW_EXT_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_hw_ext_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
++	for (i = 0; i < MLXSW_SP_PORT_HW_RFC_3635_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_hw_rfc_3635_stats[i].str);
+ 
+-		for (i = 0; i < MLXSW_SP_PORT_HW_DISCARD_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_hw_discard_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
++	for (i = 0; i < MLXSW_SP_PORT_HW_EXT_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_hw_ext_stats[i].str);
+ 
+-		for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
+-			mlxsw_sp_port_get_prio_strings(&p, i);
++	for (i = 0; i < MLXSW_SP_PORT_HW_DISCARD_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_hw_discard_stats[i].str);
+ 
+-		for (i = 0; i < TC_MAX_QUEUE; i++)
+-			mlxsw_sp_port_get_tc_strings(&p, i);
++	for (i = 0; i < IEEE_8021QAZ_MAX_TCS; i++)
++		mlxsw_sp_port_get_prio_strings(&data, i);
+ 
+-		mlxsw_sp_port->mlxsw_sp->ptp_ops->get_stats_strings(&p);
++	for (i = 0; i < TC_MAX_QUEUE; i++)
++		mlxsw_sp_port_get_tc_strings(&data, i);
+ 
+-		for (i = 0; i < MLXSW_SP_PORT_HW_TRANSCEIVER_STATS_LEN; i++) {
+-			memcpy(p, mlxsw_sp_port_transceiver_stats[i].str,
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
+-		}
+-		break;
+-	}
++	mlxsw_sp_port->mlxsw_sp->ptp_ops->get_stats_strings(&data);
++
++	for (i = 0; i < MLXSW_SP_PORT_HW_TRANSCEIVER_STATS_LEN; i++)
++		ethtool_puts(&data, mlxsw_sp_port_transceiver_stats[i].str);
+ }
+ 
+ static int mlxsw_sp_port_set_phys_id(struct net_device *dev,
+diff --git a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
+index 5b174cb95eb8..72e925558061 100644
+--- a/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
++++ b/drivers/net/ethernet/mellanox/mlxsw/spectrum_ptp.c
+@@ -1326,11 +1326,8 @@ void mlxsw_sp1_get_stats_strings(u8 **p)
+ {
+ 	int i;
+ 
+-	for (i = 0; i < MLXSW_SP_PTP_PORT_STATS_LEN; i++) {
+-		memcpy(*p, mlxsw_sp_ptp_port_stats[i].str,
+-		       ETH_GSTRING_LEN);
+-		*p += ETH_GSTRING_LEN;
+-	}
++	for (i = 0; i < MLXSW_SP_PTP_PORT_STATS_LEN; i++)
++		ethtool_puts(p, mlxsw_sp_ptp_port_stats[i].str);
+ }
+ 
+ void mlxsw_sp1_get_stats(struct mlxsw_sp_port *mlxsw_sp_port,
 -- 
-Antonio Quartulli
-OpenVPN Inc.
+2.47.0
 
 
