@@ -1,251 +1,211 @@
-Return-Path: <netdev+bounces-140550-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140551-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6849B6DF2
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:42:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5134F9B6E0A
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:48:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B8772819EF
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:42:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12141282EAE
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 20:48:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02EC8213136;
-	Wed, 30 Oct 2024 20:39:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66AAE213EF6;
+	Wed, 30 Oct 2024 20:47:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hItd5qp9"
+	dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b="CKw6Tttj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-ed1-f53.google.com (mail-ed1-f53.google.com [209.85.208.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 765B7205AC7
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 20:39:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBCAE1E0E00
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 20:47:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730320777; cv=none; b=tikR5b1ESj0zmsPoyaMkAlGn692JqGuUUZt43ojLBSr6ScuuwoGz6D/qIbQ7JP7Aaxg8idFm6ReE8bKaEVZ+HGnlwG5DfahKEOiuGKpAIqvyX1hU8xzYgwSz5so5sUamMx9XVgcl4L6eDUZw0EVufhMMzetruIB/xFUVNIf2apY=
+	t=1730321267; cv=none; b=VC7NEtDs3HofFgQ4cgzdBiME83ZQ7Eieh2jXd6sQxDOPZqGQdujvtww2TvrIMDS2jk8NTs01QPFMxjX+hpT81ZSXWnfEa2hxAvjiJFRkB9YKtHRZw69jFUhi1c7qsFcPvdMhrQpdvnPnwHR47Vb7NbOiPq+eBFbpuWJid5fUI70=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730320777; c=relaxed/simple;
-	bh=TxazTRsHHPQ610urISAHNKk7dOK31X6k7lxlztysTSg=;
-	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=S8/Jqv905jO4IPf5oU8MDvDu2AioJ0D2Pxylc0kQ8WKtvp/E8wxbRlSRSa9FjhsdkuC2SfJzsM5jRlJrqxos7jqEe60+9M2ukONMpfepmev+lEFchun1WcsE0OoSAz5su6emE+GGjdQwKnN8ri9XZnFZGilSBHN6LzDargJ2HfU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hItd5qp9; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b14f3927ddso16236385a.3
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 13:39:35 -0700 (PDT)
+	s=arc-20240116; t=1730321267; c=relaxed/simple;
+	bh=xkBOU8HHDGawwUeVGiByYGBX9nhBdgs4ZZYBKpJzD74=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Mcn7F+lxxAtP9/0zp7Dx8A3/mSvIN4JsK31e+6AK3aikIvuQY2i1fXY7y30mYxVKqVKdHJ+HEZwyYhudMF4KkT1Ih9NgBFTWG8Mp5fx/FHUhdhvfhWqYV5t5iz+AR2Uq94V9pcRD0Ybrs6q9vFu5RkLMUwi8uf90m6gGYC+dOrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net; spf=pass smtp.mailfrom=openvpn.com; dkim=pass (2048-bit key) header.d=openvpn.net header.i=@openvpn.net header.b=CKw6Tttj; arc=none smtp.client-ip=209.85.208.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=openvpn.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=openvpn.com
+Received: by mail-ed1-f53.google.com with SMTP id 4fb4d7f45d1cf-5cb15b84544so363881a12.2
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 13:47:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730320774; x=1730925574; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=rE/QfYn16jnRJDVP8Nela8ifJJQ5nLJ6NC2S82ORqmU=;
-        b=hItd5qp9oNUyd2x5uwtfu0twfyGRqM4k0PqR/O754trZzPvsylqbzTiZm91E2lwYMM
-         LleA+kjFvhWNGtEsZ32u4cltuNNVT6Y4FiEk3f2DPQdnj+IC/RgT0xrDuJS/D/mEPEDH
-         Rni33ZMhB0Xiq0qIhHhPgbiHPOWnLpvagCamM=
+        d=openvpn.net; s=google; t=1730321263; x=1730926063; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=7yaQxQU296jO/yOWyNz6bvN9BIinpfVhB4oWU13Tm/g=;
+        b=CKw6Tttj/Pvq+eaAWujnKWEs37u4b4B9FfzoAvlexNdankLmc8kuR4l4DAZ+J0PgeG
+         rBSUxlMCWR3ZF8MxvwjTGi6tXLyLybQFi7vYI6owZbQzeir7+gtL9iRN6edQqZaks3XY
+         Jg6dGe57+wMIZfgD5uFnWTNvt9PySQTfbJQTagnB1Dnrao7qK9/7x3I5MPyKDeAAz5Nd
+         1e+Yj5LkdTNRkD+VlOCgbC62pc6Prza1/sE+ntlWSJiyR+eEH095wjq5MO/BYmwESQbm
+         N1p02x6ONZYSRQERIivzlJHm7HXiPDvY0wt9/arVYd2P80WUU5G/bHItB/dqY3sF8Idd
+         TpBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730320774; x=1730925574;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:date:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rE/QfYn16jnRJDVP8Nela8ifJJQ5nLJ6NC2S82ORqmU=;
-        b=WUInvuCZTf2ZBARu4hEJQ7lJK3irT5LeMjLeCkRTErv0HZdMVDgIFhjiLGHyNHpe+D
-         0wjZu3WQZfJrRn6z6X0yhIDVoGwbSi4pKtS+hvkKJpmuSnjjM6QoXasQr5WSek+ASr3Z
-         ug8dlaOoeN3pQtTLNeDmeMWtJMiRhh9jfiB4eJOpLAUYJ00847SBFtYDAOc2HEIgP+kS
-         rqst4OWYztGhXZ7fGoGZnejY3r1Epf+qt8+iVrxPDDpzMsynlm2Dp5zLeqWNCWGyH+tA
-         NmFwFCNjMbtRF7pNAgDZjC6WFCT7ZMoPkRIm6P5pDfQo8XdXi2YO/xEPgYykmq9TL1c8
-         IeuA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9S5e8yheCmOhn+HKkmPKGVpg6JOpc7tEJwXj+vC5ZlC78LZHPSQZJpMK/LsfGUFFwE1T7NjM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWLVcS5Z4s/eDThwfhpE8eEYi3/VUQ4Z2IFsZEBGDnZ1oZjE1S
-	O8juZ/FyF5D9xRdf6pLWucYtAc05JhKm6UklJXuiqLzFhnB7cVFs5Vxo+Rj4Mg==
-X-Google-Smtp-Source: AGHT+IEyXvDMgjCJpXlH30SpQ30IvVpafb5ds6H7r+JkBg2Lgh1IfpfIZJ5RUlFH7s36Cb5OruHphQ==
-X-Received: by 2002:a05:620a:24d3:b0:7b1:1a1e:3013 with SMTP id af79cd13be357-7b193ed6f69mr2357095385a.8.1730320774215;
-        Wed, 30 Oct 2024 13:39:34 -0700 (PDT)
-Received: from JRM7P7Q02P.dhcp.broadcom.net ([192.19.144.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b2f39e992esm2906285a.25.2024.10.30.13.39.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 13:39:33 -0700 (PDT)
-From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
-X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
-Date: Wed, 30 Oct 2024 16:39:23 -0400
-To: Taehee Yoo <ap420073@gmail.com>
-Cc: Michael Chan <michael.chan@broadcom.com>,
-	Andy Gospodarek <andrew.gospodarek@broadcom.com>,
-	davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
-	edumazet@google.com, almasrymina@google.com,
-	donald.hunter@gmail.com, corbet@lwn.net, andrew+netdev@lunn.ch,
-	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org,
-	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk,
-	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com,
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org,
-	kory.maincent@bootlin.com, maxime.chevallier@bootlin.com,
-	danieller@nvidia.com, hengqi@linux.alibaba.com,
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com,
-	hkallweit1@gmail.com, ahmed.zaki@intel.com, rrameshbabu@nvidia.com,
-	idosch@nvidia.com, jiri@resnulli.us, bigeasy@linutronix.de,
-	lorenzo@kernel.org, jdamato@fastly.com,
-	aleksander.lobakin@intel.com, kaiyuanz@google.com,
-	willemb@google.com, daniel.zahka@gmail.com
-Subject: Re: [PATCH net-next v4 2/8] bnxt_en: add support for tcp-data-split
- ethtool command
-Message-ID: <ZyKZe9a20cQwEhFd@JRM7P7Q02P.dhcp.broadcom.net>
-References: <20241022162359.2713094-1-ap420073@gmail.com>
- <20241022162359.2713094-3-ap420073@gmail.com>
- <CACKFLikBKi2jBNG6_O1uFUmMwfBC30ef5AG4ACjVv_K=vv38PA@mail.gmail.com>
- <ZxvwZmJsdFOStYcV@JRM7P7Q02P.dhcp.broadcom.net>
- <CACKFLinbsMQE1jb0G-7iMKAo4ZMKp42xiSCZ0XznBV9pDAs3-g@mail.gmail.com>
- <CAMArcTWrA0ib9XHnSGGH-sNqQ9TG0BaRq+5nsGC3iQv6Zd40rQ@mail.gmail.com>
+        d=1e100.net; s=20230601; t=1730321263; x=1730926063;
+        h=content-transfer-encoding:in-reply-to:organization:autocrypt:from
+         :content-language:references:cc:to:subject:user-agent:mime-version
+         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7yaQxQU296jO/yOWyNz6bvN9BIinpfVhB4oWU13Tm/g=;
+        b=P+XmFUAIoFvTjGHdZoA+4wPSF2QmfpWpwEaKVbV7qT+DlJv/nf1NQeg9atPuywsmlE
+         j7QyADqDtOUrZrGLOTniMReYB8JGg+34WSiEpuPztMSXWYfRt8Yas08S9TtrYMgZXGNa
+         sZBaVmWsN5Ndv6eeUIGOcgKd7+rRqK72AxETQEDbLTtORqkaRAN1RLWbCs0SXfZMej2+
+         jdmo8n8FQK/oqaRTreE4AMXiE7DSp1vNEojuENUUtTLH0FHDkKR5ysdHYEmRgzBJ7LO3
+         bCts0O9oZrvKD6GBUgmLXgz6Jkt63zRS3tX7h6azixU4HqbrkxpZ8oIRwPpKO+z/eR5X
+         NIPQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXZpOfopR2uwgNA3HuQ1z7eqUOo4cJE50Nu1m0k3cj2E92W5N/unwzXjsBRAAX5K4mces7eHZU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxJ1d01Up8jvmxB44/6dQMPH2mGVeZOvguZZfxZzMRLxchZolfD
+	pKUXTAmyhPlk/mRmdgmT1FfydAhpS4OYLzhYdq86xpT5tFXhaMLCVBU7rLX3GYo=
+X-Google-Smtp-Source: AGHT+IEaeIfdsTwQV/5YgiGiSHgxyvx8PBYajDN9ioX9CQNqCDd7hL8eLzUt24j7ymojbMYas7Ka7A==
+X-Received: by 2002:a05:6402:3584:b0:5cb:6709:3cd7 with SMTP id 4fb4d7f45d1cf-5cbbf872064mr11499479a12.4.1730321262993;
+        Wed, 30 Oct 2024 13:47:42 -0700 (PDT)
+Received: from ?IPV6:2001:67c:2fbc:1:3ca3:4955:91d7:e8e1? ([2001:67c:2fbc:1:3ca3:4955:91d7:e8e1])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb63487fcsm4966653a12.91.2024.10.30.13.47.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 30 Oct 2024 13:47:42 -0700 (PDT)
+Message-ID: <4df15a91-4bcb-49d8-be78-28c71036ba8a@openvpn.net>
+Date: Wed, 30 Oct 2024 21:47:58 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAMArcTWrA0ib9XHnSGGH-sNqQ9TG0BaRq+5nsGC3iQv6Zd40rQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
+To: Sabrina Dubroca <sd@queasysnail.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+ Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net> <ZyJgs6Vrvzji8qvS@hog>
+Content-Language: en-US
+From: Antonio Quartulli <antonio@openvpn.net>
+Autocrypt: addr=antonio@openvpn.net; keydata=
+ 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
+Organization: OpenVPN Inc.
+In-Reply-To: <ZyJgs6Vrvzji8qvS@hog>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Sat, Oct 26, 2024 at 02:11:15PM +0900, Taehee Yoo wrote:
-> On Sat, Oct 26, 2024 at 7:00 AM Michael Chan <michael.chan@broadcom.com> wrote:
-> >
-> > On Fri, Oct 25, 2024 at 12:24 PM Andy Gospodarek
-> > <andrew.gospodarek@broadcom.com> wrote:
+On 30/10/2024 17:37, Sabrina Dubroca wrote:
+> 2024-10-29, 11:47:19 +0100, Antonio Quartulli wrote:
+>> +static void ovpn_peer_release(struct ovpn_peer *peer)
+>> +{
+>> +	ovpn_bind_reset(peer, NULL);
+>> +
+>> +	dst_cache_destroy(&peer->dst_cache);
 > 
-> Hi Andy,
-> Thank you so much for your review!
+> Is it safe to destroy the cache at this time? In the same function, we
+> use rcu to free the peer, but AFAICT the dst_cache will be freed
+> immediately:
 > 
-> > >
-> > > On Thu, Oct 24, 2024 at 10:02:30PM -0700, Michael Chan wrote:
-> > > > On Tue, Oct 22, 2024 at 9:24 AM Taehee Yoo <ap420073@gmail.com> wrote:
-> > > > >
-> > > > > NICs that uses bnxt_en driver supports tcp-data-split feature by the
-> > > > > name of HDS(header-data-split).
-> > > > > But there is no implementation for the HDS to enable or disable by
-> > > > > ethtool.
-> > > > > Only getting the current HDS status is implemented and The HDS is just
-> > > > > automatically enabled only when either LRO, HW-GRO, or JUMBO is enabled.
-> > > > > The hds_threshold follows rx-copybreak value. and it was unchangeable.
-> > > > >
-> > > > > This implements `ethtool -G <interface name> tcp-data-split <value>`
-> > > > > command option.
-> > > > > The value can be <on>, <off>, and <auto> but the <auto> will be
-> > > > > automatically changed to <on>.
-> > > > >
-> > > > > HDS feature relies on the aggregation ring.
-> > > > > So, if HDS is enabled, the bnxt_en driver initializes the aggregation
-> > > > > ring.
-> > > > > This is the reason why BNXT_FLAG_AGG_RINGS contains HDS condition.
-> > > > >
-> > > > > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> > > > > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > > > > ---
-> > > > >
-> > > > > v4:
-> > > > >  - Do not support disable tcp-data-split.
-> > > > >  - Add Test tag from Stanislav.
-> > > > >
-> > > > > v3:
-> > > > >  - No changes.
-> > > > >
-> > > > > v2:
-> > > > >  - Do not set hds_threshold to 0.
-> > > > >
-> > > > >  drivers/net/ethernet/broadcom/bnxt/bnxt.c         |  8 +++-----
-> > > > >  drivers/net/ethernet/broadcom/bnxt/bnxt.h         |  5 +++--
-> > > > >  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 13 +++++++++++++
-> > > > >  3 files changed, 19 insertions(+), 7 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > > > index 0f5fe9ba691d..91ea42ff9b17 100644
-> > > > > --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > > > +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-> > > >
-> > > > > @@ -6420,15 +6420,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
-> > > > >
-> > > > >         req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
-> > > > >         req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
-> > > > > +       req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
-> > > > >
-> > > > > -       if (BNXT_RX_PAGE_MODE(bp)) {
-> > > > > -               req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
-> > > >
-> > > > Please explain why this "if" condition is removed.
-> > > > BNXT_RX_PAGE_MODE() means that we are in XDP mode and we currently
-> > > > don't support HDS in XDP mode.  Added Andy Gospo to CC so he can also
-> > > > comment.
-> > > >
-> > >
-> > > In bnxt_set_rx_skb_mode we set BNXT_FLAG_RX_PAGE_MODE and clear
-> > > BNXT_FLAG_AGG_RINGS
-> >
-> > The BNXT_FLAG_AGG_RINGS flag is true if the JUMBO, GRO, or LRO flag is
-> > set.  So even though it is initially cleared in
-> > bnxt_set_rx_skb_mode(), we'll set the JUMBO flag if we are in
-> > multi-buffer XDP mode.  Again, we don't enable HDS in any XDP mode so
-> > I think we need to keep the original logic here to skip setting the
-> > HDS threshold if BNXT_FLAG_RX_PAGE_MODE is set.
+> void dst_cache_destroy(struct dst_cache *dst_cache)
+> {
+> [...]
+> 	free_percpu(dst_cache->cache);
+> }
 > 
-> I thought the HDS is disallowed only when single-buffer XDP is set.
-> By this series, Core API disallows tcp-data-split only when
-> single-buffer XDP is set, but it allows tcp-data-split to set when
-> multi-buffer XDP is set.
+> (probably no real issue because ovpn_udp_send_skb gets called while we
+> hold a reference to the peer?)
 
-So you are saying that a user could set copybreak with ethtool (included
-in patch 1) and when a multibuffer XDP program is attached to an
-interface with an MTU of 9k, only the header will be in the first page
-and all the TCP data will be in the pages that follow?
+Right.
+That was my assumption: release happens on refcnt = 0 only, therefore no 
+field should be in use anymore.
+Anything that may still be in use will have its own refcounter.
 
-> +       if (kernel_ringparam.tcp_data_split == ETHTOOL_TCP_DATA_SPLIT_ENABLED &&
-> +           dev_xdp_sb_prog_count(dev)) {
-> +               NL_SET_ERR_MSG(info->extack,
-> +                              "tcp-data-split can not be enabled with
-> single buffer XDP");
-> +               return -EINVAL;
-> +       }
 > 
-> I think other drivers would allow tcp-data-split on multi buffer XDP,
-> so I wouldn't like to remove this condition check code.
+>> +	netdev_put(peer->ovpn->dev, &peer->ovpn->dev_tracker);
+>> +	kfree_rcu(peer, rcu);
+>> +}
+> 
+> 
+> [...]
+>> +static int ovpn_peer_del_p2p(struct ovpn_peer *peer,
+>> +			     enum ovpn_del_peer_reason reason)
+>> +	__must_hold(&peer->ovpn->lock)
+>> +{
+>> +	struct ovpn_peer *tmp;
+>> +
+>> +	tmp = rcu_dereference_protected(peer->ovpn->peer,
+>> +					lockdep_is_held(&peer->ovpn->lock));
+>> +	if (tmp != peer) {
+>> +		DEBUG_NET_WARN_ON_ONCE(1);
+>> +		if (tmp)
+>> +			ovpn_peer_put(tmp);
+> 
+> Does peer->ovpn->peer need to be set to NULL here as well? Or is it
+> going to survive this _put?
+
+First of all consider that this is truly something that we don't expect 
+to happen (hence the WARN_ON).
+If this is happening it's because we are trying to delete a peer that is 
+not the one we are connected to (unexplainable scenario in p2p mode).
+
+Still, should we hit this case (I truly can't see how), I'd say "leave 
+everything as is - maybe this call was just a mistake".
+
+Cheers,
+
+> 
+>> +
+>> +		return -ENOENT;
+>> +	}
+>> +
+>> +	tmp->delete_reason = reason;
+>> +	RCU_INIT_POINTER(peer->ovpn->peer, NULL);
+>> +	ovpn_peer_put(tmp);
+>> +
+>> +	return 0;
+>> +}
 > 
 
-I have no problem keeping that logic in the core kernel.  I'm just
-asking you to please preserve the existing logic since it is
-functionally equivalent and easier to read/compare to other spots where
-XDP single-buffer mode is used.
+-- 
+Antonio Quartulli
+OpenVPN Inc.
 
-> I will not set HDS if XDP is set in the bnxt_hwrm_vnic_set_hds()
-> In addition, I think we need to add a condition to check XDP is set in
-> bnxt_set_ringparam().
-> 
-> >
-> > > , so this should work.  The only issue is that we
-> > > have spots in the driver where we check BNXT_RX_PAGE_MODE(bp) to
-> > > indicate that XDP single-buffer mode is enabled on the device.
-> > >
-> > > If you need to respin this series I would prefer that the change is like
-> > > below to key off the page mode being disabled and BNXT_FLAG_AGG_RINGS
-> > > being enabled to setup HDS.  This will serve as a reminder that this is
-> > > for XDP.
-> > >
-> > > @@ -6418,15 +6418,13 @@ static int bnxt_hwrm_vnic_set_hds(struct bnxt *bp, struct bnxt_vnic_info *vnic)
-> > >
-> > >         req->flags = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_JUMBO_PLACEMENT);
-> > >         req->enables = cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_JUMBO_THRESH_VALID);
-> > > +       req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
-> > >
-> > > -       if (BNXT_RX_PAGE_MODE(bp)) {
-> > > -               req->jumbo_thresh = cpu_to_le16(bp->rx_buf_use_size);
-> > > -       } else {
-> > > +       if (!BNXT_RX_PAGE_MODE(bp) && (bp->flags & BNXT_FLAG_AGG_RINGS)) {
-> > >                 req->flags |= cpu_to_le32(VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV4 |
-> > >                                           VNIC_PLCMODES_CFG_REQ_FLAGS_HDS_IPV6);
-> > >                 req->enables |=
-> > >                         cpu_to_le32(VNIC_PLCMODES_CFG_REQ_ENABLES_HDS_THRESHOLD_VALID);
-> > > -               req->jumbo_thresh = cpu_to_le16(bp->rx_copy_thresh);
-> > >                 req->hds_threshold = cpu_to_le16(bp->rx_copy_thresh);
-> > >         }
-> > >         req->vnic_id = cpu_to_le32(vnic->fw_vnic_id);
-> > >
-> 
-> Thanks a lot!
-> Taehee Yoo
 
