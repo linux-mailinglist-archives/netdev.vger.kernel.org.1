@@ -1,272 +1,136 @@
-Return-Path: <netdev+bounces-140327-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140328-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81FA09B5FB8
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:08:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B53479B5FCD
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:13:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03AAB1F21BBA
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:08:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75C97284774
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:13:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807B81E231C;
-	Wed, 30 Oct 2024 10:08:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b="hfL46OIM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0821E260D;
+	Wed, 30 Oct 2024 10:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CB43194151;
-	Wed, 30 Oct 2024 10:08:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.134.164.83
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D3B41E25F0
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 10:13:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730282931; cv=none; b=HmOJq1NJW3IPmm+UEiCB5/VM0MnV0ffV7EQk6933aiGCyaFcdbWTJpo0bz0XIeynggn8VOXj0vP+syYpNgaBcCfvjVJIJzNufkfPr1N/mkgsrXsfPpJ+nSjNVWy2QguIU+NFawZN2Xpue43+DQWqjp3gS6THqi+uwTrZKP25mz8=
+	t=1730283213; cv=none; b=F683GAvBR1y5X9d9Zx5bAEmeOENfbWs7OBUSg3AFJDzGYKwEFPEBEpCMzP6zBH5mOVfKXjw7hiQqybE9FAoHUDMvgqxP0msG+qS0LaTnKcIn07Vp1xj4emH+5QL9GusFJxv8KsUbK0lVAVZRWWNTJgznWGRr8TRk7dT5CP/UqYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730282931; c=relaxed/simple;
-	bh=GJjkKtJLGg2c+fpkv6w0zC/tfBrQdQJ3rxaYasuqh38=;
-	h=Date:From:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=FhEI6MdN1PkS1QWuP62/gwpH8D431buAGZVUjnP4mGrN0zWLS8DrI/76Pwvy1z6FHjSVHFUXE/IbmP0yKRNdNdXwocbQry2piMIuJOO6tjAYnsS2QvOeofTcbIwIHEctUVxsSg/5PsizxTWWXybVwG3/e7j7V4EPnn6gbwAWKd4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr; spf=pass smtp.mailfrom=inria.fr; dkim=pass (1024-bit key) header.d=inria.fr header.i=@inria.fr header.b=hfL46OIM; arc=none smtp.client-ip=192.134.164.83
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=inria.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inria.fr
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=date:from:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=aoyqYRRkHEEL8sSP+v1UFQCenPsx/7LS5sbiYM0jCV0=;
-  b=hfL46OIM18PcKRsLAxYyS/WxSYD8Ro3TW3AC0/4WXC5MaBxvvy+xN3hB
-   XXKqxYjLwiNlpZgkf+JWhmsYWK7BgcT/4K8e7Q9O+WPv8+wVPmJnMqayd
-   2CiTPAnV5k+TOXBKKvU4T9jqFrdIeEZWEX8LNSQ8d/SXcNL9gx/rvEpSo
-   8=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=julia.lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.11,244,1725314400"; 
-   d="scan'208";a="191419412"
-Received: from 089-101-193071.ntlworld.ie (HELO hadrien) ([89.101.193.71])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 11:08:44 +0100
-Date: Wed, 30 Oct 2024 10:08:43 +0000 (GMT)
-From: Julia Lawall <julia.lawall@inria.fr>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-cc: R Sundar <prosunofficial@gmail.com>, 
-    Tony Nguyen <anthony.l.nguyen@intel.com>, intel-wired-lan@lists.osuosl.org, 
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-    karol.kolacinski@intel.com, arkadiusz.kubalewski@intel.com, 
-    jacob.e.keller@intel.com, kernel test robot <lkp@intel.com>, 
-    Julia Lawall <julia.lawall@inria.fr>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-    davem@davemloft.net, Eric Dumazet <edumazet@google.com>, 
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-    Richard Cochran <richardcochran@gmail.com>
-Subject: Re: [PATCH linux-next] ice: use string choice helpers
-In-Reply-To: <ca4f7990-16c4-42ef-b0ae-12e64a100f5e@intel.com>
-Message-ID: <498a3d58-55e0-4349-bd92-8ce16c6016@inria.fr>
-References: <20241027141907.503946-1-prosunofficial@gmail.com> <ca4f7990-16c4-42ef-b0ae-12e64a100f5e@intel.com>
+	s=arc-20240116; t=1730283213; c=relaxed/simple;
+	bh=d5UJW7t9fo/lwYCkIPNEd46l8GiWAIsHzZ3+8jA04tU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LLuCuSsCzWTGpJvl87J8x+4vy/I+/snE0MnzvGMMRMk018Tcjh6Y0T6OAVDEDw0NHBoMWtjBH54O/RrnsQmX+QpqxW917p81lhDwvVjbivylhNhzNdt6DEbARyigFax6jJyVpBooj+ji7FAPjLLWTU7GMT7qaaIaYSmAZ5ftxCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t65h1-0001bM-Mj; Wed, 30 Oct 2024 11:12:47 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t65gx-001B9S-3A;
+	Wed, 30 Oct 2024 11:12:44 +0100
+Received: from pengutronix.de (pd9e595f8.dip0.t-ipconnect.de [217.229.149.248])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 837433622F0;
+	Wed, 30 Oct 2024 10:12:43 +0000 (UTC)
+Date: Wed, 30 Oct 2024 11:12:43 +0100
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Ming Yu <a0282524688@gmail.com>
+Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
+	brgl@bgdev.pl, andi.shyti@kernel.org, mailhol.vincent@wanadoo.fr, 
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, wim@linux-watchdog.org, linux@roeck-us.net, jdelvare@suse.com, 
+	jic23@kernel.org, lars@metafoo.de, ukleinek@kernel.org, 
+	alexandre.belloni@bootlin.com, linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, linux-iio@vger.kernel.org, 
+	linux-pwm@vger.kernel.org, linux-rtc@vger.kernel.org
+Subject: Re: [PATCH v1 0/9] Add Nuvoton NCT6694 MFD devices
+Message-ID: <20241030-industrious-sidewinder-of-strength-efbe4a-mkl@pengutronix.de>
+References: <20241024085922.133071-1-tmyu0@nuvoton.com>
+ <20241024-eminent-dancing-narwhal-8f25dd-mkl@pengutronix.de>
+ <CAOoeyxV4K=jR+tofeQtsMB7+smuu+Ghas5Tqfx4JvhuVK8dXrA@mail.gmail.com>
+ <20241025-modest-hasty-angelfish-1e9193-mkl@pengutronix.de>
+ <CAOoeyxU9VwsM=mRZy5AtjH=V3iSGQxkKw18qL+yeUxkh1OVHgQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="frl5xcswfbpqjn4v"
+Content-Disposition: inline
+In-Reply-To: <CAOoeyxU9VwsM=mRZy5AtjH=V3iSGQxkKw18qL+yeUxkh1OVHgQ@mail.gmail.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
 
+--frl5xcswfbpqjn4v
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH v1 0/9] Add Nuvoton NCT6694 MFD devices
+MIME-Version: 1.0
 
-On Mon, 28 Oct 2024, Przemek Kitszel wrote:
+On 30.10.2024 16:30:37, Ming Yu wrote:
+> I am trying to register interrupt controller for the MFD deivce.
+> I need to queue work to call handle_nested_irq() in the callback
+> of the interrupt pipe, right?
 
-> On 10/27/24 15:19, R Sundar wrote:
-> > Use string choice helpers for better readability.
-> >
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Reported-by: Julia Lawall <julia.lawall@inria.fr>
-> > Closes: https://lore.kernel.org/r/202410121553.SRNFzc2M-lkp@intel.com/
-> > Signed-off-by: R Sundar <prosunofficial@gmail.com>
-> > ---
->
-> thanks, this indeed covers all "enabled/disabled" cases, so:
-> Acked-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
->
-> for future submissions for Intel Ethernet drivers please use the
-> iwl-next (or iwl-net) target trees.
->
-> There are also other cases that we could cover ON/OFF etc
+I think you can directly demux the IRQ from the interrupt endpoint
+callback. But handle_nested_irq() only works from threaded IRQ context,
+so you have to use something like generic_handle_domain_irq_safe().
 
-I counted the number of occurrences of various cases.  Here are the
-results for at least 5 occurrences.  I converted everything to lowercase
-and put the two strings in alphabetical order.
+Have a look for how to setup the IRQ domain:
 
-julia
+| drivers/net/usb/lan78xx.c
+| drivers/net/usb/smsc95xx.c
 
-" " "\n   ": 5
-" (full)" "": 5
-" (last)" "": 5
-" csc" "": 5
-" recoverable" "": 5
-"" ".5": 5
-"" "1": 5
-"" ":" systemlow: 5
-"" "\"": 5
-"" "_backup": 5
-"" "auto-": 5
-"" "non": 5
-"" "t": 5
-"" # x " ": 5
-"->" "<-": 5
-"070701" "070702": 5
-"2.4g" "5g": 5
-"2g" dpk->bp[path][kidx].band == 1 ? "5g" : "6g": 5
-"80m" dpk->bp[path][kidx].bw == rtw89_channel_width_40 ? "40m" : "20m": 5
-"aborted" "completed": 5
-"active" "disabled": 5
-"anode" "sectors": 5
-"assert" "deassert": 5
-"attach" "detach": 5
-"basic rate" "edr rate": 5
-"bulk" "isoc": 5
-"client" "server": 5
-"closed" "open": 5
-"correctable" "uncorrectable": 5
-"dedicated" "shared": 5
-"fcp" "nvme": 5
-"fixed" "roll": 5
-"full duplex" "half duplex": 5
-"full" "high": 5
-"gsi" "smi": 5
-"hit" "not hit": 5
-"ht20" "ht40": 5
-"init" "rt": 5
-"ips off" "ips on": 5
-"lps off" "lps on": 5
-"mc" "uc": 5
-"migration" "recovery": 5
-"none" "tx": 5
-"off!!" "on!!": 5
-"pause" "resume": 5
-"rf_1t1r" "rf_2t2r": 5
-"running" "stopped": 5
-"set" "unset": 5
-"veb" "vepa": 5
-kern_emerg kern_info: 5
-" " "\n": 6
-" -- kernel too old?" "": 6
-" and " "": 6
-" flr" "": 6
-" iaa" "": 6
-" int" "": 6
-" pcd" "": 6
-" periodic" "": 6
-" x4" "": 6
-"" ")": 6
-"" "*not* ": 6
-"" ", ibss": 6
-"" ".": 6
-"" ":": 6
-"" "_flip": 6
-"" "amps, ": 6
-"" "i": 6
-"" "no": 6
-"" "pkgpwrl1, ": 6
-"" "pkgpwrl2, ": 6
-"" "prochot, ": 6
-"" "thermstatus, ": 6
-"" "vr-therm, ": 6
-"(not available)" "(success)": 6
-"1" "2": 6
-"20m" "40m": 6
-"32" "64": 6
-"???" "dma write": 6
-"active/passive" "passive only": 6
-"analog" "digital": 6
-"aura" "pool": 6
-"beacon" "probe response": 6
-"c-vlan" "vlan": 6
-"cancelled" "initiated": 6
-"capture" "playback": 6
-"cc1" "cc2": 6
-"decoder" "encoder": 6
-"downlink" "uplink": 6
-"exmode" "prmode": 6
-"found" "lost": 6
-"gdt" "ldt": 6
-"get" "set": 6
-"group" "user": 6
-"host" "peripheral": 6
-"ipv4" "ipv6": 6
-"is" "not": 6
-"kill" "on": 6
-"ns" "us": 6
-"reading" "writing": 6
-"recv" "send": 6
-" ..." "": 7
-" overflow" "": 7
-" suspend" "": 7
-"" ", nowayout": 7
-"" "...": 7
-"" "c": 7
-"" (#x " "): 7
-"" column_sep: 7
-"active" "idle": 7
-"add" "del": 7
-"add" "remove": 7
-"autodetected" "insmod option": 7
-"capture" "output": 7
-"ce" "ue": 7
-"dual" "single": 7
-"enter" "exit": 7
-"fail:" "pass:": 7
-"gate" "ungate": 7
-"intx" "msi": 7
-"private" "shared": 7
-"read error" "write error": 7
-"read from" "write to": 7
-"ro" "rw": 7
-kern_debug kern_err: 7
-" async" "": 8
-" fatal" "": 8
-" sof" "": 8
-" x16" "": 8
-"" "a": 8
-"" "b": 8
-"10" "100": 8
-"40m" "80m": 8
-"active" "passive": 8
-"bypass" "ram b": 8
-"connected" "disconnected": 8
-"dcs" "generic": 8
-"done" "failed": 8
-"dst" "src": 8
-"entering" "leaving": 8
-"failed" "ok": 8
-"failed" "pass": 8
-"fast" "slow": 8
-"hard" "soft": 8
-"invalid" "valid": 8
-"kernel" "user": 8
-"local" "remote": 8
-"primary" "secondary": 8
-"ram" "unknown": 8
-"restart" "start": 8
-"runtime" "system": 8
-" err" "": 9
-"" "-": 9
-"" "/s": 9
-"" ": ": 9
-"" "[": 9
-"" "]": 9
-"" "d": 9
-"2.4" "5.2": 9
-"absent" "present": 9
-"fail" "pass": 9
-"locked" "unlocked": 9
-"offline" "online": 9
-"r" "w": 9
-"struct" "union": 9
-"failed" "success": 53
-"" "un": 55
-"down" "up": 56
-"high" "low": 57
-"" "s": 65
-"full" "half": 84
-"" ",": 86
-"not supported" "supported": 91
-"" "not ": 96
+But the IRQ demux in the lan78xx only handles the PHY IRQ. The ksz
+driver does proper IRQ demux:
+
+| net/dsa/microchip/ksz_common.c
+
+regards,
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--frl5xcswfbpqjn4v
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmciBpgACgkQKDiiPnot
+vG8nUQgAjlFmdH0l/1kIMmisd2Oil+MBaXTjGPuahpQda7WUz6pZi56UHxgat+ZF
+Hr/eYxOz73BjWGuXCp3FfL1Mqp5NY66h0ZYdjgItMGN/0Dic5naFg/RnfniUnSUE
+rPYn+MI4K/R/n+O7ZFzg6LTU5isPKsCfmJhD1M4WXpd/QRX7Jv5yo6qdtlfwYFM2
+sDX5CRR4iyfcdaM4kyF/JCfhlzYqDBEQG2tLdJfU8zlqm8SW+CNGLDs7uWOIguaA
+SINbHFo2E4UONkdEhDkgn4seDDr4ykSKfazN/YbvhimF3862GtEUbeK7R8l8SJN6
+r76RxQK4oMaCy7/ydWFpcaOqfWG4qA==
+=BTYV
+-----END PGP SIGNATURE-----
+
+--frl5xcswfbpqjn4v--
 
