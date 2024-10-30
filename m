@@ -1,97 +1,123 @@
-Return-Path: <netdev+bounces-140332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CABC49B6043
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:35:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8F3BD9B604A
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 11:36:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70DE11F21285
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:35:16 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3438DB2324D
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 10:36:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D91B81E260C;
-	Wed, 30 Oct 2024 10:35:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2E281E3779;
+	Wed, 30 Oct 2024 10:36:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="KBWd1fxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA6C729CE7;
-	Wed, 30 Oct 2024 10:35:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 207DE1E2016;
+	Wed, 30 Oct 2024 10:36:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730284511; cv=none; b=tqUPg8+MxHQZxzleBAB8q60odE5+x7KwkoGnCCv6R9vb7RT/fY3CZpym3D57ETncddKcVn74Mh0xROTdYJUFDqOZnInwnDutrYt8vAXsbXwQ9z/wknim8yZ53+uZTQHXlG7u8wFd36wYcD+6SpXz7eU37dck4UZXDZpartmkvGA=
+	t=1730284566; cv=none; b=Ob6OFkPfMoBhJDLLIiDFLJZ+yhZpdZveRVxG/IEyThe6WKoQESj3zusbF8JtmFEo5LeWmmb65iBlMz7c6uAZ1inmMFrnORsDcOHbExxvlHzd9x4c9JBXRWragDb55xxGcxcH46yAZVPc9qdtyEk+QHBSlIOZLIowYRCR7FNToXk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730284511; c=relaxed/simple;
-	bh=Dh/ygCMs9EkmyJgZCXuDVA/pwti7uq3qYxM6qQs6dmQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=c2zXFe5zS/gim6M6/54TqZ6ZQyLn9ASiDT4fwCmlAERqISYkD9SlMYoYH2ANtt7kfvCP5vd2ANPFdKSYUDNW2naMm4HGWLi0jPBU43XjlWk/ml6qRfHqHr4Jbi79IGT9gCA6I9xxkXbcVOyy7xo7Ql98BM5tZmNc9sNc/FvWsu0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5cb6ca2a776so8598662a12.0;
-        Wed, 30 Oct 2024 03:35:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730284508; x=1730889308;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GifnlPtN7NiyeZMSkjEx+dbPyN49ofS66QMTyEeTgtw=;
-        b=DvAljSiS9Z5O3Bv6yi++MA9IrkVyDIM3sEJpZV9xorATLgzja2I9LDS2kB12Vg4G5X
-         Pq31lbP8KxBfQJedgMfh0OeTG6nmNKqDk6ifvp0qQb3g1VYb8QZQllHrymCiZJuO8D4A
-         Nazyca3qnWAx+A1RTtaWzjddfq0UugAeLOnLSmJXwUjnhe1OQ4tf8dA2b+1lH5nx+rkQ
-         aVQXhHrBRTUYVahJa7kv+hToNFwrBG0A+cnlq1Zitcs4THn2P15qiucMJB/STrXfkVY4
-         L2ssDfGGy0GOqAM5G0JkNFEJl+bvunRJ7Y7AAlRh7XS65XIWLlXOYNNNV28rUqixqEn+
-         rkjA==
-X-Forwarded-Encrypted: i=1; AJvYcCV6nC3/6m1bo+HOeVvU8nui3tWD3hrgQOIa/bdHqb7s3NRdgpBdLHBEwKe00u7X3Ns0Iave0Dom8VG1UNA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxPJ+UDpdEJlJoRwK95x3QkTwqoGeL8yoeUTMmDo5oeFGbfxMpn
-	3L1rsuOLWsJkMdZT1FhND+9m5FBk67YxMOmQqt4JHJTyCOulEzU6
-X-Google-Smtp-Source: AGHT+IF71lZKKH1Wi7ha9ca6zPk452ASkUG+FwwI2pKLbi61y6FlJ0tkir1WgK+psYexHGdJGCQKxg==
-X-Received: by 2002:a05:6402:4403:b0:5c9:584d:17e2 with SMTP id 4fb4d7f45d1cf-5cd54a7718fmr1809727a12.3.1730284507741;
-        Wed, 30 Oct 2024 03:35:07 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb629f338sm4590147a12.35.2024.10.30.03.35.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 03:35:07 -0700 (PDT)
-Date: Wed, 30 Oct 2024 03:35:04 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Madalin Bucur <madalin.bucur@nxp.com>,
-	Ioana Ciornei <ioana.ciornei@nxp.com>,
-	Radu Bulie <radu-andrei.bulie@nxp.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Sean Anderson <sean.anderson@linux.dev>,
-	linux-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next 3/3] net: dpaa_eth: extract hash using __be32
- pointer in rx_default_dqrr()
-Message-ID: <20241030-lemon-flamingo-from-uranus-35f6db@leitao>
-References: <20241029164317.50182-1-vladimir.oltean@nxp.com>
- <20241029164317.50182-4-vladimir.oltean@nxp.com>
+	s=arc-20240116; t=1730284566; c=relaxed/simple;
+	bh=U+REpOqvLjENyA0XU1vPiQWu1XnEWzydVJhUPOOIkuU=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=clwg8QOdkJx9hJt1Prwi0JRwEwxnuan+zfKNM+U7ZXo2/h2+g7wUctDZ4zscfU2M14bKJLVcPDdkYNRjimZ8wiXJaLHnGCQqytHubywVU/3++5sZr8axf4zvJAsrGG6D1wgR9sJLZTgUOed5qxYdnc1x1mmjRi+aHeQZnM+5cPA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=KBWd1fxi; arc=none smtp.client-ip=60.244.123.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
+X-UUID: c009435c96aa11efb88477ffae1fc7a5-20241030
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=PMCqO+Kb6KUAaZnkRTfDMbBZG7qEWSk59mysfqC4sPA=;
+	b=KBWd1fxikSDUho47LLeCjSPvZrin22+5dJPBlNON2gd2JbbR6x1bY8uF1793FgAao5cRg/ViFcg1W3//s7lxJFFV7HgfDii4rof1gpZh/8gxUroNQuTUY2M7rgUokWucDHdhkS8Wwqs95eJq9gf3iypDl/bVtV//CpDN+88N4KY=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.42,REQID:d6ff2fb4-6340-4715-8a5c-4492f5968784,IP:0,U
+	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
+	release,TS:0
+X-CID-META: VersionHash:b0fcdc3,CLOUDID:4b054807-7990-429c-b1a0-768435f03014,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_ULS,TF_CID_SPAM_SNR
+X-UUID: c009435c96aa11efb88477ffae1fc7a5-20241030
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
+	(envelope-from <skylake.huang@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 1329595114; Wed, 30 Oct 2024 18:35:58 +0800
+Received: from mtkmbs11n1.mediatek.inc (172.21.101.185) by
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 30 Oct 2024 03:35:57 -0700
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n1.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 30 Oct 2024 18:35:56 +0800
+From: Sky Huang <SkyLake.Huang@mediatek.com>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
+	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
+	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, Simon
+ Horman <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
+	<linux-mediatek@lists.infradead.org>
+CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
+	<skylake.huang@mediatek.com>
+Subject: [PATCH net-next 0/5] Re-organize MediaTek ethernet phy drivers and propose mtk-phy-lib
+Date: Wed, 30 Oct 2024 18:35:49 +0800
+Message-ID: <20241030103554.29218-1-SkyLake.Huang@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029164317.50182-4-vladimir.oltean@nxp.com>
+Content-Type: text/plain
+X-MTK: N
 
-On Tue, Oct 29, 2024 at 06:43:17PM +0200, Vladimir Oltean wrote:
-> Sparse provides the following output:
-> 
-> warning: cast to restricted __be32
-> 
-> This is a harmless warning due to the fact that we dereference the hash
-> stored in the FD using an incorrect type annotation. Suppress the
-> warning by using the correct __be32 type instead of u32. No functional
-> change.
-> 
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
-Reviewed-by: Breno Leitao <leitao@debian.org>
+This patchset comes from patch 1/9, 3/9, 4/9, 5/9 and 7/9 of:
+https://lore.kernel.org/netdev/20241004102413.5838-1-SkyLake.Huang@mediatek.com/
+
+This patchset changes MediaTek's ethernet phy's folder structure and
+integrates helper functions, including LED & token ring manipulation,
+into mtk-phy-lib.
+
+SkyLake.Huang (5):
+  net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+  net: phy: mediatek: Move LED helper functions into mtk phy lib
+  net: phy: mediatek: Improve readability of mtk-phy-lib.c's
+    mtk_phy_led_hw_ctrl_set()
+  net: phy: mediatek: Integrate read/write page helper functions
+  net: phy: mediatek: add MT7530 & MT7531's PHY ID macros
+
+ MAINTAINERS                                   |   6 +-
+ drivers/net/phy/Kconfig                       |  17 +-
+ drivers/net/phy/Makefile                      |   3 +-
+ drivers/net/phy/mediatek/Kconfig              |  26 ++
+ drivers/net/phy/mediatek/Makefile             |   4 +
+ .../mtk-ge-soc.c}                             | 298 ++----------------
+ .../phy/{mediatek-ge.c => mediatek/mtk-ge.c}  |  31 +-
+ drivers/net/phy/mediatek/mtk-phy-lib.c        | 270 ++++++++++++++++
+ drivers/net/phy/mediatek/mtk.h                |  89 ++++++
+ 9 files changed, 437 insertions(+), 307 deletions(-)
+ create mode 100644 drivers/net/phy/mediatek/Kconfig
+ create mode 100644 drivers/net/phy/mediatek/Makefile
+ rename drivers/net/phy/{mediatek-ge-soc.c => mediatek/mtk-ge-soc.c} (83%)
+ rename drivers/net/phy/{mediatek-ge.c => mediatek/mtk-ge.c} (82%)
+ create mode 100644 drivers/net/phy/mediatek/mtk-phy-lib.c
+ create mode 100644 drivers/net/phy/mediatek/mtk.h
+
+-- 
+2.45.2
+
 
