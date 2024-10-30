@@ -1,164 +1,132 @@
-Return-Path: <netdev+bounces-140431-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140432-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59FAF9B66C2
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:01:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 379B29B66C8
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 16:01:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CB3A282624
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:01:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67BBA1C21371
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:01:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865D01F4712;
-	Wed, 30 Oct 2024 15:00:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Z2GBuIhe"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7497312D1FA;
+	Wed, 30 Oct 2024 15:01:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-vs1-f49.google.com (mail-vs1-f49.google.com [209.85.217.49])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D0F28C0B;
-	Wed, 30 Oct 2024 15:00:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.217.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B6ED26AD0;
+	Wed, 30 Oct 2024 15:01:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730300434; cv=none; b=AwgdCvMc5uQIHkxPQwNk9OaRsNnCWS4LWNMu9/dJxCawbb851G/ScqFOj01GAZ6vtji4bUWGlCeuk5UH0k6AwRsaKIsrH09JYJBbfv0rq9K3KSVHi9yWOwNAIQ0No25y3n1QSrSyKNm/xO0QG9HsJp1myUSyknXbeIcwEemNTms=
+	t=1730300489; cv=none; b=B/KnEuazEvYzeS2wpaG+2uFyfsbCq5aKyzHTbtqSBNeyATgXmpfmUJuRs7YikNIlHYcU2KwC2HepeU6bDidb0w3c8d++A16LvVB28VB3NBq++oHj6oTTfM/L7ZwCRc5sWGWyp0IytCmPDhX2NWuDBLNj73uBCobfI1ZVdvAz+yA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730300434; c=relaxed/simple;
-	bh=NSUsPKNIcxxIl25/ie9F75hAbipw9DFEqV26/g+9lQs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=kVBzWlgozVD1pev9ne9lM2eCCaKwLBghDe03CIIhURlrXXwBRwNYUsYKqXyPb5v0B0xisTn0PwDfBPL/AZcG0c9tFf9K27odWClTA6uHdNl72i7IsQW1z9qSjoDZOgZuaPmfdW2MgRD/QZawN6cCfaVRNRn4GMY5bCY/wv15t2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Z2GBuIhe; arc=none smtp.client-ip=209.85.217.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1730300489; c=relaxed/simple;
+	bh=s6cBiL9Hq0Q20TzyA2dVWFduhAA/rN8bWvy+wmTLmYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lu5TaWNLp0f9lS9XQjuvqI/mJitHx2vMueCnMPb9N7GerFFxjMJNXu4TjdFfJqQFyPB36Tw9BMCFj/8RWPx3foALgV+1g4UajeKcJyei3h2/EnC5tqST0hTOLb2lYe64emq78t8ChWCyKmbPL29jN5d4mtExSoV3XctmICtfMJw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-vs1-f49.google.com with SMTP id ada2fe7eead31-4a46d662fccso2250188137.2;
-        Wed, 30 Oct 2024 08:00:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730300431; x=1730905231; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rULvNichQesAS+BgmPl/sd0NpNj1EoASQ5iS96a/gGA=;
-        b=Z2GBuIheyDVyDXeput23V0l/PAlnOo1GwXjU9KN6EMnjaxtOCk52ZmUWUo6kY+WJuJ
-         Son+whZgToHjKX7D7hIWjs0mMzA9tu2Ye1Rbxz5elLRd1g/o3uPUr+VyNUe6hb+/QydR
-         6AB+SBl8zi5LE8GKdMHcRaYVycxE3EPLjZJvu91Vq8nTyybUY4Oat+SGQTAFJ+AHYvIx
-         cBaC4HlG0ZBjYsaDi1HjUABvWj421TCz98z3HJQGIAFMqXhTdvBvWwVQl6nrH7nVZEYO
-         VfsRRWe/GE/7ScBNhhSzFM9p0QgzV7JmBPQAjJY/tJbxcTKGtHr3Y3KNVtmq6bk4XvD2
-         GAsg==
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9a2209bd7fso1018207766b.2;
+        Wed, 30 Oct 2024 08:01:26 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730300431; x=1730905231;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rULvNichQesAS+BgmPl/sd0NpNj1EoASQ5iS96a/gGA=;
-        b=ji3td4l7aUYyoAECSEGf21AhBjMf5TISnHKpAixsiEAxeI2Jgt+KYpC2EtYLOytApl
-         O90G5vhErSTNi1ONDg82snJ2JwMVh9HXapcEcWt+Ssq7UvKMeUy8AD5aLREFhXZ7bsgD
-         Elnhnpri40+lrA74GmCyDhe/x3Ids4cjDCCOB6XZH1Tf6JLcgyoZcM6Sv72TxZCvqlBt
-         vKHtWp9a98NyBhaIOxpt14VRW8ojOt17hX+My0n0aPgHeyHHJPDaIoqip35ufrWiC4r6
-         alM272QMfztfxmD0FgqWDbbn5EYWzH6wrv4vezMA6sIW+FNkMDuXs4zZtZdRev51Ehf0
-         iQ8Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWIEa3iCAa1edhvtSYhozfZjwoDjMT2oGH05jpVhVpNJ7gf8qu1MQ7lzw7zIUQ16gJ6btIkrt0S@vger.kernel.org, AJvYcCWqqn2WZY3I/kqfhkJlopYE75SXSqAbvIu+668gRQLqy57gdfAz03oFlXBcg3jvbvWAxGJofJGr0giH@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4coM5rmOqX2UgFn3AwHZd3P/Mauwe4Fjn/wHmlJdTmlbJQIp5
-	IKZVKKhgtvwyVy3s+2komL7AlnX1MUmpOPNZTqzNR8NBUZ3R0McyfnKSGniQq0CbqMcQtJor9tv
-	S6RXShJDz74g8p9egxuFNuNqDFs4=
-X-Google-Smtp-Source: AGHT+IGQPAOAvrDdaWqZtP3lATUixCSPGWfj+d5lffyZ2v6OC+36VZ5Z0Mp2NekS6Gn1XXBZCpriDdcwWyKIc08XnTQ=
-X-Received: by 2002:a05:6102:6c9:b0:497:6bb5:398a with SMTP id
- ada2fe7eead31-4a8cfb5d0c6mr12909664137.7.1730300431163; Wed, 30 Oct 2024
- 08:00:31 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730300485; x=1730905285;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=OcefwH6DwVLO3jkdi4UJLGk29QViGQKLdm89K+/T0Ig=;
+        b=vhgBvwji8qXctqO5PlTXltxfk0wtni8iqu3I2/L03nm1GppS5EXigdKKGGPNeBXNvq
+         QaPt+vKL9PGsqbbLW1HpDdzn/qzQ5wev1FIIdpYvrCuMYfb+Uj4j/MyyZCJX6HpM6WoH
+         /u/9/higLE5A0kkV1g5toh3uP11wD7DRD9xvt6Xs+f0ogfJvFifOcX6xfPBBdWAuWjtl
+         aAqSOnnm7JkZYQB6UksqYHT4BFYHLkwH9BrXhYLeGcDjXfn8Othnb/d9FGKUQsVWQULs
+         wTtQx21ehbdy8QQ8vqb+n/UxmawRmC69AAH0CxTtAZL0GjyLN8tZspjQ732dBejAW0Gz
+         EaMw==
+X-Forwarded-Encrypted: i=1; AJvYcCVSxXDAi+4BPa+0B/tQkkDVgG1ZMKN1UUYXdP8eFiY83nV5qAWnHIj0dWrhwraxOprwpZ1nfLZ2XDDYx6g=@vger.kernel.org, AJvYcCWPqgm/cKutWfmoVSczqCTdxdtijCMWiaFUcfxyB42OYhbZ+M3XX2K3JEQgrFdAgMJk9TT2xXWt@vger.kernel.org, AJvYcCWWYxPg/x9TMVzW+CGWZ/vH0K75/AKx7HBOlP2NKKFZzTIfMh1chJDD200pFGC8C/u8gnjamqq5@vger.kernel.org
+X-Gm-Message-State: AOJu0YywTXyV7kKnuNQL8cJAC4qVq70P/QcMHQ0jnuRr7EU7i8cBiZT1
+	wa6VTCX9F4ItkDY40fl+3mXa2HYgPrDkL+L7Kh8PU+iMFxVBdkwE
+X-Google-Smtp-Source: AGHT+IE0mMeXCQD6h1yd6THZC/eiGg3fCLvdBgMNwVez6Ft/Ssxur1UOrug1MDpyzVlJbd/JIZBSlA==
+X-Received: by 2002:a17:907:1c22:b0:a99:f1aa:a71f with SMTP id a640c23a62f3a-a9de5c90d49mr1630487766b.11.1730300484919;
+        Wed, 30 Oct 2024 08:01:24 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cbb631af22sm4800577a12.77.2024.10.30.08.01.22
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 08:01:23 -0700 (PDT)
+Date: Wed, 30 Oct 2024 08:01:21 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Matthieu Baerts <matttbe@kernel.org>
+Cc: kuba@kernel.org, horms@kernel.org, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vlad.wing@gmail.com, max@kutsevol.com,
+	kernel-team@meta.com, aehkn@xenhub.one, stable@vger.kernel.org,
+	"open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>
+Subject: Re: [PATCH net] mptcp: Ensure RCU read lock is held when calling
+ mptcp_sched_find()
+Message-ID: <20241030-hospitable-sweet-chicken-f71faa@leitao>
+References: <20241030140224.972565-1-leitao@debian.org>
+ <e891f590-7dd5-4207-adef-d90b90172aeb@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
-In-Reply-To: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
-From: Robert Nelson <robertcnelson@gmail.com>
-Date: Wed, 30 Oct 2024 10:00:03 -0500
-Message-ID: <CAOCHtYgRD_HTD1F-5+CQ3H1PK3Lbhb-ZdyqDYp3wN2wRK5vOUA@mail.gmail.com>
-Subject: Re: BeagleBone Black Ethernet PHY issues
-To: Geert Uytterhoeven <geert@linux-m68k.org>
-Cc: ext Tony Lindgren <tony@atomide.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	Roger Quadros <rogerq@kernel.org>, 
-	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
-	Matti Vaittinen <mazziesaccount@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <e891f590-7dd5-4207-adef-d90b90172aeb@kernel.org>
 
-On Tue, Oct 29, 2024 at 12:18=E2=80=AFPM Geert Uytterhoeven
-<geert@linux-m68k.org> wrote:
->
-> Hi all,
->
-> During the last few months, booting kernels on BeagleBone Black
-> sometimes fails with:
->
->     +SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
-> LAN8710/LAN8720 failed with error -5
->      davinci_mdio 4a101000.mdio: phy[0]: device 4a101000.mdio:00,
-> driver SMSC LAN8710/LAN8720
->      soc_device_match(cpsw_soc_devices): no match
->      cpsw-switch 4a100000.switch: initialized cpsw ale version 1.4
->      ...
->      am335x-phy-driver 47401300.usb-phy: dummy supplies not allowed
-> for exclusive requests (id=3Dvbus)
->     +cpsw-125mhz-clkctrl:0014:0: failed to disable
->      am335x-phy-driver 47401b00.usb-phy: using DT
-> '/ocp/target-module@47400000/usb-phy@1b00' for 'reset' GPIO lookup
->      ...
->      cpsw-switch 4a100000.switch: starting ndev. mode: dual_mac
->     -SMSC LAN8710/LAN8720 4a101000.mdio:00: attached PHY driver
-> (mii_bus:phy_addr=3D4a101000.mdio:00, irq=3DPOLL)
->     -cpsw-switch 4a100000.switch eth0: Link is Up - 100Mbps/Full -
-> flow control off
->     -Sending DHCP requests ., OK
->     -IP-Config: Complete:
->     -[...]
->     +cpsw-switch 4a100000.switch: phy
-> "/ocp/interconnect@4a000000/segment@0/target-module@100000/switch@0/mdio@=
-1000/ethernet-phy@0"
-> not found on slave 0
->     +[HANG]
->
-> Adding debug prints to smsc_phy_probe() makes the issue go away, so it
-> must be timing related.
->
-> Adding specific debug prints in the failure case gives:
->
->     SMSC LAN8710/LAN8720 4a101000.mdio:00: genphy_read_abilities:2859:
-> phy_read(MII_BMSR) failed -EIO
->     SMSC LAN8710/LAN8720 4a101000.mdio:00: phy_probe:3613:
-> genphy_read_abilities() failed -EIO
->     SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
-> LAN8710/LAN8720 failed with error -5
->
-> and later:
->
->     Generic PHY 4a101000.mdio:00: genphy_read_abilities:2859:
-> phy_read(MII_BMSR) failed -EIO
->     Generic PHY 4a101000.mdio:00: phy_probe:3609:
-> genphy_read_abilities failed -EIO
->     cpsw-switch 4a100000.switch: phy
-> "/ocp/interconnect@4a000000/segment@0/target-module@100000/switch@0/mdio@=
-1000/ethernet-phy@0"
-> not found on slave 0
+Hello Matthieu,
 
-Hey Geert,
+On Wed, Oct 30, 2024 at 03:45:02PM +0100, Matthieu Baerts wrote:
+> Hi Breno
+> 
+> 30 Oct 2024 15:02:45 Breno Leitao <leitao@debian.org>:
+> 
+> > The mptcp_sched_find() function must be called with the RCU read lock
+> > held, as it accesses RCU-protected data structures. This requirement was
+> > not properly enforced in the mptcp_init_sock() function, leading to a
+> > RCU list traversal in a non-reader section error when
+> > CONFIG_PROVE_RCU_LIST is enabled.
+> >
+> >     net/mptcp/sched.c:44 RCU-list traversed in non-reader section!!
+> >
+> > Fix it by acquiring the RCU read lock before calling the
+> > mptcp_sched_find() function. This ensures that the function is invoked
+> > with the necessary RCU protection in place, as it accesses RCU-protected
+> > data structures.
+> 
+> Thank you for having looked at that, but there is already a fix:
+> 
+> https://lore.kernel.org/netdev/20241021-net-mptcp-sched-lock-v1-1-637759cf061c@kernel.org/
+> 
+> This fix has even been applied in the net tree already:
+> 
+> https://git.kernel.org/netdev/net/c/3deb12c788c3
+> 
+> Did you not get conflicts when rebasing your branch on top of the
+> latest version?
 
-What revision of the board do you have, Bx, Cx, etc.
+Oh, I was testing on Linus' tree when I got the problem, and net was not
+merged in Linus' tree yet.
 
-Only C3 has the new PCB with the phy 'reset' gpio line.
+> > Additionally, the patch breaks down the mptcp_init_sched() call into
+> > smaller parts, with the RCU read lock only covering the specific call to
+> > mptcp_sched_find(). This helps minimize the critical section, reducing
+> > the time during which RCU grace periods are blocked.
+> 
+> I agree with Eric (thank you for the review!): this creates other issues.
 
-https://openbeagle.org/beagleboard/beaglebone-black/-/blob/master/BBB_SCH.p=
-df?ref_type=3Dheads
+Let me comment there.
 
-For pre-C3 boards, removing "C24" has fixed a large percentage of my
-boards in my ci test farm, while it's not a perfect fix as some still
-fail..
+> 
+> > The mptcp_sched_list_lock is not held in this case, and it is not clear
+> > if it is necessary.
+> 
+> It is not needed, the list is not modified, only read with RCU.
 
-Regards,
-
---=20
-Robert Nelson
-https://rcn-ee.com/
+Thanks
 
