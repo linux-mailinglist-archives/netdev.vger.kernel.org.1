@@ -1,256 +1,91 @@
-Return-Path: <netdev+bounces-140353-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140354-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6E369B6274
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:02:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 565E39B627C
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 13:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5885E1F21CBC
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:02:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5456B1C22021
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 12:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B31851E766D;
-	Wed, 30 Oct 2024 12:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 338A91E5000;
+	Wed, 30 Oct 2024 12:03:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AE51E3DF0;
-	Wed, 30 Oct 2024 12:02:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4E3DB1E6DC2
+	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 12:03:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730289745; cv=none; b=XoBBLYX8vr7QjJF/WnxAGehoKKEOpJSmMHtqe2hoeNaaaHY0SMO3KJy+VcqwPpdVeVWceKzBJSERfhf3mevpqJoAPzjnTvnDgSi/7dj3VPSAxQd8CMqxpLDHxbR8WcyZjpNFy+DVnOxegt9HK+m0CtD251BQxMsNX35SqR83EMw=
+	t=1730289806; cv=none; b=EnQzyKkgBLAhSUBR0pn7ghM7ncN1AizSeOytUmO2MFFzQZWeztBqiFZ0ccp8aStMKam9SYT61OpXVLhqB2/YPV0PqG/Q00zSiNVVV7MrGhTJgY7HU6lAMSFCy/+Dz0AWQl9Co67z2CxwQPiJSALBH57rX1+TDZzYqlR4LUNpGrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730289745; c=relaxed/simple;
-	bh=X4PuOlu2OmPy5Pm8VWXenvbfCvduwpACca9+OC+pmJg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=QFhLI10UgJsscYW6p7Xk7iuYB+G+aEXD2GG2T1aTlcMm06ejTAebxVSqi5bFBNO2ch1ajKYOE+DISbnaV7aDjZZy6fb6kPhip3zM+PxmFMsMZQePozgAIwIdcZx8zX58tO0lLVXPhnELzsN8JbhlHgdajLPcwQQwek/l55GE/DM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=41894 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1t67Ox-00BAA0-JW; Wed, 30 Oct 2024 13:02:18 +0100
-Date: Wed, 30 Oct 2024 13:02:14 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: syzbot <syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	laforge@gnumonks.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, osmocom-net-gprs@lists.osmocom.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com,
-	wenjia@linux.ibm.com, jaka@linux.ibm.com, alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com
-Subject: Re: [syzbot] [net?] possible deadlock in gtp_encap_enable_socket
-Message-ID: <ZyIgRmJUbnZpzXNV@calendula>
-References: <66f18d50.050a0220.c23dd.0012.GAE@google.com>
+	s=arc-20240116; t=1730289806; c=relaxed/simple;
+	bh=JY2oCrHIfhPJlZMIwcdNkVKSXrp1Y2lDTuMSPbRIb/Y=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=MWLXxScqOXUkr6XhkXqAiaS0aSEQ5nVdEM4L25a36pn48o4GGtqSNz8F+lOY+XgQNam/MDvurq1yeHyz7ubLOTPFiBKXEBqW0gI08mJkvc6lgiS2eyxrhy1fSD/FUWWJ2Yc8HueA3bOHqgpXq9bhN0JQhx9xPOhTiH38JcOKepA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from ptz.office.stw.pengutronix.de ([2a0a:edc0:0:900:1d::77] helo=ratatoskr.trumtrar.info)
+	by metis.whiteo.stw.pengutronix.de with esmtp (Exim 4.92)
+	(envelope-from <s.trumtrar@pengutronix.de>)
+	id 1t67Pu-0005ni-4E; Wed, 30 Oct 2024 13:03:14 +0100
+From: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+Subject: [PATCH 0/2] clk: socfpga: add clock driver for Agilex5
+Date: Wed, 30 Oct 2024 13:02:58 +0100
+Message-Id: <20241030-v6-12-topic-socfpga-agilex5-clk-v1-0-e29e57980398@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <66f18d50.050a0220.c23dd.0012.GAE@google.com>
-X-Spam-Score: -1.7 (-)
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAHIgImcC/x3NTQqDMBBA4avIrDuQxJ9qryJdJNMxDhUTEgmCe
+ PeGLr/NexdkTsIZXs0FiYtkCXuFfjRAq909o3yqwSjTadUqLANqg0eIQpgDLdFbtF42Pnuk7Yt
+ Px7ZraXST66FWYuJFzv9hft/3DyzwQ+RxAAAA
+X-Change-ID: 20241030-v6-12-topic-socfpga-agilex5-clk-7bea43c8b9b5
+To: Michael Turquette <mturquette@baylibre.com>, 
+ Stephen Boyd <sboyd@kernel.org>, Rob Herring <robh@kernel.org>, 
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>, Dinh Nguyen <dinguyen@kernel.org>, 
+ Richard Cochran <richardcochran@gmail.com>
+Cc: linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, 
+ devicetree@vger.kernel.org, netdev@vger.kernel.org, 
+ Steffen Trumtrar <s.trumtrar@pengutronix.de>, 
+ Teh Wen Ping <wen.ping.teh@intel.com>
+X-Mailer: b4 0.14.2
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:900:1d::77
+X-SA-Exim-Mail-From: s.trumtrar@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Cc'ing SMC maintainers.
+The Agilex5 clock tree is compatible to the existing s10 drivers.
+Therefore the pll,gate and periph drivers can be reused and only the
+main clock tree is added.
 
-syzkaller combining layer is a crazy way to find crashes.
+Signed-off-by: Steffen Trumtrar <s.trumtrar@pengutronix.de>
+---
+Teh Wen Ping (2):
+      dt-bindings: clk: agilex5: Add Agilex5 clock bindings
+      clk: socfpga: Add clock driver for Agilex5
 
-I think this is a false possible lockdep considers smc->clcsock_release_lock
-is a lock of the same class sk_lock-AF_INET.
+ drivers/clk/socfpga/Kconfig               |   4 +-
+ drivers/clk/socfpga/Makefile              |   2 +-
+ drivers/clk/socfpga/clk-agilex5.c         | 847 ++++++++++++++++++++++++++++++
+ drivers/clk/socfpga/clk-pll-s10.c         |  48 ++
+ drivers/clk/socfpga/stratix10-clk.h       |   2 +
+ include/dt-bindings/clock/agilex5-clock.h | 100 ++++
+ 6 files changed, 1000 insertions(+), 3 deletions(-)
+---
+base-commit: 9852d85ec9d492ebef56dc5f229416c925758edc
+change-id: 20241030-v6-12-topic-socfpga-agilex5-clk-7bea43c8b9b5
 
-this can be solved with lockdep_set_class in af_smc?
+Best regards,
+-- 
+Steffen Trumtrar <s.trumtrar@pengutronix.de>
 
-Thanks.
-
-On Mon, Sep 23, 2024 at 08:46:24AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    9410645520e9 Merge tag 'net-next-6.12' of git://git.kernel..
-> git tree:       net-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=15d39e9f980000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=37c006d80708398d
-> dashboard link: https://syzkaller.appspot.com/bug?extid=e953a8f3071f5c0a28fd
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16215ca9980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=110c6c27980000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/80466d230dfb/disk-94106455.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/ba253eabab42/vmlinux-94106455.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/569982fb6c88/bzImage-94106455.xz
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+e953a8f3071f5c0a28fd@syzkaller.appspotmail.com
-> 
-> IPVS: Unknown mcast interface: macvlan0
-> netlink: 8 bytes leftover after parsing attributes in process `syz-executor297'.
-> netlink: 24 bytes leftover after parsing attributes in process `syz-executor297'.
-> ======================================================
-> WARNING: possible circular locking dependency detected
-> 6.11.0-syzkaller-01458-g9410645520e9 #0 Not tainted
-> ------------------------------------------------------
-> syz-executor297/5243 is trying to acquire lock:
-> ffff88801cf99158 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1609 [inline]
-> ffff88801cf99158 (sk_lock-AF_INET){+.+.}-{0:0}, at: gtp_encap_enable_socket+0x2ce/0x5c0 drivers/net/gtp.c:1674
-> 
-> but task is already holding lock:
-> ffffffff8fc88588 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
-> ffffffff8fc88588 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
-> 
-> which lock already depends on the new lock.
-> 
-> 
-> the existing dependency chain (in reverse order) is:
-> 
-> -> #2 (rtnl_mutex){+.+.}-{3:3}:
->        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
->        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->        start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
->        do_ip_vs_set_ctl+0x442/0x13d0 net/netfilter/ipvs/ip_vs_ctl.c:2732
->        nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
->        smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3064
->        do_sock_setsockopt+0x3af/0x720 net/socket.c:2330
->        __sys_setsockopt+0x1ae/0x250 net/socket.c:2353
->        __do_sys_setsockopt net/socket.c:2362 [inline]
->        __se_sys_setsockopt net/socket.c:2359 [inline]
->        __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2359
->        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #1 (&smc->clcsock_release_lock){+.+.}-{3:3}:
->        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
->        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
->        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
->        smc_switch_to_fallback+0x35/0xdb0 net/smc/af_smc.c:902
->        smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2771
->        sock_sendmsg_nosec net/socket.c:730 [inline]
->        __sock_sendmsg+0x221/0x270 net/socket.c:745
->        ____sys_sendmsg+0x525/0x7d0 net/socket.c:2603
->        ___sys_sendmsg net/socket.c:2657 [inline]
->        __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2686
->        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> -> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
->        check_prev_add kernel/locking/lockdep.c:3133 [inline]
->        check_prevs_add kernel/locking/lockdep.c:3252 [inline]
->        validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
->        __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
->        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
->        lock_sock_nested+0x48/0x100 net/core/sock.c:3611
->        lock_sock include/net/sock.h:1609 [inline]
->        gtp_encap_enable_socket+0x2ce/0x5c0 drivers/net/gtp.c:1674
->        gtp_encap_enable drivers/net/gtp.c:1707 [inline]
->        gtp_newlink+0x589/0xf30 drivers/net/gtp.c:1511
->        rtnl_newlink_create net/core/rtnetlink.c:3510 [inline]
->        __rtnl_newlink net/core/rtnetlink.c:3730 [inline]
->        rtnl_newlink+0x1591/0x20a0 net/core/rtnetlink.c:3743
->        rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6646
->        netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
->        netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->        netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
->        netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
->        sock_sendmsg_nosec net/socket.c:730 [inline]
->        __sock_sendmsg+0x221/0x270 net/socket.c:745
->        ____sys_sendmsg+0x525/0x7d0 net/socket.c:2603
->        ___sys_sendmsg net/socket.c:2657 [inline]
->        __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2686
->        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->        entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> other info that might help us debug this:
-> 
-> Chain exists of:
->   sk_lock-AF_INET --> &smc->clcsock_release_lock --> rtnl_mutex
-> 
->  Possible unsafe locking scenario:
-> 
->        CPU0                    CPU1
->        ----                    ----
->   lock(rtnl_mutex);
->                                lock(&smc->clcsock_release_lock);
->                                lock(rtnl_mutex);
->   lock(sk_lock-AF_INET);
-> 
->  *** DEADLOCK ***
-> 
-> 1 lock held by syz-executor297/5243:
->  #0: ffffffff8fc88588 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
->  #0: ffffffff8fc88588 (rtnl_mutex){+.+.}-{3:3}, at: rtnetlink_rcv_msg+0x6e6/0xcf0 net/core/rtnetlink.c:6643
-> 
-> stack backtrace:
-> CPU: 0 UID: 0 PID: 5243 Comm: syz-executor297 Not tainted 6.11.0-syzkaller-01458-g9410645520e9 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 08/06/2024
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:93 [inline]
->  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:119
->  check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2186
->  check_prev_add kernel/locking/lockdep.c:3133 [inline]
->  check_prevs_add kernel/locking/lockdep.c:3252 [inline]
->  validate_chain+0x18e0/0x5900 kernel/locking/lockdep.c:3868
->  __lock_acquire+0x137a/0x2040 kernel/locking/lockdep.c:5142
->  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5759
->  lock_sock_nested+0x48/0x100 net/core/sock.c:3611
->  lock_sock include/net/sock.h:1609 [inline]
->  gtp_encap_enable_socket+0x2ce/0x5c0 drivers/net/gtp.c:1674
->  gtp_encap_enable drivers/net/gtp.c:1707 [inline]
->  gtp_newlink+0x589/0xf30 drivers/net/gtp.c:1511
->  rtnl_newlink_create net/core/rtnetlink.c:3510 [inline]
->  __rtnl_newlink net/core/rtnetlink.c:3730 [inline]
->  rtnl_newlink+0x1591/0x20a0 net/core/rtnetlink.c:3743
->  rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6646
->  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2550
->  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
->  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
->  sock_sendmsg_nosec net/socket.c:730 [inline]
->  __sock_sendmsg+0x221/0x270 net/socket.c:745
->  ____sys_sendmsg+0x525/0x7d0 net/socket.c:2603
->  ___sys_sendmsg net/socket.c:2657 [inline]
->  __sys_sendmsg+0x2b0/0x3a0 net/socket.c:2686
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7fed198844a9
-> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RS
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-> 
-> If you want to overwrite report's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the report is a duplicate of another one, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
 
