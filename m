@@ -1,139 +1,150 @@
-Return-Path: <netdev+bounces-140518-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 786929B6B25
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:36:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA4CB9B6BF5
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 19:17:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F3831F21DF5
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 17:36:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CE1E81C210CD
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 18:17:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 980FF1FEFA1;
-	Wed, 30 Oct 2024 17:36:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A39CE1C3F02;
+	Wed, 30 Oct 2024 18:17:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="m8A9+mrA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EBA11F4FCE
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 17:35:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC9B21BD9DB;
+	Wed, 30 Oct 2024 18:17:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730309762; cv=none; b=ksI97S+SgSW0+IajA/0OTC1TVaStCaYtvqq2U71FotqcEz4wzBDDd3gwtGhyFUW7fzT5H1R98X5CB+3xyTInho3ttf1Klr2oxYxxwEX/gkpe22cquT/2IVSipxcOo7QjM73vu4MvGGkjE4WheXCmcjZvpDqL7y75s+D3wpXtlug=
+	t=1730312272; cv=none; b=cn6drrL8xqJ8JoIRg3kC+QHcgSwkZqmIhiTuyTo9aWDDBI3i0PeFy/Hr5yoLQidKTv2d+sn+XYc2Tgky3I9q6iqm62YXsbxWuErDDygKqhWJyuFRKjh65pNsx2XkSS1EXgLWZ3AHyMfzqB9L5/Clg24kmJjMr4ac1do3l+q+6vQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730309762; c=relaxed/simple;
-	bh=IrBiUW993Sdm1olxCvWxk4r70UKx2wgvGA5vqxuvA7U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FE1mvkfBJyrXUB/qYckHgPGACkiZ+zvqn9LO80DDjTpbwwN/OT36ZqCfiYmsFpFpReak76VKjsY3inAQY1B0UGCgI7wPg5xZfMNOENqydMs87lIVavTqk/tF4ALCCVWcL00hM07tTnnF9zbW1reIgACGT+MgmzQUyb+x75DBueU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [141.14.220.45] (g45.guest.molgen.mpg.de [141.14.220.45])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 1E8F161E5FE05;
-	Wed, 30 Oct 2024 18:35:36 +0100 (CET)
-Message-ID: <03b7d4ef-1e1e-4b9e-84b6-1ff4a5b92b29@molgen.mpg.de>
-Date: Wed, 30 Oct 2024 18:35:35 +0100
+	s=arc-20240116; t=1730312272; c=relaxed/simple;
+	bh=JQ/9P5SeV/Q+Tp83AVedSQbdDe89werZDEcT9MXp4Y8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=t8N6a3DX8EgzyxlGDyuD7H6LTzJOYmv2z9adYTWI8L+wMU0JU6o0mnrmiys7a1XwDFhLhflcl8+YVNAlRt97oyqusUFigh888M3tafs1IfJv+aSPdaRs8mTzjIAD1bn2OYB5ogSjiMKQx2hAKbeJzyJB+vVS4s66Rgvg+8itDlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=m8A9+mrA; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E1181240002;
+	Wed, 30 Oct 2024 18:17:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730312261;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=06tOOHd19QuPRfEvfQXspwA+6KLAkL5zimvRvbwQg8E=;
+	b=m8A9+mrAjl/Aj3gcQEM+Gs7ZjaYbcPkepQpEue/BIWjmVOiFNsBlZbCVwsBDK0roLmjC/u
+	gYApbs7kEtV4pIC+ibNMleSNeoAlpgYdRSKiYffe10cf/gFN12xeH7n/+STRUb1Ut2akDj
+	ikF9Uo2A8Gifzs7LJB/hRWNfqP/Cm8E3ngOtDjCF46TxKuNohJAyrKTMghD48Z7Y6xzZHg
+	sHW/SL+a/7gjRJzParROwKtI/+Fy7IjnbpCdjsxXPmpa7pHafOrlNKajUhHz0qymz1VGwZ
+	Wo44Wo4BDEB1EeeBeGzCWb0gAbZg4QcApVVJ3mLW6eIjZxZGQJvwnsf9VHo7+w==
+Date: Wed, 30 Oct 2024 19:17:38 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov
+ <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard
+ Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, Simon
+ Horman <horms@kernel.org>, Vignesh Raghavendra <vigneshr@ti.com>, Siddharth
+ Vadapalli <s-vadapalli@ti.com>, Md Danish Anwar <danishanwar@ti.com>,
+ Govindarajan Sriramakrishnan <srk@ti.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org
+Subject: Re: [PATCH net v2] net: ethernet: ti: am65-cpsw: Fix multi queue Rx
+ on J7
+Message-ID: <20241030191738.5bd12ccc@fedora.home>
+In-Reply-To: <20241030-am65-cpsw-multi-rx-j7-fix-v2-1-bc54087b0856@kernel.org>
+References: <20241030-am65-cpsw-multi-rx-j7-fix-v2-1-bc54087b0856@kernel.org>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH iwl-net v2] i40e: Fix handling changed priv flags
-To: =?UTF-8?Q?Peter_Gro=C3=9Fe?= <pegro@friiks.de>
-Cc: intel-wired-lan@lists.osuosl.org, Tony Nguyen
- <anthony.l.nguyen@intel.com>, Przemek Kitszel
- <przemyslaw.kitszel@intel.com>, netdev@vger.kernel.org
-References: <cf6dd743-759e-4db9-8811-fd1520262412@molgen.mpg.de>
- <20241030172224.30548-1-pegro@friiks.de>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241030172224.30548-1-pegro@friiks.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Dear Peter,
+Hello Roger,
 
+On Wed, 30 Oct 2024 15:53:58 +0200
+Roger Quadros <rogerq@kernel.org> wrote:
 
-Am 30.10.24 um 18:22 schrieb pegro@friiks.de:
-> From: Peter Große <pegro@friiks.de>
+> On J7 platforms, setting up multiple RX flows was failing
+> as the RX free descriptor ring 0 is shared among all flows
+> and we did not allocate enough elements in the RX free descriptor
+> ring 0 to accommodate for all RX flows.
 > 
-> After assembling the new private flags on a PF, the operation to determine
-> the changed flags uses the wrong bitmaps. Instead of xor-ing orig_flags
-> with new_flags, it uses the still unchanged pf->flags, thus changed_flags
-> is always 0.
+> This issue is not present on AM62 as separate pair of
+> rings are used for free and completion rings for each flow.
 > 
-> Fix it by using the correct bitmaps.
+> Fix this by allocating enough elements for RX free descriptor
+> ring 0.
 > 
-> The issue was discovered while debugging why disabling source pruning
-> stopped working with release 6.7. Although the new flags will be copied to
-> pf->flags later on in that function, disabling source pruning requires
-> a reset of the PF, which was skipped due to this bug.
-> 
-> Disabling source pruning:
-> $ sudo ethtool --set-priv-flags eno1 disable-source-pruning on
-> $ sudo ethtool --show-priv-flags eno1
-> Private flags for eno1:
-> MFP                   : off
-> total-port-shutdown   : off
-> LinkPolling           : off
-> flow-director-atr     : on
-> veb-stats             : off
-> hw-atr-eviction       : off
-> link-down-on-close    : off
-> legacy-rx             : off
-> disable-source-pruning: on
-> disable-fw-lldp       : off
-> rs-fec                : off
-> base-r-fec            : off
-> vf-vlan-pruning       : off
-> 
-> Regarding reproducing:
-> 
-> I observed the issue with a rather complicated lab setup, where
->   * two VLAN interfaces are created on eno1
->   * each with a different MAC address assigned
->   * each moved into a separate namespace
->   * both VLANs are bridged externally, so they form a single layer 2 network
-> 
-> The external bridge is done via a channel emulator adding packet loss and
-> delay and the application in the namespaces tries to send/receive traffic
-> and measure the performance. Sender and receiver are separated by
-> namespaces, yet the network card "sees its own traffic" send back to it.
-> To make that work, source pruning has to be disabled.
+> However, we can no longer rely on desc_idx (descriptor based
+> offsets) to identify the pages in the respective flows as
+> free descriptor ring includes elements for all flows.
+> To solve this, introduce a new swdata data structure to store
+> flow_id and page. This can be used to identify which flow (page_pool)
+> and page the descriptor belonged to when popped out of the
+> RX rings.
 
-Thank you for taking the time to write this up.
+[...]
 
-> Fixes: 70756d0a4727 ("i40e: Use DECLARE_BITMAP for flags and hw_features fields in i40e_pf")
-> Signed-off-by: Peter Große <pegro@friiks.de>
-> ---
->   drivers/net/ethernet/intel/i40e/i40e_ethtool.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> index c841779713f6..016c0ae6b36f 100644
-> --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
-> @@ -5306,7 +5306,7 @@ static int i40e_set_priv_flags(struct net_device *dev, u32 flags)
->   	}
->   
->   flags_complete:
-> -	bitmap_xor(changed_flags, pf->flags, orig_flags, I40E_PF_FLAGS_NBITS);
-> +	bitmap_xor(changed_flags, new_flags, orig_flags, I40E_PF_FLAGS_NBITS);
->   
->   	if (test_bit(I40E_FLAG_FW_LLDP_DIS, changed_flags))
->   		reset_needed = I40E_PF_RESET_AND_REBUILD_FLAG;
+> @@ -339,7 +339,7 @@ static int am65_cpsw_nuss_rx_push(struct am65_cpsw_common *common,
+>  	struct device *dev = common->dev;
+>  	dma_addr_t desc_dma;
+>  	dma_addr_t buf_dma;
+> -	void *swdata;
+> +	struct am65_cpsw_swdata *swdata;
 
-Reviewed-by: Paul Menzel <pmenzel@molgen.mpg.de>
+There's a reverse xmas-tree issue here, where variables should be
+declared from the longest line to the shortest.
 
+[...]
 
-Kind regards,
+>  static void am65_cpsw_nuss_rx_cleanup(void *data, dma_addr_t desc_dma)
+>  {
+> -	struct am65_cpsw_rx_flow *flow = data;
+> +	struct am65_cpsw_rx_chn *rx_chn = data;
+>  	struct cppi5_host_desc_t *desc_rx;
+> -	struct am65_cpsw_rx_chn *rx_chn;
+> +	struct am65_cpsw_swdata *swdata;
+>  	dma_addr_t buf_dma;
+>  	u32 buf_dma_len;
+> -	void *page_addr;
+> -	void **swdata;
+> -	int desc_idx;
+> +	struct page *page;
+> +	u32 flow_id;
 
-Paul
+Here as well
+
+[...]
+
+>  	rx_chn->rx_chn = k3_udma_glue_request_rx_chn(dev, "rx", &rx_cfg);
+> @@ -2455,10 +2441,12 @@ static int am65_cpsw_nuss_init_rx_chns(struct am65_cpsw_common *common)
+>  		flow = &rx_chn->flows[i];
+>  		flow->id = i;
+>  		flow->common = common;
+> +		flow->irq = -EINVAL;
+
+I've tried to follow the code and I don't get that assignment for the
+irq field, does it really have to do with the current change or is it
+another issue that's being fixed ?
+
+Sorry if I missed the point here.
+
+Thanks,
+
+Maxime
 
