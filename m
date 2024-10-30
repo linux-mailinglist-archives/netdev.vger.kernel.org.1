@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-140557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC2009B6F42
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 22:41:10 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C7C559B6F8F
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 22:48:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A0771C225E0
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:41:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C267284ECD
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 21:48:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6847D229137;
-	Wed, 30 Oct 2024 21:35:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E53AB1E0B66;
+	Wed, 30 Oct 2024 21:47:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="6ODvVexG"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EKYDfn3V"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A14CD22912E;
-	Wed, 30 Oct 2024 21:35:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D740C1CF7BB;
+	Wed, 30 Oct 2024 21:46:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730324129; cv=none; b=a30VHXvg1D2VhilfCri+X0BW3DvXF1RC34optJquAyFTOx6JisD705QQh9rqWNhjEEIZEuYE9k897l9Z+08//DVGsch7wvqGdc7eH73aJOKnQbRW3lUNoxU+Y/oo6IVci//LjOXLKVKCJYemaatMcatI/JwrMXieweJKEYvWiGQ=
+	t=1730324820; cv=none; b=AWvpNkaEqRArjjEbLmaVvEYFubkY3e/UzuAkCaxRcSBWUaqb8+PbisGEJgGVfehkMHSjnisqkanBr8UOPmAhJ9UWi1BHMSPQ8Acc6Nfpcp5waYauH2e+lJVMHg9AUhhSW2WdfmGon2Pt7R7+8/3ROcts6nF67GMN/xP/ekSptx4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730324129; c=relaxed/simple;
-	bh=rm1fOaMV8+ZvaLA3SVdwxChD9HtTwnn7bmt8JS4Yi6c=;
+	s=arc-20240116; t=1730324820; c=relaxed/simple;
+	bh=dYnaVemO5OPTP+WAPRmhR/5ZR2REs2aQhH/k1Bn2TOk=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=X/pvKI5pjZE5XZ+Ez5+pH29Q2svKs817MuMQe77ilTZq0XAa+VD2ELTYzTykqQRFN4slt1Nq/+uEKu/3W4Bj+5moDUSPXbRJZdTJ30Pqc6NIUkRbduuIt/RX5hZDkL3uyVTnbmOom42SJy6JHUmJjv34V0FTSPR04myskgzxRro=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=6ODvVexG; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=pt/9or9crq2buu696AW4a2t+FBO7CyxdoCwoyJadVMQcu94/ZPlNpXumTxH7sOo2fdjH+KAvfkOWj+AyoJL+baizTQhSfGBDXI/2dJAV0tSteTg8LZr3T6QNioa8JvVv8vMmjXLD/vO+tIlmbRCgajlL352JuOnbKDVfo0Y7Ib0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EKYDfn3V; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NyNMPjO7MMUd6ojdX9/UDWNYw2O+FoxGF7IwqpNjl2U=; b=6ODvVexGP24auXYynC9wLkGhzw
-	Ij5b5N2p3PUMIHkDOtE4nr8am56jtAaFUhmf/2F9T8z891JnfVvg327KEtn58HBHyEZ050bRc/cTP
-	08HGvuZ+j1tH62+k+BM0/SYAdhM+Lp5LpgXMRSsVm2j+A2zLM7zJCLN+myVyboiCPnAk=;
+	bh=Eaav/kHiULYtRFO7qGHqUzM2GyuXCQUp8En/mARPwCQ=; b=EKYDfn3Vh58p9C5n1lAe40Lvqf
+	ucFYM5n2r+44VJfBuIUPFlcpOTPfwsyXCjnQX9eaegFSdB4v4LkAe5m1ur3BuhS9bT5jjp3qf0Ffk
+	kpaQjznr4/fcD0MP0DPukyvCULZA2pTqtP9rT+KPXq9goFjH8pZaBjua6XOujBirCyjE=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t6GLP-00BjTa-At; Wed, 30 Oct 2024 22:35:11 +0100
-Date: Wed, 30 Oct 2024 22:35:11 +0100
+	id 1t6GWd-00BjVC-67; Wed, 30 Oct 2024 22:46:47 +0100
+Date: Wed, 30 Oct 2024 22:46:47 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Sky Huang <SkyLake.Huang@mediatek.com>
 Cc: Heiner Kallweit <hkallweit1@gmail.com>,
@@ -58,11 +58,11 @@ Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
 	linux-mediatek@lists.infradead.org,
 	Steven Liu <Steven.Liu@mediatek.com>
-Subject: Re: [PATCH net-next 1/5] net: phy: mediatek: Re-organize MediaTek
- ethernet phy drivers
-Message-ID: <cd2f249b-6257-4692-ac2f-93252534cff4@lunn.ch>
+Subject: Re: [PATCH net-next 2/5] net: phy: mediatek: Move LED helper
+ functions into mtk phy lib
+Message-ID: <7cb014a6-ec64-4482-b85c-44f29760d186@lunn.ch>
 References: <20241030103554.29218-1-SkyLake.Huang@mediatek.com>
- <20241030103554.29218-2-SkyLake.Huang@mediatek.com>
+ <20241030103554.29218-3-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,32 +71,25 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241030103554.29218-2-SkyLake.Huang@mediatek.com>
+In-Reply-To: <20241030103554.29218-3-SkyLake.Huang@mediatek.com>
 
-On Wed, Oct 30, 2024 at 06:35:50PM +0800, Sky Huang wrote:
-> From: "SkyLake.Huang" <skylake.huang@mediatek.com>
-> 
-> Re-organize MediaTek ethernet phy driver files and get ready to integrate
-> some common functions and add new 2.5G phy driver.
-> mtk-ge.c: MT7530 Gphy on MT7621 & MT7531 Gphy
-> mtk-ge-soc.c: Built-in Gphy on MT7981 & Built-in switch Gphy on MT7988
-> mtk-2p5ge.c: Planned for built-in 2.5G phy on MT7988
-> 
-> Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
-> ---
-> No change since commit:
-> https://lore.kernel.org/netdev/20241004102413.5838-2-SkyLake.Huang@mediatek.com/
-> 
-> Andrew Lunn has already reviewed this.
+> +void mtk_phy_leds_state_init(struct phy_device *phydev)
+> +{
+> +	int i;
+> +
+> +	for (i = 0; i < 2; ++i)
+> +		phydev->drv->led_hw_control_get(phydev, i, NULL);
+> +}
 
-You should append the Reviewed-by: Andrew Lunn <andrew@lunn.ch> to the
-commit message, just before your Signed-off-by:. Taking the patches
-out of a series like this should not invalidate a Reviewed-by, so long
-as you don't make any changes to the patch.
+This does appear to be the same as what it is replacing, but it also
+seems odd.
+
+Why is an init function doing a get? I assume it is to do with setting
+priv->led_state? But led_state is not used in setting *rules, which is
+what led_hw_control_get() is all about. So maybe in a follow up patch,
+move the actual init code out of led_hw_control_get()?
+
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
     Andrew
-
----
-pw-bot: cr
-
 
