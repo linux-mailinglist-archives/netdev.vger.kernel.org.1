@@ -1,106 +1,165 @@
-Return-Path: <netdev+bounces-140259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EE3F9B5B07
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:04:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1719E9B5B4D
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 06:37:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43234284285
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:04:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CA8752853E8
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 05:37:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAF3582899;
-	Wed, 30 Oct 2024 05:04:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72EF51CF5D0;
+	Wed, 30 Oct 2024 05:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YBQhpRqS"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="H4h/Vdxi"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+Received: from mail-oi1-f180.google.com (mail-oi1-f180.google.com [209.85.167.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7466BA4A
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 05:04:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 610D71CF293;
+	Wed, 30 Oct 2024 05:36:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730264686; cv=none; b=pB2A2FdIq1NDUI2Gv7wO505TQiPEbZNnsA3AXfh54DAQTy93u4bX7KtslIa7LbKGBzxSdA6txkLdv4FW+VpPCqpYsoOci086QKfZShTFr54l0iabK01/tYKz2ukSdz/8aJY0xKdhpj6G+UiSXMG9fNB+3/bda80Bs5NrXoRf9uA=
+	t=1730266600; cv=none; b=bzQAUI6B/1kT900S9SNHXX92gc0HY4j9IoenX+D92ljlLk91oE0bz9irbaZQfnAbROKiVpGVd5BUHc8m8D7wnBL27oZPbnQfuejFuFndTtBDUzhm4IutrFOWIy1/iwUaz4Jb2KrVS06QtNO1AFFouoBVnLNheV2RX1Q9SNjFucE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730264686; c=relaxed/simple;
-	bh=kENvROmXFOVMy3MzRezX/8fz+65kXsPNPzgmMIAes6A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=sTg1KfFS9ALn1RzWsF55zH1rPYx4eiRmhC/IqU5nxhaDmG2yis2Nru0sIOKRn6EPPzbjIBrObPDqEvoZoenyu1HB2kyZTs9T5M8LR8K/moqawA0mmwPL37ui9Q8AM37v7DtCXTihG4Oh1fL+wrx3To+9aUtKFEgVBUoKMlGyGZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YBQhpRqS; arc=none smtp.client-ip=209.85.215.175
+	s=arc-20240116; t=1730266600; c=relaxed/simple;
+	bh=pb2WEI6e0Y9CXRnhptznPXv/5BI4xkMtWblg/9X3dW4=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=fartj5W0AuyCyX98KeQtCP5FOijagm92sVVOEyhLMNikUr7ciqnN6JNFRrH0zETGUmF2sXawHJANew6lJFOt5ycxnkJWnDGxn6M9jNSih57Zk6VfRYVP/dVQZL3yANeKohbBwgh8DJp27ioFLnYAdYkUJgilwdxtpz1hx4VVofw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=H4h/Vdxi; arc=none smtp.client-ip=209.85.167.180
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ea9739647bso4457864a12.0
-        for <netdev@vger.kernel.org>; Tue, 29 Oct 2024 22:04:44 -0700 (PDT)
+Received: by mail-oi1-f180.google.com with SMTP id 5614622812f47-3e601b6a33aso3643981b6e.0;
+        Tue, 29 Oct 2024 22:36:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730264684; x=1730869484; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kENvROmXFOVMy3MzRezX/8fz+65kXsPNPzgmMIAes6A=;
-        b=YBQhpRqSlANll25zBwa4IKjvAw0DfM3mLKX6mZn+b8xCRTkzkMyX36uFLBZVsLKDq5
-         AZPIsvPTEv8qRha4QK33AC2BDOtzFyMcHAO69cnIJZ8U1a3ObYHfiDOA3i65ZPDzNb1n
-         /F31A3xaSpJ60aB0h14Qc1q/YcuSjcAjwEaVC23gRccjMXKorh7kPNdNF5Ke1HpM4OTZ
-         HNqhqnleYR5rhiH05+eYyP3dZHjX2uHPV2O5WtKnLsGiRl/USXvmr04Njij8MTh2Rokw
-         FuJwkHlcy9+wfDMJ7FKDH9XHgxQU55auuiSfcTL0CARRTb4W5ixUlzBTTQFyCx+/9e5L
-         zhOA==
+        d=gmail.com; s=20230601; t=1730266597; x=1730871397; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=5JB/cGgUoF+EaDvRZAGIK3OwHiKrJHGT5IlWD3Oxlrk=;
+        b=H4h/VdxicuYW17Kt7EQAaLPxPUgOadvteHP6RyKozgtgVXNEEXZEXtxqcBvcucjds1
+         RxoirmYjBc15BOiEUI1ErEVN+JVz3ddEmDKe4qGYF2SnhmOrV254bHRrKCGXT81gYRB2
+         9IPOxK/2ZXDXTm8PhiMoDWmCwqCE97kXR0jtaXWHjyPipl3i7HuCh/L/N9/mWEDY1hPM
+         HjA5y8za7oCnNOnE52bkdFpGTb23BdQCJXuBX3kE6uuYWcJGGEaYHjcPe838gsVzoHae
+         uHkUnFcf62gXHo+NhFa0ytphNkS+vZEdSHc0zp4c9NFJlx9cLiNA+cCPPDOltlVo/FLz
+         RCXg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730264684; x=1730869484;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kENvROmXFOVMy3MzRezX/8fz+65kXsPNPzgmMIAes6A=;
-        b=pN0jAGQGR0u060cHJSdxgUiNCLWS//eN9glPEQpzE18cKAcA34Q3dwAs93jA4OH4JS
-         38g5OBDTWEnBeTQIh298bv1PQ0zq1CqUJZFitpNJ2RKh48TSaTtRs3n33fcqcTeKWrlr
-         8zpqfXKirXJ+RmhdY8N9AB5Bb8Y64C/0yTIvSXbIZ5+ZKu9s5DjXuAlVQNcPaaz9JIuy
-         cE/zBkRLGhF7UynTVkyYtSCoQC2bG6eZFw26y0HX5uXzxUjn2wOcrdP+29V2siuy1dSz
-         ZltPUnVLnanHvEDg44KV4+tRXtjcI10fv4ehAX1U+W06V1Acq8PX5BAqlF6GhZ9cd1AF
-         U4ZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXxJDBb4CIWKC0lh/Bbfh2xC78vo+/4ggYFbRYrfhLYrwlgKu6l/F4tvCGh2mWzmTk4FAyg+q8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz6+Hd7inbnf8AOs38q80/wwa6h1n3gVIqRtNpHzSfWkEVQbW2W
-	vlobg7oAEqkOCe86wCrHcPVhIfWooij5YQ0UyyRfm7JQwaJTcoHMxq0D6980wwyU+DuNZMNkKWp
-	8IUBdE7X7vjnYvbbWtVaRY+p2aP9Xqg==
-X-Google-Smtp-Source: AGHT+IF8wNkNXVikoxU3uYTBGNhzGSKbY9D2acpsFQytYhILfTi9dPoWkaPPjl1zpwXjkxWo9FmcXYh8L0DK8SlMCQU=
-X-Received: by 2002:a05:6a21:e88:b0:1d8:f171:dccd with SMTP id
- adf61e73a8af0-1d9a851e08dmr16053235637.37.1730264684147; Tue, 29 Oct 2024
- 22:04:44 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730266597; x=1730871397;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=5JB/cGgUoF+EaDvRZAGIK3OwHiKrJHGT5IlWD3Oxlrk=;
+        b=raYXf1iz/KePMOGZ0pNFr160twyZsipnHnj49P7j7rKVAoW2XUm7Asnz/BsF45FG3j
+         9arAbgMayvbfJL48But2fCGq6zXWR38mzMNotXd3odJro8Zo52boCnp7d/HYqETrGDUJ
+         T/FSKUZFMa2VcnAWKOZ68mkqvX2bTTxjBS4BrfLclRFcgyKxg88uKh8X/asRZHKIRk5d
+         CbPlsdOlwG5DzSxEeOWa+ax1dt3yFJW9iJEhwc4N6xPigCwvP3PIgXaMxil3FSSCgPzm
+         MwH1pMShfB0ZpLvkINrnugYCKtsJCRqzyQfjXa7DTczC/227cDA/2b+PyfSkr28GrUq3
+         N1Zg==
+X-Forwarded-Encrypted: i=1; AJvYcCXCvIDSyUV8nKDSkvpGi7XhslWh1JW7pJoA9silPqw+Cw59o9yfHvqcPBTQPQv/MWg7BGj3BNRjh6caj1E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEP2A+MDIeKyh3p9S0zuFsGTjN4VUD08JDP3x/xV9LgEZmkne0
+	FBNrGwAOT2Z2zKr4AwGl3ckHPpCRitOiHRjgsju7vgZr3WxciYvHbcsr+A==
+X-Google-Smtp-Source: AGHT+IH4FirAelcYwz6Otzk0LxXXB4G8PXfXbrPJ8o3q22jWDCJ8ZAFjpdGAFz8nJtPeZGloDI4FmA==
+X-Received: by 2002:a05:6808:1918:b0:3e6:ad7:9a38 with SMTP id 5614622812f47-3e63844158emr12362178b6e.24.1730266596775;
+        Tue, 29 Oct 2024 22:36:36 -0700 (PDT)
+Received: from localhost.localdomain ([129.146.253.192])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-7edc8661098sm8516595a12.8.2024.10.29.22.36.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 29 Oct 2024 22:36:36 -0700 (PDT)
+From: Furong Xu <0x1207@gmail.com>
+To: netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Vladimir Oltean <olteanv@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	xfr@outlook.com,
+	Furong Xu <0x1207@gmail.com>
+Subject: [PATCH net-next v6 0/6] net: stmmac: Refactor FPE as a separate module
+Date: Wed, 30 Oct 2024 13:36:09 +0800
+Message-Id: <cover.1730263957.git.0x1207@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAEFUPH2npsz4XKna0KYjOeU_MfYN-bVTw25jn6m2dS+f32RuxQ@mail.gmail.com>
- <630f1b99-fcf6-4097-888c-3e982c9ab8d0@lunn.ch> <CAEFUPH20oR-dmaAxvpbYw7ehYDRGoA1kiv5Z+Bkiz7H+0XvZeA@mail.gmail.com>
- <20241029153614.2cdt2kyhn7sb6aqi@skbuf>
-In-Reply-To: <20241029153614.2cdt2kyhn7sb6aqi@skbuf>
-From: SIMON BABY <simonkbaby@gmail.com>
-Date: Tue, 29 Oct 2024 22:04:32 -0700
-Message-ID: <CAEFUPH3gUV3WXY+VEr-9H8Xu3Zva2jiT_WY+Edp=Q9Ja33XwRQ@mail.gmail.com>
-Subject: Re: query on VLAN with linux DSA ports
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Thank you Vladimir.
+Refactor FPE implementation by moving common code for DWMAC4 and
+DWXGMAC into a separate FPE module.
 
-Regards
-Simon
+FPE implementation for DWMAC4 and DWXGMAC differs only for:
+1) Offset address of MAC_FPE_CTRL_STS and MTL_FPE_CTRL_STS
+2) FPRQ(Frame Preemption Residue Queue) field in MAC_RxQ_Ctrl1
+3) Bit offset of Frame Preemption Interrupt Enable
 
-On Tue, Oct 29, 2024 at 8:36=E2=80=AFAM Vladimir Oltean <olteanv@gmail.com>=
- wrote:
->
-> On Thu, Oct 24, 2024 at 08:15:50AM -0700, SIMON BABY wrote:
-> > Any advantages of using vlan aware bridges?
->
-> Bridges can have more than one lower interface, unlike VLAN (8021q) inter=
-faces.
-> The lower interfaces of a bridge will forward packets between each other
-> according to the destination MAC address (optionally + VLAN ID), which is
-> something VLANs don't do.
->
-> I don't believe that a bridge with a single lower interface (port), as in
-> your example, is exactly "intended use".
+Tested on DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
+
+Changes in v6:
+  1. Introduce stmmac_fpe_supported() to improve compatibility
+  2. Remove redundant fpesel check
+  3. Remove redundant parameters of stmmac_fpe_configure()
+
+  V5:
+    https://patchwork.kernel.org/project/netdevbpf/list/?series=903628&state=%2A&archive=both
+
+Changes in v5:
+  1. Fix build errors reported by kernel test robot:
+  https://lore.kernel.org/oe-kbuild-all/202410260025.sME33DwY-lkp@intel.com/
+
+Changes in v4:
+  1. Update FPE IRQ handling
+  2. Check fpesel bit and stmmac_fpe_reg pointer to guarantee that driver
+  does not crash on a certain platform that FPE is to be implemented
+
+Changes in v3:
+  1. Drop stmmac_fpe_ops and refactor FPE functions to generic version to
+  avoid function pointers
+  2. Drop the _SHIFT macro definitions
+
+Changes in v2:
+  1. Split patches to easily review
+  2. Use struct as function param to keep param list short
+  3. Typo fixes in commit message and title
+
+Furong Xu (6):
+  net: stmmac: Introduce separate files for FPE implementation
+  net: stmmac: Rework macro definitions for gmac4 and xgmac
+  net: stmmac: Refactor FPE functions to generic version
+  net: stmmac: xgmac: Rename XGMAC_RQ to XGMAC_FPRQ
+  net: stmmac: xgmac: Complete FPE support
+  net: stmmac: xgmac: Enable FPE for tc-mqprio/tc-taprio
+
+ drivers/net/ethernet/stmicro/stmmac/Makefile  |   2 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h  |   1 -
+ .../net/ethernet/stmicro/stmmac/dwmac4_core.c |  11 +-
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.c  | 150 -------
+ drivers/net/ethernet/stmicro/stmmac/dwmac5.h  |  26 --
+ .../net/ethernet/stmicro/stmmac/dwxgmac2.h    |   6 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_core.c   |  31 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.c    |   7 +
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  20 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |  11 +-
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  |   8 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.c  | 405 ++++++++++++++++++
+ .../net/ethernet/stmicro/stmmac/stmmac_fpe.h  |  45 ++
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 165 +------
+ .../net/ethernet/stmicro/stmmac/stmmac_tc.c   |   4 +-
+ 15 files changed, 480 insertions(+), 412 deletions(-)
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.c
+ create mode 100644 drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+
+-- 
+2.34.1
+
 
