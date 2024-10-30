@@ -1,277 +1,144 @@
-Return-Path: <netdev+bounces-140216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAECC9B58EC
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:03:44 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 509819B58EE
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:05:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0823B1C2272A
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:03:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EEDD61F24052
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 01:05:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41268405FB;
-	Wed, 30 Oct 2024 01:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 249B87EF09;
+	Wed, 30 Oct 2024 01:05:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="URKdCcFo"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="g9yqBDQP"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 925853C14
-	for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 01:03:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E78EB3C14;
+	Wed, 30 Oct 2024 01:05:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730250221; cv=none; b=pB3rVacd+ZNw9iYV/HctzuEF0/vw4qrPoV8va9nY+Nuymr1/Jnw29JC7mim5zvakS8NJUBd6vohBs0aGAw5x+ZA2Nfp8teZoV3tjuhEUGDN42w3SHecBfmFo0sTUAxLxuJh1V5V6vSqxSQ0GyTbDA7NgQio7srVE7H//+Q45HoU=
+	t=1730250336; cv=none; b=TugpjQhKXTL3dd9qXQFWFquuyitQjhyYjKyojVzrfzmfGS0oeOQ1pSi+ZxJv9/IoF9WcKFEQOXt/NuSe0VVbyZS9+A8/stPtfcg4btkLRij8e1s+TKNFH/EaqTuGN9eJjD0ebIyid2FnIRVIrXnbds7oGhltEY2AJGqanGyX8E4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730250221; c=relaxed/simple;
-	bh=RJvpBE5S9nxx5+G3sW9WzZfSOwWw5uzZ/mHZ88ZqlPw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bLyLXbbot8oGpDASJxnzl4SHsuNWXU9oF4hql1q4jwZUV1QQI2Gf8k14e7njFJMtvHytxVUbxvLUJTcQy2ebNWbAs88uJDpRTCstXrCbEEjXndJgs/UKbWYPNFf+kp9jYw+bosyspZ86gLKH88lmmZybT46q+v2t+DnJenE/5Gc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=URKdCcFo; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=6dNRFzSlX3feZ30aQZAj097bOFbSH8w7kCnwdztI2NE=; b=URKdCcFogno0pYBpHiiWMSjZuT
-	wtIn50fxvCGZZyC+e3OYHRFy6fe2LsrwxQQO+tYb23b8iDxazkK3GUOzMzxRtNpzZZFSvKIg5mUKJ
-	+6Av2YxX4Qz8wJz7wr1e3T7Mfz9n3AVlSskvRGR/9iWNl+SNDpyb7YrzD60cqkTpx/W0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t5x7Y-00Bdza-FN; Wed, 30 Oct 2024 02:03:36 +0100
-Date: Wed, 30 Oct 2024 02:03:36 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: John Ousterhout <ouster@cs.stanford.edu>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 11/12] net: homa: create homa_plumbing.c
- homa_utils.c
-Message-ID: <a109d5c6-76d6-47c5-834d-9f263f254b5c@lunn.ch>
-References: <20241028213541.1529-1-ouster@cs.stanford.edu>
- <20241028213541.1529-12-ouster@cs.stanford.edu>
+	s=arc-20240116; t=1730250336; c=relaxed/simple;
+	bh=O3eyHCxMcdQ467ALRIumPj1rNupJxrZMOTcaSjzwyvA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=XLPo5YOg6rIxR+1X85aOioCtNybE+w66jCT03mfOlBNRCxTbIFl/FuJCWpzkK1wx3xZ4T7nU+kfx/k6e3ZgVV7EV8+oAEZd3Jp2hSDEdH3iiiDd9+Y+iIBMUi/jDEJuH3QrYKqnj35O66JBxUlcYOuG3gupgV+sLeJ9FhP0gRJY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=g9yqBDQP; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1730250326;
+	bh=rJ+zeOXAOkv0gwsLv1luKB4UBmUC3jKRnaMznn+sZ54=;
+	h=Date:From:To:Cc:Subject:From;
+	b=g9yqBDQPWwHheAUZ1cogWboY7xJXsw0x2PmCquxMdLczVOBfdPD73Ost6vd7EQpcF
+	 2fmWJ1esTB317UqFZQ6c6MbFa72Z/uAir43LY2oMfy43sw5H/+vSQd8WtgCpQOosoU
+	 gQUj40PmZ+2q8kIL/Xxd0kMUCyvu+sZsE7rN56uWWy3u7U4HCyQ6MgpCMF+S+8ktHs
+	 WBYeIZnYLKLZi7K61dsJ92CnsXNYrR4uj96oqZ5WzF5OS90hjNmaJHTbWeoibGJXPy
+	 XWliswlp3jibsoaqpSF58fn3p2puWWx6SkwKiWCx12UMzu8/H2z3ZMaSOENShyNBO8
+	 XXQ1mGBuV/dpg==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XdTSj0Xl7z4xFt;
+	Wed, 30 Oct 2024 12:05:23 +1100 (AEDT)
+Date: Wed, 30 Oct 2024 12:05:24 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Arkadiusz Kubalewski
+ <arkadiusz.kubalewski@intel.com>, Jacob Keller <jacob.e.keller@intel.com>,
+ Karol Kolacinski <karol.kolacinski@intel.com>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Yochai Hagvi <yochai.hagvi@intel.com>, Yue Haibing <yuehaibing@huawei.com>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20241030120524.1ee1af18@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241028213541.1529-12-ouster@cs.stanford.edu>
+Content-Type: multipart/signed; boundary="Sig_/qQcC7M9W10_+AKldn1crROG";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-> +static int __init homa_load(void)
-> +{
-> +	int status;
-> +
-> +	pr_notice("Homa module loading\n");
-> +	pr_notice("Homa structure sizes: data_header %u, seg_header %u, ack %u, peer %u, ip_hdr %u flowi %u ipv6_hdr %u, flowi6 %u tcp_sock %u homa_rpc %u sk_buff %u rcvmsg_control %u union sockaddr_in_union %u HOMA_MAX_BPAGES %u NR_CPUS %u nr_cpu_ids %u, MAX_NUMNODES %d\n",
-> +		  sizeof32(struct data_header),
-> +		  sizeof32(struct seg_header),
-> +		  sizeof32(struct homa_ack),
-> +		  sizeof32(struct homa_peer),
-> +		  sizeof32(struct iphdr),
-> +		  sizeof32(struct flowi),
-> +		  sizeof32(struct ipv6hdr),
-> +		  sizeof32(struct flowi6),
-> +		  sizeof32(struct tcp_sock),
-> +		  sizeof32(struct homa_rpc),
-> +		  sizeof32(struct sk_buff),
-> +		  sizeof32(struct homa_recvmsg_args),
-> +		  sizeof32(union sockaddr_in_union),
-> +		  HOMA_MAX_BPAGES,
-> +		  NR_CPUS,
-> +		  nr_cpu_ids,
-> +		  MAX_NUMNODES);
+--Sig_/qQcC7M9W10_+AKldn1crROG
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-We generally don't want kernel modules spamming the log. I would
-suggest dropping these the pr_dbg(), or removing them altogether.
+Hi all,
 
-> +	status = proto_register(&homa_prot, 1);
-> +	if (status != 0) {
-> +		pr_err("proto_register failed for homa_prot: %d\n", status);
-> +		goto out;
-> +	}
-> +	status = proto_register(&homav6_prot, 1);
-> +	if (status != 0) {
-> +		pr_err("proto_register failed for homav6_prot: %d\n", status);
-> +		goto out;
-> +	}
-> +	inet_register_protosw(&homa_protosw);
-> +	inet6_register_protosw(&homav6_protosw);
-> +	status = inet_add_protocol(&homa_protocol, IPPROTO_HOMA);
-> +	if (status != 0) {
-> +		pr_err("inet_add_protocol failed in %s: %d\n", __func__,
-> +		       status);
-> +		goto out_cleanup;
-> +	}
-> +	status = inet6_add_protocol(&homav6_protocol, IPPROTO_HOMA);
-> +	if (status != 0) {
-> +		pr_err("inet6_add_protocol failed in %s: %d\n",  __func__,
-> +		       status);
-> +		goto out_cleanup;
-> +	}
-> +
-> +	status = homa_init(homa);
-> +	if (status)
-> +		goto out_cleanup;
-> +
-> +	timer_kthread = kthread_run(homa_timer_main, homa, "homa_timer");
-> +	if (IS_ERR(timer_kthread)) {
-> +		status = PTR_ERR(timer_kthread);
-> +		pr_err("couldn't create homa pacer thread: error %d\n",
-> +		       status);
-> +		timer_kthread = NULL;
-> +		goto out_cleanup;
-> +	}
-> +
-> +	return 0;
-> +
-> +out_cleanup:
-> +	homa_destroy(homa);
-> +	inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
-> +	inet_unregister_protosw(&homa_protosw);
-> +	inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
-> +	inet6_unregister_protosw(&homav6_protosw);
-> +	proto_unregister(&homa_prot);
-> +	proto_unregister(&homav6_prot);
-> +out:
-> +	return status;
-> +}
-> +
-> +/**
-> + * homa_unload() - invoked when this module is unloaded from the Linux kernel.
-> + */
-> +static void __exit homa_unload(void)
-> +{
-> +	pr_notice("Homa module unloading\n");
-> +	exiting = true;
-> +
-> +	if (timer_kthread)
-> +		wake_up_process(timer_kthread);
-> +	wait_for_completion(&timer_thread_done);
-> +	homa_destroy(homa);
-> +	inet_del_protocol(&homa_protocol, IPPROTO_HOMA);
-> +	inet_unregister_protosw(&homa_protosw);
-> +	inet6_del_protocol(&homav6_protocol, IPPROTO_HOMA);
-> +	inet6_unregister_protosw(&homav6_protosw);
-> +	proto_unregister(&homa_prot);
-> +	proto_unregister(&homav6_prot);
-> +}
-> +
-> +module_init(homa_load);
-> +module_exit(homa_unload);
-> +
-> +/**
-> + * homa_bind() - Implements the bind system call for Homa sockets: associates
-> + * a well-known service port with a socket. Unlike other AF_INET6 protocols,
-> + * there is no need to invoke this system call for sockets that are only
-> + * used as clients.
-> + * @sock:     Socket on which the system call was invoked.
-> + * @addr:    Contains the desired port number.
-> + * @addr_len: Number of bytes in uaddr.
-> + * Return:    0 on success, otherwise a negative errno.
-> + */
-> +int homa_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
-> +{
-> +	struct homa_sock *hsk = homa_sk(sock->sk);
-> +	union sockaddr_in_union *addr_in = (union sockaddr_in_union *)addr;
-> +	int port = 0;
-> +
-> +	if (unlikely(addr->sa_family != sock->sk->sk_family))
-> +		return -EAFNOSUPPORT;
-> +	if (addr_in->in6.sin6_family == AF_INET6) {
-> +		if (addr_len < sizeof(struct sockaddr_in6))
-> +			return -EINVAL;
-> +		port = ntohs(addr_in->in4.sin_port);
-> +	} else if (addr_in->in4.sin_family == AF_INET) {
-> +		if (addr_len < sizeof(struct sockaddr_in))
-> +			return -EINVAL;
-> +		port = ntohs(addr_in->in6.sin6_port);
-> +	}
-> +	return homa_sock_bind(homa->port_map, hsk, port);
-> +}
-> +
-> +/**
-> + * homa_close() - Invoked when close system call is invoked on a Homa socket.
-> + * @sk:      Socket being closed
-> + * @timeout: ??
-> + */
-> +void homa_close(struct sock *sk, long timeout)
-> +{
-> +	struct homa_sock *hsk = homa_sk(sk);
-> +
-> +	homa_sock_destroy(hsk);
-> +	sk_common_release(sk);
-> +}
-> +
-> +/**
-> + * homa_shutdown() - Implements the shutdown system call for Homa sockets.
-> + * @sock:    Socket to shut down.
-> + * @how:     Ignored: for other sockets, can independently shut down
-> + *           sending and receiving, but for Homa any shutdown will
-> + *           shut down everything.
-> + *
-> + * Return: 0 on success, otherwise a negative errno.
-> + */
-> +int homa_shutdown(struct socket *sock, int how)
-> +{
-> +	homa_sock_shutdown(homa_sk(sock->sk));
-> +	return 0;
-> +}
-> +
-> +/**
-> + * homa_disconnect() - Invoked when disconnect system call is invoked on a
-> + * Homa socket.
-> + * @sk:    Socket to disconnect
-> + * @flags: ??
-> + *
-> + * Return: 0 on success, otherwise a negative errno.
-> + */
-> +int homa_disconnect(struct sock *sk, int flags)
-> +{
-> +	pr_warn("unimplemented disconnect invoked on Homa socket\n");
-> +	return -EINVAL;
+Today's linux-next merge of the net-next tree got a conflict in:
 
-Can this be used to DoS the system, spam the log? At minimum rate
-limit the message, but it might be better to just remove the message.
+  drivers/net/ethernet/intel/ice/ice_ptp_hw.h
 
-> +}
-> +
-> +/**
-> + * homa_ioctl() - Implements the ioctl system call for Homa sockets.
-> + * @sk:    Socket on which the system call was invoked.
-> + * @cmd:   Identifier for a particular ioctl operation.
-> + * @karg:  Operation-specific argument; typically the address of a block
-> + *         of data in user address space.
-> + *
-> + * Return: 0 on success, otherwise a negative errno.
-> + */
-> +int homa_ioctl(struct sock *sk, int cmd, int *karg)
-> +{
-> +	return -EINVAL;
-> +}
+between commit:
 
-Is this actually needed? Core code will generally test to see if the
-op is not NULL before calling it.
+  6e58c3310622 ("ice: fix crash on probe for DPLL enabled E810 LOM")
 
-> +/**
-> + * homa_getsockopt() - Implements the getsockopt system call for Homa sockets.
-> + * @sk:      Socket on which the system call was invoked.
-> + * @level:   ??
-> + * @optname: Identifies a particular setsockopt operation.
-> + * @optval:  Address in user space where the option's value should be stored.
-> + * @option:  ??.
-> + * Return:   0 on success, otherwise a negative errno.
-> + */
-> +int homa_getsockopt(struct sock *sk, int level, int optname,
-> +		    char __user *optval, int __user *option)
-> +{
-> +	pr_warn("unimplemented getsockopt invoked on Homa socket: level %d, optname %d\n",
-> +		level, optname);
+from the net tree and commits:
 
-Another way to spam the log.
+  e4291b64e118 ("ice: Align E810T GPIO to other products")
+  ebb2693f8fbd ("ice: Read SDP section from NVM for pin definitions")
+  ac532f4f4251 ("ice: Cleanup unused declarations")
 
-	Andrew
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 6cedc1a906af,656daff3447e..000000000000
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@@ -400,11 -402,10 +402,11 @@@ int ice_phy_cfg_rx_offset_e82x(struct i
+  int ice_phy_cfg_intr_e82x(struct ice_hw *hw, u8 quad, bool ena, u8 thresh=
+old);
+ =20
+  /* E810 family functions */
+- int ice_read_sma_ctrl_e810t(struct ice_hw *hw, u8 *data);
+- int ice_write_sma_ctrl_e810t(struct ice_hw *hw, u8 data);
+- int ice_read_pca9575_reg_e810t(struct ice_hw *hw, u8 offset, u8 *data);
+- bool ice_is_pca9575_present(struct ice_hw *hw);
++ int ice_read_sma_ctrl(struct ice_hw *hw, u8 *data);
++ int ice_write_sma_ctrl(struct ice_hw *hw, u8 data);
++ int ice_read_pca9575_reg(struct ice_hw *hw, u8 offset, u8 *data);
++ int ice_ptp_read_sdp_ac(struct ice_hw *hw, __le16 *entries, uint *num_ent=
+ries);
+ +int ice_cgu_get_num_pins(struct ice_hw *hw, bool input);
+  enum dpll_pin_type ice_cgu_get_pin_type(struct ice_hw *hw, u8 pin, bool i=
+nput);
+  struct dpll_pin_frequency *
+  ice_cgu_get_pin_freq_supp(struct ice_hw *hw, u8 pin, bool input, u8 *num);
+
+--Sig_/qQcC7M9W10_+AKldn1crROG
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmchhlQACgkQAVBC80lX
+0GzxWQf/Z3ukUS5tXbrpV+AFp0cF9uL7oxqvq3A/tmSCOBBFnBT8GrbSPyn9Iggq
+RBgNBOnMX3dc3gCxF62IQphDRwMm/OXHtW568uRhJPdMKC/BVtXXD9/GbUo907il
+IwqOBo9Bhk9iZrFnr00kYTwMfj4f5lyLcfxW9lInXioyGttMhDnotthzwrTxNHsZ
+HPB7vHmK0nVLxdEXHM52jdnzQdDpfYYnkRsThm8lSujvvJaulgeew0teZkc7Yr7e
+986Wa5x1kNd24bbX1Ma3RxkAUsLB2WIqBit36maNIHgyCk+Hi8NWvVrwfpFI10do
+vmFQ+s2oOKvDF4n4/NBMaCb08l8QMQ==
+=n2/n
+-----END PGP SIGNATURE-----
+
+--Sig_/qQcC7M9W10_+AKldn1crROG--
 
