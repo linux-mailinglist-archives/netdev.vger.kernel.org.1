@@ -1,123 +1,227 @@
-Return-Path: <netdev+bounces-140243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C6529B59F1
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 03:30:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DDAA9B59F5
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 03:33:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEFA61F242C8
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:30:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B71BF1F22556
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 02:32:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B209193063;
-	Wed, 30 Oct 2024 02:29:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D1A7374F1;
+	Wed, 30 Oct 2024 02:32:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EKtDsbgN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="R1V6TdD6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f53.google.com (mail-pj1-f53.google.com [209.85.216.53])
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81211BE46;
-	Wed, 30 Oct 2024 02:29:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5FF538C;
+	Wed, 30 Oct 2024 02:32:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730255392; cv=none; b=Jk90alWxO47gz0xLfSOmc3owAT40M+J9c0f/9rc1B58aixfkKvd+bLH0kmfSzDy9nsXisO+2hUOgy7RgTfykWv1OQmoNoe6b30Ep0JxazxVhvEEyxjBihC/nCJYbQtnGdt0v41FeaO+djdGHj/qC6M95qabQTEsjalsQgZ3qxmI=
+	t=1730255575; cv=none; b=YxzQuoVl+Ljn593dL/QhCmDvirYHqI2Xs+7Y3qV8eRUGL1wmAIwna7jIDX7GiLZAPvpuJv+28MmWYILeqhl65wxdOXBGMJPlVdBBIpVdkk4zAtt7jvIe5iV9584knxaN7oP2vC+AvDVMIUA4Nm5KXcKIjegbl46f2Aqd+lo9wn0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730255392; c=relaxed/simple;
-	bh=9ruMqdY2bry4FJOiAjnED7TcQMhgrho6KLl9cyXbF9M=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Jxqo4ykSvYhSU6buL4OT3xvENlr5/v2CUDvbS59Ew/hp8Ftiie4Lv7cPqvv32jtuuBX4MSE85HhZ2DgeG2CKYvZTnj0Z0cyIyDhYaf4tgqmnjwll4rO3MCb6yXx4ygGrhKpRyF3R0+sGB4AMjOs1SumIf5nYr7riasAz3V3H2sE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EKtDsbgN; arc=none smtp.client-ip=209.85.216.53
+	s=arc-20240116; t=1730255575; c=relaxed/simple;
+	bh=y3tGIjvpyrZAsRZwS3KHsqRmnNnKmCpa2zmfQD283I4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=C8HomOo9kLREed2M7VBhuvV5RBey8KYWZp5MpCNw6HOalZ0rAN4y41IdShL1q1ek7atSCtKPmld+RiMwLE6ErY9dZAoQRO/YR8u1J7HF9IdZBQxR/Bo9rpqLXY5gFKMXo51AhsYhvg38XmyUY4O84Z5wTVFjRoZiI1D1O9m/I58=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=R1V6TdD6; arc=none smtp.client-ip=209.85.166.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f53.google.com with SMTP id 98e67ed59e1d1-2e2a999b287so4983197a91.0;
-        Tue, 29 Oct 2024 19:29:50 -0700 (PDT)
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-3a4e5f07c8fso17942215ab.0;
+        Tue, 29 Oct 2024 19:32:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730255390; x=1730860190; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1730255572; x=1730860372; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=+/o5XK5OJrkzuHt0jaoQyx3CwN+lOhE6gCV0XZuBDN8=;
-        b=EKtDsbgNA+rD2AajU5fIiaIoAqhIOg+RON+oookTovOK5JPRMNxTxW5qEZhi+55nrE
-         0JB2SJC/mtZzTb5eUzqTOHTVqEjrbi0cY7nmt0PqGWtgo70K11O8neFNE9IdWdOGOms3
-         fU4Ya6/BLnXLp619Jqcpw205dRKfRzb/IExmZGZMTcWNCNdhhByE/FovmjvWb60UrIaX
-         jYs05U4Ycw61fGIiH9UmfPJ66YoXLC6kN2K6v5BxUxCfsP0hDP1qswH2ZM7B3JRWnEbO
-         S9tBpH9AqGQWVry4AjuE5vTXpiLM3qbjAu37CwgqVqEm+iZogPac1z6sPuSxlsde062U
-         naSA==
+        bh=uf3/537v6CvS5WNnu+KBmHeOA1NOvNi0+XInTvxne4g=;
+        b=R1V6TdD6p8xtagXCCTojwQeLf547KPcXaQmbPd4FevdWbIwrJX7794fg+K8yNplhl+
+         pXBeVz6P5buwyIqhFVA5KEJiFjEeQpNpw22bL/KEU4O2L+Odr1/fnud0Q7asCvvX4b77
+         T4gWMGBMeQ/3Tsc2Wtnpmf8WhIw1px7TiQDskpt+y9xm9VLF4j936Y4o45cFd56gEQfV
+         pI3zADsm8akkroZAwKVMKsMONBWWkoqADA8IuyrgFBBGRx6Ap9zSh+AFuG4N7SHrex7/
+         jm6xa72VfDLwh2Vx2Lp6fTqBiHbxe3C3IqYW7HqKoDatu0t6Jgo/Gh2w4u1u36jNm/Al
+         6tXA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730255390; x=1730860190;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1730255572; x=1730860372;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=+/o5XK5OJrkzuHt0jaoQyx3CwN+lOhE6gCV0XZuBDN8=;
-        b=LvvpX9w2WIl6IOX76apiZFnyA9bwtGIVlhMGcyldhu7OSnLwgx/0F0BFcXmfe1z0+N
-         wEGFGq1U8GxkpQGBfwEL9uk3ay5XNrBQDIGc9DX4t77b9WoetKMpyzTekZ5jTW78pHXF
-         UHbH+InjXLUUbreqn0QRLPEpIhhACU97BvSQ9Hup0m+d54vIp3xizEPgRaeozrxrI1Tx
-         we8dskx/QW+GouaNCpAlH1B4CU+GnBzFAXgkU9sVo4AJi0HrQjZMyBMOVijHPqvEktW7
-         bzcDF2wmhWY91d3ZCbB0cdzYErh9YZj/aVTjzQtrQnTyH7WOFKH3+NnM+FksaTpu97wJ
-         NT7A==
-X-Forwarded-Encrypted: i=1; AJvYcCWDCx+5KnSJ3EzfaQe0MtigO3GWHVRzFH4x5e0lWJ5/+fUf90OUyzVZvv1F8ECGWzpOrzziHDnu0GOIzCU=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw4w300XmmcBTuTiHfGHkNwEPkvk41PWocwx5HOzkWVi3AS3vEW
-	FaQarYy/aoGSGYCvpkTJLgjotqS0kyFLL2YFqvp5Ct1CTWtNF+0R
-X-Google-Smtp-Source: AGHT+IFijIy1xOySQ/m5xGQRS6VrQCf5Idul7+RyGkBFMYnlMj95XQcicMtXJGIScuTdNjzKS8VqNw==
-X-Received: by 2002:a17:90a:c703:b0:2d8:7561:db71 with SMTP id 98e67ed59e1d1-2e8f10a6eadmr14210471a91.25.1730255389397;
-        Tue, 29 Oct 2024 19:29:49 -0700 (PDT)
-Received: from localhost ([129.146.253.192])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa0ed8fsm431801a91.3.2024.10.29.19.29.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 29 Oct 2024 19:29:49 -0700 (PDT)
-Date: Wed, 30 Oct 2024 10:29:35 +0800
-From: Furong Xu <0x1207@gmail.com>
-To: Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, Andrew
- Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
- andrew+netdev@lunn.ch, Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- xfr@outlook.com
-Subject: Re: [PATCH net-next v5 3/6] net: stmmac: Refactor FPE functions to
- generic version
-Message-ID: <20241030102935.00005ad5@gmail.com>
-In-Reply-To: <20241029185231.fgy6tofi2uoslp3l@skbuf>
-References: <cover.1730084449.git.0x1207@gmail.com>
-	<0f13217c5f7a543121286f13b389b5800bde1730.1730084449.git.0x1207@gmail.com>
-	<20241029185231.fgy6tofi2uoslp3l@skbuf>
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.42; x86_64-w64-mingw32)
+        bh=uf3/537v6CvS5WNnu+KBmHeOA1NOvNi0+XInTvxne4g=;
+        b=ITOLgUdLlIwsy7OUF9WacpgYZ6G9aqRu17k2q/o1Bdy9iJMqrvNTBIIHB5mGuazcQB
+         Nvh81bmK23H3x1wLIq8qcCwCyqjyzrIg9R7hDirdnHrp74oGoXUG/wGIOvk4vZWJaQyn
+         CWiL++88c7mwqtawAbUlt6Q5z56sdQNdUqQL514EtV7GEc6edgzJFA9DGfZEg6Map4f3
+         gjWJvMREY+ghihfxZH2jYgsCVfpo7/xYjpikPrdMWxppwP1N5P3BIEfs0HiSta48xXin
+         04k0qZn1mezGfFlEezsIhuYJj92MsuNDAoURGejhfoyY6QzmuFquE/xtO6C0WQWwcVrI
+         I6CQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkv490nHojg+rYxHGHph8iGmHNnOSN+1W88fvOsLmFwmRnPG0InFKsKHXUBqm+jjCTJxA=@vger.kernel.org, AJvYcCXyrKF1GCCCGfltVvUDDPIxaodBjIbRj2Ejs+Zf+Z0FdOp6Vlxw8fkhwImcrG7G0K9ILuTZNjyu@vger.kernel.org
+X-Gm-Message-State: AOJu0YxVZjSNf3kdjsdBsakeGlU/FF90o5HplXa+tPBLWhqOPqLiW8je
+	9rcXp/2v5zT/xSgZCzA5YLcV1zTOckbkbJjZs9jE8UHgxGxGgJ2jPSvUCrfXNzjOJ77bCWUC9m3
+	3+LeB6Zm0GtIFfeuph4U1BG7oQVk=
+X-Google-Smtp-Source: AGHT+IHry4ur+IXmp3tTTNPgCgTWB29f1Qf/HHLbTDqoVO5LecQSXTulDqr79vBdXfDXaUiIK6hQlLnfItc/RFW26ok=
+X-Received: by 2002:a05:6e02:b2b:b0:3a3:a5c5:3915 with SMTP id
+ e9e14a558f8ab-3a4ed32f502mr135735075ab.16.1730255571871; Tue, 29 Oct 2024
+ 19:32:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-3-kerneljasonxing@gmail.com> <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
+ <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com> <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+In-Reply-To: <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Wed, 30 Oct 2024 10:32:15 +0800
+Message-ID: <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, willemb@google.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	shuah@kernel.org, ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Vladimir,
+On Wed, Oct 30, 2024 at 9:45=E2=80=AFAM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Jason Xing wrote:
+> > On Wed, Oct 30, 2024 at 7:00=E2=80=AFAM Martin KaFai Lau <martin.lau@li=
+nux.dev> wrote:
+> > >
+> > > On 10/28/24 4:05 AM, Jason Xing wrote:
+> > > > From: Jason Xing <kernelxing@tencent.com>
+> > > >
+> > > > This patch has introduced a separate sk_tsflags_bpf for bpf
+> > > > extension, which helps us let two feature work nearly at the
+> > > > same time.
+> > > >
+> > > > Each feature will finally take effect on skb_shinfo(skb)->tx_flags,
+> > > > say, tcp_tx_timestamp() for TCP or skb_setup_tx_timestamp() for
+> > > > other types, so in __skb_tstamp_tx() we are unable to know which
+> > > > feature is turned on, unless we check each feature's own socket
+> > > > flag field.
+> > > >
+> > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > ---
+> > > >   include/net/sock.h |  1 +
+> > > >   net/core/skbuff.c  | 39 +++++++++++++++++++++++++++++++++++++++
+> > > >   2 files changed, 40 insertions(+)
+> > > >
+> > > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > > index 7464e9f9f47c..5384f1e49f5c 100644
+> > > > --- a/include/net/sock.h
+> > > > +++ b/include/net/sock.h
+> > > > @@ -445,6 +445,7 @@ struct sock {
+> > > >       u32                     sk_reserved_mem;
+> > > >       int                     sk_forward_alloc;
+> > > >       u32                     sk_tsflags;
+> > > > +     u32                     sk_tsflags_bpf;
+> > > >       __cacheline_group_end(sock_write_rxtx);
+> > > >
+> > > >       __cacheline_group_begin(sock_write_tx);
+> > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > index 1cf8416f4123..39309f75e105 100644
+> > > > --- a/net/core/skbuff.c
+> > > > +++ b/net/core/skbuff.c
+> > > > @@ -5539,6 +5539,32 @@ void skb_complete_tx_timestamp(struct sk_buf=
+f *skb,
+> > > >   }
+> > > >   EXPORT_SYMBOL_GPL(skb_complete_tx_timestamp);
+> > > >
+> > > > +/* This function is used to test if application SO_TIMESTAMPING fe=
+ature
+> > > > + * or bpf SO_TIMESTAMPING feature is loaded by checking its own so=
+cket flags.
+> > > > + */
+> > > > +static bool sk_tstamp_tx_flags(struct sock *sk, u32 tsflags, int t=
+stype)
+> > > > +{
+> > > > +     u32 testflag;
+> > > > +
+> > > > +     switch (tstype) {
+> > > > +     case SCM_TSTAMP_SCHED:
+> > > > +             testflag =3D SOF_TIMESTAMPING_TX_SCHED;
+> > > > +             break;
+> > > > +     case SCM_TSTAMP_SND:
+> > > > +             testflag =3D SOF_TIMESTAMPING_TX_SOFTWARE;
+> > > > +             break;
+> > > > +     case SCM_TSTAMP_ACK:
+> > > > +             testflag =3D SOF_TIMESTAMPING_TX_ACK;
+> > > > +             break;
+> > > > +     default:
+> > > > +             return false;
+> > > > +     }
+> > > > +     if (tsflags & testflag)
+> > > > +             return true;
+> > > > +
+> > > > +     return false;
+> > > > +}
+> > > > +
+> > > >   static void skb_tstamp_tx_output(struct sk_buff *orig_skb,
+> > > >                                const struct sk_buff *ack_skb,
+> > > >                                struct skb_shared_hwtstamps *hwtstam=
+ps,
+> > > > @@ -5549,6 +5575,9 @@ static void skb_tstamp_tx_output(struct sk_bu=
+ff *orig_skb,
+> > > >       u32 tsflags;
+> > > >
+> > > >       tsflags =3D READ_ONCE(sk->sk_tsflags);
+> > > > +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
+> > >
+> > > I still don't get this part since v2. How does it work with cmsg only
+> > > SOF_TIMESTAMPING_TX_*?
+> > >
+> > > I tried with "./txtimestamp -6 -c 1 -C -N -L ::1" and it does not ret=
+urn any tx
+> > > time stamp after this patch.
+> > >
+> > > I am likely missing something
+> > > or v2 concluded that this behavior change is acceptable?
+> >
+> > Sorry, I submitted this series accidentally removing one important
+> > thing which is similar to what Vadim Fedorenko mentioned in the v1
+> > [1]:
+> > adding another member like sk_flags_bpf to handle the cmsg case.
+> >
+> > Willem, would it be acceptable to add another field in struct sock to
+> > help us recognise the case where BPF and cmsg works parallelly?
+> >
+> > [1]: https://lore.kernel.org/all/662873cb-a897-464e-bdb3-edf01363c3b2@l=
+inux.dev/
+>
+> The current timestamp flags don't need a u32. Maybe just reserve a bit
+> for this purpose?
 
-On Tue, 29 Oct 2024 20:52:31 +0200, Vladimir Oltean <olteanv@gmail.com> wrote:
-> Let's not change the output of stmmac_dma_cap_show() sysfs attribute if
-> we don't have to. Who knows what depends on that. It's better to
-> introduce stmmac_fpe_supported(), which tests for both conditions,
-> and use it throughout (except, of course, for the sysfs, which should
-> still print the raw DMA capability).
+Sure. Good suggestion.
 
-stmmac_fpe_supported() is a better option, thanks.
+But I think only using one bit to reflect whether the sk->sk_tsflags
+is used by normal or cmsg features is not enough. The existing
+implementation in tcp_sendmsg_locked() doesn't override the
+sk->sk_tsflags even the normal and cmsg features enabled parallelly.
+It only overrides sockc.tsflags in tcp_sendmsg_locked(). Based on
+that, even if at some point users suddenly remove the cmsg use and
+then the prior normal SO_TIMESTAMPING continues to work.
 
-> 
-> Which devices would those even be, which support FPE but the driver
-> doesn't deal with them (after your XGMAC addition), do you have any idea?
-> 
+How about this, please see below:
+For now, sk->sk_tsflags only uses 17 bits (see the last one
+SOF_TIMESTAMPING_OPT_RX_FILTER). The cmsg feature only uses 4 flags
+(see SOF_TIMESTAMPING_TX_RECORD_MASK in __sock_cmsg_send()). With that
+said, we could reserve the highest four bits for cmsg use for the
+moment. Four bits represents four points where we can record the
+timestamp in the tx case.
 
-Well, nobody can tell that but only Synopsys, as you can see that
-stmmac_hwif_entry in hwif.c defines quite a few MAC cores.
+Do you agree on this point?
 
-Since FPE have been an optional implementation for MAC cores, so I think
-we should not convert FPE implementation from optional to mandatory for
-new MAC cores, for example, a new MAC support is pending for merge:
-https://lore.kernel.org/netdev/20240904054815.1341712-1-jitendra.vegiraju@broadcom.com/
-
-stmmac_fpe_supported() is a perfect option to handle these concerns.
+Thanks,
+Jason
 
