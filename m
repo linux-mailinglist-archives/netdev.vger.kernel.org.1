@@ -1,123 +1,113 @@
-Return-Path: <netdev+bounces-140424-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140425-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 645239B663F
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:43:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D7DC49B6647
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 15:45:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2883228159B
-	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:43:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 151811C20AA3
+	for <lists+netdev@lfdr.de>; Wed, 30 Oct 2024 14:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 760B81EABAC;
-	Wed, 30 Oct 2024 14:43:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE74A1EF92C;
+	Wed, 30 Oct 2024 14:45:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q87V6h2S"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="I6tiHAYG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C2F8B672;
-	Wed, 30 Oct 2024 14:43:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D17A26AD4;
+	Wed, 30 Oct 2024 14:45:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730299423; cv=none; b=izdjgpDtfxmMPvcwxjZAJCsBEu5a7xIn1wUMx2u/fC4R+VE+At303Hu5el2dyoKw0R0NX5VZcS2S3UNG8jbhdSWzQ45Rn6zfWq5yA627mo/gsBl4d1yPhej2NmhZS5BwCpfHGL3b9/POpXrk21GHsxWwRaxVd17pw+dwz0y1rSg=
+	t=1730299510; cv=none; b=T/gsmomAdlOe5d2Ev+pIkBN05KSiY5O97h8QYu3PXvJ7qyC9B5PN3EorOoV8QSXxMmFeckACzHEsLJ/KV1O5JJIA6syXBC9fX82dc3fp/RIm+Ex2CDtF/sWc4JR7SW84hcRKHDKnv+RMZ0HILzv/VLXYCFfq8ar6dxjcdIOoRIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730299423; c=relaxed/simple;
-	bh=olNxa36OenCXZDSRtWxpBo3OPrtt1ORr8iiTeXjyn7A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KbGORyPYj0IcPGEcL66sfKRJUISwdR4ixyBWwQI0hrUj07GD7QBSOgznSw3U6g0gbi5grKi7xa8ua87HYV0F+wd8JR9dXNgx5BZeDx1kKQr0gWTUfcrfNBPciBquOlh3jlGKlWm6t2PnIfcJKsZ9XSvXNByFQjb1pRANJcQr7Gw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q87V6h2S; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-71e953f4e7cso4960004b3a.3;
-        Wed, 30 Oct 2024 07:43:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730299421; x=1730904221; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=EzEFtEvodZMIY3TcdOA4u9YfoRg5tUWYSWh1VKJyGMg=;
-        b=Q87V6h2SSvkwx5+pW5PAB7jGwx9IzZR//BqFObwz/9qv29EQqP4sm0MzwccksROcuI
-         w1CHB4RTKAoXKL0ZZoMxMLpDGDT/JtGFPm3BkDDSiU/uAg2vEAt6Ztu3WISAXxAKTgKr
-         5NwHVWIr4ZgvQrz2ss3ijGqz3ntD4h+iIUbsMwJIEG70aFr6OesqHx2bElt1BHbfsmI6
-         Ia4WUTsD+uD1AQkwCNfdn/AhzYKVyr0ldpefY+SQuqsvrThHpOyf1EP7nPw80BXFWOjs
-         kzOWZ6dEdySBCuWTtkamU66nKgzYZTzOSahS+ad44EQ/AGpbSeWqyCEyszDlhzFSYVqv
-         Z73w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730299421; x=1730904221;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EzEFtEvodZMIY3TcdOA4u9YfoRg5tUWYSWh1VKJyGMg=;
-        b=psOuCAUftzXO+E4wloWLnKaImJY/jxtf5RsOLY5K29zFj0LfR+8YUq95OIYQM2d24W
-         /B1+neN93M4ovohYQpYwAoy3I//xvZiw51lj4VZg7qIG1v3QslbrJCdj8KEd6CdqmJhN
-         GKatH2Vc3H35vN1BX6qOaFbV93A1Dh9LqQAYrsEV90CR9wXelJ5YHEDIEHQw86Qg7cZR
-         gXImhCX49ZmlpQuJVJ1FMHuQG+dqXgNtyUCSCCWkMvzxEGW9HajsbBSw5MyW9bFZcAGF
-         ETFV6HBBEv5MwP10vbhyEiMc7KGw9nnIpzOYJMFoiw8Ohv0mc3o+wGnYZ3gSH5Ju8EEz
-         C27g==
-X-Forwarded-Encrypted: i=1; AJvYcCVdzN7tCioYqCQTT5hUoOGQsqkIgbClAtOM2eB/Y1j+KNcdVjKij5DnbzGgMfyZezsiG6Y=@vger.kernel.org, AJvYcCXsyswX4BC/YLaSPax8/5W6KGJDa6a8fMLuxpt1IZBTgBPXnxwNy5GN/K4f74WXqpQPvTcKBT1s@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw18zbCibmqMbZ3JT9abRYx/EnRDZZVUOsGHzZWXbzYNbdF4faN
-	WCFGLrdhUbyhcfFittuhYQRT/Uc1ye5KoXgK7UyCQz6X+4527E8=
-X-Google-Smtp-Source: AGHT+IGDJiuBkdeXlxc32ojbr2QziFJCH7t9Zj8FLjEsOFhNKu3pi5/rIocq+tO1UUODrOzDPFSl6g==
-X-Received: by 2002:a05:6a00:3e1f:b0:720:36c5:b548 with SMTP id d2e1a72fcca58-72062fb8112mr20516374b3a.16.1730299420815;
-        Wed, 30 Oct 2024 07:43:40 -0700 (PDT)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72057921863sm9294250b3a.33.2024.10.30.07.43.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 07:43:40 -0700 (PDT)
-Date: Wed, 30 Oct 2024 07:43:39 -0700
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-Subject: Re: [PATCH bpf] bpf, test_run: Fix LIVE_FRAME frame update after a
- page has been recycled
-Message-ID: <ZyJGG7aWRb0Lvk13@mini-arch>
-References: <20241030-test-run-mem-fix-v1-1-41e88e8cae43@redhat.com>
+	s=arc-20240116; t=1730299510; c=relaxed/simple;
+	bh=z8WrrbogaEylcqJjgys2QWCe65qdGnEJNaFj0WpQtd0=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 MIME-Version:Content-Type; b=HHVlqgrt6948qeP/9UxnCrnNYPpZfU93K7E1FL/dNNScpbmHFivi/SzJSjEQo2hQDSmw9aW0c9mtDHt7h9noCeaI2bXqze6ziKjGFAhadAJ4gYERMxTcTTExhQUIy1H/9KWP7T8Ih+7+JbMbRpnfFVk7tgLq/Pdh3wBfo9FlrhQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=I6tiHAYG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EA43EC4CECE;
+	Wed, 30 Oct 2024 14:45:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730299510;
+	bh=z8WrrbogaEylcqJjgys2QWCe65qdGnEJNaFj0WpQtd0=;
+	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
+	b=I6tiHAYGMTTFaAd5Au3dFvpmaqCTdxU2qYSYjlQiTkQsdVRaDtlxIWOc/Xm4XvJ+9
+	 xq9opcdJNNH6OFXtjQ2lI5t90VAnI/rsVUaLaN1HcvAxT9svBgAWbgPI/kqhPnrjQD
+	 7cXb4Ru+qaxZCk+FtC4vLXBqnU6rusNfhmVZs/KQuXxu2YdGbNXEFdyAatVsgInk4x
+	 kKLF5WMDXP9IvpQvOPE5rA1+LSEaVvDowBCBKqWUnbHE/Q3y6eolsYI6UKQ3KP2cm/
+	 xr/s0sSOKXuKtBbmjfuiPJYQQcaIjQ2Vd8PPn/TCEp/Y6uhNOYVVvnQk8hEvWxbYr/
+	 DWKFZv48I1lvg==
+Date: Wed, 30 Oct 2024 15:45:02 +0100 (GMT+01:00)
+From: Matthieu Baerts <matttbe@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: kuba@kernel.org, horms@kernel.org, davem@davemloft.net,
+	edumazet@google.com, pabeni@redhat.com,
+	Mat Martineau <martineau@kernel.org>,
+	Geliang Tang <geliang@kernel.org>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, vlad.wing@gmail.com, max@kutsevol.com,
+	kernel-team@meta.com, aehkn@xenhub.one, stable@vger.kernel.org,
+	"open list:NETWORKING [MPTCP]" <mptcp@lists.linux.dev>
+Message-ID: <e891f590-7dd5-4207-adef-d90b90172aeb@kernel.org>
+In-Reply-To: <20241030140224.972565-1-leitao@debian.org>
+References: <20241030140224.972565-1-leitao@debian.org>
+Subject: Re: [PATCH net] mptcp: Ensure RCU read lock is held when calling
+ mptcp_sched_find()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241030-test-run-mem-fix-v1-1-41e88e8cae43@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Correlation-ID: <e891f590-7dd5-4207-adef-d90b90172aeb@kernel.org>
 
-On 10/30, Toke Høiland-Jørgensen wrote:
-> The test_run code detects whether a page has been modified and
-> re-initialises the xdp_frame structure if it has, using
-> xdp_update_frame_from_buff(). However, xdp_update_frame_from_buff()
-> doesn't touch frame->mem, so that wasn't correctly re-initialised, which
-> led to the pages from page_pool not being returned correctly. Syzbot
-> noticed this as a memory leak.
-> 
-> Fix this by also copying the frame->mem structure when re-initialising
-> the frame, like we do on initialisation of a new page from page_pool.
-> 
-> Reported-by: syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-> Tested-by: syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
-> Fixes: e5995bc7e2ba ("bpf, test_run: fix crashes due to XDP frame overwriting/corruption")
-> Fixes: b530e9e1063e ("bpf: Add "live packet" mode for XDP in BPF_PROG_RUN")
-> Signed-off-by: Toke Høiland-Jørgensen <toke@redhat.com>
+Hi Breno
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+30 Oct 2024 15:02:45 Breno Leitao <leitao@debian.org>:
+
+> The mptcp_sched_find() function must be called with the RCU read lock
+> held, as it accesses RCU-protected data structures. This requirement was
+> not properly enforced in the mptcp_init_sock() function, leading to a
+> RCU list traversal in a non-reader section error when
+> CONFIG_PROVE_RCU_LIST is enabled.
+>
+> =C2=A0=C2=A0=C2=A0 net/mptcp/sched.c:44 RCU-list traversed in non-reader =
+section!!
+>
+> Fix it by acquiring the RCU read lock before calling the
+> mptcp_sched_find() function. This ensures that the function is invoked
+> with the necessary RCU protection in place, as it accesses RCU-protected
+> data structures.
+
+Thank you for having looked at that, but there is already a fix:
+
+https://lore.kernel.org/netdev/20241021-net-mptcp-sched-lock-v1-1-637759cf0=
+61c@kernel.org/
+
+This fix has even been applied in the net tree already:
+
+https://git.kernel.org/netdev/net/c/3deb12c788c3
+
+Did you not get conflicts when rebasing your branch on top of the
+latest version?
+
+> Additionally, the patch breaks down the mptcp_init_sched() call into
+> smaller parts, with the RCU read lock only covering the specific call to
+> mptcp_sched_find(). This helps minimize the critical section, reducing
+> the time during which RCU grace periods are blocked.
+
+I agree with Eric (thank you for the review!): this creates other issues.
+
+> The mptcp_sched_list_lock is not held in this case, and it is not clear
+> if it is necessary.
+
+It is not needed, the list is not modified, only read with RCU.
+
+Cheers,
+Matt
 
