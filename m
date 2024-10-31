@@ -1,222 +1,273 @@
-Return-Path: <netdev+bounces-140719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB6569B7B3C
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:00:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6799E9B7B3E
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:01:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AEDA2860CF
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:00:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A6511C21015
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7286119D89E;
-	Thu, 31 Oct 2024 13:00:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16FBE156236;
+	Thu, 31 Oct 2024 13:01:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GTybwIMh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gJmGn3VV"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2069.outbound.protection.outlook.com [40.107.244.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f43.google.com (mail-ot1-f43.google.com [209.85.210.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52BDC19D091
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 13:00:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.69
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730379620; cv=fail; b=rNT2K0tUc0tzGHILl6vM7MOI4Fv48mxxheCRgaaX9Lmuv92wC5195WD13FfbuMuwnZLw7XTCjuvulG147vDf6fmd47zGlrk0XkxbMcwZjPkRSjqva36/faF5yz1vCYjVKqIHp2Mite0n/4Y3m5GLPDW3C3ZTNN1yWkjFyB4JuY4=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730379620; c=relaxed/simple;
-	bh=y+DH2EfvsfwmMteBTTwqSrIhzKqABHI6FBB03FgoyPk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NRFOA6L6UI9DM8oEGqKVJBbLyqLEcFU/cre+xeiQ/2q6Ojy+gfwou2it7PMyBNiKuKdRx7hqAu62Z5bo0YajMCgAJzNDpwATu7BhPRisv+mmxf4Ywfeq7D0ZXuCeyaRX+67BkdIjw4JR6Crq9a1q641XtcQlPMhlBLQO3M/L9as=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GTybwIMh; arc=fail smtp.client-ip=40.107.244.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=P9vlXL49L5fX3PHM4fQx9/2TolJLXzctdFZWuVQjtoFRRkPzbj1XJxozBkuypAstLXQ9xOW+ZCNoE3gHMUYivlct4+doGz9fETFE94b87i/uajl0LlHa0e1uTjw9+r9CEV1W2mWQeEoR+ElNKt1Mn9ejHaBbHpSrMRrk0GCdIFYffyDbuzPttRtkVU18fv/3xw6VtjeUHzLaRqFmOl8L8fhXDF5Wtf9uiGOP25JSQ+3BhJnQU/lXNdxe9egjMpDynyzCfkP8/3pRLWEcv4Wzbf3IUSVuLDfxNcmm+McY4iSsip5t23d7eSMhPrYxiGGrZUXU+6W/33JgRYJXuiBmjA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=nt2FsRATwimwLze+s3f7Xb4wQwEhRZ35tBEc7ilZsQ0=;
- b=CXci1yWLqNSpYyV8bLX1mEH+64oxqX9sNRFydoznwFiC/HDDRJyLCjJ+mcdbdfZHVguatINdb+y/cGpxkdccdkZzROvYbg4V48ljgBbpyLvs4cogTE5tfvSIpAA4q5jQJx4KQve8oJ46qAKNP/FNaCOZKVYoi6jKXlomZvxBzUT0gCNnRFguQ5Eu4L0h4Rnh6+aumz8uhfHeipk2x0GdgxyWUw4PZXiVtaoPDvQL4bnMgizI0/p8itU2NaQOMicAAVYfTSFVEy5Ow//n8227jU89OKYcdcyg9ngjM1jnQCEKRRZTcQHngbJBB8Hsin3se4sbiFfdmY4tE5A7DjYdSQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=nt2FsRATwimwLze+s3f7Xb4wQwEhRZ35tBEc7ilZsQ0=;
- b=GTybwIMhpouE3wYRWw6aQ/GtUx5JGvh/wWtTjCLYWdpwqlKKsqbgXsJ9gBbTLxiLb93WtxIM3ZvoBnpG2aFp9gD/kylAPq3+hgpJ/6LKACyn9yEck2DMpKCjdjz3FlD6ei5sGczt6tT9tnQjnPcI/Vj1PM0Fxf8qrKy/n832AzDOUnVF1tPeswGs8bLMHukjft7khefflBHJuUa/zXsLYTYZ/nuzeAj5EnJ2ZQx7lWgKxRvtaWd8hhoosG8BhQ4xh+0L1H7roZa0uL57IGKOCFVYWToK/z5hkv1u1axQVCbGlJC1z/ERwKj8T6s0Vj7PJX+N7grXd3eU5k2XyahIQg==
-Received: from CH2PR11CA0026.namprd11.prod.outlook.com (2603:10b6:610:54::36)
- by DM4PR12MB8452.namprd12.prod.outlook.com (2603:10b6:8:184::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.23; Thu, 31 Oct
- 2024 13:00:08 +0000
-Received: from CH2PEPF00000147.namprd02.prod.outlook.com
- (2603:10b6:610:54:cafe::3d) by CH2PR11CA0026.outlook.office365.com
- (2603:10b6:610:54::36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.20 via Frontend
- Transport; Thu, 31 Oct 2024 13:00:08 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.232) by
- CH2PEPF00000147.mail.protection.outlook.com (10.167.244.104) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8114.16 via Frontend Transport; Thu, 31 Oct 2024 13:00:07 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 31 Oct
- 2024 05:59:53 -0700
-Received: from drhqmail203.nvidia.com (10.126.190.182) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 31 Oct 2024 05:59:52 -0700
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 31 Oct 2024 05:59:49 -0700
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, William Tu
-	<witu@nvidia.com>, Parav Pandit <parav@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net-next 5/5] net/mlx5e: do not create xdp_redirect for non-uplink rep
-Date: Thu, 31 Oct 2024 14:58:56 +0200
-Message-ID: <20241031125856.530927-6-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241031125856.530927-1-tariqt@nvidia.com>
-References: <20241031125856.530927-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A727B1BD9E4
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 13:01:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.43
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730379668; cv=none; b=QwEiime30Zv5poH7omkMGfOdFNKEFo5MHC9jT2YYbzWNQ7OwksvtuN9d+R7o+Rf1Efae3WhAmIbLQh+NwsuLDHTUX+XHpjhLihr0Syz6+BzVY/oOwEFRO9nMc+q8SW5PifCEWTFB3nfqUtIN9zjUPSZUhJMCTCAeCck8iKvXhgE=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730379668; c=relaxed/simple;
+	bh=WL0ekRzpEJWB2MlvkZdSWdD1HNMMUD37a8GqtIGSz6U=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=VOM70ixRSOTpDzcY1lN2DF16eu+D43osEo77jseIRuTqMfcb9jJpLi3/5aOP1gqWG245IUIwmL+p2Bvie65TUheKismo72axafUTs/fmSfANkKT6K1dqqFDnQo3Rg1rbasKEQoV26SMOREFCavecifjyVLirKzvamsUwPLeNnU4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gJmGn3VV; arc=none smtp.client-ip=209.85.210.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f43.google.com with SMTP id 46e09a7af769-71809fe188cso414602a34.0
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:01:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730379664; x=1730984464; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9dpGwKmpYLtHY2CPvIf6drSwpHGzRpDVIUyo9Mf7N0A=;
+        b=gJmGn3VVz4O5ghc+bHhaWk2dL52TLcfpiGXjX4aZx/aMpDqQNnKlAkkicV2iMDRlK9
+         xQbXkjFlVTiVQnAmor+a30WXYPKF4ggKbbgzzMYVE/1UCUWg1gPzj6DMJU1VjDO4hJpd
+         5zJ58rdKYDRtH+s95Jb2PD3O7Mioo1S2qt4uiG7tH19MBQ2b4Djwc0HpdBkFZqoM6SDx
+         bKeqpvNwXasgCw0IbX+Drv5YYu4ktnp8FOumV9iaI2iTLK9ib1UaLnBJvqo9pDVKBe3Q
+         YokXJVLdZcurxquzHlCWrD6T55F6Q2jSf+az1LeN78iC0PKFhj4lhTAxLZF3k66hwc0L
+         28Og==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730379664; x=1730984464;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=9dpGwKmpYLtHY2CPvIf6drSwpHGzRpDVIUyo9Mf7N0A=;
+        b=GFe59xoS1tsGf+QYBqh0GNI0RY+8YxISAK9PBB49UXgWRRSV24QRLQt1/2uqY1VJyp
+         eAXs52ZI3sblETuXGlSMSjq6YrV9W7or2Ri8Jkp5TiE6ov8JboB96c1tF1RbVehhk96g
+         jGcjmB6TUkxf0EbW8CDzSHdmbsAmFmNcRqG5oHifGf8IxTnY7UDTeFe4WMY8htyAQBUS
+         mWVj8yg+YJpHpIN8DvVtAru+1z3ILsnhLmBzMJqPUQvMqPosxGJP+54GEUtA+/HDT0YV
+         oWa5VlbtsicuFV5o2t5wn2OuQAhWl14CUNSnCOOxTTibGTPdOSzQGE6gQ2PuqiYNZJYV
+         uTuA==
+X-Gm-Message-State: AOJu0Yx/k9VETsMOA1QEavTuMPluB+nmkQlcbfBpiMjd6XC6TjHoalx5
+	L2p9dPVrkeVJZ4m0lLOZ41DiPaVvi1tm2lAL/4OveZq7AFYos4Qx
+X-Google-Smtp-Source: AGHT+IFj5yyG8To4lT6ftA5AtR4SwqTVO9IU7qsBys2ep5hzvhJ/n9aGZtO1qN39NHRSJ+xZLoQEvQ==
+X-Received: by 2002:a05:6830:2a9f:b0:718:4063:4c71 with SMTP id 46e09a7af769-7189b4f290fmr3614154a34.15.1730379663802;
+        Thu, 31 Oct 2024 06:01:03 -0700 (PDT)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ad164066sm7171521cf.73.2024.10.31.06.01.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2024 06:01:03 -0700 (PDT)
+Date: Thu, 31 Oct 2024 09:01:02 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Anna Nyiri <annaemesenyiri@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, 
+ fejes@inf.elte.hu
+Message-ID: <67237f8ec3078_b635c29443@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAKm6_Rv2-0BgpzAKCBPsi9TJbTPq5q0maC1odUAdNEQV7GegiQ@mail.gmail.com>
+References: <20241029144142.31382-1-annaemesenyiri@gmail.com>
+ <6720fc298dd5a_2bcd7f29492@willemb.c.googlers.com.notmuch>
+ <CAKm6_Rv2-0BgpzAKCBPsi9TJbTPq5q0maC1odUAdNEQV7GegiQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] support SO_PRIORITY cmsg
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CH2PEPF00000147:EE_|DM4PR12MB8452:EE_
-X-MS-Office365-Filtering-Correlation-Id: 31cf640e-6249-44d5-cc21-08dcf9abf235
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|82310400026|1800799024|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?6hdXyia+4hrDhVmUB+Ip/01PeSuLhQp2vXNkJNuGXKJl9bO15lI6eiReldO/?=
- =?us-ascii?Q?fP6R1NePXp1C9Kox+b0KIDP9RtRlyzGK5HwMRtYY8YUjaftMWOa8h3a69jAF?=
- =?us-ascii?Q?p22djIxIPF8cwc/WcTskO7Efnwwqe+xKzaWetRyk8T9+q596hF6AhnntvQfo?=
- =?us-ascii?Q?qlFUUG7+t+G4ICKK/CaIKAFbo3Ci+2kkI/CgVxlXrcnlpQP+lgaZt7e2+Z1X?=
- =?us-ascii?Q?cH+CsBUjQzWYsn1WA7nwJSJKYxCpwfGDfG2Kya/Z7tZ2hwJKSKWy58HtOqea?=
- =?us-ascii?Q?f0PS+xff8cyqdpD0htqLh/AZ/PxbiMhSHwujM4F78rnqlj28izF9t/2UpigI?=
- =?us-ascii?Q?MXcd5y2Zg3KtH/XndN9EaJ/+BhMuR+ZrMAEVa9iF3tmBUv13vuqG2PyPs/qC?=
- =?us-ascii?Q?kB24qGUt80/hIgTNT/YtG7Rx4xlLH6L3nSXGBZQy8J/UHN7OKn/Tuh5g71JH?=
- =?us-ascii?Q?NNUs/yoRILnCN0j0CGcoFEoFkOKx3THC8Omm0VzSj1Ctpl7DAF+NTEcHiGDM?=
- =?us-ascii?Q?F7NglMnvUwe7K9M54f5d3psPGvZUJGIcqBRR9UlO8KwNsTCC6JXjDa0rgRmH?=
- =?us-ascii?Q?iPWJEV14eLEGLjN7B71+Jn989XCxT3USYR5aJ+eZgBvUlJr8wQr7zLWaEcFs?=
- =?us-ascii?Q?tEfTo/sw63mxbGBZZVskPeRHDn2QDl7pJsDLySqscqWrIe88t4eDdPsU/HlI?=
- =?us-ascii?Q?+nFkYJn6zt0ehZPq28qDmvyhWLKYMiWjt4UWWbbQUIeMuG+KBy0wEehO0cXw?=
- =?us-ascii?Q?6r4JvSI7KtrLVraPJCWlrZ7iLUtAVQfW7xLNXLYu4uI8BEw6dwyrEv4Wyb05?=
- =?us-ascii?Q?lVL6jxRb1RTsNr+w0N87ET36MhaAnPQ8ZOe/BaI/vUCdWO/taRCH+g8ryT5Z?=
- =?us-ascii?Q?QNjpMKDCWtqC+MVEXX2Tgnza7j96Yp+iVJ/1x6GGkTAwF/+9+pGfWJwqxN81?=
- =?us-ascii?Q?wInVZmSwsjdKfOZyPYysbMPDSe0TFoxbLKYMMfsNVt8kM8NFne4wOC16dwcN?=
- =?us-ascii?Q?ghCjkMl1VIJ4bJ7EV3b3hOZihDIQWT8BsT41yue/7E1CdtT695KbRZHv97eb?=
- =?us-ascii?Q?KfF0JD0WVVih/vzlGjzsThUyAYt3xEVOJc+WP0XdzVcPX70mRddYQMAW19cC?=
- =?us-ascii?Q?/s2T4evar9qUosbtSMW4GKP80o5HEwG6cOP1UZEE1qPxOk/ANfT12ZZ28glh?=
- =?us-ascii?Q?HAGVp9e6T3SP0xwKEeS0ZzIu59D/VCsijWK0MjMHkxHxOn0CmliEUbgLV7bk?=
- =?us-ascii?Q?l1uQqaFig6i7xIkXzpVADs/J8Vcn6ul600X1QsPkR7PcWSS4tUSqZBkmYbwu?=
- =?us-ascii?Q?d3dkAcS9GglTiNKjrcbeIuf6X9GyvXtVd3PERacS7PpvRJdOiSa3pvbgrcV8?=
- =?us-ascii?Q?efVT2cXWKtSwKILi8S5eDb5EeAfTjkIJsppFS05Exjajp8Cbew=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(82310400026)(1800799024)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 13:00:07.6697
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31cf640e-6249-44d5-cc21-08dcf9abf235
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CH2PEPF00000147.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB8452
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-From: William Tu <witu@nvidia.com>
+Anna Nyiri wrote:
+> Willem de Bruijn <willemdebruijn.kernel@gmail.com> ezt =C3=ADrta (id=C5=
+=91pont:
+> 2024. okt. 29., K, 16:15):
+> >
+> > Anna Emese Nyiri wrote:
+> > > The Linux socket API currently supports setting SO_PRIORITY at the =
+socket
+> > > level, which applies a uniform priority to all packets sent through=
+ that
+> > > socket. The only exception is IP_TOS, if that is specified as ancil=
+lary
+> > > data, the packet does not inherit the socket's priority. Instead, t=
+he
+> > > priority value is computed when handling the ancillary data (as imp=
+lemented
+> > > in commit <f02db315b8d888570cb0d4496cfbb7e4acb047cb>: "ipv4: IP_TOS=
 
-XDP and XDP socket require extra SQ/RQ/CQs. Most of these resources
-are dynamically created: no XDP program loaded, no resources are
-created. One exception is the SQ/CQ created for XDP_REDRIECT, used
-for other netdev to forward packet to mlx5 for transmit. The patch
-disables creation of SQ and CQ used for egress XDP_REDIRECT, by
-checking whether ndo_xdp_xmit is set or not.
+> > > and IP_TTL can be specified as ancillary data").
+> >
+> > Please use commit format <$SHA1:12> ("subject"). Checkpatch might als=
+o
+> > flag this.
+> >
+> > > Currently, there is no option to set the priority directly from use=
+rspace
+> > > on a per-packet basis. The following changes allow SO_PRIORITY to b=
+e set
+> > > through control messages (CMSG), giving userspace applications more=
 
-For netdev without XDP support such as non-uplink representor, this
-saves around 0.35MB of memory, per representor netdevice per channel.
+> > > granular control over packet priorities.
+> > >
+> > > This patch enables setting skb->priority using CMSG. If SO_PRIORITY=
+ is
+> > > specified as ancillary data, the packet is sent with the priority v=
+alue
+> > > set through sockc->priority_cmsg_value, overriding the socket-level=
 
-Signed-off-by: William Tu <witu@nvidia.com>
-Reviewed-by: Parav Pandit <parav@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- .../net/ethernet/mellanox/mlx5/core/en_main.c   | 17 +++++++++++------
- 1 file changed, 11 insertions(+), 6 deletions(-)
+> > > values set via the traditional setsockopt() method.
+> >
+> > Please also describe how this interacts with priority set from IP_TOS=
+ or
+> > IPV6_TCLASS.
+> >
+> > > This is analogous to
+> > > existing support for SO_MARK (as implemented in commit
+> > > <c6af0c227a22bb6bb8ff72f043e0fb6d99fd6515>, =E2=80=9Cip: support SO=
+_MARK
+> > > cmsg=E2=80=9D).
+> > >
+> > > Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
+> > > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+> > > ---
+> > >  include/net/inet_sock.h |  2 ++
+> > >  include/net/sock.h      |  5 ++++-
+> > >  net/can/raw.c           |  6 +++++-
+> > >  net/core/sock.c         | 12 ++++++++++++
+> > >  net/ipv4/ip_output.c    | 11 ++++++++++-
+> > >  net/ipv4/raw.c          |  5 ++++-
+> > >  net/ipv6/ip6_output.c   |  8 +++++++-
+> > >  net/ipv6/raw.c          |  6 +++++-
+> > >  net/packet/af_packet.c  |  6 +++++-
+> > >  9 files changed, 54 insertions(+), 7 deletions(-)
+> > >
+> > > diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
+> > > index f9ddd47dc4f8..9d4e4e2a8232 100644
+> > > --- a/include/net/inet_sock.h
+> > > +++ b/include/net/inet_sock.h
+> > > @@ -175,6 +175,8 @@ struct inet_cork {
+> > >       __u16                   gso_size;
+> > >       u64                     transmit_time;
+> > >       u32                     mark;
+> > > +     __u8            priority_cmsg_set;
+> > > +     u32                     priority_cmsg_value;
+> >
+> > Just priority, drop the cmsg value.
+> >
+> > Instead of an explicit "is set" bit, preferred is to initialize the
+> > cookie field from the sock. See sockcm_init(), below, and also
+> > ipcm_init_sk(). That also avoids the branches later in the datapath.
+> >
+> > >  };
+> > >
+> > >  struct inet_cork_full {
+> > > diff --git a/include/net/sock.h b/include/net/sock.h
+> > > index cce23ac4d514..e02170977165 100644
+> > > --- a/include/net/sock.h
+> > > +++ b/include/net/sock.h
+> > > @@ -1794,13 +1794,16 @@ struct sockcm_cookie {
+> > >       u64 transmit_time;
+> > >       u32 mark;
+> > >       u32 tsflags;
+> > > +     u32 priority_cmsg_value;
+> > > +     u8 priority_cmsg_set;
+> > >  };
+> > >
+> > >  static inline void sockcm_init(struct sockcm_cookie *sockc,
+> > >                              const struct sock *sk)
+> > >  {
+> > >       *sockc =3D (struct sockcm_cookie) {
+> > > -             .tsflags =3D READ_ONCE(sk->sk_tsflags)
+> > > +             .tsflags =3D READ_ONCE(sk->sk_tsflags),
+> > > +             .priority_cmsg_set =3D 0
+> > >       };
+> > >  }
+> > >
+> > > diff --git a/net/can/raw.c b/net/can/raw.c
+> > > index 00533f64d69d..cf7e7ae64cde 100644
+> > > --- a/net/can/raw.c
+> > > +++ b/net/can/raw.c
+> > > @@ -962,7 +962,11 @@ static int raw_sendmsg(struct socket *sock, st=
+ruct msghdr *msg, size_t size)
+> > >       }
+> > >
+> > >       skb->dev =3D dev;
+> > > -     skb->priority =3D READ_ONCE(sk->sk_priority);
+> > > +     if (sockc.priority_cmsg_set)
+> > > +             skb->priority =3D sockc.priority_cmsg_value;
+> > > +     else
+> > > +             skb->priority =3D READ_ONCE(sk->sk_priority);
+> > > +
+> > >       skb->mark =3D READ_ONCE(sk->sk_mark);
+> > >       skb->tstamp =3D sockc.transmit_time;
+> > >
+> > > diff --git a/net/core/sock.c b/net/core/sock.c
+> > > index 9abc4fe25953..899bf850b52a 100644
+> > > --- a/net/core/sock.c
+> > > +++ b/net/core/sock.c
+> > > @@ -2863,6 +2863,18 @@ int __sock_cmsg_send(struct sock *sk, struct=
+ cmsghdr *cmsg,
+> > >       case SCM_RIGHTS:
+> > >       case SCM_CREDENTIALS:
+> > >               break;
+> > > +     case SO_PRIORITY:
+> > > +             if (cmsg->cmsg_len !=3D CMSG_LEN(sizeof(u32)))
+> > > +                     return -EINVAL;
+> > > +
+> > > +             if ((*(u32 *)CMSG_DATA(cmsg) >=3D 0 && *(u32 *)CMSG_D=
+ATA(cmsg) <=3D 6) ||
+> > > +                 sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET=
+_RAW) ||
+> > > +                 sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET=
+_ADMIN)) {
+> > > +                     sockc->priority_cmsg_value =3D *(u32 *)CMSG_D=
+ATA(cmsg);
+> > > +                     sockc->priority_cmsg_set =3D 1;
+> > > +                     break;
+> > > +             }
+> >
+> > What is the magic constant 6 here?
+> =
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 2f609b92d29b..59d7a0e28f24 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -2514,6 +2514,7 @@ static int mlx5e_open_queues(struct mlx5e_channel *c,
- 			     struct mlx5e_params *params,
- 			     struct mlx5e_channel_param *cparam)
- {
-+	const struct net_device_ops *netdev_ops = c->netdev->netdev_ops;
- 	struct dim_cq_moder icocq_moder = {0, 0};
- 	struct mlx5e_create_cq_param ccp;
- 	int err;
-@@ -2534,10 +2535,12 @@ static int mlx5e_open_queues(struct mlx5e_channel *c,
- 	if (err)
- 		goto err_close_icosq_cq;
- 
--	c->xdpsq = mlx5e_open_xdpredirect_sq(c, params, cparam, &ccp);
--	if (IS_ERR(c->xdpsq)) {
--		err = PTR_ERR(c->xdpsq);
--		goto err_close_tx_cqs;
-+	if (netdev_ops->ndo_xdp_xmit) {
-+		c->xdpsq = mlx5e_open_xdpredirect_sq(c, params, cparam, &ccp);
-+		if (IS_ERR(c->xdpsq)) {
-+			err = PTR_ERR(c->xdpsq);
-+			goto err_close_tx_cqs;
-+		}
- 	}
- 
- 	err = mlx5e_open_cq(c->mdev, params->rx_cq_moderation, &cparam->rq.cqp, &ccp,
-@@ -2601,7 +2604,8 @@ static int mlx5e_open_queues(struct mlx5e_channel *c,
- 	mlx5e_close_cq(&c->rq.cq);
- 
- err_close_xdpredirect_sq:
--	mlx5e_close_xdpredirect_sq(c->xdpsq);
-+	if (c->xdpsq)
-+		mlx5e_close_xdpredirect_sq(c->xdpsq);
- 
- err_close_tx_cqs:
- 	mlx5e_close_tx_cqs(c);
-@@ -2629,7 +2633,8 @@ static void mlx5e_close_queues(struct mlx5e_channel *c)
- 	if (c->xdp)
- 		mlx5e_close_cq(&c->rq_xdpsq.cq);
- 	mlx5e_close_cq(&c->rq.cq);
--	mlx5e_close_xdpredirect_sq(c->xdpsq);
-+	if (c->xdpsq)
-+		mlx5e_close_xdpredirect_sq(c->xdpsq);
- 	mlx5e_close_tx_cqs(c);
- 	mlx5e_close_cq(&c->icosq.cq);
- 	mlx5e_close_cq(&c->async_icosq.cq);
--- 
-2.44.0
+> The mechanism for setting the priority value via cmsg mirrors that of
+> setting the priority value through setsockopt. The control of the
+> priority value is managed by the sk_setsockopt function, which allows
+> setting the priority within the range of 0 to 6. However, if the user
+> has CAP_NET_ADMIN or CAP_NET_RAW capability, they are permitted to set
+> any priority value without restriction. The specified range of 0 to 6
+> was selected to align with existing priority value check.
+
+Oh right. This is just copied from setsockopt SO_PRIORITY.
+Having an non-annotated constant there is unfortunate too, but goes
+back to before the introduction of git.
+
+And that goes back to the priority bands configured with
+rt_tos2priority. As setsockopt IP_TOS is not a privileged operation.
+
+Ideally this would say TC_PRIO_BESTEFFORT and TC_PRIO_INTERACTIVE.
+
+Since both the setsockopt and cmsg check are in net/core/sock.c,
+can we deduplicate the logic and introduce helper:
+
+    static bool sk_set_prio_allowed(const struct sock *sk, int val)
+    {
+            return ((val >=3D TC_PRIO_BESTEFFORT && val <=3D TC_PRIO_INTE=
+RACTIVE) ||
+                    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW=
+) ||
+                    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADM=
+IN))
+    }
 
 
