@@ -1,216 +1,82 @@
-Return-Path: <netdev+bounces-140598-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140599-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3E19B720E
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:41:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 303719B723D
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:49:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 42280B23704
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:41:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFE001F2455F
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:49:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C305D71B3A;
-	Thu, 31 Oct 2024 01:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2757D42AA5;
+	Thu, 31 Oct 2024 01:49:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="tBxghj98"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZqBCkTK"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C75145025;
-	Thu, 31 Oct 2024 01:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC39A442C;
+	Thu, 31 Oct 2024 01:49:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730338863; cv=none; b=inDNPA6RDo95Bod3IwI/7PnnpUhpirRkJM+dxYfTqEqBGzFa/S9MBvKh8/dVjJeMXMMaKx2PMPb6FsxhqYCNp02ZlmQPWJ/bLYeDGbfY+Tk6qtbaHRg2Z9JK0/gFUv0rNqWOXD2KL/m6vXFQeQhThS/grvrWreJRS7D+CwZcAvE=
+	t=1730339371; cv=none; b=mNhCK2zCQx2HrapwGINE9+ht4DQbHuYQ6Cg0RSgpErySEjvH/4laUCEYzU77m5HPJZULF4VrLAVrru8dOyWpnVGVMBMVCPj1ZkCHMgxOg6P42JNhqshnIynQZRRPXfQOslPR4QLKVearynzs2hnRygF1WxVYEVo5p9co/+qbC/w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730338863; c=relaxed/simple;
-	bh=PruUELLs5uKbkikgD7DNfTVa6rqlhMSedYgBFpijzEA=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=a4B39vIazAyot8CpcqX32KIIPe6D9I/Ou02cMG1blrT/vZmE9UOMtXuNPvP1oMZ/sDMbVlX72n/Hp8wO2k7hEOTqQBgu5gu1eqEHaAwrNdBTdqGuA15xxaAmMdGW6vPI9nHk/KJb7idKURGHZ9nX0kFjU95dwW3CqR54ddAFHGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=tBxghj98; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B0583C4CECE;
-	Thu, 31 Oct 2024 01:40:57 +0000 (UTC)
+	s=arc-20240116; t=1730339371; c=relaxed/simple;
+	bh=8ahn1VB1Hn10WaMpYW3c0BOhGixbKAjaO+u0J+wFEyE=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=WNQ24c3tEpt8P5xJTjLkXvQh5tR2j/ExZb2xE/WfFn00KzZgKULcHqrBN/D1GmNu8EvZRAqPshMsNT3DhR1tO86CShltg26AEupU0DwiJhwXRlYs5oF1jq+gNbH73H8mnMWDKKHz4LCLx8ld4X0soKIpxUe12VuJG/5wTzRhon0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZqBCkTK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF6BC4CECE;
+	Thu, 31 Oct 2024 01:49:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730338863;
-	bh=PruUELLs5uKbkikgD7DNfTVa6rqlhMSedYgBFpijzEA=;
-	h=From:To:Cc:Subject:Date:From;
-	b=tBxghj98kyqm1zlyAqSMRpfTJeXOiqUe8TOP3xp6jVLVDbpvHy6M0O6BcyF5snRPZ
-	 hyIbnj/M6A3V2oGOOM7KwxU6JgEjwNKOAEOc69Or4hWXbMNFouyOQ51TT1F3bniYF/
-	 8wOPIxWDo5ghAlJeP24x2k3lo/FwOVQ+PGrUpvxhg1OGqOyzjBRrFmn+3+beiyP1xv
-	 Gq38w+40sZYQtJH+zWi5XaFTbn/GuS3qG/14tlGX9PxQnLPxb+/71tG9hy7Kfd+ZdY
-	 ExzMPpTrHEUT1wuWpWYOmShrn7mVR9hzOt8UeEL/NkAG85XSKYJSjYAeak+zqLDY5B
-	 iKquI++45LLhg==
-From: Geliang Tang <geliang@kernel.org>
-To: Andrii Nakryiko <andrii@kernel.org>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Mykola Lysenko <mykolal@fb.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Shuah Khan <shuah@kernel.org>
-Cc: Geliang Tang <tanggeliang@kylinos.cn>,
-	netdev@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	bpf@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Matthieu Baerts <matttbe@kernel.org>
-Subject: [PATCH bpf-next/net v3] selftests/bpf: Drop netns helpers in mptcp
-Date: Thu, 31 Oct 2024 09:40:46 +0800
-Message-ID: <c02fda3177b34f9e74a044833fda9761627f4d07.1730338692.git.tanggeliang@kylinos.cn>
-X-Mailer: git-send-email 2.45.2
+	s=k20201202; t=1730339370;
+	bh=8ahn1VB1Hn10WaMpYW3c0BOhGixbKAjaO+u0J+wFEyE=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=jZqBCkTKLpX6jmE0RBkwsbEf8gMS5FTsDpm5YrG/el+CnUgd6w4frtFfcDgBOnVO7
+	 FDZ3eGHoPPH1E2NdZ11P8MuY6xRccnNUIKr3jwTE5XipHInJ/vraWvHAO8OZjEem7b
+	 8ZPUq9dppIWiTIRRrkIoWTFmi6GoiWfBWkQSMHT53TvpW47jlGAT9TE0O3o0QTd3Cj
+	 U3O/Fn7qlzS5L18eOLPyw1XAORUFaJG1Nq2DGznA2pjSyYuoKlkkTXuEuRFRf3cRgo
+	 OGGF2EX8BT3j7GvfBwQw0r+DdKg4PvvcNRXWSEmRoyfwD7zDhjx3s3FQNu7xR8LodK
+	 OtCy8mv4WoUFw==
+Date: Wed, 30 Oct 2024 18:49:28 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Maksym Kutsevol <max@kutsevol.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
+ <andrew+netdev@lunn.ch>, Breno Leitao <leitao@debian.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-doc@vger.kernel.org
+Subject: Re: [PATCH net-next v4 2/2] netcons: Add udp send fail statistics
+ to netconsole
+Message-ID: <20241030184928.3273f76d@kernel.org>
+In-Reply-To: <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-2-a8065a43c897@kutsevol.com>
+References: <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-0-a8065a43c897@kutsevol.com>
+	<20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-2-a8065a43c897@kutsevol.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-From: Geliang Tang <tanggeliang@kylinos.cn>
+On Sun, 27 Oct 2024 12:59:42 -0700 Maksym Kutsevol wrote:
+> +struct netconsole_target_stats  {
+> +	u64_stats_t xmit_drop_count;
+> +	u64_stats_t enomem_count;
+> +	struct u64_stats_sync syncp;
+> +} __aligned(2 * sizeof(u64));
 
-New netns selftest helpers netns_new() and netns_free() has been added
-in network_helpers.c, let's use them in mptcp selftests too instead of
-using MPTCP's own helpers create_netns() and cleanup_netns().
+Why the alignment?
 
-Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
----
-v3:
- - No code has changed.
- - Change subject prefix as "bpf-next/net" since CI complains that this
-patch cannot be merged.
- - Add Matt's Reviewed-by tag.
+> +static void netpoll_send_udp_count_errs(struct netconsole_target *nt,
+> +					const char *msg, int len)
 
-v2:
- - Use netns_new/netns_free instead of create_netns/cleanup_netns as
-Martin suggested.
-
-v1:
-  selftests/bpf: Use make/remove netns helpers in mptcp
----
- .../testing/selftests/bpf/prog_tests/mptcp.c  | 42 ++++++-------------
- 1 file changed, 12 insertions(+), 30 deletions(-)
-
-diff --git a/tools/testing/selftests/bpf/prog_tests/mptcp.c b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-index be3cad2aff77..f8eb7f9d4fd2 100644
---- a/tools/testing/selftests/bpf/prog_tests/mptcp.c
-+++ b/tools/testing/selftests/bpf/prog_tests/mptcp.c
-@@ -69,24 +69,6 @@ struct mptcp_storage {
- 	char ca_name[TCP_CA_NAME_MAX];
- };
- 
--static struct nstoken *create_netns(void)
--{
--	SYS(fail, "ip netns add %s", NS_TEST);
--	SYS(fail, "ip -net %s link set dev lo up", NS_TEST);
--
--	return open_netns(NS_TEST);
--fail:
--	return NULL;
--}
--
--static void cleanup_netns(struct nstoken *nstoken)
--{
--	if (nstoken)
--		close_netns(nstoken);
--
--	SYS_NOFAIL("ip netns del %s", NS_TEST);
--}
--
- static int start_mptcp_server(int family, const char *addr_str, __u16 port,
- 			      int timeout_ms)
- {
-@@ -206,15 +188,15 @@ static int run_test(int cgroup_fd, int server_fd, bool is_mptcp)
- 
- static void test_base(void)
- {
--	struct nstoken *nstoken = NULL;
-+	struct netns_obj *netns = NULL;
- 	int server_fd, cgroup_fd;
- 
- 	cgroup_fd = test__join_cgroup("/mptcp");
- 	if (!ASSERT_GE(cgroup_fd, 0, "test__join_cgroup"))
- 		return;
- 
--	nstoken = create_netns();
--	if (!ASSERT_OK_PTR(nstoken, "create_netns"))
-+	netns = netns_new(NS_TEST, true);
-+	if (!ASSERT_OK_PTR(netns, "netns_new"))
- 		goto fail;
- 
- 	/* without MPTCP */
-@@ -237,7 +219,7 @@ static void test_base(void)
- 	close(server_fd);
- 
- fail:
--	cleanup_netns(nstoken);
-+	netns_free(netns);
- 	close(cgroup_fd);
- }
- 
-@@ -322,21 +304,21 @@ static int run_mptcpify(int cgroup_fd)
- 
- static void test_mptcpify(void)
- {
--	struct nstoken *nstoken = NULL;
-+	struct netns_obj *netns = NULL;
- 	int cgroup_fd;
- 
- 	cgroup_fd = test__join_cgroup("/mptcpify");
- 	if (!ASSERT_GE(cgroup_fd, 0, "test__join_cgroup"))
- 		return;
- 
--	nstoken = create_netns();
--	if (!ASSERT_OK_PTR(nstoken, "create_netns"))
-+	netns = netns_new(NS_TEST, true);
-+	if (!ASSERT_OK_PTR(netns, "netns_new"))
- 		goto fail;
- 
- 	ASSERT_OK(run_mptcpify(cgroup_fd), "run_mptcpify");
- 
- fail:
--	cleanup_netns(nstoken);
-+	netns_free(netns);
- 	close(cgroup_fd);
- }
- 
-@@ -414,7 +396,7 @@ static void run_subflow(void)
- static void test_subflow(void)
- {
- 	struct mptcp_subflow *skel;
--	struct nstoken *nstoken;
-+	struct netns_obj *netns;
- 	int cgroup_fd;
- 
- 	cgroup_fd = test__join_cgroup("/mptcp_subflow");
-@@ -437,8 +419,8 @@ static void test_subflow(void)
- 	if (!ASSERT_OK_PTR(skel->links._getsockopt_subflow, "attach _getsockopt_subflow"))
- 		goto skel_destroy;
- 
--	nstoken = create_netns();
--	if (!ASSERT_OK_PTR(nstoken, "create_netns: mptcp_subflow"))
-+	netns = netns_new(NS_TEST, true);
-+	if (!ASSERT_OK_PTR(netns, "netns_new: mptcp_subflow"))
- 		goto skel_destroy;
- 
- 	if (endpoint_init("subflow") < 0)
-@@ -447,7 +429,7 @@ static void test_subflow(void)
- 	run_subflow();
- 
- close_netns:
--	cleanup_netns(nstoken);
-+	netns_free(netns);
- skel_destroy:
- 	mptcp_subflow__destroy(skel);
- close_cgroup:
--- 
-2.45.2
-
+This is defined in the netconsole driver, it should not use the
+netpoll_ prefix for the function name.
 
