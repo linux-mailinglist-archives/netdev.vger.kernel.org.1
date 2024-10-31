@@ -1,97 +1,221 @@
-Return-Path: <netdev+bounces-140601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6AB59B7257
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:00:36 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 070E19B726F
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:20:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83A3D285CB7
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:00:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 745111F24E5D
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:20:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABBF4126BFC;
-	Thu, 31 Oct 2024 02:00:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C58D12CDB6;
+	Thu, 31 Oct 2024 02:19:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sxMv7CBZ"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEoO7EL8"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E7D41BD9F7;
-	Thu, 31 Oct 2024 02:00:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A27033D994;
+	Thu, 31 Oct 2024 02:19:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730340027; cv=none; b=HGPFc0aRXO8kY2WVTiBnWyoQ1MyCrD+mrIt2ehn0Mo+LLCG99InU/A1gfIk4w/9gbEJsB0XE/nf7ZwTfmTbMYVDZhZy3ovNl5oi9P8/+kCkbbIYm0D1nhiPxYOvoXj7JP3R3Af0DFKoRl3sTZLpRm2fD2nEf53q8i2ep2Yg6bCo=
+	t=1730341195; cv=none; b=fJQPnBMotAkrt2mlcbGX+TFNzTXY0grcfc4vk9PvMPBW7TopCtulkaGWp1s1HsU50BoirNlzCIs17kTIaEk+MoTGOwcm5Tw1W0+ldPT0xTSIi/roJ8HBRKJ00XOKf9ztOGnTgCb7haokP84qEQLJsI8f/PJP45DfRuzcc2Op2lw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730340027; c=relaxed/simple;
-	bh=vZMVsbHNqyyr8Yn54rtnZgMFl+1OmQ4zR7lt+BwmeFk=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=GoAkcKx71Wqbs9nKQhoFs6W9mwuBaY8OqantTCb3l27J0g00GN3cutYvbrdfADlDYdMP//Q07G8m7tmpOjrwQuGvMmkLtu8FvJ/AJx0TX6xGgZzSJHtj5+p+cyIImcgRbwkYWjQu0hBlHVuB1HKcZCb+Fdgka+AbkzVN/IRGRFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sxMv7CBZ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E4088C4CECF;
-	Thu, 31 Oct 2024 02:00:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730340026;
-	bh=vZMVsbHNqyyr8Yn54rtnZgMFl+1OmQ4zR7lt+BwmeFk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=sxMv7CBZ5foQRJW+oGoe0rVzaspDacvos4thi150CE89TnkNPqDgPEMNbLbCswULs
-	 7o67xfN5No71n64T22aqaE/TXFAOfv6ILyspZP14vDjuKwzyz1FYQBYG5MPYDZS30p
-	 vFHyln62v8uHZ6KXk2hswAYtFDZt6vz6hAouctN24aQYC2/D7LwimrS9Dkynjp4ZW1
-	 k814zQpScpOuDMGECAL37Sy6a5k9iijdih6jxSXDN2y6K0DQ9FF+3qmiTbivyfU8YH
-	 zMYqq2WExnrZf8nP9h0SuoNYOAXh8vRdvPHIZmruNBz+O+pOSDpkGjbX1Zzyb1Mmwo
-	 qntiq7+0f9zWg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF9B380AC22;
-	Thu, 31 Oct 2024 02:00:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730341195; c=relaxed/simple;
+	bh=NC9CDOFTbxQbG8x/a/AHSZzkUSoApy76KPCBDimnLaU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rjq9B+q5/JhNiHkL3tdq/DVEnLvDSaBHHR7cLgpfo6G1xb5wQSvYzOJR7eb3RsLN16SpBIXna0PF31pSZnZQrlMMLULhMSB7ZjWWLSzlxVQMC83QZLBkNyq94jJvT1ur59crzRmHeI9HG3gkjg41bU5lP+sAFNnHke4j34/f7+U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEoO7EL8; arc=none smtp.client-ip=192.198.163.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730341192; x=1761877192;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NC9CDOFTbxQbG8x/a/AHSZzkUSoApy76KPCBDimnLaU=;
+  b=CEoO7EL8w+cFGN9fQgAdLtkWLmHhmp9xfVVUNS0aMcSGXSv2o2QSl7pl
+   1qw2JtJOJ4RCCG+zIKgVg+i/S10n8Z7rcPqvuo9dIA5ct89X/ehYf2beZ
+   khlRlGCFXSytweLpesNjigJmrdi9rcBgfPrnsBGBcW0k6pyfVEiG05rUj
+   Y0TyTUCVM8P4KBiRIU8OTri63Jo+cHedonyVu7HRos13iDIeknt4arctV
+   mPcooD8QE0EE80POI10Y5OoEGSgnoRmEmppKj/4T8qDzfOFvDRZV7aYQ6
+   /Eg+wqMSKeH/fxSw79ZrEDUv1AwyyzbPgjNIOEUKOygG7jeTru5FMeV+H
+   A==;
+X-CSE-ConnectionGUID: 5iB9ZxBJSSCN1weyXP0k7w==
+X-CSE-MsgGUID: fr0f8wuRS5GICxd4vRtx6Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11241"; a="29964351"
+X-IronPort-AV: E=Sophos;i="6.11,246,1725346800"; 
+   d="scan'208";a="29964351"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa111.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 19:19:51 -0700
+X-CSE-ConnectionGUID: TVktP3QLRqmkXfoXsTvVmg==
+X-CSE-MsgGUID: 2VxImrEYTtqGDDBRJWNxvQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="87281480"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 30 Oct 2024 19:19:46 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t6Kmm-000fYC-1r;
+	Thu, 31 Oct 2024 02:19:44 +0000
+Date: Thu, 31 Oct 2024 10:19:41 +0800
+From: kernel test robot <lkp@intel.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 05/13] virtio_ring: introduce add api for
+ premapped
+Message-ID: <202410310925.LuCycrTj-lkp@intel.com>
+References: <20241030082453.97310-6-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v3 0/2] Add ethernet dts schema for qcs615/qcs8300
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173034003374.1522872.103186698139735392.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Oct 2024 02:00:33 +0000
-References: <20241029-schema-v3-0-fbde519eaf00@quicinc.com>
-In-Reply-To: <20241029-schema-v3-0-fbde519eaf00@quicinc.com>
-To: Yijie Yang <quic_yijiyang@quicinc.com>
-Cc: vkoul@kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
- krzk+dt@kernel.org, conor+dt@kernel.org, bhupesh.sharma@linaro.org,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- krzysztof.kozlowski@linaro.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241030082453.97310-6-xuanzhuo@linux.alibaba.com>
 
-Hello:
+Hi Xuan,
 
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+kernel test robot noticed the following build warnings:
 
-On Tue, 29 Oct 2024 11:11:54 +0800 you wrote:
-> Document the ethernet and SerDes compatible for qcs8300. This platform
-> shares the same EMAC and SerDes as sa8775p, so the compatible fallback to
-> it.
-> Document the ethernet compatible for qcs615. This platform shares the
-> same EMAC as sm8150, so the compatible fallback to it.
-> Document the compatible for revision 2 of the qcs8300-ride board.
-> 
-> [...]
+[auto build test WARNING on net-next/main]
 
-Here is the summary with links:
-  - [v3,1/2] dt-bindings: net: qcom,ethqos: add description for qcs615
-    https://git.kernel.org/netdev/net-next/c/32535b9410b8
-  - [v3,2/2] dt-bindings: net: qcom,ethqos: add description for qcs8300
-    https://git.kernel.org/netdev/net-next/c/0fb248365993
+url:    https://github.com/intel-lab-lkp/linux/commits/Xuan-Zhuo/virtio_ring-introduce-vring_need_unmap_buffer/20241030-162739
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241030082453.97310-6-xuanzhuo%40linux.alibaba.com
+patch subject: [PATCH net-next v2 05/13] virtio_ring: introduce add api for premapped
+config: x86_64-buildonly-randconfig-003-20241031 (https://download.01.org/0day-ci/archive/20241031/202410310925.LuCycrTj-lkp@intel.com/config)
+compiler: clang version 19.1.2 (https://github.com/llvm/llvm-project 7ba7d8e2f7b6445b60679da826210cdde29eaf8b)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241031/202410310925.LuCycrTj-lkp@intel.com/reproduce)
 
-You are awesome, thank you!
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410310925.LuCycrTj-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> drivers/virtio/virtio_ring.c:2293: warning: Function parameter or struct member 'premapped' not described in 'virtqueue_add_outbuf_premapped'
+>> drivers/virtio/virtio_ring.c:2364: warning: Function parameter or struct member 'premapped' not described in 'virtqueue_add_inbuf_premapped'
+
+
+vim +2293 drivers/virtio/virtio_ring.c
+
+  2274	
+  2275	/**
+  2276	 * virtqueue_add_outbuf_premapped - expose output buffers to other end
+  2277	 * @vq: the struct virtqueue we're talking about.
+  2278	 * @sg: scatterlist (must be well-formed and terminated!)
+  2279	 * @num: the number of entries in @sg readable by other side
+  2280	 * @data: the token identifying the buffer.
+  2281	 * @gfp: how to do memory allocations (if necessary).
+  2282	 *
+  2283	 * Caller must ensure we don't call this with other virtqueue operations
+  2284	 * at the same time (except where noted).
+  2285	 *
+  2286	 * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
+  2287	 */
+  2288	int virtqueue_add_outbuf_premapped(struct virtqueue *vq,
+  2289					   struct scatterlist *sg, unsigned int num,
+  2290					   void *data,
+  2291					   bool premapped,
+  2292					   gfp_t gfp)
+> 2293	{
+  2294		return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, premapped, gfp);
+  2295	}
+  2296	EXPORT_SYMBOL_GPL(virtqueue_add_outbuf_premapped);
+  2297	
+  2298	/**
+  2299	 * virtqueue_add_inbuf - expose input buffers to other end
+  2300	 * @vq: the struct virtqueue we're talking about.
+  2301	 * @sg: scatterlist (must be well-formed and terminated!)
+  2302	 * @num: the number of entries in @sg writable by other side
+  2303	 * @data: the token identifying the buffer.
+  2304	 * @gfp: how to do memory allocations (if necessary).
+  2305	 *
+  2306	 * Caller must ensure we don't call this with other virtqueue operations
+  2307	 * at the same time (except where noted).
+  2308	 *
+  2309	 * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
+  2310	 */
+  2311	int virtqueue_add_inbuf(struct virtqueue *vq,
+  2312				struct scatterlist *sg, unsigned int num,
+  2313				void *data,
+  2314				gfp_t gfp)
+  2315	{
+  2316		return virtqueue_add(vq, &sg, num, 0, 1, data, NULL, false, gfp);
+  2317	}
+  2318	EXPORT_SYMBOL_GPL(virtqueue_add_inbuf);
+  2319	
+  2320	/**
+  2321	 * virtqueue_add_inbuf_ctx - expose input buffers to other end
+  2322	 * @vq: the struct virtqueue we're talking about.
+  2323	 * @sg: scatterlist (must be well-formed and terminated!)
+  2324	 * @num: the number of entries in @sg writable by other side
+  2325	 * @data: the token identifying the buffer.
+  2326	 * @ctx: extra context for the token
+  2327	 * @gfp: how to do memory allocations (if necessary).
+  2328	 *
+  2329	 * Caller must ensure we don't call this with other virtqueue operations
+  2330	 * at the same time (except where noted).
+  2331	 *
+  2332	 * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
+  2333	 */
+  2334	int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
+  2335				struct scatterlist *sg, unsigned int num,
+  2336				void *data,
+  2337				void *ctx,
+  2338				gfp_t gfp)
+  2339	{
+  2340		return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, false, gfp);
+  2341	}
+  2342	EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
+  2343	
+  2344	/**
+  2345	 * virtqueue_add_inbuf_premapped - expose input buffers to other end
+  2346	 * @vq: the struct virtqueue we're talking about.
+  2347	 * @sg: scatterlist (must be well-formed and terminated!)
+  2348	 * @num: the number of entries in @sg writable by other side
+  2349	 * @data: the token identifying the buffer.
+  2350	 * @ctx: extra context for the token
+  2351	 * @gfp: how to do memory allocations (if necessary).
+  2352	 *
+  2353	 * Caller must ensure we don't call this with other virtqueue operations
+  2354	 * at the same time (except where noted).
+  2355	 *
+  2356	 * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
+  2357	 */
+  2358	int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
+  2359					  struct scatterlist *sg, unsigned int num,
+  2360					  void *data,
+  2361					  void *ctx,
+  2362					  bool premapped,
+  2363					  gfp_t gfp)
+> 2364	{
+  2365		return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, premapped, gfp);
+  2366	}
+  2367	EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_premapped);
+  2368	
+
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
