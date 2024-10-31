@@ -1,186 +1,146 @@
-Return-Path: <netdev+bounces-140728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BAEEA9B7BCA
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:37:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F6259B7C09
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:45:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80ACE2823F5
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:37:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 23EE3281FDE
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A9A19DF60;
-	Thu, 31 Oct 2024 13:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E64811A01C4;
+	Thu, 31 Oct 2024 13:45:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gJEZk603"
+	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="yoCNsTYA";
+	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="tnv8I/cO"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BE1619D89D;
-	Thu, 31 Oct 2024 13:37:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C001F19EEC0;
+	Thu, 31 Oct 2024 13:45:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730381828; cv=none; b=s7cPBdwTc9W0Y9GT33lpIwaJdEpPNHPr/VXgWVNSNihYjQlbaRjfaLof8y5qGRV5tuRTbqyXwWUB0gIoHubZBWFKxjkoMjpdkSXKTHbegKTE5ILfB9y+Xky1K7IjAbm5pmhSWcC5I7hWxg6DRMjBvSy75cWudoUbURixMzWitJ0=
+	t=1730382307; cv=none; b=PO4c+rpmqDEgR8okCGeIDGu7cg7rnsGaDYDVIgQSozUWTcH5kVYg55ZuEVZ0cP1TI8KBvIkiGJj5U5xaxQ64rIfTC4ajjhKKnR+fpk/DZwE9p4LU5bS/aSUve2t/y4AQhBTBZ38A1tFlpnXj8UjQFf6OiOzXvOCCwcpipiRRI9k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730381828; c=relaxed/simple;
-	bh=d3l6x6GlVstePoqlh0W6O0rvKV+qLzRLN0Cu1vRZdTQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=tBPQyHHzMjtwhsfqzEdrSzIRKoR+6CMr9jvskicaooiNLrePOxFvSIJe4dlo8+eDRXp6Gv7OdGp8nWs0v5LM3tUHjcipMXWUbfHOR79gbmPN9TFPy7m3CC4oxfu2Kmv8+bZ0PQ+/qg5yOiQ64l56SHKCSs4hTTKlHgDNNFBo3Zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gJEZk603; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 24B0CC4E697;
-	Thu, 31 Oct 2024 13:37:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730381827;
-	bh=d3l6x6GlVstePoqlh0W6O0rvKV+qLzRLN0Cu1vRZdTQ=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=gJEZk6036fb3tjMGeAC3ko4srrJMgHalT9n/gVY1QeXiyqQ5sK6TRlR3IPHb7SDtd
-	 3Cm9AtlhbGwpfEERpE6UtZY4fCz1d5yYfiRUWJV/ukTKWL78beQxw4iD3DSvrEUL4+
-	 e2ZXusinxiFBNrjuH2fHyxU/MO/fyzZUmpF6We5yp/RbB7qiPGY8QYkKbgXlzn9jRx
-	 4OCcicpMZFQbsia1xuWZBfHofa0eWlFp9jk1HitiV64mgspomKymBXkQeIFB+J04sP
-	 D+kdCU2gKorwmYCqMGX3Ke3GwIx7st6A4FIArWC+5zCdv69B6FpNfRp4dqhDuldPhf
-	 ZpknZPiXtYB4A==
-From: Leon Romanovsky <leon@kernel.org>
-To: Jason Gunthorpe <jgg@nvidia.com>
-Cc: Chiara Meiohas <cmeiohas@nvidia.com>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	linux-rdma@vger.kernel.org,
-	Michael Guralnik <michaelgur@nvidia.com>,
-	netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH mlx5-next 3/3] RDMA/mlx5: Ensure active slave attachment to the bond IB device
-Date: Thu, 31 Oct 2024 15:36:52 +0200
-Message-ID: <91fc2cb24f63add266a528c1c702668a80416d9f.1730381292.git.leon@kernel.org>
-X-Mailer: git-send-email 2.46.2
-In-Reply-To: <cover.1730381292.git.leon@kernel.org>
-References: <cover.1730381292.git.leon@kernel.org>
+	s=arc-20240116; t=1730382307; c=relaxed/simple;
+	bh=SyiKIQDNVRhU2dYWC7KpnbYi2u+O8MurNHCaNdwZdao=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=Jysb6iqz23lag5IlsmQUOz7/rXCj016mYBLVGtEpVA8Wj6unrULdgSB0vBvxgouO4TqAm4uM9ZpDYRPj8dKhlzEMYggkvKDY1hM89DZNMJANo+GWYNUjsnfqRcSuZ+oL+gmrex/V1utaUwUkf/cTdPbtN++bMDPCwmScGdR1Osc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=yoCNsTYA; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=tnv8I/cO; arc=none smtp.client-ip=193.142.43.55
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
+From: Thomas Gleixner <tglx@linutronix.de>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020; t=1730382304;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eEO4GUXIuQTW+sY+/WiYJk1PjJtbzNP/nS0HeFEOI6A=;
+	b=yoCNsTYAFyyFk5pGSYkD1piEjw8MOo53vDo2YkXW02EDMHDlaOfzFQIBgvw62YeQnStj0R
+	qkY5Ky9UOyVC1w3OVKBzXSwejc99F3AGpf5zUOBwsDyJSVfTnZWMWet1KTbQJOfOLCVNhV
+	cy7TVNur5FmVBVRh+KOvfZ/CNyLR8SNv9i7yqNqrq5kD5xMENaMe0V6OpvokmfW/Ob9QM/
+	5un8Zwrlq9QRR3JPr7QuSkLpK98KMG43mFh0DMvW9yQHq+GuztrjGuFKrW+m4h5GhCy/Ac
+	kp1SwmKR/ksHOOv6R90FQYE4O+PRPlazUvlT9/6ThYdYhTcp0TO69X6RMhaPYQ==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
+	s=2020e; t=1730382304;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eEO4GUXIuQTW+sY+/WiYJk1PjJtbzNP/nS0HeFEOI6A=;
+	b=tnv8I/cOG9O9Bmuz6A4PtC/V6UOPd//2+oyqsIznzxGGzis4KZd76yQ3kxGFswkP13hKpV
+	nr8ioE+FYr3wlOBw==
+To: Philipp Stanner <pstanner@redhat.com>, Damien Le Moal
+ <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, Sergey Shtylyov
+ <s.shtylyov@omp.ru>, Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri
+ Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Arnd
+ Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Alex Dubov <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
+ Manish Chopra <manishc@marvell.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
+ <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
+ <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
+ Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam
+ Sundar S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave
+ Jiang <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn
+ Helgaas <bhelgaas@google.com>, Alex Williamson
+ <alex.williamson@redhat.com>, Juergen Gross <jgross@suse.com>, Stefano
+ Stabellini <sstabellini@kernel.org>, Oleksandr Tyshchenko
+ <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
+ Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
+ <mario.limonciello@amd.com>, Philipp Stanner <pstanner@redhat.com>, Ricky
+ Wu <ricky_wu@realtek.com>, Al Viro <viro@zeniv.linux.org.uk>, Breno Leitao
+ <leitao@debian.org>, Kevin Tian <kevin.tian@intel.com>, Ilpo =?utf-8?Q?J?=
+ =?utf-8?Q?=C3=A4rvinen?=
+ <ilpo.jarvinen@linux.intel.com>, Andy Shevchenko
+ <andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>,
+ Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Christian
+ Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, Eric
+ Auger <eric.auger@redhat.com>, Reinette Chatre
+ <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
+ =?utf-8?Q?Marczykowski-G=C3=B3recki?= <marmarek@invisiblethingslab.com>,
+ Pierre-Louis
+ Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
+ <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
+ <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
+ <kai.vehmanen@linux.intel.com>, Rui Salvaterra <rsalvaterra@gmail.com>
+Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-input@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
+ linux-pci@vger.kernel.org, kvm@vger.kernel.org,
+ xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH 01/13] PCI: Prepare removing devres from pci_intx()
+In-Reply-To: <20241015185124.64726-2-pstanner@redhat.com>
+References: <20241015185124.64726-1-pstanner@redhat.com>
+ <20241015185124.64726-2-pstanner@redhat.com>
+Date: Thu, 31 Oct 2024 14:45:03 +0100
+Message-ID: <87cyjgwfmo.ffs@tglx>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-From: Chiara Meiohas <cmeiohas@nvidia.com>
+On Tue, Oct 15 2024 at 20:51, Philipp Stanner wrote:
+> +/**
+> + * pci_intx - enables/disables PCI INTx for device dev, unmanaged version
 
-Fix a race condition when creating a lag bond in active backup
-mode where after the bond creation the backup slave was
-attached to the IB device, instead of the active slave.
-This caused stale entries in the GID table, as the gid updating
-mechanism relies on ib_device_get_netdev(), which would return
-the backup slave.
+mismatch vs. actual function name.
 
-Send an MLX5_DRIVER_EVENT_ACTIVE_BACKUP_LAG_CHANGE_LOWERSTATE
-event when activating the lag, additionally to when modifying
-the lag. This ensures that eventually the active netdevice is
-stored in the bond IB device.
-When handling this event remove the GIDs of the previously
-attached netdevice in this port and rescan the GIDs of the
-newly attached netdevice.
+> + * @pdev: the PCI device to operate on
+> + * @enable: boolean: whether to enable or disable PCI INTx
+> + *
+> + * Enables/disables PCI INTx for device @pdev
+> + *
+> + * This function behavios identically to pci_intx(), but is never managed with
+> + * devres.
+> + */
+> +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
 
-This ensures that eventually the active slave netdevice is
-correctly stored in the IB device port. While there might be
-a brief moment where the backup slave GIDs appear in the GID
-table, it will eventually stabilize with the correct GIDs
-(of the bond and the active slave).
+This is a misnomer. The function controls the INTX_DISABLE bit of a
+PCI device. Something like this:
 
-Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
-Signed-off-by: Chiara Meiohas <cmeiohas@nvidia.com>
-Signed-off-by: Leon Romanovsky <leonro@nvidia.com>
----
- drivers/infiniband/hw/mlx5/main.c             | 28 ++++++++++++-------
- .../net/ethernet/mellanox/mlx5/core/lag/lag.c | 11 ++++++++
- 2 files changed, 29 insertions(+), 10 deletions(-)
+void __pci_intx_control()
+{
+}
 
-diff --git a/drivers/infiniband/hw/mlx5/main.c b/drivers/infiniband/hw/mlx5/main.c
-index 5f7fe32b9051..5038c52b79aa 100644
---- a/drivers/infiniband/hw/mlx5/main.c
-+++ b/drivers/infiniband/hw/mlx5/main.c
-@@ -3219,12 +3219,14 @@ static int lag_event(struct notifier_block *nb, unsigned long event, void *data)
- 	struct mlx5_ib_dev *dev = container_of(nb, struct mlx5_ib_dev,
- 					       lag_events);
- 	struct mlx5_core_dev *mdev = dev->mdev;
-+	struct ib_device *ibdev = &dev->ib_dev;
-+	struct net_device *old_ndev = NULL;
- 	struct mlx5_ib_port *port;
- 	struct net_device *ndev;
--	int  i, err;
--	int portnum;
-+	u32 portnum = 0;
-+	int ret = 0;
-+	int i;
- 
--	portnum = 0;
- 	switch (event) {
- 	case MLX5_DRIVER_EVENT_ACTIVE_BACKUP_LAG_CHANGE_LOWERSTATE:
- 		ndev = data;
-@@ -3240,18 +3242,24 @@ static int lag_event(struct notifier_block *nb, unsigned long event, void *data)
- 					}
- 				}
- 			}
--			err = ib_device_set_netdev(&dev->ib_dev, ndev,
--						   portnum + 1);
--			if (err)
--				return err;
--			/* Rescan gids after new netdev assignment */
--			rdma_roce_rescan_device(&dev->ib_dev);
-+			old_ndev = ib_device_get_netdev(ibdev, portnum + 1);
-+			ret = ib_device_set_netdev(ibdev, ndev, portnum + 1);
-+			if (ret)
-+				goto out;
-+
-+			if (old_ndev)
-+				roce_del_all_netdev_gids(ibdev, portnum + 1,
-+							 old_ndev);
-+			rdma_roce_rescan_port(ibdev, portnum + 1);
- 		}
- 		break;
- 	default:
- 		return NOTIFY_DONE;
- 	}
--	return NOTIFY_OK;
-+
-+out:
-+	dev_put(old_ndev);
-+	return notifier_from_errno(ret);
- }
- 
- static void mlx5e_lag_event_register(struct mlx5_ib_dev *dev)
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-index d661267d98ff..7f68468c2e75 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/lag/lag.c
-@@ -919,6 +919,7 @@ static void mlx5_do_bond(struct mlx5_lag *ldev)
- {
- 	struct mlx5_core_dev *dev0 = ldev->pf[MLX5_LAG_P1].dev;
- 	struct lag_tracker tracker = { };
-+	struct net_device *ndev;
- 	bool do_bond, roce_lag;
- 	int err;
- 	int i;
-@@ -982,6 +983,16 @@ static void mlx5_do_bond(struct mlx5_lag *ldev)
- 				return;
- 			}
- 		}
-+		if (tracker.tx_type == NETDEV_LAG_TX_TYPE_ACTIVEBACKUP) {
-+			ndev = mlx5_lag_active_backup_get_netdev(dev0);
-+			/** Only sriov and roce lag should have tracker->TX_type
-+			 *  set so no need to check the mode
-+			 */
-+			blocking_notifier_call_chain(&dev0->priv.lag_nh,
-+						     MLX5_DRIVER_EVENT_ACTIVE_BACKUP_LAG_CHANGE_LOWERSTATE,
-+						     ndev);
-+			dev_put(ndev);
-+		}
- 	} else if (mlx5_lag_should_modify_lag(ldev, do_bond)) {
- 		mlx5_modify_lag(ldev, &tracker);
- 	} else if (mlx5_lag_should_disable_lag(ldev, do_bond)) {
--- 
-2.46.2
+static inline void pci_intx_enable(d)
+{
+        __pci_intx_control(d, true);
+}
 
+.....
+
+makes it entirely clear what this is about.
+
+Hmm?
+
+Thanks,
+
+        tglx
 
