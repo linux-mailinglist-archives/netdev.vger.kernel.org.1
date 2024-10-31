@@ -1,184 +1,135 @@
-Return-Path: <netdev+bounces-140662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14C989B778A
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:31:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CBC49B778D
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:31:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3862A1C20915
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 09:31:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F7AC1C22086
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 09:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A688191F65;
-	Thu, 31 Oct 2024 09:31:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21A2B19341D;
+	Thu, 31 Oct 2024 09:31:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Z4utpWuL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A7B1940BC;
-	Thu, 31 Oct 2024 09:31:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E98E5131BDD;
+	Thu, 31 Oct 2024 09:31:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730367070; cv=none; b=Q5oMo9Q+Tt6BrC1+6sXJUaD9swyFlEo+HR3r2As4dZYihup5m5vcEC2qexvQiPJz8iEWmjmRKWlv2X1TsjIjm/7AqAhhg689DOfSBzw8vficZZGXS6nOA5BXDmK/onxVzo8Y58kKn8jtOFZK1ZUOg59p36gejD5Niz7sQ7i0SeU=
+	t=1730367091; cv=none; b=XniyKoB7BsFjpA0PqvkByx2yj8C44lHnoi+ooNG/12AHtuVACtVUFtV1KPotrR5X06RWXDvx2rZpCN8l0KzpMnKNvWzU6pLvMyt0OLwn5a5IhxSjijfVHN4E7XbuFHFZNfN8dJUwJFJX/8AjFO7QyzlaDdxI4eH+AWlCD6cNRQ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730367070; c=relaxed/simple;
-	bh=TuMVZsz+UKv7UO7ZBvM6lqL/hr/CbH5V2Fs4zW30yFY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=jO0tuX9DY2QChrbBQq37TwtYoGRw/AfEfSbgmu6sRcFjraW0wHD8ym2OGrOqyBvXwAAxFZwgGidNPP+9WlTkaSasq8q4rIJsNRIWWWrPxlprDdRPvgz+y3VbD8MWK6HsYC5LG/qsy1Ve5TwuJ/ybqe63G5OKabutyNIg83iPsqQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ea339a41f1so6062557b3.2;
-        Thu, 31 Oct 2024 02:31:07 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730367066; x=1730971866;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yxr4uhJhkKujIbCmn/2BlmBZDzUgZQRQwOInIgaY+OM=;
-        b=UrdXOwFqsyKCJ1a7+HXpYAOeJlNFbggdRwNeNcePpRYva7zzY5slCjMOXxwyEgjWAt
-         j6cqRpOJ5jsO6lfJnFHSYrwY1LCq67IJB+JUnre4/5R3E8cQA287zlwHAxmgFGopO/fN
-         QUJg1zcHnrCorkszYa9TNW3twa9gPYs+MJROeUrj5s+TV3GxObREbCqOZlc7OdYesKbl
-         5lybAUBfZbX+TWwG/SN+ivTIwIGAgEURqpND4vuV3jS/CE86Jbhgzkvyie0o6m9sU7u5
-         43K8C8Z+PrOa8XTqwydqSJdRvwq1GCoLVgW8qg2aPUApv8CHpOgbMxDdfy++x+181FDZ
-         b82w==
-X-Forwarded-Encrypted: i=1; AJvYcCViMt9mGXj2Pucw8ZInvjltR0qqHZBdUATp8k60KyiJb92vhfHHKbTiLx0Ai308xoTvVfggTV8KuG7J@vger.kernel.org, AJvYcCVu8zadOVVAZEWVKxDVl4wUjA2WtUCPQM+pV6DDNvYTfXt33l6xCzwxklQQTld+pabCkQunbmCl@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw18ogbV5SujY8wscHwwdVtFLLXUSqwEezEBYMYgjNdsdrlhpx6
-	eA2+MXaeJS/G6yIO97RBvzM79BCq0VpawglHIVusIrcN0M1urIsLteAOIQFJ
-X-Google-Smtp-Source: AGHT+IEWvt7dWOsqzeJ34w3BsxdbNRkVAhZRN+JhfqZf1d7VjLGHieehFQvAQSstdgaffR3GU/IbYg==
-X-Received: by 2002:a05:690c:25c8:b0:6e5:e571:108b with SMTP id 00721157ae682-6ea523216f0mr28178407b3.8.1730367065580;
-        Thu, 31 Oct 2024 02:31:05 -0700 (PDT)
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com. [209.85.128.177])
-        by smtp.gmail.com with ESMTPSA id 00721157ae682-6ea55b24804sm1814887b3.51.2024.10.31.02.31.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 02:31:05 -0700 (PDT)
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6ea15a72087so5649627b3.1;
-        Thu, 31 Oct 2024 02:31:05 -0700 (PDT)
-X-Forwarded-Encrypted: i=1; AJvYcCUmSMM7xNH2g5z2YxLSwf2Jk5H4UEtKezirYmN2PWxUWasZ7ujvg3RNDVDYS8+NHOih0O2xbP9fNNMp@vger.kernel.org, AJvYcCVMTuvxIKY99rI60qvsYdpvieVe9DHaMmpJtZbb92U3v+djoPj/DQtubdezjn6H17uCG3K+VaSa@vger.kernel.org
-X-Received: by 2002:a05:690c:6ac2:b0:6e7:d974:8cee with SMTP id
- 00721157ae682-6ea52323519mr32131157b3.7.1730367064809; Thu, 31 Oct 2024
- 02:31:04 -0700 (PDT)
+	s=arc-20240116; t=1730367091; c=relaxed/simple;
+	bh=M7n9ArN1pF/j++L+7rpatjFM0gfuXP/agcXResfeXIw=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bwiNhKxM3dfKlG5HOpPjcisiNuGN327LDTR4x6He6qk1OGg6jTiJ+0B5MAAi3n8DoXcT8rf7jZEcPADhplnP/A/+l6HFGYwYoSytT3mQPw4ZsK55Sr4sWdPtDLGiH6u2BI9q52ObvivkjFVL15tLxiOcsl0i7qPxvBiyRAZ3pdI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Z4utpWuL; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1730367088; x=1761903088;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=M7n9ArN1pF/j++L+7rpatjFM0gfuXP/agcXResfeXIw=;
+  b=Z4utpWuLk7p8JdYp16lZM29QZshlIVz5vMUVXMo8R51fhri+D+QQ1GTD
+   jYl/iRUB3rAk+yq3G33S+SDcy4ARqzD2sjVs7fPK1+NaPpsa0QboMilLl
+   uFml84Zx+IBHGqX0UBk+7MKhiC+08KRnF7iI6+KkZkvP+8j98qsKtqO8k
+   EMWtpwoh+0U+d6zkjkhjPuTapM6hhxCA/mkGEm5DTfx3HmkLZ9LXXhitz
+   LqvYyAY+vv7qg23d3S1+vjWMC+hHCQHI6QrwH+loZbgdLPeykcH2Fu+ca
+   ctidWQc7phhJFbS6xXVm2lS2OTfdaH/cdvxTbZRPU6yvldjhbj1lh4igS
+   A==;
+X-CSE-ConnectionGUID: 49pURKPtTNqTvY80gZRRCQ==
+X-CSE-MsgGUID: KxhHOITaRC6Jo4IAeI9sKA==
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="201138544"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 31 Oct 2024 02:31:27 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Thu, 31 Oct 2024 02:30:57 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Thu, 31 Oct 2024 02:30:55 -0700
+Date: Thu, 31 Oct 2024 09:30:54 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+CC: Vladimir Oltean <olteanv@gmail.com>, Andrew Morton
+	<akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Tony Nguyen
+	<anthony.l.nguyen@intel.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Masahiro Yamada <masahiroy@kernel.org>, <linux-kernel@vger.kernel.org>,
+	<netdev@vger.kernel.org>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v2 0/9] lib: packing: introduce and use
+ (un)pack_fields
+Message-ID: <20241031093054.p5gz2defkbytsjcx@DEN-DL-M70577>
+References: <20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
- <1f927944-30aa-4298-9bd0-d9d3ace3fc78@kernel.org> <CAMuHMdVN_xNLTvy9u6FvK=agSAUzSHxEuyBS37sOA7jpGLwddw@mail.gmail.com>
- <cd120c6b-e469-46d9-95b5-71a8cc6513cf@kernel.org>
-In-Reply-To: <cd120c6b-e469-46d9-95b5-71a8cc6513cf@kernel.org>
-From: Geert Uytterhoeven <geert@linux-m68k.org>
-Date: Thu, 31 Oct 2024 10:30:52 +0100
-X-Gmail-Original-Message-ID: <CAMuHMdWfq4+gZcq6PzU=n0d2tTGEG3MV5c2tTQKLDysmj-g=kg@mail.gmail.com>
-Message-ID: <CAMuHMdWfq4+gZcq6PzU=n0d2tTGEG3MV5c2tTQKLDysmj-g=kg@mail.gmail.com>
-Subject: Re: BeagleBone Black Ethernet PHY issues
-To: Roger Quadros <rogerq@kernel.org>
-Cc: ext Tony Lindgren <tony@atomide.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
-	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
-	Matti Vaittinen <mazziesaccount@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20241025-packing-pack-fields-and-ice-implementation-v2-0-734776c88e40@intel.com>
 
-On Thu, Oct 31, 2024 at 10:06=E2=80=AFAM Roger Quadros <rogerq@kernel.org> =
-wrote:
-> On 30/10/2024 17:08, Geert Uytterhoeven wrote:
-> > On Wed, Oct 30, 2024 at 1:58=E2=80=AFPM Roger Quadros <rogerq@kernel.or=
-g> wrote:
-> >> On 29/10/2024 19:18, Geert Uytterhoeven wrote:
-> >>> During the last few months, booting kernels on BeagleBone Black
-> >>> sometimes fails with:
-> >>>
-> >>>     +SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
-> >>> LAN8710/LAN8720 failed with error -5
-> >
-> > [...]
-> >
-> >> Just wondering if the Reset is happening correctly and it has settled
-> >> before PHY access.
-> >>
-> >> From arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi
-> >>
-> >> &davinci_mdio_sw {
-> >>         pinctrl-names =3D "default", "sleep";
-> >>         pinctrl-0 =3D <&davinci_mdio_default>;
-> >>         pinctrl-1 =3D <&davinci_mdio_sleep>;
-> >>
-> >>         ethphy0: ethernet-phy@0 {
-> >>                 reg =3D <0>;
-> >>                 /* Support GPIO reset on revision C3 boards */
-> >>                 reset-gpios =3D <&gpio1 8 GPIO_ACTIVE_LOW>;
-> >>                 reset-assert-us =3D <300>;
-> >>                 reset-deassert-us =3D <13000>;
-> >>         };
-> >> };
-> >>
-> >> Do we need to increase reset-deassert-us for some reason?
-> >
-> > Thanks for the hint!
-> >
-> > This is indeed on Rev. C3 (my other boards are Rev. A5C or C, but
-> > I don't test boot recent kernels on them, as they are in active use).
-> >
-> > Multiplying reset-deassert-us by 10 gives me a booting board.
-> > More experiments reveal that I need a delay of 14 ms to boot
-> > successfully, and 15 ms to avoid the early __mdiobus_read()
-> > failure, too.
-> >
-> >> I couldn't find MII ready time after reset de-assert information form =
-the
-> >> PHY datasheet. except the following line [1].
-> >> "For the first 16us after coming out of reset, the MII/RMII interface =
-will run at 2.5 MHz. After this time, it will
-> >> switch to 25 MHz if auto-negotiation is enabled"
-> >>
-> >> [1] 3.8.5 RESETS
-> >> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
-Documents/DataSheets/LAN8710A-LAN8710Ai-Data-Sheet-DS00002164.pdf
-> >
-> > 3.8.5.1 Hardware Reset
-> > "A Hardware reset is asserted by driving the nRST input pin low. When
-> >  driven, nRST should be held low for the minimum time detailed in
-> >  Section 5.6.3, "Power-On nRST & Configuration Strap Timing," on page
-> >  60 to ensure a proper transceiver reset."
-> >
-> > 5.6.3 POWER-ON NRST & CONFIGURATION STRAP TIMING
-> > "For proper operation, nRST must be asserted for no less than trstia."
-> >
-> > TABLE 5-8: POWER-ON NRST & CONFIGURATION STRAP TIMING VALUES
-> > "trstia nRST input assertion time min. 100 =C2=B5S"
-> >
-> > On Rev. C3, ETH_RESETn is controlled by an open-drain AND gate.
-> > It is pulled high by a 10K resistor, and has a 4.7=C2=B5F capacitor to
-> > ground.  That gives an RC constant of 47ms.  As you need 0.7RC to charg=
-e
-> > the capacitor above the threshold voltage of a CMOS input (VDD/2),
-> > reset-deassert-us should be at least 33ms. Considering the typical
-> > tolerance of 20% on capacitors, 40ms would be safer. Or perhaps
-> > even 50ms?
->
-> Super! Yes, I agree 50ms would be a good setting.
+> This series improves the packing library with a new API for packing or
+> unpacking a large number of fields at once with minimal code footprint. The
+> API is then used to replace bespoke packing logic in the ice driver,
+> preparing it to handle unpacking in the future. Finally, the ice driver has
+> a few other cleanups related to the packing logic.
+> 
+> The pack_fields and unpack_fields functions have the following improvements
+> over the existing pack() and unpack() API:
+> 
+>  1. Packing or unpacking a large number of fields takes significantly less
+>     code. This significantly reduces the .text size for an increase in the
+>     .data size which is much smaller.
+> 
+>  2. The unpacked data can be stored in sizes smaller than u64 variables.
+>     This reduces the storage requirement both for runtime data structures,
+>     and for the rodata defining the fields. This scales with the number of
+>     fields used.
+> 
+>  3. Most of the error checking is done at compile time, rather than
+>     runtime via CHECK_PACKED_FIELD_* macros. This saves wasted computation
+>     time, *and* catches errors in the field definitions immediately instead
+>     of only after the offending code executes.
+> 
+> The actual packing and unpacking code still uses the u64 size
+> variables. However, these are converted to the appropriate field sizes when
+> storing or reading the data from the buffer.
+> 
+> One complexity is that the CHECK_PACKED_FIELD_* macros need to be defined
+> one per size of the packed_fields array. This is because we don't have a
+> good way to handle the ordering checks otherwise. The C pre-processor is
+> unable to generate and run variable length loops at compile time.
+> 
+> This is a significant amount of macro code, ~22,000 lines of code. To
+> ensure it is correct and to avoid needing to store this directly in the
+> kernel history, this file is generated as <generated/packing-checks.h> via
+> a small C program, gen_packing_checks. To generate this, we need to update
+> the top level Kbuild process to include the compilation of
+> gen_packing_checks and execution to generate the packing-checks.h file.
+> 
 
-> > If you agree, I can send a patch.
-> > Thanks!
->
-> Much appreciated, thanks!
+Hi Jacob,
 
-https://lore.kernel.org/9002a58daa1b2983f39815b748ee9d2f8dcc4829.1730366936=
-.git.geert+renesas@glider.be
+As for the rest of the patches:
 
-Gr{oetje,eeting}s,
+Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
 
-                        Geert
+I can confirm that smatch does not complain anymore, after Dan's recent
+commit that skips the macros.
 
---=20
-Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
-.org
+/Daniel
 
-In personal conversations with technical people, I call myself a hacker. Bu=
-t
-when I'm talking to journalists I just say "programmer" or something like t=
-hat.
-                                -- Linus Torvalds
 
