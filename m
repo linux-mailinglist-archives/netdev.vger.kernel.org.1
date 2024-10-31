@@ -1,45 +1,73 @@
-Return-Path: <netdev+bounces-140821-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140822-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2A7799B85C2
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:53:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 323459B85C4
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:54:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C32D1C219B6
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 21:53:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64C021C21AB4
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 21:54:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F03C11CBE97;
-	Thu, 31 Oct 2024 21:52:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7181CB521;
+	Thu, 31 Oct 2024 21:54:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4p+2YOoo"
 X-Original-To: netdev@vger.kernel.org
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [91.216.245.30])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66E041B86E4
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 21:52:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.216.245.30
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A165193402;
+	Thu, 31 Oct 2024 21:54:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730411572; cv=none; b=NA3AgsFqbLnbHiWXlIATUKqvL4DjGi4nt3+adTuK6jU4cydnPe0A+OIKNynWfAcODfyezTDiGu1jkacqp15M1mBo+StNf7ZwGEPfu3gf986x3MnY28nxV05Pf9o1XiCMmE9nStAL235WEJ6QYKeIm5vsfokx047r2DhygurvqMk=
+	t=1730411653; cv=none; b=qv4XJYcy39QBhKATUr8FwiyzwbTYqB0Jhk26iuhUbgrW9jwJmQTdwQOFHZTGizy2y2gvVtHEZW+b5uaITvzQs3FFx6FbOgoeQX8vQQfaX4Q6k8RVCg2WqImjZ/yC/BrPjMxLEiL7M/8H4lQgVhU4nZsVEXdVFXnIbcW3SoCny74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730411572; c=relaxed/simple;
-	bh=DIF5yMFIuUVzaWgiyduIS166EZzF5/AL8mzGWDH0hgk=;
+	s=arc-20240116; t=1730411653; c=relaxed/simple;
+	bh=KdoeNpiS/p+rm8Qelj5rACdK1Lf1Zz8RIgV4JeX9MUc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=p4LfrDhv0bB4uXC2qxp0Nf2uY6UBJl1aXa0gM3XAuDANpKQaR5vpTecGOUbZd33ouGTIrk3E7FIeE1bRfQmS3oHU8cl1Rsh09d2ulkZd7LrXK2AVtVDzvKy1COt6iEV6bAQsHSwNuHcZWEtqAS639r16FLMVAnuuCZn/UmtpqbU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de; spf=pass smtp.mailfrom=strlen.de; arc=none smtp.client-ip=91.216.245.30
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=strlen.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=strlen.de
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1t6d5v-0001Ip-51; Thu, 31 Oct 2024 22:52:43 +0100
-Date: Thu, 31 Oct 2024 22:52:43 +0100
-From: Florian Westphal <fw@strlen.de>
-To: Austin Hendrix <namniart@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: Duplicate invocation of NF_INET_POST_ROUTING rule for outbound
- multicast?
-Message-ID: <20241031215243.GA4460@breakpoint.cc>
-References: <CAL5mK8wsgqQCVt0jG7YjJz4E6YoPPs3tq7rrhhbsr=BDeJMVMg@mail.gmail.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=MD9AaGLd+lkjnUCSO1crLmm2OM/ZyyLaWN/+cP1TmllF9VhokmEoQDxzrnMsi8R72uzyZCdSYZzz7RShlVZKLJyYhSA+LYLkCz0s7obgVGnHoTchIpgqaOdQ27qSwCssLSkGrBguDoU2o3+0wloXEWT5MNUMUIbR4bz/tiJnNpQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4p+2YOoo; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Md7xndCkD5h/1Ch/BvzvPhebt5YH0GB26ZGICP1J8EE=; b=4p+2YOoorOOUn81RfZBszqpd02
+	3As8Zzp1BVYReRCL4m63N+KP7tSEKUD+78tkLXYIOnUxqpjpHRwftpR9h3wrqOY3TFyc0acwoq9Vz
+	KvtlxzqP2sTWj30TIhxZG9GLjjyAhiuyt11D6WAe4BGDVohWOeCLV1Uln0q4b10plMVw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t6d7A-00Bp5Y-Up; Thu, 31 Oct 2024 22:54:00 +0100
+Date: Thu, 31 Oct 2024 22:54:00 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v2 08/18] net: pse-pd: Add support for
+ reporting events
+Message-ID: <ede82d07-6adc-486a-b715-e6e783655333@lunn.ch>
+References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
+ <20241030-feature_poe_port_prio-v2-8-9559622ee47a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -48,74 +76,24 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <CAL5mK8wsgqQCVt0jG7YjJz4E6YoPPs3tq7rrhhbsr=BDeJMVMg@mail.gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
+In-Reply-To: <20241030-feature_poe_port_prio-v2-8-9559622ee47a@bootlin.com>
 
-Austin Hendrix <namniart@gmail.com> wrote:
-> I've been staring at the linux source code for a while, and I think
-> this part of ip_mc_output explains it.
-> 
-> if (sk_mc_loop(sk)
-> #ifdef CONFIG_IP_MROUTE
-> /* Small optimization: do not loopback not local frames,
->    which returned after forwarding; they will be  dropped
->    by ip_mr_input in any case.
->    Note, that local frames are looped back to be delivered
->    to local recipients.
-> 
->    This check is duplicated in ip_mr_input at the moment.
-> */
->     &&
->     ((rt->rt_flags & RTCF_LOCAL) ||
->      !(IPCB(skb)->flags & IPSKB_FORWARDED))
-> #endif
->    ) {
-> struct sk_buff *newskb = skb_clone(skb, GFP_ATOMIC);
-> if (newskb)
-> NF_HOOK(NFPROTO_IPV4, NF_INET_POST_ROUTING,
-> net, sk, newskb, NULL, newskb->dev,
-> ip_mc_finish_output);
-> }
-> 
-> It looks like ip_mc_output duplicates outgoing multicast, sends the
-> copy through POSTROUTING first (remember how the first copy didn't
-> have UID and GID?), and then loops that copy back for local multicast
-> listeners.
-> 
-> I haven't followed all of the details yet, but it looks like the copy
-> that is looped back lacks the sk_buff attributes which identify the
-> UID, GID and cgroup of the sender.
+> +static struct phy_device *
+> +pse_control_find_phy_by_id(struct pse_controller_dev *pcdev, int id)
+> +{
+> +	struct pse_control *psec;
+> +
+> +	mutex_lock(&pse_list_mutex);
+> +	list_for_each_entry(psec, &pcdev->pse_control_head, list) {
+> +		if (psec->id == id)
+> +			return psec->attached_phydev;
 
-Yes, skb_clone'd skbs are not owned by any socket.
+The mutex is still locked. I'm surprised your testing did not
+deadlock, and that none of the automated tools have reported this.
 
-> Is my understanding of this correct? Is the netdev team willing to
-> discuss possible solutions to this, or is this behavior "by design?"
 
-Its for historic reasons, this is very old and predates cgroups.
+    Andrew
 
-You could try this (untested) patch, ipv6 would need similar treatment.
-We'd probably also want to extend this to RTCF_BROADCAST, i.e. add
-skb_clone_sk() or similar helper and then use that for these clones.
-
-diff --git a/net/ipv4/ip_output.c b/net/ipv4/ip_output.c
---- a/net/ipv4/ip_output.c
-+++ b/net/ipv4/ip_output.c
-@@ -396,10 +396,16 @@ int ip_mc_output(struct net *net, struct sock *sk, struct sk_buff *skb)
- #endif
- 		   ) {
- 			struct sk_buff *newskb = skb_clone(skb, GFP_ATOMIC);
--			if (newskb)
-+			if (newskb) {
-+				struct sock *skb_sk = skb->sk;
-+
-+				if (skb_sk)
-+					skb_set_owner_edemux(newskb, skb_sk);
-+
- 				NF_HOOK(NFPROTO_IPV4, NF_INET_POST_ROUTING,
- 					net, sk, newskb, NULL, newskb->dev,
- 					ip_mc_finish_output);
-+			}
- 		}
- 
- 		/* Multicasts with ttl 0 must not go beyond the host */
+---
+pw-bot: cr
 
