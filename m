@@ -1,297 +1,357 @@
-Return-Path: <netdev+bounces-140723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4CC79B7B60
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:10:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8D269B7B69
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:10:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6896F1F221E9
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:10:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75431281639
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:10:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A0CD19DF4C;
-	Thu, 31 Oct 2024 13:09:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D3E119DF62;
+	Thu, 31 Oct 2024 13:10:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b="F2RdWql0"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="ZAcOYc0c"
 X-Original-To: netdev@vger.kernel.org
-Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sg2apc01on2127.outbound.protection.outlook.com [40.107.215.127])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 978C21991BE;
-	Thu, 31 Oct 2024 13:09:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.215.127
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730380197; cv=fail; b=FNkhEHcp8R9QXFwLW/1sQAclpc4cA0JcwzDmjPXg6FNx+6mt0CZNaMCpv8hdysiCx4GS5hzo+6FCn/GQb8gHToV5xltWiAuEHy1QNvitHyH/9fEz8Ih4msoZDVlCbyxmgcnHNuG40I86vd4oHDyv++Bdx1mp93HsZmaq56/z7/c=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730380197; c=relaxed/simple;
-	bh=KQt0qyfnFczN9Nikee8eYixTLeSpTX0GHq4Ke9cQUmw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=ZnutY6qKJ2rEcbYhp+sb80jdnx7ypj+7SqztrnTmdDpnVu6ZQKOXtD7t/lrFYUE+xAmYC1p+Vaao8dEchZ+KU+QNqjzHj7HMyKEOH2gv5IMibQaQwoP633SJ9GXbrASTRTjSMUCD/0dTssHrQ9RUmUHTfqRj5uAHV3oKcnMQ7fI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com; spf=pass smtp.mailfrom=fibocom.com; dkim=pass (1024-bit key) header.d=fibocomcorp.onmicrosoft.com header.i=@fibocomcorp.onmicrosoft.com header.b=F2RdWql0; arc=fail smtp.client-ip=40.107.215.127
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=fibocom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fibocom.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=nqSlOjpjffkiElb1Q+oecdnw/uoWdbFX5Y2BL88uqnm4uM2IDXNhyE/1F6SHU+C1/McnxLj8WbRiZj0SUYdS7kmvOz1Rn4y93ndVvgQyy6l5dnD42dZnf9cpZYF2mTP+5NESZx//8mOFwUoiEEC5HnSgYQBZsr71I0G2dBTw605v/6xZ6DuYEaki28FQ08r85lBnvL/jtY0Q1P7tdFg22GtGSDV/khB7IjKYDeWlOtDFt1CL9AsksYONfhs4/LNjZivf06FIHQRl9h2xDCls4+T+GFN6QIeFl0eedcwTzryVhdaqGwnjUSVpPgHw9CVUklXxhC/asILqqGI1Z7Gk3A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=aZYlpQTCTa8nV6TQLlq7S+sdt2aCdcEeGA6qU1KAn/o=;
- b=AtLB0lxzL9K1lVgGfglhsJ+hJWeAnYgTnkFWKZBCjvsEhCCFi0lWRhRDUAGRlRY+zFIDnYohzSP0DEghtfGd3QuHY2+cfInf67cuws5mkwttLUKy0DlRkYjklArm11MUCpqwp023wJqkooTtiAuPepooFkRFoM/xdg06nluses+tBaDX3UT1Cm+v1o1YARHFVNm6+uhRrBbd//Co/wCoBR2bdpWonUTuEptyLA9SssDXaMOaLmIcJ/hXFHyMJzUfA89osE5oeFW0VDlWf0nZgK2clEsctcDH4ysyAYTeOGRVJ3K+I+zt8xoRp1DP4f3hr1gxwzueqvrS0okb4sbl3A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=fibocom.com; dmarc=pass action=none header.from=fibocom.com;
- dkim=pass header.d=fibocom.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=fibocomcorp.onmicrosoft.com; s=selector1-fibocomcorp-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=aZYlpQTCTa8nV6TQLlq7S+sdt2aCdcEeGA6qU1KAn/o=;
- b=F2RdWql09cEEgJULpD+0+05PHj7g4ZBhUe9zexEJczGoYKr6KrQk1Onr1qE4TcDJskI5Mklpd+MgPrirzv9ntBUlebUvHfCnsyhDAsS7+Uz/Y4MVEV+Ukvu2egMELU+aPCvTUXzn1C/3F8bfq0BWJfuanSRJiCjqJF3n7b9t8u0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=fibocom.com;
-Received: from TY0PR02MB5766.apcprd02.prod.outlook.com (2603:1096:400:1b5::6)
- by TYZPR02MB6294.apcprd02.prod.outlook.com (2603:1096:400:287::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.20; Thu, 31 Oct
- 2024 13:09:47 +0000
-Received: from TY0PR02MB5766.apcprd02.prod.outlook.com
- ([fe80::f53d:47b:3b04:9a8b]) by TY0PR02MB5766.apcprd02.prod.outlook.com
- ([fe80::f53d:47b:3b04:9a8b%4]) with mapi id 15.20.8114.015; Thu, 31 Oct 2024
- 13:09:47 +0000
-From: Jinjian Song <jinjian.song@fibocom.com>
-To: ryazanov.s.a@gmail.com,
-	Jinjian Song <jinjian.song@fibocom.com>,
-	chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com,
-	haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com,
-	ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org,
-	johannes@sipsolutions.net,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: angelogioacchino.delregno@collabora.com,
-	bhelgaas@google.com,
-	corbet@lwn.net,
-	danielwinkler@google.com,
-	helgaas@kernel.org,
-	korneld@google.com,
-	linasvepstas@gmail.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	matthias.bgg@gmail.com,
-	netdev@vger.kernel.org
-Subject: Re: [net-next v2] net: wwan: t7xx: reset device if suspend fails
-Date: Thu, 31 Oct 2024 21:09:30 +0800
-Message-Id: <20241031130930.5583-1-jinjian.song@fibocom.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <e37b9baa-51e5-48f9-a15d-521f29ce5f9c@gmail.com>
-References: <20241022084348.4571-1-jinjian.song@fibocom.com> <20241029034657.6937-1-jinjian.song@fibocom.com>
-Content-Language: en-US
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: TYAPR01CA0167.jpnprd01.prod.outlook.com
- (2603:1096:404:7e::35) To TY0PR02MB5766.apcprd02.prod.outlook.com
- (2603:1096:400:1b5::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0919E19F110;
+	Thu, 31 Oct 2024 13:10:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730380230; cv=none; b=qlfBRfYrlAnvALcSu9UPrXVYT1tZBWQL3I6Mf5eaVyI6PpwarDjKbJmUDlXLbIwxBr/DfKG+zhnBbsswU70CfG7MIbXB/rsxRFA+xTBYVQg3YaXQAxFz6nQCd7Zrbx/7pKp72RPm0hVc69pAC9Mm/Ab2Eop7dk/0K85dSLZvWvY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730380230; c=relaxed/simple;
+	bh=Ws4nFLQqfgbxQOnLOFS16yMCjEu3wZ5jnket4MtMOrk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=sVnAMs2esAa+I9RUDK8hCjrUteyEGyDdVKn/JS6jOCnvZMEb/S98a6RzfGc+9X0RvcBjCC0X74U5KngrhvNNT0XCqrhiF1QJZ4S7i72KbuhSqA9LsOAycA+EBcMHsvw/+NCdUdXpUF7vGYICFBaUxoljEQxqqTjSHLErvFYTTeM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=ZAcOYc0c; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730380226; x=1761916226;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Ws4nFLQqfgbxQOnLOFS16yMCjEu3wZ5jnket4MtMOrk=;
+  b=ZAcOYc0c/UIq7cr8jwg/O4uhM3NakieuvHdFO3NJ9IwYCiu7gk/sRPRD
+   MPMGsMsvo+1S5yLNb0BmsVGhYnQQ/hx4Vy3NmCMHYVrsmV3Mn/AB+Kouv
+   BTj/oYzCyZIv4pNYZSaPbin9UxPEbgC7NQrE2TS+Kw+JzctGVw+H9bPvX
+   Es29tw9lVd9ZMwnXxcK0RSzTWxb+n2X1AwLBzd/oUJPb8FYb4tqsrs33x
+   91TTsvoqcIAh63pxLFlNwmlLMaKSucSDlQYQZ32P3Y4KunHFEmGxXfBXk
+   caIqQeCds/hBwR95aPNAH5ej9Ca2CEgXGJ/PZixDu+ROsgu96VinTW2V5
+   Q==;
+X-CSE-ConnectionGUID: FOClypPsTC+ugZhZE7AiSg==
+X-CSE-MsgGUID: +V8wnyv+RLGWejMTFyibtA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47572642"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="47572642"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 06:10:20 -0700
+X-CSE-ConnectionGUID: m3YLlGEcREuPMDz+uUjwbg==
+X-CSE-MsgGUID: PTzwQAYEQEG429s16g1aCQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="82777249"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa006.jf.intel.com with ESMTP; 31 Oct 2024 06:10:16 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t6UwH-000g7S-0y;
+	Thu, 31 Oct 2024 13:10:13 +0000
+Date: Thu, 31 Oct 2024 21:09:51 +0800
+From: kernel test robot <lkp@intel.com>
+To: admiyo@os.amperecomputing.com, Jeremy Kerr <jk@codeconstruct.com.au>,
+	Matt Johnston <matt@codeconstruct.com.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Sudeep Holla <sudeep.holla@arm.com>,
+	Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+	Huisong Li <lihuisong@huawei.com>
+Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
+Message-ID: <202410312048.W6PV1dIU-lkp@intel.com>
+References: <20241029165414.58746-3-admiyo@os.amperecomputing.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: TY0PR02MB5766:EE_|TYZPR02MB6294:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4bd1cf01-6e63-4f22-3279-08dcf9ad4b59
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|7416014|52116014|366016|376014|1800799024|921020|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?bkZyZmxlZGM5ZnhoMHVTTVNYcWpZME9GNU1kamRaK1FtTEFCSGJmY0VhMEVN?=
- =?utf-8?B?L0xESHlMS05BYys2aHRJUFpsa1dKYWtNaXJncFpMY1dwR283V3hYY1VRcnhV?=
- =?utf-8?B?eHo4Y1RSZGFxY3o5dmViVnRKaFd5YUl5OWIwQm5WQkUzWXF6ZENqaWR2NFI5?=
- =?utf-8?B?YUpVeDgrazZyU3ZFU2RvOVZyOHdMRDQxN0xzNGtOWUFDdFB3THZQVlZsajNB?=
- =?utf-8?B?eWx2YTdxRklxN3dUMUZ3WHhBWWdFeFZvcWFTRjBCdzNLeFV6UXNLeTBVMk1s?=
- =?utf-8?B?aWdYa0o1MHZ2cXRBZnp0Z2crdkpBZVEwMHZWb1BzcGhpVllvQUtiVStMMll4?=
- =?utf-8?B?WWM0eDErTFhHUkNzRnE5aUpnVzlnV0t0M0hVVW9iL3hDaGZDbFd5MW9CREx4?=
- =?utf-8?B?TngySWtUbVVzc3ozYlhzQWVtd24rYjJFYklkRVJzQUN1cFRFV082TUZQVzVT?=
- =?utf-8?B?K1RmZXd1YURhNWRqcUN5R1NySXdtR25XZUpMTHlYSXlOSXdOU3VMVDhlb0lO?=
- =?utf-8?B?Qm9PMXhCbHlmVWthdWRvZ1JiU3FHaVVjSGt1Y2hHREV3K3lPdWYraUpmRWlY?=
- =?utf-8?B?MmJ3cGVNbm9uMTNSemJGc0w2UG9Jb21lYldHd2FNRGIxZmxIQTBvTDZXVk1v?=
- =?utf-8?B?TkdsSDdveFk0SmxIZG5teURjdFRjRXNRNE9Ic1lIbjhlQkc2Z1VkUXRhWk9H?=
- =?utf-8?B?VW4yWXlvV21Qcjc2dzd0ZEtCbnJHK093QTloVXJ0c0FWSXZqZFJBbVEwMjlp?=
- =?utf-8?B?c3FvYk42RFNLMDJWZk81L3FkMVl3c3V5ZlYzbmFsSE9scjJTdnc1T284R2Qz?=
- =?utf-8?B?YkRSanJyd1drTlBuVFZYTjFpaG9tQVlpeDZzK3VLWnRCZUpCR2xUa1E1M1Bj?=
- =?utf-8?B?ZjRPOWV5eXBLMXNoakh0dTNYOXI0bVdQWURiWmNyc1plNDloRC80OWl1T3J6?=
- =?utf-8?B?cHZ3aTU0aEt3d2gxU2FvMFlVMHRBNncvTHhUaFlnd1J0TFAyMjlwSThlT1p3?=
- =?utf-8?B?QTNPcmlBc3E1TnZ2SHBReG1ncGRJMmRSdWovd004WW5wV2ZNTm9mOVBYNXMv?=
- =?utf-8?B?RUdVVWdQUmJGdnlCd3kyc1BGT29VdjBMdTNHdGcrZkZycC96cXRuUHZBWm9y?=
- =?utf-8?B?WDZDTFU4Um90dDZBL3l0OHBPQ0xtYlVXRnVzVldhOFlwZHVoZXFXSlQ1V0ln?=
- =?utf-8?B?OTRGL1d3VHA3d2xZQWZ0VzQyNThxVEpqUGExWjhTUlFuYjArZEdiMW44QW9L?=
- =?utf-8?B?RzdXZ3g3Z1FXK0tQN3FnSVRrZS9sWHI4aCtCVFFyb0QybkdaTWZMMm1FTUVw?=
- =?utf-8?B?dlltMDZueFQxTGRmWTdPZ1Bpa2s3WVFFVWtMT09BU3VuTEd0NFlITlY5c2Vw?=
- =?utf-8?B?WDBmZGxzNXpNUkc0Vks0aG1xM2UySVMwOVhydExQbkVCRlUwRjhXenp0TnpS?=
- =?utf-8?B?cFRXVkRQYzZia1gvNVlNR3BISGpmVmU5K2FjeVN1TGw4bUpRMGw2N2VoYytC?=
- =?utf-8?B?eW8yRGY2TDJOc3JqSDdnTi9Za09Va083ZFk0TzNYbTFWOGtVWnYvTWZSRGZ0?=
- =?utf-8?B?MHdwdVVCZ3daRlpVMVFsZElwaXV1N2JMbUk5ektOemg0VUZTUkprd05sVWZu?=
- =?utf-8?B?eEE1NUdxK0NxeHc2Y0x5K0txVk05YkhScFJKN2E1aGI3UE82L0dKM1kvTnU1?=
- =?utf-8?B?Q2ZrOEgrTUxVK0NFaVpNMURGeVp0MTEzd05uRDY0VC9RTnpEOEx0VE8wZFg4?=
- =?utf-8?B?d3grbHBhZ3ZHbVlIYnFVMjZBdVVITlY5dXZ6ZjNkQ1VaS0tZVHU2YklSUTkv?=
- =?utf-8?B?YUxsR21ySzFVWm1nNFFyUkFUV0RWZVIyZEpPWmM5VEtqMlBnYStFdnk3Z24x?=
- =?utf-8?Q?No8Z87wbMYmPb?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:TY0PR02MB5766.apcprd02.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(52116014)(366016)(376014)(1800799024)(921020)(38350700014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?UWJDZ0lhdDBvZHoyazZNcXp4L3FFRHM3RUU2RU80VllEUzVWT3RxbDE4L2xu?=
- =?utf-8?B?eE5kazI2TnpoQVU3RUd0L0F3T0VGZkMyUWw5MHpabkJWTi93cEFkc0tHQnZB?=
- =?utf-8?B?QXNlUDhrU3FKbHpVS1VJSGlBMm4xRWNhWTR5UFhXRDh1TW5SaG9UaisyTjBa?=
- =?utf-8?B?SllzOWlVQ0ZxVXhPKzhPeXlmeFpVczMvVTdZOFNjZjN3V0ZUejYvZWYxYURt?=
- =?utf-8?B?S2dRMkNqZkFqZWYvLzlseWhXTnpOdGlGdmZwUVQyL3hGRFphNWFvdkpjZ05F?=
- =?utf-8?B?YXovRG95dll6aDJFU3B1cGJ6Mi96UU1kdUwvL2MwMDJKNkQxQlpJWWtMeGNk?=
- =?utf-8?B?bnEvbjhjcWJ3b2tSaGt0VW8wSEdNU25SeDVsZWRTdmcwV0lGTnFLOFlVeUhN?=
- =?utf-8?B?dUIxNjRhYXEveWt6TU5Mb1JZY0lSUXZUU3c0bWZCZE5YWlp4VDQxM0RXZkJi?=
- =?utf-8?B?RkRsVCtPNXNPVVVIMmlKMmtBbG5oajdadDdQdk01YzlZYWNCODVWMGhleVBJ?=
- =?utf-8?B?UytmWmx2dTRsWVNFRDVSK1F3Q0dkeTdvQVJsb2pnWHM5WE1jNDVxSnorQ1hr?=
- =?utf-8?B?bDg5MlA3S0plUlBSdGJZS1VKdk1sN2g4TkdRM1oxNDBCR0hvaEwyRjF6bmJE?=
- =?utf-8?B?cUU5QTJKR3hnMlVieGdRN241QkU1R0VTcjByZzVJVi8zTURwbDJMTG01ank3?=
- =?utf-8?B?Z3p1U1dTU3VCZUFyT01VRVkyYlBudnl0WVpPWTNVZFlwVTFUTVRVWkV3RXRV?=
- =?utf-8?B?MW5FNGdhWFJOVE5vZS9seUxJVFQ3V0RaRnJOM2tNazRrUmZ6bEdJdGVvTFZ4?=
- =?utf-8?B?UUZVYm9CR01UdGJtZnpGcXVZSm1SSVhIQ0M2czQxdy8zbXZMQmxRSTkyayta?=
- =?utf-8?B?TDNiWnE2b21jcy9Fdzc4aG1md1VYTlhIbFlPVG80TjR1Y2RmU3BuTTlkcC9i?=
- =?utf-8?B?NzlIaWhKeEFxc2NiaHYzZDd0WXZ5NVE3d29GVFBEa0ZPbVoyUnNCUit2L2hM?=
- =?utf-8?B?aHNlTm9Dd0tqbjQvN25DRDI1TXVqRkoybHdmRUlubTdPeFhka0pXR2ZaL3Bo?=
- =?utf-8?B?Y0pIMXBEWHRXdjZpRjB3YU16TDZTc3FZWlJEMlN5aEJMWG9JV1ZEZFE2cnhn?=
- =?utf-8?B?MXJEajltOEV0SndJbWRnWHZHMU4wdjIxZEtnanVQcG4ra2JXRzhudjV0NTl2?=
- =?utf-8?B?eHlsUVdlSGFnK2VtMzRXNFUzTWswR2lpQnNaaDBzb3N3VE9oUGExNmZ5NHJC?=
- =?utf-8?B?RnBZS0ovaHhYYTYvNkpzZTQ1RFVGQXRiYTZ1L3pkaUR0WmoyN2ZSTlBZR1Bl?=
- =?utf-8?B?MXdsY1FTOGpET1NuR0JBcWdibkNzVENSRXRZUUNQUFk3NWwyb2tHanhqRlZB?=
- =?utf-8?B?Mm1iMWFwRHJqN0JYQ2VMOE02RU1JWEE3RmdudkVwUnBKN21zYjhUaldCa3Ni?=
- =?utf-8?B?dkcrMFpES1duSG1nQXpFdGtSamVqUjk4SmFFMFNmbVAyeDl5Y0FLRnF4UkhX?=
- =?utf-8?B?VmJZN0V4QmJsOFlTdzA5WERRTWR1a3dsVkpxakpwTWJTRkpDMlNxV21jWmNr?=
- =?utf-8?B?YlBQRy9UWmdSQWJaUThwVkdacDl4L0Z5Z3FPc0RxNGNXUE5NVzdrQk4xeUw1?=
- =?utf-8?B?eFA5QVhmYzdvQTNoMFRFeFZEMEUrTHdzc29zdGM1MnU2ZWlVL2czSmQ4VDRO?=
- =?utf-8?B?MmQzQmlPbEd2cGM3VXE2cFhMSVdPNFZkL2JiZ1pLWW9nVndHUnR4Z2s4bHFo?=
- =?utf-8?B?QXBnQjNnWXBpZkpndVRTMnBVVjZsbTJ4cWFFYThoWm1NUFd1QncxWFZLYXhL?=
- =?utf-8?B?QWZkZTNWWmlhZ2hqZXlHNEVTVmxWU3lnU1kvWmdRRXNRQmdQSlNYNzJManli?=
- =?utf-8?B?NWkzcE1KN1cxenhNanA2QS9ZK3E3TzJFVjRHTzllQUZlQ2NaSzBDelp4QVMy?=
- =?utf-8?B?dkRXRFM3T1ZWSkN4ZW9ZWkRyVW5tTXk1QkZ1dmJnWi9QSlROaEgwQWowaERN?=
- =?utf-8?B?L29yRkg4MEJSRUQ0RDlpbGYzWFN1aGlYTUZwWk41Z3VpenRQSWNoYmNQZXQy?=
- =?utf-8?B?NEg5d0lSTDdOeEk5RnM2ODdYdDBjTGI1M2FiSmdNOXZGeHQ3ZlFtK1BGR0Jm?=
- =?utf-8?B?aHZldnRHbmR5anlpL25XODRFR1c5K2I1d0JTQXZYQXI5UytsWVpiL0F6cTFH?=
- =?utf-8?B?aFE9PQ==?=
-X-OriginatorOrg: fibocom.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4bd1cf01-6e63-4f22-3279-08dcf9ad4b59
-X-MS-Exchange-CrossTenant-AuthSource: TY0PR02MB5766.apcprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 13:09:47.2400
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 889bfe61-8c21-436b-bc07-3908050c8236
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: zLgpRfjTMmiueSuCkZxlajCnm0CKazX7dwtAK/mDMPTdfOzDFaomrM167hv94lpR/oM5MDSFHKXAOFhmzQ85h247HF7XuRXgAp9jcB86l3A=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYZPR02MB6294
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241029165414.58746-3-admiyo@os.amperecomputing.com>
 
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Hi,
 
->Hi Jinjian,
->
->On 29.10.2024 05:46, Jinjian Song wrote:
->> From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
->>> On 22.10.2024 11:43, Jinjian Song wrote:
->>>> If driver fails to set the device to suspend, it means that the
->>>> device is abnormal. In this case, reset the device to recover
->>>> when PCIe device is offline.
->>>
->>> Is it a reproducible or a speculative issue? Does the fix recover 
->>> modem from a problematic state?
->>>
->>> Anyway we need someone more familiar with this hardware (Intel or 
->>> MediaTek engineer) to Ack the change to make sure we are not going to 
->>> put a system in a more complicated state.
->> 
->> Hi Sergey,
->> 
->> This is a very difficult issue to replicate onece occured and fixed.
->> 
->> The issue occured when driver and device lost the connection. I have
->> encountered this problem twice so far:
->> 1. During suspend/resume stress test, there was a probabilistic D3L2
->> time sequence issue with the BIOS, result in PCIe link down, driver
->> read and write the register of device invalid, so suspend failed.
->> This issue was eventually fixed in the BIOS and I was able to restore
->> it through the reset module after reproducing the problem.
->> 
->> 2. During idle test, the modem probabilistic hang up, result in PCIe
->> link down, driver read and write the register of device invalid, so
->> suspend failed. This issue was eventually fiex in device modem firmware
->> by adjust a certain power supply voltage, and reset modem as a workround
->> to restore when the MBIM port command timeout in userspace applycations.
->> 
->> Hardware reset modem to recover was discussed with MTK, and they said
->> that if we don't want to keep the on-site problem location in case of
->> suspend failure, we can use the recover solution.
->> Both the ocurred issues result in the PCIe link issue, driver can't read 
->> and writer the register of WWAN device, so I want to add this path
->> to restore, hardware reset modem can recover modem, but using the 
->> pci_channle_offline() as the judgment is my inference.
->
->Thank you for the clarification. Let me summarize what I've understood 
->from the explanation:
->a) there were hardware (firmware) issues,
->b) issues already were solved,
->c) issues were not directly related to the device suspension procedure,
->d) you want to implement a backup plan to make the modem support robust.
->
->If got it right, then I would like to recommend to implement a generic 
->error handling solution for the PCIe interface. You can check this 
->document: Documentation/PCI/pci-error-recovery.rst
-Hi Sergey,
+kernel test robot noticed the following build errors:
 
-Yes, got it right.
-I want to identify the scenario and then recover by reset device,
-otherwise suspend failure will aways prevent the system from suspending
-if it occurs.
+[auto build test ERROR on rafael-pm/linux-next]
+[also build test ERROR on rafael-pm/bleeding-edge linus/master v6.12-rc5 next-20241031]
+[cannot apply to horms-ipvs/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
->Suddenly, I am not an expert in the PCIe link recovery procedure, so 
->I've CCed this message to PCI subsystem maintainers. I hope they can 
->suggest a conceptually correct way to handle these cases.
+url:    https://github.com/intel-lab-lkp/linux/commits/admiyo-os-amperecomputing-com/mctp-pcc-Check-before-sending-MCTP-PCC-response-ACK/20241030-005644
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/rafael/linux-pm.git linux-next
+patch link:    https://lore.kernel.org/r/20241029165414.58746-3-admiyo%40os.amperecomputing.com
+patch subject: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
+config: hexagon-allmodconfig (https://download.01.org/0day-ci/archive/20241031/202410312048.W6PV1dIU-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 639a7ac648f1e50ccd2556e17d401c04f9cce625)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241031/202410312048.W6PV1dIU-lkp@intel.com/reproduce)
 
-Thanks.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410312048.W6PV1dIU-lkp@intel.com/
 
->>>> Signed-off-by: Jinjian Song <jinjian.song@fibocom.com>
->>>> ---
->>>> V2:
->>>>   * Add judgment, reset when device is offline
->>>> ---
->>>>   drivers/net/wwan/t7xx/t7xx_pci.c | 4 ++++
->>>>   1 file changed, 4 insertions(+)
->>>>
->>>> diff --git a/drivers/net/wwan/t7xx/t7xx_pci.c b/drivers/net/wwan/ 
->>>> t7xx/t7xx_pci.c
->>>> index e556e5bd49ab..4f89a353588b 100644
->>>> --- a/drivers/net/wwan/t7xx/t7xx_pci.c
->>>> +++ b/drivers/net/wwan/t7xx/t7xx_pci.c
->>>> @@ -427,6 +427,10 @@ static int __t7xx_pci_pm_suspend(struct pci_dev 
->>>> *pdev)
->>>>       iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) + 
->>>> ENABLE_ASPM_LOWPWR);
->>>>       atomic_set(&t7xx_dev->md_pm_state, MTK_PM_RESUMED);
->>>>       t7xx_pcie_mac_set_int(t7xx_dev, SAP_RGU_INT);
->>>> +    if (pci_channel_offline(pdev)) {
->>>> +        dev_err(&pdev->dev, "Device offline, reset to recover\n");
->>>> +        t7xx_reset_device(t7xx_dev, PLDR);
->>>> +    }
->>>>       return ret;
->>>>   }
->
->--
->Sergey
->
+All error/warnings (new ones prefixed by >>):
 
-Best Regards,
-Jinjian
+   In file included from drivers/net/mctp/mctp-pcc.c:12:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:10:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   In file included from drivers/net/mctp/mctp-pcc.c:12:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     548 |         val = __raw_readb(PCI_IOBASE + addr);
+         |                           ~~~~~~~~~~ ^
+   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
+      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
+         |                                                   ^
+   In file included from drivers/net/mctp/mctp-pcc.c:12:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
+         |                                                         ~~~~~~~~~~ ^
+   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
+      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
+         |                                                   ^
+   In file included from drivers/net/mctp/mctp-pcc.c:12:
+   In file included from include/linux/if_arp.h:22:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
+   In file included from include/asm-generic/hardirq.h:17:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:14:
+   In file included from arch/hexagon/include/asm/io.h:328:
+   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     585 |         __raw_writeb(value, PCI_IOBASE + addr);
+         |                             ~~~~~~~~~~ ^
+   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
+         |                                                       ~~~~~~~~~~ ^
+   In file included from drivers/net/mctp/mctp-pcc.c:21:
+>> include/acpi/acpi_drivers.h:72:43: warning: declaration of 'struct acpi_pci_root' will not be visible outside of this function [-Wvisibility]
+      72 | struct pci_bus *pci_acpi_scan_root(struct acpi_pci_root *root);
+         |                                           ^
+>> drivers/net/mctp/mctp-pcc.c:237:32: error: incomplete definition of type 'struct acpi_device'
+     237 |         struct device *dev = &acpi_dev->dev;
+         |                               ~~~~~~~~^
+   include/linux/acpi.h:801:8: note: forward declaration of 'struct acpi_device'
+     801 | struct acpi_device;
+         |        ^
+>> drivers/net/mctp/mctp-pcc.c:246:3: error: call to undeclared function 'acpi_device_hid'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     246 |                 acpi_device_hid(acpi_dev));
+         |                 ^
+   drivers/net/mctp/mctp-pcc.c:246:3: note: did you mean 'acpi_device_dep'?
+   include/acpi/acpi_bus.h:41:6: note: 'acpi_device_dep' declared here
+      41 | bool acpi_device_dep(acpi_handle target, acpi_handle match);
+         |      ^
+>> drivers/net/mctp/mctp-pcc.c:246:3: warning: format specifies type 'char *' but the argument has type 'int' [-Wformat]
+     245 |         dev_dbg(dev, "Adding mctp_pcc device for HID  %s\n",
+         |                                                       ~~
+         |                                                       %d
+     246 |                 acpi_device_hid(acpi_dev));
+         |                 ^~~~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/dev_printk.h:165:39: note: expanded from macro 'dev_dbg'
+     165 |         dynamic_dev_dbg(dev, dev_fmt(fmt), ##__VA_ARGS__)
+         |                                      ~~~     ^~~~~~~~~~~
+   include/linux/dynamic_debug.h:274:19: note: expanded from macro 'dynamic_dev_dbg'
+     274 |                            dev, fmt, ##__VA_ARGS__)
+         |                                 ~~~    ^~~~~~~~~~~
+   include/linux/dynamic_debug.h:250:59: note: expanded from macro '_dynamic_func_call'
+     250 |         _dynamic_func_call_cls(_DPRINTK_CLASS_DFLT, fmt, func, ##__VA_ARGS__)
+         |                                                                  ^~~~~~~~~~~
+   include/linux/dynamic_debug.h:248:65: note: expanded from macro '_dynamic_func_call_cls'
+     248 |         __dynamic_func_call_cls(__UNIQUE_ID(ddebug), cls, fmt, func, ##__VA_ARGS__)
+         |                                                                        ^~~~~~~~~~~
+   include/linux/dynamic_debug.h:224:15: note: expanded from macro '__dynamic_func_call_cls'
+     224 |                 func(&id, ##__VA_ARGS__);                       \
+         |                             ^~~~~~~~~~~
+>> drivers/net/mctp/mctp-pcc.c:247:15: error: call to undeclared function 'acpi_device_handle'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     247 |         dev_handle = acpi_device_handle(acpi_dev);
+         |                      ^
+>> drivers/net/mctp/mctp-pcc.c:247:13: error: incompatible integer to pointer conversion assigning to 'acpi_handle' (aka 'void *') from 'int' [-Wint-conversion]
+     247 |         dev_handle = acpi_device_handle(acpi_dev);
+         |                    ^ ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+   drivers/net/mctp/mctp-pcc.c:290:10: error: incomplete definition of type 'struct acpi_device'
+     290 |         acpi_dev->driver_data = mctp_pcc_ndev;
+         |         ~~~~~~~~^
+   include/linux/acpi.h:801:8: note: forward declaration of 'struct acpi_device'
+     801 | struct acpi_device;
+         |        ^
+>> drivers/net/mctp/mctp-pcc.c:317:27: error: variable has incomplete type 'struct acpi_driver'
+     317 | static struct acpi_driver mctp_pcc_driver = {
+         |                           ^
+   drivers/net/mctp/mctp-pcc.c:317:15: note: forward declaration of 'struct acpi_driver'
+     317 | static struct acpi_driver mctp_pcc_driver = {
+         |               ^
+>> drivers/net/mctp/mctp-pcc.c:326:1: error: type specifier missing, defaults to 'int'; ISO C99 and later do not support implicit int [-Wimplicit-int]
+     326 | module_acpi_driver(mctp_pcc_driver);
+         | ^
+         | int
+>> drivers/net/mctp/mctp-pcc.c:326:20: error: a parameter list without types is only allowed in a function definition
+     326 | module_acpi_driver(mctp_pcc_driver);
+         |                    ^
+   9 warnings and 8 errors generated.
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [m]:
+   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
+
+
+vim +237 drivers/net/mctp/mctp-pcc.c
+
+   231	
+   232	static int mctp_pcc_driver_add(struct acpi_device *acpi_dev)
+   233	{
+   234		struct mctp_pcc_lookup_context context = {0, 0, 0};
+   235		struct mctp_pcc_hw_addr mctp_pcc_hw_addr;
+   236		struct mctp_pcc_ndev *mctp_pcc_ndev;
+ > 237		struct device *dev = &acpi_dev->dev;
+   238		struct net_device *ndev;
+   239		acpi_handle dev_handle;
+   240		acpi_status status;
+   241		int mctp_pcc_mtu;
+   242		char name[32];
+   243		int rc;
+   244	
+   245		dev_dbg(dev, "Adding mctp_pcc device for HID  %s\n",
+ > 246			acpi_device_hid(acpi_dev));
+ > 247		dev_handle = acpi_device_handle(acpi_dev);
+   248		status = acpi_walk_resources(dev_handle, "_CRS", lookup_pcct_indices,
+   249					     &context);
+   250		if (!ACPI_SUCCESS(status)) {
+   251			dev_err(dev, "FAILURE to lookup PCC indexes from CRS");
+   252			return -EINVAL;
+   253		}
+   254	
+   255		//inbox initialization
+   256		snprintf(name, sizeof(name), "mctpipcc%d", context.inbox_index);
+   257		ndev = alloc_netdev(sizeof(struct mctp_pcc_ndev), name, NET_NAME_ENUM,
+   258				    mctp_pcc_setup);
+   259		if (!ndev)
+   260			return -ENOMEM;
+   261	
+   262		mctp_pcc_ndev = netdev_priv(ndev);
+   263		rc =  devm_add_action_or_reset(dev, mctp_cleanup_netdev, ndev);
+   264		if (rc)
+   265			goto cleanup_netdev;
+   266		spin_lock_init(&mctp_pcc_ndev->lock);
+   267	
+   268		rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->inbox,
+   269						 context.inbox_index);
+   270		if (rc)
+   271			goto cleanup_netdev;
+   272		mctp_pcc_ndev->inbox.client.rx_callback = mctp_pcc_client_rx_callback;
+   273	
+   274		//outbox initialization
+   275		rc = mctp_pcc_initialize_mailbox(dev, &mctp_pcc_ndev->outbox,
+   276						 context.outbox_index);
+   277		if (rc)
+   278			goto cleanup_netdev;
+   279	
+   280		mctp_pcc_hw_addr.parent_id = cpu_to_be32(0);
+   281		mctp_pcc_hw_addr.inbox_id = cpu_to_be16(context.inbox_index);
+   282		mctp_pcc_hw_addr.outbox_id = cpu_to_be16(context.outbox_index);
+   283		ndev->addr_len = sizeof(mctp_pcc_hw_addr);
+   284		dev_addr_set(ndev, (const u8 *)&mctp_pcc_hw_addr);
+   285	
+   286		mctp_pcc_ndev->acpi_device = acpi_dev;
+   287		mctp_pcc_ndev->inbox.client.dev = dev;
+   288		mctp_pcc_ndev->outbox.client.dev = dev;
+   289		mctp_pcc_ndev->mdev.dev = ndev;
+   290		acpi_dev->driver_data = mctp_pcc_ndev;
+   291	
+   292		/* There is no clean way to pass the MTU to the callback function
+   293		 * used for registration, so set the values ahead of time.
+   294		 */
+   295		mctp_pcc_mtu = mctp_pcc_ndev->outbox.chan->shmem_size -
+   296			sizeof(struct mctp_pcc_hdr);
+   297		ndev->mtu = MCTP_MIN_MTU;
+   298		ndev->max_mtu = mctp_pcc_mtu;
+   299		ndev->min_mtu = MCTP_MIN_MTU;
+   300	
+   301		/* ndev needs to be freed before the iomemory (mapped above) gets
+   302		 * unmapped,  devm resources get freed in reverse to the order they
+   303		 * are added.
+   304		 */
+   305		rc = register_netdev(ndev);
+   306		return rc;
+   307	cleanup_netdev:
+   308		free_netdev(ndev);
+   309		return rc;
+   310	}
+   311	
+   312	static const struct acpi_device_id mctp_pcc_device_ids[] = {
+   313		{ "DMT0001"},
+   314		{}
+   315	};
+   316	
+ > 317	static struct acpi_driver mctp_pcc_driver = {
+   318		.name = "mctp_pcc",
+   319		.class = "Unknown",
+   320		.ids = mctp_pcc_device_ids,
+   321		.ops = {
+   322			.add = mctp_pcc_driver_add,
+   323		},
+   324	};
+   325	
+ > 326	module_acpi_driver(mctp_pcc_driver);
+   327	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
