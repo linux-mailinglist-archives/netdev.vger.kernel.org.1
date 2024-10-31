@@ -1,112 +1,134 @@
-Return-Path: <netdev+bounces-140757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37D1E9B7DBE
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:06:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A66CE9B7E3E
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:22:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686071C218FB
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6BFBC283FF1
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:22:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 867BC1A256B;
-	Thu, 31 Oct 2024 15:03:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C172D19DFAB;
+	Thu, 31 Oct 2024 15:22:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rc4NufGu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Rva0xk8r"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f172.google.com (mail-oi1-f172.google.com [209.85.167.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7502519F406;
-	Thu, 31 Oct 2024 15:03:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8DD8127B56
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 15:22:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730387014; cv=none; b=slh057xARfC4NeYzEwYTlK6NjfWZym4pS6g3pMjYDCYlQSEluJVPEWIUkHl82zLqwqDk8eOXvQPIEBafAur5HaR2UowuvSfjMJA5a2PiPSsIoGEzTzFQNXyHmOFy9ZtNCi5ojmWf+4DTQZkLjRVHqiWukKO9/vOHfZNbiON9iK0=
+	t=1730388136; cv=none; b=gaE8HZ3JOpd7/HLV1jRgRDaBuC+2RNsgK/uq6lshOzBNgpRgLW9Gekt+lxntPyMBBWxmtZY65D9Q5GReVbl/a66Q7KXblx/nFUwXBEOWpPoVJNgm7lYzb+JUb0dVoDPN/zCCeMHudDNh0/WKEqPY0V6c6btdcP5htYrTkXsgJY8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730387014; c=relaxed/simple;
-	bh=KV/t0i3CRGXochMmWaFDtVDx7+mJcxlVD4Ipji8k1ac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=dPFLehCM/g5iTu3ExxvHzzQM9K3bO7AGGyPf8lNKeGZx93ZaEjenuOoi2R2FQ99ubTJ71vJVp+BsrC1kGESuFST+7Ngk8stZk57iMqdASMbwqrPVPOz61ZRo2KH9ZjAkIp0cZqzSl/bn1M4H+LVtQNdwRU5793U2zaapHp7UopU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rc4NufGu; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3CYEngcINh3YznzU5GG7+Z6paSZSCs5bVmStIlkx+/U=; b=rc4NufGuoGCNzo1emNKloaPtTl
-	RnqRqVGPJrF8i4rlyw/MO1cy7zYdQo2CvWc9459VI33q2XoehubNv+67F8aw8NL0xy/TnHe97V55s
-	eYPbES3obNDPiw9TrCtqZ2uyhuj0I8GIrBXwcJjN1jVHirckHnZcfcr7b4hjCGa7HtQA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t6Whp-00BnPZ-2z; Thu, 31 Oct 2024 16:03:25 +0100
-Date: Thu, 31 Oct 2024 16:03:25 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: SkyLake Huang =?utf-8?B?KOm7g+WVn+a+pCk=?= <SkyLake.Huang@mediatek.com>
-Cc: "linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-mediatek@lists.infradead.org" <linux-mediatek@lists.infradead.org>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"dqfext@gmail.com" <dqfext@gmail.com>,
-	Steven Liu =?utf-8?B?KOWKieS6uuixqik=?= <steven.liu@mediatek.com>,
-	"matthias.bgg@gmail.com" <matthias.bgg@gmail.com>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"daniel@makrotopia.org" <daniel@makrotopia.org>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
-Subject: Re: [PATCH net-next 2/5] net: phy: mediatek: Move LED helper
- functions into mtk phy lib
-Message-ID: <1b9e9b1a-cc12-44b8-bbdd-6e6777adfb13@lunn.ch>
-References: <20241030103554.29218-1-SkyLake.Huang@mediatek.com>
- <20241030103554.29218-3-SkyLake.Huang@mediatek.com>
- <7cb014a6-ec64-4482-b85c-44f29760d186@lunn.ch>
- <29352dda1b5c647c30e48fbb31e7781fdab43d9f.camel@mediatek.com>
+	s=arc-20240116; t=1730388136; c=relaxed/simple;
+	bh=Htn84sImGSSwntmcqyR+CCMswiSrziL9amxfBmUmm/c=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=Zwekq5nmwHJIKmI6c+mnEfAx131CEh6ouqF+1yHyg06RnjoqkRhRBZAE56/ri1W8leDiUbgHT5lhCyg0+e9SgZDwl+jgs+h2r9ZXB5sA9I02A5wxYpi0VJuHxmWlYBLVi11wNCsePLD37h+LFG5kyRnkqw/Jbw2Z4B9miZuvkto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Rva0xk8r; arc=none smtp.client-ip=209.85.167.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f172.google.com with SMTP id 5614622812f47-3e6089a1d39so546346b6e.0
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 08:22:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730388134; x=1730992934; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Htn84sImGSSwntmcqyR+CCMswiSrziL9amxfBmUmm/c=;
+        b=Rva0xk8rP/wP9Ou948QeyNO9kfD0iUsFRhHUmzL61B9GgXUoCv4idOSFg2ZbZHhyo3
+         LaVIEAH70g4WplHJjgz9Z6k2Jlf19/kiYk4DG9h3qJ3RB+ZZP4AuudXXRbhXYVLeYho+
+         aHBGYkfbmMznYkSmyGHlPElq1wA++FHQnqDAKoVVgWrIjlub7pa7axrLu6XEPahjik4V
+         T1IAyUtTpfbAbaJHbvgK6sAzP0JommYRoKoBOv2LBfTMW0NR9ttVBEsAN3av5K4Fz4b/
+         YdVQXRPuT4lXaExFLhpiLLasWcTOnS4UKNcLFnMn9K14eOE8SQ3ShyINn7z9zDzukqUW
+         TKTw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730388134; x=1730992934;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Htn84sImGSSwntmcqyR+CCMswiSrziL9amxfBmUmm/c=;
+        b=oUBKnkZf8UAUXTOKJ0Oo7cQXbFh9MCKuAUjiusWPqCJ1JNjI2FUMrEi0jH+NZOtu4M
+         Xuw/uVS/x8Y8xYvYiRVoqhagTZTA3ZIaISq35b07UOVf5/W1x0OwKQy/B8eR7I/Uua1G
+         U3K+MsFtBbxB16T/JMZTveMevEjlvV6juu0a5+Acw1DCOt3ajhxRM0+httgI8Sx5sCVo
+         UJajQX6w8hyaLzpDpsnqkjw8Y0yZzNj5Ox/Hp4t8iUDDK6D58TyMfbOtWkvFSqXV6avM
+         DN8yXE2GdKaDkj0ImJ6s1uj9YmBzLqLMqD5h1Dfonc7ZDZlNsslIkXeTRxQhMk0Kr5ku
+         6eVw==
+X-Forwarded-Encrypted: i=1; AJvYcCWhkDg1ImkzIdg0FXtqmlAaevxFCPiwt9xb2bmfaxf1hcx5Pmuwb5G7bcuFBvpNoRq5HGNwyeE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxIQAANKOnOBBu3uihEfP9MsfBbMj9Za7bySCXBbORoRk85hTSl
+	dQZ1iRfASyqk206j+L7MDfxuYAyy8HaaMvEURlvvFCkwHBhdSDf6feEJG77jMBoZ3pJ26vEHEKH
+	LZFR3li3oPem5X4UmG/7gjFp2YBY=
+X-Google-Smtp-Source: AGHT+IHLLBqJ9JW5lY/ucNM+7kxX0n/aCVQYbZZMGhtkSZ83tk2qgjpaanxk5/tyOnsNePlTzAPmyWQmJQD3KCMQYXQ=
+X-Received: by 2002:a05:6808:2223:b0:3e5:f06f:653d with SMTP id
+ 5614622812f47-3e758c32581mr170701b6e.22.1730388133791; Thu, 31 Oct 2024
+ 08:22:13 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <29352dda1b5c647c30e48fbb31e7781fdab43d9f.camel@mediatek.com>
+References: <20241024093742.87681-1-laoar.shao@gmail.com> <20241024093742.87681-3-laoar.shao@gmail.com>
+ <a4797bfc-73c3-44ca-bda2-8ad232d63d7e@app.fastmail.com> <CALOAHbDgfcc9XPmsw=2KkBQs4EUOQHH4dFVC=zGMfxfFDAEa-Q@mail.gmail.com>
+ <6162222b-0a2e-4fb7-b605-c57fa8420bc9@redhat.com>
+In-Reply-To: <6162222b-0a2e-4fb7-b605-c57fa8420bc9@redhat.com>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Thu, 31 Oct 2024 23:21:36 +0800
+Message-ID: <CALOAHbC2emaruOaJFa3whyGDUf+bgY5W3bYKvfET-DJCizSkMg@mail.gmail.com>
+Subject: Re: [PATCH 2/2] net: tcp: Add noinline_for_tracing annotation for tcp_drop_reason()
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Daniel Xu <dxu@dxuuu.xyz>, Eric Dumazet <edumazet@google.com>, 
+	David Miller <davem@davemloft.net>, dsahern@kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	netdev@vger.kernel.org, Menglong Dong <menglong8.dong@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> I think I got your point. In a follow up patch, I'll do the following
-> change:
-> 
-> [Psuedo code]
-> /* Currently */
-> mtk_phy_led_hw_ctrl_get() {
-> 	get_led_hw_settings(); //on & blink
-> 
-> 	set/clear &priv->led_state according to led_hw_settings
-> 
-> 	get *rules according to led_hw_settings
-> }
-> 
-> /* Change into */
-> get_led_hw_settings()
-> 
-> mtk_phy_leds_state_init() { /* Actual led_state init code */
-> 	get_led_hw_settings(); //on & blink
-> 
-> 	set/clear &priv->led_state according to led_hw_settings
-> }
-> 
-> mtk_phy_led_hw_ctrl_get() {
-> 	get_led_hw_settings() in register; //on & blink
-> 
-> 	get *rules according to led_hw_settings
-> }
+On Thu, Oct 31, 2024 at 10:24=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+>
+> Hi,
+>
+> On 10/25/24 07:58, Yafang Shao wrote:
+> > On Fri, Oct 25, 2024 at 4:57=E2=80=AFAM Daniel Xu <dxu@dxuuu.xyz> wrote=
+:
+> >> On Thu, Oct 24, 2024, at 2:37 AM, Yafang Shao wrote:
+> >>> We previously hooked the tcp_drop_reason() function using BPF to moni=
+tor
+> >>> TCP drop reasons. However, after upgrading our compiler from GCC 9 to=
+ GCC
+> >>> 11, tcp_drop_reason() is now inlined, preventing us from hooking into=
+ it.
+> >>> To address this, it would be beneficial to make noinline explicitly f=
+or
+> >>> tracing.
+> >>
+> >> It looks like kfree_skb() tracepoint has rx_sk field now. Added in
+> >> c53795d48ee8 ("net: add rx_sk to trace_kfree_skb").
+> >
+> > This commit is helpful. Thank you for providing the information. I
+> > plan to backport it to our local kernel.
+> >
+> >>
+> >> Between sk and skb, is there enough information to monitor TCP drops?
+> >> Or do you need something particular about tcp_drop_reason()?
+> >
+> > There's nothing else specific to mention. The @rx_sk introduced in the
+> > commit you referred to will be beneficial to us.
+>
+> The implications of the above statement are not clear to me. Do you mean
+> this patchset is not needed anymore?
 
-This looks about right. I will review the real patch when it is sent.
+The introduction of a dedicated tcp_drop_reason() function is intended
+to enhance the traceability of TCP drops for the user, providing more
+convenient and detailed insights. Additionally, since
+tcp_drop_reason() does not impact the critical path, marking it as
+noinline is acceptable. For these reasons, I believe this patchset
+remains necessary.
 
-	Andrew
+--=20
+Regards
+Yafang
 
