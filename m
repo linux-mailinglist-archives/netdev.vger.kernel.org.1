@@ -1,133 +1,110 @@
-Return-Path: <netdev+bounces-140622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ACC69B745F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:17:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7195B9B7468
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:19:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 00B69282FEF
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:17:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379BF283581
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:19:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8587B13DDAE;
-	Thu, 31 Oct 2024 06:17:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bvbUe8Gu"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A913145B0F;
+	Thu, 31 Oct 2024 06:18:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f175.google.com (mail-il1-f175.google.com [209.85.166.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 966BC13D245;
-	Thu, 31 Oct 2024 06:17:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 89ADD13D8A3
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730355437; cv=none; b=bTOv1SQR1A2kX4400B9iD2R6HKY12FJJcsEgR3QBc7XOrde8Mq2eu4TgcTwyHVcMnDrSSDttXp4a6VXr3lfm+sXBxEwn1o1Q+NZX83mZERzSQsf0p1y8vAMPv0JFVgjQH5P5ip8SwlphmLJ78nIUSuGfuwHi16UrDo9jdFNMC/s=
+	t=1730355536; cv=none; b=u/pudTla2XC9PUgb521a05KiOkEqNu5kZzy5vx1ktWA1GBiyKdRW0el+bMdJyPEVi+vm4+EHdsj38nR3JXeyMUXpnMARVPn5+npWh3KD8Q3+kbgTXWJNzPO6x6kr+dGgDdtHvC2iHln/shiLIZan9fTyG+BMbO50mDUz4KS4mDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730355437; c=relaxed/simple;
-	bh=8HsG/AVOvVWvjm5f5/DShlPUjg6c3lTyZvLttwf7Noc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ldCFDwYh0GlblZT5HQePYIRU5dOxcxv+UDZmzGk7/CWrib/7kndttEwUagrP76T6sR8qkOG5yssuP7Ve/OoSzZYVxli4Y/8kdCECanASbXmTpFL4Jrm7YshOQb++ohJc89wMyIje2FrfYWBIXUCkANaUkAqo9JGk0M/Id7Z7BQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bvbUe8Gu; arc=none smtp.client-ip=209.85.166.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f175.google.com with SMTP id e9e14a558f8ab-3a4e551efdbso2286755ab.3;
-        Wed, 30 Oct 2024 23:17:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730355435; x=1730960235; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8HsG/AVOvVWvjm5f5/DShlPUjg6c3lTyZvLttwf7Noc=;
-        b=bvbUe8GuFC7Neyghs7nv7SRQt9q/7HiFXK4dh99YeKY/8vgzRNgys4ohkCBXUZ0BSI
-         ko8i1MTnJ4oJ4S6IjYBkvlefgabapB0bTiEQc36SfJQTCyI3uzM63bg/SVK+v/fB3au3
-         3LMahh2xgNZiz3m7AfD5wjlTgusVyVDz+RO+TYoPMsktgqtpWlX9OAYc9J2wU48ZLKAK
-         SymiKngMvwj8mTQDIqMr3Q/Ys/1aAYNAmDVP3cCavTOvLBDnsnQvwhZLL1bUS4/wDh8T
-         ZjP+BahC0vqSpfkqj0Y1lNgM0dLimPvkkxszp2itIfst7KjCSvoToq+3+b42v2BZIaEx
-         gKzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730355435; x=1730960235;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8HsG/AVOvVWvjm5f5/DShlPUjg6c3lTyZvLttwf7Noc=;
-        b=fkR0VgMyEw1Q3OyHJuJIb1V0CaFB38mw2mCuRkCdeQMSreJ9f4yGx0Aiyds5V4sozn
-         hTqou/HWpaLb84mfJQhg7hMZ8rFbNJEe9Ze54bMEAcL8a6z/Dt2HwtivxIS4B9SjSSdU
-         sOzOP02e9vqtGFYz9lN+7URaOC/vsEq75u2Vis0m2Ic3UTVqqeFFzaoNfqnx2aVjkCf8
-         vGYvfDW97bv3XaEN0tJQBEaLRzafdNa5x8gb5wt9J7I7W4BbOFloSFgC60q7VbRU+nt5
-         J0Eygzy67uVHV6uBy/Gpy/V706jK052yTXHeeWz/JZvCaBKgXIIhWMp9RMjfDQLo0YrG
-         JFFA==
-X-Forwarded-Encrypted: i=1; AJvYcCVJEK23DQ9mqF9VECndoIBuFu7A8l4gK6JH3elGsNVMcvzU4WP2F2tAXwKI1G56PJaqRq95i1Hb@vger.kernel.org, AJvYcCW7iqa9GKaRfbDN0/c17RUo6TKdQ2aHJ+ZXHZYnKrT0DVGdtdAzKnuieIwdUJoZf2OuiAk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw46qUxjyjJk94mxz/9Y4qMeWDD1mHXptBTRkC485x6/UL4XeVm
-	YitmuySkwN4pRb9CrmTI1N+C+Wleg3Nmmm2uPFZVNRvLX1ffYDL1mNjWBT/RRd1TawUZhZhYDPW
-	/Vf/rXN3f1drf9znmntJQbsPt4jh7Dg==
-X-Google-Smtp-Source: AGHT+IGbNpic/BdiijIe65L4RRBuLypikRdPmVkHo5k6kGdLInfvx8OL+9ElCBwaL1ptJeg81MY1qIiw9aC9XybLIT0=
-X-Received: by 2002:a05:6e02:1529:b0:3a4:eaae:f9f0 with SMTP id
- e9e14a558f8ab-3a609a2adc5mr28156315ab.2.1730355434781; Wed, 30 Oct 2024
- 23:17:14 -0700 (PDT)
+	s=arc-20240116; t=1730355536; c=relaxed/simple;
+	bh=RDCtHX+TEpBrpKXWUjkNi8VEpT+KCOZN+o2Yf1/biPs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ibqQNW215DejeomAvxWy4HDUJ5IjLTg+MIVTj1aYmuIVdL/wHJ9Ry9CSa1sqjrVsP8bgRCQQRJcq3Ka4iR5l4VFlOjkyrHFTRD1SO+r/+gXQLQKwShdC++d/Pglr9RFnKjVtX1h3thIuJRAJX/9w4Ka6wnMAva3sZU+N33m1vuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6OVt-0003MA-Ml; Thu, 31 Oct 2024 07:18:33 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6OVq-001JfG-0o;
+	Thu, 31 Oct 2024 07:18:30 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6OVq-0069Ol-0P;
+	Thu, 31 Oct 2024 07:18:30 +0100
+Date: Thu, 31 Oct 2024 07:18:30 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v2 03/18] net: pse-pd: tps23881: Use helpers
+ to calculate bit offset for a channel
+Message-ID: <ZyMhNqRaalfbP_f2@pengutronix.de>
+References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
+ <20241030-feature_poe_port_prio-v2-3-9559622ee47a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-11-kerneljasonxing@gmail.com> <8fd16b77-b8e8-492c-ab69-8192cafa9fc7@linux.dev>
- <CAL+tcoBNiZQr=yk_fb9eoKX1_Nr4LuDaa1kkLGbdnc=8JNKnNg@mail.gmail.com>
- <e56f78a9-cbda-4b80-8b55-c16b36e4efb1@linux.dev> <CAL+tcoDi86GkJRd8fShGNH8CgdFu3kbfMubWxCLVdo+3O-wnfg@mail.gmail.com>
- <0b4392ce-b10d-4103-b592-2ab7a624cae7@linux.dev>
-In-Reply-To: <0b4392ce-b10d-4103-b592-2ab7a624cae7@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 31 Oct 2024 14:16:38 +0800
-Message-ID: <CAL+tcoBHNbHu0i+oLA5inZg=sYXUb4+va0qd-c1TZCQFunk7Dg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
- tskey offset
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241030-feature_poe_port_prio-v2-3-9559622ee47a@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, Oct 31, 2024 at 1:52=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 10/30/24 7:41 PM, Jason Xing wrote:
->
-> >> All that said, while looking at tcp_tx_timestamp() again, there is alw=
-ays
-> >> "shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;". shinfo->tske=
-y can be
-> >> used directly as-is by the bpf prog. I think now I am missing why the =
-bpf prog
-> >> needs the sk_tskey in the sk?
-> >
-> > As you said, tcp seqno could be treated as the key, but it leaks the
-> > information in TCP layer to users. Please see the commit:
->
-> I don't think it is a concern for bpf prog running in the kernel. The soc=
-kops
-> bpf prog can already read the sk, the skb (which has seqno), and many oth=
-ers.
->
-> The bpf prog is not a print-only logic. Only using bpf prog to do raw dat=
-a
-> dumping is not fully utilizing its capability, e.g. data aggregation. The=
- bpf
-> prog should aggregate the data first which is to calculate the delay here=
-.
+On Wed, Oct 30, 2024 at 05:53:05PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+> 
+> This driver frequently follows a pattern where two registers are read or
+> written in a single operation, followed by calculating the bit offset for
+> a specific channel.
+> 
+> Introduce helpers to streamline this process and reduce code redundancy,
+> making the codebase cleaner and more maintainable.
+> 
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> ---
 
-Agree, I forgot BPF is only for admin, so it's a feasible solution. It
-saves a lot of energy :)
+Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
 
-It looks like the thing is getting simpler and simpler, which could be
-mostly taken over by bpf itself at last. Good news!
-
-Thanks,
-Jason
+-- 
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
