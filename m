@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-140677-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140678-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76C2F9B7873
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 11:13:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DB6B49B78AE
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 11:31:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 983801C21DF2
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:13:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591B4B24C0D
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:31:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 019D61990BD;
-	Thu, 31 Oct 2024 10:13:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27792198E83;
+	Thu, 31 Oct 2024 10:31:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Z73tf9kf"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqOzw8gs"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 959AD1953A2
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:13:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1527B13A89A
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:31:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730369610; cv=none; b=BdfQSJBtrp+F6+PvuYyqVbPfShcbSHgxwoHZu/yW2rBGTOG5LouY01M7CuCsGjAwfgeRrjOC7wgTiYaD5ZW/4ycKe38TrdcjpoB0Yfh8sNTz/ufJQ0XVJzX+8GpSZ2zvyAucjA6f99vWGIyLkJSl56fwfIcUnuadjv996DvHLYY=
+	t=1730370711; cv=none; b=o4iRYstxw4VEI0FBmVAIbbjs8IcqJg9AbZ4XQMKR2fTF+TTuQmbErZnQF70S5E11LgO2/UQlzmXJbrtB+L1wMdhwjp1dGCxwEwEKtnjSBNq6MHW4hnFy3qVaPwYHVGhi6nsrpPJhDf6rHdR+5Axq2SxIISg3BBc9xVYXdusR3R4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730369610; c=relaxed/simple;
-	bh=fXxSVMz93g9pT9H5CH7uPNFmTLZeJHNmc6B1HbdMZts=;
+	s=arc-20240116; t=1730370711; c=relaxed/simple;
+	bh=MAxrGkYBTB4lsgQpsbbTi320t0etIsLAZy+HTb2JCJw=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=rTsVBwe+tVFMkGbR3heB6+2QOyqm/6axnn20wPYTDGftswld/w/NfXCWQzAzBybbqRv1rgd62s9SF7gnq6Izywb86ZJufAGubYDBoMdL2r7OvWAzW4KdZVENeCb03SlhGb1Ia3e9dII8vI6PZZAkQ2gPRLjZ6rfDWAn68WHIE+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Z73tf9kf; arc=none smtp.client-ip=170.10.133.124
+	 In-Reply-To:Content-Type; b=T8ofOYLjp0fgJzqqULgeW0Bfk744p4GU94AS8Taij2caKOW9dD8nxYCzcbffg+h9YvcmRHuAmSZfbaVULKw5cW5HJETijD5o1U+4/S4PRVjYS9PnkNl6hKiitwCu3LfzlU5jjfDF/5EH2dgjAY1A8wIJYqru+xyxUlcLaDc2uvA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MqOzw8gs; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730369607;
+	s=mimecast20190719; t=1730370707;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=8qpsGLSEnI+XWmBEuuVMwNo+r2BaEC8hB8NVYcY+RYc=;
-	b=Z73tf9kfBwhD5MUXKsCWATHDPPC+DxZk/BRcxIRazXqBpyRoGS9bHpDbNaR1psrlXfQdpf
-	LRyHh7yIRXnc6Gt26B48p4aRaqn+hRiCmkgd1yrbv5dfH6dn21eLBOf8fu2IF3VuqgRfbf
-	KapxgCU1j6bzIxX+AYYA6gFOLDZ9V6c=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=hH1YLckJ09rnGx5FtwuGX8PiOK1vIS/MMWnvFkTaFuk=;
+	b=MqOzw8gs5sDhybPGxHB1lP4ayxFn0S/t0poSPVcADLqTu+KW9CvUxSAG0mtt92IerGcNvM
+	2h8FIFxWyp2vkWtRVNk0X8PJz7Sgzqv0Dxj7rvhj1khEV+N3IdhHkG0GXukzjZz6kE5Iaj
+	/sU68fpyaLZSXj3mdMHSUbN/eehKOOA=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-648-twTIe-xVMlusI7sLtpPFOw-1; Thu, 31 Oct 2024 06:13:26 -0400
-X-MC-Unique: twTIe-xVMlusI7sLtpPFOw-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d4cf04be1so378407f8f.2
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 03:13:26 -0700 (PDT)
+ us-mta-580-Fd_LSsfLPku_DajyVv0AGQ-1; Thu, 31 Oct 2024 06:31:46 -0400
+X-MC-Unique: Fd_LSsfLPku_DajyVv0AGQ-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4316e2dde9eso6459025e9.2
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 03:31:46 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730369605; x=1730974405;
+        d=1e100.net; s=20230601; t=1730370705; x=1730975505;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8qpsGLSEnI+XWmBEuuVMwNo+r2BaEC8hB8NVYcY+RYc=;
-        b=vpmPE8Mbw9rOENUQwoKSvgNTK7cxF2eF699Oh/jTII6ppg99V8c4zI23WMS/78FRk1
-         dPK3fZicsPfJzpkEqS/ff1q1y71F384inBvbgFdhDtTZR4/Q0rL6Z/e4mz+DZgXj25tH
-         V8w2vbCbR7tbrHrlmJuMWScIj4tfDcMiO6CBENbVR4lLryryF5Muu8kDbStOgrH54/PN
-         GobHZzNFLsSVUQu1cE2npasgxMCuoIt0v+rKNNmKwx2bHuO0W3H8zGl9vuzig8F+ZYqY
-         DqbItTsbOTn4244keoFYbz2Ypzl5yC2trViHBWAUHW5NTnVWn41yhf/zTUqo7D5ZnFf2
-         VHnA==
-X-Forwarded-Encrypted: i=1; AJvYcCW92brW2ctRUmOcr2j+RJs0uG8zuHbYllX4GyC6OThAsXFb37u/0FwA0am4z1gc8Wu3J6NFbdU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwSwEhcWRnuKAkApHQJ0tHIXksQhGkUTsKHaVwFa7odCiKCJpqL
-	Vwg9XIdX0omg3UdfuidJRe3TDQshb4rpNrLa2muLFwqG4PHHkcOgt+yAwlxAFqzQEX/R0MO1Op0
-	9h7lnEEjuwJ8GL9Y5EqPXndmVACjVcSpYgZWGI6ngkax0n9LNIMw4bYcMMeujtLUh
-X-Received: by 2002:a05:6000:18a5:b0:369:9358:4634 with SMTP id ffacd0b85a97d-381be7c80a7mr2432250f8f.19.1730369604477;
-        Thu, 31 Oct 2024 03:13:24 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IGR7Z4vtf7/u6NjtUKe9akOrVpf/NCyjOUCTQtYcxrwIu/laeojTfp3Q1NBwmWGlWwyZTZGmQ==
-X-Received: by 2002:a05:6000:18a5:b0:369:9358:4634 with SMTP id ffacd0b85a97d-381be7c80a7mr2432230f8f.19.1730369604041;
-        Thu, 31 Oct 2024 03:13:24 -0700 (PDT)
+        bh=hH1YLckJ09rnGx5FtwuGX8PiOK1vIS/MMWnvFkTaFuk=;
+        b=m/mZwUUbM1kzCr8bd1nB/E0yb+5a0bAA2JYvmvifsiYjZ2ohZYb/AjU+GMMy3uSBO3
+         0B8+WavwKZYhC7MxeLPE8CohmZh24Lnf0aexLTdMlDxVOZ0gy++kfOdevBwmN079NsDL
+         NhRYcZKBlkBrAhLPlEeaoWX8HZ2slvZILWKS7dEo5P0i8/yqH0Hq5AC6Q/+ODDhElgm+
+         libqTAPi/DhIU7FowtDNFUh31hYBonu3b9+I48YXrWMDzRqygOEPYi6UMYLVkFNLO+/S
+         seYC4/l/Fi/HY/7HFh6fyHkl+BAlRMBgbfT2x7/vori4fxoVSV6xoZLVeaxQUAqP/emT
+         pmiw==
+X-Forwarded-Encrypted: i=1; AJvYcCW7Ss5bCAJxqxxHIm8ru4moP9hx4YGWQUhWL8QlIAdVsmX72V0ch7dvgiR4h7qv/1ud+C2DtFg=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy/FcTVdjAVZuN5bMc1K2Ngs4BZppp/3wtfr2REYKoKzff0yBdw
+	OrTDnBkeMRiEUuiPBmcFLalXeFY33tFxY35e7cpe4EXxXn9uZlNSWjT9BXLM8wTMMoIthlmqhRJ
+	uM7cOmW9fihejUj3BgpNMdsHtXoU8QvoeON7pepFAcAhC2AKfXZ5a/A==
+X-Received: by 2002:a05:600c:35c2:b0:431:5533:8f0d with SMTP id 5b1f17b1804b1-4319ad26eafmr194075525e9.30.1730370705338;
+        Thu, 31 Oct 2024 03:31:45 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IFRGxV0+TZbdoUeDZDodJcDv+grkJBQ1+llkypgfemEdjGygC+QAOO6D/yANc2dcoSYn5qwyg==
+X-Received: by 2002:a05:600c:35c2:b0:431:5533:8f0d with SMTP id 5b1f17b1804b1-4319ad26eafmr194075165e9.30.1730370704890;
+        Thu, 31 Oct 2024 03:31:44 -0700 (PDT)
 Received: from [192.168.88.248] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10e565csm1653659f8f.48.2024.10.31.03.13.22
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d69845csm20819025e9.47.2024.10.31.03.31.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 03:13:23 -0700 (PDT)
-Message-ID: <0dc8c829-23f0-4904-8017-fc98c079f0ab@redhat.com>
-Date: Thu, 31 Oct 2024 11:13:22 +0100
+        Thu, 31 Oct 2024 03:31:44 -0700 (PDT)
+Message-ID: <91ce8149-718b-4c6d-929b-65b8fc4ca933@redhat.com>
+Date: Thu, 31 Oct 2024 11:31:43 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,111 +82,50 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v6] ipv6: Fix soft lockups in fib6_select_path under
- high next hop churn
-To: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
- netdev@vger.kernel.org
-Cc: adrian.oliver@menlosecurity.com, Adrian Oliver <kernel@aoliver.ca>,
- "David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@gmail.com>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@idosch.org>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241025073003.2079945-1-omid.ehtemamhaghighi@menlosecurity.com>
+Subject: Re: pull request: bluetooth 2024-10-23
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
+ kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
+References: <20241030185633.34818-1-luiz.dentz@gmail.com>
 Content-Language: en-US
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241025073003.2079945-1-omid.ehtemamhaghighi@menlosecurity.com>
+In-Reply-To: <20241030185633.34818-1-luiz.dentz@gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Transfer-Encoding: 7bit
 
-On 10/25/24 09:30, Omid Ehtemam-Haghighi wrote:
-> Soft lockups have been observed on a cluster of Linux-based edge routers
-> located in a highly dynamic environment. Using the `bird` service, these
-> routers continuously update BGP-advertised routes due to frequently
-> changing nexthop destinations, while also managing significant IPv6
-> traffic. The lockups occur during the traversal of the multipath
-> circular linked-list in the `fib6_select_path` function, particularly
-> while iterating through the siblings in the list. The issue typically
-> arises when the nodes of the linked list are unexpectedly deleted
-> concurrently on a different core—indicated by their 'next' and
-> 'previous' elements pointing back to the node itself and their reference
-> count dropping to zero. This results in an infinite loop, leading to a
-> soft lockup that triggers a system panic via the watchdog timer.
+On 10/30/24 19:56, Luiz Augusto von Dentz wrote:
+> The following changes since commit c05c62850a8f035a267151dd86ea3daf887e28b8:
 > 
-> Apply RCU primitives in the problematic code sections to resolve the
-> issue. Where necessary, update the references to fib6_siblings to
-> annotate or use the RCU APIs.
+>   Merge tag 'wireless-2024-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-10-29 18:57:12 -0700)
 > 
-> Include a test script that reproduces the issue. The script
-> periodically updates the routing table while generating a heavy load
-> of outgoing IPv6 traffic through multiple iperf3 clients. It
-> consistently induces infinite soft lockups within a couple of minutes.
+> are available in the Git repository at:
 > 
-> Kernel log:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-30
 > 
->  0 [ffffbd13003e8d30] machine_kexec at ffffffff8ceaf3eb
->  1 [ffffbd13003e8d90] __crash_kexec at ffffffff8d0120e3
->  2 [ffffbd13003e8e58] panic at ffffffff8cef65d4
->  3 [ffffbd13003e8ed8] watchdog_timer_fn at ffffffff8d05cb03
->  4 [ffffbd13003e8f08] __hrtimer_run_queues at ffffffff8cfec62f
->  5 [ffffbd13003e8f70] hrtimer_interrupt at ffffffff8cfed756
->  6 [ffffbd13003e8fd0] __sysvec_apic_timer_interrupt at ffffffff8cea01af
->  7 [ffffbd13003e8ff0] sysvec_apic_timer_interrupt at ffffffff8df1b83d
-> -- <IRQ stack> --
->  8 [ffffbd13003d3708] asm_sysvec_apic_timer_interrupt at ffffffff8e000ecb
->     [exception RIP: fib6_select_path+299]
->     RIP: ffffffff8ddafe7b  RSP: ffffbd13003d37b8  RFLAGS: 00000287
->     RAX: ffff975850b43600  RBX: ffff975850b40200  RCX: 0000000000000000
->     RDX: 000000003fffffff  RSI: 0000000051d383e4  RDI: ffff975850b43618
->     RBP: ffffbd13003d3800   R8: 0000000000000000   R9: ffff975850b40200
->     R10: 0000000000000000  R11: 0000000000000000  R12: ffffbd13003d3830
->     R13: ffff975850b436a8  R14: ffff975850b43600  R15: 0000000000000007
->     ORIG_RAX: ffffffffffffffff  CS: 0010  SS: 0018
->  9 [ffffbd13003d3808] ip6_pol_route at ffffffff8ddb030c
-> 10 [ffffbd13003d3888] ip6_pol_route_input at ffffffff8ddb068c
-> 11 [ffffbd13003d3898] fib6_rule_lookup at ffffffff8ddf02b5
-> 12 [ffffbd13003d3928] ip6_route_input at ffffffff8ddb0f47
-> 13 [ffffbd13003d3a18] ip6_rcv_finish_core.constprop.0 at ffffffff8dd950d0
-> 14 [ffffbd13003d3a30] ip6_list_rcv_finish.constprop.0 at ffffffff8dd96274
-> 15 [ffffbd13003d3a98] ip6_sublist_rcv at ffffffff8dd96474
-> 16 [ffffbd13003d3af8] ipv6_list_rcv at ffffffff8dd96615
-> 17 [ffffbd13003d3b60] __netif_receive_skb_list_core at ffffffff8dc16fec
-> 18 [ffffbd13003d3be0] netif_receive_skb_list_internal at ffffffff8dc176b3
-> 19 [ffffbd13003d3c50] napi_gro_receive at ffffffff8dc565b9
-> 20 [ffffbd13003d3c80] ice_receive_skb at ffffffffc087e4f5 [ice]
-> 21 [ffffbd13003d3c90] ice_clean_rx_irq at ffffffffc0881b80 [ice]
-> 22 [ffffbd13003d3d20] ice_napi_poll at ffffffffc088232f [ice]
-> 23 [ffffbd13003d3d80] __napi_poll at ffffffff8dc18000
-> 24 [ffffbd13003d3db8] net_rx_action at ffffffff8dc18581
-> 25 [ffffbd13003d3e40] __do_softirq at ffffffff8df352e9
-> 26 [ffffbd13003d3eb0] run_ksoftirqd at ffffffff8ceffe47
-> 27 [ffffbd13003d3ec0] smpboot_thread_fn at ffffffff8cf36a30
-> 28 [ffffbd13003d3ee8] kthread at ffffffff8cf2b39f
-> 29 [ffffbd13003d3f28] ret_from_fork at ffffffff8ce5fa64
-> 30 [ffffbd13003d3f50] ret_from_fork_asm at ffffffff8ce03cbb
+> for you to fetch changes up to 1e67d8641813f1876a42eeb4f532487b8a7fb0a8:
 > 
-> Fixes: 66f5d6ce53e6 ("ipv6: replace rwlock with rcu and spinlock in fib6_table")
-> Reported-by: Adrian Oliver <kernel@aoliver.ca>
-> Signed-off-by: Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: David Ahern <dsahern@gmail.com>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> Cc: Shuah Khan <shuah@kernel.org>
-> Cc: Ido Schimmel <idosch@idosch.org>
-> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Cc: Simon Horman <horms@kernel.org>
-> Cc: netdev@vger.kernel.org
-> Cc: linux-kselftest@vger.kernel.org
-> Cc: linux-kernel@vger.kernel.org
+>   Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs (2024-10-30 14:49:09 -0400)
+> 
+> ----------------------------------------------------------------
+> bluetooth pull request for net:
+> 
+>  - hci: fix null-ptr-deref in hci_read_supported_codecs
+> 
+> ----------------------------------------------------------------
+> Sungwoo Kim (1):
+>       Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
+> 
+>  net/bluetooth/hci_sync.c | 18 +++++++++++-------
+>  1 file changed, 11 insertions(+), 7 deletions(-)
 
-Given the issue is long-standing, and the fix is somewhat invasive, I
-suggest steering this patch on net-next.
+Just to state the obvious and avoid some dumb error on my side, this is
+superseded by:
 
-Would that be ok for you?
+https://lore.kernel.org/netdev/20241030192205.38298-1-luiz.dentz@gmail.com/
 
-Thanks,
+due to the bad subj here, right?
+
+Thanks!
 
 Paolo
 
