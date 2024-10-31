@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-140816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96E2A9B858F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:44:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 420BD9B8599
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:44:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1C9131F254B9
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 21:44:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95B95B20375
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 21:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75EA11E5709;
-	Thu, 31 Oct 2024 21:43:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3DE81CCEF9;
+	Thu, 31 Oct 2024 21:43:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="E2sud19c"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EObRQQBm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7367C1CC15C
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 21:42:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9D0B1CCB5E
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 21:43:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730410981; cv=none; b=qt6rc7l4wuWn2DVQbGZ7I8dH1DqMJuWHW3hKa8fDOVMrJDp1wG/PE1hDdan9d3YNQEPKNNCzC5UuhMuqNad0Ui2H+7tI7bFw7vuBJQ0EOAc40WvAEO0+P1w5o8hQe3KmBtqi4ngcun4pGjRbYnghKujtrE89fh1qjDScBpC3VBc=
+	t=1730411035; cv=none; b=FzEnzJHha91ERLTi2LwALZnr7Oi/tseHx5AKn+GYY3GLCal4YmNd+X4gRBNSOW2Jj6JP3rTB0BqkqriYkZroMrO1E1OuvhHwFocVyciPF0wpew+Ef+xVXWqsGK31sK8fLh0C+RbqwRXinhFJAuFCt0rhbSPnyWuB+4EskzA0wwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730410981; c=relaxed/simple;
-	bh=Ot3xwKTdy3PO6VVE2ho8ZwjinNE2jaPbfo2opEqku5A=;
+	s=arc-20240116; t=1730411035; c=relaxed/simple;
+	bh=K23lSd8nbZws0vhnkSvhZfGlVaiIm/iHndeT+o661DU=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=Q9twWb62Ls5e731Qq6h0R4clybsCBEVjAW4+YdPVpjn1ZcEWD19nCU6W6pvtsMGkGeId2kCkygAWXqcEXE67ifRXCLWyOW4vVM961JFydCtQnBvKMFi5qgmG/SKqgG++0LJeDiE6ETZ4s7QUuGncgQb3SV/BXIB/XoLK1F5TWkQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=E2sud19c; arc=none smtp.client-ip=209.85.218.49
+	 In-Reply-To:Content-Type; b=j8MGIQ2b2Zbp85HjWQD6DmnDZuTubzRLiK6Y5MvoEH4qcOWbczKwrhYIYY80Ac6UAxthKIa6jKU9T+FdCb4tPld2nRYrreQRjfUj7/QQSRVD+vhTqWxujv8onumUt+KWhNLVwGfUaEMy4FL65kbLPi1gykbjLzzScsZkwepBcqg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EObRQQBm; arc=none smtp.client-ip=209.85.167.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9a2209bd7fso215114266b.2
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 14:42:55 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-539e59dadebso1782677e87.0
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 14:43:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730410974; x=1731015774; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730411028; x=1731015828; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=O5TCqt4iaG1nfsbX/JGCG3xm9DNPzqb8v/mgG2JFNHI=;
-        b=E2sud19cosfWmN1IgK75GLUa9Wrn3184xri/OWtyed8FGY7bnBeYgIwAbDuPtZcwtm
-         ezncmJiJkh6J1x6Ch9uAnnJrDSbawJepPOpWtyfEEzH/jDhIufn2Wl/l76hs6tBAwuc/
-         l015tlee+afSKynMbhcPio5jhQiynHUpWkpAmslcoWdyJVfPG2DqC4UCYqnBsMSlgMoZ
-         7k8r/MtIMX6jKkXFLlu6z5lYIwj0NDMZGQGZNpgwIM+kfm5ZCRsRu/B/V8UWyN7eOjEt
-         crl0t5wppg7QiTmSEgA4sj337n4kmNYX8jFm5+eR1AVeqolrmeZdLgzVM85M4AIc2H4m
-         fA3A==
+        bh=HE2Ywr9s2mjH0ddSbxwDai609n77BJx1MuEoW91p1pw=;
+        b=EObRQQBmbDR6JqkoeBrH1yrisUAOybRIIfA0sGtoMW/eZdwYm0GPkKf/8iyUEH0Sg/
+         wvSAS9rbYhDW6CFzrrCmpmTO9BPTSPfZ1NA/PQ/V8pJTkIedWC5F82qdWifd9sbp8lue
+         2oPhlypTG72jQ3mWLPmxPUwwmBWQ4Hxu8j9o+XsJGR2PmOPpGS4RyXdJVIMtTtpFM95V
+         /nVCYVFj66rfbVeiefALWWsOq9prCnjLSgOtUxEJb5gNxw629HP1+zlDIrwXYRPtO0Iy
+         eV4hl9eUepjP7A4YefjziZMXHHCoQgwvFPHI7JT9ez7leRNpIsfXOAoNrdO+omBT8z2k
+         hVHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730410974; x=1731015774;
+        d=1e100.net; s=20230601; t=1730411028; x=1731015828;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=O5TCqt4iaG1nfsbX/JGCG3xm9DNPzqb8v/mgG2JFNHI=;
-        b=DiJ7MjcCxVn+KUoh9uAtp33O/XFg9IqQH3FWHF6YcPm7PDuCRb8/cwuz0jRmiN1ESX
-         5rBJ0eK1k7r62ldQdYdK2faWUdIjYSrs2blX4ew6HNogrSmxWJaQn26VK/TR4Q2F1eBI
-         ipPr/TXH9TgOvScCfnRzaymQol4DlSVooocD04Y/vEr9h197gwRvM55+MBTubJjMZzVt
-         hCmB4onlc7t17+KbbYpROIfZzqfBcSUrkVaW7KwmOVdVAQHOMBdTVVFRN50y+OnzGxuk
-         1BIOxNnR2pDSTIaZD88K70q8ixitdIvjldc5tgr97k5eboQ9o55YXQ5Xtf2E3b3ExVUd
-         h2ng==
-X-Gm-Message-State: AOJu0Yw4+0PHU3DCrhKRO28rkkfNk+Bfo51vKGdK/l3aooUfzuHYDcSg
-	GXanJLxqYGic2OEblrugVMdQylfGGwlBorb757h1h3OsEUokiwkl
-X-Google-Smtp-Source: AGHT+IFCv3Vss8ZRSYxtUocPcwROFxLPSwNa88ZBOw7jY4jFwh0OKUWPAXmAD3EAyNHcn8PtinmWtg==
-X-Received: by 2002:a17:907:94c4:b0:a99:fc9a:5363 with SMTP id a640c23a62f3a-a9de5c919e4mr1995614066b.9.1730410973599;
-        Thu, 31 Oct 2024 14:42:53 -0700 (PDT)
+        bh=HE2Ywr9s2mjH0ddSbxwDai609n77BJx1MuEoW91p1pw=;
+        b=GbBGQ4tfAbgI9wVyOyJLgkGJtucHY1x/T5pFM9CQk3bEHKBAC3UkZTq+RWW0JO8erP
+         ZX7BOs47J7O7RtYmgWyCwplcyZPtkABXDcabvaqAOZDfBW7VY6CvP8nYFtWKAm3ElnCZ
+         K5PtmzSRs0JN8Ocelwni8ddZmm4hsdo61RTaQ5S4qgaj6TLtwk0cf9EhAmfVP6Tt+zV+
+         GvbTJGgLnqXsaWIdEt3YZtc4eLzkzo0Wjrkfg4pkZoEZjF37+5kgiOvAFH81SOHsBV1O
+         nDf4UsGQ3tXCwd6B4nFG/kZgUaewb1Q+r+KsxfxZSF6Px5HizO4Hmp6FqnhwIjomRY7v
+         STYg==
+X-Gm-Message-State: AOJu0Yw3li16HF7fwhqNv/ckCN4z/fabDFdg5g05FUfZJJk/mrdFJpLJ
+	NVIsQiCHuog6RFZ0kaWnZv+yA8bLzBX+1uI/+ADLlOn0RQHABI+N
+X-Google-Smtp-Source: AGHT+IECHN9pMPtXu2EmsSZkYIHLLuYFZ1RNEbnbqsz024Vs5T2RFLbKvGlZ4JF4aViVhzGlEMx9wQ==
+X-Received: by 2002:a05:6512:1294:b0:539:edd1:e56a with SMTP id 2adb3069b0e04-53b34c9d5f6mr10421411e87.59.1730411027366;
+        Thu, 31 Oct 2024 14:43:47 -0700 (PDT)
 Received: from ?IPV6:2a02:3100:af9e:3f00:f876:f664:2bd5:aff4? (dynamic-2a02-3100-af9e-3f00-f876-f664-2bd5-aff4.310.pool.telefonica.de. [2a02:3100:af9e:3f00:f876:f664:2bd5:aff4])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9e5664352bsm107576066b.158.2024.10.31.14.42.51
+        by smtp.googlemail.com with ESMTPSA id 4fb4d7f45d1cf-5ceac78941bsm967021a12.44.2024.10.31.14.43.44
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 14:42:53 -0700 (PDT)
-Message-ID: <044c925e-8669-4b98-87df-95b4056f4f5f@gmail.com>
-Date: Thu, 31 Oct 2024 22:42:52 +0100
+        Thu, 31 Oct 2024 14:43:46 -0700 (PDT)
+Message-ID: <a8a9d896-fbe6-41f2-bf87-666567d3cdb3@gmail.com>
+Date: Thu, 31 Oct 2024 22:43:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,8 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 1/3] r8169: align RTL8125 EEE config with vendor
- driver
+Subject: [PATCH net-next 2/3] r8169: align RTL8125/RTL8126 PHY config with
+ vendor driver
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
  Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
@@ -133,50 +133,47 @@ In-Reply-To: <7a849c7c-50ff-4a9b-9a1c-a963b0561c79@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Align the EEE config for RTL8125A/RTL8125B with vendor driver r8125.
-This should help to avoid compatibility issues.
+This aligns some parameters with vendor driver r8125/r8126 to avoid
+compatibility issues. Note that for RTL8125B there's no functional
+change, just the open-coded version of the function is replaced.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- .../net/ethernet/realtek/r8169_phy_config.c    | 18 ++++++++++++------
- 1 file changed, 12 insertions(+), 6 deletions(-)
+ drivers/net/ethernet/realtek/r8169_phy_config.c | 6 +++++-
+ 1 file changed, 5 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/realtek/r8169_phy_config.c b/drivers/net/ethernet/realtek/r8169_phy_config.c
-index 8739f4b42..a0ecfa9c6 100644
+index a0ecfa9c6..54b254b9b 100644
 --- a/drivers/net/ethernet/realtek/r8169_phy_config.c
 +++ b/drivers/net/ethernet/realtek/r8169_phy_config.c
-@@ -89,19 +89,25 @@ static void rtl8168h_config_eee_phy(struct phy_device *phydev)
- 	phy_modify_paged(phydev, 0xa42, 0x14, 0x0000, 0x0080);
- }
- 
--static void rtl8125a_config_eee_phy(struct phy_device *phydev)
-+static void rtl8125_common_config_eee_phy(struct phy_device *phydev)
+@@ -1073,8 +1073,8 @@ static void rtl8125b_hw_phy_config(struct rtl8169_private *tp,
+ 				   struct phy_device *phydev)
  {
--	rtl8168h_config_eee_phy(phydev);
-+	phy_modify_paged(phydev, 0xa6d, 0x14, 0x0010, 0x0000);
-+	phy_modify_paged(phydev, 0xa42, 0x14, 0x0080, 0x0000);
-+	phy_modify_paged(phydev, 0xa4a, 0x11, 0x0200, 0x0000);
-+}
+ 	r8169_apply_firmware(tp);
++	rtl8168g_enable_gphy_10m(phydev);
  
-+static void rtl8125a_config_eee_phy(struct phy_device *phydev)
-+{
-+	rtl8168g_config_eee_phy(phydev);
-+	/* disable EEE at 2.5Gbps */
- 	phy_modify_paged(phydev, 0xa6d, 0x12, 0x0001, 0x0000);
--	phy_modify_paged(phydev, 0xa6d, 0x14, 0x0010, 0x0000);
-+	rtl8125_common_config_eee_phy(phydev);
- }
+-	phy_modify_paged(phydev, 0xa44, 0x11, 0x0000, 0x0800);
+ 	phy_modify_paged(phydev, 0xac4, 0x13, 0x00f0, 0x0090);
+ 	phy_modify_paged(phydev, 0xad3, 0x10, 0x0003, 0x0001);
  
- static void rtl8125b_config_eee_phy(struct phy_device *phydev)
+@@ -1113,6 +1113,7 @@ static void rtl8125d_hw_phy_config(struct rtl8169_private *tp,
+ 				   struct phy_device *phydev)
  {
--	phy_modify_paged(phydev, 0xa6d, 0x14, 0x0010, 0x0000);
--	phy_modify_paged(phydev, 0xa42, 0x14, 0x0080, 0x0000);
--	phy_modify_paged(phydev, 0xa4a, 0x11, 0x0200, 0x0000);
-+	rtl8168g_config_eee_phy(phydev);
-+	rtl8125_common_config_eee_phy(phydev);
+ 	r8169_apply_firmware(tp);
++	rtl8168g_enable_gphy_10m(phydev);
+ 	rtl8125_legacy_force_mode(phydev);
+ 	rtl8168g_disable_aldps(phydev);
+ 	rtl8125b_config_eee_phy(phydev);
+@@ -1122,6 +1123,9 @@ static void rtl8126a_hw_phy_config(struct rtl8169_private *tp,
+ 				   struct phy_device *phydev)
+ {
+ 	r8169_apply_firmware(tp);
++	rtl8168g_enable_gphy_10m(phydev);
++	rtl8125_legacy_force_mode(phydev);
++	rtl8168g_disable_aldps(phydev);
  }
  
- static void rtl8169s_hw_phy_config(struct rtl8169_private *tp,
+ void r8169_hw_phy_config(struct rtl8169_private *tp, struct phy_device *phydev,
 -- 
 2.47.0
 
