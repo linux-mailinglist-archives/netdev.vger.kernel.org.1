@@ -1,130 +1,131 @@
-Return-Path: <netdev+bounces-140788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D49669B8115
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 18:20:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8027F9B811C
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 18:23:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 995B6283246
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:20:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0E1031F23DE2
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:23:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF7571BF328;
-	Thu, 31 Oct 2024 17:20:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D3281BD515;
+	Thu, 31 Oct 2024 17:23:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lkWMWtWD"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fq3JuKg8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f47.google.com (mail-lf1-f47.google.com [209.85.167.47])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23921386C9
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 17:20:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15DCC1386C9;
+	Thu, 31 Oct 2024 17:23:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730395231; cv=none; b=YiVSzW5qKq9aJJrYcGfuGeg7hPasWKgJnPzjBLpT/CqlZDlZq0jQ8qDxkrkGREcBF2bbjObd5GlXGHoYBWn1L8g+xaLgF7YkN0mUqnwo7gvxvDkBc7M3SI17/OC0SQAf7X/Z9DnNvt/SFxAi1LGLx+XKp3zfj7LHg4tp3Sn8eGQ=
+	t=1730395406; cv=none; b=FDbDzlTle8L/TrrMS8fvUFZ6TmI4TvrvZvLUP3dfnzb7V+L1XLR41xwkGrXUd4Ph4HIKtvaFdubHmEK6L/pmSxDVjZCmnkPUyTRsW5abb/lwa1DzBO/ROH2600dFn9NoHeUlTQMc1vyWKkoxE8seqsSggKUPU7AR6+SlycCwAfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730395231; c=relaxed/simple;
-	bh=Qpfn1aqERxQIIO2RpljK3QlpdUDGs/PQ+KjnHTvZPus=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Skp2efpkBMQbiWytziaaAisZPafvrbXDzzEio9yaw4NG5K3ECIbTBjQ/hHZE53QrOhnd1ZX4oHKyMPrNXXJrTdntZ/Jl9x4lwhuvD2sgk48jSR7a78LnuiOTI6u3CdPejQfCk0zzTWflGO+3xd5T++q3WxRYKU1BnXqIYAWsY1w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lkWMWtWD; arc=none smtp.client-ip=209.85.167.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-539e66ba398so1650e87.0
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:20:29 -0700 (PDT)
+	s=arc-20240116; t=1730395406; c=relaxed/simple;
+	bh=wXDe5lgDv74I8xwIkKsTzfDMb2TkCpRhzbt8TEStEyY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=mHPrq09KpIRMxq3MSZ7xrT5stYBVp4ETaIQXewhYlKR0Qxyl2feb7LAZtdmHDY3IJv1hJxvSZd9q9UHIEFqwNia/kLWGtOGOFQ+4rBQg1jTqCA7q2mDJV9pSOmXmQ7dny2DX1Rh+IOhiKFC0DqbfKcc5yvwKgcN0DjJpEKH+pSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fq3JuKg8; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-37d7351883aso78553f8f.0;
+        Thu, 31 Oct 2024 10:23:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730395228; x=1731000028; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zg+rF3bbkwD/l4VpYrtWhBYduAyO2UrjlFMGIgBxxz8=;
-        b=lkWMWtWD46ADG8jSwjfHnEmlVrrgNDA0o6MP2JOK85moVKiCMLk9+DwYBoc5vUypqM
-         M5mpsiALO/I8YrL3Pe4+U5FpM9tbBlqBaI5TLpn4aNhv6COACGcZFgivkSAnVUX6Zb1m
-         lDDuOYWaBYi/WqzKWF/s4CrD0SXEjsRg3VPB0NBPlEqqJ/2lasFxT70La5l7RtY8K+j7
-         /uN+NyE/s4IW5Ewr2VU2PAE4z3f+SJ+iM0nbHpSpECHt+K7R8Yq01Uzdu5lB6Bg8UpQb
-         VRAz634vKYXRMHUS7ePbhf4HhMsDVj1hlCa3E47zpGflO8zVkqkCqORQxN/tEvc6xVk/
-         Uu9w==
+        d=gmail.com; s=20230601; t=1730395402; x=1731000202; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VVTW9hw36AFB4MImdvCga8qTTKZp0wzSmGjii8X9VoA=;
+        b=fq3JuKg8XN93vSUcAgkdX0wsh8GFNZvlnqiDPH8OZjWMHpkNnGk86yH0ryvKP+ia/A
+         a5bdVTMivG2yH2F8y0J4smNSzQf1L695pvLr+Ub1OaMPBcuHtP3/hpls1bKDZlgmkN5K
+         UZG3QkmDjbWAVZDDcqKl1QiYo4gYTVUjQtYLe9hhbBpUyQ19IubfhlAyi312HxBVuFe3
+         +wfHIYrhzZQv9r5QtBBKxApq0Q5+1urIModYihMBKtwB9soL1ntub0pYpGMPjnfl49bj
+         yXrrgNsRY0ZBMV93RHcHeDcdkDV/KtbqOPvFog91XqyL5qkHO3xdIHLmLXbET5NeSP7g
+         fBMA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730395228; x=1731000028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zg+rF3bbkwD/l4VpYrtWhBYduAyO2UrjlFMGIgBxxz8=;
-        b=BUE3EJAmiuPn+ylmOJXMh1dZ/FBPWEnKcbeL6qJ3mGeIr+7xpxG1CB9+74z5xCsXZB
-         /OufKKyebfCRrfLseDmVSEcSblSwJGub/1yzpgW6apb4Jk6L8wzI+XGKYaPvWc3sREXz
-         NKXHzqmWHe3udrDDmIW1je9YWQGTAbbHfI+u2ynk3LRyvU46txZb3D1KtwHdOQO+Vksu
-         /MCacLUu3p2JiMwD7SsVpVtq7p97WWAWMnmA41Cw4dOEbRtuDriib92OHEw2St8Khsq4
-         KeueVE6G9P/F9FlBa0elPbx5lm3JFDTp+8nDAeL4sFhNmklPR7CrbXsUQV3zZKm9QCtx
-         FHxQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXoga507H3jb2mac719FWoAh188nQ23hPlJGNDPO3fPEJi48KJgJrbDH2pYtE4kATKBXLcZ7gk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxBprXkVTAOX1zPFH3j/pEZwPo0pG/Yby4Iy2lBZwslOBU1tLit
-	Pj0PnbRfx/lcmE+Kvrrk9TcIkokr14m6MmWoACacKqzugw7CFz+H5l601F6t+9ntk5/oaqLqjdt
-	YSTWR+hjHmc8sTwgNOZmk8vGJ2sur2nMalP85
-X-Gm-Gg: ASbGncv9l7+RDYQqpEaYYqUKM56xZYpIoMO6TsZU4hwYC4erp8ZawPwamHpj5VX9PaG
-	HJQIZAvUbMMkp4kuDXJzTT+k075bBL7+SwUBSt0HF1GoyJyuqAxZPhohFdY4nVQ==
-X-Google-Smtp-Source: AGHT+IEv90dd5q1CIH9Mt3/RPC+ncg8zHsWLi93i93FxiGZUohh8fnGc3oCrDv0I2EcVmSgpEDXcHBPyCl2iNQcs/7c=
-X-Received: by 2002:a05:6512:4024:b0:53b:5ae5:a9c8 with SMTP id
- 2adb3069b0e04-53c7bb8e9f5mr285304e87.7.1730395227548; Thu, 31 Oct 2024
- 10:20:27 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730395402; x=1731000202;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VVTW9hw36AFB4MImdvCga8qTTKZp0wzSmGjii8X9VoA=;
+        b=HBHTW+BoPXFQr4RePE10nmf9FNsPPM82W6KArTuKQhVfV6n3zFJTJFyTpBybZKkYE9
+         jfyWpMJxXcTYGZAJs4D5zeiiXTd9bLfz2bmx2uiZs1hAP/WYRM52FdN0UTGFi7yXv7uP
+         0sM0WYWApQ3OB3yrIKI/DaMAOwJmCU7XXyjxW9Fv/1WPU4gj7ZpsrcLUQ8jDOQd0xaiO
+         UwIWh/t+VJ4tp+LDmaKErPhFZTc9wP53RpmZyIbEcj9KL4AlK9FmZqmje8OoWCg8O8iY
+         UleIaY+/WXMeBFktPktmAlxC0AqG6xw/SBHtUmJDdN1Va8hdmeJA8/s1UD/bU7CjcjnY
+         9BYg==
+X-Forwarded-Encrypted: i=1; AJvYcCWMVB6X1UKS099YVheRUuezMvMZdMqV9XeARz2xPiaGAE+PZNBGIG3sNRpTmjwI/OpDDr+UB5/QJf2+8t4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyOpK/7hSJhZFVGMfJUjElgqj8rctI2T0SnJcxMQyCMpfRZiG0E
+	sKLxeNhv62lL4ORB2GRBmzKsl10QvC84FyD/p29EKl3AY7aHA6nu
+X-Google-Smtp-Source: AGHT+IG8AifXoJzt/afMNe67tcFeiLrP5M6/urrkBJoQb1aUjJpqK75XQe++iygSMilFNcs3++wDxA==
+X-Received: by 2002:a5d:6c6d:0:b0:37d:487e:4d9d with SMTP id ffacd0b85a97d-380612323c9mr8339382f8f.8.1730395402017;
+        Thu, 31 Oct 2024 10:23:22 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c116b181sm2703414f8f.107.2024.10.31.10.23.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2024 10:23:21 -0700 (PDT)
+Date: Thu, 31 Oct 2024 19:23:18 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v7 3/8] net: stmmac: Refactor FPE functions to
+ generic version
+Message-ID: <20241031172318.w77ibjcz7pvia5wh@skbuf>
+References: <cover.1730376866.git.0x1207@gmail.com>
+ <cover.1730376866.git.0x1207@gmail.com>
+ <1c05e448a12057b909cc6c7cc0c9645cf393d181.1730376866.git.0x1207@gmail.com>
+ <1c05e448a12057b909cc6c7cc0c9645cf393d181.1730376866.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030142722.2901744-1-sdf@fomichev.me> <CAHS8izOBp4yXBg-nOSouD+A7gOGs9MPmdFc9_hB8=Ni0QdeZHg@mail.gmail.com>
- <ZyJM_dVs1_ys3bFX@mini-arch> <CAHS8izN6-5RJgKX08sgntYDVgETkBGpgoYToq8ezcy+tYHdaSA@mail.gmail.com>
- <ZyJSpBrhz7UJ0r7c@mini-arch> <CAHS8izPCFVd=opRiGMYu3u0neOP7yCJDX8Ff+TdURq2U-Pi27A@mail.gmail.com>
-In-Reply-To: <CAHS8izPCFVd=opRiGMYu3u0neOP7yCJDX8Ff+TdURq2U-Pi27A@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Thu, 31 Oct 2024 10:20:14 -0700
-Message-ID: <CAHS8izOUx=_HqS8foFoyv7H2d7zz6+jchG2r7w+LL9fq8CJvLQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v6 00/12] selftests: ncdevmem: Add ncdevmem to ksft
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	andrew+netdev@lunn.ch, shuah@kernel.org, horms@kernel.org, willemb@google.com, 
-	petrm@nvidia.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1c05e448a12057b909cc6c7cc0c9645cf393d181.1730376866.git.0x1207@gmail.com>
+ <1c05e448a12057b909cc6c7cc0c9645cf393d181.1730376866.git.0x1207@gmail.com>
 
-On Thu, Oct 31, 2024 at 9:45=E2=80=AFAM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-...
->
-> Sorry, 2 issues testing this series:
->
-...
->
-> 2. Validation is now broken:
->
+On Thu, Oct 31, 2024 at 08:37:57PM +0800, Furong Xu wrote:
+> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+> index 25725fd5182f..15fcb9ef1a97 100644
+> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_fpe.h
+> @@ -12,34 +12,22 @@
+>  #define STMMAC_FPE_MM_MAX_VERIFY_RETRIES	3
+>  #define STMMAC_FPE_MM_MAX_VERIFY_TIME_MS	128
+>  
+> -/* FPE link-partner hand-shaking mPacket type */
+> -enum stmmac_mpacket_type {
+> -	MPACKET_VERIFY = 0,
+> -	MPACKET_RESPONSE = 1,
+> -};
+> -
+>  struct stmmac_priv;
+>  struct stmmac_fpe_cfg;
 
-Validation is re-fixed with this diff:
+With the removal of the dwmac5_*() and dwxgmac3_*() functions, the
+forward definition of struct stmmac_fpe_cfg has no user in stmmac_fpe.h.
 
-diff --git a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-index 692c189bb5cc..494ae66d8abf 100644
---- a/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-+++ b/tools/testing/selftests/drivers/net/hw/ncdevmem.c
-@@ -568,8 +568,7 @@ int do_server(struct memory_buffer *mem)
+>  
+>  void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up);
+> -void stmmac_fpe_event_status(struct stmmac_priv *priv, int status);
+>  void stmmac_fpe_init(struct stmmac_priv *priv);
+>  void stmmac_fpe_apply(struct stmmac_priv *priv);
+> +void stmmac_fpe_configure(struct stmmac_priv *priv, bool tx_enable,
+> +			  bool pmac_enable);
 
-                        if (do_validation)
-                                validate_buffer(
--                                       ((unsigned char *)tmp_mem) +
--                                               dmabuf_cmsg->frag_offset,
-+                                       ((unsigned char *)tmp_mem),
-                                        dmabuf_cmsg->frag_size);
-                        else
-                                print_nonzero_bytes(tmp_mem,
-dmabuf_cmsg->frag_size);
-
-Since memcpy_from_device copies to the beginning of tmp_mem, then the
-beginning tmp_mem should be passed to the validation.
-
---=20
-Thanks,
-Mina
+I'm not sure why I missed this during v6, but stmmac_fpe_configure() is
+only called from within stmmac_fpe.c, and thus should be static.
 
