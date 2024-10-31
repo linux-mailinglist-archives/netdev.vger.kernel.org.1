@@ -1,111 +1,116 @@
-Return-Path: <netdev+bounces-140628-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140629-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 413F99B7471
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:21:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC42B9B747C
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:27:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0597D28350A
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:21:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 930551F25798
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:27:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C624514658C;
-	Thu, 31 Oct 2024 06:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A30BE145A16;
+	Thu, 31 Oct 2024 06:27:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="D9urGUXf"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out-177.mta0.migadu.com (out-177.mta0.migadu.com [91.218.175.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE1824437
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:21:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FBBB145A05
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:27:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730355666; cv=none; b=SP45vG8nVyljCv24jRMQ5FpYMI6sQJNCBKsC3sjTzwNbG3t8azxC7UmsPQjUlv7GAoraJz2/u6aUMlM0Q+MSpdGgYJTlzUN0ccRt3Npe6BA3Td6H9EFHM8Mty2a2BqEhOtesfiW+9YAl3g2KftXa1n0Fg9e5T+jbdaq5qFJ3tz0=
+	t=1730356051; cv=none; b=f9t4ucEW0MriNc7wr5pSsy4WqBr2QMOyYD2Cv8HIDEK96hCHDoyBzADxbd+WQZyzgxCdn+ajep+ovL17/3721nvUsEvYHGXGTZk7ryzIa5yHmRyDlvGYSsti3NlpkQNfgmuDkx+cJC5fRBBRcw8ownhO2f11D7Nt0XjiGLbIRi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730355666; c=relaxed/simple;
-	bh=62K0YOIabZYg0xl9QhmiNmjTIH0QnVrVx4DOJC7nRes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Lq56MGxjPSMdCQJ2MmsiudpVpZflfcfqvxasF7rwRwzhPwLmX1px7QvfXUMP7rJu1Af2g1i97qFRB2m/qmHi0IamygoPJtcj0AAyV7osZxG4XILXsPG9NwJSRLMwLkLZ373CLyY+mtE0C3EObli6mAoamlF+wiZimFuAAupTnXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6OXx-0003a3-0p; Thu, 31 Oct 2024 07:20:41 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6OXs-001JfQ-38;
-	Thu, 31 Oct 2024 07:20:36 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6OXs-0069Ri-2l;
-	Thu, 31 Oct 2024 07:20:36 +0100
-Date: Thu, 31 Oct 2024 07:20:36 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 04/18] net: pse-pd: tps23881: Add support
- for power limit and measurement features
-Message-ID: <ZyMhtPbUsEOE-SJd@pengutronix.de>
-References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
- <20241030-feature_poe_port_prio-v2-4-9559622ee47a@bootlin.com>
+	s=arc-20240116; t=1730356051; c=relaxed/simple;
+	bh=LNnicIiLWUGsYxKk4aqOOgdoeTCcxPTZXfcZIkLSLWg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Vsfz0NqEUMfHffUCmJ80BDhRr5ShN0K3gZ+015uGNUFV7Tg3d9dCwXihXjNUn4TTydmgDghs03PJluaa5L9oRMBGg4+7Hy6SjuPilBld8jR1CnTY5U/YlLWUI8ry8wOM33dvdBf7XWT7D0lKMKcizEi9VGJozppGUsua5RLYf+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=D9urGUXf; arc=none smtp.client-ip=91.218.175.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730356043;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=yTt0daxcPq5U9kriisaXUUnPi8tyERB4VX2SVL7WQIc=;
+	b=D9urGUXfa2UEEUQCdjDhpO6dFznPP+kXX4yRYcuApneDyqXOFvjBK8+tqG1Dz+qLLpo8Di
+	7Id/HMCtwmPsInwUJJoXdvJDTxkcuFxAKr06zjm0IMLTV8YgHCpkOz5ZYywDHFTvC3vn8O
+	jGgH1J5ZeG3u8olYWkB5wAVFkxJPTi0=
+Date: Wed, 30 Oct 2024 23:27:13 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241030-feature_poe_port_prio-v2-4-9559622ee47a@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Jason Xing <kerneljasonxing@gmail.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: willemb@google.com, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-3-kerneljasonxing@gmail.com>
+ <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
+ <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
+ <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
+ <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Wed, Oct 30, 2024 at 05:53:06PM +0100, Kory Maincent wrote:
-> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
+On 10/30/24 5:13 PM, Jason Xing wrote:
+> I realized that we will have some new sock_opt flags like
+> TS_SCHED_OPT_CB in patch 4, so we can control whether to print or
+> not... For each sock_opt point, they will be called without caring if
+> related flags in skb are set. Well, it's meaningless to add more
+> control of skb tsflags at each TS_xx_OPT_CB point.
 > 
-> Expand PSE callbacks to support the newly introduced
-> pi_get/set_current_limit() and pi_get_voltage() functions. These callbacks
-> allow for power limit configuration in the TPS23881 controller.
-> 
-> Additionally, the patch includes the detected class, the current power
-> delivered and the power limit ranges in the status returned, providing more
-> comprehensive PoE status reporting.
-> 
-> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
+> Am I understanding in a correct way? Now, I'm totally fine with this great idea!
+Yes, I think so.
 
-Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+The sockops prog can choose to ignore any BPF_SOCK_OPS_TS_*_CB. The are only 3: 
+SCHED, SND, and ACK. If the hwtstamp is available from a NIC, I think it would 
+be quite wasteful to throw it away. ACK can be controlled by the 
+TCP_SKB_CB(skb)->bpf_txstamp_ack.
 
-Thank you!
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Going back to my earlier bpf_setsockopt(SOL_SOCKET, BPF_TX_TIMESTAMPING) 
+comment. I think it may as well go back to use the "u8 
+bpf_sock_ops_cb_flags;" and use the bpf_sock_ops_cb_flags_set() helper to 
+enable/disable the timestamp related callback hook. May be add one 
+BPF_SOCK_OPS_TX_TIMESTAMPING_CB_FLAG.
+
+For tx, one new hook should be at the sendmsg and should be around 
+tcp_tx_timestamp (?) for tcp. Another hook is __skb_tstamp_tx() which should be 
+similar to your patch. Add a new kfunc to set shinfo->tx_flags |= SKBTX_BPF 
+and/or TCP_SKB_CB(skb)->bpf_txstamp_ack during sendmsg.
+
+
+For rx, add one BPF_SOCK_OPS_RX_TIMESTAMPING_CB_FLAG. bpf_sock_ops_cb_flags 
+needs to move from the tcp_sock to the sock because it will be used by UDP also. 
+When enabling or disabling this flag, it needs to take care of the 
+net_{enable,disable}_timestamp. The same for the __sk_destruct() also.
+
 
