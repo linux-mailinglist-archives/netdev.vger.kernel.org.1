@@ -1,185 +1,172 @@
-Return-Path: <netdev+bounces-140726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE93D9B7BA7
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:28:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B56D9B7BED
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:42:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D62E11C20895
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:28:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A51428262B
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:42:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 615BF19DF4F;
-	Thu, 31 Oct 2024 13:28:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA9F19DFA7;
+	Thu, 31 Oct 2024 13:42:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="XGjViwhx"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="XZ93d0Ep"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from antelope.elm.relay.mailchannels.net (antelope.elm.relay.mailchannels.net [23.83.212.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3031019CC0B
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 13:28:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730381289; cv=none; b=ASX8GVAfF6c31qXNoyHVXvWHgDTJWn1hYlZA7qU3EMtF6JI2OBVS+lv6wfhgmNYZIoscIjg3Zd6szvJpbPLH4vY2gaqvEq1iHaIE3zIlJgwog0Lr7Y9dvyOUjkOo8FoUNIqLuU2r0TFGXwItU3MBAlhjViomvcA28OlI+eHKCFc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730381289; c=relaxed/simple;
-	bh=Jjcka7E6MaSQ7nC/CFEot10Oi7cbuvv9l+tAnI2O9Ug=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=XTg2MHk0V5WgkHfq158VpZcQTffsN5pFj26yjhgGWMEb7TsVnoRugC26JD5TNQ63b/ENu3jVOjvDFNyAr3n9NJIFKyOJSAWQLdL9TjxvvyRgu0oynZSt5XaVltw0biBis6Jo1Jv9hLGc+9pCXcBkRoW+BOvDoNG9i5cbkRhXTUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=XGjViwhx; arc=none smtp.client-ip=209.85.160.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-460b295b9eeso129871cf.1
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:28:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730381286; x=1730986086; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=x+8pPFT1eOD/z3ha9J7u1uxzhaY7+UYdheZyJLi46ZI=;
-        b=XGjViwhxWUaEKhDMyq/6RvrnMokx/rK+gX3rlfnO4oVAX1qk87i58iSeav2yTrtend
-         jgN6s9D6putKTKrj7x6v0weJEOkguMIe706LeJ7deYB9IKnprZfYIYYKt9V0xagXRxG7
-         onDAWLb0dUNrzGnapGrWV6CB2G3QQWaHjv+WjyWvsiZI5TpXiaNXlLwZKM6VdmUkqgE+
-         9QjeWGAWELb4mbOVcDy4QEPLJRwknZJi4J0Z2Qgi0wcSieDxp5ShhGsOLTuIwHYOa/8e
-         mSeMn3Oe8mVnqCAUwJxob5ha87J2/2KJGZSNTfeTI3uL/FHbAMV5v3nFD+qVgUvL/ieI
-         d3ww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730381286; x=1730986086;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=x+8pPFT1eOD/z3ha9J7u1uxzhaY7+UYdheZyJLi46ZI=;
-        b=uUPzgm3O+1OmbOSTq20CN0UTIk3TlEj5PXyGgiMofesyaLFOZCtUVrQD+n1NxKgfBD
-         ebqCRzs7Ourem9YvXAk+VUCvEjPfJF7vfa1Z75tQn6Jh40zCakGTSiuDRlUsp3OPzu9F
-         FYOylQrx/GKcdfHVp0xUFc3nYYorSpoFQiBEK/WdV523A1m9OjrF2R1br0Filgcy2Oqq
-         J/U8D+6XoietOvZTZGBLt69it+fFpm0XH1bldfGY0Hh9m9flkjeDM5fvbU85iyb9ICcg
-         zd+Z4P/z6ooWmrFCP10og91KXTxyVMf8ovKYMYxCTK7bhq/Z48aL1ZVCLNRKQ0EnSQlo
-         2iQw==
-X-Forwarded-Encrypted: i=1; AJvYcCUpJ8rGFpf+mzscavDPPTj7mGcE7H/NTj4Ve//amhBRUHgxrObnTSkdmEQWpb/mBYAfcS2GuMc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKxhExDw0khg3CkYP3g9ESQAHmt3J7/Ye0CqSkLS2IiMKsRtKx
-	c5ZrNmAZ/fHj6l7oxcPQlU5zcFsfuhehIdKJA2D67v9eyB4iaD3crtH5321S14hTB4aV1qH2Vxj
-	XQRKuarxILEy6lhyyiOj3jbkR9QC4UgOrCQU6
-X-Gm-Gg: ASbGnctMLwm1Wfo0uwPSEMT2sk0WTAeX19ZvWeqWhzAD4aaMvMb+NwNHNPo5WYlEm00
-	c8Js2dmswnVMmMwpSsy2ugDMFakJ0EEBHL7V1O9P9cnLTSo1TekMkQ7Fn0HA+gMHe
-X-Google-Smtp-Source: AGHT+IHYNqzSZym//dzOXkU1elr06MP9CUrZZFR8bYzLtv3uxrKgDmP5/hQUYFV0jUEicQkMxk2E0Cr7lCnhMQBhMsI=
-X-Received: by 2002:a05:622a:614:b0:461:4be1:c612 with SMTP id
- d75a77b69052e-462ad2da722mr2934321cf.21.1730381285738; Thu, 31 Oct 2024
- 06:28:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5BF19D89D
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 13:42:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.212.4
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730382170; cv=pass; b=cmbWLJP78Sdccit8/wO+Ah06Nwl4r5bLoZXlAscnxauyRiYHLg1ku+LcTQ2XtTd7wpAw4KaBwnphzcHE4+xonKX0dtFfyo3Tu2L3RWSR6+O4nrG6RgXa7NWSnOaCqNYiMBgAElh928JjLQfuUJ7oOyU3YmekBViLlGmkxRohglo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730382170; c=relaxed/simple;
+	bh=j55Rm5Pt5e4EzAS5v0eiFuXVhv+4pTM57AbCjJPPrrg=;
+	h=Message-ID:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Date; b=GfqocNtxHLZAlPBCJU+y08ClzlhlaIC+qHi6IxJ7NkNKBonfa/UGb5VTV1jp132TLoF87zLDNizlJ6U6DW/EwuJOKDRcV5NRyv4I48nwF8wEdLHJ2gIaDHQT7+7b3lgAw+DNI/CoNatEMS4CKh+tN03u3L/WxMZ5WhUmoJgqpX0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=XZ93d0Ep; arc=pass smtp.client-ip=23.83.212.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|arinc.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 6DF417836D6
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 13:35:44 +0000 (UTC)
+Received: from uk-fast-smtpout9.hostinger.io (100-102-250-142.trex-nlb.outbound.svc.cluster.local [100.102.250.142])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id A740678362D
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 13:35:43 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1730381743; a=rsa-sha256;
+	cv=none;
+	b=YxTWttwF2fG9zl0vey7ZsLk6Y0AsArC0EmE/wDhukO3Q2lyG/cg6/G6olP+iOlS4inT/5A
+	5GZgQV9lyuX4Lht2HcxpfgocU4Bbx5FdOasFeTnkX+bbu4ort9eHLs5302QBt5h9hU/3S/
+	6t99NjXo/MiTTMAbpXrJqeOUjbV7ije+Ouoep6PJaHns3VXH/Od4d+Jt4T9/d2WZbyDsNG
+	RTzl0Nem4j2Y8vY32cZBmR4vH1iTsQxWJBerwzob79j4Wse3NPB0CTRGs9TTuiz6adydMJ
+	WCtKnlaaa9YJfvuiUPeSlDf2VtPfTSifl1kpcsIGS+TA3gbWpexgGFrAHUgp4g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1730381743;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=VA2D/3s3T/BEXi5y4Fa4JGpA6vR01kfLSIvpX9EDjM0=;
+	b=Xm9oiRyWzzju5a3XgqtIELxw0cwjqKIgMb5D9BJmEkHWFXxyyEMfPH/hlLLCNTZ6Kz1wzw
+	amhkdaFkR4an6VUpxxz9qmtq4LxCXgjymMgic+3T8cQVMK3KoVeZO4ZEfgoy742K6zDJwN
+	KjMCgzy95XDqrkOmwJejXX9nczQ9YjblAlOsiJbBxFDpdYfqhzrsKiBcVLviaBoCAiEJm2
+	09zCrUtWp6q4SZMW94JQqj1xzRW7TqmbcRhU2NbbfVyaSPf9aHFxkC66xTA/6NUy7iREMU
+	taRdsBNxuGTPn4B5gqYJ+VvxWEP8GTk4rjFdgbKtbITnTC2FC849+J8dFVaKpg==
+ARC-Authentication-Results: i=1;
+	rspamd-77cfccfb8-gmr4g;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=arinc.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|arinc.unal@arinc9.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: hostingeremail|x-authuser|arinc.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Lyrical-Versed: 2595bb2b0f6dbbfa_1730381744176_3768256655
+X-MC-Loop-Signature: 1730381744176:2728131966
+X-MC-Ingress-Time: 1730381744176
+Received: from uk-fast-smtpout9.hostinger.io (uk-fast-smtpout9.hostinger.io
+ [31.220.23.89])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.102.250.142 (trex/7.0.2);
+	Thu, 31 Oct 2024 13:35:44 +0000
+Message-ID: <d2776a19-5176-4ce4-9306-273ec7cda0a6@arinc9.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1730381741;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VA2D/3s3T/BEXi5y4Fa4JGpA6vR01kfLSIvpX9EDjM0=;
+	b=XZ93d0EpvzYzHqsXjJbn3ujqnNXJ6i58bnSgHu+5Vj7mGJdKWQxTLBlxpOs+cHwM2O/Q9v
+	GcaVm8Ha71r5FMWxOUY13wv3gKPvU7eeGaSKfCmNZA9CT6PfodxwJoJryqNRu+eSwXld8e
+	naB/9gn4qYMM4MqG6oYcZBEuxVVIJvWpZ3rAI6LXHHCG3EmPMxYkUqT8cISnd4z1E2ynMI
+	R367UCo5Y0YcG2k+KtUa4K5dslTBvxIZpbjk7HzRAIVIl1YxHKgmPBDchgwnJKHGcUyk/2
+	+yWH3IjIhcuHu/8+/OAxAZBQEvg3ml71p3YbcKHVqNsjSsq3JvICJC85i/SBRw==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021221248.60378-1-chia-yu.chang@nokia-bell-labs.com>
- <20241021221248.60378-2-chia-yu.chang@nokia-bell-labs.com>
- <ea2ccad9-6a4a-48e1-8e99-0289e13d501c@redhat.com> <CANn89iKU5G-vEPkLFY9vGyNBEA-G6msGiPJqiBNAcw4nNXoSbg@mail.gmail.com>
-In-Reply-To: <CANn89iKU5G-vEPkLFY9vGyNBEA-G6msGiPJqiBNAcw4nNXoSbg@mail.gmail.com>
-From: Neal Cardwell <ncardwell@google.com>
-Date: Thu, 31 Oct 2024 09:27:49 -0400
-Message-ID: <CADVnQy=Gt+PHPJ+EdaXY=xcrgeDwusSBmmWV9+6-=93ZhD4SXw@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 1/1] sched: Add dualpi2 qdisc
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, chia-yu.chang@nokia-bell-labs.com, 
-	netdev@vger.kernel.org, davem@davemloft.net, stephen@networkplumber.org, 
-	jhs@mojatatu.com, kuba@kernel.org, dsahern@kernel.org, ij@kernel.org, 
-	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
-	ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
-	cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
-	vidhi_goel@apple.com, Olga Albisser <olga@albisser.org>, 
-	Olivier Tilmans <olivier.tilmans@nokia.com>, Henrik Steen <henrist@henrist.net>, 
-	Bob Briscoe <research@bobbriscoe.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: mt7530: Add TBF qdisc offload support
+To: Lorenzo Bianconi <lorenzo@kernel.org>
+Cc: Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+ netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20241030-mt7530-tc-offload-v1-1-f7eeffaf3d9e@kernel.org>
+ <a66528bd-37cb-46b2-90e5-37b10dfa9c78@arinc9.com>
+ <ZyM5CPfQYHc_Eolh@lore-desk>
+Content-Language: en-US
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <ZyM5CPfQYHc_Eolh@lore-desk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Date: Thu, 31 Oct 2024 13:35:39 +0000 (UTC)
+X-CM-Analysis: v=2.4 cv=ZLWFmm7b c=1 sm=1 tr=0 ts=672387ad a=aGj/nXfi4qz2iMxz7h0kJQ==:117 a=aGj/nXfi4qz2iMxz7h0kJQ==:17 a=IkcTkHD0fZMA:10 a=M51BFTxLslgA:10 a=LYXDv5rQIZ189asnIbQA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-CM-Envelope: MS4xfCfguuhZl9jj8TTlQ0BBGoVE4NCQHUKSMlnIjPUdQpeXnVRPJJIzY/PL1QnOcPwa9fEB9GoRLsmv6tlPeU1OUnQUyhOnssZj8K/3Jqf/y8j6GvIWThU9 6tNuW6h+uxTgOqQnS9GrVdB0FQUTsyIRpdf9//BYkD3Y1DubfPHmlWJBH+B9NeMUgXZdGlyryRWRtK1p2x2iUK/NRGLEK3MVHixjsSzi6BVTJ9oFC7Bymcnp jRStttJLp7W4KlV1OGSmqHM1vr5MxOGbxKKPaTQ7ErI60Tv2+vEYZDk+QXMAqzZs3VFeUUNxuydKwCv98dbMhdFdFr7Qv1xXDWlP/oncRWURJrBh7vhy77Qy 64jbcJph/3Lypl+8Y3Xh4pQE2igSoIQyyK3m6f18gUb1g/ReIlLXMvh59y8cXe6NYCgAnoALEgrX9Z0x5cYvsdqifryrK9jYPjYHJJud/dLJWyb2YnqswX8a SJD4+BitVvWpeMuzq+P3wQzAZMmFAHvJVGHmRb+QsSXW5re1D7GbTgoX3vvXBSnprKM5RQf8iSZBFbQPFN6OAHRH7vnkTf9C7mCu3gm7sNL9QlR8z6HEsCFV PwZ8JaOcXr/qVujUKBsqlZI5sl8aAwyrPfdJ99rCtAqMY5hU7GYRzGotqr6ZPHh7a0AWjGSpWfuVNJpPRRLjEcqRusArVz2Tj5uRtSBdqZP4ecpV96ueywVV 0zhzQK/Uzk8=
+X-AuthUser: arinc.unal@arinc9.com
 
-On Tue, Oct 29, 2024 at 12:53=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->
-> On Tue, Oct 29, 2024 at 1:56=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On 10/22/24 00:12, chia-yu.chang@nokia-bell-labs.com wrote:
-> > > +/* Default alpha/beta values give a 10dB stability margin with max_r=
-tt=3D100ms. */
-> > > +static void dualpi2_reset_default(struct dualpi2_sched_data *q)
-> > > +{
-> > > +     q->sch->limit =3D 10000;                          /* Max 125ms =
-at 1Gbps */
-> > > +
-> > > +     q->pi2.target =3D 15 * NSEC_PER_MSEC;
-> > > +     q->pi2.tupdate =3D 16 * NSEC_PER_MSEC;
-> > > +     q->pi2.alpha =3D dualpi2_scale_alpha_beta(41);    /* ~0.16 Hz *=
- 256 */
-> > > +     q->pi2.beta =3D dualpi2_scale_alpha_beta(819);    /* ~3.20 Hz *=
- 256 */
-> > > +
-> > > +     q->step.thresh =3D 1 * NSEC_PER_MSEC;
-> > > +     q->step.in_packets =3D false;
-> > > +
-> > > +     dualpi2_calculate_c_protection(q->sch, q, 10);  /* wc=3D10%, wl=
-=3D90% */
-> > > +
-> > > +     q->ecn_mask =3D INET_ECN_ECT_1;
-> > > +     q->coupling_factor =3D 2;         /* window fairness for equal =
-RTTs */
-> > > +     q->drop_overload =3D true;        /* Preserve latency by droppi=
-ng */
-> > > +     q->drop_early =3D false;          /* PI2 drops on dequeue */
-> > > +     q->split_gso =3D true;
-> >
-> > This is a very unexpected default. Splitting GSO packets earlier WRT th=
-e
-> > H/W constaints definitely impact performances in a bad way.
-> >
-> > Under which condition this is expected to give better results?
-> > It should be at least documented clearly.
->
-> I agree, it is very strange to see this orthogonal feature being
-> spread in some qdisc.
+On 31/10/2024 11:00, Lorenzo Bianconi wrote:
+>> On 30/10/2024 22:29, Lorenzo Bianconi wrote:
+>>> Introduce port_setup_tc callback in mt7530 dsa driver in order to enable
+>>> dsa ports rate shaping via hw Token Bucket Filter (TBF) for hw switched
+>>> traffic. Enable hw TBF just for EN7581 SoC for the moment.
+>>
+>> Is this because you didn't test it on the other models? Let me know if
+>> that's the case and I'll test it.
+> 
+> yep, exactly. I have tested it just on EN7581 since I do not have any other
+> boards for testing at the moment. If you confirm it works on other SoCs too,
+> I can remove the limitation.
 
-IMHO it makes sense to offer this split_gso feature in the dualpi2
-qdisc because the dualpi2 qdisc is targeted at reducing latency and
-targeted mostly at hops in the last mile of the public Internet, where
-there can be orders of magnitude disparities in bandwidth between
-upstream and downstream links (e.g., packets arriving over 10G
-ethernet and leaving destined for a 10M DSL link). In such cases, GRO
-may aggregate many packets into a single skb receiving data on a fast
-ingress link, and then may want to reduce latency issues on the slow
-link by allowing smaller skbs to be enqueued on the slower egress
-link.
+Seems to be working fine on MT7530. As we have tested this on the oldest
+and newest models that use this switching IP, I'm going to assume it will
+work on the other models as well. You can remove the limitation. Also,
+please change MT7530_ERLCR_P and MT7530_GERLCR to MT753X_ERLCR_P and
+MT753X_GERLCR.
 
-> Also, it seems this qdisc could be a mere sch_prio queue, with two
-> sch_pie children, or two sch_fq or sch_fq_codel ?
+tc qdisc add dev lan4 root tbf rate 10mbit burst 10kb latency 50ms
 
-Having two independent children would not allow meeting the dualpi2
-goal to "preserve fairness between ECN-capable and non-ECN-capable
-traffic." (quoting text from https://datatracker.ietf.org/doc/rfc9332/
-). The main issue is that there may be differing numbers of flows in
-the ECN-capable and non-ECN-capable queues, and yet dualpi2 wants to
-maintain approximate per-flow fairness on both sides. To do this, it
-uses a single qdisc with coupling of the ECN mark rate in the
-ECN-capable queue and drop rate in the non-ECN-capable queue.
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.00   sec  5.88 MBytes  9.85 Mbits/sec    4             sender
+[  5]   0.00-5.00   sec  5.50 MBytes  9.23 Mbits/sec                  receiver
 
-This could probably be made more clear in the commit message.
+tc qdisc del dev lan4 root
 
-> Many of us are using fq_codel or fq, there is no way we can switch to
-> dualpi2 just to experiment things.
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.00   sec   469 MBytes   786 Mbits/sec    0             sender
+[  5]   0.00-5.00   sec   468 MBytes   785 Mbits/sec                  receiver
 
-Yes, sites that are using fq_codel or fq do not need to switch to dualpi2.
+tc qdisc add dev lan4 root tbf rate 11mbit burst 10kb latency 50ms
 
-AFAIK the idea with dualpi2 is to offer a new qdisc for folks
-developing hardware for the last mile of the Internet where you want
-low latency via L4S, and want approximate per-flow fairness between
-L4S and non-L4S traffic, even in the presence of VPN-encrypted traffic
-(where flow identifiers are not available for fq_codel or fq fair
-queuing).
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.00   sec  6.38 MBytes  10.7 Mbits/sec    6             sender
+[  5]   0.00-5.00   sec  6.00 MBytes  10.1 Mbits/sec                  receiver
 
-Sites that don't have VPN traffic or don't care about the VPN issue
-can use fq or fq_codel with the ce_threshold parameter to allow low
-latency via L4S while achieving approximate per-flow fairness.
+tc qdisc del dev lan4 root
 
-best regards,
-neal
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.00   sec   467 MBytes   783 Mbits/sec    0             sender
+[  5]   0.00-5.00   sec   466 MBytes   783 Mbits/sec                  receiver
+
+tc qdisc add dev lan4 root tbf rate 11mbit burst 10kb latency 50ms
+tc qdisc replace dev lan4 root tbf rate 10mbit burst 10kb latency 50ms
+
+[ ID] Interval           Transfer     Bitrate         Retr
+[  5]   0.00-5.00   sec  5.88 MBytes  9.85 Mbits/sec    4             sender
+[  5]   0.00-5.00   sec  5.50 MBytes  9.23 Mbits/sec                  receiver
+
+Arınç
 
