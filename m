@@ -1,227 +1,315 @@
-Return-Path: <netdev+bounces-140711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 13DD69B7B07
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:46:55 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BDE979B7B12
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:49:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8BF301F23449
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:46:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 420E91F24250
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DF4119F108;
-	Thu, 31 Oct 2024 12:46:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94DA119D071;
+	Thu, 31 Oct 2024 12:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="mfXUc12O"
+	dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b="VlNzCXWx"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-98.freemail.mail.aliyun.com (out30-98.freemail.mail.aliyun.com [115.124.30.98])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2120.outbound.protection.outlook.com [40.107.237.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 283F419CC1F;
-	Thu, 31 Oct 2024 12:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.98
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730378769; cv=none; b=P0BZfIj7xGMzlNk+1k6JMFUDp7Adt343zJzIkYGn9WY+inB2IKZmCDMJEHUety6tqToiHEzWFm6EMnvjs8EtigIxQbNe2Yp3IIrSyYvI0Do7dJZ7/3YYGEglrFipiTk1i3BCRlganCF+IfYC2V+xxjdMzEcRCEn5dubM79C+CEc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730378769; c=relaxed/simple;
-	bh=XYg76EAmIgHULvgUNRmUeJv9IMbGnP0tDOHNvJcWTF4=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=XGzl64Vc6E1sE+i9HPfph+bqRRlIGnu/br7pfUzpOnF1LjKzmJIjhqAQhU6pSwmAgamExl71EjA5CAc3gSZ1UXUwPg9eBK7yxk6mNg5lhE7IFJ2e10fdMiirUzE4l27u42z5h2djmqa2fhdNYX5IgNYARmMJ0DpGfzlsX1t46zw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=mfXUc12O; arc=none smtp.client-ip=115.124.30.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730378756; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=kSc8Bj7SPtnQI0RsxprgD4KpDp/GIYakLcxoAFQhVWw=;
-	b=mfXUc12O8cTghyc7xIicNPaHhvAZFe22VsPlVy0Ex0r4jVn6mxGCUq/Nl9MYdSF5K320hmpF4DyUOO/EjhSpkgsUL+oaPxFkro0TMpJk4iAKZ6hYR60PBXEVo1LNTZIZbhPl3T6P3lr9FLj+ZAeq+f3ZCn0FBGHhgxUvAoLAE6w=
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WIIdMyd_1730378754 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 31 Oct 2024 20:45:55 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	dsahern@kernel.org,
-	horms@kernel.org,
-	antony.antony@secunet.com,
-	steffen.klassert@secunet.com,
-	linux-kernel@vger.kernel.org,
-	dust.li@linux.alibaba.com,
-	jakub@cloudflare.com,
-	fred.cc@alibaba-inc.com,
-	yubing.qiuyubing@alibaba-inc.com
-Subject: [PATCH v6 net-next 4/4] ipv6/udp: Add 4-tuple hash for connected socket
-Date: Thu, 31 Oct 2024 20:45:50 +0800
-Message-Id: <20241031124550.20227-5-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20241031124550.20227-1-lulie@linux.alibaba.com>
-References: <20241031124550.20227-1-lulie@linux.alibaba.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9552619CC1F;
+	Thu, 31 Oct 2024 12:49:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.120
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730378979; cv=fail; b=YMzcdBiCGznOGQHQD9ep57MtSJ6WgUqsacU7TmkBzl9iX/wy0RCEUcq6Qvtf6QgVBrI5X11m/T1+IOpFy9xPQO6YqEEPt2hnWt/d1yL0QREJnJ+o4IL0W+0d4jdS7il6Hxo6ot8VFli4xJmrm65Jn4FJcbVhkjNlaYfM/QPoqW0=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730378979; c=relaxed/simple;
+	bh=GWUwJTjpK78e2ch1vbqsK3sDIgc7mCKvcI1beEWSpv4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=PdxImG3VvDXHWYMAHsYqXKTfYOrdnnlVgvgyYKKQnaIEnc+kOsWCuXZBpAgMQ18d5FNLxPDGENlPJioHrVZWoAFt7XbwpN+M7Tg4Q8Bi5gHYEH+5cVZOrDlVpHpEP0NGMLLduMzypNZl990sJfAhiyjEZhJjMNyOzwcnkaRFnq0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com; spf=pass smtp.mailfrom=corigine.com; dkim=pass (1024-bit key) header.d=corigine.onmicrosoft.com header.i=@corigine.onmicrosoft.com header.b=VlNzCXWx; arc=fail smtp.client-ip=40.107.237.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=corigine.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=corigine.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=DZjHI1FvPSv5cooUrudqbiCqI6Vvh5e+sYVhIJHhzuKhInAIUAOP8lGJliGMLoujxgLYuF0E5PcSf0XszAlA6pmxyn/ec9NAZriAWrxpeiNogOWJGO+bZ2nIlpiBRDZYGeASiDRmWWhe5E+hK3Kx+j4fHc/83UTwiZoVETJA6On2TZ/iJ7a9+IbMAq5ZdWy6k/5wO3q8FAg5FG7nN/ZixJgdp5WH/K/8jFn4xcDg2kBO4gBTlDIog8FV+5RnCQEEYvXubB/92D0fYcnkAkww29+itII8BiY9nrF9vu6Jvn/BDUGFavUkz4y6bGlg/tVJAt75oJE4CZdq6fu8bTwShg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hdLzqf/yTk55heKa4L26mVR5RIL4KsJIu5JPiJiDxC8=;
+ b=LM4+K1qKLlq6+MN2U7iQZzfTMDZ3V3UjfA9PTgVXlvPDCxAn8Eg/t58gocrZGruMJzTow/tgxIldJgL51VBW57z1T86KB4EYvkTRaZUva6B/Daihhs6WDsxyoO6Il25A3m44I751jrRLr+10vrm0lQUWPOH3DCNEX9jGDYb/j1+mJFcdUgK8AvmPe4F2JH+vyh2sHlDeGRaZ1W7eMI9PmwVxmzMWiS70hCvAaZiBUd1V8PX65uFPCJJJvbyObqWRg1xTcXvWcvC6fU1j7npjp7l6CLvef/HNv2y7RrwX20tX1UpVfc2WyhFx5F78VpPoRxJSnIt3rvFZ+2ZPOQK9Ig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hdLzqf/yTk55heKa4L26mVR5RIL4KsJIu5JPiJiDxC8=;
+ b=VlNzCXWx3K5bDL+6v2udxSkE5ZadCwXCXbfxFi0qxBFVRXwYwCwyIkrXLIxMK8pPguxoSDwTlrZ2B7M7+CtuRfcwKBv3BbHJgooclb7TXLlpqLA/fKFPthCsfaiRIELDLBCRzdOmHH/qT9i8SrgSuMbG2bTjRw4+quFe90oH+VM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
+ by MW5PR13MB5414.namprd13.prod.outlook.com (2603:10b6:303:195::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.24; Thu, 31 Oct
+ 2024 12:49:31 +0000
+Received: from BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::bbcb:1c13:7639:bdc0]) by BL0PR13MB4403.namprd13.prod.outlook.com
+ ([fe80::bbcb:1c13:7639:bdc0%6]) with mapi id 15.20.8114.020; Thu, 31 Oct 2024
+ 12:49:31 +0000
+Date: Thu, 31 Oct 2024 14:49:10 +0200
+From: Louis Peens <louis.peens@corigine.com>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	David Arinzon <darinzon@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
+	Jason Wang <jasowang@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Noam Dagan <ndagan@amazon.com>, Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Roy Pledge <Roy.Pledge@nxp.com>, Saeed Bishara <saeedb@amazon.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Shay Agroskin <shayagr@amazon.com>, Simon Horman <horms@kernel.org>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>, Tal Gilboa <talgi@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org, oss-drivers@corigine.com,
+	virtualization@lists.linux.dev
+Subject: Re: [resend PATCH 2/2] dim: pass dim_sample to net_dim() by reference
+Message-ID: <ZyN8xpq5C36Tg9rz@LouisNoVo>
+References: <20241031002326.3426181-1-csander@purestorage.com>
+ <20241031002326.3426181-2-csander@purestorage.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241031002326.3426181-2-csander@purestorage.com>
+X-ClientProxiedBy: JNAP275CA0002.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:4c::7)
+ To BL0PR13MB4403.namprd13.prod.outlook.com (2603:10b6:208:1c4::8)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL0PR13MB4403:EE_|MW5PR13MB5414:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a7b7130-47b6-4d73-28b3-08dcf9aa76a5
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?c/Ftqv0wIKpMdlsyPPggGsb7wRuRQa5trC96IOtdxBDmhGFKAbqcQFqvaIb7?=
+ =?us-ascii?Q?2JuP/PgXEEe7fxfG3TffUAgUUL8uVS+6enUYEUNoIVFfuf8Edc8W/AeEA0qf?=
+ =?us-ascii?Q?4FhtWceoFK8LwnuxSu+La3ElbEvF7o25uAfHUG2skCqZi1c3Rq75B8JbVtRs?=
+ =?us-ascii?Q?gbhTeac4/lI/fI4Zu9aI+cdm8fvgi6Axt3LmlLHw7a1yepsnky/WfUNCh3qz?=
+ =?us-ascii?Q?1Abfurf4eGHrOjmO/mWXCZKsZAbmv9F6eEzKqgV0/U8mvHqQDypxjEw5yVN0?=
+ =?us-ascii?Q?GqHv8n3/+MpgatBQb2P0a25thp3OfTcN0f3u6klat32WmuRojJj3Nghh3Gnq?=
+ =?us-ascii?Q?1guUQ2QW9LEBMF6vIpTrpBj9JesUupj/9HgQ5WT8pMTkBdRwCtKIsrFUfCFt?=
+ =?us-ascii?Q?JQJQtLZeshuoDJLkfIPRvoB+p9Plev/QetAN5k/Fewi9D+cI0+mmIiiHL5Vr?=
+ =?us-ascii?Q?v4VkMdFfs2+0aBY2TXK+EfHo9z6wPMYzRHoaaYP8sH9+Ac4xWqGWrqLPfU9i?=
+ =?us-ascii?Q?cmH2iCOvV6kN/PXLUpwCWJDtNnslD74sV4mEU/B0+1DaBYD/DbPUbufjtIba?=
+ =?us-ascii?Q?qY7Jt6JkIZ3ULH65TAs5wJ7bAbmp17SaFdMV7aT7hmwML56+WxOWuYRas+kO?=
+ =?us-ascii?Q?llPNkHjgL74PC9GS8I7ZIAeY/q94kz7zA1YbE0Kj/QJhvsSnc9B4XvhSeb7+?=
+ =?us-ascii?Q?X5DX6zDxuoLaXJ7+G77IDuovN8l+7ue3RvPZu81z9jBWuay6V7rK6It3p+Zo?=
+ =?us-ascii?Q?D6JzsHz4VWpBihU8aV/yRRLcfsBvD2XcaP1zM837SOUEj2zyQcL73bpNFivp?=
+ =?us-ascii?Q?68JxdWnL6bXYDPsb7XiUJUB/ECEfUs2XYEg+v0+/e0uUNGg8o2CEZNGc8eSS?=
+ =?us-ascii?Q?LXPe7Cv2TBYnw7J7Ynyie3tZjX82+Zph5ezss8WECOu+nL+BNJp9RksMy246?=
+ =?us-ascii?Q?X/TS18JRy0kieeQtfwQh9UNP2VgVmpaX9vA+7/vmoqjf1Z8yia6RQLtYT3RP?=
+ =?us-ascii?Q?BnX6PB5HSaF/uJtwfVZAq2Rlci/EmnRLoFkeR/Iz8YEJOR67kLnRLdh0cHvL?=
+ =?us-ascii?Q?n8UH3ZAodeASBDLvP47H/A1RJGqZPUCrDaylKPYuJgNdcv6xuUSHTUvIQekO?=
+ =?us-ascii?Q?oVYW+CXydXd/ryUmj3yixSCQdPirWtdKv/rWTDFU2+G8EV7Ayo+JDbXjv39n?=
+ =?us-ascii?Q?ZCaDUjddukJpvnAAYkqazPyU7s+1+nl7Cvw+olLboqcOBLG+Aoluf1jaWpgB?=
+ =?us-ascii?Q?3I8Xlh0E/lJNLqQZs/C9f+CD3AOvGIp+zoFaaQJGjPXNqd5yVRu4d2ng0NEq?=
+ =?us-ascii?Q?AmpDEnTdN15ux5rXqlRlJIzp?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR13MB4403.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?V6yYCgQPIOt5l6NIDak0QlxNjmeokJDdNd8W5TbwD9NnrRZWDia2NrDrAUlb?=
+ =?us-ascii?Q?vf7eSGPXFj9xlf+cA5KtmTCW7hCY6p1f+Cr6I6NOVA7A9b9hukA2GSrrzeKk?=
+ =?us-ascii?Q?mtcFEAsGZJ46tvJGs9snHGyMb2/2Lk+WVEgYLbf+KMHK9bq9kuXkGo/shQUx?=
+ =?us-ascii?Q?hTJTzTMAFYAvMllI014CKVK3ATgYCxUwlLEf5p93n7zSuGLQs90oPWQ3uBrS?=
+ =?us-ascii?Q?LMO3VlwFi8OlrnkUwA1QLm6zZMFeZ2qbg0+PmuEXmHqJ6GQ9/qCSRCNPvakt?=
+ =?us-ascii?Q?CCw4wAFmNgOEbd7YCs1xUX+po0XEX2gBUk4s/Z9pTzOAWfSFqaznrxkB3Mhm?=
+ =?us-ascii?Q?JUIMxrnmCo7jzyIybyeAzFx3WUMMz7v6R2KebePcPa9w2GkMV1IiHYUncKfn?=
+ =?us-ascii?Q?zbQpHtjvsgE5xvCm5/m6NDhZWKmBxXcjo05Lyr5n1o/6vGbb/CXThgCsUQzw?=
+ =?us-ascii?Q?IT9IxPe3Sk1VayWf9kVOIjEgJoxJp0QG/GpWhHS4g8S5n4WYvCEHG/lq5YUH?=
+ =?us-ascii?Q?zEfhKTvuQYyY5OcZu4cejQo62vY6NFtCfvtTCtRU6vqQWy1+Awu/cWp3W/4L?=
+ =?us-ascii?Q?XXEoDNW8phtt4XxOOadjxHE/hAQvabPyI75MLjbD9LvFknhac+UKY5ELBqHO?=
+ =?us-ascii?Q?ckGoTsKKvE8bcMIQhbznl42LIZDzm2wFEjIRZWUzJGro3O628zvnlnDyo8ao?=
+ =?us-ascii?Q?oaQEPkUgE9WSeW8FULciCNUD9majMrLUy4dwg/PSEXod5vCoQ9ka+FUpWHsR?=
+ =?us-ascii?Q?EF7m45FRiW1MdMonshPaZzP4JMZKNtopj2sfXY26pnIpPekkj/D0uC+M5Ih3?=
+ =?us-ascii?Q?t95i3rLOB5spGs/2S6i8Or19a/jGReuQHPKdV0jfdux5B7pMjeZNBX9Ko3Jb?=
+ =?us-ascii?Q?DM9To0sP8dqSgJmG6GP5VUEj9qLmF1jgW+eYfN4xptGmcqkxPonmuhqjzVJL?=
+ =?us-ascii?Q?NxIMErde+YdvHNegDN+1hUGlEI3LBIDDVBkH5b1PDlQA3+ZOtZSuD7GowVp2?=
+ =?us-ascii?Q?iFDXmZjdsmM/TrC3cd+ILsP8BRL/aZroPkylnGq3vd9z5p58TLEAD/w01Ok/?=
+ =?us-ascii?Q?HA/FDZTeiFXHfNBdhnmGgmixWqNIRODsMB+kRmGwZzlhhcaW2UrG9zUeCH2t?=
+ =?us-ascii?Q?wByWzsuHLdduL+76v4rlcuCd8WleD64WHnSJOW2W/iapVjZ0RksVIBZdQxsH?=
+ =?us-ascii?Q?8+r9EF3eREYvQGdVxiOlyToNXFww10VQYiMFEnsMJufwHn581HENn8a+yy2l?=
+ =?us-ascii?Q?aZ/GPcHfTvNRo7bAE9+PjGOdR0JnTOZbjYTglx+7Mz+lAKoC1yybHKt0PSPJ?=
+ =?us-ascii?Q?DkO435CeQKN0RnER30EFnnWeNbJRtg0YdyaeMglBVkbZHUVNBQcheuS1WkRi?=
+ =?us-ascii?Q?lpyTw66qSZkUwH/MHojlrhtSPAoWWzG5l+4CeU+6419s7rBgy4mc1xqfKZAJ?=
+ =?us-ascii?Q?eIJOT5Ng+0aTJsp4USvy9fW0UIHOs4ochHEUaPIy+1IlSxiew2ckONSgk7v+?=
+ =?us-ascii?Q?oXoDWXI2PG3kGT+Yp2zXOoet4vjN5ANXwCBbIrAZ8qFAeLgI8EQQ4VLk/1FU?=
+ =?us-ascii?Q?jOwyhvuHMsx9WtQXdD2kU2G2F/0M5rumEagjMTfBycz7uTwNv1vfo/L2Da40?=
+ =?us-ascii?Q?lw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a7b7130-47b6-4d73-28b3-08dcf9aa76a5
+X-MS-Exchange-CrossTenant-AuthSource: BL0PR13MB4403.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 12:49:31.6106
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: R9f61Zk4LrodHYoH2hHLXBcixOq58vk40qQ75o2Z67QVpoPEmysiKuVpUjaKTeNU0uQYc1oZCHX12oWVdAigbTquI/oSQF4t1w1aQgWQvy0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR13MB5414
 
-Implement ipv6 udp hash4 like that in ipv4. The major difference is that
-the hash value should be calculated with udp6_ehashfn(). Besides,
-ipv4-mapped ipv6 address is handled before hash() and rehash().
+On Wed, Oct 30, 2024 at 06:23:26PM -0600, Caleb Sander Mateos wrote:
+> net_dim() is currently passed a struct dim_sample argument by value.
+> struct dim_sample is 24 bytes. Since this is greater 16 bytes, x86-64
+> passes it on the stack. All callers have already initialized dim_sample
+> on the stack, so passing it by value requires pushing a duplicated copy
+> to the stack. Either witing to the stack and immediately reading it, or
+> perhaps dereferencing addresses relative to the stack pointer in a chain
+> of push instructions, seems to perform quite poorly.
+> 
+> In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
+> 94% of which is attributed to the first push instruction to copy
+> dim_sample on the stack for the call to net_dim():
+> // Call ktime_get()
+>   0.26 |4ead2:   call   4ead7 <mlx5e_handle_rx_dim+0x47>
+> // Pass the address of struct dim in %rdi
+>        |4ead7:   lea    0x3d0(%rbx),%rdi
+> // Set dim_sample.pkt_ctr
+>        |4eade:   mov    %r13d,0x8(%rsp)
+> // Set dim_sample.byte_ctr
+>        |4eae3:   mov    %r12d,0xc(%rsp)
+> // Set dim_sample.event_ctr
+>   0.15 |4eae8:   mov    %bp,0x10(%rsp)
+> // Duplicate dim_sample on the stack
+>  94.16 |4eaed:   push   0x10(%rsp)
+>   2.79 |4eaf1:   push   0x10(%rsp)
+>   0.07 |4eaf5:   push   %rax
+> // Call net_dim()
+>   0.21 |4eaf6:   call   4eafb <mlx5e_handle_rx_dim+0x6b>
+> 
+> To allow the caller to reuse the struct dim_sample already on the stack,
+> pass the struct dim_sample by reference to net_dim().
+> 
+> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> ---
+>  Documentation/networking/net_dim.rst                   |  2 +-
+>  drivers/net/ethernet/amazon/ena/ena_netdev.c           |  2 +-
+>  drivers/net/ethernet/broadcom/bcmsysport.c             |  2 +-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c              |  4 ++--
+>  drivers/net/ethernet/broadcom/genet/bcmgenet.c         |  2 +-
+>  drivers/net/ethernet/freescale/enetc/enetc.c           |  2 +-
+>  drivers/net/ethernet/hisilicon/hns3/hns3_enet.c        |  4 ++--
+>  drivers/net/ethernet/intel/ice/ice_txrx.c              |  4 ++--
+>  drivers/net/ethernet/intel/idpf/idpf_txrx.c            |  4 ++--
+>  drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  2 +-
+>  drivers/net/ethernet/mediatek/mtk_eth_soc.c            |  4 ++--
+>  drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c      |  4 ++--
+>  drivers/net/ethernet/netronome/nfp/nfd3/dp.c           |  4 ++--
+>  drivers/net/ethernet/netronome/nfp/nfdk/dp.c           |  4 ++--
+>  drivers/net/ethernet/pensando/ionic/ionic_txrx.c       |  2 +-
+>  drivers/net/virtio_net.c                               |  2 +-
+>  drivers/soc/fsl/dpio/dpio-service.c                    |  2 +-
+>  include/linux/dim.h                                    |  2 +-
+>  lib/dim/net_dim.c                                      | 10 +++++-----
+>  19 files changed, 31 insertions(+), 31 deletions(-)
+> 
+--- snip --
 
-Core procedures of hash/unhash/rehash are same as ipv4, and udpv4 and
-udpv6 share the same udptable, so some functions in ipv4 hash4 can also
-be shared.
+> diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+> index d215efc6cad0..f1c6c47564b1 100644
+> --- a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+> +++ b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+> @@ -1177,11 +1177,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int budget)
+>  			pkts = r_vec->rx_pkts;
+>  			bytes = r_vec->rx_bytes;
+>  		} while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
+>  
+>  		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
+> -		net_dim(&r_vec->rx_dim, dim_sample);
+> +		net_dim(&r_vec->rx_dim, &dim_sample);
+>  	}
+>  
+>  	if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
+>  		struct dim_sample dim_sample = {};
+>  		unsigned int start;
+> @@ -1192,11 +1192,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int budget)
+>  			pkts = r_vec->tx_pkts;
+>  			bytes = r_vec->tx_bytes;
+>  		} while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
+>  
+>  		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
+> -		net_dim(&r_vec->tx_dim, dim_sample);
+> +		net_dim(&r_vec->tx_dim, &dim_sample);
+>  	}
+>  
+>  	return pkts_polled;
+>  }
+>  
+> diff --git a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+> index dae5af7d1845..ebeb6ab4465c 100644
+> --- a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+> +++ b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+> @@ -1287,11 +1287,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int budget)
+>  			pkts = r_vec->rx_pkts;
+>  			bytes = r_vec->rx_bytes;
+>  		} while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
+>  
+>  		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
+> -		net_dim(&r_vec->rx_dim, dim_sample);
+> +		net_dim(&r_vec->rx_dim, &dim_sample);
+>  	}
+>  
+>  	if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
+>  		struct dim_sample dim_sample = {};
+>  		unsigned int start;
+> @@ -1302,11 +1302,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int budget)
+>  			pkts = r_vec->tx_pkts;
+>  			bytes = r_vec->tx_bytes;
+>  		} while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
+>  
+>  		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
+> -		net_dim(&r_vec->tx_dim, dim_sample);
+> +		net_dim(&r_vec->tx_dim, &dim_sample);
+>  	}
+>  
+>  	return pkts_polled;
+>  }
+--- snip ---
 
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
-Signed-off-by: Fred Chen <fred.cc@alibaba-inc.com>
-Signed-off-by: Yubing Qiu <yubing.qiuyubing@alibaba-inc.com>
----
- net/ipv6/udp.c | 96 ++++++++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 94 insertions(+), 2 deletions(-)
+Hi Caleb. Looks like a fair enough update to me in general, but I am not an
+expert on 'dim'. For the corresponding nfp driver changes feel free to add:
 
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 1ea99d704e31..64f13f258fca 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -110,8 +110,17 @@ void udp_v6_rehash(struct sock *sk)
- 	u16 new_hash = ipv6_portaddr_hash(sock_net(sk),
- 					  &sk->sk_v6_rcv_saddr,
- 					  inet_sk(sk)->inet_num);
-+	u16 new_hash4;
- 
--	udp_lib_rehash(sk, new_hash, 0); /* 4-tuple hash not implemented */
-+	if (ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr)) {
-+		new_hash4 = udp_ehashfn(sock_net(sk), sk->sk_rcv_saddr, sk->sk_num,
-+					sk->sk_daddr, sk->sk_dport);
-+	} else {
-+		new_hash4 = udp6_ehashfn(sock_net(sk), &sk->sk_v6_rcv_saddr, sk->sk_num,
-+					 &sk->sk_v6_daddr, sk->sk_dport);
-+	}
-+
-+	udp_lib_rehash(sk, new_hash, new_hash4);
- }
- 
- static int compute_score(struct sock *sk, const struct net *net,
-@@ -216,6 +225,71 @@ static struct sock *udp6_lib_lookup2(const struct net *net,
- 	return result;
- }
- 
-+#if IS_ENABLED(CONFIG_BASE_SMALL)
-+static struct sock *udp6_lib_lookup4(const struct net *net,
-+				     const struct in6_addr *saddr, __be16 sport,
-+				     const struct in6_addr *daddr, unsigned int hnum,
-+				     int dif, int sdif, struct udp_table *udptable)
-+{
-+	return NULL;
-+}
-+
-+static void udp6_hash4(struct sock *sk)
-+{
-+}
-+#else /* !CONFIG_BASE_SMALL */
-+static struct sock *udp6_lib_lookup4(const struct net *net,
-+				     const struct in6_addr *saddr, __be16 sport,
-+				     const struct in6_addr *daddr, unsigned int hnum,
-+				     int dif, int sdif, struct udp_table *udptable)
-+{
-+	const __portpair ports = INET_COMBINED_PORTS(sport, hnum);
-+	const struct hlist_nulls_node *node;
-+	struct udp_hslot *hslot4;
-+	unsigned int hash4, slot;
-+	struct udp_sock *up;
-+	struct sock *sk;
-+
-+	hash4 = udp6_ehashfn(net, daddr, hnum, saddr, sport);
-+	slot = hash4 & udptable->mask;
-+	hslot4 = &udptable->hash4[slot];
-+
-+begin:
-+	udp_lrpa_for_each_entry_rcu(up, node, &hslot4->nulls_head) {
-+		sk = (struct sock *)up;
-+		if (inet6_match(net, sk, saddr, daddr, ports, dif, sdif))
-+			return sk;
-+	}
-+
-+	/* if the nulls value we got at the end of this lookup is not the expected one, we must
-+	 * restart lookup. We probably met an item that was moved to another chain due to rehash.
-+	 */
-+	if (get_nulls_value(node) != slot)
-+		goto begin;
-+
-+	return NULL;
-+}
-+
-+static void udp6_hash4(struct sock *sk)
-+{
-+	struct net *net = sock_net(sk);
-+	unsigned int hash;
-+
-+	if (ipv6_addr_v4mapped(&sk->sk_v6_rcv_saddr)) {
-+		udp4_hash4(sk);
-+		return;
-+	}
-+
-+	if (sk_unhashed(sk) || ipv6_addr_any(&sk->sk_v6_rcv_saddr))
-+		return;
-+
-+	hash = udp6_ehashfn(net, &sk->sk_v6_rcv_saddr, sk->sk_num,
-+			    &sk->sk_v6_daddr, sk->sk_dport);
-+
-+	udp_lib_hash4(sk, hash);
-+}
-+#endif /* CONFIG_BASE_SMALL */
-+
- /* rcu_read_lock() must be held */
- struct sock *__udp6_lib_lookup(const struct net *net,
- 			       const struct in6_addr *saddr, __be16 sport,
-@@ -231,6 +305,12 @@ struct sock *__udp6_lib_lookup(const struct net *net,
- 	hash2 = ipv6_portaddr_hash(net, daddr, hnum);
- 	hslot2 = udp_hashslot2(udptable, hash2);
- 
-+	if (udp_has_hash4(hslot2)) {
-+		result = udp6_lib_lookup4(net, saddr, sport, daddr, hnum, dif, sdif, udptable);
-+		if (result) /* udp6_lib_lookup4 return sk or NULL */
-+			return result;
-+	}
-+
- 	/* Lookup connected or non-wildcard sockets */
- 	result = udp6_lib_lookup2(net, saddr, sport,
- 				  daddr, hnum, dif, sdif,
-@@ -1166,6 +1246,18 @@ static int udpv6_pre_connect(struct sock *sk, struct sockaddr *uaddr,
- 	return BPF_CGROUP_RUN_PROG_INET6_CONNECT_LOCK(sk, uaddr, &addr_len);
- }
- 
-+static int udpv6_connect(struct sock *sk, struct sockaddr *uaddr, int addr_len)
-+{
-+	int res;
-+
-+	lock_sock(sk);
-+	res = __ip6_datagram_connect(sk, uaddr, addr_len);
-+	if (!res)
-+		udp6_hash4(sk);
-+	release_sock(sk);
-+	return res;
-+}
-+
- /**
-  *	udp6_hwcsum_outgoing  -  handle outgoing HW checksumming
-  *	@sk:	socket we are sending on
-@@ -1761,7 +1853,7 @@ struct proto udpv6_prot = {
- 	.owner			= THIS_MODULE,
- 	.close			= udp_lib_close,
- 	.pre_connect		= udpv6_pre_connect,
--	.connect		= ip6_datagram_connect,
-+	.connect		= udpv6_connect,
- 	.disconnect		= udp_disconnect,
- 	.ioctl			= udp_ioctl,
- 	.init			= udpv6_init_sock,
--- 
-2.32.0.3.g01195cf9f
-
+Signed-off-by: Louis Peens <louis.peens@corigine.com>
 
