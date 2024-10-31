@@ -1,106 +1,167 @@
-Return-Path: <netdev+bounces-140740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF039B7C76
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:10:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28AE09B7C7F
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:12:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A15142824CB
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:10:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C7B6B21B09
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:12:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934411A0B04;
-	Thu, 31 Oct 2024 14:10:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFDF1A08B2;
+	Thu, 31 Oct 2024 14:12:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcHIgDM7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cLp1GjMv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF97F1A0730;
-	Thu, 31 Oct 2024 14:10:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C30E19FA8D
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 14:12:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730383815; cv=none; b=uczM8OLmgiWsOjAc+n2gxywZlV0VR2XlKMM+sbv4Bx+HVLiVtEWWJfNb2O6zakBE5bBZd5fJcJesqz81ROp7YEfIAln58kFkZbc2Za4OJIBLwUgxQFIloNJM+Rqlr6K5TJMM4BqAjHEtlHMNHcjyWx1VsLjGuGeilhS7ktveQlI=
+	t=1730383955; cv=none; b=UQRZfTYcYqQf3vYtY2fjcyF1bH5ihqPChuaQnUY/H62jwIqY28r9Qgngzy2uYIosK2EcDMv9NJTbLlr0X//6IW8/VNcHyqmrIjuuQCIaPsENIHZQ4KC0zb13FHY0t5E5BMtUugf89lQdb50S4jgx9iQHugOaUH3jdF6PJo4WV8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730383815; c=relaxed/simple;
-	bh=ZOirEjwoVyKsr9B7zI9+5sVH12vbyRc/ixY45nVUD1M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=lK/LvVwoAQE/XOL285UuNkBFHIiLpqqkWW7XUued6rWFSmkz270+E91Z29RSVmI1ZoXErkgSzpjOzNdFECMfgIglCZc6xgCzoyySzDq7tsGhS1pTIgK6TPcFhv2xI9G12XsLsvjmbW9sC8qcYbi13ThCAenHlHur9rAbCcwOKKQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BcHIgDM7; arc=none smtp.client-ip=209.85.166.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-83ab94452a7so39173639f.3;
-        Thu, 31 Oct 2024 07:10:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730383813; x=1730988613; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=fGapzIuvflb8DMomsECaOF4DzIXKNMU6ZtxGVo61eig=;
-        b=BcHIgDM7dgDAv1C5NmCD9T77R/XAkryMFsv9/uRdYsAIzB453NsAjOymdkajBw7h1B
-         MdPQnpum7APv5Zw23SV2kNfnI+9udoSu5iuI4bb+o5YY6vY5E5wFC1LxnN3jv0puhIb8
-         JdyJMfxT0FRTCdwc4dRX6FC334eWmS2sNwvP5qD9xLrwqiFXw85rxAoLBoGGJnxOnYVJ
-         kXRW08m9kiLUeLe4KNirnhCCONx8Gt7j5eZUvatFldPVk7AzKJeuWP4ED18WG5fs+PxO
-         nZTaCf7MCIzDR/0d85eHkTlmOZm4Rm4hYNemr3eO4bXKv9Lw6AA8u7QPRu+XxEmFntdh
-         7WCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730383813; x=1730988613;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=fGapzIuvflb8DMomsECaOF4DzIXKNMU6ZtxGVo61eig=;
-        b=UDiDFla4rKGKpoaFx2H7u7ZXnKibvJITf0iuwptDn808w0FSafM+ZV3keoAPWdWBSt
-         ExI1+7j44eUK3f+Fp1vY/AuWxmpEUs0R8RNmEZlCBLA9n1XbWdm/ycDwS6M+a4utjsnZ
-         Ype/CeZREDR0yy4vcBTfv8BM2xyd+ZnS/e4vYHzMbUKo5OX0NqPZOk+aeD4+QsMC4Uni
-         gHzmq9C1Alx4F2WplkzsPew9hbkhzuamEQrCi8b9yrR7ch6csrFXxQG1vuHpjlWJT7uW
-         6a2JttX4Cka4zRJ3WXxYXVQvLVAvI7u8520XYPhxc0wjvImUgnHDDQAYHWobSsSuS53n
-         IUgg==
-X-Forwarded-Encrypted: i=1; AJvYcCW8Cjo7rWSRNcGYYR1IuzbuWRd8JPjp4ezbzzgm2VPL0k8AKzZmMXgrHxvOjTbZD4wwcY8mMdg21q2a4Rw=@vger.kernel.org, AJvYcCX3rZ6GdGv/m2ylUgUMBjrBQ85Pf9qsRhiMQwd0n6us8ogZHobdVCSbcPSQViTxW0p/5uV6golxaIytROkKb6r7@vger.kernel.org, AJvYcCXSn8dYOAoutDcARoMYze6sAIRiUuEI/ujZy8/qOSR5F1VzLlmqajiI3toMdrys5m8ms2M8VsGu@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywx0DiVKBD/s3XBdxkrsXNm0SYbpP5yYMkwx/PQlcLZM834GrDk
-	Y4H1sqEiq1naXtit0106wUC9pB0KQIMnLFzSvNz5ST5dCfl/yV3I
-X-Google-Smtp-Source: AGHT+IGbgq1ksw8UcbLciUbszieiqw3+Qq2pAxekHHQzxo6i2O9Z7UYOH19oJAPum3hUsEqsFoqrDA==
-X-Received: by 2002:a05:6602:1507:b0:82c:d67d:aa91 with SMTP id ca18e2360f4ac-83b566cc65dmr936862939f.1.1730383812577;
-        Thu, 31 Oct 2024 07:10:12 -0700 (PDT)
-Received: from ?IPV6:2601:284:8200:b700:1848:120e:c56:3740? ([2601:284:8200:b700:1848:120e:c56:3740])
-        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4de04887facsm311707173.26.2024.10.31.07.10.11
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 07:10:11 -0700 (PDT)
-Message-ID: <7ae73a73-fba4-4692-97df-1a88ccc5f576@gmail.com>
-Date: Thu, 31 Oct 2024 08:10:10 -0600
+	s=arc-20240116; t=1730383955; c=relaxed/simple;
+	bh=mQzdoA6HITBooHuI8ytc1oMFxWv2X/pE16EJqC+j+h8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eTsQXOHuf0pxRQDprEfbsnTv4IuXs/9cFulrYAWwvBrOtntlCr7+eUAT4btfghQ8Hmzvx7qe0EYAFvZIC404MduEMcBBWRwV6bju+IWssdswzW8Y+BXQB2aJAsjaQwLdj8sQyLQsHEsosZDI+ExpZKacC/RxnPfXhCkOogEZbnU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cLp1GjMv; arc=none smtp.client-ip=198.175.65.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730383954; x=1761919954;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=mQzdoA6HITBooHuI8ytc1oMFxWv2X/pE16EJqC+j+h8=;
+  b=cLp1GjMvUizaZKjwuZanZej3a64zJ2UJ9afFquM/idM+4t1Hj6/9GAXT
+   EC/jsMJazN7k/3R1SwXI0gM6+h0Iz8OprgHZ5w1QP2hzw4JqjMtC6ngsS
+   tqM5pqAjKvt3TMZRzsFy6ScgtvoGRMgDYnXB0aqqhc5KqOjEjjfKJBAyY
+   oS0BgX8mSKkmB17MH7qcalHTMuwzlKEpJa44FYAdHQI3CnNl66D5pjDBF
+   lJ5sR9umvFIdW62QnmKBhUB4xgJquDCOwGpXmXoCO+LAge6oTXxBCYldt
+   f/fEZ1mqLEJJOes+dkkNuGA4Y1k6FgvRkoACq3zb44IijYxUxWP3hv/1w
+   w==;
+X-CSE-ConnectionGUID: vamPjTL1R06s3aO0QMkyQA==
+X-CSE-MsgGUID: XZy3yFHRTXyqRBKoi5azPw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47580739"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="47580739"
+Received: from fmviesa004.fm.intel.com ([10.60.135.144])
+  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 07:12:33 -0700
+X-CSE-ConnectionGUID: t79serrzTHyW7k5Cors6Bw==
+X-CSE-MsgGUID: XiH28u6WRhanW3J1sEup0Q==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
+   d="scan'208";a="87232153"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa004.fm.intel.com with ESMTP; 31 Oct 2024 07:12:25 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t6VuR-000gH9-16;
+	Thu, 31 Oct 2024 14:12:23 +0000
+Date: Thu, 31 Oct 2024 22:12:19 +0800
+From: kernel test robot <lkp@intel.com>
+To: qiang4.zhang@linux.intel.com, "Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
+	Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	"Chen, Jian Jun" <jian.jun.chen@intel.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	David Hildenbrand <david@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Qiang Zhang <qiang4.zhang@intel.com>
+Subject: Re: [PATCH] virtio: only reset device and restore status if needed
+ in device resume
+Message-ID: <202410312128.7ymyjL4j-lkp@intel.com>
+References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v6] ipv6: Fix soft lockups in fib6_select_path under
- high next hop churn
-Content-Language: en-US
-To: Paolo Abeni <pabeni@redhat.com>,
- Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
- netdev@vger.kernel.org
-Cc: adrian.oliver@menlosecurity.com, Adrian Oliver <kernel@aoliver.ca>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@idosch.org>,
- Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241025073003.2079945-1-omid.ehtemamhaghighi@menlosecurity.com>
- <0dc8c829-23f0-4904-8017-fc98c079f0ab@redhat.com>
-From: David Ahern <dsahern@gmail.com>
-In-Reply-To: <0dc8c829-23f0-4904-8017-fc98c079f0ab@redhat.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
 
-On 10/31/24 4:13 AM, Paolo Abeni wrote:
-> Given the issue is long-standing, and the fix is somewhat invasive, I
-> suggest steering this patch on net-next.
-> 
+Hi,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on char-misc/char-misc-testing]
+[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus mst-vhost/linux-next axboe-block/for-next herbert-cryptodev-2.6/master andi-shyti/i2c/i2c-host mkp-scsi/for-next jejb-scsi/for-next tiwai-sound/for-next tiwai-sound/for-linus linus/master v6.12-rc5 next-20241031]
+[cannot apply to herbert-crypto-2.6/master]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/qiang4-zhang-linux-intel-com/virtio-only-reset-device-and-restore-status-if-needed-in-device-resume/20241031-111315
+base:   char-misc/char-misc-testing
+patch link:    https://lore.kernel.org/r/20241031030847.3253873-1-qiang4.zhang%40linux.intel.com
+patch subject: [PATCH] virtio: only reset device and restore status if needed in device resume
+config: x86_64-buildonly-randconfig-003-20241031 (https://download.01.org/0day-ci/archive/20241031/202410312128.7ymyjL4j-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241031/202410312128.7ymyjL4j-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202410312128.7ymyjL4j-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/i2c/busses/i2c-virtio.c:14:
+   In file included from include/linux/i2c.h:19:
+   In file included from include/linux/regulator/consumer.h:35:
+   In file included from include/linux/suspend.h:5:
+   In file included from include/linux/swap.h:9:
+   In file included from include/linux/memcontrol.h:21:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+>> drivers/i2c/busses/i2c-virtio.c:256:8: error: call to undeclared function 'virtio_device_reset_and_restore_status'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
+     256 |         ret = virtio_device_reset_and_restore_status(vdev);
+         |               ^
+   1 warning and 1 error generated.
 
 
-FWIW, I think net-next is best.
+vim +/virtio_device_reset_and_restore_status +256 drivers/i2c/busses/i2c-virtio.c
 
+   251	
+   252	static int virtio_i2c_restore(struct virtio_device *vdev)
+   253	{
+   254		int ret;
+   255	
+ > 256		ret = virtio_device_reset_and_restore_status(vdev);
+   257		if (ret)
+   258			return ret;
+   259	
+   260		return virtio_i2c_setup_vqs(vdev->priv);
+   261	}
+   262	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
