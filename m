@@ -1,141 +1,106 @@
-Return-Path: <netdev+bounces-140739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69FC79B7C6F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:09:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF039B7C76
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CB541C20A46
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:09:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A15142824CB
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:10:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD27E19EED6;
-	Thu, 31 Oct 2024 14:09:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 934411A0B04;
+	Thu, 31 Oct 2024 14:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lWx7oxo/"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BcHIgDM7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f44.google.com (mail-io1-f44.google.com [209.85.166.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AAA097483;
-	Thu, 31 Oct 2024 14:09:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF97F1A0730;
+	Thu, 31 Oct 2024 14:10:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730383779; cv=none; b=CJvhdfB1xtiDVoFhCSNsptOefBeKaHvFCkT/xH2RZCpSr4R2Z6o3YMsOq82328Gc7Ua43lkz2yoo7tcxI5nTjHx/x4cIDma0Z+RXDTqDbza892gfv2HU16rextfWFBgLIXrN4WoEOQkF3Lv/3gGkcXj5n/VTGNS3H56d2g69zM8=
+	t=1730383815; cv=none; b=uczM8OLmgiWsOjAc+n2gxywZlV0VR2XlKMM+sbv4Bx+HVLiVtEWWJfNb2O6zakBE5bBZd5fJcJesqz81ROp7YEfIAln58kFkZbc2Za4OJIBLwUgxQFIloNJM+Rqlr6K5TJMM4BqAjHEtlHMNHcjyWx1VsLjGuGeilhS7ktveQlI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730383779; c=relaxed/simple;
-	bh=4ceT/iOIGZcSpJVdW0LWOwHAcJw2b/1T7CPx9IuqL/A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=duuy7hsPl5u43/k5F1X6F3TYdauMGex4K8j/RjGTL/wlRK7UncS9KHnnvzlgpfpaOTWsKji8zVNnD6SVs9V+59xs1z9iV4W1CkJkN77PknsI6yEJJBliEeN5Gu79rxZD0RgPbCDjMC7uQ0SzY6qkk4MI94SdKd/FagNdxSsXGl8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lWx7oxo/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9AB0AC4FF78;
-	Thu, 31 Oct 2024 14:09:38 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730383779;
-	bh=4ceT/iOIGZcSpJVdW0LWOwHAcJw2b/1T7CPx9IuqL/A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=lWx7oxo/BWefgupPnyVBFF4EVpoLomBSGE9ciTgQZWG4GP58bKIm6HsqHGAB0Vui1
-	 xfij0CepoVPLYF+ZkexuvOYQBFhjW+zsTDfelI7ZWd8BpJ0g6HfhEbA+83IrD91ikc
-	 OBOtukngbNprUkkarKpY5+yHCncE6aK4voihvs58+3qw37vJe9ciMzsO+dAnnRtAGL
-	 lWFrUikZ78NpdHv5TlXgAdrGOopyN+ei8Nlh6bgbB0VinjdKUD1L91zAPfQ+TQR0KR
-	 TSJdpHzsba7ExepK7DBbR5XMkPZp/MiZ19Lzq9cxbB3Esmy5FdC1fe+9FCpR/yrBWW
-	 gTyIpMoDfYUGw==
-Date: Thu, 31 Oct 2024 15:08:56 +0100
-From: Joel Granados <joel.granados@kernel.org>
-To: chia-yu.chang@nokia-bell-labs.com
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
-	netfilter-devel@vger.kernel.org, kadlec@netfilter.org, coreteam@netfilter.org, 
-	pablo@netfilter.org, bpf@vger.kernel.org, linux-fsdevel@vger.kernel.org, 
-	kees@kernel.org, mcgrof@kernel.org, ij@kernel.org, ncardwell@google.com, 
-	koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
-	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
-	vidhi_goel@apple.com
-Subject: Re: [PATCH v4 net-next 14/14] net: sysctl: introduce sysctl
- SYSCTL_FIVE
-Message-ID: <qnrzl4tjlgw5rzlvxavr3pt7fhkslnm4dd62q7uqzb3mfoa2jg@fuayx77rfcs6>
-References: <20241021215910.59767-1-chia-yu.chang@nokia-bell-labs.com>
- <20241021215910.59767-15-chia-yu.chang@nokia-bell-labs.com>
+	s=arc-20240116; t=1730383815; c=relaxed/simple;
+	bh=ZOirEjwoVyKsr9B7zI9+5sVH12vbyRc/ixY45nVUD1M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lK/LvVwoAQE/XOL285UuNkBFHIiLpqqkWW7XUued6rWFSmkz270+E91Z29RSVmI1ZoXErkgSzpjOzNdFECMfgIglCZc6xgCzoyySzDq7tsGhS1pTIgK6TPcFhv2xI9G12XsLsvjmbW9sC8qcYbi13ThCAenHlHur9rAbCcwOKKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BcHIgDM7; arc=none smtp.client-ip=209.85.166.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f44.google.com with SMTP id ca18e2360f4ac-83ab94452a7so39173639f.3;
+        Thu, 31 Oct 2024 07:10:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730383813; x=1730988613; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fGapzIuvflb8DMomsECaOF4DzIXKNMU6ZtxGVo61eig=;
+        b=BcHIgDM7dgDAv1C5NmCD9T77R/XAkryMFsv9/uRdYsAIzB453NsAjOymdkajBw7h1B
+         MdPQnpum7APv5Zw23SV2kNfnI+9udoSu5iuI4bb+o5YY6vY5E5wFC1LxnN3jv0puhIb8
+         JdyJMfxT0FRTCdwc4dRX6FC334eWmS2sNwvP5qD9xLrwqiFXw85rxAoLBoGGJnxOnYVJ
+         kXRW08m9kiLUeLe4KNirnhCCONx8Gt7j5eZUvatFldPVk7AzKJeuWP4ED18WG5fs+PxO
+         nZTaCf7MCIzDR/0d85eHkTlmOZm4Rm4hYNemr3eO4bXKv9Lw6AA8u7QPRu+XxEmFntdh
+         7WCQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730383813; x=1730988613;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fGapzIuvflb8DMomsECaOF4DzIXKNMU6ZtxGVo61eig=;
+        b=UDiDFla4rKGKpoaFx2H7u7ZXnKibvJITf0iuwptDn808w0FSafM+ZV3keoAPWdWBSt
+         ExI1+7j44eUK3f+Fp1vY/AuWxmpEUs0R8RNmEZlCBLA9n1XbWdm/ycDwS6M+a4utjsnZ
+         Ype/CeZREDR0yy4vcBTfv8BM2xyd+ZnS/e4vYHzMbUKo5OX0NqPZOk+aeD4+QsMC4Uni
+         gHzmq9C1Alx4F2WplkzsPew9hbkhzuamEQrCi8b9yrR7ch6csrFXxQG1vuHpjlWJT7uW
+         6a2JttX4Cka4zRJ3WXxYXVQvLVAvI7u8520XYPhxc0wjvImUgnHDDQAYHWobSsSuS53n
+         IUgg==
+X-Forwarded-Encrypted: i=1; AJvYcCW8Cjo7rWSRNcGYYR1IuzbuWRd8JPjp4ezbzzgm2VPL0k8AKzZmMXgrHxvOjTbZD4wwcY8mMdg21q2a4Rw=@vger.kernel.org, AJvYcCX3rZ6GdGv/m2ylUgUMBjrBQ85Pf9qsRhiMQwd0n6us8ogZHobdVCSbcPSQViTxW0p/5uV6golxaIytROkKb6r7@vger.kernel.org, AJvYcCXSn8dYOAoutDcARoMYze6sAIRiUuEI/ujZy8/qOSR5F1VzLlmqajiI3toMdrys5m8ms2M8VsGu@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywx0DiVKBD/s3XBdxkrsXNm0SYbpP5yYMkwx/PQlcLZM834GrDk
+	Y4H1sqEiq1naXtit0106wUC9pB0KQIMnLFzSvNz5ST5dCfl/yV3I
+X-Google-Smtp-Source: AGHT+IGbgq1ksw8UcbLciUbszieiqw3+Qq2pAxekHHQzxo6i2O9Z7UYOH19oJAPum3hUsEqsFoqrDA==
+X-Received: by 2002:a05:6602:1507:b0:82c:d67d:aa91 with SMTP id ca18e2360f4ac-83b566cc65dmr936862939f.1.1730383812577;
+        Thu, 31 Oct 2024 07:10:12 -0700 (PDT)
+Received: from ?IPV6:2601:284:8200:b700:1848:120e:c56:3740? ([2601:284:8200:b700:1848:120e:c56:3740])
+        by smtp.googlemail.com with ESMTPSA id 8926c6da1cb9f-4de04887facsm311707173.26.2024.10.31.07.10.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Oct 2024 07:10:11 -0700 (PDT)
+Message-ID: <7ae73a73-fba4-4692-97df-1a88ccc5f576@gmail.com>
+Date: Thu, 31 Oct 2024 08:10:10 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241021215910.59767-15-chia-yu.chang@nokia-bell-labs.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v6] ipv6: Fix soft lockups in fib6_select_path under
+ high next hop churn
+Content-Language: en-US
+To: Paolo Abeni <pabeni@redhat.com>,
+ Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
+ netdev@vger.kernel.org
+Cc: adrian.oliver@menlosecurity.com, Adrian Oliver <kernel@aoliver.ca>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@idosch.org>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241025073003.2079945-1-omid.ehtemamhaghighi@menlosecurity.com>
+ <0dc8c829-23f0-4904-8017-fc98c079f0ab@redhat.com>
+From: David Ahern <dsahern@gmail.com>
+In-Reply-To: <0dc8c829-23f0-4904-8017-fc98c079f0ab@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Mon, Oct 21, 2024 at 11:59:10PM +0200, chia-yu.chang@nokia-bell-labs.com wrote:
-> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> 
-> Add SYSCTL_FIVE for new AccECN feedback modes of net.ipv4.tcp_ecn.
-> 
-> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
-> ---
->  include/linux/sysctl.h | 17 +++++++++--------
->  kernel/sysctl.c        |  3 ++-
->  2 files changed, 11 insertions(+), 9 deletions(-)
-> 
-> diff --git a/include/linux/sysctl.h b/include/linux/sysctl.h
-> index aa4c6d44aaa0..37c95a70c10e 100644
-> --- a/include/linux/sysctl.h
-> +++ b/include/linux/sysctl.h
-> @@ -37,21 +37,22 @@ struct ctl_table_root;
->  struct ctl_table_header;
->  struct ctl_dir;
->  
-> -/* Keep the same order as in fs/proc/proc_sysctl.c */
-> +/* Keep the same order as in kernel/sysctl.c */
->  #define SYSCTL_ZERO			((void *)&sysctl_vals[0])
->  #define SYSCTL_ONE			((void *)&sysctl_vals[1])
->  #define SYSCTL_TWO			((void *)&sysctl_vals[2])
->  #define SYSCTL_THREE			((void *)&sysctl_vals[3])
->  #define SYSCTL_FOUR			((void *)&sysctl_vals[4])
-> -#define SYSCTL_ONE_HUNDRED		((void *)&sysctl_vals[5])
-> -#define SYSCTL_TWO_HUNDRED		((void *)&sysctl_vals[6])
-> -#define SYSCTL_ONE_THOUSAND		((void *)&sysctl_vals[7])
-> -#define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[8])
-> -#define SYSCTL_INT_MAX			((void *)&sysctl_vals[9])
-> +#define SYSCTL_FIVE			((void *)&sysctl_vals[5])
-Is it necessary to insert the value instead of appending it to the end
-of sysctl_vals? I would actually consider Paolo Abeni's suggestion to
-just use a constant if you are using it only in one place.
-
-> +#define SYSCTL_ONE_HUNDRED		((void *)&sysctl_vals[6])
-> +#define SYSCTL_TWO_HUNDRED		((void *)&sysctl_vals[7])
-> +#define SYSCTL_ONE_THOUSAND		((void *)&sysctl_vals[8])
-> +#define SYSCTL_THREE_THOUSAND		((void *)&sysctl_vals[9])
-> +#define SYSCTL_INT_MAX			((void *)&sysctl_vals[10])
->  
->  /* this is needed for the proc_dointvec_minmax for [fs_]overflow UID and GID */
-> -#define SYSCTL_MAXOLDUID		((void *)&sysctl_vals[10])
-> -#define SYSCTL_NEG_ONE			((void *)&sysctl_vals[11])
-> +#define SYSCTL_MAXOLDUID		((void *)&sysctl_vals[11])
-> +#define SYSCTL_NEG_ONE			((void *)&sysctl_vals[12])
->  
->  extern const int sysctl_vals[];
->  
-> diff --git a/kernel/sysctl.c b/kernel/sysctl.c
-> index 79e6cb1d5c48..68b6ca67a0c6 100644
-> --- a/kernel/sysctl.c
-> +++ b/kernel/sysctl.c
-> @@ -82,7 +82,8 @@
->  #endif
->  
->  /* shared constants to be used in various sysctls */
-> -const int sysctl_vals[] = { 0, 1, 2, 3, 4, 100, 200, 1000, 3000, INT_MAX, 65535, -1 };
-> +const int sysctl_vals[] = { 0, 1, 2, 3, 4, 5, 100, 200, 1000, 3000, INT_MAX,
-> +			   65535, -1 };
->  EXPORT_SYMBOL(sysctl_vals);
->  
->  const unsigned long sysctl_long_vals[] = { 0, 1, LONG_MAX };
-> -- 
-> 2.34.1
+On 10/31/24 4:13 AM, Paolo Abeni wrote:
+> Given the issue is long-standing, and the fix is somewhat invasive, I
+> suggest steering this patch on net-next.
 > 
 
--- 
 
-Joel Granados
+FWIW, I think net-next is best.
+
 
