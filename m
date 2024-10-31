@@ -1,79 +1,108 @@
-Return-Path: <netdev+bounces-140832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140833-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDE869B8694
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 00:03:44 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A4B09B86D6
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 00:15:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AEAD1C222B8
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 23:03:44 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C48C2B21FF1
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 23:15:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 564BF1E571B;
-	Thu, 31 Oct 2024 23:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gov8hTH9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 744BE1CBE84;
+	Thu, 31 Oct 2024 23:15:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2ED891E47BC;
-	Thu, 31 Oct 2024 23:03:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2552ECF;
+	Thu, 31 Oct 2024 23:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730415804; cv=none; b=L1iBS43Z8RMqE6EvPIH8UYR/kks/6bEDW5qc6y9FVEyoumdIihfo4sB+fN4fycveQn5zS6N4AFBVvpf8yxziMHFRi0WgY831FLkeg8uW55D5on0KdCt2dcGsjfX8vWEq5sW4ESl1XLUIU4ZwicK4poBYQpQILU5gguxQ5y3yr54=
+	t=1730416528; cv=none; b=jGFFFc22sUFKT/nkPHETjzNXP66D46+SeK5RhdHnkenVafc0VLmceeA7uYhrtfg3Y+gHtvKQnl83LKPIeZfY017yNp+4Y78q4ATV6gNE8LDByQQOM/GGp6Y7JSGylQnMaoGXsqBrn8umckXRSzdggAncOVcArspf2E4vM7xnfNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730415804; c=relaxed/simple;
-	bh=Q7VmlL8x2IQAiiRMu3bsnDBoaFjg0O2WHqVJfKrxeo8=;
-	h=Subject:From:In-Reply-To:References:Message-Id:Date:To:Cc; b=W3yE/SI4OIJXW9IfuaEh5QY60AKQpT50U73KedX9bFMljbjRj0FV8imlozrkgOXUneYcQ4yklF9fIZl/Zc+CCDkqzxqlxsGO25seKu2+PfEb7a0tRahLyjzm9vckdu5Vd00jDaMFB/tulrwIyEU7zX1ClOc3Y3N/E8LkfossmCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gov8hTH9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 01646C4CEC3;
-	Thu, 31 Oct 2024 23:03:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730415804;
-	bh=Q7VmlL8x2IQAiiRMu3bsnDBoaFjg0O2WHqVJfKrxeo8=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=gov8hTH9TSxUoX/AGIui67hT4+4qPmkYWQuConW3rZhSa/n8GRFfBuNfC5QDLZYxm
-	 WS9nl3zzSqR4lb3sJAkUjtGKN7a8viHuNqVWXRwseAhIQaiaOA5dovRw+DlROZN6pe
-	 9D+3Rv1ZuG6bIC/1X0MqQM4/8qftwYwZbiXK7S7p+xpXL+zzQNdb+3/EkJGnm4xMCa
-	 kDWiyisksSE4cG6yCRd9ECCdy0Q2mp7O0wWpTOSG8qGgahIdlNJg1inu9Xm8RtZX4g
-	 25W5IfICrSK3sO3YVnhRZ5Z9dyHiBGbqGx/6Gsjy2QCEPDNhEm4TPRWjjDEVWYCC8b
-	 pjDve9ECInr5Q==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33E72380AC02;
-	Thu, 31 Oct 2024 23:03:33 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.12-rc6
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20241031141748.160214-1-pabeni@redhat.com>
-References: <20241031141748.160214-1-pabeni@redhat.com>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20241031141748.160214-1-pabeni@redhat.com>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.12-rc6
-X-PR-Tracked-Commit-Id: 50ae879de107ca2fe2ca99180f6ba95770f32a62
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 90602c251cda8a1e526efb250f28c1ea3f87cd78
-Message-Id: <173041581170.2114557.15895995326087684060.pr-tracker-bot@kernel.org>
-Date: Thu, 31 Oct 2024 23:03:31 +0000
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+	s=arc-20240116; t=1730416528; c=relaxed/simple;
+	bh=n+ofn+IZQGqt0nNbyFaFX0NIR/Sl6Ip5PYCmvfDHYD8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=G8GJ7AfMejFpCzndkTOhyhZMpUCnKEsdFjuMSV1RIhOrzwDcPj0qSTj6kDi1xcHkHp4kTTtwLTm+/+7UOyTV7ntrDJG+hP3IQJl+Iw2a7UP2RNmomwCYbpD3fLaJGfsXYNa5IOEcwiaVHDjxub6D8K1TrYoWD67w8783rY0Ew2w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=40956 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1t6eNh-00HKVf-Ac; Fri, 01 Nov 2024 00:15:15 +0100
+Date: Fri, 1 Nov 2024 00:15:08 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Paul Moore <paul@paul-moore.com>
+Cc: Casey Schaufler <casey@schaufler-ca.com>,
+	linux-security-module@vger.kernel.org, jmorris@namei.org,
+	serge@hallyn.com, keescook@chromium.org,
+	john.johansen@canonical.com, penguin-kernel@i-love.sakura.ne.jp,
+	stephen.smalley.work@gmail.com, linux-kernel@vger.kernel.org,
+	selinux@vger.kernel.org, mic@digikod.net, netdev@vger.kernel.org,
+	audit@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	Todd Kjos <tkjos@google.com>
+Subject: Re: [PATCH v3 2/5] LSM: Replace context+len with lsm_context
+Message-ID: <ZyQPfFvPD72rx4ME@calendula>
+References: <20241023212158.18718-3-casey@schaufler-ca.com>
+ <68a956fa44249434dedf7d13cd949b35@paul-moore.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <68a956fa44249434dedf7d13cd949b35@paul-moore.com>
+X-Spam-Score: -1.9 (-)
 
-The pull request you sent on Thu, 31 Oct 2024 15:17:48 +0100:
+Hi Paul,
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git net-6.12-rc6
+This patch breaks nf_conntrack_netlink, Casey mentioned that he will
+post another series.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/90602c251cda8a1e526efb250f28c1ea3f87cd78
+On Thu, Oct 31, 2024 at 06:53:38PM -0400, Paul Moore wrote:
+> On Oct 23, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
+> > 
+> > Replace the (secctx,seclen) pointer pair with a single
+> > lsm_context pointer to allow return of the LSM identifier
+> > along with the context and context length. This allows
+> > security_release_secctx() to know how to release the
+> > context. Callers have been modified to use or save the
+> > returned data from the new structure.
+> > 
+> > security_secid_to_secctx() and security_lsmproc_to_secctx()
+> > will now return the length value on success instead of 0.
+> > 
+> > Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
+> > Cc: netdev@vger.kernel.org
+> > Cc: audit@vger.kernel.org
+> > Cc: netfilter-devel@vger.kernel.org
+> > Cc: Todd Kjos <tkjos@google.com>
+> > ---
+> >  drivers/android/binder.c                |  5 ++-
+> >  include/linux/lsm_hook_defs.h           |  5 ++-
+> >  include/linux/security.h                |  9 +++---
+> >  include/net/scm.h                       |  5 ++-
+> >  kernel/audit.c                          |  9 +++---
+> >  kernel/auditsc.c                        | 16 ++++------
+> >  net/ipv4/ip_sockglue.c                  |  4 +--
+> >  net/netfilter/nf_conntrack_netlink.c    |  8 ++---
+> >  net/netfilter/nf_conntrack_standalone.c |  4 +--
+> >  net/netfilter/nfnetlink_queue.c         | 27 +++++++---------
+> >  net/netlabel/netlabel_unlabeled.c       | 14 +++------
+> >  net/netlabel/netlabel_user.c            |  3 +-
+> >  security/apparmor/include/secid.h       |  5 ++-
+> >  security/apparmor/secid.c               | 26 +++++++--------
+> >  security/security.c                     | 34 +++++++++-----------
+> >  security/selinux/hooks.c                | 23 +++++++++++---
+> >  security/smack/smack_lsm.c              | 42 +++++++++++++++----------
+> >  17 files changed, 118 insertions(+), 121 deletions(-)
+> 
+> See my note on patch 1/5, merging into lsm/dev.
 
-Thank you!
-
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
 
