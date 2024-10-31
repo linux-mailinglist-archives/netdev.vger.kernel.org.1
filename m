@@ -1,273 +1,217 @@
-Return-Path: <netdev+bounces-140606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1237E9B7295
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:42:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76ADC9B72B4
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 04:06:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 982682848BA
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:42:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E39981F24CA5
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:06:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28EA712C465;
-	Thu, 31 Oct 2024 02:42:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71B0384E11;
+	Thu, 31 Oct 2024 03:06:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kNuUYz1g"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ewt8W3Zt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CEC2432C8B;
-	Thu, 31 Oct 2024 02:42:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343951BD9EA;
+	Thu, 31 Oct 2024 03:06:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730342545; cv=none; b=OzN/qHPhl+0ENnhjsHA/RnVMlyXA+wq3gfYKy3+hYpVVDJkFg8WUBqx5M/5f8510/o2vcLh0MN72UYlFreJvq3eu4uzU6LleHnf56Aht/fYwoH7LgY0JSsqiIUO11zGWOrp4esENAT+JkBuVfADWLhSUaqORJHzrNR/j1dNs5BA=
+	t=1730344005; cv=none; b=SYmQBi8seQj75lEQxLwoJ337oA7zzCNFfjxCdQ1QJEu5+v/kQ3y4ssTLOY0sQa49b+tiX3Skgl1kwQJfIHzqQ68aIL8zwAgR9ja037iQjR6gsB3QWo65hOkbRZd66/AxeugkRkkTZKV8QwrHFJjKJG9hjp8xq8IbBPi183vSbFo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730342545; c=relaxed/simple;
-	bh=5cj0vXpsRZDbVNFvN+abraMS+1dbKP+gquDCbJr+joM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=p2weGsrFYhiK+85HCxiRdVJWOIePpjz3Dc1kRoe4mT37D7Qb6EECs5g+8Z1AfeiC2b5BUUMno+2+0u3g5YAW5yHDzqpkNZK6ftmOasEPtg7x6V4+GbYIZpbei8LZ5H70hU+Lgs5vodzcU9+APypkf9HaR2Y6WHt4ShSBulau3qA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kNuUYz1g; arc=none smtp.client-ip=209.85.166.169
+	s=arc-20240116; t=1730344005; c=relaxed/simple;
+	bh=0+87QNyXrcq66+VpqxO5RqGtaTNR33vzlhv46UBphfE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jZcaVM+FutdRCAaiNexJhrJIN9St6WiSOBHsz9kHdwj11l9YANLkcpOYB76J3CE1MmWIeKiwszYePdd3xww0SE4wTLb6uI6UcJ0pMzAAeXRnouD4Xq0Esti5q4FEY9L3yLH0AU4IvHnceUeMzjcIU4vrrRNzPo3VEvOs93nY6yk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ewt8W3Zt; arc=none smtp.client-ip=209.85.210.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3a3f8543f5eso4560015ab.0;
-        Wed, 30 Oct 2024 19:42:22 -0700 (PDT)
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-71e8235f0b6so382477b3a.3;
+        Wed, 30 Oct 2024 20:06:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730342542; x=1730947342; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oUhLa0WlRk4ZQqGc0jp8jnQ/5kR2w1KXzasvguaPdjs=;
-        b=kNuUYz1gxSpu94x5YFZlXW1o+nELgQRS4N7/RNDCC3M7jwKATQ0er7Q/WgecpKNp1a
-         yQr4+W9lXuXUDCeiSOxQykozAByzRLn8xUsXHaD1QUokO1kQk3E/B8Qc7FAf4+2NrHWr
-         gpjV0WYPWWlMtJ3mqxx2mlWKBTOxI8dHDnHjzdpohgZOaA/7vC473n/fPmS/LkMoCMas
-         vdsoq1RvFchz6nQMAvuedkJFz51GVWKwKCiETUyh6DmiZ4jnUgkFn0eYbVyZC9F73Msz
-         aqia9JgnTChF3VkHpspkCEbY7MEaCx4kWMNtfawhDtKZ3PVX82C7B2arqNyRaTGWjJye
-         2uBA==
+        d=gmail.com; s=20230601; t=1730344002; x=1730948802; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sallBo0D525QcqP1/P+ZmxEdEXJWaysONmrq+mBGLLU=;
+        b=ewt8W3ZtO4l0g59NC/7GkXFgGIL1N7StqqNuD/LEUsZxOvsf/RRm4Zg2CW36T6pW2R
+         EPtIbRDrhZiVN6XA/olFIHLJWy0pdA5Y3kQOY/A80QZZSMrp4hPwrk9gjrWz8GUGr8RG
+         Cv5wOodqyN5/pE63htjXgZ+EKT2lq3vM0v/xCID3yY1lfx2/kO1I8Y7+digCLbBOAx1d
+         EONWWTlXERQdIlI5ooepftYEA+TnE/7RYXzihaseeEZlOEejxs9pLiBf+VaUAc5zMcnX
+         RBQUZ3p7Wf/Zshjssu543LNNIpHl/Pm+PXaiJoQe72A9OjDCIwNBtiDobxuI/wiZBbtf
+         HPvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730342542; x=1730947342;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=oUhLa0WlRk4ZQqGc0jp8jnQ/5kR2w1KXzasvguaPdjs=;
-        b=dfPO2Yo078afxAsaMtUuvVTBc+XUh1o0Itv9gYfFpjUNftlSeCiEd+IBCyzD0XHoj+
-         ejzK05kxtoqNQqYhJTULcixw8dGSn9TMeIQlcDxNFAN5C6kMWwyrQIYCiihtUkzQ9eWq
-         dESnNsNQLkXyRQ9S+dhEUKNLUUE2Afm+KzUIY3h/nbvR1lc4vPG4QVLP6GC6VfHeetlm
-         4+8ZeaP7eeONkxlYlXEkQGmeKddO5PvVXktzrS+UNWoSsT0gPXFgzCzyBkrQhXg21Tde
-         FGbynf+6dwhlf8tHa4+3DOXvk1klnTq93gveLAYvvjYMjs9Ww+eVPjjZ7YM6BkBIPR6i
-         RleA==
-X-Forwarded-Encrypted: i=1; AJvYcCVXZeR6dDvKFrtjqxmMH1esxtt6iTvUvLHqjECJavzD/V1u5Rn5lcLKarU1143YHFl1F2M=@vger.kernel.org, AJvYcCXeN6wlUisxwEChDYSSHGXIh/pYmRl9Tl35g1uqAvbi70zT5zTFsuquxeo9FRag7IqV5Y3Jn0/x@vger.kernel.org
-X-Gm-Message-State: AOJu0YzFq1LrXSFG18u6jpfXXXRLlZB1CF9pxyvqp2ULYkdBW23sGe05
-	tAEJRd2WcEX1KCA7DYhcJbgV1mR6MJAOjfBGBJa0dK8f2QZz08P0SQYO4DGntk0/gii/xt1RbSV
-	9yySIXcHhXkLdwv2ccDSdMmaUb5k=
-X-Google-Smtp-Source: AGHT+IFEaJiOXvau+SPSuXswXQQhn7Wy4IINTxvObunO6KPWDHK44rjfVGSAD8ct9IOBKsAbz2FDTk/LGhS/AxWq078=
-X-Received: by 2002:a05:6e02:3886:b0:3a3:a639:a594 with SMTP id
- e9e14a558f8ab-3a6a94a162dmr6164855ab.4.1730342541663; Wed, 30 Oct 2024
- 19:42:21 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730344002; x=1730948802;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sallBo0D525QcqP1/P+ZmxEdEXJWaysONmrq+mBGLLU=;
+        b=Tl2OeFSMRFcAS4xN1YxhKAZ9lvG0t653uuMtEHAa5908YkOi/YwxwtpqUz4DVt22Kc
+         0jgwHW5VPlzm4l7YZfWa4yl3RICrCEngfNnieqfU8Ayw8GgWXbTVBNO7kblr/B1yBWXO
+         FMPcB1SDyIzzpxRTMP1oUUX3FSROrw12jf30W4v4Bw8XnBvgzAl50woVMJtc/v83XZjN
+         bAkIz7TeHWwJAWvxJdycyQ41VdhuuDnR0XYnLu+OO8rzhg7tLsfhaPO5CpRpE6cJfwXz
+         iHl1ERBauhpH7bBRGKJWuNrlkgQuwJnXrhSRyL8fz8igt258selUZcd0S7IgMHcLBiSU
+         +XdQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXeghqWyjfDiW2cfsO4KJ1aGelKwj2pJU5Pxfk2CMmuGSSEX8xHHUyuDYWsWY4MrT2/fHSWyolwfmBfYJs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxXfLnB0E+wqjvszTCsMt8SiwrylMIjW2z2be+/yhaBTLJP0zzc
+	5KU27K79PD4InbTd33qzIAWTnZyqMvtG3kumnxaT/oZGEfHNo9nl
+X-Google-Smtp-Source: AGHT+IHAZCV8L/qW1aocav+j2pJ9KrlW7U/wjfcBMI690bSifTI5pCqIPcCZTJXA1TLu6F/0beGwTA==
+X-Received: by 2002:a05:6a20:d487:b0:1d9:2705:699e with SMTP id adf61e73a8af0-1db91d43efemr2039869637.7.1730344002313;
+        Wed, 30 Oct 2024 20:06:42 -0700 (PDT)
+Received: from fedora ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc2c47fcsm359755b3a.126.2024.10.30.20.06.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 20:06:41 -0700 (PDT)
+Date: Thu, 31 Oct 2024 03:06:34 +0000
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: Jay Vosburgh <jv@jvosburgh.net>
+Cc: netdev@vger.kernel.org, Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCHv2 net] bonding: add ns target multicast address to slave
+ device
+Message-ID: <ZyL0OgXVAEUxthbq@fedora>
+References: <20241023123215.5875-1-liuhangbin@gmail.com>
+ <213367.1730305265@vermin>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-11-kerneljasonxing@gmail.com> <8fd16b77-b8e8-492c-ab69-8192cafa9fc7@linux.dev>
- <CAL+tcoBNiZQr=yk_fb9eoKX1_Nr4LuDaa1kkLGbdnc=8JNKnNg@mail.gmail.com> <e56f78a9-cbda-4b80-8b55-c16b36e4efb1@linux.dev>
-In-Reply-To: <e56f78a9-cbda-4b80-8b55-c16b36e4efb1@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 31 Oct 2024 10:41:45 +0800
-Message-ID: <CAL+tcoDi86GkJRd8fShGNH8CgdFu3kbfMubWxCLVdo+3O-wnfg@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
- tskey offset
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
-	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <213367.1730305265@vermin>
 
-On Thu, Oct 31, 2024 at 9:17=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 10/29/24 11:50 PM, Jason Xing wrote:
-> > On Wed, Oct 30, 2024 at 1:42=E2=80=AFPM Martin KaFai Lau <martin.lau@li=
-nux.dev> wrote:
-> >>
-> >> On 10/28/24 4:05 AM, Jason Xing wrote:
-> >>> +/* Used to track the tskey for bpf extension
-> >>> + *
-> >>> + * @sk_tskey: bpf extension can use it only when no application uses=
-.
-> >>> + *            Application can use it directly regardless of bpf exte=
-nsion.
-> >>> + *
-> >>> + * There are three strategies:
-> >>> + * 1) If we've already set through setsockopt() and here we're going=
- to set
-> >>> + *    OPT_ID for bpf use, we will not re-initialize the @sk_tskey an=
-d will
-> >>> + *    keep the record of delta between the current "key" and previou=
-s key.
-> >>> + * 2) If we've already set through bpf_setsockopt() and here we're g=
-oing to
-> >>> + *    set for application use, we will record the delta first and th=
-en
-> >>> + *    override/initialize the @sk_tskey.
-> >>> + * 3) other cases, which means only either of them takes effect, so =
-initialize
-> >>> + *    everything simplely.
-> >>> + */
-> >>> +static long int sock_calculate_tskey_offset(struct sock *sk, int val=
-, int bpf_type)
-> >>> +{
-> >>> +     u32 tskey;
-> >>> +
-> >>> +     if (sk_is_tcp(sk)) {
-> >>> +             if ((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LISTEN))
-> >>> +                     return -EINVAL;
-> >>> +
-> >>> +             if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
-> >>> +                     tskey =3D tcp_sk(sk)->write_seq;
-> >>> +             else
-> >>> +                     tskey =3D tcp_sk(sk)->snd_una;
-> >>> +     } else {
-> >>> +             tskey =3D 0;
-> >>> +     }
-> >>> +
-> >>> +     if (bpf_type && (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID)) {
-> >>> +             sk->sk_tskey_bpf_offset =3D tskey - atomic_read(&sk->sk=
-_tskey);
-> >>> +             return 0;
-> >>> +     } else if (!bpf_type && (sk->sk_tsflags_bpf & SOF_TIMESTAMPING_=
-OPT_ID)) {
-> >>> +             sk->sk_tskey_bpf_offset =3D atomic_read(&sk->sk_tskey) =
-- tskey;
-> >>> +     } else {
-> >>> +             sk->sk_tskey_bpf_offset =3D 0;
-> >>> +     }
-> >>> +
-> >>> +     return tskey;
-> >>> +}
-> >>
-> >> Before diving into this route, the bpf prog can peek into the tcp seq =
-no in the
-> >> skb. It can also look at the sk->sk_tskey for UDP socket. Can you expl=
-ain why
-> >> those are not enough information for the bpf prog?
+Hi Jay,
+On Wed, Oct 30, 2024 at 05:21:05PM +0100, Jay Vosburgh wrote:
+> 	I suspect the set of multicast addresses involved is likely to
+> be small in the usual case, so the question then is whether the
+> presumably small amount of traffic that inadvertently passes the filter
+> (and is then thrown away by the kernel RX logic) is worth the complexity
+> added here.
+
+Yes, while the code and logic may be complex, the "small amount of
+traffic", specifically, the IPv6 NS messages, plays a crucial role in
+determining whether backup slaves are up or not. Without these messages,
+it would be akin to dropping ARP traffic for IPv4, which could lead to
+connectivity issues.
+
+> 
+> 	That said, I have a few questions below.
+> 
+> >    arp_validate doesn't support 3ad, tlb, alb. So let's only do it on ab mode.
+> >---
+> > drivers/net/bonding/bond_main.c    | 18 +++++-
+> > drivers/net/bonding/bond_options.c | 95 +++++++++++++++++++++++++++++-
+> > include/net/bond_options.h         |  1 +
+> > 3 files changed, 112 insertions(+), 2 deletions(-)
 > >
-> > Well, it does make sense. It seems we don't need to implement tskey
-> > for this bpf feature...
-> >
-> > Due to lack of enough knowledge of bpf, could you provide more hints
-> > that I can follow to write a bpf program to print more information
-> > from the skb? Like in the last patch of this series, in
-> > tools/testing/selftests/bpf/prog_tests/so_timestamping.c, do we have a
-> > feasible way to do that?
->
-> The bpf-prog@sendmsg() will be run to capture a timestamp for sendmsg().
-> When running the bpf-prog@sendmsg(), the skb can be set to the "struct
-> bpf_sock_ops_kern sock_ops;" which is passed to the sockops prog. Take a =
-look at
-> bpf_skops_write_hdr_opt().
+> >diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
+> >index b1bffd8e9a95..d7c1016619f9 100644
+> >--- a/drivers/net/bonding/bond_main.c
+> >+++ b/drivers/net/bonding/bond_main.c
+> >@@ -1008,6 +1008,9 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
+> > 
+> > 		if (bond->dev->flags & IFF_UP)
+> > 			bond_hw_addr_flush(bond->dev, old_active->dev);
+> >+
+> >+		/* add target NS maddrs for backup slave */
+> >+		slave_set_ns_maddrs(bond, old_active, true);
+> > 	}
+> > 
+> > 	if (new_active) {
+> >@@ -1024,6 +1027,9 @@ static void bond_hw_addr_swap(struct bonding *bond, struct slave *new_active,
+> > 			dev_mc_sync(new_active->dev, bond->dev);
+> > 			netif_addr_unlock_bh(bond->dev);
+> > 		}
+> >+
+> >+		/* clear target NS maddrs for active slave */
+> >+		slave_set_ns_maddrs(bond, new_active, false);
+> > 	}
+> > }
+> > 
+> >@@ -2341,6 +2347,12 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+> > 	bond_compute_features(bond);
+> > 	bond_set_carrier(bond);
+> > 
+> >+	/* set target NS maddrs for new slave, need to be called before
+> >+	 * bond_select_active_slave(), which will remove the maddr if
+> >+	 * the slave is selected as active slave
+> >+	 */
+> >+	slave_set_ns_maddrs(bond, new_slave, true);
+> >+
+> > 	if (bond_uses_primary(bond)) {
+> > 		block_netpoll_tx();
+> > 		bond_select_active_slave(bond);
+> >@@ -2350,7 +2362,6 @@ int bond_enslave(struct net_device *bond_dev, struct net_device *slave_dev,
+> > 	if (bond_mode_can_use_xmit_hash(bond))
+> > 		bond_update_slave_arr(bond, NULL);
+> > 
+> >-
+> > 	if (!slave_dev->netdev_ops->ndo_bpf ||
+> > 	    !slave_dev->netdev_ops->ndo_xdp_xmit) {
+> > 		if (bond->xdp_prog) {
+> >@@ -2548,6 +2559,11 @@ static int __bond_release_one(struct net_device *bond_dev,
+> > 	if (oldcurrent == slave)
+> > 		bond_change_active_slave(bond, NULL);
+> > 
+> >+	/* clear target NS maddrs, must after bond_change_active_slave()
+> >+	 * as we need to clear the maddrs on backup slave
+> >+	 */
+> >+	slave_set_ns_maddrs(bond, slave, false);
+> >+
+> > 	if (bond_is_lb(bond)) {
+> > 		/* Must be called only after the slave has been
+> > 		 * detached from the list and the curr_active_slave
+> >diff --git a/drivers/net/bonding/bond_options.c b/drivers/net/bonding/bond_options.c
+> >index 95d59a18c022..2554ba70f092 100644
+> >--- a/drivers/net/bonding/bond_options.c
+> >+++ b/drivers/net/bonding/bond_options.c
+> >@@ -1234,6 +1234,75 @@ static int bond_option_arp_ip_targets_set(struct bonding *bond,
+> > }
+> > 
+> > #if IS_ENABLED(CONFIG_IPV6)
+> >+/* convert IPv6 address to link-local solicited-node multicast mac address */
+> >+static void ipv6_addr_to_solicited_mac(const struct in6_addr *addr,
+> >+				       unsigned char mac[ETH_ALEN])
+> >+{
+> >+	mac[0] = 0x33;
+> >+	mac[1] = 0x33;
+> >+	mac[2] = 0xFF;
+> >+	mac[3] = addr->s6_addr[13];
+> >+	mac[4] = addr->s6_addr[14];
+> >+	mac[5] = addr->s6_addr[15];
+> >+}
+> 
+> 	Can we make use of ndisc_mc_map() / ipv6_eth_mc_map() to perform
+> this step, instead of creating a new function that's almost the same?
 
-Thanks. I see the skb field in struct bpf_sock_ops_kern.
+Ah, yes, I think so. Thanks for this tips.
 
->
-> bpf prog cannot directly access the skops->skb now. It is because the soc=
-kops
-> prog sees the uapi "struct bpf_sock_ops" instead of "struct
-> bpf_sock_ops(_kern)". The conversion is done in sock_ops_convert_ctx_acce=
-ss. It
-> is an old way before BTF. I don't want to extend the uapi "struct bpf_soc=
-k_ops".
 
-Oh, so it seems we cannot use this way, right?
+> >+void slave_set_ns_maddrs(struct bonding *bond, struct slave *slave, bool add)
+> >+{
+> >+	if (!bond->params.arp_validate)
+> >+		return;
+> >+
+> >+	_slave_set_ns_maddrs(bond, slave, add);
+> >+}
+> 
+> 	Why does this need a wrapper function vs. having the
+> arp_validate test be first in the larger function?
 
-I also noticed a use case that allow users to get the information from one =
-skb:
-"int BPF_PROG(trace_netif_receive_skb, struct sk_buff *skb)" in
-tools/testing/selftests/bpf/progs/netif_receive_skb.c
-But it requires us to add the tracepoint in __skb_tstamp_tx() first.
-Two months ago, I was planning to use a tracepoint for some people who
-find it difficult to deploy bpf.
+We have 4 places call slave_set_ns_maddrs(). I think with this wrapper could
+save some codes. I'm fine to remove this wrapper if you think the code
+would be simpler.
 
->
-> Instead, use bpf_cast_to_kern_ctx((struct bpf_sock_ops *)skops_ctx) to ge=
-t a
-> trusted "struct bpf_sock_ops(_kern) *skops" pointer. Then it can access t=
-he
-> skops->skb.
-
-Let me spend some time on it. Thanks.
-
-> afaik, the tcb->seq should be available already during sendmsg. it
-> should be able to get it from TCP_SKB_CB(skb)->seq with the bpf_core_cast=
-. Take
-> a look at the existing examples of bpf_core_cast.
->
-> The same goes for the skb->data. It can use the bpf_dynptr_from_skb(). It=
- is not
-> available to skops program now but should be easy to expose.
-
-I wonder what the use of skb->data is here.
-
->
-> The bpf prog wants to calculate the delay between [sendmsg, SCHED], [SCHE=
-D,
-> SND], [SND, ACK]. It is why (at least in my mental model) a key is needed=
- to
-> co-relate the sendmsg, SCHED, SND, and ACK timestamp. The tcp seqno could=
- be
-> served as that key.
->
-> All that said, while looking at tcp_tx_timestamp() again, there is always
-> "shinfo->tskey =3D TCP_SKB_CB(skb)->seq + skb->len - 1;". shinfo->tskey c=
-an be
-> used directly as-is by the bpf prog. I think now I am missing why the bpf=
- prog
-> needs the sk_tskey in the sk?
-
-As you said, tcp seqno could be treated as the key, but it leaks the
-information in TCP layer to users. Please see the commit:
-commit 4ed2d765dfaccff5ebdac68e2064b59125033a3b
-Author: Willem de Bruijn <willemb@google.com>
-Date:   Mon Aug 4 22:11:49 2014 -0400
-
-    net-timestamp: TCP timestamping
-...
-    - To avoid leaking the absolute seqno to userspace, the offset
-    returned in ee_data must always be relative. It is an offset between
-    an skb and sk field.
-
-It has to be computed in the kernel before reporting to the user space, I t=
-hink.
-
->
-> In the bpf prog, when the SCHED/SND/ACK timestamp comes back, it has to f=
-ind the
-> earlier sendmsg timestamp. One option is to store the earlier sendmsg tim=
-estamp
-> at the bpf map key-ed by seqno or the shinfo's tskey. Storing in a bpf ma=
-p
-> key-ed by seqno/tskey is probably what the selftest should do. In the fut=
-ure, we
-> can consider allowing the rbtree in the bpf sk local storage for searchin=
-g
-> seqno. There is shinfo's hwtstamp that can be used also if there is a nee=
-d.
-
-Thanks for the information! Let me investigate how the bpf map works...
-
-I wonder that for the selftests could it be much simpler if we just
-record each timestamp stored in three variables and calculate them at
-last since we only send the small packet once instead of using bpf
-map. I mean, bpf map is really good as far as I know, but I'm a bit
-worried that implementing such a function could cause more extra work
-(implementation and review).
+Thanks
+Hangbin
 
