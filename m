@@ -1,282 +1,184 @@
-Return-Path: <netdev+bounces-140661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8BE6E9B7775
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:28:46 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14C989B778A
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:31:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0F1FA1F232B0
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 09:28:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3862A1C20915
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 09:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 517351946C8;
-	Thu, 31 Oct 2024 09:28:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PMTYDI5x"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A688191F65;
+	Thu, 31 Oct 2024 09:31:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEE11494A3
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 09:28:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A7B1940BC;
+	Thu, 31 Oct 2024 09:31:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730366920; cv=none; b=iVa80JXbItlQ6jnoqOXXZDOxVOwZdiORcUQEkHbbbXcjHfpSRrB6JIQtsWcWIVO9Bq9P4khVqU1U+or8kn2ih4JPucNudzwFzewx1ByLJ0hARU1036L6/acO2yMSj3cybADFxRSHwEi8dw1clCSbqDW4lFqjnPWoZ63xwaoUiNk=
+	t=1730367070; cv=none; b=Q5oMo9Q+Tt6BrC1+6sXJUaD9swyFlEo+HR3r2As4dZYihup5m5vcEC2qexvQiPJz8iEWmjmRKWlv2X1TsjIjm/7AqAhhg689DOfSBzw8vficZZGXS6nOA5BXDmK/onxVzo8Y58kKn8jtOFZK1ZUOg59p36gejD5Niz7sQ7i0SeU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730366920; c=relaxed/simple;
-	bh=d6wn1lKONgblnZ++1qSDC4UeXUH/h7Owd02AbOfZVIQ=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=GF6j7zdqUeAEzza0Jc3s4lURkpMPyLDTFmno6r46rcSTka1sg3OAyq8LKo9qFKiYjTNNJV5cZ3VAE71PkKwz9FRO5IaE84A9BewcxUdohUJ/wlT6TM55a3tcZZzb3yS2Cn0IJvw19OJW3sOLFmKNMCh/p/+W+AfbgcVimAAmIEI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PMTYDI5x; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730366916;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=d6wn1lKONgblnZ++1qSDC4UeXUH/h7Owd02AbOfZVIQ=;
-	b=PMTYDI5xnq2rQwhZrbbqh+pRwquKk1UzecGbSqQpeIlyuZR41EL6vlO5DLO4H1vdadCfGS
-	05tNt0ddyNgly4ldDGSsgXX8mNPIwYwA5V3xAWVg7DhIbxvNsaSbusqOfNTpqCU8R5TRlT
-	NgyCSuMnUmQqzXj2ielOYOZS43tmUes=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-693-vBr3oacxOlu8ba1fwMi-Yw-1; Thu, 31 Oct 2024 05:28:35 -0400
-X-MC-Unique: vBr3oacxOlu8ba1fwMi-Yw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2fcda6c1906so4587351fa.1
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 02:28:35 -0700 (PDT)
+	s=arc-20240116; t=1730367070; c=relaxed/simple;
+	bh=TuMVZsz+UKv7UO7ZBvM6lqL/hr/CbH5V2Fs4zW30yFY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jO0tuX9DY2QChrbBQq37TwtYoGRw/AfEfSbgmu6sRcFjraW0wHD8ym2OGrOqyBvXwAAxFZwgGidNPP+9WlTkaSasq8q4rIJsNRIWWWrPxlprDdRPvgz+y3VbD8MWK6HsYC5LG/qsy1Ve5TwuJ/ybqe63G5OKabutyNIg83iPsqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.128.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=linux-m68k.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ea339a41f1so6062557b3.2;
+        Thu, 31 Oct 2024 02:31:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730366914; x=1730971714;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=d6wn1lKONgblnZ++1qSDC4UeXUH/h7Owd02AbOfZVIQ=;
-        b=KH3wrtidbBvj8AYQLNKoiRtUU74Rrb4cKjjqNHQh5TJWG84A8NQepK0AB2RTSDYxoF
-         NJmaaZzHOjgAQVQHB+mFK5/Mljz1x7wPokJ1qoEF2s/Mxq+cKMJprbko9JdAFbzz+dXE
-         wD766c4Jr7jbp5aXpVdt7Bc6yrIpVlJ2ChWJ11ep2IcaGBWWecEa8us8r1bx/RJAOGR+
-         9Rrl42Pej6vyGSVlhlPk7VChdsB22WVfpdQYUdTHJuBtSSLYdQfPZJiVFAfktWDlM2QO
-         n4vGVDlEFuYBXQ67ZBGMZjLEgl8QhuTL2jaxQzaGiol2Wu0hApNErAEOZUSFfsZ7sotB
-         y+ZA==
-X-Forwarded-Encrypted: i=1; AJvYcCVk9g+EttI632IBa+Zw+3nhx2Mghn6plq//4rEfL/46nxwdfe6N6zP/uHGMEZ8RgFjgc5nWwTc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YznODvXVBshKG9rhDtr15OB6xqG9FWwUvwWQJFYmB5GLrSOD8qe
-	fUGXo43l2A63Ym44Hh7XkXmMG+WAtntpJSCwgyqym6nFsRiKdxeK4RIblIX7Wqo3w8e3F45T5YY
-	7dflmy5BWPIl+lMzcoL0MrJFCOSMxMKWMeFSKhTwfBhWXoDTywNNbpA==
-X-Received: by 2002:a2e:b8cf:0:b0:2fb:58b1:3731 with SMTP id 38308e7fff4ca-2fd058fbda2mr43394591fa.6.1730366913672;
-        Thu, 31 Oct 2024 02:28:33 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IEinR4wm9boDAsEkZ9V3ivoUKK9VQmKYoIEQNVXO7Y2sjsmX4v4AmQcNIDCbC3ckt5R0LeFLA==
-X-Received: by 2002:a2e:b8cf:0:b0:2fb:58b1:3731 with SMTP id 38308e7fff4ca-2fd058fbda2mr43394381fa.6.1730366913125;
-        Thu, 31 Oct 2024 02:28:33 -0700 (PDT)
-Received: from dhcp-64-16.muc.redhat.com (nat-pool-muc-t.redhat.com. [149.14.88.26])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5e94cdsm18626575e9.28.2024.10.31.02.28.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2024 02:28:32 -0700 (PDT)
-Message-ID: <f13c91f2d1e7672e1d9983425117eeb6347c0ea1.camel@redhat.com>
-Subject: Re: [PATCH 00/13] Remove implicit devres from pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Takashi Iwai <tiwai@suse.de>, Bjorn Helgaas <helgaas@kernel.org>
-Cc: Damien Le Moal <dlemoal@kernel.org>, Niklas Cassel <cassel@kernel.org>, 
- Sergey Shtylyov <s.shtylyov@omp.ru>, Basavaraj Natikar
- <basavaraj.natikar@amd.com>, Jiri Kosina <jikos@kernel.org>,  Benjamin
- Tissoires <bentiss@kernel.org>, Arnd Bergmann <arnd@arndb.de>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Alex Dubov <oakad@yahoo.com>,
- Sudarsana Kalluru <skalluru@marvell.com>, Manish Chopra
- <manishc@marvell.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, Rasesh Mody <rmody@marvell.com>,
- GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko <imitsyanko@quantenna.com>,
- Sergey Matyukevich <geomatsi@gmail.com>, Kalle Valo <kvalo@kernel.org>,
- Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar S K
- <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Thomas Gleixner <tglx@linutronix.de>, Ilpo
- =?ISO-8859-1?Q?J=E4rvinen?= <ilpo.jarvinen@linux.intel.com>, Andy
- Shevchenko <andriy.shevchenko@linux.intel.com>, Mostafa Saleh
- <smostafa@google.com>, Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu
- <yi.l.liu@intel.com>,  Christian Brauner <brauner@kernel.org>, Ankit
- Agrawal <ankita@nvidia.com>, Eric Auger <eric.auger@redhat.com>, Reinette
- Chatre <reinette.chatre@intel.com>, Ye Bin <yebin10@huawei.com>, Marek
- =?ISO-8859-1?Q?Marczykowski-G=F3recki?= <marmarek@invisiblethingslab.com>,
- Pierre-Louis Bossart <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>,
- linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Thu, 31 Oct 2024 10:28:29 +0100
-In-Reply-To: <87plngwrws.wl-tiwai@suse.de>
-References: <20241015185124.64726-1-pstanner@redhat.com>
-	 <20241030221737.GA1223682@bhelgaas> <87plngwrws.wl-tiwai@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
+        d=1e100.net; s=20230601; t=1730367066; x=1730971866;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yxr4uhJhkKujIbCmn/2BlmBZDzUgZQRQwOInIgaY+OM=;
+        b=UrdXOwFqsyKCJ1a7+HXpYAOeJlNFbggdRwNeNcePpRYva7zzY5slCjMOXxwyEgjWAt
+         j6cqRpOJ5jsO6lfJnFHSYrwY1LCq67IJB+JUnre4/5R3E8cQA287zlwHAxmgFGopO/fN
+         QUJg1zcHnrCorkszYa9TNW3twa9gPYs+MJROeUrj5s+TV3GxObREbCqOZlc7OdYesKbl
+         5lybAUBfZbX+TWwG/SN+ivTIwIGAgEURqpND4vuV3jS/CE86Jbhgzkvyie0o6m9sU7u5
+         43K8C8Z+PrOa8XTqwydqSJdRvwq1GCoLVgW8qg2aPUApv8CHpOgbMxDdfy++x+181FDZ
+         b82w==
+X-Forwarded-Encrypted: i=1; AJvYcCViMt9mGXj2Pucw8ZInvjltR0qqHZBdUATp8k60KyiJb92vhfHHKbTiLx0Ai308xoTvVfggTV8KuG7J@vger.kernel.org, AJvYcCVu8zadOVVAZEWVKxDVl4wUjA2WtUCPQM+pV6DDNvYTfXt33l6xCzwxklQQTld+pabCkQunbmCl@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw18ogbV5SujY8wscHwwdVtFLLXUSqwEezEBYMYgjNdsdrlhpx6
+	eA2+MXaeJS/G6yIO97RBvzM79BCq0VpawglHIVusIrcN0M1urIsLteAOIQFJ
+X-Google-Smtp-Source: AGHT+IEWvt7dWOsqzeJ34w3BsxdbNRkVAhZRN+JhfqZf1d7VjLGHieehFQvAQSstdgaffR3GU/IbYg==
+X-Received: by 2002:a05:690c:25c8:b0:6e5:e571:108b with SMTP id 00721157ae682-6ea523216f0mr28178407b3.8.1730367065580;
+        Thu, 31 Oct 2024 02:31:05 -0700 (PDT)
+Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com. [209.85.128.177])
+        by smtp.gmail.com with ESMTPSA id 00721157ae682-6ea55b24804sm1814887b3.51.2024.10.31.02.31.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 31 Oct 2024 02:31:05 -0700 (PDT)
+Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6ea15a72087so5649627b3.1;
+        Thu, 31 Oct 2024 02:31:05 -0700 (PDT)
+X-Forwarded-Encrypted: i=1; AJvYcCUmSMM7xNH2g5z2YxLSwf2Jk5H4UEtKezirYmN2PWxUWasZ7ujvg3RNDVDYS8+NHOih0O2xbP9fNNMp@vger.kernel.org, AJvYcCVMTuvxIKY99rI60qvsYdpvieVe9DHaMmpJtZbb92U3v+djoPj/DQtubdezjn6H17uCG3K+VaSa@vger.kernel.org
+X-Received: by 2002:a05:690c:6ac2:b0:6e7:d974:8cee with SMTP id
+ 00721157ae682-6ea52323519mr32131157b3.7.1730367064809; Thu, 31 Oct 2024
+ 02:31:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAMuHMdX-1bBphfFmEy708MeBePb2pF6rWj0xOjR4d9S-KVgA3A@mail.gmail.com>
+ <1f927944-30aa-4298-9bd0-d9d3ace3fc78@kernel.org> <CAMuHMdVN_xNLTvy9u6FvK=agSAUzSHxEuyBS37sOA7jpGLwddw@mail.gmail.com>
+ <cd120c6b-e469-46d9-95b5-71a8cc6513cf@kernel.org>
+In-Reply-To: <cd120c6b-e469-46d9-95b5-71a8cc6513cf@kernel.org>
+From: Geert Uytterhoeven <geert@linux-m68k.org>
+Date: Thu, 31 Oct 2024 10:30:52 +0100
+X-Gmail-Original-Message-ID: <CAMuHMdWfq4+gZcq6PzU=n0d2tTGEG3MV5c2tTQKLDysmj-g=kg@mail.gmail.com>
+Message-ID: <CAMuHMdWfq4+gZcq6PzU=n0d2tTGEG3MV5c2tTQKLDysmj-g=kg@mail.gmail.com>
+Subject: Re: BeagleBone Black Ethernet PHY issues
+To: Roger Quadros <rogerq@kernel.org>
+Cc: ext Tony Lindgren <tony@atomide.com>, Siddharth Vadapalli <s-vadapalli@ti.com>, 
+	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>, netdev <netdev@vger.kernel.org>, 
+	Matti Vaittinen <mazziesaccount@gmail.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 2024-10-31 at 10:19 +0100, Takashi Iwai wrote:
-> On Wed, 30 Oct 2024 23:17:37 +0100,
-> Bjorn Helgaas wrote:
-> >=20
-> > On Tue, Oct 15, 2024 at 08:51:10PM +0200, Philipp Stanner wrote:
-> > > @Driver-Maintainers: Your driver might be touched by patch
-> > > "Remove
-> > > devres from pci_intx()". You might want to take a look.
-> > >=20
-> > > Changes since the RFC [1]:
-> > > =C2=A0 - Add a patch deprecating pci{m}_intx(). (Heiner, Andy, Me)
-> > > =C2=A0 - Add Acked-by's already given.
-> > > =C2=A0 - Export pcim_intx() as a GPL function. (Alex)
-> > > =C2=A0 - Drop patch for rts5280, since this driver will be removed
-> > > quite
-> > > =C2=A0=C2=A0=C2=A0 soon. (Philipp Hortmann, Greg)
-> > > =C2=A0 - Use early-return in pci_intx_unmanaged() and pci_intx().
-> > > (Andy)
-> > >=20
-> > > Hi all,
-> > >=20
-> > > this series removes a problematic feature from pci_intx(). That
-> > > function
-> > > sometimes implicitly uses devres for automatic cleanup. We should
-> > > get
-> > > rid of this implicit behavior.
-> > >=20
-> > > To do so, a pci_intx() version that is always-managed, and one
-> > > that is
-> > > never-managed are provided. Then, all pci_intx() users are ported
-> > > to the
-> > > version they need. Afterwards, pci_intx() can be cleaned up and
-> > > the
-> > > users of the never-managed version be ported back to pci_intx().
-> > >=20
-> > > This way we'd get this PCI API consistent again.
-> > >=20
-> > > Patch "Remove devres from pci_intx()" obviously reverts the
-> > > previous
-> > > patches that made drivers use pci_intx_unmanaged(). But this way
-> > > it's
-> > > easier to review and approve. It also makes sure that each
-> > > checked out
-> > > commit should provide correct behavior, not just the entire
-> > > series as a
-> > > whole.
-> > >=20
-> > > Merge plan for this is to enter through the PCI tree.
-> > >=20
-> > > [1]
-> > > https://lore.kernel.org/all/20241009083519.10088-1-pstanner@redhat.co=
-m/
-> >=20
-> > I *think* this series depends on resolution of Takashi's "Restore
-> > the
-> > original INTX_DISABLE bit by pcim_intx()" patch [2], right?
->=20
-> IIUC, it's not really dependent, as pcim_intx() has been used in
-> pci_intx() internally when the PCI device is already managed.
-> My patch is to correct the already existing behavior.
+On Thu, Oct 31, 2024 at 10:06=E2=80=AFAM Roger Quadros <rogerq@kernel.org> =
+wrote:
+> On 30/10/2024 17:08, Geert Uytterhoeven wrote:
+> > On Wed, Oct 30, 2024 at 1:58=E2=80=AFPM Roger Quadros <rogerq@kernel.or=
+g> wrote:
+> >> On 29/10/2024 19:18, Geert Uytterhoeven wrote:
+> >>> During the last few months, booting kernels on BeagleBone Black
+> >>> sometimes fails with:
+> >>>
+> >>>     +SMSC LAN8710/LAN8720 4a101000.mdio:00: probe with driver SMSC
+> >>> LAN8710/LAN8720 failed with error -5
+> >
+> > [...]
+> >
+> >> Just wondering if the Reset is happening correctly and it has settled
+> >> before PHY access.
+> >>
+> >> From arch/arm/boot/dts/ti/omap/am335x-bone-common.dtsi
+> >>
+> >> &davinci_mdio_sw {
+> >>         pinctrl-names =3D "default", "sleep";
+> >>         pinctrl-0 =3D <&davinci_mdio_default>;
+> >>         pinctrl-1 =3D <&davinci_mdio_sleep>;
+> >>
+> >>         ethphy0: ethernet-phy@0 {
+> >>                 reg =3D <0>;
+> >>                 /* Support GPIO reset on revision C3 boards */
+> >>                 reset-gpios =3D <&gpio1 8 GPIO_ACTIVE_LOW>;
+> >>                 reset-assert-us =3D <300>;
+> >>                 reset-deassert-us =3D <13000>;
+> >>         };
+> >> };
+> >>
+> >> Do we need to increase reset-deassert-us for some reason?
+> >
+> > Thanks for the hint!
+> >
+> > This is indeed on Rev. C3 (my other boards are Rev. A5C or C, but
+> > I don't test boot recent kernels on them, as they are in active use).
+> >
+> > Multiplying reset-deassert-us by 10 gives me a booting board.
+> > More experiments reveal that I need a delay of 14 ms to boot
+> > successfully, and 15 ms to avoid the early __mdiobus_read()
+> > failure, too.
+> >
+> >> I couldn't find MII ready time after reset de-assert information form =
+the
+> >> PHY datasheet. except the following line [1].
+> >> "For the first 16us after coming out of reset, the MII/RMII interface =
+will run at 2.5 MHz. After this time, it will
+> >> switch to 25 MHz if auto-negotiation is enabled"
+> >>
+> >> [1] 3.8.5 RESETS
+> >> https://ww1.microchip.com/downloads/aemDocuments/documents/UNG/Product=
+Documents/DataSheets/LAN8710A-LAN8710Ai-Data-Sheet-DS00002164.pdf
+> >
+> > 3.8.5.1 Hardware Reset
+> > "A Hardware reset is asserted by driving the nRST input pin low. When
+> >  driven, nRST should be held low for the minimum time detailed in
+> >  Section 5.6.3, "Power-On nRST & Configuration Strap Timing," on page
+> >  60 to ensure a proper transceiver reset."
+> >
+> > 5.6.3 POWER-ON NRST & CONFIGURATION STRAP TIMING
+> > "For proper operation, nRST must be asserted for no less than trstia."
+> >
+> > TABLE 5-8: POWER-ON NRST & CONFIGURATION STRAP TIMING VALUES
+> > "trstia nRST input assertion time min. 100 =C2=B5S"
+> >
+> > On Rev. C3, ETH_RESETn is controlled by an open-drain AND gate.
+> > It is pulled high by a 10K resistor, and has a 4.7=C2=B5F capacitor to
+> > ground.  That gives an RC constant of 47ms.  As you need 0.7RC to charg=
+e
+> > the capacitor above the threshold voltage of a CMOS input (VDD/2),
+> > reset-deassert-us should be at least 33ms. Considering the typical
+> > tolerance of 20% on capacitors, 40ms would be safer. Or perhaps
+> > even 50ms?
+>
+> Super! Yes, I agree 50ms would be a good setting.
 
-IOW, pcim_intx() does not behave correctly, independently from removing
-the call to it in pci_intx().
+> > If you agree, I can send a patch.
+> > Thanks!
+>
+> Much appreciated, thanks!
 
-> =C2=A0 So I guess you
-> can take this series, and I'll post the revised patch later (sorry, I
-> was too busy for other tasks).
->=20
->=20
-> thanks,
->=20
-> Takashi
->=20
-> >=20
-> > For now I'm postponing this series, but let me know if that's not
-> > the
-> > right thing.
+https://lore.kernel.org/9002a58daa1b2983f39815b748ee9d2f8dcc4829.1730366936=
+.git.geert+renesas@glider.be
 
-There are still several reviews / acks missing from the respective
-driver maintainers, so there's no hurry with this series regarding your
-side ;)
+Gr{oetje,eeting}s,
 
-Regards
-P.
+                        Geert
 
+--=20
+Geert Uytterhoeven -- There's lots of Linux beyond ia32 -- geert@linux-m68k=
+.org
 
-> >=20
-> > [2] https://lore.kernel.org/r/20241024155539.19416-1-tiwai@suse.de
-> >=20
-> > > Philipp Stanner (13):
-> > > =C2=A0 PCI: Prepare removing devres from pci_intx()
-> > > =C2=A0 ALSA: hda_intel: Use always-managed version of pcim_intx()
-> > > =C2=A0 drivers/xen: Use never-managed version of pci_intx()
-> > > =C2=A0 net/ethernet: Use never-managed version of pci_intx()
-> > > =C2=A0 net/ntb: Use never-managed version of pci_intx()
-> > > =C2=A0 misc: Use never-managed version of pci_intx()
-> > > =C2=A0 vfio/pci: Use never-managed version of pci_intx()
-> > > =C2=A0 PCI: MSI: Use never-managed version of pci_intx()
-> > > =C2=A0 ata: Use always-managed version of pci_intx()
-> > > =C2=A0 wifi: qtnfmac: use always-managed version of pcim_intx()
-> > > =C2=A0 HID: amd_sfh: Use always-managed version of pcim_intx()
-> > > =C2=A0 Remove devres from pci_intx()
-> > > =C2=A0 PCI: Deprecate pci_intx(), pcim_intx()
-> > >=20
-> > > =C2=A0drivers/ata/ahci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/ata/ata_piix.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/ata/pata_rdc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/ata/sata_sil24.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/ata/sata_sis.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/ata/sata_uli.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/ata/sata_vsc.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A0drivers/hid/amd-sfh-hid/amd_sfh_pcie.c=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 |=C2=A0 4 +--
-> > > =C2=A0drivers/hid/amd-sfh-hid/sfh1_1/amd_sfh_init.c |=C2=A0 2 +-
-> > > =C2=A0.../wireless/quantenna/qtnfmac/pcie/pcie.c=C2=A0=C2=A0=C2=A0 |=
-=C2=A0 2 +-
-> > > =C2=A0drivers/pci/devres.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 29 +++++--------
-> > > ------
-> > > =C2=A0drivers/pci/pci.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 19 ++++--------
-> > > =C2=A0include/linux/pci.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 |=C2=A0 1 +
-> > > =C2=A0sound/pci/hda/hda_intel.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0 |=C2=A0 2 +-
-> > > =C2=A014 files changed, 26 insertions(+), 47 deletions(-)
-> > >=20
-> > > --=20
-> > > 2.47.0
-> > >=20
->=20
-
+In personal conversations with technical people, I call myself a hacker. Bu=
+t
+when I'm talking to journalists I just say "programmer" or something like t=
+hat.
+                                -- Linus Torvalds
 
