@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-140620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140621-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F5269B7440
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:00:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C98E89B7441
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 61B0D1C21C05
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:00:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4C281C21B3E
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:00:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3EA1142E76;
-	Thu, 31 Oct 2024 06:00:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE2171448DC;
+	Thu, 31 Oct 2024 06:00:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="BmeBjtUe"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HhzQMpTA"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E3A13E41A
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:00:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5980F13D8A3
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:00:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730354417; cv=none; b=uauJ5CZr3bdC56Ogi1jqpUDJPx9lbozD8czW5VIj34njZvSeKdJbCzX8OPDz5W9Ui/1O0+HdgYyp2Whi9M+me3kgqhJM/FeG/ZXWjK/PgUMh5+kAvbyPkDVD3MJo+4ESGDBvjpVGgJty7CadItT4mRLOSNkJeaT6c3U7WZCckxE=
+	t=1730354418; cv=none; b=JcwjcujsccXxwdGk/nh3jvCR+39uMzDFTFH4jLtqCApcQfCAAin5ejq8N0Vq8pRP5fzkTK1VLeYVyKfiqm5br56g/UNpx8nEOiL2HpFaGdJF/iwKyqgT4RuLAyqQDyu0uTOjcMMn4F0M9xA2o85efIJTkphHccMqWgzw06QrvRw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730354417; c=relaxed/simple;
-	bh=ah4ER9uuaDuiKqExVX2njPkUq8+DKNu+ToTM9QJUQk8=;
+	s=arc-20240116; t=1730354418; c=relaxed/simple;
+	bh=wAF3JYpaJMaVVvrRpeHUKgd/P9Xv1gBYJiwvPM/V6tg=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Fxtp4Tc8/YsD3b9O9oviGtDpKyYhAs49hg94InyoTZkUOM4+E3GvmDhGWACNpYY30m9tx4lWwcUj/697eeE23PT3m8756JuDhhWLM0tnc4ssJqB5f0rVLR0v/aawY40yTht85fZ9Y2C5p2pPxwOItxfjU3qUrnaLOUttuGeQZR8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=BmeBjtUe; arc=none smtp.client-ip=198.175.65.18
+	 MIME-Version; b=jZJHvE0YZ1T1MH8nB280N8Kgh555XL9HAQzavTqgDrHzqVeM4a/5IBsf1eyaEjTloGM6REFKd27jja4o7VW0T+Dv5eunoteayGQiSCYktG7YeGudoi3aqrEL2Xr2TsURSLbn0Sg3a/zQSKtk9cD6sB1TiGYVqCDjZnmio/UDEI8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HhzQMpTA; arc=none smtp.client-ip=198.175.65.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
@@ -36,35 +36,35 @@ DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   t=1730354416; x=1761890416;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=ah4ER9uuaDuiKqExVX2njPkUq8+DKNu+ToTM9QJUQk8=;
-  b=BmeBjtUetTnaK2SyAf1HLZkVhYnuTur/f3g2XYIeEMtzhB7YUVPq/PdI
-   DEh9mbQViwqL0RPBDqbnaIEyCwmaf043ZreuaKBGSiT8fmWAw86b/lAMM
-   3eVfyempVkZuS2XnFmPDypwVprJEPIkHgAKrxG93IH2InWlXbUpCROc89
-   wr6PfWNSUYUTcg9c1aP6MT5nOYdB1Xxyb7y2w9l2jCqBkKlKkxb3BA6tp
-   djcZQaxwxGstSmZky1GXDsUEFhom97VgAo6tPvbyUMBbecUSMY88XHQej
-   /CzPevJgkCCezGjchZsiBEFfJOy5VIuPtguSLDYFYm05vTtOSiumK40RM
-   A==;
-X-CSE-ConnectionGUID: 7IlXKBgTT2ST/87oWlAhnA==
-X-CSE-MsgGUID: 044kEkBDTT+0qyWH6g7sqw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30272915"
+  bh=wAF3JYpaJMaVVvrRpeHUKgd/P9Xv1gBYJiwvPM/V6tg=;
+  b=HhzQMpTA339PR8kcIWvWhxw5aIF5TgPmIyo4n4SXfFrj8ahVhLLekQlu
+   /EDkxkcqQrCOFiwd/Muhio+YMheAtPpgInZyNlp0m5jx1bU0RACC7g5Sg
+   Lrb0qQm846hQum5blO+YBUeDGAxmJSTTXXWnT9XMBwYZ3CIr/iYtwMAF7
+   N8gnuV+b/fOfoWpMSvJ+CtWMxIKYtnar9C0m2N/g9/gbow57rFlhGYf/b
+   H+u47jVyHSSGmh4WfQf8RvKyb2GGxvRHDsh3hYxyFn2oDywJTLAvRhH3C
+   TNGCWo2U3pMbzwP6mEY4J58ZTfdh5q7cgk9xUz9JvK0tUkmU94tcAHW0e
+   Q==;
+X-CSE-ConnectionGUID: 4fJiECLzQGSW5X5F0AYpjQ==
+X-CSE-MsgGUID: 8Hx3ymnvRA6CdCorgl5/7Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30272928"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30272915"
+   d="scan'208";a="30272928"
 Received: from fmviesa007.fm.intel.com ([10.60.135.147])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 23:00:14 -0700
-X-CSE-ConnectionGUID: 7wwz33LMQzS7GO/vxF3PRw==
-X-CSE-MsgGUID: HZDAcR/nS+SbesStu1tJag==
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Oct 2024 23:00:15 -0700
+X-CSE-ConnectionGUID: /Vn9IotMQ1+lOF6Qy5Xjcw==
+X-CSE-MsgGUID: F746RiXBQIOi6aLYDqi3dw==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
-   d="scan'208";a="82183636"
+   d="scan'208";a="82183642"
 Received: from gk3153-dr2-r750-36946.igk.intel.com ([10.102.20.192])
-  by fmviesa007.fm.intel.com with ESMTP; 30 Oct 2024 23:00:12 -0700
+  by fmviesa007.fm.intel.com with ESMTP; 30 Oct 2024 23:00:14 -0700
 From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	sridhar.samudrala@intel.com
-Subject: [iwl-next v1 2/3] ice: ethtool support for SF
-Date: Thu, 31 Oct 2024 07:00:08 +0100
-Message-ID: <20241031060009.38979-3-michal.swiatkowski@linux.intel.com>
+Subject: [iwl-next v1 3/3] ice: allow changing SF VSI queues number
+Date: Thu, 31 Oct 2024 07:00:09 +0100
+Message-ID: <20241031060009.38979-4-michal.swiatkowski@linux.intel.com>
 X-Mailer: git-send-email 2.42.0
 In-Reply-To: <20241031060009.38979-1-michal.swiatkowski@linux.intel.com>
 References: <20241031060009.38979-1-michal.swiatkowski@linux.intel.com>
@@ -76,85 +76,182 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Initial support for subfunction device. Mostly it is sharing the same
-ethtool ops as the PF, however, define new ops structure to support
-only needed part of ethtool ops.
+Move setting number of Rx and Tx queues to the separate functions and
+use it in SF case.
 
-Define new function for getting stats length as subfunction VSI have
-less stats available than PF one.
+Adjust getting max Rx and Tx queues for SF usecase.
 
 Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 28 ++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_sf_eth.c  |  1 +
- 2 files changed, 29 insertions(+)
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 37 +++++++-----
+ drivers/net/ethernet/intel/ice/ice_lib.c     | 63 ++++++++++++--------
+ 2 files changed, 60 insertions(+), 40 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index b552439fc1f9..9e2f20ed55d5 100644
+index 9e2f20ed55d5..c68f7796b83e 100644
 --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
 +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -47,6 +47,7 @@ static int ice_q_stats_len(struct net_device *netdev)
- 		 / sizeof(u64))
- #define ICE_ALL_STATS_LEN(n)	(ICE_PF_STATS_LEN + ICE_PFC_STATS_LEN + \
- 				 ICE_VSI_STATS_LEN + ice_q_stats_len(n))
-+#define ICE_SF_STATS_LEN(n)	(ICE_VSI_STATS_LEN + ice_q_stats_len(n))
+@@ -3786,22 +3786,31 @@ ice_get_ts_info(struct net_device *dev, struct kernel_ethtool_ts_info *info)
  
- static const struct ice_stats ice_gstrings_vsi_stats[] = {
- 	ICE_VSI_STAT("rx_unicast", eth_stats.rx_unicast),
-@@ -4431,6 +4432,16 @@ static int ice_repr_get_sset_count(struct net_device *netdev, int sset)
+ /**
+  * ice_get_max_txq - return the maximum number of Tx queues for in a PF
+- * @pf: PF structure
++ * @vsi: VSI structure
+  */
+-static int ice_get_max_txq(struct ice_pf *pf)
++static int ice_get_max_txq(struct ice_vsi *vsi)
+ {
+-	return min3(pf->num_lan_msix, (u16)num_online_cpus(),
+-		    (u16)pf->hw.func_caps.common_cap.num_txq);
++	u16 num_queues = vsi->back->num_lan_msix;
++
++	if (vsi->max_io_eqs)
++		num_queues = vsi->max_io_eqs;
++	return min3(num_queues, (u16)num_online_cpus(),
++		    (u16)vsi->back->hw.func_caps.common_cap.num_txq);
+ }
+ 
+ /**
+  * ice_get_max_rxq - return the maximum number of Rx queues for in a PF
+- * @pf: PF structure
++ * @vsi: VSI structure
+  */
+-static int ice_get_max_rxq(struct ice_pf *pf)
++static int ice_get_max_rxq(struct ice_vsi *vsi)
+ {
+-	return min3(pf->num_lan_msix, (u16)num_online_cpus(),
+-		    (u16)pf->hw.func_caps.common_cap.num_rxq);
++	u16 num_queues = vsi->back->num_lan_msix;
++
++	if (vsi->max_io_eqs)
++		num_queues = vsi->max_io_eqs;
++
++	return min3(num_queues, (u16)num_online_cpus(),
++		    (u16)vsi->back->hw.func_caps.common_cap.num_rxq);
+ }
+ 
+ /**
+@@ -3839,8 +3848,8 @@ ice_get_channels(struct net_device *dev, struct ethtool_channels *ch)
+ 	struct ice_pf *pf = vsi->back;
+ 
+ 	/* report maximum channels */
+-	ch->max_rx = ice_get_max_rxq(pf);
+-	ch->max_tx = ice_get_max_txq(pf);
++	ch->max_rx = ice_get_max_rxq(vsi);
++	ch->max_tx = ice_get_max_txq(vsi);
+ 	ch->max_combined = min_t(int, ch->max_rx, ch->max_tx);
+ 
+ 	/* report current channels */
+@@ -3958,14 +3967,14 @@ static int ice_set_channels(struct net_device *dev, struct ethtool_channels *ch)
+ 			   vsi->tc_cfg.numtc);
+ 		return -EINVAL;
+ 	}
+-	if (new_rx > ice_get_max_rxq(pf)) {
++	if (new_rx > ice_get_max_rxq(vsi)) {
+ 		netdev_err(dev, "Maximum allowed Rx channels is %d\n",
+-			   ice_get_max_rxq(pf));
++			   ice_get_max_rxq(vsi));
+ 		return -EINVAL;
+ 	}
+-	if (new_tx > ice_get_max_txq(pf)) {
++	if (new_tx > ice_get_max_txq(vsi)) {
+ 		netdev_err(dev, "Maximum allowed Tx channels is %d\n",
+-			   ice_get_max_txq(pf));
++			   ice_get_max_txq(vsi));
+ 		return -EINVAL;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+index 01220e21cc81..64a6152eaaef 100644
+--- a/drivers/net/ethernet/intel/ice/ice_lib.c
++++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+@@ -157,6 +157,32 @@ static void ice_vsi_set_num_desc(struct ice_vsi *vsi)
  	}
  }
  
-+static int ice_sf_get_sset_count(struct net_device *netdev, int sset)
++static void ice_vsi_set_num_txqs(struct ice_vsi *vsi, u16 def_qs)
 +{
-+	switch (sset) {
-+	case ETH_SS_STATS:
-+		return ICE_SF_STATS_LEN(netdev);
-+	default:
-+		return -EOPNOTSUPP;
++	if (vsi->req_txq) {
++		vsi->alloc_txq = vsi->req_txq;
++		vsi->num_txq = vsi->req_txq;
++	} else {
++		vsi->alloc_txq = min_t(u16, def_qs, (u16)num_online_cpus());
 +	}
 +}
 +
- #define ICE_I2C_EEPROM_DEV_ADDR		0xA0
- #define ICE_I2C_EEPROM_DEV_ADDR2	0xA2
- #define ICE_MODULE_TYPE_SFP		0x03
-@@ -4870,6 +4881,23 @@ void ice_set_ethtool_repr_ops(struct net_device *netdev)
- 	netdev->ethtool_ops = &ice_ethtool_repr_ops;
- }
- 
-+static const struct ethtool_ops ice_ethtool_sf_ops = {
-+	.get_drvinfo		= ice_get_drvinfo,
-+	.get_link		= ethtool_op_get_link,
-+	.get_channels		= ice_get_channels,
-+	.set_channels		= ice_set_channels,
-+	.get_ringparam		= ice_get_ringparam,
-+	.set_ringparam		= ice_set_ringparam,
-+	.get_strings		= ice_get_strings,
-+	.get_ethtool_stats	= ice_get_ethtool_stats,
-+	.get_sset_count		= ice_sf_get_sset_count,
-+};
-+
-+void ice_set_ethtool_sf_ops(struct net_device *netdev)
++static void ice_vsi_set_num_rxqs(struct ice_vsi *vsi, bool rss_ena, u16 def_qs)
 +{
-+	netdev->ethtool_ops = &ice_ethtool_sf_ops;
++	/* only 1 Rx queue unless RSS is enabled */
++	if (rss_ena) {
++		vsi->alloc_rxq = 1;
++		return;
++	}
++
++	if (vsi->req_rxq) {
++		vsi->alloc_rxq = vsi->req_rxq;
++		vsi->num_rxq = vsi->req_rxq;
++	} else {
++		vsi->alloc_rxq = min_t(u16, def_qs, (u16)num_online_cpus());
++	}
 +}
 +
  /**
-  * ice_set_ethtool_ops - setup netdev ethtool ops
-  * @netdev: network interface device structure
-diff --git a/drivers/net/ethernet/intel/ice/ice_sf_eth.c b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-index 1a2c94375ca7..d63492c25949 100644
---- a/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-+++ b/drivers/net/ethernet/intel/ice/ice_sf_eth.c
-@@ -58,6 +58,7 @@ static int ice_sf_cfg_netdev(struct ice_dynamic_port *dyn_port,
- 	eth_hw_addr_set(netdev, dyn_port->hw_addr);
- 	ether_addr_copy(netdev->perm_addr, dyn_port->hw_addr);
- 	netdev->netdev_ops = &ice_sf_netdev_ops;
-+	ice_set_ethtool_sf_ops(netdev);
- 	SET_NETDEV_DEVLINK_PORT(netdev, devlink_port);
+  * ice_vsi_set_num_qs - Set number of queues, descriptors and vectors for a VSI
+  * @vsi: the VSI being configured
+@@ -174,31 +200,13 @@ static void ice_vsi_set_num_qs(struct ice_vsi *vsi)
  
- 	err = register_netdev(netdev);
+ 	switch (vsi_type) {
+ 	case ICE_VSI_PF:
+-		if (vsi->req_txq) {
+-			vsi->alloc_txq = vsi->req_txq;
+-			vsi->num_txq = vsi->req_txq;
+-		} else {
+-			vsi->alloc_txq = min3(pf->num_lan_msix,
+-					      ice_get_avail_txq_count(pf),
+-					      (u16)num_online_cpus());
+-		}
+-
++		ice_vsi_set_num_txqs(vsi, min(pf->num_lan_msix,
++					      ice_get_avail_txq_count(pf)));
+ 		pf->num_lan_tx = vsi->alloc_txq;
+ 
+-		/* only 1 Rx queue unless RSS is enabled */
+-		if (!test_bit(ICE_FLAG_RSS_ENA, pf->flags)) {
+-			vsi->alloc_rxq = 1;
+-		} else {
+-			if (vsi->req_rxq) {
+-				vsi->alloc_rxq = vsi->req_rxq;
+-				vsi->num_rxq = vsi->req_rxq;
+-			} else {
+-				vsi->alloc_rxq = min3(pf->num_lan_msix,
+-						      ice_get_avail_rxq_count(pf),
+-						      (u16)num_online_cpus());
+-			}
+-		}
+-
++		ice_vsi_set_num_rxqs(vsi, !test_bit(ICE_FLAG_RSS_ENA, pf->flags),
++				     min(pf->num_lan_msix,
++					 ice_get_avail_rxq_count(pf)));
+ 		pf->num_lan_rx = vsi->alloc_rxq;
+ 
+ 		vsi->num_q_vectors = min_t(int, pf->num_lan_msix,
+@@ -206,9 +214,12 @@ static void ice_vsi_set_num_qs(struct ice_vsi *vsi)
+ 						 vsi->alloc_txq));
+ 		break;
+ 	case ICE_VSI_SF:
+-		vsi->alloc_txq = 1;
+-		vsi->alloc_rxq = 1;
+-		vsi->num_q_vectors = 1;
++		ice_vsi_set_num_txqs(vsi, min(vsi->max_io_eqs,
++					      ice_get_avail_txq_count(pf)));
++		ice_vsi_set_num_rxqs(vsi, !test_bit(ICE_FLAG_RSS_ENA, pf->flags),
++				     min(vsi->max_io_eqs,
++					 ice_get_avail_rxq_count(pf)));
++		vsi->num_q_vectors = max_t(int, vsi->alloc_rxq, vsi->alloc_txq);
+ 		vsi->irq_dyn_alloc = true;
+ 		break;
+ 	case ICE_VSI_VF:
 -- 
 2.42.0
 
