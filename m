@@ -1,248 +1,212 @@
-Return-Path: <netdev+bounces-140775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 25A819B7FE9
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:22:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C16C9B803D
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:35:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9BA128161F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:22:18 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E9271B219DF
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:35:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4C2C1BC069;
-	Thu, 31 Oct 2024 16:22:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB931BD4F7;
+	Thu, 31 Oct 2024 16:35:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="dcZVxfsb"
 X-Original-To: netdev@vger.kernel.org
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f228.google.com (mail-il1-f228.google.com [209.85.166.228])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC68B1BCA1C;
-	Thu, 31 Oct 2024 16:21:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.176.79.56
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1E361BC9FB
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 16:35:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.228
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730391720; cv=none; b=T/z/V9IQOZXvIGh5lGBgQm07YQxbKPv2B+7tXTYu2/pJgAOkDHflOQZMvo/7s89F+Wu6AYY5t6IC8uF7MyH5uK+Wl4xzSdGzWsI+L82t3JsAsjIzz13OymPfJiaibgl22sKtEU/hTvVxTmHRffc4bmV2IgLrB0S+qkmdeH2KJco=
+	t=1730392532; cv=none; b=Kzd/4jng2ilb2kLrrCdFFmtptoivHPaNtu1lPVnnholl4h47LGMN5UG1Ye7WMFfnQ0FA9/eIqttg5e7+7/AS7bvzwQh9i/r+BmND/eOdQ9NTmphtTUn51e/dEEvXw05w/DcZNu36st03PXiPkARDkqWp0zTaMmyZHqbENQwI3yc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730391720; c=relaxed/simple;
-	bh=p/bsuflYohrgMd2pyA4rxn/ZvnOCH4iDYm+W5B7U/84=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=A+O+1/SxQJIt75j5liwHztkzYK/9DJw2SRePYmVaIkcVcxtHx7RK0kCqIK9NIDHh3UF9EmtDMtSBxW+2Sm9+qMxmXuh6ir5qPPcgtqyjcyFzMBHgfUkRBhjymSQdXQclY8+mskj3amF1fTJBjw3/i8NYcwMvvwqMracEgxIsY6s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com; spf=pass smtp.mailfrom=huawei-partners.com; arc=none smtp.client-ip=185.176.79.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei-partners.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei-partners.com
-Received: from mail.maildlp.com (unknown [172.18.186.31])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4XfTf0017xz6GDty;
-	Fri,  1 Nov 2024 00:16:56 +0800 (CST)
-Received: from mscpeml500004.china.huawei.com (unknown [7.188.26.250])
-	by mail.maildlp.com (Postfix) with ESMTPS id A16AC140133;
-	Fri,  1 Nov 2024 00:21:48 +0800 (CST)
-Received: from [10.123.123.159] (10.123.123.159) by
- mscpeml500004.china.huawei.com (7.188.26.250) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1258.34; Thu, 31 Oct 2024 19:21:46 +0300
-Message-ID: <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
-Date: Thu, 31 Oct 2024 19:21:44 +0300
+	s=arc-20240116; t=1730392532; c=relaxed/simple;
+	bh=zzXkOlh5hiXCUUbO0nb3qEfXdj5SDjtx+GReFyrR2uY=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=Un4amraW+4eXVSyvwY4uyYHRBXp2KHP1/xsnHRbuh2Q9LA9KDsJMIaKPT8+E0oXm2jI8Ja5tLWA8iyIlV1U2JVZrUq2+qen4Pvjv7mrlepX0++KrALdK3VXHTJAl2gf09jWklJeN+3+syWSCI8qYO0vox+L+mmq9a1Fh1F4bC98=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=dcZVxfsb; arc=none smtp.client-ip=209.85.166.228
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-il1-f228.google.com with SMTP id e9e14a558f8ab-3a4e5acc542so539835ab.3
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 09:35:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1730392528; x=1730997328; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=udAzS3synZF4yyevrFcTMKxh/yzcEiLj9OsuKAlgjEw=;
+        b=dcZVxfsbeX7w/erZua2YgpuRLXGBIbHVaPVTSTxsdbYRAyqd9NF4IVCn3uRW+HUuqv
+         M+2XrQWtmvrxlE3dZkTniO4NwPTWQHuUreISfuXIu3qgdEfHiL5oZWaKA44Pc0icxCiZ
+         xTX9XHvDT5Uz78KYPXKBSKmLIO43PnlS8x4QNftNIC7b2KZGqB95C6UfanF/jPgvuF2n
+         x4I8QefRZUcrkj7RoXXlSW93u8G3Nw0AeZbe6uYxFGrRkYa1eswW3mvJ9U1llA1uWIk8
+         hkbYaD2+Ti8JpXvNWDtbXR0oKov4kr28D6oGyxXmVBEk9Xqf12sVK0M1QkKcib9FFlnp
+         pYEg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730392528; x=1730997328;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=udAzS3synZF4yyevrFcTMKxh/yzcEiLj9OsuKAlgjEw=;
+        b=Tp1xKdWhkh+4MSJ2O1yi1x2IJwGbnr4CYchewuwEUB1fdJe4C5bvYX4ciZD6Nkh6sv
+         l+hpXAfmJ5SVAnQ/4YymF/CMKPMr91+H6yp7G+AU0iVQTovPVvz9IW4ukFfBE3xQxKS5
+         WAN4gDex16b0atJhFPI1gTT6P7AQtLNl8WQ9PT7kSs5tGEBH/FiOrUH3lrVQhhZsxI3S
+         wvN6r7ZM+ixpJxuVMTBctsTHPkB7Rrk/8g4dVHHRU8OtCK4Iykk18Y2hSLqBDhfFDLcX
+         quglPaQ3TiqWRuO1hC7g8PzzF1hBVZgS4O16lW84M71Yba3umyW52laVGZMVWg63LbYo
+         fXRw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzmmQ/QBdE/MPZTHvYBHiBNsl+3cnWH3B1KNogRvICV4N8tSa3xrn/8LBKnApBr7678Zb5j5A=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMVGytm79v4xtS4tpaKmOWLtrZJCOmLCz8bRZXzJpaxgiDU0c5
+	NqrXyGK9ROdz8+OHX1dDMnlGZUpGeTSPCawCSfDPfeD06zVy3L/CpwhRLnvVnFDt1vmleFVu2f9
+	a5EwYa4asCPgtAiYXZoe7da6Viyy3iEZy
+X-Google-Smtp-Source: AGHT+IEYmpCcSU6QWW+t6z0zTGotJqUuLejQfvFP4zbbC+HVoj6SgAYoVUSoRJHnl37w89QnTTjsluh+rPSv
+X-Received: by 2002:a92:c54e:0:b0:3a3:b4ec:b409 with SMTP id e9e14a558f8ab-3a4ed2ee8c1mr53844515ab.3.1730392528000;
+        Thu, 31 Oct 2024 09:35:28 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id 8926c6da1cb9f-4de0496ef08sm57822173.53.2024.10.31.09.35.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2024 09:35:27 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 068F7340590;
+	Thu, 31 Oct 2024 10:35:27 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id EF9CBE484BE; Thu, 31 Oct 2024 10:34:56 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	Parav Pandit <parav@nvidia.com>,
+	netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v3] mlx5/core: Schedule EQ comp tasklet only if necessary
+Date: Thu, 31 Oct 2024 10:34:25 -0600
+Message-ID: <20241031163436.3732948-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
+In-Reply-To: <CY8PR12MB7195C97EB164CD3A0E9A99F9DC552@CY8PR12MB7195.namprd12.prod.outlook.com>
+References: <CY8PR12MB7195C97EB164CD3A0E9A99F9DC552@CY8PR12MB7195.namprd12.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
-Content-Language: ru
-To: =?UTF-8?Q?Micka=C3=ABl_Sala=C3=BCn?= <mic@digikod.net>, Matthieu Baerts
-	<matttbe@kernel.org>
-CC: <gnoack@google.com>, <willemdebruijn.kernel@gmail.com>,
-	<matthieu@buffet.re>, <linux-security-module@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <netfilter-devel@vger.kernel.org>,
-	<yusongping@huawei.com>, <artem.kuzin@huawei.com>,
-	<konstantin.meskhidze@huawei.com>, MPTCP Linux <mptcp@lists.linux.dev>
-References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
- <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
- <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
- <20241018.Kahdeik0aaCh@digikod.net>
-From: Mikhail Ivanov <ivanov.mikhail1@huawei-partners.com>
-In-Reply-To: <20241018.Kahdeik0aaCh@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: lhrpeml100012.china.huawei.com (7.191.174.184) To
- mscpeml500004.china.huawei.com (7.188.26.250)
 
-On 10/18/2024 9:08 PM, Mickaël Salaün wrote:
-> On Thu, Oct 17, 2024 at 02:59:48PM +0200, Matthieu Baerts wrote:
->> Hi Mikhail and Landlock maintainers,
->>
->> +cc MPTCP list.
-> 
-> Thanks, we should include this list in the next series.
-> 
->>
->> On 17/10/2024 13:04, Mikhail Ivanov wrote:
->>> Do not check TCP access right if socket protocol is not IPPROTO_TCP.
->>> LANDLOCK_ACCESS_NET_BIND_TCP and LANDLOCK_ACCESS_NET_CONNECT_TCP
->>> should not restrict bind(2) and connect(2) for non-TCP protocols
->>> (SCTP, MPTCP, SMC).
->>
->> Thank you for the patch!
->>
->> I'm part of the MPTCP team, and I'm wondering if MPTCP should not be
->> treated like TCP here. MPTCP is an extension to TCP: on the wire, we can
->> see TCP packets with extra TCP options. On Linux, there is indeed a
->> dedicated MPTCP socket (IPPROTO_MPTCP), but that's just internal,
->> because we needed such dedicated socket to talk to the userspace.
->>
->> I don't know Landlock well, but I think it is important to know that an
->> MPTCP socket can be used to discuss with "plain" TCP packets: the kernel
->> will do a fallback to "plain" TCP if MPTCP is not supported by the other
->> peer or by a middlebox. It means that with this patch, if TCP is blocked
->> by Landlock, someone can simply force an application to create an MPTCP
->> socket -- e.g. via LD_PRELOAD -- and bypass the restrictions. It will
->> certainly work, even when connecting to a peer not supporting MPTCP.
->>
->> Please note that I'm not against this modification -- especially here
->> when we remove restrictions around MPTCP sockets :) -- I'm just saying
->> it might be less confusing for users if MPTCP is considered as being
->> part of TCP. A bit similar to what someone would do with a firewall: if
->> TCP is blocked, MPTCP is blocked as well.
-> 
-> Good point!  I don't know well MPTCP but I think you're right.  Given
-> it's close relationship with TCP and the fallback mechanism, it would
-> make sense for users to not make a difference and it would avoid bypass
-> of misleading restrictions.  Moreover the Landlock rules are simple and
-> only control TCP ports, not peer addresses, which seems to be the main
-> evolution of MPTCP. >
->>
->> I understand that a future goal might probably be to have dedicated
->> restrictions for MPTCP and the other stream protocols (and/or for all
->> stream protocols like it was before this patch), but in the meantime, it
->> might be less confusing considering MPTCP as being part of TCP (I'm not
->> sure about the other stream protocols).
-> 
-> We need to take a closer look at the other stream protocols indeed.
-Hello! Sorry for the late reply, I was on a small business trip.
+Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet
+to call mlx5_cq_tasklet_cb() if it processes any completions. For CQs
+whose completions don't need to be processed in tasklet context, this
+adds unnecessary overhead. In a heavy TCP workload, we see 4% of CPU
+time spent on the tasklet_trylock() in tasklet_action_common(), with a
+smaller amount spent on the atomic operations in tasklet_schedule(),
+tasklet_clear_sched(), and locking the spinlock in mlx5_cq_tasklet_cb().
+TCP completions are handled by mlx5e_completion_event(), which schedules
+NAPI to poll the queue, so they don't need tasklet processing.
 
-Thanks a lot for this catch, without doubt MPTCP should be controlled
-with TCP access rights.
+Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
+overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs
+to be processed in tasklet context, so it can schedule the tasklet. CQs
+that need tasklet processing have their interrupt comp handler set to
+mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that
+don't need tasklet processing won't schedule the tasklet. To avoid
+scheduling the tasklet multiple times during the same interrupt, only
+schedule the tasklet in mlx5_add_cq_to_tasklet() if the tasklet work
+queue was empty before the new CQ was pushed to it.
 
-In that case, we should reconsider current semantics of TCP control.
+The additional branch in mlx5_add_cq_to_tasklet(), called for each EQE,
+may add a small cost for the userspace Infiniband CQs whose completions
+are processed in tasklet context. But this seems worth it to avoid the
+tasklet overhead for CQs that don't need it.
 
-Currently, it looks like this:
-* LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
-* LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to a
-   remote port.
+Note that the mlx4 driver works the same way: it schedules the tasklet
+in mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
 
-According to these definitions only TCP sockets should be restricted and
-this is already provided by Landlock (considering observing commit)
-(assuming that "TCP socket" := user space socket of IPPROTO_TCP
-protocol).
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+Reviewed-by: Parav Pandit <parav@nvidia.com>
+---
+v3: revise commit message
+v2: reorder variable declarations, describe CPU profile results
 
-AFAICS the two objectives of TCP access rights are to control
-(1) which ports can be used for sending or receiving TCP packets
-     (including SYN, ACK or other service packets).
-(2) which ports can be used to establish TCP connection (performed by
-     kernel network stack on server or client side).
+ drivers/net/ethernet/mellanox/mlx5/core/cq.c | 5 +++++
+ drivers/net/ethernet/mellanox/mlx5/core/eq.c | 5 +----
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
-In most cases denying (2) cause denying (1). Sending or receiving TCP
-packets without initial 3-way handshake is only possible on RAW [1] or
-PACKET [2] sockets. Usage of such sockets requires root privilligies, so
-there is no point to control them with Landlock.
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cq.c b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+index 4caa1b6f40ba..25f3b26db729 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+@@ -69,22 +69,27 @@ void mlx5_cq_tasklet_cb(struct tasklet_struct *t)
+ static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
+ 				   struct mlx5_eqe *eqe)
+ {
+ 	unsigned long flags;
+ 	struct mlx5_eq_tasklet *tasklet_ctx = cq->tasklet_ctx.priv;
++	bool schedule_tasklet = false;
+ 
+ 	spin_lock_irqsave(&tasklet_ctx->lock, flags);
+ 	/* When migrating CQs between EQs will be implemented, please note
+ 	 * that you need to sync this point. It is possible that
+ 	 * while migrating a CQ, completions on the old EQs could
+ 	 * still arrive.
+ 	 */
+ 	if (list_empty_careful(&cq->tasklet_ctx.list)) {
+ 		mlx5_cq_hold(cq);
++		schedule_tasklet = list_empty(&tasklet_ctx->list);
+ 		list_add_tail(&cq->tasklet_ctx.list, &tasklet_ctx->list);
+ 	}
+ 	spin_unlock_irqrestore(&tasklet_ctx->lock, flags);
++
++	if (schedule_tasklet)
++		tasklet_schedule(&tasklet_ctx->task);
+ }
+ 
+ /* Callers must verify outbox status in case of err */
+ int mlx5_create_cq(struct mlx5_core_dev *dev, struct mlx5_core_cq *cq,
+ 		   u32 *in, int inlen, u32 *out, int outlen)
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+index 859dcf09b770..3fd2091c11c8 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+@@ -112,14 +112,14 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+ 	struct mlx5_eq_comp *eq_comp =
+ 		container_of(nb, struct mlx5_eq_comp, irq_nb);
+ 	struct mlx5_eq *eq = &eq_comp->core;
+ 	struct mlx5_eqe *eqe;
+ 	int num_eqes = 0;
+-	u32 cqn = -1;
+ 
+ 	while ((eqe = next_eqe_sw(eq))) {
+ 		struct mlx5_core_cq *cq;
++		u32 cqn;
+ 
+ 		/* Make sure we read EQ entry contents after we've
+ 		 * checked the ownership bit.
+ 		 */
+ 		dma_rmb();
+@@ -142,13 +142,10 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+ 			break;
+ 	}
+ 
+ 	eq_update_ci(eq, 1);
+ 
+-	if (cqn != -1)
+-		tasklet_schedule(&eq_comp->tasklet_ctx.task);
+-
+ 	return 0;
+ }
+ 
+ /* Some architectures don't latch interrupts when they are disabled, so using
+  * mlx5_eq_poll_irq_disabled could end up losing interrupts while trying to
+-- 
+2.45.2
 
-Therefore Landlock should only take care about case (2). For now
-(please correct me if I'm wrong), we only considered control of
-connection performed on user space plain TCP sockets (created with
-IPPROTO_TCP).
-
-TCP kernel sockets are generally used in the following ways:
-* in a couple of other user space protocols (MPTCP, SMC, RDS)
-* in a few network filesystems (e.g. NFS communication over TCP)
-
-For the second case TCP connection is currently not restricted by
-Landlock. This approach is may be correct, since NFS should not have
-access to a plain TCP communication and TCP restriction of NFS may
-be too implicit. Nevertheless, I think that restriction via current
-access rights should be considered.
-
-For the first case, each protocol use TCP differently, so they should
-be considered separately.
-
-In the case of MPTCP TCP internal sockets are used to establish
-connection and exchange data between two network interfaces. MPTCP
-allows to have multiple TCP connections between two MPTCP sockets by
-connecting different network interfaces (e.g. WIFI and 3G).
-
-Shared Memory Communication is a protocol that allows TCP applications
-transparently use RDMA for communication [3]. TCP internal socket is
-used to exchange service CLC messages when establishing SMC connection
-(which seems harmless for sandboxing) and for communication in the case
-of fallback. Fallback happens only if RDMA communication became
-impossible (e.g. if RDMA capable RNIC card went down on host or peer
-side). So, preventing TCP communication may be achieved by controlling
-fallback mechanism.
-
-Reliable Datagram Socket is connectionless protocol implemented by
-Oracle [4]. It uses TCP stack or Infiniband to reliably deliever
-datagrams. For every sendmsg(2), recvmsg(2) it establishes TCP
-connection and use it to deliever splitted message.
-
-In comparison with previous protocols, RDS sockets cannot be binded or
-connected to special TCP ports (e.g. with bind(2), connect(2)). 16385
-port is assigned to receiving side and sending side is binded to the
-port allocated by the kernel (by using zero as port number).
-
-It may be useful to restrict RDS-over-TCP with current access rights,
-since it allows to perform TCP communication from user-space. But it
-would be only possible to fully allow or deny sending/receiving
-(since used ports are not controlled from user space).
-
-Restricting any TCP connection in the kernel is probably simplest
-design, but we should consider above cases to provide the most useful
-one.
-
-[1] https://man7.org/linux/man-pages/man7/raw.7.html
-[2] https://man7.org/linux/man-pages/man7/packet.7.html
-[3] https://datatracker.ietf.org/doc/html/rfc7609
-[4] https://oss.oracle.com/projects/rds/dist/documentation/rds-3.1-spec.html
-
-> 
->>
->>
->>> sk_is_tcp() is used for this to check address family of the socket
->>> before doing INET-specific address length validation. This is required
->>> for error consistency.
->>>
->>> Closes: https://github.com/landlock-lsm/linux/issues/40
->>> Fixes: fff69fb03dde ("landlock: Support network rules with TCP bind and connect")
->>
->> I don't know how fixes are considered in Landlock, but should this patch
->> be considered as a fix? It might be surprising for someone who thought
->> all "stream" connections were blocked to have them unblocked when
->> updating to a minor kernel version, no?
-> 
-> Indeed.  The main issue was with the semantic/definition of
-> LANDLOCK_ACCESS_FS_NET_{CONNECT,BIND}_TCP.  We need to synchronize the
-> code with the documentation, one way or the other, preferably following
-> the principle of least astonishment.
-> 
->>
->> (Personally, I would understand such behaviour change when upgrading to
->> a major version, and still, maybe only if there were alternatives to
-> 
-> This "fix" needs to be backported, but we're not clear yet on what it
-> should be. :)
-> 
->> continue having the same behaviour, e.g. a way to restrict all stream
->> sockets the same way, or something per stream socket. But that's just me
->> :) )
-> 
-> The documentation and the initial idea was to control TCP bind and
-> connect.  The kernel implementation does more than that, so we need to
-> synthronize somehow.
-> 
->>
->> Cheers,
->> Matt
->> -- 
->> Sponsored by the NGI0 Core fund.
->>
->>
 
