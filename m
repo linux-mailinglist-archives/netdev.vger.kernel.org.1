@@ -1,110 +1,95 @@
-Return-Path: <netdev+bounces-140755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9819A9B7D9F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:03:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A8059B7D7A
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:00:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C98561C21890
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:03:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB9941C210ED
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3B4F1C4617;
-	Thu, 31 Oct 2024 15:00:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD9F19D88D;
+	Thu, 31 Oct 2024 15:00:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="SS/Cc20K"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GYXlmhIi"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4315E1BE251;
-	Thu, 31 Oct 2024 15:00:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6F04196C6C;
+	Thu, 31 Oct 2024 15:00:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730386855; cv=none; b=uo+oSkEeXXnTniWTb3IOuWB4LLnprl0WaTPrvtLNLxC2IIU9kpOyYAujDj6CdS8Xg6oAWKHXHEeF6gH1IxKh97a92Nr9n+G0vj9QEqXstIwcZ1XPflfRdP9vKcR7NvnnTyWPkXXmx6CbX5w6RO9Ew+VkhCyXMvNXnx8/X1UQEs4=
+	t=1730386831; cv=none; b=ZYVWXYMhW6+H09YMHhWj6FEZs1RZpr5M3yiGOR9P1HKrz+MWFWM24QZI0QQoloA785WvO/D+ngI9PhBSaW7R/LxZBpsng+q8xgCks9HcxhGRGqnEvJBkvPGcUq1rmNP0JPkyQh7dTHJ/rb2aP1S6jQewEX3FISnH1xASEfTWoA4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730386855; c=relaxed/simple;
-	bh=+tmv06LQkli0snw8KI+ayhOvS0fqopLEcR1UVstfZx8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hvv1yzG7q1wPQ8VSgYM50PPWM3QOdR1q3WV3JQ+loFYKvf28HUWcy9wEDRmqYll3qtQzMkizBOrYwVl8MthwIspBgRaEL+1VgYj21yRn+NW0DWpQpt8smcWiP1aQgv52xy1ZWfZWYmmfVno/sJkCjA0PzrfiCjPsrvOJPeYkKzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=SS/Cc20K; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=vH9IxEylnimSrP4rDt0pvOOOUMyhyk1CV6pRJ7l0cZ0=; b=SS/Cc20KOgLFEXcrxgamK0HYgr
-	rMQxmIJBUVUd0lAhatW4oGY7oQuQOKyRgExfLLdXNr8GRtstsKpYGjRJMx4snhB1W/lbVWKnN46LF
-	mpBd9u18hiTHO7ELPxr5iJdVKBG8Q+lTvphgJgWIBSC6W5tMlq8VqpdBSJvi3oh+oq0E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t6Weq-00BnNn-Mu; Thu, 31 Oct 2024 16:00:20 +0100
-Date: Thu, 31 Oct 2024 16:00:20 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jan Petrous <jan.petrous@oss.nxp.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vinod Koul <vkoul@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Shawn Guo <shawnguo@kernel.org>,
-	Sascha Hauer <s.hauer@pengutronix.de>,
-	Pengutronix Kernel Team <kernel@pengutronix.de>,
-	Fabio Estevam <festevam@gmail.com>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Minda Chen <minda.chen@starfivetech.com>,
-	Nicolas Ferre <nicolas.ferre@microchip.com>,
-	Claudiu Beznea <claudiu.beznea@tuxon.dev>,
-	Iyappan Subramanian <iyappan@os.amperecomputing.com>,
-	Keyur Chudgar <keyur@os.amperecomputing.com>,
-	Quan Nguyen <quan@os.amperecomputing.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org,
-	imx@lists.linux.dev, devicetree@vger.kernel.org,
-	NXP S32 Linux Team <s32@nxp.com>
-Subject: Re: [PATCH v4 13/16] dt-bindings: net: Add DT bindings for DWMAC on
- NXP S32G/R SoCs
-Message-ID: <a938f3cd-9c9c-43a6-8f06-760eec69e1d1@lunn.ch>
-References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
- <20241028-upstream_s32cc_gmac-v4-13-03618f10e3e2@oss.nxp.com>
- <erg5zzxgy45ucqv2nq3fkcv4sr7cxqzxz6ejdikafwfpgkkmse@7eigsyq245lu>
- <ZyOUSgMo0chsGnCa@lsv051416.swis.nl-cdc01.nxp.com>
+	s=arc-20240116; t=1730386831; c=relaxed/simple;
+	bh=6aYTYpn8XYvD5hJGD3rYwwoC1Zt77qYWC4sWsNJymlw=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=QXDVQytBp93j8zofw3+uWrZdZQO/+WdvLWZaXb4NwDe4Kns6nKYbBEFl8Gao3ZFpvKFB5ZjKZouWzczjIuW44CQDgBypLphIJqOGvvTjJxHBWMRxgw3LO4KwZ6NFQxppg3L5wCzdOyVogHQrfPFMoyKfL8uaGe1ivjNKQFb7VEY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GYXlmhIi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 51F3EC4FF7B;
+	Thu, 31 Oct 2024 15:00:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730386831;
+	bh=6aYTYpn8XYvD5hJGD3rYwwoC1Zt77qYWC4sWsNJymlw=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GYXlmhIitpA3Q1L9Yb5sY6LXMLNiQFfzOdP8QYt65rMJfXFBN/yOBgz4ZW0Eb0v1t
+	 KxReS+q2hHQxUWI4f6UMOGVwnHMTNUMPEfcjEwzu+dBHJzGdLO1nUxQeP1f7TtHWm4
+	 AbrBORmetYyssxt2VVDU6P1t6YAdINPqBZLdRXxDqJ+Eh+uyF/WmdlEFqP6Ej/t+pC
+	 BXbQrmwwxhEbWy7S/6jBaa+ziGgr1lK2Ulrd++2cbo91agKAUyIeVl7AMEuxcSbqkE
+	 rIWYyXmeZyZiHeWytosIIWPEv3g9LlCRHFceNnuSPG+CB9iRyv+LvGVlt7sun/mu9C
+	 3wZ9f3RHp3H3Q==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70E40380AC0A;
+	Thu, 31 Oct 2024 15:00:40 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZyOUSgMo0chsGnCa@lsv051416.swis.nl-cdc01.nxp.com>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: phy: dp83822: Configure RMII mode on DP83825
+ devices
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173038683927.1988442.18235112192893672854.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Oct 2024 15:00:39 +0000
+References: <aa62d081804f44b5af0e8de2372ae6bfe1affd34.camel@iris-sensing.com>
+In-Reply-To: <aa62d081804f44b5af0e8de2372ae6bfe1affd34.camel@iris-sensing.com>
+To: Erik Schumacher <erik.schumacher@iris-sensing.com>
+Cc: hkallweit1@gmail.com, andrew@lunn.ch, linux@armlinux.org.uk,
+ davem@davemloft.net, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ kuba@kernel.org, edumazet@google.com, jeremie.dautheribes@bootlin.com,
+ pabeni@redhat.com
 
-> They are compatible on current stage of driver implementation, the
-> RGMII interface has no any difference. But later there shall be
-> added SGMII and this provides some level of difference, at least
-> from max-speed POV.
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Thu, 24 Oct 2024 13:24:23 +0000 you wrote:
+> Like the DP83826, the DP83825 can also be configured as an RMII master or
+> slave via a control register. The existing function responsible for this
+> configuration is renamed to a general dp8382x function. The DP83825 only
+> supports RMII so nothing more needs to be configured.
 > 
-> The S32R allows higher speed (2G5) on SGMII, but S32G2/S32G3 has
-> 1G as maximum.
+> With this change, the dp83822_driver list is reorganized according to the
+> device name.
+> 
+> [...]
 
-Please be careful with your naming. SGMII is defined by CISCO to only
-support 10/100/1000Mbps. If you support more than 1G, it is not SGMII,
-it is likely to be 2500BaseX, etc.
+Here is the summary with links:
+  - [net-next] net: phy: dp83822: Configure RMII mode on DP83825 devices
+    https://git.kernel.org/netdev/net-next/c/9e114ec80840
 
-	Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
