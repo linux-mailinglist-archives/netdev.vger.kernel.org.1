@@ -1,82 +1,94 @@
-Return-Path: <netdev+bounces-140599-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140600-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 303719B723D
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:49:56 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A48749B7254
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:00:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFE001F2455F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:49:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 16DF5B24162
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:00:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2757D42AA5;
-	Thu, 31 Oct 2024 01:49:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3202F855;
+	Thu, 31 Oct 2024 02:00:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jZqBCkTK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DVAxYhg8"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC39A442C;
-	Thu, 31 Oct 2024 01:49:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E61B2AE7C
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 02:00:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730339371; cv=none; b=mNhCK2zCQx2HrapwGINE9+ht4DQbHuYQ6Cg0RSgpErySEjvH/4laUCEYzU77m5HPJZULF4VrLAVrru8dOyWpnVGVMBMVCPj1ZkCHMgxOg6P42JNhqshnIynQZRRPXfQOslPR4QLKVearynzs2hnRygF1WxVYEVo5p9co/+qbC/w=
+	t=1730340025; cv=none; b=ITfvb/SBN/jUKU4bj63778D9Y5iXbGXlAtNKZTQORHheaXore3haghANYU8w7T6oA+1tDvMbHxwZBwo+GswTInu6XO/bHdQqHnAD2RygXi3Smts+IQIe0VedCsXApYxwguq6T5cZuid1w4I/OvXTDK01U7rhDycpA0tMn/nkTPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730339371; c=relaxed/simple;
-	bh=8ahn1VB1Hn10WaMpYW3c0BOhGixbKAjaO+u0J+wFEyE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=WNQ24c3tEpt8P5xJTjLkXvQh5tR2j/ExZb2xE/WfFn00KzZgKULcHqrBN/D1GmNu8EvZRAqPshMsNT3DhR1tO86CShltg26AEupU0DwiJhwXRlYs5oF1jq+gNbH73H8mnMWDKKHz4LCLx8ld4X0soKIpxUe12VuJG/5wTzRhon0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jZqBCkTK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DBF6BC4CECE;
-	Thu, 31 Oct 2024 01:49:29 +0000 (UTC)
+	s=arc-20240116; t=1730340025; c=relaxed/simple;
+	bh=fjg2y3a5hAn9CQFGe/bzwrPhmc4rVlCmd8Y7HVa9sZM=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=H9YjvqjIjIZnPvouZX+jbLsA2n9ghFQ4/8CmrwpsS/tlyz6nY/ZJ9GHs2KOssE1nYSJEPkb+pgAOHgRmntT53d/bWFJ+lI/7x29Xt4QuniWN/fHb1xL4IRHTD2kKfHS0PyJM9OZTzE7TVaZpCYeT5jBMITzX856PQR/8O9w2lJA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DVAxYhg8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A60E1C4CECE;
+	Thu, 31 Oct 2024 02:00:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730339370;
-	bh=8ahn1VB1Hn10WaMpYW3c0BOhGixbKAjaO+u0J+wFEyE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=jZqBCkTKLpX6jmE0RBkwsbEf8gMS5FTsDpm5YrG/el+CnUgd6w4frtFfcDgBOnVO7
-	 FDZ3eGHoPPH1E2NdZ11P8MuY6xRccnNUIKr3jwTE5XipHInJ/vraWvHAO8OZjEem7b
-	 8ZPUq9dppIWiTIRRrkIoWTFmi6GoiWfBWkQSMHT53TvpW47jlGAT9TE0O3o0QTd3Cj
-	 U3O/Fn7qlzS5L18eOLPyw1XAORUFaJG1Nq2DGznA2pjSyYuoKlkkTXuEuRFRf3cRgo
-	 OGGF2EX8BT3j7GvfBwQw0r+DdKg4PvvcNRXWSEmRoyfwD7zDhjx3s3FQNu7xR8LodK
-	 OtCy8mv4WoUFw==
-Date: Wed, 30 Oct 2024 18:49:28 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maksym Kutsevol <max@kutsevol.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Andrew Lunn
- <andrew+netdev@lunn.ch>, Breno Leitao <leitao@debian.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-doc@vger.kernel.org
-Subject: Re: [PATCH net-next v4 2/2] netcons: Add udp send fail statistics
- to netconsole
-Message-ID: <20241030184928.3273f76d@kernel.org>
-In-Reply-To: <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-2-a8065a43c897@kutsevol.com>
-References: <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-0-a8065a43c897@kutsevol.com>
-	<20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-2-a8065a43c897@kutsevol.com>
+	s=k20201202; t=1730340024;
+	bh=fjg2y3a5hAn9CQFGe/bzwrPhmc4rVlCmd8Y7HVa9sZM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=DVAxYhg8+eizTjXdCC2vj8iP2EGpDlk7gBP+V36rJHQDx9Q4XCmLHM99MOFc+jqzv
+	 tgEfCBmLadGABSgIYQVbGPw3F4Zc4L+q234nvEKac/T6IZRhVGUvaUqlgDlhntinmX
+	 Q5p5786ZC0OTJdrvdjiAUuO8N6YD/R20R593cRHBVVvv8E8eD4DsfsobeqLLSCRuof
+	 IqeZKGlo1KYhfoBGkmrBIqxNL/pP5T4FMHRKCKcrY+4NoPZlSxwH7EBjY0VAL4Ng9z
+	 iZE9euOCA6g4kVCK/HW9lX1aABb5PVnnDpUrRH2horNYMahpFCaODJQUmDVCOl6+5U
+	 7ANhOY/xlSIjQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF16380AC22;
+	Thu, 31 Oct 2024 02:00:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v3 0/2] bna: Remove error checking for debugfs create APIs
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173034003252.1522872.1244247656475361684.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Oct 2024 02:00:32 +0000
+References: <20241028020943.507-1-thunder.leizhen@huawei.com>
+In-Reply-To: <20241028020943.507-1-thunder.leizhen@huawei.com>
+To: Leizhen (ThunderTown) <thunder.leizhen@huawei.com>
+Cc: rmody@marvell.com, skalluru@marvell.com, GR-Linux-NIC-Dev@marvell.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, netdev@vger.kernel.org
 
-On Sun, 27 Oct 2024 12:59:42 -0700 Maksym Kutsevol wrote:
-> +struct netconsole_target_stats  {
-> +	u64_stats_t xmit_drop_count;
-> +	u64_stats_t enomem_count;
-> +	struct u64_stats_sync syncp;
-> +} __aligned(2 * sizeof(u64));
+Hello:
 
-Why the alignment?
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> +static void netpoll_send_udp_count_errs(struct netconsole_target *nt,
-> +					const char *msg, int len)
+On Mon, 28 Oct 2024 10:09:41 +0800 you wrote:
+> v2 --> v3:
+> 1. Keep line wrapping <= 80 columns wide.
+> 2. Add Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> v1 --> v2:
+> Remove error checking for debugfs_create_file() instead of fixing it.
+> 
+> [...]
 
-This is defined in the netconsole driver, it should not use the
-netpoll_ prefix for the function name.
+Here is the summary with links:
+  - [v3,1/2] bna: Remove error checking for debugfs create APIs
+    https://git.kernel.org/netdev/net-next/c/bf8207ec8c30
+  - [v3,2/2] bna: Remove field bnad_dentry_files[] in struct bnad
+    https://git.kernel.org/netdev/net-next/c/67826db318dd
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
