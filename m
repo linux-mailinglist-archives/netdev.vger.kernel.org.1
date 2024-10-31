@@ -1,121 +1,252 @@
-Return-Path: <netdev+bounces-140633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9EDE39B74B7
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:51:45 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3D4B9B74BD
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:54:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A997B2401C
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:51:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 137711C235CD
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:54:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40BFC14430E;
-	Thu, 31 Oct 2024 06:51:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YOkQxazQ"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E2E146D6E;
+	Thu, 31 Oct 2024 06:54:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 661FD282F0;
-	Thu, 31 Oct 2024 06:51:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DA0146D53
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:54:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730357497; cv=none; b=MXAQ7rm+ZMcoLwYwxym45OyBgZ6yATIVD+0yPmBVkVLOGZDGu6gLgJ/r0gAA6ExAqty/+Rfhx74ehcY60YoWoT0eE0X5GYT1FpkEHZxcSQnjvyBeHlqypzFhy3k3xEiGdJjS94EfxPY+2HQ1iiRByZMfNBKfYTk5vuoy8+hATCs=
+	t=1730357669; cv=none; b=bxWbzjG2VM2tnzsTGfos2Xl4bOIJli+aLuLJCgetok2UmoBr+pTv1E4moTqvzpxWHXEC42/N9cwb9AJ6ys7EYqmLT0ap8jINTgzoe2Xw7t9/CRT3fDNHbifDJgzN3Vrw6yArAqJ49N2LNP43hyzo2AtghHrJioZfzL4+s63wW74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730357497; c=relaxed/simple;
-	bh=1KU0RTwAvUZiokGeeJPgZq+44cF0Y6z41yqw6rmZAFY=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=gVUw5vNjByKgrNEUHhhwDsJ/G7uzKS2dqlvJk5T0I+jg8By5NwUAoAwEKCybr6Sn8j5uWkg53zJv0d56US5G3y2g4OurtqdzTtlNZ4tOqhgS13Nmghbtla1bGjgduPSG02DxdURVc+w6br+03gozpJJ6us/M1Ow/Fx/vQulEFlo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YOkQxazQ; arc=none smtp.client-ip=209.85.214.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-20c7edf2872so13188625ad.1;
-        Wed, 30 Oct 2024 23:51:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730357495; x=1730962295; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=mixF7vpLf4xPO/TJEqzW71juqB0qqrq4k/61RZiAI+E=;
-        b=YOkQxazQJkQcnXbRJZTSgtWG9mo2M9C//YouoQsxrwEPIVauWaH/ABaTU4C3tvlle7
-         fMjikrwrr+Lodtrgl7IGly+1z5itfW1gfOOTdQkRboqn8Do/M7IU+ETmgUxacNWwagdo
-         I76A63dWsP8HlrUCd3eQ6EjtmODoPpvwnSXejLontTSIQN9wr8gOXXwxhURWr237gmS7
-         S2HB8YoNW4HHjTkLKdsYeYvPjr6q8cmC1w3PqDECAs/tlaF1rxzcOdfyNijpd1UbOsny
-         8mt0eDlS/hYwnlFtWhGdZ/gmqHmXMLqU4I9XvzZEzlFuXTIuGLYAJY9Z8xDBCbveZGBl
-         fCmA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730357495; x=1730962295;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=mixF7vpLf4xPO/TJEqzW71juqB0qqrq4k/61RZiAI+E=;
-        b=ueSUv7sZ1DGkkyBWuddlavGcL9jLdHc5/5EqRgUUFpF/YtfmdmKXjo7y5Bm4bxPtr9
-         MKBemnLeyRzcPp0C3mF0fQ+rcFq9u6RMyOpPJr+KhZ8DtgK6JqGC2K174mQfhMS46GKv
-         YJwBU4wVDBdS5tYkvQwZQD8nPNKGegvjPVdAa5MYd8AB+9THi+U6Kp8rccpn33QTKAyS
-         CvrMaPvkzwA3FTmw5gN1ZqTSvIFB9IluttAYT+illJR9Wy0tIwnD7TCNXBKZBDDxQHtl
-         F1lolbxE4Q+Ld+3O8jSSuJusrAZ0KEWl9EQmHKxFqXNGiemitdlUsUJ+Uh6x/o/Qvs64
-         uk1Q==
-X-Forwarded-Encrypted: i=1; AJvYcCV27SVd4aYWZ+wIsp1kLZej3l8aZedxuHbPApyhEKempI4HgpVTK9EBZycVLh+6jhbCDViSm4pN@vger.kernel.org, AJvYcCW1MNC53Km+no2BqgjpI5870EPs1eIqPZXjJHmFB9m4zux7RsBSJ4OmnA25hj22sCrNj5XwdvgSUDHNAvk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqK2Ofa9ZYJ1BckdS8t21lFm5BKIMue9Iq+Ce+LOmhy4NxuqjF
-	MUpYR9EZu5znSAEIu6dfaKclOmAGlhTiPdL1FzOajepODBZLRhuRo12tvoQXxV4=
-X-Google-Smtp-Source: AGHT+IE4e7Hcho9hTpGO6CPaSuhsZhcHLcNa5wsaMmJ/AG/+Ll4TfRwI77tH1AADo+DYFnwq82Ro5A==
-X-Received: by 2002:a17:903:32cc:b0:205:5d71:561e with SMTP id d9443c01a7336-211057a8f8amr19933085ad.26.1730357494565;
-        Wed, 30 Oct 2024 23:51:34 -0700 (PDT)
-Received: from purva-IdeaPad-Gaming-3-15IHU6.. ([2409:40f2:e:4b75:a7f4:68e1:fad8:f425])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057e7a69sm4807055ad.290.2024.10.30.23.51.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 23:51:34 -0700 (PDT)
-From: Suraj Sonawane <surajsonawane0215@gmail.com>
-To: davem@davemloft.net
-Cc: dsahern@kernel.org,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Suraj Sonawane <surajsonawane0215@gmail.com>
-Subject: [PATCH] net: ipv6: fix inconsistent indentation in ipv6_gro_receive
-Date: Thu, 31 Oct 2024 12:21:24 +0530
-Message-Id: <20241031065124.4834-1-surajsonawane0215@gmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1730357669; c=relaxed/simple;
+	bh=7pZk6xURsLrp/rp1VDQ/01OCJzqZvLcza5ZMTiODdUs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=N8ARiGbhoE8QAO3AoDleLRz73letW04PV2FlrpTPL4rLy4WVOC6bBdlKj2ggHloAd79ee5O+xb6Dky1ZfmcHNFCvKqEEB8dL6ueaucX1gzC+rHytxM6hskeW9pCoWPdkqt32crBULfn2ZwpdFcOLGKF9HV1e/ubGCfrIctJbIzU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6P4M-0004us-N9; Thu, 31 Oct 2024 07:54:10 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6P4K-001JmE-1m;
+	Thu, 31 Oct 2024 07:54:08 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6P4K-0069fz-1O;
+	Thu, 31 Oct 2024 07:54:08 +0100
+Date: Thu, 31 Oct 2024 07:54:08 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v2 15/18] net: pse-pd: Add support for
+ getting and setting port priority
+Message-ID: <ZyMpkJRHZWYsszh2@pengutronix.de>
+References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
+ <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Fix the indentation to ensure consistent code style and improve
-readability, and to fix this warning:
+>  struct pse_control_status {
+>  	u32 pse_id;
+> @@ -74,6 +83,10 @@ struct pse_control_status {
+>  	u32 c33_avail_pw_limit;
+>  	struct ethtool_c33_pse_pw_limit_range *c33_pw_limit_ranges;
+>  	u32 c33_pw_limit_nb_ranges;
+> +	u32 c33_prio_supp_modes;
+> +	enum pse_port_prio_modes c33_prio_mode;
+> +	u32 c33_prio_max;
+> +	u32 c33_prio;
+>  };
+>  
+>  /**
+> @@ -93,6 +106,8 @@ struct pse_control_status {
+>   *			  set_current_limit regulator callback.
+>   *			  Should not return an error in case of MAX_PI_CURRENT
+>   *			  current value set.
+> + * @pi_set_prio: Configure the PSE PI priority.
+> + * @pi_get_pw_req: Get the power requested by a PD before enabling the PSE PI
+>   */
+>  struct pse_controller_ops {
+>  	int (*ethtool_get_status)(struct pse_controller_dev *pcdev,
+> @@ -107,6 +122,9 @@ struct pse_controller_ops {
+>  				    int id);
+>  	int (*pi_set_current_limit)(struct pse_controller_dev *pcdev,
+>  				    int id, int max_uA);
+> +	int (*pi_set_prio)(struct pse_controller_dev *pcdev, int id,
+> +			   unsigned int prio);
+> +	int (*pi_get_pw_req)(struct pse_controller_dev *pcdev, int id);
+>  };
+>  
+>  struct module;
+> @@ -141,6 +159,10 @@ struct pse_pi_pairset {
+>   * @rdev: regulator represented by the PSE PI
+>   * @admin_state_enabled: PI enabled state
+>   * @pw_d: Power domain of the PSE PI
+> + * @prio: Priority of the PSE PI. Used in static port priority mode
+> + * @pw_enabled: PSE PI power status in static port priority mode
+> + * @pw_allocated: Power allocated to a PSE PI to manage power budget in
+> + *	static port priority mode
+>   */
+>  struct pse_pi {
+>  	struct pse_pi_pairset pairset[2];
+> @@ -148,6 +170,9 @@ struct pse_pi {
+>  	struct regulator_dev *rdev;
+>  	bool admin_state_enabled;
+>  	struct pse_power_domain *pw_d;
+> +	int prio;
+> +	bool pw_enabled;
+> +	int pw_allocated;
+>  };
+>  
+>  /**
+> @@ -165,6 +190,9 @@ struct pse_pi {
+>   * @pi: table of PSE PIs described in this controller device
+>   * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
+>   * @id: Index of the PSE
+> + * @pis_prio_max: Maximum value allowed for the PSE PIs priority
+> + * @port_prio_supp_modes: Bitfield of port priority mode supported by the PSE
+> + * @port_prio_mode: Current port priority mode of the PSE
+>   */
+>  struct pse_controller_dev {
+>  	const struct pse_controller_ops *ops;
+> @@ -179,6 +207,9 @@ struct pse_controller_dev {
+>  	struct pse_pi *pi;
+>  	bool no_of_pse_pi;
+>  	int id;
+> +	unsigned int pis_prio_max;
+> +	u32 port_prio_supp_modes;
+> +	enum pse_port_prio_modes port_prio_mode;
+>  };
 
-net/ipv6/ip6_offload.c:280 ipv6_gro_receive() warn: inconsistent indenting
+> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> index a1ad257b1ec1..22664b1ea4a2 100644
+> --- a/include/uapi/linux/ethtool.h
+> +++ b/include/uapi/linux/ethtool.h
+> @@ -1002,11 +1002,35 @@ enum ethtool_c33_pse_pw_d_status {
+>   * enum ethtool_c33_pse_events - event list of the C33 PSE controller.
+>   * @ETHTOOL_C33_PSE_EVENT_OVER_CURRENT: PSE output current is too high.
+>   * @ETHTOOL_C33_PSE_EVENT_OVER_TEMP: PSE in over temperature state.
+> + * @ETHTOOL_C33_PSE_EVENT_CONNECTED: PD detected on the PSE.
+> + * @ETHTOOL_C33_PSE_EVENT_DISCONNECTED: PD has been disconnected on the PSE.
+> + * @ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR: PSE faced an error in static
+> + *	port priority management mode.
+>   */
+>  
+>  enum ethtool_c33_pse_events {
+> -	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =	1 << 0,
+> -	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =	1 << 1,
+> +	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =		1 << 0,
+> +	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =		1 << 1,
+> +	ETHTOOL_C33_PSE_EVENT_CONNECTED =		1 << 2,
+> +	ETHTOOL_C33_PSE_EVENT_DISCONNECTED =		1 << 3,
+> +	ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR =	1 << 4,
+> +};
 
-Signed-off-by: Suraj Sonawane <surajsonawane0215@gmail.com>
----
- net/ipv6/ip6_offload.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
+Same here, priority concept is not part of the spec, so the C33 prefix
+should be removed.
 
-diff --git a/net/ipv6/ip6_offload.c b/net/ipv6/ip6_offload.c
-index 982216342..e4c3ab837 100644
---- a/net/ipv6/ip6_offload.c
-+++ b/net/ipv6/ip6_offload.c
-@@ -277,10 +277,10 @@ INDIRECT_CALLABLE_SCOPE struct sk_buff *ipv6_gro_receive(struct list_head *head,
- 		 * (nlen != (sizeof(*iph2) + ipv6_exthdrs_len(iph2, &ops)))
- 		 * memcmp() alone below is sufficient, right?
- 		 */
--		 if ((first_word & htonl(0xF00FFFFF)) ||
--		     !ipv6_addr_equal(&iph->saddr, &iph2->saddr) ||
--		     !ipv6_addr_equal(&iph->daddr, &iph2->daddr) ||
--		     iph->nexthdr != iph2->nexthdr) {
-+		if ((first_word & htonl(0xF00FFFFF)) ||
-+		    !ipv6_addr_equal(&iph->saddr, &iph2->saddr) ||
-+		    !ipv6_addr_equal(&iph->daddr, &iph2->daddr) ||
-+		    iph->nexthdr != iph2->nexthdr) {
- not_same_flow:
- 			NAPI_GRO_CB(p)->same_flow = 0;
- 			continue;
+> +
+> +/**
+> + * enum pse_port_prio_modes - PSE port priority modes.
+> + * @ETHTOOL_PSE_PORT_PRIO_DISABLED: Port priority disabled.
+> + * @ETHTOOL_PSE_PORT_PRIO_STATIC: PSE static port priority. Port priority
+> + *	based on the power requested during PD classification. This mode
+> + *	is managed by the PSE core.
+> + * @ETHTOOL_PSE_PORT_PRIO_DYNAMIC: PSE dynamic port priority. Port priority
+> + *	based on the current consumption per ports compared to the total
+> + *	power budget. This mode is managed by the PSE controller.
+> + */
+
+This part will need some clarification about behavior with mixed port
+configurations. Here is my proposal:
+
+ * Expected behaviors in mixed port priority configurations:
+ * - When ports are configured with a mix of disabled, static, and dynamic
+ *   priority modes, the following behaviors are expected:
+ *     - Ports with priority disabled (ETHTOOL_PSE_PORT_PRIO_DISABLED) are
+ *       treated with lowest priority, receiving power only if the budget
+ *       remains after static and dynamic ports have been served.
+ *     - Static-priority ports are allocated power up to their requested
+ *       levels during PD classification, provided the budget allows.
+ *     - Dynamic-priority ports receive power based on real-time consumption,
+ *       as monitored by the PSE controller, relative to the remaining budget
+ *       after static ports.
+ *
+ * Handling scenarios where power budget is exceeded:
+ * - Hot-plug behavior: If a new device is added that causes the total power
+ *   demand to exceed the PSE budget, the newly added device is de-prioritized
+ *   and shut down to maintain stability for previously connected devices.
+ *   This behavior ensures that existing connections are not disrupted, though
+ *   it may lead to inconsistent behavior if the device is disconnected and
+ *   reconnected (hot-plugged).
+ *
+ * - Startup behavior (boot): When the system initializes with attached devices,
+ *   the PSE allocates power based on a predefined order (e.g., by port index)
+ *   until the budget is exhausted. Devices connected later in this order may
+ *   not be enabled if they would exceed the power budget, resulting in consistent
+ *   behavior during startup but potentially differing from runtime behavior
+ *   (hot-plug).
+ *
+ * - Consistency challenge: These two scenarios—hot-plug vs. system boot—may lead
+ *   to different handling of devices. During system boot, power is allocated
+ *   sequentially, potentially leaving out high-priority devices added later due to
+ *   a first-come-first-serve approach. In contrast, hot-plug behavior favors the
+ *   status quo, maintaining stability for initially connected devices, which
+ *   might not align with the system's prioritization policy.
+ *
+
+> +enum pse_port_prio_modes {
+> +	ETHTOOL_PSE_PORT_PRIO_DISABLED,
+> +	ETHTOOL_PSE_PORT_PRIO_STATIC,
+> +	ETHTOOL_PSE_PORT_PRIO_DYNAMIC,
+>  };
+ 
+
 -- 
-2.34.1
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
