@@ -1,50 +1,60 @@
-Return-Path: <netdev+bounces-140760-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE25D9B7E84
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:31:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 571F09B7EC9
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:44:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B4D1B21566
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:31:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9ADC1F225D2
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB4D3137747;
-	Thu, 31 Oct 2024 15:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99931BAEF8;
+	Thu, 31 Oct 2024 15:43:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nQzU+5mX"
+	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="eF61e0B0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from qs51p00im-qukt01072101.me.com (qs51p00im-qukt01072101.me.com [17.57.155.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8150019E7EB;
-	Thu, 31 Oct 2024 15:30:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485281A2872
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 15:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730388623; cv=none; b=emlUc5D57zHg9YkZx7L3TlwWqSiLJSmDdAa4XE9xvzB/VSjHy2h6ClSI1IPPGuwe5rLn6nRuk9ywvttUjr+hkrT30Q8Hw09382gleYNBLVQy92RzXb2HHNjFeVqGnj1zPcMbXOBrWAJnlbCb6SBfN5bgcYVYY46L77sJFIp+pBM=
+	t=1730389419; cv=none; b=GJQI7R56EFxktjdg+RmaxoEoYDW7Z9tt7RUyhNef8oXISLyZXIXEV07b7eGIPYQFM0JA8GMmS1KUXgxhUnh0jDKiRTuxELbMC/G311BtIRNAsJoQKtd96aLPkQDEFg2Txg6Vt+7LhXfTvgeu8zDhDX04wj6NlVYLjiqAroTaQJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730388623; c=relaxed/simple;
-	bh=OvzSifmX4gwDA00DM+e60niTQxZ4iyWIF7c+fO+Tc60=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=PZcsko+s/8LIFpNgAHblEfMmNhCXBmTC9eBymmHN/UPW0kYS26GicAs94/+tPjpyFglzeawcAwiMCdfBsbHnjgHnkv14GNgcsr/0x6UoD80viqp9I4wNlM/XL13pwoLuQtc0o7mL/XrcXr/nohcwAtJMxp/xjqGpDkN1bpdlLj0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nQzU+5mX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A74DC4DE03;
-	Thu, 31 Oct 2024 15:30:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730388623;
-	bh=OvzSifmX4gwDA00DM+e60niTQxZ4iyWIF7c+fO+Tc60=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=nQzU+5mXm0F0SZGc7/g6+7JJdaxLLP4Wbt7FmYSZQNTYIxHyIdpsLQK9MG3XdbCop
-	 YckXd5jpixxbNhoU4FgJfIrgFS3CA3DBr6tjUfs3gCg6fcEdALXXa0MjsfIluZWz8x
-	 wL1xvgB8OdN7XxrhLYWY0mLj6THS5Q8t49GdOq5lS2JobgiWClE6gZO/Bg5ZASr2oV
-	 Lglip5WgThmA/lXyvEJz6M8rud1mhrMD4ezVy4k0kslngj2oo0BouPCsa6dxOducZt
-	 G7HT/ISorhuMS7Az5Kd7dkCgCjr4/LXuldqWSBazrNhdH3IoW58Vd/AloHpEq2FbaQ
-	 aNlNrg3udzlGA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D44380AC0A;
-	Thu, 31 Oct 2024 15:30:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730389419; c=relaxed/simple;
+	bh=BkkmMJsHcrCTY1PBTdSBM5q6G2oWrJzMYNi/GyMzRxo=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=PEsvwUF/lw2OyslCI1H6NEoTAn23NwGfx/kAfUANdEpIaMXbZvOKxW1KEcDdFhyJQgAlxcUbTOV7jk2a800OrrqW5gKrp09WydivcvYz9gn0ZEQXeGhWEzNSalvOsze/HluwkJBxB+3LjmnpUsLjwElEiH7gQGeEsMa3nX90mHk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=eF61e0B0; arc=none smtp.client-ip=17.57.155.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
+	t=1730389415; bh=iVllsxbqz1MTBvxId23+fDR7pNwYAN1FvSHh8k8rhn4=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
+	b=eF61e0B0Can7+Z/XyhSeX2onHSJhKlxwlyYQQQCIu/fPaXOU/Hbzk05DscEeYPRDE
+	 DQA03upDEH8nOZv3QpiQENFDkcQXkd2mcPe+uUGX2RmzaYO31Fx16Tbqlqmfs3/zB7
+	 7KhaC+4UuxPBAP5Iu2xD214iJ0e4/K+9nP9zRvKHG0k/zZLlInO1fMjLXODQv9M1Pt
+	 EsSe4kfhA8JiRpwD6ZCqnkVKA9o92z8jDvuhUN2w6mej7OAGyy4GBDb9ZQKPo2woaU
+	 f0H3qcgupJZbEHIwenq1OSvTcfc1h9GWw6o0YbxIFIGhqhgWw8iv3RNdq2xPzng89L
+	 Wjyc0YoWm1mjA==
+Received: from almalinux-std3-4-4-10gb.novalocal (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01072101.me.com (Postfix) with ESMTPSA id DDF63402BE;
+	Thu, 31 Oct 2024 15:43:32 +0000 (UTC)
+From: Vladimir Vdovin <deliran@verdict.gg>
+To: netdev@vger.kernel.org,
+	dsahern@kernel.org,
+	davem@davemloft.net
+Cc: Vladimir Vdovin <deliran@verdict.gg>,
+	idosch@idosch.org
+Subject: [PATCH v3] net: ipv4: Cache pmtu for all packet paths if multipath enabled
+Date: Thu, 31 Oct 2024 15:42:55 +0000
+Message-ID: <20241031154313.2272-1-deliran@verdict.gg>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -52,46 +62,210 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH bpf] bpf, test_run: Fix LIVE_FRAME frame update after a
- page has been recycled
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173038863101.1997785.11856320294725217143.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Oct 2024 15:30:31 +0000
-References: <20241030-test-run-mem-fix-v1-1-41e88e8cae43@redhat.com>
-In-Reply-To: <20241030-test-run-mem-fix-v1-1-41e88e8cae43@redhat.com>
-To: =?utf-8?b?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2VuIDx0b2tlQHJlZGhhdC5jb20+?=@codeaurora.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, eddyz87@gmail.com, song@kernel.org,
- yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org,
- hawk@kernel.org, aleksander.lobakin@intel.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, syzbot+d121e098da06af416d23@syzkaller.appspotmail.com
+X-Proofpoint-GUID: yZrNSsmuE732rgWSgJgXru794m-Z0o9H
+X-Proofpoint-ORIG-GUID: yZrNSsmuE732rgWSgJgXru794m-Z0o9H
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-31_06,2024-10-30_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
+ clxscore=1030 spamscore=0 mlxscore=0 adultscore=0 bulkscore=0
+ malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2308100000 definitions=main-2410310119
 
-Hello:
+Check number of paths by fib_info_num_path(),
+and update_or_create_fnhe() for every path.
+Problem is that pmtu is cached only for the oif
+that has received icmp message "need to frag",
+other oifs will still try to use "default" iface mtu.
 
-This patch was applied to bpf/bpf.git (master)
-by Daniel Borkmann <daniel@iogearbox.net>:
+V3:
+  - added selftest
+  - fixed compile error
 
-On Wed, 30 Oct 2024 11:48:26 +0100 you wrote:
-> The test_run code detects whether a page has been modified and
-> re-initialises the xdp_frame structure if it has, using
-> xdp_update_frame_from_buff(). However, xdp_update_frame_from_buff()
-> doesn't touch frame->mem, so that wasn't correctly re-initialised, which
-> led to the pages from page_pool not being returned correctly. Syzbot
-> noticed this as a memory leak.
-> 
-> [...]
+V2:
+  - fix fib_info_num_path parameter pass
 
-Here is the summary with links:
-  - [bpf] bpf, test_run: Fix LIVE_FRAME frame update after a page has been recycled
-    https://git.kernel.org/bpf/bpf/c/c40dd8c47325
+An example topology showing the problem:
 
-You are awesome, thank you!
+                    |  host1
+                +---------+
+                |  dummy0 | 10.179.20.18/32  mtu9000
+                +---------+
+        +-----------+----------------+
+    +---------+                     +---------+
+    | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
+    +---------+                     +---------+
+        |    (all here have mtu 9000)    |
+    +------+                         +------+
+    | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
+    +------+                         +------+
+        |                                |
+---------+------------+-------------------+------
+                        |
+                    +-----+
+                    | ro3 | 10.10.10.10  mtu1500
+                    +-----+
+                        |
+    ========================================
+                some networks
+    ========================================
+                        |
+                    +-----+
+                    | eth0| 10.10.30.30  mtu9000
+                    +-----+
+                        |  host2
+
+host1 have enabled multipath and
+sysctl net.ipv4.fib_multipath_hash_policy = 1:
+
+default proto static src 10.179.20.18
+        nexthop via 10.179.2.12 dev ens17f1 weight 1
+        nexthop via 10.179.2.140 dev ens17f0 weight 1
+
+When host1 tries to do pmtud from 10.179.20.18/32 to host2,
+host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
+And host1 caches it in nexthop exceptions cache.
+
+Problem is that it is cached only for the iface that has received icmp,
+and there is no way that ro3 will send icmp msg to host1 via another path.
+
+Host1 now have this routes to host2:
+
+ip r g 10.10.30.30 sport 30000 dport 443
+10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
+    cache expires 521sec mtu 1500
+
+ip r g 10.10.30.30 sport 30033 dport 443
+10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
+    cache
+
+So when host1 tries again to reach host2 with mtu>1500,
+if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
+if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
+until lucky day when ro3 will send it through another flow to ens17f0.
+
+Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
+---
+ net/ipv4/route.c                    | 13 ++++++
+ tools/testing/selftests/net/pmtu.sh | 71 ++++++++++++++++++++++++++++-
+ 2 files changed, 83 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 723ac9181558..41162b5cc4cb 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1027,6 +1027,19 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
+ 		struct fib_nh_common *nhc;
+ 
+ 		fib_select_path(net, &res, fl4, NULL);
++#ifdef CONFIG_IP_ROUTE_MULTIPATH
++		if (fib_info_num_path(res.fi) > 1) {
++			int nhsel;
++
++			for (nhsel = 0; nhsel < fib_info_num_path(res.fi); nhsel++) {
++				nhc = fib_info_nhc(res.fi, nhsel);
++				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
++							  jiffies + net->ipv4.ip_rt_mtu_expires);
++			}
++			rcu_read_unlock();
++			return;
++		}
++#endif /* CONFIG_IP_ROUTE_MULTIPATH */
+ 		nhc = FIB_RES_NHC(res);
+ 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
+ 				      jiffies + net->ipv4.ip_rt_mtu_expires);
+diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
+index 569bce8b6383..f440fda700e1 100755
+--- a/tools/testing/selftests/net/pmtu.sh
++++ b/tools/testing/selftests/net/pmtu.sh
+@@ -266,7 +266,8 @@ tests="
+ 	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
+ 	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
+ 	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
+-	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
++	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
++	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
+ 
+ # Addressing and routing for tests with routers: four network segments, with
+ # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) and an
+@@ -2329,6 +2330,74 @@ test_pmtu_ipv6_route_change() {
+ 	test_pmtu_ipvX_route_change 6
+ }
+ 
++test_pmtu_ipv4_mp_exceptions() {
++	setup namespaces routing || return $ksft_skip
++
++	ip nexthop ls >/dev/null 2>&1
++	if [ $? -ne 0 ]; then
++		echo "Nexthop objects not supported; skipping tests"
++		exit $ksft_skip
++	fi
++
++	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
++	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
++	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
++	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
++
++	dummy0_a="192.168.99.99"
++	dummy0_b="192.168.88.88"
++
++	# Set up initial MTU values
++	mtu "${ns_a}"  veth_A-R1 2000
++	mtu "${ns_r1}" veth_R1-A 2000
++	mtu "${ns_r1}" veth_R1-B 1500
++	mtu "${ns_b}"  veth_B-R1 1500
++
++	mtu "${ns_a}"  veth_A-R2 2000
++	mtu "${ns_r2}" veth_R2-A 2000
++	mtu "${ns_r2}" veth_R2-B 1500
++	mtu "${ns_b}"  veth_B-R2 1500
++
++	fail=0
++
++	#Set up host A with multipath routes to host B dummy0_b
++	run_cmd ${ns_a} sysctl -q net.ipv4.fib_multipath_hash_policy=1
++	run_cmd ${ns_a} sysctl -q net.ipv4.ip_forward=1
++	run_cmd ${ns_a} ip link add dummy0 mtu 2000 type dummy
++	run_cmd ${ns_a} ip link set dummy0 up
++	run_cmd ${ns_a} ip addr add ${dummy0_a} dev dummy0
++	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev veth_A-R1
++	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev veth_A-R2
++	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
++	run_cmd ${ns_a} ip route add ${dummy0_b} nhid 203
++
++	#Set up host B with multipath routes to host A dummy0_a
++	run_cmd ${ns_b} sysctl -q net.ipv4.fib_multipath_hash_policy=1
++	run_cmd ${ns_b} sysctl -q net.ipv4.ip_forward=1
++	run_cmd ${ns_b} ip link add dummy0 mtu 2000 type dummy
++	run_cmd ${ns_b} ip link set dummy0 up
++	run_cmd ${ns_b} ip addr add ${dummy0_b} dev dummy0
++	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev veth_A-R1
++	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev veth_A-R2
++	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
++	run_cmd ${ns_b} ip route add ${dummy0_a} nhid 203
++
++	#Set up routers with routes to dummies
++	run_cmd ${ns_r1} ip route add ${dummy0_a} via ${prefix4}.${a_r1}.1
++	run_cmd ${ns_r2} ip route add ${dummy0_a} via ${prefix4}.${a_r2}.1
++	run_cmd ${ns_r1} ip route add ${dummy0_b} via ${prefix4}.${b_r1}.1
++	run_cmd ${ns_r2} ip route add ${dummy0_b} via ${prefix4}.${b_r2}.1
++
++	#Ping and expect two nexthop exceptions for two routes in nh group
++	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dummy0_b}"
++	if [ "$(${ns_a} ip -oneline route list cache | wc -l)" -ne 2 ]; then
++		err "  there are not enough cached exceptions"
++		fail=1
++	fi
++
++	return ${fail}
++}
++
+ usage() {
+ 	echo
+ 	echo "$0 [OPTIONS] [TEST]..."
+
+base-commit: 66600fac7a984dea4ae095411f644770b2561ede
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.43.5
 
 
