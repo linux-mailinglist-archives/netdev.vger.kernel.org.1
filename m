@@ -1,115 +1,132 @@
-Return-Path: <netdev+bounces-140690-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140691-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF8099B7A51
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:14:30 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E31B9B7A62
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:17:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BA06280BEA
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:14:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A28DB21292
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:17:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DACB19ABBD;
-	Thu, 31 Oct 2024 12:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="bd5kABBI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C9C19C56C;
+	Thu, 31 Oct 2024 12:17:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DBE191F65
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 12:14:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9619882B;
+	Thu, 31 Oct 2024 12:17:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730376866; cv=none; b=iaan3yyrlLhGSAtOSwNOJi+g4qxedgphCNK2qmjQRbR1FYrRYq8uPmr1IiD/u3sZuPlAh1NJMPpll/CpIm/XkS1hAaZyrv89L1sAU53f4yVw8ymPknP3KaDUBaM82uKCp8w4zNnOPhp+P0F5uR5mdo/zH+NpEe0lauN5nHGwXpI=
+	t=1730377055; cv=none; b=Tlqu/2/W9GZN2V6sNDR7NwClORrGDeGq3xJboxHnOnZO3rCizQhgv3M+QSNJahn3iMjFtT95wHDbrZU/JKsvmLiGBNIoUq7d5G//1/+vIw4l/2qqb/H80CurbNmrHkyQ7A9W/0Xfrm1BcB6bMIJ7tWAuQAGC0yHuvvMScZb0OLY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730376866; c=relaxed/simple;
-	bh=KDjroN32FOyFQYH5QqMQ6Jr/RaS7orSOjGDBfkDgzQw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OjvPkUrrSVQJG8os3l9duSKKhXZNydh2eiB/NzhGrZw8lVN0eyAVJt9s/OkP8VGvlR/NQwHatphek8wx17zZUKBjdfSn6mvELdHXtx2o6JVoJUnQl75sRlGuJiPzBnTECwW5I7U8gkPqXbyEfcnuOFDrXdH2H4G6aJ4FVzRJ24k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=bd5kABBI; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539fe02c386so1777880e87.0
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 05:14:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730376862; x=1730981662; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=pegCTwmOsAalYVSqftHLLv2q/dMO922qXsLEv2pv/6Q=;
-        b=bd5kABBItTd3hZeOtVJ2ReRZQYyZu/7evPvH7d5e88YJzoWSnl9NgJQxohbgr1r36i
-         cc6x/KU0JS4lXgiFziFbF85itEfE+5RZiKkj4vH7CY29x5axX19iP7SrEEC8y0u1xijQ
-         UMeQjqNfFBndM0iP/i5Mi2bmVzkoSfwu592LBVmoXDZfC3h1EdjJtZdkKWHpOltr+f7/
-         QDXsf5mTUcByngKVF+OhGcY/jnWw9hrvLiHRZ37R/WU9bZgrmdn0+MbSe1KtdtSZdK88
-         lQtXeF6H297JOcYjofIuMP1tq+VhzJI/CjDpSxgkswGqkzDW5c9JDcv98LyJIuEENDMY
-         xPOA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730376862; x=1730981662;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=pegCTwmOsAalYVSqftHLLv2q/dMO922qXsLEv2pv/6Q=;
-        b=j2opVL1coawQlpsFYZJeKGUplTLFb7zZuXyp+0egYhhrWgiFeSeruo5VnhKWcWBrll
-         CiPdOoUD5QIj4h8xXgVJCeaWlb2MOYS256xM/WmpVXGuaX4+xrrY1rapP8//NRs0zrjK
-         +ATcpB5DZb56l75rH/HApahztfNrcnIhfrMGtQoS6dAztJFIDdb4gtaQl1oQwBwb1FPT
-         BDsDGBkv3/7H6acBHxtNMprt33H6rHg35/cOqtXmiZe4yC4AZcq4hGXRlTGuJibihl5/
-         L7bVw/cb6Y0TE7AJ6LVz0XTgI1siqS21rE5iViTP6FE99om17AFLZCBw+BjBougy7VLO
-         gMrA==
-X-Gm-Message-State: AOJu0YxUcjuuzAUjiZMSNGRbf7fpw7r4ajHZQ3Yisc96J5mAJ3+5wyA2
-	nVxqO9v2Jo5tFej1I701AxnEDK5XdKo5tLIZeTsb0M12q1MDzya5Yrq9j/t/RXc=
-X-Google-Smtp-Source: AGHT+IGrIXBd6jkN8PQZywGXvEEdVtnlcmQKO/IyNF1fM9VJoSkOyV+PF7492q5lna5gZBGZvcznow==
-X-Received: by 2002:a05:6512:ac2:b0:539:a2e0:4e94 with SMTP id 2adb3069b0e04-53c7bc2972amr707867e87.30.1730376862016;
-        Thu, 31 Oct 2024 05:14:22 -0700 (PDT)
-Received: from localhost.localdomain ([83.217.198.104])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53c7bc9be7dsm179672e87.71.2024.10.31.05.14.21
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2024 05:14:21 -0700 (PDT)
-From: Denis Kirjanov <kirjanov@gmail.com>
-To: stephen@networkplumber.org,
-	dsahern@kernel.org
-Cc: netdev@vger.kernel.org,
-	Denis Kirjanov <kirjanov@gmail.com>
-Subject: [iproute2-next] lib: utils: close file handle on error
-Date: Thu, 31 Oct 2024 15:14:11 +0300
-Message-ID: <20241031121411.20556-1-kirjanov@gmail.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1730377055; c=relaxed/simple;
+	bh=ZJp8CpUWes1dkqbgbG7DbJ43gENXj3SMpJtHKxIrvaE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cHBa9rqbXchtaY4Nm2VZ5BvLw/VFBFScjcDUWGMZloSBJ8M8P8nSUhgVkN3cxq7QmI1mFK6j5i97MUJXeM+GNR5TJ/YGFvDA5R42x8WAQRKqeeTynN8p9YcgPY615xEunaOhEss10KGoyg8IOgVMV9yfBo5KtUcoIL/ywtCw5Mw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.48])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XfNGj0FYFzdkYF;
+	Thu, 31 Oct 2024 20:14:53 +0800 (CST)
+Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
+	by mail.maildlp.com (Postfix) with ESMTPS id 267A118009B;
+	Thu, 31 Oct 2024 20:17:27 +0800 (CST)
+Received: from [10.67.120.129] (10.67.120.129) by
+ dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 31 Oct 2024 20:17:26 +0800
+Message-ID: <023fdee7-dbd4-4e78-b911-a7136ff81343@huawei.com>
+Date: Thu, 31 Oct 2024 20:17:26 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
+ has already unbound
+To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, Jesper
+ Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>
+CC: <zhangkun09@huawei.com>, <fanghaiqing@huawei.com>,
+	<liuyonglong@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
+ Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Andrew
+ Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Ilias
+ Apalodimas <ilias.apalodimas@linaro.org>, <linux-mm@kvack.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, kernel-team
+	<kernel-team@cloudflare.com>
+References: <20241022032214.3915232-1-linyunsheng@huawei.com>
+ <20241022032214.3915232-4-linyunsheng@huawei.com>
+ <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
+ <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
+ <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
+ <cf1911c5-622f-484c-9ee5-11e1ac83da24@huawei.com> <878qu7c8om.fsf@toke.dk>
+ <1eac33ae-e8e1-4437-9403-57291ba4ced6@huawei.com> <87o731by64.fsf@toke.dk>
+Content-Language: en-US
+From: Yunsheng Lin <linyunsheng@huawei.com>
+In-Reply-To: <87o731by64.fsf@toke.dk>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
+ dggpemf200006.china.huawei.com (7.185.36.61)
 
-reap_prop() doesn't close the file descriptor
-on some errors, fix it.
+On 2024/10/30 19:57, Toke Høiland-Jørgensen wrote:
+> Yunsheng Lin <linyunsheng@huawei.com> writes:
+> 
+>>> But, well, I'm not sure it is? You seem to be taking it as axiomatic
+>>> that the wait in itself is bad. Why? It's just a bit memory being held
+>>> on to while it is still in use, and so what?
+>>
+>> Actually, I thought about adding some sort of timeout or kicking based on
+>> jakub's waiting patch too.
+>>
+>> But after looking at more caching in the networking, waiting and kicking/flushing
+>> seems harder than recording the inflight pages, mainly because kicking/flushing
+>> need very subsystem using page_pool owned page to provide a kicking/flushing
+>> mechanism for it to work, not to mention how much time does it take to do all
+>> the kicking/flushing.
+> 
+> Eliding the details above, but yeah, you're right, there are probably
+> some pernicious details to get right if we want to flush all caches. S
+> I wouldn't do that to start with. Instead, just add the waiting to start
+> with, then wait and see if this actually turns out to be a problem in
+> practice. And if it is, identify the source of that problem, deal with
+> it, rinse and repeat :)
 
-Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
----
- lib/utils.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+I am not sure if I have mentioned to you that jakub had a RFC for the waiting,
+see [1]. And Yonglong Cc'ed had tested it, the waiting caused the driver unload
+stalling forever and some task hung, see [2].
 
-diff --git a/lib/utils.c b/lib/utils.c
-index 66713251..aea4e8b7 100644
---- a/lib/utils.c
-+++ b/lib/utils.c
-@@ -73,7 +73,6 @@ int read_prop(const char *dev, char *prop, long *value)
- 
- 	if (!fgets(buf, sizeof(buf), fp)) {
- 		fprintf(stderr, "property \"%s\" in file %s is currently unknown\n", prop, fname);
--		fclose(fp);
- 		goto out;
- 	}
- 
-@@ -98,6 +97,7 @@ int read_prop(const char *dev, char *prop, long *value)
- 	*value = result;
- 	return 0;
- out:
-+	fclose(fp);
- 	fprintf(stderr, "Failed to parse %s\n", fname);
- 	return -1;
- }
--- 
-2.43.0
+The root cause for the above case is skb_defer_free_flush() not being called
+as mentioned before.
 
+I am not sure if I understand the reasoning behind the above suggestion to 'wait
+and see if this actually turns out to be a problem' when we already know that there
+are some cases which need cache kicking/flushing for the waiting to work and those
+kicking/flushing may not be easy and may take indefinite time too, not to mention
+there might be other cases that need kicking/flushing that we don't know yet.
+
+Is there any reason not to consider recording the inflight pages so that unmapping
+can be done for inflight pages before driver unbound supposing dynamic number of
+inflight pages can be supported?
+
+IOW, Is there any reason you and jesper taking it as axiomatic that recording the
+inflight pages is bad supposing the inflight pages can be unlimited and recording
+can be done with least performance overhead?
+
+Or is there any better idea other than recording the inflight pages and doing the
+kicking/flushing during waiting?
+
+1. https://lore.kernel.org/netdev/20240806151618.1373008-1-kuba@kernel.org/
+2. https://lore.kernel.org/netdev/758b4d47-c980-4f66-b4a4-949c3fc4b040@huawei.com/
+
+> 
+> -Toke
+> 
+> 
 
