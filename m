@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-140812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CFB19B8548
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:28:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B4739B854E
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:29:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB891C2141D
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 21:28:48 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9690DB20CEB
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 21:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B148191F75;
-	Thu, 31 Oct 2024 21:28:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED8B1CB521;
+	Thu, 31 Oct 2024 21:29:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="XmA9oC92"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="UEkYrWL7"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5E5E16A92E;
-	Thu, 31 Oct 2024 21:28:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436EC1C8FCF;
+	Thu, 31 Oct 2024 21:29:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730410125; cv=none; b=SEVZunkYiDzXxEPGqW9FmighPN62nIJx+aIcNlZRWQ9UZBrJKkYEa1YGcEjQsjQ9MdtR1koYOTrLaZpOIfRjbrd9X7uSBAH/oG1eZW+WYgiQjeyabHoce50FWKW89MsvZkxmJHJvINeNpLVE3j3X5f/eFVXRT4Uwj35jg2MZuSA=
+	t=1730410164; cv=none; b=KvYPB6CnH60cSjztDSfxO6ymtG9ZSqrXdLuu6dwaAvHZwB2sZ4YbyLu3aWbgcRHsIjoSlf9r/lwflwt0gQNbnE7fCKBGunX0aLguCDo9FwFl17TnXp9DbJ3YB8z7Krqz3/LpPKCaqA04CVtOj3BXGX9WEQexULF5MKGIEBlTU6k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730410125; c=relaxed/simple;
-	bh=SGR83djc/v2VkXvkg2+OaTGIuGeErWCQ2UGUDAVfgmM=;
+	s=arc-20240116; t=1730410164; c=relaxed/simple;
+	bh=BA7mKwb6fhLIyezq1tTdt6iVDL1a84xL9CmDyRMXGhw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=rwhPATI0kSc6KYOekVAkh4NXr612neXa7FGkGx/P8InsZt/X/fHWMH0/BZFG/QOAIoW2T7SCl/1MO48e9Vf+jxypaan717zj154AiMKcCLklQ2X2P2+G9Sy1oWvEcfSDEDDwgKUN6mK/H/aN8ZjIW3ejkxWAuZIs1rj7Wrg651U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=XmA9oC92; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=ESXCwbGjlLuAjiYtsYff9WoTmOr1cXj9Fl3TT3NO2t35ZFFWYKcUVtaXdbwELaJAtDUKa0/tcmXhJrVmKriLLDYrpKv+/fVqs37n7gdazqP68zWn4BbHWQFjjHY5j4QI+wuFGBLM2WShgFveoijvdrFL10Q8JtFobzKYDJnY7Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=UEkYrWL7; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,16 +36,16 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=OKM06f42KHs8vmOBjtTC1kovaCxYd14xIsb8xvHlv5k=; b=XmA9oC92+zr/QTiXUtC2sY5wkH
-	Iwr4q+kvTqI+Pcch/D99gITHL8n+XkTrXRb+g8c2yxSGuTYONOXJ3UGZU7HiPE0egm/Xcof5WImv7
-	20+7MKV5yYGts8Hj5j2e92vw3atdDorpO5bbtxSoeWC0yvGxYCITVza7y4EnzCPGATwM=;
+	bh=mS365H68vw5lonypZKzKALxD6gdEUDKqKwISeJ1jw4Q=; b=UEkYrWL7D2ruGGPOfNUmqYD9b3
+	rBNsGr+ovflTpzYQjDhH6ALzZWY3Lrd8UgrpP6+NqjUfyqP2XfupXP+Vpz5YcVmZRciibRXV8Gh+2
+	HNEXpmTEz+163n3s+9wr1Qw+vIRMXKq+GIrm0U3JVj8qrrHVqQnn1zQWa6aMEhxBjjCA=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t6ciT-00BowT-Tq; Thu, 31 Oct 2024 22:28:29 +0100
-Date: Thu, 31 Oct 2024 22:28:29 +0100
+	id 1t6cj9-00BoxI-Sf; Thu, 31 Oct 2024 22:29:11 +0100
+Date: Thu, 31 Oct 2024 22:29:11 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Kory Maincent <kory.maincent@bootlin.com>,
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
@@ -63,12 +63,11 @@ Cc: Kory Maincent <kory.maincent@bootlin.com>,
 	Dent Project <dentproject@linuxfoundation.org>,
 	kernel@pengutronix.de,
 	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 05/18] net: pse-pd: Add support for PSE
- device index
-Message-ID: <46d4b5be-60d3-4949-8eb9-9e8a036cb580@lunn.ch>
+Subject: Re: [PATCH RFC net-next v2 06/18] net: ethtool: Add support for new
+ PSE device index description
+Message-ID: <bedeea0e-a64a-46e3-832e-aea51b09b459@lunn.ch>
 References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
- <20241030-feature_poe_port_prio-v2-5-9559622ee47a@bootlin.com>
- <ZyMjbzK7SJq5nmYz@pengutronix.de>
+ <20241030-feature_poe_port_prio-v2-6-9559622ee47a@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,37 +76,17 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <ZyMjbzK7SJq5nmYz@pengutronix.de>
+In-Reply-To: <20241030-feature_poe_port_prio-v2-6-9559622ee47a@bootlin.com>
 
-On Thu, Oct 31, 2024 at 07:27:59AM +0100, Oleksij Rempel wrote:
-> On Wed, Oct 30, 2024 at 05:53:07PM +0100, Kory Maincent wrote:
+On Wed, Oct 30, 2024 at 05:53:08PM +0100, Kory Maincent wrote:
+> From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
 > 
-> ...
-> >  /**
-> >   * struct pse_control - a PSE control
-> > @@ -440,18 +441,22 @@ int pse_controller_register(struct pse_controller_dev *pcdev)
-> >  
-> >  	mutex_init(&pcdev->lock);
-> >  	INIT_LIST_HEAD(&pcdev->pse_control_head);
-> > +	ret = ida_alloc_max(&pse_ida, INT_MAX, GFP_KERNEL);
+> Add functionality to report the newly introduced PSE device index to
+> the user, enabling better identification and management of PSE devices.
 > 
-> s/INT_MAX/U32_MAX
+> Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
 
- * Return: The allocated ID, or %-ENOMEM if memory could not be allocated,
- * or %-ENOSPC if there are no free IDs.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-static inline int ida_alloc_max(struct ida *ida, unsigned int max, gfp_t gfp)
-
-We need to be careful here, at least theoretically. Assuming a 32 bit
-system, and you pass it U32_MAX, how does it return values in the
-range S32_MAX..U32_MAX when it also needs to be able to return
-negative numbers as errors?
-
-I think the correct value to pass is S32_MAX, because it will always
-fit in a u32, and there is space left for negative values for errors.
-
-But this is probably theoretical, no real system should have that many
-controllers.
-
-	Andrew
+    Andrew
 
