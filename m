@@ -1,98 +1,76 @@
-Return-Path: <netdev+bounces-140585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A362B9B7182
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:10:35 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AB439B7189
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:17:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68EA4282618
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:10:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93DB5281F67
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:17:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 844DF43ABD;
-	Thu, 31 Oct 2024 01:10:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CF727702;
+	Thu, 31 Oct 2024 01:17:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IS771gIB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Feh0XcDG"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6220241C62
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 01:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525C21EB31
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 01:17:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730337028; cv=none; b=A0KBcxuYfCANojhEbtCgwr6qeTJOFeVoIa0OFSHTk2kMcidB3Nnxwe0Vh7TYJlp1bHT5oYuvOJBK0YUlg6CGJcxnhyuouWaFLi19qk49bWKtR8viac+qtXem3auyU2V4VtxD2ymCbFJbA/XCC5usPpajTVTllZ8p0oH0RJW8WP0=
+	t=1730337431; cv=none; b=nbIC2ZJzFLRybQ3dHDFu9NGVyN1uh7DADmBpaZ8C7Paeq3/bts/P170fcdVrbg0DSSvdRM7Le6Xvgh9rHzK49Rft6OIh7tqcgqMRjGw4wEXQeQ0bU7HfIkRTmXQQgYEp1+RhV9e82+WIgDC1fcE3RWFzU++TsO8Bsx0fVrlGw2o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730337028; c=relaxed/simple;
-	bh=xIFemhMMsAnBkh+qIECbCkAFwd/1dR5mLwBy2//qqqo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kGQf/IdjAG0z0FpAn5ss3LH9MJ+XeaWeBksF3D0Xq7TXpeH7wqEtHu84xbV2zKF7QuuXaK2GXjesAEuZeHF1+V8MgowL9Y5OYAmYgwzed3W21lhSnYxfI7Xawr39ehW2A4w7ZzqpTYeCW4xGG++7JHF3jb5n/CYcCId7iFtMBao=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IS771gIB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E53DFC4CECF;
-	Thu, 31 Oct 2024 01:10:26 +0000 (UTC)
+	s=arc-20240116; t=1730337431; c=relaxed/simple;
+	bh=aJ7Gjg+kX75Ji3y12sNo8oWtAZFkofxhsbFuwKqaUWQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ewyX5v+zwqNJxrxcBpbh+nj9mTQBwJRrPN1+PSLqFRibQ39WaXCpBz98nxmtBYNmiK/jFh7SJS4UKzmzfgB2JvBCuDKXHP+Xa2a7bnNXL/+dBX2Xxj0GY1XTOPRDf4pK/rqYsUf0uBQtXM5IQRKfVTshZKzsCrEWaK65r6a09SI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Feh0XcDG; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36DD9C4CECE;
+	Thu, 31 Oct 2024 01:17:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730337026;
-	bh=xIFemhMMsAnBkh+qIECbCkAFwd/1dR5mLwBy2//qqqo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=IS771gIBtnCdvQW0TD9oBUjMbzY0Y9PXkFyR4J66wkSVyolfhGRMNEg/EAtS3tutu
-	 Q8ybBeHQHK94qW5kS3Lv8xTwsQFo59veVdkWpGI3JN/aDGUrpEUYCj5Zv7dNsOdRzk
-	 fjjFu+a+bq6Ndkqmpk5YhdtFrvqNxzwm6pTuHqJSOLuyAsyKxp2msJb8oqpEfXySZf
-	 qUwwHFmKVNjY3C5p2hobT8Ga0ElY6zo4Tqr9jmQltHnrrfbKpM2nd6YSpkoxOc0cy8
-	 xEycJEt/fBsFW88XRCBbA2xmZg5oOy6OdHpADa2AqOn00HOysB3CB2hivVAowe96LN
-	 kDYFNw+YBiSUQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB014380AC22;
-	Thu, 31 Oct 2024 01:10:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730337430;
+	bh=aJ7Gjg+kX75Ji3y12sNo8oWtAZFkofxhsbFuwKqaUWQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Feh0XcDGyLihUvtPcgcVvratbbVuR1y88whzZUIah9qztLNVgjbr5/A8nmwddyrAl
+	 ItYuDuex3TMzv0cM0lyRFog6+igWBNUO1rYhTXDz/y6sKXM9NDwv242cQqH73NkbIg
+	 X4B8IS42HEM6j10ul3K//SoaIJncmPMr0zo67lBFhjpVekGL2kKrUd2j1wAA5I+4N4
+	 3rVZJxY3QMNPIRhKkb86Vg8I3wCSu2cYFo/2PK4skWbIzamVXSK95HpLJxPY5I1Q9T
+	 TchV3bnbo0LL4eso129URWl9y/paK0KcSEJoVuhiZyGRC2sJ0Bt9+YLk3MowSdvz+E
+	 wwopWPklpuWmQ==
+Date: Wed, 30 Oct 2024 18:17:09 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Zhang Zekun <zhangzekun11@huawei.com>
+Cc: <justin.chen@broadcom.com>, <florian.fainelli@broadcom.com>,
+ <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <o.rempel@pengutronix.de>,
+ <kory.maincent@bootlin.com>, <horms@kernel.org>, <edumazet@google.com>,
+ <pabeni@redhat.com>, <netdev@vger.kernel.org>, <chenjun102@huawei.com>
+Subject: Re: [PATCH net 0/2] Get the device_node before calling
+ of_find_node_by_name()
+Message-ID: <20241030181709.24ae5efb@kernel.org>
+In-Reply-To: <20241024015909.58654-1-zhangzekun11@huawei.com>
+References: <20241024015909.58654-1-zhangzekun11@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] gve: change to use page_pool_put_full_page when
- recycling pages
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173033703450.1512423.3734049278634147857.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Oct 2024 01:10:34 +0000
-References: <20241023221141.3008011-1-pkaligineedi@google.com>
-In-Reply-To: <20241023221141.3008011-1-pkaligineedi@google.com>
-To: Praveen Kaligineedi <pkaligineedi@google.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, andrew+netdev@lunn.ch,
- willemb@google.com, jeroendb@google.com, shailend@google.com,
- hramamurthy@google.com, ziweixiao@google.com, linyunsheng@huawei.com,
- jacob.e.keller@intel.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Thu, 24 Oct 2024 09:59:07 +0800 Zhang Zekun wrote:
+> of_find_node_by_name() will decrease the refount of the device node.
+> Get the device_node before call to it.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Doing some quick grepping I think Andrew is completely right.
+Most callers either get this wrong or call get() immediately prior.
+Maybe add a new helper with more suitable semantics?
 
-On Wed, 23 Oct 2024 15:11:41 -0700 you wrote:
-> From: Harshitha Ramamurthy <hramamurthy@google.com>
-> 
-> The driver currently uses page_pool_put_page() to recycle
-> page pool pages. Since gve uses split pages, if the fragment
-> being recycled is not the last fragment in the page, there
-> is no dma sync operation. When the last fragment is recycled,
-> dma sync is performed by page pool infra according to the
-> value passed as dma_sync_size which right now is set to the
-> size of fragment.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] gve: change to use page_pool_put_full_page when recycling pages
-    https://git.kernel.org/netdev/net-next/c/4ddf7ccfdf70
-
-You are awesome, thank you!
+The goal is not to fix the bugs but to prevent them in the first place.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
