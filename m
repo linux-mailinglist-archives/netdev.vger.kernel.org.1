@@ -1,167 +1,205 @@
-Return-Path: <netdev+bounces-140741-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140742-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 28AE09B7C7F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:12:49 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 593409B7C8E
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:17:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8C7B6B21B09
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:12:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DC7E01F2248F
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BFDF1A08B2;
-	Thu, 31 Oct 2024 14:12:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEAB126BEF;
+	Thu, 31 Oct 2024 14:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="cLp1GjMv"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Us4Dgiri"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.10])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C30E19FA8D
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 14:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA3E3FB8B
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 14:16:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730383955; cv=none; b=UQRZfTYcYqQf3vYtY2fjcyF1bH5ihqPChuaQnUY/H62jwIqY28r9Qgngzy2uYIosK2EcDMv9NJTbLlr0X//6IW8/VNcHyqmrIjuuQCIaPsENIHZQ4KC0zb13FHY0t5E5BMtUugf89lQdb50S4jgx9iQHugOaUH3jdF6PJo4WV8U=
+	t=1730384214; cv=none; b=jAwyypsWyCHICubjRAvLg6vnTMjVf002EWjgGY01qV7sS+iD046TqshzGlNgA1Skhy/bYlSUaH99FzKsVeIoVwrB5zWBicGLNwaqQIa4mlCS91BcOXSESDMznYf7bDc8xcxUxDwqWIFRPlo9I7Z5XcUyPe/0zrt+2p0svxLV88c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730383955; c=relaxed/simple;
-	bh=mQzdoA6HITBooHuI8ytc1oMFxWv2X/pE16EJqC+j+h8=;
+	s=arc-20240116; t=1730384214; c=relaxed/simple;
+	bh=cKLbfvOMqKQEtZ5qclELN1TR2T2jcygPLOGOX/rPHAo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eTsQXOHuf0pxRQDprEfbsnTv4IuXs/9cFulrYAWwvBrOtntlCr7+eUAT4btfghQ8Hmzvx7qe0EYAFvZIC404MduEMcBBWRwV6bju+IWssdswzW8Y+BXQB2aJAsjaQwLdj8sQyLQsHEsosZDI+ExpZKacC/RxnPfXhCkOogEZbnU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=cLp1GjMv; arc=none smtp.client-ip=198.175.65.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730383954; x=1761919954;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=mQzdoA6HITBooHuI8ytc1oMFxWv2X/pE16EJqC+j+h8=;
-  b=cLp1GjMvUizaZKjwuZanZej3a64zJ2UJ9afFquM/idM+4t1Hj6/9GAXT
-   EC/jsMJazN7k/3R1SwXI0gM6+h0Iz8OprgHZ5w1QP2hzw4JqjMtC6ngsS
-   tqM5pqAjKvt3TMZRzsFy6ScgtvoGRMgDYnXB0aqqhc5KqOjEjjfKJBAyY
-   oS0BgX8mSKkmB17MH7qcalHTMuwzlKEpJa44FYAdHQI3CnNl66D5pjDBF
-   lJ5sR9umvFIdW62QnmKBhUB4xgJquDCOwGpXmXoCO+LAge6oTXxBCYldt
-   f/fEZ1mqLEJJOes+dkkNuGA4Y1k6FgvRkoACq3zb44IijYxUxWP3hv/1w
-   w==;
-X-CSE-ConnectionGUID: vamPjTL1R06s3aO0QMkyQA==
-X-CSE-MsgGUID: XZy3yFHRTXyqRBKoi5azPw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="47580739"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="47580739"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 07:12:33 -0700
-X-CSE-ConnectionGUID: t79serrzTHyW7k5Cors6Bw==
-X-CSE-MsgGUID: XiH28u6WRhanW3J1sEup0Q==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,247,1725346800"; 
-   d="scan'208";a="87232153"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 31 Oct 2024 07:12:25 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t6VuR-000gH9-16;
-	Thu, 31 Oct 2024 14:12:23 +0000
-Date: Thu, 31 Oct 2024 22:12:19 +0800
-From: kernel test robot <lkp@intel.com>
-To: qiang4.zhang@linux.intel.com, "Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	Paolo Bonzini <pbonzini@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-	Olivia Mackall <olivia@selenic.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Gonglei <arei.gonglei@huawei.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Viresh Kumar <viresh.kumar@linaro.org>,
-	"Chen, Jian Jun" <jian.jun.chen@intel.com>,
-	Andi Shyti <andi.shyti@kernel.org>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	David Hildenbrand <david@redhat.com>,
-	Gerd Hoffmann <kraxel@redhat.com>,
-	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Qiang Zhang <qiang4.zhang@intel.com>
-Subject: Re: [PATCH] virtio: only reset device and restore status if needed
- in device resume
-Message-ID: <202410312128.7ymyjL4j-lkp@intel.com>
-References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=aA+GJm7dsHmBEI7Mmndq/NfhH7tltcUBZysRg8n6fghnEJiQCH9Dyzo1qkqIw4t2B79+p+lDGKu6dPneLww27pIGSwD/rS1qeGMiWoULbum8iB4Fq2azAcvN9SCTfi3tpBsgl1PKH15ZtT7mKnyZWr5Xdsfu7iMJEdWt5TBGunA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Us4Dgiri; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730384211;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ovEB1StOJ3pznvYEcRDlXSyCfUgSPoZbfcLdse6q8W8=;
+	b=Us4DgiriylXP6FSb0TNTj9clCiaY8d5YQrhVmW3T1/b4+yMqNKDlkWHnXlaYLn7Vu2Ongp
+	oHw/DvWtfdpkfA3grY52FL/if8JFWNCJ1bOFBhRovSy4vwYzMJRI3w9U7qroebH+nug8B0
+	6iYBGtjxPJeXQZEHB6hI0y4BikDSFx8=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-35-VAoc5A0xNGK7-yORrDMQ1g-1; Thu, 31 Oct 2024 10:16:49 -0400
+X-MC-Unique: VAoc5A0xNGK7-yORrDMQ1g-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-460c73093edso16053291cf.2
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 07:16:49 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730384209; x=1730989009;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ovEB1StOJ3pznvYEcRDlXSyCfUgSPoZbfcLdse6q8W8=;
+        b=UARiKYp2ie6Nj+ONH/ersfdLbIx2DkiBF+KE8u5OOIXAgJzMOT6XNAB7ZkW2SoOkrm
+         rjO1SKoghG+CPVJ+1y+Zeiel1ZZC2UKcr54ldFW017pNSPaDWT27+GENgy4Sl4SB4M51
+         Gqu8ad4/aYVYRiAJnpZegSWe73EhR2lCVeQ++9580reXdP83zEmYxi/PcHRaruI1w04w
+         GbAubR37LC35mugrUOFt3JyALDZ52oaw1/dGk3OK5oSXwfklYGUh9/SgfRweMR+uDwcQ
+         wiDFiP94aHhDNsfWap+tEqkxZt5JallFkUcrsdaJ9Ym19ULvxGilsozkztRqKJn7k2qs
+         jUAA==
+X-Forwarded-Encrypted: i=1; AJvYcCVM+YIe7FjW36rvMUFUYF3qZxoIOv0cUtzdR260OWN6D0wCGHAQB2c0TKSaKvS9Sg39I9XJJ2c=@vger.kernel.org
+X-Gm-Message-State: AOJu0YynvAjxEmM/HTWbwRv1wbemvH7XqJMKjwc/4hm0/Zbu7FTHTwGB
+	+mlnkRglrrXpLS9geDRJmESwAhaPxDpvzBRykxhWaTS3ohogtikkAMRbx2FZu4MYq+nSC6MtpwM
+	bLxqq58FqNGMylFWDatvONskOUlkKnExGHU3pZVbUF5MVtDfgycIVz0puPXbHYQ==
+X-Received: by 2002:ac8:5f54:0:b0:447:e769:76fc with SMTP id d75a77b69052e-462ab281dd7mr38992691cf.34.1730384208847;
+        Thu, 31 Oct 2024 07:16:48 -0700 (PDT)
+X-Google-Smtp-Source: AGHT+IE3kzGANbJFLZsZsBNtKFVvhMspBrZjxm8HkCv2R3gtqqOdYfj7lK8iIiAbmNobSSw7VhuhVA==
+X-Received: by 2002:ac8:5f54:0:b0:447:e769:76fc with SMTP id d75a77b69052e-462ab281dd7mr38991981cf.34.1730384208150;
+        Thu, 31 Oct 2024 07:16:48 -0700 (PDT)
+Received: from sgarzare-redhat ([5.179.173.225])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ad1b42ffsm7879231cf.93.2024.10.31.07.16.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2024 07:16:47 -0700 (PDT)
+Date: Thu, 31 Oct 2024 15:16:43 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Konstantin Shkolnyy <kshk@linux.ibm.com>
+Cc: virtualization@lists.linux.dev, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, mjrosato@linux.ibm.com
+Subject: Re: [PATCH v4 2/2] vsock/test: fix parameter types in
+ SO_VM_SOCKETS_* calls
+Message-ID: <7o2b3ggh7ojcoiyh5dcgu5y6436tqjarvmvavxmbm2id3fggdu@46rhdjnyqdpr>
+References: <20241029144954.285279-1-kshk@linux.ibm.com>
+ <20241029144954.285279-3-kshk@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
+In-Reply-To: <20241029144954.285279-3-kshk@linux.ibm.com>
 
-Hi,
+On Tue, Oct 29, 2024 at 09:49:54AM -0500, Konstantin Shkolnyy wrote:
+>Change parameters of SO_VM_SOCKETS_* to uint64_t so that they are always
 
-kernel test robot noticed the following build errors:
+In include/uapi/linux/vm_sockets.h we talk about "unsigned long long",
+but in the kernel code we use u64. IIUC "unsigned long long" should be 
+u64 on every architecture, at least till we will have some 128-bit cpu, 
+right?
 
-[auto build test ERROR on char-misc/char-misc-testing]
-[also build test ERROR on char-misc/char-misc-next char-misc/char-misc-linus mst-vhost/linux-next axboe-block/for-next herbert-cryptodev-2.6/master andi-shyti/i2c/i2c-host mkp-scsi/for-next jejb-scsi/for-next tiwai-sound/for-next tiwai-sound/for-linus linus/master v6.12-rc5 next-20241031]
-[cannot apply to herbert-crypto-2.6/master]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+>64-bit, because the corresponding kernel code requires them to be at 
+>least
+>that large, no matter what architecture.
+>
+>Fixes: 5c338112e48a ("test/vsock: rework message bounds test")
+>Fixes: 685a21c314a8 ("test/vsock: add big message test")
+>Fixes: 542e893fbadc ("vsock/test: two tests to check credit update logic")
+>Fixes: 8abbffd27ced ("test/vsock: vsock_perf utility")
+>Signed-off-by: Konstantin Shkolnyy <kshk@linux.ibm.com>
+>---
+> tools/testing/vsock/vsock_perf.c |  2 +-
+> tools/testing/vsock/vsock_test.c | 19 ++++++++++++++-----
+> 2 files changed, 15 insertions(+), 6 deletions(-)
+>
+>diff --git a/tools/testing/vsock/vsock_perf.c b/tools/testing/vsock/vsock_perf.c
+>index 22633c2848cc..88f6be4162a6 100644
+>--- a/tools/testing/vsock/vsock_perf.c
+>+++ b/tools/testing/vsock/vsock_perf.c
+>@@ -33,7 +33,7 @@
+>
+> static unsigned int port = DEFAULT_PORT;
+> static unsigned long buf_size_bytes = DEFAULT_BUF_SIZE_BYTES;
+>-static unsigned long vsock_buf_bytes = DEFAULT_VSOCK_BUF_BYTES;
+>+static uint64_t vsock_buf_bytes = DEFAULT_VSOCK_BUF_BYTES;
 
-url:    https://github.com/intel-lab-lkp/linux/commits/qiang4-zhang-linux-intel-com/virtio-only-reset-device-and-restore-status-if-needed-in-device-resume/20241031-111315
-base:   char-misc/char-misc-testing
-patch link:    https://lore.kernel.org/r/20241031030847.3253873-1-qiang4.zhang%40linux.intel.com
-patch subject: [PATCH] virtio: only reset device and restore status if needed in device resume
-config: x86_64-buildonly-randconfig-003-20241031 (https://download.01.org/0day-ci/archive/20241031/202410312128.7ymyjL4j-lkp@intel.com/config)
-compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241031/202410312128.7ymyjL4j-lkp@intel.com/reproduce)
+What about using `unsigned long long` as documented in the vm_sockets.h?
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202410312128.7ymyjL4j-lkp@intel.com/
+Thanks,
+Stefano
 
-All errors (new ones prefixed by >>):
+> static bool zerocopy;
+>
+> static void error(const char *s)
+>diff --git a/tools/testing/vsock/vsock_test.c b/tools/testing/vsock/vsock_test.c
+>index 7fd25b814b4b..49a32515886f 100644
+>--- a/tools/testing/vsock/vsock_test.c
+>+++ b/tools/testing/vsock/vsock_test.c
+>@@ -429,7 +429,7 @@ static void test_seqpacket_msg_bounds_client(const struct test_opts *opts)
+>
+> static void test_seqpacket_msg_bounds_server(const struct test_opts *opts)
+> {
+>-	unsigned long sock_buf_size;
+>+	uint64_t sock_buf_size;
+> 	unsigned long remote_hash;
+> 	unsigned long curr_hash;
+> 	int fd;
+>@@ -634,7 +634,8 @@ static void test_seqpacket_timeout_server(const struct test_opts *opts)
+>
+> static void test_seqpacket_bigmsg_client(const struct test_opts *opts)
+> {
+>-	unsigned long sock_buf_size;
+>+	uint64_t sock_buf_size;
+>+	size_t buf_size;
+> 	socklen_t len;
+> 	void *data;
+> 	int fd;
+>@@ -655,13 +656,19 @@ static void test_seqpacket_bigmsg_client(const struct test_opts *opts)
+>
+> 	sock_buf_size++;
+>
+>-	data = malloc(sock_buf_size);
+>+	buf_size = (size_t) sock_buf_size; /* size_t can be < uint64_t */
+>+	if (buf_size != sock_buf_size) {
+>+		fprintf(stderr, "Returned BUFFER_SIZE too large\n");
+>+		exit(EXIT_FAILURE);
+>+	}
+>+
+>+	data = malloc(buf_size);
+> 	if (!data) {
+> 		perror("malloc");
+> 		exit(EXIT_FAILURE);
+> 	}
+>
+>-	send_buf(fd, data, sock_buf_size, 0, -EMSGSIZE);
+>+	send_buf(fd, data, buf_size, 0, -EMSGSIZE);
+>
+> 	control_writeln("CLISENT");
+>
+>@@ -1360,6 +1367,7 @@ static void test_stream_credit_update_test(const struct test_opts *opts,
+> 	int recv_buf_size;
+> 	struct pollfd fds;
+> 	size_t buf_size;
+>+	uint64_t sock_buf_size;
+> 	void *buf;
+> 	int fd;
+>
+>@@ -1370,9 +1378,10 @@ static void test_stream_credit_update_test(const struct test_opts *opts,
+> 	}
+>
+> 	buf_size = RCVLOWAT_CREDIT_UPD_BUF_SIZE;
+>+	sock_buf_size = buf_size; /* size_t can be < uint64_t */
+>
+> 	if (setsockopt(fd, AF_VSOCK, SO_VM_SOCKETS_BUFFER_SIZE,
+>-		       &buf_size, sizeof(buf_size))) {
+>+		       &sock_buf_size, sizeof(sock_buf_size))) {
+> 		perror("setsockopt(SO_VM_SOCKETS_BUFFER_SIZE)");
+> 		exit(EXIT_FAILURE);
+> 	}
+>-- 
+>2.34.1
+>
 
-   In file included from drivers/i2c/busses/i2c-virtio.c:14:
-   In file included from include/linux/i2c.h:19:
-   In file included from include/linux/regulator/consumer.h:35:
-   In file included from include/linux/suspend.h:5:
-   In file included from include/linux/swap.h:9:
-   In file included from include/linux/memcontrol.h:21:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
->> drivers/i2c/busses/i2c-virtio.c:256:8: error: call to undeclared function 'virtio_device_reset_and_restore_status'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-     256 |         ret = virtio_device_reset_and_restore_status(vdev);
-         |               ^
-   1 warning and 1 error generated.
-
-
-vim +/virtio_device_reset_and_restore_status +256 drivers/i2c/busses/i2c-virtio.c
-
-   251	
-   252	static int virtio_i2c_restore(struct virtio_device *vdev)
-   253	{
-   254		int ret;
-   255	
- > 256		ret = virtio_device_reset_and_restore_status(vdev);
-   257		if (ret)
-   258			return ret;
-   259	
-   260		return virtio_i2c_setup_vqs(vdev->priv);
-   261	}
-   262	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
 
