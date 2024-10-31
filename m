@@ -1,142 +1,83 @@
-Return-Path: <netdev+bounces-140604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140605-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D1A9B727B
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:24:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D23B79B7287
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 03:34:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B0F41C23522
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:24:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A41E7B22EE6
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:34:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B018D84E14;
-	Thu, 31 Oct 2024 02:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="c4ZVLWI9"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 952CD175BF;
+	Thu, 31 Oct 2024 02:34:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F9B03C463;
-	Thu, 31 Oct 2024 02:24:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26ABE1BD9C0
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 02:34:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730341449; cv=none; b=k0WEY4OuQ+fbuS/iA8zWI4EiMLN1BQuIPupSngOFuhGUHW8AW/Cz7o55x5fZXSGR0Q1Wf66/R6StiMFFkQNY5QlDlK7OSmFAWMVZnR0I/DrOzIJvB27MtywpUlzjeAVHIHZ5lm8CpSm6krJK7jaSF8wk+VGDg2Hkjt29BbkrWTU=
+	t=1730342060; cv=none; b=Q1NfwbF/gF3l1yMLiIQyVAk4UwKCJ7pu0pFsUn3oBOsBcItsRLG/J0mHqihSAs3P54aCyVvu4v0xtyNPosQcn/TOntod422QV6U0CSxAifstuWL/19/pt/cfffCuJV6IhfmKYTqn70hlRjsnarLiPe58+D+YHgT4pQiRHlsyuzY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730341449; c=relaxed/simple;
-	bh=CpfpjeoHFq7UMSel8L39BpXOdU5xFOL1/GfnADwFstQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YZHTcJtyxknBnFP3c+P2iOMjEu6iIIBRsqfnRuUodpzUna+V5YfJL4rC5T+ZfwQ+KwpTdNclo99DqddoQQ1CVbKPjNi7M9mEwPelxJU8ry4eupm0bm+n6e+ebv7jRcnK8pLP6MVx/Jfr2hzPAXZ8lkNxV3KPH2jgRNF+Fr4Qoaw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=c4ZVLWI9; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1730341442;
-	bh=/P2CzaVMCo0NXrWGQ9eXia4Ee/PM59wr7D5hNHndo0E=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=c4ZVLWI9hNTAHDI9jbEmkeirZQHQJzAhnoU5JsHOLOIeWjwuIToLh9V7RlZ3E5Emy
-	 Y9MFb8E19ZsBhRM39rjiA7D3nnAuWo5gAUNkhmzpti8H88dCziryJUtA/4Ok5K/lKs
-	 WjHLm80wrvu/6Bs5curLM11djyjZTo3S1sFn+5jwv+wM1s1xZMU6N2UY71Ff/aK5jm
-	 faMIq/7AhZyWmZdDldP4LwarHU1Lw75oUTaGiJBUYmPMy/qv920AqwchAYnkEFZUAu
-	 Ti1EY3fHARBZbmSpxFGhenI0OfTYh9nZpy8EbW8AW5gibIa+GXhdpem1IirONk5JY2
-	 ReoF4r6ma13KQ==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xf78y4FKsz4xN2;
-	Thu, 31 Oct 2024 13:24:02 +1100 (AEDT)
-Date: Thu, 31 Oct 2024 13:24:03 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>
-Cc: Kalle Valo <kvalo@kernel.org>, Johannes Berg
- <johannes@sipsolutions.net>, Ben Greear <greearb@candelatech.com>, Emmanuel
- Grumbach <emmanuel.grumbach@intel.com>, Johannes Berg
- <johannes.berg@intel.com>, Wireless <linux-wireless@vger.kernel.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>, Miri Korenblit
- <miriam.rachel.korenblit@intel.com>, Networking <netdev@vger.kernel.org>
-Subject: Re: linux-next: manual merge of the wireless-next tree with the
- wireless tree
-Message-ID: <20241031132403.7b5a0ca5@canb.auug.org.au>
-In-Reply-To: <20241024115523.4cd35dde@canb.auug.org.au>
-References: <20241024115523.4cd35dde@canb.auug.org.au>
+	s=arc-20240116; t=1730342060; c=relaxed/simple;
+	bh=lGkZj3ihnhclOqxtyVd42hLTVnfsqZadFXgO/dFAj+w=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=C4EvQ+UhsSfIwzSeEoKU7/TzlH/hUo+m3oa8eohcx8dto2jUg/M6rDpcFSWFLkdf4b1ZfinY7DHDhGwuRCEJdQYLSNZCCZJ4xtcD5LLpcNIthxHNMmwOOIlfjtnXFfetvPkf5oi9AZfSNJKXglBBjHmOTf79jmOUbZ9Qbg7fzW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.174])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Xf7L92qJnz10PL3;
+	Thu, 31 Oct 2024 10:32:01 +0800 (CST)
+Received: from dggpemf500016.china.huawei.com (unknown [7.185.36.197])
+	by mail.maildlp.com (Postfix) with ESMTPS id 6341714038F;
+	Thu, 31 Oct 2024 10:34:13 +0800 (CST)
+Received: from DESKTOP-8F1OVF5.china.huawei.com (10.136.114.27) by
+ dggpemf500016.china.huawei.com (7.185.36.197) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Thu, 31 Oct 2024 10:34:12 +0800
+From: chengyechun <chengyechun1@huawei.com>
+To: <netdev@vger.kernel.org>, <j.vosburgh@gmail.com>, <andy@greyhouse.net>
+CC: <vfalico@gmail.com>
+Subject: [PATCH] enable port after switch
+Date: Thu, 31 Oct 2024 10:34:08 +0800
+Message-ID: <20241031023408.31008-1-chengyechun1@huawei.com>
+X-Mailer: git-send-email 2.21.0.windows.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/CWEjHZMyWAED2ywnE75p_z=";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpemf500016.china.huawei.com (7.185.36.197)
 
---Sig_/CWEjHZMyWAED2ywnE75p_z=
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+After switching the best aggregator,
+change the backup value of the corresponding slave node to 0
 
-Hi all,
+Signed-off-by: chengyechun <chengyechun1@huawei.com>
 
-On Thu, 24 Oct 2024 11:55:23 +1100 Stephen Rothwell <sfr@canb.auug.org.au> =
-wrote:
->=20
-> Today's linux-next merge of the wireless-next tree got a conflict in:
->=20
->   net/mac80211/cfg.c
->=20
-> between commit:
->=20
->   8dd0498983ee ("wifi: mac80211: Fix setting txpower with emulate_chanctx=
-")
->=20
-> from the wireless tree and commit:
->=20
->   c4382d5ca1af ("wifi: mac80211: update the right link for tx power")
->=20
-> from the wireless-next tree.
->=20
-> I fixed it up (see below) and can carry the fix as necessary. This
-> is now fixed as far as linux-next is concerned, but any non trivial
-> conflicts should be mentioned to your upstream maintainer when your tree
-> is submitted for merging.  You may also want to consider cooperating
-> with the maintainer of the conflicting tree to minimise any particularly
-> complex conflicts.
->=20
-> diff --cc net/mac80211/cfg.c
-> index 6dfc61a9acd4,6c0b228523cb..000000000000
-> --- a/net/mac80211/cfg.c
-> +++ b/net/mac80211/cfg.c
-> @@@ -3046,7 -3070,7 +3070,8 @@@ static int ieee80211_set_tx_power(struc
->   	enum nl80211_tx_power_setting txp_type =3D type;
->   	bool update_txp_type =3D false;
->   	bool has_monitor =3D false;
->  +	int old_power =3D local->user_power_level;
-> + 	int user_power_level;
->  =20
->   	lockdep_assert_wiphy(local->hw.wiphy);
+---
+ drivers/net/bonding/bond_3ad.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-This is now a conflict between the net and net-next trees.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/CWEjHZMyWAED2ywnE75p_z=
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmci6kMACgkQAVBC80lX
-0GyTsAf+PD2CF5n4o66iImXT68HZ9M5r/oFJa7DJvUBLuOH4IX0norUf3kqq63iP
-IpGFhd1ZOOqIKpYldQ3Gqo0tmfXPQpHoGIR36udXFcdBaWgeU/y5hjObttpN+mRL
-PHqLH2kNP7/FPFyZfGoZmZvsDSKa+aIXFUf9ha3/y+wmuXTaKhIHp+ejeS49DL0e
-Aog5tIeoB6vEG+vmX2vfgdSCVtk3zC2stmMg2Z9S57y0mqnsvwVlFoGNDbl2bXqX
-29X9p05vpMMrW0UivCuqXndcVPfdk3Xo32/u72U2/JZBGVC0gsjutlJI1BBZdGle
-nC16b97kWxP3EU7QYwH5j4IFb8oopg==
-=IDYd
------END PGP SIGNATURE-----
-
---Sig_/CWEjHZMyWAED2ywnE75p_z=--
+diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
+index b19e0e41b..b07e42950 100644
+--- a/drivers/net/bonding/bond_3ad.c
++++ b/drivers/net/bonding/bond_3ad.c
+@@ -1830,6 +1830,8 @@ static void ad_agg_selection_logic(struct aggregator *agg,
+                                __disable_port(port);
+                        }
+                }
++               port = best->lag_ports;
++               __enable_port(port);
+                /* Slave array needs update. */
+                *update_slave_arr = true;
+        }
+--
+2.33.0
 
