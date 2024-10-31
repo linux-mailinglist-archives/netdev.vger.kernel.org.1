@@ -1,187 +1,135 @@
-Return-Path: <netdev+bounces-140790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140792-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A7F39B8126
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 18:27:49 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D172F9B812F
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 18:30:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 514FE282D47
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:27:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0F0A81C21E44
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:30:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BFF21BD517;
-	Thu, 31 Oct 2024 17:27:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE34B1BE23C;
+	Thu, 31 Oct 2024 17:29:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jsNQMckr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="j40/yvW4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oa1-f44.google.com (mail-oa1-f44.google.com [209.85.160.44])
+Received: from mail-wm1-f46.google.com (mail-wm1-f46.google.com [209.85.128.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6CC21386C9
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 17:27:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACB3E1BDAA4;
+	Thu, 31 Oct 2024 17:29:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730395664; cv=none; b=lSIP7i3vfsUrLp7OVojRXQlbHQQj9B5bibjliQu6Zc0P3LxmSMjzzOPv05wYpR1E0RuzcLRSJYSiur2oWfzx/Sx96kQIxKRpALJFq2WqhO609Ei8hvRCrJGDNUK9BwpcP+luuBu7WyTwiNu2yiWVxHQrCpu221BtPqtlwEddvXk=
+	t=1730395792; cv=none; b=tINelg2YKquMnZDX7TjWeg1tdFp8c2uowZeV345mNFf0bxMXocOMzD1Tc2v7p+pX6YiDkQ2ig+IIycsXCmjeW3HBwv4tsVrhSJ9l6z2F7WZ9W9lhVSC/tCsHwXe6hCQUx4WDzgXtVIZ6XgskLah+bZiww/yjmgJriZwne+aLV80=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730395664; c=relaxed/simple;
-	bh=wajFU0VqH/eWf8Gcuw1Tf0q2QHCAYb3SgHwDwszQgrM=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gWWkfxMTUoH0lsnxKsRDZyC5IxAgH19F2StT2zXqTK/Y2wNUVvI8C5djFy5GFwWuchn5O/HQz6I66NzQ0XtQSCwQPgFSLft5F0nCejgolcwD8IoeWOj9I4U3qTPOnn2ORvK45dBsu88u2vQMuXYKeebRgCCAhGdmZ/x0te4DO+Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jsNQMckr; arc=none smtp.client-ip=209.85.160.44
+	s=arc-20240116; t=1730395792; c=relaxed/simple;
+	bh=a5u8tp56/AYeTIz8p+9JUb3Jf0C1KWhW1Qot8R2kHRE=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LydXtK5q/dSrl5JQNo+44Yw5cW5P/MiJUasIvPaEjNa6wXTO9Cdfk0VYnXLd9guOIfi0d7QSzhqAFyimQ57JFtF7AZe3Jtt5Hi1KcbySQmRDw9s0O60V1lYTBnrNKsIhr5fdy0E4IUAfN1j9mmlNp8yOw7v29CLaWxNyOwQMsvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=j40/yvW4; arc=none smtp.client-ip=209.85.128.46
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oa1-f44.google.com with SMTP id 586e51a60fabf-28c654c9e79so1233622fac.0
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:27:42 -0700 (PDT)
+Received: by mail-wm1-f46.google.com with SMTP id 5b1f17b1804b1-4315ce4d250so1624155e9.2;
+        Thu, 31 Oct 2024 10:29:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730395662; x=1731000462; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=15tVf+gqbtVobKotVC5kh7A1yTAAJ4bmaozLqkT5Qiw=;
-        b=jsNQMckrztsfFBaVQixEULfvYqyC8pW0i20Ix3Xti4l1m6xYQdbaWKA+E8JWILntc2
-         HwvT9A4PcpXNlABL9nH04cDAkNRbuEvcyuMN+okSl3uPzhP4RvBpHghIqekvImHW9r6W
-         m2gq1kWaSHpf4neVa348Nf8w7+q/FSfzryWdw6U9VTemkb/jxxHw5MP0lhfHA/Kux8/7
-         5SIsAcBoFTqDWaaDo7IQjESaD8Da+F9JytYoe48xSGPbhiuHGxmZR6HNyRXNea1cyuDo
-         tAGhhmN5zmJeNsrWzsWyFwc7UXDCPbpmy5MdQ1DGEfvIpURh8EMiMxwPHyFuWbYCMjw5
-         F5FA==
+        d=gmail.com; s=20230601; t=1730395789; x=1731000589; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=y2c2+8hCBcHHsv3z7ugoMx+aG94aS+LJBUKz0Fv+Ygw=;
+        b=j40/yvW4Equ6MND0a+EzAkKrCirqFFe1qpX/9SKuUBLYGGIAHAe8yCKpHPXCR4sOu6
+         zxDXSJ18+hZVJo17mkmjol8HNfucN/g66/jgUVzh8KQADaEbmO0PKE5kKDcLbppEH+pw
+         l1+zS28+Gz7tfg8v+eHdwUZZMhH00cZmPe1OF9n39JT11rqS5Zm2NVarbvuToDOJsVkA
+         pLQXVYbCCZGpCrpxvyKsoitQAKdN2MUpWq3Gsn/z5bmC8hUZBFFD1DyauGKIxz9cC9RT
+         EcPn61tFyNhMIwW2SzN+GNEVNiInomyu7lVdW3ephF/fj9u0DTgpGQgmreqOn0kSktMK
+         NehQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730395662; x=1731000462;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=15tVf+gqbtVobKotVC5kh7A1yTAAJ4bmaozLqkT5Qiw=;
-        b=rtFZYU7bAaHTRB1IRHFZyb9TDcw/83G47hQykJRj1cGUaAbeOm3mfCXQYi0v6RcEcz
-         /EHJRky4LU/eKW6Xtt0gQ2S0oC5thl9lUwRmyWBnllfMlOHUbUdIMkPKLax94lAqeQMV
-         mntaoQzsfKjEDZIA/E2O/AWw9FPqq2gfp9Ni1eoIiB7Rd6OvdsUITI88196ZO/aCfsen
-         MkSXCTkYryCDLEZK9y8mBelfjm0f1qlQjd6k75ig5ZF3BCtWiIDMweAIU8eihQy/XfJW
-         ts7bJDdk6qCI43zptNL9Gk4Smi9kAmNKnX5htrxsq6Xown4FShFqxlX20+yep6X+lyXI
-         H3rg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCOV78//W665izGmDnTjH0r4hFws9kxbjDfyBToDsQoACZc+pFvCrfN1MQHVm3ACRbt52O+I0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzDBfZkMiFLL56VONjB636Q5tkss7U0Uvk3VxrW9x+DrFJjlXCy
-	IPj9WbpQTiXmsntRcW3aPPVfOwnIQhP60bUA++9sdDs5vJswgwynCBaral635Ab0LujPCtVyHTy
-	rfaEnbTMWG2RHAbU+PEdJ5amwdqo=
-X-Google-Smtp-Source: AGHT+IHjD9/sSv6GHUJ2jRr35+8QlvFfu0em8OE9qRrMMT7W6ORIHzYu95bZXvzS0Bs57EWYV41onV/z7mchANxpVSI=
-X-Received: by 2002:a05:6870:9d96:b0:277:73ce:da7c with SMTP id
- 586e51a60fabf-29488987aeemr1781653fac.23.1730395661780; Thu, 31 Oct 2024
- 10:27:41 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730395789; x=1731000589;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y2c2+8hCBcHHsv3z7ugoMx+aG94aS+LJBUKz0Fv+Ygw=;
+        b=IRd16r6GApMi3mRXVpHZvHROHameveVVSDqVqJzhqNh7cnDVbDMlOujhOr9RSWw7Q9
+         B6K/rWce1ZnttL/XgkynJaF/kjDnEL++mWaRBR0vXZFNc8S44Y/g2HfohGTqqO0OQjlh
+         yKHNgwS3aRNsXrhzVTO+TeJBk7l7jlV0bMnb6Q4Rcz1Q/ZO5wDJA6KJY8DT5QtGhdH66
+         yGnd7xn/CFafHIOwsKf6GXn8Cbe4keCgjOkbIrAhK3U3XmKafGBVZDpyhUwLWOULkNyj
+         KNMUL8TgfyeT/HgDYmt5dno7LMiR1iRQ5CA3NMTMk4WRmq6W+lX4x5razid/Ws5jeGCM
+         OzvA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2izyt59GKNr4Vc5WG4A/ht8tL3UPxVxCQAHfg2hSOLg1BJvOqhUJ1OEu+CvKwfCbpIGG+sq21ER1+78I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxPxwI5vSXzQ2bfKYa8rT+CSPI06AkUhab7V4wFuXdOHdhlOAZO
+	ryDv/uMrYbdJlJLvBDg+XtxdjNzxzn8Q60kTgTBSZDh+9huS5ARi
+X-Google-Smtp-Source: AGHT+IHakfGneSPWq42iuCut70oQ1E9rhNIoV1udWPYkJZcYcJIwtNnTlcAC2SE6lmct2XjYknh6Xg==
+X-Received: by 2002:a05:600c:1c91:b0:42c:b9c8:2ba9 with SMTP id 5b1f17b1804b1-4319ad2b318mr76969105e9.6.1730395788864;
+        Thu, 31 Oct 2024 10:29:48 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5ab305sm33621135e9.7.2024.10.31.10.29.46
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2024 10:29:47 -0700 (PDT)
+Date: Thu, 31 Oct 2024 19:29:44 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v7 1/8] net: stmmac: Introduce separate files
+ for FPE implementation
+Message-ID: <20241031172944.ykgvlsysz5srxyr4@skbuf>
+References: <cover.1730376866.git.0x1207@gmail.com>
+ <9876134957283296792864da97eab60328f8d478.1730376866.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241021221248.60378-1-chia-yu.chang@nokia-bell-labs.com>
- <20241021221248.60378-2-chia-yu.chang@nokia-bell-labs.com>
- <ea2ccad9-6a4a-48e1-8e99-0289e13d501c@redhat.com> <CANn89iKU5G-vEPkLFY9vGyNBEA-G6msGiPJqiBNAcw4nNXoSbg@mail.gmail.com>
- <CADVnQy=Gt+PHPJ+EdaXY=xcrgeDwusSBmmWV9+6-=93ZhD4SXw@mail.gmail.com>
- <CANn89iJNi1=+gAx6P4keDb9wuHoTjZnN0DNRgBEZ5cJuUcaZHg@mail.gmail.com> <AM6PR07MB4456EAF742A691AD513AE8C1B9552@AM6PR07MB4456.eurprd07.prod.outlook.com>
-In-Reply-To: <AM6PR07MB4456EAF742A691AD513AE8C1B9552@AM6PR07MB4456.eurprd07.prod.outlook.com>
-From: Dave Taht <dave.taht@gmail.com>
-Date: Thu, 31 Oct 2024 10:27:27 -0700
-Message-ID: <CAA93jw7b5D3DXw3=x5hWxvEctLiVhc4ozQSgwogqArOE6pMYcQ@mail.gmail.com>
-Subject: Re: [PATCH v4 net-next 1/1] sched: Add dualpi2 qdisc
-To: "Koen De Schepper (Nokia)" <koen.de_schepper@nokia-bell-labs.com>
-Cc: Eric Dumazet <edumazet@google.com>, Neal Cardwell <ncardwell@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, 
-	"Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"stephen@networkplumber.org" <stephen@networkplumber.org>, "jhs@mojatatu.com" <jhs@mojatatu.com>, 
-	"kuba@kernel.org" <kuba@kernel.org>, "dsahern@kernel.org" <dsahern@kernel.org>, "ij@kernel.org" <ij@kernel.org>, 
-	"g.white@cablelabs.com" <g.white@cablelabs.com>, 
-	"ingemar.s.johansson@ericsson.com" <ingemar.s.johansson@ericsson.com>, 
-	"mirja.kuehlewind@ericsson.com" <mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>, 
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, 
-	"Jason_Livingood@comcast.com" <Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>, 
-	Olga Albisser <olga@albisser.org>, "Olivier Tilmans (Nokia)" <olivier.tilmans@nokia.com>, 
-	Henrik Steen <henrist@henrist.net>, Bob Briscoe <research@bobbriscoe.net>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9876134957283296792864da97eab60328f8d478.1730376866.git.0x1207@gmail.com>
 
-On Thu, Oct 31, 2024 at 9:46=E2=80=AFAM Koen De Schepper (Nokia)
-<koen.de_schepper@nokia-bell-labs.com> wrote:
->
->
-> From: Eric Dumazet <edumazet@google.com>
-> Sent: Thursday, October 31, 2024 3:31 PM
-> > On Thu, Oct 31, 2024 at 2:28=E2=80=AFPM Neal Cardwell <ncardwell@google=
-.com> wrote:
-> > > On Tue, Oct 29, 2024 at 12:53=E2=80=AFPM Eric Dumazet <edumazet@googl=
-e.com> wrote:
-> > > > Also, it seems this qdisc could be a mere sch_prio queue, with two
-> > > > sch_pie children, or two sch_fq or sch_fq_codel ?
-> > >
-> > > Having two independent children would not allow meeting the dualpi2
-> > > goal to "preserve fairness between ECN-capable and non-ECN-capable
-> > > traffic." (quoting text from https://datatracker.ietf.org/doc/rfc9332=
-/
-> > > ). The main issue is that there may be differing numbers of flows in
-> > > the ECN-capable and non-ECN-capable queues, and yet dualpi2 wants to
-> > > maintain approximate per-flow fairness on both sides. To do this, it
-> > > uses a single qdisc with coupling of the ECN mark rate in the
-> > > ECN-capable queue and drop rate in the non-ECN-capable queue.
-> >
-> > Not sure I understand this argument.
-> >
-> > The dequeue  seems to use WRR, so this means that instead of prio, this=
- could use net/sched/sch_drr.c, then two PIE (with different settings) as c=
-hildren, and a proper classify at enqueue to choose one queue or the other.
-> >
-> > Reviewing ~1000 lines of code, knowing that in one year another net/sch=
-ed/sch_fq_dualpi2.c will follow (as net/sched/sch_fq_pie.c followed net/sch=
-ed/sch_pie.c ) is not exactly appealing to me.
->
-> This composition doesn't work. We need more than 2 independent AQMs and a=
- scheduler. The coupling between the queues and other extra interworking co=
-nditions is very important here, which are unfortunately not possible with =
-a composition of existing qdiscs.
+On Thu, Oct 31, 2024 at 08:37:55PM +0800, Furong Xu wrote:
+> +void stmmac_fpe_link_state_handle(struct stmmac_priv *priv, bool is_up)
+> +{
+> +	struct stmmac_fpe_cfg *fpe_cfg = &priv->fpe_cfg;
+> +	unsigned long flags;
+> +
+> +	timer_shutdown_sync(&fpe_cfg->verify_timer);
+> +
+> +	spin_lock_irqsave(&fpe_cfg->lock, flags);
+> +
+> +	if (is_up && fpe_cfg->pmac_enabled) {
+> +		/* VERIFY process requires pmac enabled when NIC comes up */
+> +		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
+> +				     priv->plat->tx_queues_to_use,
+> +				     priv->plat->rx_queues_to_use,
+> +				     false, true);
+> +
+> +		/* New link => maybe new partner => new verification process */
+> +		stmmac_fpe_apply(priv);
+> +	} else {
+> +		/* No link => turn off EFPE */
+> +		stmmac_fpe_configure(priv, priv->ioaddr, fpe_cfg,
+> +				     priv->plat->tx_queues_to_use,
+> +				     priv->plat->rx_queues_to_use,
+> +				     false, false);
+> +	}
+> +
+> +	spin_unlock_irqrestore(&fpe_cfg->lock, flags);
+> +}
+> +
+> +void stmmac_fpe_apply(struct stmmac_priv *priv)
 
-I tried to mention that the dualpi concept is not very dual when
-hardware mq is in use - one "dualpi" instance per core.
-
-So essential limitations on usage for dualpi are:
-
-Single instance only
-gso-splitting only
-
-So it is not suitable as a general purpose data center qdisc because
-it simply cannot scale to larger bandwidths.
-
-I think in part the confusion here is the other stuff that was
-originally submitted (accecn, tcp prague), needs to be tested somehow,
-and a path forward seems to be to put a ce_threshold into sch_fq
-matching the l4s ecn bit, with a suitable default (which in dualpi is
-1ms). (self congestion is a thing), then incorporate accecn, then test
-prague driving that, then, somewhere on the path or test setup put in
-a rate limited dualpi instance?
-
-> Also, we don't expect any FQ and DualQ merger. Using only 2 queues (one f=
-or each class L4S and Classic) is one of the differentiating features of Du=
-alQ compared to FQ, with a lower L4S tail latency compared to a blocking an=
-d scheduled FQ qdiscs.
-
->Adding FQ_ on top or under DualQ would break the goal of DualQ.
-
-Comparing fq_codel or fq_pie to dualQ would probably be enlightening.
-Both of these scale to hardware mq.
-
-In dualpi's defence it seems to be an attempt to mimic a hardware
-implementation.
-
-> If an FQ_ supporting L4S is needed, then existing FQ_ implementations can=
- be used (like fq_codel) or extended (identifying L4S and using the correct=
- thresholds by default).
-
-Merely having a preferred value for that threshold would be nice. The
-threshold first deployed for fq_codel was far too low for production
-environments. If 1ms works, cool!
-
->
-> Regards,
-> Koen.
-
-
-
---=20
-Dave T=C3=A4ht CSO, LibreQos
+This is absolutely minor, but could you please sort the functions in
+their natural calling order (callee first, caller second)? It's fine now
+that stmmac_fpe_apply() has its function prototype exported, and that
+works as a forward declaration because we also include stmmac_fpe.h.
+But if somebody were to unexport stmmac_fpe_apply() in the future, they
+would also have to move it too.
 
