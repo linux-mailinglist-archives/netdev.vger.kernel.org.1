@@ -1,299 +1,309 @@
-Return-Path: <netdev+bounces-140713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325489B7B2F
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:59:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 78E639B7B36
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 14:00:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id AAB5F1F23820
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:59:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5591B24384
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:00:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C250319D8B4;
-	Thu, 31 Oct 2024 12:58:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C07C919C55C;
+	Thu, 31 Oct 2024 13:00:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="htWyYGYy"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="nYaELqOT"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2057.outbound.protection.outlook.com [40.107.236.57])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D5C319D08A
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 12:58:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730379528; cv=none; b=FchfGnIFuCLpyPhqkEu/MOFxqvCsYYRgqAmvjNTye+fKixoDlKZyY+2PP1aYpFf4yBHb3ZbkLc5o+oN1n8MKZneqv4q3JbjRqIoHaRuRV3gjBRMuSaa+4nKUrbStpVHCYtG3EHESilVKcNj8vx4Kiw1mHBwQq6frO38c6KCA+E4=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730379528; c=relaxed/simple;
-	bh=DXnZKixscFoBQMJXA8w4bMmQD+j421Dnphaji0yHKQU=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=aI0VqpRhiOyXnA4I8a02nGL7EdLBJHEd2JQDt7Dh5LMJSr7pC+sGSx8qvEqkQZOr3DrugINDbprUbcEDvw4AqRXiajag4JyIl3GwYzpAeQQ21RRJqs5MTr/sY4QefkLf9OdxSnOBApsq/zjtdXO6bwCDxvzTJnF9KXjXFpZ3wso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=htWyYGYy; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730379525;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Tw7g6uU6ZxI1gC/pUKtFC6nfgE91Ln7aDN8ewiylNhk=;
-	b=htWyYGYyeTk1L2RoIaI6L9WRmA1mwEkxOsTlqnwOp9cJsVTYScoL5SJp8Th6Jyv2f7+pib
-	SXcAlMDiL1bgF9twu3k11Xds8WgClYirdTRGwg3Sz3Q+hAw8B++z+OrSOeKJcRIIUXxm0A
-	1+Ghqw2hsmMu6ssdKrM36pnnvIbGh48=
-Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-99-Mc0dZgGdMRKw16nHTE7gOw-1; Thu,
- 31 Oct 2024 08:58:41 -0400
-X-MC-Unique: Mc0dZgGdMRKw16nHTE7gOw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91A071956058;
-	Thu, 31 Oct 2024 12:58:38 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.231])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 40C4E1956054;
-	Thu, 31 Oct 2024 12:58:34 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20241025204008.4076565-26-dhowells@redhat.com>
-References: <20241025204008.4076565-26-dhowells@redhat.com> <20241025204008.4076565-1-dhowells@redhat.com>
-To: Marc Dionne <marc.dionne@auristor.com>
-Cc: dhowells@redhat.com, Christian Brauner <christian@brauner.io>,
-    Jeff Layton <jlayton@kernel.org>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2 25/31] afs: Make {Y,}FS.FetchData an asynchronous operation
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02C311BD9E4
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 12:59:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.236.57
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730379601; cv=fail; b=XXoweuR5faSu+eEXr/1cLP+VnQcppqFS6l4Mm8JRvaYdqZAGeKNdCakBKSyh3N+lJglNupKyBxgrb+nQSAf3UvzLXczmVNeL9GIELMN3TKQQS+e92iZpUQOlEB4lZn59Dfy6rmr7vHbf24u7CTyyqB8qZR2bFBFwkLn/Z3wMHDo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730379601; c=relaxed/simple;
+	bh=ARb+katsooqZGb4V1v+EDk6WAq4zb+/o+qXWqvG4Blo=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Od/w0LIAA8JszqtAaM/Goa6bV4f5xISRMnF5TMgdm10xj2+XX1J84B8ji4U+HDJu3k0dQsAZgD1VVsvm7vYWY24+u/zKpZxLMQVCmzxgnwDDrF4yv0kOjFLv/5aHgPU3qNumSxNW7DsaYyWmgibBV8ED5Gqb16jhv3sdi5bzGzY=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=nYaELqOT; arc=fail smtp.client-ip=40.107.236.57
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=k1l3OVaSvlqf5OlH9PuMBbqU4LTOiEwzqVsJ6H0e5OQ/cIFUx5cLDrb4Ich5y7AzaQenbgZHKn001rZzNqyJb3mTVNi035wFF6nkYa/5dutBr39U6zT+huk41/k/5jfgnCp0KL5/Bep1be6HXshuSRSkohP8r8JdC9/xjll17tpTkRv3kSb6M/aT9ombM39uFjwUc/IpgUNzxVAoibTROBN0DKDwps2xBE2mTZoYNDpUZICcdgszLAohwRRI2UgyG9/aDrPKJ1Rb7uhoZyChaaXQkWu3ryRt0iPhheLFbx6Zz/SM/EK/GkD3ZYn6FOkzIZ3Cyw5gMr4jnI5HZkoAjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gAQLQika97ZjrA7GU2s7Ct8PgEjwxtX1SqYhmgqRfTg=;
+ b=SSi0RxnWoQDGnEJXPmDZzn059DpZLrsecwzBpjjLk4LGRqaVeAKs5CXMFh4jMDcJrQ4jj6J+FUw6gwtlcZc5d8O5xGJFRgnrID42iD0xYhjC1BVkzbuAiRtXW/bv59ulBQp15skRccQb33ANlj5aJzWOMhERPRhdQh7RY703lb3yfiBZ50ebllYVH7S3PLKgEH+0yebgJ4l0dZ0J62gwZGxvcVadcOT1H07y9FQGRCyk+XBMPjGDlr1C+Nc53ch3fkUuTnN1RIEEzyn7xw4lzS9pAlZZZoUPWqRBHvMJ0696xMUsaqNb1H7dKzSkNMxvmyvtQzmohnhrpRlpp2Yh3g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.118.232) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gAQLQika97ZjrA7GU2s7Ct8PgEjwxtX1SqYhmgqRfTg=;
+ b=nYaELqOTVX5K4h9Ib8wTO081fd8x4lUD3Y0henr+m2Ckzr32i+/yAPkBpQ89gwtkHUGr/2K69YURpOFc/TOOmExVpOAQhG/oHcuNoNZR8Y2LakBLpJ9Yyd/fZd7MbD2m4twnd0GanqJUNPQwcyek8GUj6gOD2GiOulaDljwdN7X2b8/dHzOSNoR5WWjKbfDt1mLs5pcrVc1yrltwO1dgBb/cUUlKXshpS03dgiYZAqIvAr5qOC7iEwh+Tu6ORKzMSb5lUkgvMo4OwS4UNqzFpnD6WtDyavpWg3pFrggVed8zpJW1XlybnCBcneOn87PaDtwoVEzyuDrdlnRIjxzrGA==
+Received: from CH2PR07CA0065.namprd07.prod.outlook.com (2603:10b6:610:5b::39)
+ by SA3PR12MB9180.namprd12.prod.outlook.com (2603:10b6:806:39b::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Thu, 31 Oct
+ 2024 12:59:53 +0000
+Received: from CH2PEPF00000146.namprd02.prod.outlook.com
+ (2603:10b6:610:5b:cafe::5e) by CH2PR07CA0065.outlook.office365.com
+ (2603:10b6:610:5b::39) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.20 via Frontend
+ Transport; Thu, 31 Oct 2024 12:59:53 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.232)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.118.232 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.118.232; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.118.232) by
+ CH2PEPF00000146.mail.protection.outlook.com (10.167.244.103) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8114.16 via Frontend Transport; Thu, 31 Oct 2024 12:59:53 +0000
+Received: from drhqmail202.nvidia.com (10.126.190.181) by mail.nvidia.com
+ (10.127.129.5) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 31 Oct
+ 2024 05:59:36 -0700
+Received: from drhqmail203.nvidia.com (10.126.190.182) by
+ drhqmail202.nvidia.com (10.126.190.181) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 31 Oct 2024 05:59:36 -0700
+Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
+ (10.126.190.182) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 31 Oct 2024 05:59:33 -0700
+From: Tariq Toukan <tariqt@nvidia.com>
+To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
+ Lunn" <andrew+netdev@lunn.ch>
+CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
+	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Tariq Toukan
+	<tariqt@nvidia.com>
+Subject: [PATCH net-next 0/5] mlx5 misc patches 2024-10-31
+Date: Thu, 31 Oct 2024 14:58:51 +0200
+Message-ID: <20241031125856.530927-1-tariqt@nvidia.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <43387.1730379513.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 31 Oct 2024 12:58:33 +0000
-Message-ID: <43388.1730379513@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-NV-OnPremToCloud: ExternallySecured
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CH2PEPF00000146:EE_|SA3PR12MB9180:EE_
+X-MS-Office365-Filtering-Correlation-Id: 26ead9ec-0545-4dcd-4faf-08dcf9abe9a8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|376014|36860700013|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?tBZSiZiuvth2VU89Fn36R8SKL1XRckH20ygEs/XadSDorm8Zj0Wkt15/Anmy?=
+ =?us-ascii?Q?FZLdCBqQsKyXCdgCV/s3AO0ACs1J7jNy/hDRAFRlHVURojHx9Iv+yXwzKcUH?=
+ =?us-ascii?Q?IcqgZlOLf3L50UVJfCuzfZD/0n5CrxrtADmjfHusWfCA8franFU6MhUqK7Um?=
+ =?us-ascii?Q?XEx59qrrQWeaq/oei+18KsQ9gKAp2E5qPxRd/1L/dvgi37IWtekAn8D7B8s5?=
+ =?us-ascii?Q?ACyc2ngDBj2tgTYN7GA4wgrfWk3MZE+1og19sDInRA6oPK0Gl2taxweNMdEq?=
+ =?us-ascii?Q?ffoXkD0vJRDYbet7SsnVjPMGeeiDE+qfPkxtCwRNmRe5pnlFEVPn4UAweu7+?=
+ =?us-ascii?Q?ybGPUh5h/TfpWRcfMtm5zvW49StTJOYjUut6g2SajwTD8sfNTruN9jGmTcyy?=
+ =?us-ascii?Q?3OBLeDlytKoRnii4oVw3fyccaXlxg1PImGpMHKEoFJyg2djkA1kNBhPdisY4?=
+ =?us-ascii?Q?7UYkXFHWUCEryw49JxhNL0aBsAxXLrPaf5WyYHcVzyTRthVoZ16ZlhO5hbZl?=
+ =?us-ascii?Q?MXp/or9E1WZcTy+Um9wlzwyMFwoEh2qdxUtGUUeaihm+Luf+7MZG2dUnsqil?=
+ =?us-ascii?Q?3cZ2REgtu3um4rQ82etV0TfAkI4MYTUzEhvsUoLqZIjs9RqedbVeiG5Wbv7Z?=
+ =?us-ascii?Q?bU1KMU+O6Uyw9wdmBviuIyYX1D7spNUVqbvwuMdq8YHx+2eD/DOvtjMWjWUi?=
+ =?us-ascii?Q?3FdO1d/o1dWOxEcG4JZEPLoAoLpcg9r/hN1f5I7O3lu97rA1/BazE9MrlG8n?=
+ =?us-ascii?Q?XqxYv3CQsjZ3/jKQKSvOdJ8LnicePQ9C4gF52MDhdf+bIMiqqx2kLu4i2yMr?=
+ =?us-ascii?Q?uKfFaJ6CXFbQA71iHK25pcCfBt6Knv3Ckg9moZQMfKrHX5TL4OiCmjPFQRJx?=
+ =?us-ascii?Q?is9wLbKTQ5hC8X0EWvrJJPluCbfAZW+LHKUikdEj4DBIvh9rrrSq5dRVKiIk?=
+ =?us-ascii?Q?3h3IqIPh20KLDzr+8NFvMYyu7IRK9UHQOljICrYidPdOi6q5jteYrGtvfbtp?=
+ =?us-ascii?Q?ul1GRr+TTunQ5rkTknHtVj7xqXeycZ/XohZTq2wxOOPvae7N7pW/iqtUp1JU?=
+ =?us-ascii?Q?YGJC80yubrUtoRDAfldvzggUX1RjZuBbo8hz8riq70vlSPgL3IS0LvDzclkq?=
+ =?us-ascii?Q?wGF0tlbJ905ezvbpW9gVvBR1VfYBzuSBQ4R2Y8OQgWJbL73LyTeDpFSJED7K?=
+ =?us-ascii?Q?C/cfvgzKUWSLDk2iVqwEKuoiu+X51aJ5Kdu/W44mwAFdGR2k0Ar6iOTSCvvv?=
+ =?us-ascii?Q?OWI+RdklJrwIFMZXoCMLjjhHJzM1eu+mjeawsaY6CN3GjWvfRF1Y2X+eZNxB?=
+ =?us-ascii?Q?z9AbZrw1gGNMfci7iL/W5rb8m8LTPAwqvf3xuB8yE1aEJ8m/8TnTcrlDUOsE?=
+ =?us-ascii?Q?OuhPwdUXSeslS4xjWktAjMsKPfZHsjrLMhdMFgpFsYiKafsV4A=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.118.232;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge1.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(376014)(36860700013)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 31 Oct 2024 12:59:53.3207
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 26ead9ec-0545-4dcd-4faf-08dcf9abe9a8
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.232];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CH2PEPF00000146.namprd02.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA3PR12MB9180
 
-I think this may need an additional bit (see attached).
+Hi,
 
-David
----
-afs: Fix hang due to FetchData RPC op being cancelled by signal
+This patchset for the mlx5 driver contains small misc patches.
 
-If a signal comes in just as an RPC operation is being queued to get a
-channel for transmission, afs_make_call() will submit an immediate abort
-and cancel the asynchronous work.  This is a problem for asynchronous
-FetchData as the file-read routines don't get notified and don't therefore
-get to inform netfslib, leaving netfslib hanging.
+First patch by Cosmin fixes an issue in a recent commit.
 
-Fix this by:
+Followed by 2 patches by Yevgeny that organize and rename the files
+under the steering directory.
 
- (1) Split the ->done() call op to have an ->immediate_cancel() op also
-     that is called by afs_make_call() instead of ->done().
+Finally, 2 patches by William that save the creation of the unused
+egress-XDP_REDIRECT send queue on non-uplink representor.
 
-     It is undesirable from async FetchData's point of view to implement
-     ->done() as this is also called from the received data processing
-     loop, which is triggered by the async notification from AF_RXRPC.
+Series generated against:
+commit 2b1d193a5a57 ("Documentation: networking: Add missing PHY_GET command in the message list")
 
- (2) Make the various async Probe RPCs use their ->immediate_cancel() go t=
-o
-     the same handler as their ->done() call.
+Thanks,
+Tariq
 
- (3) Don't provide the Lock RPCs, InlineBulkStatus RPC and YFS.RemoveFile2
-     RPC with ->immediate_cancel() as their ->done() calls are only
-     interested in looking at the response from the server.
+Cosmin Ratiu (1):
+  net/mlx5: Rework esw qos domain init and cleanup
 
- (4) Implement this for FetchData RPCs, making it schedule the async
-     handler and wait for it so that it doesn't get cancelled.
+William Tu (2):
+  net/mlx5e: move XDP_REDIRECT sq to dynamic allocation
+  net/mlx5e: do not create xdp_redirect for non-uplink rep
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Marc Dionne <marc.dionne@auristor.com>
-cc: linux-afs@lists.infradead.org
----
- fs/afs/file.c      |    8 ++++++++
- fs/afs/fsclient.c  |    3 +++
- fs/afs/internal.h  |   17 +++++++++++++++++
- fs/afs/rxrpc.c     |   17 ++---------------
- fs/afs/vlclient.c  |    1 +
- fs/afs/yfsclient.c |    1 +
- 6 files changed, 32 insertions(+), 15 deletions(-)
+Yevgeny Kliteynik (2):
+  net/mlx5: DR, moved all the SWS code into a separate directory
+  net/mlx5: HWS, renamed the files in accordance with naming convention
 
-diff --git a/fs/afs/file.c b/fs/afs/file.c
-index dbc108c6cae5..a2880fd3c460 100644
---- a/fs/afs/file.c
-+++ b/fs/afs/file.c
-@@ -314,6 +314,14 @@ void afs_fetch_data_async_rx(struct work_struct *work=
-)
- 	afs_put_call(call);
- }
- =
+ .../net/ethernet/mellanox/mlx5/core/Makefile  | 63 +++++++++-------
+ drivers/net/ethernet/mellanox/mlx5/core/en.h  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  2 +-
+ .../net/ethernet/mellanox/mlx5/core/en_main.c | 73 ++++++++++++++-----
+ .../net/ethernet/mellanox/mlx5/core/en_rep.c  |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_txrx.c |  6 +-
+ .../net/ethernet/mellanox/mlx5/core/esw/qos.c |  3 +
+ .../net/ethernet/mellanox/mlx5/core/eswitch.c | 16 ++--
+ .../net/ethernet/mellanox/mlx5/core/fs_core.h |  2 +-
+ .../ethernet/mellanox/mlx5/core/lib/smfs.h    |  4 +-
+ .../hws/{mlx5hws_action.c => action.c}        |  2 +-
+ .../hws/{mlx5hws_action.h => action.h}        |  6 +-
+ .../steering/hws/{mlx5hws_buddy.c => buddy.c} |  4 +-
+ .../steering/hws/{mlx5hws_buddy.h => buddy.h} |  6 +-
+ .../steering/hws/{mlx5hws_bwc.c => bwc.c}     |  2 +-
+ .../steering/hws/{mlx5hws_bwc.h => bwc.h}     |  6 +-
+ .../{mlx5hws_bwc_complex.c => bwc_complex.c}  |  2 +-
+ .../{mlx5hws_bwc_complex.h => bwc_complex.h}  |  6 +-
+ .../steering/hws/{mlx5hws_cmd.c => cmd.c}     |  2 +-
+ .../steering/hws/{mlx5hws_cmd.h => cmd.h}     |  6 +-
+ .../hws/{mlx5hws_context.c => context.c}      |  2 +-
+ .../hws/{mlx5hws_context.h => context.h}      |  6 +-
+ .../steering/hws/{mlx5hws_debug.c => debug.c} |  2 +-
+ .../steering/hws/{mlx5hws_debug.h => debug.h} |  6 +-
+ .../hws/{mlx5hws_definer.c => definer.c}      |  2 +-
+ .../hws/{mlx5hws_definer.h => definer.h}      |  6 +-
+ .../hws/{mlx5hws_internal.h => internal.h}    | 36 ++++-----
+ .../hws/{mlx5hws_matcher.c => matcher.c}      |  2 +-
+ .../hws/{mlx5hws_matcher.h => matcher.h}      |  6 +-
+ .../hws/{mlx5hws_pat_arg.c => pat_arg.c}      |  2 +-
+ .../hws/{mlx5hws_pat_arg.h => pat_arg.h}      |  0
+ .../steering/hws/{mlx5hws_pool.c => pool.c}   |  4 +-
+ .../steering/hws/{mlx5hws_pool.h => pool.h}   |  0
+ .../steering/hws/{mlx5hws_prm.h => prm.h}     |  0
+ .../steering/hws/{mlx5hws_rule.c => rule.c}   |  2 +-
+ .../steering/hws/{mlx5hws_rule.h => rule.h}   |  0
+ .../steering/hws/{mlx5hws_send.c => send.c}   |  2 +-
+ .../steering/hws/{mlx5hws_send.h => send.h}   |  0
+ .../steering/hws/{mlx5hws_table.c => table.c} |  2 +-
+ .../steering/hws/{mlx5hws_table.h => table.h} |  0
+ .../steering/hws/{mlx5hws_vport.c => vport.c} |  2 +-
+ .../steering/hws/{mlx5hws_vport.h => vport.h} |  0
+ .../mlx5/core/steering/{ => sws}/dr_action.c  |  0
+ .../mlx5/core/steering/{ => sws}/dr_arg.c     |  0
+ .../mlx5/core/steering/{ => sws}/dr_buddy.c   |  0
+ .../mlx5/core/steering/{ => sws}/dr_cmd.c     |  0
+ .../mlx5/core/steering/{ => sws}/dr_dbg.c     |  0
+ .../mlx5/core/steering/{ => sws}/dr_dbg.h     |  0
+ .../mlx5/core/steering/{ => sws}/dr_definer.c |  0
+ .../mlx5/core/steering/{ => sws}/dr_domain.c  |  0
+ .../mlx5/core/steering/{ => sws}/dr_fw.c      |  0
+ .../core/steering/{ => sws}/dr_icm_pool.c     |  0
+ .../mlx5/core/steering/{ => sws}/dr_matcher.c |  0
+ .../mlx5/core/steering/{ => sws}/dr_ptrn.c    |  0
+ .../mlx5/core/steering/{ => sws}/dr_rule.c    |  0
+ .../mlx5/core/steering/{ => sws}/dr_send.c    |  0
+ .../mlx5/core/steering/{ => sws}/dr_ste.c     |  0
+ .../mlx5/core/steering/{ => sws}/dr_ste.h     |  0
+ .../mlx5/core/steering/{ => sws}/dr_ste_v0.c  |  0
+ .../mlx5/core/steering/{ => sws}/dr_ste_v1.c  |  0
+ .../mlx5/core/steering/{ => sws}/dr_ste_v1.h  |  0
+ .../mlx5/core/steering/{ => sws}/dr_ste_v2.c  |  0
+ .../mlx5/core/steering/{ => sws}/dr_table.c   |  0
+ .../mlx5/core/steering/{ => sws}/dr_types.h   |  0
+ .../mlx5/core/steering/{ => sws}/fs_dr.c      |  0
+ .../mlx5/core/steering/{ => sws}/fs_dr.h      |  0
+ .../core/steering/{ => sws}/mlx5_ifc_dr.h     |  0
+ .../steering/{ => sws}/mlx5_ifc_dr_ste_v1.h   |  0
+ .../mlx5/core/steering/{ => sws}/mlx5dr.h     |  0
+ 69 files changed, 177 insertions(+), 121 deletions(-)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_action.c => action.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_action.h => action.h} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_buddy.c => buddy.c} (98%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_buddy.h => buddy.h} (86%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_bwc.c => bwc.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_bwc.h => bwc.h} (96%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_bwc_complex.c => bwc_complex.c} (98%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_bwc_complex.h => bwc_complex.h} (90%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_cmd.c => cmd.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_cmd.h => cmd.h} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_context.c => context.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_context.h => context.h} (95%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_debug.c => debug.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_debug.h => debug.h} (93%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_definer.c => definer.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_definer.h => definer.h} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_internal.h => internal.h} (67%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_matcher.c => matcher.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_matcher.h => matcher.h} (96%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_pat_arg.c => pat_arg.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_pat_arg.h => pat_arg.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_pool.c => pool.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_pool.h => pool.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_prm.h => prm.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_rule.c => rule.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_rule.h => rule.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_send.c => send.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_send.h => send.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_table.c => table.c} (99%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_table.h => table.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_vport.c => vport.c} (98%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/hws/{mlx5hws_vport.h => vport.h} (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_action.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_arg.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_buddy.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_cmd.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_dbg.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_dbg.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_definer.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_domain.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_fw.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_icm_pool.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_matcher.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ptrn.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_rule.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_send.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ste.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ste.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ste_v0.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ste_v1.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ste_v1.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_ste_v2.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_table.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/dr_types.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/fs_dr.c (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/fs_dr.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/mlx5_ifc_dr.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/mlx5_ifc_dr_ste_v1.h (100%)
+ rename drivers/net/ethernet/mellanox/mlx5/core/steering/{ => sws}/mlx5dr.h (100%)
 
-+void afs_fetch_data_immediate_cancel(struct afs_call *call)
-+{
-+	afs_get_call(call, afs_call_trace_wake);
-+	if (!queue_work(afs_async_calls, &call->async_work))
-+		afs_deferred_put_call(call);
-+	flush_work(&call->async_work);
-+}
-+
- /*
-  * Fetch file data from the volume.
-  */
-diff --git a/fs/afs/fsclient.c b/fs/afs/fsclient.c
-index 6380cdcfd4fc..1d9ecd5418d8 100644
---- a/fs/afs/fsclient.c
-+++ b/fs/afs/fsclient.c
-@@ -410,6 +410,7 @@ static const struct afs_call_type afs_RXFSFetchData =3D=
- {
- 	.op		=3D afs_FS_FetchData,
- 	.async_rx	=3D afs_fetch_data_async_rx,
- 	.deliver	=3D afs_deliver_fs_fetch_data,
-+	.immediate_cancel =3D afs_fetch_data_immediate_cancel,
- 	.destructor	=3D afs_flat_call_destructor,
- };
- =
-
-@@ -418,6 +419,7 @@ static const struct afs_call_type afs_RXFSFetchData64 =
-=3D {
- 	.op		=3D afs_FS_FetchData64,
- 	.async_rx	=3D afs_fetch_data_async_rx,
- 	.deliver	=3D afs_deliver_fs_fetch_data,
-+	.immediate_cancel =3D afs_fetch_data_immediate_cancel,
- 	.destructor	=3D afs_flat_call_destructor,
- };
- =
-
-@@ -1734,6 +1736,7 @@ static const struct afs_call_type afs_RXFSGetCapabil=
-ities =3D {
- 	.op		=3D afs_FS_GetCapabilities,
- 	.deliver	=3D afs_deliver_fs_get_capabilities,
- 	.done		=3D afs_fileserver_probe_result,
-+	.immediate_cancel =3D afs_fileserver_probe_result,
- 	.destructor	=3D afs_fs_get_capabilities_destructor,
- };
- =
-
-diff --git a/fs/afs/internal.h b/fs/afs/internal.h
-index b11b2dfb8380..2077f6c923e0 100644
---- a/fs/afs/internal.h
-+++ b/fs/afs/internal.h
-@@ -210,6 +210,9 @@ struct afs_call_type {
- =
-
- 	/* Call done function (gets called immediately on success or failure) */
- 	void (*done)(struct afs_call *call);
-+
-+	/* Handle a call being immediately cancelled. */
-+	void (*immediate_cancel)(struct afs_call *call);
- };
- =
-
- /*
-@@ -1127,6 +1130,7 @@ extern void afs_put_wb_key(struct afs_wb_key *);
- extern int afs_open(struct inode *, struct file *);
- extern int afs_release(struct inode *, struct file *);
- void afs_fetch_data_async_rx(struct work_struct *work);
-+void afs_fetch_data_immediate_cancel(struct afs_call *call);
- =
-
- /*
-  * flock.c
-@@ -1362,6 +1366,19 @@ extern void afs_send_simple_reply(struct afs_call *=
-, const void *, size_t);
- extern int afs_extract_data(struct afs_call *, bool);
- extern int afs_protocol_error(struct afs_call *, enum afs_eproto_cause);
- =
-
-+static inline struct afs_call *afs_get_call(struct afs_call *call,
-+					    enum afs_call_trace why)
-+{
-+	int r;
-+
-+	__refcount_inc(&call->ref, &r);
-+
-+	trace_afs_call(call->debug_id, why, r + 1,
-+		       atomic_read(&call->net->nr_outstanding_calls),
-+		       __builtin_return_address(0));
-+	return call;
-+}
-+
- static inline void afs_make_op_call(struct afs_operation *op, struct afs_=
-call *call,
- 				    gfp_t gfp)
- {
-diff --git a/fs/afs/rxrpc.c b/fs/afs/rxrpc.c
-index 94fff4e214b0..066e5d70dabe 100644
---- a/fs/afs/rxrpc.c
-+++ b/fs/afs/rxrpc.c
-@@ -236,19 +236,6 @@ void afs_deferred_put_call(struct afs_call *call)
- 		schedule_work(&call->free_work);
- }
- =
-
--static struct afs_call *afs_get_call(struct afs_call *call,
--				     enum afs_call_trace why)
--{
--	int r;
--
--	__refcount_inc(&call->ref, &r);
--
--	trace_afs_call(call->debug_id, why, r + 1,
--		       atomic_read(&call->net->nr_outstanding_calls),
--		       __builtin_return_address(0));
--	return call;
--}
--
- /*
-  * Queue the call for actual work.
-  */
-@@ -444,8 +431,8 @@ void afs_make_call(struct afs_call *call, gfp_t gfp)
- 	call->error =3D ret;
- 	trace_afs_call_done(call);
- error_kill_call:
--	if (call->type->done)
--		call->type->done(call);
-+	if (call->type->immediate_cancel)
-+		call->type->immediate_cancel(call);
- =
-
- 	/* We need to dispose of the extra ref we grabbed for an async call.
- 	 * The call, however, might be queued on afs_async_calls and we need to
-diff --git a/fs/afs/vlclient.c b/fs/afs/vlclient.c
-index cac75f89b64a..adc617a82a86 100644
---- a/fs/afs/vlclient.c
-+++ b/fs/afs/vlclient.c
-@@ -370,6 +370,7 @@ static const struct afs_call_type afs_RXVLGetCapabilit=
-ies =3D {
- 	.name		=3D "VL.GetCapabilities",
- 	.op		=3D afs_VL_GetCapabilities,
- 	.deliver	=3D afs_deliver_vl_get_capabilities,
-+	.immediate_cancel =3D afs_vlserver_probe_result,
- 	.done		=3D afs_vlserver_probe_result,
- 	.destructor	=3D afs_destroy_vl_get_capabilities,
- };
-diff --git a/fs/afs/yfsclient.c b/fs/afs/yfsclient.c
-index 4e7d93ee5a08..f57c089f26ee 100644
---- a/fs/afs/yfsclient.c
-+++ b/fs/afs/yfsclient.c
-@@ -458,6 +458,7 @@ static const struct afs_call_type yfs_RXYFSFetchData64=
- =3D {
- 	.op		=3D yfs_FS_FetchData64,
- 	.async_rx	=3D afs_fetch_data_async_rx,
- 	.deliver	=3D yfs_deliver_fs_fetch_data64,
-+	.immediate_cancel =3D afs_fetch_data_immediate_cancel,
- 	.destructor	=3D afs_flat_call_destructor,
- };
- =
+-- 
+2.44.0
 
 
