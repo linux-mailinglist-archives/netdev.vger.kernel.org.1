@@ -1,650 +1,330 @@
-Return-Path: <netdev+bounces-140575-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF1CC9B7128
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:24:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 288C59B7130
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:31:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 08845B22001
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 00:24:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A089B1F21AC8
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 00:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4BE314F90;
-	Thu, 31 Oct 2024 00:24:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C597CC2FD;
+	Thu, 31 Oct 2024 00:31:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="cST7n0B0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="J4V5Qp12"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f98.google.com (mail-io1-f98.google.com [209.85.166.98])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 852138BE5
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 00:24:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.98
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96EF7360;
+	Thu, 31 Oct 2024 00:31:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730334268; cv=none; b=i18ezkMU/FA7KRnHK/GWJtqw/XwmwXX8QCqv4pj0tRjFUoshh7EQg/IRglXdyg9VQ65RRHFH67Im6bquN8++xcQaWlXHnrmzVV1Iqg09U0/HsD+Zca/sMZ4o7ZBE3hZL6rpWVf1NCG1d6KMi8Nv/vhSreluS5yA7F8Dy+Ghtbfc=
+	t=1730334714; cv=none; b=hxdvvkq7dTElTDQFrIw4917wqSt+yPXc7thcGTUOW/7dqwZFfpwHWE4rgZN6uF9XPN0GMZam+nbwIISAtYW/B66lD1tSWhlnlN0G1J0c855kikA+GWZwDJj7FEeGgSXiyM0ihGHTO9rsqSyRCKJQ0pWK4NjxomzCX6jtl2D4l74=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730334268; c=relaxed/simple;
-	bh=41F5UOU4jNXOgmxKAqf6XjFoH5crf4BsqOMWHbf38os=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=CEJcihm0XjH2JfsO0D+oV6Gy8zONoGH/Gg105VyVB+6iohXQdhwSfYi6+AkW3j1QjBKJI/K5S4oJkiuwRsmTy75oLEFvIC/k7+udTx46hg8w28T8uhfnS+0OggPkzgGNXSrQJc8C9x02S72a+iJU+bFUbPqLlHcRXaWCj/JUtYQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=cST7n0B0; arc=none smtp.client-ip=209.85.166.98
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-io1-f98.google.com with SMTP id ca18e2360f4ac-83aea6d2b64so930139f.2
-        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 17:24:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1730334265; x=1730939065; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=BxTaQzY11T+U6/4qLM4FfUQ0BEPwevvcufdmsyeDobE=;
-        b=cST7n0B0+Q33MvC7RF2rFWNxWdeUYgaebQ106Vy0mDGBQdkE665RRZC9lf+ZKn79cE
-         ivwPmsATVDEm5vEox5+DOIcBHIwCAT45KEJ6Av6VcmflDbo9L79M3kOiTOSoZOHTZ7gw
-         lHtrkaSYvscUcrHsFINCZ6vWWzkqqRkIAB+0oIEn+1QppSCRRkuPUGKD7wPltnoTrZDD
-         3v8D1ioOicP1fkprqYv4XWKyQX3EWR4g7IiWsCQYtXTKSOcLqWf1//FWcRhsbGRahUDE
-         fzbi1cdsiHoSzCUjV+HPYnia4RQ3NijOha5SYLkswmupHIgRyXMreADlb/4brpDHAa0f
-         nz7w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730334265; x=1730939065;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BxTaQzY11T+U6/4qLM4FfUQ0BEPwevvcufdmsyeDobE=;
-        b=BNoFZUXpH9SZioanKzYfWUUt2dnMqYo0nzQCt9GMmnyGeTi4+2PK4lPCI1IiUWklqi
-         VQFN1VYLvmJbr+9qyfS0atw7kDmNUDTWJDliECFbkCRevR6xB77Oa36Qshm8QDSIoAgN
-         a2eKkRkYhSxv4004veBReRoLgCtfCug8oEMXqN2BViPGAChCalKsB4QoE2JJkYU68Yzc
-         Nug2qIvH1UR6uy/X8mu6exbBPMvJ0bzHVHjSZG/VCroFbtxmcZ9EUc9BRsBzoDcnHDj7
-         Kr0Wc0WyJhqPMd5g/Far8QmbKtzUuRGbNq8JRvsuv/1YGWQh2vNXbqc4Yc3GyRHK/yLw
-         CgcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWfpPj0YUrWGWTPRrJJV5Tg2vb0IHkUnEdyYvcSnSvunJU9pDjGEWNXi8rearrIWbWVHOSC9AU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyV4TmUqAu78jt3qOESOo9UsCi9of5ouiw1HmEpntTe36p2MpZy
-	rV12ih5axrQSckG00S94ykCYb9XbTs4dBBibRo/dckmqGn4T3+/m4wJUt8WQUIwk+sKVCNyJodr
-	GU5WWykhnvYFUNBk0ySlOtEbZPCZq8FkSeDGgD0KPv3NRusli
-X-Google-Smtp-Source: AGHT+IHOnHYYk23L5V00iX0lOxxUZoEcM1wbOU4IjQ9W/rfvW9oxLAF46cylp8Of0pqtfppEOerdK/FT0GdK
-X-Received: by 2002:a05:6e02:219b:b0:3a1:f549:7290 with SMTP id e9e14a558f8ab-3a4ed33b63cmr42425485ab.6.1730334264690;
-        Wed, 30 Oct 2024 17:24:24 -0700 (PDT)
-Received: from c7-smtp-2023.dev.purestorage.com ([2620:125:9017:12:36:3:5:0])
-        by smtp-relay.gmail.com with ESMTPS id e9e14a558f8ab-3a6a97ac34bsm109715ab.6.2024.10.30.17.24.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 30 Oct 2024 17:24:24 -0700 (PDT)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 7D51034039C;
-	Wed, 30 Oct 2024 18:24:23 -0600 (MDT)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 720ECE40A10; Wed, 30 Oct 2024 18:23:53 -0600 (MDT)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	Brett Creeley <brett.creeley@amd.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	David Arinzon <darinzon@amazon.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Doug Berger <opendmb@gmail.com>,
-	Eric Dumazet <edumazet@google.com>,
-	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
-	Felix Fietkau <nbd@nbd.name>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Geetha sowjanya <gakula@marvell.com>,
-	hariprasad <hkelam@marvell.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jason Wang <jasowang@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Leon Romanovsky <leon@kernel.org>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Louis Peens <louis.peens@corigine.com>,
-	Mark Lee <Mark-MC.Lee@mediatek.com>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	Michael Chan <michael.chan@broadcom.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Noam Dagan <ndagan@amazon.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Roy Pledge <Roy.Pledge@nxp.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Sean Wang <sean.wang@mediatek.com>,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	Shay Agroskin <shayagr@amazon.com>,
-	Simon Horman <horms@kernel.org>,
-	Subbaraya Sundeep <sbhatta@marvell.com>,
-	Sunil Goutham <sgoutham@marvell.com>,
-	Tal Gilboa <talgi@nvidia.com>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Caleb Sander Mateos <csander@purestorage.com>,
-	intel-wired-lan@lists.osuosl.org,
-	linux-arm-kernel@lists.infradead.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-mediatek@lists.infradead.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	oss-drivers@corigine.com,
-	virtualization@lists.linux.dev
-Subject: [resend PATCH 2/2] dim: pass dim_sample to net_dim() by reference
-Date: Wed, 30 Oct 2024 18:23:26 -0600
-Message-ID: <20241031002326.3426181-2-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241031002326.3426181-1-csander@purestorage.com>
-References: <20241031002326.3426181-1-csander@purestorage.com>
+	s=arc-20240116; t=1730334714; c=relaxed/simple;
+	bh=A4dRY4eH4YbXkwbpbPcRMGQgIKn3Mq9XborynAEqih4=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T6HIn6zfJXd32evUFz+xSYN4m8SiCu9qHAzUe9wy+ijcEiwwIzYcilY3uq0gQ/pOoCqh77BUu5IJDhJRiXVzIEsL07J0zl9UgP8qfpXeQtklQMlC0d1Vw58+jkP/nAub5NeMqQ3sl3gYjaHnlUbJ8H37JQEncfDzmiE3UR2dR5o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=J4V5Qp12; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 29394C4CECE;
+	Thu, 31 Oct 2024 00:31:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730334714;
+	bh=A4dRY4eH4YbXkwbpbPcRMGQgIKn3Mq9XborynAEqih4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=J4V5Qp12LY5EeOcgR0buUcw72ZwRGWsulAbVYjtJtpNpcAfefeNEOjOwIGd9T+c+N
+	 kOp5GNxGL8C5ruWRPeTaljv4JWHN0XcNBsS7v/5LcQx9q5CU1HJzSh3q7x5mhrmTmy
+	 PqNFDiwbcUNVA3HJmeSVWsuBVAtVloqwqomQmFNsgS6xDhriobUC0XrwmNAIU4B2ck
+	 /uzCcxKc8uwYmWmpPng1togWANntCnbBqlNhkT3l4xc/LuGXrUACE6nyykORIocjrr
+	 LCLmh5h9RKgqZXcNMjpAOWN2eDpERQTmX6IiypxFhJCK8jyOeZfKZrtlARrCdct5NI
+	 NyqXxIpLS0oJQ==
+Date: Wed, 30 Oct 2024 17:31:52 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Akinobu Mita <akinobu.mita@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Andrew Morton
+ <akpm@linux-foundation.org>, kernel-team@meta.com, Thomas Huth
+ <thuth@redhat.com>, "Paul E. McKenney" <paulmck@kernel.org>, "Borislav
+ Petkov (AMD)" <bp@alien8.de>, Steven Rostedt <rostedt@goodmis.org>,
+ Xiongwei Song <xiongwei.song@windriver.com>, Mina Almasry
+ <almasrymina@google.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, Alexander
+ Lobakin <aleksander.lobakin@intel.com>, Oleksij Rempel
+ <o.rempel@pengutronix.de>, linux-doc@vger.kernel.org (open
+ list:DOCUMENTATION), linux-kernel@vger.kernel.org (open list),
+ netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
+Subject: Re: [PATCH net-next v4] net: Implement fault injection forcing skb
+ reallocation
+Message-ID: <20241030173152.0349b466@kernel.org>
+In-Reply-To: <20241023113819.3395078-1-leitao@debian.org>
+References: <20241023113819.3395078-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-net_dim() is currently passed a struct dim_sample argument by value.
-struct dim_sample is 24 bytes. Since this is greater 16 bytes, x86-64
-passes it on the stack. All callers have already initialized dim_sample
-on the stack, so passing it by value requires pushing a duplicated copy
-to the stack. Either witing to the stack and immediately reading it, or
-perhaps dereferencing addresses relative to the stack pointer in a chain
-of push instructions, seems to perform quite poorly.
+On Wed, 23 Oct 2024 04:38:01 -0700 Breno Leitao wrote:
+> +- fail_skb_realloc
+> +
+> +  inject skb (socket buffer) reallocation events into the network path. The
+> +  primary goal is to identify and prevent issues related to pointer
+> +  mismanagement in the network subsystem.  By forcing skb reallocation at
+> +  strategic points, this feature creates scenarios where existing pointers to
+> +  skb headers become invalid.
+> +
+> +  When the fault is injected and the reallocation is triggered, these pointers
 
-In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
-94% of which is attributed to the first push instruction to copy
-dim_sample on the stack for the call to net_dim():
-// Call ktime_get()
-  0.26 |4ead2:   call   4ead7 <mlx5e_handle_rx_dim+0x47>
-// Pass the address of struct dim in %rdi
-       |4ead7:   lea    0x3d0(%rbx),%rdi
-// Set dim_sample.pkt_ctr
-       |4eade:   mov    %r13d,0x8(%rsp)
-// Set dim_sample.byte_ctr
-       |4eae3:   mov    %r12d,0xc(%rsp)
-// Set dim_sample.event_ctr
-  0.15 |4eae8:   mov    %bp,0x10(%rsp)
-// Duplicate dim_sample on the stack
- 94.16 |4eaed:   push   0x10(%rsp)
-  2.79 |4eaf1:   push   0x10(%rsp)
-  0.07 |4eaf5:   push   %rax
-// Call net_dim()
-  0.21 |4eaf6:   call   4eafb <mlx5e_handle_rx_dim+0x6b>
+s/these pointers/cached pointers to skb headers and data/
 
-To allow the caller to reuse the struct dim_sample already on the stack,
-pass the struct dim_sample by reference to net_dim().
+> +  no longer reference valid memory locations. This deliberate invalidation
+> +  helps expose code paths where proper pointer updating is neglected after a
+> +  reallocation event.
+> +
+> +  By creating these controlled fault scenarios, the system can catch instances
+> +  where stale pointers are used, potentially leading to memory corruption or
+> +  system instability.
+> +
+> +  To select the interface to act on, write the network name to the following file:
+> +  `/sys/kernel/debug/fail_skb_realloc/devname`
+> +  If this field is left empty (which is the default value), skb reallocation
+> +  will be forced on all network interfaces.
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
----
- Documentation/networking/net_dim.rst                   |  2 +-
- drivers/net/ethernet/amazon/ena/ena_netdev.c           |  2 +-
- drivers/net/ethernet/broadcom/bcmsysport.c             |  2 +-
- drivers/net/ethernet/broadcom/bnxt/bnxt.c              |  4 ++--
- drivers/net/ethernet/broadcom/genet/bcmgenet.c         |  2 +-
- drivers/net/ethernet/freescale/enetc/enetc.c           |  2 +-
- drivers/net/ethernet/hisilicon/hns3/hns3_enet.c        |  4 ++--
- drivers/net/ethernet/intel/ice/ice_txrx.c              |  4 ++--
- drivers/net/ethernet/intel/idpf/idpf_txrx.c            |  4 ++--
- drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  2 +-
- drivers/net/ethernet/mediatek/mtk_eth_soc.c            |  4 ++--
- drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c      |  4 ++--
- drivers/net/ethernet/netronome/nfp/nfd3/dp.c           |  4 ++--
- drivers/net/ethernet/netronome/nfp/nfdk/dp.c           |  4 ++--
- drivers/net/ethernet/pensando/ionic/ionic_txrx.c       |  2 +-
- drivers/net/virtio_net.c                               |  2 +-
- drivers/soc/fsl/dpio/dpio-service.c                    |  2 +-
- include/linux/dim.h                                    |  2 +-
- lib/dim/net_dim.c                                      | 10 +++++-----
- 19 files changed, 31 insertions(+), 31 deletions(-)
+Should we mention here that KASAN or some such is needed to catch 
+the bugs? Chances are the resulting UAF will not crash and go unnoticed
+without KASAN.
 
-diff --git a/Documentation/networking/net_dim.rst b/Documentation/networking/net_dim.rst
-index 8908fd7b0a8d..4377998e6826 100644
---- a/Documentation/networking/net_dim.rst
-+++ b/Documentation/networking/net_dim.rst
-@@ -154,11 +154,11 @@ usage is not complete but it should make the outline of the usage clear.
- 	dim_update_sample(my_entity->events,
- 		          my_entity->packets,
- 		          my_entity->bytes,
- 		          &dim_sample);
- 	/* Call net DIM */
--	net_dim(&my_entity->dim, dim_sample);
-+	net_dim(&my_entity->dim, &dim_sample);
- 	...
-   }
- 
-   /* My entity's initialization function (my_entity was already allocated) */
-   int my_driver_init_my_entity(struct my_driver_entity *my_entity, ...)
-diff --git a/drivers/net/ethernet/amazon/ena/ena_netdev.c b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-index 96df20854eb9..63c8a2328142 100644
---- a/drivers/net/ethernet/amazon/ena/ena_netdev.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_netdev.c
-@@ -1381,11 +1381,11 @@ static void ena_adjust_adaptive_rx_intr_moderation(struct ena_napi *ena_napi)
- 	dim_update_sample(rx_ring->non_empty_napi_events,
- 			  rx_ring->rx_stats.cnt,
- 			  rx_ring->rx_stats.bytes,
- 			  &dim_sample);
- 
--	net_dim(&ena_napi->dim, dim_sample);
-+	net_dim(&ena_napi->dim, &dim_sample);
- 
- 	rx_ring->per_napi_packets = 0;
- }
- 
- void ena_unmask_interrupt(struct ena_ring *tx_ring,
-diff --git a/drivers/net/ethernet/broadcom/bcmsysport.c b/drivers/net/ethernet/broadcom/bcmsysport.c
-index caff6e87a488..031e9e0cca53 100644
---- a/drivers/net/ethernet/broadcom/bcmsysport.c
-+++ b/drivers/net/ethernet/broadcom/bcmsysport.c
-@@ -1027,11 +1027,11 @@ static int bcm_sysport_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (priv->dim.use_dim) {
- 		dim_update_sample(priv->dim.event_ctr, priv->dim.packets,
- 				  priv->dim.bytes, &dim_sample);
--		net_dim(&priv->dim.dim, dim_sample);
-+		net_dim(&priv->dim.dim, &dim_sample);
- 	}
- 
- 	return work_done;
- }
- 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6dd6541d8619..ca42b81133d7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -3100,11 +3100,11 @@ static int bnxt_poll(struct napi_struct *napi, int budget)
- 
- 		dim_update_sample(cpr->event_ctr,
- 				  cpr->rx_packets,
- 				  cpr->rx_bytes,
- 				  &dim_sample);
--		net_dim(&cpr->dim, dim_sample);
-+		net_dim(&cpr->dim, &dim_sample);
- 	}
- 	return work_done;
- }
- 
- static int __bnxt_poll_cqs(struct bnxt *bp, struct bnxt_napi *bnapi, int budget)
-@@ -3231,11 +3231,11 @@ static int bnxt_poll_p5(struct napi_struct *napi, int budget)
- 
- 		dim_update_sample(cpr->event_ctr,
- 				  cpr_rx->rx_packets,
- 				  cpr_rx->rx_bytes,
- 				  &dim_sample);
--		net_dim(&cpr->dim, dim_sample);
-+		net_dim(&cpr->dim, &dim_sample);
- 	}
- 	return work_done;
- }
- 
- static void bnxt_free_tx_skbs(struct bnxt *bp)
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmgenet.c b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-index 10966ab15373..53a949eb9180 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmgenet.c
-@@ -2403,11 +2403,11 @@ static int bcmgenet_rx_poll(struct napi_struct *napi, int budget)
- 	}
- 
- 	if (ring->dim.use_dim) {
- 		dim_update_sample(ring->dim.event_ctr, ring->dim.packets,
- 				  ring->dim.bytes, &dim_sample);
--		net_dim(&ring->dim.dim, dim_sample);
-+		net_dim(&ring->dim.dim, &dim_sample);
- 	}
- 
- 	return work_done;
- }
- 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index c09370eab319..05dedea6185a 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -716,11 +716,11 @@ static void enetc_rx_net_dim(struct enetc_int_vector *v)
- 
- 	dim_update_sample(v->comp_cnt,
- 			  v->rx_ring.stats.packets,
- 			  v->rx_ring.stats.bytes,
- 			  &dim_sample);
--	net_dim(&v->rx_dim, dim_sample);
-+	net_dim(&v->rx_dim, &dim_sample);
- }
- 
- static int enetc_bd_ready_count(struct enetc_bdr *tx_ring, int ci)
- {
- 	int pi = enetc_rd_reg_hot(tx_ring->tcir) & ENETC_TBCIR_IDX_MASK;
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-index 4cbc4d069a1f..43377a7b2426 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hns3_enet.c
-@@ -4446,11 +4446,11 @@ static void hns3_update_rx_int_coalesce(struct hns3_enet_tqp_vector *tqp_vector)
- 	if (!rx_group->coal.adapt_enable)
- 		return;
- 
- 	dim_update_sample(tqp_vector->event_cnt, rx_group->total_packets,
- 			  rx_group->total_bytes, &sample);
--	net_dim(&rx_group->dim, sample);
-+	net_dim(&rx_group->dim, &sample);
- }
- 
- static void hns3_update_tx_int_coalesce(struct hns3_enet_tqp_vector *tqp_vector)
- {
- 	struct hns3_enet_ring_group *tx_group = &tqp_vector->tx_group;
-@@ -4459,11 +4459,11 @@ static void hns3_update_tx_int_coalesce(struct hns3_enet_tqp_vector *tqp_vector)
- 	if (!tx_group->coal.adapt_enable)
- 		return;
- 
- 	dim_update_sample(tqp_vector->event_cnt, tx_group->total_packets,
- 			  tx_group->total_bytes, &sample);
--	net_dim(&tx_group->dim, sample);
-+	net_dim(&tx_group->dim, &sample);
- }
- 
- static int hns3_nic_common_poll(struct napi_struct *napi, int budget)
- {
- 	struct hns3_nic_priv *priv = netdev_priv(napi->dev);
-diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.c b/drivers/net/ethernet/intel/ice/ice_txrx.c
-index 8208055d6e7f..5d2d7736fd5f 100644
---- a/drivers/net/ethernet/intel/ice/ice_txrx.c
-+++ b/drivers/net/ethernet/intel/ice/ice_txrx.c
-@@ -1350,18 +1350,18 @@ static void ice_net_dim(struct ice_q_vector *q_vector)
- 
- 	if (ITR_IS_DYNAMIC(tx)) {
- 		struct dim_sample dim_sample;
- 
- 		__ice_update_sample(q_vector, tx, &dim_sample, true);
--		net_dim(&tx->dim, dim_sample);
-+		net_dim(&tx->dim, &dim_sample);
- 	}
- 
- 	if (ITR_IS_DYNAMIC(rx)) {
- 		struct dim_sample dim_sample;
- 
- 		__ice_update_sample(q_vector, rx, &dim_sample, false);
--		net_dim(&rx->dim, dim_sample);
-+		net_dim(&rx->dim, &dim_sample);
- 	}
- }
- 
- /**
-  * ice_buildreg_itr - build value for writing to the GLINT_DYN_CTL register
-diff --git a/drivers/net/ethernet/intel/idpf/idpf_txrx.c b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-index d4e6f0e10487..da2a5becf62f 100644
---- a/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-+++ b/drivers/net/ethernet/intel/idpf/idpf_txrx.c
-@@ -3677,11 +3677,11 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
- 		} while (u64_stats_fetch_retry(&txq->stats_sync, start));
- 	}
- 
- 	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->tx_dim,
- 			       packets, bytes);
--	net_dim(&q_vector->tx_dim, dim_sample);
-+	net_dim(&q_vector->tx_dim, &dim_sample);
- 
- check_rx_itr:
- 	if (!IDPF_ITR_IS_DYNAMIC(q_vector->rx_intr_mode))
- 		return;
- 
-@@ -3696,11 +3696,11 @@ static void idpf_net_dim(struct idpf_q_vector *q_vector)
- 		} while (u64_stats_fetch_retry(&rxq->stats_sync, start));
- 	}
- 
- 	idpf_update_dim_sample(q_vector, &dim_sample, &q_vector->rx_dim,
- 			       packets, bytes);
--	net_dim(&q_vector->rx_dim, dim_sample);
-+	net_dim(&q_vector->rx_dim, &dim_sample);
- }
- 
- /**
-  * idpf_vport_intr_update_itr_ena_irq - Update itr and re-enable MSIX interrupt
-  * @q_vector: q_vector for which itr is being updated and interrupt enabled
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-index 933e18ba2fb2..7aaf32e9aa95 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
-@@ -525,11 +525,11 @@ static void otx2_adjust_adaptive_coalese(struct otx2_nic *pfvf, struct otx2_cq_p
- 
- 	dim_update_sample(pfvf->napi_events,
- 			  rx_frames + tx_frames,
- 			  rx_bytes + tx_bytes,
- 			  &dim_sample);
--	net_dim(&cq_poll->dim, dim_sample);
-+	net_dim(&cq_poll->dim, &dim_sample);
- }
- 
- int otx2_napi_handler(struct napi_struct *napi, int budget)
- {
- 	struct otx2_cq_queue *rx_cq = NULL;
-diff --git a/drivers/net/ethernet/mediatek/mtk_eth_soc.c b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-index f01ceee5f02d..53485142938c 100644
---- a/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-+++ b/drivers/net/ethernet/mediatek/mtk_eth_soc.c
-@@ -2225,11 +2225,11 @@ static int mtk_poll_rx(struct napi_struct *napi, int budget,
- 
- 	eth->rx_packets += done;
- 	eth->rx_bytes += bytes;
- 	dim_update_sample(eth->rx_events, eth->rx_packets, eth->rx_bytes,
- 			  &dim_sample);
--	net_dim(&eth->rx_dim, dim_sample);
-+	net_dim(&eth->rx_dim, &dim_sample);
- 
- 	if (xdp_flush)
- 		xdp_do_flush();
- 
- 	return done;
-@@ -2375,11 +2375,11 @@ static int mtk_poll_tx(struct mtk_eth *eth, int budget)
- 	if (state.txq)
- 		netdev_tx_completed_queue(state.txq, state.done, state.bytes);
- 
- 	dim_update_sample(eth->tx_events, eth->tx_packets, eth->tx_bytes,
- 			  &dim_sample);
--	net_dim(&eth->tx_dim, dim_sample);
-+	net_dim(&eth->tx_dim, &dim_sample);
- 
- 	if (mtk_queue_stopped(eth) &&
- 	    (atomic_read(&ring->free_count) > ring->thresh))
- 		mtk_wake_queue(eth);
- 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-index 5873fde65c2e..417098f0b2bb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c
-@@ -53,11 +53,11 @@ static void mlx5e_handle_tx_dim(struct mlx5e_txqsq *sq)
- 
- 	if (unlikely(!test_bit(MLX5E_SQ_STATE_DIM, &sq->state)))
- 		return;
- 
- 	dim_update_sample(sq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
--	net_dim(sq->dim, dim_sample);
-+	net_dim(sq->dim, &dim_sample);
- }
- 
- static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- {
- 	struct mlx5e_rq_stats *stats = rq->stats;
-@@ -65,11 +65,11 @@ static void mlx5e_handle_rx_dim(struct mlx5e_rq *rq)
- 
- 	if (unlikely(!test_bit(MLX5E_RQ_STATE_DIM, &rq->state)))
- 		return;
- 
- 	dim_update_sample(rq->cq.event_ctr, stats->packets, stats->bytes, &dim_sample);
--	net_dim(rq->dim, dim_sample);
-+	net_dim(rq->dim, &dim_sample);
- }
- 
- void mlx5e_trigger_irq(struct mlx5e_icosq *sq)
- {
- 	struct mlx5_wq_cyc *wq = &sq->wq;
-diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-index d215efc6cad0..f1c6c47564b1 100644
---- a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
-@@ -1177,11 +1177,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->rx_pkts;
- 			bytes = r_vec->rx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->rx_dim, dim_sample);
-+		net_dim(&r_vec->rx_dim, &dim_sample);
- 	}
- 
- 	if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
- 		struct dim_sample dim_sample = {};
- 		unsigned int start;
-@@ -1192,11 +1192,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->tx_pkts;
- 			bytes = r_vec->tx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->tx_dim, dim_sample);
-+		net_dim(&r_vec->tx_dim, &dim_sample);
- 	}
- 
- 	return pkts_polled;
- }
- 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-index dae5af7d1845..ebeb6ab4465c 100644
---- a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
-@@ -1287,11 +1287,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->rx_pkts;
- 			bytes = r_vec->rx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->rx_dim, dim_sample);
-+		net_dim(&r_vec->rx_dim, &dim_sample);
- 	}
- 
- 	if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
- 		struct dim_sample dim_sample = {};
- 		unsigned int start;
-@@ -1302,11 +1302,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int budget)
- 			pkts = r_vec->tx_pkts;
- 			bytes = r_vec->tx_bytes;
- 		} while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
- 
- 		dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sample);
--		net_dim(&r_vec->tx_dim, dim_sample);
-+		net_dim(&r_vec->tx_dim, &dim_sample);
- 	}
- 
- 	return pkts_polled;
- }
- 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-index 0eeda7e502db..2ac59564ded1 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_txrx.c
-@@ -926,11 +926,11 @@ static void ionic_dim_update(struct ionic_qcq *qcq, int napi_mode)
- 	}
- 
- 	dim_update_sample(qcq->cq.bound_intr->rearm_count,
- 			  pkts, bytes, &dim_sample);
- 
--	net_dim(&qcq->dim, dim_sample);
-+	net_dim(&qcq->dim, &dim_sample);
- }
- 
- int ionic_tx_napi(struct napi_struct *napi, int budget)
- {
- 	struct ionic_qcq *qcq = napi_to_qcq(napi);
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 792e9eadbfc3..869586c17ffd 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -2802,11 +2802,11 @@ static void virtnet_rx_dim_update(struct virtnet_info *vi, struct receive_queue
- 	dim_update_sample(rq->calls,
- 			  u64_stats_read(&rq->stats.packets),
- 			  u64_stats_read(&rq->stats.bytes),
- 			  &cur_sample);
- 
--	net_dim(&rq->dim, cur_sample);
-+	net_dim(&rq->dim, &cur_sample);
- 	rq->packets_in_napi = 0;
- }
- 
- static int virtnet_poll(struct napi_struct *napi, int budget)
- {
-diff --git a/drivers/soc/fsl/dpio/dpio-service.c b/drivers/soc/fsl/dpio/dpio-service.c
-index b811446e0fa5..0b60ed16297c 100644
---- a/drivers/soc/fsl/dpio/dpio-service.c
-+++ b/drivers/soc/fsl/dpio/dpio-service.c
-@@ -889,10 +889,10 @@ void dpaa2_io_update_net_dim(struct dpaa2_io *d, __u64 frames, __u64 bytes)
- 
- 	d->bytes += bytes;
- 	d->frames += frames;
- 
- 	dim_update_sample(d->event_ctr, d->frames, d->bytes, &dim_sample);
--	net_dim(&d->rx_dim, dim_sample);
-+	net_dim(&d->rx_dim, &dim_sample);
- 
- 	spin_unlock(&d->dim_lock);
- }
- EXPORT_SYMBOL(dpaa2_io_update_net_dim);
-diff --git a/include/linux/dim.h b/include/linux/dim.h
-index 84579a50ae7f..06543fd40fcc 100644
---- a/include/linux/dim.h
-+++ b/include/linux/dim.h
-@@ -423,11 +423,11 @@ struct dim_cq_moder net_dim_get_def_tx_moderation(u8 cq_period_mode);
-  *
-  * Called by the consumer.
-  * This is the main logic of the algorithm, where data is processed in order
-  * to decide on next required action.
-  */
--void net_dim(struct dim *dim, struct dim_sample end_sample);
-+void net_dim(struct dim *dim, const struct dim_sample *end_sample);
- 
- /* RDMA DIM */
- 
- /*
-  * RDMA DIM profile:
-diff --git a/lib/dim/net_dim.c b/lib/dim/net_dim.c
-index d7e7028e9b19..d6aa09a979b3 100644
---- a/lib/dim/net_dim.c
-+++ b/lib/dim/net_dim.c
-@@ -345,33 +345,33 @@ static bool net_dim_decision(struct dim_stats *curr_stats, struct dim *dim)
- 		dim->prev_stats = *curr_stats;
- 
- 	return dim->profile_ix != prev_ix;
- }
- 
--void net_dim(struct dim *dim, struct dim_sample end_sample)
-+void net_dim(struct dim *dim, const struct dim_sample *end_sample)
- {
- 	struct dim_stats curr_stats;
- 	u16 nevents;
- 
- 	switch (dim->state) {
- 	case DIM_MEASURE_IN_PROGRESS:
- 		nevents = BIT_GAP(BITS_PER_TYPE(u16),
--				  end_sample.event_ctr,
-+				  end_sample->event_ctr,
- 				  dim->start_sample.event_ctr);
- 		if (nevents < DIM_NEVENTS)
- 			break;
--		if (!dim_calc_stats(&dim->start_sample, &end_sample, &curr_stats))
-+		if (!dim_calc_stats(&dim->start_sample, end_sample, &curr_stats))
- 			break;
- 		if (net_dim_decision(&curr_stats, dim)) {
- 			dim->state = DIM_APPLY_NEW_PROFILE;
- 			schedule_work(&dim->work);
- 			break;
- 		}
- 		fallthrough;
- 	case DIM_START_MEASURE:
--		dim_update_sample(end_sample.event_ctr, end_sample.pkt_ctr,
--				  end_sample.byte_ctr, &dim->start_sample);
-+		dim_update_sample(end_sample->event_ctr, end_sample->pkt_ctr,
-+				  end_sample->byte_ctr, &dim->start_sample);
- 		dim->state = DIM_MEASURE_IN_PROGRESS;
- 		break;
- 	case DIM_APPLY_NEW_PROFILE:
- 		break;
- 	}
+>  - NVMe fault injection
+>  
+>    inject NVMe status code and retry flag on devices permitted by setting
+> @@ -216,6 +238,19 @@ configuration of fault-injection capabilities.
+>  	use a negative errno, you better use 'printf' instead of 'echo', e.g.:
+>  	$ printf %#x -12 > retval
+>  
+> +- /sys/kernel/debug/fail_skb_realloc/devname:
+> +
+> +        Specifies the network interface on which to force SKB reallocation.  If
+> +        left empty, SKB reallocation will be applied to all network interfaces.
+> +
+> +        Example usage::
+> +
+> +          # Force skb reallocation on eth0
+> +          echo "eth0" > /sys/kernel/debug/fail_skb_realloc/devname
+> +
+> +          # Clear the selection and force skb reallocation on all interfaces
+> +          echo "" > /sys/kernel/debug/fail_skb_realloc/devname
+> +
+>  Boot option
+>  ^^^^^^^^^^^
+>  
+> @@ -227,6 +262,7 @@ use the boot option::
+>  	fail_usercopy=
+>  	fail_make_request=
+>  	fail_futex=
+> +	fail_skb_realloc=
+>  	mmc_core.fail_request=<interval>,<probability>,<space>,<times>
+>  
+>  proc entries
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 48f1e0fa2a13..285e36a5e5d7 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -2681,6 +2681,12 @@ static inline void skb_assert_len(struct sk_buff *skb)
+>  #endif /* CONFIG_DEBUG_NET */
+>  }
+>  
+> +#if defined(CONFIG_FAIL_SKB_REALLOC)
+> +void skb_might_realloc(struct sk_buff *skb);
+> +#else
+> +static inline void skb_might_realloc(struct sk_buff *skb) {}
+> +#endif
+> +
+>  /*
+>   *	Add data to an sk_buff
+>   */
+> @@ -2781,6 +2787,7 @@ static inline enum skb_drop_reason
+>  pskb_may_pull_reason(struct sk_buff *skb, unsigned int len)
+>  {
+>  	DEBUG_NET_WARN_ON_ONCE(len > INT_MAX);
+> +	skb_might_realloc(skb);
+>  
+>  	if (likely(len <= skb_headlen(skb)))
+>  		return SKB_NOT_DROPPED_YET;
+> @@ -3216,6 +3223,7 @@ static inline int __pskb_trim(struct sk_buff *skb, unsigned int len)
+>  
+>  static inline int pskb_trim(struct sk_buff *skb, unsigned int len)
+>  {
+> +	skb_might_realloc(skb);
+>  	return (len < skb->len) ? __pskb_trim(skb, len) : 0;
+>  }
+>  
+> @@ -3970,6 +3978,7 @@ int pskb_trim_rcsum_slow(struct sk_buff *skb, unsigned int len);
+>  
+>  static inline int pskb_trim_rcsum(struct sk_buff *skb, unsigned int len)
+>  {
+> +	skb_might_realloc(skb);
+>  	if (likely(len >= skb->len))
+>  		return 0;
+>  	return pskb_trim_rcsum_slow(skb, len);
+> diff --git a/lib/Kconfig.debug b/lib/Kconfig.debug
+> index 7315f643817a..52bb27115185 100644
+> --- a/lib/Kconfig.debug
+> +++ b/lib/Kconfig.debug
+> @@ -2115,6 +2115,16 @@ config FAIL_SUNRPC
+>  	  Provide fault-injection capability for SunRPC and
+>  	  its consumers.
+>  
+> +config FAIL_SKB_REALLOC
+> +	bool "Fault-injection capability forcing skb to reallocate"
+> +	depends on FAULT_INJECTION_DEBUG_FS
+> +	help
+> +	  Provide fault-injection capability that forces the skb to be
+> +	  reallocated, caughting possible invalid pointers to the skb.
+
+catching
+
+> +	  For more information, check
+> +	  Documentation/dev-tools/fault-injection/fault-injection.rst
+> +
+>  config FAULT_INJECTION_CONFIGFS
+>  	bool "Configfs interface for fault-injection capabilities"
+>  	depends on FAULT_INJECTION
+> diff --git a/net/core/Makefile b/net/core/Makefile
+> index 5a72a87ee0f1..d9326600e289 100644
+> --- a/net/core/Makefile
+> +++ b/net/core/Makefile
+> @@ -46,3 +46,4 @@ obj-$(CONFIG_OF)	+= of_net.o
+>  obj-$(CONFIG_NET_TEST) += net_test.o
+>  obj-$(CONFIG_NET_DEVMEM) += devmem.o
+>  obj-$(CONFIG_DEBUG_NET_SMALL_RTNL) += rtnl_net_debug.o
+> +obj-$(CONFIG_FAIL_SKB_REALLOC) += skb_fault_injection.o
+> diff --git a/net/core/skb_fault_injection.c b/net/core/skb_fault_injection.c
+> new file mode 100644
+> index 000000000000..21b0ea48c139
+> --- /dev/null
+> +++ b/net/core/skb_fault_injection.c
+> @@ -0,0 +1,103 @@
+> +// SPDX-License-Identifier: GPL-2.0-only
+> +
+> +#include <linux/fault-inject.h>
+> +#include <linux/netdevice.h>
+> +#include <linux/debugfs.h>
+> +#include <linux/skbuff.h>
+
+alphabetic sort, please?
+
+> +static struct {
+> +	struct fault_attr attr;
+> +	char devname[IFNAMSIZ];
+> +	bool filtered;
+> +} skb_realloc = {
+> +	.attr = FAULT_ATTR_INITIALIZER,
+> +	.filtered = false,
+> +};
+> +
+> +static bool should_fail_net_realloc_skb(struct sk_buff *skb)
+> +{
+> +	struct net_device *net = skb->dev;
+> +
+> +	if (skb_realloc.filtered &&
+> +	    strncmp(net->name, skb_realloc.devname, IFNAMSIZ))
+> +		/* device name filter set, but names do not match */
+> +		return false;
+> +
+> +	if (!should_fail(&skb_realloc.attr, 1))
+> +		return false;
+> +
+> +	return true;
+> +}
+> +ALLOW_ERROR_INJECTION(should_fail_net_realloc_skb, TRUE);
+> +
+> +void skb_might_realloc(struct sk_buff *skb)
+> +{
+> +	if (!should_fail_net_realloc_skb(skb))
+> +		return;
+> +
+> +	pskb_expand_head(skb, 0, 0, GFP_ATOMIC);
+> +}
+> +EXPORT_SYMBOL(skb_might_realloc);
+> +
+> +static int __init fail_skb_realloc_setup(char *str)
+> +{
+> +	return setup_fault_attr(&skb_realloc.attr, str);
+> +}
+> +__setup("fail_skb_realloc=", fail_skb_realloc_setup);
+> +
+> +static void reset_settings(void)
+> +{
+> +	skb_realloc.filtered = false;
+> +	memzero_explicit(&skb_realloc.devname, IFNAMSIZ);
+
+why _explicit ?
+
+> +}
+> +
+> +static ssize_t devname_write(struct file *file, const char __user *buffer,
+> +			     size_t count, loff_t *ppos)
+> +{
+> +	ssize_t ret;
+> +
+> +	reset_settings();
+> +	ret = simple_write_to_buffer(&skb_realloc.devname, IFNAMSIZ,
+> +				     ppos, buffer, count);
+> +	if (ret < 0)
+> +		return ret;
+
+the buffer needs to be null terminated, like:
+
+skb_realloc.devname[IFNAMSIZ - 1] = '\0';
+
+no?
+
+> +	strim(skb_realloc.devname);
+> +
+> +	if (strnlen(skb_realloc.devname, IFNAMSIZ))
+> +		skb_realloc.filtered = true;
+> +
+> +	return count;
+> +}
+> +
+> +static ssize_t devname_read(struct file *file,
+> +			    char __user *buffer,
+> +			    size_t size, loff_t *ppos)
+> +{
+> +	if (!skb_realloc.filtered)
+> +		return 0;
+> +
+> +	return simple_read_from_buffer(buffer, size, ppos, &skb_realloc.devname,
+> +				       strlen(skb_realloc.devname));
+> +}
+> +
+> +static const struct file_operations devname_ops = {
+> +	.write = devname_write,
+> +	.read = devname_read,
+> +};
+> +
+> +static int __init fail_skb_realloc_debugfs(void)
+> +{
+> +	umode_t mode = S_IFREG | 0600;
+> +	struct dentry *dir;
+> +
+> +	dir = fault_create_debugfs_attr("fail_skb_realloc", NULL,
+> +					&skb_realloc.attr);
+> +	if (IS_ERR(dir))
+> +		return PTR_ERR(dir);
+> +
+> +	debugfs_create_file("devname", mode, dir, NULL, &devname_ops);
+> +
+> +	return 0;
+> +}
+> +
+> +late_initcall(fail_skb_realloc_debugfs);
 -- 
-2.45.2
-
+pw-bot: cr
 
