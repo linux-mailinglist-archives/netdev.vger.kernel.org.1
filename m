@@ -1,132 +1,257 @@
-Return-Path: <netdev+bounces-140691-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140688-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E31B9B7A62
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:17:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E3819B7A3B
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 13:06:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A28DB21292
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:17:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F1B8128147D
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 12:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52C9C19C56C;
-	Thu, 31 Oct 2024 12:17:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B57419AD94;
+	Thu, 31 Oct 2024 12:06:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BD9619882B;
-	Thu, 31 Oct 2024 12:17:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.188
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1A00199FB8;
+	Thu, 31 Oct 2024 12:06:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730377055; cv=none; b=Tlqu/2/W9GZN2V6sNDR7NwClORrGDeGq3xJboxHnOnZO3rCizQhgv3M+QSNJahn3iMjFtT95wHDbrZU/JKsvmLiGBNIoUq7d5G//1/+vIw4l/2qqb/H80CurbNmrHkyQ7A9W/0Xfrm1BcB6bMIJ7tWAuQAGC0yHuvvMScZb0OLY=
+	t=1730376398; cv=none; b=nQX3IwVxiouKcZeb8XWlUMPQQbe4xQRc3Euv6/zT7o8LRF0U63hQWXmBfJm0BBm0WE8l5x0dSBE/PCC3RVXqzXUeoxDLVFDP/cx8kN+3AsYSes79vRbPagZKMPW5SZgomXz/FS9b8mqlmXsJ0o0DX8U+qonIAj6pNM9Fd9BfAzM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730377055; c=relaxed/simple;
-	bh=ZJp8CpUWes1dkqbgbG7DbJ43gENXj3SMpJtHKxIrvaE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cHBa9rqbXchtaY4Nm2VZ5BvLw/VFBFScjcDUWGMZloSBJ8M8P8nSUhgVkN3cxq7QmI1mFK6j5i97MUJXeM+GNR5TJ/YGFvDA5R42x8WAQRKqeeTynN8p9YcgPY615xEunaOhEss10KGoyg8IOgVMV9yfBo5KtUcoIL/ywtCw5Mw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.188
+	s=arc-20240116; t=1730376398; c=relaxed/simple;
+	bh=5sZBGAZdlZ8njThROCJogtID/PIdkdvJbFc6hdanMog=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Hp3ON8TRdRb2e1ui1H6i+lK5ZLQkzQpDhdQNF6CzzNgfrPHQIL1XkD5BND3XgXJjVXKHscpM2x8zjP1aLk2aLYUpwd3MTTOxJvp4Sc/W5KTT+a1Wzh2carNQrJLvFlGJQ++7ywuTl3G00rzUAt/FIiuD0IT7J8PjXDZQ4lQgMkQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.48])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4XfNGj0FYFzdkYF;
-	Thu, 31 Oct 2024 20:14:53 +0800 (CST)
-Received: from dggpemf200006.china.huawei.com (unknown [7.185.36.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id 267A118009B;
-	Thu, 31 Oct 2024 20:17:27 +0800 (CST)
-Received: from [10.67.120.129] (10.67.120.129) by
- dggpemf200006.china.huawei.com (7.185.36.61) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Thu, 31 Oct 2024 20:17:26 +0800
-Message-ID: <023fdee7-dbd4-4e78-b911-a7136ff81343@huawei.com>
-Date: Thu, 31 Oct 2024 20:17:26 +0800
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XfN2V3MTFz10Mxm;
+	Thu, 31 Oct 2024 20:04:18 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id EBF341800DB;
+	Thu, 31 Oct 2024 20:06:30 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
+ (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 31 Oct
+ 2024 20:06:29 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <edumazet@google.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <dsahern@kernel.org>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<wangliang74@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: [RFC PATCH net] net: fix data-races around sk->sk_forward_alloc
+Date: Thu, 31 Oct 2024 20:23:44 +0800
+Message-ID: <20241031122344.2148586-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
- has already unbound
-To: =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, Jesper
- Dangaard Brouer <hawk@kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<pabeni@redhat.com>
-CC: <zhangkun09@huawei.com>, <fanghaiqing@huawei.com>,
-	<liuyonglong@huawei.com>, Robin Murphy <robin.murphy@arm.com>, Alexander
- Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>, Andrew
- Morton <akpm@linux-foundation.org>, Eric Dumazet <edumazet@google.com>, Ilias
- Apalodimas <ilias.apalodimas@linaro.org>, <linux-mm@kvack.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>, kernel-team
-	<kernel-team@cloudflare.com>
-References: <20241022032214.3915232-1-linyunsheng@huawei.com>
- <20241022032214.3915232-4-linyunsheng@huawei.com>
- <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
- <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
- <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
- <cf1911c5-622f-484c-9ee5-11e1ac83da24@huawei.com> <878qu7c8om.fsf@toke.dk>
- <1eac33ae-e8e1-4437-9403-57291ba4ced6@huawei.com> <87o731by64.fsf@toke.dk>
-Content-Language: en-US
-From: Yunsheng Lin <linyunsheng@huawei.com>
-In-Reply-To: <87o731by64.fsf@toke.dk>
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems703-chm.china.huawei.com (10.3.19.180) To
- dggpemf200006.china.huawei.com (7.185.36.61)
+Content-Type: text/plain
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-On 2024/10/30 19:57, Toke Høiland-Jørgensen wrote:
-> Yunsheng Lin <linyunsheng@huawei.com> writes:
-> 
->>> But, well, I'm not sure it is? You seem to be taking it as axiomatic
->>> that the wait in itself is bad. Why? It's just a bit memory being held
->>> on to while it is still in use, and so what?
->>
->> Actually, I thought about adding some sort of timeout or kicking based on
->> jakub's waiting patch too.
->>
->> But after looking at more caching in the networking, waiting and kicking/flushing
->> seems harder than recording the inflight pages, mainly because kicking/flushing
->> need very subsystem using page_pool owned page to provide a kicking/flushing
->> mechanism for it to work, not to mention how much time does it take to do all
->> the kicking/flushing.
-> 
-> Eliding the details above, but yeah, you're right, there are probably
-> some pernicious details to get right if we want to flush all caches. S
-> I wouldn't do that to start with. Instead, just add the waiting to start
-> with, then wait and see if this actually turns out to be a problem in
-> practice. And if it is, identify the source of that problem, deal with
-> it, rinse and repeat :)
+Syzkaller reported this warning:
+[   65.568203][    C0] ------------[ cut here ]------------
+[   65.569339][    C0] WARNING: CPU: 0 PID: 16 at net/ipv4/af_inet.c:156 inet_sock_destruct+0x1c5/0x1e0
+[   65.575017][    C0] Modules linked in:
+[   65.575699][    C0] CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.12.0-rc5 #26
+[   65.577086][    C0] Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+[   65.577094][    C0] RIP: 0010:inet_sock_destruct+0x1c5/0x1e0
+[   65.577100][    C0] Code: 24 12 4c 89 e2 5b 48 c7 c7 98 ec bb 82 41 5c e9 d1 18 17 ff 4c 89 e6 5b 48 c7 c7 d0 ec bb 82 41 5c e9 bf 18 17 ff 0f 0b eb 83 <0f> 0b eb 97 0f 0b eb 87 0f 0b e9 68 ff ff ff 66 66 2e 0f 1f 84 00
+[   65.577107][    C0] RSP: 0018:ffffc9000008bd90 EFLAGS: 00010206
+[   65.577113][    C0] RAX: 0000000000000300 RBX: ffff88810b172a90 RCX: 0000000000000007
+[   65.577117][    C0] RDX: 0000000000000002 RSI: 0000000000000300 RDI: ffff88810b172a00
+[   65.577120][    C0] RBP: ffff88810b172a00 R08: ffff888104273c00 R09: 0000000000100007
+[   65.577123][    C0] R10: 0000000000020000 R11: 0000000000000006 R12: ffff88810b172a00
+[   65.577125][    C0] R13: 0000000000000004 R14: 0000000000000000 R15: ffff888237c31f78
+[   65.577131][    C0] FS:  0000000000000000(0000) GS:ffff888237c00000(0000) knlGS:0000000000000000
+[   65.592485][    C0] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   65.592489][    C0] CR2: 00007ffc63fecac8 CR3: 000000000342e000 CR4: 00000000000006f0
+[   65.592491][    C0] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[   65.592492][    C0] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[   65.592495][    C0] Call Trace:
+[   65.596277][    C0]  <TASK>
+[   65.598171][    C0]  ? __warn+0x88/0x130
+[   65.598874][    C0]  ? inet_sock_destruct+0x1c5/0x1e0
+[   65.598879][    C0]  ? report_bug+0x18e/0x1a0
+[   65.598883][    C0]  ? handle_bug+0x53/0x90
+[   65.598886][    C0]  ? exc_invalid_op+0x18/0x70
+[   65.598888][    C0]  ? asm_exc_invalid_op+0x1a/0x20
+[   65.598893][    C0]  ? inet_sock_destruct+0x1c5/0x1e0
+[   65.598897][    C0]  __sk_destruct+0x2a/0x200
+[   65.604664][    C0]  rcu_do_batch+0x1aa/0x530
+[   65.605450][    C0]  ? rcu_do_batch+0x13b/0x530
+[   65.605456][    C0]  rcu_core+0x159/0x2f0
+[   65.605466][    C0]  handle_softirqs+0xd3/0x2b0
+[   65.607689][    C0]  ? __pfx_smpboot_thread_fn+0x10/0x10
+[   65.607695][    C0]  run_ksoftirqd+0x25/0x30
+[   65.607699][    C0]  smpboot_thread_fn+0xdd/0x1d0
+[   65.610152][    C0]  kthread+0xd3/0x100
+[   65.610158][    C0]  ? __pfx_kthread+0x10/0x10
+[   65.610160][    C0]  ret_from_fork+0x34/0x50
+[   65.610170][    C0]  ? __pfx_kthread+0x10/0x10
+[   65.610172][    C0]  ret_from_fork_asm+0x1a/0x30
+[   65.610181][    C0]  </TASK>
+[   65.610182][    C0] ---[ end trace 0000000000000000 ]---
 
-I am not sure if I have mentioned to you that jakub had a RFC for the waiting,
-see [1]. And Yonglong Cc'ed had tested it, the waiting caused the driver unload
-stalling forever and some task hung, see [2].
+Its possible that two threads call tcp_v6_do_rcv()/sk_forward_alloc_add()
+concurrently when sk->sk_state == TCP_LISTEN with sk->sk_lock unlocked,
+which triggers a data-race around sk->sk_forward_alloc:
+tcp_v6_rcv
+    tcp_v6_do_rcv
+        skb_clone_and_charge_r
+            sk_rmem_schedule
+                __sk_mem_schedule
+                    sk_forward_alloc_add()
+            skb_set_owner_r
+                sk_mem_charge
+                    sk_forward_alloc_add()
+        __kfree_skb
+            skb_release_all
+                skb_release_head_state
+                    sock_rfree
+                        sk_mem_uncharge
+                            sk_forward_alloc_add()
+                            sk_mem_reclaim
+                                // set local var reclaimable
+                                __sk_mem_reclaim
+                                    sk_forward_alloc_add()
 
-The root cause for the above case is skb_defer_free_flush() not being called
-as mentioned before.
+In this syzkaller testcase, two threads call tcp_v6_do_rcv() with
+skb->truesize=768, the sk_forward_alloc changes like this:
+ (cpu 1)             | (cpu 2)             | sk_forward_alloc
+ ...                 | ...                 | 0
+ __sk_mem_schedule() |                     | +4096 = 4096
+                     | __sk_mem_schedule() | +4096 = 8192
+ sk_mem_charge()     |                     | -768  = 7424
+                     | sk_mem_charge()     | -768  = 6656
+ ...                 |    ...              |
+ sk_mem_uncharge()   |                     | +768  = 7424
+ reclaimable=7424    |                     |
+                     | sk_mem_uncharge()   | +768  = 8192
+                     | reclaimable=8192    |
+ __sk_mem_reclaim()  |                     | -4096 = 4096
+                     | __sk_mem_reclaim()  | -8192 = -4096 != 0
 
-I am not sure if I understand the reasoning behind the above suggestion to 'wait
-and see if this actually turns out to be a problem' when we already know that there
-are some cases which need cache kicking/flushing for the waiting to work and those
-kicking/flushing may not be easy and may take indefinite time too, not to mention
-there might be other cases that need kicking/flushing that we don't know yet.
+Add lock around tcp_v6_do_rcv() in tcp_v6_rcv() will have some the
+performance impacts, only add lock when opt_skb clone occurs. In some
+scenes, tcp_v6_do_rcv() is embraced by sk->sk_lock, add
+TCP_SKB_CB(skb)->sk_lock_capability to avoid re-locking.
 
-Is there any reason not to consider recording the inflight pages so that unmapping
-can be done for inflight pages before driver unbound supposing dynamic number of
-inflight pages can be supported?
+Fixes: e994b2f0fb92 ("tcp: do not lock listener to process SYN packets")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
+---
+ include/net/tcp.h   |  3 ++-
+ net/ipv6/tcp_ipv6.c | 21 ++++++++++++++++-----
+ 2 files changed, 18 insertions(+), 6 deletions(-)
 
-IOW, Is there any reason you and jesper taking it as axiomatic that recording the
-inflight pages is bad supposing the inflight pages can be unlimited and recording
-can be done with least performance overhead?
+diff --git a/include/net/tcp.h b/include/net/tcp.h
+index d1948d357dad..110a23dda1eb 100644
+--- a/include/net/tcp.h
++++ b/include/net/tcp.h
+@@ -961,7 +961,8 @@ struct tcp_skb_cb {
+ 	__u8		txstamp_ack:1,	/* Record TX timestamp for ack? */
+ 			eor:1,		/* Is skb MSG_EOR marked? */
+ 			has_rxtstamp:1,	/* SKB has a RX timestamp	*/
+-			unused:5;
++			sk_lock_capability:1, /* Avoid re-lock flag */
++			unused:4;
+ 	__u32		ack_seq;	/* Sequence number ACK'd	*/
+ 	union {
+ 		struct {
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index d71ab4e1efe1..a1166035fbce 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1588,6 +1588,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	struct sk_buff *opt_skb = NULL;
+ 	enum skb_drop_reason reason;
+ 	struct tcp_sock *tp;
++	bool sk_lock_flag = false;
+ 
+ 	/* Imagine: socket is IPv6. IPv4 packet arrives,
+ 	   goes to IPv4 receive handler and backlogged.
+@@ -1618,8 +1619,13 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	   by tcp. Feel free to propose better solution.
+ 					       --ANK (980728)
+ 	 */
+-	if (np->rxopt.all)
++	if (np->rxopt.all) {
++		if (TCP_SKB_CB(skb)->sk_lock_capability) {
++			sk_lock_flag = true;
++			bh_lock_sock_nested(sk);
++		}
+ 		opt_skb = skb_clone_and_charge_r(skb, sk);
++	}
+ 
+ 	if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
+ 		struct dst_entry *dst;
+@@ -1641,7 +1647,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 		tcp_rcv_established(sk, skb);
+ 		if (opt_skb)
+ 			goto ipv6_pktoptions;
+-		return 0;
++		goto unlock;
+ 	}
+ 
+ 	if (tcp_checksum_complete(skb))
+@@ -1658,7 +1664,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 			}
+ 			if (opt_skb)
+ 				__kfree_skb(opt_skb);
+-			return 0;
++			goto unlock;
+ 		}
+ 	} else
+ 		sock_rps_save_rxhash(sk, skb);
+@@ -1668,7 +1674,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 		goto reset;
+ 	if (opt_skb)
+ 		goto ipv6_pktoptions;
+-	return 0;
++	goto unlock;
+ 
+ reset:
+ 	tcp_v6_send_reset(sk, skb, sk_rst_convert_drop_reason(reason));
+@@ -1676,7 +1682,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	if (opt_skb)
+ 		__kfree_skb(opt_skb);
+ 	sk_skb_reason_drop(sk, skb, reason);
+-	return 0;
++	goto unlock;
+ csum_err:
+ 	reason = SKB_DROP_REASON_TCP_CSUM;
+ 	trace_tcp_bad_csum(skb);
+@@ -1715,6 +1721,9 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	}
+ 
+ 	consume_skb(opt_skb);
++unlock:
++	if (sk_lock_flag)
++		bh_unlock_sock(sk);
+ 	return 0;
+ }
+ 
+@@ -1900,7 +1909,9 @@ INDIRECT_CALLABLE_SCOPE int tcp_v6_rcv(struct sk_buff *skb)
+ 	skb->dev = NULL;
+ 
+ 	if (sk->sk_state == TCP_LISTEN) {
++		TCP_SKB_CB(skb)->sk_lock_capability = true;
+ 		ret = tcp_v6_do_rcv(sk, skb);
++		TCP_SKB_CB(skb)->sk_lock_capability = false;
+ 		goto put_and_return;
+ 	}
+ 
+-- 
+2.34.1
 
-Or is there any better idea other than recording the inflight pages and doing the
-kicking/flushing during waiting?
-
-1. https://lore.kernel.org/netdev/20240806151618.1373008-1-kuba@kernel.org/
-2. https://lore.kernel.org/netdev/758b4d47-c980-4f66-b4a4-949c3fc4b040@huawei.com/
-
-> 
-> -Toke
-> 
-> 
 
