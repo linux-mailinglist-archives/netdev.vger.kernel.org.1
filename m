@@ -1,252 +1,177 @@
-Return-Path: <netdev+bounces-140634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3D4B9B74BD
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:54:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AC099B7508
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 08:07:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 137711C235CD
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 06:54:33 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63AC4B24D94
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:07:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2E2E146D6E;
-	Thu, 31 Oct 2024 06:54:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07941465BB;
+	Thu, 31 Oct 2024 07:05:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJEFgQeX"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72DA0146D53
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 06:54:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96F2148318;
+	Thu, 31 Oct 2024 07:05:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730357669; cv=none; b=bxWbzjG2VM2tnzsTGfos2Xl4bOIJli+aLuLJCgetok2UmoBr+pTv1E4moTqvzpxWHXEC42/N9cwb9AJ6ys7EYqmLT0ap8jINTgzoe2Xw7t9/CRT3fDNHbifDJgzN3Vrw6yArAqJ49N2LNP43hyzo2AtghHrJioZfzL4+s63wW74=
+	t=1730358320; cv=none; b=C+A3XxkO9ZrL1IJ8JmjmBn+ps8ogOAt1YrbmCYfrm8YvVliuzl7O/e1WFbip2cn4fYLpsH9iRFo+6RzGZyQuxXPyg0nfN7ti8OzUufYmSbCI1Rs+F2JlwLuZhcxrDTZdAyw5BqMd/CZjynKnWE8M0nWn12FxBIBcBvcdcwDDyGc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730357669; c=relaxed/simple;
-	bh=7pZk6xURsLrp/rp1VDQ/01OCJzqZvLcza5ZMTiODdUs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=N8ARiGbhoE8QAO3AoDleLRz73letW04PV2FlrpTPL4rLy4WVOC6bBdlKj2ggHloAd79ee5O+xb6Dky1ZfmcHNFCvKqEEB8dL6ueaucX1gzC+rHytxM6hskeW9pCoWPdkqt32crBULfn2ZwpdFcOLGKF9HV1e/ubGCfrIctJbIzU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6P4M-0004us-N9; Thu, 31 Oct 2024 07:54:10 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6P4K-001JmE-1m;
-	Thu, 31 Oct 2024 07:54:08 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6P4K-0069fz-1O;
-	Thu, 31 Oct 2024 07:54:08 +0100
-Date: Thu, 31 Oct 2024 07:54:08 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 15/18] net: pse-pd: Add support for
- getting and setting port priority
-Message-ID: <ZyMpkJRHZWYsszh2@pengutronix.de>
-References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
- <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
+	s=arc-20240116; t=1730358320; c=relaxed/simple;
+	bh=ziFMZhcj+leFELwUEjmBQ1LaRWWwukmoQhg8YxVAOco=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BQxphmjFiW3ZpDo5bffcved0b9EhJh5ILiCthpgTlvRQUHueoLEVmCE9PtWPn+KxPegq95nPhzLSTHl55E4RssHxvAIK6e6Cjb+NqPikhGxC7FaCh2Byafd2dE7ezt1Ao2gjtraNC/B4XEtJ6P+r201rwi5oje64JmZpML5C7zk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GJEFgQeX; arc=none smtp.client-ip=209.85.166.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-83ab21c26f1so24065339f.2;
+        Thu, 31 Oct 2024 00:05:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730358317; x=1730963117; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=i2SkXndThhCcf1/mGVvarO7LUr9qmr9Xt0h6PkdmTHY=;
+        b=GJEFgQeXPqhxU8VYGW1rDzfX5aEbhPPB8gTcibKea1wcl0LFFt39oT2g/gNKHGVIY7
+         x1JBwRdXqK1GGZbid7eiMRrJ4QdoJvhGCi/ljEZy2Gi1Ljn8dGKHXkPMixfiHiv/gMUz
+         AfvZ9yYdGvIBnMYwKYsiMXWn7f57fI9AfYb4pfUtozUelSFFvW7xQr+0kerNcPlzVchc
+         V7R7pH2yVNvaA8pBjAyixEkBTiYW6v3ZqAczhv30PbEYp/qeAiow0He+sIIEj/sqi90y
+         AQKIo69wnMHEr4dJ6Rvfti0LSlW7c5JSW3vPnIWC0mvl/Qveyu+4uumxnJW/YVJOrDUb
+         P8mw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730358317; x=1730963117;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=i2SkXndThhCcf1/mGVvarO7LUr9qmr9Xt0h6PkdmTHY=;
+        b=HcQ0jGmtOXuXOvqINYg4oxlOGa6FdBl86yAgSUWLccSpvIvWjrQ1enlzvdbq4y9z6M
+         EBvXgjVQtpqwf7vzpccaBCT4OUqabqlruZSYzP5F2O1us0+X7vOTz0+lxMJsc3lH7+Ym
+         Mjx2ol7bgd9cCOk2NAmy6dd9VJbg0ps9xbXqN4O7R/nH8AyOdKz1hNJcTqwuriEMfY72
+         9DC7P4/PtUhGssPGTXO8TcPxksLbzFhLEw3TPwkJB3X8keE6ahbN2f3Przu8Ioby8TE4
+         d5c1ylZ4c3qjhxoLcvoMiaCyrJ+s7IsFrncDbSBKAafXQU6utFJJyQeSWz+N3Um0wgPB
+         F4HA==
+X-Forwarded-Encrypted: i=1; AJvYcCVI2EWp9ZZoENTLqN+1+aLNJyls3hxoNp796u/nW4qq48eAzmlomRJtw84RGgNNyaocg/vGLRsu@vger.kernel.org, AJvYcCWdfcLOoKR+tSn5UNwzVNsa/0YVW3iryNueB/bzq6bw+G298fnIoHxFnl8ipZvB3EOaAo4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyMJ/2DeX3pvoo/g/fBC9BsFf/pwSHirxTSuBqBOeYRemEcFvtT
+	TScJQBFGg66QuYC9+SSlKFaiCv75sWNknoSLrTxsrnShU6VdWEiQ/df7xTzBB9pdB5jpAc1R1se
+	9je1+AATFsgewd87vKRzHQCYgjsI=
+X-Google-Smtp-Source: AGHT+IHc/LMy8LqpZcwjtYFeVo2QCen0QKVHW//6tn8HMjIsK7NdA7YSfMTOWbDZvf85L3MKrNFYq6q4iaD6F2GCsSA=
+X-Received: by 2002:a05:6e02:1888:b0:3a3:445d:f711 with SMTP id
+ e9e14a558f8ab-3a5e23461e1mr68886475ab.0.1730358316992; Thu, 31 Oct 2024
+ 00:05:16 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-3-kerneljasonxing@gmail.com> <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
+ <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
+ <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev> <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com> <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+In-Reply-To: <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 31 Oct 2024 15:04:40 +0800
+Message-ID: <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, willemb@google.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->  struct pse_control_status {
->  	u32 pse_id;
-> @@ -74,6 +83,10 @@ struct pse_control_status {
->  	u32 c33_avail_pw_limit;
->  	struct ethtool_c33_pse_pw_limit_range *c33_pw_limit_ranges;
->  	u32 c33_pw_limit_nb_ranges;
-> +	u32 c33_prio_supp_modes;
-> +	enum pse_port_prio_modes c33_prio_mode;
-> +	u32 c33_prio_max;
-> +	u32 c33_prio;
->  };
->  
->  /**
-> @@ -93,6 +106,8 @@ struct pse_control_status {
->   *			  set_current_limit regulator callback.
->   *			  Should not return an error in case of MAX_PI_CURRENT
->   *			  current value set.
-> + * @pi_set_prio: Configure the PSE PI priority.
-> + * @pi_get_pw_req: Get the power requested by a PD before enabling the PSE PI
->   */
->  struct pse_controller_ops {
->  	int (*ethtool_get_status)(struct pse_controller_dev *pcdev,
-> @@ -107,6 +122,9 @@ struct pse_controller_ops {
->  				    int id);
->  	int (*pi_set_current_limit)(struct pse_controller_dev *pcdev,
->  				    int id, int max_uA);
-> +	int (*pi_set_prio)(struct pse_controller_dev *pcdev, int id,
-> +			   unsigned int prio);
-> +	int (*pi_get_pw_req)(struct pse_controller_dev *pcdev, int id);
->  };
->  
->  struct module;
-> @@ -141,6 +159,10 @@ struct pse_pi_pairset {
->   * @rdev: regulator represented by the PSE PI
->   * @admin_state_enabled: PI enabled state
->   * @pw_d: Power domain of the PSE PI
-> + * @prio: Priority of the PSE PI. Used in static port priority mode
-> + * @pw_enabled: PSE PI power status in static port priority mode
-> + * @pw_allocated: Power allocated to a PSE PI to manage power budget in
-> + *	static port priority mode
->   */
->  struct pse_pi {
->  	struct pse_pi_pairset pairset[2];
-> @@ -148,6 +170,9 @@ struct pse_pi {
->  	struct regulator_dev *rdev;
->  	bool admin_state_enabled;
->  	struct pse_power_domain *pw_d;
-> +	int prio;
-> +	bool pw_enabled;
-> +	int pw_allocated;
->  };
->  
->  /**
-> @@ -165,6 +190,9 @@ struct pse_pi {
->   * @pi: table of PSE PIs described in this controller device
->   * @no_of_pse_pi: flag set if the pse_pis devicetree node is not used
->   * @id: Index of the PSE
-> + * @pis_prio_max: Maximum value allowed for the PSE PIs priority
-> + * @port_prio_supp_modes: Bitfield of port priority mode supported by the PSE
-> + * @port_prio_mode: Current port priority mode of the PSE
->   */
->  struct pse_controller_dev {
->  	const struct pse_controller_ops *ops;
-> @@ -179,6 +207,9 @@ struct pse_controller_dev {
->  	struct pse_pi *pi;
->  	bool no_of_pse_pi;
->  	int id;
-> +	unsigned int pis_prio_max;
-> +	u32 port_prio_supp_modes;
-> +	enum pse_port_prio_modes port_prio_mode;
->  };
+On Thu, Oct 31, 2024 at 2:27=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
+dev> wrote:
+>
+> On 10/30/24 5:13 PM, Jason Xing wrote:
+> > I realized that we will have some new sock_opt flags like
+> > TS_SCHED_OPT_CB in patch 4, so we can control whether to print or
+> > not... For each sock_opt point, they will be called without caring if
+> > related flags in skb are set. Well, it's meaningless to add more
+> > control of skb tsflags at each TS_xx_OPT_CB point.
+> >
+> > Am I understanding in a correct way? Now, I'm totally fine with this gr=
+eat idea!
+> Yes, I think so.
+>
+> The sockops prog can choose to ignore any BPF_SOCK_OPS_TS_*_CB. The are o=
+nly 3:
+> SCHED, SND, and ACK. If the hwtstamp is available from a NIC, I think it =
+would
+> be quite wasteful to throw it away. ACK can be controlled by the
+> TCP_SKB_CB(skb)->bpf_txstamp_ack.
 
-> diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> index a1ad257b1ec1..22664b1ea4a2 100644
-> --- a/include/uapi/linux/ethtool.h
-> +++ b/include/uapi/linux/ethtool.h
-> @@ -1002,11 +1002,35 @@ enum ethtool_c33_pse_pw_d_status {
->   * enum ethtool_c33_pse_events - event list of the C33 PSE controller.
->   * @ETHTOOL_C33_PSE_EVENT_OVER_CURRENT: PSE output current is too high.
->   * @ETHTOOL_C33_PSE_EVENT_OVER_TEMP: PSE in over temperature state.
-> + * @ETHTOOL_C33_PSE_EVENT_CONNECTED: PD detected on the PSE.
-> + * @ETHTOOL_C33_PSE_EVENT_DISCONNECTED: PD has been disconnected on the PSE.
-> + * @ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR: PSE faced an error in static
-> + *	port priority management mode.
->   */
->  
->  enum ethtool_c33_pse_events {
-> -	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =	1 << 0,
-> -	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =	1 << 1,
-> +	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =		1 << 0,
-> +	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =		1 << 1,
-> +	ETHTOOL_C33_PSE_EVENT_CONNECTED =		1 << 2,
-> +	ETHTOOL_C33_PSE_EVENT_DISCONNECTED =		1 << 3,
-> +	ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR =	1 << 4,
-> +};
+Right, let me try this:)
 
-Same here, priority concept is not part of the spec, so the C33 prefix
-should be removed.
+> Going back to my earlier bpf_setsockopt(SOL_SOCKET, BPF_TX_TIMESTAMPING)
+> comment. I think it may as well go back to use the "u8
+> bpf_sock_ops_cb_flags;" and use the bpf_sock_ops_cb_flags_set() helper to
+> enable/disable the timestamp related callback hook. May be add one
+> BPF_SOCK_OPS_TX_TIMESTAMPING_CB_FLAG.
 
-> +
-> +/**
-> + * enum pse_port_prio_modes - PSE port priority modes.
-> + * @ETHTOOL_PSE_PORT_PRIO_DISABLED: Port priority disabled.
-> + * @ETHTOOL_PSE_PORT_PRIO_STATIC: PSE static port priority. Port priority
-> + *	based on the power requested during PD classification. This mode
-> + *	is managed by the PSE core.
-> + * @ETHTOOL_PSE_PORT_PRIO_DYNAMIC: PSE dynamic port priority. Port priority
-> + *	based on the current consumption per ports compared to the total
-> + *	power budget. This mode is managed by the PSE controller.
-> + */
+bpf_sock_ops_cb_flags this flag is only used in TCP condition, right?
+If that is so, it cannot be suitable for UDP.
 
-This part will need some clarification about behavior with mixed port
-configurations. Here is my proposal:
+I'm thinking of this solution:
+1) adding a new flag in SOF_TIMESTAMPING_OPT_BPF flag (in
+include/uapi/linux/net_tstamp.h) which can be used by sk->sk_tsflags
+2) flags =3D   SOF_TIMESTAMPING_OPT_BPF;    bpf_setsockopt(skops,
+SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
+3) test if sk->sk_tsflags has this new flag in tcp_tx_timestamp() or
+in udp_sendmsg()
+...
 
- * Expected behaviors in mixed port priority configurations:
- * - When ports are configured with a mix of disabled, static, and dynamic
- *   priority modes, the following behaviors are expected:
- *     - Ports with priority disabled (ETHTOOL_PSE_PORT_PRIO_DISABLED) are
- *       treated with lowest priority, receiving power only if the budget
- *       remains after static and dynamic ports have been served.
- *     - Static-priority ports are allocated power up to their requested
- *       levels during PD classification, provided the budget allows.
- *     - Dynamic-priority ports receive power based on real-time consumption,
- *       as monitored by the PSE controller, relative to the remaining budget
- *       after static ports.
- *
- * Handling scenarios where power budget is exceeded:
- * - Hot-plug behavior: If a new device is added that causes the total power
- *   demand to exceed the PSE budget, the newly added device is de-prioritized
- *   and shut down to maintain stability for previously connected devices.
- *   This behavior ensures that existing connections are not disrupted, though
- *   it may lead to inconsistent behavior if the device is disconnected and
- *   reconnected (hot-plugged).
- *
- * - Startup behavior (boot): When the system initializes with attached devices,
- *   the PSE allocates power based on a predefined order (e.g., by port index)
- *   until the budget is exhausted. Devices connected later in this order may
- *   not be enabled if they would exceed the power budget, resulting in consistent
- *   behavior during startup but potentially differing from runtime behavior
- *   (hot-plug).
- *
- * - Consistency challenge: These two scenarios—hot-plug vs. system boot—may lead
- *   to different handling of devices. During system boot, power is allocated
- *   sequentially, potentially leaving out high-priority devices added later due to
- *   a first-come-first-serve approach. In contrast, hot-plug behavior favors the
- *   status quo, maintaining stability for initially connected devices, which
- *   might not align with the system's prioritization policy.
- *
+>
+> For tx, one new hook should be at the sendmsg and should be around
+> tcp_tx_timestamp (?) for tcp. Another hook is __skb_tstamp_tx() which sho=
+uld be
 
-> +enum pse_port_prio_modes {
-> +	ETHTOOL_PSE_PORT_PRIO_DISABLED,
-> +	ETHTOOL_PSE_PORT_PRIO_STATIC,
-> +	ETHTOOL_PSE_PORT_PRIO_DYNAMIC,
->  };
- 
+I think there are two points we're supposed to record:
+1) the moment tcp/udp_sendmsg() is triggered. It represents the syscall tim=
+e.
+2) another point in tcp_tx_timestamp(). It represents the timestamp of
+the last skb in this sendmsg() call.
+Users may happen to send a big packet.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+> similar to your patch. Add a new kfunc to set shinfo->tx_flags |=3D SKBTX=
+_BPF
+> and/or TCP_SKB_CB(skb)->bpf_txstamp_ack during sendmsg.
+
+Got it.
+
+>
+>
+> For rx, add one BPF_SOCK_OPS_RX_TIMESTAMPING_CB_FLAG. bpf_sock_ops_cb_fla=
+gs
+> needs to move from the tcp_sock to the sock because it will be used by UD=
+P also.
+> When enabling or disabling this flag, it needs to take care of the
+> net_{enable,disable}_timestamp. The same for the __sk_destruct() also.
+>
+
+I think if the solution I proposed as above is feasible, then we don't
+have to move the tcp_sock which brings more extra work :)
+
+Thanks,
+Jason
 
