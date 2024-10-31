@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-140594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C0CC9B71F8
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:32:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7DD29B71FD
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:32:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E6BD1C24006
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:32:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DBFC286053
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41E3812D20D;
-	Thu, 31 Oct 2024 01:30:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2182813B2A2;
+	Thu, 31 Oct 2024 01:30:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h0GqxaZK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KqadQ3m5"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F3A612CD89;
-	Thu, 31 Oct 2024 01:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D666313AD0F;
+	Thu, 31 Oct 2024 01:30:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730338246; cv=none; b=pzZqT0MipW+yhOlMicvnA4oBtPitRvqvkpEx1oUtbNZXdpnKVWbjVHHOD4caZc8UBvoZ/S3QOd8W6h/de+X+Ol+43ECSE1h7c42H1QY2cmEo8QFPgas01Bhc36DEpiKuWDWjolgZlQ8CT9Ew4odfIm+su6TM8Om3MoAi7Mi8Xwo=
+	t=1730338247; cv=none; b=AHEnYnP7Po78X1x61rj0IS/bXz88Ar6LoSDPw/p2k2qjyXGzWNLJ91AEhARuNzd8jD/gftuIy3KW66HmO8w4zn9xJqAX1w+A2oMSrYluDimM0CaqQ/HvsKXK8/Eoc3Kn1OPfpdW8U6nqButWbRrYklO2Ju3r5nqa+Rclyg9+NU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730338246; c=relaxed/simple;
-	bh=Y+lcThPBWVjCPTYYlmOezurYzskGCGSZ+hugRIeTewQ=;
+	s=arc-20240116; t=1730338247; c=relaxed/simple;
+	bh=j+BB9YGaPQ5Jt/rM1wEWyTXGGJ8IZD0VG0ayICqAde4=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SiMTimILUyzsJ1Lq/Y9D156htofoTa+dJHsUHs/IH6xfk9nDe/bP7n1sFFNtMwO5BDCIAiLci8gpe14887gfWhWOFml1qCOm/Dfo58VUqJqt8zTfwslfIEUm8zPszZL/nt7jecB19QjpMQf18LqTkRa4gwNlU+Gq3gWP248k5Do=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h0GqxaZK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D64DC4CED6;
-	Thu, 31 Oct 2024 01:30:45 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=gz9k8v3KtXiNyw2BYkvU5RnpCepX2lfbrQpZ61QwKWCmZjhXZe202CO031Ypi6IHLBhW2JCoa5fePPgAqFdFIQSgW4Sq4oy6EfIPvrPZ5cFabaSdv8CFevy+cVEBns2OxvEvfsDr1gBPvwrfr/9zGrle4K0dNAgXjlgE+utPVCw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KqadQ3m5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A85DAC4CECF;
+	Thu, 31 Oct 2024 01:30:46 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730338245;
-	bh=Y+lcThPBWVjCPTYYlmOezurYzskGCGSZ+hugRIeTewQ=;
+	s=k20201202; t=1730338246;
+	bh=j+BB9YGaPQ5Jt/rM1wEWyTXGGJ8IZD0VG0ayICqAde4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=h0GqxaZK43sLetCv71O6lVTichkGB1j8LDoJZ9TbktWv6y0nNnK67JAjX0eklCMqj
-	 w00onVQVif/dpI60833yHnfTwXLGe7cphEkPbCdjDixXToYoCz9ZQJ9yP1T5GLqGcG
-	 uM5gMUZo5bjYGRgwNlx0RfVgK1HaKzan69W5kfIslsmP50jyZG4XX3vsW7W2X0eV6z
-	 i/lnPzK3sBKEkUc9FFyDizdXG+9t12RDFQTfK1bffGe8CLPm16N4ssziI/ovIv5u+9
-	 iiotBJZlrBBXqMEqeFQvppZar6xNpJ+GmU636BO6QEacl5Id8qojbmmWT0fbLsgFkS
-	 Uom+VR/eD0FYA==
+	b=KqadQ3m5rQty8x5sVzIu6aGKXRSz+gGhEuzXteAbc/7khJUbaL4fd3HS3JmEshWZo
+	 uE7C87CLAqM485F5EN/FXyayA7Ny+2aiqudjS5wskAYsdOZfCkhb0uA/4V3C9btUti
+	 EVlrbMMRFmUUW2FnaLuMU+Z9XHajjFi4upK95ak4mRKNCdfA4Q3Q9E7Yt9CYv9Nlby
+	 HwenkkxyYUC8NU9b8Ki35RG1r4iopYEqawRFfJ4Cd7sWaFbHcZm4EHRDiEi/vU/60B
+	 vQ8z1VYe/Z+AqcqhmmxDXejeo7DO+mByDtNYVTGfynQ6YwCd+s9RKc1NUEFF37/MG5
+	 4VxYr2QAhDi0Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70DB0380AC22;
-	Thu, 31 Oct 2024 01:30:54 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE41E380AC22;
+	Thu, 31 Oct 2024 01:30:55 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] rtnetlink: Fix an error handling path in rtnl_newlink()
+Subject: Re: [PATCH] dt-bindings: net: renesas,ether: Add iommus property
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173033825326.1516656.63148059324643801.git-patchwork-notify@kernel.org>
-Date: Thu, 31 Oct 2024 01:30:53 +0000
-References: <eca90eeb4d9e9a0545772b68aeaab883d9fe2279.1729952228.git.christophe.jaillet@wanadoo.fr>
-In-Reply-To: <eca90eeb4d9e9a0545772b68aeaab883d9fe2279.1729952228.git.christophe.jaillet@wanadoo.fr>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org, kuniyu@amazon.com,
- linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org
+ <173033825449.1516656.15513030725066077693.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Oct 2024 01:30:54 +0000
+References: <2ca890323477a21c22e13f6a1328288f4ee816f9.1729868894.git.geert+renesas@glider.be>
+In-Reply-To: <2ca890323477a21c22e13f6a1328288f4ee816f9.1729868894.git.geert+renesas@glider.be>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: sergei.shtylyov@gmail.com, paul.barker.ct@bp.renesas.com,
+ niklas.soderlund+renesas@ragnatech.se, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
+ krzk+dt@kernel.org, conor+dt@kernel.org, netdev@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org, devicetree@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 26 Oct 2024 16:17:44 +0200 you wrote:
-> When some code has been moved in the commit in Fixes, some "return err;"
-> have correctly been changed in goto <some_where_in_the_error_handling_path>
-> but this one was missed.
+On Fri, 25 Oct 2024 17:12:24 +0200 you wrote:
+> make dtbs_check:
 > 
-> Should "ops->maxtype > RTNL_MAX_TYPE" happen, then some resources would
-> leak.
+>     arch/arm64/boot/dts/renesas/r8a77980-condor.dtb: ethernet@e7400000: 'iommus' does not match any of the regexes: '@[0-9a-f]$', 'pinctrl-[0-9]+'
+> 	    from schema $id: http://devicetree.org/schemas/net/renesas,ether.yaml#
+> 
+> Ethernet Controllers on R-Car Gen2/Gen3 SoCs can make use of the IOMMU,
+> so add the missing iommus property.
 > 
 > [...]
 
 Here is the summary with links:
-  - rtnetlink: Fix an error handling path in rtnl_newlink()
-    https://git.kernel.org/netdev/net-next/c/bd03e7627c37
+  - dt-bindings: net: renesas,ether: Add iommus property
+    https://git.kernel.org/netdev/net-next/c/1aea2c42d494
 
 You are awesome, thank you!
 -- 
