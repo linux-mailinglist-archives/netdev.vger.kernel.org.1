@@ -1,76 +1,170 @@
-Return-Path: <netdev+bounces-140586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3AB439B7189
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:17:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D8819B718B
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 02:17:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93DB5281F67
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:17:13 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DC5E1F21EE4
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:17:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76CF727702;
-	Thu, 31 Oct 2024 01:17:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 961CA41C77;
+	Thu, 31 Oct 2024 01:17:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Feh0XcDG"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="hawWaENe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-182.mta1.migadu.com (out-182.mta1.migadu.com [95.215.58.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 525C21EB31
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 01:17:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED27022083
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 01:17:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730337431; cv=none; b=nbIC2ZJzFLRybQ3dHDFu9NGVyN1uh7DADmBpaZ8C7Paeq3/bts/P170fcdVrbg0DSSvdRM7Le6Xvgh9rHzK49Rft6OIh7tqcgqMRjGw4wEXQeQ0bU7HfIkRTmXQQgYEp1+RhV9e82+WIgDC1fcE3RWFzU++TsO8Bsx0fVrlGw2o=
+	t=1730337476; cv=none; b=bQWsQDneSloCZX2KxRLX2O45dR3z3nKbmfIOJFKBZ276NfD/LMX11ERE+4RQhiU7rUNlP2iyGfDzsLGFdfKIh9KFbG5LCYo9RUCc4k01pT4z0rKQTmqAw/sCzJYEUfn8FRZC/HiIRUp1bkxs5QcUcYnDhp6cRszfE9Ht6UX+wCA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730337431; c=relaxed/simple;
-	bh=aJ7Gjg+kX75Ji3y12sNo8oWtAZFkofxhsbFuwKqaUWQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ewyX5v+zwqNJxrxcBpbh+nj9mTQBwJRrPN1+PSLqFRibQ39WaXCpBz98nxmtBYNmiK/jFh7SJS4UKzmzfgB2JvBCuDKXHP+Xa2a7bnNXL/+dBX2Xxj0GY1XTOPRDf4pK/rqYsUf0uBQtXM5IQRKfVTshZKzsCrEWaK65r6a09SI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Feh0XcDG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 36DD9C4CECE;
-	Thu, 31 Oct 2024 01:17:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730337430;
-	bh=aJ7Gjg+kX75Ji3y12sNo8oWtAZFkofxhsbFuwKqaUWQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Feh0XcDGyLihUvtPcgcVvratbbVuR1y88whzZUIah9qztLNVgjbr5/A8nmwddyrAl
-	 ItYuDuex3TMzv0cM0lyRFog6+igWBNUO1rYhTXDz/y6sKXM9NDwv242cQqH73NkbIg
-	 X4B8IS42HEM6j10ul3K//SoaIJncmPMr0zo67lBFhjpVekGL2kKrUd2j1wAA5I+4N4
-	 3rVZJxY3QMNPIRhKkb86Vg8I3wCSu2cYFo/2PK4skWbIzamVXSK95HpLJxPY5I1Q9T
-	 TchV3bnbo0LL4eso129URWl9y/paK0KcSEJoVuhiZyGRC2sJ0Bt9+YLk3MowSdvz+E
-	 wwopWPklpuWmQ==
-Date: Wed, 30 Oct 2024 18:17:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Zhang Zekun <zhangzekun11@huawei.com>
-Cc: <justin.chen@broadcom.com>, <florian.fainelli@broadcom.com>,
- <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <o.rempel@pengutronix.de>,
- <kory.maincent@bootlin.com>, <horms@kernel.org>, <edumazet@google.com>,
- <pabeni@redhat.com>, <netdev@vger.kernel.org>, <chenjun102@huawei.com>
-Subject: Re: [PATCH net 0/2] Get the device_node before calling
- of_find_node_by_name()
-Message-ID: <20241030181709.24ae5efb@kernel.org>
-In-Reply-To: <20241024015909.58654-1-zhangzekun11@huawei.com>
-References: <20241024015909.58654-1-zhangzekun11@huawei.com>
+	s=arc-20240116; t=1730337476; c=relaxed/simple;
+	bh=xaaDaF/m7vHxyN8IGGUdxhbDxH9D+uwHM+N6bJ61w0Q=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QnX9PHAW2v5DnG91kD4PKhJ6WdA0BVAuhPf77u6eIaeSfseSSHguIrS5fjyAkFKUHh2/8t+nfZtwpDbxE+NNP0oEOu7SSLaWwZ/PPXDeQlLG75IyBW73JMBkxRGjUoeYyhH2zFlry1lZUoVK003dOQgcNAaosdK2zZoOPgj4dA0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=hawWaENe; arc=none smtp.client-ip=95.215.58.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e56f78a9-cbda-4b80-8b55-c16b36e4efb1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730337467;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ZBy8Ng1n+ziBeL2KTfh1+oSsW7siKHO3HDf2bItEBNc=;
+	b=hawWaENe36fC7kbQTHjlL71Xtc20RWK0S25WZPgnWWVxEgp0CgrX5hNPgkaZwvtG9lc9YP
+	PaeAOxGvmItJCgQaSn/Tgfz3WjM3qOs1VD9sC7OpGKxoovgiwfC947vlLMbdik+ZtpFVY1
+	8KWxphGh5ILGpvg43rdsAJeoW/yPGTo=
+Date: Wed, 30 Oct 2024 18:17:39 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
+ tskey offset
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com,
+ willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
+ john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
+ haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-11-kerneljasonxing@gmail.com>
+ <8fd16b77-b8e8-492c-ab69-8192cafa9fc7@linux.dev>
+ <CAL+tcoBNiZQr=yk_fb9eoKX1_Nr4LuDaa1kkLGbdnc=8JNKnNg@mail.gmail.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+Content-Language: en-US
+In-Reply-To: <CAL+tcoBNiZQr=yk_fb9eoKX1_Nr4LuDaa1kkLGbdnc=8JNKnNg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On Thu, 24 Oct 2024 09:59:07 +0800 Zhang Zekun wrote:
-> of_find_node_by_name() will decrease the refount of the device node.
-> Get the device_node before call to it.
+On 10/29/24 11:50 PM, Jason Xing wrote:
+> On Wed, Oct 30, 2024 at 1:42 PM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 10/28/24 4:05 AM, Jason Xing wrote:
+>>> +/* Used to track the tskey for bpf extension
+>>> + *
+>>> + * @sk_tskey: bpf extension can use it only when no application uses.
+>>> + *            Application can use it directly regardless of bpf extension.
+>>> + *
+>>> + * There are three strategies:
+>>> + * 1) If we've already set through setsockopt() and here we're going to set
+>>> + *    OPT_ID for bpf use, we will not re-initialize the @sk_tskey and will
+>>> + *    keep the record of delta between the current "key" and previous key.
+>>> + * 2) If we've already set through bpf_setsockopt() and here we're going to
+>>> + *    set for application use, we will record the delta first and then
+>>> + *    override/initialize the @sk_tskey.
+>>> + * 3) other cases, which means only either of them takes effect, so initialize
+>>> + *    everything simplely.
+>>> + */
+>>> +static long int sock_calculate_tskey_offset(struct sock *sk, int val, int bpf_type)
+>>> +{
+>>> +     u32 tskey;
+>>> +
+>>> +     if (sk_is_tcp(sk)) {
+>>> +             if ((1 << sk->sk_state) & (TCPF_CLOSE | TCPF_LISTEN))
+>>> +                     return -EINVAL;
+>>> +
+>>> +             if (val & SOF_TIMESTAMPING_OPT_ID_TCP)
+>>> +                     tskey = tcp_sk(sk)->write_seq;
+>>> +             else
+>>> +                     tskey = tcp_sk(sk)->snd_una;
+>>> +     } else {
+>>> +             tskey = 0;
+>>> +     }
+>>> +
+>>> +     if (bpf_type && (sk->sk_tsflags & SOF_TIMESTAMPING_OPT_ID)) {
+>>> +             sk->sk_tskey_bpf_offset = tskey - atomic_read(&sk->sk_tskey);
+>>> +             return 0;
+>>> +     } else if (!bpf_type && (sk->sk_tsflags_bpf & SOF_TIMESTAMPING_OPT_ID)) {
+>>> +             sk->sk_tskey_bpf_offset = atomic_read(&sk->sk_tskey) - tskey;
+>>> +     } else {
+>>> +             sk->sk_tskey_bpf_offset = 0;
+>>> +     }
+>>> +
+>>> +     return tskey;
+>>> +}
+>>
+>> Before diving into this route, the bpf prog can peek into the tcp seq no in the
+>> skb. It can also look at the sk->sk_tskey for UDP socket. Can you explain why
+>> those are not enough information for the bpf prog?
+> 
+> Well, it does make sense. It seems we don't need to implement tskey
+> for this bpf feature...
+> 
+> Due to lack of enough knowledge of bpf, could you provide more hints
+> that I can follow to write a bpf program to print more information
+> from the skb? Like in the last patch of this series, in
+> tools/testing/selftests/bpf/prog_tests/so_timestamping.c, do we have a
+> feasible way to do that?
 
-Doing some quick grepping I think Andrew is completely right.
-Most callers either get this wrong or call get() immediately prior.
-Maybe add a new helper with more suitable semantics?
+The bpf-prog@sendmsg() will be run to capture a timestamp for sendmsg().
+When running the bpf-prog@sendmsg(), the skb can be set to the "struct 
+bpf_sock_ops_kern sock_ops;" which is passed to the sockops prog. Take a look at 
+bpf_skops_write_hdr_opt().
 
-The goal is not to fix the bugs but to prevent them in the first place.
--- 
-pw-bot: cr
+bpf prog cannot directly access the skops->skb now. It is because the sockops 
+prog sees the uapi "struct bpf_sock_ops" instead of "struct 
+bpf_sock_ops(_kern)". The conversion is done in sock_ops_convert_ctx_access. It 
+is an old way before BTF. I don't want to extend the uapi "struct bpf_sock_ops".
+
+Instead, use bpf_cast_to_kern_ctx((struct bpf_sock_ops *)skops_ctx) to get a 
+trusted "struct bpf_sock_ops(_kern) *skops" pointer. Then it can access the 
+skops->skb. afaik, the tcb->seq should be available already during sendmsg. it 
+should be able to get it from TCP_SKB_CB(skb)->seq with the bpf_core_cast. Take 
+a look at the existing examples of bpf_core_cast.
+
+The same goes for the skb->data. It can use the bpf_dynptr_from_skb(). It is not 
+available to skops program now but should be easy to expose.
+
+The bpf prog wants to calculate the delay between [sendmsg, SCHED], [SCHED, 
+SND], [SND, ACK]. It is why (at least in my mental model) a key is needed to 
+co-relate the sendmsg, SCHED, SND, and ACK timestamp. The tcp seqno could be 
+served as that key.
+
+All that said, while looking at tcp_tx_timestamp() again, there is always 
+"shinfo->tskey = TCP_SKB_CB(skb)->seq + skb->len - 1;". shinfo->tskey can be 
+used directly as-is by the bpf prog. I think now I am missing why the bpf prog 
+needs the sk_tskey in the sk?
+
+In the bpf prog, when the SCHED/SND/ACK timestamp comes back, it has to find the 
+earlier sendmsg timestamp. One option is to store the earlier sendmsg timestamp 
+at the bpf map key-ed by seqno or the shinfo's tskey. Storing in a bpf map 
+key-ed by seqno/tskey is probably what the selftest should do. In the future, we 
+can consider allowing the rbtree in the bpf sk local storage for searching 
+seqno. There is shinfo's hwtstamp that can be used also if there is a need.
 
