@@ -1,177 +1,128 @@
-Return-Path: <netdev+bounces-140635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC099B7508
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 08:07:22 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F4EE9B7523
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 08:16:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 63AC4B24D94
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:07:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7046D1C20C6B
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 07:16:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D07941465BB;
-	Thu, 31 Oct 2024 07:05:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB003145A19;
+	Thu, 31 Oct 2024 07:16:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="GJEFgQeX"
+	dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b="NRoo+kQ7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bisque.elm.relay.mailchannels.net (bisque.elm.relay.mailchannels.net [23.83.212.18])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96F2148318;
-	Thu, 31 Oct 2024 07:05:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.52
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730358320; cv=none; b=C+A3XxkO9ZrL1IJ8JmjmBn+ps8ogOAt1YrbmCYfrm8YvVliuzl7O/e1WFbip2cn4fYLpsH9iRFo+6RzGZyQuxXPyg0nfN7ti8OzUufYmSbCI1Rs+F2JlwLuZhcxrDTZdAyw5BqMd/CZjynKnWE8M0nWn12FxBIBcBvcdcwDDyGc=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730358320; c=relaxed/simple;
-	bh=ziFMZhcj+leFELwUEjmBQ1LaRWWwukmoQhg8YxVAOco=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BQxphmjFiW3ZpDo5bffcved0b9EhJh5ILiCthpgTlvRQUHueoLEVmCE9PtWPn+KxPegq95nPhzLSTHl55E4RssHxvAIK6e6Cjb+NqPikhGxC7FaCh2Byafd2dE7ezt1Ao2gjtraNC/B4XEtJ6P+r201rwi5oje64JmZpML5C7zk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=GJEFgQeX; arc=none smtp.client-ip=209.85.166.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-83ab21c26f1so24065339f.2;
-        Thu, 31 Oct 2024 00:05:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730358317; x=1730963117; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=i2SkXndThhCcf1/mGVvarO7LUr9qmr9Xt0h6PkdmTHY=;
-        b=GJEFgQeXPqhxU8VYGW1rDzfX5aEbhPPB8gTcibKea1wcl0LFFt39oT2g/gNKHGVIY7
-         x1JBwRdXqK1GGZbid7eiMRrJ4QdoJvhGCi/ljEZy2Gi1Ljn8dGKHXkPMixfiHiv/gMUz
-         AfvZ9yYdGvIBnMYwKYsiMXWn7f57fI9AfYb4pfUtozUelSFFvW7xQr+0kerNcPlzVchc
-         V7R7pH2yVNvaA8pBjAyixEkBTiYW6v3ZqAczhv30PbEYp/qeAiow0He+sIIEj/sqi90y
-         AQKIo69wnMHEr4dJ6Rvfti0LSlW7c5JSW3vPnIWC0mvl/Qveyu+4uumxnJW/YVJOrDUb
-         P8mw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730358317; x=1730963117;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=i2SkXndThhCcf1/mGVvarO7LUr9qmr9Xt0h6PkdmTHY=;
-        b=HcQ0jGmtOXuXOvqINYg4oxlOGa6FdBl86yAgSUWLccSpvIvWjrQ1enlzvdbq4y9z6M
-         EBvXgjVQtpqwf7vzpccaBCT4OUqabqlruZSYzP5F2O1us0+X7vOTz0+lxMJsc3lH7+Ym
-         Mjx2ol7bgd9cCOk2NAmy6dd9VJbg0ps9xbXqN4O7R/nH8AyOdKz1hNJcTqwuriEMfY72
-         9DC7P4/PtUhGssPGTXO8TcPxksLbzFhLEw3TPwkJB3X8keE6ahbN2f3Przu8Ioby8TE4
-         d5c1ylZ4c3qjhxoLcvoMiaCyrJ+s7IsFrncDbSBKAafXQU6utFJJyQeSWz+N3Um0wgPB
-         F4HA==
-X-Forwarded-Encrypted: i=1; AJvYcCVI2EWp9ZZoENTLqN+1+aLNJyls3hxoNp796u/nW4qq48eAzmlomRJtw84RGgNNyaocg/vGLRsu@vger.kernel.org, AJvYcCWdfcLOoKR+tSn5UNwzVNsa/0YVW3iryNueB/bzq6bw+G298fnIoHxFnl8ipZvB3EOaAo4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyMJ/2DeX3pvoo/g/fBC9BsFf/pwSHirxTSuBqBOeYRemEcFvtT
-	TScJQBFGg66QuYC9+SSlKFaiCv75sWNknoSLrTxsrnShU6VdWEiQ/df7xTzBB9pdB5jpAc1R1se
-	9je1+AATFsgewd87vKRzHQCYgjsI=
-X-Google-Smtp-Source: AGHT+IHc/LMy8LqpZcwjtYFeVo2QCen0QKVHW//6tn8HMjIsK7NdA7YSfMTOWbDZvf85L3MKrNFYq6q4iaD6F2GCsSA=
-X-Received: by 2002:a05:6e02:1888:b0:3a3:445d:f711 with SMTP id
- e9e14a558f8ab-3a5e23461e1mr68886475ab.0.1730358316992; Thu, 31 Oct 2024
- 00:05:16 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED06D1E51D
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 07:16:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=pass smtp.client-ip=23.83.212.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730359004; cv=pass; b=ID937hRHeObgaSBGDA84SC5VAnkDf5v6qnaW6aCninOcsflGa0GoD6J2MuHvQJaa9zmG1jlL/RqTvwoH29kg51EFZ+qdMl7noAdKFbWkTgR+ZAbSOn5vkzMNCcEiNm126JmUqLMg1YKlkvl08uHPnHzwg6fVL9dVDmvbH8pQuuc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730359004; c=relaxed/simple;
+	bh=lZlmnnd6VY4iWOEJN3fR2oAOuKekDnzf7D9Hkfh3i4s=;
+	h=Message-ID:MIME-Version:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:Date; b=LDY4/eL4zyzuTcBRTQQwNC/hdGkShXwhBaSA6TECgbVltSh5yEh1EO5+4D9tqNqPcgWLlnxwii9Jdim/UYvt497jxXamtXM0f8dbRJX2+oBerwMmmPp+GaoUD7mLsPcoGhpyFGhOCIQ75T4+iH7mo3TFsEjwzo0Bh2xZy3hOqxQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com; spf=pass smtp.mailfrom=arinc9.com; dkim=pass (2048-bit key) header.d=arinc9.com header.i=@arinc9.com header.b=NRoo+kQ7; arc=pass smtp.client-ip=23.83.212.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arinc9.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|arinc.unal@arinc9.com
+Received: from relay.mailchannels.net (localhost [127.0.0.1])
+	by relay.mailchannels.net (Postfix) with ESMTP id 616488A4705
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 07:10:37 +0000 (UTC)
+Received: from nl-srv-smtpout9.hostinger.io (trex-8.trex.outbound.svc.cluster.local [100.103.220.31])
+	(Authenticated sender: hostingeremail)
+	by relay.mailchannels.net (Postfix) with ESMTPA id CD7AD8A2D02
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 07:10:36 +0000 (UTC)
+ARC-Seal: i=1; s=arc-2022; d=mailchannels.net; t=1730358637; a=rsa-sha256;
+	cv=none;
+	b=6JbtyXMpup8CPhqsmiiK8pVJS9Xfef7oMld/6+MoXo9jAdV13YX3DpR1enGifE8cEZqjBz
+	k+0UK4Bt9s+3NQnJQt9RDK5Bjm1XhA0JsL9AjyXH/e1B7GeRHMVJZqvLf9M4Qo75m76SKt
+	IP4xCqB7GWLOs9d9fdStCHcG4aPHA6hdZchOcP43laDrmlpjkA9hko8IoXyhWLR78o3MMq
+	qKf++VaF+1DR7WGvmwA+hiEkGZ92l7gjNee4uB4bi6NpTcxwcbakxCUq0JvhE376sLiZd3
+	cPHUkCUq+7UYzml1iz4Kwwry2yzCP/Qnohz38inFAtbTdJdrq85cLm6X5bCDjg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=mailchannels.net;
+	s=arc-2022; t=1730358637;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references:dkim-signature;
+	bh=lZlmnnd6VY4iWOEJN3fR2oAOuKekDnzf7D9Hkfh3i4s=;
+	b=sGtRrh1TmkhvP9ZlLKMhQ0lZ0FXZ8/sfgFIA4BgdLlylKgpzgkuo9/SC9HdmX33eO26bBo
+	68BW2DAoGgxwWv6yBlFwkTYU4NS2ynRTwoEHRWucHiToEm0PGbI/c2LLdQdO8+mHuZG0N9
+	6FBpq3dHwslQiM3r9W0Ul9YIpFYfwQDyRnX27d82bqP6yfD21rxKu8QJz3/PsqPobWjkpi
+	ZScoQn7/qG0qi/2VsHZqP0UbtzGu0UpV3dlhcrNLa8zE1QUSo+tRU+YBkSB0u6Z+UVG4PU
+	myeN1/qB0zPYzDLHyHKI869mcTpJLR6MZsx2ELfwSleamUsOaZR/emoTTquvIA==
+ARC-Authentication-Results: i=1;
+	rspamd-65cf4487d9-7gscz;
+	auth=pass smtp.auth=hostingeremail smtp.mailfrom=arinc.unal@arinc9.com
+X-Sender-Id: hostingeremail|x-authuser|arinc.unal@arinc9.com
+X-MC-Relay: Neutral
+X-MailChannels-SenderId: hostingeremail|x-authuser|arinc.unal@arinc9.com
+X-MailChannels-Auth-Id: hostingeremail
+X-Quick-Robust: 1419273d5740c10e_1730358637300_1131769421
+X-MC-Loop-Signature: 1730358637300:1398205219
+X-MC-Ingress-Time: 1730358637299
+Received: from nl-srv-smtpout9.hostinger.io (nl-srv-smtpout9.hostinger.io
+ [45.87.82.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384)
+	by 100.103.220.31 (trex/7.0.2);
+	Thu, 31 Oct 2024 07:10:37 +0000
+Message-ID: <a66528bd-37cb-46b2-90e5-37b10dfa9c78@arinc9.com>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arinc9.com;
+	s=hostingermail-a; t=1730358634;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lZlmnnd6VY4iWOEJN3fR2oAOuKekDnzf7D9Hkfh3i4s=;
+	b=NRoo+kQ7pFbuPT6z5Cb6S84fbfJOOj5qAwFha52OFrJ0JExn7Ku/fTJnZajCq05w9LZP8e
+	ZLYX0yKjmNbdDVHUMzA3vuRhsyB4Bl3ghIiolEItiM2nEx7ufCGnuGKkBOtrpSDtV0jJhS
+	gJMAYQwb/16d3o2JYOnr5GDD529wd194SZBEXJNL/baBcZr10Wj1AsSaSJCRjbtySuiwCq
+	iNOW34RKx+CkvPABdc6xFqXjI0sGc7kVAsy+3/VZOWW0IgUv/SDgT9BnhDFLYyN+NHyCGq
+	7nl8LYDpOdFTBZoyU8jjJdDPMvdxqD0UOcYlCOPU3k1yuvsnXZ/6RjZgj1OOzA==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-3-kerneljasonxing@gmail.com> <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
- <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
- <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
- <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
- <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
- <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
- <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev> <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
- <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
- <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
- <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com> <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
-In-Reply-To: <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 31 Oct 2024 15:04:40 +0800
-Message-ID: <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
- work parallelly
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, willemb@google.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next] net: dsa: mt7530: Add TBF qdisc offload support
+To: Lorenzo Bianconi <lorenzo@kernel.org>,
+ Daniel Golle <daniel@makrotopia.org>, DENG Qingfang <dqfext@gmail.com>,
+ Sean Wang <sean.wang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+ Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
+ <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Matthias Brugger <matthias.bgg@gmail.com>,
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>
+Cc: netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ linux-mediatek@lists.infradead.org
+References: <20241030-mt7530-tc-offload-v1-1-f7eeffaf3d9e@kernel.org>
+Content-Language: en-GB
+From: =?UTF-8?B?QXLEsW7DpyDDnE5BTA==?= <arinc.unal@arinc9.com>
+In-Reply-To: <20241030-mt7530-tc-offload-v1-1-f7eeffaf3d9e@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+Date: Thu, 31 Oct 2024 07:10:32 +0000 (UTC)
+X-CM-Analysis: v=2.4 cv=OKJ13jaB c=1 sm=1 tr=0 ts=67232d6a a=aGj/nXfi4qz2iMxz7h0kJQ==:117 a=aGj/nXfi4qz2iMxz7h0kJQ==:17 a=IkcTkHD0fZMA:10 a=M51BFTxLslgA:10 a=9B2793jWSBC_Fij88T4A:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
+X-CM-Envelope: MS4xfJ/GJC6qZKiYCkaiLF9+RV7BmCKM+DnqGuxt3BbelWGFn+juo5V5ssnDAaI+gp5DQHingWLNsB0HgKjnqdqhTgjkwp4qIyLGG/wdcqJ4BQRi7RjE1ymL lOcInGjafAnmffS0+G4chgWYc66e1U4H7UzEzNUKqECwBBY3NMfJ1ChNB5ycVPZnlpswfylUf5lRSNLso1zbtFSQHJZXc1Z0ZlKpAn0HCoWUwWOz70ogd2WD wOr6NVCO23sJdZ9TB4CusHjf+LtX/l3OK6WrDLJCpwD97SlAJ3LssZTVGAH+Uc99M+X5Z43IrCh6YTXESUO+/rjOv1RF/iAQCKRmdELy4h9AYTI5C1j+PhaT Hzo9oY7tEWiDKave1F8Z6sVLxT0m2EcLLIbH/5QGdRLOmqf1RUQ0kMahrobTAsqrgQjrhQhCCMIesvNsriv/ngI3FTy/YVAYfgE1x2lxDDgeIMfMbB1nl19Y WLa5MyppkVUF9KwmytVWGtbe5Jm7UjJvpRKTj+EagFqHR3fLULdGSR4p8MVAqc/bU3JoF/i23WlSynRTDb6ivQYgDBzXPXMPSqEW44iyxS+qcxSnhFVlCZiU B/LfTiwwYS4CQVvPKuC9EIX5Ax1t9Vhkdcd83JXnUi07BbOy8S2WW6+m87wZWll6D83OvkG66K0MfFLg4zsk5Gqb2FnDDLJIGNJVwVIfRUhZoaT42TdpzlgC FtXE4thUHvE=
+X-AuthUser: arinc.unal@arinc9.com
 
-On Thu, Oct 31, 2024 at 2:27=E2=80=AFPM Martin KaFai Lau <martin.lau@linux.=
-dev> wrote:
->
-> On 10/30/24 5:13 PM, Jason Xing wrote:
-> > I realized that we will have some new sock_opt flags like
-> > TS_SCHED_OPT_CB in patch 4, so we can control whether to print or
-> > not... For each sock_opt point, they will be called without caring if
-> > related flags in skb are set. Well, it's meaningless to add more
-> > control of skb tsflags at each TS_xx_OPT_CB point.
-> >
-> > Am I understanding in a correct way? Now, I'm totally fine with this gr=
-eat idea!
-> Yes, I think so.
->
-> The sockops prog can choose to ignore any BPF_SOCK_OPS_TS_*_CB. The are o=
-nly 3:
-> SCHED, SND, and ACK. If the hwtstamp is available from a NIC, I think it =
-would
-> be quite wasteful to throw it away. ACK can be controlled by the
-> TCP_SKB_CB(skb)->bpf_txstamp_ack.
+On 30/10/2024 22:29, Lorenzo Bianconi wrote:
+> Introduce port_setup_tc callback in mt7530 dsa driver in order to enable
+> dsa ports rate shaping via hw Token Bucket Filter (TBF) for hw switched
+> traffic. Enable hw TBF just for EN7581 SoC for the moment.
 
-Right, let me try this:)
+Is this because you didn't test it on the other models? Let me know if
+that's the case and I'll test it.
 
-> Going back to my earlier bpf_setsockopt(SOL_SOCKET, BPF_TX_TIMESTAMPING)
-> comment. I think it may as well go back to use the "u8
-> bpf_sock_ops_cb_flags;" and use the bpf_sock_ops_cb_flags_set() helper to
-> enable/disable the timestamp related callback hook. May be add one
-> BPF_SOCK_OPS_TX_TIMESTAMPING_CB_FLAG.
-
-bpf_sock_ops_cb_flags this flag is only used in TCP condition, right?
-If that is so, it cannot be suitable for UDP.
-
-I'm thinking of this solution:
-1) adding a new flag in SOF_TIMESTAMPING_OPT_BPF flag (in
-include/uapi/linux/net_tstamp.h) which can be used by sk->sk_tsflags
-2) flags =3D   SOF_TIMESTAMPING_OPT_BPF;    bpf_setsockopt(skops,
-SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
-3) test if sk->sk_tsflags has this new flag in tcp_tx_timestamp() or
-in udp_sendmsg()
-...
-
->
-> For tx, one new hook should be at the sendmsg and should be around
-> tcp_tx_timestamp (?) for tcp. Another hook is __skb_tstamp_tx() which sho=
-uld be
-
-I think there are two points we're supposed to record:
-1) the moment tcp/udp_sendmsg() is triggered. It represents the syscall tim=
-e.
-2) another point in tcp_tx_timestamp(). It represents the timestamp of
-the last skb in this sendmsg() call.
-Users may happen to send a big packet.
-
-> similar to your patch. Add a new kfunc to set shinfo->tx_flags |=3D SKBTX=
-_BPF
-> and/or TCP_SKB_CB(skb)->bpf_txstamp_ack during sendmsg.
-
-Got it.
-
->
->
-> For rx, add one BPF_SOCK_OPS_RX_TIMESTAMPING_CB_FLAG. bpf_sock_ops_cb_fla=
-gs
-> needs to move from the tcp_sock to the sock because it will be used by UD=
-P also.
-> When enabling or disabling this flag, it needs to take care of the
-> net_{enable,disable}_timestamp. The same for the __sk_destruct() also.
->
-
-I think if the solution I proposed as above is feasible, then we don't
-have to move the tcp_sock which brings more extra work :)
-
-Thanks,
-Jason
+Arınç
 
