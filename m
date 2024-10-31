@@ -1,126 +1,197 @@
-Return-Path: <netdev+bounces-140825-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140826-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F0CC9B85F2
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 23:13:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D35EC9B8605
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 23:16:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40B7C1C2139A
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:13:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 021F41C20F74
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 22:16:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B30EC1CEE86;
-	Thu, 31 Oct 2024 22:13:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA721CB316;
+	Thu, 31 Oct 2024 22:16:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EhBAv5GE"
+	dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b="TrjGckgW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 230F31CC16B
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 22:13:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA4722097;
+	Thu, 31 Oct 2024 22:15:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.133.104.62
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730412829; cv=none; b=kIQr3/ZbYaPEBvq3Cmkok8t3bXXzLR7xjIDK0fmGbrxKI/kSyg/252aLAE56rCxPxdJVA816aJy+R39a4B7QIfcyEe+uopHpJaqNEARHfHJIdKLtmUVMwXK9HJ4Q+bSH6wMY04dixrVzoIDPwCR+SBVLORhIcHw7Qp+6uLYRwIs=
+	t=1730412961; cv=none; b=pdnCA4FIAJA+9tiIN7vGNNgiG2ZdsP+YQCDcWVnNip/dIZn+Ob3z2obR+jDXNk4o542rjdmLla9AEH+KLlgeE1JwG84YOKR2mNrAY0pXEg7ar3ncOh/TaBCtixwOd4wgTeO7GHjuMoj1smXuvEzq+ATQPjLA64lvz0PvlgFtyg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730412829; c=relaxed/simple;
-	bh=OZ9PqEYxURrLAvUM7vO0DTaefO+S2bxcANQLjbtoXdQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YYDUpTzqkE9xKdXGiTMVWg+ghRx5S2lrlYWv5fumfjw4HIofbZILUd+HZI0zh7E13m5TtHpNldP9eMs+0cvvCInYFjPl5XNX/UkYhQliamp749HgLENmYgYynGzx59S+KFEjU7w8HFOyQCN6IqPqNAsq9EbHTMIHiag/oanVy54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EhBAv5GE; arc=none smtp.client-ip=209.85.210.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-720d01caa66so26317b3a.2
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 15:13:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730412823; x=1731017623; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=yuJsu0BgB+Eg9HTDtI1avclDFI5OW2VcEJ2KCfMr3BE=;
-        b=EhBAv5GEo/HsyizUiV89a3JwW2LaGmOOD2NUWWD64S0zQO8juoID7omnMYt4VWjuWJ
-         dHyzehUbvcYLhL65FBiU0lhml1YbpP59cD6P/nFWBB4IyR9teYITabnbBGAhTBxWiG3X
-         KEPR74vDC+VLR8BoeoWmNDmnoAcTl7tmemWvNJOjU5dyVV7zHuJzk9RhCvpd3DUHJzwu
-         m5inIWe85aZfpVmhO94g0/ww3SZO4FyE4Lk788QJa3qAbbdXdDVTofoAQZtmIT7XJtiF
-         /8LvmJscJFzIvAhUG7oWQ5jmA5Elr2XF8WJLJb1caU5/9etBNXe4VWgiui1MTr+uXiE3
-         CHzw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730412823; x=1731017623;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuJsu0BgB+Eg9HTDtI1avclDFI5OW2VcEJ2KCfMr3BE=;
-        b=BcHF7bPPgQTvguRqXlO0Tlr7ANjILOp3jdfdZEiZW3x1NQIpkk1kVeHqpPDS+fclzU
-         SLRsZr7JT8wlmQpTVl3Bi95OdpSjSQ6A1BIxd/PcenULwnOif0wWxTrK7QSTxfz06F+T
-         bDrnCAjKYNHcwSVq/d8VxfgL7so/CiD+n+dzkN62G1oHWnRtI3iVoMmMTKESOdu+z9hv
-         rGfvXeb6fXFBsok7AIW28twhzOplVodC7o5BHPv/ut2Is8tUK/3gTpRlLDUsZFZ71wel
-         FCGgVMJXYqarjGlAZ4j/bKDssKF8Hr7ICCj08gF5n8WZ97T6mzula+Zg9vevhIw9ZWej
-         /dHg==
-X-Gm-Message-State: AOJu0Yzozpz0opB6qgaiaJ6//bUdUPy5N8mLsl0dWIVj6T5MBFRofE93
-	gONsWmqdluK2xbrtRkiipfMRnz0Gsyx6JQJO1X5vO/RRhxoqGz15
-X-Google-Smtp-Source: AGHT+IGdeYhZdREsE9YYfW57vN7jNJd9SmdxLWCmv0tOsR9Zhc39MaWG5Ys7drbGE2kA6Om712UHEQ==
-X-Received: by 2002:a05:6a00:2e96:b0:71e:594:f1ef with SMTP id d2e1a72fcca58-720b9c2ce5fmr6852497b3a.16.1730412823189;
-        Thu, 31 Oct 2024 15:13:43 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c085:21e8::1094? ([2620:10d:c090:400::5:671f])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee45a11cbfsm1450532a12.89.2024.10.31.15.13.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 15:13:42 -0700 (PDT)
-Message-ID: <e2c12a98-acf3-46df-8831-4b898387bfa0@gmail.com>
-Date: Thu, 31 Oct 2024 15:13:40 -0700
+	s=arc-20240116; t=1730412961; c=relaxed/simple;
+	bh=Qsugghxcfd8X2KBuPsAhSzxIY/wk3Ga7LrSxOt/JNBk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=FCJWbMnvEi8jc6+dkRQf20tdcP9yNLWQHhMO1aVXbV6LK0nnkM/Wjziheqd/XsaSlOumyU0ytyOw8KRk80tewqFZmb8o1NH6EleaeJjAU/Ev4lnauSIYqwCzf5I8l6I8Exa3u0OYPmGc4nw7722xGjGN38m7c2ipJkN1l/6C+fs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net; spf=pass smtp.mailfrom=iogearbox.net; dkim=pass (2048-bit key) header.d=iogearbox.net header.i=@iogearbox.net header.b=TrjGckgW; arc=none smtp.client-ip=213.133.104.62
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=iogearbox.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iogearbox.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=9qZb3+0O13WmQ34m1zz0npxtZPmtp6Tr6e9o5B8LN80=; b=TrjGckgWzBIc8YIyMf7caxXQmp
+	BWNkxWneMsAp6HloUrF54I1m5uEaUgLXsGzbc9A4UuvxSxiBu1c00EhYZJorzdFn+t5kN7ROlOuSh
+	pmmfQtFDN78Su/bSuWbuPwazO8oDnlzNBO0RrIQueRfRp1m25TdEljwrYPnB5aBsHPe/qNEp3xRps
+	Kc/zLUIZOGfm/463Xl9dAwpBneETQuep2wRBZBQv4qMZ0YaywWmK7j2BeD3DzE7ZAKb/M+biqVrQf
+	Xspa6g+ttYT52rb1W0PYTv5+MXTVrHhtzRCnS13Cp906JhbNLcvhMO8p6cpnwR+jymwAjfPRCUj+G
+	3C3MGoiQ==;
+Received: from 47.248.197.178.dynamic.cust.swisscom.net ([178.197.248.47] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1t6dSC-000965-Oq; Thu, 31 Oct 2024 23:15:44 +0100
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf-next 2024-10-31
+Date: Thu, 31 Oct 2024 23:15:43 +0100
+Message-Id: <20241031221543.108853-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2] eth: fbnic: Add support to write TCE TCAM
- entries
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
- andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, kernel-team@meta.com, sanmanpradhan@meta.com,
- sdf@fomichev.me, vadim.fedorenko@linux.dev, hmohsin@meta.com
-References: <20241024223135.310733-1-mohsin.bashr@gmail.com>
- <757b4a24-f849-4dae-9615-27c86f094a2e@lunn.ch>
- <97383310-c846-493a-a023-4d8033c5680b@gmail.com>
- <4bc30e2c-a0ba-4ccb-baf6-c76425b7995b@lunn.ch>
-Content-Language: en-US
-From: Mohsin Bashir <mohsin.bashr@gmail.com>
-In-Reply-To: <4bc30e2c-a0ba-4ccb-baf6-c76425b7995b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27444/Thu Oct 31 09:34:36 2024)
 
-On 10/31/24 5:43 AM, Andrew Lunn wrote:
-> On Wed, Oct 30, 2024 at 05:51:53PM -0700, Mohsin Bashir wrote:
->> Hi Andrew,
->>
-> 
->> Basically, in addition to the RX TCAM (RPC) that you mentioned, we
->> also have a TCAM on the TX path that enables traffic redirection for
->> BMC. Unlike other NICs where BMC diversion is typically handled by
->> firmware, FBNIC firmware does not touch anything host-related. In
->> this patch, we are writing MACDA entries from the RPC (Rx Parser and
->> Classifier) to the TX TCAM, allowing us to reroute any host traffic
->> destined for BMC.
-> 
-> Two TCAMs, that makes a bit more sense.
-> 
-> But why is this hooked into set_rx_mode? It is nothing to do with RX.
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-We are trying to maintain a single central function to handle MAC updates.
+The following pull-request contains BPF updates for your *net-next* tree.
 
-> I assume you have some mechanism to get the MAC address of the BMC. I
-> would of thought you need to write one entry into the TCAM during
-> probe, and you are done?
-> 
-> 	Andrew
+We've added 13 non-merge commits during the last 16 day(s) which contain
+a total of 16 files changed, 710 insertions(+), 668 deletions(-).
 
-Actually, we may need to write entries in other cases as well. The fact 
-that the BMC can come and go independently of the host would result in 
-firmware notifying the host of the resulting change. Consequently, the 
-host would need to make some changes that will be added in the following 
-patch(es).
+There's a small merge conflict between f91b256644ea ("selftests/bpf: Add
+test for kfunc module order") in net-next tree and c3566ee6c66c
+("selftests/bpf: remove test_tcp_check_syncookie") from bpf-next/net.
 
+Resolve as follows in tools/testing/selftests/bpf/Makefile so that end
+result looks like:
+
+ # Compile but not part of 'make run_tests'
+ TEST_GEN_PROGS_EXTENDED = \
+	bench \
+	bpf_testmod.ko \
+	bpf_test_modorder_x.ko \
+	bpf_test_modorder_y.ko \
+	bpf_test_no_cfi.ko \
+	flow_dissector_load \
+	runqslower \
+	test_cpp \
+	test_flow_dissector \
+	test_lirc_mode2_user \
+	veristat \
+	xdp_features \
+	xdp_hw_metadata \
+	xdp_redirect_multi \
+	xdp_synproxy \
+	xdping \
+	xskxceiver
+
+The main changes are:
+
+1) Optimize and homogenize bpf_csum_diff helper for all archs and also
+   add a batch of new BPF selftests for it, from Puranjay Mohan.
+
+2) Rewrite and migrate the test_tcp_check_syncookie.sh BPF selftest
+   into test_progs so that it can be run in BPF CI, from Alexis Lothoré.
+
+3) Two BPF sockmap selftest fixes, from Zijian Zhang.
+
+4) Small XDP synproxy BPF selftest cleanup to remove IP_DF check,
+   from Vincent Li.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Daniel Borkmann, John Fastabend, Toke Høiland-Jørgensen
+
+----------------------------------------------------------------
+
+The following changes since commit 4a6f05d9fe8adb25dff35ca6cbd707efeda4d527:
+
+  Merge tag 'batadv-next-pullrequest-20241015' of git://git.open-mesh.org/linux-merge (2024-10-15 15:28:17 +0200)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
+
+for you to fetch changes up to 00c1f3dc66a38cf65c3cfd0cb4fe7acfc7f60e37:
+
+  selftests/bpf: Add a selftest for bpf_csum_diff() (2024-10-30 15:29:59 +0100)
+
+----------------------------------------------------------------
+bpf-next-for-netdev
+
+----------------------------------------------------------------
+Alexis Lothoré (eBPF Foundation) (6):
+      selftests/bpf: factorize conn and syncookies tests in a single runner
+      selftests/bpf: add missing ns cleanups in btf_skc_cls_ingress
+      selftests/bpf: get rid of global vars in btf_skc_cls_ingress
+      selftests/bpf: add ipv4 and dual ipv4/ipv6 support in btf_skc_cls_ingress
+      selftests/bpf: test MSS value returned with bpf_tcp_gen_syncookie
+      selftests/bpf: remove test_tcp_check_syncookie
+
+Martin KaFai Lau (2):
+      Merge branch 'Two fixes for test_sockmap'
+      Merge branch 'selftests/bpf: integrate test_tcp_check_syncookie.sh into test_progs'
+
+Puranjay Mohan (4):
+      net: checksum: Move from32to16() to generic header
+      bpf: bpf_csum_diff: Optimize and homogenize for all archs
+      selftests/bpf: Don't mask result of bpf_csum_diff() in test_verifier
+      selftests/bpf: Add a selftest for bpf_csum_diff()
+
+Vincent Li (1):
+      selftests/bpf: remove xdp_synproxy IP_DF check
+
+Zijian Zhang (2):
+      selftests/bpf: Fix msg_verify_data in test_sockmap
+      selftests/bpf: Fix txmsg_redir of test_txmsg_pull in test_sockmap
+
+ arch/parisc/lib/checksum.c                         |  13 +-
+ include/net/checksum.h                             |   6 +
+ lib/checksum.c                                     |  11 +-
+ net/core/filter.c                                  |  39 +-
+ tools/testing/selftests/bpf/.gitignore             |   1 -
+ tools/testing/selftests/bpf/Makefile               |   9 +-
+ .../selftests/bpf/prog_tests/btf_skc_cls_ingress.c | 264 +++++++------
+ .../selftests/bpf/prog_tests/test_csum_diff.c      | 408 +++++++++++++++++++++
+ tools/testing/selftests/bpf/progs/csum_diff_test.c |  42 +++
+ .../selftests/bpf/progs/test_btf_skc_cls_ingress.c |  82 +++--
+ .../bpf/progs/test_tcp_check_syncookie_kern.c      | 167 ---------
+ .../selftests/bpf/progs/verifier_array_access.c    |   3 +-
+ .../selftests/bpf/progs/xdp_synproxy_kern.c        |   3 +-
+ tools/testing/selftests/bpf/test_sockmap.c         |  32 +-
+ .../selftests/bpf/test_tcp_check_syncookie.sh      |  85 -----
+ .../selftests/bpf/test_tcp_check_syncookie_user.c  | 213 -----------
+ 16 files changed, 710 insertions(+), 668 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/test_csum_diff.c
+ create mode 100644 tools/testing/selftests/bpf/progs/csum_diff_test.c
+ delete mode 100644 tools/testing/selftests/bpf/progs/test_tcp_check_syncookie_kern.c
+ delete mode 100755 tools/testing/selftests/bpf/test_tcp_check_syncookie.sh
+ delete mode 100644 tools/testing/selftests/bpf/test_tcp_check_syncookie_user.c
 
