@@ -1,193 +1,259 @@
-Return-Path: <netdev+bounces-140786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4F939B8100
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 18:17:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79CF79B810F
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 18:20:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44B2C1F22B64
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:17:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3841028143C
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 17:20:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A9B1BDA99;
-	Thu, 31 Oct 2024 17:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C40491BE235;
+	Thu, 31 Oct 2024 17:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Tm9fylOI"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="b/DWy6M8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 544E019E7D3
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 17:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D7401BDA9A
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 17:20:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730395053; cv=none; b=hf47RAgymJ0AzhsZsfJM7C8TxtyUrxPUyp7FtBrhXMiIhylGlAhvqGUhbsSQaiVWZjiYayWDXBdyMnPJT+8chw6KH+HcyWHZlLkj7nrvo519pz9qsDOBDUpEnKWyX/IRWyzJ+spkjBbcAMP8RfjHSwgScRwXe29DjfHmS85uYBs=
+	t=1730395209; cv=none; b=jC2+1lpi3EAbkbZvPyQT9LlwFjF8AtkXpRZ8MP6NPbJGRb3jMCzsAxQqLBD38G/5go3F6QZzbS2KHnTSILGSc/0spUdKQTqSTaCEKg/o+G731bJM/pt4z73fVXIlst+FI98w1XfPyjoXBxotdkBytrHcMlhWkoKxDqD6XOrM+T0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730395053; c=relaxed/simple;
-	bh=bx0jessu0KfLRZtCqrKGlDJ3ti7ypTOq/nU0abf7IMo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YB40X7kUo5swMLQXYDZD/II7rl1Rp4vxsbIQPgg8UtZXo4zRpaxf69a5OZV1RnzJmO52AqpUiJLM/f1KmmkIZpCPthlgLUAMBilMfOrpUWR1qiNvl6vRY6KnUivlrKR7Ya/PBlmqp/wHk39rJ5vbCcaux6g7DvFhJvXlQX7WP70=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Tm9fylOI; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37d462c91a9so745820f8f.2
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:17:31 -0700 (PDT)
+	s=arc-20240116; t=1730395209; c=relaxed/simple;
+	bh=mBfBKMdNjU6LD3I7YHUbQ9mT5gM9AFujU/rJ0kWLqbs=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=djz1RjBpGIIS8F5EYFdbAXc5+KQwFQQh5YefaolyAH9KjFXz1H7YgrES2YJj0o0czMHio0B3UVzrR0+UGZxcG361RYntR01yCi23ASX3XeLRkC6d1Fsm0TVXgXEanNpZm63mXMETIYZ8mTpdtzpWY+e/NNGQP5mG0rDi24K76lY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=b/DWy6M8; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e2ab5bbc01so131575a91.2
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:20:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730395050; x=1730999850; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=yuVL5XevAlSQZiTVvR3V3r/+5ebo7kY9AfDcEkuoaT4=;
-        b=Tm9fylOI8o3RBB7refl2qDn20v4IulV4ZCK4YXcswsL5fFskYp4jvguqX+xCFC0GLn
-         hAuYQGLVOfiUL70RFgUMtjdXRGwiVlDxpbfei60Ut/FHceOAAXr6WVOIKxZ1WWiau/kI
-         GQxPv+JvLHtNTCeD/R3MNsl2ihOyMm4ivWR5Q=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730395050; x=1730999850;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1730395206; x=1731000006; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=yuVL5XevAlSQZiTVvR3V3r/+5ebo7kY9AfDcEkuoaT4=;
-        b=wFCyfR7/5N9E72BlFVm6d8LZstc0CcoiU9O3F0Pas44wXQxU93Thxaft7NjUoSOR6i
-         hVAtA95i/ndjlsaNqDZFSMXXaNQNkVw+SQwTi2njSHuK/WMKgsQLVcGhnQzktp1npYqu
-         XKQRbLDpWfGu4Ay6gifisrpLuCYK9avPtM8uagGMSPttbMTIGoveLT6V7yUNh/J6feXx
-         ICUVlmEZWgyOYaRyxrilg5jvk3oA8xHRZ1j3xlFb0HsauWy1b17YLU5Kl0PeRPKASOiV
-         pcjizFFEPO27vBzaS6WmMRoU6TCHCJl9X08jz0QlfMLGjwx/DSJhuPp6d9NxS3lrCvkK
-         iDzw==
-X-Forwarded-Encrypted: i=1; AJvYcCXxxaTWPdSzlUT2vRPma1g/zN7cmML74BGBWq9LyknehX7/zsKXkf8OVEKopkvN0Af9oznXtOg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyQk6QUjDcWqeA3yVxSPc9rC1iT59HUNw95fWKmO0ugk7YOYL+R
-	INIGhyqMNSc/MfbXDV3d+AzBI/7bFNXZI9cUJvP4jhvhz4ZjCITPQiWdV4binA==
-X-Google-Smtp-Source: AGHT+IFjT29yi5SX0dw1nHhzoYLJGP+01L3NL5a3fZUFudXflNMBcjs32Cnleu5VTb7EMdHUUlSccA==
-X-Received: by 2002:a05:6000:ac1:b0:37d:3280:203a with SMTP id ffacd0b85a97d-381b7057644mr5887676f8f.10.1730395049620;
-        Thu, 31 Oct 2024 10:17:29 -0700 (PDT)
-Received: from [10.67.48.245] ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7c08sm2713960f8f.17.2024.10.31.10.17.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 10:17:28 -0700 (PDT)
-Message-ID: <5ab60ad8-5625-41d3-b20a-4137a8f4c19a@broadcom.com>
-Date: Thu, 31 Oct 2024 10:17:17 -0700
+        bh=SKkFDkzIEBItD3yNbuSEm7Az14lr6rR23lccwnGeVnE=;
+        b=b/DWy6M8QwiR2jMbwUgRKI48rrxRBoPeUnXaP8A6atdWBO5SzLKiU9ESm2xusUFuxM
+         CosRDnvhxR0/fhe15ksMhBFs0EQDH3QbN4GCxdcNipOaEt4ZdaFV9xJgeXI98HwLovSg
+         jpXYgJNWQ5K0oHBpTeUmNZZ2h4V59mhLaxSdkRBboUWtvR/RcEISfZlLigLpcJiz8wUa
+         cQNJLiU9bcTqEJl9931ZEgiBOobFoAZO6Pjok1AC14BKa6QjaW3QQxNNBPm/cvUIgHOf
+         WTD8nR6fzwdSdeldFNWXWUPCRmPTeWmFOfHaSa3Xy33y9vTp7tq7+W/95PKc9MuXdFFP
+         Dpgw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730395206; x=1731000006;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=SKkFDkzIEBItD3yNbuSEm7Az14lr6rR23lccwnGeVnE=;
+        b=WMBBvt0uGJCRMki7Uk8c2md2Zm6T0TJqRCVnUiEBnDixYMqfG6cCwTvrIGTBLA+mX1
+         A+wXeNc26FjE5SUmzWF17dlb162/ZZPkm3CL0hMbIW9t8uybu4GX4vasQjqcFfN1R9F/
+         P2M9z01XqOvFpPT/pE1G7gvZG4GjXIl4GY1lhDxDLAIh762TWyYwxELXa+PmRCeFAGpK
+         yrO/wphUeQE53JDEiDXINDcL9jJPnargt7l1e3TL2AOLkPE2iR7ITJhQDHZ0t9nUj0uv
+         DV+Xy9RCujAS5TYXRwkX5bxEitECF31uncrtd6Cxh2r6txri6PRvErmvn38I9yM/c0kv
+         orCg==
+X-Forwarded-Encrypted: i=1; AJvYcCX3RkcRNTyk2pvtzYmjo5hw/6WwE9TX3SNfZNTv/zNyTiMxK/f/ZINh5ihji9PZ8t8xPuAwwQA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUJBIBcrSt7W4STNFh0kEb7puFwfszmfL2pS4AuvWGne1BE9ES
+	Ahzy0gaGwosv6ksCjjKTkj2HbDnl6w2pMl4IEpfM1g9IMZLhrTwZXGZW2c8SSYJdIlvdTTsnSG6
+	oumopuwY9sUA9Bqe2XFKkAAR5CbzU/EemZQtArg==
+X-Google-Smtp-Source: AGHT+IH6t05mbCPluyw/Zm7bZ8Y86vIuSvJgupQimK2c7oAZcHqEQQGqxSncMtgAi8PvmdylJnQUlmy+Sc53Mt/5SYg=
+X-Received: by 2002:a17:90b:3003:b0:2e2:b45d:bbb9 with SMTP id
+ 98e67ed59e1d1-2e8f11bfd7bmr9879885a91.6.1730395206352; Thu, 31 Oct 2024
+ 10:20:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [resend PATCH 2/2] dim: pass dim_sample to net_dim() by reference
-To: Caleb Sander Mateos <csander@purestorage.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- Arthur Kiyanovski <akiyano@amazon.com>, Brett Creeley
- <brett.creeley@amd.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Claudiu Manoil <claudiu.manoil@nxp.com>, David Arinzon
- <darinzon@amazon.com>, "David S. Miller" <davem@davemloft.net>,
- Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>,
- =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
- Felix Fietkau <nbd@nbd.name>, Geetha sowjanya <gakula@marvell.com>,
- hariprasad <hkelam@marvell.com>, Jakub Kicinski <kuba@kernel.org>,
- Jason Wang <jasowang@redhat.com>, Jonathan Corbet <corbet@lwn.net>,
- Leon Romanovsky <leon@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Louis Peens <louis.peens@corigine.com>, Mark Lee <Mark-MC.Lee@mediatek.com>,
- Matthias Brugger <matthias.bgg@gmail.com>,
- Michael Chan <michael.chan@broadcom.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Noam Dagan <ndagan@amazon.com>,
- Paolo Abeni <pabeni@redhat.com>,
- Przemek Kitszel <przemyslaw.kitszel@intel.com>,
- Roy Pledge <Roy.Pledge@nxp.com>, Saeed Bishara <saeedb@amazon.com>,
- Saeed Mahameed <saeedm@nvidia.com>, Sean Wang <sean.wang@mediatek.com>,
- Shannon Nelson <shannon.nelson@amd.com>, Shay Agroskin <shayagr@amazon.com>,
- Simon Horman <horms@kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>,
- Sunil Goutham <sgoutham@marvell.com>, Tal Gilboa <talgi@nvidia.com>,
- Tariq Toukan <tariqt@nvidia.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- oss-drivers@corigine.com, virtualization@lists.linux.dev
 References: <20241031002326.3426181-1-csander@purestorage.com>
- <20241031002326.3426181-2-csander@purestorage.com>
-Content-Language: en-US
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-Autocrypt: addr=florian.fainelli@broadcom.com; keydata=
- xsBNBFPAG8ABCAC3EO02urEwipgbUNJ1r6oI2Vr/+uE389lSEShN2PmL3MVnzhViSAtrYxeT
- M0Txqn1tOWoIc4QUl6Ggqf5KP6FoRkCrgMMTnUAINsINYXK+3OLe7HjP10h2jDRX4Ajs4Ghs
- JrZOBru6rH0YrgAhr6O5gG7NE1jhly+EsOa2MpwOiXO4DE/YKZGuVe6Bh87WqmILs9KvnNrQ
- PcycQnYKTVpqE95d4M824M5cuRB6D1GrYovCsjA9uxo22kPdOoQRAu5gBBn3AdtALFyQj9DQ
- KQuc39/i/Kt6XLZ/RsBc6qLs+p+JnEuPJngTSfWvzGjpx0nkwCMi4yBb+xk7Hki4kEslABEB
- AAHNMEZsb3JpYW4gRmFpbmVsbGkgPGZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tPsLB
- IQQQAQgAywUCZWl41AUJI+Jo+hcKAAG/SMv+fS3xUQWa0NryPuoRGjsA3SAUAAAAAAAWAAFr
- ZXktdXNhZ2UtbWFza0BwZ3AuY29tjDAUgAAAAAAgAAdwcmVmZXJyZWQtZW1haWwtZW5jb2Rp
- bmdAcGdwLmNvbXBncG1pbWUICwkIBwMCAQoFF4AAAAAZGGxkYXA6Ly9rZXlzLmJyb2FkY29t
- Lm5ldAUbAwAAAAMWAgEFHgEAAAAEFQgJChYhBNXZKpfnkVze1+R8aIExtcQpvGagAAoJEIEx
- tcQpvGagWPEH/2l0DNr9QkTwJUxOoP9wgHfmVhqc0ZlDsBFv91I3BbhGKI5UATbipKNqG13Z
- TsBrJHcrnCqnTRS+8n9/myOF0ng2A4YT0EJnayzHugXm+hrkO5O9UEPJ8a+0553VqyoFhHqA
- zjxj8fUu1px5cbb4R9G4UAySqyeLLeqnYLCKb4+GklGSBGsLMYvLmIDNYlkhMdnnzsSUAS61
- WJYW6jjnzMwuKJ0ZHv7xZvSHyhIsFRiYiEs44kiYjbUUMcXor/uLEuTIazGrE3MahuGdjpT2
- IOjoMiTsbMc0yfhHp6G/2E769oDXMVxCCbMVpA+LUtVIQEA+8Zr6mX0Yk4nDS7OiBlvOwE0E
- U8AbwQEIAKxr71oqe+0+MYCc7WafWEcpQHFUwvYLcdBoOnmJPxDwDRpvU5LhqSPvk/yJdh9k
- 4xUDQu3rm1qIW2I9Puk5n/Jz/lZsqGw8T13DKyu8eMcvaA/irm9lX9El27DPHy/0qsxmxVmU
- pu9y9S+BmaMb2CM9IuyxMWEl9ruWFS2jAWh/R8CrdnL6+zLk60R7XGzmSJqF09vYNlJ6Bdbs
- MWDXkYWWP5Ub1ZJGNJQ4qT7g8IN0qXxzLQsmz6tbgLMEHYBGx80bBF8AkdThd6SLhreCN7Uh
- IR/5NXGqotAZao2xlDpJLuOMQtoH9WVNuuxQQZHVd8if+yp6yRJ5DAmIUt5CCPcAEQEAAcLB
- gQQYAQIBKwUCU8AbwgUbDAAAAMBdIAQZAQgABgUCU8AbwQAKCRCTYAaomC8PVQ0VCACWk3n+
- obFABEp5Rg6Qvspi9kWXcwCcfZV41OIYWhXMoc57ssjCand5noZi8bKg0bxw4qsg+9cNgZ3P
- N/DFWcNKcAT3Z2/4fTnJqdJS//YcEhlr8uGs+ZWFcqAPbteFCM4dGDRruo69IrHfyyQGx16s
- CcFlrN8vD066RKevFepb/ml7eYEdN5SRALyEdQMKeCSf3mectdoECEqdF/MWpfWIYQ1hEfdm
- C2Kztm+h3Nkt9ZQLqc3wsPJZmbD9T0c9Rphfypgw/SfTf2/CHoYVkKqwUIzI59itl5Lze+R5
- wDByhWHx2Ud2R7SudmT9XK1e0x7W7a5z11Q6vrzuED5nQvkhAAoJEIExtcQpvGagugcIAJd5
- EYe6KM6Y6RvI6TvHp+QgbU5dxvjqSiSvam0Ms3QrLidCtantcGT2Wz/2PlbZqkoJxMQc40rb
- fXa4xQSvJYj0GWpadrDJUvUu3LEsunDCxdWrmbmwGRKqZraV2oG7YEddmDqOe0Xm/NxeSobc
- MIlnaE6V0U8f5zNHB7Y46yJjjYT/Ds1TJo3pvwevDWPvv6rdBeV07D9s43frUS6xYd1uFxHC
- 7dZYWJjZmyUf5evr1W1gCgwLXG0PEi9n3qmz1lelQ8lSocmvxBKtMbX/OKhAfuP/iIwnTsww
- 95A2SaPiQZA51NywV8OFgsN0ITl2PlZ4Tp9hHERDe6nQCsNI/Us=
-In-Reply-To: <20241031002326.3426181-2-csander@purestorage.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+ <20241031002326.3426181-2-csander@purestorage.com> <ZyN8xpq5C36Tg9rz@LouisNoVo>
+In-Reply-To: <ZyN8xpq5C36Tg9rz@LouisNoVo>
+From: Caleb Sander <csander@purestorage.com>
+Date: Thu, 31 Oct 2024 10:19:55 -0700
+Message-ID: <CADUfDZoba9hNOBU7TT+0K6BYiYzVkZ_awt751g6HBm+-cCZf8w@mail.gmail.com>
+Subject: Re: [resend PATCH 2/2] dim: pass dim_sample to net_dim() by reference
+To: Louis Peens <louis.peens@corigine.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, Brett Creeley <brett.creeley@amd.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	David Arinzon <darinzon@amazon.com>, "David S. Miller" <davem@davemloft.net>, 
+	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Felix Fietkau <nbd@nbd.name>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Jason Wang <jasowang@redhat.com>, Jonathan Corbet <corbet@lwn.net>, 
+	Leon Romanovsky <leon@kernel.org>, Lorenzo Bianconi <lorenzo@kernel.org>, 
+	Mark Lee <Mark-MC.Lee@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	Michael Chan <michael.chan@broadcom.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Noam Dagan <ndagan@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Roy Pledge <Roy.Pledge@nxp.com>, 
+	Saeed Bishara <saeedb@amazon.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Shannon Nelson <shannon.nelson@amd.com>, 
+	Shay Agroskin <shayagr@amazon.com>, Simon Horman <horms@kernel.org>, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Tal Gilboa <talgi@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, intel-wired-lan@lists.osuosl.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, oss-drivers@corigine.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 10/30/24 17:23, Caleb Sander Mateos wrote:
-> net_dim() is currently passed a struct dim_sample argument by value.
-> struct dim_sample is 24 bytes. Since this is greater 16 bytes, x86-64
-> passes it on the stack. All callers have already initialized dim_sample
-> on the stack, so passing it by value requires pushing a duplicated copy
-> to the stack. Either witing to the stack and immediately reading it, or
-> perhaps dereferencing addresses relative to the stack pointer in a chain
-> of push instructions, seems to perform quite poorly.
-> 
-> In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
-> 94% of which is attributed to the first push instruction to copy
-> dim_sample on the stack for the call to net_dim():
-> // Call ktime_get()
->    0.26 |4ead2:   call   4ead7 <mlx5e_handle_rx_dim+0x47>
-> // Pass the address of struct dim in %rdi
->         |4ead7:   lea    0x3d0(%rbx),%rdi
-> // Set dim_sample.pkt_ctr
->         |4eade:   mov    %r13d,0x8(%rsp)
-> // Set dim_sample.byte_ctr
->         |4eae3:   mov    %r12d,0xc(%rsp)
-> // Set dim_sample.event_ctr
->    0.15 |4eae8:   mov    %bp,0x10(%rsp)
-> // Duplicate dim_sample on the stack
->   94.16 |4eaed:   push   0x10(%rsp)
->    2.79 |4eaf1:   push   0x10(%rsp)
->    0.07 |4eaf5:   push   %rax
-> // Call net_dim()
->    0.21 |4eaf6:   call   4eafb <mlx5e_handle_rx_dim+0x6b>
-> 
-> To allow the caller to reuse the struct dim_sample already on the stack,
-> pass the struct dim_sample by reference to net_dim().
-> 
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+On Thu, Oct 31, 2024 at 5:49=E2=80=AFAM Louis Peens <louis.peens@corigine.c=
+om> wrote:
+>
+> On Wed, Oct 30, 2024 at 06:23:26PM -0600, Caleb Sander Mateos wrote:
+> > net_dim() is currently passed a struct dim_sample argument by value.
+> > struct dim_sample is 24 bytes. Since this is greater 16 bytes, x86-64
+> > passes it on the stack. All callers have already initialized dim_sample
+> > on the stack, so passing it by value requires pushing a duplicated copy
+> > to the stack. Either witing to the stack and immediately reading it, or
+> > perhaps dereferencing addresses relative to the stack pointer in a chai=
+n
+> > of push instructions, seems to perform quite poorly.
+> >
+> > In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
+> > 94% of which is attributed to the first push instruction to copy
+> > dim_sample on the stack for the call to net_dim():
+> > // Call ktime_get()
+> >   0.26 |4ead2:   call   4ead7 <mlx5e_handle_rx_dim+0x47>
+> > // Pass the address of struct dim in %rdi
+> >        |4ead7:   lea    0x3d0(%rbx),%rdi
+> > // Set dim_sample.pkt_ctr
+> >        |4eade:   mov    %r13d,0x8(%rsp)
+> > // Set dim_sample.byte_ctr
+> >        |4eae3:   mov    %r12d,0xc(%rsp)
+> > // Set dim_sample.event_ctr
+> >   0.15 |4eae8:   mov    %bp,0x10(%rsp)
+> > // Duplicate dim_sample on the stack
+> >  94.16 |4eaed:   push   0x10(%rsp)
+> >   2.79 |4eaf1:   push   0x10(%rsp)
+> >   0.07 |4eaf5:   push   %rax
+> > // Call net_dim()
+> >   0.21 |4eaf6:   call   4eafb <mlx5e_handle_rx_dim+0x6b>
+> >
+> > To allow the caller to reuse the struct dim_sample already on the stack=
+,
+> > pass the struct dim_sample by reference to net_dim().
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  Documentation/networking/net_dim.rst                   |  2 +-
+> >  drivers/net/ethernet/amazon/ena/ena_netdev.c           |  2 +-
+> >  drivers/net/ethernet/broadcom/bcmsysport.c             |  2 +-
+> >  drivers/net/ethernet/broadcom/bnxt/bnxt.c              |  4 ++--
+> >  drivers/net/ethernet/broadcom/genet/bcmgenet.c         |  2 +-
+> >  drivers/net/ethernet/freescale/enetc/enetc.c           |  2 +-
+> >  drivers/net/ethernet/hisilicon/hns3/hns3_enet.c        |  4 ++--
+> >  drivers/net/ethernet/intel/ice/ice_txrx.c              |  4 ++--
+> >  drivers/net/ethernet/intel/idpf/idpf_txrx.c            |  4 ++--
+> >  drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c |  2 +-
+> >  drivers/net/ethernet/mediatek/mtk_eth_soc.c            |  4 ++--
+> >  drivers/net/ethernet/mellanox/mlx5/core/en_txrx.c      |  4 ++--
+> >  drivers/net/ethernet/netronome/nfp/nfd3/dp.c           |  4 ++--
+> >  drivers/net/ethernet/netronome/nfp/nfdk/dp.c           |  4 ++--
+> >  drivers/net/ethernet/pensando/ionic/ionic_txrx.c       |  2 +-
+> >  drivers/net/virtio_net.c                               |  2 +-
+> >  drivers/soc/fsl/dpio/dpio-service.c                    |  2 +-
+> >  include/linux/dim.h                                    |  2 +-
+> >  lib/dim/net_dim.c                                      | 10 +++++-----
+> >  19 files changed, 31 insertions(+), 31 deletions(-)
+> >
+> --- snip --
+>
+> > diff --git a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c b/drivers/net=
+/ethernet/netronome/nfp/nfd3/dp.c
+> > index d215efc6cad0..f1c6c47564b1 100644
+> > --- a/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+> > +++ b/drivers/net/ethernet/netronome/nfp/nfd3/dp.c
+> > @@ -1177,11 +1177,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int=
+ budget)
+> >                       pkts =3D r_vec->rx_pkts;
+> >                       bytes =3D r_vec->rx_bytes;
+> >               } while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
+> >
+> >               dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sam=
+ple);
+> > -             net_dim(&r_vec->rx_dim, dim_sample);
+> > +             net_dim(&r_vec->rx_dim, &dim_sample);
+> >       }
+> >
+> >       if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
+> >               struct dim_sample dim_sample =3D {};
+> >               unsigned int start;
+> > @@ -1192,11 +1192,11 @@ int nfp_nfd3_poll(struct napi_struct *napi, int=
+ budget)
+> >                       pkts =3D r_vec->tx_pkts;
+> >                       bytes =3D r_vec->tx_bytes;
+> >               } while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
+> >
+> >               dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sam=
+ple);
+> > -             net_dim(&r_vec->tx_dim, dim_sample);
+> > +             net_dim(&r_vec->tx_dim, &dim_sample);
+> >       }
+> >
+> >       return pkts_polled;
+> >  }
+> >
+> > diff --git a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c b/drivers/net=
+/ethernet/netronome/nfp/nfdk/dp.c
+> > index dae5af7d1845..ebeb6ab4465c 100644
+> > --- a/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+> > +++ b/drivers/net/ethernet/netronome/nfp/nfdk/dp.c
+> > @@ -1287,11 +1287,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int=
+ budget)
+> >                       pkts =3D r_vec->rx_pkts;
+> >                       bytes =3D r_vec->rx_bytes;
+> >               } while (u64_stats_fetch_retry(&r_vec->rx_sync, start));
+> >
+> >               dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sam=
+ple);
+> > -             net_dim(&r_vec->rx_dim, dim_sample);
+> > +             net_dim(&r_vec->rx_dim, &dim_sample);
+> >       }
+> >
+> >       if (r_vec->nfp_net->tx_coalesce_adapt_on && r_vec->tx_ring) {
+> >               struct dim_sample dim_sample =3D {};
+> >               unsigned int start;
+> > @@ -1302,11 +1302,11 @@ int nfp_nfdk_poll(struct napi_struct *napi, int=
+ budget)
+> >                       pkts =3D r_vec->tx_pkts;
+> >                       bytes =3D r_vec->tx_bytes;
+> >               } while (u64_stats_fetch_retry(&r_vec->tx_sync, start));
+> >
+> >               dim_update_sample(r_vec->event_ctr, pkts, bytes, &dim_sam=
+ple);
+> > -             net_dim(&r_vec->tx_dim, dim_sample);
+> > +             net_dim(&r_vec->tx_dim, &dim_sample);
+> >       }
+> >
+> >       return pkts_polled;
+> >  }
+> --- snip ---
+>
+> Hi Caleb. Looks like a fair enough update to me in general, but I am not =
+an
+> expert on 'dim'. For the corresponding nfp driver changes feel free to ad=
+d:
+>
+> Signed-off-by: Louis Peens <louis.peens@corigine.com>
 
-Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com> 
-#bcm{sysport,genet}.c
+Hi Louis,
+Thanks for the review. Did you mean "Reviewed-by"? If there was a
+change you were suggesting, I missed it.
 
-Thanks!
--- 
-Florian
+Best,
+Caleb
 
