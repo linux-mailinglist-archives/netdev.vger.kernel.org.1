@@ -1,271 +1,190 @@
-Return-Path: <netdev+bounces-140762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140761-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 571F09B7EC9
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:44:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1ED49B7EC4
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 16:43:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9ADC1F225D2
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:44:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F2EC1F224FA
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 15:43:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E99931BAEF8;
-	Thu, 31 Oct 2024 15:43:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A65571A3047;
+	Thu, 31 Oct 2024 15:43:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="eF61e0B0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUgafuay"
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01072101.me.com (qs51p00im-qukt01072101.me.com [17.57.155.10])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 485281A2872
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 15:43:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 704D11A287E;
+	Thu, 31 Oct 2024 15:43:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730389419; cv=none; b=GJQI7R56EFxktjdg+RmaxoEoYDW7Z9tt7RUyhNef8oXISLyZXIXEV07b7eGIPYQFM0JA8GMmS1KUXgxhUnh0jDKiRTuxELbMC/G311BtIRNAsJoQKtd96aLPkQDEFg2Txg6Vt+7LhXfTvgeu8zDhDX04wj6NlVYLjiqAroTaQJQ=
+	t=1730389416; cv=none; b=FAcORrKHyEm1mCriWAweW2J8JcK2aTZ4DkfRyvv3EO+/wGSDjd0Kn3ESNbLgMgmwsMBkEqjAGJ9Ku9SgvXg98MTLaHOwj/bFgVY+WUwrseBQujstiUhJd0jF6uuufZmLwbhNp+nBS3vQt0MRAN7SuNPaFiksuVGFCMtGvg4nUWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730389419; c=relaxed/simple;
-	bh=BkkmMJsHcrCTY1PBTdSBM5q6G2oWrJzMYNi/GyMzRxo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PEsvwUF/lw2OyslCI1H6NEoTAn23NwGfx/kAfUANdEpIaMXbZvOKxW1KEcDdFhyJQgAlxcUbTOV7jk2a800OrrqW5gKrp09WydivcvYz9gn0ZEQXeGhWEzNSalvOsze/HluwkJBxB+3LjmnpUsLjwElEiH7gQGeEsMa3nX90mHk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=eF61e0B0; arc=none smtp.client-ip=17.57.155.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730389415; bh=iVllsxbqz1MTBvxId23+fDR7pNwYAN1FvSHh8k8rhn4=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
-	b=eF61e0B0Can7+Z/XyhSeX2onHSJhKlxwlyYQQQCIu/fPaXOU/Hbzk05DscEeYPRDE
-	 DQA03upDEH8nOZv3QpiQENFDkcQXkd2mcPe+uUGX2RmzaYO31Fx16Tbqlqmfs3/zB7
-	 7KhaC+4UuxPBAP5Iu2xD214iJ0e4/K+9nP9zRvKHG0k/zZLlInO1fMjLXODQv9M1Pt
-	 EsSe4kfhA8JiRpwD6ZCqnkVKA9o92z8jDvuhUN2w6mej7OAGyy4GBDb9ZQKPo2woaU
-	 f0H3qcgupJZbEHIwenq1OSvTcfc1h9GWw6o0YbxIFIGhqhgWw8iv3RNdq2xPzng89L
-	 Wjyc0YoWm1mjA==
-Received: from almalinux-std3-4-4-10gb.novalocal (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01072101.me.com (Postfix) with ESMTPSA id DDF63402BE;
-	Thu, 31 Oct 2024 15:43:32 +0000 (UTC)
-From: Vladimir Vdovin <deliran@verdict.gg>
-To: netdev@vger.kernel.org,
-	dsahern@kernel.org,
-	davem@davemloft.net
-Cc: Vladimir Vdovin <deliran@verdict.gg>,
-	idosch@idosch.org
-Subject: [PATCH v3] net: ipv4: Cache pmtu for all packet paths if multipath enabled
-Date: Thu, 31 Oct 2024 15:42:55 +0000
-Message-ID: <20241031154313.2272-1-deliran@verdict.gg>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
-References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+	s=arc-20240116; t=1730389416; c=relaxed/simple;
+	bh=xSVSfWvupjWY+ia/O4hK4dAwK9UhjBvlZUksqXpgdlA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=dLA4PVE+fNAP1xf1dI7mm7y8W6e97bW+3bOnd7VIea2FExHsyek8xXkwEZUGhmOpTzKzFbLeExXCpr7AHPzlr/ZtpfFM/+rjkH03vEKTVS/EE7QBvRo5Dyqi+uZiVmpi+VIz1cZBreU/xho3pT+QPZy+HskiPOY8XRozza1YuQU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IUgafuay; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DA274C4DE00;
+	Thu, 31 Oct 2024 15:43:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730389416;
+	bh=xSVSfWvupjWY+ia/O4hK4dAwK9UhjBvlZUksqXpgdlA=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=IUgafuayS19RYU6XbsKzq2l1iax8zc0B9iFDAzRwHKHTxXJ3g0wQegaYmNxiD774b
+	 C/Gm+WQEp3x8N6+toYU6dkYrk8XdjNGaaKaS+kU+Jqmbit3ObSJC3KQeOe4vks3pqC
+	 nCek6wa0KAx8VMf1oDGxj0HmrIM0Q6Io026f9njTmXeHVCN94d6c/AVPbwexWggLMm
+	 SFVteHXjfdEuhlrBCddcc7XdOHmHLvvfsLiVEXQv0mQ4Se1D8Q8kCou+HYSnmfWL75
+	 t8q34N80IRvlycQ15CzH4+BRrwFNC4ooNZg+rBgAFA/ojoHnXi8tz8qWHEwlgbkRhX
+	 MrNYhpRD5ABuQ==
+Message-ID: <c89d51a7-0477-471c-b4e9-0623e7b7ad67@kernel.org>
+Date: Thu, 31 Oct 2024 16:43:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: yZrNSsmuE732rgWSgJgXru794m-Z0o9H
-X-Proofpoint-ORIG-GUID: yZrNSsmuE732rgWSgJgXru794m-Z0o9H
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-31_06,2024-10-30_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 mlxlogscore=999
- clxscore=1030 spamscore=0 mlxscore=0 adultscore=0 bulkscore=0
- malwarescore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2308100000 definitions=main-2410310119
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v4 13/16] dt-bindings: net: Add DT bindings for DWMAC on
+ NXP S32G/R SoCs
+To: Jan Petrous <jan.petrous@oss.nxp.com>
+Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+ Alexandre Torgue <alexandre.torgue@foss.st.com>,
+ Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
+ Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+ Heiner Kallweit <hkallweit1@gmail.com>, Russell King
+ <linux@armlinux.org.uk>, Shawn Guo <shawnguo@kernel.org>,
+ Sascha Hauer <s.hauer@pengutronix.de>,
+ Pengutronix Kernel Team <kernel@pengutronix.de>,
+ Fabio Estevam <festevam@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>,
+ Minda Chen <minda.chen@starfivetech.com>,
+ Nicolas Ferre <nicolas.ferre@microchip.com>,
+ Claudiu Beznea <claudiu.beznea@tuxon.dev>,
+ Iyappan Subramanian <iyappan@os.amperecomputing.com>,
+ Keyur Chudgar <keyur@os.amperecomputing.com>,
+ Quan Nguyen <quan@os.amperecomputing.com>, Rob Herring <robh@kernel.org>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
+ <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+ linux-stm32@st-md-mailman.stormreply.com,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev,
+ devicetree@vger.kernel.org, NXP S32 Linux Team <s32@nxp.com>
+References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
+ <20241028-upstream_s32cc_gmac-v4-13-03618f10e3e2@oss.nxp.com>
+ <erg5zzxgy45ucqv2nq3fkcv4sr7cxqzxz6ejdikafwfpgkkmse@7eigsyq245lu>
+ <ZyOUSgMo0chsGnCa@lsv051416.swis.nl-cdc01.nxp.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <ZyOUSgMo0chsGnCa@lsv051416.swis.nl-cdc01.nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Check number of paths by fib_info_num_path(),
-and update_or_create_fnhe() for every path.
-Problem is that pmtu is cached only for the oif
-that has received icmp message "need to frag",
-other oifs will still try to use "default" iface mtu.
+On 31/10/2024 15:29, Jan Petrous wrote:
+> On Tue, Oct 29, 2024 at 08:12:37AM +0100, Krzysztof Kozlowski wrote:
+>> On Mon, Oct 28, 2024 at 09:24:55PM +0100, Jan Petrous (OSS) wrote:
+>>> Add basic description for DWMAC ethernet IP on NXP S32G2xx, S32G3xx
+>>> and S32R45 automotive series SoCs.
+>>>
+>>> Signed-off-by: Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+>>> ---
+>>>  .../devicetree/bindings/net/nxp,s32-dwmac.yaml     | 98 ++++++++++++++++++++++
+>>>  .../devicetree/bindings/net/snps,dwmac.yaml        |  3 +
+>>>  2 files changed, 101 insertions(+)
+>>>
+>>> diff --git a/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+>>> new file mode 100644
+>>> index 000000000000..b11ba3bc4c52
+>>> --- /dev/null
+>>> +++ b/Documentation/devicetree/bindings/net/nxp,s32-dwmac.yaml
+>>> @@ -0,0 +1,98 @@
+>>> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+>>> +# Copyright 2021-2024 NXP
+>>> +%YAML 1.2
+>>> +---
+>>> +$id: http://devicetree.org/schemas/net/nxp,s32-dwmac.yaml#
+>>> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+>>> +
+>>> +title: NXP S32G2xx/S32G3xx/S32R45 GMAC ethernet controller
+>>> +
+>>> +maintainers:
+>>> +  - Jan Petrous (OSS) <jan.petrous@oss.nxp.com>
+>>> +
+>>> +description:
+>>> +  This device is a Synopsys DWC IP, integrated on NXP S32G/R SoCs.
+>>> +
+>>> +properties:
+>>> +  compatible:
+>>> +    enum:
+>>> +      - nxp,s32g2-dwmac
+>>> +      - nxp,s32g3-dwmac
+>>> +      - nxp,s32r-dwmac
+>>
+>> Your driver says these are fully compatible, why this is not expressed
+>> here?
+>>
+> 
+> They are compatible on current stage of driver implementation, the
+> RGMII interface has no any difference. But later there shall be
+> added SGMII and this provides some level of difference, at least
+> from max-speed POV.
+> 
+> The S32R allows higher speed (2G5) on SGMII, but S32G2/S32G3 has
+> 1G as maximum.
 
-V3:
-  - added selftest
-  - fixed compile error
+So G2/G3 will work just fine but with lower speeds? That's the meaning
+of compatibility.
 
-V2:
-  - fix fib_info_num_path parameter pass
-
-An example topology showing the problem:
-
-                    |  host1
-                +---------+
-                |  dummy0 | 10.179.20.18/32  mtu9000
-                +---------+
-        +-----------+----------------+
-    +---------+                     +---------+
-    | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
-    +---------+                     +---------+
-        |    (all here have mtu 9000)    |
-    +------+                         +------+
-    | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
-    +------+                         +------+
-        |                                |
----------+------------+-------------------+------
-                        |
-                    +-----+
-                    | ro3 | 10.10.10.10  mtu1500
-                    +-----+
-                        |
-    ========================================
-                some networks
-    ========================================
-                        |
-                    +-----+
-                    | eth0| 10.10.30.30  mtu9000
-                    +-----+
-                        |  host2
-
-host1 have enabled multipath and
-sysctl net.ipv4.fib_multipath_hash_policy = 1:
-
-default proto static src 10.179.20.18
-        nexthop via 10.179.2.12 dev ens17f1 weight 1
-        nexthop via 10.179.2.140 dev ens17f0 weight 1
-
-When host1 tries to do pmtud from 10.179.20.18/32 to host2,
-host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
-And host1 caches it in nexthop exceptions cache.
-
-Problem is that it is cached only for the iface that has received icmp,
-and there is no way that ro3 will send icmp msg to host1 via another path.
-
-Host1 now have this routes to host2:
-
-ip r g 10.10.30.30 sport 30000 dport 443
-10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
-    cache expires 521sec mtu 1500
-
-ip r g 10.10.30.30 sport 30033 dport 443
-10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
-    cache
-
-So when host1 tries again to reach host2 with mtu>1500,
-if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
-if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
-until lucky day when ro3 will send it through another flow to ens17f0.
-
-Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
----
- net/ipv4/route.c                    | 13 ++++++
- tools/testing/selftests/net/pmtu.sh | 71 ++++++++++++++++++++++++++++-
- 2 files changed, 83 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 723ac9181558..41162b5cc4cb 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1027,6 +1027,19 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
- 		struct fib_nh_common *nhc;
- 
- 		fib_select_path(net, &res, fl4, NULL);
-+#ifdef CONFIG_IP_ROUTE_MULTIPATH
-+		if (fib_info_num_path(res.fi) > 1) {
-+			int nhsel;
-+
-+			for (nhsel = 0; nhsel < fib_info_num_path(res.fi); nhsel++) {
-+				nhc = fib_info_nhc(res.fi, nhsel);
-+				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
-+							  jiffies + net->ipv4.ip_rt_mtu_expires);
-+			}
-+			rcu_read_unlock();
-+			return;
-+		}
-+#endif /* CONFIG_IP_ROUTE_MULTIPATH */
- 		nhc = FIB_RES_NHC(res);
- 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
- 				      jiffies + net->ipv4.ip_rt_mtu_expires);
-diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
-index 569bce8b6383..f440fda700e1 100755
---- a/tools/testing/selftests/net/pmtu.sh
-+++ b/tools/testing/selftests/net/pmtu.sh
-@@ -266,7 +266,8 @@ tests="
- 	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
- 	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
- 	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
--	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
-+	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
-+	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
- 
- # Addressing and routing for tests with routers: four network segments, with
- # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) and an
-@@ -2329,6 +2330,74 @@ test_pmtu_ipv6_route_change() {
- 	test_pmtu_ipvX_route_change 6
- }
- 
-+test_pmtu_ipv4_mp_exceptions() {
-+	setup namespaces routing || return $ksft_skip
-+
-+	ip nexthop ls >/dev/null 2>&1
-+	if [ $? -ne 0 ]; then
-+		echo "Nexthop objects not supported; skipping tests"
-+		exit $ksft_skip
-+	fi
-+
-+	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
-+	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
-+	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
-+	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
-+
-+	dummy0_a="192.168.99.99"
-+	dummy0_b="192.168.88.88"
-+
-+	# Set up initial MTU values
-+	mtu "${ns_a}"  veth_A-R1 2000
-+	mtu "${ns_r1}" veth_R1-A 2000
-+	mtu "${ns_r1}" veth_R1-B 1500
-+	mtu "${ns_b}"  veth_B-R1 1500
-+
-+	mtu "${ns_a}"  veth_A-R2 2000
-+	mtu "${ns_r2}" veth_R2-A 2000
-+	mtu "${ns_r2}" veth_R2-B 1500
-+	mtu "${ns_b}"  veth_B-R2 1500
-+
-+	fail=0
-+
-+	#Set up host A with multipath routes to host B dummy0_b
-+	run_cmd ${ns_a} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_a} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_a} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_a} ip link set dummy0 up
-+	run_cmd ${ns_a} ip addr add ${dummy0_a} dev dummy0
-+	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_a} ip route add ${dummy0_b} nhid 203
-+
-+	#Set up host B with multipath routes to host A dummy0_a
-+	run_cmd ${ns_b} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_b} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_b} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_b} ip link set dummy0 up
-+	run_cmd ${ns_b} ip addr add ${dummy0_b} dev dummy0
-+	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_b} ip route add ${dummy0_a} nhid 203
-+
-+	#Set up routers with routes to dummies
-+	run_cmd ${ns_r1} ip route add ${dummy0_a} via ${prefix4}.${a_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_a} via ${prefix4}.${a_r2}.1
-+	run_cmd ${ns_r1} ip route add ${dummy0_b} via ${prefix4}.${b_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_b} via ${prefix4}.${b_r2}.1
-+
-+	#Ping and expect two nexthop exceptions for two routes in nh group
-+	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dummy0_b}"
-+	if [ "$(${ns_a} ip -oneline route list cache | wc -l)" -ne 2 ]; then
-+		err "  there are not enough cached exceptions"
-+		fail=1
-+	fi
-+
-+	return ${fail}
-+}
-+
- usage() {
- 	echo
- 	echo "$0 [OPTIONS] [TEST]..."
-
-base-commit: 66600fac7a984dea4ae095411f644770b2561ede
--- 
-2.43.5
+Best regards,
+Krzysztof
 
 
