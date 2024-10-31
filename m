@@ -1,132 +1,118 @@
-Return-Path: <netdev+bounces-140678-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DB6B49B78AE
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 11:31:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 568529B78CE
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 11:40:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 591B4B24C0D
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:31:55 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D22C3B20EE4
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 10:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27792198E83;
-	Thu, 31 Oct 2024 10:31:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1051E19924F;
+	Thu, 31 Oct 2024 10:40:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MqOzw8gs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="N7kOt/u8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1527B13A89A
-	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 10:31:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA689198E83;
+	Thu, 31 Oct 2024 10:40:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730370711; cv=none; b=o4iRYstxw4VEI0FBmVAIbbjs8IcqJg9AbZ4XQMKR2fTF+TTuQmbErZnQF70S5E11LgO2/UQlzmXJbrtB+L1wMdhwjp1dGCxwEwEKtnjSBNq6MHW4hnFy3qVaPwYHVGhi6nsrpPJhDf6rHdR+5Axq2SxIISg3BBc9xVYXdusR3R4=
+	t=1730371226; cv=none; b=SLEjx8AYX0bt2IPpY3o7X48+sch9mfVItrbOpQqnp7vnivkzHrR8Hg3VZXDF6LccxAEgC/B9kWfSsb7mIVaLFbqhnBgz3wf6Thz5gRBd7cS0Vj7lCZr4AXHSmSwf4WHCCWQAeWpwKvcZP7zxGpQe7YNL50MVhQUFnfAKhjZbbFU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730370711; c=relaxed/simple;
-	bh=MAxrGkYBTB4lsgQpsbbTi320t0etIsLAZy+HTb2JCJw=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=T8ofOYLjp0fgJzqqULgeW0Bfk744p4GU94AS8Taij2caKOW9dD8nxYCzcbffg+h9YvcmRHuAmSZfbaVULKw5cW5HJETijD5o1U+4/S4PRVjYS9PnkNl6hKiitwCu3LfzlU5jjfDF/5EH2dgjAY1A8wIJYqru+xyxUlcLaDc2uvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MqOzw8gs; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730370707;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hH1YLckJ09rnGx5FtwuGX8PiOK1vIS/MMWnvFkTaFuk=;
-	b=MqOzw8gs5sDhybPGxHB1lP4ayxFn0S/t0poSPVcADLqTu+KW9CvUxSAG0mtt92IerGcNvM
-	2h8FIFxWyp2vkWtRVNk0X8PJz7Sgzqv0Dxj7rvhj1khEV+N3IdhHkG0GXukzjZz6kE5Iaj
-	/sU68fpyaLZSXj3mdMHSUbN/eehKOOA=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-580-Fd_LSsfLPku_DajyVv0AGQ-1; Thu, 31 Oct 2024 06:31:46 -0400
-X-MC-Unique: Fd_LSsfLPku_DajyVv0AGQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4316e2dde9eso6459025e9.2
-        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 03:31:46 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730370705; x=1730975505;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hH1YLckJ09rnGx5FtwuGX8PiOK1vIS/MMWnvFkTaFuk=;
-        b=m/mZwUUbM1kzCr8bd1nB/E0yb+5a0bAA2JYvmvifsiYjZ2ohZYb/AjU+GMMy3uSBO3
-         0B8+WavwKZYhC7MxeLPE8CohmZh24Lnf0aexLTdMlDxVOZ0gy++kfOdevBwmN079NsDL
-         NhRYcZKBlkBrAhLPlEeaoWX8HZ2slvZILWKS7dEo5P0i8/yqH0Hq5AC6Q/+ODDhElgm+
-         libqTAPi/DhIU7FowtDNFUh31hYBonu3b9+I48YXrWMDzRqygOEPYi6UMYLVkFNLO+/S
-         seYC4/l/Fi/HY/7HFh6fyHkl+BAlRMBgbfT2x7/vori4fxoVSV6xoZLVeaxQUAqP/emT
-         pmiw==
-X-Forwarded-Encrypted: i=1; AJvYcCW7Ss5bCAJxqxxHIm8ru4moP9hx4YGWQUhWL8QlIAdVsmX72V0ch7dvgiR4h7qv/1ud+C2DtFg=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy/FcTVdjAVZuN5bMc1K2Ngs4BZppp/3wtfr2REYKoKzff0yBdw
-	OrTDnBkeMRiEUuiPBmcFLalXeFY33tFxY35e7cpe4EXxXn9uZlNSWjT9BXLM8wTMMoIthlmqhRJ
-	uM7cOmW9fihejUj3BgpNMdsHtXoU8QvoeON7pepFAcAhC2AKfXZ5a/A==
-X-Received: by 2002:a05:600c:35c2:b0:431:5533:8f0d with SMTP id 5b1f17b1804b1-4319ad26eafmr194075525e9.30.1730370705338;
-        Thu, 31 Oct 2024 03:31:45 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFRGxV0+TZbdoUeDZDodJcDv+grkJBQ1+llkypgfemEdjGygC+QAOO6D/yANc2dcoSYn5qwyg==
-X-Received: by 2002:a05:600c:35c2:b0:431:5533:8f0d with SMTP id 5b1f17b1804b1-4319ad26eafmr194075165e9.30.1730370704890;
-        Thu, 31 Oct 2024 03:31:44 -0700 (PDT)
-Received: from [192.168.88.248] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d69845csm20819025e9.47.2024.10.31.03.31.44
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 31 Oct 2024 03:31:44 -0700 (PDT)
-Message-ID: <91ce8149-718b-4c6d-929b-65b8fc4ca933@redhat.com>
-Date: Thu, 31 Oct 2024 11:31:43 +0100
+	s=arc-20240116; t=1730371226; c=relaxed/simple;
+	bh=YLQ4UN5KY9nH6YRowLB7t4pE4jbaZEG6sqtB2Cq7H5U=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=G821E6mUNdPy2LmMCSSXb2q+nWgUnOCVvjipcr83RmX5auObWRcRGgcvvpkdZPDmhyqIWKYDa2g3IhTsDKpNrwokgtGzfjiK9T21C6AZxjMZZEdeSmtjCpTMIOwiqLx0uFSAhvVE1dGHQm4hB4qtOapdLF5G/Zska6FinAG589Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=N7kOt/u8; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EF58C4CEC3;
+	Thu, 31 Oct 2024 10:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730371225;
+	bh=YLQ4UN5KY9nH6YRowLB7t4pE4jbaZEG6sqtB2Cq7H5U=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=N7kOt/u8hT13Bd5zghXZUh/ki7NeFEcEy0oMr8L3Ph6b56YOS053MIP0o///G/sqo
+	 GX6879JFtHKHEeH2wTDW6aoiTpg3rS1dBgmDy6sXT4wFCn5aJ4vWnEZTzPmnbWyd/Z
+	 Ujj8swLYRLEhGOQYvy8ySGPRHCPn2J5OZqwZz1PXDVU3jZx4oQDSZf73qyRJ1AXBt8
+	 yGZRlxX+C+kKldGvhrGn/4/55E0+X3aeMxhsmw8T3myfmtZUY1hN4HvdqJclVw2UKw
+	 /O9bCvKr1r9xvcPIwlhgQ9TnAiwXGURVheIw//vL5l6rLe+CtWU8e9uOeMvWH1EIKg
+	 nrbEE74UnnqfA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 7105E380AC02;
+	Thu, 31 Oct 2024 10:40:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: pull request: bluetooth 2024-10-23
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>, davem@davemloft.net,
- kuba@kernel.org
-Cc: linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org
-References: <20241030185633.34818-1-luiz.dentz@gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241030185633.34818-1-luiz.dentz@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH V3 net 0/9] There are some bugfix for the HNS3 ethernet driver
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173037123325.1922651.13719151078657706845.git-patchwork-notify@kernel.org>
+Date: Thu, 31 Oct 2024 10:40:33 +0000
+References: <20241025092938.2912958-1-shaojijie@huawei.com>
+In-Reply-To: <20241025092938.2912958-1-shaojijie@huawei.com>
+To: Jijie Shao <shaojijie@huawei.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, andrew+netdev@lunn.ch, horms@kernel.org,
+ shenjian15@huawei.com, salil.mehta@huawei.com, liuyonglong@huawei.com,
+ wangpeiyang1@huawei.com, chenhao418@huawei.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-On 10/30/24 19:56, Luiz Augusto von Dentz wrote:
-> The following changes since commit c05c62850a8f035a267151dd86ea3daf887e28b8:
-> 
->   Merge tag 'wireless-2024-10-29' of https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless (2024-10-29 18:57:12 -0700)
-> 
-> are available in the Git repository at:
-> 
->   git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth.git tags/for-net-2024-10-30
-> 
-> for you to fetch changes up to 1e67d8641813f1876a42eeb4f532487b8a7fb0a8:
-> 
->   Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs (2024-10-30 14:49:09 -0400)
-> 
-> ----------------------------------------------------------------
-> bluetooth pull request for net:
-> 
->  - hci: fix null-ptr-deref in hci_read_supported_codecs
-> 
-> ----------------------------------------------------------------
-> Sungwoo Kim (1):
->       Bluetooth: hci: fix null-ptr-deref in hci_read_supported_codecs
-> 
->  net/bluetooth/hci_sync.c | 18 +++++++++++-------
->  1 file changed, 11 insertions(+), 7 deletions(-)
+Hello:
 
-Just to state the obvious and avoid some dumb error on my side, this is
-superseded by:
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-https://lore.kernel.org/netdev/20241030192205.38298-1-luiz.dentz@gmail.com/
+On Fri, 25 Oct 2024 17:29:29 +0800 you wrote:
+> There are some bugfix for the HNS3 ethernet driver
+> 
+> ---
+> ChangeLog:
+> v2 -> v3:
+>   - Rewrite the commit logs of net: hns3: add sync command to sync io-pgtable' to
+>     add more verbose explanation, suggested Paolo.
+>   - Add fixes tag for hardware issue, suggested Paolo and Simon Horman.
+> v2: https://lore.kernel.org/all/20241018101059.1718375-1-shaojijie@huawei.com/
+> v1 -> v2:
+>   - Pass IRQF_NO_AUTOEN to request_irq(), suggested by Jakub.
+>   - Rewrite the commit logs of 'net: hns3: default enable tx bounce buffer when smmu enabled'
+>     and 'net: hns3: add sync command to sync io-pgtable'.
+> v1: https://lore.kernel.org/all/20241011094521.3008298-1-shaojijie@huawei.com/
+> 
+> [...]
 
-due to the bad subj here, right?
+Here is the summary with links:
+  - [V3,net,1/9] net: hns3: default enable tx bounce buffer when smmu enabled
+    https://git.kernel.org/netdev/net/c/e6ab19443b36
+  - [V3,net,2/9] net: hns3: add sync command to sync io-pgtable
+    https://git.kernel.org/netdev/net/c/f2c14899caba
+  - [V3,net,3/9] net: hns3: fixed reset failure issues caused by the incorrect reset type
+    https://git.kernel.org/netdev/net/c/3e0f7cc887b7
+  - [V3,net,4/9] net: hns3: fix missing features due to dev->features configuration too early
+    https://git.kernel.org/netdev/net/c/662ecfc46690
+  - [V3,net,5/9] net: hns3: Resolved the issue that the debugfs query result is inconsistent.
+    https://git.kernel.org/netdev/net/c/2758f18a83ef
+  - [V3,net,6/9] net: hns3: don't auto enable misc vector
+    https://git.kernel.org/netdev/net/c/5f62009ff108
+  - [V3,net,7/9] net: hns3: initialize reset_timer before hclgevf_misc_irq_init()
+    https://git.kernel.org/netdev/net/c/d1c2e2961ab4
+  - [V3,net,8/9] net: hns3: fixed hclge_fetch_pf_reg accesses bar space out of bounds issue
+    https://git.kernel.org/netdev/net/c/3e22b7de34cb
+  - [V3,net,9/9] net: hns3: fix kernel crash when 1588 is sent on HIP08 devices
+    https://git.kernel.org/netdev/net/c/2cf246143519
 
-Thanks!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Paolo
 
 
