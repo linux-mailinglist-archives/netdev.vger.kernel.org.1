@@ -1,290 +1,190 @@
-Return-Path: <netdev+bounces-140573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D4769B70F0
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:14:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 961159B7120
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 01:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1D0AD281B0C
-	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 00:14:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5245428451E
+	for <lists+netdev@lfdr.de>; Thu, 31 Oct 2024 00:24:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2321981E;
-	Thu, 31 Oct 2024 00:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CA713FF5;
+	Thu, 31 Oct 2024 00:23:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YO2KMRWy"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="bqCqN9Kl"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f47.google.com (mail-io1-f47.google.com [209.85.166.47])
+Received: from mail-qv1-f98.google.com (mail-qv1-f98.google.com [209.85.219.98])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 932CC8F49;
-	Thu, 31 Oct 2024 00:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 21EDE2BAF5
+	for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 00:23:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.98
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730333663; cv=none; b=ZTGfxAG697IDqFOFRW7KBjs58IBI/Bs9recxe1EMBcYwVZM+wXC132HEGNDzmm8uy//TCtEAW9FCFky9B89duz8vEKnaWRgAJuSQ1sUQgLlgCWeDHmz9WLtGjWuP32KBJLgGyq8ZLvdgBUtGjMDBgV157N48VRYf6TQzoNwqkzI=
+	t=1730334227; cv=none; b=hOtBVqPuolrCQeE9Lw6kdkjQHvc9DsrgDQCFr3awDpp7iqn3YpKLYI+h4hDpkKonJxH8O3Pt3nyT7yN0FDaRZzvsot2ORJlQkTB4uIDK2G6hv6AI/U4xXpr2bxaHjufoobc5wRogvg8NQrDPescDxHZ7y6KG2ZSkuY3q9+qg1f4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730333663; c=relaxed/simple;
-	bh=hHWyEwZvtqmiYaus4+N1OibokJx9R3zrvvC9ey/3rAg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O8KVV6r/Fs8cAaNO9AUnV444jmP+U0gJIGEp2oAlKP6772XDgBCbBJMks9lEEQjQcmmheL6XmY70h4M93YgrHLj6O+FZTtm97UiXkxyzOEBFnL6YaklVob7MX/P8qg9ZTXlUi9hW8Vl5qk3C+CxW4nygUQqMEn2uOsVpxZukKjE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YO2KMRWy; arc=none smtp.client-ip=209.85.166.47
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f47.google.com with SMTP id ca18e2360f4ac-8323b555a6aso16840939f.3;
-        Wed, 30 Oct 2024 17:14:19 -0700 (PDT)
+	s=arc-20240116; t=1730334227; c=relaxed/simple;
+	bh=z3nAQNKQ8EPpdG3q4GCW/62oF7r6Z6P5c1Z3MZCXaUU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=AYnfKcErhRFzzfzO6K0SsxBc/88u1Uhw0hlBhofEro+sN+OyrfEt+uieep87Wc6cuKkK+vEekcwQwIkEJppWN0hG/Jb0OgKvXnAGyDUXWp/4kw9LqdGo5FAPlWNSyIExImw5UnS3pTdpLIkjNd5T6YjvUa4MfJKkHIMtSxP01MA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=bqCqN9Kl; arc=none smtp.client-ip=209.85.219.98
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-qv1-f98.google.com with SMTP id 6a1803df08f44-6cbf8cee5aaso669816d6.3
+        for <netdev@vger.kernel.org>; Wed, 30 Oct 2024 17:23:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730333659; x=1730938459; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Be86WG/I23PGsLUV2qAQXgvNj2xQrfHoRUgDD4D88yo=;
-        b=YO2KMRWyWqk6YWwVgrVIBBEZI6YTG5DXuxXZF0Cz5EwDooD2nkBU/0Jl3eFqtrmqf3
-         a6Y1Jq17io/naeUvC7HLL4sRrOhEnrBD/O5IQnntnzl8N/evcZxbJbn1p3W0/FvcUcXF
-         MuaqXiRjNdZwnwK7Y37JMJgbrpVjSJApgCJXYE8uNVxWV7wIVMyeyKp/WAt60rl9xRPp
-         x/e9xhcWKMQkQJrKEhwScM+5rU8ZC8iD6Lj8zcBzUrXWMTN8CJLQWSDbuNxLCWyyRAwP
-         y+rT88r9t2tLEl5Qi4H3IofOlJ54479BowVGFnusMVyGPvLnxgQsJ1LXbep2pAW88kk1
-         XhSA==
+        d=purestorage.com; s=google2022; t=1730334224; x=1730939024; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=tf88+MjxuRscGCJUWSV+JgU09beZteKvue7KtOwrEjg=;
+        b=bqCqN9KlSIQ3gYJVsIYw8zzBPxZ4Baam5ErLZXiwyDakHYWYUMRaQOhFNWXqJEq1/3
+         Lb4j3wC6VDbbe340UzvNwCHYWsJtGsTPrJvudE4Vrbr09rp66z+q1bKZ+0bgy8+tfZfw
+         jYa66OGkTXosd2C7edv9I6D8AgdcbanIg01FYULfgQnWD+16DZQfhjjqfiGohNPsFpGg
+         yAp29zNsaWw21TnCWPTqRfOYNCt7DCO6cZGiT2USBLpoEYWiv7lbZOOwLANXnY6eAQoS
+         O6IGPWZ5upM9faK8RpPLQbbTWdkZnoZgwI7zWnJjsWzX08rqxaoCa3L3ipTl5/8S4Ri2
+         1jrA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730333659; x=1730938459;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Be86WG/I23PGsLUV2qAQXgvNj2xQrfHoRUgDD4D88yo=;
-        b=wKj/CRc+pS7p80RzCO8XG7LalrJFij1UlV9/LmbrLfyne1l7GqbdSmMYdNzK84epEI
-         dJ7A/i2eL/mCRMjR3yl3uh7b/DvI0nO84ZryfLlJSoxd+3aOQ4F42S2K88C7jrBsLAZd
-         LTA64DiTDkUpxthPo0iZhFn0X+7WZrdEalNvHQXc9gvMJkqC/EMSPueZvCyrmdEqrStJ
-         +WQjoEgI4rCcvyvst0SonF/bMwmsGcfAnikgmdNLJHMlYIc7AoPGa6VyUXm84ylvFg8m
-         ifjEQh+jLlKeYDoQQFMNbXpDfOvf0lQ4Td3xKnt0SBCf6+cfK62Gr+QWmNdU0mevShfP
-         /lMw==
-X-Forwarded-Encrypted: i=1; AJvYcCU+LpgJHBh0WgoPOxzAuxRqdXE3cCZcSWF01WungHYvcK5nMzfPcX3adK1OjB4/xwsWHFQ=@vger.kernel.org, AJvYcCUD7mcSksXoKFebIo4WGOBq5ueqr8NRYV9TO5+zGfi/7+XzIBk26ExJAUEQ6SHVLq8fEwsTu8fN@vger.kernel.org
-X-Gm-Message-State: AOJu0YwwdZFWts0ULHcq+sWwXb9obHBzxATkiD8gTWL4P8oE6sSUMBAK
-	ZYNFKrMp5gpVW2pELY8usJA87DlVw9MCyUcGmWSzZelFsWMJ8x8+Wr/EfpDU7pzUKuo4A+XHteF
-	KoSyspJaDOvHBYIYlEY+o7eTcLOA=
-X-Google-Smtp-Source: AGHT+IHLVWxcE6bUJPGtC7ouVbAfr2HO5RHhBz8PmfvrBmuRAfoOJeqrcp3k91f8xJrcsXDioVvTWKq9F36DBWkEPig=
-X-Received: by 2002:a05:6e02:174e:b0:3a3:40f0:cb8c with SMTP id
- e9e14a558f8ab-3a61752b08cmr19288625ab.17.1730333658493; Wed, 30 Oct 2024
- 17:14:18 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730334224; x=1730939024;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=tf88+MjxuRscGCJUWSV+JgU09beZteKvue7KtOwrEjg=;
+        b=BQDX/LMkrFIJ0cShCp+TlusCz5gL4qLMMLuiI6UIP+fiWu9ez72UuWQ+Nh8RxIPnxV
+         Dyot5VrQlokM/DgEOWzZ9iPeU+3b6ngGzJXIkgQxXFkAe21I+sMqw6baGNiDn4G9tdW+
+         66VbOzJrOQWlTeP94rScNgPHn1UsNnr0cUPVyTg4JQmYiUf9+ZKOunVRb/SfqjI2Pjjk
+         zwnuBOr1XLkHwK1OBtSsf+B3BOBH/0UiYvRxLFtHZSwm9s4Zzkn0w0I8JLT6TU+0mrzr
+         dQ6moRp3TTm/AuGZkabvMEG3A5RUZqwb01DHVwQYWu0Flcgycml5T64Ntog+Ty64fdXY
+         XFZA==
+X-Forwarded-Encrypted: i=1; AJvYcCUYvD0oEkENF5w64rlnzWjYjV0JJmEMsQ+cWqyetEJiS28GQf9aEaZkAYFeRCbBO+8aF4zdjl4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwvM1YSoLygGdOgpD+8GKi9DE0d3Y36HlbhY5O88e8JkamBizl3
+	FFseAgSdhIufqohkIAd2BTEwLAl3aZlOsHB2WHXm6dVeU9YCKlFF1xOPyrYYnqdNfHFbODW4EQB
+	rVRYRDOES1e13V8x912661sWHHjEvdcLQ
+X-Google-Smtp-Source: AGHT+IFWsRmOrMEqCX2JKpYyyP20jT4EjhYF6nfkwiWrX3lyx/J6drAHCyLE8ycuPc1ryiPw8RvCWPQOnpw6
+X-Received: by 2002:ad4:5c8a:0:b0:6c3:662f:8e09 with SMTP id 6a1803df08f44-6d185817c9cmr122847176d6.9.1730334223990;
+        Wed, 30 Oct 2024 17:23:43 -0700 (PDT)
+Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
+        by smtp-relay.gmail.com with ESMTPS id 6a1803df08f44-6d353f9cd82sm197576d6.3.2024.10.30.17.23.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 30 Oct 2024 17:23:43 -0700 (PDT)
+X-Relaying-Domain: purestorage.com
+Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
+	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id E22DE340748;
+	Wed, 30 Oct 2024 18:23:42 -0600 (MDT)
+Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
+	id D5083E40A10; Wed, 30 Oct 2024 18:23:42 -0600 (MDT)
+From: Caleb Sander Mateos <csander@purestorage.com>
+To: Andrew Lunn <andrew+netdev@lunn.ch>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Arthur Kiyanovski <akiyano@amazon.com>,
+	Brett Creeley <brett.creeley@amd.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	David Arinzon <darinzon@amazon.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Doug Berger <opendmb@gmail.com>,
+	Eric Dumazet <edumazet@google.com>,
+	=?UTF-8?q?Eugenio=20P=C3=A9rez?= <eperezma@redhat.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	hariprasad <hkelam@marvell.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Jason Wang <jasowang@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Leon Romanovsky <leon@kernel.org>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Louis Peens <louis.peens@corigine.com>,
+	Mark Lee <Mark-MC.Lee@mediatek.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	Michael Chan <michael.chan@broadcom.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Noam Dagan <ndagan@amazon.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Roy Pledge <Roy.Pledge@nxp.com>,
+	Saeed Bishara <saeedb@amazon.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Sean Wang <sean.wang@mediatek.com>,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	Shay Agroskin <shayagr@amazon.com>,
+	Simon Horman <horms@kernel.org>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Tal Gilboa <talgi@nvidia.com>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Caleb Sander Mateos <csander@purestorage.com>,
+	intel-wired-lan@lists.osuosl.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mediatek@lists.infradead.org,
+	linuxppc-dev@lists.ozlabs.org,
+	linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	oss-drivers@corigine.com,
+	virtualization@lists.linux.dev
+Subject: [resend PATCH 1/2] dim: make dim_calc_stats() inputs const pointers
+Date: Wed, 30 Oct 2024 18:23:25 -0600
+Message-ID: <20241031002326.3426181-1-csander@purestorage.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-3-kerneljasonxing@gmail.com> <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
- <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
- <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
- <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
- <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
- <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
- <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev> <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
- <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch> <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
-In-Reply-To: <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 31 Oct 2024 08:13:42 +0800
-Message-ID: <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
- work parallelly
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, willemb@google.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	shuah@kernel.org, ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Oct 31, 2024 at 7:54=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Thu, Oct 31, 2024 at 1:15=E2=80=AFAM Willem de Bruijn
-> <willemdebruijn.kernel@gmail.com> wrote:
-> >
-> > Jason Xing wrote:
-> > > On Wed, Oct 30, 2024 at 1:37=E2=80=AFPM Martin KaFai Lau <martin.lau@=
-linux.dev> wrote:
-> > > >
-> > > > On 10/29/24 8:04 PM, Jason Xing wrote:
-> > > > >>>>>>>    static void skb_tstamp_tx_output(struct sk_buff *orig_sk=
-b,
-> > > > >>>>>>>                                 const struct sk_buff *ack_s=
-kb,
-> > > > >>>>>>>                                 struct skb_shared_hwtstamps=
- *hwtstamps,
-> > > > >>>>>>> @@ -5549,6 +5575,9 @@ static void skb_tstamp_tx_output(stru=
-ct sk_buff *orig_skb,
-> > > > >>>>>>>        u32 tsflags;
-> > > > >>>>>>>
-> > > > >>>>>>>        tsflags =3D READ_ONCE(sk->sk_tsflags);
-> > > > >>>>>>> +     if (!sk_tstamp_tx_flags(sk, tsflags, tstype))
-> > > > >>>>>>
-> > > > >>>>>> I still don't get this part since v2. How does it work with =
-cmsg only
-> > > > >>>>>> SOF_TIMESTAMPING_TX_*?
-> > > > >>>>>>
-> > > > >>>>>> I tried with "./txtimestamp -6 -c 1 -C -N -L ::1" and it doe=
-s not return any tx
-> > > > >>>>>> time stamp after this patch.
-> > > > >>>>>>
-> > > > >>>>>> I am likely missing something
-> > > > >>>>>> or v2 concluded that this behavior change is acceptable?
-> > > > >>>>>
-> > > > >>>>> Sorry, I submitted this series accidentally removing one impo=
-rtant
-> > > > >>>>> thing which is similar to what Vadim Fedorenko mentioned in t=
-he v1
-> > > > >>>>> [1]:
-> > > > >>>>> adding another member like sk_flags_bpf to handle the cmsg ca=
-se.
-> > > > >>>>>
-> > > > >>>>> Willem, would it be acceptable to add another field in struct=
- sock to
-> > > > >>>>> help us recognise the case where BPF and cmsg works parallell=
-y?
-> > > > >>>>>
-> > > > >>>>> [1]: https://lore.kernel.org/all/662873cb-a897-464e-bdb3-edf0=
-1363c3b2@linux.dev/
-> > > > >>>>
-> > > > >>>> The current timestamp flags don't need a u32. Maybe just reser=
-ve a bit
-> > > > >>>> for this purpose?
-> > > > >>>
-> > > > >>> Sure. Good suggestion.
-> > > > >>>
-> > > > >>> But I think only using one bit to reflect whether the sk->sk_ts=
-flags
-> > > > >>> is used by normal or cmsg features is not enough. The existing
-> > > > >>> implementation in tcp_sendmsg_locked() doesn't override the
-> > > > >>> sk->sk_tsflags even the normal and cmsg features enabled parall=
-elly.
-> > > > >>> It only overrides sockc.tsflags in tcp_sendmsg_locked(). Based =
-on
-> > > > >>> that, even if at some point users suddenly remove the cmsg use =
-and
-> > > > >>> then the prior normal SO_TIMESTAMPING continues to work.
-> > > > >>>
-> > > > >>> How about this, please see below:
-> > > > >>> For now, sk->sk_tsflags only uses 17 bits (see the last one
-> > > > >>> SOF_TIMESTAMPING_OPT_RX_FILTER). The cmsg feature only uses 4 f=
-lags
-> > > > >>> (see SOF_TIMESTAMPING_TX_RECORD_MASK in __sock_cmsg_send()). Wi=
-th that
-> > > > >>> said, we could reserve the highest four bits for cmsg use for t=
-he
-> > > > >>> moment. Four bits represents four points where we can record th=
-e
-> > > > >>> timestamp in the tx case.
-> > > > >>>
-> > > > >>> Do you agree on this point?
-> > > > >>
-> > > > >> I don't follow.
-> > > > >>
-> > > > >> I probably miss the entire point.
-> > > > >>
-> > > > >> The goal for sockcm fields is to start with the sk field and
-> > > > >> optionally override based on cmsg. This is what sockcm_init does=
- for
-> > > > >> tsflags.
-> > > > >>
-> > > > >> This information is for the skb, so these are recording flags.
-> > > > >>
-> > > > >> Why does the new datapath need to know whether features are enab=
-led
-> > > > >> through setsockopt or on a per-call basis with a cmsg?
-> > > > >>
-> > > > >> The goal was always to keep the reporting flags per socket, but =
-make
-> > > > >> the recording flag per packet, mainly for sampling.
-> > > > >
-> > > > > If a user uses 1) cmsg feature, 2) bpf feature at the same time, =
-we
-> > > > > allow each feature to work independently.
-> > > > >
-> > > > > How could it work? It relies on sk_tstamp_tx_flags() function in =
-the
-> > > > > current patch: when we are in __skb_tstamp_tx(), we cannot know w=
-hich
-> > > > > flags in each feature are set without fetching sk->sk_tsflags and
-> > > > > sk->sk_tsflags_bpf. Then we are able to know what timestamp we wa=
-nt to
-> > > > > record. To put it in a simple way, we're not sure if the user wan=
-ts to
-> > > > > see a SCHED timestamp by using the cmsg feature in __skb_tstamp_t=
-x()
-> > > > > if we hit this test statement "skb_shinfo(skb)->tx_flags &
-> > > > > SKBTX_SCHED_TSTAMP)". So we need those two socket tsflag fields t=
-o
-> > > > > help us.
-> > > >
-> > > > I also don't see how a new bit/integer in a sk can help to tell the=
- per cmsg
-> > > > on/off. This cmsg may have tx timestamp on while the next cmsg can =
-have it off.
-> > >
-> > > It's not hard to use it because we can clear every socket cmsg tsflag=
-s
-> > > when we're done the check in tcp_sendmsg_locked() if the cmsg feature
-> > > is not enabled. Then we can accurately know which timestamp should we
-> > > print in the tx path.
-> > >
-> > > >
-> > > > There is still one bit in skb_shinfo(skb)->tx_flags. How about defi=
-ne a
-> > > > SKBTX_BPF for everything. imo, the fine control on
-> > > > SOF_TIMESTAMPING_TX_{SCHED,SOFTWARE} is not useful for bpf. Almost =
-all of the
-> > > > time the bpf program wants all available time stamps (sched, softwa=
-re, and
-> > > > hwtstamp if the NIC has it).
-> >
-> > I like the approach of just calling BPF on every hook. Assuming that
-> > the call is very cheap, which AFAIK is true.
-> >
-> > In that case we don't need complex branching in C to optionally skip
-> > this step, as we do for reporting to userspace.
-> >
-> > All the logic and complexity is in the BPF program itself.
-> >
-> > We obviously then let go of the goal to model the BPF API close to the
-> > existing SO_TIMESTAMPING API. Though I advocated for keeping them
-> > aligned, I also think we should just tailor it to what makes most
-> > sense in the BPF space.
-> >
-> > > Sorry, I really doubt that we can lose the fine control.
-> >
-> > Since BPF is called at each reporting point, no control is lost,
-> > actually.
->
-> Sorry, I still don't get it :( If there is something wrong with my
-> understanding, please correct me.
->
-> BPF is only called on every sock_opt point in this case, like
-> BPF_SOCK_OPS_TCP_CONNECT_CB, not every report point of
-> SO_TIMESTAMPING. If we add check to test if skb is set SKBTX_BPF in
-> __skb_tstamp_tx(), then at every point bpf will be called. But it's
-> different from SO_TIMESTAMPING drived by each bit (SCHED/TX_SOFTWARE)
-> to control each point. My question is if we would use SKBTX_BPF for
-> everything, how could we control and know when we hit
-> SCHED/TX_SOFTWARE/ACK time from the bpf programs' perspective? Only
-> one bit... It will print everything without the ability to control.
->
-> Then if we try the SKBTX_BPF approach, it seems we don't actually
-> insist on adding a test statement in __skb_tstamp_tx(). Instead, we
-> could add into more places (by only checking the SKBTX_BPF flag), say,
-> tcp_write_xmit(), right?
+Make the start and end arguments to dim_calc_stats() const pointers
+to clarify that the function does not modify their values.
 
-I realized that we will have some new sock_opt flags like
-TS_SCHED_OPT_CB in patch 4, so we can control whether to print or
-not... For each sock_opt point, they will be called without caring if
-related flags in skb are set. Well, it's meaningless to add more
-control of skb tsflags at each TS_xx_OPT_CB point.
+Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+---
+ include/linux/dim.h | 3 ++-
+ lib/dim/dim.c       | 3 ++-
+ 2 files changed, 4 insertions(+), 2 deletions(-)
 
-Am I understanding in a correct way? Now, I'm totally fine with this great =
-idea!
+diff --git a/include/linux/dim.h b/include/linux/dim.h
+index 1b581ff25a15..84579a50ae7f 100644
+--- a/include/linux/dim.h
++++ b/include/linux/dim.h
+@@ -349,11 +349,12 @@ void dim_park_tired(struct dim *dim);
+  *
+  * Calculate the delta between two samples (in data rates).
+  * Takes into consideration counter wrap-around.
+  * Returned boolean indicates whether curr_stats are reliable.
+  */
+-bool dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
++bool dim_calc_stats(const struct dim_sample *start,
++		    const struct dim_sample *end,
+ 		    struct dim_stats *curr_stats);
+ 
+ /**
+  *	dim_update_sample - set a sample's fields with given values
+  *	@event_ctr: number of events to set
+diff --git a/lib/dim/dim.c b/lib/dim/dim.c
+index 83b65ac74d73..97c3d084ebf0 100644
+--- a/lib/dim/dim.c
++++ b/lib/dim/dim.c
+@@ -52,11 +52,12 @@ void dim_park_tired(struct dim *dim)
+ 	dim->steps_left   = 0;
+ 	dim->tune_state   = DIM_PARKING_TIRED;
+ }
+ EXPORT_SYMBOL(dim_park_tired);
+ 
+-bool dim_calc_stats(struct dim_sample *start, struct dim_sample *end,
++bool dim_calc_stats(const struct dim_sample *start,
++		    const struct dim_sample *end,
+ 		    struct dim_stats *curr_stats)
+ {
+ 	/* u32 holds up to 71 minutes, should be enough */
+ 	u32 delta_us = ktime_us_delta(end->time, start->time);
+ 	u32 npkts = BIT_GAP(BITS_PER_TYPE(u32), end->pkt_ctr, start->pkt_ctr);
+-- 
+2.45.2
 
-Thanks,
-Jason
 
