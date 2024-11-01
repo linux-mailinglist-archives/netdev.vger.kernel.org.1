@@ -1,83 +1,85 @@
-Return-Path: <netdev+bounces-141041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 799E99B9345
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:32:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A72F9B9343
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:32:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id F166E1F23084
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:32:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A45AB1F232CC
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:32:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACCC71A0721;
-	Fri,  1 Nov 2024 14:32:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55EF019D8B7;
+	Fri,  1 Nov 2024 14:32:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="QMUjBLIZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AtNJsz9o"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C0FE49620
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 14:32:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4513149620;
+	Fri,  1 Nov 2024 14:32:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730471547; cv=none; b=uAP54niPfmd6gn3iJ7yGexTUD1UQ1kgVY1DFScfw3HeIcj5i0iyoc7wOtTx32zLT/ZWHW1r4AZ5XHRK9y32ezBP7MQO7pxrFBzyyshSWnEIP9ug/RCOx7l9a/FUDH86OS12cWTCcxZTrF5I1NojuDk4VRi3pt2hY1BRQuNDgOas=
+	t=1730471535; cv=none; b=li8mxPbGJOcEurG0/YNyQ6EnpYkPOYxLJv5rJ6BbypstSjrexhBlRSLj/PpixPTKxTjn+nmNRorCkuB4ATV+Up1tE2rQKKey8PF0K+kgSSdC8hZHDsZ06zq8EEmsPexFkEpwVb2j3Na0qFsoTod+shL3ay0hP58eIohElpkXmtk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730471547; c=relaxed/simple;
-	bh=zRufYQTM2AyaUG/3MkZBNIjcR4kJ1MSCKM92Jc2SsTk=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=gLwo0i5iUvAwq8Eawi6GKN5WwmH3Ji7oL5JIdMUrFVyw+uo/nTUmfAEX4fkVwaLYC8NuW4XfkTshKhpps89aQUdJIKVSwmgnSPOc63relH4QGVKC01E+ApSj1/qgF2EZXoiwIjcdjjcFH67ewdKsCpQufC5ngRuOe1M917dr0dc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=QMUjBLIZ; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20cbcd71012so23930415ad.3
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 07:32:25 -0700 (PDT)
+	s=arc-20240116; t=1730471535; c=relaxed/simple;
+	bh=Ye+OnA3pcBCvTB594Gt6ixWt++CfWAxTqEQjPllTXqA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=tFZJTBlGKrUB0PL5ImavFo0c5GWYMINftq9lvIf2SMCRcFKM9fxaPQwhzd7+Y6DnXNP0fD1EyW915WqmCfz/isYBAe7AgOnfNO5ad/UrT5rRpSJi0a7cyn3DKVzvQoT6wmbaNu6g3WTdCgx4JSRNCBNVZ6d9hy83CxzAYSHyNVU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AtNJsz9o; arc=none smtp.client-ip=209.85.128.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-4314c4cb752so17951725e9.2;
+        Fri, 01 Nov 2024 07:32:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1730471544; x=1731076344; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730471531; x=1731076331; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=gruszeIpxYM6GpwIDsKD9euVO3Z3vPd1Uc086E1jl5g=;
-        b=QMUjBLIZ6Aked778FkpRgf5IglINFkqxiEqYAKA7OaT4lV4oUPFjNEV3zTYYXmZ7J+
-         Mz33RM69FHIifQp8weOOVrlwC4OCmbUL9y9WbzJxZBCX1OgYuP2wpIEJICNmYgsG0Ia4
-         oWFqycOJkHS9j9GdA7Purhtm9YtARMmufLf9vxiMYkcmqlPtvGxEI5YU5RvdzWv63q0y
-         xPJ49F0Za2TDS/nSvt5ty3v1ANQECt3yjt1vivAE1QhUs+SUs0FHCCV3BAact9PbihAy
-         7PVSROpyL2u+Cy2oNml3pyiWP0DjNZAb54YExu/VbNh/c4tRmT7yxFsAuDI9viGqiL94
-         nvtg==
+        bh=BzMHOq/iCf0mTo6/esKAisiJt3XWXmE/BAGapCEWblg=;
+        b=AtNJsz9oaJgofjW7xrsYYbwZpkstg2c7c4VRyT2LyIQzGQYVSzSLIB4+0CQjmyyV22
+         p6oDMAoA5iIh5/C1qpTT3bpZMPwGXS5874n2JyNjc0xAWrFZYq5vReEJQu0gJo0n3ANg
+         6f/H10dTVUxlqzC4jld/zDuNBqzfgS3P3G7nJAdp9GPBszJvF2RH/jBgEMyj8wbcQ0om
+         d7jz/bc04Rp3IWmdxlslokr1qKkE0Hq+/LFLr3o9ig//ssYmPPDvlBHOxYtg0Xh2BU/5
+         /YDtWvLznG7PhPFNzjKCNpsf9y+yVEFXj44q8h4x1kvt1tMuDPWPZAx/5+sBknn3p2pa
+         m5gQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730471544; x=1731076344;
+        d=1e100.net; s=20230601; t=1730471531; x=1731076331;
         h=content-transfer-encoding:mime-version:message-id:date:subject:cc
          :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=gruszeIpxYM6GpwIDsKD9euVO3Z3vPd1Uc086E1jl5g=;
-        b=ieEL+n9w4v2o5cDcn5OrVrz14Ck7cYqwNonYwLHpdOEdgPJOGW0VVqFJi77TckHJqT
-         t09fba8/R/3Top4BIrm6SLZaakkRSa5xTHwmJn34OcBdkMd8bRAyOrFN9oC9MdnJ3Vml
-         22ooCOlFbNPEpBy+sxBcKs+sLRgr6K38NSH2XuS3nfhtV6YQFvN8uPVkhUNu50n7clOc
-         SZazLdpJgS0tI2UZH1VeMtfTpBbYGeYgOYYSQ7ky/Jv6uZKM65xa2UzqvuayZ056HR7g
-         LNnvYDpf1q/RWklXiFbFDoRIfxHGLYhoTClr2zEGHCUvOsqAMa4uaJYMxRAKNw7zFMpU
-         QpqQ==
-X-Gm-Message-State: AOJu0Yyli9A8r3WjZXn6zInsLpUaCNd0ouMZwXtYL/O/hagK6wXRhVaa
-	Nyx2UTsFt4JYxW72EQ2/nYIgtsA0GqzX6sksZP+Pp2ob1Qj6kc+PxrwUDdq9A4UeO0k0+Lf3oqE
-	NTQ==
-X-Google-Smtp-Source: AGHT+IEJf1H/GvLhyEhHmZm/gVhBTi+P/f977a9UB1J2PxbHQ1I2inYwcwuyo3yIHhvEk7trWKFpUw==
-X-Received: by 2002:a17:902:d481:b0:20b:6918:30b5 with SMTP id d9443c01a7336-2111af5a6bcmr42574355ad.41.1730471544449;
-        Fri, 01 Nov 2024 07:32:24 -0700 (PDT)
-Received: from rogue-one.tail33bf8.ts.net ([179.218.14.134])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2110570bfe6sm21926665ad.109.2024.11.01.07.32.21
+        bh=BzMHOq/iCf0mTo6/esKAisiJt3XWXmE/BAGapCEWblg=;
+        b=qU5lJKFK6nX5roFEyX77RkVKqk+i7pifqYL3ruzTFAdDHBM0/25FyiJ1+XBnFRBSOc
+         kxVlKh0Z4WqeurKbr6ujdxjfwz6b/6s+/zoUo/mbIiP9+iqs7K2ngTxtHTYn/aXZRgNd
+         EUssxOwxbev4uKVw88cIusVIliQ19bHDFzanXoAi70VQAPaIZOy4aPlueaDBIqu8wwge
+         RFPhuEStRhaxBp9WtIRAbsIo4w9430uKyie9BtqPL+xUAl4/kn4X5DZtG7PRHK61grcd
+         FN/riP7KIxMeT+49Y77VMbQ6E9PegfAqJOo8JRuPPzMxWPgIeOgCPwjyuijTlaumJlJJ
+         zDbQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU/MHY6bnMeGPi9AKHLmZyUj/QP/lMTnPaduh3FOuCLY31K+5hpmlfZWRSLyVPpPoLZdfBpMQk=@vger.kernel.org, AJvYcCW+hgN78Nh6+keAFHLAgFl1u6A+f0Nn9B2GvWVb+eNaa/68K2SNg89UZQX/ZtgwMpYKpv/NkO0JEIBcg9jSOrwI@vger.kernel.org
+X-Gm-Message-State: AOJu0YwWB1D2MvGfa8+IUCnWsqlF24cC2t/4OKWdI6WmJfPrDRzfaNXG
+	RZebbxvNF5hbjT7DKgGWG2yyW9VZQvlcS2n3qtoDmsoaq74l1nr6
+X-Google-Smtp-Source: AGHT+IHvtpZn7d8vB942r4zuG2RQkp0979/qnUzdbg1tJcN0Dzoy0ix9aImEY0F4ebHBwiv1isfxug==
+X-Received: by 2002:a05:600c:5115:b0:431:7c78:b885 with SMTP id 5b1f17b1804b1-4327b6f954emr61643485e9.4.1730471531352;
+        Fri, 01 Nov 2024 07:32:11 -0700 (PDT)
+Received: from imac.lan ([2a02:8010:60a0:0:5575:fafa:8c58:48a3])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd9a99c8sm93675215e9.29.2024.11.01.07.32.10
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 07:32:24 -0700 (PDT)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	shuah@kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net-next] selftests/tc-testing: add tests for qdisc_tree_reduce_backlog
-Date: Fri,  1 Nov 2024 11:31:48 -0300
-Message-ID: <20241101143148.1218890-1-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.43.0
+        Fri, 01 Nov 2024 07:32:10 -0700 (PDT)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netfilter-devel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH nf v1] netfilter: netlink: Report extack policy errors for batched ops
+Date: Fri,  1 Nov 2024 14:32:07 +0000
+Message-ID: <20241101143207.42408-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,127 +88,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Add 3 tests to check for the expected behaviour of
-qdisc_tree_reduce_backlog in special scenarios.
+The nftables batch processing does not currently populate extack with
+policy errors. Fix this by passing extack when parsing batch messages.
 
-- The first test checks if the qdisc class is notified of deletion for
-major handle 'ffff:'.
-- The second test checks the same as the first test but with 'ffff:' as the root
-qdisc.
-- The third test checks if everything works if ingress is active.
-
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
 ---
- .../tc-testing/tc-tests/infra/qdiscs.json     | 98 +++++++++++++++++++
- 1 file changed, 98 insertions(+)
- create mode 100644 tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
+ net/netfilter/nfnetlink.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-new file mode 100644
-index 000000000000..d3dd65b05b5f
---- /dev/null
-+++ b/tools/testing/selftests/tc-testing/tc-tests/infra/qdiscs.json
-@@ -0,0 +1,98 @@
-+[
-+    {
-+        "id": "ca5e",
-+        "name": "Check class delete notification for ffff:",
-+        "category": [
-+            "qdisc"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY root handle 1: drr",
-+            "$TC filter add dev $DUMMY parent 1: basic classid 1:1",
-+            "$TC class add dev $DUMMY parent 1: classid 1:1 drr",
-+            "$TC qdisc add dev $DUMMY parent 1:1 handle ffff: drr",
-+            "$TC filter add dev $DUMMY parent ffff: basic classid ffff:1",
-+            "$TC class add dev $DUMMY parent ffff: classid ffff:1 drr",
-+            "$TC qdisc add dev $DUMMY parent ffff:1 netem delay 1s",
-+            "ping -c1 -W0.01 -I $DUMMY 10.10.10.1 || true",
-+            "$TC class del dev $DUMMY classid ffff:1",
-+            "$TC class add dev $DUMMY parent ffff: classid ffff:1 drr"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC -s qdisc ls dev $DUMMY",
-+        "matchPattern": "drr 1: root",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY root handle 1: drr",
-+            "$IP addr del 10.10.10.10/24 dev $DUMMY"
-+        ]
-+    },
-+    {
-+        "id": "e4b7",
-+        "name": "Check class delete notification for root ffff:",
-+        "category": [
-+            "qdisc"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY root handle ffff: drr",
-+            "$TC filter add dev $DUMMY parent ffff: basic classid ffff:1",
-+            "$TC class add dev $DUMMY parent ffff: classid ffff:1 drr",
-+            "$TC qdisc add dev $DUMMY parent ffff:1 netem delay 1s",
-+            "ping -c1 -W0.01 -I $DUMMY 10.10.10.1 || true",
-+            "$TC class del dev $DUMMY classid ffff:1",
-+            "$TC class add dev $DUMMY parent ffff: classid ffff:1 drr"
-+        ],
-+        "cmdUnderTest": "ping -c1 -W0.01 -I $DUMMY 10.10.10.1",
-+        "expExitCode": "1",
-+        "verifyCmd": "$TC qdisc ls dev $DUMMY",
-+        "matchPattern": "drr ffff: root",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY root handle ffff: drr",
-+            "$IP addr del 10.10.10.10/24 dev $DUMMY"
-+        ]
-+    },
-+    {
-+        "id": "33a9",
-+        "name": "Check ingress is not searchable on backlog update",
-+        "category": [
-+            "qdisc"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP link set dev $DUMMY up || true",
-+            "$IP addr add 10.10.10.10/24 dev $DUMMY || true",
-+            "$TC qdisc add dev $DUMMY ingress",
-+            "$TC qdisc add dev $DUMMY root handle 1: drr",
-+            "$TC filter add dev $DUMMY parent 1: basic classid 1:1",
-+            "$TC class add dev $DUMMY parent 1: classid 1:1 drr",
-+            "$TC qdisc add dev $DUMMY parent 1:1 handle 2: drr",
-+            "$TC filter add dev $DUMMY parent 2: basic classid 2:1",
-+            "$TC class add dev $DUMMY parent 2: classid 2:1 drr",
-+            "$TC qdisc add dev $DUMMY parent 2:1 netem delay 1s",
-+            "ping -c1 -W0.01 -I $DUMMY 10.10.10.1 || true"
-+        ],
-+        "cmdUnderTest": "$TC class del dev $DUMMY classid 2:1",
-+        "expExitCode": "0",
-+        "verifyCmd": "$TC qdisc ls dev $DUMMY",
-+        "matchPattern": "drr 1: root",
-+        "matchCount": "1",
-+        "teardown": [
-+            "$TC qdisc del dev $DUMMY root handle 1: drr",
-+            "$TC qdisc del dev $DUMMY ingress",
-+            "$IP addr del 10.10.10.10/24 dev $DUMMY"
-+        ]
-+    }
-+]
+diff --git a/net/netfilter/nfnetlink.c b/net/netfilter/nfnetlink.c
+index 7784ec094097..e598a2a252b0 100644
+--- a/net/netfilter/nfnetlink.c
++++ b/net/netfilter/nfnetlink.c
+@@ -517,7 +517,7 @@ static void nfnetlink_rcv_batch(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			err = nla_parse_deprecated(cda,
+ 						   ss->cb[cb_id].attr_count,
+ 						   attr, attrlen,
+-						   ss->cb[cb_id].policy, NULL);
++						   ss->cb[cb_id].policy, &extack);
+ 			if (err < 0)
+ 				goto ack;
+ 
 -- 
-2.43.0
+2.47.0
 
 
