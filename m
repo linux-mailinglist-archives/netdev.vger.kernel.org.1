@@ -1,122 +1,182 @@
-Return-Path: <netdev+bounces-140923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E83F9B8A23
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 04:59:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 983C69B8A41
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 05:39:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEC1228308D
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 03:59:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 106101F22905
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 04:39:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50814145B1B;
-	Fri,  1 Nov 2024 03:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27031494BB;
+	Fri,  1 Nov 2024 04:39:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="VFyqusHe"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="QoaI2uOx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+Received: from mail-pl1-f172.google.com (mail-pl1-f172.google.com [209.85.214.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76ACC4C79;
-	Fri,  1 Nov 2024 03:58:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F194C1494A7
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 04:39:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730433538; cv=none; b=egVTDHXAGpZWlj6gyy58jr9Xe9t35sm+FK0gIis5x+fhDtR5LpdvnzURMu9UNbjDdae0qTnRX9IjH9HlHTSXi5CvnbwK88Xmfl+ESwACerzStrgUks596oUKf2gPBW/h1NTHt5hhTCWgFO33tsvgC9J9Tb98g4jzY0b2gsGraCk=
+	t=1730435949; cv=none; b=BhqqK6ZEEmNf2p2lBGqIr5MaM/nHXcGKyn5Yxpfo8vorc4lBp5ZjgVBdVqbDgNKLf11mBMS8OmKEkAGoQx4M4avMpr/b0c61YyhUsu+hwyoh1fEftoaJhuV2umiro7HNlGefcy7EBWMUrefE6vmLSFKSNL1HtkDzRFiyUlEvjcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730433538; c=relaxed/simple;
-	bh=aat2SRLBzqfpOO0tUw+f+240+XOG0Y2UqKNqUXsRKzw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=qg/UQZQFoEy6eknsN8U78irbGjqnwHo6gkm+AGV6ncdzfMJHPn8ycPvRgvhzZQyJJ6xf171o6YeuLi3t5lz3cO2EM/MVFXqj4o6tPcwUz0NqlksxAusfuh/hiFyrt7F/Q3n6WxMM0nYBvJwrLeOac9wqDNZIzm80CSGTRvLBqUY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=VFyqusHe; arc=none smtp.client-ip=209.85.216.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e30db524c2so1238556a91.1;
-        Thu, 31 Oct 2024 20:58:56 -0700 (PDT)
+	s=arc-20240116; t=1730435949; c=relaxed/simple;
+	bh=ZekkZF+UkdHn0Q91alOKmAiQsy9GAM3MuhejYi4hJYs=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EpJ8sMZeFxGHflBfcdOOCm33fIgrUukWVf8QyCopTZlZqFQ1rAwAuh1CW8fBXJXbj5pAJIjOhxwDGn9WGm/YjtKDvWAw4KMBNlExrkJgV4Any2/LtGHFJAEdHlhR2Ntj9RUVs9VRweSTZkgOB1yfKe0dqygIfI9B2SRCqfEaat4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=QoaI2uOx; arc=none smtp.client-ip=209.85.214.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f172.google.com with SMTP id d9443c01a7336-20ca388d242so16836515ad.2
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 21:39:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730433536; x=1731038336; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=sFSmtqGbfIT/4iT0z5PLJ7AcPQYB66rGXOxJKiMBTHE=;
-        b=VFyqusHe5D7wHAonxzHvfSAkB1EKSSblWWGBY1iy191+xPdQGpn6ZjZZeMAITshw5b
-         6VE1R1bDVS1/pq0NkpbtB/KEDTRPNTRwiLtJ3DTCU8/sJu4SaKORdIwLh1G4+u5RnmUI
-         b8xhdbm4OTfUWGXasxKbkP+1PCLyuNj3C9NPyDwlomZvYrjINm8dq/vitvYOkdeO2kDM
-         zmlIjI5eBrBX0fo7M3MEkYm2951/frdLX4R6yTual+yJNgiNoWRkzYH5z2SvtsTjEZZi
-         0L4YDceXivjKvjoC9bGwKnsRLQ/js/9atHYZbvgSSedzCjw+M8QkhJT3W+ZFc5TWCuPW
-         A4iA==
+        d=fastly.com; s=google; t=1730435946; x=1731040746; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IjTMm7UeOMlkBJOsYxfUqt1WhI+YrUl78uiV5XzaxbI=;
+        b=QoaI2uOxgBIC9UnQxUy+RgUg5F/39CGqMiEu018qxqfBHVNOeoXazCJ+BNQr0XVb8K
+         RAmh1MGUOdCjLDRLZ5j38uJo7Zq4IZD9rDyEv3upVFy+wom+oeZvBH1GykQm34qHCd3g
+         S30Nn0YynwzgYHue8L4c2Q8IyxONot2DcUn6A=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730433536; x=1731038336;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=sFSmtqGbfIT/4iT0z5PLJ7AcPQYB66rGXOxJKiMBTHE=;
-        b=I5eUw7+S8mCO/C0ILPq7tZpVYV8a9cNLRtlWWJLnClbgvhbdEQ1fiYUdGW94P0hGq4
-         jqp8M26OnjQxF9SIqDoBpSlNyp80nnUl8g8BRrRT60u2buq9nzbMLBJKReHTiL30+uAV
-         VMnD4NyllKdp178kBVduwnPKYnB8vTrzCe88eotEeLYWZ0OX1uLDPp76Wn9yxHGmEHsH
-         JkGKpeKNp2/Y65x8kv38lfdspQ6n6ehFI40zY1jjB/Jkh1YY6baZK4mkHpZnjLURYXJN
-         OXSu7pXOrDY/+bmQ5+Ycq32xTAFSh3uXosP1q0/Vm86iYQz+4MShxSPe2PT6gIZWohX3
-         SPsw==
-X-Forwarded-Encrypted: i=1; AJvYcCWrF1IMuD1N3PRkAk75NudJ0gHwRcg2jx7SZiVQ5IligTng/X11XwttbkQFrJjBdUM/CpmXSanjuUphhvc=@vger.kernel.org, AJvYcCX+04Uj5TiZ0eixdtYyhOp1yLFa5USH1pO30zQihMbdP9AtK37x10rxyqL9BY4Q12bzy5ZlewQP@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzjg2na/mznxGo3UPc97y+iRCW5yeFDEHsNlZHaSALq/waXVFOz
-	RqYYaCIDVeuLwDuaCdqgIDqh6yumS/6oNZNin2knAgt3UatkHie5
-X-Google-Smtp-Source: AGHT+IGkBJL8wRX4GxtDQsr/iacArADSVmyqrSK0Dwd0q8ln8OL6ByY2OLyV5Z2zg2+SpXa9fsi5AQ==
-X-Received: by 2002:a17:90b:2e43:b0:2e0:a77e:8305 with SMTP id 98e67ed59e1d1-2e94c533088mr2887836a91.39.1730433535731;
-        Thu, 31 Oct 2024 20:58:55 -0700 (PDT)
-Received: from localhost.localdomain ([101.94.129.40])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa2603fsm4146844a91.17.2024.10.31.20.58.52
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 31 Oct 2024 20:58:55 -0700 (PDT)
-From: Yi Zou <03zouyi09.25@gmail.com>
-To: davem@davemloft.net
-Cc: 21210240012@m.fudan.edu.cn,
-	21302010073@m.fudan.edu.cn,
-	dsahern@kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Yi Zou <03zouyi09.25@gmail.com>
-Subject: [PATCH] ipv6: route: fix possible null-pointer-dereference in ip6_route_info_create
-Date: Fri,  1 Nov 2024 11:58:43 +0800
-Message-ID: <20241101035843.52230-1-03zouyi09.25@gmail.com>
-X-Mailer: git-send-email 2.44.0
+        d=1e100.net; s=20230601; t=1730435946; x=1731040746;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=IjTMm7UeOMlkBJOsYxfUqt1WhI+YrUl78uiV5XzaxbI=;
+        b=qKhtPhj1DrH41gTPc5wuy61THewbwsaJHJz6ZGVKaGiRf7heg1a1HvSfwNxSl2ylA/
+         qgkXayl9zT8fQuBd0CoHk91W5fpeYKS4VaPOzdCBIhtK5MeIG/dZ75pJDu3AevlgFhOl
+         sClhRf5WW82EhJXDEUVkfexVXHX4VyL2byHaxUythVxx06d9faIO1432gE4aIZRmBtxT
+         biwzXA0E+Sfgmxr2ALXTsjqQ+9inFC60DZXxX2coejxP+Qw7lmhj6A6hUmS+Le9FVutA
+         ABhB4UaCU9dN0Z5uRUkSSWvzCuc1d4aGifojFmSxq0IH5HTxP7p9gPIvRas2LA4fIhVI
+         WTzg==
+X-Gm-Message-State: AOJu0YyAX+Ium7Q7qd6mRDxMMN99qNhUMQhFb3B4c5/OHeYtQwhJwTK2
+	ytOCYPqi6S5qoyZ5QWPkercTpqRJHhUygblsfKc1YXsg6l5PKw081XJNbkMZVsQ=
+X-Google-Smtp-Source: AGHT+IHFzA8goxLg/i7aPIPHLWpnxlZs+6kU062+Winb+Bwot9ysYkafB2xRqmetM9tiBbmc4yIqqA==
+X-Received: by 2002:a17:903:1c7:b0:206:a87c:2864 with SMTP id d9443c01a7336-2111afd6ca6mr22884905ad.42.1730435946221;
+        Thu, 31 Oct 2024 21:39:06 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211056edc7csm15778075ad.36.2024.10.31.21.39.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 31 Oct 2024 21:39:05 -0700 (PDT)
+Date: Thu, 31 Oct 2024 21:39:02 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: "Samudrala, Sridhar" <sridhar.samudrala@intel.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com, sdf@fomichev.me,
+	peter@typeblog.net, m2shafiei@uwaterloo.ca, bjorn@rivosinc.com,
+	hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:BPF [MISC] :Keyword:(?:b|_)bpf(?:b|_)" <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 7/7] docs: networking: Describe irq suspension
+Message-ID: <ZyRbZpCiANaxNNlv@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	"Samudrala, Sridhar" <sridhar.samudrala@intel.com>,
+	netdev@vger.kernel.org, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com, sdf@fomichev.me,
+	peter@typeblog.net, m2shafiei@uwaterloo.ca, bjorn@rivosinc.com,
+	hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:BPF [MISC] :Keyword:(?:b|_)bpf(?:b|_)" <bpf@vger.kernel.org>
+References: <20241101004846.32532-1-jdamato@fastly.com>
+ <20241101004846.32532-8-jdamato@fastly.com>
+ <cd033a99-014c-4b41-bfca-7b893604fe5a@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cd033a99-014c-4b41-bfca-7b893604fe5a@intel.com>
 
-In the ip6_route_info_create function, the variable fib6_nh is
-assigned the return value of nexthop_fib6_nh(rt->nh), which could
-result in fib6_nh being NULL. Immediately after this assignment,
-there is a potential dereference of fib6_nh in the following code:
-if (!ipv6_addr_any(&cfg->fc_prefsrc)) {
- struct net_device *dev = fib6_nh->fib_nh_dev;
-This lead to a null pointer dereference (NPD) risk if fib6_nh is
-NULL. The issue can be resolved by adding a NULL check before the
-deference line.
+On Thu, Oct 31, 2024 at 10:47:05PM -0500, Samudrala, Sridhar wrote:
+> 
+> 
+> On 10/31/2024 7:48 PM, Joe Damato wrote:
+> > Describe irq suspension, the epoll ioctls, and the tradeoffs of using
+> > different gro_flush_timeout values.
+> > 
+> > Signed-off-by: Joe Damato <jdamato@fastly.com>
+> > Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> > Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
+> > ---
+> <snip>
+> 
+> 
+> > +
+> > +IRQ suspension
+> > +--------------
+> > +
+> > +IRQ suspension is a mechanism wherein device IRQs are masked while epoll
+> > +triggers NAPI packet processing.
+> > +
+> > +While application calls to epoll_wait successfully retrieve events, the kernel will
+> > +defer the IRQ suspension timer. If the kernel does not retrieve any events
+> > +while busy polling (for example, because network traffic levels subsided), IRQ
+> > +suspension is disabled and the IRQ mitigation strategies described above are
+> > +engaged.
+> > +
+> > +This allows users to balance CPU consumption with network processing
+> > +efficiency.
+> > +
+> > +To use this mechanism:
+> > +
+> > +  1. The per-NAPI config parameter ``irq_suspend_timeout`` should be set to the
+> > +     maximum time (in nanoseconds) the application can have its IRQs
+> > +     suspended. This is done using netlink, as described above. This timeout
+> > +     serves as a safety mechanism to restart IRQ driver interrupt processing if
+> > +     the application has stalled. This value should be chosen so that it covers
+> > +     the amount of time the user application needs to process data from its
+> > +     call to epoll_wait, noting that applications can control how much data
+> > +     they retrieve by setting ``max_events`` when calling epoll_wait.
+> > +
+> > +  2. The sysfs parameter or per-NAPI config parameters ``gro_flush_timeout``
+> > +     and ``napi_defer_hard_irqs`` can be set to low values. They will be used
+> > +     to defer IRQs after busy poll has found no data.
+> 
+> Is it required to set gro_flush_timeout and napi_defer_hard_irqs when
+> irq_suspend_timeout is set? Doesn't it override any smaller
+> gro_flush_timeout value?
 
-Signed-off-by: Yi Zou <03zouyi09.25@gmail.com>
----
- net/ipv6/route.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It is not required to use gro_flush_timeout or napi_defer_hard_irqs,
+but if they are set they will take over when epoll finds no events.
+Their usage is recommended. See the Usage section of the cover
+letter for details.
 
-diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-index b4251915585f..919592fa4e64 100644
---- a/net/ipv6/route.c
-+++ b/net/ipv6/route.c
-@@ -3821,7 +3821,7 @@ static struct fib6_info *ip6_route_info_create(struct fib6_config *cfg,
- 			rt->fib6_flags = RTF_REJECT | RTF_NONEXTHOP;
- 	}
- 
--	if (!ipv6_addr_any(&cfg->fc_prefsrc)) {
-+	if (!ipv6_addr_any(&cfg->fc_prefsrc) && fib6_nh) {
- 		struct net_device *dev = fib6_nh->fib_nh_dev;
- 
- 		if (!ipv6_chk_addr(net, &cfg->fc_prefsrc, dev, 0)) {
--- 
-2.44.0
+While gro_flush_timeout and napi_defer_hard_irqs are not strictly
+required, it is difficult for the polling-based packet delivery loop
+to gain control over packet delivery.
 
+Please see a previous email about this from the RFC for more
+details:
+
+https://lore.kernel.org/netdev/2bb121dd-3dcd-4142-ab87-02ccf4afd469@uwaterloo.ca/
+
+In the cover letter, you can note the difference in performance when
+gro_flush_timeout is set to different values. Note the explanation
+of suspendX; each suspend case is testing a different
+gro_flush_timeout.
+
+Let us know if you have any other questions; both Martin and I are
+happy to help or further explain anything that is not clear.
 
