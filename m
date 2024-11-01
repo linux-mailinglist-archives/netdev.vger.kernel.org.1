@@ -1,104 +1,111 @@
-Return-Path: <netdev+bounces-141046-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45CD39B93D4
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:58:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A28B59B93F6
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:08:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7707D1C20A0E
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:58:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEFFC1C20CD0
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CC931AA787;
-	Fri,  1 Nov 2024 14:57:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="rqTjhhBC"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91B3E1A724C;
+	Fri,  1 Nov 2024 15:08:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509F81A4F1F
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 14:57:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D054E12AAE2;
+	Fri,  1 Nov 2024 15:08:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730473078; cv=none; b=T0VEYGtuQv74sFKRUVYc1W+3TlQitFs3VRyLitJwtn3LsP5G/Nql9/DxyL43HDJ4n+1xu+WVEpFZGVvhwidlyyvbz0pP1pAsgAYaTDiaFpGMQfHGClKtSy6EfgRUBv8gT1GfB/4mFJ2deSKuyG5LXzkK5uPum18EWPoh4G78nCg=
+	t=1730473695; cv=none; b=hjjrDRHzhPnpWaoRw1OR5LRfqmfQbFrDlpjqgQ6/TnZO43RDO3MqwOsY3dX4mcOXDBLl7VchtZ58OQuMmbk+3dEG3eJe4TFUW6/Hk3jud/nKSwIivoG+yKdauwayToWpC0nPrPs9oMhSzZb4QGJEkC0vrRTf1PXlAWEJz9CpFqM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730473078; c=relaxed/simple;
-	bh=HAKYWZYx81tzoWdX3VevVxQgSCoKlHjOH/hWoXOy5W8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RX4qwV0fQAp2ZXcQVo4x8hKyq1kVUtDj7VsjtulQJGAgNGwAY75N8ZVSPvHVFmdB2WwyK1vIKWp9jx5Ccu8lg4E8VdekavGHKCFCr5pya9gle4RzvRs/SXWYxQYlXa3sKLFcOgosG80+WDlwcJya6b7N2HIcJRYPUGzKwFVR7E0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=rqTjhhBC; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-4608dddaa35so174961cf.0
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 07:57:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730473075; x=1731077875; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=HAKYWZYx81tzoWdX3VevVxQgSCoKlHjOH/hWoXOy5W8=;
-        b=rqTjhhBC9hU+WkOAPWU4RIGn5JxKM31Zak7qWRSJuhvRzpz2bwF4dwzOa/lwXxtCod
-         i5lm15CwzfTUIex05xIMHzauDWPmLWJ2/FypGM9rXRcQ1zywN+4+tjfhsjIl0HEiIVZ7
-         FC7zkr0qLUv8L66Nr8RDiYrzdXMPNwDu4tyKCJhshfL6SXEK6r42RME1nxs8u8HKEy+Q
-         ++TtTI7hdv8M3v3IU42Z7uaMRVOgiX9bk0YikOjXaPLORao1PT1RyaIJYlqwzHVsBqcu
-         Qszu/gaPEbNsvEoqS0c7iDVu9Q0wh1D9hm5uOUnCvOTMk2IuEv7p/zwm0DnAJ2by9vsD
-         40Cw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730473075; x=1731077875;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=HAKYWZYx81tzoWdX3VevVxQgSCoKlHjOH/hWoXOy5W8=;
-        b=FBJOyh/EAx4gOT0fnUN/g8Ezi+Y00lxBMEcWze8LNzGfkxOZZBRLC0tkK8OQ+LPAcA
-         XUQ4+XtImAQGFCQp1ML3CNHmuXKzPz9+kXB2uqgK8J9nCbK3s/wHaoo8bfM/EYanAjo5
-         /E70QSY4DNvvpLbAClHjAJnIbYoeAb92A4YiOq3nw6T9q/sLUD/AlTe4PX/vBluOB+Bi
-         rFZueSubGFe8aH4aly4XU+lpELUz/Bx7/vF2a7Ve5/EhWLmDur8r+R6LH1bv8q8yHOK6
-         CjlOOSA9+JpSVWt+HLowEcCWXIMT3nasFGtAWUXrKBdyjk/fs3yVVDsi2/bHRKgCTiYm
-         lALQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXA15P/QRdHyGFkmS6GTBtgDCRNj3kcrpnzBuaFnE19UHNxPFjA3zH7VeCWC2zsEssQoZwL+0U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwKiGMT4Ymhjb3TvQ7C/UMcS5nu0hfyK/hUxwvTJ9L2B4Mx0jTw
-	6lbGTaojl5YQmxEk6O7Mc8Aqw9BD4QfJeMR3+dqlcNGFHHEgjPiv2P3w3W5IKGQYQLmb1ZqcUpD
-	nQCFdAqkBKGaE6QCTnyvWVuv2XW48L+0IKeiDmLDoe7a0EPRu91ai
-X-Gm-Gg: ASbGncsjf5mjY1iSHFWvWrCu9da/JSQFiZ7R2XSwFHsJ3Mj6MJawnXYxsiJg5v1zq9x
-	5u7ospuMxov39uui+Lz1tEkwIzPORbms=
-X-Google-Smtp-Source: AGHT+IFsxGUWa4VfPbyiWUamurViNWXHq/tQXiIZJlN6p9X0wZXszbpUZgaUZKOuw2yIZ5QZTxwGURHFCn6Egdnz7go=
-X-Received: by 2002:a05:622a:88:b0:460:4620:232b with SMTP id
- d75a77b69052e-462abb290f6mr6586171cf.28.1730473074948; Fri, 01 Nov 2024
- 07:57:54 -0700 (PDT)
+	s=arc-20240116; t=1730473695; c=relaxed/simple;
+	bh=Z6Dr2PgbqzIdIWSiIp258pot0TuM6/5gHcxvt7FOJpY=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BZImjWGmIj6asMQO1C52EShVmQ1TRhMDLqikZZ+m1kfvz6spXP4MzFm6wTJ4oxH1GNQEiuLmSaFntczmewOtvRv9og3jyiPQ+sonGE3NW2htuyWQc2Z5zMGpMBOLrMYOEE0zekIvn4XZarOIR8NO96FoX+Q0qVVTiXD5HazKkME=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
+Received: from pps.filterd (m0250811.ppops.net [127.0.0.1])
+	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A18jBJp023074;
+	Fri, 1 Nov 2024 15:07:49 GMT
+Received: from ala-exchng01.corp.ad.wrs.com (ala-exchng01.wrs.com [147.11.82.252])
+	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 42mf2e934y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
+	Fri, 01 Nov 2024 15:07:48 +0000 (GMT)
+Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
+ ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Fri, 1 Nov 2024 08:07:47 -0700
+Received: from pop-os.wrs.com (172.25.44.6) by ala-exchng01.corp.ad.wrs.com
+ (147.11.82.252) with Microsoft SMTP Server id 15.1.2507.39 via Frontend
+ Transport; Fri, 1 Nov 2024 08:07:46 -0700
+From: <Randy.MacLeod@windriver.com>
+To: <stable@vger.kernel.org>, <gregkh@linuxfoundation.org>,
+        <sashal@kernel.org>
+CC: <sherry.yang@oracle.com>, <bridge@lists.linux-foundation.org>,
+        <davem@davemloft.net>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
+        <nikolay@nvidia.com>, <roopa@nvidia.com>,
+        <linux-kernel@vger.kernel.org>, <randy.macleod@windriver.com>
+Subject: [PATCH 0/1: 5.10/5.15] net: bridge: xmit: make sure we have at least eth header len bytes
+Date: Fri, 1 Nov 2024 11:07:44 -0400
+Message-ID: <20241101150745.3671416-1-Randy.MacLeod@windriver.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-2-dw@davidwei.uk>
-In-Reply-To: <20241029230521.2385749-2-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 1 Nov 2024 07:57:43 -0700
-Message-ID: <CAHS8izOeCDKrEcE4aH=OofTJL0OGtGA5O8R9aKk1=VOb1C9kLQ@mail.gmail.com>
-Subject: Re: [PATCH v7 01/15] net: prefix devmem specific helpers
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Authority-Analysis: v=2.4 cv=K4dwHDWI c=1 sm=1 tr=0 ts=6724eec4 cx=c_pps a=/ZJR302f846pc/tyiSlYyQ==:117 a=/ZJR302f846pc/tyiSlYyQ==:17 a=eMPNgDwjIQXpT8XC:21 a=VlfZXiiP6vEA:10 a=t7CeM3EgAAAA:8 a=VwQbUJbxAAAA:8 a=ag1SF4gXAAAA:8 a=owxRARuu7T3lYmZcKXwA:9
+ a=FdTzh2GWekK77mhwV6Dw:22 a=Yupwre4RP9_Eg_Bd0iYG:22
+X-Proofpoint-GUID: BE-Q3zTQ4R7TRNS4izKP4odOP0PX-KoJ
+X-Proofpoint-ORIG-GUID: BE-Q3zTQ4R7TRNS4izKP4odOP0PX-KoJ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-01_09,2024-11-01_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 bulkscore=0
+ spamscore=0 suspectscore=0 clxscore=1011 impostorscore=0 malwarescore=0
+ priorityscore=1501 mlxscore=0 phishscore=0 lowpriorityscore=0
+ mlxlogscore=993 classifier=spam authscore=0 adjust=0 reason=mlx
+ scancount=1 engine=8.21.0-2409260000 definitions=main-2411010109
 
-On Tue, Oct 29, 2024 at 4:06=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> Add prefixes to all helpers that are specific to devmem TCP, i.e.
-> net_iov_binding[_id].
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
+From: Randy MacLeod <Randy.MacLeod@windriver.com>
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+This is my first commit to -stable so I'm going to carefully explain what I've done.
+I work on the Yocto Project and I have done some work on the Linux network
+stack a long time ago so I'm not quite a complete newbie.
+
+I took the commit found here:
+   https://lore.kernel.org/stable/20240527185645.658299380@linuxfoundation.org/
+
+and backported as per my commit log:
+   Based on above commit but simplified since pskb_may_pull_reason()
+   does not exist until 6.1.
+
+I also trimmed the original commit log of the "Tested by dropwatch" section
+as well as the full stack trace since that may have changed in 5.10/5.15 and
+It compiles fine for 5.10 and 5.15 but I have not tested with dropwatch since
+the patch is just dropping short xmit packets for bridging.
+
+Finally, since the patch is much simpler than the original, I've removed the
+original patch author's SOB line.
+
+Please let me know if any of this is not what y'all'd like to see.
+
+Randy MacLeod (1):
+  net: bridge: xmit: make sure we have at least eth header len bytes
+
+ net/bridge/br_device.c | 5 +++++
+ 1 file changed, 5 insertions(+)
+
+
+base-commit: 5a8fa04b2a4de1d52be4a04690dcb52ac7998943
+-- 
+2.34.1
+
 
