@@ -1,299 +1,322 @@
-Return-Path: <netdev+bounces-141064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46ADF9B9574
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:33:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0793A9B9579
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:33:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAAE41F21F16
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:33:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B98792828A6
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:33:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57CC1B4F23;
-	Fri,  1 Nov 2024 16:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC97B145FE0;
+	Fri,  1 Nov 2024 16:33:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b="UpkUgC/3";
-	dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b="k9ewc3K9"
+	dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b="WAqvyQ5E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+Received: from mx0b-00190b01.pphosted.com (mx0b-00190b01.pphosted.com [67.231.157.127])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4208A81741;
-	Fri,  1 Nov 2024 16:32:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=205.220.177.32
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730478775; cv=fail; b=PGJKqAOYIhgv1epFz1pCEEvKl7YPPKj5eRfJfOIRiKJXyGsnNVDPgfWoulKHAthK9BqWDwWKNb/E8aa5MvETkqW6ofzEBK55BMfK3iW7jZjk1Ycc9oL9xW+WogyqNasxz9pF8Ma6JCt1p8GhstoOE5feldlsCXDVcD0zgPL63Ro=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730478775; c=relaxed/simple;
-	bh=c+DlgEAEUJpxwysHfbxOEtLLuKkR/j5I4ynYkn+nJj4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=ryTI1/GRMNq2z1K0VrKpcrS6wOjEVRB7FEGhYSgnfqukd5fSjTnYKGao0OuGRL6T7x8Gu51oHU4///hYpxlQVPVAn2qPLA8h3uoiClGJ4qNEETS9Jrf8GVjdnkqSu3DNHs6Sk5TyyrqPoN0cbq82JNtR5QTpvei8lyyAnSmi/Zw=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com; spf=pass smtp.mailfrom=oracle.com; dkim=pass (2048-bit key) header.d=oracle.com header.i=@oracle.com header.b=UpkUgC/3; dkim=pass (1024-bit key) header.d=oracle.onmicrosoft.com header.i=@oracle.onmicrosoft.com header.b=k9ewc3K9; arc=fail smtp.client-ip=205.220.177.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=oracle.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=oracle.com
-Received: from pps.filterd (m0246631.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A1GBoQc019754;
-	Fri, 1 Nov 2024 16:27:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=cc
-	:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=corp-2023-11-20; bh=TseTCXAMulraY17I6x
-	VZDelZMEqtsNl9fVjn1LojDLY=; b=UpkUgC/3+4GPo7z/XTPEcQIsh+TO7urCjZ
-	93C1RDZ1LPCPlCCNjWUzANlZa70fDCPDT44Fg2S+SU3vanNSkiyvKlofCABa+H8B
-	7ZSLURVV00/biv9BTQcQRXLjBdcLQ3KhYglEBdmchDLLRXfNFvP7zV1S0YLHz6Tt
-	nxGEV0+F3Rf3HS7ZIMAo0uDdp4ULwIAy88o/KHkmZ47TQ9jZ/2r6hpANrj+btb5g
-	LXlyss6B16Om4EMB+p906sQvYpsTYr1zjnOGzHWAh0/1vv9XiVJIZF9kawwXQ8a/
-	dYToGhDUESm+uIo8xkvg7n31G5WMTbfPuD/mf5gJAapGwPLuBTyw==
-Received: from iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta02.appoci.oracle.com [147.154.18.20])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 42grdpcm7n-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 01 Nov 2024 16:27:22 +0000 (GMT)
-Received: from pps.filterd (iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (8.18.1.2/8.18.1.2) with ESMTP id 4A1Fua90034748;
-	Fri, 1 Nov 2024 16:27:21 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2040.outbound.protection.outlook.com [104.47.66.40])
-	by iadpaimrmta02.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 42hndbq9v5-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 01 Nov 2024 16:27:21 +0000
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=Uq+5ddi0Hwz0zR46KpeD8Q2lYRjhM+EPoJs1c2ZyRvFpx61icldE9BoNQEiPsADR0ZxPNFzRmpyhcM4jV8zRBZqaMJLdLVmAKP9ugduuLqgTWQ+W9e3LfzNlcvuklV4KkvfPXVxYhR5u9QSRYnsV7JeCX4E/PZwTKUPum6m/94uWcvixUF2EBwJHa5wDFOjY8lpvulv5zt7X8ZlOIQIwfpRPbzBt5Q0uPsh1Sqtz8jGwjK1jNYsiYPVB2tcy6EHiPZd1Jp1dAcdtKpN0OLpvp+t6ZLWqNiSnSeevsgAc0WyU1dy3BA9KJhzny1XIxk3bf2ilJbKo25fj2etBzLrIsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TseTCXAMulraY17I6xVZDelZMEqtsNl9fVjn1LojDLY=;
- b=NDqtgjKhGvuurx/gwG3KoKwJUg8xhu3/OX5YUZi0JzljOEk8/uLllU4NeRgZZyb0xxYuG4SJTU7OaCLDxBhBrncAwV2pQgEo1BcpP1NDRNtzXDe6hcYY3LcipRDh0OKxZD/GFVKPSSKnUU+eBvWiu4ei98mE2DQH0gzjrWjIFdt146DKhDEWcmAaqG/2/11kqCii/a0FnNUWlZiQTzfNE8cyNfPlagggNZI+57FKE4CMB0ANDhapbtmrsjokG+Mma1idc8xHuoSXC+iPZjjoPOmf4oCzZmysXrkqvzTsiMzz3CW7NUSHqJU5yy6N/Gj7mqiXzGlyDRrJvOUuBDieLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TseTCXAMulraY17I6xVZDelZMEqtsNl9fVjn1LojDLY=;
- b=k9ewc3K9bUBq1HtVTCLxlpVhPziPTNzVOTxNKPZtYZ4oF/9TcwNH3y9Y2OKfl4ds8cw8NzRsSyjXwEPi7WiG+SdnFaaG3tnZ40dlnUp/EpqL7lXktSEKyVmSPmBNXUd9Y4WWSFtL4vBivx71fEujxd+e1bQ/jTeREuu3oP7PmGc=
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com (2603:10b6:408:117::24)
- by DM4PR10MB6256.namprd10.prod.outlook.com (2603:10b6:8:b5::7) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8114.20; Fri, 1 Nov 2024 16:27:18 +0000
-Received: from BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::743a:3154:40da:cf90]) by BN0PR10MB5128.namprd10.prod.outlook.com
- ([fe80::743a:3154:40da:cf90%4]) with mapi id 15.20.8114.023; Fri, 1 Nov 2024
- 16:27:18 +0000
-Date: Fri, 1 Nov 2024 12:27:14 -0400
-From: Chuck Lever <chuck.lever@oracle.com>
-To: Simon Horman <horms@kernel.org>
-Cc: Ye Bin <yebin@huaweicloud.com>, trondmy@kernel.org, anna@kernel.org,
-        jlayton@kernel.org, neilb@suse.de, okorniev@redhat.com,
-        Dai.Ngo@oracle.com, tom@talpey.com, davem@davemloft.net,
-        edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-        joel.granados@kernel.org, linux@weissschuh.net,
-        linux-nfs@vger.kernel.org, netdev@vger.kernel.org, yebin10@huawei.com,
-        zhangxiaoxu5@huawei.com
-Subject: Re: [PATCH] svcrdma: fix miss destroy percpu_counter in
- svc_rdma_proc_init()
-Message-ID: <ZyUBYpOuHHHc2NoZ@tissot.1015granger.net>
-References: <20241024015520.1448198-1-yebin@huaweicloud.com>
- <20241101115511.GA1845794@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101115511.GA1845794@kernel.org>
-X-ClientProxiedBy: CH2PR17CA0018.namprd17.prod.outlook.com
- (2603:10b6:610:53::28) To BN0PR10MB5128.namprd10.prod.outlook.com
- (2603:10b6:408:117::24)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16FF214884F
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 16:33:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.157.127
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730478806; cv=none; b=j6/Xhv6CtM/O6OgyAcWHsyAFm9YsWrQoRRRt9RwTFnSx1KzTSxQv+d3NFiiift4/NOf6dDu92+sJGWd50r9VCk2WUAc4207W9q7AdMdn+ltM94+izb+rmXrkhZo5f67JvgpcYHstZ3fq2XpL/cjAPBHYOtatVzN2z2LAfqsZoSo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730478806; c=relaxed/simple;
+	bh=On8LByMUMPJ/v8jOG5Xx12HT3MaHDgMujA0M548NRpw=;
+	h=From:To:CC:Subject:Date:Message-ID:Content-Type:MIME-Version; b=QY3FzGHz99eVSWPHsJ0KP1DupRpEHXTH41bbS16DMqHZdTrKrKw2lwvjc9UZOUvRsDvdC1KIxCn3N1Nq15sPsMGNA6/Osdajv1h4aK0k7i5pyfpzI0PjLE4MlFGFpYO+Y3rKby1myC5KiIkxp9CKEpzwAo1qX/axjIXJtlDupMQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com; spf=pass smtp.mailfrom=akamai.com; dkim=pass (2048-bit key) header.d=akamai.com header.i=@akamai.com header.b=WAqvyQ5E; arc=none smtp.client-ip=67.231.157.127
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=akamai.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=akamai.com
+Received: from pps.filterd (m0050096.ppops.net [127.0.0.1])
+	by m0050096.ppops.net-00190b01. (8.18.1.2/8.18.1.2) with ESMTP id 4A18j0t4013192;
+	Fri, 1 Nov 2024 16:28:56 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=akamai.com; h=cc
+	:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=jan2016.eng; bh=Oejh6t/b8MYUhmRSIHS+
+	P9trmrqhfm0+Kt3RkzQyEFY=; b=WAqvyQ5EjwkcSyo1DRP5f7C2aT2Icobf0SR6
+	HFBpt5vuk0+2WKbYqQLnO86SKm0+vrB6+Ss02rUZh/b11AZXnp24CZ32LtfqCPWK
+	NawajE+45oX3WE+dFIq5nOH+qBunO2GNOihaJHMd+E9YLQK1nn+nGpJIF6h4GFTB
+	gnWZ0ainxMz4qduAU8xpqa7PhjokbIaiCFhKlfRoMKIk0ZAMUF9CewD7VFKYwvZo
+	/G20GVn3I580kAswEOtauIsrWuFHkJWXIST2xQCDwhRatdLYcKREZmTO9mSJJp4V
+	TuGGWTMWfI8kS2rElKx2R7/jq6c7M35C+mUk4/hIr7woWdW0JQ==
+Received: from prod-mail-ppoint8 (a72-247-45-34.deploy.static.akamaitechnologies.com [72.247.45.34] (may be forged))
+	by m0050096.ppops.net-00190b01. (PPS) with ESMTPS id 42jtj09m72-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Nov 2024 16:28:56 +0000 (GMT)
+Received: from pps.filterd (prod-mail-ppoint8.akamai.com [127.0.0.1])
+	by prod-mail-ppoint8.akamai.com (8.18.1.2/8.18.1.2) with ESMTP id 4A1GESaF020437;
+	Fri, 1 Nov 2024 12:28:55 -0400
+Received: from email.msg.corp.akamai.com ([172.27.50.207])
+	by prod-mail-ppoint8.akamai.com (PPS) with ESMTPS id 42gurwr0hx-16
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 01 Nov 2024 12:28:55 -0400
+Received: from ustx2ex-dag4mb2.msg.corp.akamai.com (172.27.50.201) by
+ ustx2ex-dag4mb8.msg.corp.akamai.com (172.27.50.207) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 1 Nov 2024 09:28:54 -0700
+Received: from ustx2ex-dag4mb2.msg.corp.akamai.com ([172.27.50.201]) by
+ ustx2ex-dag4mb2.msg.corp.akamai.com ([172.27.50.201]) with mapi id
+ 15.02.1544.011; Fri, 1 Nov 2024 09:28:54 -0700
+From: "Mortensen, Christian" <cworm@akamai.com>
+To: "davem@davemloft.net" <davem@davemloft.net>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Stackoverflow when using seg6 routes
+Thread-Topic: Stackoverflow when using seg6 routes
+Thread-Index: AQHbLHgGBbzTarS88E2nQjLK/Exe5A==
+Date: Fri, 1 Nov 2024 16:28:54 +0000
+Message-ID: <2bc9e2079e864a9290561894d2a602d6@akamai.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BN0PR10MB5128:EE_|DM4PR10MB6256:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4799cde8-3901-4e06-7417-08dcfa920da5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0ZCxtdVo0fKqPG9cewsAfk8e3trMMZ0JneO8yNeAv4z/spR2xD1C1Rj+J6ar?=
- =?us-ascii?Q?XLPDQf1t242TO/1VbcFb99jcfFhs8YRxP23CPPiiHQHMZl8zvQ65P3TwZWJr?=
- =?us-ascii?Q?IisFoh11MVBcV8tuYMBvUJninl9ClZlhqf96017vnukc+20H3gMmLlTbYktn?=
- =?us-ascii?Q?Ijpl8W1PRK5sO+Wc6q6gOas9BU5z+paLBCxY0ajdx/g7nF9UXLyXXAyZzTUK?=
- =?us-ascii?Q?kPRImCaWNNc/oS88Th4tSkd6J+BxaT5XuQR0ffDG0q1msuoZBZxO6vNusRqw?=
- =?us-ascii?Q?5HT286TDLlBGNQDWCy5BTeCmzAvOgc6Wr8KgpJsoGOUUwPHW7VpfRykkSABG?=
- =?us-ascii?Q?a3N+7zBOHG77rPAfnaUlL7K0IibS7PEUMB3Ty2XB3/bTpRpQrbswH5XQ80nP?=
- =?us-ascii?Q?NI9VEnrA6LjEhkkO217vAkwoxY0EpDIOfmPEKMlde8IZA2ZMKE2tANY8eeC/?=
- =?us-ascii?Q?BxPirjMUF2OMFHh9YUpSL0A4OsFh4qTJXqCkhLMCz59jVwIjdBxxQriySi9m?=
- =?us-ascii?Q?dPjAqFeIAkwyqKAPW0ckQHCdNTNCdaJjO5y7N1ydu/26d/mvP1Zq8do5GXFQ?=
- =?us-ascii?Q?JLbHfAnyQg6kjUu0E+rQp2hWFtT4Q/LB7np580IUrFvu6wNdzwH+EusFe+X0?=
- =?us-ascii?Q?69FjMkMsAacjKkbsWZe9Jd7wM1KNeL/lNpIIW5SJsNi0efNmm8IfY+rx3bds?=
- =?us-ascii?Q?5FB5wYGfrYhIzU5Lm+O3K+ahOblApFduOKVVmI3vcKSkdVtpMc2BhueUTWSh?=
- =?us-ascii?Q?ywrUtghTzNBmjA45qWF56AsRNm1oFi/APpzAO7sICIc72G92ueCGDGvrzoH1?=
- =?us-ascii?Q?lKYWR9LHx040FhFydNIqgydOF3t6lhjd1eKTo+6UcMTtZtBoRQiznbWiVxlh?=
- =?us-ascii?Q?ZYiAtvyqgrXkA5KDkW7N+PheJI7VP1/Ml8OdWDoF8bNDcFl5GGRSV8NO0Usy?=
- =?us-ascii?Q?RmDXcqZZWB1UelssheYEaNwB+oXeRNNPFQ+u8C/knVhFayuStxMiusW7YTD0?=
- =?us-ascii?Q?WKnidNFXYGru5WUH/sCnJ16RlehldlLY18oAPaoMFh74EnslWUq3x1SPNWi2?=
- =?us-ascii?Q?UZ22aeSaRkjAqlODNXk3eNyZtDiFa26NgQpauOcXPhQoymEEz51T2PUZtK5W?=
- =?us-ascii?Q?tkbHQCTvEXjQau80IVg/I3jUe4QQQBL7c3peRYQs/7FB0+4May4QnXyjcHAR?=
- =?us-ascii?Q?/QojZOm7jmHz9LKahUD9ZLjx6CuBJPtFIEFpbKV61paKAwnl3o3fDBq+HhfV?=
- =?us-ascii?Q?B4mFPSYqubZSo5Ll6q7nVoGiLRtBWuy31tDEUjmN2mvFZ5Xnyf0EOxvX6ppT?=
- =?us-ascii?Q?5qq1zZluzchUNY/E7dcbrjUa?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN0PR10MB5128.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rPD1aSXmtvwWnvX4dL/XPGZ7azTwEoLUh1rt3Gkb2cpUq62oWb2E+Iu80F60?=
- =?us-ascii?Q?/80gA9eZbJ0GrIXoKE0Y9SWRx+SkpnOM9QOdc30fs2ORTaIr9ibuHrSO7QJt?=
- =?us-ascii?Q?CJqdLQ9bwN5fyuIWKB0MgOKjjKfzV5wU++H8bHweYaQ3i+uF93pM4tlAaoZG?=
- =?us-ascii?Q?IZbDf3bE9FYuutpZdrJeCFAoQGZfiskVFYeMc6tUM5BUwT4PNui2gVZ4rXcU?=
- =?us-ascii?Q?GRYzUJwIZGuMgqphLMcNa1X9XMgcOEgnIKyTVvrt9OOs6bMKfvBODHMtkWD1?=
- =?us-ascii?Q?yGONhnGSyzp849gYe6IBIkdd1Ilegs7SeMqV5R1w7n3ojg4ijwg8h/kSUq+W?=
- =?us-ascii?Q?VoC67aiMYPMB2QUXbPvvh33/YK+AQ8XB7CsgU09iQVAb2iXkGN+DU7XhB/0x?=
- =?us-ascii?Q?2dwPDIbdHZQXftLMgWNFaxdSQojEZHJ2eDTUlbirukkOV75O34kMzqgKbTVk?=
- =?us-ascii?Q?PdJqD1OAnhsK0MXBYxNuIwXoFzQHHzyRDRYEfd0tc2VnlWf9OBZoxZpG+XVu?=
- =?us-ascii?Q?5cOzEFCyI+dKBlpMJm42Ps1ZS5HHKWZ2y62p7QudnRAba9z+akA60bayw7Pf?=
- =?us-ascii?Q?lnYZthT/lLfWq8nqiZGND+pihS2S+WGeCZr3Oa6oJkIQJwPD0YSD4G0EWlas?=
- =?us-ascii?Q?+c33U3401yuxqSrFftf8CbHso5i15o7fP8+Hw3K7Fyi7EMkprW4YyL5Cup4v?=
- =?us-ascii?Q?JxoqrSmXJ/uSlR7Ws4eKakidFtTEzm3sg9zUaJ/J34XpB+HZXvpZ/1iKMSTh?=
- =?us-ascii?Q?42o4wdSHpgs21a3DSHdQzxLNKqISkKuFSPOWkfELHMLN6KetHIIjJh1TQlwN?=
- =?us-ascii?Q?YAWq5NvdvSyc+ge7YnjeNepLXg5imgxWJDKERoAmFfGCh4Az45R27A7Z3kE0?=
- =?us-ascii?Q?6iteiyLQFLyH2kvwBkHO5ewQH2pyEP4lrxcXslepvoE0t1RsDQJzQ82rdwu4?=
- =?us-ascii?Q?QE7W8v9leMgfDAPCHbuHhOhs4RQdFhr+unAd7pNpPQOhB7DCBNaNFw/9IZC5?=
- =?us-ascii?Q?PZtx7MBe4f/Os2LkFQYXkmK0rWcURGrh6uFxttIaPnC72e5vTIuijlbZ3J73?=
- =?us-ascii?Q?Pge8A3mbqSxNL9EiDwRaAXyiuRLyoxlIBKVxgsEdnh1lVuElPTF+xJeB2ehM?=
- =?us-ascii?Q?1iSROQZfPANPdRGQHKrPahraXObHjnj52pwW01cz33WZyPcwtY8D0fpzC3fk?=
- =?us-ascii?Q?e5U4rL2YZZd6pDYr7BrMnS28GNoWmj+7nBWyogbnRekaBSpEYYl6nXaPaTLV?=
- =?us-ascii?Q?zz4vHY9k4grrJi5T/ID0oYGfNGSWZWuVfx9rEgdlPm/9x72zhNPwIA5WtiAB?=
- =?us-ascii?Q?0EBvIndywxP16O/oJZe3nGHekShc8ZPggwFnkSEvZLNe/hKtz/6xvzlDsfVI?=
- =?us-ascii?Q?QidTCCao11r8oUy4dninJq2jwrxgzWPrOVpEvGHrFHmNilZQ68KGVsONTcgG?=
- =?us-ascii?Q?XTK6UPc/PFljr46wNmmaRdfGo8JWJi8/49BgBdGF2NDxW9MTIPLtgH1MwBKx?=
- =?us-ascii?Q?nyKXBqUDVSZai2OVKZ3kszuR7A0IakyEv3kEe5hU9Y6MfwkS43KqmTkSjUn/?=
- =?us-ascii?Q?a3mvHzGiJ05C9YTX8w1B5I8muNfil8MryyKjVSeO?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0:
-	aaXcQzLRfz0Z3xQfMEPbUGdmXKMWY4UpvtP7CJraF0gGorF+sVsAMyVOd16S0SbNVQYsREDuRgxryU+rOFal3c0rfQTtZ48dp261h3f+5yZVvW5xCQ3NyJSjGArlmWzH+G1qidhygX+FwPouRV9pbH6NxTo1m8dkPh00/k8bH0Rn/HNAjxm/bpB7DFbG9NnUi+VOojGo5B5bXyK/8aEyH5iQw9fhbS/X6GKeBstEkjWzbhyAIZILhi2SyjIZkbfVW5VY0rw/0JzJ7hUF9Y9LYJuFH2CqcW14aLeflOEz0E5rW9GpV0GsvEIe4uLbo9CknnGsQVi0aHWuODIcLRf73PUbPb/5uEhTMVHPb8DPc9bDbe+qQbUw7ikLviLIpZdEEy/e27f9L6UuU0k7tXomMiEl7F6Vk5GS1NUv0qUHEnQuHD3iidwAxiLpAFdBZ9IO0fnK7ER2/J8mwMFQlaa8N7Y4e3kqAr3qufAv9anfzVleRHfUVKF/olZ+T38q9dJDR2hBkjRjjS2GSf1z11Cz1cTeJbLv1YGAt3benRtcN+RMoT6VBa0kY/833qAMkjBOXZYViXbDSgdawd221jwNk0HLp/jmdeJefoZD/7j4W7Q=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4799cde8-3901-4e06-7417-08dcfa920da5
-X-MS-Exchange-CrossTenant-AuthSource: BN0PR10MB5128.namprd10.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2024 16:27:18.3363
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 4lU9K3M0hvOvocmbAQeivTtinD4d5m9zHqvLRZFUumR1oa/j+YFZJ0yKyNJ99gsgF1phbFDOLW0Xtz9kBTZ4rw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR10MB6256
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-01_11,2024-11-01_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 malwarescore=0 spamscore=0
- phishscore=0 mlxscore=0 bulkscore=0 suspectscore=0 mlxlogscore=999
+ definitions=2024-11-01_10,2024-11-01_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 malwarescore=0
+ suspectscore=0 phishscore=0 bulkscore=0 spamscore=0 mlxlogscore=503
  classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2409260000
- definitions=main-2411010119
-X-Proofpoint-ORIG-GUID: XaYvWJo_OuyybAmTTp_bWLqD0vzNuqPh
-X-Proofpoint-GUID: XaYvWJo_OuyybAmTTp_bWLqD0vzNuqPh
+ definitions=main-2411010118
+X-Proofpoint-GUID: VD-26SE2sahrZJ51t5k-pb3IzMBX8mrH
+X-Proofpoint-ORIG-GUID: VD-26SE2sahrZJ51t5k-pb3IzMBX8mrH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 phishscore=0 impostorscore=0
+ bulkscore=0 malwarescore=0 adultscore=0 suspectscore=0 priorityscore=1501
+ mlxscore=0 lowpriorityscore=0 clxscore=1011 spamscore=0 mlxlogscore=328
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.19.0-2409260000
+ definitions=main-2411010120
 
-On Fri, Nov 01, 2024 at 11:55:11AM +0000, Simon Horman wrote:
-> On Thu, Oct 24, 2024 at 09:55:20AM +0800, Ye Bin wrote:
-> > From: Ye Bin <yebin10@huawei.com>
-> > 
-> > There's issue as follows:
-> > RPC: Registered rdma transport module.
-> > RPC: Registered rdma backchannel transport module.
-> > RPC: Unregistered rdma transport module.
-> > RPC: Unregistered rdma backchannel transport module.
-> > BUG: unable to handle page fault for address: fffffbfff80c609a
-> > PGD 123fee067 P4D 123fee067 PUD 123fea067 PMD 10c624067 PTE 0
-> > Oops: Oops: 0000 [#1] PREEMPT SMP KASAN NOPTI
-> > RIP: 0010:percpu_counter_destroy_many+0xf7/0x2a0
-> > Call Trace:
-> >  <TASK>
-> >  __die+0x1f/0x70
-> >  page_fault_oops+0x2cd/0x860
-> >  spurious_kernel_fault+0x36/0x450
-> >  do_kern_addr_fault+0xca/0x100
-> >  exc_page_fault+0x128/0x150
-> >  asm_exc_page_fault+0x26/0x30
-> >  percpu_counter_destroy_many+0xf7/0x2a0
-> >  mmdrop+0x209/0x350
-> >  finish_task_switch.isra.0+0x481/0x840
-> >  schedule_tail+0xe/0xd0
-> >  ret_from_fork+0x23/0x80
-> >  ret_from_fork_asm+0x1a/0x30
-> >  </TASK>
-> > 
-> > If register_sysctl() return NULL, then svc_rdma_proc_cleanup() will not
-> > destroy the percpu counters which init in svc_rdma_proc_init().
-> > If CONFIG_HOTPLUG_CPU is enabled, residual nodes may be in the
-> > 'percpu_counters' list. The above issue may occur once the module is
-> > removed. If the CONFIG_HOTPLUG_CPU configuration is not enabled, memory
-> > leakage occurs.
-> > To solve above issue just destroy all percpu counters when
-> > register_sysctl() return NULL.
-> > 
-> > Fixes: 1e7e55731628 ("svcrdma: Restore read and write stats")
-> > Fixes: 22df5a22462e ("svcrdma: Convert rdma_stat_sq_starve to a per-CPU counter")
-> > Fixes: df971cd853c0 ("svcrdma: Convert rdma_stat_recv to a per-CPU counter")
-> > Signed-off-by: Ye Bin <yebin10@huawei.com>
-> > ---
-> >  net/sunrpc/xprtrdma/svc_rdma.c | 18 +++++++++++++-----
-> >  1 file changed, 13 insertions(+), 5 deletions(-)
-> > 
-> > diff --git a/net/sunrpc/xprtrdma/svc_rdma.c b/net/sunrpc/xprtrdma/svc_rdma.c
-> > index 58ae6ec4f25b..11dff4d58195 100644
-> > --- a/net/sunrpc/xprtrdma/svc_rdma.c
-> > +++ b/net/sunrpc/xprtrdma/svc_rdma.c
-> > @@ -233,25 +233,33 @@ static int svc_rdma_proc_init(void)
-> >  
-> >  	rc = percpu_counter_init(&svcrdma_stat_read, 0, GFP_KERNEL);
-> >  	if (rc)
-> > -		goto out_err;
-> > +		goto err;
-> >  	rc = percpu_counter_init(&svcrdma_stat_recv, 0, GFP_KERNEL);
-> >  	if (rc)
-> > -		goto out_err;
-> > +		goto err_read;
-> >  	rc = percpu_counter_init(&svcrdma_stat_sq_starve, 0, GFP_KERNEL);
-> >  	if (rc)
-> > -		goto out_err;
-> > +		goto err_recv;
-> >  	rc = percpu_counter_init(&svcrdma_stat_write, 0, GFP_KERNEL);
-> >  	if (rc)
-> > -		goto out_err;
-> > +		goto err_sq;
-> >  
-> >  	svcrdma_table_header = register_sysctl("sunrpc/svc_rdma",
-> >  					       svcrdma_parm_table);
-> > +	if (!svcrdma_table_header)
-> 
-> Hi Ye Bin,
-> 
-> Should rc be set to a negative error value here,
-> as is the case for other error cases above?
-> 
-> Flagged by Smatch.
+Hi!
 
-I can add "rc = -ENOMEM;" to the applied patch.
+I can consistently reproduce a stack-overflow=A0in the kernel when using se=
+g6 routes. I was hit by the bug in a stock 5.15.0-119 Ubuntu kernel. I repr=
+oduced it in QEMU using a custom 6.11.3 kernel. I have not tried other kern=
+els.
+
+Here is output from the 6.11.3 kernel:
+
+BUG: IRQ stack guard page was hit at (____ptrval____) (stack is (____ptrval=
+____)..(____ptrval____))
+Oops: stack guard page: 0000 [#1] PREEMPT SMP PTI
+CPU: 1 UID: 0 PID: 0 Comm: swapper/1 Not tainted 6.11.3 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-debian-1=
+.16.2-1 04/01/2014
+RIP: 0010:fib_table_lookup+0x25/0x640
+Code: 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 41 57 49 89 f8 49 89 f1 41 =
+56 41 55 41 54 55 53 48 83 ec 58 48 8b 6f 28 44 8b 76 2c <89> 0c 24 48 8b 5=
+d 08 48 85 db 0f 84 82 00 00 00 49 89 d2 45 31 e4
+RSP: 0018:ffffa81e000f4fe0 EFLAGS: 00010282
+RAX: ffff940dc2d9b600 RBX: ffff940dc1d7d9c0 RCX: 0000000000000001
+RDX: ffffa81e000f5128 RSI: ffffa81e000f5158 RDI: ffff940dc2d9b600
+RBP: ffff940dc2d9b630 R08: ffff940dc2d9b600 R09: ffffa81e000f5158
+R10: ffff940dc6882200 R11: ffff940dc3360000 R12: 00000000fffffff5
+R13: ffffa81e000f5158 R14: 000000000101a8c0 R15: ffff940dc793b080
+FS:  0000000000000000(0000) GS:ffff940e79c80000(0000) knlGS:000000000000000=
+0
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffa81e000f4fd8 CR3: 000000000ce2c000 CR4: 00000000000006f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <#DF>
+ ? die+0x37/0x90
+ ? handle_stack_overflow+0x4d/0x60
+ ? exc_double_fault+0xe3/0x150
+ ? asm_exc_double_fault+0x23/0x30
+ ? fib_table_lookup+0x25/0x640
+ </#DF>
+ <IRQ>
+ ? fib_table_lookup+0x223/0x640
+ fib4_rule_action+0x7c/0xa0
+ fib_rules_lookup+0x1db/0x260
+ __fib_lookup+0x5f/0x90
+ __fib_validate_source+0x2e0/0x410
+ ? fib4_rule_action+0x84/0xa0
+ ? fib_rules_lookup+0x106/0x260
+ fib_validate_source+0x55/0x110
+ ip_route_input_slow+0x69b/0xb60
+ ip_route_input_noref+0x79/0x80
+ input_action_end_dt4+0x8c/0x180
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+
+(MANY SIMILAR LINES OMITTED)
+
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+ seg6_local_input_core+0x34/0x70
+ lwtunnel_input+0x62/0xb0
+ lwtunnel_input+0x62/0xb0
+ __netif_receive_skb_one_core+0x6b/0x80
+ process_backlog+0x8a/0x130
+ __napi_poll+0x2c/0x1b0
+ net_rx_action+0x2e6/0x350
+ ? sched_balance_domains+0xe9/0x350
+ handle_softirqs+0xc4/0x290
+ irq_exit_rcu+0x67/0x90
+ sysvec_apic_timer_interrupt+0x75/0x90
+ </IRQ>
+ <TASK>
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20
+RIP: 0010:default_idle+0xf/0x20
+Code: 4c 01 c7 4c 29 c2 e9 72 ff ff ff 90 90 90 90 90 90 90 90 90 90 90 90 =
+90 90 90 90 f3 0f 1e fa eb 07 0f 00 2d c3 26 26 00 fb f4 <fa> c3 cc cc cc c=
+c 66 66 2e 0f 1f 84 00 00 00 00 00 90 90 90 90 90
+RSP: 0018:ffffa81e000b3ef0 EFLAGS: 00000202
+RAX: ffff940e79c80000 RBX: 0000000000000001 RCX: 0000000000000000
+RDX: 0000000000000001 RSI: ffffffffb5a2e8a9 RDI: 0000000000d4f884
+RBP: ffff940dc0384000 R08: 0000000000d4f884 R09: 0000000000000000
+R10: 0000000000000001 R11: 0000000000000000 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ default_idle_call+0x30/0xf0
+ do_idle+0x1b1/0x1c0
+ cpu_startup_entry+0x29/0x30
+ start_secondary+0xf5/0x100
+ common_startup_64+0x13e/0x148
+ </TASK>
+Modules linked in: veth vrf
+---[ end trace 0000000000000000 ]---
+RIP: 0010:fib_table_lookup+0x25/0x640
+Code: 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 41 57 49 89 f8 49 89 f1 41 =
+56 41 55 41 54 55 53 48 83 ec 58 48 8b 6f 28 44 8b 76 2c <89> 0c 24 48 8b 5=
+d 08 48 85 db 0f 84 82 00 00 00 49 89 d2 45 31 e4
+RSP: 0018:ffffa81e000f4fe0 EFLAGS: 00010282
+RAX: ffff940dc2d9b600 RBX: ffff940dc1d7d9c0 RCX: 0000000000000001
+RDX: ffffa81e000f5128 RSI: ffffa81e000f5158 RDI: ffff940dc2d9b600
+RBP: ffff940dc2d9b630 R08: ffff940dc2d9b600 R09: ffffa81e000f5158
+R10: ffff940dc6882200 R11: ffff940dc3360000 R12: 00000000fffffff5
+R13: ffffa81e000f5158 R14: 000000000101a8c0 R15: ffff940dc793b080
+FS:  0000000000000000(0000) GS:ffff940e79c80000(0000) knlGS:000000000000000=
+0
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: ffffa81e000f4fd8 CR3: 000000000ce2c000 CR4: 00000000000006f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Kernel panic - not syncing: Fatal exception in interrupt
+Kernel Offset: 0x33000000 from 0xffffffff81000000 (relocation range: 0xffff=
+ffff80000000-0xffffffffbfffffff)
+
+The following script consistently reproduces the problem for me. It is prob=
+ably not minimal:
+
+#!/bin/bash
+
+# Make a network namespace
+ip netns delete network
+ip netns add network
+ip netns exec network ip link add br0 type bridge
+ip netns exec network ip link set br0 up
+
+# Setup host1:
+ip netns delete host1
+ip netns add host1
+ip netns exec network ip link add host1 type veth peer frr0 netns host1
+ip netns exec host1 ip addr add dev frr0 fe80::1
+ip netns exec host1 ip link set dev frr0 address 00:00:01:00:00:01
+ip netns exec host1 ip link set frr0 up
+ip netns exec network ip link set host1 master br0
+ip netns exec network ip link set host1 up
+ip netns exec host1 ip l set dev lo up
+ip netns exec host1 sysctl net.ipv4.ip_forward=3D1
+ip netns exec host1 sysctl net.ipv4.conf.all.rp_filter=3D0
+ip netns exec host1 sysctl net.ipv6.conf.all.forwarding=3D1
+ip netns exec host1 sysctl net.ipv4.conf.default.log_martians=3D1
+ip netns exec host1 sysctl net.vrf.strict_mode=3D1
+ip netns exec host1 ip addr add dev lo fc00::1:6:0:0:1
+ip netns exec host1 ip link add vrf9 type vrf table 1009
+ip netns exec host1 ip link set vrf9 up
+ip netns exec host1 ip r add fc00:0:0:1:7:: encap seg6local action End.DT4 =
+vrftable 1009 dev vrf9 proto bgp metric 20 pref medium
+ip netns exec host1 ip r add 192.168.2.1 encap seg6 mode encap segs fc00:0:=
+0:1:7:: via inet6 fe80::2 dev frr0 vrf vrf9
+
+# Setup pseduo-vm on host1
+ip netns delete host1_1
+ip netns add host1_1
+ip netns exec host1 ip link add vm1 type veth peer eth0 netns host1_1
+ip netns exec host1 ip link set vm1 master vrf9
+ip netns exec host1 ip link set vm1 up
+ip netns exec host1_1 ip link set eth0 up
+ip netns exec host1 sysctl net.ipv4.conf.vm1.proxy_arp=3D1
+ip netns exec host1_1 ip addr add dev eth0 192.168.1.1/16
+ip netns exec host1 ip route add 192.168.1.1/32 dev vm1 vrf vrf9
+
+# Setup host2
+ip netns delete host2
+ip netns add host2
+ip netns exec network ip link add host2 type veth peer frr0 netns host2
+ip netns exec host2 ip addr add dev frr0 fe80::2
+ip netns exec host2 ip link set dev frr0 address 00:00:01:00:00:02
+ip netns exec host2 ip link set frr0 up
+ip netns exec network ip link set host2 master br0
+ip netns exec network ip link set host2 up
+ip netns exec host2 ip l set dev lo up
+ip netns exec host2 sysctl net.ipv4.ip_forward=3D1
+ip netns exec host2 sysctl net.ipv4.conf.all.rp_filter=3D0
+ip netns exec host2 sysctl net.ipv6.conf.all.forwarding=3D1
+ip netns exec host2 sysctl net.ipv4.conf.default.log_martians=3D1
+ip netns exec host2 sysctl net.vrf.strict_mode=3D1
+ip netns exec host2 ip addr add dev lo fc00::2:6:0:0:1
+ip netns exec host2 ip link add vrf9 type vrf table 1009
+ip netns exec host2 ip link set vrf9 up
+ip netns exec host2 ip r add fc00:0:0:1:7:: encap seg6local action End.DT4 =
+vrftable 1009 dev vrf9 proto bgp metric 20 pref medium
+ip netns exec host2 ip r add 192.168.1.1 encap seg6 mode encap segs fc00:0:=
+0:1:7:: via inet6 fe80::1 dev frr0 vrf vrf9
+
+# Setup pseduo-vm on host2:
+ip netns delete host2_1
+ip netns add host2_1
+ip netns exec host2 ip link add vm1 type veth peer eth0 netns host2_1
+ip netns exec host2 ip link set vm1 master vrf9
+ip netns exec host2 ip link set vm1 up
+ip netns exec host2_1 ip link set eth0 up
+ip netns exec host2 sysctl net.ipv4.conf.vm1.proxy_arp=3D1
+ip netns exec host2_1 ip addr add dev eth0 192.168.2.1/16
+ip netns exec host2 ip route add 192.168.2.1/32 dev vm1 vrf vrf9
+ip netns exec host1_1 ip a add 192.168.254.254 dev eth0
+
+# Setup routes between host1 and host2:
+ip netns exec host1 ip -6 route add fc00:0:0:2::/64 dev frr0 nexthop via fe=
+80::2
+ip netns exec host1 ip neigh add fe80::2 lladdr 00:00:01:00:00:02 dev frr0
+ip netns exec host2 ip -6 route add fc00:0:0:1::/64 dev frr0 nexthop via fe=
+80::1
+ip netns exec host2 ip neigh add fe80::1 lladdr 00:00:01:00:00:01 dev frr0
+
+# And ping
+ip netns exec host1_1 ping 192.168.2.1
 
 
-> > +		goto err_write;
-> > +
-> >  	return 0;
-> >  
-> > -out_err:
-> > +err_write:
-> > +	percpu_counter_destroy(&svcrdma_stat_write);
-> > +err_sq:
-> >  	percpu_counter_destroy(&svcrdma_stat_sq_starve);
-> > +err_recv:
-> >  	percpu_counter_destroy(&svcrdma_stat_recv);
-> > +err_read:
-> >  	percpu_counter_destroy(&svcrdma_stat_read);
-> > +err:
-> >  	return rc;
-> >  }
-> >  
-> > -- 
-> > 2.34.1
-> > 
+Best
 
--- 
-Chuck Lever
+Christian
+
+
 
