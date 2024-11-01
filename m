@@ -1,109 +1,128 @@
-Return-Path: <netdev+bounces-140866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A889B883E
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:19:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AAB29B8840
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:19:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A2BC2823BA
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:19:15 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAECA1F220E7
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:19:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E6E3A1BA;
-	Fri,  1 Nov 2024 01:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A537D3A1BA;
+	Fri,  1 Nov 2024 01:19:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZOpVJusB"
+	dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b="o/bTmDQ5"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ua1-f53.google.com (mail-ua1-f53.google.com [209.85.222.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94014E1CA;
-	Fri,  1 Nov 2024 01:19:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05ED14436E
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 01:19:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730423951; cv=none; b=BdyiWgkDdCQa3F6Vik3EwQd4VohOztmbdUztm1hKqfvUIBajx2P5LzK7JuX1uFIKpGRMMphjhHemWsL4qHTj/NZo2+68jCwNcGryrvcpwSCkVfdo9C1djBDoMwxSk5AznFXnmjAVeh6CWS9OklmMZPwK+Xta3ygynpDuobVOG3U=
+	t=1730423983; cv=none; b=ryXOG1VpeaCKadpbExx9LVaWgEmyKz3oQi/OLMaV1CrsNjemNVq3KEmScVGRMFjBQ9PQIFjxeGDOxy8RpCTGumssW2ko8YceS9skxMjCOZYSXfoF/YIEwge7cdc73QAzAD8NfMn5c1TjvEL1WcGuoQVujrybvVjEPrRrfWoZMyE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730423951; c=relaxed/simple;
-	bh=a/BTAZOpBWmD64gqQe+NBKQnoP7/lsloauWesLVevVU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=e/6eZKQ35PtV+qYt0+vWIF5tPCJQqPU3kJFQTpjHu27I+UcwNoE9r1lSRUNLcxmnDvEX8SEPHRMaQCxBb05PM5qLhlBFuX3Bpzj1i30rLChL6ipa1Iy+6myOIZ6+/1aTpm+MUIN0mkSljQ/QRUzjReuLgHwFcwFEsnRlrU/kO/0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZOpVJusB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D94F5C4CEC3;
-	Fri,  1 Nov 2024 01:19:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730423951;
-	bh=a/BTAZOpBWmD64gqQe+NBKQnoP7/lsloauWesLVevVU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZOpVJusBDbMkB4pBTukN1gTFj0NvdsWgUwLmCerDPQGVEewMRj1Whb5KxQbdziwb4
-	 P9IY/LRsBwN+Ff5B98r0xqYJHfzgGmG8Ec7H2s+DlwBaDIlqciknz0RstOWAlpJpcq
-	 tZXgowz911Pq9lOpgSDAV5iL+YEMLbNeufjF8fEfCzAZO0WNkvmD+bvnG7geWOeJ0b
-	 BHbg/5hqngHFW8As0m7PiNeELKsN/fLY5JCyW3j6W9wf+UGsl+7fna+uWzd8TsyxZp
-	 uaf/h3Kma68z8NWh03r4ynnzGGeO5qKGDR4RoEihVx106YuwoHW1V+iLO/S5FaP3R1
-	 9i9HGT1Ek4AfA==
-Date: Thu, 31 Oct 2024 18:19:09 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Nelson Escobar via B4 Relay <devnull+neescoba.cisco.com@kernel.org>
-Cc: neescoba@cisco.com, John Daley <johndale@cisco.com>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Christian Benvenuti
- <benve@cisco.com>, Satish Kharat <satishkh@cisco.com>, Andrew Lunn
- <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Simon Horman
- <horms@kernel.org>
-Subject: Re: [PATCH net-next v2 5/5] enic: Adjust used MSI-X
- wq/rq/cq/interrupt resources in a more robust way
-Message-ID: <20241031181909.4f12b240@kernel.org>
-In-Reply-To: <20241024-remove_vic_resource_limits-v2-5-039b8cae5fdd@cisco.com>
-References: <20241024-remove_vic_resource_limits-v2-0-039b8cae5fdd@cisco.com>
-	<20241024-remove_vic_resource_limits-v2-5-039b8cae5fdd@cisco.com>
+	s=arc-20240116; t=1730423983; c=relaxed/simple;
+	bh=7hpn8HcLcK05uF7RJHNz2gNqdIUXbsjJMB13axZo1vQ=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=aFFXpVh9lRy7c3ZE8PD0g2UKOqEnLnZ+KLwQdQWB3HBhaySwdzGT/pgYiSpNRMv1wsmcBjFS6HJRIZpxS3FlsuiWKy1BjfSS3okT1guedUKNZrrbhKkrRAqhJEpXpqctTCiQPeZP4+1enfjxv2yleMHaa/aKp6dlrJFXif6EC1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com; spf=none smtp.mailfrom=kutsevol.com; dkim=pass (2048-bit key) header.d=kutsevol-com.20230601.gappssmtp.com header.i=@kutsevol-com.20230601.gappssmtp.com header.b=o/bTmDQ5; arc=none smtp.client-ip=209.85.222.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=kutsevol.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=kutsevol.com
+Received: by mail-ua1-f53.google.com with SMTP id a1e0cc1a2514c-84fdb038aaaso371605241.3
+        for <netdev@vger.kernel.org>; Thu, 31 Oct 2024 18:19:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=kutsevol-com.20230601.gappssmtp.com; s=20230601; t=1730423977; x=1731028777; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=zsPpxtjxBpROy0U81sgj+9OcCVp8X5Atrm3j2hCZcyg=;
+        b=o/bTmDQ5P0vvSbri58pq5NdNzWGzDVWbPdG0+jNIDAu+sedjglQOrSX3g1M0d/utzS
+         AI6iZtaFDOQYhrbfP3ydI13ZdrsZ4OjjNtfAKOvEwcGECiiVh1WR+EM/LxAhmwGf/Aot
+         a3tGMtgCZg3EDL0e718b8YrXexj8MxGEZ4aAncQG9Xs1lIBzBlc/x/Ec5EEQ/4ugP1aE
+         GC5+ZlDkvmapQ9XN517AW62SL7atm7mnA9sWRCJLYREa3X8ELGWETm0db13aFSa/PKy+
+         24czXYaA2gwRBiD7Uj9JFwrQMLMstaHbFQpUYXp5rh4pr88RSoJCmQ/jaK+yYzb2NHlI
+         kG6A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730423977; x=1731028777;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=zsPpxtjxBpROy0U81sgj+9OcCVp8X5Atrm3j2hCZcyg=;
+        b=mCPYmY6B8rBUXdWM/9rsTNKc/T14ugax83Se5CxJw5CYAka16Al+TfJ/P0v7Y3TFZI
+         M2mKXwVLWaKG1Dcjze+kMVMLb59thuZTzSNFjcrxH9KLiWDR697Z6FYXbw5vRkybWZs5
+         eBPPNMwqFJvrPLZ4JB+6+pu4TCKenyalaubcMNrytIawi7n4Cuh4sxnAssXISDWqZ1Q1
+         yN9nX2Vd2oOmkMaiPOcJs3WUTS7JDJsRhNNA8HtldWbvUiiPwVT2UJ8OaSvYKrfjmPj+
+         AwOeUIuv1DF3ypKy3Fx1uMhDSZABjH7NtDMbpcvql92RW65WKJVVNOPl/pojXii3hQH4
+         7xcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUP8KPmui7FmG0QKMNrhEatxfZDMYU9aSrlx+Fp2ShnkwtrVccxL46TrT5tcgWrw5jhcpchcWQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuBxxAHlITSA0CJcCMoweqsyIHl8A1qge6OuroVdmbZ0MflubU
+	eizPuMJcnMOcSifdQcGaHTtD9kKGOLGfjm1bXbN03yJYA9zmeCq7zObelG/GNCgYb1yOJkuvra3
+	jROGLfiDJXerPUJ1KwrNO8ScMmfOXAOx0di9tFw==
+X-Google-Smtp-Source: AGHT+IGhk6bzoauf+z3OsS/ViFnTwLQWVpzU9hrCB5ELls4IaWjKV5gGae/XfLi9TWNsk4NIPgkGjz8ZMlCRQ5tazqg=
+X-Received: by 2002:a05:6102:3f0d:b0:4a4:6098:1fec with SMTP id
+ ada2fe7eead31-4a962d6cbc9mr2047720137.2.1730423976771; Thu, 31 Oct 2024
+ 18:19:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-0-a8065a43c897@kutsevol.com>
+ <20241027-netcons-add-udp-send-fail-statistics-to-netconsole-v4-2-a8065a43c897@kutsevol.com>
+ <20241030184928.3273f76d@kernel.org>
+In-Reply-To: <20241030184928.3273f76d@kernel.org>
+From: Maksym Kutsevol <max@kutsevol.com>
+Date: Thu, 31 Oct 2024 21:19:26 -0400
+Message-ID: <CAO6EAnW4LwZax-UJf8s1uNS=V7FYJ6e1N3MekNjzaoyVDCO_Tg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 2/2] netcons: Add udp send fail statistics to netconsole
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Breno Leitao <leitao@debian.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-doc@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, 24 Oct 2024 18:19:47 -0700 Nelson Escobar via B4 Relay wrote:
-> To accomplish this do the following:
-> - Make enic_set_intr_mode() only set up interrupt related stuff.
-> - Move resource adjustment out of enic_set_intr_mode() into its own
->   function, and basing the resources used on the most constrained
->   resource.
-> - Move the kdump resources limitations into the new function too.
+On Wed, Oct 30, 2024 at 9:49=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Sun, 27 Oct 2024 12:59:42 -0700 Maksym Kutsevol wrote:
+> > +struct netconsole_target_stats  {
+> > +     u64_stats_t xmit_drop_count;
+> > +     u64_stats_t enomem_count;
+> > +     struct u64_stats_sync syncp;
+> > +} __aligned(2 * sizeof(u64));
+>
+> Why the alignment?
+Hi Jakub,
 
-Please try to split the pure code moves / refactors to separate
-commits, this change is quite hard to review.
+Thanks for looking into this!
 
-> +	case VNIC_DEV_INTR_MODE_MSIX:
-> +		/* Adjust the number of wqs/rqs/cqs/interrupts that will be
-> +		 * used based on which resource is the most constrained
-> +		 */
-> +		wq_avail = min(enic->wq_avail, ENIC_WQ_MAX);
-> +		rq_avail = min(enic->rq_avail, ENIC_RQ_MAX);
-> +		max_queues = min(enic->cq_avail,
-> +				 enic->intr_avail - ENIC_MSIX_RESERVED_INTR);
-> +		if (wq_avail + rq_avail <= max_queues) {
-> +			/* we have enough cq and interrupt resources to cover
-> +			 *  the number of wqs and rqs
-> +			 */
-> +			enic->rq_count = rq_avail;
-> +			enic->wq_count = wq_avail;
-> +		} else {
-> +			/* recalculate wq/rq count */
-> +			if (rq_avail < wq_avail) {
-> +				enic->rq_count = min(rq_avail, max_queues / 2);
-> +				enic->wq_count = max_queues - enic->rq_count;
-> +			} else {
-> +				enic->wq_count = min(wq_avail, max_queues / 2);
-> +				enic->rq_count = max_queues - enic->wq_count;
-> +			}
-> +		}
+Parroting examples, e.g.
+struct pcpu_lstats {
+u64_stats_t packets;
+u64_stats_t bytes;
+struct u64_stats_sync syncp;
+} __aligned(2 * sizeof(u64));
 
-I don't see netif_get_num_default_rss_queues() being used and you're
-now moving into the "serious queue count" territory. Please cap the
-default number of allocated Rx rings to what the helper returns.
--- 
-pw-bot: cr
+in netdevice.h https://github.com/torvalds/linux/blob/master/include/linux/=
+netdevice.h#L2743-L2747
+I don't have any strongly held opinion about this. I'd appreciate an
+explanation (a link would suffice) why this is a bad idea.
+
+
+> > +static void netpoll_send_udp_count_errs(struct netconsole_target *nt,
+> > +                                     const char *msg, int len)
+>
+> This is defined in the netconsole driver, it should not use the
+> netpoll_ prefix for the function name.'
+
+netconsole_send_udp_count_errs sounds better?
+
+Regards,
+Maksym
 
