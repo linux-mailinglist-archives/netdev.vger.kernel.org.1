@@ -1,144 +1,113 @@
-Return-Path: <netdev+bounces-140952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B2BA9B8D37
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:38:43 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D08129B8D39
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5734B2103E
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:38:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E1661C20FFE
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:39:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ABF156C70;
-	Fri,  1 Nov 2024 08:38:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93B1A156C70;
+	Fri,  1 Nov 2024 08:39:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FeJNe5QC"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R0RajtaQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2684087C;
-	Fri,  1 Nov 2024 08:38:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C867C15665E;
+	Fri,  1 Nov 2024 08:39:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730450316; cv=none; b=oS8QGJWlFItUbr3EHCEkluB3F8ZRnUgBtwMULoNNbi+tmiEL5l13hgFK4HcresScGOgYZPXLm7CPhuxa/q0YWWjgEcBYrZAa6J+BHU8BLl8awvpHPe66ExzbWe8zcXWI953XjpMHZKPrGjD4GzFqfVl3T71LUVn71i6bn5zU/Wo=
+	t=1730450358; cv=none; b=cyriobU2d8AlNPFjpjGDtSW5u7y/AC9jmk4ssWRO6WcW1lt1jMWvY3tYkGBxw+FQWQR9aihkNFzs99PIqnPgbem1erHQhNWDXrTlU5vOC28RC5IZTI+3aHeMKdzmzI1Yepmo/5rbZprCxO0sO1ap+/DShV+be+idhtsEccP7lU0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730450316; c=relaxed/simple;
-	bh=PhXxH3Z/ltNgwYhM5c6aEv3VTRIKKPaInCVryOk19KU=;
-	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
-	 MIME-Version:Content-Type; b=NI/IBm1Yrma6GJqH+FO6dN7P4Fv+b2w0x3KH6l7nWur4O4Y4hGUKX8s4Qo5H3s8/Il2m+OoOZaztZ03NldbEJAGBcZztqvJ23Y39qNwNzKineXcNOMLEH8QXOJNQ4tmHc4DyS88aHGG19ZZhJEYAzpzhr6oml5u08x0D3gVfkfA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FeJNe5QC; arc=none smtp.client-ip=198.175.65.17
+	s=arc-20240116; t=1730450358; c=relaxed/simple;
+	bh=iDr4q8fYZcr9ntsRwmck/+vUSSOtQ8CnR+Ua/SEe7WM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=J/kiCu8qkTqN4Z2YNm3TCMNOtr7LazEJzkAeoq4l2oFapIVUiqPypQ9F+boS2hn6/FoZkjZ+E0gNVySXY2FyA2Rb6pWzZDIfjIWVcWnIEJaksbGNTy/FbGFUvkh7yMMJWf2SrO3D7giecBA7FsoqZuPGlqtI6K/x6EVopt13Upk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R0RajtaQ; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730450314; x=1761986314;
-  h=from:date:to:cc:subject:in-reply-to:message-id:
-   references:mime-version;
-  bh=PhXxH3Z/ltNgwYhM5c6aEv3VTRIKKPaInCVryOk19KU=;
-  b=FeJNe5QC9xM9LxAVy9mlnmelVlTSlrVmRGvXVlVkRzuGrTbA+Ea9iekU
-   tOucTzd6nxP8OzIEmMrgoKuXywloV5t6JPQZL2lSFnhjHTt8J9B529IEn
-   1ru1rkrJtSmVfiaH9SYalcj2Xn1XbbRGL9GI1UQq6WUQEnIVJazyBj5U2
-   i3uMj5J9uqSeyZCYc++XD9CZf5Pj6zZfc8mPFOy4rJ7BUmkINsZ3w1kst
-   s2ZLdHmbtxxrcZirGdqITrMZsDtzvINZ7IFifQYdJ3+URxCqGuKRKTvgp
-   176kLfamckT3KNILRQJAqpLmeX3iuXc3JrM8O8+0y1+5j6j6S4ofjnBzd
-   Q==;
-X-CSE-ConnectionGUID: 4KnUsKF5Sem2LGLwX/y1Xw==
-X-CSE-MsgGUID: vaVnYYdGSKyPa7ANc/2z9Q==
-X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="30325689"
-X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
-   d="scan'208";a="30325689"
-Received: from orviesa006.jf.intel.com ([10.64.159.146])
-  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 01:38:33 -0700
-X-CSE-ConnectionGUID: 3SJb+PQpTZ+pFH8NKO3uCA==
-X-CSE-MsgGUID: jJM27wa3Qpm+88z9uC9o4A==
+  t=1730450357; x=1761986357;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=iDr4q8fYZcr9ntsRwmck/+vUSSOtQ8CnR+Ua/SEe7WM=;
+  b=R0RajtaQ2eo1uhZY57J8O+2tK2O4uf5vEL0syyftCR0LLdeFS2Ww86Mi
+   jfpUmIXhw7buAebS4/oWlVajUguUo+J3pvvc4X3n65wakEnF0b3NA8ybl
+   YlBnNVfVp5GaLGIMgY40DphbzAudNA8Y4n+4UIPyJeS8uSVyztJ98rK/K
+   sN41SY2X4Jb0eBSAMwnTCSvwt5NiM96CLWyixAIfgBpqMPP9qmc7GOmzE
+   waFSQbhPJk0S7jiBmViLTVgUhAA8x01IX3E9H+Grll7u3JbLRtnqLagPv
+   yN4oA6GQHF9nQO+vO5p+Sk0awKjIisHHDSC9kltBN9vyCDQ5qgIhy9/Zt
+   A==;
+X-CSE-ConnectionGUID: ucJkbt0pRjGJv50+I7EWOQ==
+X-CSE-MsgGUID: 8foWuz7cTHyMu7UfiUfXcw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="33902877"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="33902877"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 01:39:17 -0700
+X-CSE-ConnectionGUID: 3g15tqEWTouj4KZMoAc5fw==
+X-CSE-MsgGUID: Va+lsToYR5+wwlmUTt1sZQ==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
-   d="scan'208";a="83052207"
-Received: from oandoniu-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.38])
-  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 01:38:27 -0700
-From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
-Date: Fri, 1 Nov 2024 10:38:23 +0200 (EET)
-To: Jinjie Ruan <ruanjinjie@huawei.com>
-cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com, 
-    haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com, 
-    ricardo.martinez@linux.intel.com, loic.poulain@linaro.org, 
-    ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch, 
-    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-    pabeni@redhat.com, Netdev <netdev@vger.kernel.org>, 
-    LKML <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net v3] net: wwan: t7xx: Fix off-by-one error in
- t7xx_dpmaif_rx_buf_alloc()
-In-Reply-To: <20241101025316.3234023-1-ruanjinjie@huawei.com>
-Message-ID: <1645aca2-2231-6ac4-d8cf-eddbb16259be@linux.intel.com>
-References: <20241101025316.3234023-1-ruanjinjie@huawei.com>
+   d="scan'208";a="83713725"
+Received: from black.fi.intel.com ([10.237.72.28])
+  by orviesa008.jf.intel.com with ESMTP; 01 Nov 2024 01:39:16 -0700
+Received: by black.fi.intel.com (Postfix, from userid 1003)
+	id 28ADF1AC; Fri, 01 Nov 2024 10:39:13 +0200 (EET)
+From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Krzysztof Kozlowski <krzk@kernel.org>
+Subject: [PATCH net-next v1 1/1] nfc: mrvl: Don't use "proxy" headers
+Date: Fri,  1 Nov 2024 10:39:10 +0200
+Message-ID: <20241101083910.3362945-1-andriy.shevchenko@linux.intel.com>
+X-Mailer: git-send-email 2.43.0.rc1.1336.g36b5255a03ac
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="8323328-140363434-1730450303=:1235"
+Content-Transfer-Encoding: 8bit
 
-  This message is in MIME format.  The first part should be readable text,
-  while the remaining parts are likely unreadable without MIME-aware tools.
+Update header inclusions to follow IWYU (Include What You Use)
+principle.
 
---8323328-140363434-1730450303=:1235
-Content-Type: text/plain; charset=ISO-8859-15
-Content-Transfer-Encoding: QUOTED-PRINTABLE
+Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+---
+ drivers/nfc/nfcmrvl/uart.c | 9 +++++++--
+ 1 file changed, 7 insertions(+), 2 deletions(-)
 
-On Fri, 1 Nov 2024, Jinjie Ruan wrote:
+diff --git a/drivers/nfc/nfcmrvl/uart.c b/drivers/nfc/nfcmrvl/uart.c
+index 956ae92f7573..2037cd6d4f4f 100644
+--- a/drivers/nfc/nfcmrvl/uart.c
++++ b/drivers/nfc/nfcmrvl/uart.c
+@@ -5,11 +5,16 @@
+  * Copyright (C) 2015, Marvell International Ltd.
+  */
+ 
+-#include <linux/module.h>
+ #include <linux/delay.h>
+-#include <linux/of_gpio.h>
++#include <linux/device.h>
++#include <linux/err.h>
++#include <linux/module.h>
++#include <linux/of.h>
++#include <linux/printk.h>
++
+ #include <net/nfc/nci.h>
+ #include <net/nfc/nci_core.h>
++
+ #include "nfcmrvl.h"
+ 
+ static unsigned int hci_muxed;
+-- 
+2.43.0.rc1.1336.g36b5255a03ac
 
-> The error path in t7xx_dpmaif_rx_buf_alloc(), free and unmap the already
-> allocated and mapped skb in a loop, but the loop condition terminates whe=
-n
-> the index reaches zero, which fails to free the first allocated skb at
-> index zero.
->=20
-> Check with i-- so that skb at index 0 is freed as well.
->=20
-> Cc: stable@vger.kernel.org
-> Fixes: d642b012df70 ("net: wwan: t7xx: Add data path interface")
-> Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
-> ---
-> v3:
-> - Remove suggested-by.
-> - Use i-- to simplify the fix.
-> - Add Acked-by.
-> - Add cc stable.
-> - Update the commit message.
-> v2:
-> - Update the commit title.
-> - Declare i as signed to avoid the endless loop.
-> ---
->  drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->=20
-> diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c b/drivers/net/wwa=
-n/t7xx/t7xx_hif_dpmaif_rx.c
-> index 210d84c67ef9..7a9c09cd4fdc 100644
-> --- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
-> +++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
-> @@ -226,7 +226,7 @@ int t7xx_dpmaif_rx_buf_alloc(struct dpmaif_ctrl *dpma=
-if_ctrl,
->  =09return 0;
-> =20
->  err_unmap_skbs:
-> -=09while (--i > 0)
-> +=09while (i--)
->  =09=09t7xx_unmap_bat_skb(dpmaif_ctrl->dev, bat_req->bat_skb, i);
-> =20
->  =09return ret;
->=20
-
-Thanks.
-
-Reviewed-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
-
---=20
- i.
-
---8323328-140363434-1730450303=:1235--
 
