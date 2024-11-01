@@ -1,135 +1,87 @@
-Return-Path: <netdev+bounces-140871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 299E59B8877
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:28:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 159169B887A
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:29:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5B6E11C21D95
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:28:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8AB15B21C28
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:29:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29E8B12BF02;
-	Fri,  1 Nov 2024 01:27:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5BD941C94;
+	Fri,  1 Nov 2024 01:28:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ge4G7QvN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RcXoHLfr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f178.google.com (mail-yb1-f178.google.com [209.85.219.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB0D126BF9;
-	Fri,  1 Nov 2024 01:27:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9358522097;
+	Fri,  1 Nov 2024 01:28:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730424441; cv=none; b=e6gk7bYsY+2XV19kRg34dgEf/09xjhiOGLWIoHn6ZabYvZkdPMhRej1MyHnOe25x5/0Htwr3UbwIZWoY2moC8h0phIEgEd/JMM4rJRLx7pJkwRVQsr5aRQPb2gyZrhqjKRbKKbvZNMrVVCjbZvASwXws2H7mxCbyxOs1nd5um1o=
+	t=1730424539; cv=none; b=HEOHOj9ggjS8RPRPew6D/FFxip+MpRJc5ozgRrqi9bxw1EYVVTfqo91g+TPMjCHmWfmUt3cQYNMd7V3XBnUuWvfFsYcLm3bKxfvyX8GtTrMvbBWF6pJ5LUcAWh7lThzwgAibpTFRgHqoWdyqfWDG1wuRBQb21SKJK6P7DrQW+nQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730424441; c=relaxed/simple;
-	bh=cYghth004Y+ziI1BLYjIHoNPT69vX2DPR9UgmOHO1Lg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=lO8c5P2oDnQQONGdn+lhHwG1zZR8DOHPALi5aBBPDJp9F7G8/lX+RpShR92LDO6YpepznVY1QR3+3vgP0E0g7kMSlqaCaTqFAoI77jcJc5B97BmXQfhThXBXggmGZlqSgLVVPZCWCdnk8lxYznmB5zdRPqlgV+F5rltmzRL3e/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ge4G7QvN; arc=none smtp.client-ip=209.85.219.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f178.google.com with SMTP id 3f1490d57ef6-e30d517c82fso1481134276.1;
-        Thu, 31 Oct 2024 18:27:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730424434; x=1731029234; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=7lAHS3y97L28G0aqvaaMnejRHt9hiLKd7Y1LDM5wK9g=;
-        b=Ge4G7QvNm/sKujScEJWsThrAZDPKwg+rW3eZHf0sB5mF7mNwRS8jKWbthMDc8HzpyN
-         tif9QgCjsG3Ptrd6Bun7vGlTY5AqQYf6Q7Wq4BacIlY2CsLZuL/pbsOCIIQGMjhzF663
-         xxxuvgB0M1G2uJJ+4nn3u7xI2Rgqf9KJnhXgvGW94QqoOYiu9duxZktZuDUYN8BGQtGg
-         cg0gnfVQXzHHWRTsdm0JebbtZ2iiA3dts5LhQf0fI7rfk3oZQh7cvzPyyAl3MWqjDrLW
-         oiRhPIJ7yogsEFyjTcfcTmX8riLkDia8KrCrp+haNJM6IO1HLlbE6KeJ8F6hsDn31iH5
-         NVCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730424434; x=1731029234;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=7lAHS3y97L28G0aqvaaMnejRHt9hiLKd7Y1LDM5wK9g=;
-        b=Ez9R4Xkju+av9gZPscvVgyiqR7AAd2BYQ5bxlvmiHVNm0nDsgCE2IXNFt73C8B61j4
-         zWehc5xJpa5nL4vq+pTf5xjiWplsQh5dztFwDthC4pE2Zg2ys0QAFbxd7p1BMu9mRjQa
-         shgFVLvhZdm4ZiCL77v+0jnR+Bs4/vOXKCE2WQ0jz0a4bGzqiMq6ftchhc0HNMpRMm+U
-         zDdljsPAOEzVJ5EysOZiso55O8nEXs14b66moakSn7XeuLaMwKYddUyJTWcC8zfiCu0M
-         /AFax6sFtoMSoFGB6yAurfGBgpIqpliuEEKZr48f/EhRyv99O0sZY/aZwfiowgBb+EoP
-         J0wQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUeVymQQ0YCkoOIU7klKuDvvTXqwXHSujyYANoQ86LkjVfjz7l+HMM5tvbiUIWLnpQUp9xSv/5bYGI=@vger.kernel.org, AJvYcCWmIbO0zNay229M8bEQxBZx7x6dfKoXMkyc6APtB7IhelnokAFtbjFmwmFijqGT5rBmc180+G5K@vger.kernel.org
-X-Gm-Message-State: AOJu0YyvXywOAo47WMV63VbzOqYJr3pgwxAcuJPV3G1qMGA1OxFK3nrC
-	byz14Y+8ZeioOQf1VIwouu6DmkXC83rjAANvsZozMfGLXwQLd+6baHN8Fsqd8FdGrE8wiZz63uv
-	Fr0onWMcdXObZyVEIlfYbV/jwwHg=
-X-Google-Smtp-Source: AGHT+IGgOyf/FE7RVpDG/63tQRhq0RMkbFVHW5BJNl4qMsmU0kjBVtbc36vacNxnK1zCbPGbHplDYswMI2TPIHpFJ1c=
-X-Received: by 2002:a05:690c:dc6:b0:6e2:1626:fc24 with SMTP id
- 00721157ae682-6ea3b87e144mr123565037b3.7.1730424434204; Thu, 31 Oct 2024
- 18:27:14 -0700 (PDT)
+	s=arc-20240116; t=1730424539; c=relaxed/simple;
+	bh=Ro2wOnPsRBt1diTGU2M/zs+SVAUDM/F0zIV7WcyhoOo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pf4PZ5NIdx5aOM9ssc3xox7a5H38uYBh6bG5XNWOm+Wf76HWYKssVv1/mlDGOozl79UHCntPUZxs7dkQY0vU3DAIQsimn/9EnOv2Uit77MUy2WKSLcoaKGlXtBl4FGTbp/uC5keiH5mH+CqcLnzQ2mk5xvUdp/SVt0oAvpacTjo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RcXoHLfr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5884FC4CEC3;
+	Fri,  1 Nov 2024 01:28:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730424539;
+	bh=Ro2wOnPsRBt1diTGU2M/zs+SVAUDM/F0zIV7WcyhoOo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RcXoHLfrE4SHFihNod53epyWLW6w0+i/KjDQeTCK6ybU5wXh40KCO6DTH15306zza
+	 LDuTQ8a+w280Q6vfB+lJVnbnwm3pfDqWQwteSgEfyDf5WpFcQgC6dqTALen/MqPZ7j
+	 5BOmLI09f1+knZEyZweyOQIP4FUEc29qGKfJeRKJj9lug7Syax1zixlO87daGq6OYu
+	 qmbWCr2R3JWdM1gqFGPMKcGZSxilJYjm+wIQVle4uIwKtxoif0RwmfsDKmHM3U7AJ9
+	 5GWKKFcv5Dzjb7qTjjXAcy5KsIUPg0zd5mts4bnWOi/Nmrm8v0ne4zqtCcdUPKxMAS
+	 sj5oPd56PAp2w==
+Date: Thu, 31 Oct 2024 18:28:57 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davej@codemonkey.org.uk, vlad.wing@gmail.com,
+ max@kutsevol.com, kernel-team@meta.com, jiri@resnulli.us, jv@jvosburgh.net,
+ andy@greyhouse.net, aehkn@xenhub.one, Rik van Riel <riel@surriel.com>, Al
+ Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH net-next 2/3] net: netpoll: Individualize the skb pool
+Message-ID: <20241031182857.68d41c6f@kernel.org>
+In-Reply-To: <20241025142025.3558051-3-leitao@debian.org>
+References: <20241025142025.3558051-1-leitao@debian.org>
+	<20241025142025.3558051-3-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-5-tmyu0@nuvoton.com>
- <20241024-fluffy-fearless-wapiti-d48c1a-mkl@pengutronix.de>
-In-Reply-To: <20241024-fluffy-fearless-wapiti-d48c1a-mkl@pengutronix.de>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 1 Nov 2024 09:27:03 +0800
-Message-ID: <CAOoeyxURx_bPkeetymUJ6v1Ne0CjEnX0wMm76q670SD-HbMwYw@mail.gmail.com>
-Subject: Re: [PATCH v1 4/9] can: Add Nuvoton NCT6694 CAN support
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, mailhol.vincent@wanadoo.fr, 
-	linux-can@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Dear Marc,
+On Fri, 25 Oct 2024 07:20:19 -0700 Breno Leitao wrote:
+> The current implementation of the netpoll system uses a global skb pool,
+> which can lead to inefficient memory usage and waste when targets are
+> disabled or no longer in use.
+> 
+> This can result in a significant amount of memory being unnecessarily
+> allocated and retained, potentially causing performance issues and
+> limiting the availability of resources for other system components.
+> 
+> Modify the netpoll system to assign a skb pool to each target instead of
+> using a global one.
+> 
+> This approach allows for more fine-grained control over memory
+> allocation and deallocation, ensuring that resources are only allocated
+> and retained as needed.
 
-Thank you for your comments,
+If memory consumption is a concern then having n pools for n targets
+rather than one seems even worse? 
 
-> > +static struct platform_driver nct6694_canfd_driver = {
-> > +     .driver = {
-> > +             .name   = DRVNAME,
-> > +     },
-> > +     .probe          = nct6694_canfd_probe,
-> > +     .remove         = nct6694_canfd_remove,
-> > +};
-> > +
-> > +static int __init nct6694_init(void)
-> > +{
-> > +     int err;
-> > +
-> > +     err = platform_driver_register(&nct6694_canfd_driver);
-> > +     if (!err) {
->             ^^^^
-> > +             if (err)
->                     ^^^
->
-> This look wrong.
->
-> > +                     platform_driver_unregister(&nct6694_canfd_driver);
->
-> Why do you want to unregister if registering fails?
->
-> > +     }
-> > +
-> > +     return err;
-> > +}
-> > +subsys_initcall(nct6694_init);
-> > +
-> > +static void __exit nct6694_exit(void)
-> > +{
-> > +     platform_driver_unregister(&nct6694_canfd_driver);
-> > +}
-> > +module_exit(nct6694_exit);
->
-> Can you use
->
-> | module_platform_driver(nct6694_canfd_driver);
->
-
-I will modify platform driver registration to use module_platform_driver()
-in the next patch.
-
-Best regards
-Ming
+Is it not better to flush the pool when last target gets disabled?
 
