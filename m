@@ -1,135 +1,287 @@
-Return-Path: <netdev+bounces-141057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9AD559B94C7
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:55:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC23E9B94F6
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:09:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5763D282F82
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:55:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A8C51C20C68
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDBF1C8FCF;
-	Fri,  1 Nov 2024 15:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A0721C82F3;
+	Fri,  1 Nov 2024 16:09:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Twz+bMkd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iV1KUAZA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+Received: from mail-il1-f171.google.com (mail-il1-f171.google.com [209.85.166.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8238C1C761F
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 15:55:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C143213D893;
+	Fri,  1 Nov 2024 16:09:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730476550; cv=none; b=Hwx4C1tU8J9/6Kte8Md1RSGoqPMx3s+KUcpf4xrfTTEZM4Q7XsF3BaG6jYcyzyC66b2YaIX4g9a+RcY/AmKVz2o/xriRVSExJtYjw7ToMEFJxJxiWPA52w9hPAX7bLFa5u35V2k4TMuPJCkuLsNxBXYFQD8Dch6BKPYBnRYLw2w=
+	t=1730477343; cv=none; b=ZdrDAPcaI4WQTwoenrABggvawNmSmIJ/GcJISiQWlLd5d9B5qvDRokJo6FxEM9FlLJXMzTtBjFjJfNePgL3QPvyErDp25OZHazxHuzAIJEEyeNK4+cp29L3qntqHNNMvvuVJ9BsARaR4ktZqm+sRR4HF4d6Hs2xxqY/w9Xj/XFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730476550; c=relaxed/simple;
-	bh=4uAD9jOOqXaCa32oc6A+GDRWQpHNHx04sARiGTc2Qu4=;
+	s=arc-20240116; t=1730477343; c=relaxed/simple;
+	bh=DuJvo8Yva15bmGKXj45TxpTCAbD3oqzYnfzTgaO54DU=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L7axvwErUwoUeEHqiAHWHXWQ/mYgzKe8VxJm/es5KO3yDjO0M9nRC+u0VS3aRUwF21tvVI90DH+27JvyoaXzv2/3Ld/urA0u/DdpvUwoAYont40Hy/dorFrBGRexuQG/YTKKh0A5hDxJ2G7gRAlyRxudSTdgiAihnvFFcJN+q1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Twz+bMkd; arc=none smtp.client-ip=209.85.216.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e2fb304e7dso1684925a91.1
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 08:55:47 -0700 (PDT)
+	 To:Cc:Content-Type; b=mdjaNznydP/+vIShrMlgC6BJv/u6SInJTkEVasbOHj+/ALAdrWuUz64x4S/25k1KzaPwssjUF4AjYHtVppQcSkSHS0ZhjQ4DzDe8xGRu7udnqvaBs9bn81M0MoAmcQHkUQpVb5/nb9ECfM2LDMb5MRiv2RhBI7IOeTttTK5v2Dk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iV1KUAZA; arc=none smtp.client-ip=209.85.166.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f171.google.com with SMTP id e9e14a558f8ab-3a3b463e9b0so7994035ab.3;
+        Fri, 01 Nov 2024 09:09:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730476547; x=1731081347; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730477339; x=1731082139; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qLBlsEZQifedxSMlNM71vQWvxRSeWYs3fggN7cWB9ls=;
-        b=Twz+bMkdAKNON9eZpqP/2UcRFv1nUm4omV0TdAHf3tm3AJPFpHcHsUFngDloahHqyq
-         LVeF7djHyFvHYcig5dDo0bbtUfskSWDC7HEwx0tjEtbEZMaMJQJLCE1vMcmFLu5MKoLg
-         864UBVpfgwWRlbwjDA5UtNg/CD3SB3cZW/eu4rwOTmNgUbKB0HYUestcDDv3gkObmq97
-         WFBVjj6BpGlKtPVa5adTIxxJUcIENiUi9xpOqDNr7mnoOwSkGLq4Uv+NQeO08eUecxKv
-         1u3A4DmynbELs7Xj5znoS1CUgtjvURcqI5fmD3YRbRnN4rJsUeu+9J7ggO/AdYk9Izgb
-         nMlg==
+        bh=MZ4NHM16bbIRrVd9VqhHjGsKf/Jn4VNPbsUSmm5pHA0=;
+        b=iV1KUAZAcfA+wyqh7bRW/QBwLrPMB23GKWCNUvp20vNWJXKom17R6xnzuQhXHrOjBl
+         7baZNBxfQzU6j0LRMvLyoxa3+2Zg7r3J4NrUxJWwHwkmoFqaesSdagAxHGJatumOvZWf
+         +3u/BhdThsRF4WpBS+64wrYzJml55zbNbECh1b6GYwJi0zNFRLTtfc+FxGRfALbBHYxp
+         M0YtK7IbB0Zls7x7k7mC6ieRMImKflhHcMGRrsdpkDLvN8Np6CFcsgYG1LRHYmK1wekY
+         gjfXocP17K3vtCNKK3+H5pLGxXMf8mEtdlxMxPAptfuQvV/C+gKnZNtdgEM0FRPnB8Vk
+         VYKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730476547; x=1731081347;
+        d=1e100.net; s=20230601; t=1730477339; x=1731082139;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qLBlsEZQifedxSMlNM71vQWvxRSeWYs3fggN7cWB9ls=;
-        b=ruyQMEyX/1z9DyXhZzDK5IAd0NSDa2PiPI7QNiXIfYEhPqC975lE4xgEMUV5aTlUWw
-         Ar2RRFtnRk5fBke2RRCJVzle2HYc7DmRaDE7Yb6IXFpVtvJWG4LvY8GYjVmgp3JbmLuU
-         D7MKzgHomm4TWSqdffjG4NHRHsS+zy8Uf7/4i8ygXX8RRdGnBz8/qULjdKv2FtMQ8NJR
-         KS0hpCIE9i5cOrbNniv9qTc4Chw5SPSfCWtoUhZz7yjMqj2S1aWp9qusXmt1mHE2Mix5
-         OWct73zs/nTKPYbRtmlNjkXxOD6VxDMQO5qpfA9VTXM7pr+onEi/5+OYraQa9OPYBSeo
-         UIWQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXp+3NcuWoiePwCoswNNDSTUnAZ3hGioUa1HXvjv505QF6dXkta9hk7jSIvAMp2w3CS+cM78n4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyl120Kh9FooWgjmJ2TCOXA0ZgEAKAQRzlxnTL+oBScDLEp+0/m
-	Buum2AKHXIWpa8ygIw94ElN1BqHktR5xXt/ebbsARX5CMSI05x2+bnNvWPXmygmu3BxItQ3WExx
-	IDYcQPDm2xH6RqigZLM/XZoxsQSgQ82z2aX0B
-X-Google-Smtp-Source: AGHT+IHMRbP5nE3OD/sTxFNgEl4A+Ix91K3szIsn26YzRn5L7WbY5jaruHKUNjBpS/XhaoJn/vvvjAV9HGaLKjL/bmk=
-X-Received: by 2002:a17:90a:d14f:b0:2e2:bb32:73eb with SMTP id
- 98e67ed59e1d1-2e8f10a72a3mr26553959a91.31.1730476546681; Fri, 01 Nov 2024
- 08:55:46 -0700 (PDT)
+        bh=MZ4NHM16bbIRrVd9VqhHjGsKf/Jn4VNPbsUSmm5pHA0=;
+        b=b2vU6dgGY7sAZQLyaoEVg2Zq8vnvlJQDTjpvM5Bw/cS7PTz8esrg4u9Ok8L9CX00bc
+         63nCQmq2ikvRnFh2exXVCIg86GEBiHzHWDIZ7PngC+lOrm1Uacx0x6N4yqMF5X5t/iU8
+         2uogPjbz96axT791lfNAhjLz+Tvqpjzu2lQ62cJJeLPzFtzrDqOmQ1pF/kW/UWlsYTCJ
+         P7AmqkI13bgggI8nwBXAalGeAPeJA8DN92Trz+2w2nga2K51JXPFWqalb6UJquwVZVtD
+         HDWbZciCicmJuKyRX2CyCID0AbAXI8C88ItoD8vy+0vX3QxS8mtSR3BVaNNtPhuxk2cO
+         UYNA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSUMsHjMM8bk/H40z4vOJrzuHUdKH1SOYh9eL2GjbEucFzoWdOt6Gs74QEdJW1N7OnGEI=@vger.kernel.org, AJvYcCWdv8Da4Swb11/bn3iclbF0FJntDid1QOwJHqc/fKXqEbjZhv5gcHYV6rh5Fr/9yQx26fFg92V/@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzs0A612vTTSBfal4YVOV4nDY40d/px7sd/Kr6QwCKq5gEtoAzl
+	JpSewrhm01PyQSIjIrEn6lezAqSMBo89sUdiIVO4WA9COKtl9x0FkhKLBOvC2eqX++AH+RbmaE5
+	oLQUJO05d+aZDA9PBpap8U5Ld8qs=
+X-Google-Smtp-Source: AGHT+IGSnbSqxDDsGi3A+nZ8EAi1lbQp8ca5FHritB76Q+WZUughbLGzgck1oxzE+DwTYTZTH2ZEcU69POaS+tLQbjw=
+X-Received: by 2002:a05:6e02:154a:b0:3a6:acdf:1a19 with SMTP id
+ e9e14a558f8ab-3a6acdf1e12mr57236425ab.18.1730477339481; Fri, 01 Nov 2024
+ 09:08:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <671756af.050a0220.10f4f4.010f.GAE@google.com> <20241022142901.GA13306@ziepe.ca>
-In-Reply-To: <20241022142901.GA13306@ziepe.ca>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Fri, 1 Nov 2024 16:55:32 +0100
-Message-ID: <CANp29Y534CT0jqhp5LQi_ZCs=1_i4duRO=4CJ52by9ZDW-1Wfw@mail.gmail.com>
-Subject: Re: [syzbot] [rdma?] INFO: task hung in add_one_compat_dev (3)
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: syzbot <syzbot+6dee15fdb0606ef7b6ba@syzkaller.appspotmail.com>, leon@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev> <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
+ <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev> <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+ <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev> <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+ <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch> <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
+ <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev> <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+In-Reply-To: <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Sat, 2 Nov 2024 00:08:23 +0800
+Message-ID: <CAL+tcoDyvAcwxdsOWfWoJ-ZJ=kMXdw-XM2BDC+_tJO+Eudg3jg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, willemb@google.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
+	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
+	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
+	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
+	shuah@kernel.org, ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-Hi Jason,
+On Fri, Nov 1, 2024 at 9:32=E2=80=AFPM Willem de Bruijn
+<willemdebruijn.kernel@gmail.com> wrote:
+>
+> Martin KaFai Lau wrote:
+> > On 10/31/24 6:50 AM, Jason Xing wrote:
+> > > On Thu, Oct 31, 2024 at 8:30=E2=80=AFPM Willem de Bruijn
+> > > <willemdebruijn.kernel@gmail.com> wrote:
+> > >>
+> > >> Jason Xing wrote:
+> > >>> On Thu, Oct 31, 2024 at 2:27=E2=80=AFPM Martin KaFai Lau <martin.la=
+u@linux.dev> wrote:
+> > >>>>
+> > >>>> On 10/30/24 5:13 PM, Jason Xing wrote:
+> > >>>>> I realized that we will have some new sock_opt flags like
+> > >>>>> TS_SCHED_OPT_CB in patch 4, so we can control whether to print or
+> > >>>>> not... For each sock_opt point, they will be called without carin=
+g if
+> > >>>>> related flags in skb are set. Well, it's meaningless to add more
+> > >>>>> control of skb tsflags at each TS_xx_OPT_CB point.
+> > >>>>>
+> > >>>>> Am I understanding in a correct way? Now, I'm totally fine with t=
+his great idea!
+> > >>>> Yes, I think so.
+> > >>>>
+> > >>>> The sockops prog can choose to ignore any BPF_SOCK_OPS_TS_*_CB. Th=
+e are only 3:
+> > >>>> SCHED, SND, and ACK. If the hwtstamp is available from a NIC, I th=
+ink it would
+> > >>>> be quite wasteful to throw it away. ACK can be controlled by the
+> > >>>> TCP_SKB_CB(skb)->bpf_txstamp_ack.
+> > >>>
+> > >>> Right, let me try this:)
+> > >>>
+> > >>>> Going back to my earlier bpf_setsockopt(SOL_SOCKET, BPF_TX_TIMESTA=
+MPING)
+> > >>>> comment. I think it may as well go back to use the "u8
+> > >>>> bpf_sock_ops_cb_flags;" and use the bpf_sock_ops_cb_flags_set() he=
+lper to
+> > >>>> enable/disable the timestamp related callback hook. May be add one
+> > >>>> BPF_SOCK_OPS_TX_TIMESTAMPING_CB_FLAG.
+> > >>>
+> > >>> bpf_sock_ops_cb_flags this flag is only used in TCP condition, righ=
+t?
+> > >>> If that is so, it cannot be suitable for UDP.
+> > >>>
+> > >>> I'm thinking of this solution:
+> > >>> 1) adding a new flag in SOF_TIMESTAMPING_OPT_BPF flag (in
+> > >>> include/uapi/linux/net_tstamp.h) which can be used by sk->sk_tsflag=
+s
+> >
+> > probably not in include/uapi/linux/net_tstamp.h. This flag can only be =
+used by a
+> > bpf prog (meaning will not be used by user space syscall). More below.
+> >
+> > >>> 2) flags =3D   SOF_TIMESTAMPING_OPT_BPF;    bpf_setsockopt(skops,
+> > >>> SOL_SOCKET, SO_TIMESTAMPING, &flags, sizeof(flags));
+> > >>> 3) test if sk->sk_tsflags has this new flag in tcp_tx_timestamp() o=
+r
+> > >>> in udp_sendmsg()
+> > >>> ...
+> >
+> > Not sure how many churns/audits is needed to ensure the user space cann=
+ot
+> > set/clear the SOF_TIMESTAMPING_OPT_BPF bit in sk->sk_tsflags. Could be =
+not much.
+>
+> Stores are limited to defined bits with the following in
+> sock_set_timestamping
+>
+>         if (val & ~SOF_TIMESTAMPING_MASK)
+>                 return -EINVAL;
+>
+> > May be it is cleaner to leave the sk->sk_tsflags for user space only an=
+d having
+> > a separate field in "struct sock" to track bpf specific needs. More lik=
+e your
+> > current sk_tsflags_bpf approach but I was thinking to reuse the
+> > bpf_sock_ops_cb_flags instead. e.g. "BPF_SOCK_OPS_TEST_FLAG(tcp_sk(sk),
+> > BPF_SOCK_OPS_WRITE_HDR_OPT_CB_FLAG)" is used to check if it needs to ca=
+ll a bpf
+> > prog to decide if it needs to add tcp header option. Here we want to te=
+st if it
+> > should call a bpf prog to make a decision on tx timestamp on a skb.
+> >
+> > The bpf_sock_ops_cb_flags can be moved from struct tcp_sock to struct s=
+ock. It
+> > is doable from the bpf side.
+> >
+> > All that said, but, yes, it will add some TCP specific enum flag (e.g.
+> > BPF_SOCK_OPS_RTO_CB_FLAG) to the struct sock which will not be used by
+> > UDP/raw/...etc, so may be keep your current sk_tsflags_bpf approach but=
+ rename
+> > it to sk_bpf_cb_flags in struct "sock" so that it can be reused for oth=
+er non
+> > tstamp ops in the future? probably a u8 is enough.
+> >
+> > This optname is used by the bpf prog only and not usable by user space =
+syscall.
+> > If it prefers to stay with bpf_setsockopt (which is fine), it needs a b=
+pf
+> > specific optname like the current TCP_BPF_SOCK_OPS_CB_FLAGS which curre=
+ntly sets
+> > the tp->bpf_sock_ops_cb_flags. May be a new SK_BPF_CB_FLAGS optname for=
+ setting
+> > the sk->sk_bpf_cb_flags, like bpf_setsockopt(skops_ctx, SOL_SOCKET,
+> > SK_BPF_CB_FLAGS, &val, sizeof(val)) and handle it in the sol_socket_soc=
+kopt()
+> > alone without calling into sk_{set,get}sockopt. Add a new enum for the =
+optval
+> > for the sk_bpf_cb_flags:
+> >
+> > enum {
+> >       SK_BPF_CB_TX_TIMESTAMPING =3D (1 << 0),
+> >       SK_BPF_CB_RX_TIEMSTAMPING =3D (1 << 1),
+> > };
+> >
+> > >>
+> > >> On using the raw seqno: this data is accessible to anyone root in
+> > >> namespace (ns_capable) using packet sockets, so as long as it does n=
+ot
+> > >> open to more than that, it is logically equivalent to the current
+> > >> setting.
+> > >>
+> > >> With seqno the BPF program has to be careful that the same seqno can
+> > >> be retransmitted, so for instance seeing an ACK before a (second) SN=
+D
+> > >> must be anticipated. That is true for SO_TIMESTAMPING today too.
+> >
+> > Ah. It will be a very useful comment to add to the selftests bpf prog.
+> >
+> > >>
+> > >> For datagrams (UDP as well as RAW and many non IP protocols), an
+> > >> alternative still needs to be found.
+> >
+> > In udp/raw/..., I don't know how likely is the user space having "cork-=
+>tx_flags
+> > & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflags) &
+> > SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" set.
+>
+> This is not something to rely on. OPT_ID was added relatively recently.
+> Older applications, or any that just use the most straightforward API,
+> will not set this.
+>
+> > If it is
+> > unlikely, may be we can just disallow bpf prog from directly setting
+> > skb_shinfo(skb)->tskey for this particular skb.
+> >
+> > For all other cases, in __ip[6]_append_data, directly call a bpf prog a=
+nd also
+> > pass the kernel decided tskey to the bpf prog.
+> >
+> > The kernel passed tskey could be 0 (meaning the user space has not used=
+ it). The
+> > bpf prog can give one for the kernel to use. The bpf prog can store the
+> > sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add one to t=
+he struct
+> > sock. The bpf prog does not have to start from 0 (e.g. start from U32_M=
+AX
+> > instead) if it helps.
+> >
+> > If the kernel passed tskey is not 0, the bpf prog can just use that one
+> > (assuming the user space is doing something sane, like the value in
+> > SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_MAX). I =
+hope this
+> > is very unlikely also (?) but the bpf prog can probably detect this and=
+ choose
+> > to ignore this sk.
+>
+> If an applications uses OPT_ID, it is unlikely that they will toggle
+> the feature on and off on a per-packet basis. So in the common case
+> the program could use the user-set counter or use its own if userspace
+> does not enable the feature. In the rare case that an application does
+> intermittently set an OPT_ID, the numbering would be erratic. This
+> does mean that an actively malicious application could mess with admin
+> measurements.
+>
 
-On Tue, Oct 22, 2024 at 4:29=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrot=
-e:
->
-> On Tue, Oct 22, 2024 at 12:39:27AM -0700, syzbot wrote:
->
-> > 1 lock held by syz-executor/27959:
-> >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/=
-rtnetlink.c:79 [inline]
-> >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: __rtnl_newlink net/=
-core/rtnetlink.c:3749 [inline]
-> >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_newlink+0xab7/=
-0x20a0 net/core/rtnetlink.c:3772
->
-> There is really something wrong with the new sykzaller reporting, can
-> someone fix it?
->
-> The kernel log that shows the programs:
->
-> https://syzkaller.appspot.com/x/log.txt?x=3D10d72727980000
->
-> Doesn't have the word "newlink"/"new"/"link" etc, and yet there is an
-> executor clearly sitting in a newlink netlink callback when we
-> crashed.
+Sorry, I got lost in this part. What would you recommend I should do
+about OPT_ID in the next move? Should I keep those three OPT_ID
+patches?
 
-These are likely coming from the network devices initialization code.
-When syzbot spins up a new syz-executor, it creates a lot of
-networking devices as one of the first steps.
-https://github.com/google/syzkaller/blob/f00eed24f2a1332b07fef1a353a4391339=
-78d97b/executor/common_linux.h#L1482
-
-So those syz-executors might have just been unable to start and then
-they were abandoned (?)
-
->
-> We need to see the syzkaller programs that are triggering these issues
-> to get ideas, and for some reason they are missing now.
-
-Once syzbot manages to find a reproducer, hopefully things will become
-more clear.
-
---=20
-Aleksandr
-
->
-> Jason
->
+Thanks,
+Jason
 
