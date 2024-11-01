@@ -1,175 +1,166 @@
-Return-Path: <netdev+bounces-141108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0060D9B9945
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:15:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5F889B9949
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:17:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63139284227
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:15:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2360C1C20F6F
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AC31D07AA;
-	Fri,  1 Nov 2024 20:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19FC31CCB21;
+	Fri,  1 Nov 2024 20:16:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VkE7DZG7"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="G+eqrW5s"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B2D1BF24
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:15:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF2F1D9A50
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:16:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730492134; cv=none; b=n0I5EUhibU4ctvWKDdmaunNMx2DTBw5tmMm/Xyv2jtahSnhRGx18wbJq9HkesyowX8Zbdd44X82sW/IAyeqFr03uISx7l39BmImch0I4Vmw/oEmZaGkzV0FUF+CQQ8l8LvAlBIDvSLAXOiUREfTu4hdv/uFy+Eu0tZojHiGo9W4=
+	t=1730492214; cv=none; b=KxRUp99udZpQqcJUOrg3yJtgV50i4/3qO0RZn+InalQ0DJCfEULOamnCgPwV3hkQ6CqZMLPmumgDL9AoHYXsHvA9t9JI9oVu3NRst6C2tvdEMW3UY+hGDv22vIIWlSvJdIDrZj896xoQ71iBBihkCWzGage4TXGNDnHK3srC27o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730492134; c=relaxed/simple;
-	bh=KojzClBS51NXZHtfP/ssEPl81S3kAgFdoobwtV9/FUM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PaKMIbIc3YUSrmebuGzcrOMtCyrbs/dRaIee3PgqbFizPPHBFTpliMqkOkFzoN9oMBQIYv54EVJZ19rPF2S8FOjttjtzLTxZM6Od9Zm8u1rfxAZhJ+xQWYedW8CcXpLwAlVDuKoeoJqg38pL15vTMjkoMYLxgLXuxu86z2AT5xQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VkE7DZG7; arc=none smtp.client-ip=209.85.214.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20ca388d242so24791315ad.2
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:15:32 -0700 (PDT)
+	s=arc-20240116; t=1730492214; c=relaxed/simple;
+	bh=Neq2taM8S5zc3+C2OTWpu8fNI6E1Ypyk9B14+qIRqyo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=INoNJqyK0+cLRqnqFg/oz2l88IlMHhrPIvMfUdkvDPe5rS8dzx0LYvc66QfNZEcIXYvOwZy3cLWmZd3jc+9JeB8rsduzbIROYaIjUicZI5o0o9jsEQTqAICrWIinAaqFamrQKYmX0/n9GzhnL6+HdSkXHyI7iHobk81s4avC+Bg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=G+eqrW5s; arc=none smtp.client-ip=209.85.160.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-4608dddaa35so76831cf.0
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:16:52 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730492132; x=1731096932; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4rOWj5wq1SGCaCslB1TWBLOjmfXZ4GP9FgmX1YHf/NE=;
-        b=VkE7DZG7bce/7rzDqfgjd5v6gbe0xL3pHMErjgPQSgLnHfYJ8Twqdt7N0w7x9p/GxC
-         yeF3Cb0VSlusfkQEcgIl/EQpQ7Oyg8peMEhOkOCqig36yMlaZDpzlOOyzKUaqKQzSJck
-         ZShtvq9BGrYanVAb179nR+AfPE59ZQGhXkgE8=
+        d=google.com; s=20230601; t=1730492211; x=1731097011; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m0pmXdKRRehOTDxxZcS9Rlf0z5oyVOgg9mgnJxfzU+4=;
+        b=G+eqrW5s8586h2weWLiXdnwb3dkkfqyEejh9G/JQDjpfDjh3fQ54vmQbrVTwwtMkPg
+         FlLO7qlahLANtJmy4U+uSZeYlgzEHHmwxNzg/0+GGt8iKuNDRGvqBvKf9mQAVwO0j+0o
+         P70AOqClXEbXtsEP2WmIbnFPoQLla6hx6dB5mRRTrkRpkfYlc9zN1wDEvGeP0V+al/Eq
+         p2nGgyIaULRRdmT5O5Sm7P4/aF4PWCyybQ1etfOEp3I4AXVqaQXAVWBpEA+uuDw+qhxG
+         W0DcX4L9YT2446ZTjG54sM4O70H9IO9TyApjv8N19bYZS6xxWvpu4BCB6z6vnOOMVDd0
+         5ucQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730492132; x=1731096932;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4rOWj5wq1SGCaCslB1TWBLOjmfXZ4GP9FgmX1YHf/NE=;
-        b=qa/uaG4+fwW5kaRbp0uwqMRwMt7vZXKmoFCfpicgcOrTA5g4iClVgt0X/+ouGQ93ra
-         9lEBMwtMVPEsigSdYjm+7Pgmj50jhhWCM9OdLTsniXPzm6e8D/+mKwzV/WRMzXtEh4o2
-         eAJRS2R32l0Y9CmcwFkAq/nKtO7mxHW19bGrID1U0BQ09R3kakifttI5F/x3OCRbsyk0
-         rks8AiYi+6OWkDq+HUG5iu7dyda8pq4e7gWe46DMorrqMBKmzbTQWp7aqpMJ0W9oFj6P
-         MyohtF6I80MF30O1diNi/5oMXd0FqhPO5bfpYhXjA1AwH4S0CUrx0wA+odcfpMPDpw5y
-         ZL0Q==
-X-Gm-Message-State: AOJu0Yz/syV7P6CiRRiw1vIYaCOQdZlaxnHttnWHNV7Y0HM2ElZ+3S8H
-	ih7BY9dtjlav3yZdjo2nwsRt8oBs48yV+C97ZYCQGxz0Xgi7q/g4Xbd8KayHT0Q=
-X-Google-Smtp-Source: AGHT+IGLQMQLNv4xaq8DqBOYiAGWYiXP+moKivQ5tFF9FFk0WRRRqQkt0/6YXC6frC7khIREMn44nQ==
-X-Received: by 2002:a17:90b:2e42:b0:2e9:4967:244 with SMTP id 98e67ed59e1d1-2e94c2e4c29mr6924981a91.24.1730492131974;
-        Fri, 01 Nov 2024 13:15:31 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa2603fsm5316018a91.17.2024.11.01.13.15.29
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 13:15:31 -0700 (PDT)
-Date: Fri, 1 Nov 2024 13:15:28 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, namangulati@google.com,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
-	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 6/7] selftests: net: Add busy_poll_test
-Message-ID: <ZyU24Kogy3HlzNqx@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-References: <20241101004846.32532-1-jdamato@fastly.com>
- <20241101004846.32532-7-jdamato@fastly.com>
- <20241101063426.2e1423a8@kernel.org>
+        d=1e100.net; s=20230601; t=1730492211; x=1731097011;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m0pmXdKRRehOTDxxZcS9Rlf0z5oyVOgg9mgnJxfzU+4=;
+        b=QNN13DDpHg16nQiGYjsigIIR2MEsNYreNYHTSjt2rZ7X5h+WLjFshFGVkd8Q7oICZe
+         3OnIn8NJgg/z+tNAhQ3pjTgViL2RWlEWKSzlAbJYtVvFEF6l/C+kjhlF588MNJ4Wsci2
+         ynOP9qRoQud8PgjKRriALtk9og9ewVXUp20eBkAEDRrw0Cufbe0bThijrfa/yO8bV0Ec
+         spjHhmHNArRLSOozabP8T0Gn0Mv7SMFrLTC3NcQzcTrduvVoHtDgKiY6Dtd+qcrg4L6G
+         TfidgoeSa/rSt2DCk/+3buHfesyT6i0QUQQDOvoZrt7aiBDJfLJvNhEX0zNf1u2DJ5xW
+         pEDw==
+X-Forwarded-Encrypted: i=1; AJvYcCXvm5DP0BUh0lmdWV0HBrwfEVC/4S8XhVQLO0V/7jqwUrDdleZ3FBCsuHdT/2vRIjGbiRkTmw4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKCwNNaddKlf9B9fBjnICBHYZU5Ht/6eeP9g3QLQB/8/RPIk3J
+	mYzh2BacnCMXPgOCH7LsKWe4kx3rDH+ujvBZtF0VTUJn0eHemFyNPvbndxAm9UeBdZPJ9Ig5vyY
+	igWU0YyRJPzTslQK3NDGu6O/X2z0d88o5qqfa
+X-Gm-Gg: ASbGncv53jUlSJ1bAm/Q8dlB4GUh39ODUzufX5M6R+IqHYeaQkvEbOTzH5QAxN3vpb4
+	O2Lf/hNK7Wk2UL8ziZiNjAaDwjzTzqOjV6qI3pYgxcMBp2tg7Xq92nhEt9EWFfw==
+X-Google-Smtp-Source: AGHT+IGQlnMovoi5lGZ5r+xc2iOTrOWS9RcVERrIUE0qklnzO30h74p7/gLLkEvfHRWyOdgZxsJcaMWekAkfadGD3mI=
+X-Received: by 2002:a05:622a:4e9b:b0:45f:89c:e55 with SMTP id
+ d75a77b69052e-462c5ed23c0mr637391cf.8.1730492211131; Fri, 01 Nov 2024
+ 13:16:51 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101063426.2e1423a8@kernel.org>
+References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-14-dw@davidwei.uk>
+In-Reply-To: <20241029230521.2385749-14-dw@davidwei.uk>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 1 Nov 2024 13:16:39 -0700
+Message-ID: <CAHS8izMFV=1oRR6Tq-BVJxCL3hbEjNa0CBzWmWxbnk_0MZOs6w@mail.gmail.com>
+Subject: Re: [PATCH v7 13/15] io_uring/zcrx: set pp memory provider for an rx queue
+To: David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 01, 2024 at 06:34:26AM -0700, Jakub Kicinski wrote:
-> On Fri,  1 Nov 2024 00:48:33 +0000 Joe Damato wrote:
-> > +	ip netns exec nscl nc -N 192.168.1.1 48675 < $tmp_file
-> 
-> Thanks a lot for adding the test.
+On Tue, Oct 29, 2024 at 4:06=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+>
+> From: David Wei <davidhwei@meta.com>
+>
+> Set the page pool memory provider for the rx queue configured for zero
+> copy to io_uring. Then the rx queue is reset using
+> netdev_rx_queue_restart() and netdev core + page pool will take care of
+> filling the rx queue from the io_uring zero copy memory provider.
+>
+> For now, there is only one ifq so its destruction happens implicitly
+> during io_uring cleanup.
+>
+> Signed-off-by: David Wei <dw@davidwei.uk>
+> ---
+>  io_uring/zcrx.c | 86 +++++++++++++++++++++++++++++++++++++++++++++++--
+>  io_uring/zcrx.h |  2 ++
+>  2 files changed, 86 insertions(+), 2 deletions(-)
+>
+> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
+> index 477b0d1b7b91..3f4625730dbd 100644
+> --- a/io_uring/zcrx.c
+> +++ b/io_uring/zcrx.c
+> @@ -8,6 +8,7 @@
+>  #include <net/page_pool/helpers.h>
+>  #include <net/page_pool/memory_provider.h>
+>  #include <trace/events/page_pool.h>
+> +#include <net/netdev_rx_queue.h>
+>  #include <net/tcp.h>
+>  #include <net/rps.h>
+>
+> @@ -36,6 +37,65 @@ static inline struct io_zcrx_area *io_zcrx_iov_to_area=
+(const struct net_iov *nio
+>         return container_of(owner, struct io_zcrx_area, nia);
+>  }
+>
+> +static int io_open_zc_rxq(struct io_zcrx_ifq *ifq, unsigned ifq_idx)
+> +{
+> +       struct netdev_rx_queue *rxq;
+> +       struct net_device *dev =3D ifq->dev;
+> +       int ret;
+> +
+> +       ASSERT_RTNL();
+> +
+> +       if (ifq_idx >=3D dev->num_rx_queues)
+> +               return -EINVAL;
+> +       ifq_idx =3D array_index_nospec(ifq_idx, dev->num_rx_queues);
+> +
+> +       rxq =3D __netif_get_rx_queue(ifq->dev, ifq_idx);
+> +       if (rxq->mp_params.mp_priv)
+> +               return -EEXIST;
+> +
+> +       ifq->if_rxq =3D ifq_idx;
+> +       rxq->mp_params.mp_ops =3D &io_uring_pp_zc_ops;
+> +       rxq->mp_params.mp_priv =3D ifq;
+> +       ret =3D netdev_rx_queue_restart(ifq->dev, ifq->if_rxq);
+> +       if (ret)
+> +               goto fail;
+> +       return 0;
+> +fail:
+> +       rxq->mp_params.mp_ops =3D NULL;
+> +       rxq->mp_params.mp_priv =3D NULL;
+> +       ifq->if_rxq =3D -1;
+> +       return ret;
+> +}
+> +
 
-Thanks for the review.
+I don't see a CAP_NET_ADMIN check. Likely I missed it. Is that done
+somewhere? Binding user memory to an rx queue needs to be a privileged
+operation.
 
-> Could you replace nc with socat or
-> a similar tool? There are multiple incompatible implementations of
-> netcat packaged by various distros, we get:
-> 
-> # selftests: net: busy_poll_test.sh
-> # nc: invalid option -- 'N'
-> # Ncat: Try `--help' or man(1) ncat for more information, usage options and help. QUITTING.
-> 
-> nc is a known PITA.
-
-OK, I've replaced with socat for the v4 I am working on. I've also
-added some additional documentation to the FAQ in the cover letter
-and the kernel documentation to help answer Sridhar's question
-because it may be a question others have as well.
-
-> > +	# set the suspend parameter for the server via its IFIDX
-> > +
-> > +	DUMP_CMD="${YNL_PATH} --spec ${SPEC_PATH} --dump napi-get --json=\"{\\\"ifindex\\\": ${NSIM_DEV_1_IFIDX}}\" --output-json"
-> > +	NSIM_DEV_1_NAPIID=$(ip netns exec nssv bash -c "$DUMP_CMD")
-> > +	NSIM_DEV_1_NAPIID=$(echo $NSIM_DEV_1_NAPIID | jq '.[] | .id')
-> > +
-> > +	SUSPEND_CMD="${YNL_PATH} --spec ${SPEC_PATH} --do napi-set --json=\"{\\\"id\\\": ${NSIM_DEV_1_NAPIID}, \\\"irq-suspend-timeout\\\": 20000000, \\\"gro-flush-timeout\\\": 50000, \\\"defer-hard-irqs\\\": 100}\""
-> > +	NSIM_DEV_1_SETCONFIG=$(ip netns exec nssv bash -c "$SUSPEND_CMD")
-> 
-> Can you try to run this test in installed mode?
-> 
-> https://docs.kernel.org/dev-tools/kselftest.html#install-selftests
-> 
-> IIRC YNL moves around when we install, you'd either need to do
-> autodetection of the path (see tools/testing/selftests/net/lib/py/ynl.py
-> and if you go down this route please move the helper which exports the
-> YNL variables to lib.sh so other tests can reuse); or teach the C code
-> to do the setup, you can link against YNL fairly easily (look at where
-> ncdevmem is added in the Makefile, it uses YNL)
-
-I think I'm going to go the C route.
-
-Just to make sure I'm following how to do this properly:
-  - I've added busy_poller to YNL_GEN_FILES (and removed it from
-    TEST_GEN_FILES)
-  - It still needs to be run via the script (which sets up netdevsim
-    etc), so I am leaving that script (busy_poll_test.sh) in
-    TEST_PROGS. busy_poller is not intended to be run on its own for
-    selftest purposes.
-
-I am not sure if YNL_GEN_FILES are expected to run standalone when
-invoked or if this will work as I expect it to (busy_poll_test.sh is
-run):
-
-  [...]
-  TEST_PROGS += busy_poll_test.sh
-  
-  # YNL files, must be before "include ..lib.mk"
-  YNL_GEN_FILES := ncdevmem busy_poller
-  [...]
-
-Doing the above: I am hoping that busy_poll_test.sh will be run
-(which will use busy_poller) and that busy_poller won't be run on
-its own.
-
-Thanks for the guidance.
+--=20
+Thanks,
+Mina
 
