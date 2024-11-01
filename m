@@ -1,122 +1,175 @@
-Return-Path: <netdev+bounces-141107-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141108-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1D7BB9B9935
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:12:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0060D9B9945
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:15:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADDC11F23E53
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:12:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63139284227
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:15:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3661E2309;
-	Fri,  1 Nov 2024 20:12:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75AC31D07AA;
+	Fri,  1 Nov 2024 20:15:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y66KX+dq"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VkE7DZG7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4741E1A33
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:11:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8B2D1BF24
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:15:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730491921; cv=none; b=Z1mVJucvNuVTTtNmoMQ+wz1IZQvfGngU3KFqIt/9OOY4BJb5pXpwxw/Xu9XuhJlbr96eve4ON1qlyvuhoVyQTs5U9YqK3ZPZ3erz7a8ZIAW1RmtvsJbrKlgBgKbhJUPWzNFeU33wJNe/n5ITSZsAlyWpcd1gaWJTal53Ir/rXvU=
+	t=1730492134; cv=none; b=n0I5EUhibU4ctvWKDdmaunNMx2DTBw5tmMm/Xyv2jtahSnhRGx18wbJq9HkesyowX8Zbdd44X82sW/IAyeqFr03uISx7l39BmImch0I4Vmw/oEmZaGkzV0FUF+CQQ8l8LvAlBIDvSLAXOiUREfTu4hdv/uFy+Eu0tZojHiGo9W4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730491921; c=relaxed/simple;
-	bh=hr97Yp3Qp6SmW8JuJbDwdSzmRhchs4ulWgoo6MWx2hI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mlEv0lhwST9AGG1eqB4rCrTQ7Q3hpXy+SjqT7bJpGM0H+KqTVcPu+pgE2Ya2AbOqwXoLG1cID6ASFDjpe/Ng1vefjwho3JZiCndqubZnuaKpA05QH8PwuenTHpHjt/upYKvvf6FG1B+APFL4J249QCX6bLYcWWUuzqh3Zlkw8Zs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y66KX+dq; arc=none smtp.client-ip=209.85.160.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-460b295b9eeso10721cf.1
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:11:59 -0700 (PDT)
+	s=arc-20240116; t=1730492134; c=relaxed/simple;
+	bh=KojzClBS51NXZHtfP/ssEPl81S3kAgFdoobwtV9/FUM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=PaKMIbIc3YUSrmebuGzcrOMtCyrbs/dRaIee3PgqbFizPPHBFTpliMqkOkFzoN9oMBQIYv54EVJZ19rPF2S8FOjttjtzLTxZM6Od9Zm8u1rfxAZhJ+xQWYedW8CcXpLwAlVDuKoeoJqg38pL15vTMjkoMYLxgLXuxu86z2AT5xQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VkE7DZG7; arc=none smtp.client-ip=209.85.214.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20ca388d242so24791315ad.2
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:15:32 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730491919; x=1731096719; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ejiV3nojKU8JOSRuqbEiFZ2lXr3DMRw92KQ2wPjl88w=;
-        b=Y66KX+dqIUF/kiMMuILdaoMfa7BOoK8P/JD7e3jkubRqEC0JiNmzku704pdOooZwvG
-         QSjweK4ptQkFXd/SbN2ukdh7Ed3ksiiOUkBHkx5yfScgkXXgUN1Lt7kHaguRrbCfdtrr
-         y85G+wGHON591di9BXLRK30SCe+ouq/v73kidEg8QiNdVICf1qWMZhoM9DHUhWPsrTGS
-         yJaxOUgHLwzgeoWYZjYqwnhvXFEvQjggGE8+qTM0/trMrjC7umtq8+qMJdtCS/SmVIzR
-         0uqmDz2gqNswXDzbSRvmEcu3T+clOQuFBGFLPZgEQfEv1BE/5m5PrC2pFH1rLIQ3qgQH
-         fNlA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730491919; x=1731096719;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1730492132; x=1731096932; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ejiV3nojKU8JOSRuqbEiFZ2lXr3DMRw92KQ2wPjl88w=;
-        b=i3Vl+3SBGKbpyTGdJZ/msynlXPpd8gopFL9vYoQZz+j6MfrU7/yx3GtBYu/Mx0P1sN
-         CUnJeB9uJKqnPw43LFCTC6CeholcEe7C9VKN3iEDxWtYjgqSsvRUR4zRFPMy20YG6KpV
-         fivbR15L9sPO6MIkGkXvifQbVnSCu0A1i86ymJwQyo0K/RGBbh6iOp+RhEx9g6ABdIJo
-         IdVwSevmEWA2k1njBZj5vayhITBNmI9imTP7UgeuW6stUUEZvOcfYIMsvXaFNSUfZbKK
-         /BAA3z5V0kWudgUsLnqPfsNQMVW+O24TOqjrvcc4C9FCfv3ups17nyJEcW7Yoj/FnaiW
-         T5Ag==
-X-Forwarded-Encrypted: i=1; AJvYcCVxwMeg5C5rsJAcfM5OWFO9KhOQIlEHnoKsuUfNQ8mqDTPUbkz2cpxtk3dHV3C5GdYkrZcr/DA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzaMF7QfR3dUSF7ncyHxt32lDcaZuY6TvUWkz2JPGDfgssdv6Bh
-	7lcqeQiuVt5yPojVB+FFQgcuHUjmdRybBKx1aX5olKBAPaBAq/yJjouQfp9p6xJtFN3lukNOCZb
-	mgEfW/z2HvKpfyG6kSfcdPAUnqhfv3XOhx0cK
-X-Gm-Gg: ASbGnctiOsPpYMgIa7GOp7a7MKqU4SmkTylSxCD3TFMDGXdixfyUEfRotsz+MADMSsS
-	y0osyocG10eq+3Xyz57h/WmCJ9ys2cscRSnmEDiSClj9oo5WHQWvKom84/vTtiA==
-X-Google-Smtp-Source: AGHT+IHhchjVNua+q1hjFSSUiFjye5O8F2gFXrFh+qB1xxZL2N98zYmsGHlhpJipLyhO/M3LOagO1DK9x+u5isJgcdM=
-X-Received: by 2002:a05:622a:2991:b0:461:5b0d:7aa5 with SMTP id
- d75a77b69052e-462c5ef8accmr680331cf.16.1730491918776; Fri, 01 Nov 2024
- 13:11:58 -0700 (PDT)
+        bh=4rOWj5wq1SGCaCslB1TWBLOjmfXZ4GP9FgmX1YHf/NE=;
+        b=VkE7DZG7bce/7rzDqfgjd5v6gbe0xL3pHMErjgPQSgLnHfYJ8Twqdt7N0w7x9p/GxC
+         yeF3Cb0VSlusfkQEcgIl/EQpQ7Oyg8peMEhOkOCqig36yMlaZDpzlOOyzKUaqKQzSJck
+         ZShtvq9BGrYanVAb179nR+AfPE59ZQGhXkgE8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730492132; x=1731096932;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=4rOWj5wq1SGCaCslB1TWBLOjmfXZ4GP9FgmX1YHf/NE=;
+        b=qa/uaG4+fwW5kaRbp0uwqMRwMt7vZXKmoFCfpicgcOrTA5g4iClVgt0X/+ouGQ93ra
+         9lEBMwtMVPEsigSdYjm+7Pgmj50jhhWCM9OdLTsniXPzm6e8D/+mKwzV/WRMzXtEh4o2
+         eAJRS2R32l0Y9CmcwFkAq/nKtO7mxHW19bGrID1U0BQ09R3kakifttI5F/x3OCRbsyk0
+         rks8AiYi+6OWkDq+HUG5iu7dyda8pq4e7gWe46DMorrqMBKmzbTQWp7aqpMJ0W9oFj6P
+         MyohtF6I80MF30O1diNi/5oMXd0FqhPO5bfpYhXjA1AwH4S0CUrx0wA+odcfpMPDpw5y
+         ZL0Q==
+X-Gm-Message-State: AOJu0Yz/syV7P6CiRRiw1vIYaCOQdZlaxnHttnWHNV7Y0HM2ElZ+3S8H
+	ih7BY9dtjlav3yZdjo2nwsRt8oBs48yV+C97ZYCQGxz0Xgi7q/g4Xbd8KayHT0Q=
+X-Google-Smtp-Source: AGHT+IGLQMQLNv4xaq8DqBOYiAGWYiXP+moKivQ5tFF9FFk0WRRRqQkt0/6YXC6frC7khIREMn44nQ==
+X-Received: by 2002:a17:90b:2e42:b0:2e9:4967:244 with SMTP id 98e67ed59e1d1-2e94c2e4c29mr6924981a91.24.1730492131974;
+        Fri, 01 Nov 2024 13:15:31 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa2603fsm5316018a91.17.2024.11.01.13.15.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 13:15:31 -0700 (PDT)
+Date: Fri, 1 Nov 2024 13:15:28 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 6/7] selftests: net: Add busy_poll_test
+Message-ID: <ZyU24Kogy3HlzNqx@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
+	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+References: <20241101004846.32532-1-jdamato@fastly.com>
+ <20241101004846.32532-7-jdamato@fastly.com>
+ <20241101063426.2e1423a8@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-13-dw@davidwei.uk>
-In-Reply-To: <20241029230521.2385749-13-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 1 Nov 2024 13:11:46 -0700
-Message-ID: <CAHS8izP=S8nEk77A+dfBzOyq7ddcGUNYNkVGDhpfJarzdx3vGw@mail.gmail.com>
-Subject: Re: [PATCH v7 12/15] io_uring/zcrx: add io_recvzc request
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241101063426.2e1423a8@kernel.org>
 
-On Tue, Oct 29, 2024 at 4:06=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
->
-...
-> +static void io_zcrx_get_buf_uref(struct net_iov *niov)
-> +{
-> +       atomic_long_add(IO_ZC_RX_UREF, &niov->pp_ref_count);
-> +}
-> +
+On Fri, Nov 01, 2024 at 06:34:26AM -0700, Jakub Kicinski wrote:
+> On Fri,  1 Nov 2024 00:48:33 +0000 Joe Damato wrote:
+> > +	ip netns exec nscl nc -N 192.168.1.1 48675 < $tmp_file
+> 
+> Thanks a lot for adding the test.
 
-This is not specific to io_rcrx I think. Please rename this and put it
-somewhere generic, like netmem.h.
+Thanks for the review.
 
-Then tcp_recvmsg_dmabuf can use the same helper instead of the very
-ugly call it currently does:
+> Could you replace nc with socat or
+> a similar tool? There are multiple incompatible implementations of
+> netcat packaged by various distros, we get:
+> 
+> # selftests: net: busy_poll_test.sh
+> # nc: invalid option -- 'N'
+> # Ncat: Try `--help' or man(1) ncat for more information, usage options and help. QUITTING.
+> 
+> nc is a known PITA.
 
-- atomic_long_inc(&niov->pp_ref_count);
-+ net_iov_pp_ref_get(niov, 1);
+OK, I've replaced with socat for the v4 I am working on. I've also
+added some additional documentation to the FAQ in the cover letter
+and the kernel documentation to help answer Sridhar's question
+because it may be a question others have as well.
 
-Or something.
+> > +	# set the suspend parameter for the server via its IFIDX
+> > +
+> > +	DUMP_CMD="${YNL_PATH} --spec ${SPEC_PATH} --dump napi-get --json=\"{\\\"ifindex\\\": ${NSIM_DEV_1_IFIDX}}\" --output-json"
+> > +	NSIM_DEV_1_NAPIID=$(ip netns exec nssv bash -c "$DUMP_CMD")
+> > +	NSIM_DEV_1_NAPIID=$(echo $NSIM_DEV_1_NAPIID | jq '.[] | .id')
+> > +
+> > +	SUSPEND_CMD="${YNL_PATH} --spec ${SPEC_PATH} --do napi-set --json=\"{\\\"id\\\": ${NSIM_DEV_1_NAPIID}, \\\"irq-suspend-timeout\\\": 20000000, \\\"gro-flush-timeout\\\": 50000, \\\"defer-hard-irqs\\\": 100}\""
+> > +	NSIM_DEV_1_SETCONFIG=$(ip netns exec nssv bash -c "$SUSPEND_CMD")
+> 
+> Can you try to run this test in installed mode?
+> 
+> https://docs.kernel.org/dev-tools/kselftest.html#install-selftests
+> 
+> IIRC YNL moves around when we install, you'd either need to do
+> autodetection of the path (see tools/testing/selftests/net/lib/py/ynl.py
+> and if you go down this route please move the helper which exports the
+> YNL variables to lib.sh so other tests can reuse); or teach the C code
+> to do the setup, you can link against YNL fairly easily (look at where
+> ncdevmem is added in the Makefile, it uses YNL)
 
-In general I think io_uring code can do whatever it wants with the
-io_uring specific bits in net_iov (everything under net_area_owner I
-think), but please lets try to keep any code touching the generic
-net_iov fields (pp_pagic, pp_ref_count, and others) in generic
-helpers.
+I think I'm going to go the C route.
 
---=20
-Thanks,
-Mina
+Just to make sure I'm following how to do this properly:
+  - I've added busy_poller to YNL_GEN_FILES (and removed it from
+    TEST_GEN_FILES)
+  - It still needs to be run via the script (which sets up netdevsim
+    etc), so I am leaving that script (busy_poll_test.sh) in
+    TEST_PROGS. busy_poller is not intended to be run on its own for
+    selftest purposes.
+
+I am not sure if YNL_GEN_FILES are expected to run standalone when
+invoked or if this will work as I expect it to (busy_poll_test.sh is
+run):
+
+  [...]
+  TEST_PROGS += busy_poll_test.sh
+  
+  # YNL files, must be before "include ..lib.mk"
+  YNL_GEN_FILES := ncdevmem busy_poller
+  [...]
+
+Doing the above: I am hoping that busy_poll_test.sh will be run
+(which will use busy_poller) and that busy_poller won't be run on
+its own.
+
+Thanks for the guidance.
 
