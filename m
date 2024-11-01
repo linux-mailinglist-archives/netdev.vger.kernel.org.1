@@ -1,210 +1,216 @@
-Return-Path: <netdev+bounces-140934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3AD49B8B33
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:25:04 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2D6269B8B40
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:34:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9214628251B
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 06:25:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5BEC6B21B9E
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 06:34:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CE314B97E;
-	Fri,  1 Nov 2024 06:25:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 430FF14A4C6;
+	Fri,  1 Nov 2024 06:34:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IoYJoHyf"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344C12AD20;
-	Fri,  1 Nov 2024 06:24:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1913D143C7E;
+	Fri,  1 Nov 2024 06:34:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730442301; cv=none; b=WsyQq5p+rp5j55dPrV+8iZoA0SMA/tHzlGHQ8c2OX8uNdD4k2y+ltvuM9Szxy4dhrjU8ikx8oGA1LApWJL1lrZXjZx8GK6azezEzNAVMvzP5DyWhPELffsSbO/G7pWovvcQNt9DRnbQCQLyh2vyBilAPHLH0r3FW4dP9fi3SSlQ=
+	t=1730442863; cv=none; b=sf99KeLEMs5nZcYpMV3m7mvBej9Cs2ioA4le782Len2o8i68GPzTmQDxjN24wrA0IQm/tMq0XkUISsYUSo4zuSECRinM44/PQNtFEuc6o5n7TWjs4QIRnFGRaOheWFsWgbsxzBO4dqiFQoGE48UiMyXHfs/od3oXZQ+GqlLaDbw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730442301; c=relaxed/simple;
-	bh=g2hRf7mnB2xJ3tmxFSkGiernG4bpg+/LT5R0E4trLtI=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=juecyKBFIFU7gbiR0UV/hBfqcPbG9yE+FsCxXUcIqrmSY68ri12XZywQijagRKwVhwiZvo64I3gpdsl9GznWXNNFH7gttQTbrd1gxRYbCxL0FCFg0LglFWcaw0ju94DnFZ5kMSiUVxNKxQGVUIEzYYCXATfPqFmg/zNIcBSMnts=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.252])
-	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XfrPp054qz1T9Qw;
-	Fri,  1 Nov 2024 14:22:38 +0800 (CST)
-Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
-	by mail.maildlp.com (Postfix) with ESMTPS id 366F71800A5;
-	Fri,  1 Nov 2024 14:24:51 +0800 (CST)
-Received: from [10.174.176.70] (10.174.176.70) by
- kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 1 Nov 2024 14:24:50 +0800
-Message-ID: <0913d4ba-7298-4295-8ce0-8c38ddb9d5b6@huawei.com>
-Date: Fri, 1 Nov 2024 14:24:40 +0800
+	s=arc-20240116; t=1730442863; c=relaxed/simple;
+	bh=95yD769XLoFkFNsg54mOTbkdi1HWHfovV9T61neThs8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=rBZqXG7UlCQbpI4+VthDZ0WsBV71bWILnJ2khnO4p3Ejdq1fv97d2VdqDSndt4M1ruZ4yr0BuG9B1dpKZGDHPZulCwmhIpbZNzeROCe4FbItK1lnr3efYLMKoAVzZOmm9UBFuWjEnXEsrTgsKV8URBP9vLUGvnZgL5jciYiJaw4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IoYJoHyf; arc=none smtp.client-ip=209.85.166.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-8323b555a6aso87703339f.3;
+        Thu, 31 Oct 2024 23:34:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730442859; x=1731047659; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=b9JUHJPvvjPGiBQPeFdEOgn0ZyJhRjPJdSvJFrrfo3A=;
+        b=IoYJoHyfFzzarOBZiMKw9WlaXLoNSYSzi/QbEc5179sETG7j89vhP26/Jj97IPhjn9
+         9Vx2Gbo6qdamENr0uUPxKhodNTwqJ6Si/QAbBJ04A/Ffm1f3QsnzIV78QbhrSWbhwP+0
+         k6UVne2kt5ZgE2axLXpnyd3qEA0L2NsX6+v2UfIKenjLAAqWgiMnBv/URGODy7862UyA
+         IUlAqRkQEGWsuAzFwV/5KOjUfcGx7gzAIjXMAxRl2nLmyiXqdLad6IZRYKVJhwGvL7jg
+         TML1zJLkQdKJ/rlEIE9px2Ob+eig3PT4HpOkgxL3ZOnGyzEL3LYvO9lyyyGrC3gR9w7S
+         AFGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730442859; x=1731047659;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=b9JUHJPvvjPGiBQPeFdEOgn0ZyJhRjPJdSvJFrrfo3A=;
+        b=b8HMZkhbdm3LSNxwT/I68ttTgqaYgv/f0GOh4nh0x3edahhmY7BL44a9z8P7cvkHlk
+         k8OyJnJvNVD65MKjb3dYQCDGwG4n0NfeTdVP+dufx8qh0JvnF/37AEeyPZ3HtOSPlv4p
+         YdmtFdPJof71MnJP10zLGlB2o4/5y5Sqfdt9ps3CDeTpJ4LIyo58rH0ep0RGsEj/fD8b
+         7049MKuIbn4MIfSnRvv+Y0pj7+N73V/VphZmq3X9r1Wq66b65hyhmmRG+YPnlRcchAqX
+         DgK+2ekzY0dqk6dUwuQ3kc4RyyV2sv80MfC3dm75yThhrRY+Ger+F7i9CTmd042sJbEM
+         /rPA==
+X-Forwarded-Encrypted: i=1; AJvYcCVRiWqDyZnZf7hUzfyCCZ2wrOwMr0avjrOeLJdFLh0kp/lAKArNxb/r8mTUPVSY+LYbSy97Ulny@vger.kernel.org, AJvYcCWFcsHJAsN1rLpLahqBxf4cp3YoUmrRdnWNWoNfQmH5QkaNADTK6lH0nTPkc4NkWa4T2sI=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxwvnm0xrKBrjUIMPhQ1oLtMLcc2aM/FBHTqLGfZuTylEbPeAaj
+	hlr1p6yM+YiJSlHzjrV1WsbM4OezLGyX8P0faI/qpzzUMh0xjshL9Eqcuye64Q0E2MS7tQXw+ER
+	v8M/WSIJ68Jlup+YSNfHWSBI3NgI=
+X-Google-Smtp-Source: AGHT+IF6WFD2HTtJ7BJ/fBAWqZwQa7v86tjpi6w+MUJjMhbfg7N7EBJVnhVy9JECIJg9hGwf5FogmVQt9k3N/qdZwcI=
+X-Received: by 2002:a92:ca06:0:b0:3a4:e856:a8fd with SMTP id
+ e9e14a558f8ab-3a6175551f3mr67533785ab.22.1730442859009; Thu, 31 Oct 2024
+ 23:34:19 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [RFC PATCH net] net: fix data-races around sk->sk_forward_alloc
-To: Eric Dumazet <edumazet@google.com>
-CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<horms@kernel.org>, <dsahern@kernel.org>, <yuehaibing@huawei.com>,
-	<zhangchangzhong@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20241031122344.2148586-1-wangliang74@huawei.com>
- <CANn89i+KL0=p2mchoZCOsZ1YoF9xhoUoubkub6YyLOY2wpSJtg@mail.gmail.com>
-From: Wang Liang <wangliang74@huawei.com>
-In-Reply-To: <CANn89i+KL0=p2mchoZCOsZ1YoF9xhoUoubkub6YyLOY2wpSJtg@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemg200005.china.huawei.com (7.202.181.32)
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <20241028110535.82999-11-kerneljasonxing@gmail.com> <8fd16b77-b8e8-492c-ab69-8192cafa9fc7@linux.dev>
+ <CAL+tcoBNiZQr=yk_fb9eoKX1_Nr4LuDaa1kkLGbdnc=8JNKnNg@mail.gmail.com>
+ <e56f78a9-cbda-4b80-8b55-c16b36e4efb1@linux.dev> <CAL+tcoDi86GkJRd8fShGNH8CgdFu3kbfMubWxCLVdo+3O-wnfg@mail.gmail.com>
+ <29a4e6ef-0af0-4905-8511-398fb20619bb@linux.dev>
+In-Reply-To: <29a4e6ef-0af0-4905-8511-398fb20619bb@linux.dev>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Fri, 1 Nov 2024 14:33:42 +0800
+Message-ID: <CAL+tcoD8jYsFPfAHAppbKSQu3eJS0V2V60xvijaUnN2rJSQiCg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 10/14] net-timestamp: add basic support with
+ tskey offset
+To: Martin KaFai Lau <martin.lau@linux.dev>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	pabeni@redhat.com, dsahern@kernel.org, willemdebruijn.kernel@gmail.com, 
+	willemb@google.com, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
+	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
+	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
+	bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	Jason Xing <kernelxing@tencent.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Fri, Nov 1, 2024 at 7:50=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.d=
+ev> wrote:
+>
+> On 10/30/24 7:41 PM, Jason Xing wrote:
+> >> bpf prog cannot directly access the skops->skb now. It is because the =
+sockops
+> >> prog sees the uapi "struct bpf_sock_ops" instead of "struct
+> >> bpf_sock_ops(_kern)". The conversion is done in sock_ops_convert_ctx_a=
+ccess. It
+> >> is an old way before BTF. I don't want to extend the uapi "struct bpf_=
+sock_ops".
+> >
+> > Oh, so it seems we cannot use this way, right?
+>
+> No. don't extend the uapi "struct bpf_sock_ops". Use bpf_cast_to_kern_ctx=
+() instead.
 
-在 2024/10/31 22:08, Eric Dumazet 写道:
-> On Thu, Oct 31, 2024 at 1:06 PM Wang Liang <wangliang74@huawei.com> wrote:
->> Syzkaller reported this warning:
-> Was this a public report ?
-Yes，I find the report here (the C repo in the url is useful):
+Got it!
 
-https://syzkaller.appspot.com/bug?id=3e9b62ff331dcc3a6c28c41207f3b9911828a46b
->> [   65.568203][    C0] ------------[ cut here ]------------
->> [   65.569339][    C0] WARNING: CPU: 0 PID: 16 at net/ipv4/af_inet.c:156 inet_sock_destruct+0x1c5/0x1e0
->> [   65.575017][    C0] Modules linked in:
->> [   65.575699][    C0] CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.12.0-rc5 #26
->> [   ...]
-> Oh the horror, this is completely wrong and unsafe anyway.
 >
-> TCP listen path MUST be lockless, and stay lockless.
+> >
+> > I also noticed a use case that allow users to get the information from =
+one skb:
+> > "int BPF_PROG(trace_netif_receive_skb, struct sk_buff *skb)" in
+> > tools/testing/selftests/bpf/progs/netif_receive_skb.c
+> > But it requires us to add the tracepoint in __skb_tstamp_tx() first.
+> > Two months ago, I was planning to use a tracepoint for some people who
+> > find it difficult to deploy bpf.
 >
-> Ask yourself : Why would a listener even hold a pktoptions in the first place ?
 >
-> Normally, each request socket can hold an ireq->pktopts (see in
-> tcp_v6_init_req())
->
-> The skb_clone_and_charge_r() happen later in tcp_v6_syn_recv_sock()
->
-> The correct fix is to _not_ call skb_clone_and_charge_r() for a
-> listener socket, of course, this never made _any_ sense.
->
-> The following patch should fix both TCP  and DCCP, and as a bonus make
-> TCP SYN processing faster
-> for listeners requesting these IPV6_PKTOPTIONS things.
-Thank you very much for your suggestion and patch!
+> It is a tracing prog instead of sockops prog. The verifier allows accessi=
+ng
+> different things based on the program type. This patch set is using the s=
+ockops
+> bpf prog type which is not a tracing prog. Tracing can do a lot of read-o=
+nly
+> things but here we need write (e.g. bpf_setsockopt), so tracing prog is n=
+ot
+> suitable here.
 
-However, the problem remains unsolved when I use the following patch to 
-test.
+Thanks for the explaination.
 
-Because skb_clone_and_charge_r() is still called when sk_state is 
-TCP_LISTEN in discard tag.
-
-So I modify the patch like this (it works after local test):
-
-diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-index da5dba120bc9..2d07f7385783 100644
---- a/net/dccp/ipv6.c
-+++ b/net/dccp/ipv6.c
-@@ -618,7 +618,7 @@ static int dccp_v6_do_rcv(struct sock *sk, struct 
-sk_buff *skb)
-            by tcp. Feel free to propose better solution.
-                                                --ANK (980728)
-          */
--       if (np->rxopt.all)
-+       if (np->rxopt.all && (sk->sk_state != DCCP_LISTEN))
-                 opt_skb = skb_clone_and_charge_r(skb, sk);
-
-         if (sk->sk_state == DCCP_OPEN) { /* Fast path */
-diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-index d71ab4e1efe1..0ab06ed78cac 100644
---- a/net/ipv6/tcp_ipv6.c
-+++ b/net/ipv6/tcp_ipv6.c
-@@ -1618,7 +1618,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff 
-*skb)
-            by tcp. Feel free to propose better solution.
-                                                --ANK (980728)
-          */
--       if (np->rxopt.all)
-+       if (np->rxopt.all && (sk->sk_state != TCP_LISTEN))
-                 opt_skb = skb_clone_and_charge_r(skb, sk);
-
-         if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
-@@ -1656,8 +1656,6 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff 
-*skb)
-                                 if (reason)
-                                         goto reset;
-                         }
--                       if (opt_skb)
--                               __kfree_skb(opt_skb);
-                         return 0;
-                 }
-         } else
-
-
-> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
-> index da5dba120bc9a55c5fd9d6feda791b0ffc887423..d6649246188d72b3df6c74750779b7aa5910dcb7
-> 100644
-> --- a/net/dccp/ipv6.c
-> +++ b/net/dccp/ipv6.c
-> @@ -618,7 +618,7 @@ static int dccp_v6_do_rcv(struct sock *sk, struct
-> sk_buff *skb)
->             by tcp. Feel free to propose better solution.
->                                                 --ANK (980728)
->           */
-> -       if (np->rxopt.all)
-> +       if (np->rxopt.all && sk->sk_state != DCCP_LISTEN)
->                  opt_skb = skb_clone_and_charge_r(skb, sk);
 >
->          if (sk->sk_state == DCCP_OPEN) { /* Fast path */
-> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
-> index d71ab4e1efe1c6598cf3d3e4334adf0881064ce9..e643dbaec9ccc92eb2d9103baf185c957ad1dd2e
-> 100644
-> --- a/net/ipv6/tcp_ipv6.c
-> +++ b/net/ipv6/tcp_ipv6.c
-> @@ -1605,25 +1605,12 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
->           *      is currently called with bh processing disabled.
->           */
+> >
+> >>
+> >> Instead, use bpf_cast_to_kern_ctx((struct bpf_sock_ops *)skops_ctx) to=
+ get a
+> >> trusted "struct bpf_sock_ops(_kern) *skops" pointer. Then it can acces=
+s the
+> >> skops->skb.
+> >
+> > Let me spend some time on it. Thanks.
 >
-> -       /* Do Stevens' IPV6_PKTOPTIONS.
-> -
-> -          Yes, guys, it is the only place in our code, where we
-> -          may make it not affecting IPv4.
-> -          The rest of code is protocol independent,
-> -          and I do not like idea to uglify IPv4.
-> -
-> -          Actually, all the idea behind IPV6_PKTOPTIONS
-> -          looks not very well thought. For now we latch
-> -          options, received in the last packet, enqueued
-> -          by tcp. Feel free to propose better solution.
-> -                                              --ANK (980728)
-> -        */
-> -       if (np->rxopt.all)
-> -               opt_skb = skb_clone_and_charge_r(skb, sk);
+> Take a look at the bpf_cast_to_kern_ctx() examples in selftests/bpf. I th=
+ink
+> this can be directly used to get to (struct bpf_sock_ops_kern *)skops->sk=
+b. Ping
+> back if your selftest bpf prog cannot load.
+
+No problem :)
+
 >
->          if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
->                  struct dst_entry *dst;
+> >
+> >> afaik, the tcb->seq should be available already during sendmsg. it
+> >> should be able to get it from TCP_SKB_CB(skb)->seq with the bpf_core_c=
+ast. Take
+> >> a look at the existing examples of bpf_core_cast.
+> >>
+> >> The same goes for the skb->data. It can use the bpf_dynptr_from_skb().=
+ It is not
+> >> available to skops program now but should be easy to expose.
+>  > I wonder what the use of skb->data is here.
 >
-> +               if (np->rxopt.all)
-> +                       opt_skb = skb_clone_and_charge_r(skb, sk);
->                  dst = rcu_dereference_protected(sk->sk_rx_dst,
->                                                  lockdep_sock_is_held(sk));
+> You are right, not needed. I was thinking it may need to parse the tcp he=
+ader
+> from the skb at the rx timestamping. It is not needed. The tcp stack shou=
+ld have
+> already parsed it and TCP_SKB_CB can be directly used as long as the sock=
+ops
+> prog can get to the skops->skb.
+
+Agreed.
+
 >
-> @@ -1656,13 +1643,13 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
->                                  if (reason)
->                                          goto reset;
->                          }
-> -                       if (opt_skb)
-> -                               __kfree_skb(opt_skb);
->                          return 0;
->                  }
->          } else
->                  sock_rps_save_rxhash(sk, skb);
+> >>
+> >> In the bpf prog, when the SCHED/SND/ACK timestamp comes back, it has t=
+o find the
+> >> earlier sendmsg timestamp. One option is to store the earlier sendmsg =
+timestamp
+> >> at the bpf map key-ed by seqno or the shinfo's tskey. Storing in a bpf=
+ map
+> >> key-ed by seqno/tskey is probably what the selftest should do. In the =
+future, we
+> >> can consider allowing the rbtree in the bpf sk local storage for searc=
+hing
+> >> seqno. There is shinfo's hwtstamp that can be used also if there is a =
+need.
+> >
+> > Thanks for the information! Let me investigate how the bpf map works...
+> >
+> > I wonder that for the selftests could it be much simpler if we just
+> > record each timestamp stored in three variables and calculate them at
+> > last since we only send the small packet once instead of using bpf
+> > map. I mean, bpf map is really good as far as I know, but I'm a bit
+> > worried that implementing such a function could cause more extra work
+> > (implementation and review).
 >
-> +       if (np->rxopt.all)
-> +               opt_skb = skb_clone_and_charge_r(skb, sk);
->          reason = tcp_rcv_state_process(sk, skb);
->          if (reason)
->                  goto reset;
+> Don't worry on the review side. imo, a closer to the real world selftest =
+prog is
+> actually helping the review process. It needs to test the tskey anyway an=
+d it
+> needs to store somewhere. bpf map is pretty simple to use. I don't think =
+it will
+> have much different in term of complexity also.
+
+Got it, will do it soon :)
+
+Thanks,
+Jason
 
