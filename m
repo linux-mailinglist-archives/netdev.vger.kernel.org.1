@@ -1,254 +1,334 @@
-Return-Path: <netdev+bounces-141111-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141112-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01E589B9993
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:41:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2719F9B9995
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:41:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 221C11C2138E
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:41:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA6EF28204F
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:41:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C93A1D9588;
-	Fri,  1 Nov 2024 20:41:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71291D5AA3;
+	Fri,  1 Nov 2024 20:41:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jVm02lnN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dLUnlU+l"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
+Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562371BF24
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:41:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFA57168DA
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:41:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730493666; cv=none; b=UiLJV9sdHyRYg+vA/fHCUjmElzsjRp2sUBlEMqn0GJeYWcU7brJMaGfh3yBT6Y2WYaKwDjLhayQNmcUNs9aasxoaHSaAntX9JhIXQt0aHwtQ246Lsu/4J9BNzT3Q6sFo+joY1CvaFlXnf52FBcV/b73kaLkRe2Ol2wFhZV6WdZ4=
+	t=1730493691; cv=none; b=ZzIjpe23TWVeeFjQQ5BIK+DPtkhaE6PiJWnWKfKk7+5evPrZR2sS4XcQoCfArRd+KOyU+l0AlpwIOee6+mR2DnAM+3KXcHiOfOpUJp0lmPhnGAKJqKyI1hKBfoh4p0rgHLP41f2vEdw8czosplkAKV8OG9iggUOuvoEGGUN5t4c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730493666; c=relaxed/simple;
-	bh=QnZ9NtjUbdQTJvpttaHRdaRqT9o2KWoYfK1rOy0QK5g=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=YXsn5iWxEVgO/aBoaus4uvf5BvoHBSeqbA4Yfzi13gwFGkR5J4iHl2V08B7pmcctwYy2D8fwoetbqDSpUAUxHz6MzeALey/jNdREcn4BLF+s/gZpPYSkSm7tJsIR+eY0w1qAb+51xTA87nwF3z6RbLfhT+Ciw6W58BLhBS3/+hs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jVm02lnN; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-460b295b9eeso17561cf.1
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:41:04 -0700 (PDT)
+	s=arc-20240116; t=1730493691; c=relaxed/simple;
+	bh=QOphRyKAsxIaEFGcLo/qel+AtfTxF+JUHmxDpd5th8U=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hfTRP37S9Z1E99DFb4Ehrbc7wcxnslqel4zmwHeufm73UMn6ruZY2QnT7eG9+dOWiBGWIfAWqIHGBfF006QztzPU0ZnnJLDTLuNOQSsU5Eto+Np0YJc3ROfYnr8nMPxOUluBCJahRja/ASvsk7OkBkjjJspTp9c4eV7gbSBBuZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dLUnlU+l; arc=none smtp.client-ip=209.85.128.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-431548bd1b4so19547465e9.3
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:41:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730493663; x=1731098463; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4cWDY3NSGHiCMXI2nz1acGMypfvF/NU2Y53NaKDsy0s=;
-        b=jVm02lnN8pB9N5B2eS+ZuHYukaQQD3tXkTNG3eQfEr99qJSgo/aBqr/mG/UbsAFo0N
-         PKv14VgFZhVY/FNHiixVKIFrW3hwE60+ZKAg6fV6GCWlULb0k9N2AN0HY1jPwUeXH+Gx
-         5wipCyb09zw0gnE2bKZVtIXvNz0O0dc4CeM5TYSjVeKTu7Br7vanqAOPAsUGIXfETChV
-         LhMrYvCSJ71+xBPMaUcwCoY/Ng08s0JTfNVQNNqpKH5Ts72rmnuT0Ri0wYGuyhqZzBnY
-         wuP1b2BCnZT7kX54hZtWMyhZuP7ZMVyaFc/QE+re+vu/B0Wg42puhsUJGKpku3fhlEEM
-         mQ0g==
+        d=gmail.com; s=20230601; t=1730493688; x=1731098488; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LFpXM2gzrzFolk86kxvnGgp4sU8zsgEQqSpmVmzFk+Y=;
+        b=dLUnlU+lTzBt0mQLce1vwzfB5ezTFuwckw1weuo/FfDzo/0S9+vYK3RbiiQwDFP/N1
+         PHCUJOKtbJIapl6TjcfiTf+GOJDWYONeRC5hgL/Kfq1nGSqQXvykuOdAc1gX7b+ePA2P
+         Gj6MbyskOnqeXJZMnojr528QVQVc37XwObqo4GQqTvGSw1gxZ/GQ+5wBRMUCemLGu3FS
+         WoHaFOMzT+lwZTTLvYafh71WQXHWnGN+E93BWwSy538TpTx5/njMLdcJ8oN+Ee+cxW1X
+         oYsULrXYyj8fxXuQqk+98e82Y5pweW4duMUKnfSW9ZxNA4OM6rxw+ltKDJBrkF/R0zxb
+         SFcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730493663; x=1731098463;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=4cWDY3NSGHiCMXI2nz1acGMypfvF/NU2Y53NaKDsy0s=;
-        b=NPfjsAHvD3tyB6aY/ogw1BIW6U1zP+g69KtLVKktaj5htyOOks6wZ0J2Dcs/K6ZbR3
-         iy6U/ufCdglVoOGt26gjbpzg9YPGzyu5uEHXfg4/iQqIdzvbQagL3Zx2xCHCpK2xdJpY
-         mr+BKVUtk/PWhIBRY9ktfN7fCxhefEAjc/2KhIKrwvjqOYbxE3O41VumotUQ9QxoLKNW
-         awNPgLpgb2HH5mBctnf7NlADfqZ9KjdWBMPJLL+7tdSFEDs7KU0foz5QaasPhmB205Wo
-         GK0i9+U+tbuh6EsXU9atwAzczgwbJKIRbVquEHLSp0mRssOIKA8LiV6oxNsnvIzoNTFa
-         v2eA==
-X-Forwarded-Encrypted: i=1; AJvYcCUWo9nT/1ywSdoBYLC8ZTml7BJTMTFTnjCgtyptfulayodIjiq3NBHMgyH1w/GErHHglG3hQ/U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxK2AY+wnekqlqNJJPBiddezLFm4cvb/+iCvD1GlPy39r1cOZUs
-	qQ8WoJ5l/Me5+KANJ2yxCa0iEl5r58yDMPZKQNoHEF2zp7+ST6kUfUyqf30D5odMGoy1FfLjMwT
-	vJLUlvYg9SvaFmxukx+KOTSrnYqpJE099N3wS
-X-Gm-Gg: ASbGncvctolsL93GbUyp1yp/W+TRpTO6b/OmTk54q1YJkRWY1NwfOgE8BTycUuUjxXC
-	x3HfPVJLhJ+B2/QigsE3XaXWAKlGiZSNyDjOATp3IEh/6VrP1PW1NUSfdOx4ZCA==
-X-Google-Smtp-Source: AGHT+IHQx73scTifKy/me2Cyi0Y+euncHKvBIpySAjRUMBxZGYBYJh/Kcv4YekjCYJP7ayAIXMrsTrsGu3mbqoHIrJU=
-X-Received: by 2002:a05:622a:2a10:b0:461:4467:14c7 with SMTP id
- d75a77b69052e-462c5d3126cmr905151cf.0.1730493662840; Fri, 01 Nov 2024
- 13:41:02 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730493688; x=1731098488;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=LFpXM2gzrzFolk86kxvnGgp4sU8zsgEQqSpmVmzFk+Y=;
+        b=Qht7rHUmu+L4NnG82cZ+VodVGjVkP0pwdtqZ+DJKL6rKIss45oSspxcMo/RNHXo/X4
+         dBY3MkVy9e4Vezk4Cx8xhFEeQyfiQf1fUhntZmvYmb3EQd1a9dWyaKoSrGy9WldZSCIE
+         VdGZU4kbC/OdWaMitw70P5t0JoMF5lX05wjvaUt/kAxYJ4LnzxOj/yCTbjFJmARlmQ/l
+         6wxeDVlD+oLeCJcFGTGNgy7/VfbmX7WVUmZo2Aoc2YVqXHLfYCl/vJIVnDDFJcgcT7im
+         L40ycYYLjpDwkds8J9g6pEqcju7D0sKNUYuOLmnIQVfDXl07vmmQoNvH/JOjuR3F8blY
+         h1iQ==
+X-Gm-Message-State: AOJu0YxxOA3bI53J7qKM46+e2qjN85nMq9lKTKg6rTVVZHVmQOnus1X9
+	wpS0SAfOa2Dw7Q8J7zShaWhW6frYfve9T5FdOsrQePPMTVCOqmDvcO1LtLzj
+X-Google-Smtp-Source: AGHT+IE/QLQM9aWOi6RSdfhmGoHG0xe1YHSrHcyTJUJu2rrdpDuNeb+IJmmPa65b7VUhkdDza+mmWQ==
+X-Received: by 2002:a05:600c:354e:b0:431:52f5:f48d with SMTP id 5b1f17b1804b1-43283297ac6mr42569805e9.31.1730493687426;
+        Fri, 01 Nov 2024 13:41:27 -0700 (PDT)
+Received: from localhost (fwdproxy-cln-001.fbsv.net. [2a03:2880:31ff:1::face:b00c])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7b80sm6206478f8f.10.2024.11.01.13.41.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 13:41:25 -0700 (PDT)
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+To: netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com,
+	kuba@kernel.org,
+	andrew@lunn.ch,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	kernel-team@meta.com,
+	sanmanpradhan@meta.com,
+	sdf@fomichev.me,
+	vadim.fedorenko@linux.dev,
+	horms@kernel.org,
+	jdamato@fastly.com,
+	mohsin.bashr@gmail.com
+Subject: [PATCH net-next v4] eth: fbnic: Add support to write TCE TCAM entries
+Date: Fri,  1 Nov 2024 13:41:16 -0700
+Message-ID: <20241101204116.1368328-1-mohsin.bashr@gmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022162359.2713094-1-ap420073@gmail.com> <20241022162359.2713094-6-ap420073@gmail.com>
- <CAHS8izNbS4i+ke0bK07-rNLuq6RGXD-H73DhVb1-tsUOzSCBog@mail.gmail.com> <CAMArcTUGTF2Qr9=W_mcrA9au2jhm0Ru6hC+Nt3V2tk=LODQs+A@mail.gmail.com>
-In-Reply-To: <CAMArcTUGTF2Qr9=W_mcrA9au2jhm0Ru6hC+Nt3V2tk=LODQs+A@mail.gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 1 Nov 2024 13:40:51 -0700
-Message-ID: <CAHS8izN0_v0UTNT9Xu8yJcvStvAYBQW3kadMG_0d4xr7Ta-VVQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 5/8] net: devmem: add ring parameter filtering
-To: Taehee Yoo <ap420073@gmail.com>, Harshitha Ramamurthy <hramamurthy@google.com>, 
-	Ziwei Xiao <ziweixiao@google.com>
-Cc: Praveen Kaligineedi <pkaligineedi@google.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, edumazet@google.com, donald.hunter@gmail.com, 
-	corbet@lwn.net, michael.chan@broadcom.com, andrew+netdev@lunn.ch, 
-	hawk@kernel.org, ilias.apalodimas@linaro.org, ast@kernel.org, 
-	daniel@iogearbox.net, john.fastabend@gmail.com, dw@davidwei.uk, 
-	sdf@fomichev.me, asml.silence@gmail.com, brett.creeley@amd.com, 
-	linux-doc@vger.kernel.org, netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 1, 2024 at 11:03=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> On Fri, Nov 1, 2024 at 11:29=E2=80=AFPM Mina Almasry <almasrymina@google.=
-com> wrote:
-> >
-> > Hi Taehee, sorry for the late reply. I was out on vacation and needed
-> > to catch up on some stuff when I got back.
->
-> Hi Mina,
-> Thank you so much for your review :)
->
-> >
-> > On Tue, Oct 22, 2024 at 9:25=E2=80=AFAM Taehee Yoo <ap420073@gmail.com>=
- wrote:
-> > >
-> > > If driver doesn't support ring parameter or tcp-data-split configurat=
-ion
-> > > is not sufficient, the devmem should not be set up.
-> > > Before setup the devmem, tcp-data-split should be ON and
-> > > header-data-split-thresh value should be 0.
-> > >
-> > > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> > > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > > ---
-> > >
-> > > v4:
-> > >  - Check condition before __netif_get_rx_queue().
-> > >  - Separate condition check.
-> > >  - Add Test tag from Stanislav.
-> > >
-> > > v3:
-> > >  - Patch added.
-> > >
-> > >  net/core/devmem.c | 18 ++++++++++++++++++
-> > >  1 file changed, 18 insertions(+)
-> > >
-> > > diff --git a/net/core/devmem.c b/net/core/devmem.c
-> > > index 11b91c12ee11..3425e872e87a 100644
-> > > --- a/net/core/devmem.c
-> > > +++ b/net/core/devmem.c
-> > > @@ -8,6 +8,8 @@
-> > >   */
-> > >
-> > >  #include <linux/dma-buf.h>
-> > > +#include <linux/ethtool.h>
-> > > +#include <linux/ethtool_netlink.h>
-> > >  #include <linux/genalloc.h>
-> > >  #include <linux/mm.h>
-> > >  #include <linux/netdevice.h>
-> > > @@ -131,6 +133,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_de=
-vice *dev, u32 rxq_idx,
-> > >                                     struct net_devmem_dmabuf_binding =
-*binding,
-> > >                                     struct netlink_ext_ack *extack)
-> > >  {
-> > > +       struct kernel_ethtool_ringparam kernel_ringparam =3D {};
-> > > +       struct ethtool_ringparam ringparam =3D {};
-> > >         struct netdev_rx_queue *rxq;
-> > >         u32 xa_idx;
-> > >         int err;
-> > > @@ -140,6 +144,20 @@ int net_devmem_bind_dmabuf_to_queue(struct net_d=
-evice *dev, u32 rxq_idx,
-> > >                 return -ERANGE;
-> > >         }
-> > >
-> > > +       if (!dev->ethtool_ops->get_ringparam)
-> > > +               return -EOPNOTSUPP;
-> > > +
-> >
-> > Maybe an error code not EOPNOTSUPP. I think that gets returned when
-> > NET_DEVMEM is not compiled in and other situations like that. Lets
-> > pick another error code? Maybe ENODEV.
->
-> There are several same code in the ethtool core.
-> It returns EOPNOTSUPP consistently.
-> In the v3 series, Brett reviewed it.
-> So, I changed it from EINVAL to EOPNOTSUPP it was reasonable to me.
-> So I prefer EOPNOTSUPP but I will follow your decision.
-> What do you think?
->
-> >
-> > Also consider extack error message. But it's very unlikely to hit this
-> > error, so maybe not necessary.
->
-> I removed extack from the v3. because ethtool doesn't use extack for
-> the same logic. It was reasonable to me.
->
+Add support to redirect host-to-BMC traffic by writing MACDA entries
+from the RPC (RX Parser and Classifier) to TCE-TCAM. The TCE TCAM is a
+small L2 destination TCAM which is placed at the end of the TX path (TCE).
 
-Ah, looks like I accidentally re-opened discussion on a couple of
-items that you're already aligned on. Not critical. This is fine by
-me.
+Unlike other NICs, where BMC diversion is typically handled by firmware,
+for fbnic, firmware does not touch anything related to the host; hence,
+the host uses TCE TCAM to divert BMC traffic.
 
-> >
-> > > +       dev->ethtool_ops->get_ringparam(dev, &ringparam, &kernel_ring=
-param,
-> > > +                                       extack);
-> > > +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_SPL=
-IT_ENABLED) {
-> > > +               NL_SET_ERR_MSG(extack, "tcp-data-split is disabled");
-> > > +               return -EINVAL;
-> > > +       }
-> > > +       if (kernel_ringparam.hds_thresh) {
-> > > +               NL_SET_ERR_MSG(extack, "header-data-split-thresh is n=
-ot zero");
-> > > +               return -EINVAL;
-> > > +       }
-> > > +
-> >
-> > Thinking about drivers that support tcp-data-split, but don't support
-> > any kind of hds_thresh. For us (GVE), the hds_thresh is implicitly
-> > always 0.
-> >
-> > Does the driver need to explicitly set hds_thresh to 0? If so, that
-> > adds a bit of churn to driver code. Is it possible to detect in this
-> > function that the driver doesn't support hds_thresh and allow the
-> > binding if so?
-> >
-> > I see in the previous patch you do something like:
-> >
-> > supported_ring_params & ETHTOOL_RING_USE_HDS_THRS
-> >
-> > To detect there is hds_thresh support. I was wondering if something
-> > like this is possible so we don't have to update GVE and all future
-> > drivers to explicitly set thresh to 0.
->
-> How about setting maximum hds_threshold to 0?
-> The default value of hds_threshold of course 0.
-> I think gve code does not need to change much, just adding like below
-> will be okay.
->
-> I think if drivers don't support setting hds_threshold explicitly, it
-> is actually the same as support only 0.
-> So, there is no problem I think.
->
-> I didn't analyze gve driver code, So I might think it too optimistically.
->
-> #define GVE_HDS_THRESHOLD_MAX 0
-> kernel_ering->hds_thresh =3D GVE_HDS_THRESHOLD_MAX;
-> kernel_ering->hds_thresh_max =3D GVE_HDS_THRESHOLD_MAX;
-> ...
-> .supported_ring_params  =3D ETHTOOL_RING_USE_TCP_DATA_SPLIT |
-> ETHTOOL_RING_USE_HDS_THRS,
->
+Currently, we lack metadata to track where addresses have been written
+in the TCAM, except for the last entry written. To address this issue,
+we start at the opposite end of the table in each pass, so that adding
+or deleting entries does not affect the availability of all entries,
+assuming there is no significant reordering of entries.
+---
+Changes in V4:
+- Update the commit message to clearly specify the role of TCE TCAM in
+  fbnic
+- Revert iterator related changes made in V3 back to V2, including
+  iterator type and place of declaration
 
-OK, if you can think of a way to do this without any churn to other
-drivers, that would be better, but this is fine by me either way.
+V3: https://lore.kernel.org/netdev/20241025225910.30187-1-mohsin.bashr@gmail.com
+V2: https://lore.kernel.org/netdev/20241024223135.310733-1-mohsin.bashr@gmail.com
+V1: https://lore.kernel.org/netdev/20241021185544.713305-1-mohsin.bashr@gmail.com
 
-Reviewed-by: Mina Almasry <almasrymina@google.com>
+Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
+---
+ drivers/net/ethernet/meta/fbnic/fbnic.h       |   1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  20 ++++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   1 +
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.c   | 110 ++++++++++++++++++
+ drivers/net/ethernet/meta/fbnic/fbnic_rpc.h   |   4 +
+ 5 files changed, 136 insertions(+)
 
---=20
-Thanks,
-Mina
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic.h b/drivers/net/ethernet/meta/fbnic/fbnic.h
+index fec567c8fe4a..9f9cb9b3e74e 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic.h
+@@ -48,6 +48,7 @@ struct fbnic_dev {
+ 	struct fbnic_act_tcam act_tcam[FBNIC_RPC_TCAM_ACT_NUM_ENTRIES];
+ 	struct fbnic_mac_addr mac_addr[FBNIC_RPC_TCAM_MACDA_NUM_ENTRIES];
+ 	u8 mac_addr_boundary;
++	u8 tce_tcam_last;
+ 
+ 	/* Number of TCQs/RCQs available on hardware */
+ 	u16 max_num_queues;
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+index 79cdd231d327..dd407089ca47 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+@@ -397,6 +397,14 @@ enum {
+ #define FBNIC_TCE_DROP_CTRL_TTI_FRM_DROP_EN	CSR_BIT(1)
+ #define FBNIC_TCE_DROP_CTRL_TTI_TBI_DROP_EN	CSR_BIT(2)
+ 
++#define FBNIC_TCE_TCAM_IDX2DEST_MAP	0x0404A		/* 0x10128 */
++#define FBNIC_TCE_TCAM_IDX2DEST_MAP_DEST_ID_0	CSR_GENMASK(3, 0)
++enum {
++	FBNIC_TCE_TCAM_DEST_MAC		= 1,
++	FBNIC_TCE_TCAM_DEST_BMC		= 2,
++	FBNIC_TCE_TCAM_DEST_FW		= 4,
++};
++
+ #define FBNIC_TCE_TXB_TX_BMC_Q_CTRL	0x0404B		/* 0x1012c */
+ #define FBNIC_TCE_TXB_BMC_DWRR_CTRL	0x0404C		/* 0x10130 */
+ #define FBNIC_TCE_TXB_BMC_DWRR_CTRL_QUANTUM0	CSR_GENMASK(7, 0)
+@@ -407,6 +415,18 @@ enum {
+ #define FBNIC_TCE_TXB_BMC_DWRR_CTRL_EXT	0x0404F		/* 0x1013c */
+ #define FBNIC_CSR_END_TCE		0x04050	/* CSR section delimiter */
+ 
++/* TCE RAM registers */
++#define FBNIC_CSR_START_TCE_RAM		0x04200	/* CSR section delimiter */
++#define FBNIC_TCE_RAM_TCAM(m, n) \
++	(0x04200 + 0x8 * (n) + (m))		/* 0x10800 + 32*n + 4*m */
++#define FBNIC_TCE_RAM_TCAM_MASK			CSR_GENMASK(15, 0)
++#define FBNIC_TCE_RAM_TCAM_VALUE		CSR_GENMASK(31, 16)
++#define FBNIC_TCE_RAM_TCAM3(n)		(0x04218 + (n))	/* 0x010860 + 4*n */
++#define FBNIC_TCE_RAM_TCAM3_DEST_MASK		CSR_GENMASK(5, 3)
++#define FBNIC_TCE_RAM_TCAM3_MCQ_MASK		CSR_BIT(7)
++#define FBNIC_TCE_RAM_TCAM3_VALIDATE		CSR_BIT(31)
++#define FBNIC_CSR_END_TCE_RAM		0x0421F	/* CSR section delimiter */
++
+ /* TMI registers */
+ #define FBNIC_CSR_START_TMI		0x04400	/* CSR section delimiter */
+ #define FBNIC_TMI_SOP_PROT_CTRL		0x04400		/* 0x11000 */
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index c08798fad203..fc7d80db5fa6 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -273,6 +273,7 @@ void __fbnic_set_rx_mode(struct net_device *netdev)
+ 	/* Write updates to hardware */
+ 	fbnic_write_rules(fbd);
+ 	fbnic_write_macda(fbd);
++	fbnic_write_tce_tcam(fbd);
+ }
+ 
+ static void fbnic_set_rx_mode(struct net_device *netdev)
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+index 337b8b3aef2f..908c098cd59e 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.c
+@@ -587,6 +587,116 @@ static void fbnic_clear_act_tcam(struct fbnic_dev *fbd, unsigned int idx)
+ 		wr32(fbd, FBNIC_RPC_TCAM_ACT(idx, i), 0);
+ }
+ 
++static void fbnic_clear_tce_tcam_entry(struct fbnic_dev *fbd, unsigned int idx)
++{
++	int i;
++
++	/* Invalidate entry and clear addr state info */
++	for (i = 0; i <= FBNIC_TCE_TCAM_WORD_LEN; i++)
++		wr32(fbd, FBNIC_TCE_RAM_TCAM(idx, i), 0);
++}
++
++static void fbnic_write_tce_tcam_dest(struct fbnic_dev *fbd, unsigned int idx,
++				      struct fbnic_mac_addr *mac_addr)
++{
++	u32 dest = FBNIC_TCE_TCAM_DEST_BMC;
++	u32 idx2dest_map;
++
++	if (is_multicast_ether_addr(mac_addr->value.addr8))
++		dest |= FBNIC_TCE_TCAM_DEST_MAC;
++
++	idx2dest_map = rd32(fbd, FBNIC_TCE_TCAM_IDX2DEST_MAP);
++	idx2dest_map &= ~(FBNIC_TCE_TCAM_IDX2DEST_MAP_DEST_ID_0 << (4 * idx));
++	idx2dest_map |= dest << (4 * idx);
++
++	wr32(fbd, FBNIC_TCE_TCAM_IDX2DEST_MAP, idx2dest_map);
++}
++
++static void fbnic_write_tce_tcam_entry(struct fbnic_dev *fbd, unsigned int idx,
++				       struct fbnic_mac_addr *mac_addr)
++{
++	__be16 *mask, *value;
++	int i;
++
++	mask = &mac_addr->mask.addr16[FBNIC_TCE_TCAM_WORD_LEN - 1];
++	value = &mac_addr->value.addr16[FBNIC_TCE_TCAM_WORD_LEN - 1];
++
++	for (i = 0; i < FBNIC_TCE_TCAM_WORD_LEN; i++)
++		wr32(fbd, FBNIC_TCE_RAM_TCAM(idx, i),
++		     FIELD_PREP(FBNIC_TCE_RAM_TCAM_MASK, ntohs(*mask--)) |
++		     FIELD_PREP(FBNIC_TCE_RAM_TCAM_VALUE, ntohs(*value--)));
++
++	wrfl(fbd);
++
++	wr32(fbd, FBNIC_TCE_RAM_TCAM3(idx), FBNIC_TCE_RAM_TCAM3_MCQ_MASK |
++				       FBNIC_TCE_RAM_TCAM3_DEST_MASK |
++				       FBNIC_TCE_RAM_TCAM3_VALIDATE);
++}
++
++static void __fbnic_write_tce_tcam_rev(struct fbnic_dev *fbd)
++{
++	int tcam_idx = FBNIC_TCE_TCAM_NUM_ENTRIES;
++	int mac_idx;
++
++	for (mac_idx = ARRAY_SIZE(fbd->mac_addr); mac_idx--;) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[mac_idx];
++
++		/* Verify BMC bit is set */
++		if (!test_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam))
++			continue;
++
++		if (!tcam_idx) {
++			dev_err(fbd->dev, "TCE TCAM overflow\n");
++			return;
++		}
++
++		tcam_idx--;
++		fbnic_write_tce_tcam_dest(fbd, tcam_idx, mac_addr);
++		fbnic_write_tce_tcam_entry(fbd, tcam_idx, mac_addr);
++	}
++
++	while (tcam_idx)
++		fbnic_clear_tce_tcam_entry(fbd, --tcam_idx);
++
++	fbd->tce_tcam_last = tcam_idx;
++}
++
++static void __fbnic_write_tce_tcam(struct fbnic_dev *fbd)
++{
++	int tcam_idx = 0;
++	int mac_idx;
++
++	for (mac_idx = 0; mac_idx < ARRAY_SIZE(fbd->mac_addr); mac_idx++) {
++		struct fbnic_mac_addr *mac_addr = &fbd->mac_addr[mac_idx];
++
++		/* Verify BMC bit is set */
++		if (!test_bit(FBNIC_MAC_ADDR_T_BMC, mac_addr->act_tcam))
++			continue;
++
++		if (tcam_idx == FBNIC_TCE_TCAM_NUM_ENTRIES) {
++			dev_err(fbd->dev, "TCE TCAM overflow\n");
++			return;
++		}
++
++		fbnic_write_tce_tcam_dest(fbd, tcam_idx, mac_addr);
++		fbnic_write_tce_tcam_entry(fbd, tcam_idx, mac_addr);
++		tcam_idx++;
++	}
++
++	while (tcam_idx < FBNIC_TCE_TCAM_NUM_ENTRIES)
++		fbnic_clear_tce_tcam_entry(fbd, tcam_idx++);
++
++	fbd->tce_tcam_last = tcam_idx;
++}
++
++void fbnic_write_tce_tcam(struct fbnic_dev *fbd)
++{
++	if (fbd->tce_tcam_last)
++		__fbnic_write_tce_tcam_rev(fbd);
++	else
++		__fbnic_write_tce_tcam(fbd);
++}
++
+ void fbnic_clear_rules(struct fbnic_dev *fbd)
+ {
+ 	u32 dest = FIELD_PREP(FBNIC_RPC_ACT_TBL0_DEST_MASK,
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+index d62935f722a2..0d8285fa5b45 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_rpc.h
+@@ -35,6 +35,9 @@ enum {
+ #define FBNIC_RPC_TCAM_ACT_WORD_LEN		11
+ #define FBNIC_RPC_TCAM_ACT_NUM_ENTRIES		64
+ 
++#define FBNIC_TCE_TCAM_WORD_LEN			3
++#define FBNIC_TCE_TCAM_NUM_ENTRIES		8
++
+ struct fbnic_mac_addr {
+ 	union {
+ 		unsigned char addr8[ETH_ALEN];
+@@ -186,4 +189,5 @@ static inline int __fbnic_mc_unsync(struct fbnic_mac_addr *mac_addr)
+ 
+ void fbnic_clear_rules(struct fbnic_dev *fbd);
+ void fbnic_write_rules(struct fbnic_dev *fbd);
++void fbnic_write_tce_tcam(struct fbnic_dev *fbd);
+ #endif /* _FBNIC_RPC_H_ */
+-- 
+2.43.5
+
 
