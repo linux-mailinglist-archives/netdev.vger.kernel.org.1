@@ -1,95 +1,75 @@
-Return-Path: <netdev+bounces-140906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 713369B8943
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 03:20:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F22C79B8955
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 03:35:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D2FF6B22361
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:20:42 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 95E981F22A76
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:35:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A9C13B7A1;
-	Fri,  1 Nov 2024 02:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D44735280;
+	Fri,  1 Nov 2024 02:35:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="R5DlriMw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="sePsJvnJ"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9989513A865;
-	Fri,  1 Nov 2024 02:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13B427482;
+	Fri,  1 Nov 2024 02:35:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730427625; cv=none; b=LxHzDQK23A9c6IjaRTorIr/+tsd0NpPsaPVW74nUXIsrmmIBAENcNCyd/vPwJTUBHIKFgkjqspoiPhOiU6KLNDVoFPLfDM2W5Eb736R25xGPc2IqcnYtwvVLuwXRXGGtritJmMa2BgTWMWpm5Fd15TGeAuENi8HmlytuQywDrec=
+	t=1730428526; cv=none; b=VexbQl+IuzZqx2WeDjDUoFnK1q+6osBHmhf5ocGwh74j8MabF0TshdQa98vAR/jkXLr4VOFNe8jW5cpv2Pi1VPJ/b3rMx6IXY4PVZzlF3B/sg4AmrcBj1YI7L1OG8xLh9/8z4jz5QZJsz14HmFL3uXqujZX2/A2OD52GxQTfvao=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730427625; c=relaxed/simple;
-	bh=FtFEokLt5E0nK+5sRxHP7/c9bnPq5dIqxz3jsniozhI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=tUYTZTDHCXvsFUjifiyGpiDSIqtv4KPsZ+ddaT+nuS+2aJb3WX8Z409PhGRkWa5un4RZP3lc/mx+8Wc09w9YwB9f0r8NM9GcyiDqRaDHZKxBey0gDuWT71N12sfFDab9hNBJ+pSWhDioy3fPG0vwpMAOMpC5XeiEriUW15Z1dXM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=R5DlriMw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 377FFC4CED9;
-	Fri,  1 Nov 2024 02:20:25 +0000 (UTC)
+	s=arc-20240116; t=1730428526; c=relaxed/simple;
+	bh=JrrcGy3WNSLTN19FZmr/1xEe+Vp+HHilQggRG+C2jss=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=JBOOHNfw0dML2nmOMCQ9MqnpvRr3S0gCXcsoceRMw4jGvSdPg89x2gn12jgwfJjdhtZZSyF51mvMxOMdtFKp+V7KHFYB70DR78Gwg6oEgSEFAq0zEcOqQqLCvCTvQQ4Et/g/M/oclgRsbweLmtJVCFC+KuKf8Z+voxz4JxuWVes=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=sePsJvnJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E9F22C4CEC3;
+	Fri,  1 Nov 2024 02:35:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730427625;
-	bh=FtFEokLt5E0nK+5sRxHP7/c9bnPq5dIqxz3jsniozhI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=R5DlriMwVYc+8LFZrZLbJW5SCrW3R2Ht7kFxgjFD1eZCmS9aqsyh3kVvmZJ9XWzNB
-	 VJDMq3zW+HOGcFUZwg/CVjDxyZOEaz9DsUoLKMNVmR6udiiEVXPtvzzqjmTatQ18rz
-	 dwZ1P0G8DG5EDrTgliypll7p9jC+P+j2aFZdQKx7nBwH0lVy51TxF7U6G200yAeqjk
-	 jl1LPxfhGGmT0hwMenAbsxrtDSOY6yDXlhmvVmc4VlgL0XhH2/sMECAXASrFSSR6r0
-	 i5v7zujO0LTCXRUFf5CEjJg8jxJxiy7yC8SW38mqH7I1+t90kiVkpURf2PQoEYssmW
-	 krugnp8avdJvg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C46380AC02;
-	Fri,  1 Nov 2024 02:20:34 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730428525;
+	bh=JrrcGy3WNSLTN19FZmr/1xEe+Vp+HHilQggRG+C2jss=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=sePsJvnJnFWmiteSyCg4yIUBWt+sU2Ldqxxi+YDpQs57ZRvXh7paWKjgARxQrKzft
+	 c7DMRq00K9/d1nR4FZGCxvVV3085J/yRG0nItgol+HyWlXuDj6tacUObqlF4QkhIZU
+	 xAWDD5AASa8zONmTOcBkBZ0bvPIadLb99W6eRUciPV+3G80+HvZW0nhkKnzsvwkcz3
+	 C9zlLwb/7vdAy6j5k3R3pzTeCOdzbK4lC8J5mYZ6RZ26XtweR6o0bVdZ+WOleHqcjQ
+	 JwuvGBQLiv2P8n+2Gfvjcyc0ezob1SsIQD93QiQmom4WG4xsDHTk3RcT1XgTO1J7wq
+	 OIZN1xRV16hlw==
+Date: Thu, 31 Oct 2024 19:35:23 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Gur Stavi <gur.stavi@huawei.com>
+Cc: gongfan <gongfan1@huawei.com>, <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Cai
+ Huoqing <cai.huoqing@linux.dev>, Xin Guo <guoxin09@huawei.com>, Shen
+ Chenyang <shenchenyang1@hisilicon.com>, Zhou Shuai
+ <zhoushuai28@huawei.com>, Wu Like <wulike1@huawei.com>, Shi Jing
+ <shijing34@huawei.com>, Meny Yossefi <meny.yossefi@huawei.com>
+Subject: Re: [RFC net-next v01 1/1] net: hinic3: Add a driver for Huawei 3rd
+ gen NIC
+Message-ID: <20241031193523.09f63a7e@kernel.org>
+In-Reply-To: <ebb0fefe47c29ffed5af21d6bd39d19c2bcddd9c.1730290527.git.gur.stavi@huawei.com>
+References: <cover.1730290527.git.gur.stavi@huawei.com>
+	<ebb0fefe47c29ffed5af21d6bd39d19c2bcddd9c.1730290527.git.gur.stavi@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v4] fsl/fman: Validate cell-index value obtained from
- Device Tree
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173042763300.2156176.4170019581094798127.git-patchwork-notify@kernel.org>
-Date: Fri, 01 Nov 2024 02:20:33 +0000
-References: <20241028065824.15452-1-amishin@t-argos.ru>
-In-Reply-To: <20241028065824.15452-1-amishin@t-argos.ru>
-To: Aleksandr Mishin <amishin@t-argos.ru>
-Cc: igal.liberman@freescale.com, madalin.bucur@nxp.com,
- sean.anderson@seco.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, lvc-project@linuxtesting.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Wed, 30 Oct 2024 14:25:47 +0200 Gur Stavi wrote:
+>  50 files changed, 18058 insertions(+)
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Mon, 28 Oct 2024 09:58:24 +0300 you wrote:
-> Cell-index value is obtained from Device Tree and then used to calculate
-> the index for accessing arrays port_mfl[], mac_mfl[] and intr_mng[].
-> In case of broken DT due to any error cell-index can contain any value
-> and it is possible to go beyond the array boundaries which can lead
-> at least to memory corruption.
-> 
-> Validate cell-index value obtained from Device Tree.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v4] fsl/fman: Validate cell-index value obtained from Device Tree
-    https://git.kernel.org/netdev/net-next/c/bd50c4125c98
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+4kLoC is the right ballpark to target for the initial submission.
+Please cut this down and submit a minimal driver, then add the
+features.
 
