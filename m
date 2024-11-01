@@ -1,67 +1,60 @@
-Return-Path: <netdev+bounces-140968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6F5919B8ED6
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:14:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54E489B8EEE
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:18:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 33C31283037
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:14:58 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5B9EB2285C
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:18:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B05CB168488;
-	Fri,  1 Nov 2024 10:14:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 383281586F2;
+	Fri,  1 Nov 2024 10:18:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NtZ6MkSZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BEC815B97E
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 10:14:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E7B817C222;
+	Fri,  1 Nov 2024 10:18:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730456090; cv=none; b=L9lMGaVxGKZFd7s2t4xbMn5u5s/VGZ+yms387fiinJI7x5i9NDRuuIryl3xFRv4ZXphZCHTZktKJBg/Bpyi25cSkByTJ5KKkIV4bs7hmIO5c6bDzrvaE2I5SIbKyQUMsuMrd20wRj5ZpEn0vC9kvTLwRWBWHGVi0pbwnok5WwSI=
+	t=1730456334; cv=none; b=tDoHtde3OAb4O7OeLcVcf/PMjArXAKpHXJ614eUgA9nmRjNF0fudgUv3pEpspErGP17bwpDRc4yDF3gvOXjZe5CrTV4xuaiazv2Ns40UC1QChZacnq190yYdV+0oBo50bf4+bemOiZPT6sHVuYzYkoas7Ukdo4cnvCRoiIX/Ss8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730456090; c=relaxed/simple;
-	bh=FxZ6lDE3z1Ekk1oapLEQUiWEX57ejZShoYoIVseC+4Q=;
+	s=arc-20240116; t=1730456334; c=relaxed/simple;
+	bh=91HgHQdlPnl+2yxTwemtCDmPgHq5QCFAF7klqhPUruA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oqqz7o6ihkBIfGGrh85ryMn4smO4u9jesnwp/QOCg0i2DnFBZOgiUNfccEgBHbk9w1Yt6HjqWcWqmzH9Ci9w6aS6loljWVhNlaH/qzRWENVC/en/w8z9Kcnykw5c+iG3JX6ZYmIQY2pm2lykvMZ4UXagROy+hS8Z5Z6D3bPNGAQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9a26a5d6bfso265977466b.1
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 03:14:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730456087; x=1731060887;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=3w45ANRdUj4mrOui3s3eHA2JSaJRmmApwTgpSsWKFYU=;
-        b=S1oD3dxjQ8XIOCr7o/H3Dx3UyvQtTtPjCw7ZF1VumGOQCC/DlWMxpAWP8L8f7gWZHK
-         DuHFS7zKKbjKvEwwzvfnMqqZAaxVByoCilszBDIXgElIUiKn7bSv71FSP+GJrFcopk6t
-         4pzgE27wcoaloXmJEwm9egGupQZXnU6j+rmw7Z/TezmxhqojNLF/xJnCX7X0FMxck3f3
-         nZKPt1lj/3Q8ztiDICVW/qkFUmq+8eVusAltteQyEY/WYLuAKmnRk8e3O4Kd+Sn5wHF9
-         xQYu7WIvVIU1NlfHQJ3Asx1jjY9LeKv/eMseTeBdDKWOl5aM7wWz/mFuy+h9SSeOII3V
-         QXvw==
-X-Forwarded-Encrypted: i=1; AJvYcCVthvJY2YQRX0nYw1QuEW5cXsinH/nxjycjhOe8SplWZ3nWwQf3wu2NN86OXh22i4ITxl++TRg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTjiQvFT96QEW9lGwSp5CvcdpCiAcRn0d4zSpRhkwKiA0eJspR
-	LvVrjGyoVzclFCaxjUC5yO+Q95XCzZ5AxIHE2/rNZtPC0BEo5EWTO3QdN/my
-X-Google-Smtp-Source: AGHT+IFdL8eBoNwwX5yIDjVpYUPj1q8CDuRlP6DPXdW0CcmE6KpQBlEmlSEpLAqaMT+ovyK7Mj5H/w==
-X-Received: by 2002:a17:907:d23:b0:a99:f833:ca32 with SMTP id a640c23a62f3a-a9e6556fcd0mr310327566b.18.1730456085069;
-        Fri, 01 Nov 2024 03:14:45 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-113.fbsv.net. [2a03:2880:30ff:71::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e564c4f67sm164795666b.54.2024.11.01.03.14.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 03:14:44 -0700 (PDT)
-Date: Fri, 1 Nov 2024 03:14:42 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Simon Horman <horms@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, davem@davemloft.net,
-	netdev@vger.kernel.org, edumazet@google.com, pabeni@redhat.com
-Subject: Re: [PATCH net] MAINTAINERS: add Simon as an official reviewer
-Message-ID: <20241101-silky-goldfish-of-karma-6d80ed@leitao>
-References: <20241015153005.2854018-1-kuba@kernel.org>
- <20241016140801.GG2162@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=nLfBCyPjFtnDnnuPNMl2fbDfaQrQBfOpbxh4k0SJUQyyAP8T+jKTXOzJGiLbspjtsW1IlzDDYmR47jS5xh30EBkVZ3UZ9or4XcdsInOydJV7ot7BP/bkErfUaTLZEFoS7YwaPSI0NZvWlH4VTCjIJrsJO9u2JRQLEkMlIDO4u+o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NtZ6MkSZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EB439C4CECD;
+	Fri,  1 Nov 2024 10:18:50 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730456333;
+	bh=91HgHQdlPnl+2yxTwemtCDmPgHq5QCFAF7klqhPUruA=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NtZ6MkSZVdauJn/wXdDeAebAty2cy/vcp9hKTYFfLK5NRIPUZ4noA+OemEj2+OPMp
+	 KGVlE/rKwatybahr0FOxDeHoSEjoAqZRg0ATTi97tSt00+heSV5YviNqB6tIkHmgWG
+	 uDTu41SnM5icx5xLv+ZO+goRcrcHDGDasHjRf70zfAbRmkg7GMMKUm8bNyJVPG8Gtc
+	 mprGF+cnTedUdYr28/tyck8b4/x0bjzZShE9ZVmb1uyZ+9Jnsi6RczSX9aAUiHntc0
+	 Bzp50QcRDaK7f1RSr27T6gub0DgqbcMBn9wToDJV5jyEVzPjHFq/i4i0NeY57QRw39
+	 Gz4UD0tcxbhWA==
+Date: Fri, 1 Nov 2024 10:18:48 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
+	gakula@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+	hkelam@marvell.com, sbhatta@marvell.com,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [net-next PATCH v2 3/6] octeontx2-af: CN20k mbox to support AF
+ REQ/ACK functionality
+Message-ID: <20241101101848.GD1838431@kernel.org>
+References: <20241022185410.4036100-1-saikrishnag@marvell.com>
+ <20241022185410.4036100-4-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,28 +63,43 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241016140801.GG2162@kernel.org>
+In-Reply-To: <20241022185410.4036100-4-saikrishnag@marvell.com>
 
-On Wed, Oct 16, 2024 at 03:08:01PM +0100, Simon Horman wrote:
-> On Tue, Oct 15, 2024 at 08:30:05AM -0700, Jakub Kicinski wrote:
-> > Simon has been diligently and consistently reviewing networking
-> > changes for at least as long as our development statistics
-> > go back. Often if not usually topping the list of reviewers.
-> > Make his role official.
-> > 
-> > Acked-by: Eric Dumazet <edumazet@google.com>
-> > Acked-by: Paolo Abeni <pabeni@redhat.com>
-> > Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+On Wed, Oct 23, 2024 at 12:24:07AM +0530, Sai Krishna wrote:
+> This implementation uses separate trigger interrupts for request,
+> response MBOX messages against using trigger message data in CN10K.
+> This patch adds support for basic mbox implementation for CN20K
+> from AF side.
 > 
-> Thanks for the kind words and trusting me with this role.
-> I'm happy to help.
+> Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
 
-I'm thrilled to see this change.
+...
 
-Simon has been instrumental in thoroughly reviewing numerous of my
-patches, and his valuable feedback has been so helpful that I've started
-to include him on all my netdev patch submissions.
+>  #endif /* CN20K_API_H */
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
+> index 0e128013a03f..0c1ea6923043 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/af/cn20k/mbox_init.c
+> @@ -13,6 +13,137 @@
+>  #include "reg.h"
+>  #include "api.h"
+>  
+> +/* CN20K mbox PFx => AF irq handler */
+> +static irqreturn_t cn20k_mbox_pf_common_intr_handler(int irq, void *rvu_irq)
+> +{
+> +	struct rvu_irq_data *rvu_irq_data = (struct rvu_irq_data *)rvu_irq;
 
-It's great to see this process happening automatically by default
-now.
+Hi Sunil and Sai,
+
+A minor nit from my side: I general there is no need to explicitly cast a
+pointer to or from void *, and in Networking code it is preferred not to.
+
+	struct rvu_irq_data *rvu_irq_data = rvu_irq;
+
+> +	struct rvu *rvu = rvu_irq_data->rvu;
+> +	u64 intr;
+> +
+
+...
 
