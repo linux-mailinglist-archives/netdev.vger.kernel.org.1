@@ -1,206 +1,135 @@
-Return-Path: <netdev+bounces-141056-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC089B9499
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:41:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD559B94C7
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:55:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 914FD1C21C25
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:41:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5763D282F82
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:55:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94B811C9DCE;
-	Fri,  1 Nov 2024 15:41:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DDBF1C8FCF;
+	Fri,  1 Nov 2024 15:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GaFb1+V/"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Twz+bMkd"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f51.google.com (mail-pj1-f51.google.com [209.85.216.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BB2D25634;
-	Fri,  1 Nov 2024 15:41:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8238C1C761F
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 15:55:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730475663; cv=none; b=kO4W2oMvwe2FflRHPrCtbrOrixNSWQV+fFMoaYPT8k3RTi5wVUj7jJwKJXLIgBOieb5fAjRNHlgvx+5NpDgU3MHgZiS+PjxYxyVjPvqs97PCJ9BVJhLFle9ZL7Bq3B68I8DTGkbOT+rrYbK3FltHJNSVBUov52D4KyYePW0ceJw=
+	t=1730476550; cv=none; b=Hwx4C1tU8J9/6Kte8Md1RSGoqPMx3s+KUcpf4xrfTTEZM4Q7XsF3BaG6jYcyzyC66b2YaIX4g9a+RcY/AmKVz2o/xriRVSExJtYjw7ToMEFJxJxiWPA52w9hPAX7bLFa5u35V2k4TMuPJCkuLsNxBXYFQD8Dch6BKPYBnRYLw2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730475663; c=relaxed/simple;
-	bh=zla9w9yuxenlwXZM9FMEzg1b87SODZSVTWyPtyv2tJQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=LmOGWYS3i2mW28M11cnaGZu0Eub7wPvLGXVtAzqp5DE9JJu3hseGPVJB6z0ubCRYYa2mD3BCnTzhTIeJxtpgbuBwauKhJ/Cu6lKNVfK+DexcDiiF+9o8lXWriMF0eO4NMzliSlAMqMDBv3EaXDALaVUPmVJvWf0sDWKbj/ikY18=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GaFb1+V/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8B599C4CECD;
-	Fri,  1 Nov 2024 15:40:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730475662;
-	bh=zla9w9yuxenlwXZM9FMEzg1b87SODZSVTWyPtyv2tJQ=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GaFb1+V/oKwjeRtAHrj7Jz11JXecNJLRIxuWfVub7Y/7Lx1tCRuv9YZsZfDwODgr6
-	 BSprj8QPULTkHLHEgonlW4Gy1seNjtx4EfG1G6itCT6BY8QK4w5FoACp8oRJuIgZhm
-	 wdgNcbDGP+7BU/3OnqSJW24QbXtj+zB7QxspAINC7HjI9cxQ4qCBRxs2356JfRf6V6
-	 59qi3Cnc9KVjX9bQP3PMBwvFd4y/xdtl8ZIedU9eq4E3Yj2UAXRsZ1hOi61xF3cPcm
-	 h3NowUVMf7oO0Q96O+6I+d+9ZKn1w8up6DME6Wx3vyDjG/K7VZ4EDPc4LtvLQ0BRDR
-	 IH620WjfPLkUA==
-Message-ID: <9e876379-c555-45e6-8a8a-752d90fdc8ed@kernel.org>
-Date: Fri, 1 Nov 2024 16:40:50 +0100
+	s=arc-20240116; t=1730476550; c=relaxed/simple;
+	bh=4uAD9jOOqXaCa32oc6A+GDRWQpHNHx04sARiGTc2Qu4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L7axvwErUwoUeEHqiAHWHXWQ/mYgzKe8VxJm/es5KO3yDjO0M9nRC+u0VS3aRUwF21tvVI90DH+27JvyoaXzv2/3Ld/urA0u/DdpvUwoAYont40Hy/dorFrBGRexuQG/YTKKh0A5hDxJ2G7gRAlyRxudSTdgiAihnvFFcJN+q1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Twz+bMkd; arc=none smtp.client-ip=209.85.216.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-pj1-f51.google.com with SMTP id 98e67ed59e1d1-2e2fb304e7dso1684925a91.1
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 08:55:47 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730476547; x=1731081347; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qLBlsEZQifedxSMlNM71vQWvxRSeWYs3fggN7cWB9ls=;
+        b=Twz+bMkdAKNON9eZpqP/2UcRFv1nUm4omV0TdAHf3tm3AJPFpHcHsUFngDloahHqyq
+         LVeF7djHyFvHYcig5dDo0bbtUfskSWDC7HEwx0tjEtbEZMaMJQJLCE1vMcmFLu5MKoLg
+         864UBVpfgwWRlbwjDA5UtNg/CD3SB3cZW/eu4rwOTmNgUbKB0HYUestcDDv3gkObmq97
+         WFBVjj6BpGlKtPVa5adTIxxJUcIENiUi9xpOqDNr7mnoOwSkGLq4Uv+NQeO08eUecxKv
+         1u3A4DmynbELs7Xj5znoS1CUgtjvURcqI5fmD3YRbRnN4rJsUeu+9J7ggO/AdYk9Izgb
+         nMlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730476547; x=1731081347;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=qLBlsEZQifedxSMlNM71vQWvxRSeWYs3fggN7cWB9ls=;
+        b=ruyQMEyX/1z9DyXhZzDK5IAd0NSDa2PiPI7QNiXIfYEhPqC975lE4xgEMUV5aTlUWw
+         Ar2RRFtnRk5fBke2RRCJVzle2HYc7DmRaDE7Yb6IXFpVtvJWG4LvY8GYjVmgp3JbmLuU
+         D7MKzgHomm4TWSqdffjG4NHRHsS+zy8Uf7/4i8ygXX8RRdGnBz8/qULjdKv2FtMQ8NJR
+         KS0hpCIE9i5cOrbNniv9qTc4Chw5SPSfCWtoUhZz7yjMqj2S1aWp9qusXmt1mHE2Mix5
+         OWct73zs/nTKPYbRtmlNjkXxOD6VxDMQO5qpfA9VTXM7pr+onEi/5+OYraQa9OPYBSeo
+         UIWQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXp+3NcuWoiePwCoswNNDSTUnAZ3hGioUa1HXvjv505QF6dXkta9hk7jSIvAMp2w3CS+cM78n4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyl120Kh9FooWgjmJ2TCOXA0ZgEAKAQRzlxnTL+oBScDLEp+0/m
+	Buum2AKHXIWpa8ygIw94ElN1BqHktR5xXt/ebbsARX5CMSI05x2+bnNvWPXmygmu3BxItQ3WExx
+	IDYcQPDm2xH6RqigZLM/XZoxsQSgQ82z2aX0B
+X-Google-Smtp-Source: AGHT+IHMRbP5nE3OD/sTxFNgEl4A+Ix91K3szIsn26YzRn5L7WbY5jaruHKUNjBpS/XhaoJn/vvvjAV9HGaLKjL/bmk=
+X-Received: by 2002:a17:90a:d14f:b0:2e2:bb32:73eb with SMTP id
+ 98e67ed59e1d1-2e8f10a72a3mr26553959a91.31.1730476546681; Fri, 01 Nov 2024
+ 08:55:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 14/16] net: stmmac: dwmac-s32: add basic NXP S32G/S32R
- glue driver
-To: Jan Petrous <jan.petrous@oss.nxp.com>
-Cc: Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Alexandre Torgue <alexandre.torgue@foss.st.com>,
- Jose Abreu <joabreu@synopsys.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vinod Koul <vkoul@kernel.org>,
- Richard Cochran <richardcochran@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Shawn Guo <shawnguo@kernel.org>,
- Sascha Hauer <s.hauer@pengutronix.de>,
- Pengutronix Kernel Team <kernel@pengutronix.de>,
- Fabio Estevam <festevam@gmail.com>, Emil Renner Berthing <kernel@esmil.dk>,
- Minda Chen <minda.chen@starfivetech.com>,
- Nicolas Ferre <nicolas.ferre@microchip.com>,
- Claudiu Beznea <claudiu.beznea@tuxon.dev>,
- Iyappan Subramanian <iyappan@os.amperecomputing.com>,
- Keyur Chudgar <keyur@os.amperecomputing.com>,
- Quan Nguyen <quan@os.amperecomputing.com>, Rob Herring <robh@kernel.org>,
- Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley
- <conor+dt@kernel.org>, Giuseppe Cavallaro <peppe.cavallaro@st.com>,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, imx@lists.linux.dev,
- devicetree@vger.kernel.org, NXP S32 Linux Team <s32@nxp.com>
-References: <20241028-upstream_s32cc_gmac-v4-0-03618f10e3e2@oss.nxp.com>
- <20241028-upstream_s32cc_gmac-v4-14-03618f10e3e2@oss.nxp.com>
- <xanb4j56u2rjwpkyj5gwh6y6t36gpvawph62jw72ksh7jximhr@cjwlp7wsxgp6>
- <ZyOXgdqUgg2qlCah@lsv051416.swis.nl-cdc01.nxp.com>
- <b9aefcf2-8f0d-431c-865b-34c9b8e69c4d@kernel.org>
- <ZyO7fn3NWULA9bGG@lsv051416.swis.nl-cdc01.nxp.com>
- <ZyO9Mfq+znZdJJrJ@lsv051416.swis.nl-cdc01.nxp.com>
-From: Krzysztof Kozlowski <krzk@kernel.org>
-Content-Language: en-US
-Autocrypt: addr=krzk@kernel.org; keydata=
- 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 fv0=
-In-Reply-To: <ZyO9Mfq+znZdJJrJ@lsv051416.swis.nl-cdc01.nxp.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <671756af.050a0220.10f4f4.010f.GAE@google.com> <20241022142901.GA13306@ziepe.ca>
+In-Reply-To: <20241022142901.GA13306@ziepe.ca>
+From: Aleksandr Nogikh <nogikh@google.com>
+Date: Fri, 1 Nov 2024 16:55:32 +0100
+Message-ID: <CANp29Y534CT0jqhp5LQi_ZCs=1_i4duRO=4CJ52by9ZDW-1Wfw@mail.gmail.com>
+Subject: Re: [syzbot] [rdma?] INFO: task hung in add_one_compat_dev (3)
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: syzbot <syzbot+6dee15fdb0606ef7b6ba@syzkaller.appspotmail.com>, leon@kernel.org, 
+	linux-kernel@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 31/10/2024 18:24, Jan Petrous wrote:
-> On Thu, Oct 31, 2024 at 06:16:46PM +0100, Jan Petrous wrote:
->> On Thu, Oct 31, 2024 at 04:44:45PM +0100, Krzysztof Kozlowski wrote:
->>> On 31/10/2024 15:43, Jan Petrous wrote:
->>>> On Tue, Oct 29, 2024 at 08:13:40AM +0100, Krzysztof Kozlowski wrote:
->>>>> On Mon, Oct 28, 2024 at 09:24:56PM +0100, Jan Petrous (OSS) wrote:
->>>>>> +	plat->init = s32_gmac_init;
->>>>>> +	plat->exit = s32_gmac_exit;
->>>>>> +	plat->fix_mac_speed = s32_fix_mac_speed;
->>>>>> +
->>>>>> +	plat->bsp_priv = gmac;
->>>>>> +
->>>>>> +	return stmmac_pltfr_probe(pdev, plat, &res);
->>>>>> +}
->>>>>> +
->>>>>> +static const struct of_device_id s32_dwmac_match[] = {
->>>>>> +	{ .compatible = "nxp,s32g2-dwmac" },
->>>>>> +	{ .compatible = "nxp,s32g3-dwmac" },
->>>>>> +	{ .compatible = "nxp,s32r-dwmac" },
->>>>>
->>>>> Why do you need three same entries?
->>>>>
->>>>
->>>> We have three different SoCs and in v3 review you told me
->>>> to return all back:
->>>> https://patchwork.kernel.org/comment/26067257/
->>>
->>> It was about binding, not driver.
->>>
->>> I also asked there: use proper fallback and compatibility. Both comments
->>> of course affect your driver, but why choosing only first part?
->>>
->>
->> Does it mean I should remove first two (G2/G3) members from match array
->> and use "nxp,s32r-dwmac" as fallback for G2/G3? And similarly change
->> the bindings to:
->>
->>   compatible:
->>     oneOf:
->>       - const: nxp,s32r-dwmac
->>       - items:
->> 	  - enum:
->> 	      - nxp,s32g2-dwmac
->> 	      - nxp,s32g3-dwmac
->>           - const: nxp,s32r-dwmac
->>
->> And add here, into the driver, those members back when some device
->> specific feature will be needed? Am I understand your hints right?
->>
-> 
-> Sorry, it's not correct. This way I'm not able to detect S32R which is
-> the only one with higher speed.
-> 
-> Then I could use the G2 as fallback I think, Ie.:
-> 
->   compatible:
->     oneOf:
->       - const: nxp,s32g2-dwmac
->       - items:
-> 	  - enum:
->               - nxp,s32g3-dwmac
->               - nxp,s32r-dwmac
->            - const: nxp,s32g2-dwmac
+Hi Jason,
 
-I don't understand. In both cases you can 'detect r', if by this you
-meant match and bind. I don't care which one is the fallback, but if one
-does not work it points to different issues with your code.
+On Tue, Oct 22, 2024 at 4:29=E2=80=AFPM Jason Gunthorpe <jgg@ziepe.ca> wrot=
+e:
+>
+> On Tue, Oct 22, 2024 at 12:39:27AM -0700, syzbot wrote:
+>
+> > 1 lock held by syz-executor/27959:
+> >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/=
+rtnetlink.c:79 [inline]
+> >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: __rtnl_newlink net/=
+core/rtnetlink.c:3749 [inline]
+> >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_newlink+0xab7/=
+0x20a0 net/core/rtnetlink.c:3772
+>
+> There is really something wrong with the new sykzaller reporting, can
+> someone fix it?
+>
+> The kernel log that shows the programs:
+>
+> https://syzkaller.appspot.com/x/log.txt?x=3D10d72727980000
+>
+> Doesn't have the word "newlink"/"new"/"link" etc, and yet there is an
+> executor clearly sitting in a newlink netlink callback when we
+> crashed.
 
-Best regards,
-Krzysztof
+These are likely coming from the network devices initialization code.
+When syzbot spins up a new syz-executor, it creates a lot of
+networking devices as one of the first steps.
+https://github.com/google/syzkaller/blob/f00eed24f2a1332b07fef1a353a4391339=
+78d97b/executor/common_linux.h#L1482
 
+So those syz-executors might have just been unable to start and then
+they were abandoned (?)
+
+>
+> We need to see the syzkaller programs that are triggering these issues
+> to get ideas, and for some reason they are missing now.
+
+Once syzbot manages to find a reproducer, hopefully things will become
+more clear.
+
+--=20
+Aleksandr
+
+>
+> Jason
+>
 
