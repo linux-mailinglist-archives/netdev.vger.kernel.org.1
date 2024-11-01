@@ -1,224 +1,196 @@
-Return-Path: <netdev+bounces-141089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 468169B971D
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 19:08:42 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E9469B973B
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 19:17:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4861B214B3
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:08:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5596B2817DE
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:17:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5196B1CDFAC;
-	Fri,  1 Nov 2024 18:08:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707BE1CDFDE;
+	Fri,  1 Nov 2024 18:16:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jo5m7Obc"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAeH6rW5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
+Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7231214F132;
-	Fri,  1 Nov 2024 18:08:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910401CEAA4;
+	Fri,  1 Nov 2024 18:16:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730484513; cv=none; b=SfW4KRX/dNXDqLwcP8dukazqkxj2Ih5I78CfNDSIg77imSZDKSzDHywo5CU32l+UNt8R3p3BCN8MnwornMDabg0NzvtsWXeJ+MNxMKqY25MMwLjQk25Wf6wp+EmgA8bYoZUtqOvcJLvvkLBl3WyTky0S2wAs0WMMSyrS70oVQ3I=
+	t=1730484982; cv=none; b=M8XZFLgy8hcCqech6c8HDOlLQqbRn5vEfSzjTKP5v+k3ndrtk+oUwmohrtiYkNlqrF/VfR6iv3BUIupY0nKKEcXctumqtw/LMHRpyLFURYhowGdkZTQ+3LnQ9nw7thyMTIqXQKEFXQv0EsGWSpEPna0gT/FXTmdod+DrTVa9bIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730484513; c=relaxed/simple;
-	bh=kUlkaiEAbITpS5libgwOHCPxndGIP44TyCYpqXX2sCA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gLwHaSmKPZllour4ncTjFOUlMofOc7kc3yArcmBSsrfGr7Al6hBFkD6373NyrkjkYs5omEjUK4GSzDmkNG3qvfD1mEiowHMK6Ha6OGCxAtHem6ZGov7lt7IRJJotMx9yidHO10EiHifUZm5i9vTRE6rNQ2lslpRvQROEEjh1YiE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jo5m7Obc; arc=none smtp.client-ip=209.85.218.46
+	s=arc-20240116; t=1730484982; c=relaxed/simple;
+	bh=0FR/njw452jCVSO4SsQ9lRF6aQwJcXYFDa74fwjd7xU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Kli2LW5KkP77VL/F3jORLKfvCdqth3t2hfFntm/0IpnX/cHTS6pmBUzq71P7PA9WXT5podsWVk4maTujia9QrLlC1sJGC6GAV35GP1amdWCIyA/74KdG2yNV9xy3pzdwo6eW1Tte2bWEHYKd52ZudairwFZu75j6xGIDpsIfyPQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RAeH6rW5; arc=none smtp.client-ip=209.85.128.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9a977d6cc7so155772266b.3;
-        Fri, 01 Nov 2024 11:08:31 -0700 (PDT)
+Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43163667f0eso18815705e9.0;
+        Fri, 01 Nov 2024 11:16:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730484510; x=1731089310; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=OCtfL4LKHT16bIcd7QMas0zSxNmGktKU2W/PiR+cLdA=;
-        b=jo5m7Obcq+O7EZwiP/XUFW7vZgq6Qu/b1D+OuoUmveJl2CqwRY1sckShFrDGFQW9ZH
-         DJeHXTFoQHMBuiuL25d8BjvAwS1jDyzLVDlWa8Z2l8XwpbWH/5xW+dVcvL8da7OkGCx7
-         TDGK+qUfFDetDygw7DcUE7Lf9xxl6P1pJgNxK21GGMv44Dy/c5h02/v0+dq8yB2uAUuh
-         qhoz/qKpO6Ks3PSVjW5GJs2EJlqR1tqxvzYX6/2CNnp0BWb8idfgKwaxMFecUogXaamp
-         O85u2/WfLiYsyId0WJ0EV+sRLUxOhyG2u4h45L9oSQNNPwj/tC9IyvFIQS/oIX5P3Fi4
-         D5rw==
+        d=gmail.com; s=20230601; t=1730484979; x=1731089779; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cc4lXFKgcyUIAuEC6kZ9N4WBDUARabN2Mw/9c+S8Xsw=;
+        b=RAeH6rW5kWb5ME5WurdlJIRXNC8K59CZlvmVjf6YofVxOFRe8Bw1oDGcgMcS2r3Wav
+         NslruWQfEOeKWEFuQIyOtMgHjoDkAS9M8D1FTC90t7b2VQm2BofmnshwhdPhH23sWvtZ
+         adWg/VstzzpMw4qW3Nc4P4aRFyWiCz4/Uj6/lM50EMNWXTR7JcPsfhMALYzgn/Ldee0F
+         /iiSPoaSyaAUgPLQiGpmYhAZ9Pgi2zQRpHYu6CciU69nWAAAdMmgTvzQ4VLFRRxYiB7I
+         TxS7A5RX7Uwa76TCvrfYG6hDf694rVADc/rbdEwEdnJNj/lRRQh0uXoAVd0oOPBY/R3P
+         xl2A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730484510; x=1731089310;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OCtfL4LKHT16bIcd7QMas0zSxNmGktKU2W/PiR+cLdA=;
-        b=Xfo05r1LtBuIAYYKyRu3m8uc5NWNXWf5NF13zNOlJzJ69mXHzS7OjYF7BdRaRSZ4aE
-         dgeAsLvwZ1uWE8bfYWJVlBu5Qc0O3k3aAqZkOxpnzMWoJ+YUu/Rnmg1ic1rguIbDNFCA
-         RneUKctxhbWwNbQncCFdQOdeVJ72ozzqCOzi3g6PvffadnW0KJC9KO3vb9xHsrs8jISe
-         lWnbT4euHMartLTk3GJc1ybgXvPd78kwkr5xeRw0/Tkh6Do8dqFQPv6WmgL30KerssvV
-         Vjj8THIQ4W6ZlP4jQR+ekBgrka+JYYjWTvPeaS4UUgoCcgWOayyqVma06fAgaxean7RW
-         8RDA==
-X-Forwarded-Encrypted: i=1; AJvYcCUZe+ueiQu8YaFJfv8altbvCPtXGBB4kAVnDD+1/PKK4sapQ26NVH7uwxZNgMhEZBFCPd8qZ22S@vger.kernel.org, AJvYcCVwjimj7VubaC70Mp+8gD0L9djDJ54B3v0Oj3qQugVtGYMC/+VfcmKBANXvD/H+1V+1zY3ayPuNqC4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwuX+rZpIhd1/tjYx+58JJta13/RsC5kUcHRRNZpN2D+mhkocHc
-	BBX3pmCWqk3/l760lEtAl+0H6jRBoVFZfj8MuLNHB178NBZim+8BW+EAiA0oMwwP3akhMJHUFz0
-	U4qvxuselx4uWYzmsIoAl/uuBjho=
-X-Google-Smtp-Source: AGHT+IHsQJRWuTtNCKMdaamaYNellvKQy+MGvR0wU3bd0Udn5YV99dp3SCMg6+sdMqCBWuD+vOxqtsHpUCD/03Lpc2E=
-X-Received: by 2002:a05:6402:524b:b0:5ce:afba:f48a with SMTP id
- 4fb4d7f45d1cf-5ceb935bbc3mr4809875a12.27.1730484509256; Fri, 01 Nov 2024
- 11:08:29 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730484979; x=1731089779;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cc4lXFKgcyUIAuEC6kZ9N4WBDUARabN2Mw/9c+S8Xsw=;
+        b=jkogd5jZs6FGi1ZPmHdiXYYQo2gAPTRnqUVbC6aEHCCGj+FsmGmQ2wLmM1z5ebAJZi
+         wXN+zvFcyDl/Q1SXhTARDJZkZUpv/ffo4/fgk0UxET+FzWZZ+LUdmOfN0TeHOMMhmK/e
+         Fyha6f8E4avp3weWhjY7BBSxGuHHu2iYFzQ7I7Q/p28mIez7UR988CXQ0kai9zx7OeH+
+         m1sYyQxj4RdPnVWyoXLK2IuxD6C5+8/8VqLZbN3zBvsAdVVNMc7Y2E5v9W0yQ+fXlHlL
+         rFOSVnsKcIKldonc8EzYZi+98OZrOT0nL2UXAAmUWMZIift69d/cChwduJHKwsXHTCzU
+         CATQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUhbjxZLWnFiGVsFhyn8isExjSio12if+SWZS2XFX0F8c8GSNc2U76S/2HWnTMJYuyzYVR/mhI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxxacGxPh3VIrxPDB8mTnF1K6bp0nNHbQdBTDzRkIgDM62eBwJF
+	5RU2k4dzUwR0IDBXyg/tsDZhxbJLmKHDk9Bieq2R8BLn9PBcW2YN
+X-Google-Smtp-Source: AGHT+IElKTn819yNPTSho21gH78+hoFX4HkE49vG5ci5mpB3stuKhjkJP3WgO8moYPZrDmK6WDB6gA==
+X-Received: by 2002:a05:600c:3150:b0:431:5ce5:4864 with SMTP id 5b1f17b1804b1-432832aa0b1mr34058125e9.35.1730484978490;
+        Fri, 01 Nov 2024 11:16:18 -0700 (PDT)
+Received: from [192.168.42.19] ([85.255.236.151])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5c65c7sm69352105e9.19.2024.11.01.11.16.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Nov 2024 11:16:18 -0700 (PDT)
+Message-ID: <2928976c-d3ea-4595-803f-b975847e4402@gmail.com>
+Date: Fri, 1 Nov 2024 18:16:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022162359.2713094-1-ap420073@gmail.com> <20241022162359.2713094-7-ap420073@gmail.com>
- <CAHS8izMingYgf_ZuGWZMFNb3QGGkqKFjYwWvFpdbLW5yBWvvng@mail.gmail.com>
-In-Reply-To: <CAHS8izMingYgf_ZuGWZMFNb3QGGkqKFjYwWvFpdbLW5yBWvvng@mail.gmail.com>
-From: Taehee Yoo <ap420073@gmail.com>
-Date: Sat, 2 Nov 2024 03:08:17 +0900
-Message-ID: <CAMArcTXzTQJuA2q26i61OFgOSrnAvOyNWKFbW59V+h4WqBt_3g@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 6/8] net: ethtool: add ring parameter filtering
-To: Mina Almasry <almasrymina@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 06/15] net: page pool: add helper creating area from
+ pages
+To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241029230521.2385749-1-dw@davidwei.uk>
+ <20241029230521.2385749-7-dw@davidwei.uk>
+ <CAHS8izMkpisFO1Mx0z_qh0eeAkhsowbyCqKqvcV=JkzHV0Y2gQ@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izMkpisFO1Mx0z_qh0eeAkhsowbyCqKqvcV=JkzHV0Y2gQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 1, 2024 at 11:35=E2=80=AFPM Mina Almasry <almasrymina@google.co=
-m> wrote:
->
-> On Tue, Oct 22, 2024 at 9:25=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> w=
-rote:
-> >
-> > While the devmem is running, the tcp-data-split and
-> > header-data-split-thresh configuration should not be changed.
-> > If user tries to change tcp-data-split and threshold value while the
-> > devmem is running, it fails and shows extack message.
-> >
-> > Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> > Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> > ---
-> >
-> > v4:
-> >  - Add netdev_devmem_enabled() helper.
-> >  - Add Test tag from Stanislav.
-> >
-> > v3:
-> >  - Patch added
-> >
-> >  include/net/netdev_rx_queue.h | 14 ++++++++++++++
-> >  net/ethtool/common.h          |  1 +
-> >  net/ethtool/rings.c           | 13 +++++++++++++
-> >  3 files changed, 28 insertions(+)
-> >
-> > diff --git a/include/net/netdev_rx_queue.h b/include/net/netdev_rx_queu=
-e.h
-> > index 596836abf7bf..7fbb64ce8d89 100644
-> > --- a/include/net/netdev_rx_queue.h
-> > +++ b/include/net/netdev_rx_queue.h
-> > @@ -55,6 +55,20 @@ get_netdev_rx_queue_index(struct netdev_rx_queue *qu=
-eue)
-> >         return index;
-> >  }
-> >
-> > +static inline bool netdev_devmem_enabled(struct net_device *dev)
->
-> Mega nit: netdev_memory_provider_enabled().
->
-> This is actually not devmem specific, and there is already an io_uring
-> provider in the works.
->
-> But, also, we already have dev_get_min_mp_channel_count() defined in
-> linux/netdevice.h. Lets re-use that one instead of adding another
-> helper that does almost the same thing. Sorry, I should have
-> remembered we already have this helper in the last iteration.
+On 11/1/24 17:33, Mina Almasry wrote:
+> On Tue, Oct 29, 2024 at 4:06 PM David Wei <dw@davidwei.uk> wrote:
+>>
+>> From: Pavel Begunkov <asml.silence@gmail.com>
+>>
+>> Add a helper that takes an array of pages and initialises passed in
+>> memory provider's area with them, where each net_iov takes one page.
+>> It's also responsible for setting up dma mappings.
+>>
+>> We keep it in page_pool.c not to leak netmem details to outside
+>> providers like io_uring, which don't have access to netmem_priv.h
+>> and other private helpers.
+>>
+> 
+> I honestly prefer leaking netmem_priv.h details into the io_uring
+> rather than having io_uring provider specific code in page_pool.c.
 
-Ah, I didn't catch it too.
-I will use dev_get_min_mp_channel_count() instead.
-Thanks a lot!
+Even though Jakub didn't comment on this patch, but he definitely
+wasn't fond of giving all those headers to non net/ users. I guess
+I can't please everyone. One middle option is to make the page
+pool helper more granular, i.e. taking care of one netmem at
+a time, and moving the loop to io_uring, but I don't think it
+changes anything.
 
->
-> Other than that, looks fine to me.
->
-> > +{
-> > +       struct netdev_rx_queue *queue;
-> > +       int i;
-> > +
-> > +       for (i =3D 0; i < dev->real_num_rx_queues; i++) {
-> > +               queue =3D __netif_get_rx_queue(dev, i);
-> > +               if (queue->mp_params.mp_priv)
-> > +                       return true;
-> > +       }
-> > +
-> > +       return false;
-> > +}
-> > +
-> >  int netdev_rx_queue_restart(struct net_device *dev, unsigned int rxq);
-> >
-> >  #endif
-> > diff --git a/net/ethtool/common.h b/net/ethtool/common.h
-> > index 4a2de3ce7354..5b8e5847ba3c 100644
-> > --- a/net/ethtool/common.h
-> > +++ b/net/ethtool/common.h
-> > @@ -5,6 +5,7 @@
-> >
-> >  #include <linux/netdevice.h>
-> >  #include <linux/ethtool.h>
-> > +#include <net/netdev_rx_queue.h>
-> >
-> >  #define ETHTOOL_DEV_FEATURE_WORDS      DIV_ROUND_UP(NETDEV_FEATURE_COU=
-NT, 32)
-> >
-> > diff --git a/net/ethtool/rings.c b/net/ethtool/rings.c
-> > index e1fd82a91014..ca313c301081 100644
-> > --- a/net/ethtool/rings.c
-> > +++ b/net/ethtool/rings.c
-> > @@ -258,6 +258,19 @@ ethnl_set_rings(struct ethnl_req_info *req_info, s=
-truct genl_info *info)
-> >                 return -ERANGE;
-> >         }
-> >
-> > +       if (netdev_devmem_enabled(dev)) {
-> > +               if (kernel_ringparam.tcp_data_split !=3D
-> > +                   ETHTOOL_TCP_DATA_SPLIT_ENABLED) {
-> > +                       NL_SET_ERR_MSG(info->extack,
-> > +                                      "tcp-data-split should be enable=
-d while devmem is running");
->
-> Maybe: "can't disable tcp-data-split while device has memory provider ena=
-bled"
+...
+>>   #include <linux/dma-direction.h>
+>> @@ -459,7 +460,8 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
+>>                  __page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
+>>   }
+>>
+>> -static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
+>> +static bool page_pool_dma_map_page(struct page_pool *pool, netmem_ref netmem,
+>> +                                  struct page *page)
+> 
+> I have to say this is confusing for me. Passing in both the netmem and
+> the page is weird. The page is the one being mapped and the
+> netmem->dma_addr is the one being filled with the mapping.
 
-Thanks! I will use it!
+the page argument provides a mapping, the netmem gives the object
+where the mapping is set. netmem could be the same as the page
+argument, but I don't think it's inherently wrong, and it's an
+internal helper anyway. I can entirely copy paste the function, I
+don't think it's anyhow an improvement.
 
->
-> > +                       return -EINVAL;
-> > +               } else if (kernel_ringparam.hds_thresh) {
-> > +                       NL_SET_ERR_MSG(info->extack,
-> > +                                      "header-data-split-thresh should=
- be zero while devmem is running");
->
-> Maybe: "can't set non-zero hds_thresh while device is memory provider ena=
-bled".
+> Netmem is meant to be an abstraction over page. Passing both makes
+> little sense to me. The reason you're doing this is because the
+> io_uring memory provider is in a bit of a weird design IMO where the
+> memory comes in pages but it doesn't want to use paged-backed-netmem.
 
-Thanks, I will use it too.
+Mina, as explained it before, I view it rather as an abstraction
+that helps with finer grained control over memory and extending
+it this way, I don't think it's such a stretch, and it doesn't
+change much for the networking stack overall. Not fitting into
+devmem TCP category doesn't make it weird.
 
-Thanks a lot!
-Taehee Yoo
+> Instead it uses net_iov-backed-netmem and there is an out of band page
+> to be managed.
+> 
+> I think it would make sense to use paged-backed-netmem for your use
+> case, or at least I don't see why it wouldn't work. Memory providers
 
->
->
-> --
-> Thanks,
-> Mina
+It's a user page, we can't make assumptions about it, we can't
+reuse space in struct page like for pp refcounting (unlike when
+it's allocated by the kernel), we can't use the normal page
+refcounting.
+
+If that's the direction people prefer, we can roll back to v1 from
+a couple years ago, fill skbs fill user pages, attach ubuf_info to
+every skb, and whack-a-mole'ing all places where the page could be
+put down or such, pretty similarly what net_iov does. Honestly, I
+thought that reusing common infra so that the net stack doesn't
+need a different path per interface was a good idea.
+
+> were designed to handle the hugepage usecase where the memory
+> allocated by the provider is pages. Is there a reason that doesn't
+> work for you as well?
+> 
+> If you really need to use net_iov-backed-netmem, can we put this
+> weirdness in the provider? I don't know that we want a generic-looking
+> dma_map function which is a bit confusing to take a netmem and a page.> 
+...
+>> +
+>> +static void page_pool_release_page_dma(struct page_pool *pool,
+>> +                                      netmem_ref netmem)
+>> +{
+>> +       __page_pool_release_page_dma(pool, netmem);
+>> +}
+>> +
+> 
+> Is this wrapper necessary? Do you wanna rename the original function
+> to remove the __ instead of a adding a wrapper?
+
+I only added it here to cast away __always_inline since it's used in
+a slow / setup path. It shouldn't change the binary, but I'm not a huge
+fan of leaving the hint for the code where it's not needed.
+
+-- 
+Pavel Begunkov
 
