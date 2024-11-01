@@ -1,120 +1,210 @@
-Return-Path: <netdev+bounces-140933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3529D9B8B1B
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:16:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D3AD49B8B33
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE1EA2822FF
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 06:16:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9214628251B
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 06:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBECB14E2DA;
-	Fri,  1 Nov 2024 06:16:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="T+7qA85W"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16CE314B97E;
+	Fri,  1 Nov 2024 06:25:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f179.google.com (mail-yb1-f179.google.com [209.85.219.179])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from szxga08-in.huawei.com (szxga08-in.huawei.com [45.249.212.255])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F2E146D45;
-	Fri,  1 Nov 2024 06:16:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 344C12AD20;
+	Fri,  1 Nov 2024 06:24:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.255
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730441773; cv=none; b=ShHGNanyNGGjz6mUwOTVmrQz/nCmM+VlPcQGGSHiRQIii252XwBMTjYW+zkiBM2e/5rgM9W6zkhYG/TvgQDsn/i/d21VuE5cUtt93qXz95VhkWvdEZWd4ZROIvDHR/2p0JEuKdPWE/TjR1/k2+/GUubaRdBb4g/rrjtphjkKk7M=
+	t=1730442301; cv=none; b=WsyQq5p+rp5j55dPrV+8iZoA0SMA/tHzlGHQ8c2OX8uNdD4k2y+ltvuM9Szxy4dhrjU8ikx8oGA1LApWJL1lrZXjZx8GK6azezEzNAVMvzP5DyWhPELffsSbO/G7pWovvcQNt9DRnbQCQLyh2vyBilAPHLH0r3FW4dP9fi3SSlQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730441773; c=relaxed/simple;
-	bh=a7gaRvcsFk7990BgLEMKrwpaq/uiRRcp9jkHGSR92BI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oEruR6D/7CDIPYiB2DoG3HdQ9ifmrWHIU0iuZmlSfWYhqIkE0m5TCO/mCSC5FD/lndsCo7Uz+TipyiFAXrmwwuVzSMKadCk6QcjEIaWSNDMnKbUa3odDfljKmcFTwLZjRnmD3VItzfhHntS24N7IrKjl1I9MKXTtGsk+1RIs3VA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=T+7qA85W; arc=none smtp.client-ip=209.85.219.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f179.google.com with SMTP id 3f1490d57ef6-e290554afb4so1869905276.0;
-        Thu, 31 Oct 2024 23:16:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730441771; x=1731046571; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a7gaRvcsFk7990BgLEMKrwpaq/uiRRcp9jkHGSR92BI=;
-        b=T+7qA85WAX5jK3hEFj9YDnQSf/giHGB/mf5YmJ17lXrCocKr2fNxlF5ZaACob2xq++
-         vKXgJKLtqn4m+Z2HK0s8qT9LiYWkSUeKhbkocSo9UehL7mFQdwb93whltSRRmwFtEMGG
-         1EW+UCfRQTFCyUgeU7Sz2CNxckms5NxsQ1su8KmzoyvoDK+smsacjnxuFIsjJvOmsZx8
-         EhWmhWufbkcO+k4vbL2QyHV7ZiBmoFPyZUZnpYTqcvG9xlrnbplJqYR7O/0vdX5UoIW5
-         ByFDrbC75N5WoNpllUNN65X3MT1yHO+e+fewyS6R2BAmj5eRG7VtfuGNOp8raXp/l01R
-         aSJQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730441771; x=1731046571;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a7gaRvcsFk7990BgLEMKrwpaq/uiRRcp9jkHGSR92BI=;
-        b=rwgpvDQmVzvoa32jE9YgOzKYyO0e0F3LgJfjsmZs4XIdsSdIyo5FKfyOn52nYLNzmo
-         H7ZU7B0l5iGtbeaszfN0GXMS8E64ioU/hTVFv/kxM5uf2Yn8Us+TOcWeYw/x2LYWLUw9
-         M7MAWZrPUmOzyoqhINMViVsk+mcruXHZGmXZCObI+XSRJw8cak2h1Qo7sHTwD6zoWHxA
-         6SkQa8CD9qvf55ZXlT2dCa3NM1wh1a3ESZNVtnWGtmbALMHNOj0PhdOvv/eh3tIRyIwb
-         9KMBSED7ZQc73AwjFnWJO3v/ubjemPNcW0pRaiqha96pc+Y38z9rFMpSyObGiKBIeQO8
-         QY/Q==
-X-Forwarded-Encrypted: i=1; AJvYcCU1sMvc3n/ZuPv66+ba5gQLh3/+kq/CtTJUC2/03bFtuwe/60UsvMmiTEUxT8OGqm+38q0NYRxh@vger.kernel.org, AJvYcCUCx95UwCIr5ZCWKNsJfH3pePJ0Ez+WzRNFoe0dli+BiOHgpsS3UYaAhT7zaOr0/qzdj1/+SM86xWp1X6I=@vger.kernel.org, AJvYcCULzWCz/It5QbJHQoBotEIUNjUQApi9UGnXdtc/vSsBQq/r3AWmBMhvb4kBoEOYkL9iy/xIVAbLgepe@vger.kernel.org, AJvYcCUQikgN4lUAwAwDH61LL9ljCGSbQav7Fm3qMKT65jPzCfVvxDk0xvRxkAWf8S3G+6nV4+svMdEstHrmv2+A@vger.kernel.org, AJvYcCUfZ9Ele1myXUTjJzI497aGDEjUd3CjCSsvyGRfCJcgRRhxMPj60yMbV7ISl8d62TF3wnzbb294Ydbikm7ndLw=@vger.kernel.org, AJvYcCV+kSvEzuZA059Q3P034Jq4xxnIGVpNNgeae3fsUEDzZczDw/evvN841xXb3yzZG+UtXkaQ5CertIhN@vger.kernel.org, AJvYcCVkWK2yK3iRZgVYM9ljtyuCHh2jxURWzH1LH6xK44YYE6bkhMWC+fMVUDPv9Q7tt7Wxf0IbO7rzx/aT@vger.kernel.org, AJvYcCWj1AyzL1G3J8WbSEAu/P3LzgxKaCrc69osF6ruZTJ00g9wonElOFVOl6pBH1Sw3GazlyJomIylUE7h8Q==@vger.kernel.org, AJvYcCWpokYfRiebrKDWDlArpTZtIIjbfjIW/NpkGeb5hNFNjR4jGVsrI3D4lg1jaMLtDwJjyVE/q9xmCqn9@vger.kernel.org, AJvYcCXHvN8ES3MqGfIK1EyFM1LvYpdoiusl
- Bbbt44kkUho9nc3GeRx3CGYkXuB3SyM3RTZgUL/Ip2B+VG8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6dF5STPBTz6pPDByyLKINCuy0Y/ow7jcshE+6wQgzFhOWd6Dx
-	5+pxncY3En+N/e8/D8r/bWZ0q95TB8Uh73d9MbqPGPirlHpdOaFkbACZDlKfIT8saoLNodgdf4C
-	jHcGCGjLz0dwY4lJzJjde6fuJfq4=
-X-Google-Smtp-Source: AGHT+IFqMKdP/PNKGwnzDQJmnqEp+I7YNFa7RnoAoYOmar2xUzZgcR5eeFveEUZVqb1Er5ED63rd6vgk5E5KJ56d+nU=
-X-Received: by 2002:a05:6902:33c7:b0:e30:e0ab:8eed with SMTP id
- 3f1490d57ef6-e30e5a3e0eemr5326265276.17.1730441770787; Thu, 31 Oct 2024
- 23:16:10 -0700 (PDT)
+	s=arc-20240116; t=1730442301; c=relaxed/simple;
+	bh=g2hRf7mnB2xJ3tmxFSkGiernG4bpg+/LT5R0E4trLtI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=juecyKBFIFU7gbiR0UV/hBfqcPbG9yE+FsCxXUcIqrmSY68ri12XZywQijagRKwVhwiZvo64I3gpdsl9GznWXNNFH7gttQTbrd1gxRYbCxL0FCFg0LglFWcaw0ju94DnFZ5kMSiUVxNKxQGVUIEzYYCXATfPqFmg/zNIcBSMnts=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.255
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.252])
+	by szxga08-in.huawei.com (SkyGuard) with ESMTP id 4XfrPp054qz1T9Qw;
+	Fri,  1 Nov 2024 14:22:38 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id 366F71800A5;
+	Fri,  1 Nov 2024 14:24:51 +0800 (CST)
+Received: from [10.174.176.70] (10.174.176.70) by
+ kwepemg200005.china.huawei.com (7.202.181.32) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 1 Nov 2024 14:24:50 +0800
+Message-ID: <0913d4ba-7298-4295-8ce0-8c38ddb9d5b6@huawei.com>
+Date: Fri, 1 Nov 2024 14:24:40 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241024085922.133071-1-tmyu0@nuvoton.com> <20241024085922.133071-3-tmyu0@nuvoton.com>
- <CAMRc=Mc+SZN=EytxY=qA-qBEAY_F17GP-7FRE9oLojLbdUoPaQ@mail.gmail.com>
- <CAOoeyxW4=+5-QMcd_wgncFC9jgx_1Zf1Tq8RTnBvVqZ1JcUBQg@mail.gmail.com>
- <CAMRc=MexqwSCDrsBS0mK0fo_MCwngAH9XVgjRuDQjw0TVUBmPw@mail.gmail.com>
- <CAOoeyxXRrDuKJRMb3O2h3BF1vC=pwNN3DKfnEN9LnA+jiBCTQg@mail.gmail.com> <CAMRc=Me+R_i1WxFGeVe-MRREGn1YJvUon73A4FHDOPgs8wVaCg@mail.gmail.com>
-In-Reply-To: <CAMRc=Me+R_i1WxFGeVe-MRREGn1YJvUon73A4FHDOPgs8wVaCg@mail.gmail.com>
-From: Ming Yu <a0282524688@gmail.com>
-Date: Fri, 1 Nov 2024 14:15:59 +0800
-Message-ID: <CAOoeyxWo5CjJooM1nG_0Z4ZMaWmcDtt=ysRC5Z6JnpZ7cTcL7A@mail.gmail.com>
-Subject: Re: [PATCH v1 2/9] gpio: Add Nuvoton NCT6694 GPIO support
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: tmyu0@nuvoton.com, lee@kernel.org, linus.walleij@linaro.org, 
-	andi.shyti@kernel.org, mkl@pengutronix.de, mailhol.vincent@wanadoo.fr, 
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, wim@linux-watchdog.org, 
-	linux@roeck-us.net, jdelvare@suse.com, jic23@kernel.org, lars@metafoo.de, 
-	ukleinek@kernel.org, alexandre.belloni@bootlin.com, 
-	linux-kernel@vger.kernel.org, linux-gpio@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, linux-can@vger.kernel.org, netdev@vger.kernel.org, 
-	linux-watchdog@vger.kernel.org, linux-hwmon@vger.kernel.org, 
-	linux-iio@vger.kernel.org, linux-pwm@vger.kernel.org, 
-	linux-rtc@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH net] net: fix data-races around sk->sk_forward_alloc
+To: Eric Dumazet <edumazet@google.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<horms@kernel.org>, <dsahern@kernel.org>, <yuehaibing@huawei.com>,
+	<zhangchangzhong@huawei.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20241031122344.2148586-1-wangliang74@huawei.com>
+ <CANn89i+KL0=p2mchoZCOsZ1YoF9xhoUoubkub6YyLOY2wpSJtg@mail.gmail.com>
+From: Wang Liang <wangliang74@huawei.com>
+In-Reply-To: <CANn89i+KL0=p2mchoZCOsZ1YoF9xhoUoubkub6YyLOY2wpSJtg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-Bartosz Golaszewski <brgl@bgdev.pl> =E6=96=BC 2024=E5=B9=B410=E6=9C=8831=E6=
-=97=A5 =E9=80=B1=E5=9B=9B =E4=B8=8A=E5=8D=883:32=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> > > No for line names - as this is a dynamic USB expander, I'd suggest to
-> > > have them in the driver and assign to gc->names.
-> >
-> > Could I create an array to map each of the GPIO pins?
-> >
->
-> Please trim the quoted email to only the relevant parts.
->
-> I'm not sure what you mean by that. There's a field in struct
-> gpio_chip which you can use to set the line names from the driver
-> code.
->
 
-Understood, thank you very much.
+在 2024/10/31 22:08, Eric Dumazet 写道:
+> On Thu, Oct 31, 2024 at 1:06 PM Wang Liang <wangliang74@huawei.com> wrote:
+>> Syzkaller reported this warning:
+> Was this a public report ?
+Yes，I find the report here (the C repo in the url is useful):
 
-Best regards
-Ming
+https://syzkaller.appspot.com/bug?id=3e9b62ff331dcc3a6c28c41207f3b9911828a46b
+>> [   65.568203][    C0] ------------[ cut here ]------------
+>> [   65.569339][    C0] WARNING: CPU: 0 PID: 16 at net/ipv4/af_inet.c:156 inet_sock_destruct+0x1c5/0x1e0
+>> [   65.575017][    C0] Modules linked in:
+>> [   65.575699][    C0] CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.12.0-rc5 #26
+>> [   ...]
+> Oh the horror, this is completely wrong and unsafe anyway.
+>
+> TCP listen path MUST be lockless, and stay lockless.
+>
+> Ask yourself : Why would a listener even hold a pktoptions in the first place ?
+>
+> Normally, each request socket can hold an ireq->pktopts (see in
+> tcp_v6_init_req())
+>
+> The skb_clone_and_charge_r() happen later in tcp_v6_syn_recv_sock()
+>
+> The correct fix is to _not_ call skb_clone_and_charge_r() for a
+> listener socket, of course, this never made _any_ sense.
+>
+> The following patch should fix both TCP  and DCCP, and as a bonus make
+> TCP SYN processing faster
+> for listeners requesting these IPV6_PKTOPTIONS things.
+Thank you very much for your suggestion and patch!
+
+However, the problem remains unsolved when I use the following patch to 
+test.
+
+Because skb_clone_and_charge_r() is still called when sk_state is 
+TCP_LISTEN in discard tag.
+
+So I modify the patch like this (it works after local test):
+
+diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+index da5dba120bc9..2d07f7385783 100644
+--- a/net/dccp/ipv6.c
++++ b/net/dccp/ipv6.c
+@@ -618,7 +618,7 @@ static int dccp_v6_do_rcv(struct sock *sk, struct 
+sk_buff *skb)
+            by tcp. Feel free to propose better solution.
+                                                --ANK (980728)
+          */
+-       if (np->rxopt.all)
++       if (np->rxopt.all && (sk->sk_state != DCCP_LISTEN))
+                 opt_skb = skb_clone_and_charge_r(skb, sk);
+
+         if (sk->sk_state == DCCP_OPEN) { /* Fast path */
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index d71ab4e1efe1..0ab06ed78cac 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1618,7 +1618,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff 
+*skb)
+            by tcp. Feel free to propose better solution.
+                                                --ANK (980728)
+          */
+-       if (np->rxopt.all)
++       if (np->rxopt.all && (sk->sk_state != TCP_LISTEN))
+                 opt_skb = skb_clone_and_charge_r(skb, sk);
+
+         if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
+@@ -1656,8 +1656,6 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff 
+*skb)
+                                 if (reason)
+                                         goto reset;
+                         }
+-                       if (opt_skb)
+-                               __kfree_skb(opt_skb);
+                         return 0;
+                 }
+         } else
+
+
+> diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+> index da5dba120bc9a55c5fd9d6feda791b0ffc887423..d6649246188d72b3df6c74750779b7aa5910dcb7
+> 100644
+> --- a/net/dccp/ipv6.c
+> +++ b/net/dccp/ipv6.c
+> @@ -618,7 +618,7 @@ static int dccp_v6_do_rcv(struct sock *sk, struct
+> sk_buff *skb)
+>             by tcp. Feel free to propose better solution.
+>                                                 --ANK (980728)
+>           */
+> -       if (np->rxopt.all)
+> +       if (np->rxopt.all && sk->sk_state != DCCP_LISTEN)
+>                  opt_skb = skb_clone_and_charge_r(skb, sk);
+>
+>          if (sk->sk_state == DCCP_OPEN) { /* Fast path */
+> diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+> index d71ab4e1efe1c6598cf3d3e4334adf0881064ce9..e643dbaec9ccc92eb2d9103baf185c957ad1dd2e
+> 100644
+> --- a/net/ipv6/tcp_ipv6.c
+> +++ b/net/ipv6/tcp_ipv6.c
+> @@ -1605,25 +1605,12 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+>           *      is currently called with bh processing disabled.
+>           */
+>
+> -       /* Do Stevens' IPV6_PKTOPTIONS.
+> -
+> -          Yes, guys, it is the only place in our code, where we
+> -          may make it not affecting IPv4.
+> -          The rest of code is protocol independent,
+> -          and I do not like idea to uglify IPv4.
+> -
+> -          Actually, all the idea behind IPV6_PKTOPTIONS
+> -          looks not very well thought. For now we latch
+> -          options, received in the last packet, enqueued
+> -          by tcp. Feel free to propose better solution.
+> -                                              --ANK (980728)
+> -        */
+> -       if (np->rxopt.all)
+> -               opt_skb = skb_clone_and_charge_r(skb, sk);
+>
+>          if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
+>                  struct dst_entry *dst;
+>
+> +               if (np->rxopt.all)
+> +                       opt_skb = skb_clone_and_charge_r(skb, sk);
+>                  dst = rcu_dereference_protected(sk->sk_rx_dst,
+>                                                  lockdep_sock_is_held(sk));
+>
+> @@ -1656,13 +1643,13 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+>                                  if (reason)
+>                                          goto reset;
+>                          }
+> -                       if (opt_skb)
+> -                               __kfree_skb(opt_skb);
+>                          return 0;
+>                  }
+>          } else
+>                  sock_rps_save_rxhash(sk, skb);
+>
+> +       if (np->rxopt.all)
+> +               opt_skb = skb_clone_and_charge_r(skb, sk);
+>          reason = tcp_rcv_state_process(sk, skb);
+>          if (reason)
+>                  goto reset;
 
