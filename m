@@ -1,85 +1,84 @@
-Return-Path: <netdev+bounces-141106-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141107-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B0729B9924
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:06:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7BB9B9935
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:12:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEF911C20C00
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:06:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ADDC11F23E53
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 20:12:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CC141D365A;
-	Fri,  1 Nov 2024 20:06:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA3661E2309;
+	Fri,  1 Nov 2024 20:12:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="lWSF/fzi"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Y66KX+dq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f169.google.com (mail-qt1-f169.google.com [209.85.160.169])
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A271D279D
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:06:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A4741E1A33
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 20:11:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730491583; cv=none; b=jzAi9/bPw/9P+gaI/MpXAIxwBdsUsePRCPk6L/r8HxuRKC6D7Gq8W2BZCqIAUZ+91Xc8PZejcRAqjp4P7MiPZXn7W2vzxHfJJPn2toCS1LYpugqEhMkBsuAWHIRt1aUMMrD31J5CcL4D2HA976gWaFzsAqpn0Fd+HXubPMTZK+c=
+	t=1730491921; cv=none; b=Z1mVJucvNuVTTtNmoMQ+wz1IZQvfGngU3KFqIt/9OOY4BJb5pXpwxw/Xu9XuhJlbr96eve4ON1qlyvuhoVyQTs5U9YqK3ZPZ3erz7a8ZIAW1RmtvsJbrKlgBgKbhJUPWzNFeU33wJNe/n5ITSZsAlyWpcd1gaWJTal53Ir/rXvU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730491583; c=relaxed/simple;
-	bh=eDvBd0RJmlf64vWUqIjHYo2mGRkX+gu6CWsdP4uXYTI=;
+	s=arc-20240116; t=1730491921; c=relaxed/simple;
+	bh=hr97Yp3Qp6SmW8JuJbDwdSzmRhchs4ulWgoo6MWx2hI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ZJE6Tj9/AUXw3Gy7Fd0z9pA4sxhP0CwqQMgsxhnzOuZl3Ew8PwmncJ/bwB5kHo/6S4dbed3JkdqaIbWNGqSKRFNcxEC5PP5UrZZNb4Yt7jgtDgjsWIMiyDZRM2otGASBm1S9d4KSRuL/ABaBv5MQHyZJFyMa4qTu5CKzVLDkIvA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=lWSF/fzi; arc=none smtp.client-ip=209.85.160.169
+	 To:Cc:Content-Type; b=mlEv0lhwST9AGG1eqB4rCrTQ7Q3hpXy+SjqT7bJpGM0H+KqTVcPu+pgE2Ya2AbOqwXoLG1cID6ASFDjpe/Ng1vefjwho3JZiCndqubZnuaKpA05QH8PwuenTHpHjt/upYKvvf6FG1B+APFL4J249QCX6bLYcWWUuzqh3Zlkw8Zs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Y66KX+dq; arc=none smtp.client-ip=209.85.160.176
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f169.google.com with SMTP id d75a77b69052e-460b295b9eeso9631cf.1
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:06:21 -0700 (PDT)
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-460b295b9eeso10721cf.1
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 13:11:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730491580; x=1731096380; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730491919; x=1731096719; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=aBX89yKJ2HqWZ/CCS0a/BYUjLVu16MLWxRK1UVwLzC0=;
-        b=lWSF/fziEB9rielSGPQvevKNZgwQz4//5IAUsIor3a5qWxuvPlOODULmY5rhCTqHL3
-         dYcuZ0DRjrctTgCX+e36kmqwTj9Pbi+gpWQ/0P1fs0zShFGD3joQAH1TkwmJtNfSBqOn
-         9lu3KTkBNxHk9s2OeD65W0TQRJLBvAACJvcvs8CxQflmQdPj2JLm/AdeOaKk9wXvLDhG
-         aZ5poZMawWruK86b2i6VITKPw4Unl7FtU/rHcoHIvXUCMIDgow6qp98/SQwPj3jOQLLs
-         BwDKCPW+xSeJuTLZbbhmjcN/At9+7x/rlWy+xkvdr+gh6xkQPWjZ+W7wp5mIdYg5lyky
-         RzhQ==
+        bh=ejiV3nojKU8JOSRuqbEiFZ2lXr3DMRw92KQ2wPjl88w=;
+        b=Y66KX+dqIUF/kiMMuILdaoMfa7BOoK8P/JD7e3jkubRqEC0JiNmzku704pdOooZwvG
+         QSjweK4ptQkFXd/SbN2ukdh7Ed3ksiiOUkBHkx5yfScgkXXgUN1Lt7kHaguRrbCfdtrr
+         y85G+wGHON591di9BXLRK30SCe+ouq/v73kidEg8QiNdVICf1qWMZhoM9DHUhWPsrTGS
+         yJaxOUgHLwzgeoWYZjYqwnhvXFEvQjggGE8+qTM0/trMrjC7umtq8+qMJdtCS/SmVIzR
+         0uqmDz2gqNswXDzbSRvmEcu3T+clOQuFBGFLPZgEQfEv1BE/5m5PrC2pFH1rLIQ3qgQH
+         fNlA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730491580; x=1731096380;
+        d=1e100.net; s=20230601; t=1730491919; x=1731096719;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aBX89yKJ2HqWZ/CCS0a/BYUjLVu16MLWxRK1UVwLzC0=;
-        b=dQ4T3sJpuqNzx14asxG9lfTaQRYlMpx+/cVRQvFNR6MzjDEOZOG0Aj8hwtq0mo4EKb
-         FewygAl2N6rV91MlPk9SJ/5zeJGCvpMLP9yIdZdPQ6c7TclyoK0SJPiDXYszhrg/N9W8
-         NhKMm3TON9VE2rS2YBUWGWKHzzZsWjhwOgnavt8IA6ZZUMjIiSOFSQSZwtWuUEVOfeAR
-         cTbotu2EMp7vtkAQAa7zBdmi7EA0HbVkyZKpZq2+i57jE5Cem152IQNcnJdhfsLZ8tBm
-         xck67yZcYLBRKd3HCJb2937+TYQB6FsyB3yXtzI2qfpkIeL+wk4ovxWKFbSW+P3pq2hc
-         B4Uw==
-X-Forwarded-Encrypted: i=1; AJvYcCWSWrL+AEpWweXW0cX12s3tB4BUmUfrbULvHtRS3Z3JHuCEWrHfYF+Y4CKTc+KRLyd3ajBTYls=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxrIGkyxbADRhTSFtxQV46tXkcFBNlBxIL3lSMTaEOQ7xZAu5v+
-	8hgNwW3627dMgK4Jgeh5aEjx5JeD5Jr0P5BiDPfNksR5RWcn1eoWG6jzn7oUpT++/o2qR6wUBbE
-	cQAVDJmImCKUGmJcZhXyckHkJWKgBcyoQKrz+
-X-Gm-Gg: ASbGncuHiuN5roiZAnKWxfitkWYb30JPI9xm8wZxsDxn2WlUPHnn2p5h2X7p3OLNrXO
-	5Jn30hXV4oU1ruHJ7xiAMxy1YeG5oMjhnifv1Km1TELkfmDw6ZoUanbKe4NH0hQ==
-X-Google-Smtp-Source: AGHT+IHwnlNkeYa9/b9+eO71X2wEjzfQJjxWhWPCctBiL+ioqeUZvFNlWt+35CbcgACdxK3StDimp9sE1nirM6vKv6o=
-X-Received: by 2002:ac8:5945:0:b0:461:4150:b835 with SMTP id
- d75a77b69052e-462c5ed22a2mr662271cf.6.1730491579843; Fri, 01 Nov 2024
- 13:06:19 -0700 (PDT)
+        bh=ejiV3nojKU8JOSRuqbEiFZ2lXr3DMRw92KQ2wPjl88w=;
+        b=i3Vl+3SBGKbpyTGdJZ/msynlXPpd8gopFL9vYoQZz+j6MfrU7/yx3GtBYu/Mx0P1sN
+         CUnJeB9uJKqnPw43LFCTC6CeholcEe7C9VKN3iEDxWtYjgqSsvRUR4zRFPMy20YG6KpV
+         fivbR15L9sPO6MIkGkXvifQbVnSCu0A1i86ymJwQyo0K/RGBbh6iOp+RhEx9g6ABdIJo
+         IdVwSevmEWA2k1njBZj5vayhITBNmI9imTP7UgeuW6stUUEZvOcfYIMsvXaFNSUfZbKK
+         /BAA3z5V0kWudgUsLnqPfsNQMVW+O24TOqjrvcc4C9FCfv3ups17nyJEcW7Yoj/FnaiW
+         T5Ag==
+X-Forwarded-Encrypted: i=1; AJvYcCVxwMeg5C5rsJAcfM5OWFO9KhOQIlEHnoKsuUfNQ8mqDTPUbkz2cpxtk3dHV3C5GdYkrZcr/DA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzaMF7QfR3dUSF7ncyHxt32lDcaZuY6TvUWkz2JPGDfgssdv6Bh
+	7lcqeQiuVt5yPojVB+FFQgcuHUjmdRybBKx1aX5olKBAPaBAq/yJjouQfp9p6xJtFN3lukNOCZb
+	mgEfW/z2HvKpfyG6kSfcdPAUnqhfv3XOhx0cK
+X-Gm-Gg: ASbGnctiOsPpYMgIa7GOp7a7MKqU4SmkTylSxCD3TFMDGXdixfyUEfRotsz+MADMSsS
+	y0osyocG10eq+3Xyz57h/WmCJ9ys2cscRSnmEDiSClj9oo5WHQWvKom84/vTtiA==
+X-Google-Smtp-Source: AGHT+IHhchjVNua+q1hjFSSUiFjye5O8F2gFXrFh+qB1xxZL2N98zYmsGHlhpJipLyhO/M3LOagO1DK9x+u5isJgcdM=
+X-Received: by 2002:a05:622a:2991:b0:461:5b0d:7aa5 with SMTP id
+ d75a77b69052e-462c5ef8accmr680331cf.16.1730491918776; Fri, 01 Nov 2024
+ 13:11:58 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-12-dw@davidwei.uk>
-In-Reply-To: <20241029230521.2385749-12-dw@davidwei.uk>
+References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-13-dw@davidwei.uk>
+In-Reply-To: <20241029230521.2385749-13-dw@davidwei.uk>
 From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 1 Nov 2024 13:06:08 -0700
-Message-ID: <CAHS8izNbNCAmecRDCL_rRjMU0Spnqo_BY5pyG1EhF2rZFx+y0A@mail.gmail.com>
-Subject: Re: [PATCH v7 11/15] io_uring/zcrx: implement zerocopy receive pp
- memory provider
+Date: Fri, 1 Nov 2024 13:11:46 -0700
+Message-ID: <CAHS8izP=S8nEk77A+dfBzOyq7ddcGUNYNkVGDhpfJarzdx3vGw@mail.gmail.com>
+Subject: Re: [PATCH v7 12/15] io_uring/zcrx: add io_recvzc request
 To: David Wei <dw@davidwei.uk>
 Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
 	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
@@ -93,418 +92,31 @@ Content-Transfer-Encoding: quoted-printable
 
 On Tue, Oct 29, 2024 at 4:06=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
 >
-> From: Pavel Begunkov <asml.silence@gmail.com>
->
-> Implement a page pool memory provider for io_uring to receieve in a
-> zero copy fashion. For that, the provider allocates user pages wrapped
-> around into struct net_iovs, that are stored in a previously registered
-> struct net_iov_area.
->
-> Unlike with traditional receives, for which pages from a page pool can
-> be deallocated right after the user receives data, e.g. via recv(2),
-> we extend the lifetime by recycling buffers only after the user space
-> acknowledges that it's done processing the data via the refill queue.
-> Before handing buffers to the user, we mark them by bumping the refcount
-> by a bias value IO_ZC_RX_UREF, which will be checked when the buffer is
-> returned back. When the corresponding io_uring instance and/or page pool
-> are destroyed, we'll force back all buffers that are currently in the
-> user space in ->io_pp_zc_scrub by clearing the bias.
->
-> Refcounting and lifetime:
->
-> Initially, all buffers are considered unallocated and stored in
-> ->freelist, at which point they are not yet directly exposed to the core
-> page pool code and not accounted to page pool's pages_state_hold_cnt.
-> The ->alloc_netmems callback will allocate them by placing into the
-> page pool's cache, setting the refcount to 1 as usual and adjusting
-> pages_state_hold_cnt.
->
-> Then, either the buffer is dropped and returns back to the page pool
-> into the ->freelist via io_pp_zc_release_netmem, in which case the page
-> pool will match hold_cnt for us with ->pages_state_release_cnt. Or more
-> likely the buffer will go through the network/protocol stacks and end up
-> in the corresponding socket's receive queue. From there the user can get
-> it via an new io_uring request implemented in following patches. As
-> mentioned above, before giving a buffer to the user we bump the refcount
-> by IO_ZC_RX_UREF.
->
-> Once the user is done with the buffer processing, it must return it back
-> via the refill queue, from where our ->alloc_netmems implementation can
-> grab it, check references, put IO_ZC_RX_UREF, and recycle the buffer if
-> there are no more users left. As we place such buffers right back into
-> the page pools fast cache and they didn't go through the normal pp
-> release path, they are still considered "allocated" and no pp hold_cnt
-> is required. For the same reason we dma sync buffers for the device
-> in io_zc_add_pp_cache().
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  io_uring/zcrx.c | 215 ++++++++++++++++++++++++++++++++++++++++++++++++
->  io_uring/zcrx.h |   5 ++
->  2 files changed, 220 insertions(+)
->
-> diff --git a/io_uring/zcrx.c b/io_uring/zcrx.c
-> index a276572fe953..aad35676207e 100644
-> --- a/io_uring/zcrx.c
-> +++ b/io_uring/zcrx.c
-> @@ -2,7 +2,12 @@
->  #include <linux/kernel.h>
->  #include <linux/errno.h>
->  #include <linux/mm.h>
-> +#include <linux/nospec.h>
-> +#include <linux/netdevice.h>
->  #include <linux/io_uring.h>
-> +#include <net/page_pool/helpers.h>
-> +#include <net/page_pool/memory_provider.h>
-> +#include <trace/events/page_pool.h>
->
->  #include <uapi/linux/io_uring.h>
->
-> @@ -14,6 +19,16 @@
->
->  #define IO_RQ_MAX_ENTRIES              32768
->
-> +__maybe_unused
-> +static const struct memory_provider_ops io_uring_pp_zc_ops;
-> +
-> +static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct net_=
-iov *niov)
+...
+> +static void io_zcrx_get_buf_uref(struct net_iov *niov)
 > +{
-> +       struct net_iov_area *owner =3D net_iov_owner(niov);
-> +
-> +       return container_of(owner, struct io_zcrx_area, nia);
+> +       atomic_long_add(IO_ZC_RX_UREF, &niov->pp_ref_count);
 > +}
 > +
 
-We discussed this before I disappeared on vacation but I'm not too
-convinced to be honest, sorry.
+This is not specific to io_rcrx I think. Please rename this and put it
+somewhere generic, like netmem.h.
 
-It's invalid to call io_zcrx_iov_to_area on a devmem niov and vice
-versa, right? So current and future code has to be very careful to
-call the right helpers on the right niovs.
+Then tcp_recvmsg_dmabuf can use the same helper instead of the very
+ugly call it currently does:
 
-At the very least there needs to be a comment above all these
-container_of helpers:
+- atomic_long_inc(&niov->pp_ref_count);
++ net_iov_pp_ref_get(niov, 1);
 
-/* caller must have verified that this niov is devmem/io_zcrx */.
+Or something.
 
-However I feel like even a comment is extremely error prone. These
-container_of's are inside of the call stack of some helpers. I would
-say we need a check. If we're concerned about performance, the check
-can be behind DEBUG_NET_WARN_ON(), although even that is a bit iffy,
-but could be fine. Doing this without a check seems too risky to me.
+In general I think io_uring code can do whatever it wants with the
+io_uring specific bits in net_iov (everything under net_area_owner I
+think), but please lets try to keep any code touching the generic
+net_iov fields (pp_pagic, pp_ref_count, and others) in generic
+helpers.
 
->  static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
->                                  struct io_uring_zcrx_ifq_reg *reg)
->  {
-> @@ -99,6 +114,9 @@ static int io_zcrx_create_area(struct io_ring_ctx *ctx=
-,
->                 goto err;
->
->         for (i =3D 0; i < nr_pages; i++) {
-> +               struct net_iov *niov =3D &area->nia.niovs[i];
-> +
-> +               niov->owner =3D &area->nia;
->                 area->freelist[i] =3D i;
->         }
->
-> @@ -230,3 +248,200 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *ctx)
->  {
->         lockdep_assert_held(&ctx->uring_lock);
->  }
-> +
-> +static bool io_zcrx_niov_put(struct net_iov *niov, int nr)
-> +{
-> +       return atomic_long_sub_and_test(nr, &niov->pp_ref_count);
-> +}
-> +
-> +static bool io_zcrx_put_niov_uref(struct net_iov *niov)
-> +{
-> +       if (atomic_long_read(&niov->pp_ref_count) < IO_ZC_RX_UREF)
-> +               return false;
-> +
-> +       return io_zcrx_niov_put(niov, IO_ZC_RX_UREF);
-> +}
-> +
-
-Sorry, I have to push back a bit against this. The refcounting of
-netmem is already complicated. the paged netmem has 2 refcounts and
-care needs to be taken when acquiring and dropping refcounts. net_iov
-inherited the pp_ref_count but not the paged refcount, and again need
-some special handling. skb_frag_unref takes very special care checking
-pp->recycle, is_pp_netmem, and others to figure out the correct
-refcount to put based on the type of the netmem and skb flag.
-
-This code ignores all these generic code
-skb_frag_unref/napi_pp_put_page/etc paths and uses raw access to
-niv->pp_ref_count. If this is merged as-is, for posterity any changes
-in netmem refcounting need to also account for this use case opting
-out of these generic code paths that handle all other skb reffing
-including devmem.
-
-Additionally since you're opting out of the generic unreffing paths
-you're also (as mentioned before) bypassing the pp recycling. AFAICT
-that may be hurting your performance. IIUC you refill
-PP_ALLOC_CACHE_REFILL (64) entries everytime _alloc_netmems is
-entered, and you don't recycle netmem any other way, so your slow path
-is entered 1/64 of the page_pool_alloc calls? That should be much
-worse than what the normal pp recycling does, which returns all freed
-netmem into its alloc.cache or the ptr_ring and hits *_alloc_netmems
-much more rarely. There are also regular perf improvements and testing
-to the generic pool recycling paths you're also opting out of.
-
-I see a lot of downsides to opting out of the generic use cases. Is
-there any reason the normal freeing paths are not applicable to your
-use case?
-
-> +static inline void io_zc_add_pp_cache(struct page_pool *pp,
-> +                                     struct net_iov *niov)
-> +{
-> +}
-> +
-
-Looks unused/empty.
-
-> +static inline u32 io_zcrx_rqring_entries(struct io_zcrx_ifq *ifq)
-> +{
-> +       u32 entries;
-> +
-> +       entries =3D smp_load_acquire(&ifq->rq_ring->tail) - ifq->cached_r=
-q_head;
-> +       return min(entries, ifq->rq_entries);
-> +}
-> +
-> +static struct io_uring_zcrx_rqe *io_zcrx_get_rqe(struct io_zcrx_ifq *ifq=
-,
-> +                                                unsigned mask)
-> +{
-> +       unsigned int idx =3D ifq->cached_rq_head++ & mask;
-> +
-> +       return &ifq->rqes[idx];
-> +}
-> +
-> +static void io_zcrx_ring_refill(struct page_pool *pp,
-> +                               struct io_zcrx_ifq *ifq)
-> +{
-> +       unsigned int entries =3D io_zcrx_rqring_entries(ifq);
-> +       unsigned int mask =3D ifq->rq_entries - 1;
-> +
-> +       entries =3D min_t(unsigned, entries, PP_ALLOC_CACHE_REFILL - pp->=
-alloc.count);
-> +       if (unlikely(!entries))
-> +               return;
-> +
-> +       do {
-> +               struct io_uring_zcrx_rqe *rqe =3D io_zcrx_get_rqe(ifq, ma=
-sk);
-> +               struct io_zcrx_area *area;
-> +               struct net_iov *niov;
-> +               unsigned niov_idx, area_idx;
-> +
-> +               area_idx =3D rqe->off >> IORING_ZCRX_AREA_SHIFT;
-> +               niov_idx =3D (rqe->off & ~IORING_ZCRX_AREA_MASK) / PAGE_S=
-IZE;
-> +
-> +               if (unlikely(rqe->__pad || area_idx))
-> +                       continue;
-> +               area =3D ifq->area;
-> +
-> +               if (unlikely(niov_idx >=3D area->nia.num_niovs))
-> +                       continue;
-> +               niov_idx =3D array_index_nospec(niov_idx, area->nia.num_n=
-iovs);
-> +
-> +               niov =3D &area->nia.niovs[niov_idx];
-> +               if (!io_zcrx_put_niov_uref(niov))
-> +                       continue;
-> +               page_pool_mp_return_in_cache(pp, net_iov_to_netmem(niov))=
-;
-
-I'm sorry I pushed back against the provider filling the pp cache in
-earlier iterations. That was very wrong.
-
-*_alloc_netmems was meant to be a mirror of
-__page_pool_alloc_pages_slow. Since the latter fills the pp->cache,
-the former should also fill the pp->cache. The dmabuf mp is actually
-deficient in this regard. I'll look into fixing it. This part is more
-than fine for me.
-
-I'm still unsure about opting out of the generic freeing paths as I
-mentioned above though.
-
-> +       } while (--entries);
-> +
-> +       smp_store_release(&ifq->rq_ring->head, ifq->cached_rq_head);
-> +}
-> +
-> +static void io_zcrx_refill_slow(struct page_pool *pp, struct io_zcrx_ifq=
- *ifq)
-> +{
-> +       struct io_zcrx_area *area =3D ifq->area;
-> +
-> +       spin_lock_bh(&area->freelist_lock);
-> +       while (area->free_count && pp->alloc.count < PP_ALLOC_CACHE_REFIL=
-L) {
-> +               struct net_iov *niov;
-> +               u32 pgid;
-> +
-> +               pgid =3D area->freelist[--area->free_count];
-> +               niov =3D &area->nia.niovs[pgid];
-> +
-> +               page_pool_mp_return_in_cache(pp, net_iov_to_netmem(niov))=
-;
-> +
-> +               pp->pages_state_hold_cnt++;
-> +               trace_page_pool_state_hold(pp, net_iov_to_netmem(niov),
-> +                                          pp->pages_state_hold_cnt);
-> +       }
-> +       spin_unlock_bh(&area->freelist_lock);
-> +}
-> +
-> +static void io_zcrx_recycle_niov(struct net_iov *niov)
-> +{
-> +       struct io_zcrx_area *area =3D io_zcrx_iov_to_area(niov);
-> +
-> +       spin_lock_bh(&area->freelist_lock);
-> +       area->freelist[area->free_count++] =3D net_iov_idx(niov);
-> +       spin_unlock_bh(&area->freelist_lock);
-> +}
-> +
-> +static netmem_ref io_pp_zc_alloc_netmems(struct page_pool *pp, gfp_t gfp=
-)
-> +{
-> +       struct io_zcrx_ifq *ifq =3D pp->mp_priv;
-> +
-> +       /* pp should already be ensuring that */
-> +       if (unlikely(pp->alloc.count))
-> +               goto out_return;
-> +
-> +       io_zcrx_ring_refill(pp, ifq);
-> +       if (likely(pp->alloc.count))
-> +               goto out_return;
-> +
-> +       io_zcrx_refill_slow(pp, ifq);
-> +       if (!pp->alloc.count)
-> +               return 0;
-> +out_return:
-> +       return pp->alloc.cache[--pp->alloc.count];
-> +}
-> +
-> +static bool io_pp_zc_release_netmem(struct page_pool *pp, netmem_ref net=
-mem)
-> +{
-> +       struct net_iov *niov;
-> +
-> +       if (WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
-> +               return false;
-> +
-> +       niov =3D netmem_to_net_iov(netmem);
-> +
-> +       if (io_zcrx_niov_put(niov, 1))
-> +               io_zcrx_recycle_niov(niov);
-> +       return false;
-> +}
-> +
-> +static void io_pp_zc_scrub(struct page_pool *pp)
-> +{
-> +       struct io_zcrx_ifq *ifq =3D pp->mp_priv;
-> +       struct io_zcrx_area *area =3D ifq->area;
-> +       int i;
-> +
-> +       /* Reclaim back all buffers given to the user space. */
-> +       for (i =3D 0; i < area->nia.num_niovs; i++) {
-> +               struct net_iov *niov =3D &area->nia.niovs[i];
-> +               int count;
-> +
-> +               if (!io_zcrx_put_niov_uref(niov))
-> +                       continue;
-> +               io_zcrx_recycle_niov(niov);
-> +
-> +               count =3D atomic_inc_return_relaxed(&pp->pages_state_rele=
-ase_cnt);
-> +               trace_page_pool_state_release(pp, net_iov_to_netmem(niov)=
-, count);
-> +       }
-> +}
-> +
-> +static int io_pp_zc_init(struct page_pool *pp)
-> +{
-> +       struct io_zcrx_ifq *ifq =3D pp->mp_priv;
-> +       struct io_zcrx_area *area =3D ifq->area;
-> +       int ret;
-> +
-> +       if (!ifq)
-> +               return -EINVAL;
-> +       if (pp->p.order !=3D 0)
-> +               return -EINVAL;
-> +       if (!pp->p.napi)
-> +               return -EINVAL;
-> +
-> +       ret =3D page_pool_mp_init_paged_area(pp, &area->nia, area->pages)=
-;
-> +       if (ret)
-> +               return ret;
-> +
-> +       percpu_ref_get(&ifq->ctx->refs);
-> +       ifq->pp =3D pp;
-> +       return 0;
-> +}
-> +
-> +static void io_pp_zc_destroy(struct page_pool *pp)
-> +{
-> +       struct io_zcrx_ifq *ifq =3D pp->mp_priv;
-> +       struct io_zcrx_area *area =3D ifq->area;
-> +
-> +       page_pool_mp_release_area(pp, &ifq->area->nia);
-> +
-> +       ifq->pp =3D NULL;
-> +
-> +       if (WARN_ON_ONCE(area->free_count !=3D area->nia.num_niovs))
-> +               return;
-> +       percpu_ref_put(&ifq->ctx->refs);
-> +}
-> +
-> +static const struct memory_provider_ops io_uring_pp_zc_ops =3D {
-> +       .alloc_netmems          =3D io_pp_zc_alloc_netmems,
-> +       .release_netmem         =3D io_pp_zc_release_netmem,
-> +       .init                   =3D io_pp_zc_init,
-> +       .destroy                =3D io_pp_zc_destroy,
-> +       .scrub                  =3D io_pp_zc_scrub,
-> +};
-> diff --git a/io_uring/zcrx.h b/io_uring/zcrx.h
-> index a8db61498c67..464b4bd89b64 100644
-> --- a/io_uring/zcrx.h
-> +++ b/io_uring/zcrx.h
-> @@ -5,6 +5,9 @@
->  #include <linux/io_uring_types.h>
->  #include <net/page_pool/types.h>
->
-> +#define IO_ZC_RX_UREF                  0x10000
-> +#define IO_ZC_RX_KREF_MASK             (IO_ZC_RX_UREF - 1)
-> +
->  struct io_zcrx_area {
->         struct net_iov_area     nia;
->         struct io_zcrx_ifq      *ifq;
-> @@ -22,10 +25,12 @@ struct io_zcrx_ifq {
->         struct io_ring_ctx              *ctx;
->         struct net_device               *dev;
->         struct io_zcrx_area             *area;
-> +       struct page_pool                *pp;
->
->         struct io_uring                 *rq_ring;
->         struct io_uring_zcrx_rqe        *rqes;
->         u32                             rq_entries;
-> +       u32                             cached_rq_head;
->
->         unsigned short                  n_rqe_pages;
->         struct page                     **rqe_pages;
-> --
-> 2.43.5
->
-
-
---
+--=20
 Thanks,
 Mina
 
