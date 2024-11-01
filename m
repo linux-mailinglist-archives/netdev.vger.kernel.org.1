@@ -1,203 +1,115 @@
-Return-Path: <netdev+bounces-141039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D4479B932F
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:29:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D52E9B932B
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:29:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 003371F236F5
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:29:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1492B1F22CB1
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:29:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09DA91A76CD;
-	Fri,  1 Nov 2024 14:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 108381A264A;
+	Fri,  1 Nov 2024 14:29:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KU9Hw65+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QR9DiodU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f172.google.com (mail-qt1-f172.google.com [209.85.160.172])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E611A4F12
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 14:29:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 059C01A2C06;
+	Fri,  1 Nov 2024 14:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730471360; cv=none; b=WEzcF9gGamYZHJ2RIH20qajK+Gms9oc+P3RE6zwY11aqlNcwKLpTfEPKIDI6pmKaCTc5EsqVI/h+95lLuRsQ/25syz3fjBiOgvdtAL5oyPj9eqewPw28yLgMIO4h1IF/OjJsosM4Pe3WU02Z6Vau1MGXmmIKicbYVdgD2xjcteU=
+	t=1730471357; cv=none; b=eKSF1gy4oNi/u4AmgUYQcR5ariF5+eW3nSVtHYO/6INXjwnSMDh3S5olZa7yCBhssVrYL5DTBj4AJs3bgneJpxQn0GkJaDci8yBTUyyj0Qe7C1kOKmEl9U6/+55ACjeQzYFnEiU9FToeap1WzAxXxxbiYmqEiD4dv69uPA2S2Gs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730471360; c=relaxed/simple;
-	bh=eJVNvJnZLTG4PpxBtX9b0krF09fZgAY5tkl/hJZTlyI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rcQXxPZ2kj0XiyZKBr+X3x1wvNJb0X9gqUTx0HS15Sk8Y/3CbygtF7Poh+dJEq//SLYY8P9mSvBzDiGcDAxwzZ2j3h2xWTiuyD2odJ/B18JDxsG7ssPHud5t6Wiaz7Oua4mK1lDqq6wqmePuYrnUnLMxxIOfjHy2ZrqbtBoIuwQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KU9Hw65+; arc=none smtp.client-ip=209.85.160.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f172.google.com with SMTP id d75a77b69052e-460b295b9eeso138761cf.1
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 07:29:17 -0700 (PDT)
+	s=arc-20240116; t=1730471357; c=relaxed/simple;
+	bh=sGQPau7KCDdF/Ae95DXOCmqJ7A87TuwQ1h0aYFgMeA4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=FNqU7gLrPStRZU2hNss9kCss0EamALeVYYUj+lzThlB7HSwIEJ+TdoiabPB8JoA3wiWfeWKR96dm1BNhDYJbAmd3PxjZy5wV+UDbDy1mx7YWQ2rg/+rcda3TnIzw4YhJMgCR2VIoyTbWOPds+1Mt3LP3b48/rjsKBhOjzcm4CZA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QR9DiodU; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4315ce4d250so2060305e9.2;
+        Fri, 01 Nov 2024 07:29:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730471356; x=1731076156; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=71rDrn/xSyrSel5+3YD+U/lkEjJUJKYWwLFn/ivmxck=;
-        b=KU9Hw65+obka9tr/pM5cR/jNGsgQzIcHig0dyxxDBX0kh1mHE5/auhSDDlvO4KWOZ4
-         i25/rSX7cwnOjYoE912O+SnQhhBdrNsXIdnhwuGrWrrjJnqy+0XP/kJliUymcNUCmIc7
-         Yv/lC/lztn8oZtGzzhQ/i4SP1eabCNQMyVPfdtEInRhsUQ0Lp9al8J/oONCi1pxFaxXZ
-         ArdQ0DZRylzVCkOubQ3Hia4GOf+jy2NEJgGHuJW+xWp0cxTb9rJXm2nZBwU+FPbmbqnm
-         XbIzmbjRbz3T8y4ycgNpbVmzqBSExGHH8K9LzqIGSfrJsvxtRlBLD+8cLjo/qnjk33m0
-         R6DA==
+        d=gmail.com; s=20230601; t=1730471353; x=1731076153; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=odFhpibLPvwuhQLLhb1fVT+w+/dlMBz12uJSK00SoM4=;
+        b=QR9DiodUQKPKjG9c0emqMv0coSWHJfEMiCTN2Gj0TXyrtteti3Ezb8aAKp5AyII96z
+         MoX+xi4J7jP3cwZRIde67cpbNgE3K2HiMDWq2ItSPxSXWSFq/sqWKhffBPa4GxBBYQXz
+         P2/LbaPFT/x4KbvBYkAJP6RhnTz6MMoLPR0PWa01k1MqV+iLU1MHZYNslxhG6oJqL6Is
+         kyBiLuBDCIL/ftRR3aFYjZV4FfH+uM8ytVJUCMYFB2HUqQOygRXaJsG3/J6SL48hv4ef
+         6BXtCdfjMmm2jEhPSXUsC4Dvo1TidsBKZqzceY+xnnxWfYz4fnhAdb9DSBFxKtVE8sta
+         elGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730471356; x=1731076156;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=71rDrn/xSyrSel5+3YD+U/lkEjJUJKYWwLFn/ivmxck=;
-        b=WMopg4TB5S+332hXX7mwM8KRsQYhMnsIDHxaF4LMyPQfO/iLnLqzfvnJomIYAzucy7
-         xfcOT2NFE9jcrtEBypcep7lTjuJ9yDqYEd6gvfIm/lnMqH+FMhq1IEnBDvwLybvTlvJN
-         2x6EdvNbGsznSdW6SszVc1eBUiNcKQ3fMbl2F6bF4FS6ARi1A253CfkhJ5YrRO84ouus
-         bj+4vnCVpDxiFGQF9xvyVU0tlaHpinFPID3Homn6zvulSymFBusy5z9je1AdEwo0ZEw4
-         txW6X8zrAr5DrVVfYwWozpoCKJCzd5tlWtglwNAEdAWgbl/GXpGWmVsF0gpP5BhSrg0D
-         Rnlw==
-X-Forwarded-Encrypted: i=1; AJvYcCXhA8x5gvRpW7Po0Ahvdt08SIrMlkYt7tOTaRx9tLNYMr71g1MIg176el/1A3XA02QBIV5WUE8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwlcI4QDRZu5+Ev8q1tpd/ACraMkoilLXZqQ/LBYHMVP72DDW84
-	apW/tqaDuvoyBCSlLKcowvx/SfCA9V/oXyC5SKAS95/An6nMgWWzGg88absRpSWaHRrxVN+jk8H
-	pE6SjkzTdJwEhCvpwlNCt4OTVCGQW8bE8+rTx
-X-Gm-Gg: ASbGncs/Uv7t6TgshF6O6yf44/HZNYZAf7odjfs6dp/w8k1O+0qsstfcR+VKCLrCOKz
-	+0imqMZNt48BmmPDnKlrXOEwiTBEp4FQ=
-X-Google-Smtp-Source: AGHT+IHfPf4efEtalOK8WUuB9JdEhR5RMnc0VUPGI/FfzKul0egqfNyIe0EJS2sbq6VHEkHbfxIaYbjkGSJgcXA7P3I=
-X-Received: by 2002:a05:622a:614:b0:461:4be1:c612 with SMTP id
- d75a77b69052e-462ad2da722mr6592141cf.21.1730471356319; Fri, 01 Nov 2024
- 07:29:16 -0700 (PDT)
+        d=1e100.net; s=20230601; t=1730471353; x=1731076153;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=odFhpibLPvwuhQLLhb1fVT+w+/dlMBz12uJSK00SoM4=;
+        b=qr1+m601h9RvRAkrqtmwfZe7KKQU7CsZk6TmMtUUEzHaPOkLOgUzw9OBZ/e+kzM7iV
+         kJjRrcSl3zs1SnLb4RLky+E2nCkDUpZYZPtcciaOmm3iga+HgSPQnm7bNDO8yLUDNOEb
+         ZPy0qpzV60PmsICg1YQmmS0RMAcwZohi7fQOfPhbJngOj8zeKJFyIT+OOYaMkYm8gwXw
+         danHS2B2I11Fpr60IWhyZtQ/P5UWmkElcJ6tfS5gziIkUs7h1xaTDotRwceIEKdEzuAE
+         ECbJOrJNo+QYqrXxnhIKL1v8An76jEvR/TOeDU2M27gQR42lZpiLrPlgcQpmkNl/o8vl
+         zHfg==
+X-Forwarded-Encrypted: i=1; AJvYcCXR5I8DGqXdTNYvrERaYE53rKJiiRtHtW4mJHDCvEOTre7EM/cVcp9EXCQ3pC0PRRrlqtQOdJSMMaS2P+4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzbMmhwBd12bJF6CvVtsPayYf5gcyGRMK/6vjKXinrQvzHDi+55
+	9Wa3kDX1jFHqPUbOaLtOBqpGWLaXvlJVrtaZkdDqiZbvNSzBU90q
+X-Google-Smtp-Source: AGHT+IEEMVRXqLdwmJV7pRqfFpEUN3/kmvstqI5JyyZgowwwoXMF0vgEs0QQNJ4tL3FcNqLPsYwFmA==
+X-Received: by 2002:a05:600c:3542:b0:42c:ba6c:d9a7 with SMTP id 5b1f17b1804b1-4319ad08603mr88397485e9.4.1730471352892;
+        Fri, 01 Nov 2024 07:29:12 -0700 (PDT)
+Received: from skbuf ([188.25.134.29])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d685287sm66007415e9.35.2024.11.01.07.29.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 07:29:11 -0700 (PDT)
+Date: Fri, 1 Nov 2024 16:29:08 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Furong Xu <0x1207@gmail.com>
+Cc: netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>, Simon Horman <horms@kernel.org>,
+	andrew+netdev@lunn.ch,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, xfr@outlook.com
+Subject: Re: [PATCH net-next v8 0/8] net: stmmac: Refactor FPE as a separate
+ module
+Message-ID: <20241101142908.ohdxsokygout5mfs@skbuf>
+References: <cover.1730449003.git.0x1207@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241022162359.2713094-1-ap420073@gmail.com> <20241022162359.2713094-6-ap420073@gmail.com>
-In-Reply-To: <20241022162359.2713094-6-ap420073@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 1 Nov 2024 07:29:04 -0700
-Message-ID: <CAHS8izNbS4i+ke0bK07-rNLuq6RGXD-H73DhVb1-tsUOzSCBog@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 5/8] net: devmem: add ring parameter filtering
-To: Taehee Yoo <ap420073@gmail.com>, Praveen Kaligineedi <pkaligineedi@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	edumazet@google.com, donald.hunter@gmail.com, corbet@lwn.net, 
-	michael.chan@broadcom.com, andrew+netdev@lunn.ch, hawk@kernel.org, 
-	ilias.apalodimas@linaro.org, ast@kernel.org, daniel@iogearbox.net, 
-	john.fastabend@gmail.com, dw@davidwei.uk, sdf@fomichev.me, 
-	asml.silence@gmail.com, brett.creeley@amd.com, linux-doc@vger.kernel.org, 
-	netdev@vger.kernel.org, kory.maincent@bootlin.com, 
-	maxime.chevallier@bootlin.com, danieller@nvidia.com, hengqi@linux.alibaba.com, 
-	ecree.xilinx@gmail.com, przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, 
-	ahmed.zaki@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
-	jiri@resnulli.us, bigeasy@linutronix.de, lorenzo@kernel.org, 
-	jdamato@fastly.com, aleksander.lobakin@intel.com, kaiyuanz@google.com, 
-	willemb@google.com, daniel.zahka@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1730449003.git.0x1207@gmail.com>
 
-Hi Taehee, sorry for the late reply. I was out on vacation and needed
-to catch up on some stuff when I got back.
+On Fri, Nov 01, 2024 at 09:31:27PM +0800, Furong Xu wrote:
+> Refactor FPE implementation by moving common code for DWMAC4 and
+> DWXGMAC into a separate FPE module.
+> 
+> FPE implementation for DWMAC4 and DWXGMAC differs only for:
+> 1) Offset address of MAC_FPE_CTRL_STS and MTL_FPE_CTRL_STS
+> 2) FPRQ(Frame Preemption Residue Queue) field in MAC_RxQ_Ctrl1
+> 3) Bit offset of Frame Preemption Interrupt Enable
+> 
+> Tested on DWMAC CORE 5.20a and DWXGMAC CORE 3.20a
+> 
+> Changes in v8:
+>   1. Reorder functions in their natural calling order
+>   2. Unexport stmmac_fpe_configure() and make it static
+>   3. Swap 3rd patch and 4th patch in V7
 
-On Tue, Oct 22, 2024 at 9:25=E2=80=AFAM Taehee Yoo <ap420073@gmail.com> wro=
-te:
->
-> If driver doesn't support ring parameter or tcp-data-split configuration
-> is not sufficient, the devmem should not be set up.
-> Before setup the devmem, tcp-data-split should be ON and
-> header-data-split-thresh value should be 0.
->
-> Tested-by: Stanislav Fomichev <sdf@fomichev.me>
-> Signed-off-by: Taehee Yoo <ap420073@gmail.com>
-> ---
->
-> v4:
->  - Check condition before __netif_get_rx_queue().
->  - Separate condition check.
->  - Add Test tag from Stanislav.
->
-> v3:
->  - Patch added.
->
->  net/core/devmem.c | 18 ++++++++++++++++++
->  1 file changed, 18 insertions(+)
->
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index 11b91c12ee11..3425e872e87a 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -8,6 +8,8 @@
->   */
->
->  #include <linux/dma-buf.h>
-> +#include <linux/ethtool.h>
-> +#include <linux/ethtool_netlink.h>
->  #include <linux/genalloc.h>
->  #include <linux/mm.h>
->  #include <linux/netdevice.h>
-> @@ -131,6 +133,8 @@ int net_devmem_bind_dmabuf_to_queue(struct net_device=
- *dev, u32 rxq_idx,
->                                     struct net_devmem_dmabuf_binding *bin=
-ding,
->                                     struct netlink_ext_ack *extack)
->  {
-> +       struct kernel_ethtool_ringparam kernel_ringparam =3D {};
-> +       struct ethtool_ringparam ringparam =3D {};
->         struct netdev_rx_queue *rxq;
->         u32 xa_idx;
->         int err;
-> @@ -140,6 +144,20 @@ int net_devmem_bind_dmabuf_to_queue(struct net_devic=
-e *dev, u32 rxq_idx,
->                 return -ERANGE;
->         }
->
-> +       if (!dev->ethtool_ops->get_ringparam)
-> +               return -EOPNOTSUPP;
-> +
+For the series:
 
-Maybe an error code not EOPNOTSUPP. I think that gets returned when
-NET_DEVMEM is not compiled in and other situations like that. Lets
-pick another error code? Maybe ENODEV.
-
-Also consider extack error message. But it's very unlikely to hit this
-error, so maybe not necessary.
-
-> +       dev->ethtool_ops->get_ringparam(dev, &ringparam, &kernel_ringpara=
-m,
-> +                                       extack);
-> +       if (kernel_ringparam.tcp_data_split !=3D ETHTOOL_TCP_DATA_SPLIT_E=
-NABLED) {
-> +               NL_SET_ERR_MSG(extack, "tcp-data-split is disabled");
-> +               return -EINVAL;
-> +       }
-> +       if (kernel_ringparam.hds_thresh) {
-> +               NL_SET_ERR_MSG(extack, "header-data-split-thresh is not z=
-ero");
-> +               return -EINVAL;
-> +       }
-> +
-
-Thinking about drivers that support tcp-data-split, but don't support
-any kind of hds_thresh. For us (GVE), the hds_thresh is implicitly
-always 0.
-
-Does the driver need to explicitly set hds_thresh to 0? If so, that
-adds a bit of churn to driver code. Is it possible to detect in this
-function that the driver doesn't support hds_thresh and allow the
-binding if so?
-
-I see in the previous patch you do something like:
-
-supported_ring_params & ETHTOOL_RING_USE_HDS_THRS
-
-To detect there is hds_thresh support. I was wondering if something
-like this is possible so we don't have to update GVE and all future
-drivers to explicitly set thresh to 0.
-
-Other than that, looks fine to me.
-
-
---=20
-Thanks,
-Mina
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
