@@ -1,142 +1,81 @@
-Return-Path: <netdev+bounces-140869-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140870-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3214F9B885C
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:25:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7491D9B8869
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:27:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id F332BB21C02
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:25:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63771C21193
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:27:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BBDA41C94;
-	Fri,  1 Nov 2024 01:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D8E583CC7;
+	Fri,  1 Nov 2024 01:26:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="tK5O18Ys"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OmKhQqvy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF86C4C3D0;
-	Fri,  1 Nov 2024 01:25:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117C582C7E;
+	Fri,  1 Nov 2024 01:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730424328; cv=none; b=QR4TKH/k9W+U5qR72ONHsjJBixBtNhqTaJL3paV5fmw949b2H18Oq8adpBO5MLlkIEjAe3PH/xFGEJMmZ28mp0mdxR8dOB5lAdkPikZmQFNn1TvIOK1iE5DU972iizIl9mhJ0Gbp/MwkWx0aEaoTt10syXiu3YFA2GARfFtsZXY=
+	t=1730424410; cv=none; b=V3HHsA2/wee4OHT++T+R5BWwx/xLsR28mByhVQpQUL3w1FgfOsde1retot4/tduFPb84wXaO4FTbT8b+MXOw4uHL6fojQrAeOBBqkVrtM6yluoMDEMnkmjafofNpboTBFGGRp8p8p523Jl0CwbdZjl4UgW08HgQxVUuO4oWKpnk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730424328; c=relaxed/simple;
-	bh=2dbM5EpWRjcPfzrtyr+TJTsnnL79nW2KMqKKbCvuCGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=GgIXokwje4oXEocn2pLxwGVxxpZxaOlXp4PBowqfWHOm1dBKs1mV8Q7aId0jjW9JHNHwGRw17JpoEcRAELxNIMu3WFOptZUL2EIOV3RQG40nw/EK27pTOOGHSbg2OZnCKQWmLwSWkRaTLSHYtV+cgvPt7prWGf1wsHk4sumd6Yw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=tK5O18Ys; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1730424309;
-	bh=MD3/3YQuyZL5hZ/YibVTQie64WK9EHSl7SiHTqu3hPc=;
-	h=Date:From:To:Cc:Subject:From;
-	b=tK5O18YsvSlAj8mF4VDS1SzrU4rH6dXFLjADbFwJv79k4B4RO7hUlaUXGuNQ+V2tu
-	 BCsMVcTuj16Q6KZbTglGEOb8yrz5I3GoijAIq0jQOIvT6/BEDBpne27smVPogOP63m
-	 znpRv7ARIAcHsGQ1MPwVd5qufzsN+Yq/RTYb5I1yfeKSfIo5t5mHut3lEosyn2to0H
-	 FSrA+IEgt7d/v1/Ny1IKvzG7COzGbsTzGTT4L92Y8MEyK+k6/OjpXiann0mLdTcacq
-	 WPYe7vlV6dtft/V8aRf7Af0cPuOV5V4X5S5TC8LyPY1jl8LO8iu/K/U4/CQgYmR8nm
-	 mjyLiKpO3s7GA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XfjpW524Dz4xKl;
-	Fri,  1 Nov 2024 12:25:07 +1100 (AEDT)
-Date: Fri, 1 Nov 2024 12:25:05 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Philipp Zabel <p.zabel@pengutronix.de>
-Cc: Daniel Machon <daniel.machon@microchip.com>, Herve Codina
- <herve.codina@bootlin.com>, Networking <netdev@vger.kernel.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the net-next tree with the reset tree
-Message-ID: <20241101122505.3eacd183@canb.auug.org.au>
+	s=arc-20240116; t=1730424410; c=relaxed/simple;
+	bh=SOidcFY93eVmt85VoTjputoO3SXQ+jLjj72zPsRKZCk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=oIhlHCNORiDdFFEke4gCMtucL+U29pMxquFmuapX+WqgO0rL7vKyw6dqn3JjARzeYq/NhR4wiid7UrsaJEmlG0xa68AZ716OgSZZkiUUmd5Yn//LedVvV51FPKNQpzoY97R2nHvud0xXS7uOPOQVILJ7Gwn6cB6LcBmOxeRFUrM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OmKhQqvy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8CC2AC4CED6;
+	Fri,  1 Nov 2024 01:26:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730424409;
+	bh=SOidcFY93eVmt85VoTjputoO3SXQ+jLjj72zPsRKZCk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OmKhQqvyKE1k5nwa/A4lY0gfIapimepS9wRgGaQjR2roEpzIqSzYvmuQ8hK8RbOq8
+	 N/pEBswJY8fHwvD5O9XtN1e7filQbj0VVBC71xFy+CiioHa2IARh5U5tDseNadT8J/
+	 6lNjs2J5fNfzQIbZsSmJn5UgHOvesHnWyzkO+bLJyXZ7TjGSGj9qljOIQUl/VAWuvX
+	 i7jtdTEcDqZ+SVLh4qGLRGr1KBkIEUSaJaPQKy5hXJrmWbYDVeFhoR5phIrxNygA3t
+	 qdL1cPJkeX/v7w+RH6/ms6yZFG/tZ0+F4x1yqxiIwqka15sRtO60ofoDd7jyWo2j4o
+	 +B8WAL1bgn8pg==
+Date: Thu, 31 Oct 2024 18:26:47 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, davej@codemonkey.org.uk, vlad.wing@gmail.com,
+ max@kutsevol.com, kernel-team@meta.com, jiri@resnulli.us, jv@jvosburgh.net,
+ andy@greyhouse.net, aehkn@xenhub.one, Rik van Riel <riel@surriel.com>, Al
+ Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH net-next 1/3] net: netpoll: Defer skb_pool population
+ until setup success
+Message-ID: <20241031182647.3fbb2ac4@kernel.org>
+In-Reply-To: <20241025142025.3558051-2-leitao@debian.org>
+References: <20241025142025.3558051-1-leitao@debian.org>
+	<20241025142025.3558051-2-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/95eJKgqrkg.3gs6ZY4s9wV8";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/95eJKgqrkg.3gs6ZY4s9wV8
 Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 7bit
 
-Hi all,
+On Fri, 25 Oct 2024 07:20:18 -0700 Breno Leitao wrote:
+> The current implementation has a flaw where it populates the skb_pool
+> with 32 SKBs before calling __netpoll_setup(). If the setup fails, the
+> skb_pool buffer will persist indefinitely and never be cleaned up.
+> 
+> This change moves the skb_pool population to after the successful
+> completion of __netpoll_setup(), ensuring that the buffers are not
+> unnecessarily retained. Additionally, this modification alleviates rtnl
+> lock pressure by allowing the buffer filling to occur outside of the
+> lock.
 
-Today's linux-next merge of the net-next tree got a conflict in:
-
-  MAINTAINERS
-
-between commit:
-
-  86f134941a4b ("MAINTAINERS: Add the Microchip LAN966x PCI driver entry")
-
-from the reset tree and commit:
-
-  7280f01e79cc ("net: lan969x: add match data for lan969x")
-
-from the net-next tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc MAINTAINERS
-index a0cad73c28d0,c4027397286b..000000000000
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@@ -15179,12 -15091,13 +15185,19 @@@ S:	Maintaine
-  F:	Documentation/devicetree/bindings/interrupt-controller/microchip,lan96=
-6x-oic.yaml
-  F:	drivers/irqchip/irq-lan966x-oic.c
- =20
- +MICROCHIP LAN966X PCI DRIVER
- +M:	Herve Codina <herve.codina@bootlin.com>
- +S:	Maintained
- +F:	drivers/misc/lan966x_pci.c
- +F:	drivers/misc/lan966x_pci.dtso
- +
-+ MICROCHIP LAN969X ETHERNET DRIVER
-+ M:	Daniel Machon <daniel.machon@microchip.com>
-+ M:	UNGLinuxDriver@microchip.com
-+ L:	netdev@vger.kernel.org
-+ S:	Maintained
-+ F:	drivers/net/ethernet/microchip/lan969x/*
-+=20
-  MICROCHIP LCDFB DRIVER
-  M:	Nicolas Ferre <nicolas.ferre@microchip.com>
-  L:	linux-fbdev@vger.kernel.org
-
---Sig_/95eJKgqrkg.3gs6ZY4s9wV8
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmckLfEACgkQAVBC80lX
-0GwXzgf9G/RDBjSqycK2SiwjhRuAt5VG8oMJDDFcQ8b348Wf/AyhzbJTFqpLOaSJ
-hcLLLXSL5io6p5Q8T9pFk0/2k031gdsBg1E8io5pGor9Miajua6BhQ2g/Dqw8z72
-cJ1N19reJZ3spTsYT09VskxwVmihyGSCRkIB8qvqazqtzxbcS7F4P0thXRgUXSNV
-T4cwZydD3LDCJMsmfWB/ETD+JcEhxXB3JyjHxrSkzHlbXzDu7OMIuc7Of+XrTnlY
-CdGuvzH14Klov2aI/WgYBNurAneorc1UuzlIRtaZwW0jSD0mxUi34bykU5PSh3Mc
-Kl1LGNUzjCjgctHoc1UeCbrJjgI3dw==
-=BU+d
------END PGP SIGNATURE-----
-
---Sig_/95eJKgqrkg.3gs6ZY4s9wV8--
+arguably if the setup succeeds there would now be a window of time
+where np is active but pool is empty.
 
