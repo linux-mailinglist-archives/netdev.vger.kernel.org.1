@@ -1,152 +1,162 @@
-Return-Path: <netdev+bounces-140957-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16CCE9B8D5F
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:55:51 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B75B9B8E56
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:59:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B1271C220D2
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:55:50 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 206CA1F23F18
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C9FF156676;
-	Fri,  1 Nov 2024 08:55:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="XhTR7R+r"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03DE319995E;
+	Fri,  1 Nov 2024 09:57:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from CHN02-SH0-obe.outbound.protection.partner.outlook.cn (mail-sh0chn02on2096.outbound.protection.partner.outlook.cn [139.219.146.96])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43A7F147C9B;
-	Fri,  1 Nov 2024 08:55:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730451349; cv=none; b=X53BOw+M9b8a7rZ0/lh3f6QiXXFMnMMREUntzLPdd7nionR26kC4Y44DDdPyPXSrQZaeah2dL1BGgFWeK6aSR7xtOE136XktH6aMIPHOuubzQBS6ZpiopgWys1kGttmib0vofnENBQweWoyUX8CHWFmK0rnJ6povgWWeCWngQbo=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730451349; c=relaxed/simple;
-	bh=fLxGO+NXyb3lVBIx8VQdDEHOKDua9XIGAZdhiTyuwsY=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Dap5xYolSI9xYvVidG84UzENTJaZWiVrTw0zhyZbNe3ctZjQbpAYsWS37el8HJxFC79BSiYaRV5yaAcjonT8y6INEEoQ/ct2PfK4/fKTCG0jFqiimlTIiq9CAxPj0/OLQT0LfSxI25cpBEopar5Xe2gczphqIedzgS3KM+k7YJE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=XhTR7R+r; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1730451337;
-	bh=LK1BfNcDjWqjY5IAYjhatcpF/S0PKDuPZuW/7DFKhNQ=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=XhTR7R+rWkMy7t6j1Hw+Cfy162xf8VxwNkdwTKRmlrPAcW6I4BfMr6B/Q99K/b9rh
-	 icKaOqO3a5I0Vjub/Do1b23hdcBNbSErAdYbk0VqdWykOT0RwxCdHMArGM+M4OazmC
-	 RDpvpSyAl4AyIcYjWlMj7gCqhOavqv2OkO3/M4rhnMhT51IRwiG6+VYj5fU8FJ7i/3
-	 EWMsUSP+IbvRYkcVZB7vCKxMMyIhqYzO/m/V46YHw+SCS8pQHWMd7UoHp7lHLq0xIt
-	 R+8TaQT0yguqBdjEVYx+I1t5str35nwe09Z9/V2BTx2xEGRWxl46SrlwC3SbLeJjDb
-	 SS5useDzSNe5w==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 00A226A53E;
-	Fri,  1 Nov 2024 16:55:35 +0800 (AWST)
-Message-ID: <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>, 
- admiyo@os.amperecomputing.com, Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Fri, 01 Nov 2024 16:55:35 +0800
-In-Reply-To: <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
-References: <20241029165414.58746-1-admiyo@os.amperecomputing.com>
-	 <20241029165414.58746-3-admiyo@os.amperecomputing.com>
-	 <b614c56f007b2669f1a23bfe8a8bc6c273f81bba.camel@codeconstruct.com.au>
-	 <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91C7515B14B;
+	Fri,  1 Nov 2024 09:57:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=139.219.146.96
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730455070; cv=fail; b=oXHKFZTWZ6PICzslHdYpcxG6NR9LPTcSfPF2DhAFp4VE/CKtu2FjyPKstdTJ44n0l39WT+9oOuIV3r+rRU6ouiK3H49nqLapyjeOIRaMrt4Ir1HghY+qFMgw8lUEpPuuI6heNl3DR2n+tsysuN2pMLloWpFdY+NxigvvVdrv/cg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730455070; c=relaxed/simple;
+	bh=cl21HXob9nXo2mGH5DM6P2Gk3R7PpVnGTas6NvwJI+U=;
+	h=From:To:Cc:Subject:Date:Message-ID:Content-Type:MIME-Version; b=E29/whF9HKKuQ1xqIwRWd1/0xVvBRdMkSlRxXK1X/S0UC+hTu7Kgqa8Sf6EbFeTi+MGgzUsUvGCnYmJtCDAWUakb9JrPdWqP5dfY2xyWRKACl/bhT5kGv2P8C3lBaaS32FPUmygrGzLcf9XwLCzlKng/JR0iz/yDlR5tulf1YC0=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com; spf=pass smtp.mailfrom=starfivetech.com; arc=fail smtp.client-ip=139.219.146.96
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=starfivetech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=starfivetech.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=mSg1KlbU6JNhqJiIPFNX94il/AJpx2uSHdMAbJfCJvLAaPoV460buo9rS8d5ML0/GOxCbyhoMms8ofCqxsjFTa9240xaSeyr7DYYLkdyw05D4H8+JLJ9QuwJbc+CMmVffazz1mPlGf9wrzEBolbbsCtGmVTWWLEu0WutqbBiMAUx1AKmzmPUtUi4zsJn8yqE5Mn9TLK6IWOFZ8Oc5HB80xeBNMRRhHCJGvTn2XfqsYMXTKHgz/JmxwiqXZJ7jE/Aur4JE1bjcjiWwzhItBk8ru3teInO1vKUELDebVD9snbuKTh7qK/rv/tcIIajmSCJj+Cw8RVss6WpeO+g8km9+Q==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=+gL2odibtg5TQTIw8whdtYpTzsJn0jKKORT08sIewQc=;
+ b=mGnLjk4Q4A88RRLoYtZxYFzxxhnsvPzcG+6wRuYuwlpUWqJjokdS5dU2/E/BXoi1zUPoNgw2/7e/jDf1B1sfw5l17XA4Rg9TTJBKmtjLoXgsDhzrwtUe1uUONndoEeiXtNUqFa1JPTVDD/ekyYpfFF4kBlk5quMIstMqjlSuuP5D6+xxqu7VigUm6rQbuRVjHH/7G40yHj+ewFkGOMurXd7ikpMVWX4DigNSVzTb21vRAjGa8FfZI9F7la2teraUNdgVM6kWPlPk/rcauc0AoxznXtH0Ds7XodXltblT71jKyLDEqSSpGzINOSF6KMc037q9jsffdzTQBRkrIn35tw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=starfivetech.com; dmarc=pass action=none
+ header.from=starfivetech.com; dkim=pass header.d=starfivetech.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=starfivetech.com;
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12) by ZQZPR01MB1107.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8069.27; Fri, 1 Nov
+ 2024 08:24:01 +0000
+Received: from ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ ([fe80::617c:34a2:c5bf:8095]) by
+ ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn ([fe80::617c:34a2:c5bf:8095%4])
+ with mapi id 15.20.8069.016; Fri, 1 Nov 2024 08:24:01 +0000
+From: Ley Foon Tan <leyfoon.tan@starfivetech.com>
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Andrew Lunn <andrew@lunn.ch>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	lftan.linux@gmail.com,
+	leyfoon.tan@starfivetech.com
+Subject: code From d0f446931dfee7afa9f6ce5b1ac032e4dfa98460 Mon Sep 17 00:00:00 2001
+Date: Fri,  1 Nov 2024 16:23:33 +0800
+Message-ID: <20241101082336.1552084-1-leyfoon.tan@starfivetech.com>
+X-Mailer: git-send-email 2.46.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: ZQ0PR01CA0015.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:5::9) To ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+ (2406:e500:c550:f::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: ZQZPR01MB0979:EE_|ZQZPR01MB1107:EE_
+X-MS-Office365-Filtering-Correlation-Id: 46112631-fdb0-4f59-40bd-08dcfa4e8a3b
+X-MS-Exchange-SenderADCheck: 1
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|1800799024|366016|52116014|7416014|41320700013|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	yqvjCA+SPrKIr7x6aPxjgSCF0iLT9IlRj71p9JuIeVrX64p2gUzT8rMdZ6EMw9lKqLdxm4yZBROZjDWV8DGpeAVO/WaXFoSi3NghVNwwL0w8tFlvYi1o+fVDZ59a03RcV7IR2yvgIRvP7H2vpWQAjTCtwIYmA937KOZTfHS4UeHU8Z8YxBm5okOymOqvKCDKV0ur2qHbFXVIuNbURf10rsZLjjs2rQbI7lHXQJE/y1h+Tfp2bkOjT2DQTCGyE5i76mYA7zussacjVI406+1vzZxYoq/RuSs3gVXACRo84ZITCjOIrpREFONstKA7Sp8gTWSiANz/DMCIiOK/mJCW0bsg+IiTBntZyDtR2KKsZjl6g0NMbBT7J/Z+l3SGhBRzJ9ySKYNP/ctrs7+igf56nH3SLwjcTSU2j3Ws7AKiP03Zg5f67l1CcPnwvzsdyfV/BAKVMuUF9iqZQdRIgLorUkRQNHKD1sqj6fMfmOf174pH22sKOEFXx24wBc13aqpaph0n9fq9DnkUfLMIitegSw/Bd55vtC3jgQla4k6w1YyKMz49j7N2QTkvb1ADSVQlCA9klvJ184kBNBSr2WGwCT5O/aoF+rWkAVhUQ3vF8xYXmz4lyAqbk2krkeM7N6in
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(52116014)(7416014)(41320700013)(38350700014);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?lCVDj+RFAJlIoj0n1Qe9zKj3O3Y0FBW1i6yCcU4RsQ1APxCxoZWyLvbs6Qb5?=
+ =?us-ascii?Q?qcLIemMyxsuexd9z3rGhCdCmF7BVwe86D0R1r7nNEodhk+ZDpzA7Dn8oIxz6?=
+ =?us-ascii?Q?f2zqS7sVlp/JvuOw1oJrBuHyRGJ/F37l2AS3oqruxCHsvfSs9puSBtHvwfrV?=
+ =?us-ascii?Q?U9JsUAvGdPKfYGWdieGcT7kHKym/vU5wMXSYXTHaThDzGg0olMbV8wm9dKM8?=
+ =?us-ascii?Q?tsfR7wZt7Ylws2QhQmtE+rQ2QtfTs4m2hKLE22Xd9uw6lbfHZTLxTja753x/?=
+ =?us-ascii?Q?O97W4olRo8YrS1ri14B5M8Itjo6XlCt7CONrahBq9EsC2WG8PztXMNFwKsGd?=
+ =?us-ascii?Q?qqDSTUmGdVzR0OHiRpdG1wkPl9bLg65peilAe//VOKBbR4joX3ukH/ssd9NE?=
+ =?us-ascii?Q?omVcynH1BLEHCqTO4ldXwFVdzblEPLW+hDWb9nILI/T8q4+n5R+ahA4ocFdu?=
+ =?us-ascii?Q?1J/cEC2NRxzhlNZYw52iKH/Zb2w678mchObuf9QOXEJGnwvRF9pI1SD4iywD?=
+ =?us-ascii?Q?B9yyEwMpdaY5+3QhCIcvrOER68sCFEZCjDIfdz6eIbB7bwciJN99vz8hrMcy?=
+ =?us-ascii?Q?eijJN1GS8S5bO/iHlMqY+rA/k2QM0FSVkyJ6IQigoq9CSGZ73rJvkPoz2hae?=
+ =?us-ascii?Q?vOMEHqgst808u4CmIcVQ7MmUmTTKR1YmLIX56qcA3Weo+qG9LxxuD9IkspZe?=
+ =?us-ascii?Q?JOOQ1kNFz84tX3Vm9xF5vZ8R45r2HkGTpE7gdT60M+5udK5rDOAN5jYJCbRX?=
+ =?us-ascii?Q?U1tnJnSr2CaxYyap50LxYSnLDCbql037Rlo8+XB5YoXTmkyZYk5LnApFB2Lc?=
+ =?us-ascii?Q?KRTlhAU1MxZapEo+fQHNW4OfB8qsNs6cVoxd+MJQXIH+/6Bnk0bFzCvRQQ8F?=
+ =?us-ascii?Q?l1Etoh6uUA4A9kDxPeQBEMddI7YcZhTe24HuoNFHcHMGVRW5hKx5jaLG31h+?=
+ =?us-ascii?Q?YrfIYxag8PXnlgWJ67yJDE8HoimPOiybOUQmVyzdsVpnXvyZy9WfsusJVEoc?=
+ =?us-ascii?Q?pbiaemkcPt3UGifyU5GNZcp5cjECov1OPdFSEWOFXKk8s0pqmqMnMaxuo2I3?=
+ =?us-ascii?Q?zhyMVcSkGgxRhuKWHGMNm5dT1nhTi1Niq1ZeBWYido3ouzwao+HK31dRFXZz?=
+ =?us-ascii?Q?nU/9pbgUVcE/sPnmTcVQ6QoVI+Pztd+2G5eklQWRMU3eN+aoO8SHjOJBsx+i?=
+ =?us-ascii?Q?Sf19cH7+I+28AJw0Brs3MUd9/IyM8i0EwFcZf9a/dVtI6u0GFtnpNIVVYnoM?=
+ =?us-ascii?Q?0AgUZtXgZFbae2BgSwRnan7Zy0nZL9MqWDWg8136GitIOzyxKwHgV3zFR/3Q?=
+ =?us-ascii?Q?+8r0t/VGhYxm/oFn5a8+fRBS5anvte6iLDzeES/7OkHzZ/GYYZzAaBLIaBPx?=
+ =?us-ascii?Q?znFWeSsqhYzPgxINeSpwTb/5SSA5689yID3bzZUSDRKnjnLpG8ng5pSFSZT0?=
+ =?us-ascii?Q?ESvFZdtn63McbV89S5UZrSbEQSSrpKYLjF5RIrjRzGJ0dxDwd0hMSdNdfD38?=
+ =?us-ascii?Q?YbeRSgCowFT8u+bLFQsF+QwCcwMkAp3S3rh2B9Jp0UBunLE3xgjTI65mMXgv?=
+ =?us-ascii?Q?rP1+xp90GuqJMaUWEo0sQRLZ9Pl253U6hDiPRYCbUunFgrYmhpCsgTXzUhX6?=
+ =?us-ascii?Q?eQ=3D=3D?=
+X-OriginatorOrg: starfivetech.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 46112631-fdb0-4f59-40bd-08dcfa4e8a3b
+X-MS-Exchange-CrossTenant-AuthSource: ZQZPR01MB0979.CHNPR01.prod.partner.outlook.cn
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2024 08:24:01.5689
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 06fe3fa3-1221-43d3-861b-5a4ee687a85c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jcQnoqYJVHZat72CDyIEVmEaJn1E8MI7gf97J/M3iO2GS4aBJgWyolSA6d6rDWpgV488H4hLTWUHbxktPQ4Dv7z509QWSOl8NLdG/DGuGqQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: ZQZPR01MB1107
 
-Hi Adam,
+This patch series fixes the bugs in the dwmac4 drivers:
 
-Thanks for the quick response. I think the dev lladdr is the main thing
-to work out here, and it's not something we can change that post-merge.
-I'm not yet  convinced on your current approach, but a few
-comments/queries that may help us get a consensus there, one way or the
-other:
+Patch #1: Fix incorrect _SHIFT and _MASK for MTL_OP_MODE_RTC_* macros.
+Patch #2: Fix bit mask off operation for MTL_OP_MODE_*_MASK.
+Patch #3: Fix Receive Watchdog Timeout (RWT) interrupt handling.
 
-> We need a hardware address to create a socket without an EID in order
-> to know where we are sending the packets.
+Changes since v1:
+- Updated CC list from get_maintainers.pl.
+- Removed Fixes tag.
+- Add more description in cover letter.
 
-Just to clarify that: for physical (ie, null-EID) addressing, you don't
-need the hardware address, you need:
+History:
+v1: https://lore.kernel.org/linux-arm-kernel/20241023112005.GN402847@kernel.org/T/
 
- 1) the outgoing interface's ifindex; and
- 2) the hardware address of the *remote* endpoint, in whatever=C2=A0
-    format=C2=A0is appropriate for link type
+Ley Foon Tan (3):
+  net: stmmac: dwmac4: Fix MTL_OP_MODE_RTC mask and shift macros
+  net: stmmac: dwmac4: Fix the MTL_OP_MODE_*_MASK operation
+  net: stmmac: dwmac4: Receive Watchdog Timeout is not in abnormal
+    interrupt summary
 
-In cases where there is no hardware addressing in the tx packet (which
-looks to apply to PCC), (2) is empty.=20
+ drivers/net/ethernet/stmicro/stmmac/dwmac4.h     | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_dma.c | 4 ++--
+ drivers/net/ethernet/stmicro/stmmac/dwmac4_lib.c | 6 ++++--
+ 3 files changed, 8 insertions(+), 6 deletions(-)
 
-I understand that you're needing some mechanism for finding the correct
-ifindex, but I don't think using the device lladdr is the correct
-approach.
+-- 
+2.34.1
 
-We have this model already for mctp-over-serial, which is another
-point-to-point link type. MCTP-over-serial devices have no hardware
-address, as there is no hardware addressing in the packet format. In
-EID-less routing, it's up to the application to determine the ifindex,
-using whatever existing device-identification mechanism is suitable.
-
-> The Hardware addressing is needed to be able to use the device in=20
-> point-to-point mode.=C2=A0 It is possible to have multiple devices at the=
-=20
-> hardware level, and also to not use EID based routing.=C2=A0 Thus, the
-> kernel needs to expose which device is which.
-
-Yes, that's totally fine to expect find a specific device - but the
-device's hardware address is not the conventional place to do that.
-
-> The Essential piece of information is the outbox, which identifies
-> which channel the=C2=A0message will be sent on.=C2=A0 The inbox is in the
-> hardware address as well as a confirmation of on which channel the
-> messages are expected to return.
-
-Those are the indices of the shared memory regions used for the
-transfer, right?
-
-> In the future, it is possible to reuse channels and IRQs in
-> constrained situations, and the driver would then be able to deduce
-> from the packet which remote device sent it.
-
-The spec mentions:
-
-  A single PCC instance shall serve as a communication channel=C2=A0
-  between=C2=A0at most two MCTP capable entities
-
-so how is it ambiguous which remote device has sent a packet? Am I
-misinterpreting "channel" there?
-
-In which case, how does the driver RX path do that deduction? There is
-no hardware addressing information in the DSP0292 packet format.
-
-> =C2=A0Instead, there is a portion of it on outgoing packets, and a
-> different portion on incoming packets.
->=20
-> The hardware address format is in an upcoming version of the spec not
-> yet published.
-
-I can't really comment on non-published specs, but that looks more like
-identifiers for the tx/rx channel pair (ie., maps to a device
-identifier) rather than physical packet addressing data (ie., an
-interface lladdr). Happy to be corrected on that though!
-
-Cheers,
-
-
-Jeremy
 
