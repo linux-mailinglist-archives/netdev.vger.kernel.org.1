@@ -1,131 +1,119 @@
-Return-Path: <netdev+bounces-141118-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141119-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C4EFC9B9A03
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 22:17:01 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F24689B9A04
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 22:18:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 518AEB21C70
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:16:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6F9E2820AF
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C25FA1DE4CE;
-	Fri,  1 Nov 2024 21:16:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 162241E2828;
+	Fri,  1 Nov 2024 21:18:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W3iJBmUA"
+	dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b="HMCGKJ1h"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bali.collaboradmins.com (bali.collaboradmins.com [148.251.105.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A50E1547DC;
-	Fri,  1 Nov 2024 21:16:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 937DD1547DC;
+	Fri,  1 Nov 2024 21:18:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.251.105.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730495815; cv=none; b=iRW1zYCv769bCX9O8L8qlDxOFEXnmiP2s8cL+/kYZmGDnunMByk4D+QCLrbbjFgt8lA10OQsfOXAEQqLbBPWmsogCec5dWMF8PLw8j+RLqeXL1nMN/sj+R6l6N/f5xo/Cw6AVCNdeTmew8WruOcqq7fcRrODGT2GjNbVeIpE6AQ=
+	t=1730495892; cv=none; b=sMLEENyeflBre1FwD+jCDOOXMwljpi136MYG0KWuZPoxCz2cc6Wk6auxioBXJoZMJLgNNK3aXE/kF0G5sWNO1MwA2qcJdrQqwQHVuAJG0qOahHxyByXYWbUnLUnfKI8HM5isZjL8WGHMfTUVQ6eJf/NexYrgwwYbecnZ8/Bw6yM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730495815; c=relaxed/simple;
-	bh=xOtjIU76/6UVuXbA47J7OkfyU328phIrEkAD9TrtXbs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uckog/uWMVAOLG91Es65jywi8gs3V6Hl61+z91ewuW82dqHjvBs0qn0sgYRa6Pm+TnpZOjp00TMblB9ekcJg8vxC0PGx0ctXb4tmv+vUM1TAu74ZlvMhr2WFh8gNTgRM9pxbU7eNeDmf2KHkPhmPjjQ+AB8FWq4hj+iLz3agZ+w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W3iJBmUA; arc=none smtp.client-ip=209.85.221.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37d3ecad390so2138245f8f.1;
-        Fri, 01 Nov 2024 14:16:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730495811; x=1731100611; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1H7uxdTQs0chBY951yxomZ1Iay/UJ/Umw2IFMPAb96U=;
-        b=W3iJBmUAwF4gh/vASHvKMduYIXVMAzhbQ8CfZx1ogdko6VbGp/fY0oeVU5cW1EuK9g
-         2p00pcg4lbNWC0wx0YGi5DB9miNuWIF0udRXE0yDsXTjtss7UOhwa/yn4oVH9FmMx3Oo
-         Fnj7SgaKhOB2Az/PSua3JMJnM5XrQmFy9D1HFyhB08uX0ZDGWpaHDljki+2QsMzESASl
-         XYdbc9pf8BvdhKYtmWQVJS881Ljj2hVssTIV/YtgepqWD6gim06ZvxZNo+eA0MvUOF9y
-         p6aLb2RcEBdB0Z3o3vo/J/VjVWz0mmDg/zX0SkQEyZLixfU58FddG6fBSA13ndQYQzFF
-         41ew==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730495811; x=1731100611;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1H7uxdTQs0chBY951yxomZ1Iay/UJ/Umw2IFMPAb96U=;
-        b=YqoEEHC39W1+Z4RhCGDzx0UsuXavmEuid8GzKbt8asMFy4W9j6z/oEi/eqR3y4WKAR
-         tyiyhAS8RDtRwvFdkmYcPSGjx8jy9C0ICGqCo21FxgLfXQwoeNWP/1ZsCzSlkmefxVAr
-         +QJJr+E+EThIb3rPrhocoQPCX5eYBGld6Vi4/WLQCzhYuQfgHMN5LwFkODe72XG1Xb+k
-         KZNYoAB0wEV2NKxttVlG+VV0JRVFdB9ijVaIbd6HHs0/dlorpPYYfbX1DnwqcxUkYF9X
-         DOA4WmQs+hCb3qSmHQpAmO/zSU+rWCxXK1WEgR0fQTsTUTDqrOjhRo+OvhHV/rGUwr0e
-         1u1g==
-X-Forwarded-Encrypted: i=1; AJvYcCUa3bpj9yATGwO+9zCNoaur0OQPHQdhawD85KWdJJoG7MVDmq0EgMc4HMDn7QLOJjjfO8pgU5E=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzVaU2OBbIllecQ8zZEdVAXGCaHZ07a7+j0+bD4tqUlFwh91/90
-	qNwQK4iJgHQnvj6fzo5g1Ju0qAYN7Iw+ZH8VCR1G9wypA4PYzUAS
-X-Google-Smtp-Source: AGHT+IE45Fg2IaFv0E0Tasg4G8KbNNnKCYo5tESLUWMrR/gklV5Og5b2jX0lBMsOj9u9J9lhadJ6mg==
-X-Received: by 2002:a5d:64e8:0:b0:37d:321e:ef0c with SMTP id ffacd0b85a97d-381c797507fmr3873433f8f.11.1730495810727;
-        Fri, 01 Nov 2024 14:16:50 -0700 (PDT)
-Received: from [192.168.42.19] ([85.255.236.151])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c118905dsm6169035f8f.114.2024.11.01.14.16.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Nov 2024 14:16:50 -0700 (PDT)
-Message-ID: <f675b3ec-d2b3-4031-8c6e-f5e544faedc2@gmail.com>
-Date: Fri, 1 Nov 2024 21:17:02 +0000
+	s=arc-20240116; t=1730495892; c=relaxed/simple;
+	bh=66Ei27eT+JrfjmeRi9X6QMMDpHjXuetf/JuMi8MPyQE=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=psN0t3iAU+1IMFaaD++qA+IhhuTJsCud2ebKDPnOVIvZr0gP44Oj2ukujtGhy/84pHmTINVflwx0G82TTWNLUEifGdW9gQv6Y9IV35p9KYgwvIrPI0LLycrRwCVXj7oyqLynL6GqA2uKPuWBJVonaz+xx0wnOp03+/bjjLvhYcc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com; spf=pass smtp.mailfrom=collabora.com; dkim=pass (2048-bit key) header.d=collabora.com header.i=@collabora.com header.b=HMCGKJ1h; arc=none smtp.client-ip=148.251.105.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=collabora.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=collabora.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=collabora.com;
+	s=mail; t=1730495886;
+	bh=66Ei27eT+JrfjmeRi9X6QMMDpHjXuetf/JuMi8MPyQE=;
+	h=From:Date:Subject:To:Cc:From;
+	b=HMCGKJ1haZqHGDbHpHOmcQo1NoHvtFO+fE66drSQMSf6rIi7bf8m/mmsTsAuwNXmj
+	 xMdvU4bJxCe+CNJZvWbv8xvu/gW0cN0dUWpavk8NKpBzIrn3iD+WKMYAkJNeWlnjkt
+	 zvUnIo/WDBC4cjSHLjmMNs6QVoSTEZ524W0XcTuPysprng3MJOYAGnD/fgUwG4SHSj
+	 0MWywKJP+T0YfqwQ+0golLziJkgrcSmSBMTfUIpZ0N6BHIRJkE0sCbg0cqExtm0+04
+	 7YO5NXMaT4hhF/N/g67qZlzNtrhlIUqmEFFPVhHEGx74hrkKfKU+ExBVtSduu/7YXB
+	 lQOYDmIDywC7w==
+Received: from [192.168.1.230] (pool-100-2-116-133.nycmny.fios.verizon.net [100.2.116.133])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	(Authenticated sender: nfraprado)
+	by bali.collaboradmins.com (Postfix) with ESMTPSA id EF7FD17E0F9B;
+	Fri,  1 Nov 2024 22:18:03 +0100 (CET)
+From: =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>
+Date: Fri, 01 Nov 2024 17:17:29 -0400
+Subject: [PATCH] net: stmmac: Fix unbalanced IRQ wake disable warning on
+ single irq case
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 12/15] io_uring/zcrx: add io_recvzc request
-To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241029230521.2385749-1-dw@davidwei.uk>
- <20241029230521.2385749-13-dw@davidwei.uk>
- <CAHS8izP=S8nEk77A+dfBzOyq7ddcGUNYNkVGDhpfJarzdx3vGw@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izP=S8nEk77A+dfBzOyq7ddcGUNYNkVGDhpfJarzdx3vGw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
+Message-Id: <20241101-stmmac-unbalanced-wake-single-fix-v1-1-5952524c97f0@collabora.com>
+X-B4-Tracking: v=1; b=H4sIAGhFJWcC/x2NsQ7CMAwFf6XyjKWmqRj4FcTgJI9i0RoUU0Cq+
+ u9EjHfD3UaOqnA6dRtVvNX1YQ3CoaN8E5vAWhrT0A9jCH1gfy2LZF4tySyWUfgjd7CrTTP4ql+
+ ORVKMo6QjErXOs6Lp/+N82fcfkBbL9XMAAAA=
+X-Change-ID: 20241101-stmmac-unbalanced-wake-single-fix-3dab334ab6eb
+To: Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+ Jose Abreu <joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+ Simon Horman <horms@kernel.org>, Qiang Ma <maqianga@uniontech.com>
+Cc: kernel@collabora.com, netdev@vger.kernel.org, 
+ linux-stm32@st-md-mailman.stormreply.com, 
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+ AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+ =?utf-8?q?N=C3=ADcolas_F=2E_R=2E_A=2E_Prado?= <nfraprado@collabora.com>
+X-Mailer: b4 0.14.2
 
-On 11/1/24 20:11, Mina Almasry wrote:
-> On Tue, Oct 29, 2024 at 4:06 PM David Wei <dw@davidwei.uk> wrote:
->>
-> ...
->> +static void io_zcrx_get_buf_uref(struct net_iov *niov)
->> +{
->> +       atomic_long_add(IO_ZC_RX_UREF, &niov->pp_ref_count);
->> +}
->> +
-> 
-> This is not specific to io_rcrx I think. Please rename this and put it
-> somewhere generic, like netmem.h.
-> 
-> Then tcp_recvmsg_dmabuf can use the same helper instead of the very
-> ugly call it currently does:
-> 
-> - atomic_long_inc(&niov->pp_ref_count);
-> + net_iov_pp_ref_get(niov, 1);
-> 
-> Or something.
-> 
-> In general I think io_uring code can do whatever it wants with the
-> io_uring specific bits in net_iov (everything under net_area_owner I
-> think), but please lets try to keep any code touching the generic
-> net_iov fields (pp_pagic, pp_ref_count, and others) in generic
-> helpers.
+Commit a23aa0404218 ("net: stmmac: ethtool: Fixed calltrace caused by
+unbalanced disable_irq_wake calls") introduced checks to prevent
+unbalanced enable and disable IRQ wake calls. However it only
+initialized the auxiliary variable on one of the paths,
+stmmac_request_irq_multi_msi(), missing the other,
+stmmac_request_irq_single().
 
-I'm getting confused, io_uring shouldn't be touching these
-fields, but on the other hand should export net/ private
-netmem_priv.h and page_pool_priv.h and directly hard code a bunch
-of low level setup io_uring that is currently in page_pool.c
+Add the same initialization on stmmac_request_irq_single() to prevent
+"Unbalanced IRQ <x> wake disable" warnings from being printed the first
+time disable_irq_wake() is called on platforms that run on that code
+path.
 
+Fixes: a23aa0404218 ("net: stmmac: ethtool: Fixed calltrace caused by unbalanced disable_irq_wake calls")
+Signed-off-by: Nícolas F. R. A. Prado <nfraprado@collabora.com>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 208dbc68aaf9d4a650f167a76d1ef223d5eb6aec..7bf275f127c9d750418db8b4fdb6e650a53dc644 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3780,6 +3780,7 @@ static int stmmac_request_irq_single(struct net_device *dev)
+ 	/* Request the Wake IRQ in case of another line
+ 	 * is used for WoL
+ 	 */
++	priv->wol_irq_disabled = true;
+ 	if (priv->wol_irq > 0 && priv->wol_irq != dev->irq) {
+ 		ret = request_irq(priv->wol_irq, stmmac_interrupt,
+ 				  IRQF_SHARED, dev->name, dev);
+
+---
+base-commit: c88416ba074a8913cf6d61b789dd834bbca6681c
+change-id: 20241101-stmmac-unbalanced-wake-single-fix-3dab334ab6eb
+
+Best regards,
 -- 
-Pavel Begunkov
+Nícolas F. R. A. Prado <nfraprado@collabora.com>
+
 
