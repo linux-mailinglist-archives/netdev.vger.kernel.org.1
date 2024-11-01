@@ -1,141 +1,138 @@
-Return-Path: <netdev+bounces-140958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCDBE9B8DD5
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:28:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3F619B8DE4
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:31:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 038C71C212B8
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:28:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B2DF1F22E24
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:31:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D56915855E;
-	Fri,  1 Nov 2024 09:27:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C910115B111;
+	Fri,  1 Nov 2024 09:31:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
+Received: from szxga04-in.huawei.com (szxga04-in.huawei.com [45.249.212.190])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E231F15C158;
-	Fri,  1 Nov 2024 09:27:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEC015B971
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 09:31:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.190
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730453275; cv=none; b=WbhFz+l1B+iM/Mau9R+R4Et5IPu05xpWsyIE4wS7X/oLhHm45EWaZAR+igZ+G+LsvwZizGjCURXrh3IwcdXxDI8AZsubtfXqRd8kwlhSElCb+7JN1b/xWRHKlPyKvF9PUkW9Pro9Dmc/9Taadv8BsKrDMZfe1vK9NQ5kWZdBEzI=
+	t=1730453493; cv=none; b=UXq8Pta0P56I7X2y+fwma7Zh4Br/p0ukCXPwtviJKTDMuddjahutgmmEWkkV3N8Rbw8zrLhIyUNq9fkBC2m9ljz16e7d9KllHL7lCshFqtwG3+0frTkGN5E0B2yfcGloL3HUZ0W+SHr6VxNa/ZNyOPA02BYeWvgaxd/IpaZZtgg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730453275; c=relaxed/simple;
-	bh=tqSksozhg+SR5AgWX0/sEltZoCf9nCYQ8jIaVYZ/UAs=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=TqF96MrxjQQd5hrI5rg4I9rUG57nNwTJmG2tNDJSu2/dUtzHw3nq7MIJs8Y3SlEXyuxr/pqzSo1408Cn8HA+h8G3oUnV0FNzzXEk2QzcF+i8/DE6w+tmOWXh8zEVrpSTS/jx/N9XXpDHTmyNjLgNhCN2kSjuaDsK0116TYuDoBg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.187
+	s=arc-20240116; t=1730453493; c=relaxed/simple;
+	bh=V7vhY+bZ5LH62o5Xo6aKqkv2PBOz1KjfC9w9krZrc8Y=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=Cgle5SoC+hrHXHfxc22KrZk43hWPSEuFmgNLxKRezgVgnYr3wzDqtVtwFDnFQ9eePIYVGomgx7YDzCHy+N+Fh2WqeFUb9L3xmgHaQd1DWVJKDHcS6yCrwnHg2Y40alqC2etjtQEspYdhK3/3ipuzK9VN+ndywyqIEmKklk9qnuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.190
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.174])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4XfwTX57xPzyTtX;
-	Fri,  1 Nov 2024 17:26:08 +0800 (CST)
-Received: from kwepemk100013.china.huawei.com (unknown [7.202.194.61])
-	by mail.maildlp.com (Postfix) with ESMTPS id E4BF0140878;
-	Fri,  1 Nov 2024 17:27:49 +0800 (CST)
-Received: from localhost.localdomain (10.90.30.45) by
- kwepemk100013.china.huawei.com (7.202.194.61) with Microsoft SMTP Server
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga04-in.huawei.com (SkyGuard) with ESMTP id 4XfwYh0js8z2Fbny;
+	Fri,  1 Nov 2024 17:29:44 +0800 (CST)
+Received: from kwepemf500003.china.huawei.com (unknown [7.202.181.241])
+	by mail.maildlp.com (Postfix) with ESMTPS id AEEC114035F;
+	Fri,  1 Nov 2024 17:31:18 +0800 (CST)
+Received: from [10.174.176.82] (10.174.176.82) by
+ kwepemf500003.china.huawei.com (7.202.181.241) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 1 Nov 2024 17:27:49 +0800
-From: Jijie Shao <shaojijie@huawei.com>
-To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <andrew+netdev@lunn.ch>, <horms@kernel.org>
-CC: <shenjian15@huawei.com>, <salil.mehta@huawei.com>,
-	<liuyonglong@huawei.com>, <wangpeiyang1@huawei.com>, <shaojijie@huawei.com>,
-	<chenhao418@huawei.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-Subject: [PATCH net] net: hns3: fix kernel crash when uninstalling driver
-Date: Fri, 1 Nov 2024 17:15:07 +0800
-Message-ID: <20241101091507.3644584-1-shaojijie@huawei.com>
-X-Mailer: git-send-email 2.30.0
+ 15.2.1544.11; Fri, 1 Nov 2024 17:31:17 +0800
+Message-ID: <22c2a6ff-531f-4044-92b7-c9616642c733@huawei.com>
+Date: Fri, 1 Nov 2024 17:31:16 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net 1/2] net: bcmasp: Add missing of_node_get() before
+ of_find_node_by_name()
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <justin.chen@broadcom.com>, <florian.fainelli@broadcom.com>,
+	<andrew+netdev@lunn.ch>, <davem@davemloft.net>, <o.rempel@pengutronix.de>,
+	<kory.maincent@bootlin.com>, <horms@kernel.org>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<chenjun102@huawei.com>
+References: <20241024015909.58654-1-zhangzekun11@huawei.com>
+ <20241024015909.58654-2-zhangzekun11@huawei.com>
+ <d3c3c6b5-499a-4890-9829-ae39022fec87@lunn.ch>
+ <9ed41df0-7d35-4f64-87d7-e0717d9c172b@huawei.com>
+ <0c9ea6c2-535d-4ce8-aea1-7523b5304635@lunn.ch>
+From: "zhangzekun (A)" <zhangzekun11@huawei.com>
+In-Reply-To: <0c9ea6c2-535d-4ce8-aea1-7523b5304635@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
 X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
- kwepemk100013.china.huawei.com (7.202.194.61)
+ kwepemf500003.china.huawei.com (7.202.181.241)
 
-From: Peiyang Wang <wangpeiyang1@huawei.com>
 
-When the driver is uninstalled and the VF is disabled concurrently, a
-kernel crash occurs. The reason is that the two actions call function
-pci_disable_sriov(). The num_VFs is checked to determine whether to
-release the corresponding resources. During the second calling, num_VFs
-is not 0 and the resource release function is called. However, the
-corresponding resource has been released during the first invoking.
-Therefore, the problem occurs:
 
-[15277.839633][T50670] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000020
-...
-[15278.131557][T50670] Call trace:
-[15278.134686][T50670]  klist_put+0x28/0x12c
-[15278.138682][T50670]  klist_del+0x14/0x20
-[15278.142592][T50670]  device_del+0xbc/0x3c0
-[15278.146676][T50670]  pci_remove_bus_device+0x84/0x120
-[15278.151714][T50670]  pci_stop_and_remove_bus_device+0x6c/0x80
-[15278.157447][T50670]  pci_iov_remove_virtfn+0xb4/0x12c
-[15278.162485][T50670]  sriov_disable+0x50/0x11c
-[15278.166829][T50670]  pci_disable_sriov+0x24/0x30
-[15278.171433][T50670]  hnae3_unregister_ae_algo_prepare+0x60/0x90 [hnae3]
-[15278.178039][T50670]  hclge_exit+0x28/0xd0 [hclge]
-[15278.182730][T50670]  __se_sys_delete_module.isra.0+0x164/0x230
-[15278.188550][T50670]  __arm64_sys_delete_module+0x1c/0x30
-[15278.193848][T50670]  invoke_syscall+0x50/0x11c
-[15278.198278][T50670]  el0_svc_common.constprop.0+0x158/0x164
-[15278.203837][T50670]  do_el0_svc+0x34/0xcc
-[15278.207834][T50670]  el0_svc+0x20/0x30
+在 2024/10/25 21:14, Andrew Lunn 写道:
+> On Fri, Oct 25, 2024 at 10:41:22AM +0800, zhangzekun (A) wrote:
+>>
+>>
+>> 在 2024/10/24 19:56, Andrew Lunn 写道:
+>>> On Thu, Oct 24, 2024 at 09:59:08AM +0800, Zhang Zekun wrote:
+>>>> of_find_node_by_name() will decrease the refcount of the device_node.
+>>>> So, get the device_node before passing to it.
+>>>
+>>> This seems like an odd design. Why does it decrement the reference
+>>> count?
+>>>
+>>> Rather than adding missing of_node_get() everywhere, should we be
+>>> thinking about the design and fixing it to be more logical?
+>>>
+>>> 	Andrew
+>>
+>> Hi, Andrew,
+>>
+>> of_find* API is used as a iterater of the for loop defined in
+>> "include/linux/of.h", which is already wildly used. I think is reasonable to
+>> put the previous node when implement a loop, besides, the functionality has
+>> been documented before the definiton of of_find* APIs.
+>> The logical change of these series of APIs would require a large number of
+>> conversions in the driver subsys, and I don't think it it necessary.
+> 
+> Do you have a rough idea how many missing gets there are because of
+> this poor design?
+> 
+> A quick back of the envelope analysis, which will be inaccurate...
+> 
+> $ grep -r of_find_node_by_name | wc
+>       68     348    5154
+> 
+> Now, a lot of these pass NULL as the node pointer:
+> 
+> $ grep -r of_find_node_by_name | grep NULL | wc
+>       47     232    3456
+> 
+> so there are only about 20 call sites which are interesting. Have you
+> looked at them all?
+> 
+> What percentage of these are not in a loop and hence don't want the
+> decrement?
+> 
+> What percentage are broken?
+> 
+> We have to assume a similar number of new instances will also be
+> broken, so you have an endless job of fixing these new broken cases as
+> they are added.
+> 
+> If you found that 15 of the 20 are broken, it makes little difference
+> changing the call to one which is not broken by design. If it is only
+> 5 from 20 which are broken, then yes, it might be considered pointless
+> churn changing them all, and you have a little job for life...
+> 
+> 	Andrew
 
-For details, see the following figure.
+Hi, Andrew,
 
-     rmmod hclge              disable VFs
-----------------------------------------------------
-hclge_exit()            sriov_numvfs_store()
-  ...                     device_lock()
-  pci_disable_sriov()     hns3_pci_sriov_configure()
-                            pci_disable_sriov()
-                              sriov_disable()
-    sriov_disable()             if !num_VFs :
-      if !num_VFs :               return;
-        return;                 sriov_del_vfs()
-      sriov_del_vfs()             ...
-        ...                       klist_put()
-        klist_put()               ...
-        ...                     num_VFs = 0;
-      num_VFs = 0;        device_unlock();
+There are about 10/20 call sites might have this problem, spreading in 
+six files. May be we can fix these problems instead of adding a new API?
 
-In this patch, when driver is removing, we get the device_lock()
-to protect num_VFs, just like sriov_numvfs_store().
-
-Fixes: 0dd8a25f355b ("net: hns3: disable sriov before unload hclge layer")
-Signed-off-by: Peiyang Wang <wangpeiyang1@huawei.com>
-Signed-off-by: Jijie Shao <shaojijie@huawei.com>
----
- drivers/net/ethernet/hisilicon/hns3/hnae3.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.c b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
-index 67b0bf310daa..9a63fbc69408 100644
---- a/drivers/net/ethernet/hisilicon/hns3/hnae3.c
-+++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.c
-@@ -25,8 +25,11 @@ void hnae3_unregister_ae_algo_prepare(struct hnae3_ae_algo *ae_algo)
- 		pci_id = pci_match_id(ae_algo->pdev_id_table, ae_dev->pdev);
- 		if (!pci_id)
- 			continue;
--		if (IS_ENABLED(CONFIG_PCI_IOV))
-+		if (IS_ENABLED(CONFIG_PCI_IOV)) {
-+			device_lock(&ae_dev->pdev->dev);
- 			pci_disable_sriov(ae_dev->pdev);
-+			device_unlock(&ae_dev->pdev->dev);
-+		}
- 	}
- }
- EXPORT_SYMBOL(hnae3_unregister_ae_algo_prepare);
--- 
-2.33.0
-
+Thanks,
+Zekun
 
