@@ -1,255 +1,126 @@
-Return-Path: <netdev+bounces-140942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48F789B8BD0
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:11:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 74AC59B8BFE
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:26:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B4D71C213D7
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:11:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3912F2823B4
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F6DE1581F9;
-	Fri,  1 Nov 2024 07:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="StR7S5Hq"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5561531EF;
+	Fri,  1 Nov 2024 07:26:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E08941531C2;
-	Fri,  1 Nov 2024 07:10:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.153.233
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AFE786252;
+	Fri,  1 Nov 2024 07:25:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730445036; cv=none; b=ZnVviozOy1hDLB8tS05sCLq7PsmnApWVV//Kws76FG85SJG2NEgXKHQnOKNOLyY79ajUv7KtlCdvI81Te86OCIRXvY2t0xr9TxCO0J02Rj6zNVsVdyd/QJctDGgkvcbJ+OqeHDM1OCRhzTWWRMPBvqr8sQnzbxKDxQjXDDq0cGY=
+	t=1730445967; cv=none; b=OkYXnNN13OHaqK4uHMMH3kiytH3cCe8oUyTnlzDL4gMqdnPnZxEnfiqYEOfvWm6Jt/EzzoykQUyDM5ltKZM0REKLlyioCW1bbR3W9u+37REMIFk6Fi/MJ2S8r9Idv6YJTLZi01xG+1QeVxYzwJRHk3Q724sDqfurDE7PHRCyZQQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730445036; c=relaxed/simple;
-	bh=QoxEepSpxIzxiW268nfycWfp/ZCANVoZdj/L2K/PPzM=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
-	 In-Reply-To:To:CC; b=SZxAwWH7FB6qAnsmEDPhMwc9Lni5eTfX7qnCqQQrGtXnmfHLFG+cEs6OQcw7eNeBKNQrcGWDMIKZEYZklVkdL1iX82CxAC7146jGDmCYLdAEp4Yll3UudgBPap3G7pOdF3ZNmvpBmnEPZh85M0pyWHJQDwms+H5HdkTqDMmQjcg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=StR7S5Hq; arc=none smtp.client-ip=68.232.153.233
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1730445034; x=1761981034;
-  h=from:date:subject:mime-version:content-transfer-encoding:
-   message-id:references:in-reply-to:to:cc;
-  bh=QoxEepSpxIzxiW268nfycWfp/ZCANVoZdj/L2K/PPzM=;
-  b=StR7S5HqXsyhgnRSJPTufkga0basMfKQSdmpmRpgh8zogqnnaYmy5xCN
-   JEZ0pL5EhP+Tpa0EZXhT0zXjNO0pt6HGCz7DWlOmcUUiEqKYQ6P+2JGlQ
-   DQ7zVrzODItd4349LFOIhYLjk9fp+WyffxL6VgWLLEIyIeFXVGbYieRs1
-   T+XQ5J+yz+SZij6wV8pBQTJyFx2CVQpNlnTQsXGL87+N7BsE1VnUOK2jm
-   9ly+ZKACvq0KxvmWQbI0Vqt3Wp1O6e4weGlQVFZFjxcYVavCjLLWyeGZQ
-   fAv/Y1VlrcP00E7LObPWq3qnvZaHip0Oh5MLJsPKytC6I06Vn1asFf/i9
-   w==;
-X-CSE-ConnectionGUID: j3YBXS8JS+qztkz9gl3BFg==
-X-CSE-MsgGUID: AIVyQYU1TU63uRNfiH9Lrg==
-X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
-   d="scan'208";a="264868831"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Nov 2024 00:10:32 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 1 Nov 2024 00:10:08 -0700
-Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 1 Nov 2024 00:10:05 -0700
-From: Daniel Machon <daniel.machon@microchip.com>
-Date: Fri, 1 Nov 2024 08:09:12 +0100
-Subject: [PATCH net-next 6/6] net: lan969x: add VCAP configuration data
+	s=arc-20240116; t=1730445967; c=relaxed/simple;
+	bh=9KsNjW73/rwnA/MCFDoVKZvKFbcg6J+eV9177kx9fzA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iZcepl1DiKb4+6PK0UtR+OQDq61+kbXqGiqYYqc6lr96Mi28xmy7u7Nz//NIRLqAbq0Gdimm9TEZ3SM4qI5oYmUtBUFNr6AwINjvzF1R4a/OvrBKW08chQSM0qT8vLbWyJjq6j0JgVA3MGEiuSoLz4QQ2rbNmZcgqlJ00GZs/Z4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=48922 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1t6m2W-001NQn-1M; Fri, 01 Nov 2024 08:25:50 +0100
+Date: Fri, 1 Nov 2024 08:25:46 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Casey Schaufler <casey@schaufler-ca.com>
+Cc: Paul Moore <paul@paul-moore.com>, linux-security-module@vger.kernel.org,
+	jmorris@namei.org, serge@hallyn.com, keescook@chromium.org,
+	john.johansen@canonical.com, penguin-kernel@i-love.sakura.ne.jp,
+	stephen.smalley.work@gmail.com, linux-kernel@vger.kernel.org,
+	selinux@vger.kernel.org, mic@digikod.net, netdev@vger.kernel.org,
+	audit@vger.kernel.org, netfilter-devel@vger.kernel.org,
+	Todd Kjos <tkjos@google.com>
+Subject: Re: [PATCH v3 2/5] LSM: Replace context+len with lsm_context
+Message-ID: <ZySCeoe3kVqKTyUh@calendula>
+References: <20241023212158.18718-3-casey@schaufler-ca.com>
+ <68a956fa44249434dedf7d13cd949b35@paul-moore.com>
+ <ZyQPfFvPD72rx4ME@calendula>
+ <ZyQRgL_jWdvKgRl-@calendula>
+ <dd727620-9823-4701-aaf1-080b03fb6ccd@schaufler-ca.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-Message-ID: <20241101-sparx5-lan969x-switch-driver-3-v1-6-3c76f22f4bfa@microchip.com>
-References: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
-In-Reply-To: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
-To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lars Povlsen
-	<lars.povlsen@microchip.com>, Steen Hegelund <Steen.Hegelund@microchip.com>,
-	=?utf-8?q?Jens_Emil_Schulz_=C3=98stergaard?=
-	<jensemil.schulzostergaard@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	<jacob.e.keller@intel.com>, <christophe.jaillet@wanadoo.fr>
-CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>
-X-Mailer: b4 0.14-dev
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <dd727620-9823-4701-aaf1-080b03fb6ccd@schaufler-ca.com>
+X-Spam-Score: -1.9 (-)
 
-Add configuration data (for consumption by the VCAP API) for the four
-VCAP's that we are going to support. The following VCAP's will be
-supported:
+On Thu, Oct 31, 2024 at 04:58:13PM -0700, Casey Schaufler wrote:
+> On 10/31/2024 4:23 PM, Pablo Neira Ayuso wrote:
+> > On Fri, Nov 01, 2024 at 12:15:16AM +0100, Pablo Neira Ayuso wrote:
+> >> Hi Paul,
+> >>
+> >> This patch breaks nf_conntrack_netlink, Casey mentioned that he will
+> >> post another series.
+> 
+> I have a fix, it is pretty simple. How about I send a 6/5 patch for it?
 
- - VCAP CLM: (also known as IS0) is part of the analyzer and enables
-   frame classification using VCAP functionality.
+No idea. I don't know what is the status of this series. I would
+suggest to repost a new series.
 
- - VCAP IS2: is part of ANA_ACL and enables access control lists, using
-   VCAP functionality.
+> Or, if you want to fix it yourself, in ctnetlink_secctx_size() remove the
+> declaration of "len" and replace its use in the return with "ret".
 
- - VCAP ES0: is part of the rewriter and enables rewriting of frames
-   using VCAP functionality.
+No, sorry, I won't do that.
 
- - VCAP ES2: is part of EACL and enables egress access control lists
-   using VCAP functionality
+Thanks.
 
-The two VCAP's: CLM and IS2 use shared resources from the SUPER VCAP.
-The SUPER VCAP is a shared pool of 6 blocks that can be distributed
-freely among CLM and IS2.  Each block in the pool has 3,072 addresses
-with entries, actions, and counters. ES0 and ES2 does not use shared
-resources.
-
-In the configuration data for lan969x CLM uses blocks 2-4 with a total
-of 6 lookups. IS2 uses blocks 0-1 with a total of 4 lookups.
-
-Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
-Reviewed-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
-Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
----
- drivers/net/ethernet/microchip/lan969x/Makefile    |  2 +-
- drivers/net/ethernet/microchip/lan969x/lan969x.c   |  1 +
- drivers/net/ethernet/microchip/lan969x/lan969x.h   |  3 +
- .../ethernet/microchip/lan969x/lan969x_vcap_impl.c | 85 ++++++++++++++++++++++
- 4 files changed, 90 insertions(+), 1 deletion(-)
-
-diff --git a/drivers/net/ethernet/microchip/lan969x/Makefile b/drivers/net/ethernet/microchip/lan969x/Makefile
-index 3ea560e08a21..9a2351b4f111 100644
---- a/drivers/net/ethernet/microchip/lan969x/Makefile
-+++ b/drivers/net/ethernet/microchip/lan969x/Makefile
-@@ -6,7 +6,7 @@
- obj-$(CONFIG_LAN969X_SWITCH) += lan969x-switch.o
- 
- lan969x-switch-y := lan969x_regs.o lan969x.o lan969x_calendar.o \
-- lan969x_vcap_ag_api.o
-+ lan969x_vcap_ag_api.o lan969x_vcap_impl.o
- 
- # Provide include files
- ccflags-y += -I$(srctree)/drivers/net/ethernet/microchip/fdma
-diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.c b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-index 0cb9ec1d2054..ac37d0f74ee3 100644
---- a/drivers/net/ethernet/microchip/lan969x/lan969x.c
-+++ b/drivers/net/ethernet/microchip/lan969x/lan969x.c
-@@ -321,6 +321,7 @@ static const struct sparx5_consts lan969x_consts = {
- 	.tod_pin             = 4,
- 	.vcaps               = lan969x_vcaps,
- 	.vcap_stats          = &lan969x_vcap_stats,
-+	.vcaps_cfg           = lan969x_vcap_inst_cfg,
- };
- 
- static const struct sparx5_ops lan969x_ops = {
-diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.h b/drivers/net/ethernet/microchip/lan969x/lan969x.h
-index 167281d99c50..2489d0d32dfd 100644
---- a/drivers/net/ethernet/microchip/lan969x/lan969x.h
-+++ b/drivers/net/ethernet/microchip/lan969x/lan969x.h
-@@ -18,6 +18,9 @@ extern const struct sparx5_match_data lan969x_desc;
- extern const struct vcap_statistics lan969x_vcap_stats;
- extern const struct vcap_info lan969x_vcaps[];
- 
-+/* lan969x_vcap_impl.c */
-+extern const struct sparx5_vcap_inst lan969x_vcap_inst_cfg[];
-+
- /* lan969x_regs.c */
- extern const unsigned int lan969x_tsize[TSIZE_LAST];
- extern const unsigned int lan969x_raddr[RADDR_LAST];
-diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x_vcap_impl.c b/drivers/net/ethernet/microchip/lan969x/lan969x_vcap_impl.c
-new file mode 100644
-index 000000000000..543a1f2bf6bd
---- /dev/null
-+++ b/drivers/net/ethernet/microchip/lan969x/lan969x_vcap_impl.c
-@@ -0,0 +1,85 @@
-+// SPDX-License-Identifier: GPL-2.0+
-+
-+#include "vcap_api.h"
-+#include "lan969x.h"
-+
-+const struct sparx5_vcap_inst lan969x_vcap_inst_cfg[] = {
-+	{
-+		.vtype = VCAP_TYPE_IS0, /* CLM-0 */
-+		.vinst = 0,
-+		.map_id = 1,
-+		.lookups = SPARX5_IS0_LOOKUPS,
-+		.lookups_per_instance = SPARX5_IS0_LOOKUPS / 3,
-+		.first_cid = SPARX5_VCAP_CID_IS0_L0,
-+		.last_cid = SPARX5_VCAP_CID_IS0_L2 - 1,
-+		.blockno = 2,
-+		.blocks = 1,
-+		.ingress = true,
-+	},
-+	{
-+		.vtype = VCAP_TYPE_IS0, /* CLM-1 */
-+		.vinst = 1,
-+		.map_id = 2,
-+		.lookups = SPARX5_IS0_LOOKUPS,
-+		.lookups_per_instance = SPARX5_IS0_LOOKUPS / 3,
-+		.first_cid = SPARX5_VCAP_CID_IS0_L2,
-+		.last_cid = SPARX5_VCAP_CID_IS0_L4 - 1,
-+		.blockno = 3,
-+		.blocks = 1,
-+		.ingress = true,
-+	},
-+	{
-+		.vtype = VCAP_TYPE_IS0, /* CLM-2 */
-+		.vinst = 2,
-+		.map_id = 3,
-+		.lookups = SPARX5_IS0_LOOKUPS,
-+		.lookups_per_instance = SPARX5_IS0_LOOKUPS / 3,
-+		.first_cid = SPARX5_VCAP_CID_IS0_L4,
-+		.last_cid = SPARX5_VCAP_CID_IS0_MAX,
-+		.blockno = 4,
-+		.blocks = 1,
-+		.ingress = true,
-+	},
-+	{
-+		.vtype = VCAP_TYPE_IS2, /* IS2-0 */
-+		.vinst = 0,
-+		.map_id = 4,
-+		.lookups = SPARX5_IS2_LOOKUPS,
-+		.lookups_per_instance = SPARX5_IS2_LOOKUPS / 2,
-+		.first_cid = SPARX5_VCAP_CID_IS2_L0,
-+		.last_cid = SPARX5_VCAP_CID_IS2_L2 - 1,
-+		.blockno = 0,
-+		.blocks = 1,
-+		.ingress = true,
-+	},
-+	{
-+		.vtype = VCAP_TYPE_IS2, /* IS2-1 */
-+		.vinst = 1,
-+		.map_id = 5,
-+		.lookups = SPARX5_IS2_LOOKUPS,
-+		.lookups_per_instance = SPARX5_IS2_LOOKUPS / 2,
-+		.first_cid = SPARX5_VCAP_CID_IS2_L2,
-+		.last_cid = SPARX5_VCAP_CID_IS2_MAX,
-+		.blockno = 1,
-+		.blocks = 1,
-+		.ingress = true,
-+	},
-+	{
-+		.vtype = VCAP_TYPE_ES0,
-+		.lookups = SPARX5_ES0_LOOKUPS,
-+		.lookups_per_instance = SPARX5_ES0_LOOKUPS,
-+		.first_cid = SPARX5_VCAP_CID_ES0_L0,
-+		.last_cid = SPARX5_VCAP_CID_ES0_MAX,
-+		.count = 1536,
-+		.ingress = false,
-+	},
-+	{
-+		.vtype = VCAP_TYPE_ES2,
-+		.lookups = SPARX5_ES2_LOOKUPS,
-+		.lookups_per_instance = SPARX5_ES2_LOOKUPS,
-+		.first_cid = SPARX5_VCAP_CID_ES2_L0,
-+		.last_cid = SPARX5_VCAP_CID_ES2_MAX,
-+		.count = 1024,
-+		.ingress = false,
-+	},
-+};
-
--- 
-2.34.1
-
+> > Please, see:
+> >
+> > https://lore.kernel.org/netfilter-devel/ZxpxZuErvXSLApsf@calendula/
+> >
+> >> On Thu, Oct 31, 2024 at 06:53:38PM -0400, Paul Moore wrote:
+> >>> On Oct 23, 2024 Casey Schaufler <casey@schaufler-ca.com> wrote:
+> >>>> Replace the (secctx,seclen) pointer pair with a single
+> >>>> lsm_context pointer to allow return of the LSM identifier
+> >>>> along with the context and context length. This allows
+> >>>> security_release_secctx() to know how to release the
+> >>>> context. Callers have been modified to use or save the
+> >>>> returned data from the new structure.
+> >>>>
+> >>>> security_secid_to_secctx() and security_lsmproc_to_secctx()
+> >>>> will now return the length value on success instead of 0.
+> >>>>
+> >>>> Signed-off-by: Casey Schaufler <casey@schaufler-ca.com>
+> >>>> Cc: netdev@vger.kernel.org
+> >>>> Cc: audit@vger.kernel.org
+> >>>> Cc: netfilter-devel@vger.kernel.org
+> >>>> Cc: Todd Kjos <tkjos@google.com>
+> >>>> ---
+> >>>>  drivers/android/binder.c                |  5 ++-
+> >>>>  include/linux/lsm_hook_defs.h           |  5 ++-
+> >>>>  include/linux/security.h                |  9 +++---
+> >>>>  include/net/scm.h                       |  5 ++-
+> >>>>  kernel/audit.c                          |  9 +++---
+> >>>>  kernel/auditsc.c                        | 16 ++++------
+> >>>>  net/ipv4/ip_sockglue.c                  |  4 +--
+> >>>>  net/netfilter/nf_conntrack_netlink.c    |  8 ++---
+> >>>>  net/netfilter/nf_conntrack_standalone.c |  4 +--
+> >>>>  net/netfilter/nfnetlink_queue.c         | 27 +++++++---------
+> >>>>  net/netlabel/netlabel_unlabeled.c       | 14 +++------
+> >>>>  net/netlabel/netlabel_user.c            |  3 +-
+> >>>>  security/apparmor/include/secid.h       |  5 ++-
+> >>>>  security/apparmor/secid.c               | 26 +++++++--------
+> >>>>  security/security.c                     | 34 +++++++++-----------
+> >>>>  security/selinux/hooks.c                | 23 +++++++++++---
+> >>>>  security/smack/smack_lsm.c              | 42 +++++++++++++++----------
+> >>>>  17 files changed, 118 insertions(+), 121 deletions(-)
+> >>> See my note on patch 1/5, merging into lsm/dev.
 
