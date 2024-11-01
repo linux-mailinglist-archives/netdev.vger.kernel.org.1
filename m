@@ -1,117 +1,175 @@
-Return-Path: <netdev+bounces-141000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9B9E19B9098
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 12:47:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 72AE29B90AA
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 12:53:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3B191C209BC
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:47:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A411B1C2074D
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:53:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0846E19B3E3;
-	Fri,  1 Nov 2024 11:47:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="IAangWgP"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254CA17C227;
+	Fri,  1 Nov 2024 11:53:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2030C166F16
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 11:47:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875DA15820C
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 11:53:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730461666; cv=none; b=fBMr5NsQcesmM1/gyWgyCxxpWkhUjXSrLVahHxBX41b66u0NA3ho8wv98JB5BZ7I7MQvs2mxH1Jxrqpau/nZx0jzEphsxD1aLvOkdegy4LR5UgshsvM2p5im1iQYUHqkP2g6Zbto3CIMGyFwJ4sHlHhkfO9zFnqCk3VepcTv0oU=
+	t=1730462005; cv=none; b=JNZBYdJ6wstH5NJBCkUwTn66nr/u2FmRkh2IVpFPE3Yb18uYeOHhOr2G5Z+5lu3bo2xEhofuU7dyLIkk20bHXMZbPfr7WQVmAk/iuz7on6pIDfnBF6nAyUi8QcZ/s90jiRlm8hBLbSpxueY1ysP/WY6tFZG7Oybqk0Fx1dvDmFA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730461666; c=relaxed/simple;
-	bh=rFzzuYAv2SKccWouLovsdeghCh1s+OmcwrhbhkmvI6g=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
-	 MIME-Version:Content-Type; b=GWFMszJ1Hqg/rw6U24uolAIqheUKxKMDVkFtbVWUW5RcvStIZ6mBKiBYcX3bizHN6Fmwjwzz44+okW0HxqACL8RrEj60lLpFVfizVNvSXU2Y0pUle9YIGJR9Q5U8JkxR1xiaZhqeQtPz4/sEPM7QlwDxJMjLNJ/ZIp26Zj+eb2g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=IAangWgP; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730461664;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=rFzzuYAv2SKccWouLovsdeghCh1s+OmcwrhbhkmvI6g=;
-	b=IAangWgPB6bLrQjWV6qgxesAOFyZKGAXCpJlv6vckDaMA+t+qThi9a9zUCkp7RdRSlJipI
-	3Q5giknJe7esyIymB/BywYYGKlzchpX1dSIRc4PQY3xPw69K1P1wkzvY57thZHmb2E32m1
-	zt9MdvHgIKE4eM++B+wbOMmg4ictE6w=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-286-8Nuj20csNDKcsctCSGWNPQ-1; Fri, 01 Nov 2024 07:47:41 -0400
-X-MC-Unique: 8Nuj20csNDKcsctCSGWNPQ-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-43152cd2843so11745015e9.3
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 04:47:41 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730461660; x=1731066460;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=rFzzuYAv2SKccWouLovsdeghCh1s+OmcwrhbhkmvI6g=;
-        b=SU4EyZqCtjs1gC77e0W+iRBkjzCNWs9421ZXdXM26Z2EuUqE7kertglPAMaeowJdRz
-         ncolgWEucsKzQyVoFVKYipqyHucVW0R+cXbR/MjiIi0jh7gPLmz+lBcRGRQAymKa0fjR
-         E1MPKSxSpOP0oClYh1Y6PVOEH9hpa0Nq1TUBXeqa+vT8m0iF4LBqRwGBTY5OnBG5XNYV
-         JVtK67wDgX6zuYZKhwb2dafmIrl/Uaphbx+gpM+tVdR+lC4uZEvX71kwjaxQdxYeUtRd
-         Cf7VveU0HhSRk/tZsaJiAY28V0IY21MoohNbn/1S/MhN0xROiB6mgiH7idVCCO3gSTkd
-         vcKg==
-X-Forwarded-Encrypted: i=1; AJvYcCWk8dVw1HwY8ElzzlPLC6OvSlrSCC+TbF0i9sUZdNLgNyb6QLqgXX/Tqti82Nwb01855ztgiZo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy4SJifC1KRvI1FySa1qDEZew20gMnYHrW5az5JYnMu+SSM/P5w
-	9vbTeMaOOrT/YSMWHu0X30Xl+c36FjV116w7pnrOdhxAK4Ld8Rg74mjsbRyPk1mMvNNbVq7L2yp
-	RnxvTd8jXrHOcsTV9o7bwBUH1t0tqF/+ApTs+LAZdUYmkbY7Mbbkk3w==
-X-Received: by 2002:a05:600c:1d97:b0:431:5459:33c2 with SMTP id 5b1f17b1804b1-431bb99053bmr107786655e9.17.1730461660612;
-        Fri, 01 Nov 2024 04:47:40 -0700 (PDT)
-X-Google-Smtp-Source: AGHT+IFNlCYVzQ8SAbhWfaM5n3nvXcLZFSRiXEpUvQ8tFWfAU9tvUBvRq0rnYNEnYa0nWbeMoxReGw==
-X-Received: by 2002:a05:600c:1d97:b0:431:5459:33c2 with SMTP id 5b1f17b1804b1-431bb99053bmr107786455e9.17.1730461660233;
-        Fri, 01 Nov 2024 04:47:40 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10e7365sm4783523f8f.54.2024.11.01.04.47.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 04:47:39 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id BA4BA164B94E; Fri, 01 Nov 2024 12:47:38 +0100 (CET)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, Alexei Starovoitov
- <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, John Fastabend
- <john.fastabend@gmail.com>, Andrii Nakryiko <andrii@kernel.org>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Stanislav Fomichev
- <sdf@fomichev.me>, Magnus Karlsson <magnus.karlsson@intel.com>,
- nex.sw.ncis.osdt.itp.upstreaming@intel.com, bpf@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3 05/18] xdp, xsk: constify read-only
- arguments of some static inline helpers
-In-Reply-To: <20241030165201.442301-6-aleksander.lobakin@intel.com>
-References: <20241030165201.442301-1-aleksander.lobakin@intel.com>
- <20241030165201.442301-6-aleksander.lobakin@intel.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Fri, 01 Nov 2024 12:47:38 +0100
-Message-ID: <87v7x79nvp.fsf@toke.dk>
+	s=arc-20240116; t=1730462005; c=relaxed/simple;
+	bh=5WpOuEix74X7yKM6WtxCZXsnuVlB/PdCVvCIoID6/jY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=n5zPU9rRwc0HOnkSvCMVgXmSR1i+D/42PsXMzhQn+20rKzMzolIqbzz84VasEZxVCqXgEpoty6iePBhuG66Dwb0n2QOomx+DTS/raj3/JEEwAAJ5flwG9Y7E7IFoCH3ZPtuii3ilRZDxTSPkcHkR/KGyUn6hzmE3YjFDXyS/gdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <fpf@pengutronix.de>)
+	id 1t6qDO-0006Ep-ED; Fri, 01 Nov 2024 12:53:18 +0100
+Received: from dude05.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::54])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <fpf@pengutronix.de>)
+	id 1t6qDM-001VL6-1p;
+	Fri, 01 Nov 2024 12:53:16 +0100
+Received: from fpf by dude05.red.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <fpf@pengutronix.de>)
+	id 1t6qDM-00AveW-1e;
+	Fri, 01 Nov 2024 12:53:16 +0100
+From: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: dsahern@gmail.com,
+	entwicklung@pengutronix.de,
+	roopa@nvidia.com,
+	razor@blackwall.org,
+	bridge@lists.linux-foundation.org,
+	stephen@networkplumber.org,
+	Fabian Pfitzner <f.pfitzner@pengutronix.de>
+Subject: [PATCH v3 iproute] bridge: dump mcast querier state
+Date: Fri,  1 Nov 2024 12:50:40 +0100
+Message-Id: <20241101115039.2604631-1-f.pfitzner@pengutronix.de>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: fpf@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Alexander Lobakin <aleksander.lobakin@intel.com> writes:
+Kernel support for dumping the multicast querier state was added in this
+commit [1]. As some people might be interested to get this information
+from userspace, this commit implements the necessary changes to show it
+via
 
-> Lots of read-only helpers for &xdp_buff and &xdp_frame, such as getting
-> the frame length, skb_shared_info etc., don't have their arguments
-> marked with `const` for no reason. Add the missing annotations to leave
-> less place for mistakes and more for optimization.
->
-> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+ip -d link show [dev]
 
-Reviewed-by: Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com>
+The querier state shows the following information for IPv4 and IPv6
+respectively:
+
+1) The ip address of the current querier in the network. This could be
+   ourselves or an external querier.
+2) The port on which the querier was seen
+3) Querier timeout in seconds
+
+[1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=c7fa1d9b1fb179375e889ff076a1566ecc997bfc
+
+Signed-off-by: Fabian Pfitzner <f.pfitzner@pengutronix.de>
+---
+
+v1->v2
+	- refactor code
+	- link to v1: https://lore.kernel.org/netdev/20241025142836.19946-1-f.pfitzner@pengutronix.de/
+v2->v3
+	- use print_color_string for addresses
+	- link to v2: https://lore.kernel.org/netdev/20241030222136.3395120-1-f.pfitzner@pengutronix.de/
+
+ ip/iplink_bridge.c | 60 ++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 60 insertions(+)
+
+diff --git a/ip/iplink_bridge.c b/ip/iplink_bridge.c
+index f01ffe15..9c01154b 100644
+--- a/ip/iplink_bridge.c
++++ b/ip/iplink_bridge.c
+@@ -661,6 +661,66 @@ static void bridge_print_opt(struct link_util *lu, FILE *f, struct rtattr *tb[])
+ 			   "mcast_querier %u ",
+ 			   rta_getattr_u8(tb[IFLA_BR_MCAST_QUERIER]));
+ 
++	if (tb[IFLA_BR_MCAST_QUERIER_STATE]) {
++		struct rtattr *bqtb[BRIDGE_QUERIER_MAX + 1];
++
++		SPRINT_BUF(other_time);
++
++		parse_rtattr_nested(bqtb, BRIDGE_QUERIER_MAX, tb[IFLA_BR_MCAST_QUERIER_STATE]);
++		memset(other_time, 0, sizeof(other_time));
++
++		open_json_object("mcast_querier_state_ipv4");
++		if (bqtb[BRIDGE_QUERIER_IP_ADDRESS]) {
++			print_string(PRINT_FP,
++				NULL,
++				"%s ",
++				"mcast_querier_ipv4_addr");
++			print_color_string(PRINT_ANY,
++				COLOR_INET,
++				"mcast_querier_ipv4_addr",
++				"%s ",
++				format_host_rta(AF_INET, bqtb[BRIDGE_QUERIER_IP_ADDRESS]));
++		}
++		if (bqtb[BRIDGE_QUERIER_IP_PORT])
++			print_uint(PRINT_ANY,
++				"mcast_querier_ipv4_port",
++				"mcast_querier_ipv4_port %u ",
++				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IP_PORT]));
++		if (bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER])
++			print_string(PRINT_ANY,
++				"mcast_querier_ipv4_other_timer",
++				"mcast_querier_ipv4_other_timer %s ",
++				sprint_time64(
++					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IP_OTHER_TIMER]),
++									other_time));
++		close_json_object();
++		open_json_object("mcast_querier_state_ipv6");
++		if (bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]) {
++			print_string(PRINT_FP,
++				NULL,
++				"%s ",
++				"mcast_querier_ipv6_addr");
++			print_color_string(PRINT_ANY,
++				COLOR_INET6,
++				"mcast_querier_ipv6_addr",
++				"%s ",
++				format_host_rta(AF_INET6, bqtb[BRIDGE_QUERIER_IPV6_ADDRESS]));
++		}
++		if (bqtb[BRIDGE_QUERIER_IPV6_PORT])
++			print_uint(PRINT_ANY,
++				"mcast_querier_ipv6_port",
++				"mcast_querier_ipv6_port %u ",
++				rta_getattr_u32(bqtb[BRIDGE_QUERIER_IPV6_PORT]));
++		if (bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER])
++			print_string(PRINT_ANY,
++				"mcast_querier_ipv6_other_timer",
++				"mcast_querier_ipv6_other_timer %s ",
++				sprint_time64(
++					rta_getattr_u64(bqtb[BRIDGE_QUERIER_IPV6_OTHER_TIMER]),
++									other_time));
++		close_json_object();
++	}
++
+ 	if (tb[IFLA_BR_MCAST_HASH_ELASTICITY])
+ 		print_uint(PRINT_ANY,
+ 			   "mcast_hash_elasticity",
+-- 
+2.39.5
 
 
