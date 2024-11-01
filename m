@@ -1,85 +1,109 @@
-Return-Path: <netdev+bounces-140925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 693569B8A45
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 05:48:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC5C59B8A49
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 05:59:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D1D61F2290F
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 04:48:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 561682824AA
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 04:59:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E2113D897;
-	Fri,  1 Nov 2024 04:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191D4147C9B;
+	Fri,  1 Nov 2024 04:59:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UBUfjTzH"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="OWhYry3a";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nXAd6zox"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0067139B;
-	Fri,  1 Nov 2024 04:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B1D322B;
+	Fri,  1 Nov 2024 04:59:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730436518; cv=none; b=NSV9jzE6S9qHrXLPHt4Zzxe91AgRPrqNBEKo+5eS5Z+lJAPwqOVD/w3fosQQHRb3QsNA0TqctTzmJC3yjmL0rPv7rvrF5oCPYGA4UFJh3CjLvMcW7YGiKyMNcb0TqCP9TCdkNEtaXiearPasaTKDtTDr3UXpObRANMBwN8a5Nrw=
+	t=1730437154; cv=none; b=QRbuRWqfTr/FkfwLCned7wrEXQBkVrc2P07dAfiPPTok2F+azsK+krISu5pvdxvv5U0O0vdNiMsN0fKWUrXoAtBKUSo1sbl9ikHxTYlzhB5z5UFhO6493i4WSw1QbgllvLC+ol5msFxehMvIfSNq/fOZ4dG0ErLOXdikJ+sjPaw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730436518; c=relaxed/simple;
-	bh=goupBVKKF4uoCNiNKh9pKJyH7g/obcamc9uDsfjlrVw=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=dTmoTmbQ+hLG401452TJu3CGakcORu6UHPP42otpAywziUsgK5VSxg4Z317it42HiZ+2V0YC52F4zTvnvH0Ska4+uOxR8OFESgP/pq74qUvPPO+DfWHCNWOtdCsmaDFuyScBjoSl87iFs5wAhyL7xt9pU3ggSCTt90nnBoqPn5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UBUfjTzH; arc=none smtp.client-ip=209.85.214.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20c714cd9c8so17475075ad.0;
-        Thu, 31 Oct 2024 21:48:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730436516; x=1731041316; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fx1RChMr66gIWYhPNL1PsqJ/YHNLAl0LYOv2JnnTM64=;
-        b=UBUfjTzHEGH+NIJ5lsS9GaTx9UVqXt06t5gL27DlvwuUom6DX+VPkP2VszoTFDz3ho
-         yL0glAFj5ROJ6WWkhSzAxZqDmGj00O8DTKuiKvfQzEDHFsItsr4ixaok9ajJJ6cEWJ9g
-         tXGOZfgk2igCMfZ8wvpQAZvY8L8KRa7VrO9jKIn1ecQVHEIdesN44n3crM7+lYogPvlL
-         MoxjkSAjZYykZGXw7Fchj/nlSzp6NKPgMqd2wE62Gf1BbVbl9NoZ93kBgxaL/7hu23vJ
-         n2itPzwwnCBIih2vQbaChP3FwHaje87zC4CAwER14aZfXD/KY35a0rIx1SEjvLn1jjn4
-         D+Ig==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730436516; x=1731041316;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Fx1RChMr66gIWYhPNL1PsqJ/YHNLAl0LYOv2JnnTM64=;
-        b=pFDYRHCP13B766PBNH+9an1I+hf4FhoHWMaeR6UVuAockmmf/P1La2r9MAJYHt1tEu
-         N4ZRjhJ4GK5TQQPFAL8+NZ+LeEYZUvz3pvfF7aydW9T4lGuN+aYDHhWMjMJmcqDjy9Uq
-         JC2ZPMtQd4jMor1akTLh3ibnaNsSXe9yeP1bO9UN282bXmuD/wPdEhGZNGpnsdKw+3M1
-         kA+vVEMYsYspNgr9L8GD+LmPcXt3nXsaFNRexVIvSWUoUl7Uzu+Umq6NIE18wA5Lk5Id
-         W0ne7XNRJIB99nM06rTN6H43+cbwi6cZfL4aWNMg4m8pZqSkkGXn3jwPoNmX5ovBGVaj
-         tpsA==
-X-Forwarded-Encrypted: i=1; AJvYcCVIST3qmE7hFEtJZVQQysCF8xgVgLjLZK3juj9CaCLigQvCO9ABqAHG5FJ/o3fsMII832R6/oxt@vger.kernel.org, AJvYcCWkSmXDGx98+L8MnKqctIaSMCfqMdZHN4ylOWchPJvRla3ywIvomN0B7nx2j2TRcpjbAAJ8/S/eijnzb2g=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyx78hCEZcb4fcozPrKF409uYCgyK6Dh/Ip5wH5/RMJaETDdEA/
-	PPwDpEFfgyAg+VGJUxAAQ5zbHAS+jqjZVwkods416p4AV5CXGxDT
-X-Google-Smtp-Source: AGHT+IEEMIk857bmmD7AVDexG2/qdpDowNobcbSPfjOQpeynHnn2y0pAVGvCRKS+NHwwh5UODrqXQA==
-X-Received: by 2002:a17:902:ec81:b0:20c:fb47:5c02 with SMTP id d9443c01a7336-2111b01aff0mr23099375ad.52.1730436516122;
-        Thu, 31 Oct 2024 21:48:36 -0700 (PDT)
-Received: from localhost.localdomain ([101.94.129.40])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057a59a8sm15890625ad.130.2024.10.31.21.48.32
-        (version=TLS1_3 cipher=TLS_CHACHA20_POLY1305_SHA256 bits=256/256);
-        Thu, 31 Oct 2024 21:48:35 -0700 (PDT)
-From: Yi Zou <03zouyi09.25@gmail.com>
-To: davem@davemloft.net
-Cc: 21210240012@m.fudan.edu.cn,
-	21302010073@m.fudan.edu.cn,
-	dsahern@kernel.org,
+	s=arc-20240116; t=1730437154; c=relaxed/simple;
+	bh=t2sfTpM5WPgCUaI+PxFBg3ngx12mwdycHLvzxpb70eU=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OsDgundIxwppX3aR5irrC4NgXGoO8EJcgKy1hNAIOXzBlxVPuTH6RJTPTvWs5EgVsVLDWvzafAKs/MoBbqg0DGssdBDVqtqvxAPeSLxfbEufVa+HXSlwNPIAZJGtW3D5HzmDOa1PcjbL++wU3i4zYTn9pQSkKdkSDgi7obys4xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=OWhYry3a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nXAd6zox; arc=none smtp.client-ip=103.168.172.144
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
+	by mailfout.phl.internal (Postfix) with ESMTP id 0FFE8138012C;
+	Fri,  1 Nov 2024 00:59:10 -0400 (EDT)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-04.internal (MEProxy); Fri, 01 Nov 2024 00:59:10 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1730437150; x=1730523550; bh=JJ9+M/HGlO5YKjsRaH9qT
+	g7jRa5jm5uIC1oaNkJ8ijs=; b=OWhYry3a4nXL7seqHkZEdAmV/IINkKaq4r/i2
+	8ivssk1ws7lb/rsqgaClf2SrWno99EqwgcyB9z7QHhlKI7qktrBWSHssnIEAqDje
+	cXQS+h/Srs8FceTRXNBaPevjq1WItkf+XyJt78knGPRRguFDUMqtgVrY3IMxvhNE
+	cEx6T8dJ82AnCFpKRsD63CS3j0pt6GeEt1L//uYC3EVB/414L+7X0Ei6SWyNhWBg
+	+Mw1pRALiOq2o/Yd49ZXvke2CxpxYc9RWuKs5+W+0tWtLHAAaSg3uTEJ93DW971w
+	EoJu90c5HWDhBKbfqz6cLpix7V5kdGgugMVTzI1EtuRzOik7g==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730437150; x=1730523550; bh=JJ9+M/HGlO5YKjsRaH9qTg7jRa5jm5uIC1o
+	aNkJ8ijs=; b=nXAd6zox5lWNcWWYLI118/rMtVyPijWT6/6Ke0Cs+6cgSUcx+up
+	Zq5TFrQrOl0xBYiJHOFj8N5GKlCxGiztN9okRvJcz9kcxKJRAEgH0DU8qgKRt86S
+	wpxQPYWdRy6VG6GTUqwxfQTo4fgUELYrxnNdpZhXcxWNtjcgJATm76oOVNObQEJv
+	uJJwBEw+T6XVRLDAG3ny8Wdg1AqqJhtKGIhmpbM0RTrgK3AAXcTGszfUEKlK1zw9
+	t2g8zKR+u/PtZY7RQZdo2T8voIWJkJ492FVvXGwGH75F4C8vc/Urk8Z3D30uSVVc
+	Dd6GG/2p5ZIIKR8JERHtYhBD2ltG8mWYh2Q==
+X-ME-Sender: <xms:HGAkZ4DPCXiFVV9fgTZTgeCpGWkO4ettS8HIGYAd4EryX9nUjTjVzw>
+    <xme:HGAkZ6h1kH50xh1lq6UR0-QUYYmMs_5-D2dNA2-EKPnMlKztrHsmqZRGqdrcGLcqG
+    f1Gl2Asts2LffCKvw>
+X-ME-Received: <xmr:HGAkZ7lgd8vv6aLs_kaKkdI5BrIBXZQj6hbSLm2ObtB8R7IF6As9lpqSLZDXO1rbC3ezXJs-xnF1vtJiuFf4380iX8zBgUUMWq8wbWTNJcXxuUq1Q6Ur>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdekkedgjeehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
+    dtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghn
+    ihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepvd
+    eggfetgfelhefhueefkeduvdfguedvhfegleejudduffffgfetueduieeikeejnecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguh
+    huuhdrgiihiidpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgt
+    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepmhhitg
+    hhrggvlhdrtghhrghnsegsrhhorggutghomhdrtghomhdprhgtphhtthhopegvughumhgr
+    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvh
+    eslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghp
+    thhtohepvhhikhgrshdrghhuphhtrgessghrohgruggtohhmrdgtohhmpdhrtghpthhtoh
+    eprghnughrvgifrdhgohhsphhouggrrhgvkhessghrohgruggtohhmrdgtohhmpdhrtghp
+    thhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehprghvrghnrd
+    gthhgvsggsihessghrohgruggtohhmrdgtohhm
+X-ME-Proxy: <xmx:HGAkZ-zQKcBrQZrXkZFm6vdCHRuOgZAorWniWUl7UopJGDbpIedslQ>
+    <xmx:HGAkZ9TAVeEJ9bHzIYlw7Z9MbO8k3epXscOvEezTqMJ2brfvVbv_NA>
+    <xmx:HGAkZ5YuGBnoE_VkDrp6dL9CRUHMn-ezQ1Hp7CgPWY4775F4xKzavw>
+    <xmx:HGAkZ2QrDOJg_2ol0LsdztEj4UbFuGnk3sPPiOHuuDs6Nz5t-5QDKA>
+    <xmx:HmAkZzD2O20rt48UzA2d1b3tDYqp25J5iNGhWZl0LYus7G7s8TWwq999>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 1 Nov 2024 00:59:07 -0400 (EDT)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: davem@davemloft.net,
+	michael.chan@broadcom.com,
 	edumazet@google.com,
-	pabeni@redhat.com,
+	andrew+netdev@lunn.ch,
 	kuba@kernel.org,
-	netdev@vger.kernel.org,
+	vikas.gupta@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	pabeni@redhat.com,
+	pavan.chebbi@broadcom.com,
+	martin.lau@linux.dev
+Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Yi Zou <03zouyi09.25@gmail.com>
-Subject: [PATCH] ipv6: ip6_fib: fix possible null-pointer-dereference in  ipv6_route_native_seq_show
-Date: Fri,  1 Nov 2024 12:48:28 +0800
-Message-ID: <20241101044828.55960-1-03zouyi09.25@gmail.com>
-X-Mailer: git-send-email 2.44.0
+	kernel-team@meta.com
+Subject: [PATCH net] bnxt_en: ethtool: Fix ip[6] ntuple rule verification
+Date: Thu, 31 Oct 2024 22:58:30 -0600
+Message-ID: <219859e674ef7a9d8af9ab4f64a9095580f04bcc.1730436983.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,41 +112,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-In the ipv6_route_native_seq_show function, the fib6_nh variable
-is assigned the value from nexthop_fib6_nh(rt->nh), which could
-return NULL. This creates a risk of a null-pointer-dereference
-when accessing fib6_nh->fib_nh_gw_family. This can be resolved by
-checking if fib6_nh is non-NULL before accessing fib6_nh->fib_nh_gw_family
- and assign dev using dev = fib6_nh ? fib6_nh->fib_nh_dev : NULL;
-to prevent null-pointer dereference errors.
+Previously, trying to insert an ip or ip6 only rule would get rejected
+with -EOPNOTSUPP. For example, the following would fail:
 
-Signed-off-by: Yi Zou <03zouyi09.25@gmail.com>
+    ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
+
+The reason was that all the l4proto validation was being run despite the
+l4proto mask being set to 0x0.  Fix by only running l4proto validation
+when mask is set.
+
+Fixes: 9ba0e56199e3 ("bnxt_en: Enhance ethtool ntuple support for ip flows besides TCP/UDP")
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
 ---
- net/ipv6/ip6_fib.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 15 ++++++++++-----
+ 1 file changed, 10 insertions(+), 5 deletions(-)
 
-diff --git a/net/ipv6/ip6_fib.c b/net/ipv6/ip6_fib.c
-index eb111d20615c..6632ab65d206 100644
---- a/net/ipv6/ip6_fib.c
-+++ b/net/ipv6/ip6_fib.c
-@@ -2555,14 +2555,14 @@ static int ipv6_route_native_seq_show(struct seq_file *seq, void *v)
- #else
- 	seq_puts(seq, "00000000000000000000000000000000 00 ");
- #endif
--	if (fib6_nh->fib_nh_gw_family) {
-+	if (fib6_nh && fib6_nh->fib_nh_gw_family) {
- 		flags |= RTF_GATEWAY;
- 		seq_printf(seq, "%pi6", &fib6_nh->fib_nh_gw6);
- 	} else {
- 		seq_puts(seq, "00000000000000000000000000000000");
- 	}
- 
--	dev = fib6_nh->fib_nh_dev;
-+	dev = fib6_nh ? fib6_nh->fib_nh_dev : NULL;
- 	seq_printf(seq, " %08x %08x %08x %08x %8s\n",
- 		   rt->fib6_metric, refcount_read(&rt->fib6_ref), 0,
- 		   flags, dev ? dev->name : "");
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+index f71cc8188b4e..1c97ee406bd7 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
+@@ -1289,10 +1289,13 @@ static int bnxt_add_l2_cls_rule(struct bnxt *bp,
+ static bool bnxt_verify_ntuple_ip4_flow(struct ethtool_usrip4_spec *ip_spec,
+ 					struct ethtool_usrip4_spec *ip_mask)
+ {
++	u8 mproto = ip_mask->proto;
++	u8 sproto = ip_spec->proto;
++
+ 	if (ip_mask->l4_4_bytes || ip_mask->tos ||
+ 	    ip_spec->ip_ver != ETH_RX_NFC_IP4 ||
+-	    ip_mask->proto != BNXT_IP_PROTO_FULL_MASK ||
+-	    (ip_spec->proto != IPPROTO_RAW && ip_spec->proto != IPPROTO_ICMP))
++	    (mproto && mproto != BNXT_IP_PROTO_FULL_MASK) ||
++	    (mproto && sproto != IPPROTO_RAW && sproto != IPPROTO_ICMP))
+ 		return false;
+ 	return true;
+ }
+@@ -1300,10 +1303,12 @@ static bool bnxt_verify_ntuple_ip4_flow(struct ethtool_usrip4_spec *ip_spec,
+ static bool bnxt_verify_ntuple_ip6_flow(struct ethtool_usrip6_spec *ip_spec,
+ 					struct ethtool_usrip6_spec *ip_mask)
+ {
++	u8 mproto = ip_mask->l4_proto;
++	u8 sproto = ip_spec->l4_proto;
++
+ 	if (ip_mask->l4_4_bytes || ip_mask->tclass ||
+-	    ip_mask->l4_proto != BNXT_IP_PROTO_FULL_MASK ||
+-	    (ip_spec->l4_proto != IPPROTO_RAW &&
+-	     ip_spec->l4_proto != IPPROTO_ICMPV6))
++	    (mproto && mproto != BNXT_IP_PROTO_FULL_MASK) ||
++	    (mproto && sproto != IPPROTO_RAW && sproto != IPPROTO_ICMPV6))
+ 		return false;
+ 	return true;
+ }
 -- 
-2.44.0
+2.46.0
 
 
