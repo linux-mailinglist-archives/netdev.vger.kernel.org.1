@@ -1,240 +1,191 @@
-Return-Path: <netdev+bounces-141132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CE649B9B12
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 00:01:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A9949B9B15
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 00:04:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 416801C21088
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 23:01:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 570491C2106B
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 23:04:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9F051D0F50;
-	Fri,  1 Nov 2024 23:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 608F71D041B;
+	Fri,  1 Nov 2024 23:04:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CQXm4L2b"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DHz83Sbj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 271981E47AE
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 23:01:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.16
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730502106; cv=fail; b=HYfohPHuoTlzojwBTry6oMAuNEFsechsiAvcQsPK5sEejrQ/5FJeCy0t6Odp6fQsKhjdse2ywtlQtowUoDflPFkJVKkh/3Rqjf7SFmMkP7jANgnZUPJo/4Urti9XYb9Db88NtWQbeCLtrg/BIqOixJdBBbUPQoZmua3aMdFVLMo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730502106; c=relaxed/simple;
-	bh=B2J2lsT5P5HbW0hrU0b0nPzSvzNpsLtxaQMpiIiB2Vo=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=ueFDQTjG+3maNcGfdCkefbOs/kUvCUkD8Tu7T9TkwTMQ2ZVPJg0fFEPto1qNTfWUimUDMHG/S5NWBP9v0L/iT+K/wxJgSNtReO7IpkmQhbo3/PVWWpWsbK9cfTq64p58pUCbr5+xIehgLULBmBUiux3KxnfJHPkCyU5nKfICJEY=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CQXm4L2b; arc=fail smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730502106; x=1762038106;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=B2J2lsT5P5HbW0hrU0b0nPzSvzNpsLtxaQMpiIiB2Vo=;
-  b=CQXm4L2bIFlheIituiQRbyNByOEC9JvH0wiXn69tDLc6qOoHSGrl/a/2
-   3L5CNGDUjLsCH2kmMmNFf1Ehcu2zrq99gk4k6uAKbQOZvGg8sIyumucdD
-   AaDjUl75WCpfuYfMlGjVBX6Zmgm9FtTMFiCUsyfr6D5u++Y7JFxCWgLSQ
-   zATCYT8gpCyRIai+iWnZKSRv2pXcR6tRkdiw48fRBaIHcS0vsVKVU3zaR
-   hURFffiomEwQv19u4tMNrgGWPRrtbEHLZ0R82mI70DaoVFZVnKHgXbi3l
-   Vq6xrYwT/ZqoXvlLsUSEsYXuIF7t3ImLGlWsefiqRVewRgAVEB0cRqb/W
-   A==;
-X-CSE-ConnectionGUID: reOiFAjjRnKJB3/qYdo2mQ==
-X-CSE-MsgGUID: HE6qCu2fREOckM7VQTcVsA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30437023"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30437023"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 16:01:44 -0700
-X-CSE-ConnectionGUID: uDSYQOC8Q1aJc4mZ3XkPRw==
-X-CSE-MsgGUID: XXEMxEpTTh+awcazhfSCaA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,251,1725346800"; 
-   d="scan'208";a="83204613"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 01 Nov 2024 16:01:43 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 1 Nov 2024 16:01:42 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Fri, 1 Nov 2024 16:01:42 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.40) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Fri, 1 Nov 2024 16:01:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=xzEnf2LXAoolBUz8CjygoKQyHTDKgSkjjhv9FbpDCk7y82ZbLLVqkgnI+G3pBOXwVzsGdpPXccBoJ6j/d1VILBh+zauDb9tLc3jS5ONrsab9U554JIUyPlQy5Nqa/8r7emJNxJMe7NbIQMirrDmVLZmKAT4ihLsTe4ug8pZ+KxTaIoHjGxV/hPhwkcKE8216TgZTSuUtm6aS5MO2xvEttxFQdfVOMkDyQFF8muGJKJmWHJ6W585EQuKyyz1PwD8TSFnW1s8pPK75y+fFT6AXEoaziyPK1WXD1BrjwAfq7LYN979oJd8ykHfeK0CNquRTdtlcHy8AAMfPRlDyDQO4bA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=MPbiPNK3doNe5bfNWti+lo3pbDA/pLU5WekK/FdWdyE=;
- b=lg2LLJRZI+yoyk6S11lXBhgy1/Kso0//XI75UqRShWl4nrXiT/4OyvepKrX/xMN28jLoOy7+UoHgWTuSkynopm3fqWq9u+pTHPkhJ3iXr7Vm0pZvImcJp/ZZXcCVV3oJU5Pi8eNCsYM/ZSOG6ahp1hqK3SpK3+XC3pIcesi+EIWOEh8gSz3pC3BH3+T439zNK3soq9VPhjHJjfHJLu7cS5KADwsDJh4q7dtQr5Rnvdw+OZYizWYGOokaFHcxVZqHhDfQ2mIaepMnYkXp6Zb+TgH/FIOCyWtX7/eKiSIH9tU4WDfjenLOAmfUyTEc+W/ZKra85BRIA8pbITltE0Iw+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com (2603:10b6:303:16b::16)
- by CH3PR11MB8592.namprd11.prod.outlook.com (2603:10b6:610:1b1::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.20; Fri, 1 Nov
- 2024 23:01:39 +0000
-Received: from MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::1d00:286c:1800:c2f2]) by MW4PR11MB5911.namprd11.prod.outlook.com
- ([fe80::1d00:286c:1800:c2f2%4]) with mapi id 15.20.8114.020; Fri, 1 Nov 2024
- 23:01:39 +0000
-From: "Singh, Krishneil K" <krishneil.k.singh@intel.com>
-To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "horms@kernel.org"
-	<horms@kernel.org>, "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>,
-	"stable@vger.kernel.org" <stable@vger.kernel.org>, "Singh, Tarun K"
-	<tarun.k.singh@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-net v2 1/2] idpf: avoid vport access
- in idpf_get_link_ksettings
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-net v2 1/2] idpf: avoid vport
- access in idpf_get_link_ksettings
-Thread-Index: AQHbJw06PhawaN5PPka7PUE5UBoNmrKjFZfA
-Date: Fri, 1 Nov 2024 23:01:39 +0000
-Message-ID: <MW4PR11MB5911CC01EAA08BFD0E38F4A1BA562@MW4PR11MB5911.namprd11.prod.outlook.com>
-References: <20241025183843.34678-1-pavan.kumar.linga@intel.com>
- <20241025183843.34678-2-pavan.kumar.linga@intel.com>
-In-Reply-To: <20241025183843.34678-2-pavan.kumar.linga@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MW4PR11MB5911:EE_|CH3PR11MB8592:EE_
-x-ms-office365-filtering-correlation-id: 8a40e730-08c5-45f3-17fe-08dcfac924eb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|1800799024|376014|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?PoFGK4yXp54sFSd1PY3ffdI86kEcnPKkHzC8deDhhIwdMytn5uAjlMJzukui?=
- =?us-ascii?Q?0K0PqPDqN90OHH3UgsfwX1MMoCsfE8ZnQ97Y2nP8DUdeoD9k0kEj9fT93VyW?=
- =?us-ascii?Q?tXPqzzoYkA+QjXNJrDikZECYsXMVCXlFtl0TGfdZIc6iSakvDFVhsoDp1l+N?=
- =?us-ascii?Q?4CNQwzi7jSCozcsvbAw9oAFdZ/0apxx9QtfuA2mZqhMhxqMdsagqdb16rvQe?=
- =?us-ascii?Q?xxGgpoaEReu9oM9COobMLke3Ma8aw9XTAJFc14lXV/E1EtbIUlNYPjISjRJd?=
- =?us-ascii?Q?85Pg3lzmVjIEmZb9P1wQ10ywa8D5mlxnpU6Iv4zy04SbZA8+3IkF92492inZ?=
- =?us-ascii?Q?pEJ/ZHSnZrFYiBbZfnrgei3GUJR+RcP+cPTNouHQWzgEmO+3/yhg9EGsj55G?=
- =?us-ascii?Q?df00cs1HJ2yJwC2qdPeHPZFJCnM85RKprs86jS5jdongBksXgLPERrckhI/w?=
- =?us-ascii?Q?wC+1UInerterR8PS+7LpwtVYRZjipPthA4pyDj4uuBxbeeI/2EbfYap8Hohn?=
- =?us-ascii?Q?Pzaa/VXvX469KJPJDqVlT2a6LcRTI6MTWQad64sY/TVJHf+yuYhaW9u0sb9A?=
- =?us-ascii?Q?8+m+EiojOVZMih8Al/5l92ucnwom9MjnlrVDAh3ykfUfwf9a1vgLS/8WANNj?=
- =?us-ascii?Q?VcUhB9q9PqFLij61mZU/KXI1xdmHTJpvz9VnaUHc70ruAP0Ju172TJZ3uLqf?=
- =?us-ascii?Q?l2oailHG+PAxGco5omI0nfNdYyp8TjbdePvD5Ha8HzrW+p5wwdLHIJ4zY0hl?=
- =?us-ascii?Q?Dy4VmCRkS3jB/x3iKWLRk8e1XFzZameBGrSgYdDDUiRsnrSg8BeyBRuM37Py?=
- =?us-ascii?Q?jDJTVVbcK8lXHy9tKzD1VCncb/b+RaGMQs2feYd/DgA9+AspFZ9+HXKSOSMt?=
- =?us-ascii?Q?hrOV2GRtquyS/0fEjjZSK/heitw6ImzXGpR37t+5jApZ8cAqz+IFrC4cMrFR?=
- =?us-ascii?Q?y3zLGbzvEj1IBX9D/0kFC/O4dyKN8IOECp0534DCWQhwzVSIoEboZl5ZW97/?=
- =?us-ascii?Q?IpahiQnFygdQ1N8qDZfCunuQ3J0nDC+FRJWipL/bN7gtfmIs9VS/N8+SfN6z?=
- =?us-ascii?Q?icySCsXxMLu6nqcC4bax2Gs3MCe6AJoi9uiLnLNTKwj65IIlUyW0yFllHFbR?=
- =?us-ascii?Q?lVtKGu4vDbzfkVjZMZqYm9CgIbDXXLDPtex8L3FNqUUnNL0sS0o4aj+Nt5d8?=
- =?us-ascii?Q?B68dc6Nzf/cPRtjAsCHj2ohSZhKlLgtbNzsuMffwRhzxM5Eml3oZnfF4DR3H?=
- =?us-ascii?Q?HPKgJMR20klIwB2IS1FL/5gAHyHvPKp7+ciB0lxrYi8xcV6+xMBMbhJ+jaoA?=
- =?us-ascii?Q?5q9+XKIPYeK8Lk6utW+0fx66MAqFI7NGlvuAeHX9dvVSOAW7Ce4QqeEyE9J6?=
- =?us-ascii?Q?nGmRoGU=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB5911.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?TUGzLerr0ZwdQR9Ao9dY8hMGGDbsD/489eagihiypeMjg4NSuwjb3XV59e1h?=
- =?us-ascii?Q?nY9iGbUilJmk72XAPIrf1PYq0txACIki4DzoL+UOS1+umMZSsO03GfhCuJpO?=
- =?us-ascii?Q?4bQSURBGk2ttnrcKUGLscM1axW4eUuMBfzc5Ag/eNWYrE/8iiY7k+K5uwspG?=
- =?us-ascii?Q?SGLU8UTIaBLfQ/qyP3XXuBBDzVZq8S4R6dvjKiznJh8KhVffWIzjpUxVXJOL?=
- =?us-ascii?Q?F9f5vTTPUsusvDXEwnyrrLU8KD2XL69FuUri8AKDTjringq6yAzDihNDs+yC?=
- =?us-ascii?Q?G/zAfHyvEBw+XqRAYH9nzv7qnScQ0jcmF9De9JFafOT6rSQ/2LXeh4DGCW8M?=
- =?us-ascii?Q?1/Vf54drIM716/cHlqKxcqgaWyg1xBV1ooVCiTqJgxM0v/J0nBNFMIPWgJFG?=
- =?us-ascii?Q?ouRcPQwb1c8JE9Jwq7eMtMYZ+WWub5IFwhaJYw3FvKWgOyqeM6SnwV2Amue5?=
- =?us-ascii?Q?XzzoB3uEC2WQ76XxIYT25jzNN1VmH4T65U9U0RWdv8sxRS9f0hW+SAvYOHmf?=
- =?us-ascii?Q?BRcYHIloh0MrBeCgMptSyezYJzQAm4FNgCMfUKlht5nXnGDME/x1JwjjW1iR?=
- =?us-ascii?Q?1gVUBBpsArc/c4Z70u7QG8MHZ+lJADgzAdQn1TI+VEzXLElwqg0wq4C5OuBS?=
- =?us-ascii?Q?PrIVHrzDPnR2Ax8nUTVgorlbYNp+li0DTYZqG5Ub6TPeLR+pv78km6DMAUAZ?=
- =?us-ascii?Q?YWuIO+qq2aYgxabrr4zORbf+WKIk2YrWtvaSX7S0tczaROfi3gsN2kt/AURB?=
- =?us-ascii?Q?3Uv/SswQcRuAhdJuHB6XV5qQBkVbfDcNTkO6boBst5xo1IkZte80Sywv+Pqc?=
- =?us-ascii?Q?LfWv/kbp1IR6cgKBCy03yslZmHbuzDYIYNhdkwI8zZPSlXZ5cVfjHq2/wH8b?=
- =?us-ascii?Q?ZaJTUs0acm4wKmouO5rS9i52xlK3eW5ehkbIEeiORF7HFNDlLMU9sIjmXrxz?=
- =?us-ascii?Q?lpOqgMIGihksarmzLkSwRRq+fDhqfCKAq0/yFAjXdaRizk/5OtLEyihYctcx?=
- =?us-ascii?Q?AgX/nZJy3LSkPUcSh3k3kNqs/1opJ7dfa9xUwGrfhR3Uxh8QxOulR94SCiKe?=
- =?us-ascii?Q?3gGw8+5JCP3U3msN1zIW1tzPP4oKFtlDmfQoeus/OYOBT6ERF2+1F3umaeHa?=
- =?us-ascii?Q?RZ3PZMRZeHQi3WRy8DOZ8d2ZCD568ct/fvHlvL4iQUKRIUxEe5AKmu41CVoY?=
- =?us-ascii?Q?UKYYTx2YsYSTV3QwqfwzcOluGrgjtaRWo2t8RrBtb5smhIgecLqAbB8ew5Ll?=
- =?us-ascii?Q?KHfeu2Fv6e45tR7hseNn0KEaAlQxdQH5pkgkkynd45NJsD8dHBJtFkAhDT6f?=
- =?us-ascii?Q?2p+6Wdrr237l4j+RuqV10Ea6RXTC6IpSyefN6Wen8Ox0zQBpIxsbsGIk8nfH?=
- =?us-ascii?Q?dfEaUfkHSRALYv17ApPQBRP0OVugrN9CF1DJH2ktctmFVytUvSGByF/ad2KC?=
- =?us-ascii?Q?CUNJOY/YSeaAzmdkpcaQB7Ag+lhaAk+4ufPbkVlKZK165lSynDJlpJniz6DL?=
- =?us-ascii?Q?xUzuQ6+zjW9V8YGurlUUXCx47L9mWLOJfF0LafGCh32Rg/PRLuuFTHpDQm/y?=
- =?us-ascii?Q?aqSE9B14zrmsHHuq0UiJjcZD9ANRQBt8H/4fmw8HYu6VrwdSWuWzL3jfizfj?=
- =?us-ascii?Q?Hg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5E81607B4
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 23:04:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730502294; cv=none; b=O9ySsI5mgsb4MPxGpaxY0pa/C7zuCYsEOneTlWPLJprA5GL8H8uPPNvnwOCYVZrHWiPyvYc/HWz2ZqY4/HBl3dIm3TY5uHZElKWFZodwAPcjAoaygAfJkLjkJyjFRY/eBd5vTU8gtRezLp3SvdR+EzTYyNDRn8ICZM/wNMB/pa4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730502294; c=relaxed/simple;
+	bh=DixNhVF4jakrdr22GwfD2VcDsBiLU/pzh+zKxgtEml0=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=OLh09ESMQW3c/OLq1OG1rvFUeS0FM7JhXawgwMO1wEP9QCMcHpyzz1cpNMQBx7RuDaXkPVgdKl4W6VExrDF7dha9h9vPT07UF/VMNZyCElLwYTdO85cDf2wNVL1JbaBhT5cNZBPmRtwymI7XSpHsBbajsB4DbqoY5g3asAcYg0c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DHz83Sbj; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-7205b6f51f3so2163523b3a.1
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 16:04:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730502292; x=1731107092; darn=vger.kernel.org;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nKZLu72Me7oUS7vdyW1rBBqfAQKAYGju/TDlZKaa54Y=;
+        b=DHz83SbjuKuN9uSjEziueerzo8PNy97U7S0weAOyXRH++pyBYzk8WWmZsllBf2lJOd
+         MhTnAK9TXSuwOfW10Nx2mcx9di94P/oVe4P39RtIbIDgYBkN7Z3rZuqIhS7EG8+GE1OK
+         uUTK7NZ3zsPep0nIcl5ylmECfGhWIsxUpGshxcqXCRT79SAhfZVW9OSElDMuouJLEhM4
+         uYKC0Tp9c7i9L2Zsuj93LefvbHORm7Q2FFUAoYC0ZbjIT9CDfZHGPY+ZU2PJ0M2RdbJS
+         WWR1h9zkeaXoDMv14VwBfk2jqomg66KsjoXPPjEryanhMt+MB1NXMhx8n92IUzKJbMXp
+         25iA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730502292; x=1731107092;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nKZLu72Me7oUS7vdyW1rBBqfAQKAYGju/TDlZKaa54Y=;
+        b=eDkxPArxhx88LgY4E7s1Ua1sW3Pks98LaYFKrtRF8xUzLxjnOqahoSP2KOSwrjG5km
+         hPIJ+yns4bsQOlTtHThlEihT3YqcRPS7Az/BUWVvSYMHqe496+Vk4lwKkOtLV4FzZtWJ
+         tsydfwWxEeb/HjX3Pffq1Pcn7hC/t8M/NBmxsVOx+OtwzoEvvxaZ9eMSk3jvO0F05KBL
+         e6WtkW2+Ns+tBZVlBJl8z9AmqHK6gyRj5gRwesB9Ohk7NqAm25xbmCoOQEK19ywVboW/
+         XvyIZ2jzND8T9oVy5JearLVIVESRSWJMlRH6ptjn0F3uuQrWo8VcDJnVJBZzo8w4UOrf
+         DIfw==
+X-Gm-Message-State: AOJu0YwwTbiuGAgzueIKh2MQ9zzKBlnNzQddtQhycKoKUK4BRwPDXzhx
+	Tsz2fOXEdaQsxmAz4aDwx8hhy3Cv3b59nYFc8A+xqeQjbM3lvHlw
+X-Google-Smtp-Source: AGHT+IEbZr+5LQFn8LKL6YFQi1EimvZ6uUldokWK1o5LpC/9wspQ7R1Is5gUUzROx5ewmP1PcHM7OA==
+X-Received: by 2002:a05:6a21:31c8:b0:1d9:a80:bcfe with SMTP id adf61e73a8af0-1dba552944cmr6172665637.41.1730502291970;
+        Fri, 01 Nov 2024 16:04:51 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:829:4c00:82ee:73ff:fe41:9a02? ([2605:59c8:829:4c00:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id d2e1a72fcca58-720bc31874bsm3171597b3a.213.2024.11.01.16.04.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 16:04:51 -0700 (PDT)
+Message-ID: <7f4a7177f249c3906343afb74ecef76bd0479723.camel@gmail.com>
+Subject: Re: [PATCH net-next v2] eth: fbnic: Add support to write TCE TCAM
+ entries
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>, Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org, 
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com,  kernel-team@meta.com, sanmanpradhan@meta.com,
+ sdf@fomichev.me,  vadim.fedorenko@linux.dev, hmohsin@meta.com
+Date: Fri, 01 Nov 2024 16:04:50 -0700
+In-Reply-To: <61830f21-f943-4d84-82c1-fce0e2659ac7@lunn.ch>
+References: <20241024223135.310733-1-mohsin.bashr@gmail.com>
+	 <757b4a24-f849-4dae-9615-27c86f094a2e@lunn.ch>
+	 <97383310-c846-493a-a023-4d8033c5680b@gmail.com>
+	 <4bc30e2c-a0ba-4ccb-baf6-c76425b7995b@lunn.ch>
+	 <e2c12a98-acf3-46df-8831-4b898387bfa0@gmail.com>
+	 <61830f21-f943-4d84-82c1-fce0e2659ac7@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-1.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB5911.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a40e730-08c5-45f3-17fe-08dcfac924eb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 01 Nov 2024 23:01:39.4418
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: ZH9W/XczofbXzPNzG85EavNZsewgvaSCpd+tzKy++thUW/wo1zyY9MCHQT0g899AJjnMHDSjDdF2NqSf/+jy79TmSwNANGOK0mmvO66yDLc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB8592
-X-OriginatorOrg: intel.com
 
+On Fri, 2024-11-01 at 13:33 +0100, Andrew Lunn wrote:
+> On Thu, Oct 31, 2024 at 03:13:40PM -0700, Mohsin Bashir wrote:
+> > On 10/31/24 5:43 AM, Andrew Lunn wrote:
+> > > On Wed, Oct 30, 2024 at 05:51:53PM -0700, Mohsin Bashir wrote:
+> > > > Hi Andrew,
+> > > >=20
+> > >=20
+> > > > Basically, in addition to the RX TCAM (RPC) that you mentioned, we
+> > > > also have a TCAM on the TX path that enables traffic redirection fo=
+r
+> > > > BMC. Unlike other NICs where BMC diversion is typically handled by
+> > > > firmware, FBNIC firmware does not touch anything host-related. In
+> > > > this patch, we are writing MACDA entries from the RPC (Rx Parser an=
+d
+> > > > Classifier) to the TX TCAM, allowing us to reroute any host traffic
+> > > > destined for BMC.
+> > >=20
+> > > Two TCAMs, that makes a bit more sense.
+> > >=20
+> > > But why is this hooked into set_rx_mode? It is nothing to do with RX.
+> >=20
+> > We are trying to maintain a single central function to handle MAC updat=
+es.
+>=20
+> So you plan to call set_rx_mode() for any change to the TCAM, for any
+> reason? When IGMP snooping asks you to add an multicast entry due to
+> snooping?  ethtool --config-ntuple? Some TC actions? i assume you are
+> going to call it yourself, not rely on the stack call set_rx_mode()
+> for you?
+>=20
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Pavan Kumar Linga
-> Sent: Friday, October 25, 2024 11:39 AM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; horms@kernel.org; Linga, Pavan Kumar
-> <pavan.kumar.linga@intel.com>; stable@vger.kernel.org; Singh, Tarun K
-> <tarun.k.singh@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-net v2 1/2] idpf: avoid vport acces=
-s in
-> idpf_get_link_ksettings
->=20
-> When the device control plane is removed or the platform
-> running device control plane is rebooted, a reset is detected
-> on the driver. On driver reset, it releases the resources and
-> waits for the reset to complete. If the reset fails, it takes
-> the error path and releases the vport lock. At this time if the
-> monitoring tools tries to access link settings, it call traces
-> for accessing released vport pointer.
->=20
-> To avoid it, move link_speed_mbps to netdev_priv structure
-> which removes the dependency on vport pointer and the vport lock
-> in idpf_get_link_ksettings. Also use netif_carrier_ok()
-> to check the link status and adjust the offsetof to use link_up
-> instead of link_speed_mbps.
->=20
-> Fixes: 02cbfba1add5 ("idpf: add ethtool callbacks")
-> Cc: stable@vger.kernel.org # 6.7+
-> Reviewed-by: Tarun K Singh <tarun.k.singh@intel.com>
-> Signed-off-by: Pavan Kumar Linga <pavan.kumar.linga@intel.com>
-> ---
->  drivers/net/ethernet/intel/idpf/idpf.h          |  4 ++--
->  drivers/net/ethernet/intel/idpf/idpf_ethtool.c  | 11 +++--------
->  drivers/net/ethernet/intel/idpf/idpf_lib.c      |  4 ++--
->  drivers/net/ethernet/intel/idpf/idpf_virtchnl.c |  2 +-
->  4 files changed, 8 insertions(+), 13 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/intel/idpf/idpf.h
-> b/drivers/net/ethernet/intel/idpf/idpf.h
-> index 2c31ad87587a..66544faab710 100644
-> --- a/drivers/net/ethernet/intel/idpf/idpf.h
-> +++ b/drivers/net/ethernet/intel/idpf/idpf.h
+What the set_rx_mode function is doing is taking in all the MAC
+addresses from all the various lists, unicast, multicast, BMC, and then
+updating the TCAM as needed. We are keeping a copy of the TCAM in
+software so if we call set_rx_mode with no change there is no change to
+the hardware setup.
 
-Tested-by: Krishneil Singh <krishneil.k.singh@intel.com>
+I think the TCE TCAM may be the only exception to that as it might
+shift up or down as we are just parsing the list for BMC addresses and
+writing them top down, or bottom up in order to preserve the entries in
+the case of one being added or removed. So the table may shift if there
+is no change, but the contents should stay the same.
+
+Basically the BMC makes it so that we have to modify the ACT_TCAM rules
+if we add/remove the BMC addresses, or if we toggle the ALL_MULTI flag
+since the BMC can force us to have to place that rule at either entry
+24 in the MACDA TCAM, or if it isn't present we place it at entry 31.
+
+For the --config-ntuple we don't call it as the assumption is that we
+aren't going to be modifying the multicast or unicast promiscuous flags
+due to the rule addition. Instead that does a subset where it will use
+fbnic_write_macda to update the MACDA TCAM if there is a new MAC
+destination address added.
+
+> > > I assume you have some mechanism to get the MAC address of the BMC. I
+> > > would of thought you need to write one entry into the TCAM during
+> > > probe, and you are done?
+> > >=20
+> > > 	Andrew
+> >=20
+> > Actually, we may need to write entries in other cases as well. The fact=
+ that
+> > the BMC can come and go independently of the host would result in firmw=
+are
+> > notifying the host of the resulting change. Consequently, the host woul=
+d
+> > need to make some changes that will be added in the following patch(es)=
+.
+>=20
+> And the MAC address changes when the firmware goes away and comes back
+> again? It is not burned into an OTP/EEPROM? What triggers
+> set_rx_mode() being called in this condition?
+>=20
+> 	Andrew
+
+So there are BMC addresses that are passed in via the Firmware
+Capabilities Response message. Unfortunately we have to deal with BMCs
+that will bail on us and force us to remove the entries for it as soon
+as they see the link go down and come back as soon as they see the link
+come up. In addition the NCSI spec basically makes it so that we have
+to support the BMC deciding to change the config or enable/disable the
+channel on a whim.
+
+In such a case we have to go through and take care of several items
+including pointing our TCE TCAM at the BMC addresses, and then sending
+a message to the firmware with the list of our unicast MAC addresses so
+that it can send the BMC packets back to us if it is sending to our
+unicast addresses. Unfortunately the BMC also tends to enjoy running in
+multicast promiscuous so we don't have any way of knowing what
+mutlicast entries it has so we normally will just have it send us all
+it's multicast traffic and likewise all our multicast traffic will be
+routed to it. It simplifies the handling a bit, but also is kind of
+sloppy as far as I am concerned.
+
+- Alex
 
