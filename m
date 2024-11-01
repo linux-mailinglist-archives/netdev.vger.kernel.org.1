@@ -1,144 +1,87 @@
-Return-Path: <netdev+bounces-140864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A86FE9B8823
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:04:51 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DDDA9B8813
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 02:01:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B8AB281A0A
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:04:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 008EC281D5A
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 01:01:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEBD9140E30;
-	Fri,  1 Nov 2024 01:02:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8164F1AAC4;
+	Fri,  1 Nov 2024 01:01:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="K6RcZ5PQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Q2O1Hr1W"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D00413CFA1;
-	Fri,  1 Nov 2024 01:02:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4795C22615;
+	Fri,  1 Nov 2024 01:01:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730422968; cv=none; b=jQXfFCvoI9Ym4LOtrFe7k9ENzh9a76CCUJV0MCixUy7HgNUn27u87qO2O/5EKQD1swgCLrjzSUL8GQ3cj6t5K2CAB4lDKCrquZkox5Z4Rg/Kf8hToKf+cITMEuDATzEOHsTijaisBIAi+GjU+ovQu0UEHsFYxX9St0MWssK5Qfs=
+	t=1730422907; cv=none; b=ZGOWTbZqpc5vYsx+OiYX0hHxhjgy2DZTY/pLs4y6QXCW84c/2oMjLJ7w0sKSXypMBby9AGxN0rARVY8YLtx1Db1xKoVZ+QZb0m7AqL5R60z6Ewmwom0Jf1sIObdc0CS5Jlvfe1x8NO2Eyouunk8uPyRy671csGt+Rm7lBUhvzMQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730422968; c=relaxed/simple;
-	bh=jB92JpeDW2yhP2VRKGudKbbfDREsNE6Gpy5FBMVK5aM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=JbaSPEK61hHqqRkZIfrvYBpEWbdYbkdZdIOWYXHb58WjLi4O289s/PiTezCltprmEah+ENvCcrZDk6PEEtIZH6a9E67Cs0+OyhFas+c9CeFHVYfaoBP/+lVvzj54BwYW5RuK2nq3zxWvri/Y6X4ZELViAdjlJuGbvIH6TT8H7+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=K6RcZ5PQ; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-720b2d8bb8dso1167682b3a.1;
-        Thu, 31 Oct 2024 18:02:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730422962; x=1731027762; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mK2RJ1Xug5oMAzwhSCqVHPpqDu7p/3YqJqaxy25r6IM=;
-        b=K6RcZ5PQ/jHuVET2LPDWRT2gGOMPoZJ3qgUoBgvFr5oV7CIMS/r7SDhWAGALecqJXE
-         uHIg/rdboZmHcPGHbZdnY+Sv4wFRG90tUv+HHpxJd83gr82jEaHcpkS4RKkFm+tnuNCo
-         9NcUL37CXyiAiqF1h7uQunn9XcAiZyVyMFIqQ09Lr+I9DvO7/yQ8fnNoOXxgUqRQDaA/
-         u1bw65umUQ0CoPf0csCpvTO2Wxw8u1OyytzRaY4PZTx62GHVBfgiNJmBTRhJl0VzL8wC
-         4ggImIqFGbMRwqbeCI62tNhRZ+qeJVED9eEISmprzUrAKwOPJWymAOZLdX/AJ08eeX3n
-         5+PA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730422962; x=1731027762;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mK2RJ1Xug5oMAzwhSCqVHPpqDu7p/3YqJqaxy25r6IM=;
-        b=ncht1IYR0gmTY+/Q2S1H48UqXVOTUXlwnHkXp1cZSmrwqaK0RcFJGr/j3UwbgwlYpP
-         4uw6UyAjhe9POED8FUB/A5GMZEcDcXxf9znaeYHdt6jILuv9dRSo3u5MuAdBo4nkH2gy
-         /0b1g6BonFyLCq5c4ov/jdFno6KiS6GeofuQ18mQjnS6gpGLy3d4RQpHb5WBVwoQR6Zv
-         Ol/L7M9pVi6sZMiX7ycwj0l+pBTxSWbRqf5SkGfsiEqXXlhJoaWQU5ebZc615y7hByIc
-         0qjpr+bbmQxavUQt4cWk+n+EId2/9cB+DNOvzJyloW29Wuhd3XRe59O6PraD5kIEli1O
-         +NXA==
-X-Forwarded-Encrypted: i=1; AJvYcCVbYywT/5Drc6KJs4nr+b3TdQrs3bX2tuHhYpFzXHJ//PXIOL/9feYfPDh+kmVv1kY2JhSXs/KvkTf2Lvs=@vger.kernel.org, AJvYcCWwy0HpAgae6Ff52/tBqJbv9o592t8fBR0VN2G3sVfEHXfY+LdjDwcO0kHuHlmdGxkjuCF3lQKXue2wSorxdCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw+JezzUUcCeRSrU8yDK1PFhuQgN0oe7yjdJv9tUlc05L7unOW3
-	24llqtl4BHzUbW8xQtHiwd15b8rPKcq7G1hBdM5Ad5J1dMYf4J9S
-X-Google-Smtp-Source: AGHT+IHkyE9UpBFyYv5S5Va5DuUIZq6OF/wcFyP2zyu3sOmg17gD9KqyIrhK+dK32peNyOFGyFxLSQ==
-X-Received: by 2002:a05:6a21:58d:b0:1d6:e6b1:120f with SMTP id adf61e73a8af0-1d9a83d0b04mr30096430637.11.1730422962531;
-        Thu, 31 Oct 2024 18:02:42 -0700 (PDT)
-Received: from mew.. (p4007189-ipxg22601hodogaya.kanagawa.ocn.ne.jp. [180.53.81.189])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1ea6a1sm1743403b3a.74.2024.10.31.18.02.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 31 Oct 2024 18:02:42 -0700 (PDT)
-From: FUJITA Tomonori <fujita.tomonori@gmail.com>
-To: anna-maria@linutronix.de,
-	frederic@kernel.org,
-	tglx@linutronix.de,
-	jstultz@google.com,
-	sboyd@kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: netdev@vger.kernel.org,
-	rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	tmgross@umich.edu,
-	ojeda@kernel.org,
-	alex.gaynor@gmail.com,
-	gary@garyguo.net,
-	bjorn3_gh@protonmail.com,
-	benno.lossin@proton.me,
-	a.hindborg@samsung.com,
-	aliceryhl@google.com,
-	arnd@arndb.de
-Subject: [PATCH v5 7/7] net: phy: qt2025: Wait until PHY becomes ready
-Date: Fri,  1 Nov 2024 10:01:21 +0900
-Message-ID: <20241101010121.69221-8-fujita.tomonori@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241101010121.69221-1-fujita.tomonori@gmail.com>
-References: <20241101010121.69221-1-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1730422907; c=relaxed/simple;
+	bh=g9AJo+IRyva5UjfrrunnTm56/Yysi7JItCsP262Jt0o=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=RrvzTKrfQ5nfATXSftrJ1yxoPvghbEg67V+pqmqbGZNPxnHAcmHC6lskfXmL/gjUaNtlREXun/QJP9kwxN9csprbufgOB4sPxy/N+j2KTr1gDqWGK1AvF8mHntpTdsQ6CqKzyTK4lxEn/V5q9BZ3j1uRsP6mOqLmegztAWrqfBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Q2O1Hr1W; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48FA1C4CEC3;
+	Fri,  1 Nov 2024 01:01:46 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730422906;
+	bh=g9AJo+IRyva5UjfrrunnTm56/Yysi7JItCsP262Jt0o=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=Q2O1Hr1WU75GypbCn1riww821dleef8Cc/Vva/PRFM7MLO40c1beyJsxpZkTlHUHH
+	 OuXZufPeJy4TjVJYaFkIMZ9Gk8BkmtEkE5kNPtiac2xDVjBBHtul9hElUVusVBACnY
+	 yGDUg5WJItiIgHB0+zeJrJU47wubtqylP+uvZUSY4gsi0Qn2Wx3zZjxz5DKfEO0TNp
+	 95+ped56WEDgAWPs4ln9o1XOIAv+B3kHi+uzly8QpvtfNJPNyx1nuF9PiqRuGZWYLt
+	 L4/OIt592oRxZMl6xd4eTHaqtusL50Qaz3/0wUl/5BQSqJixJWPMH83IRzAIwkESTo
+	 ZWot1b74nM23g==
+Date: Thu, 31 Oct 2024 18:01:45 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, Johannes Berg
+ <johannes@sipsolutions.net>, David Ahern <dsahern@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hardening@vger.kernel.org, Kees Cook
+ <kees@kernel.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH v2 1/4][next] uapi: socket: Introduce struct
+ sockaddr_legacy
+Message-ID: <20241031180145.01e14e38@kernel.org>
+In-Reply-To: <23bd38a4bf024d4a92a8a634ddf4d5689cd3a67e.1729802213.git.gustavoars@kernel.org>
+References: <cover.1729802213.git.gustavoars@kernel.org>
+	<23bd38a4bf024d4a92a8a634ddf4d5689cd3a67e.1729802213.git.gustavoars@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Wait until a PHY becomes ready in the probe callback by
-using readx_poll_timeout function.
+On Thu, 24 Oct 2024 15:11:24 -0600 Gustavo A. R. Silva wrote:
+> + * This is the legacy form of `struct sockaddr`. The original `struct sockaddr`
+> + * was modified in commit b5f0de6df6dce ("net: dev: Convert sa_data to flexible
+> + * array in struct sockaddr") due to the fact that "One of the worst offenders
+> + * of "fake flexible arrays" is struct sockaddr". This means that the original
+> + * `char sa_data[14]` behaved as a flexible array at runtime, so a proper
+> + * flexible-array member was introduced.
 
-Signed-off-by: FUJITA Tomonori <fujita.tomonori@gmail.com>
----
- drivers/net/phy/qt2025.rs | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+This isn't spelled out in the commit messages AFACT so let me ask..
+Why aren't we reverting b5f0de6df6dce, then?
+Feels like the best solution would be to have a separate type with
+the flex array to clearly annotate users who treat it as such.
+Is that not going to work?
 
-diff --git a/drivers/net/phy/qt2025.rs b/drivers/net/phy/qt2025.rs
-index 28d8981f410b..f7480c19d4cc 100644
---- a/drivers/net/phy/qt2025.rs
-+++ b/drivers/net/phy/qt2025.rs
-@@ -18,7 +18,9 @@
-     DeviceId, Driver,
- };
- use kernel::prelude::*;
-+use kernel::readx_poll_timeout;
- use kernel::sizes::{SZ_16K, SZ_8K};
-+use kernel::time::Delta;
- 
- kernel::module_phy_driver! {
-     drivers: [PhyQT2025],
-@@ -93,7 +95,13 @@ fn probe(dev: &mut phy::Device) -> Result<()> {
-         // The micro-controller will start running from SRAM.
-         dev.write(C45::new(Mmd::PCS, 0xe854), 0x0040)?;
- 
--        // TODO: sleep here until the hw becomes ready.
-+        readx_poll_timeout!(
-+            || dev.read(C45::new(Mmd::PCS, 0xd7fd)),
-+            |val| val != 0x00 && val != 0x10,
-+            Delta::from_millis(50),
-+            Delta::from_secs(3)
-+        )?;
-+
-         Ok(())
-     }
- 
--- 
-2.43.0
-
+My noob reading of b5f0de6df6dce is that it was a simpler workaround
+for the previous problem, avoided adding a new type (and the conversion
+churn). But now we are adding a type and another workaround on top.
+Sorry if I'm misunderstanding. No question that the struct is a mess,
+but I don't feel like this is helping the messiness...
 
