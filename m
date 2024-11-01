@@ -1,169 +1,193 @@
-Return-Path: <netdev+bounces-140926-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140927-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5C59B8A49
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 05:59:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF729B8A69
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 06:23:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 561682824AA
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 04:59:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EF382828FA
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 05:23:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 191D4147C9B;
-	Fri,  1 Nov 2024 04:59:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEEE51487DF;
+	Fri,  1 Nov 2024 05:22:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="OWhYry3a";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="nXAd6zox"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="YYD9qxns"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14B1D322B;
-	Fri,  1 Nov 2024 04:59:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64074142624;
+	Fri,  1 Nov 2024 05:22:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730437154; cv=none; b=QRbuRWqfTr/FkfwLCned7wrEXQBkVrc2P07dAfiPPTok2F+azsK+krISu5pvdxvv5U0O0vdNiMsN0fKWUrXoAtBKUSo1sbl9ikHxTYlzhB5z5UFhO6493i4WSw1QbgllvLC+ol5msFxehMvIfSNq/fOZ4dG0ErLOXdikJ+sjPaw=
+	t=1730438576; cv=none; b=BjTU3MQOIv+ollAFSG/uvmLI0bYJG56QrJIIzkn3i5v1o/NLC7603GbRAjzuAesFki0MqNZ4g+N8N78enxFVLrqFArpc2SUC1lMA1PjvjHBeXHe/2DHito3q4B3QPdVQ+AsiCmofgANBVtrkwCuTYumv3zTlwQgRm9zVOItS9lo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730437154; c=relaxed/simple;
-	bh=t2sfTpM5WPgCUaI+PxFBg3ngx12mwdycHLvzxpb70eU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=OsDgundIxwppX3aR5irrC4NgXGoO8EJcgKy1hNAIOXzBlxVPuTH6RJTPTvWs5EgVsVLDWvzafAKs/MoBbqg0DGssdBDVqtqvxAPeSLxfbEufVa+HXSlwNPIAZJGtW3D5HzmDOa1PcjbL++wU3i4zYTn9pQSkKdkSDgi7obys4xU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=OWhYry3a; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=nXAd6zox; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
-Received: from phl-compute-04.internal (phl-compute-04.phl.internal [10.202.2.44])
-	by mailfout.phl.internal (Postfix) with ESMTP id 0FFE8138012C;
-	Fri,  1 Nov 2024 00:59:10 -0400 (EDT)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-04.internal (MEProxy); Fri, 01 Nov 2024 00:59:10 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to; s=fm2; t=1730437150; x=1730523550; bh=JJ9+M/HGlO5YKjsRaH9qT
-	g7jRa5jm5uIC1oaNkJ8ijs=; b=OWhYry3a4nXL7seqHkZEdAmV/IINkKaq4r/i2
-	8ivssk1ws7lb/rsqgaClf2SrWno99EqwgcyB9z7QHhlKI7qktrBWSHssnIEAqDje
-	cXQS+h/Srs8FceTRXNBaPevjq1WItkf+XyJt78knGPRRguFDUMqtgVrY3IMxvhNE
-	cEx6T8dJ82AnCFpKRsD63CS3j0pt6GeEt1L//uYC3EVB/414L+7X0Ei6SWyNhWBg
-	+Mw1pRALiOq2o/Yd49ZXvke2CxpxYc9RWuKs5+W+0tWtLHAAaSg3uTEJ93DW971w
-	EoJu90c5HWDhBKbfqz6cLpix7V5kdGgugMVTzI1EtuRzOik7g==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1730437150; x=1730523550; bh=JJ9+M/HGlO5YKjsRaH9qTg7jRa5jm5uIC1o
-	aNkJ8ijs=; b=nXAd6zox5lWNcWWYLI118/rMtVyPijWT6/6Ke0Cs+6cgSUcx+up
-	Zq5TFrQrOl0xBYiJHOFj8N5GKlCxGiztN9okRvJcz9kcxKJRAEgH0DU8qgKRt86S
-	wpxQPYWdRy6VG6GTUqwxfQTo4fgUELYrxnNdpZhXcxWNtjcgJATm76oOVNObQEJv
-	uJJwBEw+T6XVRLDAG3ny8Wdg1AqqJhtKGIhmpbM0RTrgK3AAXcTGszfUEKlK1zw9
-	t2g8zKR+u/PtZY7RQZdo2T8voIWJkJ492FVvXGwGH75F4C8vc/Urk8Z3D30uSVVc
-	Dd6GG/2p5ZIIKR8JERHtYhBD2ltG8mWYh2Q==
-X-ME-Sender: <xms:HGAkZ4DPCXiFVV9fgTZTgeCpGWkO4ettS8HIGYAd4EryX9nUjTjVzw>
-    <xme:HGAkZ6h1kH50xh1lq6UR0-QUYYmMs_5-D2dNA2-EKPnMlKztrHsmqZRGqdrcGLcqG
-    f1Gl2Asts2LffCKvw>
-X-ME-Received: <xmr:HGAkZ7lgd8vv6aLs_kaKkdI5BrIBXZQj6hbSLm2ObtB8R7IF6As9lpqSLZDXO1rbC3ezXJs-xnF1vtJiuFf4380iX8zBgUUMWq8wbWTNJcXxuUq1Q6Ur>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdekkedgjeehucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
-    dtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghn
-    ihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepvd
-    eggfetgfelhefhueefkeduvdfguedvhfegleejudduffffgfetueduieeikeejnecuvehl
-    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguh
-    huuhdrgiihiidpnhgspghrtghpthhtohepudefpdhmohguvgepshhmthhpohhuthdprhgt
-    phhtthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepmhhitg
-    hhrggvlhdrtghhrghnsegsrhhorggutghomhdrtghomhdprhgtphhtthhopegvughumhgr
-    iigvthesghhoohhglhgvrdgtohhmpdhrtghpthhtoheprghnughrvgifodhnvghtuggvvh
-    eslhhunhhnrdgthhdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpdhrtghp
-    thhtohepvhhikhgrshdrghhuphhtrgessghrohgruggtohhmrdgtohhmpdhrtghpthhtoh
-    eprghnughrvgifrdhgohhsphhouggrrhgvkhessghrohgruggtohhmrdgtohhmpdhrtghp
-    thhtohepphgrsggvnhhisehrvgguhhgrthdrtghomhdprhgtphhtthhopehprghvrghnrd
-    gthhgvsggsihessghrohgruggtohhmrdgtohhm
-X-ME-Proxy: <xmx:HGAkZ-zQKcBrQZrXkZFm6vdCHRuOgZAorWniWUl7UopJGDbpIedslQ>
-    <xmx:HGAkZ9TAVeEJ9bHzIYlw7Z9MbO8k3epXscOvEezTqMJ2brfvVbv_NA>
-    <xmx:HGAkZ5YuGBnoE_VkDrp6dL9CRUHMn-ezQ1Hp7CgPWY4775F4xKzavw>
-    <xmx:HGAkZ2QrDOJg_2ol0LsdztEj4UbFuGnk3sPPiOHuuDs6Nz5t-5QDKA>
-    <xmx:HmAkZzD2O20rt48UzA2d1b3tDYqp25J5iNGhWZl0LYus7G7s8TWwq999>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
- 1 Nov 2024 00:59:07 -0400 (EDT)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: davem@davemloft.net,
-	michael.chan@broadcom.com,
-	edumazet@google.com,
-	andrew+netdev@lunn.ch,
-	kuba@kernel.org,
-	vikas.gupta@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	pabeni@redhat.com,
-	pavan.chebbi@broadcom.com,
-	martin.lau@linux.dev
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-team@meta.com
-Subject: [PATCH net] bnxt_en: ethtool: Fix ip[6] ntuple rule verification
-Date: Thu, 31 Oct 2024 22:58:30 -0600
-Message-ID: <219859e674ef7a9d8af9ab4f64a9095580f04bcc.1730436983.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.46.0
+	s=arc-20240116; t=1730438576; c=relaxed/simple;
+	bh=pGNjlh/5TANRkDFAanOu/LKbRP8oaSiAvvCfhO4t6yI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=H6Kcvv3qxJLw+YOwTM2OafQK8pwIiHp4QQvy9RW6fnDxoR5duxlf2jtPFP5kcaKMZSLR7lyuTUAk7QJALXGKKNLYTUbHRzoNRuDcet4nBbLk1aSGUaDpDjThdonkf26bLJQ8e0jYhkL9vf1mTEUB2ySNutK5m/BYuVti3Sp9TW8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=YYD9qxns; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730438574; x=1761974574;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:content-transfer-encoding:in-reply-to;
+  bh=pGNjlh/5TANRkDFAanOu/LKbRP8oaSiAvvCfhO4t6yI=;
+  b=YYD9qxns7tfTKNWnEINwY5oeJvXljPRcGawyhfCWqzP3K7nexPS+Kdm2
+   U1wKHQXNqFeYLkksa+mzqGjct60JItoDsUcQTWH+QggQzUbUDHJtsCBap
+   trIDOL6eVYYIC2YufcRnYU5RT4A8uV4tH8NywAnZpQviOV7/QNbBbYVN/
+   Wf96U5njp8QgfXkEYfuJPQ8ItGlrpGs/xzDuCSgZ7W5S6u/sn8RCcT+Xw
+   9LFYYKltlTM0LHoY0BggSSFiM9/33emXHC/JvwAMbnevER1UI8tov4pcB
+   ACVCn918QNYGdEQVZMR1MZSPpVrrlg25JW7spIdn5HyBnnzfduiKlRTmu
+   Q==;
+X-CSE-ConnectionGUID: jA2xccugSsu1flMsUGDkeQ==
+X-CSE-MsgGUID: E8OGjcz2QgarRGZ/LjKR8A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="30314687"
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="30314687"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 22:22:51 -0700
+X-CSE-ConnectionGUID: TVbU//UlQUCwNIzd8pgqTg==
+X-CSE-MsgGUID: R6mTecEmTzu92S+st927WA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,248,1725346800"; 
+   d="scan'208";a="83678534"
+Received: from qz-dev1.sh.intel.com (HELO localhost) ([10.239.147.28])
+  by orviesa008-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 31 Oct 2024 22:22:44 -0700
+Date: Fri, 1 Nov 2024 13:20:11 +0800
+From: Qiang Zhang <qiang4.zhang@linux.intel.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>,
+	Paolo Bonzini <pbonzini@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Jens Axboe <axboe@kernel.dk>, Olivia Mackall <olivia@selenic.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Gonglei <arei.gonglei@huawei.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Viresh Kumar <viresh.kumar@linaro.org>,
+	"Chen, Jian Jun" <jian.jun.chen@intel.com>,
+	Andi Shyti <andi.shyti@kernel.org>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>,
+	"Martin K. Petersen" <martin.petersen@oracle.com>,
+	David Hildenbrand <david@redhat.com>,
+	Gerd Hoffmann <kraxel@redhat.com>,
+	Anton Yakovlev <anton.yakovlev@opensynergy.com>,
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>,
+	Qiang Zhang <qiang4.zhang@intel.com>,
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org,
+	linux-scsi@vger.kernel.org, linux-sound@vger.kernel.org
+Subject: Re: [PATCH v2] virtio: only reset device and restore status if
+ needed in device resume
+Message-ID: <ZyRlC-5V_NTKgzXh@dev-qz>
+References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
+ <20241101015101.98111-1-qiang4.zhang@linux.intel.com>
+ <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
 
-Previously, trying to insert an ip or ip6 only rule would get rejected
-with -EOPNOTSUPP. For example, the following would fail:
+On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
+> On Fri, Nov 1, 2024 at 9:54 AM <qiang4.zhang@linux.intel.com> wrote:
+> >
+> > From: Qiang Zhang <qiang4.zhang@intel.com>
+> >
+> > Virtio core unconditionally reset and restore status for all virtio
+> > devices before calling restore method. This breaks some virtio drivers
+> > which don't need to do anything in suspend and resume because they
+> > just want to keep device state retained.
+> 
+> The challenge is how can driver know device doesn't need rest.
 
-    ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
+Hi,
 
-The reason was that all the l4proto validation was being run despite the
-l4proto mask being set to 0x0.  Fix by only running l4proto validation
-when mask is set.
+Per my understanding to PM, in the suspend flow, device drivers need to
+1. First manage/stop accesses from upper level software and
+2. Store the volatile context into in-memory data structures.
+3. Put devices into some low power (suspended) state.
+The resume process does the reverse.
+If a device context won't loose after entering some low power state
+(optional), it's OK to skip step 2.
 
-Fixes: 9ba0e56199e3 ("bnxt_en: Enhance ethtool ntuple support for ip flows besides TCP/UDP")
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 15 ++++++++++-----
- 1 file changed, 10 insertions(+), 5 deletions(-)
+For virtio devices, spec doesn't define whether their states will lost
+after platform entering suspended state. So to work with different
+hypervisors, virtio drivers typically trigger a reset in suspend/resume
+flow. This works fine for virtio devices if following conditions are met:
+- Device state can be totally recoverable.
+- There isn't any working behaviour expected in suspended state, i.e. the
+  suspended state should be sub-state of reset.
+However, the first point may be hard to implement from driver side for some
+devices. The second point may be unacceptable for some kind of devices.
 
-diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-index f71cc8188b4e..1c97ee406bd7 100644
---- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-+++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-@@ -1289,10 +1289,13 @@ static int bnxt_add_l2_cls_rule(struct bnxt *bp,
- static bool bnxt_verify_ntuple_ip4_flow(struct ethtool_usrip4_spec *ip_spec,
- 					struct ethtool_usrip4_spec *ip_mask)
- {
-+	u8 mproto = ip_mask->proto;
-+	u8 sproto = ip_spec->proto;
-+
- 	if (ip_mask->l4_4_bytes || ip_mask->tos ||
- 	    ip_spec->ip_ver != ETH_RX_NFC_IP4 ||
--	    ip_mask->proto != BNXT_IP_PROTO_FULL_MASK ||
--	    (ip_spec->proto != IPPROTO_RAW && ip_spec->proto != IPPROTO_ICMP))
-+	    (mproto && mproto != BNXT_IP_PROTO_FULL_MASK) ||
-+	    (mproto && sproto != IPPROTO_RAW && sproto != IPPROTO_ICMP))
- 		return false;
- 	return true;
- }
-@@ -1300,10 +1303,12 @@ static bool bnxt_verify_ntuple_ip4_flow(struct ethtool_usrip4_spec *ip_spec,
- static bool bnxt_verify_ntuple_ip6_flow(struct ethtool_usrip6_spec *ip_spec,
- 					struct ethtool_usrip6_spec *ip_mask)
- {
-+	u8 mproto = ip_mask->l4_proto;
-+	u8 sproto = ip_spec->l4_proto;
-+
- 	if (ip_mask->l4_4_bytes || ip_mask->tclass ||
--	    ip_mask->l4_proto != BNXT_IP_PROTO_FULL_MASK ||
--	    (ip_spec->l4_proto != IPPROTO_RAW &&
--	     ip_spec->l4_proto != IPPROTO_ICMPV6))
-+	    (mproto && mproto != BNXT_IP_PROTO_FULL_MASK) ||
-+	    (mproto && sproto != IPPROTO_RAW && sproto != IPPROTO_ICMPV6))
- 		return false;
- 	return true;
- }
--- 
-2.46.0
+For your question, for devices whose suspended state is alike reset state,
+the hypervisor have the flexibility to retain its state or not, kernel
+driver can unconditionally reset it with proper re-initialization to
+accomplish better compatibility. For others, hypervisor *must* retain
+device state and driver just keeps using it.
 
+> 
+> For example, PCI has no_soft_reset which has been done in the commit
+> "virtio: Add support for no-reset virtio PCI PM".
+> 
+> And there's a ongoing long discussion of adding suspend support in the
+> virtio spec, then driver know it's safe to suspend/resume without
+> reset.
+
+That's great! Hopefully it can fill the gap.
+Currently, I think we can safely move the reset to drivers' freeze methods,
+virtio core has no reason to take it as a common action required by all
+devices. And the reset operation can be optional skipped if driver have
+hints from device that it can retain state.
+
+> 
+> >
+> > Virtio GPIO is a typical example. GPIO states should be kept unchanged
+> > after suspend and resume (e.g. output pins keep driving the output) and
+> > Virtio GPIO driver does nothing in freeze and restore methods. But the
+> > reset operation in virtio_device_restore breaks this.
+> 
+> Is this mandated by GPIO or virtio spec? If yes, let's quote the revelant part.
+
+No. But in actual hardware design (e.g. Intel PCH GPIO), or from the
+requirement perspective, GPIO pin state can be (should support) retained
+in suspended state.
+If Virtio GPIO is used to let VM operate such physical GPIO chip indirectly,
+it can't be reset in suspend and resume. Meanwhile the hypervisor will
+retain pin states after suspension.
+
+> 
+> >
+> > Since some devices need reset in suspend and resume while some needn't,
+> > create a new helper function for the original reset and status restore
+> > logic so that virtio drivers can invoke it in their restore method
+> > if necessary.
+> 
+> How are those drivers classified?
+
+I think this depends whether hypervisor will keep devices state in platform
+suspend process. I think hypervisor should because suspend and reset are
+conceptually two different things.
+
+
+Thanks
+Qiang
 
