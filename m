@@ -1,170 +1,144 @@
-Return-Path: <netdev+bounces-140951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id ECC1B9B8D26
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:32:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B2BA9B8D37
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:38:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6D7421F22C0A
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:32:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D5734B2103E
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:38:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157B0149DE8;
-	Fri,  1 Nov 2024 08:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21ABF156C70;
+	Fri,  1 Nov 2024 08:38:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="FeJNe5QC"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4071839F4
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 08:32:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA2684087C;
+	Fri,  1 Nov 2024 08:38:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730449930; cv=none; b=PYWlYrw5wedQK3g9p31UwJEEsPGASqfoMTPyiVFpPhmdqVFKuwQuPs5sh2MnZPjtOiybXfnGzAmMFCFzidPUFFwdAMmBUi/gyXFczJtC/FOohSNk36JpKy3+1QkVmC6eNkqSlZOq+FROd8amoOUbOTiYbD8j0WDELXD6M8/X9V0=
+	t=1730450316; cv=none; b=oS8QGJWlFItUbr3EHCEkluB3F8ZRnUgBtwMULoNNbi+tmiEL5l13hgFK4HcresScGOgYZPXLm7CPhuxa/q0YWWjgEcBYrZAa6J+BHU8BLl8awvpHPe66ExzbWe8zcXWI953XjpMHZKPrGjD4GzFqfVl3T71LUVn71i6bn5zU/Wo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730449930; c=relaxed/simple;
-	bh=SIw5E0b2RSZkIPrX258J7VBZ9Fk9xKHVun/bxusijmk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FJT5NgcidyaZoiohTn/+OnsIeFbhHAPVQCX4CLV1H+1jMYzOFZh+nUIfiH/y0BqPTquY6aXPnhEAzG547yUau0T/2tbDA5UEd02GrUKSc6AsfncM0UkGiby6O8iPg6WUwHWt1CsWlzZZsFCrSpplA5k++E9Y26D7jSoKVvOzbjo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6n4O-0007x2-Jj; Fri, 01 Nov 2024 09:31:48 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6n4K-001U2A-0C;
-	Fri, 01 Nov 2024 09:31:44 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t6n4J-007xe3-31;
-	Fri, 01 Nov 2024 09:31:43 +0100
-Date: Fri, 1 Nov 2024 09:31:43 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 15/18] net: pse-pd: Add support for
- getting and setting port priority
-Message-ID: <ZySR75i3BEzNbjnv@pengutronix.de>
-References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
- <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
- <ZyMpkJRHZWYsszh2@pengutronix.de>
- <20241031121104.6f7d669c@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1730450316; c=relaxed/simple;
+	bh=PhXxH3Z/ltNgwYhM5c6aEv3VTRIKKPaInCVryOk19KU=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=NI/IBm1Yrma6GJqH+FO6dN7P4Fv+b2w0x3KH6l7nWur4O4Y4hGUKX8s4Qo5H3s8/Il2m+OoOZaztZ03NldbEJAGBcZztqvJ23Y39qNwNzKineXcNOMLEH8QXOJNQ4tmHc4DyS88aHGG19ZZhJEYAzpzhr6oml5u08x0D3gVfkfA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=FeJNe5QC; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730450314; x=1761986314;
+  h=from:date:to:cc:subject:in-reply-to:message-id:
+   references:mime-version;
+  bh=PhXxH3Z/ltNgwYhM5c6aEv3VTRIKKPaInCVryOk19KU=;
+  b=FeJNe5QC9xM9LxAVy9mlnmelVlTSlrVmRGvXVlVkRzuGrTbA+Ea9iekU
+   tOucTzd6nxP8OzIEmMrgoKuXywloV5t6JPQZL2lSFnhjHTt8J9B529IEn
+   1ru1rkrJtSmVfiaH9SYalcj2Xn1XbbRGL9GI1UQq6WUQEnIVJazyBj5U2
+   i3uMj5J9uqSeyZCYc++XD9CZf5Pj6zZfc8mPFOy4rJ7BUmkINsZ3w1kst
+   s2ZLdHmbtxxrcZirGdqITrMZsDtzvINZ7IFifQYdJ3+URxCqGuKRKTvgp
+   176kLfamckT3KNILRQJAqpLmeX3iuXc3JrM8O8+0y1+5j6j6S4ofjnBzd
+   Q==;
+X-CSE-ConnectionGUID: 4KnUsKF5Sem2LGLwX/y1Xw==
+X-CSE-MsgGUID: vaVnYYdGSKyPa7ANc/2z9Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11242"; a="30325689"
+X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
+   d="scan'208";a="30325689"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 01:38:33 -0700
+X-CSE-ConnectionGUID: 3SJb+PQpTZ+pFH8NKO3uCA==
+X-CSE-MsgGUID: jJM27wa3Qpm+88z9uC9o4A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
+   d="scan'208";a="83052207"
+Received: from oandoniu-mobl3.ger.corp.intel.com (HELO localhost) ([10.245.244.38])
+  by orviesa006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 01:38:27 -0700
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ilpo.jarvinen@linux.intel.com>
+Date: Fri, 1 Nov 2024 10:38:23 +0200 (EET)
+To: Jinjie Ruan <ruanjinjie@huawei.com>
+cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com, 
+    haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com, 
+    ricardo.martinez@linux.intel.com, loic.poulain@linaro.org, 
+    ryazanov.s.a@gmail.com, johannes@sipsolutions.net, andrew+netdev@lunn.ch, 
+    davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+    pabeni@redhat.com, Netdev <netdev@vger.kernel.org>, 
+    LKML <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net v3] net: wwan: t7xx: Fix off-by-one error in
+ t7xx_dpmaif_rx_buf_alloc()
+In-Reply-To: <20241101025316.3234023-1-ruanjinjie@huawei.com>
+Message-ID: <1645aca2-2231-6ac4-d8cf-eddbb16259be@linux.intel.com>
+References: <20241101025316.3234023-1-ruanjinjie@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241031121104.6f7d669c@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Type: multipart/mixed; boundary="8323328-140363434-1730450303=:1235"
 
-On Thu, Oct 31, 2024 at 12:11:04PM +0100, Kory Maincent wrote:
-> On Thu, 31 Oct 2024 07:54:08 +0100
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
-> 
-> > > diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
-> > > index a1ad257b1ec1..22664b1ea4a2 100644
-> > > --- a/include/uapi/linux/ethtool.h
-> > > +++ b/include/uapi/linux/ethtool.h
-> > > @@ -1002,11 +1002,35 @@ enum ethtool_c33_pse_pw_d_status {
-> > >   * enum ethtool_c33_pse_events - event list of the C33 PSE controller.
-> > >   * @ETHTOOL_C33_PSE_EVENT_OVER_CURRENT: PSE output current is too high.
-> > >   * @ETHTOOL_C33_PSE_EVENT_OVER_TEMP: PSE in over temperature state.
-> > > + * @ETHTOOL_C33_PSE_EVENT_CONNECTED: PD detected on the PSE.
-> > > + * @ETHTOOL_C33_PSE_EVENT_DISCONNECTED: PD has been disconnected on the
-> > > PSE.
-> > > + * @ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR: PSE faced an error in
-> > > static
-> > > + *	port priority management mode.
-> > >   */
-> > >  
-> > >  enum ethtool_c33_pse_events {
-> > > -	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =	1 << 0,
-> > > -	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =	1 << 1,
-> > > +	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =		1 << 0,
-> > > +	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =		1 << 1,
-> > > +	ETHTOOL_C33_PSE_EVENT_CONNECTED =		1 << 2,
-> > > +	ETHTOOL_C33_PSE_EVENT_DISCONNECTED =		1 << 3,
-> > > +	ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR =	1 << 4,
-> > > +};  
-> > 
-> > Same here, priority concept is not part of the spec, so the C33 prefix
-> > should be removed.
-> 
-> Ack. So we assume PoDL could have the same interruption events.
-> 
-> > > +/**
-> > > + * enum pse_port_prio_modes - PSE port priority modes.
-> > > + * @ETHTOOL_PSE_PORT_PRIO_DISABLED: Port priority disabled.
-> > > + * @ETHTOOL_PSE_PORT_PRIO_STATIC: PSE static port priority. Port priority
-> > > + *	based on the power requested during PD classification. This mode
-> > > + *	is managed by the PSE core.
-> > > + * @ETHTOOL_PSE_PORT_PRIO_DYNAMIC: PSE dynamic port priority. Port priority
-> > > + *	based on the current consumption per ports compared to the total
-> > > + *	power budget. This mode is managed by the PSE controller.
-> > > + */  
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-After thinking about it more overnight, I wanted to revisit the idea of having
-a priority strategy per port. Right now, if one port is set to static or
-dynamic mode, all disabled ports seem to have to follow it somehow too. This
-makes it feel like we should have a strategy for the whole power domain, not
-just for each port.
+--8323328-140363434-1730450303=:1235
+Content-Type: text/plain; charset=ISO-8859-15
+Content-Transfer-Encoding: QUOTED-PRINTABLE
 
-I'm having trouble imagining how a per-port priority strategy would work in
-this setup.
+On Fri, 1 Nov 2024, Jinjie Ruan wrote:
 
-Another point that came to mind is that we might have two different components
-here, and we need to keep these two parts separate in follow-up discussions:
+> The error path in t7xx_dpmaif_rx_buf_alloc(), free and unmap the already
+> allocated and mapped skb in a loop, but the loop condition terminates whe=
+n
+> the index reaches zero, which fails to free the first allocated skb at
+> index zero.
+>=20
+> Check with i-- so that skb at index 0 is freed as well.
+>=20
+> Cc: stable@vger.kernel.org
+> Fixes: d642b012df70 ("net: wwan: t7xx: Add data path interface")
+> Acked-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+> Signed-off-by: Jinjie Ruan <ruanjinjie@huawei.com>
+> ---
+> v3:
+> - Remove suggested-by.
+> - Use i-- to simplify the fix.
+> - Add Acked-by.
+> - Add cc stable.
+> - Update the commit message.
+> v2:
+> - Update the commit title.
+> - Declare i as signed to avoid the endless loop.
+> ---
+>  drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c b/drivers/net/wwa=
+n/t7xx/t7xx_hif_dpmaif_rx.c
+> index 210d84c67ef9..7a9c09cd4fdc 100644
+> --- a/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
+> +++ b/drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c
+> @@ -226,7 +226,7 @@ int t7xx_dpmaif_rx_buf_alloc(struct dpmaif_ctrl *dpma=
+if_ctrl,
+>  =09return 0;
+> =20
+>  err_unmap_skbs:
+> -=09while (--i > 0)
+> +=09while (i--)
+>  =09=09t7xx_unmap_bat_skb(dpmaif_ctrl->dev, bat_req->bat_skb, i);
+> =20
+>  =09return ret;
+>=20
 
-- **Budget Evaluation Strategy**: The static approach seems straightforward—if
-a class requests more than available, appropriate actions are taken. However,
-the dynamic approach has more complexity, such as determining the threshold,
-how long violations can be tolerated, and whether a safety margin should be
-maintained before exceeding maximum load.
+Thanks.
 
-- **Disconnection Policy**: Once a budget violation is detected, this decides
-how to react, like which ports should be disconnected and in what order.
+Reviewed-by: Ilpo J=E4rvinen <ilpo.jarvinen@linux.intel.com>
 
-Would it make more sense to have a unified strategy for power domains, where we
-apply the same budget evaluation mode (static or dynamic) and disconnection
-policy to all ports in that domain? This could make the configuration simpler
-and the power management more predictable.
+--=20
+ i.
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+--8323328-140363434-1730450303=:1235--
 
