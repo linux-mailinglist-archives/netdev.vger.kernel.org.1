@@ -1,267 +1,141 @@
-Return-Path: <netdev+bounces-141074-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141075-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D26149B9645
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:09:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 190DF9B9648
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:11:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9705B282D7C
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:09:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D142D282B93
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:11:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC3271AA781;
-	Fri,  1 Nov 2024 17:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 775F519F430;
+	Fri,  1 Nov 2024 17:11:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="4uwigSGs"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LktIwCgK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f46.google.com (mail-lf1-f46.google.com [209.85.167.46])
+Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C192D1BD9DC
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 17:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50631CA81;
+	Fri,  1 Nov 2024 17:11:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730480984; cv=none; b=NeJK3nuq8ZacxjvjVf+Di6GsA5em1OdIWjPplk1BJBJFZ8FBiTKPhbZ+Oj0/QkIIxsoeOABzhxXibLLdl2t2bbl0X7DabmP9UYToval0T9V0U4yzu1upwGeVYPhlYA3xwX6tHfrmzrt9VLyIMYtEO9lnij+L3sTx5fX9wES8ME0=
+	t=1730481076; cv=none; b=nmQ/QVTMmuSmBOsA6hr90SewZu5IL+0v/PzVmmmDE5Hd44i6ZWYPPvczMBQdT1puFq1/fDSVPop03LbIxlgNQuF8dYDfFnvSPvFphqRr46HNPDePlRCncZpXDlU5IAa4w4UFu+q1wIZ1V9Iqm268VdWGlIRG6WS4RMu1iSCzlNs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730480984; c=relaxed/simple;
-	bh=v/flG3MQ6OddjwpQCS3r/Fpymi8ON8bNYYOP+7Sda0Y=;
+	s=arc-20240116; t=1730481076; c=relaxed/simple;
+	bh=hrmMYL51uQ+aNmsN/cZfyxdeBlGg+T9v2778IgPjGn8=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KDPDy7uE/Mb/IBFlLIoHSD11ZbulBJ0O6SDphcT7IR6NH1Wq4jjnDfJ1aOQH79Z9CqEcLox7CRxxmlM9T1ndrmyAMsB6328Sm3eaBmygMhcvp1rH1/iot6MWbiWlptmN6hkqxnsjT7M17BZ83uByY559hkbFJFtzDZdvm2BqYM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=4uwigSGs; arc=none smtp.client-ip=209.85.167.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f46.google.com with SMTP id 2adb3069b0e04-539e19d8c41so1340e87.0
-        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 10:09:40 -0700 (PDT)
+	 To:Cc:Content-Type; b=YU/e4YL95v+wW3KSSpqnQF9+k+JFRE4QGSQQcyg1w5IaCZgFAVEUOEpf0pTern77BnEkqA9BvUT9yGuKpe5GGYu9sD4aSySyPjFAbrb1sbJGE+T22zXxI/yhrQ/vFqddLXsOUA/Y9IE0UCEi/6WBNLlF4NokRvFbHw5RGwj7iqk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LktIwCgK; arc=none smtp.client-ip=209.85.208.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5cec7cde922so443177a12.3;
+        Fri, 01 Nov 2024 10:11:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730480979; x=1731085779; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730481073; x=1731085873; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=leKs4cy/2ceBeA0A+XYjBZ1WS0bFYV6vrc29reZpnsM=;
-        b=4uwigSGsPN04Gkvfl7UZSiNvDpiy7HisC2OnIfzqqGmUbHPRlnH1y4xdI57b/s24iv
-         X7PxzNdJBjH/6NBLhkfxJwwte8+xcvKgkrGBepDEzMPqtxeNT/TX8zLj/Sc1LSosHuru
-         N1ZtGW0toVettv0rpd5b7W6oARup9ZKMqFZyllD7UR8y14jBYfrwfdwHVhugfASXsizL
-         FvEkxfcZO/fIhKEq4W7E1Z7n/3UfbkCwBOOUq4Mr/g1T6K1FIJCav5iyazbhdNMygM3P
-         pTfiuUYaUseybHrAqK2ZgrA7OancUeAlELls2x/aLQb0iE0TQSifTsMuaH5OZgM97f1H
-         nBiA==
+        bh=hrmMYL51uQ+aNmsN/cZfyxdeBlGg+T9v2778IgPjGn8=;
+        b=LktIwCgKzBarY8Ugz1EPYWV9v4ac7TZZTqaelSoQGRuCOpm15EtK6RL6Xj/T6SiQAp
+         ljy8FuLWMIUYacV0OV2M3nYsGvA9s8l3Sf4tD16X+7pN3mTvO0u+i29zioKzU+GwUbLU
+         DhobWACS9ghPGVi3MDChGYkdLxuCHlkZHzTnBRAwKWbYxhGybm4cOsx7M/YI4cnlvo8b
+         uZNxpl14RMwAmlxo7y2CmgSmfqO0vhLATqjXyYZe3qtzK6mK6uJjvekhSCb5LkZTR9YD
+         40nmfDkLI2d+UisWEc37une6RJnmCHgDIlnBlBz7UQ6xbB3T08BN5F+SkVU3cXWhHri8
+         CAog==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730480979; x=1731085779;
+        d=1e100.net; s=20230601; t=1730481073; x=1731085873;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=leKs4cy/2ceBeA0A+XYjBZ1WS0bFYV6vrc29reZpnsM=;
-        b=KdoEDdzCyN3XPeDIAYiaTTEFPfNV9dPkh6Dr/OvNPTtOdqw8mT5xABHymD62blOHM7
-         /BgUDIWgaXQKWPTsnJ+O9bVXWZQJuj8h+Hn0xod1LCUjC0uSaYqynF82XMUnVgdGsYLR
-         wu0qy3w79LtWI1UH2wQFvH9uRh0vX1TJGObUg3/kR5qMWb2F9IkuP/HPsc45BH3XNfFA
-         fsLVjpFP9P32xQQlnyetdNRrzjhTpyoJlpDc16+djZixkm89l95/nrsDKhlVnseE3mP5
-         ZF65osSJGR+dKO7bWyidyypTcWqJb9MX2gVIoDzKRVJH4JLQnRNnd/7ij4eaGvvnFe34
-         ZzxA==
-X-Forwarded-Encrypted: i=1; AJvYcCXmoKu8jw+IhlvJbhLTQCfolrpvs31B9+lm8DH31c0iOCOdYwvpRN5KOlZHObcXAEvp/fDfcVs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YynyuMtbLlN+cq1Qued11LI9kxPpdOhgIiGTcqsptg4MelFhl6s
-	dHBwW3BRIJYzRay7UcN2IHy6afTnCw7HD3j2jb3H0+tdNol69i7BHTDgRN3dbI1MxKrW2VeQxsm
-	lHfZRyVYyjVXu08ASjYsERdZtMjjITSJfF69xLb2WNmIz3I9xxTKp
-X-Gm-Gg: ASbGncvBcsIepQql2CGHieoOQ4tWwMMipBmUTK1v2OCNo4HcNKtarg1hoeZyak8XmmF
-	NmngXBNGmQfwFKn2ZRNpLiyVmth4MsbWNIIy2wxhuvxq4x74OFipZWnZUi04n9w==
-X-Google-Smtp-Source: AGHT+IFJg2QoQo+HZXxYUlhvJJ4YYwGOZgmDliKv7KclE5csHykWupXpSX551XBsReEwY0xxjINcXOOo7bv53rlku+A=
-X-Received: by 2002:a05:6512:3da3:b0:53c:75e8:a5c9 with SMTP id
- 2adb3069b0e04-53c7ada1db3mr714381e87.4.1730480978386; Fri, 01 Nov 2024
- 10:09:38 -0700 (PDT)
+        bh=hrmMYL51uQ+aNmsN/cZfyxdeBlGg+T9v2778IgPjGn8=;
+        b=WWzvBvmBoplLjB9vHNNrak0l1POhWs5czIIDyeRGHFtZRFIXWOtkTRDvuTBQ6HTgmo
+         ciWgrvL+R/hhl45F9pS5nbTY/iz2Fg5rhnJksdOQTUIKVwlFGS0Wm/ytU0BLMlr7gDv0
+         4gId3pCUZvFktPWyq+R1qMm1GrhLxlq7BPD9YnaouTSa/iNkAUWod7KbgyXQbS2ZshpM
+         pIwT1PdKDy//bSu4FBa1bOgU2OpaJgadbCe4Xygz0noysOuUPMz5cMTZxka+jMvbE3uH
+         d5Q9uSshgpp638J/wYlujVWAvSQbiN7kFhlo+MQoVyr8piZ4GIeOuLdB3vt0TRof86Mp
+         z5pA==
+X-Forwarded-Encrypted: i=1; AJvYcCWaxMd0RYU0IOQvC5qfQN/ewFXcxn29JN9TgfNJME0eZrRP8mMzc4BV8OR1M77tphtW5w17Gdgm@vger.kernel.org, AJvYcCXu4V+/N4KhgbPQhwVNsk7VGJIZxt6/WIunEw0h1yt+DNDzjKToYea8ytPh6VAUK/MQkqAKZ7CSEc8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzr91CLhsBJ7E3cKe04W5uku2TND9FecZJ5pAVO27wfOLDz8PFC
+	Ave8jP1AXoUCr18eKFUGgPsX8SDWSsx5uzrxXVqzF7OE1lvVip0vaEIzfN1GRNC1Q/u7wwsCRqS
+	lUzE8ugbhxh9WMSVpfAjbI65ovRk=
+X-Google-Smtp-Source: AGHT+IEOYvjsewNxQ2cVWG6mSdsgcMhdy0Cf69WHKLUDeI2pXZkA5dAmk6XtbsPAup5IW3HXr4B0ph3rxctp4mgrEyQ=
+X-Received: by 2002:a05:6402:518a:b0:5c9:76ca:705b with SMTP id
+ 4fb4d7f45d1cf-5cd54afde73mr8495018a12.34.1730481072531; Fri, 01 Nov 2024
+ 10:11:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-5-dw@davidwei.uk>
-In-Reply-To: <20241029230521.2385749-5-dw@davidwei.uk>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 1 Nov 2024 10:09:25 -0700
-Message-ID: <CAHS8izPZ3bzmPx=geE0Nb0q8kG8fvzsGT2YgohoFJbSz2r21Zw@mail.gmail.com>
-Subject: Re: [PATCH v7 04/15] net: prepare for non devmem TCP memory providers
-To: David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
+References: <20241003160620.1521626-1-ap420073@gmail.com> <20241003160620.1521626-3-ap420073@gmail.com>
+ <20241008111926.7056cc93@kernel.org> <CAMArcTU+r+Pj_y7rUvRwTrDWqg57xy4e-OacjWCfKRCUa8A-aw@mail.gmail.com>
+ <20241009082837.2735cd97@kernel.org> <CAMArcTVXJhJopGTHc-DqK1ydCkaQj5-VRGoJ-saGNGeTLXZHcw@mail.gmail.com>
+ <20241031165624.5a7f8618@kernel.org>
+In-Reply-To: <20241031165624.5a7f8618@kernel.org>
+From: Taehee Yoo <ap420073@gmail.com>
+Date: Sat, 2 Nov 2024 02:11:00 +0900
+Message-ID: <CAMArcTWQijQ5S44rJzrpNWrbgo6hyJiyUddcuA6ZoegZmkvTLg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/7] bnxt_en: add support for tcp-data-split
+ ethtool command
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: davem@davemloft.net, pabeni@redhat.com, edumazet@google.com, 
+	almasrymina@google.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org, 
+	donald.hunter@gmail.com, corbet@lwn.net, michael.chan@broadcom.com, 
+	kory.maincent@bootlin.com, andrew@lunn.ch, maxime.chevallier@bootlin.com, 
+	danieller@nvidia.com, hengqi@linux.alibaba.com, ecree.xilinx@gmail.com, 
+	przemyslaw.kitszel@intel.com, hkallweit1@gmail.com, ahmed.zaki@intel.com, 
+	paul.greenwalt@intel.com, rrameshbabu@nvidia.com, idosch@nvidia.com, 
+	asml.silence@gmail.com, kaiyuanz@google.com, willemb@google.com, 
+	aleksander.lobakin@intel.com, dw@davidwei.uk, sridhar.samudrala@intel.com, 
+	bcreeley@amd.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Oct 29, 2024 at 4:06=E2=80=AFPM David Wei <dw@davidwei.uk> wrote:
+On Fri, Nov 1, 2024 at 8:56=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
 >
-> From: Pavel Begunkov <asml.silence@gmail.com>
+> On Fri, 1 Nov 2024 02:34:59 +0900 Taehee Yoo wrote:
+> > While I'm writing a patch I face an ambiguous problem here.
+> > ethnl_set_ring() first calls .get_ringparam() to get current config.
+> > Then it calls .set_ringparam() after it sets the current config + new
+> > config to param structures.
+> > The bnxt_set_ringparam() may receive ETHTOOL_TCP_DATA_SPLIT_ENABLED
+> > because two cases.
+> > 1. from user
+> > 2. from bnxt_get_ringparam() because of UNKNWON.
+> > The problem is that the bnxt_set_ringparam() can't distinguish them.
+> > The problem scenario is here.
+> > 1. tcp-data-split is UNKNOWN mode.
+> > 2. HDS is automatically enabled because one of LRO or GRO is enabled.
+> > 3. user changes ring parameter with following command
+> > `ethtool -G eth0 rx 1024`
+> > 4. ethnl_set_rings() calls .get_ringparam() to get current config.
+> > 5. bnxt_get_ringparam() returns ENABLE of HDS because of UNKNWON mode.
+> > 6. ethnl_set_rings() calls .set_ringparam() after setting param with
+> > configs comes from .get_ringparam().
+> > 7. bnxt_set_ringparam() is passed ETHTOOL_TCP_DATA_SPLIT_ENABLED but
+> > the user didn't set it explicitly.
+> > 8. bnxt_set_ringparam() eventually force enables tcp-data-split.
+> >
+> > I couldn't find a way to distinguish them so far.
+> > I'm not sure if this is acceptable or not.
+> > Maybe we need to modify a scenario?
 >
-> There is a good bunch of places in generic paths assuming that the only
-> page pool memory provider is devmem TCP. As we want to reuse the net_iov
-> and provider infrastructure, we need to patch it up and explicitly check
-> the provider type when we branch into devmem TCP code.
->
-> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
-> Signed-off-by: David Wei <dw@davidwei.uk>
-> ---
->  net/core/devmem.c         | 10 ++++++++--
->  net/core/devmem.h         |  8 ++++++++
->  net/core/page_pool_user.c | 15 +++++++++------
->  net/ipv4/tcp.c            |  6 ++++++
->  4 files changed, 31 insertions(+), 8 deletions(-)
->
-> diff --git a/net/core/devmem.c b/net/core/devmem.c
-> index 01738029e35c..78983a98e5dc 100644
-> --- a/net/core/devmem.c
-> +++ b/net/core/devmem.c
-> @@ -28,6 +28,12 @@ static DEFINE_XARRAY_FLAGS(net_devmem_dmabuf_bindings,=
- XA_FLAGS_ALLOC1);
->
->  static const struct memory_provider_ops dmabuf_devmem_ops;
->
-> +bool net_is_devmem_page_pool_ops(const struct memory_provider_ops *ops)
-> +{
-> +       return ops =3D=3D &dmabuf_devmem_ops;
-> +}
-> +EXPORT_SYMBOL_GPL(net_is_devmem_page_pool_ops);
-> +
->  static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
->                                                struct gen_pool_chunk *chu=
-nk,
->                                                void *not_used)
-> @@ -316,10 +322,10 @@ void dev_dmabuf_uninstall(struct net_device *dev)
->         unsigned int i;
->
->         for (i =3D 0; i < dev->real_num_rx_queues; i++) {
-> -               binding =3D dev->_rx[i].mp_params.mp_priv;
-> -               if (!binding)
-> +               if (dev->_rx[i].mp_params.mp_ops !=3D &dmabuf_devmem_ops)
->                         continue;
->
+> I thought we discussed this, but I may be misremembering.
+> You may need to record in the core whether the setting came
+> from the user or not (similarly to IFF_RXFH_CONFIGURED).
+> User setting UNKNWON would mean "reset".
+> Maybe I'm misunderstanding..
 
-Use the net_is_devmem_page_pool_ops helper here?
+Thanks a lot for that!
+I will try to add a new variable, that indicates tcp-data-split is set by
+user. It would be the tcp_data_split_mod in the
+kernel_ethtool_ringparam structure.
 
-> +               binding =3D dev->_rx[i].mp_params.mp_priv;
->                 xa_for_each(&binding->bound_rxqs, xa_idx, rxq)
->                         if (rxq =3D=3D &dev->_rx[i]) {
->                                 xa_erase(&binding->bound_rxqs, xa_idx);
-> diff --git a/net/core/devmem.h b/net/core/devmem.h
-> index a2b9913e9a17..a3fdd66bb05b 100644
-> --- a/net/core/devmem.h
-> +++ b/net/core/devmem.h
-> @@ -116,6 +116,8 @@ struct net_iov *
->  net_devmem_alloc_dmabuf(struct net_devmem_dmabuf_binding *binding);
->  void net_devmem_free_dmabuf(struct net_iov *ppiov);
->
-> +bool net_is_devmem_page_pool_ops(const struct memory_provider_ops *ops);
-> +
->  #else
->  struct net_devmem_dmabuf_binding;
->
-> @@ -168,6 +170,12 @@ static inline u32 net_devmem_iov_binding_id(const st=
-ruct net_iov *niov)
->  {
->         return 0;
->  }
-> +
-> +static inline bool
-> +net_is_devmem_page_pool_ops(const struct memory_provider_ops *ops)
-> +{
-> +       return false;
-> +}
->  #endif
->
->  #endif /* _NET_DEVMEM_H */
-> diff --git a/net/core/page_pool_user.c b/net/core/page_pool_user.c
-> index 48335766c1bf..604862a73535 100644
-> --- a/net/core/page_pool_user.c
-> +++ b/net/core/page_pool_user.c
-> @@ -214,7 +214,7 @@ static int
->  page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
->                   const struct genl_info *info)
->  {
-> -       struct net_devmem_dmabuf_binding *binding =3D pool->mp_priv;
-> +       struct net_devmem_dmabuf_binding *binding;
->         size_t inflight, refsz;
->         void *hdr;
->
-> @@ -244,8 +244,11 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct =
-page_pool *pool,
->                          pool->user.detach_time))
->                 goto err_cancel;
->
-> -       if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, bindin=
-g->id))
-> -               goto err_cancel;
-> +       if (net_is_devmem_page_pool_ops(pool->mp_ops)) {
-> +               binding =3D pool->mp_priv;
-> +               if (nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->=
-id))
-> +                       goto err_cancel;
-> +       }
-
-Worthy of note is that I think Jakub asked for this introspection, and
-likely you should also add similar introspection. I.e. page_pool
-dumping should likely be improved to dump that it's bound to io_uring
-memory. Not sure what io_uring memory 'id' equivalent would be, if
-any.
-
->
->         genlmsg_end(rsp, hdr);
->
-> @@ -353,16 +356,16 @@ void page_pool_unlist(struct page_pool *pool)
->  int page_pool_check_memory_provider(struct net_device *dev,
->                                     struct netdev_rx_queue *rxq)
->  {
-> -       struct net_devmem_dmabuf_binding *binding =3D rxq->mp_params.mp_p=
-riv;
-> +       void *mp_priv =3D rxq->mp_params.mp_priv;
->         struct page_pool *pool;
->         struct hlist_node *n;
->
-> -       if (!binding)
-> +       if (!mp_priv)
->                 return 0;
->
->         mutex_lock(&page_pools_lock);
->         hlist_for_each_entry_safe(pool, n, &dev->page_pools, user.list) {
-> -               if (pool->mp_priv !=3D binding)
-> +               if (pool->mp_priv !=3D mp_priv)
->                         continue;
->
->                 if (pool->slow.queue_idx =3D=3D get_netdev_rx_queue_index=
-(rxq)) {
-> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> index e928efc22f80..31e01da61c12 100644
-> --- a/net/ipv4/tcp.c
-> +++ b/net/ipv4/tcp.c
-> @@ -277,6 +277,7 @@
->  #include <net/ip.h>
->  #include <net/sock.h>
->  #include <net/rstreason.h>
-> +#include <net/page_pool/types.h>
->
->  #include <linux/uaccess.h>
->  #include <asm/ioctls.h>
-> @@ -2476,6 +2477,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, con=
-st struct sk_buff *skb,
->                         }
->
->                         niov =3D skb_frag_net_iov(frag);
-> +                       if (net_is_devmem_page_pool_ops(niov->pp->mp_ops)=
-) {
-> +                               err =3D -ENODEV;
-> +                               goto out;
-> +                       }
-> +
-
-I think this check needs to go in the caller. Currently the caller
-assumes that if !skb_frags_readable(), then the frag is dma-buf, and
-calls tcp_recvmsg_dmabuf on it. The caller needs to check that the
-frag is specifically a dma-buf frag now.
-
-Can io_uring frags somehow end up in tcp_recvmsg_locked? You're still
-using the tcp stack with io_uring ZC right? So I suspect they might?
-
---
-Thanks,
-Mina
+Thanks a lot!
+Taehee Yoo
 
