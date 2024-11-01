@@ -1,290 +1,173 @@
-Return-Path: <netdev+bounces-140988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140989-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8B189B8FB7
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:49:54 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 83B989B8FBE
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:52:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1916A1C22383
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:49:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D61F9B20981
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:52:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9BB1581EE;
-	Fri,  1 Nov 2024 10:49:39 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="IstiBmgO"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70369168488;
+	Fri,  1 Nov 2024 10:52:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01071701.me.com (qs51p00im-qukt01071701.me.com [17.57.155.6])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6134189B8F
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 10:49:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 196131D555;
+	Fri,  1 Nov 2024 10:52:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730458179; cv=none; b=FDqFvcdmy1NIpXP4yaNC04KNYSbVt5J/K0fK/xUup9RrOANnz8ZZsBs8HrSi7MVy87ivVWyZC7BQBJSvUlvGys8Ksw8F3DIYm5qN1yZGTAne3pZwarHtEB2gJnud9qB0p/JimoIWAsotv/mlMtncWN3uhnMgbaqoVT1mHFbksas=
+	t=1730458326; cv=none; b=mdiR9vjN//c0HX1o8SPotglqUXuXKO0DI8g5vX1FLibQvqUu0voKPm3nP91J/hgqmMiSVaas8FMgVL6N2yL44kMpeA8LV4qRwSvIkoWb5KBeVGCvbQR5MKr6u8O/Pdhju/j6rSWO3NZy5p6r96dqbtGJuRLq1EeM4dvRwzpKrmc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730458179; c=relaxed/simple;
-	bh=+6lm4BUHHl9klVGOr736/mzHPp2s7famQ3KDDPx7cYQ=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZecV960NgeXKc+LnJC/OOyH9wXJY5GV0NHMoAIEvU+1lZBvgTa2BMT9VIMhZyi85BrRrdqzOvPEfmT0INtLjcyV85xAkOEejENS/V7q3MAz/vu1O6fNtwKRtwqjDP+E6bb7mPP/Xt1J/2Z3FGfWi49j+BlmR2ABu7mZZQU6yZaA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=IstiBmgO; arc=none smtp.client-ip=17.57.155.6
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730458174; bh=I37lDDYBBtxNa3TjybkPQc80NAx8iTVPvUq3Yd4QueE=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
-	b=IstiBmgOpmjm0XcbyqT9HsibfQLcTJN2jUSa54WOuLZB7rTJks2ky0DsQkPfmf0t5
-	 Au+NQMmCD8lXO4MlWMR2iCQhmqv/3urDQfdSsHu1C/S8FUTZ9iJCjVYHxnEni95Iw3
-	 Dhd8eOGKFf0x+dhtXryZWiGfa7qWp/DeKkSterx7noGf5rKW6nFke68G6NGN5K0YFn
-	 udyZYE4M4NsdbwjEE+Ibnldz7RiLg5pTwaVA4lMKexZeoyMenizEqVROQJgg6BU5Oj
-	 NUuilq2g3xBKjcMUW83bLKIMnDESV1iJpy+8/tKDwJUfN0l0UTqw8KC2Bf6vgxbcWH
-	 MNZMqb8eLn9Ig==
-Received: from almalinux-std3-4-4-10gb.novalocal (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01071701.me.com (Postfix) with ESMTPSA id 68D304D002A7;
-	Fri,  1 Nov 2024 10:49:29 +0000 (UTC)
-From: Vladimir Vdovin <deliran@verdict.gg>
-To: netdev@vger.kernel.org,
-	dsahern@kernel.org,
-	davem@davemloft.net
-Cc: Vladimir Vdovin <deliran@verdict.gg>,
-	idosch@idosch.org,
-	edumazet@google.com,
-	linux-kselftest@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	horms@kernel.org
-Subject: [PATCH v5] net: ipv4: Cache pmtu for all packet paths if multipath enabled
-Date: Fri,  1 Nov 2024 10:48:57 +0000
-Message-ID: <20241101104922.68956-1-deliran@verdict.gg>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
-References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+	s=arc-20240116; t=1730458326; c=relaxed/simple;
+	bh=TU8dGZ1eNu3Hk2l7gdb8rvSsxYs/ZIyWZjXgy6rwpOA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SeZvFws/UJ8Nr8a06N0kOq8ORrqthjoDGBx+cUs/1ednZmifTlyxEAf5Mp4dZ3kx+WqfOhMF5XCENFVrVBxq3d6LisExxR2ex6pXFk5CnfdtviJ5at3y6najuDtE1AEvQhU38X02L0OdO23p8PMdbz+dtfUE5WZ5eLWWoGa3Brw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c94c4ad9d8so2504043a12.2;
+        Fri, 01 Nov 2024 03:52:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730458322; x=1731063122;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nKSTmHmFuYCAOmRQkPVmNmsckzHyWUaKkCyqHZXPrGs=;
+        b=ddL6+9z5Al3UGD43DbudjthX8UqHq8eS9hQ3KnIhmdfAgxxMyGVBI1RatYQSD2XRdY
+         Z836NuRZMZBxMiB20nXHFGPOk+TYjdu1G5NyYU3oLVxtX2hBDIBhhgKpMd9c7Up7MUYp
+         8T8bbo2S/5eyss3woUBo1AJYq6iqp8cRYBMajIRafNKmSgG27VdAlr8nYsvAtF83trsH
+         +A1Wl/TzGByMTk/icghlKtQKJ7xfXzAykRsFfTi984PV76ODdZudOGQkIGeXSFO8h54m
+         EGctRucCPUBhRMnlQ+zOhsrGwbsVspNC3GmytHVs31gGPmy5RTAfQB9RbfkYBqhBC99V
+         +bqA==
+X-Forwarded-Encrypted: i=1; AJvYcCU/nLH1dRsGYI9Yl7Hsc8BKeuwRnb13P38dOViapKr2qlWjh2sQSQDMFFnMBI5qOVE7Zoo9xUtx@vger.kernel.org, AJvYcCVWUbB2jwg6HS9XwQ0J5RD35+OB4gpGF2C3Fw8kQXRVzhc61mlnT9r5nlLqfA1bF/sFdXcnlf45AjTLeUI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxvG+Ud8PrKrt2KoN13bMPIme8JLApIuBvHuKfS+z0FZV9JM/ja
+	mDYBqwloaui8ZELNG3zj6x0AWX1L4Y+o/0IelPKyICiAaXlyRT1E
+X-Google-Smtp-Source: AGHT+IFubAKraTfHDTY8/bsTKvjr2pLAaf81VaTF4emfdFHq5lkd6fNtjX4Nf6nK6nHQNB7C3rtr0Q==
+X-Received: by 2002:a17:907:7dac:b0:a9a:81a3:59bf with SMTP id a640c23a62f3a-a9e5093f631mr543618266b.35.1730458322095;
+        Fri, 01 Nov 2024 03:52:02 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e56643823sm167683066b.167.2024.11.01.03.52.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 03:52:01 -0700 (PDT)
+Date: Fri, 1 Nov 2024 03:51:59 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
+	vlad.wing@gmail.com, max@kutsevol.com, kernel-team@meta.com,
+	jiri@resnulli.us, jv@jvosburgh.net, andy@greyhouse.net,
+	aehkn@xenhub.one, Rik van Riel <riel@surriel.com>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH net-next 1/3] net: netpoll: Defer skb_pool population
+ until setup success
+Message-ID: <20241101-cheerful-pretty-wapiti-d5f69e@leitao>
+References: <20241025142025.3558051-1-leitao@debian.org>
+ <20241025142025.3558051-2-leitao@debian.org>
+ <20241031182647.3fbb2ac4@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: dHrACLZ6F3hiDL48h_ntVIH83u_2APxG
-X-Proofpoint-GUID: dHrACLZ6F3hiDL48h_ntVIH83u_2APxG
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-01_06,2024-10-31_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
- clxscore=1030 mlxlogscore=999 adultscore=0 mlxscore=0 spamscore=0
- bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411010078
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241031182647.3fbb2ac4@kernel.org>
 
-Check number of paths by fib_info_num_path(),
-and update_or_create_fnhe() for every path.
-Problem is that pmtu is cached only for the oif
-that has received icmp message "need to frag",
-other oifs will still try to use "default" iface mtu.
+Hello Jakub,
 
-V5:
-  - make self test cleaner
+On Thu, Oct 31, 2024 at 06:26:47PM -0700, Jakub Kicinski wrote:
+> On Fri, 25 Oct 2024 07:20:18 -0700 Breno Leitao wrote:
+> > The current implementation has a flaw where it populates the skb_pool
+> > with 32 SKBs before calling __netpoll_setup(). If the setup fails, the
+> > skb_pool buffer will persist indefinitely and never be cleaned up.
+> > 
+> > This change moves the skb_pool population to after the successful
+> > completion of __netpoll_setup(), ensuring that the buffers are not
+> > unnecessarily retained. Additionally, this modification alleviates rtnl
+> > lock pressure by allowing the buffer filling to occur outside of the
+> > lock.
+> 
+> arguably if the setup succeeds there would now be a window of time
+> where np is active but pool is empty.
 
-V4:
-  - fix selftest, do route lookup before checking cached exceptions
+I am not convinced this is a problem. Given that netpoll_setup() is only
+called from netconsole.
 
-V3:
-  - added selftest
-  - fixed compile error
+In netconsole, a target is not enabled (as in sending packets) until the
+netconsole target is, in fact, enabled. (nt->enabled = true). Enabling
+the target(nt) only happen after netpoll_setup() returns successfully.
 
-V2:
-  - fix fib_info_num_path parameter pass
+Example:
 
-An example topology showing the problem:
+	static void write_ext_msg(struct console *con, const char *msg,
+				  unsigned int len)
+	{
+		...
+		list_for_each_entry(nt, &target_list, list)
+			if (nt->extended && nt->enabled && netif_running(nt->np.dev))
+				send_ext_msg_udp(nt, msg, len);
 
-                    |  host1
-                +---------+
-                |  dummy0 | 10.179.20.18/32  mtu9000
-                +---------+
-        +-----------+----------------+
-    +---------+                     +---------+
-    | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
-    +---------+                     +---------+
-        |    (all here have mtu 9000)    |
-    +------+                         +------+
-    | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
-    +------+                         +------+
-        |                                |
----------+------------+-------------------+------
-                        |
-                    +-----+
-                    | ro3 | 10.10.10.10  mtu1500
-                    +-----+
-                        |
-    ========================================
-                some networks
-    ========================================
-                        |
-                    +-----+
-                    | eth0| 10.10.30.30  mtu9000
-                    +-----+
-                        |  host2
+So, back to your point, the netpoll interface will be up, but, not used
+at all.
 
-host1 have enabled multipath and
-sysctl net.ipv4.fib_multipath_hash_policy = 1:
+On top of that, two other considerations:
 
-default proto static src 10.179.20.18
-        nexthop via 10.179.2.12 dev ens17f1 weight 1
-        nexthop via 10.179.2.140 dev ens17f0 weight 1
+ * If the netpoll target is used without the buffer, it is not a big
+deal, since refill_skbs() is called, independently if the pool is full
+or not. (Which is not ideal and I eventually want to improve it).
 
-When host1 tries to do pmtud from 10.179.20.18/32 to host2,
-host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
-And host1 caches it in nexthop exceptions cache.
+Anyway, this is how the code works today:
 
-Problem is that it is cached only for the iface that has received icmp,
-and there is no way that ro3 will send icmp msg to host1 via another path.
 
-Host1 now have this routes to host2:
+	void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
+	{
+		...
+		skb = find_skb(np, total_len + np->dev->needed_tailroom,...
+		// transmit the skb
+		
 
-ip r g 10.10.30.30 sport 30000 dport 443
-10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
-    cache expires 521sec mtu 1500
+	static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
+	{
+		...
+		refill_skbs(np);
+		skb = alloc_skb(len, GFP_ATOMIC);
+		if (!skb)
+			skb = skb_dequeue(&np->skb_pool);
+		...
+		// return the skb
 
-ip r g 10.10.30.30 sport 30033 dport 443
-10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
-    cache
+So, even in there is a transmission in-between enabling the netpoll
+target and not populating the pool (which is NOT the case in the code
+today), it would not be a problem, given that netpoll_send_udp() will
+call refill_skbs() anyway.
 
-So when host1 tries again to reach host2 with mtu>1500,
-if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
-if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
-until lucky day when ro3 will send it through another flow to ens17f0.
+I have an in-development patch to improve it, by deferring this to a
+workthread, mainly because this whole allocation dance is done with a
+bunch of locks held, including printk/console lock.
 
-Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
----
- net/ipv4/route.c                    | 13 +++++
- tools/testing/selftests/net/pmtu.sh | 78 ++++++++++++++++++++++++++++-
- 2 files changed, 90 insertions(+), 1 deletion(-)
+I think that a best mechanism might be something like:
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 723ac9181558..41162b5cc4cb 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1027,6 +1027,19 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
- 		struct fib_nh_common *nhc;
- 
- 		fib_select_path(net, &res, fl4, NULL);
-+#ifdef CONFIG_IP_ROUTE_MULTIPATH
-+		if (fib_info_num_path(res.fi) > 1) {
-+			int nhsel;
-+
-+			for (nhsel = 0; nhsel < fib_info_num_path(res.fi); nhsel++) {
-+				nhc = fib_info_nhc(res.fi, nhsel);
-+				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
-+							  jiffies + net->ipv4.ip_rt_mtu_expires);
-+			}
-+			rcu_read_unlock();
-+			return;
-+		}
-+#endif /* CONFIG_IP_ROUTE_MULTIPATH */
- 		nhc = FIB_RES_NHC(res);
- 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
- 				      jiffies + net->ipv4.ip_rt_mtu_expires);
-diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
-index 569bce8b6383..a0159340fe84 100755
---- a/tools/testing/selftests/net/pmtu.sh
-+++ b/tools/testing/selftests/net/pmtu.sh
-@@ -266,7 +266,8 @@ tests="
- 	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
- 	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
- 	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
--	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
-+	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
-+	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
- 
- # Addressing and routing for tests with routers: four network segments, with
- # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) and an
-@@ -2329,6 +2330,81 @@ test_pmtu_ipv6_route_change() {
- 	test_pmtu_ipvX_route_change 6
- }
- 
-+test_pmtu_ipv4_mp_exceptions() {
-+	setup namespaces routing || return $ksft_skip
-+
-+	ip nexthop ls >/dev/null 2>&1
-+	if [ $? -ne 0 ]; then
-+		echo "Nexthop objects not supported; skipping tests"
-+		exit $ksft_skip
-+	fi
-+
-+	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
-+	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
-+	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
-+	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
-+
-+	dummy0_a="192.168.99.99"
-+	dummy0_b="192.168.88.88"
-+
-+	# Set up initial MTU values
-+	mtu "${ns_a}"  veth_A-R1 2000
-+	mtu "${ns_r1}" veth_R1-A 2000
-+	mtu "${ns_r1}" veth_R1-B 1500
-+	mtu "${ns_b}"  veth_B-R1 1500
-+
-+	mtu "${ns_a}"  veth_A-R2 2000
-+	mtu "${ns_r2}" veth_R2-A 2000
-+	mtu "${ns_r2}" veth_R2-B 1500
-+	mtu "${ns_b}"  veth_B-R2 1500
-+
-+	fail=0
-+
-+	#Set up host A with multipath routes to host B dummy0_b
-+	run_cmd ${ns_a} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_a} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_a} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_a} ip link set dummy0 up
-+	run_cmd ${ns_a} ip addr add ${dummy0_a} dev dummy0
-+	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_a} ip route add ${dummy0_b} nhid 203
-+
-+	#Set up host B with multipath routes to host A dummy0_a
-+	run_cmd ${ns_b} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_b} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_b} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_b} ip link set dummy0 up
-+	run_cmd ${ns_b} ip addr add ${dummy0_b} dev dummy0
-+	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_b} ip route add ${dummy0_a} nhid 203
-+
-+	#Set up routers with routes to dummies
-+	run_cmd ${ns_r1} ip route add ${dummy0_a} via ${prefix4}.${a_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_a} via ${prefix4}.${a_r2}.1
-+	run_cmd ${ns_r1} ip route add ${dummy0_b} via ${prefix4}.${b_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_b} via ${prefix4}.${b_r2}.1
-+
-+
-+	#Ping and expect two nexthop exceptions for two routes in nh group
-+	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dummy0_b}"
-+
-+	#Do route lookup before checking cached exceptions
-+	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R1
-+	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R2
-+
-+	#Check cached exceptions
-+	if [ "$(${ns_a} ip -oneline route list cache| grep mtu | wc -l)" -ne 2 ]; then
-+		err "  there are not enough cached exceptions"
-+		fail=1
-+	fi
-+
-+	return ${fail}
-+}
-+
- usage() {
- 	echo
- 	echo "$0 [OPTIONS] [TEST]..."
+ * If find_skb() needs to consume from the pool (which is rare, only
+when alloc_skb() fails), raise workthread that tries to repopulate the
+pool in the background. 
 
-base-commit: 66600fac7a984dea4ae095411f644770b2561ede
--- 
-2.43.5
+ * Eventually avoid alloc_skb() first, and getting directly from the
+   pool first, if the pool is depleted, try to alloc_skb(GPF_ATOMIC).
+   This might make the code faster, but, I don't have data yet.
 
+   This might also required a netpool reconfigurable of pool size. Today
+   it is hardcoded (#define MAX_SKBS 32). This current patchset is the
+   first step to individualize the pool, then, we can have a field in
+   struct netpoll that specify what is the pool size (32 by default),
+   but user configuration.
+
+   On netconsole, we can do it using the configfs fields.
+
+Anyway, are these ideas too crazy?
 
