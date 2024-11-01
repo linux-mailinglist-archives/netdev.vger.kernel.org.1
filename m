@@ -1,84 +1,60 @@
-Return-Path: <netdev+bounces-140962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E3A9B8E37
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:56:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA86E9B8E84
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF344282469
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 09:55:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07CBB1C20F41
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:04:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4383415A85A;
-	Fri,  1 Nov 2024 09:55:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C9A156220;
+	Fri,  1 Nov 2024 10:04:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rxqqZnd9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26B6742C0B;
-	Fri,  1 Nov 2024 09:55:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F21E5143C72;
+	Fri,  1 Nov 2024 10:04:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730454954; cv=none; b=twu8wPckR2X9wVFduClZzlYC4s4z1DTsZ7FpH4HX2N9q7K+HRDACI4/rSFBy+dLx8DC3tLcXgQBi0S9fxW+uDQSpB2ia65MofWRfYssJyuhvsjNbTDXqF69qi+6gMayDnYM4ZxYbM5zNakHTmpOFXaiiNCgLcTJkL53y7z/Ml/g=
+	t=1730455450; cv=none; b=MNCZU69LmAIQ9NyGuEaA1FaJaVj/OWhD8hYoS+UlXhYbsnimeLeMGfX1D/p558X2E3FZ1P1i7ZPa66hRDv5Jytc7S1+qby6bB5bcpBf1JIoKw3VGAWpZNV363drSMiZTv+fEjMKOJheHFGcLiFa+iaGewfeml8X6BgybG7bXkOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730454954; c=relaxed/simple;
-	bh=WTYnH8m7kXjv8qZInYAhGdSknl4/AE4BuBqGwmmfme0=;
+	s=arc-20240116; t=1730455450; c=relaxed/simple;
+	bh=Rf8bkdBlxwr+7xHtx+gq94UWKa4xBxRh3LErQfhnuCc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Np/46xcta5Hs3uTgAiEV6Px+vUHZ1FJvXxFJqSrrqTEONyCmYwKl4ua0f9FFWkPpsN6zyramtDmcr5h9Yd0q+ES5jgvV+N2GM+SFznK5GUCoHNXluOZLD8EycdT953GkEji44vmyVt4vlHCznU3kHSTl/xFg1Yak53Q57AeQSdI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a99f646ff1bso218807166b.2;
-        Fri, 01 Nov 2024 02:55:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730454950; x=1731059750;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/t+QYyf8qZDtsRwJcXowF6EM2CgFAnHXFELfH+lEWqI=;
-        b=gYX1RaQ0MlVJJ+c7J8jfgDm+GH/0R3zyq+b1OctAr+pI97pnbvI6tcmDj5bauVqJeo
-         TUcSj8YWUZcQ+3f41F0WkjWrBGEKejsoJAwbKuNQ4nGbPHs/EIodily2j3yjVj5D5UTT
-         YGwgGt01TThpeneWl5j1fYYWZO/64lfj89e5s0V2n5SbTul4mKYpHpsWwgFlUirPp0XV
-         zUvQkmQvzxuq5VG/ivD2LZdHGkuIKPL8EKc5c/7L4ybztQ1VJWjPXtghLYT4TQWFIGce
-         3zRYRONBveWeV706MPy9Th+DOKqKrOcH8MO24xH4x1hNCUDcRViEaegqkghw2tviefQH
-         1YIQ==
-X-Forwarded-Encrypted: i=1; AJvYcCU6xPpXcxrAQ5Rxf7YB/486pnNDMctzBvWDgAtAzMMjqi1txnrP77PsmRYKdc45us44TG0B/YWRCX2laBca@vger.kernel.org, AJvYcCVQ2FvZj+3lWk9++lMhZiMaP9xYrltiNCgCwzS/UlXh04s7bhEV2ApPBbs7Rj/imVFv6/7lycyYmFo=@vger.kernel.org, AJvYcCXz6gGVc0+wp2d9INCJb7b3eW+VTJHk4Az2l88Zi3rh715sHpuQWU+AKF8E0UIzNxNUEtYZrLk8@vger.kernel.org
-X-Gm-Message-State: AOJu0YyPU23VjHM82f7+Yu0SbLdZyIInlBsK+Q4ij1vpxE5jdqD4H1Zn
-	YRrxhrx8oSuADGtEyGVvsgXoC9je3ibXZmFQPSYjB0kRatdPUYEu
-X-Google-Smtp-Source: AGHT+IGCLOakR0b9WPcsve9Vt1k91BRnbuy4Q1X5xpkkj29pof6MeeJf5jFzuWN+7Je/9pRzsXBdsQ==
-X-Received: by 2002:a17:907:7b9e:b0:a9a:dac:2ab9 with SMTP id a640c23a62f3a-a9e3a6c99ebmr932418066b.42.1730454950171;
-        Fri, 01 Nov 2024 02:55:50 -0700 (PDT)
-Received: from gmail.com (fwdproxy-lla-116.fbsv.net. [2a03:2880:30ff:74::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e564c4fc6sm162479666b.69.2024.11.01.02.55.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 02:55:49 -0700 (PDT)
-Date: Fri, 1 Nov 2024 02:55:47 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Akinobu Mita <akinobu.mita@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Andrew Morton <akpm@linux-foundation.org>, kernel-team@meta.com,
-	Thomas Huth <thuth@redhat.com>,
-	"Paul E. McKenney" <paulmck@kernel.org>,
-	"Borislav Petkov (AMD)" <bp@alien8.de>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Xiongwei Song <xiongwei.song@windriver.com>,
-	Mina Almasry <almasrymina@google.com>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	Oleksij Rempel <o.rempel@pengutronix.de>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH net-next v4] net: Implement fault injection forcing skb
- reallocation
-Message-ID: <20241101-macho-wolverine-of-glee-2ea606@leitao>
-References: <20241023113819.3395078-1-leitao@debian.org>
- <20241030173152.0349b466@kernel.org>
- <20241031-hallowed-bizarre-curassow-ea16cc@leitao>
- <20241031170428.27c1f26a@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=hbpR56kEPhBH6DK4xTipjI2o5QLD83yD6VClG8m47IFXTC8LCZpytZnaWvdMh5zVw5r25HnDvrIHN5pLnVGmdQceQuzgTaENTbPT1pz02w4+ztUkVwBqk0xjEtqrZYgzEBJM0Rz/mgf7J9LAtqUWHsvjqEyGxEjNVS3a5tTyXL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rxqqZnd9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id ED248C4CECD;
+	Fri,  1 Nov 2024 10:04:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730455449;
+	bh=Rf8bkdBlxwr+7xHtx+gq94UWKa4xBxRh3LErQfhnuCc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=rxqqZnd9R34nT6j2WbLQ9Llzjrb28oDhV718cg1N6M9WqGXAdPRIQ/B3bYW8g8oaI
+	 9EQprAApa5uc8pgkMNzzw+yuhaganwCOQ0PJXipRYGhm1AfaXeaDRx+QH8ZkbKZQfr
+	 f1+fk666vIC8I5Fk5pmdzFnnV/EYzQw8r4aYkoO0GGCu5vGm1wzJkO5cJYa7UTSahg
+	 ljgkwk2zKDqop6INAG6lXT7NdPUDKU9z4gAClARws8gRbtk0D8MAUlG01h138/Bcev
+	 lRfqfp2XVcWbQxmXn+WUsdNxpFFrbWT09+1fYPncDr4yl7B8ZYGgzp0V/zykAjDzNO
+	 Ywdg7zOT8oPhA==
+Date: Fri, 1 Nov 2024 10:04:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Sai Krishna <saikrishnag@marvell.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, sgoutham@marvell.com,
+	gakula@marvell.com, lcherian@marvell.com, jerinj@marvell.com,
+	hkelam@marvell.com, sbhatta@marvell.com,
+	kalesh-anakkur.purayil@broadcom.com
+Subject: Re: [net-next PATCH v2 6/6] octeontx2-pf: CN20K mbox implementation
+ between PF-VF
+Message-ID: <20241101100404.GB1838431@kernel.org>
+References: <20241022185410.4036100-1-saikrishnag@marvell.com>
+ <20241022185410.4036100-7-saikrishnag@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,24 +63,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241031170428.27c1f26a@kernel.org>
+In-Reply-To: <20241022185410.4036100-7-saikrishnag@marvell.com>
 
-Hello Jakub,
-
-On Thu, Oct 31, 2024 at 05:04:28PM -0700, Jakub Kicinski wrote:
-> > > the buffer needs to be null terminated, like:
-> > > 
-> > > skb_realloc.devname[IFNAMSIZ - 1] = '\0';
-> > > 
-> > > no?  
-> > 
-> > Yes, but isn't it what the next line do, with strim()?
+On Wed, Oct 23, 2024 at 12:24:10AM +0530, Sai Krishna wrote:
+> This patch implements the CN20k MBOX communication between PF and
+> it's VFs. CN20K silicon got extra interrupt of MBOX response for trigger
+> interrupt. Also few of the CSR offsets got changed in CN20K against
+> prior series of silicons.
 > 
-> I could be wrong, but looks like first thing strim does is call strlen()
+> Signed-off-by: Sunil Kovvuri Goutham <sgoutham@marvell.com>
+> Signed-off-by: Sai Krishna <saikrishnag@marvell.com>
 
-makes sense. Let me send a v5 with the fixes, and we can continue from
-there.
+...
 
-Thanks for the review!
---breno
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> index 148a5c91af55..1a7920327fd5 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_pf.c
+> @@ -565,6 +565,23 @@ irqreturn_t otx2_pfvf_mbox_intr_handler(int irq, void *pf_irq)
+>  	return IRQ_HANDLED;
+>  }
+>  
+> +static void *cn20k_pfvf_mbox_alloc(struct otx2_nic *pf, int numvfs)
+> +{
+> +	struct qmem *mbox_addr;
+> +	int err;
+> +
+> +	err = qmem_alloc(&pf->pdev->dev, &mbox_addr, numvfs, MBOX_SIZE);
+
+Hi Sai and Sunil,
+
+MBOX_SIZE is 0x10000 (i.e. 2^16).
+
+But qmem_alloc() will assign this value to the entry_sz field of an
+instance of struct qmem, whose type is u16. Thus the value will be
+truncated to 0. I didn't dig further, but this doesn't seem desirable.
+
+Flagged by Sparse on x86_64.
+
+Also, not strictly related to this patchset: There Sparse flags
+a handful of warnings in .../marvell/octeontx2/nic/otx2_pf.c,
+which all seem to relate to __iomem annotations. It would be nice
+to investigate and resolve those at some point.
+
+> +	if (err) {
+> +		dev_err(pf->dev, "qmem alloc fail\n");
+> +		return ERR_PTR(-ENOMEM);
+> +	}
+> +
+> +	otx2_write64(pf, RVU_PF_VF_MBOX_ADDR, (u64)mbox_addr->iova);
+> +	pf->pfvf_mbox_addr = mbox_addr;
+> +
+> +	return mbox_addr->base;
+> +}
+> +
+>  static int otx2_pfvf_mbox_init(struct otx2_nic *pf, int numvfs)
+>  {
+>  	void __iomem *hwbase;
+
+...
 
