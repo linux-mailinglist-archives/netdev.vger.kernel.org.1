@@ -1,113 +1,200 @@
-Return-Path: <netdev+bounces-141080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A62C09B969C
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:34:29 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECDC19B96B5
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:41:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6C3892827DB
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:34:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB43628208B
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:41:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E7901CC8AE;
-	Fri,  1 Nov 2024 17:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADC621CCEE3;
+	Fri,  1 Nov 2024 17:41:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="MUCgY3jU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dHaLX6On"
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01072701.me.com (qs51p00im-qukt01072701.me.com [17.57.155.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 927A21990C0
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 17:34:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFF301AC884;
+	Fri,  1 Nov 2024 17:41:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730482465; cv=none; b=G2RBLLsVVQQBwti4uuJ7wzaL7rpwHO/kMRcVnpw/q17sp5fTKViMZ8S2AlGSaiRP7ipKgEml8EWCgsI3f7DgoR4GqQVzs2siTWKSEWSM0eTeIphYXLA37YpYHok7puF9pEcAFKtSGU2gNNv6VX0vvarfbRQRTPPOPBd09CPWPOc=
+	t=1730482863; cv=none; b=fV0DMJKeVS7vgxYhnkWphKMAJh/9Mn/VUNk3Nrs30vfvLxpE2eL8RDNMerl/cMArfEl4MDs5Gf2VLvFvGualunTZbK+2pfkQ54LLuH3BPb2sY4EMkbF3w30EABqdjc9ILEu8WJTLpV4Z2Kd1NELoZUfAmKQ2nm6jJin+sn86lbU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730482465; c=relaxed/simple;
-	bh=yWxSY6lpq9y436+CBlx7pOJWYkE1IZeB7U9qpm5zK2s=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=X+KW8dzcjqydfzTbbfUEqdxcDwfNP/NDxZe4YQiF/xi/VWHNkpF1/ZnQUCKrJ5HnY00aogWRdFVuiqBw0PzJEMlRWAeJlrsGQ5taE9BtI9ZnZpIb5staEW1G0wpU+aIOA/6ebX4lO7E6LkYZr+cgVWB4XgpK0AFVUriikzr/0eo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=MUCgY3jU; arc=none smtp.client-ip=17.57.155.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730482461; bh=o0PyLD589lYfc1t+zExAXE2fviy2AdnQrnho3zTWnfw=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:
-	 x-icloud-hme;
-	b=MUCgY3jU84Vtq9GS2uQ87VcoA5hUhvGkRoI2ROmlHWEGyFNHem6q776LJ/YKv+Czj
-	 tCAABVWL92Z6309PUyAZg44NARfF7axlliGPA0Q91GIgJc7uWfj8KxLh+GIxxnUf1e
-	 BOKw8wjyAwxCS18xjFI3edfH3+YUpRTGUBTXs80uurgUjoCUPA1HKAANNSfNOccz+8
-	 oUbRnWzBKgEz2MIaVHENhXyC72mGRuEwD6DW8Feay1ELgb0KO0Lct++VbOv/NVjlcb
-	 D6P+goabyqupEDS8eMcF191eIMZ5J6i08R1T7OU6zyfZXplv5umTgYjJZGPQ1T20a9
-	 puX9SLeRoiopA==
-Received: from localhost (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01072701.me.com (Postfix) with ESMTPSA id 10B8615C062F;
-	Fri,  1 Nov 2024 17:34:17 +0000 (UTC)
+	s=arc-20240116; t=1730482863; c=relaxed/simple;
+	bh=q+mSis0eJrpzcfbXQ4vOMDEyoAC5gFQlxWK7wgJPFbM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=vBtqvsNNhmwkHo4wJW6kEaBjNWmOkOWTXKTC0FGRjm/df3AL+P8FLyS7A+T5R8AtejVz5atjPBeZ8rYPdMZyPC2t2XSnCVNJMs0M8LvxJ5vJtNc6Um96lAdxrLOUKmkP2Xn+CAvj14m8xFcMSU6oK6kQo41/63OXP3CZKuPuQF4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dHaLX6On; arc=none smtp.client-ip=209.85.221.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-37d41894a32so1235599f8f.1;
+        Fri, 01 Nov 2024 10:41:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730482860; x=1731087660; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=iTwsd4RDo3jFbS015Dfc+aEcibnzb1LuBrWGUJngbOM=;
+        b=dHaLX6On8sZUSRc3VOlga/UXKVMewDsmBbZRmCa32MO3hvdrKGAV8K+BdgY3zn+lqV
+         qyKnxNLJA26ApsgEhlfBwO6XPrhke7x4KhVCiFWZea2OD1FRAqXNtwhEx6QEp4IiNmIH
+         mfgqhphwqm9dE3775viOp/xHPnv5MJJ/AwtA75FEkcGg5yNbOYNPwH9UiGn0CuYLO/MF
+         VBuDVCnC7OaFJ+laTq6yFDwly96s9E5kRGi+G4eMl2zVd7pBbIhQqNSxuo7FD/lkJ68W
+         35WF6PdIgAysuV7qsStPkPN4qUVO9hn2d1v5DMnW1lgSz75w9Sn/QZumR+AqDuCGMQSw
+         cNQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730482860; x=1731087660;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=iTwsd4RDo3jFbS015Dfc+aEcibnzb1LuBrWGUJngbOM=;
+        b=FpLE8jZLBLO3RzXdK24KIwyeTkSb53WscpvGTTtZghlsGiQiISs+pbCCj3sYXVa+Xy
+         jr1iJTRIn4/I/ZgezIXCCgJVO1T2D2QTtWtYqp97JZN8OOuQoBzHuslIohv9pU80tl1n
+         VlsFNUDYgyWZNZ2J7Hn6wOsHVRHMKau5q2HBZtvT7fGmKud8LQqUrScL3n6UcQe78Sld
+         ESEGVyIKN+6W69vgSiIW82dERe5iB7FCxD6tDpoLiy91A2V4Fx//sUNpQRMCfz/WztiR
+         GAh+LSf1yqZanbdo4xeSMu/rHfuPXt8pjD3APcglL3hCkN6+lapHytLKIzxYMDi2oa6e
+         MfNw==
+X-Forwarded-Encrypted: i=1; AJvYcCXIm28U8LBjcbTqM23whj0gW8XxRXklK+HMUREA6bZOKa9OyTvL7/dIiJKrCZZzzvzD4aaw2zk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCrp9R5GD7NEo64wwCqDimdhlg53E0he4+KEFgvWxMCQV3EM4T
+	GyQal/qhxSJg3LkbQJNqd2a3C7MH9RIhNNDG4zFOHQm2aAcyJ4xD
+X-Google-Smtp-Source: AGHT+IHb1gtgC+CA86ED+yRUNLH0wa8osL8Mxswo6TjQAAakiOk8u0P57fXFQrku88HxGB0JeZofZA==
+X-Received: by 2002:a05:6000:1f8c:b0:37d:3780:31d2 with SMTP id ffacd0b85a97d-381c79b88cemr4080615f8f.15.1730482860039;
+        Fri, 01 Nov 2024 10:41:00 -0700 (PDT)
+Received: from [192.168.42.19] ([85.255.236.151])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d6848b5sm68485835e9.32.2024.11.01.10.40.58
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 01 Nov 2024 10:40:59 -0700 (PDT)
+Message-ID: <5b928f0e-f3f8-4eaa-b750-e3f445d2fa46@gmail.com>
+Date: Fri, 1 Nov 2024 17:41:05 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Fri, 01 Nov 2024 20:34:15 +0300
-Message-Id: <D5B0U1C0N9JC.3PXNVEEH12786@verdict.gg>
-Cc: <netdev@vger.kernel.org>, <dsahern@kernel.org>, <davem@davemloft.net>,
- <idosch@idosch.org>, <edumazet@google.com>,
- <linux-kselftest@vger.kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>,
- <horms@kernel.org>
-Subject: Re: [PATCH v5] net: ipv4: Cache pmtu for all packet paths if
- multipath enabled
-From: "Vladimir Vdovin" <deliran@verdict.gg>
-To: "Jakub Kicinski" <kuba@kernel.org>
-X-Mailer: aerc 0.18.2
-References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
- <20241101104922.68956-1-deliran@verdict.gg>
- <20241101064511.1ef698db@kernel.org>
-In-Reply-To: <20241101064511.1ef698db@kernel.org>
-X-Proofpoint-GUID: pWPWANGMcJnZRigdq-1M2A07egqp_Pa8
-X-Proofpoint-ORIG-GUID: pWPWANGMcJnZRigdq-1M2A07egqp_Pa8
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-01_12,2024-11-01_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 bulkscore=0
- mlxlogscore=238 clxscore=1030 adultscore=0 malwarescore=0 phishscore=0
- mlxscore=0 spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411010126
+MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 04/15] net: prepare for non devmem TCP memory providers
+To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241029230521.2385749-1-dw@davidwei.uk>
+ <20241029230521.2385749-5-dw@davidwei.uk>
+ <CAHS8izPZ3bzmPx=geE0Nb0q8kG8fvzsGT2YgohoFJbSz2r21Zw@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izPZ3bzmPx=geE0Nb0q8kG8fvzsGT2YgohoFJbSz2r21Zw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On Fri Nov 1, 2024 at 4:45 PM MSK, Jakub Kicinski wrote:
-> On Fri,  1 Nov 2024 10:48:57 +0000 Vladimir Vdovin wrote:
-> > +	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
->
-> This new test seems to fail in our CI:
->
-> # TEST: ipv4: PMTU multipath nh exceptions                            [FA=
-IL]
-> #   there are not enough cached exceptions
->
-> https://netdev-3.bots.linux.dev/vmksft-net/results/840861/3-pmtu-sh/stdou=
-t
+On 11/1/24 17:09, Mina Almasry wrote:
+> On Tue, Oct 29, 2024 at 4:06 PM David Wei <dw@davidwei.uk> wrote:
+...
+>> +
+>>   static void net_devmem_dmabuf_free_chunk_owner(struct gen_pool *genpool,
+>>                                                 struct gen_pool_chunk *chunk,
+>>                                                 void *not_used)
+>> @@ -316,10 +322,10 @@ void dev_dmabuf_uninstall(struct net_device *dev)
+>>          unsigned int i;
+>>
+>>          for (i = 0; i < dev->real_num_rx_queues; i++) {
+>> -               binding = dev->_rx[i].mp_params.mp_priv;
+>> -               if (!binding)
+>> +               if (dev->_rx[i].mp_params.mp_ops != &dmabuf_devmem_ops)
+>>                          continue;
+>>
+> 
+> Use the net_is_devmem_page_pool_ops helper here?
 
-Yes it failed in V4 patch, in this V5 its already ok:
+It could, but the function is there primarily for outside users to
+avoid ifdefs and build problems. I don't think it worth reiteration?
+I'll change if there is a next version.
 
-# TEST: ipv4: PMTU multipath nh exceptions                            [ OK =
-]
-ok 1 selftests: net: pmtu.sh
+...
+>> @@ -244,8 +244,11 @@ page_pool_nl_fill(struct sk_buff *rsp, const struct page_pool *pool,
+>>                           pool->user.detach_time))
+>>                  goto err_cancel;
+>>
+>> -       if (binding && nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
+>> -               goto err_cancel;
+>> +       if (net_is_devmem_page_pool_ops(pool->mp_ops)) {
+>> +               binding = pool->mp_priv;
+>> +               if (nla_put_u32(rsp, NETDEV_A_PAGE_POOL_DMABUF, binding->id))
+>> +                       goto err_cancel;
+>> +       }
+> 
+> Worthy of note is that I think Jakub asked for this introspection, and
+> likely you should also add similar introspection. I.e. page_pool
 
-https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/841042/2-pmtu-sh/std=
-out
+I think we can patch it up after merging the series? Depends what Jakub
+thinks. In any case, I can't parse io_uring ops here until a later patch
+adding those ops, so it'd be a new patch if it's a part of this series.
 
-But in V5, there is failed test, not sure that this patch causes fail:
-https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/841042/31-busy-poll-=
-test-sh/stdout
+> dumping should likely be improved to dump that it's bound to io_uring
+> memory. Not sure what io_uring memory 'id' equivalent would be, if
+> any.
 
->
-> Also some process notes:
->  - please don't post multiple versions of the patch a day:
->    https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl=
--dr
->  - please avoid posting new versions in-reply-to the old one
-Thanks, will keep it in mind next time, sorry for my ignorance
+I don't think io_uring have any id to give. What is it for in the
+first place? Do you give it to netlink to communicate with devmem
+TCP or something similar?
+
+>>          genlmsg_end(rsp, hdr);
+>>
+>> @@ -353,16 +356,16 @@ void page_pool_unlist(struct page_pool *pool)
+>>   int page_pool_check_memory_provider(struct net_device *dev,
+>>                                      struct netdev_rx_queue *rxq)
+...
+>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+>> index e928efc22f80..31e01da61c12 100644
+>> --- a/net/ipv4/tcp.c
+>> +++ b/net/ipv4/tcp.c
+>> @@ -277,6 +277,7 @@
+>>   #include <net/ip.h>
+>>   #include <net/sock.h>
+>>   #include <net/rstreason.h>
+>> +#include <net/page_pool/types.h>
+>>
+>>   #include <linux/uaccess.h>
+>>   #include <asm/ioctls.h>
+>> @@ -2476,6 +2477,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, const struct sk_buff *skb,
+>>                          }
+>>
+>>                          niov = skb_frag_net_iov(frag);
+>> +                       if (net_is_devmem_page_pool_ops(niov->pp->mp_ops)) {
+>> +                               err = -ENODEV;
+>> +                               goto out;
+>> +                       }
+>> +
+> 
+> I think this check needs to go in the caller. Currently the caller
+> assumes that if !skb_frags_readable(), then the frag is dma-buf, and
+
+io_uring originated netmem that are marked unreadable as well
+and so will end up in tcp_recvmsg_dmabuf(), then we reject and
+fail since they should not be fed to devmem TCP. It should be
+fine from correctness perspective.
+
+We need to check frags, and that's the place where we iterate
+frags. Another option is to add a loop in tcp_recvmsg_locked
+walking over all frags of an skb and doing the checks, but
+that's an unnecessary performance burden to devmem.
+
+> calls tcp_recvmsg_dmabuf on it. The caller needs to check that the
+> frag is specifically a dma-buf frag now.
+> 
+> Can io_uring frags somehow end up in tcp_recvmsg_locked? You're still
+> using the tcp stack with io_uring ZC right? So I suspect they might?
+
+All of them are using the same socket rx queue, so yes, any of them
+can see any type of packet non net_iov / pages
+
+-- 
+Pavel Begunkov
 
