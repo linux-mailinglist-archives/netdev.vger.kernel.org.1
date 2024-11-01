@@ -1,288 +1,186 @@
-Return-Path: <netdev+bounces-140973-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140974-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E62089B8F18
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:22:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF9559B8F1B
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:23:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 157621C223BA
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:22:46 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 46A5C1F22F72
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:23:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B82315C158;
-	Fri,  1 Nov 2024 10:22:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="V6YJ0jjN"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9003160783;
+	Fri,  1 Nov 2024 10:23:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01071902.me.com (qs51p00im-qukt01071902.me.com [17.57.155.9])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C968815A85A
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 10:22:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.9
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66EF015C158
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 10:23:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730456563; cv=none; b=tV9CgB492HrsdHtF9DMax5NSATAC8DghuOIj6smg4EI4gbnqqpUMWkdaZUvRNRdXl9ytFEKPMSrGMowQEmfVyboWIKvjOn+/mAYJZFi376N8dq0dQeXpRbXryCmGMb/2nQO5khFS/U4v97icDCmrF/V29wMUmz2aGbexzBYHP+A=
+	t=1730456609; cv=none; b=piAxBmpc5pRZSOLKjGi1HVZ8zIFU6ve9ybe5ulY+Hk41gwh7WhcZMFJ7Q8P0XRcvucZvVqafCpJoKUQRT+XtiSXzSun+mY77Uy16EYJdO+wYOQEvBU++3pnns/dHNda6zRNTd+6PCs0QGE/3et7l7IyjrMFMElW79AneahaCScI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730456563; c=relaxed/simple;
-	bh=nSyBjBXxs4qqZaQPQEIbY6vTVAqIZySvep7SIIhUDZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=K31392q6ZW9Y3E+FGSnWXmulXi+3vzXOWpXKCeeyhw52Hrzk0SiN+Btss2eJxmIn0Ip9ffdFNldfXkH/ZDfQm/iQlTcwaCdbxJttLIkiUGS/jMxotXVayqLF7vVKswcFveEr9lmVvSrkoKcL2p7R/OutUDysAJEY1rndK7tKiHc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=V6YJ0jjN; arc=none smtp.client-ip=17.57.155.9
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730456557; bh=o7ASiyFV+Hosqd1uhMOtY9gjtmrT6eZBqgvQxbmi1fU=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
-	b=V6YJ0jjNnqUsKTBa5dJNxHmTC131QKWeb1da6K4j4r5m5LI6+LMF1DQzG2e4P5Otd
-	 TE6AK7249R0ZbcIWNp3YhY8OoKLvQn2pbr+alOzzRlAT15VSvYTBH2lCbOeF3TDTrf
-	 7XOki9EezlpABpO2uYM4OWZSPsvhjImqFcebBLneAps5gIldeibfpGwLueccYWeO8B
-	 BwJRfUn84eFGJnmMl4Dew7Xmac+laC9QT4cFEphDg9QEFHtx8Z5WfoypuuCsUVOTXy
-	 EtVFBq+h6IVP5vin6YC1lHw6HQ/KTKxN5SbQeCfymjN3D72XzjiOZ8gos5SPp/jeo1
-	 QdZB6GNiojOFQ==
-Received: from almalinux-std3-4-4-10gb.novalocal (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01071902.me.com (Postfix) with ESMTPSA id 231E65EC0325;
-	Fri,  1 Nov 2024 10:22:33 +0000 (UTC)
-From: Vladimir Vdovin <deliran@verdict.gg>
-To: netdev@vger.kernel.org,
-	dsahern@kernel.org,
-	davem@davemloft.net
-Cc: Vladimir Vdovin <deliran@verdict.gg>,
-	idosch@idosch.org,
-	edumazet@google.com,
-	linux-kselftest@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	horms@kernel.org
-Subject: [PATCH v4] net: ipv4: Cache pmtu for all packet paths if multipath enabled
-Date: Fri,  1 Nov 2024 10:21:40 +0000
-Message-ID: <20241101102207.68271-1-deliran@verdict.gg>
-X-Mailer: git-send-email 2.43.5
-In-Reply-To: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
-References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+	s=arc-20240116; t=1730456609; c=relaxed/simple;
+	bh=8b9a53kp/jr0dPpeCii/tX8yWaa+/nuB5CkfS4qxa7E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BIYs664hQtenvDoO3iO00JneT0lob1Nw8EGU/wXUtFt2kpmDmUMD7LzT2sYCUc6s/kgivXOpNDR9umhlGBz6CPYAn9mXdHJO64KGeCxtR3xl1wRGsrJv/s8+0oWON7dP5EqeNoE3ZvXouh1GSZXUeducJisoiUyoD4LczXUzlsc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6oo8-0000H7-S1; Fri, 01 Nov 2024 11:23:08 +0100
+Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6oo6-001Ur2-2x;
+	Fri, 01 Nov 2024 11:23:06 +0100
+Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
+	(envelope-from <ore@pengutronix.de>)
+	id 1t6oo6-007zJb-2X;
+	Fri, 01 Nov 2024 11:23:06 +0100
+Date: Fri, 1 Nov 2024 11:23:06 +0100
+From: Oleksij Rempel <o.rempel@pengutronix.de>
+To: Kory Maincent <kory.maincent@bootlin.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	Simon Horman <horms@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Liam Girdwood <lgirdwood@gmail.com>,
+	Mark Brown <broonie@kernel.org>,
+	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
+	Dent Project <dentproject@linuxfoundation.org>,
+	kernel@pengutronix.de,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>
+Subject: Re: [PATCH RFC net-next v2 15/18] net: pse-pd: Add support for
+ getting and setting port priority
+Message-ID: <ZySsCuOvSnVZnIwq@pengutronix.de>
+References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
+ <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
+ <ZyMpkJRHZWYsszh2@pengutronix.de>
+ <20241031121104.6f7d669c@kmaincent-XPS-13-7390>
+ <ZySR75i3BEzNbjnv@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-ORIG-GUID: BWNl501YpNwe5NTxr58mx1Syli_-Rhwf
-X-Proofpoint-GUID: BWNl501YpNwe5NTxr58mx1Syli_-Rhwf
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-01_06,2024-10-31_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 clxscore=1030 phishscore=0 spamscore=0
- bulkscore=0 mlxlogscore=999 malwarescore=0 adultscore=0 mlxscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411010074
+In-Reply-To: <ZySR75i3BEzNbjnv@pengutronix.de>
+X-Sent-From: Pengutronix Hildesheim
+X-URL: http://www.pengutronix.de/
+X-Accept-Language: de,en
+X-Accept-Content-Type: text/plain
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: ore@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-Check number of paths by fib_info_num_path(),
-and update_or_create_fnhe() for every path.
-Problem is that pmtu is cached only for the oif
-that has received icmp message "need to frag",
-other oifs will still try to use "default" iface mtu.
+On Fri, Nov 01, 2024 at 09:31:43AM +0100, Oleksij Rempel wrote:
+> On Thu, Oct 31, 2024 at 12:11:04PM +0100, Kory Maincent wrote:
+> > On Thu, 31 Oct 2024 07:54:08 +0100
+> > Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+> > 
+> > > > diff --git a/include/uapi/linux/ethtool.h b/include/uapi/linux/ethtool.h
+> > > > index a1ad257b1ec1..22664b1ea4a2 100644
+> > > > --- a/include/uapi/linux/ethtool.h
+> > > > +++ b/include/uapi/linux/ethtool.h
+> > > > @@ -1002,11 +1002,35 @@ enum ethtool_c33_pse_pw_d_status {
+> > > >   * enum ethtool_c33_pse_events - event list of the C33 PSE controller.
+> > > >   * @ETHTOOL_C33_PSE_EVENT_OVER_CURRENT: PSE output current is too high.
+> > > >   * @ETHTOOL_C33_PSE_EVENT_OVER_TEMP: PSE in over temperature state.
+> > > > + * @ETHTOOL_C33_PSE_EVENT_CONNECTED: PD detected on the PSE.
+> > > > + * @ETHTOOL_C33_PSE_EVENT_DISCONNECTED: PD has been disconnected on the
+> > > > PSE.
+> > > > + * @ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR: PSE faced an error in
+> > > > static
+> > > > + *	port priority management mode.
+> > > >   */
+> > > >  
+> > > >  enum ethtool_c33_pse_events {
+> > > > -	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =	1 << 0,
+> > > > -	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =	1 << 1,
+> > > > +	ETHTOOL_C33_PSE_EVENT_OVER_CURRENT =		1 << 0,
+> > > > +	ETHTOOL_C33_PSE_EVENT_OVER_TEMP =		1 << 1,
+> > > > +	ETHTOOL_C33_PSE_EVENT_CONNECTED =		1 << 2,
+> > > > +	ETHTOOL_C33_PSE_EVENT_DISCONNECTED =		1 << 3,
+> > > > +	ETHTOOL_C33_PSE_EVENT_PORT_PRIO_STATIC_ERROR =	1 << 4,
+> > > > +};  
+> > > 
+> > > Same here, priority concept is not part of the spec, so the C33 prefix
+> > > should be removed.
+> > 
+> > Ack. So we assume PoDL could have the same interruption events.
+> > 
+> > > > +/**
+> > > > + * enum pse_port_prio_modes - PSE port priority modes.
+> > > > + * @ETHTOOL_PSE_PORT_PRIO_DISABLED: Port priority disabled.
+> > > > + * @ETHTOOL_PSE_PORT_PRIO_STATIC: PSE static port priority. Port priority
+> > > > + *	based on the power requested during PD classification. This mode
+> > > > + *	is managed by the PSE core.
+> > > > + * @ETHTOOL_PSE_PORT_PRIO_DYNAMIC: PSE dynamic port priority. Port priority
+> > > > + *	based on the current consumption per ports compared to the total
+> > > > + *	power budget. This mode is managed by the PSE controller.
+> > > > + */  
+> 
+> After thinking about it more overnight, I wanted to revisit the idea of having
+> a priority strategy per port. Right now, if one port is set to static or
+> dynamic mode, all disabled ports seem to have to follow it somehow too. This
+> makes it feel like we should have a strategy for the whole power domain, not
+> just for each port.
+> 
+> I'm having trouble imagining how a per-port priority strategy would work in
+> this setup.
+> 
+> Another point that came to mind is that we might have two different components
+> here, and we need to keep these two parts separate in follow-up discussions:
+> 
+> - **Budget Evaluation Strategy**: The static approach seems straightforward—if
+> a class requests more than available, appropriate actions are taken. However,
+> the dynamic approach has more complexity, such as determining the threshold,
+> how long violations can be tolerated, and whether a safety margin should be
+> maintained before exceeding maximum load.
+> 
+> - **Disconnection Policy**: Once a budget violation is detected, this decides
+> how to react, like which ports should be disconnected and in what order.
+> 
+> Would it make more sense to have a unified strategy for power domains, where we
+> apply the same budget evaluation mode (static or dynamic) and disconnection
+> policy to all ports in that domain? This could make the configuration simpler
+> and the power management more predictable.
 
-V4:
-  - fix selftest, do route lookup before checking cached exceptions
+Except of user reports, do we have documented confirmation about dynamic
+Budget Evaluation Strategy in PD692x0 firmware?
 
-V3:
-  - added selftest
-  - fixed compile error
+Do this configuration bits are what I called Budget Evaluation Strategy?
+Version 3.55:
+Bits [3..0]—BT port PM mode
+0x0: The port power that is used for power management purposes is
+     dynamic (Iport x Vmain).
+0x1: The port power that is used for power management purposes is port
+     TPPL_BT.
+0x2: The port power that is used for power management purposes is
+     dynamic for non LLDP/CDP/Autoclass ports and TPPL_BT for
+     LLDP/CDP/Autoclass ports.
 
-V2:
-  - fix fib_info_num_path parameter pass
-
-An example topology showing the problem:
-
-                    |  host1
-                +---------+
-                |  dummy0 | 10.179.20.18/32  mtu9000
-                +---------+
-        +-----------+----------------+
-    +---------+                     +---------+
-    | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
-    +---------+                     +---------+
-        |    (all here have mtu 9000)    |
-    +------+                         +------+
-    | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
-    +------+                         +------+
-        |                                |
----------+------------+-------------------+------
-                        |
-                    +-----+
-                    | ro3 | 10.10.10.10  mtu1500
-                    +-----+
-                        |
-    ========================================
-                some networks
-    ========================================
-                        |
-                    +-----+
-                    | eth0| 10.10.30.30  mtu9000
-                    +-----+
-                        |  host2
-
-host1 have enabled multipath and
-sysctl net.ipv4.fib_multipath_hash_policy = 1:
-
-default proto static src 10.179.20.18
-        nexthop via 10.179.2.12 dev ens17f1 weight 1
-        nexthop via 10.179.2.140 dev ens17f0 weight 1
-
-When host1 tries to do pmtud from 10.179.20.18/32 to host2,
-host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
-And host1 caches it in nexthop exceptions cache.
-
-Problem is that it is cached only for the iface that has received icmp,
-and there is no way that ro3 will send icmp msg to host1 via another path.
-
-Host1 now have this routes to host2:
-
-ip r g 10.10.30.30 sport 30000 dport 443
-10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
-    cache expires 521sec mtu 1500
-
-ip r g 10.10.30.30 sport 30033 dport 443
-10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
-    cache
-
-So when host1 tries again to reach host2 with mtu>1500,
-if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
-if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
-until lucky day when ro3 will send it through another flow to ens17f0.
-
-Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
----
- net/ipv4/route.c                    | 13 +++++
- tools/testing/selftests/net/pmtu.sh | 79 ++++++++++++++++++++++++++++-
- 2 files changed, 91 insertions(+), 1 deletion(-)
-
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 723ac9181558..41162b5cc4cb 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1027,6 +1027,19 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
- 		struct fib_nh_common *nhc;
- 
- 		fib_select_path(net, &res, fl4, NULL);
-+#ifdef CONFIG_IP_ROUTE_MULTIPATH
-+		if (fib_info_num_path(res.fi) > 1) {
-+			int nhsel;
-+
-+			for (nhsel = 0; nhsel < fib_info_num_path(res.fi); nhsel++) {
-+				nhc = fib_info_nhc(res.fi, nhsel);
-+				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
-+							  jiffies + net->ipv4.ip_rt_mtu_expires);
-+			}
-+			rcu_read_unlock();
-+			return;
-+		}
-+#endif /* CONFIG_IP_ROUTE_MULTIPATH */
- 		nhc = FIB_RES_NHC(res);
- 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
- 				      jiffies + net->ipv4.ip_rt_mtu_expires);
-diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
-index 569bce8b6383..f7ced4c436fb 100755
---- a/tools/testing/selftests/net/pmtu.sh
-+++ b/tools/testing/selftests/net/pmtu.sh
-@@ -266,7 +266,8 @@ tests="
- 	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
- 	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
- 	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
--	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
-+	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
-+	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
- 
- # Addressing and routing for tests with routers: four network segments, with
- # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) and an
-@@ -2329,6 +2330,82 @@ test_pmtu_ipv6_route_change() {
- 	test_pmtu_ipvX_route_change 6
- }
- 
-+test_pmtu_ipv4_mp_exceptions() {
-+	setup namespaces routing || return $ksft_skip
-+
-+	ip nexthop ls >/dev/null 2>&1
-+	if [ $? -ne 0 ]; then
-+		echo "Nexthop objects not supported; skipping tests"
-+		exit $ksft_skip
-+	fi
-+
-+	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
-+	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
-+	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
-+	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
-+
-+	dummy0_a="192.168.99.99"
-+	dummy0_b="192.168.88.88"
-+
-+	# Set up initial MTU values
-+	mtu "${ns_a}"  veth_A-R1 2000
-+	mtu "${ns_r1}" veth_R1-A 2000
-+	mtu "${ns_r1}" veth_R1-B 1500
-+	mtu "${ns_b}"  veth_B-R1 1500
-+
-+	mtu "${ns_a}"  veth_A-R2 2000
-+	mtu "${ns_r2}" veth_R2-A 2000
-+	mtu "${ns_r2}" veth_R2-B 1500
-+	mtu "${ns_b}"  veth_B-R2 1500
-+
-+	fail=0
-+
-+	#Set up host A with multipath routes to host B dummy0_b
-+	run_cmd ${ns_a} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_a} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_a} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_a} ip link set dummy0 up
-+	run_cmd ${ns_a} ip addr add ${dummy0_a} dev dummy0
-+	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_a} ip route add ${dummy0_b} nhid 203
-+
-+	#Set up host B with multipath routes to host A dummy0_a
-+	run_cmd ${ns_b} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_b} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_b} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_b} ip link set dummy0 up
-+	run_cmd ${ns_b} ip addr add ${dummy0_b} dev dummy0
-+	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_b} ip route add ${dummy0_a} nhid 203
-+
-+	#Set up routers with routes to dummies
-+	run_cmd ${ns_r1} ip route add ${dummy0_a} via ${prefix4}.${a_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_a} via ${prefix4}.${a_r2}.1
-+	run_cmd ${ns_r1} ip route add ${dummy0_b} via ${prefix4}.${b_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_b} via ${prefix4}.${b_r2}.1
-+
-+
-+	#Ping and expect two nexthop exceptions for two routes in nh group
-+	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dummy0_b}"
-+
-+	#Do route lookup before checking cached exceptions
-+	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R1
-+	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R2
-+
-+	#Check cached exceptions
-+	echo "$(ip -oneline route list cache)"
-+	if [ "$(${ns_a} ip -oneline route list cache| grep mtu | wc -l)" -ne 2 ]; then
-+		err "  there are not enough cached exceptions"
-+		fail=1
-+	fi
-+
-+	return ${fail}
-+}
-+
- usage() {
- 	echo
- 	echo "$0 [OPTIONS] [TEST]..."
-
-base-commit: 66600fac7a984dea4ae095411f644770b2561ede
 -- 
-2.43.5
-
+Pengutronix e.K.                           |                             |
+Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
+31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
+Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
 
