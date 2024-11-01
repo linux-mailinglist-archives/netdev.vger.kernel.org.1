@@ -1,133 +1,128 @@
-Return-Path: <netdev+bounces-140990-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FCDF9B8FC0
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:53:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A3099B8FF0
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 12:06:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8F51282440
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:53:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2E5BD282CF7
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B98D9160783;
-	Fri,  1 Nov 2024 10:53:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EC4D1714BC;
+	Fri,  1 Nov 2024 11:06:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="r9VzzRi+"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="h9Pz5WED"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-118.freemail.mail.aliyun.com (out30-118.freemail.mail.aliyun.com [115.124.30.118])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6900615A849;
-	Fri,  1 Nov 2024 10:53:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.118
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27B25166F16
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 11:06:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730458387; cv=none; b=EZFb5Rlzf9+H8cBgz4qmMSHBLGr6LvmtrQofWAF2/s8xk9L0M+JAyPqW+VVyqrEIO7OcKp4zsPbA0lohmPwOUPFxkoR8fvF6ZgbTeiJG+5pA6swYhhPOFZ7oj1uxcKSZa3vSW4Mhbt+LXDwgXk2zm3WhUx3IeOEQ0T5vSn0MYR0=
+	t=1730459166; cv=none; b=LTv7mptrQTsmsU9/nNJW5yk0+OiJJC9j9vWPQc+TN1UNqDQBuAy9JBkhxClkYuUc6Qanzpvsy7CVE/FNJ4CNFEDlwedJvJjy1qJUACy1REtYMRV4qV3l2w8UkKduDPMLdzcxZuo7RpdGZIZXKYpQP3RzxeVgUDkREt9J0X8OlSE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730458387; c=relaxed/simple;
-	bh=jrULZg4ou+aDyNcoBXl/ExbJGAa8QubISoiQ4TyKDp4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=k8v8iOnWLK2/LfyMCCXCzhRxGvAosQ9HLiRpeyGZ1jVkkbN+QLUV3EF16VSphezZOHnPbi/4vc52jtsRuzEpXHQjq3UCMWcsukKUeFANc9pH84Nw1zeWLXkbWuvWdxhZXbuuqlqqm/MEcPCeYi+xk8/4Q7xvObWflSwDJ6QCSXg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=r9VzzRi+; arc=none smtp.client-ip=115.124.30.118
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730458374; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	bh=GlyU/jmz8E+JausTqFQnV6XgtV59/K6paYp/eLXbSPI=;
-	b=r9VzzRi+TAQ0rrZsKlZFmKidIdjwhmlRjeq+gOmEjJxLxvkM4PGJKEZ53PJ89nvm9PVsL+xFdbFRHDI/EA1sNWPIojJOu4rNWgbN3l7xlPUx4zsuqb1QR10K+zA2+qe5nAtLIYDnnFSnuePVkVpRGtVXpTI1LKIFczob0TkzEtY=
-Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WIRFmgx_1730458373 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Fri, 01 Nov 2024 18:52:54 +0800
-Date: Fri, 1 Nov 2024 18:52:53 +0800
-From: Dust Li <dust.li@linux.alibaba.com>
-To: liqiang <liqiang64@huawei.com>, wenjia@linux.ibm.com,
-	jaka@linux.ibm.com, alibuda@linux.alibaba.com,
-	tonylu@linux.alibaba.com, guwen@linux.alibaba.com
-Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, luanjianhai@huawei.com,
-	zhangxuzhou4@huawei.com, dengguangxing@huawei.com,
-	gaochao24@huawei.com, kuba@kernel.org
-Subject: Re: [PATCH net-next] net/smc: Optimize the search method of reused
- buf_desc
-Message-ID: <20241101105253.GG101007@linux.alibaba.com>
-Reply-To: dust.li@linux.alibaba.com
-References: <20241101082342.1254-1-liqiang64@huawei.com>
+	s=arc-20240116; t=1730459166; c=relaxed/simple;
+	bh=yPUb7r2ZS5jcg/tT8Dywot1IlWzoNuc0xmIyeqy0J3E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oB9cigWZ0eAKK00PROQQZIX1zYgk1WCUaYrRN+G9eg6OgzsJzedHQzIaAAVaeH69/Fv0KjNclfOCASsFSSWJrOVmJ4/0Q7Jl/Q6m6Y8tHet+Dni7YAnt262BnigUVlUonu8/VKvocXtdjF+Td1OmvfD9R2slco9kNEG/+sJsZtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=h9Pz5WED; arc=none smtp.client-ip=209.85.167.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-53a097aa3daso1781653e87.1
+        for <netdev@vger.kernel.org>; Fri, 01 Nov 2024 04:06:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730459162; x=1731063962; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=7hQyYW7v0sIC58MsRpBNiWuQFllkcDdCEwJ8wx46KLI=;
+        b=h9Pz5WEDHN1PROxrxdt7Sv8x8wOBE33CkjChJ9UN5gK3bRG8GWUjWufTG6D5Yd7+n8
+         HVBs72PdFHKaKDpbILBTPhXledO0+XAOhAR1oKj+mQRm1UIpoXBj5UbvPyfEsr1rfsIJ
+         Jgiu5Z5VZtumsJyV7PNS8ugAYYN5fcAaiuoRXLPZ9XrclizJknHyLZGHlkd4hMH+jWEI
+         tvqyKLb9pUIjL1496vxMbNw++QbuNNYIxlYp5Mg2GdThdo1GocqZu2aDIg/mQYFZTGoC
+         HBi8FtyC+5VJdBZmuHd3WCeX9AAnxodBrGsCaxag6hS43PlBXiPhC9tkIo8nDyo5l4o2
+         a+9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730459162; x=1731063962;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=7hQyYW7v0sIC58MsRpBNiWuQFllkcDdCEwJ8wx46KLI=;
+        b=XV8s7WUdz3mUToIeILKoBdNJtFiCOj44LNrBFQ/GKhH9w/rA/sDHpb4W/L1w6Lacwi
+         w/FQitYiO0aBUmyJNjjNWmrObsoVtl5qZorSs2CWDrvfJ966LJAv7ZiCUGB3aValHhSz
+         GsnuBVpTrbMrh7KPF59xPHhtpZR7ov4vawr2IuV9nhdLHRzZwHJh0bP4SR6drbM1csV3
+         rsjPOii2cQ/xD+LEZD0DeLr+OIR/WeLb+igBo2KUH+hOA9QnbNjhseNHK2+YufeNqsGI
+         avvT+ve5rYNIZW9Z/Mxb4iURxHuPNlaH6l71eCx092uHP5/OE31luyttJmXhQ3h763um
+         QlnQ==
+X-Gm-Message-State: AOJu0YyikK4TFPq+S/MBQlGt444YAiQ7x4C5dyRqY0OKWCkPRBEAqrjm
+	5jWJgf4WYf650ASmjhcBR7dXUIHnTJe9zC+AcMq+cj34QFYxG3IC
+X-Google-Smtp-Source: AGHT+IE2PVDRNCnfy55wO9wPCi0JJZjqTd41gIunuuKMiX+vr2YBkfMhuaQQtPWiiSpB3GUj4XeF+A==
+X-Received: by 2002:a05:6512:2244:b0:535:6942:29ea with SMTP id 2adb3069b0e04-53d65de556dmr1533225e87.11.1730459161821;
+        Fri, 01 Nov 2024 04:06:01 -0700 (PDT)
+Received: from localhost.localdomain ([83.217.201.225])
+        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53c7bcce6d9sm515242e87.120.2024.11.01.04.06.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 04:06:00 -0700 (PDT)
+From: Denis Kirjanov <kirjanov@gmail.com>
+To: stephen@networkplumber.org,
+	dsahern@kernel.org
+Cc: netdev@vger.kernel.org,
+	Denis Kirjanov <kirjanov@gmail.com>
+Subject: [iproute2-next] ifstat: handle fclose errors
+Date: Fri,  1 Nov 2024 14:05:39 +0300
+Message-ID: <20241101110539.7046-1-kirjanov@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101082342.1254-1-liqiang64@huawei.com>
+Content-Transfer-Encoding: 8bit
 
-On 2024-11-01 16:23:42, liqiang wrote:
->We create a lock-less link list for the currently 
->idle reusable smc_buf_desc.
->
->When the 'used' filed mark to 0, it is added to 
->the lock-less linked list. 
->
->When a new connection is established, a suitable 
->element is obtained directly, which eliminates the 
->need for traversal and search, and does not require 
->locking resource.
->
->A lock-less linked list is a linked list that uses 
->atomic operations to optimize the producer-consumer model.
->
->I didn't find a suitable public benchmark, so I tested the 
->time-consuming comparison of this function under multiple 
->connections based on redis-benchmark (test in smc loopback-ism mode):
+fclose() can fail so print an error
 
-I think you can run test wrk/nginx test with short-lived connection.
-For example:
+Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+---
+ misc/ifstat.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
 
-```
-# client
-wrk -H "Connection: close" http://$serverIp
-
-# server
-nginx
-```
-
->
->    1. On the current version:
->        [x.832733] smc_buf_get_slot cost:602 ns, walk 10 buf_descs
->        [x.832860] smc_buf_get_slot cost:329 ns, walk 12 buf_descs
->        [x.832999] smc_buf_get_slot cost:479 ns, walk 17 buf_descs
->        [x.833157] smc_buf_get_slot cost:679 ns, walk 13 buf_descs
->        ...
->        [x.045240] smc_buf_get_slot cost:5528 ns, walk 196 buf_descs
->        [x.045389] smc_buf_get_slot cost:4721 ns, walk 197 buf_descs
->        [x.045537] smc_buf_get_slot cost:4075 ns, walk 198 buf_descs
->        [x.046010] smc_buf_get_slot cost:6476 ns, walk 199 buf_descs
->
->    2. Apply this patch:
->        [x.180857] smc_buf_get_slot_free cost:75 ns
->        [x.181001] smc_buf_get_slot_free cost:147 ns
->        [x.181128] smc_buf_get_slot_free cost:97 ns
->        [x.181282] smc_buf_get_slot_free cost:132 ns
->        [x.181451] smc_buf_get_slot_free cost:74 ns
->
->It can be seen from the data that it takes about 5~6us to traverse 200 
->times, and the time complexity of the lock-less linked algorithm is O(1).
->
->And my test process is only single-threaded. If multiple threads 
->establish SMC connections in parallel, locks will also become a 
->bottleneck, and lock-less linked can solve this problem well.
->
->SO I guess this patch should be beneficial in scenarios where a 
->large number of short connections are parallel?
-
-Based on your data, I'm afraid the short-lived connection
-test won't show much benificial. Since the time to complete a
-SMC-R connection should be several orders of magnitude larger
-than 100ns.
-
-Best regards,
-Dust
+diff --git a/misc/ifstat.c b/misc/ifstat.c
+index faebe938..b0c1ef10 100644
+--- a/misc/ifstat.c
++++ b/misc/ifstat.c
+@@ -1003,7 +1003,8 @@ int main(int argc, char *argv[])
+ 			if ((tfp = fopen("/proc/uptime", "r")) != NULL) {
+ 				if (fscanf(tfp, "%ld", &uptime) != 1)
+ 					uptime = -1;
+-				fclose(tfp);
++				if (fclose(tfp))
++					perror("ifstat: fclose");
+ 			}
+ 			if (uptime >= 0 && time(NULL) >= stb.st_mtime+uptime) {
+ 				fprintf(stderr, "ifstat: history is aged out, resetting\n");
+@@ -1035,7 +1036,8 @@ int main(int argc, char *argv[])
+ 				fprintf(stderr, "ifstat: history is stale, ignoring it.\n");
+ 				hist_db = NULL;
+ 			}
+-			fclose(sfp);
++			if (fclose(sfp))
++				perror("ifstat: fclose");
+ 		}
+ 	} else {
+ 		if (fd >= 0)
+@@ -1064,7 +1066,8 @@ int main(int argc, char *argv[])
+ 
+ 		json_output = 0;
+ 		dump_raw_db(hist_fp, 1);
+-		fclose(hist_fp);
++		if (fclose(hist_fp))
++			perror("ifstat: fclose");
+ 	}
+ 	exit(0);
+ }
+-- 
+2.43.0
 
 
