@@ -1,436 +1,183 @@
-Return-Path: <netdev+bounces-140993-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2E809B8FFE
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 12:08:35 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A0DBA9B905D
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 12:37:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2653282C7E
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:08:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6007A28130E
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:37:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 74773185E53;
-	Fri,  1 Nov 2024 11:08:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9500E199238;
+	Fri,  1 Nov 2024 11:37:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="MestVr0T"
 X-Original-To: netdev@vger.kernel.org
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2072.outbound.protection.outlook.com [40.107.22.72])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B21B14F126;
-	Fri,  1 Nov 2024 11:08:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730459308; cv=none; b=F7xER8/RsYTqKemovCSxXq/3tBH/mWSamYVV6+njfV6QmT9Y/0uscsIRgYMLXMVwUCpcoZLN91Z9CmH1Xw+UXDJQ2CSQG3HFBfCLrM2mmrdY9pV7Ln7SV4A3cq6B8KTK/cjl5yg4c3O21swEd5pSLfZb2DWgYy+/3VCgnQ/DGGE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730459308; c=relaxed/simple;
-	bh=N24mt5ovwBEmQOtPdNhGmB2V+k39f517dREE5jgDYAo=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=VQxuCjbFyjR+3LYrfEfHkHWxl1tohdL+G2qS6kwHe2HSqgsGpHi9cegeaaUerNbyvJ3IdwpfMIisiMJFQnXK2/QE5ubnpRKVXL0sSfISYOTQPMWaA4DEt6FLdQ/VMcYMTmrv6P1m+8k8hcvXJjA18oDWc9ZskEISw8ykptv7EaQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
-Received: from mail.maildlp.com (unknown [172.19.93.142])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Xfyl54hJ4z4f3jXl;
-	Fri,  1 Nov 2024 19:08:01 +0800 (CST)
-Received: from mail02.huawei.com (unknown [10.116.40.128])
-	by mail.maildlp.com (Postfix) with ESMTP id 6E2C41A018D;
-	Fri,  1 Nov 2024 19:08:19 +0800 (CST)
-Received: from k01.huawei.com (unknown [10.67.174.197])
-	by APP4 (Coremail) with SMTP id gCh0CgAHL4OgtiRnaRMxAg--.38718S2;
-	Fri, 01 Nov 2024 19:08:17 +0800 (CST)
-From: Xu Kuohai <xukuohai@huaweicloud.com>
-To: bpf@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Eduard Zingerman <eddyz87@gmail.com>,
-	Yonghong Song <yonghong.song@linux.dev>,
-	Kui-Feng Lee <thinker.li@gmail.com>
-Subject: [PATCH bpf-next v2] bpf: Add kernel symbol for struct_ops trampoline
-Date: Fri,  1 Nov 2024 19:19:48 +0800
-Message-Id: <20241101111948.1570547-1-xukuohai@huaweicloud.com>
-X-Mailer: git-send-email 2.39.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18E4152787;
+	Fri,  1 Nov 2024 11:37:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.22.72
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730461066; cv=fail; b=BRk9kW4KUT++LqsOQQzjbvQEYU94Oa+a/c0IVSyKVnVhEf4moNmIdgBXw2CFsqHEKmBjKpGuKefdjGJnLrg8CH2HoM1nUFPiR6YQVjZIccFZDf/mzBIGLC3IOJtN4+U3nqg8IyDbHB03XIf+SfTkWz3LW85NEs9n7MNh0z0+2yw=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730461066; c=relaxed/simple;
+	bh=I9wNHwDD+PQ07OITLUof7q8TPAWxbdZ7MuJNAdl0N6M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=JMZQ9+YGtNVW3zWYhw6TedpSNN+CFNpuTMZ5zrKKxF44Fs0tIHgFl7cQO64jL6en3/KjpIMgMF+VSLQ3sPhMKM09mcDdIxggaB1fBjOTk20JVXRH4V5aTIP4XWJDXVHbWcinxGGEgdtPPEDrbmC1O1RG0P21sn/VJEtT6cvpve4=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=MestVr0T; arc=fail smtp.client-ip=40.107.22.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=ZGTgzTqZaVIZEmRINVtpB1Ow8DxUqrC587I8tTuh0X/6m1bCqy0Vgai1dS5B+afrPDGFKsSmqsG3AkmML/vd2R6JSNB7bF2v3qDOJrGOzMtqZAraLeYgOuImorIsM3qssHqfvOCjBsZUvp+++e7ZeiXvrmnPVGhUxXQjHxtO9ZfY/SpAp20f6yus/XsHi4lKebtyMEDKgIYPjzWwPfh8W3JPf6TWX1lINLtcWhAqzfJuN6KnYiqrwARx27DV9dpLX8YFlf6ogY2lLqJQr5Opmj59V5HxJ6hS15OySk7L6aJ60UYQ7+WHXZvD6H1mYA+eBq0epFD0AzOukrEIC2tvpQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zf4VOHp1okd342i+8/yEI507BPHOa1qttyCqCUNSr5c=;
+ b=UxtHmyZyw8a8wkj3JE/KTMCcnlLR07z7OOrF4WPHlVMDZYPOIIPM8hz9Nvom7hGj5pUWE6JKWNcvMu+79GZPZFjR7uekCjNkiKbSewPm2fl1AxksM7Vx8jMU7zqnn0HJHjdgxFCVev8PUDcVjHNubpDmsx7zrJkoDdPaVcwp8MH7W1Hrgvft8AXksfH0Qse/nXfmFCrS0lE5uQb4GWaQQVy0JN1DUFaLrSsY0FGVV/8xeRhv8hYIt84jYr4xGUsCiiLubzNsKdxXauAGsHofCu1Ni+W4yQeSTZe1uBTlbmD0i/g6mYbTPTBFAflRcgYUnn3ODsSSWbL3vC2MVS875Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zf4VOHp1okd342i+8/yEI507BPHOa1qttyCqCUNSr5c=;
+ b=MestVr0TC09B5cllFxjDyOhbPRA85rXXQWhDRmlhN3rHpgyOBQ5YhJe3qWN3gu+Vd+RtpHVtiTEai9ZbRRgGXo8HaiKt4mT3tr0tBXt8Frji43OV1lDvasep0Ijx4qV10BL+ceY2KJpMhrSa/DvO7fXPZhSF2EFBKtIAtX/anug9T7qdMO1+y8i9tw7szbJBaxyO0OPVSIighOt+9O37egwHISIV4kGGm2viay+meetWE6LFtDy06XvTrxOOWLMjxkWhh/v0KaDkBGz5/knbzR4HgNYHbRW+N1NsSxnMb8gtS0QrMX1xHxTOKV4IjcHMrfVJLN/auVwIraAkSqh6bg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
+ by AS8PR04MB7573.eurprd04.prod.outlook.com (2603:10a6:20b:29e::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.18; Fri, 1 Nov
+ 2024 11:37:41 +0000
+Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
+ ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.027; Fri, 1 Nov 2024
+ 11:37:40 +0000
+Date: Fri, 1 Nov 2024 13:37:37 +0200
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, andrew+netdev@lunn.ch, claudiu.manoil@nxp.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: Re: [PATCH net 1/2] net: enetc: allocate vf_state during PF probes
+Message-ID: <20241101113737.dqrp3w2tjrnumyig@skbuf>
+References: <20241031060247.1290941-1-wei.fang@nxp.com>
+ <20241031060247.1290941-2-wei.fang@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241031060247.1290941-2-wei.fang@nxp.com>
+X-ClientProxiedBy: VI1PR06CA0122.eurprd06.prod.outlook.com
+ (2603:10a6:803:a0::15) To AM8PR04MB7779.eurprd04.prod.outlook.com
+ (2603:10a6:20b:24b::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:gCh0CgAHL4OgtiRnaRMxAg--.38718S2
-X-Coremail-Antispam: 1UD129KBjvAXoW3KF17AF47GF18WFWfuryUWrg_yoW8Gry8Wo
-	W7Jr1UXFyxJw18XrZ5Gwn5XFWaqrWUtr9rAr4Fqrn5WF4fJ3yUKry7Gr15JFWvq348tF47
-	Aw4UK3yrA3Z3JF1rn29KB7ZKAUJUUUU8529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUY97kC6x804xWl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK
-	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4
-	AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF
-	7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7
-	CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8C
-	rVC2j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4
-	IE7xkEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x02
-	62kKe7AKxVWUtVW8ZwCY1x0264kExVAvwVAq07x20xyl42xK82IYc2Ij64vIr41l4I8I3I
-	0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWU
-	GVWUWwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI
-	0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0
-	rVWUJVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r
-	4UYxBIdaVFxhVjvjDU0xZFpf9x07jeLvtUUUUU=
-X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS8PR04MB7573:EE_
+X-MS-Office365-Filtering-Correlation-Id: ccb0b0c1-458d-4aaa-8ff0-08dcfa6997f1
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|376014|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?qIZ7ijnR4aMC8NSL92xL8DiSAPjxaolOta0hyO/0XJgxHomau7WoESPWkBo+?=
+ =?us-ascii?Q?hQfb9kZqD8ap3nmMwXE3FANWuyxrno9Zuxs9OXzXNu8GnuclvKIjy8v4GAnO?=
+ =?us-ascii?Q?1Jt7CSx0kWqW7fOSiOzXu7OhX/zF4Q26au27i5QGQGik8WIwsow5D4SvhmCj?=
+ =?us-ascii?Q?uSa7Id4TOldC6yt/JbgBoDia75ESGWQqNyZHVqGm/HbMXJwmC7s17gFk6Cy8?=
+ =?us-ascii?Q?jHsoVy0pvyoR7aJjbtGYFjz/+2PDy+9NfqbLfIUWM/kzEM2esnxVsaF8sM/Y?=
+ =?us-ascii?Q?nw8Ubpap/tnqaIxTFmZe8p4M0XxBylTUCbC1mZmHm/WeOcNXA0+hHAIU/d5w?=
+ =?us-ascii?Q?aMhp0UQw4LhhsZbDj+gWD3aBaRvSwsS7LaKEnCsstVC5bPMB99Ae/GIHu5JQ?=
+ =?us-ascii?Q?IyRgnYYcz8BCKrh3vUzupVbcOkbJZ91fgStXoKVNR24UbsAEpQW4Yz5hZsVx?=
+ =?us-ascii?Q?EIya3DBGqJfCm2rbsY5aHNgp1Rx/4EDXDPlfOOX/UldVcurPklT4/fdRI44S?=
+ =?us-ascii?Q?bjMMIQr0alpqrgFlzz00n7rytK0wQBFpNsNTmZ0B7QpxP+Eizx3OaYYFY2aE?=
+ =?us-ascii?Q?lMQ9UlNp9c62NADp81qSsqL7rfLcKvjyKphmwpsMkXziY/mxEG3/hibA070y?=
+ =?us-ascii?Q?2kmecI3XlpqIeH4FYiGsFFExhGlqg+LK3JzXXqC4yErMmXYSe7vP98BrTcAg?=
+ =?us-ascii?Q?y9LOfYioMjFSwyGvicDZTH9XyPWkB24WkGNdT6r7LE4Rd/01idQ3M4bwaB9P?=
+ =?us-ascii?Q?7RLrs6tET6CDEBn9wmXbRUTOg/KrI5EezDi80Vqm2vXGzX2aeWXduiVKb//2?=
+ =?us-ascii?Q?BRKmQINzvBB7uTVNXrur/+z61Zzm0iiZ69Y5EfAuFGiRyJ84C0nQrE0jNxH/?=
+ =?us-ascii?Q?hcMQQcJVz0CuXbchgQkbiJzK4tFpZOiNUraJ1Hb5J2JwhX4arOgpIzl3rPBP?=
+ =?us-ascii?Q?KwFs7ed18ULkYZwMteqxMTfthkjdcrWHVLMmrWnAA397ihzrPmaDUuGcmOtk?=
+ =?us-ascii?Q?YdZCxnyL9C5eg3bD8pKlcExKQMJc5pH310vF29EtZebMoVcRMv+VSTecBIbM?=
+ =?us-ascii?Q?utdr6wIJUoi83Hkp+1gnlqTxFqNOCM0hrTLQYwahoznIIZOhHn3JE8w/wqSU?=
+ =?us-ascii?Q?LetagjtBfGk2FZp4ggW+VkN9JPZOa5i1sooElz0xhlTTRw8Q1sSsOeusYqf+?=
+ =?us-ascii?Q?GyI2Flx2vzYwb8V6LinPbJInaARZ6cUYEe/oH3AobJ+d02M//W7t0sHMWS2S?=
+ =?us-ascii?Q?7SJY9pOTWwRCxHCCABAoWmNnN0X/5dgxcPmR+iBtg/QLna6TDMz00VEnszMm?=
+ =?us-ascii?Q?m4fLm9Nnqu3w9xEoTqvhlD2a?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(376014)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?3kL/k9ByACePTf99ZWwZLLHHNBHuQ1s0vkDXxH6gbreB9HCjEXfdmyVUxhEN?=
+ =?us-ascii?Q?y2Qh9c4nvI4cf0ufqsxwbKzz5FaGrMt1gBqNOF2uCk/SdkcVzDlYF5SAdhf+?=
+ =?us-ascii?Q?WP10zHb4b7Yps8cx5Vc4YFK/b8yMT9XkAbRfb9YZmrqllDXagsZs612Y+UhM?=
+ =?us-ascii?Q?zamgaYa8X+kyqZHq3FJoy/tIUOBeR9rlS4FzH+t4oydpabKLwe6OzC4moqNn?=
+ =?us-ascii?Q?OIJK9HQOEzpdZEoC2JqWA9ZoR5U5cXMwzCddK2B0heg8eiTzV7OndGebF//s?=
+ =?us-ascii?Q?0B4qUYG6veX4HP6ZzOs5kw5DXOUNZcekRixG2W+eGcyBV41+dIRtdr771kkg?=
+ =?us-ascii?Q?o3aYR59rAJJ8xO1omoxQJJa5r9YowApawb3TWSy1/iTO7q/c2EinetGZW9R3?=
+ =?us-ascii?Q?/m/hROWfSSjlaglYoWrrO9BHrF6KKnxH7dTMMWGpdODXAYw4l6UwHlVZRQqf?=
+ =?us-ascii?Q?9QojnciloWwMUeyn+Mje3DYJWDJAymo4vn2//AqAqFCAVJmfFJuIvPmxSKbF?=
+ =?us-ascii?Q?2stvsoxq426g4sMmBQbWN9q19n7AtXlY+ODGh2stNmdaFoI67oEvX1nlFLhe?=
+ =?us-ascii?Q?UbsAJkVsufWw9sl/BD0KeCRKBPSDdD5TWHYaGqp/To5G9BiP8fIAYrIHiuCp?=
+ =?us-ascii?Q?HgsJXPHyBybZcvqSG4glD54NK88boJIcBfYOxfqUSq1CBoLnFejYXqndmKdd?=
+ =?us-ascii?Q?iv7Hv2/6KFrIAJRRTsjg1Ebm6E/zECFbMQXg2sFRrfpLLZEqwdWWoQuhKYdh?=
+ =?us-ascii?Q?SdFI84/NL6JieX1iWujL33mPErYuWtoVcRDjBAxuw/DyIDDagJLg/WEo5rnS?=
+ =?us-ascii?Q?whsLWhTmTlRH9m1IovsnxkR7aTyM3kDXGk9/OQ9oISE2B1T3PWX/uKKXhu/1?=
+ =?us-ascii?Q?0jEq6PrrjowfLRWB2EEFtTwsj6sEx2VLbQoAd+P6Al8FP3F7n2h2zdcftfk7?=
+ =?us-ascii?Q?H+yPYxpeyYO0xiTUHeAspm7JEP2I1b74cq7wR/TvE3ffJ5v0h6JjkYrGek5E?=
+ =?us-ascii?Q?F21eeOZbwfWYRmeJU8e15MFFv2pYLPk45Gu5NkSYU5Dhk4BDTpev7CqXkZQm?=
+ =?us-ascii?Q?CCX3eDRFDDmk58GD8KxnU+jr1QLsc/CHpUZXbJ8ezRL3ilwjBZVvflm4nAk6?=
+ =?us-ascii?Q?rTfztQ9BdPVsfzRLxVkknAX7tPia3KriwBu2Mntsd2WLD6UWFKLbbSMLrMu9?=
+ =?us-ascii?Q?alh4KYYwADDgckxLQECj91Gqpi+0J29RqxehXoanOE4Ms38q97tcMbuB2Vd6?=
+ =?us-ascii?Q?oYl/SncCp6DRcbRMkQDqp5v8okwDZehLUEQeQ76Kp9YQcJgUiF3wwcd9ob2e?=
+ =?us-ascii?Q?sj/PkeRDaD8v3b9u311owE6SXh9zhA4d6RhiRL7qIBEsN7nbl6CWEMeeFf6V?=
+ =?us-ascii?Q?o7FYiHZ1zGzerLFZg+rIgPGi8WuF8gVbDxPr0ElV4kPMucwonQrdt71PiO/b?=
+ =?us-ascii?Q?DfMdN2mjNstIM9Mw0BDavTuEGvhxdwD/D9CJ5POe5pmCeUSVkXaXuMJ31a5q?=
+ =?us-ascii?Q?4eu9tOSI7m42z9Fw1te/4lVjuxAO3d8gCzihDgQSQjs6fgKHYmiiK5FlCDDi?=
+ =?us-ascii?Q?KrqLBzgIWidFcUIev8ZUAvxJ/w+fTLk5NeP7jqf0hrRtNxs/18DCbcD3axqW?=
+ =?us-ascii?Q?og=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ccb0b0c1-458d-4aaa-8ff0-08dcfa6997f1
+X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2024 11:37:40.9505
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: l5Ljn5b4+NDC/O5DSjhzrDsnyJta2X+u8BytsQJgqqLq090r8fwi36nlE5MoZ9rkSrbbYyYn1KRZNbyjnbnLrQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB7573
 
-From: Xu Kuohai <xukuohai@huawei.com>
+On Thu, Oct 31, 2024 at 02:02:46PM +0800, Wei Fang wrote:
+> In the previous implementation, vf_state is allocated memory only when VF
+> is enabled. However, net_device_ops::ndo_set_vf_mac() may be called before
+> VF is enabled to configure the MAC address of VF. If this is the case,
+> enetc_pf_set_vf_mac() will access vf_state, resulting in access to a null
+> pointer. The simplified error log is as follows.
+> 
+> root@ls1028ardb:~# ip link set eno0 vf 1 mac 00:0c:e7:66:77:89
+> [  173.543315] Unable to handle kernel NULL pointer dereference at virtual address 0000000000000004
+> [  173.637254] pc : enetc_pf_set_vf_mac+0x3c/0x80 Message from sy
+> [  173.641973] lr : do_setlink+0x4a8/0xec8
+> [  173.732292] Call trace:
+> [  173.734740]  enetc_pf_set_vf_mac+0x3c/0x80
+> [  173.738847]  __rtnl_newlink+0x530/0x89c
+> [  173.742692]  rtnl_newlink+0x50/0x7c
+> [  173.746189]  rtnetlink_rcv_msg+0x128/0x390
+> [  173.750298]  netlink_rcv_skb+0x60/0x130
+> [  173.754145]  rtnetlink_rcv+0x18/0x24
+> [  173.757731]  netlink_unicast+0x318/0x380
+> [  173.761665]  netlink_sendmsg+0x17c/0x3c8
+> 
+> Fixes: d4fd0404c1c9 ("enetc: Introduce basic PF and VF ENETC ethernet drivers")
+> Signed-off-by: Wei Fang <wei.fang@nxp.com>
+> ---
 
-Without kernel symbols for struct_ops trampoline, the unwinder may
-produce unexpected stacktraces.
-
-For example, the x86 ORC and FP unwinders check if an IP is in kernel
-text by verifying the presence of the IP's kernel symbol. When a
-struct_ops trampoline address is encountered, the unwinder stops due
-to the absence of symbol, resulting in an incomplete stacktrace that
-consists only of direct and indirect child functions called from the
-trampoline.
-
-The arm64 unwinder is another example. While the arm64 unwinder can
-proceed across a struct_ops trampoline address, the corresponding
-symbol name is displayed as "unknown", which is confusing.
-
-Thus, add kernel symbol for struct_ops trampoline. The name is
-bpf_trampoline_<PROG_NAME>, where PROG_NAME is the name of the
-struct_ops prog linked to the trampoline.
-
-Below is a comparison of stacktraces captured on x86 by perf record,
-before and after this patch.
-
-Before:
-
-... FP chain: nr:4
-.....  0: ffffffffffffff80 # PERF_CONTEXT_KERNEL mark
-.....  1: ffffffff8116545d
-.....  2: ffffffff81167fcc
-.....  3: ffffffff813088f4
- ... thread: iperf:595
- ...... dso: /proc/kcore
-iperf     595 [002]  9015.616291:     824245  cycles:
-        ffffffff8116545d __lock_acquire+0xad ([kernel.kallsyms])
-        ffffffff81167fcc lock_acquire+0xcc ([kernel.kallsyms])
-        ffffffff813088f4 __bpf_prog_enter+0x34 ([kernel.kallsyms])
-
-After:
-
-... FP chain: nr:44
-.....  0: ffffffffffffff80 # PERF_CONTEXT_KERNEL mark
-.....  1: ffffffff81165930
-.....  2: ffffffff81167fcc
-.....  3: ffffffff813088f4
-.....  4: ffffffffc000da5e
-.....  5: ffffffff81f243df
-.....  6: ffffffff81f27326
-.....  7: ffffffff81f3a3c3
-.....  8: ffffffff81f3c99b
-.....  9: ffffffff81ef9870
-..... 10: ffffffff81ef9b13
-..... 11: ffffffff81ef9c69
-..... 12: ffffffff81ef9f47
-..... 13: ffffffff81efa15d
-..... 14: ffffffff81efa9c0
-..... 15: ffffffff81d979eb
-..... 16: ffffffff81d987e8
-..... 17: ffffffff81ddce16
-..... 18: ffffffff81bc7b90
-..... 19: ffffffff81bcf677
-..... 20: ffffffff81bd1b4f
-..... 21: ffffffff81d99693
-..... 22: ffffffff81d99a52
-..... 23: ffffffff810c9eb2
-..... 24: ffffffff810ca631
-..... 25: ffffffff822367db
-..... 26: ffffffff824015ef
-..... 27: ffffffff811678e6
-..... 28: ffffffff814f7d85
-..... 29: ffffffff814f8119
-..... 30: ffffffff81492fb9
-..... 31: ffffffff81355c53
-..... 32: ffffffff813d79d7
-..... 33: ffffffff813d88fc
-..... 34: ffffffff8139a52e
-..... 35: ffffffff8139a661
-..... 36: ffffffff8152c193
-..... 37: ffffffff8152cbc5
-..... 38: ffffffff814a5908
-..... 39: ffffffff814a72d3
-..... 40: ffffffff814a758b
-..... 41: ffffffff81008869
-..... 42: ffffffff822323e8
-..... 43: ffffffff8240012f
- ... thread: sleep:493
- ...... dso: /proc/kcore
-sleep     493 [000]    55.483168:     410428  cycles:
-        ffffffff81165930 __lock_acquire+0x580 ([kernel.kallsyms])
-        ffffffff81167fcc lock_acquire+0xcc ([kernel.kallsyms])
-        ffffffff813088f4 __bpf_prog_enter+0x34 ([kernel.kallsyms])
-        ffffffffc000da5e bpf_trampoline_bpf_prog_075f577900bac1d2_bpf_cubic_acked+0x3a ([kernel.kallsyms])
-        ffffffff81f243df tcp_ack+0xd4f ([kernel.kallsyms])
-        ffffffff81f27326 tcp_rcv_established+0x3b6 ([kernel.kallsyms])
-        ffffffff81f3a3c3 tcp_v4_do_rcv+0x193 ([kernel.kallsyms])
-        ffffffff81f3c99b tcp_v4_rcv+0x11fb ([kernel.kallsyms])
-        ffffffff81ef9870 ip_protocol_deliver_rcu+0x50 ([kernel.kallsyms])
-        ffffffff81ef9b13 ip_local_deliver_finish+0xb3 ([kernel.kallsyms])
-        ffffffff81ef9c69 ip_local_deliver+0x79 ([kernel.kallsyms])
-        ffffffff81ef9f47 ip_sublist_rcv_finish+0xb7 ([kernel.kallsyms])
-        ffffffff81efa15d ip_sublist_rcv+0x18d ([kernel.kallsyms])
-        ffffffff81efa9c0 ip_list_rcv+0x110 ([kernel.kallsyms])
-        ffffffff81d979eb __netif_receive_skb_list_core+0x21b ([kernel.kallsyms])
-        ffffffff81d987e8 netif_receive_skb_list_internal+0x208 ([kernel.kallsyms])
-        ffffffff81ddce16 napi_gro_receive+0xf6 ([kernel.kallsyms])
-        ffffffff81bc7b90 virtnet_receive_done+0x340 ([kernel.kallsyms])
-        ffffffff81bcf677 receive_buf+0xd7 ([kernel.kallsyms])
-        ffffffff81bd1b4f virtnet_poll+0xcbf ([kernel.kallsyms])
-        ffffffff81d99693 __napi_poll.constprop.0+0x33 ([kernel.kallsyms])
-        ffffffff81d99a52 net_rx_action+0x1c2 ([kernel.kallsyms])
-        ffffffff810c9eb2 handle_softirqs+0xe2 ([kernel.kallsyms])
-        ffffffff810ca631 irq_exit_rcu+0x91 ([kernel.kallsyms])
-        ffffffff822367db sysvec_apic_timer_interrupt+0x9b ([kernel.kallsyms])
-        ffffffff824015ef asm_sysvec_apic_timer_interrupt+0x1f ([kernel.kallsyms])
-        ffffffff811678e6 lock_release+0x186 ([kernel.kallsyms])
-        ffffffff814f7d85 prepend_path+0x395 ([kernel.kallsyms])
-        ffffffff814f8119 d_path+0x159 ([kernel.kallsyms])
-        ffffffff81492fb9 file_path+0x19 ([kernel.kallsyms])
-        ffffffff81355c53 perf_event_mmap+0x1e3 ([kernel.kallsyms])
-        ffffffff813d79d7 mmap_region+0x2e7 ([kernel.kallsyms])
-        ffffffff813d88fc do_mmap+0x4ec ([kernel.kallsyms])
-        ffffffff8139a52e vm_mmap_pgoff+0xde ([kernel.kallsyms])
-        ffffffff8139a661 vm_mmap+0x31 ([kernel.kallsyms])
-        ffffffff8152c193 elf_load+0xa3 ([kernel.kallsyms])
-        ffffffff8152cbc5 load_elf_binary+0x655 ([kernel.kallsyms])
-        ffffffff814a5908 bprm_execve+0x2a8 ([kernel.kallsyms])
-        ffffffff814a72d3 do_execveat_common.isra.0+0x193 ([kernel.kallsyms])
-        ffffffff814a758b __x64_sys_execve+0x3b ([kernel.kallsyms])
-        ffffffff81008869 x64_sys_call+0x1399 ([kernel.kallsyms])
-        ffffffff822323e8 do_syscall_64+0x68 ([kernel.kallsyms])
-        ffffffff8240012f entry_SYSCALL_64_after_hwframe+0x76 ([kernel.kallsyms])
-
-Fixes: 85d33df357b6 ("bpf: Introduce BPF_MAP_TYPE_STRUCT_OPS")
-Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
----
-v2:
-Refine the commit message for clarity and fix a test bot warning
-
-v1:
-https://lore.kernel.org/bpf/20241030111533.907289-1-xukuohai@huaweicloud.com/
----
- include/linux/bpf.h         |  3 +-
- kernel/bpf/bpf_struct_ops.c | 67 +++++++++++++++++++++++++++++++++++++
- kernel/bpf/dispatcher.c     |  3 +-
- kernel/bpf/trampoline.c     |  9 +++--
- 4 files changed, 78 insertions(+), 4 deletions(-)
-
-diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-index c3ba4d475174..46f8d6c1a55c 100644
---- a/include/linux/bpf.h
-+++ b/include/linux/bpf.h
-@@ -1402,7 +1402,8 @@ int arch_prepare_bpf_dispatcher(void *image, void *buf, s64 *funcs, int num_func
- void bpf_dispatcher_change_prog(struct bpf_dispatcher *d, struct bpf_prog *from,
- 				struct bpf_prog *to);
- /* Called only from JIT-enabled code, so there's no need for stubs. */
--void bpf_image_ksym_add(void *data, unsigned int size, struct bpf_ksym *ksym);
-+void bpf_image_ksym_init(void *data, unsigned int size, struct bpf_ksym *ksym);
-+void bpf_image_ksym_add(struct bpf_ksym *ksym);
- void bpf_image_ksym_del(struct bpf_ksym *ksym);
- void bpf_ksym_add(struct bpf_ksym *ksym);
- void bpf_ksym_del(struct bpf_ksym *ksym);
-diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-index fda3dd2ee984..172a081ed1c3 100644
---- a/kernel/bpf/bpf_struct_ops.c
-+++ b/kernel/bpf/bpf_struct_ops.c
-@@ -38,6 +38,9 @@ struct bpf_struct_ops_map {
- 	 * that stores the func args before calling the bpf_prog.
- 	 */
- 	void *image_pages[MAX_TRAMP_IMAGE_PAGES];
-+	u32 ksyms_cnt;
-+	/* ksyms for bpf trampolines */
-+	struct bpf_ksym *ksyms;
- 	/* The owner moduler's btf. */
- 	struct btf *btf;
- 	/* uvalue->data stores the kernel struct
-@@ -586,6 +589,35 @@ int bpf_struct_ops_prepare_trampoline(struct bpf_tramp_links *tlinks,
- 	return 0;
- }
- 
-+static void bpf_struct_ops_ksym_init(struct bpf_prog *prog, void *image,
-+				     unsigned int size, struct bpf_ksym *ksym)
-+{
-+	int n;
-+
-+	n = strscpy(ksym->name, "bpf_trampoline_", KSYM_NAME_LEN);
-+	strncat(ksym->name + n, prog->aux->ksym.name, KSYM_NAME_LEN - 1 - n);
-+	INIT_LIST_HEAD_RCU(&ksym->lnode);
-+	bpf_image_ksym_init(image, size, ksym);
-+}
-+
-+static void bpf_struct_ops_map_ksyms_add(struct bpf_struct_ops_map *st_map)
-+{
-+	struct bpf_ksym *ksym = st_map->ksyms;
-+	struct bpf_ksym *end = ksym + st_map->ksyms_cnt;
-+
-+	while (ksym != end && ksym->start)
-+		bpf_image_ksym_add(ksym++);
-+}
-+
-+static void bpf_struct_ops_map_ksyms_del(struct bpf_struct_ops_map *st_map)
-+{
-+	struct bpf_ksym *ksym = st_map->ksyms;
-+	struct bpf_ksym *end = ksym + st_map->ksyms_cnt;
-+
-+	while (ksym != end && ksym->start)
-+		bpf_image_ksym_del(ksym++);
-+}
-+
- static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 					   void *value, u64 flags)
- {
-@@ -601,6 +633,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 	int prog_fd, err;
- 	u32 i, trampoline_start, image_off = 0;
- 	void *cur_image = NULL, *image = NULL;
-+	struct bpf_ksym *ksym;
- 
- 	if (flags)
- 		return -EINVAL;
-@@ -640,6 +673,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 	kdata = &kvalue->data;
- 
- 	module_type = btf_type_by_id(btf_vmlinux, st_ops_ids[IDX_MODULE_ID]);
-+	ksym = st_map->ksyms;
- 	for_each_member(i, t, member) {
- 		const struct btf_type *mtype, *ptype;
- 		struct bpf_prog *prog;
-@@ -735,6 +769,11 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- 
- 		/* put prog_id to udata */
- 		*(unsigned long *)(udata + moff) = prog->aux->id;
-+
-+		/* init ksym for this trampoline */
-+		bpf_struct_ops_ksym_init(prog, image + trampoline_start,
-+					 image_off - trampoline_start,
-+					 ksym++);
- 	}
- 
- 	if (st_ops->validate) {
-@@ -790,6 +829,8 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
- unlock:
- 	kfree(tlinks);
- 	mutex_unlock(&st_map->lock);
-+	if (!err)
-+		bpf_struct_ops_map_ksyms_add(st_map);
- 	return err;
- }
- 
-@@ -883,6 +924,10 @@ static void bpf_struct_ops_map_free(struct bpf_map *map)
- 	 */
- 	synchronize_rcu_mult(call_rcu, call_rcu_tasks);
- 
-+	/* no trampoline in the map is running anymore, delete symbols */
-+	bpf_struct_ops_map_ksyms_del(st_map);
-+	synchronize_rcu();
-+
- 	__bpf_struct_ops_map_free(map);
- }
- 
-@@ -895,6 +940,19 @@ static int bpf_struct_ops_map_alloc_check(union bpf_attr *attr)
- 	return 0;
- }
- 
-+static u32 count_func_ptrs(const struct btf *btf, const struct btf_type *t)
-+{
-+	int i;
-+	u32 count;
-+	const struct btf_member *member;
-+
-+	count = 0;
-+	for_each_member(i, t, member)
-+		if (btf_type_resolve_func_ptr(btf, member->type, NULL))
-+			count++;
-+	return count;
-+}
-+
- static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
- {
- 	const struct bpf_struct_ops_desc *st_ops_desc;
-@@ -905,6 +963,8 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
- 	struct bpf_map *map;
- 	struct btf *btf;
- 	int ret;
-+	size_t ksyms_offset;
-+	u32 ksyms_cnt;
- 
- 	if (attr->map_flags & BPF_F_VTYPE_BTF_OBJ_FD) {
- 		/* The map holds btf for its whole life time. */
-@@ -951,6 +1011,11 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
- 		 */
- 		(vt->size - sizeof(struct bpf_struct_ops_value));
- 
-+	st_map_size = round_up(st_map_size, sizeof(struct bpf_ksym));
-+	ksyms_offset = st_map_size;
-+	ksyms_cnt = count_func_ptrs(btf, t);
-+	st_map_size += ksyms_cnt * sizeof(struct bpf_ksym);
-+
- 	st_map = bpf_map_area_alloc(st_map_size, NUMA_NO_NODE);
- 	if (!st_map) {
- 		ret = -ENOMEM;
-@@ -958,6 +1023,8 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
- 	}
- 
- 	st_map->st_ops_desc = st_ops_desc;
-+	st_map->ksyms = (void *)st_map + ksyms_offset;
-+	st_map->ksyms_cnt = ksyms_cnt;
- 	map = &st_map->map;
- 
- 	st_map->uvalue = bpf_map_area_alloc(vt->size, NUMA_NO_NODE);
-diff --git a/kernel/bpf/dispatcher.c b/kernel/bpf/dispatcher.c
-index 70fb82bf1637..b77db7413f8c 100644
---- a/kernel/bpf/dispatcher.c
-+++ b/kernel/bpf/dispatcher.c
-@@ -154,7 +154,8 @@ void bpf_dispatcher_change_prog(struct bpf_dispatcher *d, struct bpf_prog *from,
- 			d->image = NULL;
- 			goto out;
- 		}
--		bpf_image_ksym_add(d->image, PAGE_SIZE, &d->ksym);
-+		bpf_image_ksym_init(d->image, PAGE_SIZE, &d->ksym);
-+		bpf_image_ksym_add(&d->ksym);
- 	}
- 
- 	prev_num_progs = d->num_progs;
-diff --git a/kernel/bpf/trampoline.c b/kernel/bpf/trampoline.c
-index 9f36c049f4c2..ecdd2660561f 100644
---- a/kernel/bpf/trampoline.c
-+++ b/kernel/bpf/trampoline.c
-@@ -115,10 +115,14 @@ bool bpf_prog_has_trampoline(const struct bpf_prog *prog)
- 		(ptype == BPF_PROG_TYPE_LSM && eatype == BPF_LSM_MAC);
- }
- 
--void bpf_image_ksym_add(void *data, unsigned int size, struct bpf_ksym *ksym)
-+void bpf_image_ksym_init(void *data, unsigned int size, struct bpf_ksym *ksym)
- {
- 	ksym->start = (unsigned long) data;
- 	ksym->end = ksym->start + size;
-+}
-+
-+void bpf_image_ksym_add(struct bpf_ksym *ksym)
-+{
- 	bpf_ksym_add(ksym);
- 	perf_event_ksymbol(PERF_RECORD_KSYMBOL_TYPE_BPF, ksym->start,
- 			   PAGE_SIZE, false, ksym->name);
-@@ -377,7 +381,8 @@ static struct bpf_tramp_image *bpf_tramp_image_alloc(u64 key, int size)
- 	ksym = &im->ksym;
- 	INIT_LIST_HEAD_RCU(&ksym->lnode);
- 	snprintf(ksym->name, KSYM_NAME_LEN, "bpf_trampoline_%llu", key);
--	bpf_image_ksym_add(image, size, ksym);
-+	bpf_image_ksym_init(image, size, ksym);
-+	bpf_image_ksym_add(ksym);
- 	return im;
- 
- out_free_image:
--- 
-2.39.5
-
+Reviewed-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+Tested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
