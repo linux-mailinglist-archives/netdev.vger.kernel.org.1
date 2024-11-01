@@ -1,243 +1,290 @@
-Return-Path: <netdev+bounces-140979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 871C09B8F3E
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:34:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B189B8FB7
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 11:49:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 162081F22D66
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:34:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1916A1C22383
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 10:49:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605E21922D6;
-	Fri,  1 Nov 2024 10:34:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B9BB1581EE;
+	Fri,  1 Nov 2024 10:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="MBqxO6ix"
+	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="IstiBmgO"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2050.outbound.protection.outlook.com [40.107.105.50])
+Received: from qs51p00im-qukt01071701.me.com (qs51p00im-qukt01071701.me.com [17.57.155.6])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13CA315C158;
-	Fri,  1 Nov 2024 10:34:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.105.50
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730457277; cv=fail; b=AxHHB62yyrdxFXeYVkNZ7BmklJ/yOEJ987Q42sSJzCjtkVd26RPW1byC91ecY9cFdSM6GJF7Qv0O/khPu2emMuSM2ceU1c5MAEdCNSWGODbry9SQr8rQx4h9snaW8zj5In15ktLejYLLkOYYV3awxRTYCyadLlRoB0bUDG6BhyE=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730457277; c=relaxed/simple;
-	bh=iyADMSZZTYlVRePkQ+QSRDY3yC/IPjZiXHc7uzogTTs=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
-	 Content-Disposition:In-Reply-To:MIME-Version; b=SyK8UuB8OYc8GYG6PWCo1cSNXm+CVp6UXSp2rQWkkkORiHiKFf2jLfzJNeqAwI18+JiAGGBDOxF8+BGEduwMn9ZQrJflLagw0C1cmhOILOidWAZ1dBrUPaj0tVpX8XqzcTPtGfcdTkUBCVFmNOW6VyGF2zTy99qFNfxZN8WGEJE=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=MBqxO6ix; arc=fail smtp.client-ip=40.107.105.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=INlxVRzoJWxQiiNJfJIwwJc/aQW4ImLR8GOXS3hKqL+a8VdNqsCtE1uRWYgUAjBCJyC6o/WyK3q3jZn5to6QdGXcDwnXzg6HTocWPsqLIhkzmWT9tCNlpMd7Qu5ezUa8ldbJtAUHPJ8p+EOgNmQ69wWh25xEELaeOTAxgTTtSxyl0ArcpyUcliu7RROQLoW6lu0eKIGopKCMeH/XNYlspFxN54Vokv9k/GKjPVKmQs7YXwPsOGvMgbrHkrQfcs09Nidvtv37CoLrKLVVII5nLiv23qyXd+ewjkicaa8TX1GVmK6t6XuM0JpOW2UnUqe/Rw6pfGDxv1YFwHzlXUFtjQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QQ9FuSL6V0fqPvpFO6E155kLvgMk569Pg+uIHA8ZHlg=;
- b=OpnFSpmCbpqTh+0sSaqJ9uGn8r+FHVa0cqfAolwLmsVLh0Jq/gO6JfKCx/KwSoVI49qRRjxwbiKov7Ic/9YvR6F41osJgU6MCoWefYjPhwgvxmSTmd3MktsQR5iVoyiYMLbSL0TrFFqDK3ziciUQt9pBCPbG+MWDtprpUolltmx3TjVpXjxIKSNUpo3t0RS1Jior+W9jTaEqLm6J27mDEVWNfSrQ1wRXRTElEVAWcRbRBUgpI77N6Mo2hr4Y+bRF8kDb8/XTkxMJJr6FyNSGuE/U/JL9Il4QjypesZ07PcpvcNXDwfWXQ1qNVkCtqZroyQpnBe1DuX9R38AjjzLIDQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QQ9FuSL6V0fqPvpFO6E155kLvgMk569Pg+uIHA8ZHlg=;
- b=MBqxO6ixJ4dWbk+vGNCOStgrpb8MNPGGIUVPwVoIUTfyWq8l6MJiLKJjTtVdgCPhxJBxAHsfKB4CT8kh/trURGonaEpocOpflROGU4dY6xIurLwPwvLjDG3At1GqBY8Nudgmj7S595lc/v9gmy5oMr9FJ8lDkiCv67b8dXV4drtR9BVeAvIowS+qZOM1WfvkmbXPprBHEGcxdG7eYR6bUDPEEAGn/Yn8xCIaJifWgmUkpewMKjlMbpxvC2A0sSKH9vcqAuUZoMLTqz5+31a1pS9YnqhskMFmXmEXouQmRM8oguQ/srDHBr14XGOuZmNBooD8okr0T+XM5681ohrYNw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com (2603:10a6:20b:24b::14)
- by AS8PR04MB8947.eurprd04.prod.outlook.com (2603:10a6:20b:42e::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8093.32; Fri, 1 Nov
- 2024 10:34:31 +0000
-Received: from AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2]) by AM8PR04MB7779.eurprd04.prod.outlook.com
- ([fe80::7417:d17f:8d97:44d2%3]) with mapi id 15.20.8093.027; Fri, 1 Nov 2024
- 10:34:31 +0000
-Date: Fri, 1 Nov 2024 12:34:27 +0200
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: Krzysztof Kozlowski <krzk@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"robh@kernel.org" <robh@kernel.org>,
-	"krzk+dt@kernel.org" <krzk+dt@kernel.org>,
-	"conor+dt@kernel.org" <conor+dt@kernel.org>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Clark Wang <xiaoning.wang@nxp.com>, Frank Li <frank.li@nxp.com>,
-	"christophe.leroy@csgroup.eu" <christophe.leroy@csgroup.eu>,
-	"linux@armlinux.org.uk" <linux@armlinux.org.uk>,
-	"bhelgaas@google.com" <bhelgaas@google.com>,
-	"horms@kernel.org" <horms@kernel.org>,
-	"imx@lists.linux.dev" <imx@lists.linux.dev>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"linux-pci@vger.kernel.org" <linux-pci@vger.kernel.org>,
-	"alexander.stein@ew.tq-group.com" <alexander.stein@ew.tq-group.com>
-Subject: Re: [PATCH v4 net-next 03/13] dt-bindings: net: add bindings for
- NETC blocks control
-Message-ID: <20241101103427.b2a7ir57tigwghcu@skbuf>
-References: <PAXPR04MB851034FDAC4E63F1866356B4884D2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20241024143214.qhsxghepykrxbiyk@skbuf>
- <PAXPR04MB8510BE30C31D55831BB276B2884F2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <PAXPR04MB85102B944E851C315F4C5BE1884F2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <PAXPR04MB85102B944E851C315F4C5BE1884F2@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20241025130611.4em37ery2iwirsbf@skbuf>
- <PAXPR04MB8510B731B4F27B1A45C1792588482@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <20241031124500.vxj7ppuhygh6lkpm@skbuf>
- <PAXPR04MB851041AFADEE8FC8790E90FF88562@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <PAXPR04MB851041AFADEE8FC8790E90FF88562@PAXPR04MB8510.eurprd04.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PAXPR04MB851041AFADEE8FC8790E90FF88562@PAXPR04MB8510.eurprd04.prod.outlook.com>
- <PAXPR04MB851041AFADEE8FC8790E90FF88562@PAXPR04MB8510.eurprd04.prod.outlook.com>
-X-ClientProxiedBy: VI1PR04CA0081.eurprd04.prod.outlook.com
- (2603:10a6:803:64::16) To AM8PR04MB7779.eurprd04.prod.outlook.com
- (2603:10a6:20b:24b::14)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6134189B8F
+	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 10:49:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.6
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730458179; cv=none; b=FDqFvcdmy1NIpXP4yaNC04KNYSbVt5J/K0fK/xUup9RrOANnz8ZZsBs8HrSi7MVy87ivVWyZC7BQBJSvUlvGys8Ksw8F3DIYm5qN1yZGTAne3pZwarHtEB2gJnud9qB0p/JimoIWAsotv/mlMtncWN3uhnMgbaqoVT1mHFbksas=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730458179; c=relaxed/simple;
+	bh=+6lm4BUHHl9klVGOr736/mzHPp2s7famQ3KDDPx7cYQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=ZecV960NgeXKc+LnJC/OOyH9wXJY5GV0NHMoAIEvU+1lZBvgTa2BMT9VIMhZyi85BrRrdqzOvPEfmT0INtLjcyV85xAkOEejENS/V7q3MAz/vu1O6fNtwKRtwqjDP+E6bb7mPP/Xt1J/2Z3FGfWi49j+BlmR2ABu7mZZQU6yZaA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=IstiBmgO; arc=none smtp.client-ip=17.57.155.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
+	t=1730458174; bh=I37lDDYBBtxNa3TjybkPQc80NAx8iTVPvUq3Yd4QueE=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
+	b=IstiBmgOpmjm0XcbyqT9HsibfQLcTJN2jUSa54WOuLZB7rTJks2ky0DsQkPfmf0t5
+	 Au+NQMmCD8lXO4MlWMR2iCQhmqv/3urDQfdSsHu1C/S8FUTZ9iJCjVYHxnEni95Iw3
+	 Dhd8eOGKFf0x+dhtXryZWiGfa7qWp/DeKkSterx7noGf5rKW6nFke68G6NGN5K0YFn
+	 udyZYE4M4NsdbwjEE+Ibnldz7RiLg5pTwaVA4lMKexZeoyMenizEqVROQJgg6BU5Oj
+	 NUuilq2g3xBKjcMUW83bLKIMnDESV1iJpy+8/tKDwJUfN0l0UTqw8KC2Bf6vgxbcWH
+	 MNZMqb8eLn9Ig==
+Received: from almalinux-std3-4-4-10gb.novalocal (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01071701.me.com (Postfix) with ESMTPSA id 68D304D002A7;
+	Fri,  1 Nov 2024 10:49:29 +0000 (UTC)
+From: Vladimir Vdovin <deliran@verdict.gg>
+To: netdev@vger.kernel.org,
+	dsahern@kernel.org,
+	davem@davemloft.net
+Cc: Vladimir Vdovin <deliran@verdict.gg>,
+	idosch@idosch.org,
+	edumazet@google.com,
+	linux-kselftest@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	shuah@kernel.org,
+	horms@kernel.org
+Subject: [PATCH v5] net: ipv4: Cache pmtu for all packet paths if multipath enabled
+Date: Fri,  1 Nov 2024 10:48:57 +0000
+Message-ID: <20241101104922.68956-1-deliran@verdict.gg>
+X-Mailer: git-send-email 2.43.5
+In-Reply-To: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM8PR04MB7779:EE_|AS8PR04MB8947:EE_
-X-MS-Office365-Filtering-Correlation-Id: 038b9147-88a3-45ba-da0a-08dcfa60c4f8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|366016|1800799024|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?TH9NBoMaURkNc8vKtmELc1ehBDCFN2JMvX5jCqQAbb7BVyWjMRr65quq3SXR?=
- =?us-ascii?Q?MHQPvy+PlrrUOhH+yQ9XZRlnRV1hiBuei8ks3LfZ9lZLC4PRcniK6XF0x40Z?=
- =?us-ascii?Q?lND6BMYifaqLXoLzqJ9mNW/IN/U1yAcEVnItzmLbn1O4kalHwzzPCge1DX0A?=
- =?us-ascii?Q?qYxbnT78a2KTEjxQJbcM8ADt5mLTrUiaDvOmvJJLJu02nTPZu2yb5pSF+/3y?=
- =?us-ascii?Q?77f431n3KAkJIUHq2fmtkQWlSvPOZlm8ifA/V0F0x5l1bRRlpGeO4+mmpVUe?=
- =?us-ascii?Q?RZw7OMvv/hQ4wySlFmBWgya3nNY9yBzY4S99B+FEFYmcvrEWggUyLNNgC6zW?=
- =?us-ascii?Q?kvhQ0Aw0SO+32/5X+BU5ZVSdtr/eJp7NR6B6vOe1ii8XSsYxOoxDplwAIO9R?=
- =?us-ascii?Q?fWrlFIsB+M6uTVa7HhNPixfNbtSKUhDGNiwZFOvMZq+IOv76WE2vQbcGUwWl?=
- =?us-ascii?Q?+wZ8XCgWdNMZ76AfuyRejswTh7PBfIwhFlSPcCXxrNeZnt0LSqJidMPsNAE8?=
- =?us-ascii?Q?VCWnL9rT+TWXuaKaelnAcVPH66g+qNNfuWquimLnvHmGaogBs5X5ZVyoK0UH?=
- =?us-ascii?Q?DCCFGtCq45pNoYRKznxRm6eXse8EWtTOkVRb183iDMH74PLWFIFmEvvNq3Nu?=
- =?us-ascii?Q?Sf8C82dY58v2Rn9UdsE+mV+SI+m9obsrlzzB96EH3ZCKYXmK2k2fd/NkuzZp?=
- =?us-ascii?Q?x8EZZgn7igyU3ag0APrmwpCH6d8GYDKtwi4XKWpkirqFqFf1NBid5LYqN4e9?=
- =?us-ascii?Q?yArrA/emOGZTrwoIZldR97nNgKY/h7JSyRIerZh0TbWdWPIIbRhWdmfGTRqK?=
- =?us-ascii?Q?a5mMK0XC0DJnGyX+BvS2ePirxsITWcQKKPL104Ot9vdataaHeXZqpJa1p2up?=
- =?us-ascii?Q?9TWmi0GJyT/4jQfZIXVbIZnvlM5tMMktjeiZMmeCfvVTsTdrR3BSFQrJ5hjk?=
- =?us-ascii?Q?r/RZJ24dceCrgi9bVZuwH4CAqSInTD6ct9fHwXarz/vmiUBAmv8yl71dZOCd?=
- =?us-ascii?Q?o2vd7lYQlxEf2X54id7aJ48tu1pXsk7a5dWLE4YcW9ncBcp4kZhqMDeGFf8+?=
- =?us-ascii?Q?abwP44W1UOctz4yIeuLISqLDZk9tznOghVp1YUULTfPUXoIY8ghEcwTFevp9?=
- =?us-ascii?Q?hzXiFdf9c7klWWSEaFETZm6Lckr5CSegy9AyvnNrZbcdtCidAkPWLH1TAYy4?=
- =?us-ascii?Q?1WX+tbdZSwGI0tCt9J/TXvqBotOJVEKApBVfbZ/k8LkVELwYGMI8fnJUj4R7?=
- =?us-ascii?Q?OMFEBE8/7psk98zMlq2Sz0/AbA2pXcxO3KHQd60dCU/tlLKAOWUtLVzJZhP7?=
- =?us-ascii?Q?DMNM2DttT9uQBZo3LGDxXqOg?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM8PR04MB7779.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(7416014)(376014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QFg6nGIW9OxMUJSN/1/a6JKXOVAS5JV6py3+pZGjD3uXiBMTgkk8vIVGA1g2?=
- =?us-ascii?Q?0l2indxsOzGDOs7HWRcGKA3tbAND0KxVuLXc93zUROiL7dA5nvjE7OkMoJ9/?=
- =?us-ascii?Q?5Z/gVzaapgAzQD8RMDqIYa7b3yK8+BywcDNJ9fweWWmbO83WEAbAYIjOMise?=
- =?us-ascii?Q?jH5oW8Nt2ZkSGR7h68+dY2nOnhaRXhNdXi07TNVut6xiRbkk/S1eTbjgWHIQ?=
- =?us-ascii?Q?7EvZokhyN/G6fE5DHaa7vc6Fljmwlzg+SjJ+m7nVpVRbMxTUuQBWnKBLgRyb?=
- =?us-ascii?Q?f23gl8nqaAzlum1UOqWa+bKBvY8ZqEwwYjKAw8XE20qC933WqhhKOu8JnLMR?=
- =?us-ascii?Q?WV9zXRuazJVc6XYZRGUISEkkuyN9S4f8dN+Sz5nC8KJiHynXh63esZQbCHS4?=
- =?us-ascii?Q?B0mkK/nBcQIPTtrIbdz/Kjp/T1EZwZ3Igr9aWMbFyJnIhwW98I+khnGV00RO?=
- =?us-ascii?Q?PGd+odD46JTqum4zbPwwMV9jsjAVSCvPUW0PXV0kAZ6ff2+c6rBhdZV4BoMq?=
- =?us-ascii?Q?YfvjmnGffZqVjfKHkDxIgjzg6Q4OHV2RtgIDlZ+FZ8qUzJW7Gun7H8a2h9g+?=
- =?us-ascii?Q?dbr5MKgaKn821h2/BHDwMa/rZjfrJLFACgehPAvBFfEhfGA+9dQKzgZ1nu/j?=
- =?us-ascii?Q?nnqf2ae/4S6W1GI0DkZxWtjA1y2UMX8hKZ+2+BOla2HIJyTxcaK+t6dDJ4pt?=
- =?us-ascii?Q?sSF3wnzdqF5szBgTkafZHCcZdkQLZao1wr5XAVj1eKR3m5w64sKxW4p8TXA3?=
- =?us-ascii?Q?sGMWlQWnDmrFiM22BPo3096YvN1a0Ekw2V7w7hqtjvydd0KUuacSfXpkWdVn?=
- =?us-ascii?Q?8eVaq41enDwI/w33XEet7IpGlJYWa5KJFYT0mKJBtFjIMAUbtLxyjDpWqFbx?=
- =?us-ascii?Q?8p/FbBdEJ0joe+vKGOZkToq4pzi1FnPuGYGXmR8zSiLRPbFFeoAx5DNkJK9l?=
- =?us-ascii?Q?yDwCpYKYlW+CLIpngLaQRI+nVc9zNngqe8LOivzvByFyIJgsbXMlP29CusRe?=
- =?us-ascii?Q?Mtst+TZKP9S/+I4uaIM6nH7cah2K2nbEH/hLF/6wCMd7WDsVjqcWjJeH+pV5?=
- =?us-ascii?Q?7YH9hsj2zFtsmCJ4ic+eCQ+gkkBpL9fXHaT9kqFjaELQ/Cpi2Xg2OFvCWiCB?=
- =?us-ascii?Q?JD5AH8iHp4wAfM0FJ1mAa1F8qtovWG9ILfmiQNXbL4lihMAj1Ysl2+fsX/VN?=
- =?us-ascii?Q?MVk9rHfGaPrXfRXKCI2gA09zuSiQPVkQMu2j5CwOZ+FwhuGeUfSKEnXKJ8Wd?=
- =?us-ascii?Q?X4ufWg5hEiJsFKSL1Azf+m+QL664HowQOTo2r0lOJO9JeXm0MFo+KbrXjC+5?=
- =?us-ascii?Q?mhAEMlTaO7iHRpW6zVRXwBLTYH1P0mzjXfTNI9cwSIzzPzfqNIuQDyAukhyy?=
- =?us-ascii?Q?l5qDK/y2OCtfYivT+K9KtjF3xmXTuMHUbHyR/Gv61ug7w+Hd4hkWJ2Yioczu?=
- =?us-ascii?Q?pGqR8H2f1DUeBPr+xwwfsuupeqokbaOWVqDV9XjFIAoHhQdwzywA/zC1WUVH?=
- =?us-ascii?Q?k5rflgfa8HL/316+CFftWKee+PoiJ20WBHpZ8vp6CIxcL50vxl1RobcuFszC?=
- =?us-ascii?Q?1y1yC2rWN7QPRYaBvHwn9xUdrcly1O078MP6C0eLgKVTzW+bNmRhm/MRmKd9?=
- =?us-ascii?Q?8A=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 038b9147-88a3-45ba-da0a-08dcfa60c4f8
-X-MS-Exchange-CrossTenant-AuthSource: AM8PR04MB7779.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Nov 2024 10:34:31.0121
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ZhxwZwyL0jbIOahoFMgXYJWB83+ZbxccUogjLIyK31fx4sfl1luPEWrqFV1oLQuEcALtN3aiZx34Su0Q7d0QVw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8947
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-ORIG-GUID: dHrACLZ6F3hiDL48h_ntVIH83u_2APxG
+X-Proofpoint-GUID: dHrACLZ6F3hiDL48h_ntVIH83u_2APxG
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-01_06,2024-10-31_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 malwarescore=0 phishscore=0
+ clxscore=1030 mlxlogscore=999 adultscore=0 mlxscore=0 spamscore=0
+ bulkscore=0 suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2411010078
 
-On Fri, Nov 01, 2024 at 04:18:55AM +0200, Wei Fang wrote:
-> > On Sat, Oct 26, 2024 at 06:01:37AM +0300, Wei Fang wrote:
-> > > system-controller not only configure the endpoints of the NETC, but also
-> > > can configure the ECAM space, such as the vendor ID, device ID, the RID
-> > > of endpoint, VF stride and so on. For this perspective, I don't think the
-> > > ECAM space should placed at the same hierarchical level with system-controller.
-> > >
-> > > If they are placed at the same level, then before pci_host_common_probe() is
-> > > called, we need to ensure that IERB completes probe(), which means we need
-> > > to modify the PCI host common driver, component API or add a callback function
-> > > or something else, which I don't think is a good idea.
-> > 
-> > Ok, that does sound important. If the NETCMIX block were to actually
-> > modify the ECAM space, what would be the primary source of information
-> > for how the ECAM device descriptions should look like?
-> > 
-> 
-> I think the related info should be provided by DTS, but currently, we do not
-> have such requirement that needs Linux to change the ECAM space, this may
-> be supported in the future if we have the requirement.
-> 
-> > I remember a use case being discussed internally a while ago was that
-> > where the Cortex-A cores are only guests which only have ownership of
-> > some Ethernet ports discovered through the ECAM, but not of the entire
-> > NETCMIX block and not of physical Ethernet ports. How would that be
-> > described in the device tree? The ECAM node would no longer be placed
-> > under system-controller?
-> 
-> Yes, we indeed have this use case on i.MX95, only the VFs of 10G ENETC
-> are owned by Cortex-A, the entire ECAM space and other NETC devices
-> are all owned by Cortex-M. In this case, the system-controller is no needed
-> in DTS, because Linux have no permission to access these resources.
-> 
-> > 
-> > At what point does it simply just make more sense to have a different
-> > PCIe ECAM driver than pcie-host-ecam-generic, which just handles
-> > internally the entire NETCMIX?
-> 
-> Currently, I have not idea in what use case we need a different ECAM driver
-> to handle internally the entire system-controller.
-> 
-> For the use case I mentioned above, we use a different ECAM driver, which
-> is implemented by RPMSG, because the entire ECAM space is owned by
-> Cortex-M. So we use the ECAM driver to notify the Cortex-M to enable/disable
-> VFs or do FLR for VFs and so on. But this ECAM driver does not need to
-> configure the system-controller.
+Check number of paths by fib_info_num_path(),
+and update_or_create_fnhe() for every path.
+Problem is that pmtu is cached only for the oif
+that has received icmp message "need to frag",
+other oifs will still try to use "default" iface mtu.
 
-Ok, I was actually wondering if it makes sense for the the parent bus of
-the NETC PCIe functions to be described through a unified binding that
-covers all of the above use cases, so that major device tree modifications
-aren't necessary to adapt between the 'Linux as host' and 'Linux as guest'
-use cases. But you're saying it doesn't make much sense, because the
-device tree in the guest case would contain descriptions of inaccessible
-resources (the NETCMIX block). Oh well, this is just another case where
-"device tree should describe hardware" actually means "device tree describes
-what software wants to know about the hardware".
+V5:
+  - make self test cleaner
 
-Anyway, I am now convinced by your design choices at least to the extent
-that they appear self-consistent to me (I still don't really have an
-independent opinion). If somebody has a different idea on how the PCIe
-bus should be described, feel free to chime in.
+V4:
+  - fix selftest, do route lookup before checking cached exceptions
+
+V3:
+  - added selftest
+  - fixed compile error
+
+V2:
+  - fix fib_info_num_path parameter pass
+
+An example topology showing the problem:
+
+                    |  host1
+                +---------+
+                |  dummy0 | 10.179.20.18/32  mtu9000
+                +---------+
+        +-----------+----------------+
+    +---------+                     +---------+
+    | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
+    +---------+                     +---------+
+        |    (all here have mtu 9000)    |
+    +------+                         +------+
+    | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
+    +------+                         +------+
+        |                                |
+---------+------------+-------------------+------
+                        |
+                    +-----+
+                    | ro3 | 10.10.10.10  mtu1500
+                    +-----+
+                        |
+    ========================================
+                some networks
+    ========================================
+                        |
+                    +-----+
+                    | eth0| 10.10.30.30  mtu9000
+                    +-----+
+                        |  host2
+
+host1 have enabled multipath and
+sysctl net.ipv4.fib_multipath_hash_policy = 1:
+
+default proto static src 10.179.20.18
+        nexthop via 10.179.2.12 dev ens17f1 weight 1
+        nexthop via 10.179.2.140 dev ens17f0 weight 1
+
+When host1 tries to do pmtud from 10.179.20.18/32 to host2,
+host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
+And host1 caches it in nexthop exceptions cache.
+
+Problem is that it is cached only for the iface that has received icmp,
+and there is no way that ro3 will send icmp msg to host1 via another path.
+
+Host1 now have this routes to host2:
+
+ip r g 10.10.30.30 sport 30000 dport 443
+10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
+    cache expires 521sec mtu 1500
+
+ip r g 10.10.30.30 sport 30033 dport 443
+10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
+    cache
+
+So when host1 tries again to reach host2 with mtu>1500,
+if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
+if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
+until lucky day when ro3 will send it through another flow to ens17f0.
+
+Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
+---
+ net/ipv4/route.c                    | 13 +++++
+ tools/testing/selftests/net/pmtu.sh | 78 ++++++++++++++++++++++++++++-
+ 2 files changed, 90 insertions(+), 1 deletion(-)
+
+diff --git a/net/ipv4/route.c b/net/ipv4/route.c
+index 723ac9181558..41162b5cc4cb 100644
+--- a/net/ipv4/route.c
++++ b/net/ipv4/route.c
+@@ -1027,6 +1027,19 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
+ 		struct fib_nh_common *nhc;
+ 
+ 		fib_select_path(net, &res, fl4, NULL);
++#ifdef CONFIG_IP_ROUTE_MULTIPATH
++		if (fib_info_num_path(res.fi) > 1) {
++			int nhsel;
++
++			for (nhsel = 0; nhsel < fib_info_num_path(res.fi); nhsel++) {
++				nhc = fib_info_nhc(res.fi, nhsel);
++				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
++							  jiffies + net->ipv4.ip_rt_mtu_expires);
++			}
++			rcu_read_unlock();
++			return;
++		}
++#endif /* CONFIG_IP_ROUTE_MULTIPATH */
+ 		nhc = FIB_RES_NHC(res);
+ 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
+ 				      jiffies + net->ipv4.ip_rt_mtu_expires);
+diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
+index 569bce8b6383..a0159340fe84 100755
+--- a/tools/testing/selftests/net/pmtu.sh
++++ b/tools/testing/selftests/net/pmtu.sh
+@@ -266,7 +266,8 @@ tests="
+ 	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
+ 	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
+ 	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
+-	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
++	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
++	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
+ 
+ # Addressing and routing for tests with routers: four network segments, with
+ # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) and an
+@@ -2329,6 +2330,81 @@ test_pmtu_ipv6_route_change() {
+ 	test_pmtu_ipvX_route_change 6
+ }
+ 
++test_pmtu_ipv4_mp_exceptions() {
++	setup namespaces routing || return $ksft_skip
++
++	ip nexthop ls >/dev/null 2>&1
++	if [ $? -ne 0 ]; then
++		echo "Nexthop objects not supported; skipping tests"
++		exit $ksft_skip
++	fi
++
++	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
++	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
++	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
++	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
++
++	dummy0_a="192.168.99.99"
++	dummy0_b="192.168.88.88"
++
++	# Set up initial MTU values
++	mtu "${ns_a}"  veth_A-R1 2000
++	mtu "${ns_r1}" veth_R1-A 2000
++	mtu "${ns_r1}" veth_R1-B 1500
++	mtu "${ns_b}"  veth_B-R1 1500
++
++	mtu "${ns_a}"  veth_A-R2 2000
++	mtu "${ns_r2}" veth_R2-A 2000
++	mtu "${ns_r2}" veth_R2-B 1500
++	mtu "${ns_b}"  veth_B-R2 1500
++
++	fail=0
++
++	#Set up host A with multipath routes to host B dummy0_b
++	run_cmd ${ns_a} sysctl -q net.ipv4.fib_multipath_hash_policy=1
++	run_cmd ${ns_a} sysctl -q net.ipv4.ip_forward=1
++	run_cmd ${ns_a} ip link add dummy0 mtu 2000 type dummy
++	run_cmd ${ns_a} ip link set dummy0 up
++	run_cmd ${ns_a} ip addr add ${dummy0_a} dev dummy0
++	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev veth_A-R1
++	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev veth_A-R2
++	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
++	run_cmd ${ns_a} ip route add ${dummy0_b} nhid 203
++
++	#Set up host B with multipath routes to host A dummy0_a
++	run_cmd ${ns_b} sysctl -q net.ipv4.fib_multipath_hash_policy=1
++	run_cmd ${ns_b} sysctl -q net.ipv4.ip_forward=1
++	run_cmd ${ns_b} ip link add dummy0 mtu 2000 type dummy
++	run_cmd ${ns_b} ip link set dummy0 up
++	run_cmd ${ns_b} ip addr add ${dummy0_b} dev dummy0
++	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev veth_A-R1
++	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev veth_A-R2
++	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
++	run_cmd ${ns_b} ip route add ${dummy0_a} nhid 203
++
++	#Set up routers with routes to dummies
++	run_cmd ${ns_r1} ip route add ${dummy0_a} via ${prefix4}.${a_r1}.1
++	run_cmd ${ns_r2} ip route add ${dummy0_a} via ${prefix4}.${a_r2}.1
++	run_cmd ${ns_r1} ip route add ${dummy0_b} via ${prefix4}.${b_r1}.1
++	run_cmd ${ns_r2} ip route add ${dummy0_b} via ${prefix4}.${b_r2}.1
++
++
++	#Ping and expect two nexthop exceptions for two routes in nh group
++	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dummy0_b}"
++
++	#Do route lookup before checking cached exceptions
++	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R1
++	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R2
++
++	#Check cached exceptions
++	if [ "$(${ns_a} ip -oneline route list cache| grep mtu | wc -l)" -ne 2 ]; then
++		err "  there are not enough cached exceptions"
++		fail=1
++	fi
++
++	return ${fail}
++}
++
+ usage() {
+ 	echo
+ 	echo "$0 [OPTIONS] [TEST]..."
+
+base-commit: 66600fac7a984dea4ae095411f644770b2561ede
+-- 
+2.43.5
+
 
