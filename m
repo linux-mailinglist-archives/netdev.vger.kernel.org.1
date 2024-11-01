@@ -1,66 +1,66 @@
-Return-Path: <netdev+bounces-140938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-140940-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7107C9B8BC5
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:10:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A65B9B8BC9
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 08:10:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1E871C20DF6
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:10:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D12F1C20E80
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 07:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D939E155303;
-	Fri,  1 Nov 2024 07:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BC6F156237;
+	Fri,  1 Nov 2024 07:10:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="eQnBa29f"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="YoRJ3O6X"
 X-Original-To: netdev@vger.kernel.org
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 934F31534FB;
-	Fri,  1 Nov 2024 07:10:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7B511537A8;
+	Fri,  1 Nov 2024 07:10:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730445012; cv=none; b=e7KwVjmbe7Z/0XP/TTesRRpAT5s0R+izi7/zEKP5OmgPbtJbyQnkxA9sAGP34bCnY0Nc15koSV8UlYszdQ6tq7LNJLiAIYHBabb4r6ngHj6/CgOPOsuoUSpd8yhHSLnVGI2JWGtqqvDIgIKBF/5CLrRGJCvW+MxvHP7/0maH68I=
+	t=1730445015; cv=none; b=JdO9fsy77h3G9G23fYtvNl0jtlHrSzBE1PmybX3ORneB73v7xQZILixJeY6Nm9TVtXDKyUL9GcBN7ufQQle3T48sAA8614iwaTXgK/7CZCOiq36dEfd36BklDjiG7UD05wBxfIOnDIemhqpGCD/7Y+4mxQ1Tn1R0sY9O55BImgc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730445012; c=relaxed/simple;
-	bh=8SBtAFIZv6QdmDpsSm24E8xxTeonWxMbs9IQUu8QsfA=;
-	h=From:Subject:Date:Message-ID:MIME-Version:Content-Type:To:CC; b=kg0MaqJyaPrHEEnFMuiW97sBy7a0SQKHt/4/p+aKJ8N0WdmXZ4C8h5hXVe/ucyRZ1O+uOh2hA8o07yQKghJ4N9eBf3zE3EE3Zp5WVXKmu2MKXMdxoSux8TRIuFC465pYxqnCcZSlZF8MmuoGHxAtXOC6GuapEtaY1tGYFFU3UHE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=eQnBa29f; arc=none smtp.client-ip=68.232.154.123
+	s=arc-20240116; t=1730445015; c=relaxed/simple;
+	bh=PoUpoiqh15WbBGv3obiAOp0I0e8/k6KBOM9i6jG/LjA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:References:
+	 In-Reply-To:To:CC; b=OVaa3k/hShLlAXbNBGC5tjje/urwjvgPbOpcMDyoQX/6x9I7zwzT/OuRbueARro6DrQ31U9ipvXRWEi/2kLxXAB+lEv4pVfx6B+Ewq4xo1pcnc7Qx5Bo8C+OFjDbKekh4qTVOfAvoMyntwsdTfGvYAKgB1tqOjlhxYFCrsK0ah8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=YoRJ3O6X; arc=none smtp.client-ip=68.232.154.123
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1730445010; x=1761981010;
-  h=from:subject:date:message-id:mime-version:
-   content-transfer-encoding:to:cc;
-  bh=8SBtAFIZv6QdmDpsSm24E8xxTeonWxMbs9IQUu8QsfA=;
-  b=eQnBa29ffZbscWhz46GlTzr7lAtpVsr57QIgO69jWKrnVpYOwycUF4eS
-   zT7Jp2dE6aeeV3qtu3/cx4gbUWIHic5Q1R1vd6BWGiP/8dB2tYGEt4vJD
-   /f4C/DguuG1tRDhC1HFsjNegSQ66XuwtyzVCfaCMphCQLbytTo2b6Y6XU
-   I0cwGL2KpZS9GheEOljZ/kuKzSsNv+h/IieOkN+XyOdmWcmNZPCt+dgDV
-   9rTlxcmewBpDOKynFg5W/cWBaKTXLmH+IaW1Bgs/XQCeRUVADFvYawhbj
-   eZQYq4CHu6M7uIMfMJ1BrPw288cnmkLHgDCus04kukFEWzuBuspehd4nE
-   w==;
+  t=1730445012; x=1761981012;
+  h=from:date:subject:mime-version:content-transfer-encoding:
+   message-id:references:in-reply-to:to:cc;
+  bh=PoUpoiqh15WbBGv3obiAOp0I0e8/k6KBOM9i6jG/LjA=;
+  b=YoRJ3O6XvFapqrl/YMUQW4e1vLJBXK19HOlFNGr6z0R1oQj0Iqob2R/0
+   VDjB9p4JrQ97/djj9n4Rg+A2NGI3Ogk5gjKMcdoz9uv4wN0q/ZYmvQecR
+   yFCf+Okn8Leg9JfuS5z+CVSkA0DLeP/zBHdTePCmknFBLPnUY9p27YE88
+   07h/YrLndw4Swb9/fseZXuctVgInV/kR0U2WuXnHPyU+qU5Kyc1DQklj0
+   k+JFrp/9LsJUU4KcAA1jIJm4N7GOlsot8h4ddu60hq3DDc79JtmkIDTHR
+   7yrJ54aIBQT4hI4GHLQjmvjmPoSWcJ38KlOsLc+P+xlRf+kmCElSw96/l
+   A==;
 X-CSE-ConnectionGUID: NPrwf/hMSSa00KPy6thoyw==
-X-CSE-MsgGUID: ROduA6SrQSevCJ88YzhLHQ==
+X-CSE-MsgGUID: r7VsTCbOQcaA3FloD0sZgQ==
 X-IronPort-AV: E=Sophos;i="6.11,249,1725346800"; 
-   d="scan'208";a="201180317"
+   d="scan'208";a="201180320"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
   by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 01 Nov 2024 00:10:04 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Fri, 1 Nov 2024 00:09:52 -0700
+ 15.1.2507.35; Fri, 1 Nov 2024 00:09:54 -0700
 Received: from DEN-DL-M70577.microchip.com (10.10.85.11) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Fri, 1 Nov 2024 00:09:49 -0700
+ 15.1.2507.35 via Frontend Transport; Fri, 1 Nov 2024 00:09:52 -0700
 From: Daniel Machon <daniel.machon@microchip.com>
-Subject: [PATCH net-next 0/6] net: lan969x: add VCAP functionality
-Date: Fri, 1 Nov 2024 08:09:06 +0100
-Message-ID: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
+Date: Fri, 1 Nov 2024 08:09:07 +0100
+Subject: [PATCH net-next 1/6] net: sparx5: expose some sparx5 VCAP symbols
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,10 +68,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-X-B4-Tracking: v=1; b=H4sIAJJ+JGcC/x2NywrCMBAAf6Xs2YU8ajX+inhI09Us6Fo2pQZK/
- 93ocRiY2aCQMhW4dBsorVz4LQ3soYOUozwIeWoMzrjeGm+xzFHrEZ9RwhAqlg8vKeOkvJKix0D
- u1A90Ho330CKz0p3rf3AFoQWF6gK3ZsZYCEeNkvJv8IossO9f2Doum5EAAAA=
+Content-Transfer-Encoding: 8bit
+Message-ID: <20241101-sparx5-lan969x-switch-driver-3-v1-1-3c76f22f4bfa@microchip.com>
+References: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
+In-Reply-To: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
 To: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
 	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
 	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Lars Povlsen
@@ -83,87 +83,119 @@ CC: <netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-kernel@vger.kernel.org>
 X-Mailer: b4 0.14-dev
 
-== Description:
+In preparation for lan969x VCAP support, expose the following symbols for
+use by the lan969x VCAP implementation:
 
-This series is the third of a multi-part series, that prepares and adds
-support for the new lan969x switch driver.
+- The symbols SPARX5_*_LOOKUPS defines the number of lookups in each
+  VCAP instance.  These are the same for lan969x. Move them to the
+  header file.
 
-The upstreaming efforts is split into multiple series (might change a
-bit as we go along):
+- The struct sparx5_vcap_inst encapsulates information about a single
+  VCAP instance. Move this struct to the header file and declare the
+  sparx5_vcap_inst_cfg as extern.
 
-        1) Prepare the Sparx5 driver for lan969x (merged)
-
-        2) Add support for lan969x (same basic features as Sparx5
-           provides excl. FDMA and VCAP, merged).
-
-    --> 3) Add lan969x VCAP functionality.
-
-        4) Add RGMII and FDMA functionality.
-
-== VCAP support:
-
-The Versatile Content-Aware Processor (VCAP) is a content-aware packet
-processor that allows wirespeed packet inspection for rich
-implementation of, for example, advanced VLAN and QoS classification and
-manipulations, IP source guarding, longest prefix matching for Layer-3
-routing, and security features for wireline and wireless applications.
-This is all achieved by programming rules into the VCAP.
-
-When a VCAP is enabled, every frame passing through the switch is
-analyzed and multiple keys are created based on the contents of the
-frame. The frame is examined to determine the frame type (for example,
-IPv4 TCP frame), so that the frame information is extracted according to
-the frame type, port-specific configuration, and classification results
-from the basic classification. Keys are applied to the VCAP and when
-there is a match between a key and a rule in the VCAP, the rule is then
-applied to the frame from which the key was extracted.
-
-After this series is applied, the lan969x driver will support the same
-VCAP functionality as Sparx5.
-
-== Patch breakdown:
-
-Patch #1 exposes some VCAP symbols for lan969x.
-
-Patch #2 replaces VCAP uses of SPX5_PORTS with n_ports from the match
-data.
-
-Patch #3 adds new VCAP constants to match data
-
-Patch #4 removes the is_sparx5() check to now initialize the VCAP API on
-lan969x.
-
-Patch #5 adds the auto-generated VCAP data for lan969x.
-
-Patch #6 adds the VCAP configuration data for lan969x.
-
+Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+Reviewed-by: Jens Emil Schulz Østergaard <jensemil.schulzostergaard@microchip.com>
 Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
 ---
-Daniel Machon (6):
-      net: sparx5: expose some sparx5 VCAP symbols
-      net: sparx5: replace SPX5_PORTS with n_ports
-      net: sparx5: add new VCAP constants to match data
-      net: sparx5: execute sparx5_vcap_init() on lan969x
-      net: lan969x: add autogenerated VCAP information
-      net: lan969x: add VCAP configuration data
+ .../ethernet/microchip/sparx5/sparx5_vcap_impl.c    | 18 +-----------------
+ .../ethernet/microchip/sparx5/sparx5_vcap_impl.h    | 21 +++++++++++++++++++++
+ 2 files changed, 22 insertions(+), 17 deletions(-)
 
- drivers/net/ethernet/microchip/lan969x/Makefile    |    3 +-
- drivers/net/ethernet/microchip/lan969x/lan969x.c   |    3 +
- drivers/net/ethernet/microchip/lan969x/lan969x.h   |    8 +
- .../microchip/lan969x/lan969x_vcap_ag_api.c        | 3843 ++++++++++++++++++++
- .../ethernet/microchip/lan969x/lan969x_vcap_impl.c |   85 +
- .../net/ethernet/microchip/sparx5/sparx5_main.c    |   15 +-
- .../net/ethernet/microchip/sparx5/sparx5_main.h    |    3 +
- .../ethernet/microchip/sparx5/sparx5_vcap_ag_api.h |    2 +
- .../ethernet/microchip/sparx5/sparx5_vcap_impl.c   |   48 +-
- .../ethernet/microchip/sparx5/sparx5_vcap_impl.h   |   21 +
- 10 files changed, 3995 insertions(+), 36 deletions(-)
----
-base-commit: 157a4881225bd0af5444aab9510e7b6da28f2469
-change-id: 20241031-sparx5-lan969x-switch-driver-3-9e2746e8b033
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+index 967c8621c250..0bdf7a378892 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.c
+@@ -17,7 +17,6 @@
+ #define SUPER_VCAP_BLK_SIZE 3072 /* addresses per Super VCAP block */
+ #define STREAMSIZE (64 * 4)  /* bytes in the VCAP cache area */
+ 
+-#define SPARX5_IS2_LOOKUPS 4
+ #define VCAP_IS2_KEYSEL(_ena, _noneth, _v4_mc, _v4_uc, _v6_mc, _v6_uc, _arp) \
+ 	(ANA_ACL_VCAP_S2_KEY_SEL_KEY_SEL_ENA_SET(_ena) | \
+ 	 ANA_ACL_VCAP_S2_KEY_SEL_NON_ETH_KEY_SEL_SET(_noneth) | \
+@@ -27,7 +26,6 @@
+ 	 ANA_ACL_VCAP_S2_KEY_SEL_IP6_UC_KEY_SEL_SET(_v6_uc) | \
+ 	 ANA_ACL_VCAP_S2_KEY_SEL_ARP_KEY_SEL_SET(_arp))
+ 
+-#define SPARX5_IS0_LOOKUPS 6
+ #define VCAP_IS0_KEYSEL(_ena, _etype, _ipv4, _ipv6, _mpls_uc, _mpls_mc, _mlbs) \
+ 	(ANA_CL_ADV_CL_CFG_LOOKUP_ENA_SET(_ena) | \
+ 	ANA_CL_ADV_CL_CFG_ETYPE_CLM_KEY_SEL_SET(_etype) | \
+@@ -37,31 +35,17 @@
+ 	ANA_CL_ADV_CL_CFG_MPLS_MC_CLM_KEY_SEL_SET(_mpls_mc) | \
+ 	ANA_CL_ADV_CL_CFG_MLBS_CLM_KEY_SEL_SET(_mlbs))
+ 
+-#define SPARX5_ES0_LOOKUPS 1
+ #define VCAP_ES0_KEYSEL(_key) (REW_RTAG_ETAG_CTRL_ES0_ISDX_KEY_ENA_SET(_key))
+ #define SPARX5_STAT_ESDX_GRN_PKTS  0x300
+ #define SPARX5_STAT_ESDX_YEL_PKTS  0x301
+ 
+-#define SPARX5_ES2_LOOKUPS 2
+ #define VCAP_ES2_KEYSEL(_ena, _arp, _ipv4, _ipv6) \
+ 	(EACL_VCAP_ES2_KEY_SEL_KEY_ENA_SET(_ena) | \
+ 	EACL_VCAP_ES2_KEY_SEL_ARP_KEY_SEL_SET(_arp) | \
+ 	EACL_VCAP_ES2_KEY_SEL_IP4_KEY_SEL_SET(_ipv4) | \
+ 	EACL_VCAP_ES2_KEY_SEL_IP6_KEY_SEL_SET(_ipv6))
+ 
+-static struct sparx5_vcap_inst {
+-	enum vcap_type vtype; /* type of vcap */
+-	int vinst; /* instance number within the same type */
+-	int lookups; /* number of lookups in this vcap type */
+-	int lookups_per_instance; /* number of lookups in this instance */
+-	int first_cid; /* first chain id in this vcap */
+-	int last_cid; /* last chain id in this vcap */
+-	int count; /* number of available addresses, not in super vcap */
+-	int map_id; /* id in the super vcap block mapping (if applicable) */
+-	int blockno; /* starting block in super vcap (if applicable) */
+-	int blocks; /* number of blocks in super vcap (if applicable) */
+-	bool ingress; /* is vcap in the ingress path */
+-} sparx5_vcap_inst_cfg[] = {
++const struct sparx5_vcap_inst sparx5_vcap_inst_cfg[] = {
+ 	{
+ 		.vtype = VCAP_TYPE_IS0, /* CLM-0 */
+ 		.vinst = 0,
+diff --git a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.h b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.h
+index 2684d9199b05..d0a42406bf26 100644
+--- a/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.h
++++ b/drivers/net/ethernet/microchip/sparx5/sparx5_vcap_impl.h
+@@ -16,6 +16,11 @@
+ #include "vcap_api.h"
+ #include "vcap_api_client.h"
+ 
++#define SPARX5_IS2_LOOKUPS 4
++#define SPARX5_IS0_LOOKUPS 6
++#define SPARX5_ES0_LOOKUPS 1
++#define SPARX5_ES2_LOOKUPS 2
++
+ #define SPARX5_VCAP_CID_IS0_L0 VCAP_CID_INGRESS_L0 /* IS0/CLM lookup 0 */
+ #define SPARX5_VCAP_CID_IS0_L1 VCAP_CID_INGRESS_L1 /* IS0/CLM lookup 1 */
+ #define SPARX5_VCAP_CID_IS0_L2 VCAP_CID_INGRESS_L2 /* IS0/CLM lookup 2 */
+@@ -40,6 +45,22 @@
+ #define SPARX5_VCAP_CID_ES2_MAX \
+ 	(VCAP_CID_EGRESS_STAGE2_L1 + VCAP_CID_LOOKUP_SIZE - 1) /* ES2 Max */
+ 
++struct sparx5_vcap_inst {
++	enum vcap_type vtype; /* type of vcap */
++	int vinst; /* instance number within the same type */
++	int lookups; /* number of lookups in this vcap type */
++	int lookups_per_instance; /* number of lookups in this instance */
++	int first_cid; /* first chain id in this vcap */
++	int last_cid; /* last chain id in this vcap */
++	int count; /* number of available addresses, not in super vcap */
++	int map_id; /* id in the super vcap block mapping (if applicable) */
++	int blockno; /* starting block in super vcap (if applicable) */
++	int blocks; /* number of blocks in super vcap (if applicable) */
++	bool ingress; /* is vcap in the ingress path */
++};
++
++extern const struct sparx5_vcap_inst sparx5_vcap_inst_cfg[];
++
+ /* IS0 port keyset selection control */
+ 
+ /* IS0 ethernet, IPv4, IPv6 traffic type keyset generation */
 
-Best regards,
 -- 
-Daniel Machon <daniel.machon@microchip.com>
+2.34.1
 
 
