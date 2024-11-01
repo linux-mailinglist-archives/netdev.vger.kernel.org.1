@@ -1,196 +1,309 @@
-Return-Path: <netdev+bounces-141090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141091-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E9469B973B
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 19:17:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 176169B9742
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 19:18:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5596B2817DE
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:17:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7CEFFB211E4
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 18:18:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707BE1CDFDE;
-	Fri,  1 Nov 2024 18:16:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RAeH6rW5"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CAB21CDA27;
+	Fri,  1 Nov 2024 18:18:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f48.google.com (mail-wm1-f48.google.com [209.85.128.48])
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910401CEAA4;
-	Fri,  1 Nov 2024 18:16:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 091F314F132;
+	Fri,  1 Nov 2024 18:18:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730484982; cv=none; b=M8XZFLgy8hcCqech6c8HDOlLQqbRn5vEfSzjTKP5v+k3ndrtk+oUwmohrtiYkNlqrF/VfR6iv3BUIupY0nKKEcXctumqtw/LMHRpyLFURYhowGdkZTQ+3LnQ9nw7thyMTIqXQKEFXQv0EsGWSpEPna0gT/FXTmdod+DrTVa9bIw=
+	t=1730485117; cv=none; b=URv+aEQR/hWtVuRcGC89GwKYMiWg6QeUNg2DNyuHI+fRr/4zDgazTaaSQDAIgc/NgSmTZCARfkfKmMZdW7hq2Ais/1fRD0VU84qeLPWgD8pSNDQ9HLTE/kBjNGxSRdA6FFnLR6rp9KqO9DMHUFSZFqo4AvkjOaOY5bdoyc4Cxqo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730484982; c=relaxed/simple;
-	bh=0FR/njw452jCVSO4SsQ9lRF6aQwJcXYFDa74fwjd7xU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Kli2LW5KkP77VL/F3jORLKfvCdqth3t2hfFntm/0IpnX/cHTS6pmBUzq71P7PA9WXT5podsWVk4maTujia9QrLlC1sJGC6GAV35GP1amdWCIyA/74KdG2yNV9xy3pzdwo6eW1Tte2bWEHYKd52ZudairwFZu75j6xGIDpsIfyPQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RAeH6rW5; arc=none smtp.client-ip=209.85.128.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1730485117; c=relaxed/simple;
+	bh=rp5ZouIQfP4PRaaX4NYqHmAXKb3TRtFuzfWpt6SAQX0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uJ7XrGyfNL5W2SzgO82ys6WJq/rWFKfhpGb0zqcF9bnzVnMVCEzJPoABhKcl1sTIBdWyZES7E5EZ3aEVpomarIA8TDpqObBsGCz1Nlp1uEc1AdKCeYf8LKHwzfbSbYQErsxZ/c13Tmi3zdy/s7MrVs1iG1VCZaPQk4HWM3zSjVY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f48.google.com with SMTP id 5b1f17b1804b1-43163667f0eso18815705e9.0;
-        Fri, 01 Nov 2024 11:16:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730484979; x=1731089779; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cc4lXFKgcyUIAuEC6kZ9N4WBDUARabN2Mw/9c+S8Xsw=;
-        b=RAeH6rW5kWb5ME5WurdlJIRXNC8K59CZlvmVjf6YofVxOFRe8Bw1oDGcgMcS2r3Wav
-         NslruWQfEOeKWEFuQIyOtMgHjoDkAS9M8D1FTC90t7b2VQm2BofmnshwhdPhH23sWvtZ
-         adWg/VstzzpMw4qW3Nc4P4aRFyWiCz4/Uj6/lM50EMNWXTR7JcPsfhMALYzgn/Ldee0F
-         /iiSPoaSyaAUgPLQiGpmYhAZ9Pgi2zQRpHYu6CciU69nWAAAdMmgTvzQ4VLFRRxYiB7I
-         TxS7A5RX7Uwa76TCvrfYG6hDf694rVADc/rbdEwEdnJNj/lRRQh0uXoAVd0oOPBY/R3P
-         xl2A==
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539f8490856so2416426e87.2;
+        Fri, 01 Nov 2024 11:18:34 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730484979; x=1731089779;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cc4lXFKgcyUIAuEC6kZ9N4WBDUARabN2Mw/9c+S8Xsw=;
-        b=jkogd5jZs6FGi1ZPmHdiXYYQo2gAPTRnqUVbC6aEHCCGj+FsmGmQ2wLmM1z5ebAJZi
-         wXN+zvFcyDl/Q1SXhTARDJZkZUpv/ffo4/fgk0UxET+FzWZZ+LUdmOfN0TeHOMMhmK/e
-         Fyha6f8E4avp3weWhjY7BBSxGuHHu2iYFzQ7I7Q/p28mIez7UR988CXQ0kai9zx7OeH+
-         m1sYyQxj4RdPnVWyoXLK2IuxD6C5+8/8VqLZbN3zBvsAdVVNMc7Y2E5v9W0yQ+fXlHlL
-         rFOSVnsKcIKldonc8EzYZi+98OZrOT0nL2UXAAmUWMZIift69d/cChwduJHKwsXHTCzU
-         CATQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUhbjxZLWnFiGVsFhyn8isExjSio12if+SWZS2XFX0F8c8GSNc2U76S/2HWnTMJYuyzYVR/mhI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxxacGxPh3VIrxPDB8mTnF1K6bp0nNHbQdBTDzRkIgDM62eBwJF
-	5RU2k4dzUwR0IDBXyg/tsDZhxbJLmKHDk9Bieq2R8BLn9PBcW2YN
-X-Google-Smtp-Source: AGHT+IElKTn819yNPTSho21gH78+hoFX4HkE49vG5ci5mpB3stuKhjkJP3WgO8moYPZrDmK6WDB6gA==
-X-Received: by 2002:a05:600c:3150:b0:431:5ce5:4864 with SMTP id 5b1f17b1804b1-432832aa0b1mr34058125e9.35.1730484978490;
-        Fri, 01 Nov 2024 11:16:18 -0700 (PDT)
-Received: from [192.168.42.19] ([85.255.236.151])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5c65c7sm69352105e9.19.2024.11.01.11.16.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 01 Nov 2024 11:16:18 -0700 (PDT)
-Message-ID: <2928976c-d3ea-4595-803f-b975847e4402@gmail.com>
-Date: Fri, 1 Nov 2024 18:16:30 +0000
+        d=1e100.net; s=20230601; t=1730485113; x=1731089913;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F+x+swhfU93hRI3h78UCPOELgbvo7wYFfk9WP+jVDLo=;
+        b=rX9mpieMeNiY6AMf/ZveDK7/cwD063Bc+ebBtgj30YZOG3pGDigtxpXT72k2b091C+
+         itZxwsHcQWQ+lOPWellmW8oqdpixETbjVhZs1QFHTM/KX1MMRT+Tnvm21DcBKua99D2T
+         1LS5lnj5m8ttiTp2F7hVTJ0iPIeB5GLsrZzSXjI63J0yC6MXbFtd/gtlJGnhtYk4OL7F
+         TcRgrqtAltPWpF+wjXn5m9Xo6KUzpEgs+04qSDFj2lQ9dyf0ZPAKq94KMg6/rHgUP2Jd
+         fBRopWIUDNyCO8k8GzFX8xY1+93yi7fRbx4H2FGCx3PorZGO/6heWVYJagSitWbNYRTB
+         OfKA==
+X-Forwarded-Encrypted: i=1; AJvYcCVplyqQ51m4f0Pk1bzWnXbNGThQkJNakJ6OzG424QMo2RnUjLNrJoGoU+NDMrZYSc4g7bqYCURMpB078+8=@vger.kernel.org, AJvYcCW9KCtZkCjHJKDsjQUgNXulA9Kdk2SggBF8xR1DajadZ2c7Xmw4E/c2fS9LSKM6EF1ZKzlsgNAi@vger.kernel.org
+X-Gm-Message-State: AOJu0YwN0WCutjiN3PnUm5o7RSKjFFF+PgZkaSWAYrO7UlM9uPiAKqZI
+	iIDRckNqnxCpbTMJKrEJOi3dr93c00FeFJw93RnVRcqNuTP+SN8+CIgB0g==
+X-Google-Smtp-Source: AGHT+IETR8aBiN9iNaZpomelbXjCefG6qFLHlS1al0g1ANZBI4bV0KDJkCjwpkxenHshVzq74uSK2g==
+X-Received: by 2002:a05:6512:b84:b0:536:55a9:4b6c with SMTP id 2adb3069b0e04-53c79e2f90amr4457731e87.13.1730485112611;
+        Fri, 01 Nov 2024 11:18:32 -0700 (PDT)
+Received: from gmail.com (fwdproxy-lla-005.fbsv.net. [2a03:2880:30ff:5::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9e565dfaaasm212059066b.106.2024.11.01.11.18.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 11:18:32 -0700 (PDT)
+Date: Fri, 1 Nov 2024 11:18:29 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
+	vlad.wing@gmail.com, max@kutsevol.com, kernel-team@meta.com,
+	jiri@resnulli.us, jv@jvosburgh.net, andy@greyhouse.net,
+	aehkn@xenhub.one, Rik van Riel <riel@surriel.com>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH net-next 1/3] net: netpoll: Defer skb_pool population
+ until setup success
+Message-ID: <20241101-prompt-carrot-hare-ff2aaa@leitao>
+References: <20241025142025.3558051-1-leitao@debian.org>
+ <20241025142025.3558051-2-leitao@debian.org>
+ <20241031182647.3fbb2ac4@kernel.org>
+ <20241101-cheerful-pretty-wapiti-d5f69e@leitao>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 06/15] net: page pool: add helper creating area from
- pages
-To: Mina Almasry <almasrymina@google.com>, David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241029230521.2385749-1-dw@davidwei.uk>
- <20241029230521.2385749-7-dw@davidwei.uk>
- <CAHS8izMkpisFO1Mx0z_qh0eeAkhsowbyCqKqvcV=JkzHV0Y2gQ@mail.gmail.com>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CAHS8izMkpisFO1Mx0z_qh0eeAkhsowbyCqKqvcV=JkzHV0Y2gQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241101-cheerful-pretty-wapiti-d5f69e@leitao>
 
-On 11/1/24 17:33, Mina Almasry wrote:
-> On Tue, Oct 29, 2024 at 4:06 PM David Wei <dw@davidwei.uk> wrote:
->>
->> From: Pavel Begunkov <asml.silence@gmail.com>
->>
->> Add a helper that takes an array of pages and initialises passed in
->> memory provider's area with them, where each net_iov takes one page.
->> It's also responsible for setting up dma mappings.
->>
->> We keep it in page_pool.c not to leak netmem details to outside
->> providers like io_uring, which don't have access to netmem_priv.h
->> and other private helpers.
->>
+On Fri, Nov 01, 2024 at 03:51:59AM -0700, Breno Leitao wrote:
+> Hello Jakub,
 > 
-> I honestly prefer leaking netmem_priv.h details into the io_uring
-> rather than having io_uring provider specific code in page_pool.c.
-
-Even though Jakub didn't comment on this patch, but he definitely
-wasn't fond of giving all those headers to non net/ users. I guess
-I can't please everyone. One middle option is to make the page
-pool helper more granular, i.e. taking care of one netmem at
-a time, and moving the loop to io_uring, but I don't think it
-changes anything.
-
-...
->>   #include <linux/dma-direction.h>
->> @@ -459,7 +460,8 @@ page_pool_dma_sync_for_device(const struct page_pool *pool,
->>                  __page_pool_dma_sync_for_device(pool, netmem, dma_sync_size);
->>   }
->>
->> -static bool page_pool_dma_map(struct page_pool *pool, netmem_ref netmem)
->> +static bool page_pool_dma_map_page(struct page_pool *pool, netmem_ref netmem,
->> +                                  struct page *page)
+> On Thu, Oct 31, 2024 at 06:26:47PM -0700, Jakub Kicinski wrote:
+> > On Fri, 25 Oct 2024 07:20:18 -0700 Breno Leitao wrote:
+> > > The current implementation has a flaw where it populates the skb_pool
+> > > with 32 SKBs before calling __netpoll_setup(). If the setup fails, the
+> > > skb_pool buffer will persist indefinitely and never be cleaned up.
+> > > 
+> > > This change moves the skb_pool population to after the successful
+> > > completion of __netpoll_setup(), ensuring that the buffers are not
+> > > unnecessarily retained. Additionally, this modification alleviates rtnl
+> > > lock pressure by allowing the buffer filling to occur outside of the
+> > > lock.
+> > 
+> > arguably if the setup succeeds there would now be a window of time
+> > where np is active but pool is empty.
 > 
-> I have to say this is confusing for me. Passing in both the netmem and
-> the page is weird. The page is the one being mapped and the
-> netmem->dma_addr is the one being filled with the mapping.
-
-the page argument provides a mapping, the netmem gives the object
-where the mapping is set. netmem could be the same as the page
-argument, but I don't think it's inherently wrong, and it's an
-internal helper anyway. I can entirely copy paste the function, I
-don't think it's anyhow an improvement.
-
-> Netmem is meant to be an abstraction over page. Passing both makes
-> little sense to me. The reason you're doing this is because the
-> io_uring memory provider is in a bit of a weird design IMO where the
-> memory comes in pages but it doesn't want to use paged-backed-netmem.
-
-Mina, as explained it before, I view it rather as an abstraction
-that helps with finer grained control over memory and extending
-it this way, I don't think it's such a stretch, and it doesn't
-change much for the networking stack overall. Not fitting into
-devmem TCP category doesn't make it weird.
-
-> Instead it uses net_iov-backed-netmem and there is an out of band page
-> to be managed.
+> I am not convinced this is a problem. Given that netpoll_setup() is only
+> called from netconsole.
 > 
-> I think it would make sense to use paged-backed-netmem for your use
-> case, or at least I don't see why it wouldn't work. Memory providers
-
-It's a user page, we can't make assumptions about it, we can't
-reuse space in struct page like for pp refcounting (unlike when
-it's allocated by the kernel), we can't use the normal page
-refcounting.
-
-If that's the direction people prefer, we can roll back to v1 from
-a couple years ago, fill skbs fill user pages, attach ubuf_info to
-every skb, and whack-a-mole'ing all places where the page could be
-put down or such, pretty similarly what net_iov does. Honestly, I
-thought that reusing common infra so that the net stack doesn't
-need a different path per interface was a good idea.
-
-> were designed to handle the hugepage usecase where the memory
-> allocated by the provider is pages. Is there a reason that doesn't
-> work for you as well?
+> In netconsole, a target is not enabled (as in sending packets) until the
+> netconsole target is, in fact, enabled. (nt->enabled = true). Enabling
+> the target(nt) only happen after netpoll_setup() returns successfully.
 > 
-> If you really need to use net_iov-backed-netmem, can we put this
-> weirdness in the provider? I don't know that we want a generic-looking
-> dma_map function which is a bit confusing to take a netmem and a page.> 
-...
->> +
->> +static void page_pool_release_page_dma(struct page_pool *pool,
->> +                                      netmem_ref netmem)
->> +{
->> +       __page_pool_release_page_dma(pool, netmem);
->> +}
->> +
+> Example:
 > 
-> Is this wrapper necessary? Do you wanna rename the original function
-> to remove the __ instead of a adding a wrapper?
+> 	static void write_ext_msg(struct console *con, const char *msg,
+> 				  unsigned int len)
+> 	{
+> 		...
+> 		list_for_each_entry(nt, &target_list, list)
+> 			if (nt->extended && nt->enabled && netif_running(nt->np.dev))
+> 				send_ext_msg_udp(nt, msg, len);
+> 
+> So, back to your point, the netpoll interface will be up, but, not used
+> at all.
+> 
+> On top of that, two other considerations:
+> 
+>  * If the netpoll target is used without the buffer, it is not a big
+> deal, since refill_skbs() is called, independently if the pool is full
+> or not. (Which is not ideal and I eventually want to improve it).
+> 
+> Anyway, this is how the code works today:
+> 
+> 
+> 	void netpoll_send_udp(struct netpoll *np, const char *msg, int len)
+> 	{
+> 		...
+> 		skb = find_skb(np, total_len + np->dev->needed_tailroom,...
+> 		// transmit the skb
+> 		
+> 
+> 	static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
+> 	{
+> 		...
+> 		refill_skbs(np);
+> 		skb = alloc_skb(len, GFP_ATOMIC);
+> 		if (!skb)
+> 			skb = skb_dequeue(&np->skb_pool);
+> 		...
+> 		// return the skb
+> 
+> So, even in there is a transmission in-between enabling the netpoll
+> target and not populating the pool (which is NOT the case in the code
+> today), it would not be a problem, given that netpoll_send_udp() will
+> call refill_skbs() anyway.
+> 
+> I have an in-development patch to improve it, by deferring this to a
+> workthread, mainly because this whole allocation dance is done with a
+> bunch of locks held, including printk/console lock.
+> 
+> I think that a best mechanism might be something like:
+> 
+>  * If find_skb() needs to consume from the pool (which is rare, only
+> when alloc_skb() fails), raise workthread that tries to repopulate the
+> pool in the background. 
+> 
+>  * Eventually avoid alloc_skb() first, and getting directly from the
+>    pool first, if the pool is depleted, try to alloc_skb(GPF_ATOMIC).
+>    This might make the code faster, but, I don't have data yet.
 
-I only added it here to cast away __always_inline since it's used in
-a slow / setup path. It shouldn't change the binary, but I'm not a huge
-fan of leaving the hint for the code where it's not needed.
+I've hacked this case (getting the skb from the pool first and refilling
+it on a workqueue) today, and the performance is expressive.
 
--- 
-Pavel Begunkov
+I've tested sending 2k messages, and meassured the time it takes to
+run `netpoll_send_udp`, which is the critical function in netpoll.
+
+Actual code (with this patchset applied), where the index is
+nanoseconds:
+
+	[14K, 16K)           107 |@@@                                                 |
+	[16K, 20K)          1757 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+	[20K, 24K)            59 |@                                                   |
+	[24K, 28K)            35 |@                                                   |
+	[28K, 32K)            35 |@                                                   |
+	[32K, 40K)             5 |                                                    |
+	[40K, 48K)             0 |                                                    |
+	[48K, 56K)             0 |                                                    |
+	[56K, 64K)             0 |                                                    |
+	[64K, 80K)             1 |                                                    |
+	[80K, 96K)             0 |                                                    |
+	[96K, 112K)            1 |                                                    |
+
+
+With the optimization applied, I get a solid win:
+
+	[8K, 10K)             32 |@                                                   |
+	[10K, 12K)           514 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@                        |
+	[12K, 14K)           932 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+	[14K, 16K)           367 |@@@@@@@@@@@@@@@@@@@@                                |
+	[16K, 20K)           102 |@@@@@                                               |
+	[20K, 24K)            29 |@                                                   |
+	[24K, 28K)            17 |                                                    |
+	[28K, 32K)             1 |                                                    |
+	[32K, 40K)             3 |                                                    |
+	[40K, 48K)             0 |                                                    |
+	[48K, 56K)             0 |                                                    |
+	[56K, 64K)             1 |                                                    |
+	[64K, 80K)             0 |                                                    |
+	[80K, 96K)             1 |                                                    |
+	[96K, 112K)            1 |                                                    |
+
+That was captured this simple bpftrace script:
+
+	kprobe:netpoll_send_udp {
+	    @start[tid] = nsecs;
+	}
+
+	kretprobe:netpoll_send_udp /@start[tid]/ {
+	    $duration = nsecs - @start[tid];
+	    delete(@start[tid]);
+	    @ = hist($duration, 2)
+	}
+
+	END
+	{
+		clear(@start);
+		print(@);
+	}
+
+And this is the patch I am testing right now:
+
+
+	commit 262de00e439e0708fadf5e4c2896837c046a325b
+	Author: Breno Leitao <leitao@debian.org>
+	Date:   Fri Nov 1 10:03:58 2024 -0700
+
+	    netpoll: prioritize the skb from the pool.
+
+	    Prioritize allocating SKBs from the pool over alloc_skb() to reduce
+	    overhead in the critical path.
+
+	    Move the pool refill operation to a worktask, allowing it to run
+	    outside of the printk/console lock.
+
+	    This change improves performance by minimizing the time spent in the
+	    critical path filling and allocating skbs, reducing contention on the
+	    printk/console lock.
+
+	    Signed-off-by: Breno Leitao <leitao@debian.org>
+
+	diff --git a/include/linux/netpoll.h b/include/linux/netpoll.h
+	index 77635b885c18..c81dc9cc0139 100644
+	--- a/include/linux/netpoll.h
+	+++ b/include/linux/netpoll.h
+	@@ -33,6 +33,7 @@ struct netpoll {
+		u16 local_port, remote_port;
+		u8 remote_mac[ETH_ALEN];
+		struct sk_buff_head skb_pool;
+	+	struct work_struct work;
+	 };
+
+	 struct netpoll_info {
+	diff --git a/net/core/netpoll.c b/net/core/netpoll.c
+	index bf2064d689d5..657100393489 100644
+	--- a/net/core/netpoll.c
+	+++ b/net/core/netpoll.c
+	@@ -278,18 +278,24 @@ static void zap_completion_queue(void)
+		put_cpu_var(softnet_data);
+	 }
+
+	+
+	+static void refill_skbs_wt(struct work_struct *work)
+	+{
+	+	struct netpoll *np = container_of(work, struct netpoll, work);
+	+
+	+	refill_skbs(np);
+	+}
+	+
+	 static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
+	 {
+		int count = 0;
+		struct sk_buff *skb;
+
+		zap_completion_queue();
+	-	refill_skbs(np);
+	 repeat:
+	-
+	-	skb = alloc_skb(len, GFP_ATOMIC);
+	+	skb = skb_dequeue(&np->skb_pool);
+		if (!skb)
+	-		skb = skb_dequeue(&np->skb_pool);
+	+		skb = alloc_skb(len, GFP_ATOMIC);
+
+		if (!skb) {
+			if (++count < 10) {
+	@@ -301,6 +307,7 @@ static struct sk_buff *find_skb(struct netpoll *np, int len, int reserve)
+
+		refcount_set(&skb->users, 1);
+		skb_reserve(skb, reserve);
+	+	schedule_work(&np->work);
+		return skb;
+	 }
+
+	@@ -780,6 +787,7 @@ int netpoll_setup(struct netpoll *np)
+
+		/* fill up the skb queue */
+		refill_skbs(np);
+	+	INIT_WORK(&np->work, refill_skbs_wt);
+		return 0;
+
+	 put:
+
+
 
