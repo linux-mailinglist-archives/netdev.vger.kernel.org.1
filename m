@@ -1,151 +1,105 @@
-Return-Path: <netdev+bounces-141125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A17B69B9A69
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 22:50:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F0539B9A77
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 22:52:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D39D91C214CA
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:50:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E96DD281534
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 21:52:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4EFB1F7073;
-	Fri,  1 Nov 2024 21:48:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA5D1E572C;
+	Fri,  1 Nov 2024 21:51:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Do/nMTSY"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Q5b0sI9f"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D99A1F5827;
-	Fri,  1 Nov 2024 21:48:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73FE51E32BD;
+	Fri,  1 Nov 2024 21:51:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730497717; cv=none; b=LzXOULSAx2mMFsWKZ+m327DILJjeIvt1443KCMS5V/Ok+yNIB4ttRTVnUGUaIG6SStqbBmIsK6gDXYCEoYWaz6zxDtLjMQi2J3WjNNSlxcpgp3Qndgcy7mKvZmr4o5N9gudbrc0A/79AczuMVRMzAScabbgDaYIMbLburjyLOeY=
+	t=1730497895; cv=none; b=glPOmRfnaTgTiOmJtxUgcR8FTfsETgm7vwj2nE7nbAnHaaEDN1QvL5KNM1P4MAeCCfwcCnz/EGZ2bX9YsIb7CUj0lKJDwPI8Rl9LQfr1FxYk/du6dkG6OMSF3cCL5bVWU+ORg60aVxYDXruCE1yofQ3Cvzf/aVp4evGYMQc1vvY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730497717; c=relaxed/simple;
-	bh=r7j2WvtsieCpZbMv5XMgyVj6RY6NOBqWFXbpmlBC0Gs=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=DcOzF79hVTGh7DGJw//AOCeAxebNfzOZPey24+p7lK6p56TAZ8n9COdmee8PrBwpYGIb0L2Prf2NnDTcpu+H2C76xITxGp9gPdvBQmN01jiEaCS2zAxOVaZR3YFu9/fBsywWODBTNRav8guYKav2wI2zDD35wE8RfqnuHdvk8A0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Do/nMTSY; arc=none smtp.client-ip=209.85.214.173
+	s=arc-20240116; t=1730497895; c=relaxed/simple;
+	bh=2MYIZiXSfLL6vxUEZZdUkiQvueBlK/GaJ4xtn7dtCz0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EyPdDwPg/dytExmB+nB9S3pToRmT/bPgYm+HFSJVeFXikPZs/xImbttYWpYf2Ql54IvK9sLo9gM0DbnSyoIrE64T70JIUlekvDV5aYxtpOLbQ+kxoT3uubAr7QnYgdBxPerprikQWIXPa26n30NfmXFPuGOyqSvOL0ZIjifkaiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Q5b0sI9f; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20cbcd71012so28387655ad.3;
-        Fri, 01 Nov 2024 14:48:36 -0700 (PDT)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c767a9c50so24713515ad.1;
+        Fri, 01 Nov 2024 14:51:34 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730497715; x=1731102515; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=JkCgUid3lALqAkyziGA3/78dlQ1W88S6aeKIVhXq5Qo=;
-        b=Do/nMTSYCOUuHUb6raBXJlra9cnAqXor+XP59lK4xMnvpTP/72rWKxhfB6lix7tRXW
-         JtKYHBKgP7y0MwRv/QZkDQu0ppY87qVyPDhO1g4UFjT7qHIPJzFPJDH4WvOrEB5cscBv
-         azJ9aN54AK1kCYZYFZ6zpKvQ8Tuyois7p80iVaCxjDV1IMoMKmGgrUI0fLJxpnWiaPuJ
-         2CrCLcSiBJwac6OSd70sKFBWYQgAMRKJmNlo3X3qi7Rww2R3XtTjs7acHlN90dohMHMZ
-         W2UnB02HJ25BY6RKE0tH3BQBu8gnxJjstlAzvEy/NkBTwHj+dUa9vOWS9I9T7MSO+3gF
-         lFJw==
+        d=gmail.com; s=20230601; t=1730497894; x=1731102694; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=AqOSQvizINBYla+O3k1bEzctQxHc9qL4AnI65iFZnfY=;
+        b=Q5b0sI9fo1HyOnccZwhMOUVghOY0ocmQNOBQr5beAxpA2JQhGLGmjp6WCXosPNsdwp
+         dVrKADxSs2gKE1AS7A2EC+M/gw+piuIgZzXchDX705tJEZrGU1RyutyNLNcWyHz8p7sN
+         R0Wie1xyiZxY/Wq5TOPbzDpuXOUDvjFb1sjAz8mT7RHVo4bt6P/oJLNf03rSY/dAjNz2
+         DRn5lE0PjX5tdsPQTaa8GeqirVtsfj8lKaCCXMVdIB/g+3Qg3EBHk3kOP2aeUvoxnH7j
+         FVNSyKcmhSW8VsH1O4UkY95ZXV13i7VMh0yQ4CzYmtNfPXxvREQ00ftmXZ3fRObPkqWI
+         cCcA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730497715; x=1731102515;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JkCgUid3lALqAkyziGA3/78dlQ1W88S6aeKIVhXq5Qo=;
-        b=AZIC57rY0sda0mbYUzWGZVvBPyEZFIzTraf2dTBmzqamWuHGBe5z5H7tn5Xr8iF6yl
-         nNLxgg1flAy55v+j10eM/O6BQ0NSv34yuIqU2/kusvlAQckDcolPGzS1ecJAi7+hzfnx
-         2DRZnyhYgGx1CTd3VYgKk3rcseFYsOh9MX1lQmibEF3EmA9ZmngexRpJV++KyR16juS4
-         UcWogJDYyngcF6VFIg8NiReaJvrOwChcedvQuUkgJhyrh5P7CIS8MkDnX+YBNxLWwqh6
-         GocQnXo+xehCHkeg416PeoqYCIlpVhUM3hUet+9O71/+0r+Iryd6xXjcV+PXqIKP/X97
-         gV3w==
-X-Forwarded-Encrypted: i=1; AJvYcCUyHJqYx+EvhqvDW37/cu+PwggmQZtWzqHHL9tqnlJAvimqo/dlCqDBLf86RLu65AyZAm5EfDjmd+fP1uE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbifJTAfcoAZ8MV+HHwjeIIGDKSnk7lwUPHSkeKuScpnmcDC4A
-	VxodHTnQBHcViESjDNez/RbWG2OvMdxoe34N+CRoS+rWit54oaJvyAgHmOf7
-X-Google-Smtp-Source: AGHT+IF7TeB8qbK2O90WipxhJ5So7uylLqr58H+sqar5PQ2+2Kz9JTR8a/Tonh8MQjF4WjwptrcObQ==
-X-Received: by 2002:a17:902:ce91:b0:20c:7a0b:74a3 with SMTP id d9443c01a7336-2111af0aa80mr59481315ad.24.1730497715423;
-        Fri, 01 Nov 2024 14:48:35 -0700 (PDT)
-Received: from ryzen.lan ([2601:644:8200:dab8::a86])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057cf273sm25120155ad.239.2024.11.01.14.48.33
+        d=1e100.net; s=20230601; t=1730497894; x=1731102694;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=AqOSQvizINBYla+O3k1bEzctQxHc9qL4AnI65iFZnfY=;
+        b=iyk+ZwYSqbOG7ep8dCj6SHS0Z2cKL8khNpHjpbWiMmWUZgYieDLjz2n0pfQXEy57uh
+         zchYLwnhyqKLxF7xr4EKiJxY0LkGunGIpa6td15yVcKuGmwH8J6eh8B6uS9Adjihn/a7
+         dNjgIaQqH3rj51HbSC/a37BdPMY9DR5qirkshzQRc5R1HTqVNKORTapEKNfMi+zQliAe
+         JpATLAFWx4krKwUj6500nsN1owwvP1jQn9SoyEYrC5ek6K9BGQ+kbE8R1X262jfYE5uz
+         vNjqf3h7SX9dsUSTuImrL6bYVCfHzVxdJG9sN1XleuhgriMz3ZiyQMVdf3CCsUBVcoIt
+         TEfg==
+X-Forwarded-Encrypted: i=1; AJvYcCWtLPqSbo3ACFe7Sidc4DVOhI9Ubu/5+caPLHd4dci6B21Y+YBQqWAFXRD+d4H1k5mIcSbGt5BAFPeZjDyvLTc6@vger.kernel.org, AJvYcCXshLHEscTZO43OLtKJgH3CWkoWsjWr0SWu0yxNtKbcEyJRqojuTU0ZTJYKjAle1W24N1NO4ZUoBjgRFH0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxhZ1AFAgIDoLCVSbGUFbB+CIhZgfuYhww9nxhBCLd+KdGf1kHE
+	Oltp3SdUVOSAVyL+5KDhapy4j+xxhx8JRoEKpw5nIggVmo7yPSrE
+X-Google-Smtp-Source: AGHT+IELqqb+P4HgQGBysM8Mc88nov1zQGX/2aqpM0HFXz0rK167Reeprdax+9M/6TVaKHOE+Y5WEQ==
+X-Received: by 2002:a17:902:d486:b0:20c:5d05:69b4 with SMTP id d9443c01a7336-2111af5a0a6mr65686245ad.26.1730497893646;
+        Fri, 01 Nov 2024 14:51:33 -0700 (PDT)
+Received: from localhost ([2601:647:6881:9060:be2e:c8e6:bba5:abcd])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057d9750sm25415905ad.280.2024.11.01.14.51.32
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 01 Nov 2024 14:48:35 -0700 (PDT)
-From: Rosen Penev <rosenp@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Shay Agroskin <shayagr@amazon.com>,
-	Arthur Kiyanovski <akiyano@amazon.com>,
-	David Arinzon <darinzon@amazon.com>,
-	Noam Dagan <ndagan@amazon.com>,
-	Saeed Bishara <saeedb@amazon.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jian Shen <shenjian15@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Jijie Shao <shaojijie@huawei.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next 2/2] net: ena: simplify some pointer addition
-Date: Fri,  1 Nov 2024 14:48:28 -0700
-Message-ID: <20241101214828.289752-3-rosenp@gmail.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241101214828.289752-1-rosenp@gmail.com>
-References: <20241101214828.289752-1-rosenp@gmail.com>
+        Fri, 01 Nov 2024 14:51:33 -0700 (PDT)
+Date: Fri, 1 Nov 2024 14:51:32 -0700
+From: Cong Wang <xiyou.wangcong@gmail.com>
+To: Pedro Tammela <pctammela@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, jiri@resnulli.us,
+	shuah@kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests/tc-testing: add tests for
+ qdisc_tree_reduce_backlog
+Message-ID: <ZyVNZFnZO79iQlSr@pop-os.localdomain>
+References: <20241101143148.1218890-1-pctammela@mojatatu.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241101143148.1218890-1-pctammela@mojatatu.com>
 
-Use ethtool_sprintf to simplify the code.
+On Fri, Nov 01, 2024 at 11:31:48AM -0300, Pedro Tammela wrote:
+> Add 3 tests to check for the expected behaviour of
+> qdisc_tree_reduce_backlog in special scenarios.
+> 
+> - The first test checks if the qdisc class is notified of deletion for
+> major handle 'ffff:'.
+> - The second test checks the same as the first test but with 'ffff:' as the root
+> qdisc.
+> - The third test checks if everything works if ingress is active.
+> 
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 
-Because strings_buf is separate from buf, it needs to be incremented
-separately.
+Acked-by: Cong Wang <cong.wang@bytedance.com>
 
-Signed-off-by: Rosen Penev <rosenp@gmail.com>
----
- drivers/net/ethernet/amazon/ena/ena_ethtool.c | 17 ++++++++---------
- 1 file changed, 8 insertions(+), 9 deletions(-)
-
-diff --git a/drivers/net/ethernet/amazon/ena/ena_ethtool.c b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-index fa9d7b8ec00d..96fa55a88faf 100644
---- a/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-+++ b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-@@ -1120,7 +1120,7 @@ static void ena_dump_stats_ex(struct ena_adapter *adapter, u8 *buf)
- 	u8 *strings_buf;
- 	u64 *data_buf;
- 	int strings_num;
--	int i, rc;
-+	int i;
- 
- 	strings_num = ena_get_sw_stats_count(adapter);
- 	if (strings_num <= 0) {
-@@ -1149,17 +1149,16 @@ static void ena_dump_stats_ex(struct ena_adapter *adapter, u8 *buf)
- 	/* If there is a buffer, dump stats, otherwise print them to dmesg */
- 	if (buf)
- 		for (i = 0; i < strings_num; i++) {
--			rc = snprintf(buf, ETH_GSTRING_LEN + sizeof(u64),
--				      "%s %llu\n",
--				      strings_buf + i * ETH_GSTRING_LEN,
--				      data_buf[i]);
--			buf += rc;
-+			ethtool_sprintf(&buf, "%s %llu\n", strings_buf,
-+					data_buf[i]);
-+			strings_buf += ETH_GSTRING_LEN;
- 		}
- 	else
--		for (i = 0; i < strings_num; i++)
-+		for (i = 0; i < strings_num; i++) {
- 			netif_err(adapter, drv, netdev, "%s: %llu\n",
--				  strings_buf + i * ETH_GSTRING_LEN,
--				  data_buf[i]);
-+				  strings_buf, data_buf[i]);
-+			strings_buf += ETH_GSTRING_LEN;
-+		}
- 
- 	kfree(strings_buf);
- 	kfree(data_buf);
--- 
-2.47.0
-
+Thanks for more tests!
 
