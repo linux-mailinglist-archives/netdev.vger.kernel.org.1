@@ -1,235 +1,175 @@
-Return-Path: <netdev+bounces-141067-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141068-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 14F4D9B9596
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:38:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2A159B959A
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 17:39:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 97B521F22FC6
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:37:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1F87A1C21D2A
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 16:39:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97D7A1A2562;
-	Fri,  1 Nov 2024 16:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4E6A1A2562;
+	Fri,  1 Nov 2024 16:39:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nRO7P6XL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="CRnkiUMC"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 685C31C2456
-	for <netdev@vger.kernel.org>; Fri,  1 Nov 2024 16:37:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.21
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6ED137747;
+	Fri,  1 Nov 2024 16:39:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730479077; cv=none; b=L8VYvQHqKRf/GSStriy4fepLqiQnfnE74BZowmDd7t1/Fn8sREjk7fDrJCoTlEu9oyGVuM6vKZgdSRh5kgIB9NeC/tVB4inmxAy7MtancdSy5+akhTFlE9456NhF92r9x3fOlON79lIi+YEsQB5RaaUWjo7TDILPmKy84WA5zow=
+	t=1730479176; cv=none; b=IH5ZB1UHJFUfq9uC7us1osVminJ8Kokyrw/RT71W/Ogk5syMeRvyKF1ZpvJpNaicOkyIoSP29HprKCcCHkPRaT+oZugkPUQsDBgdHni3GSkZjskuHKhPzvUhbjdl+o4QSKcRfjk/qIOOVJBgjOMAse4kyyi9RLLPgVb3e0MEBVU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730479077; c=relaxed/simple;
-	bh=I7oORcEtGj/iiaA43PSLCnPafGuurwysB9AtbJETIaw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=t5qUyFvis2Ri5Ajq3PNxS0DxzNrtsqKGeUMuFFrNhcZ7DeHpHG7MPDAJCQFwvzebuVP+hraMMuKzvqEVSr1QA0hn3FV1mBQc0K2OiGgibkgB5nHeZVbglFcI8SLoNHFNLiya+CKGtV/DYTvXQWZt8S0nFvQA0v8NPwnr1iFGxk8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nRO7P6XL; arc=none smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730479074; x=1762015074;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=I7oORcEtGj/iiaA43PSLCnPafGuurwysB9AtbJETIaw=;
-  b=nRO7P6XLnlSo7txLwHAQe771UBHTdZtwPNCJbr5LR0soS0JpRjRr5Ui9
-   yj6lrPsWqq/XAQUxjS/s2BPHaN44yWxP3VnITGdd8CWEJXkyWbEwP1YfG
-   AH2Y8C2MltLrktYZnZg++C33UBWewBvJhnOI7tfbusZy7sBMBsDjb+k6i
-   tCIUQreNATJ3wvOWuhEz0lb4tlErW9gAg3t3ZX1nSwK3pgZ68jxJk4CPw
-   tkKN438B5uc16BE3RxbTtbRz0tTvRJ476nkGhq/wrEDv4XUqsiOO40GPs
-   koR+i2AVkZRS7DTPGcrN48y/xUY4nkCN/AWDrUE8lwemiQA3DHAOYItJo
-   g==;
-X-CSE-ConnectionGUID: 6cWyVbQgQmSSWQ685aEY5g==
-X-CSE-MsgGUID: jH/IwG94Qv2OZy3C7qEeIQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30205785"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30205785"
-Received: from orviesa009.jf.intel.com ([10.64.159.149])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 09:37:54 -0700
-X-CSE-ConnectionGUID: 4puZEzRERSmf4D4rpDD9Mw==
-X-CSE-MsgGUID: cqmxMK7EQO23CzQ3GCm8vA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,250,1725346800"; 
-   d="scan'208";a="82891481"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa009.jf.intel.com with ESMTP; 01 Nov 2024 09:37:49 -0700
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t6uef-000hlh-1v;
-	Fri, 01 Nov 2024 16:37:45 +0000
-Date: Sat, 2 Nov 2024 00:37:09 +0800
-From: kernel test robot <lkp@intel.com>
-To: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	David Arinzon <darinzon@amazon.com>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	"Woodhouse, David" <dwmw@amazon.com>,
-	"Machulsky, Zorik" <zorik@amazon.com>,
-	"Matushevsky, Alexander" <matua@amazon.com>,
-	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
-	"Liguori, Anthony" <aliguori@amazon.com>,
-	"Bshara, Nafea" <nafea@amazon.com>,
-	"Schmeilin, Evgeny" <evgenys@amazon.com>,
-	"Belgazal, Netanel" <netanel@amazon.com>,
-	"Saidi, Ali" <alisaidi@amazon.com>,
-	"Herrenschmidt, Benjamin" <benh@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bernstein, Amit" <amitbern@amazon.com>,
-	"Agroskin, Shay" <shayagr@amazon.com>,
-	"Abboud, Osama" <osamaabb@amazon.com>,
-	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
-	"Tabachnik, Ofir" <ofirt@amazon.com>,
-	"Machnikowski, Maciek" <maciek@machnikowski.net>
-Subject: Re: [PATCH v2 net-next 1/3] net: ena: Add PHC support in the ENA
- driver
-Message-ID: <202411020050.npvLNJ7N-lkp@intel.com>
-References: <20241031085245.18146-2-darinzon@amazon.com>
+	s=arc-20240116; t=1730479176; c=relaxed/simple;
+	bh=eYcrOG9mHh6yyHrcNyGtvglh2QWfqXs/k1+/Wyn9ENs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=cd/utpx5/b+481V9l/iMtIXvloLygkb1jPQZuNC4uSIzX+KQyFGU1iq9oxTdNiwKocJ+9Ravon2aRAjWCIcgZOaqMLSM2ytKNUmPy6la+NuQ75VoPZ8XPnbChx81xVNdQ5xGM1wU7TEPQNfZdbH2OgKqlgfpA0lXO5kWgMidfNQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=CRnkiUMC; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b1474b1377so156234385a.2;
+        Fri, 01 Nov 2024 09:39:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730479173; x=1731083973; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JHm8aPw/Qd4coTpdXsYu8y9FaG/uUMCrjQn/n+HNt4I=;
+        b=CRnkiUMCXPZjIkZOlD9xTdx+kWBCm2TSQTvfG2xnUIRGL+5RzOWC7oL9tHFARpVLcS
+         xvDd033DLRomyK4/AG6tMIT//9w1CgNFFI+W2FnAjLj/ufKSxkkmqQI7ETKNwGi/W7j2
+         DC8AeDd9fu1jLJq4BfpGguNLakEhw0vEyolhn6WPVfPgNvnbVW1WELXT0lnY9o5eSej5
+         jtKw353QcJCLlmZTMR9brAVO4wtSyfqFISExj0xmWH/n3Tp52tGlumRF6Y9p20ocRX+Z
+         dr9p7m4Jf5yD047tFvHh/GVyOJ/+pH0uMYsQeiz6UVPr9CB7+Bqmij/RzHY5sI5NKq9H
+         Cb8w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730479173; x=1731083973;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=JHm8aPw/Qd4coTpdXsYu8y9FaG/uUMCrjQn/n+HNt4I=;
+        b=ePf0DYRkK/BrkDLDo8UoaHNrRqVp/S+bUZPzz/DpN1JLofoyGoaSgzE4sJDeE7nmes
+         YoRGe+Q5uIqRIZ5v3kZkTVQi9fk4pDuFjFW7FZk+s5p2zig5OnWYA57ZqLCM35PT3JOW
+         7rZqlPFY+o3QkLqhNSkWUbtliLffG3OIdsN5AbkSIBYx6Od/tmhLWGQfI9O3NJNWo34s
+         QbdnIb0o+oquWY+gdlTrd6eIYfw3M+DDZx400Y2VrJ6jOUzwK3IF1wA4pLuBOA+x5KSU
+         DTmOXAnYM5zcgEnGSc2d+H2ST9+pNl029gKaaFNTI6Fw7iJR4bwlEER61fIIOT4Sbc9S
+         1FeQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWcCBrkyY9eVjXBqt06Acq8+qTQNJxEnE5pzLOv7HYTkF8ndUgAguIAfcAdPwCQYh5AVPKiNOz9@vger.kernel.org, AJvYcCXykX+Z9lSwEZ5+nIWU2lWaic/ECvVycl5+4wmo7+9beLfytj9+714shSEtj4zVQg5DenI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxMqKi/GlkkulmA3WW6ncF/2UYymOkZTNMCue+iww0wEjlxI0K4
+	wOkln5KDJMT0hdHf2We3bTw/ZyYhGNQ4zcY5dEad2pjgXPfafU/G
+X-Google-Smtp-Source: AGHT+IGHtA0Toc/v5pgrYY+zsCHCYwv1iuiz4qJujChQ72j7yIN5GAC3yZ4auLrd9x5pBdVJSS01Lw==
+X-Received: by 2002:a05:620a:2444:b0:7b1:440a:fdf2 with SMTP id af79cd13be357-7b2f24dd30bmr1058347185a.20.1730479173300;
+        Fri, 01 Nov 2024 09:39:33 -0700 (PDT)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b2f3a9b28fsm182981185a.130.2024.11.01.09.39.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 01 Nov 2024 09:39:32 -0700 (PDT)
+Date: Fri, 01 Nov 2024 12:39:32 -0400
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: Martin KaFai Lau <martin.lau@linux.dev>, 
+ willemb@google.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ shuah@kernel.org, 
+ ykolal@fb.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <672504444fc8a_1c9cd029466@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoDyvAcwxdsOWfWoJ-ZJ=kMXdw-XM2BDC+_tJO+Eudg3jg@mail.gmail.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <61e8c5cf-247f-484e-b3cc-27ab86e372de@linux.dev>
+ <CAL+tcoDB8UvNMfTwmvTJb1JvCGDb3ESaJMszh4-Qa=ey0Yn3Vg@mail.gmail.com>
+ <67218fb61dbb5_31d4d029455@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBhfZ4XB5QgCKKbNyq+dfm26fPsvXfbWbV=jAEKYeLDEg@mail.gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
+ <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+ <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+ <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+ <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
+ <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev>
+ <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDyvAcwxdsOWfWoJ-ZJ=kMXdw-XM2BDC+_tJO+Eudg3jg@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241031085245.18146-2-darinzon@amazon.com>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 
-Hi David,
+> > > >>
+> > > >> For datagrams (UDP as well as RAW and many non IP protocols), an
+> > > >> alternative still needs to be found.
+> > >
+> > > In udp/raw/..., I don't know how likely is the user space having "cork->tx_flags
+> > > & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflags) &
+> > > SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" set.
+> >
+> > This is not something to rely on. OPT_ID was added relatively recently.
+> > Older applications, or any that just use the most straightforward API,
+> > will not set this.
+> >
+> > > If it is
+> > > unlikely, may be we can just disallow bpf prog from directly setting
+> > > skb_shinfo(skb)->tskey for this particular skb.
+> > >
+> > > For all other cases, in __ip[6]_append_data, directly call a bpf prog and also
+> > > pass the kernel decided tskey to the bpf prog.
+> > >
+> > > The kernel passed tskey could be 0 (meaning the user space has not used it). The
+> > > bpf prog can give one for the kernel to use. The bpf prog can store the
+> > > sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add one to the struct
+> > > sock. The bpf prog does not have to start from 0 (e.g. start from U32_MAX
+> > > instead) if it helps.
+> > >
+> > > If the kernel passed tskey is not 0, the bpf prog can just use that one
+> > > (assuming the user space is doing something sane, like the value in
+> > > SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_MAX). I hope this
+> > > is very unlikely also (?) but the bpf prog can probably detect this and choose
+> > > to ignore this sk.
+> >
+> > If an applications uses OPT_ID, it is unlikely that they will toggle
+> > the feature on and off on a per-packet basis. So in the common case
+> > the program could use the user-set counter or use its own if userspace
+> > does not enable the feature. In the rare case that an application does
+> > intermittently set an OPT_ID, the numbering would be erratic. This
+> > does mean that an actively malicious application could mess with admin
+> > measurements.
+> >
+> 
+> Sorry, I got lost in this part. What would you recommend I should do
+> about OPT_ID in the next move? Should I keep those three OPT_ID
+> patches?
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/David-Arinzon/net-ena-Add-PHC-support-in-the-ENA-driver/20241031-165503
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241031085245.18146-2-darinzon%40amazon.com
-patch subject: [PATCH v2 net-next 1/3] net: ena: Add PHC support in the ENA driver
-config: arm64-randconfig-001-20241101 (https://download.01.org/0day-ci/archive/20241102/202411020050.npvLNJ7N-lkp@intel.com/config)
-compiler: aarch64-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241102/202411020050.npvLNJ7N-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411020050.npvLNJ7N-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   drivers/net/ethernet/amazon/ena/ena_com.c: In function 'ena_com_phc_config':
->> drivers/net/ethernet/amazon/ena/ena_com.c:1702:49: error: expected ')' before 'ENA_ADMIN_PHC_CONFIG'
-    1702 |                                   &get_feat_resp
-         |                                                 ^
-         |                                                 )
-    1703 |                                   ENA_ADMIN_PHC_CONFIG,
-         |                                   ~~~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/amazon/ena/ena_com.c:1701:34: note: to match this '('
-    1701 |         ret = ena_com_get_feature(ena_dev,
-         |                                  ^
->> drivers/net/ethernet/amazon/ena/ena_com.c:1701:15: error: too few arguments to function 'ena_com_get_feature'
-    1701 |         ret = ena_com_get_feature(ena_dev,
-         |               ^~~~~~~~~~~~~~~~~~~
-   drivers/net/ethernet/amazon/ena/ena_com.c:1037:12: note: declared here
-    1037 | static int ena_com_get_feature(struct ena_com_dev *ena_dev,
-         |            ^~~~~~~~~~~~~~~~~~~
-
-
-vim +1702 drivers/net/ethernet/amazon/ena/ena_com.c
-
-  1691	
-  1692	int ena_com_phc_config(struct ena_com_dev *ena_dev)
-  1693	{
-  1694		struct ena_com_phc_info *phc = &ena_dev->phc;
-  1695		struct ena_admin_get_feat_resp get_feat_resp;
-  1696		struct ena_admin_set_feat_resp set_feat_resp;
-  1697		struct ena_admin_set_feat_cmd set_feat_cmd;
-  1698		int ret = 0;
-  1699	
-  1700		/* Get device PHC default configuration */
-> 1701		ret = ena_com_get_feature(ena_dev,
-> 1702					  &get_feat_resp
-  1703					  ENA_ADMIN_PHC_CONFIG,
-  1704					  0);
-  1705		if (unlikely(ret)) {
-  1706			netdev_err(ena_dev->net_device,
-  1707				   "Failed to get PHC feature configuration, error: %d\n",
-  1708				   ret);
-  1709			return ret;
-  1710		}
-  1711	
-  1712		/* Supporting only readless PHC retrieval */
-  1713		if (get_feat_resp.u.phc.type != ENA_ADMIN_PHC_TYPE_READLESS) {
-  1714			netdev_err(ena_dev->net_device, "Unsupported PHC type, error: %d\n",
-  1715				   -EOPNOTSUPP);
-  1716			return -EOPNOTSUPP;
-  1717		}
-  1718	
-  1719		/* Update PHC doorbell offset according to device value,
-  1720		 * used to write req_id to PHC bar
-  1721		 */
-  1722		phc->doorbell_offset = get_feat_resp.u.phc.doorbell_offset;
-  1723	
-  1724		/* Update PHC expire timeout according to device
-  1725		 * or default driver value
-  1726		 */
-  1727		phc->expire_timeout_usec = (get_feat_resp.u.phc.expire_timeout_usec) ?
-  1728					    get_feat_resp.u.phc.expire_timeout_usec :
-  1729					    ENA_PHC_DEFAULT_EXPIRE_TIMEOUT_USEC;
-  1730	
-  1731		/* Update PHC block timeout according to device
-  1732		 * or default driver value
-  1733		 */
-  1734		phc->block_timeout_usec = (get_feat_resp.u.phc.block_timeout_usec) ?
-  1735					   get_feat_resp.u.phc.block_timeout_usec :
-  1736					   ENA_PHC_DEFAULT_BLOCK_TIMEOUT_USEC;
-  1737	
-  1738		/* Sanity check - expire timeout must not be above skip timeout */
-  1739		if (phc->expire_timeout_usec > phc->block_timeout_usec)
-  1740			phc->expire_timeout_usec = phc->block_timeout_usec;
-  1741	
-  1742		/* Prepare PHC config feature command */
-  1743		memset(&set_feat_cmd, 0x0, sizeof(set_feat_cmd));
-  1744		set_feat_cmd.aq_common_descriptor.opcode = ENA_ADMIN_SET_FEATURE;
-  1745		set_feat_cmd.feat_common.feature_id = ENA_ADMIN_PHC_CONFIG;
-  1746		set_feat_cmd.u.phc.output_length = sizeof(*phc->virt_addr);
-  1747		ret = ena_com_mem_addr_set(ena_dev,
-  1748					   &set_feat_cmd.u.phc.output_address,
-  1749					   phc->phys_addr);
-  1750		if (unlikely(ret)) {
-  1751			netdev_err(ena_dev->net_device, "Failed setting PHC output address, error: %d\n",
-  1752				   ret);
-  1753			return ret;
-  1754		}
-  1755	
-  1756		/* Send PHC feature command to the device */
-  1757		ret = ena_com_execute_admin_command(&ena_dev->admin_queue,
-  1758						    (struct ena_admin_aq_entry *)&set_feat_cmd,
-  1759						    sizeof(set_feat_cmd),
-  1760						    (struct ena_admin_acq_entry *)&set_feat_resp,
-  1761						    sizeof(set_feat_resp));
-  1762	
-  1763		if (unlikely(ret)) {
-  1764			netdev_err(ena_dev->net_device,
-  1765				   "Failed to enable PHC, error: %d\n",
-  1766				   ret);
-  1767			return ret;
-  1768		}
-  1769	
-  1770		phc->active = true;
-  1771		netdev_dbg(ena_dev->net_device, "PHC is active in the device\n");
-  1772	
-  1773		return ret;
-  1774	}
-  1775	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+I did not offer a suggestion. Just pointed out a constraint.
 
