@@ -1,81 +1,192 @@
-Return-Path: <netdev+bounces-141034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 213D39B9246
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:45:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 227DC9B92BE
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 15:03:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD46CB21146
-	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 13:45:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B0571F2389C
+	for <lists+netdev@lfdr.de>; Fri,  1 Nov 2024 14:03:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E6F17108A;
-	Fri,  1 Nov 2024 13:45:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E0BE1A3AB1;
+	Fri,  1 Nov 2024 14:02:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KQG0Fvr8"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="GFKblxF1"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D19CD2D600;
-	Fri,  1 Nov 2024 13:45:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A66B19D8A9;
+	Fri,  1 Nov 2024 14:02:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730468712; cv=none; b=kQ5UGF4mzUGeVIXVBVfUASWjRM+ka/5Q1+qNHryUbaMZno0R6D7+0bVEBVFocZnbBXrbN3CGzwQXCYxjs/frzUAWCN7vb3Zp5fsGFzABhA2NVdNsUgly0jL/hYOyojp4CKbuq/jayACI5Zs1lt79cobZ5YDIlvtQQ+5Z6vZXdtw=
+	t=1730469770; cv=none; b=rzaHJx6bLhEHrZ3OtzsjHWYK26o7l1pgvmeiD+5PtJobfn3XWJ5iHqwxNwC3tcRhwMj5NlYD4VbQkd4kv67jGItrSQD92c+zGJrVDnIOmkRBn+1Wa7tus8U/rSTzlJjT7V1HwMu/3aDjoSxrQ010dSj9kNVkpHWcCtHsa0L1YkQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730468712; c=relaxed/simple;
-	bh=vci9jydUwTZ/may1ziLxV8PAIyMusaHDSrKasyYmULU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Dsdehs5vUHv+VufQ1T8fC5+7Psu725W7+YhprwjkiwV6EZh9G4agcylWX5Bzqal9NWsDIItPgHRWIfM/aPk5RqOI/iFZ1bSWu6zKANGP1UNVRLJNCMLZcKl6tsAl/Hn97YdiJwOCc+NBnMd5vifZtBwllyDjNxcOz4Yb9SKvwlU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KQG0Fvr8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0AF29C4CECD;
-	Fri,  1 Nov 2024 13:45:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730468712;
-	bh=vci9jydUwTZ/may1ziLxV8PAIyMusaHDSrKasyYmULU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KQG0Fvr812IVtksh/oMua+p1jCDLfH+5WMaMXELTJ/RPqOWb7aRZ8/bhuaVBoxLzs
-	 lE8v/QR7fxVT3MNl4OtbzjnY9tn6J9iwmHIze4lzRPTiw4d9u8UpS2exciPWX9HOWw
-	 zB857Tcp90DUST3/eZm2KjaMCKba8AgF8Y0cpBIj42kB42tcu3Y1etHq8Cq6IXPSOH
-	 15Q08KGT9XLO9qlTftXd8eSM642Hu0TmnQbSZ+vQHMxhsavclNDUjz5MCD+nO5W16T
-	 /yevLGSr9ci1TO3niI1SxeOK98aJ13XsJYKTyBRNKrJnz+L+IyS3piFQcjOkLdkGD2
-	 VjmnES8gFxiNA==
-Date: Fri, 1 Nov 2024 06:45:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Vladimir Vdovin <deliran@verdict.gg>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, davem@davemloft.net,
- idosch@idosch.org, edumazet@google.com, linux-kselftest@vger.kernel.org,
- pabeni@redhat.com, shuah@kernel.org, horms@kernel.org
-Subject: Re: [PATCH v5] net: ipv4: Cache pmtu for all packet paths if
- multipath enabled
-Message-ID: <20241101064511.1ef698db@kernel.org>
-In-Reply-To: <20241101104922.68956-1-deliran@verdict.gg>
-References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
-	<20241101104922.68956-1-deliran@verdict.gg>
+	s=arc-20240116; t=1730469770; c=relaxed/simple;
+	bh=o/BerWlG15TZeIiVvxiFPW0yeKnoj9S/2SLCMGpF7es=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=gNjdbY/5qgh8WbfZ+3oCEsKK4SiZt1cMaZtbk2NYPgaJ5ts9856ONKia95wwKmYHdNGBp5TrwlwQkm+YIoEy2ya1GK8oSkian20We5CB+olcvFbUB6E8Uvjjyt0Bx4KMU8ceeCkVftmvOcGJSmdNuZs94ZVfb1iINtUIHI7D3mo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=GFKblxF1; arc=none smtp.client-ip=192.198.163.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730469768; x=1762005768;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=o/BerWlG15TZeIiVvxiFPW0yeKnoj9S/2SLCMGpF7es=;
+  b=GFKblxF18TozMDu+Q6daK4Im/NuCiefMJoofcUeoKut3iZABmcz48M9y
+   tgiqgKEP/VLlbnMsPiXyEg5vb3hkLNJVPLWyyvRAO7JSmyKQHf9vxYEj8
+   /plBZwVQVfXh/LzYZK53ZG/6MgY3sU87aTyoJPhMJ5JpYo6vvnZQMcstY
+   AFeZOLs7REeQbrPkt/NFh6sNOpb4K08p4tU5Wc23kG9nDpVKxUMHhzTY4
+   QQIEdhVyoPxNIoIBEbffcUt6DvCZIp3atdzWMbZKnOSa0+hq5IS5CI5bt
+   H2tA5iazTaTZQ3PFAYJ4vHy7EiHvH5bqwFSCeUQx/blUvvLAgYKYTDWx4
+   Q==;
+X-CSE-ConnectionGUID: wCOjVoiiT724Yf3/0B2B6A==
+X-CSE-MsgGUID: HqqDdtbrTcWum6MwB5SBpQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11243"; a="29654136"
+X-IronPort-AV: E=Sophos;i="6.11,250,1725346800"; 
+   d="scan'208";a="29654136"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 07:02:44 -0700
+X-CSE-ConnectionGUID: rAjQ2NzoRoOWf8nQDxqZLg==
+X-CSE-MsgGUID: +vYyrcdsRN6cV+5MXDr6SA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="87767853"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa003.jf.intel.com with ESMTP; 01 Nov 2024 07:02:41 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t6sEX-000hcJ-2m;
+	Fri, 01 Nov 2024 14:02:37 +0000
+Date: Fri, 1 Nov 2024 22:02:01 +0800
+From: kernel test robot <lkp@intel.com>
+To: mrpre <mrpre@163.com>, yonghong.song@linux.dev,
+	john.fastabend@gmail.com, martin.lau@kernel.org,
+	edumazet@google.com, jakub@cloudflare.com, davem@davemloft.net,
+	dsahern@kernel.org, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, mrpre <mrpre@163.com>
+Subject: Re: [PATCH 1/2] bpf: Introduce cpu affinity for sockmap
+Message-ID: <202411012135.447KNHZK-lkp@intel.com>
+References: <20241101023832.32404-1-mrpre@163.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241101023832.32404-1-mrpre@163.com>
 
-On Fri,  1 Nov 2024 10:48:57 +0000 Vladimir Vdovin wrote:
-> +	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
+Hi mrpre,
 
-This new test seems to fail in our CI:
+kernel test robot noticed the following build errors:
 
-# TEST: ipv4: PMTU multipath nh exceptions                            [FAIL]
-#   there are not enough cached exceptions
+[auto build test ERROR on bpf-next/master]
+[also build test ERROR on bpf/master net-next/main net/main linus/master v6.12-rc5 next-20241101]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-https://netdev-3.bots.linux.dev/vmksft-net/results/840861/3-pmtu-sh/stdout
+url:    https://github.com/intel-lab-lkp/linux/commits/mrpre/bpf-implement-libbpf-sockmap-cpu-affinity/20241101-104144
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git master
+patch link:    https://lore.kernel.org/r/20241101023832.32404-1-mrpre%40163.com
+patch subject: [PATCH 1/2] bpf: Introduce cpu affinity for sockmap
+config: arc-randconfig-001-20241101 (https://download.01.org/0day-ci/archive/20241101/202411012135.447KNHZK-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241101/202411012135.447KNHZK-lkp@intel.com/reproduce)
 
-Also some process notes:
- - please don't post multiple versions of the patch a day:
-   https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#tl-dr
- - please avoid posting new versions in-reply-to the old one
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411012135.447KNHZK-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   kernel/bpf/syscall.c: In function 'bpf_map_update_value':
+>> kernel/bpf/syscall.c:254:24: error: too many arguments to function 'sock_map_update_elem_sys'
+     254 |                 return sock_map_update_elem_sys(map, key, value, flags, target_cpu);
+         |                        ^~~~~~~~~~~~~~~~~~~~~~~~
+   In file included from kernel/bpf/syscall.c:4:
+   include/linux/bpf.h:3175:19: note: declared here
+    3175 | static inline int sock_map_update_elem_sys(struct bpf_map *map, void *key, void *value,
+         |                   ^~~~~~~~~~~~~~~~~~~~~~~~
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [m]:
+   - RESOURCE_KUNIT_TEST [=m] && RUNTIME_TESTING_MENU [=y] && KUNIT [=m]
+
+
+vim +/sock_map_update_elem_sys +254 kernel/bpf/syscall.c
+
+   240	
+   241	static int bpf_map_update_value(struct bpf_map *map, struct file *map_file,
+   242					void *key, void *value, __u64 flags, s32 target_cpu)
+   243	{
+   244		int err;
+   245		/* Need to create a kthread, thus must support schedule */
+   246		if (bpf_map_is_offloaded(map)) {
+   247			return bpf_map_offload_update_elem(map, key, value, flags);
+   248		} else if (map->map_type == BPF_MAP_TYPE_CPUMAP ||
+   249			   map->map_type == BPF_MAP_TYPE_ARENA ||
+   250			   map->map_type == BPF_MAP_TYPE_STRUCT_OPS) {
+   251			return map->ops->map_update_elem(map, key, value, flags);
+   252		} else if (map->map_type == BPF_MAP_TYPE_SOCKHASH ||
+   253			   map->map_type == BPF_MAP_TYPE_SOCKMAP) {
+ > 254			return sock_map_update_elem_sys(map, key, value, flags, target_cpu);
+   255		} else if (IS_FD_PROG_ARRAY(map)) {
+   256			return bpf_fd_array_map_update_elem(map, map_file, key, value,
+   257							    flags);
+   258		}
+   259	
+   260		bpf_disable_instrumentation();
+   261		if (map->map_type == BPF_MAP_TYPE_PERCPU_HASH ||
+   262		    map->map_type == BPF_MAP_TYPE_LRU_PERCPU_HASH) {
+   263			err = bpf_percpu_hash_update(map, key, value, flags);
+   264		} else if (map->map_type == BPF_MAP_TYPE_PERCPU_ARRAY) {
+   265			err = bpf_percpu_array_update(map, key, value, flags);
+   266		} else if (map->map_type == BPF_MAP_TYPE_PERCPU_CGROUP_STORAGE) {
+   267			err = bpf_percpu_cgroup_storage_update(map, key, value,
+   268							       flags);
+   269		} else if (IS_FD_ARRAY(map)) {
+   270			err = bpf_fd_array_map_update_elem(map, map_file, key, value,
+   271							   flags);
+   272		} else if (map->map_type == BPF_MAP_TYPE_HASH_OF_MAPS) {
+   273			err = bpf_fd_htab_map_update_elem(map, map_file, key, value,
+   274							  flags);
+   275		} else if (map->map_type == BPF_MAP_TYPE_REUSEPORT_SOCKARRAY) {
+   276			/* rcu_read_lock() is not needed */
+   277			err = bpf_fd_reuseport_array_update_elem(map, key, value,
+   278								 flags);
+   279		} else if (map->map_type == BPF_MAP_TYPE_QUEUE ||
+   280			   map->map_type == BPF_MAP_TYPE_STACK ||
+   281			   map->map_type == BPF_MAP_TYPE_BLOOM_FILTER) {
+   282			err = map->ops->map_push_elem(map, value, flags);
+   283		} else {
+   284			err = bpf_obj_pin_uptrs(map->record, value);
+   285			if (!err) {
+   286				rcu_read_lock();
+   287				err = map->ops->map_update_elem(map, key, value, flags);
+   288				rcu_read_unlock();
+   289				if (err)
+   290					bpf_obj_unpin_uptrs(map->record, value);
+   291			}
+   292		}
+   293		bpf_enable_instrumentation();
+   294	
+   295		return err;
+   296	}
+   297	
+
 -- 
-pw-bot: cr
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
