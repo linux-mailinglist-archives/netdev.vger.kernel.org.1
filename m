@@ -1,108 +1,133 @@
-Return-Path: <netdev+bounces-141204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141206-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFFB79BA098
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 14:44:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3C39BA0A0
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 14:49:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E64CE1C20CD8
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 13:44:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DB406B210B7
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 13:49:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCE43198A3F;
-	Sat,  2 Nov 2024 13:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08D1C19D8B2;
+	Sat,  2 Nov 2024 13:49:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Nyvx0Zlu"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i1jYIr3o"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B11FA175D34;
-	Sat,  2 Nov 2024 13:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44C331607AA;
+	Sat,  2 Nov 2024 13:49:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730555046; cv=none; b=sgOn8QXEtTGjXXfnS8Zkwfga+GG8h2zyoA5QvOehOK3masQenDVRmcS38Ij0hHKqewtQWdFH9BV6MNRcx8IDi/T91JmjYSE8MPzQIyz0UX9kzIjMQzIESc5FM7wel/TJ14Xbbjs8Ip1/e5VkjI0p4dm51iEl+FlZR6wocgHljD4=
+	t=1730555350; cv=none; b=HgQ/gmhvtAqw3C0+EAeuF2whl7sBUi6iiKNC3GOqe9mEwf2Z92ZThNo0I7y2jq/dbUIeyTGFr7Cg8h5sQkidFbDjWQlOYYXXAdgE+7tyZ247c7psHPYASo/AiUgHI7Izolspv21X4G6U5rrBXy0y6Rzc+rp6jETjacYHox73qVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730555046; c=relaxed/simple;
-	bh=Fh1tOp6zu5S7ndDQm3e4S5z+1IAX7J4sD51WBJXNmIQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bgiQPw5bQNWp52l4dSaBTq8vhnxIFDKWACjoviYmo51N3XF3vb9gxba3T8qEdaXd8DSKHGl3UHqmBC+8gx/aCBNgi3wK7Ny9nCAo4v43CDoXtBHxMfSESjOzsD41BDETsikye/lFGjhLGktvR/ddvmnK9WtJKSW1C8GdQgk9ftI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Nyvx0Zlu; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A526C4CEC3;
-	Sat,  2 Nov 2024 13:44:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730555046;
-	bh=Fh1tOp6zu5S7ndDQm3e4S5z+1IAX7J4sD51WBJXNmIQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=Nyvx0ZluaFgFw0qtEwyN/1zOCzvMLn5alJ1Mp0kObq9Ud8NCOJgd9j4BkFbGOD1KR
-	 gmpwwftLbjGoSjiqNajdyptbFaGTos6NAUxy+kb24vuC4+wLUetnUlZXlni2rKfw7U
-	 nhwk55QiN/GvA3TBoEkyWaQmcNLX4Mfy13tQ8+OJOqj8Tn4nhTlcHlN39EcbAWt3cB
-	 OZNuGOBJfFRIfIvCJ0QwCPqjqCqzioXCvdegwIG/GV8argT8oF8TygLY6oum4+XU9J
-	 1r0HNdewhrtbLa2Bcon+alBeBqL3Z6XeJigT5wbpi7WPcCtYLq4JLT8LUTuE3Vixt5
-	 2ippRyRLDo1nA==
-Date: Sat, 2 Nov 2024 13:43:57 +0000
-From: Simon Horman <horms@kernel.org>
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org,
-	willemdebruijn.kernel@gmail.com, willemb@google.com, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev,
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me,
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
-	ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
-	Jason Xing <kernelxing@tencent.com>
-Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
- work parallelly
-Message-ID: <20241102134357.GK1838431@kernel.org>
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <20241028110535.82999-3-kerneljasonxing@gmail.com>
+	s=arc-20240116; t=1730555350; c=relaxed/simple;
+	bh=QlN9eg7ts+7pJDsvtKx/3mxNo/F1JSwVO7OYNfiO9F4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=g/SMCuts3PDTuQsQGQorx8AdNcNd7mHb7aAQnamkPmcRa1W0RVCvN1DlZXVb9VaE6MdCf4LMJhcrCiGX4XAGhpi6HHjkzrAmng/CpEclvMeBmfzlZMZlWvt20e6DViBAUyLsjEpTjc8L/UzquE4de/OFPdVE4PHVM5PnYkWfejY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i1jYIr3o; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-4315f24a6bbso21541205e9.1;
+        Sat, 02 Nov 2024 06:49:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730555347; x=1731160147; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZZXYdOojQ5JCeFAKKAsf3AfZWq+8G43XEkW5mMC20uw=;
+        b=i1jYIr3ogMxiQCsf0GsdOItYy7ouaS7q5+qN/B6/8576R4VtnrAazF+DH2a94ZQ7D3
+         x3DZBCKLAN3kWpTMksstdAOelL4SZVwDOvoFMGp4Je3rEXMh5GvOf2/MHzxqSJUOU3me
+         OqF5pVftPyR852DgQdwshFMyQFCrYP655RMqvEoVeUGJTMO+biojc1XHFqp4j0VaLNlu
+         HXkfkfNldnqY8Eq7Nkh61Qpgc7WjHg/rPr6BFh+QoLgMJjlibtJCrqccr75rZw/uwW1E
+         NfhXa0ee3+JQf7pGkwO+vhpgxvpTlzwS067/MRO1Ju5asIn9gWsdvf+kmNfc0M8wQ4Uo
+         CKWA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730555347; x=1731160147;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZZXYdOojQ5JCeFAKKAsf3AfZWq+8G43XEkW5mMC20uw=;
+        b=vd6C6qNOdWmOGx3oG20OnVhOoKVnfwhwAEGN8DG2CC+wOs5jNwuyHfdlqzoYFQsazV
+         cfkLVJIY8B2nlhcHvAvfHwrakHLq0FmhfNG6hZCglN5SBIvj5Ai9qR7u3k+HMWmuojfw
+         tDzrbCIgRDETXaLyw/tlGo5r4reaFHVIMKCgLfDHLZultKf+HPPF4rA0xbttaAmiRRI/
+         4FaRWGskCyhCrTBtAc6hqN2WTCavbKdq78LPLHUVStBbDXU1tVUDWQcDN+fdA0nQRxK+
+         x0O2wMFqO8LYLUdvAKYAPpF4KHjST71fOIlLnp/tuqrF5hFXIYaxo/mr5+vkUeqqYtfn
+         Q2Aw==
+X-Forwarded-Encrypted: i=1; AJvYcCUNsGoeZahHyMaQd4EToXiKwyBXUrLDOHiQDfQTGZU/qi4xbxZPyGe3AI5F3sO1hcGGpybIJmofch+xok6lz6g=@vger.kernel.org, AJvYcCXprq/n8PjPsPIZdwUb2j6AYOJ3EOCGrOJZRUdE4P9lmnM/AG89H6SessD18/272X6EfyYVybKWZi73pHOx@vger.kernel.org
+X-Gm-Message-State: AOJu0YyGxcHCRNNdlK9NXOJ748bHSx31KcPAA28mh2ks21n0KtYMuEA+
+	CSecZ6TB6wk9OhLwuVa1OUOByNigAhR0ixE8IWev1mpLfwr12szS
+X-Google-Smtp-Source: AGHT+IFQv52kCU7Mwzq1OHsKKTo1+SsQhgY0RzuxusXU/D0yybpByXaiO5qp726iFp5CmIGoMcnGvA==
+X-Received: by 2002:a05:600c:46d4:b0:427:ff3b:7a20 with SMTP id 5b1f17b1804b1-4319ad049a8mr216105165e9.27.1730555347446;
+        Sat, 02 Nov 2024 06:49:07 -0700 (PDT)
+Received: from void.void ([31.210.180.123])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5bf429sm93256255e9.12.2024.11.02.06.49.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 02 Nov 2024 06:49:07 -0700 (PDT)
+From: Andrew Kreimer <algonell@gmail.com>
+To: Karsten Keil <isdn@linux-pingi.de>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Simon Horman <horms@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	kernel-janitors@vger.kernel.org,
+	Andrew Kreimer <algonell@gmail.com>
+Subject: [PATCH net-next] mISDN: Fix typos
+Date: Sat,  2 Nov 2024 15:48:24 +0200
+Message-ID: <20241102134856.11322-1-algonell@gmail.com>
+X-Mailer: git-send-email 2.47.0.170.g23d289d273.dirty
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241028110535.82999-3-kerneljasonxing@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On Mon, Oct 28, 2024 at 07:05:23PM +0800, Jason Xing wrote:
-> From: Jason Xing <kernelxing@tencent.com>
-> 
-> This patch has introduced a separate sk_tsflags_bpf for bpf
-> extension, which helps us let two feature work nearly at the
-> same time.
-> 
-> Each feature will finally take effect on skb_shinfo(skb)->tx_flags,
-> say, tcp_tx_timestamp() for TCP or skb_setup_tx_timestamp() for
-> other types, so in __skb_tstamp_tx() we are unable to know which
-> feature is turned on, unless we check each feature's own socket
-> flag field.
-> 
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  include/net/sock.h |  1 +
->  net/core/skbuff.c  | 39 +++++++++++++++++++++++++++++++++++++++
->  2 files changed, 40 insertions(+)
-> 
-> diff --git a/include/net/sock.h b/include/net/sock.h
-> index 7464e9f9f47c..5384f1e49f5c 100644
-> --- a/include/net/sock.h
-> +++ b/include/net/sock.h
-> @@ -445,6 +445,7 @@ struct sock {
->  	u32			sk_reserved_mem;
->  	int			sk_forward_alloc;
->  	u32			sk_tsflags;
-> +	u32			sk_tsflags_bpf;
+Fix typos:
+  - syncronized -> synchronized.
+  - interfacs -> interface.
 
-Please add sk_tsflags_bpf to the Kernel doc for this structure.
-Likewise for sk_tskey_bpf_offset which is added by a subsequent patch.
+Signed-off-by: Andrew Kreimer <algonell@gmail.com>
+---
+ drivers/isdn/hardware/mISDN/hfcmulti.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
->  	__cacheline_group_end(sock_write_rxtx);
->  
->  	__cacheline_group_begin(sock_write_tx);
+diff --git a/drivers/isdn/hardware/mISDN/hfcmulti.c b/drivers/isdn/hardware/mISDN/hfcmulti.c
+index e5a483fd9ad8..f3af73ea34ae 100644
+--- a/drivers/isdn/hardware/mISDN/hfcmulti.c
++++ b/drivers/isdn/hardware/mISDN/hfcmulti.c
+@@ -930,7 +930,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
+ 	if (newmaster) {
+ 		hc = newmaster;
+ 		if (debug & DEBUG_HFCMULTI_PLXSD)
+-			printk(KERN_DEBUG "id=%d (0x%p) = syncronized with "
++			printk(KERN_DEBUG "id=%d (0x%p) = synchronized with "
+ 			       "interface.\n", hc->id, hc);
+ 		/* Enable new sync master */
+ 		plx_acc_32 = hc->plx_membase + PLX_GPIOC;
+@@ -949,7 +949,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
+ 			hc = pcmmaster;
+ 			if (debug & DEBUG_HFCMULTI_PLXSD)
+ 				printk(KERN_DEBUG
+-				       "id=%d (0x%p) = PCM master syncronized "
++				       "id=%d (0x%p) = PCM master synchronized "
+ 				       "with QUARTZ\n", hc->id, hc);
+ 			if (hc->ctype == HFC_TYPE_E1) {
+ 				/* Use the crystal clock for the PCM
+@@ -4672,7 +4672,7 @@ init_e1_port_hw(struct hfc_multi *hc, struct hm_map *m)
+ 			if (debug & DEBUG_HFCMULTI_INIT)
+ 				printk(KERN_DEBUG
+ 				       "%s: PORT set optical "
+-				       "interfacs: card(%d) "
++				       "interface: card(%d) "
+ 				       "port(%d)\n",
+ 				       __func__,
+ 				       HFC_cnt + 1, 1);
+-- 
+2.47.0.170.g23d289d273.dirty
 
-...
 
