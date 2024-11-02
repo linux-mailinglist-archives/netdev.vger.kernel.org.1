@@ -1,105 +1,89 @@
-Return-Path: <netdev+bounces-141234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141235-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE43B9BA1BA
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 18:31:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 983E49BA21B
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 20:01:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6245E1F21651
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:31:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 459931F21887
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 19:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C3A716DED2;
-	Sat,  2 Nov 2024 17:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC98613BAF1;
+	Sat,  2 Nov 2024 19:01:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="s9KMDmyi"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="IjB2i5kz"
 X-Original-To: netdev@vger.kernel.org
-Received: from mout.web.de (mout.web.de [212.227.15.3])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F82A4EB50;
-	Sat,  2 Nov 2024 17:30:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA7D8191
+	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 19:01:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730568659; cv=none; b=jEWInAlyxAcX21QQNDc42C2h7OpmKaEIb0vltcgQ6o0JnMzpY+m0KDB/w2qFbZS9Jp5bi2C+OmsGXfftoimiyabSdvokmt26KRm+c72jL0FefFhM/RgRXRwP5nrzpojeGQuVcKqt/Z0mhQXo6eVat+C4xjqTDA7j9V+G1BiQIS0=
+	t=1730574086; cv=none; b=GuKoQXERgAZEpGTy72qTvFP9msthsJuX+ZoKmvdXAu7baaJ9mRL/VD5RW0G0LjAjHgq9ULFK1g25r7dQFBEADlzQQVsNQwnBU4CnyxERzA4dB5gPbqJF4fkQPE/q0ID2CCaojTggmHWp9sESoWHPz8ooph5VQQy+jskJrfv27E8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730568659; c=relaxed/simple;
-	bh=QEjLdGSqdqsQxZsvatxuqZSLE+aQoVLZvHnOqV6Fkgo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=GgX7AGzWiKVIEnb1QJp6y8ECNrUtDTiRDubtWko8tS0ZSpwhRXalG8WcfExPOXhZliNTgzbnUXdSkCtVXTWUmkufBFbXtpFekyeYloxCYF0Ago3nFoORKVJHuG4NiK8gsaKW4D3qyyNhyiq6ektScXmXMXAw54B4Wvfh0ehZQRg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=s9KMDmyi; arc=none smtp.client-ip=212.227.15.3
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
-	s=s29768273; t=1730568626; x=1731173426; i=markus.elfring@web.de;
-	bh=kx5Io8K8wJlg4vSJsuwGcgwj0x7OwKY6orRaelQ8v8Q=;
-	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:Subject:To:Cc:
-	 References:From:In-Reply-To:Content-Type:
-	 Content-Transfer-Encoding:cc:content-transfer-encoding:
-	 content-type:date:from:message-id:mime-version:reply-to:subject:
-	 to;
-	b=s9KMDmyioIc1/16pGgBYJ15rn/UD5/q+1VV3GAwHaoZGFebiJE7sQTRJ/OetyPMf
-	 HqAHsjUhcVqkl9jdDZJSWa56viALruzMnvr5LA0bqA5IO9hmBG3sLhzL+Ijj4TBRi
-	 1/xgPz7TV7OcwBTSrfgvS7Mn/pc35dHUk+DrCiFat8TB522koi0iZtz+ZU85JalfI
-	 iT2T7gezZ2QzGk+iAOT+wk4uI7i6MEBE0Cy8UB46q7mKFPCuhMKeaeADEpx/T6Hci
-	 bZ16/SXjm8hH2iRHIT4wJeSUqEHWksU8DDwQRpRjiQ18cGNdp3c5lI18rt3ad4596
-	 AvMPTl+GbgRqdqm74Q==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.83.95]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1M604t-1tDdk11Ezb-00ARP5; Sat, 02
- Nov 2024 18:30:26 +0100
-Message-ID: <359e4cfa-d1f4-41ce-a986-89440fcf66cd@web.de>
-Date: Sat, 2 Nov 2024 18:30:22 +0100
+	s=arc-20240116; t=1730574086; c=relaxed/simple;
+	bh=3MyrrkeZ+7dujianB0KhJfvGajDD4g01mqZgELSnJZ8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=uuuMU0tXUyACHx2AZXHysLSU+W+3y3n8b/WjOqalFN7Tb9ImF8CyuDSCb5+PVuMiPy3wYvFcGYeYyXS74MDtQjMfghuj6xSPd9JRJAEE2Vly5MH3909a9nL7TDgsK+FnXKYKUIoIOc1VZqasorqvgeBqBSqc/caqD2JeTiwzV90=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=IjB2i5kz; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
+	:Subject; bh=s9a99yU6MnVvj0RHDwRSYgLdzcVA1la4mCyQ0V/UxW0=; b=IjB2i5kzPe4YXowm
+	XmxTC9xwUe53AhLJLF4g2PCFLjvT1x1Q5poXEn8F7Rcs5LC4UViAiEC+W1SMQPzFKll4CsJSGHfHb
+	UMrXMJSN4CCyx+cXWNIxc8VHOTIMx6ibsRZJHsmpbdbGwv66/BCWmLQKlNZSxOTHGDsEcEx+4wkz6
+	EYSNPMTStmkypZ6OyaRCJ6FrBfTNxedrGw6Gzdx2gMnmkaXbTD5jSaWQC9KVjSQqSqdEEXXK6+0Wa
+	vKLg6jXE9IG88eoVJmCMwFmoZx+/kPBELQ6nTgZlDSFMdiUmXZOln/IMp2+gAGwI7AQ7XCwWqyoAU
+	z03wLctKCaK5qiACjA==;
+Received: from dg by mx.treblig.org with local (Exim 4.96)
+	(envelope-from <dg@treblig.org>)
+	id 1t7JNB-00F7Q2-2g;
+	Sat, 02 Nov 2024 19:01:21 +0000
+Date: Sat, 2 Nov 2024 19:01:21 +0000
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
+To: shayagr@amazon.com, akiyano@amazon.com
+Cc: darinzon@amazon.com, ndagan@amazon.com, saeedb@amazon.com,
+	netdev@vger.kernel.org
+Subject: Of ena auto_polling
+Message-ID: <ZyZ3AWoocmXY6esd@gallifrey>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] ipv6: ip6_fib: fix possible null-pointer-dereference in
- ipv6_route_native_seq_show
-To: Yi Zou <03zouyi09.25@gmail.com>, netdev@vger.kernel.org
-Cc: David Ahern <dsahern@kernel.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- LKML <linux-kernel@vger.kernel.org>, 21210240012@m.fudan.edu.cn,
- 21302010073@m.fudan.edu.cn
-References: <20241101044828.55960-1-03zouyi09.25@gmail.com>
- <feac7231-5563-4f68-8554-483c7030b50a@web.de>
- <CAH_kV5EXr6B3vU3mbwHYaCHdSeCcVw9DiNT4on5rNwiAE+svRg@mail.gmail.com>
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <CAH_kV5EXr6B3vU3mbwHYaCHdSeCcVw9DiNT4on5rNwiAE+svRg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Provags-ID: V03:K1:8hoHBIowGhlMIEo2kNNYhGcnCN34OkCxFyRF1lYF4SLvVPGlSw+
- khk1I1rTtGZ/OlScv66btrDTmNaIM0zjdhAQYAarWiwiau/TCShrpK4+8Ez+jwrhZKI6Yro
- 520rqQRHIkcvcjNXDCqQFhNhGg74hIgQ5WgrLVGxeKaD7WHirM5Lb0Q5ZVLNMESi4/RwNFf
- BT/C8CfsmWKBFk039UabA==
-X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:4tvy1g6j+d0=;yTi4Z8bxyJ3BNcF8qH5359jEQTJ
- 61k7ffOMkZg7Ou0PbXFeLl00qHOqzvf8sOsHvtw6IA465SRVOUhfoXykmasTaqm/Y9CurPzdQ
- ZT9AjIaRU0RftyTdulfL2h1GuU+cBz1AJYwmOHubQgObSrPcblAuPSdKgxEoRn/ThfmYB8yFA
- PRH6dFYDR3bx5gpR001AyvwFTmweJ4pbVHbv+mMzCJLERP4HIm2AyQ/vxfBETsnzr9K1PN7eS
- kksK/og+yrklWddUZSYea8we5n1pTdJPwan0V5H8HGa3Ksctd+N/Ux8xidNKGshxi3XPj4Dfx
- BdiidPCOiIqwVnH8Rf2LrMS/gULGNZb7dvRBC+y157eC0KKcAS6X9scllm3jGGcLqyp403Mx8
- TryyckecUslEz0UfXeyZQtrKkETsjXB5Dk42PmrKJKaTC9KsomI+EEvH61CMDRTdlb7fBhRBn
- 4wvimtmKaEj90y74kRYuu92cEJMdcGF9E3zcSvOr4Xsi03Ql/0kOm9sl6MnaWw9xqSrPlI5ry
- 926aEGPKxiNJh7BuBxXJKDhquDhDbpU7vyYnsGbuVvGi04UD/pnl4hBCxdRoYf+28RBkBcAnP
- DxBaedWlfgBQimbgYfXzD3ehUjacM7D17vdAJ/tfOnaT/7BB/AthxcvpUZInAC+D/DScAEsob
- RvPeocQizTsGBRrJ4FqeyROoiqRYRjC6EjbofWhkV481/IXtI0kkLQpVCDbU0cNrdYBRJjjyV
- 872krupqsVjTLVj4sC1mykNAKRmG62WV/1R3TX79klvX7iylQ66G734aKcZColQGGKWtV0kGE
- IRuuf3YFerJ7JSywo90kPLgw==
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
+X-Chocolate: 70 percent or better cocoa solids preferably
+X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
+X-Uptime: 18:58:42 up 178 days,  6:12,  1 user,  load average: 0.01, 0.01,
+ 0.00
+User-Agent: Mutt/2.2.12 (2023-09-09)
 
->     Check if fib6_nh is non-NULL before accessing fib6_nh->fib_nh_gw_family
->     in ipv6_route_native_seq_show() to prevent a null-pointer dereference.
->     Assign dev as dev = fib6_nh ? fib6_nh->fib_nh_dev : NULL to ensure safe
->     handling when nexthop_fib6_nh(rt->nh) returns NULL.
-Would you like to send another improved patch version (instead of a reply)
-according to a change review?
+Hi,
+  I noticed that commit:
+commit a4e262cde3cda4491ce666e7c5270954c4d926b9
+Author: Sameeh Jubran <sameehj@amazon.com>
+Date:   Mon Jun 3 17:43:25 2019 +0300
 
-Regards,
-Markus
+    net: ena: allow automatic fallback to polling mode
+
+added a 'ena_com_set_admin_auto_polling_mode()' that's unused.
+Is that the intention?
+Because that then makes me wonder how
+admin_queue->auto_polling
+gets set, and then if the whole chunk is unused?
+
+Thanks,
+
+Dave
+-- 
+ -----Open up your eyes, open up your mind, open up your code -------   
+/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
+\        dave @ treblig.org |                               | In Hex /
+ \ _________________________|_____ http://www.treblig.org   |_______/
 
