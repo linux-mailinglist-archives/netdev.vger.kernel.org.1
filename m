@@ -1,150 +1,133 @@
-Return-Path: <netdev+bounces-141224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68FEA9BA14D
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:58:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B6099BA14F
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:58:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D9631B213E5
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 15:58:38 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31EB31F21924
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 15:58:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 897E51A0BE1;
-	Sat,  2 Nov 2024 15:58:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3891A0BF1;
+	Sat,  2 Nov 2024 15:58:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="ZCnNZl+E"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 942C5189BAD
-	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 15:58:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from qs51p00im-qukt01071901.me.com (qs51p00im-qukt01071901.me.com [17.57.155.8])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C681A0BE1
+	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 15:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730563114; cv=none; b=gQWQ1SihfYXyA+wwStzCgk87zUGy61eiQNpsGGCK9Q39H5MPnOcZSKKdEIm7rab+SuA1YTpiGfemXaocafexPUeCKhZscl3+qh2qCBjJcfhlK2+VGb7NuTUBl3WtT3v47wDOtlr4pSH5Oe5QFh341714taJ/TqNqmJbumfIAM2k=
+	t=1730563128; cv=none; b=TOdZ9PS71SubGZdVGdZFGzQFzybtLeiKTMNNPBRJV6HkGRj1MWP60/u1PYNLufKA1Obo5EiukkN/0RviWM08a2YVRDuwzuonkbuCIAu012UrlCvee+LP5gkoNPSIIVnxhM2o8nD3GVwKW88BpdwxZx+p3E4bv6B9UMjqRqVSGqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730563114; c=relaxed/simple;
-	bh=kZwhxL4tq+vcv9AutL0zFGbi2LsG7PVSn8ofF1oO6jU=;
-	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
-	 MIME-Version:Content-Type; b=NCVlcPeRziXMDsMqSjlUMIDN5TZuFDiqg7HDvllTEC6GbMegUOnXV7Ktr66hB/9Sl4rwp5tLj14Wp2Fiqv/8+bBGADEVAorxgnrLh4Sq855Uyr6Nn9OS/+g+liQv+QDVCvYkPHYl+zUwePM0Thtk+PoSVSum2A5eXZTnVBE1P8U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from vapr.local.chopps.org (unknown [185.122.134.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 9DD257D08A;
-	Sat,  2 Nov 2024 15:58:30 +0000 (UTC)
-References: <20241007135928.1218955-1-chopps@chopps.org>
- <20241007135928.1218955-11-chopps@chopps.org>
- <ZxYhHQ1xDW69EiDM@gauss3.secunet.de>
-User-agent: mu4e 1.8.14; emacs 28.2
-From: Christian Hopps <chopps@chopps.org>
-To: Steffen Klassert <steffen.klassert@secunet.com>
-Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
- netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>, Sabrina Dubroca
- <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony Antony
- <antony@phenome.org>, Christian Hopps <chopps@labn.net>
-Subject: Re: [PATCH ipsec-next v12 10/16] xfrm: iptfs: add fragmenting of
- larger than MTU user packets
-Date: Sat, 02 Nov 2024 15:50:42 +0000
-In-reply-to: <ZxYhHQ1xDW69EiDM@gauss3.secunet.de>
-Message-ID: <m2v7x5iq56.fsf@chopps.org>
+	s=arc-20240116; t=1730563128; c=relaxed/simple;
+	bh=8ZCIjqe6nbbqsWqN3Vcpxe64gjYHyzF400J/Pb64xNM=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
+	 References:In-Reply-To; b=mNjEtv2x2252iL1OltGmAOSfV6NVkwWTGG3EvClxAldoO1bAkPK1fNCsUxY4xEw4PKbLZPxxDEHLj+PEW+7zrrW/qpAWvX3FIPBmoYJ7wle9E0JWDYwAL/8+CM/89CH6VT+VsSKIwm8Ekk4Bpkhj3vEU+nWurhBGRaTbI0Mb/uQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=ZCnNZl+E; arc=none smtp.client-ip=17.57.155.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
+	t=1730563124; bh=dAlXGCff2WQWMMo4l+7vl5vNILyFo+zASwJ92FaKpGc=;
+	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Subject:
+	 x-icloud-hme;
+	b=ZCnNZl+EQahElN4bOzUbvSJ0tMxXtcXDEBBxtsnUY3DNgKAPFZcCvKewXWEIzW/UK
+	 nieMnjztjGtzYbiTO1LADcx/f8Dw5Fc8JZURkvsVtPSeLGP58UyLMoBbtTUM89iapl
+	 OqvJYBmLFF+MyC7+pfTVNYCQ6sbQ+DtGKMVBrwRGZCfICQ0+mDXRjnLgupF1Mwpi9t
+	 NQnAXQ9jEbxQPx7epPyL5IvUWUpQh7Bk0PtelFtu/9hhhbvG8ue1H8e7guVWf+9ppj
+	 CzKNJONBHAgHHE5OR8ekgNGse9ar6U1PtwQsg5u0yql4+l7OdL9nzzpm8he9G1RZ5E
+	 zSL9C2DbB3mQQ==
+Received: from localhost (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01071901.me.com (Postfix) with ESMTPSA id 53C4D628000C;
+	Sat,  2 Nov 2024 15:58:42 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="=-=-=";
-	micalg=pgp-sha512; protocol="application/pgp-signature"
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Sat, 02 Nov 2024 18:58:39 +0300
+Message-Id: <D5BTFE1AXSVK.2YNEV7RO2T5IT@verdict.gg>
+From: "Vladimir Vdovin" <deliran@verdict.gg>
+To: "Paolo Abeni" <pabeni@redhat.com>, "Jakub Kicinski" <kuba@kernel.org>
+Cc: <netdev@vger.kernel.org>, <dsahern@kernel.org>, <davem@davemloft.net>,
+ <idosch@idosch.org>, <edumazet@google.com>,
+ <linux-kselftest@vger.kernel.org>, <shuah@kernel.org>, <horms@kernel.org>
+Subject: Re: [PATCH v5] net: ipv4: Cache pmtu for all packet paths if
+ multipath enabled
+X-Mailer: aerc 0.18.2
+References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+ <20241101104922.68956-1-deliran@verdict.gg>
+ <20241101064511.1ef698db@kernel.org>
+ <D5B0U1C0N9JC.3PXNVEEH12786@verdict.gg>
+ <141acc87-19a4-44b5-a222-3f159835c711@redhat.com>
+In-Reply-To: <141acc87-19a4-44b5-a222-3f159835c711@redhat.com>
+X-Proofpoint-ORIG-GUID: OZfPGOPG-8bvVJjDkRysZ1ZR0LpBklyj
+X-Proofpoint-GUID: OZfPGOPG-8bvVJjDkRysZ1ZR0LpBklyj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-02_13,2024-11-01_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 clxscore=1030 mlxscore=0
+ phishscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=512
+ suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2411020142
 
---=-=-=
-Content-Type: text/plain; format=flowed
-
-
-Steffen Klassert <steffen.klassert@secunet.com> writes:
-
-> On Mon, Oct 07, 2024 at 09:59:22AM -0400, Christian Hopps wrote:
->> From: Christian Hopps <chopps@labn.net>
->>
->> Add support for tunneling user (inner) packets that are larger than the
->> tunnel's path MTU (outer) using IP-TFS fragmentation.
->>
->> Signed-off-by: Christian Hopps <chopps@labn.net>
->> ---
->>  net/xfrm/xfrm_iptfs.c | 350 ++++++++++++++++++++++++++++++++++++++----
->>  1 file changed, 321 insertions(+), 29 deletions(-)
->>
->> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
->> index 627b10ed4db0..7343ed77160c 100644
->> --- a/net/xfrm/xfrm_iptfs.c
->> +++ b/net/xfrm/xfrm_iptfs.c
->> @@ -46,12 +46,29 @@
->>   */
->>  #define IPTFS_DEFAULT_MAX_QUEUE_SIZE	(1024 * 10240)
->>
->> +/* Assumed: skb->head is cache aligned.
->> + *
->> + * L2 Header resv: Arrange for cacheline to start at skb->data - 16 to keep the
->> + * to-be-pushed L2 header in the same cacheline as resulting `skb->data` (i.e.,
->> + * the L3 header). If cacheline size is > 64 then skb->data + pushed L2 will all
->> + * be in a single cacheline if we simply reserve 64 bytes.
->> + *
->> + * L3 Header resv: For L3+L2 headers (i.e., skb->data points at the IPTFS payload)
->> + * we want `skb->data` to be cacheline aligned and all pushed L2L3 headers will
->> + * be in their own cacheline[s]. 128 works for cachelins up to 128 bytes, for
->> + * any larger cacheline sizes the pushed headers will simply share the cacheline
->> + * with the start of the IPTFS payload (skb->data).
->> + */
->> +#define XFRM_IPTFS_MIN_L3HEADROOM 128
->> +#define XFRM_IPTFS_MIN_L2HEADROOM (L1_CACHE_BYTES > 64 ? 64 : 64 + 16)
->> +
->>  #define NSECS_IN_USEC 1000
->>
->>  #define IPTFS_HRTIMER_MODE HRTIMER_MODE_REL_SOFT
->>
->>  /**
->>   * struct xfrm_iptfs_config - configuration for the IPTFS tunnel.
->> + * @dont_frag: true to inhibit fragmenting across IPTFS outer packets.
->>   * @pkt_size: size of the outer IP packet. 0 to use interface and MTU discovery,
->>   *	otherwise the user specified value.
->>   * @max_queue_size: The maximum number of octets allowed to be queued to be sent
->> @@ -59,6 +76,7 @@
->>   *	packets enqueued.
->>   */
->>  struct xfrm_iptfs_config {
->> +	bool dont_frag : 1;
+On Sat Nov 2, 2024 at 11:49 AM MSK, Paolo Abeni wrote:
+> Hi,
 >
-> This bool creates a two byte hole at the beginning of the structure.
-> Not a big issue here, but usually it is good to check the structure
-> layout with pahole to avoid this.
-
-Moved to bottom changed to `u8 dont_frag : 1`
-
+> On 11/1/24 18:34, Vladimir Vdovin wrote:
+> > On Fri Nov 1, 2024 at 4:45 PM MSK, Jakub Kicinski wrote:
+> >> On Fri,  1 Nov 2024 10:48:57 +0000 Vladimir Vdovin wrote:
+> >>> +	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
+> >>
+> >> This new test seems to fail in our CI:
+> >>
+> >> # TEST: ipv4: PMTU multipath nh exceptions                            =
+[FAIL]
+> >> #   there are not enough cached exceptions
+> >>
+> >> https://netdev-3.bots.linux.dev/vmksft-net/results/840861/3-pmtu-sh/st=
+dout
+> >=20
+> > Yes it failed in V4 patch, in this V5 its already ok:
+> >=20
+> > # TEST: ipv4: PMTU multipath nh exceptions                            [=
+ OK ]
+> > ok 1 selftests: net: pmtu.sh
+> >=20
+> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/841042/2-pmtu-sh=
+/stdout
+> >=20
+> > But in V5, there is failed test, not sure that this patch causes fail:
+> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/841042/31-busy-p=
+oll-test-sh/stdout
+> >=20
+> >>
+> >> Also some process notes:
+> >>  - please don't post multiple versions of the patch a day:
+> >>    https://www.kernel.org/doc/html/next/process/maintainer-netdev.html=
+#tl-dr
+> >>  - please avoid posting new versions in-reply-to the old one
+> > Thanks, will keep it in mind next time, sorry for my ignorance
 >
->>  	u32 pkt_size;	    /* outer_packet_size or 0 */
->>  	u32 max_queue_size; /* octets */
->>  };
+> Some additional notes:
+>
+> - please do answer to Ido's question: what about ipv6?
+> - move the changelog after the SoB tag and a '---' separator, so that it
+> will not be included into the git commit message
+> - post new revisions of the patch in a different thread
+>
+> Thanks,
+>
+> Paolo
 
+Thanks for your comments,=20
+I will resend patch with fixed commit message as new thread.
 
---=-=-=
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmcmTCUSHGNob3Bwc0Bj
-aG9wcHMub3JnAAoJEC4dgw7XuDAl7LIP/RgfwSZKe19ACfaR8MYptz+RGvTj5501
-fxaCpjcDGhjQa4ZfxkBNcORCzGL/UW8MiWrvaXzKa2vbX85+/HVtfd1M+qzPo8ZO
-Km2yB0KP+e/mnmjQERGJxMsGf/d6H3fd9aMlW/qclPynS9RIFodA3xzSGx6pQjJS
-WsuSzw3lV1I0pIWRn1Crm1ILICogfiPhzfRDAfwXwykaD6f+E2I+5rk8xWEeL4AS
-WL15i/88v3+T4MhgrVUJ0Ttxs1Pd0MbdqgdRJkQ1cIKllixzB8zIRTytQUSbmHPD
-kparfl11l18n6KrzM8+1pO7E4XzbMv1ugmw1BdvkQOpMPF4pOJcvK6VB3vxk7/eX
-dml08ZWyzv6L2aQWPrYTNqr2wVPPr+Pt5lp1LRDkbqCpwIUXJQAJ+jU9KL2lAS4H
-Dqe/0SuLuauUhev3WSqVI/Zd4wc6DqTNwnCSWx7R6lWKFCOUJ39g3EGyBinCgGHP
-9JaXwrVaCL7/nHZyNWp/W+KXBwJUrvL2KDtUPo4F68iT9w5yfp6kcAyK24cpgoan
-f8SpwAB+Vog5hgJJVLkaS62YX1vc37tSl3thb6dKQPkxLTuBzpZl4dTLpE9nhDjr
-kUyvKDwzEBIRPAFvN5ZLWalNH8pgQRGIZB3lieoU4YqVSafjxldX79YyhBFcfbTE
-1bJACWUTQ5Yz
-=zRro
------END PGP SIGNATURE-----
---=-=-=--
 
