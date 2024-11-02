@@ -1,291 +1,322 @@
-Return-Path: <netdev+bounces-141230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 584B69BA168
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:30:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 362C59BA184
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:50:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DB911C20C1F
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:30:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3910281E30
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:50:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26782189BB8;
-	Sat,  2 Nov 2024 16:30:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="HYFVZ5cM"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8BEF19DF4B;
+	Sat,  2 Nov 2024 16:50:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01071901.me.com (qs51p00im-qukt01071901.me.com [17.57.155.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DE0713B791
-	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 16:30:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.8
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAD80175D47
+	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 16:50:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730565022; cv=none; b=u2AuZGM4H3fJbiPOzKZR1FjawQ9DxmeeDl+63fcCnVniNmolWKfSwDii4RykJQ7OnGoUvGGgAR6PhatFZ92xMPdzsZ4AC3A9G9s+ei171Z9YInfof14DiWXwr0fG4TrPrfqg46Hz6K+U0bv73wIqQwUAJm5q/IXTyC1zHLKk8Co=
+	t=1730566236; cv=none; b=AfkukhC7x7TJzR5eJ1g+yKUK0UiviVnJz8cMr/stSXl9KfbNqSE2mLT1LyZ+h5kB1YXdGbHcjHI46mOX/aCh2a/R03tB7HFsdss5a3H1AWBeGyX5UurUpJt0qYYfiD8i11/quihYMVOG8rH3cSYj05zvbLEU3pBwdFbm2RY7YIA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730565022; c=relaxed/simple;
-	bh=oL4LOaaxYyFSbzDq0ODh4Una+IuybqTzNiRpPeFEqRY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=DT1rv9+LYdhSecZ1ZKWzvVoXjk8j+EyxCmMPXkDsw6dbrgP4nPCW4qaXRw3X8j8Jk90KquHeaV5KqCRcW9gIa2XCrRUEVcFtaSLEbqD7Q5metfudpocEWl+LXNgJc4F7qHuCHbOtbdVysCfkgS9yYzAX4z/Fwa5zCdl01xfwe1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=HYFVZ5cM; arc=none smtp.client-ip=17.57.155.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730565017; bh=9VtYuPUT2G/ApaJA1R0BoIWRl+u+eqDfegUTEXx4cXs=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:x-icloud-hme;
-	b=HYFVZ5cML/A61z2hI7EyNH8DBa7bebIOc06nrC12sIiKm0OBX4/D6nLY+fAkUViiG
-	 3F5M63QvYb5cyjDgxkVLK+qFsuwR0y/uQ5WqfMGsPXoATdLzolMiNX0u1SJDJw7siL
-	 63u6LkCnX0ZqgTJryotxvb7reTXDOd2W+kQGGU9N5v9+6YwNIAgG3aPSUH7L/8a0r4
-	 jF6ouwisxLYoLePtVaGosWI8a5J41HHHCDozIKb8QplKcw3HJPcanyB5HU71tBbTpQ
-	 6qyKEY+d7hHV1w/Ncidwbl5flkcN39iLDKi53lv48DRFQkpX1N2Xb/EDyrJcTsYstv
-	 P/5BWxZa+X+WA==
-Received: from almalinux-std3-4-4-10gb.novalocal (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01071901.me.com (Postfix) with ESMTPSA id 20B01628031E;
-	Sat,  2 Nov 2024 16:30:13 +0000 (UTC)
-From: Vladimir Vdovin <deliran@verdict.gg>
-To: netdev@vger.kernel.org,
-	dsahern@kernel.org,
-	davem@davemloft.net
-Cc: Vladimir Vdovin <deliran@verdict.gg>,
-	idosch@idosch.org,
-	edumazet@google.com,
-	linux-kselftest@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	horms@kernel.org
-Subject: [PATCH v6] net: ipv4: Cache pmtu for all packet paths if multipath enabled
-Date: Sat,  2 Nov 2024 16:29:35 +0000
-Message-ID: <20241102163000.2392-1-deliran@verdict.gg>
-X-Mailer: git-send-email 2.43.5
+	s=arc-20240116; t=1730566236; c=relaxed/simple;
+	bh=b6EoWRD1xYMwlXkPz2mb59JUHG6v0kHjdtPcfrXvgLg=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=J1sruVh36KUk6dgULAJIxCGt03wsRfe6ZYBvD+fQ9YLPU0l2ot9xM+Pd9/ZACWTpjNCRo3Z27PQxtj5L28Gsxo9oIHFEXHuD/Dg1eVdIE9v1hXG0kbUjE9rw9bc5kSSsu+m04XqU0kW6CuyY8YPJ1nL8ueTUOqtJ3pl/usE3Rcs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from vapr.local.chopps.org (unknown [185.122.134.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id E4C127D08A;
+	Sat,  2 Nov 2024 16:50:31 +0000 (UTC)
+References: <20241007135928.1218955-1-chopps@chopps.org>
+ <20241007135928.1218955-16-chopps@chopps.org>
+ <ZxYO+BuvEyROVORj@gauss3.secunet.de>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
+ netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>, Sabrina Dubroca
+ <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony Antony
+ <antony@phenome.org>, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v12 15/16] xfrm: iptfs: handle reordering of
+ received packets
+Date: Sat, 02 Nov 2024 16:30:16 +0000
+In-reply-to: <ZxYO+BuvEyROVORj@gauss3.secunet.de>
+Message-ID: <m2ikt5inqh.fsf@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: hv5YLIg5UkfTLKwaxUp2sfbRKMIvSWIW
-X-Proofpoint-ORIG-GUID: hv5YLIg5UkfTLKwaxUp2sfbRKMIvSWIW
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-02_14,2024-11-01_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxscore=0 spamscore=0 malwarescore=0
- phishscore=0 clxscore=1030 mlxlogscore=999 adultscore=0 bulkscore=0
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411020147
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-Check number of paths by fib_info_num_path(),
-and update_or_create_fnhe() for every path.
-Problem is that pmtu is cached only for the oif
-that has received icmp message "need to frag",
-other oifs will still try to use "default" iface mtu.
+--=-=-=
+Content-Type: text/plain; format=flowed
 
-An example topology showing the problem:
 
-                    |  host1
-                +---------+
-                |  dummy0 | 10.179.20.18/32  mtu9000
-                +---------+
-        +-----------+----------------+
-    +---------+                     +---------+
-    | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
-    +---------+                     +---------+
-        |    (all here have mtu 9000)    |
-    +------+                         +------+
-    | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
-    +------+                         +------+
-        |                                |
----------+------------+-------------------+------
-                        |
-                    +-----+
-                    | ro3 | 10.10.10.10  mtu1500
-                    +-----+
-                        |
-    ========================================
-                some networks
-    ========================================
-                        |
-                    +-----+
-                    | eth0| 10.10.30.30  mtu9000
-                    +-----+
-                        |  host2
+Steffen Klassert <steffen.klassert@secunet.com> writes:
 
-host1 have enabled multipath and
-sysctl net.ipv4.fib_multipath_hash_policy = 1:
+> On Mon, Oct 07, 2024 at 09:59:27AM -0400, Christian Hopps wrote:
+>> From: Christian Hopps <chopps@labn.net>
+>>
+>> +static u32 __reorder_drop(struct xfrm_iptfs_data *xtfs, struct list_head *list)
+>> +
+>> +{
+>> +	struct skb_wseq *s, *se;
+>> +	const u32 savedlen = xtfs->w_savedlen;
+>> +	time64_t now = ktime_get_raw_fast_ns();
+>> +	u32 count = 0;
+>> +	u32 scount = 0;
+>> +
+>> +	WARN_ON_ONCE(!savedlen);
+>> +	if (xtfs->w_saved[0].drop_time > now)
+>> +		goto set_timer;
+>> +
+>> +	++xtfs->w_wantseq;
+>> +
+>> +	/* Keep flushing packets until we reach a drop time greater than now. */
+>> +	s = xtfs->w_saved;
+>> +	se = s + savedlen;
+>> +	do {
+>> +		/* Walking past empty slots until we reach a packet */
+>> +		for (; s < se && !s->skb; s++)
+>> +			if (s->drop_time > now)
+>> +				goto outerdone;
+>
+> Please use braces if there is more that one line in the loop.
 
-default proto static src 10.179.20.18
-        nexthop via 10.179.2.12 dev ens17f1 weight 1
-        nexthop via 10.179.2.140 dev ens17f0 weight 1
+Done.
 
-When host1 tries to do pmtud from 10.179.20.18/32 to host2,
-host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
-And host1 caches it in nexthop exceptions cache.
+>> +
+>> +static void __reorder_future_shifts(struct xfrm_iptfs_data *xtfs,
+>> +				    struct sk_buff *inskb,
+>> +				    struct list_head *list,
+>> +				    struct list_head *freelist)
+>
+> freelist is unused in this function.
 
-Problem is that it is cached only for the iface that has received icmp,
-and there is no way that ro3 will send icmp msg to host1 via another path.
+Removed.
 
-Host1 now have this routes to host2:
+>> +{
+>> +	const u32 nslots = xtfs->cfg.reorder_win_size + 1;
+>> +	const u64 inseq = __esp_seq(inskb);
+>> +	u32 savedlen = xtfs->w_savedlen;
+>> +	u64 wantseq = xtfs->w_wantseq;
+>> +	struct sk_buff *slot0 = NULL;
+>> +	struct skb_wseq *wnext;
+>> +	u32 beyond, shifting, slot;
+>> +	u64 distance;
+>> +
+>> +	WARN_ON_ONCE(inseq <= wantseq);
+>
+> Do we really need this warning? You checked exactly this before calling
+> __reorder_future_shifts.
+>
+>> +	distance = inseq - wantseq;
+>> +	WARN_ON_ONCE(distance <= nslots - 1);
+>
+> Same here. There are a lot of these WARN_ON_ONCE all over the
+> place. I don't think we need it at places where it is clear
+> that the warn condition will never be true.
 
-ip r g 10.10.30.30 sport 30000 dport 443
-10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
-    cache expires 521sec mtu 1500
+Removed.
 
-ip r g 10.10.30.30 sport 30033 dport 443
-10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
-    cache
+>> +	beyond = distance - (nslots - 1);
+>> +
+>> +	/* Handle future sequence number received.
+>> +	 *
+>> +	 * IMPORTANT: we are at least advancing w_wantseq (i.e., wantseq) by 1
+>> +	 * b/c we are beyond the window boundary.
+>> +	 *
+>> +	 * We know we don't have the wantseq so that counts as a drop.
+>> +	 */
+>> +
+>> +	/* ex: slot count is 4, array size is 3 savedlen is 2, slot 0 is the
+>
+> What means 'ex:'?
 
-So when host1 tries again to reach host2 with mtu>1500,
-if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
-if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
-until lucky day when ro3 will send it through another flow to ens17f0.
+"Example" - expanded.
 
-Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
----
+>> +	 * missing sequence number.
+>> +	 *
+>> +	 * the final slot at savedlen (index savedlen - 1) is always occupied.
+>> +	 *
+>> +	 * beyond is "beyond array size" not savedlen.
+>> +	 *
+>> +	 *          +--------- array length (savedlen == 2)
+>> +	 *          |   +----- array size (nslots - 1 == 3)
+>> +	 *          |   |   +- window boundary (nslots == 4)
+>> +	 *          V   V | V
+>
+> window boundary points to seq number 6 here. In all other
+> examples, it points between 5 and 6. Is that intentional?
 
-V6:
-  - make commit message cleaner
+Fixed to match others.
 
-V5:
-  - make self test cleaner
+>> +	 *                |
+>> +	 *  0   1   2   3 |   slot number
+>> +	 * ---  0   1   2 |   array index
+>
+> This looks odd. I guess this is because slot0 does
+> not belong to the array. Why is that?
 
-V4:
-  - fix selftest, do route lookup before checking cached exceptions
+the slots are the logical window, the array implements the physical data structure requirements for holding received future packets. This never includes the missing "next in line" required packet by definition (slot 0 in the window).
 
-V3:
-  - added selftest
-  - fixed compile error
+> Can we have slot0 integrated in the array? This would make
+> the counting much simpler IMO.
 
-V2:
-  - fix fib_info_num_path parameter pass
----
- net/ipv4/route.c                    | 13 +++++
- tools/testing/selftests/net/pmtu.sh | 78 ++++++++++++++++++++++++++++-
- 2 files changed, 90 insertions(+), 1 deletion(-)
+We don't want to do this b/c then simple shifting logic doesn't work as slot0 is, by definition, always missing, the code will actually get more complex with an always missing initial array item to be special cased.
 
-diff --git a/net/ipv4/route.c b/net/ipv4/route.c
-index 723ac9181558..41162b5cc4cb 100644
---- a/net/ipv4/route.c
-+++ b/net/ipv4/route.c
-@@ -1027,6 +1027,19 @@ static void __ip_rt_update_pmtu(struct rtable *rt, struct flowi4 *fl4, u32 mtu)
- 		struct fib_nh_common *nhc;
- 
- 		fib_select_path(net, &res, fl4, NULL);
-+#ifdef CONFIG_IP_ROUTE_MULTIPATH
-+		if (fib_info_num_path(res.fi) > 1) {
-+			int nhsel;
-+
-+			for (nhsel = 0; nhsel < fib_info_num_path(res.fi); nhsel++) {
-+				nhc = fib_info_nhc(res.fi, nhsel);
-+				update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
-+							  jiffies + net->ipv4.ip_rt_mtu_expires);
-+			}
-+			rcu_read_unlock();
-+			return;
-+		}
-+#endif /* CONFIG_IP_ROUTE_MULTIPATH */
- 		nhc = FIB_RES_NHC(res);
- 		update_or_create_fnhe(nhc, fl4->daddr, 0, mtu, lock,
- 				      jiffies + net->ipv4.ip_rt_mtu_expires);
-diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftests/net/pmtu.sh
-index 569bce8b6383..a0159340fe84 100755
---- a/tools/testing/selftests/net/pmtu.sh
-+++ b/tools/testing/selftests/net/pmtu.sh
-@@ -266,7 +266,8 @@ tests="
- 	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
- 	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
- 	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
--	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
-+	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
-+	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
- 
- # Addressing and routing for tests with routers: four network segments, with
- # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) and an
-@@ -2329,6 +2330,81 @@ test_pmtu_ipv6_route_change() {
- 	test_pmtu_ipvX_route_change 6
- }
- 
-+test_pmtu_ipv4_mp_exceptions() {
-+	setup namespaces routing || return $ksft_skip
-+
-+	ip nexthop ls >/dev/null 2>&1
-+	if [ $? -ne 0 ]; then
-+		echo "Nexthop objects not supported; skipping tests"
-+		exit $ksft_skip
-+	fi
-+
-+	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
-+	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
-+	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
-+	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
-+
-+	dummy0_a="192.168.99.99"
-+	dummy0_b="192.168.88.88"
-+
-+	# Set up initial MTU values
-+	mtu "${ns_a}"  veth_A-R1 2000
-+	mtu "${ns_r1}" veth_R1-A 2000
-+	mtu "${ns_r1}" veth_R1-B 1500
-+	mtu "${ns_b}"  veth_B-R1 1500
-+
-+	mtu "${ns_a}"  veth_A-R2 2000
-+	mtu "${ns_r2}" veth_R2-A 2000
-+	mtu "${ns_r2}" veth_R2-B 1500
-+	mtu "${ns_b}"  veth_B-R2 1500
-+
-+	fail=0
-+
-+	#Set up host A with multipath routes to host B dummy0_b
-+	run_cmd ${ns_a} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_a} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_a} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_a} ip link set dummy0 up
-+	run_cmd ${ns_a} ip addr add ${dummy0_a} dev dummy0
-+	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_a} ip route add ${dummy0_b} nhid 203
-+
-+	#Set up host B with multipath routes to host A dummy0_a
-+	run_cmd ${ns_b} sysctl -q net.ipv4.fib_multipath_hash_policy=1
-+	run_cmd ${ns_b} sysctl -q net.ipv4.ip_forward=1
-+	run_cmd ${ns_b} ip link add dummy0 mtu 2000 type dummy
-+	run_cmd ${ns_b} ip link set dummy0 up
-+	run_cmd ${ns_b} ip addr add ${dummy0_b} dev dummy0
-+	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev veth_A-R1
-+	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev veth_A-R2
-+	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
-+	run_cmd ${ns_b} ip route add ${dummy0_a} nhid 203
-+
-+	#Set up routers with routes to dummies
-+	run_cmd ${ns_r1} ip route add ${dummy0_a} via ${prefix4}.${a_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_a} via ${prefix4}.${a_r2}.1
-+	run_cmd ${ns_r1} ip route add ${dummy0_b} via ${prefix4}.${b_r1}.1
-+	run_cmd ${ns_r2} ip route add ${dummy0_b} via ${prefix4}.${b_r2}.1
-+
-+
-+	#Ping and expect two nexthop exceptions for two routes in nh group
-+	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 2 -s 1800 "${dummy0_b}"
-+
-+	#Do route lookup before checking cached exceptions
-+	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R1
-+	run_cmd ${ns_a} ip route get ${dummy0_b} oif veth_A-R2
-+
-+	#Check cached exceptions
-+	if [ "$(${ns_a} ip -oneline route list cache| grep mtu | wc -l)" -ne 2 ]; then
-+		err "  there are not enough cached exceptions"
-+		fail=1
-+	fi
-+
-+	return ${fail}
-+}
-+
- usage() {
- 	echo
- 	echo "$0 [OPTIONS] [TEST]..."
+>> +	 *     [b] [c] : :|   array
+>> +	 *                |
+>> +	 * "2" "3" "4" "5"|*6*  seq numbers
+>
+> Is it so that in the example above packet [a] with seq number 2
+> is missing and we have packet [b] with seq number 3 in slot 1
+> and packet [c] with seq number 4 in slot 2?
 
-base-commit: 66600fac7a984dea4ae095411f644770b2561ede
--- 
-2.43.5
+Yes.
 
+>> +	 *
+>> +	 * We receive seq number 6
+>> +	 * distance == 4 [inseq(6) - w_wantseq(2)]
+>> +	 * newslot == distance
+>> +	 * index == 3 [distance(4) - 1]
+>> +	 * beyond == 1 [newslot(4) - lastslot((nslots(4) - 1))]
+>> +	 * shifting == 1 [min(savedlen(2), beyond(1)]
+>> +	 * slot0_skb == [b], and should match w_wantseq
+>
+> We don't have slot0_skb, I guess this is slot0.
+>
+> How will the example above look like after shifting?
+> Is it this:
+>
+> 	 *  0   1   2   3 |   slot number
+> 	 * ---  0   1   2 |   array index
+> 	 * [b] [c] : : [e]|   array
+> 	 *                |
+> 	 * "3" "4" "5" "6"|  seq numbers
+>
+> Whereby [e] is the packet with seq number 6.
+
+Yes.
+
+>> +	 *
+>> +	 *                +--- window boundary (nslots == 4)
+>> +	 *  0   1   2   3 | 4   slot number
+>> +	 * ---  0   1   2 | 3   array index
+>> +	 *     [b] : : : :|     array
+>> +	 * "2" "3" "4" "5" *6*  seq numbers
+>
+> What's the difference to the first example? Is it
+> the same but packet [c] is missing?
+
+Yes.
+
+>> +	 *
+>> +	 * We receive seq number 6
+>> +	 * distance == 4 [inseq(6) - w_wantseq(2)]
+>> +	 * newslot == distance
+>> +	 * index == 3 [distance(4) - 1]
+>> +	 * beyond == 1 [newslot(4) - lastslot((nslots(4) - 1))]
+>> +	 * shifting == 1 [min(savedlen(1), beyond(1)]
+>> +	 * slot0_skb == [b] and should match w_wantseq
+>> +	 *
+>> +	 *                +-- window boundary (nslots == 4)
+>> +	 *  0   1   2   3 | 4   5   6   slot number
+>> +	 * ---  0   1   2 | 3   4   5   array index
+>> +	 *     [-] [c] : :|             array
+>
+> What does [-] mean? Is it the [b] is missing?
+
+Yes. empty (NULL) array item.
+
+>> +	 * "2" "3" "4" "5" "6" "7" *8*  seq numbers
+>> +	 *
+>> +	 * savedlen = 2, beyond = 3
+>> +	 * iter 1: slot0 == NULL, missed++, lastdrop = 2 (2+1-1), slot0 = [-]
+>> +	 * iter 2: slot0 == NULL, missed++, lastdrop = 3 (2+2-1), slot0 = [c]
+>> +	 * 2 < 3, extra = 1 (3-2), missed += extra, lastdrop = 4 (2+2+1-1)
+>> +	 *
+>> +	 * We receive seq number 8
+>> +	 * distance == 6 [inseq(8) - w_wantseq(2)]
+>> +	 * newslot == distance
+>> +	 * index == 5 [distance(6) - 1]
+>> +	 * beyond == 3 [newslot(6) - lastslot((nslots(4) - 1))]
+>> +	 * shifting == 2 [min(savedlen(2), beyond(3)]
+>> +	 *
+>> +	 * slot0_skb == NULL changed from [b] when "savedlen < beyond" is true.
+>> +	 */
+>> +
+>> +	/* Now send any packets that are being shifted out of saved, and account
+>> +	 * for missing packets that are exiting the window as we shift it.
+>> +	 */
+>
+> Documentation is in genaral good, but it must be clear what's
+> documented here. It took me quite a while to figure out what
+> these examples mean, and I'm still not absoluely sure if
+> I'm correct. All that might be clear to you when you wrote
+> that, but it is very hard to guess what you thought when
+> writing this :)
+
+You understood everything correctly. Sliding window code is by nature complex, and as you noted I really wanted to document the crap out of it to try and help. You got it all right so I think I accomplished the goal. :)
+
+>> +	/* If savedlen > beyond we are shifting some, else all. */
+>> +	shifting = min(savedlen, beyond);
+>> +
+>> +	/* slot0 is the buf that just shifted out and into slot0 */
+>> +	slot0 = NULL;
+>
+> slot0 was set to NULL already at the beginning of this function.
+>
+> It is just hard to notice because of the huge coment in the middle
+> of the function. It might make sense to put all that bigger comments
+> to a central place. It would make the functions more readable,
+> at least.
+
+That was the intention. :) I removed the redundant assignment above, and moved 2 others below to join the rest.
+
+>> @@ -2222,6 +2700,11 @@ static void iptfs_destroy_state(struct xfrm_state *x)
+>>  	if (xtfs->ra_newskb)
+>>  		kfree_skb(xtfs->ra_newskb);
+>>
+>> +	for (s = xtfs->w_saved, se = s + xtfs->w_savedlen; s < se; s++)
+>> +		if (s->skb)
+>> +			kfree_skb(s->skb);
+>
+> Braces please.
+
+Done.
+
+Thanks,
+Chris.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmcmWFYSHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlou8P/1wK9Zm0Wyb3nb1mza8GCVNkmwPj5Ipm
+ZQo+3mAw7+wawwxCGM5/pmtVTFuBiMYBlHgM6WB+fVGLbFu3mgu8TTlA6p1j27JO
+MGsGf+5KHFJ3PvgZbz66YFQ2Iq/H+Vcm4UCLeHkracBINfq7xK8O6yRNjudNG48q
+y67/W0ZbYwtJVAZj5+P46raiHoPqETZcVVJQetOqRccoJAp42fy8zCPS9QNaJ57A
+etMT/5qasRtd8C3T19/FlVMl08eOMvRvjJo/s3m4tXlIEbNDkjCQOQ0zOj5zk6WP
+IRrZDqs6Qdx4Pm7+X0nBsSRYweiP/OJDNHPtOtxlvyM0AOLODhWeuFZH/Wls4MSf
+ixntKp36f1Q5RL2SQxmCDsRzCc8yyDUPXgK1hPCOVcrMrbSoJelkSFXcm+3M4HcY
+uuag+m9MyqTaQ745i/gK44Z0QxINEJTo6UgfHcY67PqC8SJLcBhVw7eq9RvlauyA
+1E7kWkwk8MO6N5Sblu382/H4svZLjuCrzb41YxsvaJSzuu5B8tTU4fgHXtfolm2a
+rlTEKWQoBtU/8t/nM0I33uWBHQavaK1nt7PAO56kf4ZL+4GDyRsb3rcClt/qVHAT
+XZHwe7YOL3sN1zPwXoDNHKV9EryYHEbgaOFSi6r6TL2bYHeoViXVJENZbXJfv+ln
+s9xRZlDDy6y6
+=oVS1
+-----END PGP SIGNATURE-----
+--=-=-=--
 
