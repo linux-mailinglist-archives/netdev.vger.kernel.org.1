@@ -1,63 +1,56 @@
-Return-Path: <netdev+bounces-141195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141196-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19B7B9B9FDD
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 13:00:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 045009B9FFB
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 13:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42BFF1C20CCD
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 12:00:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A6721C20AA2
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 12:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB7917D340;
-	Sat,  2 Nov 2024 12:00:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72665189F2B;
+	Sat,  2 Nov 2024 12:21:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOy5EUSy"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eA1pol+o"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF686AB8;
-	Sat,  2 Nov 2024 12:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35528149E16;
+	Sat,  2 Nov 2024 12:21:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730548842; cv=none; b=kt8Qkwe0se83xx2bl9jWPRJv7VKbW+St7QALPev8wLnZBP4j9cdsNSTU7HzInbjWhG47CpPUejTEZT0VU3HWBlhg6ikhw8sFqazU7TapmanhdQ+DJfyBOdUpRDvVIBNc1XAUGe5QJIZy+MceRLhFpNGr3xWvjgIIPv9DypAI/c0=
+	t=1730550103; cv=none; b=e6woYNsd+pgVx/GvTZk6qAIF78k2IFJTR7kD2ll4Is5fcFkdJzNUEvdOt/ozA8kx7b+LVfictJmK3Vx5ZuEeqiO3eWP0UvPCrllMFGYPba2tinU8bqilVuvCqQLv6ZShpNf8slaoE5RSm74RTUqR/zvvZCUe34Ve4y9m5Md0WuE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730548842; c=relaxed/simple;
-	bh=Gax01FuZKLQfe+8CO7ewzivLwUdPlXNuJeuqRVWx8Qc=;
+	s=arc-20240116; t=1730550103; c=relaxed/simple;
+	bh=EUcbs1cSrphp8pI7Q6rosjx620b4eV5z/fHgLoriit4=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jPhD6D+fBF6gzxknshcbpHophNoM6/04j4NwCEHkBrMCrE7APoX8V4bVH5bK57PbnOk86WxJX0WKDc4UVyBgbFp/OL6jOjF9lVgyjNl93XklaKnLUyKarsZr2Vnaxt//HrELRJ4MFzCAKDCEzIgMk61AvdoN3tFlVoWbMyRh6wM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOy5EUSy; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16A1C4CED2;
-	Sat,  2 Nov 2024 12:00:38 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=qtR3R4tli8drkgUsrxbTM6yprme1vg2jOK5NtZL+mf6/EA+TATyxRI+TyfAVDfPRtYSVCLQM8ysCXeXoVhIo+n91IpwN2010cVYaca1fs3TkP/0vJFeNAGVcbCv4gOLBj4ylyi/oecSEuNHUkoxlcmsm1np5nVeqRmqlnXSyFLo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eA1pol+o; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D7F7C4CEC3;
+	Sat,  2 Nov 2024 12:21:40 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730548842;
-	bh=Gax01FuZKLQfe+8CO7ewzivLwUdPlXNuJeuqRVWx8Qc=;
+	s=k20201202; t=1730550102;
+	bh=EUcbs1cSrphp8pI7Q6rosjx620b4eV5z/fHgLoriit4=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=hOy5EUSypJsqP3WaNWj8wo13ZKzdP7ItQe6wpSkp5E/shKd/Jg8XJds3y8apv97bG
-	 dLxo0ECMkWdfaeaioW8poZ6Pfv+e5mFt00Pb13PJPM9O/JfvJfyPQBn5f3+fLyLg/t
-	 tkpZgWTzCSxO7OAnfFRhi6M1aOZOZciftNFY+THjG81eeXl9ray4CYrQIDgPkmfE4r
-	 jYqNlVCykpkR+5VhWbXt+xakVAIvvmJ4JObdP8Nv41Jc+I8n+i6ERrqmSdntKFV4F3
-	 0Swj+Ss+SUPNn+onGxe1xtWPgISqAlW2xdxmIbsftlDJoItvn5q1SAhwPbZXsQ1SuY
-	 6AoJjjmrG8dQw==
-Date: Sat, 2 Nov 2024 12:00:30 +0000
+	b=eA1pol+o0LuK3tzs+pdYsRUx47ng/osqRkSYRBzDArN+eNs/QJXVS/WJWFU4hqVfp
+	 wzXtp44VX1j8N2q3QvKziMTBI3xjlRp+Re4FSskzFkA8W2aGJ6/CPJB3FCyWN7EJKo
+	 Bi74c6aEVLz2nDzu/qlCoR1AXvJ599AqO/F7cOm9Od9Y8KzyNB9gvu+tCk/FEw307a
+	 1UzHi1f54zlnl0sehHIKu+RkDWsOeYExwpCm+iB7xT3upaAK20GPsL2G79UcgmV313
+	 +chh/jHmYRLr6+HRzqaVUu7+JVJNBu9EEkGK1C3tlg3cc6bIMYCt8K+GT3ZIneLAIL
+	 HgQTboIMoDFGA==
+Date: Sat, 2 Nov 2024 12:21:32 +0000
 From: Simon Horman <horms@kernel.org>
-To: "Nemanov, Michael" <michael.nemanov@ti.com>
-Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Sabeeh Khan <sabeeh-khan@ti.com>
-Subject: Re: [PATCH v3 12/17] wifi: cc33xx: Add scan.c, scan.h
-Message-ID: <20241102120030.GG1838431@kernel.org>
-References: <20240806170018.638585-1-michael.nemanov@ti.com>
- <20240806170018.638585-13-michael.nemanov@ti.com>
- <20240809160355.GD1951@kernel.org>
- <33f3b6a4-f907-4374-90ac-d81a81700936@ti.com>
+To: Al Viro <viro@zeniv.linux.org.uk>
+Cc: linux-fsdevel@vger.kernel.org, brauner@kernel.org,
+	cgroups@vger.kernel.org, kvm@vger.kernel.org,
+	netdev@vger.kernel.org, torvalds@linux-foundation.org
+Subject: Re: [PATCH v3 01/28] net/socket.c: switch to CLASS(fd)
+Message-ID: <20241102122132.GH1838431@kernel.org>
+References: <20241102050219.GA2450028@ZenIV>
+ <20241102050827.2451599-1-viro@zeniv.linux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,79 +59,64 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <33f3b6a4-f907-4374-90ac-d81a81700936@ti.com>
+In-Reply-To: <20241102050827.2451599-1-viro@zeniv.linux.org.uk>
 
-On Mon, Oct 28, 2024 at 06:26:50PM +0200, Nemanov, Michael wrote:
-> On 8/9/2024 7:03 PM, Simon Horman wrote:
-> > On Tue, Aug 06, 2024 at 08:00:13PM +0300, Michael Nemanov wrote:
-> > 
-> > ...
-> > 
-> > > diff --git a/drivers/net/wireless/ti/cc33xx/scan.h b/drivers/net/wireless/ti/cc33xx/scan.h
-> > 
-> > ...
-> > 
-> > > +/**
-> > > + * struct cc33xx_cmd_ssid_list - scan SSID list description
-> > > + *
-> > > + * @role_id:            roleID
-> > > + *
-> > > + * @num_of_ssids:       Number of SSID in the list. MAX 16 entries
-> > 
-> > @num_of_ssids -> @n_ssids
-> > 
-> > > + *
-> > > + * @ssid_list:          SSIDs to scan for (active scan only)
-> > 
-> > @ssid_list -> @ssids
-> >
+On Sat, Nov 02, 2024 at 05:07:59AM +0000, Al Viro wrote:
+> 	The important part in sockfd_lookup_light() is avoiding needless
+> file refcount operations, not the marginal reduction of the register
+> pressure from not keeping a struct file pointer in the caller.
 > 
-> Thanks for the feedback, will fix.
+> 	Switch to use fdget()/fdpu(); with sane use of CLASS(fd) we can
+> get a better code generation...
 > 
-> > Please document all non-private fields,
-> > and annotate those that are private.
-> > 
+> 	Would be nice if somebody tested it on networking test suites
+> (including benchmarks)...
 > 
-> Not sure I follow. You mean mark private vs. non private members in the
-> documentation? If so, private to what (the CC33xx driver or the underlying
-> HW)?
-
-Hi Michael,
-
-I'm not sure why I mentioned private, perhaps it was a general statement
-that all fields should either be documented or marked as private. If
-you don't think anything is private - whatever that might mean - then you
-can ignore that part of my comment. But suffice to say, there is syntax to
-mark fields as private[1].
-
-[1] https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html#members
-
-> > There are a number of similar minor Kernel doc problems with this patch.
-> > Please consider using W=1 builds or ./scripts/kernel-doc -none
-> > (bonus points for -Wall)
-> > 
+> 	sockfd_lookup_light() does fdget(), uses sock_from_file() to
+> get the associated socket and returns the struct socket reference to
+> the caller, along with "do we need to fput()" flag.  No matching fdput(),
+> the caller does its equivalent manually, using the fact that sock->file
+> points to the struct file the socket has come from.
 > 
-> Ran both, got warning for "no structured comments found" on multiple files.
-> Is that it?
+> 	Get rid of that - have the callers do fdget()/fdput() and
+> use sock_from_file() directly.  That kills sockfd_lookup_light()
+> and fput_light() (no users left).
+> 
+> 	What's more, we can get rid of explicit fdget()/fdput() by
+> switching to CLASS(fd, ...) - code generation does not suffer, since
+> now fdput() inserted on "descriptor is not opened" failure exit
+> is recognized to be a no-op by compiler.
+> 
+> Reviewed-by: Christian Brauner <brauner@kernel.org>
+> Signed-off-by: Al Viro <viro@zeniv.linux.org.uk>
 
-I'm a but unsure why you see that, but what I was referring to is this:
+...
 
-$ ./scripts/kernel-doc -none drivers/net/wireless/ti/cc33xx/scan.h
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'scan_type' not described in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'n_ssids' not described in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'ssids' not described in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Excess struct member 'num_of_ssids' description in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Excess struct member 'ssid_list' description in 'cc33xx_cmd_ssid_list'
-drivers/net/wireless/ti/cc33xx/scan.h:149: warning: bad line:
-drivers/net/wireless/ti/cc33xx/scan.h:177: warning: cannot understand function prototype: 'struct sched_scan_plan_cmd '
-drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Function parameter or struct member 'u' not described in 'scan_param'
-drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Excess struct member 'one_shot' description in 'scan_param'
-drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Excess struct member 'periodic' description in 'scan_param'
-drivers/net/wireless/ti/cc33xx/scan.h:269: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_scan_params'
-drivers/net/wireless/ti/cc33xx/scan.h:269: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_scan_params'
-drivers/net/wireless/ti/cc33xx/scan.h:295: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_set_ies'
-drivers/net/wireless/ti/cc33xx/scan.h:319: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_scan_stop'
-drivers/net/wireless/ti/cc33xx/scan.h:319: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_scan_stop'
+> diff --git a/net/socket.c b/net/socket.c
+
+...
+
+> @@ -2926,16 +2900,18 @@ static int do_recvmmsg(int fd, struct mmsghdr __user *mmsg,
+>  
+>  	datagrams = 0;
+>  
+> -	sock = sockfd_lookup_light(fd, &err, &fput_needed);
+> -	if (!sock)
+> -		return err;
+> +	CLASS(fd, f)(fd);
+> +
+> +	if (fd_empty(f))
+> +		return -EBADF;
+> +	sock = sock_from_file(fd_file(f));
+> +	if (unlikely(!sock))
+> +		return -ENOTSOCK;
+
+Hi Al,
+
+There is an unconditional check on err down on line 2977.
+However, with the above change err is now only conditionally
+set before we reach that line. Are you sure that it will always
+be initialised by the time line 2977 is reached?
+
+...
 
