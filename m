@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-141220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6428E9BA10C
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:17:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 350959BA10F
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:17:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20BC4282571
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 15:17:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9E0A1F21BAA
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 15:17:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 099FC1AAE10;
-	Sat,  2 Nov 2024 15:16:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 949191AB6C7;
+	Sat,  2 Nov 2024 15:16:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="RLu5GH46"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="B2sad9+f"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 476861A3042;
-	Sat,  2 Nov 2024 15:16:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36D619F409;
+	Sat,  2 Nov 2024 15:16:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730560596; cv=none; b=B51kpwzyl2vrHN3AsAx10/Lm3fDnCewL88d1h81WEvalvVVFVkPGJZOUdugXOdPAe7ifVGuZxyTkQsW9yMVuiSmg1biXzfFV7C8409UVlhD6peHlUngfm/GiMQqU8ijBXKr+s2bJEXvmH6kdHmcvm6gzw8xU1F+NhxBzn6FfKOw=
+	t=1730560598; cv=none; b=NZLyOMJLdQBn5W+/uSIlE2dt52XPT6yuETneqOQtCcIDqMwB1Ng8/AS4yPmTQu2ZTycRSydrmKVGKdQSn7Z7iwaUcm7csmmSg7/FXKvKaJ/RdQneP58qqVnFr2JYOiaYHEk07J8vYLNSC0P5TKcDVwVQD590lqqQ/Dk/sepsHX4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730560596; c=relaxed/simple;
-	bh=UbSuWf/19x4OB+7U6UWVKjmJ/GhijPEV35fpBLAfWE8=;
+	s=arc-20240116; t=1730560598; c=relaxed/simple;
+	bh=P5HZuhcGf3cFBA+A3tV5V3VnkK+SmRrbOL72QSgrTKk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=PJNpH2RjC5PD3XMl7z0RFG6JDHwg9FwvAhxlu+mr3aU5GWfVe8cgBkE7x/EmkM1k6fdCuENBChgngSbbvfmryUH3dqpmfhqGTp+hsV4x5xiMtfAJKZ1X4NOHRPvR/Q796f9uVVl6TEJl5NUyxHxV+n/+MNTdurdpqiZ/zByy9dE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=RLu5GH46; arc=none smtp.client-ip=46.235.229.95
+	 MIME-Version; b=SwZZGptKnjpJlWauIbh1z4U4yn75rJ+Db6V6yMPSgD91rXlexQgUvGDXPh0uyTSoTn7CTMzyQipxOcn9M9Gp4gntmxeVqpBDSo1IWeeLwvjf/RUHrAVS0YIk7tVkSVZ1sWgVRluZJ311xIPzsyKzOd4SAWE0eNOySJzKNchQS4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=B2sad9+f; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=dUtivoqZwwFukVSbC82sMbINKjtK80TVINmS0LRQqkE=; b=RLu5GH462blDqwHS
-	qcUjLm/DLdD7m0rcfLbMOgSRXIMate/HAg+rwrXqQAB8ztFKyuNvT9QpfM0MnEvfu/89KahzNo3Bd
-	FKetWzYoveUQPKgyH3KJ0Kel03J+FbwokQObdfTdeZ0O8ldFWD/oJgQ2jvjmODZurfmJkj1xi3edn
-	+qa2KSQdFAjYugWd4g0MFPQg5IYMd/Ozt/GSvFKBSWwrZDhH99R/m56jpipsfdOgIilrx/WvqbOb2
-	H9Kj81BbQeAR/G00rZlxVwjp8PT4oy3EdERXdqT4u2MTT8Z1Xv17MSBELME/XVgpPs8nLbQx7uFL+
-	qAWWXbAe2hTgm7GWUQ==;
+	:Subject; bh=yrQTyP91hTnzUDfr+6Z9M449GasNlZJsvCf6FX7ZLlY=; b=B2sad9+f1PHt+PgD
+	BwJtNHQLBDsArkExCpm49vTqBbJQSdZucuFfaOHo9BkPRW7Dwpe79ZCX8hr7QGZGhvtZKavXwSAjZ
+	ODMtfY0rvM8hqOAm5eNmRLFdSrrvupSLv8PjXgx6tt4onfZ5bs1B9UZGqHv766W6mKxauAB/QSvs8
+	yls05WaaOfx21ayQUZTSJtah6WcftN/I7092jqG/YuDRyMot2qXrPWmZ0YmufBZoMoVGFKulXp0HS
+	PfnHQ2nOFjmlXt2f2DK5PwVRhl+0nwiTLsxErfHLyx5KuAFQurnEl2zgps6OazCoz3+hpJ5gzpEFG
+	iQAlRw//GhWkONkR8Q==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1t7FrZ-00F6WZ-0X;
-	Sat, 02 Nov 2024 15:16:29 +0000
+	id 1t7Fra-00F6WZ-2I;
+	Sat, 02 Nov 2024 15:16:30 +0000
 From: linux@treblig.org
 To: ecree.xilinx@gmail.com,
 	habetsm.xilinx@gmail.com,
@@ -56,9 +56,9 @@ Cc: netdev@vger.kernel.org,
 	linux-net-drivers@amd.com,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH net-next 3/4] sfc: Remove unused mcdi functions
-Date: Sat,  2 Nov 2024 15:16:24 +0000
-Message-ID: <20241102151625.39535-4-linux@treblig.org>
+Subject: [PATCH net-next 4/4] sfc: Remove more unused functions
+Date: Sat,  2 Nov 2024 15:16:25 +0000
+Message-ID: <20241102151625.39535-5-linux@treblig.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241102151625.39535-1-linux@treblig.org>
 References: <20241102151625.39535-1-linux@treblig.org>
@@ -72,169 +72,156 @@ Content-Transfer-Encoding: 8bit
 
 From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-efx_mcdi_flush_rxqs(), efx_mcdi_rpc_async_quiet(),
-efx_mcdi_rpc_finish_quiet(), and efx_mcdi_wol_filter_get_magic()
-are unused.
-I think these are fall out from the split into Siena
-that happened in
-commit 4d49e5cd4b09 ("sfc/siena: Rename functions in mcdi headers to avoid
-conflicts with sfc")
-and
-commit d48523cb88e0 ("sfc: Copy shared files needed for Siena (part 2)")
+efx_ticks_to_usecs(), efx_reconfigure_port(), efx_ptp_get_mode(), and
+efx_tx_get_copy_buffer_limited() are unused.
+They seem to be partially due to the later splits to Siena, but
+some seem unused for longer.
 
 Remove them.
 
 Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 ---
- drivers/net/ethernet/sfc/mcdi.c | 76 ---------------------------------
- drivers/net/ethernet/sfc/mcdi.h | 10 -----
- 2 files changed, 86 deletions(-)
+ drivers/net/ethernet/sfc/efx.c        |  8 --------
+ drivers/net/ethernet/sfc/efx.h        |  1 -
+ drivers/net/ethernet/sfc/efx_common.c | 16 ----------------
+ drivers/net/ethernet/sfc/efx_common.h |  1 -
+ drivers/net/ethernet/sfc/ptp.c        |  5 -----
+ drivers/net/ethernet/sfc/ptp.h        |  1 -
+ drivers/net/ethernet/sfc/tx.c         |  8 --------
+ drivers/net/ethernet/sfc/tx.h         |  3 ---
+ 8 files changed, 43 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/mcdi.c b/drivers/net/ethernet/sfc/mcdi.c
-index 76578502226e..d461b1a6ce81 100644
---- a/drivers/net/ethernet/sfc/mcdi.c
-+++ b/drivers/net/ethernet/sfc/mcdi.c
-@@ -1051,15 +1051,6 @@ efx_mcdi_rpc_async(struct efx_nic *efx, unsigned int cmd,
- 				   cookie, false);
+diff --git a/drivers/net/ethernet/sfc/efx.c b/drivers/net/ethernet/sfc/efx.c
+index 36b3b57e2055..0382ac30d1aa 100644
+--- a/drivers/net/ethernet/sfc/efx.c
++++ b/drivers/net/ethernet/sfc/efx.c
+@@ -417,14 +417,6 @@ unsigned int efx_usecs_to_ticks(struct efx_nic *efx, unsigned int usecs)
+ 	return usecs * 1000 / efx->timer_quantum_ns;
  }
  
--int efx_mcdi_rpc_async_quiet(struct efx_nic *efx, unsigned int cmd,
--			     const efx_dword_t *inbuf, size_t inlen,
--			     size_t outlen, efx_mcdi_async_completer *complete,
--			     unsigned long cookie)
+-unsigned int efx_ticks_to_usecs(struct efx_nic *efx, unsigned int ticks)
 -{
--	return _efx_mcdi_rpc_async(efx, cmd, inbuf, inlen, outlen, complete,
--				   cookie, true);
+-	/* We must round up when converting ticks to microseconds
+-	 * because we round down when converting the other way.
+-	 */
+-	return DIV_ROUND_UP(ticks * efx->timer_quantum_ns, 1000);
 -}
 -
- int efx_mcdi_rpc_finish(struct efx_nic *efx, unsigned cmd, size_t inlen,
- 			efx_dword_t *outbuf, size_t outlen,
- 			size_t *outlen_actual)
-@@ -1068,14 +1059,6 @@ int efx_mcdi_rpc_finish(struct efx_nic *efx, unsigned cmd, size_t inlen,
- 				    outlen_actual, false, NULL, NULL);
- }
+ /* Set interrupt moderation parameters */
+ int efx_init_irq_moderation(struct efx_nic *efx, unsigned int tx_usecs,
+ 			    unsigned int rx_usecs, bool rx_adaptive,
+diff --git a/drivers/net/ethernet/sfc/efx.h b/drivers/net/ethernet/sfc/efx.h
+index 7a6cab883d66..45e191686625 100644
+--- a/drivers/net/ethernet/sfc/efx.h
++++ b/drivers/net/ethernet/sfc/efx.h
+@@ -168,7 +168,6 @@ extern const struct ethtool_ops efx_ethtool_ops;
  
--int efx_mcdi_rpc_finish_quiet(struct efx_nic *efx, unsigned cmd, size_t inlen,
--			      efx_dword_t *outbuf, size_t outlen,
--			      size_t *outlen_actual)
--{
--	return _efx_mcdi_rpc_finish(efx, cmd, inlen, outbuf, outlen,
--				    outlen_actual, true, NULL, NULL);
--}
--
- void efx_mcdi_display_error(struct efx_nic *efx, unsigned cmd,
- 			    size_t inlen, efx_dword_t *outbuf,
- 			    size_t outlen, int rc)
-@@ -1982,33 +1965,6 @@ efx_mcdi_wol_filter_set_magic(struct efx_nic *efx,  const u8 *mac, int *id_out)
- }
- 
- 
--int efx_mcdi_wol_filter_get_magic(struct efx_nic *efx, int *id_out)
--{
--	MCDI_DECLARE_BUF(outbuf, MC_CMD_WOL_FILTER_GET_OUT_LEN);
--	size_t outlen;
--	int rc;
--
--	rc = efx_mcdi_rpc(efx, MC_CMD_WOL_FILTER_GET, NULL, 0,
--			  outbuf, sizeof(outbuf), &outlen);
--	if (rc)
--		goto fail;
--
--	if (outlen < MC_CMD_WOL_FILTER_GET_OUT_LEN) {
--		rc = -EIO;
--		goto fail;
--	}
--
--	*id_out = (int)MCDI_DWORD(outbuf, WOL_FILTER_GET_OUT_FILTER_ID);
--
--	return 0;
--
--fail:
--	*id_out = -1;
--	netif_err(efx, hw, efx->net_dev, "%s: failed rc=%d\n", __func__, rc);
--	return rc;
--}
--
--
- int efx_mcdi_wol_filter_remove(struct efx_nic *efx, int id)
- {
- 	MCDI_DECLARE_BUF(inbuf, MC_CMD_WOL_FILTER_REMOVE_IN_LEN);
-@@ -2021,38 +1977,6 @@ int efx_mcdi_wol_filter_remove(struct efx_nic *efx, int id)
+ /* Global */
+ unsigned int efx_usecs_to_ticks(struct efx_nic *efx, unsigned int usecs);
+-unsigned int efx_ticks_to_usecs(struct efx_nic *efx, unsigned int ticks);
+ int efx_init_irq_moderation(struct efx_nic *efx, unsigned int tx_usecs,
+ 			    unsigned int rx_usecs, bool rx_adaptive,
+ 			    bool rx_may_override_tx);
+diff --git a/drivers/net/ethernet/sfc/efx_common.c b/drivers/net/ethernet/sfc/efx_common.c
+index 13cf647051af..c88ec3e24836 100644
+--- a/drivers/net/ethernet/sfc/efx_common.c
++++ b/drivers/net/ethernet/sfc/efx_common.c
+@@ -635,22 +635,6 @@ int __efx_reconfigure_port(struct efx_nic *efx)
  	return rc;
  }
  
--int efx_mcdi_flush_rxqs(struct efx_nic *efx)
+-/* Reinitialise the MAC to pick up new PHY settings, even if the port is
+- * disabled.
+- */
+-int efx_reconfigure_port(struct efx_nic *efx)
 -{
--	struct efx_channel *channel;
--	struct efx_rx_queue *rx_queue;
--	MCDI_DECLARE_BUF(inbuf,
--			 MC_CMD_FLUSH_RX_QUEUES_IN_LEN(EFX_MAX_CHANNELS));
--	int rc, count;
+-	int rc;
 -
--	BUILD_BUG_ON(EFX_MAX_CHANNELS >
--		     MC_CMD_FLUSH_RX_QUEUES_IN_QID_OFST_MAXNUM);
+-	EFX_ASSERT_RESET_SERIALISED(efx);
 -
--	count = 0;
--	efx_for_each_channel(channel, efx) {
--		efx_for_each_channel_rx_queue(rx_queue, channel) {
--			if (rx_queue->flush_pending) {
--				rx_queue->flush_pending = false;
--				atomic_dec(&efx->rxq_flush_pending);
--				MCDI_SET_ARRAY_DWORD(
--					inbuf, FLUSH_RX_QUEUES_IN_QID_OFST,
--					count, efx_rx_queue_index(rx_queue));
--				count++;
--			}
--		}
--	}
--
--	rc = efx_mcdi_rpc(efx, MC_CMD_FLUSH_RX_QUEUES, inbuf,
--			  MC_CMD_FLUSH_RX_QUEUES_IN_LEN(count), NULL, 0, NULL);
--	WARN_ON(rc < 0);
+-	mutex_lock(&efx->mac_lock);
+-	rc = __efx_reconfigure_port(efx);
+-	mutex_unlock(&efx->mac_lock);
 -
 -	return rc;
 -}
 -
- int efx_mcdi_wol_filter_reset(struct efx_nic *efx)
+ /**************************************************************************
+  *
+  * Device reset and suspend
+diff --git a/drivers/net/ethernet/sfc/efx_common.h b/drivers/net/ethernet/sfc/efx_common.h
+index 2c54dac3e662..19a8ca530969 100644
+--- a/drivers/net/ethernet/sfc/efx_common.h
++++ b/drivers/net/ethernet/sfc/efx_common.h
+@@ -40,7 +40,6 @@ void efx_destroy_reset_workqueue(void);
+ void efx_start_monitor(struct efx_nic *efx);
+ 
+ int __efx_reconfigure_port(struct efx_nic *efx);
+-int efx_reconfigure_port(struct efx_nic *efx);
+ 
+ #define EFX_ASSERT_RESET_SERIALISED(efx)				\
+ 	do {								\
+diff --git a/drivers/net/ethernet/sfc/ptp.c b/drivers/net/ethernet/sfc/ptp.c
+index aaacdcfa54ae..36bceeeb6483 100644
+--- a/drivers/net/ethernet/sfc/ptp.c
++++ b/drivers/net/ethernet/sfc/ptp.c
+@@ -1800,11 +1800,6 @@ int efx_ptp_tx(struct efx_nic *efx, struct sk_buff *skb)
+ 	return NETDEV_TX_OK;
+ }
+ 
+-int efx_ptp_get_mode(struct efx_nic *efx)
+-{
+-	return efx->ptp_data->mode;
+-}
+-
+ int efx_ptp_change_mode(struct efx_nic *efx, bool enable_wanted,
+ 			unsigned int new_mode)
  {
- 	int rc;
-diff --git a/drivers/net/ethernet/sfc/mcdi.h b/drivers/net/ethernet/sfc/mcdi.h
-index ea612c619874..cdb17d7c147f 100644
---- a/drivers/net/ethernet/sfc/mcdi.h
-+++ b/drivers/net/ethernet/sfc/mcdi.h
-@@ -155,9 +155,6 @@ int efx_mcdi_rpc_start(struct efx_nic *efx, unsigned cmd,
- int efx_mcdi_rpc_finish(struct efx_nic *efx, unsigned cmd, size_t inlen,
- 			efx_dword_t *outbuf, size_t outlen,
- 			size_t *outlen_actual);
--int efx_mcdi_rpc_finish_quiet(struct efx_nic *efx, unsigned cmd,
--			      size_t inlen, efx_dword_t *outbuf,
--			      size_t outlen, size_t *outlen_actual);
+diff --git a/drivers/net/ethernet/sfc/ptp.h b/drivers/net/ethernet/sfc/ptp.h
+index 6946203499ef..feab7bdd7889 100644
+--- a/drivers/net/ethernet/sfc/ptp.h
++++ b/drivers/net/ethernet/sfc/ptp.h
+@@ -26,7 +26,6 @@ int efx_ptp_get_ts_config(struct efx_nic *efx,
+ void efx_ptp_get_ts_info(struct efx_nic *efx,
+ 			 struct kernel_ethtool_ts_info *ts_info);
+ bool efx_ptp_is_ptp_tx(struct efx_nic *efx, struct sk_buff *skb);
+-int efx_ptp_get_mode(struct efx_nic *efx);
+ int efx_ptp_change_mode(struct efx_nic *efx, bool enable_wanted,
+ 			unsigned int new_mode);
+ int efx_ptp_tx(struct efx_nic *efx, struct sk_buff *skb);
+diff --git a/drivers/net/ethernet/sfc/tx.c b/drivers/net/ethernet/sfc/tx.c
+index fe2d476028e7..6b4a343a455d 100644
+--- a/drivers/net/ethernet/sfc/tx.c
++++ b/drivers/net/ethernet/sfc/tx.c
+@@ -49,14 +49,6 @@ static inline u8 *efx_tx_get_copy_buffer(struct efx_tx_queue *tx_queue,
+ 	return (u8 *)page_buf->addr + offset;
+ }
  
- typedef void efx_mcdi_async_completer(struct efx_nic *efx,
- 				      unsigned long cookie, int rc,
-@@ -167,11 +164,6 @@ int efx_mcdi_rpc_async(struct efx_nic *efx, unsigned int cmd,
- 		       const efx_dword_t *inbuf, size_t inlen, size_t outlen,
- 		       efx_mcdi_async_completer *complete,
- 		       unsigned long cookie);
--int efx_mcdi_rpc_async_quiet(struct efx_nic *efx, unsigned int cmd,
--			     const efx_dword_t *inbuf, size_t inlen,
--			     size_t outlen,
--			     efx_mcdi_async_completer *complete,
--			     unsigned long cookie);
+-u8 *efx_tx_get_copy_buffer_limited(struct efx_tx_queue *tx_queue,
+-				   struct efx_tx_buffer *buffer, size_t len)
+-{
+-	if (len > EFX_TX_CB_SIZE)
+-		return NULL;
+-	return efx_tx_get_copy_buffer(tx_queue, buffer);
+-}
+-
+ static void efx_tx_maybe_stop_queue(struct efx_tx_queue *txq1)
+ {
+ 	/* We need to consider all queues that the net core sees as one */
+diff --git a/drivers/net/ethernet/sfc/tx.h b/drivers/net/ethernet/sfc/tx.h
+index f2c4d2f89919..f882749af8c3 100644
+--- a/drivers/net/ethernet/sfc/tx.h
++++ b/drivers/net/ethernet/sfc/tx.h
+@@ -15,9 +15,6 @@
+ unsigned int efx_tx_limit_len(struct efx_tx_queue *tx_queue,
+ 			      dma_addr_t dma_addr, unsigned int len);
  
- void efx_mcdi_display_error(struct efx_nic *efx, unsigned cmd,
- 			    size_t inlen, efx_dword_t *outbuf,
-@@ -410,10 +402,8 @@ int efx_mcdi_handle_assertion(struct efx_nic *efx);
- int efx_mcdi_set_id_led(struct efx_nic *efx, enum efx_led_mode mode);
- int efx_mcdi_wol_filter_set_magic(struct efx_nic *efx, const u8 *mac,
- 				  int *id_out);
--int efx_mcdi_wol_filter_get_magic(struct efx_nic *efx, int *id_out);
- int efx_mcdi_wol_filter_remove(struct efx_nic *efx, int id);
- int efx_mcdi_wol_filter_reset(struct efx_nic *efx);
--int efx_mcdi_flush_rxqs(struct efx_nic *efx);
- void efx_mcdi_process_link_change(struct efx_nic *efx, efx_qword_t *ev);
- void efx_mcdi_mac_start_stats(struct efx_nic *efx);
- void efx_mcdi_mac_stop_stats(struct efx_nic *efx);
+-u8 *efx_tx_get_copy_buffer_limited(struct efx_tx_queue *tx_queue,
+-				   struct efx_tx_buffer *buffer, size_t len);
+-
+ /* What TXQ type will satisfy the checksum offloads required for this skb? */
+ static inline unsigned int efx_tx_csum_type_skb(struct sk_buff *skb)
+ {
 -- 
 2.47.0
 
