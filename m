@@ -1,70 +1,97 @@
-Return-Path: <netdev+bounces-141135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B37889B9B5D
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 01:06:13 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B713D9B9B82
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 01:13:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B38751C20FAC
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 00:06:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D530B1C21356
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 00:13:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FA4E804;
-	Sat,  2 Nov 2024 00:06:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DC1184F;
+	Sat,  2 Nov 2024 00:12:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="TJ3yz2hL"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="oCk66Rwj"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67362191
-	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 00:06:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B56F23CB
+	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 00:12:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730505969; cv=none; b=moj8bXjACgVBQc5iF7aMPquMNT7DwPk7AoU+YkXrVivSvi+atzQXm87e2L66W4Bb0iZNTmfghJh4xD5WxMWXltZyXYO7BhS2UxZk1oCjkFpdGEAylqowJqLg9JPLb3NjGyj1jTFLMPxg8h9fByeU5yCk98jFQOnn5z3EGwqIB18=
+	t=1730506336; cv=none; b=rZXW+X/PZ37JnQWxJEquhoN7evzQG6BTS1IM4JBXK3S0NwH97LmLthqvIUH1PaMllnAMQOLk0JHe81y8ONgw7HPJoTJz7J9K1gcu8avTg6diVOtiFRhc69XDrydhnjhNnQaSBZkA+HPF4/esIzRU6wToOfjDalmxypi1OaH+r/0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730505969; c=relaxed/simple;
-	bh=RFBCvAfRJZVPtrwDBWsGzzzaP6W6R/D2rPQqsCyLu0w=;
+	s=arc-20240116; t=1730506336; c=relaxed/simple;
+	bh=xv+nykGXHVSjOSmJkCXOvxnP2m+hqI1dTS+fBxn4gvc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=J7zIDV96gMfOi4qVJdM2QHWESwvS36eNIjuFh40Ei1Ilzgf14lnCd6qp2Ayw/B/erSZJIhn06vbHxXMBZn4MRReND+dy/Eo/4XQegCO5YLGMy260EkxravHysN30vO5nCugfEJdIg9V5LdG/EnzY0itEqmzlcA0dk4lR7PgslIo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=TJ3yz2hL; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730505966;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=S1PBfSrAzBxmUVqSgHsa1F6KHo6yq8ammotU0yHgYcQ=;
-	b=TJ3yz2hLafBr28VDToZfgX0PUM4eRMYkJ3eqEhkRsfif8gbzNvHdnxOHEswKwoEWltySYR
-	a0fFNVnjtQQApSM4vJVY88YgBmzIg9y38JsEBmMsd+nM2eQ11gj6qhR0qZB/buGPpqrIGo
-	OPWvokAUKF8U7wsSSL3vQ5GRlPDVbQY=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-523-JEQr7_kkMe6sYl1uXyu7Gw-1; Fri,
- 01 Nov 2024 20:06:02 -0400
-X-MC-Unique: JEQr7_kkMe6sYl1uXyu7Gw-1
-Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id E59221956095;
-	Sat,  2 Nov 2024 00:06:00 +0000 (UTC)
-Received: from fedora (unknown [10.72.116.4])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4EF74195605A;
-	Sat,  2 Nov 2024 00:05:52 +0000 (UTC)
-Date: Sat, 2 Nov 2024 08:05:47 +0800
-From: Ming Lei <ming.lei@redhat.com>
-To: syzbot <syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com>
-Cc: axboe@kernel.dk, davem@davemloft.net, dsahern@kernel.org,
-	edumazet@google.com, hch@lst.de, horms@kernel.org, kuba@kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [net?] general protection fault in put_page (3)
-Message-ID: <ZyVs271blMTITWVZ@fedora>
-References: <67251378.050a0220.3c8d68.08cb.GAE@google.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=uYqWVZuopQnzxHA99hd6P3Jkv9KW3Kn+R8T+Uu8kM6Ybk9ygPXEbpyTfciTptpxiZyfH964takGdWn1c6UjtDmW5M8lSvi3/qXNAA8ahEvsysAHbC68WK9DvZ28PyVQNGqnVxILuVRUZ2WSsiRTTIIwxiURt37yy8OuaU/TFdSM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=oCk66Rwj; arc=none smtp.client-ip=192.198.163.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730506333; x=1762042333;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=xv+nykGXHVSjOSmJkCXOvxnP2m+hqI1dTS+fBxn4gvc=;
+  b=oCk66RwjBNH4UpDfY9DN3J/PuaOfGhV86qLvPvSzlG17jYq0KQgDbLCy
+   8VUMzSM2gUmjhLSVXy8eQX7wnGKWG4xja2OZa5fiHJnZe78qTn0SK0Ue/
+   Q4Qn+C8IpPMwc8xQ5/CqMBPdz3dkWSRxBa1DGRD9nLNBplsCmXetuPNHx
+   PKjcYBF2g5TOv4yMeOao2iJicpry1C8SM8y4g/Ut8XveXkw/wTE+/ZA9t
+   ZuEOTBmH/u1gKNOQJs5lj50C40+bl8cAk7Co+px415hrBOxkZlEl6RdfU
+   6njEifGWjM7Vep4GSgNiHjFFB2+Hu1Rh8U9XvyxKzoz1GUjrTSGUikcXJ
+   w==;
+X-CSE-ConnectionGUID: msNtNrjET3SYz4XLJ4Y/xw==
+X-CSE-MsgGUID: NmpXJ797Qi2Umq3MBmB9Eg==
+X-IronPort-AV: E=McAfee;i="6700,10204,11243"; a="29708503"
+X-IronPort-AV: E=Sophos;i="6.11,251,1725346800"; 
+   d="scan'208";a="29708503"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa113.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 01 Nov 2024 17:12:12 -0700
+X-CSE-ConnectionGUID: SYcSZUb8SY2zz3VY3iFssg==
+X-CSE-MsgGUID: B71jvY/mS+aLgDu8y++ckg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,251,1725346800"; 
+   d="scan'208";a="83559994"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 01 Nov 2024 17:12:06 -0700
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t71kJ-000iCJ-1u;
+	Sat, 02 Nov 2024 00:12:03 +0000
+Date: Sat, 2 Nov 2024 08:11:54 +0800
+From: kernel test robot <lkp@intel.com>
+To: David Arinzon <darinzon@amazon.com>, David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, David Arinzon <darinzon@amazon.com>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	"Woodhouse, David" <dwmw@amazon.com>,
+	"Machulsky, Zorik" <zorik@amazon.com>,
+	"Matushevsky, Alexander" <matua@amazon.com>,
+	Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt" <msw@amazon.com>,
+	"Liguori, Anthony" <aliguori@amazon.com>,
+	"Bshara, Nafea" <nafea@amazon.com>,
+	"Schmeilin, Evgeny" <evgenys@amazon.com>,
+	"Belgazal, Netanel" <netanel@amazon.com>,
+	"Saidi, Ali" <alisaidi@amazon.com>,
+	"Herrenschmidt, Benjamin" <benh@amazon.com>,
+	"Kiyanovski, Arthur" <akiyano@amazon.com>,
+	"Dagan, Noam" <ndagan@amazon.com>,
+	"Bernstein, Amit" <amitbern@amazon.com>,
+	"Agroskin, Shay" <shayagr@amazon.com>,
+	"Abboud, Osama" <osamaabb@amazon.com>,
+	"Ostrovsky, Evgeny" <evostrov@amazon.com>,
+	"Tabachnik, Ofir" <ofirt@amazon.com>,
+	"Machnikowski, Maciek" <maciek@machnikowski.net>
+Subject: Re: [PATCH v2 net-next 1/3] net: ena: Add PHC support in the ENA
+ driver
+Message-ID: <202411020715.L7KdiUt4-lkp@intel.com>
+References: <20241031085245.18146-2-darinzon@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,163 +100,150 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <67251378.050a0220.3c8d68.08cb.GAE@google.com>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
+In-Reply-To: <20241031085245.18146-2-darinzon@amazon.com>
 
-On Fri, Nov 01, 2024 at 10:44:24AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    f9f24ca362a4 Add linux-next specific files for 20241031
-> git tree:       linux-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=131f2630580000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=328572ed4d152be9
-> dashboard link: https://syzkaller.appspot.com/bug?extid=71abe7ab2b70bca770fd
-> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1110d2a7980000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=153e5540580000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/eb84549dd6b3/disk-f9f24ca3.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/beb29bdfa297/vmlinux-f9f24ca3.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/8881fe3245ad/bzImage-f9f24ca3.xz
-> 
-> The issue was bisected to:
-> 
-> commit e4e535bff2bc82bb49a633775f9834beeaa527db
-> Author: Ming Lei <ming.lei@redhat.com>
-> Date:   Thu Oct 24 05:00:15 2024 +0000
-> 
->     iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1539b2a7980000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=1339b2a7980000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+71abe7ab2b70bca770fd@syzkaller.appspotmail.com
-> Fixes: e4e535bff2bc ("iov_iter: don't require contiguous pages in iov_iter_extract_bvec_pages")
-> 
-> Oops: general protection fault, probably for non-canonical address 0xed2e87ee8f0cadc6: 0000 [#1] PREEMPT SMP KASAN PTI
-> KASAN: maybe wild-memory-access in range [0x69745f7478656e30-0x69745f7478656e37]
-> CPU: 1 UID: 0 PID: 5869 Comm: syz-executor171 Not tainted 6.12.0-rc5-next-20241031-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
-> RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
-> Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 00 fc ff df e8 d8 ae 0d f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 5f e5 77 f8 48 8b 1b 48 89 de 48 83
-> RSP: 0018:ffffc90003f970a8 EFLAGS: 00010207
-> RAX: 0d2e8bee8f0cadc6 RBX: 69745f7478656e36 RCX: ffff8880306d3c00
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 69745f7478656e2e
-> RBP: dffffc0000000000 R08: ffffffff898706fd R09: 1ffffffff203a076
-> R10: dffffc0000000000 R11: fffffbfff203a077 R12: 0000000000000000
-> R13: ffff88807fd7a842 R14: 69745f7478656e2e R15: 69745f7478656e2e
-> FS:  0000555590726380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000000000045ad50 CR3: 0000000025350000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
->  <TASK>
->  skb_page_unref include/linux/skbuff_ref.h:43 [inline]
->  __skb_frag_unref include/linux/skbuff_ref.h:56 [inline]
->  skb_release_data+0x483/0x8a0 net/core/skbuff.c:1119
->  skb_release_all net/core/skbuff.c:1190 [inline]
->  __kfree_skb net/core/skbuff.c:1204 [inline]
->  sk_skb_reason_drop+0x1c9/0x380 net/core/skbuff.c:1242
->  kfree_skb_reason include/linux/skbuff.h:1262 [inline]
->  kfree_skb include/linux/skbuff.h:1271 [inline]
->  __ip_flush_pending_frames net/ipv4/ip_output.c:1538 [inline]
->  ip_flush_pending_frames+0x12d/0x260 net/ipv4/ip_output.c:1545
->  udp_flush_pending_frames net/ipv4/udp.c:829 [inline]
->  udp_sendmsg+0x5d2/0x2a50 net/ipv4/udp.c:1302
->  sock_sendmsg_nosec net/socket.c:729 [inline]
->  __sock_sendmsg+0x1a6/0x270 net/socket.c:744
->  sock_sendmsg+0x134/0x200 net/socket.c:767
->  splice_to_socket+0xa10/0x10b0 fs/splice.c:889
->  do_splice_from fs/splice.c:941 [inline]
->  direct_splice_actor+0x11b/0x220 fs/splice.c:1164
->  splice_direct_to_actor+0x586/0xc80 fs/splice.c:1108
->  do_splice_direct_actor fs/splice.c:1207 [inline]
->  do_splice_direct+0x289/0x3e0 fs/splice.c:1233
->  do_sendfile+0x561/0xe10 fs/read_write.c:1388
->  __do_sys_sendfile64 fs/read_write.c:1455 [inline]
->  __se_sys_sendfile64+0x17c/0x1e0 fs/read_write.c:1441
->  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> RIP: 0033:0x7f17eb533ab9
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 17 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007ffdeb190c28 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
-> RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f17eb533ab9
-> RDX: 0000000000000000 RSI: 0000000000000003 RDI: 0000000000000004
-> RBP: 00007f17eb5a65f0 R08: 0000000000000006 R09: 0000000000000006
-> R10: 0000020000023893 R11: 0000000000000246 R12: 0000000000000001
-> R13: 431bde82d7b634db R14: 0000000000000001 R15: 0000000000000001
->  </TASK>
-> Modules linked in:
-> ---[ end trace 0000000000000000 ]---
-> RIP: 0010:_compound_head include/linux/page-flags.h:242 [inline]
-> RIP: 0010:put_page+0x23/0x260 include/linux/mm.h:1552
-> Code: 90 90 90 90 90 90 90 55 41 57 41 56 53 49 89 fe 48 bd 00 00 00 00 00 fc ff df e8 d8 ae 0d f8 49 8d 5e 08 48 89 d8 48 c1 e8 03 <80> 3c 28 00 74 08 48 89 df e8 5f e5 77 f8 48 8b 1b 48 89 de 48 83
-> RSP: 0018:ffffc90003f970a8 EFLAGS: 00010207
-> RAX: 0d2e8bee8f0cadc6 RBX: 69745f7478656e36 RCX: ffff8880306d3c00
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 69745f7478656e2e
-> RBP: dffffc0000000000 R08: ffffffff898706fd R09: 1ffffffff203a076
-> R10: dffffc0000000000 R11: fffffbfff203a077 R12: 0000000000000000
-> R13: ffff88807fd7a842 R14: 69745f7478656e2e R15: 69745f7478656e2e
-> FS:  0000555590726380(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 000000000045ad50 CR3: 0000000025350000 CR4: 00000000003526f0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> ----------------
-> Code disassembly (best guess):
->    0:	90                   	nop
->    1:	90                   	nop
->    2:	90                   	nop
->    3:	90                   	nop
->    4:	90                   	nop
->    5:	90                   	nop
->    6:	90                   	nop
->    7:	55                   	push   %rbp
->    8:	41 57                	push   %r15
->    a:	41 56                	push   %r14
->    c:	53                   	push   %rbx
->    d:	49 89 fe             	mov    %rdi,%r14
->   10:	48 bd 00 00 00 00 00 	movabs $0xdffffc0000000000,%rbp
->   17:	fc ff df
->   1a:	e8 d8 ae 0d f8       	call   0xf80daef7
->   1f:	49 8d 5e 08          	lea    0x8(%r14),%rbx
->   23:	48 89 d8             	mov    %rbx,%rax
->   26:	48 c1 e8 03          	shr    $0x3,%rax
-> * 2a:	80 3c 28 00          	cmpb   $0x0,(%rax,%rbp,1) <-- trapping instruction
->   2e:	74 08                	je     0x38
->   30:	48 89 df             	mov    %rbx,%rdi
->   33:	e8 5f e5 77 f8       	call   0xf877e597
->   38:	48 8b 1b             	mov    (%rbx),%rbx
->   3b:	48 89 de             	mov    %rbx,%rsi
->   3e:	48                   	rex.W
->   3f:	83                   	.byte 0x83
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> 
-> If the report is already addressed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
+Hi David,
 
-#syz test: https://github.com/ming1/linux.git for-next
+kernel test robot noticed the following build errors:
 
-Thanks,
-Ming
+[auto build test ERROR on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/David-Arinzon/net-ena-Add-PHC-support-in-the-ENA-driver/20241031-165503
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241031085245.18146-2-darinzon%40amazon.com
+patch subject: [PATCH v2 net-next 1/3] net: ena: Add PHC support in the ENA driver
+config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20241102/202411020715.L7KdiUt4-lkp@intel.com/config)
+compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 639a7ac648f1e50ccd2556e17d401c04f9cce625)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241102/202411020715.L7KdiUt4-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411020715.L7KdiUt4-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   In file included from drivers/net/ethernet/amazon/ena/ena_com.c:6:
+   In file included from drivers/net/ethernet/amazon/ena/ena_com.h:11:
+   In file included from include/linux/dma-mapping.h:11:
+   In file included from include/linux/scatterlist.h:8:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/ethernet/amazon/ena/ena_com.c:1703:7: error: expected ')'
+    1703 |                                   ENA_ADMIN_PHC_CONFIG,
+         |                                   ^
+   drivers/net/ethernet/amazon/ena/ena_com.c:1701:27: note: to match this '('
+    1701 |         ret = ena_com_get_feature(ena_dev,
+         |                                  ^
+   4 warnings and 1 error generated.
+
+
+vim +1703 drivers/net/ethernet/amazon/ena/ena_com.c
+
+  1691	
+  1692	int ena_com_phc_config(struct ena_com_dev *ena_dev)
+  1693	{
+  1694		struct ena_com_phc_info *phc = &ena_dev->phc;
+  1695		struct ena_admin_get_feat_resp get_feat_resp;
+  1696		struct ena_admin_set_feat_resp set_feat_resp;
+  1697		struct ena_admin_set_feat_cmd set_feat_cmd;
+  1698		int ret = 0;
+  1699	
+  1700		/* Get device PHC default configuration */
+  1701		ret = ena_com_get_feature(ena_dev,
+  1702					  &get_feat_resp
+> 1703					  ENA_ADMIN_PHC_CONFIG,
+  1704					  0);
+  1705		if (unlikely(ret)) {
+  1706			netdev_err(ena_dev->net_device,
+  1707				   "Failed to get PHC feature configuration, error: %d\n",
+  1708				   ret);
+  1709			return ret;
+  1710		}
+  1711	
+  1712		/* Supporting only readless PHC retrieval */
+  1713		if (get_feat_resp.u.phc.type != ENA_ADMIN_PHC_TYPE_READLESS) {
+  1714			netdev_err(ena_dev->net_device, "Unsupported PHC type, error: %d\n",
+  1715				   -EOPNOTSUPP);
+  1716			return -EOPNOTSUPP;
+  1717		}
+  1718	
+  1719		/* Update PHC doorbell offset according to device value,
+  1720		 * used to write req_id to PHC bar
+  1721		 */
+  1722		phc->doorbell_offset = get_feat_resp.u.phc.doorbell_offset;
+  1723	
+  1724		/* Update PHC expire timeout according to device
+  1725		 * or default driver value
+  1726		 */
+  1727		phc->expire_timeout_usec = (get_feat_resp.u.phc.expire_timeout_usec) ?
+  1728					    get_feat_resp.u.phc.expire_timeout_usec :
+  1729					    ENA_PHC_DEFAULT_EXPIRE_TIMEOUT_USEC;
+  1730	
+  1731		/* Update PHC block timeout according to device
+  1732		 * or default driver value
+  1733		 */
+  1734		phc->block_timeout_usec = (get_feat_resp.u.phc.block_timeout_usec) ?
+  1735					   get_feat_resp.u.phc.block_timeout_usec :
+  1736					   ENA_PHC_DEFAULT_BLOCK_TIMEOUT_USEC;
+  1737	
+  1738		/* Sanity check - expire timeout must not be above skip timeout */
+  1739		if (phc->expire_timeout_usec > phc->block_timeout_usec)
+  1740			phc->expire_timeout_usec = phc->block_timeout_usec;
+  1741	
+  1742		/* Prepare PHC config feature command */
+  1743		memset(&set_feat_cmd, 0x0, sizeof(set_feat_cmd));
+  1744		set_feat_cmd.aq_common_descriptor.opcode = ENA_ADMIN_SET_FEATURE;
+  1745		set_feat_cmd.feat_common.feature_id = ENA_ADMIN_PHC_CONFIG;
+  1746		set_feat_cmd.u.phc.output_length = sizeof(*phc->virt_addr);
+  1747		ret = ena_com_mem_addr_set(ena_dev,
+  1748					   &set_feat_cmd.u.phc.output_address,
+  1749					   phc->phys_addr);
+  1750		if (unlikely(ret)) {
+  1751			netdev_err(ena_dev->net_device, "Failed setting PHC output address, error: %d\n",
+  1752				   ret);
+  1753			return ret;
+  1754		}
+  1755	
+  1756		/* Send PHC feature command to the device */
+  1757		ret = ena_com_execute_admin_command(&ena_dev->admin_queue,
+  1758						    (struct ena_admin_aq_entry *)&set_feat_cmd,
+  1759						    sizeof(set_feat_cmd),
+  1760						    (struct ena_admin_acq_entry *)&set_feat_resp,
+  1761						    sizeof(set_feat_resp));
+  1762	
+  1763		if (unlikely(ret)) {
+  1764			netdev_err(ena_dev->net_device,
+  1765				   "Failed to enable PHC, error: %d\n",
+  1766				   ret);
+  1767			return ret;
+  1768		}
+  1769	
+  1770		phc->active = true;
+  1771		netdev_dbg(ena_dev->net_device, "PHC is active in the device\n");
+  1772	
+  1773		return ret;
+  1774	}
+  1775	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
