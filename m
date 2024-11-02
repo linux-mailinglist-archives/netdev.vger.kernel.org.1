@@ -1,169 +1,144 @@
-Return-Path: <netdev+bounces-141194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 821269B9FD9
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 12:59:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19B7B9B9FDD
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 13:00:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B7DDCB2157D
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 11:59:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 42BFF1C20CCD
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 12:00:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3034A187355;
-	Sat,  2 Nov 2024 11:59:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BB7917D340;
+	Sat,  2 Nov 2024 12:00:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i7YUAfqa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hOy5EUSy"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B88156C5E;
-	Sat,  2 Nov 2024 11:59:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF686AB8;
+	Sat,  2 Nov 2024 12:00:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730548767; cv=none; b=SLZBR7ZCZjycAsjsUaTNKsIG22LBtW/0AV5/00z741TAk5ZsKfJo24Rs4VvSAiEQytBlhoneJYVUpg3Eb8qpyLb7wUbPj8ybDlZBjhjKflYq+tTong/Fe4JGlUvPMS0uicg27Q605bsKqFfUpDaI6WwZxIGTqDaPUlMrEYULoyU=
+	t=1730548842; cv=none; b=kt8Qkwe0se83xx2bl9jWPRJv7VKbW+St7QALPev8wLnZBP4j9cdsNSTU7HzInbjWhG47CpPUejTEZT0VU3HWBlhg6ikhw8sFqazU7TapmanhdQ+DJfyBOdUpRDvVIBNc1XAUGe5QJIZy+MceRLhFpNGr3xWvjgIIPv9DypAI/c0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730548767; c=relaxed/simple;
-	bh=6BZBv2koBZFEV3fNfwGJ8Fje5PDD4OA7Ov5A9pHFnMQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=RpVmikyo6pvu9C9ApG/9rWzPHclHF+1t7+OFQjwnBGbzmu5+uFImS3uN0LmVpLOA4GvXkewU73uLhqXCrQ6mY+eELK/t3QseDYD9YQpcMgWT/w0RoUbsh+yyOvR5cG0PWEwQgoiOG9b8BWDFhnBh6nyVd2R8N5uy2dymMHP9vZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i7YUAfqa; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6e344ccb049so1751507b3.0;
-        Sat, 02 Nov 2024 04:59:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730548764; x=1731153564; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U8eATJCki+TxES4vc6y+ssSPQ0d6v6bnz/0z0oHNrr0=;
-        b=i7YUAfqar32MOhmejoUDmXsd0yOIy8emH7h4B2NU75HrKFsb9WlQre+0pa9CXa/3E9
-         nVKXWFDgO6Oo2+hOd8g3UOX6sEz/Pcn38yDemgC07MUpndGXCTXZ7FmGqg1n0OELeyDC
-         i4THzsrQMMQOcdYbJuxtLsDGEkEIRRJ5tPcJ4O2PKfuR8yt8cWSdN9yS0O6Buom/wPHu
-         qdh6TK/+YgX4Duo+de0ks9T2GUZIsMKuJIOAIDHYuyxTcu4xZulYABski5fS7+/yAteh
-         8WkFUvlpaxgEEl8v5bQuAIYvy/CD0XKkjQF/bMFukCFLSIh01EM+zQbpJtZTaUxuV7LC
-         02UQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730548764; x=1731153564;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U8eATJCki+TxES4vc6y+ssSPQ0d6v6bnz/0z0oHNrr0=;
-        b=cAOkNer8mynA+AF2q8s5LcNbb4CHfEEBxJS5u4k/PPdiw2RNYRR5W9dYTdTzsJIiaX
-         zPC3RsfpDRf3KcgrSbtvIYTpzfCC7GKFKFZf7yFBsSBfxu9C9bCO38U/xx7ZAe5ULaXq
-         K0shmOghWBsR5bmaYlkb8APaHvtJslKH7Z1feGPHJBr+iQ28Dzpun43gnltnqFDXaSLc
-         X8ECgsuBPY2i8mZtiGzyCCiFHeBfeFZNH2lEG8FV/1qlVLKI/klsM79fO+EUf7ZTuG87
-         /UjoVuG1aq52BFnxtNTvrDDUDTVIKBfEuqJsdZFdNdgRoW0MeqQt57VN9yA9q70HiL4q
-         tZ9Q==
-X-Forwarded-Encrypted: i=1; AJvYcCUM5OD6Kq7nDX/xleiUp7/ApyzQOKKji+YFFeqPC5ACbvlFNpKcSKJJFsKiTADVhjZKzYlL9Ty9JZHl/nnO@vger.kernel.org, AJvYcCVWddnQZwcspE1lCUtB9uy57sTepE76fJ4CYMTvxwoMiwkZZjFveznBkF4PEhteMxNRO58Z2Mzc@vger.kernel.org, AJvYcCXGmwHDqC8v6awd1LMQR8tRFKvWSIBECOabojU6EKMBl7wY9V8fBjz8X57R4IwKmR+sZmyGN2L72kbK@vger.kernel.org
-X-Gm-Message-State: AOJu0YzfW0ruumPIye4Y4mzmmtzaqetRQz1G/oEKFqvznjNfJqdt5Axs
-	SunQ214duHIMovb6YzXfx0hnh6JxYH3Oy6R8cIPu+vNy+OxXWi9BYvG6nnd6JkvqLjoHSBefNPa
-	dzdHrMOWaynzAqJGD3LGhybfXbNE=
-X-Google-Smtp-Source: AGHT+IFMbxyKVoPx41xbCrD0GPiI2GpxGV8kau6mx1CGcW2fC32QAQ0PlbBb0QPHWgT/KLrfKzplVdzjum4zHSCNoGI=
-X-Received: by 2002:a05:690c:4484:b0:6d3:c7d:5eaa with SMTP id
- 00721157ae682-6e9d8b22e4amr116494867b3.8.1730548764251; Sat, 02 Nov 2024
- 04:59:24 -0700 (PDT)
+	s=arc-20240116; t=1730548842; c=relaxed/simple;
+	bh=Gax01FuZKLQfe+8CO7ewzivLwUdPlXNuJeuqRVWx8Qc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=jPhD6D+fBF6gzxknshcbpHophNoM6/04j4NwCEHkBrMCrE7APoX8V4bVH5bK57PbnOk86WxJX0WKDc4UVyBgbFp/OL6jOjF9lVgyjNl93XklaKnLUyKarsZr2Vnaxt//HrELRJ4MFzCAKDCEzIgMk61AvdoN3tFlVoWbMyRh6wM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hOy5EUSy; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D16A1C4CED2;
+	Sat,  2 Nov 2024 12:00:38 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730548842;
+	bh=Gax01FuZKLQfe+8CO7ewzivLwUdPlXNuJeuqRVWx8Qc=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=hOy5EUSypJsqP3WaNWj8wo13ZKzdP7ItQe6wpSkp5E/shKd/Jg8XJds3y8apv97bG
+	 dLxo0ECMkWdfaeaioW8poZ6Pfv+e5mFt00Pb13PJPM9O/JfvJfyPQBn5f3+fLyLg/t
+	 tkpZgWTzCSxO7OAnfFRhi6M1aOZOZciftNFY+THjG81eeXl9ray4CYrQIDgPkmfE4r
+	 jYqNlVCykpkR+5VhWbXt+xakVAIvvmJ4JObdP8Nv41Jc+I8n+i6ERrqmSdntKFV4F3
+	 0Swj+Ss+SUPNn+onGxe1xtWPgISqAlW2xdxmIbsftlDJoItvn5q1SAhwPbZXsQ1SuY
+	 6AoJjjmrG8dQw==
+Date: Sat, 2 Nov 2024 12:00:30 +0000
+From: Simon Horman <horms@kernel.org>
+To: "Nemanov, Michael" <michael.nemanov@ti.com>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sabeeh Khan <sabeeh-khan@ti.com>
+Subject: Re: [PATCH v3 12/17] wifi: cc33xx: Add scan.c, scan.h
+Message-ID: <20241102120030.GG1838431@kernel.org>
+References: <20240806170018.638585-1-michael.nemanov@ti.com>
+ <20240806170018.638585-13-michael.nemanov@ti.com>
+ <20240809160355.GD1951@kernel.org>
+ <33f3b6a4-f907-4374-90ac-d81a81700936@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029202349.69442-1-l.rubusch@gmail.com> <20241029202349.69442-12-l.rubusch@gmail.com>
- <20241101193528.GA4067749-robh@kernel.org>
-In-Reply-To: <20241101193528.GA4067749-robh@kernel.org>
-From: Lothar Rubusch <l.rubusch@gmail.com>
-Date: Sat, 2 Nov 2024 12:58:47 +0100
-Message-ID: <CAFXKEHa5A039NfyGFnXH4pm1FN9YwDuTLtoa9Xn8xzZYwTCvKg@mail.gmail.com>
-Subject: Re: [PATCH v4 11/23] net: stmmac: add support for dwmac 3.72a
-To: Rob Herring <robh@kernel.org>
-Cc: krzk+dt@kernel.org, a.fatoum@pengutronix.de, conor+dt@kernel.org, 
-	dinguyen@kernel.org, marex@denx.de, s.trumtrar@pengutronix.de, 
-	alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mcoquelin.stm32@gmail.com, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <33f3b6a4-f907-4374-90ac-d81a81700936@ti.com>
 
-On Fri, Nov 1, 2024 at 8:35=E2=80=AFPM Rob Herring <robh@kernel.org> wrote:
->
-> On Tue, Oct 29, 2024 at 08:23:37PM +0000, Lothar Rubusch wrote:
-> > The dwmac 3.72a is an ip version that can be found on Intel/Altera Arri=
-a10
-> > SoCs. Going by the hardware features "snps,multicast-filter-bins" and
-> > "snps,perfect-filter-entries" shall be supported. Thus add a
-> > compatibility flag, and extend coverage of the driver for the 3.72a.
+On Mon, Oct 28, 2024 at 06:26:50PM +0200, Nemanov, Michael wrote:
+> On 8/9/2024 7:03 PM, Simon Horman wrote:
+> > On Tue, Aug 06, 2024 at 08:00:13PM +0300, Michael Nemanov wrote:
+> > 
+> > ...
+> > 
+> > > diff --git a/drivers/net/wireless/ti/cc33xx/scan.h b/drivers/net/wireless/ti/cc33xx/scan.h
+> > 
+> > ...
+> > 
+> > > +/**
+> > > + * struct cc33xx_cmd_ssid_list - scan SSID list description
+> > > + *
+> > > + * @role_id:            roleID
+> > > + *
+> > > + * @num_of_ssids:       Number of SSID in the list. MAX 16 entries
+> > 
+> > @num_of_ssids -> @n_ssids
+> > 
+> > > + *
+> > > + * @ssid_list:          SSIDs to scan for (active scan only)
+> > 
+> > @ssid_list -> @ssids
 > >
-> > Signed-off-by: Lothar Rubusch <l.rubusch@gmail.com>
-> > ---
-> >  drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c   | 1 +
-> >  drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 1 +
-> >  2 files changed, 2 insertions(+)
-> >
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c b/driv=
-ers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-> > index 598eff926..b9218c07e 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-generic.c
-> > @@ -56,6 +56,7 @@ static const struct of_device_id dwmac_generic_match[=
-] =3D {
-> >       { .compatible =3D "snps,dwmac-3.610"},
-> >       { .compatible =3D "snps,dwmac-3.70a"},
-> >       { .compatible =3D "snps,dwmac-3.710"},
-> > +     { .compatible =3D "snps,dwmac-3.72a"},
-> >       { .compatible =3D "snps,dwmac-4.00"},
-> >       { .compatible =3D "snps,dwmac-4.10a"},
-> >       { .compatible =3D "snps,dwmac"},
-> > diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/dr=
-ivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > index 54797edc9..e7e2d6c20 100644
-> > --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
-> > @@ -522,6 +522,7 @@ stmmac_probe_config_dt(struct platform_device *pdev=
-, u8 *mac)
-> >       if (of_device_is_compatible(np, "st,spear600-gmac") ||
-> >               of_device_is_compatible(np, "snps,dwmac-3.50a") ||
-> >               of_device_is_compatible(np, "snps,dwmac-3.70a") ||
-> > +             of_device_is_compatible(np, "snps,dwmac-3.72a") ||
->
-> All these of_device_is_compatible() checks should really go away and all
-> the settings just come from match table data. Then everything is const
-> and we're not matching multiple times at run-time. That would be a bit
-> of refactoring though...
+> 
+> Thanks for the feedback, will fix.
+> 
+> > Please document all non-private fields,
+> > and annotate those that are private.
+> > 
+> 
+> Not sure I follow. You mean mark private vs. non private members in the
+> documentation? If so, private to what (the CC33xx driver or the underlying
+> HW)?
 
-I can see your point, but I have some doubts on that. As I asked
-before, my current scope is actually on upstreaming my .dts/.dtsi
-files. This would be nice, since I'm doing it in parallel in u-boot
-and they're going to dts/upstream so we're waiting on the kernel
-community here.
+Hi Michael,
 
-I'm unclear what additionally to fixing my .dts files is needed. Shall
-I fix all? / some? / none? of the errors your dtbs check bot gives?
-First, most of the errors come from not covered bindings. Since TXT
-files for socfpga never were converted to YAML. Should I do this? I
-guess this would increase coverage of dt-bindings check and reduce the
-errors tremendously. But I'd see it as a different patch set if so. Is
-this needed to upstream my .dts files?
-Second, the maintainer of platform socfpga seems to be currently on a
-sabbatical. At least I hope he's fine and not sick or burned out. But
-also I would like to get some feedback on the .dts files. Please help
-me if you can give me some.
-Third, when I update things like the mentioned dwmac things and try to
-update the driver compatible to best of my knowledge, I understand
-that it would be better to refactor a redundantly checked
-compatibility to just one check in the driver.
-But, I only have one hardware: an Arria10 SOM which is affected here.
-And, is it really anyway needed to refactor networking drivers for
-upstreamining my .dts/.dtsi files at the end of the day?
+I'm not sure why I mentioned private, perhaps it was a general statement
+that all fields should either be documented or marked as private. If
+you don't think anything is private - whatever that might mean - then you
+can ignore that part of my comment. But suffice to say, there is syntax to
+mark fields as private[1].
 
-Please don't missunderstand me. I can absolutely see your point here
-and appreciate all type of feedback. Anyway IMHO these are all
-different topics i.e. different sets of patches, or smells a bit like
-scope creep. I separated the 2 patches for a different set, as Jakub
-wrote.
+[1] https://www.kernel.org/doc/html/latest/doc-guide/kernel-doc.html#members
+
+> > There are a number of similar minor Kernel doc problems with this patch.
+> > Please consider using W=1 builds or ./scripts/kernel-doc -none
+> > (bonus points for -Wall)
+> > 
+> 
+> Ran both, got warning for "no structured comments found" on multiple files.
+> Is that it?
+
+I'm a but unsure why you see that, but what I was referring to is this:
+
+$ ./scripts/kernel-doc -none drivers/net/wireless/ti/cc33xx/scan.h
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'scan_type' not described in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'n_ssids' not described in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'ssids' not described in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Excess struct member 'num_of_ssids' description in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Excess struct member 'ssid_list' description in 'cc33xx_cmd_ssid_list'
+drivers/net/wireless/ti/cc33xx/scan.h:149: warning: bad line:
+drivers/net/wireless/ti/cc33xx/scan.h:177: warning: cannot understand function prototype: 'struct sched_scan_plan_cmd '
+drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Function parameter or struct member 'u' not described in 'scan_param'
+drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Excess struct member 'one_shot' description in 'scan_param'
+drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Excess struct member 'periodic' description in 'scan_param'
+drivers/net/wireless/ti/cc33xx/scan.h:269: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_scan_params'
+drivers/net/wireless/ti/cc33xx/scan.h:269: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_scan_params'
+drivers/net/wireless/ti/cc33xx/scan.h:295: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_set_ies'
+drivers/net/wireless/ti/cc33xx/scan.h:319: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_scan_stop'
+drivers/net/wireless/ti/cc33xx/scan.h:319: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_scan_stop'
 
