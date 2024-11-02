@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-141232-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141233-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2F289BA18F
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 18:03:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 866589BA196
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 18:09:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D135B2132A
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:03:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A730281D03
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:09:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6691C171E76;
-	Sat,  2 Nov 2024 17:03:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98EE51A00DF;
+	Sat,  2 Nov 2024 17:09:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="a+WJc3N9"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Re5DHr0S"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41D93C3C;
-	Sat,  2 Nov 2024 17:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BB333C3C;
+	Sat,  2 Nov 2024 17:09:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730567006; cv=none; b=NMOqT+unrfb7I6m2uEI5ymIAG2gZ7iOrrHuR79FSDor9FmWLouUXtKFi20OZxxVBy7yws+z75hUI9JVleROkbmHRWOIW+FHAk5cMgB6mzseDGWXRagtO4vCNOmHvHVQMz69+moRQkDwAgRaJxZXlMqYU82k5fvtQQbv0dQrsN1Q=
+	t=1730567377; cv=none; b=MFvvq8LUYIBJhdqxeLEiAVuRTaj54uZqWCWhsQqc3snxpSf4trBA3DsP59AUKArmQgRFHpHPgbfCITKWpa4NniyTvohq96WDVgQuj1nlmJY2aTya3vp7/qL2XosI3rbNcuW5oxH4J3fFYcEHLrJ3wzmv4eQqIlnYZOcNP3YJCIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730567006; c=relaxed/simple;
-	bh=3ACyveipojrmN/PCwvTW+IDNBtMDqVzAv3GYyqMlnnM=;
+	s=arc-20240116; t=1730567377; c=relaxed/simple;
+	bh=X/poZeRXfv9KEdUEkcBRv4jU2dSdr8sqzGUSPiRdSqA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ug5NdPKpOaBE5lm6JDgr3yxU2iFGWo5b5h73IvEtB9GO87lN7z5R1qMB5eEahnemXMCN0iCsdth9AZ8pdCLGiEHLsIKbkQs9GaHUN4orINar56JTY36TSFfY7WCz6SaYN3Aj3ut/DwtU3kdUecuMt6cCSE7CpEexXzBlaCNvw+I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=a+WJc3N9; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=FZ0WlPc0fUhAaYIlViFLO5+zXHjPw5AutPI9/9OfuNV9j5hRhERzKTSwK+QivJwOJ5kKZPPP8HPJ97hLAZ8+LKEefV0EmPraaWBYEY3FahRc4VyWLCdfu3g8B7flb7YURC5BWHcKzO0w+X6/ACfys0WV1J2nZRoPRNxzHlvDR3o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Re5DHr0S; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,22 +36,23 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=oP145i++rm3i2laxEVa359PHCFb5oUOJpBrFpEuBJ1M=; b=a+WJc3N9qNmtacwniYwmxwDHVN
-	xqvPt+s2LOmnUSYO60hBDVX0j+AW0FKNozh9TP29H9qGWwYeX8PFZdtCnvOeA95G48OM4fyme9UX6
-	hDErdMtyCWyLjHx/PJeitK1U2L2QJYOv3aK9PiJO6arFCcL+IuE/cGqUPLAzIszG6454=;
+	bh=Z29jkdXj9YGOWoN2vvChzA1RVSL/Q7Uwqt222xRUrBw=; b=Re5DHr0SldTdmD9KhJIERrx+Vj
+	+Bz2V+7ZvVNvRxT9nkYOKwuYlAZPcDIRnNAhotruZyod5fekZ2JJSDFmwigDo3p6Q/dhIJvBFS39B
+	X1eGNtbplKRLOUrq1iCs4eZ7ak7XVKVYK/VjCLxxE1JmifPHSNWeioWXvqtRFqYQYquk=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t7HWl-00ByYT-4p; Sat, 02 Nov 2024 18:03:07 +0100
-Date: Sat, 2 Nov 2024 18:03:07 +0100
+	id 1t7Hcs-00ByZu-1W; Sat, 02 Nov 2024 18:09:26 +0100
+Date: Sat, 2 Nov 2024 18:09:26 +0100
 From: Andrew Lunn <andrew@lunn.ch>
-To: Diogo Silva <diogompaissilva@gmail.com>
-Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
-	tolvupostur@gmail.com
-Subject: Re: [PATCH] net: phy: ti: add PHY_RST_AFTER_CLK_EN flag
-Message-ID: <900d2449-ff88-45ea-9b29-da145541d42b@lunn.ch>
-References: <20241102151504.811306-1-paissilva@ld-100007.ds1.internal>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>
+Cc: ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com, andrew+netdev@lunn.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] sfc: Remove deadcode
+Message-ID: <fd699a8a-d595-4e7d-8d6d-fd5da1f8ce3b@lunn.ch>
+References: <20241102143317.24745-1-linux@treblig.org>
+ <ZyY_avQn4yuj6WC3@gallifrey>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,17 +61,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241102151504.811306-1-paissilva@ld-100007.ds1.internal>
+In-Reply-To: <ZyY_avQn4yuj6WC3@gallifrey>
 
-On Sat, Nov 02, 2024 at 04:15:05PM +0100, Diogo Silva wrote:
-> From: Diogo Silva <diogompaissilva@gmail.com>
+On Sat, Nov 02, 2024 at 03:04:10PM +0000, Dr. David Alan Gilbert wrote:
+> * linux@treblig.org (linux@treblig.org) wrote:
+> > From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> > 
+> > ef4_farch_dimension_resources(), ef4_nic_fix_nodesc_drop_stat(),
+> > ef4_ticks_to_usecs() and ef4_tx_get_copy_buffer_limited() were
+> > copied over from efx_ equivalents in 2016 but never used by
+> > commit 5a6681e22c14 ("sfc: separate out SFC4000 ("Falcon") support into new
+> > sfc-falcon driver")
+> > 
+> > EF4_MAX_FLUSH_TIME is also unused.
+> > 
+> > Remove them.
+> > 
+> > Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 > 
-> DP83848	datasheet (section 4.7.2) indicates that the reset pin should be
-> toggled after the clocks are running. Add the PHY_RST_AFTER_CLK_EN to
-> make sure that this indication is respected.
+> Actually, NAK this copy; I'll resend it in a minute
+> as part of a series with a whole load more.
 
-Do you have the datasheets for the other three devices this driver
-supports? Do they all require this flag?
+https://www.kernel.org/doc/html/latest/process/maintainer-netdev.html#updating-patch-status
 
-	Andrew
+  pw-bot: changes-requested
+
+  As a result the bot will set the entire series to Changes
+  Requested. This may be useful when author discovers a bug in their
+  own series and wants to prevent it from getting applied.
+
+    Andrew
+
+---
+pw-bot: cr
+
 
