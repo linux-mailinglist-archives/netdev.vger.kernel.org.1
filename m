@@ -1,133 +1,246 @@
-Return-Path: <netdev+bounces-141225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B6099BA14F
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:58:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3281A9BA15C
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:07:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 31EB31F21924
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 15:58:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5A0728208A
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:07:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F3891A0BF1;
-	Sat,  2 Nov 2024 15:58:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="ZCnNZl+E"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5687E19CC25;
+	Sat,  2 Nov 2024 16:07:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01071901.me.com (qs51p00im-qukt01071901.me.com [17.57.155.8])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4C681A0BE1
-	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 15:58:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.8
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51CB14B97E
+	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 16:07:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730563128; cv=none; b=TOdZ9PS71SubGZdVGdZFGzQFzybtLeiKTMNNPBRJV6HkGRj1MWP60/u1PYNLufKA1Obo5EiukkN/0RviWM08a2YVRDuwzuonkbuCIAu012UrlCvee+LP5gkoNPSIIVnxhM2o8nD3GVwKW88BpdwxZx+p3E4bv6B9UMjqRqVSGqs=
+	t=1730563623; cv=none; b=UAtMzkihJYfRk0tSWjgJP3UBWpN9H1pMDliKymhtnOO8pamznV9UCd8XKstSROoiNl6zIMsX4wAGsBdOiZfCbJ/8fkP8egpxunGkAUruT89V4QJZ93ry1/gI9WOR//zVIXgX64Ts0zOzesrk/5FgBMXa8XPNql1FD885NhEbXAk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730563128; c=relaxed/simple;
-	bh=8ZCIjqe6nbbqsWqN3Vcpxe64gjYHyzF400J/Pb64xNM=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Cc:Subject:
-	 References:In-Reply-To; b=mNjEtv2x2252iL1OltGmAOSfV6NVkwWTGG3EvClxAldoO1bAkPK1fNCsUxY4xEw4PKbLZPxxDEHLj+PEW+7zrrW/qpAWvX3FIPBmoYJ7wle9E0JWDYwAL/8+CM/89CH6VT+VsSKIwm8Ekk4Bpkhj3vEU+nWurhBGRaTbI0Mb/uQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=ZCnNZl+E; arc=none smtp.client-ip=17.57.155.8
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730563124; bh=dAlXGCff2WQWMMo4l+7vl5vNILyFo+zASwJ92FaKpGc=;
-	h=Mime-Version:Content-Type:Date:Message-Id:From:To:Subject:
-	 x-icloud-hme;
-	b=ZCnNZl+EQahElN4bOzUbvSJ0tMxXtcXDEBBxtsnUY3DNgKAPFZcCvKewXWEIzW/UK
-	 nieMnjztjGtzYbiTO1LADcx/f8Dw5Fc8JZURkvsVtPSeLGP58UyLMoBbtTUM89iapl
-	 OqvJYBmLFF+MyC7+pfTVNYCQ6sbQ+DtGKMVBrwRGZCfICQ0+mDXRjnLgupF1Mwpi9t
-	 NQnAXQ9jEbxQPx7epPyL5IvUWUpQh7Bk0PtelFtu/9hhhbvG8ue1H8e7guVWf+9ppj
-	 CzKNJONBHAgHHE5OR8ekgNGse9ar6U1PtwQsg5u0yql4+l7OdL9nzzpm8he9G1RZ5E
-	 zSL9C2DbB3mQQ==
-Received: from localhost (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01071901.me.com (Postfix) with ESMTPSA id 53C4D628000C;
-	Sat,  2 Nov 2024 15:58:42 +0000 (UTC)
+	s=arc-20240116; t=1730563623; c=relaxed/simple;
+	bh=oJzNWoPnfP64TD1o7Wjla2LUz02+MTHUEB3eKRMEelU=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=aZY/vESwFRMdVKfsW8bn4xoLNyHdw9davA2Eom8OrLnY/jemiHD8Rh1pbqdVc7IiEtTk6/pby04fUiMETUpQFbIslT+QIf58aKuTYYUQ6DWVtVU0fPef8/MWwtpI6sHauGdTyeZd2pLRPgxcl/PssF6r49RUP3kRXM7qqhIcbHM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from vapr.local.chopps.org (unknown [185.122.134.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id B67A27D08A;
+	Sat,  2 Nov 2024 16:06:59 +0000 (UTC)
+References: <20241007135928.1218955-1-chopps@chopps.org>
+ <20241007135928.1218955-13-chopps@chopps.org>
+ <ZxYsWnWKPYyaoX79@gauss3.secunet.de>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
+ netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>, Sabrina Dubroca
+ <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony Antony
+ <antony@phenome.org>, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v12 12/16] xfrm: iptfs: handle received
+ fragmented inner packets
+Date: Sat, 02 Nov 2024 16:01:42 +0000
+In-reply-to: <ZxYsWnWKPYyaoX79@gauss3.secunet.de>
+Message-ID: <m2r07tipr1.fsf@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 02 Nov 2024 18:58:39 +0300
-Message-Id: <D5BTFE1AXSVK.2YNEV7RO2T5IT@verdict.gg>
-From: "Vladimir Vdovin" <deliran@verdict.gg>
-To: "Paolo Abeni" <pabeni@redhat.com>, "Jakub Kicinski" <kuba@kernel.org>
-Cc: <netdev@vger.kernel.org>, <dsahern@kernel.org>, <davem@davemloft.net>,
- <idosch@idosch.org>, <edumazet@google.com>,
- <linux-kselftest@vger.kernel.org>, <shuah@kernel.org>, <horms@kernel.org>
-Subject: Re: [PATCH v5] net: ipv4: Cache pmtu for all packet paths if
- multipath enabled
-X-Mailer: aerc 0.18.2
-References: <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
- <20241101104922.68956-1-deliran@verdict.gg>
- <20241101064511.1ef698db@kernel.org>
- <D5B0U1C0N9JC.3PXNVEEH12786@verdict.gg>
- <141acc87-19a4-44b5-a222-3f159835c711@redhat.com>
-In-Reply-To: <141acc87-19a4-44b5-a222-3f159835c711@redhat.com>
-X-Proofpoint-ORIG-GUID: OZfPGOPG-8bvVJjDkRysZ1ZR0LpBklyj
-X-Proofpoint-GUID: OZfPGOPG-8bvVJjDkRysZ1ZR0LpBklyj
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-02_13,2024-11-01_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 bulkscore=0 clxscore=1030 mlxscore=0
- phishscore=0 malwarescore=0 spamscore=0 adultscore=0 mlxlogscore=512
- suspectscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411020142
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Sat Nov 2, 2024 at 11:49 AM MSK, Paolo Abeni wrote:
-> Hi,
->
-> On 11/1/24 18:34, Vladimir Vdovin wrote:
-> > On Fri Nov 1, 2024 at 4:45 PM MSK, Jakub Kicinski wrote:
-> >> On Fri,  1 Nov 2024 10:48:57 +0000 Vladimir Vdovin wrote:
-> >>> +	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions		0"
-> >>
-> >> This new test seems to fail in our CI:
-> >>
-> >> # TEST: ipv4: PMTU multipath nh exceptions                            =
-[FAIL]
-> >> #   there are not enough cached exceptions
-> >>
-> >> https://netdev-3.bots.linux.dev/vmksft-net/results/840861/3-pmtu-sh/st=
-dout
-> >=20
-> > Yes it failed in V4 patch, in this V5 its already ok:
-> >=20
-> > # TEST: ipv4: PMTU multipath nh exceptions                            [=
- OK ]
-> > ok 1 selftests: net: pmtu.sh
-> >=20
-> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/841042/2-pmtu-sh=
-/stdout
-> >=20
-> > But in V5, there is failed test, not sure that this patch causes fail:
-> > https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/841042/31-busy-p=
-oll-test-sh/stdout
-> >=20
-> >>
-> >> Also some process notes:
-> >>  - please don't post multiple versions of the patch a day:
-> >>    https://www.kernel.org/doc/html/next/process/maintainer-netdev.html=
-#tl-dr
-> >>  - please avoid posting new versions in-reply-to the old one
-> > Thanks, will keep it in mind next time, sorry for my ignorance
->
-> Some additional notes:
->
-> - please do answer to Ido's question: what about ipv6?
-> - move the changelog after the SoB tag and a '---' separator, so that it
-> will not be included into the git commit message
-> - post new revisions of the patch in a different thread
->
-> Thanks,
->
-> Paolo
+--=-=-=
+Content-Type: text/plain; format=flowed
 
-Thanks for your comments,=20
-I will resend patch with fixed commit message as new thread.
 
+Steffen Klassert <steffen.klassert@secunet.com> writes:
+
+> On Mon, Oct 07, 2024 at 09:59:24AM -0400, Christian Hopps wrote:
+>> From: Christian Hopps <chopps@labn.net>
+>>
+>> +
+>> +/**
+>> + * __iptfs_iphlen() - return the v4/v6 header length using packet data.
+>> + * @data: pointer at octet with version nibble
+>> + *
+>> + * The version data is expected to be valid (i.e., either 4 or 6).
+>> + *
+>> + * Return: the IP header size based on the IP version.
+>> + */
+>> +static u32 __iptfs_iphlen(u8 *data)
+>> +{
+>> +	struct iphdr *iph = (struct iphdr *)data;
+>> +
+>> +	if (iph->version == 0x4)
+>> +		return sizeof(*iph);
+>> +	WARN_ON_ONCE(iph->version != 0x6);
+>> +	return sizeof(struct ipv6hdr);
+>
+> Better to return an error if this is not IPv6
+
+The version is checked prior to calling to only be v4 or v6. Removed the WARN call and made the comment above saying this more explicit.
+
+>> +}
+>> +
+>> +/**
+>> + * __iptfs_iplen() - return the v4/v6 length using packet data.
+>> + * @data: pointer to ip (v4/v6) packet header
+>> + *
+>> + * Grab the IPv4 or IPv6 length value in the start of the inner packet header
+>> + * pointed to by `data`. Assumes data len is enough for the length field only.
+>> + *
+>> + * The version data is expected to be valid (i.e., either 4 or 6).
+>> + *
+>> + * Return: the length value.
+>> + */
+>> +static u32 __iptfs_iplen(u8 *data)
+>> +{
+>> +	struct iphdr *iph = (struct iphdr *)data;
+>> +
+>> +	if (iph->version == 0x4)
+>> +		return ntohs(iph->tot_len);
+>> +	WARN_ON_ONCE(iph->version != 0x6);
+>> +	return ntohs(((struct ipv6hdr *)iph)->payload_len) +
+>> +	       sizeof(struct ipv6hdr);
+>
+> Same here.
+
+Same.
+
+>> +
+>> +		/* We have enough data to get the ip length value now,
+>> +		 * allocate an in progress skb
+>> +		 */
+>> +		ipremain = __iptfs_iplen(xtfs->ra_runt);
+>> +		if (ipremain < sizeof(xtfs->ra_runt)) {
+>> +			/* length has to be at least runtsize large */
+>> +			XFRM_INC_STATS(xs_net(xtfs->x),
+>> +				       LINUX_MIB_XFRMINIPTFSERROR);
+>> +			goto abandon;
+>> +		}
+>> +
+>> +		/* For the runt case we don't attempt sharing currently. NOTE:
+>> +		 * Currently, this IPTFS implementation will not create runts.
+>> +		 */
+>> +
+>> +		newskb = iptfs_alloc_skb(skb, ipremain, false);
+>
+> As mentioned above, __iptfs_iplen needs error handling. Otherwise
+> you might alocate a random amount of data here.
+>
+>> +		if (!newskb) {
+>> +			XFRM_INC_STATS(xs_net(xtfs->x), LINUX_MIB_XFRMINERROR);
+>> +			goto abandon;
+>> +		}
+>> +		xtfs->ra_newskb = newskb;
+>> +
+>> +		/* Copy the runt data into the buffer, but leave data
+>> +		 * pointers the same as normal non-runt case. The extra `rrem`
+>> +		 * recopied bytes are basically cacheline free. Allows using
+>> +		 * same logic below to complete.
+>> +		 */
+>> +		memcpy(skb_put(newskb, runtlen), xtfs->ra_runt,
+>> +		       sizeof(xtfs->ra_runt));
+>> +	}
+>> +
+>> +	/* Continue reassembling the packet */
+>> +	ipremain = __iptfs_iplen(newskb->data);
+>> +	iphlen = __iptfs_iphlen(newskb->data);
+>> +
+>> +	/* Sanity check, we created the newskb knowing the IP length so the IP
+>> +	 * length can't now be shorter.
+>> +	 */
+>> +	WARN_ON_ONCE(newskb->len > ipremain);
+>> +
+>> +	ipremain -= newskb->len;
+>> +	if (blkoff < ipremain) {
+>> +		/* Corrupt data, we don't have enough to complete the packet */
+>> +		XFRM_INC_STATS(xs_net(xtfs->x), LINUX_MIB_XFRMINIPTFSERROR);
+>> +		goto abandon;
+>> +	}
+>> +
+>> +	/* We want the IP header in linear space */
+>> +	if (newskb->len < iphlen) {
+>> +		iphremain = iphlen - newskb->len;
+>> +		if (blkoff < iphremain) {
+>> +			XFRM_INC_STATS(xs_net(xtfs->x),
+>> +				       LINUX_MIB_XFRMINIPTFSERROR);
+>> +			goto abandon;
+>> +		}
+>> +		fraglen = min(blkoff, remaining);
+>> +		copylen = min(fraglen, iphremain);
+>> +		WARN_ON_ONCE(skb_tailroom(newskb) < copylen);
+>
+> This is also something that needs error handling. This WARN_ON_ONCE
+> does not make much sense, as the next line will crash the machine
+> anyway if this condition is true.
+>
+> This is also a general thing, there are a lot of WARN_ON_ONCE
+> and you just continue after the warning. Whenever such a warn
+> condition can happen, it needs audit why it can happen. Usually
+> it can be either fixed or catched with an error. Warnings
+> should be used very rarely.
+>
+> In this case you can either make sure to allocate the correct amount
+> of data or extend the tailroom with pskb_expand_head().
+>
+> No need to crash the machine here :)
+>
+> Please audit your WARN_ON_ONCE calls, I guess most are either not
+> needed or the condition can be handled otherwise somehow.
+
+As we discussed offline, these uses were not where value can actually be wrong, they were all originally BUG_ON() and meant to document the code assumptions/assertions and to catch future coding/review bugs.
+
+This is not a style that is used by/welcome in linux kernel code so I will remove it's use.
+
+>
+>> +		if (skb_copy_seq_read(st, data, skb_put(newskb, copylen),
+>> +				      copylen)) {
+>> +			XFRM_INC_STATS(xs_net(xtfs->x),
+>> +				       LINUX_MIB_XFRMINBUFFERERROR);
+>> +			goto abandon;
+>> +		}
+>
+>> @@ -1286,7 +1729,11 @@ static int iptfs_copy_to_user(struct xfrm_state *x, struct sk_buff *skb)
+>>  	int ret = 0;
+>>  	u64 q;
+>>
+>> -	if (x->dir == XFRM_SA_DIR_OUT) {
+>> +	if (x->dir == XFRM_SA_DIR_IN) {
+>> +		q = xtfs->drop_time_ns;
+>> +		(void)do_div(q, NSECS_IN_USEC);
+>
+> This cast is not needed.
+
+Removed.
+
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmcmTiISHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlzNUP/i6MCMml6XAmjHm/841ETKWdqZEFFAmf
+rHlMkBBdAKMjJLY6+lcgI6hTkS+tf/m6UrblWe8wVs5WzsYZWCVwgCeu6gjM/qrE
+sGJWJe1qTei6zs0K2kMP1wz8LfRGdsa8MzX3mD18tTJconMiJlDC5aEO/QS3i6Ej
+y4a+/HvXkABOqVOfVo8NOl+01eTCiHgICiUXa/5wf7YoiY2aldNFQXeYv1nI+eUY
+zC2lYfbLIAL00Z6jw4A8QtstLEKVXIYFhIiXOKQiDUaYlNu3iWqObTVFTCYrePZe
+lYlvYXp1lWGq90wnNOS+bi3A/+BdE9C7y5saEpg9BPxO6Sl3Sq8lqAbMLBUWQujZ
+YgfLX1IIXDOvMO4pacWlVuqMSUrY6o/KjXsPKhOU8Np0BkJaFKJ/dgYIYWs8M+Ct
+ZiZlZwfih+6xfUSkVHsVB/3CLO7L6ohVay4v9m7iHezx7qV4/x1n9veRuEyxraRs
+6ID0XTXbt0niqmb6HvBo1JLgpqfYC4g5Nnb77+u8brDrpvBcD6nawyUA3BfkW9H0
+ZfRLWo/vMSQaFtEQ1LGfgna/1jlGIDNMeSiiOUMaad1+cEdsiSqxsAw6J/IELxiQ
+STgJcqnEQJYpTJwi2i1salqKcQg2CmyzHLoOT710GmWpdA6aDrTepINJ76KUYsLu
+vZf/alxiUge2
+=uRSK
+-----END PGP SIGNATURE-----
+--=-=-=--
 
