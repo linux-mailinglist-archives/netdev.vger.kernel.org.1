@@ -1,181 +1,144 @@
-Return-Path: <netdev+bounces-141228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 177609BA163
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:20:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D86089BA166
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 17:26:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8F42F1F213D5
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:20:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 230901C20AAC
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 16:26:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BC8C155336;
-	Sat,  2 Nov 2024 16:20:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="cpL3iNk4"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB6DF19D07C;
+	Sat,  2 Nov 2024 16:26:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ci74p00im-qukt09082302.me.com (ci74p00im-qukt09082302.me.com [17.57.156.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 506A942070
-	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 16:20:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.156.13
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79067155336
+	for <netdev@vger.kernel.org>; Sat,  2 Nov 2024 16:26:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730564410; cv=none; b=ccTa6TRAmoaIk/66bQOlM7IPh/FljpOqzpEjqU2SrC94EXaF8jUwNpFD0iNATFaLoEf+iUmnp7dUJCAajp5pKc7zq3i4ZQQYKzBrrIknLc3WvwtcuMQ7bxO+k3iVx5s6MAq3KsxSEa0E9Nptc2g0zs41z7pcvzZrL9pjmpleAUo=
+	t=1730564812; cv=none; b=aaoohVEDqU+047Uwc8BJnmQy/CUB2AinKX1wRswNMKmB/Uw+sJOUJqkbVKdpGU8xhTsEWyPkCHoPXc9mftr+UuuXgTp2lKed+W+TKvZD1s2ijo4Br0DGfxFX6T8Cw1h+qknCNUkXCIig1eMyHRtVoP59bZqS/nE3ECi3xI/JInM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730564410; c=relaxed/simple;
-	bh=scCluSYQtHdqN2CxlQfou1k9oOaQGwEtoIcDw3tKeF4=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
-	 References:In-Reply-To; b=DaQHQ7z9RerZvJWCMCRcfsO80yHdW3tBz0GyE6/q4fmHNugXov0fvrWlpSNov6MGWejPIfUrrS/7Ls7aIZt5Le6Exmbsy9PXgYZMt43S65RTl4HRNt9pQEF/+nlWdMi9pvyhiIxmLxaU9oPE2k+DaaTmapKy8GEtBOI4LUN9wu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=cpL3iNk4; arc=none smtp.client-ip=17.57.156.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730564407; bh=XoSg4c3PAmauNtowH+vg08CvRIFkV+15uoiCazxoM2c=;
-	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:
-	 x-icloud-hme;
-	b=cpL3iNk4bw0ngvjURS5c+w4TE0zCJEzohwSdZlcMq4O1+DaACNV0z92fChf6SsO14
-	 35TPDFPoF02UbtKTRkxoups/piaMZp7sbgll+0mlbGPgXFUIy1PXHLq0wA30kXbIK2
-	 N7WFfs2tgOUK7k1c8Ekqmxv0owtFYetzVhx+KFnz1qlQkOaS8kh7GvFfku5/2Qcma5
-	 ctpc5Jy3m7G8G2BoUZZSHjia+TdECBRUWKBhPbAaG9XwCX/eJCzdpyq2gxTZAwdsU4
-	 rV6V1tIpHr1VbVHUqTLyxU4xg2fVLHmt+Dao74B25QjvcTdJqNi7laWWCAEudfZyWw
-	 8He53vpspmChQ==
-Received: from localhost (ci77p00im-dlb-asmtp-mailmevip.me.com [17.57.156.26])
-	by ci74p00im-qukt09082302.me.com (Postfix) with ESMTPSA id 844372FC040A;
-	Sat,  2 Nov 2024 16:20:05 +0000 (UTC)
+	s=arc-20240116; t=1730564812; c=relaxed/simple;
+	bh=AiNreFk6Y4Zo/uFJGvxRLQe67Sk6v6yoOTHnTIfQNlo=;
+	h=References:From:To:Cc:Subject:Date:In-reply-to:Message-ID:
+	 MIME-Version:Content-Type; b=AEDqhIWq/e948esrexU9nOVMTythIvo9rrhnm7AIrd5Fc34nhQBCHIjHUxqAM1n2jLP2aDIKo6J3ADt3Y4L/MnoEpkxsljw+YW+0vRi/cCQKraI1cqJ/l9RuliRV0TJ1Z0Hkt+Xhhbue20Bj4B+hqRFGcuG6WU/ALzfosHoQDi4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from vapr.local.chopps.org (unknown [185.122.134.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 494D47D08A;
+	Sat,  2 Nov 2024 16:26:49 +0000 (UTC)
+References: <20241007135928.1218955-1-chopps@chopps.org>
+ <20241007135928.1218955-15-chopps@chopps.org>
+ <ZxYvWDFrdSMn8iVF@gauss3.secunet.de>
+User-agent: mu4e 1.8.14; emacs 28.2
+From: Christian Hopps <chopps@chopps.org>
+To: Steffen Klassert <steffen.klassert@secunet.com>
+Cc: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org,
+ netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>, Sabrina Dubroca
+ <sd@queasysnail.net>, Simon Horman <horms@kernel.org>, Antony Antony
+ <antony@phenome.org>, Christian Hopps <chopps@labn.net>
+Subject: Re: [PATCH ipsec-next v12 14/16] xfrm: iptfs: add skb-fragment
+ sharing code
+Date: Sat, 02 Nov 2024 16:26:35 +0000
+In-reply-to: <ZxYvWDFrdSMn8iVF@gauss3.secunet.de>
+Message-ID: <m2msihiou0.fsf@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Sat, 02 Nov 2024 19:20:02 +0300
-Message-Id: <D5BTVREQGREW.3RSUZQK6LDN60@verdict.gg>
-To: "Ido Schimmel" <idosch@idosch.org>, "David Ahern" <dsahern@kernel.org>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>
-Subject: Re: [PATCH] net: ipv4: Cache pmtu for all packet paths if multipath
- enabled
-From: "Vladimir Vdovin" <deliran@verdict.gg>
-X-Mailer: aerc 0.18.2
-References: <20241029152206.303004-1-deliran@verdict.gg>
- <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
- <ZyJo1561ADF_e2GO@shredder.mtl.com>
-In-Reply-To: <ZyJo1561ADF_e2GO@shredder.mtl.com>
-X-Proofpoint-ORIG-GUID: k-11R3e3nbDQAm5F8FeOwlmwuVITlDcb
-X-Proofpoint-GUID: k-11R3e3nbDQAm5F8FeOwlmwuVITlDcb
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-02_14,2024-11-01_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 mlxscore=0 bulkscore=0
- suspectscore=0 malwarescore=0 mlxlogscore=583 phishscore=0 spamscore=0
- clxscore=1030 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411020145
+MIME-Version: 1.0
+Content-Type: multipart/signed; boundary="=-=-=";
+	micalg=pgp-sha512; protocol="application/pgp-signature"
 
-On Wed Oct 30, 2024 at 8:11 PM MSK, Ido Schimmel wrote:
-> On Tue, Oct 29, 2024 at 05:22:23PM -0600, David Ahern wrote:
-> > On 10/29/24 9:21 AM, Vladimir Vdovin wrote:
-> > > Check number of paths by fib_info_num_path(),
-> > > and update_or_create_fnhe() for every path.
-> > > Problem is that pmtu is cached only for the oif
-> > > that has received icmp message "need to frag",
-> > > other oifs will still try to use "default" iface mtu.
-> > >=20
-> > > An example topology showing the problem:
-> > >=20
-> > >                     |  host1
-> > >                 +---------+
-> > >                 |  dummy0 | 10.179.20.18/32  mtu9000
-> > >                 +---------+
-> > >         +-----------+----------------+
-> > >     +---------+                     +---------+
-> > >     | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
-> > >     +---------+                     +---------+
-> > >         |    (all here have mtu 9000)    |
-> > >     +------+                         +------+
-> > >     | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
-> > >     +------+                         +------+
-> > >         |                                |
-> > > ---------+------------+-------------------+------
-> > >                         |
-> > >                     +-----+
-> > >                     | ro3 | 10.10.10.10  mtu1500
-> > >                     +-----+
-> > >                         |
-> > >     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >                 some networks
-> > >     =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > >                         |
-> > >                     +-----+
-> > >                     | eth0| 10.10.30.30  mtu9000
-> > >                     +-----+
-> > >                         |  host2
-> > >=20
-> > > host1 have enabled multipath and
-> > > sysctl net.ipv4.fib_multipath_hash_policy =3D 1:
-> > >=20
-> > > default proto static src 10.179.20.18
-> > >         nexthop via 10.179.2.12 dev ens17f1 weight 1
-> > >         nexthop via 10.179.2.140 dev ens17f0 weight 1
-> > >=20
-> > > When host1 tries to do pmtud from 10.179.20.18/32 to host2,
-> > > host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=
-=3D1500.
-> > > And host1 caches it in nexthop exceptions cache.
-> > >=20
-> > > Problem is that it is cached only for the iface that has received icm=
-p,
-> > > and there is no way that ro3 will send icmp msg to host1 via another =
-path.
-> > >=20
-> > > Host1 now have this routes to host2:
-> > >=20
-> > > ip r g 10.10.30.30 sport 30000 dport 443
-> > > 10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
-> > >     cache expires 521sec mtu 1500
-> > >=20
-> > > ip r g 10.10.30.30 sport 30033 dport 443
-> > > 10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
-> > >     cache
-> > >=20
-> >=20
-> > well known problem, and years ago I meant to send a similar patch.
+--=-=-=
+Content-Type: text/plain; format=flowed
+
+
+Steffen Klassert <steffen.klassert@secunet.com> writes:
+
+> On Mon, Oct 07, 2024 at 09:59:26AM -0400, Christian Hopps wrote:
+>> From: Christian Hopps <chopps@labn.net>
+>>
+>> Avoid copying the inner packet data by sharing the skb data fragments
+>> from the output packet skb into new inner packet skb.
+>>
+>> Signed-off-by: Christian Hopps <chopps@labn.net>
+>> ---
+>>  net/xfrm/xfrm_iptfs.c | 312 ++++++++++++++++++++++++++++++++++++++++--
+>>  1 file changed, 304 insertions(+), 8 deletions(-)
+>>
+>> diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
+>> index 4c95656d7492..ef4c23159471 100644
+>> --- a/net/xfrm/xfrm_iptfs.c
+>> +++ b/net/xfrm/xfrm_iptfs.c
+>> @@ -81,6 +81,9 @@
+>>  #define XFRM_IPTFS_MIN_L3HEADROOM 128
+>>  #define XFRM_IPTFS_MIN_L2HEADROOM (L1_CACHE_BYTES > 64 ? 64 : 64 + 16)
+>>
+>> +/* Min to try to share outer iptfs skb data vs copying into new skb */
+>> +#define IPTFS_PKT_SHARE_MIN 129
+>> +
+>>  #define NSECS_IN_USEC 1000
+>>
+>>  #define IPTFS_HRTIMER_MODE HRTIMER_MODE_REL_SOFT
+>> @@ -236,10 +239,261 @@ static void iptfs_skb_head_to_frag(const struct sk_buff *skb, skb_frag_t *frag)
+>>  	skb_frag_fill_page_desc(frag, page, skb->data - addr, skb_headlen(skb));
+>>  }
+>>
+>> +/**
+>> + * struct iptfs_skb_frag_walk - use to track a walk through fragments
+>> + * @fragi: current fragment index
+>> + * @past: length of data in fragments before @fragi
+>> + * @total: length of data in all fragments
+>> + * @nr_frags: number of fragments present in array
+>> + * @initial_offset: the value passed in to skb_prepare_frag_walk()
+>> + * @pp_recycle: copy of skb->pp_recycle
+>> + * @frags: the page fragments inc. room for head page
+>> + */
+>> +struct iptfs_skb_frag_walk {
+>> +	u32 fragi;
+>> +	u32 past;
+>> +	u32 total;
+>> +	u32 nr_frags;
+>> +	u32 initial_offset;
+>> +	bool pp_recycle;
 >
-> Doesn't IPv6 suffer from a similar problem?
+> This boll creates a 3 byte hole. Better to put it to the end.
 
-I am not very familiar with ipv6,
-but I tried to reproduce same problem with my tests with same topology.
+Moved.
 
-ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30003 dport 443
-fc00:1001::2:2 via fc00:2::2 dev veth_A-R2 src fc00:1000::1:1 metric 1024 e=
-xpires 495sec mtu 1500 pref medium
+Thanks,
+Chris.
 
-ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30013 dport 443
-fc00:1001::2:2 via fc00:1::2 dev veth_A-R1 src fc00:1000::1:1 metric 1024 e=
-xpires 484sec mtu 1500 pref medium
+>> +	skb_frag_t frags[MAX_SKB_FRAGS + 1];
+>> +};
 
-It seems that there are no problems with ipv6. We have nhce entries for bot=
-h paths.
+--=-=-=
+Content-Type: application/pgp-signature; name="signature.asc"
 
->
-> >=20
-> > Can you add a test case under selftests; you will see many pmtu,
-> > redirect and multipath tests.
-> >=20
-> > > So when host1 tries again to reach host2 with mtu>1500,
-> > > if packet flow is lucky enough to be hashed with oif=3Dens17f1 its ok=
-,
-> > > if oif=3Dens17f0 it blackholes and still gets icmp msgs from ro3 to e=
-ns17f1,
-> > > until lucky day when ro3 will send it through another flow to ens17f0=
-.
-> > >=20
-> > > Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
->
-> Thanks for the detailed commit message
+-----BEGIN PGP SIGNATURE-----
 
+iQJGBAEBCgAwFiEEm56yH/NF+m1FHa6lLh2DDte4MCUFAmcmUscSHGNob3Bwc0Bj
+aG9wcHMub3JnAAoJEC4dgw7XuDAlJKIP/1vU/8xCG2m0XkSg5NwxCyncG+1pJQSF
+kac+1AG/lr6VfSLOYzpyOe7Rm63sxzozJ4rY0Ivu+wXT832YzMYPi2bUbfKe1qkn
+d1MTWVYY4UlEdWZ/XjoEg2oLSpGK1bj1wZP5ac6wI6M17kxZjPnxGRSjoN9Z7POG
+xV1Z8ZF9Vk4z0D9002qm2k2REsUbYu4QdNPTOWpc3O0VuN+OS/nunVgtrSNqZj5b
+wgC6smgcr8m4zIQctp3kqy+GoiOXISNQ9iPu+Vze8TqIBKSR6BGMVwvcXsaWYBTN
+hrXHl9dMiByJ/D9yvPgXdX5JjS5szfgsc3/8ASK5guRBvSBHJYoqzd29eGCX9fEW
+piCw/NNRoBskbU+mDqgoMjQT4BncPl/C8dnlHADrrA3AP5A7OhFASA6jSBvaEslK
+YUM9Y0VU2nYKbgPETSwJRIMao2FJzr+bUq2K2KlBtY2Q6Lu4hUqoqpjFBKGkkCM3
+Qa/EDauV6zhfOM/89zvachNgbhFAyzh9joKiVWcl39b/a82xz45Tb8Tq9j+9QIx+
+nnZqD0UsWD/eXlACtZUblb6rNl4Ovq/v5GbR3lB6PAdii1H/cZppoNSjaHsZxxqk
+o0YX5v3APFPpcLxxlv56CJJCxZbfwwxdhkYcp5CjtgNt9c02DnqpJVTgQbyWKkXK
+LW8IY9L46fiW
+=cniL
+-----END PGP SIGNATURE-----
+--=-=-=--
 
