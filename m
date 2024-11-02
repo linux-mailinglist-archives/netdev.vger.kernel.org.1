@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-141240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCE029BA2A1
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 22:59:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A9D79BA2A4
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 23:01:58 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81CAD283608
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 21:59:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 53B461C20DB0
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 22:01:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DB321ABEB4;
-	Sat,  2 Nov 2024 21:59:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA1115623A;
+	Sat,  2 Nov 2024 22:01:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="Gt+Da33K"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="j04aiFAU"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 635EC1AA7AB;
-	Sat,  2 Nov 2024 21:59:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1F648614E;
+	Sat,  2 Nov 2024 22:01:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730584762; cv=none; b=di+nlMu9n9h/FV28uitzYjfITh+hx96dGYA+ZsNnt48a3grwVhnQyPX+9Q+y+95o/20BiLPvQtY0QzdfHa+OOMOuKe4W9dMliYUXUalxI58cN+OgOiuFip570QpKaNR0U1tI6NVPWWe2wKC3VC6fbtbjCoQcYyUDXi9BAWq6BPY=
+	t=1730584914; cv=none; b=X+7tws8zoZ+x/I6ZlSHXs9EQ+TiPNbltd2H3u+kcD5PFoLHMh+S4fpl4WFJLb5fZs8yVSObLXqGlVB/LPjIl1Y6COE292fmhwZMCk+R7AUgPPfrtGiRJlqOmR5u6Luwxth1Rd6W4v9hNFamUq1cZNp7fzqMYrdcifKILWzMKNrA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730584762; c=relaxed/simple;
+	s=arc-20240116; t=1730584914; c=relaxed/simple;
 	bh=Sf7JXMx9xsS/c1EdJK3lN7rNnBDOmXkfcQN3U1G1LZY=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=MORONTyCy1ul8DFCrEeapkn4h4gjkr0fy+Nr9XaBiyjalg145bxUtwJfqyB2EEifTruvGuBkCiXL+YyD3d3CUZb6jObW/DOyZ8yW1U/aieacdKMAd/ApyDwyN7J5orH2t5LdnMxAJyn6moA8Rh9Lq0XPMCWViF5xvDBVxTntyJk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=Gt+Da33K; arc=none smtp.client-ip=46.235.229.95
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=hmp1B6oCC85v6Eygcszh+QLnom/9KYMGBwBEZIuQ8jhqJ0Gzu8Y1huM3yN+kkTOqjR0PqXFFwTfrhBSsuLfQ8QfVwtTgXfRec972DaXTbwBKjAzc+294WO+YpwKg/TSs5DMcbL67D90EQTTvXE2cNFWkeXjIU6mypWMH/ewiQ5Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=j04aiFAU; arc=none smtp.client-ip=46.235.229.95
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
 	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
-	:Subject; bh=Xz/xV9bgfMQiU18NYnrLyS6x4kS7JNrVV7Z9KqjoIw0=; b=Gt+Da33K8WvdmEmK
-	gCaMXwL2Z6NM2plnxX+elx1jHnCqD6hLS0YfAVN1OXi8UgTnqwrTpCMXCyNKXTh2Atvldm0XvVbJ4
-	rCSseC1uxqC8JUSVQMDko+nzVBetjCB8d+9XFUMi3QQyWBXslb8VUihQyRfOc2JZSExx7kUQB+j1h
-	xlT2KQSaO/gX0nH78vvEWXLDaCXFzipP7nwjgEdcp4arUEfpuW8K5gRxhBWwPozplinB4uq2zLaaR
-	+otb7OeJ5yrUgoaLSQcvPLNY4PJEXICGYrdYK+yhvtaZl7VzlOywwMK4aNG8ouqXRbCxPZOoRhQMi
-	a9dGghCF/DnUCJm3Uw==;
+	:Subject; bh=Xz/xV9bgfMQiU18NYnrLyS6x4kS7JNrVV7Z9KqjoIw0=; b=j04aiFAUY2pbHAiJ
+	2pFd0dgJMgr97bsSGA/xLCxLsXDiKxCa6lCCCt1apnTBthF/M4636rF5wLGuf6oDUEih9rTc9WiLj
+	mKED0h9owzqjBUfOhRw3XeUDgW8mFpATcnOzb3WoZ1r1s6welMoPKr2pBgJ1kwWgFM7c5qjwj3lbK
+	mLA/FKaJWL7jrEO6AWjGfszCkmhACcZxOJssbuNONnEigFdVj7pg6YSI8tbogRTzLjX8u1TKDLf8B
+	CvBtdHVRyH3xKXaBley8ZXoCpF4JuOzqI/0AVopm6lOUuBVYsBLwJd9Rc2lUke06Nv92/Qnyy4DgM
+	pohcqitwrmuNQNI8LA==;
 Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
 	by mx.treblig.org with esmtp (Exim 4.96)
 	(envelope-from <linux@treblig.org>)
-	id 1t7M9F-00F7qi-0F;
-	Sat, 02 Nov 2024 21:59:09 +0000
+	id 1t7MBm-00F7uJ-09;
+	Sat, 02 Nov 2024 22:01:46 +0000
 From: linux@treblig.org
 To: shayagr@amazon.com,
 	akiyano@amazon.com,
@@ -57,9 +57,9 @@ To: shayagr@amazon.com,
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	"Dr. David Alan Gilbert" <linux@treblig.org>
-Subject: [PATCH] net: ena: Remove deadcode
-Date: Sat,  2 Nov 2024 21:59:07 +0000
-Message-ID: <20241102215907.79931-1-linux@treblig.org>
+Subject: [PATCH net-next] net: ena: Remove deadcode
+Date: Sat,  2 Nov 2024 22:01:42 +0000
+Message-ID: <20241102220142.80285-1-linux@treblig.org>
 X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
