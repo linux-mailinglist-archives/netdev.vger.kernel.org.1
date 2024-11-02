@@ -1,48 +1,48 @@
-Return-Path: <netdev+bounces-141184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74CF9B9DD0
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 08:57:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CD9E9B9DD2
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 09:00:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 61A26B21F9C
-	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 07:57:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DA308B21EE4
+	for <lists+netdev@lfdr.de>; Sat,  2 Nov 2024 08:00:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5DD155753;
-	Sat,  2 Nov 2024 07:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E503156C70;
+	Sat,  2 Nov 2024 08:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jNBmKftk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IUlCET7i"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8036812FF69;
-	Sat,  2 Nov 2024 07:57:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D4D149C42;
+	Sat,  2 Nov 2024 08:00:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730534220; cv=none; b=a++tjzqnYOFt6iRLmJAh+2d3K4Q1Z97dLbzyjwNxWPkXykimVZQo2eItSiKEklhC6X+Pj3P/VWmb17Ze7eWxWyHt36mepUgiybPBKgtEr1ov/xVr/Za3SXZN6BkTw+xFHTkSYpaCkh6S7Q2d+N2MnPlibrTKCwwgUF0kiJWlxkY=
+	t=1730534407; cv=none; b=P9w6PtqZBYB0Vhsri0xMv5dKXEph//ke20PLnlm68at9BmF/qOzaUae0bFUt45ZLDe2v1wqhzmIDF51BxeEzARJdBVo4/hSg1kBOKQgmwdGzVbXh5k2NzyWtPZGIc1nEl1lvBUcEAFxEHv5bSIkfkXFofI8ojLhcYTxM0T1UbWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730534220; c=relaxed/simple;
-	bh=BitM8KRVJwA7pViMcYxTM/oQamBQOjB+WxzT1mwDhvI=;
+	s=arc-20240116; t=1730534407; c=relaxed/simple;
+	bh=nMP5YAbvzzwDnVaFSKH4A4/uHZ/HOT9vGp97g86Nn7Q=;
 	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=fxDS3/bE80elufu20cyE1yAA251bPhI4weg13bUEPhUAC7XZO3ol3zlNsa6WAxXWkx4BTVezK7jyC17AReB3iUIaoMlcxREXwvDwSxifPHBmzIaSm7wNqpi19fPgX707HUW4+cWhMQSyJugFCikdoKkPrImjukIN0CQQecKxi+8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jNBmKftk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A30BAC4CEC3;
-	Sat,  2 Nov 2024 07:56:58 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=Yhpoq4+nSBRuZlIPQI8d4sdHMiejWpVftpzRGSrXQywVWEwwYsO5zE2dX5K43jAIQolAOMWCGy72fFNcfhEzgAejh88SU5/EEBCxIXYNFpgx++f70bwpqu8H9QSEQV9gjP5VIT8Y5/9UWXVOZLPntWf1WI4CUls28y/0rQOCtKs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IUlCET7i; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E3F32C4CEC3;
+	Sat,  2 Nov 2024 08:00:05 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730534220;
-	bh=BitM8KRVJwA7pViMcYxTM/oQamBQOjB+WxzT1mwDhvI=;
+	s=k20201202; t=1730534406;
+	bh=nMP5YAbvzzwDnVaFSKH4A4/uHZ/HOT9vGp97g86Nn7Q=;
 	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=jNBmKftkAhysn1Vl2uul2B5tWopNEMppZLMBxOLB4saGCwQR2hnG9bHpn4fAOqJf/
-	 arXZRJgtTxKShQKvZ+nufV3RJkMZUlkgbl+Lr9pg5IZbfstWum7TPgtrogdJ3G9GXQ
-	 78t+kbmGYacnBdciGTyKmmdpYSbutoF4otx+NuenIS8YYLNbw/VKJUPnVeKHii8KA3
-	 Zf/dXsoq1yDJ4qjo2x+4m0Iug3kXXVc/PB5+qN6/H3m/Hf3/YQz5A7F+qZIV8KRWTN
-	 s7Kh7kSXol4+53zO1bS362isbt9L1wDt5f+2ZpB538MjsYGTxxf8+a6sM5VYOc2wJs
-	 T5GLRUimN3OkQ==
-Message-ID: <b968933c-3a16-43f7-be65-ea637d654859@kernel.org>
-Date: Sat, 2 Nov 2024 08:56:56 +0100
+	b=IUlCET7iuPAHAAbKglnx3CJ3HuoIr9OCPolVQepYdplQiCU15eexyixaWEXsBfuHz
+	 Xx8JG/Ok2QLQ5MdOxeVgbwQ/G48mWA/izTi/Rdx+6Xe6AqSA8fALqjr+GgrwUZIkPP
+	 w5LIMylMj68IIgUkCNon7MYBN0nJ4Y2TArTC0TwYKGWEx7zSu+dRIoKwe05+v/BTz0
+	 Da9vZwx2idSPhNwBDDNzWdHhHj1MNAOp+1sun284Wld/SW1c7e/dGg9ZoGJX5lG7iC
+	 q9q5cYF3j6cq0NxVdaXlRf/S6elYLm+BNDV4MasK0LX03POd+VldPzmk957U4ADRfE
+	 3nLZisixQfPfg==
+Message-ID: <2dc98d01-6353-478c-b6ad-d6eac63c53da@kernel.org>
+Date: Sat, 2 Nov 2024 09:00:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,11 +50,10 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 1/1] nfc: st21nfca: Remove unused of_gpio.h
+Subject: Re: [PATCH net-next v1 1/1] nfc: mrvl: Don't use "proxy" headers
 To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
  netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241101084212.3363129-1-andriy.shevchenko@linux.intel.com>
+References: <20241101083910.3362945-1-andriy.shevchenko@linux.intel.com>
 From: Krzysztof Kozlowski <krzk@kernel.org>
 Content-Language: en-US
 Autocrypt: addr=krzk@kernel.org; keydata=
@@ -100,17 +99,42 @@ Autocrypt: addr=krzk@kernel.org; keydata=
  uZwJCLykjad45hsWcOGk3OcaAGQS6NDlfhM6O9aYNwGL6tGt/6BkRikNOs7VDEa4/HlbaSJo
  7FgndGw1kWmkeL6oQh7wBvYll2buKod4qYntmNKEicoHGU+x91Gcan8mCoqhJkbqrL7+nXG2
  5Q/GS5M9RFWS+nYyJh+c3OcfKqVcZQNANItt7+ULzdNJuhvTRRdC3g9hmCEuNSr+CLMdnRBY fv0=
-In-Reply-To: <20241101084212.3363129-1-andriy.shevchenko@linux.intel.com>
+In-Reply-To: <20241101083910.3362945-1-andriy.shevchenko@linux.intel.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 01/11/2024 09:42, Andy Shevchenko wrote:
-> of_gpio.h is deprecated and subject to remove. The drivers in question
-> don't use it, simply remove the unused header.
+On 01/11/2024 09:39, Andy Shevchenko wrote:
+> Update header inclusions to follow IWYU (Include What You Use)
+> principle.
 > 
 > Signed-off-by: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+> ---
+>  drivers/nfc/nfcmrvl/uart.c | 9 +++++++--
+>  1 file changed, 7 insertions(+), 2 deletions(-)
+> 
+> diff --git a/drivers/nfc/nfcmrvl/uart.c b/drivers/nfc/nfcmrvl/uart.c
+> index 956ae92f7573..2037cd6d4f4f 100644
+> --- a/drivers/nfc/nfcmrvl/uart.c
+> +++ b/drivers/nfc/nfcmrvl/uart.c
+> @@ -5,11 +5,16 @@
+>   * Copyright (C) 2015, Marvell International Ltd.
+>   */
+>  
+> -#include <linux/module.h>
+>  #include <linux/delay.h>
+> -#include <linux/of_gpio.h>
+> +#include <linux/device.h>
+> +#include <linux/err.h>
+> +#include <linux/module.h>
+> +#include <linux/of.h>
+> +#include <linux/printk.h>
 
-Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Do we really include printk? It's almost everywhere and pulled by kernel.h.
+
+I assume you checked rest of the nfcmrvl files for similar cleanups, so
+anyway:
+
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
 Best regards,
 Krzysztof
