@@ -1,144 +1,112 @@
-Return-Path: <netdev+bounces-141256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4CCE9BA376
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 02:30:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 270519BA37D
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 02:50:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DAEC01C20E05
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 01:30:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1D4BCB20BAD
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 01:50:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17C241CAAC;
-	Sun,  3 Nov 2024 01:30:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA935588B;
+	Sun,  3 Nov 2024 01:50:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TjNVQsZL"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LXlc3P0g"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f177.google.com (mail-qk1-f177.google.com [209.85.222.177])
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E402C2FB
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 01:30:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB7644500E
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 01:50:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730597436; cv=none; b=DKWTHoKfnL3NVDoRsR1DHJ6Gwqn+h+0wv2tJRf8028lli9JAAZDgwVOibJLD/pXCGt0o/2xdUC4E7ZWNZIJWQl/B5tKdLGSP2SIJNhKKU4lnjLsvb+eRldMimINcoslrqPciIwcg7PTELfasuqDeX7dcFcyOUok2g/HZrGzutw8=
+	t=1730598646; cv=none; b=CTonkNtGKUI12NlgQU3LJyQqQkmCvfprSEGANlAzVoyIsgkCzcGod8T1aAx8U4q+1jk6ghuf3YO6+q8gfJRKySZRtjoV3lCekWLv7K7+rn5nbWGfB9XoYlzoitQlBED0vDpqwatcDCEMB05bevOuUyGXt+3D/LgdnNNRC7aazpM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730597436; c=relaxed/simple;
-	bh=P0RJ9mzw08AOi4abG+5xsIbVMnLA5j+e5bSc57X+Sq4=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=g1TVSS9s+pcZXNQrJ64Y93d4gvyNFfQ1V1swwtUaO85U7YMZ0UXjW+zhT8N0ZHF7H+18oiX6H2BmHSlwWVbHhxGGi6pkjzHogYc44XjkQiMyvRKHXq7QKR52MIcJFLW9I94Tpm3Dt6Q7Ozj71wNCZ5mPGpCDXXqgX78FudR1i2c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TjNVQsZL; arc=none smtp.client-ip=209.85.222.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f177.google.com with SMTP id af79cd13be357-7b14df8f821so277591185a.2
-        for <netdev@vger.kernel.org>; Sat, 02 Nov 2024 18:30:34 -0700 (PDT)
+	s=arc-20240116; t=1730598646; c=relaxed/simple;
+	bh=EBs5gl7N93upcJIXXwrDgIci/YMFdfn4ptMpREAlBNU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ha37kYJuShonkj7D22mdJsSj6azLPgo1Ce/L74fSPE9FGRSuIseQBPRshJGgsBKjyYhLwTJyL0/relGMO1ACWPricXwqFvvzpEQfF9Xs5CElreRxKsvcg30piOoKlCKu340/M89Yi0c2gimWrg2xTUefGZkxsnMdrN6gl/JYzYA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LXlc3P0g; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e2e2d09decso3051277a91.1
+        for <netdev@vger.kernel.org>; Sat, 02 Nov 2024 18:50:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730597433; x=1731202233; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=841QDqoDbsBUo6+w55wSJ6n6FTRdoRriylyWyrz5PvI=;
-        b=TjNVQsZLOWuEiJWaJixdqUqtZMx72u2wRXysQNRHKQasL0fliAmmtHYRAYmEI0pOZH
-         O7W364lE53uflWwboOmnP9eCFVOWKDW78mgGgVQtbhFXo+YmPkMf1AikBHiIyigEzLjJ
-         pBk/kOvqsb6xsru7R6+wBHtgTxCRaqqMfGemXb8h0ByVOY95yvSEr4ZE2H1tHyemGZf/
-         OHuN7Z7s4STxPj6L3ZqwLGki9aBs3TDljk85o8gxh8Rsii2D0Q8jQDLPZJQrFZGObPPD
-         Az6WCgdOUgVprmSx6GSIskJFlxyGCS0xP++nhSqANEsr07qAyk6jb+H7xH8+CfDWldaT
-         xA0Q==
+        d=fastly.com; s=google; t=1730598644; x=1731203444; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=q3Pxis2muyr2ltVxVCPzj+ieXZtWSMkxjvBW6HHZ6bw=;
+        b=LXlc3P0g5MEdc8K1kdFuwNyOPNkFAOgp8kIPDHv8+1CIl85QEJOcfQv7Rfxty91uXE
+         an6DEgYGZjk4H5+fRP2wRojD/P6bMbkBP2cUxH9LrY3m4zXZWsHCp0Tvr9SbxniF5Bpc
+         E2K/xt3INbVVDmy0Cf7Ui33pRwmpwDQAFhKdI=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730597433; x=1731202233;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=841QDqoDbsBUo6+w55wSJ6n6FTRdoRriylyWyrz5PvI=;
-        b=dFPhJot+JsujrhuygbjWhimbeaZqT/agtFFh5GF07BxdVoORhY0px9MCKk5C5HOnib
-         tDRaNDoJbEPqUgNbGCg0RBTpFafozTEnqS59+iHposc6lYWLkfSTxpq49ZTW1UQkDtBi
-         iMghUkIjeEoIUJUBztAx3Zl9GXoBJhPPc/j0hsa2SEkW5YoQtvMGdkguQfj9XZmoI983
-         sQxT0Fc0uqh0mYFLncEODgqnyEAof/E43AEpe39D4TXWb2lhCgEG1PtWMS8OsbRxrC6o
-         3fZQysnDU6hM/e1z5uGBFfeLhA2wngnUiTYwDuZ+1wLSDp90jAFti1hdpr+wmflssjsJ
-         M1BA==
-X-Forwarded-Encrypted: i=1; AJvYcCUSGLu6HFN9jQxbm0/Zjh4pz2fPC+DZLD42sYX0HuofolGPr05p9UT8gYohaY0S51gaGaqE+z4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdaxvATwOwHiklhFPZLAKXrR5jUs1acUG+IkwwElbzd9uLKkE8
-	ej3LtqgJb/ELu3fBMBVhqW0u2rLv/fo6gVTlcfuMFDkzuu7PJM4S
-X-Google-Smtp-Source: AGHT+IFHJ8yH9kpfy6KQXp99Fi9XH90/9by7wEoXbCZcgptBvYbzhwTmxegeJLCaPgaL37eQl5uNJw==
-X-Received: by 2002:a05:620a:370c:b0:7b1:5424:e997 with SMTP id af79cd13be357-7b2fb978b56mr995170785a.14.1730597433353;
-        Sat, 02 Nov 2024 18:30:33 -0700 (PDT)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b2f3a0c199sm303430785a.64.2024.11.02.18.30.32
+        d=1e100.net; s=20230601; t=1730598644; x=1731203444;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q3Pxis2muyr2ltVxVCPzj+ieXZtWSMkxjvBW6HHZ6bw=;
+        b=ibpEbbHAzDDp22UZL2WW1tu/zF/INnJfIUBDUljxxuuaLLNJ8gXkUFoLZOEeqUMz8J
+         1MyrKBbR3gfTW7Mk0GojfgJb8Eaj7GhCDsNeElWdAR3bMvJKLD3RuOY8tm+xAZ5y7WMQ
+         uCwTpF69rXOelxHdCEBoZbbMpUsumcmVkRCpUECGhJtTg7gN3PhlZ2Wy+cGltA7LVp24
+         R+SBoCkrchw8lb6LfOkMVi3brx5b7b2gpfg35tVlCSLk/onPuPhrK3064sqJEdr17ZBR
+         pVyg4QW1pNnsT3SKd1aOxTzgfOrqmB77SG5H59tRqpASYomwzlozF2EPxhUTooekc8j1
+         ENIg==
+X-Gm-Message-State: AOJu0YzUPmVA2qQ3MTUHB4KJYzSAL4Aml37EpdOcNX3Fu8goK+zCUFxz
+	xTy+mtAx64fB0S9tVwihuFbQfouIpEWa3+t19sS1jqnCcPKcj5u4XTr7tLdAXfJn+gU8mdc4PSF
+	t
+X-Google-Smtp-Source: AGHT+IFsHnbXf1U3NgvkcpiLAfPsPJzjVhKBCWplOF+ORDTLneObrD4bFY9HYjBaYdBSMDye9dYOCw==
+X-Received: by 2002:a17:90b:1844:b0:2da:6e46:ad48 with SMTP id 98e67ed59e1d1-2e93e058c03mr16960867a91.1.1730598644112;
+        Sat, 02 Nov 2024 18:50:44 -0700 (PDT)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e93db1890fsm5002054a91.45.2024.11.02.18.50.40
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Nov 2024 18:30:32 -0700 (PDT)
-Date: Sat, 02 Nov 2024 21:30:32 -0400
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
- netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu, 
- annaemesenyiri@gmail.com, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <6726d23863738_2980c729459@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241102125136.5030-2-annaemesenyiri@gmail.com>
-References: <20241102125136.5030-1-annaemesenyiri@gmail.com>
- <20241102125136.5030-2-annaemesenyiri@gmail.com>
-Subject: Re: [PATCH net-next v2 1/2] Introduce sk_set_prio_allowed helper
- function
+        Sat, 02 Nov 2024 18:50:43 -0700 (PDT)
+Date: Sat, 2 Nov 2024 18:50:34 -0700
+From: Joe Damato <jdamato@fastly.com>
+To: Hillf Danton <hdanton@sina.com>
+Cc: netdev@vger.kernel.org, edumazet@google.com,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 0/7] Suspend IRQs during application busy
+ periods
+Message-ID: <ZybW6uMXrted0UGF@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Hillf Danton <hdanton@sina.com>, netdev@vger.kernel.org,
+	edumazet@google.com, Alexander Viro <viro@zeniv.linux.org.uk>,
+	linux-kernel@vger.kernel.org
+References: <20241102005214.32443-1-jdamato@fastly.com>
+ <20241102235121.3002-1-hdanton@sina.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241102235121.3002-1-hdanton@sina.com>
 
-Anna Emese Nyiri wrote:
-> Simplifies the priority setting permissions through
-> `sk_set_prio_allowed` function. No functional changes.
-
-tiny, only because asking for changes in patch 2/2: please use
-imperative mood: "Simplify". And maybe mention that this is in
-anticipation of a second caller in a following patch.
- 
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> ---
->  net/core/sock.c | 11 ++++++++---
->  1 file changed, 8 insertions(+), 3 deletions(-)
+On Sun, Nov 03, 2024 at 07:51:21AM +0800, Hillf Danton wrote:
+> On Sat,  2 Nov 2024 00:51:56 +0000 Joe Damato <jdamato@fastly.com>
+> > 
+> > ~ Design rationale
+> > 
+> > The implementation of the IRQ suspension mechanism very nicely dovetails
+> > with the existing mechanism for IRQ deferral when preferred busy poll is
+> > enabled (introduced in commit 7fd3253a7de6 ("net: Introduce preferred
+> > busy-polling"), see that commit message for more details).
 > 
-> diff --git a/net/core/sock.c b/net/core/sock.c
-> index 7f398bd07fb7..5ecf6f1a470c 100644
-> --- a/net/core/sock.c
-> +++ b/net/core/sock.c
-> @@ -454,6 +454,13 @@ static int sock_set_timeout(long *timeo_p, sockptr_t optval, int optlen,
->  	return 0;
->  }
->  
-> +static bool sk_set_prio_allowed(const struct sock *sk, int val)
-> +{
-> +	return ((val >= TC_PRIO_BESTEFFORT && val <= TC_PRIO_INTERACTIVE) ||
-> +		sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
-> +		sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN));
-> +}
-> +
->  static bool sock_needs_netstamp(const struct sock *sk)
->  {
->  	switch (sk->sk_family) {
-> @@ -1187,9 +1194,7 @@ int sk_setsockopt(struct sock *sk, int level, int optname,
->  	/* handle options which do not require locking the socket. */
->  	switch (optname) {
->  	case SO_PRIORITY:
-> -		if ((val >= 0 && val <= 6) ||
-> -		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_RAW) ||
-> -		    sockopt_ns_capable(sock_net(sk)->user_ns, CAP_NET_ADMIN)) {
-> +		if (sk_set_prio_allowed(sk, val)) {
->  			sock_set_priority(sk, val);
->  			return 0;
->  		}
-> -- 
-> 2.43.0
+> Pull Kselftest fixes from Shuah Khan: [1]
 > 
+> [1] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?=7fd3253a7de6
 
+Your URL is missing a query parameter, id, and should be:
 
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/commit/?id=7fd3253a7de6
+
+which is "net: Introduce preferred busy-polling", and so the cover
+letter is correct.
 
