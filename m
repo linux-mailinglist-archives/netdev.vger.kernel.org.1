@@ -1,81 +1,79 @@
-Return-Path: <netdev+bounces-141299-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141300-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64C809BA67E
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 16:57:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C6749BA680
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 16:58:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2AE87281880
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:57:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C3FA281788
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4003D17C234;
-	Sun,  3 Nov 2024 15:56:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E31216FF44;
+	Sun,  3 Nov 2024 15:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="qWAQLDDM"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Fa7bho5a"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f173.google.com (mail-pl1-f173.google.com [209.85.214.173])
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 155AD171A7
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 15:56:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 633D4E552
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 15:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730649412; cv=none; b=JalFgx8y+LAiVXqLP1Itq0SgUamEKwcfGklQPvvOopXf/Y7yPE+iEUJ6IkQ+lWBArLx7G8yy2xPgw0bmiPuOmCDbHR05cVOP/sFMA44N4Tr4ftMOLec287ugYfhM5pTQK8OTQgVHkJl5YPibwzYno411JBe7q7Z6xOTLsUGMVtI=
+	t=1730649497; cv=none; b=NUWZot4W4i89gsZ1kbTugs6E89dVl2/px9jE7Fr7ay+Zst/0Yovz7kkgENFwbxFdRktdkmGw6vfFfw0aqZ4LF23GkkQg/zLPIYYW5KwdMFjqCosoBU5jMnQqz6d1i1Rtzjloajsk4z6PhWaKctRbvRmkwOtVbI9ys8lhmzJ9l8Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730649412; c=relaxed/simple;
-	bh=uVOvzmrL2uIusu39TcWvWL2OuxpPp/4jVn2IhKZtRzw=;
+	s=arc-20240116; t=1730649497; c=relaxed/simple;
+	bh=HWBgZkUmPVzrloXfNapbzp7PFPfVFmC8qPxNcKxNmu4=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jn0za7JBmax+Wh1R2d/6WrG8a8isA/jjMtF0H9hNJbd923ugPfUw+mDL2o1UGanG6EmXCVlCd4GKgQS/KqIGIgvI/cCxqx2YGQjcuGfUito6WpUJqo9gq/lOJXYXBSN+Tn9dVa7eFNqXBQj40LK1Wp8T/Kr6ntf+lygHBcUQtNY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=qWAQLDDM; arc=none smtp.client-ip=209.85.214.173
+	 MIME-Version:Content-Type; b=c5htJknQCW90HRVAWK4usmNo2UkeLYgIuNOQ7j5+GV9+qSWrPP8KBWnW05lghSq3gBLKn4+n4GpuVcXvQ9fnOs6G4U1GxsVoZ+qwNME08xHWZGg9f4Wf3W+g2L0xn7DeDhNTz1HgpNigNdq0Gx8HiND+4vuL7RPTryIvUknFnPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Fa7bho5a; arc=none smtp.client-ip=209.85.210.175
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f173.google.com with SMTP id d9443c01a7336-20cdbe608b3so33788445ad.1
-        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 07:56:49 -0800 (PST)
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-72097a5ca74so3193787b3a.3
+        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 07:58:15 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730649409; x=1731254209; darn=vger.kernel.org;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730649495; x=1731254295; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=fWoKw7vMI1rbINkCOXeNFSSiNKHto7EpBf34+HGBMqI=;
-        b=qWAQLDDMThA1GZPB6MreQ2F9iq5aqlDiZ0SgZdNIVsi+dbeU/o9PioNpPdog5Rlydk
-         yVpWldIYmMMTuQJyRUafrMEIV+an4MIIuNU5wePjCPhrYSMgrsKY2GuxAM9qsh+KwEOr
-         A1cBQTGs7Bd9c3HlWz1oJablwoNZZmco0fc4tGuK4maEO/JS5WCG3U2DXk7eiaxM6f10
-         GWjC/BsRpZkboVnHcycTPauH19UzPP6MexhbPGumvhKxYDY6OMfIh0Utu0rDIfR4cNMv
-         /LlS1I8+DNHGPW2zLPLx7DRHM0dg3w5uyGUth5m+6IZG/DSzR5/Q+Ma9xSfuE6mlHo3P
-         GFSA==
+        bh=3383YEtkHYFgNHw9+P2FH1a9C7KzEvqX5tXyfqkibcg=;
+        b=Fa7bho5aw53/PZxi2uHqebCTKZWR8mPuXRS81TQmb8HihlkqkZ93WzoqEarrXZd4tq
+         NbmaEMK2/iovxdj4L//NFzRXdMbSS5gsKla9d4aIk2vErkucoe2twIRWUA2ei3xAyrIm
+         G30xijey/VD0NW9pkVEq7Tdkvws/51QDv+7NSksFzYGBoC5guhrmTqjeOks+DYCacDqi
+         BIIxEFJrL0tjo9sxYbQlN8C7U1ABB9M9z22GIE7XZC8jX8t6zpScM/CRAzL0zorzVcrk
+         gMjckBywJo+WzFYFIgG+UtKrjwtlo1yVxoxcigGkXQfcK2pXzHjUffS0RUnqvXseya8O
+         jajg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730649409; x=1731254209;
+        d=1e100.net; s=20230601; t=1730649495; x=1731254295;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=fWoKw7vMI1rbINkCOXeNFSSiNKHto7EpBf34+HGBMqI=;
-        b=N6B+NeMuZa3r5g9rLer77wrr+piXiVj2JFHvgG8m9m8DfLjXI+3oUltwX5Ub0VekOl
-         3NsjmwD8Fgjmv832h88wCF+PZf5OQAWwuOU1KyFTCLgZFonN+M4Yz+ywF7OUxXdtyncW
-         SrdHZFeWTJlIMXoipHecArx8xUgjIxlALxisaa87TQ92RfQ0TwZyeRxUMF7lMZX5Ah7A
-         /j1BKapL+Hf+rf7kgNCsOs6cBJsD9ac9ObOJlllGNfxHzYtIkLCiTi1IJK+a7BZz24CS
-         +ygrCKU+laO0ouheKmJtozYnyr6d8qFQdiMxS+Eann2xRJKESyLx0Udzoa87SyUdCcj1
-         RFeA==
-X-Forwarded-Encrypted: i=1; AJvYcCXow6epr3YMPgUTceAJK8aVklT3RPLnrSs77JCIe/AAauzkZLyQnLGQ88cU/wSM9TfV22MNfSY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNpRXnPnNAz/aR8XARnu5rlDO/MEUtzV/jEJ16mrEeWLOp5/J6
-	BOGcQvk4DsT5husJpuAoEP430TTX0bmKeCmOqTPOwF0Aa3pCt50pRtn0NTfv6mYmEuDwzM3w8LW
-	j
-X-Google-Smtp-Source: AGHT+IHdkpnsKG34/WhfzO/ZhrAAIRqj/1Sq9XfhRTB+2YYyA1OkqIBl677gzzjYRbNN0C4njw2pbQ==
-X-Received: by 2002:a17:902:db0f:b0:20b:65d6:d268 with SMTP id d9443c01a7336-210f76f53eemr242270345ad.53.1730649409328;
-        Sun, 03 Nov 2024 07:56:49 -0800 (PST)
+        bh=3383YEtkHYFgNHw9+P2FH1a9C7KzEvqX5tXyfqkibcg=;
+        b=MmcymaFA2FLYNBrmAvhf9fP4YcMvqegomLa+Tbd4AmgrVw/IFBfKxLVcfw211Vd8H/
+         meigoEavLOm6G2qlRo6sJlg763mrHMMJHgPjR9VCibsJd8jblXYP8UUPQYnSPbyCl3Vb
+         8RMnRN6ktmG3g/s57Oh4P7+WoJp6cvc3c4DCNn0/og3vvd2afcvT4/SVUl7svOy1i/R1
+         /6ocXI8yWYpEzB3uLEQLxcXuLcbnbCdR4x0QLmvkMIVTMcOGxXOEH3pNHj6kh+gr5fMY
+         fkh9/XOrOmsrXeRvwcsytwecWcdB+84Upz+ZrkrWKdhWn4+hWsUeeOU0pZ7N0vAxbp6c
+         uYow==
+X-Gm-Message-State: AOJu0YwjNY11ESKJDVC2bDWq1jO5lYSzeD4gejvYT9h96KAl2UGfolmI
+	1ZhVsWTobClZde24Oagk7jv+hdXCshp6chaRXEvKZ5P8RX+tsQDcHW9aD8SkU3g=
+X-Google-Smtp-Source: AGHT+IED6uEn6rcGyC9hFTv8HSaQG/xUwUPikcWeNYMIyCKjcFTuPEbFtWPZ1K866xL2UTbIWlls2g==
+X-Received: by 2002:a05:6a00:a8c:b0:71e:13ac:d835 with SMTP id d2e1a72fcca58-720c98d0dabmr14344348b3a.11.1730649494734;
+        Sun, 03 Nov 2024 07:58:14 -0800 (PST)
 Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2110570815bsm47320175ad.91.2024.11.03.07.56.48
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc31b40csm5667334b3a.209.2024.11.03.07.58.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Nov 2024 07:56:49 -0800 (PST)
-Date: Sun, 3 Nov 2024 07:56:43 -0800
+        Sun, 03 Nov 2024 07:58:14 -0800 (PST)
+Date: Sun, 3 Nov 2024 07:58:09 -0800
 From: Stephen Hemminger <stephen@networkplumber.org>
-To: Denis Kirjanov <kirjanov@gmail.com>
-Cc: dsahern@kernel.org, netdev@vger.kernel.org
-Subject: Re: [iproute2-next] ifstat: handle fclose errors
-Message-ID: <20241103075643.03cdd7f9@hermes.local>
-In-Reply-To: <20241101110539.7046-1-kirjanov@gmail.com>
-References: <20241101110539.7046-1-kirjanov@gmail.com>
+To: Bjarni Ingi Gislason <bjarniig@simnet.is>
+Cc: netdev@vger.kernel.org
+Subject: Re: dcb.8: some remarks and editorial changes for this manual
+Message-ID: <20241103075809.199df5bd@hermes.local>
+In-Reply-To: <ZybRdNeIHWohpWYN@kassi.invalid.is>
+References: <ZybRdNeIHWohpWYN@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -85,13 +83,24 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri,  1 Nov 2024 14:05:39 +0300
-Denis Kirjanov <kirjanov@gmail.com> wrote:
+On Sun, 3 Nov 2024 01:27:16 +0000
+Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
 
-> fclose() can fail so print an error
+>   The man page is from Debian:
 > 
-> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
+> Package: iproute2
+> Version: 6.11.0-1
+> Severity: minor
+> Tags: patch
+> 
+>   Improve the layout of the man page according to the "man-page(7)"
+> guidelines, the output of "mandoc -lint T", the output of
+> "groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+> conventions.
+> 
+> -.-
+> 
+> Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
 
-I am not convinced this is worth the effort, especially
-for files that are /proc.
+Thanks will pick this up in iproute2 release
 
