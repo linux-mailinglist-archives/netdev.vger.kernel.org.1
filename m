@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-141317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141318-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A82419BA773
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:40:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 70A189BA77C
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5B6E11F213EF
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 18:40:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1465D1F21414
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 18:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 704341411E0;
-	Sun,  3 Nov 2024 18:40:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0877188014;
+	Sun,  3 Nov 2024 18:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="s7CJ+g6D"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epXc8mpm"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9BEF4F1
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 18:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB5B1EF01;
+	Sun,  3 Nov 2024 18:50:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730659220; cv=none; b=N/AWc1E5hdd6+wC5CEriQq+3WAcUUDq8QK3vaunECSDVsQx5w8Ycf2yV6NnRWWy2ik5wGcmHfu3zU0uCPskMPx9+oLcl8nW8aRHjp/o0kiqBW3Vd9ZcgLgiQuid43z5dv/BghDqj0Jb2YOz5z45wGaN2KIC45T4KZy66l7hqbSo=
+	t=1730659821; cv=none; b=EyddzOyILq2YCddkLRiU1n/+Z0K3K6zZI3asBTF0Pua86+6FQ05pw3tXWt9HFyn37Cufo2WqXelB/wJ0zjRVF4O276WSN73JoRkoAfSkhFkCh6XT6j69k4Tl/X23/+pymrIaQWsGzW4m6tpHXdDNKYmhphUWgdXMmRvl6nFUwHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730659220; c=relaxed/simple;
-	bh=r5bBA75ah/CJeVvGl/rzULBM6+fhFadfQCdHZJ4czNA=;
+	s=arc-20240116; t=1730659821; c=relaxed/simple;
+	bh=ArlCszO/6ZYqC0Nxcu1SiuF9ped7P1H2Pv1TYd1KdWQ=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=aSQD3tSvyqKul6COk6Gu5l3x7sADpwl8MHw6uvA0nTUkvvXc55t+DnyZ2sVhK3QlK25P7RJBNLNKB0j52YQSATFihNH0dZVgJvKLqH15cfVWNLkOFV8zC6unsgfo7brhIns3ShoTTD45TnLT0Hl43B9Z4W1eAKZnjd2ee2UMrkY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=s7CJ+g6D; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BCD4CC4CECD;
-	Sun,  3 Nov 2024 18:40:19 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=b7wcIIYRpRCXwu7iphQaCz/AEa/IT1FkFeCeHjFL4qnjLfspzfDr8FXuWUbhV2rXAnkQYyV0BTD39UzddPJRxhqlf8X8uZ3WjUUP+Dv5iLfWsE7TdukRE23gXIoQHm2lt+SsNKUSMseQ1+drjKguFoK/8MiOQ0PYvMqEScLft/U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epXc8mpm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B427C4CECD;
+	Sun,  3 Nov 2024 18:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730659219;
-	bh=r5bBA75ah/CJeVvGl/rzULBM6+fhFadfQCdHZJ4czNA=;
+	s=k20201202; t=1730659820;
+	bh=ArlCszO/6ZYqC0Nxcu1SiuF9ped7P1H2Pv1TYd1KdWQ=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=s7CJ+g6DdRHIG+hQDX1TEIFS2F+bvStRAlVHQ+Ls+ZNXQZ0QIuHDLiSCYGaAbMGZW
-	 eATOJIxFIdRjQQIJVmlkbaeyCL11WnkbGO8V029old43rk6g4mewsAGxB0z88HM8qc
-	 N+uJeOXmgogICKb/upOfrftCxTsgwOd+N/pe61tD0CPuC/4SevbRqcpViOhH+6f/dB
-	 jSnsImx4KT9yPLYc8e+kLhorigP6KXAHD6sIGBSbLjlN1XFOkMcja2UjqYmYeh3ICU
-	 U/bUfw32YtLl6ulOgzyrh8c0uvAOyQXTjOVdKONpMs3I0FTgxiE7epRd0zS+mGtjhB
-	 tzjuA0HY8ECuQ==
+	b=epXc8mpmbu1A3yIV5gwMiNlU9xSL9I1R53e+fQrOJcA+pIN824jx7zjW/m8aeLeUD
+	 nyZF1egnapYatzemJSJrQXccCjWpC41R+l+j9fMug8i6OLlVusRM0CTtZUQEZIuBGl
+	 2JUK+5865rC0qKekc/0XlTpMx8/HfCmaklhz0+JFl5pueyd3OGCus3fwQavXSfyh0F
+	 MumenGzQl+y5dMc3XDXcBEPrDjbF48Sz5P9cDu4Jv2efcT3vEZq8WBZXCvB1W4M35h
+	 Y+Dc8H2gFYbuH2kLrEGbqrld7XgTRmd7mrXiAg2DWVbH37RKbmFJ4JmcgEMafmoERD
+	 cwor3islUUJNg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70D4A38363C3;
-	Sun,  3 Nov 2024 18:40:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCF038363C3;
+	Sun,  3 Nov 2024 18:50:29 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,38 +52,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH 0/2] Add noinline_for_tracing and apply it to tcp_drop_reason
+Subject: Re: [PATCHv4 net-next] net: dsa: use ethtool string helpers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173065922825.3229475.14917431772969917056.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 18:40:28 +0000
-References: <20241024093742.87681-1-laoar.shao@gmail.com>
-In-Reply-To: <20241024093742.87681-1-laoar.shao@gmail.com>
-To: Yafang Shao <laoar.shao@gmail.com>
-Cc: edumazet@google.com, davem@davemloft.net, dsahern@kernel.org,
- kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org
+ <173065982851.3230954.2623889336248911818.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Nov 2024 18:50:28 +0000
+References: <20241028044828.1639668-1-rosenp@gmail.com>
+In-Reply-To: <20241028044828.1639668-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com, andrew@lunn.ch,
+ olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kurt@linutronix.de, woojung.huh@microchip.com,
+ UNGLinuxDriver@microchip.com, clement.leger@bootlin.com,
+ george.mccollister@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org,
+ linux-renesas-soc@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 24 Oct 2024 17:37:40 +0800 you wrote:
-> This patchset introduces a new compiler annotation, noinline_for_tracing,
-> designed to prevent specific functions from being inlined to facilitate
-> tracing. In Patch #2, this annotation is applied to the tcp_drop_reason().
+On Sun, 27 Oct 2024 21:48:28 -0700 you wrote:
+> These are the preferred way to copy ethtool strings.
 > 
-> Yafang Shao (2):
->   compiler_types: Add noinline_for_tracing annotation
->   net: tcp: Add noinline_for_tracing annotation for tcp_drop_reason()
+> Avoids incrementing pointers all over the place.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
+> (for hellcreek driver)
+> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
 > 
 > [...]
 
 Here is the summary with links:
-  - [1/2] compiler_types: Add noinline_for_tracing annotation
-    https://git.kernel.org/netdev/net-next/c/a8f80673ca0d
-  - [2/2] net: tcp: Add noinline_for_tracing annotation for tcp_drop_reason()
-    https://git.kernel.org/netdev/net-next/c/dbd5e2e79ed8
+  - [PATCHv4,net-next] net: dsa: use ethtool string helpers
+    https://git.kernel.org/netdev/net-next/c/f12b363887c7
 
 You are awesome, thank you!
 -- 
