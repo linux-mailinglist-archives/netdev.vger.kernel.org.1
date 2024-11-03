@@ -1,60 +1,58 @@
-Return-Path: <netdev+bounces-141335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A259C9BA7C3
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:55:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0895C9BA7D9
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 21:15:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A5F51F214EE
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:55:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C57B1C20B0A
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:15:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA252189F3E;
-	Sun,  3 Nov 2024 19:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43892184101;
+	Sun,  3 Nov 2024 20:15:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="KaBKBSiK"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JowD/RBV"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA67B17DFF5;
-	Sun,  3 Nov 2024 19:55:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 199BA60B8A;
+	Sun,  3 Nov 2024 20:15:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730663750; cv=none; b=sZmX0tvTsYmqykq1wm5SNG/CHHTZj6spSnmTl8gkGs8qwQ6TmRyKGkyHrb3h2QKueG+yvd6k3XT5i/2naUfSlu3YyF7AY663C3S0GVEvg/czhgltaa1sXGG+tWfpc5hGPvnai7sbfLYrMR4GayPX3lTjZIF6HrAupVYoe8AxVRw=
+	t=1730664949; cv=none; b=A8VTnWopkZT5IclJoDPW5IKb9gwN6S4uC3H/P5wt+nQD2VQvxUzCHEoa3xccV0F6cqAMGMnkNKTVwl66TUzvh00zSHlStH/542/ROon51xg6Mcr45Cke9oSc8q9COJOlMozJQY+RJ3QOAKdony9CxpadNE76ZFs9Yu2kDXR7TwY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730663750; c=relaxed/simple;
-	bh=CkuDlYfKZOxDpFjnDLG0+0sTCT27qXAWrvfalxB7i1w=;
+	s=arc-20240116; t=1730664949; c=relaxed/simple;
+	bh=JYx0++DsQhkaj0R7/VrTnd8TLChmbWYEn5/kLjsSFkM=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=h0Us+6CllReudhs9/Q51ZbQ4iEOj9cwitPH8f3FG9bfOZYLU2eU3dvUSBSb0gNupF+n5J7NVtKBTRjQDQfN8/YJ3aQCAVCEKWB0l7TE1+3uE3/kcQYPsAn/FogJGi6+iKuROJvtdx2JkbyFjVzSACafqzv+c2gbdCScZ9ZnxsHM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=KaBKBSiK; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D43BFC4CECD;
-	Sun,  3 Nov 2024 19:55:49 +0000 (UTC)
+	 MIME-Version:Content-Type; b=oLwuxUZAiO6niaIfp2Ibt7EODJ6Zo1ZgR8Gour/HKJdhNJk8ko2mXrFNETgb0zNB3Et8ZV/MyCZ7HyNYzDYLtXBEnPPs1QxQqcbTDywBrhLtP+dJQN+hnhNvz3WQbxHAPz27SYat86ILObXc7Xy3bPRbbKQ/Fh4kMJtlYulNTKA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JowD/RBV; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E21BAC4CECD;
+	Sun,  3 Nov 2024 20:15:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730663750;
-	bh=CkuDlYfKZOxDpFjnDLG0+0sTCT27qXAWrvfalxB7i1w=;
+	s=k20201202; t=1730664948;
+	bh=JYx0++DsQhkaj0R7/VrTnd8TLChmbWYEn5/kLjsSFkM=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=KaBKBSiKoHtHLChxibTwcWccAJHnIEMljcbjsJ7EDA+FY/K2Kr6PJNQAeZte7CuIu
-	 xvZgDLVg12KH2yp0tkwfjZRyTDnn9KBNOqgnkHqnbmUihMCjLUq7D2lYjW+7iBNmN2
-	 JScF8bWY5RX/Ou2NFGg+3iGHW7iZjYTmwzTqfcfRgBFa3LS09gvCEMcnnFcPvBMCF/
-	 sxSkOFBCe6TNN5wtLyxrB3TUge2+WTngtBua8AvKOzu2lLo/UmxqGqxNeHdR8s4wju
-	 MalhcsPrwJV8HulQ2jFgrknXMD1Oau9VhCHq+Dfyi7BjQkltoxXil1NGV58I0/l9+P
-	 obhZj9NPl7odQ==
-Date: Sun, 3 Nov 2024 11:55:48 -0800
+	b=JowD/RBVPwi+lfNRustCYC2XWJXbH3lOUvg/N4l04sQENJZV0EhdWIHOcdDpwNSwF
+	 4/WUt9/US1So/cF18yZX59P+AWLJqIRmd2aQSvAiXWWEeJvhOrRpA4w7j3yTWI7Udw
+	 9uDvvDek3045ped5fTuEmOYaE6RGhTDk+Ogo0hx98DnSLqO3v8PLqu8bTxnMfE2AB0
+	 0+v27gZo4Z09tEzXQvePTW9gv+vK2zjugv5RPuFmhLS3zxmgOIUZp1X8xWPWgJR712
+	 AaeVUtsT/4f3IyueA1z+NPaXRJneMiWDGoOWvEQuyDmkFB/pL4yD8N5epJF3dz6O6U
+	 Kzya8falpmHyw==
+Date: Sun, 3 Nov 2024 12:15:46 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Linu Cherian <lcherian@marvell.com>
-Cc: <davem@davemloft.net>, <sgoutham@marvell.com>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>, <gakula@marvell.com>, <hkelam@marvell.com>,
- <sbhatta@marvell.com>, <jerinj@marvell.com>, <edumazet@google.com>,
- <pabeni@redhat.comi>, <jiri@resnulli.us>, <corbet@lwn.net>,
- <linux-doc@vger.kernel.org>
-Subject: Re: [PATCH v4 net-next 3/3] devlink: Add documenation for OcteonTx2
- AF
-Message-ID: <20241103115548.35d0cbdf@kernel.org>
-In-Reply-To: <20241029035739.1981839-4-lcherian@marvell.com>
-References: <20241029035739.1981839-1-lcherian@marvell.com>
-	<20241029035739.1981839-4-lcherian@marvell.com>
+To: zijianzhang@bytedance.com
+Cc: bpf@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ horms@kernel.org, daniel@iogearbox.net, ast@kernel.org,
+ stfomichev@gmail.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v2 bpf] bpf: Add sk_is_inet and IS_ICSK check in
+ tls_sw_has_ctx_tx/rx
+Message-ID: <20241103121546.4b9558aa@kernel.org>
+In-Reply-To: <20241030161855.149784-1-zijianzhang@bytedance.com>
+References: <20241030161855.149784-1-zijianzhang@bytedance.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,14 +62,18 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 29 Oct 2024 09:27:39 +0530 Linu Cherian wrote:
-> +   * - ``npc_def_rule_cntr``
-> +     - bool
-> +     - runtime
-> +     - Use to enable or disable hit counters for the default rules in NPC MCAM.
+On Wed, 30 Oct 2024 16:18:55 +0000 zijianzhang@bytedance.com wrote:
+> As the introduction of the support for vsock and unix sockets in sockmap,
+> tls_sw_has_ctx_tx/rx cannot presume the socket passed in must be IS_ICSK.
+> vsock and af_unix sockets have vsock_sock and unix_sock instead of
+> inet_connection_sock. For these sockets, tls_get_ctx may return an invalid
+> pointer and cause page fault in function tls_sw_ctx_rx.
 
-How are those counters accessible? ethtool -S? debugfs ? it should be
-documented here. Plus please add examples of what such rules cover.
-"default rules in NPC MCAM" requires too much familiarity with the
-device.
+Since it's touching TLS code:
+
+Acked-by: Jakub Kicinski <kuba@kernel.org>
+
+I wonder if we should move these helpers to skmsg or such, since only
+bpf uses them.
+
 
