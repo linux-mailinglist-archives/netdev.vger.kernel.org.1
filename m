@@ -1,55 +1,59 @@
-Return-Path: <netdev+bounces-141296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141297-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 942009BA670
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 16:41:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E2639BA676
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 16:54:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C50C81C20CBD
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:41:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BEF011F213DE
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:54:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 542D1171E6E;
-	Sun,  3 Nov 2024 15:41:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCACB176251;
+	Sun,  3 Nov 2024 15:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="eCTw92J8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="uowakQZC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3036915D5C1
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 15:41:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3E5816EC0E;
+	Sun,  3 Nov 2024 15:54:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730648478; cv=none; b=unfIPhxKGzZ6/c3Rru/zYaoGvAXmhy7FABDNP0v5Y99tzEvROUuSHh6VDkjWFQUtM0+j/N3Mfdd0RmeBq/pqGcHTeQ4CfZeBSOP/ErTCSXUXF6dDNsXOhzvwASnSfDH7AAI0xv+wr7zryBTqlKdebVL9laox+mZFim7LN5TalaA=
+	t=1730649251; cv=none; b=E7XLcQWOmCGGFqkXaDLlx42bVP7L6CjJOrEFOXoOOoFaHRJzbhwySLC++jJ9YqsxqSD/SKk2VTNpSwYl+n2Xqbg8/EflA/cV5k0DXBasWk2eEp0WWbhj/3nQ9/E0NsYjD7/GjLb3pjOdcRHR9KpMVy2EAVdneDzQERyByUnFJ0I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730648478; c=relaxed/simple;
-	bh=mq+a7uap3x7ge3zppShRWYFEV/6PsH2++2hZs2HurQE=;
+	s=arc-20240116; t=1730649251; c=relaxed/simple;
+	bh=6sv0lXKBraM8bsqSE/nFJD8+HhevcGipFf9cWOaUdqY=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tdWDCXsOzdru/rLhvNUy4dfyfMj8LjzyNzhh2/yy1A7mrJnq0xI2m4Pq/9iHfaMzElYCsIW6Y10Mne2TTwGTbgQ9c0yNbik4H+dKJ3PO5OMjvfj9DzKgROk/8n1/IFeIve9rqZNIv6tH6oUY7e1stIjbSR2DEGKEg3OsbIyyDPw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=eCTw92J8; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 21A92C4CECD;
-	Sun,  3 Nov 2024 15:41:17 +0000 (UTC)
+	 MIME-Version:Content-Type; b=Ca0xTzvnOzF/x+FaluLOIQgb9skYHYHpGq3WdHNRqINakdgS1oVB06MbGpbQqh5vS8iBhySCQEJfZDisl7fFr9ABfdBIR4Os/bbfr+UAxUAgSxBx5m86jtzBTNHrb72kTlqXxyykiKnVGCJS/WWcostmCbxBPUhV5bcd10+Egmo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=uowakQZC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 992F2C4CECD;
+	Sun,  3 Nov 2024 15:54:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730648477;
-	bh=mq+a7uap3x7ge3zppShRWYFEV/6PsH2++2hZs2HurQE=;
+	s=k20201202; t=1730649251;
+	bh=6sv0lXKBraM8bsqSE/nFJD8+HhevcGipFf9cWOaUdqY=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=eCTw92J8cC4RlQSpzmcVor+6yfmESoPFfMzldOwYgbzLkKg9sX3CMSKca9foUDahZ
-	 oNCR43h9mPnC9RTNLKys3UYq2AFaDyVX5cjBCxjKe+2/c8YFrnjNMDeJqi66WLCLJK
-	 WhO9XCWFwolYGiFZH68XOzY3fW6T7UVybFH0/yEQXb3m5Bs9/hTPXDqDb/H2UYdbo1
-	 agzOQdpgwGYJzZB1TDFBWunlHysLeCqRVkhzaRbOFADKhlcgqG3G75Tfd/GqKZRy0U
-	 qE2UmkbB3SkRkAApMUOqY9Xz9l7XMT6mAXiBUFoaj7pHYy2gfBu3V9oi2kPy/DM2v1
-	 dWWCAMlwIOycQ==
-Date: Sun, 3 Nov 2024 07:41:16 -0800
+	b=uowakQZCdEqIfu957nYgHU207R/xlNLbUI09F1zw5JJfhQ/3seYpZlwkxaArTbc0v
+	 i4GGtrdTZXrlKXuaguq7Edh96jPNf1xyHJbxxcrLjUx7W46RqjLcwyQBywQh+lfBit
+	 yEOkn+s01suVXWQ3byl4F2G5mxEb1nDAsbOA9ZDSQvZctM7StOQwPh5njr7vcClBNV
+	 1xhgDy80svDKlyw9hz66UJZB/XIFtJ5A+hbC8+E/c60LxpUYlJuLUYVp32XYzAh8/w
+	 oERRbgzQDIHySFemb69i/NhLKNlKdEchxIcwQx+y7UYyBsYajhPnmQAWHOsGHSez/N
+	 o1ctFPLUlIDhQ==
+Date: Sun, 3 Nov 2024 07:54:09 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, edumazet@google.com,
- pabeni@redhat.com, willemdebruijn.kernel@gmail.com
-Subject: Re: [PATCH net-next v2 0/2] support SO_PRIORITY cmsg
-Message-ID: <20241103074116.2061b6d6@kernel.org>
-In-Reply-To: <20241102125136.5030-1-annaemesenyiri@gmail.com>
-References: <20241102125136.5030-1-annaemesenyiri@gmail.com>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: davem@davemloft.net, michael.chan@broadcom.com, edumazet@google.com,
+ andrew+netdev@lunn.ch, vikas.gupta@broadcom.com,
+ andrew.gospodarek@broadcom.com, pabeni@redhat.com,
+ pavan.chebbi@broadcom.com, martin.lau@linux.dev, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net] bnxt_en: ethtool: Fix ip[6] ntuple rule
+ verification
+Message-ID: <20241103075409.0d31e277@kernel.org>
+In-Reply-To: <219859e674ef7a9d8af9ab4f64a9095580f04bcc.1730436983.git.dxu@dxuuu.xyz>
+References: <219859e674ef7a9d8af9ab4f64a9095580f04bcc.1730436983.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,16 +63,12 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat,  2 Nov 2024 13:51:34 +0100 Anna Emese Nyiri wrote:
-> The changes introduce a new helper function,
-> `sk_set_prio_allowed`, which centralizes the logic for validating
-> priority settings. This series adds support for the `SO_PRIORITY`
-> control message, allowing user-space applications to set socket
-> priority via control messages (cmsg).
+On Thu, 31 Oct 2024 22:58:30 -0600 Daniel Xu wrote:
+> The reason was that all the l4proto validation was being run despite the
+> l4proto mask being set to 0x0.  Fix by only running l4proto validation
+> when mask is set.
 
-Could be a flake but it seems to break this test:
-  tools/testing/selftests/net/fq_band_pktlimit.sh
-with
-  # unexpected drop count at 3
-please double check if you see this failure.
+Limitation is odd, but it's not a regression nor does it violate 
+the uAPI so I think net-next would be appropriate, no Fixes tag
+(you can say "commit xyz ("..") added.." as the reference).
 
