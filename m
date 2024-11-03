@@ -1,94 +1,143 @@
-Return-Path: <netdev+bounces-141367-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141368-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1825D9BA963
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:51:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93C479BA964
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:51:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0617281365
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:51:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AC8428139A
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C218198E81;
-	Sun,  3 Nov 2024 22:50:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC9C018C90E;
+	Sun,  3 Nov 2024 22:51:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HqqTq/04"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Rb1aC6CS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65ECA197521
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 22:50:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFDF18BC37
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 22:51:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730674231; cv=none; b=uQ8sM7pCpdaFW2NK8eDyT/7C5WiwaByavUlOwhwQTpNZmiPIs0rwdjxnBbmJ+zueQl5MMTMVQE0/xC/5CuZIZGJJknytWIH7+Z3yMq4Gpf9UuOFbhQsiPbOy0ZNt3bO4ap4xyIX4qX6sQ6KZ7+xt+GdCdHX/8TWvHcpPbo1iG0M=
+	t=1730674261; cv=none; b=uDL16ubQrTZj8pdnegYkRUTG7juCurnhiChw3A6FBWp4TXHWdx1/0xXXU4PjZHjw7QjibCLCCEmyfAg8/HL/EnSIAglgPnZeYeUBZ5O7k6a0O9SelZy+LzpQFN76ghcnn6PuDoFd+1/eeT02PVYYmmN/xylWh4+JTG5/CJQRNNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730674231; c=relaxed/simple;
-	bh=pOSKcDFC1qAmrlBfAnoJwQPnJbCAURA9aAKNg4qaDXo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=EKtHt5zeBIy5wjyjINTnaMcW4s6tawUxPYQTo0bpZV04prtANcoUVvbk793yw2N7nQxLGK4v7EEiTJkItQFqoT/6IfRptuA0BhQnB/pB+eMv2KD4+utyQh08Onoqxs6ECxE3mq2OZxeCgunGwDPHmUk3tbEATnuLYsS9Z0fmj8w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HqqTq/04; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EAEC6C4CECD;
-	Sun,  3 Nov 2024 22:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730674231;
-	bh=pOSKcDFC1qAmrlBfAnoJwQPnJbCAURA9aAKNg4qaDXo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=HqqTq/043YQKPY9Q0c2JNW4w/d50hdquZ0kQg81QnlK7dsphqtBMSmwvz8c3K8ZuX
-	 rCUlfF7cFPegpkw9w3KRMY3xrV65wgTPAo/6JqWwRik/shQNhWL6QfOIYyN0tH6rYT
-	 n4AxlliPk/qIdlp3EwB8KKZOgarFUJinaPFugEgba95mZ2g6kpi7H628Yb6Ct1o+GO
-	 nc2l7qqFT3711stqw7FHqQVkSWwXcf/N9H5/dwmUSQcW/0WatqFh2kzEOdpfaFNzll
-	 0Vq/nycftxfcwP8/gzh8oUa+trKorDWfToHa5QTklwKYptqtwuKtB8f/yOvGIJZYCQ
-	 oIdUFX0YXshRg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADB8B38363C3;
-	Sun,  3 Nov 2024 22:50:40 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730674261; c=relaxed/simple;
+	bh=vbZ+uzGqdW4hX03Xi3d7fgtT2grFuBySNiXCV4fiIF8=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=WNQ5Jq16LQ8Q2tHyiOQEU8T5u3ZdfBoHF1Cv1YHy8nmCc3DxjSpuBEPtzhSRXV19CkSOIJHxULAbVDzvm9M7C7II9UO8+ac7mD/DSBscGOt29fGFgsuMRKIkeVDSHT/5hCR88WyL3t/L95KRuCLPhqTKmlzdJHDN94+hU2ztq2o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Rb1aC6CS; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e31977c653so356012a91.0
+        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 14:51:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=purestorage.com; s=google2022; t=1730674259; x=1731279059; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=vbZ+uzGqdW4hX03Xi3d7fgtT2grFuBySNiXCV4fiIF8=;
+        b=Rb1aC6CS0PoihxDfK82nfYdLZkQuf6gn8jYryWsOdwASBB0xPeuLVj//7tKWMvJJLj
+         ewAHrYvotvyz+9jrWzjp2a6QHGfB0WXQB2E53jRg9HiZub8t96s5rlJuOmG3QF8seMhx
+         iPHOTAhkRE3eoP3Bz574YzrDAyfmePP7xdyqYX2vNe1k3e0sGtVQSSm/M+YWGZlgm1w1
+         jpXnSQTqtenPU8MyKukvT9n3qAyZXWeKOJlWnGQDebRFlig1HpppsN4GO/Yx/ChtURb5
+         duH12G3Ols5gbtlQOef6mqxikCjXEFXFnLU0IiCp0MGGPjMdWowrcbeNCjNBDMM0rXLL
+         4i9g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730674259; x=1731279059;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=vbZ+uzGqdW4hX03Xi3d7fgtT2grFuBySNiXCV4fiIF8=;
+        b=KhqRVS412dRNMvACycZcEyCMUNB5Gqy4Gr1oQ4njtAcwZIG225rim9qMBhJC0pezao
+         +l0fsz/aaz7OVvrJ9mzsQNLZKU0sMcyPtmalormSJgwvcNeHpndzY+JlslKfFxSRuh90
+         gxi+xNA7qZLkwqIJWTggKMYGZ278pKegdQkdA/Esn8gV7HtJrayDdtIfaJZIP9OotEU6
+         sTBrs4kCRegjvTULLfQlHCfhGkVeBVM5h4jB+e/crIzcl1d+yNQH2iosVMSAweYvBgOw
+         yAf22T28rdkUPj4CIIScfwm1iE60bhF87gCh09fg5tyvCZOOl8nBjTWExe7tF48t9ssI
+         YM4g==
+X-Forwarded-Encrypted: i=1; AJvYcCU1+ShNZpskqLODjD3sbouX4fh0vks+/cvKKPtOG42juumK9bO5X8STEYQQhs79rtdbym9sbFA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxO9WVcyiGn+5RKym3Ehcx5eC1Ru8SG+9L7HQQxBh/vtqTNUsDE
+	Z8tPHuhp2POa31pq8tNXDp8pIUqUl3kGWxsMvgswPeTaAilOlc+PX1j4Cz2fUn5QXCtn9TP8MgQ
+	qiT8wn8YQnNItnTlmvtBVfrFCIyQRsz2tLOAMJQ==
+X-Google-Smtp-Source: AGHT+IFUl1GCcoqWHoZYbz+qEG71KEMvn1Im+9ZYr+neR/oxPoOmgzFQQqZYN0kcHlFEkQf/7jeXNqXwpJVr9GMXuU8=
+X-Received: by 2002:a17:90a:e511:b0:2e2:e139:447d with SMTP id
+ 98e67ed59e1d1-2e8f0d62425mr14589494a91.0.1730674259424; Sun, 03 Nov 2024
+ 14:50:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] vrf: Prepare vrf_process_v4_outbound() to future
- .flowi4_tos conversion.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173067423923.3271988.409261031971405732.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 22:50:39 +0000
-References: <6be084229008dcfa7a4e2758befccfd2217a331e.1730294788.git.gnault@redhat.com>
-In-Reply-To: <6be084229008dcfa7a4e2758befccfd2217a331e.1730294788.git.gnault@redhat.com>
-To: Guillaume Nault <gnault@redhat.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, dsahern@kernel.org,
- andrew+netdev@lunn.ch
+References: <20241031002326.3426181-1-csander@purestorage.com>
+ <20241031002326.3426181-2-csander@purestorage.com> <20241103122138.6d0d62f6@kernel.org>
+In-Reply-To: <20241103122138.6d0d62f6@kernel.org>
+From: Caleb Sander <csander@purestorage.com>
+Date: Sun, 3 Nov 2024 14:50:48 -0800
+Message-ID: <CADUfDZpBfwGJwhUHCZk8AgZDY0QP3j2dEUHZfC1VkR+75jj2WA@mail.gmail.com>
+Subject: Re: [resend PATCH 2/2] dim: pass dim_sample to net_dim() by reference
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Arthur Kiyanovski <akiyano@amazon.com>, Brett Creeley <brett.creeley@amd.com>, 
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>, 
+	Christophe Leroy <christophe.leroy@csgroup.eu>, Claudiu Manoil <claudiu.manoil@nxp.com>, 
+	David Arinzon <darinzon@amazon.com>, "David S. Miller" <davem@davemloft.net>, 
+	Doug Berger <opendmb@gmail.com>, Eric Dumazet <edumazet@google.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Felix Fietkau <nbd@nbd.name>, Florian Fainelli <florian.fainelli@broadcom.com>, 
+	Geetha sowjanya <gakula@marvell.com>, hariprasad <hkelam@marvell.com>, 
+	Jason Wang <jasowang@redhat.com>, Jonathan Corbet <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Louis Peens <louis.peens@corigine.com>, 
+	Mark Lee <Mark-MC.Lee@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	Michael Chan <michael.chan@broadcom.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	Noam Dagan <ndagan@amazon.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Roy Pledge <Roy.Pledge@nxp.com>, 
+	Saeed Bishara <saeedb@amazon.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Sean Wang <sean.wang@mediatek.com>, Shannon Nelson <shannon.nelson@amd.com>, 
+	Shay Agroskin <shayagr@amazon.com>, Simon Horman <horms@kernel.org>, 
+	Subbaraya Sundeep <sbhatta@marvell.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Tal Gilboa <talgi@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>, 
+	Tony Nguyen <anthony.l.nguyen@intel.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, intel-wired-lan@lists.osuosl.org, 
+	linux-arm-kernel@lists.infradead.org, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-mediatek@lists.infradead.org, 
+	linuxppc-dev@lists.ozlabs.org, linux-rdma@vger.kernel.org, 
+	netdev@vger.kernel.org, oss-drivers@corigine.com, 
+	virtualization@lists.linux.dev
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Sun, Nov 3, 2024 at 12:21=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Wed, 30 Oct 2024 18:23:26 -0600 Caleb Sander Mateos wrote:
+> > In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
+> > 94% of which is attributed to the first push instruction to copy
+> > dim_sample on the stack for the call to net_dim():
+>
+> Change itself looks fine, so we can apply, but this seems surprising.
+> Are you sure this is not just some measurement problem?
+> Do you see 3% higher PPS with this change applied?
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+Agreed, this bottleneck surprised me too. But the CPU profiles clearly
+point to this push instruction in mlx5e_handle_rx_dim() being very
+hot. My best explanation is that the 2- and 4-byte stores followed
+immediately by 8-byte loads from the same addresses cannot be
+pipelined effectively. The loads must wait for the stores to complete
+before reading back the values they wrote. Ideally the compiler would
+recognize that the struct dim_sample local variable is only used to
+pass to net_dim() and avoid duplicating it. I guess passing large
+structs by value in C is not very common, so there probably isn't as
+much effort put into optimizing it.
+With the patches applied, the CPU time spent in mlx5e_handle_rx_dim()
+(excluding children) drops from 3.14% to 0.08%. Unfortunately, there
+are other bottlenecks in the system and 1% variation in the throughput
+is typical, so the patches don't translate into a clear 3% increase in
+throughput.
 
-On Wed, 30 Oct 2024 14:27:19 +0100 you wrote:
-> Use ip4h_dscp() to get the DSCP from the IPv4 header, then convert the
-> dscp_t value to __u8 with inet_dscp_to_dsfield().
-> 
-> Then, when we'll convert .flowi4_tos to dscp_t, we'll just have to drop
-> the inet_dscp_to_dsfield() call.
-> 
-> Signed-off-by: Guillaume Nault <gnault@redhat.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - [net-next] vrf: Prepare vrf_process_v4_outbound() to future .flowi4_tos conversion.
-    https://git.kernel.org/netdev/net-next/c/937677f48125
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Best,
+Caleb
 
