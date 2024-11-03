@@ -1,139 +1,194 @@
-Return-Path: <netdev+bounces-141260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A082B9BA3E7
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 05:11:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8099BA3FE
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 05:57:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5C3A1C20F74
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 04:11:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56B9D281DC5
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 04:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0AD1369A8;
-	Sun,  3 Nov 2024 04:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84B4212B169;
+	Sun,  3 Nov 2024 04:57:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="EYyrgkGP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="kowKDVgs"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f45.google.com (mail-pj1-f45.google.com [209.85.216.45])
+Received: from mail-pl1-f181.google.com (mail-pl1-f181.google.com [209.85.214.181])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3FB813635B
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 04:10:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F181E5234;
+	Sun,  3 Nov 2024 04:57:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730607054; cv=none; b=JMZSNDcGcdDdmP3ZBMqyTGWWxkh7uklSujJbLNXo6YKGOB9miH4YnmQAak2PyjMzVbQNM8X7VLWM9Cna1RXzepCwExObnpqwy5a/oUKu0cctcF6DhecBB6RYYfP3XtfPm33Ywb9CqDkQzDKrEk49pNSKFZ9Z09wzyqDf0PjukS4=
+	t=1730609871; cv=none; b=VindSGGcCgESuHa824mpyRtbeJ2zOCiH87demo2d7AhCYg1na+RKTHEHeOWlhjhQvY9d7P8nm92BaM2ThFvPHrCKBqQjfSc2NYxjmADq1y1rU4/BirYc9UDI84R+llxa3LgIOjbnfdNdZzn5hX+DVkctQZoL2mvPrIIhRFheFGM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730607054; c=relaxed/simple;
-	bh=xTxPw0CcizNWkYCAn8c8UgrWWW+GaQdSBsCV59pgcp8=;
+	s=arc-20240116; t=1730609871; c=relaxed/simple;
+	bh=DamPCOQqvqHgBQMIRawC2apnMnfEYjKilQOyfGyyoWI=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tAihuQ8OkHwspUClkosQhjYGNz8MlWRTAObVKO7wC8fZP0LtoVPNq//arMKvF3PxHID/WyN1+3/HgXavMCXwqmVt4S+I7dPje7LprGKMv8mBC5jtzwRHyjqJXMiNyZrB1+zwYxM852wW8imFlZL2KAgEAS2ZMPy/cXEFrFqbI14=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=EYyrgkGP; arc=none smtp.client-ip=209.85.216.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f45.google.com with SMTP id 98e67ed59e1d1-2e30116efc9so2550664a91.2
-        for <netdev@vger.kernel.org>; Sat, 02 Nov 2024 21:10:52 -0700 (PDT)
+	 Content-Type:Content-Disposition:In-Reply-To; b=f6NEcLD4+1Uxw4A8IuYWLPtxwcBHjG06IfmNb5EmX8HZtZqUzQVFzyGp+GXbTSw0p6LrMQ/5r7GhCtKGkxAbbCmO8wEZ/bkvgKoEVZlfEE2fifFgShHhseoFIKt0QxfV/QazsOgQkAiOkNHbdy3wCmbsSU1WbyvlCWizbhB4Gjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=kowKDVgs; arc=none smtp.client-ip=209.85.214.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f181.google.com with SMTP id d9443c01a7336-21116b187c4so19298935ad.3;
+        Sat, 02 Nov 2024 21:57:49 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730607052; x=1731211852; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h/iCSnN/M7HQhmE74Mj4nBBH2JpYOpk0mdmCbZW6msY=;
-        b=EYyrgkGPJeKu6FZm3u1tTfIc+wTGtbVo+pRf1pLT5tC3Z/2s6pjo7kerJMyZbRt6x7
-         P0AQEQB9iKowkYBqOE2oIOKGTvt3p7Q0e5EYbaok9o9UnmCmj1rbRIqchE5AnUV+pFMA
-         CTk+T0Rm7+SWU02amGzxQrggdtK0rWC5KBwjc=
+        d=gmail.com; s=20230601; t=1730609869; x=1731214669; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9CSP3/mrH4IDIU1fu+rXtqZU/482FT2wNtvgPf2ZNos=;
+        b=kowKDVgsdJMnd7KZmuYxLcRJrAcnC0jfeoYoGcqmyKzVxUTmr7DN+1jMERnauliQyR
+         RDcGJaiU5OuS915XD5VME7QoRs84XZYecdboI/zbVU70yM4xEOsZqMDhHVlDL2Otp6ea
+         4YV72mRYSpo9UkCnw+h+eclUbUC+cMS6SttsLNdULhQHN/6VVOC/NFcQCfwzYn8SDVbb
+         bbKtOCCm/jGW8jjiuZvdE+3KPJVh3lfDNNwnt2Emja0EroMLVBJftABJsPtkaAdk3XgP
+         5TlkvipAmBS1TQW7ecOPB+GQOqaPqkClM8Iw/T2EGnUZS7ir8li+iMrFeNCXjSPKwuq2
+         bYRQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730607052; x=1731211852;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=h/iCSnN/M7HQhmE74Mj4nBBH2JpYOpk0mdmCbZW6msY=;
-        b=gbFQuTRw6E0VHLN311W3Bo/EC0RtnlTpv1NUbrVFhShhzq35QvlNzfSx+q3GaDTzkO
-         +/qPBe7o3WkIw1LdsDA6iXHJhHesTq79jP59NkCQMN/mBKFGAOxWlTO/f6z33kNMWACu
-         R1Yh+n9WQ0Ib/bfj0ihql3Pfqhc+2GRsc1P8OmborP2wrNoE0K8waz2gr/FF83fzgXHf
-         Tq9YaWZ79rEkLV88ZS7adUqvrZN7fS0qFM5XjSaeu4zocgplge/5Wpwh87nKLqavxQmi
-         VU1V3GLdoVvm+wK3oPy/V6l8cNH0SeDw6r2H9IKXV3aBrd/lKl6Z2eKrZTOJSza/xW+0
-         mNSw==
-X-Gm-Message-State: AOJu0Yw+hR+BwnfNRgC63WpHKaCJ/j6MBo8wRWhbZY+JcFqkFS3hUAJ7
-	+ngsAZwT76XkLMGUqeFPepw+Sl7tii+7v7hurNTuW0NTT82MHIuACVk0ltYtAj8=
-X-Google-Smtp-Source: AGHT+IEhUpctNzyB3Q/oVIYxbRXEG5RJ4wFo2uHDkY11JbH34UZ1+uPmsCEyS2zgljj0ve1XBu4tPg==
-X-Received: by 2002:a17:90a:510f:b0:2e2:cd65:de55 with SMTP id 98e67ed59e1d1-2e8f10723a7mr31449321a91.20.1730607052119;
-        Sat, 02 Nov 2024 21:10:52 -0700 (PDT)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e93da983f9sm5131469a91.5.2024.11.02.21.10.50
+        d=1e100.net; s=20230601; t=1730609869; x=1731214669;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9CSP3/mrH4IDIU1fu+rXtqZU/482FT2wNtvgPf2ZNos=;
+        b=LQnPFDKJhxgMS1v1OgKy0HGP+lpPNMKCi/uBXPddM8C0PxMneJpZy7hNhBZwTxovaY
+         yr9iy89jrKNg0sEbvZoIipZTbdHCR+V1SdYmfPuxjVpROcGowoxM5h9/MtD92C4umdZ1
+         2QY4m4MCwCIGsJQF2adU0PN0EBqY9RMnwsuYQbHZhw9X9FW/4Fo1GxleJPiFiGoytwf9
+         bVwZNUCDqcQeTl/1QERRMuzMuD0ssr6G//t1E7ZvNba9RliHAXY6opkaaT9EzVjHdocr
+         nLIcLVMuJJlBUebFc/lA51AsW4qoYybY1b4GUzy4hsOxrNX27dfDp1Zcdb2FSpukHe5m
+         nYcA==
+X-Forwarded-Encrypted: i=1; AJvYcCW/hzmY4FQ8TVrQQsZyYZvrlwMJpxbP3zrF/Cv+o8F+dudO13ycFAM4EzC04GE2VwwPiPwqnJ2z@vger.kernel.org, AJvYcCW32gXy1DUbljenyhU0UZb+HsQ4oLB+dGQydekepfenAjwOommnsLK4GNVZyMr7yMgrUSTHT0ApWuKyJYU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzxGwxhbR5CGCGaqZmu0bRieGM6UPzV7xwwseK+D2pbNYP3veys
+	P0JTFvVHZoDUXzXaQUHLgszllO6TmTzjzK3utWa9Ace0btAuAod5
+X-Google-Smtp-Source: AGHT+IG7sUBdy/xx+Zu6ChxQOE1thGM06heQMRaC4nXJLe8VdWP928UxfwL9C3m8n/n/e9mWL9jnQQ==
+X-Received: by 2002:a17:903:2344:b0:20c:94d1:2cb9 with SMTP id d9443c01a7336-2111af1cdf2mr115398945ad.9.1730609869080;
+        Sat, 02 Nov 2024 21:57:49 -0700 (PDT)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057a63f2sm40915545ad.168.2024.11.02.21.57.47
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 02 Nov 2024 21:10:51 -0700 (PDT)
-Date: Sat, 2 Nov 2024 21:10:49 -0700
-From: Joe Damato <jdamato@fastly.com>
-To: Hillf Danton <hdanton@sina.com>
-Cc: netdev@vger.kernel.org, edumazet@google.com, willy@infradead.org,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-kernel@vger.kernel.org, mkarsten@uwaterloo.ca,
-	sridhar.samudrala@intel.com
-Subject: Re: [PATCH net-next v4 5/7] eventpoll: Control irq suspension for
- prefer_busy_poll
-Message-ID: <Zyb3yS6Whi5Na0lg@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Hillf Danton <hdanton@sina.com>, netdev@vger.kernel.org,
-	edumazet@google.com, willy@infradead.org,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	linux-kernel@vger.kernel.org, mkarsten@uwaterloo.ca,
-	sridhar.samudrala@intel.com
-References: <20241102005214.32443-1-jdamato@fastly.com>
- <20241102233925.2948-1-hdanton@sina.com>
+        Sat, 02 Nov 2024 21:57:48 -0700 (PDT)
+Received: by archie.me (Postfix, from userid 1000)
+	id BFB124207D11; Sun, 03 Nov 2024 11:57:43 +0700 (WIB)
+Date: Sun, 3 Nov 2024 11:57:43 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Breno Leitao <leitao@debian.org>, Jonathan Corbet <corbet@lwn.net>,
+	Akinobu Mita <akinobu.mita@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>
+Cc: linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, kernel-team@meta.com
+Subject: Re: [PATCH net-next v5] net: Implement fault injection forcing skb
+ reallocation
+Message-ID: <ZycCx6CqjvsxPMqd@archie.me>
+References: <20241101-skb_fault_injection_v5-v5-1-a99696f0a853@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="3xLCjlLG7xYJ1hlU"
 Content-Disposition: inline
-In-Reply-To: <20241102233925.2948-1-hdanton@sina.com>
-
-On Sun, Nov 03, 2024 at 07:39:25AM +0800, Hillf Danton wrote:
-> On Sat,  2 Nov 2024 00:52:01 +0000 Martin Karsten <mkarsten@uwaterloo.ca>
-> > 
-> > @@ -2005,8 +2032,10 @@ static int ep_poll(struct eventpoll *ep, struct epoll_event __user *events,
-> >  			 * trying again in search of more luck.
-> >  			 */
-> >  			res = ep_send_events(ep, events, maxevents);
-> > -			if (res)
-> > +			if (res) {
-> > +				ep_suspend_napi_irqs(ep);
-> 
-> Leave napi irq intact in case of -EINTR.
-
-(I've added Martin and Sridhar to the CC list)
-
-Thanks for pointing out this inconsistency. It's not a big problem,
-because on receiving EINTR or another error code, the app either
-retries epoll_wait or, if the app is buggy somehow and doesn't retry
-epoll_wait, the timer fires and everything proceeds as normal.
-
-However, since irqs are not suspended at other points in ep_poll
-where an error code is returned, it is probably best to be
-consistent and not suspend here either. We will fix this in the next
-revision.
-
-Sridhar: Since the change is very minor I plan to retain your
-Reviewed-by, but if you'd like me to drop it, please let me know.
-
-The proposed fix will look like:
-
-if (res) {
-  if (res > 0)
-    ep_suspend_napi_irqs(ep);
-  return res;
-}
+In-Reply-To: <20241101-skb_fault_injection_v5-v5-1-a99696f0a853@debian.org>
 
 
-> 
-> >  				return res;
-> > +			}
-> >  		}
-> >  
-> >  		if (timed_out)
-> > -- 
-> > 2.25.1
+--3xLCjlLG7xYJ1hlU
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Fri, Nov 01, 2024 at 03:09:33AM -0700, Breno Leitao wrote:
+> diff --git a/Documentation/fault-injection/fault-injection.rst b/Document=
+ation/fault-injection/fault-injection.rst
+> index 8b8aeea71c685b358dfebb419ae74277e729298a..880237dca4ff78e7f11dac3cc=
+a70969a18a70cc3 100644
+> --- a/Documentation/fault-injection/fault-injection.rst
+> +++ b/Documentation/fault-injection/fault-injection.rst
+> @@ -45,6 +45,32 @@ Available fault injection capabilities
+>    ALLOW_ERROR_INJECTION() macro, by setting debugfs entries
+>    under /sys/kernel/debug/fail_function. No boot option supported.
+> =20
+> +- fail_skb_realloc
+> +
+> +  inject skb (socket buffer) reallocation events into the network path. =
+The
+> +  primary goal is to identify and prevent issues related to pointer
+> +  mismanagement in the network subsystem.  By forcing skb reallocation at
+> +  strategic points, this feature creates scenarios where existing pointe=
+rs to
+> +  skb headers become invalid.
+> +
+> +  When the fault is injected and the reallocation is triggered, cached p=
+ointers
+> +  to skb headers and data no longer reference valid memory locations. Th=
+is
+> +  deliberate invalidation helps expose code paths where proper pointer u=
+pdating
+> +  is neglected after a reallocation event.
+> +
+> +  By creating these controlled fault scenarios, the system can catch ins=
+tances
+> +  where stale pointers are used, potentially leading to memory corruptio=
+n or
+> +  system instability.
+> +
+> +  To select the interface to act on, write the network name to the follo=
+wing file:
+> +  `/sys/kernel/debug/fail_skb_realloc/devname`
+"... write the network name to /sys/kernel/debug/fail_skb_realloc/devname."
+> +  If this field is left empty (which is the default value), skb realloca=
+tion
+> +  will be forced on all network interfaces.
+> +
+> +  The effectiveness of this fault detection is enhanced when KASAN is
+> +  enabled, as it helps identify invalid memory references and use-after-=
+free
+> +  (UAF) issues.
+> +
+>  - NVMe fault injection
+> =20
+>    inject NVMe status code and retry flag on devices permitted by setting
+> @@ -216,6 +242,19 @@ configuration of fault-injection capabilities.
+>  	use a negative errno, you better use 'printf' instead of 'echo', e.g.:
+>  	$ printf %#x -12 > retval
+> =20
+> +- /sys/kernel/debug/fail_skb_realloc/devname:
+> +
+> +        Specifies the network interface on which to force SKB reallocati=
+on.  If
+> +        left empty, SKB reallocation will be applied to all network inte=
+rfaces.
+> +
+> +        Example usage::
+> +
+> +          # Force skb reallocation on eth0
+> +          echo "eth0" > /sys/kernel/debug/fail_skb_realloc/devname
+> +
+> +          # Clear the selection and force skb reallocation on all interf=
+aces
+> +          echo "" > /sys/kernel/debug/fail_skb_realloc/devname
+> +
+
+The rest of docs changes looks good.
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--3xLCjlLG7xYJ1hlU
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZycCxwAKCRD2uYlJVVFO
+oytuAP9qvyjbHCEZRQ4ccAVBL/XWZcHGp0tvN1HoCBRK+jajfAEA2IsE40V85wK5
+NMBD/mmUFBkzqHjPrRCfw9cMZPdN6Aw=
+=+28l
+-----END PGP SIGNATURE-----
+
+--3xLCjlLG7xYJ1hlU--
 
