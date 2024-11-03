@@ -1,452 +1,481 @@
-Return-Path: <netdev+bounces-141310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DC459BA6C6
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 17:58:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BAFB19BA73A
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 18:14:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 16CEF1F22253
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 16:58:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF9271C20F1D
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 17:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3702F18A6D9;
-	Sun,  3 Nov 2024 16:58:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 314D017B4E9;
+	Sun,  3 Nov 2024 17:14:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b="VDzHL7gg"
+	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="B8fPycFS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out1-03.simnet.is (smtp-out1-03.simnet.is [194.105.232.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F4D2189B82
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 16:58:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36C4014D718
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 17:14:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.232.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730653092; cv=none; b=NvJIf2uequJD2zLmGj9P7FqI0p7evJN0rCX8DxTgs9pnAjQeIw2OZxrM4NrfApw1YkHzaIDYKhNyKo+yXYhjxkJjEh1WDNlUQoLjjEdlSUSMwwJQlEWC1EDJwQ9lx0vupwHfqS7FyuhH6gHt2y3zNvjZvSoWNbYAzJNK6+L21cc=
+	t=1730654091; cv=none; b=VawTosXpU0y/6VQWB5Tzt97ytYni4m2woFQ6LXUfTCIewm5zZyoA72mwY7uG7KAi6S/A2ritrqP1s/Xd2WORKPj52Rxx2sTsIC3RVBHxizgld9T9/AuN7K1VMgqxZhF8nrGGbVvHN+EE4GU20l1YPCHNrcZfB7tfFMJTN71YLJE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730653092; c=relaxed/simple;
-	bh=nijXGPcroXAozpWk+NmlPyntpqfTgpVY4Wkwm48aPAA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Wn6jXl/1P2gzIHKUoCtyhfLztBN56obYDheglPMxDu1Ex/1gPancIwACEoYB/EZOGZ7ZzT6kUfsytLZgvEJYOVv+abuO1Gtt3FJVSI25yMxYuQJFey4XPooxlz+5W0iIkjb13xu1DjE5HzGZMYyhNA+NPEJoAJt4ktXCxvTx8RY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com; spf=pass smtp.mailfrom=tenstorrent.com; dkim=pass (2048-bit key) header.d=tenstorrent.com header.i=@tenstorrent.com header.b=VDzHL7gg; arc=none smtp.client-ip=209.85.214.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=tenstorrent.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=tenstorrent.com
-Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20e576dbc42so35127195ad.0
-        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 08:58:09 -0800 (PST)
+	s=arc-20240116; t=1730654091; c=relaxed/simple;
+	bh=zcRHdb8amWzYx53GjvOThueDuT7taEZfFXOQUNMc2zs=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=KSg23EhNlIOk5GVy948Oxa1YiIyHq1HvnkaaCEyTIJfyeSL1vPbk6awbYFvPwHqoPUvNdFbY1rbWwEKgWc/SPCOE13EQGabitJ1/Pzwba0b1B0I8m5xbNmwDuom4yHb/bWWVVXXTtoQ+DlQ1eAQc9lAX4gNQLdfbTwLjlcH7uBM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=B8fPycFS; arc=none smtp.client-ip=194.105.232.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tenstorrent.com; s=google; t=1730653089; x=1731257889; darn=vger.kernel.org;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Wpjo/TYXuVj+kJtSeeoa47athMXrUQ0tEtCps3hD5uI=;
-        b=VDzHL7ggU0l2Cly7w9YIHTothls+nLDZ/hnqCS50Wr5KK84zi+Q7/PJpDGpFcLQfDy
-         GKIfIy6SZ0gzx6JXywmbFWqcWb5UzRtE+QxFNXz3UOaVjM308cvUYi4/UShhJql9jos4
-         UkjYi6GE9ueHKDDEaywbcbHGAoaLBeyU0i3IM0kFUXF2iGKXQs1+q+s6kRQOw2fX7kQY
-         gBvYqmS+yE+/YzOFofmJwNjiX9T0xj/eZ+e4gM5m0Yp2d/gCFdKD3IPgpL0kWbecvap/
-         UP1ZwNNADsvWHM+Is9Iks9AkBU3D5mtD+o2oDVuaPZOrKcM+TO69+5o3ZW1zv8TSipow
-         z6iA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730653089; x=1731257889;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Wpjo/TYXuVj+kJtSeeoa47athMXrUQ0tEtCps3hD5uI=;
-        b=YvGOXuTCuF4TPttfq6NN1kPgvxukmkgWss6EmRANzS3qPkOkAK+u5R1DcuMczL3z5R
-         /5soiHdFfdA3Gdr7Z1p1DOFLxKqBE3o6O6ijqwsXql/a/OxJLEKSUgm86bPeCCOT4Lmv
-         ODPSsUDN+2ojddtw9iRwTVuJB7868aIV98x4mwFBfM0r2ko3BNXRMsq9dZelHOAxZRPu
-         Wl27ISAE3ry68+NumDXK+EGA7IEe2GN9QMW/8Dxwa0VQ2P/XPJpWczJwitFyDWJUggkX
-         b9W530yJSgfrgNlb+y7BFEYOQiJTIvaSH8DSEW4VMy99ZVAHihPSX4CkRWaA11iJNlKH
-         L2Kw==
-X-Gm-Message-State: AOJu0YxT6CiUe/3zmhVoauVLwUR1VkT9iD5A4IgqIM/8yW4nI0Y8icLH
-	1+LrxPl8SVUAqilUICKjW4TKgbq0XL5ugjXaQp5NZv0BwRST8VNzsrbWqTv9C00=
-X-Google-Smtp-Source: AGHT+IH4CUmNlQEj295YqF5a2EBsZggdpPFPyaX6AYOl1G2yXvfzR+DbE4H+Xhj9TYIedBb/D4SPJA==
-X-Received: by 2002:a17:902:b205:b0:20c:ea0a:9665 with SMTP id d9443c01a7336-21103b1d99dmr143142765ad.32.1730653089291;
-        Sun, 03 Nov 2024 08:58:09 -0800 (PST)
-Received: from [127.0.1.1] (71-34-69-82.ptld.qwest.net. [71.34.69.82])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057c9783sm47531355ad.236.2024.11.03.08.58.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Nov 2024 08:58:08 -0800 (PST)
-From: Drew Fustini <dfustini@tenstorrent.com>
-Date: Sun, 03 Nov 2024 08:58:00 -0800
-Subject: [PATCH net-next v7 2/2] net: stmmac: Add glue layer for T-HEAD
- TH1520 SoC
+  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
+  t=1730654087; x=1762190087;
+  h=date:from:to:subject:message-id:mime-version;
+  bh=0T9ZkDU4XMlI+G/JgAoznSaPZb33dQmZ1f5nzq30XYw=;
+  b=B8fPycFS2DBjYIn8YoomaQ3+ev0V65MHGOWOXVyjhngO3MkCFe4hXAEJ
+   6Iqze6IJYwHZaDhtvtIr8qBdWdfDd054KHzGNwUwnq7G6g+pOuZ03LZ/p
+   ALzehq/atJL/XAFp6/7NmgBMoWqleHGo+rLDBT4r1mxtAIujA2nEanoNg
+   hoCyf7aMyjsnYITbEQtRQNIZuI0/8gQ8mbvYbJwyQitjSHkW/ohKWRYMw
+   7+Cc64eIRP6UWsPRN5ew0iMQNG1BVLFgR9ekKy/vuwdGE3VHLdVojLJ33
+   7Ak6FG+7Myp+2IOvEHACvxVES54OSl0VmLu0NWNms8Rpi+l4PwpjJGLeq
+   A==;
+X-CSE-ConnectionGUID: JwVi+vivT+qQ9xPSrj/huA==
+X-CSE-MsgGUID: VDeWsIn0Tx6ICqUSFHCyPA==
+Authentication-Results: smtp-out-03.simnet.is; dkim=none (message not signed) header.i=none
+X-SBRS: 3.3
+X-IPAS-Result: =?us-ascii?q?A2FMAgAtrCdnhVjoacJaHAEBAQEBAQcBARIBAQQEAQFAg?=
+ =?us-ascii?q?VOCHCh9gWSIJY4fgRaCEpx2BwEBAQ8xEwQBAQSPNyg4EwECBAEBAQEDAgMBA?=
+ =?us-ascii?q?QEBAQEBAQ4BAQYBAQEBAQEGBwIQAQEBAUAOO4U1Rg2FLCyCe1+DAQGCZK4ng?=
+ =?us-ascii?q?TSBAYMc2xeBXBCBSIVqgmIBhWmEdzwGgg2BFTWBBm1KdosHBIIyFXw6gT0Mg?=
+ =?us-ascii?q?g4SJYIvgRCFVoglgleBTopxgWkDWSERAVUTFwsHBYF5A4NRgTmBUYMgSoNZg?=
+ =?us-ascii?q?UJGPzeCE2lNOgINAjaCJH2CToMYggeEcIRqQB02CgMLbT01FBufAwFGgjUvQ?=
+ =?us-ascii?q?wEBBTcyHwt5LRMDMAYECx0BIS+SeUSPQ4FEjEyTUYE+hCSGW4MwgguVQzOEB?=
+ =?us-ascii?q?JM7DDqSRph3o20ZhRuBfoF/LAcaCDA7gmcJSRkPjioZgQwBAwSHIr9oeDsCB?=
+ =?us-ascii?q?wsBAQMJkGsBAQ?=
+IronPort-PHdr: A9a23:yYMkaRYbuOiumusNVWaEl3D/LTAChN3EVzX9i7I8jq5WN6O+49G6Z
+ wrE5PBrgUOPXJ6Io/5Hiu+DtafmVCRA5Juaq3kNfdRKUANNksQZmQEsQYaFBET3IeSsbnk8G
+ 8JPPGI=
+IronPort-Data: A9a23:IXlojKy3Mk3bPbdU1wF6t+fAxirEfRIJ4+MujC+fZmQN5Y4CYwd3n
+ TpENjTXZOHfICDrL4okddz2tVQOiSLmvoRnQAM+rSEyQ3wR95efXITGcU2uMimccsCdQBg94
+ ptAY4GQdcloE3PQrUfzO7aw/HRyiKiEF7D1Ur7ONnsuGAUMpEvN8f5Gs7dRbtlA3oXmXmthw
+ O/PnvAzGGNJ+hYqPGxM4v2P8Uhi5Kur4WMT4gRha65A5wXUyyVMXJlOL4i8fiDyKmV2NrfhH
+ r6cltlV3Y94EzMFUI7NfmPTKxVSKlLqFVHTzCIQA+772kQqShUais4TLOAbZVpclwKHltVwz
+ MQlnZGrQG/FBIWV8Agme0ceSngW0ZFuouedfSHm6ZfLlSUqTlO1qxlQJBBnVWEn0r4f7VFmr
+ ZQwND0LZxafsOO6qJrTpj5E35lLwGHDZevzi1k4pd3rJa9OraPrH80m0eRlMAIY3aiiKxpxi
+ /0xMlKDZDyYC/FG18x+5JgWxI9EjVGnG9FURc78SQPaLAE/wSQouIUBPuY5dfSoWvtU3ViZu
+ F6F5l2oEikhLt7YySespyfEau/nxUsXWaoMFaaks+xrhUWJwXwCTUVME0W6uuX/i1XWt9B3c
+ h1IvHN28O5orxbtHomVsx6Q+RZoujYWVPJLEug85R3Ly7G8DwOxXDNVEWIcMYZOWMkeexAn6
+ USomYvVFWJOm6Socly93aashGbnUcQSBTReNX5bHFdtD8PYiIc+kh7CUP59H6OvyN74Azf9x
+ 3aNtidWulkIpdAKzLn+71HCmyirtomMFlRz+ATMQiSk9WuVebJJeaSK9mbaruhBMrraV2DQr
+ EA/gcrZ7P0nWMTleDO2fM0BG7Sg5vCgOTLagEJyE5RJy9hL0yL4FWy3yG0uTHqFIvo5lSnVj
+ Fj7mDg52XO+FGWrdrMycYO0E94t3bmlTY6jSPHPcpxPefCdlTNrHgkwPiZ8PEi0wSDAdJ3T3
+ 7/BKq5A6l5BUcxaIMKeHbt17FPS7nlWKZnvbZ761Q+79rGVeWSYT7wIWHPXMbthsfze/F2Pq
+ IwAXydv9/m5eLGhCsUw2dNLRW3m0VBiX82eRzF/L7LYfFM4cI3fI6OAn+NJl3NZc1R9zbuYr
+ y7sBie0OXL6hHnOYQWEAk2Pm5uyNauTWUkTZHR2VX7xgiRLSdj0ts83KcBoFYTLAcQ4lpaYu
+ dFeIJ3YWpyii13vp1wgUHUKhNU7JE/221vXYXTNjfpWV8cIejElM+TMJmPHnBTixALu3Sfii
+ 9VMDj/mfKc=
+IronPort-HdrOrdr: A9a23:HGmzbKoGOFP0DcNq1Q45gYkaV5oReYIsimQD101hICG9E/b1qy
+ nKpp8mPHDP5wr5NEtPpTnjAsm9qALnlKKdiLN5Vd3OYOCBghrLEGgI1/qA/9SPIVyYysdtkY
+ tmbqhiGJnRIDFB/KDHCdCDYrMdKQ+8gcSVuds=
+X-Talos-CUID: 9a23:q3ZLwmAVAU102BD6Ewt4yk9XBME7Tj7E9SbAG3SiCyFpVZTAHA==
+X-Talos-MUID: 9a23:7iqy6QRR8NPFcWZ7RXTSqDxdL+Zuu5i+VmEmiKg9lemvJBRZbmI=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.11,255,1725321600"; 
+   d="8'?scan'208";a="23974512"
+Received: from vist-zimproxy-02.vist.is ([194.105.232.88])
+  by smtp-out-03.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2024 17:13:35 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-02.vist.is (Postfix) with ESMTP id 33EAE442866F
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 17:13:35 +0000 (GMT)
+Received: from vist-zimproxy-02.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-02.vist.is [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id rIgwSYj0qdhW for <netdev@vger.kernel.org>;
+ Sun,  3 Nov 2024 17:13:34 +0000 (GMT)
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-02.vist.is (Postfix) with ESMTP id 535DF442887C
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 17:13:34 +0000 (GMT)
+Received: from vist-zimproxy-02.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-02.vist.is [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id lZYiagp_q_kp for <netdev@vger.kernel.org>;
+ Sun,  3 Nov 2024 17:13:34 +0000 (GMT)
+Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
+	by vist-zimproxy-02.vist.is (Postfix) with ESMTPS id 3EDD2442866F
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 17:13:34 +0000 (GMT)
+Received: from bg by kassi.invalid.is with local (Exim 4.98)
+	(envelope-from <bg@kassi.invalid.is>)
+	id 1t7eAR-000000006Bc-0rmJ
+	for netdev@vger.kernel.org;
+	Sun, 03 Nov 2024 17:13:35 +0000
+Date: Sun, 3 Nov 2024 17:13:35 +0000
+From: Bjarni Ingi Gislason <bjarniig@simnet.is>
+To: netdev@vger.kernel.org
+Subject: dcb-app.8: some remarks and editorial changes for this manual
+Message-ID: <ZyevP76CiK57k_CZ@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241103-th1520-gmac-v7-2-ef094a30169c@tenstorrent.com>
-References: <20241103-th1520-gmac-v7-0-ef094a30169c@tenstorrent.com>
-In-Reply-To: <20241103-th1520-gmac-v7-0-ef094a30169c@tenstorrent.com>
-To: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>, 
- Alexandre Torgue <alexandre.torgue@foss.st.com>, 
- Giuseppe Cavallaro <peppe.cavallaro@st.com>, 
- Jose Abreu <joabreu@synopsys.com>, 
- Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
- Emil Renner Berthing <emil.renner.berthing@canonical.com>, 
- Jisheng Zhang <jszhang@kernel.org>, Guo Ren <guoren@kernel.org>, 
- Fu Wei <wefu@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>, 
- Palmer Dabbelt <palmer@dabbelt.com>, Albert Ou <aou@eecs.berkeley.edu>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, Drew Fustini <drew@pdp7.com>
-Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org, 
- linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
- linux-riscv@lists.infradead.org, Drew Fustini <dfustini@tenstorrent.com>, 
- linux-stm32@st-md-mailman.stormreply.com
-X-Mailer: b4 0.14.1
+Content-Type: multipart/mixed; boundary="duav7VVD32ow5N1B"
+Content-Disposition: inline
 
-From: Jisheng Zhang <jszhang@kernel.org>
 
-Add dwmac glue driver to support the DesignWare-based GMAC controllers
-on the T-HEAD TH1520 SoC.
+--duav7VVD32ow5N1B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
-[esmil: rename plat->interface -> plat->mac_interface,
-        use devm_stmmac_probe_config_dt()]
-Signed-off-by: Emil Renner Berthing <emil.renner.berthing@canonical.com>
-[drew: convert from stmmac_dvr_probe() to devm_stmmac_pltfr_probe(),
-       convert register access from regmap to regular mmio]
-Signed-off-by: Drew Fustini <dfustini@tenstorrent.com>
----
- MAINTAINERS                                       |   1 +
- drivers/net/ethernet/stmicro/stmmac/Kconfig       |  10 +
- drivers/net/ethernet/stmicro/stmmac/Makefile      |   1 +
- drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c | 273 ++++++++++++++++++++++
- 4 files changed, 285 insertions(+)
+  The man page is from Debian:
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 72dee6d07ced..b53f9f6b3e04 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -19830,6 +19830,7 @@ F:	Documentation/devicetree/bindings/clock/thead,th1520-clk-ap.yaml
- F:	Documentation/devicetree/bindings/net/thead,th1520-gmac.yaml
- F:	arch/riscv/boot/dts/thead/
- F:	drivers/clk/thead/clk-th1520-ap.c
-+F:	drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
- F:	include/dt-bindings/clock/thead,th1520-clk-ap.h
+Package: iproute2
+Version: 6.11.0-1
+Severity: minor
+Tags: patch
+
+  Improve the layout of the man page according to the "man-page(7)"
+guidelines, the output of "mandoc -lint T", the output of
+"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+conventions.
+
+-.-
+
+  Output from a script "chk_manual" should be in an attachment.
+
+-.-
+
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+
+diff --git a/dcb-app.8 b/dcb-app.8.new
+index be505a0..dde3d28 100644
+--- a/dcb-app.8
++++ b/dcb-app.8.new
+@@ -3,20 +3,19 @@
+ dcb-app \- show / manipulate application priority table of
+ the DCB (Data Center Bridging) subsystem
+ .SH SYNOPSIS
+-.sp
+ .ad l
+ .in +8
  
- RNBD BLOCK DRIVERS
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Kconfig b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-index 05cc07b8f48c..6658536a4e17 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Kconfig
-+++ b/drivers/net/ethernet/stmicro/stmmac/Kconfig
-@@ -228,6 +228,16 @@ config DWMAC_SUN8I
- 	  stmmac device driver. This driver is used for H3/A83T/A64
- 	  EMAC ethernet controller.
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .B app
+ .RI "{ " COMMAND " | " help " }"
+ .sp
  
-+config DWMAC_THEAD
-+	tristate "T-HEAD dwmac support"
-+	depends on OF && (ARCH_THEAD || COMPILE_TEST)
-+	help
-+	  Support for ethernet controllers on T-HEAD RISC-V SoCs
-+
-+	  This selects the T-HEAD platform specific glue layer support for
-+	  the stmmac device driver. This driver is used for T-HEAD TH1520
-+	  ethernet controller.
-+
- config DWMAC_IMX8
- 	tristate "NXP IMX8 DWMAC support"
- 	default ARCH_MXC
-diff --git a/drivers/net/ethernet/stmicro/stmmac/Makefile b/drivers/net/ethernet/stmicro/stmmac/Makefile
-index c2f0e91f6bf8..d065634c6223 100644
---- a/drivers/net/ethernet/stmicro/stmmac/Makefile
-+++ b/drivers/net/ethernet/stmicro/stmmac/Makefile
-@@ -28,6 +28,7 @@ obj-$(CONFIG_DWMAC_STI)		+= dwmac-sti.o
- obj-$(CONFIG_DWMAC_STM32)	+= dwmac-stm32.o
- obj-$(CONFIG_DWMAC_SUNXI)	+= dwmac-sunxi.o
- obj-$(CONFIG_DWMAC_SUN8I)	+= dwmac-sun8i.o
-+obj-$(CONFIG_DWMAC_THEAD)	+= dwmac-thead.o
- obj-$(CONFIG_DWMAC_DWC_QOS_ETH)	+= dwmac-dwc-qos-eth.o
- obj-$(CONFIG_DWMAC_INTEL_PLAT)	+= dwmac-intel-plat.o
- obj-$(CONFIG_DWMAC_LOONGSON1)	+= dwmac-loongson1.o
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-new file mode 100644
-index 000000000000..dce84ed184e9
---- /dev/null
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-thead.c
-@@ -0,0 +1,273 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * T-HEAD DWMAC platform driver
-+ *
-+ * Copyright (C) 2021 Alibaba Group Holding Limited.
-+ * Copyright (C) 2023 Jisheng Zhang <jszhang@kernel.org>
-+ *
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_device.h>
-+#include <linux/of_net.h>
-+#include <linux/platform_device.h>
-+
-+#include "stmmac_platform.h"
-+
-+#define GMAC_CLK_EN			0x00
-+#define  GMAC_TX_CLK_EN			BIT(1)
-+#define  GMAC_TX_CLK_N_EN		BIT(2)
-+#define  GMAC_TX_CLK_OUT_EN		BIT(3)
-+#define  GMAC_RX_CLK_EN			BIT(4)
-+#define  GMAC_RX_CLK_N_EN		BIT(5)
-+#define  GMAC_EPHY_REF_CLK_EN		BIT(6)
-+#define GMAC_RXCLK_DELAY_CTRL		0x04
-+#define  GMAC_RXCLK_BYPASS		BIT(15)
-+#define  GMAC_RXCLK_INVERT		BIT(14)
-+#define  GMAC_RXCLK_DELAY		GENMASK(4, 0)
-+#define GMAC_TXCLK_DELAY_CTRL		0x08
-+#define  GMAC_TXCLK_BYPASS		BIT(15)
-+#define  GMAC_TXCLK_INVERT		BIT(14)
-+#define  GMAC_TXCLK_DELAY		GENMASK(4, 0)
-+#define GMAC_PLLCLK_DIV			0x0c
-+#define  GMAC_PLLCLK_DIV_EN		BIT(31)
-+#define  GMAC_PLLCLK_DIV_NUM		GENMASK(7, 0)
-+#define GMAC_GTXCLK_SEL			0x18
-+#define  GMAC_GTXCLK_SEL_PLL		BIT(0)
-+#define GMAC_INTF_CTRL			0x1c
-+#define  PHY_INTF_MASK			BIT(0)
-+#define  PHY_INTF_RGMII			FIELD_PREP(PHY_INTF_MASK, 1)
-+#define  PHY_INTF_MII_GMII		FIELD_PREP(PHY_INTF_MASK, 0)
-+#define GMAC_TXCLK_OEN			0x20
-+#define  TXCLK_DIR_MASK			BIT(0)
-+#define  TXCLK_DIR_OUTPUT		FIELD_PREP(TXCLK_DIR_MASK, 0)
-+#define  TXCLK_DIR_INPUT		FIELD_PREP(TXCLK_DIR_MASK, 1)
-+
-+#define GMAC_GMII_RGMII_RATE	125000000
-+#define GMAC_MII_RATE		25000000
-+
-+struct thead_dwmac {
-+	struct plat_stmmacenet_data *plat;
-+	void __iomem *apb_base;
-+	struct device *dev;
-+};
-+
-+static int thead_dwmac_set_phy_if(struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	u32 phyif;
-+
-+	switch (plat->mac_interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		phyif = PHY_INTF_MII_GMII;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		phyif = PHY_INTF_RGMII;
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->mac_interface);
-+		return -EINVAL;
-+	}
-+
-+	writel(phyif, dwmac->apb_base + GMAC_INTF_CTRL);
-+	return 0;
-+}
-+
-+static int thead_dwmac_set_txclk_dir(struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	u32 txclk_dir;
-+
-+	switch (plat->mac_interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		txclk_dir = TXCLK_DIR_INPUT;
-+		break;
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+		txclk_dir = TXCLK_DIR_OUTPUT;
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->mac_interface);
-+		return -EINVAL;
-+	}
-+
-+	writel(txclk_dir, dwmac->apb_base + GMAC_TXCLK_OEN);
-+	return 0;
-+}
-+
-+static void thead_dwmac_fix_speed(void *priv, unsigned int speed, unsigned int mode)
-+{
-+	struct plat_stmmacenet_data *plat;
-+	struct thead_dwmac *dwmac = priv;
-+	unsigned long rate;
-+	u32 div, reg;
-+
-+	plat = dwmac->plat;
-+
-+	switch (plat->mac_interface) {
-+	/* For MII, rxc/txc is provided by phy */
-+	case PHY_INTERFACE_MODE_MII:
-+		return;
-+
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		rate = clk_get_rate(plat->stmmac_clk);
-+		if (!rate || rate % GMAC_GMII_RGMII_RATE != 0 ||
-+		    rate % GMAC_MII_RATE != 0) {
-+			dev_err(dwmac->dev, "invalid gmac rate %ld\n", rate);
-+			return;
-+		}
-+
-+		writel(0, dwmac->apb_base + GMAC_PLLCLK_DIV);
-+
-+		switch (speed) {
-+		case SPEED_1000:
-+			div = rate / GMAC_GMII_RGMII_RATE;
-+			break;
-+		case SPEED_100:
-+			div = rate / GMAC_MII_RATE;
-+			break;
-+		case SPEED_10:
-+			div = rate * 10 / GMAC_MII_RATE;
-+			break;
-+		default:
-+			dev_err(dwmac->dev, "invalid speed %u\n", speed);
-+			return;
-+		}
-+
-+		reg = FIELD_PREP(GMAC_PLLCLK_DIV_EN, 1) |
-+		      FIELD_PREP(GMAC_PLLCLK_DIV_NUM, div);
-+		writel(reg, dwmac->apb_base + GMAC_PLLCLK_DIV);
-+		break;
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->mac_interface);
-+		return;
-+	}
-+}
-+
-+static int thead_dwmac_enable_clk(struct plat_stmmacenet_data *plat)
-+{
-+	struct thead_dwmac *dwmac = plat->bsp_priv;
-+	u32 reg;
-+
-+	switch (plat->mac_interface) {
-+	case PHY_INTERFACE_MODE_MII:
-+		reg = GMAC_RX_CLK_EN | GMAC_TX_CLK_EN;
-+		break;
-+
-+	case PHY_INTERFACE_MODE_RGMII:
-+	case PHY_INTERFACE_MODE_RGMII_ID:
-+	case PHY_INTERFACE_MODE_RGMII_RXID:
-+	case PHY_INTERFACE_MODE_RGMII_TXID:
-+		/* use pll */
-+		writel(GMAC_GTXCLK_SEL_PLL, dwmac->apb_base + GMAC_GTXCLK_SEL);
-+		reg = GMAC_TX_CLK_EN | GMAC_TX_CLK_N_EN | GMAC_TX_CLK_OUT_EN |
-+		      GMAC_RX_CLK_EN | GMAC_RX_CLK_N_EN;
-+		break;
-+
-+	default:
-+		dev_err(dwmac->dev, "unsupported phy interface %d\n",
-+			plat->mac_interface);
-+		return -EINVAL;
-+	}
-+
-+	writel(reg, dwmac->apb_base + GMAC_CLK_EN);
-+	return 0;
-+}
-+
-+static int thead_dwmac_init(struct platform_device *pdev, void *priv)
-+{
-+	struct thead_dwmac *dwmac = priv;
-+	unsigned int reg;
-+	int ret;
-+
-+	ret = thead_dwmac_set_phy_if(dwmac->plat);
-+	if (ret)
-+		return ret;
-+
-+	ret = thead_dwmac_set_txclk_dir(dwmac->plat);
-+	if (ret)
-+		return ret;
-+
-+	reg = readl(dwmac->apb_base + GMAC_RXCLK_DELAY_CTRL);
-+	reg &= ~(GMAC_RXCLK_DELAY);
-+	reg |= FIELD_PREP(GMAC_RXCLK_DELAY, 0);
-+	writel(reg, dwmac->apb_base + GMAC_RXCLK_DELAY_CTRL);
-+
-+	reg = readl(dwmac->apb_base + GMAC_TXCLK_DELAY_CTRL);
-+	reg &= ~(GMAC_TXCLK_DELAY);
-+	reg |= FIELD_PREP(GMAC_TXCLK_DELAY, 0);
-+	writel(reg, dwmac->apb_base + GMAC_TXCLK_DELAY_CTRL);
-+
-+	return thead_dwmac_enable_clk(dwmac->plat);
-+}
-+
-+static int thead_dwmac_probe(struct platform_device *pdev)
-+{
-+	struct stmmac_resources stmmac_res;
-+	struct plat_stmmacenet_data *plat;
-+	struct thead_dwmac *dwmac;
-+	void __iomem *apb;
-+	int ret;
-+
-+	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
-+	if (ret)
-+		return dev_err_probe(&pdev->dev, ret,
-+				     "failed to get resources\n");
-+
-+	plat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
-+	if (IS_ERR(plat))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(plat),
-+				     "dt configuration failed\n");
-+
-+	dwmac = devm_kzalloc(&pdev->dev, sizeof(*dwmac), GFP_KERNEL);
-+	if (!dwmac)
-+		return -ENOMEM;
-+
-+	apb = devm_platform_ioremap_resource(pdev, 1);
-+	if (IS_ERR(apb))
-+		return dev_err_probe(&pdev->dev, PTR_ERR(apb),
-+				     "failed to remap gmac apb registers\n");
-+
-+	dwmac->dev = &pdev->dev;
-+	dwmac->plat = plat;
-+	dwmac->apb_base = apb;
-+	plat->bsp_priv = dwmac;
-+	plat->fix_mac_speed = thead_dwmac_fix_speed;
-+	plat->init = thead_dwmac_init;
-+
-+	return devm_stmmac_pltfr_probe(pdev, plat, &stmmac_res);
-+}
-+
-+static const struct of_device_id thead_dwmac_match[] = {
-+	{ .compatible = "thead,th1520-gmac" },
-+	{ /* sentinel */ }
-+};
-+MODULE_DEVICE_TABLE(of, thead_dwmac_match);
-+
-+static struct platform_driver thead_dwmac_driver = {
-+	.probe = thead_dwmac_probe,
-+	.driver = {
-+		.name = "thead-dwmac",
-+		.pm = &stmmac_pltfr_pm_ops,
-+		.of_match_table = thead_dwmac_match,
-+	},
-+};
-+module_platform_driver(thead_dwmac_driver);
-+
-+MODULE_AUTHOR("Jisheng Zhang <jszhang@kernel.org>");
-+MODULE_AUTHOR("Drew Fustini <drew@pdp7.com>");
-+MODULE_DESCRIPTION("T-HEAD DWMAC platform driver");
-+MODULE_LICENSE("GPL");
+ .ti -8
+ .B dcb app " { " show " | " flush " } " dev
+-.RI DEV
++.I DEV
+ .RB "[ " default-prio " ]"
+ .RB "[ " ethtype-prio " ]"
+ .RB "[ " stream-port-prio " ]"
+@@ -27,7 +26,7 @@ the DCB (Data Center Bridging) subsystem
+ 
+ .ti -8
+ .B dcb app " { " add " | " del " | " replace " } " dev
+-.RI DEV
++.I DEV
+ .RB "[ " default-prio " " \fIPRIO-LIST\fB " ]"
+ .RB "[ " ethtype-prio " " \fIET-MAP\fB " ]"
+ .RB "[ " stream-port-prio " " \fIPORT-MAP\fB " ]"
+@@ -90,7 +89,7 @@ other prioritization rule applies.
+ DCB APP entries are 3-tuples of selector, protocol ID, and priority. Selector is
+ an enumeration that picks one of the prioritization namespaces. Currently it
+ mostly corresponds to configurable parameters described below. Protocol ID is a
+-value in the selector namespace. E.g. for EtherType selector, protocol IDs are
++value in the selector namespace. E.g., for EtherType selector, protocol IDs are
+ the individual EtherTypes, for DSCP they are individual code points. The
+ priority is the priority that should be assigned to traffic that matches the
+ selector and protocol ID.
+@@ -108,7 +107,7 @@ and
+ .B del
+ commands. On the other hand, the command
+ .B replace
+-does what one would typically want in this situation--first adds the new
++does what one would typically want in this situation\(emfirst adds the new
+ configuration, and then removes the obsolete one, so that only one
+ prioritization is in effect for a given selector and protocol ID.
+ 
+@@ -190,7 +189,7 @@ will only use the higher six bits).
+ .B dcb app show
+ will similarly format DSCP values as symbolic names if possible. The
+ command line option
+-.B -N
++.B \-N
+ turns the show translation off.
+ 
+ .TP
+@@ -199,8 +198,8 @@ turns the show translation off.
+ .BR dcb (8)
+ for details. Keys are PCP/DEI. Values are priorities assigned to traffic with
+ matching PCP/DEI. PCP/DEI values are written as a combination of numeric- and
+-symbolic values, to accommodate for both. PCP always in numerical form e.g
+-0 .. 7 and DEI in symbolic form e.g 'de' (drop-eligible), indicating that the
++symbolic values, to accommodate for both. PCP always in numerical form e.g.,
++0 .. 7 and DEI in symbolic form, e.g., 'de' (drop-eligible), indicating that the
+ DEI bit is 1 or 'nd' (not-drop-eligible), indicating that the DEI bit is 0.
+ In combination 2de:1 translates to a mapping of PCP=2 and DEI=1 to priority 1.
+ 
+@@ -220,7 +219,7 @@ Add another rule to configure DSCP 24 to priority 2 and show the result:
+ .br
+ dscp-prio 0:0 CS3:2 CS3:3 CS6:6
+ .br
+-# dcb -N app show dev eth0 dscp-prio
++# dcb \-N app show dev eth0 dscp-prio
+ .br
+ dscp-prio 0:0 24:2 24:3 48:6
+ 
+@@ -230,7 +229,7 @@ priority 4:
+ .P
+ # dcb app replace dev eth0 dscp-prio 24:4
+ .br
+-# dcb app -N show dev eth0 dscp-prio
++# dcb app \-N show dev eth0 dscp-prio
+ .br
+ dscp-prio 0:0 24:4 48:6
+ 
 
--- 
-2.34.1
+--duav7VVD32ow5N1B
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="chk_man.err.dcb-app.8"
 
+  Any program (person), that produces man pages, should check the output
+for defects by using (both groff and nroff)
+
+[gn]roff -mandoc -t -ww -b -z -K utf8  <man page>
+
+  The same goes for man pages that are used as an input.
+
+  For a style guide use
+
+  mandoc -T lint
+
+-.-
+
+  So any 'generator' should check its products with the above mentioned
+'groff', 'mandoc',  and additionally with 'nroff ...'.
+
+  This is just a simple quality control measure.
+
+  The 'generator' may have to be corrected to get a better man page,
+the source file may, and any additional file may.
+
+  Common defects:
+
+  Input text line longer than 80 bytes.
+
+  Not removing trailing spaces (in in- and output).
+  The reason for these trailing spaces should be found and eliminated.
+
+  Not beginning each input sentence on a new line.
+Lines should thus be shorter.
+
+  See man-pages(7), item 'semantic newline'.
+
+-.-
+
+The difference between the formatted output of the original and patched file
+can be seen with:
+
+  nroff -mandoc <file1> > <out1>
+  nroff -mandoc <file2> > <out2>
+  diff -u <out1> <out2>
+
+and for groff, using
+
+"printf '%s\n%s\n' '.kern 0' '.ss 12 0' | groff -mandoc -Z - "
+
+instead of 'nroff -mandoc'
+
+  Add the option '-t', if the file contains a table.
+
+  Read the output of 'diff -u' with 'less -R' or similar.
+
+-.-.
+
+  If 'man' (man-db) is used to check the manual for warnings,
+the following must be set:
+
+  The option "-warnings=w"
+
+  The environmental variable:
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+  or
+
+  (produce only warnings):
+
+export MANROFFOPT="-ww -b -z"
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+-.-.
+
+Output from "mandoc -T lint dcb-app.8": (possibly shortened list)
+
+mandoc: dcb-app.8:6:2: WARNING: skipping paragraph macro: sp after SH
+
+-.-.
+
+Change two HYPHEN-MINUSES (code 0x2D) to an em-dash (\(em),
+if one is intended.
+  " \(em " creates a too big gap in the text (in "troff").
+
+An en-dash is usually surrounded by a space,
+while an em-dash is used without spaces.
+"man" (1 byte characters in input) transforms an en-dash (\(en) to one
+HYPHEN-MINUS,
+and an em-dash to two HYPHEN-MINUSES without considering the space
+around it.
+If "--" are two single "-" (end of options) then use "\-\-".
+
+dcb-app.8:111:does what one would typically want in this situation--first adds the new
+
+-.-.
+
+Change -- in x--y to \(em (em-dash), or, if an
+option, to \-\-
+
+111:does what one would typically want in this situation--first adds the new
+
+-.-.
+
+Use the correct macro for the font change of a single argument or
+split the argument into two.
+
+19:.RI DEV
+30:.RI DEV
+
+-.-.
+
+Use a macro to change to the italic font, instead of \fI, if
+possible (see man-pages(7)).
+The macros have the italic corrections, but "\c" removes the "\/" part,
+which is in the macro.
+So "\/" must be added between the italic argument and the "\c" string.
+
+  Or
+
+add the italic corrections.
+
+154:rules are configured as triplets (\fBEtherType\fR, \fB0\fR, \fIPRIO\fR).
+162:\fIET-MAP\fR uses the array parameter syntax, see
+173:\fIPORT-MAP\fR uses the array parameter syntax, see
+181:\fIDSCP-MAP\fR uses the array parameter syntax, see
+198:\fIPCP-MAP\fR uses the array parameter syntax, see
+
+-.-.
+
+Change a HYPHEN-MINUS (code 0x2D) to a minus(-dash) (\-),
+if it
+is in front of a name for an option,
+is a symbol for standard input,
+is a single character used to indicate an option,
+or is in the NAME section (man-pages(7)).
+N.B. - (0x2D), processed as a UTF-8 file, is changed to a hyphen
+(0x2010, groff \[u2010] or \[hy]) in the output.
+
+193:.B -N
+223:# dcb -N app show dev eth0 dscp-prio
+233:# dcb app -N show dev eth0 dscp-prio
+
+-.-.
+
+Add a comma (or \&) after "e.g." and "i.e.", or use English words
+(man-pages(7)).
+Abbreviation points should be protected against being interpreted as
+an end of sentence, if they are not, and that independent of the
+current place on the line.
+
+93:value in the selector namespace. E.g. for EtherType selector, protocol IDs are
+
+-.-.
+
+Wrong distance between sentences in the input file.
+
+  Separate the sentences and subordinate clauses; each begins on a new
+line.  See man-pages(7) ("Conventions for source file layout") and
+"info groff" ("Input Conventions").
+
+  The best procedure is to always start a new sentence on a new line,
+at least, if you are typing on a computer.
+
+Remember coding: Only one command ("sentence") on each (logical) line.
+
+E-mail: Easier to quote exactly the relevant lines.
+
+Generally: Easier to edit the sentence.
+
+Patches: Less unaffected text.
+
+Search for two adjacent words is easier, when they belong to the same line,
+and the same phrase.
+
+  The amount of space between sentences in the output can then be
+controlled with the ".ss" request.
+
+N.B.
+
+  The number of lines affected can be too large to be in a patch.
+
+85:Center Bridging) subsystem. The APP table is used to assign priority to traffic
+87:DSCP. It also allows configuration of port-default priority that is chosen if no
+90:DCB APP entries are 3-tuples of selector, protocol ID, and priority. Selector is
+91:an enumeration that picks one of the prioritization namespaces. Currently it
+92:mostly corresponds to configurable parameters described below. Protocol ID is a
+93:value in the selector namespace. E.g. for EtherType selector, protocol IDs are
+94:the individual EtherTypes, for DSCP they are individual code points. The
+98:The APP table is a set of DCB APP entries. The only requirement is that
+99:duplicate entries are not added. Notably, it is valid to have conflicting
+100:priority assignment for the same selector and protocol ID. For example, the set
+102:10 should get priority of both 1 and 2, form a well-defined APP table. The
+109:commands. On the other hand, the command
+119:Display all entries with a given selector. When no selector is given, shows all
+124:Remove all entries with a given selector. When no selector is given, removes all
+137:present in the APP table yet. Then remove those entries, whose selector and
+139:priority. This has the effect of, for the given selector and protocol ID,
+146:\fBadd\fR, \fBdel\fR and \fBreplace\fR commands. For \fBshow\fR and \fBflush\fR,
+152:unspecified. The argument is a list of individual priorities. Note that
+164:for details. Keys are EtherType values. Values are priorities to be assigned to
+175:for details. Keys are L4 destination port numbers that match on, respectively,
+176:TCP and SCTP traffic, UDP and DCCP traffic, and either of those. Values are
+183:for details. Keys are DSCP points, values are priorities assigned to
+184:traffic with matching DSCP. DSCP points can be written either directly as
+191:will similarly format DSCP values as symbolic names if possible. The
+200:for details. Keys are PCP/DEI. Values are priorities assigned to traffic with
+201:matching PCP/DEI. PCP/DEI values are written as a combination of numeric- and
+202:symbolic values, to accommodate for both. PCP always in numerical form e.g
+203:0 .. 7 and DEI in symbolic form e.g 'de' (drop-eligible), indicating that the
+
+-.-.
+
+No space is needed before a quote (") at the end of a line
+
+12:.RI "[ " OPTIONS " ] "
+
+-.-.
+
+Output from "test-groff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
+
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
+troff: backtrace: file '<stdin>':12
+troff:<stdin>:12: warning: trailing space in the line
+
+Output from "test-nroff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
+
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
+troff: backtrace: file '<stdin>':12
+troff:<stdin>:12: warning: trailing space in the line
+
+-.-.
+
+--duav7VVD32ow5N1B--
 
