@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-141363-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141365-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 664599BA959
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:50:27 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EC9A59BA95B
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:50:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0016C1F21167
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:50:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 94E9C1F2127B
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F053518BC15;
-	Sun,  3 Nov 2024 22:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3002718D62D;
+	Sun,  3 Nov 2024 22:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPCMWFHa"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VpuGG80e"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AA5433AB;
-	Sun,  3 Nov 2024 22:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1503433AB;
+	Sun,  3 Nov 2024 22:50:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730674221; cv=none; b=OPSCMHBWqyu/7c9dbH8P5w3drzsw5r4594sSnaX7E7yahCIFQjJs3gjKv1XLGJ8iQvaPjAqpUKhjWjp/+ZHnEJ2VRRSshTsPczONdjydTBVIk6Uivyti7hF9kSJcmpOY4ujqULnKmSQ4HU6RN6dTVApEo9KP9v4BBqJq1Q5YTUo=
+	t=1730674229; cv=none; b=GXPtPyvqYCrs+Td0vg8PXHDixT1l5yDVegW3AjdqYpdpP47fIzRT3tj6wJkFK74ip2yZaXGc0EDPA8x1KKC6jsbzyAZHDoIGlzPUFHjfCJgJNzoXlrOVAClSjZ53kb4Jqs6NfIjHdZhrDeBZ10/hEA1m8O5FKoYvLTjAbbcpz1c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730674221; c=relaxed/simple;
-	bh=0SkRTSGIsqiHs5Dh71zvHWv9TulxU8fWVKzt6rhmO3I=;
+	s=arc-20240116; t=1730674229; c=relaxed/simple;
+	bh=X69aYaQPY1p1zrw0RsL/G3Dwr+PLLoq4fnyMayEKkFU=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=bYgkWoTGPDcmVxqNada4bBWA1vd4mmMNDIaN6Vfbm+ebwZHr8zdHxFGYgeJOhlpF6/nGO+kDOnx9z0FVpbOEeWnsO74cLlx7NFGLMs8osiT1RmuFL+KLoNGK8ZkCkmg2tCKO6RLlkvgVzsR3xe159P4wNQQUqvBZULt3jNugRvs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPCMWFHa; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4289AC4CECD;
-	Sun,  3 Nov 2024 22:50:20 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=TghyNc7eH51krhBIDcJy0/oKfCDrTDcK4XWJ2bpmWe7y33Uh9XIxERCrRyAf6UBzWpaS6TkAnRF8ZTY3UBg0qj1yEg/ebpxT3H1ZEyPTTGSKKIZrnRuvZ2gDYjAB2WOq/uuKo1rIn7dc6j1Wd6kNaVWxA9Q+D4hUh6qZyVmZ+Jw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VpuGG80e; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 73C48C4CECD;
+	Sun,  3 Nov 2024 22:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730674220;
-	bh=0SkRTSGIsqiHs5Dh71zvHWv9TulxU8fWVKzt6rhmO3I=;
+	s=k20201202; t=1730674226;
+	bh=X69aYaQPY1p1zrw0RsL/G3Dwr+PLLoq4fnyMayEKkFU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BPCMWFHaP3Z8NTmYEyOHOkT/3VHxcCmtgnh91Z3tLN2Nr5AOl1UypTmkHX3jJ2HTh
-	 lhxDE71KEBBoEdMrO2GVLBFzOP/+t22y6RPHhvjU3oof3hepLHcmr8F4Hwkosh2AK0
-	 GOsQ0gKVwXWd+blPBzRPVjYORcdJL8L+WueQmDzBw6Hp8TkYK7SocYv+2OECnqe8uN
-	 QaKosYae+yrLtg5XFueEDZh9HAdyCSA6mstmI0zQgtWCb7FdAyggIPai0/rdFq2SCm
-	 jdB/ihBkaw4OtVfXXb3813O8oL36cDsDc3Etpy7UikU7zD22Blj1NhwvhDFCmfQsAs
-	 Ai9rimwXOf8ZQ==
+	b=VpuGG80eXkrjQJQDXdwCOGo8ZZOWybSe0F5/SY9TwejYPsviHCJ26LhOqR6Yk3wiZ
+	 etCTRb7SR6OZLCnl436/9wfK0SzOVm2Q147sLI094ONj1byXluvzCr07hiPVKN/3u/
+	 kTnYeRjX3LLX39Rm2GS9IAg+DtgShud/srvJnO+Fk+15DJb/vu2k09FgJ5V0fc6tlA
+	 2hFfm1ln4mdQtu9HzX8B+yx6E5bYu7M0qMr6oGwHwg302xC9fvAc1NscWWQFitNSCN
+	 B43eXgnnuGyAjgkHnv25Rv1K2jc8ShDw1EiUTiKIS5N/5svNwtKcZCZ5Z5iyfcdVDo
+	 ULjW4Uby2Sh0Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF8538363C3;
-	Sun,  3 Nov 2024 22:50:29 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B9838363C3;
+	Sun,  3 Nov 2024 22:50:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,43 +52,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] net: xilinx: axienet: Fix kernel crash in dmaengine
- transmit path
+Subject: Re: [PATCH net-next] dt-bindings: net: snps,dwmac: Fix "snps,kbbe" type
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173067422875.3271988.4124250768668395576.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 22:50:28 +0000
-References: <20241030062533.2527042-1-suraj.gupta2@amd.com>
-In-Reply-To: <20241030062533.2527042-1-suraj.gupta2@amd.com>
-To: Suraj Gupta <suraj.gupta2@amd.com>
-Cc: radhey.shyam.pandey@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- michal.simek@amd.com, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- git@amd.com, harini.katakam@amd.com
+ <173067423473.3271988.8001663009790702380.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Nov 2024 22:50:34 +0000
+References: <20241101211331.24605-2-robh@kernel.org>
+In-Reply-To: <20241101211331.24605-2-robh@kernel.org>
+To: Rob Herring (Arm) <robh@kernel.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, krzk+dt@kernel.org, conor+dt@kernel.org,
+ alexandre.torgue@foss.st.com, peppe.cavallaro@st.com, joabreu@synopsys.com,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 30 Oct 2024 11:55:31 +0530 you wrote:
-> This series fixes kernel crash in dmaengine transmit path. To fix it,
-> enqueue Tx packets in dql before starting dmaengine and check if queue is
-> not stopped.
+On Fri,  1 Nov 2024 16:13:31 -0500 you wrote:
+> The driver and description indicate "snps,kbbe" is a boolean, not an
+> uint32.
 > 
-> Suraj Gupta (2):
->   net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine
->     starts
->   net: xilinx: axienet: Check if Tx queue enabled
-> 
-> [...]
+> Signed-off-by: Rob Herring (Arm) <robh@kernel.org>
+> ---
+>  Documentation/devicetree/bindings/net/snps,dwmac.yaml | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net,1/2] net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine starts
-    https://git.kernel.org/netdev/net/c/5ccdcdf186ae
-  - [net,2/2] net: xilinx: axienet: Check if Tx queue enabled
-    (no matching commit)
+  - [net-next] dt-bindings: net: snps,dwmac: Fix "snps,kbbe" type
+    https://git.kernel.org/netdev/net-next/c/d847548c7ef4
 
 You are awesome, thank you!
 -- 
