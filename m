@@ -1,135 +1,148 @@
-Return-Path: <netdev+bounces-141356-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141357-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67FEA9BA877
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:09:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 063729BA881
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:19:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A0761C20D85
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:09:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D64A9B21066
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:19:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6784818C020;
-	Sun,  3 Nov 2024 22:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33DEA18C341;
+	Sun,  3 Nov 2024 22:18:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IziPJNGL"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="Z0lAo4pm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f173.google.com (mail-pf1-f173.google.com [209.85.210.173])
+Received: from mail-pg1-f180.google.com (mail-pg1-f180.google.com [209.85.215.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3A71189BA0;
-	Sun,  3 Nov 2024 22:09:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7076D18BC27
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 22:18:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730671783; cv=none; b=Q+l9v8fKLQo9goNyJcMPppsBixbkXQwfmYNfEWp7TxYNN6rCB3FEI8pIqDteCl3Vy2bUakfrlCT4XRDmqLLTvOY6gsmojoDEV4nChQWrmClSaTMRvYbuyQlmf8P8FDBmx95U12zal5Zao2lftB0+PC8ciU3i5eVS6QBe98rSd5U=
+	t=1730672338; cv=none; b=CSdD8XiwDsNJnyIfLpWo2zXqNqA9OacJji2QbJ8UhNu/0+FcIgG6Roo0Mlb9QWuu5VZIsSgu/ndU8GfwviWNMZ5hTPZOdTIWCo5yWPO5gaX54XY6h1G1arozvSpphNF/+A9IkdM3DVYG82e4n+wrCy18mudgg/mf9jPXksPyBOA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730671783; c=relaxed/simple;
-	bh=WkYHzjB1FsobEK55AqhBuGNO8OPLcecCjyT36wwY6Lc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tYdXo7IOwJ7q8JO64PgRit4NqxVOauD9rsIeZnyS+p4NZ81SFbvY4odDwck2/Ewa1eH0u03pgwELXL57PorGeUtyWiVVmHhkiAVHZVFNMKeX9aEKhm3ufwL4BjdX5TTPYBV69tzR/N/ZFf+BSLdXfSks8WDktfR5mUYCyCnuH/g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IziPJNGL; arc=none smtp.client-ip=209.85.210.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f173.google.com with SMTP id d2e1a72fcca58-7206304f93aso3456965b3a.0;
-        Sun, 03 Nov 2024 14:09:40 -0800 (PST)
+	s=arc-20240116; t=1730672338; c=relaxed/simple;
+	bh=YGawsJXB+jsEC2Okr4d21ol8xSluHNkz7XQ5YfM4hmc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=ZRKZHIsV0rQyT+hr3UbLKBIpBBcvkLIPlpia2zKMaaImf3gtEpRc93AWyUcn+7qVqqGiECKHThrFtHJUUbzUD6uCGcvijwWsUyyE0NM/rK3nxCkzle5U6qNvDdtEMP1E5capATD8YzDTV5v7tc8Ut2sUIs089SbB9ov0SLUJC+Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=Z0lAo4pm; arc=none smtp.client-ip=209.85.215.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pg1-f180.google.com with SMTP id 41be03b00d2f7-7ee6afa7ac7so320583a12.2
+        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 14:18:55 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730671780; x=1731276580; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=/rHJELaF04JBRi0aLmrWuxoS3tWtyUhwmRJRrDNiPz8=;
-        b=IziPJNGLtz56KgxCv8Fn6ziU+UMUMlzwizoWlz45bCIqRzhldvhiwqRhl9JAU7u3ri
-         bjnyf0RrPzPxeeGdPbQUulRBbIgW+hG8dStFaP3UW603klM1pZuyR19dWuPw6rxBzC7r
-         9jwTDOBlThdKilsQrHGd8LtLG42MfFiG3vnKhxz7ZsnYcHyYOlqhHpQC59w5++EWv7JM
-         g+VGVYKAgRKy/Pc5ZSoLqcQy0kSAk8vs10ReVrs+QjFgggxFPhpxqcwIz7nYP3g8fO1k
-         vYbdMyiuIovi1FrO+XmIoY0JDkSdpQoSeTnheyFDe743yrST6iPzmLOB6e0FV9pTlUh4
-         tc3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730671780; x=1731276580;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=purestorage.com; s=google2022; t=1730672335; x=1731277135; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=/rHJELaF04JBRi0aLmrWuxoS3tWtyUhwmRJRrDNiPz8=;
-        b=bkLYNfhnNgv0mgaTKivGL/rEkxf6Rk6jBwxYalxyQA/g01kJ0TWdEr8HUENQolkxOT
-         zrizqeU7LC3sC0AgjePUUYwl+q7u13VDXqc8880cuFewULaw8WOKcsRPLnZF7CwPskgx
-         DYvMOKiHyEPaCSoqtAlKWNuPkd8M9c94X5ofBx/fDr968Jh1gbkbgErWG+8OqOLgsSxW
-         Itnc9BZqIFc0EjMdzH9VaFbLzyss9A4ALIAxTKVCClhlUF4h5TACS6R6FodDt3qP6Ran
-         34vUsF3z7Aywdg8Qdt5nmwd0L3+0wpzQItpB+op5XbXbACNdw84pD6CXGNX1NmqreFK+
-         mb7w==
-X-Forwarded-Encrypted: i=1; AJvYcCV5/x6hqJTm+626GB7+ug56IHO9F4bsRAj/POXGpAr9Yf9zD7+f7KtNpO+IqR3UdPk3sxDF5BoA@vger.kernel.org, AJvYcCVEjNVCH2jro4pL5vgb+Jo0iU/M5Luq5H9KJ8gXzhGC9b11vtVA+4WTbula6NAxOrGwdhuTNNB4IGVtoBZ/@vger.kernel.org, AJvYcCXeTabEGgC2F3rRHEluaeYNnihIdJqd2xrbzTYg5gkM/Rjm+KV5y4uLHzwa33ai2Ft1MCjKAx099iho@vger.kernel.org
-X-Gm-Message-State: AOJu0YyhPZpx6SIFsxKUxUOL8m00xw4+i40+LlklU3H9/ScnMIujiKN8
-	X0KTmmH9lk4pUfVlJ+RnwexD+VZkf12DnVH1Rp/veXQN+Qqj5SAd
-X-Google-Smtp-Source: AGHT+IFKyJJZHHJG1xrvYibWpBIs/FS0N3kdjWrsxFMjWgEPFe5BpYTq3ei0lG/0AXdt3oOlAP3xDg==
-X-Received: by 2002:a05:6a20:e605:b0:1d9:dfd:93c0 with SMTP id adf61e73a8af0-1dba556fdc2mr13977660637.49.1730671780063;
-        Sun, 03 Nov 2024 14:09:40 -0800 (PST)
-Received: from x1 (71-34-69-82.ptld.qwest.net. [71.34.69.82])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1ba033sm6074536b3a.34.2024.11.03.14.09.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Nov 2024 14:09:38 -0800 (PST)
-Date: Sun, 3 Nov 2024 14:09:37 -0800
-From: Drew Fustini <pdp7pdp7@gmail.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Drew Fustini <dfustini@tenstorrent.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Emil Renner Berthing <emil.renner.berthing@canonical.com>,
-	Jisheng Zhang <jszhang@kernel.org>, Guo Ren <guoren@kernel.org>,
-	Fu Wei <wefu@redhat.com>, Paul Walmsley <paul.walmsley@sifive.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Albert Ou <aou@eecs.berkeley.edu>,
-	Andrew Lunn <andrew+netdev@lunn.ch>, Drew Fustini <drew@pdp7.com>,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-riscv@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Subject: Re: [PATCH net-next v7 0/2] Add the dwmac driver support for T-HEAD
- TH1520 SoC
-Message-ID: <Zyf0oVGk6FiVrPsB@x1>
-References: <20241103-th1520-gmac-v7-0-ef094a30169c@tenstorrent.com>
- <662a8258-291d-4cfc-b21a-f3c92f9588f2@lunn.ch>
+        bh=DR6c/WPJN94TSRP9CTlobXAtJd4oqXafjQHarDgT3xg=;
+        b=Z0lAo4pm9kE/AL/MM90CCrdbc1DMqNVaTcZF/rgDQgpKxHJF7ikrdnOVHBP9i0yA1O
+         D7XOB58ITkxOPaQ0AH4oCWdWUT3g9BjRdB54RXkwGGmMf54GDRpWbnnyeXnLBOmDGnGt
+         87/P6Q1YmWdZWkir9mk7RL8oq0GuwnVoF8w68cPlPUWSuefOVa4O1TaoHjiXVwp4oIM+
+         zUq0+vi2/MBegEAIbdogQpQ4lvhTvK74SkxYt+60Njxpi0WnDNwqIRJDAkn37n3SriKU
+         j0/O7j37FJqHo6jj7gjqOI6HTawQeskaWN67/OOKmoEirxnUskWvlzPlYH07ODDd4ygC
+         DjXQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730672335; x=1731277135;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=DR6c/WPJN94TSRP9CTlobXAtJd4oqXafjQHarDgT3xg=;
+        b=r9kzhLFs3WlNHsR5l7xAIhYy6W9Qap/D7JI89f3t5+zsJBcZOD5FAXj6y69tBsjw6J
+         NJ8ZXMF9Crbx02JkYbYHadqOVT/Eez6tQqFyKoY0wLNuF2ZlQm9w1khOFEqZj/Ba8Hv1
+         Xr3EGcpKaIjOfFQOtN50eRGqNch7LvunfXpq7uVte6FUn/L0qShg6yR+rskfv0VqBjie
+         M3QFxKpfqkF9sHBP5FWke2j1IIOlKoV/zsMCBpjQ1LpWnx4ChGI3LUnNKkBAakDAmzaX
+         rkGRajmz3vR5TEhms2p74//crczU5nTlxLzJbe4Ra5z49tOkgwUBQAoBcGPcuZaWT6s/
+         iqSg==
+X-Forwarded-Encrypted: i=1; AJvYcCUg6VoWflbPz/laimg4v3l9KfpxfzS6g6i4we9UKubQAO6aIf7OUEMp+DVLUZUcHSs8lepixXI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxbRVD/Fy2IfrWOb02UV1hMtVQXubfvBlBHrr3/7YbVMQ4UQWYr
+	uMUX2YCnLlU+XhkQ6iUurg26IeuA79OWEZ28kiK5WSM/uaq5yP7k/th58ObQYk+YBIhRE8OgZ8f
+	dL5cQgirMnD6GSoRmtdFe1CqYG738n1eejezZGA==
+X-Google-Smtp-Source: AGHT+IExPA2hsiAKoyDZwRCgYk5UAZ7TEXffOizLQFxWQDP2pcqP6Jrb05184RINemMWnN8NpvwAMu6stmFhPCSnf1w=
+X-Received: by 2002:a17:90a:77c5:b0:2e5:5a58:630 with SMTP id
+ 98e67ed59e1d1-2e8f11a8ba9mr15038332a91.5.1730672334564; Sun, 03 Nov 2024
+ 14:18:54 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <662a8258-291d-4cfc-b21a-f3c92f9588f2@lunn.ch>
+References: <20241101034647.51590-1-csander@purestorage.com>
+ <20241101034647.51590-2-csander@purestorage.com> <CY8PR12MB71958512F168E2C172D0BE05DC502@CY8PR12MB7195.namprd12.prod.outlook.com>
+In-Reply-To: <CY8PR12MB71958512F168E2C172D0BE05DC502@CY8PR12MB7195.namprd12.prod.outlook.com>
+From: Caleb Sander <csander@purestorage.com>
+Date: Sun, 3 Nov 2024 14:18:43 -0800
+Message-ID: <CADUfDZofFwy12oZYTmm3TE314RM79EGsxV6bKEBRMVFv8C3jNg@mail.gmail.com>
+Subject: Re: [PATCH net-next 2/2] mlx5/core: deduplicate {mlx5_,}eq_update_ci()
+To: Parav Pandit <parav@nvidia.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Sun, Nov 03, 2024 at 07:12:24PM +0100, Andrew Lunn wrote:
-> On Sun, Nov 03, 2024 at 08:57:58AM -0800, Drew Fustini wrote:
-> > This series adds support for dwmac gigabit ethernet in the T-Head TH1520
-> > RISC-V SoC used on boards like BeagleV Ahead and the LicheePi 4A.
-> > 
-> > The gigabit ethernet on these boards does need pinctrl support to mux
-> > the necessary pads. The pinctrl-th1520 driver, pinctrl binding, and
-> > related dts patches are in linux-next. However, they are not yet in
-> > net-next/main.
-> > 
-> > Therefore, I am dropping the dts patch for v5 as it will not build on
-> > net-next/main due to the lack of the padctrl0_apsys pin controller node
-> > in next-next/main version th1520.dtsi.
-> 
-> You should send the .dts patch to the Maintainer responsible for
-> merging all the RISC-V DT patches, maybe via a sub Maintainer. All the
-> different parts will then meet up in linux-next.
-> 
-> 	Andrew
+On Sat, Nov 2, 2024 at 8:55=E2=80=AFPM Parav Pandit <parav@nvidia.com> wrot=
+e:
+>
+>
+>
+> > From: Caleb Sander Mateos <csander@purestorage.com>
+> > Sent: Friday, November 1, 2024 9:17 AM
+> >
+> > The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci(). The o=
+nly
+> > additional work done by mlx5_eq_update_ci() is to increment
+> > eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to avoid
+> > the duplication.
+> >
+> > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> > ---
+> >  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
+> >  1 file changed, 1 insertion(+), 8 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > index 859dcf09b770..078029c81935 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+> > @@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct
+> > mlx5_eq *eq, u32 cc)  }  EXPORT_SYMBOL(mlx5_eq_get_eqe);
+> >
+> >  void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)  {
+> > -     __be32 __iomem *addr =3D eq->doorbell + (arm ? 0 : 2);
+> > -     u32 val;
+> > -
+> >       eq->cons_index +=3D cc;
+> > -     val =3D (eq->cons_index & 0xffffff) | (eq->eqn << 24);
+> > -
+> > -     __raw_writel((__force u32)cpu_to_be32(val), addr);
+> > -     /* We still want ordering, just not swabbing, so add a barrier */
+> > -     wmb();
+> > +     eq_update_ci(eq, arm);
+> Long ago I had similar rework patches to get rid of __raw_writel(), which=
+ I never got chance to push,
+>
+> Eq_update_ci() is using full memory barrier.
+> While mlx5_eq_update_ci() is using only write memory barrier.
+>
+> So it is not 100% deduplication by this patch.
+> Please have a pre-patch improving eq_update_ci() to use wmb().
+> Followed by this patch.
 
-I am the maintainer for arch/riscv/boot/dts/thead. I'm planning to apply
-the dts patch to my for-next branch once this series with the binding
-and driver are applied to net-next.
+Right, patch 1/2 in this series is changing eq_update_ci() to use
+writel() instead of __raw_writel() and avoid the memory barrier:
+https://lore.kernel.org/lkml/20241101034647.51590-1-csander@purestorage.com=
+/
+Are you suggesting something different? If so, it would be great if
+you could clarify what you mean.
 
-Thanks,
-Drew
+Best,
+Caleb
 
