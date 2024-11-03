@@ -1,225 +1,170 @@
-Return-Path: <netdev+bounces-141289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 255AD9BA5CD
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 14:57:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF4839BA5EA
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:23:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7B959B20ADE
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 13:57:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EAA6281800
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 14:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEA4016BE14;
-	Sun,  3 Nov 2024 13:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C657175D37;
+	Sun,  3 Nov 2024 14:23:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YMvyQR+9"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="ED1/bSz5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f180.google.com (mail-qk1-f180.google.com [209.85.222.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2040.outbound.protection.outlook.com [40.107.212.40])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1609C6F30C
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 13:57:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730642233; cv=none; b=EbC8MrjwxxpbNC+JRMsIr9UmF9H7azm09ghXpkxys4/7lRvf7/Pb1n3G0wWODNpe7i4Uc7juVrhoMbKWiBznoTF4X56rqxWnTUSGqSxdB5mkFK4bFQJnNd6yPxeUEPSmrmfg3nh3WWGTUmA5UNGARGqQMfMSE6exvPErRC1M3x8=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730642233; c=relaxed/simple;
-	bh=Ke7Mn/axNJ/tQCjZ+ECm7kRH7hV1rMBdxizspW86Yqw=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=RWYMm6vAMHpfcFJAQ+chgF8xHU9U3r/uVRD2UczCkRfDk+sYWKV4Sz9CxqTmTHprVGMfi+q2xkFdTtiU8wYQeDIZr/1uHWu7uHSt0IxDYy2nbF1EhxgxX2cXwJpNhtoCANbbX1Ghw+LlYdruphijEJnmfpCvCncawYYJ5PKJhmA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YMvyQR+9; arc=none smtp.client-ip=209.85.222.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qk1-f180.google.com with SMTP id af79cd13be357-7b155da5b0cso284052785a.2
-        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 05:57:11 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730642231; x=1731247031; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xpIenzEUgJVuXKuGym0zB9/nc9QqPe9oLO7RJf3KVoo=;
-        b=YMvyQR+98tiUpOzEru18ogia3M5k5BWAq2CIQcs78evGkgfTqfy4rsLLfLn1zdosHB
-         2qTgOELTECpLGNhyk5FkRofkn5rYD6XetHb6Kfh2LLdRo8HSITVVk7VjhXdX+013qUWM
-         KHXfO8A5NTum2g2zDJG57Z8dzELjsMZRF4UoXy7WZzJLm+QY6WCCVdAYlZxCzctHD8A1
-         MI8OV2mh+GkldmepaYHoJyhlCApN5tsyhay5iZfGSLKfakL3hWg/29yIX4CGaUo6p3Ho
-         Dm6eygKQDMINhBgNebl6yujadhqBziPrlmiUcDmtzzN1mf40OM6t/HrH3KacPpsit2Aa
-         WG4g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730642231; x=1731247031;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=xpIenzEUgJVuXKuGym0zB9/nc9QqPe9oLO7RJf3KVoo=;
-        b=V8S//UrvOjMHuFaLGg5jtpUsmXLMqh4qsCWu5oRxd7zgQ2c7PYn22HLHQtRXNGMT3T
-         VaF+iR3RTx43RJMNA3rel861hxFb7wBjKAYks5D1o83hkZ7D7MBxdfQGxOvf6neSGOZh
-         ilSFYP5+fKjtwOF0T1Ar35s1f5JiANOjD9iJPcJRQSqCtgnt7GFcGAeKM6HK9NE4I4KH
-         QbtijH9P7MG3czNtYcfD20hH8HunhQ1q7Nsh7F//ZTVkW0b73OxZx/jIQ2M4vrAx+YnC
-         WWrryoeq9q/vx2/WtJoQjj29C9uTInnAuYkZoZlaAlVO8lKkFum/KR+EwZWI56WxCWrN
-         f3Sw==
-X-Gm-Message-State: AOJu0YzEdJhxl5sPjBxNoQsp1OeV2Qoi8IXtbrn1Zehfe3Ub9HSqtrU1
-	6MjQHRw5THpRBhiVh5HF532wZ2pw5JpLKljG2UAk/NPHg8V9/Byu
-X-Google-Smtp-Source: AGHT+IHItMedHkvwdUiKSbTeUh1FXqmnzBE1+bZJl4x1kr/puAJM3fxZpPTT0Oj5UcuBsbEUTlty1A==
-X-Received: by 2002:a05:620a:248a:b0:7b1:4cc0:5e1f with SMTP id af79cd13be357-7b1aed6dac1mr2522518085a.7.1730642230814;
-        Sun, 03 Nov 2024 05:57:10 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b2f39eb203sm342573985a.14.2024.11.03.05.57.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Nov 2024 05:57:10 -0800 (PST)
-Date: Sun, 03 Nov 2024 08:57:09 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Nyiri <annaemesenyiri@gmail.com>, 
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, 
- fejes@inf.elte.hu, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com
-Message-ID: <672781359b9d1_312cad29465@willemb.c.googlers.com.notmuch>
-In-Reply-To: <CAKm6_RtYXpa5HnTNe+b1xy9p4BsdD8JnG30F+_ktBYcd2QSyfQ@mail.gmail.com>
-References: <20241102125136.5030-1-annaemesenyiri@gmail.com>
- <20241102125136.5030-3-annaemesenyiri@gmail.com>
- <6726d1954a48f_2980c729499@willemb.c.googlers.com.notmuch>
- <CAKm6_RtYXpa5HnTNe+b1xy9p4BsdD8JnG30F+_ktBYcd2QSyfQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 2/2] support SO_PRIORITY cmsg
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CFAE170836
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 14:23:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.212.40
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730643810; cv=fail; b=IIPLymwfeVe8F0qgjMSwermjsu6lQ6Anr4tTlYy9mrHhd5gwBuVrQX+IWIQuCDR2H7RztnCXYUh8+nGupSrQHC3KF272fjDpK3eQszWe22dTS4V+WiM5ISheCe093320WSwZ5apFZki0ZzNU9xJA9JKSrs9iWdOy7iJ8Bj6qagY=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730643810; c=relaxed/simple;
+	bh=W+scV4VyZbrtzA7j8snoZFzWAQepAlyBmj1wCaHatIw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:Content-Type:
+	 Content-Disposition:In-Reply-To:MIME-Version; b=u2btvwgdrT2i69ccLIWaQdYbhltoGWh1WkGl8NlaW5OQdpSLw1T9OvN+5KUfsDfMGIhdXSBLCwf6+r39KPOypfaDEOzTej7HyjyRrSEF2iBKusPi9YY3K9TbsXM4Bv/ImFPzAvvm8PxYA5LGIcgD/TW97eiaK0WwNMRYeE2uy00=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=ED1/bSz5; arc=fail smtp.client-ip=40.107.212.40
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=h1F91xdx5RBRsgusWPDl9iCz9sAtq0xqtztSj/J9Ui/1xwK7jDDmFWFciar9OSgo1w7vbVO94hmUm/2zOpF72dyuPMMCSyG2WNa5KN+t8SuubkPu9C4eJUQdVyvMO4yGeA4ngkMlYYCSwF8/Mm8/rfuhyaeO00d1BxAh3SfvSwR7P7JhorVadzWYKJGJUbtKkl6uOA0zPfXJdtAq3iOyp43plBfwavHrnmiuIPxj9IErua/h5L72m8vNN7xkdFLUpOnwQPQn4sKfaaatqus1kwWXoSKqUywk8yMJbhKqW4kuHsdCWBhfwSkGXwuqngLwparLPfSH5xtul3GGz/+M+g==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=F7ZvRNNp9QPA5QJhQOVSCBahWxzErKJ3QnP3lgo4JG8=;
+ b=MqhndJbH3FKgWVE2a3AO0LNtq6SJnMKYANQOKr09uXsBbKlBFEstbXRIk5vkrWYa+sZUcBrMVNvXhKJzooSSXgHeWFKPBM5hW5huWZbc595R4MyioGh0PnprIhzTqrE1GnnoXKT9CxRh4Iqw3vt7wJX8s8UGLBSKn6+FzuINL6PFMV0jQec+M16lARQRUrNRKeacHbRjOTCZYvXcBZZcCBcImstaRNhVc5GSASa1NYQDObcI+MzxlYgQxB1tC9p1tMIwvnSqUht6CkJLxgjbjMkxD8T+tVPe8KW2fq/uyO+j6vKSy9jKs4t4OBHLhG4CJPUV0WzfhKrWXguYd45S/g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=F7ZvRNNp9QPA5QJhQOVSCBahWxzErKJ3QnP3lgo4JG8=;
+ b=ED1/bSz5zXQ0d5ONVa6CacE8JbeSMsFevXCjKwyTfpJIWt0tvThWfrP4kHjmLIqkpgov57ZSl9xfxakRj4kU4pN4FEXkebNrkps05LtVx8yh2D5Xd2mSjkbBw5zwDrnSYdR9djRCx69P7BDk6CLPyrBaQhLMIOAl66JmozOg1q9PBKF2kHyfsGSktS2sMLdG3mtvxRQIPMsCEPrn/Mv7lc1r0gulHAKCJWI1KMIDN+jo2U+lGPA+byGhzz2c5tS6Kio6ZkAWDyka4iA2A90DOhBcKMEc2UyHTmY785QsjuaJSQFe9+zVf7EWVjOnxFTyy9Du+jjfJ0JWN188sgFbHw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com (2603:10b6:8:14e::10)
+ by CH2PR12MB4263.namprd12.prod.outlook.com (2603:10b6:610:a6::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Sun, 3 Nov
+ 2024 14:23:22 +0000
+Received: from DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3a32:fdf9:cf10:e695]) by DS0PR12MB7900.namprd12.prod.outlook.com
+ ([fe80::3a32:fdf9:cf10:e695%4]) with mapi id 15.20.8093.027; Sun, 3 Nov 2024
+ 14:23:22 +0000
+Date: Sun, 3 Nov 2024 16:23:01 +0200
+From: Ido Schimmel <idosch@nvidia.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	David Ahern <dsahern@kernel.org>,
+	Eyal Birger <eyal.birger@gmail.com>
+Subject: Re: [PATCH ipsec-next v2 1/4] xfrm: Convert xfrm_get_tos() to dscp_t.
+Message-ID: <ZyeHRZztmAWlJJwt@shredder>
+References: <cover.1730387416.git.gnault@redhat.com>
+ <5b34d13b962afc226c4ad1246ef57e502c047fab.1730387416.git.gnault@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <5b34d13b962afc226c4ad1246ef57e502c047fab.1730387416.git.gnault@redhat.com>
+X-ClientProxiedBy: LO4P123CA0126.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:192::23) To SA3PR12MB7901.namprd12.prod.outlook.com
+ (2603:10b6:806:306::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS0PR12MB7900:EE_|CH2PR12MB4263:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0f92cc3b-9820-43fb-29f3-08dcfc131112
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|7416014|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?YpybO9qVue659kMke8dg/CL2qhDug3HWsE5sbrL1PcP07IRWjUrqy7yAob8n?=
+ =?us-ascii?Q?iZ1cl0L3ioWWzx7z9af4C8xXWeqa+oY6Lgsuk/TJphM01F86y5WmTMgdZjiF?=
+ =?us-ascii?Q?0DP9X/+DqiBQoKV32fhzN2TAZ825MQ7i50Mc7XcGtDZwZSU76sPey6wdepiH?=
+ =?us-ascii?Q?/A9NuBR9coVbuVOQoIvXOdbn5YKQVYOdAQMCtymDUOAHtSUAWYu5uHlabY1M?=
+ =?us-ascii?Q?n+plZT4hT4Aojp0iQEf2wpjzfejRHwJp7YxEia8nXdJsGyjKFhXFLuz0gKVy?=
+ =?us-ascii?Q?4/ePu/IgiBuJ0tyKVjaUWlumhcE+drwOso7OsxcV44QLElFgMknu1Qa9gj1s?=
+ =?us-ascii?Q?dhnEh25BV/5hRbdDHyuxYRZTifWHxWcfs+FG8p8zfowtE1+76YWL/lsUZ4dJ?=
+ =?us-ascii?Q?nDt4p1Htta8pXtb7ixcpHD++qlXA5MlxzxT75GxyKaWwOMpx/YUbZlYzy8v5?=
+ =?us-ascii?Q?Kw6joiLe32Ye0mOnknhEm7xw/jNUwrsxojKKYE5lxMEC0CpsNs46ZCUlqNiB?=
+ =?us-ascii?Q?0tfggVKJF8kB7wf4L087pA4Ug2ap66dLScqJvG/P41QZXyG5XCYa/BUwZTrf?=
+ =?us-ascii?Q?nKOnxWwEbw+0XH07hX5W+oxBagR8RGOeAw2taEkYajIjvge6c8nZTwjfHGGW?=
+ =?us-ascii?Q?2PF9CZolXtisKUmbMYaPqBw7ryG4DIkIvldmHiIw2Pl5QW3qJFqxWyGcik0K?=
+ =?us-ascii?Q?M0Jv3cT2umCSB0bEr+u4YtakbYFy3suWhNpTCwSMTOPuOIbisF6aGcAAhR5B?=
+ =?us-ascii?Q?0Enskp7vb847guR3COWLHLp+3x1rbGXeXxs88lWR7d993rx1bIpvKOHNIZSa?=
+ =?us-ascii?Q?Aw76A1SxpAquDV1lOy/OJNZTjKLxfOn29e9m8SqQzyDR1FWfYj33UMJXTNNz?=
+ =?us-ascii?Q?Z/8oM/SUvk+mFzN7rdamcbGeEJ8QnSWXB7HD8u++4FgnSQYWd6OG2CconudQ?=
+ =?us-ascii?Q?KDHZiS5d+X5VXiCz/pzRQkeD50Kf/jzxRGWO7yVXWONZLtkTgFE5crrMrCDm?=
+ =?us-ascii?Q?AELaHmUbQqsz2INcgiFsBo/aVGsrxA+Fh2is8WR2WwqLFg8LJmELXFsfMaZL?=
+ =?us-ascii?Q?5hARsBLU2nEeb6SKu5jt1y0Mshs/sCxpJjHNYimaYWgzMlNBMfld6QXGy15U?=
+ =?us-ascii?Q?kLNAVumiysrCnMNZ8nFNk3O0QW5jODPttqsPd3nEQkc4ZBBvCxuyg67Ag243?=
+ =?us-ascii?Q?Gh0CYNmi97RW3eWY5iDOoRf0LR/WTFyi222lMaGfKOL/UzP8nISw8KJ44cpV?=
+ =?us-ascii?Q?2BHvcbimJrjUsUSjrv7GkicKP832X7tl5wYh5pb1kf/uaUBB1W8ml2eUUHPy?=
+ =?us-ascii?Q?bfc=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS0PR12MB7900.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(7416014)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?rIbYHGdwOtt8gpUSBlPOo4gexzUFPkhh+ugMuZn6dMEU3rwZs+GCR4yMjsWK?=
+ =?us-ascii?Q?ZPr93UdhJNejbEHo8FkBn0LBM6/T8McfFnaPDuQxsYi1mDp4wd2qxZqSQ2Op?=
+ =?us-ascii?Q?hmG9mTU65ewm0pfA8Ox2Bkpnp5U3doP1NUsAHfhgKF7GZKZ4Gmv17WOjgp+k?=
+ =?us-ascii?Q?LNySVjCqVIOFG5LUW1M8eXCkNa3cWR2Ui3YVHf7F/dtu/Y9jSJiqEPzlCIAx?=
+ =?us-ascii?Q?rFcuhcTAU4IbTrjCIUYvA0O26GlidYGTGolPmT49KWCSgwIxrIpKTBsT9nYc?=
+ =?us-ascii?Q?5JMSQk9XSU96kzQ5IVZIL1lInRSgG8p5LcHBa2snvITmFEZgoUUMWbGcVviD?=
+ =?us-ascii?Q?z6RGP6CRcxPLdTwkLjctwXWueFYk96SAq81oFF9wt65Oc/NiNHVsE5hYO86d?=
+ =?us-ascii?Q?3LVWZxzEawvydx+I3RMwMs1qn/TlrytqYwmXWgZ9lBhmKR9VcXfyyz0OkkvH?=
+ =?us-ascii?Q?RgJykX9oRw2BZAP4qWa4Nqu13wsoDsMyV18ZWIIVQOIjTxOByWls/a3xuGFW?=
+ =?us-ascii?Q?Xo7eTq4Hd5BgHynl0bB06jtVPoc3irS9AnlXuWtxoGnhU4RHc+hxmtqMPmJU?=
+ =?us-ascii?Q?QAxakIyQSsHS9jwo6WQE0M1Tiaw07dbzXfsUwPfWVvm9pODKUEFcFYK3hg1y?=
+ =?us-ascii?Q?TvXxj7mr9BSL6N0j6EHh0PE2A7rJUkkXs1bJFDv3f8/+Sdj7lDG4wt24kyRk?=
+ =?us-ascii?Q?3/Iki5ktLb5svCUCE1vdPtHTpEzF2/pFGmn6szjFIEX2Cf40zUJx4B16vUNb?=
+ =?us-ascii?Q?QtB9osTOAiFvoSFIDMgwIV4r1uIPv5u7VqcuD36cImCjZZyqVoOYTQAGwvrd?=
+ =?us-ascii?Q?iuKcfqj2ZNcW3soe8zSn3J7ezx5sV3eE5jrpTVtN2gcF4Glq5Yl0AetJ25RY?=
+ =?us-ascii?Q?XjFmcuMXQn9Mkr+Xn7Gnw0MSX2+odCV6kYftXHtCN79L7Aya1gPp8cK6+mTN?=
+ =?us-ascii?Q?+VfHRVgNRgJtn76QymYYyqxgzb4pFuvC+B0MoVQ0qRoVDhfPYGt0U5PHF2Va?=
+ =?us-ascii?Q?aTf9nr0ftVLl4fRgXshiFXqbjbXY6zMOsDZoacOUUpsk4q3Y3REJ1h5m1nao?=
+ =?us-ascii?Q?W+cvuIWfNg32cvfsfDvFiaQvVJzkwQW1JXQY3w1Qu2CDeVKfdDOtzpbtiGHJ?=
+ =?us-ascii?Q?UsNJsudr+X9xmd8DmRW2tk54R2tlXiC3jfj6cTWi8fpJvR03DCBOmU2qG5r4?=
+ =?us-ascii?Q?VyIzumcLdWnjVjzHTqxehFReEZ5Xm4CSQFGFJJNp5lEpQ2zCxPRmQllEydWF?=
+ =?us-ascii?Q?bEC9URSgZCzIGTPRgE5sF3yjpbxiGv/DcRSDkm51r7tzxzDwb3kBK6k8uLMs?=
+ =?us-ascii?Q?Ojp0mrMMEbsBGIaszYhHpB0mPAjeTr7JzMa4gZi5LQkRhmkPZjs1BSKXHt5N?=
+ =?us-ascii?Q?CcD3sKJOCH2waoDYPWCHG98Q0lBl3EEKFGtAFDUgNAxKHzBRgVTDoS3bC+eE?=
+ =?us-ascii?Q?tFSUIjBtb7mFheWZbSjVFjVUsuF/QVH3isX3FBlRqZhD8LJOO4JbIoL1gW63?=
+ =?us-ascii?Q?r16cgdTP6Sb6hUkkBTy4Zhmea1kkSvfmym9sc46EkBlITx1PZTw1yTZIwjyL?=
+ =?us-ascii?Q?XGU3gl7mmv7mj3H/IHrYxVEB4l9kVwbomSYVzhGk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0f92cc3b-9820-43fb-29f3-08dcfc131112
+X-MS-Exchange-CrossTenant-AuthSource: SA3PR12MB7901.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Nov 2024 14:23:21.9714
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: s+kD0Yeb+wHw+ogQVOHRPRszo0HNRm/of/jH+IDuiujLXN3yxnpVGeZoCr/zGJ+nvgQ/ak6vidV0zM5kLDa/lg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR12MB4263
 
-Anna Nyiri wrote:
-> Willem de Bruijn <willemdebruijn.kernel@gmail.com> ezt =C3=ADrta (id=C5=
-=91pont:
-> 2024. nov. 3., V, 2:27):
-> >
-> > Anna Emese Nyiri wrote:
-> > > The Linux socket API currently supports setting SO_PRIORITY at the
-> > > socket level, which applies a uniform priority to all packets sent
-> > > through that socket. The only exception is IP_TOS; if specified as
-> > > ancillary data, the packet does not inherit the socket's priority.
-> > > Instead, the priority value is computed when handling the ancillary=
+On Thu, Oct 31, 2024 at 04:52:36PM +0100, Guillaume Nault wrote:
+> Return a dscp_t variable to prepare for the future conversion of
+> xfrm_bundle_create() to dscp_t.
+> 
+> While there, rename the function "xfrm_get_dscp", to align its name
+> with the new return type.
+> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 
-> > > data (as implemented in commit <f02db315b8d88>
-> >
-> > nit: drop the brackets
-> >
-> > > ("ipv4: IP_TOS and IP_TTL can be specified as ancillary data")). If=
-
-> > > the priority is set via IP_TOS, then skb->priority derives its valu=
-e
-> > > from the rt_tos2priority function, which calculates the priority
-> > > based on the value of ipc->tos obtained from IP_TOS. However, if
-> > > IP_TOS is not used and the priority has been set through a control
-> > > message, skb->priority will take the value provided by that control=
-
-> > > message.
-> >
-> > The above describes the new situation? There is no way to set
-> > priority to a control message prior to this patch.
-> >
-> > > Therefore, when both options are available, the primary
-> > > source for skb->priority is the value set via IP_TOS.
-> > >
-> > > Currently, there is no option to set the priority directly from
-> > > userspace on a per-packet basis. The following changes allow
-> > > SO_PRIORITY to be set through control messages (CMSG), giving
-> > > userspace applications more granular control over packet priorities=
-.
-> > >
-> > > This patch enables setting skb->priority using CMSG. If SO_PRIORITY=
-
-> >
-> > Duplicate statement. Overall, the explanation can perhaps be
-> > condensed and made more clear.
-> >
-> > > is specified as ancillary data, the packet is sent with the priorit=
-y
-> > > value set through sockc->priority_cmsg_value, overriding the
-> >
-> > No longer matches the code.
-> >
-> > > socket-level values set via the traditional setsockopt() method. Th=
-is
-> > > is analogous to existing support for SO_MARK (as implemented in com=
-mit
-> > > <c6af0c227a22> ("ip: support SO_MARK cmsg")).
-> > >
-> > > Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
-> > > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> > > ---
-> > >  include/net/inet_sock.h | 2 +-
-> > >  include/net/ip.h        | 3 ++-
-> > >  include/net/sock.h      | 4 +++-
-> > >  net/can/raw.c           | 2 +-
-> > >  net/core/sock.c         | 8 ++++++++
-> > >  net/ipv4/ip_output.c    | 7 +++++--
-> > >  net/ipv4/raw.c          | 2 +-
-> > >  net/ipv6/ip6_output.c   | 3 ++-
-> > >  net/ipv6/raw.c          | 2 +-
-> > >  net/packet/af_packet.c  | 2 +-
-> > >  10 files changed, 25 insertions(+), 10 deletions(-)
-> > >
-> > > diff --git a/include/net/inet_sock.h b/include/net/inet_sock.h
-> > > index 56d8bc5593d3..3ccbad881d74 100644
-> > > --- a/include/net/inet_sock.h
-> > > +++ b/include/net/inet_sock.h
-> > > @@ -172,7 +172,7 @@ struct inet_cork {
-> > >       u8                      tx_flags;
-> > >       __u8                    ttl;
-> > >       __s16                   tos;
-> > > -     char                    priority;
-> > > +     u32                     priority;
-> >
-> > Let's check with pahole how this affects struct size and holes.
-> > It likely adds a hole, but unavoidably so.
-> >
-> > >       __u16                   gso_size;
-> > >       u32                     ts_opt_id;
-> > >       u64                     transmit_time;
-> > > diff --git a/include/net/ip.h b/include/net/ip.h
-> > > index 0e548c1f2a0e..e8f71a191277 100644
-> > > --- a/include/net/ip.h
-> > > +++ b/include/net/ip.h
-> > > @@ -81,7 +81,7 @@ struct ipcm_cookie {
-> > >       __u8                    protocol;
-> > >       __u8                    ttl;
-> > >       __s16                   tos;
-> > > -     char                    priority;
-> > > +     u32                     priority;
-> >
-> > No need for a field in ipcm_cookie, when also present in
-> > sockcm_cookie. As SO_PRIORITY is not limited to IP, sockcm_cookie is
-> > the right location.
-> =
-
-> I think there could be a problem if the priority is set by IP_TOS for
-> some reason, and then also via cmsg. The latter value may overwrite
-> it. In the ip_setup_cork() function, there is therefore a check for
-> the value cork->tos !=3D -1 to give priority to the value set by IP_TOS=
-.
-> And that's why I thought that there should be a priority field in both
-> ipcm_cookie and sockcm_cookie. The priority field already existed in
-> ipcm_cookie, I didn't add it. I just changed the type.
-
-The existing behavior that adds a branch in the hot path is actually
-not needed.
-
-The preferred pattern is that the cookie is initialized with the sk
-field, and then optionally overwritten when parsing cmsgs.
-
-The path is slightly complicated by the fact that ipcm_init_sk does
-not call sockcm_init, but more or less open codes that.
-
-The callers of ipcm_init_sk are datagram sockets that have more
-opportunities to override per-socket options on a per-packet basis.
-
-So I was wrong that the field only has to be initialized in
-sockcm_init. It will have to be initialized by both initializers.
-
-But still only a u32 single field is needed.
+Reviewed-by: Ido Schimmel <idosch@nvidia.com>
 
