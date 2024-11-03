@@ -1,94 +1,173 @@
-Return-Path: <netdev+bounces-141328-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141329-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91D4E9BA7AD
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:35:47 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F5FC9BA7B1
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:42:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EB2B1F211CD
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:35:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA1CCB208CD
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:42:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F5E1865FC;
-	Sun,  3 Nov 2024 19:35:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EC117A597;
+	Sun,  3 Nov 2024 19:42:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IT/XYN0/"
+	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="kD1e3IaZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706B6158A36;
-	Sun,  3 Nov 2024 19:35:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03911CAB8;
+	Sun,  3 Nov 2024 19:41:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730662542; cv=none; b=k1RKShEz3WcduBw1Awbw8/HeKHdxDMT5zyHu5qI1RFuhbAIQjORNeWJd407AokD/h5qwWJcr4D8K5AXSj70l6IqFotL0Pe8Kzemc7HgLkAxeF2nhAzRy1Y3FGgGHAQRHNDHzJSbq781MrDAzKFWxgq2NzpIBtALjr0CYu4c4I28=
+	t=1730662921; cv=none; b=FyMrxLhKyTll0x5XIKhXmAh2OvgooPeGaEaOk0HA6+uGb/czYLG0wbuTvs5OlTiwAVL+n6Ertif14nMnGFAjwgXjiuMaDE7iz+tT2eZRzDQOfszz8okMbQHTzIlCx8aVSl1pAJWCDvd81N8D2KRlPrZNqi+ZsBpDZ2nNUzHz6to=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730662542; c=relaxed/simple;
-	bh=3i37xFenKWA+UPTJ/JRCjAHQUph/DlCbchQdJRAm2Ko=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=nYyEXs2H2bBMYTiw765Ugz71xBlz84+ZEWPVUMrZOLSrfc/Pone0RpR8D3vzhKJ6xOMXcr1OOzD8nw9U7mvlfzOoxAQVTXQvFPl8RqElNJzuA8dMxGVSpiNGLTsPv5VDTmfv0mldnfWbdyOHOWUxDEIVNwGLutkOr4YXfJqDuXQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IT/XYN0/; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42280C4CED0;
-	Sun,  3 Nov 2024 19:35:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730662542;
-	bh=3i37xFenKWA+UPTJ/JRCjAHQUph/DlCbchQdJRAm2Ko=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IT/XYN0/vNmWjmug2f4sIF9BgAsftD4S0acy9xQR8uujZm8AGZh1ZcYWnj2MqVQNx
-	 huxP0QL+qHId8Bt7f5mqpBl67Zq04eZF3PNprlmoUFqlVd60RXPIYXw2vNbKsOXw37
-	 14D/i2qniQHuwb9NvhJY1aFJiuYjkloiW5G0242xPNTdTgfULIq5Eo/GD276JD2D/P
-	 EP8YeOZIIGPr36oad6LDRqSlgi89+k5vrJanzDTXMOdO9b47KLspgnFAfgj/PpuNF8
-	 DRORpjSwYFEhJYh+W3pv9aYVNW+x1K3LAjHW5k+Fxs445cR3PTvs286mwTGDX2qfbG
-	 ERaFUcY5j72LA==
-Date: Sun, 3 Nov 2024 11:35:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Oberhollenzer <david.oberhollenzer@sigma-star.at>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, Julian.FRIEDRICH@frequentis.com,
- f.fainelli@gmail.com, olteanv@gmail.com, davem@davemloft.net,
- edumazet@google.com, pabeni@redhat.com, linux-kernel@vger.kernel.org,
- upstream+netdev@sigma-star.at
-Subject: Re: [PATCH] net: dsa: mv88e6xxx: properly shutdown PPU re-enable
- timer on destroy
-Message-ID: <20241103113539.7b44e4f3@kernel.org>
-In-Reply-To: <20241029124332.51008-1-david.oberhollenzer@sigma-star.at>
-References: <20241029124332.51008-1-david.oberhollenzer@sigma-star.at>
+	s=arc-20240116; t=1730662921; c=relaxed/simple;
+	bh=o0Pc2R9wuW7omPMTf/RTnyMCsJapsJt8yRyVB1HTJes=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WqfRtxNez4pSblOoEu9goXolP84AstvhFu8EuAG2nQArG90uQzl8Hq4WyDubIoOTrYoaccFL0sQAIY272untlKDxY6++YWrUOFPiyEiE9dPqFLjL7ulvaN0kkOcuqTrI0ibC7rn0glMdTakbXbHOqe6h6zFTNshy62O7zx3GD/Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=kD1e3IaZ; arc=none smtp.client-ip=46.235.229.95
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
+	; s=bytemarkmx; h=MIME-Version:Message-ID:Date:Subject:From:Content-Type:From
+	:Subject; bh=fRIwc7I4KZcMP8rRONzc1mtVgIvo9wZ3VmVmgqHtqpI=; b=kD1e3IaZv+7HZNRB
+	sbaDSIh/tPOBs4Dk/ws2rNpjiRuAUQV11xiBG//7ysrNU0Qqo/yJJCRjWscExjM2o/kfRD2zLdeiO
+	6XzfOVGTi4p7ZxbAz4JupK4pXeD2RjzcxPRwD8848yPTxeC4QvgmqHq8SdtaL3yUS/Pmf51tG2KD0
+	lt8nK/Ow9mgRC0/PQndCiLyi4Q0nE5SOJjh/mQfMCeYI292RxG899PflTMufbFxglwYYi/Dod5NZQ
+	GglSbpXyaA+kH74A3jDrUqlIQ89kmsrSIZDgX+PFR2r0PraWuKiPTI+t5furVQNu+Gbp/2SXAT3XY
+	3VqkI7O7XEmuQygKcA==;
+Received: from localhost ([127.0.0.1] helo=dalek.home.treblig.org)
+	by mx.treblig.org with esmtp (Exim 4.96)
+	(envelope-from <linux@treblig.org>)
+	id 1t7gTu-00FCCo-0z;
+	Sun, 03 Nov 2024 19:41:50 +0000
+From: linux@treblig.org
+To: shayagr@amazon.com,
+	akiyano@amazon.com,
+	darinzon@amazon.com,
+	ndagan@amazon.com,
+	saeedb@amazon.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"Dr. David Alan Gilbert" <linux@treblig.org>
+Subject: [PATCH net-next] net: ena: Remove autopolling mode
+Date: Sun,  3 Nov 2024 19:41:49 +0000
+Message-ID: <20241103194149.293456-1-linux@treblig.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On Tue, 29 Oct 2024 13:42:45 +0100 David Oberhollenzer wrote:
-> The mv88e6xxx has an internal PPU that polls PHY state. If we want to
-> access the internal PHYs, we need to disable it. Because enable/disable
-> of the PPU is a slow operation, a 10ms timer is used to re-enable it,
-> canceled with every access, so bulk operations effectively only disable
-> it once and re-enable it some 10ms after the last access.
-> 
-> If a PHY is accessed and then the mv88e6xxx module is removed before
-> the 10ms are up, the PPU re-enable ends up accessing a dangling pointer.
-> 
-> This is easily triggered by deferred probing during boot-up. MDIO bus
-> and PHY registration may succeed, but switch registration fails later
-> on, because the CPU port depends on a very slow device. In this case,
-> probe() fails, but the MDIO subsystem may already have accessed bus
-> or the PHYs, arming timer.
-> 
-> This is fixed as follows:
->  - If probe fails after mv88e6xxx_phy_init(), make sure we also call
->    mv88e6xxx_phy_destroy() before returning
->  - In mv88e6xxx_phy_destroy(), grab the ppu_mutex to make sure the work
->    function either has already exited, or (should it run) cannot do
->    anything, fails to grab the mutex and returns.
->  - In addition to destroying the timer, also destroy the work item, in
->    case the timer has already fired.
->  - Do all of this synchronously, to make sure timer & work item are
->    destroyed and none of the callbacks are running.
+From: "Dr. David Alan Gilbert" <linux@treblig.org>
 
-Looks good, AFAICT. Could you repost with a Fixes tag added?
-To make the job of the stable team easier?
+This manually reverts
+commit a4e262cde3cd ("net: ena: allow automatic fallback to polling mode")
+
+which is unused.
+
+(I did it manually because there are other minor comment
+and function changes surrounding it).
+Build tested only.
+
+Suggested-by: David Arinzon <darinzon@amazon.com>
+Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
+---
+ drivers/net/ethernet/amazon/ena/ena_com.c | 25 +++++------------------
+ drivers/net/ethernet/amazon/ena/ena_com.h | 14 -------------
+ 2 files changed, 5 insertions(+), 34 deletions(-)
+
+diff --git a/drivers/net/ethernet/amazon/ena/ena_com.c b/drivers/net/ethernet/amazon/ena/ena_com.c
+index bc23b8fa7a37..66445617fbfb 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_com.c
++++ b/drivers/net/ethernet/amazon/ena/ena_com.c
+@@ -763,25 +763,16 @@ static int ena_com_wait_and_process_admin_cq_interrupts(struct ena_comp_ctx *com
+ 
+ 		if (comp_ctx->status == ENA_CMD_COMPLETED) {
+ 			netdev_err(admin_queue->ena_dev->net_device,
+-				   "The ena device sent a completion but the driver didn't receive a MSI-X interrupt (cmd %d), autopolling mode is %s\n",
+-				   comp_ctx->cmd_opcode, admin_queue->auto_polling ? "ON" : "OFF");
+-			/* Check if fallback to polling is enabled */
+-			if (admin_queue->auto_polling)
+-				admin_queue->polling = true;
++				   "The ena device sent a completion but the driver didn't receive a MSI-X interrupt (cmd %d)\n",
++				   comp_ctx->cmd_opcode);
+ 		} else {
+ 			netdev_err(admin_queue->ena_dev->net_device,
+ 				   "The ena device didn't send a completion for the admin cmd %d status %d\n",
+ 				   comp_ctx->cmd_opcode, comp_ctx->status);
+ 		}
+-		/* Check if shifted to polling mode.
+-		 * This will happen if there is a completion without an interrupt
+-		 * and autopolling mode is enabled. Continuing normal execution in such case
+-		 */
+-		if (!admin_queue->polling) {
+-			admin_queue->running_state = false;
+-			ret = -ETIME;
+-			goto err;
+-		}
++		admin_queue->running_state = false;
++		ret = -ETIME;
++		goto err;
+ 	}
+ 
+ 	ret = ena_com_comp_status_to_errno(admin_queue, comp_ctx->comp_status);
+@@ -1650,12 +1641,6 @@ void ena_com_set_admin_polling_mode(struct ena_com_dev *ena_dev, bool polling)
+ 	ena_dev->admin_queue.polling = polling;
+ }
+ 
+-void ena_com_set_admin_auto_polling_mode(struct ena_com_dev *ena_dev,
+-					 bool polling)
+-{
+-	ena_dev->admin_queue.auto_polling = polling;
+-}
+-
+ int ena_com_mmio_reg_read_request_init(struct ena_com_dev *ena_dev)
+ {
+ 	struct ena_com_mmio_read *mmio_read = &ena_dev->mmio_read;
+diff --git a/drivers/net/ethernet/amazon/ena/ena_com.h b/drivers/net/ethernet/amazon/ena/ena_com.h
+index 20e1529adf3b..9414e93d107b 100644
+--- a/drivers/net/ethernet/amazon/ena/ena_com.h
++++ b/drivers/net/ethernet/amazon/ena/ena_com.h
+@@ -224,9 +224,6 @@ struct ena_com_admin_queue {
+ 	/* Indicate if the admin queue should poll for completion */
+ 	bool polling;
+ 
+-	/* Define if fallback to polling mode should occur */
+-	bool auto_polling;
+-
+ 	u16 curr_cmd_id;
+ 
+ 	/* Indicate that the ena was initialized and can
+@@ -493,17 +490,6 @@ bool ena_com_get_admin_running_state(struct ena_com_dev *ena_dev);
+  */
+ void ena_com_set_admin_polling_mode(struct ena_com_dev *ena_dev, bool polling);
+ 
+-/* ena_com_set_admin_auto_polling_mode - Enable autoswitch to polling mode
+- * @ena_dev: ENA communication layer struct
+- * @polling: Enable/Disable polling mode
+- *
+- * Set the autopolling mode.
+- * If autopolling is on:
+- * In case of missing interrupt when data is available switch to polling.
+- */
+-void ena_com_set_admin_auto_polling_mode(struct ena_com_dev *ena_dev,
+-					 bool polling);
+-
+ /* ena_com_admin_q_comp_intr_handler - admin queue interrupt handler
+  * @ena_dev: ENA communication layer struct
+  *
+-- 
+2.47.0
+
 
