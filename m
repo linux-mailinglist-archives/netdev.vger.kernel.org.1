@@ -1,92 +1,74 @@
-Return-Path: <netdev+bounces-141371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141372-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BC219BA98C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 00:20:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C79099BA98E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 00:22:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC19F1F219F6
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:20:30 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A20EB21C3C
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:22:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3622518C932;
-	Sun,  3 Nov 2024 23:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA63B18BC37;
+	Sun,  3 Nov 2024 23:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XG12lY2M"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mCt4MRAC"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A6F6433AB;
-	Sun,  3 Nov 2024 23:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2B154EB50;
+	Sun,  3 Nov 2024 23:22:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730676023; cv=none; b=njI/5U/8PSlFdpaW9Is0/SOsPokHAHV1xwywbjrZiPOWzwxhD9Dd75jU9ar96K7LCSVDn349c5rbrS4PJlf5KllIbFnEEDY0laUiK4vhOQ8FXz1IKdCnqMg3hG3SlryROUzinpCw7jG3N0nbD2tSrWLei7WUbH/Kh2ZRGKSUqA8=
+	t=1730676134; cv=none; b=nEZ58wMfJFhWtXvD7fF/i/08T0ys9v5zvVF15b4ku9pd5zrMX9joaJnj0azVMfhiAj7FaWQO0fJ+3V5TjLrP6n1GFxL4jPMq32YWYNu+u4FWHgWNZQ/Is0EB2VC19OqbEHfxAjktXONyDShrXgHgNlvMA+ndt3z+FrpNZ9TIMuo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730676023; c=relaxed/simple;
-	bh=JEJk00GMtoe8PdDehP0wcv8Jh9zt0Haptv/NS9kXBsI=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=faiBbKFROtSahiF5+WNLa+NVZQBK5HCOtgYCYkBNaabNPCPTGr2Ykt8GEGYRmnUlHNPrslkHiL6pN4PZ0uh54X2vYwPBmwNQAJK4J84dnNwq3C5TNpa1ERgoT4vQVLFxVMMlIY6XS9SzMjz+d97gjTeasRVpqTEl33uT37ZwL2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XG12lY2M; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C747C4CECD;
-	Sun,  3 Nov 2024 23:20:22 +0000 (UTC)
+	s=arc-20240116; t=1730676134; c=relaxed/simple;
+	bh=nItcKCtCK7UcJQoxn+1Rntvi08C5l2LlJ+hNUZ0Cwa0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=pVMEQVNTacZPp+Ih9Wq0/mRWFFpJ3k7BsHuGT6uv0wMquz+rtWnb5sBLKcaM+5afDWcPXHBzXO3/M/Y0v2Zxfq9zTuHd37woe4/4nEtVFvjzszIMb1DTDXseB+w//nPS02Zq5jys7afgznTFv2ah4MSwkhobeZXRdNDzmmoMuww=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mCt4MRAC; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 219BEC4CECD;
+	Sun,  3 Nov 2024 23:22:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730676022;
-	bh=JEJk00GMtoe8PdDehP0wcv8Jh9zt0Haptv/NS9kXBsI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=XG12lY2MhWiFTYtGz3Bf2V/1d/iiJbehbjzEvTYQg7YbYmXEPo334AwexlybmWZp7
-	 HxkhD5n1JABM+bmDJEgscLldQpK1agFHjp9r9wvwuNNaunU7nCiuepoEYFtlDdq/X0
-	 nB49nsW8DpVgPaXZHHB8HqsFgcM7G8QX+8wDy9VL9Bc3B1iT0ufZOa7oWabVLjxko5
-	 gc8w88qTO/6KRmCVotVWLd5PV6EYtrzmtOXUuCh/4mp8bQOtuDAenmHJ5VvIGaYCZ1
-	 yNy3gQYXeVhGFAM/6CRvIQDn7GXwnuEGS641p092XGT8nCNPboj/rnt/n7PNNLxvOI
-	 lcHsWh1c5p+mA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 340B438363C3;
-	Sun,  3 Nov 2024 23:20:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730676134;
+	bh=nItcKCtCK7UcJQoxn+1Rntvi08C5l2LlJ+hNUZ0Cwa0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mCt4MRACdfOs4pFTOy9Mk5+zeokooxd72jBsCltqNJF47V7CqJA7aFvf3/p0pQv5Y
+	 ETsav7iRpiGZYIGg3Njo33cjIy3C9usByzxFQu15ISsFIEdv/vrkZGrw2MM76BJTHC
+	 YkwqIDjGL806k75f1Sn7HAj1sQuUSnFlHk/v2WsX69uBgr7MUmXRvsgJRId3klkpMd
+	 PZ6AnkIuhokDEyfvbfUmTwZlYdAPEcOuyDFssy4PA3gELNyGXBWoiGigiKit5RttS+
+	 ODb5Phsc71OAMTyVJRe9yMI7skII4BY9hNx1FNx5WCc34d4O9PqUrOlLAGt6ItjL0D
+	 EJoNhPWLMqhHg==
+Date: Sun, 3 Nov 2024 15:22:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Suraj Sonawane <surajsonawane0215@gmail.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: ipv6: fix inconsistent indentation in
+ ipv6_gro_receive
+Message-ID: <20241103152213.2911b601@kernel.org>
+In-Reply-To: <20241031065124.4834-1-surajsonawane0215@gmail.com>
+References: <20241031065124.4834-1-surajsonawane0215@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf-next 2024-10-31
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173067603074.3276260.1832689639638882607.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 23:20:30 +0000
-References: <20241031221543.108853-1-daniel@iogearbox.net>
-In-Reply-To: <20241031221543.108853-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This pull request was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 31 Oct 2024 23:15:43 +0100 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
+On Thu, 31 Oct 2024 12:21:24 +0530 Suraj Sonawane wrote:
+> Fix the indentation to ensure consistent code style and improve
+> readability, and to fix this warning:
 > 
-> The following pull-request contains BPF updates for your *net-next* tree.
-> 
-> We've added 13 non-merge commits during the last 16 day(s) which contain
-> a total of 16 files changed, 710 insertions(+), 668 deletions(-).
-> 
-> [...]
+> net/ipv6/ip6_offload.c:280 ipv6_gro_receive() warn: inconsistent indenting
 
-Here is the summary with links:
-  - pull-request: bpf-next 2024-10-31
-    https://git.kernel.org/netdev/net-next/c/cbf49bed6a8c
+Warning from what tool?
 
-You are awesome, thank you!
+Unless it's gcc or clang let's leave the code be, it's fine.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
