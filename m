@@ -1,95 +1,100 @@
-Return-Path: <netdev+bounces-141375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EAA2A9BA99A
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 00:40:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55F119BA99D
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 00:43:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 85870B21EAE
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:40:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 056E91F21447
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:43:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D648C18D65F;
-	Sun,  3 Nov 2024 23:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3256718BBA3;
+	Sun,  3 Nov 2024 23:43:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EuTVqQSB"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DDcS55ei"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A041118D626;
-	Sun,  3 Nov 2024 23:40:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DA04189B95
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 23:43:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730677222; cv=none; b=YaK+cihKuCsYEmj61qHmYK7OIITMS6PqXjYVonO+X0OZt9ul8hQt2sHA0nn2m1ALOU1eT/SZQQszH6xwDXjJ7x8a+ciGcblgf4gYWoKHI07dHuJTBS6fbTwWFAOf4I95BJFgO+sQejr/OeV78hl6iqnkl+fgA1ZcrRPf+HjqXVA=
+	t=1730677431; cv=none; b=bgXONTGWaEjFYNXnai4r6mRuUIw35CCUpDLEq6S0DV7MBDfcjSz/osd2ucXbbcjeyYHrhvvrF0QDSW6FUkTtXQ0+Uu7LLJKWb/tRbRIrRkFIYSwGtBh64zUThzxVoT6g5d8GRB/Ev2ba3ZlAUPdyWZug3PVBv1mqX5X7LToMNIM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730677222; c=relaxed/simple;
-	bh=7lpDI3SH3dGBQQZtr79GnpzYlYdzwt1oFzSLvpFuUNY=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=QuzSazoFzX3b77nHozvFxKVA4/zecIhozviftaFv3vec8M64UA6CamssYyXfZRxXga+XMirgbPYL80XZltCWmH5UyqpFlk+8rkOky8ZSsY0M36pYfrQrKFqEMivZuDDAjd7sxXAKgCLHQQMUM2sXhUwqBGvzKPuHJVwQBpjS8ds=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EuTVqQSB; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 374A0C4CED5;
-	Sun,  3 Nov 2024 23:40:22 +0000 (UTC)
+	s=arc-20240116; t=1730677431; c=relaxed/simple;
+	bh=Bde1C6VjOMy+OpqDPTROhjVJGHHqjVx7/dEomUxKWDk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Se+2YAHaduDKXmLinVD8deiZfLvbBf380RGJET+wRIQdw4e+kf9hwSdBgHF86UYzRxv2+e2ByluSuVM4CO+O0sEIsSnq9g9O/dab62/ma3mVQPBkRXbbvsMGQ6kHylnI9SeE2UfpPbjIuLzXM+MUb4Y7ZVnD3f/npOKZ1mZvN5s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DDcS55ei; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 02ACDC4CECD;
+	Sun,  3 Nov 2024 23:43:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730677222;
-	bh=7lpDI3SH3dGBQQZtr79GnpzYlYdzwt1oFzSLvpFuUNY=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EuTVqQSBLvmXkONtc3FcCAKjs6HuIeu18s9TPS0yzgSg0+VxptJE5QwOZ+22XxkjU
-	 SJCLyWciroO4QdjhezEAr/WZdlnzZ9WsWhNEU3y9zZMt19l7+qvZhnYBuO1/vkmF8Y
-	 daOdo+gtwj88XhqJphUkcLWDIDG6KINNgd7tAv1mIq1eV7xYwIqABXJnpOnf35GZjh
-	 FN1O4+cYCnk5jql4ytxir/QCJuJcEh2y4MERK1MKBmCbimu+MOLFYP6M+D7D65j9Xy
-	 l5zQwIW0fXzBg9vt6T7srIAi0v/f2gEXqOVRxj790pcOP2B9LZ5fVLNOuokWOpUQXG
-	 W9xsHCQG7AlKw==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EADF338363C3;
-	Sun,  3 Nov 2024 23:40:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730677430;
+	bh=Bde1C6VjOMy+OpqDPTROhjVJGHHqjVx7/dEomUxKWDk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DDcS55eiiWtW4QiBvDOB2PCa/Jhj7im5irZ+a0sNTIwa08cCiYonA8gYnT+H2rX7t
+	 1Jxb9+RH/Vg0mNgoWvSFQM/VqKvgfPJhKgcX6ShdlMem2lJ0DbILK0Y9cud/Svt3Xq
+	 PxE3dzqvfuD7niN5FxIlplNt271cPfKiU0/k1VYyg9VbhxPywbriGqxBciRqRt49BR
+	 Yq0mgPf6Smr4PfhbCM04Wfr43p6WInGRlhL8j0HdeugzsZF7oAJg8LNHhPCtiefxGY
+	 RAAXuOeoGIl0ZUfIpd867a0sqaYCcg8g32Qt4I2m5tft7UXc29OizKeZmkVWKzmJ5R
+	 ugWYZKz/r1BOw==
+Date: Sun, 3 Nov 2024 15:43:48 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, andrew@lunn.ch,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, kernel-team@meta.com, sanmanpradhan@meta.com,
+ sdf@fomichev.me, vadim.fedorenko@linux.dev, horms@kernel.org,
+ jdamato@fastly.com
+Subject: Re: [PATCH net-next v4] eth: fbnic: Add support to write TCE TCAM
+ entries
+Message-ID: <20241103154348.792b663e@kernel.org>
+In-Reply-To: <20241101204116.1368328-1-mohsin.bashr@gmail.com>
+References: <20241101204116.1368328-1-mohsin.bashr@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] selftests/tc-testing: add tests for
- qdisc_tree_reduce_backlog
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173067723051.3278663.1340500265334898665.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 23:40:30 +0000
-References: <20241101143148.1218890-1-pctammela@mojatatu.com>
-In-Reply-To: <20241101143148.1218890-1-pctammela@mojatatu.com>
-To: Pedro Tammela <pctammela@mojatatu.com>
-Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, shuah@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Fri,  1 Nov 2024 11:31:48 -0300 you wrote:
-> Add 3 tests to check for the expected behaviour of
-> qdisc_tree_reduce_backlog in special scenarios.
+On Fri,  1 Nov 2024 13:41:16 -0700 Mohsin Bashir wrote:
+> Add support to redirect host-to-BMC traffic by writing MACDA entries
+> from the RPC (RX Parser and Classifier) to TCE-TCAM. The TCE TCAM is a
+> small L2 destination TCAM which is placed at the end of the TX path (TCE).
 > 
-> - The first test checks if the qdisc class is notified of deletion for
-> major handle 'ffff:'.
-> - The second test checks the same as the first test but with 'ffff:' as the root
-> qdisc.
-> - The third test checks if everything works if ingress is active.
+> Unlike other NICs, where BMC diversion is typically handled by firmware,
+> for fbnic, firmware does not touch anything related to the host; hence,
+> the host uses TCE TCAM to divert BMC traffic.
 > 
-> [...]
+> Currently, we lack metadata to track where addresses have been written
+> in the TCAM, except for the last entry written. To address this issue,
+> we start at the opposite end of the table in each pass, so that adding
+> or deleting entries does not affect the availability of all entries,
+> assuming there is no significant reordering of entries.
+> ---
 
-Here is the summary with links:
-  - [net-next] selftests/tc-testing: add tests for qdisc_tree_reduce_backlog
-    https://git.kernel.org/netdev/net-next/c/9ff75a23dff3
+--- will cut off the commit message when applying.
+Your sign off has to be above it.
+Please try to follow the mailing list to get a better grasp of 
+the basics.
 
-You are awesome, thank you!
+> Changes in V4:
+> - Update the commit message to clearly specify the role of TCE TCAM in
+>   fbnic
+> - Revert iterator related changes made in V3 back to V2, including
+>   iterator type and place of declaration
+> 
+> V3: https://lore.kernel.org/netdev/20241025225910.30187-1-mohsin.bashr@gmail.com
+> V2: https://lore.kernel.org/netdev/20241024223135.310733-1-mohsin.bashr@gmail.com
+> V1: https://lore.kernel.org/netdev/20241021185544.713305-1-mohsin.bashr@gmail.com
+> 
+> Signed-off-by: Mohsin Bashir <mohsin.bashr@gmail.com>
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
