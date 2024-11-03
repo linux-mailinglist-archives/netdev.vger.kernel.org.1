@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-141340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141341-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B686B9BA81C
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:00:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9E319BA81E
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:00:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 611741F21635
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 21:00:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A242A281683
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 21:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3F531553AA;
-	Sun,  3 Nov 2024 21:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B10618C022;
+	Sun,  3 Nov 2024 21:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mTICtkOI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NSPm2edk"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 843D32582;
-	Sun,  3 Nov 2024 21:00:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12F6C18C01A;
+	Sun,  3 Nov 2024 21:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730667621; cv=none; b=ss3jaA0J8yH5FIZ6+K5Mjxf2hQA1e4ArHQsEJAdlJz05Zf1HCuZ4a0iWponlglzXaenM0sBQcnam5Ww8CzStSrLy8g+4QAEDKmjJ3IIylyf3RvkolG0kn50DMd6CLbMbTkpMeEvLP1i+qDTk+ttfECTy4xP7wJYQm2oTSpLVWao=
+	t=1730667623; cv=none; b=POtqf3xVZGxG3Goa2Oc72UZko9VeMlaIJQpjADUN7hAlkTzcLvdPfNa9yBPnnCcBwQCLiAuAr8kVRdWAAjsXLH5xHxL63mFqRjKFhTKb2YVeJhBQNl+WIgP5R+C/JU8fhq7xwgkng0IrgC1UALJTKZ4tE8DD6VcLn1oPCh7H0Cw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730667621; c=relaxed/simple;
-	bh=lQYtDDKON/MzTpBlCsO45Z/YVijax61h88SPsZIe2O0=;
+	s=arc-20240116; t=1730667623; c=relaxed/simple;
+	bh=ZxjBlqbzGgDX+Q4bZH+42/uYsJa0Af5Svb3ksKvyLzk=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=RZcB/PuHyPKSUURTAMbErYkAqPke8RK7pDnVBW0ApBydHQISfypKd3W9SjZ/dDIFeJ6EaPQY2LxWFAtQEZrenKmzwpRCh+yvdqRaU/bfWOVzjPHOzV/QOMj8xSiecgjxeXD22GTP3oM5Vsn8y7eovIeA8lPSxkFKVihpArFsTUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mTICtkOI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0331FC4CED3;
-	Sun,  3 Nov 2024 21:00:21 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ZRj9lA8JqRWik3ih4f3sHcUvLN/dJTqmZDFFA6+zGFTyciPGugp0Oa1Jmub27mHN+qnOSQFzj5X8x0i1qnCtyi/hGBvHzHIevPTjzFEXTUVqBSD5f8uLxp3IvywWqxw0LpzVzLizM+RRnwBZqVu9fBkBrghV1WVFQEuQEBS5FYg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NSPm2edk; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7B23DC4AF09;
+	Sun,  3 Nov 2024 21:00:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730667621;
-	bh=lQYtDDKON/MzTpBlCsO45Z/YVijax61h88SPsZIe2O0=;
+	s=k20201202; t=1730667622;
+	bh=ZxjBlqbzGgDX+Q4bZH+42/uYsJa0Af5Svb3ksKvyLzk=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mTICtkOIuBXJLJmINXsxtm3ngbZ1xrZYWraDNy2CGmYiPp/0ZkXUTMioIQRneIUDE
-	 f6PbuBCxGERYfxQOHjBPgqtdQs/26HSJzhaAwzo2m3VZe5luD8KMxDkw4ERG1TwQ2+
-	 JlAyO5AImor9K6uBf59tw3XZB1LY9qKl9MCr77WNkd30fgZq+ls6mWBI85FGo2XOod
-	 u9NxU/LGKcRwR/ASZV0cqWXMFlIOMZDciUhE36KWfB9DXSstJs8hANmgYrPSEyDexi
-	 3NIU5hVlC8cSdDlkMlcU5kvIQ9C8J7Wuspwdu1tVbbWy5VV5jm0V33MXA2ii6YOpVf
-	 m0W1/+UqDFvZQ==
+	b=NSPm2edkzhs3vRVPSDxcBbLCh5YfLraAtTdhaIKbxDGLmO0HDQrD8sMUvX29HSnQz
+	 84rZ81wmtaLvTkd4a/hZZ90p1RiFLUU9B5VIkPCZQB4n3o3QKBMTYKPqeanG802Jwg
+	 ixgNaEt8d68vCZIUT9Fw3oB4Yc3LXqscHqM+WiTURQYR6XnHblXCYROPGwhG6esoAA
+	 jC5z2Zms61WaK6CKOVDJpeEe7YY47qUsfGzqr3c29+AUrnkJ0tsKRLT1fIZbeESGF7
+	 EiDrX65S6Ic89gRdtTM8goj8GiVQ4o+rqsqovzskVIiBUP4GzqWe7SXkb4IKJgq+jx
+	 mBWQt60rq7NJg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADFF238363C3;
-	Sun,  3 Nov 2024 21:00:30 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B4C38363C3;
+	Sun,  3 Nov 2024 21:00:32 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,42 +52,39 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/2] Fix issues when PF sets MAC address for VF
+Subject: Re: [PATCH net v2] MAINTAINERS: Remove self from DSA entry
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173066762950.3253460.10123905926382934471.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 21:00:29 +0000
-References: <20241031060247.1290941-1-wei.fang@nxp.com>
-In-Reply-To: <20241031060247.1290941-1-wei.fang@nxp.com>
-To: Wei Fang <wei.fang@nxp.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, andrew+netdev@lunn.ch, claudiu.manoil@nxp.com,
- vladimir.oltean@nxp.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, imx@lists.linux.dev
+ <173066763074.3253460.18226765088399170074.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Nov 2024 21:00:30 +0000
+References: <20241031173332.3858162-1-f.fainelli@gmail.com>
+In-Reply-To: <20241031173332.3858162-1-f.fainelli@gmail.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, olteanv@gmail.com,
+ akpm@linux-foundation.org, kuba@kernel.org, krzysztof.kozlowski@linaro.org,
+ arnd@arndb.de, bhelgaas@google.com, bagasdotme@gmail.com, mpe@ellerman.id.au,
+ yosryahmed@google.com, vbabka@suse.cz, rostedt@goodmis.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 31 Oct 2024 14:02:45 +0800 you wrote:
-> The ENETC PF driver provides enetc_pf_set_vf_mac() to configure the MAC
-> address for the ENETC VF, but there are two issues when configuring the
-> MAC address of the VF through this interface. For specific issues, please
-> refer to the commit message of the following two patches. Therefore, this
-> patch set is used to fix these two issues.
+On Thu, 31 Oct 2024 10:33:29 -0700 you wrote:
+> Signed-off-by: Florian Fainelli <f.fainelli@gmail.com>
+> ---
+> Changes in v2:
 > 
-> Wei Fang (2):
->   net: enetc: allocate vf_state during PF probes
->   net: enetc: prevent PF from configuring MAC address for an enabled VF
+> - add self to CREDITS
 > 
-> [...]
+>  CREDITS     | 4 ++++
+>  MAINTAINERS | 1 -
+>  2 files changed, 4 insertions(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net,1/2] net: enetc: allocate vf_state during PF probes
-    https://git.kernel.org/netdev/net/c/e15c5506dd39
-  - [net,2/2] net: enetc: prevent PF from configuring MAC address for an enabled VF
-    (no matching commit)
+  - [net,v2] MAINTAINERS: Remove self from DSA entry
+    https://git.kernel.org/netdev/net/c/be31ec5c8efa
 
 You are awesome, thank you!
 -- 
