@@ -1,131 +1,84 @@
-Return-Path: <netdev+bounces-141294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99EDB9BA5F0
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:35:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C9D09BA65E
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 16:20:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C45201C20DE5
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 14:35:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 277A9B20FAA
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 15:20:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88D9E16FF5F;
-	Sun,  3 Nov 2024 14:35:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D73B16FF5F;
+	Sun,  3 Nov 2024 15:20:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ER+ns65A"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="flb3kUVK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f196.google.com (mail-pl1-f196.google.com [209.85.214.196])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193CB15A8;
-	Sun,  3 Nov 2024 14:35:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.196
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B66423774;
+	Sun,  3 Nov 2024 15:20:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730644510; cv=none; b=dMCI8gRtYi9rbAxIEUu2CfNlLjFRrERNYIlJ2f/bXZc2X0LSsESzu9oQBZwZQJtAjNSxUsUIudgdvUjsCJcXQbCavy5MqqMTNUNozSN9VVqwVCafRYFVGk237e1j0mWORqGuZ+f1OSMKWOSxZ5GlI6lAP9ZCz8KLHW7UKy52hb8=
+	t=1730647246; cv=none; b=uX1l4RpgMc83mvaPYYjKrBjajGwcAJqvfJmCctHnYy04hV+ey/kTJX7Km57OUZ+7ie/yvmrby35V3ngj0D9kdxVqJt25nndMBAqLUJWqX1wIfjFHGpIIvx1JFGRZ9IoNOPYhGWbfMkhqlmCyDhuk9tzAyxb/r1ntJ1kteR+pI+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730644510; c=relaxed/simple;
-	bh=wG8Gn85Zge4Ab66VQVkdPkQl+aSYTS8FOKvqLK8bdKk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=SosFoT6eT1rX9jzHBkfiT+FzNpXOjroqj0hz/q7SHr+k++6uE9tWF138JdT85mEXgKrGPnSwQqtx9pk/OX+zCPvzObqH9q6GlqZmGy7Xwnc5fHXWhre8ALojp+pGX6B+F6PGtY385Mh2vzow8euimFCCg33AbCmJIIjtvUrWLuI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ER+ns65A; arc=none smtp.client-ip=209.85.214.196
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f196.google.com with SMTP id d9443c01a7336-20c803787abso25697515ad.0;
-        Sun, 03 Nov 2024 06:35:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730644508; x=1731249308; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=93+WiCi1ThC11RJJ36LYFSZWkX6cVfqzN1gwp+XLl5k=;
-        b=ER+ns65Ao8o8EbUQPtQtbPZyAWi1Ely9BGBMzQzLAkywnutBlI7XxRs59lTtlq1Ebp
-         bbLzL7OELZT8ba012YLwAdVHjkIZhaueDsXL2Cs0qcWHbQFsF7g9Bdtnze3cm2Vobk2B
-         Vs3GhH+fEJOYKdoxnmTx3KgcY5IcA11CHdc3lZpEmc1Vveu920ZcKzFk7EqYn/yfjYMf
-         0PH2CN6r3h21L5W/6lWVWuH8/V7Q9MOwFIavwj371qnolXD8JdiR5TPjxGvl8q4F6w4I
-         wPxhKJeziFzOu5sjiPAn/9NCYrDEdAx6n6QTawmaoX8tyLbWEJbOYovTPgNbmah71qu1
-         i+eA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730644508; x=1731249308;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=93+WiCi1ThC11RJJ36LYFSZWkX6cVfqzN1gwp+XLl5k=;
-        b=WO7MA+vuKnPLWPRxIHuslepqEZij8noBiXnPB7jUna9wSo/2nLyK8Ox82VKsuHfHvW
-         jkwwyqPEmv1fe3dSapmLQMvDyZInXXR1oVimquO6k6rHTkt/mI22HBLUtldYaoOzawIi
-         oUkJ1XLaGihGclmA3ZttxSnuHaj+WRaGywWQGncxFdouDPg/1sjdVusrMSjuW9hGznuE
-         GcsW0QXX2/Bdw5tIoXpEbbvYIAM2TlQOlS+K8ME/bpDE3RZsGrv2/p14u3/awk2W503P
-         eFbHP40Sfv3R46mTRgjuauhJqdJn5cQLV8x+lxG9eiWrNGUe/ul1i2N55QMLU9FYkNv+
-         oIIg==
-X-Forwarded-Encrypted: i=1; AJvYcCUcY+HkLD22WrzPwmC/JqIYO1oJOKyHnEKAuad8BwTCtrRGCR3TU9CHidH8NT256dtTvolrGMPMK76isJ8=@vger.kernel.org, AJvYcCXXzqlod4X3oVfBWnC/ZkXgtFT11pX/XaWW74X7FaHXK4sEX5Q8kBpiBuSPRIC5e5vVfwtQpNDvy2jiLC+6UJoF@vger.kernel.org
-X-Gm-Message-State: AOJu0YyUT13G1M8BevCoKmAXUkxbSaXRcCqAnueTRM3laULwoV9Qj9JW
-	qQFSxYal9JTc9vh4ydw3TnPbUuxVf/w3R0P2fKMWwzcJDe8j0q0x
-X-Google-Smtp-Source: AGHT+IHYGry+rKSxu3RbntAF4BRm7OG8IenHRHObkVwbvCSJWy2jgB0XmNnR8jw0ENSyjQ9ZhweoDw==
-X-Received: by 2002:a17:902:b185:b0:207:1845:bc48 with SMTP id d9443c01a7336-211057ea994mr122515045ad.30.1730644508249;
-        Sun, 03 Nov 2024 06:35:08 -0800 (PST)
-Received: from ?IPV6:2409:8a55:301b:e120:426:560f:2ff4:d2c2? ([2409:8a55:301b:e120:426:560f:2ff4:d2c2])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057d4624sm46410645ad.259.2024.11.03.06.35.04
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 03 Nov 2024 06:35:07 -0800 (PST)
-Message-ID: <1d8c55c7-1406-4af6-9dce-0b296cd40fc9@gmail.com>
-Date: Sun, 3 Nov 2024 22:35:00 +0800
+	s=arc-20240116; t=1730647246; c=relaxed/simple;
+	bh=zVuaYgLRsZYa1XUybwHktQ2q0GlPerZ3CIB6sz8W8ew=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=MW6SuK9umTKgSymdE4wr3e7X8ipXoddxRltGZts4tR41001sap13mfKiDnunIYv0k4n60/peBTaGeCphQHU+xfD0mkLlcbIUwfy8vlE37J3ubjTQOtNGvaEjs5Y8AnGPplpyVyBXw/Drr9R1brYXNu3H/K4jS+zJWgOrFl3c61I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=flb3kUVK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=EcTJqEHOtmy9IglxtzxFtYhDHa1so+bTTn9DvV6/mbw=; b=flb3kUVKt+wvset/BhIkj4qv2z
+	og3ChRn29r3w+tpG7W0e01u6Eb7S1IgpvDGG/18J1p1wYdlxkS/4Fipp+MxnJoZ1Om/HUoS2hlTB+
+	8HUjn7ib/45Winnoln6fzT/APcNAkM80jkklStHgZkXEG4kYbQIXP6Zl0BVSSdk4SmPM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t7cP3-00C1VJ-Cf; Sun, 03 Nov 2024 16:20:33 +0100
+Date: Sun, 3 Nov 2024 16:20:33 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Diogo Silva <diogompaissilva@gmail.com>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
+	tolvupostur@gmail.com
+Subject: Re: [PATCH] net: phy: ti: add PHY_RST_AFTER_CLK_EN flag
+Message-ID: <6e5298c0-eded-4fd2-8ce6-52d4239da53c@lunn.ch>
+References: <20241102151504.811306-1-paissilva@ld-100007.ds1.internal>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v1 2/7] net: page_pool: create
- page_pool_alloc_netmem
-To: Mina Almasry <almasrymina@google.com>,
- Yunsheng Lin <linyunsheng@huawei.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan <shuah@kernel.org>
-References: <20241029204541.1301203-1-almasrymina@google.com>
- <20241029204541.1301203-3-almasrymina@google.com>
- <763d9630-3064-4d88-8e99-549a07328ec8@huawei.com>
- <CAHS8izMgF8nx87D9pWPmq1pfDm1v8x5Z6gc_eMHcYo8zKX-Lrw@mail.gmail.com>
-Content-Language: en-US
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-In-Reply-To: <CAHS8izMgF8nx87D9pWPmq1pfDm1v8x5Z6gc_eMHcYo8zKX-Lrw@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241102151504.811306-1-paissilva@ld-100007.ds1.internal>
 
-On 11/1/2024 9:10 PM, Mina Almasry wrote:
-
-...
-
->>
->> Isn't it a little odd that old and new are not following the same
->> pattern?
+On Sat, Nov 02, 2024 at 04:15:05PM +0100, Diogo Silva wrote:
+> From: Diogo Silva <diogompaissilva@gmail.com>
 > 
-> Hi Yunsheng,
+> DP83848	datasheet (section 4.7.2) indicates that the reset pin should be
+> toggled after the clocks are running. Add the PHY_RST_AFTER_CLK_EN to
+> make sure that this indication is respected.
 > 
-> The intention is that page_pool_alloc_pages is mirrored by
-> page_pool_alloc_netmems.
+> In my experience not having this flag enabled would lead to, on some
+> boots, the wrong MII mode being selected if the PHY was initialized on
+> the bootloader and was receiving data during Linux boot.
 > 
-> And page_pool_alloc is mirrored by page_pool_alloc_netmem.
-> 
->>From your description, the behavior is the same for each function and
-> its mirror. What is the gap in the pattern that you see?
+> Signed-off-by: Diogo Silva <diogompaissilva@gmail.com>
 
-I was mostly referring to the API naming pattern.
+This should be merged to net.
 
-Isn't it better if page_pool_alloc is mirrored by netmem_pool_alloc and
-netmem_pool_alloc_netmems is mirrored by page_pool_alloc_pages() from
-API naming prespective?
+Fixes: 34e45ad9378c ("net: phy: dp83848: Add TI DP83848 Ethernet PHY")
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-And maybe page_pool_alloc_frag can be mirrored by netmem_pool_alloc_frag
-in the future?
-
-Also, it would be good to update Documentation/networking/page_pool.rst
-for those new netmem APIs, or create a new doc file for them.
-
-> 
-
+    Andrew
 
