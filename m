@@ -1,253 +1,336 @@
-Return-Path: <netdev+bounces-141253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141255-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 406D39BA370
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 02:24:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79D9E9BA374
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 02:28:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F576282FC8
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 01:24:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A15B71C20F48
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 01:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 828681EB2F;
-	Sun,  3 Nov 2024 01:24:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 127904120B;
+	Sun,  3 Nov 2024 01:28:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="L13eXTFL"
+	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="bBgd1jiq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oo1-f43.google.com (mail-oo1-f43.google.com [209.85.161.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out1-06.simnet.is (smtp-out1-06.simnet.is [194.105.231.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A227F33FE;
-	Sun,  3 Nov 2024 01:24:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53C892F3B
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 01:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.231.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730597065; cv=none; b=TlfSvNYu+sizfwSwj13ZEUdC/9o7frhzW3HQZBDpigorNmi5wKSvXDGyZwB4N9ie1LpNjdySm8Hu5lAy6m65uFfDFICyWUcT75tD1uV1KW6Hfnf1w0b05Vvpg/xPXHMvZiJJemfLfIpAJyidKvnX7qoTYgpdzE+d7g+jlQL29qY=
+	t=1730597313; cv=none; b=JxsE6aPnoQ+6Glr5KhZK7nugyTZnmTMt7x4RoUL/rQt5hJngda+qx5jel2WfdQ7SowoRIaKYbafWFx67vA2B5ELky07djyhckgriJtfcB180ql98/tRY16g6aQ+mRYpJgVJBrEYeTdLotir0uxd9DlC8lsIoDlFYHxS1ctxmj7Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730597065; c=relaxed/simple;
-	bh=IrxR25PDD/o8ccdrWGoK5kOG76Uf+PHZOBqU7PmxfOs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=MhD3LP4RYhTVXo5oFH054UB/ISTtZyPciZsS4iVI8F0YbT9c5OiI8DauvfRfrzXhgZP0346SkNnCNNVJ0bfip0YQQ2nFsNOOE7RNrX7YyQQrzIkNwW0tfzXyUp2JEKDXQ2C80BQQeyKW+ZPmkruR8mkUqDiD6AGeSX/PVUruCIM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=L13eXTFL; arc=none smtp.client-ip=209.85.161.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-oo1-f43.google.com with SMTP id 006d021491bc7-5ebc0992560so1895324eaf.0;
-        Sat, 02 Nov 2024 18:24:23 -0700 (PDT)
+	s=arc-20240116; t=1730597313; c=relaxed/simple;
+	bh=M3iX7ezSbpYeoIKHiuH3K1a/DSw6Gw9hmdAhTG02H/4=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=FFv0u7ONqJA+ntyu90tXp9NZvqScLjDLTw0qr6UAlpD4Vb6W4p7H90KwO4pfq9hRpC146M1nCDJZtRMdSpm+eFHAAN8C2GO6qnPfSppR/C2hwUKCUfpX7haBl8hR2fCpQcUMagYdJTCEASAzz0sdrwaUkwgvVY4keWmcBZAOtJg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=bBgd1jiq; arc=none smtp.client-ip=194.105.231.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730597063; x=1731201863; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=uxp0UfmCL60Fd3m2qKbpdlJKEAofjpqB2oYq88MXn/0=;
-        b=L13eXTFLASC50Nhkvf22UcIhH+Yqpzszsak+zgjDJTizeMbzTyJHxDGtXqkndp7t/W
-         UB5J/XIUqMn7RltIlFkrdZYpz37E1/Wm1asRxbBK+MDbUQGs5HRedoYhAmcj5mHM8Mq3
-         x8Ov9Nd+k4TGdKnd+zC7UvIk8r96F6Jw7uRPcLWGd5GhQd5Iq5H49Ym95ww58TdVYhq1
-         ujVY29FuM7sR2K7Lwnu7/jBt/LIQ7pHa/j1i/dwdeTVASg+O/MVxrlpPw4mHW/jl5+1t
-         84jk3q2G6znxAu8hAH+ZNquhhOWGJfOMDr65564wu5CH/zv6U11rvhfU62xhtYaPWArW
-         vZ4A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730597063; x=1731201863;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :reply-to:in-reply-to:references:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=uxp0UfmCL60Fd3m2qKbpdlJKEAofjpqB2oYq88MXn/0=;
-        b=PrRUrWr7ZUCdmF6+rCNnzYJAyni9skQxjWWBuNrncWrtxHq6jKvdAQLdzPluBUQOOO
-         iIyzeU1UJk5JAbc2xngZvngBIL7guXdGiZe+6RCmcl6aesROlY+xC3D+DtBgt1IrYJLy
-         vua2z2J6Oi+kxgBsxTPscBMIJNZsMu/gBbGLskGj26bz1/8fGXXKLh1fDr9ti2S57F5N
-         g7VpY0ToaPqEpmEewUFCSY67iHh3MVBJatDrdf7OtwpzRVAuHhNqeNqNy+sISE/blv7D
-         XTDMBYjJCaN3ir6yYm7/anep/GNB+9exXb7WjaM+qSJAjDFmmjNJVV927KUNQ7UMHRex
-         a8pw==
-X-Forwarded-Encrypted: i=1; AJvYcCVjIGJjxW2yEK6v9VRIQjvqbeM/KzRbykq6TlF8MbLMS8PmZgpE3pfLJ6hkL5JBVC6lFn7inOKipSU=@vger.kernel.org, AJvYcCXoefT2WujP+dck2xiGgybF9RXIKPSeq18OP+jjh7oCqsV8JIgH7PB3dRLBA0/kmqIt9g+wxT45/zZVk5L8@vger.kernel.org, AJvYcCXtPmzKjz9ocDMi5j35C/Nvjb/5ZSHWrns7BiJ13asuyikChGIahFzqNH527UQQHP5ABB99K+JJ@vger.kernel.org
-X-Gm-Message-State: AOJu0YxhE8J6dudbgCM9b3VtQQ7Rg194qiFR7KI27VZipecjaYyctchV
-	hDVtlXwJpvfxxHWWBai7Xvo31Xl5cpVCJMDCNi1xwwb1HVtUQBlJKhnq7axaZLgEWZmqlC189Pu
-	3nyEpYUJMTXrGGveQrg21dGUZGSE=
-X-Google-Smtp-Source: AGHT+IHkA/uqbEuZYTnMFlg/isXw5fHn6zLD8qPicsNST9YfPw0g6N91zDHGprQP9QF/ZJdy0tOlrdnkRHVEpJ5uXro=
-X-Received: by 2002:a05:6820:1885:b0:5ee:bb2:bdd4 with SMTP id
- 006d021491bc7-5ee0bb2c243mr292681eaf.1.1730597062621; Sat, 02 Nov 2024
- 18:24:22 -0700 (PDT)
+  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
+  t=1730597309; x=1762133309;
+  h=date:from:to:subject:message-id:mime-version;
+  bh=HxQdCmr6RTRkkmtLrSvWxuVZKtSwMMJffu2I2tRjXvU=;
+  b=bBgd1jiqVIPZU3pQK0//PVl365kvJdM9K99uB2ZTbl/LX7wlRrk0W/Ji
+   Ii70v3fRDQG1cC3ubkjcYztNWeWrtsTo2DojE/wtENKtuNBq5gzMdDjGY
+   FPo12keFyFsCE7RMkgEXyjzIMuR5UR7VZeeAZjnGxomYhVPoHiiOrULPT
+   gRkjyfwaKe5AkVy0xMVMqrls1114sx77uwGDHxYIaBUrFnrJzc/xvvFKg
+   wKOYwCuKaLRRJJUdpi+evQ6zSyYqUHgpcGKgvmCnFvZgqGnVIZ/6JyYyZ
+   6jJ1rvvRn2k15FuNJcsoh5ZWCT5v5scH7ntA5Ttb6a7yBtnqYAxObfCpF
+   Q==;
+X-CSE-ConnectionGUID: MHCpkmWxQbuhB683bV1EUw==
+X-CSE-MsgGUID: OMHnM8e8QCOy1D3Q+pyZKQ==
+Authentication-Results: smtp-out-06.simnet.is; dkim=none (message not signed) header.i=none
+X-SBRS: 3.3
+X-IPAS-Result: =?us-ascii?q?A2FvAgBYyyZnhVfoacJagQmBU4IcKH2BZIgljh+DKJx9A?=
+ =?us-ascii?q?QEBDzETBAEBBI83KDcGDgECBAEBAQEDAgMBAQEBAQEBAQ4BAQYBAQEBAQEGB?=
+ =?us-ascii?q?wIQAQEBAUAOO4U1Rg2FLCyBSzR8X4MBAYJkrgCBNIEBgxzbF4FsgUiFaoJiA?=
+ =?us-ascii?q?YVphHc8BoINgUqBBoItiwcEgjQVhRASJYkXlz2BTRwDWSERAVUTFwsHBYF5A?=
+ =?us-ascii?q?4NSgTmBUYMgSoNZgUVGP4JKaU06Ag0CNoIkfYJQgxiCBYRyhGpAHUADC209N?=
+ =?us-ascii?q?RQbnwcBRoIrgTlHChyBK0NBoy+jH4QkjBaVQzOEBJM7DDqSRph3o3yFJYF9g?=
+ =?us-ascii?q?gAsBxoIMDuCZwlJGQ+PTwEHhyK/a3g7AgcLAQEDCZB1AQE?=
+IronPort-PHdr: A9a23:kbkQhBRGx32YMUHUTYWFUd81f9pso5DLVj580XJGo6lLbrzm+In+e
+ RSBo+5siVnEQcPa8KEMh+nXtvXmXmoNqdaEvWsZeZNBHxkClY0NngMmDcLEQU32JfLndWo7S
+ cJFUlINwg==
+IronPort-Data: A9a23:0bsSNq2jhNHBochmEvbD5axxkn2cJEfYwER7XKvMYLTBsI5bp2MHm
+ zQbWmuDaPfbMDemKY1/PI20oU1V7ZTXxtBkHFA63Hw8FHgiRejtXI/AdhiqV8+xwmwvaGo9s
+ q3yv/GZdJhcokf0/0rrav656yAkiclkf5KkYMbcICd9WAR4fykojBNnioYRj5Vh6TSDK1rlV
+ eja/YuGYTdJ5xYuajhIsvvb80s21BjPkGpwUmIWNKEjUGD2zxH5PLpHTYmtIn3xRJVjH+LSb
+ 44vG5ngows1Vz90Yj+Uuu6Tnn8iG9Y+DiDS4pZiYJVOtzAZzsAEPgnXA9JHAatfo23hc9mcU
+ 7yhv7ToIesiFvWkdOjwz3C0usyxVEFL0OavHJSxjSCc52jmWGPvxsp+NUsrPadGqr19Pzhjy
+ ONNfVjhbjjb7w636Ky6UfUplMUmNNPsLJJa4igm0zDCEbAnWvgvQY2TtIMehW9twJoVR7COO
+ KL1ahI2BPjESxdAEkwWDZQzgKGpnRETdhUC9A7J9fRnvQA/yiRW9ZjrFYrYKuWhYtQMsh2h5
+ XrXzUfAV0Ry2Nu3kmbVoy392ocjhxjTXo8OGLCm3uBljUfVxWEJDhASE1yhrpGEZlWWRdNEN
+ wkG+y82t68i5QnzF5/jXgak5n+f1vIBZzZOO8gawxmOz5XE2gyEBkJaHmVLVoULidBjEFTGy
+ WS1t9/uADVutpicRnSc6qqYoFuO1c49cTRqicgsEVtt3jXznLzfmC4jWf5CK8aIYjDdBzDr3
+ 3WYrS0mnbIDnItTjuOl/EvbxTO3znQocuLXzluMNo5GxlooDGJAW2BOwQKEhRqnBN3AJmRtR
+ FBex6CjABkmVPlhbhClTuQXB62O7P2YKjDailMHN8B+rGzwpCT/JdoLum4WyKJV3iAsJWCBj
+ Kj75Fs52XOvFCLwMMebnqroV590lPaI+SrNCqGKPrKinaSdhCfcoHE/Oh/Mt4wcuE0tlah3O
+ ZnzTCpfJStyNEiT9xLvH711+eZymkgWmziJLbillEvP7FZrTCXOIVvzGADVNrhhhE5FyS2Jm
+ +ti2zyikE8OCLShOnSIreb+7zkidBAGOHw/kOQPHsbrH+asMDhJ5yP5qV/5R7FYog==
+IronPort-HdrOrdr: A9a23:5ViszKj5ieGCcqtHh8cwZEFCAHBQXsUji2hC6mlwRA09TyW9rb
+ HJoB17726StN9/YhAdcLy7WJVoIkmskaKdg7NhWItKNTOO0ADDQe0Mg7cKqAeQeREWmNQttp
+ tdTw==
+X-Talos-CUID: =?us-ascii?q?9a23=3A9xMMP2pf9OfaO89Y4dhp25nmUeUFWWXeyUjAGkW?=
+ =?us-ascii?q?lCUw3GOafdwa9xbwxxg=3D=3D?=
+X-Talos-MUID: =?us-ascii?q?9a23=3AEpkklAwwYt5tsCJ1iahjQ1OlvwCaqIOLKEYowZh?=
+ =?us-ascii?q?WguKjJHVcYA7elCWFYbZyfw=3D=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.11,254,1725321600"; 
+   d="scan'208";a="24448686"
+Received: from vist-zimproxy-01.vist.is ([194.105.232.87])
+  by smtp-out-06.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2024 01:27:16 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id 7EF4341A169F
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 01:27:16 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id fzvSpNN0-TEj for <netdev@vger.kernel.org>;
+ Sun,  3 Nov 2024 01:27:15 +0000 (GMT)
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id D6BD841A1693
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 01:27:15 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id u_tX6Ofhch8D for <netdev@vger.kernel.org>;
+ Sun,  3 Nov 2024 01:27:15 +0000 (GMT)
+Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTPS id C382E419903E
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 01:27:15 +0000 (GMT)
+Received: from bg by kassi.invalid.is with local (Exim 4.98)
+	(envelope-from <bg@kassi.invalid.is>)
+	id 1t7POe-0000000045j-2jeb
+	for netdev@vger.kernel.org;
+	Sun, 03 Nov 2024 01:27:16 +0000
+Date: Sun, 3 Nov 2024 01:27:16 +0000
+From: Bjarni Ingi Gislason <bjarniig@simnet.is>
+To: netdev@vger.kernel.org
+Subject: dcb.8: some remarks and editorial changes for this manual
+Message-ID: <ZybRdNeIHWohpWYN@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031130930.5583-1-jinjian.song@fibocom.com> <20241031170428.GA1249507@bhelgaas>
-In-Reply-To: <20241031170428.GA1249507@bhelgaas>
-Reply-To: linasvepstas@gmail.com
-From: Linas Vepstas <linasvepstas@gmail.com>
-Date: Sat, 2 Nov 2024 20:24:10 -0500
-Message-ID: <CAHrUA36X2cMZ4WNtRO7NoLaupBNfecLLxDfSVZ4mZzbzHiDjRA@mail.gmail.com>
-Subject: Re: [net-next v2] net: wwan: t7xx: reset device if suspend fails
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Jinjian Song <jinjian.song@fibocom.com>, ryazanov.s.a@gmail.com, 
-	chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com, 
-	haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com, 
-	ricardo.martinez@linux.intel.com, loic.poulain@linaro.org, 
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, pabeni@redhat.com, angelogioacchino.delregno@collabora.com, 
-	bhelgaas@google.com, corbet@lwn.net, danielwinkler@google.com, 
-	korneld@google.com, linux-arm-kernel@lists.infradead.org, 
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Top-post reply.
+  The man page is from Debian:
 
-What Bjorn says is exactly right. Just one clarifying remark: When PCI
-error recovery was designed, it was envisioned for high-end,
-high-availability servers so that they could reset a failing device
-without forcing a reboot of the OS.  Concepts like suspend/resume did
-not perturb even the unconscious sleep of the engineers. Thus,
-stepping through error recovery during suspend would be novel,
-untested, and perhaps prone to confusion. The error recovery procedure
-is trying to reset the device into a fully-powered-on,
-fully-functional and connected state. This might be problematic if the
-suspend has already walked half-way through power-down. The fact that
-error recovery might run a very long fraction of a second after the
-error is detected further complicates things. The fact that error
-recovery  usually has the driver fully reinitializing the device,
-including reloading the firmware, could be a problem if the firmware
-is not in RAM or is sitting on a suspended block device. So it all
-could be an adventure.
+Package: iproute2
+Version: 6.11.0-1
+Severity: minor
+Tags: patch
 
-As to testing: I asked one of the guys in the lab how he did it, and
-he said he would brush a metal wire against the PCI pins. I winced.
-But I guess it's cleaner than pouring coffee on it. Later we developed
-a software tool to artificially inject errors.
+  Improve the layout of the man page according to the "man-page(7)"
+guidelines, the output of "mandoc -lint T", the output of
+"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+conventions.
 
---linas
+-.-
 
-On Fri, Nov 1, 2024 at 8:52=E2=80=AFAM Bjorn Helgaas <helgaas@kernel.org> w=
-rote:
->
-> On Thu, Oct 31, 2024 at 09:09:30PM +0800, Jinjian Song wrote:
-> > From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> > > On 29.10.2024 05:46, Jinjian Song wrote:
-> > > > From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-> > > > > On 22.10.2024 11:43, Jinjian Song wrote:
-> > > > > > If driver fails to set the device to suspend, it means that the
-> > > > > > device is abnormal. In this case, reset the device to recover
-> > > > > > when PCIe device is offline.
-> > > > >
-> > > > > Is it a reproducible or a speculative issue? Does the fix
-> > > > > recover modem from a problematic state?
-> > > > >
-> > > > > Anyway we need someone more familiar with this hardware (Intel
-> > > > > or MediaTek engineer) to Ack the change to make sure we are not
-> > > > > going to put a system in a more complicated state.
-> > > >
-> > > > This is a very difficult issue to replicate onece occured and fixed=
-.
-> > > >
-> > > > The issue occured when driver and device lost the connection. I hav=
-e
-> > > > encountered this problem twice so far:
-> > > > 1. During suspend/resume stress test, there was a probabilistic D3L=
-2
-> > > > time sequence issue with the BIOS, result in PCIe link down, driver
-> > > > read and write the register of device invalid, so suspend failed.
-> > > > This issue was eventually fixed in the BIOS and I was able to resto=
-re
-> > > > it through the reset module after reproducing the problem.
-> > > >
-> > > > 2. During idle test, the modem probabilistic hang up, result in PCI=
-e
-> > > > link down, driver read and write the register of device invalid, so
-> > > > suspend failed. This issue was eventually fiex in device modem firm=
-ware
-> > > > by adjust a certain power supply voltage, and reset modem as a work=
-round
-> > > > to restore when the MBIM port command timeout in userspace applycat=
-ions.
-> > > >
-> > > > Hardware reset modem to recover was discussed with MTK, and they sa=
-id
-> > > > that if we don't want to keep the on-site problem location in case =
-of
-> > > > suspend failure, we can use the recover solution.
-> > > > Both the ocurred issues result in the PCIe link issue, driver can't
-> > > > read and writer the register of WWAN device, so I want to add this
-> > > > path
-> > > > to restore, hardware reset modem can recover modem, but using the
-> > > > pci_channle_offline() as the judgment is my inference.
-> > >
-> > > Thank you for the clarification. Let me summarize what I've understoo=
-d
-> > > from the explanation:
-> > > a) there were hardware (firmware) issues,
-> > > b) issues already were solved,
-> > > c) issues were not directly related to the device suspension procedur=
-e,
-> > > d) you want to implement a backup plan to make the modem support robu=
-st.
-> > >
-> > > If got it right, then I would like to recommend to implement a generi=
-c
-> > > error handling solution for the PCIe interface. You can check this
-> > > document: Documentation/PCI/pci-error-recovery.rst
-> >
-> > Yes, got it right.
-> > I want to identify the scenario and then recover by reset device,
-> > otherwise suspend failure will aways prevent the system from suspending
-> > if it occurs.
->
-> If a PCIe link goes down here's my understanding of what happens:
->
->   - Writes to the device are silently dropped.
->
->   - Reads from the device return ~0 (PCI_POSSIBLE_ERROR()).
->
->   - If the device is in a slot and pciehp is enabled, a Data Link
->     Layer State Changed interrupt will cause pciehp_unconfigure_device()
->     to detach the driver and remove the pci_dev.
->
->   - If AER is enabled, a failed access to the device will cause an AER
->     interrupt.  If the driver has registered pci_error_handlers, the
->     driver callbacks will be called, and based on what the driver
->     returns, the PCI core may reset the device.
->
-> The pciehp and AER interrupts are *asynchronous* to link down events
-> and to any driver access to the device, so they may be delayed an
-> arbitrary amount of time.
->
-> Both interrupt paths may lead to the device being marked as "offline".
-> Obviously this is asynchronous with respect to the driver.
->
-> > > > > > +++ b/drivers/net/wwan/t7xx/t7xx_pci.c
-> > > > > > @@ -427,6 +427,10 @@ static int __t7xx_pci_pm_suspend(struct
-> > > > > > pci_dev *pdev)
-> > > > > >       iowrite32(T7XX_L1_BIT(0), IREG_BASE(t7xx_dev) +
-> > > > > > ENABLE_ASPM_LOWPWR);
-> > > > > >       atomic_set(&t7xx_dev->md_pm_state, MTK_PM_RESUMED);
-> > > > > >       t7xx_pcie_mac_set_int(t7xx_dev, SAP_RGU_INT);
-> > > > > > +    if (pci_channel_offline(pdev)) {
-> > > > > > +        dev_err(&pdev->dev, "Device offline, reset to recover\=
-n");
-> > > > > > +        t7xx_reset_device(t7xx_dev, PLDR);
-> > > > > > +    }
->
-> This looks like an unreliable way to detect issues.  It only works if
-> AER is enabled, and the device is only marked "offline" some arbitrary
-> length of time *after* a driver access to the device has failed.
->
-> You can't reliably detect errors on writes to the device.
->
-> You can only reliably detect errors on reads from the device by
-> looking for PCI_POSSIBLE_ERROR().  Obviously ~0 might be a valid value
-> to read from some registers, so you need device-specific knowledge to
-> know whether ~0 is valid or indicates an error.
->
-> If AER or DPC are enabled, the driver can be *notified* about read
-> errors and some write errors via pci_error_handlers, but the
-> notification is long after the error.
->
-> Bjorn
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
 
-
-
---=20
-Patrick: Are they laughing at us?
-Sponge Bob: No, Patrick, they are laughing next to us.
+diff --git a/dcb.8 b/dcb.8.new
+index a1d6505..2202224 100644
+--- a/dcb.8
++++ b/dcb.8.new
+@@ -2,74 +2,74 @@
+ .SH NAME
+ dcb \- show / manipulate DCB (Data Center Bridging) settings
+ .SH SYNOPSIS
+-.sp
+ .ad l
+ .in +8
+ 
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .RB "{ " app " | " buffer " | " ets " | " maxrate " | " pfc " }"
+ .RI "{ " COMMAND " | " help " }"
+ .sp
+ 
+ .ti -8
+ .B dcb
+-.RB "[ " -force " ] "
+-.BI "-batch " filename
++.RB "[ " \-force " ]"
++.BI "\-batch " filename
+ .sp
+ 
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .B help
+ .sp
+ 
+ .SH OPTIONS
+ 
+ .TP
+-.BR "\-n" , " \--netns " <NETNS>
++.BR "\-n" , " \-\-netns " <NETNS>
+ switches
+ .B dcb
+ to the specified network namespace
+ .IR NETNS .
+ 
+ .TP
+-.BR "\-V" , " --Version"
++.BR "\-V" , " \-\-Version"
+ Print the version of the
+ .B dcb
+ utility and exit.
+ 
+ .TP
+-.BR "\-b", " --batch " <FILENAME>
+-Read commands from provided file or standard input and invoke them. First
+-failure will cause termination of dcb.
++.BR "\-b", " \-\-batch " <FILENAME>
++Read commands from provided file or standard input and invoke them.
++First failure will cause termination of dcb.
+ 
+ .TP
+-.BR "\-f", " --force"
+-Don't terminate dcb on errors in batch mode. If there were any errors during
+-execution of the commands, the application return code will be non zero.
++.BR "\-f", " \-\-force"
++Don't terminate dcb on errors in batch mode.
++If there were any errors during execution of the commands,
++the application return code will be non zero.
+ 
+ .TP
+-.BR "\-i" , " --iec"
+-When showing rates, use ISO/IEC 1024-based prefixes (Ki, Mi, Bi) instead of
+-the 1000-based ones (K, M, B).
++.BR "\-i" , " \-\-iec"
++When showing rates, use ISO/IEC 1024-based prefixes (Ki, Mi, Gi) instead of
++the 1000-based ones (K, M, G).
+ 
+ .TP
+-.BR "\-j" , " --json"
++.BR "\-j" , " \-\-json"
+ Generate JSON output.
+ 
+ .TP
+-.BR "\-N" , " --Numeric"
++.BR "\-N" , " \-\-Numeric"
+ If the subtool in question translates numbers to symbolic names in some way,
+ suppress this translation.
+ 
+ .TP
+-.BR "\-p" , " --pretty"
+-When combined with -j generate a pretty JSON output.
++.BR "\-p" , " \-\-pretty"
++When combined with \-j generate a pretty JSON output.
+ 
+ .TP
+-.BR "\-s" , " --statistics"
++.BR "\-s" , " \-\-statistics"
+ If the object in question contains any statistical counters, shown them as
+ part of the "show" output.
+ 
+@@ -77,59 +77,66 @@ part of the "show" output.
+ 
+ .TP
+ .B app
+-- Configuration of application priority table
++\(en Configuration of application priority table
+ 
+ .TP
+ .B buffer
+-- Configuration of port buffers
++\(en Configuration of port buffers
+ 
+ .TP
+ .B ets
+-- Configuration of ETS (Enhanced Transmission Selection)
++\(en Configuration of ETS (Enhanced Transmission Selection)
+ 
+ .TP
+ .B maxrate
+-- Configuration of per-TC maximum transmit rate
++\(en Configuration of per-TC maximum transmit rate
+ 
+ .TP
+ .B pfc
+-- Configuration of PFC (Priority-based Flow Control)
++\(en Configuration of PFC (Priority-based Flow Control)
+ 
+ .SH COMMANDS
+ 
+-A \fICOMMAND\fR specifies the action to perform on the object. The set of
+-possible actions depends on the object type. As a rule, it is possible to
++A \fICOMMAND\fR specifies the action to perform on the object.
++The set of possible actions depends on the object type.
++As a rule, it is possible to
+ .B show
+ objects and to invoke topical
+-.B help,
++.BR help ,
+ which prints a list of available commands and argument syntax conventions.
+ 
+ .SH ARRAY PARAMETERS
+ 
+ Like commands, specification of parameters is in the domain of individual
+-objects (and their commands) as well. However, much of the DCB interface
+-revolves around arrays of fixed size that specify one value per some key, such
+-as per traffic class or per priority. There is therefore a single syntax for
+-adjusting elements of these arrays. It consists of a series of
+-\fIKEY\fB:\fIVALUE\fR pairs, where the meaning of the individual keys and values
+-depends on the parameter.
++objects (and their commands) as well.
++However, much of the DCB interface
++revolves around arrays of fixed size that specify one value per some key,
++such as per traffic class or per priority.
++There is therefore a single syntax for adjusting elements of these arrays.
++It consists of a series of \fIKEY\fB:\fIVALUE\fR pairs,
++where the meaning of the individual keys and values depends on the parameter.
+ 
+ The elements are evaluated in order from left to right, and the latter ones
+-override the earlier ones. The elements that are not specified on the command
++override the earlier ones.
++The elements that are not specified on the command
+ line are queried from the kernel and their current value is retained.
+ 
+ As an example, take a made-up parameter tc-juju, which can be set to charm
+-traffic in a given TC with either good luck or bad luck. \fIKEY\fR can therefore
+-be 0..7 (as is usual for TC numbers in DCB), and \fIVALUE\fR either of
+-\fBnone\fR, \fBgood\fR, and \fBbad\fR. An example of changing a juju value of
+-TCs 0 and 7, while leaving all other intact, would then be:
++traffic in a given TC with either good luck or bad luck.
++\fIKEY\fR can therefore be 0..7
++(as is usual for TC numbers in DCB),
++and \fIVALUE\fR either of \fBnone\fR, \fBgood\fR, and \fBbad\fR.
++An example of changing a juju value of TCs 0 and 7,
++while leaving all other intact, would then be:
+ 
+ .P
+ # dcb foo set dev eth0 tc-juju 0:good 7:bad
+ 
+ A special key, \fBall\fR, is recognized which sets the same value to all array
+-elements. This can be combined with the usual single-element syntax. E.g. in the
+-following, the juju of all keys is set to \fBnone\fR, except 0 and 7, which have
++elements.
++This can be combined with the usual single-element syntax.
++E.g., in the following,
++the juju of all keys is set to \fBnone\fR, except 0 and 7, which have
+ other values:
+ 
+ .P
+@@ -146,7 +153,6 @@ Exit status is 0 if command was successful or a positive integer upon failure.
+ .BR dcb-maxrate (8),
+ .BR dcb-pfc (8),
+ .BR dcb-rewr (8)
+-.br
+ 
+ .SH REPORTING BUGS
+ Report any bugs to the Network Developers mailing list
 
