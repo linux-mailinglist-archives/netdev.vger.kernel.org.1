@@ -1,120 +1,187 @@
-Return-Path: <netdev+bounces-141282-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141283-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AE4B19BA57A
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 13:56:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A71419BA57F
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 14:01:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5547C281D06
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 12:56:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 44F351F2225F
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 13:01:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A82C167271;
-	Sun,  3 Nov 2024 12:56:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4AF770832;
+	Sun,  3 Nov 2024 13:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="DxTDn6oK"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="B57W/QIl"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+Received: from out-172.mta1.migadu.com (out-172.mta1.migadu.com [95.215.58.172])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36576A50;
-	Sun,  3 Nov 2024 12:56:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EE9A23774;
+	Sun,  3 Nov 2024 13:01:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730638584; cv=none; b=rWAMni6rConRL0XpxKjk3WW5YbyYdq2N/oi/gKoW1HwnNeqvbt0LQAaV3vipOaK7FGSaXKzBlL2abCdwcPGMdLCxmCwjikHOCKMTLqauYJztmfUu0xSSKpOHmScSFZtr848vF8DMYpHsNPgKzk1dVuMZ3HtcjsxqH7exCWwajvk=
+	t=1730638908; cv=none; b=jweuD/Fkyg3bqODycdAS1k4xZkVQA1V32L5cyigiz6tBESN8BQia7yCIPWdQgwVpwNPuhMcu5yhkc7wiJ3yt1t5KSMstAr2cEPZV4awzrsyG2GF15XVVRsmVg3JAL2ADZNcxLRg0eZ+R+rZs3GslX4cPPCbRINU8Ypi4jx615Bw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730638584; c=relaxed/simple;
-	bh=5BPjS0OhAOC67ybt4pGDY+igTlAREpgzNPHZfG2fOz0=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=muI8s4o6S5P4S6rbXE6yRMM8VqOtrkMeycSqWkRqUwb2o1sj28gz2qoG0U5vXqROxvuz79ugdUpha+rC8eIEZ5FoesuaeCH0Jo/U8orGa+eRqPOg0NhKGa5Anc1Dbb06QLZSqq0V096d+cDRJ7L5pvHmobsx+J7ix575N1a90Xo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=DxTDn6oK; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0034.itg.ti.com ([10.64.40.246])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A3Cu1O3048337;
-	Sun, 3 Nov 2024 06:56:01 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1730638561;
-	bh=tLvRfw/FM5dRmeV/mlHH2Fgn6SVR6Sf13E7zxcblSYw=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=DxTDn6oKReH3yQDRBDLyCmXmHjRtOCX87Mjiu9G/cUr6SuTppF8LUdPf+Jyz2KL3C
-	 qr7eLML4ptoKOf0eG3QwTIP2wA15H06pmOuPksPCAutR9X8KbOD5cBq9CH1AopBqO5
-	 BjYmIZKZo59Mw3nx+JbQGepbHHLoPDAx/dewMZz4=
-Received: from DFLE106.ent.ti.com (dfle106.ent.ti.com [10.64.6.27])
-	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A3Cu1AH083882
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Sun, 3 Nov 2024 06:56:01 -0600
-Received: from DFLE111.ent.ti.com (10.64.6.32) by DFLE106.ent.ti.com
- (10.64.6.27) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Sun, 3
- Nov 2024 06:56:01 -0600
-Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DFLE111.ent.ti.com
- (10.64.6.32) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Sun, 3 Nov 2024 06:56:01 -0600
-Received: from [10.250.202.81] ([10.250.202.81])
-	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A3CtvF0036607;
-	Sun, 3 Nov 2024 06:55:58 -0600
-Message-ID: <c2fd6c15-6b30-4777-93ae-d20b0c4a76a0@ti.com>
-Date: Sun, 3 Nov 2024 14:55:57 +0200
+	s=arc-20240116; t=1730638908; c=relaxed/simple;
+	bh=VwMBJ2K2+XANpk9Usn57k6DX/DB71GOxMHVlly/+dw8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CuILJgovv62yAQV8oBLOVPj45H1h9zcUEGxO2IxGiztqor7beAcVSUqiYrCAoZY6Qx65AVvJYT2L86KfE774O3MpCkW90Fnqnxss3Dmj3i15Jxlm0z9sVXL5G3X+O3F/OKf346O6YXDmJIGNck9Vl6QknDZStG5T49CAQYZHbxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=B57W/QIl; arc=none smtp.client-ip=95.215.58.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <8c06240b-540b-472f-974f-d2db80d90c22@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730638904;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ReGYHVYD8E6M3nWSfKDR+gV/Sseh9igwmx9QD3ig80M=;
+	b=B57W/QIlF/4PlN1s8QLuCxcq2PE+PlbFrDtUs23zr2HmlDSeUnB1AuQDe85dfBPMDq0xhk
+	AqnvByMS9EFlNGHhXyCoA7t25eqPAnLqGosyIoLhAkFba4DfxshUO3i+h/32XssbjQGKYM
+	/YUtEjua1h7Ensvjk4rZeCGygSXbXoE=
+Date: Sun, 3 Nov 2024 14:01:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v4 09/17] wifi: cc33xx: Add main.c
-To: Simon Horman <horms@kernel.org>
-CC: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, Sabeeh Khan
-	<sabeeh-khan@ti.com>
-References: <20241029172354.4027886-1-michael.nemanov@ti.com>
- <20241029172354.4027886-10-michael.nemanov@ti.com>
- <20241102132532.GJ1838431@kernel.org>
-Content-Language: en-US
-From: "Nemanov, Michael" <michael.nemanov@ti.com>
-In-Reply-To: <20241102132532.GJ1838431@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Subject: Re: [PATCH bpf-next 4/4] bpf/selftests: add simple selftest for
+ bpf_smc_ops
+To: "D. Wythe" <alibuda@linux.alibaba.com>, kgraul@linux.ibm.com,
+ wenjia@linux.ibm.com, jaka@linux.ibm.com, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ pabeni@redhat.com, song@kernel.org, sdf@google.com, haoluo@google.com,
+ yhs@fb.com, edumazet@google.com, john.fastabend@gmail.com,
+ kpsingh@kernel.org, jolsa@kernel.org, guwen@linux.alibaba.com
+Cc: kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, bpf@vger.kernel.org,
+ dtcccc@linux.alibaba.com
+References: <1729737768-124596-1-git-send-email-alibuda@linux.alibaba.com>
+ <1729737768-124596-5-git-send-email-alibuda@linux.alibaba.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Zhu Yanjun <yanjun.zhu@linux.dev>
+In-Reply-To: <1729737768-124596-5-git-send-email-alibuda@linux.alibaba.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 11/2/2024 3:25 PM, Simon Horman wrote:
+在 2024/10/24 4:42, D. Wythe 写道:
+> From: "D. Wythe" <alibuda@linux.alibaba.com>
+> 
+> This PATCH adds a tiny selftest for bpf_smc_ops, to verify the ability
+> to attach and write access.
+> 
+> Follow the steps below to run this test.
+> 
+> make -C tools/testing/selftests/bpf
+> cd tools/testing/selftests/bpf
+> sudo ./test_progs -t smc
 
-...
-> 
-> Hi Michael,
-> 
-> Sparse seems a bit unhappy about this:
-> 
-> .../main.c:332:24: warning: incorrect type in initializer (different address spaces)
-> .../main.c:332:24:    expected struct ieee80211_sband_iftype_data const [noderef] __iftype_data *iftype_data
-> .../main.c:332:24:    got struct ieee80211_sband_iftype_data *
-> 
-> So perhaps it should be:
-> 
-> static const struct ieee80211_sband_iftype_data __iftd iftype_data_2ghz[] = {{
-> 
-> Likewise for iftype_data_5ghz.
-> 
+Thanks a lot.
 
-Hi Simon,
+# ./test_progs -t smc
+#27/1    bpf_smc/load:OK
+#27      bpf_smc:OK
+Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
 
-Yeah I saw that and was unsure how to properly solve it, Sparse does not 
-seems to like direct use of this variable. The above is based on old 
-code and I see newer implementations are using 
-ieee80211_set_sband_iftype_data which has the casting that should make 
-Sparse at ease. I'll try migrating the CC33xx code to this convention 
-which will require moving some structs around.
+The above command is based on several kernel modules. After these 
+dependent kernel modules are loaded, then can run the above command 
+successfully.
 
-Thanks and regards,
-Michael.
+Zhu Yanjun
+
+> 
+> Results shows:
+> Summary: 1/1 PASSED, 0 SKIPPED, 0 FAILED
+> 
+> Signed-off-by: D. Wythe <alibuda@linux.alibaba.com>
+> ---
+>   .../selftests/bpf/prog_tests/test_bpf_smc.c        | 21 +++++++++++
+>   tools/testing/selftests/bpf/progs/bpf_smc.c        | 44 ++++++++++++++++++++++
+>   2 files changed, 65 insertions(+)
+>   create mode 100644 tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+>   create mode 100644 tools/testing/selftests/bpf/progs/bpf_smc.c
+> 
+> diff --git a/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+> new file mode 100644
+> index 00000000..2299853
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/prog_tests/test_bpf_smc.c
+> @@ -0,0 +1,21 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +#include <test_progs.h>
+> +
+> +#include "bpf_smc.skel.h"
+> +
+> +static void load(void)
+> +{
+> +	struct bpf_smc *skel;
+> +
+> +	skel = bpf_smc__open_and_load();
+> +	if (!ASSERT_OK_PTR(skel, "bpf_smc__open_and_load"))
+> +		return;
+> +
+> +	bpf_smc__destroy(skel);
+> +}
+> +
+> +void test_bpf_smc(void)
+> +{
+> +	if (test__start_subtest("load"))
+> +		load();
+> +}
+> diff --git a/tools/testing/selftests/bpf/progs/bpf_smc.c b/tools/testing/selftests/bpf/progs/bpf_smc.c
+> new file mode 100644
+> index 00000000..ebff477
+> --- /dev/null
+> +++ b/tools/testing/selftests/bpf/progs/bpf_smc.c
+> @@ -0,0 +1,44 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +
+> +#include "vmlinux.h"
+> +
+> +#include <bpf/bpf_helpers.h>
+> +#include <bpf/bpf_tracing.h>
+> +
+> +char _license[] SEC("license") = "GPL";
+> +
+> +struct smc_bpf_ops_ctx {
+> +	struct {
+> +		struct tcp_sock *tp;
+> +	} set_option;
+> +	struct {
+> +		const struct tcp_sock *tp;
+> +		struct inet_request_sock *ireq;
+> +		int smc_ok;
+> +	} set_option_cond;
+> +};
+> +
+> +struct smc_bpf_ops {
+> +	void (*set_option)(struct smc_bpf_ops_ctx *ctx);
+> +	void (*set_option_cond)(struct smc_bpf_ops_ctx *ctx);
+> +};
+> +
+> +SEC("struct_ops/bpf_smc_set_tcp_option_cond")
+> +void BPF_PROG(bpf_smc_set_tcp_option_cond, struct smc_bpf_ops_ctx *arg)
+> +{
+> +	arg->set_option_cond.smc_ok = 1;
+> +}
+> +
+> +SEC("struct_ops/bpf_smc_set_tcp_option")
+> +void BPF_PROG(bpf_smc_set_tcp_option, struct smc_bpf_ops_ctx *arg)
+> +{
+> +	struct tcp_sock *tp = arg->set_option.tp;
+> +
+> +	tp->syn_smc = 1;
+> +}
+> +
+> +SEC(".struct_ops.link")
+> +struct smc_bpf_ops sample_smc_bpf_ops = {
+> +	.set_option         = (void *) bpf_smc_set_tcp_option,
+> +	.set_option_cond    = (void *) bpf_smc_set_tcp_option_cond,
+> +};
+
 
