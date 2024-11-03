@@ -1,192 +1,118 @@
-Return-Path: <netdev+bounces-141321-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0704B9BA787
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:01:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C17519BA78F
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:03:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1447281469
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:01:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 800232817AF
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:03:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F1F215D5C1;
-	Sun,  3 Nov 2024 19:01:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8CE176AAD;
+	Sun,  3 Nov 2024 19:03:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cvsEtOJr"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="TSE9A/rV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f181.google.com (mail-lj1-f181.google.com [209.85.208.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AFE81E52D;
-	Sun,  3 Nov 2024 19:01:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9A4A1632E5
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 19:03:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730660469; cv=none; b=Tj5elew/RPxVI/RLeBL9cco4Xne45K7JufpbqjUirflN4SHmCz4oK1LKT0DC9xOtGwvLtTtlAtQ25On8BPGtx55gXfrzh7pc7tYU3E+p2RYhEsIO1i3l9WsHMocNhBQUDuKeKPfff/OuIdPwGF6ZvlCAis3ioqNe2TbiufXP7eE=
+	t=1730660584; cv=none; b=es8lI+rTrEN2jXG7Ng//ooJzymqI1oAnJXuHrRFMxokl3rKOKEQeVoEc8MUjomHxVTmIwhUnU3NKHfLpCJNhahCjuvkuzwN8WuEJ731sZVKMk8rGzkgu1GCszX7LKsxjO/16fj43xWfPXIGEvXHFVraQJi6saeFfnGOqh86TzNU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730660469; c=relaxed/simple;
-	bh=1zDalwuuocg7o7SMSPIdz221LR5IyYdeAeYYXwUg9ig=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eVpQEKhjVfioXD6cSSrFMT8ug3h5A+d9EhImn09G1sL+zpRZ/pVNo4mMhJK0/vLTtKC6DcJNZhleU2c72DOmFdYh1q2tUu0LreyuTyOQ1xhd12RsQediuf2NK5rcTB3qYc1IT+XVqTEzh7Tc3Ma7CkchBSMdUf60PAH+RC+mYQY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cvsEtOJr; arc=none smtp.client-ip=209.85.208.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f181.google.com with SMTP id 38308e7fff4ca-2fb5638dd57so31605151fa.0;
-        Sun, 03 Nov 2024 11:01:07 -0800 (PST)
+	s=arc-20240116; t=1730660584; c=relaxed/simple;
+	bh=gW1KBWQIkX1X09vI+tgytLmL9BA+goTcWkI99ezOJng=;
+	h=Subject:From:To:CC:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=gAtSV5h6hR2uPj/fZx3j7gtTzo8hV96f0LAFvt7dBTjEeMWq0OJqqdbuZzGve1B0PZv2OwsYqjZRTcG1Rw42d4nNVKC+MVl3IFz0fe6oG/L/BC24KPB62ws0yZNY40w+EAF2kD201PlXjQnN2raY7lP3lNZz05a11hVFdht586g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=TSE9A/rV; arc=none smtp.client-ip=99.78.197.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730660465; x=1731265265; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=sY4A+T6RqHEnnohZAogeCURTdPYG3z7nSaBdYQpTNlM=;
-        b=cvsEtOJr8rejxm2ZkBVt1JZ5vgmAO13L/FdgEMCbDbpqMouOTb4z8tbMVb0kSATSuD
-         XH2soMKS+U29wBOvYdEL5v2dhvWyi7/4cx3wmn1hpxbz0X1C/FB6xHJswAqdNqPdz9o3
-         tnVPNHqYovqk+JtMELQPOjjmr7spmcvwkS0MCh8NV+IwYSUuyntzQxuI41jsSIV/7Zge
-         +2DX/BEs0EaylKK/MtKCGiWx5igcmj3mUieNGyqhX9opXxRC4rN8002dXCfb56ID6e/7
-         2T5JCad1+0nNizrA2kELAkS5kjFfF1Vz2nIcTPN63GC4fmnl2XGNGzD4L8emuqvDb1pE
-         r5dA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730660465; x=1731265265;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=sY4A+T6RqHEnnohZAogeCURTdPYG3z7nSaBdYQpTNlM=;
-        b=SxEuKUxNewPeDXzGtmvy0VgousLXAc5kREmwgFOdr2nPqJZ73RkNc9iSxIj0dAicgu
-         JHZ4rnIGba9oPAuidhhMMeMUyH4xt+fC+ew0KMeWO1fRHYZZvl99EUmk2v68I39j/sZ0
-         L4P1Z4XHCjikfCJQzLYAHSbdFUtqj5n7P55xqd05K4jnaNaipLYlT0BHfwcBGh9Ia2tq
-         KmYcHCh2iNx7xmxy1fV/7uF2Gr88x5XMhSldiDsERJeQQHzn6oL4LBxWBzPdJIQ3saJm
-         ubN7htXrgxXHqDL/ORSY6EWjy+Dr0cw3hnrNA3L4q/GSBJnmwCu3moNaVaKrYIKTfdsB
-         Sz4Q==
-X-Forwarded-Encrypted: i=1; AJvYcCWYicaEbNdSnpRENfT2CdpU6QRtXtKp9BevrXOyaGyn4ARzhO9Ns0JvjG3aPRUbfTMPmbLSFsKsD662Zro=@vger.kernel.org, AJvYcCXR5WRLU42lgpleD+r+RXqxwaM+liO4n2A8HleAfU4eB8OuNSkNHkutzV8zFbXvP5goNFEeprRh@vger.kernel.org
-X-Gm-Message-State: AOJu0YxH3cVO0oFvgHiwaOg3LPCF1qBIIy8Q4CS52noDohufXaZmASoK
-	5PxjkdIshFCfXGXMH68MUIRcotH2XJsRSQBIO+7ObkdRgFsh8206HJTP56f4NebsQ/nDsIVuyI3
-	adAVYUiUJodraTGoWlC+W2LeDyQ==
-X-Google-Smtp-Source: AGHT+IE51hefYOe5xiZP51bcZsQgIVA1y18RQ54UhBWiTXSEaDmaXWZuzRMyPOLYfnY5HJkrGKV6WAz/1UPB2tYCDoM=
-X-Received: by 2002:a2e:bc15:0:b0:2fb:6181:8ca1 with SMTP id
- 38308e7fff4ca-2fcbdf5f91emr154565771fa.6.1730660465205; Sun, 03 Nov 2024
- 11:01:05 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730660582; x=1762196582;
+  h=from:to:cc:date:message-id:references:in-reply-to:
+   content-transfer-encoding:mime-version:subject;
+  bh=Bf/Q2WPImUDOFYhRIGclyFJlMAoCfx4nutIywiIEpsU=;
+  b=TSE9A/rV7EAYB/OFynJbGTWLG0shIk89A2hIplZEaIjxJ0qUCsC4m0ru
+   KwvFkfYiTVhRypQX+G26lLDSXEdEJZRtcQ/2bQD1ufKD/inExt4gZj2t/
+   nCANXlw6f4IfS9bqGfY04qmOLWGEzjb+HEUGy8LkFCJCliMwyH+P3+MDa
+   M=;
+X-IronPort-AV: E=Sophos;i="6.11,255,1725321600"; 
+   d="scan'208";a="142993748"
+Subject: RE: Of ena auto_polling
+Thread-Topic: Of ena auto_polling
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.214])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Nov 2024 19:03:01 +0000
+Received: from EX19MTAEUC001.ant.amazon.com [10.0.17.79:27271]
+ by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.2.104:2525] with esmtp (Farcaster)
+ id 216ff346-31bb-4ac9-8a64-aa3c9dc6aa15; Sun, 3 Nov 2024 19:03:00 +0000 (UTC)
+X-Farcaster-Flow-ID: 216ff346-31bb-4ac9-8a64-aa3c9dc6aa15
+Received: from EX19D006EUA002.ant.amazon.com (10.252.50.65) by
+ EX19MTAEUC001.ant.amazon.com (10.252.51.155) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Sun, 3 Nov 2024 19:03:00 +0000
+Received: from EX19D005EUA002.ant.amazon.com (10.252.50.11) by
+ EX19D006EUA002.ant.amazon.com (10.252.50.65) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Sun, 3 Nov 2024 19:02:59 +0000
+Received: from EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9]) by
+ EX19D005EUA002.ant.amazon.com ([fe80::6aa4:b4a3:92f6:8e9%3]) with mapi id
+ 15.02.1258.035; Sun, 3 Nov 2024 19:02:59 +0000
+From: "Arinzon, David" <darinzon@amazon.com>
+To: "Dr. David Alan Gilbert" <linux@treblig.org>, "Agroskin, Shay"
+	<shayagr@amazon.com>, "Kiyanovski, Arthur" <akiyano@amazon.com>
+CC: "Dagan, Noam" <ndagan@amazon.com>, "Bshara, Saeed" <saeedb@amazon.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Thread-Index: AQHbLVmppitHFUIlRkm8t7vvfgMvhbKl6hqQ
+Date: Sun, 3 Nov 2024 19:02:59 +0000
+Message-ID: <b3df5db4bea6401095b908b3632bb09e@amazon.com>
+References: <ZyZ3AWoocmXY6esd@gallifrey>
+In-Reply-To: <ZyZ3AWoocmXY6esd@gallifrey>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAKKbWA7e0TmU4z4O8tHfwE=dvqPFaZbSPjxR-==fQSsNq6ELCQ@mail.gmail.com>
-In-Reply-To: <CAKKbWA7e0TmU4z4O8tHfwE=dvqPFaZbSPjxR-==fQSsNq6ELCQ@mail.gmail.com>
-From: Avi Fishman <avifishman70@gmail.com>
-Date: Sun, 3 Nov 2024 21:00:54 +0200
-Message-ID: <CAKKbWA6zRee9Rzee-ebLnEAvwLqnmsPswGaUo_ineyzw-b=EgQ@mail.gmail.com>
-Subject: Re: [RFC PATCH] net: stmmac: Fix the problem about interrupt storm
-To: cathycai0714@gmail.com, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, Giuseppe Cavallaro <peppe.cavallaro@st.com>
-Cc: cathy.cai@unisoc.com, cixi.geng1@unisoc.com, 
-	David Miller <davem@davemloft.net>, edumazet@google.com, kuba@kernel.org, 
-	Linux ARM <linux-arm-kernel@lists.infradead.org>, 
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, linux-stm32@st-md-mailman.stormreply.com, 
-	mcoquelin.stm32@gmail.com, Network Development <netdev@vger.kernel.org>, pabeni@redhat.com, 
-	romain.gantois@bootlin.com, wade.shu@unisoc.com, xuewen.yan94@gmail.com, 
-	zhiguo.niu@unisoc.com, Alexandre Torgue <alexandre.torgue@st.com>, 
-	Murali <murali.somarouthu@dell.com>, Tomer Maimon <tmaimon77@gmail.com>, 
-	"Silva, L Antonio" <Luis.A.Silva@dell.com>, Arias Pablo <Pablo_Arias@dell.com>, 
-	Somarouthu Murali <Murali_Somarouthu@dell.com>, uri.trichter@nuvoton.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+> Hi,
+>   I noticed that commit:
+> commit a4e262cde3cda4491ce666e7c5270954c4d926b9
+> Author: Sameeh Jubran <sameehj@amazon.com>
+> Date:   Mon Jun 3 17:43:25 2019 +0300
+>=20
+>     net: ena: allow automatic fallback to polling mode
+>=20
+> added a 'ena_com_set_admin_auto_polling_mode()' that's unused.
+> Is that the intention?
+> Because that then makes me wonder how
+> admin_queue->auto_polling
+> gets set, and then if the whole chunk is unused?
+>=20
+> Thanks,
+>=20
+> Dave
+> --
+>  -----Open up your eyes, open up your mind, open up your code -------
+> / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
+> \        dave @ treblig.org |                               | In Hex /
+>  \ _________________________|_____ http://www.treblig.org
+> |_______/
 
-We recently encountered the same interrupt storm and the root cause
-was the same as here.
-The suggested patch solved 99% of the issues, but indeed as written
-below on rare cases the issue happens between the dev_open() and
-clear_bit(STMMAC_DOWN) calls.
-I also agree that stmmac_interrupt() unconditionally ignores
-interrupts when the driver is in STMMAC_DOWN state is dangerous.
+Hi Dave,
+The auto polling mode was written as a fallback in case there are issues wi=
+th interrupts,
+it is currently not used by the ENA Linux driver, from Linux's perspective,=
+ it can be removed.
 
-The issue happened for us in linux 5.10 but I see that this behaviour
-wasn't changed also in newer versions.
-maybe we should disable the device interrupts before dev_close(), and
-enable it after dev_open().
-
->
-> Hi Romain,
->
-> On Sun, Mar 31, 2024 at 4:35=E2=80=AFPM Romain Gantois
-> <romain.gantois@bootlin.com> wrote:
-> >
-> > Hello Cathy,
-> >
-> > On Wed, 27 Mar 2024, Cathy Cai wrote:
-> >
-> > > Tx queue time out then reset adapter. When reset the adapter, stmmac =
-driver
-> > > sets the state to STMMAC_DOWN and calls dev_close() function. If an i=
-nterrupt
-> > > is triggered at this instant after setting state to STMMAC_DOWN, befo=
-re the
-> > > dev_close() call.
-> > >
-> > ...
-> > > -     set_bit(STMMAC_DOWN, &priv->state);
-> > >       dev_close(priv->dev);
-> > > +     set_bit(STMMAC_DOWN, &priv->state);
-> > >       dev_open(priv->dev, NULL);
-> > >       clear_bit(STMMAC_DOWN, &priv->state);
-> > >       clear_bit(STMMAC_RESETING, &priv->state);
-> >
-> > If this IRQ issue can happen whenever STMMAC_DOWN is set while the net =
-device is
-> > open, then it could also happen between the dev_open() and
-> > clear_bit(STMMAC_DOWN) calls right? So you'd have to clear STMMAC_DOWN =
-before
-> > calling dev_open() but then I don't see the usefulness of setting STMMA=
-C_DOWN
-> > and clearing it immediately. Maybe closing and opening the net device s=
-hould be
-> > enough?
-Indeed we encounter an issue between the dev_open() and clear_bit(STMMAC_DO=
-WN)..
-> >
->  Yes. It could also happen between the dev_open() and
-> clear_bit(STMMAC_DOWN) calls.
-> Although we did not reproduce this scenario, it should have happened
-> if we had increased
-> the number of test samples. In addition, I found that other people had
-> similar problems before.
-> The link is:
-> https://lore.kernel.org/all/20210208140820.10410-11-Sergey.Semin@baikalel=
-ectronics.ru/
->
-> >
-> > Moreover, it seems strange to me that stmmac_interrupt() unconditionnal=
-ly
-> > ignores interrupts when the driver is in STMMAC_DOWN state. This seems =
-like
-> > dangerous behaviour, since it could cause IRQ storm issues whenever som=
-ething
-> > in the driver sets this state. I'm not too familiar with the interrupt =
-handling
-> > in this driver, but maybe stmmac_interrupt() could clear interrupts
-> > unconditionnally in the STMMAC_DOWN state?
-> >
-> Clear interrupts unconditionally in the STMMAC_DOWN state directly
-> certainly won't cause this problem.
-> This may be too rough, maybe this design has other considerations.
->
-But then after the dev_open() you might miss interrupt, no?
-> >
-> > Best Regards,
-> >
-> > --
-> > Romain Gantois, Bootlin
-> > Embedded Linux and Kernel engineering
-> > https://bootlin.com
->
->  Best Regards,
-> Cathy
-
-
-
---=20
-Regards,
-Avi
 
