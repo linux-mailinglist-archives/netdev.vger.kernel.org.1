@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-141364-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141366-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E85C59BA95C
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:50:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06B589BA960
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:50:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3CA9EB20DD2
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:50:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 99A9D1F217DD
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2536A18BC37;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE40518E050;
 	Sun,  3 Nov 2024 22:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pjP++LQx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIq3HLYb"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1552189BA0;
-	Sun,  3 Nov 2024 22:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AADF318DF92
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 22:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730674229; cv=none; b=SEc6ubW+DDAvM0DNcOnDDHXktaRrSIXXwew2eSM3ZqqbAAZ2GfiR4glmiRgaVD01/Jcrs9OMK0hLwr8AS9VkowPfL3hPXKCoO2lObgox3u0wO7gUY/HQkH6L1eUUmjnIVZZX20ErfzR8IQK95pLubAuxnENQrtftaq4Q2XsIZmI=
+	t=1730674229; cv=none; b=LsJMjFvB1m+vcBCA55pHNqbbUBm0MoQbDofjtH0kozoP23SDANJZ/MbJsAYvpocUntP18XZbJhRM+uBpU/WAQyO9IhFaX5hbU3ZRnWibrvlUWIPo/8kD7h405O1SIDxJ3d39FWvfYenV0naXCfO7v9zJN1Czbuyy5dcPinNBBeg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730674229; c=relaxed/simple;
-	bh=azUdsJeLA1jzLVm2gM8E42xvwq0Ytk/yQai/Spgu5ok=;
+	bh=ADCg97cO1cvD3ZAOFwzpboJctnPsW3qn6SHcJX9EnaY=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Hr2qjIFvntln86//0w8ARkzuaGN3So3fp1n3AOPNH19YODKn/66Ioc3zGSleraFREX3V4MNMCaRrFpNu/soeL9V1sLTVik8I0x06XTV4ULhcpAucpiSOYt1fT0DdzBtp9r0n0AcB+mn4NN6ktNYHR0jPG2F3wTcJOctVH0C0U7g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pjP++LQx; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EFAE5C4CED3;
-	Sun,  3 Nov 2024 22:50:27 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=BlcPfsepQyqXdsLXE4SER9fzvbMkMmxzHXW2DgO9WjOAdEBZ8AYJNXtJMf6lda2hih6gZuYqZwk3L05Wa3XRO2g1GlmlMgbEZZKtdQrzqXu7sesroLEFv9AkOdmdAYNj2qIZ09KyNlMRcMB53jVuYV99dW2zsHUB3SzKI6BWFp8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIq3HLYb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 75CC3C4CED8;
+	Sun,  3 Nov 2024 22:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730674228;
-	bh=azUdsJeLA1jzLVm2gM8E42xvwq0Ytk/yQai/Spgu5ok=;
+	s=k20201202; t=1730674229;
+	bh=ADCg97cO1cvD3ZAOFwzpboJctnPsW3qn6SHcJX9EnaY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=pjP++LQxtji39IW8pm5wWw5ICcN+bQ7p/gvmis48EA1Eflbb3njFx1CiSb8k9C8h2
-	 GBHrxmKz2VbvE32UvjliGzmvWHw85YMpmkBWbZz8jXN9h9M/deIwe+f6vSLuMC47p0
-	 P+SJSNKPHyXWlT7q4TuS9qDAEia2iWD6fKTqLEi9xhKAI+27aZVXZMyI6n5WKtJA5A
-	 Es1k50QXteSQIyHuGg1yuPX2xSrj0Wxslu9ih720kjSNuK/KvL3O/eb0EDV0uC+Ixv
-	 Gd59k9evH8avp98bvTotW1O9KwaLx+LmE9TqYi269gyoUjseOP4H1fFezWYiAMALpa
-	 vD0T5Yyie+1Hg==
+	b=FIq3HLYb6KCcJ0wvgY1bAY34eTeYiT828kTZTangSWG8vbI74x2EwZwK8Z8XCm6WM
+	 rM/YzDOkKykoSjBBJd0s7roNF5lc1+9jGOF8DXArWqS6JnuhOgdNLPFu4nGQnDu4MC
+	 U0t7XU/COjS81/I/8j62Tw9KCAI/ZCqH/icbxSx070oVmsr0WeeUcrW3LXqmGjxjxJ
+	 PLes/fO/IdQfDmuIPSWZi+SJp/TY9oUg90lvM5bi139LVJoi6Q2HQteXiyg2cvUwWf
+	 q0+tuKRu8MlGBCEVbqGtk5QPbR59G1LO4wBkGIV3r4fnc9rkvNrnNS5tYpMXI3P3jf
+	 dkpTVLVuj4AYg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE0E438363C3;
-	Sun,  3 Nov 2024 22:50:37 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33B8038363C3;
+	Sun,  3 Nov 2024 22:50:39 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,67 +52,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 00/12] ibm: emac: cleanup modules to use devm 
+Subject: Re: [PATCH net-next] ipvlan: Prepare ipvlan_process_v4_outbound() to
+ future .flowi4_tos conversion.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173067423633.3271988.11469025588601425929.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 22:50:36 +0000
-References: <20241030203727.6039-1-rosenp@gmail.com>
-In-Reply-To: <20241030203727.6039-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, andrew+netdev@lunn.ch, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, leitao@debian.org,
- u.kleine-koenig@baylibre.com, linux-kernel@vger.kernel.org
+ <173067423774.3271988.16980771214131369723.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Nov 2024 22:50:37 +0000
+References: <f48335504a05b3587e0081a9b4511e0761571ca5.1730292157.git.gnault@redhat.com>
+In-Reply-To: <f48335504a05b3587e0081a9b4511e0761571ca5.1730292157.git.gnault@redhat.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org, andrew+netdev@lunn.ch,
+ idosch@nvidia.com
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 30 Oct 2024 13:37:15 -0700 you wrote:
-> simplifies probe and removes remove functions. These drivers are small.
+On Wed, 30 Oct 2024 13:43:11 +0100 you wrote:
+> Use ip4h_dscp() to get the DSCP from the IPv4 header, then convert the
+> dscp_t value to __u8 with inet_dscp_to_dsfield().
 > 
-> Rosen Penev (12):
->   net: ibm: emac: tah: use devm for kzalloc
->   net: ibm: emac: tah: use devm for mutex_init
->   net: ibm: emac: tah: devm_platform_get_resources
->   net: ibm: emac: rgmii: use devm for kzalloc
->   net: ibm: emac: rgmii: use devm for mutex_init
->   net: ibm: emac: rgmii: devm_platform_get_resource
->   net: ibm: emac: zmii: use devm for kzalloc
->   net: ibm: emac: zmii: use devm for mutex_init
->   net: ibm: emac: zmii: devm_platform_get_resource
->   net: ibm: emac: mal: use devm for kzalloc
->   net: ibm: emac: mal: use devm for request_irq
->   net: ibm: emac: mal: move irq maps down
+> Then, when we'll convert .flowi4_tos to dscp_t, we'll just have to drop
+> the inet_dscp_to_dsfield() call.
+> 
+> Signed-off-by: Guillaume Nault <gnault@redhat.com>
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,01/12] net: ibm: emac: tah: use devm for kzalloc
-    https://git.kernel.org/netdev/net-next/c/96111f1ec6bf
-  - [net-next,02/12] net: ibm: emac: tah: use devm for mutex_init
-    https://git.kernel.org/netdev/net-next/c/18082a84a7f0
-  - [net-next,03/12] net: ibm: emac: tah: devm_platform_get_resources
-    https://git.kernel.org/netdev/net-next/c/9f3ea8d70d6c
-  - [net-next,04/12] net: ibm: emac: rgmii: use devm for kzalloc
-    https://git.kernel.org/netdev/net-next/c/070239c07ac1
-  - [net-next,05/12] net: ibm: emac: rgmii: use devm for mutex_init
-    https://git.kernel.org/netdev/net-next/c/01902fe2bdd7
-  - [net-next,06/12] net: ibm: emac: rgmii: devm_platform_get_resource
-    https://git.kernel.org/netdev/net-next/c/9fb40aeeb521
-  - [net-next,07/12] net: ibm: emac: zmii: use devm for kzalloc
-    https://git.kernel.org/netdev/net-next/c/e2da0216e55e
-  - [net-next,08/12] net: ibm: emac: zmii: use devm for mutex_init
-    https://git.kernel.org/netdev/net-next/c/3fb5272de034
-  - [net-next,09/12] net: ibm: emac: zmii: devm_platform_get_resource
-    https://git.kernel.org/netdev/net-next/c/c2744ab3ce28
-  - [net-next,10/12] net: ibm: emac: mal: use devm for kzalloc
-    https://git.kernel.org/netdev/net-next/c/3f55d1655549
-  - [net-next,11/12] net: ibm: emac: mal: use devm for request_irq
-    https://git.kernel.org/netdev/net-next/c/14f59154ff0b
-  - [net-next,12/12] net: ibm: emac: mal: move irq maps down
-    https://git.kernel.org/netdev/net-next/c/c4f5d0454cab
+  - [net-next] ipvlan: Prepare ipvlan_process_v4_outbound() to future .flowi4_tos conversion.
+    https://git.kernel.org/netdev/net-next/c/0c30d6eedd1e
 
 You are awesome, thank you!
 -- 
