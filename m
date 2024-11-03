@@ -1,84 +1,56 @@
-Return-Path: <netdev+bounces-141338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48EDF9BA7E4
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 21:21:48 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 373B29BA806
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 21:50:42 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D605280F72
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:21:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9953428179E
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:50:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 833AF18B491;
-	Sun,  3 Nov 2024 20:21:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD9C918BBB8;
+	Sun,  3 Nov 2024 20:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hbPRZL05"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QmqL4GR+"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 499257C0BE;
-	Sun,  3 Nov 2024 20:21:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6A5283CD3;
+	Sun,  3 Nov 2024 20:50:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730665302; cv=none; b=f8jO5OFbF4aPJsndKXAxBcfktN4K9zo27t8jeb5YFjgjwYJKPN/wT1pS4uuy1epLniWIQqAPPtW5bLCoUNW/DnuqivMbcSfsYUHcxfTI0NAO7nWpLQgnQEgyhbzyuO1trNnR7C83YAZDEhLkoNsoDu12/SNbETXPZTpMSbebj0o=
+	t=1730667036; cv=none; b=FdpAev7162OqkDtVdEiAIsCyALQ91CZt3Ldcufon+JQcTiYrw+MKbQ0LkQ85jRDASKLnicRclIjONW2Io6hpKedi+aY8XCOEZTWlhgNCP3nVIrND5jjtWgvFyyh5m1uMCCz2qwtaLb3uv62MNy4YIjskuP09ZDY15nq6ICC49Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730665302; c=relaxed/simple;
-	bh=8Ukc+M8CZYwlrpkjWIRwsZhzje/hVh2caYXefeqy6UU=;
+	s=arc-20240116; t=1730667036; c=relaxed/simple;
+	bh=0XUV0VbcIRK0revMTo8r7QUXU3/XHGnvm9TNClNnFVg=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uVozJLcZW2r6j1htm7KQGm80vj9xv2PP2q2c3EE+vlpExFUj26JGHRP/k6fLRj9/0onUz9+WI1tV1+oJWG4a2nKCl0RHdDw8Nsud6/5HZ6vIa4vrB9g7zD6TbmtF2BYEPzBwHKtlawUrfpCOJSfXS4cMRheZTmjd4BX8nNQqX6M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hbPRZL05; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AD122C4CECD;
-	Sun,  3 Nov 2024 20:21:39 +0000 (UTC)
+	 MIME-Version:Content-Type; b=qXdtP6Bqzcrny8/2ocNtgO2hsPZhOhGSo7Gj5ZoBUyYlRORbzKNOclDckI50Tstnkwl6loeRK4VOfP4nRoElx7+oZ9rNc/s8Cgkyb/6NUhaT0rKtFm+iUwYb+McYWCwyEXPddFKx1HQdgTv+kcIFGO+m7poa+aEHMBLj6uAx5Rw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QmqL4GR+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B821EC4CECD;
+	Sun,  3 Nov 2024 20:50:35 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730665301;
-	bh=8Ukc+M8CZYwlrpkjWIRwsZhzje/hVh2caYXefeqy6UU=;
+	s=k20201202; t=1730667036;
+	bh=0XUV0VbcIRK0revMTo8r7QUXU3/XHGnvm9TNClNnFVg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=hbPRZL054fJi30LppOH0pHtwRISF1ZSCdVrUtYIu0ppNa8ioEdfJ/dm3YYfLz3NtM
-	 FDDzikzL4fj4/2tA7J1E2L9mrUIuRitDbxRchOPRHLYcpY+eVOIJJUF/2sw3Nv+KC/
-	 MkKYL5CoKKRrOmeBncDVf/hgEJBxRSJtwv+KWf1H5OACVRVjFtm4ZhiLiklw82+0AM
-	 m+Qj20+jgyR1zDpVDBdBJVbyxI0vaXCMLviA7xAjCakdiPWw7LkGP1wzsNIVt0xcPl
-	 p/Kmu0WgZ75pRzFzZgf6IDZpKyq49AkrdXRhOn5GT7MpWMd7DiNlI4obZ4xpQ3JFue
-	 qRzwHjaAGgKpw==
-Date: Sun, 3 Nov 2024 12:21:38 -0800
+	b=QmqL4GR+ldvCw/9MNJqu6/DT/SoZWrP8wJtwZKrQNZPeadrGkpWCjdZvBRDEmh+m4
+	 GjdCEmjtqQD64NuswLMN+UzIxO+1H8iz6k4CjEXZEmEArR4cox+9ykhra4hIzkAUe8
+	 AUEbmq35eMBGKuGtz4k0RKw2+r+6AraeolDcHWD+4X8LL0zmilX9C6nuZK+5ceMKQ6
+	 VLR+PKogOtin4UdjnDHWFWmPKhSNrL8fooG4pI3QO1bB3vz6LheKN1g/ATTW5teqwC
+	 MafoEnhLYDxhIpP/qEIiDFnw6CqDbBtlMy2fU05MPcaQ7QpEL0x0ufaew1de9EJ/e5
+	 IruML2peqXoTA==
+Date: Sun, 3 Nov 2024 12:50:34 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, AngeloGioacchino Del Regno
- <angelogioacchino.delregno@collabora.com>, Arthur Kiyanovski
- <akiyano@amazon.com>, Brett Creeley <brett.creeley@amd.com>, Broadcom
- internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>, Claudiu Manoil
- <claudiu.manoil@nxp.com>, David Arinzon <darinzon@amazon.com>, "David S.
- Miller" <davem@davemloft.net>, Doug Berger <opendmb@gmail.com>, Eric
- Dumazet <edumazet@google.com>, Eugenio =?UTF-8?B?UMOpcmV6?=
- <eperezma@redhat.com>, Felix Fietkau <nbd@nbd.name>, Florian Fainelli
- <florian.fainelli@broadcom.com>, Geetha sowjanya <gakula@marvell.com>,
- hariprasad <hkelam@marvell.com>, Jason Wang <jasowang@redhat.com>, Jonathan
- Corbet <corbet@lwn.net>, Leon Romanovsky <leon@kernel.org>, Lorenzo
- Bianconi <lorenzo@kernel.org>, Louis Peens <louis.peens@corigine.com>, Mark
- Lee <Mark-MC.Lee@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
- Michael Chan <michael.chan@broadcom.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Noam Dagan <ndagan@amazon.com>, Paolo Abeni
- <pabeni@redhat.com>, Przemek Kitszel <przemyslaw.kitszel@intel.com>, Roy
- Pledge <Roy.Pledge@nxp.com>, Saeed Bishara <saeedb@amazon.com>, Saeed
- Mahameed <saeedm@nvidia.com>, Sean Wang <sean.wang@mediatek.com>, Shannon
- Nelson <shannon.nelson@amd.com>, Shay Agroskin <shayagr@amazon.com>, Simon
- Horman <horms@kernel.org>, Subbaraya Sundeep <sbhatta@marvell.com>, Sunil
- Goutham <sgoutham@marvell.com>, Tal Gilboa <talgi@nvidia.com>, Tariq Toukan
- <tariqt@nvidia.com>, Tony Nguyen <anthony.l.nguyen@intel.com>, Vladimir
- Oltean <vladimir.oltean@nxp.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
- intel-wired-lan@lists.osuosl.org, linux-arm-kernel@lists.infradead.org,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-mediatek@lists.infradead.org, linuxppc-dev@lists.ozlabs.org,
- linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- oss-drivers@corigine.com, virtualization@lists.linux.dev
-Subject: Re: [resend PATCH 2/2] dim: pass dim_sample to net_dim() by
- reference
-Message-ID: <20241103122138.6d0d62f6@kernel.org>
-In-Reply-To: <20241031002326.3426181-2-csander@purestorage.com>
-References: <20241031002326.3426181-1-csander@purestorage.com>
-	<20241031002326.3426181-2-csander@purestorage.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ andrew+netdev@lunn.ch, claudiu.manoil@nxp.com, vladimir.oltean@nxp.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, imx@lists.linux.dev
+Subject: Re: [PATCH net 0/2] Fix issues when PF sets MAC address for VF
+Message-ID: <20241103125034.27c43c51@kernel.org>
+In-Reply-To: <20241031060247.1290941-1-wei.fang@nxp.com>
+References: <20241031060247.1290941-1-wei.fang@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,12 +60,25 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 30 Oct 2024 18:23:26 -0600 Caleb Sander Mateos wrote:
-> In a heavy TCP workload, mlx5e_handle_rx_dim() consumes 3% of CPU time,
-> 94% of which is attributed to the first push instruction to copy
-> dim_sample on the stack for the call to net_dim():
+On Thu, 31 Oct 2024 14:02:45 +0800 Wei Fang wrote:
+>   net: enetc: allocate vf_state during PF probes
+>   net: enetc: prevent PF from configuring MAC address for an enabled VF
 
-Change itself looks fine, so we can apply, but this seems surprising.
-Are you sure this is not just some measurement problem?
-Do you see 3% higher PPS with this change applied?
+This combination of changes would imply that nobody sets the MAC
+address on VFs via this driver, correct? Patch 1 fixes a crash
+if address is set before VFs are enabled, patch 2 forces setting
+the MAC before VFs are enabled (which would previously crash).
+Which leads me to believe this will cause regressions to all users,
+if such users exist.
+
+The fact that the MAC address is not picked up by a running VM is
+normal, I'd say even maybe expected. IIUC hypervisor will enable 
+SRIOV at the start of day, then allocate, configure and assign VFs
+to VMs. It will FLR the VF after configuration.
+
+Your change will make it impossible to reconfigure VF with a MAC
+of a new VM, if any other VF is in use.
+
+Long story short, I don't believe the patch 2 is necessary at all,
+maybe you can print a warning to the logs, if you really want.
 
