@@ -1,96 +1,91 @@
-Return-Path: <netdev+bounces-141318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70A189BA77C
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:50:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76EB29BA782
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:54:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1465D1F21414
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 18:50:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A821F1C20B76
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 18:54:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0877188014;
-	Sun,  3 Nov 2024 18:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19D92142659;
+	Sun,  3 Nov 2024 18:54:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="epXc8mpm"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RoqUeNl0"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FB5B1EF01;
-	Sun,  3 Nov 2024 18:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8DF176036
+	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 18:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730659821; cv=none; b=EyddzOyILq2YCddkLRiU1n/+Z0K3K6zZI3asBTF0Pua86+6FQ05pw3tXWt9HFyn37Cufo2WqXelB/wJ0zjRVF4O276WSN73JoRkoAfSkhFkCh6XT6j69k4Tl/X23/+pymrIaQWsGzW4m6tpHXdDNKYmhphUWgdXMmRvl6nFUwHE=
+	t=1730660057; cv=none; b=BUzelwGJVJpbgaKeI7N839WOjYoXj6r3KOuwFOZ3SkItidSIvvOAhkUr2zCYWlmmHeFIy5u8kT0fQ93vO+Cssx2+DaYPxc1kQv1xVbUjSE5luMebwiNXQvvJqQguRhNIFD8golHO5O9FqWDxfkQFi6F53gRLRKliIs7kC28Sc0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730659821; c=relaxed/simple;
-	bh=ArlCszO/6ZYqC0Nxcu1SiuF9ped7P1H2Pv1TYd1KdWQ=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=b7wcIIYRpRCXwu7iphQaCz/AEa/IT1FkFeCeHjFL4qnjLfspzfDr8FXuWUbhV2rXAnkQYyV0BTD39UzddPJRxhqlf8X8uZ3WjUUP+Dv5iLfWsE7TdukRE23gXIoQHm2lt+SsNKUSMseQ1+drjKguFoK/8MiOQ0PYvMqEScLft/U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=epXc8mpm; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0B427C4CECD;
-	Sun,  3 Nov 2024 18:50:20 +0000 (UTC)
+	s=arc-20240116; t=1730660057; c=relaxed/simple;
+	bh=15ZgfVjGlGM0IqU/XG3XUSAtLn1cz0T5PjimnkX6Oi8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=CumE1DaWYSTOtjYeuMTxQuEql7LCZcZhm6p7qFAjmwE98LhWpW+LsK4EMLXCtfyE6mjGvKRueWFTupwlBxt3NvtwK0k9mgIceIzsWxMzrjxmpYC1x2G/98tw7TnXOPZRcw9iyAfXLhYJjHxdH5D885jG8BLq92D9t9ZNsszHrQk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RoqUeNl0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CBA95C4CECD;
+	Sun,  3 Nov 2024 18:54:15 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730659820;
-	bh=ArlCszO/6ZYqC0Nxcu1SiuF9ped7P1H2Pv1TYd1KdWQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=epXc8mpmbu1A3yIV5gwMiNlU9xSL9I1R53e+fQrOJcA+pIN824jx7zjW/m8aeLeUD
-	 nyZF1egnapYatzemJSJrQXccCjWpC41R+l+j9fMug8i6OLlVusRM0CTtZUQEZIuBGl
-	 2JUK+5865rC0qKekc/0XlTpMx8/HfCmaklhz0+JFl5pueyd3OGCus3fwQavXSfyh0F
-	 MumenGzQl+y5dMc3XDXcBEPrDjbF48Sz5P9cDu4Jv2efcT3vEZq8WBZXCvB1W4M35h
-	 Y+Dc8H2gFYbuH2kLrEGbqrld7XgTRmd7mrXiAg2DWVbH37RKbmFJ4JmcgEMafmoERD
-	 cwor3islUUJNg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADCF038363C3;
-	Sun,  3 Nov 2024 18:50:29 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730660056;
+	bh=15ZgfVjGlGM0IqU/XG3XUSAtLn1cz0T5PjimnkX6Oi8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=RoqUeNl0uwBM39S8EcaCLmP3NhU+4k+K4YaOltlDg4b/BQvxZq5aYyDvFtIZlcEHJ
+	 TyWPYem95+e+mFZjeQVGFCTr43thV9D9OneQkXFz2yr1AbhYwig/KKRr5RL0E1ufLZ
+	 9oGbZvi7yJJIDMxR6w1NRa5nz/RuZuguG4DuB6vA7b0NVhtaRl6iTwPReoJmQ/9PB/
+	 RH4Q6RbTcg5kQmgfhDHo0yeSfG646pG753HfscLPISjNPPf4KQZeqQSRrJi4NdlLFH
+	 JC/4X1+RRVxYgqkrpP8ZQidOuR/QoWMlIeYDcz5CDHMJM7OgtdDIhOizmqos81Fzjs
+	 6SQdY7mnf67/A==
+Date: Sun, 3 Nov 2024 10:54:14 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jeremy Kerr <jk@codeconstruct.com.au>
+Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] net: ncsi: check for netlink-driven responses
+ before requiring a handler
+Message-ID: <20241103105414.75ddd6bd@kernel.org>
+In-Reply-To: <20241028-ncsi-arb-opcode-v1-1-9d65080908b9@codeconstruct.com.au>
+References: <20241028-ncsi-arb-opcode-v1-1-9d65080908b9@codeconstruct.com.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCHv4 net-next] net: dsa: use ethtool string helpers
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173065982851.3230954.2623889336248911818.git-patchwork-notify@kernel.org>
-Date: Sun, 03 Nov 2024 18:50:28 +0000
-References: <20241028044828.1639668-1-rosenp@gmail.com>
-In-Reply-To: <20241028044828.1639668-1-rosenp@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, florian.fainelli@broadcom.com, andrew@lunn.ch,
- olteanv@gmail.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kurt@linutronix.de, woojung.huh@microchip.com,
- UNGLinuxDriver@microchip.com, clement.leger@bootlin.com,
- george.mccollister@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org,
- linux-renesas-soc@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 28 Oct 2024 15:08:34 +0800 Jeremy Kerr wrote:
+> Subject: [PATCH net-next] net: ncsi: check for netlink-driven responses before requiring a handler
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+> Currently, the NCSI response path will look up an opcode-specific
+> handler for all incoming response messages. However, we may be receiving
+> a response from a netlink-generated request, which may not have a
+> corresponding in-kernel handler for that request opcode. In that case,
+> we'll drop the response because we didn't find a opcode-specific
+> handler.
 
-On Sun, 27 Oct 2024 21:48:28 -0700 you wrote:
-> These are the preferred way to copy ethtool strings.
-> 
-> Avoids incrementing pointers all over the place.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> (for hellcreek driver)
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> 
-> [...]
+This makes it sound like the code is written this way unintentionally,
+which I doubt. A better description of the patch would be "allow
+userspace to issue commands unknown to the kernel". And then it'd be
+great to get some examples of commands you'd like to issue..
 
-Here is the summary with links:
-  - [PATCHv4,net-next] net: dsa: use ethtool string helpers
-    https://git.kernel.org/netdev/net-next/c/f12b363887c7
+> Perform the lookup for the pending request (and hence for
+> NETLINK_DRIVEN) before requiring an in-kernel handler, and defer the
+> requirement for a corresponding kernel request until we know it's a
+> kernel-driven command.
 
-You are awesome, thank you!
+As for the code - delaying handling ret != 0 makes me worried that
+someone will insert code in between and clobber it. Can you split
+the handling so that all the ret != 0 (or EPERM for netlink)
+are still handled in the if (ret) {} ?
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
