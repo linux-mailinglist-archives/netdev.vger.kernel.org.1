@@ -1,112 +1,99 @@
-Return-Path: <netdev+bounces-141362-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141363-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0344A9BA957
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:46:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 664599BA959
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 23:50:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A228A1F20FD8
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:46:10 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0016C1F21167
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 22:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9153813AA2F;
-	Sun,  3 Nov 2024 22:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F053518BC15;
+	Sun,  3 Nov 2024 22:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Vyg9FpGO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BPCMWFHa"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f181.google.com (mail-pg1-f181.google.com [209.85.215.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2AAA433AB
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 22:46:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7AA5433AB;
+	Sun,  3 Nov 2024 22:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730673966; cv=none; b=iE53I16rPUDCia+abuy8A+zA01M67AITLyADBaAClY+cAQssEqbHhNZIWFO2ygrbUzhl/TCNUpCL9JsNN+UafAhEcxxWS915Oh1THFobJYU8Fbd5iz6fbgTRbGcoNKjTd9zIlfzKgsVE614j6/2XONTCxO0abina/vL5Wk2/HN8=
+	t=1730674221; cv=none; b=OPSCMHBWqyu/7c9dbH8P5w3drzsw5r4594sSnaX7E7yahCIFQjJs3gjKv1XLGJ8iQvaPjAqpUKhjWjp/+ZHnEJ2VRRSshTsPczONdjydTBVIk6Uivyti7hF9kSJcmpOY4ujqULnKmSQ4HU6RN6dTVApEo9KP9v4BBqJq1Q5YTUo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730673966; c=relaxed/simple;
-	bh=gGz9nojKV9XYHMu/G0JqucViQsKNL/mo+4W7dd88faA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BdlxNw6NMYbfTRyFFxbMPKNFVYSMPGA7ND3giherWnMMGpc6mt1ujW9FHT6aeXSRoFHeFDESfh6VfcSBMASaauMT9NN6TYUY7dcLtCgHeKVxmVoEoGNeFerBHk0xOsKvgPwSypOJZc+2XultCoU5tFsdB+JJt9A+GO3Sw4Sf8F8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Vyg9FpGO; arc=none smtp.client-ip=209.85.215.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pg1-f181.google.com with SMTP id 41be03b00d2f7-7ea8c4ce232so2977911a12.0
-        for <netdev@vger.kernel.org>; Sun, 03 Nov 2024 14:46:02 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730673962; x=1731278762; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=/CUcOLWGwwQklYoitXir2io61z+J9mnvgtGSJcIPe1w=;
-        b=Vyg9FpGOoYMBOB3hykRwD7mY25pomVgV3cokfNfxBE+WfHDBk79ikwaQ3ac5qr5FCW
-         3DCm192PX97KOAQoj82D2KJqqvlEIUu5qhzYi+Vj77f3SzMWHEqZygeICym6deJgwuKe
-         ifswls4eAliDbSxaqrAkl2LPhz86ud+eBbvaV0rguZY+c44NfoVy9QjjLd6QKQtpxUZH
-         FR5j34FeZVWCoqaa+Rn02EmqjSAh169cr+0xh2GpkphWj4Iiz0FqLlYBcJS5/UQ+rm94
-         OjUs6saAzoUB/7od21DsMDypKUoEmEAv6/OqbNbFSk7j+iq5S0srjKNaW8pHHBYaXR0l
-         PRDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730673962; x=1731278762;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/CUcOLWGwwQklYoitXir2io61z+J9mnvgtGSJcIPe1w=;
-        b=NOMJ2n49m8KJjRr/njLyrMVt32WpOrMCGEtqWHa0FeWPQ1JrKdu2Lh2RAZnyvXkJ8S
-         lnrXaOdqlZonCTiRk9vFSNNcewijAFOYvEnVqXqsoDm+7CNzPw/5iDJrQdlygENGnv9F
-         Tn22TCulNb8KP2rgA8Sf2zyMJSTYlc+RIlujqHH3YbhKRdzHHKq+Og8AWBuvJ3SLPcGh
-         EddgPb6pmhgkjMz2y65LgQqbNjaVmlFlJZ23A/HqRSk+c2ussYRe961MlszrtuBmk/ZX
-         49GAtsHDtrtHB0q07xN2j7UTiNPosoOqr9ZJJw4CbXQyIvRxeeQHuE1lEUIk/ORpIzL6
-         z2qg==
-X-Gm-Message-State: AOJu0YzHyLFJNnRa5LB2d4ZBfoiY2MzlK8ATR+bKld2mYgBxg3RXZ1Qn
-	rJzok42VcGYwlXer0SwCBgktxTr0XoAlh2OOd9wRs3Y/QY6hVduBEVncb3kN9YU=
-X-Google-Smtp-Source: AGHT+IGIJ7k75pF/Ozvb6rZuLTExnagGiZiinYHFLcj+a7Pt9qQ/A2PTDkimxxRmOXJvwxPli4FNxg==
-X-Received: by 2002:a17:90b:35cd:b0:2e2:ef25:ed35 with SMTP id 98e67ed59e1d1-2e94bdfdedemr15078541a91.0.1730673962138;
-        Sun, 03 Nov 2024 14:46:02 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e93db4a5d4sm6355229a91.56.2024.11.03.14.46.01
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 03 Nov 2024 14:46:01 -0800 (PST)
-Date: Sun, 3 Nov 2024 14:45:59 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Maurice Lambert <mauricelambert434@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: Re: [PATCH] netlink: typographical error in nlmsg_type constants
- definition
-Message-ID: <20241103144559.3318d889@hermes.local>
-In-Reply-To: <20241103223950.230300-1-mauricelambert434@gmail.com>
-References: <20241103223950.230300-1-mauricelambert434@gmail.com>
+	s=arc-20240116; t=1730674221; c=relaxed/simple;
+	bh=0SkRTSGIsqiHs5Dh71zvHWv9TulxU8fWVKzt6rhmO3I=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=bYgkWoTGPDcmVxqNada4bBWA1vd4mmMNDIaN6Vfbm+ebwZHr8zdHxFGYgeJOhlpF6/nGO+kDOnx9z0FVpbOEeWnsO74cLlx7NFGLMs8osiT1RmuFL+KLoNGK8ZkCkmg2tCKO6RLlkvgVzsR3xe159P4wNQQUqvBZULt3jNugRvs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BPCMWFHa; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4289AC4CECD;
+	Sun,  3 Nov 2024 22:50:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730674220;
+	bh=0SkRTSGIsqiHs5Dh71zvHWv9TulxU8fWVKzt6rhmO3I=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=BPCMWFHaP3Z8NTmYEyOHOkT/3VHxcCmtgnh91Z3tLN2Nr5AOl1UypTmkHX3jJ2HTh
+	 lhxDE71KEBBoEdMrO2GVLBFzOP/+t22y6RPHhvjU3oof3hepLHcmr8F4Hwkosh2AK0
+	 GOsQ0gKVwXWd+blPBzRPVjYORcdJL8L+WueQmDzBw6Hp8TkYK7SocYv+2OECnqe8uN
+	 QaKosYae+yrLtg5XFueEDZh9HAdyCSA6mstmI0zQgtWCb7FdAyggIPai0/rdFq2SCm
+	 jdB/ihBkaw4OtVfXXb3813O8oL36cDsDc3Etpy7UikU7zD22Blj1NhwvhDFCmfQsAs
+	 Ai9rimwXOf8ZQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EAF8538363C3;
+	Sun,  3 Nov 2024 22:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 0/2] net: xilinx: axienet: Fix kernel crash in dmaengine
+ transmit path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173067422875.3271988.4124250768668395576.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Nov 2024 22:50:28 +0000
+References: <20241030062533.2527042-1-suraj.gupta2@amd.com>
+In-Reply-To: <20241030062533.2527042-1-suraj.gupta2@amd.com>
+To: Suraj Gupta <suraj.gupta2@amd.com>
+Cc: radhey.shyam.pandey@amd.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ michal.simek@amd.com, netdev@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ git@amd.com, harini.katakam@amd.com
 
-On Sun,  3 Nov 2024 23:39:50 +0100
-Maurice Lambert <mauricelambert434@gmail.com> wrote:
+Hello:
 
-> This commit fix a typographical error in netlink nlmsg_type constants definition in the include/uapi/linux/rtnetlink.h at line 177. The definition is RTM_NEWNVLAN RTM_NEWVLAN instead of RTM_NEWVLAN RTM_NEWVLAN.
+This series was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Wed, 30 Oct 2024 11:55:31 +0530 you wrote:
+> This series fixes kernel crash in dmaengine transmit path. To fix it,
+> enqueue Tx packets in dql before starting dmaengine and check if queue is
+> not stopped.
 > 
-> Signed-off-by: Maurice Lambert <mauricelambert434@gmail.com>
-> ---
->  include/uapi/linux/rtnetlink.h | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
+> Suraj Gupta (2):
+>   net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine
+>     starts
+>   net: xilinx: axienet: Check if Tx queue enabled
 > 
-> diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
-> index 3b687d20c9ed..db7254d52d93 100644
-> --- a/include/uapi/linux/rtnetlink.h
-> +++ b/include/uapi/linux/rtnetlink.h
-> @@ -174,7 +174,7 @@ enum {
->  #define RTM_GETLINKPROP	RTM_GETLINKPROP
->  
->  	RTM_NEWVLAN = 112,
-> -#define RTM_NEWNVLAN	RTM_NEWVLAN
-> +#define RTM_NEWVLAN	RTM_NEWVLAN
->  	RTM_DELVLAN,
->  #define RTM_DELVLAN	RTM_DELVLAN
->  	RTM_GETVLAN,
+> [...]
 
-Fixes: 8dcea187088b ("net: bridge: vlan: add rtm definitions and dump support")
+Here is the summary with links:
+  - [net,1/2] net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine starts
+    https://git.kernel.org/netdev/net/c/5ccdcdf186ae
+  - [net,2/2] net: xilinx: axienet: Check if Tx queue enabled
+    (no matching commit)
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
