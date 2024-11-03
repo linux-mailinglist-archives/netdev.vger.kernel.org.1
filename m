@@ -1,116 +1,99 @@
-Return-Path: <netdev+bounces-141330-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141331-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEFC89BA7B3
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:43:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BE409BA7B8
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 20:50:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8EDD91F21477
-	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:43:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98AC21C20A25
+	for <lists+netdev@lfdr.de>; Sun,  3 Nov 2024 19:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283851865E7;
-	Sun,  3 Nov 2024 19:43:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A38B18454C;
+	Sun,  3 Nov 2024 19:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b="E9nA7Su0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JdgF8cZ0"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx.treblig.org (mx.treblig.org [46.235.229.95])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7278B140E5F
-	for <netdev@vger.kernel.org>; Sun,  3 Nov 2024 19:43:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=46.235.229.95
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 300A214F9E9;
+	Sun,  3 Nov 2024 19:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730663013; cv=none; b=jf9VV528yuTpMPqhNqnI3zOPX761sKXKykslUnLaDwnuHYg1gTtAD689N+riocYmcz1XWEvmKy07AgaUccCy37gTAgoV1cKB6AoQH7/ZetvwlfZIO6QmWR1BYoS47zyzwm0L/+ydzGOufAHtbqj6jE1Iy5Khho+l7e4wM5JBIgo=
+	t=1730663421; cv=none; b=P4fQJUx7mq6kDpJUANHpaaxhdTCuNrfRZyWEjf+0/SMubeIy8ALxOwhLvuhTRlIjYLL2u8GzTuQtn7AswHPle0GxHBgFT015wozZb6/YkNYEbRwo8QK3eEz1gstvS7pu0kIOTNLzAkm/x5s0Il8Ew3zWJ71THhW+Mh7HTX3ATuI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730663013; c=relaxed/simple;
-	bh=0UksLun9eQJMhq+Y5/PHbI+lUWIE0RJS2aFHsBjlZMI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nE0Ed3attDbd1CubTRdfJdiCrlhYLBadAeuieSNodwTX7FyqHc100w/Xl7KXOw+qv6glbOfHjhF/lWyuU0+cinkR/Mv1GUQzB6R2/6gl4SAauQK7RYlTekc8TW+Nk6XVdtJZSCa5QUvtWgbKoeNRK7XUFLE4gnm4zHQR2azXE1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org; spf=pass smtp.mailfrom=treblig.org; dkim=pass (2048-bit key) header.d=treblig.org header.i=@treblig.org header.b=E9nA7Su0; arc=none smtp.client-ip=46.235.229.95
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=treblig.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=treblig.org
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=treblig.org
-	; s=bytemarkmx; h=Content-Type:MIME-Version:Message-ID:Subject:From:Date:From
-	:Subject; bh=dJB6w20QABS+Tyo4ES8z7MGs1dJjCRqRWyJwHQD0U+I=; b=E9nA7Su0YTtB2HI8
-	DR7ouRzElFAMGicLH4G0a0JD7JUbs92gP5B2hhHnx15kRbUgGOSdBD3L8Y6DN0HHHRma9FRzeCQ2U
-	LIUEHtEjeYjEN3/N1BoYYgRKXVU12qF6OKV5tYHF5WTkz287kM691mIpIDIhUaKLUtKCczDQQ6r23
-	Sfh10rO7PTnbi96VZefiVR+0UtcOwWNO1NhDObXdMMFs4EkDutySOvf8QtXyC6GNx+3Uq/EmQA/ER
-	6s1qNaOIxgpzlXBOp5oM+h69Ncc7EJKFleT+ZTF9tjN9Yroe04EHh61hnvjM6GhSHckqD2mRXWnHl
-	2gQ8UnuQfbCWkcSsAQ==;
-Received: from dg by mx.treblig.org with local (Exim 4.96)
-	(envelope-from <dg@treblig.org>)
-	id 1t7gVV-00FCDy-1e;
-	Sun, 03 Nov 2024 19:43:29 +0000
-Date: Sun, 3 Nov 2024 19:43:29 +0000
-From: "Dr. David Alan Gilbert" <linux@treblig.org>
-To: "Arinzon, David" <darinzon@amazon.com>
-Cc: "Agroskin, Shay" <shayagr@amazon.com>,
-	"Kiyanovski, Arthur" <akiyano@amazon.com>,
-	"Dagan, Noam" <ndagan@amazon.com>,
-	"Bshara, Saeed" <saeedb@amazon.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: Of ena auto_polling
-Message-ID: <ZyfSYWEwI4yxZI6l@gallifrey>
-References: <ZyZ3AWoocmXY6esd@gallifrey>
- <b3df5db4bea6401095b908b3632bb09e@amazon.com>
+	s=arc-20240116; t=1730663421; c=relaxed/simple;
+	bh=JQbnY43PrChKJLt7habydEMBSx27ekMiwbGzgRZo9YQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ohfdfmU6cmRObszEKz4pKjjExKaXCfU/3rREBmhMFIQ9ID5n49PgRv/S9QcQVAkkx9vLBILWE+Hf7hlfrRa0M4dPKuNbaUN7e87JiEiFncUIMih90UlT9XXpyIXG3x8bOXsn+rZKDoDGk1l648ii4cgyqy44b4TtfY40NyldUNM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JdgF8cZ0; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BC6EAC4CECD;
+	Sun,  3 Nov 2024 19:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730663419;
+	bh=JQbnY43PrChKJLt7habydEMBSx27ekMiwbGzgRZo9YQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JdgF8cZ0Wi/24CY2PuMSO0v0b7Q9mGbjnPAaduLuA7jhwuOjio0SIr2zfx0W+Fu+c
+	 m4kKQ1IxSFybTNI5XtfIWsPF6bMdvspjfD9DsQ+ivPKp+GsMnqRWNJvzyToIwprf9J
+	 oraFfp52wvZ6SGxUyqmCQuju2EQgjWf5CqBz7cO4h32eUN/ET1IBsu5uEK3gMGoPj+
+	 BJYdCjS6V0tZ/eRyCEnn2Tj/k2dulYZA6jN86dLKOQE8OXp35QIi8KMFxd6/84Rf6s
+	 Y2qTvFxmv56IIK4U2CmRSV0upZd8Xk36WTkJzNgdBib2Dcol6PKPZ2fnkChy2ocFkV
+	 Y/03WUq5mLiVA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70BE038363C3;
+	Sun,  3 Nov 2024 19:50:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-In-Reply-To: <b3df5db4bea6401095b908b3632bb09e@amazon.com>
-X-Chocolate: 70 percent or better cocoa solids preferably
-X-Operating-System: Linux/6.1.0-21-amd64 (x86_64)
-X-Uptime: 19:42:11 up 179 days,  6:56,  1 user,  load average: 0.00, 0.00,
- 0.00
-User-Agent: Mutt/2.2.12 (2023-09-09)
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] sctp: properly validate chunk size in sctp_sf_ootb()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173066342826.3240688.17815293611049051589.git-patchwork-notify@kernel.org>
+Date: Sun, 03 Nov 2024 19:50:28 +0000
+References: <a29ebb6d8b9f8affd0f9abb296faafafe10c17d8.1730223981.git.lucien.xin@gmail.com>
+In-Reply-To: <a29ebb6d8b9f8affd0f9abb296faafafe10c17d8.1730223981.git.lucien.xin@gmail.com>
+To: Xin Long <lucien.xin@gmail.com>
+Cc: netdev@vger.kernel.org, linux-sctp@vger.kernel.org, davem@davemloft.net,
+ kuba@kernel.org, edumazet@google.com, pabeni@redhat.com,
+ marcelo.leitner@gmail.com
 
-* Arinzon, David (darinzon@amazon.com) wrote:
-> > Hi,
-> >   I noticed that commit:
-> > commit a4e262cde3cda4491ce666e7c5270954c4d926b9
-> > Author: Sameeh Jubran <sameehj@amazon.com>
-> > Date:   Mon Jun 3 17:43:25 2019 +0300
-> > 
-> >     net: ena: allow automatic fallback to polling mode
-> > 
-> > added a 'ena_com_set_admin_auto_polling_mode()' that's unused.
-> > Is that the intention?
-> > Because that then makes me wonder how
-> > admin_queue->auto_polling
-> > gets set, and then if the whole chunk is unused?
-> > 
-> > Thanks,
-> > 
-> > Dave
-> > --
-> >  -----Open up your eyes, open up your mind, open up your code -------
-> > / Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \
-> > \        dave @ treblig.org |                               | In Hex /
-> >  \ _________________________|_____ http://www.treblig.org
-> > |_______/
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 29 Oct 2024 13:46:21 -0400 you wrote:
+> A size validation fix similar to that in Commit 50619dbf8db7 ("sctp: add
+> size validation when walking chunks") is also required in sctp_sf_ootb()
+> to address a crash reported by syzbot:
 > 
-> Hi Dave,
-> The auto polling mode was written as a fallback in case there are issues with interrupts,
-> it is currently not used by the ENA Linux driver, from Linux's perspective, it can be removed.
-
-Thanks for the reply,
-I've just posted what I think is a suitable revert of it then,
-see message 20241103194149.293456-1-linux@treblig.org.
-I've build tested it only, so please give it a good check and shake out!
-
-Thanks again for the reply, and the ack on the other patch.
-
-Dave
+>   BUG: KMSAN: uninit-value in sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
+>   sctp_sf_ootb+0x7f5/0xce0 net/sctp/sm_statefuns.c:3712
+>   sctp_do_sm+0x181/0x93d0 net/sctp/sm_sideeffect.c:1166
+>   sctp_endpoint_bh_rcv+0xc38/0xf90 net/sctp/endpointola.c:407
+>   sctp_inq_push+0x2ef/0x380 net/sctp/inqueue.c:88
+>   sctp_rcv+0x3831/0x3b20 net/sctp/input.c:243
+>   sctp4_rcv+0x42/0x50 net/sctp/protocol.c:1159
+>   ip_protocol_deliver_rcu+0xb51/0x13d0 net/ipv4/ip_input.c:205
+>   ip_local_deliver_finish+0x336/0x500 net/ipv4/ip_input.c:233
 > 
+> [...]
+
+Here is the summary with links:
+  - [net] sctp: properly validate chunk size in sctp_sf_ootb()
+    https://git.kernel.org/netdev/net/c/0ead60804b64
+
+You are awesome, thank you!
 -- 
- -----Open up your eyes, open up your mind, open up your code -------   
-/ Dr. David Alan Gilbert    |       Running GNU/Linux       | Happy  \ 
-\        dave @ treblig.org |                               | In Hex /
- \ _________________________|_____ http://www.treblig.org   |_______/
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
