@@ -1,177 +1,171 @@
-Return-Path: <netdev+bounces-141591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A95F9BBA7C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:43:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B17519BBA81
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:43:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D6D41C215AC
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:43:02 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5644B21505
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:43:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 168C916C695;
-	Mon,  4 Nov 2024 16:42:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="HcFBB9LY"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0521C2DAE;
+	Mon,  4 Nov 2024 16:43:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 571441C3040;
-	Mon,  4 Nov 2024 16:42:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E351C2309
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 16:43:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730738570; cv=none; b=CKOW9o+bBxMBDm4nCj3sJ9WP2yfd2nc7RHiFjqS8C/IBLzOVSUwPGB3zbKtJl+GFbO2N8cbUvWlLxzS/vsixUKa22xC4DCXqK+h+4nGm2hH4ZL0OECx4kTxlcgUsxYaeT+fe5ZNcAkk3TNpTmcpyo1992G2gXhEJNFxmB5nlZh4=
+	t=1730738610; cv=none; b=IODBkH+eWgqk/WBwM7Wo8JMtxd2VhAgnwWp9Xelqf71Fq1mVsNIVh4eFGOOYhlb3Y8u3bSePNVcekxhdJcWiKFbVu8VfSMqLDm4l7GzLrkL4bsxFllH1PzL/UErTAmmkZ/buzWIJ2m6lP7c9yk5X2u+CKdVxItuthDIaJaTwcXs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730738570; c=relaxed/simple;
-	bh=MeTxSTs10eZNYZEPyIGLWyQ3wZgS63ReMIyo0Lq7MV4=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=f9ncczpiOPn0anVanXigYJRrvZ1Tk2b5Log2gZEXxIgrogVbLLaHsyD2dbfzTzJqigynjtHHnil3h1J1VOCB4ViQGcgbmoWgvxSD/kFTx/oPXOmLxE/7t4irEjaYTDZQUiX57eZYQbjCMihCMrbBp7qLWmvuwSokp0OIooIYDh4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=HcFBB9LY; arc=none smtp.client-ip=148.163.158.5
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A4GbRcG023939;
-	Mon, 4 Nov 2024 16:42:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
-	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=xh3PEm
-	15GiAOSPpsSWQssLn2bdtZusvSU1tsX/2xXLg=; b=HcFBB9LY8c1iBE2TgeglKc
-	SxjK5F6XXKKjexx2Sx+jGBdOk96Vei87eltpz5mYoF02g9312RWeNnLFU5lTZGIu
-	D2Skg9dT6CwDA4yx98lO2sC9tpr8Cu70noP0zWtQ1jtlVOrEdYbXG48dm5GLr/dm
-	fEYHEkCPntEl7EVkBnmfC+8MxJQ2GUjzefYT1mB73yWsKcMu9Tbg+1gkSEGczldB
-	IepDgX6RzBEXG0d6lWbuvvr1GsOi9+NWzhEY+1EyA7kXsz/7d1iM276IK621pjIX
-	eJMQ3lISmHJG7nJRCb9T2378KPeJBGchqMCO311NxRafx0cg9/KJIG3yP3cHWwqw
-	==
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42q1430bbu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 16:42:35 +0000 (GMT)
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A4GgZvA017739;
-	Mon, 4 Nov 2024 16:42:35 GMT
-Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42q1430bbs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 16:42:34 +0000 (GMT)
-Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A4GFAFP023984;
-	Mon, 4 Nov 2024 16:42:34 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nxsxy34u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 16:42:34 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A4GgUVH30999146
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 4 Nov 2024 16:42:30 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 607A82004B;
-	Mon,  4 Nov 2024 16:42:30 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 3AE5F20040;
-	Mon,  4 Nov 2024 16:42:29 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.171.20.231])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Mon,  4 Nov 2024 16:42:29 +0000 (GMT)
-Date: Mon, 4 Nov 2024 17:42:15 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Dust Li <dust.li@linux.alibaba.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-s390@vger.kernel.org, Heiko Carstens
- <hca@linux.ibm.com>,
-        Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer
- <gbayer@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>,
-        Nils
- Hoppmann <niho@linux.ibm.com>,
-        Niklas Schnell <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Karsten Graul
- <kgraul@linux.ibm.com>,
-        Stefan Raspl <raspl@linux.ibm.com>, Halil Pasic
- <pasic@linux.ibm.com>
-Subject: Re: [PATCH net-next] net/smc: increase SMC_WR_BUF_CNT
-Message-ID: <20241104174215.130784ee.pasic@linux.ibm.com>
-In-Reply-To: <20241031133017.682be72b.pasic@linux.ibm.com>
-References: <20241025074619.59864-1-wenjia@linux.ibm.com>
-	<20241025235839.GD36583@linux.alibaba.com>
-	<20241031133017.682be72b.pasic@linux.ibm.com>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1730738610; c=relaxed/simple;
+	bh=63xFusTRsY1L/nYoLVzTZYDCcu+dflkbrtHdaafc8Ow=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=TTKm0i4atwwYh3w89TVz0aZsG5lALdPOW0aCQBWy2iqmHPIggfI4BkEvb0mszuFC2MAxAIeKptFdQuIHTPZr/HgMDQPiUqTI8cuhHwyzq7mZJCesoUM2hEsW1AzmQVphg1htuTLw7qtd1GEiKBTObd8bTeFwtqWeGITDjvah+XM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t80Ao-0005Fc-0V
+	for netdev@vger.kernel.org; Mon, 04 Nov 2024 17:43:26 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t80An-0020py-2c
+	for netdev@vger.kernel.org;
+	Mon, 04 Nov 2024 17:43:25 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 7AD7E367DF9
+	for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 16:43:25 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 834B7367DF1;
+	Mon, 04 Nov 2024 16:43:23 +0000 (UTC)
+Received: from [172.20.34.65] (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id e44711e1;
+	Mon, 4 Nov 2024 16:43:22 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+Date: Mon, 04 Nov 2024 17:42:40 +0100
+Subject: [PATCH can v3] can: mcp251xfd: mcp251xfd_get_tef_len(): fix length
+ calculation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: KKJemEDYMel8fChJpvLQZAfhttD1aN1I
-X-Proofpoint-ORIG-GUID: h_bJPmKXLraQZfF1yiYE2828jM_WmhM-
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 spamscore=0
- mlxscore=0 phishscore=0 bulkscore=0 clxscore=1015 impostorscore=0
- priorityscore=1501 malwarescore=0 mlxlogscore=999 lowpriorityscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411040140
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241104-mcp251xfd-fix-length-calculation-v3-1-608b6e7e2197@pengutronix.de>
+X-B4-Tracking: v=1; b=H4sIAH/5KGcC/42Nyw6DIBBFf8WwLg1Q8dFV/6PpgseoJBYNILEx/
+ nsnrpp04/LO3HvORiIEB5Hci40EyC66yWO4XQpiBuV7oM5iJoKJkjPG6dvMQvK1s7RzKx3B92m
+ gRo1mGVXCMWWtrozhTIFmBDFzAGweiicxypMXHgcX0xQ+hzbz43XekDnlVLaNLivJGlvxx4ylJ
+ YXJu/Vq4TBk8UMV8gRVIBWUtLquG91K9kfd9/0LHtUS8zABAAA=
+X-Change-ID: 20241001-mcp251xfd-fix-length-calculation-09b6cc10aeb0
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
+ Thomas Kopp <thomas.kopp@microchip.com>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ Sven Schuchmann <schuchmann@schleissheimer.de>
+Cc: linux-can@vger.kernel.org, kernel@pengutronix.de, 
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ stable@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
+X-Mailer: b4 0.15-dev-dedf8
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2880; i=mkl@pengutronix.de;
+ h=from:subject:message-id; bh=63xFusTRsY1L/nYoLVzTZYDCcu+dflkbrtHdaafc8Ow=;
+ b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBnKPmFN0MvQy+Sg3vSdfw3tywkkT9FJrkcQEQqe
+ gWP0ISUzWeJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZyj5hQAKCRAoOKI+ei28
+ b/aTB/4tiMmTguV9zreuyT/rwm10dGSiYkqN2vMEjs770WOwPNxh+zX+pYyqt1llpm+U367uovF
+ 59sgNZoY0x7CuT3xjrDOAuAyVB9ZsAf7rs+KgLPfu364rItSGUb+ByYWU3JwZKCfgc45MWtF6Xl
+ b6o4+ZouLKt7QSRvwjL3N1OhZOxrbiGISx8sWgz6JYcCmIK6yxMr1bRU4kmP7Zw9vtxIw1kuj6k
+ AVtwo9PjNtt66ZJcomC0rtRcLdMcQ7IPojctlSI9hyMHkt08agL/i9Zrvkfn7v4r8mM6aYLWNcG
+ G2lQ7WeqcfzTeXaEFoRHJuJaxFTkLT1Im7GF9WKkkIexVrii
+X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
+ fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-On Thu, 31 Oct 2024 13:30:17 +0100
-Halil Pasic <pasic@linux.ibm.com> wrote:
+Commit b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround
+broken TEF FIFO tail index erratum") introduced
+mcp251xfd_get_tef_len() to get the number of unhandled transmit events
+from the Transmit Event FIFO (TEF).
 
-> On Sat, 26 Oct 2024 07:58:39 +0800
-> Dust Li <dust.li@linux.alibaba.com> wrote:
-> 
-> > >For some reason include/linux/wait.h does not offer a top level wrapper
-> > >macro for wait_event with interruptible, exclusive and timeout. I did
-> > >not spend too many cycles on thinking if that is even a combination that
-> > >makes sense (on the quick I don't see why not) and conversely I
-> > >refrained from making an attempt to accomplish the interruptible,
-> > >exclusive and timeout combo by using the abstraction-wise lower
-> > >level __wait_event interface.
-> > >
-> > >To alleviate the tx performance bottleneck and the CPU overhead due to
-> > >the spinlock contention, let us increase SMC_WR_BUF_CNT to 256.    
-> > 
-> > Hi,
-> > 
-> > Have you tested other values, such as 64? In our internal version, we
-> > have used 64 for some time.  
-> 
-> Yes we have, but I'm not sure the data is still to be found. Let me do
-> some digging.
-> 
+As the TEF has no head pointer, the driver uses the TX FIFO's tail
+pointer instead, assuming that send frames are completed. However the
+check for the TEF being full was not correct. This leads to the driver
+stop working if the TEF is full.
 
-We did some digging and according to that data 64 is not likely to cut
-it on the TX end for highly parallel request-response workload. But we
-will measure some more these days just to be on the safe side.
+Fix the TEF full check by assuming that if, from the driver's point of
+view, there are no free TX buffers in the chip and the TX FIFO is
+empty, all messages must have been sent and the TEF must therefore be
+full.
 
-> > 
-> > Increasing this to 256 will require a 36K continuous physical memory
-> > allocation in smc_wr_alloc_link_mem(). Based on my experience, this may
-> > fail on servers that have been running for a long time and have
-> > fragmented memory.  
-> 
-> Good point! It is possible that I did not give sufficient thought to
-> this aspect.
-> 
+Reported-by: Sven Schuchmann <schuchmann@schleissheimer.de>
+Closes: https://patch.msgid.link/FR3P281MB155216711EFF900AD9791B7ED9692@FR3P281MB1552.DEUP281.PROD.OUTLOOK.COM
+Fixes: b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround broken TEF FIFO tail index erratum")
+Tested-by: Sven Schuchmann <schuchmann@schleissheimer.de>
+Cc: stable@vger.kernel.org
+Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+---
+Changes in v3:
+- add proper patch description
+- added Sven's Tested-by
+- Link to v2: https://patch.msgid.link/20241025-mcp251xfd-fix-length-calculation-v2-1-ea5db778b950@pengutronix.de
 
-The failing allocation would lead to a fallback to TCP I believe. Which
-I don't consider a catastrophic failure.
+Changes in v2:
+- mcp251xfd_tx_fifo_sta_empty(): fix check if TX-FIFO is empty
+- Link to RFC: https://patch.msgid.link/20241001-mcp251xfd-fix-length-calculation-v1-1-598b46508d61@pengutronix.de
+---
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c | 10 +++++++---
+ 1 file changed, 7 insertions(+), 3 deletions(-)
 
-But let us put this patch on hold and see if we can come up with
-something better.
+diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
+index f732556d233a7be3b43f6f08e0b8f25732190104..d3ac865933fdf6c4ecdd80ad4d7accbff51eb0f8 100644
+--- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
++++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
+@@ -16,9 +16,9 @@
+ 
+ #include "mcp251xfd.h"
+ 
+-static inline bool mcp251xfd_tx_fifo_sta_full(u32 fifo_sta)
++static inline bool mcp251xfd_tx_fifo_sta_empty(u32 fifo_sta)
+ {
+-	return !(fifo_sta & MCP251XFD_REG_FIFOSTA_TFNRFNIF);
++	return fifo_sta & MCP251XFD_REG_FIFOSTA_TFERFFIF;
+ }
+ 
+ static inline int
+@@ -122,7 +122,11 @@ mcp251xfd_get_tef_len(struct mcp251xfd_priv *priv, u8 *len_p)
+ 	if (err)
+ 		return err;
+ 
+-	if (mcp251xfd_tx_fifo_sta_full(fifo_sta)) {
++	/* If the chip says the TX-FIFO is empty, but there are no TX
++	 * buffers free in the ring, we assume all have been sent.
++	 */
++	if (mcp251xfd_tx_fifo_sta_empty(fifo_sta) &&
++	    mcp251xfd_get_tx_free(tx_ring) == 0) {
+ 		*len_p = tx_ring->obj_num;
+ 		return 0;
+ 	}
 
-Regards,
-Halil
+---
+base-commit: 5ccdcdf186aec6b9111845fd37e1757e9b413e2f
+change-id: 20241001-mcp251xfd-fix-length-calculation-09b6cc10aeb0
+
+Best regards,
+-- 
+Marc Kleine-Budde <mkl@pengutronix.de>
+
 
 
