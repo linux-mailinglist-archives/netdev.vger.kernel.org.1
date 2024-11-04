@@ -1,137 +1,155 @@
-Return-Path: <netdev+bounces-141643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141648-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 080BE9BBE3D
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:49:51 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC8999BBE60
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:01:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3723B1C20CC0
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:49:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AA4D2810B0
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:01:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447C21C729B;
-	Mon,  4 Nov 2024 19:49:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=proton.me header.i=@proton.me header.b="DpHYZJBW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651EE1C876D;
+	Mon,  4 Nov 2024 20:01:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5E123A6
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 19:49:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F23B41CACD0
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 20:01:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730749787; cv=none; b=UhXOUhqRJFHmuhj9ky+k9u5Wsb7hlkjznU5iWMaCvcfyfvhrdrIe/SKRxQpv0F8d3krvwFYZ1dNSjQZcs4cwPKUFZqqPKPEYmxFyKc2N3oEBdfkkLHxqRwaBUKsY5PtaJmJCAWAIynKoa7LSBsDO+hJZScTcEWnj1Z/3a2dfhUg=
+	t=1730750488; cv=none; b=W94MDXm5U58g8WrU1JfnJwDmVkw0Y/quiWLBLWMmafaPncSMhzm10FhyM3CRvBXKlenybeqXpt4YCzOern2U8QNCgeIYeYUD/WUWYu01CZybmb/BDV8m4mWdm5jxoBGhDaQXJ3aZZ6TnufRv/ONAe3sgSBDJyj78L8FtkpKkuqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730749787; c=relaxed/simple;
-	bh=Nf5Oa36AE0kErRWsLE8NS4ZzAEfhRzCT9x1wQZGG/6M=;
-	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=BR6j5luxtQLOD9eTDs/xneiYrUgeVKiZyGE0e4ye+WG5JL67FbZwNBEjWirgA5n3tEu8rGGgWfEYVa73SzJGz462om6DCqPVPJDVEL2yjuZoeSR8rqc0XstT1kjNp+I3ETJBwnAz6Ugq2JBg4ajXNu2c64k6TRskdTN8VX0RiDc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=DpHYZJBW; arc=none smtp.client-ip=185.70.40.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1730749776; x=1731008976;
-	bh=Nf5Oa36AE0kErRWsLE8NS4ZzAEfhRzCT9x1wQZGG/6M=;
-	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
-	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
-	 List-Unsubscribe:List-Unsubscribe-Post;
-	b=DpHYZJBWUzyYHnCV0fCW6MEDGU9aeScXoo/Dw2jyDgIxkZBCSf//naAcZSo/BS1Ys
-	 zXI+bBYCzi9GfN6/iuI/iIzO/2jg+sJIlGZJpLB3W/gHnMwlb5EFtsDPDKK5inylGy
-	 gb0AAAthKCSQrhpJnEdCgMlzcEjqUPHX/GJn+cPvUV9xF9i7HxYgFYjipSDUV/ohJi
-	 Wze9xkNjCwcqtNmaLKl7jpbVuP9Vg3HkIsUincodYCYEQV53cbTq0NndXblDFVsN9f
-	 x/1u8HCFCTdz/qees+dOEdLVgx+BCUpaklCh5FhpWCiFHla7LzqEc9ppuuV+Joz2BC
-	 HpFzX3nXZ7vRg==
-Date: Mon, 04 Nov 2024 19:49:33 +0000
-To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-From: Shochraos <shochraos@proton.me>
-Subject: Unknown NIC not recognized by r8169 Kernel-Driver
-Message-ID: <H90iT3HXlAkoSxqgPoAXPAZL_ZJ3pFxNGMtFkULq5wVhR9gcTqAPBO84chKKq3NwdgWClT7yuZ9xdLUpIR9SjZRZIcD_qGOq4KufDW2JDYA=@proton.me>
-Feedback-ID: 100367158:user:proton
-X-Pm-Message-ID: de1e1865599b729c348c61772b60be3a84f20991
+	s=arc-20240116; t=1730750488; c=relaxed/simple;
+	bh=eN6yMsFrtsKmQ8EIPxXbpSyqyXM43tLF4wJxRtSMsgY=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=JSDilwv6uEuEmtSPz+pBQfein5x6iwyRXPKLaz4KbUZcee7oScKVQtaONlMurSoGcFTfbfMYIhsgycTut0s3id3ZXdBpby/E2k8g+eTqIozTwpJ8rK4XuyH/W/7aMVKBuOsUYvyIlLOij71e2NrXsm4kjaypwZOL9ngjU0DsNfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
+Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
+	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t83GO-0001X4-7h
+	for netdev@vger.kernel.org; Mon, 04 Nov 2024 21:01:24 +0100
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1t83GN-00223c-2R
+	for netdev@vger.kernel.org;
+	Mon, 04 Nov 2024 21:01:23 +0100
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 6D541367F7B
+	for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 20:01:23 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 3D0A8367F5F;
+	Mon, 04 Nov 2024 20:01:22 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id aeb109b5;
+	Mon, 4 Nov 2024 20:01:21 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net 0/8] pull-request: can 2024-11-04
+Date: Mon,  4 Nov 2024 20:53:23 +0100
+Message-ID: <20241104200120.393312-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha512; boundary="------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a"; charset=utf-8
+Content-Type: text/plain; charset=utf8
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
---------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a
-Content-Type: multipart/mixed;boundary=---------------------fd5ec8d4f8ee20c1b12e978ff625be30
+Hello netdev-team,
 
------------------------fd5ec8d4f8ee20c1b12e978ff625be30
-Content-Type: multipart/alternative;boundary=---------------------0c834aa3abdf3d4af68e6134055fee9a
+this is a pull request of 8 patches for net/master.
 
------------------------0c834aa3abdf3d4af68e6134055fee9a
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain;charset=utf-8
+Alexander Hölzl contributes a patch to fix an error in the CAN j1939
+documentation.
 
-Hello,
+Thomas Mühlbacher's patch allows building of the {cc770,sja1000}_isa
+drivers on x86_64 again.
 
-I'm Moritz Freund and I'm currently using Linux as my daily driver. I rece=
-ntly switched my motherboard to the Gigabyte x870E Aorus Elite Wifi 7 and =
-now ethernet is not working anymore. I suspect that the Realtek-NIC used i=
-n that motherboard is a new one as it was released recently.
-The command "sudo dmesg | grep r8169" prints the following error message: =
-"[ =C2=A0 =C2=A09.452481] r8169 0000:0e:00.0: error -ENODEV: unknown chip =
-XID 688, contact r8169 maintainers (see MAINTAINERS file)".
-I'm using the distribution CachyOS-Linux and I already contacted the maint=
-ainers of that distribution, who told me that I shoulld contact the mainta=
-iners of the kernel-driver.
-I'm using the 6.11.6-2-cachyos driver as printed out by "uname -r".
+A patch by me targets the m_can driver and limits the call to
+free_irq() to devices with IRQs.
 
-Sincerely
-Moritz Freund
------------------------0c834aa3abdf3d4af68e6134055fee9a
-Content-Type: multipart/related;boundary=---------------------25bdafbedb9c658b40392a83c766bf31
+Dario Binacchi's patch fixes the RX and TX error counters in the c_can
+driver.
 
------------------------25bdafbedb9c658b40392a83c766bf31
-Content-Type: text/html;charset=utf-8
-Content-Transfer-Encoding: base64
+The next 2 patches target the rockchip_canfd driver. Geert
+Uytterhoeven's patch lets the driver depend on ARCH_ROCKCHIP. Jean
+Delvare's patch drops the obsolete dependency on COMPILE_TEST.
 
-PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE0
-cHg7Ij5IZWxsbyw8YnI+PGJyPkknbSBNb3JpdHogRnJldW5kIGFuZCBJJ20gY3VycmVudGx5IHVz
-aW5nIExpbnV4IGFzIG15IGRhaWx5IGRyaXZlci4gSSByZWNlbnRseSBzd2l0Y2hlZCBteSBtb3Ro
-ZXJib2FyZCB0byB0aGUgR2lnYWJ5dGUgeDg3MEUgQW9ydXMgRWxpdGUgV2lmaSA3IGFuZCBub3cg
-ZXRoZXJuZXQgaXMgbm90IHdvcmtpbmcgYW55bW9yZS4gSSBzdXNwZWN0IHRoYXQgdGhlIFJlYWx0
-ZWstTklDIHVzZWQgaW4gdGhhdCBtb3RoZXJib2FyZCBpcyBhIG5ldyBvbmUgYXMgaXQgd2FzIHJl
-bGVhc2VkIHJlY2VudGx5Ljxicj5UaGUgY29tbWFuZCAic3VkbyBkbWVzZyB8IGdyZXAgcjgxNjki
-IHByaW50cyB0aGUgZm9sbG93aW5nIGVycm9yIG1lc3NhZ2U6ICI8c3Bhbj5bICZuYnNwOyAmbmJz
-cDs5LjQ1MjQ4MV0gcjgxNjkgMDAwMDowZTowMC4wOiBlcnJvciAtRU5PREVWOiB1bmtub3duIGNo
-aXAgWElEIDY4OCwgY29udGFjdCByODE2OSBtYWludGFpbmVycyAoc2VlIE1BSU5UQUlORVJTIGZp
-bGUpPC9zcGFuPiIuPGJyPkknbSB1c2luZyB0aGUgZGlzdHJpYnV0aW9uIENhY2h5T1MtTGludXgg
-YW5kIEkgYWxyZWFkeSBjb250YWN0ZWQgdGhlIG1haW50YWluZXJzIG9mIHRoYXQgZGlzdHJpYnV0
-aW9uLCB3aG8gdG9sZCBtZSB0aGF0IEkgc2hvdWxsZCBjb250YWN0IHRoZSBtYWludGFpbmVycyBv
-ZiB0aGUga2VybmVsLWRyaXZlci4gPGJyPkknbSB1c2luZyB0aGUgNi4xMS42LTItY2FjaHlvcyBk
-cml2ZXIgYXMgcHJpbnRlZCBvdXQgYnkgInVuYW1lIC1yIi48YnI+PGJyPlNpbmNlcmVseTxicj5N
-b3JpdHogRnJldW5kPGJyPjwvZGl2Pgo8ZGl2IHN0eWxlPSJmb250LWZhbWlseTogQXJpYWwsIHNh
-bnMtc2VyaWY7IGZvbnQtc2l6ZTogMTRweDsiIGNsYXNzPSJwcm90b25tYWlsX3NpZ25hdHVyZV9i
-bG9jayBwcm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay1lbXB0eSI+CiAgICA8ZGl2IGNsYXNzPSJw
-cm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay11c2VyIHByb3Rvbm1haWxfc2lnbmF0dXJlX2Jsb2Nr
-LWVtcHR5Ij48L2Rpdj4KCiAgICAgICAgICAgIDxkaXYgY2xhc3M9InByb3Rvbm1haWxfc2lnbmF0
-dXJlX2Jsb2NrLXByb3RvbiBwcm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay1lbXB0eSI+CgogICAg
-ICAgICAgICA8L2Rpdj4KPC9kaXY+Cg==
------------------------25bdafbedb9c658b40392a83c766bf31--
------------------------0c834aa3abdf3d4af68e6134055fee9a--
------------------------fd5ec8d4f8ee20c1b12e978ff625be30--
+The last 2 patches are by me and fix 2 regressions in the mcp251xfd
+driver: fix broken coalescing configuration when switching CAN modes
+and fix the length calculation of the Transmit Event FIFO (TEF) on
+full TEF.
 
---------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a
-Content-Type: application/pgp-signature; name="signature.asc"
-Content-Description: OpenPGP digital signature
-Content-Disposition: attachment; filename="signature.asc"
+regards,
+Marc
 
------BEGIN PGP SIGNATURE-----
-Version: ProtonMail
+---
 
-wnUEARYKACcFgmcpJT8JkNQ0XG5Ck74XFiEEAAf3C0enkLqEKu2j1DRcbkKT
-vhcAAFNrAQC7YqsLcDW9wLKjlERQcACFj3+r5EPTyReveYVeckrvggEAx9qj
-F+33hP/1dCgi3886CJrXLQ2x+23f6aqGPIStyAY=
-=OSHp
------END PGP SIGNATURE-----
+The following changes since commit 5ccdcdf186aec6b9111845fd37e1757e9b413e2f:
 
+  net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine starts (2024-11-03 14:35:11 -0800)
 
---------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a--
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can.git tags/linux-can-fixes-for-6.12-20241104
+
+for you to fetch changes up to 3c1c18551e6ac1b988d0a05c5650e3f6c95a1b8a:
+
+  can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation (2024-11-04 18:01:07 +0100)
+
+----------------------------------------------------------------
+linux-can-fixes-for-6.12-20241104
+
+----------------------------------------------------------------
+Alexander Hölzl (1):
+      can: j1939: fix error in J1939 documentation.
+
+Dario Binacchi (1):
+      can: c_can: fix {rx,tx}_errors statistics
+
+Geert Uytterhoeven (1):
+      can: rockchip_canfd: CAN_ROCKCHIP_CANFD should depend on ARCH_ROCKCHIP
+
+Jean Delvare (1):
+      can: rockchip_canfd: Drop obsolete dependency on COMPILE_TEST
+
+Marc Kleine-Budde (3):
+      can: m_can: m_can_close(): don't call free_irq() for IRQ-less devices
+      can: mcp251xfd: mcp251xfd_ring_alloc(): fix coalescing configuration when switching CAN modes
+      can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation
+
+Thomas Mühlbacher (1):
+      can: {cc770,sja1000}_isa: allow building on x86_64
+
+ Documentation/networking/j1939.rst             |  2 +-
+ drivers/net/can/c_can/c_can_main.c             |  7 ++++++-
+ drivers/net/can/cc770/Kconfig                  |  2 +-
+ drivers/net/can/m_can/m_can.c                  |  3 ++-
+ drivers/net/can/rockchip/Kconfig               |  3 ++-
+ drivers/net/can/sja1000/Kconfig                |  2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c |  8 +++++---
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c  | 10 +++++++---
+ 8 files changed, 25 insertions(+), 12 deletions(-)
 
 
