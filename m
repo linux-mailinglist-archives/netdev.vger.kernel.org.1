@@ -1,53 +1,54 @@
-Return-Path: <netdev+bounces-141556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAD119BB547
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 14:02:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1EB69BB543
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 14:02:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 99AB2282B4F
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:02:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3C6A1C21C7A
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:02:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E34C91BC062;
-	Mon,  4 Nov 2024 13:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE8521B86CC;
+	Mon,  4 Nov 2024 13:02:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="dZlFXwJc"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="QV3cviAv"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.5])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02F0E1BE223;
-	Mon,  4 Nov 2024 13:02:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.5
+Received: from m16.mail.163.com (m16.mail.163.com [117.135.210.2])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4458B1B85D7;
+	Mon,  4 Nov 2024 13:02:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=117.135.210.2
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730725330; cv=none; b=UWTIt1aFULemvNs/s8ef9XH6b6hOBQUlwzxSoTiNwMxYsI0ieh/e3RHvoO1W7q7Fu1MlOn0gbu0t9zVbrH1GeC54optcERZ/YfHVJ5KnE0ZF8WNY4Oatui2ecs4trfHPW7NCP7LOG9GKhyh7JlpeEO20+CQpLSaQkkwZRnIuse0=
+	t=1730725325; cv=none; b=tTxsAFIiq7BPgfxNivINsdMSWJGXjORUqm6UzNKOx21TgLUcs8Pl9l/prqRuSv531uM+jilNr6aNlwrbpn7/XBVOMhBQ6N0oAGXRsKKn5yLi0n7B3iExQlzwq0/F4QOTwzEAdBGLSoizz8lb61xdHkK+X7Rfxh2wPIyhI44i4Vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730725330; c=relaxed/simple;
-	bh=81bXzyf/c0KElFkbrGf0peXgTbgrEywCB4w+SEhzFh0=;
+	s=arc-20240116; t=1730725325; c=relaxed/simple;
+	bh=kmYoxaAaiXAIj7/EBZuGyiZPPJS/LqE7N5G+nG9H11M=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=ZTPkOSGGVgBYEqNPxrkEfyW7UGPPalvHsBXO/Yu6rPB++qQ2STEDRYMaW+VYocb7rytSD6iTzL/1bVRdFyqdKlMz0pOjq9EynpyX71ecCBCh4VW3BQRx0vy2Dseu94K/I+nfJNnSnU+gRD+HsmUJ8ffWeFsD84cpsiT2NB/onx4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=dZlFXwJc; arc=none smtp.client-ip=117.135.210.5
+	 MIME-Version; b=PGUNb9l6ywfw8Xg4E6DYEjG15xz96ZX5KIlEBHVWUD+1omi74585z0ghUumXPnnoy8dlPOhT2USoSHvGAl9E52cSakhURuTZOlki6KtkVv0IBSDWCd8FnKL/CHaXgP+SISaZwOIJNBkTDSaRULR2rB8crSZYmWctVlXeSRlEt5I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=QV3cviAv; arc=none smtp.client-ip=117.135.210.2
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=yReYF
-	cMZ5fi0QK3NMeC05hlOMsUoL2XX7F1e3XLspqo=; b=dZlFXwJcnOk73IdtMSuNp
-	5TvNcfVz+HSkoAi8AvrEWnmQV/Wbo5MpbXt0eW2j1TkB3OBiDGrWY1JzNzfsHFY4
-	a/ykJ6Nn1DzR5SyidLqiApY8RSp2otqNdxbOdlNnCp09sJl6V9zUgbYsoWWUZyak
-	55RTUffMOTN18EoUKP5frM=
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=Msi5U
+	O0XeHyxPfT+8A8tLnfNN4KZV4Ysxbt0ioo0v5w=; b=QV3cviAvkozH2Z3U9/TOF
+	ysVBmP+yt9POoVC45E+ZLfQbX7vpN0KFKIxj134wr1AXTzR7Vl8yLSuT0iUaen73
+	PBIl3ejHEK0dvXn0MfZXsI9xAZsq7yk6PXdgJ/uB/X7EskrHt1NsRlt3yn68Cf8b
+	p3jrFFGDnsh56UbcugkqKo=
 Received: from ProDesk.. (unknown [58.22.7.114])
-	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wD3H6e8xShnPaEoFA--.33421S3;
-	Mon, 04 Nov 2024 21:01:52 +0800 (CST)
+	by gzga-smtp-mtada-g0-4 (Coremail) with SMTP id _____wD3H6e8xShnPaEoFA--.33421S4;
+	Mon, 04 Nov 2024 21:01:53 +0800 (CST)
 From: Andy Yan <andyshrk@163.com>
 To: andrew+netdev@lunn.ch
 Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	david.wu@rock-chips.com,
 	Johan Jonker <jbx6244@gmail.com>,
+	Andy Yan <andyshrk@163.com>,
 	Andy Yan <andy.yan@rock-chips.com>
-Subject: [PATCH v2 1/2] net: arc: fix the device for dma_map_single/dma_unmap_single
-Date: Mon,  4 Nov 2024 21:01:38 +0800
-Message-ID: <20241104130147.440125-2-andyshrk@163.com>
+Subject: [PATCH v2 2/2] net: arc: rockchip: fix emac mdio node support
+Date: Mon,  4 Nov 2024 21:01:39 +0800
+Message-ID: <20241104130147.440125-3-andyshrk@163.com>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241104130147.440125-1-andyshrk@163.com>
 References: <20241104130147.440125-1-andyshrk@163.com>
@@ -58,161 +59,64 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:_____wD3H6e8xShnPaEoFA--.33421S3
-X-Coremail-Antispam: 1Uf129KBjvJXoW3AF43Zw4kJF4rurykZr1xGrg_yoW7Cry3pF
-	1rGa4SyFW2qFnFkrWrJrWUXr1Yywn5J34S9ay7G392gFnxXrn3Wry0yFy2y3yFyFZ2kF4f
-	Ar1DCFyfXFn7WrDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07jAjjgUUUUU=
-X-CM-SenderInfo: 5dqg52xkunqiywtou0bp/1tbiqQGNXmcovEiZFgABsO
+X-CM-TRANSID:_____wD3H6e8xShnPaEoFA--.33421S4
+X-Coremail-Antispam: 1Uf129KBjvJXoW7ZFyxXr48XFyUGrWrAF15CFg_yoW8CFWUpa
+	yDurZ8CrykXr4Sgw4vyrW0vryaqw48GrWj9F12kanYqFn8JryxJry2gFyUur1qkFWqka1a
+	q3yDZFyruayDJr7anT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07UO0edUUUUU=
+X-CM-SenderInfo: 5dqg52xkunqiywtou0bp/xtbB0haNXmcow9UdaQAAs6
 
 From: Johan Jonker <jbx6244@gmail.com>
 
-The ndev->dev and pdev->dev aren't the same device, use ndev->dev.parent
-which has dma_mask, ndev->dev.parent is just pdev->dev.
-Or it would cause the following issue:
+The binding emac_rockchip.txt is converted to YAML.
+Changed against the original binding is an added MDIO subnode.
+This make the driver failed to find the PHY, and given the 'mdio
+has invalid PHY address' it is probably looking in the wrong node.
+Fix emac_mdio.c so that it can handle both old and new
+device trees.
 
-[   39.933526] ------------[ cut here ]------------
-[   39.938414] WARNING: CPU: 1 PID: 501 at kernel/dma/mapping.c:149 dma_map_page_attrs+0x90/0x1f8
-
-Fixes: f959dcd6ddfd ("dma-direct: Fix potential NULL pointer dereference")
-Signed-off-by: David Wu <david.wu@rock-chips.com>
+Fixes: 1dabb74971b3 ("ARM: dts: rockchip: restyle emac nodes")
 Signed-off-by: Johan Jonker <jbx6244@gmail.com>
+Tested-by: Andy Yan <andyshrk@163.com>
+Link: https://lore.kernel.org/r/20220603163539.537-3-jbx6244@gmail.com
 Signed-off-by: Andy Yan <andy.yan@rock-chips.com>
 
 ---
 
 Changes in v2:
 - Add fix tag.
-- Add cover letter.
+- Add more detail explaination.
 
- drivers/net/ethernet/arc/emac_main.c | 27 ++++++++++++++++-----------
- 1 file changed, 16 insertions(+), 11 deletions(-)
+ drivers/net/ethernet/arc/emac_mdio.c | 9 ++++++++-
+ 1 file changed, 8 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/arc/emac_main.c b/drivers/net/ethernet/arc/emac_main.c
-index 31ee477dd131e..8283aeee35fb6 100644
---- a/drivers/net/ethernet/arc/emac_main.c
-+++ b/drivers/net/ethernet/arc/emac_main.c
-@@ -111,6 +111,7 @@ static void arc_emac_tx_clean(struct net_device *ndev)
- {
- 	struct arc_emac_priv *priv = netdev_priv(ndev);
- 	struct net_device_stats *stats = &ndev->stats;
-+	struct device *dev = ndev->dev.parent;
- 	unsigned int i;
+diff --git a/drivers/net/ethernet/arc/emac_mdio.c b/drivers/net/ethernet/arc/emac_mdio.c
+index 87f40c2ba9040..078b1a72c1613 100644
+--- a/drivers/net/ethernet/arc/emac_mdio.c
++++ b/drivers/net/ethernet/arc/emac_mdio.c
+@@ -133,6 +133,7 @@ int arc_mdio_probe(struct arc_emac_priv *priv)
+ 	struct arc_emac_mdio_bus_data *data = &priv->bus_data;
+ 	struct device_node *np = priv->dev->of_node;
+ 	const char *name = "Synopsys MII Bus";
++	struct device_node *mdio_node;
+ 	struct mii_bus *bus;
+ 	int error;
  
- 	for (i = 0; i < TX_BD_NUM; i++) {
-@@ -140,7 +141,7 @@ static void arc_emac_tx_clean(struct net_device *ndev)
- 			stats->tx_bytes += skb->len;
- 		}
+@@ -164,7 +165,13 @@ int arc_mdio_probe(struct arc_emac_priv *priv)
  
--		dma_unmap_single(&ndev->dev, dma_unmap_addr(tx_buff, addr),
-+		dma_unmap_single(dev, dma_unmap_addr(tx_buff, addr),
- 				 dma_unmap_len(tx_buff, len), DMA_TO_DEVICE);
+ 	snprintf(bus->id, MII_BUS_ID_SIZE, "%s", bus->name);
  
- 		/* return the sk_buff to system */
-@@ -174,6 +175,7 @@ static void arc_emac_tx_clean(struct net_device *ndev)
- static int arc_emac_rx(struct net_device *ndev, int budget)
- {
- 	struct arc_emac_priv *priv = netdev_priv(ndev);
-+	struct device *dev = ndev->dev.parent;
- 	unsigned int work_done;
- 
- 	for (work_done = 0; work_done < budget; work_done++) {
-@@ -223,9 +225,9 @@ static int arc_emac_rx(struct net_device *ndev, int budget)
- 			continue;
- 		}
- 
--		addr = dma_map_single(&ndev->dev, (void *)skb->data,
-+		addr = dma_map_single(dev, (void *)skb->data,
- 				      EMAC_BUFFER_SIZE, DMA_FROM_DEVICE);
--		if (dma_mapping_error(&ndev->dev, addr)) {
-+		if (dma_mapping_error(dev, addr)) {
- 			if (net_ratelimit())
- 				netdev_err(ndev, "cannot map dma buffer\n");
- 			dev_kfree_skb(skb);
-@@ -237,7 +239,7 @@ static int arc_emac_rx(struct net_device *ndev, int budget)
- 		}
- 
- 		/* unmap previosly mapped skb */
--		dma_unmap_single(&ndev->dev, dma_unmap_addr(rx_buff, addr),
-+		dma_unmap_single(dev, dma_unmap_addr(rx_buff, addr),
- 				 dma_unmap_len(rx_buff, len), DMA_FROM_DEVICE);
- 
- 		pktlen = info & LEN_MASK;
-@@ -423,6 +425,7 @@ static int arc_emac_open(struct net_device *ndev)
- {
- 	struct arc_emac_priv *priv = netdev_priv(ndev);
- 	struct phy_device *phy_dev = ndev->phydev;
-+	struct device *dev = ndev->dev.parent;
- 	int i;
- 
- 	phy_dev->autoneg = AUTONEG_ENABLE;
-@@ -445,9 +448,9 @@ static int arc_emac_open(struct net_device *ndev)
- 		if (unlikely(!rx_buff->skb))
- 			return -ENOMEM;
- 
--		addr = dma_map_single(&ndev->dev, (void *)rx_buff->skb->data,
-+		addr = dma_map_single(dev, (void *)rx_buff->skb->data,
- 				      EMAC_BUFFER_SIZE, DMA_FROM_DEVICE);
--		if (dma_mapping_error(&ndev->dev, addr)) {
-+		if (dma_mapping_error(dev, addr)) {
- 			netdev_err(ndev, "cannot dma map\n");
- 			dev_kfree_skb(rx_buff->skb);
- 			return -ENOMEM;
-@@ -548,6 +551,7 @@ static void arc_emac_set_rx_mode(struct net_device *ndev)
- static void arc_free_tx_queue(struct net_device *ndev)
- {
- 	struct arc_emac_priv *priv = netdev_priv(ndev);
-+	struct device *dev = ndev->dev.parent;
- 	unsigned int i;
- 
- 	for (i = 0; i < TX_BD_NUM; i++) {
-@@ -555,7 +559,7 @@ static void arc_free_tx_queue(struct net_device *ndev)
- 		struct buffer_state *tx_buff = &priv->tx_buff[i];
- 
- 		if (tx_buff->skb) {
--			dma_unmap_single(&ndev->dev,
-+			dma_unmap_single(dev,
- 					 dma_unmap_addr(tx_buff, addr),
- 					 dma_unmap_len(tx_buff, len),
- 					 DMA_TO_DEVICE);
-@@ -579,6 +583,7 @@ static void arc_free_tx_queue(struct net_device *ndev)
- static void arc_free_rx_queue(struct net_device *ndev)
- {
- 	struct arc_emac_priv *priv = netdev_priv(ndev);
-+	struct device *dev = ndev->dev.parent;
- 	unsigned int i;
- 
- 	for (i = 0; i < RX_BD_NUM; i++) {
-@@ -586,7 +591,7 @@ static void arc_free_rx_queue(struct net_device *ndev)
- 		struct buffer_state *rx_buff = &priv->rx_buff[i];
- 
- 		if (rx_buff->skb) {
--			dma_unmap_single(&ndev->dev,
-+			dma_unmap_single(dev,
- 					 dma_unmap_addr(rx_buff, addr),
- 					 dma_unmap_len(rx_buff, len),
- 					 DMA_FROM_DEVICE);
-@@ -679,6 +684,7 @@ static netdev_tx_t arc_emac_tx(struct sk_buff *skb, struct net_device *ndev)
- 	unsigned int len, *txbd_curr = &priv->txbd_curr;
- 	struct net_device_stats *stats = &ndev->stats;
- 	__le32 *info = &priv->txbd[*txbd_curr].info;
-+	struct device *dev = ndev->dev.parent;
- 	dma_addr_t addr;
- 
- 	if (skb_padto(skb, ETH_ZLEN))
-@@ -692,10 +698,9 @@ static netdev_tx_t arc_emac_tx(struct sk_buff *skb, struct net_device *ndev)
- 		return NETDEV_TX_BUSY;
- 	}
- 
--	addr = dma_map_single(&ndev->dev, (void *)skb->data, len,
--			      DMA_TO_DEVICE);
-+	addr = dma_map_single(dev, (void *)skb->data, len, DMA_TO_DEVICE);
- 
--	if (unlikely(dma_mapping_error(&ndev->dev, addr))) {
-+	if (unlikely(dma_mapping_error(dev, addr))) {
- 		stats->tx_dropped++;
- 		stats->tx_errors++;
- 		dev_kfree_skb_any(skb);
+-	error = of_mdiobus_register(bus, priv->dev->of_node);
++	/* Backwards compatibility for EMAC nodes without MDIO subnode. */
++	mdio_node = of_get_child_by_name(np, "mdio");
++	if (!mdio_node)
++		mdio_node = of_node_get(np);
++
++	error = of_mdiobus_register(bus, mdio_node);
++	of_node_put(mdio_node);
+ 	if (error) {
+ 		mdiobus_free(bus);
+ 		return dev_err_probe(priv->dev, error,
 -- 
 2.34.1
 
