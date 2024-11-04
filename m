@@ -1,133 +1,114 @@
-Return-Path: <netdev+bounces-141519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141517-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 203379BB35B
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:32:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 036669BB356
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:31:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8454284ED6
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:31:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC63A284FC8
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:31:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82DF1B3945;
-	Mon,  4 Nov 2024 11:27:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3041B0F26;
+	Mon,  4 Nov 2024 11:26:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l25Z6U4O"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OOQDsTLK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
+Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119001B3932
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 11:27:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA961AF0A6;
+	Mon,  4 Nov 2024 11:26:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730719643; cv=none; b=fXe7S0zozCzBoItdM5RTAcZUDkvIBMd5Ksr7kmEbnRf6QxNYt2J+blT7vH9rcZhWH3eJHQCX+F2eKF+czH5TNfwetcuP1Fl3niUGD2AnjkmRleyfejGtLOtFihPIDSZmOdQdIyd5xg3ov43ggIRfBCeNF4FjDLPFhoG8nbhgjkY=
+	t=1730719579; cv=none; b=j5/4MU7+yz1ym/NClMN7Nm8RKgcm6D7TLFR+PNLLRcRk7CgQBuBbOrJbiFYSbY/oKrbDmEpn3I4BPM2KbzAkCgZqUIEGaNX8J7SpsSI/2pM6UonehVjcRrFfuDKQXa7QhvqSZbgJbDYwBNahXTkDbIOVlGyywYqtkLU75Gbde2U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730719643; c=relaxed/simple;
-	bh=Fry7u0FCV7hEmGhDdvK6TiCYO+iZUrJRnhJBv25/1aQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=eua+QY6lu5msPd8J3PZZ3nm6oyM6rJrGTfZbpJuj1CAV+0aJRnvvGOi810QhfviOfziovfm9EeuBG5E1y0nMjHVCsHuZxWvOwuT8dcwTQQFbM94jYiGdELbzHWnS9z5+MH+JLaC1Vxv6ltonE/Evr5VvolN4s8+dEV8RHyAEoK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l25Z6U4O; arc=none smtp.client-ip=198.175.65.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730719642; x=1762255642;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Fry7u0FCV7hEmGhDdvK6TiCYO+iZUrJRnhJBv25/1aQ=;
-  b=l25Z6U4OUlcVA4esnEEAfDrj7K5uABteHXTRR7A2uinba0bv9Vr6Omat
-   UViUj+TJag3R7AAOQLxp6+sJkJ6UzMgtnyyoxE4Uf2OA0w3yaov2UhKkc
-   nGgI6HYmsTJN3Sia20nZsLkE+UzK41vxMqwL2ZJR171aO2Tc9UgD5ndF5
-   ECOQwiru095FOPLvZUJEG5f8Ft5Dj4ejRxamDdl9yyhVx09Ex2QYhTggV
-   xVytFN7ig+QndktCR1xAr0zceOtiVE70OXEIBlTAAAqPPr5QU0WL95rZ/
-   qR46Jhlhq/sSNYSVm/yOjeaAZtfOajcUcBqtQrnVe+6Qkp3U8goXMm9ZV
-   A==;
-X-CSE-ConnectionGUID: 5pOWh/G3TxqEe1Q0ylLjhw==
-X-CSE-MsgGUID: Q/amOyHoTsGdzERYAcsUkQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30589066"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30589066"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 03:27:21 -0800
-X-CSE-ConnectionGUID: 6dM8c9XQRPa5zvtVi6vc4Q==
-X-CSE-MsgGUID: /SqGGiPXQHuBuF+PQwm5GQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="83559045"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 03:27:18 -0800
-Date: Mon, 4 Nov 2024 12:24:38 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Paul Menzel <pmenzel@molgen.mpg.de>
-Cc: David Laight <David.Laight@aculab.com>, wojciech.drewek@intel.com,
-	marcin.szycik@intel.com, netdev@vger.kernel.org,
-	konrad.knitter@intel.com, pawel.chmielewski@intel.com,
-	horms@kernel.org, intel-wired-lan@lists.osuosl.org,
-	pio.raczynski@gmail.com, sridhar.samudrala@intel.com,
-	jacob.e.keller@intel.com, jiri@resnulli.us,
-	przemyslaw.kitszel@intel.com
-Subject: Re: [Intel-wired-lan] Small Integers: Big Penalty
-Message-ID: <Zyiu9phq8/EchHxd@mev-dev.igk.intel.com>
-References: <20241028100341.16631-1-michal.swiatkowski@linux.intel.com>
- <20241028100341.16631-3-michal.swiatkowski@linux.intel.com>
- <CADEbmW0=G8u7Y8L2fFTzan8S+Uz04nAMC+-dkj-rQb_izK88pg@mail.gmail.com>
- <ZyhxmxnxPcLk2ZcX@mev-dev.igk.intel.com>
- <ad5bf0e312d44737a18c076ab2990924@AcuMS.aculab.com>
- <840b32a0-9346-4576-97ba-17af12eb4db4@molgen.mpg.de>
- <478248d8-559b-4324-a566-8ce691993018@molgen.mpg.de>
+	s=arc-20240116; t=1730719579; c=relaxed/simple;
+	bh=L7u8TSr3hsUVl5lbJJeYekyvk5tXBYjfFui3QFFAxXg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=uMakVXpQBHxVK9AC+F7L6yWdlVkodjobTSuXsIDg0MUOAwhINkI6yQmbrnSA4BPw+XfvVIST2EShMdHeoVtP/dhzP+gv6P01k4jFSc+lvHJVZIEQlnWD7Fle8fb5WG+3daCIuZ7XZ5/2FcAvNGs/+IQMe13HFuAXu4AvRo6az48=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=OOQDsTLK; arc=none smtp.client-ip=198.47.19.141
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from lelv0266.itg.ti.com ([10.180.67.225])
+	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A4BPq8f093248;
+	Mon, 4 Nov 2024 05:25:53 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1730719553;
+	bh=8lCZg7hiaSBMwhl2ZVyK4acZDVshxBaN2CgueTXDG1A=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=OOQDsTLKapMaRRAeD7RUmMELnmCCHYSMumW68hUPhZxX2zSeSjccYHOZQPUATj8Rf
+	 HIZjveUwV4hCmk5WA6iGLvqSb9MHWLrAdE7yByiAfsg5dojK0cHMNsXznECXV2SqxF
+	 mquhJziAPs1Sph8dmPnV0I/ivn06gjT04wz92nGU=
+Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
+	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A4BPq8K020829;
+	Mon, 4 Nov 2024 05:25:52 -0600
+Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE115.ent.ti.com
+ (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 4
+ Nov 2024 05:25:52 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE105.ent.ti.com
+ (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Mon, 4 Nov 2024 05:25:52 -0600
+Received: from [10.249.139.24] ([10.249.139.24])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A4BPk51046583;
+	Mon, 4 Nov 2024 05:25:47 -0600
+Message-ID: <7c3318f4-a2d4-4cbf-8a93-33c6a8afd6c4@ti.com>
+Date: Mon, 4 Nov 2024 16:55:46 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <478248d8-559b-4324-a566-8ce691993018@molgen.mpg.de>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix 1 PPS sync
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <vigneshr@ti.com>, <grygorii.strashko@ti.com>, <horms@kernel.org>,
+        <jan.kiszka@siemens.com>, <diogo.ivo@siemens.com>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>,
+        Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>
+References: <20241028111051.1546143-1-m-malladi@ti.com>
+ <20241031185905.610c982f@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <20241031185905.610c982f@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-On Mon, Nov 04, 2024 at 10:12:14AM +0100, Paul Menzel wrote:
-> [Cc: -nex.sw.ncis.nat.hpm.dev@intel.com (550 #5.1.0 Address rejected.)]
+
+
+On 11/1/2024 7:29 AM, Jakub Kicinski wrote:
+> On Mon, 28 Oct 2024 16:40:52 +0530 Meghana Malladi wrote:
+>> The first PPS latch time needs to be calculated by the driver
+>> (in rounded off seconds) and configured as the start time
+>> offset for the cycle. After synchronizing two PTP clocks
+>> running as master/slave, missing this would cause master
+>> and slave to start immediately with some milliseconds
+>> drift which causes the PPS signal to never synchronize with
+>> the PTP master.
 > 
-> Am 04.11.24 um 10:09 schrieb Paul Menzel:
-> > Dear David, dear Michal,
-> > 
-> > 
-> > Am 04.11.24 um 09:51 schrieb David Laight:
-> > > From: Michal Swiatkowski
-> > > > Sent: 04 November 2024 07:03
-> > > ...
-> > > > > The type of the devlink parameters msix_vec_per_pf_{min,max} is
-> > > > > specified as u32, so you must use value.vu32 everywhere you work with
-> > > > > them, not vu16.
-> > > > > 
-> > > > 
-> > > > I will change it.
-> > > 
-> > > You also need a pretty good reason to use u16 anywhere at all.
-> > > Just because the domain of the value is small doesn't mean the
-> > > best type isn't [unsigned] int.
-> > > 
-> > > Any arithmetic (particularly on non x86) is likely to increase
-> > > the code size above any perceived data saving.
-> > 
-> > In 2012 Scott Duplichan wrote *Small Integers: Big Penalty* [1]. Of
-> > course you always should measure yourself.
-> > 
+> You're reading a 64b value in chunks, is it not possible that it'd wrap
+> in between reads? This can be usually detected by reading high twice and
+> making sure it didn't change.
+> 
+> Please fix or explain in the commit message why this is not a problem..
+Yes I agree that there might be a wrap if the read isn't atomic. As 
+suggested by Andrew I am currently not using custom read where I can 
+implement the logic you suggested (reading high twice and making sure if 
+didn't change). Can you share me some references where this logic is 
+implemented in the kernel, so I can directly use that instead of writing 
+custom functions.
 
-Yeah, I chose it, because previously it was stored in u16. I will change
-it to u32 too, as it is stored in structure that doesn't really need to
-be small.
+Regards,
+Meghana.
 
-Thanks for comments and link to the article.
-Michal
-
-> > 
-> > Kind regards,
-> > 
-> > Paul
-> > 
-> > 
-> > [1]: https://notabs.org/coding/smallIntsBigPenalty.htm
 
