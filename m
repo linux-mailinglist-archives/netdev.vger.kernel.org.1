@@ -1,67 +1,64 @@
-Return-Path: <netdev+bounces-141487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E03D49BB1F2
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:59:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BF989BB20B
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:01:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 5D888B22DA6
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:59:25 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 22E1F1F2128B
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:01:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B9BE1D1E62;
-	Mon,  4 Nov 2024 10:52:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2AFF1D4171;
+	Mon,  4 Nov 2024 10:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Feo+lQnM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="e8WVVwx7"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD491BAED6;
-	Mon,  4 Nov 2024 10:52:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B56021D415B;
+	Mon,  4 Nov 2024 10:53:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730717574; cv=none; b=HDoPd8CU8vBbpbe4zutT2RZGWeUMdHMPJU+r5grhM3CJ7fPuaTrnxCirTcqn1/oqB9rjB6CWg0fkWH3ZeRiNtjRH8eg04tewWgh53PKAnyyyFHfTaIQXMrpro/956eC3i8YFyWn0Fq5I78GFYKwqepVIiymEFkAi8LRwbahrxFk=
+	t=1730717586; cv=none; b=QNjOr3WaGuiJOOyFj2nwzD+5QxhZjqPYqOO9mlEylsYVzsm14JPsuqQsoldj+aNAj6VZCKxWY4qkg/Wq8yboa4zqyjxp9mvDtiN8I674Y8mcub2uPa5VrjmILiqAWczbND8qRlrJL3rQrF0PC3ONfOq1oHOIT48QqrN/mKqm/qE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730717574; c=relaxed/simple;
-	bh=COcmdmlZ2lzhXaSD5dX+uOgCV0ihYITXwubTgU7eht4=;
+	s=arc-20240116; t=1730717586; c=relaxed/simple;
+	bh=SxhuDvpyLe08lQ2cNq/7Bt+sb16e8KR2Hp9PnBmPFoE=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ko++lp/Oamu7a/1PjQgqqcJ8iBVkNvx69gtEgo23YuCpNr5x8lr+2sSmydK6OGl2pDe6vGcfr/d4COPYsRB4YTGT6kxVyK6WaYy9G4mrnKuMSppQ3wgm7jIoMwpE1xOyp2NyHUoXybl3uxfc3RtytXM5cuUgf8Gik5AlsC+hmKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Feo+lQnM; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E66BEC4CECE;
-	Mon,  4 Nov 2024 10:52:51 +0000 (UTC)
+	 MIME-Version; b=tMd8xUE6fq+C7r/M77j1TBVHVhl1+J3Zk59TqBB1XylJuC7nRhpYeZlIQwnkeSbQB1jWuDJPQAlAgHP0PHCdR7TEa74Od8vmjdfMUdQgm8deOu0G+x37krGyRWN2BZ7XBu2GHvMWIQM5KhLdHJbpKL9Lleh6cOd5xuUFFJbwGKo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=e8WVVwx7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1EA2C4CED1;
+	Mon,  4 Nov 2024 10:53:04 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730717573;
-	bh=COcmdmlZ2lzhXaSD5dX+uOgCV0ihYITXwubTgU7eht4=;
+	s=k20201202; t=1730717586;
+	bh=SxhuDvpyLe08lQ2cNq/7Bt+sb16e8KR2Hp9PnBmPFoE=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=Feo+lQnMQpIij1ExfMQpUXtYVJ7TgkiBBKKqePtKQKO0otsDJ2H0yR1IkOQL/CXnu
-	 IJdRiBDmfky+qfKdLdTbb8VN/6Xj5Gr33odPOdtC+l/HX34O8UuZvfeu1mYLUiAKIz
-	 1NOTMc0P9wrM/+pgs0m6zA+l2Mld3T9FMf6C0CVc7rcNNMPKUdPpSpWOcU8QczS96N
-	 9qrahpkMxUgEKDgvUnmOyAIGu1EIhHhhhUSjoigZUvM5cCgySWsVqcsgyphygxblLq
-	 vHJ1i/5wlMtGd5CwL4fnZy53qStXDZg1aPjwID75uTCVof2w+V/MnyypMHazJCr9Mb
-	 zIQZGnC3fmw1g==
+	b=e8WVVwx7PeH4Sc6raEOUzLUfqX43fun3eWWUyMLjdV2WcdGttO4O0FwvUs54qLLhC
+	 7FG7LnYdr6P1wRv0Flx66myVmgSRHlym/Md/TL+D9mdSqIvmRJA0LuKED7OoSN74Sn
+	 EquwnCPO4SOT/xTRNcGtB2DWPjiJgCi1SpWZAX1TzMjDREUifSqIDDQpup6n5hA/s3
+	 KBDTNfquiCFzA5r9R6FPeJsZ81TPn2h4NgYnbVg+8Jna3AsrTMUmJlvSANQ0GS+LS2
+	 3EMsKrchwwygh6NOo6tqhS20yiTBFCSeWEnlmHcnewAq81G7+nck4sLTocrL3IGuzE
+	 3YaWJIWxctmXQ==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: =?UTF-8?q?Benjamin=20Gro=C3=9Fe?= <ste3ls@gmail.com>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: Jiayuan Chen <mrpre@163.com>,
+	Martin KaFai Lau <martin.lau@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
+	john.fastabend@gmail.com,
+	jakub@cloudflare.com,
 	edumazet@google.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
 	pabeni@redhat.com,
-	hayeswang@realtek.com,
-	dianders@chromium.org,
-	grundler@chromium.org,
-	hkallweit1@gmail.com,
-	gmazyland@gmail.com,
-	linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.6 08/14] usb: add support for new USB device ID 0x17EF:0x3098 for the r8152 driver
-Date: Mon,  4 Nov 2024 05:52:00 -0500
-Message-ID: <20241104105228.97053-8-sashal@kernel.org>
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH AUTOSEL 6.6 13/14] bpf: fix filed access without lock
+Date: Mon,  4 Nov 2024 05:52:05 -0500
+Message-ID: <20241104105228.97053-13-sashal@kernel.org>
 X-Mailer: git-send-email 2.43.0
 In-Reply-To: <20241104105228.97053-1-sashal@kernel.org>
 References: <20241104105228.97053-1-sashal@kernel.org>
@@ -71,41 +68,67 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
 X-stable: review
 X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.6.59
 Content-Transfer-Encoding: 8bit
 
-From: Benjamin Große <ste3ls@gmail.com>
+From: Jiayuan Chen <mrpre@163.com>
 
-[ Upstream commit 94c11e852955b2eef5c4f0b36cfeae7dcf11a759 ]
+[ Upstream commit a32aee8f0d987a7cba7fcc28002553361a392048 ]
 
-This patch adds support for another Lenovo Mini dock 0x17EF:0x3098 to the
-r8152 driver. The device has been tested on NixOS, hotplugging and sleep
-included.
+The tcp_bpf_recvmsg_parser() function, running in user context,
+retrieves seq_copied from tcp_sk without holding the socket lock, and
+stores it in a local variable seq. However, the softirq context can
+modify tcp_sk->seq_copied concurrently, for example, n tcp_read_sock().
 
-Signed-off-by: Benjamin Große <ste3ls@gmail.com>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20241020174128.160898-1-ste3ls@gmail.com
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+As a result, the seq value is stale when it is assigned back to
+tcp_sk->copied_seq at the end of tcp_bpf_recvmsg_parser(), leading to
+incorrect behavior.
+
+Due to concurrency, the copied_seq field in tcp_bpf_recvmsg_parser()
+might be set to an incorrect value (less than the actual copied_seq) at
+the end of function: 'WRITE_ONCE(tcp->copied_seq, seq)'. This causes the
+'offset' to be negative in tcp_read_sock()->tcp_recv_skb() when
+processing new incoming packets (sk->copied_seq - skb->seq becomes less
+than 0), and all subsequent packets will be dropped.
+
+Signed-off-by: Jiayuan Chen <mrpre@163.com>
+Link: https://lore.kernel.org/r/20241028065226.35568-1-mrpre@163.com
+Signed-off-by: Martin KaFai Lau <martin.lau@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/usb/r8152.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/ipv4/tcp_bpf.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index ce19ebd180f12..3e5998555f981 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -10016,6 +10016,7 @@ static const struct usb_device_id rtl8152_table[] = {
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3062) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3069) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3082) },
-+	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x3098) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7205) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x720c) },
- 	{ USB_DEVICE(VENDOR_ID_LENOVO,  0x7214) },
+diff --git a/net/ipv4/tcp_bpf.c b/net/ipv4/tcp_bpf.c
+index fe6178715ba05..915286c3615a2 100644
+--- a/net/ipv4/tcp_bpf.c
++++ b/net/ipv4/tcp_bpf.c
+@@ -221,11 +221,11 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+ 				  int flags,
+ 				  int *addr_len)
+ {
+-	struct tcp_sock *tcp = tcp_sk(sk);
+ 	int peek = flags & MSG_PEEK;
+-	u32 seq = tcp->copied_seq;
+ 	struct sk_psock *psock;
++	struct tcp_sock *tcp;
+ 	int copied = 0;
++	u32 seq;
+ 
+ 	if (unlikely(flags & MSG_ERRQUEUE))
+ 		return inet_recv_error(sk, msg, len, addr_len);
+@@ -238,7 +238,8 @@ static int tcp_bpf_recvmsg_parser(struct sock *sk,
+ 		return tcp_recvmsg(sk, msg, len, flags, addr_len);
+ 
+ 	lock_sock(sk);
+-
++	tcp = tcp_sk(sk);
++	seq = tcp->copied_seq;
+ 	/* We may have received data on the sk_receive_queue pre-accept and
+ 	 * then we can not use read_skb in this context because we haven't
+ 	 * assigned a sk_socket yet so have no link to the ops. The work-around
 -- 
 2.43.0
 
