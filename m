@@ -1,240 +1,202 @@
-Return-Path: <netdev+bounces-141488-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46D4A9BB1F9
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:59:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B11E19BB201
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:00:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A6621C221ED
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:59:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05052B239EF
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B21341D26E3;
-	Mon,  4 Nov 2024 10:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F43C1BBBFE;
+	Mon,  4 Nov 2024 10:53:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="R/ZK0AuP"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="XcMGu3Za"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f50.google.com (mail-ot1-f50.google.com [209.85.210.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E865E1B392C
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 10:52:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730717576; cv=fail; b=IwyvtPJ/crL4frpf/ClplHgWEQ56RBDAw2BGjQxFkNpS1ynM4jFbPx0SpC5ookFkR8EkGc/NkSNsLF+eRz8VPacyEZjW0DNYPr/ycdkKsXo1KPOIsa5TG7tlgpGngb2A/9PdHOgjDIDiVGMgd8FzxwjnFXFTr9q+TK5sTu11FuQ=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730717576; c=relaxed/simple;
-	bh=wcmTj5DQCbBBJ0OvuEOyOsM+/LTEH5qlkUTrc4IAoiU=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=L0a6xqplAKs8Jylzebdh7u5LaY0RoB0XqH6xQk8t9Q/dvd9M/y8E1q0ZhbrRAl25dUmIHyOBak2qVQvnhTBzvjP5DVBHg8y9eVeFu53csRnNDGyj0hggUBiYN1yeD6qfaeZ3xJpleG2fk9dBvWkMo3qyhi0dy1MkPfen8g0W2Xo=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=R/ZK0AuP; arc=fail smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730717575; x=1762253575;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=wcmTj5DQCbBBJ0OvuEOyOsM+/LTEH5qlkUTrc4IAoiU=;
-  b=R/ZK0AuPiSKtFm6fwZq3avCfsGKDI9JPgJXWR5ALksSEvBMwB+7lCw9G
-   13ACqrSurC/coPxxRBt4u2L5B84wp97wQVFzNVGji632rxN93Q/iqtew1
-   dwn+gQg6LoEetBGxreMRsruX1HZO/hQ75g5g24wwiMhbYFZKeotg6XXDt
-   BfsaaHpior8BXPN0alfd1Zz8eMzu5OtyvJPSLPak/GhkleM0t0U8Zuoyz
-   VI9RKiMehZludR9sXveNPJ/19tOT1avb3dQM3iKOYhuL4xH+2OjCTSxE7
-   6rL06Pud4fCza4GZvkId2gstttOuSRngnwxG3AVMEa0oTOIVsmJ0+LE55
-   g==;
-X-CSE-ConnectionGUID: 4IHwe0ttSNSpBcPqyMajoA==
-X-CSE-MsgGUID: W+FwZzrMSLmtBuzLtlEiGg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11245"; a="41799494"
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="41799494"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 02:52:54 -0800
-X-CSE-ConnectionGUID: YcARDTGOQ9WIk4MHdqA+0A==
-X-CSE-MsgGUID: iRv3XrSUSJKSgcLSeZWOxw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="88386181"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 02:52:54 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 4 Nov 2024 02:52:53 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 02:52:53 -0800
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.43) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 4 Nov 2024 02:52:39 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=vdriIDhpp1PQXyFfoVM6lGA9al7VeG8JsCpkVWRA2E468Px4E7kpVYRcp+s57c0FdpMPnUk8HnzZ/TzUljGPXrUqiP8A92XSmAIvsxutKlXUKuwMsAYPWobTI7kxjhAa6uklTlfC+PK6l8e00D+g600bwXeAOgblSUCX5fi5mOw01NWjxpAwp2c97qIevF05NbVFW1jPCJzzPFPrTkKuwmmYgRnrzI2oUhRf1H9I+tziycDEtZVQ72OZ1Mp++RAx/ZKFiQe9SZo8vbPikGhEuoUMVa9j1eQmgg+2TRNOCOB8DzM1o/XrZakgkVQyJiQ7o/oq/r1C9z5XwxxPgpAzOQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=wcmTj5DQCbBBJ0OvuEOyOsM+/LTEH5qlkUTrc4IAoiU=;
- b=eCCh87PtlrHSdRbrsKBq3XRUm8nNNNCzzmCSkMvfQp6nhMjjctl8bxOIShXryyC1HYEUGBu7bqwfTFu0BUVtFTMaBmulQ77BhZV8qS9Kklz0/xYrzPq/04XWcWirY86ihuDpx+Wlz0gnSzxnh2w32VewaEKSHLtEDT3aBmps1eV6yil8jlbvzaGOlmYeFhEmjiWMWIzlftyQmZWTyMsSZIxOzEvxR+N+TWoIuR2bB4JBCZmrI7OOZMyFnnAXcPLRHA0f/VGUGVO4oTWpHoIK1My8Y5YQtJYSOhyx8VoSIqLk101dltu6W0DhR8poGktMmGqUj+uOte4Z+0OIUsAMrQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
- by IA0PR11MB7791.namprd11.prod.outlook.com (2603:10b6:208:401::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
- 2024 10:52:37 +0000
-Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
- ([fe80::b615:4475:b6d7:8bc5]) by SJ0PR11MB5865.namprd11.prod.outlook.com
- ([fe80::b615:4475:b6d7:8bc5%5]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
- 10:52:37 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Simon Horman <horms@kernel.org>,
-	"Lobakin, Aleksander" <aleksander.lobakin@intel.com>, "Polchlopek, Mateusz"
-	<mateusz.polchlopek@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v12 03/14] virtchnl: add
- enumeration for the rxdid format
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v12 03/14] virtchnl: add
- enumeration for the rxdid format
-Thread-Index: AQHbJEUQEWxoEmKL4UCMoulRxVkxSLKnBqrg
-Date: Mon, 4 Nov 2024 10:52:37 +0000
-Message-ID: <SJ0PR11MB58659BF79567FDE4B6E28FE18F512@SJ0PR11MB5865.namprd11.prod.outlook.com>
-References: <20241022114121.61284-1-mateusz.polchlopek@intel.com>
- <20241022114121.61284-4-mateusz.polchlopek@intel.com>
-In-Reply-To: <20241022114121.61284-4-mateusz.polchlopek@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|IA0PR11MB7791:EE_
-x-ms-office365-filtering-correlation-id: 89b7855f-5150-4f7e-a383-08dcfcbecbb2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?BoW+H5Nsa4VLdeFq22zzAJswldEp21Afiuc/2AzraZ3puHN6vlSg6b6TUMgz?=
- =?us-ascii?Q?ktQ8GMEwD/5ejR7TdgeSDpi4b8dtcFPtvxOSHjAwY9wA7gNyrcENOt5WNBOf?=
- =?us-ascii?Q?vs409uE2FgnIaZPtcKtiTRu7xwNiV4qQ9CJp5Uck+wl8WszlzqqvlJERz5uA?=
- =?us-ascii?Q?WNlPVVnM/OIFfJ6iq5hfjdIzRlrfDlXeWvBWjcMOXhCzbiww2S4ORqVAd+s2?=
- =?us-ascii?Q?UZ49tVjq+7RyRTBr/uWweTE08WcAAu5Hk2JsZ3mLmoEVEluA2OqrRL2/ngQE?=
- =?us-ascii?Q?FlaLIzGFCCHmrm1EbMd4gs2QFeIUgcr5CdLPRIqb8kTnbfUTlvlX4CgzWrZj?=
- =?us-ascii?Q?QWeu+60PHE2bXSTFmVy5rksF/9SJTpXfw8C+1hrw80k1TuGFlEKneCr8x000?=
- =?us-ascii?Q?ASnjVVPFEjYhRDHo8i3AIJPbjK7ikLCd0YgYcnEx56dRB8o4RDcthSzNd7Qb?=
- =?us-ascii?Q?HzpJeBkN5xPLcUDB3JP4Xw6r7czzREtsaa/SQlvw7v0pQ+wwIkTrXrJ7UrUz?=
- =?us-ascii?Q?+7fsTWAy/vf+wDdK6F3V963Y8GPwlV2N6MUDsczgq7TSooix9PUhDVR4l8Vg?=
- =?us-ascii?Q?gED+63dlUB9Mg7MF2vHDQWSBCcHH+abADG9aG/5vWxycz28xhcC/4KKfiz/s?=
- =?us-ascii?Q?1oBIq+11swOptlHJqpMrEJJZ0W0Bv1aD3Ctbqwkc2JBq3BkU99DnLQyr/Irx?=
- =?us-ascii?Q?8QFblOLyoOHhzlQHiI5f/df693M9CCbxttHSljRvd95cWH7CZcowu/X609zl?=
- =?us-ascii?Q?okkKyP6DAkNVlef/3AnCPDTVc0lqNdlpvRCtOvUSr//jgx4ct52bNWd4fQSh?=
- =?us-ascii?Q?ywKVsA6evjAYG1RVRhcTzIuCEqVbvH87yWs4T638O8/cvDuVTlHyrgIhJxX0?=
- =?us-ascii?Q?PV6fsoC4rUM/JsYeZl92+BlmplFz+7tzv4N3izLaOLLUinnMcf8HQAOTnJAJ?=
- =?us-ascii?Q?i+ln1+YkWFIfG7BtAFP4qGgznch1kut3EBZo+K+QSldHnN3BYt9PYGw+pe3R?=
- =?us-ascii?Q?lw9/JJZfQI1DotfudJ3l7DvhWRe7aGTZsjkcFuuyl9sXhnrkiggr7/tWcWdG?=
- =?us-ascii?Q?nxaC9JG4pOyqevezN1nTmRoQYu0Af+Zl8QZKNp2SBfSDp4Kk6w1w4nzl3GX/?=
- =?us-ascii?Q?sIhHTZNinvH6ADeAcMC+WPdcyj5tTbWXQ3u09MDSIX1lHdiNLjpI/l5cwdMs?=
- =?us-ascii?Q?JxnH8lB40cf/56i6xlIcIF+cg/tjocFVOUKAVoKAGt7itcvcPMBBMtsCA55D?=
- =?us-ascii?Q?cpmsZzR66xg1m9zkFFtUA8bFMaDzZBTsCR/ddAjUjbdnNjYxyYM5RJ8tWuj2?=
- =?us-ascii?Q?eiQE+MkC3DbMo8KUBE4+Yy2V7ij9OujBeizQ9A6cGuZrGy/M1FC/WmlYBpu/?=
- =?us-ascii?Q?2Q1Tbkg=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?j349UFX1TPd+UPbx4VsEW/3TT3de8YJxp1BGt5DdaEeQJ5w73jO4QkmPI2RE?=
- =?us-ascii?Q?G+NyGFujDYCN3xMJdq0GJCyOEVbBZKzhlM6SV8v9FP1VFrHdVb+0VkvyItVs?=
- =?us-ascii?Q?VVn8UuWTUxfMdHkwVVwyf04ufulxwBmDwx3FaFhWaq7TyonOLHmtET0TtzoF?=
- =?us-ascii?Q?XzSaSfzbchAycQ3GMCkOMny7uUsUzVOsvZe6mfvGE1EOufFhPaqrYP7y1VPk?=
- =?us-ascii?Q?cSC0MqF7tkkUDcWuxbcN24qloCnUVeV3N7jlOkYq7CuTgv0gP8HcLdcLocDa?=
- =?us-ascii?Q?AvsZuqTrr421uc3XqZdrhCr0EjVTNsz4Owi+0I6udrFL/k79ow0xMjnvmvtO?=
- =?us-ascii?Q?ywf3tXzlR/wk3knevPlOF40JPN9p3ytKevuDD7xhDZd3JSsMr+qxCIthjrYE?=
- =?us-ascii?Q?JUur87Sxdu1qnLSZFB7R5HFNg6metdtNwRbauM/iCQQ+eHwgQ4iGALIoMUGd?=
- =?us-ascii?Q?1EahRS2M/PST/QYn3AM1l+Upi/oakEHRCXGWR4FtFV5t3UmSxadgWvPgq/BD?=
- =?us-ascii?Q?JQughW+pg24PnkULaDv+1RC38qEvmT9Ei6BcLR3qygsf4EeL1BHvAmAuADyH?=
- =?us-ascii?Q?UBK8NQoQX5r3GDgChO4YaYfuDtEA3H0br5kT4gx7TxxUHt5cVVA6iGcUyAU+?=
- =?us-ascii?Q?pfbY7AjKtn7KuIMNcdxKxsnXmOAe+Gmds5LMbGu9SwSWsfO5RM7RkQ3Jy28y?=
- =?us-ascii?Q?ocRAdwM/SmmAj6mAFGrJReOvFXQKctUDjwNk7E9FKHOrJ5bEXMPG43K+6vwW?=
- =?us-ascii?Q?nncgc0oa3IJQTzf6xsYPiXNs/lDJbvGWq3d7L32R2HA30VRR+3Z2a3K+bmwD?=
- =?us-ascii?Q?jZoV5E4xbqdQOMhplfti7bMtGEUL929iuUlVpWoy8USEWJGT6Ey0OJY7rzw6?=
- =?us-ascii?Q?m1OdlEtHoT3WYbw+zBGlX//4RM2K8I8ty4aQxAGFAEztFwTNqYvaeQ87UIvP?=
- =?us-ascii?Q?6BzwQqfCpKqJ2CpI/qINVuASER1n4FDtnFsjCtWHgQC9l/yc42Wjq2T7s6CM?=
- =?us-ascii?Q?DSxWz12XdUBj2DXf9+mV8hrCsPPhXW6X60OY98R2FrZgtkBbG5zGhBKHJO9M?=
- =?us-ascii?Q?uJmRX+XW8qED7/H1DEzvMwTfHLk64m8KZmem3fQLDyDe9Y1i4S06R6G4SPtd?=
- =?us-ascii?Q?XxJaruhpzUooAPh8RCDr7asK1GRNH6v6uTe+sJdZkshreu40RbeTCWZo96qy?=
- =?us-ascii?Q?pnhMIGTb5af5JPbIcDLUI1Rd8bJkKRRExaWVBYuDRbcg3JVBtVk7IbqNBKZy?=
- =?us-ascii?Q?giTEWX78qclGW1y0a2In8IMbfmSUHhmn3zsVh3EB/5Bzr4WDVSP82gRrzLUm?=
- =?us-ascii?Q?Q3CiPtIxZc72Cuzo+QLjVXqvT3RDuYT3+BNq7PH7AhG8onSclGM5DVzPsuEw?=
- =?us-ascii?Q?/v6iBwkmaB16aGly40n0w73Brczqyhr9N+15jl8GwkBV3rao8C17QzDzjylx?=
- =?us-ascii?Q?ue5gzKqbBgLvY9XB3B3KtYGG4zrp/2jRY4nwkIPODN7yUyuJDmzrKLWC8cF3?=
- =?us-ascii?Q?2clhM+lNQKX9Kfi5wus/Fwyea/VY9nyP21GMEOmhJsLVJsL1QQPXPm7f0zFz?=
- =?us-ascii?Q?sv8oJSRUUA45dWfxLadN+l55ygW5s73S2KqWSIG9u2BJ35TodRXuYLWwG1nh?=
- =?us-ascii?Q?JA=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B899E1D2F5C;
+	Mon,  4 Nov 2024 10:52:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.50
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730717581; cv=none; b=HAAhAx7QZFveKE9S0k98xxylFLodhskZbEW8bnWKXw1SImak9LjWOa6ZALtEbqHr49ZtNuhHpHfFAX/nzW2cFiU7aHYhDuykuaVOEFEo61g+eWiMtY0lBTjdUwMezePGP0D2bNkNkgb2BhCjuMjXucY18Sr/5JX6yKu5b9wmUzk=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730717581; c=relaxed/simple;
+	bh=lHRDj1nuYu4GZzqn0i5vZMzqyCtpSIcWjY9t6tVmdr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pjZAg8oIB74i7HLI8CEnGN6sIffAJfJseH1jbbbi48dew4stTJJ47svp9YI8k+m+cvoAuwC80wpxNm9tlGVVayHh0ufD1ysYWBqiqkyyBiR9VUZchaEymyJkcTiCGICXWRpSN0R8IFwFCTHg8+8yT3hFYnoH9sa0GKoLsENWUuU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=XcMGu3Za; arc=none smtp.client-ip=209.85.210.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f50.google.com with SMTP id 46e09a7af769-7180c7a4e02so1895729a34.0;
+        Mon, 04 Nov 2024 02:52:59 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730717579; x=1731322379; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=DgxWGDLB6WxMe8+gbg4dTFROdUbgcSI/rTCvMQUjZ94=;
+        b=XcMGu3Zaqc51ciVywijgC6NpR92QH4jGgsL5so/ABOhw5wPGJdRBPzl9+Zq2/b2/OS
+         ZjJNHHA45MHKnioE9WW1qA9PyV4DUA4V6dUig7KyJS7GrEern0M+o917j+CEi5RrRDAq
+         T1qNEU+Uhuqluvut9xkpgRrfJNS8q2onp6rpiqShJOR34J8WN1NNoCX6XX7QZ0XDL9Of
+         lxpwYldd+lLSAY78dNnyDKI8fdXaXpvkHsao/DNZBDg5Azr7HvdSq6ncTxzJJFYBaij1
+         YURR+lCvnLQVPZbSBuH5u8s6lcK+qscMijbA8VzFjd6dX5km/fDWpHbxPeLf652iHsBR
+         YWnw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730717579; x=1731322379;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=DgxWGDLB6WxMe8+gbg4dTFROdUbgcSI/rTCvMQUjZ94=;
+        b=I0DIRq9IGU4R221gI2/DXPpCuDeUfVXWGXrsJxQdkrSBoTjx9FceT/ZxYUB4uYUYrH
+         Y+hsABOymsmqVTQdN3CjC6maL2fVesiDCIApfRPXzuOBDKm+uR0NNfBJUeTB5QUUrao7
+         sOPkjbYw1hgemZXJ3BPqCTXcvWkcyKQRP3UHfVjbKUDEKRI943lY2KMJtcBNHGEjy69e
+         FC72uPRSvQ02lc3xQabydLsetDbFzRNDf8JsY7gTywyQIZERRLXQmRPnDHVPPiJLO/fH
+         YP/tbizYfXZO1cMj03SuhCvf6BBIa40GFpYKFEcNKHgluxITl4cVmH7QM4Ij7T8PQHXp
+         gvSA==
+X-Forwarded-Encrypted: i=1; AJvYcCUyaki59qLvjX08t/mxxrGedkh7oF+cXvJgRrBPUThs+NlUKxYDTtU7+Clls8lwSeFzcvQn09B2Smi1WJ1A@vger.kernel.org, AJvYcCWMYvIiGWnV2RmDlDxDg8DCmohrFuo72hIs9SsembkI7tFJtUhwoQrvSHOZw57hKqKDy0JgGKWe@vger.kernel.org, AJvYcCWi6zklkvvFmnBETYH7QFtIuCl+WeN3NVrdl1i1JI7alj32RVnnoTl1Fj+MWXH0QKo57sI=@vger.kernel.org, AJvYcCXhIWliqoJfikAZYIgSQP/FAp8SW5tpljfq6yRJZiNqGoBzO46hLPCxRi0eAIntZ7t9hgDVCPA5pYy3@vger.kernel.org
+X-Gm-Message-State: AOJu0YxQ14XBjBHeZi8e7ZgUXl78+9vWUA7+Z2IYXDtZgLcxQC5RfgZc
+	1D2fYPovjiHEcbo6XIdlOCjeDk1hJzYTbhTHFRFD3L486pZX/9Eh
+X-Google-Smtp-Source: AGHT+IEFrTmRt5MF02HRjrjN5v5W9Wx5TsujIt/V1xbOVd6bkPvSYe0yVcuZIf7JdbxvWbzwrvJNFA==
+X-Received: by 2002:a05:6870:b022:b0:260:e713:ae8b with SMTP id 586e51a60fabf-29051b56a9amr24502201fac.20.1730717578690;
+        Mon, 04 Nov 2024 02:52:58 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e780fsm7162875b3a.46.2024.11.04.02.52.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 02:52:57 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 3E9AD41AD6F2; Mon, 04 Nov 2024 17:52:53 +0700 (WIB)
+Date: Mon, 4 Nov 2024 17:52:52 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
+Cc: hdanton@sina.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 7/7] docs: networking: Describe irq suspension
+Message-ID: <ZyinhIlMIrK58ABF@archie.me>
+References: <20241103052421.518856-1-jdamato@fastly.com>
+ <20241103052421.518856-8-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89b7855f-5150-4f7e-a383-08dcfcbecbb2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2024 10:52:37.1187
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: guk0zmzdlCQiXVXXFIrNlfIWtAbOvbAdBYfscH0aAcR1YQjLa98cBtFy8b4fyT1eQ/GE2kTDv9VPF4Mvvs6sVtDt9D8kTtAH0JHvZFujsnU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7791
-X-OriginatorOrg: intel.com
-
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Mateusz Polchlopek
-> Sent: Tuesday, October 22, 2024 1:41 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; D=
-rewek,
-> Wojciech <wojciech.drewek@intel.com>; Rahul Rameshbabu
-> <rrameshbabu@nvidia.com>; Simon Horman <horms@kernel.org>; Lobakin,
-> Aleksander <aleksander.lobakin@intel.com>; Polchlopek, Mateusz
-> <mateusz.polchlopek@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v12 03/14] virtchnl: add enume=
-ration
-> for the rxdid format
->=20
-> From: Jacob Keller <jacob.e.keller@intel.com>
->=20
-> Support for allowing VF to negotiate the descriptor format requires that =
-the VF
-> specify which descriptor format to use when requesting Rx queues.
-> The VF is supposed to request the set of supported formats via the new
-> VIRTCHNL_OP_GET_SUPPORTED_RXDIDS, and then set one of the supported
-> formats in the rxdid field of the virtchnl_rxq_info structure.
->=20
-> The virtchnl.h header does not provide an enumeration of the format value=
-s. The
-> existing implementations in the PF directly use the values from the DDP p=
-ackage.
->=20
-> Make the formats explicit by defining an enumeration of the RXDIDs.
-> Provide an enumeration for the values as well as the bit positions as ret=
-urned by
-> the supported_rxdids data from the VIRTCHNL_OP_GET_SUPPORTED_RXDIDS.
->=20
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Reviewed-by: Alexander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="iuKxU6a4r/CNFDfj"
+Content-Disposition: inline
+In-Reply-To: <20241103052421.518856-8-jdamato@fastly.com>
 
 
+--iuKxU6a4r/CNFDfj
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Sun, Nov 03, 2024 at 05:24:09AM +0000, Joe Damato wrote:
+> +It is important to note that choosing a large value for ``gro_flush_time=
+out``
+> +will defer IRQs to allow for better batch processing, but will induce la=
+tency
+> +when the system is not fully loaded. Choosing a small value for
+> +``gro_flush_timeout`` can cause interference of the user application whi=
+ch is
+> +attempting to busy poll by device IRQs and softirq processing. This value
+> +should be chosen carefully with these tradeoffs in mind. epoll-based busy
+> +polling applications may be able to mitigate how much user processing ha=
+ppens
+> +by choosing an appropriate value for ``maxevents``.
+> +
+> +Users may want to consider an alternate approach, IRQ suspension, to hel=
+p deal
+                                                                     to hel=
+p dealing
+> +with these tradeoffs.
+> +
+> <snipped>...
+> +There are essentially three possible loops for network processing and
+> +packet delivery:
+> +
+> +1) hardirq -> softirq=C2=A0=C2=A0 -> napi poll; basic interrupt delivery
+> +
+> +2)=C2=A0=C2=A0 timer -> softirq=C2=A0=C2=A0 -> napi poll; deferred irq p=
+rocessing
+> +
+> +3)=C2=A0=C2=A0 epoll -> busy-poll -> napi poll; busy looping
+
+The loops list are parsed inconsistently due to tabs between the
+enumerators and list items. I have to expand them into single space
+(along with number reference fix to follow the output):
+
+---- >8 ----
+diff --git a/Documentation/networking/napi.rst b/Documentation/networking/n=
+api.rst
+index bbd58bcc430fab..848cb19f0becc1 100644
+--- a/Documentation/networking/napi.rst
++++ b/Documentation/networking/napi.rst
+@@ -375,23 +375,21 @@ epoll finds no events, the setting of ``gro_flush_tim=
+eout`` and
+ There are essentially three possible loops for network processing and
+ packet delivery:
+=20
+-1) hardirq -> softirq=C2=A0=C2=A0 -> napi poll; basic interrupt delivery
++1) hardirq -> softirq=C2=A0-> napi poll; basic interrupt delivery
++2) timer -> softirq=C2=A0-> napi poll; deferred irq processing
++3) epoll -> busy-poll -> napi poll; busy looping
+=20
+-2)=C2=A0=C2=A0 timer -> softirq=C2=A0=C2=A0 -> napi poll; deferred irq pro=
+cessing
+-
+-3)=C2=A0=C2=A0 epoll -> busy-poll -> napi poll; busy looping
+-
+-Loop 2) can take control from Loop 1), if ``gro_flush_timeout`` and
++Loop 2 can take control from Loop 1, if ``gro_flush_timeout`` and
+ ``napi_defer_hard_irqs`` are set.
+=20
+-If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are set, Loops 2)
+-and 3) "wrestle" with each other for control.
++If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are set, Loops 2
++and 3 "wrestle" with each other for control.
+=20
+-During busy periods, ``irq-suspend-timeout`` is used as timer in Loop 2),
+-which essentially tilts network processing in favour of Loop 3).
++During busy periods, ``irq-suspend-timeout`` is used as timer in Loop 2,
++which essentially tilts network processing in favour of Loop 3.
+=20
+-If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are not set, Loop 3)
+-cannot take control from Loop 1).
++If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are not set, Loop 3
++cannot take control from Loop 1.
+=20
+ Therefore, setting ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` is
+ the recommended usage, because otherwise setting ``irq-suspend-timeout``
+
+Thanks.
+
+--=20
+An old man doll... just what I always wanted! - Clara
+
+--iuKxU6a4r/CNFDfj
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZyingAAKCRD2uYlJVVFO
+o64ZAQDP3pxfWFFyMjIfi4ZGG1Nsp73evLSwCaWAqmtJ/cVfGwEA43yY1qi4t1Lq
+wpWy5WDij+Lu6fAu5J2LfoivRdtH+wA=
+=G0Aj
+-----END PGP SIGNATURE-----
+
+--iuKxU6a4r/CNFDfj--
 
