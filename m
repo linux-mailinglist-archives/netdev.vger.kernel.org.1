@@ -1,120 +1,342 @@
-Return-Path: <netdev+bounces-141660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D8449BBEC5
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:27:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 849C19BBEC6
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:27:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4466F1F216C6
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:27:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D238BB2123E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:27:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE9041D0BA7;
-	Mon,  4 Nov 2024 20:27:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 348B71E571B;
+	Mon,  4 Nov 2024 20:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TAhPkchJ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jCQaniXB"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 333091C876D
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 20:27:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71BF41C876D;
+	Mon,  4 Nov 2024 20:27:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730752024; cv=none; b=YB/Af+HA0Cv1EuDFfZ8AtThYMz0ojm7TS1f49tfyivFFi6jv7AUqItoYY7VNs4LNzyKwBZ8uzFOV3OWKEFBKypInDzNVSpDHAtYNN7rICYek34+U/Yq1df+PxpF20b3Jrt/Q3Evr/Q9G39fmTnrJPeqMTEdYZu0FiImUziZoQLM=
+	t=1730752031; cv=none; b=PpY1YNVVS2ihh9KLSwYOs5Rk9L+ur6RNCmkeVPEdLiWmzq80N77TzeMnJx0m9dhAwj5irS5/U64doBRIAbfr+dMO8LgZp1SD7aICgLt20PeEdlk7GlCeiUI4rcKmWxygiIN5qNr/wx5fmk6vindYVnxdlNQK8uT5zStCE+UIj5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730752024; c=relaxed/simple;
-	bh=zdFwE3OsRShjhkCn5U/X88T0Tzr/smV8EQjUqGs3Wqc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=u3VdrVSpHUbNJN7WYZfNurFYXJeE1b+3oq/aTsJ82epdsGuwNvhm+WRjFOwOVC/RKqS/jNQYLoQu2dYYQ3ak64rciEr+ylU8cMBTDRLy/NjBjbNt+zWO/QVbgX5FHcNkjNaGYQ7QaWEpSFC3aHHWlEcHdBqTbhzd9vlzkKaO0kQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TAhPkchJ; arc=none smtp.client-ip=209.85.218.45
+	s=arc-20240116; t=1730752031; c=relaxed/simple;
+	bh=zNFhcFpEP65NUzbAtTkXf545aP3mOPVQlH7TWQL+oVc=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=f9hya3KuGmjDabWyybYLzFCn1hUpId3GVkhf4dgG6JB9gS/VEapTltpvTEwuJ8jvHi4ZsC7STt00ls89hqeNKobEkM0aaUM7CPskHRA4I/ZpzpwNbqLinelloio95oy/+D1ju7qVQ2vei746F0B7YCqq90AFQptQ9JgxIB0wV0w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jCQaniXB; arc=none smtp.client-ip=209.85.214.169
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9a628b68a7so727331166b.2
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 12:27:02 -0800 (PST)
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20c693b68f5so49832345ad.1;
+        Mon, 04 Nov 2024 12:27:09 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730752021; x=1731356821; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=1/UfZ4Cz7Y1bNy6RHnPO48j4sD4LyZr/skcSH+vAkkk=;
-        b=TAhPkchJdNNPm+ATe3oET24V/ptXepBOCKhtCYVCsoYybDAWcUZb5gghYD7taWOWLJ
-         Tgtd6Mx/IVPEThm2TEXBqGIE0ccmnxHx0F4omMuBXdp2wgNgfKVafmMiklqQpVMZQBfX
-         46UdffhXw0YXIGD9adbG5/gT1KcTKhA41HKCsHRcLMGY9JR8il8fLWgBd0zxgnE0UCyc
-         AD3IJzfPKyq+CU0ycf4aQN173yoZDMVnUpaMpAjSFQuoaMD0odhllu26lDwWRxXW7m8s
-         /YUNEDBdQCRzeptoV7voen48oXlMdG0ln9ZI//H2vTQ8NYWdULBq5AppPqx7nq6Oecvy
-         f+/Q==
+        d=gmail.com; s=20230601; t=1730752029; x=1731356829; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=RHtMBfQecyyKv9bmAtAYemSSyWK9CXs7Ly84qsFf5U8=;
+        b=jCQaniXBwpLOtbgAm8+k5Ttu+/9MfIEemRaPNfqaqUy12DoCPut3MMa/ujisdDYXmQ
+         bVyTmLhLocIN63QcUomWaEgGH80iXHtCgI2KSAvDUOML/eb1S5W0cxLidep+swtyyMbc
+         Uq2GZfH9P9LDvXUbuYFjOaoiMeMKxTH5wU8p12kmv7sNULv5ErAepBwo++t3sJeVcmRA
+         0TKeCuzjPRW2LoJUpM/EMF7kp55tUYEGfPqGwALjTVs18sM5s+U4W+ePOcApfmzMIP/x
+         BiMGrQrb2lJe7l+j9ltF+4VdL6+dH/YMUaNHvZ4JFSXHvDuckpKpoh58ZtfDwjxfuH0D
+         6Tww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730752021; x=1731356821;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1/UfZ4Cz7Y1bNy6RHnPO48j4sD4LyZr/skcSH+vAkkk=;
-        b=VKYx8X/QUu1bN29N0C5Q0BSnTYZBZHMD1zmEHByW2pEBWOud3x2c/r4o7n1MdFOuI2
-         uI+Z1Gb+VLr7LJhoPBdfbN6wvuddxSpVX5bI8n9g+lkgWCxBYnvJGCQmYoHvYGDvV+u9
-         1eMXkV5n5IhfH96wy9cyJS9cqk2ocyCmG5ol6EVI2FtxBQo8rza7xEed74VEatz3ZzHi
-         crbu3ar0I7fnS/898J8RGGMJBaa1Ag1FIRJuCI0IrqcSi6/cx537hZn5uXLjNs6yeCKI
-         j+a4HXlf6aKG52+K+Z9lf3tSgKKaAJM00I0kRaQDtoEmkBCeETVsBpeDHmJ/xJpFep0l
-         aUHQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWZkdPp1Ep/gOr5PZ49ErdMqQmaIA3foattg83IbXYmQDm8Dlark3NlA/ZQeTHpvbCSrCweoj4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUhks9r49hnQo4SVqaRwIZljn8U8IY4Xo6OOisGS/R04JWMZKZ
-	O8RPsJNrBsyUnCQKHAA0H1VpAcDRBvycM+JUOtyLgWKgbltYi+Fp3nLSdTxP
-X-Google-Smtp-Source: AGHT+IHPydjt7oTYZ5B33ZNy4xdSE4Kb27iZFcqLDIv7zCL9J1hoW+lGOR6ZRQx26VTOUZvOjTmPgw==
-X-Received: by 2002:a17:907:6ea6:b0:a87:31c:c6c4 with SMTP id a640c23a62f3a-a9e654d1c56mr1236613166b.24.1730752021238;
-        Mon, 04 Nov 2024 12:27:01 -0800 (PST)
-Received: from [127.0.0.1] ([193.252.113.11])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16d6714sm27520366b.64.2024.11.04.12.27.00
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 12:27:00 -0800 (PST)
-Message-ID: <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
-Date: Mon, 4 Nov 2024 21:26:59 +0100
+        d=1e100.net; s=20230601; t=1730752029; x=1731356829;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=RHtMBfQecyyKv9bmAtAYemSSyWK9CXs7Ly84qsFf5U8=;
+        b=Dsor7MRM7GbZg5WrCjCFFMPShvQFabXnwUAUD3C2fYbaB0ToVtAyYu2S4wcUtL3843
+         TsMaKlVKbonh4S4s4kgPx1ZxRZMhIPiGN7D8ejU3K0N+mq54O4tbeC7sinnkyI1Yi03l
+         fLS3KUuhcqEbOgsiFH/9lgh/Pwpswo153eQ4Q8LGvvVixL7zQPJOZu9Uhqo71l4kDgor
+         45GIgTLnMdGjFUyFVB/h5YTuxzOxX0LoBFru2jSKqA85hgxT4h5XD5FF0yzKxVvozwtM
+         Sx7qH4yKdT0M5YAP4Obsa7z6//+3myobVFdBu4LO3lLpwHs4rRPslu4v5a5+B8tXvVS1
+         mM/Q==
+X-Forwarded-Encrypted: i=1; AJvYcCW3bJRRYGvK72m6ouOEmAgK38OQxoazg/4VE7NhAeYXU1FwmTmT2AQ6RSGtm94bb+z0RPo=@vger.kernel.org, AJvYcCXvx6KxdfSBfpovkiqEtUnjd1WI1JeZAHMXINplqkpwh3BqtZCjKTtTJk6qRZKNbJYe1ON+edz2orAdZLNf@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywf8+e2FyzDFr8ZCDSE9AbeUaVcYpWeBBfCK5yO4VNC6ncxR/6X
+	HPjzFp8v7AFQtBlCEi93xviYDTtzsCo9OI/gsZzUe+WxKMJD8fgAmrIcb6SP
+X-Google-Smtp-Source: AGHT+IGwx4SmI9ceRF/57XXFL+jnLXt/f43mLfRRmWIi1TEpIz9VSsTQSeK140PRBYiXCKNFROOojg==
+X-Received: by 2002:a17:902:ea0a:b0:20c:b876:b4eb with SMTP id d9443c01a7336-21103ca9ebemr256880845ad.59.1730752028558;
+        Mon, 04 Nov 2024 12:27:08 -0800 (PST)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057d5326sm63976945ad.278.2024.11.04.12.27.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 12:27:08 -0800 (PST)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Edward Cree <ecree.xilinx@gmail.com>,
+	Martin Habets <habetsm.xilinx@gmail.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	linux-net-drivers@amd.com (open list:SFC NETWORK DRIVER),
+	linux-kernel@vger.kernel.org (open list),
+	bpf@vger.kernel.org (open list:XDP (eXpress Data Path):Keyword:(?:\b|_)xdp(?:\b|_))
+Subject: [PATCH net-next] net: sfc: use ethtool string helpers
+Date: Mon,  4 Nov 2024 12:27:05 -0800
+Message-ID: <20241104202705.120939-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
- hnodes.
-To: Pedro Tammela <pctammela@mojatatu.com>,
- Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, edumazet@google.com
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- netdev@vger.kernel.org
-References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
- <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
-Content-Language: en-US
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-In-Reply-To: <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 04/11/2024 18:00, Pedro Tammela wrote:
->> 
->> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-> 
-> SoB does not match sender, probably missing 'From:' tag
+The latter is the preferred way to copy ethtool strings.
 
-Due to dumb administrativia at my organization, I am compelled to post from my
-personal gmail accout in order for my posts to be acceptable on this mailing
-list; while I'd like to keep my official address in commit logs. Is it possible ?
+Avoids manually incrementing the pointer. Cleans up the code quite well.
 
-> Also, this seems to deserve a 'Fixes:' tag as well
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ drivers/net/ethernet/sfc/ethtool_common.c     | 34 +++++++------------
+ drivers/net/ethernet/sfc/falcon/ethtool.c     | 24 +++++--------
+ drivers/net/ethernet/sfc/falcon/nic.c         |  7 ++--
+ drivers/net/ethernet/sfc/nic.c                |  7 ++--
+ .../net/ethernet/sfc/siena/ethtool_common.c   | 34 +++++++------------
+ drivers/net/ethernet/sfc/siena/nic.c          |  7 ++--
+ 6 files changed, 40 insertions(+), 73 deletions(-)
 
-This would be the initial commit:
-
- ^1da177e4c3f4 (Linus Torvalds           2005-04-16 15:20:36 -0700   19)
-
-Is that what you mean ?
-
-> 'static inline' is discouraged in .c files
-
-Why ?
-
-It could have been a local macro, but an inline has (a bit) better type
-checking. And I didn't want to add it to a .h that is included by many other
-unrelated components, as it makes no sense to them. So, what is the recommendation ?
-
+diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
+index ae32e08540fa..d46972f45ec1 100644
+--- a/drivers/net/ethernet/sfc/ethtool_common.c
++++ b/drivers/net/ethernet/sfc/ethtool_common.c
+@@ -403,24 +403,19 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
+ 	efx_for_each_channel(channel, efx) {
+ 		if (efx_channel_has_tx_queues(channel)) {
+ 			n_stats++;
+-			if (strings != NULL) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "tx-%u.tx_packets",
+-					 channel->tx_queue[0].queue /
+-					 EFX_MAX_TXQ_PER_CHANNEL);
+-
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(
++					&strings, "tx-%u.tx_packets",
++					channel->tx_queue[0].queue /
++						EFX_MAX_TXQ_PER_CHANNEL);
+ 		}
+ 	}
+ 	efx_for_each_channel(channel, efx) {
+ 		if (efx_channel_has_rx_queue(channel)) {
+ 			n_stats++;
+-			if (strings != NULL) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "rx-%d.rx_packets", channel->channel);
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(&strings, "rx-%d.rx_packets",
++						channel->channel);
+ 		}
+ 	}
+ 	if (efx->xdp_tx_queue_count && efx->xdp_tx_queues) {
+@@ -428,11 +423,10 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
+ 
+ 		for (xdp = 0; xdp < efx->xdp_tx_queue_count; xdp++) {
+ 			n_stats++;
+-			if (strings) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "tx-xdp-cpu-%hu.tx_packets", xdp);
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(&strings,
++						"tx-xdp-cpu-%hu.tx_packets",
++						xdp);
+ 		}
+ 	}
+ 
+@@ -467,9 +461,7 @@ void efx_ethtool_get_strings(struct net_device *net_dev,
+ 		strings += (efx->type->describe_stats(efx, strings) *
+ 			    ETH_GSTRING_LEN);
+ 		for (i = 0; i < EFX_ETHTOOL_SW_STAT_COUNT; i++)
+-			strscpy(strings + i * ETH_GSTRING_LEN,
+-				efx_sw_stat_desc[i].name, ETH_GSTRING_LEN);
+-		strings += EFX_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
++			ethtool_puts(&strings, efx_sw_stat_desc[i].name);
+ 		strings += (efx_describe_per_queue_stats(efx, strings) *
+ 			    ETH_GSTRING_LEN);
+ 		efx_ptp_describe_stats(efx, strings);
+diff --git a/drivers/net/ethernet/sfc/falcon/ethtool.c b/drivers/net/ethernet/sfc/falcon/ethtool.c
+index f4db683b80f7..41bd63d0c40c 100644
+--- a/drivers/net/ethernet/sfc/falcon/ethtool.c
++++ b/drivers/net/ethernet/sfc/falcon/ethtool.c
+@@ -361,24 +361,18 @@ static size_t ef4_describe_per_queue_stats(struct ef4_nic *efx, u8 *strings)
+ 	ef4_for_each_channel(channel, efx) {
+ 		if (ef4_channel_has_tx_queues(channel)) {
+ 			n_stats++;
+-			if (strings != NULL) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "tx-%u.tx_packets",
+-					 channel->tx_queue[0].queue /
+-					 EF4_TXQ_TYPES);
+-
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(&strings, "tx-%u.tx_packets",
++						channel->tx_queue[0].queue /
++							EF4_TXQ_TYPES);
+ 		}
+ 	}
+ 	ef4_for_each_channel(channel, efx) {
+ 		if (ef4_channel_has_rx_queue(channel)) {
+ 			n_stats++;
+-			if (strings != NULL) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "rx-%d.rx_packets", channel->channel);
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(&strings, "rx-%d.rx_packets",
++						channel->channel);
+ 		}
+ 	}
+ 	return n_stats;
+@@ -412,9 +406,7 @@ static void ef4_ethtool_get_strings(struct net_device *net_dev,
+ 		strings += (efx->type->describe_stats(efx, strings) *
+ 			    ETH_GSTRING_LEN);
+ 		for (i = 0; i < EF4_ETHTOOL_SW_STAT_COUNT; i++)
+-			strscpy(strings + i * ETH_GSTRING_LEN,
+-				ef4_sw_stat_desc[i].name, ETH_GSTRING_LEN);
+-		strings += EF4_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
++			ethtool_puts(&strings, ef4_sw_stat_desc[i].name);
+ 		strings += (ef4_describe_per_queue_stats(efx, strings) *
+ 			    ETH_GSTRING_LEN);
+ 		break;
+diff --git a/drivers/net/ethernet/sfc/falcon/nic.c b/drivers/net/ethernet/sfc/falcon/nic.c
+index 78c851b5a56f..a7f0caa8710f 100644
+--- a/drivers/net/ethernet/sfc/falcon/nic.c
++++ b/drivers/net/ethernet/sfc/falcon/nic.c
+@@ -451,11 +451,8 @@ size_t ef4_nic_describe_stats(const struct ef4_hw_stat_desc *desc, size_t count,
+ 
+ 	for_each_set_bit(index, mask, count) {
+ 		if (desc[index].name) {
+-			if (names) {
+-				strscpy(names, desc[index].name,
+-					ETH_GSTRING_LEN);
+-				names += ETH_GSTRING_LEN;
+-			}
++			if (names)
++				ethtool_puts(&names, desc[index].name);
+ 			++visible;
+ 		}
+ 	}
+diff --git a/drivers/net/ethernet/sfc/nic.c b/drivers/net/ethernet/sfc/nic.c
+index a33ed473cc8a..51c975cff4fe 100644
+--- a/drivers/net/ethernet/sfc/nic.c
++++ b/drivers/net/ethernet/sfc/nic.c
+@@ -306,11 +306,8 @@ size_t efx_nic_describe_stats(const struct efx_hw_stat_desc *desc, size_t count,
+ 
+ 	for_each_set_bit(index, mask, count) {
+ 		if (desc[index].name) {
+-			if (names) {
+-				strscpy(names, desc[index].name,
+-					ETH_GSTRING_LEN);
+-				names += ETH_GSTRING_LEN;
+-			}
++			if (names)
++				ethtool_puts(&names, desc[index].name);
+ 			++visible;
+ 		}
+ 	}
+diff --git a/drivers/net/ethernet/sfc/siena/ethtool_common.c b/drivers/net/ethernet/sfc/siena/ethtool_common.c
+index 075fef64de68..53b1cdf872d8 100644
+--- a/drivers/net/ethernet/sfc/siena/ethtool_common.c
++++ b/drivers/net/ethernet/sfc/siena/ethtool_common.c
+@@ -403,24 +403,19 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
+ 	efx_for_each_channel(channel, efx) {
+ 		if (efx_channel_has_tx_queues(channel)) {
+ 			n_stats++;
+-			if (strings != NULL) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "tx-%u.tx_packets",
+-					 channel->tx_queue[0].queue /
+-					 EFX_MAX_TXQ_PER_CHANNEL);
+-
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(
++					&strings, "tx-%u.tx_packets",
++					channel->tx_queue[0].queue /
++						EFX_MAX_TXQ_PER_CHANNEL);
+ 		}
+ 	}
+ 	efx_for_each_channel(channel, efx) {
+ 		if (efx_channel_has_rx_queue(channel)) {
+ 			n_stats++;
+-			if (strings != NULL) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "rx-%d.rx_packets", channel->channel);
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(&strings, "rx-%d.rx_packets",
++						channel->channel);
+ 		}
+ 	}
+ 	if (efx->xdp_tx_queue_count && efx->xdp_tx_queues) {
+@@ -428,11 +423,10 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
+ 
+ 		for (xdp = 0; xdp < efx->xdp_tx_queue_count; xdp++) {
+ 			n_stats++;
+-			if (strings) {
+-				snprintf(strings, ETH_GSTRING_LEN,
+-					 "tx-xdp-cpu-%hu.tx_packets", xdp);
+-				strings += ETH_GSTRING_LEN;
+-			}
++			if (strings)
++				ethtool_sprintf(&strings,
++						"tx-xdp-cpu-%hu.tx_packets",
++						xdp);
+ 		}
+ 	}
+ 
+@@ -467,9 +461,7 @@ void efx_siena_ethtool_get_strings(struct net_device *net_dev,
+ 		strings += (efx->type->describe_stats(efx, strings) *
+ 			    ETH_GSTRING_LEN);
+ 		for (i = 0; i < EFX_ETHTOOL_SW_STAT_COUNT; i++)
+-			strscpy(strings + i * ETH_GSTRING_LEN,
+-				efx_sw_stat_desc[i].name, ETH_GSTRING_LEN);
+-		strings += EFX_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
++			ethtool_puts(&strings, efx_sw_stat_desc[i].name);
+ 		strings += (efx_describe_per_queue_stats(efx, strings) *
+ 			    ETH_GSTRING_LEN);
+ 		efx_siena_ptp_describe_stats(efx, strings);
+diff --git a/drivers/net/ethernet/sfc/siena/nic.c b/drivers/net/ethernet/sfc/siena/nic.c
+index 0ea0433a6230..06b97218b490 100644
+--- a/drivers/net/ethernet/sfc/siena/nic.c
++++ b/drivers/net/ethernet/sfc/siena/nic.c
+@@ -457,11 +457,8 @@ size_t efx_siena_describe_stats(const struct efx_hw_stat_desc *desc, size_t coun
+ 
+ 	for_each_set_bit(index, mask, count) {
+ 		if (desc[index].name) {
+-			if (names) {
+-				strscpy(names, desc[index].name,
+-					ETH_GSTRING_LEN);
+-				names += ETH_GSTRING_LEN;
+-			}
++			if (names)
++				ethtool_puts(&names, desc[index].name);
+ 			++visible;
+ 		}
+ 	}
+-- 
+2.47.0
 
 
