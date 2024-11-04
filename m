@@ -1,187 +1,433 @@
-Return-Path: <netdev+bounces-141715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 05B399BC191
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:44:29 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16F8F9BC193
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEAB0282D34
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 23:44:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39B4F1C21C79
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 23:45:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACB91FA272;
-	Mon,  4 Nov 2024 23:44:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44FA218C009;
+	Mon,  4 Nov 2024 23:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="H2UKLijk"
+	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="Z7xXHIGK"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-out1-05.simnet.is (smtp-out1-05.simnet.is [194.105.231.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 057FE139CFF;
-	Mon,  4 Nov 2024 23:44:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82BCC18BBA0
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 23:45:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.231.8
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730763854; cv=none; b=qhzu+HEF+hSmzJDbdF/DwikAE0gJzVrc7DZ/cZATapdGJeMKIL0ZDw5ja6rCAFbtKsUYeLpWQRohkQVWirP9C5UJnjhOIIWJzqrGTtevMcUckU7k7fx0m6hke+NHuQeIV5lbut/OjWbYzA6XjYipAk0DjGRykTEq2j+hUmddRo0=
+	t=1730763935; cv=none; b=GnS5jNL79QVsNxR+/UeVo8ZaeW+4CMfbn3IRIBwFQU5LBaN/giP7/B/ouObJ7eJlMnUh6poUmS3g67/acpaLhYKsHEctLQaSwVCLAgCmBP4maP0N3dX0xHLACgW1rEgTtMjzIWhx7d55WkDf2LRjNZ8c59CVJknps7OYqE5VXJM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730763854; c=relaxed/simple;
-	bh=2aMoY1TDDy3/xz9iBSLrQX4eaLsKZYiELDT17zLpN40=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=JImxuaHxSbpeKJsgbASib+3rPOUjnMoYTdTcliGObF3RnFQmjcAFHbqLu6XgQ1QjWetJ84PZRnjHH4zVz+4gBhoLw0tMa2Fo4FdG4WUduoKsdIDegJrTLdzhZrYTKny6P3O7zmYtBJ+C9WSuuarvW6DZ81RfgRoK3l6cJBJI/1E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=H2UKLijk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AAED7C4CECE;
-	Mon,  4 Nov 2024 23:44:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730763853;
-	bh=2aMoY1TDDy3/xz9iBSLrQX4eaLsKZYiELDT17zLpN40=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=H2UKLijkMvNmkkIbBjMyh3ZPWuCwSMAUuBwg1vUWaN4DxRmCJc0LiBsp0A/kV5rU/
-	 ttWJQrp4/WBzfj7EK97Mtyaj1k3iwOPfB5cGCONLbH/gzvPA9Y7qMZoNhJiEvsTUe2
-	 YIICAqFHckO/myRF5SgGnCMJ3NojDwtMrbjy5u0N6SuVpiqgZIvRFpvKaf/8RA4bxj
-	 WbpjqinfYP9emFck0B+77REIz6dL9gY/nqN72DRjMz2qiAz5nJ+CB/Ipv9/WGbu2WM
-	 yrcPSbwsOdqXQpAXG39QbQOH+iKvK8MBTMTCp4+KRikhnhH70P3sjzk/hPssXElL0d
-	 vHTENob6qY90w==
-Date: Mon, 4 Nov 2024 17:44:12 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Dullfire <dullfire@yahoo.com>
-Cc: davem@davemloft.net, sparclinux@vger.kernel.org, netdev@vger.kernel.org,
-	linux-pci@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-Subject: Re: Kernel panic with niu module
-Message-ID: <20241104234412.GA1446170@bhelgaas>
+	s=arc-20240116; t=1730763935; c=relaxed/simple;
+	bh=kVHoYqBlIJy/PNir0IWY5WuqvrMFkhwFRsGa7pQv+2M=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=fXlCAZ/RK3vRuF4dfR7xdhEUXf8zv6/9icVQNNYq2aVc5RtIMbA+G2/pPNRAsYFDdIMLNu1vO2MubImoDN91+36x/vrY5hr9otLXJWxtDGGIzNAZv6HPCWrJAVH3aZz9DrAtrgNW8yyhqOYOGjcz95ab5wqBvEOKUO1gBo8OKFs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=Z7xXHIGK; arc=none smtp.client-ip=194.105.231.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
+  t=1730763931; x=1762299931;
+  h=date:from:to:subject:message-id:mime-version;
+  bh=6EC1i/8AKW/ghdCabcKvsXZv2KX1bzbCmYAzTYZmaR8=;
+  b=Z7xXHIGK3j88PfInJ6x3fm7xgYf1Lejd5LuzDjNoME+bu0AjgaR/JnIt
+   C8bdwtTSYMsF7lnbvFvV88OSw/fTfGyxZs4ofu9WqdiykYO0SUwIzN6Wo
+   DI6QOaSzDN9llNcGItBHVWsvyiUuY818TMAvyiO9di7i6D8Cz0yOXsmak
+   SV6ULVK2lVv5OBmaq5xcbNnge0Qt17uwT98+x6CaRaajNJC6MREQuToe2
+   joZ7EXNZtZR8gciphHVOnif9vZ9y5q8rCHQu7SBKyAhamNKo6hHW11Hde
+   J2UR7THtbIAxDJk0jz5yv3EnWtTUqKqf9j+rnKwt3mWosvggqRU732wmC
+   Q==;
+X-CSE-ConnectionGUID: lrPLZejCSgWHLWPO5l2GyQ==
+X-CSE-MsgGUID: 6DN148NXRLeLexIRbicmDA==
+Authentication-Results: smtp-out-05.simnet.is; dkim=none (message not signed) header.i=none
+X-SBRS: 3.3
+X-IPAS-Result: =?us-ascii?q?A2GeAwBdWSlnhVfoacJaHgEBCxIMQINvKH2BZIgljgIdg?=
+ =?us-ascii?q?yicdgcBAQEPNQ8EAQEEgg+NKig4EwECBAEBAQEDAgMBAQEBAQEBAQ4BAQYBA?=
+ =?us-ascii?q?QEBAQEGBwIQAQEBAUAOO4U1Rg2FLCyCe1+DAQGCZK9AgTSBAYMc2xeBXBCBS?=
+ =?us-ascii?q?IVqgmIBhWmEdzwGgg2BSoFzgUCLBwSCMhV8gXcMgg4SJYIvgRCFVogmjz2Ba?=
+ =?us-ascii?q?QNZIREBVRMXCwcFgXkDg1GBOYFRgyBKg1mBQkY/N4ITaU06Ag0CNoIkfYJQg?=
+ =?us-ascii?q?xiCBYRwhGx9HTYKAwttPTUUG58dAUaCOC89BgI8UYEEIx0DMAYECx58kk1Ej?=
+ =?us-ascii?q?0OBRKFbhCSGW4MwgguVQzOEBJM7DDqSRph3pAaFG4F+gX8sBxoIMDuCZwlJG?=
+ =?us-ascii?q?Q+OKhmBDAEHhyK/Hng7AgcLAQEDCZMsAQE?=
+IronPort-PHdr: A9a23:rNbvKRSe60PMVoG1+f8PSHcpGNpso5DLVj580XJGo6lLbrzm+In+e
+ RSCo+5siVnEQcPa8KEMh+nXtvXmXmoNqdaEvWsZeZNBHxkClY0NngMmDcLEQU32JfLndWo7S
+ cJFUlINwg==
+IronPort-Data: A9a23:GoHWKKl0UqTIeo37uY/jnbXo5gxzJkRdPkR7XQ2eYbSJt16W5oEne
+ lBvCjHdVaLbPHygOZtoPN7k6BtG+dKXi5UnVgpcGRpFFipDoJXIVdjAJ0r9NS+cccScEBo84
+ shONdOcIphqECeMrU2mO+K88yUmiqrRS+OmBrSaa3khHlE4ECp8gk5ox4bV7mIQbf2RWmth7
+ vuu/JWAULPc5wNJD440106igEg+4Pmo6DpG71dgO6lF41aOnSkeAclAe/3tIiqiTNAFN+PrH
+ OyrIJORpziAp0h3Yj+GfhcXVmVQH9Y+6CDX0iI+t5CK20UE/mpqlP9jaJLwUG8P4x2Rhdd91
+ d5RgpK5TAYtL8Xklf8UO/ViO3gW0ZZupvmeeBBTjeTJlxeaKiK0n600ZK0LFdRwFthfUDAmG
+ cMwcFjhXjjb78qqzbSyTPVbh8hLBKEH66tG5xmMZRmAZRoXacirr5fivLe07x9s7ix6JssyU
+ uJCAdZZgLssVDUUUrsfIMpWcO5FHRATeRUAwL6ejfJfD2Q+UGWdeVUiWTbYUoXieClboqqXj
+ mbcx0DLDxMxD9Og6R66ylXxgrXgjBquDer+FJXgnhJrqEOS3XBWGhwTTUG8sej80hf4RdNEN
+ woV4ULCr4BrpRDtF4GgGUfj+jjU4XbwWPIJewE+wAuC4rHV5gCUGi4FVVatbfR875VoG2B3h
+ zdlmfu3KRo27O2zeUi5+5OZvRKIMykeKEMrMHpsoQwtuIWz8d5i0nojVO1LFqOpgtDrMS//z
+ irMryUkgbgXy8kR2M2GEUvvnTO3ut3bTwst/ALHTyf9t0VnZZW5IY2zgbTG0RpeBIKDdn2zs
+ XovoMehzMQxNbbQkHaiUdxYSdlF+M25GDHbhFduGbwo+DKs52OvcOhsDNdWeBcB3iEsJW+BX
+ aPDhT698qO/K1OLVsdKj2+ZFcUx0e3yFNH9TPfEf58WO95vdRSbuiB1DaJx44wPuBZ2+U3cE
+ c7KGSpJMZr8If88pNZRb7xEuYLHPghkmQvuqWnTlnxLK4a2an+PUqsiO1CTdO0/567siFyKq
+ I4Aa5bSmkwOC7WWjszrHWg7cQBiwZ8TWMieliCrXrfZf2KK5Ul4V6SPmO1Jl3JNxfQKyY8kA
+ U1RqmcDlAqu2iybQel7QnVibLqnXZgXkJ7IFXFEALpc4FB6OdzHxP5GK/MfI+J9nMQ9lqEcc
+ hXwU57bahi5Ym+co2xFBXQ8xaQ+HCmWafWmY3L7PWlgJMcxH2QkOLbMJ2PSycXHNQLv3eNWn
+ lFq/lqzrUYrL+i6MPvrVQ==
+IronPort-HdrOrdr: A9a23:LoJOu60uB5CqdsiTxa8KqAqjBIIkLtp133Aq2lEZdPU1SKClfq
+ WV98jzuiWatN98Yh8dcKm7Sc+9qCrnhOdICOsqXYtKLTOGhILAFugLh+bfKlbbak7DH4BmpM
+ NdWpk7JNrsDUVryebWiTPIdOrIGeP3kpxAU92uqktQcQ==
+X-Talos-CUID: =?us-ascii?q?9a23=3AnOWDHmnqcwcwK/USkAAA9idDOUPXOXnH9FPiLk2?=
+ =?us-ascii?q?TMmlWaJmqcXjN/PlLgvM7zg=3D=3D?=
+X-Talos-MUID: 9a23:FfMpCQShfwtxaS2zRXSyqBc7aJdO056KBWQAgbQ8sciPMABZbmI=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.11,258,1725321600"; 
+   d="8'?scan'208";a="23266459"
+Received: from vist-zimproxy-01.vist.is ([194.105.232.87])
+  by smtp-out-05.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 23:44:20 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id E302041A16B7
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 23:44:19 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id c-DTtXQb4bNi for <netdev@vger.kernel.org>;
+ Mon,  4 Nov 2024 23:44:19 +0000 (GMT)
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id 6B7B141A16B8
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 23:44:19 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id Fbz5JwKw9XAJ for <netdev@vger.kernel.org>;
+ Mon,  4 Nov 2024 23:44:19 +0000 (GMT)
+Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTPS id 5624C41A16B7
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 23:44:19 +0000 (GMT)
+Received: from bg by kassi.invalid.is with local (Exim 4.98)
+	(envelope-from <bg@kassi.invalid.is>)
+	id 1t86k8-000000000v0-2Bmi
+	for netdev@vger.kernel.org;
+	Mon, 04 Nov 2024 23:44:20 +0000
+Date: Mon, 4 Nov 2024 23:44:20 +0000
+From: Bjarni Ingi Gislason <bjarniig@simnet.is>
+To: netdev@vger.kernel.org
+Subject: dcb-apptrust.8: some remarks and editorial changes for this manual
+Message-ID: <ZylcVAmsr55YK38b@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="7gK7vZtQK73LsW9t"
+Content-Disposition: inline
+
+
+--7gK7vZtQK73LsW9t
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <f7c43842-270e-48f8-ba89-9b5e67910131@yahoo.com>
 
-[+cc Thomas, author of 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X
-entries")]
+  The man page is from Debian:
 
-On Mon, Nov 04, 2024 at 05:34:42AM -0600, Dullfire wrote:
-> Hello,
-> 
-> I am working on a set of patches that address a panic on bind in the niu
-> module. However, none of the approaches I see integrate well with the kernels
-> frameworks, so any feed back you could provide would be appreciated.
-> 
-> On sparcv9 systems (and possibly others), when the niu drivers sets up the
-> MSIX IRQ vectors, a fatal trap[0] is encountered. I have done a number of
-> tests[1]. From these tests I have believe that any read from a specific MSIX
-> table entry must come after a write to it's PCI_MSIX_ENTRY_DATA field,
-> otherwise it will cause a fatal trap.
-> 
-> I see types of approaches:
-> 1) Add writes to the ENTRY_DATA field to niu before it call into the 
->     msi(x) code.
-> 2) Adjust the MSIX code to either skip the read, or write to ENTRY_DATA first
-> 3) Add a PCI quirk for this device to "initialize" the MSIX vector table.
-> 
-> Approach 1 encounters issues in needing to write to the MSIX table. The
-> functions needed to do this are internal to msi.c (or drivers/pci/msi/msi.h),
-> so they would have to either be reproduces in niu, or exposed in a public
-> header. Neither of those seem like a good approach to me.
-> 
-> Approach 2 can be done in a small amount of code, but it would either require
-> the addition of a struct pci_dev flag of some sort, or it would be invasive
-> to lots of other devices.
-> 
-> While approach 3 seems to be the most correct location, it suffers many of
-> the same issues as approach 1.
-> 
-> I have also bisected the kernel, and determined that  upstream commit
-> 7d5ec3d3612396dc6d4b76366d20ab9fc06f399f revealed this issue. This commit
-> adds read to the mask status before any write to PCI_MSIX_ENTRY_DATA, thus
-> provoking the issue.
+Package: iproute2
+Version: 6.11.0-1
+Severity: minor
+Tags: patch
 
-7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X entries") appeared in
-v5.14 in 2021.  Surely other drivers use MSI-X and would have been
-tested on sparcv9 since then?  Just based on the age of 7d5ec3d36123,
-I would guess some kind of niu issue.  But Thomas will know much more.
+  Improve the layout of the man page according to the "man-page(7)"
+guidelines, the output of "mandoc -lint T", the output of
+"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+conventions.
 
-> If you have any suggestions, please let me know.
-> 
-> Regards,
-> Jonathan Currier
-> 
-> 
-> [0] The trap looks like this:
-> -----------------------------------------------------------------------------
-> [   25.166817] niu: niu.c:v1.1 (Apr 22, 2010)
-> [   25.166952] niu 0001:04:00.0: enabling device (0144 -> 0146)
-> [   25.174100] niu: niu0: Found PHY 002063b0 type MII at phy_port 26
-> [   25.174559] niu: niu0: Found PHY 002063b0 type MII at phy_port 27
-> [   25.175004] niu: niu0: Found PHY 002063b0 type MII at phy_port 28
-> [   25.175449] niu: niu0: Found PHY 002063b0 type MII at phy_port 29
-> [   25.176298] niu: niu0: Port 0 [4 RX chans] [6 TX chans]
-> [   25.176405] niu: niu0: Port 1 [4 RX chans] [6 TX chans]
-> [   25.176507] niu: niu0: Port 2 [4 RX chans] [6 TX chans]
-> [   25.176548] niu: niu0: Port 3 [4 RX chans] [6 TX chans]
-> [   25.176590] niu: niu0: Port 0 RDC tbl(0) [ 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 ]
-> [   25.176757] niu: niu0: Port 0 RDC tbl(1) [ 0 1 2 3 0 1 2 3 0 1 2 3 0 1 2 3 ]
-> [   25.176890] niu: niu0: Port 1 RDC tbl(2) [ 4 5 6 7 4 5 6 7 4 5 6 7 4 5 6 7 ]
-> [   25.177053] niu: niu0: Port 1 RDC tbl(3) [ 4 5 6 7 4 5 6 7 4 5 6 7 4 5 6 7 ]
-> [   25.177185] niu: niu0: Port 2 RDC tbl(4) [ 8 9 10 11 8 9 10 11 8 9 10 11 8 9 10 11 ]
-> [   25.177349] niu: niu0: Port 2 RDC tbl(5) [ 8 9 10 11 8 9 10 11 8 9 10 11 8 9 10 11 ]
-> [   25.177483] niu: niu0: Port 3 RDC tbl(6) [ 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 ]
-> [   25.177649] niu: niu0: Port 3 RDC tbl(7) [ 12 13 14 15 12 13 14 15 12 13 14 15 12 13 14 15 ]
-> [   25.245863] NON-RESUMABLE ERROR: Reporting on cpu 64
-> [   25.245973] NON-RESUMABLE ERROR: TPC [0x00000000005f6900] <msix_prepare_msi_desc+0x90/0xa0>
-> [   25.246106] NON-RESUMABLE ERROR: RAW [4010000000000016:00000e37f93e32ff:0000000202000080:ffffffffffffffff
-> [   25.246215] NON-RESUMABLE ERROR:      0000000800000000:0000000000000000:0000000000000000:0000000000000000]
-> [   25.246291] NON-RESUMABLE ERROR: handle [0x4010000000000016] stick [0x00000e37f93e32ff]
-> [   25.246335] NON-RESUMABLE ERROR: type [precise nonresumable]
-> [   25.246373] NON-RESUMABLE ERROR: attrs [0x02000080] < ASI sp-faulted priv >
-> [   25.246435] NON-RESUMABLE ERROR: raddr [0xffffffffffffffff]
-> [   25.246476] NON-RESUMABLE ERROR: insn effective address [0x000000c50020000c]
-> [   25.246517] NON-RESUMABLE ERROR: size [0x8]
-> [   25.246544] NON-RESUMABLE ERROR: asi [0x00]
-> [   25.246573] CPU: 64 UID: 0 PID: 745 Comm: kworker/64:1 Not tainted 6.11.5 #63
-> [   25.246625] Workqueue: events work_for_cpu_fn
-> [   25.246671] TSTATE: 0000000011001602 TPC: 00000000005f6900 TNPC: 00000000005f6904 Y: 00000000    Not tainted
-> [   25.246729] TPC: <msix_prepare_msi_desc+0x90/0xa0>
-> [   25.246771] g0: 00000000000002e9 g1: 000000000000000c g2: 000000c50020000c g3: 0000000000000100
-> [   25.246815] g4: ffff8000470307c0 g5: ffff800fec5be000 g6: ffff800047a08000 g7: 0000000000000000
-> [   25.246861] o0: ffff800014feb000 o1: ffff800047a0b620 o2: 0000000000000011 o3: ffff800047a0b620
-> [   25.246906] o4: 0000000000000080 o5: 0000000000000011 sp: ffff800047a0ad51 ret_pc: 00000000005f7128
-> [   25.246951] RPC: <__pci_enable_msix_range+0x3cc/0x460>
-> [   25.247004] l0: 000000000000000d l1: 000000000000c01f l2: ffff800014feb0a8 l3: 0000000000000020
-> [   25.247049] l4: 000000000000c000 l5: 0000000000000001 l6: 0000000020000000 l7: ffff800047a0b734
-> [   25.247094] i0: ffff800014feb000 i1: ffff800047a0b730 i2: 0000000000000001 i3: 000000000000000d
-> [   25.247138] i4: 0000000000000000 i5: 0000000000000000 i6: ffff800047a0ae81 i7: 00000000101888b0
-> [   25.247182] I7: <niu_try_msix.constprop.0+0xc0/0x130 [niu]>
-> [   25.247321] Call Trace:
-> [   25.247346] [<00000000101888b0>] niu_try_msix.constprop.0+0xc0/0x130 [niu]
-> [   25.247442] [<000000001018f840>] niu_get_invariants+0x183c/0x207c [niu]
-> [   25.247536] [<00000000101902fc>] niu_pci_init_one+0x27c/0x2fc [niu]
-> [   25.247630] [<00000000005ef3e4>] local_pci_probe+0x28/0x74
-> [   25.247677] [<0000000000469240>] work_for_cpu_fn+0x8/0x1c
-> [   25.247726] [<000000000046b008>] process_scheduled_works+0x144/0x210
-> [   25.247782] [<000000000046b518>] worker_thread+0x13c/0x1c0
-> [   25.247833] [<00000000004710e0>] kthread+0xb8/0xc8
-> [   25.247874] [<00000000004060c8>] ret_from_fork+0x1c/0x2c
-> [   25.247931] [<0000000000000000>] 0x0
-> [   25.247961] Kernel panic - not syncing: Non-resumable error.
-> -----------------------------------------------------------------------------
-> 
-> [1] Tests I have done (and their results)
-> All tests done on a T5240 (UltaSPARC T2).
-> In my test cases: niu driver tries to use up to 13 vectors (table size of 32 entries).
-> "SUCCCESS" - Test case booted with functional networking
-> "FAILED" - Test case experienced a fatal trap after loading the niu module 
->  - writing 0 to all of the MSIX table entrys' ENTRY_VECTOR_CTRL: FAILED 
->  - writing 0 to all of the MSIX table entrys' ENTRY_LOWER_ADDR: FAILED 
->  - writing 0 to all of the MSIX table entrys' ENTRY_UPPER_ADDR: FAILED 
->  - writing 0 to all of the MSIX table entrys' ENTRY_DATA: SUCCESS
->  - writing 0 to only one MSIX table entry's ENTRY_DATA: FAILED
->  - writing 0 to only the first 1/2 of the MSIX table entrys' ENTRY_DATA: SUCCESS
->  - writing ~0 to only the first 1/2 of the MSIX table entrys' ENTRY_DATA: SUCCESS
->  - writing 0 to only the first 12 of the MSIX table entrys' ENTRY_DATA: FAILED
->  - writing 0 to only the first 13 of the MSIX table entrys' ENTRY_DATA: SUCCESS
->  - reading ENTRY_DATA before writing it: FAILED 
->  - reading ENTRY_LOWER_ADDR before writing it: FAILED 
->  - reading ENTRY_UPPER_ADDR before writing it: FAILED
+-.-
+
+  Output from a script "chk_manual" is in the attachment.
+
+-.-
+
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+
+
+--- dcb-apptrust.8	2024-11-04 19:51:38.581034458 +0000
++++ dcb-apptrust.8.new	2024-11-04 20:04:44.751223062 +0000
+@@ -3,33 +3,33 @@
+ dcb-apptrust \- show / configure per-selector trust and trust order of the
+ application priority table of the DCB (Data Center Bridging) subsystem.
+ .SH SYNOPSIS
+-.sp
+ .ad l
+ .in +8
+ 
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .B apptrust
+ .RI "{ " COMMAND " | " help " }"
+ .sp
+ 
+ .ti -8
+ .B dcb apptrust show dev
+-.RI DEV
++.I DEV
+ .RB "[ " order " ]"
+ 
+ .ti -8
+ .B dcb apptrust set dev
+-.RI DEV
+-.RB "[ " order "
++.I DEV
++.RB "[ " order
+ .IR "SEL-LIST" " ]"
+ 
+ .ti -8
+ .IR SEL-LIST " := [ " SEL-LIST " ] " SEL
+ 
+ .ti -8
+-.IR SEL " := { " ethtype " | " stream-port " | " dgram-port " | " port " | " dscp " | " pcp " } "
++.IR SEL " := { " ethtype " | " stream-port " | " dgram-port " | " port " | " \
++dscp " | " pcp " }"
+ 
+ .SH DESCRIPTION
+ 
+@@ -40,10 +40,13 @@ Application Priority Table, see
+ for details on how to configure app table entries.
+ 
+ Selector trust can be used by the
+-software stack, or drivers (most likely the latter), when querying the APP
+-table, to determine if an APP entry should take effect, or not. Additionally, the
+-order of the trusted selectors will dictate which selector should take
+-precedence, in the case of multiple different APP table selectors being present.
++software stack, or drivers (most likely the latter),
++when querying the APP table,
++to determine if an APP entry should take effect, or not.
++Additionally,
++the order of the trusted selectors will dictate which selector should take
++precedence,
++in the case of multiple different APP table selectors being present.
+ 
+ .SH COMMANDS
+ 
+@@ -53,25 +56,27 @@ Display all trusted selectors.
+ 
+ .TP
+ .B set
+-Set new list of trusted selectors. Empty list is effectively the same as
+-removing trust entirely.
++Set new list of trusted selectors.
++Empty list is effectively the same as removing trust entirely.
+ 
+ .SH PARAMETERS
+ 
+-The following describes only the write direction, i.e. as used with the
+-\fBset\fR command. For the \fBshow\fR command, the parameter name is to be used
+-as a simple keyword without further arguments. This instructs the tool to show
+-the values of a given parameter.
++The following describes only the write direction, i.e.,
++as used with the \fBset\fR command.
++For the \fBshow\fR command,
++the parameter name is to be used as a simple keyword without further
++arguments.
++This instructs the tool to show the values of a given parameter.
+ 
+ .TP
+ .B order \fISEL-LIST
+-\fISEL-LIST\fR is a space-separated list of selector names. Possible selector
+-values are:
+-.B ethtype,
+-.B stream-port,
+-.B dgram-port,
+-.B port,
+-.B dscp,
++\fISEL-LIST\fR is a space-separated list of selector names.
++Possible selector values are:
++.BR ethtype ,
++.BR stream-port ,
++.BR dgram-port ,
++.BR port ,
++.BR dscp ,
+ and
+ .B pcp
+ 
+
+--7gK7vZtQK73LsW9t
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="chk_man.err.dcb-apptrust.8"
+
+  Any program (person), that produces man pages, should check the output
+for defects by using (both groff and nroff)
+
+[gn]roff -mandoc -t -ww -b -z -K utf8  <man page>
+
+  The same goes for man pages that are used as an input.
+
+  For a style guide use
+
+  mandoc -T lint
+
+-.-
+
+  So any 'generator' should check its products with the above mentioned
+'groff', 'mandoc',  and additionally with 'nroff ...'.
+
+  This is just a simple quality control measure.
+
+  The 'generator' may have to be corrected to get a better man page,
+the source file may, and any additional file may.
+
+  Common defects:
+
+  Input text line longer than 80 bytes.
+
+  Not removing trailing spaces (in in- and output).
+  The reason for these trailing spaces should be found and eliminated.
+
+  Not beginning each input sentence on a new line.
+Lines should thus be shorter.
+
+  See man-pages(7), item 'semantic newline'.
+
+-.-
+
+The difference between the formatted output of the original and patched file
+can be seen with:
+
+  nroff -mandoc <file1> > <out1>
+  nroff -mandoc <file2> > <out2>
+  diff -u <out1> <out2>
+
+and for groff, using
+
+"printf '%s\n%s\n' '.kern 0' '.ss 12 0' | groff -mandoc -Z - "
+
+instead of 'nroff -mandoc'
+
+  Add the option '-t', if the file contains a table.
+
+  Read the output of 'diff -u' with 'less -R' or similar.
+
+-.-.
+
+  If 'man' (man-db) is used to check the manual for warnings,
+the following must be set:
+
+  The option "-warnings=w"
+
+  The environmental variable:
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+  or
+
+  (produce only warnings):
+
+export MANROFFOPT="-ww -b -z"
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+-.-.
+
+Output from "mandoc -T lint dcb-apptrust.8": (possibly shortened list)
+
+mandoc: dcb-apptrust.8:6:2: WARNING: skipping paragraph macro: sp after SH
+mandoc: dcb-apptrust.8:25:16: STYLE: unterminated quoted argument
+mandoc: dcb-apptrust.8:44:81: STYLE: input text line longer than 80 bytes: table, to determine ...
+
+-.-.
+
+
+Use the correct macro for the font change of a single argument or
+split the argument into two.
+
+19:.RI DEV
+24:.RI DEV
+
+-.-.
+
+Add a comma (or \&) after "e.g." and "i.e.", or use English words
+(man-pages(7)).
+Abbreviation points should be protected against being interpreted as
+an end of sentence, if they are not, and that independent of the
+current place on the line.
+
+61:The following describes only the write direction, i.e. as used with the
+
+-.-.
+
+Wrong distance between sentences in the input file.
+
+  Separate the sentences and subordinate clauses; each begins on a new
+line.  See man-pages(7) ("Conventions for source file layout") and
+"info groff" ("Input Conventions").
+
+  The best procedure is to always start a new sentence on a new line,
+at least, if you are typing on a computer.
+
+Remember coding: Only one command ("sentence") on each (logical) line.
+
+E-mail: Easier to quote exactly the relevant lines.
+
+Generally: Easier to edit the sentence.
+
+Patches: Less unaffected text.
+
+Search for two adjacent words is easier, when they belong to the same line,
+and the same phrase.
+
+44:table, to determine if an APP entry should take effect, or not. Additionally, the
+56:Set new list of trusted selectors. Empty list is effectively the same as
+61:The following describes only the write direction, i.e. as used with the
+62:\fBset\fR command. For the \fBshow\fR command, the parameter name is to be used
+63:as a simple keyword without further arguments. This instructs the tool to show
+68:\fISEL-LIST\fR is a space-separated list of selector names. Possible selector
+
+-.-.
+
+Split lines longer than 80 characters into two or more lines.
+Appropriate break points are the end of a sentence and a subordinate
+clause; after punctuation marks.
+
+Line 32, length 97
+
+.IR SEL " := { " ethtype " | " stream-port " | " dgram-port " | " port " | " dscp " | " pcp " } "
+
+Line 44, length 81
+
+table, to determine if an APP entry should take effect, or not. Additionally, the
+
+
+-.-.
+
+Split a punctuation from a single argument, if a two-font macro is meant
+
+70:.B ethtype,
+71:.B stream-port,
+72:.B dgram-port,
+73:.B port,
+74:.B dscp,
+
+-.-.
+
+No space is needed before a quote (") at the end of a line
+
+12:.RI "[ " OPTIONS " ] "
+25:.RB "[ " order "
+32:.IR SEL " := { " ethtype " | " stream-port " | " dgram-port " | " port " | " dscp " | " pcp " } "
+
+-.-.
+
+Output from "test-groff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
+
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
+troff: backtrace: file '<stdin>':12
+troff:<stdin>:12: warning: trailing space in the line
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':679: macro 'IR'
+troff: backtrace: file '<stdin>':32
+troff:<stdin>:32: warning: trailing space in the line
+
+-.-.
+
+--7gK7vZtQK73LsW9t--
 
