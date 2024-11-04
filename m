@@ -1,113 +1,147 @@
-Return-Path: <netdev+bounces-141392-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6796D9BABA0
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 04:58:01 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B95909BABA5
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 05:02:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id ADBE0B2099B
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 03:57:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB0561C2088E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 04:02:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC573165F04;
-	Mon,  4 Nov 2024 03:57:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5507B16BE0D;
+	Mon,  4 Nov 2024 04:02:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="Z2QeVFF1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="RVcI4EoE"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B411FC3
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 03:57:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF5586FC5;
+	Mon,  4 Nov 2024 04:02:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730692674; cv=none; b=F80IHP/ENjrd439gvHcyn4FEk1T96GudcwUIRSDUEbnrRliZOnMDWnm5zkCKE3EGeNLEYhjYP1R25B2iqf7bgNX7E/qAyBW4IBalRMNouXIKLzmX+MOPW06KaxSxTeVyuCDF9JUqnfOYXNsSEqyrkNas29Il/XwGZqBnZTQqnwk=
+	t=1730692942; cv=none; b=gNfNjc5W+Xmch4N/s41WZSB7VfbS+MUfyevZkk3gUhSoY64v6L1r1Heq5+7H277HoTAcK+cp6T3SlC85mWEeGwVe16Yx2trWP5w+x4Pf18s83giICGlDpm9ZBeBU7w+2imbRMUPVlPPpwSZM3BmBN4C6sfmJ9Vdb9mDWedWtJCc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730692674; c=relaxed/simple;
-	bh=CPGVDr61au8mX05CtAg/Zqd1BdLGkKwJ/6F7Psbp/lo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=qqgtOz3pVhcHEICK9m+ILVaraXc7WJlWShM4HVqWtbA8f92jgOGYk+bNhYFc68qD1eLUWSlDIT5rXDEkRhSqsiGbRHzZY1JGlOWXvfaLYFiH9cnO2MKg/3JzbwWlck0p0aHfx8YtSKxo/3igiqls5jjIeaeEYyi6N40+JOT17oU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=Z2QeVFF1; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
+	s=arc-20240116; t=1730692942; c=relaxed/simple;
+	bh=WWT3SMNHvJyx/SDhrxhY6GP2KynQvDNBGvhsdhLcAZo=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=m/HbV5a6i+wfOnRnRetKCSOH0K7L8L5xJOLvpo2WzY/PGkE2BP8EGBtuF5rdbmSPjPZsCsQih05znWKB2z2rNMhN/Icsi3KshTfs0YPlTTKFw/wlYd2gc8jf2eEjK7ZfUDwLHOEnf1NNvNEsZ/J+LlbggZIWU8j59G32og9cqGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=RVcI4EoE; arc=none smtp.client-ip=209.85.210.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-720c2db824eso3423671b3a.0;
+        Sun, 03 Nov 2024 20:02:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1730692670;
-	bh=CPGVDr61au8mX05CtAg/Zqd1BdLGkKwJ/6F7Psbp/lo=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=Z2QeVFF14j6DKRGlLWwGEISxW60VYEQSzx/k/+QuKRZuNzWrrRGIqIqVOKBB97RHx
-	 42iLmtEqHK5vkA6fUhM537G8fRk2O2inMH78vpp/n3zN7Fzo0rNXvMdWhjlDEuNgrz
-	 Co0MHyLaKaQH3Uy02wPyearNIDpgNTbZ3TAGFtiOZCdGfYaJC0Z7OoTiuwT/0pJFUi
-	 j6hLCWKZs3rksuKFDTv4huAILfN0zgWX4pVsb9phcjnnB32LZXa4y5xUtGQW/RHbzH
-	 rYuhMloOUVHIZPR/8yKZdr0pL80tFYLwTBXZjpEfWLLsuRE+oeePa6f+uWHAAv2quI
-	 Hvgz6prs9rbOg==
-Received: from [192.168.2.60] (210-10-213-150.per.static-ipl.aapt.com.au [210.10.213.150])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 5BFD16A03A;
-	Mon,  4 Nov 2024 11:57:49 +0800 (AWST)
-Message-ID: <7346cdea74daedd0abecfcdcba2e7aa3be203a6e.camel@codeconstruct.com.au>
-Subject: Re: [PATCH net-next] net: ncsi: check for netlink-driven responses
- before requiring a handler
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Samuel Mendoza-Jonas <sam@mendozajonas.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, netdev@vger.kernel.org
-Date: Mon, 04 Nov 2024 11:57:55 +0800
-In-Reply-To: <20241103105414.75ddd6bd@kernel.org>
-References: 
-	<20241028-ncsi-arb-opcode-v1-1-9d65080908b9@codeconstruct.com.au>
-	 <20241103105414.75ddd6bd@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+        d=gmail.com; s=20230601; t=1730692940; x=1731297740; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=jb2cn9o/Hwz3SJMKUwCFXwcDUKiJHlS1xO2b6PXNQ3Q=;
+        b=RVcI4EoEFlSWCIgsEMoPmpXbpRmdqN9kSjGziquZbuM5nYXnM1RSL2ch8I7YfG/p+F
+         TTBWhekKdbNMrjDpaoJ9agyVwajyoE+x+6sHU2OZOi/PQqEzM9ckmZnXENpNHG830286
+         B3150Ho3cf8vRc43vEPeeQiRFpzRn3+Fct/lDFUVfa/Wyk9FKc1qpclvm6s8qpfBjYeD
+         JjFH+QkuCzylPuaUQQJjlU8cYASD6NSmoekIRjPqqxmGq5O4yMXnCJ5zTiV3pcJaNYZA
+         x2vN0claffGYWVnNhGpD3r98eA8XBwbX1DJ5m9GAdfKi4bTlmHl7DLGyPd8p3gBtN3qz
+         CWhw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730692940; x=1731297740;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=jb2cn9o/Hwz3SJMKUwCFXwcDUKiJHlS1xO2b6PXNQ3Q=;
+        b=akwuarsRDdGRtLaA0PoP9P8rYV3OZxq8N6eUkm+BfCjh9CyrGqVOoUXE1jJ/8tluT9
+         uaZvG5U9U6/eRb6oe+2uWr6esQk5FOa6CLm/IJQnrLJBiZ+63C4MHSHtNEFFcFH9kt0p
+         juBDIdxMtVuFKQ1/cGlouK4hFbrBvKRWULUNCdakfRJcHXXnCI7gg79QN+tYZaM1Jb72
+         ttALSDjORF1yPsZfpDbZ1rPysfADHHwd107QVmDejW1eUPp2x8SJCt9kn6xaxlF/Qpwx
+         R+N01yjnGZBgk6PKPXzKrpFU1XDRDAMTNIi5Hq98G4bcQNPMNliC7mPT7NfAO7yC3f0I
+         dpKA==
+X-Forwarded-Encrypted: i=1; AJvYcCU2BlnM3jeT6Xzue0ZuDyEGc1Ht6ri/4smG02KV+5cFnISmbh/F1+YNgsW7qn9LeYIBBWrO6XWLh2ROC+4V@vger.kernel.org, AJvYcCURQuIHPzSfewwFBR0uKGzs9NnHLVqhM+wegG5TohLuYUj6YoAouqIovChNzr5Gt2bPmrE02crE@vger.kernel.org, AJvYcCXDSjjKVSmC9ZCtHtRi6YKtUMIqdyzNEAm8suwYwDT3L9YrmulL/RKZk2UcyKRmhIUhWh0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxHD6UmpNafRoSt7kE/upQ2vq+ObgNdA2G0tiM2ynY79u3zc0md
+	9/05rxhzwQz0PH2MlL5JjZA1ywTZrUk3lDvoHZvBsX8bX5bLdhwd
+X-Google-Smtp-Source: AGHT+IE1OZbBNCZcEmID2bWCABD4sivztlFo8OEcEVwSbZH0zbElhez8HpN5Df/d39Yxm+3+oGaNEw==
+X-Received: by 2002:a05:6a20:e30b:b0:1d8:abf3:58be with SMTP id adf61e73a8af0-1d9a8402d5emr42807803637.21.1730692940132;
+        Sun, 03 Nov 2024 20:02:20 -0800 (PST)
+Received: from debian.resnet.ucla.edu (s-169-232-97-87.resnet.ucla.edu. [169.232.97.87])
+        by smtp.googlemail.com with ESMTPSA id 41be03b00d2f7-7ee45a0ec8bsm6083747a12.79.2024.11.03.20.02.18
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 03 Nov 2024 20:02:19 -0800 (PST)
+From: Daniel Yang <danielyangkang@gmail.com>
+To: Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>,
+	Jiri Olsa <jolsa@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	bpf@vger.kernel.org (open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)),
+	netdev@vger.kernel.org (open list:BPF [NETWORKING] (tcx & tc BPF, sock_addr)),
+	linux-kernel@vger.kernel.org (open list)
+Cc: Daniel Yang <danielyangkang@gmail.com>,
+	syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Subject: [PATCH net] Drop packets with invalid headers to prevent KMSAN infoleak
+Date: Sun,  3 Nov 2024 20:02:07 -0800
+Message-Id: <20241104040218.193632-1-danielyangkang@gmail.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-Hi Jakub,
+KMSAN detects uninitialized memory stored to memory by
+bpf_clone_redirect(). Adding a check to the transmission path to find
+malformed headers prevents this issue. Specifically, we check if the length
+of the data stored in skb is less than the minimum device header length. If
+so, drop the packet since the skb cannot contain a valid device header.
+Also check if mac_header_len(skb) is outside the range provided of valid
+device header lengths.
 
-> > Currently, the NCSI response path will look up an opcode-specific
-> > handler for all incoming response messages. However, we may be
-> > receiving
-> > a response from a netlink-generated request, which may not have a
-> > corresponding in-kernel handler for that request opcode. In that
-> > case,
-> > we'll drop the response because we didn't find a opcode-specific
-> > handler.
->=20
-> This makes it sound like the code is written this way
-> unintentionally, which I doubt.
+Testing this patch with syzbot removes the bug.
 
-This seems like an oversight in the response path, failing on a missing
-in-kernel handler even if we don't later use it. If we were
-intentionally enforcing only known commands, then we'd also be checking
-on the request side.
+Macro added to not affect normal builds.
 
-But yes, I can certainly word this in terms of what this change now
-enables, and provide examples.
+Fixes: 88264981f208 ("Merge tag 'sched_ext-for-6.12' of git://git.kernel.org/pub/scm/linux/kernel/git/tj/sched_ext")
+Reported-by: syzbot+346474e3bf0b26bd3090@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=346474e3bf0b26bd3090
+Signed-off-by: Daniel Yang <danielyangkang@gmail.com>
+---
+v1: Enclosed in macro to not affect normal builds
 
-> > Perform the lookup for the pending request (and hence for
-> > NETLINK_DRIVEN) before requiring an in-kernel handler, and defer
-> > the
-> > requirement for a corresponding kernel request until we know it's a
-> > kernel-driven command.
->=20
-> As for the code - delaying handling ret !=3D 0 makes me worried that
-> someone will insert code in between and clobber it. Can you split
-> the handling so that all the ret !=3D 0 (or EPERM for netlink)
-> are still handled in the if (ret) {} ?
+ net/core/filter.c | 8 ++++++++
+ 1 file changed, 8 insertions(+)
 
-Can do! The -EPERM case can probably be simplified a little too, as it
-just indicates we didn't get a success response from the remote NCSI
-device.
+diff --git a/net/core/filter.c b/net/core/filter.c
+index cd3524cb3..9c5786f9c 100644
+--- a/net/core/filter.c
++++ b/net/core/filter.c
+@@ -2191,6 +2191,14 @@ static int __bpf_redirect_common(struct sk_buff *skb, struct net_device *dev,
+ 		return -ERANGE;
+ 	}
+ 
++#if IS_ENABLED(CONFIG_KMSAN)
++	if (unlikely(skb->len < dev->min_header_len ||
++		     skb_mac_header_len(skb) < dev->min_header_len ||
++		     skb_mac_header_len(skb) > dev->hard_header_len)) {
++		kfree_skb(skb);
++		return -ERANGE;
++	}
++#endif
+ 	bpf_push_mac_rcsum(skb);
+ 	return flags & BPF_F_INGRESS ?
+ 	       __bpf_rx_skb(dev, skb) : __bpf_tx_skb(dev, skb);
+-- 
+2.39.2
 
-Will work on a v2 soon.
-
-Cheers,
-
-
-Jeremy
 
