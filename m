@@ -1,155 +1,381 @@
-Return-Path: <netdev+bounces-141664-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141665-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A6E29BBEEF
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:43:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AF909BBF01
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:48:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9C736B2215A
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:43:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E30A1C21CE5
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:48:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EA011F5857;
-	Mon,  4 Nov 2024 20:42:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B5931F76A3;
+	Mon,  4 Nov 2024 20:48:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U8TdI6Q1"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="SFbxJ06E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
+Received: from mail-pl1-f182.google.com (mail-pl1-f182.google.com [209.85.214.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BB4D1F5854
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 20:42:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF7BE1F7569;
+	Mon,  4 Nov 2024 20:48:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730752971; cv=none; b=aOSQWa5s+NKNwozY9yVgUIHTf4O9ULChvHJrzolAOBAnto2ntu8vnMeVJLaSAtpP5RYiY5Hd0BW51/hu1GlZqGJiC/prVuLxzJ8NK3AGfyNfH2ltA+vfTgDAN7a2MfT6ggkBXDXZODYKUxf0TXIrgShCj+kQjJp4AUwKnAXjKkw=
+	t=1730753308; cv=none; b=jY6EeG6ADg7nvYkoER+UQLiX7xpZdvxb2P54ta0FBcWpHxHQg4Cr3DJ1VL95NILNS/7Detyp2ZN1uToKxLu6yAUKH+AUGehGy4rXqf/ygiJBI5A1NiF4KUrcIX8ZoV8x3U9UyeWp+Dc0bAvrR8Jy5vcth1XvDW4ce/htLMm2sO4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730752971; c=relaxed/simple;
-	bh=8PmX7RaIvjkEK+PQLtTGT3XGax8uE2k9vKPbrvJsjds=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ig5WL4FjI6i4lHoDhqmsKlopnKDKmHuUjGm4qNLmMAl0J7GkfY9zji9a3UKGnjFm0+cr4bFkpNP63XEXDYHC36JWnNvHJldgwkwCIgsadcoFb0o/nY96nbdhwKR/nj2kWAOTsSjJ72GykMx/vt+XFBVTMDyJrnzE9hnj9zg2+bs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U8TdI6Q1; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-460a8d1a9b7so3561cf.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 12:42:49 -0800 (PST)
+	s=arc-20240116; t=1730753308; c=relaxed/simple;
+	bh=8EnhGD2qlhj8Z6sW8iG8NB8c0Is3MLT8Zp3OfNibmls=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UfZRazksIOZMOy5A8nOX81Phz6JgpEig3MQ3D4smFwULa81pCai/7W23DZPcUhYxajDha3aUGQYiNNG+OvCgnVBV5KNiOG3MIvus31gDp84Zvm/HqSFkqTL7ez5fQxsBNo8WvQDMawfI/qHrAZ123RCUpX2JOYzkvPqCJN4sl1E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=SFbxJ06E; arc=none smtp.client-ip=209.85.214.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f182.google.com with SMTP id d9443c01a7336-20ca388d242so46239395ad.2;
+        Mon, 04 Nov 2024 12:48:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730752968; x=1731357768; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=8PmX7RaIvjkEK+PQLtTGT3XGax8uE2k9vKPbrvJsjds=;
-        b=U8TdI6Q1V6pU5frihgy14y9cc9g9vfJknVu6Eg4GojvnguAhoFkmucHVotqcoqcFvx
-         9ZHBwBA+ts1KxQ6UdWuyjAurhpL7eYgzcvFDAcFrBPggbCwCwTnGVBpdScFJPi0Ud8F+
-         a5kQvofijlZpyZVGeBaP7jMafzLHlunz76jDR2/A6LqbcOIcbVhlhJ1AGJF6ccodMObo
-         soW5Q0ujnEXlGBI7K93++nq/uYlcH+LgZ1QPVOpWwpVDmrmkrPsDHrp9gEmNFuJVachw
-         UHPEV+UTy6BAeADU6FPIdolGgGgeFQa8TNoiXmIZdwwltq/VI/4l2AfX2PFc/YgLn1/s
-         Kpjw==
+        d=gmail.com; s=20230601; t=1730753306; x=1731358106; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fg1kGUhfncmA8PwYI9BJDMVXGlhNrkCz2YzfyCWQjec=;
+        b=SFbxJ06EFjXT/t29Ed+YYUdBlBMylJ7uvdlKBb/bxpzsSDXpL8yAF+FR/uUhXHODcw
+         uJXDeMO7M3Rmo71MSGgeePwLyaRxRJKm76YjQOcDf2wT2gznO4iecjRXuhlMjbdOiNao
+         dWgqM4Q8gW0avR2SLnXN+WMChiPB/RI/sUqi/IG+jwiHamnCkdzHpnWYLQtwaQQfuzJr
+         ge2jfbZ+CagevtsFaGqVS+GJELpEoFiSGh3VBrqfl2Cq4B9PcJDbZmrDFFiToY9fWR1O
+         pHoRCrV7gDyfTzZAu55QU60CQxJiWAwNpTEqBLXKl39KpqSPBwZfI6rD1lyUmeTqcvuN
+         XD+g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730752968; x=1731357768;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=8PmX7RaIvjkEK+PQLtTGT3XGax8uE2k9vKPbrvJsjds=;
-        b=WdwPboa/eEhZK4e6Lx5SAlHqMvBdg/2jvNNLnC+bRkmnNZMBHh/OsdY+DMgJ8gClXo
-         aGXxjLFQ7LeHtWNnZcFq1ItcxwyL18P2ywVg2wEcrxGvZVWUbgJ0vuI/z5+MhIrEWWV5
-         d8XahK6XFsP1rYLrpyUlPLv4UCualnubr8vtLnxJFYhNHMHf0ni7aRn1r1QWrhoPE1Kq
-         BF3jAHu1AbX9Uaas0p2TmoCvSqF5CNN2Ltl+Cso0nkCcXWHyNMMdIq8j+FuksJfXjxJV
-         SU1WsGzp9oYaTvIfJJU6JB0hlozWd3GG3QZrCc4ReN4C8920H0hRZTWKQ/e03OWOyPnu
-         BaRw==
-X-Forwarded-Encrypted: i=1; AJvYcCXVTqQD4udVGeW8jlc7/HzBRlolVMNzPXD/LLL3xqi90EmdP29YwDUT9bsh3YA0MIk8ChB2ADs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxFcfonFLrojDF8avPojm/qP/rIDSgrFX0jnv7AaCMWiBVHZ+r5
-	A3GEhnh2JsEO0DlP7CEm7ftaSHGRrBN3hLUob+eCqvWnol89ySKkbZZ2bgtcNXF2ylKvtr9kX9A
-	tgBgAjvue+HUxIK1Tc5y+MFNtcXMs+v6TvhPX
-X-Gm-Gg: ASbGnct7hvkBGrLtevoGaNt4jsRzSo7QYxVhh9HvLImHk4Jxu9JuSvQ7ACPjEYjtVAA
-	C0BmW2CzDlNidRmrJ7DPmpGK2pv0NlQVcC4PT37z52QqQg6o074jW1z0y1XO8QQ==
-X-Google-Smtp-Source: AGHT+IF8KEUvR6ShAUb62i2/hqb5tzvwP5sN5/CtADH1jCZKF0LNCkaZFCUAEApze4pgZOCwJIvye90AtkCSSZu6lIQ=
-X-Received: by 2002:ac8:5884:0:b0:461:6b1a:26ae with SMTP id
- d75a77b69052e-462e50c958emr761261cf.29.1730752968300; Mon, 04 Nov 2024
- 12:42:48 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730753306; x=1731358106;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fg1kGUhfncmA8PwYI9BJDMVXGlhNrkCz2YzfyCWQjec=;
+        b=ABvzZbXYWwYeVEv0Svo/6E6TZ5DVLeatKzHF7fRtpG9jF3U9wkDZLTChYnul++vABk
+         YPg2goPd+zCfbDEklBwEbD6GznM4UPwsU4ragtrzBqi8SqVuC0SPhfHM8U7Pm8S4NUbl
+         156dg2UQI+U5gKXfWHlL4YVv6C62BNiyRb+HGiyHgrS1r5C1oD27kudh06xN8u0qazTg
+         uzKGh5BIGkFHaxTASKlExuBYtBUjzknuxY64aACbt4m1qflUyNNYQitkiRVHQZKy0ex5
+         tyh+D+GpT3ka/ME29bC8o29ErBChUoF//nf+zBPglR9HlqgyGjYSKblfkroU4yDzYDi4
+         Cshg==
+X-Forwarded-Encrypted: i=1; AJvYcCXtKIXmXIXjhSem6b2qOcAqsoQXP6kc3tJecrUhRFhON9h+NPIbQaU+DpZdWABCGYbeJQUso0UTQXzYHO4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy3FO2Hmf/KqVWJPND5ijzrby2sdNVwThT3Zg3ri0ofTrCcAYmF
+	iRv/MBfOtxr+RzLljcLy/VbKKy9USAfBbBvFGuD+O33SxMHaKMmPxvnoOX4t
+X-Google-Smtp-Source: AGHT+IHfHRv0jMa19eosOtiDt2co1VlwhIZJtgvkHrlXq/nss6E70COsdiTiL3FykNuKgAYgTyWVrw==
+X-Received: by 2002:a17:903:1c7:b0:206:a87c:2864 with SMTP id d9443c01a7336-2111afd6ca6mr155354385ad.42.1730753305647;
+        Mon, 04 Nov 2024 12:48:25 -0800 (PST)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057a6815sm66245235ad.135.2024.11.04.12.48.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 12:48:25 -0800 (PST)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jian Shen <shenjian15@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Jijie Shao <shaojijie@huawei.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2 net-next] net: hisilicon: hns3: use ethtool string helpers
+Date: Mon,  4 Nov 2024 12:48:23 -0800
+Message-ID: <20241104204823.297277-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241007221603.1703699-1-dw@davidwei.uk> <20241007221603.1703699-7-dw@davidwei.uk>
- <CAHS8izPFp_Q1OngcwZDQeo=YD+nnA9vyVqhuaT--+uREEkfujQ@mail.gmail.com>
- <9f1897b3-0cea-4822-8e33-a4cab278b2ac@gmail.com> <CAHS8izOxsLc82jX=b3cwEctASerQabKR=Kqqio2Rs7hVkDHL4A@mail.gmail.com>
- <5d7925ed-91bf-4c78-8b70-598ae9ab3885@davidwei.uk> <CAHS8izNt8pfBwGnRNWphN4vJJ=1yJX=++-RmGVHrVOvy59=13Q@mail.gmail.com>
- <6acf95a6-2ddc-4eee-a6e1-257ac8d41285@gmail.com> <CAHS8izNXOSGCAT6zvwTOpW7uomuA5L7EwuVD75gyeh2pmqyE2w@mail.gmail.com>
- <58046d4d-4dff-42c2-ae89-a69c2b43e295@gmail.com> <CAHS8izO6aBdHkN5QF8Z57qGwop3+XObd5T6P8VnMdyT=FUDO1A@mail.gmail.com>
- <2771e23a-2f4b-43c7-9d2a-3fa6aad26d53@gmail.com>
-In-Reply-To: <2771e23a-2f4b-43c7-9d2a-3fa6aad26d53@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 4 Nov 2024 12:42:36 -0800
-Message-ID: <CAHS8izNvrUx1cEFFAEdY-AsrVh3ttX6WtAc9NHEXfyw3bKBnDg@mail.gmail.com>
-Subject: Re: [PATCH v1 06/15] net: page_pool: add ->scrub mem provider callback
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 1, 2024 at 2:38=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 11/1/24 19:24, Mina Almasry wrote:
-> > On Fri, Nov 1, 2024 at 11:34=E2=80=AFAM Pavel Begunkov <asml.silence@gm=
-ail.com> wrote:
-> ...
-> >>> Huh, interesting. For devmem TCP we bind a region of memory to the
-> >>> queue once, and after that we can create N connections all reusing th=
-e
-> >>> same memory region. Is that not the case for io_uring? There are no
-> >>
-> >> Hmm, I think we already discussed the same question before. Yes, it
-> >> does indeed support arbitrary number of connections. For what I was
-> >> saying above, the devmem TCP analogy would be attaching buffers to the
-> >> netlink socket instead of a tcp socket (that new xarray you added) whe=
-n
-> >> you give it to user space. Then, you can close the connection after a
-> >> receive and the buffer you've got would still be alive.
-> >>
-> >
-> > Ah, I see. You're making a tradeoff here. You leave the buffers alive
-> > after each connection so the userspace can still use them if it wishes
-> > but they are of course unavailable for other connections.
-> >
-> > But in our case (and I'm guessing yours) the process that will set up
-> > the io_uring memory provider/RSS/flow steering will be a different
-> > process from the one that sends/receive data, no? Because the former
-> > requires CAP_NET_ADMIN privileges while the latter will not. If they
-> > are 2 different processes, what happens when the latter process doing
-> > the send/receive crashes? Does the memory stay unavailable until the
-> > CAP_NET_ADMIN process exits? Wouldn't it be better to tie the lifetime
-> > of the buffers of the connection? Sure, the buffers will become
->
-> That's the tradeoff google is willing to do in the framework,
-> which is fine, but it's not without cost, e.g. you need to
-> store/erase into the xarray, and it's a design choice in other
-> aspects, like you can't release the page pool if the socket you
-> got a buffer from is still alive but the net_iov hasn't been
-> returned.
->
-> > unavailable after the connection is closed, but at least you don't
-> > 'leak' memory on send/receive process crashes.
-> >
-> > Unless of course you're saying that only CAP_NET_ADMIN processes will
->
-> The user can pass io_uring instance itself
->
+The latter is the preferred way to copy ethtool strings.
 
-Thanks, but sorry, my point still stands. If the CAP_NET_ADMIN passes
-the io_uring instance to the process doing the send/receive, then the
-latter process crashes, do the io_uring netmems leak until the
-page_pool is destroyed? Or are they cleaned up because the io_uring
-instance is destroyed with the process crashing, and the io_uring will
-destroy the page_pool on exit?
+Avoids manually incrementing the pointer. Cleans up the code quite well.
 
---=20
-Thanks,
-Mina
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+Reviewed-by: Jijie Shao <shaojijie@huawei.com>
+Tested-by: Jijie Shao <shaojijie@huawei.com>
+---
+ v2: remove now useless define MAX_PREFIX_LENGTH
+ drivers/net/ethernet/hisilicon/hns3/hnae3.h   |  2 +-
+ .../hns3/hns3_common/hclge_comm_tqp_stats.c   | 11 ++--
+ .../hns3/hns3_common/hclge_comm_tqp_stats.h   |  2 +-
+ .../ethernet/hisilicon/hns3/hns3_ethtool.c    | 54 ++++++-------------
+ .../hisilicon/hns3/hns3pf/hclge_main.c        | 50 +++++++----------
+ .../hisilicon/hns3/hns3vf/hclgevf_main.c      |  6 +--
+ 6 files changed, 44 insertions(+), 81 deletions(-)
+
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hnae3.h b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+index 27dbe367f3d3..710a8f9f2248 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hnae3.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hnae3.h
+@@ -677,7 +677,7 @@ struct hnae3_ae_ops {
+ 	void (*get_mac_stats)(struct hnae3_handle *handle,
+ 			      struct hns3_mac_stats *mac_stats);
+ 	void (*get_strings)(struct hnae3_handle *handle,
+-			    u32 stringset, u8 *data);
++			    u32 stringset, u8 **data);
+ 	int (*get_sset_count)(struct hnae3_handle *handle, int stringset);
+ 
+ 	void (*get_regs)(struct hnae3_handle *handle, u32 *version,
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
+index 2b31188ff555..f9a3d6fc4416 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.c
+@@ -36,27 +36,22 @@ int hclge_comm_tqps_get_sset_count(struct hnae3_handle *handle)
+ }
+ EXPORT_SYMBOL_GPL(hclge_comm_tqps_get_sset_count);
+ 
+-u8 *hclge_comm_tqps_get_strings(struct hnae3_handle *handle, u8 *data)
++void hclge_comm_tqps_get_strings(struct hnae3_handle *handle, u8 **data)
+ {
+ 	struct hnae3_knic_private_info *kinfo = &handle->kinfo;
+-	u8 *buff = data;
+ 	u16 i;
+ 
+ 	for (i = 0; i < kinfo->num_tqps; i++) {
+ 		struct hclge_comm_tqp *tqp =
+ 			container_of(kinfo->tqp[i], struct hclge_comm_tqp, q);
+-		snprintf(buff, ETH_GSTRING_LEN, "txq%u_pktnum_rcd", tqp->index);
+-		buff += ETH_GSTRING_LEN;
++		ethtool_sprintf(data, "txq%u_pktnum_rcd", tqp->index);
+ 	}
+ 
+ 	for (i = 0; i < kinfo->num_tqps; i++) {
+ 		struct hclge_comm_tqp *tqp =
+ 			container_of(kinfo->tqp[i], struct hclge_comm_tqp, q);
+-		snprintf(buff, ETH_GSTRING_LEN, "rxq%u_pktnum_rcd", tqp->index);
+-		buff += ETH_GSTRING_LEN;
++		ethtool_sprintf(data, "rxq%u_pktnum_rcd", tqp->index);
+ 	}
+-
+-	return buff;
+ }
+ EXPORT_SYMBOL_GPL(hclge_comm_tqps_get_strings);
+ 
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.h b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.h
+index a46350162ee8..b9ff424c0bc2 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.h
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_common/hclge_comm_tqp_stats.h
+@@ -32,7 +32,7 @@ struct hclge_comm_tqp {
+ 
+ u64 *hclge_comm_tqps_get_stats(struct hnae3_handle *handle, u64 *data);
+ int hclge_comm_tqps_get_sset_count(struct hnae3_handle *handle);
+-u8 *hclge_comm_tqps_get_strings(struct hnae3_handle *handle, u8 *data);
++void hclge_comm_tqps_get_strings(struct hnae3_handle *handle, u8 **data);
+ void hclge_comm_reset_tqp_stats(struct hnae3_handle *handle);
+ int hclge_comm_tqps_update_stats(struct hnae3_handle *handle,
+ 				 struct hclge_comm_hw *hw);
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+index 97eaeec1952b..34a07fffadbb 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+@@ -509,54 +509,37 @@ static int hns3_get_sset_count(struct net_device *netdev, int stringset)
+ 	}
+ }
+ 
+-static void *hns3_update_strings(u8 *data, const struct hns3_stats *stats,
+-		u32 stat_count, u32 num_tqps, const char *prefix)
++static void hns3_update_strings(u8 **data, const struct hns3_stats *stats,
++				u32 stat_count, u32 num_tqps,
++				const char *prefix)
+ {
+-#define MAX_PREFIX_SIZE (6 + 4)
+-	u32 size_left;
+ 	u32 i, j;
+-	u32 n1;
+ 
+-	for (i = 0; i < num_tqps; i++) {
+-		for (j = 0; j < stat_count; j++) {
+-			data[ETH_GSTRING_LEN - 1] = '\0';
+-
+-			/* first, prepend the prefix string */
+-			n1 = scnprintf(data, MAX_PREFIX_SIZE, "%s%u_",
+-				       prefix, i);
+-			size_left = (ETH_GSTRING_LEN - 1) - n1;
+-
+-			/* now, concatenate the stats string to it */
+-			strncat(data, stats[j].stats_string, size_left);
+-			data += ETH_GSTRING_LEN;
+-		}
+-	}
+-
+-	return data;
++	for (i = 0; i < num_tqps; i++)
++		for (j = 0; j < stat_count; j++)
++			ethtool_sprintf(data, "%s%u_%s", prefix, i,
++					stats[j].stats_string);
+ }
+ 
+-static u8 *hns3_get_strings_tqps(struct hnae3_handle *handle, u8 *data)
++static void hns3_get_strings_tqps(struct hnae3_handle *handle, u8 **data)
+ {
+ 	struct hnae3_knic_private_info *kinfo = &handle->kinfo;
+ 	const char tx_prefix[] = "txq";
+ 	const char rx_prefix[] = "rxq";
+ 
+ 	/* get strings for Tx */
+-	data = hns3_update_strings(data, hns3_txq_stats, HNS3_TXQ_STATS_COUNT,
+-				   kinfo->num_tqps, tx_prefix);
++	hns3_update_strings(data, hns3_txq_stats, HNS3_TXQ_STATS_COUNT,
++			    kinfo->num_tqps, tx_prefix);
+ 
+ 	/* get strings for Rx */
+-	data = hns3_update_strings(data, hns3_rxq_stats, HNS3_RXQ_STATS_COUNT,
+-				   kinfo->num_tqps, rx_prefix);
+-
+-	return data;
++	hns3_update_strings(data, hns3_rxq_stats, HNS3_RXQ_STATS_COUNT,
++			    kinfo->num_tqps, rx_prefix);
+ }
+ 
+ static void hns3_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+ {
+ 	struct hnae3_handle *h = hns3_get_handle(netdev);
+ 	const struct hnae3_ae_ops *ops = h->ae_algo->ops;
+-	char *buff = (char *)data;
+ 	int i;
+ 
+ 	if (!ops->get_strings)
+@@ -564,18 +547,15 @@ static void hns3_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+ 
+ 	switch (stringset) {
+ 	case ETH_SS_STATS:
+-		buff = hns3_get_strings_tqps(h, buff);
+-		ops->get_strings(h, stringset, (u8 *)buff);
++		hns3_get_strings_tqps(h, &data);
++		ops->get_strings(h, stringset, &data);
+ 		break;
+ 	case ETH_SS_TEST:
+-		ops->get_strings(h, stringset, data);
++		ops->get_strings(h, stringset, &data);
+ 		break;
+ 	case ETH_SS_PRIV_FLAGS:
+-		for (i = 0; i < HNS3_PRIV_FLAGS_LEN; i++) {
+-			snprintf(buff, ETH_GSTRING_LEN, "%s",
+-				 hns3_priv_flags[i].name);
+-			buff += ETH_GSTRING_LEN;
+-		}
++		for (i = 0; i < HNS3_PRIV_FLAGS_LEN; i++)
++			ethtool_puts(&data, hns3_priv_flags[i].name);
+ 		break;
+ 	default:
+ 		break;
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+index 728f4777e51f..5fc08d686d25 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3pf/hclge_main.c
+@@ -595,25 +595,21 @@ static u64 *hclge_comm_get_stats(struct hclge_dev *hdev,
+ 	return buf;
+ }
+ 
+-static u8 *hclge_comm_get_strings(struct hclge_dev *hdev, u32 stringset,
+-				  const struct hclge_comm_stats_str strs[],
+-				  int size, u8 *data)
++static void hclge_comm_get_strings(struct hclge_dev *hdev, u32 stringset,
++				   const struct hclge_comm_stats_str strs[],
++				   int size, u8 **data)
+ {
+-	char *buff = (char *)data;
+ 	u32 i;
+ 
+ 	if (stringset != ETH_SS_STATS)
+-		return buff;
++		return;
+ 
+ 	for (i = 0; i < size; i++) {
+ 		if (strs[i].stats_num > hdev->ae_dev->dev_specs.mac_stats_num)
+ 			continue;
+ 
+-		snprintf(buff, ETH_GSTRING_LEN, "%s", strs[i].desc);
+-		buff = buff + ETH_GSTRING_LEN;
++		ethtool_puts(data, strs[i].desc);
+ 	}
+-
+-	return (u8 *)buff;
+ }
+ 
+ static void hclge_update_stats_for_all(struct hclge_dev *hdev)
+@@ -718,44 +714,38 @@ static int hclge_get_sset_count(struct hnae3_handle *handle, int stringset)
+ }
+ 
+ static void hclge_get_strings(struct hnae3_handle *handle, u32 stringset,
+-			      u8 *data)
++			      u8 **data)
+ {
+ 	struct hclge_vport *vport = hclge_get_vport(handle);
+ 	struct hclge_dev *hdev = vport->back;
+-	u8 *p = (char *)data;
++	const char *str;
+ 	int size;
+ 
+ 	if (stringset == ETH_SS_STATS) {
+ 		size = ARRAY_SIZE(g_mac_stats_string);
+-		p = hclge_comm_get_strings(hdev, stringset, g_mac_stats_string,
+-					   size, p);
+-		p = hclge_comm_tqps_get_strings(handle, p);
++		hclge_comm_get_strings(hdev, stringset, g_mac_stats_string,
++				       size, data);
++		hclge_comm_tqps_get_strings(handle, data);
+ 	} else if (stringset == ETH_SS_TEST) {
+ 		if (handle->flags & HNAE3_SUPPORT_EXTERNAL_LOOPBACK) {
+-			memcpy(p, hns3_nic_test_strs[HNAE3_LOOP_EXTERNAL],
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
++			str = hns3_nic_test_strs[HNAE3_LOOP_EXTERNAL];
++			ethtool_puts(data, str);
+ 		}
+ 		if (handle->flags & HNAE3_SUPPORT_APP_LOOPBACK) {
+-			memcpy(p, hns3_nic_test_strs[HNAE3_LOOP_APP],
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
++			str = hns3_nic_test_strs[HNAE3_LOOP_APP];
++			ethtool_puts(data, str);
+ 		}
+ 		if (handle->flags & HNAE3_SUPPORT_SERDES_SERIAL_LOOPBACK) {
+-			memcpy(p, hns3_nic_test_strs[HNAE3_LOOP_SERIAL_SERDES],
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
++			str = hns3_nic_test_strs[HNAE3_LOOP_SERIAL_SERDES];
++			ethtool_puts(data, str);
+ 		}
+ 		if (handle->flags & HNAE3_SUPPORT_SERDES_PARALLEL_LOOPBACK) {
+-			memcpy(p,
+-			       hns3_nic_test_strs[HNAE3_LOOP_PARALLEL_SERDES],
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
++			str = hns3_nic_test_strs[HNAE3_LOOP_PARALLEL_SERDES];
++			ethtool_puts(data, str);
+ 		}
+ 		if (handle->flags & HNAE3_SUPPORT_PHY_LOOPBACK) {
+-			memcpy(p, hns3_nic_test_strs[HNAE3_LOOP_PHY],
+-			       ETH_GSTRING_LEN);
+-			p += ETH_GSTRING_LEN;
++			str = hns3_nic_test_strs[HNAE3_LOOP_PHY];
++			ethtool_puts(data, str);
+ 		}
+ 	}
+ }
+diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+index 896f1eb172d3..8739da317897 100644
+--- a/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
++++ b/drivers/net/ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c
+@@ -130,12 +130,10 @@ static int hclgevf_get_sset_count(struct hnae3_handle *handle, int strset)
+ }
+ 
+ static void hclgevf_get_strings(struct hnae3_handle *handle, u32 strset,
+-				u8 *data)
++				u8 **data)
+ {
+-	u8 *p = (char *)data;
+-
+ 	if (strset == ETH_SS_STATS)
+-		p = hclge_comm_tqps_get_strings(handle, p);
++		hclge_comm_tqps_get_strings(handle, data);
+ }
+ 
+ static void hclgevf_get_stats(struct hnae3_handle *handle, u64 *data)
+-- 
+2.47.0
+
 
