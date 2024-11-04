@@ -1,165 +1,139 @@
-Return-Path: <netdev+bounces-141561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF5159BB686
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 14:43:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 30B919BB68F
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 14:43:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2C71AB23504
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:42:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D94BF1F20F3F
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:43:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6CE9224F6;
-	Mon,  4 Nov 2024 13:42:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 185AE70829;
+	Mon,  4 Nov 2024 13:43:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="wIl3ckA9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Pu7BHzmW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19ED98BEE;
-	Mon,  4 Nov 2024 13:42:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1EB68224F6;
+	Mon,  4 Nov 2024 13:43:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730727773; cv=none; b=mThrADVW4meo/MvVSw8ZB4MbjZuta4iIZl6MYa69fr+BHmDCy7aiJ6aQRUn5PsFzyGEMnqdZyF5XLGrYlGq8NQOCfRIicqM1W3sb/VnCopqljbf8oQIoUezWmP2H6mNjaD9N2jm1LTHoY2RW5cm70jXhISnMhgqK+dDhoQK6dv0=
+	t=1730727799; cv=none; b=BDmtCZpMFjPekRdl+Q13MP8gBaQh/oxNG7/6Ms3DekaFqdaet5Byv6tYGlyHivWdZHw36rWGjSXucsXPzokF6IEIcPCUOLse9ookkaTsz8vPnq+CfAsocRfGl/UtE70lHA+0WQVheHtigU4lS9N6Svkzz8uH/P5ciVCmbJxCd9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730727773; c=relaxed/simple;
-	bh=19K1akdAErOr697EFRw24TKIGKC8ZAe5FwEKvCMX90M=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=HSoiV5BH2vt2wzjKPNfnWDVayhq2PjSbEhhk0YmL1QITZ0T1wp+JY4AvZ0do9+u8g3XPpAnSkURsdvtcQfF3hC7Sqwu4eqF224nqTdGnJYWPGUHWTNnlubfi5RS7z83PAlZlGhisNifuypFr00gQDnDRWzqILZxCsxb8YbJSRj8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.com; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=wIl3ckA9; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730727772; x=1762263772;
-  h=references:from:to:cc:subject:date:in-reply-to:
-   message-id:mime-version;
-  bh=Qa/srygtponKFMHad9K5Zrj8KYozifJ/bpljTaDS7Jk=;
-  b=wIl3ckA9a99H8dlISM5vQduWac/SvL7ewsDcrvcjsY6kavIkvguROGEO
-   AGi+/llm4RtTy8oZkaPuOdstiea48WtjF57bJ3olS2XmWwaYosaKvyidH
-   ovd+/kqnopsm6STECEUo4GANIh/OflN9LW3R4ItbyYqnoJ52KU7Htum9V
-   g=;
-X-IronPort-AV: E=Sophos;i="6.11,257,1725321600"; 
-   d="scan'208";a="440104328"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-east-1.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 13:42:48 +0000
-Received: from EX19MTAEUB001.ant.amazon.com [10.0.43.254:39364]
- by smtpin.naws.eu-west-1.prod.farcaster.email.amazon.dev [10.0.2.199:2525] with esmtp (Farcaster)
- id c38ac48c-0061-4fba-bda0-ac78022b4880; Mon, 4 Nov 2024 13:42:47 +0000 (UTC)
-X-Farcaster-Flow-ID: c38ac48c-0061-4fba-bda0-ac78022b4880
-Received: from EX19D028EUB003.ant.amazon.com (10.252.61.31) by
- EX19MTAEUB001.ant.amazon.com (10.252.51.26) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 4 Nov 2024 13:42:45 +0000
-Received: from u95c7fd9b18a35b.ant.amazon.com.amazon.com (10.13.248.51) by
- EX19D028EUB003.ant.amazon.com (10.252.61.31) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Mon, 4 Nov 2024 13:42:39 +0000
-References: <20241101214828.289752-1-rosenp@gmail.com>
- <20241101214828.289752-3-rosenp@gmail.com>
-User-agent: mu4e 1.10.3; emacs 29.3
-From: Shay Agroskin <shayagr@amazon.com>
-To: Rosen Penev <rosenp@gmail.com>
-CC: <netdev@vger.kernel.org>, Arthur Kiyanovski <akiyano@amazon.com>, "David
- Arinzon" <darinzon@amazon.com>, Noam Dagan <ndagan@amazon.com>, "Saeed
- Bishara" <saeedb@amazon.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jian Shen
-	<shenjian15@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Jijie Shao
-	<shaojijie@huawei.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] net: ena: simplify some pointer addition
-Date: Mon, 4 Nov 2024 15:36:52 +0200
-In-Reply-To: <20241101214828.289752-3-rosenp@gmail.com>
-Message-ID: <pj41zlzfmfktdh.fsf@u95c7fd9b18a35b.ant.amazon.com>
+	s=arc-20240116; t=1730727799; c=relaxed/simple;
+	bh=pfdLiPHWAnRK8GzYwwj/H0Doi1Poy7yrH+c1hhjKyKY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=NoWBdkd6qMkTht7GOcHCd0FTm1STN+S5H08lyjHX2gvvpoSkucdG7ZSbJw0of/0ugQgG3Ov3ErT6sqnUFQx6ak2xBO39Bq9zn3YE9Cjq7eLSikbuRulfNfhlewDNM+O4zpSefaewrNDTohXCiyUTOxJjtU6RUghicBw9JNHUudg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Pu7BHzmW; arc=none smtp.client-ip=198.175.65.19
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730727797; x=1762263797;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=pfdLiPHWAnRK8GzYwwj/H0Doi1Poy7yrH+c1hhjKyKY=;
+  b=Pu7BHzmWw09b6iho+waKzqw5GjtM2GXduUPXXxboPG4LI6Z3bPhlT35j
+   Dbmq06UZg1AXxgM6JYwz2GkUK4MNDE6ctEFbOF4JN5JemBwMmMoaCAo+Y
+   w3Bl00rp3yQ1PWgir21hWA89YaTiIv+YA/3kWW628sTYivrMDULXuMlOd
+   Fz77Bu5FtwdarU5oXWqnP67FxA5gKOd7nyLdWlojcxTl2RnytLQPDeSHT
+   Sj90luAv/yWQjsmrVmqWc1KuZHE/X4NK0kmwLL6j9nWE7MJ8egfS0J0xL
+   +4Cb3DTMh1Rl8V7q6mMP6Uk03B76TeskuhDCdN23Jf+piThHNcV8r3To7
+   Q==;
+X-CSE-ConnectionGUID: Zs8pT3+FRl+5EP89JTNcgw==
+X-CSE-MsgGUID: dl9/WXkeSn2NXvidIJzEhA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30277541"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="30277541"
+Received: from orviesa009.jf.intel.com ([10.64.159.149])
+  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 05:43:17 -0800
+X-CSE-ConnectionGUID: oGMnb9OtSJe8Y/GlKwE3PQ==
+X-CSE-MsgGUID: jU7S/xEYSwCy9/t5rk1LUA==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="83544510"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa009.jf.intel.com with ESMTP; 04 Nov 2024 05:43:15 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t7xMN-000krB-30;
+	Mon, 04 Nov 2024 13:43:11 +0000
+Date: Mon, 4 Nov 2024 21:42:46 +0800
+From: kernel test robot <lkp@intel.com>
+To: Alistair Francis <alistair23@gmail.com>, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, linux@armlinux.org.uk,
+	hkallweit1@gmail.com, andrew@lunn.ch, alistair23@gmail.com,
+	Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH] include: mdio: Guard inline function with CONFIG_MDIO
+Message-ID: <202411042121.OYNPibb0-lkp@intel.com>
+References: <20241104070950.502719-1-alistair.francis@wdc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; format=flowed
-X-ClientProxiedBy: EX19D044UWA001.ant.amazon.com (10.13.139.100) To
- EX19D028EUB003.ant.amazon.com (10.252.61.31)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104070950.502719-1-alistair.francis@wdc.com>
+
+Hi Alistair,
+
+kernel test robot noticed the following build errors:
+
+[auto build test ERROR on linus/master]
+[also build test ERROR on horms-ipvs/master v6.12-rc6 next-20241104]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Alistair-Francis/include-mdio-Guard-inline-function-with-CONFIG_MDIO/20241104-151211
+base:   linus/master
+patch link:    https://lore.kernel.org/r/20241104070950.502719-1-alistair.francis%40wdc.com
+patch subject: [PATCH] include: mdio: Guard inline function with CONFIG_MDIO
+config: parisc-allmodconfig (https://download.01.org/0day-ci/archive/20241104/202411042121.OYNPibb0-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241104/202411042121.OYNPibb0-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411042121.OYNPibb0-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+   drivers/net/ethernet/sfc/falcon/qt202x_phy.c: In function 'qt202x_phy_get_link_ksettings':
+>> drivers/net/ethernet/sfc/falcon/qt202x_phy.c:440:9: error: implicit declaration of function 'mdio45_ethtool_ksettings_get' [-Wimplicit-function-declaration]
+     440 |         mdio45_ethtool_ksettings_get(&efx->mdio, cmd);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--
+   drivers/net/ethernet/sfc/falcon/tenxpress.c: In function 'tenxpress_get_link_ksettings':
+>> drivers/net/ethernet/sfc/falcon/tenxpress.c:453:9: error: implicit declaration of function 'mdio45_ethtool_ksettings_get_npage' [-Wimplicit-function-declaration]
+     453 |         mdio45_ethtool_ksettings_get_npage(&efx->mdio, cmd, adv, lpa);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--
+   drivers/net/ethernet/sfc/falcon/txc43128_phy.c: In function 'txc43128_get_link_ksettings':
+>> drivers/net/ethernet/sfc/falcon/txc43128_phy.c:543:9: error: implicit declaration of function 'mdio45_ethtool_ksettings_get' [-Wimplicit-function-declaration]
+     543 |         mdio45_ethtool_ksettings_get(&efx->mdio, cmd);
+         |         ^~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-Rosen Penev <rosenp@gmail.com> writes:
+vim +/mdio45_ethtool_ksettings_get +440 drivers/net/ethernet/sfc/falcon/qt202x_phy.c
 
-> Use ethtool_sprintf to simplify the code.
->
-> Because strings_buf is separate from buf, it needs to be 
-> incremented
-> separately.
->
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/net/ethernet/amazon/ena/ena_ethtool.c | 17 
->  ++++++++---------
->  1 file changed, 8 insertions(+), 9 deletions(-)
->
-> diff --git a/drivers/net/ethernet/amazon/ena/ena_ethtool.c 
-> b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-> index fa9d7b8ec00d..96fa55a88faf 100644
-> --- a/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-> +++ b/drivers/net/ethernet/amazon/ena/ena_ethtool.c
-> @@ -1120,7 +1120,7 @@ static void ena_dump_stats_ex(struct 
-> ena_adapter *adapter, u8 *buf)
->  	u8 *strings_buf;
->  	u64 *data_buf;
->  	int strings_num;
-> -	int i, rc;
-> +	int i;
->
->  	strings_num = ena_get_sw_stats_count(adapter);
->  	if (strings_num <= 0) {
-> @@ -1149,17 +1149,16 @@ static void ena_dump_stats_ex(struct 
-> ena_adapter *adapter, u8 *buf)
->  	/* If there is a buffer, dump stats, otherwise print them 
->  to dmesg */
->  	if (buf)
->  		for (i = 0; i < strings_num; i++) {
-> -			rc = snprintf(buf, ETH_GSTRING_LEN + 
-> sizeof(u64),
-> -				      "%s %llu\n",
-> -				      strings_buf + i * 
-> ETH_GSTRING_LEN,
-> -				      data_buf[i]);
-> -			buf += rc;
-> +			ethtool_sprintf(&buf, "%s %llu\n", 
-> strings_buf,
-> +					data_buf[i]);
-> +			strings_buf += ETH_GSTRING_LEN;
->  		}
->  	else
-> -		for (i = 0; i < strings_num; i++)
-> +		for (i = 0; i < strings_num; i++) {
->  			netif_err(adapter, drv, netdev, "%s: 
->  %llu\n",
-> -				  strings_buf + i * 
-> ETH_GSTRING_LEN,
-> -				  data_buf[i]);
-> +				  strings_buf, data_buf[i]);
-> +			strings_buf += ETH_GSTRING_LEN;
-> +		}
->
->  	kfree(strings_buf);
->  	kfree(data_buf);
+8ceee660aacb29 drivers/net/sfc/xfp_phy.c                    Ben Hutchings   2008-04-27  436  
+e938ed150f1ed9 drivers/net/ethernet/sfc/falcon/qt202x_phy.c Philippe Reynes 2017-01-01  437  static void qt202x_phy_get_link_ksettings(struct ef4_nic *efx,
+e938ed150f1ed9 drivers/net/ethernet/sfc/falcon/qt202x_phy.c Philippe Reynes 2017-01-01  438  					  struct ethtool_link_ksettings *cmd)
+68e7f45e118f98 drivers/net/sfc/xfp_phy.c                    Ben Hutchings   2009-04-29  439  {
+e938ed150f1ed9 drivers/net/ethernet/sfc/falcon/qt202x_phy.c Philippe Reynes 2017-01-01 @440  	mdio45_ethtool_ksettings_get(&efx->mdio, cmd);
+68e7f45e118f98 drivers/net/sfc/xfp_phy.c                    Ben Hutchings   2009-04-29  441  }
+8ceee660aacb29 drivers/net/sfc/xfp_phy.c                    Ben Hutchings   2008-04-27  442  
 
-Thank you for submitting the patch. If I'm not mistaken, there are 
-some bugs introduced here:
-
-1. You update string_buf pointer itself, but later you pass the 
-variable to kfree, this
-   would likely end up freeing the wrong address (/causing a 
-   kernel panic)
-2. The ethtool_sprintf increases the `buf` pointer by 
-ETH_GSTRING_LEN, while the previous code increased it
-   by (ETH_GSTRING_LEN + sizeof(u64)) bytes.
-   This causes a corruption in the buffer.
-
-This function and mechanism is already planned for an overhaul in 
-a future patch. We prefer to leave this patch out.
-
-Thanks, Shay
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
