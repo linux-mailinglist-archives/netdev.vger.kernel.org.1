@@ -1,101 +1,124 @@
-Return-Path: <netdev+bounces-141464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5A909BB08A
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:05:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27B209BB0A9
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:10:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 55839B24E75
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:05:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E069A28260D
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:10:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73D001AF0D1;
-	Mon,  4 Nov 2024 10:05:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C97031B0F01;
+	Mon,  4 Nov 2024 10:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="jnyjXEyt"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6610A19309A;
-	Mon,  4 Nov 2024 10:05:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 749A51AF0DC;
+	Mon,  4 Nov 2024 10:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730714709; cv=none; b=HZTBVz6audzob+FsJltGvk8HAQMCT4oNAHsji2At5/UrmGjbCYMaaj3v8FxLLjp9IaZX7TSkaoYFmmnILyYHAUofJHTNAvH0xJCwD83ZbzjtELSNPXjaZpDOAYLw0/Ed1sq46uskm+oKx81FZGhbbi9tqhbTeo5/BdJl3AqJnhk=
+	t=1730715021; cv=none; b=ZKRIC2uIUivd8c4DnvvkCE90lUYOG/DqIxSnRaKzZ+8rfBOd8pJwU6qWwhoSdh+ccNEkybrmNYS/VHRekicExhTjkdZFsPvtnXlMXFOb3C4nEKwcC7e72fwhlXmlGP+6XMPJWRhjERyBpWr3trl7wscLZIIo67KAVer2QQhiGcY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730714709; c=relaxed/simple;
-	bh=oye8m5QukDJKi6MQxANktZb9h404h7pmP4bgpZ9W0cM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=r5JbpxScA/2LZrBl/Use8PBo56TjAxxH3MXS6BUBUx3NrXr4OTM85WQDft8ta8FyVTje4tiwFTnp19KJKRHUVqULeQe9qtLys+OOJ54NGPOPccERrfTvCbyibhc9Rxsa5qIz/W2Xpmve4IH2WTyHO6KE22xexqF6ge2yHI+pe8I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr; spf=pass smtp.mailfrom=ghiti.fr; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ghiti.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ghiti.fr
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B85F71BF209;
-	Mon,  4 Nov 2024 10:04:56 +0000 (UTC)
-Message-ID: <a48514dc-6fe0-4f06-a5ee-10b1cf0f55e1@ghiti.fr>
-Date: Mon, 4 Nov 2024 11:04:56 +0100
+	s=arc-20240116; t=1730715021; c=relaxed/simple;
+	bh=6ml2BT2raqF8G8x+buM0eWiADTiQBARWLyqnb/h1l28=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=EuwFiSOnN85sye116QaX0287SVGFNSW72ry4WqvYCJ1J35Mnt8zuuxMMXGrLovS9qY34pGpq8b7gHGuxqwzEljLyPmS4sE0N18XY4Oleg46GYFCIvnw6yO/Lai2Xurov1hNo1bv9x1KW7+BgimpzJaaK6rm4fHxiB5wVSiU4i+Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=jnyjXEyt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E603FC4CECE;
+	Mon,  4 Nov 2024 10:10:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730715021;
+	bh=6ml2BT2raqF8G8x+buM0eWiADTiQBARWLyqnb/h1l28=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=jnyjXEytSg4Dm0xzK4vuTLgkBxwZ/GX7mBQWaqRAntPAIU1v59qxD3oNhcM18YxMX
+	 r546u+w39gMnchf3pd1bD9X3zBzJKFO6DJnRj2Cx2KF7afLAlpWhGXhJjQ6ZevXFQ7
+	 q/h6iJTvDEcTw7VqawGHV4R5zuTQ9XoHe3TU5Kk2OAToHLmkLGpAHM8lQZdthSO6Gy
+	 ZEVU61Xgq1630a9a1eFAaG/3Y5ASwCNWo9rnrzL9QsKiYWByPwoXLFqBQOMi/EXnCP
+	 viQ3Ar0siICl5XbP7Y/S+GmsLhT0cZHUbz0gdoiphvkwAGRAgrTvMLaOA05AxcCeni
+	 Oh3+bqznOu8nA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF403805CC0;
+	Mon,  4 Nov 2024 10:10:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH bpf-next 1/2] libbpf: Add missing per-arch include path
-Content-Language: en-US
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, Charlie Jenkins <charlie@rivosinc.com>
-References: <20240927131355.350918-1-bjorn@kernel.org>
-From: Alexandre Ghiti <alex@ghiti.fr>
-In-Reply-To: <20240927131355.350918-1-bjorn@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-GND-Sasl: alex@ghiti.fr
+Subject: Re: [PATCH v6 net-next 00/12] add basic support for i.MX95 NETC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173071502951.4013812.6348392511340491502.git-patchwork-notify@kernel.org>
+Date: Mon, 04 Nov 2024 10:10:29 +0000
+References: <20241030093924.1251343-1-wei.fang@nxp.com>
+In-Reply-To: <20241030093924.1251343-1-wei.fang@nxp.com>
+To: Wei Fang <wei.fang@nxp.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ vladimir.oltean@nxp.com, claudiu.manoil@nxp.com, xiaoning.wang@nxp.com,
+ Frank.Li@nxp.com, christophe.leroy@csgroup.eu, linux@armlinux.org.uk,
+ horms@kernel.org, imx@lists.linux.dev, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-pci@vger.kernel.org, alexander.stein@ew.tq-group.com
 
-Hi Bjorn,
+Hello:
 
-On 27/09/2024 15:13, Björn Töpel wrote:
-> From: Björn Töpel <bjorn@rivosinc.com>
->
-> libbpf does not include the per-arch tools include path, e.g.
-> tools/arch/riscv/include. Some architectures depend those files to
-> build properly.
->
-> Include tools/arch/$(SUBARCH)/include in the libbpf build.
->
-> Fixes: 6d74d178fe6e ("tools: Add riscv barrier implementation")
-> Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
-> ---
->   tools/lib/bpf/Makefile | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
->
-> diff --git a/tools/lib/bpf/Makefile b/tools/lib/bpf/Makefile
-> index 1b22f0f37288..857a5f7b413d 100644
-> --- a/tools/lib/bpf/Makefile
-> +++ b/tools/lib/bpf/Makefile
-> @@ -61,7 +61,8 @@ ifndef VERBOSE
->   endif
->   
->   INCLUDES = -I$(or $(OUTPUT),.) \
-> -	   -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi
-> +	   -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi \
-> +	   -I$(srctree)/tools/arch/$(SRCARCH)/include
->   
->   export prefix libdir src obj
->   
->
-> base-commit: db5ca265e3334b48c4e3fa07eef79e8bc578c430
+This series was applied to netdev/net-next.git (main)
+by David S. Miller <davem@davemloft.net>:
 
+On Wed, 30 Oct 2024 17:39:11 +0800 you wrote:
+> This is first time that the NETC IP is applied on i.MX MPU platform.
+> Its revision has been upgraded to 4.1, which is very different from
+> the NETC of LS1028A (its revision is 1.0). Therefore, some existing
+> drivers of NETC devices in the Linux kernel are not compatible with
+> the current hardware. For example, the fsl-enetc driver is used to
+> drive the ENETC PF of LS1028A, but for i.MX95 ENETC PF, its registers
+> and tables configuration are very different from those of LS1028A,
+> and only the station interface (SI) part remains basically the same.
+> For the SI part, Vladimir has separated the fsl-enetc-core driver, so
+> we can reuse this driver on i.MX95. However, for other parts of PF,
+> the fsl-enetc driver cannot be reused, so the nxp-enetc4 driver is
+> added to support revision 4.1 and later.
+> 
+> [...]
 
-You can add:
+Here is the summary with links:
+  - [v6,net-next,01/12] dt-bindings: net: add compatible string for i.MX95 EMDIO
+    https://git.kernel.org/netdev/net-next/c/da98dbbc2c74
+  - [v6,net-next,02/12] dt-bindings: net: add i.MX95 ENETC support
+    https://git.kernel.org/netdev/net-next/c/db2fb74c8560
+  - [v6,net-next,03/12] dt-bindings: net: add bindings for NETC blocks control
+    https://git.kernel.org/netdev/net-next/c/f70384e53b09
+  - [v6,net-next,04/12] net: enetc: add initial netc-blk-ctrl driver support
+    https://git.kernel.org/netdev/net-next/c/fe5ba6bf91b3
+  - [v6,net-next,05/12] net: enetc: extract common ENETC PF parts for LS1028A and i.MX95 platforms
+    https://git.kernel.org/netdev/net-next/c/80c8c852615e
+  - [v6,net-next,06/12] net: enetc: build enetc_pf_common.c as a separate module
+    https://git.kernel.org/netdev/net-next/c/3774409fd4c6
+  - [v6,net-next,07/12] net: enetc: remove ERR050089 workaround for i.MX95
+    https://git.kernel.org/netdev/net-next/c/86831a3f4cd4
+  - [v6,net-next,08/12] net: enetc: add i.MX95 EMDIO support
+    https://git.kernel.org/netdev/net-next/c/a52201fb9caa
+  - [v6,net-next,09/12] net: enetc: extract enetc_int_vector_init/destroy() from enetc_alloc_msix()
+    https://git.kernel.org/netdev/net-next/c/b4bfd0a904e9
+  - [v6,net-next,10/12] net: enetc: optimize the allocation of tx_bdr
+    https://git.kernel.org/netdev/net-next/c/9e7f2116199d
+  - [v6,net-next,11/12] net: enetc: add preliminary support for i.MX95 ENETC PF
+    https://git.kernel.org/netdev/net-next/c/99100d0d9922
+  - [v6,net-next,12/12] MAINTAINERS: update ENETC driver files and maintainers
+    https://git.kernel.org/netdev/net-next/c/f488649e40f8
 
-Tested-by: Alexandre Ghiti <alexghiti@rivosinc.com>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Thanks,
-
-Alex
 
 
