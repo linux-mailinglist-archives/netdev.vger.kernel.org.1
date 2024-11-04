@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-141673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C989BBFDD
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 22:16:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0F1EF9BBFFA
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 22:24:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB6C9B210E2
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:15:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AE3EA1F218C1
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:24:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB5331FCC65;
-	Mon,  4 Nov 2024 21:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3490A1FCC69;
+	Mon,  4 Nov 2024 21:24:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fxm6eUqC"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="D/h1dYv8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f51.google.com (mail-wm1-f51.google.com [209.85.128.51])
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DE681FCC4B;
-	Mon,  4 Nov 2024 21:15:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8042F1FCC56;
+	Mon,  4 Nov 2024 21:24:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730754955; cv=none; b=l8caEn5sOHZhczt87eM6Lcb0qcog0+wjQPw22PS0gke60Nufw+bb8vG8PEP+xSoJZPkq71T5LcuNbbFmIsXknXLwp8M++syZDN2sv5NlAiZ6TlIOXRGW1DTNuKGZFhAqZHUdWut8W1o2V2UcI7sQ2bxZQPjOwiSF7OfeB+E/tvI=
+	t=1730755475; cv=none; b=jw9naa+w15eXCwYXf6jaXOE+UOZt7gFkuAQngZwuZ2jyuAyUpz+DLaHbMmABX1es9UXxKMdBf+6aBQTZeQf4w7f9EJMlTTBbVevGlpSDRprE+QYj1SAQ7sBnQ9VHElq4QTOkLpgvsqk6JwYx+CXrlHdj3W2KkdKo6rBBWktHbU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730754955; c=relaxed/simple;
-	bh=G724cTYSxP4miHIIyEFDyCy7z3lHBjLNE65y3n6EGR0=;
+	s=arc-20240116; t=1730755475; c=relaxed/simple;
+	bh=KgmA9O/yjGXwPaEUwuagbYj6lZhVVXxgV2/KRNTMY+0=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=n9gW3IFKysHemVrRm4xjSCNW8fiNGhOzBMQn9iR9ymZn7El/g9lQhVVu6oBQBlNHxc0+fpGVteroL0VyetEou9F1aCpCiq6NzsK2jXoiRAn5iV8zw74+1V/Whvr8vnSRzQLqS1JqflwXdVjS1547WmGJY1WAwvG0v5FluI2CY2E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fxm6eUqC; arc=none smtp.client-ip=209.85.128.51
+	 In-Reply-To:Content-Type; b=SkTiOYmMGdwRK/t8qzwwCNAnfVVb9rTU4t8IkLzQbIB5LEKY2UWXyO5NKhentHoCIhakqvWQcrUl+grl3I8NMTNHAdCQNIFi3l3FCRCJQQiUf2gbLuZPw+wo7JPWfA4ssjNEyr8SMKJ8Joew2Ybfc4PbFCTUkgTmtJghFy4tovI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=D/h1dYv8; arc=none smtp.client-ip=209.85.221.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f51.google.com with SMTP id 5b1f17b1804b1-43169902057so36518355e9.0;
-        Mon, 04 Nov 2024 13:15:53 -0800 (PST)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37d447de11dso3715572f8f.1;
+        Mon, 04 Nov 2024 13:24:33 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730754952; x=1731359752; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730755472; x=1731360272; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=DXDa4pJRXXSF53bW6sg5r+RrA4H/A0V2XZTYAKAhegw=;
-        b=Fxm6eUqCmMQfpDbbCGcy+LeyfyZ8QLj4b9MeEFxkGgbNJdYw7Rcp8B8DRmXgK91XbT
-         /aEYv9/5e6fTUFOVlqVMzzDqdmU5UoRvv+1UpbM1d3aVd3ueC7dHv6Fm4bQlgICsuFCn
-         Nbx6JyOWrxC41g4ufm1j75WxbPM2mHXRUcxHJAVaxO7g1jkbGC2VvkanT4OsXc8O4DWW
-         3yjUPl7E4o+Gwpxtl5clE+ixGY1xHAmYTBmKbMAvVij5AYjIO+Awy64BtwFrFlcdufx1
-         wyEVZL6CN7PC3BhBvRNUGe1hh1X5c+NsWRZjQTCTH7y3o6mWv+gKLKMDAWLFLmrRnrE1
-         Xucg==
+        bh=jNxM0Q8uHull7FrP6GsWQNVGnPpvVtnGbtMk1UqNzYY=;
+        b=D/h1dYv81GGaxYpgdk/NUwz6IMqg9cJMZYIHqHbOpSa7N5DRijE1uRtQtZsU/poraT
+         /J383UQcGO4w2D7FED4qkQEmc+lIgqzpIOLYKq+zQOmkEOwLKRi1gluT92Bn2WtN0gu1
+         zTceLvigSMGaUA18mWPr8p4ZNoWIuY1JKV3a6k9qpSOxvP4pk+9gLL7KV++DF2gqcCth
+         WdoXWjO7P2zrkAKaGTfpcntl0v7xRAVcDeCrIbEp9wh/ZmjQWulyMv/yo7u4hXP+HwLg
+         nr4gbAQXlFC1IgDL+4BUz4rO8ealWpTIgFfdXb6XWWKOU62ItsMmL7lFM+xH98W/2wSV
+         BGAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730754952; x=1731359752;
+        d=1e100.net; s=20230601; t=1730755472; x=1731360272;
         h=content-transfer-encoding:in-reply-to:from:content-language
          :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DXDa4pJRXXSF53bW6sg5r+RrA4H/A0V2XZTYAKAhegw=;
-        b=XAnfsF/MmI/vaOZxc8oGkG/Y42z8TgLPKqH7yrMTsXmtJQK+LrUIygHkejph8LSg/w
-         FVyh3ET7yoEheD9+5rcvoK5mkB2iQ3UiOFO1keT32YsUqu1/sBLsY4Q/RzF/lpMTkbay
-         b45D2CdLKOn8MfevXhjqiwG5XxjzeeVdB+wSiBZwxfogFMnz/RqBrG/iGzxjqbFmpfP7
-         bBfNoPuNSPrssDkGcbKStChzjoP31ArHAI62/dwX30kbLUAB5aMqVUuFXnP4s3ZHdqig
-         8fhhMgSUSeABjJ7fT4ZEum8c+vxjD2pXw+Ecesx0cX9MvOPW/jbho1bPPUTc/1cIOLm0
-         N5Vw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRUrqWydTW4z9VaLauZcDAaSE2f+LZi3S0xb2VZ+k30g+wAOxmv/VRQetxVbBkGXRQEvP5GS3d@vger.kernel.org, AJvYcCWMdolbBLQwrJKIM36t4CM6Jp0em3wlFi7Z16UCi0GIw9zxhYV5XrN5ttnFL58G1UdiQ03dzZZKVJU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YyGF0aPPbbosaqlzpKvaNGPI+m3YuMZ6+NDS/McUQQ+5h1nz5Sl
-	AFxHabShdr+2TePRSqn8ytNzVLzAwCA405f9CK7hSdVEZ30PWwQU
-X-Google-Smtp-Source: AGHT+IEFhX8r7t2wnhakUur8cbvnOFOryn45oEMeOTW1QXqNNbQOndMdabsi1v2egkHAs2YMkWfzwQ==
-X-Received: by 2002:a05:600c:1c29:b0:431:588a:4498 with SMTP id 5b1f17b1804b1-431bb985df9mr186940475e9.14.1730754952179;
-        Mon, 04 Nov 2024 13:15:52 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5e7c9asm169928695e9.21.2024.11.04.13.15.48
+        bh=jNxM0Q8uHull7FrP6GsWQNVGnPpvVtnGbtMk1UqNzYY=;
+        b=lscqqMb+vQUxI8E8CGNwoJVLMvCMM5JWK/F8kXybti0D5WsY938j60M4bfTGHxzLTR
+         V+AYW8mo9oLZ9ceAJyJBC7h6gtb8xjTXjkJgjI5UXj7xtwgCzPVqsrXWSZ0z80fCNT/j
+         BcMSJjd2ah+EAbYA8wtu4M7RDxRI97pF6nS+jqeLL85CSRZTuUsznLaB5ArmQZJjukIZ
+         H85TYsY6ckJUiB4cmgQ2TRK2+zfembYeL2pZl5F1GsuFdLQmVd7q6PE4ZYukrgsw8xeF
+         gJas/PWXFVI8j5dSNGsZYMy/PfQRoLWF1ogRF8LGdc42NXJ9l+GDYYeSl5NBD82qBbOD
+         gKfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUrcQaFRkYJxagx/k/jRm3udz1mwohT6jppJladJ+0fVBO7oDCSshHBAaVCtO3+bsOcdccH5vJAYw==@vger.kernel.org, AJvYcCVmoKrHE8V5oo3en8I7N/sDb9roBRqWMDzQZ7GCjSAfrJbCkOLRjtT9lKVk2SrTk/hmVh6H4NZH@vger.kernel.org
+X-Gm-Message-State: AOJu0YwL020BybaJnjWKdHizHLG6gN3tFAvec70UekXzM22j9Xxm2K1Q
+	8LKJ8B5yQ2KAd4Ors8OLA1LPtMdW3mPCOA7sEJ8oXyaLPkqbvhjs
+X-Google-Smtp-Source: AGHT+IEpGUh8/ter2vp6zfChTBfkrbI4jytOtcNwlXgcvbC5os9jnjButkvYagv3VQZY4vC4Abzyug==
+X-Received: by 2002:a05:6000:42c2:b0:37d:f4b:b6ab with SMTP id ffacd0b85a97d-381bea29202mr11542049f8f.59.1730755471580;
+        Mon, 04 Nov 2024 13:24:31 -0800 (PST)
+Received: from [192.168.42.103] ([148.252.145.116])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cee6abfcbdsm322417a12.37.2024.11.04.13.24.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 13:15:50 -0800 (PST)
-Message-ID: <8d7b1c5b-346f-4d81-a06a-809690dd4c87@gmail.com>
-Date: Mon, 4 Nov 2024 23:16:17 +0200
+        Mon, 04 Nov 2024 13:24:31 -0800 (PST)
+Message-ID: <b966d211-26de-4796-9e54-5b464a565b7c@gmail.com>
+Date: Mon, 4 Nov 2024 21:24:35 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,38 +76,51 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next v8 0/3] net: wwan: t7xx: Add t7xx debug ports
-To: Jinjian Song <jinjian.song@fibocom.com>,
- chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
- ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, angelogioacchino.delregno@collabora.com,
- linux-arm-kernel@lists.infradead.org, matthias.bgg@gmail.com,
- corbet@lwn.net, linux-mediatek@lists.infradead.org, helgaas@kernel.org,
- danielwinkler@google.com, korneld@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org
-References: <20241104094436.466861-1-jinjian.song@fibocom.com>
+Subject: Re: [PATCH v7 04/15] net: prepare for non devmem TCP memory providers
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241029230521.2385749-1-dw@davidwei.uk>
+ <20241029230521.2385749-5-dw@davidwei.uk>
+ <CAHS8izPZ3bzmPx=geE0Nb0q8kG8fvzsGT2YgohoFJbSz2r21Zw@mail.gmail.com>
+ <5b928f0e-f3f8-4eaa-b750-e3f445d2fa46@gmail.com>
+ <CAHS8izMTuEMS2hyHs0cit0Wvo3DcuHxReE1WS-crJ8zDTs=_Wg@mail.gmail.com>
 Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <20241104094436.466861-1-jinjian.song@fibocom.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izMTuEMS2hyHs0cit0Wvo3DcuHxReE1WS-crJ8zDTs=_Wg@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 04.11.2024 11:44, Jinjian Song wrote:
-> Add support for t7xx WWAN device to debug by ADB (Android Debug Bridge)
-> port and MTK MIPCi (Modem Information Process Center) port.
+On 11/4/24 20:20, Mina Almasry wrote:
+> On Fri, Nov 1, 2024 at 10:41 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+...
+>> io_uring originated netmem that are marked unreadable as well
+>> and so will end up in tcp_recvmsg_dmabuf(), then we reject and
+>> fail since they should not be fed to devmem TCP. It should be
+>> fine from correctness perspective.
+>>
+>> We need to check frags, and that's the place where we iterate
+>> frags. Another option is to add a loop in tcp_recvmsg_locked
+>> walking over all frags of an skb and doing the checks, but
+>> that's an unnecessary performance burden to devmem.
+>>
 > 
-> Application can use ADB (Android Debug Bridge) port to implement
-> functions (shell, pull, push ...) by ADB protocol commands.
-> 
-> Application can use MIPC (Modem Information Process Center) port
-> to debug antenna tuner or noise profiling through this MTK modem
-> diagnostic interface.
+> Checking each frag in tcp_recvmsg_dmabuf (and the equivalent io_uring
+> function) is not ideal really. Especially when you're dereferencing
+> nio->pp to do the check which IIUC will pull a cache line not normally
+> needed in this code path and may have a performance impact.
 
-Well done, Jinjian! For the whole series:
+Even if it's cold, all net_iov processed are expected to come
+from the same page pool and would be cached. And it should be of
+a comparable hotness as dmabuf_genpool_chunk_owner accesses below,
+considering that there is enough of processing happening around,
+it should be of a worry and can be improve upon later.
 
-Reviewed-by: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+-- 
+Pavel Begunkov
 
