@@ -1,140 +1,204 @@
-Return-Path: <netdev+bounces-141662-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141663-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E89A9BBEE3
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:40:13 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E151E9BBEE5
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:40:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E81A528354C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:40:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F75628105E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17D5E1F5852;
-	Mon,  4 Nov 2024 20:40:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E01901F5854;
+	Mon,  4 Nov 2024 20:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="j9/Vkg45"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27BFB1E630C;
-	Mon,  4 Nov 2024 20:40:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE4701F584A
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 20:40:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730752808; cv=none; b=QMTG47/QM5Alrz01YE1qiaY/VBH/VOKGeopxPlqY4kC1TfqmBtcgH3XyLCUWvfcllqJLHwZ4Kpv3UD4ZIq/NMlJg9W2l/GzyEP2y8t/w5jx7XLlnGUkZdaD8HAHgVjkq4Ki3SAu9EuZVR8t8X3dVR5wrynq6Ag+DPNkcPRjR4f4=
+	t=1730752819; cv=none; b=rT8194rXdg5BUboeP+HCUEwP7ipCK9B3tcbjYJ4Ppm8ggQr49uD1VM8calIZGwzZ0WgJp8fubcgE4/O7wkVru8uuJ82hcKJ4fOMhS5kzcz1qK+osixdx1V17NLIniSTw9mePYAaUQEPOveiqFMnpodBUTiTAoWYUYW3ZdtAnUac=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730752808; c=relaxed/simple;
-	bh=3jPAgjCmc5xZFnFTlICOCmOgjU542J0fdZykbEcCH/U=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oIZ0m4h6srL61BqClo0KaM08nc436RQua+CgklZtIFxcN6Bq6doAChoopXWzdgt4aXN0TuxOUFBt5SMkMHaqT/HUwc1yvYeJQof5wifwOx7I7Rt2BSh/PKyoRuAjsVHD7NWdf04gEy4EP9I9OPqJELDmUMcIDd/GLMZvwmFCmgI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539f2b95775so5263824e87.1;
-        Mon, 04 Nov 2024 12:40:05 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730752804; x=1731357604;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W8o3axdgTYHI1ELDzRVuADA51JcMZl0PXk13YMEAtqI=;
-        b=ruvVnjue6uyrE9QgzneuywDSvEJKSSmpsjemyGJFL2uWKKMPFfAWGm9HwgcxqWvlQU
-         tPUJwplpJRVAFs1CYt+nnmYWdrdaRlJOaalqNzAdUPtzP/+nojgUBW2F1BK+pm10t652
-         KmmMda7T02ENgNcQjOPBLHr1ksCxVuA2/6KQGqxKneSgpah+VzetFUmGWW6h0jcHFxvc
-         bmYnZ8N5oZUD4WnpwuqlB2JLc6MLunDNRLT6aQ/0XztUX/4obmQRgbq766Zv+bFDjzCf
-         7jyfA3AVqMK+ijWWe9trHNuOzJsDEVpbrIZTzfBSy01N0N5U3/8Kiouy0MDl+5notRS+
-         dvIw==
-X-Forwarded-Encrypted: i=1; AJvYcCUBeJColJt9JsYEhH0eXc1FSX76xYUWLsRlRDExv9TU+NCJxVntLy5K+Ysf51VkgsKXFBytuCTQ@vger.kernel.org, AJvYcCW3Rs3OzvTosmIOnVOr27e2EXN7S1lAAPDOkq3jaML37TGnw0+QybUZQCucPkmvf3f8oJADMpc0hBTdd2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yynl4zgh3o81lYl4Z6cfrJq9P/BaWRJq45et03T9kzi33wGazfl
-	Y8ZqBM6AJ8/d41pRcFKPmQn2VLAr/YSaXpKXqlBD78gh10ACe9du
-X-Google-Smtp-Source: AGHT+IHgM6ZoN8gjRebFk2yb7UYmNVHSqArDicecN4n+Jms4jQjQU6O9XURNoBUCRF+SgpSWiP67/g==
-X-Received: by 2002:a05:6512:1590:b0:539:8fbd:5218 with SMTP id 2adb3069b0e04-53d65e168f6mr8509539e87.56.1730752803860;
-        Mon, 04 Nov 2024 12:40:03 -0800 (PST)
-Received: from gmail.com (fwdproxy-lla-008.fbsv.net. [2a03:2880:30ff:8::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16a1440sm28245466b.31.2024.11.04.12.40.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 12:40:03 -0800 (PST)
-Date: Mon, 4 Nov 2024 12:40:00 -0800
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
-	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
-	vlad.wing@gmail.com, max@kutsevol.com, kernel-team@meta.com,
-	jiri@resnulli.us, jv@jvosburgh.net, andy@greyhouse.net,
-	aehkn@xenhub.one, Rik van Riel <riel@surriel.com>,
-	Al Viro <viro@zeniv.linux.org.uk>
-Subject: Re: [PATCH net-next 1/3] net: netpoll: Defer skb_pool population
- until setup success
-Message-ID: <20241104-nimble-scallop-of-justice-4ab82f@leitao>
-References: <20241025142025.3558051-1-leitao@debian.org>
- <20241025142025.3558051-2-leitao@debian.org>
- <20241031182647.3fbb2ac4@kernel.org>
- <20241101-cheerful-pretty-wapiti-d5f69e@leitao>
- <20241101-prompt-carrot-hare-ff2aaa@leitao>
- <20241101190101.4a2b765f@kernel.org>
+	s=arc-20240116; t=1730752819; c=relaxed/simple;
+	bh=qf8p+dLzG/OpvDN0DwjGbePuYHScU5swdvaefylRA5Y=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=QP6Kkryng5t4BTSMat9+v0gV5Xb0pf06sgPDDZfIiKN8M/Uv2bypxMedMS41onOoyTyDoMYwh2jMG3yX+rpuFRJP4MRNAmZFxfCLwVf4olWURlunU23wTMcN0KFc6bHN4rpPP+Pgowi5kz9/AnW0emwmBbYVNnoIie2JWGAK4gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=j9/Vkg45; arc=none smtp.client-ip=52.119.213.156
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730752818; x=1762288818;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9NSxhmbX/7pkJ/tSnWEUTjcv5Gb3NL4JBAwI0XAndtQ=;
+  b=j9/Vkg45n7UmNiiALz+f4hgcKoUV3h7QBoT9ziZ87KLDxgeUVcYFw1Cc
+   2Lrlf3l8YspEheWfmcEpgteE++qBJpldfHhLw1aK2i8h2fN902RRZRpZI
+   wKz3tYgNmM3OZBx2eQPZyjpobJf/1uIEL7mIPh5NCphCQIsBJzc913LXk
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.11,258,1725321600"; 
+   d="scan'208";a="693002893"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 20:40:15 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:29573]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.102:2525] with esmtp (Farcaster)
+ id d89a45f8-5c70-42c9-810c-fedfb0993820; Mon, 4 Nov 2024 20:40:14 +0000 (UTC)
+X-Farcaster-Flow-ID: d89a45f8-5c70-42c9-810c-fedfb0993820
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Mon, 4 Nov 2024 20:40:10 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.171.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Mon, 4 Nov 2024 20:40:07 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <courmisch@gmail.com>, <davem@davemloft.net>, <eric.dumazet@gmail.com>,
+	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net-next] phonet: do not call synchronize_rcu() from phonet_route_del()
+Date: Mon, 4 Nov 2024 12:40:05 -0800
+Message-ID: <20241104204005.86813-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241104152622.3580037-1-edumazet@google.com>
+References: <20241104152622.3580037-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101190101.4a2b765f@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA003.ant.amazon.com (10.13.139.46) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Fri, Nov 01, 2024 at 07:01:01PM -0700, Jakub Kicinski wrote:
-> On Fri, 1 Nov 2024 11:18:29 -0700 Breno Leitao wrote:
-> > > I think that a best mechanism might be something like:
-> > > 
-> > >  * If find_skb() needs to consume from the pool (which is rare, only
-> > > when alloc_skb() fails), raise workthread that tries to repopulate the
-> > > pool in the background. 
-> > > 
-> > >  * Eventually avoid alloc_skb() first, and getting directly from the
-> > >    pool first, if the pool is depleted, try to alloc_skb(GPF_ATOMIC).
-> > >    This might make the code faster, but, I don't have data yet.  
-> > 
-> > I've hacked this case (getting the skb from the pool first and refilling
-> > it on a workqueue) today, and the performance is expressive.
-> > 
-> > I've tested sending 2k messages, and meassured the time it takes to
-> > run `netpoll_send_udp`, which is the critical function in netpoll.
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon,  4 Nov 2024 15:26:22 +0000
+> Calling synchronize_rcu() while holding rcu_read_lock() is not
+> permitted [1]
+
+Thanks for catching this !
+
 > 
-> The purpose of the pool is to have a reserve in case of OOM, AFAIU.
-> We may speed things up by taking the allocations out of line but
-> we risk the pool being empty when we really need it.
+> Move the synchronize_rcu() to route_doit().
+> 
+> [1]
+> WARNING: suspicious RCU usage
+> 6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0 Not tainted
+> -----------------------------
+> kernel/rcu/tree.c:4092 Illegal synchronize_rcu() in RCU read-side critical section!
+> 
+> other info that might help us debug this:
+> 
+> rcu_scheduler_active = 2, debug_locks = 1
+> 1 lock held by syz-executor427/5840:
+>   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
+>   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
+>   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: route_doit+0x3d6/0x640 net/phonet/pn_netlink.c:264
+> 
+> stack backtrace:
+> CPU: 1 UID: 0 PID: 5840 Comm: syz-executor427 Not tainted 6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+> Call Trace:
+>  <TASK>
+>   __dump_stack lib/dump_stack.c:94 [inline]
+>   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+>   lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6821
+>   synchronize_rcu+0xea/0x360 kernel/rcu/tree.c:4089
+>   phonet_route_del+0xc6/0x140 net/phonet/pn_dev.c:409
+>   route_doit+0x514/0x640 net/phonet/pn_netlink.c:275
+>   rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6790
+>   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+>   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+>   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+>   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+>   sock_sendmsg_nosec net/socket.c:729 [inline]
+>   __sock_sendmsg+0x221/0x270 net/socket.c:744
+>   sock_write_iter+0x2d7/0x3f0 net/socket.c:1165
+>   new_sync_write fs/read_write.c:590 [inline]
+>   vfs_write+0xaeb/0xd30 fs/read_write.c:683
+>   ksys_write+0x183/0x2b0 fs/read_write.c:736
+>   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> Fixes: 17a1ac0018ae ("phonet: Don't hold RTNL for route_doit().")
+> Reported-by: syzbot <syzkaller@googlegroups.com>
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Cc: Remi Denis-Courmont <courmisch@gmail.com>
+> ---
+>  net/phonet/pn_dev.c     |  4 +++-
+>  net/phonet/pn_netlink.c | 10 ++++++++--
+>  2 files changed, 11 insertions(+), 3 deletions(-)
+> 
+> diff --git a/net/phonet/pn_dev.c b/net/phonet/pn_dev.c
+> index 19234d664c4fb537eba0267266efbb226cf103c3..578d935f2b11694fd1004c5f854ec344b846eeb2 100644
+> --- a/net/phonet/pn_dev.c
+> +++ b/net/phonet/pn_dev.c
+> @@ -406,7 +406,9 @@ int phonet_route_del(struct net_device *dev, u8 daddr)
+>  
+>  	if (!dev)
+>  		return -ENOENT;
+> -	synchronize_rcu();
+> +
+> +	/* Note : our caller must call synchronize_rcu() */
+> +
+>  	dev_put(dev);
 
-Correct, but, in a case of OOM, I am not sure if this is going to
-change the chances at all.
+Are these synchronize_rcu() + dev_put() paired with rcu_read_lock()
+and dev_hold() in phonet_route_output() ?
 
-Let's assume the pool is full and we start getting OOMs. It doesn't
-matter if alloc_skb() will fail in the critical path or in the work
-thread, netpoll will have MAX_SKBS skbs buffered to use, and none will
-be allocated, thus, just 32 SKBs will be used until a -ENOMEM returns.
+If so, we need to move dev_put() too or maybe we can remove
+synchronize_rcu() here and replace rcu_read_lock() with
+spin_lock(&routes->lock) in phonet_route_output().
 
-On the other side, let's suppose there is a bunch of OOM pressure for a
-while (10 SKBs are consumed for instance), and then some free memory
-show up, causing the pool to be replenished. It is better
-to do it in the workthread other than in the hot path.
 
-In both cases, the chance of not having SKBs to send the packet seems to
-be the same, unless I am not modeling the problem correctly.
-
-On top of that, a few other points that this new model could help more,
-in a OOM case.
-
-1) Now with Maksysm patches, we can monitor the OOMing rate
-
-2) With the pool per target, we can easily increase the pool size if we
-want. (patchset not pushed yet)
-
-This will also fix another corner case we have in netconsole. When
-printk() holds the console/target_list locked, the upcoming code cannot
-printk() anymore, otherwise it will deadlcok system. That is because a
-printk() will call netconsole again (nested), and it will try to get the
-console_lock/target_lock again, but that is already held. Having the
-alloc_skb() out of that thot path will reduce the probability of this
-happening. This is something I am planning to fix later, by just
-dropping the upcoming message. Having this patch might make less packets
-being dropped.
+>  	return 0;
+>  }
+> diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
+> index ca1f04e4a2d9eb3b2a6d6cc5b299aee28d569b08..24930733ac572ed3ec5fd142d347c115346a28fa 100644
+> --- a/net/phonet/pn_netlink.c
+> +++ b/net/phonet/pn_netlink.c
+> @@ -233,6 +233,7 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
+>  {
+>  	struct net *net = sock_net(skb->sk);
+>  	struct nlattr *tb[RTA_MAX+1];
+> +	bool sync_needed = false;
+>  	struct net_device *dev;
+>  	struct rtmsg *rtm;
+>  	u32 ifindex;
+> @@ -269,16 +270,21 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
+>  		return -ENODEV;
+>  	}
+>  
+> -	if (nlh->nlmsg_type == RTM_NEWROUTE)
+> +	if (nlh->nlmsg_type == RTM_NEWROUTE) {
+>  		err = phonet_route_add(dev, dst);
+> -	else
+> +	} else {
+>  		err = phonet_route_del(dev, dst);
+> +		if (!err)
+> +			sync_needed = true;
+> +	}
+>  
+>  	rcu_read_unlock();
+>  
+>  	if (!err)
+>  		rtm_phonet_notify(net, nlh->nlmsg_type, ifindex, dst);
+>  
+> +	if (sync_needed)
+> +		synchronize_rcu();
+>  	return err;
+>  }
+>  
+> -- 
+> 2.47.0.163.g1226f6d8fa-goog
 
