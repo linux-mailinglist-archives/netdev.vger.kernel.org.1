@@ -1,176 +1,137 @@
-Return-Path: <netdev+bounces-141642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141643-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 809909BBDFD
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:29:35 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 080BE9BBE3D
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:49:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E22E7B2207C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:29:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3723B1C20CC0
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:49:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE7D01C3026;
-	Mon,  4 Nov 2024 19:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 447C21C729B;
+	Mon,  4 Nov 2024 19:49:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ihP8pJgs"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=proton.me header.i=@proton.me header.b="DpHYZJBW"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f169.google.com (mail-lj1-f169.google.com [209.85.208.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mail-40131.protonmail.ch (mail-40131.protonmail.ch [185.70.40.131])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC2AA1E89C;
-	Mon,  4 Nov 2024 19:29:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC5E123A6
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 19:49:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.70.40.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730748563; cv=none; b=l89uKIWXFKu6RiaDNXAaFp+obcEw//cNImBZEuDgUVx9EluHOWhTrWp9CNZ4wrIMFcRUTTgfDu2vu2eGvYho3+X2vzJujncpHO0APINbkE/CcEWFuEQ5ereW2OW5873rvZfIVwA5/IZKQZsh4nl7LK7KP/DOe2pdC5kd7LftCaM=
+	t=1730749787; cv=none; b=UhXOUhqRJFHmuhj9ky+k9u5Wsb7hlkjznU5iWMaCvcfyfvhrdrIe/SKRxQpv0F8d3krvwFYZ1dNSjQZcs4cwPKUFZqqPKPEYmxFyKc2N3oEBdfkkLHxqRwaBUKsY5PtaJmJCAWAIynKoa7LSBsDO+hJZScTcEWnj1Z/3a2dfhUg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730748563; c=relaxed/simple;
-	bh=G5F0GT2JJaXeVR3AnLTQpq3wSD2onPZCQkFb6V3jPHQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=meUGKKfKO1h4gHd1//WPihtulrgOnn0aLhZdTXcvdSxv8RJed6iHPzfSs6kiWaO4aVv/QqBn9VX+nknzu8AIxUOel1F1caek8/WteiuVUowUuoWclI6+gr2hrER3jCia2R/Fe8eDWJolY1d5BpPlsGCdKS3SlM4hzzz/ru/23Zo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ihP8pJgs; arc=none smtp.client-ip=209.85.208.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f169.google.com with SMTP id 38308e7fff4ca-2fb4fa17044so46973541fa.3;
-        Mon, 04 Nov 2024 11:29:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730748560; x=1731353360; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=4XjSlsiNOh57JxX3lBao2jdi0q5lpdDEDtUd4aqmXE4=;
-        b=ihP8pJgs++X4//HAQY5TYbU3EicUwrZLFzxHfky7isTlnsuLK8VGIy7xHTT1s28UiR
-         kUg5nZdLOJJWZJB9Pwb/KHNZl9QMIc9jYMJwP+gOAaljFSBFk25D2Ico8+k8cl+Yi3oG
-         9DijN8j/Y5xirRj+K6ll/l7cTtcxNuYfWsxq3lNqZBKz7OEcGi6gejGKq1L21xLBOQ5Q
-         fOzOyTuQIH0jNrHjIkEyi/CWAcPsrO20qEDmTdjrgoxR2DSM3jU2vZT32XOVZEqoUc15
-         8/N8r1puly4nIn86FaReUneI7hmwNOMHzSHFWD6tu82iRXoQgz0rOf+j28qTOMN+/Zi8
-         SxFA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730748560; x=1731353360;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4XjSlsiNOh57JxX3lBao2jdi0q5lpdDEDtUd4aqmXE4=;
-        b=BrN0Fq5kmhmci8KZfrg+xqsL/0eaL/8t1bW/9fTTq9p2e2a2pPxY8S3U86sZqpVHuG
-         3pVlgJqoODdHyNXn0El/z9Lr/LgtbqwuO2Wa+iscbJHPsX3qKPNN8/bmqyfVEtFkOvSo
-         QmqHMWCH8I6civu2fZMm9P/u1iBKWE8RO3URyVVN4OKfjE6VAlEpUsWaJrspjYYVJxuI
-         KztAhgZ2sKYqLMXQEOjokX4p9YXssCG85Blt4sBxVJxr73/9VW0oLnlw/peQtSXtF86U
-         Y78DCjSTeInHFUHxNObyAdWDzo0Dq0yc6U/eixBx0Vt0RpixZr/fJuCDjvY/LTdU4mah
-         NqDQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUem1OUX+otvDe6259jPorXAk9CD+JkW9p+cJg9rhso6ZqLntM4LffX/WWuYuJhNkaJ2ZZsrJduj73LboQ/@vger.kernel.org, AJvYcCVxrG2lU3rqj5iaDnEA+PFSQYam3jC9h9QFNEWnGGOdmSFuBXTKeKJdHkalx1VC7NdejXIetyQ1@vger.kernel.org, AJvYcCW+sey8sOxTfdIS6QtO4krtIyiSY5Npq3fhJHxXazn23EeP3ZyrM9O7aDdjFem9uD7RJK5vlKkACmc=@vger.kernel.org, AJvYcCXBNye7arLqa0nGTd2CBgZbYT68usr8EZ3kv0YzlfYlX0M757Q+6B3YOYZieUcF60dGyRHM5gDZaxY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSA+yT68UnBHrd/Mc8zpyTGwfbrV+QHnjD4W6AWwjWlmnjboOW
-	6o+aW/eeWYnTpUrSTYYGUq7w4QVpA1LtWSYra3bBF5JPUmFx8/WG
-X-Google-Smtp-Source: AGHT+IFjlt0vsot99zI+uSrpDWCgbIgG0OV2Eap+Ti+Za6yzEb/ER2ZWZFujJxZR9wcOHFVIQY317w==
-X-Received: by 2002:a05:651c:994:b0:2fb:5504:794d with SMTP id 38308e7fff4ca-2fedb7ecb76mr60144821fa.44.1730748559796;
-        Mon, 04 Nov 2024 11:29:19 -0800 (PST)
-Received: from ?IPV6:2a00:1fa0:101:3021:c7c:ed77:7717:fcd8? ([2a00:1fa0:101:3021:c7c:ed77:7717:fcd8])
-        by smtp.gmail.com with ESMTPSA id 38308e7fff4ca-2fdef8a6627sm18226061fa.98.2024.11.04.11.29.17
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 11:29:18 -0800 (PST)
-Message-ID: <e7123fcb-048c-4415-adb5-97b9f032e6ff@gmail.com>
-Date: Mon, 4 Nov 2024 22:29:16 +0300
+	s=arc-20240116; t=1730749787; c=relaxed/simple;
+	bh=Nf5Oa36AE0kErRWsLE8NS4ZzAEfhRzCT9x1wQZGG/6M=;
+	h=Date:To:From:Subject:Message-ID:MIME-Version:Content-Type; b=BR6j5luxtQLOD9eTDs/xneiYrUgeVKiZyGE0e4ye+WG5JL67FbZwNBEjWirgA5n3tEu8rGGgWfEYVa73SzJGz462om6DCqPVPJDVEL2yjuZoeSR8rqc0XstT1kjNp+I3ETJBwnAz6Ugq2JBg4ajXNu2c64k6TRskdTN8VX0RiDc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me; spf=pass smtp.mailfrom=proton.me; dkim=pass (2048-bit key) header.d=proton.me header.i=@proton.me header.b=DpHYZJBW; arc=none smtp.client-ip=185.70.40.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=proton.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=proton.me
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
+	s=protonmail; t=1730749776; x=1731008976;
+	bh=Nf5Oa36AE0kErRWsLE8NS4ZzAEfhRzCT9x1wQZGG/6M=;
+	h=Date:To:From:Subject:Message-ID:Feedback-ID:From:To:Cc:Date:
+	 Subject:Reply-To:Feedback-ID:Message-ID:BIMI-Selector:
+	 List-Unsubscribe:List-Unsubscribe-Post;
+	b=DpHYZJBWUzyYHnCV0fCW6MEDGU9aeScXoo/Dw2jyDgIxkZBCSf//naAcZSo/BS1Ys
+	 zXI+bBYCzi9GfN6/iuI/iIzO/2jg+sJIlGZJpLB3W/gHnMwlb5EFtsDPDKK5inylGy
+	 gb0AAAthKCSQrhpJnEdCgMlzcEjqUPHX/GJn+cPvUV9xF9i7HxYgFYjipSDUV/ohJi
+	 Wze9xkNjCwcqtNmaLKl7jpbVuP9Vg3HkIsUincodYCYEQV53cbTq0NndXblDFVsN9f
+	 x/1u8HCFCTdz/qees+dOEdLVgx+BCUpaklCh5FhpWCiFHla7LzqEc9ppuuV+Joz2BC
+	 HpFzX3nXZ7vRg==
+Date: Mon, 04 Nov 2024 19:49:33 +0000
+To: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+From: Shochraos <shochraos@proton.me>
+Subject: Unknown NIC not recognized by r8169 Kernel-Driver
+Message-ID: <H90iT3HXlAkoSxqgPoAXPAZL_ZJ3pFxNGMtFkULq5wVhR9gcTqAPBO84chKKq3NwdgWClT7yuZ9xdLUpIR9SjZRZIcD_qGOq4KufDW2JDYA=@proton.me>
+Feedback-ID: 100367158:user:proton
+X-Pm-Message-ID: de1e1865599b729c348c61772b60be3a84f20991
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH/RFC v2] MAINTAINERS: Re-add cancelled Renesas driver
- sections
-To: Geert Uytterhoeven <geert+renesas@glider.be>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Paul Barker <paul.barker.ct@bp.renesas.com>,
- =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
- Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
- Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
- James Bottomley <James.Bottomley@hansenpartnership.com>,
- Arnd Bergmann <arnd@arndb.de>
-Cc: linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
- linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
- linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
- Niklas Cassel <cassel@kernel.org>
-References: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
-Content-Language: en-US
-From: Sergey Shtylyov <sergei.shtylyov@gmail.com>
-In-Reply-To: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; protocol="application/pgp-signature"; micalg=pgp-sha512; boundary="------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a"; charset=utf-8
 
-On 11/4/24 2:05 PM, Geert Uytterhoeven wrote:
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a
+Content-Type: multipart/mixed;boundary=---------------------fd5ec8d4f8ee20c1b12e978ff625be30
 
-> Removing full driver sections also removed mailing list entries, causing
-> submitters of future patches to forget CCing these mailing lists.
-> 
-> Hence re-add the sections for the Renesas Ethernet AVB, R-Car SATA, and
-> SuperH Ethernet drivers.  Add people who volunteered to maintain these
-> drivers (thanks a lot!).
-> 
-> Fixes: 6e90b675cf942e50 ("MAINTAINERS: Remove some entries due to various compliance requirements.")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Acked-by: Niklas Cassel <cassel@kernel.org>
-[...]
+-----------------------fd5ec8d4f8ee20c1b12e978ff625be30
+Content-Type: multipart/alternative;boundary=---------------------0c834aa3abdf3d4af68e6134055fee9a
 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 13f4c23281f89332..b04d678240e80ec9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -19578,6 +19578,16 @@ S:	Supported
->  F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
->  F:	drivers/i2c/busses/i2c-emev2.c
->  
-> +RENESAS ETHERNET AVB DRIVER
-> +M:	Paul Barker <paul.barker.ct@bp.renesas.com>
-> +M:	Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+-----------------------0c834aa3abdf3d4af68e6134055fee9a
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain;charset=utf-8
 
-   M:, not R:?
+Hello,
 
-[...]
-> @@ -19627,6 +19637,14 @@ F:	Documentation/devicetree/bindings/i2c/renesas,rmobile-iic.yaml
->  F:	drivers/i2c/busses/i2c-rcar.c
->  F:	drivers/i2c/busses/i2c-sh_mobile.c
->  
-> +RENESAS R-CAR SATA DRIVER
-> +M:	Geert Uytterhoeven <geert+renesas@glider.be>
+I'm Moritz Freund and I'm currently using Linux as my daily driver. I rece=
+ntly switched my motherboard to the Gigabyte x870E Aorus Elite Wifi 7 and =
+now ethernet is not working anymore. I suspect that the Realtek-NIC used i=
+n that motherboard is a new one as it was released recently.
+The command "sudo dmesg | grep r8169" prints the following error message: =
+"[ =C2=A0 =C2=A09.452481] r8169 0000:0e:00.0: error -ENODEV: unknown chip =
+XID 688, contact r8169 maintainers (see MAINTAINERS file)".
+I'm using the distribution CachyOS-Linux and I already contacted the maint=
+ainers of that distribution, who told me that I shoulld contact the mainta=
+iners of the kernel-driver.
+I'm using the 6.11.6-2-cachyos driver as printed out by "uname -r".
 
-   M:, not R:?
+Sincerely
+Moritz Freund
+-----------------------0c834aa3abdf3d4af68e6134055fee9a
+Content-Type: multipart/related;boundary=---------------------25bdafbedb9c658b40392a83c766bf31
 
-> +L:	linux-ide@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +S:	Supported
-> +F:	Documentation/devicetree/bindings/ata/renesas,rcar-sata.yaml
-> +F:	drivers/ata/sata_rcar.c
-> +
->  RENESAS R-CAR THERMAL DRIVERS
->  M:	Niklas Söderlund <niklas.soderlund@ragnatech.se>
->  L:	linux-renesas-soc@vger.kernel.org
-> @@ -19702,6 +19720,16 @@ S:	Supported
->  F:	Documentation/devicetree/bindings/i2c/renesas,rzv2m.yaml
->  F:	drivers/i2c/busses/i2c-rzv2m.c
->  
-> +RENESAS SUPERH ETHERNET DRIVER
-> +M:	Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+-----------------------25bdafbedb9c658b40392a83c766bf31
+Content-Type: text/html;charset=utf-8
+Content-Transfer-Encoding: base64
 
-   M:, not R:?
+PGRpdiBzdHlsZT0iZm9udC1mYW1pbHk6IEFyaWFsLCBzYW5zLXNlcmlmOyBmb250LXNpemU6IDE0
+cHg7Ij5IZWxsbyw8YnI+PGJyPkknbSBNb3JpdHogRnJldW5kIGFuZCBJJ20gY3VycmVudGx5IHVz
+aW5nIExpbnV4IGFzIG15IGRhaWx5IGRyaXZlci4gSSByZWNlbnRseSBzd2l0Y2hlZCBteSBtb3Ro
+ZXJib2FyZCB0byB0aGUgR2lnYWJ5dGUgeDg3MEUgQW9ydXMgRWxpdGUgV2lmaSA3IGFuZCBub3cg
+ZXRoZXJuZXQgaXMgbm90IHdvcmtpbmcgYW55bW9yZS4gSSBzdXNwZWN0IHRoYXQgdGhlIFJlYWx0
+ZWstTklDIHVzZWQgaW4gdGhhdCBtb3RoZXJib2FyZCBpcyBhIG5ldyBvbmUgYXMgaXQgd2FzIHJl
+bGVhc2VkIHJlY2VudGx5Ljxicj5UaGUgY29tbWFuZCAic3VkbyBkbWVzZyB8IGdyZXAgcjgxNjki
+IHByaW50cyB0aGUgZm9sbG93aW5nIGVycm9yIG1lc3NhZ2U6ICI8c3Bhbj5bICZuYnNwOyAmbmJz
+cDs5LjQ1MjQ4MV0gcjgxNjkgMDAwMDowZTowMC4wOiBlcnJvciAtRU5PREVWOiB1bmtub3duIGNo
+aXAgWElEIDY4OCwgY29udGFjdCByODE2OSBtYWludGFpbmVycyAoc2VlIE1BSU5UQUlORVJTIGZp
+bGUpPC9zcGFuPiIuPGJyPkknbSB1c2luZyB0aGUgZGlzdHJpYnV0aW9uIENhY2h5T1MtTGludXgg
+YW5kIEkgYWxyZWFkeSBjb250YWN0ZWQgdGhlIG1haW50YWluZXJzIG9mIHRoYXQgZGlzdHJpYnV0
+aW9uLCB3aG8gdG9sZCBtZSB0aGF0IEkgc2hvdWxsZCBjb250YWN0IHRoZSBtYWludGFpbmVycyBv
+ZiB0aGUga2VybmVsLWRyaXZlci4gPGJyPkknbSB1c2luZyB0aGUgNi4xMS42LTItY2FjaHlvcyBk
+cml2ZXIgYXMgcHJpbnRlZCBvdXQgYnkgInVuYW1lIC1yIi48YnI+PGJyPlNpbmNlcmVseTxicj5N
+b3JpdHogRnJldW5kPGJyPjwvZGl2Pgo8ZGl2IHN0eWxlPSJmb250LWZhbWlseTogQXJpYWwsIHNh
+bnMtc2VyaWY7IGZvbnQtc2l6ZTogMTRweDsiIGNsYXNzPSJwcm90b25tYWlsX3NpZ25hdHVyZV9i
+bG9jayBwcm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay1lbXB0eSI+CiAgICA8ZGl2IGNsYXNzPSJw
+cm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay11c2VyIHByb3Rvbm1haWxfc2lnbmF0dXJlX2Jsb2Nr
+LWVtcHR5Ij48L2Rpdj4KCiAgICAgICAgICAgIDxkaXYgY2xhc3M9InByb3Rvbm1haWxfc2lnbmF0
+dXJlX2Jsb2NrLXByb3RvbiBwcm90b25tYWlsX3NpZ25hdHVyZV9ibG9jay1lbXB0eSI+CgogICAg
+ICAgICAgICA8L2Rpdj4KPC9kaXY+Cg==
+-----------------------25bdafbedb9c658b40392a83c766bf31--
+-----------------------0c834aa3abdf3d4af68e6134055fee9a--
+-----------------------fd5ec8d4f8ee20c1b12e978ff625be30--
 
-> +L:	netdev@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +F:	Documentation/devicetree/bindings/net/renesas,ether.yaml
-> +F:	drivers/net/ethernet/renesas/Kconfig
-> +F:	drivers/net/ethernet/renesas/Makefile
-> +F:	drivers/net/ethernet/renesas/sh_eth*
-> +F:	include/linux/sh_eth.h
-> +
->  RENESAS USB PHY DRIVER
->  M:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
->  L:	linux-renesas-soc@vger.kernel.org
+--------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a
+Content-Type: application/pgp-signature; name="signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="signature.asc"
 
-   Niklas, Paul, I hope you won't mind me re-joining the sh_eth/ravb
-entries as a reviewer when the fog clears a bit?
-   (Besides, I'm still on vacation -- till 11/11...)
+-----BEGIN PGP SIGNATURE-----
+Version: ProtonMail
 
-MBR, Sergey
+wnUEARYKACcFgmcpJT8JkNQ0XG5Ck74XFiEEAAf3C0enkLqEKu2j1DRcbkKT
+vhcAAFNrAQC7YqsLcDW9wLKjlERQcACFj3+r5EPTyReveYVeckrvggEAx9qj
+F+33hP/1dCgi3886CJrXLQ2x+23f6aqGPIStyAY=
+=OSHp
+-----END PGP SIGNATURE-----
+
+
+--------d7b92fe3551ba5ad858995b9b5a8cf7ec8e7a62ae144ea287caa6f5b44ba402a--
 
 
