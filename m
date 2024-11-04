@@ -1,137 +1,132 @@
-Return-Path: <netdev+bounces-141585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A9A979BB948
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:45:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA6289BB964
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:51:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6D2A028281B
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:45:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB7971C20973
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:51:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DFE1AF0B9;
-	Mon,  4 Nov 2024 15:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4F11B6D14;
+	Mon,  4 Nov 2024 15:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IZlnFGSn"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJ4EQGdQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8858C78685
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 15:45:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD7770816
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 15:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730735126; cv=none; b=nn8guSC8caVQTKQ9AO7x272WHkcZqnzXsxxazqasBU4kITcOEdNwMI8gTeWKa8GLuWcEJYOdnrC/eNGhmB5pkTnkaQNAgLjIG3QyN37pOLtC+Hudpg1aEKxRqi1psz3OVdPGsuNe3bXL4JXyTn1ubSMD8r4f+JC7WAKZL6bH9TU=
+	t=1730735475; cv=none; b=YVRsGmIoDtb2/VnAW93ccxEJWxdkIk7dgEpaa8vJ7/4q+yc4b7VcP4/vihVZGCDGn22pYtzCJ4TVdTiWGXqpOe1K0FcvMq6p0z8Qzd/nXxhAekmnAWGmBS9ChMyf/h+Jd1i1S5PqAQ4Jq07EO/KE3w7NAk34icGRJhxCxg7Jwdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730735126; c=relaxed/simple;
-	bh=hPDJcBx36zovOZyGA7UWvc4j7jN6je11Jp4t2rUWfj8=;
+	s=arc-20240116; t=1730735475; c=relaxed/simple;
+	bh=t8dak0VK6rK4EY2nAcpBuTfFm+KGbqhaFYNHPFex83w=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=VwF5JD5ApzI04gomQjOosyi8caW22qXdXuCgVgYdvrWS67yITMjo1ae3kvu5RCYF8I+BxLHZGPw1Ul5yr9GjiM0wBXXZiVo1kAw1pcdLYA/5mv4fsI26Kg4aLZ6J6g74Om4STaEw8J9zDj1VcsoHNRDcdNWeaJ6fywQ64T8YF/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IZlnFGSn; arc=none smtp.client-ip=209.85.208.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c937b5169cso7177721a12.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 07:45:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730735123; x=1731339923; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CyD6YqQEWKxUIe4S6LmMmf6PWiCVhHiKz195ndFs5bE=;
-        b=IZlnFGSnmD0MRHl1RSGrTBtSDERcLIHBKDCy2jsi6tYJ/IcomdMVderOnZQHELTuQS
-         DLa8CRjg/AdXlIwXSb04KblacKVUKThfN0Oj9eoivkN86x9XdJk8WXFEDAGJmu7cIY4D
-         QEDUxUipbPW6debAfE339w164mBugU3GgUcDjldO9onP/7KVHDOO4Kno1b2L4gG/RIds
-         VzpjowiQ93tlM4+B7R8FYHjY0TjSR+mNDzgusIhs1VVWTmY9O2ShrduVMgjJH1BNnDaG
-         0sHTwW8j6BiY6k6gwmYYckFxx36I0WsFL3zz31c+GDTbDX5qBOWnlEAzBWH5pTCK45Tl
-         p9xA==
+	 To:Cc:Content-Type; b=o5V5D0DXsx/oXy6uUvioFbSJJ1tCpu3w/b1mjq21ktB8AxTTN/gQQoAsCo9V1Vn7pU3F2nR9qZGPgThzE4/mxuB1aWxrOhDzweK5/isEi19bZz9bZjTRkQZGViWAZgvzoYVWJ5csTWqy+tj+i/Lqms/mbNTy1y7UpACXZ4Vn7bc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fJ4EQGdQ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730735472;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=f573NGxGwwEcpEI02aRs9Mv6MPzHTm8n3DIYo90WOAg=;
+	b=fJ4EQGdQXr5vGVKGr4yZxrsIEfkbrT0mJQ3JEn3X2voiU2SYPCmUXGO0jA5L1Wm1BnaSPP
+	HijbCm+dFR+aaHAhvNk+kfpfAsT5qSQRKmEOiFUudFPO+Akl/dt8Zhb/Malx7FOWpzBDe/
+	w64wQSGC/LWRuiIyK9xqppSrLU/cU/k=
+Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
+ [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-632-I6yhx7WMMxWmnOgN8hXRnA-1; Mon, 04 Nov 2024 10:51:11 -0500
+X-MC-Unique: I6yhx7WMMxWmnOgN8hXRnA-1
+Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5eb87df274dso369017eaf.2
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 07:51:11 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730735123; x=1731339923;
+        d=1e100.net; s=20230601; t=1730735470; x=1731340270;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=CyD6YqQEWKxUIe4S6LmMmf6PWiCVhHiKz195ndFs5bE=;
-        b=FtwrUgB5Iq9BYMC02/ThGzHaKtmx8i3g7mXp96jTkhQEWBmWfKHifSDO/zisT4O8F2
-         nZJsppjLpslGJ5HF8ArG+PZYkv+lFQpJHBlp7ahoLgW/99netlEe3VvHUkLMYuY5SXee
-         CGoDlEOvpb2UHkKQDoqEXyiUoe7X2dHrxC6LlcT5ttSoPrPfnTpCa7J1TJmtEYe+SFrj
-         mf4TWSk7+95wdOIOVpemqF/vanCRY/qGZfuaV0kModQmzVMXAgscUxDS2TM5WHDhvKOs
-         G7OJT6KPyarOe18kzvBTYy56udVl8kWXN9LpQ2/WAnR3tefyUBCojhO1ScIJze+fvL2r
-         s/zw==
-X-Forwarded-Encrypted: i=1; AJvYcCXAr7faaB7tJUYFoP1GOAGkaLNGVs3RbD6ej0GghlOhushoUnjQpmCYzf1mlaoWu1Ou0GDj0xw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwP4Ukno5+T9Q+8sC2vJrp1Jg37t3PQ1oUMZZmH4mSdO4JnAAkr
-	KJqrhDmENZe5D4eOp7R75QLoXfsx5yn0X1Fbu4Bi4Fc3anguDjOKF8kuNvBnLPyK1683+LK/3DB
-	DTLN3lL+y213CrOQ+Y93J/76cPwupajjtCusq
-X-Google-Smtp-Source: AGHT+IEL4Bfa722zzMFIJFIe6LUBra+dg2DR/J927/adcjEn393kcxsz9by8vrW9A2NUCiatisxFPqNB6U5c0PPsRnA=
-X-Received: by 2002:a05:6402:40c2:b0:5ce:b120:a080 with SMTP id
- 4fb4d7f45d1cf-5ceb120a12cmr14019344a12.13.1730735122632; Mon, 04 Nov 2024
- 07:45:22 -0800 (PST)
+        bh=f573NGxGwwEcpEI02aRs9Mv6MPzHTm8n3DIYo90WOAg=;
+        b=fZvKI7qfjVNFiOfyxLQyMKZpuWqdAOo5oeobDyX3EFo3qvBgrjM5UFs7mnsrxS8gix
+         5Uz7lIQTDeMBxFnvNGrVtTBZrNx5HXc6W+7h/Hpmfhrxw2qOm7+KgiiZgmanN3GIeBNW
+         fd0xb6gW+xUwMdDn6wzalqiVhGq4SOSa+wsgQbYRIMT+As7pXRqr1E+cvRcYJd6EqB8m
+         oc9JfuA9on6qSBwMwPose8WDqd561yWdMiTvNimmj9YZTFMDz6rQdUGA8gLNbDfDdwXG
+         vg26GzmPkxuGbXXYgJG0KMrBh2FnM7acv1MM2LLoGXCBKKO1+eiUncgmvbrjRXFQv/jm
+         ZtPw==
+X-Forwarded-Encrypted: i=1; AJvYcCXTKahwVRAv7zsAa4RBQW43fHPHxlJ4LRXuig8XZluc4i+UVN7oRpbeBExmRVBtxWHj+SPz2GQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7NctRTpmZ2bqpPQonYINwTOngHmrQr9IOAbRnZpZaK+3SYaw2
+	2hBtkM/6nuNS4wQJ7XKWTbBi19G+6uVx4lo4QihsZonhZGvqg6+6BsXvLR/KTpJ6NbYomthy0xo
+	WMtft6fZJmtctvz5Y5kTnUfypcoX3b6iSzwcFMKUc+2wfPL9qO8ftkFd/mhDF+jnMd8jtVfteP5
+	aiGsQb85UTju+0eEawZmpqOfCUipB4
+X-Received: by 2002:a05:6871:3a28:b0:27b:9f8b:7e49 with SMTP id 586e51a60fabf-29051ed2e07mr8128950fac.11.1730735470677;
+        Mon, 04 Nov 2024 07:51:10 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFPHhMtv9li+aLKBXugLstxd80vMrdlAgTUr2ut5C9X79h0VKy4FqWxhiv+7Ma6OH4h81v54eHfUtX8m+iMlO4=
+X-Received: by 2002:a05:6871:3a28:b0:27b:9f8b:7e49 with SMTP id
+ 586e51a60fabf-29051ed2e07mr8128940fac.11.1730735470357; Mon, 04 Nov 2024
+ 07:51:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031122344.2148586-1-wangliang74@huawei.com>
- <CANn89i+KL0=p2mchoZCOsZ1YoF9xhoUoubkub6YyLOY2wpSJtg@mail.gmail.com> <0913d4ba-7298-4295-8ce0-8c38ddb9d5b6@huawei.com>
-In-Reply-To: <0913d4ba-7298-4295-8ce0-8c38ddb9d5b6@huawei.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 4 Nov 2024 16:45:11 +0100
-Message-ID: <CANn89iKWbcjavVB-7Lwqou8n2v6oGnaE3-jzDz7n9Nj3+5yJTw@mail.gmail.com>
-Subject: Re: [RFC PATCH net] net: fix data-races around sk->sk_forward_alloc
-To: Wang Liang <wangliang74@huawei.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, horms@kernel.org, 
-	dsahern@kernel.org, yuehaibing@huawei.com, zhangchangzhong@huawei.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241029123637.1974604-1-aleksandr.loktionov@intel.com> <CADEbmW1rJdFZ0ccpo-YLv0W8zQsr9-2eMnncDgR-tE+On0TX5g@mail.gmail.com>
+In-Reply-To: <CADEbmW1rJdFZ0ccpo-YLv0W8zQsr9-2eMnncDgR-tE+On0TX5g@mail.gmail.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 4 Nov 2024 16:50:59 +0100
+Message-ID: <CADEbmW0r4BCU_qWHRrvAPQ-kwA-xMDj2YD_OdiGotRnfEMtpoQ@mail.gmail.com>
+Subject: Re: [PATCH iwl-next v4444] i40e: add ability to reset VF for Tx and
+ Rx MDD events
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com, 
+	netdev@vger.kernel.org, Jan Sokolowski <jan.sokolowski@intel.com>, 
+	Padraig J Connolly <padraig.j.connolly@intel.com>, maciej.fijalkowski@intel.com, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 1, 2024 at 7:24=E2=80=AFAM Wang Liang <wangliang74@huawei.com> =
-wrote:
+On Mon, Nov 4, 2024 at 4:40=E2=80=AFPM Michal Schmidt <mschmidt@redhat.com>=
+ wrote:
 >
+> On Tue, Oct 29, 2024 at 1:36=E2=80=AFPM Aleksandr Loktionov
+> <aleksandr.loktionov@intel.com> wrote:
+[...]
+> > +
+> > +                       i40e_vc_reset_vf(vf, true);
+> >                 }
+> >         }
+> >
+> >         /* re-enable mdd interrupt cause */
+> >         clear_bit(__I40E_MDD_EVENT_PENDING, pf->state);
 >
-> =E5=9C=A8 2024/10/31 22:08, Eric Dumazet =E5=86=99=E9=81=93:
-> > On Thu, Oct 31, 2024 at 1:06=E2=80=AFPM Wang Liang <wangliang74@huawei.=
-com> wrote:
-> >> Syzkaller reported this warning:
-> > Was this a public report ?
-> Yes=EF=BC=8CI find the report here (the C repo in the url is useful):
+> Can you remove this 2nd clearing of the __I40E_MDD_EVENT_PENDING bit?
+> If the interrupt handler detects a MDD event while we're still
+> printing the message about the previous one, we don't want to forget
+> it by clearing it here.
 >
-> https://syzkaller.appspot.com/bug?id=3D3e9b62ff331dcc3a6c28c41207f3b99118=
-28a46b
-> >> [   65.568203][    C0] ------------[ cut here ]------------
-> >> [   65.569339][    C0] WARNING: CPU: 0 PID: 16 at net/ipv4/af_inet.c:1=
-56 inet_sock_destruct+0x1c5/0x1e0
-> >> [   65.575017][    C0] Modules linked in:
-> >> [   65.575699][    C0] CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tai=
-nted 6.12.0-rc5 #26
-> >> [   ...]
-> > Oh the horror, this is completely wrong and unsafe anyway.
-> >
-> > TCP listen path MUST be lockless, and stay lockless.
-> >
-> > Ask yourself : Why would a listener even hold a pktoptions in the first=
- place ?
-> >
-> > Normally, each request socket can hold an ireq->pktopts (see in
-> > tcp_v6_init_req())
-> >
-> > The skb_clone_and_charge_r() happen later in tcp_v6_syn_recv_sock()
-> >
-> > The correct fix is to _not_ call skb_clone_and_charge_r() for a
-> > listener socket, of course, this never made _any_ sense.
-> >
-> > The following patch should fix both TCP  and DCCP, and as a bonus make
-> > TCP SYN processing faster
-> > for listeners requesting these IPV6_PKTOPTIONS things.
-> Thank you very much for your suggestion and patch!
->
-> However, the problem remains unsolved when I use the following patch to
-> test.
->
-> Because skb_clone_and_charge_r() is still called when sk_state is
-> TCP_LISTEN in discard tag.
->
-> So I modify the patch like this (it works after local test):
+> Michal
 
-SGTM, please send a V2 then.
+Well, I suppose the race I described cannot happen because the
+unmasking of ..._MAL_DETECT_MASK happens after this.
+But it's still redundant to clear the bit twice.
+
+Michal
+
+> >         reg =3D rd32(hw, I40E_PFINT_ICR0_ENA);
+> >         reg |=3D  I40E_PFINT_ICR0_ENA_MAL_DETECT_MASK;
+> >         wr32(hw, I40E_PFINT_ICR0_ENA, reg);
+> >         i40e_flush(hw);
+> > +
+> > +       i40e_print_vfs_mdd_events(pf);
+> >  }
+> >
+> >  /**
+
 
