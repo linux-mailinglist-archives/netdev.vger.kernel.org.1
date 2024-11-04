@@ -1,155 +1,224 @@
-Return-Path: <netdev+bounces-141658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3AD29BBEB6
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:20:59 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id B40119BBEBD
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:23:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7FA12821B6
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:20:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 394121F21AF7
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:23:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2B321E3DF1;
-	Mon,  4 Nov 2024 20:20:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 858CA1E491B;
+	Mon,  4 Nov 2024 20:23:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="MysYrUtk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PG1TYxxF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 668AE1E3DCF
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 20:20:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E75A11CC178;
+	Mon,  4 Nov 2024 20:23:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730751655; cv=none; b=TubVCl/f6qOHgIynM5nsdxd4tZR6pMxcbiC+sMWZPNNqAbI3WWnxYP1XdL2VgRQHr3vhO11jgkODanVJwvbmSiTusxn5N4XL0ngkAb5jpr7u+JmtKF7eA57pCyg2m0mYZ7CdSvtRBSvaZ6UE0Xg7C6bK13KUfp2Ml8AmX4Jt01s=
+	t=1730751811; cv=none; b=FgIczvtGim/jh+lHdM4iaAXgLx2ukasBKJgsKsyIQPV561moVxquyZ4zm78tzdb4OglZauJA9IiJjlQtEuKlMnINaFG7p4InpDKH0HQvN//E9jLh1GPcDsjnoTtMRX6+je3Jej4FA7TdUQWIiUfPRG6kpjJsbg9hxj6FHyikkQg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730751655; c=relaxed/simple;
-	bh=G8UM6S47N1hnQwwcxjbdqO/6J6HHccLXABrZTA+EPTA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=gYU3iFJu7K0ZOFO6bSsHDlA8jYuYHzeVCH8J63jJHQ1Gh1E0zQaMPpelXY+AAhcd2RRoqrSnFXA3CXDp7gIrUTABsTLwmg1Y9Chapz4Mb5BlBGnfVMYwCeAR7VO+1VSCY79r7AzTlUWK4K07oJ7RAkl9r2rgDlU3auFxQJBbd8s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=MysYrUtk; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a3b28ac9a1so40905ab.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 12:20:54 -0800 (PST)
+	s=arc-20240116; t=1730751811; c=relaxed/simple;
+	bh=bVRTVkdVLpt3k2Sz3dR1IgaViZm9u/+auAbXEsHZa5Q=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=EMhz5WuFcW0a+vxCni66RF1Yarx/h9KEwfd/BZTMEaaTS9Blyd5+o3isvZ6s5uHoF/tcN93kqlGg+ou0Eyd+AFzXN93JX0hYwSpwtJektVnKhEl4IH08XykNx5cQQPU67IbdT4JrxtRkPYZMBRfODVgnoEYO6txsk4jjSYtdz/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PG1TYxxF; arc=none smtp.client-ip=209.85.214.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20c8c50fdd9so37538245ad.0;
+        Mon, 04 Nov 2024 12:23:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730751653; x=1731356453; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Uql/Bw1vcaYh8+NWY2ZEj9oRvcn+EreIycRFoRD4OVw=;
-        b=MysYrUtkyTmu7zxzu2II/1nvVCMXbIcUE9hmdCD7Nvf2z4LLNExuRKSjs58DTTpPPL
-         NRslZAzS6SIR9nl4E9nqavWmhwDeMWVOY2F5nGcL4dzkO0548/5DnS1peCu+WP59bQBe
-         5Ei1nFNTqAajybLmE1H5s1ROndhxzDgnZpUpk5xuXsPf2EQNe3Gg00ciAr7nOk75jBIu
-         IxnbRIn5NZKHwsURWBizBohv9IED8CaQ37u+fmtFotmdS/4sF7BJLY/IdJgcEA7TBr9J
-         luzYk8yuIE0f/6EPbK9HCIw7tlEi1+VCZiLL5akIRtwFTLAR/of2JGUzhphNmK68w1//
-         aUmA==
+        d=gmail.com; s=20230601; t=1730751809; x=1731356609; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=M+5x6kMVU1G6KEqc3nr1gaq6PpBkuKcx3+eLAbZss6k=;
+        b=PG1TYxxF1R3eg7RfTAjHo8JcIa1CkJzDHt9j48SDpzzE923MsFrYW+FoO2Vb6iYzvs
+         6NXvuykDkb89MzGqrdZtLMtPtuOAmgnRywweXvjPc/4OeJXg9843roF5BAA0A73q38R/
+         sSRsxw40/FPk6vZRbBiIzX9cAjkVjPVa5BU1zbKQWphQEBqfOchznQthAzUobVdA7LN+
+         7S71stdmKoNA9SOSot/K6rPyaH4vya4h7KAxxYXuuLBcyafZFhJIJ9gcU0T7fig2qzuD
+         OFxX9LSNiavdFOXS0B4fn47yabRcOv5LJQ4EeakbY8MT3cGo0viOC8wOksGI7B468KCm
+         AjDA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730751653; x=1731356453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Uql/Bw1vcaYh8+NWY2ZEj9oRvcn+EreIycRFoRD4OVw=;
-        b=Hijhcmre1ZsfrOhOCRfrXnfw4iPJJiWkKXiKDWpRRetIQ5U9Nl6mxQ8H0RfTZhowb0
-         RVLDJmUtHVpjcRfZSLJ/JwExvyCvkFrSDV0rZA22SbmE/phbzWt0UXkLN7tmsSb4caqa
-         saXrJKFx8+ZRxplMwqs5Ivudt06mc+ar2QmeCtrckj0sA6HyLetEyjE2qnK4i8pBUdN2
-         sATvfybikxXOiCErAmFPevlXUOiPJTNm6tNozc47oB76KOEPO7OlegM3hZfHsqplA5Qi
-         minEj87pDByVjAao0BozXpCJFQM92EhR4UHBuLoB3yHouFYSDHZDYkJJINps+mLEa9HS
-         TOyA==
-X-Forwarded-Encrypted: i=1; AJvYcCWBgmzCNkIAY34yApP1ogKCS5otXZlofwLUjw8bTzD1qe4tUe1x4l7PpPf4KEEJ4/szcTjaY9U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaYGbFIDjjxGG0wJC/ex7to31abaTIy/0rJ+A2M9UVBTMbecrM
-	Bk0eyYMc+JWwV1L0PQ/BBRwJr15Queat31rKr+CMjb3amwi37cZgCBf1k/ICdwG4+kuIkzlQ5YO
-	S9bTOnfSVeJSydZQiQkGh/62B0u/Q/4RTN00v
-X-Gm-Gg: ASbGncvVXJd8xSRHApA5/0QIPel9ZG8FDaRdUxhoNOJotipBYlQdhesl2S2WlDZ2MNn
-	nB96Uuq+7Zs4ctuLY2kKaZbA6vnxL/mv5+X0GYJeoyu+Ft9n6R82dV/iGVjhGyg==
-X-Google-Smtp-Source: AGHT+IFzSkcrUS2LnkOi2cTsx/E8EjUnf3mipQEN/gZ5HS1tCJDpCOnfzB4nfSUr8CDBFueEK+2x9JATC18GABaEGjI=
-X-Received: by 2002:a05:6e02:12b4:b0:3a6:b318:3b99 with SMTP id
- e9e14a558f8ab-3a6daa9e751mr547355ab.27.1730751653363; Mon, 04 Nov 2024
- 12:20:53 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730751809; x=1731356609;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=M+5x6kMVU1G6KEqc3nr1gaq6PpBkuKcx3+eLAbZss6k=;
+        b=D0r0WrrypNscnvdOBQNcdSHPc5ZsnyK7eosdGlp4Pfh9+FAeGuQ5swCdaAbVyy9guw
+         vY7ewPaY46n7gQY7DF26QwtKTrWUvwYF/ozUgPt55BO+lCz9r5b4wPd1pV8mMeUB5peg
+         g0ujQHTeGorfH6bnGyRsmvIRTZ8Day0O8gInAqO6+dtNSEVEhUDynDFT3Qae7SM9/R7p
+         vNp/EV4Cnv5vaiGdeNmq6ISmRyYdQsFT56gD+capkvLtRht/J6yEHdm4CAD5w4i3feba
+         mrIml+1dveoPVm60EBTeEXj7Z7GE6Hq4z/441TkED18T93alsfR7R1hghOYcR3HbrdMy
+         JNig==
+X-Forwarded-Encrypted: i=1; AJvYcCU+1YQYdKWCHXf46b6IQuK7PWkNfvX/7VczUUaoh3s9gFUAWbXlaDs8QrWGA0C4PZfxFFxeNdnAAu6h1YA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwA6DFw90Neqrsi73u10TFheGKL1cxhu6FaZKrT6jDt4YKAHP7O
+	UoieiIoOuQO9U6hQBFNarUdOHADMAyiLM5K0Cemhq5QJDnvYoxjrsrgv+w==
+X-Google-Smtp-Source: AGHT+IFie9ycNzrKoyUya76A8gnuPRJNJn/rr1vkTgiP7mo1hOVSdwoxYiZl+CB9V9WHImDp12W3tQ==
+X-Received: by 2002:a17:90b:4ac7:b0:2e9:20d8:414c with SMTP id 98e67ed59e1d1-2e94bcdcb02mr22005352a91.5.1730751808955;
+        Mon, 04 Nov 2024 12:23:28 -0800 (PST)
+Received: from ryzen.lan ([2601:644:8200:dab8::a86])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa57cc3sm10315054a91.32.2024.11.04.12.23.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 12:23:28 -0800 (PST)
+From: Rosen Penev <rosenp@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Sudarsana Kalluru <skalluru@marvell.com>,
+	Manish Chopra <manishc@marvell.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org (open list)
+Subject: [PATCHv2 net-next] net: bnx2x: use ethtool string helpers
+Date: Mon,  4 Nov 2024 12:23:26 -0800
+Message-ID: <20241104202326.78418-1-rosenp@gmail.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-5-dw@davidwei.uk>
- <CAHS8izPZ3bzmPx=geE0Nb0q8kG8fvzsGT2YgohoFJbSz2r21Zw@mail.gmail.com> <5b928f0e-f3f8-4eaa-b750-e3f445d2fa46@gmail.com>
-In-Reply-To: <5b928f0e-f3f8-4eaa-b750-e3f445d2fa46@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 4 Nov 2024 12:20:41 -0800
-Message-ID: <CAHS8izMTuEMS2hyHs0cit0Wvo3DcuHxReE1WS-crJ8zDTs=_Wg@mail.gmail.com>
-Subject: Re: [PATCH v7 04/15] net: prepare for non devmem TCP memory providers
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 1, 2024 at 10:41=E2=80=AFAM Pavel Begunkov <asml.silence@gmail.=
-com> wrote:
-> ...
-> >> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
-> >> index e928efc22f80..31e01da61c12 100644
-> >> --- a/net/ipv4/tcp.c
-> >> +++ b/net/ipv4/tcp.c
-> >> @@ -277,6 +277,7 @@
-> >>   #include <net/ip.h>
-> >>   #include <net/sock.h>
-> >>   #include <net/rstreason.h>
-> >> +#include <net/page_pool/types.h>
-> >>
-> >>   #include <linux/uaccess.h>
-> >>   #include <asm/ioctls.h>
-> >> @@ -2476,6 +2477,11 @@ static int tcp_recvmsg_dmabuf(struct sock *sk, =
-const struct sk_buff *skb,
-> >>                          }
-> >>
-> >>                          niov =3D skb_frag_net_iov(frag);
-> >> +                       if (net_is_devmem_page_pool_ops(niov->pp->mp_o=
-ps)) {
-> >> +                               err =3D -ENODEV;
-> >> +                               goto out;
-> >> +                       }
-> >> +
-> >
-> > I think this check needs to go in the caller. Currently the caller
-> > assumes that if !skb_frags_readable(), then the frag is dma-buf, and
->
-> io_uring originated netmem that are marked unreadable as well
-> and so will end up in tcp_recvmsg_dmabuf(), then we reject and
-> fail since they should not be fed to devmem TCP. It should be
-> fine from correctness perspective.
->
-> We need to check frags, and that's the place where we iterate
-> frags. Another option is to add a loop in tcp_recvmsg_locked
-> walking over all frags of an skb and doing the checks, but
-> that's an unnecessary performance burden to devmem.
->
+The latter is the preferred way to copy ethtool strings.
 
-Checking each frag in tcp_recvmsg_dmabuf (and the equivalent io_uring
-function) is not ideal really. Especially when you're dereferencing
-nio->pp to do the check which IIUC will pull a cache line not normally
-needed in this code path and may have a performance impact.
+Avoids manually incrementing the pointer. Cleans up the code quite well.
 
-We currently have a check in __skb_fill_netmem_desc() that makes sure
-all frags added to an skb are pages or dmabuf. I think we need to
-improve it to make sure all frags added to an skb are of the same type
-(pages, dmabuf, iouring). sending it to skb_copy_datagram_msg or
-tcp_recvmsg_dmabuf or error.
+Signed-off-by: Rosen Penev <rosenp@gmail.com>
+---
+ v2: handle IS_VF
+ v1: split off from main broadcom patch.
+ .../ethernet/broadcom/bnx2x/bnx2x_ethtool.c   | 68 +++++++++----------
+ 1 file changed, 31 insertions(+), 37 deletions(-)
 
-I also I'm not sure dereferencing ->pp to check the frag type is ever
-OK in such a fast path when ->pp is not usually needed until the skb
-is freed? You may have to add a flag to the niov to indicate what type
-it is, or change the skb->unreadable flag to a u8 that determines if
-it's pages/io_uring/dmabuf.
+diff --git a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+index adf7b6b94941..44199855ebfb 100644
+--- a/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
++++ b/drivers/net/ethernet/broadcom/bnx2x/bnx2x_ethtool.c
+@@ -39,34 +39,34 @@ static const struct {
+ 	int size;
+ 	char string[ETH_GSTRING_LEN];
+ } bnx2x_q_stats_arr[] = {
+-/* 1 */	{ Q_STATS_OFFSET32(total_bytes_received_hi), 8, "[%s]: rx_bytes" },
++/* 1 */	{ Q_STATS_OFFSET32(total_bytes_received_hi), 8, "[%d]: rx_bytes" },
+ 	{ Q_STATS_OFFSET32(total_unicast_packets_received_hi),
+-						8, "[%s]: rx_ucast_packets" },
++						8, "[%d]: rx_ucast_packets" },
+ 	{ Q_STATS_OFFSET32(total_multicast_packets_received_hi),
+-						8, "[%s]: rx_mcast_packets" },
++						8, "[%d]: rx_mcast_packets" },
+ 	{ Q_STATS_OFFSET32(total_broadcast_packets_received_hi),
+-						8, "[%s]: rx_bcast_packets" },
+-	{ Q_STATS_OFFSET32(no_buff_discard_hi),	8, "[%s]: rx_discards" },
++						8, "[%d]: rx_bcast_packets" },
++	{ Q_STATS_OFFSET32(no_buff_discard_hi),	8, "[%d]: rx_discards" },
+ 	{ Q_STATS_OFFSET32(rx_err_discard_pkt),
+-					 4, "[%s]: rx_phy_ip_err_discards"},
++					 4, "[%d]: rx_phy_ip_err_discards"},
+ 	{ Q_STATS_OFFSET32(rx_skb_alloc_failed),
+-					 4, "[%s]: rx_skb_alloc_discard" },
+-	{ Q_STATS_OFFSET32(hw_csum_err), 4, "[%s]: rx_csum_offload_errors" },
+-	{ Q_STATS_OFFSET32(driver_xoff), 4, "[%s]: tx_exhaustion_events" },
+-	{ Q_STATS_OFFSET32(total_bytes_transmitted_hi),	8, "[%s]: tx_bytes" },
++					 4, "[%d]: rx_skb_alloc_discard" },
++	{ Q_STATS_OFFSET32(hw_csum_err), 4, "[%d]: rx_csum_offload_errors" },
++	{ Q_STATS_OFFSET32(driver_xoff), 4, "[%d]: tx_exhaustion_events" },
++	{ Q_STATS_OFFSET32(total_bytes_transmitted_hi),	8, "[%d]: tx_bytes" },
+ /* 10 */{ Q_STATS_OFFSET32(total_unicast_packets_transmitted_hi),
+-						8, "[%s]: tx_ucast_packets" },
++						8, "[%d]: tx_ucast_packets" },
+ 	{ Q_STATS_OFFSET32(total_multicast_packets_transmitted_hi),
+-						8, "[%s]: tx_mcast_packets" },
++						8, "[%d]: tx_mcast_packets" },
+ 	{ Q_STATS_OFFSET32(total_broadcast_packets_transmitted_hi),
+-						8, "[%s]: tx_bcast_packets" },
++						8, "[%d]: tx_bcast_packets" },
+ 	{ Q_STATS_OFFSET32(total_tpa_aggregations_hi),
+-						8, "[%s]: tpa_aggregations" },
++						8, "[%d]: tpa_aggregations" },
+ 	{ Q_STATS_OFFSET32(total_tpa_aggregated_frames_hi),
+-					8, "[%s]: tpa_aggregated_frames"},
+-	{ Q_STATS_OFFSET32(total_tpa_bytes_hi),	8, "[%s]: tpa_bytes"},
++					8, "[%d]: tpa_aggregated_frames"},
++	{ Q_STATS_OFFSET32(total_tpa_bytes_hi),	8, "[%d]: tpa_bytes"},
+ 	{ Q_STATS_OFFSET32(driver_filtered_tx_pkt),
+-					4, "[%s]: driver_filtered_tx_pkt" }
++					4, "[%d]: driver_filtered_tx_pkt" }
+ };
+ 
+ #define BNX2X_NUM_Q_STATS ARRAY_SIZE(bnx2x_q_stats_arr)
+@@ -3184,49 +3184,43 @@ static u32 bnx2x_get_private_flags(struct net_device *dev)
+ static void bnx2x_get_strings(struct net_device *dev, u32 stringset, u8 *buf)
+ {
+ 	struct bnx2x *bp = netdev_priv(dev);
+-	int i, j, k, start;
+-	char queue_name[MAX_QUEUE_NAME_LEN+1];
++	const char *str;
++	int i, j, start;
+ 
+ 	switch (stringset) {
+ 	case ETH_SS_STATS:
+-		k = 0;
+ 		if (is_multi(bp)) {
+ 			for_each_eth_queue(bp, i) {
+-				memset(queue_name, 0, sizeof(queue_name));
+-				snprintf(queue_name, sizeof(queue_name),
+-					 "%d", i);
+-				for (j = 0; j < BNX2X_NUM_Q_STATS; j++)
+-					snprintf(buf + (k + j)*ETH_GSTRING_LEN,
+-						ETH_GSTRING_LEN,
+-						bnx2x_q_stats_arr[j].string,
+-						queue_name);
+-				k += BNX2X_NUM_Q_STATS;
++				for (j = 0; j < BNX2X_NUM_Q_STATS; j++) {
++					str = bnx2x_q_stats_arr[j].string;
++					ethtool_sprintf(&buf, str, i);
++				}
+ 			}
+ 		}
+ 
+-		for (i = 0, j = 0; i < BNX2X_NUM_STATS; i++) {
++		for (i = 0; i < BNX2X_NUM_STATS; i++) {
+ 			if (HIDE_PORT_STAT(bp) && IS_PORT_STAT(i))
+ 				continue;
+-			strcpy(buf + (k + j)*ETH_GSTRING_LEN,
+-				   bnx2x_stats_arr[i].string);
+-			j++;
++			ethtool_puts(&buf, bnx2x_stats_arr[i].string);
+ 		}
+ 
+ 		break;
+ 
+ 	case ETH_SS_TEST:
++		if (IS_VF(bp))
++			break;
+ 		/* First 4 tests cannot be done in MF mode */
+ 		if (!IS_MF(bp))
+ 			start = 0;
+ 		else
+ 			start = 4;
+-		memcpy(buf, bnx2x_tests_str_arr + start,
+-		       ETH_GSTRING_LEN * BNX2X_NUM_TESTS(bp));
++		for (i = start; i < BNX2X_NUM_TESTS_SF; i++)
++			ethtool_puts(&buf, bnx2x_tests_str_arr[i]);
+ 		break;
+ 
+ 	case ETH_SS_PRIV_FLAGS:
+-		memcpy(buf, bnx2x_private_arr,
+-		       ETH_GSTRING_LEN * BNX2X_PRI_FLAG_LEN);
++		for (i = 0; i < BNX2X_PRI_FLAG_LEN; i++)
++			ethtool_puts(&buf, bnx2x_private_arr[i]);
+ 		break;
+ 	}
+ }
+-- 
+2.47.0
 
-
---=20
-Thanks,
-Mina
 
