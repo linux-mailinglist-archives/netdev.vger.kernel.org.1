@@ -1,109 +1,73 @@
-Return-Path: <netdev+bounces-141397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 096159BAC12
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 06:31:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39F979BAC3A
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 06:48:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01EE01C20A85
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 05:31:29 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E587D1F236E1
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 05:48:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CC6A179956;
-	Mon,  4 Nov 2024 05:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BF691885A0;
+	Mon,  4 Nov 2024 05:48:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="YyBFsnk5"
+	dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b="0l2PahRp"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B5F216EB5D
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 05:31:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49E4718BC2C;
+	Mon,  4 Nov 2024 05:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730698286; cv=none; b=rURsdHhDhWOZ9R4pAzQ2GRUkI99K8giRF5dmTYL2K0nxP8ZujLTGkOy1AYrDGZmYRikF2Rr4MyE1g9ufpTE10MX9qQzTQD7Z+CJ+G6U3/Un7nZGT7tQ4gCVByUSugbIYHvnQrJ6VnGQXS529f9RyTI+CDOd0W56y934pmN268tc=
+	t=1730699321; cv=none; b=tTHwBw8BA7OHSvnLsw7nPzWrfSTraDsc41rSQ4kCvDYUDvxqWe3YpON1IQe2oCPBxvZf07i3Zu+nS17tveHuleN3oYG0KLnlNPUTaxo8gTVSkMzcFPNSFPchX+orPI+7YrokjPKOyCwsnH/mLHM22d+b0lNebV2reZy+m5y4JBs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730698286; c=relaxed/simple;
-	bh=eAscMrBtxFJNjQaJHm5mLwqn013BMV7IjcX21gR4UVU=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=jTDqt3m3B+gLr455xXGHZlC+7YDIpceN9lBdvJGKR4o0SLjbB4at/TNPWB0yynJ0WUGcEcwOSV7Ye2EIYILEH2AvahB6NfGZvFhgb79cOJqQexWZDAVJEjvUGfWxPz1uO5n9ger0RIJO3TNlOqEsmdyar46rZ2sHSld1yFWpZ8o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=YyBFsnk5; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1730698284; x=1762234284;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=eAscMrBtxFJNjQaJHm5mLwqn013BMV7IjcX21gR4UVU=;
-  b=YyBFsnk5jGQU/30Vz1MZNDlbqhHRoOzYfEV+tIL31iWQUkxam6Da3kVV
-   ct4sk4MCmFMnM3YgUOxjNrNhVq7Z64b6Xz6j/eVXLQydmfF/CkCGIYn/R
-   lu5EfThYYr9QjA0TiUkazRGfOlf/SPokge4uS02qFnUaanYLMnusTvJKX
-   dOAO8XU7pWS9p5Ne1B/NfKTwYy/lgl2a2LGu3Rhf2XjWydnmuG/ZdiZZZ
-   /eFLV7IiXCgHvKboT9+5F7XStZZwIE4LZb1t7ckRY8Y1Re0nL21wj3aL7
-   bmTgyAiQJjso0W4YiSkvbegAEzQMl9R7EqK2U9J6xRDwwFqysdTMM/ngU
-   A==;
-X-CSE-ConnectionGUID: RBSmdqnPT4+THByMDZKx9Q==
-X-CSE-MsgGUID: GHqoPKDFS+eCo3Mzq7PASw==
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="201254695"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 03 Nov 2024 22:31:17 -0700
-Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
- chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Sun, 3 Nov 2024 22:31:14 -0700
-Received: from nisar-OptiPlex-9020.microchip.com (10.10.85.11) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
- 15.1.2507.35 via Frontend Transport; Sun, 3 Nov 2024 22:31:11 -0700
-From: Mohan Prasad J <mohan.prasad@microchip.com>
-To: <f.pfitzner@pengutronix.de>, <mkubecek@suse.cz>, <netdev@vger.kernel.org>,
-	<kory.maincent@bootlin.com>, <davem@davemloft.net>
-CC: <kuba@kernel.org>, <andrew@lunn.ch>, <Anbazhagan.Sakthivel@microchip.com>,
-	<Nisar.Sayed@microchip.com>, <mohan.prasad@microchip.com>
-Subject: [PATCH ethtool v2] netlink: settings: Fix for wrong auto-negotiation state
-Date: Mon, 4 Nov 2024 04:04:07 +0530
-Message-ID: <20241103223408.26274-1-mohan.prasad@microchip.com>
-X-Mailer: git-send-email 2.43.0
+	s=arc-20240116; t=1730699321; c=relaxed/simple;
+	bh=5fy6xKs7vhmUZBinU8ERiLTywxLCmF+rAnpbE/Um2aQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=aIqyFLaiZRRkIXtvBQCXGbdTQPoGoeUFkk39vA3uKe+zmAvoHrHx36RhhD5xi8hsvBGw1MA98cYjIJA5QOu+hO3Jc3k9EI0Hcp9l4tkgh8b234PdsJXj5C7eY3lSB33xFS9VxE7fowVENyZdqh7wV6HiBxRbhJr5yY79M4o6C7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (1024-bit key) header.d=linuxfoundation.org header.i=@linuxfoundation.org header.b=0l2PahRp; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 57BD5C4CECE;
+	Mon,  4 Nov 2024 05:48:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1730699320;
+	bh=5fy6xKs7vhmUZBinU8ERiLTywxLCmF+rAnpbE/Um2aQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=0l2PahRptpiEAyN4wodVq4nyyBKrG2iT6AhSssgSZs12x9aXjOxFaAP3N0pwTcizi
+	 0hjt3vxUg4eg/t6fBn4ehlSbmIKddGTVTRJHCIzG8Xp/Y9VybmzsMblzQ7dGLO4WKI
+	 QD7fOU4iUdeofngSjTc8KUEXUZUkpAG2PYLruDZQ=
+Date: Mon, 4 Nov 2024 01:34:19 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Geert Uytterhoeven <geert+renesas@glider.be>
+Cc: Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+	Paul Barker <paul.barker.ct@bp.renesas.com>,
+	Niklas =?iso-8859-1?Q?S=F6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+	linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH/RFC] MAINTAINERS: Re-add cancelled Renesas driver sections
+Message-ID: <2024110457-enhance-arrive-b781@gregkh>
+References: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0a189e2c4090a1b308e18005d2552e335bac354f.1729511337.git.geert+renesas@glider.be>
 
-Auto-negotiation state in json format showed the
-opposite state due to wrong comparison.
-Fix for returning the correct auto-neg state implemented.
+On Mon, Oct 21, 2024 at 01:56:51PM +0200, Geert Uytterhoeven wrote:
+> +RENESAS R-CAR SATA DRIVER
+> +L:	linux-ide@vger.kernel.org
+> +L:	linux-renesas-soc@vger.kernel.org
+> +S:	Supported
+> +F:	Documentation/devicetree/bindings/ata/renesas,rcar-sata.yaml
+> +F:	drivers/ata/sata_rcar.c
 
-Signed-off-by: Mohan Prasad J <mohan.prasad@microchip.com>
----
-Changes in v2:
-    Used simpler comparison statement for checking
-auto-negotiation.
-Link to v1:https://patchwork.kernel.org/project/netdevbpf/patch/20241016035848.292603-1-mohan.prasad@microchip.com/
----
----
- netlink/settings.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff --git a/netlink/settings.c b/netlink/settings.c
-index dbfb520..b9b3ba9 100644
---- a/netlink/settings.c
-+++ b/netlink/settings.c
-@@ -546,7 +546,7 @@ int linkmodes_reply_cb(const struct nlmsghdr *nlhdr, void *data)
- 						(autoneg == AUTONEG_DISABLE) ? "off" : "on");
- 		else
- 			print_bool(PRINT_JSON, "auto-negotiation", NULL,
--				   autoneg == AUTONEG_DISABLE);
-+				   autoneg != AUTONEG_DISABLE);
- 	}
- 	if (tb[ETHTOOL_A_LINKMODES_MASTER_SLAVE_CFG]) {
- 		uint8_t val;
--- 
-2.43.0
-
+You can't have a "Supported" entry with no person assigned to it :(
 
