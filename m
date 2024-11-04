@@ -1,107 +1,132 @@
-Return-Path: <netdev+bounces-141606-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141607-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22EF29BBB0B
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:05:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 489B79BBB35
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:12:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 541B71C216B5
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:05:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D0BC2818E0
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:12:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF9A1D0E0F;
-	Mon,  4 Nov 2024 17:03:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD05D1C3034;
+	Mon,  4 Nov 2024 17:12:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="LzD3z90R"
+	dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b="hz7n0cAM"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AC5C1CD15;
-	Mon,  4 Nov 2024 17:03:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17DAD1C3306
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 17:12:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730739787; cv=none; b=O/IDFBqlDeOzkNdxdapgBX0TWbdwaR6v9t/9swMG/8gKhbqB4F/3xJW0dhRCj/I6E/RPTJfUI2BJhfY2ISReLWmuOKFJxi9njq9vI0U+nCOv8aOfyG92zUn1kS3B6EoY5ZneW1aCi1wAKFP5QkWlSCPWWgACbP1G+WYIqlq4vrc=
+	t=1730740371; cv=none; b=RaoNhxcbywvJBQajiKeyE2DIMB93qjUFE9dt8gCtRS+dJPCDxxDghl6SBVEPgXyDX5skhDn1q375JC6vWrYqwOY8r7JIsACxRzNUaH+WVxZWrGRu4+fgougBouq45XFMhVNIxvzAkvp5aNroSpLcbrP5PAbafmHh9ARxSl/0KhI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730739787; c=relaxed/simple;
-	bh=Qhke3aQ/LKX8NgnOjf25kpHzyWzOYic/Qlwn68EtZMg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Dt8neyeklVoOh9szFCc9ljtMoZo17ASOUd10P/ibkSutv4SQLja9CYgf+WQOt9OoOn9TRgcHWrmp42ckalIVOJ+k4oAcGZGrcIlUN6akKMaFzcvn4ggrhL0cKsQrnohLJqHOx6N3UMaqkEEaXE31ctohwpuzj1fsDhJOWsymbJI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=LzD3z90R; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id CA89B60011;
-	Mon,  4 Nov 2024 17:03:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730739783;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=42kxzvTWuXxqunQIkofuM5yI8E9ydjyRl0t7IPFnnsE=;
-	b=LzD3z90R2ZmbkZFhVPMAW0gFfa9+bUK16e+zoEJoUBBvhtWJPhZcznkicbtoAdTxMZrVix
-	xLZJ952dU70MPKkt74w4plYF1NWSGl1mryyakbyJM9kKdBOvJYL3k24voD5zOSexzFIJdd
-	UcWxH3vg5UC/a6yek1Fb2zGqahRyBZcXbctWPyaE7aq4Bm24IpEQzeUun7ep81+Ml1wFHr
-	CuJbpYp6xqa36dUYYxjkkQBNR1Uwx3z9MRLAWkzqgoRt5BcjFnFVFSenBDrvAcMYxiOVIR
-	FmDI5xqlgJZcG69FqRrXkwsDCpyk+yhbyXkUOdLtWptTGkk3Ou2rZONsxtvf4w==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 9/9] net: stmmac: dwmac_socfpga: This platform has GMAC
-Date: Mon,  4 Nov 2024 18:02:49 +0100
-Message-ID: <20241104170251.2202270-10-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241104170251.2202270-1-maxime.chevallier@bootlin.com>
-References: <20241104170251.2202270-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1730740371; c=relaxed/simple;
+	bh=2yDeCwWeanhRfjDcg3QZSEc/Uy0EkHEvsV/TrF/rvl4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=O42Xne+JZqyhHzTq4KZgyaZ56C44d2i07oZZy4I/LQa2hYpkWPV/EQKozN6dL6PbDq63CMiJTV4AfYOJhedzD/kq7OUUJYKLOuXpdu66rgLrqXLeJry8IiLKvibyqQDEfKimZKLZqmDVeArsDYa9AZBGpb51hpb0iBE4wMj1Sxg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org; spf=pass smtp.mailfrom=chromium.org; dkim=pass (1024-bit key) header.d=chromium.org header.i=@chromium.org header.b=hz7n0cAM; arc=none smtp.client-ip=209.85.167.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=chromium.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=chromium.org
+Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-539e13375d3so4575842e87.3
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 09:12:49 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1730740368; x=1731345168; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2yDeCwWeanhRfjDcg3QZSEc/Uy0EkHEvsV/TrF/rvl4=;
+        b=hz7n0cAMJzvaCd5LAUAMmtMAoJFN6Qwse0QIK++5Rcuv/RVLV2QqyIKi/bnn/i2tWp
+         LuHqf4BY9CHJYIhnIKacRIBcDTpV4mu6Gs6euajF7OEVnpUEWaGSfBXZSMbrIdABsw/W
+         vW0PyKsCtuwzp46wuAmhWklMGghFc5h4cNwxM=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730740368; x=1731345168;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2yDeCwWeanhRfjDcg3QZSEc/Uy0EkHEvsV/TrF/rvl4=;
+        b=rfq0WxuUFj2HrJNb8nH38yjuW9yNwNCFQgBRca1EClQgcY2IAaGhc7ez1p8w1lnHIz
+         /pA76Y7ak+ZOjOaHRr5sz5B7VFKYfihiJyN9CRHkzNrhxyg/aylKLsxdYquS2x/R9gl3
+         7y4jOQlgW/etII37WOvdi2SR2qqPfFqAzyI67KZ/XWy/HLCaOPbe7an0+gnEskxQOzsV
+         nzjyu0qdcaj2gEpS/QWfH0kObXOBoKdrMKp1yBg7YaJGV4iOB7XYy3t4pGbCIM2gq0GF
+         5uYtATaDPUVtpQEQdBVSWi8dFyM535zFanFR3KZEdWcqeZAMqZDqQ3yfhDXSb1s+VIPn
+         7oDA==
+X-Forwarded-Encrypted: i=1; AJvYcCXznhrcJ7TAiixR4a1TbRHN/+Lqekb2pbj2yEdLH08JunLO5Dr6UIhA5uDnOhvqnTyCGW/TWYQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUpqLTzFVcR9r8obRvceioL1mLsXZ/cBerjsV2yr+wAPAwRqR2
+	FPsLrARrIH2G+yjNDtPLsY/kXiw6I8zLjp6bPiJ+dGrfx9WVFBb5ffePHD1CVh+owGPwHpiHOav
+	CHjBTDfnvdlB0jqcwjUN+d/AVi8UdFxe+X7p2
+X-Google-Smtp-Source: AGHT+IEjX0KYihsg5M12Yt94xgwDXRaw8vbt/BnR8UnvYMxv/mjOptO88w2Qrs4232astMC3NZm9KHekpOYU9jnJJKs=
+X-Received: by 2002:a05:6512:239a:b0:533:4b70:8722 with SMTP id
+ 2adb3069b0e04-53c79e2fa52mr7351705e87.15.1730740368184; Mon, 04 Nov 2024
+ 09:12:48 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+References: <20241031092504.840708-1-dualli@chromium.org> <20241031092504.840708-3-dualli@chromium.org>
+ <20241103151554.5fc79ce1@kernel.org> <CANBPYPj4VCYuhOTxPSHBGNtpRyG5wRzuMxRB49eSDXXjrxb7TA@mail.gmail.com>
+ <20241104081928.7e383c93@kernel.org>
+In-Reply-To: <20241104081928.7e383c93@kernel.org>
+From: Li Li <dualli@chromium.org>
+Date: Mon, 4 Nov 2024 09:12:37 -0800
+Message-ID: <CANBPYPjo0KKm3JbPk=E8Nuv05i=EeR93PHWjSU8fcH-GVWV94w@mail.gmail.com>
+Subject: Re: [PATCH net-next v7 2/2] binder: report txn errors via generic netlink
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dualli@google.com, corbet@lwn.net, davem@davemloft.net, 
+	edumazet@google.com, pabeni@redhat.com, donald.hunter@gmail.com, 
+	gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com, 
+	maco@android.com, joel@joelfernandes.org, brauner@kernel.org, 
+	cmllamas@google.com, surenb@google.com, arnd@arndb.de, masahiroy@kernel.org, 
+	bagasdotme@gmail.com, horms@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-doc@vger.kernel.org, netdev@vger.kernel.org, hridya@google.com, 
+	smoreland@google.com, kernel-team@android.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Indicate that dwmac_socfpga has a gmac. This will make sure that
-gmac-specific interrupt processing is done, including timestamp
-interrupt handling. Without this, the external snapshot interrupt is
-never ack'd and we have an interrupt storm on external snapshot event.
+On Mon, Nov 4, 2024 at 8:19=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Sun, 3 Nov 2024 22:25:44 -0800 Li Li wrote:
+> > > You're trying to register multiple families with different names?
+> > > The family defines the language / protocol. If you have multiple
+> > > entities to multiplex you should do that based on attributes inside
+> > > the messages.
+> >
+> > My initial plan was to use a single "binder" family, which was more
+> > straightforward and cleaner. As Android uses multiple binder contexts
+> > to isolate system framework and vendor domains[1], Grek KH suggested
+> > the netlink messages from different binder contexts should also be
+> > isolated for security reason[2]. Personally I'm fine with either
+> > approach. Please kindly advice which implementation is better.
+> >
+> > And I'll fix other issues you mentioned above.
+>
+> Greg is obviously right, but using different family names will not help
+> you in any way. There is no action of "opening" a socket for a generic
+> netlink family, one generic netlink socket can talk to all families.
+> The only built in checking netlink provides is that you can declare
+> an operation as requiring admin privileges, or network capability
+> (namespaced or global).
+>
+> Unless those are good enough for you - I think you should do all
+> the security isolation within your code, manually.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
-V2: new patch
+That's why binder genl uses unicast instead of multicast. The administratio=
+n
+process of the OS (Android in this case) always runs before any other user
+applications, which registers itself to the kernel binder driver and uses i=
+t
+exclusively. With a unified family name, the same userspace admin process
+has access to all binder contexts. With separate family names, each domain
+admin process can register itself to the corresponding binder context.
 
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 0745117d5872..248b30d7b864 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -485,6 +485,7 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
- 	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
- 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
-+	plat_dat->has_gmac = true;
- 
- 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
- 	if (ret)
--- 
-2.47.0
-
+So, do you think the current implementation of registering multiple familie=
+s
+with different names acceptable? Or is there a better way to do it? Thank
+you very much!
 
