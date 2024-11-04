@@ -1,132 +1,117 @@
-Return-Path: <netdev+bounces-141586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA6289BB964
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:51:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 141559BB9D4
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:07:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB7971C20973
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:51:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 403821C22C0A
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:07:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C4F11B6D14;
-	Mon,  4 Nov 2024 15:51:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C7211C07EC;
+	Mon,  4 Nov 2024 16:07:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fJ4EQGdQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="okZXBXo+"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAD7770816
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 15:51:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 600601BE23F;
+	Mon,  4 Nov 2024 16:07:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730735475; cv=none; b=YVRsGmIoDtb2/VnAW93ccxEJWxdkIk7dgEpaa8vJ7/4q+yc4b7VcP4/vihVZGCDGn22pYtzCJ4TVdTiWGXqpOe1K0FcvMq6p0z8Qzd/nXxhAekmnAWGmBS9ChMyf/h+Jd1i1S5PqAQ4Jq07EO/KE3w7NAk34icGRJhxCxg7Jwdg=
+	t=1730736441; cv=none; b=C8W8cZMNt36kv6dlwia7WZsW9nBLxC+eDVfAM+xX3nk90X3KOHChipCkBhCjoc97B+1K/qSdYNVGqwCF5PK1MbZHwPZMW+d2Cp16R7VbewK3C0R+8Hyy4BHrrdgw9mOwpZmZV46HSJnjdgtpp9gU4CuZwA5VLbTQNnjjyw90qQU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730735475; c=relaxed/simple;
-	bh=t8dak0VK6rK4EY2nAcpBuTfFm+KGbqhaFYNHPFex83w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=o5V5D0DXsx/oXy6uUvioFbSJJ1tCpu3w/b1mjq21ktB8AxTTN/gQQoAsCo9V1Vn7pU3F2nR9qZGPgThzE4/mxuB1aWxrOhDzweK5/isEi19bZz9bZjTRkQZGViWAZgvzoYVWJ5csTWqy+tj+i/Lqms/mbNTy1y7UpACXZ4Vn7bc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fJ4EQGdQ; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730735472;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=f573NGxGwwEcpEI02aRs9Mv6MPzHTm8n3DIYo90WOAg=;
-	b=fJ4EQGdQXr5vGVKGr4yZxrsIEfkbrT0mJQ3JEn3X2voiU2SYPCmUXGO0jA5L1Wm1BnaSPP
-	HijbCm+dFR+aaHAhvNk+kfpfAsT5qSQRKmEOiFUudFPO+Akl/dt8Zhb/Malx7FOWpzBDe/
-	w64wQSGC/LWRuiIyK9xqppSrLU/cU/k=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-I6yhx7WMMxWmnOgN8hXRnA-1; Mon, 04 Nov 2024 10:51:11 -0500
-X-MC-Unique: I6yhx7WMMxWmnOgN8hXRnA-1
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5eb87df274dso369017eaf.2
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 07:51:11 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730735470; x=1731340270;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=f573NGxGwwEcpEI02aRs9Mv6MPzHTm8n3DIYo90WOAg=;
-        b=fZvKI7qfjVNFiOfyxLQyMKZpuWqdAOo5oeobDyX3EFo3qvBgrjM5UFs7mnsrxS8gix
-         5Uz7lIQTDeMBxFnvNGrVtTBZrNx5HXc6W+7h/Hpmfhrxw2qOm7+KgiiZgmanN3GIeBNW
-         fd0xb6gW+xUwMdDn6wzalqiVhGq4SOSa+wsgQbYRIMT+As7pXRqr1E+cvRcYJd6EqB8m
-         oc9JfuA9on6qSBwMwPose8WDqd561yWdMiTvNimmj9YZTFMDz6rQdUGA8gLNbDfDdwXG
-         vg26GzmPkxuGbXXYgJG0KMrBh2FnM7acv1MM2LLoGXCBKKO1+eiUncgmvbrjRXFQv/jm
-         ZtPw==
-X-Forwarded-Encrypted: i=1; AJvYcCXTKahwVRAv7zsAa4RBQW43fHPHxlJ4LRXuig8XZluc4i+UVN7oRpbeBExmRVBtxWHj+SPz2GQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy7NctRTpmZ2bqpPQonYINwTOngHmrQr9IOAbRnZpZaK+3SYaw2
-	2hBtkM/6nuNS4wQJ7XKWTbBi19G+6uVx4lo4QihsZonhZGvqg6+6BsXvLR/KTpJ6NbYomthy0xo
-	WMtft6fZJmtctvz5Y5kTnUfypcoX3b6iSzwcFMKUc+2wfPL9qO8ftkFd/mhDF+jnMd8jtVfteP5
-	aiGsQb85UTju+0eEawZmpqOfCUipB4
-X-Received: by 2002:a05:6871:3a28:b0:27b:9f8b:7e49 with SMTP id 586e51a60fabf-29051ed2e07mr8128950fac.11.1730735470677;
-        Mon, 04 Nov 2024 07:51:10 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPHhMtv9li+aLKBXugLstxd80vMrdlAgTUr2ut5C9X79h0VKy4FqWxhiv+7Ma6OH4h81v54eHfUtX8m+iMlO4=
-X-Received: by 2002:a05:6871:3a28:b0:27b:9f8b:7e49 with SMTP id
- 586e51a60fabf-29051ed2e07mr8128940fac.11.1730735470357; Mon, 04 Nov 2024
- 07:51:10 -0800 (PST)
+	s=arc-20240116; t=1730736441; c=relaxed/simple;
+	bh=4wMk8tpFq/A6HJt9/TcWCPAJzZ7H3SFj1GkpDsHnzjw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EKtCoPlVrAHDC5+q7+q0qyZ3a8LDY3/hShH8qLfNkLlnmHIRkq/NgHI0vQrggtCJfvdhm3BBhFmtgzarxi4LaHrNymGcOkStra1Fri0EXifMfjDOlOZTi7n8ax1eYEOo5ChQdUgUW6Q0TKCmd97p+sz9BpWeJXa0dProESJ+dMw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=okZXBXo+; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 912DEC4CECE;
+	Mon,  4 Nov 2024 16:07:15 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730736438;
+	bh=4wMk8tpFq/A6HJt9/TcWCPAJzZ7H3SFj1GkpDsHnzjw=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=okZXBXo+8i9TCnYpxP1ne6zY8pxjYj3mHj01oR1aAB0M399boMDdUvLpBY/aPk9cp
+	 C/ucp9fPQ1nES2lKV6eQoT8+zhe5oNHlV7DCrWO6KyVVbfFqvKswU4y19I1x5bT+MG
+	 JyW+8L0FcIqSxsenUPkzS8OcEgxyzLpt7aL39Ly6t3hPmTwlWzYhh0gcD8LSL1WUQO
+	 1ADCRyMQ0hm53y1QGZ1PBCkozvETRyvTsr6dUzeIQRHGU1R6M5yYkIFygU1l+xOmpG
+	 P/6IJn9XVQC2wsfhbti82d5ioru0uRpzt4+X7l2zUDemeLmDN+HNxvb8vwj2KM0Z20
+	 uo/SaO8nGTIcw==
+Date: Mon, 4 Nov 2024 16:07:13 +0000
+From: Simon Horman <horms@kernel.org>
+To: Tuo Li <islituo@gmail.com>
+Cc: ayush.sawal@chelsio.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	almasrymina@google.com, dtatulea@nvidia.com,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, baijiaju1990@gmail.com
+Subject: Re: [PATCH] chcr_ktls: fix a possible null-pointer dereference in
+ chcr_ktls_dev_add()
+Message-ID: <20241104160713.GE2118587@kernel.org>
+References: <20241030132352.154488-1-islituo@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029123637.1974604-1-aleksandr.loktionov@intel.com> <CADEbmW1rJdFZ0ccpo-YLv0W8zQsr9-2eMnncDgR-tE+On0TX5g@mail.gmail.com>
-In-Reply-To: <CADEbmW1rJdFZ0ccpo-YLv0W8zQsr9-2eMnncDgR-tE+On0TX5g@mail.gmail.com>
-From: Michal Schmidt <mschmidt@redhat.com>
-Date: Mon, 4 Nov 2024 16:50:59 +0100
-Message-ID: <CADEbmW0r4BCU_qWHRrvAPQ-kwA-xMDj2YD_OdiGotRnfEMtpoQ@mail.gmail.com>
-Subject: Re: [PATCH iwl-next v4444] i40e: add ability to reset VF for Tx and
- Rx MDD events
-To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com, 
-	netdev@vger.kernel.org, Jan Sokolowski <jan.sokolowski@intel.com>, 
-	Padraig J Connolly <padraig.j.connolly@intel.com>, maciej.fijalkowski@intel.com, 
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241030132352.154488-1-islituo@gmail.com>
 
-On Mon, Nov 4, 2024 at 4:40=E2=80=AFPM Michal Schmidt <mschmidt@redhat.com>=
- wrote:
->
-> On Tue, Oct 29, 2024 at 1:36=E2=80=AFPM Aleksandr Loktionov
-> <aleksandr.loktionov@intel.com> wrote:
-[...]
-> > +
-> > +                       i40e_vc_reset_vf(vf, true);
-> >                 }
-> >         }
-> >
-> >         /* re-enable mdd interrupt cause */
-> >         clear_bit(__I40E_MDD_EVENT_PENDING, pf->state);
->
-> Can you remove this 2nd clearing of the __I40E_MDD_EVENT_PENDING bit?
-> If the interrupt handler detects a MDD event while we're still
-> printing the message about the previous one, we don't want to forget
-> it by clearing it here.
->
-> Michal
+On Thu, Oct 31, 2024 at 12:23:52AM +1100, Tuo Li wrote:
+> There is a possible null-pointer dereference related to the wait-completion
+> synchronization mechanism in the function chcr_ktls_dev_add().
+> 
+> Consider the following execution scenario:
+> 
+>   chcr_ktls_cpl_act_open_rpl()   //641
+>     u_ctx = adap->uld[CXGB4_ULD_KTLS].handle;   //686
+>     if (u_ctx) {  //687
+>     complete(&tx_info->completion);  //704
+> 
+> The variable u_ctx is checked by an if statement at Line 687, which means
+> it can be NULL. Then, complete() is called at Line 704, which will wake
+> up wait_for_completion_xxx().
+> 
+> Consider the wait_for_completion_timeout() in chcr_ktls_dev_add():
+> 
+>   chcr_ktls_dev_add()  //412
+>     u_ctx = adap->uld[CXGB4_ULD_KTLS].handle;  //432
+>     wait_for_completion_timeout(&tx_info->completion, 30 * HZ); //551
+>     xa_erase(&u_ctx->tid_list, tx_info->tid);  //580
+> 
+> The variable u_ctx is dereferenced without being rechecked at Line 580
+> after the wait_for_completion_timeout(), which can introduce a null-pointer
+> dereference. Besides, the variable u_ctx is also checked at Line 442 in
+> chcr_ktls_dev_add(), which indicates that u_ctx is likely to be NULL in
+> some execution contexts.
+> 
+> To fix this possible null-pointer dereference, a NULL check is put ahead of
+> the call to xa_erase().
+> 
+> This potential bug was discovered using an experimental static analysis
+> tool developed by our team. The tool deduces complete() and
+> wait_for_completion() pairs using alias analysis. It then applies data
+> flow analysis to detect null-pointer dereferences across synchronization
+> points.
+> 
+> Fixes: 65e302a9bd57 ("cxgb4/ch_ktls: Clear resources when pf4 device is removed") 
+> Signed-off-by: Tuo Li <islituo@gmail.com>
 
-Well, I suppose the race I described cannot happen because the
-unmasking of ..._MAL_DETECT_MASK happens after this.
-But it's still redundant to clear the bit twice.
+Hi Tuo Li,
 
-Michal
+I do see that the checking of u_ctx is inconsistent,
+but it is not clear to me that is because one part is too defensive
+or, OTOH, there is a bug as you suggest. And I think that we need
+more analysis to determine which case it is.
 
-> >         reg =3D rd32(hw, I40E_PFINT_ICR0_ENA);
-> >         reg |=3D  I40E_PFINT_ICR0_ENA_MAL_DETECT_MASK;
-> >         wr32(hw, I40E_PFINT_ICR0_ENA, reg);
-> >         i40e_flush(hw);
-> > +
-> > +       i40e_print_vfs_mdd_events(pf);
-> >  }
-> >
-> >  /**
+Also, if it is the case that there is a bug as you suggest, after a quick
+search, I think it also exists in at least one other place in this file.
 
+...
 
