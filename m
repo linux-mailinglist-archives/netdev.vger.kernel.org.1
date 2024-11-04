@@ -1,222 +1,123 @@
-Return-Path: <netdev+bounces-141635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B85909BBD73
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:46:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3463F9BBD75
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:46:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 64C071F22FBA
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:46:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5D2280F12
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:46:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1230218622;
-	Mon,  4 Nov 2024 18:45:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302C118D642;
+	Mon,  4 Nov 2024 18:46:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="c/cW+U8Z"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yw0zyxGq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F54E1CB9F1
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:45:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBDB19BBA
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:45:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730745938; cv=none; b=TygTdoZ6VPVVIh4bpz7R5L++P3pK2tO2zQgK9CTevUkRAqzhOq+pejyQWSo/rWPelz6W6rh8O63mmvbgIMhqe4bwdqfdZfMaFUsMqc6xaqh+OcxDmO808ozVZbnBv8+GwIYGOITdn1AcL4Hs6y7TZMyX0SdCqtO2yoiUokKix7M=
+	t=1730745962; cv=none; b=OXUCBvIphdWnech5Am9OiYxma/KOaTf0ZaWD4VTsjSmxZ5YIsbX8LUfipifYX9MuWGHiFu9RVCpJ+kav2a31r6Zm73TF3OKfgDALmaQ800SsRZZ+P0AaQhWcokv05lFRb1awFyLZOikYC0zXZCV43kmmy7vdhVOS8/9w0vvSm54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730745938; c=relaxed/simple;
-	bh=hIDdK68oZDHF6AOg2BrhRsl6CUDpF1j+r+a5/O7rTPY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tJ8lbTsmpJ4Uj2ABctdjw88npHOz62aZP7/pJ+hM+DuXom+B7Zy5iyefOL7lnDEoNJstjwPSo3CAxfOqGn5RCm4fQmx7U1ccrke2PF3auMn3Te2au0Vx9fCmtmp7Y5ZV9z142yusoNoo8qU/4NdUxPGr1WVcCdPlJ8g2oclonbI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=c/cW+U8Z; arc=none smtp.client-ip=209.85.210.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71e4c2e36daso3577243b3a.0
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 10:45:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730745936; x=1731350736; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=k1kvRNmJD5kG8Mwv5Sy0Gd42DT9y0nJpCYMoFJ2FQpE=;
-        b=c/cW+U8Zv2+iKaWLhls0H2WsQrNBoNlmPZtc4LkODlyeSr2w9jECuW00mTciY0wV6G
-         /iwQd4SCWx0hdqm6qE1PlKUvnLNHA19hU1Kc6xo2EQR610mXjWy5/0gjImK/zGBFHGnI
-         tJwSWayKS4ZDibfFDgSzzodHuqVJwJQX+/JUWS3gXcl979nCnbbhPwA9EmQrFA8kjCHJ
-         O2/MdyCSutgbXvzpgSyxJogZBUQgyuExqVfX078X/3A8mNOiMsV44luv7fuvxSbZPpEE
-         SFg+Xjm5I2pcH7KYqg6PhB4oIssHCFZ2qMitvJyycDKyTISYIWwNVj7zJLabIHxm0TZi
-         rLOQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730745936; x=1731350736;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=k1kvRNmJD5kG8Mwv5Sy0Gd42DT9y0nJpCYMoFJ2FQpE=;
-        b=C1DKYqv4FQIRncX1qQS28Q9etrUGCAWHS7Rep6XVahbbzW2MInjikSf1LVc4kBD/ly
-         E8rgBz7sy7UCMKboMCi8EUN9VuQ7dFogtENdOp4BhrC2rkno5w24/6NrT5gQKzkIMJ3H
-         5J9mhR6wo298aaL7AxvcHsTpOdQFml5qKUcAt8deh0cvRNJ5wG2tIVL8hyR29NjlypqU
-         VVJUcditFZQiFuDJqGdkHGIcKPMmEIXacW91YUVGHCD+RXx6d+IsqfqyaGgRXCTZ7t5t
-         W8FViJJLKkGQOUEOrtRnDpZSxQhSXME6hNgJnDp+KaeBegWAR5nmstghfd2OqwKiYl6J
-         Wk8w==
-X-Gm-Message-State: AOJu0YxdjwjWaXk6gn1f2R/XgrLVkHdBmukt3MRnAmowGcs4Sg9e3Ndi
-	4HX4nBxxIE/AG+6WYmm99idc4Faim+TNImD0vppmOkRIUzC9IR0=
-X-Google-Smtp-Source: AGHT+IFMGVmPh536BH7N9JOttisHQmHfXDLIFFqFoLIdRw+74U+eOIB9J64Jdqbq2flwGk1djc+J5Q==
-X-Received: by 2002:a05:6a00:1d14:b0:71e:6f09:c0a8 with SMTP id d2e1a72fcca58-720c97f58e4mr25754533b3a.10.1730745935697;
-        Mon, 04 Nov 2024 10:45:35 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e5717sm7860359b3a.54.2024.11.04.10.45.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 10:45:35 -0800 (PST)
-Date: Mon, 4 Nov 2024 10:45:34 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, donald.hunter@redhat.com
-Subject: Re: [PATCH net-next v1 2/2] netlink: specs: Add a spec for FIB rule
- management
-Message-ID: <ZykWTs9a3EqJ3nz5@mini-arch>
-References: <20241104165352.19696-1-donald.hunter@gmail.com>
- <20241104165352.19696-3-donald.hunter@gmail.com>
+	s=arc-20240116; t=1730745962; c=relaxed/simple;
+	bh=r1QhwuPbs8ubNXAmG4ArE39tL4xRdB4Ohl4TH4RUulM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WKe0ib6p7tqQbr1jXOldZYTrCxjTjmqK5cQIUa+jF1zyMckP54Ly4zpc14jMlQajPXkkBQHEQH4q/qpOk+jpa/S1B/wwHKv99+3LVmTrrUsP87iyjipWQQg1UhxfYy8/hBl4C9OLK3Bq5sL3oXFQCnaq0TT0rCKldTNpDZyZaLw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yw0zyxGq; arc=none smtp.client-ip=198.175.65.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730745960; x=1762281960;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=r1QhwuPbs8ubNXAmG4ArE39tL4xRdB4Ohl4TH4RUulM=;
+  b=Yw0zyxGqvm9bnXN2l5Wj8OPzukVVeTtcuMh56PZRKmr84TmWMKG4e2Gb
+   cedbqGeihekM82QogSs5SkVZcWnsMZ/wUHRTh9VNPfnBfrRNv6thuz1gJ
+   s56GHOIXc6a9HKTMOoOIjTwvzob7Bf9xZNel/E8sH4+L4OHiEIRnm4aAz
+   QJ2ptVjDt3jFG0plSdb8EgLmCUjVCR10PEExacXkPZ80j16EKXJrwJZQo
+   fcbnhMRbf2+rmWKQ4CONLYH9CwAxZHdo9xOpC/cAuhCZALeBufJ4wTX8C
+   fmj86faqV+SuQFMX9UxcKsze3Cv2uxwb6Zf4qS5eUtH6PqMivySIdRtSN
+   g==;
+X-CSE-ConnectionGUID: X5asnfJ5RX+fygkDpBOICw==
+X-CSE-MsgGUID: epOiiITZQAutEfNKfIB+Yw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="34248722"
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="34248722"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 10:45:59 -0800
+X-CSE-ConnectionGUID: r1J37tPaR3+tRmbp17DQ2w==
+X-CSE-MsgGUID: e4WPHgxoR++LQSEoLbrzUw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="88497487"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orviesa003.jf.intel.com with ESMTP; 04 Nov 2024 10:45:58 -0800
+Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id BB01628781;
+	Mon,  4 Nov 2024 18:45:56 +0000 (GMT)
+From: Marcin Szycik <marcin.szycik@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	Marcin Szycik <marcin.szycik@linux.intel.com>,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Subject: [PATCH iwl-net] ice: Fix VLAN pruning in switchdev mode
+Date: Mon,  4 Nov 2024 19:49:09 +0100
+Message-ID: <20241104184908.632863-2-marcin.szycik@linux.intel.com>
+X-Mailer: git-send-email 2.45.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241104165352.19696-3-donald.hunter@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-On 11/04, Donald Hunter wrote:
-> Add a YNL spec for FIB rules:
-> 
-> ./tools/net/ynl/cli.py \
->     --spec Documentation/netlink/specs/rt_rule.yaml \
->     --dump getrule --json '{"family": 2}'
-> 
-> [{'action': 'to-tbl',
->   'dst-len': 0,
->   'family': 2,
->   'flags': 0,
->   'protocol': 2,
->   'src-len': 0,
->   'suppress-prefixlen': '0xffffffff',
->   'table': 255,
->   'tos': 0},
->   ... ]
-> 
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
-> ---
->  Documentation/netlink/specs/rt_rule.yaml | 240 +++++++++++++++++++++++
->  1 file changed, 240 insertions(+)
->  create mode 100644 Documentation/netlink/specs/rt_rule.yaml
-> 
-> diff --git a/Documentation/netlink/specs/rt_rule.yaml b/Documentation/netlink/specs/rt_rule.yaml
-> new file mode 100644
-> index 000000000000..736bcdb25738
-> --- /dev/null
-> +++ b/Documentation/netlink/specs/rt_rule.yaml
-> @@ -0,0 +1,240 @@
-> +# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-> +
-> +name: rt-rule
-> +protocol: netlink-raw
-> +protonum: 0
-> +
-> +doc:
-> +  FIB rule management over rtnetlink.
-> +
-> +definitions:
-> +  -
-> +    name: rtgenmsg
-> +    type: struct
-> +    members:
-> +      -
-> +        name: family
-> +        type: u8
-> +      -
-> +        name: pad
-> +        type: pad
-> +        len: 3
-> +  -
-> +    name: fib-rule-hdr
-> +    type: struct
-> +    members:
-> +      -
-> +        name: family
-> +        type: u8
-> +      -
-> +        name: dst-len
-> +        type: u8
-> +      -
-> +        name: src-len
-> +        type: u8
-> +      -
-> +        name: tos
-> +        type: u8
-> +      -
-> +        name: table
-> +        type: u8
-> +      -
-> +        name: res1
-> +        type: pad
-> +        len: 1
-> +      -
-> +        name: res2
-> +        type: pad
-> +        len: 1
-> +      -
-> +        name: action
-> +        type: u8
-> +        enum: fr-act
-> +      -
-> +        name: flags
-> +        type: u32
-> +  -
-> +    name: fr-act
-> +    type: enum
-> +    entries:
-> +      - unspec
-> +      - to-tbl
-> +      - goto
-> +      - nop
-> +      - res3
-> +      - res4
-> +      - blackhole
-> +      - unreachable
-> +      - prohibit
-> +  -
-> +    name: fib-rule-port-range
-> +    type: struct
-> +    members:
-> +      -
-> +        name: start
-> +        type: u16
-> +      -
-> +        name: end
-> +        type: u16
-> +  -
+In switchdev mode the uplink VSI should receive all unmatched packets,
+including VLANs. Therefore, VLAN pruning should be disabled if uplink is
+in switchdev mode. It is already being done in ice_eswitch_setup_env(),
+however the addition of ice_up() in commit 44ba608db509 ("ice: do
+switchdev slow-path Rx using PF VSI") caused VLAN pruning to be
+re-enabled after disabling it.
 
-[..]
+Add a check to ice_set_vlan_filtering_features() to ensure VLAN
+filtering will not be enabled if uplink is in switchdev mode. Note that
+ice_is_eswitch_mode_switchdev() is being used instead of
+ice_is_switchdev_running(), as the latter would only return true after
+the whole switchdev setup completes.
 
-> +    name: fib-rule-uid-range
-> +    type: struct
-> +    members:
-> +      -
-> +        name: start
-> +        type: u16
-> +      -
-> +        name: end
-> +        type: u16
+Fixes: 44ba608db509 ("ice: do switchdev slow-path Rx using PF VSI")
+Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_main.c | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-Should be u32?
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index b1e7727b8677..8f2e758c3942 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -6361,10 +6361,12 @@ ice_set_vlan_filtering_features(struct ice_vsi *vsi, netdev_features_t features)
+ 	int err = 0;
+ 
+ 	/* support Single VLAN Mode (SVM) and Double VLAN Mode (DVM) by checking
+-	 * if either bit is set
++	 * if either bit is set. In switchdev mode Rx filtering should never be
++	 * enabled.
+ 	 */
+-	if (features &
+-	    (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER))
++	if ((features &
++	     (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)) &&
++	     !ice_is_eswitch_mode_switchdev(vsi->back))
+ 		err = vlan_ops->ena_rx_filtering(vsi);
+ 	else
+ 		err = vlan_ops->dis_rx_filtering(vsi);
+-- 
+2.45.0
 
-struct fib_rule_uid_range {
-        __u32           start;
-        __u32           end;
-};
-
-Otherwise, both patches look good:
-
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
 
