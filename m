@@ -1,76 +1,61 @@
-Return-Path: <netdev+bounces-141438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C7D59BAEC4
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:57:26 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D94909BAECC
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:57:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E13D2280EE2
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:57:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 161C01C20BA3
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:57:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28421AF0AC;
-	Mon,  4 Nov 2024 08:56:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0EC1AD3F6;
+	Mon,  4 Nov 2024 08:57:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="Nb9buJXz"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="iO89sIld"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6546E1ABEA5;
-	Mon,  4 Nov 2024 08:56:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 551B91AB6D4;
+	Mon,  4 Nov 2024 08:57:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730710609; cv=none; b=JTI2fM02C9Ox+Hwj+Q4rMKM1BFHj9SWt56i1SIwus4Igx7ae/JuA4/8IUK9OJuYr9YbQ6rZykOKjQvX/b73BR6e3ljW1kB0IhVabiTGOnm4G42zjNmNjVtgQF5BIHV1GCWd4GVlekPVvbgXf948+OZx8/5uBUwBRt/3sYX2/UeM=
+	t=1730710632; cv=none; b=pwA+Zc/HGn0rAUzM+zwnalz99wvjTWoVELB9mnr4whpFO3cct5betE+ypFvJM3MfHBreKT5H4/wx4BGFxi1cotoe8yDVYzUnI0zvCNUNS1SZ1nLTk8y701086KkLuYgYO3F+sRYlc1nSsyp0yZTlIHoSK4f2aXaL/DayDlV07zk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730710609; c=relaxed/simple;
-	bh=DbA2AEzCZovDIsw1ZlFZ8GDzT6MXyd0MnqvqEW2ykrU=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ZV0dxqH2OLlCeuTNqrVpt7W+2bsh8Gy7emDPDrmJqIapnoebMvLsRw0OqtjAZzWkV8SCMNJGgxjQYCARKB3/E4d1bCfwvA2PsfElwmLcoPebKCsHjfvGOKWVEuVm5kYPHfsAukQCRt2aO2FU+oEfuQBYTrpy7Xn2OwfF0Z+CtTc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=Nb9buJXz; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
-	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=l/EQKtXU0ivrCC+MIz2pary8R5/8USRLvyKAY9Yy/mI=; b=Nb9buJXzFJqBghSp8frhQOW6LC
-	1B5luLCs+8k/Dd2IAHihMYKoZPHK5Z9UlGPondaumnKJU0oJc9src2K35KpZRMYzFFvSxUcI4mwHj
-	SIMfdKbV5e6L0Bp+y40mAh5a9euQocXuaXfcmfnokgNkV06SUhrvniAXoCOPJrxpckqssGos2Z/um
-	jycHo1tIvc8OjK9xR6dmJUkr2Fc9kKpztfxNdgQfXsZh1KECycDIrMF/aObLU8d+Jjhgpto3UzX0B
-	Lo5LALHqy5+bsC8GynrztyIZmIXmoni/tYTKJ4RXYxOn10inAJfJ/ogjeU3ztRhiEslxVvde8Z6zG
-	EimE9TwA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sean@geanix.com>)
-	id 1t7st2-0005XE-99; Mon, 04 Nov 2024 09:56:36 +0100
-Received: from [185.17.218.86] (helo=zen..)
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <sean@geanix.com>)
-	id 1t7st1-000Gvx-1d;
-	Mon, 04 Nov 2024 09:56:35 +0100
-From: Sean Nyekjaer <sean@geanix.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Sean Nyekjaer <sean@geanix.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
+	s=arc-20240116; t=1730710632; c=relaxed/simple;
+	bh=f7BTja9oKOZtYZkvpN8Dt89RsQJtgfIyZkdIpLDN0KY=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=LA555DRrh2LDa9F5f39XlcV2VyhidocvuJqViBOKJJM2TvSH1plTHahaID5WgtxsJ3KnF+NHDwmAShom3aUUMqMP3SIbmnB9RYmxJnaDu0xDJTMySzsIFSmC3SME6rxpUgwa4GEMcamFb693uy+mlf2FOSSxgiGONdMWCI3GgMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=iO89sIld; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730710627; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=9T27x571qL2VW+tYc6sKeCTtuwJS10Bq4YWjUFrRQ4w=;
+	b=iO89sIld6WBRFdrhbf4GUl9uNApGsQvkwYRw/+8R9TMx3dHx9f1BZawEbW/8wuK1BGrAJae7SFcapzCu90bbTvwaRHajwSgCf8gU7x0zWUApC55WUV2KRZl/lRIs1X5mmBSBd3P3FYd2vQ/UaVDsxCWqkWlmOKpW5EbCDSaOnnE=
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WIdkVm2_1730710626 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 04 Nov 2024 16:57:07 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: mst@redhat.com,
+	jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	andrew@daynix.com,
+	virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org
-Subject: [RFC PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
-Date: Mon,  4 Nov 2024 09:56:15 +0100
-Message-ID: <20241104085616.469862-1-sean@geanix.com>
-X-Mailer: git-send-email 2.46.2
+Subject: [PATCH net 0/4] virtio_net: Make RSS interact properly with queue number
+Date: Mon,  4 Nov 2024 16:57:02 +0800
+Message-Id: <20241104085706.13872-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,187 +63,29 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: sean@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27447/Sun Nov  3 10:33:29 2024)
 
-Convert binding doc tcan4x5x.txt to yaml.
+With this patch set, RSS updates with queue_pairs changing:
+- When virtnet_probe, init default rss and commit
+- When queue_pairs changes _without_ user rss configuration, update rss
+  with the new queue number
+- When queue_pairs changes _with_ user rss configuration, keep rss as user
+  configured
 
-Signed-off-by: Sean Nyekjaer <sean@geanix.com>
----
+Patch 1 and 2 fix possible out of bound errors for indir_table and key.
+Patch 3 and 4 add RSS update in probe() and set_queues().
 
-Can we somehow reference bosch,mram-cfg from the bosch,m_can.yaml?
-I have searched for yaml files that tries the same, but it's usually
-includes a whole node.
+Please review, thanks.
 
-I have also tried:
-$ref: /schema/bosch,m_can.yaml#/properties/bosch,mram-cfg
+Philo Lu (4):
+  virtio_net: Support dynamic rss indirection table size
+  virtio_net: Add hash_key_length check
+  virtio_net: Sync rss config to device when virtnet_probe
+  virtio_net: Update rss when set queue
 
-Any hints to share a property?
+ drivers/net/virtio_net.c | 119 ++++++++++++++++++++++++++++++++-------
+ 1 file changed, 100 insertions(+), 19 deletions(-)
 
- .../devicetree/bindings/net/can/tcan4x5x.txt  | 48 ---------
- .../bindings/net/can/ti,tcan4x5x.yaml         | 97 +++++++++++++++++++
- 2 files changed, 97 insertions(+), 48 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/can/tcan4x5x.txt
- create mode 100644 Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-
-diff --git a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt b/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
-deleted file mode 100644
-index 20c0572c9853..000000000000
---- a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
-+++ /dev/null
-@@ -1,48 +0,0 @@
--Texas Instruments TCAN4x5x CAN Controller
--================================================
--
--This file provides device node information for the TCAN4x5x interface contains.
--
--Required properties:
--	- compatible:
--		"ti,tcan4552", "ti,tcan4x5x"
--		"ti,tcan4553", "ti,tcan4x5x" or
--		"ti,tcan4x5x"
--	- reg: 0
--	- #address-cells: 1
--	- #size-cells: 0
--	- spi-max-frequency: Maximum frequency of the SPI bus the chip can
--			     operate at should be less than or equal to 18 MHz.
--	- interrupt-parent: the phandle to the interrupt controller which provides
--                    the interrupt.
--	- interrupts: interrupt specification for data-ready.
--
--See Documentation/devicetree/bindings/net/can/bosch,m_can.yaml for additional
--required property details.
--
--Optional properties:
--	- reset-gpios: Hardwired output GPIO. If not defined then software
--		       reset.
--	- device-state-gpios: Input GPIO that indicates if the device is in
--			      a sleep state or if the device is active. Not
--			      available with tcan4552/4553.
--	- device-wake-gpios: Wake up GPIO to wake up the TCAN device. Not
--			     available with tcan4552/4553.
--	- wakeup-source: Leave the chip running when suspended, and configure
--			 the RX interrupt to wake up the device.
--
--Example:
--tcan4x5x: tcan4x5x@0 {
--		compatible = "ti,tcan4x5x";
--		reg = <0>;
--		#address-cells = <1>;
--		#size-cells = <1>;
--		spi-max-frequency = <10000000>;
--		bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
--		interrupt-parent = <&gpio1>;
--		interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
--		device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
--		device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
--		reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
--		wakeup-source;
--};
-diff --git a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-new file mode 100644
-index 000000000000..62c108fac6b3
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-@@ -0,0 +1,97 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Texas Instruments TCAN4x5x CAN Controller
-+
-+maintainers:
-+  - Marc Kleine-Budde <mkl@pengutronix.de>
-+
-+allOf:
-+  - $ref: can-controller.yaml#
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - enum:
-+          - ti,tcan4552
-+          - ti,tcan4553
-+          - ti,tcan4x5x
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+
-+  clocks:
-+    maxItems: 1
-+
-+  vdd-supply:
-+    description: Regulator that powers the CAN controller.
-+
-+  xceiver-supply:
-+    description: Regulator that powers the CAN transceiver.
-+
-+  reset-gpios:
-+    description: Hardwired output GPIO. If not defined then software reset.
-+    maxItems: 1
-+
-+  device-state-gpios:
-+    description: Input GPIO that indicates if the device is in a sleep state or if the device is active.
-+      Not available with tcan4552/4553.
-+    maxItems: 1
-+
-+  device-wake-gpios:
-+    description: Wake up GPIO to wake up the TCAN device. Not available with tcan4552/4553.
-+    maxItems: 1
-+
-+  bosch,mram-cfg:
-+    $ref: bosch,m_can.yaml#
-+
-+  spi-max-frequency:
-+    description:
-+      Must be half or less of "clocks" frequency.
-+    maximum: 10000000
-+
-+  wakeup-source:
-+    $ref: /schemas/types.yaml#/definitions/flag
-+    description:
-+      Enable CAN remote wakeup.
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - bosch,mram-cfg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        can@0 {
-+            compatible = "ti,tcan4x5x";
-+            reg = <0>;
-+            clocks = <&can0_osc>;
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&can0_pins>;
-+            spi-max-frequency = <10000000>;
-+            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
-+            interrupt-parent = <&gpio1>;
-+            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
-+            device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
-+            device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
-+            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
-+            wakeup-source;
-+        };
-+    };
--- 
-2.46.2
+--
+2.32.0.3.g01195cf9f
 
 
