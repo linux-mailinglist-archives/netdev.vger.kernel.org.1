@@ -1,121 +1,182 @@
-Return-Path: <netdev+bounces-141381-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141382-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA1289BAA0B
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 01:59:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id DAF249BAA10
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 02:05:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E15071C20B9D
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 00:59:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEF861F212F2
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 01:05:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEEB564A8F;
-	Mon,  4 Nov 2024 00:59:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEF75757EB;
+	Mon,  4 Nov 2024 01:05:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="WClie5S3"
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="jTZV4vl+";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="gKaZLbzh";
+	dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b="xHZGksrK";
+	dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b="AISwnlk7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.223.130])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A40A2B9B9;
-	Mon,  4 Nov 2024 00:59:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CEF5EAD0
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 01:05:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=195.135.223.130
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730681975; cv=none; b=QpaMwWbZi/HUL5V/OFjpVNVkKOLI8dSFn6crds2SZl9wXjDSlBmJu1TAxW6NnLiH6Ko9n3FZIa3PINmYE9sBPDJ1Psn57w+ICZh9DmqW6LgyDURN/9BvZgYypHxk137D/QCQeu4YXF684tQoyhkD53X1ZiyEJ2d82n3btNSYe3I=
+	t=1730682345; cv=none; b=gtq+FB/26ECUtSyPEP6HlGmwjtstITsT3uyzM40HDBoumld9Q+uJrfQucqefF+FOpVdfdCufppVa8DR4aKpHCd/JKmqWKxNHOyZ0bVv86IGo6QZvUnP1uJdMLRYRysSCGbMGCXa7z5tIYkhErWm6oIf7IaxWBsh/T0z2ky7T9ns=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730681975; c=relaxed/simple;
-	bh=mCmkE4KC0S6H3ElFbSOdrrAUl+RGfHoqDfh7iIUGvtU=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=LdYGH1ctyj2CQgICQBufhX57fstG8zsVduIq0r8ge/GsYzwbI3vmIbJhe6PUK/hxBVUtpUjDOYUqqUSTFOV+qmhkEteqW3LxjsekMeA1/Lzbtqvs9V0hxSqq9XPc4/SPDDYZlxEmxW9zbU0ysLCbw3HycekX8/A8sEAesbE+DG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=WClie5S3; arc=none smtp.client-ip=150.107.74.76
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1730681964;
-	bh=f/sR8dnm/aLqRzOQCfDkA3QQgE4vsYwa9jg/D8Glbp8=;
-	h=Date:From:To:Cc:Subject:From;
-	b=WClie5S3oIjdW+eX3M6bZIu2TfI+d38iyfapqTrjR8iFAmaiI2aqpk7fjDyKiBuNo
-	 AybNsGLZD6B/qJpe9EbcpADRCt15jd27WGykhLgB6z8LIi2jEIi/xUarLMkC0j8Enj
-	 XZVyHe64RI7AC0inxEZf0t4BXXCH44AYfG7w2mvupQWQXhpdiKJVmB2Gc9ofKVPIbJ
-	 3Ut+hJURpwFjQeJJFNWnln/jZEd6Xrl34oaEtGvYiKTdyIZAyZ6hxq7/ZOhb4AP/0q
-	 AQ2tmr2a8ucyLMPcTj7LP4W9frvVGu88jTyjHq0wr7JuVmA9ZdOglsY+Fetx63G+Do
-	 5POthf4HvBIAA==
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	s=arc-20240116; t=1730682345; c=relaxed/simple;
+	bh=mySv+AoLldC1jNd8zhNxrRGjLDllAz+VoN6BYj2Z7Q4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ROzwwsvCQaQI1z+GNsZVpncltGKCIWKkO2sqlscdGMhFFqLXbpmO8XtqC4mGQFRnaMEZjBiFXsI+u++a07m/JR3A8c4F8DcpA+5TkdaUfHsuxfKK4Bpz8oGSnTfAEqmcMLjOWWShlnMLguhsfoQWNP8V4ZdwO1epnYS42RWF0C4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz; spf=pass smtp.mailfrom=suse.cz; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=jTZV4vl+; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=gKaZLbzh; dkim=pass (1024-bit key) header.d=suse.cz header.i=@suse.cz header.b=xHZGksrK; dkim=permerror (0-bit key) header.d=suse.cz header.i=@suse.cz header.b=AISwnlk7; arc=none smtp.client-ip=195.135.223.130
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=suse.cz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=suse.cz
+Received: from lion.mk-sys.cz (unknown [10.100.225.114])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4XhY5R1vhZz4x3p;
-	Mon,  4 Nov 2024 11:59:22 +1100 (AEDT)
-Date: Mon, 4 Nov 2024 11:59:24 +1100
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: Daniel Borkmann <daniel@iogearbox.net>, Alexei Starovoitov
- <ast@kernel.org>, Andrii Nakryiko <andrii@kernel.org>, David Miller
- <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: bpf <bpf@vger.kernel.org>, Networking <netdev@vger.kernel.org>, Linux
- Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
- <linux-next@vger.kernel.org>
-Subject: linux-next: manual merge of the bpf-next tree with the net-next
- tree
-Message-ID: <20241104115924.2615858f@canb.auug.org.au>
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id E03F621B5E;
+	Mon,  4 Nov 2024 01:05:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1730682336; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ILxR/pbsE/vwpayzK9lXM9E8DI2m+5l2hfflq2foVBI=;
+	b=jTZV4vl+NUNuXW35OPapntPPth3zNUsNT26PNDM5Ja8PO9VdJ3AToypfEhnAq04JQ9Tann
+	q8V3YVsUEx72xPnjiTaceL1Prz3MNquIswv6fHfbFdX9dqEdepWeVlFr1Pz//Easn5KLKL
+	IGVrWHuPqsnBdjuOMs1c4iKAUr8d4Y8=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1730682336;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ILxR/pbsE/vwpayzK9lXM9E8DI2m+5l2hfflq2foVBI=;
+	b=gKaZLbzhSftLxoahzqMjCFhcs8r/ZhU9Wi/GvGgSYYBPioVFFLx4lUkvOXz/vNs2CxePZb
+	rqUqZvreadq+zpBQ==
+Authentication-Results: smtp-out1.suse.de;
+	none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
+	t=1730682334; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ILxR/pbsE/vwpayzK9lXM9E8DI2m+5l2hfflq2foVBI=;
+	b=xHZGksrK9291ddLiw1ge/pv6cb0NPbyOZGZbjYnO0HQtGzgvu3lBvtaq/CK4bQkkEMwAQR
+	cQC1PJCHBlh/LZ/tV+FXDQf5okA09ivtzrZBYYSunOGAvH2+Q9Fq8fg2oZ5M6JD6oFRUPC
+	KbRNgf9n4LrelSrWbrwO2tqw861jhVQ=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
+	s=susede2_ed25519; t=1730682334;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ILxR/pbsE/vwpayzK9lXM9E8DI2m+5l2hfflq2foVBI=;
+	b=AISwnlk7NxuT/3OlNO6yo2htMMZAhG13am5fhilO2SJoqysQ0MZsoENyk9ol/l0kKVPA+Z
+	KIqu9XP/f6qXGLAA==
+Received: by lion.mk-sys.cz (Postfix, from userid 1000)
+	id B4B402012C; Mon,  4 Nov 2024 02:05:34 +0100 (CET)
+Date: Mon, 4 Nov 2024 02:05:34 +0100
+From: Michal Kubecek <mkubecek@suse.cz>
+To: Mohan Prasad J <mohan.prasad@microchip.com>
+Cc: f.pfitzner@pengutronix.de, netdev@vger.kernel.org, 
+	kory.maincent@bootlin.com, davem@davemloft.net, kuba@kernel.org, andrew@lunn.ch, 
+	Anbazhagan.Sakthivel@microchip.com, Nisar.Sayed@microchip.com
+Subject: Re: [PATCH ethtool] netlink: settings: Fix for wrong
+ auto-negotiation state
+Message-ID: <uzwfeeltnozvbdxigpu2mshrr7yjxgkbyrjeyfeavasue63cgn@w3ju2lpjq2ln>
+References: <20241016035848.292603-1-mohan.prasad@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/eTZL+obPJQ99AGrfxDS_OJU";
- protocol="application/pgp-signature"; micalg=pgp-sha256
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="5u2gasxlfmibzwdc"
+Content-Disposition: inline
+In-Reply-To: <20241016035848.292603-1-mohan.prasad@microchip.com>
+X-Spam-Level: 
+X-Spamd-Result: default: False [-5.72 / 50.00];
+	BAYES_HAM(-3.00)[99.99%];
+	SIGNED_PGP(-2.00)[];
+	NEURAL_HAM_LONG(-1.00)[-1.000];
+	MID_RHS_NOT_FQDN(0.50)[];
+	MIME_GOOD(-0.20)[multipart/signed,text/plain];
+	NEURAL_HAM_SHORT(-0.02)[-0.086];
+	MISSING_XM_UA(0.00)[];
+	RCVD_COUNT_ONE(0.00)[1];
+	MIME_TRACE(0.00)[0:+,1:+,2:~];
+	ARC_NA(0.00)[];
+	TO_DN_SOME(0.00)[];
+	RCPT_COUNT_SEVEN(0.00)[9];
+	FROM_HAS_DN(0.00)[];
+	DKIM_SIGNED(0.00)[suse.cz:s=susede2_rsa,suse.cz:s=susede2_ed25519];
+	FROM_EQ_ENVFROM(0.00)[];
+	FUZZY_BLOCKED(0.00)[rspamd.com];
+	TO_MATCH_ENVRCPT_ALL(0.00)[];
+	RCVD_TLS_LAST(0.00)[];
+	DBL_BLOCKED_OPENRESOLVER(0.00)[lion.mk-sys.cz:helo,microchip.com:email]
+X-Spam-Score: -5.72
+X-Spam-Flag: NO
 
---Sig_/eTZL+obPJQ99AGrfxDS_OJU
-Content-Type: text/plain; charset=US-ASCII
+
+--5u2gasxlfmibzwdc
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-Hi all,
+On Wed, Oct 16, 2024 at 09:28:47AM +0530, Mohan Prasad J wrote:
+> Auto-negotiation state in json format showed the
+> opposite state due to wrong comparison.
+> Fix for returning the correct auto-neg state implemented.
+>=20
+> Signed-off-by: Mohan Prasad J <mohan.prasad@microchip.com>
+> ---
+>  netlink/settings.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+>=20
+> diff --git a/netlink/settings.c b/netlink/settings.c
+> index dbfb520..a454bfb 100644
+> --- a/netlink/settings.c
+> +++ b/netlink/settings.c
+> @@ -546,7 +546,7 @@ int linkmodes_reply_cb(const struct nlmsghdr *nlhdr, =
+void *data)
+>  						(autoneg =3D=3D AUTONEG_DISABLE) ? "off" : "on");
+>  		else
+>  			print_bool(PRINT_JSON, "auto-negotiation", NULL,
+> -				   autoneg =3D=3D AUTONEG_DISABLE);
+> +				   (autoneg =3D=3D AUTONEG_DISABLE) ? false : true);
+>  	}
+>  	if (tb[ETHTOOL_A_LINKMODES_MASTER_SLAVE_CFG]) {
+>  		uint8_t val;
 
-Today's linux-next merge of the bpf-next tree got a conflict in:
+The fix looks correct but isn't
 
-  tools/testing/selftests/bpf/Makefile
+	(autoneg =3D=3D AUTONEG_DISABLE) ? false : true
 
-between commit:
+just a more complicated way to say
 
-  cbf49bed6a8c ("Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/l=
-inux/kernel/git/bpf/bpf-next")
+	autoneg !=3D AUTONEG_DISABLE
 
-from the net-next tree and commit:
+(and harder to read)?
 
-  34419b2def88 ("Merge branch 'bpf-next/master' into for-next")
+Michal
 
-from the bpf-next tree.
-
-The former reordered and reformatted a list.
-
-I fixed it up (I used the former) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/eTZL+obPJQ99AGrfxDS_OJU
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
+--5u2gasxlfmibzwdc
+Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcoHGwACgkQAVBC80lX
-0GxMIAf/VpUaLcRN2iwlrlEagMya7GmnS18kOgrDeiPVkyiSnzsVwhgE2MzOFzvi
-Bh4/jjC4HHoNAwhqJuaivUzGkqoltv+qIuiDRaJgVvvYiTNSQrOjZxHqNYhFIGis
-++zC7DlxPDtSZRasbm0QVCk7Kdy91SuOA6Z/7kkqqQOZGrMQ7i1we+hr02EsqaTX
-cwT2M6rIUSyqQEtX0FYY8VI/vFtyDGmNY/CI/lNNKWLZiCkhHosGubbhVSK83aNB
-su6jXDEavgjIsUqpLKWlKV6aUb39fn1111omT/O9gWxoCS6b37T5UVx2nAh94dRB
-ijVFrX5iLx01XJ66Qzx77uSgygj7Qw==
-=cQNc
+iQEzBAABCAAdFiEEWN3j3bieVmp26mKO538sG/LRdpUFAmcoHdgACgkQ538sG/LR
+dpXeqggAq3MH34Ddq/a+dg4tBV1PKiUx52FfM43yUIQafjKQFLj4Xn7kDhM+94eS
+0YOwFALPBQwbr3cjCmSRfIGZoxsTUf/EF4ne4ctBuVjwiNw0de2R+3sjxwF72SUR
+BJSa1EanrxRywXEGxP3t6uJ6+UG42ewEhNm1tAOD8TDOO23+udhXbMIK4AwEKn4X
+c+FuZmcjS68ppV1L3NtJJ5Gt2aL81e1FdRz05BtXqR5kdf0aAV/vM3zHaxb68YCR
+xBO7AJUSExH2Kr585HlED055Xy1uJx9sAU3c/Eh2x1rjHum/KyMtiPvU7JIcuvcA
+iQWOGcvHnesZJkwAV7AhoJXswkf2HA==
+=Ljx3
 -----END PGP SIGNATURE-----
 
---Sig_/eTZL+obPJQ99AGrfxDS_OJU--
+--5u2gasxlfmibzwdc--
 
