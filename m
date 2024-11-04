@@ -1,198 +1,99 @@
-Return-Path: <netdev+bounces-141442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E9379BAEDA
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:58:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E02399BAF19
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:08:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09142B231E7
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:58:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DE2A1C22406
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:08:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 258CF1B2195;
-	Mon,  4 Nov 2024 08:57:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F17E1AA7BE;
+	Mon,  4 Nov 2024 09:08:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="poZJLFpZ"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="ojaM3Bx2"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 875861B0F12;
-	Mon,  4 Nov 2024 08:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.97
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 666E219D8BE;
+	Mon,  4 Nov 2024 09:08:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730710638; cv=none; b=BxkJLFPnSJxvSTloICk1p4xWl1BjDWDQ34ZQSCpEFkienahEeFGllQwkavDlFV6ooL3PeehqPyU3PFKrNRtTenQn4rIAMrkNen4/1aqfaTqDQeKfRGcE6VASEnCdImESvlsIbf5NQkpnF7l47kLC2ON5WY5LVXh2BtOeIPr6/vU=
+	t=1730711283; cv=none; b=RhnnYCYJPeIg7HhjvxJADo60+hjxkluOCroG/0qWpZv1oZSxqR4hCqPUCFrsrUPPJHgcyo2ZfGr24y/F4F/cVvBKiY36syJTLn4TJdpxdsYHuRcX3BSqd19Sm4ARtAGQQqffZlYPi5fs8iSZn2m4hCoeUK6oCTXhDTsrhTG29uY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730710638; c=relaxed/simple;
-	bh=0FLFfBSAK6sU4ebwfJfJ/l+kivNg1Idp2rGw8Bmwh0U=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=Q8KWbLhtcOj5mWpvEWN6qNGsVHa+lIBSFT2uh62lMwkEuwAnTE+YlrcZPSyR609J5A3AdyVtceSqQ0H90BZQbFUu36gvmO0NPQ1DUTx7qf+kNsCsRy8V1Y+uqDu9/TgIQ47CYLVrEgFMoMW5xIGPnBemJ2/59oTg9HZDUCn1eGw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=poZJLFpZ; arc=none smtp.client-ip=115.124.30.97
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730710633; h=From:To:Subject:Date:Message-Id:MIME-Version;
-	bh=aDKj9+4ZrQzwmLfshFCpLQjvnEMoj1w8tVLqhzceXe8=;
-	b=poZJLFpZjTp6uNdcL54nJ9iQZt6bWJr+ymyCLJ1IqGcxA8HbARMQUf5StoQN3to2I8YkPNUlU1coqvzB2+e0G41i33D5/Jp0ukaJbElEDrjWRB3sPc/GhLkCKKOKjEbLjKp8ZHM/XNRYICh6CkL+oUa6gqNnQAONEZwhJtmV/v8=
-Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WIdkVoT_1730710630 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Mon, 04 Nov 2024 16:57:11 +0800
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: mst@redhat.com,
-	jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew@daynix.com,
-	virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net 4/4] virtio_net: Update rss when set queue
-Date: Mon,  4 Nov 2024 16:57:06 +0800
-Message-Id: <20241104085706.13872-5-lulie@linux.alibaba.com>
-X-Mailer: git-send-email 2.32.0.3.g01195cf9f
-In-Reply-To: <20241104085706.13872-1-lulie@linux.alibaba.com>
-References: <20241104085706.13872-1-lulie@linux.alibaba.com>
+	s=arc-20240116; t=1730711283; c=relaxed/simple;
+	bh=nvTvcMq87NAEajnxg84zXbjs+exdQHrT/KIDHDbHkJA=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=alJtBdFh2/1E/4iukVNZV10AsS6/USk1LM0vYynxZg3QUqhap2KISKqZ+fUfusqdwh0wfmd+9fgd+/w4f0UAYFtJHiDzM1RS7TkH6m4GKG4xjBc1qzmFxSorZUIt5ArSpU63faic4/DveQRjmt7V+8WaJJqXKn/eZkmYjmYSmO4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=ojaM3Bx2; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1730711281; x=1762247281;
+  h=from:to:subject:date:message-id:mime-version;
+  bh=nvTvcMq87NAEajnxg84zXbjs+exdQHrT/KIDHDbHkJA=;
+  b=ojaM3Bx2FoINjEIqF1QRHxDctgIhmVliOYwLfDs7OL7scajBF+1IlJZR
+   Lk2kMNvRVdxw0ZnWlrPPd3YygkKhp2m2RicM08v9my2PLA99ZAtXjHWiO
+   GZXXMFgN9bIDAJeVKJGBamMi3S7oLiLqnEIbRqthu7w+7QLmX+hM7o63D
+   cCQ35ZsyNJ3lH+cIMP0x2VyW8sywPGFV42Cg/pYfHM8oRIVaOuDY+CIQz
+   dwYusMqZ5GaivkBTguHFcJntIG2TvY2S5HQ94X5s1jguTjLVPzZhsFDXF
+   aQ8hUa/yhFiwnW+FHfUkKxiNg2MlxsIimHXEIabvk+SNRRZy4Ree252UB
+   Q==;
+X-CSE-ConnectionGUID: b8mzosZWTB24zVJMTbB3MA==
+X-CSE-MsgGUID: vs7EqtfEQX2zAGjHUUNH8Q==
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="201261156"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa6.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Nov 2024 02:08:00 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Mon, 4 Nov 2024 02:07:56 -0700
+Received: from training-HP-280-G1-MT-PC.microchip.com (10.10.85.11) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server id
+ 15.1.2507.35 via Frontend Transport; Mon, 4 Nov 2024 02:07:52 -0700
+From: Divya Koppera <divya.koppera@microchip.com>
+To: <andrew@lunn.ch>, <arun.ramadoss@microchip.com>,
+	<UNGLinuxDriver@microchip.com>, <hkallweit1@gmail.com>,
+	<linux@armlinux.org.uk>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <richardcochran@gmail.com>
+Subject: [PATCH net-next 0/5] Add ptp library for Microchip phys
+Date: Mon, 4 Nov 2024 14:37:45 +0530
+Message-ID: <20241104090750.12942-1-divya.koppera@microchip.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-RSS configuration should be updated with queue number. In particular, it
-should be updated when (1) rss enabled and (2) default rss configuration
-is used without user modification.
+Adds support of ptp library in Microchip phys
 
-During rss command processing, device updates queue_pairs using
-rss.max_tx_vq. That is, the device updates queue_pairs together with
-rss, so we can skip the sperate queue_pairs update
-(VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET below) and return directly.
+Divya Koppera (5):
+  net: phy: microchip_ptp : Add header file for Microchip ptp library
+  net: phy: microchip_ptp : Add ptp library for Microchip phys
+  net: phy: Kconfig: Add ptp library support and  1588 optional flag in
+    Microchip phys
+  net: phy: Makefile: Add makefile support for ptp in Microchip phys
+  net: phy: microchip_t1 : Add initialization of ptp for lan887x
 
-Also remove the `vi->has_rss ?` check when setting vi->rss.max_tx_vq,
-because this is not used in the other hash_report case.
+ drivers/net/phy/Kconfig         |   9 +-
+ drivers/net/phy/Makefile        |   1 +
+ drivers/net/phy/microchip_ptp.c | 990 ++++++++++++++++++++++++++++++++
+ drivers/net/phy/microchip_ptp.h | 217 +++++++
+ drivers/net/phy/microchip_t1.c  |  29 +-
+ 5 files changed, 1242 insertions(+), 4 deletions(-)
+ create mode 100644 drivers/net/phy/microchip_ptp.c
+ create mode 100644 drivers/net/phy/microchip_ptp.h
 
-Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
-Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
----
- drivers/net/virtio_net.c | 65 +++++++++++++++++++++++++++++++---------
- 1 file changed, 51 insertions(+), 14 deletions(-)
-
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 59d9fdf562e0..189afad3ffaa 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -3394,15 +3394,59 @@ static void virtnet_ack_link_announce(struct virtnet_info *vi)
- 		dev_warn(&vi->dev->dev, "Failed to ack link announce.\n");
- }
- 
-+static bool virtnet_commit_rss_command(struct virtnet_info *vi);
-+
-+static void virtnet_rss_update_by_qpairs(struct virtnet_info *vi, u16 queue_pairs)
-+{
-+	u32 indir_val = 0;
-+	int i = 0;
-+
-+	for (; i < vi->rss_indir_table_size; ++i) {
-+		indir_val = ethtool_rxfh_indir_default(i, queue_pairs);
-+		vi->rss.indirection_table[i] = indir_val;
-+	}
-+	vi->rss.max_tx_vq = queue_pairs;
-+}
-+
- static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- {
- 	struct virtio_net_ctrl_mq *mq __free(kfree) = NULL;
--	struct scatterlist sg;
-+	struct virtio_net_ctrl_rss old_rss;
- 	struct net_device *dev = vi->dev;
-+	struct scatterlist sg;
- 
- 	if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
- 		return 0;
- 
-+	/* Firstly check if we need update rss. Do updating if both (1) rss enabled and
-+	 * (2) no user configuration.
-+	 *
-+	 * During rss command processing, device updates queue_pairs using rss.max_tx_vq. That is,
-+	 * the device updates queue_pairs together with rss, so we can skip the sperate queue_pairs
-+	 * update (VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET below) and return directly.
-+	 */
-+	if (vi->has_rss && !netif_is_rxfh_configured(dev)) {
-+		memcpy(&old_rss, &vi->rss, sizeof(old_rss));
-+		if (rss_indirection_table_alloc(&vi->rss, vi->rss_indir_table_size)) {
-+			vi->rss.indirection_table = old_rss.indirection_table;
-+			return -ENOMEM;
-+		}
-+
-+		virtnet_rss_update_by_qpairs(vi, queue_pairs);
-+
-+		if (!virtnet_commit_rss_command(vi)) {
-+			/* restore ctrl_rss if commit_rss_command failed */
-+			rss_indirection_table_free(&vi->rss);
-+			memcpy(&vi->rss, &old_rss, sizeof(old_rss));
-+
-+			dev_warn(&dev->dev, "Fail to set num of queue pairs to %d, because committing RSS failed\n",
-+				 queue_pairs);
-+			return -EINVAL;
-+		}
-+		rss_indirection_table_free(&old_rss);
-+		goto succ;
-+	}
-+
- 	mq = kzalloc(sizeof(*mq), GFP_KERNEL);
- 	if (!mq)
- 		return -ENOMEM;
-@@ -3415,12 +3459,12 @@ static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
- 		dev_warn(&dev->dev, "Fail to set num of queue pairs to %d\n",
- 			 queue_pairs);
- 		return -EINVAL;
--	} else {
--		vi->curr_queue_pairs = queue_pairs;
--		/* virtnet_open() will refill when device is going to up. */
--		if (dev->flags & IFF_UP)
--			schedule_delayed_work(&vi->refill, 0);
- 	}
-+succ:
-+	vi->curr_queue_pairs = queue_pairs;
-+	/* virtnet_open() will refill when device is going to up. */
-+	if (dev->flags & IFF_UP)
-+		schedule_delayed_work(&vi->refill, 0);
- 
- 	return 0;
- }
-@@ -3880,21 +3924,14 @@ static bool virtnet_commit_rss_command(struct virtnet_info *vi)
- 
- static void virtnet_init_default_rss(struct virtnet_info *vi)
- {
--	u32 indir_val = 0;
--	int i = 0;
--
- 	vi->rss.hash_types = vi->rss_hash_types_supported;
- 	vi->rss_hash_types_saved = vi->rss_hash_types_supported;
- 	vi->rss.indirection_table_mask = vi->rss_indir_table_size
- 						? vi->rss_indir_table_size - 1 : 0;
- 	vi->rss.unclassified_queue = 0;
- 
--	for (; i < vi->rss_indir_table_size; ++i) {
--		indir_val = ethtool_rxfh_indir_default(i, vi->curr_queue_pairs);
--		vi->rss.indirection_table[i] = indir_val;
--	}
-+	virtnet_rss_update_by_qpairs(vi, vi->curr_queue_pairs);
- 
--	vi->rss.max_tx_vq = vi->has_rss ? vi->curr_queue_pairs : 0;
- 	vi->rss.hash_key_length = vi->rss_key_size;
- 
- 	netdev_rss_key_fill(vi->rss.key, vi->rss_key_size);
 -- 
-2.32.0.3.g01195cf9f
+2.17.1
 
 
