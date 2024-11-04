@@ -1,100 +1,111 @@
-Return-Path: <netdev+bounces-141541-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141524-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68BD29BB469
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:15:13 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 59E639BB3E2
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:51:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 213F21F23FB8
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:15:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CC46B26FE4
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:46:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6149E1BDA95;
-	Mon,  4 Nov 2024 12:14:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC5DB1B3942;
+	Mon,  4 Nov 2024 11:46:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="qLC0lpHO"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="cBTxvycZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE76B1BBBD0;
-	Mon,  4 Nov 2024 12:14:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 974481B3937
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 11:46:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730722451; cv=none; b=t311s4H/wPm2xz1y8ZUjsLxD2ubZwe2WlK3g0QQ9S3EzjxUdS6digWIM1brU1CP56zCqVK25okBnNHG+Z/BlODtqeBfEAj9VRwVIRHtagL3rHnsmxs/wbb7NsCMjsUdXm4M1137R1XAytjbMUP8g6PAjHttKvusZgk3AOHKGrYo=
+	t=1730720782; cv=none; b=JuDjIv7jjYIVeHY/K/rJa6Kb+VuMtBBpc/gkC9ApTJKJJpVIkXNyVQV9OWBwUZH/EsjVERRyjONPRsfp1nk+zuw7hswiOFjfp5gddBjwm/y1dcvINQ+SsEeNdNjJGnI6yVDVRv4xUnsAlSVA25dQqMm7Cr/oShQZxYSGCjkNik4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730722451; c=relaxed/simple;
-	bh=hnoFp2jrmTCv8QXmcb/QGK9fuoQ7COD+C5WnlZRNs5g=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=r45WXdjzUXidINJ/M8qjy4SIvE83S9onwEbUUW3cF7dgAupZgrwlPOyS3AezpR0iG2zJAAIsgGsHyNK5WvCMuJ+Few3LV7FdtzS6uJcrlErX8pWqj1j8RPQZfQ/G3M+csmtEcuCOpJwzkNVq89zQHBwKaD2w+DkjpPP6gzPWZqA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=qLC0lpHO; arc=none smtp.client-ip=85.214.62.61
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
-Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
-	(No client certificate requested)
-	(Authenticated sender: marex@denx.de)
-	by phobos.denx.de (Postfix) with ESMTPSA id 8C1A688009;
-	Mon,  4 Nov 2024 13:14:06 +0100 (CET)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
-	s=phobos-20191101; t=1730722447;
-	bh=RbP1054GvB61ShZBZGNpCOGJO/HAU6VHlS0FG1xGG0A=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=qLC0lpHOOnxdRkOo5dIwmh7FkzUTx9YtUI0K20NQztK0/8Tya5E8u72eVkyvUTZ7W
-	 6ovz0aHu+/wYLWi0sGjxS1vkgXVJEqqXxXf5ICT1gE7TSA7/uP/9HnDmPwmfOGFgY3
-	 +GKuzictb8S/hH+P9XIbqFmk9JqKyErArIlfAop/DWLidTIpAFSwX7kJj02OvT0J6n
-	 wiyJtpajcYul4Z6Ztgu3tsczv65+/l4LLWsGwrbbthkIzuwowNAe9dcwFxmhUNe1HL
-	 ddh2/eaco0gaRXXELDmONpKAw8r9E5AC4BN4eW3MVQZAKk8pHlngDimIfMYxPBA6W/
-	 bf/nOgpplharA==
-Message-ID: <16e5c8d7-64ac-424e-9430-b683ae16a34e@denx.de>
-Date: Mon, 4 Nov 2024 12:44:07 +0100
+	s=arc-20240116; t=1730720782; c=relaxed/simple;
+	bh=6fyI+TJeacaVlmMYQ3fai+EmFug2NS3CEbFwoFVH6TI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ig492xen7XNiXvqDy3jMNs0nk1nNHPPsJKX29kcG3f+HayIn+U7a1zciESITpl1/26EGwF4NE6INF7Sa+uNKjaYhqhoUFcfHk1Z6iPyvoJOEMnYkTtb/XSlqiMAtAVKsJWhinWJSYmQxlAmGWlpDUZE1x2msFwFUsnkChH+oWQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=cBTxvycZ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 61EE9C4CECE;
+	Mon,  4 Nov 2024 11:46:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730720782;
+	bh=6fyI+TJeacaVlmMYQ3fai+EmFug2NS3CEbFwoFVH6TI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cBTxvycZy7eAxoKgZqgCUjhTNk8sMbRO0QReK3SIv5C5MZrWeBYxfvYQTBlHYYIyH
+	 LNPcmzuqYYJCS3/wOFi3SyrFAyUptyX7vSpNBMHGG+lpWxxqC/3VdekDVtZN/bWyg0
+	 CwQoKEyW/tTvBzz8U1cqjWGMw6omcepJ+imb9u4QLd3081/h4Qnq5jwAEdHXvbsu63
+	 7+sBRVhZSa831KRVJhCQe4UNOnKkt6B05S21tWYqEwe8HOB3ErfFtEvCsKtM49OrM+
+	 a4CYyb+XiZDvbzpLOcPmJvmdF7S0VDQaPv9sZ9WucuMI1KUtG4Dq55CXbHey5fObra
+	 rlfiLAYm7pwqg==
+Date: Mon, 4 Nov 2024 11:46:19 +0000
+From: Simon Horman <horms@kernel.org>
+To: Wojciech Drewek <wojciech.drewek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next] ice: Fix NULL pointer dereference in switchdev
+Message-ID: <20241104114619.GB2118587@kernel.org>
+References: <20241029094259.77738-1-wojciech.drewek@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
-From: Marek Vasut <marex@denx.de>
-To: Ajay.Kathat@microchip.com, alexis.lothore@bootlin.com,
- linux-wireless@vger.kernel.org
-Cc: davem@davemloft.net, adham.abozaeid@microchip.com,
- claudiu.beznea@tuxon.dev, conor+dt@kernel.org, edumazet@google.com,
- kuba@kernel.org, kvalo@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
- robh@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
-References: <20241022013855.284783-1-marex@denx.de>
- <c9e98811-15f5-427a-82f7-2e7fff4a9873@bootlin.com>
- <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
- <a4c8c489-c6b9-4a38-84ab-f08409baccff@microchip.com>
- <5e2a5056-78ac-4be0-83ca-4aa55f524535@denx.de>
- <880baad9-be3d-41b2-bea3-620f915ca397@microchip.com>
- <9d20b408-72a4-49f0-aca6-108dfdd65f99@denx.de>
-Content-Language: en-US
-In-Reply-To: <9d20b408-72a4-49f0-aca6-108dfdd65f99@denx.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
-X-Virus-Status: Clean
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241029094259.77738-1-wojciech.drewek@intel.com>
 
-On 10/23/24 8:47 PM, Marek Vasut wrote:
+On Tue, Oct 29, 2024 at 10:42:59AM +0100, Wojciech Drewek wrote:
+> Commit ("virtchnl: support queue rate limit and quanta size
 
-Hello again,
+It would be nice to include 12 characters of sha1 hash immediately
+after "Commit".
 
->> Is power-save enabled during the test. With PS enabled, The SDIO 
->> commands may
->> fail momentarily but it should recover.
+> configuration") introduced new virtchnl ops:
+> - get_qos_caps
+> - cfg_q_bw
+> - cfg_q_quanta
 > 
-> It seems it gets enabled after first ifconfig up, that's a good hint, 
-> I'll try to disable it and see if that makes them errors go away. Thanks!
+> New ops were added to ice_virtchnl_dflt_ops but not to the
+> ice_virtchnl_repr_ops. Because of that, if we get one of those
+> messages in switchdev mode we end up with NULL pointer dereference:
 > 
-> Do you have any details on WHY would such sporadic errors occur and how 
-> to make those go away even with PS enabled ?
-Can you explain why does uAPSD (iw ...set power_save off) adversely 
-affect SDIO bus stability ?
+> [ 1199.794701] BUG: kernel NULL pointer dereference, address: 0000000000000000
+> [ 1199.794804] Workqueue: ice ice_service_task [ice]
+> [ 1199.794878] RIP: 0010:0x0
+> [ 1199.795027] Call Trace:
+> [ 1199.795033]  <TASK>
+> [ 1199.795039]  ? __die+0x20/0x70
+> [ 1199.795051]  ? page_fault_oops+0x140/0x520
+> [ 1199.795064]  ? exc_page_fault+0x7e/0x270
+> [ 1199.795074]  ? asm_exc_page_fault+0x22/0x30
+> [ 1199.795086]  ice_vc_process_vf_msg+0x6e5/0xd30 [ice]
+> [ 1199.795165]  __ice_clean_ctrlq+0x734/0x9d0 [ice]
+> [ 1199.795207]  ice_service_task+0xccf/0x12b0 [ice]
+> [ 1199.795248]  process_one_work+0x21a/0x620
+> [ 1199.795260]  worker_thread+0x18d/0x330
+> [ 1199.795269]  ? __pfx_worker_thread+0x10/0x10
+> [ 1199.795279]  kthread+0xec/0x120
+> [ 1199.795288]  ? __pfx_kthread+0x10/0x10
+> [ 1199.795296]  ret_from_fork+0x2d/0x50
+> [ 1199.795305]  ? __pfx_kthread+0x10/0x10
+> [ 1199.795312]  ret_from_fork_asm+0x1a/0x30
+> [ 1199.795323]  </TASK>
 
-Can you explain how to prevent that or shall we disable uAPSD altogether ?
+It seems that the cited commit is present in net-next but not Linus's tree.
+But, regardless, I think a Fixes tag is warranted.
 
-Thank you
+> 
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+
+The fix itself looks good to me, thanks.
+
+Reviewed-by: Simon Horman <horms@kernel.org>
+
+...
 
