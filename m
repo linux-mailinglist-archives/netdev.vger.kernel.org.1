@@ -1,173 +1,163 @@
-Return-Path: <netdev+bounces-141675-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141676-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id D77C89BBFFF
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 22:25:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C38EA9BC006
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 22:27:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5BCA81F21C93
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:25:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 495541F21D4E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:27:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39BF1FCC63;
-	Mon,  4 Nov 2024 21:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A251D54C0;
+	Mon,  4 Nov 2024 21:27:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fBQzBmH2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BDCA1D54C0
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 21:25:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97E4C19BBA;
+	Mon,  4 Nov 2024 21:27:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730755528; cv=none; b=QKT3bkaHJbpq+1F7vAQWVGJi3mgnhZErz0NuFErNysb46kLlapJ8WIVdgsyz+EJSZDMMXVcbGiWi/eVcQhsIuRm5UW1XlcQ0v46NKlEEYAJuPY7P5LmbcdnuxjnpEGf3L1EZoReGpzShaKWyW03GrR906e5rRYgvH8UHqPVbmuQ=
+	t=1730755652; cv=none; b=rSRmHLhwyTnU4U/qdx9m67xlfeqZJQnba6nn0u1w/JZ6rZi5zz6nXQ+SC38ptcBehtacImpDNGboQ+3/LEbg5N6txyNXx0u4U22SXSA7dIJ1w8deK2101b4mY38we6gsiDXvh6CKGgkWbE6wGEaS/eSMi8dMZdHNwJ+sIgG0KCQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730755528; c=relaxed/simple;
-	bh=Rre4DbdsOxeLgoI5LSbnhb9diCbHE4TntsWN6o3Ahq4=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=BkQH/MCZE+J1G+R4fFXlZSVxyw2vcLsJgMs/UrC5XRqC0x+x2UIuKpYFvNb7P8jk0b5+BDAyCHkhpbyIagUqCpyt6aIht8w/NCcAB9A1kiALcNDWlfR57UqezSq0+dicALclLQ3KvESIhMY3/jRU7QkCY7uW4jpS2iU3YWkuLJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a4f3d7d13fso45880735ab.0
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 13:25:27 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730755526; x=1731360326;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+	s=arc-20240116; t=1730755652; c=relaxed/simple;
+	bh=CssUUmt7kYvujk7m2ME9ffLzr6JOp2MGXnKwUAJ1Rqw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mSvltS+oMdhRfmLle1+U5nmWoEvMlJFHJSAhgrU/hUWIziKXv2eI5JoQjZeZNy0kVmGpRCfWzGtRva1HDdc0r4JsRdEAzcmXh3mY/hME9gdq3OKHGBmZO2L01SBiYEqxz77zzOkN5Zx8KvBumuflYJ1SMoyl1pHjKFO+9/YpJ1o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fBQzBmH2; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a9a0f198d38so799974466b.1;
+        Mon, 04 Nov 2024 13:27:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730755649; x=1731360449; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=SAsKvAp8Sst3NYJtT1LShmmNbzN8YlFhKi+LB2P10Gs=;
-        b=erZQuIVzEFdZCamMNiId2k50uP2DyOHvPGfTqrmmjJsOEiC8IFqDW/QFTGqqBun6u5
-         j3JupsejWzIit/B2flMoQd0t/wbGC6jpZU/6ZvXwH18/IVs7IxzKq/ls09HVV7DVbhpk
-         TKTxPCUXCPzVIWQaXo2KpIHK06ZLpsTOStnskiBnohG/Lsqo0rAoBZxpnlc6d5Prb7PT
-         aH/IJ3WVr+3pzdT9BN4hfzsvzxTN2wgACOQW/xkMXVVMjby4I1nFW85v+6eakR2gkVn5
-         Z38Wt1Y2ydVz9+yjqk46EPgqKY8pqk9Z1LwlAkWGhKMNZS9C5UntX/i5p+mzSpcXgZ/I
-         JM9A==
-X-Forwarded-Encrypted: i=1; AJvYcCUqoXAgtZ+jDN2CXhYjBcnRWHJQnCMl4gw5Hoa3tmI7/23CywmQ7xeksutgwphxRpfnKpjzjPo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYE4uU+ZLwHOKhTe3ctv4XpcMIWZBoeY+T7nAa2JRGcJbmCmPl
-	odevNtPZ3VpNHb3NrItE/WhhEK13e6Gy60XHTFD7iQe5f1MXKGkF4sEJdfw17Nbw30T4mAqqAxO
-	7MEfiK1Rbb9QprKUyf3IvqCHPGrIh+MkUkmxo4iR/7wNd+oXh5tjwxYs=
-X-Google-Smtp-Source: AGHT+IHthQkVIqK9FjtxcEWleyaboaWzlDMUbs0UcaxRBaxZT6t2Tla3mP4Y2/hhLaOfFQ8UdxWHvCZczEKkhNOrCtEZlNAraFYZ
+        bh=gNQYgmKSO8uZ7d58ovGGv37TlDMxUyuw3zjkggRIGJE=;
+        b=fBQzBmH2omUrAxB3E2t7yqRVW2fXMfgMHn2phSRpKiJmS0O9Xw+YSFnKOqDxXh/TiQ
+         E5xtLByKXeATsMV3kUyWs8HZWhr0u4wTweALnahmlQ5POVNfWwyYXloQUbTX3EvKA+i5
+         N1/+8qEN0lDJYh7YNh1k0Y7PT37VDusWMxOgX0psyQfwQWo900nw9DBx+q1WGkLIJSOD
+         /UgqaDCr9+618pQqczLXrCPTUhmusHNbMiBm1SMuTfYx8DgljhYfJSNiPEntwqN6tUZf
+         QuKVnim3BSRbxzOt1uekH3wd03R0aOING7edyT02fRA/8f7q19ogzpIjNzdf5ItkFOsE
+         zRUg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730755649; x=1731360449;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=gNQYgmKSO8uZ7d58ovGGv37TlDMxUyuw3zjkggRIGJE=;
+        b=ENSIiBZjVMH3arM+DoMaahmxC0g20H0a+PK0SuLQd/xXG1M/y6av9PoxCQvx4M/Gsd
+         t/+OYOWkeNTSev/p1kxdIgFZqCxhQezIBe4ERpnQgTM8xhnC+dv6CRdBNSiJVl5iAUsg
+         A7hxoKUTaiYRK6+A84sFTOqyd+etNfQp4/i5EFSrMzH7hCsHxDv1MtvEA454vFI1oPnv
+         D7QsF0LvwYdmXCturv/XpTyHoa5Jq/WlZ9C8bbf6FdcQztyfV20IyDhAbIx2qQ1w5b6T
+         8dwKb9ADWiPXYCNFPIfsqPerKAtgPTkqHLsDqXausjlSnJQSD7bYc6CZCvjmJygZyGOG
+         yLnA==
+X-Forwarded-Encrypted: i=1; AJvYcCU9hjQj+RTHSuC35fKUXFtw3MN7QeZ4D+azv5rYn4sHa3waTarYRGTLzoB4yosdsQ9DTTSoCYer@vger.kernel.org, AJvYcCVHGw5d0iTQvPi0rudSnh/9Khn+kpph6xw0CCzMUxbo5N7l4b/CJbk4uH7RYMurDYCsJqbxSwdKjg==@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxm6VfZiVr33HfXI0OHbaAw9bDoil81MMwL9J0cgw7MpXFgzf7e
+	+FdlvzuT82whQYZyjr1Tu04bJLDwqev4g/Kbmu9Rd2fjUBdUn1RyD8xq2Q==
+X-Google-Smtp-Source: AGHT+IHtoreAFpwSLbMbyf/HL9HUhqaa7rHs4WW3N+AzsA18XIK03tUJixFmkmEfQu2U6K89YftbeQ==
+X-Received: by 2002:a17:906:c115:b0:a99:7bc0:bca7 with SMTP id a640c23a62f3a-a9e654953bfmr1177756466b.10.1730755648515;
+        Mon, 04 Nov 2024 13:27:28 -0800 (PST)
+Received: from [192.168.42.103] ([148.252.145.116])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16aecbasm33139766b.32.2024.11.04.13.27.27
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Nov 2024 13:27:27 -0800 (PST)
+Message-ID: <4d88742a-9e83-464f-9058-85f6777ae13b@gmail.com>
+Date: Mon, 4 Nov 2024 21:27:32 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:3d06:b0:3a6:c122:508c with SMTP id
- e9e14a558f8ab-3a6c1225323mr89295815ab.19.1730755526457; Mon, 04 Nov 2024
- 13:25:26 -0800 (PST)
-Date: Mon, 04 Nov 2024 13:25:26 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67293bc6.050a0220.2edce.14fb.GAE@google.com>
-Subject: [syzbot] [wireless?] WARNING in kcov_remote_start (6)
-From: syzbot <syzbot+3f51ad7ac3ae57a6fdcc@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 06/15] net: page_pool: add ->scrub mem provider
+ callback
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>
+References: <20241007221603.1703699-1-dw@davidwei.uk>
+ <20241007221603.1703699-7-dw@davidwei.uk>
+ <CAHS8izPFp_Q1OngcwZDQeo=YD+nnA9vyVqhuaT--+uREEkfujQ@mail.gmail.com>
+ <9f1897b3-0cea-4822-8e33-a4cab278b2ac@gmail.com>
+ <CAHS8izOxsLc82jX=b3cwEctASerQabKR=Kqqio2Rs7hVkDHL4A@mail.gmail.com>
+ <5d7925ed-91bf-4c78-8b70-598ae9ab3885@davidwei.uk>
+ <CAHS8izNt8pfBwGnRNWphN4vJJ=1yJX=++-RmGVHrVOvy59=13Q@mail.gmail.com>
+ <6acf95a6-2ddc-4eee-a6e1-257ac8d41285@gmail.com>
+ <CAHS8izNXOSGCAT6zvwTOpW7uomuA5L7EwuVD75gyeh2pmqyE2w@mail.gmail.com>
+ <58046d4d-4dff-42c2-ae89-a69c2b43e295@gmail.com>
+ <CAHS8izO6aBdHkN5QF8Z57qGwop3+XObd5T6P8VnMdyT=FUDO1A@mail.gmail.com>
+ <2771e23a-2f4b-43c7-9d2a-3fa6aad26d53@gmail.com>
+ <CAHS8izNvrUx1cEFFAEdY-AsrVh3ttX6WtAc9NHEXfyw3bKBnDg@mail.gmail.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CAHS8izNvrUx1cEFFAEdY-AsrVh3ttX6WtAc9NHEXfyw3bKBnDg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Hello,
+On 11/4/24 20:42, Mina Almasry wrote:
+> On Fri, Nov 1, 2024 at 2:38 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> On 11/1/24 19:24, Mina Almasry wrote:
+>>> On Fri, Nov 1, 2024 at 11:34 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>> ...
+>>>>> Huh, interesting. For devmem TCP we bind a region of memory to the
+>>>>> queue once, and after that we can create N connections all reusing the
+>>>>> same memory region. Is that not the case for io_uring? There are no
+>>>>
+>>>> Hmm, I think we already discussed the same question before. Yes, it
+>>>> does indeed support arbitrary number of connections. For what I was
+>>>> saying above, the devmem TCP analogy would be attaching buffers to the
+>>>> netlink socket instead of a tcp socket (that new xarray you added) when
+>>>> you give it to user space. Then, you can close the connection after a
+>>>> receive and the buffer you've got would still be alive.
+>>>>
+>>>
+>>> Ah, I see. You're making a tradeoff here. You leave the buffers alive
+>>> after each connection so the userspace can still use them if it wishes
+>>> but they are of course unavailable for other connections.
+>>>
+>>> But in our case (and I'm guessing yours) the process that will set up
+>>> the io_uring memory provider/RSS/flow steering will be a different
+>>> process from the one that sends/receive data, no? Because the former
+>>> requires CAP_NET_ADMIN privileges while the latter will not. If they
+>>> are 2 different processes, what happens when the latter process doing
+>>> the send/receive crashes? Does the memory stay unavailable until the
+>>> CAP_NET_ADMIN process exits? Wouldn't it be better to tie the lifetime
+>>> of the buffers of the connection? Sure, the buffers will become
+>>
+>> That's the tradeoff google is willing to do in the framework,
+>> which is fine, but it's not without cost, e.g. you need to
+>> store/erase into the xarray, and it's a design choice in other
+>> aspects, like you can't release the page pool if the socket you
+>> got a buffer from is still alive but the net_iov hasn't been
+>> returned.
+>>
+>>> unavailable after the connection is closed, but at least you don't
+>>> 'leak' memory on send/receive process crashes.
+>>>
+>>> Unless of course you're saying that only CAP_NET_ADMIN processes will
+>>
+>> The user can pass io_uring instance itself
+>>
+> 
+> Thanks, but sorry, my point still stands. If the CAP_NET_ADMIN passes
+> the io_uring instance to the process doing the send/receive, then the
+> latter process crashes, do the io_uring netmems leak until the
+> page_pool is destroyed? Or are they cleaned up because the io_uring
+> instance is destroyed with the process crashing, and the io_uring will
+> destroy the page_pool on exit?
 
-syzbot found the following issue on:
+It'll be killed when io_uring dies / closed.
 
-HEAD commit:    3e5e6c9900c3 Merge tag 'nfsd-6.12-3' of git://git.kernel.o..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=11406b40580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=f527353e21e067e8
-dashboard link: https://syzkaller.appspot.com/bug?extid=3f51ad7ac3ae57a6fdcc
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-
-Unfortunately, I don't have any reproducer for this issue yet.
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/3c9dd6858e45/disk-3e5e6c99.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/4d49c920af4f/vmlinux-3e5e6c99.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/9905ad94dc22/bzImage-3e5e6c99.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+3f51ad7ac3ae57a6fdcc@syzkaller.appspotmail.com
-
-netdevsim netdevsim4 netdevsim1: unset [1, 0] type 2 family 0 port 6081 - 0
-netdevsim netdevsim4 netdevsim2: unset [1, 0] type 2 family 0 port 6081 - 0
-netdevsim netdevsim4 netdevsim3: unset [1, 0] type 2 family 0 port 6081 - 0
-------------[ cut here ]------------
-WARNING: CPU: 0 PID: 16141 at kernel/kcov.c:872 kcov_remote_start+0x542/0x7d0 kernel/kcov.c:872
-Modules linked in:
-CPU: 0 UID: 0 PID: 16141 Comm: syz.4.2741 Not tainted 6.12.0-rc5-syzkaller-00308-g3e5e6c9900c3 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:kcov_remote_start+0x542/0x7d0 kernel/kcov.c:872
-Code: 4c 89 ff be 03 00 00 00 e8 9b df 1f 03 e9 04 fb ff ff e8 d1 af 29 0a 41 f7 c6 00 02 00 00 0f 84 f2 fa ff ff e9 7f fc ff ff 90 <0f> 0b 90 e8 06 cd 29 0a 89 c0 48 c7 c7 c0 d4 02 00 48 03 3c c5 50
-RSP: 0018:ffffc9000d826610 EFLAGS: 00010002
-RAX: 0000000080000200 RBX: ffff888033771e00 RCX: 0000000000000002
-RDX: dffffc0000000000 RSI: ffffffff8c0adc40 RDI: ffffffff8c603460
-RBP: 0000000000000000 R08: ffffffff9429786f R09: 1ffffffff2852f0d
-R10: dffffc0000000000 R11: fffffbfff2852f0e R12: ffffffff8194e367
-R13: ffff888025389780 R14: 0000000000000246 R15: ffff8880b862d4c0
-FS:  00007ff44c8056c0(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007fdf652656c0 CR3: 000000001fed8000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- kcov_remote_start_common include/linux/kcov.h:50 [inline]
- ieee80211_rx_list+0x799/0x3780 net/mac80211/rx.c:5444
- ieee80211_rx_napi+0x18a/0x3c0 net/mac80211/rx.c:5485
- ieee80211_rx include/net/mac80211.h:5138 [inline]
- ieee80211_handle_queued_frames+0xe7/0x1e0 net/mac80211/main.c:441
- ieee80211_stop_device+0x3f/0xf0 net/mac80211/util.c:1587
- ieee80211_do_stop+0x1cb5/0x2300 net/mac80211/iface.c:721
- ieee80211_stop+0x436/0x4a0 net/mac80211/iface.c:780
- __dev_close_many+0x219/0x300 net/core/dev.c:1560
- __dev_close net/core/dev.c:1572 [inline]
- __dev_change_flags+0x30e/0x6f0 net/core/dev.c:8843
- dev_change_flags+0x8b/0x1a0 net/core/dev.c:8917
- do_setlink+0xcd0/0x41f0 net/core/rtnetlink.c:2929
- rtnl_group_changelink net/core/rtnetlink.c:3476 [inline]
- __rtnl_newlink net/core/rtnetlink.c:3735 [inline]
- rtnl_newlink+0x1119/0x20a0 net/core/rtnetlink.c:3772
- rtnetlink_rcv_msg+0x73f/0xcf0 net/core/rtnetlink.c:6675
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
- netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
- netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
- netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg+0x221/0x270 net/socket.c:744
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
- ___sys_sendmsg net/socket.c:2661 [inline]
- __sys_sendmsg+0x292/0x380 net/socket.c:2690
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7ff44b97e719
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ff44c805038 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 00007ff44bb35f80 RCX: 00007ff44b97e719
-RDX: 0000000000000000 RSI: 0000000020000040 RDI: 0000000000000003
-RBP: 00007ff44b9f132e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007ff44bb35f80 R15: 00007fffdca94ea8
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+Pavel Begunkov
 
