@@ -1,122 +1,213 @@
-Return-Path: <netdev+bounces-141423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141424-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A925F9BADAC
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:07:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACAF9BADCB
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:13:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 767912813A7
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:07:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BC4E1C20F01
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:13:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B892A19F42F;
-	Mon,  4 Nov 2024 08:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AD161A4F2F;
+	Mon,  4 Nov 2024 08:13:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="H9C5FVyO"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="MBk/ShCH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.18])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19CD218C038;
-	Mon,  4 Nov 2024 08:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.18
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6BCB171E43;
+	Mon,  4 Nov 2024 08:13:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730707670; cv=none; b=iKX+LILiSwiF3is7QrdPnPR5bz1K2hNxKfNY1cWYzc8FVEtoHUFJx9earQ+/+O+9ZNyjShW6ce8kpkWXZOWRxHuGNfEdQcBxTYUw+ZmDfs1NiQ3DlYBIyI2vK8AUEg/4xhAfJAEybaqEbC8m0WHyClNiNtB6EmreJ4ZENUK1jd8=
+	t=1730707997; cv=none; b=FVBj2ubzrbPtI3gUG35sM0xbJrCkQYNo1XA+53mLjHBbdPwURF0p7XFM1U6o0CHCtAYL2GlyA8HCHf49Irz74EOBS2fLWwfTXooHCuv/nB4y/j8SfZBv35/4+co/aVAJfUXtl1utrgp4B4Z2kKlMgoxCgwdxzpf9rSw/P49gPDA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730707670; c=relaxed/simple;
-	bh=EVN2V4bbSLmI7qsPcV4IxN2y4hO89i3pGgMbquzqX6M=;
+	s=arc-20240116; t=1730707997; c=relaxed/simple;
+	bh=Pp1Yk8ui1FRnrFGWB9FnRi3+0KB0oBKBfe2pqMXuxO8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=n9t2am2YbdFHrjRm0kjaoFL3LUv2ICe8Ol7bDoQADkk7tQabSYH+2B5lpv/512qMy4He2cSnpmecrQcFTIjxrj2eJpXqMQuFzBe3yQdXW4Bu3eifhSF+bew9LAbifJ/xeDibuLrQAXnN48cgNgRNvWhNJ66DBMp8fEPJLjCZ0vQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=H9C5FVyO; arc=none smtp.client-ip=192.198.163.18
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730707669; x=1762243669;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=EVN2V4bbSLmI7qsPcV4IxN2y4hO89i3pGgMbquzqX6M=;
-  b=H9C5FVyOQ2F4D3q6V0L5c4DLekBGf710/isnM5QyI/zQOS3jyUBVpO7h
-   pfi0Fe9sfEAQh9bBLonIUlJ7OB6TzwVYkj4OLmK/q2929gO14NL/Lvwfl
-   ca8fmoKUyC1EJh1d3PoRJivMx3dlMhziq+LmOeL3iSEDyoQhS6ekU26v6
-   rs67yienzRxq17Begu4l1U2d7mx4ZWTtbljcjhP+Rh8cKYK/9QMMra+Iv
-   N8D93xODhmz0pnW5iohWHaNTGqk6+HSHws2vVKkXF76GRKo5w2q/Gt9N5
-   K90FgII5pbHr+WsF5JOaF5N5ljYi5YJyvSnQ+DWV2I0zqe3yNfj1lhfzv
-   A==;
-X-CSE-ConnectionGUID: tPhTL4EuQdalIaqHM+uKSw==
-X-CSE-MsgGUID: +y4bCs4pSM6wk4IRkUrEYw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11245"; a="29819876"
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="29819876"
-Received: from fmviesa003.fm.intel.com ([10.60.135.143])
-  by fmvoesa112.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:07:48 -0800
-X-CSE-ConnectionGUID: L5XD7miLRYyV38vUW8BLSA==
-X-CSE-MsgGUID: NVSUHHwgR4KxZpeM9CF2HQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="87511484"
-Received: from smile.fi.intel.com ([10.237.72.154])
-  by fmviesa003.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 00:07:47 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1t7s7l-0000000AyaG-02Uy;
-	Mon, 04 Nov 2024 10:07:45 +0200
-Date: Mon, 4 Nov 2024 10:07:44 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v1 1/1] nfc: mrvl: Don't use "proxy" headers
-Message-ID: <ZyiA0Hx6z4hHqwe0@smile.fi.intel.com>
-References: <20241101083910.3362945-1-andriy.shevchenko@linux.intel.com>
- <2dc98d01-6353-478c-b6ad-d6eac63c53da@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=njPbg2RfbMl7A4UyE+x6v4zpJdUK9c5MsWMJCC7y/zSeACSpKnZUURGm3ag6qbzlUUiJSGGn1tIwILg6UGB8NCi52VTnD0QjlLpP/g1PWPK/MWK5mu2teadWmyuiG1+zfmQhvhdI7lPHAx6Wm0eKLNEjuNxwjjsGkHULuBH4F/c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=MBk/ShCH; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730707985; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=KlHW0TjIMoMSJWtV5hCBhi4UNl5BlTIuOIRKwDcZAXU=;
+	b=MBk/ShCHh+O+W7OD0lzzYjsD+p1SuDBD38+7xPIu+A46Ei9/e0y6POBaoFCQYQ2ay22zpkqp/ImGs2S1CIomNqL6JxaBMYFnvyCNT+DId8I39/k9B7wj/0cRH1LBNuyBhY3fIKvb6UbJOQoIP1V1mT3yHBymdmU+F2nXVisI0TM=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WIdFvKz_1730707984 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Mon, 04 Nov 2024 16:13:05 +0800
+Date: Mon, 4 Nov 2024 16:13:04 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Li Qiang <liqiang64@huawei.com>, wenjia@linux.ibm.com,
+	jaka@linux.ibm.com, alibuda@linux.alibaba.com,
+	tonylu@linux.alibaba.com, guwen@linux.alibaba.com
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, luanjianhai@huawei.com,
+	zhangxuzhou4@huawei.com, dengguangxing@huawei.com,
+	gaochao24@huawei.com, kuba@kernel.org
+Subject: Re: [PATCH net-next] net/smc: Optimize the search method of reused
+ buf_desc
+Message-ID: <20241104081304.GB54400@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20241101082342.1254-1-liqiang64@huawei.com>
+ <20241101105253.GG101007@linux.alibaba.com>
+ <fa7dc8fc-fc6a-5ee1-94a2-b4ad62624834@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <2dc98d01-6353-478c-b6ad-d6eac63c53da@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <fa7dc8fc-fc6a-5ee1-94a2-b4ad62624834@huawei.com>
 
-On Sat, Nov 02, 2024 at 09:00:04AM +0100, Krzysztof Kozlowski wrote:
-> On 01/11/2024 09:39, Andy Shevchenko wrote:
-> > Update header inclusions to follow IWYU (Include What You Use)
-> > principle.
+On 2024-11-02 14:43:52, Li Qiang wrote:
+>
+>
+>在 2024/11/1 18:52, Dust Li 写道:
+>> On 2024-11-01 16:23:42, liqiang wrote:
+>>> connections based on redis-benchmark (test in smc loopback-ism mode):
+>> 
+>> I think you can run test wrk/nginx test with short-lived connection.
+>> For example:
+>> 
+>> ```
+>> # client
+>> wrk -H "Connection: close" http://$serverIp
+>> 
+>> # server
+>> nginx
+>> ```
+>
+>I tested with nginx, the test command is:
+># server
+>smc_run nginx
+>
+># client
+>smc_run wrk -t <2,4,8,16,32,64> -c 200 -H "Connection: close" http://127.0.0.1
+>
+>Requests/sec
+>--------+---------------+---------------+
+>req/s	| without patch	| apply patch	|
+>--------+---------------+---------------+
+>-t 2	|6924.18	|7456.54	|
+>--------+---------------+---------------+
+>-t 4	|8731.68	|9660.33	|
+>--------+---------------+---------------+
+>-t 8	|11363.22	|13802.08	|
+>--------+---------------+---------------+
+>-t 16	|12040.12	|18666.69	|
+>--------+---------------+---------------+
+>-t 32	|11460.82	|17017.28	|
+>--------+---------------+---------------+
+>-t 64	|11018.65	|14974.80	|
+>--------+---------------+---------------+
+>
+>Transfer/sec
+>--------+---------------+---------------+
+>trans/s	| without patch	| apply patch	|
+>--------+---------------+---------------+
+>-t 2	|24.72MB	|26.62MB	|
+>--------+---------------+---------------+
+>-t 4	|31.18MB	|34.49MB	|
+>--------+---------------+---------------+
+>-t 8	|40.57MB	|49.28MB	|
+>--------+---------------+---------------+
+>-t 16	|42.99MB	|66.65MB	|
+>--------+---------------+---------------+
+>-t 32	|40.92MB	|60.76MB	|
+>--------+---------------+---------------+
+>-t 64	|39.34MB	|53.47MB	|
+>--------+---------------+---------------+
+>
+>> 
+>>>
+>>>    1. On the current version:
+>>>        [x.832733] smc_buf_get_slot cost:602 ns, walk 10 buf_descs
+>>>        [x.832860] smc_buf_get_slot cost:329 ns, walk 12 buf_descs
+>>>        [x.832999] smc_buf_get_slot cost:479 ns, walk 17 buf_descs
+>>>        [x.833157] smc_buf_get_slot cost:679 ns, walk 13 buf_descs
+>>>        ...
+>>>        [x.045240] smc_buf_get_slot cost:5528 ns, walk 196 buf_descs
+>>>        [x.045389] smc_buf_get_slot cost:4721 ns, walk 197 buf_descs
+>>>        [x.045537] smc_buf_get_slot cost:4075 ns, walk 198 buf_descs
+>>>        [x.046010] smc_buf_get_slot cost:6476 ns, walk 199 buf_descs
+>>>
+>>>    2. Apply this patch:
+>>>        [x.180857] smc_buf_get_slot_free cost:75 ns
+>>>        [x.181001] smc_buf_get_slot_free cost:147 ns
+>>>        [x.181128] smc_buf_get_slot_free cost:97 ns
+>>>        [x.181282] smc_buf_get_slot_free cost:132 ns
+>>>        [x.181451] smc_buf_get_slot_free cost:74 ns
+>>>
+>>> It can be seen from the data that it takes about 5~6us to traverse 200 
+>> 
+>> Based on your data, I'm afraid the short-lived connection
+>> test won't show much benificial. Since the time to complete a
+>> SMC-R connection should be several orders of magnitude larger
+>> than 100ns.
+>
+>Sorry, I didn't explain my test data well before.
+>
+>The main optimized functions of this patch are as follows:
+>
+>```
+>struct smc_buf_desc *smc_buf_get_slot(...)
+>{
+>	struct smc_buf_desc *buf_slot;
+>        down_read(lock);
+>        list_for_each_entry(buf_slot, buf_list, list) {
+>                if (cmpxchg(&buf_slot->used, 0, 1) == 0) {
+>                        up_read(lock);
+>                        return buf_slot;
+>                }
+>        }
+>        up_read(lock);
+>        return NULL;
+>}
+>```
+>The above data is the time-consuming data of this function.
+>If the current system has 200 active links, then during the
+>process of establishing a new SMC connection, this function
+>must traverse all 200 active links, which will take 5~6us.
+>If there are already 1,000 for active links, it takes about 30us.
+>
+>After optimization, this function takes <100ns, it has nothing
+>to do with the number of active links.
+>
+>Moreover, the lock has been removed, which is firendly to multi-thread
+>parallel scenarios.
+>
+>The optimized code is as follows:
+>
+>```
+>static struct smc_buf_desc *smc_buf_get_slot_free(struct llist_head *buf_llist)
+>{
+>        struct smc_buf_desc *buf_free;
+>        struct llist_node *llnode;
+>
+>        if (llist_empty(buf_llist))
+>                return NULL;
+>        // lock-less link list don't need an lock
+         ^^^ kernel use /**/ for comments
 
-...
+>        llnode = llist_del_first(buf_llist);
+>        buf_free = llist_entry(llnode, struct smc_buf_desc, llist);
 
-> > -#include <linux/module.h>
-> >  #include <linux/delay.h>
-> > -#include <linux/of_gpio.h>
-> > +#include <linux/device.h>
-> > +#include <linux/err.h>
-> > +#include <linux/module.h>
-> > +#include <linux/of.h>
-> > +#include <linux/printk.h>
-> 
-> Do we really include printk?
+If 2 CPU both passed the llist_empty() check, only 1 CPU can get llnode,
+the other one should be NULL ?
 
-Yes, we use it here.
-
-> It's almost everywhere and pulled by kernel.h.
-
-kernel.h shouldn't be considered at all, it's a mess which is on undergoing
-cleaning up process.
-
-
-> I assume you checked rest of the nfcmrvl files for similar cleanups, so
-> anyway:
-> 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-
-Thank you!
-
--- 
-With Best Regards,
-Andy Shevchenko
-
-
+>        WRITE_ONCE(buf_free->used, 1);
+>        return buf_free;
+>}
+>```
+>
+>-- 
+>Cheers,
+>Li Qiang
 
