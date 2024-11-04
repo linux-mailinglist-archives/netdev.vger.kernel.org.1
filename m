@@ -1,183 +1,133 @@
-Return-Path: <netdev+bounces-141516-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141519-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 154169BB34B
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:30:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 203379BB35B
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:32:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8309284D23
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:30:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8454284ED6
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:31:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 082E21C729B;
-	Mon,  4 Nov 2024 11:24:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C82DF1B3945;
+	Mon,  4 Nov 2024 11:27:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="GQnt38nN";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="OWpoKna5"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="l25Z6U4O"
 X-Original-To: netdev@vger.kernel.org
-Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBAD01C7274;
-	Mon,  4 Nov 2024 11:24:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 119001B3932
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 11:27:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730719478; cv=none; b=cEnlvvYoRgwQcLwjc6OwWHAle34IUl3568jHeSq3orT1eNg2dg8O/++/olPB8NDTowI6Wyjk1mS5hvRQ+FxNHCeSS1/ih9FsU2Uyr9S8/X9N5vI4galLvyJJvDoEr1wsDZB/frIPTJiS2S55lf84GXkLFiPVxQbsTeTTlcZYrj8=
+	t=1730719643; cv=none; b=fXe7S0zozCzBoItdM5RTAcZUDkvIBMd5Ksr7kmEbnRf6QxNYt2J+blT7vH9rcZhWH3eJHQCX+F2eKF+czH5TNfwetcuP1Fl3niUGD2AnjkmRleyfejGtLOtFihPIDSZmOdQdIyd5xg3ov43ggIRfBCeNF4FjDLPFhoG8nbhgjkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730719478; c=relaxed/simple;
-	bh=c5cmqJKCzRXjZX4BQY0MmxVSVWNlpksK1VTyTpz8Ykc=;
+	s=arc-20240116; t=1730719643; c=relaxed/simple;
+	bh=Fry7u0FCV7hEmGhDdvK6TiCYO+iZUrJRnhJBv25/1aQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=nfhCr2iOleE4Z8V8C6DOI0WeWfCyVvSJw+62BbShmR7gkh4kYMPZ8WE1sh2ogHYYUeI6VX4eCm+QB7u5H0gg472DVFTBzp++1SS8ApeaE+pDB+0EghRWre3l62o3MtfPgwiXovrrWhh2H7lwUf4MugBu+TJKTb4xqfdTroQkai0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=GQnt38nN; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=OWpoKna5; arc=none smtp.client-ip=202.12.124.136
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailflow.stl.internal (Postfix) with ESMTP id 206A31D4012F;
-	Mon,  4 Nov 2024 06:24:33 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Mon, 04 Nov 2024 06:24:33 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
-	 h=cc:cc:content-type:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:subject:subject:to:to; s=fm1; t=1730719472; x=
-	1730723072; bh=8527qvyn8s3tp1A8G7J33ch0STQt6X1YJ2YVR8+xU8w=; b=G
-	Qnt38nNLXqeO2oqED4K0WtxE/ehtzAHZdlgScMIi4r3XOpmw/BjBJsGeemTASOwY
-	gpWnilwuIrZ5zmArKsbPYQd32JJsV+JEwrkbWbBL1zyMcdfVdk2DGNzvGuc/IfNc
-	T94UHvkO0oIPZzlgIrJrU37cJmon+vtNSCEpd7/ex2pe0iRF2CTWx7iePwz0Rj7a
-	yBqbQNe1WOIqma9UuiuoUlEzQ9pWMibL+bPVQuwPcKv7o0dEmKHyMyLgZBY49nwr
-	fKXYyux9Lf0CLODNSNHgln+Grc81VpnMmsF1e+X09VA2Oxsg6XeK8Ec4/XHy8oMu
-	F57atArOD4sOvvogFeFUA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1730719472; x=1730723072; bh=8527qvyn8s3tp1A8G7J33ch0STQt6X1YJ2Y
-	VR8+xU8w=; b=OWpoKna5qAwlb4hVnZxoiK9XSLI8ZkjRU13yEO8xhK1RIEu0ncW
-	Z1wdbjaSQcVhcYtVDZNNyW+mzPEfPFVHzAKEnsBbWxB9LO++26w3SJxOYWEr9mCP
-	Y3w96YKCzPJJpxyGVe9Xxab5l2CmYmxRVfS3A+t/VuBcV2RPe8AAp1t6LRi/Uqr6
-	6wZftX1EB64HGqmFTT39YKrDCU/ZmBxp2ouYpMtZNkJi8de5J8FlUynd5FdYeiQw
-	adVZaAvZ5YytTx8KsNPn4vEZz+e0zFkF16X0UBXpa0lL1da3uqxMlMiP7pMhLdzF
-	uRb97YZFeNic+pHCeEAqVGy3jm5Z3WOtUbQ==
-X-ME-Sender: <xms:8K4oZw9QxeIfWrZw-viCPU9CvBSuuqws9-7E1uwpVZUVhZ5XZV-Enw>
-    <xme:8K4oZ4usuuuWD839-IMNe8K1WyP01m8jk07S4x0nHoOMPCII0T02S4zOj18rXVwvD
-    CB5oMVwZw9sfnTtVVE>
-X-ME-Received: <xmr:8K4oZ2CxBKcmSiNqJ3uy1ctxiIF-9eGgyagOnu8HofSRHB3AaBmsHwdRvTsB>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeliedgvdeiucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
-    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
-    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
-    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
-    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
-    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
-    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
-    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
-    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
-    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
-    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
-    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
-    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:8K4oZwcyv12ZUrw5AQEuVotstrbcoBRh5dinYkwP332k3sYivDkhWw>
-    <xmx:8K4oZ1NbEh5AX0TwKNES7D1ZXrc1kzNttcHf0WVzbNIx9Zm_q0T2JQ>
-    <xmx:8K4oZ6kQSPeKGnjEYu_EF7croKhsMZjR6AmKzg7RFRNggHk3_WJ1tw>
-    <xmx:8K4oZ3t_EGXC35cZanZ1CZJ6DyeYNpCppGSz4a8xnYuDN6nOIU58zg>
-    <xmx:8K4oZ-ixwghvVoOBz4gHjKoCwgOgjhRMoSXGuugeMAS286kSSVzo1J9I>
-Feedback-ID: i934648bf:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 4 Nov 2024 06:24:31 -0500 (EST)
-Date: Mon, 4 Nov 2024 12:24:29 +0100
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Antonio Quartulli <antonio@openvpn.net>
-Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net-next v11 17/23] ovpn: add support for peer floating
-Message-ID: <Zyiu7d5X7GcTK3Hq@hog>
-References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
- <20241029-b4-ovpn-v11-17-de4698c73a25@openvpn.net>
+	 Content-Type:Content-Disposition:In-Reply-To; b=eua+QY6lu5msPd8J3PZZ3nm6oyM6rJrGTfZbpJuj1CAV+0aJRnvvGOi810QhfviOfziovfm9EeuBG5E1y0nMjHVCsHuZxWvOwuT8dcwTQQFbM94jYiGdELbzHWnS9z5+MH+JLaC1Vxv6ltonE/Evr5VvolN4s8+dEV8RHyAEoK8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=l25Z6U4O; arc=none smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730719642; x=1762255642;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Fry7u0FCV7hEmGhDdvK6TiCYO+iZUrJRnhJBv25/1aQ=;
+  b=l25Z6U4OUlcVA4esnEEAfDrj7K5uABteHXTRR7A2uinba0bv9Vr6Omat
+   UViUj+TJag3R7AAOQLxp6+sJkJ6UzMgtnyyoxE4Uf2OA0w3yaov2UhKkc
+   nGgI6HYmsTJN3Sia20nZsLkE+UzK41vxMqwL2ZJR171aO2Tc9UgD5ndF5
+   ECOQwiru095FOPLvZUJEG5f8Ft5Dj4ejRxamDdl9yyhVx09Ex2QYhTggV
+   xVytFN7ig+QndktCR1xAr0zceOtiVE70OXEIBlTAAAqPPr5QU0WL95rZ/
+   qR46Jhlhq/sSNYSVm/yOjeaAZtfOajcUcBqtQrnVe+6Qkp3U8goXMm9ZV
+   A==;
+X-CSE-ConnectionGUID: 5pOWh/G3TxqEe1Q0ylLjhw==
+X-CSE-MsgGUID: Q/amOyHoTsGdzERYAcsUkQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30589066"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="30589066"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 03:27:21 -0800
+X-CSE-ConnectionGUID: 6dM8c9XQRPa5zvtVi6vc4Q==
+X-CSE-MsgGUID: /SqGGiPXQHuBuF+PQwm5GQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="83559045"
+Received: from mev-dev.igk.intel.com ([10.237.112.144])
+  by orviesa010-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 03:27:18 -0800
+Date: Mon, 4 Nov 2024 12:24:38 +0100
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: Paul Menzel <pmenzel@molgen.mpg.de>
+Cc: David Laight <David.Laight@aculab.com>, wojciech.drewek@intel.com,
+	marcin.szycik@intel.com, netdev@vger.kernel.org,
+	konrad.knitter@intel.com, pawel.chmielewski@intel.com,
+	horms@kernel.org, intel-wired-lan@lists.osuosl.org,
+	pio.raczynski@gmail.com, sridhar.samudrala@intel.com,
+	jacob.e.keller@intel.com, jiri@resnulli.us,
+	przemyslaw.kitszel@intel.com
+Subject: Re: [Intel-wired-lan] Small Integers: Big Penalty
+Message-ID: <Zyiu9phq8/EchHxd@mev-dev.igk.intel.com>
+References: <20241028100341.16631-1-michal.swiatkowski@linux.intel.com>
+ <20241028100341.16631-3-michal.swiatkowski@linux.intel.com>
+ <CADEbmW0=G8u7Y8L2fFTzan8S+Uz04nAMC+-dkj-rQb_izK88pg@mail.gmail.com>
+ <ZyhxmxnxPcLk2ZcX@mev-dev.igk.intel.com>
+ <ad5bf0e312d44737a18c076ab2990924@AcuMS.aculab.com>
+ <840b32a0-9346-4576-97ba-17af12eb4db4@molgen.mpg.de>
+ <478248d8-559b-4324-a566-8ce691993018@molgen.mpg.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241029-b4-ovpn-v11-17-de4698c73a25@openvpn.net>
+In-Reply-To: <478248d8-559b-4324-a566-8ce691993018@molgen.mpg.de>
 
-2024-10-29, 11:47:30 +0100, Antonio Quartulli wrote:
-> +static int ovpn_peer_reset_sockaddr(struct ovpn_peer *peer,
-> +				    const struct sockaddr_storage *ss,
-> +				    const u8 *local_ip)
-> +	__must_hold(&peer->lock)
-> +{
-> +	struct ovpn_bind *bind;
-> +	size_t ip_len;
-> +
-> +	/* create new ovpn_bind object */
-> +	bind = ovpn_bind_from_sockaddr(ss);
-> +	if (IS_ERR(bind))
-> +		return PTR_ERR(bind);
-> +
-> +	if (local_ip) {
-> +		if (ss->ss_family == AF_INET) {
-> +			ip_len = sizeof(struct in_addr);
-> +		} else if (ss->ss_family == AF_INET6) {
-> +			ip_len = sizeof(struct in6_addr);
-> +		} else {
-> +			netdev_dbg(peer->ovpn->dev, "%s: invalid family for remote endpoint\n",
-> +				   __func__);
+On Mon, Nov 04, 2024 at 10:12:14AM +0100, Paul Menzel wrote:
+> [Cc: -nex.sw.ncis.nat.hpm.dev@intel.com (550 #5.1.0 Address rejected.)]
+> 
+> Am 04.11.24 um 10:09 schrieb Paul Menzel:
+> > Dear David, dear Michal,
+> > 
+> > 
+> > Am 04.11.24 um 09:51 schrieb David Laight:
+> > > From: Michal Swiatkowski
+> > > > Sent: 04 November 2024 07:03
+> > > ...
+> > > > > The type of the devlink parameters msix_vec_per_pf_{min,max} is
+> > > > > specified as u32, so you must use value.vu32 everywhere you work with
+> > > > > them, not vu16.
+> > > > > 
+> > > > 
+> > > > I will change it.
+> > > 
+> > > You also need a pretty good reason to use u16 anywhere at all.
+> > > Just because the domain of the value is small doesn't mean the
+> > > best type isn't [unsigned] int.
+> > > 
+> > > Any arithmetic (particularly on non x86) is likely to increase
+> > > the code size above any perceived data saving.
+> > 
+> > In 2012 Scott Duplichan wrote *Small Integers: Big Penalty* [1]. Of
+> > course you always should measure yourself.
+> > 
 
-ratelimited since that can be triggered from packet processing?
+Yeah, I chose it, because previously it was stored in u16. I will change
+it to u32 too, as it is stored in structure that doesn't really need to
+be small.
 
+Thanks for comments and link to the article.
+Michal
 
-[...]
-> +void ovpn_peer_float(struct ovpn_peer *peer, struct sk_buff *skb)
-> +{
-[...]
-> +
-> +	switch (family) {
-> +	case AF_INET:
-> +		sa = (struct sockaddr_in *)&ss;
-> +		sa->sin_family = AF_INET;
-> +		sa->sin_addr.s_addr = ip_hdr(skb)->saddr;
-> +		sa->sin_port = udp_hdr(skb)->source;
-> +		salen = sizeof(*sa);
-> +		break;
-> +	case AF_INET6:
-> +		sa6 = (struct sockaddr_in6 *)&ss;
-> +		sa6->sin6_family = AF_INET6;
-> +		sa6->sin6_addr = ipv6_hdr(skb)->saddr;
-> +		sa6->sin6_port = udp_hdr(skb)->source;
-> +		sa6->sin6_scope_id = ipv6_iface_scope_id(&ipv6_hdr(skb)->saddr,
-> +							 skb->skb_iif);
-> +		salen = sizeof(*sa6);
-> +		break;
-> +	default:
-> +		goto unlock;
-> +	}
-> +
-> +	netdev_dbg(peer->ovpn->dev, "%s: peer %d floated to %pIScp", __func__,
-
-                                              %u for peer->id?
-
-and ratelimited too, probably.
-
-(also in ovpn_peer_update_local_endpoint in the previous patch)
-
-> +		   peer->id, &ss);
-> +	ovpn_peer_reset_sockaddr(peer, (struct sockaddr_storage *)&ss,
-> +				 local_ip);
-
-skip the rehash if this fails? peer->bind will still be the old one so
-moving it to the new hash chain won't help (the lookup will fail).
-
--- 
-Sabrina
+> > 
+> > Kind regards,
+> > 
+> > Paul
+> > 
+> > 
+> > [1]: https://notabs.org/coding/smallIntsBigPenalty.htm
 
