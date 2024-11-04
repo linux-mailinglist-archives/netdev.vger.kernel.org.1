@@ -1,143 +1,307 @@
-Return-Path: <netdev+bounces-141656-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBA929BBE74
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:02:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 843239BBE4D
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:55:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8FA2B281727
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:02:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A835B1C211C9
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B7B1D514C;
-	Mon,  4 Nov 2024 20:01:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55541CC165;
+	Mon,  4 Nov 2024 19:55:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FvwIWSGa"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5F0F1D4171
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 20:01:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF71CBA1B
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 19:55:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730750491; cv=none; b=I050tMdoS9rI6R4uxjB1gU/0xs/rw/ZqmgZ60ePbNg6ZvWzweMNVpuxaHKLzVd+dwOGdG/d296KUU+r2Rgdb1jCID4Ayf6ql1RKGEKUOr7ePiqtlZZ5D+PE+nX4fUhCuZuQ/zExrehz6/4mqs9THeOxd1S4rjnG29wi7dyDLI4M=
+	t=1730750110; cv=none; b=E2jYW2pCcxw6NX1Z/7loyWX3t9uJho2Fuy8J60RIhaDZqr4WGjdKfHJgHOYtBxGvmwWUfYSmgO9XYqjQhaKrQKlJBUAzn/4cTMMvLCN6Y9pd16DVJCx74XrYXl3MlPL9RBpwGoKFViV1Yy9KYt7Qh40nURDiggGEveJV41mDGZU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730750491; c=relaxed/simple;
-	bh=OfjEopnqbStbp4O45I56Ve4VGUhVQwKE7+txzTy/qPg=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=emH827PQmJyJS8BAV3q4AFZbtWIzI1euTYS0WwYZ5M8zp6HRgBQ15Ksy3wDho7nmWynzWFsNmisn62q91A4SpkK1w5q/ij2ZhDTZMWcuieDfRXCokPX/zDagjrCjtQ3BJdTxePxwTFcjAPtJjLkiBIVN4Vv46RTNP9S9JWcAw8Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t83GR-0001dN-RY
-	for netdev@vger.kernel.org; Mon, 04 Nov 2024 21:01:27 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t83GQ-00226g-1u
-	for netdev@vger.kernel.org;
-	Mon, 04 Nov 2024 21:01:26 +0100
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 42117367FAA
-	for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 20:01:26 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id C6DEA367F6E;
-	Mon, 04 Nov 2024 20:01:22 +0000 (UTC)
-Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id e89cdeda;
-	Mon, 4 Nov 2024 20:01:21 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	kuba@kernel.org,
-	linux-can@vger.kernel.org,
-	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Sven Schuchmann <schuchmann@schleissheimer.de>,
-	stable@vger.kernel.org
-Subject: [PATCH net 8/8] can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation
-Date: Mon,  4 Nov 2024 20:53:31 +0100
-Message-ID: <20241104200120.393312-9-mkl@pengutronix.de>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241104200120.393312-1-mkl@pengutronix.de>
-References: <20241104200120.393312-1-mkl@pengutronix.de>
+	s=arc-20240116; t=1730750110; c=relaxed/simple;
+	bh=n0tjmfDL6BPyhTjR/b5T4gb0CZuykaLBAss9SlCr3As=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nu/swxr1as4l22+no0hyloBkBEmSNlsAHVvTh29mvstmsuc4SIS72+NN/FD9R7RhcmjR66q0bhVOqjXieF2C2cdz6FiqA54y12f6v61CCCz1mJFBOMeprnefIxCsUFqg4NdLsnv8E2AvUtNULuRIJf/7li6dTVgHMlX5cnaKLS4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FvwIWSGa; arc=none smtp.client-ip=209.85.166.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3a3b28ac9a1so33605ab.1
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 11:55:08 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730750107; x=1731354907; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N53p+N4N73iQueCAcYjATG0UWlXOJ7UXR8iV8B23S0U=;
+        b=FvwIWSGarKum485O44ZJg35EeWpa8rUd/fhLLxjA8mu1f5agLUxfdxiVXU833WiM3f
+         4WaIu5GboKAgs0vQszzF1oheBrcplzENsW7f2ilqKZKoUdiPaB9vKW6yQzt2dqN1OU4h
+         epwwUfNynACich3nwqqps8/Sxzcyv4YWx+KOUmv0E8mDM1xUAq87uGysiUhdjvGyHkWa
+         J4djj/XQkPEfdNOLD/U/Hwsmwo+On36yw5hry2GgWAN9HSFrPDlEp6C0REWlteyWtcpa
+         Dpgnnx09xwtAOyDVbivYepGODq9be3RilYGueSzi61ko6utQa2VdiipvYjQXT45Wl9pd
+         hCZA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730750107; x=1731354907;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N53p+N4N73iQueCAcYjATG0UWlXOJ7UXR8iV8B23S0U=;
+        b=h6Te7TWKK0cbKjPHx7/L477IBLA5hfWvC4IIDRybbkh3OtimsNX8gQs1hmVW0AsVPd
+         A1tim/Rk5sR7Ap9PQk/MRq1obNp+W65wynmsRfj1PrR8iYWcC4mP/MZpb3dx1yOjThKg
+         N0GOi7pU9fIfvYqO+2Onop88ApZ82eFyOYLsHGIp4Y5/RBiHwvaAI424cXbzY+GzCko/
+         44Aa6mrk7OgKjiXYzwBBQLZiy+cM3LJPIP28CzsdMjTkZWQSKlfDNZDjsYstmWb3GCDE
+         Xfpo+X/VNB2JpUuzZY3R3/IDfwgqx1325WIFcdWv+kat5YpD0Dw119KsrQRfxRE8jGyf
+         Wnxw==
+X-Forwarded-Encrypted: i=1; AJvYcCXHxLexbi/p1ogEuVkLLlFUdjGEzAIE2PVPcKiQp7h4SQdKkTWztWxh9mfz5yIeVbmzK0jyab0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw9WBLtd8XztL9UTcCNJXTUrGNJ5o6/ZNWL/lqrirLdtAqLWorF
+	3tP78uyy2krd8oEqn9doDFkrqjO4gffoAKd7kdm7OPYeD92RcH/IaLKtMYNerQw1iRoSdamHex3
+	3YtXT1JPZu9Qf3EjGH46vHTo9r1JofhcjPMww
+X-Gm-Gg: ASbGncsexVIJWUlA8Si5PhULVYT/03sLDpULdRXB+awukf/B0gsdoq0qcJYpkhP+HeX
+	RH1p1/k3eyH5bIHH6v8jm26OM6eev7DoNE4pVGxWhwDx7+h8ZfT6G2KzNH74kLg==
+X-Google-Smtp-Source: AGHT+IEVf+z3HXNjKKIwO0Wb+qwYQ8MbmzBQqeK9bj1EWmdRHMahC5PcNriDAiiIA0EL9JLTVNKDXu+jSO15BNyefa8=
+X-Received: by 2002:a05:6e02:691:b0:3a6:b1c5:e644 with SMTP id
+ e9e14a558f8ab-3a6daa961b5mr364675ab.21.1730750106999; Mon, 04 Nov 2024
+ 11:55:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-12-dw@davidwei.uk>
+ <CAHS8izNbNCAmecRDCL_rRjMU0Spnqo_BY5pyG1EhF2rZFx+y0A@mail.gmail.com> <af9a249a-1577-40fd-b1ba-be3737e86b18@gmail.com>
+In-Reply-To: <af9a249a-1577-40fd-b1ba-be3737e86b18@gmail.com>
+From: Mina Almasry <almasrymina@google.com>
+Date: Mon, 4 Nov 2024 11:54:55 -0800
+Message-ID: <CAHS8izPEmbepTYsjjsxX_Dt-0Lz1HviuCyPM857-0q4GPdn4Rg@mail.gmail.com>
+Subject: Re: [PATCH v7 11/15] io_uring/zcrx: implement zerocopy receive pp
+ memory provider
+To: Pavel Begunkov <asml.silence@gmail.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
+	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
+	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
+	Pedro Tammela <pctammela@mojatatu.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Commit b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround
-broken TEF FIFO tail index erratum") introduced
-mcp251xfd_get_tef_len() to get the number of unhandled transmit events
-from the Transmit Event FIFO (TEF).
+On Fri, Nov 1, 2024 at 2:09=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
+om> wrote:
+>
+> On 11/1/24 20:06, Mina Almasry wrote:
+> ...
+> >> +__maybe_unused
+> >> +static const struct memory_provider_ops io_uring_pp_zc_ops;
+> >> +
+> >> +static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct n=
+et_iov *niov)
+> >> +{
+> >> +       struct net_iov_area *owner =3D net_iov_owner(niov);
+> >> +
+> >> +       return container_of(owner, struct io_zcrx_area, nia);
+> >> +}
+> >> +
+> >
+> > We discussed this before I disappeared on vacation but I'm not too
+> > convinced to be honest, sorry.
+> >
+> > It's invalid to call io_zcrx_iov_to_area on a devmem niov and vice
+> > versa, right? So current and future code has to be very careful to
+>
+> Yes
+>
+> > call the right helpers on the right niovs.
+> >
+> > At the very least there needs to be a comment above all these
+> > container_of helpers:
+> >
+> > /* caller must have verified that this niov is devmem/io_zcrx */.
+> >
+> > However I feel like even a comment is extremely error prone. These
+> > container_of's are inside of the call stack of some helpers. I would
+> > say we need a check. If we're concerned about performance, the check
+> > can be behind DEBUG_NET_WARN_ON(), although even that is a bit iffy,
+> > but could be fine. Doing this without a check seems too risky to me.
+>
+> No, it doesn't need a check nor it needs a comment. The very
+> essence of virtual function tables is that they're coupled
+> together with objects for which those function make sense and
+> called only for those objects. The only way to get here with
+> invalid net_iovs is to take one page pool and feed it with
+> net_iovs from other another page pool that won't be sane in
+> the first place.
+>
 
-As the TEF has no head pointer, the driver uses the TX FIFO's tail
-pointer instead, assuming that send frames are completed. However the
-check for the TEF being full was not correct. This leads to the driver
-stop working if the TEF is full.
+That could happen. In fact the whole devmem tcp paths are very
+carefully written to handle that
 
-Fix the TEF full check by assuming that if, from the driver's point of
-view, there are no free TX buffers in the chip and the TX FIFO is
-empty, all messages must have been sent and the TEF must therefore be
-full.
+net_iovs are allocated from the page_pool, put in skbs, and then sit
+in the sk receive queue. In pathological cases (user is
+re/misconfiguring flow steering) we can have 1 sk receive queue that
+has a mix of page skbs, devmem skbs, and io_uring skbs, and other
+skbs.
 
-Reported-by: Sven Schuchmann <schuchmann@schleissheimer.de>
-Closes: https://patch.msgid.link/FR3P281MB155216711EFF900AD9791B7ED9692@FR3P281MB1552.DEUP281.PROD.OUTLOOK.COM
-Fixes: b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround broken TEF FIFO tail index erratum")
-Tested-by: Sven Schuchmann <schuchmann@schleissheimer.de>
-Cc: stable@vger.kernel.org
-Link: https://patch.msgid.link/20241104-mcp251xfd-fix-length-calculation-v3-1-608b6e7e2197@pengutronix.de
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+Code that is processing the skbs in the receive queue has no idea
+whether what kind of skb it is. That's why that code needs to check
+whether the skb has readable frags, and that's why in this very series
+you needed to add a check in tcp_recvmsg_dmabuf to make sure that its
+a dmabuf skb, and you need to add a check to io_zcrx_recv_frag that
+the frag inside it is io_uring niov. The code would be wrong without
+it.
 
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-index f732556d233a..d3ac865933fd 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-@@ -16,9 +16,9 @@
- 
- #include "mcp251xfd.h"
- 
--static inline bool mcp251xfd_tx_fifo_sta_full(u32 fifo_sta)
-+static inline bool mcp251xfd_tx_fifo_sta_empty(u32 fifo_sta)
- {
--	return !(fifo_sta & MCP251XFD_REG_FIFOSTA_TFNRFNIF);
-+	return fifo_sta & MCP251XFD_REG_FIFOSTA_TFERFFIF;
- }
- 
- static inline int
-@@ -122,7 +122,11 @@ mcp251xfd_get_tef_len(struct mcp251xfd_priv *priv, u8 *len_p)
- 	if (err)
- 		return err;
- 
--	if (mcp251xfd_tx_fifo_sta_full(fifo_sta)) {
-+	/* If the chip says the TX-FIFO is empty, but there are no TX
-+	 * buffers free in the ring, we assume all have been sent.
-+	 */
-+	if (mcp251xfd_tx_fifo_sta_empty(fifo_sta) &&
-+	    mcp251xfd_get_tx_free(tx_ring) == 0) {
- 		*len_p = tx_ring->obj_num;
- 		return 0;
- 	}
--- 
-2.45.2
+All I'm trying to say is that it's very error prone to rely on folks
+writing and reviewing code to check that whenever dmabuf/io_rcrx/etc
+handling is done, somewhere in the call stack a type verification
+check has been made, and a DEBUG_NET_WARN could help avoid some subtle
+memory corruption bugs.
 
+> That would be an equivalent of:
+>
+> struct file *f1 =3D ...;
+> struct file *f2 =3D ...;
+>
+> f1->f_op->read(f2, ...);
+>
+> Maybe it looks strange for you in C, but it's same as putting
+> comments that a virtual function that it should be called only
+> for objects of that class:
+>
+> struct A {
+>         virtual void foo() =3D 0;
+> };
+> struct B: public A {
+>         void foo() override {
+>                 // we should only be called with objects of type
+>                 // struct B (or anything inheriting it), check that
+>                 if (!reinterpret_cast<struct B*>(this))
+>                         throw;
+>                 ...
+>         }
+> }
+>
+>
 
+I'm not really sure I followed here. We do not get any type of
+compiler or type safety from this code because the dma-buf niovs and
+io_uring niovs are the same net_iov type.
+
+We can get type safety by defining new types for dmabuf_net_iov and
+io_uring_net_iov, then provide helpers:
+
+dmabuf_net_iov *net_iov_to_dmabuf();
+io_uring_net_iov *net_iov_to_io_uring();
+
+The helpers can check the niov is of the right type once and do a
+cast,  then the object with the specific type can be passed to all
+future heplers without additional checks. This is one way to do it I
+guess.
+
+> >>   static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
+> >>                                   struct io_uring_zcrx_ifq_reg *reg)
+> >>   {
+> >> @@ -99,6 +114,9 @@ static int io_zcrx_create_area(struct io_ring_ctx *=
+ctx,
+> >>                  goto err;
+> >>
+> >>          for (i =3D 0; i < nr_pages; i++) {
+> >> +               struct net_iov *niov =3D &area->nia.niovs[i];
+> >> +
+> >> +               niov->owner =3D &area->nia;
+> >>                  area->freelist[i] =3D i;
+> >>          }
+> >>
+> >> @@ -230,3 +248,200 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *c=
+tx)
+> >>   {
+> >>          lockdep_assert_held(&ctx->uring_lock);
+> >>   }
+> >> +
+> >> +static bool io_zcrx_niov_put(struct net_iov *niov, int nr)
+> >> +{
+> >> +       return atomic_long_sub_and_test(nr, &niov->pp_ref_count);
+> >> +}
+> >> +
+> >> +static bool io_zcrx_put_niov_uref(struct net_iov *niov)
+> >> +{
+> >> +       if (atomic_long_read(&niov->pp_ref_count) < IO_ZC_RX_UREF)
+> >> +               return false;
+> >> +
+> >> +       return io_zcrx_niov_put(niov, IO_ZC_RX_UREF);
+> >> +}
+> >> +
+> >
+> > Sorry, I have to push back a bit against this. The refcounting of
+> > netmem is already complicated. the paged netmem has 2 refcounts and
+> > care needs to be taken when acquiring and dropping refcounts. net_iov
+> > inherited the pp_ref_count but not the paged refcount, and again need
+> > some special handling. skb_frag_unref takes very special care checking
+>
+> Which is why it's using net_iovs.
+>
+> > pp->recycle, is_pp_netmem, and others to figure out the correct
+>
+> pp->recycle has nothing to do with the series. We don't add
+> it in any special way, and if it's broken it's broken even
+> for non-proivder buffers.
+>
+> > refcount to put based on the type of the netmem and skb flag.
+>
+> Just same as with the ->[un]readable flag, which is not
+> functionally needed, and if it's screwed many things can
+> go very wrong.
+>
+> > This code ignores all these generic code
+> > skb_frag_unref/napi_pp_put_page/etc paths and uses raw access to
+>
+> I don't see the point, they are not used because they're not
+> needed. Instead of checking whether it came from a page pool
+> and whether it's net_iov or not, in the path io_uring returns
+> it we already apriori know that they're from a specific page
+> pool, net_iov and from the current provider.
+>
+> Same for optimisations provided by those helpers, they are
+> useful when you're transferring buffers from one context to
+> another, e.g. task recieve path -> napi / page_pool. In this
+> case they're already fetched in the right context without any
+> need to additionally jumping through the hoops. If anything,
+> it'd be odd to jump out of a window to climb a rope on the
+> other side of the building when you could've just walked 5
+> meters to the other room.
+>
+
+For me, "they are not used because they're not needed." is not enough
+justification to ignore the generic code paths that support generic
+use cases and add your own freeing path and recycling that needs to
+work adjacent to generic paths for posterity. You need to provide
+concrete reasons why the current code paths don't work for you and
+can't be made to work for you.
+
+Is it very complicated to napi_pp_put_page() niovs as the user puts
+them in the refill queue without adding a new syscall? If so, is it
+possible to do a niov equivalent of page_pool_put_page_bulk() of the
+refill queue while/as you process the RX path?
+
+If you've tested the generic code paths to be performance deficient
+and your recycling is indeed better, you could improve the page_pool
+to pull netmems when it needs to like you're doing here, but in a
+generic way that applies to the page allocator and other providers.
+Not a one-off implementation that only applies to your provider.
+
+If you're absolutely set on ignoring the currently supported reffing
+and implementing your own reffing and recycling for your use case,
+sure, that could work, but please don't overload the
+niov->pp_ref_count reserved for the generic use cases for this. Add
+io_zcrx_area->io_uring_ref or something and do whatever you want with
+it. Since it's not sharing the pp_ref_count with the generic code
+paths I don't see them conflicting in the future.
+
+--
+Thanks,
+Mina
 
