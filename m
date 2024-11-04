@@ -1,194 +1,252 @@
-Return-Path: <netdev+bounces-141455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7B70A9BAF9E
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:27:31 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50A629BAFA1
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:27:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0D8FF1F2266A
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:27:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09F1E28109F
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:27:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 846F41AF0B3;
-	Mon,  4 Nov 2024 09:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BF781AF0C8;
+	Mon,  4 Nov 2024 09:27:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CS+/sPzX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ECss2UuK"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE1601AD3E5
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 09:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 675181AF0C1;
+	Mon,  4 Nov 2024 09:27:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730712430; cv=none; b=rTGhr9bbB3w/RvXmNJWygmR49AAzt57690pw0OX6Rhq/zPjSf6LPx0aCPA3VH1kMbiwNzjf12ad7vGI0C6mF3FpkGhahdCmoMZ+W/OdGzOSQYathcTMznwYS1r1QuJE3mUBpRBbKK3sfJYx48d2apBFLsvaIvXZfqBv9S+UhrIw=
+	t=1730712431; cv=none; b=Zb7Ln9KI4i5OvV8F8xEQpXbhSIzCMe6zRGkQcriP4i2cMsXmlgmPetSl5egaCjGOCL52JalPS3vTaVpNQ/HHuwTydckylNUqEU1PXUDimcYcRcttlomUZVeFvkRbCStReMb3jn45WZT2zCimqjZ/Dkjor71wZDmXQr9k4Fb2SMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730712430; c=relaxed/simple;
-	bh=M7ueN/LQ529FLGouL/3BXVgrjx8tY87847WIrlhrom4=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=aj2VFHgtEfBbzXiKn31HxG805Qm38JjvCT8pZUc0x+UNw5P2Ct+3+H8tOHKRqUBYNEktXJt692iuOOTAfUJRewt46e3AzaePL602Su67KK+1MnYFWdnZYEntkEJ4advfqUffeqaWReCVwVYWrFLt811u7QrI3fAnKL1xkDsmybg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CS+/sPzX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730712428;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M7ueN/LQ529FLGouL/3BXVgrjx8tY87847WIrlhrom4=;
-	b=CS+/sPzXh1mV9lC5ab3Yx6U4bXIdpqD8G+MfUAIwGT7krBbkM5YaTKx990ONiy6IiokdlF
-	LMjoveda6hXsGqzhNWIoT3Tdm1X8iSJR1mAq3djw3G7HHg2AZEDVBOzygB32NJDK7KaxnN
-	+VDlOhmoejlHzpQenYD4l16Pr6eWO+Q=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-680-IceMwLjPN5efzwjKfByojg-1; Mon, 04 Nov 2024 04:27:06 -0500
-X-MC-Unique: IceMwLjPN5efzwjKfByojg-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-539ebb67c28so2675767e87.3
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 01:27:06 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730712425; x=1731317225;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=M7ueN/LQ529FLGouL/3BXVgrjx8tY87847WIrlhrom4=;
-        b=AeRK24qlyc74KRBYiJJNq/PfMDO4+lVdAjPdHNI4bkbgH6bdL+irmqX0uQaoFRk/wo
-         dOylnpY0MJguLLYv5wJhvUXxdsYAA8RnA1511VyWMpQ2a593Zgck6PfEXNtvqVO1ic0q
-         15ft5uWld7LrQ2oXJfdGqS1rrDVcFce1mQrO5VkESO0IJ4tqafhKG1uv06pIVJEuc20n
-         YlOY0Lcgw3ZePZt+/mc9jCA69phcOz5f20mSjWnOwNdNgJ98cKo2KN0VU0WFVbmYyfRl
-         6CTaQ2qEyJid+J1KOkeTX8Wu4ADrkouLt/KTkB3SHsC/TZ6T4XL8gwFvkR11mA1+o7Tl
-         elrQ==
-X-Forwarded-Encrypted: i=1; AJvYcCX2BYWasso89SzT0incSqjmjcBlagvb0akBbKxQyT01B7RL4Ub18q7Lr4Wr+5rU+50OUSgAnXk=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxeTmDx5mGINOm/J9jVCvj+0uohCduJNyKWYogEboh4V/tMkajZ
-	Y7ZdbxenoszAmfRdUBIH1H58I+/C7lZIsa9G5WGvoaaAmKVmypj+XHMNg7ATrz0EJ3+qkJ7WXk7
-	qTf+ZSRiub5tF8h4a/jGwkT66JnQjlqurHyoKgx5+4jeMejlNlpeq6Q==
-X-Received: by 2002:a5d:5f54:0:b0:37d:373c:ed24 with SMTP id ffacd0b85a97d-381c7a3a49cmr8192696f8f.4.1730712414718;
-        Mon, 04 Nov 2024 01:26:54 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHUG4i3r4RT/0mDz+U1cY7m40dZcu2ijC6eEouX1uNQBldOHTZd5hoduIq2TUsnjYO3wLrnew==
-X-Received: by 2002:a5d:5f54:0:b0:37d:373c:ed24 with SMTP id ffacd0b85a97d-381c7a3a49cmr8192628f8f.4.1730712414212;
-        Mon, 04 Nov 2024 01:26:54 -0800 (PST)
-Received: from ?IPv6:2001:16b8:2d7f:e400:7f8:722c:bb2e:bb7f? (200116b82d7fe40007f8722cbb2ebb7f.dip.versatel-1u1.de. [2001:16b8:2d7f:e400:7f8:722c:bb2e:bb7f])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7d20sm12817150f8f.7.2024.11.04.01.26.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 01:26:53 -0800 (PST)
-Message-ID: <a8d9f32f60f55c58d79943c4409b8b94535ff853.camel@redhat.com>
-Subject: Re: [PATCH 01/13] PCI: Prepare removing devres from pci_intx()
-From: Philipp Stanner <pstanner@redhat.com>
-To: Thomas Gleixner <tglx@linutronix.de>, Damien Le Moal
- <dlemoal@kernel.org>,  Niklas Cassel <cassel@kernel.org>, Sergey Shtylyov
- <s.shtylyov@omp.ru>, Basavaraj Natikar <basavaraj.natikar@amd.com>, Jiri
- Kosina <jikos@kernel.org>, Benjamin Tissoires <bentiss@kernel.org>, Arnd
- Bergmann <arnd@arndb.de>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- Alex Dubov <oakad@yahoo.com>, Sudarsana Kalluru <skalluru@marvell.com>,
- Manish Chopra <manishc@marvell.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Rasesh Mody
- <rmody@marvell.com>, GR-Linux-NIC-Dev@marvell.com, Igor Mitsyanko
- <imitsyanko@quantenna.com>, Sergey Matyukevich <geomatsi@gmail.com>, Kalle
- Valo <kvalo@kernel.org>, Sanjay R Mehta <sanju.mehta@amd.com>, Shyam Sundar
- S K <Shyam-sundar.S-k@amd.com>, Jon Mason <jdmason@kudzu.us>, Dave Jiang
- <dave.jiang@intel.com>, Allen Hubbe <allenbh@gmail.com>, Bjorn Helgaas
- <bhelgaas@google.com>, Alex Williamson <alex.williamson@redhat.com>,
- Juergen Gross <jgross@suse.com>, Stefano Stabellini
- <sstabellini@kernel.org>, Oleksandr Tyshchenko
- <oleksandr_tyshchenko@epam.com>, Jaroslav Kysela <perex@perex.cz>, Takashi
- Iwai <tiwai@suse.com>, Chen Ni <nichen@iscas.ac.cn>, Mario Limonciello
- <mario.limonciello@amd.com>, Ricky Wu <ricky_wu@realtek.com>, Al Viro
- <viro@zeniv.linux.org.uk>, Breno Leitao <leitao@debian.org>, Kevin Tian
- <kevin.tian@intel.com>, Ilpo =?ISO-8859-1?Q?J=E4rvinen?=
- <ilpo.jarvinen@linux.intel.com>, Andy Shevchenko
- <andriy.shevchenko@linux.intel.com>, Mostafa Saleh <smostafa@google.com>, 
- Jason Gunthorpe <jgg@ziepe.ca>, Yi Liu <yi.l.liu@intel.com>, Christian
- Brauner <brauner@kernel.org>, Ankit Agrawal <ankita@nvidia.com>, Eric Auger
- <eric.auger@redhat.com>, Reinette Chatre <reinette.chatre@intel.com>, Ye
- Bin <yebin10@huawei.com>, Marek =?ISO-8859-1?Q?Marczykowski-G=F3recki?=
- <marmarek@invisiblethingslab.com>, Pierre-Louis Bossart
- <pierre-louis.bossart@linux.dev>, Peter Ujfalusi
- <peter.ujfalusi@linux.intel.com>, Maarten Lankhorst
- <maarten.lankhorst@linux.intel.com>, Kai Vehmanen
- <kai.vehmanen@linux.intel.com>,  Rui Salvaterra <rsalvaterra@gmail.com>
-Cc: linux-ide@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-input@vger.kernel.org, netdev@vger.kernel.org, 
- linux-wireless@vger.kernel.org, ntb@lists.linux.dev,
- linux-pci@vger.kernel.org,  kvm@vger.kernel.org,
- xen-devel@lists.xenproject.org, linux-sound@vger.kernel.org
-Date: Mon, 04 Nov 2024 10:26:51 +0100
-In-Reply-To: <87cyjgwfmo.ffs@tglx>
-References: <20241015185124.64726-1-pstanner@redhat.com>
-	 <20241015185124.64726-2-pstanner@redhat.com> <87cyjgwfmo.ffs@tglx>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
+	s=arc-20240116; t=1730712431; c=relaxed/simple;
+	bh=RmAf5WVXMgeReQ9nyzDoW0ADU9Q9iVypsXAJmIMnRSs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=C55RMnIlF3aZ8rTLENcjxECDZihrm4DPo9DY84RuUFA+cXO05RGmmLl2sbyLEB+ilLnNv8VGsbQgj0yEh4O/rH6GlTnwvHdUJqNCibgldJJnEQ+pidmw690BCY4mQgbsHySWKmn6yA+XXj0IUhdjxwZmV3f3KfhtSe9lglmWcpc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ECss2UuK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91FE4C4CECE;
+	Mon,  4 Nov 2024 09:27:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730712430;
+	bh=RmAf5WVXMgeReQ9nyzDoW0ADU9Q9iVypsXAJmIMnRSs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ECss2UuKA5lrpWqkg+uiOcbfQZpkwKNRZ5bjTLNWn0fHdNvgdoVuz3YFFnu1bJOGA
+	 6Vd+s/cJuRwREmdNLI9SThmlsf5KOYbQMN4H/3ZevDW6DGePtttv9MgX7Ku/I9t2Lw
+	 DfS6YM3t7A4RgwEwbciSE9h3MkuGnw5ryOF3qh5babvniyjrktmBXx0zKgYY6Rn+NS
+	 kJgrisuHbIIWlEeXEMHYasPEGiwUy0kGZaOtG69g+mvbEjOi/JZkD/gziSxx8uaDf0
+	 XJ3WnoJ2vwNWw/Yr++TvXk2T7qutTdn7puaTqnKGjKh7Mmc0EVpzdMijDQvoZuQdX2
+	 7BoZ3qgTRXbwQ==
+Message-ID: <ee47c6d7-4197-4f5d-b39e-aab70a9337d6@kernel.org>
+Date: Mon, 4 Nov 2024 10:27:04 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla Thunderbird
+Subject: Re: [RFC PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
+To: Sean Nyekjaer <sean@geanix.com>, Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241104085616.469862-1-sean@geanix.com>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <20241104085616.469862-1-sean@geanix.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Thu, 2024-10-31 at 14:45 +0100, Thomas Gleixner wrote:
-> On Tue, Oct 15 2024 at 20:51, Philipp Stanner wrote:
-> > +/**
-> > + * pci_intx - enables/disables PCI INTx for device dev, unmanaged
-> > version
->=20
-> mismatch vs. actual function name.
+On 04/11/2024 09:56, Sean Nyekjaer wrote:
+> Convert binding doc tcan4x5x.txt to yaml.
+> 
+> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+> ---
+> 
+> Can we somehow reference bosch,mram-cfg from the bosch,m_can.yaml?
+> I have searched for yaml files that tries the same, but it's usually
+> includes a whole node.
+> 
+> I have also tried:
+> $ref: /schema/bosch,m_can.yaml#/properties/bosch,mram-cfg
 
-ACK, will fix
+Yes, this would work just with full path, so /schemas/net/can/...
 
->=20
-> > + * @pdev: the PCI device to operate on
-> > + * @enable: boolean: whether to enable or disable PCI INTx
-> > + *
-> > + * Enables/disables PCI INTx for device @pdev
-> > + *
-> > + * This function behavios identically to pci_intx(), but is never
-> > managed with
-> > + * devres.
-> > + */
-> > +void pci_intx_unmanaged(struct pci_dev *pdev, int enable)
->=20
-> This is a misnomer. The function controls the INTX_DISABLE bit of a
-> PCI device. Something like this:
->=20
-> void __pci_intx_control()
-> {
-> }
->=20
-> static inline void pci_intx_enable(d)
-> {
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 __pci_intx_control(d, true);
-> }
->=20
-> .....
->=20
-> makes it entirely clear what this is about.
+See:
+Documentation/devicetree/bindings/pinctrl/starfive,jh7100-pinctrl.yaml
 
-Well, I would agree if it were about writing a 'real' new function. But
-this is actually about creating a _temporary_ function which is added
-here and removed again in patch 12 of this same series.
+But you can also just copy it. Ideally this should be moved to common
+schema or replaced with more generic property, but these do not have to
+be part of this conversion.
 
-It wouldn't even be needed; the only reason why it exists is to make it
-easy for the driver maintainers concerned by patches 2-11 to review the
-change and understand what's going on. Hence it is
-"pci_intx_unmanaged()" =3D=3D "Attention, we take automatic management away
-from your driver"
+> 
+> Any hints to share a property?
+> 
+>  .../devicetree/bindings/net/can/tcan4x5x.txt  | 48 ---------
+>  .../bindings/net/can/ti,tcan4x5x.yaml         | 97 +++++++++++++++++++
+>  2 files changed, 97 insertions(+), 48 deletions(-)
+>  delete mode 100644 Documentation/devicetree/bindings/net/can/tcan4x5x.txt
+>  create mode 100644 Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+> 
 
-pci_intx() is then fully restored after patch 12 and it keeps its old
-name.
+...
 
-Gr=C3=BC=C3=9Fe,
-Philipp
+> diff --git a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+> new file mode 100644
+> index 000000000000..62c108fac6b3
+> --- /dev/null
+> +++ b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+> @@ -0,0 +1,97 @@
+> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
+> +%YAML 1.2
+> +---
+> +$id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
+> +$schema: http://devicetree.org/meta-schemas/core.yaml#
+> +
+> +title: Texas Instruments TCAN4x5x CAN Controller
+> +
+> +maintainers:
+> +  - Marc Kleine-Budde <mkl@pengutronix.de>
+> +
+> +allOf:
+> +  - $ref: can-controller.yaml#
+> +
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - enum:
+> +          - ti,tcan4552
+> +          - ti,tcan4553
+> +          - ti,tcan4x5x
+
+That's not really what old binding said.
+
+It said for example:
+"ti,tcan4552", "ti,tcan4x5x"
+
+Which is not allowed above. You need list. Considering there are no
+in-tree users of ti,tcan4x5x alone, I would allow only lists followed by
+ti,tcan4x5x. IOW: disallow ti,tcan4x5x alone.
+
+Mention this change to the binding in the commit message.
 
 
->=20
-> Hmm?
->=20
-> Thanks,
->=20
-> =C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 tglx
->=20
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  vdd-supply:
+> +    description: Regulator that powers the CAN controller.
+> +
+> +  xceiver-supply:
+> +    description: Regulator that powers the CAN transceiver.
+
+You need to mention all changes done to the binding in the commit msg.
+
+> +
+> +  reset-gpios:
+> +    description: Hardwired output GPIO. If not defined then software reset.
+> +    maxItems: 1
+> +
+> +  device-state-gpios:
+> +    description: Input GPIO that indicates if the device is in a sleep state or if the device is active.
+> +      Not available with tcan4552/4553.
+> +    maxItems: 1
+> +
+> +  device-wake-gpios:
+> +    description: Wake up GPIO to wake up the TCAN device. Not available with tcan4552/4553.
+> +    maxItems: 1
+> +
+> +  bosch,mram-cfg:
+> +    $ref: bosch,m_can.yaml#
+> +
+> +  spi-max-frequency:
+> +    description:
+> +      Must be half or less of "clocks" frequency.
+> +    maximum: 10000000
+
+Old binding said 18 MHz?
+
+> +
+> +  wakeup-source:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description:
+> +      Enable CAN remote wakeup.
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - bosch,mram-cfg
+> +
+
+Missing allOf: with $ref to spi-peripheral-props. See other SPI devices.
+
+
+> +additionalProperties: false
+
+And this becomes unevaluatedProperties: false
+
+Best regards,
+Krzysztof
 
 
