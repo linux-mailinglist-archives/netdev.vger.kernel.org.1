@@ -1,162 +1,154 @@
-Return-Path: <netdev+bounces-141616-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141617-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F83C9BBCF9
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:14:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B4989BBCFD
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:14:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAB581F22F5C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:14:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DB5751F22F9F
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:14:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46C4D1CACDE;
-	Mon,  4 Nov 2024 18:14:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="H6F6jHdy"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C0E51CACE9;
+	Mon,  4 Nov 2024 18:14:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f175.google.com (mail-qt1-f175.google.com [209.85.160.175])
+Received: from mail-pg1-f178.google.com (mail-pg1-f178.google.com [209.85.215.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CA731C9ED6
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:14:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1681C2309;
+	Mon,  4 Nov 2024 18:14:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730744058; cv=none; b=TpNB8lymvYYz/rSVvcI1ZRIsgIJMDAXSmfIMCS2VG+c/c9gV51rlqIEra88+EPjbjUhbfWQcU6dcWgytvSCfZmeWwVSDjyzapURe7H7pQ3C/O/LAdFdP67T9iyM6GbEXEVPYoB/NlcSexLnkwjQUulOjoVwG6zXw8zHn71j+DpM=
+	t=1730744074; cv=none; b=QVM9ihnDQS5hdu94cJxTuCCIvB1h1IQP6hnIpm7SK4Tpof1BRtcQRoY2waUxlVOqkjHVEXyioNfymTsRtAKW8JLafGd/EWOKsQSDPbu9KOZk5zMzhHcrP6uatEadw9feuiJsAyXb+I94/DMpetlzch+I7R0TbEjDTwphtcZU88Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730744058; c=relaxed/simple;
-	bh=aN8v1aA5mg4XjqvwkCFCD2Wa7UW8xJoBXXcW6XA/5zI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=elH4v/f/Czw9WHIEcI+K53qfv4bb9kmxlyXuXwW0u3OeSnuYhS2rtPztRJVq6hIQXZI0UF0f9JCLpK7LzihwF2hy2ovBvFUJFeN87osGQCtz1CYMsPktJSRPncFz9iohgmQG+NyWY+hj6pDsBDDQgxFBZrLowke6GYnE420uu7M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=H6F6jHdy; arc=none smtp.client-ip=209.85.160.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qt1-f175.google.com with SMTP id d75a77b69052e-4609d8874b1so36412901cf.3
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 10:14:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1730744055; x=1731348855; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=zXPpFLmVRieKxpkO+X210QXJX8MilLsbdVXcXNcuwhQ=;
-        b=H6F6jHdyhLIX/Oj1zBy7q7k97+h1aCAQhkZJ7zRn/yCaNWpo41XSKGNExbdyTf6P+l
-         c907jusxjvLNojyJJCLDnf0P699rcUPhdFr4X7PYJncQAc5tR4Ohr2IqAOgN+8rz57QZ
-         iQDbnRO0G1jY6+rHX5kJaqr8CiRUAZdqJABezZVMORpCdfnfMIAkIIQ+sZh/p94oMdOe
-         rWpfdA632hEpNt1a763P6QRnYjjAW9ST8E5utq2vN0gA2Y6oxhvNTFXv0WV5vVrf4rLt
-         clVNmFH4FJYkBPdPr5xPC/B6cGrkEeFYOGHA8sG2RjL8Fzv44AeI2gQPXBWtey4ieOk5
-         8+sQ==
+	s=arc-20240116; t=1730744074; c=relaxed/simple;
+	bh=aVxP0jcxO9fNti9CoyzA2eVeDe1PDDS/i8L1u30o3LE=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=JOgc3KnjCT9UUbZMlLbv7bBFsKUMirejmPcknhz/BXz98tQZxDcg8YAdpbieenuaKL/tTGH5GK+ts6yFVsY0Hl9K5Edqopy+JbLkkUHNb6pRAYe2AFzHckCoHqAnt9MYp5kJEva12LbVKz1WbXs/OXCq3mjzCPHpHClaX3DS3HI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.215.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f178.google.com with SMTP id 41be03b00d2f7-7ae3d7222d4so3238762a12.3;
+        Mon, 04 Nov 2024 10:14:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730744055; x=1731348855;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zXPpFLmVRieKxpkO+X210QXJX8MilLsbdVXcXNcuwhQ=;
-        b=qdnqdRRQrtjxkFlSKlbCe6Cf4iAQ4xNIMZTpjh7eafnyo89qx2uxjEOBGgVWY7a3Lv
-         GhYUInLfr16hjG+7NB2IymkG5OVWwBG7Z5fmgc2JJVbpf7oasLuvhbg4DBPT9PvsZwEG
-         /Xeny+TxwkbsoO6BaOQUjwYMXbPBraxXbBYYklvllzmq/DyKjVqsSjc2VMwic9qZl/mQ
-         6mZPizFOxD1pE+rYfdPCbf6CDUp5I1zJ27K1JOBI+W/se2XLNZMc+iSpQpogFSwzh4lR
-         6S2pG0QrToyI5maRLCtazEGLGBHmJG0hO9pi1iQgEP0BO2HXHCwAS3IPyfbCipyFaoNJ
-         XITg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5vFbmPSiPryRvMj37/U7P+i4rQATQSeAZaGvfx6yljznC/q2M7hCvKZsj+P29Np2ffc8L3FQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ3UQRBJiAjJl3b2fEXyGmue0TQQSSJacClSED+23vAoTRTZxW
-	yWfP1hvX6OAYD3bfUHSyPu4mEbhJYf0P5kgGqa325cCVF7xo/m6hDvg1G0X4ZHM=
-X-Google-Smtp-Source: AGHT+IF1PKPD/v9OK4iTuAs3JRnkOhZAcYBDSaPRNYYy6E54+wtegDCt1MNum4cuOwk6nR/bljzgMA==
-X-Received: by 2002:a05:622a:2c3:b0:461:1fa:fba with SMTP id d75a77b69052e-462ab29f8d3mr266421881cf.32.1730744055028;
-        Mon, 04 Nov 2024 10:14:15 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ad161597sm49349031cf.63.2024.11.04.10.14.13
+        d=1e100.net; s=20230601; t=1730744071; x=1731348871;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=IAIq1Ui2j9QsUZ4JYb3Wemxk3lhTCIGOK6mHtuKExIM=;
+        b=vMoDHGdl3qB9tkFPjT5wUqOuE/TDgdn6D1T7hwgzFCjgZTPbYpcz6UOyLrnDXzwQF3
+         ycjdPahGuuQvP5t2rcJd+FlQJX4rmaMb2we2ZVrlBm06CLgZQVmrN3dJb6ZKMQqWvvce
+         8YcBfIbGs1CrmxJH+6n6ALAAGBmEs47ZI8kFO/Yvy59BYiW9AgiZ0Q70+xVYmRi7cROG
+         1b6RhItBeEDkJ15MqIBDE+rO7yZg6zidXFOkHEyS8KYxRX6ozuyMo0V1vnLBb/FBybf6
+         OOJEFSqVyupPMJjixuEFuEEgjylmmNUymD4EL55VCqkM6AgFfekHYFhqq9jTx+FtStmC
+         p+XA==
+X-Forwarded-Encrypted: i=1; AJvYcCU5Z0BDMdNYMKQeG3+gx3kX6QvpN4JNR8557Fkm1hXeU5CzxMyTB4RMw8VG6pnE9CK+I+gT4JrSeMCqH+g=@vger.kernel.org, AJvYcCVTOBumGPZhasFnPiQwIKi4FGgdLcvFuMjqsKy86Xxuv9lRggqWrfiHIK6D3MrKb8Z4xm3GtB+Ts7EzKFelu5yd@vger.kernel.org
+X-Gm-Message-State: AOJu0YyEHgDnnzKU9zDvz/zJGasZw3QWO2x72QcmXfGsqxw1ViXwQWoE
+	r9BzovvDe2B3GzxKdoulDwNcM5DpaWDTtCBgE0O1DJCPimtZ/vdIpvuh
+X-Google-Smtp-Source: AGHT+IHhN4/EXQ7OS1e/nJAXih/1yqXdu9y3W8NeMwURhM7GYyj7osYLIyn05QRlDWosG5NQnQ9Otg==
+X-Received: by 2002:a17:90b:4a42:b0:2e2:b922:492 with SMTP id 98e67ed59e1d1-2e93c174626mr20471167a91.17.1730744071208;
+        Mon, 04 Nov 2024 10:14:31 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fbdfc1asm10217617a91.41.2024.11.04.10.14.30
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 10:14:14 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t81af-00000001jqP-2SNl;
-	Mon, 04 Nov 2024 14:14:13 -0400
-Date: Mon, 4 Nov 2024 14:14:13 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Aleksandr Nogikh <nogikh@google.com>
-Cc: syzbot <syzbot+6dee15fdb0606ef7b6ba@syzkaller.appspotmail.com>,
-	leon@kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com
-Subject: Re: [syzbot] [rdma?] INFO: task hung in add_one_compat_dev (3)
-Message-ID: <20241104181413.GG35848@ziepe.ca>
-References: <671756af.050a0220.10f4f4.010f.GAE@google.com>
- <20241022142901.GA13306@ziepe.ca>
- <CANp29Y534CT0jqhp5LQi_ZCs=1_i4duRO=4CJ52by9ZDW-1Wfw@mail.gmail.com>
+        Mon, 04 Nov 2024 10:14:30 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	shuah@kernel.org,
+	horms@kernel.org,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	willemb@google.com,
+	petrm@nvidia.com
+Subject: [PATCH net-next v7 00/12] selftests: ncdevmem: Add ncdevmem to ksft
+Date: Mon,  4 Nov 2024 10:14:18 -0800
+Message-ID: <20241104181430.228682-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANp29Y534CT0jqhp5LQi_ZCs=1_i4duRO=4CJ52by9ZDW-1Wfw@mail.gmail.com>
 
-On Fri, Nov 01, 2024 at 04:55:32PM +0100, Aleksandr Nogikh wrote:
-> Hi Jason,
-> 
-> On Tue, Oct 22, 2024 at 4:29 PM Jason Gunthorpe <jgg@ziepe.ca> wrote:
-> >
-> > On Tue, Oct 22, 2024 at 12:39:27AM -0700, syzbot wrote:
-> >
-> > > 1 lock held by syz-executor/27959:
-> > >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_lock net/core/rtnetlink.c:79 [inline]
-> > >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: __rtnl_newlink net/core/rtnetlink.c:3749 [inline]
-> > >  #0: ffffffff8fcbffc8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_newlink+0xab7/0x20a0 net/core/rtnetlink.c:3772
-> >
-> > There is really something wrong with the new sykzaller reporting, can
-> > someone fix it?
-> >
-> > The kernel log that shows the programs:
-> >
-> > https://syzkaller.appspot.com/x/log.txt?x=10d72727980000
-> >
-> > Doesn't have the word "newlink"/"new"/"link" etc, and yet there is an
-> > executor clearly sitting in a newlink netlink callback when we
-> > crashed.
-> 
-> These are likely coming from the network devices initialization code.
-> When syzbot spins up a new syz-executor, it creates a lot of
-> networking devices as one of the first steps.
-> https://github.com/google/syzkaller/blob/f00eed24f2a1332b07fef1a353a439133978d97b/executor/common_linux.h#L1482
+The goal of the series is to simplify and make it possible to use
+ncdevmem in an automated way from the ksft python wrapper.
 
-Which part of this is the syz-executor? Near the start of the VM
-lifetime?
+ncdevmem is slowly mutated into a state where it uses stdout
+to print the payload and the python wrapper is added to
+make sure the arrived payload matches the expected one.
 
-Or each time it does:
+v7:
+- fix validation (Mina)
+- add support for working with non ::ffff-prefixed addresses (Mina)
 
-last executing test programs:
+v6:
+- fix compilation issue in 'Unify error handling' patch (Jakub)
 
-3m14.839622334s ago: executing program 3 (id=3291):
-r0 = socket$nl_netfilter(0x10, 0x3, 0xc)
-sendmsg$NFT_MSG_GETRULE(r0, &(0x7f0000000240)={0x0, 0x0, &(0x7f00000001c0)={&(0x7f0000000380)={0x20, 0x19, 0xa, 0x3, 0x0, 0x0, {}, [@NFTA_RULE_TABLE={0x9, 0x1, 'syz0\x00'}]}, 0x20}}, 0x0)
+v5:
+- properly handle errors from inet_pton() and socket() (Paolo)
+- remove unneeded import from python selftest (Paolo)
 
-?
+v4:
+- keep usage example with validation (Mina)
+- fix compilation issue in one patch (s/start_queues/start_queue/)
 
-> So those syz-executors might have just been unable to start and then
-> they were abandoned (?)
+v3:
+- keep and refine the comment about ncdevmem invocation (Mina)
+- add the comment about not enforcing exit status for ntuple reset (Mina)
+- make configure_headersplit more robust (Mina)
+- use num_queues/2 in selftest and let the users override it (Mina)
+- remove memory_provider.memcpy_to_device (Mina)
+- keep ksft as is (don't use -v validate flags): we are gonna
+  need a --debug-disable flag to make it less chatty; otherwise
+  it times out when sending too much data; so leaving it as
+  a separate follow up
 
-It seems unlikely.. The crash happened like this:
+v2:
+- don't remove validation (Mina)
+- keep 5-tuple flow steering but use it only when -c is provided (Mina)
+- remove separate flag for probing (Mina)
+- move ncdevmem under drivers/net/hw, not drivers/net (Jakub)
 
-[  709.737594][   T30] INFO: task syz-executor:27961 blocked for more than 143 seconds.
+Cc: Mina Almasry <almasrymina@google.com>
 
-So whatever killed it happened at approx 566 seconds into the test,
-not when it booted.
+Stanislav Fomichev (12):
+  selftests: ncdevmem: Redirect all non-payload output to stderr
+  selftests: ncdevmem: Separate out dmabuf provider
+  selftests: ncdevmem: Unify error handling
+  selftests: ncdevmem: Make client_ip optional
+  selftests: ncdevmem: Remove default arguments
+  selftests: ncdevmem: Switch to AF_INET6
+  selftests: ncdevmem: Properly reset flow steering
+  selftests: ncdevmem: Use YNL to enable TCP header split
+  selftests: ncdevmem: Remove hard-coded queue numbers
+  selftests: ncdevmem: Run selftest when none of the -s or -c has been
+    provided
+  selftests: ncdevmem: Move ncdevmem under drivers/net/hw
+  selftests: ncdevmem: Add automated test
 
-Since the start of the "last executing test programs:" is only 3min
-back, and the above is 9 min back, it probably helps explain why there
-is no record.
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   9 +
+ .../selftests/drivers/net/hw/devmem.py        |  45 +
+ .../selftests/drivers/net/hw/ncdevmem.c       | 786 ++++++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   8 -
+ tools/testing/selftests/net/ncdevmem.c        | 570 -------------
+ 7 files changed, 841 insertions(+), 579 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/.gitignore
+ create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
+ create mode 100644 tools/testing/selftests/drivers/net/hw/ncdevmem.c
+ delete mode 100644 tools/testing/selftests/net/ncdevmem.c
 
-> > We need to see the syzkaller programs that are triggering these issues
-> > to get ideas, and for some reason they are missing now.
-> 
-> Once syzbot manages to find a reproducer, hopefully things will become
-> more clear.
+-- 
+2.47.0
 
-It never seems to find one for these kinds of things... The dashboard
-says it happens almost daily.
-
-Jason
 
