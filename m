@@ -1,237 +1,281 @@
-Return-Path: <netdev+bounces-141401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17AD59BAC44
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 06:59:12 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 02E739BAC61
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 07:12:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7BD871F2172F
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 05:59:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 695FB1F221C5
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 06:12:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4B2618BB82;
-	Mon,  4 Nov 2024 05:59:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEBA218C02F;
+	Mon,  4 Nov 2024 06:12:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="NRgWnagO"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="HpYzSPCG"
 X-Original-To: netdev@vger.kernel.org
-Received: from DUZPR83CU001.outbound.protection.outlook.com (mail-northeuropeazon11013042.outbound.protection.outlook.com [52.101.67.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFADB14E2FD;
-	Mon,  4 Nov 2024 05:59:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.67.42
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730699947; cv=fail; b=WQh5HP8QZkOrX7mk2gAmu6Z3kxjlu0paIrfrjvGtL7oQvWnATYfVK8N5coeloZ+dICfnYugrWBJbjGH3V8PdY31sQ7AY9mewwR2ijWteJn3jpV04bwoaSK9+i4wRGMkgd9U1uOBo2SdfHQvIwVVcRGKdHzcSyJZiDsAL4yNVgQU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730699947; c=relaxed/simple;
-	bh=TpOmJjxesC92ijikdMY1N6LB2jlvspErGwqu2W3aSMs=;
-	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=srHQmZwF1s1t1m4yDNhwtfJYRKHS3GtbwuHbeqtKLOUtMdv6+/87vDH9+u0gZTFbQb/SX+rcs09Y5BuDfLc/MrwWclGStVQX6SqHdv7u0IA+xCoxb6N91LzBV7V8NlBpWLFh3H/BHgnejok1LmRqnSZyyDshp44g1sL2GHgvnlA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=NRgWnagO; arc=fail smtp.client-ip=52.101.67.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=V3br2J/s8jyvS0chfoG4aygRKL9oXcrip8y22LiXGbbK4LOn3sFrglrf0R+F7CuSJrr9gQUh5WI6s9J8iDqASHHw3z0B2hV2KIb481aKne8IKLckn2xPVENxv6j8vdOUUiPN+MRR4LCW7OkXimCYJET43oQhVcaSoS/pPrWDlTZg0fGzn9xvXzStAo20DRQIavOiPcuNpqwaQUXEx/7Vz732poHdl74kVrWcIsFly5lVr5xwg5WSAuRkz3Ze4/bgwt01OFtDw959xJToy1dLCgswImB4mqklhtG+cYqxJhnYBsGe/sXgZCOHyK7ON6m8vqFKXj1VMttFKLjmnWqtDA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ktxnUWkN+nkx3qM8i218Ry7l4pjTa4bXYkS410vJiuw=;
- b=TAb+wRHuJ3OFn5iOrMf8c+BBXMcroyLRt6B3plMDSJjxKKBd7jtTH801n7bJopW98ppdD6bNZKOLHuRJjxJqSI9JTN4ugG8cMxqeYQezuJTiJgzduyI16kSBhscGIudgiXfGRAjRuxj/Ej1X+UEjTLHlLdyTf/8LhCHf60a5L87NLuopxntA1cpLQDb151hfqCz4ZrUJonyepdnxxvkcyM3G8vWj78p2TChXRzmdtg50Ud2YmyNvaMguo5tTJk/WUZo8V8OWr9WdHCgsD1/4PrZU5lTIF73adI/g5Haq7cJLTOMXfmePRiBj8Eb48HqaESFoLXwo3IgXA0HlYCNReA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ktxnUWkN+nkx3qM8i218Ry7l4pjTa4bXYkS410vJiuw=;
- b=NRgWnagOxl9inCuGPMX2ZB0LSIwyP4Ub4kZXvkuLIxPne4MK+Mo5TFrAnbLfDmZfms5yjWcFxxPGYnxxkFNWq3bS0H08zah8u5JKiapw+MFEqjDlgXYVO1wUslm5uO/cwhm5dEEehUdH8C2gp7L0HO6jKfAxdVqAGbi53fEB4JUPQGd9eiD/8/7M5nmAJUDDTnq73yY9UmPH2TYOESN8gwUA0ULDoOSBBw/rSYJIhXRqGayStesvCfqs0flTDIsZhU7ujTjbENLGzVQtOzBT2K56t/srG9PBiCoI5cXoG9L9TID6QVO6rScbBBa5hmCFomArL9/2hnIFNK6x5eCUvw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
- by PAXPR04MB8173.eurprd04.prod.outlook.com (2603:10a6:102:1ca::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
- 2024 05:59:02 +0000
-Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
- ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
- 05:59:02 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	andrew+netdev@lunn.ch,
-	claudiu.manoil@nxp.com,
-	vladimir.oltean@nxp.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	imx@lists.linux.dev
-Subject: [PATCH v2 net] net: enetc: Do not configure preemptible TCs if SIs do not support
-Date: Mon,  4 Nov 2024 13:43:09 +0800
-Message-Id: <20241104054309.1388433-1-wei.fang@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SI1PR02CA0002.apcprd02.prod.outlook.com
- (2603:1096:4:1f7::16) To PAXPR04MB8510.eurprd04.prod.outlook.com
- (2603:10a6:102:211::7)
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.4])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ADED6FC5;
+	Mon,  4 Nov 2024 06:12:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.4
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730700769; cv=none; b=IS3kd1JJoivfhyuow+hCbFfDZLn0uH4e07iW8btQ51AQB64uptS15MF+FYO8MeeAJMfT1NpTgNMvmb5/SiIaLDZGHP0ZP/VlxZm2pPjPdPXpIAJUm115PV2uyw6JXe92sONScg6HilwmPhTzVQ+aauB2NI2O3yxbLnYoPBq3gH0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730700769; c=relaxed/simple;
+	bh=ki9vFG3nfLFbUqAXf6jzfsbvTSQlqjL9yWAin/0ah8U=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=EqQDAhT1I72Kvhpod/HWxfGR/6c9MOpTtj+hKEydT8UNz1FZ1h4B3VgJ95YYo9EWTs5xMnAng0GExT10/C+Lw/MQy/vy39RyH7cmVONvNhd4tHAYlcB+odhRqnMJ9IwT9NKKrfWdZ551r0/gw97mJW5ahFzlOoO79ojyPF5jXtc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=HpYzSPCG; arc=none smtp.client-ip=220.197.31.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=Date:From:Subject:Message-ID:MIME-Version:
+	Content-Type; bh=paESjsr5A0A1ELZZUT9Rrg6vQ8i0QK8Ld0xxSWGQ1xY=;
+	b=HpYzSPCGh50YAd9lmjiig+zFH7EvrjVB71Fdrw61xeSO9G6HxBdQBxiNX3v5VS
+	PTW9s8LnnTrYSETLmwWfwc1HOCLyS827jFC+dxV+AZNxaCI56gnCY3Quz6xnhQsc
+	mVNdCurcKVgiHBQsMXW/r/M4AHtz5BUrQJ5HlWnGEFylE=
+Received: from iZ0xi1olgj2q723wq4k6skZ (unknown [47.252.33.72])
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wDXPybOZShnwx48Ag--.2216S2;
+	Mon, 04 Nov 2024 14:12:34 +0800 (CST)
+Date: Mon, 4 Nov 2024 14:12:29 +0800
+From: Jiayuan Chen <mrpre@163.com>
+To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, martin.lau@kernel.org
+Subject: Re: [PATCH 1/2] bpf: Introduce cpu affinity for sockmap
+Message-ID: <gbtlzrhme5yrbvlwkswlzz44lims7dymougc7376c5hugosqqh@qqrjg6wtmnan>
+References: <20241101023832.32404-1-mrpre@163.com>
+ <CAEf4BzbVqcCN1p8ydLN17LygK5R=gBYJV0A-cnycjtsUzrX34g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|PAXPR04MB8173:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1eec2edd-8288-45ac-6a8b-08dcfc95c84c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|52116014|1800799024|38350700014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?iXS22+Nv3kzlQYCMxK96ZUFoFp1qQigk8OHEofyFbaRZYMZUo42Cn5pro3EM?=
- =?us-ascii?Q?7hxIy0JYbO3ju6+8x4vkrxm2bphsCea4vOcki09v/H3ms7unyDuayDciBhLt?=
- =?us-ascii?Q?WniKqKUgHyjtTx42NaK9yCPUGkmuuko+BkpZIHnsqkzHwiGp2sJu2E8Jx86Q?=
- =?us-ascii?Q?rmGnZlwGLH6WLJnB0G0ztNjrVfUI33OVb/XsHySE/BgijE7e7j3Q/ICWenVc?=
- =?us-ascii?Q?2U1RezfmVtazKe/FWtoWs+DSSDN9/dipN/E+/Cs7myXda2J5lFIZYTT2rljM?=
- =?us-ascii?Q?wK+Mk3UhRnec/OmK0Q2G0SHeTeGxlvgsNRMvTlbDeimmXaOmrTTET6i34kqF?=
- =?us-ascii?Q?Ee4HbYTKn5toqifDl92266OAkiUDtzRObFP1sMfoeTDqTrrIQwb7CDYE2ipw?=
- =?us-ascii?Q?cjcJkSBq2sF4aj58J1l9fj1D0cgczB4bkay03DlPEa4NusiKHuLpMDE4DB5g?=
- =?us-ascii?Q?VQm4DlIPz2Ry/p01bOMzoewfW7OyXICL6BiIzXN5pHoVA7Yfh0TxbRIkjy19?=
- =?us-ascii?Q?RJjnE+u80S6IZjzP6x5XQT4X3cR5/rIpOh4J7K2vm0/zM+N2CjnF/UITajW/?=
- =?us-ascii?Q?iE1Nw2+TfngPiFkkcthl9RL6+aDTtXZbT8obcoIzNxhDfqiyTTwIbeUv93Py?=
- =?us-ascii?Q?Aajl5Dp58ITERFtF+oDXtbXrrKEYbII2L/1j9xjDKUZ0uFS0WzshlqFJFaNg?=
- =?us-ascii?Q?iq3n1sn8CxNqQywBsVslX8X3GOKCYQGFmRprDImpUrh+5GSkQT7oRzto5Y9u?=
- =?us-ascii?Q?kDO/DmUF6tb3YA//0+jNPuqFiqf9eMRcQkDThv/uq2EmBdoietIUZAxRZnC7?=
- =?us-ascii?Q?h58rUr2reiRUbo1wp4T+E/4bnqm/1IFcznbMcn80GH8Ddc1fGkdUe3sDewrD?=
- =?us-ascii?Q?bhG3ySUxi8kmWRfSmsyDlEAvEMDwl0/T0YzlNa1+HR1StlaFSlrzwBxELUVl?=
- =?us-ascii?Q?KQYGJIHLAtFIPlYOK2M14gMSPWxJzLSrS6CLQieh4m/AUhnaWibPHFNCRZPP?=
- =?us-ascii?Q?hDsSYHVC3m7Dje2L1MvBnvxYZ8XkcWv9MH+Pc2ClsSRFj2TNV7ei1fNPipu7?=
- =?us-ascii?Q?8GY7eikq0kA4qxnfbPL7AWFNo75KUlhBbX8l0ZpVPMn0aDm15oiEYD27lZvK?=
- =?us-ascii?Q?p9Apg+YwgudT157ONriCLG0ZoKNDlK3dXHaJ6vnG1DuOLXVKzLx7m9fTQPb4?=
- =?us-ascii?Q?0VupuMrwL7OrKsi1goCVQbhG396Utu8zsC59K89R2wdeqh/i0/g4KormaE8k?=
- =?us-ascii?Q?WACTyFrCXFfm9UHi9HGZR9b3eyO8JtC83leROSQlqrD4vHrM1Sq8EecrpTvE?=
- =?us-ascii?Q?jk2GlrNBJ/VCoGKNKp0ZMxiKLRsaGDSocHbGaqpJEX31f+IkehboeVHQtYpq?=
- =?us-ascii?Q?zz2sbunCvLgevBXsX9Uk+W06Orth?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(52116014)(1800799024)(38350700014);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?a9ahsPjAaXRgYUv0mDEfdxlFNtJtmlsL08N741B3MwL9W1EJ8MJ7a5eJTQfd?=
- =?us-ascii?Q?plvHV7pCntAY4H5LmAslduXXzN4eCvYDAsQicnbbq8mX80LwjIk3kmvQn5yr?=
- =?us-ascii?Q?JCVBfS7PJRe8Hi/n5SwEQxLExy2kGlcMzSdLrD0U2Ezm9ZVYL/E20AJCgk8b?=
- =?us-ascii?Q?gmz3JQM/KepapQZctIkFQ8UqQBvIq1c/LldmvnJxGQ6IvkUDpujhdGvbxkl2?=
- =?us-ascii?Q?ArSwoy4oIdX1VfAm9pgJ2vVkFUBrn++sqn9ZjbYcwMh1fvoQ5s9gkcF+RDCp?=
- =?us-ascii?Q?7xMOn29c4Og3kopL71ZDJ20Mv+w5SgNUS3GmJJk3YsoC2hAPs6sGoyKbBGQy?=
- =?us-ascii?Q?qCtDLuF8uwRidBfcHUAgBB34sBFQ7FfCcsOhftD7WAxt2vV+W4n+4+3VkVtw?=
- =?us-ascii?Q?RMNtpJTW1EqUKygZLA7NNTNyimQ2SVOlt/b+quZVxx2EOrZkr23bMoJTbt+s?=
- =?us-ascii?Q?2J8Ck83WnNkcGx68eusUPDhdC7yR2pIoOoPThQi+IoeBTsG5GHj8+1duFTbv?=
- =?us-ascii?Q?qQYk1teEI32ri736kfmZvfpXC4TKbnu2xELp4M+LHNSjdjFnpEmCv7AG/LM0?=
- =?us-ascii?Q?2pnnhVmY5XtEAl018RJEUkwIxKazF0cztO6DUXYBNdzRJKPWl6A/o9CPDLTv?=
- =?us-ascii?Q?MzQF98g3S9yCVNIvbCcuVRnR02PzluDyXGAEx9bt3P9F5DUU9pkGNxmzjY1g?=
- =?us-ascii?Q?mnmpJmiQ9hkI3NpgLOb5kmjk+NjEo9uA/MbRrs7NLY7SPwksxJn+f9j7DApg?=
- =?us-ascii?Q?PO1pzzDXz4uq4xRqImvwSSBLTB0pGGfSv0o9tm/CaOElxlagmVupiglh6hCv?=
- =?us-ascii?Q?U9WZZ6N1ToMxr77AY5xKJ5Ex0E0vPf1sb+bLjaGQ6PRdm+i+ouoqbF8OhTRb?=
- =?us-ascii?Q?aR7URLYHyuh1pQO/hLZdqm009BhQ8vGy//UXjMM2HSPAgyBuJWDVmmKlLey2?=
- =?us-ascii?Q?ST+IrY2T6j6Np9DLN3dzTIijp272XSimDRqL4qQQAww0MgX9TErtB1YZ0Osl?=
- =?us-ascii?Q?iT/U6ASOuIcUGBBZuNXnrZ93PNIE3NnFwRLncBFj54OkA3Lrq4k3/ZM5SBTl?=
- =?us-ascii?Q?FslfA4EBEEhvct51EbiLBA0RC6fJr+NO3TvEaDRwm2ZLhxLnhq2hf5RcekDJ?=
- =?us-ascii?Q?1tiIP/v9yFF1sdSq4J0GnlFwlSa3K0ol0UmMkb7CeDY5SJiWmwwHvUHby0fh?=
- =?us-ascii?Q?PPkrSZ80BAc3G0NgDVH5w8CzXe51BrGzP8hAjU6AtfSWEThtx36oyPJVyjOD?=
- =?us-ascii?Q?aLeFgZWo6bNVoScvWu2sFbd55a9XAgZnSoRfGgALJFgecx0UZQ8BL512EL6I?=
- =?us-ascii?Q?YDYRyPQXUZzxREGKD5OBwfpaUQcw8qsNA7l4NkT4HidO/mXfwOXyY4LnyTi0?=
- =?us-ascii?Q?sw37izAtz5SrIAMZslilZpP1i8g0LA2n1QDbARdTa876u7hFM3tD+AU3QtDd?=
- =?us-ascii?Q?b76x7Npo9z81wb6tURmnn7TmA57UL/PvpqesPykdMeWw45aJ26oqx5CSDNna?=
- =?us-ascii?Q?OZYGXc88GreEKXWDh07k2BuFsJfa6GXd4kyXQGlIBB6te+zx1AvN9VVPCBU3?=
- =?us-ascii?Q?ZmPcBp8/R9Ct8u0KMjaq6FsFHuWm15GO6hXGh9k6?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1eec2edd-8288-45ac-6a8b-08dcfc95c84c
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2024 05:59:02.2934
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: S/OpUtcnhdbxh26PWyoJz3jNwxbEJY6TlN9ordezIAywHWIDmRUY2JUUyEjgAInmtYPFKD47zTE0rLGrv+2xJQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8173
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAEf4BzbVqcCN1p8ydLN17LygK5R=gBYJV0A-cnycjtsUzrX34g@mail.gmail.com>
+X-CM-TRANSID:_____wDXPybOZShnwx48Ag--.2216S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW3GF4kWr4xGFyDWr4fKF13twb_yoW3KF4rpF
+	Z5Ga1UCF4DJayUZw1aq3yUWr4avw48G3WjkFZxKa4Yyr9IgrykWF18KF1a9F1fur4kCr40
+	vrW2gryjk3yUZaDanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07U7R67UUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiWwmNp2coXlurDQAAsU
 
-Both ENETC PF and VF drivers share enetc_setup_tc_mqprio() to configure
-MQPRIO. And enetc_setup_tc_mqprio() calls enetc_change_preemptible_tcs()
-to configure preemptible TCs. However, only PF is able to configure
-preemptible TCs. Because only PF has related registers, while VF does not
-have these registers. So for VF, its hw->port pointer is NULL. Therefore,
-VF will access an invalid pointer when accessing a non-existent register,
-which will cause a call trace issue. The simplified log is as follows.
+On Fri, Nov 01, 2024 at 12:25:51PM -0700, Andrii Nakryiko wrote:
+> On Thu, Oct 31, 2024 at 7:40 PM mrpre <mrpre@163.com> wrote:
+> >
+> > Why we need cpu affinity:
+> > Mainstream data planes, like Nginx and HAProxy, utilize CPU affinity
+> > by binding user processes to specific CPUs. This avoids interference
+> > between processes and prevents impact from other processes.
+> >
+> > Sockmap, as an optimization to accelerate such proxy programs,
+> > currently lacks the ability to specify CPU affinity. The current
+> > implementation of sockmap handling backlog is based on workqueue,
+> > which operates by calling 'schedule_delayed_work()'. It's current
+> > implementation prefers to schedule on the local CPU, i.e., the CPU
+> > that handled the packet under softirq.
+> >
+> > For extremely high traffic with large numbers of packets,
+> > 'sk_psock_backlog' becomes a large loop.
+> >
+> > For multi-threaded programs with only one map, we expect different
+> > sockets to run on different CPUs. It is important to note that this
+> > feature is not a general performance optimization. Instead, it
+> > provides users with the ability to bind to specific CPU, allowing
+> > them to enhance overall operating system utilization based on their
+> > own system environments.
+> >
+> > Implementation:
+> > 1.When updating the sockmap, support passing a CPU parameter and
+> > save it to the psock.
+> > 2.When scheduling psock, determine which CPU to run on using the
+> > psock's CPU information.
+> > 3.For thoes sockmap without CPU affinity, keep original logic by using
+> > 'schedule_delayed_work()'.
+> >
+> > Performance Testing:
+> > 'client <-> sockmap proxy <-> server'
+> >
+> > Using 'iperf3' tests, with the iperf server bound to CPU5 and the iperf
+> > client bound to CPU6, performance without using CPU affinity is
+> > around 34 Gbits/s, and CPU usage is concentrated on CPU5 and CPU6.
+> > '''
+> > [  5] local 127.0.0.1 port 57144 connected to 127.0.0.1 port 10000
+> > [ ID] Interval           Transfer     Bitrate
+> > [  5]   0.00-1.00   sec  3.95 GBytes  33.9 Gbits/sec
+> > [  5]   1.00-2.00   sec  3.95 GBytes  34.0 Gbits/sec
+> > ......
+> > '''
+> >
+> > With using CPU affinity, the performnce is close to direct connection
+> > (without any proxy).
+> > '''
+> > [  5] local 127.0.0.1 port 56518 connected to 127.0.0.1 port 10000
+> > [ ID] Interval           Transfer     Bitrate
+> > [  5]   0.00-1.00   sec  7.76 GBytes  66.6 Gbits/sec
+> > [  5]   1.00-2.00   sec  7.76 GBytes  66.7 Gbits/sec
+> > ......
+> > '''
+> >
+> > Signed-off-by: Jiayuan Chen <mrpre@163.com>
+> > ---
+> >  include/linux/bpf.h      |  3 ++-
+> >  include/linux/skmsg.h    |  8 ++++++++
+> >  include/uapi/linux/bpf.h |  4 ++++
+> >  kernel/bpf/syscall.c     | 23 +++++++++++++++++------
+> >  net/core/skmsg.c         | 11 +++++++----
+> >  net/core/sock_map.c      | 12 +++++++-----
+> >  6 files changed, 45 insertions(+), 16 deletions(-)
+> >
+> > diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> > index c3ba4d475174..a56028c389e7 100644
+> > --- a/include/linux/bpf.h
+> > +++ b/include/linux/bpf.h
+> > @@ -3080,7 +3080,8 @@ int bpf_prog_test_run_syscall(struct bpf_prog *prog,
+> >
+> >  int sock_map_get_from_fd(const union bpf_attr *attr, struct bpf_prog *prog);
+> >  int sock_map_prog_detach(const union bpf_attr *attr, enum bpf_prog_type ptype);
+> > -int sock_map_update_elem_sys(struct bpf_map *map, void *key, void *value, u64 flags);
+> > +int sock_map_update_elem_sys(struct bpf_map *map, void *key, void *value, u64 flags,
+> > +                            s32 target_cpu);
+> >  int sock_map_bpf_prog_query(const union bpf_attr *attr,
+> >                             union bpf_attr __user *uattr);
+> >  int sock_map_link_create(const union bpf_attr *attr, struct bpf_prog *prog);
+> > diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+> > index d9b03e0746e7..919425a92adf 100644
+> > --- a/include/linux/skmsg.h
+> > +++ b/include/linux/skmsg.h
+> > @@ -117,6 +117,7 @@ struct sk_psock {
+> >         struct delayed_work             work;
+> >         struct sock                     *sk_pair;
+> >         struct rcu_work                 rwork;
+> > +       s32                             target_cpu;
+> >  };
+> >
+> >  int sk_msg_alloc(struct sock *sk, struct sk_msg *msg, int len,
+> > @@ -514,6 +515,13 @@ static inline bool sk_psock_strp_enabled(struct sk_psock *psock)
+> >         return !!psock->saved_data_ready;
+> >  }
+> >
+> > +static inline int sk_psock_strp_get_cpu(struct sk_psock *psock)
+> > +{
+> > +       if (psock->target_cpu != -1)
+> > +               return psock->target_cpu;
+> > +       return WORK_CPU_UNBOUND;
+> > +}
+> > +
+> >  #if IS_ENABLED(CONFIG_NET_SOCK_MSG)
+> >
+> >  #define BPF_F_STRPARSER        (1UL << 1)
+> > diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> > index f28b6527e815..2019a87b5d4a 100644
+> > --- a/include/uapi/linux/bpf.h
+> > +++ b/include/uapi/linux/bpf.h
+> > @@ -1509,6 +1509,10 @@ union bpf_attr {
+> >                         __aligned_u64 next_key;
+> >                 };
+> >                 __u64           flags;
+> > +               union {
+> > +                       /* specify the CPU where the sockmap job run on */
+> > +                       __aligned_u64 target_cpu;
+> 
+> I have no opinion on the feature itself, I'll leave this to others.
+> But from UAPI perspective:
+> 
+> a) why is this a u64 and not, say, int?
+> b) maybe we should just specify this as flags and not have to update
+> all the UAPIs (including libbpf-side)? Just add a new
+> BPF_F_SOCKNMAP_TARGET_CPU flag or something, and specify that highest
+> 32 bits specify the CPU itself?
+> 
+> We have similar schema for some other helpers, so not *that* unusual.
+> 
+Thank you for your response. I think I should clarify my thoughts:
 
-root@ls1028ardb:~# tc qdisc add dev eno0vf0 parent root handle 100: \
-mqprio num_tc 4 map 0 0 1 1 2 2 3 3 queues 1@0 1@1 1@2 1@3 hw 1
-[  187.290775] Unable to handle kernel paging request at virtual address 0000000000001f00
-[  187.424831] pc : enetc_mm_commit_preemptible_tcs+0x1c4/0x400
-[  187.430518] lr : enetc_mm_commit_preemptible_tcs+0x30c/0x400
-[  187.511140] Call trace:
-[  187.513588]  enetc_mm_commit_preemptible_tcs+0x1c4/0x400
-[  187.518918]  enetc_setup_tc_mqprio+0x180/0x214
-[  187.523374]  enetc_vf_setup_tc+0x1c/0x30
-[  187.527306]  mqprio_enable_offload+0x144/0x178
-[  187.531766]  mqprio_init+0x3ec/0x668
-[  187.535351]  qdisc_create+0x15c/0x488
-[  187.539023]  tc_modify_qdisc+0x398/0x73c
-[  187.542958]  rtnetlink_rcv_msg+0x128/0x378
-[  187.547064]  netlink_rcv_skb+0x60/0x130
-[  187.550910]  rtnetlink_rcv+0x18/0x24
-[  187.554492]  netlink_unicast+0x300/0x36c
-[  187.558425]  netlink_sendmsg+0x1a8/0x420
-[  187.606759] ---[ end trace 0000000000000000 ]---
+My idea is to pass a user-space pointer, with the pointer being null
+to indicate that the user has not provided anything.For example, when
+users use the old interface 'bpf_map_update_elem' and pass in u64 of
+0, it means that the user hasn't specified a CPU. If a u32 or another
+type of value is passed in, when it is 0, it's ambiguous whether this
+indicates target CPU 0 or that the user hasn't provided a value. So
+my design involves passing a user-space pointer.
 
-In addition, some PFs also do not support configuring preemptible TCs,
-such as eno1 and eno3 on LS1028A. It won't crash like it does for VFs,
-but we should prevent these PFs from accessing these unimplemented
-registers.
+I also considered using the highest 32 bits of the flag as target_cpu, but
+this approach still encounters the ambiguity mentioned above. Of course
+for programs using libbpf, I can naturally init all the higher 32 bits
+default to 1 to indicate the user hasn't specified a CPU, but this is
+incompatible with programs not using libbpf. Another approach could be
+that a value of 1 for the higher 32 bits indicates CPU 0, and 2 indicates
+CPU 1..., but this seems odd and would require a helper to assist users
+in passing arguments.
 
-Fixes: 827145392a4a ("net: enetc: only commit preemptible TCs to hardware when MM TX is active")
-Signed-off-by: Wei Fang <wei.fang@nxp.com>
-Suggested-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
-v1 Link: https://lore.kernel.org/imx/20241030082117.1172634-1-wei.fang@nxp.com/
-v2 changes:
-1. Change the title and refine the commit message
-2. Only set ENETC_SI_F_QBU bit for PFs which support Qbu
-3. Prevent all SIs which not support Qbu from configuring preemptible
-TCs
----
- drivers/net/ethernet/freescale/enetc/enetc.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+There is another method, like providing an extra 'attr', to replace the
+passed 'target_cpu', which maintains the general nature of 
+'map_update_elem' interface, like:
+'''
++struct extra_bpf_attr {
++    u32 target_cpu;
++};
+struct { /* anonymous struct used by BPF_MAP_*_ELEM commands */
+    __u32   map_fd;
+    __aligned_u64 key;
+    union {
+        __aligned_u64 value;
+        __aligned_u64 next_key;
+    };
+    __u64   flags;
+    +struct extra_bpf_attr extra;
+};
 
-diff --git a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
-index c09370eab319..59d4ca52dc21 100644
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -28,6 +28,9 @@ EXPORT_SYMBOL_GPL(enetc_port_mac_wr);
- static void enetc_change_preemptible_tcs(struct enetc_ndev_priv *priv,
- 					 u8 preemptible_tcs)
- {
-+	if (!(priv->si->hw_features & ENETC_SI_F_QBU))
-+		return;
-+
- 	priv->preemptible_tcs = preemptible_tcs;
- 	enetc_mm_commit_preemptible_tcs(priv);
- }
-@@ -1752,7 +1755,12 @@ void enetc_get_si_caps(struct enetc_si *si)
- 	if (val & ENETC_SIPCAPR0_QBV)
- 		si->hw_features |= ENETC_SI_F_QBV;
- 
--	if (val & ENETC_SIPCAPR0_QBU)
-+	/* Although the SIPCAPR0 of VF indicates that VF supports Qbu,
-+	 * only PF can access the related registers to configure Qbu.
-+	 * Therefore, ENETC_SI_F_QBU is set only for PFs which support
-+	 * this feature.
-+	 */
-+	if (val & ENETC_SIPCAPR0_QBU && enetc_si_is_pf(si))
- 		si->hw_features |= ENETC_SI_F_QBU;
- 
- 	if (val & ENETC_SIPCAPR0_PSFP)
--- 
-2.34.1
+static int bpf_map_update_value(struct bpf_map *map, struct file *map_file,
+-                               void *key, void *value, __u64 flags)
++                               void *key, void *value, __u64 flags, struct bpf_attr_extra *extra);
+'''
+
+> > +               };
+> >         };
+> >
+> >         struct { /* struct used by BPF_MAP_*_BATCH commands */
+> > diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
+> > index 8254b2973157..95f719b9c3f3 100644
+> > --- a/kernel/bpf/syscall.c
+> > +++ b/kernel/bpf/syscall.c
+> > @@ -239,10 +239,9 @@ static int bpf_obj_pin_uptrs(struct btf_record *rec, void *obj)
+> >  }
+> >
+> >  static int bpf_map_update_value(struct bpf_map *map, struct file *map_file,
+> > -                               void *key, void *value, __u64 flags)
+> > +                               void *key, void *value, __u64 flags, s32 target_cpu)
+> 
+> yeah, this is what I'm talking about. Think how ridiculous it is for a
+> generic "BPF map update" operation to accept the "target_cpu"
+> parameter.
+> 
+> pw-bot: cr
+> 
+> >  {
+> >         int err;
+> > -
+> 
+> why? don't break whitespace formatting
+> 
+> >         /* Need to create a kthread, thus must support schedule */
+> >         if (bpf_map_is_offloaded(map)) {
+> >                 return bpf_map_offload_update_elem(map, key, value, flags);
+> > @@ -252,7 +251,7 @@ static int bpf_map_update_value(struct bpf_map *map, struct file *map_file,
+> >                 return map->ops->map_update_elem(map, key, value, flags);
+> >         } else if (map->map_type == BPF_MAP_TYPE_SOCKHASH ||
+> >                    map->map_type == BPF_MAP_TYPE_SOCKMAP) {
+> > -               return sock_map_update_elem_sys(map, key, value, flags);
+> > +               return sock_map_update_elem_sys(map, key, value, flags, target_cpu);
+> >         } else if (IS_FD_PROG_ARRAY(map)) {
+> >                 return bpf_fd_array_map_update_elem(map, map_file, key, value,
+> >                                                     flags);
+> 
+> [...]
 
 
