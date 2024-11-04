@@ -1,364 +1,181 @@
-Return-Path: <netdev+bounces-141595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA4829BBA9F
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:54:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 463FE9BBAE7
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:02:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DDB95B21FD4
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:54:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7A869B21C88
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:02:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1AAE51C4A1D;
-	Mon,  4 Nov 2024 16:54:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D93B1C4A25;
+	Mon,  4 Nov 2024 17:00:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="i2Xq/H1s"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="T+s4gFVn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f50.google.com (mail-wm1-f50.google.com [209.85.128.50])
+Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F9F1C4A0D
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 16:54:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0060F762EB
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 17:00:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730739248; cv=none; b=UbMAUi/cQX/TLoF9gEU5muSxSastD89PW31WKl6SfXhYAIJgbYQJbjoUfXfNHa6UGcA8TBl8Vxe+/XPxnYQg/V8K+wpbeY4M+Rcwio7m7eMF9+k4c3GdELHIXxSnB38gfXhNuazAfPnkx0aWcYzzx8qZSEcWX4jsLA04FxvWEok=
+	t=1730739623; cv=none; b=hqvBfiPLRUSypeEe2xjw1Kh4L39wnHDKZ5Kqf8OcJHgwte1fEIYfBrZzDKnFHH9VLuDqvxNn8pxV9jz0VflgnWqf9mIvjiuH6w9gG1D7dQ7hmY855B3NJFQUj8Rr9p0nTJQ2uYRESMhKgRgUybIkPNWROJWjctQKrGFLIkSLE3I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730739248; c=relaxed/simple;
-	bh=w5f6FWfvgAOLuQ20AaIaPIWUVrkMs2KNy1sgC+jDG8A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=fU6VBzsFlwdFyY9ufJLIgpT0JXYQhaUK7vs40Q5p1644W7cSs4fC91S+6pHzPLGuOhjZkJprJy2Ln2uKQ/ACY7X4ifXwXE630VogFSmN9aDVospPD3+vxyytw7c9RVFVG8WOrCMKhahnsgB9AvgZibPtaa6kwvxwa673rD77j88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=i2Xq/H1s; arc=none smtp.client-ip=209.85.128.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f50.google.com with SMTP id 5b1f17b1804b1-43168d9c6c9so36451915e9.3
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 08:54:05 -0800 (PST)
+	s=arc-20240116; t=1730739623; c=relaxed/simple;
+	bh=tLodSbLl9vhYX48+Oqa6/TPkkDflt1kVfZL8YvQFAtI=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=YUmN4wTMEWtV3Lmdhf/VpZruIieP6nNFyGP0MBbM0KGBYgfXP5jLhQ6dlQrM5IGs0bKNoI2JP3W2FULZ7Lb0Fh4U858M9hKiF5+8JqZkD69pylL4TEC/KKs9KR3nhpZRTuCGnbUs+Z0mivcMmjZT3M+aJWTvCxkzo1+E9dt2hoc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=T+s4gFVn; arc=none smtp.client-ip=209.85.215.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ea12e0dc7aso2982515a12.3
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 09:00:20 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730739244; x=1731344044; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CO6j/x/kWI8zBc/XwdjMsZ+ZtqceNlS5HOmV6KlCPzE=;
-        b=i2Xq/H1sp/WZ3KrJnC7FS6UJ9u76O1rpLEKbZZ0Aac38S/xPaCL/TIZO+m/4jC2vQP
-         bCNqmoFBc+geRNcKCqmv9VhK8DNPBuFZSHoMvz0Zlfg36MGVgX/AoSAtN2khAR11tSk1
-         raP8vUP8ay94VGxr0Jcyo0y42yz5BLpOrTGbxlyoZZ3VDqNK9IxlB5X1b6XrtcESBKEy
-         qhTDqNg+nAm2Wp6VwRh2Z/YEPQ7tRdMNtV6cqerrNmtE6PANmz/EUsN4lo1ALSPTI/+h
-         KZlLF8SdIFaccZOmIMFOezBN0AZoLnSJajmWkRsdCa884zkQA8BeN0eqklc6UdoYJn5G
-         /BzA==
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1730739620; x=1731344420; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=fz0f5g1eOQDpYJJNrZVGOLQo3m9qwjFOyaGQn7Ykj/s=;
+        b=T+s4gFVnn6mLRJBbd2C59xGifR6w8rvilf6KhL1JxjnLXOBvdehoZrW8gAGa7zhUbz
+         1Z3eYZ7UxHY6vTHo7puM2Xx52MIvRnpRo/AuqdVIFjpWmHcGQDIBjjBadVq746nGw9Vg
+         yrwiv3XbeTSBF2eB0TJDcBoVy2gP6Neyu4od/jupyTlJXGbqNagxX+BsXYOA3nj/1708
+         b4B14HsFn5lMv8m6tXLBJwN3Nrm5+1O9GD+Zn6LDwaMvsvAkfg056BATGvhON6maD1DH
+         VP1LN1c94671I7UIsc9tIpVBHYO9zocyJlSDIAJyYHxDdeTOFNkOdneeWaH8FWQ0MI3s
+         25Ng==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730739244; x=1731344044;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CO6j/x/kWI8zBc/XwdjMsZ+ZtqceNlS5HOmV6KlCPzE=;
-        b=N5Pf8j+1uROHGB8hMRUSrBh/xNMiIBo0y24d/jIPNKJ5u5iZZCsCzXG/S7IC6K0PlH
-         D/qm9PAy49Bb+Cvxf8hzPjQW8mbn7Tjh2HJbXkDW+b/M3hXWMeNjqV7EAAu8grXAYxoN
-         UAbtAGtZHnxXhAGDRL6FtcYKrAWGYGaUiYZauBmmgR+5EEDs/QCc+30f5QqYJG66Assi
-         PxdbF55L0RxgyQ1jQ2BelO33uVucrTgYLrM6rUWs8BYYZ+CfxPkXSV083uxZbgYuiKKY
-         G9NBWXvbaY5VP4X9Y2Ew7dBx91rH+H7PzUZ2+9IiJ3DRThovLnopBOx7KMufCq5DQRUK
-         ehVw==
-X-Gm-Message-State: AOJu0YwIfWqjq04/Z0FtIyxHWUiOeNhhcrVvFzQn8aBqh43IFfhEVXJD
-	AbZexFIDJz+oas2nEa9e7bvlXy285PFCij/kaA3+9zakw+sNKW+aHZPh8Q==
-X-Google-Smtp-Source: AGHT+IEinUugruS8XTGXev/x5dLn3A+H68cXuTSUX/Gz4JVs9e2xdHv0+2/Upo/okXcndnQFlLTZiw==
-X-Received: by 2002:a05:600c:5618:b0:42c:cd88:d0f4 with SMTP id 5b1f17b1804b1-431a01782c6mr276372605e9.22.1730739243965;
-        Mon, 04 Nov 2024 08:54:03 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:71af:4a7:35c:6d53])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d6852e4sm156878085e9.29.2024.11.04.08.54.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 08:54:03 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 2/2] netlink: specs: Add a spec for FIB rule management
-Date: Mon,  4 Nov 2024 16:53:52 +0000
-Message-ID: <20241104165352.19696-3-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241104165352.19696-1-donald.hunter@gmail.com>
-References: <20241104165352.19696-1-donald.hunter@gmail.com>
+        d=1e100.net; s=20230601; t=1730739620; x=1731344420;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=fz0f5g1eOQDpYJJNrZVGOLQo3m9qwjFOyaGQn7Ykj/s=;
+        b=lNf66ckyjO++rSVpYdZ0mSK+dR5cnLjoGD4UyKRRUcgDuhRfSG16B1wCrMs0YpP6wr
+         ZenEfuo3drBm4xtRHtaGi1ZTBn2bD5lH+bFs2YQ+Ez8xO/YVU6plAOxecMihJufzIa3e
+         Q8SrMNkfX/cX5Ueg2krM/zAfot0qmyN5DYvtdHjRodk8uFpuOu4Zjd7UnO1Cpjw3HMUw
+         goZpMFKJBr4Hr7q6mKh2LYAvp66dWnOZrxjqw1O28I95rLAWOQSfv3jt/oMtLq5LP6/E
+         u0ryE8GPhMj/O8GJedpEQBAwnaeRmzxKuE90qXejFxhnLfgvyKt7ngs3NrN3eJw0imdc
+         AiZA==
+X-Forwarded-Encrypted: i=1; AJvYcCXu/qQUV0lBybI00NQZ1Vi3J0z0jms8QeN+n+0R6l0lHOwSQCgq3cg7bU8Us3az83VkPqpbbC0=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwTvexFNo5QiHHf58uu6EU6kGSdHvMOTiLFFzky0QTuF8PVth3l
+	taF3/6+okRSPwTT+G2IEgn8jxHwmwsl2qwVXTgdgK9RuCUy5ZcsJFaVm2EjW/g==
+X-Google-Smtp-Source: AGHT+IHca3niBOOz/CPm1LphCtKewVfZaLj57m+SH0Zl1FXowM8i6S+a793tBCiid0uSUolkGS7NGg==
+X-Received: by 2002:a17:90b:54c4:b0:2e3:b168:70f5 with SMTP id 98e67ed59e1d1-2e94c2e472emr17880903a91.21.1730739619940;
+        Mon, 04 Nov 2024 09:00:19 -0800 (PST)
+Received: from [192.168.50.25] ([179.218.14.134])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e93dab27a8sm7910007a91.22.2024.11.04.09.00.17
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Nov 2024 09:00:19 -0800 (PST)
+Message-ID: <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
+Date: Mon, 4 Nov 2024 14:00:15 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
+ hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>, edumazet@google.com
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ alexandre.ferrieux@orange.com, netdev@vger.kernel.org
+References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
+Content-Language: en-US
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Add a YNL spec for FIB rules:
+On 04/11/2024 07:26, Alexandre Ferrieux wrote:
+> To generate hnode handles (in gen_new_htid()), u32 uses IDR and
+> encodes the returned small integer into a structured 32-bit
+> word. Unfortunately, at disposal time, the needed decoding
+> is not done. As a result, idr_remove() fails, and the IDR
+> fills up. Since its size is 2048, the following script ends up
+> with "Filter already exists":
+> 
+>    tc filter add dev myve $FILTER1
+>    tc filter add dev myve $FILTER2
+>    for i in {1..2048}
+>    do
+>      echo $i
+>      tc filter del dev myve $FILTER2
+>      tc filter add dev myve $FILTER2
+>    done
+> 
+> This patch adds the missing decoding logic for handles that
+> deserve it.
+> 
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
 
-./tools/net/ynl/cli.py \
-    --spec Documentation/netlink/specs/rt_rule.yaml \
-    --dump getrule --json '{"family": 2}'
+SoB does not match sender, probably missing 'From:' tag
+Also, this seems to deserve a 'Fixes:' tag as well
 
-[{'action': 'to-tbl',
-  'dst-len': 0,
-  'family': 2,
-  'flags': 0,
-  'protocol': 2,
-  'src-len': 0,
-  'suppress-prefixlen': '0xffffffff',
-  'table': 255,
-  'tos': 0},
-  ... ]
+> ---
+>   net/sched/cls_u32.c | 18 ++++++++++++++----
+>   1 file changed, 14 insertions(+), 4 deletions(-)
+> 
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index 9412d88a99bc..54b5fca623da 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -41,6 +41,16 @@
+>   #include <linux/idr.h>
+>   #include <net/tc_wrapper.h>
+>   
+> +static inline unsigned int handle2id(unsigned int h)
+> +{
+> +	return ((h & 0x80000000) ? ((h >> 20) & 0x7FF) : h);
+> +}
+> +
+> +static inline unsigned int id2handle(unsigned int id)
+> +{
+> +	return (id | 0x800U) << 20;
+> +}
+> +
 
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/specs/rt_rule.yaml | 240 +++++++++++++++++++++++
- 1 file changed, 240 insertions(+)
- create mode 100644 Documentation/netlink/specs/rt_rule.yaml
+'static inline' is discouraged in .c files
 
-diff --git a/Documentation/netlink/specs/rt_rule.yaml b/Documentation/netlink/specs/rt_rule.yaml
-new file mode 100644
-index 000000000000..736bcdb25738
---- /dev/null
-+++ b/Documentation/netlink/specs/rt_rule.yaml
-@@ -0,0 +1,240 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: rt-rule
-+protocol: netlink-raw
-+protonum: 0
-+
-+doc:
-+  FIB rule management over rtnetlink.
-+
-+definitions:
-+  -
-+    name: rtgenmsg
-+    type: struct
-+    members:
-+      -
-+        name: family
-+        type: u8
-+      -
-+        name: pad
-+        type: pad
-+        len: 3
-+  -
-+    name: fib-rule-hdr
-+    type: struct
-+    members:
-+      -
-+        name: family
-+        type: u8
-+      -
-+        name: dst-len
-+        type: u8
-+      -
-+        name: src-len
-+        type: u8
-+      -
-+        name: tos
-+        type: u8
-+      -
-+        name: table
-+        type: u8
-+      -
-+        name: res1
-+        type: pad
-+        len: 1
-+      -
-+        name: res2
-+        type: pad
-+        len: 1
-+      -
-+        name: action
-+        type: u8
-+        enum: fr-act
-+      -
-+        name: flags
-+        type: u32
-+  -
-+    name: fr-act
-+    type: enum
-+    entries:
-+      - unspec
-+      - to-tbl
-+      - goto
-+      - nop
-+      - res3
-+      - res4
-+      - blackhole
-+      - unreachable
-+      - prohibit
-+  -
-+    name: fib-rule-port-range
-+    type: struct
-+    members:
-+      -
-+        name: start
-+        type: u16
-+      -
-+        name: end
-+        type: u16
-+  -
-+    name: fib-rule-uid-range
-+    type: struct
-+    members:
-+      -
-+        name: start
-+        type: u16
-+      -
-+        name: end
-+        type: u16
-+
-+attribute-sets:
-+  -
-+    name: fib-rule-attrs
-+    attributes:
-+      -
-+        name: dst
-+        type: u32
-+      -
-+        name: src
-+        type: u32
-+      -
-+        name: iifname
-+        type: string
-+      -
-+        name: goto
-+        type: u32
-+      -
-+        name: unused2
-+        type: pad
-+      -
-+        name: priority
-+        type: u32
-+      -
-+        name: unused3
-+        type: pad
-+      -
-+        name: unused4
-+        type: pad
-+      -
-+        name: unused5
-+        type: pad
-+      -
-+        name: fwmark
-+        type: u32
-+        display-hint: hex
-+      -
-+        name: flow
-+        type: u32
-+      -
-+        name: tun-id
-+        type: u64
-+      -
-+        name: suppress-ifgroup
-+        type: u32
-+      -
-+        name: suppress-prefixlen
-+        type: u32
-+        display-hint: hex
-+      -
-+        name: table
-+        type: u32
-+      -
-+        name: fwmask
-+        type: u32
-+        display-hint: hex
-+      -
-+        name: oifname
-+        type: string
-+      -
-+        name: pad
-+        type: pad
-+      -
-+        name: l3mdev
-+        type: u8
-+      -
-+        name: uid-range
-+        type: binary
-+        struct: fib-rule-uid-range
-+      -
-+        name: protocol
-+        type: u8
-+      -
-+        name: ip-proto
-+        type: u8
-+      -
-+        name: sport-range
-+        type: binary
-+        struct: fib-rule-port-range
-+      -
-+        name: dport-range
-+        type: binary
-+        struct: fib-rule-port-range
-+
-+operations:
-+  enum-model: directional
-+  fixed-header: fib-rule-hdr
-+  list:
-+    -
-+      name: newrule
-+      doc: Add new FIB rule
-+      attribute-set: fib-rule-attrs
-+      do:
-+        request:
-+          value: 32
-+          attributes: &fib-rule-all
-+            - iifname
-+            - oifname
-+            - priority
-+            - fwmark
-+            - flow
-+            - tun-id
-+            - fwmask
-+            - table
-+            - suppress-prefixlen
-+            - suppress-ifgroup
-+            - goto
-+            - l3mdev
-+            - uid-range
-+            - protocol
-+            - ip-proto
-+            - sport-range
-+            - dport-range
-+    -
-+      name: newrule-ntf
-+      doc: Notify a rule creation
-+      value: 32
-+      notify: newrule
-+    -
-+      name: delrule
-+      doc: Remove an existing FIB rule
-+      attribute-set: fib-rule-attrs
-+      do:
-+        request:
-+          value: 33
-+          attributes: *fib-rule-all
-+    -
-+      name: delrule-ntf
-+      doc: Notify a rule deletion
-+      value: 33
-+      notify: delrule
-+    -
-+      name: getrule
-+      doc: Dump all FIB rules
-+      attribute-set: fib-rule-attrs
-+      dump:
-+        request:
-+          value: 34
-+          attributes:
-+            - nsid
-+        reply:
-+          value: 32
-+          attributes: *fib-rule-all
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: rtnlgrp-ipv4-rule
-+      value: 8
-+    -
-+      name: rtnlgrp-ipv6-rule
-+      value: 19
--- 
-2.47.0
+>   struct tc_u_knode {
+>   	struct tc_u_knode __rcu	*next;
+>   	u32			handle;
+> @@ -310,7 +320,7 @@ static u32 gen_new_htid(struct tc_u_common *tp_c, struct tc_u_hnode *ptr)
+>   	int id = idr_alloc_cyclic(&tp_c->handle_idr, ptr, 1, 0x7FF, GFP_KERNEL);
+>   	if (id < 0)
+>   		return 0;
+> -	return (id | 0x800U) << 20;
+> +	return id2handle(id);
+>   }
+>   
+>   static struct hlist_head *tc_u_common_hash;
+> @@ -360,7 +370,7 @@ static int u32_init(struct tcf_proto *tp)
+>   		return -ENOBUFS;
+>   
+>   	refcount_set(&root_ht->refcnt, 1);
+> -	root_ht->handle = tp_c ? gen_new_htid(tp_c, root_ht) : 0x80000000;
+> +	root_ht->handle = tp_c ? gen_new_htid(tp_c, root_ht) : id2handle(0);
+>   	root_ht->prio = tp->prio;
+>   	root_ht->is_root = true;
+>   	idr_init(&root_ht->handle_idr);
+> @@ -612,7 +622,7 @@ static int u32_destroy_hnode(struct tcf_proto *tp, struct tc_u_hnode *ht,
+>   		if (phn == ht) {
+>   			u32_clear_hw_hnode(tp, ht, extack);
+>   			idr_destroy(&ht->handle_idr);
+> -			idr_remove(&tp_c->handle_idr, ht->handle);
+> +			idr_remove(&tp_c->handle_idr, handle2id(ht->handle));
+>   			RCU_INIT_POINTER(*hn, ht->next);
+>   			kfree_rcu(ht, rcu);
+>   			return 0;
+> @@ -989,7 +999,7 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
+>   
+>   		err = u32_replace_hw_hnode(tp, ht, userflags, extack);
+>   		if (err) {
+> -			idr_remove(&tp_c->handle_idr, handle);
+> +			idr_remove(&tp_c->handle_idr, handle2id(handle));
+>   			kfree(ht);
+>   			return err;
+>   		}
 
 
