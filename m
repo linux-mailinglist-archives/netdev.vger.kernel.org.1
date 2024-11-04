@@ -1,133 +1,242 @@
-Return-Path: <netdev+bounces-141495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8CAD9BB232
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:04:28 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F31CC9BB227
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:03:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 258D11C21A9C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:04:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1C752811F0
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:03:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 795DC1D8E18;
-	Mon,  4 Nov 2024 10:53:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA1DB1D63F3;
+	Mon,  4 Nov 2024 10:53:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lis8H2+7"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Lx6T7RP6"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4ECEA1D90C8;
-	Mon,  4 Nov 2024 10:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730717639; cv=none; b=RGk2xJYTu7kwKuJwTtFNfCW1bxG2LFnC6Jf5fTGu0DnEdOAQqGFGwr6A6UQkzUePRuQA5VTSIAWoG95ox2pkXCjCICEKwzhUeiKaTFzNBw2tzVfgVlth1id0qzdeYape9lqnjF8dcZziNjeAg3Vwq5msG0rAI4JVVwdjOGxh/PU=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730717639; c=relaxed/simple;
-	bh=QpprjJzz6r7qsmzq8ofXoBAdYQ2nRpHb3oWF4+76lNc=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=i8VKxsLEHFhOzkKx6kgClgI7f7RcG6a3VqZpvLFEZHA4mFpCyu3g1ulhUQ9M1UmZqq0pp5VDRp8+ozbAGuZRyapiRCCC7CP6y6Ppm1KwRwPhUjzL5RrFvw8d3+0C336VXcq1+s8SU/r0+3xQ6NPe2SBRZRmQWQBKg+6ljqIxZZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lis8H2+7; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DD34C4CED4;
-	Mon,  4 Nov 2024 10:53:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730717638;
-	bh=QpprjJzz6r7qsmzq8ofXoBAdYQ2nRpHb3oWF4+76lNc=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=lis8H2+72ju0YSFT3ZJ218LQbrfD3ujYuahhy02MMD/n9GfSigH0l5AerR9Q0ofdH
-	 U9CBmmYYLbInMITRVvFqdmBTG/B5AJw8xOVDPrmaI3VIcYfRmmeaUbfFnOUkeguBzJ
-	 FZqKzWh5QhAdzdimxlMkaJ+kTKrOJfLC1sc92IjPhEnhCfOvE4T2gpjGLd3D4GRUqL
-	 ajXGU71cAEhT+ycsZpN3aoDlkt972l+pZhtLWAKNuGakUT7t7S5r7QBH1QP4OQ1EWC
-	 yydmK8+jKsMyIGsTSdmhmwdS2g1TEe/ea4mcV3OgIvw5pniStqfKVVAJFLJRadjubE
-	 4r9EyAuDSOtgw==
-From: Sasha Levin <sashal@kernel.org>
-To: linux-kernel@vger.kernel.org,
-	stable@vger.kernel.org
-Cc: =?UTF-8?q?Beno=C3=AEt=20Monin?= <benoit.monin@gmx.fr>,
-	Simon Horman <horms@kernel.org>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Sasha Levin <sashal@kernel.org>,
-	bjorn@mork.no,
-	andrew+netdev@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	netdev@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 11/11] net: usb: qmi_wwan: add Quectel RG650V
-Date: Mon,  4 Nov 2024 05:53:09 -0500
-Message-ID: <20241104105324.97393-11-sashal@kernel.org>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241104105324.97393-1-sashal@kernel.org>
-References: <20241104105324.97393-1-sashal@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0D18F1D63CC
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 10:53:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.12
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730717628; cv=fail; b=QxjHHLcG3dkh5iDdYOIvJOQPXf9EI88OAR04sS9dAMsshIsOtBa6B6e3CyOxp0+EedDKm/NWLMw3o9+LNNDLkcaykPrDaquyatXAfogP2Xrsn6wODhfWjhRTCt5QXE4/eufQ2aW/O47G0vYIqSK2Hytk1A/98iq5HQCz8Vpnx5E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730717628; c=relaxed/simple;
+	bh=fGCJ4t8+FwOh1j03KE1mYyEE0htNJxx3J0LZuI2jk5M=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=Kqgc1TAFKzOfp2sjjLMEdynBbkyl+HHAazbLuz/UCO2IMF4P+NrgmUvRvzzBToURDfEgU2QTy/kVsRmd1ks1G9p0RxIIyH0JA18ZgmJpiyUlS9cg3JaPIJDP8aeHn7xkZIXQGEt2gTV2iFNRwzWI4aT5mFPTYNa36XHgQvDMN+o=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Lx6T7RP6; arc=fail smtp.client-ip=198.175.65.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730717627; x=1762253627;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=fGCJ4t8+FwOh1j03KE1mYyEE0htNJxx3J0LZuI2jk5M=;
+  b=Lx6T7RP65rMuVvNFZpSPltVXLiPiOrfCXsaRo8RHraOInFh5qMcDNijr
+   3t7qmyTOHVXeK6xcSu88WVw1N76sc9FtrzG26/TVM/8SLE/NIKHb4aoCG
+   eoYvIqj+VMl3Kp9QT9DT5dJNLcaRa4bw0w+t2fzuU3L22RLb9VVfTU7bM
+   kcezCZjZIhdQwc6Rl6wTwP/P4Ewal6ut64WJT7vlSSD2vyzQx8GWD0IYW
+   S+kNPzYuEbOE7DPZUqPNdUwMf1nRh4/MTjUhUJK5b6Dr5H/rcW1hKtGG6
+   TLxSNy98URvgr/bAC2c7ohgAUOALUzV7Fwo5zSxvag6+8t/kwRsvIjkrH
+   Q==;
+X-CSE-ConnectionGUID: p8z3qhaySlem0jG5E3lDbw==
+X-CSE-MsgGUID: bRrJJcKVT86sZYMp7mHjpw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11245"; a="41799681"
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="41799681"
+Received: from orviesa003.jf.intel.com ([10.64.159.143])
+  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 02:53:46 -0800
+X-CSE-ConnectionGUID: Qy6O53AdTZuxRlCeYxCBSw==
+X-CSE-MsgGUID: JoujOm4MR1iWcaztyZeUTg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="88386699"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa003.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 02:53:46 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 4 Nov 2024 02:53:46 -0800
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 02:53:46 -0800
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.169)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 4 Nov 2024 02:53:45 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=Ho4AzPwqCa10q7Z7gkqf0AO4YJ2k7nHJRjARF6Fs6dAn+SBg16p57nKISQop4bJ0nbgTEgnjC5yYsBvMsRIcEX72UK6E/Cyb+wQ/meR3Rxnf04QSy73pnAfagt6EpGX4kUrObiryUAr6LaeuPQxqbMYOs/1peMPKCOd0YABMUyIWttKvfK1ROb8JA/DMCS9N1DQ5P9iVNwiDT9QUAYCvUonU0/IxWtzn8Jt2MxSLT6rKY+3OdDu1/o0Uk1wS8XlLrAV7lBbwXW6f1CiXzVxXifbkEtp7tVO/3CQXYiWW2elvFcUH6XJzGaVHV9TPbrH4uAFUKZHkh0Gvpl1nGCR3NA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=fGCJ4t8+FwOh1j03KE1mYyEE0htNJxx3J0LZuI2jk5M=;
+ b=b/JbMcoOABlDABLhrvSbs1KJrSe/uhUzDu4PsnrC7+95F59TLsehD0jDAur4KwfdM5kFyNq1d0EPXK04AVFLDSXV1p+lSsAzc9uj6b/IO98Qg/mdDkqB/L0ITwbQ6N5p/hWcdeZBhkSiKGC/H+ECHW6LL4OjHlLNTcQw5CGO1mCdbHCO5X/nDSuSRdkIdlRn1UudUrUp/JObgvs+K/3+pirUPkv15BzmbPKb6BupBVVDZgtewP+A7gpd6vrXhJ3X0wcLv9u1W6510L2MTuOzy/rZ9wV9vv2CyTpkkpVvFxaKgGbo4NuHB7yCDeazlwhtqCyUWo1g4offnBUKbxZPDA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
+ by IA0PR11MB7791.namprd11.prod.outlook.com (2603:10b6:208:401::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
+ 2024 10:53:43 +0000
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::b615:4475:b6d7:8bc5]) by SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::b615:4475:b6d7:8bc5%5]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
+ 10:53:36 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v12 04/14] iavf: add support
+ for negotiating flexible RXDID format
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v12 04/14] iavf: add support
+ for negotiating flexible RXDID format
+Thread-Index: AQHbJEUby3tMi8aWUUCIWt67y7Fmb7KnBvOw
+Date: Mon, 4 Nov 2024 10:53:36 +0000
+Message-ID: <SJ0PR11MB58659F3730355FCAC5C8DBBA8F512@SJ0PR11MB5865.namprd11.prod.outlook.com>
+References: <20241022114121.61284-1-mateusz.polchlopek@intel.com>
+ <20241022114121.61284-5-mateusz.polchlopek@intel.com>
+In-Reply-To: <20241022114121.61284-5-mateusz.polchlopek@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|IA0PR11MB7791:EE_
+x-ms-office365-filtering-correlation-id: e3ed0b94-d6fb-4be5-4cdb-08dcfcbeef52
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|376014|366016|1800799024|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?sA0RncJm9ya48dX2lUF0jXCP5wCu8am/l+SoOsQmUzqELXH0Sjt2y01esOlO?=
+ =?us-ascii?Q?Ef1pTHrCIU/Rqn7WzfwKiUDaTCEgXGQaqrHaZhqfgEjKtABslU49cnoS/1GY?=
+ =?us-ascii?Q?3zAO7rnLYWZ6P0nn6FiR38mq3uwaeWzgax0jIuZmqH2J2oVuipYJ2Xr0uJ0P?=
+ =?us-ascii?Q?ySn38DtFSldjddbVqxhUqyUqwe7yMdOmU2osIBaeaR2l9YkHhWk+Z9spjtsd?=
+ =?us-ascii?Q?7qEYso29z2HlgaKpVBO8rHbJXKqc64vkLzeHnonLZC/jvOZtf/C3XiPpsk+3?=
+ =?us-ascii?Q?/EOmdzeZ2y2YnhDnUV3G/zvBR/Ds7w63HYjF0tfPOHzltf3IliAY5kN6CpEo?=
+ =?us-ascii?Q?FXjco9NSP+d4A8A1iIjLYzYSbbtm/hgAWe2j6HFlUQO0/Jc4tLu9Tfo8q6zf?=
+ =?us-ascii?Q?GW999R3KCnj/bQbrldsoZpZNZH5YLgxx+anVc9KK2PcnjuScZXY8cWDnnrA3?=
+ =?us-ascii?Q?oID14GEVVt5P6w1TManIypYZTTl29ERkC3tYlu3lbUlU4idmOCJQjnuiyHNV?=
+ =?us-ascii?Q?3JrxiMf11SKgaxMr0IjpKBHS/jh43alvR3LEHQfbAvjKH/nzTK6YKcRsMoCf?=
+ =?us-ascii?Q?vebgvKqo8PWLjZTPd8OQT4LywlEyUZGtTbB+vFCkZMJvAGwvWhsbJMHP5Ea5?=
+ =?us-ascii?Q?uKgdWcONCb3Du1Uk/C/RUUOz32+nctlLMYPCkAdh4zT+hOeL3QBlpmh8/XPY?=
+ =?us-ascii?Q?Luj+sfaMBypvT7Et2ZlhSdopNkb8snse/BUN25KsCCJhHF5cA8s3zrMT5eOA?=
+ =?us-ascii?Q?3/kWz2/RZFe/s553u/9NyW8NICO1io0C/GOtCbUh04pGDiTfenn9N/9KtcuW?=
+ =?us-ascii?Q?H1KF3/DVnBPEJ/AKM+qBfSeZ96Jfjwfyzu1wTwHYLnFL016ft71HYxJxlJ0k?=
+ =?us-ascii?Q?X9f2/VMWuNf03yMlqLsmSyNIDFIrldjvDwj33W6pleKeoOem3m6N4RXOzM6Z?=
+ =?us-ascii?Q?YJcDkQ/FG5o54xzL8iQhavmcZy+qBjqi18uRBM8f4xd3LBn/suQh/O0eou/a?=
+ =?us-ascii?Q?b7mu96sBT012LOqQXx5VLzmmwcRBoiL3vDTZZLpUGUoHoMvIh/J1o2t2wab7?=
+ =?us-ascii?Q?pXzFQz3gAjhCExsFk9SLiHBqaY0Chl2ugLeYo5kHFeowueWnWdNucoxZvK+r?=
+ =?us-ascii?Q?3mFVTkZVOc9XXwp0pyDSKDdgvcW+NgX/xDdFyTwOARoaXQ0r4qoIHivStgtr?=
+ =?us-ascii?Q?hYvirYmAaZGE99gaYdTpHNDUKZyF2xIY9vck+VvkuDSrBLyOBVSWhEJ1AdPx?=
+ =?us-ascii?Q?3Wte8Nm0372nblaSw59Nv0vCQ3PWXFkiJt5jNWIz4koAcx2sAKl1TjX/bhjd?=
+ =?us-ascii?Q?bJ4+Glwvj5rG2qvJFo4fYevEZQM1WAcFtrM0VXQehi2NrguqYrPh9trO9ejQ?=
+ =?us-ascii?Q?shWE6w0=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(366016)(1800799024)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?3JTzwsySIj9ij7F0br/t8Eyhs0lI+shfN/hDvrvqUNwz7nfaI+N5LUF8Sc+7?=
+ =?us-ascii?Q?YlmJvNeGl8/rAN2ErAyySzjyJpNf2rbabJjyxROgk+CYnoV32g/GxnEaqgjp?=
+ =?us-ascii?Q?OKGhKa+jATYwRHkm3do/0ytpUmWKNXUVrqP3V+mjDO8pc/zyplHxxVBpnGP4?=
+ =?us-ascii?Q?E4Q4WMfk9KRO/UMeZjLC2hr/L+s5L2o3Y5C9ufphfhZOI4cFYX10Bm4RhO7M?=
+ =?us-ascii?Q?aFFXa/GzJLWKF1i4UB6YBQLuKKPrbqFCl9b70PH4ZKr/T92kYPuEkLPqQc7M?=
+ =?us-ascii?Q?etTdIAecqBaYllL5dKfGdIH/65sXBF5OteXghfWr9WeiKqmGoBElJL/hF65D?=
+ =?us-ascii?Q?WkaVCYxsAw26WO/SB55TRNDh2dN4hGIIl310ScqheGQcs15Xc3sqB8Ci6OVk?=
+ =?us-ascii?Q?Iorq/ahRf/RQKEEnHKLZR5S7m3DUINBgqWYsPQry5SJ/SpIpbWzPd6YiKA7B?=
+ =?us-ascii?Q?1/Zxe1+lvOD6KSCcJVUj6b/85hvE9lgg55bvM+4wGJ+Rx7AlPSjACNq2n3Cu?=
+ =?us-ascii?Q?q/TuB8Obyb0P/8Y3f9WxBYocwd+ZeXxjKdWPRWDyEn1xFDI5+Rlp3RCcvKRJ?=
+ =?us-ascii?Q?nP/MegYn0WBbDQxkLI3GOlzZZXu6ZMOQqMRxhaYp3mKJ8NnxMtz6Pmty6mtG?=
+ =?us-ascii?Q?8fYX3/zPNVsmKsZxYPOrHHiVuLhq7Cn0jRGtnpMIbFFQPo6sm0i3BJFM+b/4?=
+ =?us-ascii?Q?pMnxIUhVK0ZGr+QyPyeJibdDo3LB6avKWCiwb9gknqpmU8dHBLfX/hA7aQx3?=
+ =?us-ascii?Q?UTMbKhjtj2vVdVc7Z6x8kzVTKYcgwCzDgyONcXhIxolXiGvFMx0zX9Y6mJEx?=
+ =?us-ascii?Q?Z5EZs0PXB2D9y995MZDaZYCNRzM1RIms2/n4iQrenWHI4ifb11EyOSSEoLaU?=
+ =?us-ascii?Q?qy+c6SwYjBTwX+JDF0tPnq9KDmqWCoxIvVc/+zruSHeWX2GYUCMpxIu9cU+D?=
+ =?us-ascii?Q?F++v8R+2NFO7RBty2tGElj1+yZdJ32yQoE9r5XDTNnneTsBJ/KlQTffcUvjE?=
+ =?us-ascii?Q?hydhRUY16ATjPaVrWsIBLBlsFKKoGKsYX8OtT+7Z+/ydMe/IFzT8PWPRy9zQ?=
+ =?us-ascii?Q?PLNuWHsrGVrjy6voCJGtXfBUfJtqCSBccQiFu/MMmchhmku969W0QQwHHG0x?=
+ =?us-ascii?Q?O1daxS0cPinDv6Ga+fI/BaSk+xncugEVScdrJ+6o+B/LMhqgUDsGMfc21iTL?=
+ =?us-ascii?Q?ZJy2reJt/LsjZUEVSRZwFnAayNqYl9lKa6hbyGT2EfUWRzwfty0z83HgD2NJ?=
+ =?us-ascii?Q?SlnAbO8qpid1NrVtQKWfRLVETpK0fZfbujdWzyarTq5Gju4GVleQFspnpTqC?=
+ =?us-ascii?Q?VG4taUWVbFybJIZiyGjEtBOqVqK6qz6jrHuJ4yLrJ9PUHkq6jEaL/bUM3FBt?=
+ =?us-ascii?Q?gUkczAh6vL6ROOxZLYBRYYnMyJFjTnt0qzkCotC8axkeHr5ZX+2nnSS0YsFR?=
+ =?us-ascii?Q?O4OofiJcCD95EQXXcWKaNh2Wjl2v0/iU+bR+uYs23DZttdvnA7DVlKmOmN5o?=
+ =?us-ascii?Q?Ss19cbCR94gLeyatHwaG+0xqAoWHbHov8QiDErvg6he9FGI8XgatoFazRNkP?=
+ =?us-ascii?Q?aypuP6pi0/pGzrFeSl+qpPPCQ8ibJd0pYqyF559AmfYGu79186CBTFa92pHk?=
+ =?us-ascii?Q?nw=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-X-stable: review
-X-Patchwork-Hint: Ignore
-X-stable-base: Linux 6.1.115
-Content-Transfer-Encoding: 8bit
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e3ed0b94-d6fb-4be5-4cdb-08dcfcbeef52
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2024 10:53:36.8434
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: N9sC2j9Baqh8adNx+0FTbWmurFTiOpY1QUXhVA+aM/CN0Yh+eWLKMsbUssjA/N8D49RrpxMXPW7TuVRBpn1KTEikCuDwvsxCB7fwk1+x6I0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR11MB7791
+X-OriginatorOrg: intel.com
 
-From: Benoît Monin <benoit.monin@gmx.fr>
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Mateusz Polchlopek
+> Sent: Tuesday, October 22, 2024 1:41 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; D=
+rewek,
+> Wojciech <wojciech.drewek@intel.com>; Simon Horman <horms@kernel.org>;
+> Polchlopek, Mateusz <mateusz.polchlopek@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v12 04/14] iavf: add support f=
+or
+> negotiating flexible RXDID format
+>=20
+> From: Jacob Keller <jacob.e.keller@intel.com>
+>=20
+> Enable support for VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC, to enable the VF
+> driver the ability to determine what Rx descriptor formats are available.=
+ This
+> requires sending an additional message during initialization and reset, t=
+he
+> VIRTCHNL_OP_GET_SUPPORTED_RXDIDS. This operation requests the supported
+> Rx descriptor IDs available from the PF.
+>=20
+> This is treated the same way that VLAN V2 capabilities are handled. Add a=
+ new
+> set of extended capability flags, used to process send and receipt of the
+> VIRTCHNL_OP_GET_SUPPORTED_RXDIDS message.
+>=20
+> This ensures we finish negotiating for the supported descriptor formats p=
+rior to
+> beginning configuration of receive queues.
+>=20
+> This change stores the supported format bitmap into the iavf_adapter stru=
+cture.
+> Additionally, if VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC is enabled by the PF, w=
+e
+> need to make sure that the Rx queue configuration specifies the format.
+>=20
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
 
-[ Upstream commit 6b3f18a76be6bbd237c7594cf0bf2912b68084fe ]
 
-Add support for Quectel RG650V which is based on Qualcomm SDX65 chip.
-The composition is DIAG / NMEA / AT / AT / QMI.
-
-T: Bus=02 Lev=01 Prnt=01 Port=03 Cnt=01 Dev#=  4 Spd=5000 MxCh= 0
-D: Ver= 3.20 Cls=00(>ifc ) Sub=00 Prot=00 MxPS= 9 #Cfgs=  1
-P: Vendor=2c7c ProdID=0122 Rev=05.15
-S: Manufacturer=Quectel
-S: Product=RG650V-EU
-S: SerialNumber=xxxxxxx
-C: #Ifs= 5 Cfg#= 1 Atr=a0 MxPwr=896mA
-I: If#= 0 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=ff Prot=30 Driver=option
-E: Ad=01(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=81(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-I: If#= 1 Alt= 0 #EPs= 2 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
-E: Ad=02(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=82(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-I: If#= 2 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
-E: Ad=03(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=83(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=84(I) Atr=03(Int.) MxPS=  10 Ivl=9ms
-I: If#= 3 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=00 Prot=00 Driver=option
-E: Ad=04(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=85(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=86(I) Atr=03(Int.) MxPS=  10 Ivl=9ms
-I: If#= 4 Alt= 0 #EPs= 3 Cls=ff(vend.) Sub=ff Prot=ff Driver=qmi_wwan
-E: Ad=05(O) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=87(I) Atr=02(Bulk) MxPS=1024 Ivl=0ms
-E: Ad=88(I) Atr=03(Int.) MxPS=   8 Ivl=9ms
-
-Signed-off-by: Benoît Monin <benoit.monin@gmx.fr>
-Reviewed-by: Simon Horman <horms@kernel.org>
-Link: https://patch.msgid.link/20241024151113.53203-1-benoit.monin@gmx.fr
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-Signed-off-by: Sasha Levin <sashal@kernel.org>
----
- drivers/net/usb/qmi_wwan.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/usb/qmi_wwan.c b/drivers/net/usb/qmi_wwan.c
-index 72a2c41b9dbf8..c12320e43da31 100644
---- a/drivers/net/usb/qmi_wwan.c
-+++ b/drivers/net/usb/qmi_wwan.c
-@@ -1083,6 +1083,7 @@ static const struct usb_device_id products[] = {
- 		USB_DEVICE_AND_INTERFACE_INFO(0x03f0, 0x581d, USB_CLASS_VENDOR_SPEC, 1, 7),
- 		.driver_info = (unsigned long)&qmi_wwan_info,
- 	},
-+	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0122)},	/* Quectel RG650V */
- 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0125)},	/* Quectel EC25, EC20 R2.0  Mini PCIe */
- 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0306)},	/* Quectel EP06/EG06/EM06 */
- 	{QMI_MATCH_FF_FF_FF(0x2c7c, 0x0512)},	/* Quectel EG12/EM12 */
--- 
-2.43.0
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
 
