@@ -1,250 +1,274 @@
-Return-Path: <netdev+bounces-141581-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59B059BB850
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:56:34 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 76A4E9BB8B5
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:15:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E7D28315C
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 14:56:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D57E282022
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F70C1B78F3;
-	Mon,  4 Nov 2024 14:56:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 291031BD03B;
+	Mon,  4 Nov 2024 15:15:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M+Mij7EJ"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="MAHwzciq";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="RpgEJMuh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.21])
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2706D469D
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 14:56:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.21
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730732190; cv=fail; b=VH1CA0lFjjixj6sGWdoTXDBy9TCcjpoc/WI+2KJ+eEV+nz3q4r4MeZS+x9GxlncjdhylzxXZX7PzF/kcz9XQqwUmlaloJECSgtxNoqn1cfzdFsrJbbn+VfbG0jve7euyMncZFr1Jaj0WxxXbpvRVbraf19xT8zkKVNlDEL7dbH8=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730732190; c=relaxed/simple;
-	bh=O1yQVSZBuT1Qy9hWXovhefLGSfY33ZG/Twwa+U8uubc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=DNqycp+xvIzj5LM77p/Zl7UGM7Q1bkUlsxAXTIGFYiZZMQCt6qWOFi191SnhhMluwfRunGtP6EhJ3AJZ1WtIb92hWpP8pb5CA+G3NBEAL9D1aocrnsFjpX/+9LopUD3FCEW/qdbgeduBDjzh9mFSVWOC2VbGzCAWq/Vu9NtcGAk=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M+Mij7EJ; arc=fail smtp.client-ip=198.175.65.21
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730732188; x=1762268188;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=O1yQVSZBuT1Qy9hWXovhefLGSfY33ZG/Twwa+U8uubc=;
-  b=M+Mij7EJC8y7YXg0J7rwxluLo+pB4hvZCfmSw3hn/GRwNS91acuxGkq5
-   ZQgFnP970v4OdXIh76EbBs/nwHF+GCegv5oPcIsX0LhSC3cr6C+maMvvq
-   JZZXkNLdGentTChfSkbvySDRSwm7sT7VAjr/+xtM4zA10M+kSwJAWmreq
-   gX7YgcLo0NtGDMbl1y+tMGAsUbqwWMR5jY770059H4+EmmuG0f8ETOB/Z
-   mro9zV0ys0NWuunyKZOtb4jsxFKFw4asFuj2RndcbKegV34TviFc5WZ/F
-   oeWEY0KdzRM34jViE7Yk1iV+DceX6qNp/MewwiPaxIMfyiO52266WKd9S
-   w==;
-X-CSE-ConnectionGUID: TIJpq5I+Qpaf/XbtmN6GTQ==
-X-CSE-MsgGUID: HBLDToSTRVmCgpY20278Cg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30378107"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30378107"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa113.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 06:56:26 -0800
-X-CSE-ConnectionGUID: m6qzcaHvRyWZ1H1VCtE1Bg==
-X-CSE-MsgGUID: kyhmRtdmSjO/14Qu99K4rA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
-   d="scan'208";a="114482097"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 06:56:25 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 4 Nov 2024 06:56:25 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 06:56:25 -0800
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (104.47.73.46) by
- edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 4 Nov 2024 06:56:24 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=LUJilxFnqLfe6uzsUFIqsjAuHwLryZQsRSuS9RxVmq0+hXZfjZQ3GCjcSaRhNSBLHosJh1Btw17wXrqo7ClpTEhIVarENcbQBh029o90O/Aezb4AHJIZ9Omk1Heii4PtYlEmOrHEoQArMIFVocO0o8+hpC/YR0Gd7Hxuy2Oy+sLVvbb/S5eoZe6RXs/jyCkkpWlSltRUyHtbcZ6o4MT2QPgw2fFx+8Qy8+6jOcorr/zVaXIUvsm9H9ZtOp7LXzR7IK+2nfbPiWuXtiSq6YitFrYouEXVxE3j3/LmOqU27gyVG125Y71rSHEOWGF+0A9cjPZmzw/oHctPzdLL0f6jwA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YTqK7gmDUjPyS+6eWvoKYCAIkTIMa1t0BCu2uUGRunI=;
- b=KgbzlXgfLmGlNf9LiGXOlg81uK8zDXS68Qxgy+cEisQVc8i/nZ0WwjiuBjtqcpNewDaQ+mbhjVu599yJjE+sDrEzt0Vl8fEYzs1aybAlchNcfJjfdiL3jWEFNDGVFZatEzli9j70tin0tTPWw9tW68nXUgJcban802uqvjEh/okKM9w70UaIJrFwpD99NwICS1yA+x80qjHjusNcZ0OVzIutjGp3q4FLnvvP9Sz7oBPhWEKoGeffWy1VMlbrP2Spi8gWaeYsIhrly9sEBz+ufSliZ/dPitxYyAqAInC0Ea7O2KDfgrXvgMzRmPfAG2F6KWD9JNaW+ByvlqMqFp64+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com (2603:10b6:208:3e9::15)
- by PH7PR11MB7004.namprd11.prod.outlook.com (2603:10b6:510:20b::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
- 2024 14:56:22 +0000
-Received: from IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::f302:c534:2d71:822b]) by IA1PR11MB6219.namprd11.prod.outlook.com
- ([fe80::f302:c534:2d71:822b%4]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
- 14:56:22 +0000
-From: "Nitka, Grzegorz" <grzegorz.nitka@intel.com>
-To: Simon Horman <horms@kernel.org>
-CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Kolacinski, Karol"
-	<karol.kolacinski@intel.com>, "Kubalewski, Arkadiusz"
-	<arkadiusz.kubalewski@intel.com>
-Subject: RE: [PATCH v3 iwl-net 2/4] ice: Fix quad registers read on E825
-Thread-Topic: [PATCH v3 iwl-net 2/4] ice: Fix quad registers read on E825
-Thread-Index: AQHbLTln6479DBd9P0SDv30WSDU03LKnOENQ
-Date: Mon, 4 Nov 2024 14:56:22 +0000
-Message-ID: <IA1PR11MB621956F4A8D8A33D5B33B04592512@IA1PR11MB6219.namprd11.prod.outlook.com>
-References: <20241028204543.606371-1-grzegorz.nitka@intel.com>
- <20241028204543.606371-3-grzegorz.nitka@intel.com>
- <20241102151033.GP1838431@kernel.org>
-In-Reply-To: <20241102151033.GP1838431@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: IA1PR11MB6219:EE_|PH7PR11MB7004:EE_
-x-ms-office365-filtering-correlation-id: 82437dab-8ab3-43cc-37e1-08dcfce0d8e6
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?4ZHie8o7kCPgOB+2tLSI2+IlpaCy3kV+a7C0LBGVBX0Xg+nTA4vvn6ep32HB?=
- =?us-ascii?Q?ecHMHPvscLdpn+dh7P612c8veV9c6MF/4F2Y2NAevZzYiYMWRiwKi/2Vm4KF?=
- =?us-ascii?Q?tewWsPyULDrZQBAsVhR246Q3DiNsMct8wzfcB/DTkbwoejisNasvclg+1f8L?=
- =?us-ascii?Q?VwJX0VaLszi/emJhzKylTUq7Hyn+y1UFutalBZAKL0NZLodnqWuQy/ma1B+h?=
- =?us-ascii?Q?6rM2ik1Kmox6fwbJIqScv9yf4yRwJ7GEEca8y6AJQAfxolnFl4IuLTUcUj9d?=
- =?us-ascii?Q?g7ra6i0D6QheMdithFzDj5y2CcS+AzZ8VgyKd4DC0CNrasH/XqtA12VgSjQQ?=
- =?us-ascii?Q?qLqv1xKoj/FEYFzdPF3UuAM/r+3jRNtgjgVfw3Pa3Q23HWVBpi5mXVXW0I9U?=
- =?us-ascii?Q?STtzfBMmjyMtAUKTcLg7QNksP8PSD0DtDanwnWLbFjV+fvvgH7+E71IQRW7V?=
- =?us-ascii?Q?u3qnSgaF5fgFCoN+2yzgCbY1knjyAM1urlY4h0OK1/RqCb+9B12pP8Sx6dVJ?=
- =?us-ascii?Q?jKscszcbInO0I7meUxQ34XTEHbzZfrLwDq07eyJxImGCugyQbohOn6KV3fZW?=
- =?us-ascii?Q?1bzF2D8AiJL1P67wZSf1Ai6dF9aXx6pmfIHtLYZVybOx7X/It4XtdghGBl1G?=
- =?us-ascii?Q?++IPoYNcy19/udV5hGktFRExxtZM+eXLC5DG64M/lppR/gHfgDmo5KGY2u21?=
- =?us-ascii?Q?VvC7urep/ZpUxSTMXc3umR9ot1rYG2y8vfb189mb1agvNHdQXIt8x7WLt2GR?=
- =?us-ascii?Q?vlprh7d5TJCc9wsU60zad8I5y3HiOPDRRHdz+nKAb4UVzbp4vYgAivEQz885?=
- =?us-ascii?Q?md8pTcZ5Wrnsu92kiLOUZGxryHYt4MsGGdtErh45Talw4D96UaNCOE5ORlUR?=
- =?us-ascii?Q?z4Ltu5CClpCl8VrJ6dj+PfGIaixXiECeFSBYHyoLrS+XKnk/pFBrPeqHT8Ew?=
- =?us-ascii?Q?PsFFAEpRHLv4IDb8o5nROWJdSQ6FhXmahAip2VEzK4H6k/6aJn6xk3D0lHu2?=
- =?us-ascii?Q?tqzhhD/E34fsNaJ2kVUQkHAO42rz5VjNzyeWldwB7VqfWp9QOIy0n7GXxVCZ?=
- =?us-ascii?Q?9ovIBP6xKeFvnnhxlT2sg3v9jvTC0JuK6E6JqScCVLkIGmrCoYeest15fEOp?=
- =?us-ascii?Q?76MUGxjPt4W9p5vXlPpwuCs5WPiUeqfyVQtL2lk4ilGaUjFTmOQCXDZwmtGW?=
- =?us-ascii?Q?vAPp4E+Nu9vpJq0B5EFkxcoL5R74+HaVdxfUYnTHbVgj3tiOoGbauHiYnbxP?=
- =?us-ascii?Q?cGCrFdKPf9JyMyZ3y6zUjv33jBr0WUM2evZ1lT7HttoT0nfOU72Jbea1m4gt?=
- =?us-ascii?Q?VXyAaV29QNzxWjcXpqMXJyRFfgq0ecGD+lV+ka5KL6zFcWn6OpnI2t41HsZO?=
- =?us-ascii?Q?rGh81uo=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:IA1PR11MB6219.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?91VVjWmbwLLPQ+aXYR6qE57PoiV4q0Y7AzDgLu4WAREof66JOLyZiYKgpC3T?=
- =?us-ascii?Q?lql41fd8KvfVAire0Fa4u5AnBU3uchi1AP9XY9aHyCaEcEPXUIEYc1KBzkce?=
- =?us-ascii?Q?uhmYM89m5shjxGb4gMxDISPq06R6rTzOwF18NbwjvFaYjWLCe0J26RH9605o?=
- =?us-ascii?Q?Lb+ft9uEPGWTRLVx2O0oU7wsTopbMxalYuaOozaeFj76dvtIjJuYwIJRxR1g?=
- =?us-ascii?Q?R/Y2C5jA6NaMk2yFRokRRMeCtoI4Ri/fR6kPX0fJgFMS57V7yBJnZz4ewyAo?=
- =?us-ascii?Q?pTeod9BIG4ea2DeFXxJvt6q+l7s2QgJNksnwtVyFq7gdM4nu5zBVQJXxUVRx?=
- =?us-ascii?Q?g3QYg+5BHAgJP9AT64SFgRIQ4bwU3UTA6hEYuxgmc1PymoLYlzntUAG9qs4H?=
- =?us-ascii?Q?Gw/ypB7L7rgl1t6Zxh1/3KvpsARVFjALj/uIQr8iwySQCAHRYqkSOWgpqumo?=
- =?us-ascii?Q?T4yQbV0BfO/WzCSPL2KRQkx6H1HdhCt964pPcrbzi61hj/fDxurYT72jWykt?=
- =?us-ascii?Q?4eOAeAqCrxuEX6ekxkdra0CM/5I87XWUW2HcZiCHnQstwDZE27WbLnJrxV6B?=
- =?us-ascii?Q?wTaYTjsX7QtxjfUO8XKMqdDUy8YyLdWHQx/d3NSvNMPBM/P1JqOMwHH/h22L?=
- =?us-ascii?Q?uv1NaRul3prhXUwMaRL47VMgkeyE/JTqfVaIC9kOozkHl3qlnfO77bULMf3L?=
- =?us-ascii?Q?S/+dWI3VDMWqdi7pCICmnT27ABDlnqcsfN/BM/KHd7dPdKHQpRdpjOD2MO34?=
- =?us-ascii?Q?Xaq/ARdwiojCCYhjfc/A5xyFVKRrk/5UNyj415H8bEYXD0TukjTanBaJmG9g?=
- =?us-ascii?Q?V/AmD6IxOx+X9yhZ3U9y/TbGEJS5QrZMKTvy3AIX1k3nS7c3EK7Gy3CMPPEg?=
- =?us-ascii?Q?bs3007Wdbs2pQ+YIB6sk8sMb91GacWaYfu8DQJOrgQeH5QV32wyWkc50jd36?=
- =?us-ascii?Q?hcf/B4lahL3vLULURAtqJ0MURtvkPxwW/BfpKBklbDTd3XxM70uH/mQ5haMG?=
- =?us-ascii?Q?5AgNUAOkBsC88A4XmOrHtVc7AsJpAmpCPuyWptvnLRIWxRI7qQMNayTbmtlM?=
- =?us-ascii?Q?odsdmgZaFaKOXxKtYi2CCFJXzkDQj8XHxd4B8xlNzmqLapAjGKfy8vL1UVXB?=
- =?us-ascii?Q?45EuKCUudMMDHu7l/zpf1loMTM3OrS45jEStRfwHLQScit6NMwix14O+bKQ/?=
- =?us-ascii?Q?dtILf2oVonF6X/OVkbdBaylzzU47burQtQUppj95AgRuTI0D2C5+HxRpmyku?=
- =?us-ascii?Q?QUgOpTuoNJFdR46lkxqU+tJkrCfRO8jQqk/l8T139HU5AU2OwzdfChBR4+/C?=
- =?us-ascii?Q?2KPlKUX1UhxnDF+p/l6hWyYIT5B67iJbvcphZaRaAHTyO4m+5JDicen/52I6?=
- =?us-ascii?Q?2kP/797ynv4MPhmppA6zs7RkyHvdQtvlOAzJqrGVygxMtSoB9gHiJ/VtBc84?=
- =?us-ascii?Q?/KUTSbj9jkHq+xMAqeApNKmkn0PoxHqp3ZNnGv7eHcTxzVuLJz3EY7zuuC0E?=
- =?us-ascii?Q?gj3OM3s09Pf1/RKHGhS6GJKeQWrTqUOk+pl7aVOvX20rztiCZvKEDfxP/FPU?=
- =?us-ascii?Q?MfqpNGoV/scF9fVgsLc2bDqoG4I8IKxYzW9ih2Y9?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1EC62B9A2;
+	Mon,  4 Nov 2024 15:14:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730733304; cv=none; b=VWcFhhIHLQlgI1DMCOQcNT+BtbkdNvRLfFnrOijJuxZ4B3OojmoaY4t824hJOLnqDE2ts+nK93ybtTichyMiRI8EwRJhjb1IlBYT1REHZ52DwTHNnkRbKimE5VJoCmG4P6eUcy1ymIPXdISEOfEFn7G2CsuCwu6r7ppOgUw9UcY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730733304; c=relaxed/simple;
+	bh=kTYnw999nI/JqFsVK3bbbPIO4nM5nyfIH9Mdw+awRCk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kNcDMgkgw86K0QwV/NaafKYkdKEqnCmhRZw5qcJlaC3X0qjNR3utVEWH+90HE1hvrgWS0g2hTzr9F6j6SiE3ONYyIrVW6X7y1YQ2dgKzyRpVkxzMhh+lJHSkuOkSiBhYTZyxXaUQMSQQNCVmIhiEMoF40u34ya/gnLKrlVWPf4M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=MAHwzciq; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=RpgEJMuh; arc=none smtp.client-ip=202.12.124.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailflow.stl.internal (Postfix) with ESMTP id 4282A1D40250;
+	Mon,  4 Nov 2024 10:14:58 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Mon, 04 Nov 2024 10:14:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1730733298; x=
+	1730736898; bh=3t9S8lMLsxZ1l3HwamcmToJ6jU6n7DJ3ZQs7SNN8Hic=; b=M
+	AHwzciqVjMKKlxsMroKfrWYj5+RS/+kjkeRxP22cj4OLrn6yPV4r2GTyrZepKjFa
+	1QXM9SqJpzab0QJqVkgKeZZr7Gwjo4pYd+L5zIfE7uJHS+7Hif64oewXF3xhHDSn
+	rHO51dzAxxxVepdMHWjPch871rwu1dkmW9bp0U6rgMtANZfI2itHG2qyVMvzbO9u
+	T9ssSyhQ7UYU2A5ngyApd81WGxo+V3nFKJC64qeU7uEHU0coHxvvoRAnibr3nLFz
+	4buop86n2YKIFKB0Ae4gyeE2EGGrxE/nckXCKBPpVmSzLa+kKbBU5AFZzRz3+Ws5
+	P/3wBGJ03FPdsSVOzMoVg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730733298; x=1730736898; bh=3t9S8lMLsxZ1l3HwamcmToJ6jU6n7DJ3ZQs
+	7SNN8Hic=; b=RpgEJMuhNjKezwpkkFC9FefBRL4pCAvhaljD6qj6LsTWeeE5J7n
+	lhxLHm2O2q0FO+x9oso698a+cXrD1kCfW92TIA6jswsAcXkjQ/OGZVQq//meigEk
+	kt9AOrnVjw5OlMVFp+0FO0q8M18Gs8loPY6nG7HvDE/vfMDkbv/ab0LFtobU5sOk
+	g0wWprw3oWfXmAYTYnKBXhoR4vApKoGKa77Gn57mQLfcGzVspWJoKTJCoirwbvZG
+	0kmQTO7cYmyJ4VOFEB5N5d5R1eEdb17ye6cf/277l4SryE1QEMbXyKjX1FObU5kl
+	cP72/m8V+qdNFA19dptUOaNZ1uW32239qDw==
+X-ME-Sender: <xms:8eQoZ_LQsKsq3EqKMGVb7qr5lVLUqJGmIVERuS04WjM8YeOt6soKtg>
+    <xme:8eQoZzJ_ELm3eCWgOtnDhPcyqnycdV5RuIstPhqfJKOPFpkFqDFcjaw00kqZOnbuI
+    cRyGwd5jQDxDSp2Ses>
+X-ME-Received: <xmr:8eQoZ3tsxTPHIYnlVEz93_C0ft-JIOKRMYrUCXhftEk6Lru8oN1rqBWSSjuw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeliedgjedvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
+    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
+    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
+    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:8eQoZ4YezVoEN7itU2VG_p2WoaN59K977P6RyrNVbXfE4zB01eiUyw>
+    <xmx:8eQoZ2YnjobwfIBfKcYrHYS0ZetYmM1GDE92pV90O8UE_oJm4UA-Ag>
+    <xmx:8eQoZ8AG20jetaub2NhxzGIgym1DE9NDr4zp4XY59mkU_X-tEfUnNA>
+    <xmx:8eQoZ0bx7_hf0EqTNLcQ5YUG5SlMJcinK4lbyxsUau4bueTCTbTIxg>
+    <xmx:8eQoZ8NpZC-2xPS8DPENXui-NuvkzcESRUmoB-dcrDYthvLLW0pFlWpd>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 4 Nov 2024 10:14:57 -0500 (EST)
+Date: Mon, 4 Nov 2024 16:14:55 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 18/23] ovpn: implement peer
+ add/get/dump/delete via netlink
+Message-ID: <Zyjk781vOqV4kXhJ@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: IA1PR11MB6219.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 82437dab-8ab3-43cc-37e1-08dcfce0d8e6
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2024 14:56:22.1171
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 6P/oBNJ/FQDRLe6o75LNODWuuD9+IXL9n6UUJnIn9bL406TnXVN2/dt6WJpfPAP/RUjjCRIW43mUe8afflktDM+E4qcAAQfVesDISefvDRs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB7004
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241029-b4-ovpn-v11-18-de4698c73a25@openvpn.net>
+
+2024-10-29, 11:47:31 +0100, Antonio Quartulli wrote:
+> +static int ovpn_nl_peer_precheck(struct ovpn_struct *ovpn,
+> +				 struct genl_info *info,
+> +				 struct nlattr **attrs)
+> +{
+> +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
+> +			      OVPN_A_PEER_ID))
+> +		return -EINVAL;
+> +
+> +	if (attrs[OVPN_A_PEER_REMOTE_IPV4] && attrs[OVPN_A_PEER_REMOTE_IPV6]) {
+> +		NL_SET_ERR_MSG_MOD(info->extack,
+> +				   "cannot specify both remote IPv4 or IPv6 address");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!attrs[OVPN_A_PEER_REMOTE_IPV4] &&
+> +	    !attrs[OVPN_A_PEER_REMOTE_IPV6] && attrs[OVPN_A_PEER_REMOTE_PORT]) {
+> +		NL_SET_ERR_MSG_MOD(info->extack,
+> +				   "cannot specify remote port without IP address");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!attrs[OVPN_A_PEER_REMOTE_IPV4] &&
+> +	    attrs[OVPN_A_PEER_LOCAL_IPV4]) {
+> +		NL_SET_ERR_MSG_MOD(info->extack,
+> +				   "cannot specify local IPv4 address without remote");
+> +		return -EINVAL;
+> +	}
+> +
+> +	if (!attrs[OVPN_A_PEER_REMOTE_IPV6] &&
+> +	    attrs[OVPN_A_PEER_LOCAL_IPV6]) {
+
+I think these consistency checks should account for v4mapped
+addresses. With remote=v4mapped and local=v6 we'll end up with an
+incorrect ipv4 "local" address (taken out of the ipv6 address's first
+4B by ovpn_peer_reset_sockaddr). With remote=ipv6 and local=v4mapped,
+we'll pass the last 4B of OVPN_A_PEER_LOCAL_IPV6 to
+ovpn_peer_reset_sockaddr and try to read 16B (the full ipv6 address)
+out of that.
+
+> +		NL_SET_ERR_MSG_MOD(info->extack,
+> +				   "cannot specify local IPV6 address without remote");
+> +		return -EINVAL;
+> +	}
 
 
-> -----Original Message-----
-> From: Simon Horman <horms@kernel.org>
-> Sent: Saturday, November 2, 2024 4:11 PM
-> To: Nitka, Grzegorz <grzegorz.nitka@intel.com>
-> Cc: intel-wired-lan@lists.osuosl.org; netdev@vger.kernel.org; Nguyen,
-> Anthony L <anthony.l.nguyen@intel.com>; Kitszel, Przemyslaw
-> <przemyslaw.kitszel@intel.com>; Kolacinski, Karol
-> <karol.kolacinski@intel.com>; Kubalewski, Arkadiusz
-> <arkadiusz.kubalewski@intel.com>
-> Subject: Re: [PATCH v3 iwl-net 2/4] ice: Fix quad registers read on E825
->=20
-> On Mon, Oct 28, 2024 at 09:45:41PM +0100, Grzegorz Nitka wrote:
-> > From: Karol Kolacinski <karol.kolacinski@intel.com>
-> >
-> > Quad registers are read/written incorrectly. E825 devices always use
-> > quad 0 address and differentiate between the PHYs by changing SBQ
-> > destination device (phy_0 or phy_0_peer).
-> >
-> > Add helpers for reading/writing PTP registers shared per quad and use
-> > correct quad address and SBQ destination device based on port.
-> >
-> > Rename rmn_0 to phy_0 and remove rmn_1 and rmn_2 as E82X HW does
-> not
-> > support it. Rename eth56g_phy_1 to phy_0_peer.
-> >
-> > Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C
-> products")
-> > Reviewed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-> > Signed-off-by: Karol Kolacinski <karol.kolacinski@intel.com>
-> > ---
-> > V2 -> V3: Replaced lower/upper_32_bits calls with lower/upper_16_bits
-> > V1 -> V2: Fixed kdoc issues
-> >
-> >  drivers/net/ethernet/intel/ice/ice_common.c   |   2 +-
-> >  .../net/ethernet/intel/ice/ice_ptp_consts.h   |  75 ++----
-> >  drivers/net/ethernet/intel/ice/ice_ptp_hw.c   | 237 +++++++++++-------
-> >  drivers/net/ethernet/intel/ice/ice_ptp_hw.h   |  37 ++-
-> >  drivers/net/ethernet/intel/ice/ice_sbq_cmd.h  |   7 +-
-> >  drivers/net/ethernet/intel/ice/ice_type.h     |   1 -
-> >  6 files changed, 177 insertions(+), 182 deletions(-)
->=20
-> This patch seems to mix bug fixes and cleanup.
-> Which leads to a rather large patch - larger than is desirable for stable=
- IMHO.
->=20
-> Could we consider a more minimal fix for iwl-net.
-> And then follow-up with clean-ups for iwl?
->=20
-> ...
+[...]
+>  int ovpn_nl_peer_set_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+[...]
+> +	ret = ovpn_nl_peer_modify(peer, info, attrs);
+> +	if (ret < 0) {
+> +		ovpn_peer_put(peer);
+> +		return ret;
+> +	}
+> +
+> +	/* ret == 1 means that VPN IPv4/6 has been modified and rehashing
+> +	 * is required
+> +	 */
+> +	if (ret > 0) {
 
-Thanks Simon for reviewing this.
-Sure, will try to adjust this patch to include only minimum changes to addr=
-ess
-the original issue.
+&& mode == MP ?
 
+I don't see ovpn_nl_peer_modify checking that before returning 1, and
+in P2P mode ovpn->peers will be NULL.
+
+> +		spin_lock_bh(&ovpn->peers->lock);
+> +		ovpn_peer_hash_vpn_ip(peer);
+> +		spin_unlock_bh(&ovpn->peers->lock);
+> +	}
+> +
+> +	ovpn_peer_put(peer);
+> +
+> +	return 0;
+> +}
+
+>  int ovpn_nl_peer_get_dumpit(struct sk_buff *skb, struct netlink_callback *cb)
+>  {
+[...]
+> +	} else {
+> +		rcu_read_lock();
+> +		hash_for_each_rcu(ovpn->peers->by_id, bkt, peer,
+> +				  hash_entry_id) {
+> +			/* skip already dumped peers that were dumped by
+> +			 * previous invocations
+> +			 */
+> +			if (last_idx > 0) {
+> +				last_idx--;
+> +				continue;
+> +			}
+
+If a peer that was dumped during a previous invocation is removed in
+between, we'll miss one that's still present in the overall dump. I
+don't know how much it matters (I guses it depends on how the results
+of this dump are used by userspace), so I'll let you decide if this
+needs to be fixed immediately or if it can be ignored for now.
+
+> +
+> +			if (ovpn_nl_send_peer(skb, info, peer,
+> +					      NETLINK_CB(cb->skb).portid,
+> +					      cb->nlh->nlmsg_seq,
+> +					      NLM_F_MULTI) < 0)
+> +				break;
+> +
+> +			/* count peers being dumped during this invocation */
+> +			dumped++;
+> +		}
+> +		rcu_read_unlock();
+> +	}
+> +
+> +out:
+> +	netdev_put(ovpn->dev, &ovpn->dev_tracker);
+> +
+> +	/* sum up peers dumped in this message, so that at the next invocation
+> +	 * we can continue from where we left
+> +	 */
+> +	cb->args[1] += dumped;
+> +	return skb->len;
+>  }
+>  
+>  int ovpn_nl_peer_del_doit(struct sk_buff *skb, struct genl_info *info)
+>  {
+> -	return -EOPNOTSUPP;
+> +	struct nlattr *attrs[OVPN_A_PEER_MAX + 1];
+> +	struct ovpn_struct *ovpn = info->user_ptr[0];
+> +	struct ovpn_peer *peer;
+> +	u32 peer_id;
+> +	int ret;
+> +
+> +	if (GENL_REQ_ATTR_CHECK(info, OVPN_A_PEER))
+> +		return -EINVAL;
+> +
+> +	ret = nla_parse_nested(attrs, OVPN_A_PEER_MAX, info->attrs[OVPN_A_PEER],
+> +			       ovpn_peer_nl_policy, info->extack);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (NL_REQ_ATTR_CHECK(info->extack, info->attrs[OVPN_A_PEER], attrs,
+> +			      OVPN_A_PEER_ID))
+> +		return -EINVAL;
+> +
+> +	peer_id = nla_get_u32(attrs[OVPN_A_PEER_ID]);
+> +
+> +	peer = ovpn_peer_get_by_id(ovpn, peer_id);
+> +	if (!peer)
+
+maybe c/p the extack from ovpn_nl_peer_get_doit?
+
+> +		return -ENOENT;
+> +
+> +	netdev_dbg(ovpn->dev, "%s: peer id=%u\n", __func__, peer->id);
+> +	ret = ovpn_peer_del(peer, OVPN_DEL_PEER_REASON_USERSPACE);
+> +	ovpn_peer_put(peer);
+> +
+> +	return ret;
+>  }
+
+-- 
+Sabrina
 
