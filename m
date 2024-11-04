@@ -1,114 +1,172 @@
-Return-Path: <netdev+bounces-141517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 036669BB356
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:31:21 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C87589BB3B4
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:44:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC63A284FC8
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:31:19 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 52609B28CB5
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:31:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB3041B0F26;
-	Mon,  4 Nov 2024 11:26:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AE911BC069;
+	Mon,  4 Nov 2024 11:26:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="OOQDsTLK"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="zvb5TYGP";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="WjWFaF3h"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from flow-b1-smtp.messagingengine.com (flow-b1-smtp.messagingengine.com [202.12.124.136])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCA961AF0A6;
-	Mon,  4 Nov 2024 11:26:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C20A1AF0A6;
+	Mon,  4 Nov 2024 11:26:49 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.136
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730719579; cv=none; b=j5/4MU7+yz1ym/NClMN7Nm8RKgcm6D7TLFR+PNLLRcRk7CgQBuBbOrJbiFYSbY/oKrbDmEpn3I4BPM2KbzAkCgZqUIEGaNX8J7SpsSI/2pM6UonehVjcRrFfuDKQXa7QhvqSZbgJbDYwBNahXTkDbIOVlGyywYqtkLU75Gbde2U=
+	t=1730719611; cv=none; b=tR/azD6pMFRoyXANkdfINl5L3MmGEFyGxc/9gGoDAqkdlnG6WXKKGUwyOAsYdbh9uZVltj8mVR3ulXuBhUlVUvx45Mt0ls61iO5+gXR5JeTBnBWJ+1p6m8UOv2OhJcoKZs90aLh7lNkKW9a4py6pY6/0BuWHAlgJbYJNO9xfWtg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730719579; c=relaxed/simple;
-	bh=L7u8TSr3hsUVl5lbJJeYekyvk5tXBYjfFui3QFFAxXg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=uMakVXpQBHxVK9AC+F7L6yWdlVkodjobTSuXsIDg0MUOAwhINkI6yQmbrnSA4BPw+XfvVIST2EShMdHeoVtP/dhzP+gv6P01k4jFSc+lvHJVZIEQlnWD7Fle8fb5WG+3daCIuZ7XZ5/2FcAvNGs/+IQMe13HFuAXu4AvRo6az48=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=OOQDsTLK; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A4BPq8f093248;
-	Mon, 4 Nov 2024 05:25:53 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1730719553;
-	bh=8lCZg7hiaSBMwhl2ZVyK4acZDVshxBaN2CgueTXDG1A=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=OOQDsTLKapMaRRAeD7RUmMELnmCCHYSMumW68hUPhZxX2zSeSjccYHOZQPUATj8Rf
-	 HIZjveUwV4hCmk5WA6iGLvqSb9MHWLrAdE7yByiAfsg5dojK0cHMNsXznECXV2SqxF
-	 mquhJziAPs1Sph8dmPnV0I/ivn06gjT04wz92nGU=
-Received: from DFLE115.ent.ti.com (dfle115.ent.ti.com [10.64.6.36])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A4BPq8K020829;
-	Mon, 4 Nov 2024 05:25:52 -0600
-Received: from DFLE105.ent.ti.com (10.64.6.26) by DFLE115.ent.ti.com
- (10.64.6.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Mon, 4
- Nov 2024 05:25:52 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE105.ent.ti.com
- (10.64.6.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Mon, 4 Nov 2024 05:25:52 -0600
-Received: from [10.249.139.24] ([10.249.139.24])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A4BPk51046583;
-	Mon, 4 Nov 2024 05:25:47 -0600
-Message-ID: <7c3318f4-a2d4-4cbf-8a93-33c6a8afd6c4@ti.com>
-Date: Mon, 4 Nov 2024 16:55:46 +0530
+	s=arc-20240116; t=1730719611; c=relaxed/simple;
+	bh=kAYEPRitsOzAY6hbeb25oEHVLMhVT9X/0ELkJOdJuLk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=iRadixvyHVI6BvmQVeG88WG+ui2OAuuQ9pJZvL8rFQ5cOpUXvGsmk93BxI+BAaxgODz7PilGkoP6ykv9PjzS+bF9fCtnc4EFhwn9hT0k4huilEeSWlqAi+MCYHrAtMtpwY28dyLpK87hmUXxOxJ+KYQuSLJwa9EkBdhB5GXvOlk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=zvb5TYGP; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=WjWFaF3h; arc=none smtp.client-ip=202.12.124.136
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-03.internal (phl-compute-03.phl.internal [10.202.2.43])
+	by mailflow.stl.internal (Postfix) with ESMTP id DE0471D401C1;
+	Mon,  4 Nov 2024 06:26:48 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-03.internal (MEProxy); Mon, 04 Nov 2024 06:26:49 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-type:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:subject:subject:to:to; s=fm1; t=1730719608; x=
+	1730723208; bh=Vyghno5J9c7YrXB31VGHCX520h4RHsgzGudOGYt30G8=; b=z
+	vb5TYGPMLV7KHhDY/fNiPfYjDm234CydkuuYe+gzy9kAN3DyzRqamRcM+CyGDBQh
+	cMLM05BQ6ZVNpegl+664Ll3oKyTHlT5mvEnia3M7nGCY6TyjxcR9dLizxgScTxYR
+	zUklS4CjbfwOfifqMHhMNRixQT5QgTK1Ay3GtladkaLH7WauRk21+txvN8Yk4VSA
+	4Y5RyPzRqxi3289LEYb26buDRU5HFDW/eU2snhTfa2nCMlO8G6PhXmWp/gBWoz6S
+	HU3ZHF8JOwLkmm2xazFIo2AaSPOVB/n2IBxSsYqOQkMAv/irvJOSt3OzWZQ3uszm
+	eq/Rw/1KizkKaz9DUB1ng==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730719608; x=1730723208; bh=Vyghno5J9c7YrXB31VGHCX520h4RHsgzGud
+	OGYt30G8=; b=WjWFaF3h55/o8OHp34oaaJVjdmttdYt7/wuWi1eA4zeBcBiFbjG
+	1EYkJVBb1Qt3Ysox0T+qN+k0mg/GoQ9Jrx8kKHvJp8p1hqnHs2yG8aKp10FWZKzI
+	+TsqGhylWaROH2zdC800tTIVXJnqvz2Wu02BGT5zM9pN8VrGp+KoLesSCkjMHLFr
+	9AYBbmIN2vWirEypT8lS10IdUqWGvKRuJeCNez6Ojc14yXHqu4u35IhJe0sS29MM
+	DxAHUbBdSzACXenzSZDg1va10+OL6lAWA2PMVvv8nrk6xP92seHywLmtD0fsz0us
+	87oH7T6IoRaoa6yUzHgzgZ0cik7kynYQ0fA==
+X-ME-Sender: <xms:eK8oZ6TGrv3g1sLJ5lGlXNJA69Y5AgLgzg9W3K4-CeLAYB5SqODpfA>
+    <xme:eK8oZ_wHCKmFhlOg5rp7uROdtMDIPtqqKwl2OroysEw_yOA73PCBgV0lK1keCygha
+    VSKeIhrDcSU_ENVCMc>
+X-ME-Received: <xmr:eK8oZ30mSAsGtHcvqKengwmWFANAyYGxkJGtdtoVWo-LRUmYmoF4OHb2WzVt>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeliedgvdejucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
+    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtjeen
+    ucfhrhhomhepufgrsghrihhnrgcuffhusghrohgtrgcuoehsugesqhhuvggrshihshhnrg
+    hilhdrnhgvtheqnecuggftrfgrthhtvghrnhepuefhhfffgfffhfefueeiudegtdefhfek
+    geetheegheeifffguedvuefffefgudffnecuvehluhhsthgvrhfuihiivgeptdenucfrrg
+    hrrghmpehmrghilhhfrhhomhepshgusehquhgvrghshihsnhgrihhlrdhnvghtpdhnsggp
+    rhgtphhtthhopeduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtoheprghnthhonh
+    hiohesohhpvghnvhhpnhdrnhgvthdprhgtphhtthhopegvughumhgriigvthesghhoohhg
+    lhgvrdgtohhmpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtth
+    hopehprggsvghnihesrhgvughhrghtrdgtohhmpdhrtghpthhtohepughonhgrlhgurdhh
+    uhhnthgvrhesghhmrghilhdrtghomhdprhgtphhtthhopehshhhurghhsehkvghrnhgvlh
+    drohhrghdprhgtphhtthhopehrhigriigrnhhovhdrshdrrgesghhmrghilhdrtghomhdp
+    rhgtphhtthhopegrnhgurhgvfieslhhunhhnrdgthhdprhgtphhtthhopehnvghtuggvvh
+    esvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:eK8oZ2AdbMYuI8BHolH1pD55qvHE9OZFHExO-_uu_BYlgW8KSYzP4A>
+    <xmx:eK8oZziGMC929EjOnaeC630j8U9QTLgU5Vpnu8_cd21gOXEXPlG3EA>
+    <xmx:eK8oZyoSxny7nP6a8Ah6xxateTxdGpb7DgMOmvcHUNWcs0W8h1irSA>
+    <xmx:eK8oZ2gJ_bG84sLYvdPLicpD7IVPlayDPV_u20O9C17siB0a7tIobw>
+    <xmx:eK8oZ0Wo8fVjCfBj5M0j3_irYxf91wQjIF3P5wKrN2MJ0L5PoREuhfau>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 4 Nov 2024 06:26:48 -0500 (EST)
+Date: Mon, 4 Nov 2024 12:26:46 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 14/23] ovpn: implement peer lookup logic
+Message-ID: <ZyivdrpZhx4WpMbn@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-14-de4698c73a25@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix 1 PPS sync
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <vigneshr@ti.com>, <grygorii.strashko@ti.com>, <horms@kernel.org>,
-        <jan.kiszka@siemens.com>, <diogo.ivo@siemens.com>, <pabeni@redhat.com>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>,
-        Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>
-References: <20241028111051.1546143-1-m-malladi@ti.com>
- <20241031185905.610c982f@kernel.org>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <20241031185905.610c982f@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241029-b4-ovpn-v11-14-de4698c73a25@openvpn.net>
 
+2024-10-29, 11:47:27 +0100, Antonio Quartulli wrote:
+>  struct ovpn_peer *ovpn_peer_get_by_transp_addr(struct ovpn_struct *ovpn,
+>  					       struct sk_buff *skb)
+>  {
+> -	struct ovpn_peer *peer = NULL;
+> +	struct ovpn_peer *tmp, *peer = NULL;
+>  	struct sockaddr_storage ss = { 0 };
+> +	struct hlist_nulls_head *nhead;
+> +	struct hlist_nulls_node *ntmp;
+> +	size_t sa_len;
+>  
+>  	if (unlikely(!ovpn_peer_skb_to_sockaddr(skb, &ss)))
+>  		return NULL;
+>  
+>  	if (ovpn->mode == OVPN_MODE_P2P)
+> -		peer = ovpn_peer_get_by_transp_addr_p2p(ovpn, &ss);
+> +		return ovpn_peer_get_by_transp_addr_p2p(ovpn, &ss);
+> +
+> +	switch (ss.ss_family) {
+> +	case AF_INET:
+> +		sa_len = sizeof(struct sockaddr_in);
+> +		break;
+> +	case AF_INET6:
+> +		sa_len = sizeof(struct sockaddr_in6);
+> +		break;
+> +	default:
+> +		return NULL;
+> +	}
 
+You could get rid of that switch by having ovpn_peer_skb_to_sockaddr
+also set sa_len (or return 0/the size).
 
-On 11/1/2024 7:29 AM, Jakub Kicinski wrote:
-> On Mon, 28 Oct 2024 16:40:52 +0530 Meghana Malladi wrote:
->> The first PPS latch time needs to be calculated by the driver
->> (in rounded off seconds) and configured as the start time
->> offset for the cycle. After synchronizing two PTP clocks
->> running as master/slave, missing this would cause master
->> and slave to start immediately with some milliseconds
->> drift which causes the PPS signal to never synchronize with
->> the PTP master.
-> 
-> You're reading a 64b value in chunks, is it not possible that it'd wrap
-> in between reads? This can be usually detected by reading high twice and
-> making sure it didn't change.
-> 
-> Please fix or explain in the commit message why this is not a problem..
-Yes I agree that there might be a wrap if the read isn't atomic. As 
-suggested by Andrew I am currently not using custom read where I can 
-implement the logic you suggested (reading high twice and making sure if 
-didn't change). Can you share me some references where this logic is 
-implemented in the kernel, so I can directly use that instead of writing 
-custom functions.
+> +
+> +	nhead = ovpn_get_hash_head(ovpn->peers->by_transp_addr, &ss, sa_len);
+> +
+> +	rcu_read_lock();
+> +	hlist_nulls_for_each_entry_rcu(tmp, ntmp, nhead,
+> +				       hash_entry_transp_addr) {
 
-Regards,
-Meghana.
+I think that's missing the retry in case we ended up in the wrong
+bucket due to a peer rehash?
 
+> +		if (!ovpn_peer_transp_match(tmp, &ss))
+> +			continue;
+> +
+> +		if (!ovpn_peer_hold(tmp))
+> +			continue;
+> +
+> +		peer = tmp;
+> +		break;
+> +	}
+> +	rcu_read_unlock();
+>  
+>  	return peer;
+>  }
+
+-- 
+Sabrina
 
