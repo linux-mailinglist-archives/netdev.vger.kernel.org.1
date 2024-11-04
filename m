@@ -1,342 +1,250 @@
-Return-Path: <netdev+bounces-141506-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141505-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A84339BB2BE
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:16:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B40E9BB2BC
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:16:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A4201F204DD
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:16:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE703284080
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:15:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 199871B86CC;
-	Mon,  4 Nov 2024 11:02:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E5E18BBB6;
+	Mon,  4 Nov 2024 11:01:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="NBEs9DsX"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="CEJNh5WZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20DAF1AF0B3;
-	Mon,  4 Nov 2024 11:02:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730718126; cv=none; b=YoYXAJ7XxrS4rjPuPU1gxs7x+2wc/Bt43iN676bh3JA0+mrHNG1MdS2t5ebF9LPu8CYoe1WrKB4eGnXLGfiVRKxkYBnNR1jZANfLbeboFOPN5k+c4ZzRtoNbtxqsS0AcSZxR3AfkIBAtJ/yqhSEQwrIqz5xgFJooxJ217JnxbRg=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730718126; c=relaxed/simple;
-	bh=Hjqtp28MkwTHLGdVMYwCjGKjVh3uTl747qkb8HHPzwA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=NHwm3hplqZ2WAspO4CM0nshFj6riyv+sVHFdyAJzcf7cBRjEKgWv/cVZFD5QW2YxZuogu2tvlUgBpxh+OfTxto9vOOquRcHAnrhdLx55GhdDjQdpltXON8dS7bL65EdeGIdQNIjahIFAJOp9wOa4Z+qGQcyqYNaM/wa8FIQpyN4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=NBEs9DsX; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A3NebjK003006;
-	Mon, 4 Nov 2024 11:01:48 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	QpTybn7wg9kA7W0U5vP4m/bFmDWBpTZhuuFBeCI4ZZU=; b=NBEs9DsXOBTFOjDd
-	lPxAwZZbCXkWSe9Av2icziyH6ej643Wok0ScjcqJjlaQGpluucLRb79R6uBN0E3X
-	ADzln0lrIvcThnDG9hfUV5JiqW3Qtr1MG8EDSx06+gLn9SJcLb3KP5kRDdXScRJH
-	RByCpc9Lh8sTGmevw36scWqVA5UgiEEvD7Nxcjtj757Cm8ggozuhDBQd9GPRhmU4
-	xX8Fcr0mLYUAD8+TAsb/Wtn8FgrDDqqFhSKLv1e74TaxaHXpjp7YHQPtP3xBxRlm
-	RdxVn97QFa2RM1PdsgXO3kIYxp9j3XJO0G3k+leyDfm+qxRvzu09YzM9w/jvMrRf
-	SuPtaw==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42nd4ukx7r-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 04 Nov 2024 11:01:47 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A4B1koT012239
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 4 Nov 2024 11:01:46 GMT
-Received: from [10.253.14.204] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 4 Nov 2024
- 03:01:41 -0800
-Message-ID: <4c849bc5-979f-4f78-bb46-50b93f087d9f@quicinc.com>
-Date: Mon, 4 Nov 2024 19:01:30 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5C4F1B21B9
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 11:01:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.18
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730718100; cv=fail; b=auQfBZVkEfkYbFI9vKRJAMAfKVtHdq6dYDtmM+2GIi7RMbGA+bDtbJwXHyNB+osahxoTEEmRqz0Bnm6Z7Jg8l+fsYPXWcKw9jM0om+/CyIOR06kiyxzXflSqKRWQQPYUDSyb+BGcnFQLCFJQuFgxqYOf2uHuFMA+MWQ5LUH8G0E=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730718100; c=relaxed/simple;
+	bh=OKUxZF+6ydDeiaG5K2nXzldAaOXcb0fXrsF9wAd4Dng=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 Content-Type:MIME-Version; b=RP79Las0lsmCsY4GdFg7blk1SaYFarGRJNwyYwPFqt+Y7bguCQd2stbH8zwZXV8wq/sLGVJ+CsX9DlXOctv2SpCSkpA+mwf+Xu+WgSz1Fn/Qn0N2/oIeXRUyT1xp1kK+LLtDfJQUG9yZl8lsbey18v79R59I5D3gO8BJFADnF+k=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=CEJNh5WZ; arc=fail smtp.client-ip=198.175.65.18
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730718099; x=1762254099;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=OKUxZF+6ydDeiaG5K2nXzldAaOXcb0fXrsF9wAd4Dng=;
+  b=CEJNh5WZ+PN/fl1G25+oDmVRXYVh9NuaCBFaGS4gOLKzQqK6nrzcA2ro
+   bh89ESGiaGAFuXn/hyQdbiBSxfzZD12kjzAtrVd8nxvFqPAtyiUdOpAQg
+   Cub7ZckJ2LGpMI4XhkOx/VAaTSgOKyXeY9tHgc6CHXjm5gEacnTkcQjA+
+   YTozEnjr2pQ41jaQAnU9g1K2hgAiIxMDMyNke0RApS4AStOrV3AfMVmsi
+   LKfAXUXDrHb0UmVyJr5lYzAAhkiCgB4PHIhJrgHw3KHk6vHZd1hNwse6V
+   GyCVzrQofQVDwf6/lSnhEGd8v39BlR8SmZxAcN0tF4yALcwA8ruA+W3/C
+   w==;
+X-CSE-ConnectionGUID: OPN0LT5eScuEXBrp2xiJGg==
+X-CSE-MsgGUID: NLGTAx0+RT6Oy79tH3Jz+A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30585717"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="30585717"
+Received: from orviesa002.jf.intel.com ([10.64.159.142])
+  by orvoesa110.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 03:01:39 -0800
+X-CSE-ConnectionGUID: wLbKtl0RT+iqTJ27ruqthw==
+X-CSE-MsgGUID: xpIK0LTQT3eyn04OoZ//Kg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
+   d="scan'208";a="114406787"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orviesa002.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 03:01:39 -0800
+Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 4 Nov 2024 03:01:38 -0800
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 03:01:38 -0800
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.174)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 4 Nov 2024 03:01:37 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=dLkQCQuUbnQsMo6FmQPmwtgsNReTrFxWTa0L46AFBOHu4dKokT7HoqDVJ6nGszU7N1WcxAHSeX0tZpAGtFbERUtBlWTF710RCCHEZOcPN0MYitOOp34noIMrhRfERPz5Mo1+oVRLPL1ovhu09myxUML4WeyrmIvx0tpMyJUgNSJYyxwoCAgoYGu8sk/6UabsbW5utPaapbe+SrNHYphMZSKLoNoEM45ZTx8YozKoCJfGAkPg4vczqUtYABKo5jQK5l0qTt/vuhaimeeW3XcFeNgKja26IZANUGF7uPIvGbJU7HnjEemhW1kXCcg5VgGN6HDPZY5UhPGFgCRujSIEmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=OKUxZF+6ydDeiaG5K2nXzldAaOXcb0fXrsF9wAd4Dng=;
+ b=RgEDHflqH6iw/C9mBkJIqwVqCCN4dIDWbThVnZ2cWbazYhZx0Q2OfjD5nV8H662G3tHhgDz737nwKZQX7t6kV+CL6htzT30s/SJ/+ZMtXLR87cmlK2GGy2YjkYmS0EBb2cnsCrKj11KagJC/PIlUJlZYTrrcpKIhVEbD1WX5KRbRFat3ICbcHAhK+4VszxulPj/oSrMECeYynhZZ5pBNhjsNUGcjVbbn8iZbdRWVzeMgWUCBlwWqky6IeU1ba/j6z1uYTISxTK/u8nxT1NygKux9fCB6GDNXIR9Ffut+oA8W9FkwhKzLwLMaA6W2PXX+Rghv/zPKgjZozfUYQ0jQyg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
+ by CY8PR11MB7082.namprd11.prod.outlook.com (2603:10b6:930:52::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
+ 2024 11:01:35 +0000
+Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::b615:4475:b6d7:8bc5]) by SJ0PR11MB5865.namprd11.prod.outlook.com
+ ([fe80::b615:4475:b6d7:8bc5%5]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
+ 11:01:35 +0000
+From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
+To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
+	<jacob.e.keller@intel.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>,
+	Simon Horman <horms@kernel.org>, "Polchlopek, Mateusz"
+	<mateusz.polchlopek@intel.com>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v12 08/14] iavf: periodically
+ cache PHC time
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v12 08/14] iavf: periodically
+ cache PHC time
+Thread-Index: AQHbJEUqQKVIISX3s0mwsv7eyUZ95rKnCTbA
+Date: Mon, 4 Nov 2024 11:01:35 +0000
+Message-ID: <SJ0PR11MB5865227E501F005A08B0FC578F512@SJ0PR11MB5865.namprd11.prod.outlook.com>
+References: <20241022114121.61284-1-mateusz.polchlopek@intel.com>
+ <20241022114121.61284-9-mateusz.polchlopek@intel.com>
+In-Reply-To: <20241022114121.61284-9-mateusz.polchlopek@intel.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|CY8PR11MB7082:EE_
+x-ms-office365-filtering-correlation-id: 9a442586-a83a-4910-3ede-08dcfcc00ca5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
+x-microsoft-antispam-message-info: =?us-ascii?Q?ho7ft+GuDYIfr2Ir/lF9ldZPVlCigGImLalU7amIW3uuJUXl91ygnXcQr9yn?=
+ =?us-ascii?Q?VxDFg78o+qtX6OaDzVNZd5EDtHwpUagTFx/e9UNPamF3X9sbs5po8BD24xrY?=
+ =?us-ascii?Q?6kuZRo5CNKMASWnxgHutPh/qfAs7utD15HCrLjYU0XdFt2sOf3j14TZ2n/Xy?=
+ =?us-ascii?Q?ynI3/9kzb2xTP8y3m7dYuyumcQQkBgAEx3Zn5LnV9TjoThdsVYJguaGzOmCV?=
+ =?us-ascii?Q?BrecpXZroMbKmcSFJJYHqMS4wiLiTCi0Yg4vWA84GmI3T8azGvdJgtyDH5hT?=
+ =?us-ascii?Q?gO9WcJUFqQmvr+eniS/USdri7Nj8Q4xtUNTfp9lDfilT1Urlk5nXu4KNksn3?=
+ =?us-ascii?Q?InWTFqex8eMoNf37xXu8kXdD9EZQ9KXhsP1EZ1+3On2jBNgkFkP0Iil83GNT?=
+ =?us-ascii?Q?OEpqg8VoBJS0pX235FkdBJMI7jYDVDhQp2zbw62ouBKrXjlI61lJHbN9rUtc?=
+ =?us-ascii?Q?ozuX2E8fPG2e31DjZrMxI/b5yNWsYtzs/+5CJY5rDAL/GyVdOgY/9gBO+VFe?=
+ =?us-ascii?Q?pfcas69dCQ6wa359r3UrtXyRmA2xXla7RRqrw1N6lFHxk5G1K37m8KHhk1Sz?=
+ =?us-ascii?Q?YadrpTsigpv67wRToHa+1o7yxcbgeAFe1IUkqrwwy0YDnRw+m9/AN/DNToTH?=
+ =?us-ascii?Q?C/lFOPaPgVnIFzZsrTl4lAndpAV1BEV6E7wV52k+ghyeXF5e5hFmSzW8GDH4?=
+ =?us-ascii?Q?Mqn1vSw5VNNKwwivFvdwiCFkgUwK8umezWYbQ5X+nnpMj199nHp1wb57ObP5?=
+ =?us-ascii?Q?011zryKxUyZpxhn0PVpSD5lefyAijAesNKOVgX5VVqjA+5lXz+0sr2Aku/hT?=
+ =?us-ascii?Q?NxEToLPC6cdEMxeujm4GlA6G4Vcv9ZQuxT4rKyQTTehqCw6t750pGxwLT36d?=
+ =?us-ascii?Q?t3B3IUtReuy+gINn+i5PLAkIs2tysG+q4xQP3MjxFxRJe/sxVQTVPoFZrG4A?=
+ =?us-ascii?Q?mReMPd6UxHj3RBe8jK+5NQyUeq57H6FUGMmOcvt5gyloMDuei6wohHEYKo2r?=
+ =?us-ascii?Q?NGz1b8QqOfIyYfn7JSyRh0AIY6E1owYHb/0/pYX1REg5QE+M3tn2qKI4WlQY?=
+ =?us-ascii?Q?TPb1eN+viTyvsEcHzYmQdGTMsOkwtFakhkNbZX8JuKBySU7wdk0NXW2VfWSK?=
+ =?us-ascii?Q?EHYSFiraKet+iXZD5CCctNRfKrdT62z8A3Waw+FcOdlqVs53e4U6oH6aSDID?=
+ =?us-ascii?Q?PLBHXxsgBCLs4W7wF9dhWkV/0J50z+7eJpXZloR05aH1tm3pCqfZxALyPh+v?=
+ =?us-ascii?Q?Id/G+v0cmnDvPlEVUF5s/UV8cNiDEk9r6z6yW3i1Pk3RIIMch4ZRebcN6NIH?=
+ =?us-ascii?Q?lS7u7pNhNNscf//aTEBaCPdC/C5RbuF4eRZxwW/rmbmWkfUzhCZ488b/hSUK?=
+ =?us-ascii?Q?z/a4wqk=3D?=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?pFsvRewXT2Wd3YB9YRBb/5xAYGZY8LsJuQRZgR3qaoreNOsfFDMXPaP4dIot?=
+ =?us-ascii?Q?jt8RMRWaWQNH/FTFvSicwALsvF1GPo6Kf2nYT+3JmlgxgIcNmpd8Uvpa77F+?=
+ =?us-ascii?Q?E9y1GG5OdrMOCcLDnc+agUWfuOUvFTM/fN6z4qkTZM/J0ipXmp1LD9Z3xGA5?=
+ =?us-ascii?Q?pk3cRIbJCi9FKMjXla42mgN+FAjH5CB2/yeKryDxKHGl1YatfI/yCzte8tmg?=
+ =?us-ascii?Q?82fFGRCUawgW4IQ5DFhIE4BlDdxrFPYOtdCCI9ziJrGCqDHF4W53+led6iVx?=
+ =?us-ascii?Q?Q9QUGYimYvn8cNPnb+AvjmqUb6Evru11QNv1XWkAOmuZyB27yvm4zf6zP8qA?=
+ =?us-ascii?Q?I9P64IJGnpTFzlSd6Nw/FWdy8JbHvxu/QMM/vpjI6EPJbMuS7evL4n1HoEZo?=
+ =?us-ascii?Q?Dmbr0t6IfGrTAD5wHx0fwirMh50tKBxy+euIciM2NJDxvxHmWYz6IN4GrwbX?=
+ =?us-ascii?Q?mALU/yE40539tutA763D1s+6h5I/EzPXciUgszNSK7Q6xOdzEbVptu8ZS0JX?=
+ =?us-ascii?Q?giL01NX+V7Gv1BZhRMuAuL4iscT0G8/QLqePiLEm3VkIY9T6t/oSrZnpEb42?=
+ =?us-ascii?Q?4T/UqTt+RsvtQbt+kW6uSsSR3JA7ecHqRrmSdrvz+1V8FfVGH7sftXtNZQ8U?=
+ =?us-ascii?Q?h+wiwY1p7IiCpBQU843AjXAo7ZoKoXIuHQpg1MWsX/2/obd2eqLysAwAjLeA?=
+ =?us-ascii?Q?teejm95PBP8n6R0egkLhd9JIkKvCTqO27n6+xecHyF0qbVugssFCS4vhktgY?=
+ =?us-ascii?Q?lpfkV8EilrXbBd7N9pURGEQa+LWSxJ5j4xEQ0K6Cm/amxqfgLQ/mw8DKxcKX?=
+ =?us-ascii?Q?G+PXBS2cTbgFW75q3Resc7lGquNXSLHAW8ADNWtiBMTeXaAB+zYcD5igHYK9?=
+ =?us-ascii?Q?UPPpp6SFJXBqMYEFGHDfDQy4qd3UQJK4VHPqgVW1uti1+eZ9q7zV8eefDC4r?=
+ =?us-ascii?Q?zfhgcvZQomS/vSs+P+Z9HF+FBLxwPeQmBmKOOG+Ju7I7Ey/6pCCOzuxXT2iE?=
+ =?us-ascii?Q?9Czq3XD1pQZyIzyJb2o0dKckQIVXewTBjXw8Uut1iDLADYjmLtM2bI4rLdP0?=
+ =?us-ascii?Q?s+uB15YPPsS9H3HRLruSWQE2HxB1XqkjD/b2fyxjULzTxfmzV99HzgPi+3F8?=
+ =?us-ascii?Q?JpkANbg5o0BJ8mBeR+FxcgmCFOrbj1bySLVAYF0tmn/22NDsLoRf23KuscEq?=
+ =?us-ascii?Q?Zxy1Mpz55+10k6qjvOqZAGLd7W1ArliyYEXLDJ7lx51qWtekAE2R5TkaI/A9?=
+ =?us-ascii?Q?2i3+5HDsne29jgahVPffGVPATJw34qk2OFaZe915/wyonaPGPSbHgXsimsr9?=
+ =?us-ascii?Q?OfRPgrbOX71mASUTPKDXHIuM7sazqMHnEF7DO9ToBYPr5hRsO80om6dI2hh3?=
+ =?us-ascii?Q?Ad0wuQnQqGnJuLhljpeq7TZj9F58r/JzmKkmMR1WYGzpsYyckuMlWW2GTpjs?=
+ =?us-ascii?Q?KHMy+zMJ6/Nq36hPyR0vWAeXqDgCXF9Lzf4ragIhKvt/0gfWrxboxbwJ7JW3?=
+ =?us-ascii?Q?vAJ2uCLbiPzqLwcjZmhS2q2gSl/MJ6yASOwyX15fp9p/aYar4It6OUkcTW4m?=
+ =?us-ascii?Q?X0XYbm2KVBtOcThHKV2+aRlksuLhm2z01T4rFjcWZ8LT3Vwo8gvVHgdUFHWx?=
+ =?us-ascii?Q?nA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/5] dt-bindings: net: pcs: Add Ethernet PCS for
- Qualcomm IPQ9574 SoC
-To: Krzysztof Kozlowski <krzk@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, Andrew Lunn
-	<andrew@lunn.ch>,
-        Heiner Kallweit <hkallweit1@gmail.com>,
-        Russell King
-	<linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
-        <quic_pavir@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_luoj@quicinc.com>, <srinivas.kandagatla@linaro.org>,
-        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
-        <john@phrozen.org>
-References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
- <20241101-ipq_pcs_rc1-v1-1-fdef575620cf@quicinc.com>
- <c3kdfqqcgczy3k2odbxnemmjvuaoqmli67zisyrrrdfxd5hu4v@thxnvpv5gzap>
-Content-Language: en-US
-From: Lei Wei <quic_leiwei@quicinc.com>
-In-Reply-To: <c3kdfqqcgczy3k2odbxnemmjvuaoqmli67zisyrrrdfxd5hu4v@thxnvpv5gzap>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: m-iU_Uh5vpMRv6Ib9agqRvNmNXsXPNSH
-X-Proofpoint-ORIG-GUID: m-iU_Uh5vpMRv6Ib9agqRvNmNXsXPNSH
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=999 impostorscore=0 suspectscore=0 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411040097
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9a442586-a83a-4910-3ede-08dcfcc00ca5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2024 11:01:35.5786
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /dBedzLFiZixsE+8Il3fjRJVIZt6ZnkfEaL69Ppsnp+bxumHBBygKAKqW6eyBfaAqDKHlHLmoUvSPnrm4VT90Ib+C51Ja2aj2C8gtiLz5nY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7082
+X-OriginatorOrg: intel.com
+
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Mateusz Polchlopek
+> Sent: Tuesday, October 22, 2024 1:41 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; D=
+rewek,
+> Wojciech <wojciech.drewek@intel.com>; Simon Horman <horms@kernel.org>;
+> Polchlopek, Mateusz <mateusz.polchlopek@intel.com>
+> Subject: [Intel-wired-lan] [PATCH iwl-next v12 08/14] iavf: periodically =
+cache PHC
+> time
+>=20
+> From: Jacob Keller <jacob.e.keller@intel.com>
+>=20
+> The Rx timestamps reported by hardware may only have 32 bits of storage f=
+or
+> nanosecond time. These timestamps cannot be directly reported to the Linu=
+x
+> stack, as it expects 64bits of time.
+>=20
+> To handle this, the timestamps must be extended using an algorithm that
+> calculates the corrected 64bit timestamp by comparison between the PHC ti=
+me
+> and the timestamp. This algorithm requires the PHC time to be captured wi=
+thin
+> ~2 seconds of when the timestamp was captured.
+>=20
+> Instead of trying to read the PHC time in the Rx hotpath, the algorithm r=
+elies on a
+> cached value that is periodically updated.
+>=20
+> Keep this cached time up to date by using the PTP .do_aux_work kthread
+> function.
+>=20
+> The iavf_ptp_do_aux_work will reschedule itself about twice a second, and=
+ will
+> check whether or not the cached PTP time needs to be updated.
+> If so, it issues a VIRTCHNL_OP_1588_PTP_GET_TIME to request the time from
+> the PF. The jitter and latency involved with this command aren't importan=
+t,
+> because the cached time just needs to be kept up to date within about ~2
+> seconds.
+>=20
+> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
+> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Co-developed-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> ---
 
 
+Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
-On 11/2/2024 9:34 PM, Krzysztof Kozlowski wrote:
-> On Fri, Nov 01, 2024 at 06:32:49PM +0800, Lei Wei wrote:
->> The 'UNIPHY' PCS block in the IPQ9574 SoC includes PCS and SerDes
->> functions. It supports different interface modes to enable Ethernet
->> MAC connections to different types of external PHYs/switch. It includes
->> PCS functions for 1Gbps and 2.5Gbps interface modes and XPCS functions
->> for 10Gbps interface modes. There are three UNIPHY (PCS) instances
->> in IPQ9574 SoC which provide PCS/XPCS functions to the six Ethernet
->> ports.
->>
->> Signed-off-by: Lei Wei <quic_leiwei@quicinc.com>
->> ---
->>   .../bindings/net/pcs/qcom,ipq9574-pcs.yaml         | 230 +++++++++++++++++++++
->>   include/dt-bindings/net/pcs-qcom-ipq.h             |  15 ++
->>   2 files changed, 245 insertions(+)
->>
->> diff --git a/Documentation/devicetree/bindings/net/pcs/qcom,ipq9574-pcs.yaml b/Documentation/devicetree/bindings/net/pcs/qcom,ipq9574-pcs.yaml
->> new file mode 100644
->> index 000000000000..a33873c7ad73
->> --- /dev/null
->> +++ b/Documentation/devicetree/bindings/net/pcs/qcom,ipq9574-pcs.yaml
->> @@ -0,0 +1,230 @@
->> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
->> +%YAML 1.2
->> +---
->> +$id: http://devicetree.org/schemas/net/pcs/qcom,ipq9574-pcs.yaml#
->> +$schema: http://devicetree.org/meta-schemas/core.yaml#
->> +
->> +title: Ethernet PCS for Qualcomm IPQ SoC
-> 
-> s/IPQ/IPQ9574/
-> 
-
-OK, will update.
-
->> +
->> +maintainers:
->> +  - Lei Wei <quic_leiwei@quicinc.com>
-> 
-> ...
-> 
->> +    const: 0
->> +
->> +  clocks:
->> +    items:
->> +      - description: system clock
->> +      - description: AHB clock needed for register interface access
->> +
->> +  clock-names:
->> +    items:
->> +      - const: sys
->> +      - const: ahb
->> +
->> +  '#clock-cells':
-> 
-> Use consistent quotes, either ' or "
-> 
-
-OK, will use single quotes ' everywhere.
-
->> +    const: 1
->> +    description: See include/dt-bindings/net/pcs-qcom-ipq.h for constants
->> +
->> +patternProperties:
->> +  "^pcs-mii@[0-4]$":
->> +    type: object
->> +    description: PCS MII interface.
->> +
->> +    properties:
->> +      reg:
->> +        minimum: 0
->> +        maximum: 4
->> +        description: MII index
->> +
->> +      clocks:
->> +        items:
->> +          - description: PCS MII RX clock
->> +          - description: PCS MII TX clock
->> +
->> +      clock-names:
->> +        items:
->> +          - const: mii_rx
-> 
-> rx
-> 
-
-OK.
-
->> +          - const: mii_tx
-> 
-> tx
-
-OK.
-
-> 
->> +
->> +    required:
->> +      - reg
->> +      - clocks
->> +      - clock-names
->> +
->> +    additionalProperties: false
->> +
->> +required:
->> +  - compatible
->> +  - reg
->> +  - '#address-cells'
->> +  - '#size-cells'
->> +  - clocks
->> +  - clock-names
->> +  - '#clock-cells'
->> +
->> +additionalProperties: false
->> +
->> +examples:
->> +  - |
->> +    #include <dt-bindings/clock/qcom,ipq9574-gcc.h>
->> +
->> +    pcs0: ethernet-pcs@7a00000 {
-> 
-> Drop unused labels here and further.
-> 
-
-OK, will drop the unused labels "pcs0" and "pcs0_miiX".
-
->> +        compatible = "qcom,ipq9574-pcs";
->> +        reg = <0x7a00000 0x10000>;
->> +        #address-cells = <1>;
->> +        #size-cells = <0>;
->> +        clocks = <&gcc GCC_UNIPHY0_SYS_CLK>,
->> +                 <&gcc GCC_UNIPHY0_AHB_CLK>;
->> +        clock-names = "sys",
->> +                      "ahb";
->> +        #clock-cells = <1>;
->> +
->> +        pcs0_mii0: pcs-mii@0 {
->> +            reg = <0>;
->> +            clocks = <&nsscc 116>,
->> +                     <&nsscc 117>;
->> +            clock-names = "mii_rx",
->> +                          "mii_tx";
->> +        };
->> +
->> +        pcs0_mii1: pcs-mii@1 {
->> +            reg = <1>;
->> +            clocks = <&nsscc 118>,
->> +                     <&nsscc 119>;
->> +            clock-names = "mii_rx",
->> +                          "mii_tx";
->> +        };
->> +
->> +        pcs0_mii2: pcs-mii@2 {
->> +            reg = <2>;
->> +            clocks = <&nsscc 120>,
->> +                     <&nsscc 121>;
->> +            clock-names = "mii_rx",
->> +                          "mii_tx";
->> +        };
->> +
->> +        pcs0_mii3: pcs-mii@3 {
->> +            reg = <3>;
->> +            clocks = <&nsscc 122>,
->> +                     <&nsscc 123>;
->> +            clock-names = "mii_rx",
->> +                          "mii_tx";
->> +        };
->> +    };
->> +
->> +    pcs1: ethernet-pcs@7a10000 {
-> 
-> One example is enough, drop the rest.
-> 
-
-OK.
-
->> +        compatible = "qcom,ipq9574-pcs";
->> +        reg = <0x7a10000 0x10000>;
->> +        #address-cells = <1>;
->> +        #size-cells = <0>;
->> +        clocks = <&gcc GCC_UNIPHY1_SYS_CLK>,
->> +                 <&gcc GCC_UNIPHY1_AHB_CLK>;
->> +        clock-names = "sys",
->> +                      "ahb";
->> +        #clock-cells = <1>;
->> +
->> +        pcs1_mii0: pcs-mii@0 {
->> +            reg = <0>;
->> +            clocks = <&nsscc 124>,
->> +                     <&nsscc 125>;
->> +            clock-names = "mii_rx",
->> +                          "mii_tx";
->> +        };
->> +    };
->> +
->> +    pcs2: ethernet-pcs@7a20000 {
->> +        compatible = "qcom,ipq9574-pcs";
->> +        reg = <0x7a20000 0x10000>;
->> +        #address-cells = <1>;
->> +        #size-cells = <0>;
->> +        clocks = <&gcc GCC_UNIPHY2_SYS_CLK>,
->> +                 <&gcc GCC_UNIPHY2_AHB_CLK>;
->> +        clock-names = "sys",
->> +                      "ahb";
->> +        #clock-cells = <1>;
->> +
->> +        pcs2_mii0: pcs-mii@0 {
->> +            reg = <0>;
->> +            clocks = <&nsscc 126>,
->> +                     <&nsscc 127>;
->> +            clock-names = "mii_rx",
->> +                          "mii_tx";
->> +        };
->> +    };
->> diff --git a/include/dt-bindings/net/pcs-qcom-ipq.h b/include/dt-bindings/net/pcs-qcom-ipq.h
->> new file mode 100644
->> index 000000000000..8d9124ffd75d
->> --- /dev/null
->> +++ b/include/dt-bindings/net/pcs-qcom-ipq.h
-> 
-> Filename matching exactly binding filename.
-> 
-
-OK.
-
-> Best regards,
-> Krzysztof
-> 
 
 
