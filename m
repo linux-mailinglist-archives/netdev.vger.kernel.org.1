@@ -1,237 +1,213 @@
-Return-Path: <netdev+bounces-141630-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141631-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5550C9BBD3D
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:24:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C8C9D9BBD3E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:25:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A4D6CB20B7F
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:24:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE3531C21460
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:25:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4775B1CACD0;
-	Mon,  4 Nov 2024 18:24:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C27311CB318;
+	Mon,  4 Nov 2024 18:24:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="BcIOfNgz"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="FWt+i2d6"
 X-Original-To: netdev@vger.kernel.org
-Received: from fhigh-b5-smtp.messagingengine.com (fhigh-b5-smtp.messagingengine.com [202.12.124.156])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 397221C6F70
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:24:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04C7A1CACDE
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:24:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730744652; cv=none; b=czZLASBfHSMrAVSxSRpnunHnbUc4a2Aus0q1p/aWe35j7Du9hST9Co4Xw77wjtNb3/XA2ndlxzQqEPnNMgQfdmXfUkBWIcVQTmZKk5cQsOeJbJNbhfIfOhd87xMzcsB33h774dEmyvJE3JooUBIBllBPzrGTgiUJ97xbGVyKFg0=
+	t=1730744698; cv=none; b=KDTqSV9G7R1C+jf/qL8Upc9Mzytf+UCmfA4ZBfhMk99dkdaJb1y895zjZzmy9tUm73EWW7t/ycie1361W89fT4+t4bdFJ2qUt3AA7wgPKlxC4pDKegqaRM96sCE/ekYDUYiYRmymeNBN+kmBBFHB+E/2ZVsF2i3dw0HKJc62TG8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730744652; c=relaxed/simple;
-	bh=wCTAqgKdkSa0YuEkuz7gnB4EPPV0CnF4SXiM6iliv5Q=;
+	s=arc-20240116; t=1730744698; c=relaxed/simple;
+	bh=hjmtCr4RvpNtlz3b/lLgBNa8CcjPWCV2aUlUR2nChXc=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Tnn5+CPk2L3zfkDa7WFJkMLRp/+fD9gZYSr8DBOixT3CQIaxja0sAHJUqzqEOb7munZuupd8wsVzrXjcSi7fMLhvtB94GbqbxqwcCeCpDvHiAtNJYjV4/HuN2qBlNZ0c83MG+4B/VX34NFjExbBmvK9x5/71Pa9yjNriAPy8kPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=BcIOfNgz; arc=none smtp.client-ip=202.12.124.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfhigh.stl.internal (Postfix) with ESMTP id 0AEFD2540170;
-	Mon,  4 Nov 2024 13:24:09 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-12.internal (MEProxy); Mon, 04 Nov 2024 13:24:09 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1730744648; x=1730831048; bh=KrEZgdZ6WSUOVpe3h/G/+NPMfNurDWWDIiN
-	ecQ2Gmdg=; b=BcIOfNgzlIQZwtyJLI9l3IEFU1pk4ABma8iOee1cFaPnKAMYI2E
-	BanoLXvDWDMsdRm8VaHSYbyeegF0AidK7Yn07Ubmz4FoNHxAFa+NdnMyCw5RKbgZ
-	7ZR19ee9gL5/bxGhD8rvEjSKneYjoeY/ieYe73YHrA2rNa8D406eMZrS3Sui1vXS
-	lmUjYSX6gW2tiGKpdZcXheOUcc2t4Lh3jQRk0Xe3SjMG2os/A8UUJ1HVCJR5X6DF
-	m417lvSzd65TOjpdectd5d9+++4GoIm5Ak4GGBzkvJymBDKgkSzfEBb+a/qteWl2
-	SwFaDD4KMIWirOggyPMlPdcOGpagIqfJLAA==
-X-ME-Sender: <xms:SBEpZ07mV0I-YW_nO_rlBYuuFVMKjpg3sjq009KJfqM2sEb4Y6OmOg>
-    <xme:SBEpZ14_NXSJ684Dq1xhdNMecTJs3_gc4g4Uxg4kZ-_bLcr67Bwy_6FztFDL_D9pa
-    o6LqlH3zmchtSk>
-X-ME-Received: <xmr:SBEpZzfHojfhnQGYadQKilmBhynoGfzE_W3KZu0vweGCYPIm8doJ0M0X8q2i>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeliedguddutdcutefuodetggdotefrod
-    ftvfcurfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdp
-    uffrtefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivg
-    hnthhsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddv
-    necuhfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrd
-    horhhgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudei
-    fefgleekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphht
-    thhopeelpdhmohguvgepshhmthhpohhuthdprhgtphhtthhopeguohhnrghlugdrhhhunh
-    htvghrsehgmhgrihhlrdgtohhmpdhrtghpthhtohepnhgvthguvghvsehvghgvrhdrkhgv
-    rhhnvghlrdhorhhgpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopegurghvvghmsegurghvvghmlhhofhhtrdhnvghtpdhrtghpthhtohepvgguuhhm
-    rgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehprggsvghnihesrhgvughhrg
-    htrdgtohhmpdhrtghpthhtohephhhorhhmsheskhgvrhhnvghlrdhorhhgpdhrtghpthht
-    ohepughonhgrlhgurdhhuhhnthgvrhesrhgvughhrghtrdgtohhmpdhrtghpthhtohepgh
-    hnrghulhhtsehrvgguhhgrthdrtghomh
-X-ME-Proxy: <xmx:SBEpZ5Ko4Yx3Qe3eEryE_xnPCsFYHBW5X05KoIBqnslsxY_hYOW_rw>
-    <xmx:SBEpZ4K2Y_jvhXoshyXmMVdocJBHS1Y0B2ErQpxgQNDaiaC2sazAgA>
-    <xmx:SBEpZ6wdLNVRY3mlIWkPxn0XDM_tmTYziXkYYkTVDTNCJis5nOZl1g>
-    <xmx:SBEpZ8K7nlsXf22aCy2zGyMHfC83T41Z0FYXOzEAcMCQ2Gzw2qjXNw>
-    <xmx:SBEpZ3_rfYJmqRHnZ_zsvzY8CLIbLdWCYLWDZgfZoK8G0BLpxb0WKDoT>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 4 Nov 2024 13:24:08 -0500 (EST)
-Date: Mon, 4 Nov 2024 20:24:06 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Donald Hunter <donald.hunter@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=REM7VpoOSnBsbzhNEgNe2dhKHvHstDNt6b3ojdTgYHffAA1UF5bo+5SUrEHXqAp0mXvx5de05gjpxisXyvGZQGnbWcodENc+ANzNHmufTvUIw1Ttn03XArD3JCKXZRoZQrkXqI7zP9tpbsLvnz2vdq3nW/n5XERci7DL31X6t/k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=FWt+i2d6; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ee51d9ae30so2615648a12.1
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 10:24:56 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1730744696; x=1731349496; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=vEXIZqC5VcLDorkVVv0u5LjNvfAzKSFSY+HZszN2aqU=;
+        b=FWt+i2d6Qq4r30sCRa9UXIYQnT/ioFsy6muWqvINzn59bEPPy8OViTJH/WFHcOMLIR
+         4v0zswpv5FrE+UP0Rr1Cje+5lr0SL4polON3d6lAK+rJjKTC5k0HuDeUaB0TB7Q4dUOG
+         8WcwzrM7usUS9w+cKHUcMqnaJug8s6il+K2Z0=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730744696; x=1731349496;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:mail-followup-to:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=vEXIZqC5VcLDorkVVv0u5LjNvfAzKSFSY+HZszN2aqU=;
+        b=iZZd0iwACLW5XpgOpOPzhUlkuhk0SwDbYnXxRu73yDNXh/bCJ6CljjCcPlHmU/6+2a
+         iGQmwDkbjZiyGFS8zQ5I79GI4a+5bDBYkGF3JT38u5brHnW2Gv9TR0aTHaY7cwBMXcFR
+         /WsFHdsS90+QWE9ugEUl9gY2xfwVClN0+tSBJedXtEV7Q2678bn9gwkgSpnoxlgfGLVC
+         LkdA/AZGikErpdpVnqY9CLvX4nsKB1bqy6Sh/nWnTpAFYEM1ZYjxQq8/Cy6cPtu4qyM/
+         T/de72zSYPVxHlH/+G2C68H2Qwhb35hAUBUWuINAycRZajkZmGC7/HDAVjVgJr43q8ZR
+         f6Rg==
+X-Gm-Message-State: AOJu0YyQB2rKC833o/Ut01WkIvnY3bx/Q7ZFzEXUNhvSQVDA9gS3swvs
+	DZEpB46iuV8hWO24x+Yh3LnxOfoD5ob3EdVr/95+eH1cx5rTdNSdDoEJolateP4=
+X-Google-Smtp-Source: AGHT+IFpdfhbfkjgEQWpS6fEh5XcbhUvqgvXbQ8YCcQUXqN2GLQVkvXuNax1ALfDwZxYSpCLmjOVCg==
+X-Received: by 2002:a17:90b:2703:b0:2d3:c9bb:9cd7 with SMTP id 98e67ed59e1d1-2e94c52aa1amr19422073a91.36.1730744696125;
+        Mon, 04 Nov 2024 10:24:56 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa123e0sm10392385a91.7.2024.11.04.10.24.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 10:24:55 -0800 (PST)
+Date: Mon, 4 Nov 2024 10:24:52 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: netdev@vger.kernel.org, hdanton@sina.com, pabeni@redhat.com,
+	namangulati@google.com, edumazet@google.com,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
+	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
 	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, donald.hunter@redhat.com,
-	gnault@redhat.com
-Subject: Re: [PATCH net-next v1 2/2] netlink: specs: Add a spec for FIB rule
- management
-Message-ID: <ZykRRvZ-lvfEz_EG@shredder>
-References: <20241104165352.19696-1-donald.hunter@gmail.com>
- <20241104165352.19696-3-donald.hunter@gmail.com>
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 7/7] docs: networking: Describe irq suspension
+Message-ID: <ZykRdK6WgfR_4p5X@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Bagas Sanjaya <bagasdotme@gmail.com>, netdev@vger.kernel.org,
+	hdanton@sina.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+References: <20241103052421.518856-1-jdamato@fastly.com>
+ <20241103052421.518856-8-jdamato@fastly.com>
+ <ZyinhIlMIrK58ABF@archie.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <20241104165352.19696-3-donald.hunter@gmail.com>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <ZyinhIlMIrK58ABF@archie.me>
 
-On Mon, Nov 04, 2024 at 04:53:52PM +0000, Donald Hunter wrote:
-> Add a YNL spec for FIB rules:
+On Mon, Nov 04, 2024 at 05:52:52PM +0700, Bagas Sanjaya wrote:
+> On Sun, Nov 03, 2024 at 05:24:09AM +0000, Joe Damato wrote:
+> > +It is important to note that choosing a large value for ``gro_flush_timeout``
+> > +will defer IRQs to allow for better batch processing, but will induce latency
+> > +when the system is not fully loaded. Choosing a small value for
+> > +``gro_flush_timeout`` can cause interference of the user application which is
+> > +attempting to busy poll by device IRQs and softirq processing. This value
+> > +should be chosen carefully with these tradeoffs in mind. epoll-based busy
+> > +polling applications may be able to mitigate how much user processing happens
+> > +by choosing an appropriate value for ``maxevents``.
+> > +
+> > +Users may want to consider an alternate approach, IRQ suspension, to help deal
+>                                                                      to help dealing
+> > +with these tradeoffs.
+> > +
+
+Thanks for the careful review. I read this sentence a few times and
+perhaps my English grammar isn't great, but I think it should be
+one of:
+
+Users may want to consider an alternate approach, IRQ suspension, to
+help deal with these tradeoffs.  (the original)
+
+or
+
+Users may want to consider an alternate approach, IRQ suspension,
+which can help to deal with these tradeoffs.
+
+or
+
+Users may want to consider an alternate approach, IRQ suspension,
+which can help when dealing with these tradeoffs.
+
+I am thinking of leaving the original unless you have a strong
+preference? My apologies if I've gotten the grammar wrong here :)
+
+Please let me know.
+
+> > <snipped>...
+> > +There are essentially three possible loops for network processing and
+> > +packet delivery:
+> > +
+> > +1) hardirq -> softirq   -> napi poll; basic interrupt delivery
+> > +
+> > +2)   timer -> softirq   -> napi poll; deferred irq processing
+> > +
+> > +3)   epoll -> busy-poll -> napi poll; busy looping
 > 
-> ./tools/net/ynl/cli.py \
->     --spec Documentation/netlink/specs/rt_rule.yaml \
->     --dump getrule --json '{"family": 2}'
+> The loops list are parsed inconsistently due to tabs between the
+> enumerators and list items. I have to expand them into single space
+> (along with number reference fix to follow the output):
+
+Thank you for doing that. I'll take the suggested patch below and
+apply it for our v6.
+
+> ---- >8 ----
+> diff --git a/Documentation/networking/napi.rst b/Documentation/networking/napi.rst
+> index bbd58bcc430fab..848cb19f0becc1 100644
+> --- a/Documentation/networking/napi.rst
+> +++ b/Documentation/networking/napi.rst
+> @@ -375,23 +375,21 @@ epoll finds no events, the setting of ``gro_flush_timeout`` and
+>  There are essentially three possible loops for network processing and
+>  packet delivery:
+>  
+> -1) hardirq -> softirq   -> napi poll; basic interrupt delivery
+> +1) hardirq -> softirq -> napi poll; basic interrupt delivery
+> +2) timer -> softirq -> napi poll; deferred irq processing
+> +3) epoll -> busy-poll -> napi poll; busy looping
+>  
+> -2)   timer -> softirq   -> napi poll; deferred irq processing
+> -
+> -3)   epoll -> busy-poll -> napi poll; busy looping
+> -
+> -Loop 2) can take control from Loop 1), if ``gro_flush_timeout`` and
+> +Loop 2 can take control from Loop 1, if ``gro_flush_timeout`` and
+>  ``napi_defer_hard_irqs`` are set.
+>  
+> -If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are set, Loops 2)
+> -and 3) "wrestle" with each other for control.
+> +If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are set, Loops 2
+> +and 3 "wrestle" with each other for control.
+>  
+> -During busy periods, ``irq-suspend-timeout`` is used as timer in Loop 2),
+> -which essentially tilts network processing in favour of Loop 3).
+> +During busy periods, ``irq-suspend-timeout`` is used as timer in Loop 2,
+> +which essentially tilts network processing in favour of Loop 3.
+>  
+> -If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are not set, Loop 3)
+> -cannot take control from Loop 1).
+> +If ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` are not set, Loop 3
+> +cannot take control from Loop 1.
+>  
+>  Therefore, setting ``gro_flush_timeout`` and ``napi_defer_hard_irqs`` is
+>  the recommended usage, because otherwise setting ``irq-suspend-timeout``
 > 
-> [{'action': 'to-tbl',
->   'dst-len': 0,
->   'family': 2,
->   'flags': 0,
->   'protocol': 2,
->   'src-len': 0,
->   'suppress-prefixlen': '0xffffffff',
->   'table': 255,
->   'tos': 0},
->   ... ]
+> Thanks.
 > 
-> Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+> -- 
+> An old man doll... just what I always wanted! - Clara
 
-[...]
 
-> +attribute-sets:
-> +  -
-> +    name: fib-rule-attrs
-> +    attributes:
-> +      -
-> +        name: dst
-> +        type: u32
-> +      -
-> +        name: src
-> +        type: u32
-> +      -
-> +        name: iifname
-> +        type: string
-> +      -
-> +        name: goto
-> +        type: u32
-> +      -
-> +        name: unused2
-> +        type: pad
-> +      -
-> +        name: priority
-> +        type: u32
-> +      -
-> +        name: unused3
-> +        type: pad
-> +      -
-> +        name: unused4
-> +        type: pad
-> +      -
-> +        name: unused5
-> +        type: pad
-> +      -
-> +        name: fwmark
-> +        type: u32
-> +        display-hint: hex
-> +      -
-> +        name: flow
-> +        type: u32
-> +      -
-> +        name: tun-id
-> +        type: u64
-> +      -
-> +        name: suppress-ifgroup
-> +        type: u32
-> +      -
-> +        name: suppress-prefixlen
-> +        type: u32
-> +        display-hint: hex
-> +      -
-> +        name: table
-> +        type: u32
-> +      -
-> +        name: fwmask
-> +        type: u32
-> +        display-hint: hex
-> +      -
-> +        name: oifname
-> +        type: string
-> +      -
-> +        name: pad
-> +        type: pad
-> +      -
-> +        name: l3mdev
-> +        type: u8
-> +      -
-> +        name: uid-range
-> +        type: binary
-> +        struct: fib-rule-uid-range
-> +      -
-> +        name: protocol
-> +        type: u8
-> +      -
-> +        name: ip-proto
-> +        type: u8
-> +      -
-> +        name: sport-range
-> +        type: binary
-> +        struct: fib-rule-port-range
-> +      -
-> +        name: dport-range
-> +        type: binary
-> +        struct: fib-rule-port-range
-
-Donald,
-
-We added a new DSCP attribute in the last release. Can you please
-include it in the spec? Tested the following diff [1].
-
-Thanks!
-
-[1]
-diff --git a/Documentation/netlink/specs/rt_rule.yaml b/Documentation/netlink/specs/rt_rule.yaml
-index 736bcdb25738..8d1a594e851d 100644
---- a/Documentation/netlink/specs/rt_rule.yaml
-+++ b/Documentation/netlink/specs/rt_rule.yaml
-@@ -169,6 +169,9 @@ attribute-sets:
-         name: dport-range
-         type: binary
-         struct: fib-rule-port-range
-+      -
-+        name: dscp
-+        type: u8
- 
- operations:
-   enum-model: directional
-@@ -199,6 +202,7 @@ operations:
-             - ip-proto
-             - sport-range
-             - dport-range
-+            - dscp
-     -
-       name: newrule-ntf
-       doc: Notify a rule creation
 
