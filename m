@@ -1,221 +1,182 @@
-Return-Path: <netdev+bounces-141523-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141528-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E1659BB3A5
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:40:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3C199BB406
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:58:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0469C1F21E44
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:40:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D4E61C213D1
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:58:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D53A91AF0B3;
-	Mon,  4 Nov 2024 11:40:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBB641B3949;
+	Mon,  4 Nov 2024 11:58:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b="ZfRTK+nS";
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="ngpzT2Ro"
+	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="F6fTrKDv"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-a1-smtp.messagingengine.com (fout-a1-smtp.messagingengine.com [103.168.172.144])
+Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2049.outbound.protection.outlook.com [40.107.101.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E29894430;
-	Mon,  4 Nov 2024 11:40:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=103.168.172.144
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730720419; cv=none; b=HE27RnomprWI+RPfqfuQ7ejOOsJ50uP9+3ejQHYAb6V3MedtrrTvQ8wkUxzenzAadANlr+ObyZsK4Kr2W//C4cI0oIfdZkvZzdthtZhIU4nKg9FrP/jgPodOyb2i2KrA62M1MNBxWW10yK2I44wyZm37LrPWTg9m6gZtjvpnrGw=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730720419; c=relaxed/simple;
-	bh=oP6HlThFxLs4XFbw1JoNa2rJAAq8xNotdQDdTtnEFns=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=LboYw5V2xzw31ztTlp3GZbx6aoaPH6yDvPkPU0X4NGlqhTsd/z7rSEnF1+ERLSPUhda7IZP5KIGbgGasvwo+451RpR3psNJNS7nlKlpHxjaT0mGUlH+A9kln1MCXj/WCTfstk/Zu8ETdv7YJu0ME+Ur2oiVHcg78A7b32pdPoAI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se; spf=pass smtp.mailfrom=ragnatech.se; dkim=pass (2048-bit key) header.d=ragnatech.se header.i=@ragnatech.se header.b=ZfRTK+nS; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=ngpzT2Ro; arc=none smtp.client-ip=103.168.172.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ragnatech.se
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ragnatech.se
-Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
-	by mailfout.phl.internal (Postfix) with ESMTP id E67941380245;
-	Mon,  4 Nov 2024 06:40:15 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-08.internal (MEProxy); Mon, 04 Nov 2024 06:40:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ragnatech.se; h=
-	cc:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to; s=fm2; t=1730720415;
-	 x=1730806815; bh=9NvuvEGu3Y4fTmutyF3/3Q9gfOSQU+11sjoTRbXFud0=; b=
-	ZfRTK+nSkeMx3RXf2XQuFpxvYZRGie/5Yhg+B5CtJfTucY3IJkVu3Kr3mhGseIkt
-	TixKhMIb86u0Rab4gw0osHZhrsLu0QAVUbCIWlK+n2Cqb77OeCMf3zzFTrZc4Usy
-	1fxqVFs6X2dp7GRLu+0LyCNiXyy2vzu7t4n/m3qZ16e9MqXfT3NImd36OHUbvcer
-	ervWrXQJz2ojyenuEon0CPfootIEDLAvM1rNbvjajiCPVTB8RD/4RxsMu3zCp36h
-	eDFFr21BUtciOS6b4jFVve97URoOgoBFreaIqxMgOVTuob9xcdQiyoa7H8KDZAR0
-	UgTbh3HkiYaZD859+Yszmw==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:subject:subject:to:to:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=1730720415; x=
-	1730806815; bh=9NvuvEGu3Y4fTmutyF3/3Q9gfOSQU+11sjoTRbXFud0=; b=n
-	gpzT2RoN5LgOBPo4CP6HmzwHuBuDrljq7eAbe8iGsFgP5F/rKfKarrPoQoUBqnp3
-	ldpWdKOE9tvXclshdKIfnUTQ7ixVUW5aDmB8vum5TbhbEhZxuUFX1zrivLIWI4Zh
-	6JfclzyyagDG6yp3NYoeJ0jnW8KjtiNVx4giaCIKHUDuETs7SL0XoJao9msFNZPZ
-	13gUptKidOuSRYyqD7wlmSLTkensrV3hsVPRW1Fg+Q3uz6dYCuSLK/CM2zmy6jWZ
-	awE2NIPRkZFHrWr//tAf7DgJGrwK6E/C9syrKXGf06h8+P5XEM1bJ7ow6n97mlbA
-	fw9I0a4klDEYZvYE4NBPA==
-X-ME-Sender: <xms:nrIoZ7d4JISUqqkav6FmE-wqB6wSDq6F22AkNIry-Qf-OaZoaeVkUQ>
-    <xme:nrIoZxPspUrmFkH5lK1zsoF0oMbWrS2swMWew6Rm7iHV-Eh3nabzNsO82553Fdph_
-    xpLhsdXEnsNfIeWtpE>
-X-ME-Received: <xmr:nrIoZ0juou1mKZgcYByeqTTIhcNp_h5JcNcDcuC41Fsxq1y9c0_KtLGbCljgJac2qeDnqPNYWy-H2Bbf9yMkvfoCvcbYQlyfBA>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeliedgvdelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkeertddttdej
-    necuhfhrohhmpefpihhklhgrshcuufpnuggvrhhluhhnugcuoehnihhklhgrshdrshhoug
-    gvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrshgvqeenucggtffrrght
-    thgvrhhnpeefhfellefhffejgfefudfggeejlefhveehieekhfeulefgtdefueehffdtvd
-    elieenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpehn
-    ihhklhgrshdrshhouggvrhhluhhnugdorhgvnhgvshgrshesrhgrghhnrghtvggthhdrsh
-    gvpdhnsggprhgtphhtthhopeduhedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohep
-    ghgvvghrthdorhgvnhgvshgrshesghhlihguvghrrdgsvgdprhgtphhtthhopehgrhgvgh
-    hkhheslhhinhhugihfohhunhgurghtihhonhdrohhrghdprhgtphhtthhopehprghulhdr
-    sggrrhhkvghrrdgtthessghprdhrvghnvghsrghsrdgtohhmpdhrtghpthhtoheptghlrg
-    huughiuhdrsggviihnvggrrdhujhessghprdhrvghnvghsrghsrdgtohhmpdhrtghpthht
-    ohephihoshhhihhhihhrohdrshhhihhmohgurgdruhhhsehrvghnvghsrghsrdgtohhmpd
-    hrtghpthhtohepjhgrmhgvshdrsghothhtohhmlhgvhieshhgrnhhsvghnphgrrhhtnhgv
-    rhhshhhiphdrtghomhdprhgtphhtthhopegrrhhnugesrghrnhgusgdruggvpdhrtghpth
-    htohepshgvrhhgvghirdhshhhthihlhihovhesghhmrghilhdrtghomhdprhgtphhtthho
-    pehlihhnuhigqdhrvghnvghsrghsqdhsohgtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
-X-ME-Proxy: <xmx:nrIoZ8-Qt--vfk6ocNKhaE2m9iIqgy5Or-xTJcI4Znqw0g397x1SqA>
-    <xmx:nrIoZ3tmWjpoifNQagnMtALxGSF5h3PFQmtMem72VRrb-VbocTltHQ>
-    <xmx:nrIoZ7HA2rTC_fVIIfShUX_HS6JENNCo51ydAAyh6BB2t8t-a2mfkQ>
-    <xmx:nrIoZ-OiDB4x6VOq20qOMa4w5I1eMB4pyV6G2od5Pxii6fyddHANVA>
-    <xmx:n7IoZ_Mf5HCqw0hwfyhdJXRFB_Djjzp0i-u8Arfxko5kdqc4I9okRsf9>
-Feedback-ID: i80c9496c:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 4 Nov 2024 06:40:14 -0500 (EST)
-Date: Mon, 4 Nov 2024 12:40:07 +0100
-From: Niklas =?utf-8?Q?S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>
-To: Geert Uytterhoeven <geert+renesas@glider.be>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Paul Barker <paul.barker.ct@bp.renesas.com>,
-	Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
-	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
-	James Bottomley <James.Bottomley@hansenpartnership.com>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Sergei Shtylyov <sergei.shtylyov@gmail.com>,
-	linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
-	linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
-	Niklas Cassel <cassel@kernel.org>
-Subject: Re: [PATCH/RFC v2] MAINTAINERS: Re-add cancelled Renesas driver
- sections
-Message-ID: <20241104114007.GA1412590@ragnatech.se>
-References: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A85F1B2199
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 11:58:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.101.49
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730721527; cv=fail; b=YFMVsJxggCTCppLFL+FKEwhDo6itOPwx+oDkDUoi9Oxct5WuQOuouafy2TJpuTVY+SpfBfmGgsYGRqbxDLQ91+iwOljGX1K+pl0c42sINoixLYWfAiIfdM8+12e/TOPO7khgxTZWvrWizvAXU1Z99xQwz9S7IQhvz9O/0Q3APT8=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730721527; c=relaxed/simple;
+	bh=xieV/x0xSRd6kf0TSidB70M+O3Fz2Wsp3tSQRBil0eU=;
+	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
+	 MIME-Version:Content-Type; b=o9qthbaALMrM0DJt8x3g4rNPoquhTIL9WvNlls/iH/HysH70LbFaMRxtpF9/T1LMOHFtRJ54MeAJnmmsGkkpcna/9z0dm0iNtffAuJk+wOPGTIBTWcTRof3ypz43dEOjFEhQ+Qe0sA4+TtpaT52gPX74ysCyzfbKMiFnvEKD+zQ=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=F6fTrKDv; arc=fail smtp.client-ip=40.107.101.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=kgVbdLgcSh3d1IAZzN77cM3z8Fp71Ln3BGlducfoiAz25k78QXDXkIB89HShwxwntv23RNsHgNsLbtT2GOVtOUoMfsJB7h8+eab48/CaM1vR5KEN0Bq99OKWVfNva68Gjji8iVzy6mJnnbP817NineLaCiUpwQwZj2MyP9ieRyUkznVxRz+G1oFUhDpLWBYItvEIYAxAXG5NVRiss5KVgVdcZAdTXoJC8V4NhrgkFOc1m10bg85oO28OO+t0qovhCQwwj5o3tQuS35M0IVzLsDTjt1Dt15v73Fl7HruyjinaschMqwdWVRbpYZcxi4JzAI6Ak0ud7Y/CY9k9bOV2nw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=BrW/YZhfHf2lHV/+YTYmRpmcR1B/8tqtUZZzpjpLTtc=;
+ b=TOoXycGcEjAGX0T8YyER0wyuFZqd0wIUsbFfU7uNwsgFPsvIXARxcsLCGgFtJgnlN/RrXFMiFZkTqnBUppZTxZqWRMmV/0JnJEL9/EHKSNiphcdNJUYEBsdqbLXTodHTbv5aR9yx7iAwAbvWe8cxRtpF4/Kqvkz3B1ikJEb33sUhraOZ3FRBvwb1eXcYV5PVvqMuNtIPZvk8fDkQmNap9fLL1gZ8iR5Fhg8SwE9Ss2SLB6ZVa6XRrUJjyw7egUu9Bvgc8sRLuso6BPsiYciHthNjt2tJBWREB08KUzMpOl+yrfs9Q+JRaCmtxZJgXNjN7/gYRGHCgakEF1M4dMqesA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=nxp.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none (0)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=BrW/YZhfHf2lHV/+YTYmRpmcR1B/8tqtUZZzpjpLTtc=;
+ b=F6fTrKDvB6UOA57AZdJBO9qxxbr/q9IvMs4zvR+Kd3LsF0ulrSyV8nMKHsgRFU4IvRKa2FgEiLafPIm+4YBLhIs2XNNWzIg0ygm5sgkyFiIWlxdMANEo1wE7jZdqzGpq/gBZjqjP4yfMw++mdBU7SON/iIxkAwkvnBUscAkxXsvUv5p+K6e0IE66+dHK3L1CDXF5cWLoC8S9XxjYXsLM31KVcalQ8Bez6k5JtDOwUDe5NuBaX9uPs4+itQirr4ZuwpqHdLnnFnr912yTKTxVeKVe/wU2xgp3XYubdJA/Tv3rJcVXxD71Uqq2AUkDrqB3ok5dNgEL9zZt1+mf1tot9A==
+Received: from SJ0PR13CA0129.namprd13.prod.outlook.com (2603:10b6:a03:2c6::14)
+ by PH7PR12MB6612.namprd12.prod.outlook.com (2603:10b6:510:210::14) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
+ 2024 11:58:42 +0000
+Received: from SJ1PEPF00002310.namprd03.prod.outlook.com
+ (2603:10b6:a03:2c6:cafe::8b) by SJ0PR13CA0129.outlook.office365.com
+ (2603:10b6:a03:2c6::14) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.17 via Frontend
+ Transport; Mon, 4 Nov 2024 11:58:42 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ SJ1PEPF00002310.mail.protection.outlook.com (10.167.242.164) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.17 via Frontend Transport; Mon, 4 Nov 2024 11:58:42 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 4 Nov 2024
+ 03:58:30 -0800
+Received: from fedora (10.126.230.35) by rnnvmail201.nvidia.com (10.129.68.8)
+ with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Mon, 4 Nov 2024
+ 03:58:24 -0800
+References: <cover.1729786087.git.petrm@nvidia.com>
+ <20241029121807.1a00ae7d@kernel.org>
+User-agent: mu4e 1.8.14; emacs 29.4
+From: Petr Machata <petrm@nvidia.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Petr Machata <petrm@nvidia.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Amit Cohen
+	<amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, "Andy
+ Roulin" <aroulin@nvidia.com>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next v2 0/8] net: Shift responsibility for FDB
+ notifications to drivers
+Date: Mon, 4 Nov 2024 12:43:11 +0100
+In-Reply-To: <20241029121807.1a00ae7d@kernel.org>
+Message-ID: <87ldxzky77.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
+Content-Type: text/plain
+X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SJ1PEPF00002310:EE_|PH7PR12MB6612:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0a8ea73c-a425-4a56-ba82-08dcfcc8073b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|36860700013|1800799024|376014|82310400026;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?ELNtO3ZFF83/WdU6caZQyW/7EdTPnnwqwerKefqxLXJKrHj2D+kKrsZkAUP1?=
+ =?us-ascii?Q?ZmQ2jO8UrIBKo91gkw+VurJcsoSPz75Xnloj2TUjsVPOgYb4eA2QwNRBAbmL?=
+ =?us-ascii?Q?Fz/kcb5G9oPo+eA2FdtTZtTr5cQPgy2C44zSjaUt1sSw2FZaFs7x4QF38CiT?=
+ =?us-ascii?Q?VPyePeSe6534+TVlyuzpGX6o1NOFDVMSOlzlG9xbyVkd+YTuAKwgVBK9WNS0?=
+ =?us-ascii?Q?79Diw8mh2CiOn0++Ka4YPkZMl5rjj2NshS/+pJAWGHPw/sgeWeOkIwQ9c7cu?=
+ =?us-ascii?Q?7gf8mb6UXjW8qISqem12tFtdE+0+asbxpj08C+9ihCuHnZuw9yc5gerMZ10T?=
+ =?us-ascii?Q?HcPajYsXVjgGgW8pU1Fb1+4HR2uB0vDDrOGqPMHJ5dwZFpIdfTQERZHwqbuX?=
+ =?us-ascii?Q?RssKxCY3tUEHsdW62ABQ/3MVbkhqbttG0grwZSvBtOXV0QbG+YkvYz7Y6uYT?=
+ =?us-ascii?Q?MGOw17nkR/UzwJhqE5DpjVh/T6DQ2q/6L06zUfSRQNjiz+/TwyUXEXc2cmae?=
+ =?us-ascii?Q?QPqzo4IhLCKSF1M7FSK+3uFTnOlMZ3GNeOHzh5/Yf8bb87g1jsXb46DyCGB1?=
+ =?us-ascii?Q?PoDGPK4ewqbedywZrTTIxMC2c7BIzynWgIrMVc91Ux20yiWXYbxMYsqHEqzH?=
+ =?us-ascii?Q?vy+1BX6lREREyu+qWKui6mX0nbwbLUqwntu18ShM2BqVYF0MdvXZMcrosUag?=
+ =?us-ascii?Q?8Rw0mzV/U7SaZ2lmKXKPTbIbHPhDpSFXDp9BTfcxensTtwc24QGmb6ptEaBu?=
+ =?us-ascii?Q?AvNH80knEqvgFC2JPzIRGpcmktXBWpmOoEOgj6fa88l6m7XDWeNJGX5k64s5?=
+ =?us-ascii?Q?uZil3LzPxbKprAA7t5GbJ0115Qb5/FUnnfoA7zBXZM2oGvI0bCkShOGq1Zwa?=
+ =?us-ascii?Q?2tFcIX+fvKqFa5ReIC5WXJYd5NY7r9cQoAQZ6NzvdpZ1PYXyRJVpTJLwQw/0?=
+ =?us-ascii?Q?idlf8rnGWA1uB7m16BQR7dCFV/oVdKdmRJl7ufQh4wUBibdwmhyNzrIM7BXs?=
+ =?us-ascii?Q?zLw+mxAPR7EtGL+o7WgrwY0SgrzgYlUU1F+eTr9v3IOfK5ADDMeJae0C99yG?=
+ =?us-ascii?Q?Za4ysb6norlHQ4Der77gjhOUw9E5viVuv7fpxhFj8Ala29ZXiKxOpHsiUR8w?=
+ =?us-ascii?Q?jKDRvOz11MhCkKt09Gl7SjcXtPNE2x6RzA9/R7C68ZM8mqxAllNvF8OdBrvP?=
+ =?us-ascii?Q?2D3LFa2f54/9w79umqs+8DFYKXTSuJsNKekDXrkokDG+aHRN89wllY1YwgfE?=
+ =?us-ascii?Q?tFfZFKPCDUv5J7VUrE2dKwMwWHoNjhULX6yfAyO+gU6/hfVXNmxqpaLRwjhB?=
+ =?us-ascii?Q?EGo+EqsvqjVR6ZtVeYPatKRkadbbu0hjmQLdkI/NBmHnnj+EsGtTeVm99gvF?=
+ =?us-ascii?Q?IGmIPWa8JG49vBjRT71t08mfndZEvtemtS3KHI8e8Lhg0hEkwg=3D=3D?=
+X-Forefront-Antispam-Report:
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(1800799024)(376014)(82310400026);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2024 11:58:42.4625
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0a8ea73c-a425-4a56-ba82-08dcfcc8073b
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	SJ1PEPF00002310.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB6612
 
-Hi Geert,
 
-Thanks for sorting this out.
+Jakub Kicinski <kuba@kernel.org> writes:
 
-On 2024-11-04 12:05:07 +0100, Geert Uytterhoeven wrote:
-> Removing full driver sections also removed mailing list entries, causing
-> submitters of future patches to forget CCing these mailing lists.
-> 
-> Hence re-add the sections for the Renesas Ethernet AVB, R-Car SATA, and
-> SuperH Ethernet drivers.  Add people who volunteered to maintain these
-> drivers (thanks a lot!).
-> 
-> Fixes: 6e90b675cf942e50 ("MAINTAINERS: Remove some entries due to various compliance requirements.")
-> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
-> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Acked-by: Niklas Cassel <cassel@kernel.org>
-> ---
-> To be applied to renesas-fixes for v6.12 after v6.12-rc7, unless a
-> better solution is found.
-> 
-> v2:
->   - Add Acked-by, Reviewed-by,
->   - Add M:-entries.
-> ---
->  MAINTAINERS | 28 ++++++++++++++++++++++++++++
->  1 file changed, 28 insertions(+)
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 13f4c23281f89332..b04d678240e80ec9 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -19578,6 +19578,16 @@ S:	Supported
->  F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
->  F:	drivers/i2c/busses/i2c-emev2.c
->  
-> +RENESAS ETHERNET AVB DRIVER
-> +M:	Paul Barker <paul.barker.ct@bp.renesas.com>
-> +M:	Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+> On Thu, 24 Oct 2024 18:57:35 +0200 Petr Machata wrote:
+>> Besides this approach, we considered just passing a boolean back from the
+>> driver, which would indicate whether the notification was done. But the
+>> approach presented here seems cleaner.
+>
+> Oops, I missed the v2, same question:
+>
+>   What about adding a bit to the ops struct to indicate that 
+>   the driver will generate the notification? Seems smaller in 
+>   terms of LoC and shifts the responsibility of doing extra
+>   work towards more complex users.
+>
+> https://lore.kernel.org/all/20241029121619.1a710601@kernel.org/
 
-I'm happy to look after the RAVB driver together with Paul. However 
-please don't add my +renesas tag email for new entries in the 
-MAINTAINERS file.
+Sorry for only responding now, I was out of office last week.
 
-With this fixed for RAVB and SUPERH ETHERNET,
+The reason I went with outright responsibility shift is that the
+alternatives are more complex.
 
-Acked-by: Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
+For the flag in particular, first there's no place to set the flag
+currently, we'd need a field in struct net_device_ops. But mainly, then
+you have a code that needs to corrently handle both states of the flag,
+and new-style drivers need to remember to set the flag, which is done in
+a different place from the fdb_add/del themselves. It might be fewer
+LOCs, but it's a harder to understand system.
 
-> +L:	netdev@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +F:	Documentation/devicetree/bindings/net/renesas,etheravb.yaml
-> +F:	drivers/net/ethernet/renesas/Kconfig
-> +F:	drivers/net/ethernet/renesas/Makefile
-> +F:	drivers/net/ethernet/renesas/ravb*
-> +
->  RENESAS ETHERNET SWITCH DRIVER
->  R:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
->  L:	netdev@vger.kernel.org
-> @@ -19627,6 +19637,14 @@ F:	Documentation/devicetree/bindings/i2c/renesas,rmobile-iic.yaml
->  F:	drivers/i2c/busses/i2c-rcar.c
->  F:	drivers/i2c/busses/i2c-sh_mobile.c
->  
-> +RENESAS R-CAR SATA DRIVER
-> +M:	Geert Uytterhoeven <geert+renesas@glider.be>
-> +L:	linux-ide@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +S:	Supported
-> +F:	Documentation/devicetree/bindings/ata/renesas,rcar-sata.yaml
-> +F:	drivers/ata/sata_rcar.c
-> +
->  RENESAS R-CAR THERMAL DRIVERS
->  M:	Niklas Söderlund <niklas.soderlund@ragnatech.se>
->  L:	linux-renesas-soc@vger.kernel.org
-> @@ -19702,6 +19720,16 @@ S:	Supported
->  F:	Documentation/devicetree/bindings/i2c/renesas,rzv2m.yaml
->  F:	drivers/i2c/busses/i2c-rzv2m.c
->  
-> +RENESAS SUPERH ETHERNET DRIVER
-> +M:	Niklas Söderlund <niklas.soderlund+renesas@ragnatech.se>
-> +L:	netdev@vger.kernel.org
-> +L:	linux-renesas-soc@vger.kernel.org
-> +F:	Documentation/devicetree/bindings/net/renesas,ether.yaml
-> +F:	drivers/net/ethernet/renesas/Kconfig
-> +F:	drivers/net/ethernet/renesas/Makefile
-> +F:	drivers/net/ethernet/renesas/sh_eth*
-> +F:	include/linux/sh_eth.h
-> +
->  RENESAS USB PHY DRIVER
->  M:	Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>
->  L:	linux-renesas-soc@vger.kernel.org
-> -- 
-> 2.34.1
-> 
+Responsibility shift is easy. "Thou shalt notify." Done, easy to
+understand, easy to document. When cut'n'pasting, you won't miss it.
 
--- 
-Kind Regards,
-Niklas Söderlund
+Let me know what you think.
 
