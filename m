@@ -1,307 +1,148 @@
-Return-Path: <netdev+bounces-141644-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141645-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 843239BBE4D
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:55:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 873DB9BBE51
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 20:56:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A835B1C211C9
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:55:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2083A280DAC
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:56:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E55541CC165;
-	Mon,  4 Nov 2024 19:55:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A27518CC1B;
+	Mon,  4 Nov 2024 19:56:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FvwIWSGa"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="PihJFBtc"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f170.google.com (mail-il1-f170.google.com [209.85.166.170])
+Received: from mail-ej1-f42.google.com (mail-ej1-f42.google.com [209.85.218.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41DF71CBA1B
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 19:55:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780D618D63C
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 19:56:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730750110; cv=none; b=E2jYW2pCcxw6NX1Z/7loyWX3t9uJho2Fuy8J60RIhaDZqr4WGjdKfHJgHOYtBxGvmwWUfYSmgO9XYqjQhaKrQKlJBUAzn/4cTMMvLCN6Y9pd16DVJCx74XrYXl3MlPL9RBpwGoKFViV1Yy9KYt7Qh40nURDiggGEveJV41mDGZU=
+	t=1730750175; cv=none; b=nbgdNKM5LmP7f1gkc+l/+bfOmABhIlYepFjayZRo4PSmOJVQYaPpV9Ui9GG7al1B/VJnwBqc6zopJXHlpTwE6fWnCN/TZN0XjBX0E2+19Hb1RJiOVH3AxF9sJW4GPOrv1tcajCTB5Q16RstHhGx0/1VFRuNc77b/ulKogMhNOHI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730750110; c=relaxed/simple;
-	bh=n0tjmfDL6BPyhTjR/b5T4gb0CZuykaLBAss9SlCr3As=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nu/swxr1as4l22+no0hyloBkBEmSNlsAHVvTh29mvstmsuc4SIS72+NN/FD9R7RhcmjR66q0bhVOqjXieF2C2cdz6FiqA54y12f6v61CCCz1mJFBOMeprnefIxCsUFqg4NdLsnv8E2AvUtNULuRIJf/7li6dTVgHMlX5cnaKLS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FvwIWSGa; arc=none smtp.client-ip=209.85.166.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-il1-f170.google.com with SMTP id e9e14a558f8ab-3a3b28ac9a1so33605ab.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 11:55:08 -0800 (PST)
+	s=arc-20240116; t=1730750175; c=relaxed/simple;
+	bh=oK8xwFxk1m7E7sRP5AD/oq/ENCyCxF3FnF7CZpWJvck=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
+	 In-Reply-To:Content-Type; b=iMOZcSJgJw9AXBL+YEbkTB521KUdrRKfyHm84H82K00as/9sll3REgTibckAzuZhfc0+3sfYDcMgKQG4UTuiAFlZXMQXBdN3meUTN8MuSnZtX+Vi765zsua/5LBSgmYeA1mVukohinn0QUi/UiGmIzJjBfg+GWQMaimk3jF/IUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=PihJFBtc; arc=none smtp.client-ip=209.85.218.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f42.google.com with SMTP id a640c23a62f3a-a9a0f198d38so791214666b.1
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 11:56:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730750107; x=1731354907; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N53p+N4N73iQueCAcYjATG0UWlXOJ7UXR8iV8B23S0U=;
-        b=FvwIWSGarKum485O44ZJg35EeWpa8rUd/fhLLxjA8mu1f5agLUxfdxiVXU833WiM3f
-         4WaIu5GboKAgs0vQszzF1oheBrcplzENsW7f2ilqKZKoUdiPaB9vKW6yQzt2dqN1OU4h
-         epwwUfNynACich3nwqqps8/Sxzcyv4YWx+KOUmv0E8mDM1xUAq87uGysiUhdjvGyHkWa
-         J4djj/XQkPEfdNOLD/U/Hwsmwo+On36yw5hry2GgWAN9HSFrPDlEp6C0REWlteyWtcpa
-         Dpgnnx09xwtAOyDVbivYepGODq9be3RilYGueSzi61ko6utQa2VdiipvYjQXT45Wl9pd
-         hCZA==
+        d=gmail.com; s=20230601; t=1730750172; x=1731354972; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=c2d8amve2+2UkeSLjskPRTLbBZobgMnfjzl3FV9LhEI=;
+        b=PihJFBtcDKUsIpXKFZFtBHOo8FTZgnbHwa56IP+ehyfz9HqR5nFHU0RDlUUXNIXojb
+         dM9eeYIVvRgyyKIbtzQefcfiHJkzNYXWvF8MjxPxNW+xSELgOw/kFmUO2kkmYHnjr29Q
+         BzGCBmBB4xYbm0MKRyQt+qhZ35ymboKFmimPmenoo5vJ81wxFw51kOOudeRpc2oTulb7
+         DiQ6ddz8lCzaygM72sD0SN23dk1oUD9ZpcSjRUQHstKY3pNooODKk0wWbtA/z5dHBT1c
+         Rmz//LMaNcWmSQVxBSfXbZprusUUQPom6hkIw21r3yCoZrQzevh+xVfGDzqUussjqma6
+         DoCw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730750107; x=1731354907;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=N53p+N4N73iQueCAcYjATG0UWlXOJ7UXR8iV8B23S0U=;
-        b=h6Te7TWKK0cbKjPHx7/L477IBLA5hfWvC4IIDRybbkh3OtimsNX8gQs1hmVW0AsVPd
-         A1tim/Rk5sR7Ap9PQk/MRq1obNp+W65wynmsRfj1PrR8iYWcC4mP/MZpb3dx1yOjThKg
-         N0GOi7pU9fIfvYqO+2Onop88ApZ82eFyOYLsHGIp4Y5/RBiHwvaAI424cXbzY+GzCko/
-         44Aa6mrk7OgKjiXYzwBBQLZiy+cM3LJPIP28CzsdMjTkZWQSKlfDNZDjsYstmWb3GCDE
-         Xfpo+X/VNB2JpUuzZY3R3/IDfwgqx1325WIFcdWv+kat5YpD0Dw119KsrQRfxRE8jGyf
-         Wnxw==
-X-Forwarded-Encrypted: i=1; AJvYcCXHxLexbi/p1ogEuVkLLlFUdjGEzAIE2PVPcKiQp7h4SQdKkTWztWxh9mfz5yIeVbmzK0jyab0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9WBLtd8XztL9UTcCNJXTUrGNJ5o6/ZNWL/lqrirLdtAqLWorF
-	3tP78uyy2krd8oEqn9doDFkrqjO4gffoAKd7kdm7OPYeD92RcH/IaLKtMYNerQw1iRoSdamHex3
-	3YtXT1JPZu9Qf3EjGH46vHTo9r1JofhcjPMww
-X-Gm-Gg: ASbGncsexVIJWUlA8Si5PhULVYT/03sLDpULdRXB+awukf/B0gsdoq0qcJYpkhP+HeX
-	RH1p1/k3eyH5bIHH6v8jm26OM6eev7DoNE4pVGxWhwDx7+h8ZfT6G2KzNH74kLg==
-X-Google-Smtp-Source: AGHT+IEVf+z3HXNjKKIwO0Wb+qwYQ8MbmzBQqeK9bj1EWmdRHMahC5PcNriDAiiIA0EL9JLTVNKDXu+jSO15BNyefa8=
-X-Received: by 2002:a05:6e02:691:b0:3a6:b1c5:e644 with SMTP id
- e9e14a558f8ab-3a6daa961b5mr364675ab.21.1730750106999; Mon, 04 Nov 2024
- 11:55:06 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730750172; x=1731354972;
+        h=content-transfer-encoding:in-reply-to:autocrypt:from
+         :content-language:references:to:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=c2d8amve2+2UkeSLjskPRTLbBZobgMnfjzl3FV9LhEI=;
+        b=MPVvy5RXpzlSq8HjC2nqP8jDKgz/TuNdFWGDl+7kDVHhGfsfR+799u7IlXc8GCigYO
+         H0XCjOyIydda/4P6dNoVOMPchee5JCICVvEaadJP6bySGGqSLsZAAMEXOOi6Pgk4fJxX
+         HlSif2P5219lFRrfmjbJ79o8BrJ3S/Y3dhfzk/vpK2BSa7jnIKzn8v/Zt71NMege1GUQ
+         aTMTktPU8dIlvBlW4LH9gjqizx/NdH13/9D5da0QTEy7jkLUBfiWoEcqaH7j4zVSal7V
+         A9C8AhgG/85KvE7DezX7exeiLA2AI+Kp7avvWLJhk5g5XjDV/aG8594/G49kXuqqm4fg
+         qbfA==
+X-Forwarded-Encrypted: i=1; AJvYcCUqm+I2sIey3iB7kGasO+kCVb1TpK6P1Ov+6TdRG89ZdO48OuccLe2aQNhxUqRzPrx3wiC2cms=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwFEgcmmvYo6m94kWrDH4e4HEst+PpCR+t9iMCvwux81/EDRP86
+	AeLHx1tOixaeI8XsPerKCLJV2WzLBI+9kWp0XnxX6veyUflGTMqZVRZ9ZQ==
+X-Google-Smtp-Source: AGHT+IFO/8bEFqkcWghg8rHj4v8S+AfJyTg7w4M1+zVC3uAd42LZRxs00DqmJQSzFT3CNoIHDqdLnQ==
+X-Received: by 2002:a17:907:94cb:b0:a9a:835b:fc77 with SMTP id a640c23a62f3a-a9e6549106bmr1494205466b.8.1730750171439;
+        Mon, 04 Nov 2024 11:56:11 -0800 (PST)
+Received: from ?IPV6:2a02:3100:9c2b:eb00:5887:d6c2:d681:2735? (dynamic-2a02-3100-9c2b-eb00-5887-d6c2-d681-2735.310.pool.telefonica.de. [2a02:3100:9c2b:eb00:5887:d6c2:d681:2735])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9eb17fa1f7sm22894166b.160.2024.11.04.11.56.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Nov 2024 11:56:10 -0800 (PST)
+Message-ID: <a1776168-ad82-41a5-b2b6-c35bf1ff0792@gmail.com>
+Date: Mon, 4 Nov 2024 20:56:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029230521.2385749-1-dw@davidwei.uk> <20241029230521.2385749-12-dw@davidwei.uk>
- <CAHS8izNbNCAmecRDCL_rRjMU0Spnqo_BY5pyG1EhF2rZFx+y0A@mail.gmail.com> <af9a249a-1577-40fd-b1ba-be3737e86b18@gmail.com>
-In-Reply-To: <af9a249a-1577-40fd-b1ba-be3737e86b18@gmail.com>
-From: Mina Almasry <almasrymina@google.com>
-Date: Mon, 4 Nov 2024 11:54:55 -0800
-Message-ID: <CAHS8izPEmbepTYsjjsxX_Dt-0Lz1HviuCyPM857-0q4GPdn4Rg@mail.gmail.com>
-Subject: Re: [PATCH v7 11/15] io_uring/zcrx: implement zerocopy receive pp
- memory provider
-To: Pavel Begunkov <asml.silence@gmail.com>
-Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org, netdev@vger.kernel.org, 
-	Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>, 
-	Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>, 
-	Pedro Tammela <pctammela@mojatatu.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Unknown NIC not recognized by r8169 Kernel-Driver
+To: Shochraos <shochraos@proton.me>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <H90iT3HXlAkoSxqgPoAXPAZL_ZJ3pFxNGMtFkULq5wVhR9gcTqAPBO84chKKq3NwdgWClT7yuZ9xdLUpIR9SjZRZIcD_qGOq4KufDW2JDYA=@proton.me>
+Content-Language: en-US
+From: Heiner Kallweit <hkallweit1@gmail.com>
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <H90iT3HXlAkoSxqgPoAXPAZL_ZJ3pFxNGMtFkULq5wVhR9gcTqAPBO84chKKq3NwdgWClT7yuZ9xdLUpIR9SjZRZIcD_qGOq4KufDW2JDYA=@proton.me>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Fri, Nov 1, 2024 at 2:09=E2=80=AFPM Pavel Begunkov <asml.silence@gmail.c=
-om> wrote:
->
-> On 11/1/24 20:06, Mina Almasry wrote:
-> ...
-> >> +__maybe_unused
-> >> +static const struct memory_provider_ops io_uring_pp_zc_ops;
-> >> +
-> >> +static inline struct io_zcrx_area *io_zcrx_iov_to_area(const struct n=
-et_iov *niov)
-> >> +{
-> >> +       struct net_iov_area *owner =3D net_iov_owner(niov);
-> >> +
-> >> +       return container_of(owner, struct io_zcrx_area, nia);
-> >> +}
-> >> +
-> >
-> > We discussed this before I disappeared on vacation but I'm not too
-> > convinced to be honest, sorry.
-> >
-> > It's invalid to call io_zcrx_iov_to_area on a devmem niov and vice
-> > versa, right? So current and future code has to be very careful to
->
-> Yes
->
-> > call the right helpers on the right niovs.
-> >
-> > At the very least there needs to be a comment above all these
-> > container_of helpers:
-> >
-> > /* caller must have verified that this niov is devmem/io_zcrx */.
-> >
-> > However I feel like even a comment is extremely error prone. These
-> > container_of's are inside of the call stack of some helpers. I would
-> > say we need a check. If we're concerned about performance, the check
-> > can be behind DEBUG_NET_WARN_ON(), although even that is a bit iffy,
-> > but could be fine. Doing this without a check seems too risky to me.
->
-> No, it doesn't need a check nor it needs a comment. The very
-> essence of virtual function tables is that they're coupled
-> together with objects for which those function make sense and
-> called only for those objects. The only way to get here with
-> invalid net_iovs is to take one page pool and feed it with
-> net_iovs from other another page pool that won't be sane in
-> the first place.
->
+On 04.11.2024 20:49, Shochraos wrote:
+> Hello,
+> 
+> I'm Moritz Freund and I'm currently using Linux as my daily driver. I recently switched my motherboard to the Gigabyte x870E Aorus Elite Wifi 7 and now ethernet is not working anymore. I suspect that the Realtek-NIC used in that motherboard is a new one as it was released recently.
+> The command "sudo dmesg | grep r8169" prints the following error message: "[    9.452481] r8169 0000:0e:00.0: error -ENODEV: unknown chip XID 688, contact r8169 maintainers (see MAINTAINERS file)".
+> I'm using the distribution CachyOS-Linux and I already contacted the maintainers of that distribution, who told me that I shoulld contact the maintainers of the kernel-driver.
+> I'm using the 6.11.6-2-cachyos driver as printed out by "uname -r".
+> 
+Thanks for the report. XID 688 refers to RTL8125D, support for this new chip version is
+available in linux-next and will come with kernel 6.13.
 
-That could happen. In fact the whole devmem tcp paths are very
-carefully written to handle that
+> Sincerely
+> Moritz Freund
 
-net_iovs are allocated from the page_pool, put in skbs, and then sit
-in the sk receive queue. In pathological cases (user is
-re/misconfiguring flow steering) we can have 1 sk receive queue that
-has a mix of page skbs, devmem skbs, and io_uring skbs, and other
-skbs.
-
-Code that is processing the skbs in the receive queue has no idea
-whether what kind of skb it is. That's why that code needs to check
-whether the skb has readable frags, and that's why in this very series
-you needed to add a check in tcp_recvmsg_dmabuf to make sure that its
-a dmabuf skb, and you need to add a check to io_zcrx_recv_frag that
-the frag inside it is io_uring niov. The code would be wrong without
-it.
-
-All I'm trying to say is that it's very error prone to rely on folks
-writing and reviewing code to check that whenever dmabuf/io_rcrx/etc
-handling is done, somewhere in the call stack a type verification
-check has been made, and a DEBUG_NET_WARN could help avoid some subtle
-memory corruption bugs.
-
-> That would be an equivalent of:
->
-> struct file *f1 =3D ...;
-> struct file *f2 =3D ...;
->
-> f1->f_op->read(f2, ...);
->
-> Maybe it looks strange for you in C, but it's same as putting
-> comments that a virtual function that it should be called only
-> for objects of that class:
->
-> struct A {
->         virtual void foo() =3D 0;
-> };
-> struct B: public A {
->         void foo() override {
->                 // we should only be called with objects of type
->                 // struct B (or anything inheriting it), check that
->                 if (!reinterpret_cast<struct B*>(this))
->                         throw;
->                 ...
->         }
-> }
->
->
-
-I'm not really sure I followed here. We do not get any type of
-compiler or type safety from this code because the dma-buf niovs and
-io_uring niovs are the same net_iov type.
-
-We can get type safety by defining new types for dmabuf_net_iov and
-io_uring_net_iov, then provide helpers:
-
-dmabuf_net_iov *net_iov_to_dmabuf();
-io_uring_net_iov *net_iov_to_io_uring();
-
-The helpers can check the niov is of the right type once and do a
-cast,  then the object with the specific type can be passed to all
-future heplers without additional checks. This is one way to do it I
-guess.
-
-> >>   static int io_allocate_rbuf_ring(struct io_zcrx_ifq *ifq,
-> >>                                   struct io_uring_zcrx_ifq_reg *reg)
-> >>   {
-> >> @@ -99,6 +114,9 @@ static int io_zcrx_create_area(struct io_ring_ctx *=
-ctx,
-> >>                  goto err;
-> >>
-> >>          for (i =3D 0; i < nr_pages; i++) {
-> >> +               struct net_iov *niov =3D &area->nia.niovs[i];
-> >> +
-> >> +               niov->owner =3D &area->nia;
-> >>                  area->freelist[i] =3D i;
-> >>          }
-> >>
-> >> @@ -230,3 +248,200 @@ void io_shutdown_zcrx_ifqs(struct io_ring_ctx *c=
-tx)
-> >>   {
-> >>          lockdep_assert_held(&ctx->uring_lock);
-> >>   }
-> >> +
-> >> +static bool io_zcrx_niov_put(struct net_iov *niov, int nr)
-> >> +{
-> >> +       return atomic_long_sub_and_test(nr, &niov->pp_ref_count);
-> >> +}
-> >> +
-> >> +static bool io_zcrx_put_niov_uref(struct net_iov *niov)
-> >> +{
-> >> +       if (atomic_long_read(&niov->pp_ref_count) < IO_ZC_RX_UREF)
-> >> +               return false;
-> >> +
-> >> +       return io_zcrx_niov_put(niov, IO_ZC_RX_UREF);
-> >> +}
-> >> +
-> >
-> > Sorry, I have to push back a bit against this. The refcounting of
-> > netmem is already complicated. the paged netmem has 2 refcounts and
-> > care needs to be taken when acquiring and dropping refcounts. net_iov
-> > inherited the pp_ref_count but not the paged refcount, and again need
-> > some special handling. skb_frag_unref takes very special care checking
->
-> Which is why it's using net_iovs.
->
-> > pp->recycle, is_pp_netmem, and others to figure out the correct
->
-> pp->recycle has nothing to do with the series. We don't add
-> it in any special way, and if it's broken it's broken even
-> for non-proivder buffers.
->
-> > refcount to put based on the type of the netmem and skb flag.
->
-> Just same as with the ->[un]readable flag, which is not
-> functionally needed, and if it's screwed many things can
-> go very wrong.
->
-> > This code ignores all these generic code
-> > skb_frag_unref/napi_pp_put_page/etc paths and uses raw access to
->
-> I don't see the point, they are not used because they're not
-> needed. Instead of checking whether it came from a page pool
-> and whether it's net_iov or not, in the path io_uring returns
-> it we already apriori know that they're from a specific page
-> pool, net_iov and from the current provider.
->
-> Same for optimisations provided by those helpers, they are
-> useful when you're transferring buffers from one context to
-> another, e.g. task recieve path -> napi / page_pool. In this
-> case they're already fetched in the right context without any
-> need to additionally jumping through the hoops. If anything,
-> it'd be odd to jump out of a window to climb a rope on the
-> other side of the building when you could've just walked 5
-> meters to the other room.
->
-
-For me, "they are not used because they're not needed." is not enough
-justification to ignore the generic code paths that support generic
-use cases and add your own freeing path and recycling that needs to
-work adjacent to generic paths for posterity. You need to provide
-concrete reasons why the current code paths don't work for you and
-can't be made to work for you.
-
-Is it very complicated to napi_pp_put_page() niovs as the user puts
-them in the refill queue without adding a new syscall? If so, is it
-possible to do a niov equivalent of page_pool_put_page_bulk() of the
-refill queue while/as you process the RX path?
-
-If you've tested the generic code paths to be performance deficient
-and your recycling is indeed better, you could improve the page_pool
-to pull netmems when it needs to like you're doing here, but in a
-generic way that applies to the page allocator and other providers.
-Not a one-off implementation that only applies to your provider.
-
-If you're absolutely set on ignoring the currently supported reffing
-and implementing your own reffing and recycling for your use case,
-sure, that could work, but please don't overload the
-niov->pp_ref_count reserved for the generic use cases for this. Add
-io_zcrx_area->io_uring_ref or something and do whatever you want with
-it. Since it's not sharing the pp_ref_count with the generic code
-paths I don't see them conflicting in the future.
-
---
-Thanks,
-Mina
+Heiner
 
