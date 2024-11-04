@@ -1,183 +1,249 @@
-Return-Path: <netdev+bounces-141525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCF599BB3D8
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:50:14 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7BEA9BB403
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:58:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 4E48E1F21DF2
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:50:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1602F1C2082F
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:58:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7675E1B2199;
-	Mon,  4 Nov 2024 11:50:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZTWqpI5B"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD971B395E;
+	Mon,  4 Nov 2024 11:58:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C60618A6B5;
-	Mon,  4 Nov 2024 11:50:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: from relmlie6.idc.renesas.com (relmlor2.renesas.com [210.160.252.172])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297A51B394E;
+	Mon,  4 Nov 2024 11:58:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.160.252.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730721009; cv=none; b=BPDgiIX1OfAJm4PDD1dsLCV3p7SNDnryGemci2Vlnu8mT+xPo381c86rY+TfNlcr3RpGLbAW3QAoSVJUYEk8eLr8a7wv+c463AaCEoXprySYKacr+027vTb+YGkAvdd3xRv73b89fnYTaJepx2UD73Y5enyTdDs4w9ID/79hg6U=
+	t=1730721510; cv=none; b=H5YpJWdSgWOX97qxTPXUA3696PLOJpns3oEu2pIUohoth1+mWVbNx6d01xzIVZ1O2/iVX8mNBO2yAlpcZdBLLIFf9GDzPGZBnm28AxSw3HN5y9vh5OLz5e+euv+e9i3+WmfP5j/hBq1XcRIDxN8EYid2br7lRRKt28pIj7ZeSLM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730721009; c=relaxed/simple;
-	bh=7bAXGSIMkDmiiArsenU5Ko1NFwTmYvJcvE7RrpL1XVo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=olMnjII0yHoKYZXL5XLMfHbUeHSjRaN0MNM1a/53dMvRJYag8ul6cZdopQKUwny6WNadyccGcExPc49p5tQYtfaofaiaBlnHTLZ2SUMtEmdasdpA9Nn+Cm4ELXhtY256oSizQy+fjHRsp46OhDMb0+IM0HNZ/Jru4LZqNFxTj1I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZTWqpI5B; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 13C34C4CECE;
-	Mon,  4 Nov 2024 11:50:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730721008;
-	bh=7bAXGSIMkDmiiArsenU5Ko1NFwTmYvJcvE7RrpL1XVo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=ZTWqpI5BAjfaPnVDNQPwae5G5vgeb83Sgz22Qw8kSaHF3mvvIw7lMuZQpshUbHmKd
-	 zIpAorhnt7H0r7MQgS+z2E48aJPOMUGPg8utBDy55yUqcNcLeVjGK09lRjhNNgPVFO
-	 DRR+/YdNtvmpcf/ShPy3Gkod++4MJmRpzW4PkRIWfoYQyBnIhsiT2ZTPY96Jj/F/0i
-	 qgwgzXuoIZnuQ2lq4G0Vx1fIP4zpTU5N60LyFU6+kjJA3MLp8+8JrniMiHhk3pYiH4
-	 yWhlGla8muTvIkfNlqFhLHHq3+D+EexV4Mn8hftA6sCNWI3JPaKAya/lfDCDP38Odu
-	 vbsGBQssmUR6w==
-Date: Mon, 4 Nov 2024 11:50:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-Cc: Qingfang Deng <dqfext@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-ppp@vger.kernel.org
-Subject: Re: [RFC PATCH net-next] net: ppp: convert to IFF_NO_QUEUE
-Message-ID: <20241104115004.GC2118587@kernel.org>
-References: <20241029103656.2151-1-dqfext@gmail.com>
+	s=arc-20240116; t=1730721510; c=relaxed/simple;
+	bh=qK1Cnj2fEwhgy8v0SH+3UqWdZIvizi5eg8H/oo5Jlt8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=CVVtFNErIYGf95Uejf8OK57ySaZxiOpySzjxN62c0ZhEsAHuBddcIYyGD8Z/lKRj2y1JVEtF/413bNSz2zEVw1E/YRI6zm7p0ECGauBP9+tfn+wru3PgYvjttncBywKRjeMNKju83MJyQlgtuL5nCRLyg+zfm06RlvlLAeRIU8M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com; spf=pass smtp.mailfrom=bp.renesas.com; arc=none smtp.client-ip=210.160.252.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=bp.renesas.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bp.renesas.com
+X-IronPort-AV: E=Sophos;i="6.11,256,1725289200"; 
+   d="asc'?scan'208";a="227809112"
+Received: from unknown (HELO relmlir6.idc.renesas.com) ([10.200.68.152])
+  by relmlie6.idc.renesas.com with ESMTP; 04 Nov 2024 20:53:17 +0900
+Received: from [10.226.93.217] (unknown [10.226.93.217])
+	by relmlir6.idc.renesas.com (Postfix) with ESMTP id B048B41869DF;
+	Mon,  4 Nov 2024 20:53:08 +0900 (JST)
+Message-ID: <f9a3d957-28c3-4f17-9457-598858ada7ef@bp.renesas.com>
+Date: Mon, 4 Nov 2024 11:53:07 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241029103656.2151-1-dqfext@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH/RFC v2] MAINTAINERS: Re-add cancelled Renesas driver
+ sections
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+ Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Arnd Bergmann <arnd@arndb.de>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Niklas Cassel <cassel@kernel.org>
+References: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
+Content-Language: en-GB
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+In-Reply-To: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
+Content-Type: multipart/signed; micalg=pgp-sha256;
+ protocol="application/pgp-signature";
+ boundary="------------n7lM9MTJd2Ok4mkf3U8Shixf"
 
-+ Toke
+This is an OpenPGP/MIME signed message (RFC 4880 and 3156)
+--------------n7lM9MTJd2Ok4mkf3U8Shixf
+Content-Type: multipart/mixed; boundary="------------uVEr5QfS3a5LwcjFANx2xira";
+ protected-headers="v1"
+From: Paul Barker <paul.barker.ct@bp.renesas.com>
+To: Geert Uytterhoeven <geert+renesas@glider.be>,
+ =?UTF-8?Q?Niklas_S=C3=B6derlund?= <niklas.soderlund+renesas@ragnatech.se>,
+ Sergei Shtylyov <sergei.shtylyov@gmail.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Claudiu Beznea <claudiu.beznea.uj@bp.renesas.com>,
+ Arnd Bergmann <arnd@arndb.de>,
+ James Bottomley <James.Bottomley@hansenpartnership.com>,
+ Yoshihiro Shimoda <yoshihiro.shimoda.uh@renesas.com>,
+ linux-renesas-soc@vger.kernel.org, netdev@vger.kernel.org,
+ linux-ide@vger.kernel.org, linux-sh@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Simon Horman <horms@kernel.org>,
+ Niklas Cassel <cassel@kernel.org>
+Message-ID: <f9a3d957-28c3-4f17-9457-598858ada7ef@bp.renesas.com>
+Subject: Re: [PATCH/RFC v2] MAINTAINERS: Re-add cancelled Renesas driver
+ sections
+References: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
+In-Reply-To: <90447fa332b6f73bffcb486ccfe2515c59546253.1730717649.git.geert+renesas@glider.be>
 
-On Tue, Oct 29, 2024 at 06:36:56PM +0800, Qingfang Deng wrote:
-> When testing the parallel TX performance of a single PPPoE interface
-> over a 2.5GbE link with multiple hardware queues, the throughput could
-> not exceed 1.9Gbps, even with low CPU usage.
-> 
-> This issue arises because the PPP interface is registered with a single
-> queue and a tx_queue_len of 3. This default behavior dates back to Linux
-> 2.3.13, which was suitable for slower serial ports. However, in modern
-> devices with multiple processors and hardware queues, this configuration
-> can lead to congestion.
-> 
-> For PPPoE/PPTP, the lower interface should handle qdisc, so we need to
-> set IFF_NO_QUEUE. For PPP over a serial port, we don't benefit from a
-> qdisc with such a short TX queue, so handling TX queueing in the driver
-> and setting IFF_NO_QUEUE is more effective.
-> 
-> With this change, PPPoE interfaces can now fully saturate a 2.5GbE link.
-> 
-> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+--------------uVEr5QfS3a5LwcjFANx2xira
+Content-Type: multipart/mixed; boundary="------------yaXGwMlrmPAbhC0nzhsVYm1I"
 
-Hi Toke,
+--------------yaXGwMlrmPAbhC0nzhsVYm1I
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-I'm wondering if you could offer an opinion on this.
+On 04/11/2024 11:05, Geert Uytterhoeven wrote:
+> Removing full driver sections also removed mailing list entries, causin=
+g
+> submitters of future patches to forget CCing these mailing lists.
+>=20
+> Hence re-add the sections for the Renesas Ethernet AVB, R-Car SATA, and=
 
+> SuperH Ethernet drivers.  Add people who volunteered to maintain these
+> drivers (thanks a lot!).
+>=20
+> Fixes: 6e90b675cf942e50 ("MAINTAINERS: Remove some entries due to vario=
+us compliance requirements.")
+> Signed-off-by: Geert Uytterhoeven <geert+renesas@glider.be>
+> Acked-by: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+> Reviewed-by: Simon Horman <horms@kernel.org>
+> Acked-by: Niklas Cassel <cassel@kernel.org>
 > ---
->  drivers/net/ppp/ppp_generic.c | 27 ++++++++++++---------------
->  1 file changed, 12 insertions(+), 15 deletions(-)
-> 
-> diff --git a/drivers/net/ppp/ppp_generic.c b/drivers/net/ppp/ppp_generic.c
-> index 4b2971e2bf48..5470e0fe1f9b 100644
-> --- a/drivers/net/ppp/ppp_generic.c
-> +++ b/drivers/net/ppp/ppp_generic.c
-> @@ -236,8 +236,8 @@ struct ppp_net {
->  /* Get the PPP protocol number from a skb */
->  #define PPP_PROTO(skb)	get_unaligned_be16((skb)->data)
->  
-> -/* We limit the length of ppp->file.rq to this (arbitrary) value */
-> -#define PPP_MAX_RQLEN	32
-> +/* We limit the length of ppp->file.rq/xq to this (arbitrary) value */
-> +#define PPP_MAX_QLEN	32
->  
->  /*
->   * Maximum number of multilink fragments queued up.
-> @@ -920,8 +920,6 @@ static long ppp_ioctl(struct file *file, unsigned int cmd, unsigned long arg)
->  				break;
->  		} else {
->  			ppp->npmode[i] = npi.mode;
-> -			/* we may be able to transmit more packets now (??) */
-> -			netif_wake_queue(ppp->dev);
->  		}
->  		err = 0;
->  		break;
-> @@ -1639,6 +1637,7 @@ static void ppp_setup(struct net_device *dev)
->  	dev->tx_queue_len = 3;
->  	dev->type = ARPHRD_PPP;
->  	dev->flags = IFF_POINTOPOINT | IFF_NOARP | IFF_MULTICAST;
-> +	dev->priv_flags |= IFF_NO_QUEUE;
->  	dev->priv_destructor = ppp_dev_priv_destructor;
->  	netif_keep_dst(dev);
->  }
-> @@ -1654,17 +1653,15 @@ static void __ppp_xmit_process(struct ppp *ppp, struct sk_buff *skb)
->  	if (!ppp->closing) {
->  		ppp_push(ppp);
->  
-> -		if (skb)
-> -			skb_queue_tail(&ppp->file.xq, skb);
-> +		if (skb) {
-> +			if (ppp->file.xq.qlen > PPP_MAX_QLEN)
-> +				kfree_skb(skb);
-> +			else
-> +				skb_queue_tail(&ppp->file.xq, skb);
-> +		}
->  		while (!ppp->xmit_pending &&
->  		       (skb = skb_dequeue(&ppp->file.xq)))
->  			ppp_send_frame(ppp, skb);
-> -		/* If there's no work left to do, tell the core net
-> -		   code that we can accept some more. */
-> -		if (!ppp->xmit_pending && !skb_peek(&ppp->file.xq))
-> -			netif_wake_queue(ppp->dev);
-> -		else
-> -			netif_stop_queue(ppp->dev);
->  	} else {
->  		kfree_skb(skb);
->  	}
-> @@ -1850,7 +1847,7 @@ ppp_send_frame(struct ppp *ppp, struct sk_buff *skb)
->  	 * queue it up for pppd to receive.
->  	 */
->  	if (ppp->flags & SC_LOOP_TRAFFIC) {
-> -		if (ppp->file.rq.qlen > PPP_MAX_RQLEN)
-> +		if (ppp->file.rq.qlen > PPP_MAX_QLEN)
->  			goto drop;
->  		skb_queue_tail(&ppp->file.rq, skb);
->  		wake_up_interruptible(&ppp->file.rwait);
-> @@ -2319,7 +2316,7 @@ ppp_input(struct ppp_channel *chan, struct sk_buff *skb)
->  		/* put it on the channel queue */
->  		skb_queue_tail(&pch->file.rq, skb);
->  		/* drop old frames if queue too long */
-> -		while (pch->file.rq.qlen > PPP_MAX_RQLEN &&
-> +		while (pch->file.rq.qlen > PPP_MAX_QLEN &&
->  		       (skb = skb_dequeue(&pch->file.rq)))
->  			kfree_skb(skb);
->  		wake_up_interruptible(&pch->file.rwait);
-> @@ -2472,7 +2469,7 @@ ppp_receive_nonmp_frame(struct ppp *ppp, struct sk_buff *skb)
->  		/* control or unknown frame - pass it to pppd */
->  		skb_queue_tail(&ppp->file.rq, skb);
->  		/* limit queue length by dropping old frames */
-> -		while (ppp->file.rq.qlen > PPP_MAX_RQLEN &&
-> +		while (ppp->file.rq.qlen > PPP_MAX_QLEN &&
->  		       (skb = skb_dequeue(&ppp->file.rq)))
->  			kfree_skb(skb);
->  		/* wake up any process polling or blocking on read */
-> -- 
-> 2.34.1
-> 
-> 
+> To be applied to renesas-fixes for v6.12 after v6.12-rc7, unless a
+> better solution is found.
+>=20
+> v2:
+>   - Add Acked-by, Reviewed-by,
+>   - Add M:-entries.
+> ---
+>  MAINTAINERS | 28 ++++++++++++++++++++++++++++
+>  1 file changed, 28 insertions(+)
+>=20
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index 13f4c23281f89332..b04d678240e80ec9 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -19578,6 +19578,16 @@ S:	Supported
+>  F:	Documentation/devicetree/bindings/i2c/renesas,iic-emev2.yaml
+>  F:	drivers/i2c/busses/i2c-emev2.c
+> =20
+> +RENESAS ETHERNET AVB DRIVER
+> +M:	Paul Barker <paul.barker.ct@bp.renesas.com>
+> +M:	Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.se>
+> +L:	netdev@vger.kernel.org
+> +L:	linux-renesas-soc@vger.kernel.org
+> +F:	Documentation/devicetree/bindings/net/renesas,etheravb.yaml
+> +F:	drivers/net/ethernet/renesas/Kconfig
+> +F:	drivers/net/ethernet/renesas/Makefile
+> +F:	drivers/net/ethernet/renesas/ravb*
+
+This driver should be marked as "S: Supported".
+
+[snip]
+
+> +RENESAS SUPERH ETHERNET DRIVER
+> +M:	Niklas S=C3=B6derlund <niklas.soderlund+renesas@ragnatech.se>
+> +L:	netdev@vger.kernel.org
+> +L:	linux-renesas-soc@vger.kernel.org
+> +F:	Documentation/devicetree/bindings/net/renesas,ether.yaml
+> +F:	drivers/net/ethernet/renesas/Kconfig
+> +F:	drivers/net/ethernet/renesas/Makefile
+> +F:	drivers/net/ethernet/renesas/sh_eth*
+> +F:	include/linux/sh_eth.h
+
+This should also be marked as "S: Supported".
+
+With those added,
+
+Reviewed-by: Paul Barker <paul.barker.ct@bp.renesas.com>
+
+Thanks,
+
+--=20
+Paul Barker
+--------------yaXGwMlrmPAbhC0nzhsVYm1I
+Content-Type: application/pgp-keys; name="OpenPGP_0x27F4B3459F002257.asc"
+Content-Disposition: attachment; filename="OpenPGP_0x27F4B3459F002257.asc"
+Content-Description: OpenPGP public key
+Content-Transfer-Encoding: quoted-printable
+
+-----BEGIN PGP PUBLIC KEY BLOCK-----
+
+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3D
+=3DsIIN
+-----END PGP PUBLIC KEY BLOCK-----
+
+--------------yaXGwMlrmPAbhC0nzhsVYm1I--
+
+--------------uVEr5QfS3a5LwcjFANx2xira--
+
+--------------n7lM9MTJd2Ok4mkf3U8Shixf
+Content-Type: application/pgp-signature; name="OpenPGP_signature.asc"
+Content-Description: OpenPGP digital signature
+Content-Disposition: attachment; filename="OpenPGP_signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+wnsEABYIACMWIQSiu8gv1Xr0fIw/aoLbaV4Vf/JGvQUCZyi1owUDAAAAAAAKCRDbaV4Vf/JGvaJb
+AP0RNztuS0Pu4CEC6V3w8ELdyXpMlngoYyuTpitTzIBE4QEA5vBX8XnTTCqbKIzRU8xgjs8Hgxc9
+mTy4N3HmqbA8sQk=
+=/i+2
+-----END PGP SIGNATURE-----
+
+--------------n7lM9MTJd2Ok4mkf3U8Shixf--
 
