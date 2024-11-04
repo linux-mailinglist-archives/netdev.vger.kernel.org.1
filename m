@@ -1,353 +1,255 @@
-Return-Path: <netdev+bounces-141552-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 047BD9BB521
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:54:03 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A9D9BB52B
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:57:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82ABE28136D
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:54:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC633282931
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:57:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0401B4F02;
-	Mon,  4 Nov 2024 12:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBE261B0F26;
+	Mon,  4 Nov 2024 12:57:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="Gyq7+p9O"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="QIZAFif3"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28444188700;
-	Mon,  4 Nov 2024 12:53:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730724838; cv=none; b=qRkopaEyVBMFFz4ZspqYrV+z2iwGAWb4iiMOrxIcg4Ah8ZFSUNnnqzHEVFDYVXy87EaGJkiT630pZf8wvZFSD9m+hJ3W75TgqZChEE5FOrxUf3/ip8Gu5QtVThLAfxU4GoOItMt81hG4fEs5u/Z+OxIPBPLh8B/Bq4VD3rblEws=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730724838; c=relaxed/simple;
-	bh=QsB96WLlxyBkpPCDkrGTOdZUuEGM40LRH8fdJ8ClFp4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=UD7DitAwOWjJXbj7o17lG2Hk5aPJwPZQ0b2+zXogPemfUKrMVu0FxX+k6SAE4Y5u6iE8HBTCL4oxO0ntfqrN6MY1Jdf7tN24wHQ9MV/WTFzEtARGNwzcuS/t+cI7snDB8GRh90czmZEM32YvUjgaRCdE3J7MaKrc9yGMFDJ1EFs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=Gyq7+p9O; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Content-Transfer-Encoding:MIME-Version:Message-ID:Date:
-	Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=MmlxgEqKziTj1q+YPuL8kTTJi9CETcM/dQgzPCIXOxw=; b=Gyq7+p9OGNS0B9EWxJwutI9NrA
-	QynE3nAus4PUmrU6t1pvIpEsXRKk+6GmCprvpmeswKfcQnq8xpujZ0cmt6O9DRhcjCUw46YTCl0Yt
-	MgwzRvsp80qNYOOfMgKkFg/AMybIMykfav3rWzWoxzX0D+cbwIpWbcCe/mfCWPW1kmPPvzCJ9Vd9S
-	nfPWFpFjEGpDnJvaQGlgrlqu9/Ue9lJY62MoHNe4lrwcgWT2qvHR0/KVb+eGjogMGlaaY9Lq/8SDF
-	qmz9XyZ6AONlGAvnrOFDKuN/ysBXN7g9z5FvtPmHESLruZdux2h0HxP0RBWXVL8gNEMZukb8Mrr0b
-	psVpp58g==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sean@geanix.com>)
-	id 1t7wad-000P8L-Mo; Mon, 04 Nov 2024 13:53:51 +0100
-Received: from [185.17.218.86] (helo=zen..)
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <sean@geanix.com>)
-	id 1t7wac-000OtJ-33;
-	Mon, 04 Nov 2024 13:53:50 +0100
-From: Sean Nyekjaer <sean@geanix.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Sean Nyekjaer <sean@geanix.com>,
-	linux-can@vger.kernel.org,
-	netdev@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
-Date: Mon,  4 Nov 2024 13:53:40 +0100
-Message-ID: <20241104125342.1691516-1-sean@geanix.com>
-X-Mailer: git-send-email 2.46.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12C38381B1
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 12:57:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.7
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730725045; cv=fail; b=jXufkzFfmGw7zG99J694a4f8Byv/g3GrSGydH9YLGgA2gswoxbzM78FxrsSd3/yHgCPMP0QN90YqYfcoGXq6c7bO10ud8gBAY696QS5Y1yMoIG60gEyUuHSVYhtdcY6Mlkmtx2uaiRbGOvgtQEmIRqmzQWbpr9RIH3By/68MLVg=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730725045; c=relaxed/simple;
+	bh=lcGlefsSbplyDdZ8YwxKSHUQuvQlAUoZFfzCoGWdSTI=;
+	h=Message-ID:Date:Subject:To:CC:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=fQK2aPrvuFJMqvatwZ5uHVglQn+U8ZaRFzAb81hLCBiQN+6fZzPZz81yOsCkPXrvytJg4h8KNYwqULEDmG5mpCEnquiwXnq9LFRSiOOt095A27mRRg+RXl9X4gwwv7tR1VrZvnsZF4COol6ijax/CW7cAjiKbTCf5YPGnu0ZMIo=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=QIZAFif3; arc=fail smtp.client-ip=192.198.163.7
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730725044; x=1762261044;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=lcGlefsSbplyDdZ8YwxKSHUQuvQlAUoZFfzCoGWdSTI=;
+  b=QIZAFif3WICgLS6S5lqUAzTURnqKJV6/JX+0sXJ3r7wjjhiFjKvZs3W5
+   mywjGl8wkANUCWHMYFvgJaGZ9QateMMPHJs+5r0VrqgVP6psZv4fCFTJo
+   cvcaFRgszCjU6f6U6AOvrppQX8rUcnOiQGTRTisSuH7W57ZmDmxwqgaiC
+   Ku3l36D+TZLNewuPUPuDYUMXHsHhEpQs+d7UBBj95q8VL/a847oHNKR7V
+   TMvM+GA6RnMkLZi/U2hRSostPYCr8rCi3NmjwUpzWgliBIEITUenTXS+4
+   PZ6K7MnSUK9Nf3eavqYF3HQlIasnG1yUUGUlYVBUlb+zyNeFJD3VyLNsa
+   w==;
+X-CSE-ConnectionGUID: xxdA5RjfSga7Ss3vfhSO2g==
+X-CSE-MsgGUID: oruYSLTlRJaFfEQ09auu0g==
+X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="55818959"
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="55818959"
+Received: from orviesa005.jf.intel.com ([10.64.159.145])
+  by fmvoesa101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 04:56:28 -0800
+X-CSE-ConnectionGUID: +a1o+rVOQ1KQ1fMuzryj2A==
+X-CSE-MsgGUID: sR+Q0NMCTVatdTIQeOGRtg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
+   d="scan'208";a="88472949"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orviesa005.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 04:56:28 -0800
+Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39; Mon, 4 Nov 2024 04:56:27 -0800
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 04:56:27 -0800
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.44) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.39; Mon, 4 Nov 2024 04:56:27 -0800
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=VN9kyzYAzCUOLagib/e6mERiXDBWfbJbdjYe2QOnUnRzo/dGxpCmggk+Cnu/SNDRZFRz9QRuqsajn2hk60M5+OdXTWsAzF7iKZ1Oi64pb1X2bKwvB3+2JBPpk7t0kS6ogjSavZjCP10gmWQADrykEjzEqvW52NzXpAUXd0Y6ybtwjok3TAxKGYihb9R4VhkcIhVzvQzw5l32h3XuOOu0MhLkX42UcZKHLmFV/HURRjXf95g58BNF+X2+hlL4tTtOq6Dac0H4c+BNNcX0de6WldctnERwCUo7Tlz6D96fxlkEPYMQvGT8xJgkgLMyt28od72f51mHFgtaTISPk6ONpg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=G2FAYz4OXPf4FvB2D2sdLd6OjNUTN5UNI8i17+jkaAQ=;
+ b=nlse18hlsHuMlMbjqz3xIxVgPmfqLFDeJJakyu83zfLIqlfWNmjrvS+5UCYyC4t0iJVyjEfsPTPSjewbduPIfNlN1+71PiTHZX2lihnAYJlPyiEvetxhMImwIFLXX1rogRDy7C9PIlm0ReUi1KFiSiMaZ2golOicqql+Ird31SsNjO6knQXeTwxbvkJjhe9J8JBbv4VLOWDJvoFHoCF7oTRj7LBqxq3Fv2CxPOca8dgppuY1pysPYcxqnVaWC+ezQWR8HPpqTozsUYzCZt5GVdO/vuCi9qVhkdq6b9Ngq8nfeDWrFgmIMSYdzsFFEiCgFMr2lpXcqV2OZjCCQ48Dhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com (2603:10b6:208:318::12)
+ by DM3PR11MB8714.namprd11.prod.outlook.com (2603:10b6:0:b::18) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8114.30; Mon, 4 Nov 2024 12:56:24 +0000
+Received: from BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::b8f1:4502:e77d:e2dc]) by BL1PR11MB5399.namprd11.prod.outlook.com
+ ([fe80::b8f1:4502:e77d:e2dc%5]) with mapi id 15.20.8114.031; Mon, 4 Nov 2024
+ 12:56:24 +0000
+Message-ID: <748c0685-cd16-4f7e-b359-91b095fc3d26@intel.com>
+Date: Mon, 4 Nov 2024 13:56:20 +0100
+User-Agent: Mozilla Thunderbird
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: change q_index variable
+ type to s16 to store -1 value
+To: Simon Horman <horms@kernel.org>
+CC: <intel-wired-lan@lists.osuosl.org>, <david.m.ertman@intel.com>,
+	<netdev@vger.kernel.org>, Przemek Kitszel <przemyslaw.kitszel@intel.com>
+References: <20241028165922.7188-1-mateusz.polchlopek@intel.com>
+ <20241102143818.GM1838431@kernel.org>
+Content-Language: pl
+From: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Organization: Intel
+In-Reply-To: <20241102143818.GM1838431@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: ZR2P278CA0014.CHEP278.PROD.OUTLOOK.COM
+ (2603:10a6:910:50::20) To BL1PR11MB5399.namprd11.prod.outlook.com
+ (2603:10b6:208:318::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: sean@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27448/Mon Nov  4 10:33:38 2024)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BL1PR11MB5399:EE_|DM3PR11MB8714:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9e130e12-02b0-49f1-0598-08dcfcd016c9
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;ARA:13230040|376014|1800799024|366016;
+X-Microsoft-Antispam-Message-Info: =?utf-8?B?STI0ZXV2NGFxNko5bzJ4d2wxTlNKOGZuM0Z0S2MxUmdOQ1lnY2NNTlhEeW1G?=
+ =?utf-8?B?dFdhbmJCZWo2VDlkanBJU0pWSFozdjZwRWRaY3huenl5VlY2SStEZXIwOHk0?=
+ =?utf-8?B?aEtBYXUzTjhsNW5HWkE2WFdyWWlUUkpnYlpHbEpuS3l1eDVjeGxLd0xhMy94?=
+ =?utf-8?B?bFZENWVaTWdIc0VjdFQ0NDBXc0ExVUlQYUdadnZzMXlPU2ZKcERxTTdJUHpm?=
+ =?utf-8?B?QkZlRmJXdEZ6Y2JQOUlTRkt3Y2ptUzVadlovY3NMRi9DWW9JdXhVTXorRlNq?=
+ =?utf-8?B?VGZiUlZ4anZDOUxweW9HcVFZMUFTb1MrcFN3UUhqMCtuSDdJUGFiYmF3VGF5?=
+ =?utf-8?B?MGZoUFVUSEJPMWxzQUJ1c3A1aDZqcmhLNFN4RERFV0tuaTRpVzBDTUpIRGJL?=
+ =?utf-8?B?VnAvcndOTHNZVEhvczRLTmFmQVNvY3BiTWxBSEgzSkZhVyswYk10Wjh1UWky?=
+ =?utf-8?B?eng3K1BzTlBhcjM3OHFDbVo3OEpyTG5aTVdIRFc1R0tUWHlwRVhwdHhuMUxx?=
+ =?utf-8?B?QTlwL0NKY3lWZEJjeSszRWNDekVTQmNpd3U4dWNVajBrNmZrK1daT2gxbHR5?=
+ =?utf-8?B?elJ4L0tWUVdibkp5YXlWRllEcjhxNVZTVFhyazBKdnYvM2dlaDI4TVJXSGFR?=
+ =?utf-8?B?YVl1YVkwUnp3NWg3Qi9ITVIwRXlUbWNhVEgwSjAzOTNqdzNmNnFYbEYvQlI0?=
+ =?utf-8?B?WENVQVZpcjRqODJINGNKUnV6MEQ5YkJOd1FUckd2RlgveHVmSnVEaG1xdlJ2?=
+ =?utf-8?B?WWlaQTRGQ08rUS9JUzFyWm96RDZMd0V6azNFeUVTYWtCWHpYU1AzVGd2d1hE?=
+ =?utf-8?B?NmZsck9hcmE4Uy90OVY4aGVwSmp4VmFleXk3QkdZS3p1dkpwUFpaMWJ3a1RR?=
+ =?utf-8?B?TE82UFlTL3UvNnAyS28zODVLWUV5MnkxbDNhS0JmRUJISDNRTUg0TEVmRHJQ?=
+ =?utf-8?B?SXhXU2w2U2pqMFBvbGZQOWNSL0JHRGlkQzJNdDlIMXRMZW9renZQTVlyOE5D?=
+ =?utf-8?B?L1ExbU1YTUpNRG5GTEltRnIxWmw5MmNIdzJlYXJ2Vi9jaUJaRWZ4YXp5dmtU?=
+ =?utf-8?B?WklnczRjdW83SU1BeG5NdHNHS3JoYTRXZE81bEVYNVRIYU5kb2pFSjlDWXI0?=
+ =?utf-8?B?MVk4eFFQRCtDNFJpRWkwNkxnaWJXdzBic2FaNWpHdEZPRjA2dmJXTXlHeVF2?=
+ =?utf-8?B?Tzh6SjZrdWh5U09zS1VWaUNhVHF1SURIeWlxbi9mMHp5amwxTFA4Mi91NTFp?=
+ =?utf-8?B?MXRCVTYzaGMyTk5YQUx3Vm1QejVaVlNRQVhndmJOREoxdnV1azkyYU5hSXBL?=
+ =?utf-8?B?ZlptVWVzSURUS2JwdGFhdGFYaXJudXFRWTVtTHNtb2tnNXhuU3YvMWphZlVk?=
+ =?utf-8?B?QWdkamg0UjVGOVVldytQT3hnbnpzQndnc3dFelM3V3Z1WmhuRTZxNEVIU2hq?=
+ =?utf-8?B?SHVuTkk3djNsS2pGOGZhQXZ1WnY2b0JwcCt5c3l5Mm1EOUJvOG45ZENLSmNx?=
+ =?utf-8?B?cEdVdnE0Nzl2SmVGR1dSUDNUR0s2a0l6RWFlMmhiOStCd2Z0MEVKYUYvR3Q5?=
+ =?utf-8?B?SFB5ak9IRDdTWjgrdWFFQjRhSVg3bElqUDlSU1hkT21SYmNjMHJObVZrclRR?=
+ =?utf-8?B?QW9qZzdTMjR4SWtjakFBNlV2eGdYU3dmbDRzNUo1M2JGMU1GclkyVE9vMVg5?=
+ =?utf-8?B?Y1k2bzhoOFNTOU11UFVkbm1UVzJLcGZuR0RCYjBrOW9xTENETEZlSkUxREhn?=
+ =?utf-8?Q?+qLtQr0fu04b8SUgRw=3D?=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL1PR11MB5399.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eURxc2VxLzdqUnZvOERnNEZ4endDMUpNLzlDVk5zamNCVWQvWUlwQmxaUlRW?=
+ =?utf-8?B?U0lIbnBvM0xLb3dsTmxSd25INFU4OUpyc21CaWJ3TC94WStjZ0R1NFk3Sndy?=
+ =?utf-8?B?bmxBNTRSb0J6QlV2dlVuczRGZmVVKzVKRnYram1pQmdWTFFTdnJ2WEJJdklR?=
+ =?utf-8?B?TDRvTjNMcDlYQmRqRnIwV2VVYkdKQjlYTUVFZitGUDlvbUhhdmc3aHJzNVFB?=
+ =?utf-8?B?ajRlU3IzMHJVWE91SFhKTDRoamNPS05QTnBPMk4zd1BRMm1KMHRMVzNhWVFn?=
+ =?utf-8?B?T0NuM1llR045WHR3TndTcTBPUzVlUVBmR2ZPNXF2TXBQZWE3MkdjeG9jSUhs?=
+ =?utf-8?B?S080b2RxSXVIeEUwQWpkSG1sWS82OStEekRpaWZPRUVDVzd0VXJLaFJnaGFX?=
+ =?utf-8?B?eXpUSFlNeEVnNG9pWTVTOE02Tzkvek85VU5tbkphb2U1K3dJNzlJUHVnblhl?=
+ =?utf-8?B?Y1lCd1VPYk8zc0ROWDdia1BkaCswNW5SVS9WcXhFcnFBM21qWThTRndMWVZi?=
+ =?utf-8?B?UUcvYVhIVlJQQXdXSjY2dGREaENiT2hrOGo1K0VTZTZGL2ZQOUNDd052NU9u?=
+ =?utf-8?B?SFE4STN4V2o0NlR2RW8rU0pXb0o1MXFnWUZzcURKaVZEakhzeVZ5Z3lNK1NH?=
+ =?utf-8?B?Tk8rckdGVXBmdWFoT3FyNncvQUtUQkNEQnBVMWw0UWd4UXpFVHdIenJhbHlt?=
+ =?utf-8?B?NnAyQmFiaENiTmF6Z3RpY2lkZnU5elhlUnkwOG56ZlNlRU96SnVKZjh5UXBW?=
+ =?utf-8?B?QjdKS1JwdkpWTHlaaHB1SEhUSWxMS1RTVTQyUzVqNXF5dnBDSENZQlAyMUt4?=
+ =?utf-8?B?R2hUNG45Tmt3NGw4aHpIeS81eW91eit3Si9qU2RnNW9NQ00xanNXUzVwc1gv?=
+ =?utf-8?B?QkcxNGZUbXdlOTFnbURPU3pRVWVxSGc4L1dSWlorcE1GZ3RWSFd6S0F1a1RD?=
+ =?utf-8?B?UjhPUGtpNDZVSzBUSTFod0pPZ2VwakY5UmJ4NjFQZjBWOTcwWm9uaUovWmow?=
+ =?utf-8?B?dUYyTDZpWlVyQ2I2amlTVXVPMTZHaWg1YnNTaVc2TzRjZndCSEhQNmIrNkc5?=
+ =?utf-8?B?UjEzdXJVVytrOXlMNlBwRHhlRFRmTUl6cUdndDdOZnh3cjc1VVFmMStCNWo2?=
+ =?utf-8?B?Q0g2L3QzRkFnVHU4TWdEU0pqNmg3R3FwVS82M28vbmtxOU51dWs5U2k1eG13?=
+ =?utf-8?B?aTd5M0J4UFpTYkVndFBrWGRtVTJXMitSTXRqd3FSdmFqeTdKS3o4UDM0UU9B?=
+ =?utf-8?B?eUR1QmZET0RXU1FUeXdQcVFReENSUS9NZ1FnQW9DT2c2UWUrV0Y0bXhSK0ND?=
+ =?utf-8?B?SnYvMExZczRjYUcyQzMzdk5hWHBBa3hDWGVLeFBCUkhiOU9yNExUTlNESDdH?=
+ =?utf-8?B?TnRYdmNmRDYzaUtBSWZDS2t0SHRnNE9qMWpuZEg5SWZucE10K0dHQzk3Vjht?=
+ =?utf-8?B?azZWL3NReExHL0JHeFpXWWhTOE9waDNxQjFsUm1Lc0tnWEZQdk4xZm1PaXRw?=
+ =?utf-8?B?b3FaNGlxbkpzaXV2VjhDeUErQVNPVFhDQW9VSVNvUis3Y0lCNnBQdDUzTEhZ?=
+ =?utf-8?B?WFlzNUdVZHFnaXZIaWFvWE52ZWdWSmp3T25rK3k2N0d3NlVQZUpnNGs2b0JI?=
+ =?utf-8?B?U0s4d01qdk1WdTJiRU1HVUc5L2YxS0Nrb3JJd1lLc0crYkdUbzNNbVA2QTB0?=
+ =?utf-8?B?UXd1dmsybyt4dzFTTlM0TWhNQUJXaE50ejlSK29xcmVrOUorMm5kY0ZhaHND?=
+ =?utf-8?B?em56Wk50QWl1c002RGlFUTNDSlkyUXFxb3dPOVJQT3V4K2JUMkNmSmNwNFoy?=
+ =?utf-8?B?R0hiVDdnUHNVQjZUMlV4R2dCcnVVT1grZ1FobjFNN2lkdDZPZjB6emw0c20r?=
+ =?utf-8?B?QlFkeGp3bW1kUy9DNHhNTS9wZGNBcmdZcnBFMGQ0SVRIOUNjaDRpeU1UbFdM?=
+ =?utf-8?B?eEZBcDBSZUJaSjZ2cFNoc05mRjZvMVNnbGhaRVB6RC9SYmcyMzBuNG9NdXBH?=
+ =?utf-8?B?MHRtQWtndWcyY2VDbFhUbWs4K1N6ZFJDUldxcTU2eERVVjVUSHdvaHByb2RI?=
+ =?utf-8?B?QUhNMVJyQk94cTZLZk5TaFpwaVJ1WTRHTGE0NDJqMG92STlRaU9OLzZjSFYw?=
+ =?utf-8?B?THNLVVptUGxMa1o0OW85L0FsSEZqbElYYW9nTzUwTFdEVEVtQms1TXZ5SjFI?=
+ =?utf-8?B?L1E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9e130e12-02b0-49f1-0598-08dcfcd016c9
+X-MS-Exchange-CrossTenant-AuthSource: BL1PR11MB5399.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Nov 2024 12:56:24.8422
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: Wx3UgoQUrnyKvQvgWESCWF0ZQblTcXXaLRLpLgllemCiaPNQ+wsivNOFlBumsLjqyV8iZa1Fx+KejICZKNcKaO+S5CvyOYkYNyhiONax3no=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM3PR11MB8714
+X-OriginatorOrg: intel.com
 
-Convert binding doc tcan4x5x.txt to yaml.
 
-Signed-off-by: Sean Nyekjaer <sean@geanix.com>
----
-Changes since rfc:
-  - Tried to re-add ti,tcan4x5x wildcard
-  - Removed xceiver and vdd supplies (copy paste error)
-  - Corrected max SPI frequency
-  - Copy pasted bosch,mram-cfg from bosch,m_can.yaml
-  - device-state-gpios and device-wake-gpios only available for tcan4x5x
 
- .../devicetree/bindings/net/can/tcan4x5x.txt  |  48 -----
- .../bindings/net/can/ti,tcan4x5x.yaml         | 189 ++++++++++++++++++
- 2 files changed, 189 insertions(+), 48 deletions(-)
- delete mode 100644 Documentation/devicetree/bindings/net/can/tcan4x5x.txt
- create mode 100644 Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+On 11/2/2024 3:38 PM, Simon Horman wrote:
+> On Mon, Oct 28, 2024 at 12:59:22PM -0400, Mateusz Polchlopek wrote:
+>> Fix Flow Director not allowing to re-map traffic to 0th queue when action
+>> is configured to drop (and vice versa).
+>>
+>> The current implementation of ethtool callback in the ice driver forbids
+>> change Flow Director action from 0 to -1 and from -1 to 0 with an error,
+>> e.g:
+>>
+>>   # ethtool -U eth2 flow-type tcp4 src-ip 1.1.1.1 loc 1 action 0
+>>   # ethtool -U eth2 flow-type tcp4 src-ip 1.1.1.1 loc 1 action -1
+>>   rmgr: Cannot insert RX class rule: Invalid argument
+>>
+>> We set the value of `u16 q_index = 0` at the beginning of the function
+>> ice_set_fdir_input_set(). In case of "drop traffic" action (which is
+>> equal to -1 in ethtool) we store the 0 value. Later, when want to change
+>> traffic rule to redirect to queue with index 0 it returns an error
+>> caused by duplicate found.
+>>
+>> Fix this behaviour by change of the type of field `q_index` from u16 to s16
+>> in `struct ice_fdir_fltr`. This allows to store -1 in the field in case
+>> of "drop traffic" action. What is more, change the variable type in the
+>> function ice_set_fdir_input_set() and assign at the beginning the new
+>> `#define ICE_FDIR_NO_QUEUE_IDX` which is -1. Later, if the action is set
+>> to another value (point specific queue index) the variable value is
+>> overwritten in the function.
+>>
+>> Fixes: cac2a27cd9ab ("ice: Support IPv4 Flow Director filters")
+>> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+>> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> 
+> This looks good, although I am interested to know what the maximum value
+> for q_index is. And, considering unsigned values are used elsewhere, if
+> using 0xffff within this driver was considered instead of -1.
+> 
+> That notwithstanding,
+> 
+> Reviewed-by: Simon Horman <horms@kernel.org>
 
-diff --git a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt b/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
-deleted file mode 100644
-index 20c0572c9853..000000000000
---- a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
-+++ /dev/null
-@@ -1,48 +0,0 @@
--Texas Instruments TCAN4x5x CAN Controller
--================================================
--
--This file provides device node information for the TCAN4x5x interface contains.
--
--Required properties:
--	- compatible:
--		"ti,tcan4552", "ti,tcan4x5x"
--		"ti,tcan4553", "ti,tcan4x5x" or
--		"ti,tcan4x5x"
--	- reg: 0
--	- #address-cells: 1
--	- #size-cells: 0
--	- spi-max-frequency: Maximum frequency of the SPI bus the chip can
--			     operate at should be less than or equal to 18 MHz.
--	- interrupt-parent: the phandle to the interrupt controller which provides
--                    the interrupt.
--	- interrupts: interrupt specification for data-ready.
--
--See Documentation/devicetree/bindings/net/can/bosch,m_can.yaml for additional
--required property details.
--
--Optional properties:
--	- reset-gpios: Hardwired output GPIO. If not defined then software
--		       reset.
--	- device-state-gpios: Input GPIO that indicates if the device is in
--			      a sleep state or if the device is active. Not
--			      available with tcan4552/4553.
--	- device-wake-gpios: Wake up GPIO to wake up the TCAN device. Not
--			     available with tcan4552/4553.
--	- wakeup-source: Leave the chip running when suspended, and configure
--			 the RX interrupt to wake up the device.
--
--Example:
--tcan4x5x: tcan4x5x@0 {
--		compatible = "ti,tcan4x5x";
--		reg = <0>;
--		#address-cells = <1>;
--		#size-cells = <1>;
--		spi-max-frequency = <10000000>;
--		bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
--		interrupt-parent = <&gpio1>;
--		interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
--		device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
--		device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
--		reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
--		wakeup-source;
--};
-diff --git a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-new file mode 100644
-index 000000000000..0351e5c04230
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-@@ -0,0 +1,189 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Texas Instruments TCAN4x5x CAN Controller
-+
-+maintainers:
-+  - Marc Kleine-Budde <mkl@pengutronix.de>
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - items:
-+          - enum:
-+              - ti,tcan4552
-+          - const: ti,tcan4x5x
-+      - items:
-+          - enum:
-+              - ti,tcan4553
-+          - const: ti,tcan4x5x
-+      - items:
-+          - enum:
-+              - ti,tcan4x5x
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+    description: The GPIO parent interrupt.
-+
-+  clocks:
-+    maxItems: 1
-+
-+  reset-gpios:
-+    description: Hardwired output GPIO. If not defined then software reset.
-+    maxItems: 1
-+
-+  device-state-gpios:
-+    description: |
-+      Input GPIO that indicates if the device is in a sleep state or if the
-+      device is active. Not available with tcan4552/4553.
-+    maxItems: 1
-+
-+  device-wake-gpios:
-+    description: |
-+      Wake up GPIO to wake up the TCAN device.
-+      Not available with tcan4552/4553.
-+    maxItems: 1
-+
-+  bosch,mram-cfg:
-+    description: |
-+      Message RAM configuration data.
-+      Multiple M_CAN instances can share the same Message RAM
-+      and each element(e.g Rx FIFO or Tx Buffer and etc) number
-+      in Message RAM is also configurable, so this property is
-+      telling driver how the shared or private Message RAM are
-+      used by this M_CAN controller.
-+
-+      The format should be as follows:
-+      <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
-+      The 'offset' is an address offset of the Message RAM where
-+      the following elements start from. This is usually set to
-+      0x0 if you're using a private Message RAM. The remain cells
-+      are used to specify how many elements are used for each FIFO/Buffer.
-+
-+      M_CAN includes the following elements according to user manual:
-+      11-bit Filter	0-128 elements / 0-128 words
-+      29-bit Filter	0-64 elements / 0-128 words
-+      Rx FIFO 0		0-64 elements / 0-1152 words
-+      Rx FIFO 1		0-64 elements / 0-1152 words
-+      Rx Buffers	0-64 elements / 0-1152 words
-+      Tx Event FIFO	0-32 elements / 0-64 words
-+      Tx Buffers	0-32 elements / 0-576 words
-+
-+      Please refer to 2.4.1 Message RAM Configuration in Bosch
-+      M_CAN user manual for details.
-+    $ref: /schemas/types.yaml#/definitions/int32-array
-+    items:
-+      - description: The 'offset' is an address offset of the Message RAM where
-+          the following elements start from. This is usually set to 0x0 if
-+          you're using a private Message RAM.
-+        default: 0
-+      - description: 11-bit Filter 0-128 elements / 0-128 words
-+        minimum: 0
-+        maximum: 128
-+      - description: 29-bit Filter 0-64 elements / 0-128 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Rx FIFO 0 0-64 elements / 0-1152 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Rx FIFO 1 0-64 elements / 0-1152 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Rx Buffers 0-64 elements / 0-1152 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Tx Event FIFO 0-32 elements / 0-64 words
-+        minimum: 0
-+        maximum: 32
-+      - description: Tx Buffers 0-32 elements / 0-576 words
-+        minimum: 0
-+        maximum: 32
-+    minItems: 1
-+
-+  spi-max-frequency:
-+    description:
-+      Must be half or less of "clocks" frequency.
-+    maximum: 18000000
-+
-+  wakeup-source:
-+    $ref: /schemas/types.yaml#/definitions/flag
-+    description: |
-+      Enable CAN remote wakeup.
-+
-+allOf:
-+  - $ref: can-controller.yaml#
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - ti,tcan4552
-+              - ti,tcan4553
-+    then:
-+      properties:
-+        device-state-gpios: false
-+        device-wake-gpios: false
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - bosch,mram-cfg
-+
-+additionalProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        can@0 {
-+            compatible = "ti,tcan4x5x";
-+            reg = <0>;
-+            clocks = <&can0_osc>;
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&can0_pins>;
-+            spi-max-frequency = <10000000>;
-+            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
-+            interrupt-parent = <&gpio1>;
-+            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
-+            device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
-+            device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
-+            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
-+            wakeup-source;
-+        };
-+    };
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        can@0 {
-+            compatible = "ti,tcan4552","ti,tcan4x5x";
-+            reg = <0>;
-+            clocks = <&can0_osc>;
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&can0_pins>;
-+            spi-max-frequency = <10000000>;
-+            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
-+            interrupt-parent = <&gpio1>;
-+            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
-+            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
-+            wakeup-source;
-+        };
-+    };
--- 
-2.46.2
+Hi Simon!
 
+Thanks for Your review.
+What is about q_index: it stores queue index which can be theoretically
+up to few thousands. So in this case s16 should be enough and will be
+able to hold all indexes. I didn't consider 0xffff as this may be
+misleading, I decided to stay with -1.
+
+Mateusz
 
