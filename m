@@ -1,171 +1,138 @@
-Return-Path: <netdev+bounces-141592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B17519BBA81
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:43:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6BBC69BBA99
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 17:54:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E5644B21505
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:43:35 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E52B11F22502
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:54:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE0521C2DAE;
-	Mon,  4 Nov 2024 16:43:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F7B61C4A07;
+	Mon,  4 Nov 2024 16:54:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YS3rrS4u"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f44.google.com (mail-wm1-f44.google.com [209.85.128.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E351C2309
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 16:43:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC80F1C304B
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 16:54:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730738610; cv=none; b=IODBkH+eWgqk/WBwM7Wo8JMtxd2VhAgnwWp9Xelqf71Fq1mVsNIVh4eFGOOYhlb3Y8u3bSePNVcekxhdJcWiKFbVu8VfSMqLDm4l7GzLrkL4bsxFllH1PzL/UErTAmmkZ/buzWIJ2m6lP7c9yk5X2u+CKdVxItuthDIaJaTwcXs=
+	t=1730739245; cv=none; b=NtnDa74+nEa15M0s7TPE03YoKJUGeSBHGTciNWxUj2Wyg++DMfSzuME96c66CsMZDMuTk4FUD4fytAvbFb1bCzVTDqjtcWaycZ/tDLgjlgHf4NtZIO4tetKu6TBVqR6DsEINkLY0gb6V6zU5mvSRpjcQX0jYEreNsY1KyeWP/XY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730738610; c=relaxed/simple;
-	bh=63xFusTRsY1L/nYoLVzTZYDCcu+dflkbrtHdaafc8Ow=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=TTKm0i4atwwYh3w89TVz0aZsG5lALdPOW0aCQBWy2iqmHPIggfI4BkEvb0mszuFC2MAxAIeKptFdQuIHTPZr/HgMDQPiUqTI8cuhHwyzq7mZJCesoUM2hEsW1AzmQVphg1htuTLw7qtd1GEiKBTObd8bTeFwtqWeGITDjvah+XM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t80Ao-0005Fc-0V
-	for netdev@vger.kernel.org; Mon, 04 Nov 2024 17:43:26 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t80An-0020py-2c
-	for netdev@vger.kernel.org;
-	Mon, 04 Nov 2024 17:43:25 +0100
-Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 7AD7E367DF9
-	for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 16:43:25 +0000 (UTC)
-Received: from hardanger.blackshift.org (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 834B7367DF1;
-	Mon, 04 Nov 2024 16:43:23 +0000 (UTC)
-Received: from [172.20.34.65] (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id e44711e1;
-	Mon, 4 Nov 2024 16:43:22 +0000 (UTC)
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-Date: Mon, 04 Nov 2024 17:42:40 +0100
-Subject: [PATCH can v3] can: mcp251xfd: mcp251xfd_get_tef_len(): fix length
- calculation
+	s=arc-20240116; t=1730739245; c=relaxed/simple;
+	bh=PalyVIEJgetnZgVeiXxw16ytu6k43Ef+gvpB3lzpCpk=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Y0rTpCuxMV1bOD88ubbW6eHBJLn5WQobnPGPNbbVMG/oTwhlU2SFxav/jzcZZPvVmBxT1YqgHnkJ25OaLav0aS/l2ilcz53rGGuBfCmDPWJiER7pczVemq7keVZ+8Wa2UBLLvNxyPAb/P2mmsiAuvMkAcaktSz5pDGvKlbv0T8A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YS3rrS4u; arc=none smtp.client-ip=209.85.128.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f44.google.com with SMTP id 5b1f17b1804b1-4319399a411so38886485e9.2
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 08:54:03 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730739242; x=1731344042; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6Lu+PX4eg3XLzrzdFO/07o0stso0MynG7ok/c7nqfy0=;
+        b=YS3rrS4uWgzTjla58txkK4jAVGwRryKA7kO91aUwDghRARBZI9uJkeMaPwm8B05wcU
+         RWknVdCNkg27ylGKMt3XGO7o9n+HqmRxEIh94FKU7feep2+z0tlgdD+UrhEMUt3dYLqL
+         k0rVz/ox8s1h4nywNxeWUa4RzXEyKFt2rwVSU/skjRvIhPNMQyXY8YQhyik00W2y3+kf
+         l+l8eNrgOgn6QT7PmTqIw82djH1H4w5/lEbcr+U42sxJobBv89j+k2BgEPry3cV7AAw+
+         4zV9djAX6aYCHRJdvusnWxg31OxodPkPgo1An1KMD7CRORnKxQAv6uJxTAQHRsT5vvgp
+         sAzA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730739242; x=1731344042;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6Lu+PX4eg3XLzrzdFO/07o0stso0MynG7ok/c7nqfy0=;
+        b=K5g3OQYTq2nYzPWiMntIckoj7Q1BbkORKLqL4BQMgraphR2P1PN4UM/kTITUxyeU4e
+         5O0jyz3GvMOsCuo3aFQWbx0ol1lAZnyboxdM2o249bYuXfU53AoXhMksaB0JRsdRNZDc
+         yJQcS8U6BO59pY5DoU+kGi3SP5pXRGn3cj5OBnDksrNxfavbpKMLj8rCFDf5DtKRRj7G
+         63xIZ6ukL8h6Es/+uvzlRsAb8BpojNHT5bvisZxHBF81hnDJA2ahNWMy9OgrKg4MRIjF
+         7S4noLzwIqmoJPw5CKqzxFYD5JuN74iaPekfzacFxPs56O5hIYhISzkEqLb1YJOf52/4
+         wh2Q==
+X-Gm-Message-State: AOJu0Yw8MTsz2Thfob8q6SkOJpbsndx4YlE37Nk8FqNZ8IwzZj6OAQlN
+	WNZJPEgeH3e1iCyP6ykIPbVHCBYXqYsYTAgzobHqrUZi4oEA1fJBNo1eTg==
+X-Google-Smtp-Source: AGHT+IFHUPv2D5Gl5Vi8CtpVLhV03P1fYOScyV3DKrydQBYc/YG6dIBQNZKnAOl4GhQC7Fq32IghnA==
+X-Received: by 2002:a05:600c:1d99:b0:431:1868:417f with SMTP id 5b1f17b1804b1-4319acadccdmr336704035e9.17.1730739241485;
+        Mon, 04 Nov 2024 08:54:01 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:71af:4a7:35c:6d53])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d6852e4sm156878085e9.29.2024.11.04.08.54.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 08:54:00 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 0/2] netlink: specs: Add neigh and rule YNL specs
+Date: Mon,  4 Nov 2024 16:53:50 +0000
+Message-ID: <20241104165352.19696-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241104-mcp251xfd-fix-length-calculation-v3-1-608b6e7e2197@pengutronix.de>
-X-B4-Tracking: v=1; b=H4sIAH/5KGcC/42Nyw6DIBBFf8WwLg1Q8dFV/6PpgseoJBYNILEx/
- nsnrpp04/LO3HvORiIEB5Hci40EyC66yWO4XQpiBuV7oM5iJoKJkjPG6dvMQvK1s7RzKx3B92m
- gRo1mGVXCMWWtrozhTIFmBDFzAGweiicxypMXHgcX0xQ+hzbz43XekDnlVLaNLivJGlvxx4ylJ
- YXJu/Vq4TBk8UMV8gRVIBWUtLquG91K9kfd9/0LHtUS8zABAAA=
-X-Change-ID: 20241001-mcp251xfd-fix-length-calculation-09b6cc10aeb0
-To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>, 
- Thomas Kopp <thomas.kopp@microchip.com>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- Sven Schuchmann <schuchmann@schleissheimer.de>
-Cc: linux-can@vger.kernel.org, kernel@pengutronix.de, 
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- stable@vger.kernel.org, Marc Kleine-Budde <mkl@pengutronix.de>
-X-Mailer: b4 0.15-dev-dedf8
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2880; i=mkl@pengutronix.de;
- h=from:subject:message-id; bh=63xFusTRsY1L/nYoLVzTZYDCcu+dflkbrtHdaafc8Ow=;
- b=owEBbQGS/pANAwAKASg4oj56LbxvAcsmYgBnKPmFN0MvQy+Sg3vSdfw3tywkkT9FJrkcQEQqe
- gWP0ISUzWeJATMEAAEKAB0WIQRQQLqG4LYE3Sm8Pl8oOKI+ei28bwUCZyj5hQAKCRAoOKI+ei28
- b/aTB/4tiMmTguV9zreuyT/rwm10dGSiYkqN2vMEjs770WOwPNxh+zX+pYyqt1llpm+U367uovF
- 59sgNZoY0x7CuT3xjrDOAuAyVB9ZsAf7rs+KgLPfu364rItSGUb+ByYWU3JwZKCfgc45MWtF6Xl
- b6o4+ZouLKt7QSRvwjL3N1OhZOxrbiGISx8sWgz6JYcCmIK6yxMr1bRU4kmP7Zw9vtxIw1kuj6k
- AVtwo9PjNtt66ZJcomC0rtRcLdMcQ7IPojctlSI9hyMHkt08agL/i9Zrvkfn7v4r8mM6aYLWNcG
- G2lQ7WeqcfzTeXaEFoRHJuJaxFTkLT1Im7GF9WKkkIexVrii
-X-Developer-Key: i=mkl@pengutronix.de; a=openpgp;
- fpr=C1400BA0B3989E6FBC7D5B5C2B5EE211C58AEA54
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+Content-Transfer-Encoding: 8bit
 
-Commit b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround
-broken TEF FIFO tail index erratum") introduced
-mcp251xfd_get_tef_len() to get the number of unhandled transmit events
-from the Transmit Event FIFO (TEF).
+Add YNL specs for the FDB neighbour tables and FIB rules from the
+rtnelink families.
 
-As the TEF has no head pointer, the driver uses the TX FIFO's tail
-pointer instead, assuming that send frames are completed. However the
-check for the TEF being full was not correct. This leads to the driver
-stop working if the TEF is full.
+Example usage:
 
-Fix the TEF full check by assuming that if, from the driver's point of
-view, there are no free TX buffers in the chip and the TX FIFO is
-empty, all messages must have been sent and the TEF must therefore be
-full.
+./tools/net/ynl/cli.py \
+    --spec Documentation/netlink/specs/rt_neigh.yaml \
+    --dump getneigh
+[{'cacheinfo': {'confirmed': 122664055,
+                'refcnt': 0,
+                'updated': 122658055,
+                'used': 122658055},
+  'dst': '0.0.0.0',
+  'family': 2,
+  'flags': set(),
+  'ifindex': 5,
+  'lladr': '',
+  'probes': 0,
+  'state': {'noarp'},
+  'type': 'broadcast'},
+  ...]
 
-Reported-by: Sven Schuchmann <schuchmann@schleissheimer.de>
-Closes: https://patch.msgid.link/FR3P281MB155216711EFF900AD9791B7ED9692@FR3P281MB1552.DEUP281.PROD.OUTLOOK.COM
-Fixes: b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround broken TEF FIFO tail index erratum")
-Tested-by: Sven Schuchmann <schuchmann@schleissheimer.de>
-Cc: stable@vger.kernel.org
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
----
-Changes in v3:
-- add proper patch description
-- added Sven's Tested-by
-- Link to v2: https://patch.msgid.link/20241025-mcp251xfd-fix-length-calculation-v2-1-ea5db778b950@pengutronix.de
+./tools/net/ynl/cli.py \
+    --spec Documentation/netlink/specs/rt_rule.yaml \
+    --dump getrule --json '{"family": 2}'
 
-Changes in v2:
-- mcp251xfd_tx_fifo_sta_empty(): fix check if TX-FIFO is empty
-- Link to RFC: https://patch.msgid.link/20241001-mcp251xfd-fix-length-calculation-v1-1-598b46508d61@pengutronix.de
----
- drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+[{'action': 'to-tbl',
+  'dst-len': 0,
+  'family': 2,
+  'flags': 0,
+  'protocol': 2,
+  'src-len': 0,
+  'suppress-prefixlen': '0xffffffff',
+  'table': 255,
+  'tos': 0},
+  ... ]
 
-diff --git a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-index f732556d233a7be3b43f6f08e0b8f25732190104..d3ac865933fdf6c4ecdd80ad4d7accbff51eb0f8 100644
---- a/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-+++ b/drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c
-@@ -16,9 +16,9 @@
- 
- #include "mcp251xfd.h"
- 
--static inline bool mcp251xfd_tx_fifo_sta_full(u32 fifo_sta)
-+static inline bool mcp251xfd_tx_fifo_sta_empty(u32 fifo_sta)
- {
--	return !(fifo_sta & MCP251XFD_REG_FIFOSTA_TFNRFNIF);
-+	return fifo_sta & MCP251XFD_REG_FIFOSTA_TFERFFIF;
- }
- 
- static inline int
-@@ -122,7 +122,11 @@ mcp251xfd_get_tef_len(struct mcp251xfd_priv *priv, u8 *len_p)
- 	if (err)
- 		return err;
- 
--	if (mcp251xfd_tx_fifo_sta_full(fifo_sta)) {
-+	/* If the chip says the TX-FIFO is empty, but there are no TX
-+	 * buffers free in the ring, we assume all have been sent.
-+	 */
-+	if (mcp251xfd_tx_fifo_sta_empty(fifo_sta) &&
-+	    mcp251xfd_get_tx_free(tx_ring) == 0) {
- 		*len_p = tx_ring->obj_num;
- 		return 0;
- 	}
+Donald Hunter (2):
+  netlink: specs: Add a spec for neighbor tables in rtnetlink
+  netlink: specs: Add a spec for FIB rule management
 
----
-base-commit: 5ccdcdf186aec6b9111845fd37e1757e9b413e2f
-change-id: 20241001-mcp251xfd-fix-length-calculation-09b6cc10aeb0
+ Documentation/netlink/specs/rt_neigh.yaml | 442 ++++++++++++++++++++++
+ Documentation/netlink/specs/rt_rule.yaml  | 240 ++++++++++++
+ 2 files changed, 682 insertions(+)
+ create mode 100644 Documentation/netlink/specs/rt_neigh.yaml
+ create mode 100644 Documentation/netlink/specs/rt_rule.yaml
 
-Best regards,
 -- 
-Marc Kleine-Budde <mkl@pengutronix.de>
-
+2.47.0
 
 
