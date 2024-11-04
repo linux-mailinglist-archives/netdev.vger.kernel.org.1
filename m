@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-141679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 007DC9BC055
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 22:51:22 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B82329BC05A
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 22:53:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3180A1C21E65
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:51:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D55FB1C21494
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 21:53:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A94741A727F;
-	Mon,  4 Nov 2024 21:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67F6D1AC435;
+	Mon,  4 Nov 2024 21:53:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eJLUFFpp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZP4aPUaf"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
+Received: from mail-ej1-f50.google.com (mail-ej1-f50.google.com [209.85.218.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C8D1925B0
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 21:51:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A43361925B0;
+	Mon,  4 Nov 2024 21:53:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730757079; cv=none; b=NlmsLb2x6L6WwVrQrbwezsBqP9Qdn/vav6y1cbyaWV2x2qBp8s+tpTkSmusWVkR5QbP37ZmXtF/AaWtZEqkWDcnCDvn3LbRnsdNUl7HmeE++4vWpG0Q+gOTZIwL2sOCaSz9CxIC/UdlHMMqZMrH5N9JNwBu0JzEUvNOQ48od1/g=
+	t=1730757194; cv=none; b=g21zAp4BzT7rD0pqOfJow6u/GCE8pfm2TwYJLRwb/ImzcR3bPJoecFWNBysWokNSk1kHEstxtxW4CK2WTNc/YS1xCwhZTAmD4k8g0MTqp4zRAfyySkEkIivzflCnrmbqkhQ0mKIPg4RDJEFikHuidLWtxSbto4gsMyMZRHNlVus=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730757079; c=relaxed/simple;
-	bh=XLRXEvnAXwUON/+i55ZnkHupHs67s7I1Hdyt0tIigbM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=O8Rq5MF5ra9UWnpur7a6gpBncVNFtRojH0L92HaxJdW5boHlbMLP6rMVKDxrnghJd/uxW5gpWBndh4mNMQNLQ7WXaXl+1KwC/I5JZiHVKIhCzsCNsEtuQypH9UqsbjldaZzCoiXqvUdxPnwkVjWFcjfB7AIVNi0i59E5gw3cTxU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eJLUFFpp; arc=none smtp.client-ip=209.85.218.48
+	s=arc-20240116; t=1730757194; c=relaxed/simple;
+	bh=zpIg2pQNsbuAnJL6oQqe4c4LcnxxW5W87e5WWs43z6c=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=KwLNA4kUuGHyHbkNttAdcmehTGPMasFZe/3dQw/a95X/J+OIXsyqkMrtQiKiKfk4jXIXXblAL8iSgwo8/YMO20wNEVEIEWbdsVb1ZCzddtDfypKlvgDxd3FbgECCnvNoYMbQIfaYzafZvDSPm1YfF6wMMxf8OTjhQOg5iXV0/38=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZP4aPUaf; arc=none smtp.client-ip=209.85.218.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9abe139088so718021066b.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 13:51:17 -0800 (PST)
+Received: by mail-ej1-f50.google.com with SMTP id a640c23a62f3a-a7aa086b077so604077066b.0;
+        Mon, 04 Nov 2024 13:53:12 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730757076; x=1731361876; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=9H9IWpL2XNPeCcHHUZvuIYcyD7Cge4TmSOpY7bl0VHk=;
-        b=eJLUFFpp+0lCOQ798OwBSQUVxPAGmm0qJY6CDdnweoIpGb5OjGR+9wd0DQoEU1NaXm
-         BmqeEO032mrRUDNucbwPbGusA6NPpyOEETcSydQwnlKFCS/CNXr0PEJch3gGt1SYGAFK
-         csz8eZDzyNeH+m7d2ltqgCXYK3vbSLml1gCqMw/Eo0uUIr0UILXYcTgPJZc6QTpHddzw
-         lAP2BWsR883knbmGVTiONuGvLS9HA817lsQ1qj319PXQ2ZAnwmz2ylW75ZuUzNzNw/VJ
-         sa8mylEZx1ibnqZ36qxMHWkSlCXe5+Q3+aAr7F9JtscArlniWli041noWGji8sisb+gE
-         uxkg==
+        d=gmail.com; s=20230601; t=1730757191; x=1731361991; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=soUXAJoKTID6twtUMLFXg5Ys9zkVQe+u0MKGLNcWV3U=;
+        b=ZP4aPUafCDbdQCMc2MuVtypfuNN8UaI3QKSSLHHLlQFqRuE9Ul5MPWZNPRRH4DM8A2
+         p6Y4Zf8YgFTwJUoq6fTLts8Ul0SzU1AjbS1MooqUjNKn+g+TUYx7Uf5WVv74FEJvD0eB
+         4Epr7gR/4kPC8wFqaS5zMice+vmOpQgTMBlPSVD40gi9I2eTfDtPeKNj5z9nXYjg3IeV
+         SPYxIRkZVcthiPewqihhY0R4jIA5NLCkQRliUPBDK8L457QVeF5YZkEXbiwBlZ1t5+JY
+         1xcXVmAqfa7CZggVqnWKAf+F7lz/FtMnRaAbpEXD86vksua4swc4nPLS+8MDDV5xRUu5
+         xNHg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730757076; x=1731361876;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1730757191; x=1731361991;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=9H9IWpL2XNPeCcHHUZvuIYcyD7Cge4TmSOpY7bl0VHk=;
-        b=CznvOp+W0YSzTvAmLIP6+RGAA4C40m5Jsu1Zo/PGverjJJTpECPdZEh7tvhrQ7DZMB
-         BY9WcUvfFr9Ft02NbQTp0HON+XDbTYH2v8hVrQL49QirHaRDAB7QpmtHGGRp6ZfQ/3bB
-         Zb8j9N3N6bL0oooa3x/qEwTGTZHGDnXTYJ2J3Ssj8v2bL51aDKO5/ySOfc6YJ7ozBra7
-         bEhYBReudIqd6Rrv1f96WUMFxVq03lTJ1jzzgU1uTbG5/CqfMvKAxfX34uedXWaKlV72
-         j8m4KZlo1gzZgWUbEBprnmGTOCG2B32BSvEmCMjzq0skMPS4X4NRePSEsMkNqe6EfuZk
-         SC3A==
-X-Forwarded-Encrypted: i=1; AJvYcCWWL5y3FjlWh0u26DdCjBJXT/u1f1o10fWJK9H77Hun6mHFASC+3foJKNcwmf0fMcstzxQTFZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yya0jRr1XllmjqJoIblsNG1qxje1FckrgQaYmzmlJ5WzgtMQYl3
-	fvwLmfSXJf0L5Ss1Ho11Zrex2m3kXxJX0YTy6tsNluyhD2ER0C8N
-X-Google-Smtp-Source: AGHT+IHLh3AaX61UCc01keFl+xyCoM5uyV9aJPOg0Bdayl+eOvoonzcyJ01KNtnRImnTscrRWmhPyA==
-X-Received: by 2002:a17:907:3dac:b0:a9e:b5d0:4ab7 with SMTP id a640c23a62f3a-a9eb5d05117mr4770966b.52.1730757075901;
-        Mon, 04 Nov 2024 13:51:15 -0800 (PST)
-Received: from [127.0.0.1] ([193.252.113.11])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb17f9416sm34724066b.151.2024.11.04.13.51.14
+        bh=soUXAJoKTID6twtUMLFXg5Ys9zkVQe+u0MKGLNcWV3U=;
+        b=rFN8Pv+Rr8OOBgBRR/h96Wzjn5bqYV3uaO4w8sX9zJhRq7MdYaliUR21SDjGwhPW1f
+         wq9sNlB6G11V/iglr3tanXmtOg6AyPGTdiPzTfuYk7qiPa5TjBbqKwuf4jRjSD+IksE9
+         NIdAzIdaAyfgGLsF8TFZueDH1dvJdWFIArhlUTlM4dE0qOtk8akRUSLV0lmHE3xHfnzT
+         2SmHxCKIhUtHBuehQX1RRlAvw/WCQIrfgiw498GnzQxVPoX9B0XAd5EV7dHuP+Fb60hO
+         WQXQfwkjrB9USO5uYUcI0HYcqxhvGoVArZmovWtrwEHIazbMYLcgOD7ud5HvtX/mC++2
+         oNOw==
+X-Forwarded-Encrypted: i=1; AJvYcCUnGkY156dwkgCKncMCKkaFfSnYgRTCc6rdyrJzh7eZZuW13QP3umI9u5rtGjj3X5YOTmmU61zp@vger.kernel.org, AJvYcCWnxOKJCe+Cqb7C0QwSBN0wyx7O5WfWIBHlZMzuTkOyyFBrzwyWauselwaNGbl+SFc5VTVJa2cS1w==@vger.kernel.org
+X-Gm-Message-State: AOJu0YwUQZV2WV3zhZf16nLoQzpIRncKLeSltq6FQbKqiHSh2OcLqfZ0
+	v/xcz8JwWlX8n1b5YDywBTJ21kxqb57poCV7bKLaNhg9IYzc1OJQ
+X-Google-Smtp-Source: AGHT+IFyoSSPBiGp8n/J5skMJX4yyS5l8A8F6WM50XVMWO9ql2JYyZR8eR/whBFQM8OlkpFsOq/xsQ==
+X-Received: by 2002:a17:907:728d:b0:a9a:cc8a:b281 with SMTP id a640c23a62f3a-a9e3a573cfbmr1918600266b.3.1730757190600;
+        Mon, 04 Nov 2024 13:53:10 -0800 (PST)
+Received: from [192.168.42.103] ([148.252.145.116])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16d66aesm35496766b.55.2024.11.04.13.53.09
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 04 Nov 2024 13:51:15 -0800 (PST)
-Message-ID: <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
-Date: Mon, 4 Nov 2024 22:51:01 +0100
+        Mon, 04 Nov 2024 13:53:10 -0800 (PST)
+Message-ID: <66032cb0-c68a-475d-85b3-3d6cda2c733d@gmail.com>
+Date: Mon, 4 Nov 2024 21:53:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,71 +76,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
- hnodes.
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
- Pedro Tammela <pctammela@mojatatu.com>, edumazet@google.com
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- netdev@vger.kernel.org
-References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
- <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
- <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
- <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
+Subject: Re: [PATCH v7 11/15] io_uring/zcrx: implement zerocopy receive pp
+ memory provider
+From: Pavel Begunkov <asml.silence@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Wei <dw@davidwei.uk>, io-uring@vger.kernel.org,
+ netdev@vger.kernel.org, Jens Axboe <axboe@kernel.dk>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241029230521.2385749-1-dw@davidwei.uk>
+ <20241029230521.2385749-12-dw@davidwei.uk>
+ <CAHS8izNbNCAmecRDCL_rRjMU0Spnqo_BY5pyG1EhF2rZFx+y0A@mail.gmail.com>
+ <af9a249a-1577-40fd-b1ba-be3737e86b18@gmail.com>
+ <CAHS8izPEmbepTYsjjsxX_Dt-0Lz1HviuCyPM857-0q4GPdn4Rg@mail.gmail.com>
+ <8837c96b-f764-4ba7-ae9b-40299f8c266c@gmail.com>
 Content-Language: en-US
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-In-Reply-To: <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+In-Reply-To: <8837c96b-f764-4ba7-ae9b-40299f8c266c@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-On 04/11/2024 22:33, Vadim Fedorenko wrote:
-> On 04/11/2024 20:26, Alexandre Ferrieux wrote:
->> On 04/11/2024 18:00, Pedro Tammela wrote:
->>>>
->>>> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
->>>
->>> SoB does not match sender, probably missing 'From:' tag
->> 
->> Due to dumb administrativia at my organization, I am compelled to post from my
->> personal gmail accout in order for my posts to be acceptable on this mailing
->> list; while I'd like to keep my official address in commit logs. Is it possible ?
+On 11/4/24 21:14, Pavel Begunkov wrote:
+> On 11/4/24 19:54, Mina Almasry wrote:
+>> On Fri, Nov 1, 2024 at 2:09 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+...
+>> If you've tested the generic code paths to be performance deficient
+>> and your recycling is indeed better, you could improve the page_pool
+>> to pull netmems when it needs to like you're doing here, but in a
+>> generic way that applies to the page allocator and other providers.
+>> Not a one-off implementation that only applies to your provider.
 > 
-> Yes, it's possible, the author of commit in your local git should use
-> email account of company, then git format-patch will generate proper header.
+> If I read it right, you're saying you need to improve devmem TCP
+> instead of doing an io_uring API, just like you indirectly declared
+> in the very beginning a couple of weeks ago. Again, if you're
+> against having an io_uring user API in general or against some
+> particular aspects of the API, then please state it clearly. If not,
+> I can leave the idea to you to entertain once it's merged.
 
-That's exactly what I did, and the file generated by format-patch does have the
-proper From:, but it gets overridden by Gmail when sending. That's why, as a
-last resort, I tried Signed-off-by... Any hope ?
+On top of it, that wouldn't make sense for the normal page pool path,
+it already pushes pages via a ring (ptr_ring + caches) from one
+context to another. The difference is that buffers with these zero
+copy interfaces make an extra stop in the user space, from where
+we directly push into the page pool, just like you can directly push
+via ptr_ring when you're already in the kernel, even though it
+requires more logic to handle untrusted user space.
 
-> you can add
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+It only makes for zero copy providers, and I do remember you was
+suggested to take the same approach, I think it was Stan, but since
+it didn't materialise I assume it's not of interest to devmem TCP.
 
-Ok.
-
->>> 'static inline' is discouraged in .c files
->> 
->> Why ?
->> 
->> It could have been a local macro, but an inline has (a bit) better type
->> checking. And I didn't want to add it to a .h that is included by many other
->> unrelated components, as it makes no sense to them. So, what is the recommendation ?
-> 
-> Either move it to some local header file, or use 'static u32 
-> handle2id(u32 h)'
-> and let compiler decide whether to include it or not.
-
-I believe you mean "let the compiler decide whether to _inline_ it or not".
-Sure, with a sufficiently modern Gcc this will do. However, what about more
-exotic environments ? Wouldn't it risk a perf regression for style reasons ?
-
-And speaking of style, what about the dozens of instances of "static inline" in
-net/sched/*.c alone ? Why is it a concern suddenly ?
-
-> But in either
-> cases use u32 as types to be consistent with other types in the
-> functions you modify.
-
-Ok.
-
-
+-- 
+Pavel Begunkov
 
