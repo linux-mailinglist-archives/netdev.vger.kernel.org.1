@@ -1,172 +1,162 @@
-Return-Path: <netdev+bounces-141520-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141521-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C8DB69BB384
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:35:30 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48BDE9BB38F
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:37:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87B71284451
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:35:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7A33F1C20881
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56C501B394D;
-	Mon,  4 Nov 2024 11:33:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A451B6CE9;
+	Mon,  4 Nov 2024 11:36:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="IF4ar2z8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PbIsMZt7"
 X-Original-To: netdev@vger.kernel.org
-Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.2])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A95C1B395D;
-	Mon,  4 Nov 2024 11:33:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.2
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACE561B21BA;
+	Mon,  4 Nov 2024 11:35:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730720003; cv=none; b=IfY5DStjtN4Kvei2BYUsw8yqtOPETKv3xgMT3iEw9z/U3zaQMw2KA/jWhXLTbRUkQQk0jA1M5dZuGZw7hb1WpT1B+d37HR5fRIWKHmAYEjqD+RfGUSKeGv6ZrFEFwQoZQKmB+/9n/OVu67+OXw2qgfngVYP26MMrLrjbsvJNoVU=
+	t=1730720161; cv=none; b=bnEg19D7YDHDPaAeFlvVzCZuzTOTaIX8uaDr6KFzDibtNM5u9ACMyJPa1BI0XCIHnjXvWMyNR9moReYiRzlV3V0Mxxbd2Aal1U9FsZYKex8VCThodinV0ttGgF+fnIxqE8FPy/NUQNRaSaJdqOAVe0ZhN3g3SuuTyYe0at2N2YE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730720003; c=relaxed/simple;
-	bh=UJODazVPcj9ulQdRw7qCL6k6lq/obUPC1HuFiRatleA=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=dZ3XLDBxER+o4VjNOrPhDedAKtEyizfefkYWK7PO77rQYtaqn+J8sdw6KzCtMbTyeg6jhFVII2htio6SG322cATfrtvQuAXR7ZSE+9+O0s7cTNk0DM2CGk9Es+2/jv2e3kVUAgMODxsJUffQmbehjN735NFPtckVmCrXDU8WrdU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=IF4ar2z8; arc=none smtp.client-ip=220.197.31.2
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
-	s=s110527; h=From:Subject:Date:Message-Id:MIME-Version; bh=UJODa
-	zVPcj9ulQdRw7qCL6k6lq/obUPC1HuFiRatleA=; b=IF4ar2z8GoksaeJybUaw2
-	5/HjOlOZBP2EwqMkwWdYlqUS1oPdyyRSChWP1bCA5razy+BNO2sfBVg80vox7rmE
-	jSaXMFUsrVoFWHEdnL/qhbvGwX9YHtE7xNldaiFGr4lMMZg/Q+iMQtxpf+jxsBVx
-	ebMdbgNf5+cuzYjzsN46+k=
-Received: from H00576042-PD8FB.china.huawei.com (unknown [223.104.150.4])
-	by gzga-smtp-mtada-g0-1 (Coremail) with SMTP id _____wB3eknlsChnBcbjFA--.13181S2;
-	Mon, 04 Nov 2024 19:32:55 +0800 (CST)
-From: huyizhen2024@163.com
-To: j.vosburgh@gmail.com
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	tbogendoerfer@suse.de,
-	chengyechun1@huawei.com,
-	kuba@kernel.org,
-	andy@greyhouse.net
-Subject: [Discuss]Why enable individual port in bonding 8023ad?
-Date: Mon,  4 Nov 2024 19:32:53 +0800
-Message-Id: <20241104113253.2537-1-huyizhen2024@163.com>
-X-Mailer: git-send-email 2.29.0.windows.1
+	s=arc-20240116; t=1730720161; c=relaxed/simple;
+	bh=MqirJQHMXIgrfKDB2SAWPcaT1jCCe/5NGNaz+2tKpMA=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=SVaPaGzcBA9Bsz+ROjTMfEzDPiquRn2QsjMcDIeDfKE675V7a11tkieP5kLFDXjfx05FxnfVq0KW8nKSu5EOvQFjllQDGeC1oDLsW2L3TXcuke6Rl+LWPsRAcMRiLap185xIq3YoNKRd5oNPrakle1iS6/1Xfw4zm438IR20oDs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PbIsMZt7; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 14A25C4CECE;
+	Mon,  4 Nov 2024 11:35:55 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730720159;
+	bh=MqirJQHMXIgrfKDB2SAWPcaT1jCCe/5NGNaz+2tKpMA=;
+	h=From:Date:Subject:To:Cc:From;
+	b=PbIsMZt7hKTv3fj2KAiDJGXwOJprKiA42UjoyNkf088vbEDcC8R47RkVHsdvhOqag
+	 pEqAILOH3bldzNhZfDdJij3NKcYqIaBn5LH2WZnopPoNgc+KwhkMqvdc5qZbzNHJk5
+	 KIYJ5dCDBBhhnHd7abTlFdouhAC8AAft46IZ9EcGCo2FCKibGpLo4vP8/N+MhSU80w
+	 OXjhXpVUV4w+kc0YsU/BCaDKCn+XFgAJnt0nVXD8UezgjWjyXoPyTMo7ttIQShajBF
+	 3jYjBZLkS4Hm2SGwvCL+4jb3dH3ChYVSz+2tQairUK2cMH4BFJ4N8ABi7RUOB9mhop
+	 B4A+2mmHuCUXA==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Mon, 04 Nov 2024 12:34:26 +0100
+Subject: [PATCH net-next] selftests: net: include lib/sh/*.sh with lib.sh
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-X-CM-TRANSID:_____wB3eknlsChnBcbjFA--.13181S2
-X-Coremail-Antispam: 1Uf129KBjvJXoWxWw1UKr4DKw4kGr4DXr4DXFb_yoWrCF4xpF
-	4kJ3ZrGr9F9r1Fq3y7Cw4DWws7ursaqayDJryUG3yUZayDJw1FkrsY9rZ09a9rX3ykC347
-	Xrs3KF12qF4DZ3DanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x07j7eOJUUUUU=
-X-CM-SenderInfo: pkx1x6hkhqjiisu6il2tof0z/1tbiox2Np2coq3tIKAAAsr
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241104-net-next-selftests-lib-sh-deps-v1-1-7c9f7d939fc2@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAEGxKGcC/zWNywqDMBBFf0Vm3YEkPqD9ldKFxhsdkFQyQQLiv
+ xsKXZzFWZx7T1IkgdKrOSnhEJVvrGIfDfl1jAtY5urkjOusNR1H5ErJrNhChmblTSbWlWfsyt6
+ 3/dOP/WBcoDqyJwQpv4M3/Vv6XNcNIqwXwXoAAAA=
+X-Change-ID: 20241104-net-next-selftests-lib-sh-deps-cc359ca5602f
+To: mptcp@lists.linux.dev, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+ Shuah Khan <shuah@kernel.org>, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, Pablo Neira Ayuso <pablo@netfilter.org>, 
+ Jozsef Kadlecsik <kadlec@netfilter.org>, Petr Machata <petrm@nvidia.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org, 
+ coreteam@netfilter.org, "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2947; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=MqirJQHMXIgrfKDB2SAWPcaT1jCCe/5NGNaz+2tKpMA=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnKLGbZaVJYSzdQbmHRGDBiYAjohF7t43yplQ4R
+ GtiBzByYqeJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZyixmwAKCRD2t4JPQmmg
+ c49jEACcw3RMvJT3kJc7KsxPMp9NRi/Tj0bXnfvpVBNOo/aQc+EZsAaleU7LTj6vbemiS5b1+zO
+ aOBKAi0SG1AgoB7BCp0C/NvCP9eMCulz04ilcqKuiBpwP2gaIx31tJhUAwHdTPvl3sR6gwxHxoo
+ hMWsCuvlxBYjjmpOj7nk2c3t/N22jQBT9QD4ujE8TQiusaIuKocksSLD1APRyL8f4u95kU4/Ss8
+ bZVxyyLXZ7czg7YOIFSR+KRAw9Sk0sn1uPvebLq6qmtWlZJfH7jSuQ5MmihiCLJEmFRtLZ1dVj7
+ 2gYDPfgF2z8vgcJ0GwMn+fRB37W++zhIYGwl2Q2NHiKnnDYax0B6sdOhqm8pzn6utnLJKNVLwEC
+ T5Xv8IyuKApLQ3WcaU/ek9jo2J0/vFdBW1sRE+gltnQABLNALnk5L7Fi7zH+QDuuXKA4kfcf5Py
+ BL4RwJ+T3beRhz6kHethWBGEm3CQwUbldBieEZtjcV66i2c2cl9lkCT8/s1JR0T0X4Ks+4LQK9K
+ EWUDQkmdlkXvo83OBVVk/tcF7QXSLqTR162D9lPB1LfybCHb1vgL0E50Xr5VcxH4HcwubtSlSIK
+ 4kmYFweQ19Qrt2pqFqrJav7rgXp3CSnf5EgOytIjLd+jTkE8rw5zPpLIQn9jiS9UuAoQb+4DLJH
+ uooUrsbDdtmhySQ==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-Why is individual aggregator's port enabled in function ad_agg_selection_lo=
-gic ? I have found no basis for this in the IEEE 802.3ad standard.=0D
-=0D
-In fact, I had the same problem as chengyechun <chengyechun1@huawei.com> an=
-d Thomas Bogendoerfer <tbogendoerfer@suse.de>.=0D
-https://lore.kernel.org/netdev/c464627d07434469b363134ad10e3b4c@huawei.com/=
-=0D
-https://lore.kernel.org/netdev/20240404114908.134034-1-tbogendoerfer@suse.d=
-e/T/=0D
-=0D
-I use port 1 and port 2 form a bond interface and use nftables to discard L=
-ACP packets received by port 1. =0D
-=0D
-The bond configuration is as follows:=0D
-BONDING_OPTS=3D'mode=3D4 miimon=3D100 lacp_rate=3Dfast xmit_hash_policy=3Dl=
-ayer3+4'=0D
-TYPE=3DBond=0D
-BONDING_MASTER=3Dyes=0D
-BOOTPROTO=3Dstatic=0D
-NM_CONTROLLED=3Dno=0D
-IPV4_FAILURE_FATAL=3Dno=0D
-IPV6INIT=3Dyes=0D
-IPV6_AUTOCONF=3Dyes=0D
-IPV6_DEFROUTE=3Dyes=0D
-IPV6_FAILURE_FATAL=3Dno=0D
-IPV6_ADDR_GEN_MODE=3Dstable-privacy=0D
-NAME=3Dbond0=0D
-DEVICE=3Dbond0=0D
-ONBOOT=3Dyes=0D
-IPADDR=3D1.1.1.38=0D
-NETMASK=3D255.255.0.0=0D
-IPV6ADDR=3D1:1:1::39/64=0D
-=0D
-The slave configuration is as follows: and I have four similar slaves enp13=
-s0=0D
-NAME=3Denp12s0=0D
-DEVICE=3Denp12s0=0D
-BOOTPROTO=3Dnone=0D
-ONBOOT=3Dyes=0D
-USERCTL=3Dno=0D
-NM_CONTROLLED=3Dno=0D
-MASTER=3Dbond0=0D
-SLAVE=3Dyes=0D
-IPV6INIT=3Dyes=0D
-IPV6_AUTOCONF=3Dyes=0D
-IPV6_DEFROUTE=3Dyes=0D
-IPV6_FAILURE_FATAL=3Dno=0D
-=0D
-The nftables configuration is as follows:=0D
-# cat /etc/nftables.conf=0D
-table netdev filter {=0D
-chain ingress {=0D
-type filter hook ingress device enp13s0 priority 0; policy accept;=0D
-meta protocol 0x8809 drop=0D
-}=0D
-}=0D
-Then nft -f /etc/nftables.conf to apply this conf.=0D
-=0D
-During aggregation, the time sequence is as follows:=0D
-1. When bond0 receives the NETDEV_PRE_UP event, port 1 chooses as the activ=
-e LAG. Since port 1 has not received the LACPDU, port 1 is considered as an=
- individual port and is enabled by __enable_port in function ad_agg_selecti=
-on_logic. =0D
-[37.643701] bond0: bond_netdev_event received NETDEV_PRE_UP=0D
-[37.643740] bond0: (slave enp13s0): LAG 1 chosen as the active LAG=0D
-2. The MUX state machine of port 2 enters the AD_MUX_WAITING state.=0D
-[37.643763] bond0: (slave enp14s0): Mux Machine: Port=3D2, Last State=3D0, =
-Curr State=3D1=0D
-[37.748705] bond0: (slave enp14s0): Mux Machine: Port=3D2, Last State=3D1, =
-Curr State=3D2=0D
-3. Port 2 receives the LACPDU, since port 2 has partner but port 1 has no p=
-artner, port 2 is elected as the best aggregator by ad_agg_selection_logic,=
- then __disable_ports port 1. Port 2 is not enabled just like port 1 becaus=
-e port 2 has partner. At the same time, the MUX state machine of port 2 is =
-still in AD_MUX_WAITING (it takes about 2s AD_WAIT_WHILE_TIMER). At this ti=
-me, the system does not have any enabled port (or usable slave).=0D
-[37.960715] bond0: (slave enp14s0): LAG 2 chosen as the active LAG=0D
-4. Two seconds later, the MUX state machine of port 2 enters the AD_MUX_COL=
-LECTING_DISTRIBUTING state and enabled by ad_mux_machine. The system finall=
-y has an enabled port.=0D
-[39.976696] bond0: (slave enp14s0): Mux Machine: Port=3D2, Last State=3D2, =
-Curr State=3D3=0D
-[40.084710] bond0: (slave enp14s0): Mux Machine: Port=3D2, Last State=3D3, =
-Curr State=3D4=0D
-=0D
-Within the range from [37.960715] to [40.084710], the system does not have =
-any available port. The bond_xmit_3ad_xor_slave_get cannot obtain an availa=
-ble slave port. The bond_3ad_xor_xmit return drop, and the bond port cannot=
- send packets.=0D
-=0D
-But if port 2 does not receive LACPDU, then almost all the time the bond ca=
-n send packets on port 1. (except that the MUX state machine of port 1 chan=
-ges from AD_MUX_ATTACHED to AD_MUX_COLLECTING_DISTRIBUTING, which is about =
-100 ms)=0D
-In the scenario where port 1 cannot receive LACPDUs and port 2 cannot recei=
-ve LACPDUs, the behavior of the bond interface should be the same. That is,=
- whatever port 1 or port 2 cannot receive LACPDU, packets cannot be transmi=
-tted within an equal time, 2s or 100ms. But Port 1 cannot receive LACPDUs l=
-eads to 2s packet loss and port 2 cannot receive LACPDUs leads to 100 ms pa=
-cket loss.=0D
-Therefore, it is critical to understand why the individuals aggregator's po=
-rt is enabled in the function ad_agg_selection_logic. The status of the MUX=
- state machine of port 1 is not verified. Actually, when port 1 is enabled,=
- the MUX state machine of port 1 is not processed. According to the IEEE 80=
-2.3ad standard, the status of port 1 should be disabled.=0D
+Recently, the net/lib.sh file has been modified to include defer.sh from
+net/lib/sh/ directory. The Makefile from net/lib has been modified
+accordingly, but not the ones from the sub-targets using net/lib.sh.
+
+Because of that, the new file is not installed as expected when
+installing the Forwarding, MPTCP, and Netfilter targets, e.g.
+
+  # make -C tools/testing/selftests TARGETS=net/mptcp install \
+        INSTALL_PATH=/tmp/kself
+  # cd /tmp/kself/
+  # ./run_kselftest.sh -c net/mptcp
+    TAP version 13
+    1..7
+    # timeout set to 1800
+    # selftests: net/mptcp: mptcp_connect.sh
+    # ./../lib.sh: line 5: /tmp/kself/net/lib/sh/defer.sh: No such file
+      or directory
+    # (...)
+
+This can be fixed simply by adding all the .sh files from net/lib/sh
+directory to the TEST_INCLUDES variable in the different Makefile's.
+
+Fixes: a6e263f125cd ("selftests: net: lib: Introduce deferred commands")
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+---
+ tools/testing/selftests/net/forwarding/Makefile | 3 ++-
+ tools/testing/selftests/net/mptcp/Makefile      | 2 +-
+ tools/testing/selftests/net/netfilter/Makefile  | 3 ++-
+ 3 files changed, 5 insertions(+), 3 deletions(-)
+
+diff --git a/tools/testing/selftests/net/forwarding/Makefile b/tools/testing/selftests/net/forwarding/Makefile
+index 224346426ef2220470bf2dbef66198eae9331f56..7d885cff8d79bc6882d2341d0a1a59891fc1cb2e 100644
+--- a/tools/testing/selftests/net/forwarding/Makefile
++++ b/tools/testing/selftests/net/forwarding/Makefile
+@@ -126,6 +126,7 @@ TEST_FILES := devlink_lib.sh \
+ 	tc_common.sh
+ 
+ TEST_INCLUDES := \
+-	../lib.sh
++	../lib.sh \
++	$(wildcard ../lib/sh/*.sh)
+ 
+ include ../../lib.mk
+diff --git a/tools/testing/selftests/net/mptcp/Makefile b/tools/testing/selftests/net/mptcp/Makefile
+index 5d796622e73099d0a0331c1bc8a41f09e1d36b4d..8e3fc05a539797c5e0feab72be69db623ef3fa96 100644
+--- a/tools/testing/selftests/net/mptcp/Makefile
++++ b/tools/testing/selftests/net/mptcp/Makefile
+@@ -11,7 +11,7 @@ TEST_GEN_FILES = mptcp_connect pm_nl_ctl mptcp_sockopt mptcp_inq
+ 
+ TEST_FILES := mptcp_lib.sh settings
+ 
+-TEST_INCLUDES := ../lib.sh ../net_helper.sh
++TEST_INCLUDES := ../lib.sh $(wildcard ../lib/sh/*.sh) ../net_helper.sh
+ 
+ EXTRA_CLEAN := *.pcap
+ 
+diff --git a/tools/testing/selftests/net/netfilter/Makefile b/tools/testing/selftests/net/netfilter/Makefile
+index 542f7886a0bc2ac016f41d8b70357a8e0c1d271b..9d009f74cfc2da66428b1e23d5884e2c3bc4a85d 100644
+--- a/tools/testing/selftests/net/netfilter/Makefile
++++ b/tools/testing/selftests/net/netfilter/Makefile
+@@ -55,4 +55,5 @@ TEST_FILES := lib.sh
+ TEST_FILES += packetdrill
+ 
+ TEST_INCLUDES := \
+-	../lib.sh
++	../lib.sh \
++	$(wildcard ../lib/sh/*.sh)
+
+---
+base-commit: ecf99864ea6b1843773589a935bb026951bf12dd
+change-id: 20241104-net-next-selftests-lib-sh-deps-cc359ca5602f
+
+Best regards,
+-- 
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
