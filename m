@@ -1,261 +1,131 @@
-Return-Path: <netdev+bounces-141513-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141514-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E969BB2E2
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:18:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D4EC9BB31B
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:25:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EB25B282864
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:18:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AB7D81C203AA
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:25:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DD51C2327;
-	Mon,  4 Nov 2024 11:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9CA5E1B3924;
+	Mon,  4 Nov 2024 11:15:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Ih2tlqDu"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="M7koPf3j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F26BA1C2301
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 11:06:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730718377; cv=fail; b=XAeQKX4yiJcOhBBWhq6Q+Q6NbaKmksLCAA6a1ZfGKzRmCvxEfudxNgz/Rcodhu0djzR9OkA2snWdNImsSgfrZjXE84SGvCVcn+PvdEr8YUtOUqvRPraEkWqj+mbhOf1mXxi/7lO2PIjJrPvIehcO4DjaNRY6nc/TPW+8DtCuv/M=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730718377; c=relaxed/simple;
-	bh=Ty9w7Myah2Av9x87u4GUyR2YWTKA3B/c/kZSak6Xwgc=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=e0ilrRPp16sqKKmetJVTOVPJ6Yk29yQp94MFien3HDWp+EeZUctJF6J6MQvDYJa3bFyRgH349ex9KMjnvPXf5mNNKJUe5vCuZKH9h2MOvasA3PBZOR6q7rrOditI3QJXo5vnW4Ppwnu5Zzm6U8+RV8Nz5b2+BXelg9fAOA9+fGU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Ih2tlqDu; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730718376; x=1762254376;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=Ty9w7Myah2Av9x87u4GUyR2YWTKA3B/c/kZSak6Xwgc=;
-  b=Ih2tlqDuBtxedG04E3knoK0wbvSs5NtGnvoq14M25pKhqjYBk5wCe4ZQ
-   RewqqjL4gpRLHsy9OSDFdWzgf2V3tGmt5NcM7ujJPgDTGjitZxj1CGfAe
-   w65OS1H4lcL9LZ0ZaYOclEuaEUhWBC7sHOgLtLuA1wUsYVcywkYDhkntx
-   gNnPDc5qyvcVihb3k7jvuNGNYPwAUhZFgLfq5SzBtj3awiCpSMozIskoO
-   F7q7Mr3uB89npV3rSWq9jhnudem0hQxAi3Rmahe5FXDKO1alGYxUFkWhL
-   vuX4iOe624J000CmkSZ10F59g4KWBqyCXfe1xi19nUekp1zm4yREUf0Mj
-   g==;
-X-CSE-ConnectionGUID: oMz98RvRT76YfO4gheW48w==
-X-CSE-MsgGUID: Nwj4C+IpSOm1S1HxxBBsoQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30183707"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30183707"
-Received: from orviesa001.jf.intel.com ([10.64.159.141])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 03:06:05 -0800
-X-CSE-ConnectionGUID: bOqmypTHRgKV6AgOjkXY+g==
-X-CSE-MsgGUID: 55YTkGdiRzuap0DgQh16qQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,256,1725346800"; 
-   d="scan'208";a="121086987"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by orviesa001.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 04 Nov 2024 03:06:03 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Mon, 4 Nov 2024 03:06:04 -0800
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Mon, 4 Nov 2024 03:06:04 -0800
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.169)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Mon, 4 Nov 2024 03:06:04 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=yjH6SfLgmGr3zGitRyoWanOQtFDhc26xkLb8Gio7i8Mtu6wk1d4XEKyzP0PjEipmYmKGFe6iWz9DlljmWmvISdn/wQuCjhiv+K1+65Wac6Y3dxtBHzNeuw6W/+WXNvIHg6481DH3pVT1Uuw/bk7plQhHXafOW8Tik1Aa/9c3avD47RksXcQk9yAEq9Hbf3jO4PdZnN7CFbee/OzbvAaygrJ7s2xC0CMAcAXYjGh1MJVy+FEi+1YgBujZQUXYQyrpCWNovJCpUtzgbpuHPOqpyG3thV0Nal5Mp5DMBv+Qbb1Bj0KEeUjiItMSAIWD9tM8rayRY8RwPY8lLPU5uCdKUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=b0Yw2IzhKSI+poCZth9TWxVhm31trKYIPnhde6nCUtE=;
- b=Zhql6syGh8HDkftvjwfFiXRaPsdbjMDAmQp6/OYgW4FGvR7bDyqQzjcRUrZQ/OvQ0/C7c7suE4xeXe/n+4D0orvb0J/bMpV4WtzKkf7Pao4d0Xl0tTuEVuBPUOSSjf4O/SAwkQ9YKKkZRBqGKYNNFTp9mdfAnmUlA5PoH3V/Gg6Tz3ZRJr7l6VwkJRbnYdxe/GIb/wmM4QI2E59eVFpUpxxCW9yuHgKcwjWdxckVRMR4ud0y+BIFHbwjszyUIP7e0fHChakg0jqsJvCIrcT0TT9HYnKgAjuWxAh/yeLomunjiixmSZpaBzUohDjBD9OEuzFyI0Xii7kREVCpaDnZLA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from SJ0PR11MB5865.namprd11.prod.outlook.com (2603:10b6:a03:428::13)
- by CY8PR11MB7082.namprd11.prod.outlook.com (2603:10b6:930:52::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Mon, 4 Nov
- 2024 11:06:02 +0000
-Received: from SJ0PR11MB5865.namprd11.prod.outlook.com
- ([fe80::b615:4475:b6d7:8bc5]) by SJ0PR11MB5865.namprd11.prod.outlook.com
- ([fe80::b615:4475:b6d7:8bc5%5]) with mapi id 15.20.8114.028; Mon, 4 Nov 2024
- 11:06:02 +0000
-From: "Romanowski, Rafal" <rafal.romanowski@intel.com>
-To: "Polchlopek, Mateusz" <mateusz.polchlopek@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Keller, Jacob E"
-	<jacob.e.keller@intel.com>, "Drewek, Wojciech" <wojciech.drewek@intel.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>, Sunil Goutham
-	<sgoutham@marvell.com>, Simon Horman <horms@kernel.org>, "Polchlopek,
- Mateusz" <mateusz.polchlopek@intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v12 14/14] iavf: add support
- for Rx timestamps to hotpath
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v12 14/14] iavf: add support
- for Rx timestamps to hotpath
-Thread-Index: AQHbJEVA1rhxIz4eU0a8MWobqnYJa7KnCnIg
-Date: Mon, 4 Nov 2024 11:06:02 +0000
-Message-ID: <SJ0PR11MB5865FE4484294C2FB8D34E348F512@SJ0PR11MB5865.namprd11.prod.outlook.com>
-References: <20241022114121.61284-1-mateusz.polchlopek@intel.com>
- <20241022114121.61284-15-mateusz.polchlopek@intel.com>
-In-Reply-To: <20241022114121.61284-15-mateusz.polchlopek@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SJ0PR11MB5865:EE_|CY8PR11MB7082:EE_
-x-ms-office365-filtering-correlation-id: d0d9063c-bd98-424d-d11f-08dcfcc0ab7b
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|1800799024|376014|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?sdBQolLcsCHubwvgHEN8qGVx/pDfRQbNmZot/GdTnVG5tVI2NAVVyvpt1dZa?=
- =?us-ascii?Q?1HYMQWEhopO0Yvk7TP5Z40x1fCrPUg8JZD7trZoVg2Negjfoc3T/eXIr8Zk0?=
- =?us-ascii?Q?1xh6caDolEr3Xz0h2nKoq/Tv7zHJkCO4KjyhWdh9Lw2os/IAgLd7A+qOiipA?=
- =?us-ascii?Q?SchPLMw9y2reFXwCseqMbseGIamivRMzwpapxtu6rD0Lf9n/+8jiCSRFAxaW?=
- =?us-ascii?Q?iEopHEWJPj/QcNZgzqRw0/utWgIiiZa95ToqNp1PqG4I5WFzTjoysp/d+9e6?=
- =?us-ascii?Q?mu/jx8m/aMYhhamCphrjLDV64JvZuQ6LG4zVXoT1MbEi5xL6YyYlZAvwDaAJ?=
- =?us-ascii?Q?veLiG5FWat6ib3suF0uV6bW2Gan7KNPy9SZfmDRYoU7/dULckrWi7+zlpEV0?=
- =?us-ascii?Q?T4rWsiT/+BP4vDms5NC/PK6I5OzHXX+b4Pgf9yxnrOFmtNl1533ZzGDiTi3N?=
- =?us-ascii?Q?hwfn95K7ASJs6WGu2H5itr0AtXjva05AwG9PQ9NEnIZhg0SKVRq9cJRqkVjf?=
- =?us-ascii?Q?rOlvdtfmQD93qurPle5A7tQS2fsqcP48hBwCDH7Fdu26QwOR7lX83CkX1hbN?=
- =?us-ascii?Q?TQ4As3A2IfCb7LSFvX+vNe8J4e8y0cAsnwCIx2RCix4U1CZ+gLSB3CAmF0aR?=
- =?us-ascii?Q?DwjtLK9WUA/YpOxHbhP9ZEJI7dNdSYcljRvk1aXJSedXT6zLdMvAzcD5j0IV?=
- =?us-ascii?Q?eZs4DQZvbygSwvRqvMMREihyl4/jErCJqmXwN+jNjI411XqpZD9bfA0+yNNL?=
- =?us-ascii?Q?45ZDjJfBRsHF7DsIR+fZaZJFt4SjRDoNB1unA7jz23T47WM9VPeDNr2ehvO+?=
- =?us-ascii?Q?xdNI7d7io/JH3cphh/Fo0MsvGZqqrFBtQM/AfZCgMQTupy7SDs1m1AQf2KBq?=
- =?us-ascii?Q?CPJaFX0yXfpL4jwzRKVv6er+RFAWJl6un8UQfe70KV7IqxBc+LI4FlxXjE16?=
- =?us-ascii?Q?Ti9mjeVI5fWD9tRJtXOPwEpaKpJC47MbZS+qRhVt9e1kQofq2orDArF3BBaT?=
- =?us-ascii?Q?XYzs9fapGonOP9wVMbp2L6Xbw0/PJRXSh4KJ71ZlHfVsVdoSZwWdjcwi1knH?=
- =?us-ascii?Q?Dm49CdK9Ov22Q9hTgayY2dE1CvzCTvfC9pInyWpl7oZuNWWOJaZp5DbBqdGP?=
- =?us-ascii?Q?DtR7a6W2A1iO9pR5C/Mp3zVFRkqtMXzKdwOVzRJahCfHfjJ/WiV4bz9xorJX?=
- =?us-ascii?Q?M1gSYbKJcMr3jc5vROXOfntcDXfJszYV1udLaVaDvCQ5mRU1ESwYlhKGJ9mf?=
- =?us-ascii?Q?Yvktse6+HwT5VVvAdSo8sYupU80VMnBZxHlhr1p93MzyeMY0HXuUxQDBNHcv?=
- =?us-ascii?Q?Fe+Z5Xv3Xyrnk+cHOzswE8CUv4wp8/BshDOa/8niclwJHSkPl4ui7El5zhJt?=
- =?us-ascii?Q?4y8eZTY=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ0PR11MB5865.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?/GjolYm7GDqGJdoJ0DjgyncirJOEf+N9d7YTv5wbtd04L84UE49ha5ZUk2Ii?=
- =?us-ascii?Q?PQrTAWHUdwYug49huO9neBdjr7HUp0+Mk7LtjRNIC6+H8FnwS6oOoGkPVDkN?=
- =?us-ascii?Q?J8q14m3cqPzH6fnDmarI4wLCWuM9RqMis2DB97ecb9dMxtuY0b1JEyeYNy95?=
- =?us-ascii?Q?+Y41weRVyoLE6+2Zupreo6JecBZYEoHfJdoiRMDaCq3+o93suQLaN6CnJvAy?=
- =?us-ascii?Q?kLub+04wy15+9QfNlz3z4nHKZiBMTwTUS/wClk5AOP5a4xabC9PeYGakfa/E?=
- =?us-ascii?Q?VFOf8jsexuMKcJ0bBtx3I4Xkt3aMG+3w/9puuHShkDvjKpp/XO0UyCeX9AHV?=
- =?us-ascii?Q?4sJ2RvEpnusdOYxxd0Rg56HU/WbebVKzW569R2vEGSwE4SP1x2TYeM39+6NQ?=
- =?us-ascii?Q?+Hx6vD2ZcHBiKuFyojG2+pzWh4Lb0N/GNEBNbfalOIcYUsO+066kUksH+ihu?=
- =?us-ascii?Q?OrAeK6AyeN6xHzzVJOU+x6xLYSsrs8UO1iH5IHpetI60k8Oh+Cqh/82cGXmb?=
- =?us-ascii?Q?usfpl03qawB6LW4BKkrMhUt++17rOvxahj1FlHz3rx/zCR0JIxqZjmrUuas6?=
- =?us-ascii?Q?vN/9MGJ9eSU8PJn0M0UDZRakRkYY15m+ckjpUbLZYbBnanIV8mQ5D0J8rgB7?=
- =?us-ascii?Q?wt3g1qNoH3MqHr2J2RFNov79tFfAaTfi5HefO7EZ5GnUPvN83et7ei4lB6kY?=
- =?us-ascii?Q?HkjV7dh2G2xfUjOCOr2jGciv2vkFXufPUrIwLkmU5AcmdO1H8zQWlKf/o2/U?=
- =?us-ascii?Q?Mu2PBTUTKU/LovNKlKbTBHyrqaa2RukaazyP9moFO+JUxMFICnhb2ZCfAoR0?=
- =?us-ascii?Q?ZGtQRroWGpRzICvtr7kfEP7CmDaAm7zHV7Yi5USOIJMsh4fl4VFYchulzd13?=
- =?us-ascii?Q?MwadybQafPIijRzv6asVFFbzAP2zuKwNJJJar7PJBA1dzqKJM61r3mKKaG5s?=
- =?us-ascii?Q?SXyHSSNxFXo8RN3uRzeWUM3Vop1ekxoxlX4t3vzzU4B0Sd4SBmksx5r1UEcJ?=
- =?us-ascii?Q?mg2QkKdy1cYgnFE1fMF7tqWCWMaE3Md5BGmQCuRoHazjgScASlteip4zRYFR?=
- =?us-ascii?Q?Dpu3KmsMhYoEUIDFJTvBEqxbdwhmUKhDDSw53+o1jSkCmeRQiU2q0JLrcHnT?=
- =?us-ascii?Q?51b18y8pvwDeVudEMnpzf4W8Br3UD/yNQBxjbgsA6GsHFQp47601/aJ/P5RT?=
- =?us-ascii?Q?MeGnEFalXT0zf0bLbvcn/yzZ539HvjyzhxiOLVwvdAyLJb5EswULxm6tA9ks?=
- =?us-ascii?Q?w8XxM0Jyv1gZlw9lMJ/ofgOn7E4dwmmSGMfgGT7uJh/Bd1gEmbKSd6ppvTut?=
- =?us-ascii?Q?A9Bdxrk1AJgarGygfZdGO2JQ/vi492oyjwowuTSfO7aWCAXLXAWPOTTRJJuf?=
- =?us-ascii?Q?0wL8kOMbJIFOur73A+M9knj/KfSuiUz65xtFGp5UgMwQFMsSx/I8ZiarzKm/?=
- =?us-ascii?Q?Sy6KCS9J+7if+PC7Z9EhEk6ZTwfkh/mbTI7xRDNCjTMQ3m/sNYEyE6nDftpc?=
- =?us-ascii?Q?GT8paK2yaWAHiNt6QK2tDyCnZ7PmXnA4mQToXft3dE0oRtA7PF+XvYmFqggH?=
- =?us-ascii?Q?x+b5trvdoFW3RebcPT8Q92DRdtMqrX77EFval/+BJ6aapL5XpuLSIGN2bJc1?=
- =?us-ascii?Q?sg=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D59FA1ABEC1;
+	Mon,  4 Nov 2024 11:15:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730718922; cv=none; b=euK3yUE1vJRMXKK1E559s8ygTrAEf0paYzKDXclfmHT59+ENct1yWr+mb3Bq29aLDnq7rMR32a62r9WY8YdQO+C4mKlKUp2EGrvS2oM25MQAiQmMBW2W8NOi8aOiLs/L1BRiJi7/7HTZ7HxZ1/m7kFgnZGxKjit+dARICkbXBIQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730718922; c=relaxed/simple;
+	bh=2gIlUI7PdKKTWDXTSzufN9sRX+NITpJDNOa8IuBIsUM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=VvDUsLm0sZTGEO4Cpw7x6wloGLm9jknC8v8oA34T8340fCzThiMyLUMZJQ2L8zqGThZ5HvYNrZP0mZWurQJS6XvoAi0Q4Y73EabTxkD0cKtMO4CuAiW+2TK2760xCFRdIwGQqBcb5m2hF36eKAnR0r2KNZZ0Xc3xQVdrh6o6HgM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=M7koPf3j; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279871.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A4BB2rE020115;
+	Mon, 4 Nov 2024 11:15:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
+	q3KRPy89viz3fpcXqHpGWIgbjdIp9ffw2rFAz7KIa98=; b=M7koPf3jiKP7Xa6+
+	Q2xvzqKsxD9J4bgoccS0smZQf0WaUEsQiBlwOAuxRFkQ8da6odFjuv2NJkQz1GlT
+	HK2Zi2lJTNDxHTyxSGgMzfbjpAemGrXM0vSv1acuDAIqJK1cC1kbDZlpPsK8udGD
+	FWRhQ/NxkKIBhM+WfiSn1SbGTM+nrwH2R4WE+GTjfpojvYzqxkWjf/vkacOGz8/F
+	GATw/lN2TrRK914tDrEt7ld1F5yPPbAGSiN5FSBlVgq3CLWqCTddk4qTWyMdWydE
+	+TuLGaSd7r0082OYzAIOIq8FRs1fRJ9ug9e3sV/0WjcmsHI7xIIbGotMn6l1Nt32
+	FGHUeg==
+Received: from nasanppmta03.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42nd2s3yf8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 04 Nov 2024 11:15:07 +0000 (GMT)
+Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
+	by NASANPPMTA03.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A4BF6jQ029070
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 4 Nov 2024 11:15:06 GMT
+Received: from [10.253.14.204] (10.80.80.8) by nasanex01a.na.qualcomm.com
+ (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Mon, 4 Nov 2024
+ 03:15:01 -0800
+Message-ID: <ec76fc73-79e5-4d09-ac4a-65efa60874fe@quicinc.com>
+Date: Mon, 4 Nov 2024 19:14:59 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SJ0PR11MB5865.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: d0d9063c-bd98-424d-d11f-08dcfcc0ab7b
-X-MS-Exchange-CrossTenant-originalarrivaltime: 04 Nov 2024 11:06:02.0562
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: RUt0uVi52PY+EG9JnmOOUNPxxGWu7XudLAEZVahsaIQSS9oghLXC4ELxMAA3zHiPhWfJbe5SkXozmkCGRvr37ZGy2yQorpsw77RGbhcKYjU=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7082
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next 2/5] net: pcs: Add PCS driver for Qualcomm
+ IPQ9574 SoC
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni
+	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
+        Krzysztof Kozlowski
+	<krzk+dt@kernel.org>,
+        Conor Dooley <conor+dt@kernel.org>,
+        Heiner Kallweit
+	<hkallweit1@gmail.com>,
+        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
+        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
+        <quic_pavir@quicinc.com>, <quic_linchen@quicinc.com>,
+        <quic_luoj@quicinc.com>, <srinivas.kandagatla@linaro.org>,
+        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
+        <john@phrozen.org>
+References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
+ <20241101-ipq_pcs_rc1-v1-2-fdef575620cf@quicinc.com>
+ <8f55f21e-134e-4aa8-b1d5-fd502f05a022@lunn.ch>
+Content-Language: en-US
+From: Lei Wei <quic_leiwei@quicinc.com>
+In-Reply-To: <8f55f21e-134e-4aa8-b1d5-fd502f05a022@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nasanex01a.na.qualcomm.com (10.52.223.231)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: UHj-c7Jyh7MmmH0s4H82Aix-xfWtWL40
+X-Proofpoint-GUID: UHj-c7Jyh7MmmH0s4H82Aix-xfWtWL40
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0
+ lowpriorityscore=0 mlxlogscore=622 clxscore=1015 suspectscore=0
+ adultscore=0 priorityscore=1501 bulkscore=0 mlxscore=0 malwarescore=0
+ spamscore=0 impostorscore=0 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.19.0-2409260000 definitions=main-2411040099
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> Mateusz Polchlopek
-> Sent: Tuesday, October 22, 2024 1:41 PM
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: netdev@vger.kernel.org; Keller, Jacob E <jacob.e.keller@intel.com>; D=
-rewek,
-> Wojciech <wojciech.drewek@intel.com>; Rahul Rameshbabu
-> <rrameshbabu@nvidia.com>; Sunil Goutham <sgoutham@marvell.com>; Simon
-> Horman <horms@kernel.org>; Polchlopek, Mateusz
-> <mateusz.polchlopek@intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v12 14/14] iavf: add support f=
-or Rx
-> timestamps to hotpath
->=20
-> From: Jacob Keller <jacob.e.keller@intel.com>
->=20
-> Add support for receive timestamps to the Rx hotpath. This support only w=
-orks
-> when using the flexible descriptor format, so make sure that we request t=
-his
-> format by default if we have receive timestamp support available in the P=
-TP
-> capabilities.
->=20
-> In order to report the timestamps to userspace, we need to perform timest=
-amp
-> extension. The Rx descriptor does actually contain the "40 bit" timestamp=
-.
-> However, upper 32 bits which contain nanoseconds are conveniently stored
-> separately in the descriptor. We could extract the 32bits and lower 8 bit=
-s, then
-> perform a bitwise OR to calculate the 40bit value. This makes no sense, b=
-ecause
-> the timestamp extension algorithm would simply discard the lower 8 bits
-> anyways.
->=20
-> Thus, implement timestamp extension as iavf_ptp_extend_32b_timestamp(), a=
-nd
-> extract and forward only the 32bits of nominal nanoseconds.
->=20
-> Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
-> Reviewed-by: Wojciech Drewek <wojciech.drewek@intel.com>
-> Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
-> Reviewed-by: Sunil Goutham <sgoutham@marvell.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
-> ---
->  drivers/net/ethernet/intel/iavf/iavf_main.c |  9 +++
-> drivers/net/ethernet/intel/iavf/iavf_ptp.c  | 61 +++++++++++++++++++++
-> drivers/net/ethernet/intel/iavf/iavf_ptp.h  | 11 ++++
-> drivers/net/ethernet/intel/iavf/iavf_txrx.c | 43 +++++++++++++++
-> drivers/net/ethernet/intel/iavf/iavf_type.h |  1 +
->  5 files changed, 125 insertions(+)
->=20
-> diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> index 1103c210b4e3..a25ceecf1ea7 100644
-> --- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-> +++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-> @@ -730,6 +730,15 @@ static u8 iavf_select_rx_desc_format(const struct
 
-Tested-by: Rafal Romanowski <rafal.romanowski@intel.com>
 
+On 11/1/2024 9:00 PM, Andrew Lunn wrote:
+>> +config PCS_QCOM_IPQ
+>> +	tristate "Qualcomm IPQ PCS"
+> 
+> Will Qualcomm only ever have one PCS driver?
+> 
+> You probably want a more specific name so that when the next PCS
+> driver comes along, you have a reasonable consistent naming scheme.
+> 
+
+We expect one PCS driver to support the 'IPQ' family of Qualcomm 
+processors. While we are initially adding support for IPQ9574 SoC, this 
+driver will be easily extendable later to other SoC in the IPQ family 
+such as IPQ5332, IPQ5424 and others. Therefore we used the name with 
+suffix '_IPQ'. Hope it is fine.
+
+> 	Andrew
 
 
