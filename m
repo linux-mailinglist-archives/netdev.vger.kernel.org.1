@@ -1,192 +1,468 @@
-Return-Path: <netdev+bounces-141583-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141584-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1906F9BB8F3
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:26:42 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1EE739BB929
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 16:41:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 698F3B25167
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:26:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 420DB1C21FB6
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 15:41:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DEB41BDA95;
-	Mon,  4 Nov 2024 15:26:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F1141C0DED;
+	Mon,  4 Nov 2024 15:41:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="E8IekvU/"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bycxtnoX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD4F61B6D14
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 15:26:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC9481C07CF
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 15:41:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730733988; cv=none; b=ROaSbtGBmcSU5zgn5ej+aSJeEiRttOlN4IUCqxv44doQAkttPX6DYbpfxFRH0kfF/wKE8I0BEnB58NRlgDFV1rXy53fFgd60T2+/TPUiQ98982Lyo6dAlVYL/mo3N7RNNPQSwkqtKy3Xj6ej46RNRCx502Wd2c/eS/DqdSsfY5o=
+	t=1730734867; cv=none; b=iwC+pUcWdYR3s7oKXaPsRKdYfJtZG5JfGfA8Xa3tW0gfB5/WYqSG23sqkzw5hBZali2BNlud6EkuI7AgET4iwKHq0JjHJOW8G+aoABWHTkDvW6G0SxNN2XU1z2GFxI0PqmKrsEVHV81VTyDpkIBc3wXPIPefNDJ77HdCZEg2J0w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730733988; c=relaxed/simple;
-	bh=ajOWgRvQDGIFCdepcy+aB7Rg4hFqDUIwBw+wsNolWt0=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=qZ98scxENPu0YOpj/o6Ovc10sZ4H/HzynQdSDB+4MuPw0s0rLPWv4NmYOBq3ngLW4gfsUV0rifybvu0K9YseiCk/KHzahPjwIvU+pi0wdn6B5z7BE+v7aZolIAbbvX5tmrmd55lWRCueawIqTgpA+yJZd90h8dQZlaYshsis8A4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=E8IekvU/; arc=none smtp.client-ip=209.85.219.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e29135d1d0cso7105381276.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 07:26:25 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730733984; x=1731338784; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=c2JQ9uIIEkClb4SWhkB1sYRCZyBlRVG/GX7SdltLJVo=;
-        b=E8IekvU/9eL4CWbUr0F4wIGYUEbiQHmbQXZ5IUEGae9Bd0iR/rnZ3feVe1sD2ATp5T
-         i79nJBBI6rdfvSgQFSMH1cmNkMlIkpFIt2Jk3eAtqGiiD9lkOhtWLt8c9uhZd7MBGzE6
-         SNQHLX/WzK3dAkIvjyb4SgxgjGLtNymhh0y3Gq7ae2vwJOnSFRfZqEsg41SajOYcIKys
-         9qvcLnl5z0BIERwzQGQXYbcwuwYHiXSeAEUFio4lnTidUYo1zRxgfK0691yOZ9augc77
-         WgNMo2KEOmIo1qyCCeNcdO8b3EkTV05ufgJeoqzOGNKh9fHEw+AV7DPWEUq4Qho9j67W
-         7Fuw==
+	s=arc-20240116; t=1730734867; c=relaxed/simple;
+	bh=xQOEdsF3yrWAXcQa6siuBPniWMoj9JznLuwfH15TRtA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=qDPlTnxSAJx2SHHlRsE/ELqmF2LfjVdXaxx2/S52tTzW3GXNHGbG9Ffy/h4NAHxq2Xo+fWB8lSCO/R+YLgtHzUlwC77xBvjxE8ARsM3UToNCTx6LCv0Uxv/z4w4G6y0rFHHsq6uOqV7sfXaRpkv+bN5fl51ZsQ6g4GRYPG0uePA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bycxtnoX; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730734862;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=lS1nNVVujw4czQIQmdBkpFCJWF8p7dDW3pFP3fBwFhk=;
+	b=bycxtnoXqvc0P37ErEYBopUZFNhNsGExCt6fwComLFFfnMr7lctVUCT3OFGWqV2b2cOftB
+	yMJ17AGqHuTcZDrbsfBT5MiMfviBsXv1Kv7AmBZhLCtu6T5v6EqxQYpd2vBwOA6Va+SN77
+	Hsb09pFvjHw050PlhEHmPgUngQfCO6E=
+Received: from mail-oo1-f71.google.com (mail-oo1-f71.google.com
+ [209.85.161.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-67-xzxvwxyvNFqHDmUXm0jBew-1; Mon, 04 Nov 2024 10:41:01 -0500
+X-MC-Unique: xzxvwxyvNFqHDmUXm0jBew-1
+Received: by mail-oo1-f71.google.com with SMTP id 006d021491bc7-5eb5ee84601so219455eaf.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 07:41:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730733985; x=1731338785;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=c2JQ9uIIEkClb4SWhkB1sYRCZyBlRVG/GX7SdltLJVo=;
-        b=d0dKl43JBYb+ULkrCLa8T2Hyl3Db1wrmlwD2Icx4jEhEsuhNAzzJwJQe/iUxnIyua/
-         DF1blLEfcG+6xZgdY6FC2k/4dQ0FrYfk5G1FLYf2GwQT9v6e3BI/Hto0/Bo8Imix1kil
-         pGpWLsefbeMRjCoVgki3kceX/NsUlOiJwhGEW1ij8fKSEfuKwDJsd2XAThh1F4MCtmow
-         TQTHVbE12G/hPaSuNw0lNIatwyn24pQ8ZL2T8udh25tZBw0AO+B98GglrnzPV5WaOyWZ
-         P5odmawDF+8fUjRSr43O8SWD2AMN4NZ9+dRZ0E8ZVvPaOsxH8AI+vNCotxoapWdFsNZA
-         wKdw==
-X-Gm-Message-State: AOJu0YwgalltawLvyUIUK6rqgEgU6BTOE06y0UDGdvBTwKqk6/OOtnWv
-	pO4bueHQwjaTFiVe5mkYXIvw20JqDmgJPYIiy6r8E4LBZM3bInm6uZ0d8nwYViMLrOFy75lYuE0
-	dsAj2SdRuYg==
-X-Google-Smtp-Source: AGHT+IFvUv8BJpNyZ89NZaPoPBgaKRZfX/w9AO30D11PSrQb90dvQ9wWW7Humf338UVAWPnSYK8iCr7W0Skbug==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:83c7:0:b0:e20:2502:be14 with SMTP id
- 3f1490d57ef6-e330356f9camr7941276.7.1730733984389; Mon, 04 Nov 2024 07:26:24
- -0800 (PST)
-Date: Mon,  4 Nov 2024 15:26:22 +0000
+        d=1e100.net; s=20230601; t=1730734859; x=1731339659;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lS1nNVVujw4czQIQmdBkpFCJWF8p7dDW3pFP3fBwFhk=;
+        b=nWRWRRIkXsPXa3YaUXKLmpPJPxKblBfmF1YH3+5vq3hKFuUWWjAOxZvktC7zrLWdVt
+         iU0qhCWP88WBr5miDObzt614Vh1jrOt2E3M3/afaw78DZOLTAitQ1LNwwiPSTeNrc4KH
+         qAnOFAAm3IzS59KDwsaXRefH/pholUuzDDQX/ND6hd1UnAp2hcOXk/84lzCgJwDvh8xw
+         WtaVXp+KxJ/R27sD5msTMSKTFQzw7CaADT4Bp3u3U8Hr1bxiUzQ0af0FxF28cmh2AXyM
+         RrC3zq/HaPAM1h21c5OlrWwFbQ4mrFoK54sxKkKt8EJT3E24Ftic10ScpuGuwXjZFkFg
+         uAug==
+X-Forwarded-Encrypted: i=1; AJvYcCVm6m5zmNqcJn238ILZrIz6pGxdH6s6CGcxEhiQoetjmk3iGxpY8e201UHhWYszdxA9BexXI2E=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzhow5m+sP2GIe1siV6vXnBLmJ5543d7VQuwa5JJ9q7VfvWWIB4
+	jf9lrc+qSA/EckIw4VhBLbHobNeuVh20/xNGQxZfp38EG7GWzJ+7vh79mbvyXBOfaDavLbb8pcw
+	zleuA0gQaQp/PhWVHilOP1d8qzK4GEL5fcD/M0VB7V3djsPsKCTBuOzfUHQbIKusAAMoZCHVgs4
+	wvUaIn8X4GIBmUa4bqvWTlX7aMHi11syl+u8qLES0=
+X-Received: by 2002:a05:6871:5821:b0:277:db1c:7c6a with SMTP id 586e51a60fabf-29051bfbe99mr7491039fac.7.1730734859269;
+        Mon, 04 Nov 2024 07:40:59 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHTHLgRF7sGR/rUzhL1v/h/ffLFUH/U2Lp7nPDCAr0VVi+CE0aKcH1ds8xUsJODdXa6+Bi8CubOdtJMMguHlqg=
+X-Received: by 2002:a05:6871:5821:b0:277:db1c:7c6a with SMTP id
+ 586e51a60fabf-29051bfbe99mr7491025fac.7.1730734858819; Mon, 04 Nov 2024
+ 07:40:58 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.163.g1226f6d8fa-goog
-Message-ID: <20241104152622.3580037-1-edumazet@google.com>
-Subject: [PATCH net-next] phonet: do not call synchronize_rcu() from phonet_route_del()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Remi Denis-Courmont <courmisch@gmail.com>
+MIME-Version: 1.0
+References: <20241029123637.1974604-1-aleksandr.loktionov@intel.com>
+In-Reply-To: <20241029123637.1974604-1-aleksandr.loktionov@intel.com>
+From: Michal Schmidt <mschmidt@redhat.com>
+Date: Mon, 4 Nov 2024 16:40:47 +0100
+Message-ID: <CADEbmW1rJdFZ0ccpo-YLv0W8zQsr9-2eMnncDgR-tE+On0TX5g@mail.gmail.com>
+Subject: Re: [PATCH iwl-next v4444] i40e: add ability to reset VF for Tx and
+ Rx MDD events
+To: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com, 
+	netdev@vger.kernel.org, Jan Sokolowski <jan.sokolowski@intel.com>, 
+	Padraig J Connolly <padraig.j.connolly@intel.com>, maciej.fijalkowski@intel.com, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Calling synchronize_rcu() while holding rcu_read_lock() is not
-permitted [1]
+On Tue, Oct 29, 2024 at 1:36=E2=80=AFPM Aleksandr Loktionov
+<aleksandr.loktionov@intel.com> wrote:
+> Implement "mdd-auto-reset-vf" priv-flag to handle Tx and Rx MDD events fo=
+r VFs.
+> This flag is also used in other network adapters like ICE.
+>
+> Usage:
+> - "on"  - The problematic VF will be automatically reset
+>           if a malformed descriptor is detected.
+> - "off" - The problematic VF will be disabled.
+>
+> In cases where a VF sends malformed packets classified as malicious, it c=
+an
+> cause the Tx queue to freeze, rendering it unusable for several minutes. =
+When
+> an MDD event occurs, this new implementation allows for a graceful VF res=
+et to
+> quickly restore operational state.
+>
+> Currently, VF iqueues are disabled if an MDD event occurs. This patch add=
+s the
 
-Move the synchronize_rcu() to route_doit().
+s/iqueues/queues/
 
-[1]
-WARNING: suspicious RCU usage
-6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0 Not tainted
------------------------------
-kernel/rcu/tree.c:4092 Illegal synchronize_rcu() in RCU read-side critical section!
+> ability to reset the VF if a Tx or Rx MDD event occurs. It also includes =
+MDD
+> event logging throttling to avoid dmesg pollution and unifies the format =
+of
+> Tx and Rx MDD messages.
+>
+> Note: Standard message rate limiting functions like dev_info_ratelimited(=
+)
+> do not meet our requirements. Custom rate limiting is implemented,
+> please see the code for details.
 
-other info that might help us debug this:
+I am not opposed to the custom rate-limiting, but have you also
+considered struct ratelimit_state, ratelimit_state_{init,exit}(),
+__ratelimit()?
 
-rcu_scheduler_active = 2, debug_locks = 1
-1 lock held by syz-executor427/5840:
-  #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
-  #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
-  #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: route_doit+0x3d6/0x640 net/phonet/pn_netlink.c:264
+> Co-developed-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Signed-off-by: Jan Sokolowski <jan.sokolowski@intel.com>
+> Co-developed-by: Padraig J Connolly <padraig.j.connolly@intel.com>
+> Signed-off-by:  Padraig J Connolly <padraig.j.connolly@intel.com>
+> Signed-off-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
+> ---
+>  drivers/net/ethernet/intel/i40e/i40e.h        |   4 +-
+>  .../net/ethernet/intel/i40e/i40e_debugfs.c    |   2 +-
+>  .../net/ethernet/intel/i40e/i40e_ethtool.c    |   2 +
+>  drivers/net/ethernet/intel/i40e/i40e_main.c   | 105 ++++++++++++++++--
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.c    |   2 +-
+>  .../ethernet/intel/i40e/i40e_virtchnl_pf.h    |  11 +-
+>  6 files changed, 111 insertions(+), 15 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e.h b/drivers/net/etherne=
+t/intel/i40e/i40e.h
+> index d546567..6d6683c 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e.h
+> @@ -87,6 +87,7 @@ enum i40e_state {
+>         __I40E_SERVICE_SCHED,
+>         __I40E_ADMINQ_EVENT_PENDING,
+>         __I40E_MDD_EVENT_PENDING,
+> +       __I40E_MDD_VF_PRINT_PENDING,
+>         __I40E_VFLR_EVENT_PENDING,
+>         __I40E_RESET_RECOVERY_PENDING,
+>         __I40E_TIMEOUT_RECOVERY_PENDING,
+> @@ -190,6 +191,7 @@ enum i40e_pf_flags {
+>          */
+>         I40E_FLAG_TOTAL_PORT_SHUTDOWN_ENA,
+>         I40E_FLAG_VF_VLAN_PRUNING_ENA,
+> +       I40E_FLAG_MDD_AUTO_RESET_VF,
+>         I40E_PF_FLAGS_NBITS,            /* must be last */
+>  };
+>
+> @@ -571,7 +573,7 @@ struct i40e_pf {
+>         int num_alloc_vfs;      /* actual number of VFs allocated */
+>         u32 vf_aq_requests;
+>         u32 arq_overflows;      /* Not fatal, possibly indicative of prob=
+lems */
+> -
+> +       unsigned long last_printed_mdd_jiffies; /* MDD message rate limit=
+ */
+>         /* DCBx/DCBNL capability for PF that indicates
+>          * whether DCBx is managed by firmware or host
+>          * based agent (LLDPAD). Also, indicates what
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c b/drivers/net=
+/ethernet/intel/i40e/i40e_debugfs.c
+> index abf624d..6a697bf 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_debugfs.c
+> @@ -721,7 +721,7 @@ static void i40e_dbg_dump_vf(struct i40e_pf *pf, int =
+vf_id)
+>                 dev_info(&pf->pdev->dev, "vf %2d: VSI id=3D%d, seid=3D%d,=
+ qps=3D%d\n",
+>                          vf_id, vf->lan_vsi_id, vsi->seid, vf->num_queue_=
+pairs);
+>                 dev_info(&pf->pdev->dev, "       num MDD=3D%lld\n",
+> -                        vf->num_mdd_events);
+> +                        vf->mdd_tx_events.count + vf->mdd_rx_events.coun=
+t);
+>         } else {
+>                 dev_info(&pf->pdev->dev, "invalid VF id %d\n", vf_id);
+>         }
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c b/drivers/net=
+/ethernet/intel/i40e/i40e_ethtool.c
+> index 1d0d2e5..d146575 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_ethtool.c
+> @@ -459,6 +459,8 @@ static const struct i40e_priv_flags i40e_gstrings_pri=
+v_flags[] =3D {
+>         I40E_PRIV_FLAG("base-r-fec", I40E_FLAG_BASE_R_FEC, 0),
+>         I40E_PRIV_FLAG("vf-vlan-pruning",
+>                        I40E_FLAG_VF_VLAN_PRUNING_ENA, 0),
+> +       I40E_PRIV_FLAG("mdd-auto-reset-vf",
+> +                      I40E_FLAG_MDD_AUTO_RESET_VF, 0),
+>  };
+>
+>  #define I40E_PRIV_FLAGS_STR_LEN ARRAY_SIZE(i40e_gstrings_priv_flags)
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_main.c b/drivers/net/et=
+hernet/intel/i40e/i40e_main.c
+> index cbcfada..07f0a91 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_main.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_main.c
+> @@ -11189,22 +11189,91 @@ static void i40e_handle_reset_warning(struct i4=
+0e_pf *pf, bool lock_acquired)
+>         i40e_reset_and_rebuild(pf, false, lock_acquired);
+>  }
+>
+> +/**
+> + * i40e_print_vf_mdd_event - print VF Tx/Rx malicious driver detect even=
+t
+> + * @pf: board private structure
+> + * @vf: pointer to the VF structure
+> + * @is_tx: true - for Tx event, false - for  Rx
+> + */
+> +static void i40e_print_vf_mdd_event(struct i40e_pf *pf, struct i40e_vf *=
+vf,
+> +                                      bool is_tx)
+> +{
+> +       dev_err(&pf->pdev->dev, is_tx ?
+> +               "%lld Tx Malicious Driver Detection events detected on PF=
+ %d VF %d MAC %pm. mdd-auto-reset-vfs=3D%s\n" :
+> +               "%lld Rx Malicious Driver Detection events detected on PF=
+ %d VF %d MAC %pm. mdd-auto-reset-vfs=3D%s\n",
+> +               vf->mdd_rx_events.count,
+> +               pf->hw.pf_id,
+> +               vf->vf_id,
+> +               vf->default_lan_addr.addr,
+> +               test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags) ? "on" :=
+ "off");
+> +}
+> +
+> +/**
+> + * i40e_print_vfs_mdd_events - print VFs malicious driver detect event
+> + * @pf: pointer to the PF structure
+> + *
+> + * Called from i40e_handle_mdd_event to rate limit and print VFs MDD eve=
+nts.
+> + */
+> +static void i40e_print_vfs_mdd_events(struct i40e_pf *pf)
+> +{
+> +       unsigned int i;
+> +
+> +       /* check that there are pending MDD events to print */
+> +       if (!test_and_clear_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state))
+> +               return;
+> +
+> +       /* VF MDD event logs are rate limited to one second intervals */
+> +       if (time_is_after_jiffies(pf->last_printed_mdd_jiffies + HZ * 1))
+> +               return;
+> +
+> +       pf->last_printed_mdd_jiffies =3D jiffies;
+> +
+> +       for (i =3D 0; i < pf->num_alloc_vfs; i++) {
+> +               struct i40e_vf *vf =3D &pf->vf[i];
+> +               bool is_printed =3D false;
+> +
+> +               /* only print Rx MDD event message if there are new event=
+s */
+> +               if (vf->mdd_rx_events.count !=3D vf->mdd_rx_events.last_p=
+rinted) {
+> +                       vf->mdd_rx_events.last_printed =3D vf->mdd_rx_eve=
+nts.count;
+> +                       i40e_print_vf_mdd_event(pf, vf, false);
+> +                       is_printed =3D true;
+> +               }
+> +
+> +               /* only print Tx MDD event message if there are new event=
+s */
+> +               if (vf->mdd_tx_events.count !=3D vf->mdd_tx_events.last_p=
+rinted) {
+> +                       vf->mdd_tx_events.last_printed =3D vf->mdd_tx_eve=
+nts.count;
+> +                       i40e_print_vf_mdd_event(pf, vf, true);
+> +                       is_printed =3D true;
+> +               }
+> +
+> +               if (is_printed && !test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, =
+pf->flags))
+> +                       dev_info(&pf->pdev->dev,
+> +                                "Use PF Control I/F to re-enable the VF =
+#%d\n",
+> +                                i);
+> +       }
+> +}
+> +
+>  /**
+>   * i40e_handle_mdd_event
+>   * @pf: pointer to the PF structure
+>   *
+>   * Called from the MDD irq handler to identify possibly malicious vfs
+>   **/
+>  static void i40e_handle_mdd_event(struct i40e_pf *pf)
+>  {
+>         struct i40e_hw *hw =3D &pf->hw;
+>         bool mdd_detected =3D false;
+>         struct i40e_vf *vf;
+>         u32 reg;
+>         int i;
+>
+> -       if (!test_bit(__I40E_MDD_EVENT_PENDING, pf->state))
+> +       if (!test_and_clear_bit(__I40E_MDD_EVENT_PENDING, pf->state)) {
+> +               /* Since the VF MDD event logging is rate limited, check =
+if
+> +                * there are pending MDD events.
+> +                */
+> +               i40e_print_vfs_mdd_events(pf);
 
-stack backtrace:
-CPU: 1 UID: 0 PID: 5840 Comm: syz-executor427 Not tainted 6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
-  __dump_stack lib/dump_stack.c:94 [inline]
-  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
-  lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6821
-  synchronize_rcu+0xea/0x360 kernel/rcu/tree.c:4089
-  phonet_route_del+0xc6/0x140 net/phonet/pn_dev.c:409
-  route_doit+0x514/0x640 net/phonet/pn_netlink.c:275
-  rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6790
-  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
-  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
-  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
-  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
-  sock_sendmsg_nosec net/socket.c:729 [inline]
-  __sock_sendmsg+0x221/0x270 net/socket.c:744
-  sock_write_iter+0x2d7/0x3f0 net/socket.c:1165
-  new_sync_write fs/read_write.c:590 [inline]
-  vfs_write+0xaeb/0xd30 fs/read_write.c:683
-  ksys_write+0x183/0x2b0 fs/read_write.c:736
-  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
+Can there ever be anything to print here? i40e_print_vfs_mdd_events()
+is also called at the end of i40e_handle_mdd_event(). It always clears
+the __I40E_MDD_VF_PRINT_PENDING bit. So how can the bit ever remain
+set between invocations? In fact, shouldn't the bit be a local
+variable of this function instead of a pf->state bit?
 
-Fixes: 17a1ac0018ae ("phonet: Don't hold RTNL for route_doit().")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: Remi Denis-Courmont <courmisch@gmail.com>
----
- net/phonet/pn_dev.c     |  4 +++-
- net/phonet/pn_netlink.c | 10 ++++++++--
- 2 files changed, 11 insertions(+), 3 deletions(-)
+>                 return;
+> +       }
+>
+>         /* find what triggered the MDD event */
+>         reg =3D rd32(hw, I40E_GL_MDET_TX);
+> @@ -11248,36 +11317,50 @@ static void i40e_handle_mdd_event(struct i40e_p=
+f *pf)
+>
+>         /* see if one of the VFs needs its hand slapped */
+>         for (i =3D 0; i < pf->num_alloc_vfs && mdd_detected; i++) {
+> +               bool is_mdd_on_tx =3D false;
+> +               bool is_mdd_on_rx =3D false;
+> +
+>                 vf =3D &(pf->vf[i]);
+>                 reg =3D rd32(hw, I40E_VP_MDET_TX(i));
+>                 if (reg & I40E_VP_MDET_TX_VALID_MASK) {
+> +                       set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
+>                         wr32(hw, I40E_VP_MDET_TX(i), 0xFFFF);
+> -                       vf->num_mdd_events++;
+> -                       dev_info(&pf->pdev->dev, "TX driver issue detecte=
+d on VF %d\n",
+> -                                i);
+> -                       dev_info(&pf->pdev->dev,
+> -                                "Use PF Control I/F to re-enable the VF\=
+n");
+> +                       vf->mdd_tx_events.count++;
+>                         set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
+> +                       is_mdd_on_tx =3D true;
+>                 }
+>
+>                 reg =3D rd32(hw, I40E_VP_MDET_RX(i));
+>                 if (reg & I40E_VP_MDET_RX_VALID_MASK) {
+> +                       set_bit(__I40E_MDD_VF_PRINT_PENDING, pf->state);
+>                         wr32(hw, I40E_VP_MDET_RX(i), 0xFFFF);
+> -                       vf->num_mdd_events++;
+> -                       dev_info(&pf->pdev->dev, "RX driver issue detecte=
+d on VF %d\n",
+> -                                i);
+> -                       dev_info(&pf->pdev->dev,
+> -                                "Use PF Control I/F to re-enable the VF\=
+n");
+> +                       vf->mdd_rx_events.count++;
+>                         set_bit(I40E_VF_STATE_DISABLED, &vf->vf_states);
+> +                       is_mdd_on_rx =3D true;
+> +               }
+> +
+> +               if ((is_mdd_on_tx || is_mdd_on_rx) &&
+> +                   test_bit(I40E_FLAG_MDD_AUTO_RESET_VF, pf->flags)) {
+> +                       /* VF MDD event counters will be cleared by
+> +                        * reset, so print the event prior to reset.
+> +                        */
+> +                       if (is_mdd_on_rx)
+> +                               i40e_print_vf_mdd_event(pf, vf, false);
+> +                       if (is_mdd_on_tx)
+> +                               i40e_print_vf_mdd_event(pf, vf, true);
 
-diff --git a/net/phonet/pn_dev.c b/net/phonet/pn_dev.c
-index 19234d664c4fb537eba0267266efbb226cf103c3..578d935f2b11694fd1004c5f854ec344b846eeb2 100644
---- a/net/phonet/pn_dev.c
-+++ b/net/phonet/pn_dev.c
-@@ -406,7 +406,9 @@ int phonet_route_del(struct net_device *dev, u8 daddr)
- 
- 	if (!dev)
- 		return -ENOENT;
--	synchronize_rcu();
-+
-+	/* Note : our caller must call synchronize_rcu() */
-+
- 	dev_put(dev);
- 	return 0;
- }
-diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-index ca1f04e4a2d9eb3b2a6d6cc5b299aee28d569b08..24930733ac572ed3ec5fd142d347c115346a28fa 100644
---- a/net/phonet/pn_netlink.c
-+++ b/net/phonet/pn_netlink.c
-@@ -233,6 +233,7 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
- {
- 	struct net *net = sock_net(skb->sk);
- 	struct nlattr *tb[RTA_MAX+1];
-+	bool sync_needed = false;
- 	struct net_device *dev;
- 	struct rtmsg *rtm;
- 	u32 ifindex;
-@@ -269,16 +270,21 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		return -ENODEV;
- 	}
- 
--	if (nlh->nlmsg_type == RTM_NEWROUTE)
-+	if (nlh->nlmsg_type == RTM_NEWROUTE) {
- 		err = phonet_route_add(dev, dst);
--	else
-+	} else {
- 		err = phonet_route_del(dev, dst);
-+		if (!err)
-+			sync_needed = true;
-+	}
- 
- 	rcu_read_unlock();
- 
- 	if (!err)
- 		rtm_phonet_notify(net, nlh->nlmsg_type, ifindex, dst);
- 
-+	if (sync_needed)
-+		synchronize_rcu();
- 	return err;
- }
- 
--- 
-2.47.0.163.g1226f6d8fa-goog
+I see there's no rate-limiting applied here. Is this intentional?
+
+> +
+> +                       i40e_vc_reset_vf(vf, true);
+>                 }
+>         }
+>
+>         /* re-enable mdd interrupt cause */
+>         clear_bit(__I40E_MDD_EVENT_PENDING, pf->state);
+
+Can you remove this 2nd clearing of the __I40E_MDD_EVENT_PENDING bit?
+If the interrupt handler detects a MDD event while we're still
+printing the message about the previous one, we don't want to forget
+it by clearing it here.
+
+Michal
+
+>         reg =3D rd32(hw, I40E_PFINT_ICR0_ENA);
+>         reg |=3D  I40E_PFINT_ICR0_ENA_MAL_DETECT_MASK;
+>         wr32(hw, I40E_PFINT_ICR0_ENA, reg);
+>         i40e_flush(hw);
+> +
+> +       i40e_print_vfs_mdd_events(pf);
+>  }
+>
+>  /**
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c b/drivers=
+/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> index 662622f..5b4618e 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.c
+> @@ -216,7 +216,7 @@ void i40e_vc_notify_vf_reset(struct i40e_vf *vf)
+>   * @notify_vf: notify vf about reset or not
+>   * Reset VF handler.
+>   **/
+> -static void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
+> +void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf)
+>  {
+>         struct i40e_pf *pf =3D vf->pf;
+>         int i;
+> diff --git a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h b/drivers=
+/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+> index 66f95e2..5cf74f1 100644
+> --- a/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+> +++ b/drivers/net/ethernet/intel/i40e/i40e_virtchnl_pf.h
+> @@ -64,6 +64,12 @@ struct i40evf_channel {
+>         u64 max_tx_rate; /* bandwidth rate allocation for VSIs */
+>  };
+>
+> +struct i40e_mdd_vf_events {
+> +       u64 count;      /* total count of Rx|Tx events */
+> +       /* count number of the last printed event */
+> +       u64 last_printed;
+> +};
+> +
+>  /* VF information structure */
+>  struct i40e_vf {
+>         struct i40e_pf *pf;
+> @@ -92,7 +98,9 @@ struct i40e_vf {
+>
+>         u8 num_queue_pairs;     /* num of qps assigned to VF vsis */
+>         u8 num_req_queues;      /* num of requested qps */
+> -       u64 num_mdd_events;     /* num of mdd events detected */
+> +       /* num of mdd tx and rx events detected */
+> +       struct i40e_mdd_vf_events mdd_rx_events;
+> +       struct i40e_mdd_vf_events mdd_tx_events;
+>
+>         unsigned long vf_caps;  /* vf's adv. capabilities */
+>         unsigned long vf_states;        /* vf's runtime states */
+> @@ -120,6 +128,7 @@ int i40e_alloc_vfs(struct i40e_pf *pf, u16 num_alloc_=
+vfs);
+>  int i40e_vc_process_vf_msg(struct i40e_pf *pf, s16 vf_id, u32 v_opcode,
+>                            u32 v_retval, u8 *msg, u16 msglen);
+>  int i40e_vc_process_vflr_event(struct i40e_pf *pf);
+> +void i40e_vc_reset_vf(struct i40e_vf *vf, bool notify_vf);
+>  bool i40e_reset_vf(struct i40e_vf *vf, bool flr);
+>  bool i40e_reset_all_vfs(struct i40e_pf *pf, bool flr);
+>  void i40e_vc_notify_vf_reset(struct i40e_vf *vf);
+> --
+> 2.25.1
+>
+>
 
 
