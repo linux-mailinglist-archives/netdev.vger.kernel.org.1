@@ -1,113 +1,133 @@
-Return-Path: <netdev+bounces-141549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA659BB4D1
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:41:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B12BB9BB4E2
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 13:44:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CD0A11C21A3E
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:41:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75FC92826D6
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 12:44:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33A821B6D0F;
-	Mon,  4 Nov 2024 12:41:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 586871B6CEE;
+	Mon,  4 Nov 2024 12:44:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="DkeodrxM"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FIpai+nc"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 944FD18DF85
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 12:41:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284901B0F3E;
+	Mon,  4 Nov 2024 12:44:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730724087; cv=none; b=AffGUmurOI7pgLFICwDApzeR7wnFQZLwKomWUc1Y3WRZvr8YMeEPdgiL7PF1efSOF5jqLViY6y7xA/a95ceD62ejHSasvgxbVgJgjEkvQe8ZqA78PFOakmBDvXMFj2MG4IpPCxoMlYF3aRK5Umr1XaEasSbdjaFhB/7LotLJkks=
+	t=1730724246; cv=none; b=IPlEx2s2ptLUMF4gVOpQiwPESRidTa9S69z6vgom7/HaACZLy/lgT/JTYb3NFsPkilCiyHLrZ3r7D5hTUpCnfmbcKu0XONkKJUDoiV3y8BSUhia0e8GD/Un3yVpNMVKSzx0Idu7d4HKI7z6UnK0MjU2b2cJoeA2d4O3Oz2d2zUc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730724087; c=relaxed/simple;
-	bh=K2670CLvWu848B9Z+a2LlS5M3E7jNuSgLozZti5polE=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Qga8uMophgJPxCDwYr9i/klC+aq9GKPO4JJBPjTPXy4w4yHgImPjtqWMryvHy4buwz1olC9MtGLw896kPIyY0DyjVi1ChD/Zejfqq1cgr0JL2G/eLGunx8gTFUfqpWwDxeUhFL04F9r3i0tahiEikR/jLxnmGOmMskFhjyChcV4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=DkeodrxM; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730724084;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=aKQ0/YooIp1QYyef8Z9BF7zgosXNwWGR/ZRQNwN6Nbo=;
-	b=DkeodrxMdi7LuC8DNvBF3JHV0nCNO4UMEeZZ4FQoOKZQmZaz6ICTBZE5NAX1IzAnEbv4vz
-	uYWeuPknYOZaKregFOO7N5TWPz9X4b/YAAF102SSrVEjYXdn7x3UIyA9bo9sI4WtS95cq7
-	nwoZg2FClHy5ihKHMEcVUFKVlit0604=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-185-JVFTtb9zNw-d_g3XSvp-jg-1; Mon,
- 04 Nov 2024 07:41:21 -0500
-X-MC-Unique: JVFTtb9zNw-d_g3XSvp-jg-1
-Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 249C81954AE4;
-	Mon,  4 Nov 2024 12:41:18 +0000 (UTC)
-Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.64.126])
-	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id D7D66300018D;
-	Mon,  4 Nov 2024 12:41:11 +0000 (UTC)
-From: Wander Lairson Costa <wander@redhat.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	linux-rt-devel@lists.linux.dev (open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT)
-Cc: tglx@linutronix.de,
-	Wander Lairson Costa <wander@redhat.com>
-Subject: [PATCH] Revert "igb: Disable threaded IRQ for igb_msix_other"
-Date: Mon,  4 Nov 2024 09:40:50 -0300
-Message-ID: <20241104124050.22290-1-wander@redhat.com>
+	s=arc-20240116; t=1730724246; c=relaxed/simple;
+	bh=lXtPD88/DLwgONUoZ+tzULrPtqdUA7Jgmsh/kJjJ43w=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=Lg0/zNcSqhe4wcM4OeDOjw/6/6kt8tHMDMCK1uEXpqKaALgGb8lBm7lNGzBItPMY4VYiHP/OMZBKHmaJhQJD9KptX0ci44Qgdg1y7QnKQR0bGpn9Eu7G42tzcapYha4Tp5YOBelcxpKCfksK6YhC1hDkrnHnnZ6idirKoV7BAbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FIpai+nc; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6278CC4CECE;
+	Mon,  4 Nov 2024 12:44:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730724245;
+	bh=lXtPD88/DLwgONUoZ+tzULrPtqdUA7Jgmsh/kJjJ43w=;
+	h=From:Date:Subject:To:Cc:From;
+	b=FIpai+ncM6rfCSAP5JEy1GXo8SHGD2paXxiCvFoIvTkcPy/a1vU3K3qslEsgcqi9f
+	 35bYZzNjytnC8lpK63OMl+7comQpLFmqf2UiUEqvewLv6fP8iMQ135iRlJg4KWRj5c
+	 qO+RZB56pdja1stgPoiMOKD1ufSmpFIInlnV2Pg5txBdaDxk/ioNYd2n6c/cAH2gP0
+	 coIIK/QUPCDv2Fn2eyr7kWNxIUpu4cRhu1LsQMyT0hT7/Mf6rOP04wT4E90CFMQr5f
+	 xy3GUcVn1y9W28WdMD4XNFrMQhHpAqaDygRViYSpcFMQ5WCSXndVS/AgQ+v2n0U7ON
+	 Rw4K/fZC06f8Q==
+From: "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+Date: Mon, 04 Nov 2024 13:43:47 +0100
+Subject: [PATCH net-next v2] mptcp: remove unneeded lock when listing
+ scheds
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241104-net-next-mptcp-sched-unneeded-lock-v2-1-2ccc1e0c750c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAILBKGcC/zWNwQrCMBBEf6Xs2YU0lor+inhoN1Mb1G1IohRK/
+ 91F8DAw7/BmNirIEYUuzUYZn1jiogb+0JDMg97BMRiTd75rW9exolrWyq9UJXGRGYHfqkCw8lz
+ kwc71GI+TnPvxRDaUMqa4/k6u9Pfptu9fb5aZhH4AAAA=
+X-Change-ID: 20241104-net-next-mptcp-sched-unneeded-lock-006eb3fc96b7
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ Geliang Tang <geliang@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ "Matthieu Baerts (NGI0)" <matttbe@kernel.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1732; i=matttbe@kernel.org;
+ h=from:subject:message-id; bh=lXtPD88/DLwgONUoZ+tzULrPtqdUA7Jgmsh/kJjJ43w=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBnKMGSxj8Sm8hkaENq4Ru4DFL4kUK4Tj+SKRnUH
+ nnjiQLbiJ2JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZyjBkgAKCRD2t4JPQmmg
+ c7scEACi+dZ/s9sji/LSCzCoqAVndbIEp/ojB7M+cui38Sj7+iTXIpUBKkkMM6yfedvTFqWaECv
+ 8+CW0C4OrsY7VekuaYjde3skbWTCGWF+ziyqtMA/lk8Ee/TvZyy5dHxZ6VNEL924SN2pDQ3zrI1
+ 1/RzVzdWJClcgRZ0bEhk//3uL6xrYhvJHUGJhjTJ0meuqUsOVjbOE0aVuDa9fbGAjTnXTHisTv2
+ sHiS9Fh4Rf9IQf9pwA2YNddrTldLXVcXIXqhbutcK+PDdVi/7EDd13KF5nedHzrC24LydQAmAfP
+ nYZQ36OYQ9mew1qjTPay+X0Zdbk3kvz20lrYBoGmwwD6PruIXqJXQjDoo0+/lJVd7OTqcNNeZZh
+ kad+3xFRGFswXheabAv7DP20K9511AgHfexMgnO+hPIICZh3SElLPbG0lpPxaweFH6iPQ487ztT
+ 7uLqK2viN5KTtv1OUofUpumgW5VEDWGk/gE6VpskMqyA5/xpiIiKRmNPxlEnq7XaDGJRd+ViIEG
+ rTqKOe3HgUB0kt+ikXSkxg0YysAGBf7oM1si6qdaAksRErGJUPk/m3n+KNQ23R9/erTzwfe33BF
+ M54o5hNNqhzWAQ+cVibUxwqx5bmdrixQVMnJoL6+ywTEUZc4PMRoHJD66nPMXDKUgkIeJNm+8fC
+ ZMlQ2RIRj0iFyYg==
+X-Developer-Key: i=matttbe@kernel.org; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 
-This reverts commit 338c4d3902feb5be49bfda530a72c7ab860e2c9f.
+mptcp_get_available_schedulers() needs to iterate over the schedulers'
+list only to read the names: it doesn't modify anything there.
 
-Sebastian noticed the ISR indirectly acquires spin_locks, which are
-sleeping locks under PREEMPT_RT, which leads to kernel splats.
+In this case, it is enough to hold the RCU read lock, no need to combine
+this with the associated spin lock as it was done since its introduction
+in commit 73c900aa3660 ("mptcp: add net.mptcp.available_schedulers").
 
-Signed-off-by: Wander Lairson Costa <wander@redhat.com>
-Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Suggested-by: Paolo Abeni <pabeni@redhat.com>
+Reviewed-by: Geliang Tang <geliang@kernel.org>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Signed-off-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 ---
- drivers/net/ethernet/intel/igb/igb_main.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+v2:
+ - Rebased on top of net-next instead of net, same code.
+ - Removed the 'Fixes' tag, add Simon's RvB tag.
+ - Link to v1: https://lore.kernel.org/20241021-net-mptcp-sched-lock-v1-2-637759cf061c@kernel.org
+---
+ net/mptcp/sched.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
-index b83df5f94b1f..f1d088168723 100644
---- a/drivers/net/ethernet/intel/igb/igb_main.c
-+++ b/drivers/net/ethernet/intel/igb/igb_main.c
-@@ -907,7 +907,7 @@ static int igb_request_msix(struct igb_adapter *adapter)
- 	int i, err = 0, vector = 0, free_vector = 0;
+diff --git a/net/mptcp/sched.c b/net/mptcp/sched.c
+index 78ed508ebc1b8dd9f0e020cca1bdd86f24f0afeb..df7dbcfa3b71370cc4d7e4e4f16cc1e41a50dddf 100644
+--- a/net/mptcp/sched.c
++++ b/net/mptcp/sched.c
+@@ -60,7 +60,6 @@ void mptcp_get_available_schedulers(char *buf, size_t maxlen)
+ 	size_t offs = 0;
  
- 	err = request_irq(adapter->msix_entries[vector].vector,
--			  igb_msix_other, IRQF_NO_THREAD, netdev->name, adapter);
-+			  igb_msix_other, 0, netdev->name, adapter);
- 	if (err)
- 		goto err_out;
+ 	rcu_read_lock();
+-	spin_lock(&mptcp_sched_list_lock);
+ 	list_for_each_entry_rcu(sched, &mptcp_sched_list, list) {
+ 		offs += snprintf(buf + offs, maxlen - offs,
+ 				 "%s%s",
+@@ -69,7 +68,6 @@ void mptcp_get_available_schedulers(char *buf, size_t maxlen)
+ 		if (WARN_ON_ONCE(offs >= maxlen))
+ 			break;
+ 	}
+-	spin_unlock(&mptcp_sched_list_lock);
+ 	rcu_read_unlock();
+ }
  
+
+---
+base-commit: ecf99864ea6b1843773589a935bb026951bf12dd
+change-id: 20241104-net-next-mptcp-sched-unneeded-lock-006eb3fc96b7
+
+Best regards,
 -- 
-2.47.0
+Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
