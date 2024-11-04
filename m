@@ -1,101 +1,98 @@
-Return-Path: <netdev+bounces-141435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17BFA9BAE8A
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:50:29 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 13B6D9BAE9E
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 09:53:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 70CC31F21F23
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:50:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id AEC111F21BDD
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 08:53:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 593811AB526;
-	Mon,  4 Nov 2024 08:50:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB43C1ABEB7;
+	Mon,  4 Nov 2024 08:53:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D581F192D9D
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 08:50:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.69
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A48A618A6C3
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 08:53:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.85.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730710226; cv=none; b=hDNH6ftYO5mohOtlm+5f3mSGZRxmOVNHLPhlxMO6ZDzEr/DiKY1y4Ntef6aV3679lP2/30eS4fETSGHu1ThG9jZT2tHYH0tKl1qJE4mJdn26iLWZNIaf/ak7MDVhLQMAFKGweTTUKopVWPxonTcD6dhka9/m/WBZKxJgg3ZstA4=
+	t=1730710390; cv=none; b=fKAFBvj4n+KNcWfF/FaEHwIJVFmTaxe89jeVX/zIzdtfQSKeF9PghWG/2Gjd+APBltA5HTiWRnSURkabT0x2TTmTqvjnD4tce/QqDZ++KjKc8TAMrggS/0yJmkyRLkCoJ+2kxbg7FDf+DCIGYYLOl/Ueomod0UMgDY0308mBPdE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730710226; c=relaxed/simple;
-	bh=abpzgPcE0tClxTTnJrrnJs81KOD53MlzjqO6y5O1u4I=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=dIT1w6tHUaT2PMnyHPJELrxKFDOl491Io2q3HFCk0bE0sl3sclHAUkJiHC1fYFXRw1l+dILS+ZnKobAAqPp/qghDWDbnp22QjnCtCm3cBXZnH5Ovs5M5pUDFv4Oc6WllKvBCV3XXpP1Gc2JguI2QiXPt/lg5x81dMtLoZFKWQGg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.69
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-83ac354a75fso450187239f.0
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 00:50:24 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730710224; x=1731315024;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=BZsHnwYK/Q8ued/GJkpPndJ8wZEFcqomrGeEB2XCGVs=;
-        b=Rw7Pd78hENbSIpG3mLtq4Me1xLyPDTV4e7SONRrxuDnf0bJjKzqz5/TE3uuGyC+AqI
-         7uosNA2qfnvVnHgLIy+e+9ByPaw7TPPtMF4c3PscYozugWmoAgQkVbT7IkIhoBvD9xWl
-         3j6bMqGHFmDkshXrkZWWjcja+xlv6xIQctYkTzeab6FTgRgmR04JBBcSQwnJ9DfMCxiX
-         Xq9GdwtRCvit4oJpWejmHUWWyYXwni8c51/TSClgPyknZY/VVTyJ/r/y6kf5/zPVXcOL
-         7sXq6EzpzKcXZwnshpSkeX8xNhsFZBHmlSUaaj3Nlc5SG+8a008kp+ZncU9fOy/WBmw7
-         VRNQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVTMDf1YxJEWsVeRfXRvN8y6/9DXB1UYqnG84SsaphPBnp5trx6zknNAamxH0TI4++ruViK72Y=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5brpWWXnstA42JxibMBlIiMAEttt7YiARuc3ZUq7GarxwCYv3
-	K3XwAsepn8fzDJuUBLX+LHC1BmnExuaMK2fSTVEkV9kcB7YQtHdcJvHWzxEjTSV2SnS8nRBhxhP
-	C5AGcPO5H+4rIDmxqpsheVfDuSWJ2iOfufezUHtHj1NjY6ZZE//cf4w0=
-X-Google-Smtp-Source: AGHT+IFqjFvRIGqFys7UL3sZzgrR6TeYpNnX/ESfI03l++OvjzdNvdy2RzHquIyZbne1L6pMIZ4VCzNhCnd9sboeguwi1pxU+yda
+	s=arc-20240116; t=1730710390; c=relaxed/simple;
+	bh=fOKmCxycDlf7GLnm1KtEkgjsbi8WHP37Yj1Sa2CnxNE=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=dGxktQccl4iRAG4+t0Y3CGVYV+Mj+6SzI66zER9+C7fCEqKvMwo1GIIov54ZgqqeJWu+KvOyR8deRM4ZboPDLBNFFsBB6/XH6l30htN+WxMUF4lqww5jdG1i8QuZH/c2ZfX1xKUBFXGz4r9LoMd+7UH6mG9ucV89PtsU+/M6EAo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.85.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-96-WZK9QpgdPQ-pFjUIMEnDYg-1; Mon, 04 Nov 2024 08:51:26 +0000
+X-MC-Unique: WZK9QpgdPQ-pFjUIMEnDYg-1
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 4 Nov
+ 2024 08:51:25 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Mon, 4 Nov 2024 08:51:25 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Michal Swiatkowski' <michal.swiatkowski@linux.intel.com>, Michal Schmidt
+	<mschmidt@redhat.com>
+CC: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"pawel.chmielewski@intel.com" <pawel.chmielewski@intel.com>,
+	"sridhar.samudrala@intel.com" <sridhar.samudrala@intel.com>,
+	"jacob.e.keller@intel.com" <jacob.e.keller@intel.com>,
+	"pio.raczynski@gmail.com" <pio.raczynski@gmail.com>,
+	"konrad.knitter@intel.com" <konrad.knitter@intel.com>,
+	"marcin.szycik@intel.com" <marcin.szycik@intel.com>,
+	"wojciech.drewek@intel.com" <wojciech.drewek@intel.com>,
+	"nex.sw.ncis.nat.hpm.dev@intel.com" <nex.sw.ncis.nat.hpm.dev@intel.com>,
+	"przemyslaw.kitszel@intel.com" <przemyslaw.kitszel@intel.com>,
+	"jiri@resnulli.us" <jiri@resnulli.us>, "horms@kernel.org" <horms@kernel.org>
+Subject: RE: [Intel-wired-lan] [iwl-next v6 2/9] ice: devlink PF MSI-X max and
+ min parameter
+Thread-Topic: [Intel-wired-lan] [iwl-next v6 2/9] ice: devlink PF MSI-X max
+ and min parameter
+Thread-Index: AQHbLogBIclfjUnNDkKuhxeYRHRRbbKmzwWw
+Date: Mon, 4 Nov 2024 08:51:25 +0000
+Message-ID: <ad5bf0e312d44737a18c076ab2990924@AcuMS.aculab.com>
+References: <20241028100341.16631-1-michal.swiatkowski@linux.intel.com>
+ <20241028100341.16631-3-michal.swiatkowski@linux.intel.com>
+ <CADEbmW0=G8u7Y8L2fFTzan8S+Uz04nAMC+-dkj-rQb_izK88pg@mail.gmail.com>
+ <ZyhxmxnxPcLk2ZcX@mev-dev.igk.intel.com>
+In-Reply-To: <ZyhxmxnxPcLk2ZcX@mev-dev.igk.intel.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:17ce:b0:3a6:af3c:56ae with SMTP id
- e9e14a558f8ab-3a6b02cf905mr92223925ab.11.1730710224161; Mon, 04 Nov 2024
- 00:50:24 -0800 (PST)
-Date: Mon, 04 Nov 2024 00:50:24 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67288ad0.050a0220.35b515.01b7.GAE@google.com>
-Subject: [syzbot] Monthly can report (Nov 2024)
-From: syzbot <syzbot+list9fa5fba6c1580c496e3a@syzkaller.appspotmail.com>
-To: linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	mkl@pengutronix.de, netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-Hello can maintainers/developers,
+RnJvbTogTWljaGFsIFN3aWF0a293c2tpDQo+IFNlbnQ6IDA0IE5vdmVtYmVyIDIwMjQgMDc6MDMN
+Ci4uLg0KPiA+IFRoZSB0eXBlIG9mIHRoZSBkZXZsaW5rIHBhcmFtZXRlcnMgbXNpeF92ZWNfcGVy
+X3BmX3ttaW4sbWF4fSBpcw0KPiA+IHNwZWNpZmllZCBhcyB1MzIsIHNvIHlvdSBtdXN0IHVzZSB2
+YWx1ZS52dTMyIGV2ZXJ5d2hlcmUgeW91IHdvcmsgd2l0aA0KPiA+IHRoZW0sIG5vdCB2dTE2Lg0K
+PiA+DQo+IA0KPiBJIHdpbGwgY2hhbmdlIGl0Lg0KDQpZb3UgYWxzbyBuZWVkIGEgcHJldHR5IGdv
+b2QgcmVhc29uIHRvIHVzZSB1MTYgYW55d2hlcmUgYXQgYWxsLg0KSnVzdCBiZWNhdXNlIHRoZSBk
+b21haW4gb2YgdGhlIHZhbHVlIGlzIHNtYWxsIGRvZXNuJ3QgbWVhbiB0aGUNCmJlc3QgdHlwZSBp
+c24ndCBbdW5zaWduZWRdIGludC4NCg0KQW55IGFyaXRobWV0aWMgKHBhcnRpY3VsYXJseSBvbiBu
+b24geDg2KSBpcyBsaWtlbHkgdG8gaW5jcmVhc2UNCnRoZSBjb2RlIHNpemUgYWJvdmUgYW55IHBl
+cmNlaXZlZCBkYXRhIHNhdmluZy4NCg0KCURhdmlkDQoNCi0NClJlZ2lzdGVyZWQgQWRkcmVzcyBM
+YWtlc2lkZSwgQnJhbWxleSBSb2FkLCBNb3VudCBGYXJtLCBNaWx0b24gS2V5bmVzLCBNSzEgMVBU
+LCBVSw0KUmVnaXN0cmF0aW9uIE5vOiAxMzk3Mzg2IChXYWxlcykNCg==
 
-This is a 31-day syzbot report for the can subsystem.
-All related reports/information can be found at:
-https://syzkaller.appspot.com/upstream/s/can
-
-During the period, 0 new issues were detected and 0 were fixed.
-In total, 6 issues are still open and 53 have been fixed so far.
-
-Some of the still happening issues:
-
-Ref Crashes Repro Title
-<1> 7872    Yes   WARNING: refcount bug in j1939_session_put
-                  https://syzkaller.appspot.com/bug?extid=ad601904231505ad6617
-<2> 4947    Yes   WARNING: refcount bug in sk_skb_reason_drop
-                  https://syzkaller.appspot.com/bug?extid=d4e8dc385d9258220c31
-<3> 3045    Yes   WARNING: refcount bug in j1939_xtp_rx_cts
-                  https://syzkaller.appspot.com/bug?extid=5a1281566cc25c9881e0
-<4> 523     Yes   WARNING: refcount bug in get_taint (2)
-                  https://syzkaller.appspot.com/bug?extid=72d3b151aacf9fa74455
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-To disable reminders for individual bugs, reply with the following command:
-#syz set <Ref> no-reminders
-
-To change bug's subsystems, reply with:
-#syz set <Ref> subsystems: new-subsystem
-
-You may send multiple commands in a single email message.
 
