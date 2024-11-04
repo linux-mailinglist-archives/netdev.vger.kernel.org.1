@@ -1,126 +1,102 @@
-Return-Path: <netdev+bounces-141468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593FF9BB0E9
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:22:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E4B89BB105
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 11:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8ACF21C21718
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:22:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAE611F20F9D
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 10:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDBE81AF4EE;
-	Mon,  4 Nov 2024 10:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE031B0F19;
+	Mon,  4 Nov 2024 10:25:20 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="rut4Py5v"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jeflwQR7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91A551B0F09;
-	Mon,  4 Nov 2024 10:22:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 068001AF0DD
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 10:25:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730715771; cv=none; b=MeUe2TL2L10erg068N68o1MzzLdV8nCaEK6i2AO0ZdSsFJdV81B4XVk6Maf/2mQ8xnTjOruGBw20X2TRKz6jGgPuyb87RgyjJWd8y9F6lTiC1x6fiZgwS/C7W9Wb4AUGuWCkEEd7tmHftwJiz0PfFEylXNvuhcTmLbcWGJbEKvY=
+	t=1730715920; cv=none; b=GPPKD0A1hNm+imQlfJIDO7JFdUvYNlU+2OSBOQF8+jh88Tm907IKi39va7ZPRnyAL1iFQKY4wMERgy9veR3bgv7X995IuNMX+YBUf9UE8+TBwLePZxEw1H/v+PDkE0X7Kj2lYy7Iwh/P/xcCl61e9aWmdUmPl7pJ+pWomJrs+ts=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730715771; c=relaxed/simple;
-	bh=nMfTLLFzcG1ZcG1H25Gar8chdwYJf1C0bitXKfycbJ4=;
-	h=Date:Content-Type:MIME-Version:From:To:Cc:In-Reply-To:References:
-	 Message-Id:Subject; b=FjgDZIB1xSLCJcxwpBcuoRYF6z/FGBrNyhIo0VveQieFMakNb5BuAsLZBkqpF6uYhVgyH/jRNzrrhUXO8E9D/t8z9VdccBs2FQ23+kMG/32KU5RsXHCiLouRhftfPLWV0aLwqaRyoDiJdMEOEl2dNBVzO8bAmGxgnjnKc5ML7QM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=rut4Py5v; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EC163C4CECE;
-	Mon,  4 Nov 2024 10:22:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730715771;
-	bh=nMfTLLFzcG1ZcG1H25Gar8chdwYJf1C0bitXKfycbJ4=;
-	h=Date:From:To:Cc:In-Reply-To:References:Subject:From;
-	b=rut4Py5vVrIi6BT1pfGKTCXZcGyAz3HgoAkBuQSfnktQis/5pd67FT7i3fpSNt9lI
-	 RVmQ/2kxQEXTovrZLkvfIa/FXiEjXcpP//w/H7jFsMfmapoMbnCENuiSNhAEGfWS3q
-	 8m+AvAmgpE41vBfzwg/cpYykzPHK+afTeqCCR7u3IHp8wsH9WXoRW+1IMKc/TCgFYM
-	 WWYErn3sC4kK9WLypVS8iGMb4Yd0uq0SbYOJXODcA/jZPeZnDn89od35lemgHI3s0S
-	 oYjrDUruelmeCbTg2CNcmhGXaZy/ojbtD/KTN+dETvSoSy/Pl/i23azPrCfw3k6GK4
-	 CO3QFKAgO/ErA==
-Date: Mon, 04 Nov 2024 04:22:48 -0600
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
+	s=arc-20240116; t=1730715920; c=relaxed/simple;
+	bh=V/+/hlKh1rxbiBzy+p4y6Msa+GqpWouYUTGPR3WHGsg=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=VH/PnyfPOqGq7DtaH2uyYAX0Mp0hWfV+FoX29WbRCGdYWWzTckdKYJ3DA8pnH1tVPHDUcdY3au27sZ+fFm286cIbnokTlyz9Id7X+2txyxDqmoluPuryP7LTEfHMhk+do+oxlUTUzAY1zeMUxApW0mEs5v/m5XXhogcUcu1aJdU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jeflwQR7; arc=none smtp.client-ip=209.85.208.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5cec9609303so2031185a12.1
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 02:25:18 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730715917; x=1731320717; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=V/+/hlKh1rxbiBzy+p4y6Msa+GqpWouYUTGPR3WHGsg=;
+        b=jeflwQR70EPlixlEa9MwqFVXmbEzr7jPD4RzPW4JWqp9JLFBE5Q7fNYzYKUukX4n2Y
+         Y+YMBlkV1ULvpCioOwUi6hJDtk4OtAYe/q/76MbNabJU/a9r4P9EpOEeKZ1cj0YvngEz
+         uIhCcy/1wc/VXdl54oPhj9HnQXVZqVdDbZ4X/VX6qR27Ure/WIi2wCj2tOqRBM4PK5cY
+         LtBheMyUHfwKE9dFSqCWyjsIV8DorH4zbDFuhpOHZWvwDGdqGIKVEvkiipdWoSIxITPP
+         6eiJdi0Dnw7c7hmYHlJ39kxdeiFds/S+6zHq7vI6HucEi9mkB7In252FMFCZNC3QoUrP
+         58hw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730715917; x=1731320717;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=V/+/hlKh1rxbiBzy+p4y6Msa+GqpWouYUTGPR3WHGsg=;
+        b=S5YIiF82X2jkErG8s6OwrPYSMs7D2oZRwDWY72NK+Tl8wfZIPyWY8HvGs4hUWWUGeY
+         +od1oHQowx63rF6zoouIqTvth3PkkBInm19GHrEfTk0N0Fa72U0lS6DlwtCjmlb2/wDc
+         BKmaH6gkLajIDQ46GX1FYgB/66TdLcs5GY0ZtfXJqRZsTG6BVxheaG3M+l0rcJ34T69P
+         2sIBnI8aT6KxwAfkmL/dOoAfRP7WLM7CKgTvtp/6xiphgDen2GkA438fFlea+/BSSZsQ
+         CycXA5m+2a/j9a868YX/2PmYdKhU2StL7cOcRlG7Y6VdFtABoAwnr9PG8zui25p+uFxp
+         pTEg==
+X-Forwarded-Encrypted: i=1; AJvYcCU+S/ExRDfLhizCMMmy60Xv+pXJRj1V1rXg57BPVOiv9RtJ4C7T+ge4kMmItcQN8v1GCYK7CpM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzcKIlH5PIi6B8kDT7FKXf5kY7Bsl27UATkhhmzYYkuxHBcIwg6
+	ZRKk9y2VLUZAzuBlvAP/SJrvmvcl5gvJ7XKikj6F2f6pOQLEF9Hr0nFjxwvUVZHYVOlfJLcuys0
+	DqKRjSlAL9DTO4hzd8+2RWuvIWXxBOj2TJeWd
+X-Google-Smtp-Source: AGHT+IEk/VV8aixaYr6ZbWjdMvIQt+JsCmv/TNNMBKSlXTspef08ZiIotLJVmSIItnYQWjkfpFoAoy6ki4++u+3nu2c=
+X-Received: by 2002:a05:6402:4316:b0:5ce:b82f:c4eb with SMTP id
+ 4fb4d7f45d1cf-5ceb82fcb42mr11804877a12.8.1730715917148; Mon, 04 Nov 2024
+ 02:25:17 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: "Rob Herring (Arm)" <robh@kernel.org>
-To: Sean Nyekjaer <sean@geanix.com>
-Cc: Conor Dooley <conor+dt@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, linux-can@vger.kernel.org, 
- devicetree@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
- Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, linux-kernel@vger.kernel.org, 
- Eric Dumazet <edumazet@google.com>, Marc Kleine-Budde <mkl@pengutronix.de>, 
- netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241104085616.469862-1-sean@geanix.com>
-References: <20241104085616.469862-1-sean@geanix.com>
-Message-Id: <173071576894.2866974.11023196178832654081.robh@kernel.org>
-Subject: Re: [RFC PATCH] dt-bindings: can: convert tcan4x5x.txt to DT
- schema
+References: <20241102200820.1423-1-03zouyi09.25@gmail.com>
+In-Reply-To: <20241102200820.1423-1-03zouyi09.25@gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 4 Nov 2024 11:25:05 +0100
+Message-ID: <CANn89iKzcsKRngJTTxdA96MbVSx4Y9f17ju9+Otf5axas_esjQ@mail.gmail.com>
+Subject: Re: [PATCH] ipv6: ip6_fib: fix null-pointer dereference in ipv6_route_native_seq_show()
+To: Yi Zou <03zouyi09.25@gmail.com>
+Cc: davem@davemloft.net, 21210240012@m.fudan.edu.cn, 
+	21302010073@m.fudan.edu.cn, dsahern@kernel.org, pabeni@redhat.com, 
+	Markus.Elfring@web.de, kuba@kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Sat, Nov 2, 2024 at 9:08=E2=80=AFPM Yi Zou <03zouyi09.25@gmail.com> wrot=
+e:
+>
+> Check if fib6_nh is non-NULL before accessing fib6_nh->fib_nh_gw_family
+> in ipv6_route_native_seq_show() to prevent a null-pointer dereference.
+> Assign dev as dev =3D fib6_nh ? fib6_nh->fib_nh_dev : NULL to ensure safe
+> handling when nexthop_fib6_nh(rt->nh) returns NULL.
+>
+> Fixes: 0379e8e6a9ef ("ipv6: ip6_fib: avoid NPD in ipv6_route_native_seq_s=
+how()")
 
-On Mon, 04 Nov 2024 09:56:15 +0100, Sean Nyekjaer wrote:
-> Convert binding doc tcan4x5x.txt to yaml.
-> 
-> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
-> ---
-> 
-> Can we somehow reference bosch,mram-cfg from the bosch,m_can.yaml?
-> I have searched for yaml files that tries the same, but it's usually
-> includes a whole node.
-> 
-> I have also tried:
-> $ref: /schema/bosch,m_can.yaml#/properties/bosch,mram-cfg
-> 
-> Any hints to share a property?
-> 
->  .../devicetree/bindings/net/can/tcan4x5x.txt  | 48 ---------
->  .../bindings/net/can/ti,tcan4x5x.yaml         | 97 +++++++++++++++++++
->  2 files changed, 97 insertions(+), 48 deletions(-)
->  delete mode 100644 Documentation/devicetree/bindings/net/can/tcan4x5x.txt
->  create mode 100644 Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-> 
+I could not find this commit in upstream trees.
 
-My bot found errors running 'make dt_binding_check' on your patch:
-
-yamllint warnings/errors:
-
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml: properties:bosch,mram-cfg: 'anyOf' conditional failed, one must be fixed:
-	'description' is a dependency of '$ref'
-	'bosch,m_can.yaml#' does not match 'types.yaml#/definitions/'
-		hint: A vendor property needs a $ref to types.yaml
-	'bosch,m_can.yaml#' does not match '^#/(definitions|\\$defs)/'
-		hint: A vendor property can have a $ref to a a $defs schema
-	hint: Vendor specific properties must have a type and description unless they have a defined, common suffix.
-	from schema $id: http://devicetree.org/meta-schemas/vendor-props.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.example.dtb: can@0: bosch,mram-cfg: [0, 0, 0, 16, 0, 0, 1, 1] is not of type 'object'
-	from schema $id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.example.dtb: can@0: bosch,mram-cfg: [0, 0, 0, 16, 0, 0, 1, 1] is not of type 'object'
-	from schema $id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20241104085616.469862-1-sean@geanix.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
-
+Please make sure to sort out the details before sending a patch.
 
