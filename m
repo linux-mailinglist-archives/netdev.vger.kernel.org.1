@@ -1,123 +1,150 @@
-Return-Path: <netdev+bounces-141636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141637-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3463F9BBD75
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:46:08 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 232F79BBD85
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 19:51:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A5D2280F12
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:46:06 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CC1D71F22A93
+	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 18:51:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 302C118D642;
-	Mon,  4 Nov 2024 18:46:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A50271CB9F4;
+	Mon,  4 Nov 2024 18:51:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="Yw0zyxGq"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pRrGCkFq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f170.google.com (mail-pg1-f170.google.com [209.85.215.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EBDB19BBA
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:45:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 001E31CACE5
+	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 18:51:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730745962; cv=none; b=OXUCBvIphdWnech5Am9OiYxma/KOaTf0ZaWD4VTsjSmxZ5YIsbX8LUfipifYX9MuWGHiFu9RVCpJ+kav2a31r6Zm73TF3OKfgDALmaQ800SsRZZ+P0AaQhWcokv05lFRb1awFyLZOikYC0zXZCV43kmmy7vdhVOS8/9w0vvSm54=
+	t=1730746275; cv=none; b=I7UU4GnUPbq++vlgU0KL3RZmpfgQH/TaNb8mr/yqwSlycvCJW1qqSnkMP4BuOx0jGoQD2A4JnQLWooVbDSLNyjAdybeX8k6aMLBLtA2mMmPnP6k6xlHFVpm0m9q8C7eWNAZiPEM1yWdkANuZbrXSqpxIb/qMVbDblEgXg36DIJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730745962; c=relaxed/simple;
-	bh=r1QhwuPbs8ubNXAmG4ArE39tL4xRdB4Ohl4TH4RUulM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WKe0ib6p7tqQbr1jXOldZYTrCxjTjmqK5cQIUa+jF1zyMckP54Ly4zpc14jMlQajPXkkBQHEQH4q/qpOk+jpa/S1B/wwHKv99+3LVmTrrUsP87iyjipWQQg1UhxfYy8/hBl4C9OLK3Bq5sL3oXFQCnaq0TT0rCKldTNpDZyZaLw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=Yw0zyxGq; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730745960; x=1762281960;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=r1QhwuPbs8ubNXAmG4ArE39tL4xRdB4Ohl4TH4RUulM=;
-  b=Yw0zyxGqvm9bnXN2l5Wj8OPzukVVeTtcuMh56PZRKmr84TmWMKG4e2Gb
-   cedbqGeihekM82QogSs5SkVZcWnsMZ/wUHRTh9VNPfnBfrRNv6thuz1gJ
-   s56GHOIXc6a9HKTMOoOIjTwvzob7Bf9xZNel/E8sH4+L4OHiEIRnm4aAz
-   QJ2ptVjDt3jFG0plSdb8EgLmCUjVCR10PEExacXkPZ80j16EKXJrwJZQo
-   fcbnhMRbf2+rmWKQ4CONLYH9CwAxZHdo9xOpC/cAuhCZALeBufJ4wTX8C
-   fmj86faqV+SuQFMX9UxcKsze3Cv2uxwb6Zf4qS5eUtH6PqMivySIdRtSN
-   g==;
-X-CSE-ConnectionGUID: X5asnfJ5RX+fygkDpBOICw==
-X-CSE-MsgGUID: epOiiITZQAutEfNKfIB+Yw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="34248722"
-X-IronPort-AV: E=Sophos;i="6.11,257,1725346800"; 
-   d="scan'208";a="34248722"
-Received: from orviesa003.jf.intel.com ([10.64.159.143])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 10:45:59 -0800
-X-CSE-ConnectionGUID: r1J37tPaR3+tRmbp17DQ2w==
-X-CSE-MsgGUID: e4WPHgxoR++LQSEoLbrzUw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="88497487"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by orviesa003.jf.intel.com with ESMTP; 04 Nov 2024 10:45:58 -0800
-Received: from mystra-4.igk.intel.com (mystra-4.igk.intel.com [10.123.220.40])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id BB01628781;
-	Mon,  4 Nov 2024 18:45:56 +0000 (GMT)
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Marcin Szycik <marcin.szycik@linux.intel.com>,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Subject: [PATCH iwl-net] ice: Fix VLAN pruning in switchdev mode
-Date: Mon,  4 Nov 2024 19:49:09 +0100
-Message-ID: <20241104184908.632863-2-marcin.szycik@linux.intel.com>
-X-Mailer: git-send-email 2.45.0
+	s=arc-20240116; t=1730746275; c=relaxed/simple;
+	bh=i+JUo1WbG9fBZEzMBxei4ZEoysCHsSLRrRJGVjEMQvk=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CwqUIt3kBUTTG3nnuutt56u4xstuCB1s5BYExDyveWlAkPbK+7qla8tig0sZ0Ds6R7TVBRRkxqjr1x3r42dmxEA+bBHode3tqv98LtLW+q1Oc+FgxJ1VHlda8Rl4H2JSdSDsa5kKEV29dq4O+3earl6dvxl+NLBKYWJSphaZh2Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pRrGCkFq; arc=none smtp.client-ip=209.85.215.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pg1-f170.google.com with SMTP id 41be03b00d2f7-7ea8c4ce232so3807490a12.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 10:51:13 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1730746273; x=1731351073; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=sWJfwtCH7EJrpJfmQrqLh3OrqN5mIv7D0ga+Lf0aVEw=;
+        b=pRrGCkFqAdHpzg8NHknffTNpV2qViVALW5mBF4+6xzYj6yapNvbo8XsJMkp8F5R8Zr
+         3cnNpWu77qX+lElwFvfChOMITdq/tjtzWFqDk5jZGT8OhraXJ6ha2XeAfJLyX5TMMs0j
+         jAOtjK30OCmBaLD1BGsQOLvmss/C60dPMvfeQ=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730746273; x=1731351073;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=sWJfwtCH7EJrpJfmQrqLh3OrqN5mIv7D0ga+Lf0aVEw=;
+        b=GL9wz62ax6WlJvTj8zLdl7q8Kn8D+1TErfXQe/zCWOzA9H+VSkVeo2W2u6Slyw4axn
+         N3fb8HCUrZrOEaFpIRO368a59+i7khqy+6LPj2syavXwHvfGkLr4t9TluKsd4NYnOma+
+         28J/RzMQsMcRt6G5yY5W1ZENuoQo2a5d1aeUScFIib9s4itO27dn6IOVp9lLyHqiFqSw
+         K4ynvqygytXTatwKUfnwjn4D3iU4aOYiUsA5T745qqOpiH/HYf+6xBfQf7GVjxVP2u8+
+         SZpowoY+fkjqWbdhy7I2JzW6Q69ci6T7TZUOdwLVl8aeVCBLHs7om3TQQOLBo6ipazqB
+         0dUw==
+X-Forwarded-Encrypted: i=1; AJvYcCW9sYQYAAlkkcg5/PiBtuaY0OeHzu8u+uWa/yA2hS5ZqCwq+dNkLRYaL630met2XvJyrn9qjJM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyybR0uvxRZ7rg3kXHlIr54cQOiJ4CLzkKmXOutqz5L+r/ceikb
+	rZtKFX38NTrwxXtM14GvQUEMuXXOAmBBGor16JmTuS6x9NrYc2Z1RuL13FBKR6k=
+X-Google-Smtp-Source: AGHT+IHWOygf8u1N20udthJq/ON31qkCTfTapdoM6eneR+DaWGQ7PM5fmjk8Rm84lqYDYvD8FX9TbA==
+X-Received: by 2002:a17:90b:3d87:b0:2e2:af6c:79b2 with SMTP id 98e67ed59e1d1-2e94c51c61bmr19532397a91.29.1730746273096;
+        Mon, 04 Nov 2024 10:51:13 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fa0eda6sm10277879a91.4.2024.11.04.10.51.10
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 10:51:11 -0800 (PST)
+Date: Mon, 4 Nov 2024 10:51:08 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jonathan Corbet <corbet@lwn.net>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>, netdev@vger.kernel.org,
+	hdanton@sina.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v5 7/7] docs: networking: Describe irq suspension
+Message-ID: <ZykXnG8M7qXsQcYq@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jonathan Corbet <corbet@lwn.net>,
+	Bagas Sanjaya <bagasdotme@gmail.com>, netdev@vger.kernel.org,
+	hdanton@sina.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+References: <20241103052421.518856-1-jdamato@fastly.com>
+ <20241103052421.518856-8-jdamato@fastly.com>
+ <ZyinhIlMIrK58ABF@archie.me>
+ <ZykRdK6WgfR_4p5X@LQ3V64L9R2>
+ <87v7x296wq.fsf@trenco.lwn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <87v7x296wq.fsf@trenco.lwn.net>
 
-In switchdev mode the uplink VSI should receive all unmatched packets,
-including VLANs. Therefore, VLAN pruning should be disabled if uplink is
-in switchdev mode. It is already being done in ice_eswitch_setup_env(),
-however the addition of ice_up() in commit 44ba608db509 ("ice: do
-switchdev slow-path Rx using PF VSI") caused VLAN pruning to be
-re-enabled after disabling it.
+On Mon, Nov 04, 2024 at 11:43:17AM -0700, Jonathan Corbet wrote:
+> Joe Damato <jdamato@fastly.com> writes:
+> 
+> > On Mon, Nov 04, 2024 at 05:52:52PM +0700, Bagas Sanjaya wrote:
+> >> On Sun, Nov 03, 2024 at 05:24:09AM +0000, Joe Damato wrote:
+> >> > +It is important to note that choosing a large value for ``gro_flush_timeout``
+> >> > +will defer IRQs to allow for better batch processing, but will induce latency
+> >> > +when the system is not fully loaded. Choosing a small value for
+> >> > +``gro_flush_timeout`` can cause interference of the user application which is
+> >> > +attempting to busy poll by device IRQs and softirq processing. This value
+> >> > +should be chosen carefully with these tradeoffs in mind. epoll-based busy
+> >> > +polling applications may be able to mitigate how much user processing happens
+> >> > +by choosing an appropriate value for ``maxevents``.
+> >> > +
+> >> > +Users may want to consider an alternate approach, IRQ suspension, to help deal
+> >>                                                                      to help dealing
+> >> > +with these tradeoffs.
+> >> > +
+> >
+> > Thanks for the careful review. I read this sentence a few times and
+> > perhaps my English grammar isn't great, but I think it should be
+> > one of:
+> >
+> > Users may want to consider an alternate approach, IRQ suspension, to
+> > help deal with these tradeoffs.  (the original)
+> 
+> The original is just fine here.  Bagas, *please* do not bother our
+> contributors with this kind of stuff, it does not help.
 
-Add a check to ice_set_vlan_filtering_features() to ensure VLAN
-filtering will not be enabled if uplink is in switchdev mode. Note that
-ice_is_eswitch_mode_switchdev() is being used instead of
-ice_is_switchdev_running(), as the latter would only return true after
-the whole switchdev setup completes.
+Thanks for the feedback. I had been preparing a v6 based on Bagas'
+comments below where you snipped about in the documentation, etc.
 
-Fixes: 44ba608db509 ("ice: do switchdev slow-path Rx using PF VSI")
-Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_main.c | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index b1e7727b8677..8f2e758c3942 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -6361,10 +6361,12 @@ ice_set_vlan_filtering_features(struct ice_vsi *vsi, netdev_features_t features)
- 	int err = 0;
- 
- 	/* support Single VLAN Mode (SVM) and Double VLAN Mode (DVM) by checking
--	 * if either bit is set
-+	 * if either bit is set. In switchdev mode Rx filtering should never be
-+	 * enabled.
- 	 */
--	if (features &
--	    (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER))
-+	if ((features &
-+	     (NETIF_F_HW_VLAN_CTAG_FILTER | NETIF_F_HW_VLAN_STAG_FILTER)) &&
-+	     !ice_is_eswitch_mode_switchdev(vsi->back))
- 		err = vlan_ops->ena_rx_filtering(vsi);
- 	else
- 		err = vlan_ops->dis_rx_filtering(vsi);
--- 
-2.45.0
-
+Should I continue to prepare a v6? It would only contain
+documentation changes in this patch; I can't really tell if a v6 is
+necessary or not.
 
