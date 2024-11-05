@@ -1,228 +1,131 @@
-Return-Path: <netdev+bounces-141733-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141734-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C6DE9BC245
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:05:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E4F9BC25C
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:13:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACE6B2825DA
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:05:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1B6981F22A5A
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:13:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BC57179BD;
-	Tue,  5 Nov 2024 01:05:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4565182C5;
+	Tue,  5 Nov 2024 01:12:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="hUPdx7XI"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IUXlVV46"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f170.google.com (mail-pf1-f170.google.com [209.85.210.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74F3D17583
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 01:05:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5972CB65C;
+	Tue,  5 Nov 2024 01:12:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730768716; cv=none; b=Jms/6WatwpG+WAdEWurfJG9zkE78YMl9KexNmREVW6zTtPmaRCisK0TbfNFvt5NgZR877D2wx/BqZuIINVKZe+pfwV+GiqtsLjA+QgeiJW08+n3ErWDqLVMiw9SCqIRYqFFNY1CG9ljN+dSnMxpR1B3gY0ofegnm/tQRFh9z2S8=
+	t=1730769175; cv=none; b=icSuy00cCNG10FsbDoijAlXEn5O56bwFnrFsb+zUgxndTHZExiGJh0NrFJsieSQ+UEKdxu6rFE8oBFUyjaXcePyRgCeBuIND+/BQb8rRO+72+Ds1vHhQ/DcgjEJxl2wnVB227gNBCFEsu2LEGhzbuD/B4dJO7Mw5WGsd6TlvdHo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730768716; c=relaxed/simple;
-	bh=TZ5YKE2r9nHwavzXWR8gl11dVDeFZjUMTA75vM4lN0A=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Inc9l3fpxpPsT1LppwZgdRYoSw3XzPGLH5JcEVoOqqVv5fBqrkXqQEB/WCLkiqEL0WW/icvYd7SRIRa/8IadG29tqz4jOdxwj7OjUdOofoxd4eJRhUSV7KQwlJGlYBCSvZZmhrdPCR6tgssHCYqFHIxLGMNrwC2Hmx954EWgwK8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=hUPdx7XI; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A54E5C4CED2;
-	Tue,  5 Nov 2024 01:05:15 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730768715;
-	bh=TZ5YKE2r9nHwavzXWR8gl11dVDeFZjUMTA75vM4lN0A=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hUPdx7XILnz8jO4FLUznkeeuL5EgodRIesVqRnuoUNXaCFxIwE5vnGV92DaA32rcD
-	 fYU0mbYXawhtzwIHOHQp19hM9gfyOGKCKdAGogriLHj/OKfoNl839xwDUFRUYFNUS+
-	 WapHiAH4do4Z30kxYm9HfdAz6TOPydMu4Bgu/8Z083bm495qzkfy+4AFZHnjX9moZP
-	 JNU+G6ttEeS47AkptsPql/3x0LvIwb3IxSqUWV0AglsPTictFokpFkwJDsXZ/dxYtr
-	 4ZrzLgs8hAZ3+1ahUuHLLwyZV8bUJB9Du3MgKkdkr63rEiXVgR8qgTw+HhtOCL2ihD
-	 IHloP3ljcApOg==
-From: Jakub Kicinski <kuba@kernel.org>
-To: davem@davemloft.net
-Cc: netdev@vger.kernel.org,
-	edumazet@google.com,
-	pabeni@redhat.com,
-	johannes@sipsolutions.net,
-	pablo@netfilter.org,
-	Jakub Kicinski <kuba@kernel.org>
-Subject: [PATCH net 2/2] selftests: net: add a test for closing a netlink socket ith dump in progress
-Date: Mon,  4 Nov 2024 17:03:47 -0800
-Message-ID: <20241105010347.2079981-2-kuba@kernel.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241105010347.2079981-1-kuba@kernel.org>
-References: <20241105010347.2079981-1-kuba@kernel.org>
+	s=arc-20240116; t=1730769175; c=relaxed/simple;
+	bh=m5C8XOivdf7KbGpUTDlvdSqBiY3dppczrSUlFvWubTQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bbggbFNgFSRJockn7pkfluB3TMFQAl4qMazUQcz5vBp2FzHARL6jE/QOOHPouDAlv86o7jyx+zoiELByM0Y4kwmfP7wxt9dlPP5OYb5p39Xw+Tc8o3ohDjZ/x/9xMlXQ1OZJCwque/2ybkJ5Kt419QusiCLWA1y3JW2lLuc658Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IUXlVV46; arc=none smtp.client-ip=209.85.210.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f170.google.com with SMTP id d2e1a72fcca58-720e94d36c8so1762434b3a.1;
+        Mon, 04 Nov 2024 17:12:54 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730769174; x=1731373974; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=m5C8XOivdf7KbGpUTDlvdSqBiY3dppczrSUlFvWubTQ=;
+        b=IUXlVV46MPiEigbGQORzeK63UHIk3vzQbQ+Kqa2EeN9plrj8KayGmGxTI608atCJ0z
+         YgJqL76bURDOIvLbmheq6S39XlPnDPTx5UQMXmsGVTSuVjuAq530WvadFknkJ2DLOHIW
+         AkcGuhJH+H3pfOy+DSez2vpO9kuy4inG0/VbMz2E3T83HTUkJ/pC71rGtBMI1T7ZreGv
+         5K3BAvVl3BGKLd6kXxsMH1j10ySlfx/Ph6DaHBGBoXTr1Za8lg31Gf170lJDzxZkNB01
+         A/c396AjS+qDo4EcvorcG6N/hVJcj04mz+3bRCEBoYHiRyQx1OSs8UiBJFQnwKsR9jHY
+         Zhlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730769174; x=1731373974;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m5C8XOivdf7KbGpUTDlvdSqBiY3dppczrSUlFvWubTQ=;
+        b=eR2UbsmRuh+6s08rmVvuWBIonvTV6reBFSppE13A0Qhv64I+nU6igNk4GoPwQS1PXU
+         j0K9aHy7zZKNV+gMf0z+2uTOAMj98PxnJWBOFm3s7FMNII+fx7Xih6rquxXxXN1RcULJ
+         AspuaW6CrnOqthskwaTRrz0rTWCmcl92XLEChdreWYS8qCWwb3SS6PMqSr+KwJt/xqRH
+         LDP8dpJPVC6XSG8pRqmz6ayCnKg3gSDkTkJ098F/KwF54KY1XkEHEaNsJWGHlvLpFuD+
+         BnetUnkoEX5V/BOLXo5HeEgoCQm51KdNCOKWzAfcwsZDWpv/I8i6JmOuUqJsX3U+rUdt
+         L64Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUy/JZ0vIJlJpPtrumePpw0axITUb4qLufS57oM+FxtuVBRRGs8OzZfQtqDQ9P2r9LXaKIQLDB+y9qV@vger.kernel.org, AJvYcCUzANayArnaAM0ejf5ur2wWFnLbIRitfcQH9k5EZpc3Q05qrXIQRuWXzjrNLo9szoRQPEozEAjU@vger.kernel.org, AJvYcCXOXooVq+A8YMmJfaIJ6XNorAfFeEh+oWVIzpJmYWhOcB8w65sSGr6N9Aka/BmuZA7GRSKb05nJiOTJREU5@vger.kernel.org, AJvYcCXykA/xgebXRIjx1DQrafgoKpIegPHCJy5/zMm97aRnJ4dVtTd1Oc04O20q6rcHIOmPvQ8=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyzMgFDm+qJLSBBPgXpZ/3TlkxdMH1au9XfBKuS0qRty0OE6fu8
+	VEQF8QYGUfJIgN13O2wQKm0Ed5bkxgASH/n3qfUsKyNHVHBJj1Ey
+X-Google-Smtp-Source: AGHT+IEjh8MBZRrCtXT5QVUJeeVGt2RL2XWhfBmqTN42Vg7BAdnssjEEu05r9UptXLrxeXGqMM64oA==
+X-Received: by 2002:a05:6a21:6da6:b0:1d9:3747:fb51 with SMTP id adf61e73a8af0-1dba4139846mr22781203637.8.1730769173434;
+        Mon, 04 Nov 2024 17:12:53 -0800 (PST)
+Received: from archie.me ([103.124.138.155])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee455a4fe4sm7570146a12.51.2024.11.04.17.12.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 17:12:52 -0800 (PST)
+Received: by archie.me (Postfix, from userid 1000)
+	id 74DB1420B6E5; Tue, 05 Nov 2024 08:12:49 +0700 (WIB)
+Date: Tue, 5 Nov 2024 08:12:49 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, netdev@vger.kernel.org
+Cc: corbet@lwn.net, hdanton@sina.com, pabeni@redhat.com,
+	namangulati@google.com, edumazet@google.com,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
+	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	kuba@kernel.org, Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Linux Documentation <linux-doc@vger.kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux BPF <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v6 7/7] docs: networking: Describe irq suspension
+Message-ID: <ZylxEZFuWZqWAI3q@archie.me>
+References: <20241104215542.215919-1-jdamato@fastly.com>
+ <20241104215542.215919-8-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="DH6iE1DkWfTAyKne"
+Content-Disposition: inline
+In-Reply-To: <20241104215542.215919-8-jdamato@fastly.com>
 
-Close a socket with dump in progress. We need a dump which generates
-enough info not to fit into a single skb. Policy dump fits the bill.
 
-Use the trick discovered by syzbot for keeping a ref on the socket
-longer than just close, with mqueue.
+--DH6iE1DkWfTAyKne
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-  TAP version 13
-  1..3
-  # Starting 3 tests from 1 test cases.
-  #  RUN           global.test_sanity ...
-  #            OK  global.test_sanity
-  ok 1 global.test_sanity
-  #  RUN           global.close_in_progress ...
-  #            OK  global.close_in_progress
-  ok 2 global.close_in_progress
-  #  RUN           global.close_with_ref ...
-  #            OK  global.close_with_ref
-  ok 3 global.close_with_ref
-  # PASSED: 3 / 3 tests passed.
-  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
+On Mon, Nov 04, 2024 at 09:55:31PM +0000, Joe Damato wrote:
+> Describe irq suspension, the epoll ioctls, and the tradeoffs of using
+> different gro_flush_timeout values.
+>=20
 
-Note that this test is not expected to fail but rather crash
-the kernel if we get the cleanup wrong.
+The docs LGTM, thanks!
 
-Signed-off-by: Jakub Kicinski <kuba@kernel.org>
----
- tools/testing/selftests/net/Makefile        |   1 +
- tools/testing/selftests/net/netlink-dumps.c | 110 ++++++++++++++++++++
- 2 files changed, 111 insertions(+)
- create mode 100644 tools/testing/selftests/net/netlink-dumps.c
+Reviewed-by: Bagas Sanjaya <bagasdotme@gmail.com>
 
-diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
-index 649f1fe0dc46..816447323b39 100644
---- a/tools/testing/selftests/net/Makefile
-+++ b/tools/testing/selftests/net/Makefile
-@@ -34,6 +34,7 @@ TEST_PROGS += gre_gso.sh
- TEST_PROGS += cmsg_so_mark.sh
- TEST_PROGS += cmsg_time.sh cmsg_ipv6.sh
- TEST_PROGS += netns-name.sh
-+TEST_PROGS += netlink-dumps
- TEST_PROGS += nl_netdev.py
- TEST_PROGS += srv6_end_dt46_l3vpn_test.sh
- TEST_PROGS += srv6_end_dt4_l3vpn_test.sh
-diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
-new file mode 100644
-index 000000000000..7ee6dcd334df
---- /dev/null
-+++ b/tools/testing/selftests/net/netlink-dumps.c
-@@ -0,0 +1,110 @@
-+// SPDX-License-Identifier: GPL-2.0
-+
-+#define _GNU_SOURCE
-+
-+#include <fcntl.h>
-+#include <stdio.h>
-+#include <string.h>
-+#include <sys/socket.h>
-+#include <sys/stat.h>
-+#include <sys/syscall.h>
-+#include <sys/types.h>
-+#include <unistd.h>
-+
-+#include <linux/genetlink.h>
-+#include <linux/netlink.h>
-+#include <linux/mqueue.h>
-+
-+#include "../kselftest_harness.h"
-+
-+static const struct {
-+	struct nlmsghdr nlhdr;
-+	struct genlmsghdr genlhdr;
-+	struct nlattr ahdr;
-+	__u16 val;
-+	__u16 pad;
-+} dump_policies = {
-+	.nlhdr = {
-+		.nlmsg_len	= sizeof(dump_policies),
-+		.nlmsg_type	= GENL_ID_CTRL,
-+		.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP,
-+		.nlmsg_seq	= 1,
-+	},
-+	.genlhdr = {
-+		.cmd		= CTRL_CMD_GETPOLICY,
-+		.version	= 2,
-+	},
-+	.ahdr = {
-+		.nla_len	= 6,
-+		.nla_type	= CTRL_ATTR_FAMILY_ID,
-+	},
-+	.val = GENL_ID_CTRL,
-+	.pad = 0,
-+};
-+
-+// Sanity check for the test itself, make sure the dump doesn't fit in one msg
-+TEST(test_sanity)
-+{
-+	int netlink_sock;
-+	char buf[8192];
-+	ssize_t n;
-+
-+	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-+	ASSERT_GE(netlink_sock, 0);
-+
-+	n = send(netlink_sock, &dump_policies, sizeof(dump_policies), 0);
-+	ASSERT_EQ(n, sizeof(dump_policies));
-+
-+	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
-+	ASSERT_GE(n, sizeof(struct nlmsghdr));
-+
-+	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
-+	ASSERT_GE(n, sizeof(struct nlmsghdr));
-+
-+	close(netlink_sock);
-+}
-+
-+TEST(close_in_progress)
-+{
-+	int netlink_sock;
-+	ssize_t n;
-+
-+	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-+	ASSERT_GE(netlink_sock, 0);
-+
-+	n = send(netlink_sock, &dump_policies, sizeof(dump_policies), 0);
-+	ASSERT_EQ(n, sizeof(dump_policies));
-+
-+	close(netlink_sock);
-+}
-+
-+TEST(close_with_ref)
-+{
-+	char cookie[NOTIFY_COOKIE_LEN] = {};
-+	int netlink_sock, mq_fd;
-+	struct sigevent sigev;
-+	ssize_t n;
-+
-+	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
-+	ASSERT_GE(netlink_sock, 0);
-+
-+	n = send(netlink_sock, &dump_policies, sizeof(dump_policies), 0);
-+	ASSERT_EQ(n, sizeof(dump_policies));
-+
-+	mq_fd = syscall(__NR_mq_open, "sed", O_CREAT | O_WRONLY, 0600, 0);
-+	ASSERT_GE(mq_fd, 0);
-+
-+	memset(&sigev, 0, sizeof(sigev));
-+	sigev.sigev_notify		= SIGEV_THREAD;
-+	sigev.sigev_value.sival_ptr	= cookie;
-+	sigev.sigev_signo		= netlink_sock;
-+
-+	syscall(__NR_mq_notify, mq_fd, &sigev);
-+
-+	close(netlink_sock);
-+
-+	// give mqueue time to fire
-+	usleep(100 * 1000);
-+}
-+
-+TEST_HARNESS_MAIN
--- 
-2.47.0
+--=20
+An old man doll... just what I always wanted! - Clara
 
+--DH6iE1DkWfTAyKne
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZylxDAAKCRD2uYlJVVFO
+o19AAQDfxStsVa7EAB7D+0HqQTxFuydhPib6RgS6vTp84x6xIwD/ftvmgbmVvmrk
+ZAEbGZ6PedNe74tpHE18Y0UZt2cNAgg=
+=7PrK
+-----END PGP SIGNATURE-----
+
+--DH6iE1DkWfTAyKne--
 
