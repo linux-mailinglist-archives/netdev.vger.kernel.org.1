@@ -1,167 +1,157 @@
-Return-Path: <netdev+bounces-141726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D24A9BC1D7
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:11:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1112F9BC1D9
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:11:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2F0031F2109E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:11:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD64281817
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:11:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35410163;
-	Tue,  5 Nov 2024 00:11:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE381A2D;
+	Tue,  5 Nov 2024 00:11:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="mKBN0TWU"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="V9DycDZc"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5A8046BF
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 00:11:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBCE801
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 00:11:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730765464; cv=none; b=ZhHfs9nES5usRT6G77w66mZfkOkCnE00IdDg8ZSE/qeWF1VaYPjYpQk/JhSrVG5AxYF5o3K851jvri1ff9ZsPbVS9zBEQL5UFzpjdrNelfcEj3j0MAGodGwp4QEutqJICZlfkx7g+/ZE3crNW/dZMeO7WAIWWWOsNiBzxiOcdv0=
+	t=1730765496; cv=none; b=YDR32oWUaI+QA99OP5om/ujRhzzTNtnBFKnvHy6m//DptkrCLs5Cw5yV0qzLyz7rn9SeSpwF8OZsmDg0TSh5GvXVnvKUFV6gAljU7dH5SQvUIuFVj/12108D3rbblYEqm6W4QGJT6/E0Atcnagm+G2M2+VYMptVB+NYlZO9j/d4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730765464; c=relaxed/simple;
-	bh=sWX6GWp+IeVd44w9oe6oS+dKPk9x5BRc6TfDXNXr6dg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qjfMUSVh3YUU2gNmqcwqvDjLTVnuXdp/3hkBIjxFIcIcFYC/jUsQYt3T/tcNByRGlutIW6jmm6j8zOjTPyK3ipe3IOqrfWJiKaCVUqa9fTBwbEgM1aQNBaFydVIgX1I4cthhA4sNWzrE30aHDz60p3VPwdi18g7MMyY8Ve478k0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=mKBN0TWU; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <cf62c79d-cba5-49dc-9099-fc86d54ee864@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1730765459;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=SLUHNASoXi1cubQwEnJ83CylYrNF3onOml8Be0docOM=;
-	b=mKBN0TWUbstpVq25m+JWAKgIyUhoc9CyH85G33VVtaGDuxpVSlpLRNGGvR4Ym/Kk/xRhfK
-	0JkfydW/VeqVhePdFLSusVf3k0tyyva6BwxQDm+8kPxMrN3IgRZAd7CZdpDB7KFwX9f2kd
-	2LYVWWkqCXerV1KKJqrp8/732tHLRA4=
-Date: Mon, 4 Nov 2024 16:10:52 -0800
+	s=arc-20240116; t=1730765496; c=relaxed/simple;
+	bh=gWgRcXOWyPuYyTeu+HI4eru08VqwWwTDaEH/C3Ai8TY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=V2F+DUv5rX6X2dGx+9sFh6W+lCPO4Ep1IY+1AFs0Y2/beMePzCgWG9OAjUsH8LF/+vG1n08z7mLews8MWvSlnddS90AUSCgJJJRXtmyNV4tM394ZrbL5laQQATiL7N54Wn0EW0oslgmu5CLxZCkLfcCcHwWuoJzPk13Zi+xHVnA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=V9DycDZc; arc=none smtp.client-ip=209.85.210.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-720d14c8dbfso3732748b3a.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 16:11:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1730765494; x=1731370294; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ZzBGIIzGVWypDF2F/j8kxcVTvvbYnIIP9aDVrmVHUqo=;
+        b=V9DycDZcrQMIiQgw99c8ifLm4wYIdgDN2GLr0l3lnmzTBH6iUmfpRqswwvXCjy90Xq
+         Tn1dxlJ/63MYXkzJblf9BC8YJ7S3o7i2WhtYvhcWGYn29i0jdSUCM9x0cDRnAN8DQVZg
+         ZyP1sxi/7nLU/PhHNKBhGe2Sn9Yvdh43kxais=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730765494; x=1731370294;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZzBGIIzGVWypDF2F/j8kxcVTvvbYnIIP9aDVrmVHUqo=;
+        b=jwwKgL5wCmwe5zJQ7xsftRvtnkXKV9ccRCdvjvaiX7P/YcQqFrS+pLwlGhvqVlytrB
+         l/r0HCcKLM3J39zTVMlEH5lbWPXkaxSFcU0cBp9WM1wVZfD8rCTY/ucRnNJW3R2QtzeB
+         aYC1K/UdbHVBGSOv/B7dF8z7i1coXW8xtGhE3FGhLi3ThMZfMNa8Q6bdnr8ZtluKZ/Os
+         /C/+TEAdmgx8T6hN65ORw6jG7QSzb+JSodeJvLdqQHn1cDB4yRcU+IbU1FRZOdC9QauT
+         H0aPp20iu0o/5TJyNJT+pWrd4WlP/1l8uLcbBRKlxszxWq4IsDYvC/cKQnSe72ZwcRyK
+         bi+A==
+X-Gm-Message-State: AOJu0Yw+iU78ILfeDanrkotQ6KX+akaK1g99gKNtV3SJWvumwrh4moWt
+	0SitzKqA1EmnsBng4ahmSI5FO7CYKX3IqcXaNMYA7MitQMhSuLVXz5iLYVj90dKy88kB984F1iu
+	X
+X-Google-Smtp-Source: AGHT+IE6+0r70GgR/JYYtrp8S6WEpFk6AKBf4ysxpcdZyo74q6Lq8+iIND0dfroDCYdzA0K/G5OkBQ==
+X-Received: by 2002:a05:6a20:d498:b0:1d9:1823:83bf with SMTP id adf61e73a8af0-1db91d516d0mr24240567637.8.1730765494528;
+        Mon, 04 Nov 2024 16:11:34 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1eac2fsm8150260b3a.72.2024.11.04.16.11.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 16:11:34 -0800 (PST)
+Date: Mon, 4 Nov 2024 16:11:31 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v7 10/12] selftests: ncdevmem: Run selftest when
+ none of the -s or -c has been provided
+Message-ID: <ZyliszeFtcZqfsnm@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+References: <20241104181430.228682-1-sdf@fomichev.me>
+ <20241104181430.228682-11-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH bpf-next v2] bpf: Add kernel symbol for struct_ops
- trampoline
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
- Eduard Zingerman <eddyz87@gmail.com>, Yonghong Song
- <yonghong.song@linux.dev>, Kui-Feng Lee <thinker.li@gmail.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-References: <20241101111948.1570547-1-xukuohai@huaweicloud.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Martin KaFai Lau <martin.lau@linux.dev>
-Content-Language: en-US
-In-Reply-To: <20241101111948.1570547-1-xukuohai@huaweicloud.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104181430.228682-11-sdf@fomichev.me>
 
-On 11/1/24 4:19 AM, Xu Kuohai wrote:
->   static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   					   void *value, u64 flags)
->   {
-> @@ -601,6 +633,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   	int prog_fd, err;
->   	u32 i, trampoline_start, image_off = 0;
->   	void *cur_image = NULL, *image = NULL;
-> +	struct bpf_ksym *ksym;
->   
->   	if (flags)
->   		return -EINVAL;
-> @@ -640,6 +673,7 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   	kdata = &kvalue->data;
->   
->   	module_type = btf_type_by_id(btf_vmlinux, st_ops_ids[IDX_MODULE_ID]);
-> +	ksym = st_map->ksyms;
->   	for_each_member(i, t, member) {
->   		const struct btf_type *mtype, *ptype;
->   		struct bpf_prog *prog;
-> @@ -735,6 +769,11 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   
->   		/* put prog_id to udata */
->   		*(unsigned long *)(udata + moff) = prog->aux->id;
+On Mon, Nov 04, 2024 at 10:14:28AM -0800, Stanislav Fomichev wrote:
+> This will be used as a 'probe' mode in the selftest to check whether
+> the device supports the devmem or not. Use hard-coded queue layout
+> (two last queues) and prevent user from passing custom -q and/or -t.
+> 
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  tools/testing/selftests/net/ncdevmem.c | 42 ++++++++++++++++++++------
+>  1 file changed, 32 insertions(+), 10 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
+> index 044198ce02a7..270a77206f65 100644
+> --- a/tools/testing/selftests/net/ncdevmem.c
+> +++ b/tools/testing/selftests/net/ncdevmem.c
+> @@ -76,7 +76,7 @@ static char *client_ip;
+>  static char *port;
+>  static size_t do_validation;
+>  static int start_queue = -1;
+> -static int num_queues = 1;
+> +static int num_queues = -1;
+>  static char *ifname;
+>  static unsigned int ifindex;
+>  static unsigned int dmabuf_id;
+> @@ -731,19 +731,31 @@ int main(int argc, char *argv[])
+>  		}
+>  	}
+>  
+> -	if (!server_ip)
+> -		error(1, 0, "Missing -s argument\n");
+> -
+> -	if (!port)
+> -		error(1, 0, "Missing -p argument\n");
+> -
+>  	if (!ifname)
+>  		error(1, 0, "Missing -f argument\n");
+>  
+>  	ifindex = if_nametoindex(ifname);
+>  
+> -	if (start_queue < 0) {
+> -		start_queue = rxq_num(ifindex) - 1;
+> +	if (!server_ip && !client_ip) {
+> +		if (start_queue < 0 && num_queues < 0) {
+> +			num_queues = rxq_num(ifindex);
+> +			if (num_queues < 0)
+> +				error(1, 0, "couldn't detect number of queues\n");
+> +			/* make sure can bind to multiple queues */
+> +			start_queue = num_queues / 2;
+> +			num_queues /= 2;
+
+Sorry for the beginner question :) -- is it possible that rxq_num
+ever returns 1 and thus start_queue = 0, num_queues = 0
+
+> +		}
 > +
-> +		/* init ksym for this trampoline */
-> +		bpf_struct_ops_ksym_init(prog, image + trampoline_start,
-> +					 image_off - trampoline_start,
-> +					 ksym++);
->   	}
->   
->   	if (st_ops->validate) {
-> @@ -790,6 +829,8 @@ static long bpf_struct_ops_map_update_elem(struct bpf_map *map, void *key,
->   unlock:
->   	kfree(tlinks);
->   	mutex_unlock(&st_map->lock);
-> +	if (!err)
-> +		bpf_struct_ops_map_ksyms_add(st_map);
->   	return err;
->   }
->   
+> +		if (start_queue < 0 || num_queues < 0)
+> +			error(1, 0, "Both -t and -q are required\n");
 
->   static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
->   {
->   	const struct bpf_struct_ops_desc *st_ops_desc;
-> @@ -905,6 +963,8 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
->   	struct bpf_map *map;
->   	struct btf *btf;
->   	int ret;
-> +	size_t ksyms_offset;
-> +	u32 ksyms_cnt;
->   
->   	if (attr->map_flags & BPF_F_VTYPE_BTF_OBJ_FD) {
->   		/* The map holds btf for its whole life time. */
-> @@ -951,6 +1011,11 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
->   		 */
->   		(vt->size - sizeof(struct bpf_struct_ops_value));
->   
-> +	st_map_size = round_up(st_map_size, sizeof(struct bpf_ksym));
-> +	ksyms_offset = st_map_size;
-> +	ksyms_cnt = count_func_ptrs(btf, t);
-> +	st_map_size += ksyms_cnt * sizeof(struct bpf_ksym);
-> +
->   	st_map = bpf_map_area_alloc(st_map_size, NUMA_NO_NODE);
->   	if (!st_map) {
->   		ret = -ENOMEM;
-> @@ -958,6 +1023,8 @@ static struct bpf_map *bpf_struct_ops_map_alloc(union bpf_attr *attr)
->   	}
->   
->   	st_map->st_ops_desc = st_ops_desc;
-> +	st_map->ksyms = (void *)st_map + ksyms_offset;
-
-nit. The st_map->ksyms is very similar to the existing st_map->links. Can we do 
-the allocation similar to the st_map->links and use another bpf_map_area_alloc() 
-instead of doing the round_up() and then figuring out the ksyms_offset.
-
-> +	st_map->ksyms_cnt = ksyms_cnt;
-
-The same goes for ksyms_cnt. ksyms_cnt is almost the same as the 
-st_map->links_cnt. st_map->links_cnt unnecessarily includes the non func ptr 
-(i.e. a waste). The st_map->links[i] must be NULL if the i-th member of a struct 
-is not a func ptr.
-
-If this patch adds the count_func_ptrs(), I think at least just have one 
-variable to mean funcs_cnt instead of adding another new ksyms_cnt. Both the 
-existing st_map->links and the new st_map->ksyms can use the same funcs_cnt. An 
-adjustment is needed for link in update_elem (probably use link++ similar to 
-your ksym++ idea). bpf_struct_ops_map_put_progs() should work as is.
-
-Also, the actual bpf_link is currently allocated during update_elem() only when 
-there is a bpf prog for an ops. The new st_map->ksyms pre-allocated everything 
-during map_alloc() regardless if there will be a bpf prog (e.g. 
-tcp_congestion_ops has 5 optional ops). I don't have a strong opinion on 
-pre-allocate everything in map_alloc() or allocate on-demand in update_elem(). 
-However, considering bpf_ksym has a "char name[KSYM_NAME_LEN]", the on-demand 
-allocation on bpf_link becomes not very useful. If the next respin stays with 
-the pre-allocate everything way, it is useful to followup later to stay with one 
-way and do the same for bpf_link.
+And then isn't caught here because this only checks < 0 (instead of
+num_queues <= 0) ?
 
