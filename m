@@ -1,183 +1,432 @@
-Return-Path: <netdev+bounces-141790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A68D9BC3EE
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:34:37 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id E56259BC3FB
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:42:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 035C8280C48
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:34:36 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 38F38B216DA
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:42:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8387B183CDD;
-	Tue,  5 Nov 2024 03:34:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 513F81885B4;
+	Tue,  5 Nov 2024 03:42:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="QUumOkA1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="ivj2xDDK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECA23D9E;
-	Tue,  5 Nov 2024 03:34:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D0F1885AA
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 03:42:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730777673; cv=none; b=KBgcntkSw6DFRVyd24f3q4Jm6JasRjEseeMdjXHL/m15Zab7TsJVhHdrDg+StvapuTRQlcQrdwd6sP6RU+BXWvggljuYUgdKcJbtKW1nkKXaFy+CopA1oEGpIvsfigIZcXhwgnUbfJROQ7wkuCtzhWdEIfwLozZsUv8IZYr2TUE=
+	t=1730778150; cv=none; b=aBybZzTa/aR9Z1CtrvdmmaHC6malJxlIotsT1sDJNhRFwrCVUftv5Ygs19pTMu32WByuMyUTowApsvGXExXc5+09I4+zHJvQjHIMBUV/+mvKwuyCMVCe3OEY5gDLEQ7yikLXRWKl6V8dGM5j7Q7vrHzwmWaMQF4p4758H5Pb8IU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730777673; c=relaxed/simple;
-	bh=/zkq0tofzKwv60XMTrmCP+LAJXE7HfavU3QZkSxWQPY=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=PzcBivT5/GqDkJrMf5i9cxO6VvPySS8FyPiANdZ98v2q921kivrjHHiP6v8S+hLtcPhm/3y/vFas79D2LrEiw/JdRMIW6HW1VX23wLFkvn5JPE/Ip1xHEn4FErJ/BTtb8ZgcaATebdzoQynt7Q+y4uIDXn8UsRia5QRIQUbdS0I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=QUumOkA1; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ed9c16f687so3511169a12.0;
-        Mon, 04 Nov 2024 19:34:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730777671; x=1731382471; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=X6AIe/dTqMIYfTgiz4qxI4zvtCNJoQcTeXciVnJdiHI=;
-        b=QUumOkA1kJleauelbVXK9FTKBhEfLIoq3VHuB1LSQ5hp1Kl3kpwMphtnrftgjpBG/d
-         gFI89vUwv60UM6NY3lckfCB/FjUaXArit51aYv4gAA+bnbZ+gGnGmu1DgJDHiw6HqWNI
-         iB2Mt7XIU+vF3F96AXynuS8vK2+fpvwRsX35I/LqSrThWjsRhYISqsu55L6+rcMcb1LU
-         oGK/jbrj5z8Mlz9M2W0wfwpt1yKTYg06wU/baDs70rJPbqmSehRkAFBjInJcmgzoNFfp
-         Lb7C7ndJgwGN365IRHUUpM6h+YM0kMwh6/HgcnZJyMUKyJiG5v6fsA2wtnnQUFthqHzi
-         sRwA==
+	s=arc-20240116; t=1730778150; c=relaxed/simple;
+	bh=ygegP4/EZoqtocpMOZdBPIHwz+SNXnXFjP+cUm9YUVc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=iLr4NepwdDyAuBYSr/CS2LsxLYZdSqY+KPeZTTyDswMMhlG4Vw9jnxyQTwBeWA7LLKQCW/eM6h0JhGbRaAOzXEnFJN+LY4tCB56fnXtmguNyN6gQ/tHUOaQYwhAvVHEovHftJD/8WZNaTB1U7EFJ91J/0lwNBUh8G03ZLBjWVi8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=ivj2xDDK; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730778146;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pyxHlyIyRzdEB3EvTChHeDLyL5KwnAWLFwDJsqk/g3Q=;
+	b=ivj2xDDK/Gk/CTaExPQDfSsWBnBQdEMX7IqvjDSELa7VbauJY7+Tm8aQehdezpizWHR/wC
+	HJw1r8dLiVYTEqS0Qa7HvIld0ch53mSeMAeekNZuu4N881sz3/xU0I9DqSwl0J4R7+r4NM
+	yR2FNpeIQi/qS0cKiTg80AQ/lA0ZMbk=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-549-0l9gWCL9MOWeHLmB2xnMUA-1; Mon, 04 Nov 2024 22:42:22 -0500
+X-MC-Unique: 0l9gWCL9MOWeHLmB2xnMUA-1
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e3ce03a701so4816430a91.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 19:42:22 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730777671; x=1731382471;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=X6AIe/dTqMIYfTgiz4qxI4zvtCNJoQcTeXciVnJdiHI=;
-        b=c7lI6r/49wX/y4gttF5t1j5Js6nIG2D0XKH1lDUsO2Q2c4LK0h152ZJZSyHxN8aVJQ
-         kwzkmJTYrGA8t8S2lk2OaMdh17qZPOzAdlmYqIGnqT6rOY7DT1DBtmN3Hata4I/bT9LH
-         kgeZ235wA1Uy2EbYfy6VmQMmG6iGhbPTzWQ5GNHp4bZrQ4SHILkm4NAICKyyO2QZ7MEs
-         wGmDJf1REAkp/7zKrCmXrgOacZLMQAT3j6cW/aYip5kpjbMam6unSjmAay0goP46O3ij
-         9hSASE6YOLHzafE5Vr6ACSRVsSg4Yi8mkXPQjPDMHz7JWi3sXxWQ20wezz8uVKpfnRCF
-         usUA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJCZ6ddtuJE7kRaerbT+f9td7iiBSKmcW2MvRlsstvEU6z1SfrC8StXDN1fHktHgCytgy/AWu/@vger.kernel.org, AJvYcCViWidbrEXJJlj6mEaVeYO/i7o6Vx38ZugRkdWcPfOhYHYAhm849JOaqfYWcz6hRYyyFk7l6bjJEZqseyCjSuC3@vger.kernel.org, AJvYcCXT9AIFYRipZkfDc86Rf2ZsiFKPD3hHhUsjTc2OeRc81yfdLcxf5zBUoud/mL7lhZAS6RaQTvmsjgv5JEc=@vger.kernel.org
-X-Gm-Message-State: AOJu0YywTQnsa5Yo7dr24PW+nA6vAlLbdjARVAQ5WzIEansx7c8osdB0
-	ROb6dBhvUs1ZhUZ57QMYhj9qdSN3GP7P2KLZ5b806AyaqNMlmNs=
-X-Google-Smtp-Source: AGHT+IG99VSv7YooZkG+TpE0SxkBFCnr8DMr16i90UPeDqyOBVlUtW5FCSgaEccRwWlwfwR68xj+yQ==
-X-Received: by 2002:a17:90b:2243:b0:2e2:c421:894b with SMTP id 98e67ed59e1d1-2e93c14fd5dmr23051033a91.14.1730777671021;
-        Mon, 04 Nov 2024 19:34:31 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057bffffsm68835685ad.188.2024.11.04.19.34.30
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 19:34:30 -0800 (PST)
-Date: Mon, 4 Nov 2024 19:34:30 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Joe Damato <jdamato@fastly.com>, Stanislav Fomichev <sdf@fomichev.me>,
-	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
-	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
-	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
-	willemb@google.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v7 12/12] selftests: ncdevmem: Add automated test
-Message-ID: <ZymSRij76y6bvRi9@mini-arch>
-References: <20241104181430.228682-1-sdf@fomichev.me>
- <20241104181430.228682-13-sdf@fomichev.me>
- <ZyljjgxP94IBWnI6@LQ3V64L9R2>
+        d=1e100.net; s=20230601; t=1730778142; x=1731382942;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pyxHlyIyRzdEB3EvTChHeDLyL5KwnAWLFwDJsqk/g3Q=;
+        b=wzdzPOYEswfj0jV7K/tJJkpfRjv51GmANI4PX8/syH6a/O1VYN0Y01963J8z/QVODu
+         Do/hE/QqP1jJkhKii4e4m/tS7vAJyTbRr4KhcnKOa6GULHHgGLz2Y9gQTMq736xCXnyB
+         sj5oBI3m2Iw8TZNRO80w6fUKmwOmGjIR67DbytbxXvBMAnTucUF5fAPUXAWnsTpRTh7H
+         TEVNqFFpW3H8zcV1yjM3x5sNimNJsbM5+GFNDCRH2oxSdO2U1Ff2FtITR7zkRjI7gUgw
+         wMeZYJUJEVp7izydXJv92Nfhw9FMKgWZgI9zdxG/yv00xH7qxRZW3Weg0WKFjjYm8ATe
+         utZQ==
+X-Gm-Message-State: AOJu0YziNrlgewQEjTSt2vaT6eEo0w/g44Vaktd4mK1pqQ/9img6I/YM
+	OdutjBBnPdOKUwOiLzqDX7sxkU39Gx6fOlJTg2XWEH3d02mN+NCgbP8W4KV428/dVRcSnoemPzc
+	Iu2n2LAmFdQ5VFDweRfric73oAo3lvP4mHO7Ue4K6IVBH3AGCiErpR6DeS6x13SpVz+lAsTRAX/
+	RKZ7b2/cAzNWM0P7k7BJNWb6tgCTKp
+X-Received: by 2002:a17:90b:1a90:b0:2e2:f044:caaa with SMTP id 98e67ed59e1d1-2e94c52a9c3mr22236462a91.37.1730778141668;
+        Mon, 04 Nov 2024 19:42:21 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHEKKE4AkzhqLs89skeBOJ9+eTo4h/Ix2m898YS3Im1U5+6nobYHvuGr4+eAwz1uNaLTMgkDLamsWwIszH96eY=
+X-Received: by 2002:a17:90b:1a90:b0:2e2:f044:caaa with SMTP id
+ 98e67ed59e1d1-2e94c52a9c3mr22236414a91.37.1730778141095; Mon, 04 Nov 2024
+ 19:42:21 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZyljjgxP94IBWnI6@LQ3V64L9R2>
+References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com> <20241030082453.97310-3-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20241030082453.97310-3-xuanzhuo@linux.alibaba.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 5 Nov 2024 11:42:09 +0800
+Message-ID: <CACGkMEtP7tdxxLOtDArNCqO5b=A=a7X2NimK8be2aWuaKG6Xfw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 02/13] virtio_ring: split: record extras for
+ indirect buffers
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/04, Joe Damato wrote:
-> On Mon, Nov 04, 2024 at 10:14:30AM -0800, Stanislav Fomichev wrote:
-> > Only RX side for now and small message to test the setup.
-> > In the future, we can extend it to TX side and to testing
-> > both sides with a couple of megs of data.
-> > 
-> >   make \
-> >   	-C tools/testing/selftests \
-> >   	TARGETS="drivers/hw/net" \
-> >   	install INSTALL_PATH=~/tmp/ksft
-> > 
-> >   scp ~/tmp/ksft ${HOST}:
-> >   scp ~/tmp/ksft ${PEER}:
-> > 
-> >   cfg+="NETIF=${DEV}\n"
-> >   cfg+="LOCAL_V6=${HOST_IP}\n"
-> >   cfg+="REMOTE_V6=${PEER_IP}\n"
-> >   cfg+="REMOTE_TYPE=ssh\n"
-> >   cfg+="REMOTE_ARGS=root@${PEER}\n"
-> > 
-> >   echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
-> >   ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
-> > 
-> > Reviewed-by: Mina Almasry <almasrymina@google.com>
-> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
-> > ---
-> >  .../testing/selftests/drivers/net/hw/Makefile |  1 +
-> >  .../selftests/drivers/net/hw/devmem.py        | 45 +++++++++++++++++++
-> >  2 files changed, 46 insertions(+)
-> >  create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
-> > 
-> > diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
-> > index 182348f4bd40..1c6a77480923 100644
-> > --- a/tools/testing/selftests/drivers/net/hw/Makefile
-> > +++ b/tools/testing/selftests/drivers/net/hw/Makefile
-> > @@ -3,6 +3,7 @@
-> >  TEST_PROGS = \
-> >  	csum.py \
-> >  	devlink_port_split.py \
-> > +	devmem.py \
-> >  	ethtool.sh \
-> >  	ethtool_extended_state.sh \
-> >  	ethtool_mm.sh \
-> > diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
-> > new file mode 100755
-> > index 000000000000..1416c31ff81e
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
-> > @@ -0,0 +1,45 @@
-> > +#!/usr/bin/env python3
-> > +# SPDX-License-Identifier: GPL-2.0
-> > +
-> > +from lib.py import ksft_run, ksft_exit
-> > +from lib.py import ksft_eq, KsftSkipEx
-> > +from lib.py import NetDrvEpEnv
-> > +from lib.py import bkg, cmd, rand_port, wait_port_listen
-> > +from lib.py import ksft_disruptive
-> > +
-> > +
-> > +def require_devmem(cfg):
-> > +    if not hasattr(cfg, "_devmem_probed"):
-> > +        port = rand_port()
-> > +        probe_command = f"./ncdevmem -f {cfg.ifname}"
-> > +        cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
-> > +        cfg._devmem_probed = True
-> > +
-> > +    if not cfg._devmem_supported:
-> > +        raise KsftSkipEx("Test requires devmem support")
-> > +
-> > +
-> > +@ksft_disruptive
-> > +def check_rx(cfg) -> None:
-> > +    cfg.require_v6()
-> > +    require_devmem(cfg)
-> > +
-> > +    port = rand_port()
-> > +    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
-> > +
-> > +    with bkg(listen_cmd) as nc:
-> > +        wait_port_listen(port)
-> > +        cmd(f"echo -e \"hello\\nworld\"| nc {cfg.v6} {port}", host=cfg.remote, shell=True)
-> 
-> FWIW, in the v3 of the series I submit, Jakub asked me to replace nc
-> with socat due to issues with nc [1].
-> 
-> Your usage of nc seems pretty basic though, so maybe it's fine?
-> 
-> [1]: https://lore.kernel.org/netdev/20241101063426.2e1423a8@kernel.org/
+On Wed, Oct 30, 2024 at 4:25=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
+om> wrote:
+>
+> The subsequent commit needs to know whether every indirect buffer is
+> premapped or not. So we need to introduce an extra struct for every
+> indirect buffer to record this info.
+>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 112 ++++++++++++++++-------------------
+>  1 file changed, 52 insertions(+), 60 deletions(-)
 
-Since I'm doing a respin anyway will try to move to socat as well to keep it
-uniform, thanks!
+Do we have a performance impact for this patch?
+
+>
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index 97590c201aa2..dca093744fe1 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -69,7 +69,11 @@
+>
+>  struct vring_desc_state_split {
+>         void *data;                     /* Data for callback. */
+> -       struct vring_desc *indir_desc;  /* Indirect descriptor, if any. *=
+/
+> +
+> +       /* Indirect extra table and desc table, if any. These two will be
+> +        * allocated together. So we won't stress more to the memory allo=
+cator.
+> +        */
+> +       struct vring_desc *indir_desc;
+
+So it looks like we put a descriptor table after the extra table. Can
+this lead to more crossing page mappings for the indirect descriptors?
+
+If yes, it seems expensive so we probably need to make the descriptor
+table come first.
+
+>  };
+>
+>  struct vring_desc_state_packed {
+> @@ -440,38 +444,20 @@ static void virtqueue_init(struct vring_virtqueue *=
+vq, u32 num)
+>   * Split ring specific functions - *_split().
+>   */
+>
+> -static void vring_unmap_one_split_indirect(const struct vring_virtqueue =
+*vq,
+> -                                          const struct vring_desc *desc)
+> -{
+> -       u16 flags;
+> -
+> -       if (!vring_need_unmap_buffer(vq))
+> -               return;
+> -
+> -       flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
+> -
+> -       dma_unmap_page(vring_dma_dev(vq),
+> -                      virtio64_to_cpu(vq->vq.vdev, desc->addr),
+> -                      virtio32_to_cpu(vq->vq.vdev, desc->len),
+> -                      (flags & VRING_DESC_F_WRITE) ?
+> -                      DMA_FROM_DEVICE : DMA_TO_DEVICE);
+> -}
+> -
+>  static unsigned int vring_unmap_one_split(const struct vring_virtqueue *=
+vq,
+> -                                         unsigned int i)
+> +                                         struct vring_desc_extra *extra)
+>  {
+> -       struct vring_desc_extra *extra =3D vq->split.desc_extra;
+>         u16 flags;
+>
+> -       flags =3D extra[i].flags;
+> +       flags =3D extra->flags;
+>
+>         if (flags & VRING_DESC_F_INDIRECT) {
+>                 if (!vq->use_dma_api)
+>                         goto out;
+>
+>                 dma_unmap_single(vring_dma_dev(vq),
+> -                                extra[i].addr,
+> -                                extra[i].len,
+> +                                extra->addr,
+> +                                extra->len,
+>                                  (flags & VRING_DESC_F_WRITE) ?
+>                                  DMA_FROM_DEVICE : DMA_TO_DEVICE);
+>         } else {
+> @@ -479,22 +465,23 @@ static unsigned int vring_unmap_one_split(const str=
+uct vring_virtqueue *vq,
+>                         goto out;
+>
+>                 dma_unmap_page(vring_dma_dev(vq),
+> -                              extra[i].addr,
+> -                              extra[i].len,
+> +                              extra->addr,
+> +                              extra->len,
+>                                (flags & VRING_DESC_F_WRITE) ?
+>                                DMA_FROM_DEVICE : DMA_TO_DEVICE);
+>         }
+>
+>  out:
+> -       return extra[i].next;
+> +       return extra->next;
+>  }
+>
+>  static struct vring_desc *alloc_indirect_split(struct virtqueue *_vq,
+>                                                unsigned int total_sg,
+>                                                gfp_t gfp)
+>  {
+> +       struct vring_desc_extra *extra;
+>         struct vring_desc *desc;
+> -       unsigned int i;
+> +       unsigned int i, size;
+>
+>         /*
+>          * We require lowmem mappings for the descriptors because
+> @@ -503,40 +490,41 @@ static struct vring_desc *alloc_indirect_split(stru=
+ct virtqueue *_vq,
+>          */
+>         gfp &=3D ~__GFP_HIGHMEM;
+>
+> -       desc =3D kmalloc_array(total_sg, sizeof(struct vring_desc), gfp);
+> +       size =3D sizeof(*desc) * total_sg + sizeof(*extra) * total_sg;
+> +
+> +       desc =3D kmalloc(size, gfp);
+>         if (!desc)
+>                 return NULL;
+>
+> +       extra =3D (struct vring_desc_extra *)&desc[total_sg];
+> +
+>         for (i =3D 0; i < total_sg; i++)
+> -               desc[i].next =3D cpu_to_virtio16(_vq->vdev, i + 1);
+> +               extra[i].next =3D i + 1;
+> +
+>         return desc;
+>  }
+>
+>  static inline unsigned int virtqueue_add_desc_split(struct virtqueue *vq=
+,
+>                                                     struct vring_desc *de=
+sc,
+> +                                                   struct vring_desc_ext=
+ra *extra,
+>                                                     unsigned int i,
+>                                                     dma_addr_t addr,
+>                                                     unsigned int len,
+> -                                                   u16 flags,
+> -                                                   bool indirect)
+> +                                                   u16 flags)
+>  {
+> -       struct vring_virtqueue *vring =3D to_vvq(vq);
+> -       struct vring_desc_extra *extra =3D vring->split.desc_extra;
+>         u16 next;
+>
+>         desc[i].flags =3D cpu_to_virtio16(vq->vdev, flags);
+>         desc[i].addr =3D cpu_to_virtio64(vq->vdev, addr);
+>         desc[i].len =3D cpu_to_virtio32(vq->vdev, len);
+>
+> -       if (!indirect) {
+> -               next =3D extra[i].next;
+> -               desc[i].next =3D cpu_to_virtio16(vq->vdev, next);
+> +       extra[i].addr =3D addr;
+> +       extra[i].len =3D len;
+> +       extra[i].flags =3D flags;
+> +
+> +       next =3D extra[i].next;
+>
+> -               extra[i].addr =3D addr;
+> -               extra[i].len =3D len;
+> -               extra[i].flags =3D flags;
+> -       } else
+> -               next =3D virtio16_to_cpu(vq->vdev, desc[i].next);
+> +       desc[i].next =3D cpu_to_virtio16(vq->vdev, next);
+>
+>         return next;
+>  }
+> @@ -551,6 +539,7 @@ static inline int virtqueue_add_split(struct virtqueu=
+e *_vq,
+>                                       gfp_t gfp)
+>  {
+>         struct vring_virtqueue *vq =3D to_vvq(_vq);
+> +       struct vring_desc_extra *extra;
+>         struct scatterlist *sg;
+>         struct vring_desc *desc;
+>         unsigned int i, n, avail, descs_used, prev, err_idx;
+> @@ -586,9 +575,11 @@ static inline int virtqueue_add_split(struct virtque=
+ue *_vq,
+>                 /* Set up rest to use this indirect table. */
+>                 i =3D 0;
+>                 descs_used =3D 1;
+> +               extra =3D (struct vring_desc_extra *)&desc[total_sg];
+>         } else {
+>                 indirect =3D false;
+>                 desc =3D vq->split.vring.desc;
+> +               extra =3D vq->split.desc_extra;
+>                 i =3D head;
+>                 descs_used =3D total_sg;
+>         }
+> @@ -618,9 +609,8 @@ static inline int virtqueue_add_split(struct virtqueu=
+e *_vq,
+>                         /* Note that we trust indirect descriptor
+>                          * table since it use stream DMA mapping.
+>                          */
+> -                       i =3D virtqueue_add_desc_split(_vq, desc, i, addr=
+, sg->length,
+> -                                                    VRING_DESC_F_NEXT,
+> -                                                    indirect);
+> +                       i =3D virtqueue_add_desc_split(_vq, desc, extra, =
+i, addr, sg->length,
+> +                                                    VRING_DESC_F_NEXT);
+>                 }
+>         }
+>         for (; n < (out_sgs + in_sgs); n++) {
+> @@ -634,11 +624,10 @@ static inline int virtqueue_add_split(struct virtqu=
+eue *_vq,
+>                         /* Note that we trust indirect descriptor
+>                          * table since it use stream DMA mapping.
+>                          */
+> -                       i =3D virtqueue_add_desc_split(_vq, desc, i, addr=
+,
+> +                       i =3D virtqueue_add_desc_split(_vq, desc, extra, =
+i, addr,
+>                                                      sg->length,
+>                                                      VRING_DESC_F_NEXT |
+> -                                                    VRING_DESC_F_WRITE,
+> -                                                    indirect);
+> +                                                    VRING_DESC_F_WRITE);
+>                 }
+>         }
+>         /* Last one doesn't continue. */
+> @@ -660,10 +649,10 @@ static inline int virtqueue_add_split(struct virtqu=
+eue *_vq,
+>                 }
+>
+>                 virtqueue_add_desc_split(_vq, vq->split.vring.desc,
+> +                                        vq->split.desc_extra,
+>                                          head, addr,
+>                                          total_sg * sizeof(struct vring_d=
+esc),
+> -                                        VRING_DESC_F_INDIRECT,
+> -                                        false);
+> +                                        VRING_DESC_F_INDIRECT);
+>         }
+>
+>         /* We're using some buffers from the free list. */
+> @@ -716,11 +705,8 @@ static inline int virtqueue_add_split(struct virtque=
+ue *_vq,
+>         for (n =3D 0; n < total_sg; n++) {
+>                 if (i =3D=3D err_idx)
+>                         break;
+> -               if (indirect) {
+> -                       vring_unmap_one_split_indirect(vq, &desc[i]);
+> -                       i =3D virtio16_to_cpu(_vq->vdev, desc[i].next);
+> -               } else
+> -                       i =3D vring_unmap_one_split(vq, i);
+> +
+> +               i =3D vring_unmap_one_split(vq, &extra[i]);
+>         }
+>
+>  free_indirect:
+> @@ -765,22 +751,25 @@ static bool virtqueue_kick_prepare_split(struct vir=
+tqueue *_vq)
+>  static void detach_buf_split(struct vring_virtqueue *vq, unsigned int he=
+ad,
+>                              void **ctx)
+>  {
+> +       struct vring_desc_extra *extra;
+>         unsigned int i, j;
+>         __virtio16 nextflag =3D cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F=
+_NEXT);
+>
+>         /* Clear data ptr. */
+>         vq->split.desc_state[head].data =3D NULL;
+>
+> +       extra =3D vq->split.desc_extra;
+> +
+>         /* Put back on free list: unmap first-level descriptors and find =
+end */
+>         i =3D head;
+>
+>         while (vq->split.vring.desc[i].flags & nextflag) {
+> -               vring_unmap_one_split(vq, i);
+> +               vring_unmap_one_split(vq, &extra[i]);
+
+Not sure if I've asked this before. But this part seems to deserve an
+independent fix for -stable.
+
+>                 i =3D vq->split.desc_extra[i].next;
+>                 vq->vq.num_free++;
+>         }
+>
+> -       vring_unmap_one_split(vq, i);
+> +       vring_unmap_one_split(vq, &extra[i]);
+>         vq->split.desc_extra[i].next =3D vq->free_head;
+>         vq->free_head =3D head;
+>
+> @@ -790,21 +779,24 @@ static void detach_buf_split(struct vring_virtqueue=
+ *vq, unsigned int head,
+>         if (vq->indirect) {
+>                 struct vring_desc *indir_desc =3D
+>                                 vq->split.desc_state[head].indir_desc;
+> -               u32 len;
+> +               u32 len, num;
+>
+>                 /* Free the indirect table, if any, now that it's unmappe=
+d. */
+>                 if (!indir_desc)
+>                         return;
+> -
+>                 len =3D vq->split.desc_extra[head].len;
+>
+>                 BUG_ON(!(vq->split.desc_extra[head].flags &
+>                                 VRING_DESC_F_INDIRECT));
+>                 BUG_ON(len =3D=3D 0 || len % sizeof(struct vring_desc));
+>
+> +               num =3D len / sizeof(struct vring_desc);
+> +
+> +               extra =3D (struct vring_desc_extra *)&indir_desc[num];
+> +
+>                 if (vring_need_unmap_buffer(vq)) {
+> -                       for (j =3D 0; j < len / sizeof(struct vring_desc)=
+; j++)
+> -                               vring_unmap_one_split_indirect(vq, &indir=
+_desc[j]);
+> +                       for (j =3D 0; j < num; j++)
+> +                               vring_unmap_one_split(vq, &extra[j]);
+>                 }
+>
+>                 kfree(indir_desc);
+> --
+> 2.32.0.3.g01195cf9f
+>
+
+Thanks
+
 
