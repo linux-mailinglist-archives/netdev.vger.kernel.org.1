@@ -1,99 +1,158 @@
-Return-Path: <netdev+bounces-141765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22C889BC319
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:20:55 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DB019BC320
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:21:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8ADB282D34
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:20:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18E86282C27
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8A456742;
-	Tue,  5 Nov 2024 02:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8AB3FB1B;
+	Tue,  5 Nov 2024 02:20:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpFh/7Eh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AJSLGpbQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f182.google.com (mail-pg1-f182.google.com [209.85.215.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7467D51C4A;
-	Tue,  5 Nov 2024 02:20:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 307BB364D6
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 02:20:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730773226; cv=none; b=ZDsF1PZiHp2ynsOhMjNpjh3crEvcJ7LReK0xRuVZC+ad296gx5TsYY2qb1rwyeT5aqcoH6ZxPLhc7rFnIJXz+LqEYBU2uVMTuZYN9zIVBmRwho3OG8eW82bgyZVPnaTslTq4CbH6n93gPr7S2g6kJ3BWkGCrpLDVluuprG9It0E=
+	t=1730773239; cv=none; b=b+sWOR4lglqRHFnAwRny8FTb7YVe0+6YuRcyTuaC2cSE12X7gHAatE08GY5L0jeEl8uhQ42ln3Nn4ftUjfMwUREYC+8QWrlBmHvohQVpFPg7BWJ+lJU20tbcNDt7WlxKUDoRznzMmyYlT2+w73bYz7ngkwcNgbPGpVTUxYB8HZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730773226; c=relaxed/simple;
-	bh=H7DITtRwtsNLWdS6hpi1Dq1VgEaFbuMZ06KvxC6YoWs=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=SZizjX8uGeAfhaUR5RSFwRMomXAxCS5EUgpzcma/MOacr+bz1tQqJi/4XnRxydmkAgcK5mG2IyVjWGIH+rJrJe2BVAV3vmQJ6xvygUNXRV4OgYpe67hh6Crz+HEXQwdWZvCOuGoI06JR5nEAwU0bf881SpD2yGYlFCMVtM3qvxY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpFh/7Eh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49996C4CECE;
-	Tue,  5 Nov 2024 02:20:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730773226;
-	bh=H7DITtRwtsNLWdS6hpi1Dq1VgEaFbuMZ06KvxC6YoWs=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=BpFh/7Ehgn9ARUYp1fdOf8SxLiBRY2aBW0N7E1q9IzeEZIOt7K4hEJdyp+pe6US8Z
-	 uIyNHtDk4FANEE6YLIIWaqyy2WSAMBucrhSdie4jQJqi5CI6+gvS2RTiEw6/2F3m5H
-	 MaUIe+x0XFTN/YfVkfHLg84xg6XCqVop8eUycfERc2fJrF05xDsfxslKnSMQoMkbYF
-	 Uxa4eZ+hJuELXSKtHaX2Jf2azkq+aC0FP8IlyixSRgqtudHMwDHXit5qi0fTWlCMpL
-	 jZo34LnPV8ZdXr1T7q8TSW1kBpNOw9XkK4noVxRP/qylQMnK1+j0r0+hO9nM1oe1LS
-	 cGZU2YX9017Fg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F203809A80;
-	Tue,  5 Nov 2024 02:20:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730773239; c=relaxed/simple;
+	bh=3scN1yfHs9mQ9BxlaOMQDYfsT/Xlx8DHcOI1gJ90IK8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:References:Cc:From:
+	 In-Reply-To:Content-Type; b=jtESyEiRqcZTlfiPHwUDMDR2ZZZm+acBRQ7l7PobDkgCgXyRiOW8MEyA6u4Z0xEG4YJZ+3rwJ3Z/3q/+euk8fZTUvJRkZgzV1aZVWQIS5RIOa1VK8AxF+LxDTU7b6QHMxZT+xTACjO5wdvI5vh85MiW+KKk6NIpnBlUYl3DM7gg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AJSLGpbQ; arc=none smtp.client-ip=209.85.215.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f182.google.com with SMTP id 41be03b00d2f7-7cd8803fe0aso3334739a12.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 18:20:38 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730773237; x=1731378037; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=Zu2sO02rILbi6RYbzKuYuNQiSGhqW8jNif/o6etQ7Qc=;
+        b=AJSLGpbQFglZLmqmGKKByqKlslqVvp3V/4Mg/SJcFrJjuCGVYMrWp/bZYg1pi3imJ7
+         FFOUYNwWIYR/PpoWl05A+l6/3QrjhekY/86UYvQm0FhAL+KGrOFlv7hfXfuLW69ygcR4
+         gnY7HG+YH3DdRFSoYclZkql53aZy1s/Lq6QYC8itlaZQTa/J4kGQTKqt5PDeJrjb0Jhy
+         sh6PzomGGKgMz8f0TmadNfAi21mdAGCQt2z93MZwIQZZnZm13ML87Jv0tFU+PGJFGNMU
+         nlRtFbBHlAI72z4CcpyeaQFAIxIBDxTFtUCnqnzREr6x0QA8mklkKf5WiOmbUB6sARaJ
+         crIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730773237; x=1731378037;
+        h=content-transfer-encoding:in-reply-to:from:cc:content-language
+         :references:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Zu2sO02rILbi6RYbzKuYuNQiSGhqW8jNif/o6etQ7Qc=;
+        b=hrWPNQFUOSWLuk8C55s9TVLhVvUIOfO9d7SuuI1pj+1iyS6OLw6UzqUw3ODrjDLyIc
+         7eRUQBm7m0elPVF6ijkpL6JWk0gk36F/5Y9lXIYXJNd9ZWjv9+051snX1YVzkVyFYNcR
+         dNnkPF50oSsZuPKOmVIdcDeT87r5gbeRAb/Z/pVvdqXiOogdaypMuIjAJIavrFhaSEoa
+         ZnGHCMdM2XCY/UKoCVvRbkuEJYam0vORrHMxgxU7xfRL0If7599ThYGku8v5t+0ibON1
+         NE+hYVUilWTpCtqkH6DyQuiS7/baZkiI/VF2a5ORr83B6LmED5JPw2QqyGcg4pcsHX5Q
+         Us+Q==
+X-Gm-Message-State: AOJu0YxF2DLaHeqn8xkPVa4ynekRYhGonf30KmAX+g22ivSiPJOn1qxi
+	7g8eWnpK4ld9nrbAtuTSjnNK0MMGRDFXPTomIZRMj27Ii6H4K/RA
+X-Google-Smtp-Source: AGHT+IHdQUCVsQeTfZmlqZd+CfslsS1BnKc1JzLu2wTD71Jc8vtW2WJDTwrMmuIn/sqX72LDPuhUlw==
+X-Received: by 2002:a17:902:ecc4:b0:20c:b606:d014 with SMTP id d9443c01a7336-210f76d6604mr301239985ad.44.1730773237529;
+        Mon, 04 Nov 2024 18:20:37 -0800 (PST)
+Received: from ?IPV6:2a03:83e0:1151:15:1c59:4088:26ff:3c78? ([2620:10d:c090:500::6:9ebc])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211056eee7bsm68228065ad.61.2024.11.04.18.20.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 04 Nov 2024 18:20:37 -0800 (PST)
+Message-ID: <638b1c74-3718-441c-bfee-7d00af833e36@gmail.com>
+Date: Mon, 4 Nov 2024 18:20:35 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] ptp: Remove 'default y' for VMCLOCK PTP device
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173077323501.89867.2401311053737596737.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Nov 2024 02:20:35 +0000
-References: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
-In-Reply-To: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: kuba@kernel.org, richardcochran@gmail.com, peter.hilber@opensynergy.com,
- linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
- ridouxj@amazon.com, virtio-dev@lists.linux.dev, rluu@amazon.com,
- chashper@amazon.com, abuehaze@amazon.com, pabeni@redhat.com,
- christopher.s.hall@intel.com, jasowang@redhat.com, jstultz@google.com,
- mst@redhat.com, netdev@vger.kernel.org, sboyd@kernel.org, tglx@linutronix.de,
- xuanzhuo@linux.alibaba.com, maz@kernel.org, mark.rutland@arm.com,
- daniel.lezcano@linaro.org, a.zummo@towertech.it,
- alexandre.belloni@bootlin.com, qemu-devel@nongnu.org, horms@kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v5] eth: fbnic: Add support to write TCE TCAM
+ entries
+To: Joe Damato <jdamato@fastly.com>
+References: <20241104031300.1330657-1-mohsin.bashr@gmail.com>
+ <ZykNzvV3d5SXe7Yn@LQ3V64L9R2>
+Content-Language: en-US
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+ andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kernel-team@meta.com,
+ sanmanpradhan@meta.com, sdf@fomichev.me, vadim.fedorenko@linux.dev,
+ horms@kernel.org
+From: Mohsin Bashir <mohsin.bashr@gmail.com>
+In-Reply-To: <ZykNzvV3d5SXe7Yn@LQ3V64L9R2>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Hello:
+Hi Joe,
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat, 02 Nov 2024 16:52:17 -0500 you wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+> Does the macro need to be on its own line? Maybe it does due to line
+> length, not sure.
 > 
-> The VMCLOCK device gives support for accurate timekeeping even across
-> live migration, unlike the KVM PTP clock. To help ensure that users can
-> always use ptp_vmclock where it's available in preference to ptp_kvm,
-> set it to 'default PTP_1588_CLOCK_VMCLOCK' instead of 'default y'.
+Yes, this is because of the line length.
+
+
+>> +		if (!tcam_idx) {
+>> +			dev_err(fbd->dev, "TCE TCAM overflow\n");
 > 
-> [...]
+> In the error case does fbd->tce_tcam_last need to be set ?
+> 
+>> +			return;
+>> +		}
+>> +
 
-Here is the summary with links:
-  - [net-next] ptp: Remove 'default y' for VMCLOCK PTP device
-    https://git.kernel.org/netdev/net-next/c/18ec5491a495
+Basically, we have 4 unicast and 1 multicast/broadcast entry for BMC 
+(see fbnic_bmc_rpc_init() in fbnic_rpc.c for reference), making overflow 
+really unlikely. If an overflow does occur, we currently report it for 
+debugging purposes. A more comprehensive solution to handle when it does 
+occur, will be added later.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+>> +	while (tcam_idx)
+>> +		fbnic_clear_tce_tcam_entry(fbd, --tcam_idx);
+>> +
+>> +	fbd->tce_tcam_last = tcam_idx;
+> 
+> Wouldn't this end up setting tce_tcam_last to zero every time or am
+> I missing something?
+> 
+>> +}
+
+Yes, that is true. The role of tce_tcam_last is to track the direction 
+of the next pass. Since FBNIC_TCE_TCAM_NUM_ENTRIES is 8, while the BMC 
+entries are less than 8, we clear the remaining entries (which would 
+have already been written by this point). At this point, the value of 
+tcam_idx should be 0, guiding the direction of next pass to be in 
+forward direction.
 
 
+>> +		if (tcam_idx == FBNIC_TCE_TCAM_NUM_ENTRIES) {
+>> +			dev_err(fbd->dev, "TCE TCAM overflow\n");
+> 
+> As above, in the error case does fbd->tce_tcam_last need to be set ?
+> 
+>> +			return;
+>> +		}
+As discussed above.
+
+
+>> +	while (tcam_idx < FBNIC_TCE_TCAM_NUM_ENTRIES)
+>> +		fbnic_clear_tce_tcam_entry(fbd, tcam_idx++);
+>> +
+>> +	fbd->tce_tcam_last = tcam_idx;
+> 
+> As above, wouldn't this always set tce_tcam_last to
+> FBNIC_TCE_TCAM_NUM_ENTRIES every time?
+
+Yes, similar to above, this will ensure next pass to be in reverse 
+direction.
+
+Hope this clarifies things.
 
