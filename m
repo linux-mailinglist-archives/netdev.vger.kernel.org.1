@@ -1,69 +1,133 @@
-Return-Path: <netdev+bounces-142034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBD439BD22C
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:19:03 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 247B49BD236
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:23:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 906B12883AA
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:19:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55CD61C210D6
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:23:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63F7117DE06;
-	Tue,  5 Nov 2024 16:18:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 210741D1F71;
+	Tue,  5 Nov 2024 16:23:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kzLyCVyG"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="OFkl6J8Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3893917CA09;
-	Tue,  5 Nov 2024 16:18:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6799417C7CE
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 16:22:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730823518; cv=none; b=Sb8Etns/NCH8T8nJAssfX7B8G00xEQ6gz67M58uDf2kHHSOy/LQ4k5FaHX2yl4u1shhnMmxfuHc+5+SXKqgeUlRjcWJjxUfmTp/GRFkZs7HKSrtGSRoCun9KrrwVKC6ayfBeCFh9jgUusUj36qz4+0VjvKXi1w9RIzaoYN+pjD8=
+	t=1730823781; cv=none; b=ZPclyXcCron63ujMAfKmgHq8EVleS/6BMtKPXBQOE0fwKirUg0PNnBUwRTOXfn+FRrIv504mT4wQRsIGEJLvgVXF0d6VG2ool+tdYmdDPTQ7VP/fHXYGOhntUGV9jY7Ttl7bs9/MHPtGriHnkVTo/l93ijZJsNhWX/kKbAiyQTk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730823518; c=relaxed/simple;
-	bh=9xrCyEJYHaZq8k0OoFI0Shbu0aRQqgodxtF2MeeVWnQ=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type; b=qAN4XcauVTBq+Ogf5zXAoPR31Rui29LH/AThZ7pnrXCLvxGGAJLiBWQleYfSeg7KHK58QZv7qruq4E4nn7KWp1E6sMNM1582lF/+2O3WNA5b3S0+3l0rJoE1MG2uUFIJthEOWwBWNQVDDvPbmRkKLMCnS68PUmieqoh9mR5wdHo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kzLyCVyG; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CA417C4CECF;
-	Tue,  5 Nov 2024 16:18:37 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730823518;
-	bh=9xrCyEJYHaZq8k0OoFI0Shbu0aRQqgodxtF2MeeVWnQ=;
-	h=Date:From:To:Subject:From;
-	b=kzLyCVyGqh48j39Hbj2IsCPFUPkt+K5czZh/XX8KI+2y1uYVK55keY2/iUemHMicI
-	 boEjFisPl16dGEjdrqSfHgWDZOQTHsUK/P+39H1h81uizEtfhbRrjGL+KTiHjcEzmC
-	 pn0w0a4QaB5LP9HwRAsmhSrK5d7t4EQvdzvDts+PjLaiBdunyLLASHf7NplUltZf+N
-	 3coXvfdDQsIot4l4Ji2myzw2WVN0YuhBHMDgGjVKQqX/JbzxKTr53EUcwf4n6ybpoh
-	 VSuLXWQlJWd4ECLj7+pxhLDDWVWfHiX1HIATNdxxJ87aVKRbQNpfAPtXQPFGdeJ55b
-	 4bCJfVhZhYPBA==
-Date: Tue, 5 Nov 2024 08:18:36 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org, netdev-driver-reviewers@vger.kernel.org
-Subject: [ANN] netdev call - Nov 5th
-Message-ID: <20241105081836.5619d7ad@kernel.org>
+	s=arc-20240116; t=1730823781; c=relaxed/simple;
+	bh=sU071qnW9Ah6xms9ifN5TQR/Cn89FIKDbnAVenLHXT0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=a+WXqDQCY2wpXjIMMc4RsACRZrj2LGhPpd7RwwPvxKPhh9ucLG0VtrzUuW0iuwOGXA+nXV1Pm4QFgju6k2OrVoyd55Otxcz8WxRZ09ZUq3pxkSOy4rQgXHaL8wzAjcePq/PYOnq5AO+VrQXh7RKqkbupWfeZRbUa3QLz+4k/gHA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=OFkl6J8Q; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730823778;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=3dblTnSbQrPQjhmtB+0QzZEv45vbjiUZA8WWfGC0UVk=;
+	b=OFkl6J8QRjTi8I6lH0fFOzSSVynrn2u4xYKNutZfoDSQ5/K3Ckam7XvRJQl1y1TGCM/Atn
+	wg3hrm7u1n/j6TqE3HBPUazHJicdNG71gkoPQXFfeSBzT9IwdTDthK7YaXqOZqJGxZAnQx
+	Owr2gi6GfxoMkf4Xt6CkK2Ap0gMtXIg=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-625-NAIKYJk1OGm7rYfsDpyDMQ-1; Tue, 05 Nov 2024 11:22:57 -0500
+X-MC-Unique: NAIKYJk1OGm7rYfsDpyDMQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4327bd6bd60so37397665e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 08:22:57 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730823776; x=1731428576;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3dblTnSbQrPQjhmtB+0QzZEv45vbjiUZA8WWfGC0UVk=;
+        b=tGFHa6MB/1F1AfdqNRrw7IrN4BAYO+59otyeq0/4Svfz1F+WWWNfgIiTdsExeY7rus
+         uSqdkqazZsHfuohQ5CXw4OXDP1p8Te1SYiMc3wL/UgRbS5lDx3cRgF3fEKosyyoMYYpo
+         2V/7jN8+6w6xMixI+47f9ACR7HsFaiAmDr/dvkCOiZwzU3dFPdHikOPTM0bPcwUX5l4n
+         zDuVQhEYvFO4GtQZquyNbOWiaMmiCjmA/m/iHL2A6DHUGoR6hlXmXwGRdD/NItIE8m6J
+         nqURMtZ/TOdweBy84dUiYemp7wv1NIYe0fM7k3kiDhH/7MKWLZsZBiFmAdptCi4d3dhg
+         rh2A==
+X-Forwarded-Encrypted: i=1; AJvYcCXZ2XkRwVO5aT0zVvvXweKM+Xf9BbHheWOFwzO46BVvF3pOlvwiXAoV5/2jaso+tKLmHL2WweQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwAEMM//IDwVxJxYEMRyfVYvbvO0vhenJMe/u7McV3kbeI83S7z
+	2L13s6y1s4uBln1tLQ58oUVCN/1RsVvy5YCTDdm5Vx6J9gcUFKEcbIVQmPyThz0/QwnOcIKv77x
+	O4vVBrYuwERPVonkLAlprcThGWDGdpwrNdAicK8ZRyvnK8A92ncjlpA==
+X-Received: by 2002:a05:600c:350b:b0:42c:e0da:f15c with SMTP id 5b1f17b1804b1-4319acbb947mr288020215e9.20.1730823776147;
+        Tue, 05 Nov 2024 08:22:56 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH9ZkjQKGCdeZeL0ihoS916abF93Zh3X2B4Sgu4MXKc6Mi5b61TVn1ACE4SUp96qLsKOR9vWw==
+X-Received: by 2002:a05:600c:350b:b0:42c:e0da:f15c with SMTP id 5b1f17b1804b1-4319acbb947mr288020055e9.20.1730823775813;
+        Tue, 05 Nov 2024 08:22:55 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd91093csm230334865e9.15.2024.11.05.08.22.54
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 08:22:55 -0800 (PST)
+Message-ID: <36a5e3a0-258e-4771-905b-227b74fbe5fe@redhat.com>
+Date: Tue, 5 Nov 2024 17:22:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v1 net-next 7/8] rtnetlink: Convert RTM_NEWLINK to
+ per-netns RTNL.
+To: Kuniyuki Iwashima <kuniyu@amazon.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>,
+ Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Nikolay Aleksandrov <razor@blackwall.org>,
+ Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org
+References: <20241105020514.41963-1-kuniyu@amazon.com>
+ <20241105020514.41963-8-kuniyu@amazon.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241105020514.41963-8-kuniyu@amazon.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi!
+On 11/5/24 03:05, Kuniyuki Iwashima wrote:
+> @@ -6995,7 +7017,8 @@ static struct pernet_operations rtnetlink_net_ops = {
+>  };
+>  
+>  static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst = {
+> -	{.msgtype = RTM_NEWLINK, .doit = rtnl_newlink},
+> +	{.msgtype = RTM_NEWLINK, .doit = rtnl_newlink,
+> +	 .flags = RTNL_FLAG_DOIT_PERNET},
 
-The bi-weekly call is scheduled for today at 8:30 am (PT) / 
-5:30 pm (~EU), at https://bbb.lwn.net/rooms/ldm-chf-zxx-we7/join
+The above causes a lockdep splat in many selftests:
 
-Sorry for late notice, but at least I can unambiguously tell you that
-the meeting starts in ~12 min, without worry about daylight saving time :)
+https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/846801/12-bareudp-sh/stderr
 
-Small agenda, we are pondering creating a foundation within LF
-to pay for netdev CI.
+the problem is in rtnl_newlink():
 
-In terms of review rotation - it's nVidia's week.
+#ifdef CONFIG_MODULES
+                if (!ops) {
+                        __rtnl_unlock();
+// we no more under the rtnlock
+                        request_module("rtnl-link-%s", kind);
+                        rtnl_lock();
+                        ops = rtnl_link_ops_get(kind, &ops_srcu_index);
+                }
+#endif
+
+Cheers,
+
+Paolo
+
 
