@@ -1,68 +1,68 @@
-Return-Path: <netdev+bounces-141761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A57759BC30E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:17:31 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B48D9BC311
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:19:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 13930B20E49
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:17:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04659B213F0
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22B31D6AA;
-	Tue,  5 Nov 2024 02:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C4B364AE;
+	Tue,  5 Nov 2024 02:19:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Kvyje6D9"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMRW/P58"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA3CEAD2
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 02:17:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F327AEAD2;
+	Tue,  5 Nov 2024 02:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730773044; cv=none; b=a+SbL+S2nsNkfRleGotZkHj4OIWMy58VmLFBv+SaxbeSU2rmnzezx4HhyoGIxVMia3rCgAweojanxHZb9y6GLScxp9GMDhpcpJkUQ/3liyPVeJkJp87HyedDYOK7LJYHsuS2ikhVCbG92WrZnCWVMsZ1SMNN8TYQprim6iive7w=
+	t=1730773170; cv=none; b=dv8xwKqrLqLQpfR+Bl55SCQieAJCqiOacfed2u83Sfyql0+DYrybeYk5XtB2/xtpheqRWZoX2NHqSJtNduDIXkcsqCBDWLyVWlkHyfn56FreEny2YxkQl3VsvCVa2Ws9cQJRe+U0BDEUsHpi8on/5YEHaVsqnRakNZfA6Gv4zB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730773044; c=relaxed/simple;
-	bh=KymAh+cHgs/PbrcaeFQVFFXM/UkhrTfnTl2sHiRq6ko=;
+	s=arc-20240116; t=1730773170; c=relaxed/simple;
+	bh=i6G8GnDsiZTal/kkKMwzZHQjeFYe+c86hf3Q7lJ2aY8=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=NGZKm1gGwXvzjqaH50XTvGc9sqwaWqXQQkzPPZVC7TuUXInmEvp5iJpd0rnGykESY7Lecr+SkUUbMFnN673UeBkV0v3r/tZXja2wdqYCF0F1mjnqTeHwxf8NSpNZWYRcHXFICXnACtrzEHYv5bwzLE+mXptJkVgWe0nOqiHguy8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Kvyje6D9; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 25941C4CECE;
-	Tue,  5 Nov 2024 02:17:23 +0000 (UTC)
+	 MIME-Version:Content-Type; b=jKRxGQm9+qH4hkrfU+OadJ2hx44d7dLPPNdT4P3vrEruQ2UAiZt2Szl+3uE9JBSJ5jt3MuSClkQEceHhqfBnH0ulXVHUsUq+la2Wp9z5e00aPYD7D2QhZ+V3xDJyihao3KvvyxMWzCVKTlc29rCuV6ULxvS0kVpBtU9FAwiUQAU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FMRW/P58; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CEF3C4CECE;
+	Tue,  5 Nov 2024 02:19:28 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730773044;
-	bh=KymAh+cHgs/PbrcaeFQVFFXM/UkhrTfnTl2sHiRq6ko=;
+	s=k20201202; t=1730773169;
+	bh=i6G8GnDsiZTal/kkKMwzZHQjeFYe+c86hf3Q7lJ2aY8=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Kvyje6D9r1YkgLW4NvmdSay9kd8UhD611l778Tu1lp/8JKmkbjjfneZUtDAIzfHvY
-	 1dVVpDq9zxf26ksCSTlBSP3RL06MGro0+pYQGX026HPLo3qNEZ0coV3cs52z81kt39
-	 O0DNapydtns6nmvEAv/l9lUPrHp7i+hFePuTtTcfiQ+JA6jHH1DRFU/skw0yDkIoKd
-	 Vl3P26C9XoMHK3StZ6ILd+kcg0g5eSq8M/sNxDQD/Qv8bRozhr1r4AmZ+9IK6cyjnq
-	 7/uafQg5+eRkVfko/dXaHKpmQUW4P9Dic4Ip8Gi4egvwVn+bKqkosP9vfwFnInTZ+A
-	 n7ncqyZA3rivQ==
-Date: Mon, 4 Nov 2024 18:17:22 -0800
+	b=FMRW/P58uN3mjJ8SrWdDP0mhFAfKK7zPrETFDHL/9n22NRSWbbkb54D9u7+HF4wk/
+	 NnGBXCkXXHWsHcYTTnclYG3vSbzPZeck/T+vGPEyDKh48tE1Rtrrj+c1454rH6IVrc
+	 esV5TZESlpDGbIZUf3ipGTbUjCD676m7dllKj20mPee64zmCQi5oUAPjQ1VXn/X47c
+	 1Bm9TZcqR9Xii+7aZ97dLV18H/6CDvMC8YasuD9JVfUHVxTpUDPfxbpxr0EzihWMW8
+	 hyZN2V6OMjt8fwZWs3kUFpSLIpIHvUwIdFtQoZy0UMYvDtr2hPu8mqyD+0A3dpzh/c
+	 QYXLEeDMTTDSA==
+Date: Mon, 4 Nov 2024 18:19:27 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Arinzon <darinzon@amazon.com>
-Cc: David Miller <davem@davemloft.net>, <netdev@vger.kernel.org>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Richard
- Cochran <richardcochran@gmail.com>, "Woodhouse, David" <dwmw@amazon.com>,
- "Machulsky, Zorik" <zorik@amazon.com>, "Matushevsky, Alexander"
- <matua@amazon.com>, Saeed Bshara <saeedb@amazon.com>, "Wilson, Matt"
- <msw@amazon.com>, "Liguori, Anthony" <aliguori@amazon.com>, "Bshara, Nafea"
- <nafea@amazon.com>, "Schmeilin, Evgeny" <evgenys@amazon.com>, "Belgazal,
- Netanel" <netanel@amazon.com>, "Saidi, Ali" <alisaidi@amazon.com>,
- "Herrenschmidt, Benjamin" <benh@amazon.com>, "Kiyanovski, Arthur"
- <akiyano@amazon.com>, "Dagan, Noam" <ndagan@amazon.com>, "Bernstein, Amit"
- <amitbern@amazon.com>, "Agroskin, Shay" <shayagr@amazon.com>, "Abboud,
- Osama" <osamaabb@amazon.com>, "Ostrovsky, Evgeny" <evostrov@amazon.com>,
- "Tabachnik, Ofir" <ofirt@amazon.com>, "Machnikowski, Maciek"
- <maciek@machnikowski.net>
-Subject: Re: [PATCH v3 net-next 3/3] net: ena: Add PHC documentation
-Message-ID: <20241104181722.4ee86665@kernel.org>
-In-Reply-To: <20241103113140.275-4-darinzon@amazon.com>
-References: <20241103113140.275-1-darinzon@amazon.com>
-	<20241103113140.275-4-darinzon@amazon.com>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
+ <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
+ virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
+ linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
+ virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
+ David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
+ <abuehaze@amazon.com>, Paolo Abeni <pabeni@redhat.com>, "Christopher S .
+ Hall" <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>,
+ John Stultz <jstultz@google.com>, "Michael S . Tsirkin" <mst@redhat.com>,
+ netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
+ <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier
+ <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel Lezcano
+ <daniel.lezcano@linaro.org>, Alessandro Zummo <a.zummo@towertech.it>,
+ Alexandre Belloni <alexandre.belloni@bootlin.com>, qemu-devel
+ <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
+Subject: Re: [PATCH net-next] ptp: Remove 'default y' for VMCLOCK PTP device
+Message-ID: <20241104181927.05a9485a@kernel.org>
+In-Reply-To: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
+References: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,18 +72,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 3 Nov 2024 13:31:39 +0200 David Arinzon wrote:
-> +=================   ======================================================
-> +**phc_cnt**         Number of successful retrieved timestamps (below expire timeout).
-> +**phc_exp**         Number of expired retrieved timestamps (above expire timeout).
-> +**phc_skp**         Number of skipped get time attempts (during block period).
-> +**phc_err**         Number of failed get time attempts (entering into block state).
-> +=================   ======================================================
+On Sat, 02 Nov 2024 16:52:17 -0500 David Woodhouse wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
+> 
+> The VMCLOCK device gives support for accurate timekeeping even across 
+> live migration, unlike the KVM PTP clock. To help ensure that users can
+> always use ptp_vmclock where it's available in preference to ptp_kvm,
+> set it to 'default PTP_1588_CLOCK_VMCLOCK' instead of 'default y'.
 
-I seem to recall we had an unpleasant conversation about using standard
-stats recently. Please tell me where you looked to check if Linux has
-standard stats for packet timestamping. We need to add the right info
-there.
--- 
-pw-bot: cr
+Good enough for me, let's see if it's good enough for the main guy :)
+Thanks!
 
