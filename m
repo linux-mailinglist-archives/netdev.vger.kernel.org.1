@@ -1,82 +1,106 @@
-Return-Path: <netdev+bounces-141776-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B9BA9BC379
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:59:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 112C29BC389
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:03:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 098D01F22D00
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:59:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F04E1C21C8A
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:03:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C7AD553804;
-	Tue,  5 Nov 2024 02:59:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C984D9FE;
+	Tue,  5 Nov 2024 03:02:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Zck0Cmgd"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pdc3cgtS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D153A94A;
-	Tue,  5 Nov 2024 02:59:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A4F38DDB;
+	Tue,  5 Nov 2024 03:02:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730775573; cv=none; b=roG0QaEmEznb16LLjqlo0Ugq9Ebxz7B5tin+Owj5Q9KTH7QXFGPRUpYojCj2Eo0YFSMj+f8994y2ISIRZCiLM2wUZjAg9YLLNkoFREM60owC1e1C3K6N4lgu5n7eyzWKf+DMymXHA8hb1UQri2KcsvYPyN44MdjAEUj1vTJ1Krc=
+	t=1730775775; cv=none; b=jUu0fC3H3cs4DLufcgVFvl7KA8S24wzB1+2BPYUIHOlrBM/bD8sM+Bqt9ojOYTuGVcA5kf+RhapsdgVR9pllKSgujtL3oXuxSqa9gm/98L+JSUROYF4XsFEzAGjy82FO2b6Qx4VgojlIj9Vb64utEeeZAfp/X+jvhBLLkHQ0x1s=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730775573; c=relaxed/simple;
-	bh=bu7pN4uruG2MuJ0hCR8PI4hXZNwpCzJvpzIQc6l1SWI=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=utTgkuV5URJbzIpnK28BmUXfTuD2jB1bLyT2MCMjvA6FazGwrW/tM/KdTyuq4GzZysivsAXsDMs/HjbJBj2SKFaxdKK8RbEs92dEI2PubImn61CRWVR4kh1oEoN5iOZ5YTsC1lgCHIP6GfTlk5cU/+KXuqhT0KY5t2NmoJT/4ws=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Zck0Cmgd; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DEEF2C4CECE;
-	Tue,  5 Nov 2024 02:59:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730775573;
-	bh=bu7pN4uruG2MuJ0hCR8PI4hXZNwpCzJvpzIQc6l1SWI=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Zck0Cmgd8m3pQCrr88CvSnwq6cnTgld14GUwtz7BDQzVIq3fpfato6y5tg5TblG5v
-	 n1xTgPiwDmPAmlf2iaupltcpMosX2lcI9q7aAWSEPYo1Wom4jPUb9rBE4Fbmm7tt8Y
-	 7zKJhF3uq9QGJ2KmnhBXTiPCdqhiXT1OvbM+DMGDxVtJcLeY62c2ggu29HVp0Rrq5M
-	 XBE4taJvTWgHZPvLXcPnNHsK2aAH7K94jTwP8yK+4AFz8zTFmD6Wx0wNKEvT7mZdwV
-	 5tjIp7FlkNvlE04y4bO5jwqa5ZChDAZD4I5CDlMwSYVM5UJweXoEQoEJsx1KBOmdrV
-	 /HjB81BDmJizQ==
-Date: Mon, 4 Nov 2024 18:59:32 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Toke
- =?UTF-8?B?SMO4aWxhbmQtSsO4cmdlbnNlbg==?= <toke@redhat.com>, "Alexei
- Starovoitov" <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- "John Fastabend" <john.fastabend@gmail.com>, Andrii Nakryiko
- <andrii@kernel.org>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Stanislav Fomichev <sdf@fomichev.me>, Magnus Karlsson
- <magnus.karlsson@intel.com>, <nex.sw.ncis.osdt.itp.upstreaming@intel.com>,
- <bpf@vger.kernel.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 10/18] xdp: get rid of xdp_frame::mem.id
-Message-ID: <20241104185932.7c357398@kernel.org>
-In-Reply-To: <4068b108-bd5a-4d09-97e9-4f9196b35eca@intel.com>
-References: <20241030165201.442301-1-aleksander.lobakin@intel.com>
-	<20241030165201.442301-11-aleksander.lobakin@intel.com>
-	<20241031174107.02216ff9@kernel.org>
-	<4068b108-bd5a-4d09-97e9-4f9196b35eca@intel.com>
+	s=arc-20240116; t=1730775775; c=relaxed/simple;
+	bh=sQpNHZKSwsm9PuF+xXorp5UNtacEVOe8mMj/L81nvyU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=m5E0CO8f/68GsofAkQA/KwG/beaRnZzxVHSXuzd/YSi9sP3wbw7Vsm1MI2QuGzvAzVZR1s8IqelEkKfkVoEazIXgnctiK860BbTF96e6HZAPXr4lZrmsmN+PEdax3aNeBIIVajH1S/OVPg8atwN8WRCkNgrRVBOhm0ZxjmQ1YTU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pdc3cgtS; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=hoFMWyq+iDCYAmm6oQjVciE92ijPEyH2UIFa3czySUg=; b=pdc3cgtSRw6I6BPGsED5u6EMoY
+	z5lSAxX20a4ZlT6VJmvrr4ZTsFlwpu9w0EaJm0Rp6TyP9NbZMxyEGXFEaZz3GI7lf0KOTLcqqEc+T
+	nDS6WFZXnBcaQ55qsPmGWVCs7UCzd8nFHFLG+ppCdaXx9Res56Q6Jj9uKfWZsYXpn2ro=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t89qE-00CAfH-2V; Tue, 05 Nov 2024 04:02:50 +0100
+Date: Tue, 5 Nov 2024 04:02:50 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alistair Francis <alistair23@gmail.com>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	linux@armlinux.org.uk, hkallweit1@gmail.com,
+	Alistair Francis <alistair.francis@wdc.com>
+Subject: Re: [PATCH] include: mdio: Guard inline function with CONFIG_MDIO
+Message-ID: <01d60932-f78f-4e4b-88e7-f331535b8076@lunn.ch>
+References: <20241104070950.502719-1-alistair.francis@wdc.com>
+ <9ae6af15-790a-4d34-901d-55fca0be9fd2@lunn.ch>
+ <CAKmqyKOX8gcRT2dSOvJY2o4bpoF+VuPmhaygJj7pTb1KesrFOQ@mail.gmail.com>
+ <680bd06f-6a76-4a5c-b5d2-51dd172c8428@lunn.ch>
+ <CAKmqyKNkPGPg8xsYDY9FtNvqJQsFmQ1o8KYHQXutrN1kHxsPww@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAKmqyKNkPGPg8xsYDY9FtNvqJQsFmQ1o8KYHQXutrN1kHxsPww@mail.gmail.com>
 
-On Mon, 4 Nov 2024 15:36:34 +0100 Alexander Lobakin wrote:
-> Yeah I only need to assign mem_type instead of mem in that new place.
-> linux-next handles conflicts, but not our CI...
+> Which comes from autogenerated C code like this
+> 
+> ```
+> void mdio45_ethtool_gset__extern(const struct mdio_if_info *mdio,
+> struct ethtool_cmd *ecmd) { mdio45_ethtool_gset(mdio, ecmd); }
+> ```
+> 
+> mdio45_ethtool_gset__extern() is never called, so I'm not clear why
+> it's not optimised out.
 
-FWIW we do resolve (see the "(pull: resolved)" markings on the status
-page) but this is a tricky case where the patch will likely apply but
-build will fail. And if we add a local patch in the CI the build will
-break if your series is _not_ pending.. So yeah I don't have any great
-idea how to resolve such cases. It's first time it happened.
+I think you need to understand this first, before deciding on the path
+forward.
+ 
+> It's not only MDIO that hits this, but so far there aren't too many
+> cases. That will obviously depend on the config used though.
+> 
+> There will be issues like this over the kernel. I'm not sure fixing
+> them all is the right approach as it might be too much work and too
+> hard to narrow down all occurance.
+
+Actually, that is mostly just CPU cycles. There are build bots which
+make builds with random configurations. Arnd Bergmann has one such
+bot, for example. Systems like that will find the issues for you.
+
+> But to me it seems like the correct
+> fix as the current code is calling a function that might not exist,
+> hence the patch :)
+
+As 0-day has shown, another build bot, your patch is not correct and
+causes problems. You can try again, but maybe first dig into the
+linker.
+
+Humm, interesting. I don't actually find anything calling
+mdio45_ethtool_gset(). So you might be able to just remove it.  And
+then i think you can remove mdio45_ethtool_gset_npage(). But i might
+be wrong...
+
+	Andrew
 
