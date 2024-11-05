@@ -1,186 +1,180 @@
-Return-Path: <netdev+bounces-142089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A2329BD711
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:31:41 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DA709BD721
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:39:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5E1751C23B84
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:31:40 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9E219B213AA
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22CE620FA80;
-	Tue,  5 Nov 2024 20:31:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D181F8EE4;
+	Tue,  5 Nov 2024 20:39:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="OqJr2dhv"
+	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="ULDKOT8E"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+Received: from mail-pg1-f179.google.com (mail-pg1-f179.google.com [209.85.215.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8DE1EABAB
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 20:31:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D54E1F7570
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 20:39:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730838697; cv=none; b=LzBdii8/9nO9/pQ4GJEdrAGPq2hOlKuYBWQFIuPtta/uxqtBNiIe9K9w3AspRLL+W5KUfYeMLlBNj9jfWEQb00P6bp9AYQIJVfaHM2K0/YEHxCfD2lyGaxeRrVrBKq49oICEBdxQRTiTFkXLt3Yaz1FccfsKxo2QjvkMK+6vumg=
+	t=1730839181; cv=none; b=STJ5m4+Q0ow9kCObf14ciRI2yS7mqwnA/uk1PWZmPFY5aoYJ2KialMZ/vz82PhZTB0x/4FjcEHVGpx1kXaGeSCf2HXAh9Z9oYzWwcXAIId0SbE6AbkNxzw8GVKo4o/lRaKvFetyV5WSE4ZNifP3DWvxBCV4TjEhnaapbQgeKsnw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730838697; c=relaxed/simple;
-	bh=njXvbbUSXT8lEjmP/9Q1IPocvcnbvTecO5498SE8Yc4=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Vx8yM+fGLT5HTyflxe8wT0QVaSrrAS6l4qDqRp50s5taVIidnHmxn+cVrMFCpOg19EbD+kM8uEGGkiQED9yOQStW64JH31dW7UNfP6UTfhD3KRWkb4n8Papo4vRsYC7pYpYmtI2w6HG+yAB+8u0cuuk236j7Dzjam3m5HtYlf4Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=OqJr2dhv; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-720d01caa66so4206357b3a.2
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 12:31:35 -0800 (PST)
+	s=arc-20240116; t=1730839181; c=relaxed/simple;
+	bh=AP0IOhU8NvRP6bDtTW0h4Wnk0Mt6i7DqReZJD7vQUV4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=S/OcJs91pLZ9kC0cxhyM/AEe6bFQebKhctIXor0Rv41YU2mxGXBN8XBsGng13JZ3hG1QbXLh/Mg6eHvWJVuKOfeYUN0fjs8nYv58jkg5xjZODWHQ/Rnu+dkl/cQpKtQhXbMQ7ETDsF6K9y84UJl7GsaYhP5R6WzSwIrr4ViiJM0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=ULDKOT8E; arc=none smtp.client-ip=209.85.215.179
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
+Received: by mail-pg1-f179.google.com with SMTP id 41be03b00d2f7-7ede26dc527so1009724a12.3
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 12:39:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730838695; x=1731443495; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=UhUU35PCwT4qTbZoZwuMAItdxx0KbqWaKmuzg/Mfzrs=;
-        b=OqJr2dhvKej2lddFg90e68fvAhPsyOtYPFgWGSfgsp2axyPcmjl/wHlO0PMu7uzo5n
-         K46SbtUgSJoJUw1XB4TXx7qocKNmnGc/GkB9U4KHpDn2pdFtvVJaD0h6PUotVuS/hQiq
-         RgyzzsWIYL/YCmBqJlchNBxxozkXhCW7SEjUs=
+        d=purestorage.com; s=google2022; t=1730839178; x=1731443978; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pvwCHyx85+PGiQyoEYuGS5FrhSe224LT8dAEEohoTs0=;
+        b=ULDKOT8EL2q5/sh3V31Scl4jZO9zDct/cbDy+jeGBj6JMTGIxhrLsNV4uy+kzF6k5e
+         HRT6mZPDpS4uF5ctEkDP1VG5QlEwHsoVV5QSgwVkCnWaCo6TIc6Xz8Q4T4NI32NzwP8z
+         SzV+xYHaCKmZENZ2HPU/Zp2fQk/grD6rulJXNmcSpNfmcdN3QzTPtIjl1L7hUyBrvWCR
+         +aW/A2vr5qU50KKJXoOA5cdYQxWDNOwg11c1s6P7bNPQPrNC7OLh4uHpCjfHj/jXpE0j
+         CR2YpQ90ME9zs55Wnvfw+k/ROHj7BlCXdClv7wn1ZU7SAZ9DgLHP61OjUCwEwQ1gNsZB
+         3r0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730838695; x=1731443495;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=UhUU35PCwT4qTbZoZwuMAItdxx0KbqWaKmuzg/Mfzrs=;
-        b=s8JYupdxKYFlyrnlCGf2pvub5mgTHgklAdXOr/3sSxze8Uzt+Wk017XRs+dbBktZUI
-         qmWQzlJzzAVAmEP1lkQQz7RHna9rnUmZXvnVqYZs4EXtyExJ1lvSLcBtE/Jo/cknAt/d
-         G2a2+SD3o/uQ0CAVZYiSRHwL2wPJ0YNXwan+SWpZzzk7KjBivEMj9j9S2/BvCrhLdMpE
-         sPS6XecKs/6npM0Z7GUbax/1x5iT29sqar8WfOVJA4m48KBXY4Vo77hWMY5FaJvXHEJs
-         uuxKw9JfAsnEuVi8yfgwaoV2nnQupuVXDX6Ef80ldT6tiL48XeyO+xxgJsrys9p5vLxS
-         spMw==
-X-Gm-Message-State: AOJu0YzRi8CRSVo6K61XBi0gvqCwo2krxwtivrBzp2VSwOdvwMIwKDRY
-	IMjxkwPUe6r4GD5/hzapkYQDP10G6ZaCaHo/Nuo6a+0Ndsre3lZZt4EZNI5vJiM=
-X-Google-Smtp-Source: AGHT+IHfc4XjOAk9aNraA/Fb/T/Rh+mWy4yMsOn09WygNpR/JUFt2lVx6QttW/7pfHEYXrMQoVD0wA==
-X-Received: by 2002:a05:6a20:12c7:b0:1db:eb2c:a74 with SMTP id adf61e73a8af0-1dbeb2c0b32mr7662206637.12.1730838693979;
-        Tue, 05 Nov 2024 12:31:33 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e592asm10212449b3a.60.2024.11.05.12.31.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 12:31:33 -0800 (PST)
-Date: Tue, 5 Nov 2024 12:31:30 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Philo Lu <lulie@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
-	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, andrew@daynix.com,
-	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 4/4] virtio_net: Update rss when set queue
-Message-ID: <ZyqAovoIOYkNvtys@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org,
-	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
-	eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	andrew@daynix.com, virtualization@lists.linux.dev,
-	linux-kernel@vger.kernel.org
-References: <20241104085706.13872-1-lulie@linux.alibaba.com>
- <20241104085706.13872-5-lulie@linux.alibaba.com>
+        d=1e100.net; s=20230601; t=1730839178; x=1731443978;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pvwCHyx85+PGiQyoEYuGS5FrhSe224LT8dAEEohoTs0=;
+        b=hHIIvyfI7oBHdde2yGlFj+7fdPIne7FPFYZL39pxkQs5SHHOseejqof1sWQErYPcsG
+         5Yw/HwQvAJ2uV4Qc1icAla+V1E6fWyHzPviIb/EHKaQWOEGCjP3pZSoNm9/9Ewi7cWqq
+         8YdGOkTkvzm/TxTPqhUBjbbd1mcTX8uFtm7PLAqvxvscYPOJWYDbEXfMYxkAh6am9/zm
+         VrFCslIcJBX6PY27sz5MlNEKadx1HCXMwZ8/l+Wzl2l/GdLzZxVkDDrhRM6TIUyOGzaR
+         lnbQAZMS13+z2f2ndlFWhe3sWWsiRHaM/HzCk5AT6eVQxj5LPE48+uRwwWGBNZRFjwAW
+         wfpA==
+X-Forwarded-Encrypted: i=1; AJvYcCXfXPYvzapJUFjpMTWGBdOg52oxgQyKw1gTQPPDADwj3WEyssy3bMbWsdJqwSi1Rb0uPce8T6E=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWGRcF8gTYzQ2gfsUiyJbZ+B7jWs4Q9DmjesYTtDP33ykVZ4Ut
+	Cys+fZie6SHtRBnHn95a3BinUFUa+UXWc8gWL5ms8/1AsEOmCVuGTPkkwxjkAjN8l9gTPYNhysP
+	NWpSk45o5NTNPXLhiJal2Evju+U5VAQWTWqLLYQ==
+X-Google-Smtp-Source: AGHT+IHydo3dvYseE4V3ot530A+l25Ui7y8eZ0+u5OkSZornws/UsK1beyFnhkms9q0xUowlmqfaMWRUCo10Btuw7LY=
+X-Received: by 2002:a05:6a20:1590:b0:1cf:37d4:c50b with SMTP id
+ adf61e73a8af0-1d9a83da986mr27372240637.4.1730839178412; Tue, 05 Nov 2024
+ 12:39:38 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104085706.13872-5-lulie@linux.alibaba.com>
+References: <CY8PR12MB7195C97EB164CD3A0E9A99F9DC552@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <20241031163436.3732948-1-csander@purestorage.com> <ZypqYHaRbBCGo3FD@x130>
+In-Reply-To: <ZypqYHaRbBCGo3FD@x130>
+From: Caleb Sander <csander@purestorage.com>
+Date: Tue, 5 Nov 2024 12:39:27 -0800
+Message-ID: <CADUfDZqFjjsdWpJ2=NvC5Ny2r7PyLWv4LEREEEk7=RzW-ZosYA@mail.gmail.com>
+Subject: Re: [PATCH net-next v3] mlx5/core: Schedule EQ comp tasklet only if necessary
+To: Saeed Mahameed <saeed@kernel.org>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Parav Pandit <parav@nvidia.com>, netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 04, 2024 at 04:57:06PM +0800, Philo Lu wrote:
-> RSS configuration should be updated with queue number. In particular, it
-> should be updated when (1) rss enabled and (2) default rss configuration
-> is used without user modification.
-> 
-> During rss command processing, device updates queue_pairs using
-> rss.max_tx_vq. That is, the device updates queue_pairs together with
-> rss, so we can skip the sperate queue_pairs update
-> (VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET below) and return directly.
-> 
-> Also remove the `vi->has_rss ?` check when setting vi->rss.max_tx_vq,
-> because this is not used in the other hash_report case.
-> 
-> Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
-> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 65 +++++++++++++++++++++++++++++++---------
->  1 file changed, 51 insertions(+), 14 deletions(-)
-> 
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 59d9fdf562e0..189afad3ffaa 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -3394,15 +3394,59 @@ static void virtnet_ack_link_announce(struct virtnet_info *vi)
->  		dev_warn(&vi->dev->dev, "Failed to ack link announce.\n");
->  }
->  
-> +static bool virtnet_commit_rss_command(struct virtnet_info *vi);
-> +
-> +static void virtnet_rss_update_by_qpairs(struct virtnet_info *vi, u16 queue_pairs)
-> +{
-> +	u32 indir_val = 0;
-> +	int i = 0;
-> +
-> +	for (; i < vi->rss_indir_table_size; ++i) {
-> +		indir_val = ethtool_rxfh_indir_default(i, queue_pairs);
-> +		vi->rss.indirection_table[i] = indir_val;
-> +	}
-> +	vi->rss.max_tx_vq = queue_pairs;
-> +}
-> +
->  static int virtnet_set_queues(struct virtnet_info *vi, u16 queue_pairs)
->  {
->  	struct virtio_net_ctrl_mq *mq __free(kfree) = NULL;
-> -	struct scatterlist sg;
-> +	struct virtio_net_ctrl_rss old_rss;
->  	struct net_device *dev = vi->dev;
-> +	struct scatterlist sg;
->  
->  	if (!vi->has_cvq || !virtio_has_feature(vi->vdev, VIRTIO_NET_F_MQ))
->  		return 0;
->  
-> +	/* Firstly check if we need update rss. Do updating if both (1) rss enabled and
-> +	 * (2) no user configuration.
-> +	 *
-> +	 * During rss command processing, device updates queue_pairs using rss.max_tx_vq. That is,
-> +	 * the device updates queue_pairs together with rss, so we can skip the sperate queue_pairs
-> +	 * update (VIRTIO_NET_CTRL_MQ_VQ_PAIRS_SET below) and return directly.
-> +	 */
-> +	if (vi->has_rss && !netif_is_rxfh_configured(dev)) {
+On Tue, Nov 5, 2024 at 10:56=E2=80=AFAM Saeed Mahameed <saeed@kernel.org> w=
+rote:
+>
+> On 31 Oct 10:34, Caleb Sander Mateos wrote:
+> >Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet
+> >to call mlx5_cq_tasklet_cb() if it processes any completions. For CQs
+> >whose completions don't need to be processed in tasklet context, this
+> >adds unnecessary overhead. In a heavy TCP workload, we see 4% of CPU
+> >time spent on the tasklet_trylock() in tasklet_action_common(), with a
+> >smaller amount spent on the atomic operations in tasklet_schedule(),
+> >tasklet_clear_sched(), and locking the spinlock in mlx5_cq_tasklet_cb().
+> >TCP completions are handled by mlx5e_completion_event(), which schedules
+> >NAPI to poll the queue, so they don't need tasklet processing.
+> >
+> >Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
+> >overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs
+> >to be processed in tasklet context, so it can schedule the tasklet. CQs
+> >that need tasklet processing have their interrupt comp handler set to
+> >mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that
+> >don't need tasklet processing won't schedule the tasklet. To avoid
+> >scheduling the tasklet multiple times during the same interrupt, only
+> >schedule the tasklet in mlx5_add_cq_to_tasklet() if the tasklet work
+> >queue was empty before the new CQ was pushed to it.
+> >
+> >The additional branch in mlx5_add_cq_to_tasklet(), called for each EQE,
+> >may add a small cost for the userspace Infiniband CQs whose completions
+> >are processed in tasklet context. But this seems worth it to avoid the
+> >tasklet overhead for CQs that don't need it.
+> >
+> >Note that the mlx4 driver works the same way: it schedules the tasklet
+> >in mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
+> >
+> >Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+> >Reviewed-by: Parav Pandit <parav@nvidia.com>
+> >---
+> >v3: revise commit message
+> >v2: reorder variable declarations, describe CPU profile results
+> >
+> > drivers/net/ethernet/mellanox/mlx5/core/cq.c | 5 +++++
+> > drivers/net/ethernet/mellanox/mlx5/core/eq.c | 5 +----
+> > 2 files changed, 6 insertions(+), 4 deletions(-)
+> >
+> >diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cq.c b/drivers/net/=
+ethernet/mellanox/mlx5/core/cq.c
+> >index 4caa1b6f40ba..25f3b26db729 100644
+> >--- a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+> >+++ b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+> >@@ -69,22 +69,27 @@ void mlx5_cq_tasklet_cb(struct tasklet_struct *t)
+> > static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
+> >                                  struct mlx5_eqe *eqe)
+> > {
+> >       unsigned long flags;
+> >       struct mlx5_eq_tasklet *tasklet_ctx =3D cq->tasklet_ctx.priv;
+> >+      bool schedule_tasklet =3D false;
+> >
+> >       spin_lock_irqsave(&tasklet_ctx->lock, flags);
+> >       /* When migrating CQs between EQs will be implemented, please not=
+e
+> >        * that you need to sync this point. It is possible that
+> >        * while migrating a CQ, completions on the old EQs could
+> >        * still arrive.
+> >        */
+> >       if (list_empty_careful(&cq->tasklet_ctx.list)) {
+> >               mlx5_cq_hold(cq);
+>
+> The condition here is counter intuitive, please add a comment that relate=
+s
+> to the tasklet routine mlx5_cq_tasklet_cb, something like.
+> /* If this list isn't empty, the tasklet is already scheduled, and not ye=
+t
+>   * executing the list, the spinlock here guarantees the addition of this=
+ CQ
+>   * will be seen by the next execution, so rescheduling the tasklet is no=
+t
+>   * required */
 
-Does there need to be an error case when:
+Sure, will send out a v4.
 
-vi->has_rss && netif_is_rxfh_configured(dev)
+>
+> One other way to do this, is to flag tasklet_ctx.sched_flag =3D true, ins=
+ide
+> mlx5_add_cq_to_tasklet, and then schedule once at the end of eq irq proce=
+ssing
+> if (tasklet_ctx.sched_flag =3D=3D true). to avoid "too" early scheduling,=
+ but
+> since the tasklet can't run until the irq handler returns, I think your
+> solution shouldn't suffer from "too" early scheduling ..
 
-to return EINVAL? I noted that other drivers don't let users adjust
-the queue count and return error in this case.
-
-
-> +		memcpy(&old_rss, &vi->rss, sizeof(old_rss));
-> +		if (rss_indirection_table_alloc(&vi->rss, vi->rss_indir_table_size)) {
-> +			vi->rss.indirection_table = old_rss.indirection_table;
-> +			return -ENOMEM;
-> +		}
-> +
-> +		virtnet_rss_update_by_qpairs(vi, queue_pairs);
-> +
-> +		if (!virtnet_commit_rss_command(vi)) {
-> +			/* restore ctrl_rss if commit_rss_command failed */
-> +			rss_indirection_table_free(&vi->rss);
-> +			memcpy(&vi->rss, &old_rss, sizeof(old_rss));
-> +
-> +			dev_warn(&dev->dev, "Fail to set num of queue pairs to %d, because committing RSS failed\n",
-> +				 queue_pairs);
-> +			return -EINVAL;
-> +		}
-> +		rss_indirection_table_free(&old_rss);
-> +		goto succ;
-> +	}
-> +
+Right, that was my thinking behind the list_empty(&tasklet_ctx->list) check=
+.
 
