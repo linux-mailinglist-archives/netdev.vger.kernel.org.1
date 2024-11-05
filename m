@@ -1,212 +1,134 @@
-Return-Path: <netdev+bounces-141794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF1269BC426
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:58:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CD8F49BC437
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 05:13:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E39728332B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:58:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6CC061F21E02
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:13:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFC6818CBF4;
-	Tue,  5 Nov 2024 03:58:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA7FC18873A;
+	Tue,  5 Nov 2024 04:13:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="k28MlsmI"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="Zm/1jv86";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="EldO/XTv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.16])
+Received: from fhigh-b3-smtp.messagingengine.com (fhigh-b3-smtp.messagingengine.com [202.12.124.154])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17F36187347;
-	Tue,  5 Nov 2024 03:58:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B4671367;
+	Tue,  5 Nov 2024 04:13:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730779087; cv=none; b=XkHxfyiMoKMFnZonF7lw1XOn1rGscDKgalgIXqWfnQXb56nOCoFiFY0nAfAsGlF8r4ByNB3oQqW+mqLrr7LlrLkVLS8oJkyqcfc2MbvLD6euAFFGMyC9rwpjshkG5O46vppK10YB1mHDDKq2Es+AQXWl+COrozrJHKtqzobCd6s=
+	t=1730780018; cv=none; b=EuVTDpBxgF9OEnHuaHJQrtG7cCYK9pcKS4fXbGdpX409q/Y8L2g+KfOSFTyanp8SOXVn2lmfdTq/5CgXS5Xc7/vSSaqZDGjPCbI84ojUkPek0+6W3qEuARrKz64AhShP1wDNPCnjw3eVEaQbdpS8+fRPO4HnyIrVqzEW1H2nYEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730779087; c=relaxed/simple;
-	bh=NPNcUZZo36LXZhN7ArInvKqqeZ5fQvKuHRmvYyeYDoE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V/zSQicPGMmqcUAHv54snOzn1ihdeFRA5A3w9PJW7AkSThCOehk+SU4AmlcsWlmGvwxY5I0qyG+G7MMMwnIr7MwMa1JyB4mytsmEvrW3F7rmTgpMQORepZ6VJGoO/ATavq2mwePM71N9bbjreMvOSWP0JlEkWW19ZbBJqFBkY8A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=k28MlsmI; arc=none smtp.client-ip=198.175.65.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730779086; x=1762315086;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=NPNcUZZo36LXZhN7ArInvKqqeZ5fQvKuHRmvYyeYDoE=;
-  b=k28MlsmIUiJXUGaSGRUmPAYeUmU5CxfpTlzdgzV69XXsxHbRIce6EgD9
-   3DjAbgN+bfTeu9SEfKPW53KcrXMXdc74CYfvRUFMmM93ppHkEJ+PoyEY2
-   jLyalgRJDhjdcDqCuUsPD/Z8kugra2KtINlkXzOidA0roWt1/hqqiOcPh
-   E5PiD8D4MDZyqNErh47vqSwCqXbue8cGuywmpa3mdgIT91c5JaytZWnrx
-   ZJTaU0pr4JPkNPNos8D+knV6Bp1krA9EH1oy1rd7RPPrihs/rghkMDs73
-   iUtdfCaF/u1FjSepSD6EMAJWIOOmr6PsSpyF2yQX7nDSSgrbocQ06+740
-   Q==;
-X-CSE-ConnectionGUID: 1PgsTmPlRr+Eie81lJ371g==
-X-CSE-MsgGUID: x+wDxqXCRheQ+pTkZGGSYw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30666758"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30666758"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa108.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Nov 2024 19:58:05 -0800
-X-CSE-ConnectionGUID: qKWGGDwHQ6ONsYp/rNiFlA==
-X-CSE-MsgGUID: iSeQMICZSqq7uXaOpgQfvg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,259,1725346800"; 
-   d="scan'208";a="88433093"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by fmviesa004.fm.intel.com with ESMTP; 04 Nov 2024 19:58:02 -0800
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t8Ahc-000laT-0P;
-	Tue, 05 Nov 2024 03:58:00 +0000
-Date: Tue, 5 Nov 2024 11:57:11 +0800
-From: kernel test robot <lkp@intel.com>
-To: Divya Koppera <divya.koppera@microchip.com>, andrew@lunn.ch,
-	arun.ramadoss@microchip.com, UNGLinuxDriver@microchip.com,
-	hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	richardcochran@gmail.com
-Cc: oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH net-next 4/5] net: phy: Makefile: Add makefile support
- for ptp in Microchip phys
-Message-ID: <202411051137.XUgYrwtP-lkp@intel.com>
-References: <20241104090750.12942-5-divya.koppera@microchip.com>
+	s=arc-20240116; t=1730780018; c=relaxed/simple;
+	bh=+XtWvul0vyCck5CzAWASUv5TAMX8Dh7v2fZY93/Q/4Y=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=c2mxfg+joxCM224W2hb9u7x1B+DCf9j8eaL0HDSXnZmIBxfpkmyo/8zio+um8DzIHbB7qn0UUUq7TZXavKS5NTBhYbcPXZu1648PWgfsbKvn+0diGabmp5xMzZrGzqFEVtBvlGbafqKCFYqsV/bON2w9K3LZivWzWWE8mfpGdKY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=Zm/1jv86; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=EldO/XTv; arc=none smtp.client-ip=202.12.124.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-05.internal (phl-compute-05.phl.internal [10.202.2.45])
+	by mailfhigh.stl.internal (Postfix) with ESMTP id 4C8E82540195;
+	Mon,  4 Nov 2024 23:13:35 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-05.internal (MEProxy); Mon, 04 Nov 2024 23:13:35 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1730780015; x=1730866415; bh=+0xuMymHiRYSYp3ZD9hHq
+	gsREfQ/XJH47o0IfBEfcQc=; b=Zm/1jv86rz5WSvAnQYxItTtwXtfk9fdwdUoEv
+	c6AIqbzDKN0uH9osWOBQ3cB/NZcQEVVVWJ6BZrelzEBcWjsJpO9WkdcgWzxXNmIG
+	3GmN0aKcJDsJDu/Yq6OX9Qwvw4YyT31B2P6BRH3WQyXXDCaNibV0vrfEihEhE+IG
+	S5oAWvuvLiiakwhyEOiwYMG60j6xJxtGXo3WXhq1eYIWC4NQ4HN5WCoZZnzKdrtP
+	lVsTgM3lvTUf5AGBrkmPRaez1fZIB386NVh5iHDL9SYiQ+fHS+xGeBteX3mUW6E+
+	NS3/2UBhrsUpBdWg24pTGN9iH+sTUXR3qWY2y7RjPia6Uidmg==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730780015; x=1730866415; bh=+0xuMymHiRYSYp3ZD9hHqgsREfQ/XJH47o0
+	IfBEfcQc=; b=EldO/XTvFo2as3FPIVrHCst0ZIHrllHAzGEz9fSxZUXL4ZQLaWA
+	hjUDfqAHUe/0CgSFfAEt+iB+8IBY3lRgaOFuocLDvjQ6S06V46QgudB4GeSVM5Co
+	0PhU6BGnJnWCGOiefKJUb1cJEwTgGweY5tsgIKuzl7qQ/7Xw+hfSkRR2yhZO8cnx
+	Gv05twPzaC+fka4stir2kXyrwsa6n+xghUP6x7YD8XSjEC6WKazsAhhOM2B3vmam
+	E10fW6K8lQcAWrl9TZWuDwMqCs350xlXpxW9055bPYE+qciEcaH5YCinuvvNnoc6
+	G5iXBBWetRiTQsWcFfSbApZr2rEhaL0Orbg==
+X-ME-Sender: <xms:bpspZ0LH6oriMXW_pbcqrlSse9oc1bBuBTlfNV2RhcfMgO30p1z6CA>
+    <xme:bpspZ0I_yknGgb6fvjpO9AT-qf7Qg4g_oUOAn4G7GHECQURKGiLlkSIAalvdDWPyK
+    oSVHP3PQWaypvR1dw>
+X-ME-Received: <xmr:bpspZ0uTKqTCDGJ9r6weFtsDqJr249x0TSOsGaSgzQ5EeBhyaPxRRhejUNsR4qNSYS2fWvNA5ryjEvk5pJr774G39nRxe6_CIKA6XBEJc5Je3Ny4-oWB>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeeftddrvdeljedgieelucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
+    dtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghn
+    ihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepvd
+    eggfetgfelhefhueefkeduvdfguedvhfegleejudduffffgfetueduieeikeejnecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguh
+    huuhdrgiihiidpnhgspghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtoheplhhinhhugidqkhgvrhhnvghlsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtg
+    hpthhtohepnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohep
+    mhhitghhrggvlhdrtghhrghnsegsrhhorggutghomhdrtghomhdprhgtphhtthhopehkuh
+    gsrgeskhgvrhhnvghlrdhorhhgpdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhn
+    uhigrdguvghvpdhrtghpthhtohepkhgvrhhnvghlqdhtvggrmhesmhgvthgrrdgtohhm
+X-ME-Proxy: <xmx:bpspZxaFfT7MwBNG9B7uaOg6cN2Hkh5iCzFJDodtGK-0Id_WukRZqA>
+    <xmx:bpspZ7Yyj2G6ldGz268uHzVR-z6kCj2HO7heDIRteFsbmGMMe2dLQg>
+    <xmx:bpspZ9C3NkbAr-YYzsG_EkdN8tzCTz38WjiI5BsJf2eC-ayos0w-CA>
+    <xmx:bpspZxa1zlTI884kVEKKR_k1ggI95ACbwfWhNF9mOJpFdho1H6SOGw>
+    <xmx:b5spZwOBgNBaODp3rHRbtYmlZGuzDyF7yzvNfGQS-ToVM0gWfKFl1B0p>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
+ 4 Nov 2024 23:13:34 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	michael.chan@broadcom.com,
+	kuba@kernel.org,
+	martin.lau@linux.dev
+Cc: kernel-team@meta.com
+Subject: [PATCH net-next v3 0/2] bnxt_en: ethtool: Improve wildcard l4proto on ip4/ip6 ntuple rules
+Date: Mon,  4 Nov 2024 21:13:18 -0700
+Message-ID: <cover.1730778566.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104090750.12942-5-divya.koppera@microchip.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Divya,
+This patchset improves wildcarding over l4proto on ip4 and ip6 nutple
+rules. Previous support required setting l4proto explicitly to 0xFF if
+you wanted wildcard, which ethtool (naturally) did not do. For example,
+this command would fail with -EOPNOSUPP:
 
-kernel test robot noticed the following build errors:
+    ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
 
-[auto build test ERROR on net-next/main]
+After this patchset, only TCP, UDP, ICMP, and unset will be supported
+for l4proto.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Divya-Koppera/net-phy-microchip_ptp-Add-header-file-for-Microchip-ptp-library/20241104-171132
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241104090750.12942-5-divya.koppera%40microchip.com
-patch subject: [PATCH net-next 4/5] net: phy: Makefile: Add makefile support for ptp in Microchip phys
-config: powerpc64-randconfig-r063-20241105 (https://download.01.org/0day-ci/archive/20241105/202411051137.XUgYrwtP-lkp@intel.com/config)
-compiler: clang version 14.0.6 (https://github.com/llvm/llvm-project f28c006a5895fc0e329fe15fead81e37457cb1d1)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241105/202411051137.XUgYrwtP-lkp@intel.com/reproduce)
+Changes from v2:
+* Target net-next
+* Remove Fixes: tag
+* Remove support for IPPROTO_RAW (0xFF) l4proto
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411051137.XUgYrwtP-lkp@intel.com/
+Changes from v1:
+* Set underlying l4proto to IPPROTO_RAW to fix get path
 
-All errors (new ones prefixed by >>):
+Daniel Xu (2):
+  bnxt_en: ethtool: Remove ip4/ip6 ntuple support for IPPROTO_RAW
+  bnxt_en: ethtool: Support unset l4proto on ip4/ip6 ntuple rules
 
-   In file included from drivers/net/phy/microchip_ptp.c:4:
-   drivers/net/phy/microchip_ptp.h:197:60: warning: declaration of 'struct phy_device' will not be visible outside of this function [-Wvisibility]
-   static inline struct mchp_ptp_clock *mchp_ptp_probe(struct phy_device *phydev,
-                                                              ^
-   drivers/net/phy/microchip_ptp.h:198:11: error: unknown type name 'u8'
-                                                       u8 mmd, u16 clk_base,
-                                                       ^
-   drivers/net/phy/microchip_ptp.h:198:19: error: unknown type name 'u16'
-                                                       u8 mmd, u16 clk_base,
-                                                               ^
-   drivers/net/phy/microchip_ptp.h:199:11: error: unknown type name 'u16'
-                                                       u16 port_base)
-                                                       ^
-   drivers/net/phy/microchip_ptp.h:205:12: error: unknown type name 'u16'
-                                          u16 reg, u16 val, bool enable)
-                                          ^
-   drivers/net/phy/microchip_ptp.h:205:21: error: unknown type name 'u16'
-                                          u16 reg, u16 val, bool enable)
-                                                   ^
-   drivers/net/phy/microchip_ptp.h:205:30: error: unknown type name 'bool'
-                                          u16 reg, u16 val, bool enable)
-                                                            ^
-   drivers/net/phy/microchip_ptp.h:210:15: error: unknown type name 'irqreturn_t'
-   static inline irqreturn_t mchp_ptp_handle_interrupt(struct mchp_ptp_clock *ptp_clock)
-                 ^
-   drivers/net/phy/microchip_ptp.h:212:9: error: use of undeclared identifier 'IRQ_NONE'
-           return IRQ_NONE;
-                  ^
-   drivers/net/phy/microchip_ptp.c:7:16: warning: declaration of 'enum ptp_fifo_dir' will not be visible outside of this function [-Wvisibility]
-                                  enum ptp_fifo_dir dir)
-                                       ^
-   drivers/net/phy/microchip_ptp.c:7:29: error: variable has incomplete type 'enum ptp_fifo_dir'
-                                  enum ptp_fifo_dir dir)
-                                                    ^
-   drivers/net/phy/microchip_ptp.c:7:16: note: forward declaration of 'enum ptp_fifo_dir'
-                                  enum ptp_fifo_dir dir)
-                                       ^
-   drivers/net/phy/microchip_ptp.c:9:39: error: incomplete definition of type 'struct mchp_ptp_clock'
-           struct phy_device *phydev = ptp_clock->phydev;
-                                       ~~~~~~~~~^
-   drivers/net/phy/microchip_ptp.h:197:22: note: forward declaration of 'struct mchp_ptp_clock'
-   static inline struct mchp_ptp_clock *mchp_ptp_probe(struct phy_device *phydev,
-                        ^
-   drivers/net/phy/microchip_ptp.c:12:22: error: use of undeclared identifier 'MCHP_PTP_FIFO_SIZE'
-           for (int i = 0; i < MCHP_PTP_FIFO_SIZE; ++i) {
-                               ^
->> drivers/net/phy/microchip_ptp.c:13:8: error: implicit declaration of function 'phy_read_mmd' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-                   rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-                        ^
->> drivers/net/phy/microchip_ptp.c:13:29: error: implicit declaration of function 'PTP_MMD' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-                   rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-                                             ^
-   drivers/net/phy/microchip_ptp.c:14:14: error: use of undeclared identifier 'PTP_EGRESS_FIFO'
-                                     dir == PTP_EGRESS_FIFO ?
-                                            ^
->> drivers/net/phy/microchip_ptp.c:15:7: error: implicit declaration of function 'MCHP_PTP_TX_MSG_HEADER2' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-                                     MCHP_PTP_TX_MSG_HEADER2(BASE_PORT(ptp_clock)) :
-                                     ^
->> drivers/net/phy/microchip_ptp.c:15:31: error: implicit declaration of function 'BASE_PORT' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-                                     MCHP_PTP_TX_MSG_HEADER2(BASE_PORT(ptp_clock)) :
-                                                             ^
->> drivers/net/phy/microchip_ptp.c:16:7: error: implicit declaration of function 'MCHP_PTP_RX_MSG_HEADER2' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-                                     MCHP_PTP_RX_MSG_HEADER2(BASE_PORT(ptp_clock)));
-                                     ^
-   drivers/net/phy/microchip_ptp.c:16:7: note: did you mean 'MCHP_PTP_TX_MSG_HEADER2'?
-   drivers/net/phy/microchip_ptp.c:15:7: note: 'MCHP_PTP_TX_MSG_HEADER2' declared here
-                                     MCHP_PTP_TX_MSG_HEADER2(BASE_PORT(ptp_clock)) :
-                                     ^
-   drivers/net/phy/microchip_ptp.c:20:9: error: implicit declaration of function 'phy_read_mmd' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-           return phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-                  ^
-   drivers/net/phy/microchip_ptp.c:20:30: error: implicit declaration of function 'PTP_MMD' is invalid in C99 [-Werror,-Wimplicit-function-declaration]
-           return phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-                                       ^
-   fatal error: too many errors emitted, stopping now [-ferror-limit=]
-   2 warnings and 20 errors generated.
-
-
-vim +/phy_read_mmd +13 drivers/net/phy/microchip_ptp.c
-
-cf630bd2326111 Divya Koppera 2024-11-04   5  
-cf630bd2326111 Divya Koppera 2024-11-04   6  static int mchp_ptp_flush_fifo(struct mchp_ptp_clock *ptp_clock,
-cf630bd2326111 Divya Koppera 2024-11-04   7  			       enum ptp_fifo_dir dir)
-cf630bd2326111 Divya Koppera 2024-11-04   8  {
-cf630bd2326111 Divya Koppera 2024-11-04   9  	struct phy_device *phydev = ptp_clock->phydev;
-cf630bd2326111 Divya Koppera 2024-11-04  10  	int rc;
-cf630bd2326111 Divya Koppera 2024-11-04  11  
-cf630bd2326111 Divya Koppera 2024-11-04  12  	for (int i = 0; i < MCHP_PTP_FIFO_SIZE; ++i) {
-cf630bd2326111 Divya Koppera 2024-11-04 @13  		rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-cf630bd2326111 Divya Koppera 2024-11-04  14  				  dir == PTP_EGRESS_FIFO ?
-cf630bd2326111 Divya Koppera 2024-11-04 @15  				  MCHP_PTP_TX_MSG_HEADER2(BASE_PORT(ptp_clock)) :
-cf630bd2326111 Divya Koppera 2024-11-04 @16  				  MCHP_PTP_RX_MSG_HEADER2(BASE_PORT(ptp_clock)));
-cf630bd2326111 Divya Koppera 2024-11-04  17  		if (rc < 0)
-cf630bd2326111 Divya Koppera 2024-11-04  18  			return rc;
-cf630bd2326111 Divya Koppera 2024-11-04  19  	}
-cf630bd2326111 Divya Koppera 2024-11-04  20  	return phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-cf630bd2326111 Divya Koppera 2024-11-04  21  			    MCHP_PTP_INT_STS(BASE_PORT(ptp_clock)));
-cf630bd2326111 Divya Koppera 2024-11-04  22  }
-cf630bd2326111 Divya Koppera 2024-11-04  23  
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 44 +++++++++++--------
+ .../net/ethernet/broadcom/bnxt/bnxt_ethtool.h |  1 +
+ 2 files changed, 26 insertions(+), 19 deletions(-)
 
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+2.46.0
+
 
