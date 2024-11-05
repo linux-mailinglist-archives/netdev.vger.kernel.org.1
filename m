@@ -1,106 +1,155 @@
-Return-Path: <netdev+bounces-141976-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141977-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id A27119BCCEA
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:41:11 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C1639BCCF4
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:42:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5A1481F22D86
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:41:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B7CCB1F2340D
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:42:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7177B1D5AC3;
-	Tue,  5 Nov 2024 12:40:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76B0C1D5AB2;
+	Tue,  5 Nov 2024 12:41:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YAqMdFAk"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ELEds7pU"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48B411D54FE;
-	Tue,  5 Nov 2024 12:40:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 391821D5AA2;
+	Tue,  5 Nov 2024 12:41:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730810424; cv=none; b=ZL6cOMG1V9RQGapK0kDwNOCUZDTrLf8+Q2DwW0jEe8Hpe6a8cZRJAdyRGP2HZfLS6Zbcv2+h9S2DBND1irlZpRBjYhczUsKJtQH9eVLj4roS0GfT/rZ9gypJcHgl5kJ1O8Oz0lRrvSIAFXhIAuAAm8EkgkPyX19rf1yGErD0jh4=
+	t=1730810494; cv=none; b=eU9evunaV9SGC4MJzGIQQ9Odcq17+Qboc4RViZiF2sQY4hNkyqS0k+wVMbS3dV8LwP10DB2xPAbRUr+dvf2SOQW1/lrm5Y5ckAMKcRmnw4ByKMVDGpGtXpaXoPDGM3/XuSGbZOlzukXT6NNkVF3YofzaSLp7q5V6xkHdglgYVWQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730810424; c=relaxed/simple;
-	bh=B470//hXIXrWvSblv+Zhgqc1KNBhJ2sWDSCy8NGeT8M=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=Svzf/1XLEyV9W6Nw0NRHwU7k2+gun+q9xpdRY/H2ZvQqNEY61wCcCIE+kczyYK8YJ4dv9oP7lZ8et8P4qqHpTYftgH0pav13q3t7fHOP8kYEPNxXKHnXQEpZFqyeWZ3zLTbDSwuwj5kG7kL5H0I8HdNKqKPKHah6ng6ixDSYfYs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YAqMdFAk; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DF2BC4CECF;
-	Tue,  5 Nov 2024 12:40:23 +0000 (UTC)
+	s=arc-20240116; t=1730810494; c=relaxed/simple;
+	bh=K3uoOG6s+M7EJcFy3uI2j8alVqcmrDXg3oYGlFnTGYo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=LN8XRbIJacpdiwqirzwjMKRTimdX5NBQYCOi7T26HC41fPrt+lnYJX7v1ZX3norqXq64ShWXA2yl+PvusaRj2N1HZUS4pMvHd8MOoFM9DLLgkFMpAuTh0eRezE4NZRziOju9GqoFNb4eR6DkoAjrlaU7f5pf4ZwSb1ZHLxzT4/8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ELEds7pU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B13BEC4CECF;
+	Tue,  5 Nov 2024 12:41:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730810423;
-	bh=B470//hXIXrWvSblv+Zhgqc1KNBhJ2sWDSCy8NGeT8M=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=YAqMdFAkC499s6s3pWmQ9QaZWEWS9YgZHVua8RrnUvI1+nT+nVzP5SQ54LJz0xKhY
-	 cFW4fuAwlXKs4w4ffYVxcO/yJJ2TU5x7no8NUT36QAUOSkdWwqlFa5oFBxkDo5Rg8D
-	 oazbzKTXJM3aMq8VP2kyiiP+ujCVvT16GtgvmCH1LgiHwIKmjgNzw9OMXrhYvGkWOE
-	 hqCf/MFBK5TpVxgZHp2ocuQyV1W438PP+D3OWs9ER0h4ZcVuDy+89/aLg0W64/I4/n
-	 o1b4xJA5LkfBKie7CWnyfcY4c5sn8YhkjxNin+Y/Ode8ynt7U9KilOlvVZ1xfs1cnD
-	 tKetBWYgTyGsQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70FE23809A80;
-	Tue,  5 Nov 2024 12:40:33 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730810493;
+	bh=K3uoOG6s+M7EJcFy3uI2j8alVqcmrDXg3oYGlFnTGYo=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=ELEds7pUxqctg7tDdle2r8Pu1KhGdwvfqY9YhS1pnuwsfgy2W7bJ4LxtPWDC9KKWw
+	 0TF4zouVhTs7jGIRLE03kUl/Sz2AU/DCswD5uETaJSiSKiulfC3bjKOog6srvtiAcC
+	 rOwtQs3eT/C8LZ5R8yolLEC+75Js1A0IJXUc/N/u/kBuvA+Cg+uQQFeI5T5Yff+wTG
+	 wZVhqJ7+PcRyCkBSicREJYM/wm6I/WKb6xeDmI4vyVVXzCkw1zUkw7EfC0zQ52SIOe
+	 Z9S5DKkFUkyhqinG270VOYfosmFrb9sbPI+/g3LiZQHHsRY0ILy8lHPrRlPDw4sl4h
+	 6KfJEEwFQPhOA==
+Message-ID: <f5a28e36-ef80-4ccf-b615-03fb10eb661e@kernel.org>
+Date: Tue, 5 Nov 2024 13:41:26 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/6] net: lan969x: add VCAP functionality
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173081043226.542753.11161846541422250316.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Nov 2024 12:40:32 +0000
-References: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
-In-Reply-To: <20241101-sparx5-lan969x-switch-driver-3-v1-0-3c76f22f4bfa@microchip.com>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, lars.povlsen@microchip.com,
- Steen.Hegelund@microchip.com, jensemil.schulzostergaard@microchip.com,
- UNGLinuxDriver@microchip.com, jacob.e.keller@intel.com,
- christophe.jaillet@wanadoo.fr, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241104125342.1691516-1-sean@geanix.com>
+ <dq36jlwfm7hz7dstrp3bkwd6r6jzcxqo57enta3n2kibu3e7jw@krwn5nsu6a4d>
+ <wdn2rtfahf3iu6rsgxm6ctfgft7bawtp6vzhgn7dffd54i72lu@r4v5lizhae57>
+ <60901c39-b649-4a20-a06a-7faa7ddc9346@kernel.org>
+ <mtuev7pve5ltr6vvknp2bwtwg2m7mzxduzshzbr7y3i7mwbzy6@qjbdjyb56nrv>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <mtuev7pve5ltr6vvknp2bwtwg2m7mzxduzshzbr7y3i7mwbzy6@qjbdjyb56nrv>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 1 Nov 2024 08:09:06 +0100 you wrote:
-> == Description:
+On 05/11/2024 13:24, Sean Nyekjaer wrote:
+>>>
+>>> If you use fallback for a 4552 then it would enable the use of the
+>>> optional pins device-state-gpios and device-wake-gpios. But the chip
+>>> doesn't have those so the hw guys would connect them and they won't
+>>> be in the DT.
+>>>
+>>> Honestly I'm confused :/
+>>
+>> What stops anyone to use tcan4x5x ALONE for 4552? Nothing. And that's
+>> the problem here.
+>>
+>>
 > 
-> This series is the third of a multi-part series, that prepares and adds
-> support for the new lan969x switch driver.
+> Schema check will fail, but driver wize it will work just fine.
+
+Schema will not fail. That's the problem - no errors will be ever
+reported. The entire point of the schema, in contrast to TXT, is to
+detect errors and that ridiculous wildcard used as front compatible
+affects/reduces detection.
+
+> Agree that is kinda broken.
+> If I have time I can try to fix that later.
+
+No, the fix is to drop the wildcard alone, as I said in your RFC.
+
 > 
-> The upstreaming efforts is split into multiple series (might change a
-> bit as we go along):
-> 
-> [...]
+> Please explain one more time for me. Is this a comment on the if
+> sentence or the broken behavior of the driver?
 
-Here is the summary with links:
-  - [net-next,1/6] net: sparx5: expose some sparx5 VCAP symbols
-    https://git.kernel.org/netdev/net-next/c/9bdb67b53f3f
-  - [net-next,2/6] net: sparx5: replace SPX5_PORTS with n_ports
-    https://git.kernel.org/netdev/net-next/c/8f5a812efff8
-  - [net-next,3/6] net: sparx5: add new VCAP constants to match data
-    https://git.kernel.org/netdev/net-next/c/8caa21e4e4ed
-  - [net-next,4/6] net: sparx5: execute sparx5_vcap_init() on lan969x
-    https://git.kernel.org/netdev/net-next/c/d4c97e39bf40
-  - [net-next,5/6] net: lan969x: add autogenerated VCAP information
-    https://git.kernel.org/netdev/net-next/c/7ef750e490dc
-  - [net-next,6/6] net: lan969x: add VCAP configuration data
-    https://git.kernel.org/netdev/net-next/c/1091487dc743
+This is just generic comment, nothing to change here because you decided
+not to fix that wildcard from old binding.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
 
+
+Best regards,
+Krzysztof
 
 
