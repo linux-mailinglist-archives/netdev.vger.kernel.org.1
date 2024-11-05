@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-141764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEA249BC316
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:20:41 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22C889BC319
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:20:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 743111F22B11
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:20:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8ADB282D34
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:20:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC58944384;
-	Tue,  5 Nov 2024 02:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD8A456742;
+	Tue,  5 Nov 2024 02:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NDGeyF+c"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BpFh/7Eh"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 847EC433D0;
-	Tue,  5 Nov 2024 02:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7467D51C4A;
+	Tue,  5 Nov 2024 02:20:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730773225; cv=none; b=AS0fuf5w+Uvh/j4PZ32ene1Bxl5Vt6iYVhRoOA+ifKmYdeIG2SoWS7Obh/VSs7/Daza+0z49XRg8uyvhJ5UCF8p9st6Ah00x1g3vo6jzE9hoVfkJgq2AauOEGSwsBsnOtxTBzwcZS5plekPZfShIxWui6XOza382YCwoO421I6U=
+	t=1730773226; cv=none; b=ZDsF1PZiHp2ynsOhMjNpjh3crEvcJ7LReK0xRuVZC+ad296gx5TsYY2qb1rwyeT5aqcoH6ZxPLhc7rFnIJXz+LqEYBU2uVMTuZYN9zIVBmRwho3OG8eW82bgyZVPnaTslTq4CbH6n93gPr7S2g6kJ3BWkGCrpLDVluuprG9It0E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730773225; c=relaxed/simple;
-	bh=UYzXNmnPFRBT+WCFO8GxtuO8k0BxHoZse64rUvgLUiQ=;
+	s=arc-20240116; t=1730773226; c=relaxed/simple;
+	bh=H7DITtRwtsNLWdS6hpi1Dq1VgEaFbuMZ06KvxC6YoWs=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=X2iDJJsXN01AgfpXsUEtXLXrdRM/Kvw/0fVbxbEPg2H3CsAZRsP2MOR0UmTmfWIQ91dimgH0+4IpuAsIxUso8RxyTdMqMUAdO2YjgUYVnxQ3Xha7ljO8Mmwfo+MnGRgCRr5BZOGSFlRxzY6wQ8sxhZ2TBzG1bu3YcwoK6iFvTtI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NDGeyF+c; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0421AC4CECE;
-	Tue,  5 Nov 2024 02:20:25 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=SZizjX8uGeAfhaUR5RSFwRMomXAxCS5EUgpzcma/MOacr+bz1tQqJi/4XnRxydmkAgcK5mG2IyVjWGIH+rJrJe2BVAV3vmQJ6xvygUNXRV4OgYpe67hh6Crz+HEXQwdWZvCOuGoI06JR5nEAwU0bf881SpD2yGYlFCMVtM3qvxY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BpFh/7Eh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 49996C4CECE;
+	Tue,  5 Nov 2024 02:20:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730773225;
-	bh=UYzXNmnPFRBT+WCFO8GxtuO8k0BxHoZse64rUvgLUiQ=;
+	s=k20201202; t=1730773226;
+	bh=H7DITtRwtsNLWdS6hpi1Dq1VgEaFbuMZ06KvxC6YoWs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=NDGeyF+cp1fe1TtsA6lDxUVzkSkxgpIiwGWTFXCgHV8vcVPITcL+Vr8cPvHMlO59f
-	 sjwH3GW5TTXR46OR5uOxWs/OR20ghwv5g3oIK1M8zN/etcgZgBsB7l24q9SjHGhcEL
-	 pGbpHduqLI26N9J8jqzHvdEZpzb25kwSxRwuB1UcgLDcBPiyKrfggwAl004mp20CRo
-	 ZtWwHAkhya4a/qw+QWJCQg3+GH2Rjt66q8KRS2gJLSqS4m7nwzS6lpWcveZUmJVtVY
-	 GwfOM9eyjCS37wdRtIJ+w1bPeIy2+RAhtbU8+ONIcJc02afifzf9CxRqsD84eBwalD
-	 UhgFAWowrhroQ==
+	b=BpFh/7Ehgn9ARUYp1fdOf8SxLiBRY2aBW0N7E1q9IzeEZIOt7K4hEJdyp+pe6US8Z
+	 uIyNHtDk4FANEE6YLIIWaqyy2WSAMBucrhSdie4jQJqi5CI6+gvS2RTiEw6/2F3m5H
+	 MaUIe+x0XFTN/YfVkfHLg84xg6XCqVop8eUycfERc2fJrF05xDsfxslKnSMQoMkbYF
+	 Uxa4eZ+hJuELXSKtHaX2Jf2azkq+aC0FP8IlyixSRgqtudHMwDHXit5qi0fTWlCMpL
+	 jZo34LnPV8ZdXr1T7q8TSW1kBpNOw9XkK4noVxRP/qylQMnK1+j0r0+hO9nM1oe1LS
+	 cGZU2YX9017Fg==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB9183809A80;
-	Tue,  5 Nov 2024 02:20:34 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33F203809A80;
+	Tue,  5 Nov 2024 02:20:36 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,41 +52,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next] net: ena: Remove deadcode
+Subject: Re: [PATCH net-next] ptp: Remove 'default y' for VMCLOCK PTP device
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173077323349.89867.16402117123804329088.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Nov 2024 02:20:33 +0000
-References: <20241102220142.80285-1-linux@treblig.org>
-In-Reply-To: <20241102220142.80285-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: shayagr@amazon.com, akiyano@amazon.com, darinzon@amazon.com,
- ndagan@amazon.com, saeedb@amazon.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <173077323501.89867.2401311053737596737.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Nov 2024 02:20:35 +0000
+References: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
+In-Reply-To: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
+To: David Woodhouse <dwmw2@infradead.org>
+Cc: kuba@kernel.org, richardcochran@gmail.com, peter.hilber@opensynergy.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-rtc@vger.kernel.org,
+ ridouxj@amazon.com, virtio-dev@lists.linux.dev, rluu@amazon.com,
+ chashper@amazon.com, abuehaze@amazon.com, pabeni@redhat.com,
+ christopher.s.hall@intel.com, jasowang@redhat.com, jstultz@google.com,
+ mst@redhat.com, netdev@vger.kernel.org, sboyd@kernel.org, tglx@linutronix.de,
+ xuanzhuo@linux.alibaba.com, maz@kernel.org, mark.rutland@arm.com,
+ daniel.lezcano@linaro.org, a.zummo@towertech.it,
+ alexandre.belloni@bootlin.com, qemu-devel@nongnu.org, horms@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  2 Nov 2024 22:01:42 +0000 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Sat, 02 Nov 2024 16:52:17 -0500 you wrote:
+> From: David Woodhouse <dwmw@amazon.co.uk>
 > 
-> ena_com_get_dev_basic_stats() has been unused since 2017's
-> commit d81db2405613 ("net/ena: refactor ena_get_stats64 to be atomic
-> context safe")
-> 
-> ena_com_get_offload_settings() has been unused since the original
-> commit of ENA back in 2016 in
-> commit 1738cd3ed342 ("net: ena: Add a driver for Amazon Elastic
-> Network Adapters (ENA)")
+> The VMCLOCK device gives support for accurate timekeeping even across
+> live migration, unlike the KVM PTP clock. To help ensure that users can
+> always use ptp_vmclock where it's available in preference to ptp_kvm,
+> set it to 'default PTP_1588_CLOCK_VMCLOCK' instead of 'default y'.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next] net: ena: Remove deadcode
-    https://git.kernel.org/netdev/net-next/c/6a7d68f72797
+  - [net-next] ptp: Remove 'default y' for VMCLOCK PTP device
+    https://git.kernel.org/netdev/net-next/c/18ec5491a495
 
 You are awesome, thank you!
 -- 
