@@ -1,151 +1,289 @@
-Return-Path: <netdev+bounces-141859-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141860-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id A73889BC8C6
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:12:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258889BC8E3
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:16:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 390881F23C54
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:12:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 492D61C230C5
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:16:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8866B1CFEA8;
-	Tue,  5 Nov 2024 09:12:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C94E31CDA3E;
+	Tue,  5 Nov 2024 09:16:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bbK0VwdV"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Yv9G6haA"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEB641C3025
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 933F118132A;
+	Tue,  5 Nov 2024 09:16:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730797927; cv=none; b=kED01a5LHyuzrBrf0aOKNqDCTFxzvZjUx7QWu5FwcNE+U1dOkjIeE437ycfZejhq7281VoSwXowAKxnPtIYV7+mMIsHbnI2qRaQGx/b8X8fU5h33MUa+uungJ5ptjY2CugvzuDJimcgrpOm6XZWbwYODsb3b5VvrxMsiHmSqXD4=
+	t=1730798195; cv=none; b=M8gBYASl/MCPgWDYZyxtsmPhhN6LwBVqMGc4me2Q8zBGgvGmyDlw/g+HGAtEeU8lmfcaorSfqXhtAl9iZGvxwmYRo2KBmAXd/tFXF8V3Y6xlsqmO9JhCfLAMrrBVeL/+G8zc0njkWy/5P9jmU/hwhuy+zMlVaBUdTUaQoRLo98I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730797927; c=relaxed/simple;
-	bh=7qxoYeh0UNTIQAvpcHLzqALNi2h3AYcCDoYkGPVhrps=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p+9cCTCyCwYJASWsJiVYpI40njFcq5hHszqzCu7L0xeA+2b1l9JI4LO/TqC5OWOhyccHlCPCmo0LECKkVtrSqu/4KSGkGVsSYBP0DtUnnirh6S07uS/9Zu/9ggSeXOZYcSKL6IoBmX4ZZCKsMYo6xCnmXskmERnjxUI6fubbgCk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bbK0VwdV; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730797923;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=TPboAr9Vrbfot/ZtNUHg+u5qHvWpgmD4jh6l9COaVZY=;
-	b=bbK0VwdVFH45NFzIZRSu7+U+YGIIlLNAuCUEyyA1wRqTdc6ODfoQz4aHT++10dcYZwUd2D
-	QqZeSuKUkdKLA1cXpoDbThWZ3c47rG5q5ToSFe2CNgmSx5566zKQW+SjeNufb4z+Fw4W2q
-	RmA8wqa6GibKTZ3s/la8W379tXtZnH8=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-630-hEFAJLJCOiSDDBxX-w0MjA-1; Tue, 05 Nov 2024 04:12:02 -0500
-X-MC-Unique: hEFAJLJCOiSDDBxX-w0MjA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-431604a3b47so33006935e9.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 01:12:02 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730797921; x=1731402721;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=TPboAr9Vrbfot/ZtNUHg+u5qHvWpgmD4jh6l9COaVZY=;
-        b=Hypx35T79nEgcdAaIgZnZ9dLIUJHM0qG+NUzFEMW8GHKU6SiBQLDGdsGHVrRrEKqEz
-         mgEf6Ge6ienPFmRzdQ6KgKFg2DB/VRfwuEf/YES14CGS9a0YI+29Pn3bANS9h4wgoIfE
-         IR5pXsjaxv8MCvoiAOC0TX0d/WzPT170/+oU6oMRUiSXzActS1WGYMjd+ckGRTV5n88w
-         Xrtv+UPAnGoOhz6+MTp/qtE0uPBgy8wUBKksGsf285S2MdmM1dHPootDvrqp13/227pW
-         xT6+zuif/ltNOhkA0mzOg2UQFodduXQvGy0YyuBPsaooNAWjpYLFf8hnXKVVy/kYWrTc
-         X7lg==
-X-Forwarded-Encrypted: i=1; AJvYcCX8S/P+xj+Z98mvorz+Wfw7pSeSZayJHBSQ/nKlmPQ3XZ/J3PiS2inO9TLtF82grRUgxffVhmY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwVOvLTGgd+TxE0OJ/wMtWkDfHYnMTrhjBdWonhqueGQ7QEiJUx
-	4/OLueUlBuKucF513c0+mxN37D2GVss1NNQEAUf27DhLiG8vdkjPK40HKLIy5NLaoo/VH7Hz8X/
-	9nkeeun6QvlTqzwvP7SicMxBzxl0y8rlySmMg4lNJCi+RFJxmOd3FZg==
-X-Received: by 2002:a05:600c:5249:b0:431:6052:48c3 with SMTP id 5b1f17b1804b1-4319acacd6amr331592535e9.16.1730797921067;
-        Tue, 05 Nov 2024 01:12:01 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGfEmxPafpgpApl5hDQwr9QfRtM5jAmJU2SuJZkjt4o3ri5KW8DZmqElmalUu2LjqH1BonBkQ==
-X-Received: by 2002:a05:600c:5249:b0:431:6052:48c3 with SMTP id 5b1f17b1804b1-4319acacd6amr331592255e9.16.1730797920687;
-        Tue, 05 Nov 2024 01:12:00 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d4991sm15606801f8f.29.2024.11.05.01.11.59
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2024 01:12:00 -0800 (PST)
-Message-ID: <7426480f-6443-497f-8d37-b11f8f22069e@redhat.com>
-Date: Tue, 5 Nov 2024 10:11:58 +0100
+	s=arc-20240116; t=1730798195; c=relaxed/simple;
+	bh=WcZMe9/VfUeI82nF/gy6lNIFFjy2UM0JuNhq+6rR4XQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=As4KEpDWIigWRBVPkat8isg7kacJXZHklGneuTMluqjjF0TPisK0tMN7vRiXLJ9w+0MX+D56kmiedDigv71fTuOkLJqyB9kICn9MSnLANfE+udscoJcBAo1nI3lN99dB4ZF7Pd+wD4wGJ8VmOGxUEJHdBhUHKOaWtibctrjiSlA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Yv9G6haA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4A1D8C4CECF;
+	Tue,  5 Nov 2024 09:16:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730798194;
+	bh=WcZMe9/VfUeI82nF/gy6lNIFFjy2UM0JuNhq+6rR4XQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=Yv9G6haAugRVNUqDmDVNm9Zt+aj3atfwiskZQiuFtO2Rln71uUQcIi6iK2xqbB/gY
+	 T6GsnAiaaGRwSMIXK3UENS41UL889E7z4/Rw1v+OyGr6JUk9DxWdiaIhzpmct9rRSZ
+	 JqBfnr7HYhudu8njRT5qJHGlIQZrgn+47ELxcKRjnSoykYzEXyVNSu5iMp0/PCbu9e
+	 M6f/xwXl6CWa/hSr1FMTvRgxMttAKQwChSoLDcMnrg3qJRs55PIL7tzZmrC9BLRQBl
+	 sjo3SXwXC/CHd9Z8oyGm8EEk8WFzpKR9pXcol5bmRsdG/17Y1i+OqN+EFIqkdWlEnv
+	 bDLfVRxjK59ig==
+Date: Tue, 5 Nov 2024 10:16:30 +0100
+From: Krzysztof Kozlowski <krzk@kernel.org>
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
+	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
+	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
+Message-ID: <dq36jlwfm7hz7dstrp3bkwd6r6jzcxqo57enta3n2kibu3e7jw@krwn5nsu6a4d>
+References: <20241104125342.1691516-1-sean@geanix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 0/8] net: Shift responsibility for FDB
- notifications to drivers
-To: Petr Machata <petrm@nvidia.com>, Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
- Ido Schimmel <idosch@nvidia.com>, Amit Cohen <amcohen@nvidia.com>,
- Vladimir Oltean <vladimir.oltean@nxp.com>, Andy Roulin <aroulin@nvidia.com>,
- mlxsw@nvidia.com
-References: <cover.1729786087.git.petrm@nvidia.com>
- <20241029121807.1a00ae7d@kernel.org> <87ldxzky77.fsf@nvidia.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <87ldxzky77.fsf@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <20241104125342.1691516-1-sean@geanix.com>
 
-On 11/4/24 12:43, Petr Machata wrote:
-> Jakub Kicinski <kuba@kernel.org> writes:
->> On Thu, 24 Oct 2024 18:57:35 +0200 Petr Machata wrote:
->>> Besides this approach, we considered just passing a boolean back from the
->>> driver, which would indicate whether the notification was done. But the
->>> approach presented here seems cleaner.
->>
->> Oops, I missed the v2, same question:
->>
->>   What about adding a bit to the ops struct to indicate that 
->>   the driver will generate the notification? Seems smaller in 
->>   terms of LoC and shifts the responsibility of doing extra
->>   work towards more complex users.
->>
->> https://lore.kernel.org/all/20241029121619.1a710601@kernel.org/
+On Mon, Nov 04, 2024 at 01:53:40PM +0100, Sean Nyekjaer wrote:
+> Convert binding doc tcan4x5x.txt to yaml.
 > 
-> Sorry for only responding now, I was out of office last week.
-> 
-> The reason I went with outright responsibility shift is that the
-> alternatives are more complex.
-> 
-> For the flag in particular, first there's no place to set the flag
-> currently, we'd need a field in struct net_device_ops. But mainly, then
-> you have a code that needs to corrently handle both states of the flag,
-> and new-style drivers need to remember to set the flag, which is done in
-> a different place from the fdb_add/del themselves. It might be fewer
-> LOCs, but it's a harder to understand system.
-> 
-> Responsibility shift is easy. "Thou shalt notify." Done, easy to
-> understand, easy to document. When cut'n'pasting, you won't miss it.
-> 
-> Let me know what you think.
+> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+> ---
+> Changes since rfc:
 
-I think that keeping as much action/responsibilities as possible in the
-core code is in general a better option - at very least to avoid
-duplicate code.
+That's a v2. RFC was v1. *ALWAYS*.
+Try by yourself:
+b4 diff 20241104125342.1691516-1-sean@geanix.com
 
-I don't think that the C&P is a very good argument, as I would argue
-against C&P without understanding of the underlying code. Still I agree
-that keeping all the relevant info together is better, and a separate
-flag would be not so straight-forward.
+Works? No. Should work? Yes.
 
-What about using the return value of fbd_add/fdb_del to tell the core
-that the driver did the notification? a positive value means 'already
-notified', a negative one error, zero 'please notify.
 
-Cheers,
+>   - Tried to re-add ti,tcan4x5x wildcard
+>   - Removed xceiver and vdd supplies (copy paste error)
+>   - Corrected max SPI frequency
+>   - Copy pasted bosch,mram-cfg from bosch,m_can.yaml
+>   - device-state-gpios and device-wake-gpios only available for tcan4x5x
 
-Paolo
+...
+
+> +properties:
+> +  compatible:
+> +    oneOf:
+> +      - items:
+> +          - enum:
+> +              - ti,tcan4552
+> +          - const: ti,tcan4x5x
+> +      - items:
+> +          - enum:
+> +              - ti,tcan4553
+
+Odd syntax. Combine these two into one enum.
+
+> +          - const: ti,tcan4x5x
+> +      - items:
+
+Drop items.
+
+> +          - enum:
+
+... and drop enum. That's just const or do you already plan to add here
+entries?
+
+> +              - ti,tcan4x5x
+> +
+> +  reg:
+> +    maxItems: 1
+> +
+> +  interrupts:
+> +    maxItems: 1
+> +    description: The GPIO parent interrupt.
+> +
+> +  clocks:
+> +    maxItems: 1
+> +
+> +  reset-gpios:
+> +    description: Hardwired output GPIO. If not defined then software reset.
+> +    maxItems: 1
+> +
+> +  device-state-gpios:
+> +    description: |
+
+Do not need '|' unless you need to preserve formatting.
+
+Didn't you get this comment alerady?
+
+> +      Input GPIO that indicates if the device is in a sleep state or if the
+> +      device is active. Not available with tcan4552/4553.
+> +    maxItems: 1
+> +
+> +  device-wake-gpios:
+> +    description: |
+> +      Wake up GPIO to wake up the TCAN device.
+> +      Not available with tcan4552/4553.
+> +    maxItems: 1
+> +
+> +  bosch,mram-cfg:
+> +    description: |
+> +      Message RAM configuration data.
+> +      Multiple M_CAN instances can share the same Message RAM
+> +      and each element(e.g Rx FIFO or Tx Buffer and etc) number
+> +      in Message RAM is also configurable, so this property is
+> +      telling driver how the shared or private Message RAM are
+> +      used by this M_CAN controller.
+> +
+> +      The format should be as follows:
+> +      <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
+> +      The 'offset' is an address offset of the Message RAM where
+> +      the following elements start from. This is usually set to
+> +      0x0 if you're using a private Message RAM. The remain cells
+> +      are used to specify how many elements are used for each FIFO/Buffer.
+> +
+> +      M_CAN includes the following elements according to user manual:
+> +      11-bit Filter	0-128 elements / 0-128 words
+> +      29-bit Filter	0-64 elements / 0-128 words
+> +      Rx FIFO 0		0-64 elements / 0-1152 words
+> +      Rx FIFO 1		0-64 elements / 0-1152 words
+> +      Rx Buffers	0-64 elements / 0-1152 words
+> +      Tx Event FIFO	0-32 elements / 0-64 words
+> +      Tx Buffers	0-32 elements / 0-576 words
+> +
+> +      Please refer to 2.4.1 Message RAM Configuration in Bosch
+> +      M_CAN user manual for details.
+> +    $ref: /schemas/types.yaml#/definitions/int32-array
+> +    items:
+> +      - description: The 'offset' is an address offset of the Message RAM where
+> +          the following elements start from. This is usually set to 0x0 if
+> +          you're using a private Message RAM.
+> +        default: 0
+> +      - description: 11-bit Filter 0-128 elements / 0-128 words
+> +        minimum: 0
+> +        maximum: 128
+> +      - description: 29-bit Filter 0-64 elements / 0-128 words
+> +        minimum: 0
+> +        maximum: 64
+> +      - description: Rx FIFO 0 0-64 elements / 0-1152 words
+> +        minimum: 0
+> +        maximum: 64
+> +      - description: Rx FIFO 1 0-64 elements / 0-1152 words
+> +        minimum: 0
+> +        maximum: 64
+> +      - description: Rx Buffers 0-64 elements / 0-1152 words
+> +        minimum: 0
+> +        maximum: 64
+> +      - description: Tx Event FIFO 0-32 elements / 0-64 words
+> +        minimum: 0
+> +        maximum: 32
+> +      - description: Tx Buffers 0-32 elements / 0-576 words
+> +        minimum: 0
+> +        maximum: 32
+> +    minItems: 1
+> +
+> +  spi-max-frequency:
+> +    description:
+> +      Must be half or less of "clocks" frequency.
+> +    maximum: 18000000
+> +
+> +  wakeup-source:
+> +    $ref: /schemas/types.yaml#/definitions/flag
+> +    description: |
+
+Do not need '|' unless you need to preserve formatting.
+
+> +      Enable CAN remote wakeup.
+> +
+> +allOf:
+> +  - $ref: can-controller.yaml#
+> +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+> +  - if:
+> +      properties:
+> +        compatible:
+> +          contains:
+> +            enum:
+> +              - ti,tcan4552
+> +              - ti,tcan4553
+> +    then:
+> +      properties:
+> +        device-state-gpios: false
+> +        device-wake-gpios: false
+
+Heh, this is a weird binding. It should have specific compatibles for
+all other variants because above does not make sense. For 4552 one could
+skip front compatible and use only fallback, right? And then add these
+properties bypassing schema check. I commented on this already that
+original binding is flawed and should be fixed, but no one cares then I
+also don't care.
+
+> +
+> +required:
+> +  - compatible
+> +  - reg
+> +  - interrupts
+> +  - clocks
+> +  - bosch,mram-cfg
+> +
+> +additionalProperties: false
+
+Implement feedback. Nothing changed here.
+
+> +
+> +examples:
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +
+> +    spi {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        can@0 {
+> +            compatible = "ti,tcan4x5x";
+> +            reg = <0>;
+> +            clocks = <&can0_osc>;
+> +            pinctrl-names = "default";
+> +            pinctrl-0 = <&can0_pins>;
+> +            spi-max-frequency = <10000000>;
+> +            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
+> +            interrupt-parent = <&gpio1>;
+> +            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
+> +            device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
+> +            device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+> +            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
+> +            wakeup-source;
+> +        };
+> +    };
+> +  - |
+> +    #include <dt-bindings/gpio/gpio.h>
+> +    #include <dt-bindings/interrupt-controller/irq.h>
+> +
+> +    spi {
+> +        #address-cells = <1>;
+> +        #size-cells = <0>;
+> +
+> +        can@0 {
+> +            compatible = "ti,tcan4552","ti,tcan4x5x";
+
+Missing space after ,.
+
+Best regards,
+Krzysztof
 
 
