@@ -1,96 +1,108 @@
-Return-Path: <netdev+bounces-142132-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 533729BD9D1
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:41:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F1459BD9D2
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:42:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E00D1B224AA
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 23:41:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 512441F239B4
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 23:42:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D1EE216A31;
-	Tue,  5 Nov 2024 23:41:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21706216A28;
+	Tue,  5 Nov 2024 23:42:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="f6mrzoHq"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="WakmP/W+"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f41.google.com (mail-ej1-f41.google.com [209.85.218.41])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta0.migadu.com (out-187.mta0.migadu.com [91.218.175.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A0DF21643C
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 23:41:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFCBA1D31A9
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 23:42:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730850090; cv=none; b=guUJ+3lYCFijNYw8pIF3VvpDwbXDKzgcLZjJzOYmLF1jOTcVLee94En4ejqX+/dX9SDVIDC7SjZgYn+KoiVyzN4TOcxcOjDaxLvEMsRN0xDr7zuo9tJRJN+fRTfg6auD4Y7jeFCKhyo6O+WJFeyX5apqxmMDT7/RCr2lhVMMyXs=
+	t=1730850143; cv=none; b=eECuNCSd55GaHTykk7N25qnJpf68asfCnQOxLu0bXwso9t4td8qElfbA6SN4BEtMKTSxi89x6ta+DkpZvM+TRwqzVUTt0My+zyWd/bCO78EFC+EggtcDNH0Uoxh5xGDgO+ocA4X/G4aOV9U6OBClWcxKZGigoztxBIo/Yg2yCTY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730850090; c=relaxed/simple;
-	bh=A6sIL665Rsnzw2jQbwODKs9cUBNMZ6Cwi2OgDGa3Kw8=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=fhSK9GSwZkEG/BptHbhgunki9MaFnqHn1KdpbMAyLqgOdpNymXRsxxeMSd/8Hool5xPYV2WQdBKrK9xltKxLLLB5cn+NR+sux7N+lAkk3NDjf2y/RJvxMm2KW2kH4BYnZ5BwE1g1JXIx8mQw1sy9W/URG4iGi3CYowKDX2In1MA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=f6mrzoHq; arc=none smtp.client-ip=209.85.218.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ej1-f41.google.com with SMTP id a640c23a62f3a-a9eb3794a04so189457366b.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 15:41:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730850087; x=1731454887; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=Fu0/RDofU7ER4jx30UDmi0GrnOBcb9QQbNAoTs7sIFk=;
-        b=f6mrzoHq5hCGeHEhLo0jHDjBB12mkoqiG2KTmARSq3gfP0EUwwzSabaRYgqr6Rv4hz
-         zKRmieDAzxqkwbapaY74YzzWubUaUhNVtpMqoYNgl1CLt6YQVjiI5CK3lHM3xHMamnrD
-         sEAy09eqAUqSRLfSOm9MRnjsIxRxOEhZZcAwP1fVmAmaO+bP7tcmSnAcfuvYn1h0G9Jv
-         jezoiRBxvvnKja6uvpRDXkqnT6HYBosZ2aAdTulbduqozmEYlTnZrpS1N53WlQAd5yRK
-         UXHd28cQRQyWEAvQ7SIJ9/zbPUW7u59xvaQe/mi3xnuhwNNVmt61O6dVqXM8+GJp/kr1
-         zD2A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730850087; x=1731454887;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Fu0/RDofU7ER4jx30UDmi0GrnOBcb9QQbNAoTs7sIFk=;
-        b=lQyD7HjoCBNQGf1kzWvCLDS/wZFxgdW+qGJvIb3CzeR5oSuLZC3tXtQIJjZuvKeiOV
-         IXrguiQ1zBt+kfIReLAergEU7PZQIObE6D3cafrPWEmmI20kfQthaFIuq4QJaOK+ArVv
-         3VVNv+uCOkgSZEej0MR8Ak6OmjPVnpNJ15XPZlgAUo66/+usiacUjW8tnxcL3x4GeL/F
-         FbEyCWJn+zHRNhu7gKToS1gE7gj3ochTOvQTEzll/7PRv38tBl88ww2vNJ+GWG0PbaUx
-         vfoVYQkHXMS2R71rTM/d8Yp1VqhuABQnx+Kq/b24q5vusFoxg1MKo7H25DHwBdqXXMRx
-         zIYA==
-X-Gm-Message-State: AOJu0YwHemdWSoVlkDWt3gsB/ZL06ADvL6cwd7rfINoM4k7w60N+Y96m
-	ZJmAhndTnVvMSeGgVPtsDMU94CAMwH/uhLdmhTrwe1FadpyAmaWPCPR28QNI5b//htziyyWrdbm
-	2/5X5mcHyNDoTjaj6LcGiNROawGv1ZSZ6yJpg3bIoaD6S2/FdXjzo
-X-Google-Smtp-Source: AGHT+IGKrWw7+OwT0oRkArubvu46E6a2vXnRuaAs3CHUUnyxo0FMMbd6KEZK7x/CJHumhrBhJylH/Z05d09OjV7Q0IQ=
-X-Received: by 2002:a17:906:794e:b0:a9a:76d:e86c with SMTP id
- a640c23a62f3a-a9e3a6c916dmr2490804466b.49.1730850086792; Tue, 05 Nov 2024
- 15:41:26 -0800 (PST)
+	s=arc-20240116; t=1730850143; c=relaxed/simple;
+	bh=0jVs9zHue4+7eJEKCH21MgnPhUP2ISKxYTONZ8VxzwM=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=jDrcDjjajfFO/eeYA4iEOCMRw+1WA4vtvHxSegpQJwAOm99ugRrlRhf5WVTf4BgqekKpxV5X/e5yNCnobYnNkeH8EVDj7fR5/DPUCtQCs5nJqEb3VyMQ6SxQOf6JELkLgkbgzCOTUrDXGwcHg6J2ecGqxw4V96wMI/i270weKPE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=WakmP/W+; arc=none smtp.client-ip=91.218.175.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <771bd976-e68c-48d0-bfbd-1f1b73d7bb91@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730850139;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8ejCR1VlU2IfzBLT6gtDi6E+/DpO3ZNW9b3UKwQgrR0=;
+	b=WakmP/W+Yz8B36HqJoKm6qFanPL+TsWNStmC42tMritQf1tcUqlOSffDUwIEXot2LtuYe2
+	fUW7D2tRyx1CvWSLmRNUpv2HNBpWaD3UlrVsZ3bwKS04/NAtd2+P0VAvKDZIFf/RCHNb3x
+	QUkk0ICxPFRvU0oS3J5wkK9ziM0Fa4o=
+Date: Tue, 5 Nov 2024 23:42:14 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241104233251.3387719-1-wangfe@google.com> <20241105073248.GC311159@unreal>
-In-Reply-To: <20241105073248.GC311159@unreal>
-From: Feng Wang <wangfe@google.com>
-Date: Tue, 5 Nov 2024 15:41:15 -0800
-Message-ID: <CADsK2K9seSq=OYXsgrqUGHKp+YJy5cDR1vqDCVBmF3-AV3obcg@mail.gmail.com>
-Subject: Re: [PATCH 1/2] xfrm: add SA information to the offloaded packet
-To: Leon Romanovsky <leon@kernel.org>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com, 
-	antony.antony@secunet.com
-Content-Type: text/plain; charset="UTF-8"
+Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
+ hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
+ Pedro Tammela <pctammela@mojatatu.com>, edumazet@google.com
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ netdev@vger.kernel.org
+References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
+ <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
+ <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
+ <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
+ <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
+ <9dbb815a-0137-4565-ad91-8ed92d53bced@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <9dbb815a-0137-4565-ad91-8ed92d53bced@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Leon,
-I checked the current tree and there are no drivers who support packet
-offload. Even for the mlx5 driver, it only supports crypto offload
-mode. If I miss anything, please let me know.
-Since the driver only requires the Security Association (SA) to
-perform the necessary transformations,  policy information is not
-needed. Storing policy information, matching the policy and checking
-the if_id within the driver wouldn't provide much benefit. It would
-increase CPU and memory usage without a clear advantage.
-For all other suggestions, I totally agree with you.
+On 05/11/2024 22:14, Alexandre Ferrieux wrote:
+>> On 04/11/2024 22:33, Vadim Fedorenko wrote:
+>>>> On 04/11/2024 18:00, Pedro Tammela wrote:
+>>>>> 'static inline' is discouraged in .c files
+>>>>
+>>>> Why ?
+>>>>
+>>>> It could have been a local macro, but an inline has (a bit) better type
+>>>> checking. And I didn't want to add it to a .h that is included by many other
+>>>> unrelated components, as it makes no sense to them. So, what is the recommendation ?
+>>>
+>>> Either move it to some local header file, or use 'static u32
+>>> handle2id(u32 h)'
+>>> and let compiler decide whether to include it or not.
+>>
+>> I believe you mean "let the compiler decide whether to _inline_ it or not".
+>> Sure, with a sufficiently modern Gcc this will do. However, what about more
+>> exotic environments ? Wouldn't it risk a perf regression for style reasons ?
+>>
+>> And speaking of style, what about the dozens of instances of "static inline" in
+>> net/sched/*.c alone ? Why is it a concern suddenly ?
+> 
+> Can you please explain *why* in the first place you're saying "'static inline'
+> is discouraged in .c files" ? I see no trace if this in coding-style.rst, and
+> the kernel contains hundreds of counter-examples.
 
-Thanks,
-Feng
+The biggest reason is because it will mask unused function warnings when
+"static inline" function will not be used because of some future
+patches. There is no big reason to refactor old code that's why there
+are counter-examples in the kernel, but the new code shouldn't have it.
+
+I don't really understand what kind of exotic environment you are
+thinking about, but modern kernel has proper gcc/clang version
+dependency, both of these compilers have good heuristics to identify
+which function to inline.
+
 
