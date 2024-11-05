@@ -1,142 +1,139 @@
-Return-Path: <netdev+bounces-142016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142017-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 49F769BCF64
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:32:45 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6800D9BCF83
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:34:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DFBE2854B3
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:32:44 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E932A1F218D0
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:34:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0DF51D9580;
-	Tue,  5 Nov 2024 14:32:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C22C1D4173;
+	Tue,  5 Nov 2024 14:34:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="H5BwgpdT"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A01C51D5AD7
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 14:32:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E08A1CEEAA;
+	Tue,  5 Nov 2024 14:34:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730817156; cv=none; b=H6A02FoG0kRChv2TvJJvFj+eI3dSv3VSkDSh7lZULZoEoOjTnFH2ZXvMCSSUC4HiFUq9OdjodCfLdrLqlbJcVUxOfsoNQj40RIdMCcoJYxkmc7o4VqThVamIn406GjaZB84Cpdp7vhQiGSZSkNTCOSoqyaTP4ogZBhmcqwtMxNM=
+	t=1730817283; cv=none; b=rRHLa+T/u06L1hmVYP0MeOCZUWXVlGJtL782Ojl4AMvuH1CNc9MUVkN3JtH/+Zfo8UkwVWFmM3k3IOBhCFRGLkVI5t9aw/3jvZQ9rzBEdDRPmChblf3XU1kUM4fGVmfjGafdDJMm88iWdGmRyObKfNeYEr6QFm1/YKrb4Op0LWk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730817156; c=relaxed/simple;
-	bh=frQxkDxOlabdHzuh0NP3qfAHRwCrzOqfjKrCItIFrBM=;
+	s=arc-20240116; t=1730817283; c=relaxed/simple;
+	bh=JXYG8C8U8PK2PfTzjVVWzxODStkLS87k+WMOcY0Y+rQ=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=FHie8KWGfDFozFjpvuYBunPrQIqzX1Eomx8EefGvZEkBVixmX/5ICoOiTRonRlFxkvG3Fgh9Mncs9xXiJG3vdrZWGuhoBJtVpKVbpbnD2ktuo3jffxFNn2+rRfcNoN4lqW1rTa1yEBJat0WxFzQAtsHJQE0Tdip0YEmsVECBU6w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t8KbK-0007mY-SW; Tue, 05 Nov 2024 15:32:10 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t8KbJ-0029or-0W;
-	Tue, 05 Nov 2024 15:32:09 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t8KbJ-00FPHS-07;
-	Tue, 05 Nov 2024 15:32:09 +0100
-Date: Tue, 5 Nov 2024 15:32:09 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
-	Eric Dumazet <edumazet@google.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	Woojung Huh <woojung.huh@microchip.com>,
-	Arun Ramadoss <arun.ramadoss@microchip.com>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>, kernel@pengutronix.de,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	UNGLinuxDriver@microchip.com,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	devicetree@vger.kernel.org, Marek Vasut <marex@denx.de>
-Subject: Re: [PATCH net-next v3 6/6] net: dsa: microchip: parse PHY config
- from device tree
-Message-ID: <ZyosafnNkdqt4JMb@pengutronix.de>
-References: <20241105090944.671379-1-o.rempel@pengutronix.de>
- <20241105090944.671379-7-o.rempel@pengutronix.de>
- <20241105152805.25f8b065@fedora.home>
+	 Content-Type:Content-Disposition:In-Reply-To; b=XyCtjf6QURmCgSYcOiOyXyYmU1dIo9XhMne/MyTq3G6afTwnvKEFVZX4kIFp2y4blNljXtSt1XDxAtNqMh9rWyGsFsdRk0i0sS5c4fbeTKRHN5XNZGZrPE+PSndCyid+MZ1UFnfibAcYc2rAbd2RSJsfz5fAv/eBiJnqIavpNpA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=H5BwgpdT; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730817276; h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
+	bh=VqUIx8YOuTVgTMRjLpcD/6mYu4oJpNJNpPHrEV3XDtI=;
+	b=H5BwgpdTcQw90/xTZQJdDMQXfHidi13xSv81ueowdGn8XK0NoSH/adtcePCXzc33+gqlv86s7437V0u8NANKLMIFE2O/QXXrGkei3Z5kAdpYGfXFoTGy6vuw9D1vBZdlQuvyRAge2DO8R3VnfNh19RVdnDgrCSOwO2ARaDoZA34=
+Received: from localhost(mailfrom:dust.li@linux.alibaba.com fp:SMTPD_---0WIn9yom_1730817275 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 05 Nov 2024 22:34:35 +0800
+Date: Tue, 5 Nov 2024 22:34:34 +0800
+From: Dust Li <dust.li@linux.alibaba.com>
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Nils Hoppmann <niho@linux.ibm.com>,
+	Niklas Schnell <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Stefan Raspl <raspl@linux.ibm.com>
+Subject: Re: [PATCH net-next] net/smc: increase SMC_WR_BUF_CNT
+Message-ID: <20241105143434.GA89669@linux.alibaba.com>
+Reply-To: dust.li@linux.alibaba.com
+References: <20241025074619.59864-1-wenjia@linux.ibm.com>
+ <20241025235839.GD36583@linux.alibaba.com>
+ <20241031133017.682be72b.pasic@linux.ibm.com>
+ <20241104174215.130784ee.pasic@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241105152805.25f8b065@fedora.home>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+In-Reply-To: <20241104174215.130784ee.pasic@linux.ibm.com>
 
-Hi Maxime,
+On 2024-11-04 17:42:15, Halil Pasic wrote:
+>On Thu, 31 Oct 2024 13:30:17 +0100
+>Halil Pasic <pasic@linux.ibm.com> wrote:
+>
+>> On Sat, 26 Oct 2024 07:58:39 +0800
+>> Dust Li <dust.li@linux.alibaba.com> wrote:
+>> 
+>> > >For some reason include/linux/wait.h does not offer a top level wrapper
+>> > >macro for wait_event with interruptible, exclusive and timeout. I did
+>> > >not spend too many cycles on thinking if that is even a combination that
+>> > >makes sense (on the quick I don't see why not) and conversely I
+>> > >refrained from making an attempt to accomplish the interruptible,
+>> > >exclusive and timeout combo by using the abstraction-wise lower
+>> > >level __wait_event interface.
+>> > >
+>> > >To alleviate the tx performance bottleneck and the CPU overhead due to
+>> > >the spinlock contention, let us increase SMC_WR_BUF_CNT to 256.    
+>> > 
+>> > Hi,
+>> > 
+>> > Have you tested other values, such as 64? In our internal version, we
+>> > have used 64 for some time.  
+>> 
+>> Yes we have, but I'm not sure the data is still to be found. Let me do
+>> some digging.
+>> 
+>
+>We did some digging and according to that data 64 is not likely to cut
+>it on the TX end for highly parallel request-response workload. But we
+>will measure some more these days just to be on the safe side.
+>
+>> > 
+>> > Increasing this to 256 will require a 36K continuous physical memory
+>> > allocation in smc_wr_alloc_link_mem(). Based on my experience, this may
+>> > fail on servers that have been running for a long time and have
+>> > fragmented memory.  
+>> 
+>> Good point! It is possible that I did not give sufficient thought to
+>> this aspect.
+>> 
+>
+>The failing allocation would lead to a fallback to TCP I believe. Which
+>I don't consider a catastrophic failure.
 
-On Tue, Nov 05, 2024 at 03:28:05PM +0100, Maxime Chevallier wrote:
-> > +	dsa_switch_for_each_user_port(dp, dev->ds) {
-> > +		if (!dev->info->internal_phy[dp->index])
-> > +			continue;
-> > +
-> > +		phy_node = of_parse_phandle(dp->dn, "phy-handle", 0);
-> > +		if (!phy_node) {
-> > +			dev_err(dev->dev, "failed to parse phy-handle for port %d.\n",
-> > +				dp->index);
-> > +			phys_are_valid = false;
-> > +			continue;
-> > +		}
-> > +
-> > +		phy_parent_node = of_get_parent(phy_node);
-> > +		if (!phy_parent_node) {
-> > +			dev_err(dev->dev, "failed to get PHY-parent node for port %d\n",
-> > +				dp->index);
-> > +			phys_are_valid = false;
-> > +		} else if (dev->info->internal_phy[dp->index] &&
-> > +			   phy_parent_node != mdio_np) {
-> 
-> There's a check a few lines above that guarantees that at this point
-> dev->info->internal_phy[dp->index] will always evaluate as true,
-> so you could simplify that condition a bit :)
+Yes, but fallback to TCP may be not the only result.
 
-good point :)
+When we don't have much continuous physical memory, allocating a large
+continuous physical memory without flags like __GFP_NORETRY would cause
+memory compaction. We've encounter problems before, the one I still
+remember is the statistics buffer for mlx5 was once allocated using
+kmalloc, and it was changed to kvmalloc later because of the large
+physical continous memory allocation cause problems with online servers.
 
-> > +			dev_err(dev->dev, "PHY-parent node mismatch for port %d, expected %pOF, got %pOF\n",
-> > +				dp->index, mdio_np, phy_parent_node);
-> > +			phys_are_valid = false;
-> > +		} else {
-> > +			ret = of_property_read_u32(phy_node, "reg", &phy_id);
-> > +			if (ret < 0) {
-> > +				dev_err(dev->dev, "failed to read PHY ID for port %d. Error %d\n",
-> > +					dp->index, ret);
-> > +				phys_are_valid = false;
-> > +			} else if (phy_id != dev->phy_addr_map[dp->index]) {
-> > +				dev_err(dev->dev, "PHY ID mismatch for port %d, expected 0x%x, got 0x%x\n",
-> > +					dp->index, dev->phy_addr_map[dp->index],
-> > +					phy_id);
-> 
-> In this context, PHY ID might be a bit misleading, as PHY ID usually
-> refers to the identifier (OUI + model id used at probe to select the
-> driver). May I suggest phy_addr instead ?
+>
+>But let us put this patch on hold and see if we can come up with
+>something better.
 
-ack, will rework it.
+Agree
 
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Best regards,
+Dust
+
 
