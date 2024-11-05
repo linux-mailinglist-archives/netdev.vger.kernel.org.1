@@ -1,196 +1,136 @@
-Return-Path: <netdev+bounces-142077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A957A9BD57D
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:56:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B327A9BD5C2
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:20:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F724284719
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:56:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F0A1C20F31
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:20:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE991E885E;
-	Tue,  5 Nov 2024 18:56:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151CC1E7C35;
+	Tue,  5 Nov 2024 19:20:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qV3al8eh"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MuNX9/R7"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93ED817BEB7;
-	Tue,  5 Nov 2024 18:56:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1001E7C27;
+	Tue,  5 Nov 2024 19:20:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730832994; cv=none; b=ee62gao2ofDK3+k9Zf2qY1KHpLwMtdTcB/6F5j055GeXtQsN41rYrLzglTBDVxPdMppQq/k1BSNWvWS1BgN1WFvOX+rjOdG1ZL5UmqGHvhW1SnqvvgrpZaqR9cDklXb9SkVJvhPq4C8XZaZAHVZ0dn89zFhWsspP5o2llpo795w=
+	t=1730834409; cv=none; b=nFiQQ4cx8V6bHMZ6hWoU79eosiGMvYSMhgB7XaC/aRfc43WLXNo4AYrdLwpFC6bJ2cuxTf5LICn6p1wFcxh6bD6PqQwxbOEjb2vfTQudY003bKt5gXjoZxoAY+5Qn914Jzm4IN+FoXezUp0vpJmlG7EBfESsjP9sYt4fkHfyGmE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730832994; c=relaxed/simple;
-	bh=c/J5SfUIJ9hQst/+9a2BMM/+0T0QUgD6O198Li/u3mo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=pDzcFQjvgO3gn2LCu+fH6eKxygDgg4yQv7hDs1EqIim9RUkndsaeVIGVSeLLSILatf4v7GqMy/1t8uUJUb42O8vQ04BVl0aLQylWFv2qki3E3jAVp0cT+30AtlyzBsgfmyb9axAsw/ptnp5JEj93cPbx06uLbGNFh2Q4Jj3pzmY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qV3al8eh; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8A9C4CECF;
-	Tue,  5 Nov 2024 18:56:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730832994;
-	bh=c/J5SfUIJ9hQst/+9a2BMM/+0T0QUgD6O198Li/u3mo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=qV3al8eh5yGBIlvCge0rhsVraqUXO27A+aqiSVDZA5tCLYlWKWOGLDWFSgGOgNTOI
-	 Qn8OtFnHkRoQYja3H6tOBkwfekfawfjTrTb6F6H8Y+4edPtaRGEFIVHeQJjx08X2Ir
-	 xhFjsiY1wnGeOFfcSYgT1ifE9JSch6vBOiiSy9ra3xO3171ANU33EbGatSuJmpmGzP
-	 b12JaYiD9ZIQeavoZfoWbaDpOZ7Cc38rfDrOkoMP3UCmH7/hGj+1J0BZuLemgfERjL
-	 CNlimFcs6Hfgo9mRCKxQk0N5bmI2k9YBeL6ds57lLI6iaPd35BIjN3GO9qaAjuinHC
-	 AB1DoBGjv6nQA==
-Date: Tue, 5 Nov 2024 10:56:32 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Caleb Sander Mateos <csander@purestorage.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Parav Pandit <parav@nvidia.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v3] mlx5/core: Schedule EQ comp tasklet only if
- necessary
-Message-ID: <ZypqYHaRbBCGo3FD@x130>
-References: <CY8PR12MB7195C97EB164CD3A0E9A99F9DC552@CY8PR12MB7195.namprd12.prod.outlook.com>
- <20241031163436.3732948-1-csander@purestorage.com>
+	s=arc-20240116; t=1730834409; c=relaxed/simple;
+	bh=xiscwbTQJTQiTE8ft0L8rsFtWNA96DS5JnH3vPLVUmw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=VzwcmXiDOSCuWhJNNFzGjlcjTK/WHYTH3xr2Ck2QFiqw7HQrfYEZCrxtAG9Hnd5HIPDPioYtpLyWAqb2IQVD8oSpyvdRkgtI5ASY5bHwEd0lfJbXHycLZEgCr87EBTfSah4haMvTCvh+pxwSInvhgCyRaHXW+OFj1kCIL7p+ZZM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MuNX9/R7; arc=none smtp.client-ip=209.85.216.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e2e050b1c3so111015a91.0;
+        Tue, 05 Nov 2024 11:20:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730834407; x=1731439207; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NGhRcnGegcAs6+AZNhnWAc40T167/ZzHeEXpxdgzWUU=;
+        b=MuNX9/R7DNrwttHygWNG2X6rcTckDa4oM8eNFogCVyfeOBQY0WTzT2BjlFSCvE33NE
+         1zdaIHTzLT7JHixhbQsb2k2nkkr7/evNmgX8hzDPLFnPwY84yTplQ1ldsznpMlGxxIwn
+         rCbT7hududiL9lD+bC4rwojcnYZMoeDO56rqPXaILm40uBTQIe2PxdTq+ljyrswS7k0t
+         mjFME5NXUGqBCmOJI/hMxA36gSrne+gEG5+pX+VYrHQ8mL7P41qT5vIAnX2Hdbj8TxXS
+         WKiKrOFEGJyNFjjJOMGLJeiL4IxlMU4BTY5iCDPp/Sij49nnaY6C/J23xT7w1Dzc9z51
+         2FYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730834407; x=1731439207;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=NGhRcnGegcAs6+AZNhnWAc40T167/ZzHeEXpxdgzWUU=;
+        b=ZCK+PIxaJmjxm3wAp+WBUEnkAQObLUYcQKbJDuxUKX0RX3IWWKVcfRBL4ODln2forc
+         bDWTDbYOimT6xaWxN8sGkM75wvrsEWDM/uQs36OLihK/jyXUIfzTqZfLQLIdVPN29CsU
+         iZs5AtYouz0rrSOcmOdsPrXIaL7riMRFB5IeqeZsi7o15gFLkncxOFssF9fKYGC9aQ6R
+         AV1DguXxvIO680RJeSz75UcjgHG02dRoWHnYziWNZZCE65SUQvmm0iEhY41jIE0fSJXN
+         C5hBEM8l5QcOByPjGtYZt5F/2/LTAlDJ70Bd70ImMm6/XCCs6lpwZgvikElz+kWLs4tX
+         aZ/g==
+X-Forwarded-Encrypted: i=1; AJvYcCX7dzs+FxfKdRGIn+6EiDPAsudjVzb6i7W2vj7ROV62Gw/FLnZO72R+HI6QFbbt82Ya6IgyM7so@vger.kernel.org, AJvYcCXXY2O99JgxEkk1prl3oCEBWpnwffA41vhlXZuLUrwlZQOUaUj7RDiBfvi5RPVoDo+IfoACmLr/kAD6lEo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrhotovgZASzv69eSo7zA6vz7N+QWE+lltpHYwt5iN/t1P3knU
+	J/S8AUTTA2/DNwiNgHndZUOjserhnT8/k5LAkF3rLl0Hcl1RI+rY
+X-Google-Smtp-Source: AGHT+IHMm9BWGsU3oqzfK2SGuGvci9VCqK/1siYq9TbZPUEggojsNz/coX+SiCFOL98KNG00rhDuRg==
+X-Received: by 2002:a17:90b:278c:b0:2e3:bc3e:feef with SMTP id 98e67ed59e1d1-2e93e0589dcmr29825899a91.3.1730834406994;
+        Tue, 05 Nov 2024 11:20:06 -0800 (PST)
+Received: from TW-MATTJAN1.eu.trendnet.org (61-216-130-235.hinet-ip.hinet.net. [61.216.130.235])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fc0087asm12382645a91.47.2024.11.05.11.20.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 11:20:06 -0800 (PST)
+From: Matt Jan <zoo868e@gmail.com>
+To: syzbot+14c04e62ca58315571d1@syzkaller.appspotmail.com
+Cc: davem@davemloft.net,
+	dhowells@redhat.com,
+	edumazet@google.com,
+	kuba@kernel.org,
+	linux-afs@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	marc.dionne@auristor.com,
+	netdev@vger.kernel.org,
+	pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com,
+	skhan@linuxfoundation.org,
+	Matt Jan <zoo868e@gmail.com>
+Subject: [PATCH] rxrpc: Initialize sockaddr_rxrpc directly
+Date: Wed,  6 Nov 2024 03:19:59 +0800
+Message-Id: <20241105191959.2871-1-zoo868e@gmail.com>
+X-Mailer: git-send-email 2.25.1
+In-Reply-To: <671acd8e.050a0220.381c35.0004.GAE@google.com>
+References: <671acd8e.050a0220.381c35.0004.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241031163436.3732948-1-csander@purestorage.com>
+Content-Transfer-Encoding: 8bit
 
-On 31 Oct 10:34, Caleb Sander Mateos wrote:
->Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet
->to call mlx5_cq_tasklet_cb() if it processes any completions. For CQs
->whose completions don't need to be processed in tasklet context, this
->adds unnecessary overhead. In a heavy TCP workload, we see 4% of CPU
->time spent on the tasklet_trylock() in tasklet_action_common(), with a
->smaller amount spent on the atomic operations in tasklet_schedule(),
->tasklet_clear_sched(), and locking the spinlock in mlx5_cq_tasklet_cb().
->TCP completions are handled by mlx5e_completion_event(), which schedules
->NAPI to poll the queue, so they don't need tasklet processing.
->
->Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
->overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs
->to be processed in tasklet context, so it can schedule the tasklet. CQs
->that need tasklet processing have their interrupt comp handler set to
->mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that
->don't need tasklet processing won't schedule the tasklet. To avoid
->scheduling the tasklet multiple times during the same interrupt, only
->schedule the tasklet in mlx5_add_cq_to_tasklet() if the tasklet work
->queue was empty before the new CQ was pushed to it.
->
->The additional branch in mlx5_add_cq_to_tasklet(), called for each EQE,
->may add a small cost for the userspace Infiniband CQs whose completions
->are processed in tasklet context. But this seems worth it to avoid the
->tasklet overhead for CQs that don't need it.
->
->Note that the mlx4 driver works the same way: it schedules the tasklet
->in mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
->
->Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
->Reviewed-by: Parav Pandit <parav@nvidia.com>
->---
->v3: revise commit message
->v2: reorder variable declarations, describe CPU profile results
->
-> drivers/net/ethernet/mellanox/mlx5/core/cq.c | 5 +++++
-> drivers/net/ethernet/mellanox/mlx5/core/eq.c | 5 +----
-> 2 files changed, 6 insertions(+), 4 deletions(-)
->
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cq.c b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
->index 4caa1b6f40ba..25f3b26db729 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
->@@ -69,22 +69,27 @@ void mlx5_cq_tasklet_cb(struct tasklet_struct *t)
-> static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
-> 				   struct mlx5_eqe *eqe)
-> {
-> 	unsigned long flags;
-> 	struct mlx5_eq_tasklet *tasklet_ctx = cq->tasklet_ctx.priv;
->+	bool schedule_tasklet = false;
->
-> 	spin_lock_irqsave(&tasklet_ctx->lock, flags);
-> 	/* When migrating CQs between EQs will be implemented, please note
-> 	 * that you need to sync this point. It is possible that
-> 	 * while migrating a CQ, completions on the old EQs could
-> 	 * still arrive.
-> 	 */
-> 	if (list_empty_careful(&cq->tasklet_ctx.list)) {
-> 		mlx5_cq_hold(cq);
+In rxrpc_lookup_peer_local_rcu(), removed the redundant memset call
+that zeros out the sockaddr_rxrpc structure before setting its fields.
+Instead, initialize the sockaddr_rxrpc structure directly in
+rxrpc_input_error().
 
-The condition here is counter intuitive, please add a comment that relates
-to the tasklet routine mlx5_cq_tasklet_cb, something like.
-/* If this list isn't empty, the tasklet is already scheduled, and not yet
-  * executing the list, the spinlock here guarantees the addition of this CQ
-  * will be seen by the next execution, so rescheduling the tasklet is not
-  * required */ 
+This change simplifies the code and ensures that the sockaddr_rxrpc
+structure is properly zero-initialized.
 
-One other way to do this, is to flag tasklet_ctx.sched_flag = true, inside
-mlx5_add_cq_to_tasklet, and then schedule once at the end of eq irq processing 
-if (tasklet_ctx.sched_flag == true). to avoid "too" early scheduling, but
-since the tasklet can't run until the irq handler returns, I think your
-solution shouldn't suffer from "too" early scheduling .. 
+Reported-by: syzbot+14c04e62ca58315571d1@syzkaller.appspotmail.com
+Signed-off-by: Matt Jan <zoo868e@gmail.com>
+---
+ net/rxrpc/peer_event.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-Acked-by: Saeed Mahameed <saeedm@nvidia.com>
+diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
+index 552ba84a255c..c86b432201fd 100644
+--- a/net/rxrpc/peer_event.c
++++ b/net/rxrpc/peer_event.c
+@@ -33,7 +33,6 @@ static struct rxrpc_peer *rxrpc_lookup_peer_local_rcu(struct rxrpc_local *local,
+ 
+ 	_enter("");
+ 
+-	memset(srx, 0, sizeof(*srx));
+ 	srx->transport_type = local->srx.transport_type;
+ 	srx->transport_len = local->srx.transport_len;
+ 	srx->transport.family = local->srx.transport.family;
+@@ -134,7 +133,7 @@ static void rxrpc_adjust_mtu(struct rxrpc_peer *peer, unsigned int mtu)
+ void rxrpc_input_error(struct rxrpc_local *local, struct sk_buff *skb)
+ {
+ 	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
+-	struct sockaddr_rxrpc srx;
++	struct sockaddr_rxrpc srx = {};
+ 	struct rxrpc_peer *peer = NULL;
+ 
+ 	_enter("L=%x", local->debug_id);
+-- 
+2.25.1
 
-
->+		schedule_tasklet = list_empty(&tasklet_ctx->list);
-> 		list_add_tail(&cq->tasklet_ctx.list, &tasklet_ctx->list);
-> 	}
-> 	spin_unlock_irqrestore(&tasklet_ctx->lock, flags);
->+
->+	if (schedule_tasklet)
->+		tasklet_schedule(&tasklet_ctx->task);
-> }
->
-> /* Callers must verify outbox status in case of err */
-> int mlx5_create_cq(struct mlx5_core_dev *dev, struct mlx5_core_cq *cq,
-> 		   u32 *in, int inlen, u32 *out, int outlen)
->diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->index 859dcf09b770..3fd2091c11c8 100644
->--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->@@ -112,14 +112,14 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
-> 	struct mlx5_eq_comp *eq_comp =
-> 		container_of(nb, struct mlx5_eq_comp, irq_nb);
-> 	struct mlx5_eq *eq = &eq_comp->core;
-> 	struct mlx5_eqe *eqe;
-> 	int num_eqes = 0;
->-	u32 cqn = -1;
->
-> 	while ((eqe = next_eqe_sw(eq))) {
-> 		struct mlx5_core_cq *cq;
->+		u32 cqn;
->
-> 		/* Make sure we read EQ entry contents after we've
-> 		 * checked the ownership bit.
-> 		 */
-> 		dma_rmb();
->@@ -142,13 +142,10 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
-> 			break;
-> 	}
->
-> 	eq_update_ci(eq, 1);
->
->-	if (cqn != -1)
->-		tasklet_schedule(&eq_comp->tasklet_ctx.task);
->-
-> 	return 0;
-> }
->
-> /* Some architectures don't latch interrupts when they are disabled, so using
->  * mlx5_eq_poll_irq_disabled could end up losing interrupts while trying to
->-- 
->2.45.2
->
->
 
