@@ -1,150 +1,124 @@
-Return-Path: <netdev+bounces-141891-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141892-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id BCFF29BC9E0
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:03:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 917919BC9E2
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:04:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754E41F231D4
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:03:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EDE72283BD3
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:04:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D014B1CF5C7;
-	Tue,  5 Nov 2024 10:03:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 592DE1D0F60;
+	Tue,  5 Nov 2024 10:04:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AWK+0SUU"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PJasH6dn"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016D218F2F7
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 10:03:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C000718F2F7
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 10:04:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730801003; cv=none; b=DHxLrvetj6Da8PzM2uQ5pmTwS/cOcJZEvIKBby47Kv8go6Z49dB4hhF6F7UsDhSwqCvNG7USxu79rjiISYcd+Fb/u0w2JhUe4UZ9xq6t8Fu+Pi6Dn395SHFIWmdJopnDiLffnvjVNnWHNPKypAuujCWpo+s17qbLG5OZMTaFin0=
+	t=1730801043; cv=none; b=W1mYxlkop0e7HOWSBMl1mz4JWEPP/MM22CN+pSbmoumhecM8wBxQ1NgAloUPXCUfnBxbdUydQZY/u5/Vz3c3d+oHeHf5avVD7Yp7oKLQ+bUtFkfZLmrD+5u8gdbgs5sVL1lGRR3u2iT3zFqBnb6NO4bluTkpsEmmNlfgu91Padk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730801003; c=relaxed/simple;
-	bh=BaF0wzuPEUJAYWOn5Vuel0BojFI/gn6vtsm/k2Am+60=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oZlI2eSSA2w3ifSUvlkUn3j+ZgUWjvL1Ujvk5PyehCXCTMQvVQ3gHfUD+71iKePu+AQKi54jdF68S+JzP3yHvuHyHQi3KQlB281IseHaTprEoHQa5yps+7Zr7N1QSwpxECicd65rtWc7ndDYHcFLmlMavm4t58bIfOri9nmKenk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AWK+0SUU; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5cec93719ccso3840251a12.2
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 02:03:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730801000; x=1731405800; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1z0zDjEHRjC9Hfy868GHIkGTopMm6yXCtknHbsE1cok=;
-        b=AWK+0SUUvLS7bh+x0OeFTdaBgoyEb65X/DlF0HmL7aWdyHFooDyp+t+gBZBzCUCK4e
-         5F56a5/4Ti1eUf+LG5O8t4uMIAWMwdGtDkLoRZxAppDIGPlvv31SFaOpE+FNcl9xzAru
-         Nf5PamrbA+vY+Fj/ARKbzKfsYtmEghy//JWCoKQMUtyyie4wC4FpQF4iP9OxEzhzBpnc
-         HWBWdRjeHn8a8kY3T5vjZinype/ikZyBIwN+6Zxoglx6D4Wcz1nRX6HTg2WvCTUI38mJ
-         sgvAZmQHhQUZ3LTyoHCng0AzQaWhu/FoT79SslIqXrP5cT+F2LkBmbWnOWJQh0LctEDj
-         sitg==
+	s=arc-20240116; t=1730801043; c=relaxed/simple;
+	bh=h+lVlv4v4kFhN60Y7uN6+mlTtYtzZfrbtQ0cnBBKEdU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=j7LTuE2q3/PNOs1uDJZ6DghgRfpjNHFvQyN+tJRin6h04UTkVNBPDUQLzoHl66yqqIoIpS3uqExdGm3Y+Wo66ZJXYDEn+8H6uy87yj6Mr8z2aA2xVSKI3Ue1nJjGR9DVaHfAl3NidIIypYtqkdKheOjmfyp6d691OqkrSg/6fVA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PJasH6dn; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730801040;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=8fTSKKdEnBx5rNtqdwW2TR8ocPd2sPuXo5XqxbGsjrE=;
+	b=PJasH6dnqKkmzS+5XzMT/y3hqSWNdqnMeX33NYfhTUVx8+5zEIClUQtY3kjOppJpYQ/Wno
+	yE7gSN8aKqQ9f6liiK6TgCb3BgK2WfU2voUR9JL4v4lkaYElK+MpIKtptHGGOnQJXBDNH0
+	dj4nbiUZcHCmtTAx6t+pbuT+NN/sgRk=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-245-t2aEyx6fPW-wWn6eQLkm_g-1; Tue, 05 Nov 2024 05:03:59 -0500
+X-MC-Unique: t2aEyx6fPW-wWn6eQLkm_g-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d45de8bbfso3653515f8f.3
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 02:03:59 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730801000; x=1731405800;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1z0zDjEHRjC9Hfy868GHIkGTopMm6yXCtknHbsE1cok=;
-        b=wncsUPSOIgKmJJ2JHEVWsaZpqL4uUT/jQJB0a18/B2a7ZHux82tx250DupboU6OFeE
-         LBk+8c87R1pnVV4B1bVcLmfYytZDiPnyF2IbEICcZMe8OzusGp8Rad77cy524SFa/GQP
-         e7ykCM/mFmt7OMXYJZ35Nt39eFyRIRK8tu6G6tawbwwZoH4tb7xE4NzC6yE0/NxochRO
-         AlK5NuFq2DsBGJub97J7AKCPsxS2rwu3KAtGEMZUPrwajc23eqyTyRXLcLwN1FxscoxR
-         G4DH8BUP+SZghlLURRDhrfXVYQ/SxYZqqk1c2XlGLFTeFwEDsKIcmagRcq7NS5Ue4ztA
-         qxcw==
-X-Forwarded-Encrypted: i=1; AJvYcCVGsRZ6S/G1IwNdfsI/tkZJlkVbPMa85AX0banG9MnKo6raVCDf13ZXfbCyOWixLfyMpoeR5os=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzLAdl7oWSj7lif0y9Vn3WrfdWpyQcK+//Oczj7iWC77se5FAp5
-	wvm1hQSSsqUxed0l+knFitkaJiSUDYRciuEfSpznpA8T/169ZscQ3m/pvxqWkiljwB+XeuPIq2y
-	Mz+CaJFxwdUEJl8UFpit5fxe4qvcf76KzTyns
-X-Google-Smtp-Source: AGHT+IEyI8/rO3O6vCmIdqpoUCThcWAuJk2RjWyvjFO7qe0jt1NnbcDP73Gpn0wkWtGACbeM0/IJ3Zp2xvjpe+OkAD0=
-X-Received: by 2002:a05:6402:350e:b0:5ce:cfef:1d08 with SMTP id
- 4fb4d7f45d1cf-5cecfef1e06mr7705656a12.32.1730801000129; Tue, 05 Nov 2024
- 02:03:20 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730801038; x=1731405838;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=8fTSKKdEnBx5rNtqdwW2TR8ocPd2sPuXo5XqxbGsjrE=;
+        b=DnSo85KlNf590WrxDslwklb12boa2N02z+1V7vXiA0+cym/WzFWpQfx4864UXWU1ee
+         qHV7yWaon0vxmM/rcZkyttqS4qHyoPrUws7AhzGBQDDK0J1ULGqsRrUZDa6ZltLYmTVz
+         oVkyWT9nFXPCFSEXHYKsfK8IBf9ge+TpfRLFff3VKnT2Zoyot8/STJl4nQF9iltPUlbi
+         zMYxqkURhm5lMFvwRNoZnsKFKK+LyFv809jHIY2PoBYaWihDGT8va1ZJCry6DhYLlcXa
+         tgflTMnYfIOTjVYIb2z405+luFDvemTmecE78N677w0IIaOOKY4hprhmVzAzBliIQkAA
+         Y++Q==
+X-Forwarded-Encrypted: i=1; AJvYcCWOn5AfqpH6dIp07b8G5ScJE5M+Rw2DOMHtypLTfhKQzid0vx3N43Tf/U0V17xeWre7sr2j18M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzepuwMB3d5GxQb2aZf1Y+MFSpSozSQ/mHR1i4KSmwlxwXAk9cS
+	nroEDngBmonCpXvzOlsCecdYbUtoY3/viaGLnF7nvpwQzM6lk1TK7sVUPl/Efmg9tAtr79Sg+Bo
+	FNzmDvrORcEYfwiODk2fgeD/UqKTCPcpW7GN3zOCQH+lCwOBWkSyh7Q==
+X-Received: by 2002:a5d:6d0e:0:b0:37d:612c:5e43 with SMTP id ffacd0b85a97d-381c79737c7mr17614319f8f.0.1730801038382;
+        Tue, 05 Nov 2024 02:03:58 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE5+ZA7Cgp9oNVpemsCU9kPyu7wz//Ai6PjAUKnrwmGHPvQU4tJd+dwYLWosUIaPd5NLGFBIQ==
+X-Received: by 2002:a5d:6d0e:0:b0:37d:612c:5e43 with SMTP id ffacd0b85a97d-381c79737c7mr17614283f8f.0.1730801037971;
+        Tue, 05 Nov 2024 02:03:57 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7b80sm15833061f8f.10.2024.11.05.02.03.56
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 02:03:57 -0800 (PST)
+Message-ID: <3664acbd-6468-4ec0-946b-f6d8494e4a75@redhat.com>
+Date: Tue, 5 Nov 2024 11:03:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105010347.2079981-1-kuba@kernel.org> <20241105053115.59273-1-kuniyu@amazon.com>
-In-Reply-To: <20241105053115.59273-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Nov 2024 11:03:08 +0100
-Message-ID: <CANn89i+pzZaPL5tpZ6f5crWQ3K9LGYNHdJpnTXDsGTNzZ4og4Q@mail.gmail.com>
-Subject: Re: [PATCH net 1/2] netlink: terminate outstanding dump on socket close
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: kuba@kernel.org, davem@davemloft.net, johannes@sipsolutions.net, 
-	netdev@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
-	syzkaller@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v6] ipv6: Fix soft lockups in fib6_select_path under
+ high next hop churn
+To: David Ahern <dsahern@gmail.com>,
+ Omid Ehtemam-Haghighi <omid.ehtemamhaghighi@menlosecurity.com>,
+ netdev@vger.kernel.org
+Cc: adrian.oliver@menlosecurity.com, Adrian Oliver <kernel@aoliver.ca>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Shuah Khan <shuah@kernel.org>, Ido Schimmel <idosch@idosch.org>,
+ Kuniyuki Iwashima <kuniyu@amazon.com>, Simon Horman <horms@kernel.org>,
+ linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241025073003.2079945-1-omid.ehtemamhaghighi@menlosecurity.com>
+ <0dc8c829-23f0-4904-8017-fc98c079f0ab@redhat.com>
+ <7ae73a73-fba4-4692-97df-1a88ccc5f576@gmail.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <7ae73a73-fba4-4692-97df-1a88ccc5f576@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 5, 2024 at 6:31=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> From: Jakub Kicinski <kuba@kernel.org>
-> Date: Mon,  4 Nov 2024 17:03:46 -0800
-> > Netlink supports iterative dumping of data. It provides the families
-> > the following ops:
-> >  - start - (optional) kicks off the dumping process
-> >  - dump  - actual dump helper, keeps getting called until it returns 0
-> >  - done  - (optional) pairs with .start, can be used for cleanup
-> > The whole process is asynchronous and the repeated calls to .dump
-> > don't actually happen in a tight loop, but rather are triggered
-> > in response to recvmsg() on the socket.
-> >
-> > This gives the user full control over the dump, but also means that
-> > the user can close the socket without getting to the end of the dump.
-> > To make sure .start is always paired with .done we check if there
-> > is an ongoing dump before freeing the socket, and if so call .done.
-> >
-> > The complication is that sockets can get freed from BH and .done
-> > is allowed to sleep. So we use a workqueue to defer the call, when
-> > needed.
-> >
-> > Unfortunately this does not work correctly. What we defer is not
-> > the cleanup but rather releasing a reference on the socket.
-> > We have no guarantee that we own the last reference, if someone
-> > else holds the socket they may release it in BH and we're back
-> > to square one.
-> >
-> > The whole dance, however, appears to be unnecessary. Only the user
-> > can interact with dumps, so we can clean up when socket is closed.
-> > And close always happens in process context. Some async code may
-> > still access the socket after close, queue notification skbs to it etc.
-> > but no dumps can start, end or otherwise make progress.
-> >
-> > Delete the workqueue and flush the dump state directly from the release
-> > handler. Note that further cleanup is possible in -next, for instance
-> > we now always call .done before releasing the main module reference,
-> > so dump doesn't have to take a reference of its own.
->
-> and we can remove netns & reftracker switching for kernel socket
->
->
-> >
-> > Reported-by: syzbot <syzkaller@googlegroups.com>
-> > Fixes: ed5d7788a934 ("netlink: Do not schedule work from sk_destruct")
->
-> Do you have a link to a public report ?
+On 10/31/24 15:10, David Ahern wrote:
+> On 10/31/24 4:13 AM, Paolo Abeni wrote:
+>> Given the issue is long-standing, and the fix is somewhat invasive, I
+>> suggest steering this patch on net-next.
+> 
+> FWIW, I think net-next is best.
 
-I only had reports for old kernels (6.1 stable), but the repro seems
-to work on current kernel.
+Should I count the above as a formal ack? :-P
 
->
-> Previously syzkaller's author asked me to use a different name for
-> Reported-by not to confuse their internal metrics if the report is
-> generated by local syzkaller.
+FWIW, I went through the patch as thoroughly as I could and LGTM, but it
+does not apply (anymore?) to net-next.
 
-I definitely have upstream reports (latest tree) but no repro yet.
+@Omid: could you please rebase it on top of net-next and resend (with a
+proper net-next tag)?
 
-I can release them, but IMO this would add noise to the mailing lists,
-already flooded with such reports.
+Thanks!
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Paolo
+
 
