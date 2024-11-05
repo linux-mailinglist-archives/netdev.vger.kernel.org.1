@@ -1,182 +1,382 @@
-Return-Path: <netdev+bounces-141944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DCD69BCC0B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:40:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A77C49BCC06
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:40:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 916AB1C24798
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:40:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB32A1C242A0
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE541D45EA;
-	Tue,  5 Nov 2024 11:40:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D121D45EA;
+	Tue,  5 Nov 2024 11:40:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="frt5R3vX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="azAmcMDv"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2080.outbound.protection.outlook.com [40.107.93.80])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9AE01D4615
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:40:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.93.80
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730806851; cv=fail; b=KP1WzkJiwVjzVdMqAsSccL0xZ/kHvkVXjQj061NAaTokYAB+2jjcgzH442fn6o2z2+9imBWqd21nuiz+AfC5jwlAcrkXhQe9DPSEF+AdwwvF7fk3bKV6fZKvEZPfUVmL2HMGZl6fMvOWKywtO+s0jiGVMb4xaT2MOJhRRem05zw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730806851; c=relaxed/simple;
-	bh=71khF3U/G/EE1X5DT+3TMchhZuMFRkpHwvkSYv6Dlz0=;
-	h=References:From:To:CC:Subject:Date:In-Reply-To:Message-ID:
-	 MIME-Version:Content-Type; b=bk98kiVnLCp/xWz9fWTjPZPSyUuJrlpV3wobO/Gvgs00Q+Edy9spLANbZmGPIN6seTJh/u7rTRVnNRivB1eyPQpIIGlAmBOVV5s64ml7TIbtdGzPmla1XnEaZ5Fzk5EEOtCFPKt/jpjuaNBZJVuswfyk7Qac7qZ7B48Y2iDkTxQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=frt5R3vX; arc=fail smtp.client-ip=40.107.93.80
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=fBGCB5BVLWlncJbo+ffBNhzv+UwUa5UD/cQwJgkhKL01yisXMupXqr5BsnAUCCx3UmsiIZEYJ9BxjxeZP9abIae+pDN/GV1LhFxPaOeRisc9qH1/AkYauIucHaR36juYmDpdCwnwkaxoELGpNo8dtl4KrXkrPEBYIn/Tm8mSoXns+PZDcu3SKpwqZnDM3JRgXfwa7DqUofrmG3+IXyfvtpjob9WmeX/p1H9Yu8/FPb0wHmkr/rTtypOhIQyFpFXbVfzV5KZjVcp9bbowqLhl8AqrpyABL328OYOcnF7ykxuSDJNoIEKylJ5658phF1Hey4hwkg1sZ8YtSn3GSUjm5g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6IUbr4HpJjiLqd7yu+GqgTxTkC0klEq0o7lGeILHknk=;
- b=jPpvjsErq7SqykfCRS1FYxXAPxnrGRdybRMVA+gst9RPA0QkoJVy4d133shDpAxEJnVXaheUIRZmBzfAIDfnJOZtyRceWKmHfVUGY/VSXYkcbGZzlrmFLaK/9pvIy714lviHJJ+IUFa645ehiOdSMtS9MBtOBddorHaBNBmp0DMbjac2aycsIt498S1RZy7KrJmBglchGuDkxafk38ykowSDYN7fzwqdddQFzZ+2pZS6T09T7wMI2PlGsTjdBH4u22trnWcc32MpS365WR/Znf8m9DwBodK5FPJ0hJKxvZ/dbK7g3BzAt1j/Xla86K2dJXG0H6sZj0FglnzeWdeieA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=nxp.com smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6IUbr4HpJjiLqd7yu+GqgTxTkC0klEq0o7lGeILHknk=;
- b=frt5R3vXYK84x/aYeDLtwIuwNg66ixAEavPT0El5+og89OdQW7NNZXRTkNkJSGVoLrUx4gASmG/fIRzNFCSWBjtUNoF2s626nCATFBqGTfmq3//lbMyEY+KI58m2zeygz2UXVmGQw4UM1yeM1VqizcxABK4AU6pJNYkE0N7ojkVlScDbJeUBdewEZw9nB1dWsiFO/KiKu9vFcde1XI6KVAjOptuQ9/N2BDp5e1Za4b62FsCfQr7CzgFta2IcoK8/mKk5MTa91JwTa/THcugQgYEuX0LKhLxpBmQ/KvWlpXhqbO+53emRXnJr37rwuwEQMaCqiKT2wiRvKAfv0fhVeQ==
-Received: from SN7PR04CA0158.namprd04.prod.outlook.com (2603:10b6:806:125::13)
- by IA1PR12MB8468.namprd12.prod.outlook.com (2603:10b6:208:445::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.18; Tue, 5 Nov
- 2024 11:40:44 +0000
-Received: from SN1PEPF0002636C.namprd02.prod.outlook.com
- (2603:10b6:806:125:cafe::4c) by SN7PR04CA0158.outlook.office365.com
- (2603:10b6:806:125::13) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.31 via Frontend
- Transport; Tue, 5 Nov 2024 11:40:44 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SN1PEPF0002636C.mail.protection.outlook.com (10.167.241.137) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8114.16 via Frontend Transport; Tue, 5 Nov 2024 11:40:43 +0000
-Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 5 Nov 2024
- 03:40:29 -0800
-Received: from fedora (10.126.231.35) by rnnvmail201.nvidia.com (10.129.68.8)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 5 Nov 2024
- 03:40:24 -0800
-References: <cover.1729786087.git.petrm@nvidia.com>
- <20241029121807.1a00ae7d@kernel.org> <87ldxzky77.fsf@nvidia.com>
- <7426480f-6443-497f-8d37-b11f8f22069e@redhat.com>
- <874j4mknkv.fsf@nvidia.com>
- <959af10c-8d51-4bc5-9a85-ec00ad74994d@redhat.com>
-User-agent: mu4e 1.8.14; emacs 29.4
-From: Petr Machata <petrm@nvidia.com>
-To: Paolo Abeni <pabeni@redhat.com>
-CC: Petr Machata <petrm@nvidia.com>, Jakub Kicinski <kuba@kernel.org>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
-	<netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Amit Cohen
-	<amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, Andy Roulin
-	<aroulin@nvidia.com>, <mlxsw@nvidia.com>
-Subject: Re: [PATCH net-next v2 0/8] net: Shift responsibility for FDB
- notifications to drivers
-Date: Tue, 5 Nov 2024 12:38:54 +0100
-In-Reply-To: <959af10c-8d51-4bc5-9a85-ec00ad74994d@redhat.com>
-Message-ID: <87zfmdkixn.fsf@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6D1F1D4171;
+	Tue,  5 Nov 2024 11:40:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730806815; cv=none; b=TG+M+Zj+MbYvV8Na1kJmMJlWMrK9zhHs+GjRkeH9JBWBoZQSkvwGtf9CwXpAscMnbO60IvPToXhLj8dnIfh8g6JgbPe/bFpDWyYgKm/+lLZ7j8eX3WnA0EvfdY4t7LyBUI8jBThuWw8QiHfJM9kx5UMJnAl4zJ4tSJJJJEOmhC4=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730806815; c=relaxed/simple;
+	bh=J3JUWji1lzhXNZ909b7vGT3K5a5v4u3Z0AszD2xrX5g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=qfD4wsLCnSAwTJqi8KFKRt7mCCS4i3ED5jwe/t8DGMZ6jSYv6luWQC4VUeVEN0A90+Bx9JRy5DStQDPenp8dwkwaN1BjMzRixVd8QB0hLBX3t3dC9sTWoO3ykoETgCN5RrCOoy5M9fnqLg0f9vnx8naS8US9t3CTk1pjoKbrLuc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=azAmcMDv; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5C142C4CECF;
+	Tue,  5 Nov 2024 11:40:10 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730806815;
+	bh=J3JUWji1lzhXNZ909b7vGT3K5a5v4u3Z0AszD2xrX5g=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=azAmcMDvyqPkxkZH3h+e/yezEfINUULXLBvj5DfrhJNTl0KxEgV8EEmrKxBolXhXH
+	 llTlDeQMDtHKz1+gQ4y0cw6x6V6vMpMarLwNGxrZ8r6w7mXnMbwhbr72H3JloSYhOZ
+	 1371qqRqNDJKGZOG1jmplwHNTlsg0vo0Tb6wTRQhlPI6+pOCfZsXS++Zhe/E14uepg
+	 d2AN8V0owYUIuRUcm6zzw22HNU76cnV8IWWngXJXjCJD8AwFxZ1dmglfxhdxsaG2Cn
+	 nxGsR547Usct4pM/7bXrADoR1wVP/RS9ueAVkdjhPrmCwUGZoVWi/b7kY55vAF+SCu
+	 k64ViflKiyrDQ==
+Message-ID: <60901c39-b649-4a20-a06a-7faa7ddc9346@kernel.org>
+Date: Tue, 5 Nov 2024 12:40:07 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-ClientProxiedBy: rnnvmail203.nvidia.com (10.129.68.9) To
- rnnvmail201.nvidia.com (10.129.68.8)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF0002636C:EE_|IA1PR12MB8468:EE_
-X-MS-Office365-Filtering-Correlation-Id: dbee83d6-7dfe-4901-9a8c-08dcfd8eaec5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|1800799024|82310400026|36860700013|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?I0sA7/N6qDUIRMNV8rIExrGLuJDKqiMoXkJBZPhsfbXMe5P7dsaRaPJ4i+mI?=
- =?us-ascii?Q?gIz6+0hzXRQYRhBH/vSktVhaU1Mb5C0R/WlT8cDu2lFxjVmvy5KI2+4dqVNq?=
- =?us-ascii?Q?qNfUHztVSrMLemh70kC7cYTIOqqpnhJvPQ4swS6OGMzTGdtobkwQqZUuk4VF?=
- =?us-ascii?Q?gXguI5qe28VUJoNEI7WEy1F4Fy/EOhaJDBv77U4qX3SVu86d6Medxp4Ky/uY?=
- =?us-ascii?Q?C9CzQT0aHn5H8YlggsAon7Yxg9ZasitvEgYyZIC6tfM2Fn2kWYOe7mBM7p2S?=
- =?us-ascii?Q?/RZtd08QOSy3gQuySmKVfV5QOUCKVnl4FlxwFbKh39us3lR/Y8GvZ6eQm7jL?=
- =?us-ascii?Q?ZXwbhuuzo6eSABnRZrbwAhjA3f8KoQJuDqo/PZphZSj502PQ2PQbztfSb6Po?=
- =?us-ascii?Q?5rKvMYNAuyhKkcfcO4mXUZFAntLtDH+CpYCHOkQ5k9C/uDvTV5ekHUV55HD8?=
- =?us-ascii?Q?1kios8x1YFZlClxIt+IvRusg80TtwkieZOySIGU41D/iJM1bJTRMjknIdl03?=
- =?us-ascii?Q?kcInK58lXvJHpBQ6m8AMOK83ACi1kba8Ac4K0WxEyJCgyteJz3Z1t3hYS+vm?=
- =?us-ascii?Q?2C1kJnt9L6GhLcZoVvE92wixyaX12KK+Q2PWn1zMjTjdtDA26UB7+G3PqYTx?=
- =?us-ascii?Q?8cIBB5JRdkqUNN7GGw0fKjyLz9xAU7TpViPp/IQ2fHGvy6TS1yVgeILNlmaz?=
- =?us-ascii?Q?b5U//EX9SjOcWOzl1NPOc8CygdAv0PSuGf0Ib3p72sPePvAVMbpFi0MrdaB2?=
- =?us-ascii?Q?/WJz+K5c1L0GdpQeGYwE5TsbemhkV0sP2cGGS/2Rkj1aSX+kvCVVK9XN316D?=
- =?us-ascii?Q?+QaMxPEz4/XmfTtl6pGS1Z492Td4Iot2QWC10KM+9A2pa1q3Qy3WM1kcUHMK?=
- =?us-ascii?Q?3LVKSwhBnQ43a0jJwqFP8708THQn9D/ezDcwOEyc/Ih3atS9rF7fspTmfIm3?=
- =?us-ascii?Q?DyGCrMXEmobR3w2YLsrPKbu//vfsviVjw+R+W7coL2RUeLYcIxcVxhyr5PWw?=
- =?us-ascii?Q?4Qoh3U1cTRAIHCCUBd1qMJAo2z3eBaVbI5R/sE8ZxYYJbckycXNnylTa5M7m?=
- =?us-ascii?Q?3FCviXbcNa+NSmjs8P6JwEkoKmIUmQG/GOv2+Y+0W3S+6JPym4UY0orC5i4D?=
- =?us-ascii?Q?j5SPpll9OK+whTSJ1NXsOCmQPApWcLiVa5IeGvfx1D5gNH+P03dbhkjyxNOt?=
- =?us-ascii?Q?IFd3YQz4Itr03QGGPXdsU5umosYMUEMnCBR+oOXAQhqoX8bTlkrOV2uk4KDu?=
- =?us-ascii?Q?OQFekY9sBcEepV4T39pzJAXbI9SS3rAlHE6lsIdB27OY2Slok4JSkevi1shO?=
- =?us-ascii?Q?mux4JUnFhvb3JhQs4Kc8D16EnsYhRWPm8/OvJYZQmt3yPWe9JkAV3rMb6Yek?=
- =?us-ascii?Q?qdqINJ3LXV7JbyDJp3renxcy/bW9PeYoZTe9ZW92TOU97Qd68A=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(1800799024)(82310400026)(36860700013)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 11:40:43.8043
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: dbee83d6-7dfe-4901-9a8c-08dcfd8eaec5
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF0002636C.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8468
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
+To: Sean Nyekjaer <sean@geanix.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>,
+ Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20241104125342.1691516-1-sean@geanix.com>
+ <dq36jlwfm7hz7dstrp3bkwd6r6jzcxqo57enta3n2kibu3e7jw@krwn5nsu6a4d>
+ <wdn2rtfahf3iu6rsgxm6ctfgft7bawtp6vzhgn7dffd54i72lu@r4v5lizhae57>
+From: Krzysztof Kozlowski <krzk@kernel.org>
+Content-Language: en-US
+Autocrypt: addr=krzk@kernel.org; keydata=
+ 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 fv0=
+In-Reply-To: <wdn2rtfahf3iu6rsgxm6ctfgft7bawtp6vzhgn7dffd54i72lu@r4v5lizhae57>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-
-Paolo Abeni <pabeni@redhat.com> writes:
-
-> On 11/5/24 10:45, Petr Machata wrote:
->> Paolo Abeni <pabeni@redhat.com> writes:
->>> On 11/4/24 12:43, Petr Machata wrote:
->>>> Jakub Kicinski <kuba@kernel.org> writes:
->>>>> On Thu, 24 Oct 2024 18:57:35 +0200 Petr Machata wrote:
->>>>>> Besides this approach, we considered just passing a boolean back from the
->>>>>> driver, which would indicate whether the notification was done. But the
->>>>>> approach presented here seems cleaner.
->>>>>
->>>>> Oops, I missed the v2, same question:
->>>>>
->>>>>   What about adding a bit to the ops struct to indicate that 
->>>>>   the driver will generate the notification? Seems smaller in 
->>>>>   terms of LoC and shifts the responsibility of doing extra
->>>>>   work towards more complex users.
+On 05/11/2024 11:33, Sean Nyekjaer wrote:
+> On Tue, Nov 05, 2024 at 10:16:30AM +0100, Krzysztof Kozlowski wrote:
+>> On Mon, Nov 04, 2024 at 01:53:40PM +0100, Sean Nyekjaer wrote:
+>>> Convert binding doc tcan4x5x.txt to yaml.
+>>>
+>>> Signed-off-by: Sean Nyekjaer <sean@geanix.com>
+>>> ---
+>>> Changes since rfc:
 >>
->> How about passing an explicit bool* argument for the callee to set? I'm
->> suspicious of these one-off errno protocols. Most of the time the return
->> value is an errno, these aberrations feel easy to miss.
->
-> I would be ok with that - a large arguments list should not be something
-> concerning for the control path. Just to be clear: the caller init the
-> bool to false, only the callees doing the notification set it, right?
+>> That's a v2. RFC was v1. *ALWAYS*.
+>> Try by yourself:
+>> b4 diff 20241104125342.1691516-1-sean@geanix.com
+>>
+>> Works? No. Should work? Yes.
+>>
+>>
+> 
+> Ok. Good to know RFC cannot be used...
+> Next version would need to be? In order to fix this?
+> 
+> I have enrolled my patch into b4, next verison will be v2 ;)
+> 
 
-Yes.
+ok
 
-OK, I'll do it like that.
+>>>   - Tried to re-add ti,tcan4x5x wildcard
+>>>   - Removed xceiver and vdd supplies (copy paste error)
+>>>   - Corrected max SPI frequency
+>>>   - Copy pasted bosch,mram-cfg from bosch,m_can.yaml
+>>>   - device-state-gpios and device-wake-gpios only available for tcan4x5x
+>>
+>> ...
+>>
+>>> +properties:
+>>> +  compatible:
+>>> +    oneOf:
+>>> +      - items:
+>>> +          - enum:
+>>> +              - ti,tcan4552
+>>> +          - const: ti,tcan4x5x
+>>> +      - items:
+>>> +          - enum:
+>>> +              - ti,tcan4553
+>>
+>> Odd syntax. Combine these two into one enum.
+>>
+>>> +          - const: ti,tcan4x5x
+>>> +      - items:
+>>
+>> Drop items.
+>>
+>>> +          - enum:
+>>
+>> ... and drop enum. That's just const or do you already plan to add here
+>> entries?
+> 
+> Honestly I'm struggling a bit with the syntax and I feel the feedback is containing
+> a lot of implicit terms :)
+> 
+> Something like:
+> properties:
+>   compatible:
+>     oneOf:
+>       - items:
+>           - enum:
+>               - ti,tcan4552
+>               - ti,tcan4x5x
+>       - items:
+>           - enum:
+>               - ti,tcan4553
+>               - ti,tcan4x5x
+
+No, this won't work. Just use enum for the first entry. enum stands for
+enumerate, kind of like C enum, so one of many.
+
+>       - const: ti,tcan4x5x
+> 
+> Gives:
+> /linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.example.dtb: can@0: compatible: ['ti,tcan4x5x'] is valid under each of {'items': [{'enum': ['ti,tcan4553', 'ti,tcan4x5x']}], 'type': 'array', 'minItems': 1, 'maxItems': 1}, {'items': [{'const': 'ti,tcan4x5x'}], 'type': 'array', 'minItems': 1, 'maxItems': 1}, {'items': [{'enum': ['ti,tcan4552', 'ti,tcan4x5x']}], 'type': 'array', 'minItems': 1, 'maxItems': 1}
+>         from schema $id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
+> /linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.example.dtb: can@0: compatible: 'oneOf' conditional failed, one must be fixed:
+>         ['ti,tcan4552', 'ti,tcan4x5x'] is too long
+>         'ti,tcan4552' is not one of ['ti,tcan4553', 'ti,tcan4x5x']
+>         'ti,tcan4x5x' was expected
+>         from schema $id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
+> 
+> I can understand the original binding is broken.
+> I kinda agree with Marc that we cannot break things for users of this.
+
+Hm? Absolutely nothing would get broken for users. I don't understand
+these references or false claims.
+
+> 
+>>
+>>> +              - ti,tcan4x5x
+>>> +
+>>> +  reg:
+>>> +    maxItems: 1
+>>> +
+>>> +  interrupts:
+>>> +    maxItems: 1
+>>> +    description: The GPIO parent interrupt.
+>>> +
+>>> +  clocks:
+>>> +    maxItems: 1
+>>> +
+>>> +  reset-gpios:
+>>> +    description: Hardwired output GPIO. If not defined then software reset.
+>>> +    maxItems: 1
+>>> +
+>>> +  device-state-gpios:
+>>> +    description: |
+>>
+>> Do not need '|' unless you need to preserve formatting.
+>>
+>> Didn't you get this comment alerady?
+>>
+> 
+> No, but I have removed the '|'
+> 
+>>> +      Input GPIO that indicates if the device is in a sleep state or if the
+>>> +      device is active. Not available with tcan4552/4553.
+>>> +    maxItems: 1
+>>> +
+>>> +  device-wake-gpios:
+>>> +    description: |
+>>> +      Wake up GPIO to wake up the TCAN device.
+>>> +      Not available with tcan4552/4553.
+>>> +    maxItems: 1
+>>> +
+>>> +  bosch,mram-cfg:
+>>> +    description: |
+>>> +      Message RAM configuration data.
+>>> +      Multiple M_CAN instances can share the same Message RAM
+>>> +      and each element(e.g Rx FIFO or Tx Buffer and etc) number
+>>> +      in Message RAM is also configurable, so this property is
+>>> +      telling driver how the shared or private Message RAM are
+>>> +      used by this M_CAN controller.
+>>> +
+>>> +      The format should be as follows:
+>>> +      <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
+>>> +      The 'offset' is an address offset of the Message RAM where
+>>> +      the following elements start from. This is usually set to
+>>> +      0x0 if you're using a private Message RAM. The remain cells
+>>> +      are used to specify how many elements are used for each FIFO/Buffer.
+>>> +
+>>> +      M_CAN includes the following elements according to user manual:
+>>> +      11-bit Filter	0-128 elements / 0-128 words
+>>> +      29-bit Filter	0-64 elements / 0-128 words
+>>> +      Rx FIFO 0		0-64 elements / 0-1152 words
+>>> +      Rx FIFO 1		0-64 elements / 0-1152 words
+>>> +      Rx Buffers	0-64 elements / 0-1152 words
+>>> +      Tx Event FIFO	0-32 elements / 0-64 words
+>>> +      Tx Buffers	0-32 elements / 0-576 words
+>>> +
+>>> +      Please refer to 2.4.1 Message RAM Configuration in Bosch
+>>> +      M_CAN user manual for details.
+>>> +    $ref: /schemas/types.yaml#/definitions/int32-array
+>>> +    items:
+>>> +      - description: The 'offset' is an address offset of the Message RAM where
+>>> +          the following elements start from. This is usually set to 0x0 if
+>>> +          you're using a private Message RAM.
+>>> +        default: 0
+>>> +      - description: 11-bit Filter 0-128 elements / 0-128 words
+>>> +        minimum: 0
+>>> +        maximum: 128
+>>> +      - description: 29-bit Filter 0-64 elements / 0-128 words
+>>> +        minimum: 0
+>>> +        maximum: 64
+>>> +      - description: Rx FIFO 0 0-64 elements / 0-1152 words
+>>> +        minimum: 0
+>>> +        maximum: 64
+>>> +      - description: Rx FIFO 1 0-64 elements / 0-1152 words
+>>> +        minimum: 0
+>>> +        maximum: 64
+>>> +      - description: Rx Buffers 0-64 elements / 0-1152 words
+>>> +        minimum: 0
+>>> +        maximum: 64
+>>> +      - description: Tx Event FIFO 0-32 elements / 0-64 words
+>>> +        minimum: 0
+>>> +        maximum: 32
+>>> +      - description: Tx Buffers 0-32 elements / 0-576 words
+>>> +        minimum: 0
+>>> +        maximum: 32
+>>> +    minItems: 1
+>>> +
+>>> +  spi-max-frequency:
+>>> +    description:
+>>> +      Must be half or less of "clocks" frequency.
+>>> +    maximum: 18000000
+>>> +
+>>> +  wakeup-source:
+>>> +    $ref: /schemas/types.yaml#/definitions/flag
+>>> +    description: |
+>>
+>> Do not need '|' unless you need to preserve formatting.
+>>
+> 
+> OK
+> 
+>>> +      Enable CAN remote wakeup.
+>>> +
+>>> +allOf:
+>>> +  - $ref: can-controller.yaml#
+>>> +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
+>>> +  - if:
+>>> +      properties:
+>>> +        compatible:
+>>> +          contains:
+>>> +            enum:
+>>> +              - ti,tcan4552
+>>> +              - ti,tcan4553
+>>> +    then:
+>>> +      properties:
+>>> +        device-state-gpios: false
+>>> +        device-wake-gpios: false
+>>
+>> Heh, this is a weird binding. It should have specific compatibles for
+>> all other variants because above does not make sense. For 4552 one could
+>> skip front compatible and use only fallback, right? And then add these
+>> properties bypassing schema check. I commented on this already that
+>> original binding is flawed and should be fixed, but no one cares then I
+>> also don't care.
+> 
+> To me it looks like the example you linked:
+> https://elixir.bootlin.com/linux/v5.19/source/Documentation/devicetree/bindings/example-schema.yaml#L223
+
+Yes, it looks, that's not the point.
+
+> 
+> If you use fallback for a 4552 then it would enable the use of the
+> optional pins device-state-gpios and device-wake-gpios. But the chip
+> doesn't have those so the hw guys would connect them and they won't
+> be in the DT.
+> 
+> Honestly I'm confused :/
+
+What stops anyone to use tcan4x5x ALONE for 4552? Nothing. And that's
+the problem here.
+
+
+> 
+>>
+>>> +
+>>> +required:
+>>> +  - compatible
+>>> +  - reg
+>>> +  - interrupts
+>>> +  - clocks
+>>> +  - bosch,mram-cfg
+>>> +
+>>> +additionalProperties: false
+>>
+>> Implement feedback. Nothing changed here.
+>>
+> 
+> Uh? feedback?
+
+Yeah, CAREFULLY previous review and respond to all comments or implement
+all of them (or any combination). If you leave one comment ignored, it
+will mean reviewer has to do same work twice. That's very discouraging
+and wasteful of my time.
+
+
+Best regards,
+Krzysztof
+
 
