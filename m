@@ -1,159 +1,359 @@
-Return-Path: <netdev+bounces-142011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6FE89BCF27
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:23:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5DF69BCF2E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:24:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCFFC1C23EC6
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:23:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E958B1C24506
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F1271D8DE1;
-	Tue,  5 Nov 2024 14:22:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD021D86D2;
+	Tue,  5 Nov 2024 14:24:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="gqkr7TxZ"
+	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="fAbbvoRm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
+Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 910F01D86D2;
-	Tue,  5 Nov 2024 14:22:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BE71D5AB2;
+	Tue,  5 Nov 2024 14:24:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730816556; cv=none; b=PQf07lPudpqDB8g8ASchgvS+bQfa2EhoawJ9Rwb1ikvNFOapqL1K83n93gBBqz4CNwSw/iCUuvztZDaJpURP+mIQaeaVCISsJk81ETY8lRBGSGIvfHtiKPh+fEGB7lcL/KLrPdz4ddWSzVU/8YbCjsMD3dR2keHb+yKgUjcK6RU=
+	t=1730816690; cv=none; b=YYM74nDMhjk0ivrAnaDv/IUBT9IDuNTXQCDsCSoy/9RLXrrkSzFp0FFym3V56h8Qz2XOJ2HDreaP/8Ace9SCsq3v84onKwYvIM1IzH6ooUr4C3UiR+QhFTNOVmnWpzzNseTcfH3QbcfP2dZf5+GXxyNfTagyFfyzgpYwHaSIkso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730816556; c=relaxed/simple;
-	bh=GgXqbrgnjscz1GJY/vuo3+8bT02sjpcVS4HHPzVjjeI=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=kee9Hme+ZBiHpbCuIBBnacXao2M1m+Fe58XPVzNJEYszR1p68KD05GYhebteaYQ5WrZslO/FCuKtHucWYTWBGyERRd/DSlvZapD4lwO48KDwk1OaHtdwYbN1ARe6eGFuHFVhZDsPB/RDAN7lKeefOotZNTbg1chmObRl5hunGc8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=gqkr7TxZ; arc=none smtp.client-ip=60.244.123.138
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: 61becc469b8111efb88477ffae1fc7a5-20241105
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=K2LlcVPkVu2AiR+BkVm1jRgLTSzsLTgqctnGu+62FH4=;
-	b=gqkr7TxZHK3YvtKf5qZRSY48v1wiWjKDqT/Ej9GWxtcAYLKUc+LmeNNjAodJ+Oafa6eTgi54LrhG4OGY8VkVD4nXxp2cW+qNJWjK+u7eKmDzpYuuCMHKf31FWHWmAIXsgplH6cKMhIauSnMDqUGo83sEtNr9AKuKfTtlKORfrPs=;
-X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.42,REQID:ee666c02-ae22-4ab5-8106-4b34fbbb38eb,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:b0fcdc3,CLOUDID:6ee39507-7990-429c-b1a0-768435f03014,B
-	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
-	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR
-X-UUID: 61becc469b8111efb88477ffae1fc7a5-20241105
-Received: from mtkmbs14n2.mediatek.inc [(172.21.101.76)] by mailgw01.mediatek.com
-	(envelope-from <skylake.huang@mediatek.com>)
-	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 1381273246; Tue, 05 Nov 2024 22:22:26 +0800
-Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- MTKMBS14N1.mediatek.inc (172.21.101.75) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 5 Nov 2024 22:22:24 +0800
-Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
- mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Tue, 5 Nov 2024 22:22:24 +0800
-From: Sky Huang <SkyLake.Huang@mediatek.com>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Daniel Golle
-	<daniel@makrotopia.org>, Qingfang Deng <dqfext@gmail.com>, SkyLake Huang
-	<SkyLake.Huang@mediatek.com>, Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, "Simon
- Horman" <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-mediatek@lists.infradead.org>
-CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
-	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v2 5/5] net: phy: mediatek: add MT7530 & MT7531's PHY ID macros
-Date: Tue, 5 Nov 2024 22:19:11 +0800
-Message-ID: <20241105141911.13326-6-SkyLake.Huang@mediatek.com>
-X-Mailer: git-send-email 2.18.0
-In-Reply-To: <20241105141911.13326-1-SkyLake.Huang@mediatek.com>
-References: <20241105141911.13326-1-SkyLake.Huang@mediatek.com>
+	s=arc-20240116; t=1730816690; c=relaxed/simple;
+	bh=jloAkXqe5JFmFhB0Zv7JTbb7qpuv14n45ikCXl9nlLs=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KuDupvfevSm0amaIjOT4/7Bk6EwzwKf/fCv0zdSxmhZz9AsgTo1Mzo3QHLtKrxm5EU7nlchr5jAA5l25Nq2utSJMQ04fQ1jD5v7/S5u/1S8smpG/mJ9TlESm58nhPo6TtPzQy9YU4PHFJywL8nNFcLxLIGQ4dmy4WqzZYAGTB9E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=fAbbvoRm; arc=none smtp.client-ip=188.40.30.78
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
+	s=default2211; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
+	MIME-Version:Subject:Date:From:Sender:Reply-To:Content-ID:Content-Description
+	:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References; bh=B2TbzasSipWhR1FdJvRQDldtLvGcjQd4ZD8ioLxtzsE=; b=fA
+	bbvoRmjaP4bmZlqD4aTmR0w/MeJz6Lu5k6iZBAWKUzdDbyUgLAaJ/9i/87CDuFqIRMJ89IS0L7GI2
+	TtvIIN7Wiv1i/8voY4lL2Beh8FEevw0vyoiOjxRMMCSj/nZCxsTLMYRyc/Q7gebIUVNuJX4JmrDwW
+	JXrgxYHeUBLXpoMt/CYhQWGnu4tAGJ/bNox/NTSxj386aeIJbMx6eG3w63jPCFuVxJw1Pb6pqsIR8
+	s85Unsr4f2PHOkqKhbF3DUHMvtOMdQfGR0R3xm7FI9Okfb4zf6QK761xPxn0TT7BdAckv8yyEFtK+
+	JzjsKuO/YpoeTMNhXBPDM7HGqj4GtMjA==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <sean@geanix.com>)
+	id 1t8KU7-000JBp-PN; Tue, 05 Nov 2024 15:24:43 +0100
+Received: from [185.17.218.86] (helo=zen.localdomain)
+	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <sean@geanix.com>)
+	id 1t8KU7-0002FW-08;
+	Tue, 05 Nov 2024 15:24:43 +0100
+From: Sean Nyekjaer <sean@geanix.com>
+Date: Tue, 05 Nov 2024 15:24:34 +0100
+Subject: [PATCH v2] dt-bindings: can: convert tcan4x5x.txt to DT schema
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-TM-AS-Product-Ver: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-AS-Result: No-10--4.900200-8.000000
-X-TMASE-MatchedRID: NJitR9TboxxKHSI+NapVgAPZZctd3P4Bbd6rGhWOAwRY/2pi7PK0EpJo
-	t8xOxyL5xxL5hQ2RIPifzCOk8u0mmnzWP1Z/x2lioMfp2vHck9V9LQinZ4QefCP/VFuTOXUTC5M
-	umjkcRzWOhzOa6g8KreXdaTxqvMobIxxFJpvbuyW+vg/JCDB20T2T8k+lKacfS9lLIS+y+QKfN4
-	mRNTlO+Mrt8YPzAidRP+0bY/yraU/hO0XhkI0mPcGQYFMiVRG5ehcPPz6UzEWlb5ogMngNpHOTE
-	n5IiRSOUASbXCnDmH6UTGVAhB5EbQ==
-X-TM-AS-User-Approved-Sender: No
-X-TM-AS-User-Blocked-Sender: No
-X-TMASE-Result: 10--4.900200-8.000000
-X-TMASE-Version: SMEX-14.0.0.3152-9.1.1006-23728.005
-X-TM-SNTS-SMTP:
-	2E53E153ABC76C601EB7830F32CDC43A8DDBD5370086513E6455D8DBF88E65B12000:8
-X-MTK: N
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+Message-Id: <20241105-convert-tcan-v2-1-4b320f3fcf99@geanix.com>
+X-B4-Tracking: v=1; b=H4sIAKIqKmcC/zXMwQrCMAzG8VcZOdux1LSgJ99Ddqg123KwlbaUy
+ di7WwdeAv/A99sgcxLOcO02SFwlSwwt9KkDv7gws5Jna9CDJsTBKB9D5VRU8S4oehi0pIn9ZKF
+ N3oknWQ/uPrZeJJeYPode8ff9Q4TanEn3aC/YDIUqswu3uR1Zex9fMO77/gXTirQdnwAAAA==
+X-Change-ID: 20241105-convert-tcan-4b516424ecf6
+To: Marc Kleine-Budde <mkl@pengutronix.de>, 
+ Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
+ Conor Dooley <conor+dt@kernel.org>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Sean Nyekjaer <sean@geanix.com>
+X-Mailer: b4 0.14.2
+X-Authenticated-Sender: sean@geanix.com
+X-Virus-Scanned: Clear (ClamAV 0.103.10/27449/Tue Nov  5 10:36:43 2024)
 
-From: "SkyLake.Huang" <skylake.huang@mediatek.com>
+Convert binding doc tcan4x5x.txt to yaml.
 
-This patch adds MT7530 & MT7531's PHY ID macros in mtk-ge.c so that
-it follows the same rule of mtk-ge-soc.c.
-
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
-Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
+Signed-off-by: Sean Nyekjaer <sean@geanix.com>
 ---
- drivers/net/phy/mediatek/mtk-ge.c | 11 +++++++----
- 1 file changed, 7 insertions(+), 4 deletions(-)
+Changes since rfc:
+- Tried to re-add ti,tcan4x5x wildcard
+- Removed xceiver and vdd supplies (copy paste error)
+- Corrected max SPI frequency
+- Copy pasted bosch,mram-cfg from bosch,m_can.yaml
+- device-state-gpios and device-wake-gpios only available for tcan4x5x
 
-diff --git a/drivers/net/phy/mediatek/mtk-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
-index 9122899..ed2617b 100644
---- a/drivers/net/phy/mediatek/mtk-ge.c
-+++ b/drivers/net/phy/mediatek/mtk-ge.c
-@@ -5,6 +5,9 @@
- 
- #include "mtk.h"
- 
-+#define MTK_GPHY_ID_MT7530		0x03a29412
-+#define MTK_GPHY_ID_MT7531		0x03a29441
+Changes in v2:
+- Removed unneeded "|"
+- Reworked properties, compatible
+- Removed additionalProperties: false
+- Added unevaluatedProperties: false
+- Added missing space in examples
+- Link to v1: https://lore.kernel.org/r/20241104125342.1691516-1-sean@geanix.com
+---
+ .../devicetree/bindings/net/can/tcan4x5x.txt       |  48 ------
+ .../devicetree/bindings/net/can/ti,tcan4x5x.yaml   | 184 +++++++++++++++++++++
+ 2 files changed, 184 insertions(+), 48 deletions(-)
+
+diff --git a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt b/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
+deleted file mode 100644
+index 20c0572c9853424e1d104cbf75d02094a54836c3..0000000000000000000000000000000000000000
+--- a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
++++ /dev/null
+@@ -1,48 +0,0 @@
+-Texas Instruments TCAN4x5x CAN Controller
+-================================================
+-
+-This file provides device node information for the TCAN4x5x interface contains.
+-
+-Required properties:
+-	- compatible:
+-		"ti,tcan4552", "ti,tcan4x5x"
+-		"ti,tcan4553", "ti,tcan4x5x" or
+-		"ti,tcan4x5x"
+-	- reg: 0
+-	- #address-cells: 1
+-	- #size-cells: 0
+-	- spi-max-frequency: Maximum frequency of the SPI bus the chip can
+-			     operate at should be less than or equal to 18 MHz.
+-	- interrupt-parent: the phandle to the interrupt controller which provides
+-                    the interrupt.
+-	- interrupts: interrupt specification for data-ready.
+-
+-See Documentation/devicetree/bindings/net/can/bosch,m_can.yaml for additional
+-required property details.
+-
+-Optional properties:
+-	- reset-gpios: Hardwired output GPIO. If not defined then software
+-		       reset.
+-	- device-state-gpios: Input GPIO that indicates if the device is in
+-			      a sleep state or if the device is active. Not
+-			      available with tcan4552/4553.
+-	- device-wake-gpios: Wake up GPIO to wake up the TCAN device. Not
+-			     available with tcan4552/4553.
+-	- wakeup-source: Leave the chip running when suspended, and configure
+-			 the RX interrupt to wake up the device.
+-
+-Example:
+-tcan4x5x: tcan4x5x@0 {
+-		compatible = "ti,tcan4x5x";
+-		reg = <0>;
+-		#address-cells = <1>;
+-		#size-cells = <1>;
+-		spi-max-frequency = <10000000>;
+-		bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
+-		interrupt-parent = <&gpio1>;
+-		interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
+-		device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
+-		device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
+-		reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
+-		wakeup-source;
+-};
+diff --git a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+new file mode 100644
+index 0000000000000000000000000000000000000000..f1d18a5461e05296998ae9bf09bdfa1226580131
+--- /dev/null
++++ b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
+@@ -0,0 +1,184 @@
++# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
++%YAML 1.2
++---
++$id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
++$schema: http://devicetree.org/meta-schemas/core.yaml#
 +
- #define MTK_EXT_PAGE_ACCESS		0x1f
- #define MTK_PHY_PAGE_STANDARD		0x0000
- #define MTK_PHY_PAGE_EXTENDED		0x0001
-@@ -59,7 +62,7 @@ static int mt7531_phy_config_init(struct phy_device *phydev)
- 
- static struct phy_driver mtk_gephy_driver[] = {
- 	{
--		PHY_ID_MATCH_EXACT(0x03a29412),
-+		PHY_ID_MATCH_EXACT(MTK_GPHY_ID_MT7530),
- 		.name		= "MediaTek MT7530 PHY",
- 		.config_init	= mt7530_phy_config_init,
- 		/* Interrupts are handled by the switch, not the PHY
-@@ -73,7 +76,7 @@ static struct phy_driver mtk_gephy_driver[] = {
- 		.write_page	= mtk_phy_write_page,
- 	},
- 	{
--		PHY_ID_MATCH_EXACT(0x03a29441),
-+		PHY_ID_MATCH_EXACT(MTK_GPHY_ID_MT7531),
- 		.name		= "MediaTek MT7531 PHY",
- 		.config_init	= mt7531_phy_config_init,
- 		/* Interrupts are handled by the switch, not the PHY
-@@ -91,8 +94,8 @@ static struct phy_driver mtk_gephy_driver[] = {
- module_phy_driver(mtk_gephy_driver);
- 
- static struct mdio_device_id __maybe_unused mtk_gephy_tbl[] = {
--	{ PHY_ID_MATCH_EXACT(0x03a29441) },
--	{ PHY_ID_MATCH_EXACT(0x03a29412) },
-+	{ PHY_ID_MATCH_EXACT(MTK_GPHY_ID_MT7530) },
-+	{ PHY_ID_MATCH_EXACT(MTK_GPHY_ID_MT7531) },
- 	{ }
- };
- 
++title: Texas Instruments TCAN4x5x CAN Controller
++
++maintainers:
++  - Marc Kleine-Budde <mkl@pengutronix.de>
++
++properties:
++  compatible:
++    oneOf:
++      - items:
++          - enum:
++              - ti,tcan4552
++              - ti,tcan4553
++          - const: ti,tcan4x5x
++      - const: ti,tcan4x5x
++
++  reg:
++    maxItems: 1
++
++  interrupts:
++    maxItems: 1
++    description: The GPIO parent interrupt.
++
++  clocks:
++    maxItems: 1
++
++  reset-gpios:
++    description: Hardwired output GPIO. If not defined then software reset.
++    maxItems: 1
++
++  device-state-gpios:
++    description:
++      Input GPIO that indicates if the device is in a sleep state or if the
++      device is active. Not available with tcan4552/4553.
++    maxItems: 1
++
++  device-wake-gpios:
++    description:
++      Wake up GPIO to wake up the TCAN device.
++      Not available with tcan4552/4553.
++    maxItems: 1
++
++  bosch,mram-cfg:
++    description: |
++      Message RAM configuration data.
++      Multiple M_CAN instances can share the same Message RAM
++      and each element(e.g Rx FIFO or Tx Buffer and etc) number
++      in Message RAM is also configurable, so this property is
++      telling driver how the shared or private Message RAM are
++      used by this M_CAN controller.
++
++      The format should be as follows:
++      <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
++      The 'offset' is an address offset of the Message RAM where
++      the following elements start from. This is usually set to
++      0x0 if you're using a private Message RAM. The remain cells
++      are used to specify how many elements are used for each FIFO/Buffer.
++
++      M_CAN includes the following elements according to user manual:
++      11-bit Filter	0-128 elements / 0-128 words
++      29-bit Filter	0-64 elements / 0-128 words
++      Rx FIFO 0		0-64 elements / 0-1152 words
++      Rx FIFO 1		0-64 elements / 0-1152 words
++      Rx Buffers	0-64 elements / 0-1152 words
++      Tx Event FIFO	0-32 elements / 0-64 words
++      Tx Buffers	0-32 elements / 0-576 words
++
++      Please refer to 2.4.1 Message RAM Configuration in Bosch
++      M_CAN user manual for details.
++    $ref: /schemas/types.yaml#/definitions/int32-array
++    items:
++      - description: The 'offset' is an address offset of the Message RAM where
++          the following elements start from. This is usually set to 0x0 if
++          you're using a private Message RAM.
++        default: 0
++      - description: 11-bit Filter 0-128 elements / 0-128 words
++        minimum: 0
++        maximum: 128
++      - description: 29-bit Filter 0-64 elements / 0-128 words
++        minimum: 0
++        maximum: 64
++      - description: Rx FIFO 0 0-64 elements / 0-1152 words
++        minimum: 0
++        maximum: 64
++      - description: Rx FIFO 1 0-64 elements / 0-1152 words
++        minimum: 0
++        maximum: 64
++      - description: Rx Buffers 0-64 elements / 0-1152 words
++        minimum: 0
++        maximum: 64
++      - description: Tx Event FIFO 0-32 elements / 0-64 words
++        minimum: 0
++        maximum: 32
++      - description: Tx Buffers 0-32 elements / 0-576 words
++        minimum: 0
++        maximum: 32
++    minItems: 1
++
++  spi-max-frequency:
++    description:
++      Must be half or less of "clocks" frequency.
++    maximum: 18000000
++
++  wakeup-source:
++    $ref: /schemas/types.yaml#/definitions/flag
++    description:
++      Enable CAN remote wakeup.
++
++allOf:
++  - $ref: can-controller.yaml#
++  - $ref: /schemas/spi/spi-peripheral-props.yaml#
++  - if:
++      properties:
++        compatible:
++          contains:
++            enum:
++              - ti,tcan4552
++              - ti,tcan4553
++    then:
++      properties:
++        device-state-gpios: false
++        device-wake-gpios: false
++
++required:
++  - compatible
++  - reg
++  - interrupts
++  - clocks
++  - bosch,mram-cfg
++
++unevaluatedProperties: false
++
++examples:
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    spi {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        can@0 {
++            compatible = "ti,tcan4x5x";
++            reg = <0>;
++            clocks = <&can0_osc>;
++            pinctrl-names = "default";
++            pinctrl-0 = <&can0_pins>;
++            spi-max-frequency = <10000000>;
++            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
++            interrupt-parent = <&gpio1>;
++            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
++            device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
++            device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
++            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
++            wakeup-source;
++        };
++    };
++  - |
++    #include <dt-bindings/gpio/gpio.h>
++    #include <dt-bindings/interrupt-controller/irq.h>
++
++    spi {
++        #address-cells = <1>;
++        #size-cells = <0>;
++
++        can@0 {
++            compatible = "ti,tcan4552", "ti,tcan4x5x";
++            reg = <0>;
++            clocks = <&can0_osc>;
++            pinctrl-names = "default";
++            pinctrl-0 = <&can0_pins>;
++            spi-max-frequency = <10000000>;
++            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
++            interrupt-parent = <&gpio1>;
++            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
++            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
++            wakeup-source;
++        };
++    };
+
+---
+base-commit: 2b2a9a08f8f0b904ea2bc61db3374421b0f944a6
+change-id: 20241105-convert-tcan-4b516424ecf6
+
+Best regards,
 -- 
-2.45.2
+Sean Nyekjaer <sean@geanix.com>
 
 
