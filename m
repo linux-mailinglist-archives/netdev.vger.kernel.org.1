@@ -1,85 +1,93 @@
-Return-Path: <netdev+bounces-141762-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B48D9BC311
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:19:38 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C41D9BC314
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04659B213F0
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:19:36 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D36F91F22A4A
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C4B364AE;
-	Tue,  5 Nov 2024 02:19:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27AF836AF5;
+	Tue,  5 Nov 2024 02:20:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FMRW/P58"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="TGxJHShX"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F327AEAD2;
-	Tue,  5 Nov 2024 02:19:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F118F2C859;
+	Tue,  5 Nov 2024 02:20:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730773170; cv=none; b=dv8xwKqrLqLQpfR+Bl55SCQieAJCqiOacfed2u83Sfyql0+DYrybeYk5XtB2/xtpheqRWZoX2NHqSJtNduDIXkcsqCBDWLyVWlkHyfn56FreEny2YxkQl3VsvCVa2Ws9cQJRe+U0BDEUsHpi8on/5YEHaVsqnRakNZfA6Gv4zB8=
+	t=1730773224; cv=none; b=qpFDifgvMhR7b9pLuIDEnq6c1cKgLopnG5B9kzfkXR7qiwx+2EhN137cpHo759ze79TVPnvUWHcdNd4E33Ma7zmEg64Vo3D2AVyLI6F3UTnzqzFepNifDpqTN6XBiCglS3FD4w6CC6PqPx4PlCyeQV4MDIf8TtjvlIBUmzKh0Vw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730773170; c=relaxed/simple;
-	bh=i6G8GnDsiZTal/kkKMwzZHQjeFYe+c86hf3Q7lJ2aY8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=jKRxGQm9+qH4hkrfU+OadJ2hx44d7dLPPNdT4P3vrEruQ2UAiZt2Szl+3uE9JBSJ5jt3MuSClkQEceHhqfBnH0ulXVHUsUq+la2Wp9z5e00aPYD7D2QhZ+V3xDJyihao3KvvyxMWzCVKTlc29rCuV6ULxvS0kVpBtU9FAwiUQAU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FMRW/P58; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9CEF3C4CECE;
-	Tue,  5 Nov 2024 02:19:28 +0000 (UTC)
+	s=arc-20240116; t=1730773224; c=relaxed/simple;
+	bh=OV+TjXUpuywBWxnRBlAvK87n8KcdOHvrWxU6kph37Nk=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=WKu20/wP1muGw+qUzySKLn3iVQg6UMDs9RPgjBPVsUlYnCva5PduUZ9Kj1nziv2od8bI+qONUykmB0zTEPG3M1H3cbtZU+eGVTbHrxexV9Xq8v9eeyoUoJAehR8Yj1x+yKFTWw3/rmTmiuDW7SNMerpuXdq5ChEalG73OnarH8g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=TGxJHShX; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8E3A3C4CECE;
+	Tue,  5 Nov 2024 02:20:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730773169;
-	bh=i6G8GnDsiZTal/kkKMwzZHQjeFYe+c86hf3Q7lJ2aY8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FMRW/P58uN3mjJ8SrWdDP0mhFAfKK7zPrETFDHL/9n22NRSWbbkb54D9u7+HF4wk/
-	 NnGBXCkXXHWsHcYTTnclYG3vSbzPZeck/T+vGPEyDKh48tE1Rtrrj+c1454rH6IVrc
-	 esV5TZESlpDGbIZUf3ipGTbUjCD676m7dllKj20mPee64zmCQi5oUAPjQ1VXn/X47c
-	 1Bm9TZcqR9Xii+7aZ97dLV18H/6CDvMC8YasuD9JVfUHVxTpUDPfxbpxr0EzihWMW8
-	 hyZN2V6OMjt8fwZWs3kUFpSLIpIHvUwIdFtQoZy0UMYvDtr2hPu8mqyD+0A3dpzh/c
-	 QYXLEeDMTTDSA==
-Date: Mon, 4 Nov 2024 18:19:27 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: David Woodhouse <dwmw2@infradead.org>
-Cc: Richard Cochran <richardcochran@gmail.com>, Peter Hilber
- <peter.hilber@opensynergy.com>, linux-kernel@vger.kernel.org,
- virtualization@lists.linux.dev, linux-arm-kernel@lists.infradead.org,
- linux-rtc@vger.kernel.org, "Ridoux, Julien" <ridouxj@amazon.com>,
- virtio-dev@lists.linux.dev, "Luu, Ryan" <rluu@amazon.com>, "Chashper,
- David" <chashper@amazon.com>, "Mohamed Abuelfotoh, Hazem"
- <abuehaze@amazon.com>, Paolo Abeni <pabeni@redhat.com>, "Christopher S .
- Hall" <christopher.s.hall@intel.com>, Jason Wang <jasowang@redhat.com>,
- John Stultz <jstultz@google.com>, "Michael S . Tsirkin" <mst@redhat.com>,
- netdev@vger.kernel.org, Stephen Boyd <sboyd@kernel.org>, Thomas Gleixner
- <tglx@linutronix.de>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Marc Zyngier
- <maz@kernel.org>, Mark Rutland <mark.rutland@arm.com>, Daniel Lezcano
- <daniel.lezcano@linaro.org>, Alessandro Zummo <a.zummo@towertech.it>,
- Alexandre Belloni <alexandre.belloni@bootlin.com>, qemu-devel
- <qemu-devel@nongnu.org>, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net-next] ptp: Remove 'default y' for VMCLOCK PTP device
-Message-ID: <20241104181927.05a9485a@kernel.org>
-In-Reply-To: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
-References: <89955b74d225129d6e3d79b53aa8d81d1b50560f.camel@infradead.org>
+	s=k20201202; t=1730773223;
+	bh=OV+TjXUpuywBWxnRBlAvK87n8KcdOHvrWxU6kph37Nk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TGxJHShXNi+Gg3QJ1lbnpyJXXgRerTFA6FJHq66ZwRIfkgX/qFxsRw/8As/KIvRki
+	 pSx5l3Fy6cpAXp2CQGPjgdG687Vraabk2gThQK0QwjwGVnmsK26NlaePceyRmpcblP
+	 GBUMN9/zWTphi7vHL6q0x94zkmDKbkTEBMNz+d6ICMd1cRGDqJpoecEy5ypQjfXvvg
+	 fGbKdgKY19bKFDXCYVAUgMBRQBsgMBgGkAgfyKnq1lGEPGRcABNKRxgetKBroBxYkO
+	 Yf6x1yEMj6ZafIzTPJ0rzhSjJK7lvx7nop7Au+ycMwU5o0QD1x9WUn9lj6XV4UkAlp
+	 kglqow5GSoHeA==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70CEC3809A80;
+	Tue,  5 Nov 2024 02:20:33 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next] net: ena: Remove autopolling mode
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173077323226.89867.8254343342757374598.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Nov 2024 02:20:32 +0000
+References: <20241103194149.293456-1-linux@treblig.org>
+In-Reply-To: <20241103194149.293456-1-linux@treblig.org>
+To: Dr. David Alan Gilbert <linux@treblig.org>
+Cc: shayagr@amazon.com, akiyano@amazon.com, darinzon@amazon.com,
+ ndagan@amazon.com, saeedb@amazon.com, andrew+netdev@lunn.ch,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 
-On Sat, 02 Nov 2024 16:52:17 -0500 David Woodhouse wrote:
-> From: David Woodhouse <dwmw@amazon.co.uk>
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Sun,  3 Nov 2024 19:41:49 +0000 you wrote:
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
 > 
-> The VMCLOCK device gives support for accurate timekeeping even across 
-> live migration, unlike the KVM PTP clock. To help ensure that users can
-> always use ptp_vmclock where it's available in preference to ptp_kvm,
-> set it to 'default PTP_1588_CLOCK_VMCLOCK' instead of 'default y'.
+> This manually reverts
+> commit a4e262cde3cd ("net: ena: allow automatic fallback to polling mode")
+> 
+> which is unused.
+> 
+> [...]
 
-Good enough for me, let's see if it's good enough for the main guy :)
-Thanks!
+Here is the summary with links:
+  - [net-next] net: ena: Remove autopolling mode
+    https://git.kernel.org/netdev/net-next/c/b356b9170815
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
