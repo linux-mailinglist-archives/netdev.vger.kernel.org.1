@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-141727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1112F9BC1D9
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:11:41 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33F8D9BC1E6
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:15:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DD64281817
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:11:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B9D561F21FD8
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:15:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE381A2D;
-	Tue,  5 Nov 2024 00:11:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FD71CA4E;
+	Tue,  5 Nov 2024 00:15:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="V9DycDZc"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="Xq+xhs5S"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
+Received: from mail-pl1-f178.google.com (mail-pl1-f178.google.com [209.85.214.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EBCE801
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 00:11:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9D8E61FC3
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 00:15:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730765496; cv=none; b=YDR32oWUaI+QA99OP5om/ujRhzzTNtnBFKnvHy6m//DptkrCLs5Cw5yV0qzLyz7rn9SeSpwF8OZsmDg0TSh5GvXVnvKUFV6gAljU7dH5SQvUIuFVj/12108D3rbblYEqm6W4QGJT6/E0Atcnagm+G2M2+VYMptVB+NYlZO9j/d4=
+	t=1730765717; cv=none; b=C7IgZa3FdBIwy4gBqjlg/s7BEVOQYobFokyU2UE+7g/2GnIY1Nnh9H56d31Erwn40IPH3MOVVoE5bCVQ7/8jvSR1T4aPS0x58E8Y/My8m3i6j9eTBgFQMw0P201nr86B+9r8b2vI5Sgs1Y2YSFWjF2cQymj0i5CrpHxPJVHLwVQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730765496; c=relaxed/simple;
-	bh=gWgRcXOWyPuYyTeu+HI4eru08VqwWwTDaEH/C3Ai8TY=;
+	s=arc-20240116; t=1730765717; c=relaxed/simple;
+	bh=yvIGJzhFb84eC4ca0rZJpsDxkqFSOTyuaKPg1OZWAM8=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=V2F+DUv5rX6X2dGx+9sFh6W+lCPO4Ep1IY+1AFs0Y2/beMePzCgWG9OAjUsH8LF/+vG1n08z7mLews8MWvSlnddS90AUSCgJJJRXtmyNV4tM394ZrbL5laQQATiL7N54Wn0EW0oslgmu5CLxZCkLfcCcHwWuoJzPk13Zi+xHVnA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=V9DycDZc; arc=none smtp.client-ip=209.85.210.175
+	 Content-Type:Content-Disposition:In-Reply-To; b=us4TxAtHiDpeOQkvpiPNjJWhCRcq/ePNb8UNKG/zcitXsFVqVW3c9xI2eZ6oF9DDNEAx76pWAMJ6vTJ0oJ5BolmeE3eqg9gECoxcOfUioxNPkLL6CqZZk9MT0wyQ2pAN/B/51bAyxc9VchLvnK7CDIw3cPOOAU68hljsqxiKboA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=Xq+xhs5S; arc=none smtp.client-ip=209.85.214.178
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-720d14c8dbfso3732748b3a.0
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 16:11:35 -0800 (PST)
+Received: by mail-pl1-f178.google.com with SMTP id d9443c01a7336-21145812538so15391925ad.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 16:15:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730765494; x=1731370294; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1730765714; x=1731370514; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ZzBGIIzGVWypDF2F/j8kxcVTvvbYnIIP9aDVrmVHUqo=;
-        b=V9DycDZcrQMIiQgw99c8ifLm4wYIdgDN2GLr0l3lnmzTBH6iUmfpRqswwvXCjy90Xq
-         Tn1dxlJ/63MYXkzJblf9BC8YJ7S3o7i2WhtYvhcWGYn29i0jdSUCM9x0cDRnAN8DQVZg
-         ZyP1sxi/7nLU/PhHNKBhGe2Sn9Yvdh43kxais=
+        bh=ynHKKKY2R9KZFSpLdWdmwFds5n9xS87KoEUfc7LlVbQ=;
+        b=Xq+xhs5SItiZ9oZVE6vWTAVI0KRaGy3CugbQhmkdGgvgGLhbJjzAtOtJ+0FehLLVqt
+         AABt3fhzOMDSyxncMVfx05UMCIx/x9GcJvreRwqNdy9jpGwa3UJG9LAvr8X0rNgg3hGJ
+         5gWX8/5hS9uOKbOPMa0MVd+Ou2KIwrx/HA6Es=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730765494; x=1731370294;
+        d=1e100.net; s=20230601; t=1730765714; x=1731370514;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZzBGIIzGVWypDF2F/j8kxcVTvvbYnIIP9aDVrmVHUqo=;
-        b=jwwKgL5wCmwe5zJQ7xsftRvtnkXKV9ccRCdvjvaiX7P/YcQqFrS+pLwlGhvqVlytrB
-         l/r0HCcKLM3J39zTVMlEH5lbWPXkaxSFcU0cBp9WM1wVZfD8rCTY/ucRnNJW3R2QtzeB
-         aYC1K/UdbHVBGSOv/B7dF8z7i1coXW8xtGhE3FGhLi3ThMZfMNa8Q6bdnr8ZtluKZ/Os
-         /C/+TEAdmgx8T6hN65ORw6jG7QSzb+JSodeJvLdqQHn1cDB4yRcU+IbU1FRZOdC9QauT
-         H0aPp20iu0o/5TJyNJT+pWrd4WlP/1l8uLcbBRKlxszxWq4IsDYvC/cKQnSe72ZwcRyK
-         bi+A==
-X-Gm-Message-State: AOJu0Yw+iU78ILfeDanrkotQ6KX+akaK1g99gKNtV3SJWvumwrh4moWt
-	0SitzKqA1EmnsBng4ahmSI5FO7CYKX3IqcXaNMYA7MitQMhSuLVXz5iLYVj90dKy88kB984F1iu
-	X
-X-Google-Smtp-Source: AGHT+IE6+0r70GgR/JYYtrp8S6WEpFk6AKBf4ysxpcdZyo74q6Lq8+iIND0dfroDCYdzA0K/G5OkBQ==
-X-Received: by 2002:a05:6a20:d498:b0:1d9:1823:83bf with SMTP id adf61e73a8af0-1db91d516d0mr24240567637.8.1730765494528;
-        Mon, 04 Nov 2024 16:11:34 -0800 (PST)
+        bh=ynHKKKY2R9KZFSpLdWdmwFds5n9xS87KoEUfc7LlVbQ=;
+        b=p6d34jlCwE//X7wbWD/g3Td2q+CRroPbWmQnth5yTBjseO/Soe0zi+uvVuEbROli2W
+         Os5FI27LP0MFE1NVeR5oxmKM/+zWnx1gAdBEyig1GAwy3EjLUXDCxcuYupaY/S46Opm2
+         6nY59P7jlir43T1qNwfA6XyHjtJD3oYe5tv8iKCwZWj2p1VOkQoc08wlKEGYWDGVskrX
+         xFbW/r8dazAfkXddZ+3EnYHxV4Z+CFA1f/bMlsxkLJkgbZSP4aDECZ+7eL/Xl4KPl+GV
+         XzbeOfpjKlveF6ehz3uC6+40nGdClU3YlrQM6pzGX/H5QT9xhJVxZA+nBDjTF9XDVw1X
+         baMw==
+X-Gm-Message-State: AOJu0Yx8RrOT3ZvQHkm8WozZXTGS9H7QeAja88mLneSYJN1PGG8EAQFl
+	6lX6lhPcejiHPqRzsUwO3zXygLQQwZMVr3zA0kjp5JvtQGIRdjQ/5MP5Z2Z3B5s=
+X-Google-Smtp-Source: AGHT+IHEkL8m8bR72apa+vXxyf5vfLzUePunRZZG0kg4JqaPAYNUdMM0D6/JJ1YWfRQjD5W/iT0dUw==
+X-Received: by 2002:a17:902:db0f:b0:20c:9c09:8280 with SMTP id d9443c01a7336-210c6cc207amr432628295ad.54.1730765714033;
+        Mon, 04 Nov 2024 16:15:14 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1eac2fsm8150260b3a.72.2024.11.04.16.11.32
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2110570835fsm67043375ad.77.2024.11.04.16.15.12
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 04 Nov 2024 16:11:34 -0800 (PST)
-Date: Mon, 4 Nov 2024 16:11:31 -0800
+        Mon, 04 Nov 2024 16:15:13 -0800 (PST)
+Date: Mon, 4 Nov 2024 16:15:10 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Stanislav Fomichev <sdf@fomichev.me>
 Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
@@ -72,9 +71,8 @@ Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
 	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
 	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
 	willemb@google.com, petrm@nvidia.com
-Subject: Re: [PATCH net-next v7 10/12] selftests: ncdevmem: Run selftest when
- none of the -s or -c has been provided
-Message-ID: <ZyliszeFtcZqfsnm@LQ3V64L9R2>
+Subject: Re: [PATCH net-next v7 12/12] selftests: ncdevmem: Add automated test
+Message-ID: <ZyljjgxP94IBWnI6@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
 	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
@@ -83,7 +81,7 @@ Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
 	willemb@google.com, petrm@nvidia.com
 References: <20241104181430.228682-1-sdf@fomichev.me>
- <20241104181430.228682-11-sdf@fomichev.me>
+ <20241104181430.228682-13-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -92,66 +90,93 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241104181430.228682-11-sdf@fomichev.me>
+In-Reply-To: <20241104181430.228682-13-sdf@fomichev.me>
 
-On Mon, Nov 04, 2024 at 10:14:28AM -0800, Stanislav Fomichev wrote:
-> This will be used as a 'probe' mode in the selftest to check whether
-> the device supports the devmem or not. Use hard-coded queue layout
-> (two last queues) and prevent user from passing custom -q and/or -t.
+On Mon, Nov 04, 2024 at 10:14:30AM -0800, Stanislav Fomichev wrote:
+> Only RX side for now and small message to test the setup.
+> In the future, we can extend it to TX side and to testing
+> both sides with a couple of megs of data.
+> 
+>   make \
+>   	-C tools/testing/selftests \
+>   	TARGETS="drivers/hw/net" \
+>   	install INSTALL_PATH=~/tmp/ksft
+> 
+>   scp ~/tmp/ksft ${HOST}:
+>   scp ~/tmp/ksft ${PEER}:
+> 
+>   cfg+="NETIF=${DEV}\n"
+>   cfg+="LOCAL_V6=${HOST_IP}\n"
+>   cfg+="REMOTE_V6=${PEER_IP}\n"
+>   cfg+="REMOTE_TYPE=ssh\n"
+>   cfg+="REMOTE_ARGS=root@${PEER}\n"
+> 
+>   echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
+>   ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
 > 
 > Reviewed-by: Mina Almasry <almasrymina@google.com>
 > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
 > ---
->  tools/testing/selftests/net/ncdevmem.c | 42 ++++++++++++++++++++------
->  1 file changed, 32 insertions(+), 10 deletions(-)
+>  .../testing/selftests/drivers/net/hw/Makefile |  1 +
+>  .../selftests/drivers/net/hw/devmem.py        | 45 +++++++++++++++++++
+>  2 files changed, 46 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
 > 
-> diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
-> index 044198ce02a7..270a77206f65 100644
-> --- a/tools/testing/selftests/net/ncdevmem.c
-> +++ b/tools/testing/selftests/net/ncdevmem.c
-> @@ -76,7 +76,7 @@ static char *client_ip;
->  static char *port;
->  static size_t do_validation;
->  static int start_queue = -1;
-> -static int num_queues = 1;
-> +static int num_queues = -1;
->  static char *ifname;
->  static unsigned int ifindex;
->  static unsigned int dmabuf_id;
-> @@ -731,19 +731,31 @@ int main(int argc, char *argv[])
->  		}
->  	}
->  
-> -	if (!server_ip)
-> -		error(1, 0, "Missing -s argument\n");
-> -
-> -	if (!port)
-> -		error(1, 0, "Missing -p argument\n");
-> -
->  	if (!ifname)
->  		error(1, 0, "Missing -f argument\n");
->  
->  	ifindex = if_nametoindex(ifname);
->  
-> -	if (start_queue < 0) {
-> -		start_queue = rxq_num(ifindex) - 1;
-> +	if (!server_ip && !client_ip) {
-> +		if (start_queue < 0 && num_queues < 0) {
-> +			num_queues = rxq_num(ifindex);
-> +			if (num_queues < 0)
-> +				error(1, 0, "couldn't detect number of queues\n");
-> +			/* make sure can bind to multiple queues */
-> +			start_queue = num_queues / 2;
-> +			num_queues /= 2;
-
-Sorry for the beginner question :) -- is it possible that rxq_num
-ever returns 1 and thus start_queue = 0, num_queues = 0
-
-> +		}
+> diff --git a/tools/testing/selftests/drivers/net/hw/Makefile b/tools/testing/selftests/drivers/net/hw/Makefile
+> index 182348f4bd40..1c6a77480923 100644
+> --- a/tools/testing/selftests/drivers/net/hw/Makefile
+> +++ b/tools/testing/selftests/drivers/net/hw/Makefile
+> @@ -3,6 +3,7 @@
+>  TEST_PROGS = \
+>  	csum.py \
+>  	devlink_port_split.py \
+> +	devmem.py \
+>  	ethtool.sh \
+>  	ethtool_extended_state.sh \
+>  	ethtool_mm.sh \
+> diff --git a/tools/testing/selftests/drivers/net/hw/devmem.py b/tools/testing/selftests/drivers/net/hw/devmem.py
+> new file mode 100755
+> index 000000000000..1416c31ff81e
+> --- /dev/null
+> +++ b/tools/testing/selftests/drivers/net/hw/devmem.py
+> @@ -0,0 +1,45 @@
+> +#!/usr/bin/env python3
+> +# SPDX-License-Identifier: GPL-2.0
 > +
-> +		if (start_queue < 0 || num_queues < 0)
-> +			error(1, 0, "Both -t and -q are required\n");
+> +from lib.py import ksft_run, ksft_exit
+> +from lib.py import ksft_eq, KsftSkipEx
+> +from lib.py import NetDrvEpEnv
+> +from lib.py import bkg, cmd, rand_port, wait_port_listen
+> +from lib.py import ksft_disruptive
+> +
+> +
+> +def require_devmem(cfg):
+> +    if not hasattr(cfg, "_devmem_probed"):
+> +        port = rand_port()
+> +        probe_command = f"./ncdevmem -f {cfg.ifname}"
+> +        cfg._devmem_supported = cmd(probe_command, fail=False, shell=True).ret == 0
+> +        cfg._devmem_probed = True
+> +
+> +    if not cfg._devmem_supported:
+> +        raise KsftSkipEx("Test requires devmem support")
+> +
+> +
+> +@ksft_disruptive
+> +def check_rx(cfg) -> None:
+> +    cfg.require_v6()
+> +    require_devmem(cfg)
+> +
+> +    port = rand_port()
+> +    listen_cmd = f"./ncdevmem -l -f {cfg.ifname} -s {cfg.v6} -p {port}"
+> +
+> +    with bkg(listen_cmd) as nc:
+> +        wait_port_listen(port)
+> +        cmd(f"echo -e \"hello\\nworld\"| nc {cfg.v6} {port}", host=cfg.remote, shell=True)
 
-And then isn't caught here because this only checks < 0 (instead of
-num_queues <= 0) ?
+FWIW, in the v3 of the series I submit, Jakub asked me to replace nc
+with socat due to issues with nc [1].
+
+Your usage of nc seems pretty basic though, so maybe it's fine?
+
+[1]: https://lore.kernel.org/netdev/20241101063426.2e1423a8@kernel.org/
 
