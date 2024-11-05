@@ -1,144 +1,173 @@
-Return-Path: <netdev+bounces-142013-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142014-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFB5E9BCF34
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:25:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E34C89BCF42
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:28:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A671F2383D
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:25:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FEE81C22C5F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:28:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B101D8A16;
-	Tue,  5 Nov 2024 14:25:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A312B1D88D5;
+	Tue,  5 Nov 2024 14:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1lqxFFu"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="X519f1N7"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226C61D86CE;
-	Tue,  5 Nov 2024 14:25:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 928691D2716;
+	Tue,  5 Nov 2024 14:28:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730816736; cv=none; b=nDwSNQKg+Le/ELz/pNdS4urhueE4oI1u+PAfgaUQ35rWNkNw2OPMZT8kCZqCHpQ9dQ5zu08Hl5JTGrEcG7GwDByH2FiI+cBrHNBorjrJ+qH5wLCAS5jPp7gljTriuvGA3gf6XyGkRNjmHJGudlnXJJh/dlmfaipkZ4K5dn+6SNo=
+	t=1730816892; cv=none; b=MoW6hv8R1S1+YgOmrJQSEEolel+6rCNhelyTtl85QPTpN8YQiGklb8Sr2JZ5wOXH3WtKHipn1QvNT9ZQVNm3oJkRy4bxj4+J8PtI8dyUL82g+8Okb1P1A2Bp3rS156wUcSwvJ1Rq79galpm9Xw8os9sCERuPXlUuFsXDEFEXHFk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730816736; c=relaxed/simple;
-	bh=jKywvlASPOyLP8DRMjcTka1z7/AS3/LjEEQY5ja8zGY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=mlxrxR5E6ZnUD5JcABelg34iEDPabCLSSeC9YcF+kJ9fQepL6a47cRTR29t7gHKnhrUIsvi90R/zaeafms+6UgvHXWp9Qs2kVTFXdlgDcFPwRDWzBr5djLI9iZj+NvfNA/tDEJZCrQTNGRX4xQQqDYPXxX/7f5M5p9EacKrEg2Q=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1lqxFFu; arc=none smtp.client-ip=209.85.128.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6ea1407e978so51876017b3.1;
-        Tue, 05 Nov 2024 06:25:34 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730816734; x=1731421534; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jKywvlASPOyLP8DRMjcTka1z7/AS3/LjEEQY5ja8zGY=;
-        b=I1lqxFFuDCfMHdYTyg+8yxfvNm7HXkPTT3cZ6cg6iaCRZJlQDZeZqY7pJC9L08KP+R
-         worx2hQJMyfD8dWl78dJAjzp9ZFqVbWUdSOS78Ru6QbwKdvqSw45gNbM2+8Zgyyl5vie
-         RRtQBJedOV0z3LZtdR40LqvxxPL0OMXjF9PvGS5h340pJlSraL+ws3of9aDLfqUsGgOE
-         1eFst8FrzhbQqXhcuTIfiBQqkVKu1JHVVYY0M1jHoAYshLPrSgpbJnpAPBpyLYmviX6u
-         p5aAhmD1Q4SDNYt3dEPDJeM8l6IssebY7883BoTCTkyOSMB0alfwa2+/aN5o7w64q3jZ
-         WscQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730816734; x=1731421534;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=jKywvlASPOyLP8DRMjcTka1z7/AS3/LjEEQY5ja8zGY=;
-        b=lztN0S/MLGn2ILqL5oFjm8WefWvXCaK39tqGiIRMfXNVYxOTFo3aQYk1tm88hI3aBY
-         dhTco+iecewFOm7BeKnmv0C3StniaDNDQtXuhw5ERSDqOIBGtI/i4tKpPrJmHWPk2q8i
-         J6qCQYrOlvoT0TqhErmVmY0AUHKil0RrbplPExmLTG1BlKUztuvlGOXSbI+MGIs9l7FL
-         +xPsT81GxZl5AqvPMS3sS+oT6GmF1z4xRaBgxQMN6SlPIP1GMucXfKKBWP0xN9pTk/7Y
-         mqYs1dXfbP1ImNr5OU3U9geamcrh+blLe8bIdPZyEXzSUUCVqe+wfFBuS/IaHv3ZZnHb
-         gtOA==
-X-Forwarded-Encrypted: i=1; AJvYcCWjsuA68CbOIKt37Y+oyYzmwTj5YfHbLljm5fVtb+3QjYBfVeTi7JsSWhWQ2GM7TIyGD7oE0Q9n@vger.kernel.org, AJvYcCXI1r2JGjyFiqvlKMMKehtEu8BwrrrZSLmGG4C3QBZd0qMSVpAjQ+S2rpYrqqiRnfyuJXSd53S4WMjn2Ew=@vger.kernel.org, AJvYcCXgSSb9POjfQkz7Vl6LmnUxkKDnKjH1vHW0ldaSjbMJRioyRSqq0UEMdJTAVYH2+MGQH2QfnXX4wpl+@vger.kernel.org
-X-Gm-Message-State: AOJu0YxSntAFe4vzIzbC5sK7/yhbEimoOKmkTw0t4UuTyeFZmswBVPMV
-	LLaFZqBqwqdptHwwwYXMB+pBZ5ifZbAkLOMB3RlpdYqi8IRfrCCU8ZTr8mrDzAiKWItD6uv5ws6
-	UbhYFmMhZDScmKf4cLi1NasujmWM+P3/t4iHzxA==
-X-Google-Smtp-Source: AGHT+IEDBM5Bvwz4//GIAc/5kSGLSMTJSY9VJft9ffmjTPVj9SD8qtX/F3jCktuGTe4ObCtClqmNucQY7xewGhz0eYc=
-X-Received: by 2002:a05:690c:360b:b0:6dd:d0fa:159e with SMTP id
- 00721157ae682-6ea64bb1aa1mr166148317b3.30.1730816733948; Tue, 05 Nov 2024
- 06:25:33 -0800 (PST)
+	s=arc-20240116; t=1730816892; c=relaxed/simple;
+	bh=sRu/2hY6/f6nJz3PWfsGf63AKy+vCNF5Yc9bNL1zAPo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=AQJ0rn7K0hB5casyCAOKesxRUJM11xMU8vmXV7eUilMZiaqFwuPAS4WnJclgyONdsmr2UUxdRvWOboPOV9+Dr3v/2NWiJjnvJDLukul2I69MtPtdb61YicDzzOLekwN/AlUT7zpQli0B/ggzw3UKCKw5eYoMYxgHgkPpXgDz0Pg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=X519f1N7; arc=none smtp.client-ip=217.70.183.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 442BA2000D;
+	Tue,  5 Nov 2024 14:28:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730816887;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=5EuwCKemNntiFUl0h9MOekWv295Bny26C7jMlRkpaQI=;
+	b=X519f1N7bg31nSp6vgbfL/qtutO+2z4BDU9JI6mEWjcb5+aI2aNBzVCuVhpXWlSop3hJSh
+	/41uUCZ7inbMSgUHQyUUwPNThJ2FjqMcWa1+UMZwTEoXgxFQ36UOK87TOcoORA6zk2YP2L
+	IrXsLCygpnZ7F2UjQA+4ZMSrz7g+n9YoIDFEXa3sjHMGVlqXMH/M6WBNPSVp4x0Z6qDSHu
+	qEUfb1JCh/kGZFUafyFdHxIQLKnFhBuokuaKqad72bNS6wi9JFIOEJTCGX5OdDqGEKpOXx
+	5T7H88qWb0udNGDYIvbygyoDx2rqPGIeutBbFkpVKvNnQ/G86uTuENc2zMElIQ==
+Date: Tue, 5 Nov 2024 15:28:05 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Oleksij Rempel <o.rempel@pengutronix.de>
+Cc: "David S. Miller" <davem@davemloft.net>, Andrew Lunn <andrew@lunn.ch>,
+ Eric Dumazet <edumazet@google.com>, Florian Fainelli
+ <f.fainelli@gmail.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Vladimir Oltean <olteanv@gmail.com>, Woojung Huh
+ <woojung.huh@microchip.com>, Arun Ramadoss <arun.ramadoss@microchip.com>,
+ Conor Dooley <conor+dt@kernel.org>, Krzysztof Kozlowski
+ <krzk+dt@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+ kernel@pengutronix.de, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, UNGLinuxDriver@microchip.com, "Russell King
+ (Oracle)" <linux@armlinux.org.uk>, devicetree@vger.kernel.org, Marek Vasut
+ <marex@denx.de>
+Subject: Re: [PATCH net-next v3 6/6] net: dsa: microchip: parse PHY config
+ from device tree
+Message-ID: <20241105152805.25f8b065@fedora.home>
+In-Reply-To: <20241105090944.671379-7-o.rempel@pengutronix.de>
+References: <20241105090944.671379-1-o.rempel@pengutronix.de>
+	<20241105090944.671379-7-o.rempel@pengutronix.de>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029103656.2151-1-dqfext@gmail.com> <87msid98dc.fsf@toke.dk>
-In-Reply-To: <87msid98dc.fsf@toke.dk>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Tue, 5 Nov 2024 22:25:23 +0800
-Message-ID: <CALW65jbz=3JNTx-SWk21DT4yc+oD3Dsz49z__zgDXF7TjUV7Lw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] net: ppp: convert to IFF_NO_QUEUE
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Hi Toke,
+Hello Oleksij,
 
-On Tue, Nov 5, 2024 at 8:24=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <to=
-ke@redhat.com> wrote:
->
-> Qingfang Deng <dqfext@gmail.com> writes:
->
-> > When testing the parallel TX performance of a single PPPoE interface
-> > over a 2.5GbE link with multiple hardware queues, the throughput could
-> > not exceed 1.9Gbps, even with low CPU usage.
-> >
-> > This issue arises because the PPP interface is registered with a single
-> > queue and a tx_queue_len of 3. This default behavior dates back to Linu=
-x
-> > 2.3.13, which was suitable for slower serial ports. However, in modern
-> > devices with multiple processors and hardware queues, this configuratio=
-n
-> > can lead to congestion.
-> >
-> > For PPPoE/PPTP, the lower interface should handle qdisc, so we need to
-> > set IFF_NO_QUEUE.
->
-> This bit makes sense - the PPPoE and PPTP channel types call through to
-> the underlying network stack, and their start_xmit() ops never return
-> anything other than 1 (so there's no pushback against the upper PPP
-> device anyway). The same goes for the L2TP PPP channel driver.
->
-> > For PPP over a serial port, we don't benefit from a qdisc with such a
-> > short TX queue, so handling TX queueing in the driver and setting
-> > IFF_NO_QUEUE is more effective.
->
-> However, this bit is certainly not true. For the channel drivers that
-> do push back (which is everything apart from the three mentioned above,
-> AFAICT), we absolutely do want a qdisc to store the packets, instead of
-> this arbitrary 32-packet FIFO inside the driver. Your comment about the
-> short TX queue only holds for the pfifo_fast qdisc (that's the only one
-> that uses the tx_queue_len for anything), anything else will do its own
-> thing.
->
-> (Side note: don't use pfifo_fast!)
->
-> I suppose one option here could be to set the IFF_NO_QUEUE flag
-> conditionally depending on whether the underlying channel driver does
-> pushback against the PPP device or not (add a channel flag to indicate
-> this, or something), and then call the netif_{wake,stop}_queue()
-> functions conditionally depending on this. But setting the noqueue flag
-> unconditionally like this patch does, is definitely not a good idea!
+On Tue,  5 Nov 2024 10:09:44 +0100
+Oleksij Rempel <o.rempel@pengutronix.de> wrote:
 
-I agree. Then the problem becomes how to test if a PPP device is a PPPoE.
-It seems like PPPoE is the only one that implements
-ops->fill_forward_path, should I use that? Or is there a better way?
+> Introduce ksz_parse_dt_phy_config() to validate and parse PHY
+> configuration from the device tree for KSZ switches. This function
+> ensures proper setup of internal PHYs by checking `phy-handle`
+> properties, verifying expected PHY IDs, and handling parent node
+> mismatches. Sets the PHY mask on the MII bus if validation is
+> successful. Returns -EINVAL on configuration errors.
+> 
+> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> ---
+>  drivers/net/dsa/microchip/ksz_common.c | 80 ++++++++++++++++++++++++--
+>  1 file changed, 74 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 3909b55857430..cd1a466504180 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -2373,6 +2373,77 @@ static void ksz_irq_phy_free(struct ksz_device *dev)
+>  			irq_dispose_mapping(ds->user_mii_bus->irq[phy]);
+>  }
+> 
+> +/**
+> + * ksz_parse_dt_phy_config - Parse and validate PHY configuration from DT
+> + * @dev: pointer to the KSZ device structure
+> + * @bus: pointer to the MII bus structure
+> + * @mdio_np: pointer to the MDIO node in the device tree
+> + *
+> + * This function parses and validates PHY configurations for each user port
+> + * defined in the device tree for a KSZ switch device. It verifies that the
+> + * `phy-handle` properties are correctly set and that the internal PHYs match
+> + * expected IDs and parent nodes. Sets up the PHY mask in the MII bus if all
+> + * validations pass. Logs error messages for any mismatches or missing data.
+> + *
+> + * Return: 0 on success, or a negative error code on failure.
+> + */
+> +static int ksz_parse_dt_phy_config(struct ksz_device *dev, struct mii_bus *bus,
+> +				   struct device_node *mdio_np)
+> +{
+> +	struct device_node *phy_node, *phy_parent_node;
+> +	bool phys_are_valid = true;
+> +	struct dsa_port *dp;
+> +	u32 phy_id;
+> +	int ret;
+> +
+> +	dsa_switch_for_each_user_port(dp, dev->ds) {
+> +		if (!dev->info->internal_phy[dp->index])
+> +			continue;
+> +
+> +		phy_node = of_parse_phandle(dp->dn, "phy-handle", 0);
+> +		if (!phy_node) {
+> +			dev_err(dev->dev, "failed to parse phy-handle for port %d.\n",
+> +				dp->index);
+> +			phys_are_valid = false;
+> +			continue;
+> +		}
+> +
+> +		phy_parent_node = of_get_parent(phy_node);
+> +		if (!phy_parent_node) {
+> +			dev_err(dev->dev, "failed to get PHY-parent node for port %d\n",
+> +				dp->index);
+> +			phys_are_valid = false;
+> +		} else if (dev->info->internal_phy[dp->index] &&
+> +			   phy_parent_node != mdio_np) {
 
-- Qingfang
+There's a check a few lines above that guarantees that at this point
+dev->info->internal_phy[dp->index] will always evaluate as true,
+so you could simplify that condition a bit :)
 
->
-> -Toke
->
+> +			dev_err(dev->dev, "PHY-parent node mismatch for port %d, expected %pOF, got %pOF\n",
+> +				dp->index, mdio_np, phy_parent_node);
+> +			phys_are_valid = false;
+> +		} else {
+> +			ret = of_property_read_u32(phy_node, "reg", &phy_id);
+> +			if (ret < 0) {
+> +				dev_err(dev->dev, "failed to read PHY ID for port %d. Error %d\n",
+> +					dp->index, ret);
+> +				phys_are_valid = false;
+> +			} else if (phy_id != dev->phy_addr_map[dp->index]) {
+> +				dev_err(dev->dev, "PHY ID mismatch for port %d, expected 0x%x, got 0x%x\n",
+> +					dp->index, dev->phy_addr_map[dp->index],
+> +					phy_id);
+
+In this context, PHY ID might be a bit misleading, as PHY ID usually
+refers to the identifier (OUI + model id used at probe to select the
+driver). May I suggest phy_addr instead ?
+
+Thanks,
+
+Maxime
 
