@@ -1,365 +1,223 @@
-Return-Path: <netdev+bounces-141884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72A719BC98D
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:49:04 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C0DF9BC992
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:51:00 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9185E1C225A1
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:49:03 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FBB51F21423
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:50:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 002F81D097C;
-	Tue,  5 Nov 2024 09:49:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544861D097C;
+	Tue,  5 Nov 2024 09:50:56 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Jf01UEFI"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iHsFYxWv"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E15A0163;
-	Tue,  5 Nov 2024 09:48:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8261C4A30
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:50:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730800141; cv=none; b=QcSyDUlQrJVEtcNqTzTY+lk0CQXXMJIt5uKfGtE+1Q240ct87I16KzdUSqFBD9ST6UqorWUm5BjuP0Pa91YgeEWTfGR7cZonCJfTMaR6I4fCAUSheB+wPKo8Okc5c0ZQednFpY/TaBgNOAynTMV/AZ8WWtMnLwgv3G874yvHurQ=
+	t=1730800256; cv=none; b=tmH8ykUGLvlDTfniXs7BH0NRTxYLQKRFB7Wz8IJHTZmWMyzLGvMBNQRu7HNRnDKgMS0YJKpVudJ8nCl1dz2EfFhIxzmvoc9XBm9LGdjAvaX2Lv/6oGqWJBDVPwoh6FIR79a1EyKzPz5K4SR/mJYuqvBkuUqYX8sX29AmAF112+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730800141; c=relaxed/simple;
-	bh=zxM5hAERtAB7gMIJ084EOz6L37mhY4koGGPbkVTQwTA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XCTFLdf45qZGxgCd3AZdJ7hCGklxfXaGYHEXXIGWgGgjcRcug/x3dT9Z/LNyimtXHsH7icRaUKdiE4nrPd0z4GFXgUyhUTwZC2x4cR3SEFng9Icqh0xDsXM79WtNBqt1ttHDm8kVSsgIJmYcjajHsuqcJc6yR/LiqaUauRpT+JA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Jf01UEFI; arc=none smtp.client-ip=209.85.128.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-431688d5127so41474635e9.0;
-        Tue, 05 Nov 2024 01:48:59 -0800 (PST)
+	s=arc-20240116; t=1730800256; c=relaxed/simple;
+	bh=xerk2SDTwe0awPXGy3i0NI9TftXhgabxdxQ4V2Kt9w4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=KNTxXgJ6lEEkLBCZxVu7Ck3EuSvLsLT4vOtV8WKF1GG59Yaz5KU+6szoF5emzY/LySBYhmC1JjLE7UZsRyz/Sn+tFPGp2U+9XbGRFz8cxh3U6N5c3vdEDDVNfo6BEpgo/XSEhFieYTyFnc/CEcnOUuwCEZaVflAZndQxPBFWn/w=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iHsFYxWv; arc=none smtp.client-ip=209.85.208.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c941623a5aso10999012a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 01:50:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730800138; x=1731404938; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=/w0WpjPEcium9zbrSap5bfYNsTXqLhqroWKQsTECXKM=;
-        b=Jf01UEFILvaSvF3q7Zbq7gqZ7Pm3Ckdx/bU7fy2oM7/zF9h4evT2uliMO7PbLPqq0z
-         FOjORE2KidYWBMFSyTCI4lY53g0zn1dQxjIeoEWka1C9Yv/WDmMB1kluHSjJb1viquHu
-         qesS5pEPYLcYaHX+zsEPaYMoOvQhz5RBUBANPTc7US72dWSqMJopxWujZLBXGWfEy4u4
-         ScmS/405KVS0u03UiSaIc8r7tjhrn6Lf8yZnJzoSsHtpaxoHQWNv+FrT+Mg/O3Tger50
-         oGGMOQ8Wn8EjIBC9L2mlmLB+FnllutSituYF6FCU9BU85Wu4PbUfG4kpBrFn72+H2kVw
-         pgjg==
+        d=google.com; s=20230601; t=1730800253; x=1731405053; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5/W4vyRbX95fl81LBYPamzRyNyGShocuVRWJ4be906A=;
+        b=iHsFYxWvJ32gYuABH5Y05eWQWaRaaO5Jx0hFpOQkOthX1KzfEex7c6ve4+iAwKsHm+
+         HZDDnEt074+HG6jXb57N9iG1x04hbt+13mDXz2FyeJXOWPY+acNeiAuiW9ehAVjrEMKv
+         nGL3DTgH5wrC8dORZuaBFgihLEsYXllUz6kJ7rEyNwmaxKmUOfQjrPLfZykGTc5JaydM
+         0L1qJBDJqX3rYmA2ALFiXBGBK3Izes25F1Eh914w1zAlSy+t0IMHpcxV31BDOVe0jkOp
+         iUbvtNsdEhZpaBdmuM9BuWKzwhH/3fmrHCjLFVZWdMEeDXq0svh/xDFBvfDxGVWgqCtE
+         GQ2Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730800138; x=1731404938;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/w0WpjPEcium9zbrSap5bfYNsTXqLhqroWKQsTECXKM=;
-        b=fvE1IkWCjOO+Qhds6W8j6uu2Hp1sMycB6yho5R4i7uLQRmg028jv86w74n8J2XxlID
-         D6Po4YuQXGwZ6YGgQ892nxbNMAEtlx5ZdG/Xa72+CIg5DFJsyGuOMANhK4e1pbOPPZ5E
-         o4gDOCoYLTpnG45OH6p+J1OEmVejYcOD4dz0VkGYfsxqJ4vG/3GcY/SJgPn8cfpL9ynj
-         CqVLsn3XNCL+7WiDrhFkh0Ek9GlAFwSQGZPPWQkv/cX7leLDLY2wkXKKZRbucvSHG3EB
-         0nWU4GlvjGKIseML1LXfkFKFeeZBom6tO5FXPtfNn1idR0nRmUerCrfxuUGKNxYzy2mM
-         vKAw==
-X-Forwarded-Encrypted: i=1; AJvYcCWDbwEgdqqgM9wySB0YLJUD4CyBQlF1kL5045MGk8BuaeryMID7LPPM3EAZn4hEloNoaFjN/b65YX6HDaAs@vger.kernel.org, AJvYcCWM+fF1NQ6Dr9ljRkpPFl/eL6H3dItDzon35h/16S0wuXjS/CWLjU2cs0LA/hQuQTD9k1g=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwaxF6q3q82pYjyKpQoKKSjnrICW8xDKA6TuajU96tKGS98hgmk
-	vVPeh9+feK1a90hAB6W/QZqcOqEV0E9vW/2KAAVybhSPE3Hd+TL+p3bQZMXL
-X-Google-Smtp-Source: AGHT+IHNmm2Ntw2+Ap6scTGTnQ8hpTqJZM/Tmkm9xYM7ujAthDKd3FDJ7+/j/s7g3RD+WvheukC5Yg==
-X-Received: by 2002:a05:600c:19c8:b0:430:54a4:5b03 with SMTP id 5b1f17b1804b1-4319ac6fad6mr279878385e9.6.1730800137880;
-        Tue, 05 Nov 2024 01:48:57 -0800 (PST)
-Received: from localhost ([81.168.73.77])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-431bd9ca6f8sm211157835e9.39.2024.11.05.01.48.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 01:48:56 -0800 (PST)
-Date: Tue, 5 Nov 2024 09:48:55 +0000
-From: Martin Habets <habetsm.xilinx@gmail.com>
-To: Rosen Penev <rosenp@gmail.com>
-Cc: netdev@vger.kernel.org, Edward Cree <ecree.xilinx@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"open list:SFC NETWORK DRIVER" <linux-net-drivers@amd.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: sfc: use ethtool string helpers
-Message-ID: <20241105094855.GE595392@gmail.com>
-Mail-Followup-To: Rosen Penev <rosenp@gmail.com>, netdev@vger.kernel.org,
-	Edward Cree <ecree.xilinx@gmail.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	"open list:SFC NETWORK DRIVER" <linux-net-drivers@amd.com>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:XDP (eXpress Data Path):Keyword:(?:b|_)xdp(?:b|_)" <bpf@vger.kernel.org>
-References: <20241104202705.120939-1-rosenp@gmail.com>
+        d=1e100.net; s=20230601; t=1730800253; x=1731405053;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5/W4vyRbX95fl81LBYPamzRyNyGShocuVRWJ4be906A=;
+        b=j5L/vZfmTBzhik6522J67teRpS5al+uLuf1xgGPqgPBCpTZbARk0gx/1TiKO9E8Dxp
+         PL9vtSArz4Fsuc4nFBe6gmxLzqs0Yh2kncWKhjutPbqrRJE4vcfXA1Md0N6sOlW4fnFw
+         zEEOmKxDxg1zVaZssJ7ZlObuEYhiaSexp33q+yMyweuSFeb+BNZNlWwZ5fuCMnUvUD0X
+         obeAg3iKecgVjG3DZ+01VH1zSv9hNDYDY/OzYnW3BmNpUCKbFVlW3J8bWyj0qNt0YYZR
+         gklqirJI8NbZTlSmJ4yS25Uddttk4XR7xE0MUyVRJubI9HjjppoAJBmyId59uO7IICU5
+         fxJw==
+X-Forwarded-Encrypted: i=1; AJvYcCWw3uoSMHRSo1/rDfPjihmEO0pXZFH9HhTu1uc7Fwqv6M/o6wtHoZ6drspg4HVQyDk8XSHAdzE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxKefdzKjNPbUcFQ4DrFeQdmUKq6rQiGE1DX5yYHuHkX3UaYklj
+	+ax7BbyhIJ9LIcXnJ6KwWkcR22iPw/9PS3qZXvIvgAwV4c9B+H7KSGxzHSgCRu6Z6h0AfgVrB1K
+	cWWsAX+/GKjxzrzvMD17PqSb4siJUwV/iEJrV
+X-Google-Smtp-Source: AGHT+IHkqUrECwRTb4Ns/ciMiauu94A7QmvtTawi9Vah9MKW+d80csACMzcLLS28tSeTwwx91QRmxlax+lu69vN0L9I=
+X-Received: by 2002:a05:6402:354b:b0:5ce:cfee:6e9c with SMTP id
+ 4fb4d7f45d1cf-5cecfee7314mr8744628a12.4.1730800250052; Tue, 05 Nov 2024
+ 01:50:50 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104202705.120939-1-rosenp@gmail.com>
+References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
+ <20241105074916.75107-1-kuniyu@amazon.com> <CAL+tcoAgSBMtFcDx6MfCAhYMVKERCx2d7YUjquT6Pa8jm0bXWA@mail.gmail.com>
+ <CANn89iKhSnTJUadpEBpkKYoRVP2GEJZ1ftzH7AqF4oXMF3QEZA@mail.gmail.com> <CAL+tcoCBvbR_=c_SxKmAyAE4U5wTgr=hp08yNxm0QUSWdgge5Q@mail.gmail.com>
+In-Reply-To: <CAL+tcoCBvbR_=c_SxKmAyAE4U5wTgr=hp08yNxm0QUSWdgge5Q@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 5 Nov 2024 10:50:37 +0100
+Message-ID: <CANn89i+h4zbgju1KSfTZi2R1bnQ4=Q1EThJ9y8e5XCOocLNzMw@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
+ failure in tcp_timewait_state_process
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, dsahern@kernel.org, 
+	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 04, 2024 at 12:27:05PM -0800, Rosen Penev wrote:
-> 
-> The latter is the preferred way to copy ethtool strings.
-> 
-> Avoids manually incrementing the pointer. Cleans up the code quite well.
-> 
-> Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> ---
->  drivers/net/ethernet/sfc/ethtool_common.c     | 34 +++++++------------
->  drivers/net/ethernet/sfc/falcon/ethtool.c     | 24 +++++--------
->  drivers/net/ethernet/sfc/falcon/nic.c         |  7 ++--
->  drivers/net/ethernet/sfc/nic.c                |  7 ++--
->  .../net/ethernet/sfc/siena/ethtool_common.c   | 34 +++++++------------
->  drivers/net/ethernet/sfc/siena/nic.c          |  7 ++--
->  6 files changed, 40 insertions(+), 73 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/sfc/ethtool_common.c b/drivers/net/ethernet/sfc/ethtool_common.c
-> index ae32e08540fa..d46972f45ec1 100644
-> --- a/drivers/net/ethernet/sfc/ethtool_common.c
-> +++ b/drivers/net/ethernet/sfc/ethtool_common.c
-> @@ -403,24 +403,19 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
->  	efx_for_each_channel(channel, efx) {
->  		if (efx_channel_has_tx_queues(channel)) {
->  			n_stats++;
-> -			if (strings != NULL) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "tx-%u.tx_packets",
-> -					 channel->tx_queue[0].queue /
-> -					 EFX_MAX_TXQ_PER_CHANNEL);
-> -
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(
-> +					&strings, "tx-%u.tx_packets",
+On Tue, Nov 5, 2024 at 10:42=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Tue, Nov 5, 2024 at 5:35=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
+ wrote:
+> >
+> > On Tue, Nov 5, 2024 at 10:08=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
+il.com> wrote:
+> > >
+> > > On Tue, Nov 5, 2024 at 3:49=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amaz=
+on.com> wrote:
+> > > >
+> > > > From: Jason Xing <kerneljasonxing@gmail.com>
+> > > > Date: Tue,  5 Nov 2024 10:55:11 +0800
+> > > > > From: Jason Xing <kernelxing@tencent.com>
+> > > > >
+> > > > > We found there are rare chances that some RST packets appear duri=
+ng
+> > > > > the shakehands because the timewait socket cannot accept the SYN =
+and
+> > > >
+> > > > s/shakehands/handshake/
+> > > >
+> > > > same in the subject.
+> > > >
+> > > > > doesn't return TCP_TW_SYN in tcp_timewait_state_process().
+> > > > >
+> > > > > Here is how things happen in production:
+> > > > > Time        Client(A)        Server(B)
+> > > > > 0s          SYN-->
+> > > > > ...
+> > > > > 132s                         <-- FIN
+> > > > > ...
+> > > > > 169s        FIN-->
+> > > > > 169s                         <-- ACK
+> > > > > 169s        SYN-->
+> > > > > 169s                         <-- ACK
+> > > > > 169s        RST-->
+> > > > > As above picture shows, the two flows have a start time differenc=
+e
+> > > > > of 169 seconds. B starts to send FIN so it will finally enter int=
+o
+> > > > > TIMEWAIT state. Nearly at the same time A launches a new connecti=
+on
+> > > > > that soon is reset by itself due to receiving a ACK.
+> > > > >
+> > > > > There are two key checks in tcp_timewait_state_process() when tim=
+ewait
+> > > > > socket in B receives the SYN packet:
+> > > > > 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
+> > > > > 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
+> > > > >
+> > > > > Regarding the first rule, it fails as expected because in the fir=
+st
+> > > > > connection the seq of SYN sent from A is 1892994276, then 169s ha=
+ve
+> > > > > passed, the second SYN has 239034613 (caused by overflow of s32).
+> > > > >
+> > > > > Then how about the second rule?
+> > > > > It fails again!
+> > > > > Let's take a look at how the tsval comes out:
+> > > > > __tcp_transmit_skb()
+> > > > >     -> tcp_syn_options()
+> > > > >         -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_ts, =
+skb) + tp->tsoffset;
+> > > > > The timestamp depends on two things, one is skb->skb_mstamp_ns, t=
+he
+> > > > > other is tp->tsoffset. The latter value is fixed, so we don't nee=
+d
+> > > > > to care about it. If both operations (sending FIN and then starti=
+ng
+> > > > > sending SYN) from A happen in 1ms, then the tsval would be the sa=
+me.
+> > > > > It can be clearly seen in the tcpdump log. Notice that the tsval =
+is
+> > > > > with millisecond precision.
+> > > > >
+> > > > > Based on the above analysis, I decided to make a small change to
+> > > > > the check in tcp_timewait_state_process() so that the second flow
+> > > > > would not fail.
+> > > > >
+> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > > > ---
+> > > > >  net/ipv4/tcp_minisocks.c | 2 +-
+> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > > > >
+> > > > > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> > > > > index bb1fe1ba867a..2b29d1bf5ca0 100644
+> > > > > --- a/net/ipv4/tcp_minisocks.c
+> > > > > +++ b/net/ipv4/tcp_minisocks.c
+> > > > > @@ -234,7 +234,7 @@ tcp_timewait_state_process(struct inet_timewa=
+it_sock *tw, struct sk_buff *skb,
+> > > > >       if (th->syn && !th->rst && !th->ack && !paws_reject &&
+> > > > >           (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
+> > > > >            (tmp_opt.saw_tstamp &&
+> > > > > -           (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_ts=
+val) < 0))) {
+> > > >
+> > > > I think this follows RFC 6191 and such a change requires a formal
+> > > > discussion at IETF.
+> > > >
+> > > > https://datatracker.ietf.org/doc/html/rfc6191#section-2
+> > > >
+> > > > ---8<---
+> > > >       *  If TCP Timestamps would be enabled for the new incarnation=
+ of
+> > > >          the connection, and the timestamp contained in the incomin=
+g SYN
+> > > >          segment is greater than the last timestamp seen on the pre=
+vious
+> > >
+> > > The true thing is that the timestamp of the SYN packet is greater tha=
+n
+> > > that of the last packet, but the kernel implementation uses ms
+> > > precision (please see tcp_skb_timestamp_ts()). That function makes
+> > > those two timestamps the same.
+> > >
+> > > This case happens as expected, so the second connection should be
+> > > established. My confusion just popped out of my mind: what rules
+> > > should we follow to stop the second flow?
+> >
+> > Note that linux TCP stack can use usec resolution for TCP TS values.
+> >
+> > You might adopt it, and no longer care about this ms granularity.
+>
+> Right, I noticed this feature. I wonder if we can change the check in
+> tcp_timewait_state_process() like this patch if it has no side
+> effects? I'm worried that some programs don't use this feature. It's
+> the reason why I try to propose this patch to you.
 
-This still fits after the opening parentheses above within 80 characters.
-I would prefer that style.
+Breaking RFC ? I do not think so.
 
-Martin
-
-> +					channel->tx_queue[0].queue /
-> +						EFX_MAX_TXQ_PER_CHANNEL);
->  		}
->  	}
->  	efx_for_each_channel(channel, efx) {
->  		if (efx_channel_has_rx_queue(channel)) {
->  			n_stats++;
-> -			if (strings != NULL) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "rx-%d.rx_packets", channel->channel);
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(&strings, "rx-%d.rx_packets",
-> +						channel->channel);
->  		}
->  	}
->  	if (efx->xdp_tx_queue_count && efx->xdp_tx_queues) {
-> @@ -428,11 +423,10 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
->  
->  		for (xdp = 0; xdp < efx->xdp_tx_queue_count; xdp++) {
->  			n_stats++;
-> -			if (strings) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "tx-xdp-cpu-%hu.tx_packets", xdp);
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(&strings,
-> +						"tx-xdp-cpu-%hu.tx_packets",
-> +						xdp);
->  		}
->  	}
->  
-> @@ -467,9 +461,7 @@ void efx_ethtool_get_strings(struct net_device *net_dev,
->  		strings += (efx->type->describe_stats(efx, strings) *
->  			    ETH_GSTRING_LEN);
->  		for (i = 0; i < EFX_ETHTOOL_SW_STAT_COUNT; i++)
-> -			strscpy(strings + i * ETH_GSTRING_LEN,
-> -				efx_sw_stat_desc[i].name, ETH_GSTRING_LEN);
-> -		strings += EFX_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
-> +			ethtool_puts(&strings, efx_sw_stat_desc[i].name);
->  		strings += (efx_describe_per_queue_stats(efx, strings) *
->  			    ETH_GSTRING_LEN);
->  		efx_ptp_describe_stats(efx, strings);
-> diff --git a/drivers/net/ethernet/sfc/falcon/ethtool.c b/drivers/net/ethernet/sfc/falcon/ethtool.c
-> index f4db683b80f7..41bd63d0c40c 100644
-> --- a/drivers/net/ethernet/sfc/falcon/ethtool.c
-> +++ b/drivers/net/ethernet/sfc/falcon/ethtool.c
-> @@ -361,24 +361,18 @@ static size_t ef4_describe_per_queue_stats(struct ef4_nic *efx, u8 *strings)
->  	ef4_for_each_channel(channel, efx) {
->  		if (ef4_channel_has_tx_queues(channel)) {
->  			n_stats++;
-> -			if (strings != NULL) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "tx-%u.tx_packets",
-> -					 channel->tx_queue[0].queue /
-> -					 EF4_TXQ_TYPES);
-> -
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(&strings, "tx-%u.tx_packets",
-> +						channel->tx_queue[0].queue /
-> +							EF4_TXQ_TYPES);
->  		}
->  	}
->  	ef4_for_each_channel(channel, efx) {
->  		if (ef4_channel_has_rx_queue(channel)) {
->  			n_stats++;
-> -			if (strings != NULL) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "rx-%d.rx_packets", channel->channel);
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(&strings, "rx-%d.rx_packets",
-> +						channel->channel);
->  		}
->  	}
->  	return n_stats;
-> @@ -412,9 +406,7 @@ static void ef4_ethtool_get_strings(struct net_device *net_dev,
->  		strings += (efx->type->describe_stats(efx, strings) *
->  			    ETH_GSTRING_LEN);
->  		for (i = 0; i < EF4_ETHTOOL_SW_STAT_COUNT; i++)
-> -			strscpy(strings + i * ETH_GSTRING_LEN,
-> -				ef4_sw_stat_desc[i].name, ETH_GSTRING_LEN);
-> -		strings += EF4_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
-> +			ethtool_puts(&strings, ef4_sw_stat_desc[i].name);
->  		strings += (ef4_describe_per_queue_stats(efx, strings) *
->  			    ETH_GSTRING_LEN);
->  		break;
-> diff --git a/drivers/net/ethernet/sfc/falcon/nic.c b/drivers/net/ethernet/sfc/falcon/nic.c
-> index 78c851b5a56f..a7f0caa8710f 100644
-> --- a/drivers/net/ethernet/sfc/falcon/nic.c
-> +++ b/drivers/net/ethernet/sfc/falcon/nic.c
-> @@ -451,11 +451,8 @@ size_t ef4_nic_describe_stats(const struct ef4_hw_stat_desc *desc, size_t count,
->  
->  	for_each_set_bit(index, mask, count) {
->  		if (desc[index].name) {
-> -			if (names) {
-> -				strscpy(names, desc[index].name,
-> -					ETH_GSTRING_LEN);
-> -				names += ETH_GSTRING_LEN;
-> -			}
-> +			if (names)
-> +				ethtool_puts(&names, desc[index].name);
->  			++visible;
->  		}
->  	}
-> diff --git a/drivers/net/ethernet/sfc/nic.c b/drivers/net/ethernet/sfc/nic.c
-> index a33ed473cc8a..51c975cff4fe 100644
-> --- a/drivers/net/ethernet/sfc/nic.c
-> +++ b/drivers/net/ethernet/sfc/nic.c
-> @@ -306,11 +306,8 @@ size_t efx_nic_describe_stats(const struct efx_hw_stat_desc *desc, size_t count,
->  
->  	for_each_set_bit(index, mask, count) {
->  		if (desc[index].name) {
-> -			if (names) {
-> -				strscpy(names, desc[index].name,
-> -					ETH_GSTRING_LEN);
-> -				names += ETH_GSTRING_LEN;
-> -			}
-> +			if (names)
-> +				ethtool_puts(&names, desc[index].name);
->  			++visible;
->  		}
->  	}
-> diff --git a/drivers/net/ethernet/sfc/siena/ethtool_common.c b/drivers/net/ethernet/sfc/siena/ethtool_common.c
-> index 075fef64de68..53b1cdf872d8 100644
-> --- a/drivers/net/ethernet/sfc/siena/ethtool_common.c
-> +++ b/drivers/net/ethernet/sfc/siena/ethtool_common.c
-> @@ -403,24 +403,19 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
->  	efx_for_each_channel(channel, efx) {
->  		if (efx_channel_has_tx_queues(channel)) {
->  			n_stats++;
-> -			if (strings != NULL) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "tx-%u.tx_packets",
-> -					 channel->tx_queue[0].queue /
-> -					 EFX_MAX_TXQ_PER_CHANNEL);
-> -
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(
-> +					&strings, "tx-%u.tx_packets",
-> +					channel->tx_queue[0].queue /
-> +						EFX_MAX_TXQ_PER_CHANNEL);
->  		}
->  	}
->  	efx_for_each_channel(channel, efx) {
->  		if (efx_channel_has_rx_queue(channel)) {
->  			n_stats++;
-> -			if (strings != NULL) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "rx-%d.rx_packets", channel->channel);
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(&strings, "rx-%d.rx_packets",
-> +						channel->channel);
->  		}
->  	}
->  	if (efx->xdp_tx_queue_count && efx->xdp_tx_queues) {
-> @@ -428,11 +423,10 @@ static size_t efx_describe_per_queue_stats(struct efx_nic *efx, u8 *strings)
->  
->  		for (xdp = 0; xdp < efx->xdp_tx_queue_count; xdp++) {
->  			n_stats++;
-> -			if (strings) {
-> -				snprintf(strings, ETH_GSTRING_LEN,
-> -					 "tx-xdp-cpu-%hu.tx_packets", xdp);
-> -				strings += ETH_GSTRING_LEN;
-> -			}
-> +			if (strings)
-> +				ethtool_sprintf(&strings,
-> +						"tx-xdp-cpu-%hu.tx_packets",
-> +						xdp);
->  		}
->  	}
->  
-> @@ -467,9 +461,7 @@ void efx_siena_ethtool_get_strings(struct net_device *net_dev,
->  		strings += (efx->type->describe_stats(efx, strings) *
->  			    ETH_GSTRING_LEN);
->  		for (i = 0; i < EFX_ETHTOOL_SW_STAT_COUNT; i++)
-> -			strscpy(strings + i * ETH_GSTRING_LEN,
-> -				efx_sw_stat_desc[i].name, ETH_GSTRING_LEN);
-> -		strings += EFX_ETHTOOL_SW_STAT_COUNT * ETH_GSTRING_LEN;
-> +			ethtool_puts(&strings, efx_sw_stat_desc[i].name);
->  		strings += (efx_describe_per_queue_stats(efx, strings) *
->  			    ETH_GSTRING_LEN);
->  		efx_siena_ptp_describe_stats(efx, strings);
-> diff --git a/drivers/net/ethernet/sfc/siena/nic.c b/drivers/net/ethernet/sfc/siena/nic.c
-> index 0ea0433a6230..06b97218b490 100644
-> --- a/drivers/net/ethernet/sfc/siena/nic.c
-> +++ b/drivers/net/ethernet/sfc/siena/nic.c
-> @@ -457,11 +457,8 @@ size_t efx_siena_describe_stats(const struct efx_hw_stat_desc *desc, size_t coun
->  
->  	for_each_set_bit(index, mask, count) {
->  		if (desc[index].name) {
-> -			if (names) {
-> -				strscpy(names, desc[index].name,
-> -					ETH_GSTRING_LEN);
-> -				names += ETH_GSTRING_LEN;
-> -			}
-> +			if (names)
-> +				ethtool_puts(&names, desc[index].name);
->  			++visible;
->  		}
->  	}
-> -- 
-> 2.47.0
-> 
+Instead, use a usec clock and voila, the problem is solved.
 
