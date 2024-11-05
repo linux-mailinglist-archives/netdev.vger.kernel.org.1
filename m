@@ -1,95 +1,74 @@
-Return-Path: <netdev+bounces-141767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 858B39BC31E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:21:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0DFD9BC328
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:29:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48630282988
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:21:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E78561C217A1
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:29:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20BA6137C2A;
-	Tue,  5 Nov 2024 02:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3585736AF5;
+	Tue,  5 Nov 2024 02:29:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="WNHsfwka"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nucBWmP/"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF0A41339A4;
-	Tue,  5 Nov 2024 02:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 037491CD0C;
+	Tue,  5 Nov 2024 02:29:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730773229; cv=none; b=Qv1wky166dGoCGqxxADlzIGaqpZIc/Z0n3Q0xz1A/ASUWnK/9vSoGfNtePw2qd46Dp/vrl/lijmZOVG8xEs7dglXCXyKAF8H2JRoVPnK9TtUMAavgf+riDY+S2NINptVn27NV+HQzasJ8nRDrH3riTDaWiO5t7OqJWWu2ozo2Lg=
+	t=1730773783; cv=none; b=G30oMW7GnOc3i9UrWvEB0LBEaTwQfjB+hA1SboSxV3AjXcKw6yHjdhOSC0kL3i0n6iOS0gOD8k3JBmAZU3mSdqAsVlhUCPtUuPJCl1Ld3V7aPN+Pg8gXx/m9BsDp+5URfl6ymSbJDORNVX1paSW3AQKY7SNATRLlkw3sVvNMUSY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730773229; c=relaxed/simple;
-	bh=8Z6YC6/gad8Z6uPzOYdCzmq8GJLLc4rArpcGZT6FKdc=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ZxwZtrjlc1YfyFhbRrN+6k8RF8pS+eBf5G9H2O4H5otp8zldEr03SldPCK0a4w0BJ6RoYanLWYkXzg/JdmGz92eSEyulMhb3j3bM26oquY7uSPm6uBGKRcCj5SjupznJFbOSKnQuB4Vnx/x0bsW71SWFd5J64LLRo17Wew7NrS0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=WNHsfwka; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BE4FCC4CED2;
-	Tue,  5 Nov 2024 02:20:28 +0000 (UTC)
+	s=arc-20240116; t=1730773783; c=relaxed/simple;
+	bh=+rbvRAXwqFZheDS55rt0qf6Ed8xH23mKjmoTp+dzypo=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Q1TRxJhEU5ZeD1SRUnXndjnB8IesCXL+b0TnECAEIARuC/PbuZfp+eAISaDWvuf7dcfmbSIg+jXepbpmudx2/AQEcq1uTyhoLE2Y/AnpxN3jPQM+E/S+y0uCob/phXE61jz05LM7MQwNP6jIOdrMl7ZsZ0enTT8ZvXXGoelzazw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nucBWmP/; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52736C4CECE;
+	Tue,  5 Nov 2024 02:29:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730773228;
-	bh=8Z6YC6/gad8Z6uPzOYdCzmq8GJLLc4rArpcGZT6FKdc=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=WNHsfwkaEldwRtWnIvemZXjl8G5MIMA7TkgKWAZJCSMj25eMaGXUeWu2mSDaNDSIS
-	 lsnaDTeNCQGJtrHwnl3xXJ7GSwwmlh6hrl1B8n6OC1+Zssqo8fPSi6ft5brdfFRAhW
-	 KbH67hZ6P84eh683W6g4xW4S3voM3TVMsP0uuQp/EV27D5lO/RKFqfimH4nZV2V/Tt
-	 JwDIK45x4XCBUIifs3dBqhLc1g0jbkINUMpSViXcBt5nBRSrvyYiFWGgPGYbaredBn
-	 ueX/r643mi3yhEF93I7Kc8mlxnvJGSn3TIe17mcLoWdxcfue4EqiRT6lAc+2SEHEUy
-	 SGZ41+qHbmEHA==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADD1B3809A80;
-	Tue,  5 Nov 2024 02:20:38 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730773782;
+	bh=+rbvRAXwqFZheDS55rt0qf6Ed8xH23mKjmoTp+dzypo=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=nucBWmP/0+Miljuoo8HdIXFB+wse52JmwxgO6ngB7+Gh9TOElauZMY/rtC2H7alb4
+	 OpTxEMBniTh5ErqdfgyqUAA3N7/F/VDDISpLlRlR88n6jrBDQNWCboWMuQtrYz7C/U
+	 X9+qcMhkUbwjTQ5RsS4pfEZaP3spnsTuqjEs1S6fH7Ev5QlwulVhpL7P20Qz8SgSNi
+	 WeA02ES/LAdKmhhCOgRfgfh4OcC4qt3zCPBdanugIHXuj9LQ2Wp69xXo27dVCa6GSD
+	 2rvZ++bhpK6LMFwnvh2Q/cJ0yu3s36wOKPlJJdoiH7MN57DyieIdXpP8uhblz6AzK5
+	 ZaikNeYgBPKLQ==
+Date: Mon, 4 Nov 2024 18:29:41 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Krzysztof
+ Kozlowski <krzk@kernel.org>
+Subject: Re: [PATCH net-next v1 1/1] nfc: mrvl: Don't use "proxy" headers
+Message-ID: <20241104182941.342c3b7a@kernel.org>
+In-Reply-To: <ZyiChsS_zrHlet3E@smile.fi.intel.com>
+References: <20241101083910.3362945-1-andriy.shevchenko@linux.intel.com>
+	<20241103081740.7bc006c1@kernel.org>
+	<ZyiChsS_zrHlet3E@smile.fi.intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: tcp: replace the document for "lsndtime" in
- tcp_sock
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173077323749.89867.14034672284365562278.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Nov 2024 02:20:37 +0000
-References: <20241104070041.64302-1-dongml2@chinatelecom.cn>
-In-Reply-To: <20241104070041.64302-1-dongml2@chinatelecom.cn>
-To: Menglong Dong <menglong8.dong@gmail.com>
-Cc: kuba@kernel.org, edumazet@google.com, dsahern@kernel.org,
- lixiaoyan@google.com, weiwan@google.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, dongml2@chinatelecom.cn
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Mon, 4 Nov 2024 10:15:02 +0200 Andy Shevchenko wrote:
+> So, you are welcome to help developing such a tool.
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+FTR I find saying such things to maintains very, very rude.
 
-On Mon,  4 Nov 2024 15:00:41 +0800 you wrote:
-> Commit d5fed5addb2b ("tcp: reorganize tcp_sock fast path variables")
-> moved the fields around and misplaced the documentation for "lsndtime".
-> So, let's replace it in the proper place.
-> 
-> Signed-off-by: Menglong Dong <dongml2@chinatelecom.cn>
-> ---
-> v2:
-> - remove the "Fixes" tag in the commit log
-> 
-> [...]
+> Can we have this being applied meanwhile, please? It's a showstopper for
+> getting rid of of_gpio.h rather sooner than later.
 
-Here is the summary with links:
-  - [net-next,v2] net: tcp: replace the document for "lsndtime" in tcp_sock
-    https://git.kernel.org/netdev/net-next/c/0a2cdeeae9dd
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Doing this cleanup as part of deleting a deprecated header seems legit.
+But you need to say that in the commit message.
 
