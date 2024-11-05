@@ -1,202 +1,185 @@
-Return-Path: <netdev+bounces-142048-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142049-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 517999BD377
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:36:23 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 901099BD37C
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:37:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 58D611C221D3
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:36:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 502122846D8
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:37:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D5401DD0CB;
-	Tue,  5 Nov 2024 17:36:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EC9A1E2619;
+	Tue,  5 Nov 2024 17:37:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kJlLOpsv"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Z+0j4yZQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6237815C144
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:36:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A541D15C144
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:37:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730828179; cv=none; b=MChxgQJwA3igVzuimNDhLuTKvTkF7WJ5wJeKXBtdYxvJ+J839o4YfjNFlKsmEBcug4DoEkkg5z06VBMOj/0WARDhm261vZ+KkDmDp3bsbl8IS5slc+q11ZjXcpUIvHvWmHQpaQcKzT0lUanHEZvGvQaFaoHLZxFQU60zzO5brv0=
+	t=1730828230; cv=none; b=Ht9JG7jJstYweJOKyYpcNObHW51XmfpBOMUTgz+99vskTWLFU7jyVJxTHL56idfiZ7wHJvjY7VWlw3gzAtYqiH54Mxu5ZcjlMz5jZQjPN5FkzWpKVP0Lx+wG5/9Hllh4IXHeHCVHW9sUiJczFyGHrVbPqmz77M3EAR6uRQAjvso=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730828179; c=relaxed/simple;
-	bh=bxBoMfbZpeKH7kpFOMLlgBqaMGFuWuiMW/zhdUxfoQs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Al1LEK0YqSb7bgiDv4wJm9GByMBtd9XjP27S9HQ6Y0m4aR/JTYxlkWTMpMgE1ceoEfi3bofHWqAVFUb5WKJ5UFnjJXo7WPSqfy/GrFaSe/iunVeMj1UWf0JlhImvtGy1xQwrvEYFwlvZIFCSzD5UP7F1K4fxBWjTm0csg1nZ7ns=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kJlLOpsv; arc=none smtp.client-ip=52.119.213.152
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1730828230; c=relaxed/simple;
+	bh=if40SajvVFM5lPJKQlD16FsfdC0/Ek/f1wYPx2TiIxc=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=fkIrOVlr+O3ZHhJ0OXPplkgdqUorfg0Qi8ytjPRnK9HKQRDm8qJsWtviXJqfxue5PGcaq/08mknfesbxdgri+6mTi/I2XDssbzaK/vle+6r1nkFJdwVHWhqQSef+JazmTa4c2Sz0rHjb6HHqz8fNxWosasv3j9i23UUTj3pfkSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Z+0j4yZQ; arc=none smtp.client-ip=209.85.208.50
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5c9c28c1ecbso6997796a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 09:37:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730828178; x=1762364178;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=1oGp7M+HeMqjXE5TZoqIcevsrzZ9QTe6NwbZHYH2Kdg=;
-  b=kJlLOpsv37JDXFrOksVSwRx1DDup66Bd6DhKYZVaQi7e1tVzZLGZAkoA
-   jlS0SprHj/5kBT9LAaK9zh0146w5ntfLZK/HNfMmbhWkqwFfrLRxuVN1k
-   OwlDN3N+q0bZhNvR12iuXe6nu8D6AW58I+mnMHaCH+sTFnI2CanSRcvjx
-   w=;
-X-IronPort-AV: E=Sophos;i="6.11,260,1725321600"; 
-   d="scan'208";a="39187795"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 17:36:14 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:1244]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.170:2525] with esmtp (Farcaster)
- id 3d2dfe26-6a46-48ad-804b-b828d690ff38; Tue, 5 Nov 2024 17:36:13 +0000 (UTC)
-X-Farcaster-Flow-ID: 3d2dfe26-6a46-48ad-804b-b828d690ff38
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 5 Nov 2024 17:36:12 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.17) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 5 Nov 2024 17:36:09 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <edumazet@google.com>
-CC: <courmisch@gmail.com>, <davem@davemloft.net>, <eric.dumazet@gmail.com>,
-	<kuba@kernel.org>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v2 net] phonet: do not call synchronize_rcu() from phonet_route_del()
-Date: Tue, 5 Nov 2024 09:35:57 -0800
-Message-ID: <20241105173557.43270-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241105132645.654244-1-edumazet@google.com>
-References: <20241105132645.654244-1-edumazet@google.com>
+        d=broadcom.com; s=google; t=1730828227; x=1731433027; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=if40SajvVFM5lPJKQlD16FsfdC0/Ek/f1wYPx2TiIxc=;
+        b=Z+0j4yZQD7x8gjcNvALNsttGJG6+bfnYi1QjdGnU3o/86ouCCh6aGfYDsxcWSyIx8F
+         kDIMOzBaOhCvpktv5RRlBAekQ30JD1QuIu7j7dcOWXvu+sMi2MSqKTp/Cz4I84k/ypT3
+         1VJKWN9Vo2b4fRus3cUn0NSFA8+3uRjevNStI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730828227; x=1731433027;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=if40SajvVFM5lPJKQlD16FsfdC0/Ek/f1wYPx2TiIxc=;
+        b=uLsYGjzyQizQ3iHS00oiYh5dlU7wVVJ+sOt1Bxwf1QJ8Htal5o0HGI3NXlZEcYF7TO
+         +vjc5dHf4/7qZWWKdX6FZDLFrlAqyaXYfLO9eAIxfzuBdIEiFMXopDNgeiAepCnX0jo0
+         4rjczKbQ4UVkx1/csXmcfyJfolNbnNSrrcCq/aiI2nWUnxI6hEi26HMA6rgm6jaT97eZ
+         k6VPvr9ktfQjD6MG/a6aeTmiRfAnGBc4mM6KoLO00htp1LFm3J/0POqixTiMWQalj/C/
+         KJi4htwkwk90praHHWzZG9mzwRj9lKIEBGpT5178+N/PqwWgR8idDOpx6ke0NGjTWvB7
+         YAzw==
+X-Forwarded-Encrypted: i=1; AJvYcCUbPM1RryLsumN4yZCYq0pcwGuydQFul5vrtYI9m0krkKxy3V1Kynei9VghNLmCQZmx+93WMhM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy1wQ7iH+CpuUfC3bPJKp30vLIqAorgrEZ2UmlG00yNlv9LfEqS
+	fVMSqQ7+my+PJJmY/hSTwIx04my6v7RB8jRB5XJCxIKLXDa7Fn+Sd+Bof9iKb5nU0psZePmz4me
+	YTjYnZW72kLofktueiXa+O+d18SFw0JK9YjMw
+X-Google-Smtp-Source: AGHT+IHw8qAXZwCAQR6lEPq0kyvl4WhaPDJk0WhQYfMv5AAs6c131mtsmxIyelgRHqTA21HzOsSeIRbW8lQ2CRg4hqE=
+X-Received: by 2002:a05:6402:4310:b0:5ce:cfeb:dd1 with SMTP id
+ 4fb4d7f45d1cf-5cecfeb10ebmr8331760a12.36.1730828226964; Tue, 05 Nov 2024
+ 09:37:06 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWA004.ant.amazon.com (10.13.139.93) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+References: <cover.1730778566.git.dxu@dxuuu.xyz> <a5ba0d3bd926d27977c317efa7fdfbc8a704d2b8.1730778566.git.dxu@dxuuu.xyz>
+In-Reply-To: <a5ba0d3bd926d27977c317efa7fdfbc8a704d2b8.1730778566.git.dxu@dxuuu.xyz>
+From: Michael Chan <michael.chan@broadcom.com>
+Date: Tue, 5 Nov 2024 09:36:55 -0800
+Message-ID: <CACKFLinN5zh-E5Oh+dupsECNT-07Gc8mXh8FrAkY3nbQbW7GhQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 1/2] bnxt_en: ethtool: Remove ip4/ip6 ntuple
+ support for IPPROTO_RAW
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: andrew+netdev@lunn.ch, edumazet@google.com, kuba@kernel.org, 
+	davem@davemloft.net, pabeni@redhat.com, martin.lau@linux.dev, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000a976dd06262dd9ad"
 
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue,  5 Nov 2024 13:26:45 +0000
-> Calling synchronize_rcu() while holding rcu_read_lock() is not
-> permitted [1]
-> 
-> Move the synchronize_rcu() + dev_put() to route_doit().
-> 
-> Alternative would be to not use rcu_read_lock() in route_doit().
-> 
-> [1]
-> WARNING: suspicious RCU usage
-> 6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0 Not tainted
-> -----------------------------
-> kernel/rcu/tree.c:4092 Illegal synchronize_rcu() in RCU read-side critical section!
-> 
-> other info that might help us debug this:
-> 
-> rcu_scheduler_active = 2, debug_locks = 1
-> 1 lock held by syz-executor427/5840:
->   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
->   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
->   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: route_doit+0x3d6/0x640 net/phonet/pn_netlink.c:264
-> 
-> stack backtrace:
-> CPU: 1 UID: 0 PID: 5840 Comm: syz-executor427 Not tainted 6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-> Call Trace:
->  <TASK>
->   __dump_stack lib/dump_stack.c:94 [inline]
->   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
->   lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6821
->   synchronize_rcu+0xea/0x360 kernel/rcu/tree.c:4089
->   phonet_route_del+0xc6/0x140 net/phonet/pn_dev.c:409
->   route_doit+0x514/0x640 net/phonet/pn_netlink.c:275
->   rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6790
->   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
->   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
->   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
->   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
->   sock_sendmsg_nosec net/socket.c:729 [inline]
->   __sock_sendmsg+0x221/0x270 net/socket.c:744
->   sock_write_iter+0x2d7/0x3f0 net/socket.c:1165
->   new_sync_write fs/read_write.c:590 [inline]
->   vfs_write+0xaeb/0xd30 fs/read_write.c:683
->   ksys_write+0x183/0x2b0 fs/read_write.c:736
->   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
->   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
->  entry_SYSCALL_64_after_hwframe+0x77/0x7f
-> 
-> Fixes: 17a1ac0018ae ("phonet: Don't hold RTNL for route_doit().")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
+--000000000000a976dd06262dd9ad
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+On Mon, Nov 4, 2024 at 8:13=E2=80=AFPM Daniel Xu <dxu@dxuuu.xyz> wrote:
+>
+> Commit 9ba0e56199e3 ("bnxt_en: Enhance ethtool ntuple support for ip
+> flows besides TCP/UDP") added support for ip4/ip6 ntuple rules.
+> However, if you wanted to wildcard over l4proto, you had to provide
+> 0xFF.
+>
+> The choice of 0xFF is non-standard and non-intuitive. Delete support for
+> it in this commit. Next commit we will introduce a cleaner way to
+> wildcard l4proto.
+>
+> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
 
-Thanks!
+Thanks.
+Reviewed-by: Michael Chan <michael.chan@broadcom.com>
 
+--000000000000a976dd06262dd9ad
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Cc: Remi Denis-Courmont <courmisch@gmail.com>
-> ---
-> v2: also move dev_put() to keep it after synchronize_rcu()
-> 
->  net/phonet/pn_dev.c     |  5 +++--
->  net/phonet/pn_netlink.c | 12 ++++++++++--
->  2 files changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/phonet/pn_dev.c b/net/phonet/pn_dev.c
-> index 19234d664c4fb537eba0267266efbb226cf103c3..5c36bae37b8fa85d2e97bf11d099c6c8599dcc5f 100644
-> --- a/net/phonet/pn_dev.c
-> +++ b/net/phonet/pn_dev.c
-> @@ -406,8 +406,9 @@ int phonet_route_del(struct net_device *dev, u8 daddr)
->  
->  	if (!dev)
->  		return -ENOENT;
-> -	synchronize_rcu();
-> -	dev_put(dev);
-> +
-> +	/* Note : our caller must call synchronize_rcu() and dev_put(dev) */
-> +
->  	return 0;
->  }
->  
-> diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
-> index ca1f04e4a2d9eb3b2a6d6cc5b299aee28d569b08..b9043c92dc246f8c5c313b262eb3ec4afad47ecb 100644
-> --- a/net/phonet/pn_netlink.c
-> +++ b/net/phonet/pn_netlink.c
-> @@ -233,6 +233,7 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
->  {
->  	struct net *net = sock_net(skb->sk);
->  	struct nlattr *tb[RTA_MAX+1];
-> +	bool sync_needed = false;
->  	struct net_device *dev;
->  	struct rtmsg *rtm;
->  	u32 ifindex;
-> @@ -269,13 +270,20 @@ static int route_doit(struct sk_buff *skb, struct nlmsghdr *nlh,
->  		return -ENODEV;
->  	}
->  
-> -	if (nlh->nlmsg_type == RTM_NEWROUTE)
-> +	if (nlh->nlmsg_type == RTM_NEWROUTE) {
->  		err = phonet_route_add(dev, dst);
-> -	else
-> +	} else {
->  		err = phonet_route_del(dev, dst);
-> +		if (!err)
-> +			sync_needed = true;
-> +	}
->  
->  	rcu_read_unlock();
->  
-> +	if (sync_needed) {
-> +		synchronize_rcu();
-> +		dev_put(dev);
-> +	}
->  	if (!err)
->  		rtm_phonet_notify(net, nlh->nlmsg_type, ifindex, dst);
->  
-> -- 
-> 2.47.0.199.ga7371fff76-goog
+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
+OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
+/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
+L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
+kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
+5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
+hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
+E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIGbXNWgcA/iynj2E0obqD2PTOYpSCzDX
+yOQPfOm2AYW5MBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEw
+NTE3MzcwN1owaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQBbiVojZIAcjDqb3lLZNILU8s1NO2hpl9YXo1oblCMzyCpdaGpw
+CiKKjbwGKAtxjEnqQklHf5+vylK6SyOmhc3okGV26msCrR2DXLKrzGUAmGIz6cG+3pzhbKss9yBZ
+hAJntFaQ5JKvobxhjEFARSM6WZeEyTtheEZ2dT/UXgcpLXEcqDdHoRN7h0Z2gHfsZaYbY1JNhj1i
+yHSNgxr1D/1Cibtu6devcrAMp8HXAJWLChuBWgG7bwKUthndf9VZuK1+nk1wLkscHjUih5EfDiNC
+WhBXUg20epDRjEj80oZbdLJn5vnPY784SGVhmEzu8dnPnmym2EjfPdJzpclSXdK7
+--000000000000a976dd06262dd9ad--
 
