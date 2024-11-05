@@ -1,80 +1,80 @@
-Return-Path: <netdev+bounces-141958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D8BC9BCC7F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:15:53 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A28AC9BCC93
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:19:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B575EB23457
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:15:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32508B22304
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:19:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BF891D5145;
-	Tue,  5 Nov 2024 12:15:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B7F71D432F;
+	Tue,  5 Nov 2024 12:19:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="h1PJrv7e"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="RdXZIWJ6"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA9A61CEAD3
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 12:15:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70A941D3195
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 12:19:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730808917; cv=none; b=Ft3BmnJ0alFKq8uJhYh4SCP19CUv2J71e2gjlnfnAO3fT81wbQ+nvsuHRxauIchdllwiOuVKB4vxS0W7PCa1PLmQW2eh/xhe9cuasfFgwxZm43XPkfPd1ZMWwiQp3Zt8MRU7t9FLaeoKHfFefA+5Hz+haac7qE3lOiUuLiESrEQ=
+	t=1730809169; cv=none; b=MFy5Q4cc3CNcK9wcHKz6djEVEFG/5kCd8j7rhkP5deE1NNbbi2SiEVQR8mlzSQsEUTSUPXnyBtcX+id3UBW7utnQgvU7v5CqVSBpqApbEsjos2MQnFJFyIH+32r+03uBOK5TXqaW8lEXc3PLIB0tLmi6o8zMvBrJJV1LMf/BNwU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730808917; c=relaxed/simple;
-	bh=6SOWALvb/rmcnknrQKAEU4o3rVJRfUQk/xpDgjFQ6uQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=gFZ+XWzE4UhRb3IF+W96XQ+KEHpMdinoKkGSGhcJ+C+hPI9+QDwXJBnY2XRT62gslWHxCAO2bQfrbtmMeOX8dU+2gLjTrKfuEDxlJFBJ0A3LobzGwbeJJ5pYv+3xZH9KFGzf/PkH4Jwv1YlZFDOH6GGrFptYbkVtDz9VcpqRBjA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=h1PJrv7e; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1730809169; c=relaxed/simple;
+	bh=6IG5qt5nHWJYXp4MqtybUW2xYTN5iIV2GsWYgAVZAn8=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=qRjLPP27SDVHg1NIPURxz/4ECgAAG6EqQ2B5g5ahfKZbIbnqeldA4gTR54+hUfCNMd6FWBOTT7IsVZoaffX/6LtRyc+W1q2LLZO31najCXbpGDa7y9U5EA63/0tBqsdHvA97x6zJXyE1HjsnMCDdiGXJtmHpL/+8mHwlHU9gAiw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=RdXZIWJ6; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730808913;
+	s=mimecast20190719; t=1730809166;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=wWGHnib2xNRsQbzTbd5SqdXSSG2cKuA6kf9pCmuI9a4=;
-	b=h1PJrv7eEO7S9JTzQAcueHc0zuYUB661dlmy8vuUaCuQD/xy3C/rKSwE+TpSNBSJAEGvBJ
-	6BcQfmb+RfSjb4E+pOi0/EhdEK5TtsypsVcDTrw+4/dUTGYNbbs3ILFXHksgYLnIkx+ryf
-	RZDvK+Ds/w9VoIGqoU8Fh//IBjypHB8=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nTshQDzbKVlwtPcJp5CHmi3syN7nyTyXK9J4EoOSWYU=;
+	b=RdXZIWJ6HcPCWUval8ny2H4sSOijmJlPp8l/6RIvqa7UheutOPKdB0qesNX0rxQJ8eVveB
+	Sn3MV7co7U9jSnF3I/cQlwiG1pWse2n4sNTDIS78X4UBBw+gP5HqJepgcXFF5LpQZIdzB4
+	li33il3oRS0A6xVao1PwDGx08VC0SM0=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-259-SJdDL2q3Om2PS-S9VLONgA-1; Tue, 05 Nov 2024 07:15:12 -0500
-X-MC-Unique: SJdDL2q3Om2PS-S9VLONgA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-37d45de8bbfso3732146f8f.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 04:15:12 -0800 (PST)
+ us-mta-677-GmDrdBJ8MyWDC5Is6YUPPw-1; Tue, 05 Nov 2024 07:19:25 -0500
+X-MC-Unique: GmDrdBJ8MyWDC5Is6YUPPw-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43151e4ef43so38033955e9.3
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 04:19:25 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730808911; x=1731413711;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1730809164; x=1731413964;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWGHnib2xNRsQbzTbd5SqdXSSG2cKuA6kf9pCmuI9a4=;
-        b=IGzoZvDdom/fcRbep4NWw4ZN2HjkWILIBnuWhimfOTqoVxDc/KLW35URGvBAE5AkWe
-         xbFHdgasEGs7tECbaVnKGfLYjXGbTanvTaoZXXj2Jpbr0D6XIzMRHPSTlpigf6LZI5/C
-         7I/GqNwn8jN9cYCRgHXya/DgzxuZgqrpkjyCdJNtIJXPEPqfB0NiuPfZSnttzY5xZmWq
-         qatGJh65d0sl3ocRf8iQ5UQhP/4m32Noo31v25H23ZLPIwOq8Atddda1NnoDxACR2ICT
-         fDJQIRXK5R0avRcv6oXjdIx/Q98EzhxHRIcQS7s7Z6CdXJ6/W9j1LUHDTocqiFFLqQeg
-         aL+A==
-X-Forwarded-Encrypted: i=1; AJvYcCUCTMus43wH3BMLc+0XHO6Ob6l2PxU+Z79+r6tBcStGJQ4yIV/wecvDJDbVf+gBsQjo8+WNAm8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6PeiKHfxUbeO1dSm4CYdrd/i7QjpZmXoEQNwFBVoBRtlYMxLE
-	FcAWckEBLSiztbM+9GXjwFKybtZMkBoC5LPahmA7nHLhHXsk9P42GA6/o/4YFzPLIuionBNRTkk
-	1U1xQP1Wk+8wPrA2fi5/xhwnS6y96kzMM2Sq50uXGq96xyLCswtxrBw==
-X-Received: by 2002:a05:6000:1566:b0:37d:43d4:88b7 with SMTP id ffacd0b85a97d-381c7a46499mr15231860f8f.3.1730808911508;
-        Tue, 05 Nov 2024 04:15:11 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEjIhzzWnjBB1LTytDQ/IYggoKk7/3RofeXVHVpLfnqnMaMrg4QqjZP07vh28lKzyB7j6D9ng==
-X-Received: by 2002:a05:6000:1566:b0:37d:43d4:88b7 with SMTP id ffacd0b85a97d-381c7a46499mr15231837f8f.3.1730808911120;
-        Tue, 05 Nov 2024 04:15:11 -0800 (PST)
+        bh=nTshQDzbKVlwtPcJp5CHmi3syN7nyTyXK9J4EoOSWYU=;
+        b=peyvDDYSKEUbSOjA8ZcTL0HLqvgZWSq64wDnYqx3UhjkTIUJjVt9cEGyQhIysdCVqP
+         HGhwhEWhzw3qp8z39k4eHNJly/G6YHTo28omMt+PxOKC/SDUPB3nCHZCYG4KZ2AhpsD8
+         +C4wiCqqEokcK7UVzPJhOlJxx6q53ZORM0Zjvr+vYPGHfxe81gQdEiXu9ldAzBOvvx2j
+         6JYamSL2eFmXA+5AZ+MKjvonE/uqEws1Sd54/QT6suTEHN5mXC22B0lsah7cPBBNEtTv
+         3f0O36yocDj3Y96AeqEWNA5NeiagZO2Zm7n0qU+jbee3f6NDgPorH2O2xFUnUIKC/kY3
+         7Psg==
+X-Gm-Message-State: AOJu0YwE7aMWgQakTZ8ItXctBF7+bg26RMSND+TM7Q6jJ4zedWkfThym
+	7kSjxDfKOBnsh+X4BEqPXtqGLuaMccTd4dRg9k2Ys0icR+VYAJdYuNzBh61pFE6cTic7DFTbNHU
+	3DHyrzYlWO+7G5pyV7IpKEjigHsSqoHG/qwmA3hpdrXc7soXO7Ts72EE4PRCk/cSyAHpAgAdOpV
+	y6NeELjnWX3Re1qjcxTqsDEQfZxBdqlZdkm0BawQ==
+X-Received: by 2002:a05:600c:1ca7:b0:42c:bb96:340e with SMTP id 5b1f17b1804b1-4327b8011aamr190518225e9.31.1730809164263;
+        Tue, 05 Nov 2024 04:19:24 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGTjp6lmTEdV7esbsrTypFUxd7EBoTqoWOxGLxTzTG0HSwiKyMfRgXAVZiH0HKVnkEEHzsiXQ==
+X-Received: by 2002:a05:600c:1ca7:b0:42c:bb96:340e with SMTP id 5b1f17b1804b1-4327b8011aamr190517905e9.31.1730809163811;
+        Tue, 05 Nov 2024 04:19:23 -0800 (PST)
 Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10e734csm16003501f8f.60.2024.11.05.04.15.10
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c113e6b5sm16200983f8f.88.2024.11.05.04.19.22
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2024 04:15:10 -0800 (PST)
-Message-ID: <be9b4290-1927-4353-8a15-bffe84769d23@redhat.com>
-Date: Tue, 5 Nov 2024 13:15:09 +0100
+        Tue, 05 Nov 2024 04:19:23 -0800 (PST)
+Message-ID: <453af1dc-b778-40c8-8ffc-5dc97d7572d0@redhat.com>
+Date: Tue, 5 Nov 2024 13:19:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,50 +82,34 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] enable port after switch
-To: chengyechun <chengyechun1@huawei.com>, netdev@vger.kernel.org,
- j.vosburgh@gmail.com, andy@greyhouse.net
-Cc: vfalico@gmail.com
-References: <20241031023408.31008-1-chengyechun1@huawei.com>
-Content-Language: en-US
+Subject: Re: [PATCH net-next 1/2] ipv6: release nexthop on device removal
 From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241031023408.31008-1-chengyechun1@huawei.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>, David Ahern
+ <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ Shuah Khan <shuah@kernel.org>
+References: <cover.1730364250.git.pabeni@redhat.com>
+ <85ee0558e07d23de03fca1d2444a8d3edb75e912.1730364250.git.pabeni@redhat.com>
+Content-Language: en-US
+In-Reply-To: <85ee0558e07d23de03fca1d2444a8d3edb75e912.1730364250.git.pabeni@redhat.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-On 10/31/24 03:34, chengyechun wrote:
-> After switching the best aggregator,
-> change the backup value of the corresponding slave node to 0
-> 
-> Signed-off-by: chengyechun <chengyechun1@huawei.com>
-> 
-> ---
->  drivers/net/bonding/bond_3ad.c | 2 ++
->  1 file changed, 2 insertions(+)
-> 
-> diff --git a/drivers/net/bonding/bond_3ad.c b/drivers/net/bonding/bond_3ad.c
-> index b19e0e41b..b07e42950 100644
-> --- a/drivers/net/bonding/bond_3ad.c
-> +++ b/drivers/net/bonding/bond_3ad.c
-> @@ -1830,6 +1830,8 @@ static void ad_agg_selection_logic(struct aggregator *agg,
->                                 __disable_port(port);
->                         }
->                 }
-> +               port = best->lag_ports;
-> +               __enable_port(port);
->                 /* Slave array needs update. */
->                 *update_slave_arr = true;
->         }
+On 10/31/24 09:53, Paolo Abeni wrote:
+> diff --git a/net/ipv6/route.c b/net/ipv6/route.c
+> index d7ce5cf2017a..ef55f330dcda 100644
+> --- a/net/ipv6/route.c
+> +++ b/net/ipv6/route.c
+> @@ -187,6 +187,7 @@ static void rt6_uncached_list_flush_dev(struct net_device *dev)
+>  						   GFP_ATOMIC);
+>  				handled = true;
+>  			}
+> +
 
-The above has several issues:
-- does not apply
-- does not include the target tree in the subj prefix ('net-next')
-- the commit message does not describe why such thing should be needed
-- Only the first port in the best lag group is enabled instead of all of
-them, as done a few lines later - but only if there is an active partner.
+Please do not include unrelated whitespace chang... wait! I'm talking to
+myself... in any case a v2 is needed.
 
-Thanks,
-
-Paolo
+/P
 
 
