@@ -1,80 +1,98 @@
-Return-Path: <netdev+bounces-142093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142101-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 330119BD75F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:00:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BE68D9BD7CD
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:49:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 626621C2293F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:00:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0370C1C22AAF
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01228215C68;
-	Tue,  5 Nov 2024 21:00:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1941D1D5CEB;
+	Tue,  5 Nov 2024 21:49:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="EMLOHdhR"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="KQ18iDj+"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.17])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A35E1FF7A5;
-	Tue,  5 Nov 2024 21:00:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0951CCEF4
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 21:49:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.17
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730840431; cv=none; b=ou1z+uDFnajbsJDqIA6lUdqisjnrW82JBd5wcmSwMapT83BxgqZ2qvU46VLdTHNT+mrEztdxQ/LwOFqAS/FFauDdUM3ZQePlkDP+thaH8FwQ6LWcNyw5AXceXUS4cHtg+iBuz/EECozbq2T6fln2fZ3WT3ufE01GCSzd8iX3r64=
+	t=1730843358; cv=none; b=ep+CJBdnuHX8NhHeH9dtfJVOH1VUND7R6yfiukwEb8cnPATQmLfUtN93M62K4QNLq8/h6OXTjSv+mHiT5MVyroKBMeTJvISnbkcCOtHB+WYrstLbs23588iMBFdXQ42Ov7Sdf5kD/2ApqkFFhItLn0nw3W6wCBRMUoCE4AvN23w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730840431; c=relaxed/simple;
-	bh=48s0hy2LXyleJBmoMFvBJ/haU4AH8PKwJ+78RGfmwac=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=KeZdZv4yQpPcrBTKNASXggXWsnOmj551TN+N6EESMTsIO5yQZxA+L8G8kBcSG0PA15LPK/33Gk1phF+OKhBl0Al638mhSFkN3mvq9Rqsj8qj9FgH41NbkKpAncHHj4Fpfm2A5KX8IC1NP5eCusNdiGIfQAE4NAyLTppj6r/Oi1M=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=EMLOHdhR; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=V+vyhukru1uIeE+kCfGRSTvksfHKtqzKauF6SWXFu/M=; b=EMLOHdhRqzpI6dSuwpLRH3iGqb
-	RGYoKlpFPRnoA/Fh6kyX2tOZFXigDkaI5v/cE074EzYFnfmnOMeNfPJezJL1wdDi/FPpPP9frAKCr
-	V+sL7N38ufFpzmbopw4WvkugHzE9+gEX7oFn7DqYGOYhAWj42L4FDV34AIZoEZw7j4q8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t8Qex-00CFpl-6A; Tue, 05 Nov 2024 22:00:19 +0100
-Date: Tue, 5 Nov 2024 22:00:19 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Malladi, Meghana" <m-malladi@ti.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, vigneshr@ti.com, horms@kernel.org,
-	jan.kiszka@siemens.com, diogo.ivo@siemens.com, pabeni@redhat.com,
-	edumazet@google.com, davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, srk@ti.com,
-	Roger Quadros <rogerq@kernel.org>, danishanwar@ti.com,
-	Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix 1 PPS sync
-Message-ID: <6a230b28-9298-410b-b873-21000af4c0f3@lunn.ch>
-References: <20241028111051.1546143-1-m-malladi@ti.com>
- <20241031185905.610c982f@kernel.org>
- <7c3318f4-a2d4-4cbf-8a93-33c6a8afd6c4@ti.com>
- <20241104185031.0c843951@kernel.org>
- <e5c5c9ba-fca1-4fa3-a416-1fc972ebd258@ti.com>
+	s=arc-20240116; t=1730843358; c=relaxed/simple;
+	bh=6PdbRlg5M3fLbSsWfS7ryObuGd7lsNLIQHOn0mAGD3c=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=frI02mfU9sxsN5M2XD9auKB0s8N+s/rQzm1eX1mJ2V70r+Zto9+iaZLXLcmbFgwMeioaAGs7/cK1w1Q2BeKza6h46jEQnLUWraehM4xMSNkqcML2A4IO9/OPd42CxDk+CeGETn5pTh8rnijrrVvNnNkGYxlkFScmjZiHIaQ+uWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=KQ18iDj+; arc=none smtp.client-ip=198.175.65.17
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730843356; x=1762379356;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=6PdbRlg5M3fLbSsWfS7ryObuGd7lsNLIQHOn0mAGD3c=;
+  b=KQ18iDj+OQFt9pTMDETwpi/BhXR2xmJWYAmwL+qFBjYQ1mKrnvcTHBDo
+   TjupN7gB2pI0gQ3U3fQ+DKAYAyHlCc+zbVgaD5q7Mq+PHVph7nuPkwae/
+   1zz3Xby8i3qETnPD0f/LoztO3d/O1y6FQH1leShh68KuETcmVRq25vvYj
+   uJAjts86mNWOZmFVeJ2wLTD+00fZUZxSlpMkMxF9bnQrfyaMnBHHOJwpf
+   wVQRjvtbNrgUQVP0rYx+8f/Bry1qGe1fee0cDvBmrKhh4MbJ3cks+BKT2
+   RxcfoLnUymtEk2NdpgEu88XRG9WS8Urgm0KZmFJXeQUWipl4SFqsqLPhY
+   w==;
+X-CSE-ConnectionGUID: FPTjhX8kShu1XQnpLWBW7Q==
+X-CSE-MsgGUID: 9QpBp/++RTewJEnpjkqOdw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="30735920"
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="30735920"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by orvoesa109.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 13:49:15 -0800
+X-CSE-ConnectionGUID: aaefivJLS/OSLxacnZ/nXg==
+X-CSE-MsgGUID: M2CB1TofTCeOdfc8/RSqLQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="85010407"
+Received: from coyotepass-34596-p1.jf.intel.com ([10.166.80.48])
+  by orviesa008.jf.intel.com with ESMTP; 05 Nov 2024 13:49:02 -0800
+From: Tarun K Singh <tarun.k.singh@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org
+Subject: [PATCH iwl-net v1 0/4] fix locking issue
+Date: Tue,  5 Nov 2024 13:48:55 -0500
+Message-ID: <20241105184859.741473-1-tarun.k.singh@intel.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e5c5c9ba-fca1-4fa3-a416-1fc972ebd258@ti.com>
+Content-Transfer-Encoding: 8bit
 
-> > I think you need to write a custom one. Example:
-> > https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/meta/fbnic/fbnic_time.c#n40
-> Ok thank you. I will add custom function for this and update the patch.
+This series fix deadlock issues in the driver. The first patch changes
+argument of function 'idpf_vport_ctrl_lock' to adapter. The second patch
+renames 'vport_ctrl_lock' to 'vport_cfg_lock'. The first 2 patches make the
+third patch easier to review. The third patch fixes the locking issue,
+and the fourth patch prevents lockdep from complaining.
 
-Maybe look around and see if they could be reused by other drivers. If
-so, they should be put somewhere central.
+Ahmed Zaki (1):
+  idpf: add lock class key
 
-	Andrew
+Tarun K Singh (3):
+  idpf: Change function argument
+  idpf: rename vport_ctrl_lock
+  idpf: Add init, reinit, and deinit control lock
+
+ drivers/net/ethernet/intel/idpf/idpf.h        | 49 ++++++++----
+ .../net/ethernet/intel/idpf/idpf_ethtool.c    | 59 +++++++-------
+ drivers/net/ethernet/intel/idpf/idpf_lib.c    | 80 +++++++++++++------
+ drivers/net/ethernet/intel/idpf/idpf_main.c   | 39 ++++++---
+ 4 files changed, 149 insertions(+), 78 deletions(-)
+
+-- 
+2.46.0
+
 
