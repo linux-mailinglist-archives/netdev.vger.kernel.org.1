@@ -1,62 +1,63 @@
-Return-Path: <netdev+bounces-142006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C487E9BCF08
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:20:59 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 125E89BCF0C
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:21:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7B9FE1F23725
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:20:59 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8551FB2377E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:21:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5091E1D8DE2;
-	Tue,  5 Nov 2024 14:19:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 308871D9A60;
+	Tue,  5 Nov 2024 14:19:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="P4nyIybG"
+	dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b="KE93PtXJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+Received: from mailgw01.mediatek.com (unknown [60.244.123.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81A0C1D6DB9;
-	Tue,  5 Nov 2024 14:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=210.61.82.184
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9AA61D95A2;
+	Tue,  5 Nov 2024 14:19:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=60.244.123.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730816367; cv=none; b=Ykl29lG0XEnrlPjiP5tRnh6JTkdT/8/VsO2FL4dM1N/G83Ok6mJTdeu3hry0Lu0lxMLHSe846kWD1d3GQYtlBs2Giv8F9NNn09n4a90GlXRWnb6v829LbKWSLeOhQplxlIJwrUQinfwwRMZct94JkaQ6N/JkJvRWS6W9WxC/k/w=
+	t=1730816381; cv=none; b=M5cw0DcrfPkUmaSZT1QIMr5V7JFA4D7Zyd2O695FVInX90pK5dtSOa4z4U7C+b2yIYm2eCgm9AAUXS80wbUvbDTVYESU5x1O7vEnjgCTD2c7GJ+u5w59tGZc8RDKqmmu3fTyC41R+WmnWGqQDvaO+CPciMHhjixc7BbwPGFKh2w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730816367; c=relaxed/simple;
-	bh=BvzjOz1PN0LE/ByiE0yqTBlhHDwXhyVi4S8NWVzOKE8=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kXWMIEROWQVJVOV1fOYngwwS6X9OC+1oJhpYxlJ5gx1q69SbuykOe9SsmXADqqINdwBwxYm+fvkIIwvi6scRH4d/uhDeyPc7ps1hOopB7KLyOJxrmr1RINNGmRL4agfpNLfE/hgM1Nmk5uP6Cvrp4bTNV2Hzo6jYQ/mzge7xp6k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=P4nyIybG; arc=none smtp.client-ip=210.61.82.184
+	s=arc-20240116; t=1730816381; c=relaxed/simple;
+	bh=0Jw2dZszbWMPcJeYJ/nE4x59JRD8d2NTH0bhArOh9is=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=putmq50+qbyb+8Ab57f9D//pxd0QH+0Vb9E8dunl9Dc4LHRBKGpbcHDStsypXCihYl8vpWR135EO24Ac+NjE3v1ArmHpvkhYIu3uwIyxDHJAPtskHGNEtF30bOJ5pb3e/naKpUrEplEch39y2rkzPeLEyN6iRwD1+ap9bFV99jQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com; spf=pass smtp.mailfrom=mediatek.com; dkim=pass (1024-bit key) header.d=mediatek.com header.i=@mediatek.com header.b=KE93PtXJ; arc=none smtp.client-ip=60.244.123.138
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=mediatek.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=mediatek.com
-X-UUID: f200b1089b8011efbd192953cf12861f-20241105
+X-UUID: f9e2d7989b8011efb88477ffae1fc7a5-20241105
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
-	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=HBLsfZDP9XEHM79ztSmUAr63z/6xw7Kd0kuMacswMm0=;
-	b=P4nyIybGLfxxN0YskyS2g11CBN7q3n0WdIGMc+5E5t7l+VLfigaNdLF69U1Tuh6/8k/Isgm/olzquSyLzWhwMjRwd+PDDRgKx9sf824xPFjOd1akAGO80ZXMo8tUJDOLHF+pwPtsH8OZ8N1x52e2qdXHQlTr9HoImFhxpKXYR/k=;
+	h=Content-Type:MIME-Version:References:In-Reply-To:Message-ID:Date:Subject:CC:To:From; bh=jXGN3lAhTOiiDdvB/kCVtxfAmSFZnGBeXEnN6Z1wyuQ=;
+	b=KE93PtXJkZ02upYWVWKTQNYem9ieFnnxAd0zN7J3bQL4shV8b7m16F7zO51M2jr1pUVjoFNK5xWuV16e4Tgm2BBzvleW3aIiRjQw8eJtUin4vWhkt++phn+8iUHfQaOdbP6WLCvCUP1VxQV/kOI5Z9kL5F2ykKB+itTCKWpMh4U=;
 X-CID-P-RULE: Release_Ham
-X-CID-O-INFO: VERSION:1.1.42,REQID:694e092f-8841-40f4-912a-41c7cbe5b948,IP:0,U
-	RL:0,TC:0,Content:0,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTION:
-	release,TS:0
-X-CID-META: VersionHash:b0fcdc3,CLOUDID:b6dc9507-7990-429c-b1a0-768435f03014,B
+X-CID-O-INFO: VERSION:1.1.42,REQID:42ffd92d-389e-4ba5-827c-757332d7f4a4,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:b0fcdc3,CLOUDID:a1af98e7-cb6b-4a59-bfa3-98f245b4912e,B
 	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
-	RL:1,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
+	RL:0,File:nil,RT:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,
 	SPR:NO,DKR:0,DKP:0,BRR:0,BRE:0,ARC:0
-X-CID-BVR: 0
-X-CID-BAS: 0,_,0,_
-X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULS
-X-UUID: f200b1089b8011efbd192953cf12861f-20241105
-Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw02.mediatek.com
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR
+X-UUID: f9e2d7989b8011efb88477ffae1fc7a5-20241105
+Received: from mtkmbs11n1.mediatek.inc [(172.21.101.185)] by mailgw01.mediatek.com
 	(envelope-from <skylake.huang@mediatek.com>)
 	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
-	with ESMTP id 920175025; Tue, 05 Nov 2024 22:19:19 +0800
+	with ESMTP id 534108593; Tue, 05 Nov 2024 22:19:32 +0800
 Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
- mtkmbs11n2.mediatek.inc (172.21.101.187) with Microsoft SMTP Server
+ MTKMBS09N2.mediatek.inc (172.21.101.94) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 5 Nov 2024 22:19:17 +0800
+ 15.2.1118.26; Tue, 5 Nov 2024 06:19:31 -0800
 Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
  mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
- 15.2.1118.26 via Frontend Transport; Tue, 5 Nov 2024 22:19:17 +0800
+ 15.2.1118.26 via Frontend Transport; Tue, 5 Nov 2024 22:19:31 +0800
 From: Sky Huang <SkyLake.Huang@mediatek.com>
 To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
 	Russell King <linux@armlinux.org.uk>, "David S. Miller"
@@ -68,12 +69,14 @@ To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
  Horman <horms@kernel.org>, <linux-kernel@vger.kernel.org>,
 	<netdev@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
 	<linux-mediatek@lists.infradead.org>
-CC: Steven Liu <Steven.Liu@mediatek.com>, Sky Huang
+CC: Steven Liu <Steven.Liu@mediatek.com>, SkyLake.Huang
 	<skylake.huang@mediatek.com>
-Subject: [PATCH net-next v2 0/5] Re-organize MediaTek ethernet phy drivers and propose mtk-phy-lib
-Date: Tue, 5 Nov 2024 22:19:06 +0800
-Message-ID: <20241105141911.13326-1-SkyLake.Huang@mediatek.com>
+Subject: [PATCH net-next v2 1/5] net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
+Date: Tue, 5 Nov 2024 22:19:07 +0800
+Message-ID: <20241105141911.13326-2-SkyLake.Huang@mediatek.com>
 X-Mailer: git-send-email 2.18.0
+In-Reply-To: <20241105141911.13326-1-SkyLake.Huang@mediatek.com>
+References: <20241105141911.13326-1-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,45 +86,132 @@ MIME-Version: 1.0
 Content-Type: text/plain
 X-MTK: N
 
-From: Sky Huang <skylake.huang@mediatek.com>
+From: "SkyLake.Huang" <skylake.huang@mediatek.com>
 
-This patchset comes from patch 1/9, 3/9, 4/9, 5/9 and 7/9 of:
-https://lore.kernel.org/netdev/20241004102413.5838-1-SkyLake.Huang@mediatek.com/
+Re-organize MediaTek ethernet phy driver files and get ready to integrate
+some common functions and add new 2.5G phy driver.
+mtk-ge.c: MT7530 Gphy on MT7621 & MT7531 Gphy
+mtk-ge-soc.c: Built-in Gphy on MT7981 & Built-in switch Gphy on MT7988
+mtk-2p5ge.c: Planned for built-in 2.5G phy on MT7988
 
-This patchset changes MediaTek's ethernet phy's folder structure and
-integrates helper functions, including LED & token ring manipulation,
-into mtk-phy-lib.
-
-Signed-off-by: Sky Huang <skylake.huang@mediatek.com>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Signed-off-by: SkyLake.Huang <skylake.huang@mediatek.com>
 ---
-Change in v2:
-- Add correct Reviewed-by tag in each patch.
----
-SkyLake.Huang (5):
-  net: phy: mediatek: Re-organize MediaTek ethernet phy drivers
-  net: phy: mediatek: Move LED helper functions into mtk phy lib
-  net: phy: mediatek: Improve readability of mtk-phy-lib.c's
-    mtk_phy_led_hw_ctrl_set()
-  net: phy: mediatek: Integrate read/write page helper functions
-  net: phy: mediatek: add MT7530 & MT7531's PHY ID macros
-
- MAINTAINERS                                   |   6 +-
- drivers/net/phy/Kconfig                       |  17 +-
- drivers/net/phy/Makefile                      |   3 +-
- drivers/net/phy/mediatek/Kconfig              |  26 ++
- drivers/net/phy/mediatek/Makefile             |   4 +
- .../mtk-ge-soc.c}                             | 298 ++----------------
- .../phy/{mediatek-ge.c => mediatek/mtk-ge.c}  |  31 +-
- drivers/net/phy/mediatek/mtk-phy-lib.c        | 270 ++++++++++++++++
- drivers/net/phy/mediatek/mtk.h                |  89 ++++++
- 9 files changed, 437 insertions(+), 307 deletions(-)
+ MAINTAINERS                                   |  4 ++--
+ drivers/net/phy/Kconfig                       | 17 +-------------
+ drivers/net/phy/Makefile                      |  3 +--
+ drivers/net/phy/mediatek/Kconfig              | 22 +++++++++++++++++++
+ drivers/net/phy/mediatek/Makefile             |  3 +++
+ .../mtk-ge-soc.c}                             |  0
+ .../phy/{mediatek-ge.c => mediatek/mtk-ge.c}  |  0
+ 7 files changed, 29 insertions(+), 20 deletions(-)
  create mode 100644 drivers/net/phy/mediatek/Kconfig
  create mode 100644 drivers/net/phy/mediatek/Makefile
- rename drivers/net/phy/{mediatek-ge-soc.c => mediatek/mtk-ge-soc.c} (83%)
- rename drivers/net/phy/{mediatek-ge.c => mediatek/mtk-ge.c} (82%)
- create mode 100644 drivers/net/phy/mediatek/mtk-phy-lib.c
- create mode 100644 drivers/net/phy/mediatek/mtk.h
+ rename drivers/net/phy/{mediatek-ge-soc.c => mediatek/mtk-ge-soc.c} (100%)
+ rename drivers/net/phy/{mediatek-ge.c => mediatek/mtk-ge.c} (100%)
 
+diff --git a/MAINTAINERS b/MAINTAINERS
+index e291445..6deaf94 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -13793,8 +13793,8 @@ M:	Qingfang Deng <dqfext@gmail.com>
+ M:	SkyLake Huang <SkyLake.Huang@mediatek.com>
+ L:	netdev@vger.kernel.org
+ S:	Maintained
+-F:	drivers/net/phy/mediatek-ge-soc.c
+-F:	drivers/net/phy/mediatek-ge.c
++F:	drivers/net/phy/mediatek/mtk-ge-soc.c
++F:	drivers/net/phy/mediatek/mtk-ge.c
+ F:	drivers/phy/mediatek/phy-mtk-xfi-tphy.c
+ 
+ MEDIATEK I2C CONTROLLER DRIVER
+diff --git a/drivers/net/phy/Kconfig b/drivers/net/phy/Kconfig
+index 1df0595..e0e4b5e 100644
+--- a/drivers/net/phy/Kconfig
++++ b/drivers/net/phy/Kconfig
+@@ -251,22 +251,7 @@ config MAXLINEAR_GPHY
+ 	  Support for the Maxlinear GPY115, GPY211, GPY212, GPY215,
+ 	  GPY241, GPY245 PHYs.
+ 
+-config MEDIATEK_GE_PHY
+-	tristate "MediaTek Gigabit Ethernet PHYs"
+-	help
+-	  Supports the MediaTek Gigabit Ethernet PHYs.
+-
+-config MEDIATEK_GE_SOC_PHY
+-	tristate "MediaTek SoC Ethernet PHYs"
+-	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
+-	depends on NVMEM_MTK_EFUSE
+-	help
+-	  Supports MediaTek SoC built-in Gigabit Ethernet PHYs.
+-
+-	  Include support for built-in Ethernet PHYs which are present in
+-	  the MT7981 and MT7988 SoCs. These PHYs need calibration data
+-	  present in the SoCs efuse and will dynamically calibrate VCM
+-	  (common-mode voltage) during startup.
++source "drivers/net/phy/mediatek/Kconfig"
+ 
+ config MICREL_PHY
+ 	tristate "Micrel PHYs"
+diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
+index 197acfa..de38cbf 100644
+--- a/drivers/net/phy/Makefile
++++ b/drivers/net/phy/Makefile
+@@ -71,8 +71,7 @@ obj-$(CONFIG_MARVELL_PHY)	+= marvell.o
+ obj-$(CONFIG_MARVELL_88Q2XXX_PHY)	+= marvell-88q2xxx.o
+ obj-$(CONFIG_MARVELL_88X2222_PHY)	+= marvell-88x2222.o
+ obj-$(CONFIG_MAXLINEAR_GPHY)	+= mxl-gpy.o
+-obj-$(CONFIG_MEDIATEK_GE_PHY)	+= mediatek-ge.o
+-obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)	+= mediatek-ge-soc.o
++obj-y				+= mediatek/
+ obj-$(CONFIG_MESON_GXL_PHY)	+= meson-gxl.o
+ obj-$(CONFIG_MICREL_KS8995MA)	+= spi_ks8995.o
+ obj-$(CONFIG_MICREL_PHY)	+= micrel.o
+diff --git a/drivers/net/phy/mediatek/Kconfig b/drivers/net/phy/mediatek/Kconfig
+new file mode 100644
+index 0000000..112d9c0
+--- /dev/null
++++ b/drivers/net/phy/mediatek/Kconfig
+@@ -0,0 +1,22 @@
++# SPDX-License-Identifier: GPL-2.0-only
++config MEDIATEK_GE_PHY
++	tristate "MediaTek Gigabit Ethernet PHYs"
++	help
++	  Supports the MediaTek non-built-in Gigabit Ethernet PHYs.
++
++	  Non-built-in Gigabit Ethernet PHYs include mt7530/mt7531.
++	  You may find mt7530 inside mt7621. This driver shares some
++	  common operations with MediaTek SoC built-in Gigabit
++	  Ethernet PHYs.
++
++config MEDIATEK_GE_SOC_PHY
++	tristate "MediaTek SoC Ethernet PHYs"
++	depends on (ARM64 && ARCH_MEDIATEK) || COMPILE_TEST
++	depends on NVMEM_MTK_EFUSE
++	help
++	  Supports MediaTek SoC built-in Gigabit Ethernet PHYs.
++
++	  Include support for built-in Ethernet PHYs which are present in
++	  the MT7981 and MT7988 SoCs. These PHYs need calibration data
++	  present in the SoCs efuse and will dynamically calibrate VCM
++	  (common-mode voltage) during startup.
+diff --git a/drivers/net/phy/mediatek/Makefile b/drivers/net/phy/mediatek/Makefile
+new file mode 100644
+index 0000000..005bde2
+--- /dev/null
++++ b/drivers/net/phy/mediatek/Makefile
+@@ -0,0 +1,3 @@
++# SPDX-License-Identifier: GPL-2.0
++obj-$(CONFIG_MEDIATEK_GE_PHY)		+= mtk-ge.o
++obj-$(CONFIG_MEDIATEK_GE_SOC_PHY)	+= mtk-ge-soc.o
+diff --git a/drivers/net/phy/mediatek-ge-soc.c b/drivers/net/phy/mediatek/mtk-ge-soc.c
+similarity index 100%
+rename from drivers/net/phy/mediatek-ge-soc.c
+rename to drivers/net/phy/mediatek/mtk-ge-soc.c
+diff --git a/drivers/net/phy/mediatek-ge.c b/drivers/net/phy/mediatek/mtk-ge.c
+similarity index 100%
+rename from drivers/net/phy/mediatek-ge.c
+rename to drivers/net/phy/mediatek/mtk-ge.c
 -- 
 2.45.2
 
