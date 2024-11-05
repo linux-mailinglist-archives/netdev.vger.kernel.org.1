@@ -1,249 +1,124 @@
-Return-Path: <netdev+bounces-141947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4855D9BCC26
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:49:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 99F3F9BCC46
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:02:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AF6E5B23016
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:49:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0636E28381F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:02:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78D731D5159;
-	Tue,  5 Nov 2024 11:48:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577901D433C;
+	Tue,  5 Nov 2024 12:02:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hU/Uc4zn"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="YJcOmrSq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5C871D45EF
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:48:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301271420A8;
+	Tue,  5 Nov 2024 12:01:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730807331; cv=none; b=NaLvaotpOKw0uYGWnNCYVksDxJ8ScbY704xroHW4PF4zwY+/ZH/FpUX8ubnJE409/dgbhZhSRtv9edzWzLR0jS0HROFTeL2NfNQywSRAUOrFSy7Wj+l4XYrvkae3mpmvFFY48Jl6PZDSgBmZkPRyYxwi8izBzD0JlUkxFjqGCr4=
+	t=1730808120; cv=none; b=msDuWli4yz0goDUnuxUlA4czdhlufQgAG/TNVArhrysGodX1t0vGR24wqkvvmxdhuOqNK523TT697+soFIbjnZ8dhsSSLxxboZMlLggXTzS2wRMLrUqWaYDiWuUn7vL56zVeawck1iZCW1do68OebG6JaWFy9+xRzNRA0bqqf0A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730807331; c=relaxed/simple;
-	bh=xxMH70Lth7P7/I57PA9uHTmoxZrexSifPU1Cs0oebsc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L1vKsEYeoGPujnxIkoDiIW6wM/iC1IkOfk0Fo2KqKAGF0KpMJ6UP9rEbczf7yTTzMkHy6VZDGK30B4cIsOvlBEVp2kOKY9XhahqQRfaPJ/RS+3Ht6P1Tfoa8B/VWt/3EyXvY9kk3nY+iQYOC50ksJ+UlOxvhVlEjSWerWGlUHPs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hU/Uc4zn; arc=none smtp.client-ip=209.85.166.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-83abcfb9f39so154658139f.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 03:48:49 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730807329; x=1731412129; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=amUSUVKnbmHOvo0eMlcPK5IbGzdzqhYeiSYK4D5HEDk=;
-        b=hU/Uc4znEGPCF9o1LR269y6eY/DI+MfTDSIJr6UJJY3gHz7mxqmY8oY7ssJlBG7uEZ
-         SVA5qZqUv/H3y8hoyzLcP9tnufbrIKazeQLzuNhx0o4YRcz3bQXNHBgswMCPO6CTROSJ
-         yN1zuCeoxK2DxBFvwu0hx5dNvIseK25JQ4JI5rkLyKnG0o4iN4gg28VaiDAe6bdNR7WD
-         kM6XtQR2JdW/ZcGZ1J2OUe6gV0yGop6ukOyzPP1tce89UYqDD1e9OQylbqWZ8lvOZLKr
-         YpAunZQCjgwv/iXzoT+pM/fbjBzokl3V0QH7SsBLJLxsXsbd3Kdj6dmI09JuDBzKc6/Z
-         F7hw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730807329; x=1731412129;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=amUSUVKnbmHOvo0eMlcPK5IbGzdzqhYeiSYK4D5HEDk=;
-        b=rmju9qKulqqCAzSzJfwE9p6Ml2KSnRgva+zCU5XfDLeoGAaU8eDdNUTx7vx7IgBfNV
-         TFZ2a83Ld+/G314z8zDdi/Bb0D9QjX5aFSwAwrMil0aaLWkAon1E3SVHgabylMx8bkdn
-         cRKLGZ/YS8LD2uv3tlJ6dwKWGvsKrO6Zzdd0eUdHS6nhcWrcjwHUuH0sta+rWC5bogJ7
-         ADA/mSSeP/XuuDfxMgKADZWYybw990F1Nzpl8Kc8hTK7hRU2EudL2GMvwPqlAeCAGw9w
-         X8DpK7rVhkxK01dmDHEuJPe9SZAuHyOSSJUHEDy1hPZRy/Vw0jjbrPikaRKLzKWNuMMF
-         Dg5w==
-X-Forwarded-Encrypted: i=1; AJvYcCX6ci4HQixVaCPWb/gL5GVToNbzaGj4RR6Vv5fvTLKNy0u2Ram7lcQcQk1iSTG8ZPH5wWMJlZM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+TQsJ0r7nHvNLiWV5VMphALqxmKV0w9qagCIExDI+k3a14hfM
-	5yCKxT144UimNcRoDjyjK26rI1qSTOfxhAVwAtZKRoZrNrtJFdFivnVt03rkDp/FWLCUkJ2JOBY
-	xp586LZeE1emsZzGYAUSD39zW6Y0=
-X-Google-Smtp-Source: AGHT+IEB8wibB6PaBTfIIcujwOAKk7FEMnaWRr0/CtTyJ9kOcenZZS4n2dzMxWabLvOSL8UUjI8E8gQKX7YNS0MSEZw=
-X-Received: by 2002:a05:6e02:308c:b0:3a6:c000:4490 with SMTP id
- e9e14a558f8ab-3a6c0004a17mr96029275ab.1.1730807328781; Tue, 05 Nov 2024
- 03:48:48 -0800 (PST)
+	s=arc-20240116; t=1730808120; c=relaxed/simple;
+	bh=TX6sX6x1up/HYFMnp1EPSdB0aCTeIScsn4RhiXQgfc4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=RHJKVFr6Wih3AlvYwcaZB99KpLyg57CtqO9HEvxKWzRD+oswNMaGZwgclYcRDuKvKK7Ct0LoxcMqLSEQs4+8eVEGi0pKGw0yi6AhyB2Q501dOtQDoLF0dm/HqwkhbY6O6KE798rK/OKxZ6r9dnLCiMsmzCMgrfK/2HYlxA+V6Tg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=YJcOmrSq; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0035.itg.ti.com ([10.64.41.0])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A5C1KxR073177;
+	Tue, 5 Nov 2024 06:01:20 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1730808080;
+	bh=I8Ot+L92FMNzAT/dVawQMY/gWiO3L4DG4uE/gA9uMU4=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=YJcOmrSqnbVxJv3RZnS+O4a2zYBk1oirNEMArSbhYG+TopXlv7wUrfxEt2RI6JGKx
+	 OfLuH6P6fQ61TMuaGeuytiWNFJV0jOQlE1FZ7DlIwOgeUhcjacN1VKLJDl+AcI3rIB
+	 mEhgAIeNhybc3XEWtCGMyuTG/e6n3xW8GjFhIpvQ=
+Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
+	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A5C1KA1076249
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Tue, 5 Nov 2024 06:01:20 -0600
+Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE115.ent.ti.com
+ (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 5
+ Nov 2024 06:01:19 -0600
+Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE114.ent.ti.com
+ (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Tue, 5 Nov 2024 06:01:20 -0600
+Received: from [10.249.139.24] ([10.249.139.24])
+	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A5C1DuV010566;
+	Tue, 5 Nov 2024 06:01:14 -0600
+Message-ID: <e5c5c9ba-fca1-4fa3-a416-1fc972ebd258@ti.com>
+Date: Tue, 5 Nov 2024 17:31:13 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
- <20241105074916.75107-1-kuniyu@amazon.com> <CAL+tcoAgSBMtFcDx6MfCAhYMVKERCx2d7YUjquT6Pa8jm0bXWA@mail.gmail.com>
- <CANn89iKhSnTJUadpEBpkKYoRVP2GEJZ1ftzH7AqF4oXMF3QEZA@mail.gmail.com>
- <CAL+tcoCBvbR_=c_SxKmAyAE4U5wTgr=hp08yNxm0QUSWdgge5Q@mail.gmail.com> <CANn89i+h4zbgju1KSfTZi2R1bnQ4=Q1EThJ9y8e5XCOocLNzMw@mail.gmail.com>
-In-Reply-To: <CANn89i+h4zbgju1KSfTZi2R1bnQ4=Q1EThJ9y8e5XCOocLNzMw@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Tue, 5 Nov 2024 19:48:12 +0800
-Message-ID: <CAL+tcoBVbL+tRsHZpLQro1gEoAUn11ZWG3=AL-5XxFVCAxZ5fg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: Eric Dumazet <edumazet@google.com>, Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, dsahern@kernel.org, 
-	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix 1 PPS sync
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <vigneshr@ti.com>, <horms@kernel.org>, <jan.kiszka@siemens.com>,
+        <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <edumazet@google.com>,
+        <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>,
+        Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>
+References: <20241028111051.1546143-1-m-malladi@ti.com>
+ <20241031185905.610c982f@kernel.org>
+ <7c3318f4-a2d4-4cbf-8a93-33c6a8afd6c4@ti.com>
+ <20241104185031.0c843951@kernel.org>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <20241104185031.0c843951@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-Hello Eric, Martin
 
-On Tue, Nov 5, 2024 at 5:50=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Tue, Nov 5, 2024 at 10:42=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Tue, Nov 5, 2024 at 5:35=E2=80=AFPM Eric Dumazet <edumazet@google.co=
-m> wrote:
-> > >
-> > > On Tue, Nov 5, 2024 at 10:08=E2=80=AFAM Jason Xing <kerneljasonxing@g=
-mail.com> wrote:
-> > > >
-> > > > On Tue, Nov 5, 2024 at 3:49=E2=80=AFPM Kuniyuki Iwashima <kuniyu@am=
-azon.com> wrote:
-> > > > >
-> > > > > From: Jason Xing <kerneljasonxing@gmail.com>
-> > > > > Date: Tue,  5 Nov 2024 10:55:11 +0800
-> > > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > > >
-> > > > > > We found there are rare chances that some RST packets appear du=
-ring
-> > > > > > the shakehands because the timewait socket cannot accept the SY=
-N and
-> > > > >
-> > > > > s/shakehands/handshake/
-> > > > >
-> > > > > same in the subject.
-> > > > >
-> > > > > > doesn't return TCP_TW_SYN in tcp_timewait_state_process().
-> > > > > >
-> > > > > > Here is how things happen in production:
-> > > > > > Time        Client(A)        Server(B)
-> > > > > > 0s          SYN-->
-> > > > > > ...
-> > > > > > 132s                         <-- FIN
-> > > > > > ...
-> > > > > > 169s        FIN-->
-> > > > > > 169s                         <-- ACK
-> > > > > > 169s        SYN-->
-> > > > > > 169s                         <-- ACK
-> > > > > > 169s        RST-->
-> > > > > > As above picture shows, the two flows have a start time differe=
-nce
-> > > > > > of 169 seconds. B starts to send FIN so it will finally enter i=
-nto
-> > > > > > TIMEWAIT state. Nearly at the same time A launches a new connec=
-tion
-> > > > > > that soon is reset by itself due to receiving a ACK.
-> > > > > >
-> > > > > > There are two key checks in tcp_timewait_state_process() when t=
-imewait
-> > > > > > socket in B receives the SYN packet:
-> > > > > > 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
-> > > > > > 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < =
-0)
-> > > > > >
-> > > > > > Regarding the first rule, it fails as expected because in the f=
-irst
-> > > > > > connection the seq of SYN sent from A is 1892994276, then 169s =
-have
-> > > > > > passed, the second SYN has 239034613 (caused by overflow of s32=
-).
-> > > > > >
-> > > > > > Then how about the second rule?
-> > > > > > It fails again!
-> > > > > > Let's take a look at how the tsval comes out:
-> > > > > > __tcp_transmit_skb()
-> > > > > >     -> tcp_syn_options()
-> > > > > >         -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_ts=
-, skb) + tp->tsoffset;
-> > > > > > The timestamp depends on two things, one is skb->skb_mstamp_ns,=
- the
-> > > > > > other is tp->tsoffset. The latter value is fixed, so we don't n=
-eed
-> > > > > > to care about it. If both operations (sending FIN and then star=
-ting
-> > > > > > sending SYN) from A happen in 1ms, then the tsval would be the =
-same.
-> > > > > > It can be clearly seen in the tcpdump log. Notice that the tsva=
-l is
-> > > > > > with millisecond precision.
-> > > > > >
-> > > > > > Based on the above analysis, I decided to make a small change t=
-o
-> > > > > > the check in tcp_timewait_state_process() so that the second fl=
-ow
-> > > > > > would not fail.
-> > > > > >
-> > > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > > ---
-> > > > > >  net/ipv4/tcp_minisocks.c | 2 +-
-> > > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > > >
-> > > > > > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.=
-c
-> > > > > > index bb1fe1ba867a..2b29d1bf5ca0 100644
-> > > > > > --- a/net/ipv4/tcp_minisocks.c
-> > > > > > +++ b/net/ipv4/tcp_minisocks.c
-> > > > > > @@ -234,7 +234,7 @@ tcp_timewait_state_process(struct inet_time=
-wait_sock *tw, struct sk_buff *skb,
-> > > > > >       if (th->syn && !th->rst && !th->ack && !paws_reject &&
-> > > > > >           (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
-> > > > > >            (tmp_opt.saw_tstamp &&
-> > > > > > -           (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_=
-tsval) < 0))) {
-> > > > >
-> > > > > I think this follows RFC 6191 and such a change requires a formal
-> > > > > discussion at IETF.
-> > > > >
-> > > > > https://datatracker.ietf.org/doc/html/rfc6191#section-2
-> > > > >
-> > > > > ---8<---
-> > > > >       *  If TCP Timestamps would be enabled for the new incarnati=
-on of
-> > > > >          the connection, and the timestamp contained in the incom=
-ing SYN
-> > > > >          segment is greater than the last timestamp seen on the p=
-revious
-> > > >
-> > > > The true thing is that the timestamp of the SYN packet is greater t=
-han
-> > > > that of the last packet, but the kernel implementation uses ms
-> > > > precision (please see tcp_skb_timestamp_ts()). That function makes
-> > > > those two timestamps the same.
-> > > >
-> > > > This case happens as expected, so the second connection should be
-> > > > established. My confusion just popped out of my mind: what rules
-> > > > should we follow to stop the second flow?
-> > >
-> > > Note that linux TCP stack can use usec resolution for TCP TS values.
-> > >
-> > > You might adopt it, and no longer care about this ms granularity.
-> >
-> > Right, I noticed this feature. I wonder if we can change the check in
-> > tcp_timewait_state_process() like this patch if it has no side
-> > effects? I'm worried that some programs don't use this feature. It's
-> > the reason why I try to propose this patch to you.
->
-> Breaking RFC ? I do not think so.
->
-> Instead, use a usec clock and voila, the problem is solved.
 
-I wonder if it is necessary to use BPF to extend the usec clock. Since
-I started investigating the BPF part, I found it can help us extend
-many useful features in TCP to the most extent.
-
-Using it with the BPF program can make the feature take effect and
-widely used in future.
-
-I'm asking because I somehow have a feeling that someday the majority
-of traditional sockopts could be replaced by BPF. After all, requiring
-application modification for those kernel features is a bit heavy. I'm
-not sure if I'm right about it :S
-
-Thanks,
-Jason
+On 11/5/2024 8:20 AM, Jakub Kicinski wrote:
+> On Mon, 4 Nov 2024 16:55:46 +0530 Malladi, Meghana wrote:
+>> On 11/1/2024 7:29 AM, Jakub Kicinski wrote:
+>>> On Mon, 28 Oct 2024 16:40:52 +0530 Meghana Malladi wrote:
+>>>> The first PPS latch time needs to be calculated by the driver
+>>>> (in rounded off seconds) and configured as the start time
+>>>> offset for the cycle. After synchronizing two PTP clocks
+>>>> running as master/slave, missing this would cause master
+>>>> and slave to start immediately with some milliseconds
+>>>> drift which causes the PPS signal to never synchronize with
+>>>> the PTP master.
+>>>
+>>> You're reading a 64b value in chunks, is it not possible that it'd wrap
+>>> in between reads? This can be usually detected by reading high twice and
+>>> making sure it didn't change.
+>>>
+>>> Please fix or explain in the commit message why this is not a problem..
+>> Yes I agree that there might be a wrap if the read isn't atomic. As
+>> suggested by Andrew I am currently not using custom read where I can
+>> implement the logic you suggested
+> 
+> Right but I think Andrew was commenting on a patch which contained pure
+> re-implementation of read low / hi with no extra bells or whistles.
+> 
+>> (reading high twice and making sure if
+>> didn't change). Can you share me some references where this logic is
+>> implemented in the kernel, so I can directly use that instead of writing
+>> custom functions.
+> 
+> I think you need to write a custom one. Example:
+> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/meta/fbnic/fbnic_time.c#n40
+Ok thank you. I will add custom function for this and update the patch.
 
