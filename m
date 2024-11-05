@@ -1,78 +1,56 @@
-Return-Path: <netdev+bounces-142001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6B979BCEE3
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:15:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8ED99BCEEB
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:17:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9AD3E2846DE
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:15:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD818284414
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:17:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396D71D63C4;
-	Tue,  5 Nov 2024 14:15:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5A7D1D5ACE;
+	Tue,  5 Nov 2024 14:17:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="bW4/qWqh"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="mO94tLrb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CB31D54F4;
-	Tue,  5 Nov 2024 14:15:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.19
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 961F5433D0;
+	Tue,  5 Nov 2024 14:17:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730816157; cv=none; b=UTn2RFcG1wq+TEZcuOBX/3gFBz3Lty40EG4W/We6reHIMgPHjGsNvhuft1nUZjZkqfI+NQIsidlVPt2x0ecvZdh1yAHjo7X8RPkiDsDevSDFVUnqJbnz2d0vvL+/pOpWze9Aa+V54AQj8KjaNvL9hvnEP4LTV6z9l89IKllxMDI=
+	t=1730816224; cv=none; b=qKZiKGc3i7I+xZdhP4cAiH1xkFX+tNckUMvQlLvQiNeHOeyqV33w+EpO6SL7+8RUqUIfHFEVhF9r3+wfplZZ/xBAyINjfLsFGqIlPWW6+BxPgXPWprX7ebde0MZW5Z9YHfBirWMLpfBmBEHMUdasQzHjrxd1DB8zIDc4m02Q114=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730816157; c=relaxed/simple;
-	bh=UwUee+AJ5IsJhO3fm3A0MDvNU56xubXQY38rELKG15w=;
+	s=arc-20240116; t=1730816224; c=relaxed/simple;
+	bh=0+L3qxW3NQK3xwclGQm/lsHI4QA8u4yxQmE9vqPlbzg=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NDFxkmxt03vk7avbW0BENwaYgmIwIWvY4IGoQ7s28Koa94+elNr6x7JMKgTk1FxuGib0YkVF2bytsiJzMCW8Ercx/Hy7i6vBk8cyef9iwk903OQZaS79vv39H7U4Z8XE+w1uSl9NuMQ5BC7Sd7KIw3bqeITKStnEnVYuaWFxHjM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=bW4/qWqh; arc=none smtp.client-ip=198.175.65.19
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730816156; x=1762352156;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=UwUee+AJ5IsJhO3fm3A0MDvNU56xubXQY38rELKG15w=;
-  b=bW4/qWqhdPHzQbs3Ms0XIEcgBwqWR+5gaAgoToXl0N+6+NQqtMGEfvqg
-   DikRkpT7z+8cJ/CjipbsRP4heHIOsjpEnF5ceDKacESgOH7w3bbQsDApa
-   /a72VFaMr3U8AfZ/JVHwt8UtBu/88sHZY64hAZeG0QlzlETdc3+vyyXco
-   YLq5jiK7QLIzdxY6wnTY5EOGPU5fkrujAFwiaGtt4BM9573+Hgc1H81E+
-   oiRqoogSZ7/YINNikz7SQvroSFfs+Pjs0BXtxMSty8W9OABHlXYy7yeqg
-   wsMLl/+fB5ayg49TcpOEYEwpcCilPD3928WIrpUeXf72aBs6LlXPHVGeV
-   Q==;
-X-CSE-ConnectionGUID: kyp6rP1ARFqtb0ab/ckyGg==
-X-CSE-MsgGUID: fSmwV0IrR0SkIcXoWd1s1g==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30415132"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30415132"
-Received: from fmviesa009.fm.intel.com ([10.60.135.149])
-  by orvoesa111.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 06:15:56 -0800
-X-CSE-ConnectionGUID: zojLoOgPTVa/8rTxwMe0KQ==
-X-CSE-MsgGUID: bf8+OHs/QBa1yWseXVvYTQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
-   d="scan'208";a="84158056"
-Received: from smile.fi.intel.com ([10.237.72.154])
-  by fmviesa009.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 06:15:54 -0800
-Received: from andy by smile.fi.intel.com with local (Exim 4.98)
-	(envelope-from <andriy.shevchenko@linux.intel.com>)
-	id 1t8KLX-0000000BQUO-2vQG;
-	Tue, 05 Nov 2024 16:15:51 +0200
-Date: Tue, 5 Nov 2024 16:15:51 +0200
-From: Andy Shevchenko <andriy.shevchenko@linux.intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	Krzysztof Kozlowski <krzk@kernel.org>
-Subject: Re: [PATCH net-next v1 1/1] nfc: mrvl: Don't use "proxy" headers
-Message-ID: <Zyool7zZtcfOvy8h@smile.fi.intel.com>
-References: <20241101083910.3362945-1-andriy.shevchenko@linux.intel.com>
- <20241103081740.7bc006c1@kernel.org>
- <ZyiChsS_zrHlet3E@smile.fi.intel.com>
- <20241104182941.342c3b7a@kernel.org>
+	 Content-Type:Content-Disposition:In-Reply-To; b=r7O0S6PZzgMlTMwSKQqoFw02CRhzzctYvukN4l3NAQYb4/X7RfETusKmCSJ9kkaeaEB8IuEqeLEuUr6rvbn3PO+87o+ccSU79NWT4YJitWEq023zOBdCfvJnJBSKbXxC1QBovItV3H8muGPOHJWRbYUDoptaSMM6sY0suEHHlNc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=mO94tLrb; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 79348C4CECF;
+	Tue,  5 Nov 2024 14:17:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730816224;
+	bh=0+L3qxW3NQK3xwclGQm/lsHI4QA8u4yxQmE9vqPlbzg=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=mO94tLrbQ9WmePaEa5eTBKLVjfQxFcuCIRtio8hjyC5O/0QAdX3EkZynfMXe895PN
+	 Y1qeG64q0N6B7Pean75rt6wr9aSZkV70WsgRSkFH1BNGSQy+ghxENRg1GUa9IMwz0d
+	 kTjNJUTa0csHEZPfMLsuKKQ99Xy41X6JlogDhdsNvxeBbYiYti9Zc7Ea0qRL0Qq36v
+	 KCb2dLREDogLwLmd40EuokeN62+4htEbh1wcPrfJJ7zprseiz6jqWqVzNNhe+NYsgf
+	 70NCBcnoUctJhM7nfFLXysBcH5HUIcCkRmxgRZrFte7dGjIysBZgziwMwqfvaAv5Fo
+	 Nqj8Rrk+kKSvQ==
+Date: Tue, 5 Nov 2024 14:17:00 +0000
+From: Simon Horman <horms@kernel.org>
+To: Andrew Kreimer <algonell@gmail.com>
+Cc: Karsten Keil <isdn@linux-pingi.de>, Jakub Kicinski <kuba@kernel.org>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Jeff Johnson <quic_jjohnson@quicinc.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
+Subject: Re: [PATCH net-next] mISDN: Fix typos
+Message-ID: <20241105141700.GG4507@kernel.org>
+References: <20241102134856.11322-1-algonell@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,30 +59,42 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241104182941.342c3b7a@kernel.org>
-Organization: Intel Finland Oy - BIC 0357606-4 - Westendinkatu 7, 02160 Espoo
+In-Reply-To: <20241102134856.11322-1-algonell@gmail.com>
 
-On Mon, Nov 04, 2024 at 06:29:41PM -0800, Jakub Kicinski wrote:
-> On Mon, 4 Nov 2024 10:15:02 +0200 Andy Shevchenko wrote:
-> > So, you are welcome to help developing such a tool.
+On Sat, Nov 02, 2024 at 03:48:24PM +0200, Andrew Kreimer wrote:
+> Fix typos:
+>   - syncronized -> synchronized.
+>   - interfacs -> interface.
 > 
-> FTR I find saying such things to maintains very, very rude.
+> Signed-off-by: Andrew Kreimer <algonell@gmail.com>
 
-Sorry, it wasn't meant to be that. Let me elaborate. The tool is really
-what we need, but seems nobody is ready to invest time into its appearance.
-It would great and appreciated to have a consolidated work towards that.
+Hi Andrew,
 
-> > Can we have this being applied meanwhile, please? It's a showstopper for
-> > getting rid of of_gpio.h rather sooner than later.
-> 
-> Doing this cleanup as part of deleting a deprecated header seems legit.
-> But you need to say that in the commit message.
+I'm wondering if you could make this a bit more comprehensive by addressing
+all the non-false-positives flagged by codespell in this file.
 
-Thanks for review, I will address then in next version.
+With your patch applied, manually filtering out the false-positives, I see:
+
+$ codespell drivers/isdn/hardware/mISDN/hfcmulti.c
+drivers/isdn/hardware/mISDN/hfcmulti.c:28: otherwhise ==> otherwise
+drivers/isdn/hardware/mISDN/hfcmulti.c:29: otherwhise ==> otherwise
+drivers/isdn/hardware/mISDN/hfcmulti.c:44: ony ==> only, on, one
+drivers/isdn/hardware/mISDN/hfcmulti.c:85: busses ==> buses
+drivers/isdn/hardware/mISDN/hfcmulti.c:903: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:986: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:2004: maxinum ==> maximum
+drivers/isdn/hardware/mISDN/hfcmulti.c:2565: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:2568: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:2738: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:2740: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:3235: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:3938: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:4006: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:4532: syncronized ==> synchronized
+drivers/isdn/hardware/mISDN/hfcmulti.c:4556: syncronized ==> synchronized
+
+...
 
 -- 
-With Best Regards,
-Andy Shevchenko
-
-
+pw-bot: changes-requested
 
