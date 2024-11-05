@@ -1,100 +1,117 @@
-Return-Path: <netdev+bounces-142028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142030-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66F329BD01F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:10:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 82FD49BD1AE
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:07:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 986121C21016
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:10:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1DD25B24BA4
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:07:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27321D9A4B;
-	Tue,  5 Nov 2024 15:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8983B1791ED;
+	Tue,  5 Nov 2024 16:06:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drmVIaMt"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Mf7/8l7a"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A455E1D5CCC;
-	Tue,  5 Nov 2024 15:10:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D148315380B
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 16:06:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730819422; cv=none; b=fm+wRqGMo3eq5o/9cTOLuDKavUaazpK0BgE2AHgtdh5Mxd0mS7bbtNpoipK2GtfBuCpOQtJy/2CtspYbxHIoS/tsDfVHEnCG+E2MnD81ieNoIFF/RHmwzojeZ42YPuWT0Ofa8Ka9JtkzCOtD6xXl58gSevlfXjMdf2f1X+Apet0=
+	t=1730822778; cv=none; b=t0zz8RbdgGQE969xYctgMf1x0J6bPMCY8j694RCTDG2viKRbmplG0ePMFIUwO5trCQC6hUKM3MuYH5B3HlT/GtLPlVde++lov6933gST6VuxW74xszOy0LqJMA+PS1FtqbPqRB86k38Pzc2osCZMRTlBusuWxRzAFzFX9vBdhjw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730819422; c=relaxed/simple;
-	bh=o99dfV4SMS3XtqCdnRdfpVyfvsH8r6+Drt0G7+D2AOo=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=ALKc6JMiVxFTU76WSohP99FEtPGuPsR/0741eXflOOmV172OWPAR2+byFXHjZ9vpXTBQyo+mntJRz7jT1taJNqJ21FG35rzEVNnZaoC0ySIed+SismY8An8j/mjjzfhRiMtEakf1TtSv/NaLJ/Nq/ft9uPTR+KJj4iL2iya5fRA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drmVIaMt; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42FFDC4CECF;
-	Tue,  5 Nov 2024 15:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730819422;
-	bh=o99dfV4SMS3XtqCdnRdfpVyfvsH8r6+Drt0G7+D2AOo=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=drmVIaMtr4fU7FK8ZHZ6Q9CLlAOl+AHwp63zRSfw2XBzXp/zVkrmljBzJVyPcqLRa
-	 5POMJLoKiwoc6qSkLZRtQdN2hQrLiUfhN8r72IeVVFKO17eMx0XDsPPCfdDtrdzDd1
-	 qsS0QmmT2ECPcqhkEGE6Yl2rAQceCYcY9yzsqn7VmW8VP1I/AA1pN6Q4xaiWR92dkt
-	 DpUKK9OX7wiiH68kd7gX4amc8nb+FbqY9WVEVUwrumabi9uKYzSkT8BQr+ob3ertBe
-	 FVidrrFldjaxnzrMH+CuyxqcL728W0S4M0fRE0+UksaHu6IAtGGKz1ihil6mqzNoHi
-	 e5MGBuYnUDa+w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DC03809A80;
-	Tue,  5 Nov 2024 15:10:32 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730822778; c=relaxed/simple;
+	bh=2Yd25+AzkVFGhjL2YsJvZFz27QCOqGzzjXdhKQillXg=;
+	h=From:To:Cc:Subject:In-Reply-To:Date:Message-ID:References:
+	 MIME-Version:Content-Type; b=fu9X/u6H5srDolnrQGlNNzjLGgEhAUUmvGbFrH+E0RgU1ihwERG44PNys6MVTXgI8Nxd6bYX4tChvSqYBKubid5FJVfO2+aJn/m/8UMzP6PEroZ9x5P+LvGnEqoewnw9KvoBHDgGS3iwoReo+g7lXD+fFz8iGrf6dVX+Mrw+zFg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Mf7/8l7a; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-43167ff0f91so50237745e9.1
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 08:06:16 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730822775; x=1731427575; darn=vger.kernel.org;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=IFa62HHOLc47yazK3lP26lvHtNm60ih86PmZv2WPlRw=;
+        b=Mf7/8l7a/4pze+Ar07pH4vhda+n38RrfAXXwplQmAJOBYGmHscgnObMPEcGFg13vVY
+         oIZlNv6iywTmbP6S1uL3sy9MZcRYlDBP3/SK1YSoRZ34Fh+g0JfEdSxha0NtLGmrzb+O
+         MGFFdmjD6o27s3R4aDSW8Fgre0cDnr97qfJqVBoxOVsBiD6rhM3xEDzAX8y7BV2aMsUb
+         a48Q+Jjru9ICA7FJ0HwNexZJoiuys2XQ8v3JhLNM4ccmwWFOieubx62VQj6urwTmQ+O6
+         B8WOorr7U9SJ/+MDYPxCa32zOEyrz/PTEb//DkKjwI8Z1NFRv+ka12lG+P9JMnLvogeZ
+         Y1xQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730822775; x=1731427575;
+        h=mime-version:user-agent:references:message-id:date:in-reply-to
+         :subject:cc:to:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IFa62HHOLc47yazK3lP26lvHtNm60ih86PmZv2WPlRw=;
+        b=F0V2KU+nZ/45JTaiw+uEKNXgqeGVA7eT/8d/ykqALuyJCU8134FaKMzoN0eDG2O7wF
+         ZefzGVMZGE5jajzu1+3f4EiZf4+1nhvPBbRLsKOXs564/ODWAZXT6Ozr1rpCjIdZybBv
+         hKTEn4c5ODrZdK3RbntVVA/uMuSJj6M+jASblHXThdM+cbgxm8ypKPUgg3fA79wzBEPS
+         uR5W+zHxHh+J6l8cCx6MTUsBQGAm10SLg2mzTFIyZB+/O8NNBSPla/YsfS/2Iggip7YE
+         KzLPT/v0kRiajlsH5VU/zpmYg3gOPNBuZnUme73rr1ULpEf+Hd7R0rlWfK79TlP7VFX8
+         Lhkw==
+X-Gm-Message-State: AOJu0YyzDIHz24QC406DJHSiGqteW3NE54Agep1Ot7KX0xINV8hdMkdY
+	ujEME1w45+CECDdQuuG2xOm44x5zF8+sfnu7un35cVbKSW9i06YJ
+X-Google-Smtp-Source: AGHT+IHPzZft5gIMD5zle+LAvprQn063dVKkrEpHnRLLulU/VQxgl6vJOF3x0v0CqNxsK1P7G+j0Ow==
+X-Received: by 2002:a05:600c:1f91:b0:426:66a2:b200 with SMTP id 5b1f17b1804b1-4327b6c79f7mr185726285e9.0.1730822774902;
+        Tue, 05 Nov 2024 08:06:14 -0800 (PST)
+Received: from imac ([2a02:8010:60a0:0:e89b:101d:ffaa:c8dd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5e7c51sm191612105e9.25.2024.11.05.08.06.13
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 08:06:14 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org,  Jakub Kicinski <kuba@kernel.org>,  "David S.
+ Miller" <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,  Paolo
+ Abeni <pabeni@redhat.com>,  Simon Horman <horms@kernel.org>,
+  donald.hunter@redhat.com,  Stanislav Fomichev <sdf@fomichev.me>
+Subject: Re: [PATCH net-next v2 2/2] netlink: specs: Add a spec for FIB rule
+ management
+In-Reply-To: <ZyotMdGb23YbCBiK@shredder> (Ido Schimmel's message of "Tue, 5
+	Nov 2024 16:35:29 +0200")
+Date: Tue, 05 Nov 2024 15:28:29 +0000
+Message-ID: <m2ldxxvgwy.fsf@gmail.com>
+References: <20241105122831.85882-1-donald.hunter@gmail.com>
+	<20241105122831.85882-3-donald.hunter@gmail.com>
+	<ZyotMdGb23YbCBiK@shredder>
+User-Agent: Gnus/5.13 (Gnus v5.13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3 0/2] net: ethernet: ti: am65-cpsw: Fixes to multi
- queue RX feature
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173081943101.587715.9518854111392182116.git-patchwork-notify@kernel.org>
-Date: Tue, 05 Nov 2024 15:10:31 +0000
-References: <20241101-am65-cpsw-multi-rx-j7-fix-v3-0-338fdd6a55da@kernel.org>
-In-Reply-To: <20241101-am65-cpsw-multi-rx-j7-fix-v3-0-338fdd6a55da@kernel.org>
-To: Roger Quadros <rogerq@kernel.org>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
- hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org, vigneshr@ti.com,
- maxime.chevallier@bootlin.com, s-vadapalli@ti.com, danishanwar@ti.com,
- srk@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- bpf@vger.kernel.org
+Content-Type: text/plain
 
-Hello:
+Ido Schimmel <idosch@nvidia.com> writes:
 
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Fri, 01 Nov 2024 12:18:49 +0200 you wrote:
-> On J7 platforms, setting up multiple RX flows was failing
-> as the RX free descriptor ring 0 is shared among all flows
-> and we did not allocate enough elements in the RX free descriptor
-> ring 0 to accommodate for all RX flows. Patch 1 fixes this.
-> 
-> The second patch fixes a warning if there was any error in
-> am65_cpsw_nuss_init_rx_chns() and am65_cpsw_nuss_cleanup_rx_chns()
-> was called after that.
-> 
+> On Tue, Nov 05, 2024 at 12:28:31PM +0000, Donald Hunter wrote:
+>
+> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
+>
+> One question below (didn't notice it before)
+>
 > [...]
+>
+>> +    -
+>> +      name: getrule
+>> +      doc: Dump all FIB rules
+>> +      attribute-set: fib-rule-attrs
+>> +      dump:
+>> +        request:
+>> +          value: 34
+>> +          attributes:
+>> +            - nsid
+>
+> What is the significance of 'nsid' here?
 
-Here is the summary with links:
-  - [net,v3,1/2] net: ethernet: ti: am65-cpsw: Fix multi queue Rx on J7
-    https://git.kernel.org/netdev/net/c/de794169cf17
-  - [net,v3,2/2] net: ethernet: ti: am65-cpsw: fix warning in am65_cpsw_nuss_remove_rx_chns()
-    https://git.kernel.org/netdev/net/c/ba3b7ac4f714
+Hmm, looks like a couple of lines I need to remove.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Thanks for catching this!
 
