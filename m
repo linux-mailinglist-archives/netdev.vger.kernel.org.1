@@ -1,106 +1,213 @@
-Return-Path: <netdev+bounces-141969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E1899BCCBE
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:30:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8288A9BCCC1
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:30:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31F6C2857DA
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:30:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A5C6A1C20DB7
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:30:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5F4D1D47DC;
-	Tue,  5 Nov 2024 12:30:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D19E11D0BAA;
+	Tue,  5 Nov 2024 12:30:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="cwWWqUf9"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="UpUoe6xR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f180.google.com (mail-lj1-f180.google.com [209.85.208.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D37C71D5AA5
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 12:30:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31CB41CF296;
+	Tue,  5 Nov 2024 12:30:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730809812; cv=none; b=jLQ+3VST7QvmIxb/59ueEy2Vm+rnIJ1dQMMyYUifs2M7Zql19xqRJTitwNwaK1I8NPn8kc+4aHKAtf79sG0JKWMs9MqXGhOFCE8H61C+pe3/N+QC8UEK1lJJ3FSSbaMAZS0P1IHrI33SyGqZtoZcFmtobNVd6GaT3vo3JZjdckI=
+	t=1730809837; cv=none; b=sA/jSccutc7g2uTxd/4JcNEvIWL2g+gexzSyD2N0akjnbqEIUqpiwtT+yRZN+MMI70kx2jrh9EDX/R9svo4nFVhJZkK8MphUXGB5J0ddarDljK1LfEdKJOSpcGJf6/fXaqgMDrD8THvxDQpomTadyx9rNtA5seHlmvJxGqmtorU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730809812; c=relaxed/simple;
-	bh=LhDwN/xF71ghxE5wzrbVvnOsfPv37mNis1TaAQH3ftU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OOw32b8DhFoZpd61XW+8q9Ce+5A6ti6CEEDreJGIfXC2i/f4/WfgjDmkvsUQimmJgV2Fx46wlfQHEBwVSDfqwoYmvMnqX8C4Z0TTK/gXbXK2zXRHK567AfkAfLqwFh+TRx5cokeBjOEnVnysQFr5qKF2ULrtyX0FdDThzBJvSUw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=cwWWqUf9; arc=none smtp.client-ip=209.85.208.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lj1-f180.google.com with SMTP id 38308e7fff4ca-2fb59652cb9so48393051fa.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 04:30:10 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730809809; x=1731414609; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0DjVwsSz+QZmCGpgNC26UXoavyNmG2TWtUBkyB0m0OA=;
-        b=cwWWqUf9pKsptn/DMtmam7402+mDWbLzUnx9nA3E+rGE2HquiyOgl2h237iQtzTJqt
-         DiE8MTW2N9LB4n5B9tNlmamYIqqbizwJK2vhAKWEYKVzlBjkNuJ/XmtTGD15D5VIScxO
-         FFXh90v+Mq+PWKQD0jPFcsZk0C+iMBhkxLDYaW31OUFQyn3wbYfnmehi/451LRdxqONJ
-         C6KeXwEqJA6wHIVTKjP5VslQZ8jrgf1FyZz/98oibSH3O3Y05TbxQWz892KtquiqwE8P
-         9nADFx9bLCmLBFweIf5ktN34FGEkfB0UEZYUPAGqwBDXMVc7qjhJB6k0yeUbm/1u8C/8
-         XlxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730809809; x=1731414609;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0DjVwsSz+QZmCGpgNC26UXoavyNmG2TWtUBkyB0m0OA=;
-        b=BD2ap81MH95UMsnMjdLCdow4ES8StlwkJEWPqEF7C7vjmJgLon2RRi/31dyU3jg+M3
-         HwZFTx1wXBbN2OTyFqS4ANKucz3LNI0NzAw3cD8N16C2y+TJKnnoc6ZbDl4oUVck/ZNF
-         9yy67POLrnUfJ3lSMUgfH9vYzLH7RfdaDNC/FODoMf3CXglfQ4ZnCbsgx12NVmvz0O7h
-         Vc0xCSCGkQ11tEVYYjcfb+cea6lBJtFzCoP7+DL9qwv/iNpnLnENd6/SeUQljQ4RdtKW
-         GaApZ6m1Qfsyo2Qgaq9xDXBN9SPQZEqmBaYg00ffz1dYRduz+oXKqMpCz981U70ywx6u
-         ct1w==
-X-Gm-Message-State: AOJu0YyFNoJoXJl1ihjEfostNwtjWYYzaM00J4mMxQFr8kRmISKEqiwj
-	g1twVdV/2cZMEqSebbYyLIDwPeNaQcM1NqNAPlbjsDQnbQi+hp5giRitKiBdtf2wDdrLL94nNwa
-	Ajv1zNdfhTuir3NWc0afTypQhIcJ0ZmyByzLNBL04WveS9UDztw==
-X-Google-Smtp-Source: AGHT+IFHeJed7Q71TVWo/vWUGmfcRZK9cRfzFyK9Yw0d2CLVjmxW2EPvtuL926UeITrx2YJl4cMnW18Nb8t/UFk+tkg=
-X-Received: by 2002:a2e:a803:0:b0:2fb:b59:816a with SMTP id
- 38308e7fff4ca-2fef09d5f58mr35889181fa.45.1730809808707; Tue, 05 Nov 2024
- 04:30:08 -0800 (PST)
+	s=arc-20240116; t=1730809837; c=relaxed/simple;
+	bh=5KHJ9gmGkhlkf31dOpCv10NsxuTyMiGR4s2SONLKcQk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=fPRlZD1YRivHeUKiUTZgBBjVKcDATwtn7zsJC7zxy8faJDuugstPVliDx/HHeIpNJhd7aBe87fLjN7VM7hof7JxzZBg8CzyAaYVZg6iJAE097qrI16M1BdvrqsEz9sLVAEd0BnFN0+X8cpjjwESrCrt8yiB813h/rL5NHyVc93k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=UpUoe6xR; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A5CAS5r010939;
+	Tue, 5 Nov 2024 12:30:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=kyxhLJ
+	Ta8LIztFCLtTbL9dkalpEtdiM+7DIqnymnhf8=; b=UpUoe6xR/GmAGaLitBI9wu
+	tquNRPBj5b6QsjLAmIBxF0XIOnWemwMi8pRyweobKUoBObJBDv+wIBSNiiHYTHrP
+	abPJJZGOBvZB+PLQZvn+R7+VRdKnWyI985bprw13gHSA4DVe7h66UJcWudnykRxw
+	DSMNeNsakUz1Cle6MOSpJh7+fRaQG5ElE+OuS5861A6SElM/L72AACG0qTMWObKD
+	C0wZ362FJ9QBcdyP1sDe6mKZjEFZQTk99rwB6dhOjq8cYknNQ6hciWE13Uqi4JHi
+	M8HLgIUlaetmsim3LZw1vrM/GbarQsyhSrnuflT0kUmCHbtRxIPC5c70G0GWARhQ
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42qk4h83f8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 12:30:30 +0000 (GMT)
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A5CUThk000506;
+	Tue, 5 Nov 2024 12:30:29 GMT
+Received: from ppma13.dal12v.mail.ibm.com (dd.9e.1632.ip4.static.sl-reverse.com [50.22.158.221])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42qk4h83f1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 12:30:29 +0000 (GMT)
+Received: from pps.filterd (ppma13.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma13.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A51AdVn024314;
+	Tue, 5 Nov 2024 12:30:28 GMT
+Received: from smtprelay05.dal12v.mail.ibm.com ([172.16.1.7])
+	by ppma13.dal12v.mail.ibm.com (PPS) with ESMTPS id 42p0mj41av-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 12:30:28 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay05.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A5CUSg150856372
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 5 Nov 2024 12:30:28 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 0E2875803F;
+	Tue,  5 Nov 2024 12:30:28 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 293F75805A;
+	Tue,  5 Nov 2024 12:30:25 +0000 (GMT)
+Received: from [9.152.224.138] (unknown [9.152.224.138])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  5 Nov 2024 12:30:25 +0000 (GMT)
+Message-ID: <e88d6049-6be1-4967-b88d-94d437900c3d@linux.ibm.com>
+Date: Tue, 5 Nov 2024 13:30:24 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <cover.1730364250.git.pabeni@redhat.com> <85ee0558e07d23de03fca1d2444a8d3edb75e912.1730364250.git.pabeni@redhat.com>
- <453af1dc-b778-40c8-8ffc-5dc97d7572d0@redhat.com>
-In-Reply-To: <453af1dc-b778-40c8-8ffc-5dc97d7572d0@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Nov 2024 13:29:56 +0100
-Message-ID: <CANn89iJmGepXYMheagmDyfS_0xTESaQc3J8rmcXGqskiaW5tdA@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/2] ipv6: release nexthop on device removal
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>, 
-	Shuah Khan <shuah@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
+ ib_device_get_netdev()
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>,
+        Niklas Schnell <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+ <20241027201857.GA1615717@unreal>
+ <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
+ <20241105112313.GE311159@unreal>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20241105112313.GE311159@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: gEu2s_FgrJ_OUy5tzhRNPJV4nVXYUXP7
+X-Proofpoint-ORIG-GUID: TY0DPCuc_q0fIeebcAI3fj3effNAe-0J
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
+ clxscore=1015 malwarescore=0 mlxlogscore=962 priorityscore=1501
+ phishscore=0 bulkscore=0 impostorscore=0 suspectscore=0 mlxscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411050093
 
-On Tue, Nov 5, 2024 at 1:19=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On 10/31/24 09:53, Paolo Abeni wrote:
-> > diff --git a/net/ipv6/route.c b/net/ipv6/route.c
-> > index d7ce5cf2017a..ef55f330dcda 100644
-> > --- a/net/ipv6/route.c
-> > +++ b/net/ipv6/route.c
-> > @@ -187,6 +187,7 @@ static void rt6_uncached_list_flush_dev(struct net_=
-device *dev)
-> >                                                  GFP_ATOMIC);
-> >                               handled =3D true;
-> >                       }
-> > +
->
-> Please do not include unrelated whitespace chang... wait! I'm talking to
-> myself... in any case a v2 is needed.
 
-Oh, I missed this patch, thanks a lot for sorting it out.
+
+On 05.11.24 12:23, Leon Romanovsky wrote:
+> On Tue, Nov 05, 2024 at 10:50:45AM +0100, Wenjia Zhang wrote:
+>>
+>>
+>> On 27.10.24 21:18, Leon Romanovsky wrote:
+>>> On Fri, Oct 25, 2024 at 09:23:55AM +0200, Wenjia Zhang wrote:
+>>>> Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
+>>>> alternative to get_netdev") introduced an API ib_device_get_netdev.
+>>>> The SMC-R variant of the SMC protocol continued to use the old API
+>>>> ib_device_ops.get_netdev() to lookup netdev.
+>>>
+>>> I would say that calls to ibdev ops from ULPs was never been right
+>>> thing to do. The ib_device_set_netdev() was introduced for the drivers.
+>>>
+>>> So the whole commit message is not accurate and better to be rewritten.
+>>>
+>>>> As this commit 8d159eb2117b
+>>>> ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
+>>>> get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
+>>>> ib_device_ops.get_netdev didn't work any more at least by using a mlx5
+>>>> device driver.
+>>>
+>>> It is not a correct statement too. All modern drivers (for last 5 years)
+>>> don't have that .get_netdev() ops, so it is not mlx5 specific, but another
+>>> justification to say that SMC-R was doing it wrong.
+>>>
+>>>> Thus, using ib_device_set_netdev() now became mandatory.
+>>>
+>>> ib_device_set_netdev() is mandatory for the drivers, it is nothing to do
+>>> with ULPs.
+>>>
+>>>>
+>>>> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
+>>>
+>>> It is too late for me to do proper review for today, but I would say
+>>> that it is worth to pay attention to multiple dev_put() calls in the
+>>> functions around the ib_device_get_netdev().
+>>>
+>>>>
+>>>> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+>>>> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
+>>>
+>>> It is not related to this change Fixes line.
+>>>
+>>
+>> Hi Leon,
+>>
+>> Thank you for the review! I agree that SMC could do better. However, we
+>> should fix it and give enough information and reference on the changes,
+>> since the code has already existed and didn't work with the old way.
+> 
+> The code which you change worked by chance and was wrong from day one.
+> 
+>> I can rewrite the commit message.
+>>
+>> What about:
+>> "
+>> The SMC-R variant of the SMC protocol still called
+>> ib_device_ops.get_netdev() to lookup netdev. As we used mlx5 device driver
+>> to run SMC-R, it failed to find a device, because in mlx5_ib the internal
+>> net device management for retrieving net devices was replaced by a common
+>> interface ib_device_get_netdev() in commit 8d159eb2117b ("RDMA/mlx5: Use IB
+>> set_netdev and get_netdev functions"). Thus, replace
+>> ib_device_ops.get_netdev() with ib_device_get_netdev() in SMC.
+>> "
+> 
+>   The SMC-R variant of the SMC protocol used direct call to ib_device_ops.get_netdev()
+>   function to lookup netdev. Such direct accesses are not correct for any
+>   usage outside of RDMA core code.
+> 
+Is such an absolute statement documented somewhere? If not, I don't 
+think it's convenient that I use it. Maybe you guys as RDMA core 
+maintainer can, not I.
+>   RDMA subsystem provides ib_device_get_netdev() function that works on
+>   all RDMA drivers returns valid netdev with proper locking an reference
+>   counting. The commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev
+>   functions") exposed that SMC-R didn't use that function.
+> 
+>   So update the SMC-R to use proper API,
+> 
+> Thanks
+> 
+mhhh, I'd like to stick to my version, which sounds more neutral IMO. I 
+think the purpose is the same.
+
+Thanks,
+Wenjia
 
