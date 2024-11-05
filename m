@@ -1,131 +1,196 @@
-Return-Path: <netdev+bounces-142076-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142077-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CCA29BD4C7
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:38:05 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A957A9BD57D
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:56:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EB791C22766
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:38:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F724284719
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0D3D1EABB9;
-	Tue,  5 Nov 2024 18:37:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDE991E885E;
+	Tue,  5 Nov 2024 18:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="M7DzHrhx"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="qV3al8eh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f169.google.com (mail-yw1-f169.google.com [209.85.128.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5568C1E906B;
-	Tue,  5 Nov 2024 18:37:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93ED817BEB7;
+	Tue,  5 Nov 2024 18:56:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730831873; cv=none; b=OpDJw7N8F6UKrqr5dJO5LIGQ7wCLbDib7G921fMbfU3EaLfd0GcAQzSu/o3M0LSYvOfSmL5fiyL0nYsbNjT9qfO3HOzRHUk5sKHyxDXmKwxYlfu98UkYcdQAwSMG+Eo88roOMbrKjjDY7SqpuL8ZWabnGhMlxhkMH/+i/22Ycg4=
+	t=1730832994; cv=none; b=ee62gao2ofDK3+k9Zf2qY1KHpLwMtdTcB/6F5j055GeXtQsN41rYrLzglTBDVxPdMppQq/k1BSNWvWS1BgN1WFvOX+rjOdG1ZL5UmqGHvhW1SnqvvgrpZaqR9cDklXb9SkVJvhPq4C8XZaZAHVZ0dn89zFhWsspP5o2llpo795w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730831873; c=relaxed/simple;
-	bh=EgDlh2EBkM5FH3cZ7ahyg2+lYODj1FnKkc1N6UZ9HqE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=ITvmkoxcyxnMRe/BzxnPWZThHqwLGKBO98BXEDdDkW2HkAxZExLnrKymSkYGxP4EwNStX1rlj38a6B/wf9CtK1rMJI2BlDY/wnJZxxu4l/TIIjLe+RK5efrlJsYM2fXkX/OqX/JRyMUCIvzfnduKzoNE4aAXx8AJSUz6HxqOPlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=M7DzHrhx; arc=none smtp.client-ip=209.85.128.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f169.google.com with SMTP id 00721157ae682-6e2e3e4f65dso11344167b3.3;
-        Tue, 05 Nov 2024 10:37:52 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730831871; x=1731436671; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2t4SvXKJl/as9BSR5e20xumSeA80xAkDkuxPKKvOGyQ=;
-        b=M7DzHrhxlRHx/y3qv5HVsjjxG0ysqAqy7lSW1bbOLUksB3FfsGriDY6QO49qCYTcgZ
-         RD2GTZtZuDI6wLDKrwduqHmvRzuOo2sTz9RqVQRRPQCHUzsvA8iAlbkVyzIlDTU6eB+B
-         PRKrnxrJjfJ+QdDjsFohNUf0buABSOjSVHOPQm4rRrqzs+0CMpQmFgaIjWPHmbWt1Wvg
-         Xdr5xGL4SoZ1KNEMoiMl6jP0Z9LZmSJMVCteEv4ZW51nQ3kFacmXxZ7VpcQ7gL5YQugN
-         cDkyzwEgEZHZihlKSMi0pRgPHcw1jA3bKFcNcYJsgrG0kC2Y876y9Sq991bx2q5OAedN
-         rFpA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730831871; x=1731436671;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2t4SvXKJl/as9BSR5e20xumSeA80xAkDkuxPKKvOGyQ=;
-        b=Sdcej0b1saANKieTDnsGC544F3jLTmi7UETIQ+jjo6zHExXHrAW4rKoAXf3SFNYBYj
-         FqsH0JO0B63ypscS2AyfMt5g0+RkPvQ6vB0edJ1dBv9a02WiFKxlQ1bME9REHXVxJhBv
-         oS6ei2Dywn8OJXUXDeRhb/j93nn2rczeabfvKx5+2nZ0z8/C9KFlIYoa9swQRZ9qpBlj
-         MWt6Z99SvSJOodgm808AWZkHgKeza6MtG7BYVBLCtUhUYiyTlGmnFPYNmxKadQWqUj7d
-         /Vx4YaJuzZqK4Kbjj55w251+nUhEw/mY0S6rP4NvstJJ6GdHpTtAZnRXJdAOeKS+cGzN
-         rDhA==
-X-Forwarded-Encrypted: i=1; AJvYcCWEWJbr2XuYOrm86Mt9PLqJd4nhWjy4RgUOvYOO71mW425ZPtpKDYkuY59rIhNDb4ZusWn83lnnbCrSr5s=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzcyolLqVpHv21Gj5zdsIX+1D/RF5JtDcWsu//3uXO7TxpDVEYi
-	GoqLxcISFQGqOyu+WPIVYJ3L9TUtzpp5oCkJIpDGwfm+ZpdesNfoVUSCAoKz/qz+kYqetr2Z6Yv
-	PItkLqrK6FnB/mPvZjwN1pyvDdks=
-X-Google-Smtp-Source: AGHT+IHT8tJTXWv791Sn6gVFqB0xEube/wNW5a9FU6AKEXghvMNc8IOLUaGTE6vbzsdbEOYWWH8hGCCe6y4Hq41odpk=
-X-Received: by 2002:a05:690c:9a0a:b0:6e3:21a9:d3c9 with SMTP id
- 00721157ae682-6e9d8962048mr365855607b3.9.1730831871431; Tue, 05 Nov 2024
- 10:37:51 -0800 (PST)
+	s=arc-20240116; t=1730832994; c=relaxed/simple;
+	bh=c/J5SfUIJ9hQst/+9a2BMM/+0T0QUgD6O198Li/u3mo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=pDzcFQjvgO3gn2LCu+fH6eKxygDgg4yQv7hDs1EqIim9RUkndsaeVIGVSeLLSILatf4v7GqMy/1t8uUJUb42O8vQ04BVl0aLQylWFv2qki3E3jAVp0cT+30AtlyzBsgfmyb9axAsw/ptnp5JEj93cPbx06uLbGNFh2Q4Jj3pzmY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=qV3al8eh; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0D8A9C4CECF;
+	Tue,  5 Nov 2024 18:56:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730832994;
+	bh=c/J5SfUIJ9hQst/+9a2BMM/+0T0QUgD6O198Li/u3mo=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=qV3al8eh5yGBIlvCge0rhsVraqUXO27A+aqiSVDZA5tCLYlWKWOGLDWFSgGOgNTOI
+	 Qn8OtFnHkRoQYja3H6tOBkwfekfawfjTrTb6F6H8Y+4edPtaRGEFIVHeQJjx08X2Ir
+	 xhFjsiY1wnGeOFfcSYgT1ifE9JSch6vBOiiSy9ra3xO3171ANU33EbGatSuJmpmGzP
+	 b12JaYiD9ZIQeavoZfoWbaDpOZ7Cc38rfDrOkoMP3UCmH7/hGj+1J0BZuLemgfERjL
+	 CNlimFcs6Hfgo9mRCKxQk0N5bmI2k9YBeL6ds57lLI6iaPd35BIjN3GO9qaAjuinHC
+	 AB1DoBGjv6nQA==
+Date: Tue, 5 Nov 2024 10:56:32 -0800
+From: Saeed Mahameed <saeed@kernel.org>
+To: Caleb Sander Mateos <csander@purestorage.com>
+Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Parav Pandit <parav@nvidia.com>, netdev@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v3] mlx5/core: Schedule EQ comp tasklet only if
+ necessary
+Message-ID: <ZypqYHaRbBCGo3FD@x130>
+References: <CY8PR12MB7195C97EB164CD3A0E9A99F9DC552@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <20241031163436.3732948-1-csander@purestorage.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241101220023.290926-1-rosenp@gmail.com> <20241101220023.290926-2-rosenp@gmail.com>
- <20241105140043.GF4507@kernel.org>
-In-Reply-To: <20241105140043.GF4507@kernel.org>
-From: Rosen Penev <rosenp@gmail.com>
-Date: Tue, 5 Nov 2024 10:37:40 -0800
-Message-ID: <CAKxU2N--pCxqP5O_++danSig-MkXcNJftdX_-PiLgwBkvKWQDQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] net: hisilicon: hns3: use ethtool string helpers
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, Jian Shen <shenjian15@huawei.com>, 
-	Salil Mehta <salil.mehta@huawei.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jijie Shao <shaojijie@huawei.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20241031163436.3732948-1-csander@purestorage.com>
 
-On Tue, Nov 5, 2024 at 6:00=E2=80=AFAM Simon Horman <horms@kernel.org> wrot=
-e:
+On 31 Oct 10:34, Caleb Sander Mateos wrote:
+>Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet
+>to call mlx5_cq_tasklet_cb() if it processes any completions. For CQs
+>whose completions don't need to be processed in tasklet context, this
+>adds unnecessary overhead. In a heavy TCP workload, we see 4% of CPU
+>time spent on the tasklet_trylock() in tasklet_action_common(), with a
+>smaller amount spent on the atomic operations in tasklet_schedule(),
+>tasklet_clear_sched(), and locking the spinlock in mlx5_cq_tasklet_cb().
+>TCP completions are handled by mlx5e_completion_event(), which schedules
+>NAPI to poll the queue, so they don't need tasklet processing.
 >
-> On Fri, Nov 01, 2024 at 03:00:23PM -0700, Rosen Penev wrote:
-> > The latter is the preferred way to copy ethtool strings.
-> >
-> > Avoids manually incrementing the pointer. Cleans up the code quite well=
-.
-> >
-> > Signed-off-by: Rosen Penev <rosenp@gmail.com>
-> > Reviewed-by: Jijie Shao <shaojijie@huawei.com>
-> > Tested-by: Jijie Shao <shaojijie@huawei.com>
+>Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
+>overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs
+>to be processed in tasklet context, so it can schedule the tasklet. CQs
+>that need tasklet processing have their interrupt comp handler set to
+>mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that
+>don't need tasklet processing won't schedule the tasklet. To avoid
+>scheduling the tasklet multiple times during the same interrupt, only
+>schedule the tasklet in mlx5_add_cq_to_tasklet() if the tasklet work
+>queue was empty before the new CQ was pushed to it.
 >
-> ...
+>The additional branch in mlx5_add_cq_to_tasklet(), called for each EQE,
+>may add a small cost for the userspace Infiniband CQs whose completions
+>are processed in tasklet context. But this seems worth it to avoid the
+>tasklet overhead for CQs that don't need it.
 >
-> > diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drive=
-rs/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> > index 97eaeec1952b..b6cc51bfdd33 100644
-> > --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> > +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
-> > @@ -509,54 +509,38 @@ static int hns3_get_sset_count(struct net_device =
-*netdev, int stringset)
-> >       }
-> >  }
-> >
-> > -static void *hns3_update_strings(u8 *data, const struct hns3_stats *st=
-ats,
-> > -             u32 stat_count, u32 num_tqps, const char *prefix)
-> > +static void hns3_update_strings(u8 **data, const struct hns3_stats *st=
-ats,
-> > +                             u32 stat_count, u32 num_tqps,
-> > +                             const char *prefix)
-> >  {
-> >  #define MAX_PREFIX_SIZE (6 + 4)
+>Note that the mlx4 driver works the same way: it schedules the tasklet
+>in mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
 >
-> Hi Rosen,
+>Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+>Reviewed-by: Parav Pandit <parav@nvidia.com>
+>---
+>v3: revise commit message
+>v2: reorder variable declarations, describe CPU profile results
 >
-> As per Jakub's feedback on v1, can't this #define be removed?
-Removed in v2.
+> drivers/net/ethernet/mellanox/mlx5/core/cq.c | 5 +++++
+> drivers/net/ethernet/mellanox/mlx5/core/eq.c | 5 +----
+> 2 files changed, 6 insertions(+), 4 deletions(-)
 >
-> ...
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/cq.c b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+>index 4caa1b6f40ba..25f3b26db729 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/cq.c
+>@@ -69,22 +69,27 @@ void mlx5_cq_tasklet_cb(struct tasklet_struct *t)
+> static void mlx5_add_cq_to_tasklet(struct mlx5_core_cq *cq,
+> 				   struct mlx5_eqe *eqe)
+> {
+> 	unsigned long flags;
+> 	struct mlx5_eq_tasklet *tasklet_ctx = cq->tasklet_ctx.priv;
+>+	bool schedule_tasklet = false;
+>
+> 	spin_lock_irqsave(&tasklet_ctx->lock, flags);
+> 	/* When migrating CQs between EQs will be implemented, please note
+> 	 * that you need to sync this point. It is possible that
+> 	 * while migrating a CQ, completions on the old EQs could
+> 	 * still arrive.
+> 	 */
+> 	if (list_empty_careful(&cq->tasklet_ctx.list)) {
+> 		mlx5_cq_hold(cq);
+
+The condition here is counter intuitive, please add a comment that relates
+to the tasklet routine mlx5_cq_tasklet_cb, something like.
+/* If this list isn't empty, the tasklet is already scheduled, and not yet
+  * executing the list, the spinlock here guarantees the addition of this CQ
+  * will be seen by the next execution, so rescheduling the tasklet is not
+  * required */ 
+
+One other way to do this, is to flag tasklet_ctx.sched_flag = true, inside
+mlx5_add_cq_to_tasklet, and then schedule once at the end of eq irq processing 
+if (tasklet_ctx.sched_flag == true). to avoid "too" early scheduling, but
+since the tasklet can't run until the irq handler returns, I think your
+solution shouldn't suffer from "too" early scheduling .. 
+
+Acked-by: Saeed Mahameed <saeedm@nvidia.com>
+
+
+>+		schedule_tasklet = list_empty(&tasklet_ctx->list);
+> 		list_add_tail(&cq->tasklet_ctx.list, &tasklet_ctx->list);
+> 	}
+> 	spin_unlock_irqrestore(&tasklet_ctx->lock, flags);
+>+
+>+	if (schedule_tasklet)
+>+		tasklet_schedule(&tasklet_ctx->task);
+> }
+>
+> /* Callers must verify outbox status in case of err */
+> int mlx5_create_cq(struct mlx5_core_dev *dev, struct mlx5_core_cq *cq,
+> 		   u32 *in, int inlen, u32 *out, int outlen)
+>diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>index 859dcf09b770..3fd2091c11c8 100644
+>--- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
+>@@ -112,14 +112,14 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+> 	struct mlx5_eq_comp *eq_comp =
+> 		container_of(nb, struct mlx5_eq_comp, irq_nb);
+> 	struct mlx5_eq *eq = &eq_comp->core;
+> 	struct mlx5_eqe *eqe;
+> 	int num_eqes = 0;
+>-	u32 cqn = -1;
+>
+> 	while ((eqe = next_eqe_sw(eq))) {
+> 		struct mlx5_core_cq *cq;
+>+		u32 cqn;
+>
+> 		/* Make sure we read EQ entry contents after we've
+> 		 * checked the ownership bit.
+> 		 */
+> 		dma_rmb();
+>@@ -142,13 +142,10 @@ static int mlx5_eq_comp_int(struct notifier_block *nb,
+> 			break;
+> 	}
+>
+> 	eq_update_ci(eq, 1);
+>
+>-	if (cqn != -1)
+>-		tasklet_schedule(&eq_comp->tasklet_ctx.task);
+>-
+> 	return 0;
+> }
+>
+> /* Some architectures don't latch interrupts when they are disabled, so using
+>  * mlx5_eq_poll_irq_disabled could end up losing interrupts while trying to
+>-- 
+>2.45.2
+>
+>
 
