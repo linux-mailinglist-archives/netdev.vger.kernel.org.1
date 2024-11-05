@@ -1,161 +1,150 @@
-Return-Path: <netdev+bounces-141917-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 299F09BCA42
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:21:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id BCFF29BC9E0
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:03:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CFD701F23A75
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:21:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 754E41F231D4
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:03:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD9871D358B;
-	Tue,  5 Nov 2024 10:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D014B1CF5C7;
+	Tue,  5 Nov 2024 10:03:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gphwC22X"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="AWK+0SUU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
+Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DD681D319F
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 10:20:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 016D218F2F7
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 10:03:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730802026; cv=none; b=ItgxO/Mcy3d1BLDyvvuq/KdH8zj6bBr7Zf31gMbFY98eCbvzF7TC7YEOKcxorBHQkTZwVcANpcwCcoMVKW9BbqDXd+Ytw2GT8MJ2upODlkmCDY5DTWigl0tQHZBa/rci2M5gLlvdrbaNuUY82fG4J2ND7L8xtewyKYE1z0ysFHM=
+	t=1730801003; cv=none; b=DHxLrvetj6Da8PzM2uQ5pmTwS/cOcJZEvIKBby47Kv8go6Z49dB4hhF6F7UsDhSwqCvNG7USxu79rjiISYcd+Fb/u0w2JhUe4UZ9xq6t8Fu+Pi6Dn395SHFIWmdJopnDiLffnvjVNnWHNPKypAuujCWpo+s17qbLG5OZMTaFin0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730802026; c=relaxed/simple;
-	bh=Paw3NHGBKcpYWKx6/8kixwuXZd4axLGz+zE8p3Aik4E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=gHoYklwCLdv2fFhiumOcMB9S4yDMreuDr00suquj3+errcSNW7rhabR4eN5g5sUh3JCJ2HsYLtwORBsmd1rOB2qhqRqG4CQbZEwOEPgDvbSwwn+yAeQJgPtBobFM+gu9/rTsdCUpuvQKIziqer4IEeHA6S60hgV4092nTDG5cOE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gphwC22X; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20cdda5cfb6so51295965ad.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 02:20:25 -0800 (PST)
+	s=arc-20240116; t=1730801003; c=relaxed/simple;
+	bh=BaF0wzuPEUJAYWOn5Vuel0BojFI/gn6vtsm/k2Am+60=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=oZlI2eSSA2w3ifSUvlkUn3j+ZgUWjvL1Ujvk5PyehCXCTMQvVQ3gHfUD+71iKePu+AQKi54jdF68S+JzP3yHvuHyHQi3KQlB281IseHaTprEoHQa5yps+7Zr7N1QSwpxECicd65rtWc7ndDYHcFLmlMavm4t58bIfOri9nmKenk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=AWK+0SUU; arc=none smtp.client-ip=209.85.208.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5cec93719ccso3840251a12.2
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 02:03:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730802024; x=1731406824; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KpyF7OfeG3D1SjYyfRqhBhCivmBUEISeT2uU0LeHwvU=;
-        b=gphwC22XoX9jAEwWZkDO9Pu0tryY9k4lG9StauzgTFCFW7g+W+7kR+aykHTbUed56v
-         VnzOZIq+/HJXlzh2OcqrVIpAFIQA4H51q2zoKxPd1sDxoOeJ8CuW9SAdsfPw8P4OacDi
-         Ff9tl7d5j9hJ5MLwh6g7WgvjVqFIM5wyN0Udw=
+        d=google.com; s=20230601; t=1730801000; x=1731405800; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1z0zDjEHRjC9Hfy868GHIkGTopMm6yXCtknHbsE1cok=;
+        b=AWK+0SUUvLS7bh+x0OeFTdaBgoyEb65X/DlF0HmL7aWdyHFooDyp+t+gBZBzCUCK4e
+         5F56a5/4Ti1eUf+LG5O8t4uMIAWMwdGtDkLoRZxAppDIGPlvv31SFaOpE+FNcl9xzAru
+         Nf5PamrbA+vY+Fj/ARKbzKfsYtmEghy//JWCoKQMUtyyie4wC4FpQF4iP9OxEzhzBpnc
+         HWBWdRjeHn8a8kY3T5vjZinype/ikZyBIwN+6Zxoglx6D4Wcz1nRX6HTg2WvCTUI38mJ
+         sgvAZmQHhQUZ3LTyoHCng0AzQaWhu/FoT79SslIqXrP5cT+F2LkBmbWnOWJQh0LctEDj
+         sitg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730802024; x=1731406824;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KpyF7OfeG3D1SjYyfRqhBhCivmBUEISeT2uU0LeHwvU=;
-        b=vYQaf3cffBMFSoGjzIvDz9A454/nDaXXTZgiNQZjGPB157CJ7m1p3FuZmIWEijFODn
-         +FHpRnmHTedGVb9dBzCm1IqzWLiVxxHfr1tEfYWXmQfGOW0qpbpWnjMlck2qcxNHgjl1
-         ddUm3JVLV6JNMtcH0ik3+t8KE+v5UvB4A/04eZ3MAgja0TupXQTFlPCGrH3msdcNDwyX
-         crIaiGyVPhL4CNVRy+6slFvqj6KxDw8v2HWPC/6RcstKRZ2Rpk/k6wzdq3xvk9yRTyr2
-         HBPCxJV99Hyg9/V66If2f7zL6jmFam1miOO5mhgDotQ5eQHY5H+LXhcbdZIsfuJ23/WW
-         A8Vg==
-X-Forwarded-Encrypted: i=1; AJvYcCVVvLCmeDIRFglzTwqRzUI3G8FzP5M8NzWKVsodSB1qissX+/AeVQahLpN8TQCjcqMNOHLcgWE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWhM2dduwQkQ0jY0Gk5RppcxVk4C0YxYWFO4A4xihW5qITFRC4
-	bxUko6yCbHSbj4gXyEDFlVkSEwwoa8q7UPK0NJiknWFbYc9ViYbtloS37u+Djg==
-X-Google-Smtp-Source: AGHT+IGDA/T6jNMV6isflQdNhX8z5d4jQN6lHmbWf0KOf1PRzPJ2hcQhVufloO0CQOiqBtfzV2pATQ==
-X-Received: by 2002:a17:902:ea12:b0:20c:dd71:c94f with SMTP id d9443c01a7336-21103c5c8a1mr263586265ad.41.1730802024616;
-        Tue, 05 Nov 2024 02:20:24 -0800 (PST)
-Received: from sxavier-dev.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21105707132sm75306615ad.96.2024.11.05.02.20.21
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Nov 2024 02:20:23 -0800 (PST)
-From: Selvin Xavier <selvin.xavier@broadcom.com>
-To: leon@kernel.org,
-	jgg@ziepe.ca
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	michael.chan@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	Selvin Xavier <selvin.xavier@broadcom.com>
-Subject: [PATCH rdma-next 3/3] RDMA/bnxt_re: Add set_func_resources support for P5/P7 adapters
-Date: Tue,  5 Nov 2024 01:59:12 -0800
-Message-Id: <1730800752-29925-4-git-send-email-selvin.xavier@broadcom.com>
-X-Mailer: git-send-email 2.5.5
-In-Reply-To: <1730800752-29925-1-git-send-email-selvin.xavier@broadcom.com>
-References: <1730800752-29925-1-git-send-email-selvin.xavier@broadcom.com>
+        d=1e100.net; s=20230601; t=1730801000; x=1731405800;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1z0zDjEHRjC9Hfy868GHIkGTopMm6yXCtknHbsE1cok=;
+        b=wncsUPSOIgKmJJ2JHEVWsaZpqL4uUT/jQJB0a18/B2a7ZHux82tx250DupboU6OFeE
+         LBk+8c87R1pnVV4B1bVcLmfYytZDiPnyF2IbEICcZMe8OzusGp8Rad77cy524SFa/GQP
+         e7ykCM/mFmt7OMXYJZ35Nt39eFyRIRK8tu6G6tawbwwZoH4tb7xE4NzC6yE0/NxochRO
+         AlK5NuFq2DsBGJub97J7AKCPsxS2rwu3KAtGEMZUPrwajc23eqyTyRXLcLwN1FxscoxR
+         G4DH8BUP+SZghlLURRDhrfXVYQ/SxYZqqk1c2XlGLFTeFwEDsKIcmagRcq7NS5Ue4ztA
+         qxcw==
+X-Forwarded-Encrypted: i=1; AJvYcCVGsRZ6S/G1IwNdfsI/tkZJlkVbPMa85AX0banG9MnKo6raVCDf13ZXfbCyOWixLfyMpoeR5os=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzLAdl7oWSj7lif0y9Vn3WrfdWpyQcK+//Oczj7iWC77se5FAp5
+	wvm1hQSSsqUxed0l+knFitkaJiSUDYRciuEfSpznpA8T/169ZscQ3m/pvxqWkiljwB+XeuPIq2y
+	Mz+CaJFxwdUEJl8UFpit5fxe4qvcf76KzTyns
+X-Google-Smtp-Source: AGHT+IEyI8/rO3O6vCmIdqpoUCThcWAuJk2RjWyvjFO7qe0jt1NnbcDP73Gpn0wkWtGACbeM0/IJ3Zp2xvjpe+OkAD0=
+X-Received: by 2002:a05:6402:350e:b0:5ce:cfef:1d08 with SMTP id
+ 4fb4d7f45d1cf-5cecfef1e06mr7705656a12.32.1730801000129; Tue, 05 Nov 2024
+ 02:03:20 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20241105010347.2079981-1-kuba@kernel.org> <20241105053115.59273-1-kuniyu@amazon.com>
+In-Reply-To: <20241105053115.59273-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 5 Nov 2024 11:03:08 +0100
+Message-ID: <CANn89i+pzZaPL5tpZ6f5crWQ3K9LGYNHdJpnTXDsGTNzZ4og4Q@mail.gmail.com>
+Subject: Re: [PATCH net 1/2] netlink: terminate outstanding dump on socket close
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: kuba@kernel.org, davem@davemloft.net, johannes@sipsolutions.net, 
+	netdev@vger.kernel.org, pabeni@redhat.com, pablo@netfilter.org, 
+	syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+On Tue, Nov 5, 2024 at 6:31=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Jakub Kicinski <kuba@kernel.org>
+> Date: Mon,  4 Nov 2024 17:03:46 -0800
+> > Netlink supports iterative dumping of data. It provides the families
+> > the following ops:
+> >  - start - (optional) kicks off the dumping process
+> >  - dump  - actual dump helper, keeps getting called until it returns 0
+> >  - done  - (optional) pairs with .start, can be used for cleanup
+> > The whole process is asynchronous and the repeated calls to .dump
+> > don't actually happen in a tight loop, but rather are triggered
+> > in response to recvmsg() on the socket.
+> >
+> > This gives the user full control over the dump, but also means that
+> > the user can close the socket without getting to the end of the dump.
+> > To make sure .start is always paired with .done we check if there
+> > is an ongoing dump before freeing the socket, and if so call .done.
+> >
+> > The complication is that sockets can get freed from BH and .done
+> > is allowed to sleep. So we use a workqueue to defer the call, when
+> > needed.
+> >
+> > Unfortunately this does not work correctly. What we defer is not
+> > the cleanup but rather releasing a reference on the socket.
+> > We have no guarantee that we own the last reference, if someone
+> > else holds the socket they may release it in BH and we're back
+> > to square one.
+> >
+> > The whole dance, however, appears to be unnecessary. Only the user
+> > can interact with dumps, so we can clean up when socket is closed.
+> > And close always happens in process context. Some async code may
+> > still access the socket after close, queue notification skbs to it etc.
+> > but no dumps can start, end or otherwise make progress.
+> >
+> > Delete the workqueue and flush the dump state directly from the release
+> > handler. Note that further cleanup is possible in -next, for instance
+> > we now always call .done before releasing the main module reference,
+> > so dump doesn't have to take a reference of its own.
+>
+> and we can remove netns & reftracker switching for kernel socket
+>
+>
+> >
+> > Reported-by: syzbot <syzkaller@googlegroups.com>
+> > Fixes: ed5d7788a934 ("netlink: Do not schedule work from sk_destruct")
+>
+> Do you have a link to a public report ?
 
-Enable set_func_resources for P5 and P7 adapters to handle
-VF resource distribution. Remove setting max resources per VF
-during PF initialization. This change is required for firmwares
-which does not support RoCE VF resource management by NIC driver.
-The code is same for all adapters now.
+I only had reports for old kernels (6.1 stable), but the repro seems
+to work on current kernel.
 
-Reviewed-by: Stephen Shi <stephen.shi@broadcom.com>
-Reviewed-by: Rukhsana Ansari <rukhsana.ansari@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
----
- drivers/infiniband/hw/bnxt_re/main.c       | 11 ++++++-----
- drivers/infiniband/hw/bnxt_re/qplib_rcfw.c | 11 +----------
- 2 files changed, 7 insertions(+), 15 deletions(-)
+>
+> Previously syzkaller's author asked me to use a different name for
+> Reported-by not to confuse their internal metrics if the report is
+> generated by local syzkaller.
 
-diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index dd528dd..cb61941 100644
---- a/drivers/infiniband/hw/bnxt_re/main.c
-+++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -291,11 +291,12 @@ static void bnxt_re_vf_res_config(struct bnxt_re_dev *rdev)
- 	 * available at this point.
- 	 */
- 	rdev->num_vfs = pci_sriov_get_totalvfs(rdev->en_dev->pdev);
--	if (!bnxt_qplib_is_chip_gen_p5_p7(rdev->chip_ctx)) {
--		bnxt_re_set_resource_limits(rdev);
--		bnxt_qplib_set_func_resources(&rdev->qplib_res, &rdev->rcfw,
--					      &rdev->qplib_ctx);
--	}
-+	if (!rdev->num_vfs)
-+		return;
-+
-+	bnxt_re_set_resource_limits(rdev);
-+	bnxt_qplib_set_func_resources(&rdev->qplib_res, &rdev->rcfw,
-+				      &rdev->qplib_ctx);
- }
- 
- static void bnxt_re_shutdown(struct auxiliary_device *adev)
-diff --git a/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c b/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
-index 005079b..7072991 100644
---- a/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
-+++ b/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
-@@ -851,10 +851,8 @@ int bnxt_qplib_init_rcfw(struct bnxt_qplib_rcfw *rcfw,
- 	 * shall setup this area for VF. Skipping the
- 	 * HW programming
- 	 */
--	if (is_virtfn)
-+	if (is_virtfn || bnxt_qplib_is_chip_gen_p5_p7(rcfw->res->cctx))
- 		goto skip_ctx_setup;
--	if (bnxt_qplib_is_chip_gen_p5_p7(rcfw->res->cctx))
--		goto config_vf_res;
- 
- 	lvl = ctx->qpc_tbl.level;
- 	pgsz = bnxt_qplib_base_pg_size(&ctx->qpc_tbl);
-@@ -898,13 +896,6 @@ int bnxt_qplib_init_rcfw(struct bnxt_qplib_rcfw *rcfw,
- 	req.number_of_srq = cpu_to_le32(ctx->srqc_tbl.max_elements);
- 	req.number_of_cq = cpu_to_le32(ctx->cq_tbl.max_elements);
- 
--config_vf_res:
--	req.max_qp_per_vf = cpu_to_le32(ctx->vf_res.max_qp_per_vf);
--	req.max_mrw_per_vf = cpu_to_le32(ctx->vf_res.max_mrw_per_vf);
--	req.max_srq_per_vf = cpu_to_le32(ctx->vf_res.max_srq_per_vf);
--	req.max_cq_per_vf = cpu_to_le32(ctx->vf_res.max_cq_per_vf);
--	req.max_gid_per_vf = cpu_to_le32(ctx->vf_res.max_gid_per_vf);
--
- skip_ctx_setup:
- 	if (BNXT_RE_HW_RETX(rcfw->res->dattr->dev_cap_flags))
- 		flags |= CMDQ_INITIALIZE_FW_FLAGS_HW_REQUESTER_RETX_SUPPORTED;
--- 
-2.5.5
+I definitely have upstream reports (latest tree) but no repro yet.
 
+I can release them, but IMO this would add noise to the mailing lists,
+already flooded with such reports.
+
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
