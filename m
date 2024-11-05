@@ -1,135 +1,150 @@
-Return-Path: <netdev+bounces-141864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92EC19BC914
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:25:56 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8ED809BC91B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:28:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C43CD1C210C8
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:25:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 546AD28325B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F8651CFEDB;
-	Tue,  5 Nov 2024 09:25:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE0341CEEB8;
+	Tue,  5 Nov 2024 09:28:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="ueUscxhA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cpB4VIKL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+Received: from mail-wr1-f42.google.com (mail-wr1-f42.google.com [209.85.221.42])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E071CEAD3
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:25:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B01070837;
+	Tue,  5 Nov 2024 09:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730798751; cv=none; b=Rgw+dl/D79r1R6Lg4kS2zo9YfLWW2QKrzKWP0f2B4MTzOek3OyjAou7klKhNF718z2wLLJumKCSh8fj7oKdYN0lmTDG6XmN+JMapQ3CVS8ikpsfnNAQ+JzYZxl6V1VKOBUA/HJ9pWlRHRu8IXTsBAWhLQxDEwG/4FYw6yZqM8LA=
+	t=1730798896; cv=none; b=HIMLc1hEwKX8nw+OXVYiepUzMgQbTX4wwepwgJ9VoCorc4NATdwl/Q1XDYqW6tAK5UQ+u29zmvKMnEXxayBs7k+uSFs/78Hp1Jb7jyvkKoKzhy6OzUWxDZWQYEUpB+HOKYbFADITcgLIA1Ppcx8RuWV8nPnlAAuE0Bk+4iPDwlw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730798751; c=relaxed/simple;
-	bh=KcY42FPvtnq6OFbQUwWWfgE+hW7UfWMrW1tl39zYFaU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Y+Fqe7Su3GyEZyJMo7UGqJNj1v7RCFGQZgBToTidPOeBdQFZfj8yiaff0FlNGKSJhP6JUdrQBQlLCrRNBNQmfEJr0mR9UtP508mzKLIT+YCjHy7O1KUQZeRQRm5D5twpmK0xLEvV7BYvzBaMdnHpzzM5GVaUdFOblBsYbGlJkS4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=ueUscxhA; arc=none smtp.client-ip=209.85.208.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5c984352742so6197272a12.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 01:25:49 -0800 (PST)
+	s=arc-20240116; t=1730798896; c=relaxed/simple;
+	bh=SOqA2KiSZ66RBSDN2Mzk1Ili+tcTWEUSzG2MTS2LVAw=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nFPYFhj6/8tw0wzFKnZW3WJa1bTgEpvz3izQA0od5pNR2x060S5VPnNZeqGFGMAn/EoU1rvF+joGlffofPLJdJTq1v3RsV8QY3+p6pdDsqmPs+IVk/6+wfnpxdiCx9zwvZRzNBeRX4/gn5IAB7r1k92g6Xq0CGhEe9za8jEV3xY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cpB4VIKL; arc=none smtp.client-ip=209.85.221.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f42.google.com with SMTP id ffacd0b85a97d-37d462c91a9so3068554f8f.2;
+        Tue, 05 Nov 2024 01:28:14 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730798748; x=1731403548; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=s9FPXG1LQELNToyRoGqMx1mS5uhmOWH7uDHaAUOLnUw=;
-        b=ueUscxhA8AXkI1svH/2ejX60BzZGbFmong8EFGvvPLIkBckgzXuAVKiSwD75OMO69j
-         ZFVubf8p/xOpG9mX4aw5J3fUAsagiGDEIJLfMPAj4JqkAG4cRnyr7JSbtyueBqLa3zpx
-         rIx2yY+R3C7OfsIDNJWiiqW/6tVDuiqo+XA4fvkJk7Vfq/pMubb1aJR3bp2a19Tr+BDJ
-         W64OSqrYIIv/ynVeGJI64eg9zmrJQE27BfsiSEiDGxoLm0V9d60cSmnQB3lpinlY3VEt
-         kdNSfvuNw5tUXbKudC7WgMVa94y6psND9F1cCOByetjLpcjc+7vck4iwWgJlBtJdlOV0
-         jUAQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730798748; x=1731403548;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1730798893; x=1731403693; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=s9FPXG1LQELNToyRoGqMx1mS5uhmOWH7uDHaAUOLnUw=;
-        b=fJRxkLMVxEEJXcgZ5+NzCW3XnzlGuyFRRho0BE7fsifhPZBNfk3+yMvJ4gBqJ2kxRF
-         K2VDRl9PMUkYj8ANALEx61/YTSIp6x3EIt3tI2OcTH6l9WkA6E4T7C0ZbZA2Y6fRHH4+
-         ldQB/U653dqrg09tX1SNCqoNqZr9E/4kDiThVbWlQ4G/X7aT/KW2TZ8COLFy0YQG6Oxy
-         j2/MjQllIY3AHJqkHeHw38oxWUtVFzDitUD085o9kjGr55sM9PtgdQt5G4c1dPZ9uQFv
-         7+3/IsMm/Y9VGqFZzPM0bSEaOG/CfwkxJvX4kJdYPpVduUzaGsdlLWsip9gibgYGRKsv
-         LUYw==
-X-Forwarded-Encrypted: i=1; AJvYcCV+q0UlsAmw7J1Nfefb6RRD++E6IMHEICD/a+c756rIu9zJFNZySpVkK9St0/v/FJ+L/j0SjTE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzbiJPtbgW9VZufIGcJCkWfy31G/59W1Pj3K/eH3Hv2ZSOX0+Aw
-	UFbi3ZH6TPYzhUA5jd7MFPD2mB1qR1a51t+uJ9/64SWeIOV+wzp3+QAXUD3PoW/IzsENJtl6jrV
-	PUVQIMjVNpr193qFbLLzfIsqZtEKI4UN/UVPs
-X-Google-Smtp-Source: AGHT+IFWw5e0Lj3WFMEm21UIlPzv+yQa97oWMx8p8bOR9ghoVbBQ1kyOtpJM5Qa+FzaQTbnGQmtSwGG5N1r5PakPfjY=
-X-Received: by 2002:a17:907:2cc7:b0:a99:d308:926 with SMTP id
- a640c23a62f3a-a9de632d0a5mr3159772266b.57.1730798747742; Tue, 05 Nov 2024
- 01:25:47 -0800 (PST)
+        bh=WfYpsiaVhokXvMRE5Ly3ANC1QV6XyEt1nW28Am+u6yM=;
+        b=cpB4VIKLRo+biLeU7uth0wOg04Hh3BKEzc5w45caHRW2qCunbuzkI69SELOq/i04yf
+         UaHvov29iygUR/hK4tAEhjYWkyjLxfDEU3H/eaudwRJjtovzyDRGoujfNFvHA9vt8Ats
+         8qcy6eSvtVqxj30YclccOIDriAn8TCrF4K9uM20/J6hOa6GhiwEnUrLt69FtWPHgr8oI
+         CkRpJ7MjrF17c/GBVqI2prCIGqsUBIyV6imsiNppVdDi6WczRrjlhYItGzu2cnU7fA4v
+         1jix8OFR+hNW7UwKyLm2FRKbGV6stiPzGrPBP9P3fg2WQNe/q/ce7oYxeLotKprEDOjf
+         ebLg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730798893; x=1731403693;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=WfYpsiaVhokXvMRE5Ly3ANC1QV6XyEt1nW28Am+u6yM=;
+        b=S69IaRBBcdW0MtuT7JNxFCEth1LtuHGT5I/NryVV4CtqHW1ITsGHaSn4Y7Gyn5Yh/N
+         uKw5VlMR2ax4OuJbfG1vdurmxWpA2ygFkPcfKlguqaZwBcWIdO0M5K0MQ79kw5ekyqGn
+         Sr6rzyOsrGa4sEtq52PyDIvwodvWcVkEKCwSctd0wCRcjBoDGx/1rEg+NNtVIzgSdljx
+         /PdJIyLkcuUGhllDmxXg77CxLZcuIdkq3KR4ftV2U/3MBSlYjTQk2wbTNNfJemdLuJ5k
+         mNoRMGKXTsTzDWFqtvcFTewXBto8IXUzRMci8VZbXMXHZ1vB7htX/qa52J+JmNaV3S8u
+         3kjw==
+X-Forwarded-Encrypted: i=1; AJvYcCWbu6X0iI87zXgdLtF0RNmvXTfAxkPQN9VlHF51YngRzZyVV+/TIezRoa7U/6c8X9aZZ6JwQGmi@vger.kernel.org, AJvYcCXZOld9RAhPEk/7HEial9ieiXZfDdz+1l4gl5h1n6TKQ+Up8jM1mXxySGB1/FS/fDfDFwWneHDI02Lt9Lk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzJ9MT3ZkHbKs8T0WSK83FlbxHnOM837ODF1u8RysFA1/H++PX7
+	erG87viVEXgu3zJc2QesS+n7If4nhiT93vzvW9wpL2EFsO/LFQTo
+X-Google-Smtp-Source: AGHT+IHSIm7YyJ7tIlnXXnQYXgLSSY1yNj5/Ic8h4kFjLi0jQrWKCtJcJOW3S4lKcs+sxaecJgfr7w==
+X-Received: by 2002:a05:6000:d0f:b0:378:e8a9:98c5 with SMTP id ffacd0b85a97d-381b708b566mr15215408f8f.34.1730798893173;
+        Tue, 05 Nov 2024 01:28:13 -0800 (PST)
+Received: from localhost ([81.168.73.77])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c113e69fsm15508974f8f.69.2024.11.05.01.28.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 01:28:12 -0800 (PST)
+Date: Tue, 5 Nov 2024 09:28:17 +0000
+From: Martin Habets <habetsm.xilinx@gmail.com>
+To: linux@treblig.org
+Cc: ecree.xilinx@gmail.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	netdev@vger.kernel.org, linux-net-drivers@amd.com,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/4] sfc: Remove unused efx_mae_mport_vf
+Message-ID: <20241105092817.GB595392@gmail.com>
+Mail-Followup-To: linux@treblig.org, ecree.xilinx@gmail.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-net-drivers@amd.com, linux-kernel@vger.kernel.org
+References: <20241102151625.39535-1-linux@treblig.org>
+ <20241102151625.39535-3-linux@treblig.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912071702.221128-1-en-wei.wu@canonical.com>
- <20240912113518.5941b0cf@gmx.net> <CANn89iK31kn7QRcFydsH79Pm_FNUkJXdft=x81jvKD90Z5Y0xg@mail.gmail.com>
- <CAMqyJG1W1ER0Q_poS7HQhsogxr1cBo2inRmyz_y5zxPoMtRhrA@mail.gmail.com>
- <CANn89iJ+ijDsTebhKeviXYyB=NQxP2=srpZ99Jf677+xTe7wqg@mail.gmail.com>
- <CAMqyJG1aPBsRFz1XK2JvqY+QUg2HhxugVXG1ZaF8yKYg=KoP3Q@mail.gmail.com>
- <CANn89i+4c0iLXXjFpD1OWV7OBHr5w4S975MKRVB9VU2L-htm4w@mail.gmail.com>
- <CAMqyJG2MqU46jRC1NzYCUeJ45fiP5Z5nS78Mi0FLFjbKbLVrFg@mail.gmail.com> <CAMqyJG0DYVaTXHxjSH8G8ZPRc=2aDB0SZVhoPf2MXpiNT1OXxA@mail.gmail.com>
-In-Reply-To: <CAMqyJG0DYVaTXHxjSH8G8ZPRc=2aDB0SZVhoPf2MXpiNT1OXxA@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Nov 2024 10:25:35 +0100
-Message-ID: <CANn89iL-r3+HBC10m+QdFVn20DdNH=r5EBQDV=EmewWm6Vsyqg@mail.gmail.com>
-Subject: Re: [PATCH ipsec v2] xfrm: check MAC header is shown with both
- skb->mac_len and skb_mac_header_was_set()
-To: En-Wei WU <en-wei.wu@canonical.com>
-Cc: Peter Seiderer <ps.report@gmx.net>, steffen.klassert@secunet.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kai.heng.feng@canonical.com, chia-lin.kao@canonical.com, 
-	anthony.wong@canonical.com, kuan-ying.lee@canonical.com, 
-	chris.chiu@canonical.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241102151625.39535-3-linux@treblig.org>
 
-On Fri, Oct 18, 2024 at 3:22=E2=80=AFPM En-Wei WU <en-wei.wu@canonical.com>=
- wrote:
->
-> > Seems like the __netif_receive_skb_core() and dev_gro_receive() are
-> > the places where it calls skb_reset_mac_len() with skb->mac_header =3D
-> > ~0U.
-> I believe it's the root cause.
->
-> My concern is that if we put something like:
-> +       if (!skb_mac_header_was_set(skb)) {
-> +               DEBUG_NET_WARN_ON_ONCE(1);
-> +               skb->mac_len =3D 0;
-> in skb_reset_mac_len(), it may degrade the RX path a bit.
+On Sat, Nov 02, 2024 at 03:16:23PM +0000, linux@treblig.org wrote:
+> 
+> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+> 
+> efx_mae_mport_vf() has been unused since
+> commit 5227adff37af ("sfc: add mport lookup based on driver's mport data")
+> 
+> Remove it.
+> 
+> Signed-off-by: Dr. David Alan Gilbert <linux@treblig.org>
 
-I do not have such concerns. Note this is temporary until we fix the root c=
-ause.
+Acked-by: Martin Habets <habetsm.xilinx@gmail.com>
 
->
-> Catching the bug in xfrm4_remove_tunnel_encap() and
-> xfrm6_remove_tunnel_encap() (the original patch) is nice because it
-> won't affect the systems which are not using the xfrm.
->
-
-Somehow xfrm is feeding to gro_cells_receive() packets without the mac
-header being set, this is the bug that needs to be fixed.
-
-GRO needs skb_mac_header() to return the correct pointer.
-
-For normal GRO, it is set either in :
-
-1) napi_gro_frags : napi_frags_skb()  calls skb_reset_mac_header(skb);
-
-2) napi_gro_receive() : callers are supposed to call eth_type_trans()
-before calling napi_gro_receive().
-    eth_type_trans() calls skb_reset_mac_header() as expected.
-
-xfrm calls skb_mac_header_rebuild(), but it might be a NOP if MAC
-header was never set.
+> ---
+>  drivers/net/ethernet/sfc/mae.c | 11 -----------
+>  drivers/net/ethernet/sfc/mae.h |  1 -
+>  2 files changed, 12 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/sfc/mae.c b/drivers/net/ethernet/sfc/mae.c
+> index 10709d828a63..50f097487b14 100644
+> --- a/drivers/net/ethernet/sfc/mae.c
+> +++ b/drivers/net/ethernet/sfc/mae.c
+> @@ -76,17 +76,6 @@ void efx_mae_mport_uplink(struct efx_nic *efx __always_unused, u32 *out)
+>  	*out = EFX_DWORD_VAL(mport);
+>  }
+>  
+> -void efx_mae_mport_vf(struct efx_nic *efx __always_unused, u32 vf_id, u32 *out)
+> -{
+> -	efx_dword_t mport;
+> -
+> -	EFX_POPULATE_DWORD_3(mport,
+> -			     MAE_MPORT_SELECTOR_TYPE, MAE_MPORT_SELECTOR_TYPE_FUNC,
+> -			     MAE_MPORT_SELECTOR_FUNC_PF_ID, MAE_MPORT_SELECTOR_FUNC_PF_ID_CALLER,
+> -			     MAE_MPORT_SELECTOR_FUNC_VF_ID, vf_id);
+> -	*out = EFX_DWORD_VAL(mport);
+> -}
+> -
+>  /* Constructs an mport selector from an mport ID, because they're not the same */
+>  void efx_mae_mport_mport(struct efx_nic *efx __always_unused, u32 mport_id, u32 *out)
+>  {
+> diff --git a/drivers/net/ethernet/sfc/mae.h b/drivers/net/ethernet/sfc/mae.h
+> index 8df30bc4f3ba..db79912c86d8 100644
+> --- a/drivers/net/ethernet/sfc/mae.h
+> +++ b/drivers/net/ethernet/sfc/mae.h
+> @@ -23,7 +23,6 @@ int efx_mae_free_mport(struct efx_nic *efx, u32 id);
+>  
+>  void efx_mae_mport_wire(struct efx_nic *efx, u32 *out);
+>  void efx_mae_mport_uplink(struct efx_nic *efx, u32 *out);
+> -void efx_mae_mport_vf(struct efx_nic *efx, u32 vf_id, u32 *out);
+>  void efx_mae_mport_mport(struct efx_nic *efx, u32 mport_id, u32 *out);
+>  
+>  int efx_mae_lookup_mport(struct efx_nic *efx, u32 selector, u32 *id);
+> -- 
+> 2.47.0
+> 
 
