@@ -1,29 +1,29 @@
-Return-Path: <netdev+bounces-141833-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141834-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2FA9A9BC81E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:38:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AE189BC81F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D16F71F23AC6
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:38:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBC3A1C2244A
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3581B1C9EB8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C747C1CEE90;
 	Tue,  5 Nov 2024 08:38:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C65CF19993D
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC1C1C1738
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:38:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730795910; cv=none; b=j4q4jkOGvi0p83iJBXB3Wwi7BVhQgB4DuIh+8g9patmgGOTZhEoZY0RHzIMWIyUazXLapzd3TJii/mJutrLl1I5s7D/ZVTHpSRar2EplRXsX15IWR1sJY40fZ1eR2JiSA//vqLcb8PXzxxBfj+RIqXUaFwzGBjFV6RYdKHlmrcQ=
+	t=1730795910; cv=none; b=br4yDx3D52y1Wgryb2HW69ju/gsccdB8BUxdZP0kCl0zajJxFY/rn8oVnqlIQrp3RjgwG4gWih12sRNgFlbMKF3UhlLOUTAgwxEmCFM8TX3z4Zaobv9FPNYolPjqfokTUAbIDQcBVltZLVjKQd/+amLosSWZkaxJH8lgZoT5OIg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730795910; c=relaxed/simple;
-	bh=a8/vqaW0uX50yZryzxBJ2Zz1oZFtb94lbgHBcf3srY8=;
+	bh=cs5FwVbfG3y1i8CIGwBk01J+7DPDZQO+k9vVkhonCL4=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=u60o5Ki8FPUZQepNQqnlgs1MlLnGHnXz7r4yOah/rQyS4s6vsK1Tl6vLTCLACkfVPvzAOw5hdR1z5A/++tKq2aojinI94WmZvZUGEFqzYr3X3RuMscmySGavKzVAd7g18giuhYMIHQwJ+GGB1JXcP7XBFaS6NAqA+RNsEdrsLWs=
+	 MIME-Version; b=L9CFC0Dv2qIaG/cI0QfTMp71chvZp+eLa+td43OXtTLMl5ts+Fznco4V1sKOsMu76FGRAzkCRpdkhhdcedXwvNN7vajWKKhCPoGf9QeFRPfIb0jdaJuG1nD1grs3rgIDxagSdXAefHr2F/UwEuBBs4eecW9PqBOMNGULTSi0Ig0=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
 Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
@@ -31,8 +31,8 @@ Received: from labnh.big (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 9F2677D11A;
-	Tue,  5 Nov 2024 08:38:27 +0000 (UTC)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 4130C7D121;
+	Tue,  5 Nov 2024 08:38:28 +0000 (UTC)
 From: Christian Hopps <chopps@chopps.org>
 To: devel@linux-ipsec.org
 Cc: Steffen Klassert <steffen.klassert@secunet.com>,
@@ -43,9 +43,9 @@ Cc: Steffen Klassert <steffen.klassert@secunet.com>,
 	Antony Antony <antony@phenome.org>,
 	Christian Hopps <chopps@chopps.org>,
 	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v13 01/15] xfrm: config: add CONFIG_XFRM_IPTFS
-Date: Tue,  5 Nov 2024 03:37:45 -0500
-Message-ID: <20241105083759.2172771-2-chopps@chopps.org>
+Subject: [PATCH ipsec-next v13 02/15] include: uapi: protocol number and packet structs for AGGFRAG in ESP
+Date: Tue,  5 Nov 2024 03:37:46 -0500
+Message-ID: <20241105083759.2172771-3-chopps@chopps.org>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241105083759.2172771-1-chopps@chopps.org>
 References: <20241105083759.2172771-1-chopps@chopps.org>
@@ -59,40 +59,55 @@ Content-Transfer-Encoding: 8bit
 
 From: Christian Hopps <chopps@labn.net>
 
-Add new Kconfig option to enable IP-TFS (RFC9347) functionality.
+Add the RFC assigned IP protocol number for AGGFRAG.
+Add the on-wire basic and congestion-control IP-TFS packet headers.
 
 Signed-off-by: Christian Hopps <chopps@labn.net>
 ---
- net/xfrm/Kconfig | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+ include/uapi/linux/in.h |  2 ++
+ include/uapi/linux/ip.h | 16 ++++++++++++++++
+ 2 files changed, 18 insertions(+)
 
-diff --git a/net/xfrm/Kconfig b/net/xfrm/Kconfig
-index d7b16f2c23e9..f0157702718f 100644
---- a/net/xfrm/Kconfig
-+++ b/net/xfrm/Kconfig
-@@ -135,6 +135,22 @@ config NET_KEY_MIGRATE
+diff --git a/include/uapi/linux/in.h b/include/uapi/linux/in.h
+index 5d32d53508d9..ced0fc3c3aa5 100644
+--- a/include/uapi/linux/in.h
++++ b/include/uapi/linux/in.h
+@@ -79,6 +79,8 @@ enum {
+ #define IPPROTO_MPLS		IPPROTO_MPLS
+   IPPROTO_ETHERNET = 143,	/* Ethernet-within-IPv6 Encapsulation	*/
+ #define IPPROTO_ETHERNET	IPPROTO_ETHERNET
++  IPPROTO_AGGFRAG = 144,	/* AGGFRAG in ESP (RFC 9347)		*/
++#define IPPROTO_AGGFRAG		IPPROTO_AGGFRAG
+   IPPROTO_RAW = 255,		/* Raw IP packets			*/
+ #define IPPROTO_RAW		IPPROTO_RAW
+   IPPROTO_SMC = 256,		/* Shared Memory Communications		*/
+diff --git a/include/uapi/linux/ip.h b/include/uapi/linux/ip.h
+index 283dec7e3645..5bd7ce934d74 100644
+--- a/include/uapi/linux/ip.h
++++ b/include/uapi/linux/ip.h
+@@ -137,6 +137,22 @@ struct ip_beet_phdr {
+ 	__u8 reserved;
+ };
  
- 	  If unsure, say N.
- 
-+config XFRM_IPTFS
-+	tristate "IPsec IP-TFS/AGGFRAG (RFC 9347) encapsulation support"
-+	depends on XFRM
-+	help
-+	  Information on the IP-TFS/AGGFRAG encapsulation can be found
-+	  in RFC 9347. This feature supports demand driven (i.e.,
-+	  non-constant send rate) IP-TFS to take advantage of the
-+	  AGGFRAG ESP payload encapsulation. This payload type
-+	  supports aggregation and fragmentation of the inner IP
-+	  packet stream which in turn yields higher small-packet
-+	  bandwidth as well as reducing MTU/PMTU issues. Congestion
-+	  control is unimplementated as the send rate is demand driven
-+	  rather than constant.
++struct ip_iptfs_hdr {
++	__u8 subtype;		/* 0*: basic, 1: CC */
++	__u8 flags;
++	__be16 block_offset;
++};
 +
-+	  If unsure, say N.
++struct ip_iptfs_cc_hdr {
++	__u8 subtype;		/* 0: basic, 1*: CC */
++	__u8 flags;
++	__be16 block_offset;
++	__be32 loss_rate;
++	__be64 rtt_adelay_xdelay;
++	__be32 tval;
++	__be32 techo;
++};
 +
- config XFRM_ESPINTCP
- 	bool
- 
+ /* index values for the variables in ipv4_devconf */
+ enum
+ {
 -- 
 2.47.0
 
