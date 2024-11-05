@@ -1,30 +1,31 @@
-Return-Path: <netdev+bounces-141852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141856-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 740059BC8B1
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:10:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40D2C9BC8BD
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:11:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37C3B283850
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:10:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC7031F23954
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:11:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54D261D0F66;
-	Tue,  5 Nov 2024 09:10:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD92B1CF5C6;
+	Tue,  5 Nov 2024 09:10:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF9CC1CF7AA
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:10:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 277C21D27A7
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:10:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730797809; cv=none; b=r1NVASuQ9iAwhnobfuA+UbVCd3cN1BdR/gbzkr/yEUBOsZ8M4oZWjl322u33DqiiV9dSxJtx13beiEvHNPudxDHqPy7nFnMO87G7GS6Z57vJmvKiBAFseRIYD+JKbMNYTcrXwHmNO+nKXI5KsyUN1SaubFcnRLQnI21bDkAelr0=
+	t=1730797812; cv=none; b=nyJ6c4Z2xtow3COq8ulESLKDgZNuu3oub4ZBfI9RYaFPLYrSeU0C+3zfG78IlF5M7JHZa99IWNWndPKUtoScPp6zfMQxfCrGDAlfEIRq1gD/aVNADngR9iCoZwncH4BGvDabT6oDJpbTksRyM4QGVFriwBkRAK1B5r1oDrJlbeM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730797809; c=relaxed/simple;
-	bh=s78LXm8oVlRxWfFmr0IdFkBYHf7fRypjYC9GfgbS9lI=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=hY5v6Z21G8v1nfFRi4OwR0U148VH3NZh8IPVkRxdblFnceRmsTAf7JmPUePcNfI+kmXiFVphRSSNQN1H2EECs29QxoJvpoc9fcomsMFgVfbOn2Z2qjMj3wmZkXpK0Ohgm+uPQ/zf0AtkD4YwzPDygsuAv0x8gmrE6oPNp6w/KCA=
+	s=arc-20240116; t=1730797812; c=relaxed/simple;
+	bh=KiN6DGOmM7OzUXs2Uv6Tvbtd/F9eVemP3yL1pAxNyV8=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=DOV8mdvSzaDGm3kjFxg4PvCy6o59q4tZd+EVkI4tMFoXSzqHuabBdVOi5VLBLuYizN1LENwyBwzdtU+yakqQrMe1SEOly0Z+zztgNbGG3y2WhcvTCpSKUcf2suTkNBeo5tqHAb9vDm4MqvbArrhkmPWAo/CV5sel/9yxEjHuuIM=
 ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
 Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
@@ -32,16 +33,16 @@ Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
 	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <ore@pengutronix.de>)
-	id 1t8FZL-0003oL-Rq; Tue, 05 Nov 2024 10:09:47 +0100
+	id 1t8FZL-0003oM-Rq; Tue, 05 Nov 2024 10:09:47 +0100
 Received: from dude04.red.stw.pengutronix.de ([2a0a:edc0:0:1101:1d::ac])
 	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1t8FZK-0027YS-18;
+	id 1t8FZK-0027YT-1F;
 	Tue, 05 Nov 2024 10:09:46 +0100
 Received: from ore by dude04.red.stw.pengutronix.de with local (Exim 4.96)
 	(envelope-from <ore@pengutronix.de>)
-	id 1t8FZK-002ofR-0s;
+	id 1t8FZK-002ofb-0y;
 	Tue, 05 Nov 2024 10:09:46 +0100
 From: Oleksij Rempel <o.rempel@pengutronix.de>
 To: "David S. Miller" <davem@davemloft.net>,
@@ -57,6 +58,7 @@ To: "David S. Miller" <davem@davemloft.net>,
 	Krzysztof Kozlowski <krzk+dt@kernel.org>,
 	Rob Herring <robh+dt@kernel.org>
 Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
+	Rob Herring <robh@kernel.org>,
 	kernel@pengutronix.de,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
@@ -64,10 +66,12 @@ Cc: Oleksij Rempel <o.rempel@pengutronix.de>,
 	"Russell King (Oracle)" <linux@armlinux.org.uk>,
 	devicetree@vger.kernel.org,
 	Marek Vasut <marex@denx.de>
-Subject: [PATCH net-next v3 0/6] Side MDIO Support for LAN937x Switches
-Date: Tue,  5 Nov 2024 10:09:38 +0100
-Message-Id: <20241105090944.671379-1-o.rempel@pengutronix.de>
+Subject: [PATCH net-next v3 1/6] dt-bindings: net: dsa: ksz: add internal MDIO bus description
+Date: Tue,  5 Nov 2024 10:09:39 +0100
+Message-Id: <20241105090944.671379-2-o.rempel@pengutronix.de>
 X-Mailer: git-send-email 2.39.5
+In-Reply-To: <20241105090944.671379-1-o.rempel@pengutronix.de>
+References: <20241105090944.671379-1-o.rempel@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,33 +84,39 @@ X-SA-Exim-Mail-From: ore@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 
-This patch set introduces support for an internal MDIO bus in LAN937x
-switches, enabling the use of a side MDIO channel for PHY management
-while keeping SPI as the main interface for switch configuration.
+Add description for the internal MDIO bus, including integrated PHY
+nodes, to ksz DSA bindings.
 
-changes v3:
-- add "net: dsa: microchip: parse PHY config from device tree" patch
+Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+Reviewed-by: Rob Herring (Arm) <robh@kernel.org>
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+---
+ .../devicetree/bindings/net/dsa/microchip,ksz.yaml    | 11 +++++++++++
+ 1 file changed, 11 insertions(+)
 
-other changelogs are added to separate patches.
-
-Oleksij Rempel (6):
-  dt-bindings: net: dsa: ksz: add internal MDIO bus description
-  dt-bindings: net: dsa: ksz: add mdio-parent-bus property for internal
-    MDIO
-  net: dsa: microchip: Refactor MDIO handling for side MDIO access
-  net: dsa: microchip: cleanup error handling in ksz_mdio_register
-  net: dsa: microchip: add support for side MDIO interface in LAN937x
-  net: dsa: microchip: parse PHY config from device tree
-
- .../bindings/net/dsa/microchip,ksz.yaml       |  20 ++
- drivers/net/dsa/microchip/ksz_common.c        | 260 ++++++++++++++++--
- drivers/net/dsa/microchip/ksz_common.h        |  59 ++++
- drivers/net/dsa/microchip/lan937x.h           |   2 +
- drivers/net/dsa/microchip/lan937x_main.c      | 226 +++++++++++++--
- drivers/net/dsa/microchip/lan937x_reg.h       |   4 +
- 6 files changed, 539 insertions(+), 32 deletions(-)
-
---
+diff --git a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+index 30c0c3e6f37a4..a4e463819d4d7 100644
+--- a/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
++++ b/Documentation/devicetree/bindings/net/dsa/microchip,ksz.yaml
+@@ -81,6 +81,17 @@ properties:
+   interrupts:
+     maxItems: 1
+ 
++  mdio:
++    $ref: /schemas/net/mdio.yaml#
++    unevaluatedProperties: false
++    patternProperties:
++      "^ethernet-phy@[0-9a-f]$":
++        type: object
++        $ref: /schemas/net/ethernet-phy.yaml#
++        unevaluatedProperties: false
++        description:
++          Integrated PHY node
++
+ required:
+   - compatible
+   - reg
+-- 
 2.39.5
 
 
