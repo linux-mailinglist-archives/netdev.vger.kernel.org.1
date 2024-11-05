@@ -1,201 +1,404 @@
-Return-Path: <netdev+bounces-142080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 670C39BD5D5
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:28:40 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 39E709BD5FF
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:38:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A38B1C2094B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:28:39 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81982B21C01
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:38:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3391FF7AE;
-	Tue,  5 Nov 2024 19:28:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889AE20E023;
+	Tue,  5 Nov 2024 19:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="GXGiHflg"
+	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="FFw+Aywb"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2041.outbound.protection.outlook.com [40.107.223.41])
+Received: from smtp-out1-05.simnet.is (smtp-out1-05.simnet.is [194.105.231.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62C81FC7F3
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 19:28:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.41
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730834916; cv=fail; b=cffLYem7OlaW0H2uunQJ+FOP4sTyuoByGNrdM9qaJwx3U1JZIlSFE/9mGX5H5iGmQZJrn6RW1tznYqnODwz78DUCulaNeepYS9pojYopj3p/d/fRs7mSuKNb/p64OWM0YaSW6yoiIfw54e7/qP0NLAg0R7StkmqgRgbOsJMyulw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730834916; c=relaxed/simple;
-	bh=4bgTxPEMOEhsM1TW2oSNGlSgOmTMZuuuq6p/kyAcSzA=;
-	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=E6rHiOKaHEVz9q43+5b9Wr7q4Rw5H00WvwPS9ZND/Qygwx4OJiJl0ZrxTu8I5k45qsO40LZUMGlS5R8ovLjoTbbPxczdIHjudLf/np7ul5G2qWPoq5r1hp5R7cdDWKFWGj9POzdJA7TcU6Jpz7ay4LBZqEtVcyTOM6+n+BNE4/o=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=GXGiHflg; arc=fail smtp.client-ip=40.107.223.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=tatvAPb6vLuteI7Z8NlYo0C05RtUu4G58oMlkS/X8+FNuzMT2dKWzjlmbal8ZkmNYQOxLfd6IeNKNA9cXRJqnN9G9VcYmxMJsBDhUH9a6sVdS1y7xJJtUBkC0vlGaVRLLSj4y9MO9c6HTpQ/RbOC4pxWpDiMjHUueLKsMehH98E9R/sFhGUHTrMWPDGYCxoPfLp2VOobi/RmLW/flXwQ8WjezxnLzmr1/kvTtgPmmXkUmURzlSjIMTyubfeDSwkWt3R+QSV2gy8CAOjLKnZCevffFIPSPqzvnCtV1B6085KYVg/sXa/xhRbbaAPm9RrDZu5HzO/YOhhMabqNTf4qAQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=8IN5+j93XdOqD5NDCJptx150xkQnwIE2IJwynpgruQc=;
- b=ssi/CWA6c6c+hD6oVLzs4skoecIqLZo6BL8WcUfq3UBfsbjs1K+cjETsYzjnH4SReLrkpY60SLTNBaKHYZ51LnEQUMJwT6X7FG54/S70a6awxcxXT+rPeLiX8NiHpbKnRqTf2WCXwlik+YYP7zW0+MCjWryqHH6JavNArNojgytfKvdXNKQ/9FF547Tfl3OFCnR1idd0ve/yd7Umj1S2JwV2jUb8v47Wtnuk+0P0zFLjOhcXYHx54kacM8GdSKQdst70mU7ddNbCzFI0PlrWkAvNHyezztmxrxx+/rEG6TE4oNfof6BmxCBspexpqM51ZVdYxG5p4JqAXIoMcRVMPg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.117.161) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=8IN5+j93XdOqD5NDCJptx150xkQnwIE2IJwynpgruQc=;
- b=GXGiHflgleP3houZcvsfDgHxY0+HZ9DPQImyr5nHfywut7pDbX6o+Y5t2NJGi/7Cm88FZeAubwS4gU1066IeXePJNL96ofFk9tqpzFvUOP4XrqMsY5xIy2Lt/4VuVU8Bl3ZOCScWpSfBKTpmaTHSvBNmoILZB1scFzcn+yh+EAw4eGk5jrP3inCvt276UwehluVGM2C2V9rRF2d+/jWSNFFNqZnRbiMPzU9Gi09LoneLqTErX0inX++t8VhZR3wJJBy8Q69POCsonc76XxJpJQEIs62sUWsT1sv+wxFBcIQui+ELlQCbQygEHziyLl7HGXnbZe76PRuPh3rKlwGoLw==
-Received: from SJ0P220CA0026.NAMP220.PROD.OUTLOOK.COM (2603:10b6:a03:41b::30)
- by BY5PR12MB4275.namprd12.prod.outlook.com (2603:10b6:a03:20a::18) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Tue, 5 Nov
- 2024 19:28:31 +0000
-Received: from SJ1PEPF00002314.namprd03.prod.outlook.com
- (2603:10b6:a03:41b:cafe::d8) by SJ0P220CA0026.outlook.office365.com
- (2603:10b6:a03:41b::30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.18 via Frontend
- Transport; Tue, 5 Nov 2024 19:28:31 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.161)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.117.161 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.117.161; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.117.161) by
- SJ1PEPF00002314.mail.protection.outlook.com (10.167.242.168) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.17 via Frontend Transport; Tue, 5 Nov 2024 19:28:30 +0000
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by mail.nvidia.com
- (10.129.200.67) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 5 Nov 2024
- 11:28:08 -0800
-Received: from rnnvmail202.nvidia.com (10.129.68.7) by rnnvmail202.nvidia.com
- (10.129.68.7) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Tue, 5 Nov 2024
- 11:28:07 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com (10.129.68.7)
- with Microsoft SMTP Server id 15.2.1544.4 via Frontend Transport; Tue, 5 Nov
- 2024 11:28:03 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>, Jay Vosburgh <jv@jvosburgh.net>, "Andy
- Gospodarek" <andy@greyhouse.net>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Jianbo Liu
-	<jianbol@nvidia.com>, Boris Pismenny <borisp@nvidia.com>, Tariq Toukan
-	<tariqt@nvidia.com>
-Subject: [PATCH net-next V2] bonding: add ESP offload features when slaves support
-Date: Tue, 5 Nov 2024 21:27:21 +0200
-Message-ID: <20241105192721.584822-1-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB34C20D50E
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 19:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.231.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730835478; cv=none; b=BQSDaC7aRFkzd5qnm65LuLJ9oa2wKCCZGZYibLjUuK5Lm9haqfJrPZaVFrmy1HCtnfJpBvMynQdKgVA2UiLob/lwxFJSW/cy12T0IXNiu9kfL+5grP3PI47m3AXWLgI4dPFAb+JbPvBTrIlq5vncODnzdum3NcjenU3KJr7sFIQ=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730835478; c=relaxed/simple;
+	bh=+wE9wSwJT947OiSoILkJZ0RNhoCB8NKZ93/C/n0T9qY=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=BaUgpdp+zUxHpnCcD5aVL/2IONT74X2EaP3sTxTOC9jlTxyZj0HRz8P8+xhO+cTI6/ZalmJydNL9DdqMbSVV3F9Ux2ZAa6q/0cEYjxNuEYTpARcdj/XgwHicmM9n7963W0iJlSqxUY/Hxl9P6JpECe9zd2L6TJpPKH009TN1gtY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=FFw+Aywb; arc=none smtp.client-ip=194.105.231.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
+  t=1730835475; x=1762371475;
+  h=date:from:to:subject:message-id:mime-version;
+  bh=XnG2Tvq+2LNEOhQ1U53XUgF5l0bCysZwrCSBSGDtDl0=;
+  b=FFw+AywbI+CqA6ykgoMc3NN1vJVLaYeE8Oy+jR/a2MD8zDU5uOWsOa4n
+   egVS9/O3B1KwSBJvj0Lm05l0X9BVpXSKkn7iBlFJ61reLEARkhZu7vr52
+   1XC+inDZuwUC4qp3j5YffZQoka3eSNDYD0CLSSUf3Y1FrLVDcyhv0IMe8
+   ZKxAiPaV3BQJQ6D8hI7u0DnMpQiGGilgHJ19vonzVcHLDEJj/WA8ZAGzP
+   rq0UxXszn4kZuHIEwVty0DqqT0vGJe2jUDxDviTG1LVRe8eOjIm029udj
+   OezqhC2n5raMfE0cREvfAWzUZgyrZpEvcOWRXvmw3k/1DoyqTf1eSqjXZ
+   Q==;
+X-CSE-ConnectionGUID: LSVUFTztRUC/aLZdJsgeAQ==
+X-CSE-MsgGUID: bjkQ9khmTmC3W4bL1DdwTQ==
+Authentication-Results: smtp-out-05.simnet.is; dkim=none (message not signed) header.i=none
+X-SBRS: 3.3
+X-IPAS-Result: =?us-ascii?q?A2HcEQA9cypnhVfoacJaHAECDi8BBAQBEAEHAQqBUwKCQ?=
+ =?us-ascii?q?n2BZIgljgIdgyicdgcBAQEPFAIBAg4KEwQBAQSFVAEBD4lVKDcGDgECBAEBA?=
+ =?us-ascii?q?QEDAgMBAQEBAQEBAQ4BAQYBAQEBAQEGBwIQAQEBAUAOO4U1Rg2FLCyCe1+DA?=
+ =?us-ascii?q?QGCZK9TgTSBAYMc2xeBXRCBSAGFaYJiAYVphHc8BoINgRU1gXOBQIsHBIJIf?=
+ =?us-ascii?q?IIGgg4SJYIvgRCFVoglj1CBaQNZIREBVRMXCwcFgXoDg1KBOYFRgyBKg1mBQ?=
+ =?us-ascii?q?kY/N4ITaUs6Ag0CNoIkfYJOgxiCBYRwhGmBIB02CgMLbT01FBufLgFGgjcvQ?=
+ =?us-ascii?q?wJZNIEEQAMwBg8ek1oBM49EgUShXIQkhluDMIILlUMzhASTOww6kkiYd6MiT?=
+ =?us-ascii?q?BmFG4F9ggAsBxoIMDuCZwlJGQ+OKhmINr8xeDsCBwsBAQMJkQMBAQ?=
+IronPort-PHdr: A9a23:2xFM3x2are00YzAKsmDPhFBlVkEcU9TcJQsJ8t8glq4LKvnl5JXnO
+ kHDo/R23xfFXoTevvRDjeee86XtQncJ7pvJtnceOIdNWBkIhYRenwEpDMOfT0yuKvnsYkQH
+IronPort-Data: A9a23:nMbuP6nJGxZU2SPbAGtvA5fo5gx3JkRdPkR7XQ2eYbSJt16W5oEne
+ lBvCjHdVaLbPHygOZtoPN7k6B5V697LxubXe3JoqnthFS9Eo5GcD9qVIh+sZXPCc5SbHEw2s
+ 8wVZ4WedMo+QHTV90v9beTt/HQsjP+GS+v3BrebYHwtGVU7FHZ84f4Pd5bVp6Yx6TTuK1jT5
+ IuaT7TjBWKYNx5I3kM8u6jT8ko056X4s2JF4lAyOqwX5A7TnilMXcNPfq/rcSTRT9gPFIZWZ
+ c6al+jhoTmxEzTBqz+BuuymGqHfaueKZWBislIPBu76xEAE/3RuukoCHKJ0QV9NjDmUlMxGx
+ txItJihIS8kJaSkdN41CnG0KAkge/QfkFP7CSLn65DKlhWbKyeEL8hGVSnaA6VJq46bPkkWn
+ RAoAGhlRgyOgeuw3IW6RoFE7ij0BJC2VG+3kigIIQDxVZ7Kc7iaK0n5zYMwMAMLuyx7Na22i
+ /z1xtZYRE+ojxVnYj/7AX+l9QuiriGXnzZw8Dp5qUerioR6IcMYPLXFabLoltK2qcp9un2mm
+ 0z67XjDPzpdPfitxRie/X+Fv7qa9c/7cNp6+LyQ6P9xnBiBx2kLEhoGRB7j+L+ni1WiHdNEQ
+ 6AW0nN/8e5rrBHtFIKnGU3nyJKHlkd0t954GeIS8wCIzKfIpQeCboQBZmQaM4x47pVmLdAs/
+ lWLnOq4BjxqjLi+Ek3B/JPNgT+tBRFAeAfuYgdfEVtUvIi/yG0ptTrJQ8pvHbCdkNL4A3fzz
+ iqMoSx4gK8c5fPnzI2l/EvbxiCto4DTSR4ko12OGHyk9R8/ZZXNi5GUBUbzyc1+EailXEW7g
+ VNDkuys4MIVApykrXnYKAkSJ42B6/GAOTzapFdgGZg96jigk0JPm6gMsFmSw281Yq45lS/VX
+ aPFhe9GzL5oVEZGgIdpYpmtTtYryLD6EsT0E6iNKMRPeYQ3dRTvEMBSiay4gTqFfKsEyPBX1
+ XKnnSCEVi1y5UNPl2Peegvl+eV3rh3SPEuKLXwB8zyp0KCFeFmeQqofPV2FY4gRtfzf+FqJr
+ o4ObprRk32ztdEShAGLoeb/ynhXdRAG6Wze8pYKHgJ+ClM6Qz94VZc9P5t7K9M690iqqgs41
+ irhCh4HmQaXaYzvLASOYzhjZtvSsWVX8BoG0dgXFQ/wgRALON/zhI9BLMFfVed8q4ReIQtcF
+ KJtlzOoWa8XEmyvFvV0RcWVkbGOgzzy2FnWZXL5MWdgF3OiLiSQkuLZksLU3HFmJkKKWQEW/
+ 9VMCiuzrUI/ejlf
+IronPort-HdrOrdr: A9a23:Ih/BAa3QV6Tie6M61/ggHgqjBIYkLtp133Aq2lEZdPU1SK2lfq
+ WV954mPHDP+VUssR0b9OxoQZPwJ080rKQFmLX5Xo3NYOCFggeVxehZhOPfK1eJIVyHygc378
+ hdmsZFaOEZATBB/KTHCATRKadG/DGMmJrY4Ns3wB9WPGVXV50=
+X-Talos-CUID: 9a23:Cd68tm7BQIXxQ4hpldss0HUqJ+4ZYGHn8VyXKmuKBURyR7C8cArF
+X-Talos-MUID: 9a23:THZ6cwgtBX93Pm4gGx41ssMpPsVr2vWtCEUxlL5dhJWOEXVcNyihtWHi
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.11,261,1725321600"; 
+   d="8'?scan'208";a="23386228"
+Received: from vist-zimproxy-01.vist.is ([194.105.232.87])
+  by smtp-out-05.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 19:37:51 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id 9EDE94196798
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 19:37:51 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id WUB7r3yLvS6z for <netdev@vger.kernel.org>;
+ Tue,  5 Nov 2024 19:37:51 +0000 (GMT)
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id 0D7AD41A16AD
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 19:37:51 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id NMqDUBmTFrQx for <netdev@vger.kernel.org>;
+ Tue,  5 Nov 2024 19:37:50 +0000 (GMT)
+Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTPS id EAF0741A1693
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 19:37:50 +0000 (GMT)
+Received: from bg by kassi.invalid.is with local (Exim 4.98)
+	(envelope-from <bg@kassi.invalid.is>)
+	id 1t8PNA-000000000p6-09nb
+	for netdev@vger.kernel.org;
+	Tue, 05 Nov 2024 19:37:52 +0000
+Date: Tue, 5 Nov 2024 19:37:51 +0000
+From: Bjarni Ingi Gislason <bjarniig@simnet.is>
+To: netdev@vger.kernel.org
+Subject: dcb-dcbx.8: some remarks and editorial changes for this manual
+Message-ID: <Zyp0DxgipVa8KZSN@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SJ1PEPF00002314:EE_|BY5PR12MB4275:EE_
-X-MS-Office365-Filtering-Correlation-Id: c04b77d7-4cdf-4d2e-8997-08dcfdd007d0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|376014|1800799024|82310400026;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?XFAlKYRoF9bvK/RgmqJIH88khjLBvSAtTFyXdfSkR0wF7u6Bnd8N+rBxCxmQ?=
- =?us-ascii?Q?knXAqZBJqeuXTtBcBqsS8uc17tUSzMw+RtTWRzpGJxvVlRJqNcZLsSyWmXqz?=
- =?us-ascii?Q?12z33K2Wvc132NLDBBnKMOimrlnRxFJN0DL59PgH8qEIFjlAOn2FxJOpvK4O?=
- =?us-ascii?Q?pMvvgKxrCIQSc90ajRXvqJ29yJlAQw6J2iVZQ9mPBDxS0b0QxMehiH5tzNAH?=
- =?us-ascii?Q?6rwwQYClbGFbBMY9dbgohI79NS1IKRrRZFCkJKxfvvuz5i8qX5VVP1A3yVi4?=
- =?us-ascii?Q?pjxSqf92h6jTRCs4pZuFDdPTNgf5FgBgSncBKL6tzEmEbpCciXvzPRwKWcPn?=
- =?us-ascii?Q?6t+iKaWWyp+b1aNQhOn4ZQ564qKo0gt/i7GN5I6ncw+q6MDsqYhFwm3I7s2J?=
- =?us-ascii?Q?C/eTVi0TGwSHUcm8Y+HvkTKvlI3EHIw2GdZ634rTjTV1DRhnThHZw3KpnufI?=
- =?us-ascii?Q?tqCgn7KJNwaX8v2Wnu0DJ2JtFQhYKt+/4BpiuJtz0eCcEpwep9iT1VJNF4b0?=
- =?us-ascii?Q?g1GubQaMAeIVxCLIS2Hl85ZbZV9tlmM853tXilQb7oakt/g4lnGoF8Mco3bI?=
- =?us-ascii?Q?/ni0vr4M2It93bE+7VgBAhJO2CowRDcZfHhtG4jnCOrjRMTdVtCw8C2lhOC1?=
- =?us-ascii?Q?aDZ2LxTVQbHB2GGGawrcWHNjnZrQOHpwk/xImRA9ag5bzdMGbSlRjQlBiceW?=
- =?us-ascii?Q?+wwOZ7Y2+ulyHzGNOGrcHBsLMolA29jVWfnb5x2neWk8xz5rwj4HruckTCDV?=
- =?us-ascii?Q?lEr5ENkaDKhDeWydMy5IEMWBBv2knUn4X0+oeNpa2WOzWnrpfSMRsHWzmMfG?=
- =?us-ascii?Q?+biKXFsPXyP1sJ5bZKDN9wb3RedGdk7ElLKJ15AYf3KBEaYBgaTKtEOOC2fY?=
- =?us-ascii?Q?Mn4mSlzZWRpw14hyg53vsgmfbxPhfgud13EAt0MWymiPRYvn8enE+hKSf7Kp?=
- =?us-ascii?Q?q0wpG7nIlumavgPqZOOw30ngtWtEyl6FUe98xFyFB1rLr4MTrPn/b1Yrf1ub?=
- =?us-ascii?Q?Kdk4/2HNChpJ++pM+YUA7SIztbA7KWj0FiPNLim8/GwccgkS9C0X5p0IuX4V?=
- =?us-ascii?Q?YNuN0n8ofGG2KVgI9E85rEDA0rVPpCaheGOSBABrvrLDI/eUyPHNETDNrYEz?=
- =?us-ascii?Q?uQRqrp/dXZyfWFAsM9pS2uf99O8vZRC0IgoKsvgS8EHtjWEJLd70ZpTwsWbs?=
- =?us-ascii?Q?5BoxEf1Txte7s0ospkb/NDGWbzidk7kC2lMl8eFgbExn52wHfDcgzmHvTqia?=
- =?us-ascii?Q?9PQIy43aVkkKJ7ct013S6PB36YHt10SlJcWhwoxvNp5BLb20sgcDOs0IceHG?=
- =?us-ascii?Q?V9ZA1zEP1aU5WthtLzzSfCjlzfzo46sbsK3O3Q8NXz7eWu4SJobg2mV9jWEU?=
- =?us-ascii?Q?IAXoPrGP32IRlYUra+E4N4gZNBUHX+DxnwHE43Rj6SNkCvvkmw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.117.161;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(376014)(1800799024)(82310400026);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 19:28:30.4493
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c04b77d7-4cdf-4d2e-8997-08dcfdd007d0
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.161];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SJ1PEPF00002314.namprd03.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4275
+Content-Type: multipart/mixed; boundary="B2J/ivnPufGe0hG1"
+Content-Disposition: inline
 
-From: Jianbo Liu <jianbol@nvidia.com>
 
-Add NETIF_F_GSO_ESP bit to bond's gso_partial_features if all slaves
-support it, such that ESP segmentation is handled by hardware if possible.
+--B2J/ivnPufGe0hG1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Signed-off-by: Jianbo Liu <jianbol@nvidia.com>
-Reviewed-by: Boris Pismenny <borisp@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/bonding/bond_main.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+  The man page is from Debian:
 
-V2:
-Addressed feedback about unnecessary ifdefs.
+Package: iproute2
+Version: 6.11.0-1
+Severity: minor
+Tags: patch
 
-diff --git a/drivers/net/bonding/bond_main.c b/drivers/net/bonding/bond_main.c
-index 5812e8eaccf1..9e8bdd0d0922 100644
---- a/drivers/net/bonding/bond_main.c
-+++ b/drivers/net/bonding/bond_main.c
-@@ -1545,6 +1545,7 @@ static void bond_compute_features(struct bonding *bond)
- {
- 	unsigned int dst_release_flag = IFF_XMIT_DST_RELEASE |
- 					IFF_XMIT_DST_RELEASE_PERM;
-+	netdev_features_t gso_partial_features = NETIF_F_GSO_ESP;
- 	netdev_features_t vlan_features = BOND_VLAN_FEATURES;
- 	netdev_features_t enc_features  = BOND_ENC_FEATURES;
- #ifdef CONFIG_XFRM_OFFLOAD
-@@ -1577,6 +1578,9 @@ static void bond_compute_features(struct bonding *bond)
- 							  BOND_XFRM_FEATURES);
- #endif /* CONFIG_XFRM_OFFLOAD */
+  Improve the layout of the man page according to the "man-page(7)"
+guidelines, the output of "mandoc -lint T", the output of
+"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+conventions.
+
+-.-
+
+  Output from a script "chk_man" is in the attachment.
+
+-.-
+
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+
+diff --git a/dcb-dcbx.8 b/dcb-dcbx.8.new
+index bafc18f..790c56c 100644
+--- a/dcb-dcbx.8
++++ b/dcb-dcbx.8.new
+@@ -2,24 +2,23 @@
+ .SH NAME
+ dcb-dcbx \- show / manipulate port DCBX (Data Center Bridging eXchange)
+ .SH SYNOPSIS
+-.sp
+ .ad l
+ .in +8
  
-+		if (slave->dev->hw_enc_features & NETIF_F_GSO_PARTIAL)
-+			gso_partial_features &= slave->dev->gso_partial_features;
-+
- 		mpls_features = netdev_increment_features(mpls_features,
- 							  slave->dev->mpls_features,
- 							  BOND_MPLS_FEATURES);
-@@ -1590,6 +1594,11 @@ static void bond_compute_features(struct bonding *bond)
- 	}
- 	bond_dev->hard_header_len = max_hard_header_len;
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .B dcbx
+ .RI "{ " COMMAND " | " help " }"
+ .sp
  
-+	if (gso_partial_features & NETIF_F_GSO_ESP)
-+		bond_dev->gso_partial_features |= NETIF_F_GSO_ESP;
-+	else
-+		bond_dev->gso_partial_features &= ~NETIF_F_GSO_ESP;
-+
- done:
- 	bond_dev->vlan_features = vlan_features;
- 	bond_dev->hw_enc_features = enc_features | NETIF_F_GSO_ENCAP_ALL |
--- 
-2.44.0
+ .ti -8
+ .B dcb dcbx show dev
+-.RI DEV
++.I DEV
+ 
+ .ti -8
+ .B dcb dcbx set dev
+-.RI DEV
++.I DEV
+ .RB "[ " host " ]"
+ .RB "[ " lld-managed " ]"
+ .RB "[ " cee " ]"
+@@ -29,16 +28,20 @@ dcb-dcbx \- show / manipulate port DCBX (Data Center Bridging eXchange)
+ .SH DESCRIPTION
+ 
+ Data Center Bridging eXchange (DCBX) is a protocol used by DCB devices to
+-exchange configuration information with directly connected peers. The Linux DCBX
+-object is a 1-byte bitfield of flags that configure whether DCBX is implemented
+-in the device or in the host, and which version of the protocol should be used.
++exchange configuration information with directly connected peers.
++The Linux DCBX object is a 1-byte bitfield of flags that configure whether
++DCBX is implemented in the device or in the host,
++and which version of the protocol should be used.
+ .B dcb dcbx
+ is used to access the per-port Linux DCBX object.
+ 
+ There are two principal modes of operation: in
+ .B host
+-mode, DCBX protocol is implemented by the host LLDP agent, and the DCB
+-interfaces are used to propagate the negotiate parameters to capable devices. In
++mode,
++DCBX protocol is implemented by the host LLDP agent,
++and the DCB interfaces are used to propagate the negotiate parameters to
++capable devices.
++In
+ .B lld-managed
+ mode, the configuration is handled by the device, and DCB interfaces are used
+ for inspection of negotiated parameters, and can also be used to set initial
+@@ -47,19 +50,21 @@ parameters.
+ .SH PARAMETERS
+ 
+ When used with
+-.B dcb dcbx set,
+-the following keywords enable the corresponding configuration. The keywords that
+-are not mentioned on the command line are considered disabled. When used with
+-.B show,
++.BR "dcb dcbx set" ,
++the following keywords enable the corresponding configuration.
++The keywords that are not mentioned on the command line are considered
++disabled.
++When used with
++.BR show ,
+ each enabled feature is shown by its corresponding keyword.
+ 
+ .TP
+ .B host
+ .TQ
+ .B lld-managed
+-The device is in the host mode of operation and, respectively, the lld-managed
+-mode of operation, as described above. In principle these two keywords are
+-mutually exclusive, but
++The device is in the host mode of operation and, respectively,
++the lld-managed mode of operation, as described above.
++In principle these two keywords are mutually exclusive, but
+ .B dcb dcbx
+ allows setting both and lets the driver handle it as appropriate.
+ 
+@@ -67,15 +72,17 @@ allows setting both and lets the driver handle it as appropriate.
+ .B cee
+ .TQ
+ .B ieee
+-The device supports CEE (Converged Enhanced Ethernet) and, respectively, IEEE
+-version of the DCB specification. Typically only one of these will be set, but
++The device supports CEE (Converged Enhanced Ethernet) and, respectively,
++IEEE version of the DCB specification.
++Typically only one of these will be set, but
+ .B dcb dcbx
+ does not mandate this.
+ 
+ .TP
+ .B static
+-indicates the engine supports static configuration. No actual negotiation is
+-performed, negotiated parameters are always the initial configuration.
++indicates the engine supports static configuration.
++No actual negotiation is performed,
++negotiated parameters are always the initial configuration.
+ 
+ .SH EXAMPLE & USAGE
+ 
 
+--B2J/ivnPufGe0hG1
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="chk_man.err.dcb-dcbx.8"
+
+  Any program (person), that produces man pages, should check the output
+for defects by using (both groff and nroff)
+
+[gn]roff -mandoc -t -ww -b -z -K utf8  <man page>
+
+  The same goes for man pages that are used as an input.
+
+  For a style guide use
+
+  mandoc -T lint
+
+-.-
+
+  So any 'generator' should check its products with the above mentioned
+'groff', 'mandoc',  and additionally with 'nroff ...'.
+
+  This is just a simple quality control measure.
+
+  The 'generator' may have to be corrected to get a better man page,
+the source file may, and any additional file may.
+
+  Common defects:
+
+  Input text line longer than 80 bytes.
+
+  Not removing trailing spaces (in in- and output).
+  The reason for these trailing spaces should be found and eliminated.
+
+  Not beginning each input sentence on a new line.
+Lines should thus be shorter.
+
+  See man-pages(7), item 'semantic newline'.
+
+-.-
+
+The difference between the formatted output of the original and patched file
+can be seen with:
+
+  nroff -mandoc <file1> > <out1>
+  nroff -mandoc <file2> > <out2>
+  diff -u <out1> <out2>
+
+and for groff, using
+
+"printf '%s\n%s\n' '.kern 0' '.ss 12 0' | groff -mandoc -Z - "
+
+instead of 'nroff -mandoc'
+
+  Add the option '-t', if the file contains a table.
+
+  Read the output of 'diff -u' with 'less -R' or similar.
+
+-.-.
+
+  If 'man' (man-db) is used to check the manual for warnings,
+the following must be set:
+
+  The option "-warnings=w"
+
+  The environmental variable:
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+  or
+
+  (produce only warnings):
+
+export MANROFFOPT="-ww -b -z"
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+-.-.
+
+Output from "mandoc -T lint dcb-dcbx.8": (possibly shortened list)
+
+mandoc: dcb-dcbx.8:5:2: WARNING: skipping paragraph macro: sp after SH
+
+-.-.
+
+Use the correct macro for the font change of a single argument or
+split the argument into two.
+
+18:.RI DEV
+22:.RI DEV
+
+-.-.
+
+Wrong distance between sentences in the input file.
+
+  Separate the sentences and subordinate clauses; each begins on a new
+line.  See man-pages(7) ("Conventions for source file layout") and
+"info groff" ("Input Conventions").
+
+  The best procedure is to always start a new sentence on a new line,
+at least, if you are typing on a computer.
+
+Remember coding: Only one command ("sentence") on each (logical) line.
+
+E-mail: Easier to quote exactly the relevant lines.
+
+Generally: Easier to edit the sentence.
+
+Patches: Less unaffected text.
+
+Search for two adjacent words is easier, when they belong to the same line,
+and the same phrase.
+
+  The amount of space between sentences in the output can then be
+controlled with the ".ss" request.
+
+32:exchange configuration information with directly connected peers. The Linux DCBX
+41:interfaces are used to propagate the negotiate parameters to capable devices. In
+51:the following keywords enable the corresponding configuration. The keywords that
+52:are not mentioned on the command line are considered disabled. When used with
+61:mode of operation, as described above. In principle these two keywords are
+71:version of the DCB specification. Typically only one of these will be set, but
+77:indicates the engine supports static configuration. No actual negotiation is
+
+-.-.
+
+Split a punctuation from a single argument, if a two-font macro is meant
+
+53:.B show,
+
+-.-.
+
+No space is needed before a quote (") at the end of a line
+
+11:.RI "[ " OPTIONS " ] "
+
+-.-.
+
+Output from "test-groff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
+
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
+troff: backtrace: file '<stdin>':11
+troff:<stdin>:11: warning: trailing space in the line
+
+
+--B2J/ivnPufGe0hG1--
 
