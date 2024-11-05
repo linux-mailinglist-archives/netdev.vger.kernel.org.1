@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-142087-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id DEEF39BD707
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:28:39 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D74EC9BD70D
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:29:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 966581F23473
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:28:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14C521C236C4
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:29:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52B0D215C47;
-	Tue,  5 Nov 2024 20:28:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8BE5215C65;
+	Tue,  5 Nov 2024 20:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jNR27JuP"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="VFvcMAg9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f177.google.com (mail-pl1-f177.google.com [209.85.214.177])
+Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4C4820FA9E
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 20:28:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5AB214426
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 20:29:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730838515; cv=none; b=TYDsBjv+UHQ11mTNsIgo/ieiwc/MFo77MI46glflB7lqBbRay2A4LDNxgxRCUqzN/KTCSYSf51ArtF36xZ430X8Ujp2hgxmmBDu1e/irCAeYeFt0QgQPhdjmlOZPktbhWHCTKDwCJjDSsFjcTIwACkhiU/OIG+/xc9ORwXdI5Js=
+	t=1730838569; cv=none; b=m2fWzbALH5KuTWdelQuYFeO93YI/jSMbiK/s3rnfuYqydk5nyfNK+T8gn51pW3Emfdj4bgZx4dFFPgTcT7z/MfayzQeSFBUKunZd9wzn0mXeMJyAPajJRImKMxoJ3dxEMyoD6JMZEcGnXSQRDtTZCh+tanUE3F4rTZx2mpks4k8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730838515; c=relaxed/simple;
-	bh=r4wQnQB7TOhhaDz2m1Pn1z5j3SZx+o7iBbQS2F+6OQQ=;
+	s=arc-20240116; t=1730838569; c=relaxed/simple;
+	bh=d3dD1BAZxlbYeLGAcAe/6Ue5ouZ4MMP1Gn0DibkROqw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=bW7y1HH9vT+BqdgU9qTFdlheYNBJUaS12VkqKfWiQBm63hSaEzusHxK5Yom1iRUu5nhn/PWei0LkeRD2vzGH/Co2BwJBTbAlEjnVR5ex/Qb2Xvlpz/5PLPpVh93L79txLtSyRxrefafuxfmqRFRybsgQMijFufrUVU1yUwYpnL4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jNR27JuP; arc=none smtp.client-ip=209.85.214.177
+	 Content-Type:Content-Disposition:In-Reply-To; b=A5tqBEEYQmddfeoXffcixwBtbM/A7hMV2PG4c/t24iUiIC4gxmgMHNq8cV5016SUloxiDR9tzyltzvgZwpUtk8WysMX/UhxygrG0RYrwQNkIDdONw7aH7GRmOMThTApJYWTnIrBfSz2FIeX4vCwEDk1P88tNO1XmVyBgGY4QaL4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=VFvcMAg9; arc=none smtp.client-ip=209.85.216.48
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f177.google.com with SMTP id d9443c01a7336-20ce5e3b116so47757185ad.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 12:28:33 -0800 (PST)
+Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e2e23f2931so4544245a91.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 12:29:27 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730838513; x=1731443313; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1730838566; x=1731443366; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=LQeQW2N8zpTgfzsfBRysnSUZd8G5nyNGiYxO+3VjSwE=;
-        b=jNR27JuPxXJ8NBA0lo8BRIgyEVM0oTh4lrWecL4uh5aJottAOTGNYWP5oeAYBhRN2L
-         ARugtuyHvF9y7wi3eSkBEDce5Xbq+8dduDFdPdOifd8R48haU18s+TFKuti5YzpU3ntP
-         tQcc6Lqo5g1eGkFkyo6/eYXymTcY9JuVlwzw0=
+        bh=6TG+HKfsXVndr/dbdsEdQzVp/Dckr4A4PHVsSxF6U0c=;
+        b=VFvcMAg9nXSNj7jeC3U8Ctj5Db+XxTRepT3ICnblil/L6pl2R/lKMSJv1Y9yliSGcN
+         ++vbWC6tMq/NzWE/G2kshOF1tZmfouVL9ElIy7I7dfdTMCuUOIpMyJPGIOkWDjKiIFWj
+         S0XlCdqks5aD6FXB9wL9wCgytap+lX0N4tMR0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730838513; x=1731443313;
+        d=1e100.net; s=20230601; t=1730838566; x=1731443366;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=LQeQW2N8zpTgfzsfBRysnSUZd8G5nyNGiYxO+3VjSwE=;
-        b=kUCmbJXkQZJgoWT5qvBCVqTM2o6AeAvXB/9AB+mjZHH03sHgwqsszCg2ESbZCv0a5W
-         AhCNAhBum+X8N9e3Fx+AqWYnpfVg3aGJfjONQ8x8N+LPybsJMuJhgM+CasKFHt0KTOFr
-         iiPazyKxMEWwT990DMWIJQHMUUxfdTnLvu3mwe4P2b2SpSJ1ngDD8ihTc+qpNLbWmt4u
-         NnFGE9WpyXcewdg8T01gyu6u5sYWUZYcLBA2+rUgE9nyzvecaEaKVwMt6Hrlb7Qs78gC
-         j0OMYm+weN/elWKR9/3AFmu5ANTuPAq79a/b0+O9nVSbuw3VuTEJeI+jY/J8rOmIIraZ
-         y2MA==
-X-Gm-Message-State: AOJu0YxsaXtz38UqXLhpen9sDNEep/c6cXdtMC5K/kg4UnV/qrCsauUl
-	xwgotSrTFf+6vTLEK2KSRVfeBtN2zLCCArzCUDMg2HVDvBVPMDCrBIBKMP1qEaJeD8AQEkaE9TO
-	Q
-X-Google-Smtp-Source: AGHT+IENnWKhXsUeHfoWFHGstrsTSODyhq9Rx+TVaQWEQ9Ryh4qCgsEm60cTkPZKg6zj/kWO5fN5wg==
-X-Received: by 2002:a17:902:ea02:b0:20c:a122:e6c4 with SMTP id d9443c01a7336-2111af3f634mr222617155ad.14.1730838513019;
-        Tue, 05 Nov 2024 12:28:33 -0800 (PST)
+        bh=6TG+HKfsXVndr/dbdsEdQzVp/Dckr4A4PHVsSxF6U0c=;
+        b=ZvX/QksnZc8p62DFKmVGE42nKsdJx+oabPDLLtxpsBL/AHafaj/YRX22Yckz7pmyyI
+         9LS29IJowFy3/KM2vT4/DB0i+FDJ8sZ5VTXr9Os5wTdTLSUtC2/In9aDrbn0p+qDE29U
+         pueD2gMBpJfsC0qJd1RqpTKb30KI+ZZZ8oatMPVbpPlV+kewUC4tG9s+XD2TiUk1TeeZ
+         IN6FP6gm74bvAE35p4iP/ym8mqYWXgvO5kHA30ItrQZ8U+xTCmdhB1XMruP/HxcV0uHV
+         /p22C4VkthaSC8AulCLsA9YbZk4/1xeXxeHGW0q0FYLNkDsqGnicgQMKcsDq8wsr6c1K
+         GHAQ==
+X-Gm-Message-State: AOJu0YxaUA2JS+fKj3IWcWWOmOB/ZIzxevfRMAnqAJI+mDZIRtiUkkqk
+	qd5mZ+JDfNCgbjhMfyGXTDqH9FaaaRqdPsDnkvrzMDgOOcJcE1Zb/cOGW6vd/fY=
+X-Google-Smtp-Source: AGHT+IGpXvnQLdYM/eNUxgFErDh6D1tC1fH+hd2J2ncskN5f6MUlUmoouPD6XNorFgW/ypBKExow4g==
+X-Received: by 2002:a17:90b:2781:b0:2e5:5e55:7f18 with SMTP id 98e67ed59e1d1-2e94c2e77f5mr25127221a91.24.1730838566657;
+        Tue, 05 Nov 2024 12:29:26 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-2110570865fsm82537165ad.107.2024.11.05.12.28.31
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fbfb05asm12412856a91.48.2024.11.05.12.29.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 12:28:32 -0800 (PST)
-Date: Tue, 5 Nov 2024 12:28:29 -0800
+        Tue, 05 Nov 2024 12:29:26 -0800 (PST)
+Date: Tue, 5 Nov 2024 12:29:23 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Philo Lu <lulie@linux.alibaba.com>
 Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
@@ -72,8 +71,9 @@ Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
 	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
 	kuba@kernel.org, pabeni@redhat.com, andrew@daynix.com,
 	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/4] virtio_net: Add hash_key_length check
-Message-ID: <Zyp_7ea-1F9VPEBL@LQ3V64L9R2>
+Subject: Re: [PATCH net 3/4] virtio_net: Sync rss config to device when
+ virtnet_probe
+Message-ID: <ZyqAI--BgVBo1Kt1@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org,
 	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
@@ -82,7 +82,7 @@ Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	andrew@daynix.com, virtualization@lists.linux.dev,
 	linux-kernel@vger.kernel.org
 References: <20241104085706.13872-1-lulie@linux.alibaba.com>
- <20241104085706.13872-3-lulie@linux.alibaba.com>
+ <20241104085706.13872-4-lulie@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,40 +91,44 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241104085706.13872-3-lulie@linux.alibaba.com>
+In-Reply-To: <20241104085706.13872-4-lulie@linux.alibaba.com>
 
-On Mon, Nov 04, 2024 at 04:57:04PM +0800, Philo Lu wrote:
-> Add hash_key_length check in virtnet_probe() to avoid possible out of
-> bound errors when setting/reading the hash key.
+On Mon, Nov 04, 2024 at 04:57:05PM +0800, Philo Lu wrote:
+> During virtnet_probe, default rss configuration is initialized, but was
+> not committed to the device. This patch fix this by sending rss command
+> after device ready in virtnet_probe. Otherwise, the actual rss
+> configuration used by device can be different with that read by user
+> from driver, which may confuse the user.
+> 
+> If the command committing fails, driver rss will be disabled.
 > 
 > Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
 > Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->  drivers/net/virtio_net.c | 6 ++++++
->  1 file changed, 6 insertions(+)
+>  drivers/net/virtio_net.c | 9 +++++++++
+>  1 file changed, 9 insertions(+)
 > 
 > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 75c1ff4efd13..acc3e5dc112e 100644
+> index acc3e5dc112e..59d9fdf562e0 100644
 > --- a/drivers/net/virtio_net.c
 > +++ b/drivers/net/virtio_net.c
-> @@ -6451,6 +6451,12 @@ static int virtnet_probe(struct virtio_device *vdev)
->  	if (vi->has_rss || vi->has_rss_hash_report) {
->  		vi->rss_key_size =
->  			virtio_cread8(vdev, offsetof(struct virtio_net_config, rss_max_key_size));
-> +		if (vi->rss_key_size > VIRTIO_NET_RSS_MAX_KEY_SIZE) {
-> +			dev_err(&vdev->dev, "rss_max_key_size=%u exceeds the limit %u.\n",
-> +				vi->rss_key_size, VIRTIO_NET_RSS_MAX_KEY_SIZE);
-> +			err = -EINVAL;
-> +			goto free;
+> @@ -6584,6 +6584,15 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  
+>  	virtio_device_ready(vdev);
+>  
+> +	if (vi->has_rss || vi->has_rss_hash_report) {
+> +		if (!virtnet_commit_rss_command(vi)) {
+> +			dev_warn(&vdev->dev, "RSS disabled because committing failed.\n");
+> +			dev->hw_features &= ~NETIF_F_RXHASH;
+> +			vi->has_rss_hash_report = false;
+> +			vi->has_rss = false;
 > +		}
-
-I agree that an out of bounds error could occur and a check here
-is needed.
-
-I have no idea if returning -EINVAL from probe is the correct
-solution (vs say using min()) as I am just a casual observer of
-virtio_net and not a maintainer.
+> +	}
+> +
+>  	virtnet_set_queues(vi, vi->curr_queue_pairs);
+>  
+>  	/* a random MAC address has been assigned, notify the device.
 
 Acked-by: Joe Damato <jdamato@fastly.com>
 
