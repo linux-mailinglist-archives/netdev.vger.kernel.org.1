@@ -1,223 +1,185 @@
-Return-Path: <netdev+bounces-141885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0C0DF9BC992
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:51:00 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1ACCD9BC994
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:51:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FBB51F21423
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:50:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEA3428372E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:51:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 544861D097C;
-	Tue,  5 Nov 2024 09:50:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDC5C1D150C;
+	Tue,  5 Nov 2024 09:50:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="iHsFYxWv"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="S3sYCvXU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f46.google.com (mail-ed1-f46.google.com [209.85.208.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D8261C4A30
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:50:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50EF6163;
+	Tue,  5 Nov 2024 09:50:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730800256; cv=none; b=tmH8ykUGLvlDTfniXs7BH0NRTxYLQKRFB7Wz8IJHTZmWMyzLGvMBNQRu7HNRnDKgMS0YJKpVudJ8nCl1dz2EfFhIxzmvoc9XBm9LGdjAvaX2Lv/6oGqWJBDVPwoh6FIR79a1EyKzPz5K4SR/mJYuqvBkuUqYX8sX29AmAF112+I=
+	t=1730800259; cv=none; b=HrC6EG0+vJl8QDTOPyTaTuZBtnobo+w7VY7hcw7pO+ZADCp6p4w7UpGWwRvT5VrxKDYFkIW69aVjKZyRbwuVkz0yp2M9b5Pj1jQVEt+ZwHiXLir4VptbSCyNDwE2HeFhg+IMEpQdNULryauvop5HI1ae9a/VbJJ86ud60YgkG5o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730800256; c=relaxed/simple;
-	bh=xerk2SDTwe0awPXGy3i0NI9TftXhgabxdxQ4V2Kt9w4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KNTxXgJ6lEEkLBCZxVu7Ck3EuSvLsLT4vOtV8WKF1GG59Yaz5KU+6szoF5emzY/LySBYhmC1JjLE7UZsRyz/Sn+tFPGp2U+9XbGRFz8cxh3U6N5c3vdEDDVNfo6BEpgo/XSEhFieYTyFnc/CEcnOUuwCEZaVflAZndQxPBFWn/w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=iHsFYxWv; arc=none smtp.client-ip=209.85.208.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f46.google.com with SMTP id 4fb4d7f45d1cf-5c941623a5aso10999012a12.0
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 01:50:54 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730800253; x=1731405053; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5/W4vyRbX95fl81LBYPamzRyNyGShocuVRWJ4be906A=;
-        b=iHsFYxWvJ32gYuABH5Y05eWQWaRaaO5Jx0hFpOQkOthX1KzfEex7c6ve4+iAwKsHm+
-         HZDDnEt074+HG6jXb57N9iG1x04hbt+13mDXz2FyeJXOWPY+acNeiAuiW9ehAVjrEMKv
-         nGL3DTgH5wrC8dORZuaBFgihLEsYXllUz6kJ7rEyNwmaxKmUOfQjrPLfZykGTc5JaydM
-         0L1qJBDJqX3rYmA2ALFiXBGBK3Izes25F1Eh914w1zAlSy+t0IMHpcxV31BDOVe0jkOp
-         iUbvtNsdEhZpaBdmuM9BuWKzwhH/3fmrHCjLFVZWdMEeDXq0svh/xDFBvfDxGVWgqCtE
-         GQ2Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730800253; x=1731405053;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=5/W4vyRbX95fl81LBYPamzRyNyGShocuVRWJ4be906A=;
-        b=j5L/vZfmTBzhik6522J67teRpS5al+uLuf1xgGPqgPBCpTZbARk0gx/1TiKO9E8Dxp
-         PL9vtSArz4Fsuc4nFBe6gmxLzqs0Yh2kncWKhjutPbqrRJE4vcfXA1Md0N6sOlW4fnFw
-         zEEOmKxDxg1zVaZssJ7ZlObuEYhiaSexp33q+yMyweuSFeb+BNZNlWwZ5fuCMnUvUD0X
-         obeAg3iKecgVjG3DZ+01VH1zSv9hNDYDY/OzYnW3BmNpUCKbFVlW3J8bWyj0qNt0YYZR
-         gklqirJI8NbZTlSmJ4yS25Uddttk4XR7xE0MUyVRJubI9HjjppoAJBmyId59uO7IICU5
-         fxJw==
-X-Forwarded-Encrypted: i=1; AJvYcCWw3uoSMHRSo1/rDfPjihmEO0pXZFH9HhTu1uc7Fwqv6M/o6wtHoZ6drspg4HVQyDk8XSHAdzE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxKefdzKjNPbUcFQ4DrFeQdmUKq6rQiGE1DX5yYHuHkX3UaYklj
-	+ax7BbyhIJ9LIcXnJ6KwWkcR22iPw/9PS3qZXvIvgAwV4c9B+H7KSGxzHSgCRu6Z6h0AfgVrB1K
-	cWWsAX+/GKjxzrzvMD17PqSb4siJUwV/iEJrV
-X-Google-Smtp-Source: AGHT+IHkqUrECwRTb4Ns/ciMiauu94A7QmvtTawi9Vah9MKW+d80csACMzcLLS28tSeTwwx91QRmxlax+lu69vN0L9I=
-X-Received: by 2002:a05:6402:354b:b0:5ce:cfee:6e9c with SMTP id
- 4fb4d7f45d1cf-5cecfee7314mr8744628a12.4.1730800250052; Tue, 05 Nov 2024
- 01:50:50 -0800 (PST)
+	s=arc-20240116; t=1730800259; c=relaxed/simple;
+	bh=vMqJn3LIO8ynjc5nIbPp+GYEWMReEyHxTENEDq18gK0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HEl1sXN6XoBysPlgW24IWiRAvHiM2x4RdKx1/BOXIe1t9uNVVpXaBmmvJEShJJ8kJRUW5RkRh/ufo3YC7GqAHb0JLAEABPxHApgByyc4pVTGhkrdUEoqd5CLQ1sG5xM2jRJykEh34Jh1CkqqHCeHFqGYC47OpPk65jS+wPhpaXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=S3sYCvXU; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A59eMWk003268;
+	Tue, 5 Nov 2024 09:50:52 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=VYIFae
+	SthkHPV5g2knlHMhPmFXVciGu5V8c06srw6S0=; b=S3sYCvXUl2TBvFjpvEwlGz
+	aR/HiPzWsaZoEOOzoANEJSdUxShveYakNl0y25CrZ2XGDUYrwigxS3pQeGkPkVGl
+	t58DmmO/kqNKBQUnI8D212KGFmLLonBUKXmic7OiPIkTnG741p0lvIR2arL9bQpb
+	QHWgy6kF5EhELAjXpjhVbQeL6VCgxhsT5sPuNUy+jaXBmQMQ4zw9WZ9lz8/Pe5XN
+	RI37MpNConP8nQ8xkqnFxqbPr1tvkuVErWXOasZDDK6jagxXpoDm5okihcsyCPhN
+	Ui1Yy0a0o0Ml6lCNssU9RbGqNmabZJIKdYbvqOtcoo6a7Jn14VHlariB7HrpEwUw
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42qgx6r1ra-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 09:50:52 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A59opOE031661;
+	Tue, 5 Nov 2024 09:50:51 GMT
+Received: from ppma22.wdc07v.mail.ibm.com (5c.69.3da9.ip4.static.sl-reverse.com [169.61.105.92])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42qgx6r1r8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 09:50:51 +0000 (GMT)
+Received: from pps.filterd (ppma22.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma22.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A59P7pW023983;
+	Tue, 5 Nov 2024 09:50:51 GMT
+Received: from smtprelay04.wdc07v.mail.ibm.com ([172.16.1.71])
+	by ppma22.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nxsy71bm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 09:50:51 +0000
+Received: from smtpav02.wdc07v.mail.ibm.com (smtpav02.wdc07v.mail.ibm.com [10.39.53.229])
+	by smtprelay04.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A59oo4p49545710
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 5 Nov 2024 09:50:50 GMT
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EEBE858059;
+	Tue,  5 Nov 2024 09:50:49 +0000 (GMT)
+Received: from smtpav02.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3BF0358058;
+	Tue,  5 Nov 2024 09:50:46 +0000 (GMT)
+Received: from [9.152.224.138] (unknown [9.152.224.138])
+	by smtpav02.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Tue,  5 Nov 2024 09:50:46 +0000 (GMT)
+Message-ID: <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
+Date: Tue, 5 Nov 2024 10:50:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
- <20241105074916.75107-1-kuniyu@amazon.com> <CAL+tcoAgSBMtFcDx6MfCAhYMVKERCx2d7YUjquT6Pa8jm0bXWA@mail.gmail.com>
- <CANn89iKhSnTJUadpEBpkKYoRVP2GEJZ1ftzH7AqF4oXMF3QEZA@mail.gmail.com> <CAL+tcoCBvbR_=c_SxKmAyAE4U5wTgr=hp08yNxm0QUSWdgge5Q@mail.gmail.com>
-In-Reply-To: <CAL+tcoCBvbR_=c_SxKmAyAE4U5wTgr=hp08yNxm0QUSWdgge5Q@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Nov 2024 10:50:37 +0100
-Message-ID: <CANn89i+h4zbgju1KSfTZi2R1bnQ4=Q1EThJ9y8e5XCOocLNzMw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, dsahern@kernel.org, 
-	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
+ ib_device_get_netdev()
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>,
+        Niklas Schnell <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+ <20241027201857.GA1615717@unreal>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20241027201857.GA1615717@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: an7cTprGdqKQmVMebW909_n9iSmceV-B
+X-Proofpoint-GUID: fOR5dMNMMurYWr33APtl7L9tL0IqforV
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ malwarescore=0 clxscore=1011 mlxscore=0 impostorscore=0 mlxlogscore=916
+ spamscore=0 suspectscore=0 bulkscore=0 adultscore=0 phishscore=0
+ priorityscore=1501 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411050071
 
-On Tue, Nov 5, 2024 at 10:42=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> On Tue, Nov 5, 2024 at 5:35=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Tue, Nov 5, 2024 at 10:08=E2=80=AFAM Jason Xing <kerneljasonxing@gma=
-il.com> wrote:
-> > >
-> > > On Tue, Nov 5, 2024 at 3:49=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amaz=
-on.com> wrote:
-> > > >
-> > > > From: Jason Xing <kerneljasonxing@gmail.com>
-> > > > Date: Tue,  5 Nov 2024 10:55:11 +0800
-> > > > > From: Jason Xing <kernelxing@tencent.com>
-> > > > >
-> > > > > We found there are rare chances that some RST packets appear duri=
-ng
-> > > > > the shakehands because the timewait socket cannot accept the SYN =
-and
-> > > >
-> > > > s/shakehands/handshake/
-> > > >
-> > > > same in the subject.
-> > > >
-> > > > > doesn't return TCP_TW_SYN in tcp_timewait_state_process().
-> > > > >
-> > > > > Here is how things happen in production:
-> > > > > Time        Client(A)        Server(B)
-> > > > > 0s          SYN-->
-> > > > > ...
-> > > > > 132s                         <-- FIN
-> > > > > ...
-> > > > > 169s        FIN-->
-> > > > > 169s                         <-- ACK
-> > > > > 169s        SYN-->
-> > > > > 169s                         <-- ACK
-> > > > > 169s        RST-->
-> > > > > As above picture shows, the two flows have a start time differenc=
-e
-> > > > > of 169 seconds. B starts to send FIN so it will finally enter int=
-o
-> > > > > TIMEWAIT state. Nearly at the same time A launches a new connecti=
-on
-> > > > > that soon is reset by itself due to receiving a ACK.
-> > > > >
-> > > > > There are two key checks in tcp_timewait_state_process() when tim=
-ewait
-> > > > > socket in B receives the SYN packet:
-> > > > > 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
-> > > > > 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
-> > > > >
-> > > > > Regarding the first rule, it fails as expected because in the fir=
-st
-> > > > > connection the seq of SYN sent from A is 1892994276, then 169s ha=
-ve
-> > > > > passed, the second SYN has 239034613 (caused by overflow of s32).
-> > > > >
-> > > > > Then how about the second rule?
-> > > > > It fails again!
-> > > > > Let's take a look at how the tsval comes out:
-> > > > > __tcp_transmit_skb()
-> > > > >     -> tcp_syn_options()
-> > > > >         -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_ts, =
-skb) + tp->tsoffset;
-> > > > > The timestamp depends on two things, one is skb->skb_mstamp_ns, t=
-he
-> > > > > other is tp->tsoffset. The latter value is fixed, so we don't nee=
-d
-> > > > > to care about it. If both operations (sending FIN and then starti=
-ng
-> > > > > sending SYN) from A happen in 1ms, then the tsval would be the sa=
-me.
-> > > > > It can be clearly seen in the tcpdump log. Notice that the tsval =
-is
-> > > > > with millisecond precision.
-> > > > >
-> > > > > Based on the above analysis, I decided to make a small change to
-> > > > > the check in tcp_timewait_state_process() so that the second flow
-> > > > > would not fail.
-> > > > >
-> > > > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> > > > > ---
-> > > > >  net/ipv4/tcp_minisocks.c | 2 +-
-> > > > >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > > > >
-> > > > > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> > > > > index bb1fe1ba867a..2b29d1bf5ca0 100644
-> > > > > --- a/net/ipv4/tcp_minisocks.c
-> > > > > +++ b/net/ipv4/tcp_minisocks.c
-> > > > > @@ -234,7 +234,7 @@ tcp_timewait_state_process(struct inet_timewa=
-it_sock *tw, struct sk_buff *skb,
-> > > > >       if (th->syn && !th->rst && !th->ack && !paws_reject &&
-> > > > >           (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
-> > > > >            (tmp_opt.saw_tstamp &&
-> > > > > -           (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_ts=
-val) < 0))) {
-> > > >
-> > > > I think this follows RFC 6191 and such a change requires a formal
-> > > > discussion at IETF.
-> > > >
-> > > > https://datatracker.ietf.org/doc/html/rfc6191#section-2
-> > > >
-> > > > ---8<---
-> > > >       *  If TCP Timestamps would be enabled for the new incarnation=
- of
-> > > >          the connection, and the timestamp contained in the incomin=
-g SYN
-> > > >          segment is greater than the last timestamp seen on the pre=
-vious
-> > >
-> > > The true thing is that the timestamp of the SYN packet is greater tha=
-n
-> > > that of the last packet, but the kernel implementation uses ms
-> > > precision (please see tcp_skb_timestamp_ts()). That function makes
-> > > those two timestamps the same.
-> > >
-> > > This case happens as expected, so the second connection should be
-> > > established. My confusion just popped out of my mind: what rules
-> > > should we follow to stop the second flow?
-> >
-> > Note that linux TCP stack can use usec resolution for TCP TS values.
-> >
-> > You might adopt it, and no longer care about this ms granularity.
->
-> Right, I noticed this feature. I wonder if we can change the check in
-> tcp_timewait_state_process() like this patch if it has no side
-> effects? I'm worried that some programs don't use this feature. It's
-> the reason why I try to propose this patch to you.
 
-Breaking RFC ? I do not think so.
 
-Instead, use a usec clock and voila, the problem is solved.
+On 27.10.24 21:18, Leon Romanovsky wrote:
+> On Fri, Oct 25, 2024 at 09:23:55AM +0200, Wenjia Zhang wrote:
+>> Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
+>> alternative to get_netdev") introduced an API ib_device_get_netdev.
+>> The SMC-R variant of the SMC protocol continued to use the old API
+>> ib_device_ops.get_netdev() to lookup netdev.
+> 
+> I would say that calls to ibdev ops from ULPs was never been right
+> thing to do. The ib_device_set_netdev() was introduced for the drivers.
+> 
+> So the whole commit message is not accurate and better to be rewritten.
+> 
+>> As this commit 8d159eb2117b
+>> ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
+>> get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
+>> ib_device_ops.get_netdev didn't work any more at least by using a mlx5
+>> device driver.
+> 
+> It is not a correct statement too. All modern drivers (for last 5 years)
+> don't have that .get_netdev() ops, so it is not mlx5 specific, but another
+> justification to say that SMC-R was doing it wrong.
+> 
+>> Thus, using ib_device_set_netdev() now became mandatory.
+> 
+> ib_device_set_netdev() is mandatory for the drivers, it is nothing to do
+> with ULPs.
+> 
+>>
+>> Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
+> 
+> It is too late for me to do proper review for today, but I would say
+> that it is worth to pay attention to multiple dev_put() calls in the
+> functions around the ib_device_get_netdev().
+> 
+>>
+>> Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+>> Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
+> 
+> It is not related to this change Fixes line.
+> 
+
+Hi Leon,
+
+Thank you for the review! I agree that SMC could do better. However, we 
+should fix it and give enough information and reference on the changes, 
+since the code has already existed and didn't work with the old way. I 
+can rewrite the commit message.
+
+What about:
+"
+The SMC-R variant of the SMC protocol still called 
+ib_device_ops.get_netdev() to lookup netdev. As we used mlx5 device 
+driver to run SMC-R, it failed to find a device, because in mlx5_ib the 
+internal net device management for retrieving net devices was replaced 
+by a common interface ib_device_get_netdev() in commit 8d159eb2117b 
+("RDMA/mlx5: Use IB set_netdev and get_netdev functions"). Thus, replace 
+ib_device_ops.get_netdev() with ib_device_get_netdev() in SMC.
+"
+
+Thanks,
+Wenjia
 
