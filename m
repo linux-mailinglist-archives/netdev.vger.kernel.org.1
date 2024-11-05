@@ -1,76 +1,148 @@
-Return-Path: <netdev+bounces-141758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 802E29BC2F7
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:10:19 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 782E89BC2F9
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0E6B282BC3
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:10:17 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03D591F22A84
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:10:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDFEB2C190;
-	Tue,  5 Nov 2024 02:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="lj1rDYf+"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4986364D6;
+	Tue,  5 Nov 2024 02:10:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B039418EB0;
-	Tue,  5 Nov 2024 02:10:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B33C18EB0
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 02:10:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730772612; cv=none; b=PncwZIC6OIcr5E/YmWwQ6KB4hpAJ6a1BAO1RPNqEoFY+AEwdYqPyuNWBuHOnb9AySaUqBoJIvAXBiRDrjzCtXoLUHxmJV7NsAW8f5Py3WOgfgXUMaQxqg4cxI2wJnIBDqMa/wUiNa+qZy5gAeDhqMNsTgqwlqjpXP/BNYrozEj0=
+	t=1730772622; cv=none; b=d6GfX4/I3YeOTVlOrqOv27ntAQUmNvzKl1cbuYNSDdx3xeTEG3cnv7fgBRCGxMXJqPmwHK+nkOJn0z1u5gjTH+KLBbV/CDsYq9NGO+rEpPpKshr/KxwbkjCZ/BpOCw1KylF4BHJ64jI4E8J3J3lTxK1QyO0VBlPp5+A3jFUxITg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730772612; c=relaxed/simple;
-	bh=S7Q8fgYdR5fmpu1jYGa1OhNRIdnVnHYg4/NuG030vkg=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Ff21BzbOaOXEl+BzfLuv1Ds8HareOFZ/Rl0QqrPGeti2RowfwJ9Z/uondWcjkpzLZqSKDXQFv+eq9eRHwnyOn56KKWPWNd8v6wt9WSLfx2FTtRLHyr71SwnBBjyT/2arsmt8aBxlv1o723mQX/uJdANIwIxsbJaaL5MhrX0qiEQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=lj1rDYf+; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC3B3C4CECE;
-	Tue,  5 Nov 2024 02:10:11 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730772612;
-	bh=S7Q8fgYdR5fmpu1jYGa1OhNRIdnVnHYg4/NuG030vkg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=lj1rDYf+G7Y4lI2IMztFj6WZG3ZGyini0h4p3QvUzMuSOCRiGmn6Goq3xgzZoWoaM
-	 Lk7FFF0AqZ50qVuR9Hxg46NLvGhy9xvWDgM4GRZVYsVdoiIAxvgSGaedm+gsUguBC/
-	 eNAOx5UCB9VwogoD1U/dEJWqgtMGTEjkrBLT0FUG9vzJpN339l2MmwhAJlAkGlmi1r
-	 5udxnWQg7o8AH9D6mbor4BbbUgUEHk6E6+YdT4pclGAVIxhN9qxUh+BuS3mqZpzYr6
-	 48oG46k81e7TXnwpGiU0UwaUb2/7nNG0NQ3uQLPZRthhl2DGRCftGmxKbCoA0r/xWO
-	 aPwrJLYSUSBHw==
-Date: Mon, 4 Nov 2024 18:10:10 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Robin Murphy <robin.murphy@arm.com>
-Cc: Arnd Bergmann <arnd@kernel.org>, Jian Shen <shenjian15@huawei.com>,
- Salil Mehta <salil.mehta@huawei.com>, Arnd Bergmann <arnd@arndb.de>, Will
- Deacon <will@kernel.org>, Joerg Roedel <jroedel@suse.de>,
- iommu@lists.linux.dev, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Jijie Shao <shaojijie@huawei.com>, Peiyang Wang
- <wangpeiyang1@huawei.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] [net-next] net: hns3: add IOMMU_SUPPORT dependency
-Message-ID: <20241104181010.3d1a53f1@kernel.org>
-In-Reply-To: <069c9838-b781-4012-934a-d2626fa78212@arm.com>
-References: <20241104082129.3142694-1-arnd@kernel.org>
-	<069c9838-b781-4012-934a-d2626fa78212@arm.com>
+	s=arc-20240116; t=1730772622; c=relaxed/simple;
+	bh=WOG2w6ROnRZSeXpBfdm1M5ozrfMG8hm2/mR6/2ljo78=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=S64jbHUzisJRFN2joRxgcaxBdIIhwu7rSYWT2mRIxMplFdUI40wFh4Sl4qhRuGNO/Rk9axwvadawA1Lp6AWGWSEgZJM0ksvW2iUECZe5226Vb1pmKfqTT9FQ9c/zyWt9MDnaksTMim9Rp4z7O178HWm5bSx/GBw0uDtEJDQp5iw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a6b37c6dd4so40853775ab.3
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 18:10:20 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730772620; x=1731377420;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pOwK7LgCTCkhpBtnCmrshYoV78C7UhrxMFbq+MY09GY=;
+        b=DXCY3kMMpWPAT78B/Uw4M2rwMKQ+AO4fHeDRXC4s76IUGWCAeWRA7m2avP58JHq7jV
+         cDDY/Yj79+P3waK/XcoNWFjJUpSr6pCUTfCj7xUOI285h4/JWNqnKUJ7GxWecyn2a6AJ
+         d9jxaY5/CluoNKJcJB8Q9HPfZnVh2jiJ+kSrWvEZgnIamld1ecNjyuOPYLiGILpxNJDn
+         TyyQGF9jrDH/AYDJ74flcCYVigSAzfW9/kbIMt1YOQpVZyUbw2ixG7wuB1IrZCIDZ9UU
+         QLpuWoZaFl0PnE6jCwARCjeqpK0Uw8lDVMe7oNw4HT8sH02zSRQ2xkKg2RLoy6syAYZt
+         tP6g==
+X-Forwarded-Encrypted: i=1; AJvYcCXnZJGtSQ6nydawKb0c1TrRgiLy/y+Q0PjaiX3014eB78xIwu4xyEOOSU7zE/jGixIz0U9Mu/A=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yzd38vKEaacCf7QSQTf0VW8Tm4qSO3VItidBwerBeL9EreazNrF
+	+jKjLH5JQsMZCWgdH4/o6dl22CbyLrvGtjXE6fzctXdLzBcZSzsR+ZzT90oeOXYUvdk4RF6uG3D
+	Yj1FstXPjfLEqBOnLWyJbMLMwDS5NOTqJBoYm9xJrDfCSNoKBKnnFPwg=
+X-Google-Smtp-Source: AGHT+IFmFAjJO8uzUsuCAVpvck1Ngr6POR2cxcKVMv7earv4Zm+aMtsG/f0rRxn1JsuyuBFlvcE+i4tJFgztvHW4mdoNEuXhCN4e
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Received: by 2002:a05:6e02:1a4b:b0:39f:5e12:1dde with SMTP id
+ e9e14a558f8ab-3a4ed2f2830mr327954935ab.21.1730772620239; Mon, 04 Nov 2024
+ 18:10:20 -0800 (PST)
+Date: Mon, 04 Nov 2024 18:10:20 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <67297e8c.050a0220.2edce.14fe.GAE@google.com>
+Subject: [syzbot] [rdma?] WARNING in ib_uverbs_release_dev (2)
+From: syzbot <syzbot+a617d4c5ff27f35f8255@syzkaller.appspotmail.com>
+To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Mon, 4 Nov 2024 10:29:28 +0000 Robin Murphy wrote:
-> WTF is that patch doing!? No, random device drivers should absolutely 
-> not be poking into IOMMU driver internals, this is egregiously wrong and 
-> the correct action is to drop it entirely.
+Hello,
 
-Sorry, reverted in
-https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=249cfa318fb1b77eb726c2ff4f74c9685f04e568
+syzbot found the following issue on:
+
+HEAD commit:    0fc810ae3ae1 x86/uaccess: Avoid barrier_nospec() in 64-bit..
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=15ac9340580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=4aec7739e14231a7
+dashboard link: https://syzkaller.appspot.com/bug?extid=a617d4c5ff27f35f8255
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+
+Unfortunately, I don't have any reproducer for this issue yet.
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d7ec34ee152e/disk-0fc810ae.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/ba87040ccb6c/vmlinux-0fc810ae.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0e189a9b5a22/bzImage-0fc810ae.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+a617d4c5ff27f35f8255@syzkaller.appspotmail.com
+
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 8645 at kernel/rcu/srcutree.c:656 cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:656
+Modules linked in:
+CPU: 1 UID: 0 PID: 8645 Comm: kworker/u8:11 Not tainted 6.12.0-rc5-syzkaller-00063-g0fc810ae3ae1 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+Workqueue: ib-unreg-wq ib_unregister_work
+RIP: 0010:cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:656
+Code: 4d 84 00 48 c7 03 00 00 00 00 48 83 c4 48 5b 41 5c 41 5d 41 5e 41 5f 5d e9 84 f4 75 0a 90 0f 0b 90 eb e7 90 0f 0b 90 eb e1 90 <0f> 0b 90 eb db 90 0f 0b 90 eb 0a 90 0f 0b 90 eb 04 90 0f 0b 90 48
+RSP: 0018:ffffc90003f07930 EFLAGS: 00010202
+RAX: 0000000000000001 RBX: ffff888079789980 RCX: 0000000000000002
+RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffe8ffffd59658
+RBP: 0000000000000001 R08: ffffe8ffffd5965f R09: 1ffffd1ffffab2cb
+R10: dffffc0000000000 R11: fffff91ffffab2cc R12: dffffc0000000000
+R13: ffff88805bab05e8 R14: ffff88805bab0000 R15: ffff888079789800
+FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f7b86306d58 CR3: 0000000060ea6000 CR4: 0000000000350ef0
+Call Trace:
+ <TASK>
+ ib_uverbs_release_dev+0x4e/0x80 drivers/infiniband/core/uverbs_main.c:136
+ device_release+0x9b/0x1c0
+ kobject_cleanup lib/kobject.c:689 [inline]
+ kobject_release lib/kobject.c:720 [inline]
+ kref_put include/linux/kref.h:65 [inline]
+ kobject_put+0x231/0x480 lib/kobject.c:737
+ remove_client_context+0xb9/0x1e0 drivers/infiniband/core/device.c:782
+ disable_device+0x13b/0x360 drivers/infiniband/core/device.c:1288
+ __ib_unregister_device+0x2ac/0x3d0 drivers/infiniband/core/device.c:1518
+ ib_unregister_work+0x19/0x30 drivers/infiniband/core/device.c:1630
+ process_one_work kernel/workqueue.c:3229 [inline]
+ process_scheduled_works+0xa65/0x1850 kernel/workqueue.c:3310
+ worker_thread+0x870/0xd30 kernel/workqueue.c:3391
+ kthread+0x2f2/0x390 kernel/kthread.c:389
+ ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
+ ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+ </TASK>
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
