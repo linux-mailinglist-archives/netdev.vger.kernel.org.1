@@ -1,223 +1,220 @@
-Return-Path: <netdev+bounces-142084-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142085-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 812659BD6CE
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:12:09 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5F6019BD6D4
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:16:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0DD3D1F218DB
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:12:09 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFC9BB20BB1
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:16:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAFBE214402;
-	Tue,  5 Nov 2024 20:12:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2F01FF7B2;
+	Tue,  5 Nov 2024 20:16:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="VBe0hJcO"
+	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="7Hr+tHdg"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2139.outbound.protection.outlook.com [40.107.237.139])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A21042077;
-	Tue,  5 Nov 2024 20:12:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730837524; cv=none; b=fT/jDEvc+Ts7SjB3OutL9g6wuTCIWsteRgdRExTlphiqqD7G334I6/pYc8BZN6N9BYODNklp/Jet0J6JB5wq2C1WjCVVziprGNe+H8oL66icNbVHzse3QBuPZ32DduRyN68pRR8/qwZyWQAc4aUZbe3YhJRnib1LJLZ8IX2FnHA=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730837524; c=relaxed/simple;
-	bh=6LwYiAB6meT+zkZegA4NYsStaK6/T8Pagdvmw42EAWk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=YGiDOHStLDSB5IOWUDw5W5NYTWC3f1P5H2hcxhUS1WMAayzsQC/yRet+XAdTckhpFt3yaDrIDDrrmlw3FyRBHDKUHGjHjgZEPj3bGa/oPA8tjwlc2BTrPb8PEBxSicliFkxV7IGDd66vcBuEmhduiT8NtjUfNy81Vi7jLbO0PJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=VBe0hJcO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B170FC4CECF;
-	Tue,  5 Nov 2024 20:11:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730837524;
-	bh=6LwYiAB6meT+zkZegA4NYsStaK6/T8Pagdvmw42EAWk=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VBe0hJcOMVNXSHfz3dnWDwKUWfk/hwHQWlXOXQer9zhCeMaGY5LqdEC/d4ROryBWb
-	 GXZ1Fq7+MmLwv6Gd6t4Sq/yMVn1JcgaHTwl9AVJqJY0qCyhlsDt0msoiWtc0oa+B3t
-	 A1GS3Vy1qXthtzRMdLEl5jL1QXD2FhGx0O3kMBn40f6nAWDTfMde0HPzimcUalw4lz
-	 dRTJz4JSoGw02X2aAXJHp+GaVhPhC4BvbjsPTzfsKyOhTzNVQvPIQyU7w3qJWOWCuy
-	 p1AjmJQ/tW04yHHB6cFnjKmUfklBFHk38ppHWSFewpFGquNRlPQ+OjOuKTLqSAGUxB
-	 VVN+RFaYBxbSQ==
-Message-ID: <a6cfba96-9164-4497-b075-9359c18a5eef@kernel.org>
-Date: Tue, 5 Nov 2024 21:11:57 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CDA1EABD0;
+	Tue,  5 Nov 2024 20:16:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.139
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730837790; cv=fail; b=qW+3hriSh7mfGGiEptJRt2VV2n+TQXYg03YwQ17PK0frQNpyk3CZkaqfa0Z2TZ39LOa4ci5eAsmoPpKDiTMiZl5HbxL3wkDqHcwr71N3OX087E39Ma9NVTEWdpXZ8QwsTz49+cKyZEQe075BiV1QCjsNZNhvZJ/UA8jdmSunhbo=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730837790; c=relaxed/simple;
+	bh=QGRu8e7Q8cMWbxkUQKXJDLkF0a1GKISCgJEGmwDJRKM=;
+	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
+	 Content-Type:MIME-Version; b=Lj9a0c3KBHYaYyrxZqwRsrRGvBw0E+sqFpg2CA65DBnejguEW16VfFoIAKTFeIVAYp0yS2OZa/2m6yHaxEAIT43NK+v1u1+LMcwFHMHHf/slQTLOgxcZwsW6cgpMIVHF4B8Cus+tCDroxx1uBTC7K6nbRzYMo3CpEfIti8soGJI=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=7Hr+tHdg reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.237.139
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=i1AxyS2wCF/ySXxSpHavrmmF95fgKZiqq1kVtVxFK0kpbUFTfmmWw7FLbIR004CzMUMbVYLTXpikA3pI0bjBR4V0pq94Ka5ToDUbaBiV0muWENYZIKUSznEuoDDwI6ViOaoXUc5hXozmjVjKpnpAE4RvFRCCBKr+z8kWdJiKGY8nOiiiQoIl7E/Z1q6iiHOfkJquAj8DQDMCH0yRoNhq01oZZ49K8zoxR+bEqh/VAN4a9o6dqeT/HtuTVM617YoJ3hYVmiPnAZLA4QzX/VeRGgfhv0sVu6oc2+1npgpd2ixDanzYDf6wFvdSYPHWA9XwTyIMUEwwK/9xbAxStpYCAA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tv8QdFk2GF7o9Ljjm0s/1doZenir128EfTZatqIsACA=;
+ b=nUZ6JnjMBoMWWXgAKdAsY2C78pJL/PzEF9vjlylPmj3MSQd2SKK+j76IeJv7oxkJ6TX0bPmkhmuyDBX6q8TZgOV1zMqpjWo1WSb3Hmah5+4uWom+9eRuSYCmmT6j+uqt02Q0R/EGYfE1tkTb8QzIXOIagbJPe5QMNHhXRUd75JEgceLDhLI28FetsrrHH0VWbz2iQGNd1TfTXD8oNolW5aud5XftJOmzn6tWAKX9bt9x5TjUg5tuCkoN/JOC56VnLNOGDi2UyE7zQiL6/KKhMUcPOqXsMluFZafcX2qEj5ljPmS1BE/c23Wf79ApAvvC3bjd9crPqBAs/KOwAz4Gow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
+ header.from=amperemail.onmicrosoft.com; dkim=pass
+ header.d=amperemail.onmicrosoft.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tv8QdFk2GF7o9Ljjm0s/1doZenir128EfTZatqIsACA=;
+ b=7Hr+tHdgdJ+Frb7q/l8pFWkdZ9DYsNXWJh60xlOCVAYLCHWeJtaxyzD21TXsofHAwXbdarJRx/SyZCJQOtTRyqUVw3Q58DAhC/A6ybcAwYwYotLtazIxwGfbeTzGxL1rKn8CaPUjEBlGepVeIIjbuAp4HqKK5NozfzsVJhlSOmU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
+Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
+ LV8PR01MB8499.prod.exchangelabs.com (2603:10b6:408:187::12) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.8137.18; Tue, 5 Nov 2024 20:16:25 +0000
+Received: from SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
+ ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.8137.018; Tue, 5 Nov 2024
+ 20:16:25 +0000
+Message-ID: <693f39f9-9505-4135-91db-a7280570fbc3@amperemail.onmicrosoft.com>
+Date: Tue, 5 Nov 2024 15:16:20 -0500
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
+To: Jeremy Kerr <jk@codeconstruct.com.au>, admiyo@os.amperecomputing.com,
+ Matt Johnston <matt@codeconstruct.com.au>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Sudeep Holla <sudeep.holla@arm.com>,
+ Jonathan Cameron <Jonathan.Cameron@huawei.com>,
+ Huisong Li <lihuisong@huawei.com>
+References: <20241029165414.58746-1-admiyo@os.amperecomputing.com>
+ <20241029165414.58746-3-admiyo@os.amperecomputing.com>
+ <b614c56f007b2669f1a23bfe8a8bc6c273f81bba.camel@codeconstruct.com.au>
+ <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
+ <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
+Content-Language: en-US
+From: Adam Young <admiyo@amperemail.onmicrosoft.com>
+In-Reply-To: <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SJ0PR03CA0192.namprd03.prod.outlook.com
+ (2603:10b6:a03:2ef::17) To SA0PR01MB6171.prod.exchangelabs.com
+ (2603:10b6:806:e5::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
- has already unbound
-To: Yunsheng Lin <linyunsheng@huawei.com>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc: zhangkun09@huawei.com, fanghaiqing@huawei.com, liuyonglong@huawei.com,
- Robin Murphy <robin.murphy@arm.com>,
- Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
- <edumazet@google.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- kernel-team <kernel-team@cloudflare.com>
-References: <20241022032214.3915232-1-linyunsheng@huawei.com>
- <20241022032214.3915232-4-linyunsheng@huawei.com>
- <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
- <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
- <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
- <cf1911c5-622f-484c-9ee5-11e1ac83da24@huawei.com> <878qu7c8om.fsf@toke.dk>
- <1eac33ae-e8e1-4437-9403-57291ba4ced6@huawei.com> <87o731by64.fsf@toke.dk>
- <023fdee7-dbd4-4e78-b911-a7136ff81343@huawei.com> <874j4sb60w.fsf@toke.dk>
- <a50250bf-fe76-4324-96d7-b3acf087a18c@huawei.com>
-Content-Language: en-US
-From: Jesper Dangaard Brouer <hawk@kernel.org>
-In-Reply-To: <a50250bf-fe76-4324-96d7-b3acf087a18c@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|LV8PR01MB8499:EE_
+X-MS-Office365-Filtering-Correlation-Id: 89cf5ff0-f4dc-445e-2b89-08dcfdd6b93a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|10070799003;
+X-Microsoft-Antispam-Message-Info:
+	=?utf-8?B?MFVuTCtVbUk0T0NhMk9hZTgvT3k3V0luRkd3aDh1MEJ0NkxYS0RzT3J5NVBj?=
+ =?utf-8?B?enhteUkvRzYvNDFDNUMxclo3QkZXSFBicWdWaGlZWHZZSHliakZDaFFseHZP?=
+ =?utf-8?B?bVJDWEJoNjdxcnBiOC9kbG5oQlArWmU5b3B3N1dlK3Z3S210NG1aU2Y5cCty?=
+ =?utf-8?B?N1YxaHMxN3MxSHhScVY4cWRhYWJRODhsVFY5UVhIQ0dBQTZNWW9NVlZMM2NO?=
+ =?utf-8?B?RUlteHBWMVlwUk0vQVFTYVFCWXlESmFLR2d6cnRiaXZNTjdsbllMVzQvNnEw?=
+ =?utf-8?B?c3lWVk1hRzlybS9rK0lyQjJjazNCVi84RDBwWEpQcU95eWNYT1F2dm5BU25U?=
+ =?utf-8?B?NDJjRzFkenVPblA5eG1uaS94NjJGWjNpQS9TWFVFWVVxVVhKWkRlNXJJQTJX?=
+ =?utf-8?B?bDY4Y3Nxd214MCtrVEhFQjMwQUJsN3VKeXY3NEpreHRUK0dQOU4wRlQ0YjdH?=
+ =?utf-8?B?WlFOTGs4Wk03eUdGTkU5cEY2UzFzeDNpcG9LRGoxNWl3NnlicEE3RU5ySUpF?=
+ =?utf-8?B?OU8rblk3MnE0VzhqZzBJYmlFQzR2ZXVwblN4VGErcDE0cVpST0x5SXg5S1Ay?=
+ =?utf-8?B?WFVWbDByTTdvLzhnTDA1aEtUNFloUit4UWdUb2l4SnNYWngwOFpaTWdKcVVZ?=
+ =?utf-8?B?bytHWFd1QVhsNFprSUZ5NS9XSjN1WEhBanpYSkNOTGpKQlhXdmhGdk9tcmtQ?=
+ =?utf-8?B?Wjdkdk9ZSU5RYUNSN2huWDJHajYzNEVxNjQvWjh4cmRHUmNud2o3ZVNwbGYx?=
+ =?utf-8?B?T2tiNlA3UHN4cjBESHFxb2xXYnlyMUY3WWU5MGFzZHBUUDRNS1pUVEk3V2s2?=
+ =?utf-8?B?U0RBVTQyTVFialhZSC9UVTNicWJCK3VTREswbGdvZ0crL0NSRUtyYmg5aWQ4?=
+ =?utf-8?B?d3pLdHVhRTdkbzR0WUJTMGR3V0JINUlzVHVVbm9NbFpFb0c2V0J1U2l6WE5x?=
+ =?utf-8?B?dGpqRlJTZGFhQkxhNnI1UUlGZ1NvSHRXYjNhb08xOTl0YzZEcHJQMnVwUUhT?=
+ =?utf-8?B?eFBQWWhMVk9BQkpSbzN6ZFVzellKZUwvMU5kd2lTY2hibHFON25mNmhZNXBR?=
+ =?utf-8?B?VlgvWmhncThpQmVNWUpadSthSzNUcHFhWU9CVzZ4UXZDT1FhYVJlUmFzZDJ0?=
+ =?utf-8?B?S2ZTWld1MUhWK2JWOCtjZFpEMG8ybVNtRjlvNzB4bmZOZElRN1hnM1Fxd1B4?=
+ =?utf-8?B?dXFNK2QzWndiQmNBZGxBdGtwcXdDYThpOUlEdTZ1YWV4S2ZaMjk3UFgzRWVN?=
+ =?utf-8?B?Y2lNWlh0NjlRS1hCSEFBeDZ5VzdUeVhVbWZrSCtIVnVzU3B6NnVWUGt0My9r?=
+ =?utf-8?B?eXJhenYwSUptbFRRQkRkNGh6aDIwWmdQcFpna3ltY3doU3hudzdLdGFhY1Na?=
+ =?utf-8?B?a2loQkVUZm50SndtZlR0Z0hPTndVQnpXam9ybkZHMCt2VmxWY216SXMvc2ts?=
+ =?utf-8?B?NHFFQ0R1TW1HVUE0Rk91eHpveG5XTUZ5YW8rQkRxT2ltRndDMVhQN1F3Ui9u?=
+ =?utf-8?B?N1kzc1FIQVhEY0ZCN0VUVTZ3ODFKaE5WRU9ITnVTL1UxNjdidjRYc21oMnMv?=
+ =?utf-8?B?MlVNeDlPbmM1cG9CeVdxWXliNk8xNURHTE0vQ2dYVmpNNXUwVlhNeDBrdHhn?=
+ =?utf-8?B?eGtkdmRzc0p0YmlUV0VpZmFQdFdJQ0M0dlBJblMyWDhWTWFSNmMvNWNaMFZh?=
+ =?utf-8?B?R3pXczYyRmU5cGVNVWJLbGJGd3kvOUFJWjNPVkg5NGVBVlp5L1FCU3ZmcXRS?=
+ =?utf-8?Q?uEyf1P213tcn8/tqNys1UdIYcgkxe+JePKJIVY4?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(10070799003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?NWJVYlJGc2J1anV6UmtjanE3UVlwV3JrL3NURE5scjQ2RzVObDFpYlAvbkJS?=
+ =?utf-8?B?SkREOThHVXU1cVVoaEdnYzZaQ3M0YVlSNHRFY3BMRkIzK0FJZm1YU29rSU96?=
+ =?utf-8?B?ZkVWWVBINU5TRG15TSttQ3dpbTlhZWI2UmcycGYrQWJlWWdkdTI0eGJMOXpW?=
+ =?utf-8?B?TzRyQzI0RU1rNEdCbkFpVWdmNHZqVm5RRUVsNENsS0ZxMHYxS1pXWlFiUi9I?=
+ =?utf-8?B?SjN6cnNEeEpQNUUzNTBablBMNkxZMUhjVWhyQis1bWdmMkFzeFNwakNNUldW?=
+ =?utf-8?B?UnEwZld1aHNySnhVSHcvMDFsTjY2SWFvcFFlbndGYnRHcWRuMDlxZkZ6Nmxr?=
+ =?utf-8?B?OXVVVlEvdE9TWGpuc21RVHh0S2VFUU0zVE5oZnFqNUc5SzNGSEdwMi9YU0da?=
+ =?utf-8?B?NVpDdndNRUxKemZVZG9HZDdhMXhoeE9QbVZibnh2Q2h0K3NxKzk0SjZYVXdq?=
+ =?utf-8?B?Y3FyVU1LUExCQzJJbnpCVUdXUDRuMTQ5a0JHeDM3M0pkL0l2bHgrdWwveTZC?=
+ =?utf-8?B?bnc2WDFsblJ1Zkpsc2kwOXlnVnRrZWVEeGh2YmVPc3VaWWwvcnlFNmtNK3NT?=
+ =?utf-8?B?R2hYbm9uUVFpajFzQTA0KzRvV3dRcEE1RlVJbUYzemtSemlGN0poaUQrT29p?=
+ =?utf-8?B?dGRlallDTjY2bHRNUXlkUzd6OUh3MFpjbHhIbVJJbFc4ZnlZSTYzRUNiZ1BX?=
+ =?utf-8?B?RW5WdU1Md3lZMDdYdE5GS1J0Y0czZ1BoMStmdVA5NTdOM2g4OU5nMlhhN21y?=
+ =?utf-8?B?dFhpUldtd2FsYzZrLzVtWldCUmFlVkdlTmI3b3FJRnlnNWVHQ3lTd1ZQV0s5?=
+ =?utf-8?B?eWEvOW9saFJ2ZklxTDJJMGZZaTNNV0lHak16NkpzM25hQnluZk1BaHl2MG1i?=
+ =?utf-8?B?emN5Y0dQR3pyUXI4elo1Sjh3SS95VnR0d1RTOVZEUjNOU3p5S21GcWRQMjVt?=
+ =?utf-8?B?UGNpWUE0WnVpdzVYY2d5YTIvSW5JTHFqUGVIMEd2UGdhSjRaQzdZM1dSZkNp?=
+ =?utf-8?B?QU9sY0J4ZXF2MjBEbFljSGdsaWhOa2NFdjg5ZGdxUmt6cUU5UjZMNFR5MmlC?=
+ =?utf-8?B?ZDdNOUdIQk1pU2JkWk05U21LYXkvVWVTVHlRYXhGVTcyMThXdlRsZWN5OHVi?=
+ =?utf-8?B?RUVBdjFnYnZNSnBkaTFaUStPVVpwNG41Vnd5WlFYSG5Ta2diakR2aTFtcXc0?=
+ =?utf-8?B?aGFGUnUreG1KRzRydnh4R3V6MGRwVkY5ZnNyZHlBZGg0ekV5TDdaZnpneGVT?=
+ =?utf-8?B?VWY5MlEwM3Q0eTN0aHFaSzBYZmZXNmZNZFZURGtNWndHbWpXSkZuQjJIRkJE?=
+ =?utf-8?B?MUV2amhxd3Voby8rMERtL3VHdURPOVZoMk9nRUdERVRYcXZtaWlCbmMya3d0?=
+ =?utf-8?B?bk42dzlKdGtvbnBYdU5LSzZBd1FXV1pyRWhjeU9ySHE3aGVDVE5NZVAwcjVy?=
+ =?utf-8?B?SWJNV043QWR0cWc4RmxzaGsxcFEwQy9SNXdwNUZsaUl4djhYY1NPL2ZibGgv?=
+ =?utf-8?B?cllDSWtHVFlWSTQzTG9ZUU44QUUxc1ZPK0lnb3QxN1NPQTdubEtCZkVaYm5Z?=
+ =?utf-8?B?d3RUR2dnZllwR1kxM0tkVTZIT29PTENOamdrRHJTdmhZZW9YdHM5ZU14V1Ni?=
+ =?utf-8?B?cnpJK2RONklHeklEWEMrVlpjVVd4T1NabGpQQ20rclJsYWxrYVdzU011eDli?=
+ =?utf-8?B?QzBKbzBwVFZaeUF2ZXZNL2NtOFlyT2x0c29BZlBOWjFvREpmWFdmNkxEbkNH?=
+ =?utf-8?B?dGFNdkxLV0tRZWNQUWgvZEVsVmY3dUovMk9nVWZubE1HTlNwSGdZNnY0TVNx?=
+ =?utf-8?B?SzkreHduTEFaLzNEcG1yaEZvbXAyNjJIc2pWblh6aHp4dDdnVGQwTENFRUpW?=
+ =?utf-8?B?QjFtN00yMWhDTlJmMjNzZlZCdFo3NnVMbmhKUFJGdXhNZ2pPcDZxTkwxVmgr?=
+ =?utf-8?B?NERoM2MraHQvV0RpNXk5YjNmZFZKbXMzQk00VTNpWk1WenpEd3NVNW9FaERh?=
+ =?utf-8?B?bUVwOU5reVFTa2NtWEZOUmhRVDRlSm9hUUxWMXh1SisxOEVxajg2RFV3bDdX?=
+ =?utf-8?B?cmZyblN2ajFFa2lpRVQxSS94Qk5ubHRuNlROSGVMRE5wUTZKQmdjRXdDcjJl?=
+ =?utf-8?B?Y1JjS04vVUFUR0ZFS1krYndKcXRGcW95S01YM01BdTU2aUlmekRSUUJpa3hq?=
+ =?utf-8?B?VnIvdDF6WERibzdNUkJqZzdqUFFXY0hHNnFtWHNPcElzMHRSaklBcDNUNTFv?=
+ =?utf-8?Q?fhJ67nPSjqezJ2IDthOEEr0qM333FhZsoY35Rzk+X0=3D?=
+X-OriginatorOrg: amperemail.onmicrosoft.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 89cf5ff0-f4dc-445e-2b89-08dcfdd6b93a
+X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 20:16:25.3996
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: boxyklQSxJrlNjEfLodxKwkVBILFtdjN2b22OSsivnG/8BdlQeKGnjEtSq6WZL0pTiyi//gFLbyBT/IijEJZpOMGFDnE/HbH9lj67zetxUNYSaZcjmpO7HQowXX0kXhY
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR01MB8499
 
 
-
-On 01/11/2024 12.11, Yunsheng Lin wrote:
-> On 2024/11/1 0:18, Toke Høiland-Jørgensen wrote:
-> 
-> ...
-> 
->>>>
->>>> Eliding the details above, but yeah, you're right, there are probably
->>>> some pernicious details to get right if we want to flush all caches. S
->>>> I wouldn't do that to start with. Instead, just add the waiting to start
->>>> with, then wait and see if this actually turns out to be a problem in
->>>> practice. And if it is, identify the source of that problem, deal with
->>>> it, rinse and repeat :)
->>>
->>> I am not sure if I have mentioned to you that jakub had a RFC for the waiting,
->>> see [1]. And Yonglong Cc'ed had tested it, the waiting caused the driver unload
->>> stalling forever and some task hung, see [2].
->>>
->>> The root cause for the above case is skb_defer_free_flush() not being called
->>> as mentioned before.
->>
->> Well, let's fix that, then! We already logic to flush backlogs when a
->> netdevice is going away, so AFAICT all that's needed is to add the
-> 
-> Is there a possiblity that the page_pool owned page might be still handled/cached
-> in somewhere of networking if netif_rx_internal() is already called for the
-> corresponding skb and skb_attempt_defer_free() is called after skb_defer_free_flush()
-> added in below patch is called?
-> 
-> Maybe add a timeout thing like timer to call kick_defer_list_purge() if you treat
-> 'outstanding forever' as leaked? I actually thought about this, but had not found
-> out an elegant way to add the timeout.
-> 
->> skb_defer_free_flush() to that logic. Totally untested patch below, that
->> we should maybe consider applying in any case.
-> 
-> I am not sure about that as the above mentioned timing window, but it does seem we
-> might need to do something similar in dev_cpu_dead().
-> 
->>
->>> I am not sure if I understand the reasoning behind the above suggestion to 'wait
->>> and see if this actually turns out to be a problem' when we already know that there
->>> are some cases which need cache kicking/flushing for the waiting to work and those
->>> kicking/flushing may not be easy and may take indefinite time too, not to mention
->>> there might be other cases that need kicking/flushing that we don't know yet.
->>>
->>> Is there any reason not to consider recording the inflight pages so that unmapping
->>> can be done for inflight pages before driver unbound supposing dynamic number of
->>> inflight pages can be supported?
->>>
->>> IOW, Is there any reason you and jesper taking it as axiomatic that recording the
->>> inflight pages is bad supposing the inflight pages can be unlimited and recording
->>> can be done with least performance overhead?
->>
->> Well, page pool is a memory allocator, and it already has a mechanism to
->> handle returning of memory to it. You're proposing to add a second,
->> orthogonal, mechanism to do this, one that adds both overhead and
-> 
-> I would call it as a replacement/improvement for the old one instead of
-> 'a second, orthogonal' as the old one doesn't really exist after this patch.
-> 
-
-Yes, are proposing doing a very radical change to the page_pool design.
-And this is getting proposed as a fix patch for IOMMU.
-
-It is a very radical change that page_pool needs to keep track of *ALL* 
-in-flight pages.
-
-The DMA issue is a life-time issue of DMA object associated with the
-struct device.  Then, why are you not looking at extending the life-time
-of the DMA object, or at least detect when DMA object goes away, such
-that we can change a setting in page_pool to stop calling DMA unmap for
-the pages in-flight once they get returned (which we have en existing
-mechanism for).
+On 11/1/24 04:55, Jeremy Kerr wrote:
+> Just to clarify that: for physical (ie, null-EID) addressing, you don't
+> need the hardware address, you need:
+>
+>   1) the outgoing interface's ifindex; and
+>   2) the hardware address of the*remote*  endpoint, in whatever
+>      format is appropriate for link type
 
 
->> complexity, yet doesn't handle all cases (cf your comment about devmem).
-> 
-> I am not sure if unmapping only need to be done using its own version DMA API
-> for devmem yet, but it seems waiting might also need to use its own version
-> of kicking/flushing for devmem as devmem might be held from the user space?
-> 
->>
->> And even if it did handle all cases, force-releasing pages in this way
->> really feels like it's just papering over the issue. If there are pages
->> being leaked (or that are outstanding forever, which basically amounts
->> to the same thing), that is something we should be fixing the root cause
->> of, not just working around it like this series does.
-> 
-> If there is a definite time for waiting, I am probably agreed with the above.
->  From the previous discussion, it seems the time to do the kicking/flushing
-> would be indefinite depending how much cache to be scaned/flushed.
-> 
-> For the 'papering over' part, it seems it is about if we want to paper over
-> different kicking/flushing or paper over unmapping using different DMA API.
-> 
-> Also page_pool is not really a allocator, instead it is more like a pool
-> based on different allocator, such as buddy allocator or devmem allocator.
-> I am not sure it makes much to do the flushing when page_pool_destroy() is
-> called if the buddy allocator behind the page_pool is not under memory
-> pressure yet.
-> 
+So Here is what I was thinking:
 
-I still see page_pool as an allocator like the SLUB/SLAB allocators,
-where slab allocators are created (and can be destroyed again), which we
-can allocate slab objects from.  SLAB allocators also use buddy
-allocator as their backing allocator.
+Lets ignore the namespace for now, as that is a future-proofing thing 
+and will be all 0.  If The OS listens on index 11 and the PLatform 
+listens index 22, the HW address for the OS would be
 
-The page_pool is of-cause evolving with the addition of the devmem
-allocator as a different "backing" allocator type.
+00001122
 
+and for the Platform
 
-> For the 'leaked' part mentioned above, I am agreed that it should be fixed
-> if we have a clear and unified definition of 'leaked'， for example, is it
-> allowed to keep the cache outstanding forever if the allocator is not under
-> memory pressure and not ask for the releasing of its memory?
-> 
+00002211
 
-It seems wrong to me if page_pool need to dictate how long the API users
-is allowed to hold the page.
+This is all the info  for the calling application to know both the 
+ifindex and the remote endpoint.
 
-> Doesn't it make more sense to use something like shrinker_register() mechanism
-> to decide whether to do the flushing?
-> 
-> IOW, maybe it makes more sense that the allocator behind the page_pool should
-> be deciding whether to do the kicking/flushing, and maybe page_pool should also
-> use the shrinker_register() mechanism to empty its cache when necessary instead
-> of deciding whether to do the kicking/flushing.
-> 
+They can re-order the address to 00002211 for the remote endpoint.  If 
+they have the link they have the ifindex.  It seems like a clean solution.
 
-Sure, I've argued before that page_pool should use shrinker_register()
-but only when used with the normal buddy allocator.
-BUT you need to realize that bad things can happen when network stack
-fails to allocate memory for packets, because it can block connections
-from making forward progress and those connections can be holding on to
-memory (that is part of the memory pressure problem).
+Adding the inbox id ( to the HW address does not harm anything, and it 
+makes things much more explicit.
 
+It seems like removing either the inbox or the outbox id from the HW 
+address is hiding information that should be exposed.  And the two 
+together make up the hardware addressing for the device, just not in 
+that exact format, but it maps directly.  That is what will be in the 
+upcoming version of the spec as well.
 
-> So I am not even sure if it is appropriate to do the cache kicking/flushing
-> during waiting, not to mention the indefinite time to do the kicking/flushing.
-
---Jesper
 
