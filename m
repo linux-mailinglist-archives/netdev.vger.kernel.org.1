@@ -1,119 +1,114 @@
-Return-Path: <netdev+bounces-141723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0FA9BC1BB
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:57:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A4EB9BC1BF
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:00:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0D841C20CC0
-	for <lists+netdev@lfdr.de>; Mon,  4 Nov 2024 23:57:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 04673B2105F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:00:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C1201FDFAF;
-	Mon,  4 Nov 2024 23:57:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFCB1FCF52;
+	Tue,  5 Nov 2024 00:00:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="PJrXYSf2"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="clBDYcfC"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0036A139CFF
-	for <netdev@vger.kernel.org>; Mon,  4 Nov 2024 23:57:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD4FA1B3951
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 00:00:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730764673; cv=none; b=oxGN9/r2ESCHNpe+fzog1zKYAiRoxPeK0gypibfsSGDRkyhbDTHmUhw5nzWGnSrP3cYKkCZ8bx/bmUrD7YYNpT1t+5HKqykwFPs2gAgKNupzTgJ4gMQgCVS7JO6KnM84X0gCDeA+XwyLTfiuNlgrZAx0/uRV6HxsBUt3lKCUdss=
+	t=1730764806; cv=none; b=Ybsr5UFyWNPlfUdFs5Dg+izG+Oq5VY7stqVEvEjHrQQNtencGC/nI+B5Yq0QoeWDJtaDJJ90RvqIAHTbygxWHYsnpK95W1faSzpDF+tUR4SxEvMy6xXBCFwjhjim8OTSpsxoaHB5hom8JkoNhK54mM3JmZK24u0taKpM4NhDIBk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730764673; c=relaxed/simple;
-	bh=dCgc2j8zsFcWKIhvPNux8ql6jRkdknqPrCg+obqN7Ek=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Wt3iFDRhJT/eCiGsjeet7JgPEq12s0Dzg2Os7nx72gRf0d2+cLK2Yy9wC1kCN4IMqny7TrZUtvNb1+jViOkHmnadKgNzyQqDynhF39P+Wmi9bHFyGcbeqt6swj2SKd/NMU3vR12jYq6km4TedDqPsDCKUTtL1We+clJxz6rG71s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=PJrXYSf2; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=dCgc2j8zsFcWKIhvPNux8ql6jRkdknqPrCg+obqN7Ek=; t=1730764672; x=1731628672; 
-	b=PJrXYSf2etxgUrin5EbdzGH/eCXZNI61sTnP7NcVk0zPf5p0N+O9B0BC9VfUI6NaHIt1HvCazdk
-	gncH71QlL1oxeTZL6LRjRPy4mzBfs4GYsULWwv7uhM9QxDMACfo1rR8S1YZYle/lqAY4MTVhtwP7i
-	Xaw3ipjYEsiJHXfB/ilhglT6hvB92YGlFBekI0hYSEe41xrVo7+30pkDPrVLsx/sWuXeJffBRukUN
-	L/HxKaiVwehM43syYIP62M7Da50Olf0Ue+T+cRBcy69PSe5qTuiSB0A6LGbOM61ilQiT4v+xbGE9T
-	S13N82cddKVwQ9yel2vC50bwv/anvcjKSuMw==;
-Received: from mail-oo1-f44.google.com ([209.85.161.44]:44066)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1t86x7-0003f8-14
-	for netdev@vger.kernel.org; Mon, 04 Nov 2024 15:57:45 -0800
-Received: by mail-oo1-f44.google.com with SMTP id 006d021491bc7-5ebbed44918so2830174eaf.0
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 15:57:45 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCXDFEt8DIzlRvrD4IpQXSxAZPQ5DWOKw9eRDCBUJKHWUKOG/c/UMOoILuBQQcyxgCBPKzBxAo8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy27zvODjzQ8kviRCNu9v8V/UN1I8ZDW7h3fp/0/Qzc5zEbVwCh
-	YodXShryX6wVGTxki6OUbRLIwu5Le2rl6qMu8+Fs8qfvE4q3tD9wDDnThObeRjm1TDIBt1kdoX2
-	glkkdTAD9roklOXG5qE6HeX6Ww8E=
-X-Google-Smtp-Source: AGHT+IFwebaIGfdtOvoQWKA9KYdpstIs/QkLjX2E4vhFuzXq0yG2WlLvRTLp4gsgg+aSYMmonUEzTFPQKUlvn5wlyck=
-X-Received: by 2002:a05:6820:1a03:b0:5c4:144b:1ff9 with SMTP id
- 006d021491bc7-5ec5ec9271dmr15088507eaf.5.1730764664445; Mon, 04 Nov 2024
- 15:57:44 -0800 (PST)
+	s=arc-20240116; t=1730764806; c=relaxed/simple;
+	bh=mAkFgCxWNbgHQQsvcbYxnXkz6l64EKdZMzmY/bptL6E=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=LaVX5vtrb4Nb8jAeMBWbrvWvqvn682NY8HNucIvAzHel7pCTCDeIUARE1MiUN8JOUISEG32jn5+DLV5AxmFOiVwU81M3HEogcqO83BfH5TpU/DRkYfhfgycDCj9K6gK9Kg66212odU4ZUBTTk1Lk/g+2UPoaK1uxDSqgFicINWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=clBDYcfC; arc=none smtp.client-ip=209.85.214.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20e576dbc42so50571315ad.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 16:00:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1730764804; x=1731369604; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ss2wdvpc+S9jF1wGdl+GS9FQpnDeDgZxQImgGWvIwg4=;
+        b=clBDYcfCXnTB9oZXZEbu4vX2HNUAS6m7q74fLhDIIj/BAxewMlekirRF2AlguhM/cj
+         UCnBhE+m4AVaPcz+lKr1HjqgSmdpr/jGg9CRBX19uIikCZY7ZZLVh5ig3IscNeIixc3A
+         HzM4eSfSs7IDKPFbIVkzRgfeoQS5qjrCmVl4o=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730764804; x=1731369604;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ss2wdvpc+S9jF1wGdl+GS9FQpnDeDgZxQImgGWvIwg4=;
+        b=qNi0y7mXBoODCZp/y+Pn4vMY35SgkB1XFbwWVCRscSrCZawc9158/sw88L9j6zthVJ
+         pSehaz0habObqHY4kPQSVz5jvjiTvz3H6Mhg9q/YYEDK+EKpMPmyMe3h+jTryeifVEpE
+         KmW3ckeAKhvtmz3/nl0GMqZGK33NsqVbwFSA7JkULCxeoAvWuqU9hc7w7fmQ77pwbg/S
+         bEZxT0IYfunELBiSrnXODyGT6+oSemLZYLag2S286KhodCCpHZS3CRFOicjayhsdsd21
+         zIx2LZ5zSAfItxJqmuPdn2o4eETtGTB9Vvg06IzVEMEkbqBtL34jP39ju6TxIiZ3Nxcw
+         B/Zg==
+X-Gm-Message-State: AOJu0YxMjLNgcP0u1DGBd9w0N6woOt7i5ms5bViZhJKbCHPY8cMimoCh
+	z/LeONLEsuZgUKctXD/qrE1rDbBIOdEwoRzvbkxl8Qvh5GQLvcJDZNz0z/g0h0s=
+X-Google-Smtp-Source: AGHT+IEkbdGvIND5jE3XAsTDbBC7w3dQ7XXuiWp6+dkn4ch0B6RZqBsVaq+6l6hQ27sWvq1RnnEcpw==
+X-Received: by 2002:a17:902:e812:b0:20c:ef90:e4b5 with SMTP id d9443c01a7336-21103ca54e2mr239137785ad.52.1730764804073;
+        Mon, 04 Nov 2024 16:00:04 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057c0518sm67092635ad.182.2024.11.04.16.00.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 16:00:03 -0800 (PST)
+Date: Mon, 4 Nov 2024 16:00:00 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v7 08/12] selftests: ncdevmem: Use YNL to enable
+ TCP header split
+Message-ID: <ZylgAPuiYuNcEAvk@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+References: <20241104181430.228682-1-sdf@fomichev.me>
+ <20241104181430.228682-9-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-5-ouster@cs.stanford.edu>
- <dfadfd49-a7ce-4327-94bd-a1a24cbdd5a3@lunn.ch> <CAGXJAmycKLobQxYF6Wm9RLgTFCJkhcW1-4Gzwb1Kzh7RDnt6Zg@mail.gmail.com>
- <67c42f72-4448-4fab-aa5d-c26dd47da74f@lunn.ch> <CAGXJAmyOAEC+d6aM1VQ=w2EYZXB+s4RwuD6TeDiyWpo1bnGE4w@mail.gmail.com>
- <bfb037fb-ee80-4b34-9db3-bd953c24fee8@intel.com>
-In-Reply-To: <bfb037fb-ee80-4b34-9db3-bd953c24fee8@intel.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Mon, 4 Nov 2024 15:57:08 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmykXGrd-sQO-Q1TvEwbBwnOZXTcegfh2OxjhAQ8dUH9Yw@mail.gmail.com>
-Message-ID: <CAGXJAmykXGrd-sQO-Q1TvEwbBwnOZXTcegfh2OxjhAQ8dUH9Yw@mail.gmail.com>
-Subject: Re: [PATCH net-next 04/12] net: homa: create homa_pool.h and homa_pool.c
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: bd70d0bdda1312c8b25f7b39d1e2fb7f
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104181430.228682-9-sdf@fomichev.me>
 
-On Mon, Nov 4, 2024 at 5:13=E2=80=AFAM Przemek Kitszel
-<przemyslaw.kitszel@intel.com> wrote:
-> >
-> > Homa doesn't allocate or free pages for this: the application mmap's a
-> > region and passes the virtual address range to Homa. Homa doesn't need
-> > to pin the pages. This memory is used in a fashion similar to how a
-> > buffer passed to recvmsg would be used, except that Homa maintains
-> > access to the region for the lifetime of the associated socket. When
-> > the application finishes processing an incoming message, it notifies
-> > Homa so that Homa can reuse the message's buffer space for future
-> > messages; there's no page allocation or freeing in this process.
->
-> nice, and I see the obvious performance gains that this approach yields,
-> would it be possible to instead of mmap() from user, they will ask Homa
-> to prealloc? That way it will be harder to unmap prematurely, and easier
-> to port apps between OSes too.
+On Mon, Nov 04, 2024 at 10:14:26AM -0800, Stanislav Fomichev wrote:
+> In the next patch the hard-coded queue numbers are gonna be removed.
+> So introduce some initial support for ethtool YNL and use
+> it to enable header split.
+> 
+> Also, tcp-data-split requires latest ethtool which is unlikely
+> to be present in the distros right now.
+> 
+> (ideally, we should not shell out to ethtool at all).
+> 
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  tools/testing/selftests/net/Makefile   |  2 +-
+>  tools/testing/selftests/net/ncdevmem.c | 57 +++++++++++++++++++++++++-
+>  2 files changed, 56 insertions(+), 3 deletions(-)
 
-Can you say a bit more about how your proposal would work? I'm not
-familiar enough with Linux internals to know how Homa could populate a
-region of address space on behalf of the user.
-
-Having the application mmap the region is pretty clean and simple and
-gives the application total control over the type and placement of the
-region (it doesn't necessarily even have to be a separate mmapped
-region). If the application messes things up by unmapping prematurely,
-it won't cause any problems for Homa: this will be detected when Homa
-tries to copy info out to the bogus addresses, just as would happen
-with a bogus buffer in a traditional approach to buffer management.
-And, the mmapping is likely to be done automatically by a user-space
-library, so it shouldn't impose additional complexity on the main
-application.
-
--John-
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
