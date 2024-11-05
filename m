@@ -1,513 +1,185 @@
-Return-Path: <netdev+bounces-141848-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141849-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AD459BC82F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:39:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E1729BC849
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:47:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CF68528390D
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:39:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7A0628227F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:47:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8AAF1D26F5;
-	Tue,  5 Nov 2024 08:38:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2D061BD50C;
+	Tue,  5 Nov 2024 08:46:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="EXbKzF44"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EABA21D1F44
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:38:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
+Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com [209.85.167.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 085A770837
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:46:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730795917; cv=none; b=MrPnDI/n6UEeJxhbYmEx/XmgW0S0TO73KTlllI1sNEyBc4zOz3HExq53Ao8Uhrx4hIZEiGi42PcUf4V1an+nJYylS1LPjIscoH8ymUaYVv2/RmORsHE90aUwNHjXaFOE3viGJcCf6TZTcveDUj7y1C4OZ7uJg/tSWbDtpsBT244=
+	t=1730796417; cv=none; b=OOa1OaV8CdgXQnbPf8k63GXBVl5FfOZhiMgfvxo9zKJN9j+JDaHZua1tmVQIzFGaTxjw9HAosnQYpfEyVPa6B9KdlOBiOjd3Mjrw1tJN95+cAj9mRssxVahaU3cEA8RjBxLVqlwKQyEJtowYT0NmKxhQaeDWxLlMhjsLYMU6gEA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730795917; c=relaxed/simple;
-	bh=aR4TD0g7e987NdeoRXc0f+tf07Dc8c5pPEC4CK/MT7c=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=aGOvsGbSIYoiKPADCNxzFcHh3LN2qcix7cunmiitsjEtt1LJm+dAV1K/nX77oZ1e635yOn9xTRZ3jzh0hrWO/m3qEHRuyOLmOFcwNmiRFAliS1sXOWWA9aIWhMSJcpgwQRAGh53a67q+0iUCVzW8TeBXo/KqhSO1w9c2pniXwOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
-Received: from labnh.big (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by smtp.chopps.org (Postfix) with ESMTPSA id 57C227D137;
-	Tue,  5 Nov 2024 08:38:35 +0000 (UTC)
-From: Christian Hopps <chopps@chopps.org>
-To: devel@linux-ipsec.org
-Cc: Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org,
-	Florian Westphal <fw@strlen.de>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Simon Horman <horms@kernel.org>,
-	Antony Antony <antony@phenome.org>,
-	Christian Hopps <chopps@chopps.org>,
-	Christian Hopps <chopps@labn.net>
-Subject: [PATCH ipsec-next v13 15/15] xfrm: iptfs: add tracepoint functionality
-Date: Tue,  5 Nov 2024 03:37:59 -0500
-Message-ID: <20241105083759.2172771-16-chopps@chopps.org>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241105083759.2172771-1-chopps@chopps.org>
-References: <20241105083759.2172771-1-chopps@chopps.org>
+	s=arc-20240116; t=1730796417; c=relaxed/simple;
+	bh=lz46w3w9y3OIp9uhJnKaTVCU1Vb4YxR1Pa7KZVnb+M4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=YamG1KqQ64uqkmZNGsK6sRBa4tgCikNgXXZr8WcdCVgZ0bk+V9DKF2tYzBlDdsBDyv2BEe1NyIPHbqL/ZVDXzp4eUBP1Wb53sHfmPliQmR3JlCdZOOG71e4V2ogRT0BOgkzk+Sy7vHIrzyrIr8NaoidFer+6IBR6j4LrIkbkRvc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=EXbKzF44; arc=none smtp.client-ip=209.85.167.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-539ebb5a20aso5482300e87.2
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 00:46:55 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730796414; x=1731401214; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8iMhZkDS+u7rLshm1oK3Z/OFVvJH+7ihkLEqZbSBHvw=;
+        b=EXbKzF44jLQFM0+A33i9We+BGx4m+Q92phqUKWigz+BybtT0B5jWKqQmRM61gH3uAy
+         9ByvIP+r2bfED1CvTew3gsfSsWkvywXBsL59GKQHU+6MLzbatdgyO6sgW+rDDsC7pcB6
+         UrevHlMHzcCrGLvrhiJdCB8kxjI+79G/VxlXz007LZ2n/zi8PPE0FJouHoGBHUhJa4Er
+         Cw0oKRtQEW9+v85XPw8EVPqxJIWtF+YA0sBFpXB3Rgi4rYevnEGHb7iwx8Dvio9MzjfW
+         8I/I9uHENCfBs4lurl4wvbwKTpIl94iP+uS06nDVsiFUNH+tZAfNotdv9VXicQbtyXP6
+         H4TA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730796414; x=1731401214;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8iMhZkDS+u7rLshm1oK3Z/OFVvJH+7ihkLEqZbSBHvw=;
+        b=f4qEH5C1PTlnuxWclu9utPmiCvnXd6GoSt0bu+p4XsCuIiR6xKGZOISSfEV+jmVN3U
+         IEDgU/LrbPxSMWV5jTHLpblUZsBlesEy9WPlbkyfZBzHvjjqtsubSvVVPluP8bFmV08W
+         w/MpdApBOH8CAfpfNPnbjU12C4mq/RsUNxA+XCt8Q4KyzYPGoqNkuFCBd67fegGxbksS
+         v9cDgMAL6luPlJiO9wVvQp6vdT2g78pEfP8WzV1z2jBTtiMgwyyLj3BKSCruEWCQsNPu
+         uMKqIDv8zGJN7mE6z4KLY5s3VIzV5AldfoOmAWcyXvF31zpXYSRpOpu9seZsKTLO7thN
+         upTA==
+X-Forwarded-Encrypted: i=1; AJvYcCVinXZvlqR1wHJS1D94tlEtwvoN+uS3us17nsUKGElHkkz5yxcNiHh859u0/DCuwTo0qbgVbPY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyZy9zDUnkHpkSS8Ilqik/hesUG1zOqBil7oEU/gEkzrMOz0zBi
+	2WUJjR83DXMt0SUzUlVA68KzMkKLcdc9Otnn9sHz+w1a24L0uXoa49pkqdVpnvIkEw++B/aHxpN
+	Lr/6UP8q9WzBcSD+zvK/29V6O3d2ILEybxOXnWOLNJpqeLRJSBh8Y
+X-Google-Smtp-Source: AGHT+IFgPIw15hlQO2evJi2mffY2eV1XrscJG5+iJsl0I3vYoNcrPdeJ1KR3RrJmYdNqM8VevD2Vnoox+piUb5YJ64s=
+X-Received: by 2002:a05:6402:90e:b0:5ce:b1da:3003 with SMTP id
+ 4fb4d7f45d1cf-5ceb928c6f6mr11152661a12.20.1730796400869; Tue, 05 Nov 2024
+ 00:46:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241104152622.3580037-1-edumazet@google.com> <20241104204005.86813-1-kuniyu@amazon.com>
+In-Reply-To: <20241104204005.86813-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 5 Nov 2024 09:46:29 +0100
+Message-ID: <CANn89iJ09MAg5Zf0b7LPby--1YVi9vcwKQDDGH=E5_Bvw1P89Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] phonet: do not call synchronize_rcu() from phonet_route_del()
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: courmisch@gmail.com, davem@davemloft.net, eric.dumazet@gmail.com, 
+	kuba@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-From: Christian Hopps <chopps@labn.net>
+On Mon, Nov 4, 2024 at 9:40=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
+>
+> From: Eric Dumazet <edumazet@google.com>
+> Date: Mon,  4 Nov 2024 15:26:22 +0000
+> > Calling synchronize_rcu() while holding rcu_read_lock() is not
+> > permitted [1]
+>
+> Thanks for catching this !
+>
+> >
+> > Move the synchronize_rcu() to route_doit().
+> >
+> > [1]
+> > WARNING: suspicious RCU usage
+> > 6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0 Not tainted
+> > -----------------------------
+> > kernel/rcu/tree.c:4092 Illegal synchronize_rcu() in RCU read-side criti=
+cal section!
+> >
+> > other info that might help us debug this:
+> >
+> > rcu_scheduler_active =3D 2, debug_locks =3D 1
+> > 1 lock held by syz-executor427/5840:
+> >   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquir=
+e include/linux/rcupdate.h:337 [inline]
+> >   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock i=
+nclude/linux/rcupdate.h:849 [inline]
+> >   #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: route_doit+0x3d=
+6/0x640 net/phonet/pn_netlink.c:264
+> >
+> > stack backtrace:
+> > CPU: 1 UID: 0 PID: 5840 Comm: syz-executor427 Not tainted 6.12.0-rc5-sy=
+zkaller-01056-gf07a6e6ceb05 #0
+> > Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS=
+ Google 09/13/2024
+> > Call Trace:
+> >  <TASK>
+> >   __dump_stack lib/dump_stack.c:94 [inline]
+> >   dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+> >   lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6821
+> >   synchronize_rcu+0xea/0x360 kernel/rcu/tree.c:4089
+> >   phonet_route_del+0xc6/0x140 net/phonet/pn_dev.c:409
+> >   route_doit+0x514/0x640 net/phonet/pn_netlink.c:275
+> >   rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6790
+> >   netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+> >   netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+> >   netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+> >   netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+> >   sock_sendmsg_nosec net/socket.c:729 [inline]
+> >   __sock_sendmsg+0x221/0x270 net/socket.c:744
+> >   sock_write_iter+0x2d7/0x3f0 net/socket.c:1165
+> >   new_sync_write fs/read_write.c:590 [inline]
+> >   vfs_write+0xaeb/0xd30 fs/read_write.c:683
+> >   ksys_write+0x183/0x2b0 fs/read_write.c:736
+> >   do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >   do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> >  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+> > Fixes: 17a1ac0018ae ("phonet: Don't hold RTNL for route_doit().")
+> > Reported-by: syzbot <syzkaller@googlegroups.com>
+> > Signed-off-by: Eric Dumazet <edumazet@google.com>
+> > Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > Cc: Remi Denis-Courmont <courmisch@gmail.com>
+> > ---
+> >  net/phonet/pn_dev.c     |  4 +++-
+> >  net/phonet/pn_netlink.c | 10 ++++++++--
+> >  2 files changed, 11 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/net/phonet/pn_dev.c b/net/phonet/pn_dev.c
+> > index 19234d664c4fb537eba0267266efbb226cf103c3..578d935f2b11694fd1004c5=
+f854ec344b846eeb2 100644
+> > --- a/net/phonet/pn_dev.c
+> > +++ b/net/phonet/pn_dev.c
+> > @@ -406,7 +406,9 @@ int phonet_route_del(struct net_device *dev, u8 dad=
+dr)
+> >
+> >       if (!dev)
+> >               return -ENOENT;
+> > -     synchronize_rcu();
+> > +
+> > +     /* Note : our caller must call synchronize_rcu() */
+> > +
+> >       dev_put(dev);
+>
+> Are these synchronize_rcu() + dev_put() paired with rcu_read_lock()
+> and dev_hold() in phonet_route_output() ?
 
-Add tracepoints to the IP-TFS code.
+This dev_put() was before your patch.
 
-Signed-off-by: Christian Hopps <chopps@labn.net>
----
- net/xfrm/trace_iptfs.h | 218 +++++++++++++++++++++++++++++++++++++++++
- net/xfrm/xfrm_iptfs.c  |  69 ++++++++++++-
- 2 files changed, 286 insertions(+), 1 deletion(-)
- create mode 100644 net/xfrm/trace_iptfs.h
+It is paired the dev_hold() in phonet_route_add()
 
-diff --git a/net/xfrm/trace_iptfs.h b/net/xfrm/trace_iptfs.h
-new file mode 100644
-index 000000000000..74391ba24445
---- /dev/null
-+++ b/net/xfrm/trace_iptfs.h
-@@ -0,0 +1,218 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* xfrm_trace_iptfs.h
-+ *
-+ * August 12 2023, Christian Hopps <chopps@labn.net>
-+ *
-+ * Copyright (c) 2023, LabN Consulting, L.L.C.
-+ */
-+
-+#undef TRACE_SYSTEM
-+#define TRACE_SYSTEM iptfs
-+
-+#if !defined(_TRACE_IPTFS_H) || defined(TRACE_HEADER_MULTI_READ)
-+#define _TRACE_IPTFS_H
-+
-+#include <linux/kernel.h>
-+#include <linux/skbuff.h>
-+#include <linux/tracepoint.h>
-+#include <net/ip.h>
-+
-+struct xfrm_iptfs_data;
-+
-+TRACE_EVENT(iptfs_egress_recv,
-+	    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u16 blkoff),
-+	    TP_ARGS(skb, xtfs, blkoff),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(void *, head)
-+			     __field(void *, head_pg_addr)
-+			     __field(void *, pg0addr)
-+			     __field(u32, skb_len)
-+			     __field(u32, data_len)
-+			     __field(u32, headroom)
-+			     __field(u32, tailroom)
-+			     __field(u32, tail)
-+			     __field(u32, end)
-+			     __field(u32, pg0off)
-+			     __field(u8, head_frag)
-+			     __field(u8, frag_list)
-+			     __field(u8, nr_frags)
-+			     __field(u16, blkoff)),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->head = skb->head;
-+			   __entry->skb_len = skb->len;
-+			   __entry->data_len = skb->data_len;
-+			   __entry->headroom = skb_headroom(skb);
-+			   __entry->tailroom = skb_tailroom(skb);
-+			   __entry->tail = (u32)skb->tail;
-+			   __entry->end = (u32)skb->end;
-+			   __entry->head_frag = skb->head_frag;
-+			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
-+			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
-+			   __entry->blkoff = blkoff;
-+			   __entry->head_pg_addr = page_address(virt_to_head_page(skb->head));
-+			   __entry->pg0addr = (__entry->nr_frags
-+					       ? page_address(netmem_to_page(skb_shinfo(skb)->frags[0].netmem))
-+					       : NULL);
-+			   __entry->pg0off = (__entry->nr_frags
-+					      ? skb_shinfo(skb)->frags[0].offset
-+					      : 0);
-+		    ),
-+	    TP_printk("EGRESS: skb=%p len=%u data_len=%u headroom=%u head_frag=%u frag_list=%u nr_frags=%u blkoff=%u\n\t\ttailroom=%u tail=%u end=%u head=%p hdpgaddr=%p pg0->addr=%p pg0->data=%p pg0->off=%u",
-+		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->headroom,
-+		      __entry->head_frag, __entry->frag_list, __entry->nr_frags, __entry->blkoff,
-+		      __entry->tailroom, __entry->tail, __entry->end, __entry->head,
-+		      __entry->head_pg_addr, __entry->pg0addr, __entry->pg0addr + __entry->pg0off,
-+		      __entry->pg0off)
-+	)
-+
-+DECLARE_EVENT_CLASS(iptfs_ingress_preq_event,
-+		    TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs,
-+			     u32 pmtu, u8 was_gso),
-+		    TP_ARGS(skb, xtfs, pmtu, was_gso),
-+		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+				     __field(u32, skb_len)
-+				     __field(u32, data_len)
-+				     __field(u32, pmtu)
-+				     __field(u32, queue_size)
-+				     __field(u32, proto_seq)
-+				     __field(u8, proto)
-+				     __field(u8, was_gso)
-+			    ),
-+		    TP_fast_assign(__entry->skb = skb;
-+				   __entry->skb_len = skb->len;
-+				   __entry->data_len = skb->data_len;
-+				   __entry->queue_size =
-+					xtfs->cfg.max_queue_size - xtfs->queue_size;
-+				   __entry->proto = __trace_ip_proto(ip_hdr(skb));
-+				   __entry->proto_seq = __trace_ip_proto_seq(ip_hdr(skb));
-+				   __entry->pmtu = pmtu;
-+				   __entry->was_gso = was_gso;
-+			    ),
-+		    TP_printk("INGRPREQ: skb=%p len=%u data_len=%u qsize=%u proto=%u proto_seq=%u pmtu=%u was_gso=%u",
-+			      __entry->skb, __entry->skb_len, __entry->data_len,
-+			      __entry->queue_size, __entry->proto, __entry->proto_seq,
-+			      __entry->pmtu, __entry->was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_enqueue,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_no_queue_space,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DEFINE_EVENT(iptfs_ingress_preq_event, iptfs_too_big,
-+	     TP_PROTO(struct sk_buff *skb, struct xfrm_iptfs_data *xtfs, u32 pmtu, u8 was_gso),
-+	     TP_ARGS(skb, xtfs, pmtu, was_gso));
-+
-+DECLARE_EVENT_CLASS(iptfs_ingress_postq_event,
-+		    TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff, struct iphdr *iph),
-+		    TP_ARGS(skb, mtu, blkoff, iph),
-+		    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+				     __field(u32, skb_len)
-+				     __field(u32, data_len)
-+				     __field(u32, mtu)
-+				     __field(u32, proto_seq)
-+				     __field(u16, blkoff)
-+				     __field(u8, proto)),
-+		    TP_fast_assign(__entry->skb = skb;
-+				   __entry->skb_len = skb->len;
-+				   __entry->data_len = skb->data_len;
-+				   __entry->mtu = mtu;
-+				   __entry->blkoff = blkoff;
-+				   __entry->proto = iph ? __trace_ip_proto(iph) : 0;
-+				   __entry->proto_seq = iph ? __trace_ip_proto_seq(iph) : 0;
-+			    ),
-+		    TP_printk("INGRPSTQ: skb=%p len=%u data_len=%u mtu=%u blkoff=%u proto=%u proto_seq=%u",
-+			      __entry->skb, __entry->skb_len, __entry->data_len, __entry->mtu,
-+			      __entry->blkoff, __entry->proto, __entry->proto_seq));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_dequeue,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_fragmenting,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_final_fragment,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+DEFINE_EVENT(iptfs_ingress_postq_event, iptfs_first_toobig,
-+	     TP_PROTO(struct sk_buff *skb, u32 mtu, u16 blkoff,
-+		      struct iphdr *iph),
-+	     TP_ARGS(skb, mtu, blkoff, iph));
-+
-+TRACE_EVENT(iptfs_ingress_nth_peek,
-+	    TP_PROTO(struct sk_buff *skb, u32 remaining),
-+	    TP_ARGS(skb, remaining),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(u32, skb_len)
-+			     __field(u32, remaining)),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->skb_len = skb->len;
-+			   __entry->remaining = remaining;
-+		    ),
-+	    TP_printk("INGRPSTQ: NTHPEEK: skb=%p len=%u remaining=%u",
-+		      __entry->skb, __entry->skb_len, __entry->remaining));
-+
-+TRACE_EVENT(iptfs_ingress_nth_add, TP_PROTO(struct sk_buff *skb, u8 share_ok),
-+	    TP_ARGS(skb, share_ok),
-+	    TP_STRUCT__entry(__field(struct sk_buff *, skb)
-+			     __field(u32, skb_len)
-+			     __field(u32, data_len)
-+			     __field(u8, share_ok)
-+			     __field(u8, head_frag)
-+			     __field(u8, pp_recycle)
-+			     __field(u8, cloned)
-+			     __field(u8, shared)
-+			     __field(u8, nr_frags)
-+			     __field(u8, frag_list)
-+		    ),
-+	    TP_fast_assign(__entry->skb = skb;
-+			   __entry->skb_len = skb->len;
-+			   __entry->data_len = skb->data_len;
-+			   __entry->share_ok = share_ok;
-+			   __entry->head_frag = skb->head_frag;
-+			   __entry->pp_recycle = skb->pp_recycle;
-+			   __entry->cloned = skb_cloned(skb);
-+			   __entry->shared = skb_shared(skb);
-+			   __entry->nr_frags = skb_shinfo(skb)->nr_frags;
-+			   __entry->frag_list = (bool)skb_shinfo(skb)->frag_list;
-+		    ),
-+	    TP_printk("INGRPSTQ: NTHADD: skb=%p len=%u data_len=%u share_ok=%u head_frag=%u pp_recycle=%u cloned=%u shared=%u nr_frags=%u frag_list=%u",
-+		      __entry->skb, __entry->skb_len, __entry->data_len, __entry->share_ok,
-+		      __entry->head_frag, __entry->pp_recycle, __entry->cloned, __entry->shared,
-+		      __entry->nr_frags, __entry->frag_list));
-+
-+DECLARE_EVENT_CLASS(iptfs_timer_event,
-+		    TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+		    TP_ARGS(xtfs, time_val),
-+		    TP_STRUCT__entry(__field(u64, time_val)
-+				     __field(u64, set_time)),
-+		    TP_fast_assign(__entry->time_val = time_val;
-+				   __entry->set_time = xtfs->iptfs_settime;
-+			    ),
-+		    TP_printk("TIMER: set_time=%llu time_val=%llu",
-+			      __entry->set_time, __entry->time_val));
-+
-+DEFINE_EVENT(iptfs_timer_event, iptfs_timer_start,
-+	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+	     TP_ARGS(xtfs, time_val));
-+
-+DEFINE_EVENT(iptfs_timer_event, iptfs_timer_expire,
-+	     TP_PROTO(struct xfrm_iptfs_data *xtfs, u64 time_val),
-+	     TP_ARGS(xtfs, time_val));
-+
-+#endif /* _TRACE_IPTFS_H */
-+
-+/* This part must be outside protection */
-+#undef TRACE_INCLUDE_PATH
-+#define TRACE_INCLUDE_PATH ../../net/xfrm
-+#undef TRACE_INCLUDE_FILE
-+#define TRACE_INCLUDE_FILE trace_iptfs
-+#include <trace/define_trace.h>
-diff --git a/net/xfrm/xfrm_iptfs.c b/net/xfrm/xfrm_iptfs.c
-index 3ca7d2a04ea6..4468938803b6 100644
---- a/net/xfrm/xfrm_iptfs.c
-+++ b/net/xfrm/xfrm_iptfs.c
-@@ -19,6 +19,7 @@
- #include <crypto/aead.h>
- 
- #include "xfrm_inout.h"
-+#include "trace_iptfs.h"
- 
- /* IPTFS encap (header) values. */
- #define IPTFS_SUBTYPE_BASIC 0
-@@ -131,6 +132,7 @@ struct skb_wseq {
-  * @ecn_queue_size: octets above with ECN mark.
-  * @init_delay_ns: nanoseconds to wait to send initial IPTFS packet.
-  * @iptfs_timer: output timer.
-+ * @iptfs_settime: time the output timer was set.
-  * @payload_mtu: max payload size.
-  * @w_seq_set: true after first seq received.
-  * @w_wantseq: waiting for this seq number as next to process (in order).
-@@ -155,6 +157,7 @@ struct xfrm_iptfs_data {
- 	u32 ecn_queue_size;	    /* octets above which ECN mark */
- 	u64 init_delay_ns;	    /* nanoseconds */
- 	struct hrtimer iptfs_timer; /* output timer */
-+	time64_t iptfs_settime;	    /* time timer was set */
- 	u32 payload_mtu;	    /* max payload size */
- 
- 	/* Tunnel input reordering */
-@@ -181,6 +184,39 @@ static enum hrtimer_restart iptfs_drop_timer(struct hrtimer *me);
- /* Utility Functions */
- /* ================= */
- 
-+static u32 __trace_ip_proto(struct iphdr *iph)
-+{
-+	if (iph->version == 4)
-+		return iph->protocol;
-+	return ((struct ipv6hdr *)iph)->nexthdr;
-+}
-+
-+static u32 __trace_ip_proto_seq(struct iphdr *iph)
-+{
-+	void *nexthdr;
-+	u32 protocol = 0;
-+
-+	if (iph->version == 4) {
-+		nexthdr = (void *)(iph + 1);
-+		protocol = iph->protocol;
-+	} else if (iph->version == 6) {
-+		nexthdr = (void *)(((struct ipv6hdr *)(iph)) + 1);
-+		protocol = ((struct ipv6hdr *)(iph))->nexthdr;
-+	}
-+	switch (protocol) {
-+	case IPPROTO_ICMP:
-+		return ntohs(((struct icmphdr *)nexthdr)->un.echo.sequence);
-+	case IPPROTO_ICMPV6:
-+		return ntohs(((struct icmp6hdr *)nexthdr)->icmp6_sequence);
-+	case IPPROTO_TCP:
-+		return ntohl(((struct tcphdr *)nexthdr)->seq);
-+	case IPPROTO_UDP:
-+		return ntohs(((struct udphdr *)nexthdr)->source);
-+	default:
-+		return 0;
-+	}
-+}
-+
- static u64 __esp_seq(struct sk_buff *skb)
- {
- 	u64 seq = ntohl(XFRM_SKB_CB(skb)->seq.input.low);
-@@ -461,6 +497,13 @@ static int iptfs_skb_add_frags(struct sk_buff *skb,
- 	return len;
- }
- 
-+/* ================================== */
-+/* IPTFS Trace Event Definitions      */
-+/* ================================== */
-+
-+#define CREATE_TRACE_POINTS
-+#include "trace_iptfs.h"
-+
- /* ================================== */
- /* IPTFS Receiving (egress) Functions */
- /* ================================== */
-@@ -1186,6 +1229,8 @@ static void iptfs_input_ordered(struct xfrm_state *x, struct sk_buff *skb)
- 	}
- 	data = sizeof(*ipth);
- 
-+	trace_iptfs_egress_recv(skb, xtfs, be16_to_cpu(ipth->block_offset));
-+
- 	/* Set data past the basic header */
- 	if (ipth->subtype == IPTFS_SUBTYPE_CC) {
- 		/* Copy the rest of the CC header */
-@@ -1830,6 +1875,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk, struct sk_buff
- 		 */
- 		if (!ok) {
- nospace:
-+			trace_iptfs_no_queue_space(skb, xtfs, pmtu, was_gso);
- 			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTNOQSPACE);
- 			kfree_skb_reason(skb, SKB_DROP_REASON_FULL_RING);
- 			continue;
-@@ -1839,6 +1885,7 @@ static int iptfs_output_collect(struct net *net, struct sock *sk, struct sk_buff
- 		 * enqueue.
- 		 */
- 		if (xtfs->cfg.dont_frag && iptfs_is_too_big(sk, skb, pmtu)) {
-+			trace_iptfs_too_big(skb, xtfs, pmtu, was_gso);
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -1847,11 +1894,16 @@ static int iptfs_output_collect(struct net *net, struct sock *sk, struct sk_buff
- 		ok = iptfs_enqueue(xtfs, skb);
- 		if (!ok)
- 			goto nospace;
-+
-+		trace_iptfs_enqueue(skb, xtfs, pmtu, was_gso);
- 	}
- 
- 	/* Start a delay timer if we don't have one yet */
--	if (!hrtimer_is_queued(&xtfs->iptfs_timer))
-+	if (!hrtimer_is_queued(&xtfs->iptfs_timer)) {
- 		hrtimer_start(&xtfs->iptfs_timer, xtfs->init_delay_ns, IPTFS_HRTIMER_MODE);
-+		xtfs->iptfs_settime = ktime_get_raw_fast_ns();
-+		trace_iptfs_timer_start(xtfs, xtfs->init_delay_ns);
-+	}
- 
- 	spin_unlock_bh(&x->lock);
- 	return 0;
-@@ -1934,6 +1986,7 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp, struct xfrm_iptfs_data
- 	struct sk_buff *nskb = *skbp;
- 	u32 copy_len, offset;
- 	u32 to_copy = skb->len - mtu;
-+	u32 blkoff = 0;
- 	int err = 0;
- 
- 	INIT_LIST_HEAD(&sublist);
-@@ -1945,6 +1998,7 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp, struct xfrm_iptfs_data
- 	to_copy = skb->len - offset;
- 	while (to_copy) {
- 		/* Send all but last fragment to allow agg. append */
-+		trace_iptfs_first_fragmenting(nskb, mtu, to_copy, NULL);
- 		list_add_tail(&nskb->list, &sublist);
- 
- 		/* FUTURE: if the packet has an odd/non-aligning length we could
-@@ -1963,11 +2017,14 @@ static int iptfs_copy_create_frags(struct sk_buff **skbp, struct xfrm_iptfs_data
- 		iptfs_output_prepare_skb(nskb, to_copy);
- 		offset += copy_len;
- 		to_copy -= copy_len;
-+		blkoff = to_copy;
- 	}
- 	skb_abort_seq_read(&skbseq);
- 
- 	/* return last fragment that will be unsent (or NULL) */
- 	*skbp = nskb;
-+	if (nskb)
-+		trace_iptfs_first_final_fragment(nskb, mtu, blkoff, NULL);
- 
- 	/* trim the original skb to MTU */
- 	if (!err)
-@@ -2042,6 +2099,8 @@ static int iptfs_first_skb(struct sk_buff **skbp, struct xfrm_iptfs_data *xtfs,
- 
- 	/* We've split gso up before queuing */
- 
-+	trace_iptfs_first_dequeue(skb, mtu, 0, ip_hdr(skb));
-+
- 	/* Consider the buffer Tx'd and no longer owned */
- 	skb_orphan(skb);
- 
-@@ -2137,6 +2196,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 			 */
- 			XFRM_INC_STATS(xs_net(x), LINUX_MIB_XFRMOUTERROR);
- 
-+			trace_iptfs_first_toobig(skb, mtu, 0, ip_hdr(skb));
- 			kfree_skb_reason(skb, SKB_DROP_REASON_PKT_TOO_BIG);
- 			continue;
- 		}
-@@ -2183,6 +2243,7 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 		 * case.
- 		 */
- 		while ((skb2 = skb_peek(list))) {
-+			trace_iptfs_ingress_nth_peek(skb2, remaining);
- 			if (skb2->len > remaining)
- 				break;
- 
-@@ -2220,6 +2281,8 @@ static void iptfs_output_queued(struct xfrm_state *x, struct sk_buff_head *list)
- 			skb->len += skb2->len;
- 			remaining -= skb2->len;
- 
-+			trace_iptfs_ingress_nth_add(skb2, share_ok);
-+
- 			if (share_ok) {
- 				iptfs_consume_frags(skb, skb2);
- 			} else {
-@@ -2242,6 +2305,7 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	struct sk_buff_head list;
- 	struct xfrm_iptfs_data *xtfs;
- 	struct xfrm_state *x;
-+	time64_t settime;
- 
- 	xtfs = container_of(me, typeof(*xtfs), iptfs_timer);
- 	x = xtfs->x;
-@@ -2258,6 +2322,7 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	__skb_queue_head_init(&list);
- 	skb_queue_splice_init(&xtfs->queue, &list);
- 	xtfs->queue_size = 0;
-+	settime = xtfs->iptfs_settime;
- 	spin_unlock(&x->lock);
- 
- 	/* After the above unlock, packets can begin queuing again, and the
-@@ -2266,6 +2331,8 @@ static enum hrtimer_restart iptfs_delay_timer(struct hrtimer *me)
- 	 * already).
- 	 */
- 
-+	trace_iptfs_timer_expire(xtfs, (unsigned long long)(ktime_get_raw_fast_ns() - settime));
-+
- 	iptfs_output_queued(x, &list);
- 
- 	return HRTIMER_NORESTART;
--- 
-2.47.0
+>
+> If so, we need to move dev_put() too or maybe we can remove
+> synchronize_rcu() here and replace rcu_read_lock() with
+> spin_lock(&routes->lock) in phonet_route_output().
 
+Not at all, let's not make phonet slower than needed :)
 
