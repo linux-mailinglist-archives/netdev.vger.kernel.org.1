@@ -1,136 +1,162 @@
-Return-Path: <netdev+bounces-142078-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B327A9BD5C2
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:20:13 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D8D19BD5CB
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:22:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4F0A1C20F31
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:20:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2773E1F23719
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 19:22:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 151CC1E7C35;
-	Tue,  5 Nov 2024 19:20:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 213171EBA1D;
+	Tue,  5 Nov 2024 19:22:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MuNX9/R7"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="t0rDGiu4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f43.google.com (mail-pj1-f43.google.com [209.85.216.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E1001E7C27;
-	Tue,  5 Nov 2024 19:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEE2C1E7C27
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 19:22:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730834409; cv=none; b=nFiQQ4cx8V6bHMZ6hWoU79eosiGMvYSMhgB7XaC/aRfc43WLXNo4AYrdLwpFC6bJ2cuxTf5LICn6p1wFcxh6bD6PqQwxbOEjb2vfTQudY003bKt5gXjoZxoAY+5Qn914Jzm4IN+FoXezUp0vpJmlG7EBfESsjP9sYt4fkHfyGmE=
+	t=1730834548; cv=none; b=SFDnO28gs5yBQZLMxUiuNiACAvxzDTDxWOqv5MVuee/fjxn+vmXTK9Oe0sKMqkv+2DvlIwvekDSWplNB4Xo8StX3x/4hkklxUoegX0jXrlJJARHxSBmZla1a2sgjseC0UBbGAexP/TlvDB49iFECNplFCWUl0PYu1o51eF2ND+I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730834409; c=relaxed/simple;
-	bh=xiscwbTQJTQiTE8ft0L8rsFtWNA96DS5JnH3vPLVUmw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=VzwcmXiDOSCuWhJNNFzGjlcjTK/WHYTH3xr2Ck2QFiqw7HQrfYEZCrxtAG9Hnd5HIPDPioYtpLyWAqb2IQVD8oSpyvdRkgtI5ASY5bHwEd0lfJbXHycLZEgCr87EBTfSah4haMvTCvh+pxwSInvhgCyRaHXW+OFj1kCIL7p+ZZM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MuNX9/R7; arc=none smtp.client-ip=209.85.216.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f43.google.com with SMTP id 98e67ed59e1d1-2e2e050b1c3so111015a91.0;
-        Tue, 05 Nov 2024 11:20:07 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730834407; x=1731439207; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NGhRcnGegcAs6+AZNhnWAc40T167/ZzHeEXpxdgzWUU=;
-        b=MuNX9/R7DNrwttHygWNG2X6rcTckDa4oM8eNFogCVyfeOBQY0WTzT2BjlFSCvE33NE
-         1zdaIHTzLT7JHixhbQsb2k2nkkr7/evNmgX8hzDPLFnPwY84yTplQ1ldsznpMlGxxIwn
-         rCbT7hududiL9lD+bC4rwojcnYZMoeDO56rqPXaILm40uBTQIe2PxdTq+ljyrswS7k0t
-         mjFME5NXUGqBCmOJI/hMxA36gSrne+gEG5+pX+VYrHQ8mL7P41qT5vIAnX2Hdbj8TxXS
-         WKiKrOFEGJyNFjjJOMGLJeiL4IxlMU4BTY5iCDPp/Sij49nnaY6C/J23xT7w1Dzc9z51
-         2FYw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730834407; x=1731439207;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NGhRcnGegcAs6+AZNhnWAc40T167/ZzHeEXpxdgzWUU=;
-        b=ZCK+PIxaJmjxm3wAp+WBUEnkAQObLUYcQKbJDuxUKX0RX3IWWKVcfRBL4ODln2forc
-         bDWTDbYOimT6xaWxN8sGkM75wvrsEWDM/uQs36OLihK/jyXUIfzTqZfLQLIdVPN29CsU
-         iZs5AtYouz0rrSOcmOdsPrXIaL7riMRFB5IeqeZsi7o15gFLkncxOFssF9fKYGC9aQ6R
-         AV1DguXxvIO680RJeSz75UcjgHG02dRoWHnYziWNZZCE65SUQvmm0iEhY41jIE0fSJXN
-         C5hBEM8l5QcOByPjGtYZt5F/2/LTAlDJ70Bd70ImMm6/XCCs6lpwZgvikElz+kWLs4tX
-         aZ/g==
-X-Forwarded-Encrypted: i=1; AJvYcCX7dzs+FxfKdRGIn+6EiDPAsudjVzb6i7W2vj7ROV62Gw/FLnZO72R+HI6QFbbt82Ya6IgyM7so@vger.kernel.org, AJvYcCXXY2O99JgxEkk1prl3oCEBWpnwffA41vhlXZuLUrwlZQOUaUj7RDiBfvi5RPVoDo+IfoACmLr/kAD6lEo=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwrhotovgZASzv69eSo7zA6vz7N+QWE+lltpHYwt5iN/t1P3knU
-	J/S8AUTTA2/DNwiNgHndZUOjserhnT8/k5LAkF3rLl0Hcl1RI+rY
-X-Google-Smtp-Source: AGHT+IHMm9BWGsU3oqzfK2SGuGvci9VCqK/1siYq9TbZPUEggojsNz/coX+SiCFOL98KNG00rhDuRg==
-X-Received: by 2002:a17:90b:278c:b0:2e3:bc3e:feef with SMTP id 98e67ed59e1d1-2e93e0589dcmr29825899a91.3.1730834406994;
-        Tue, 05 Nov 2024 11:20:06 -0800 (PST)
-Received: from TW-MATTJAN1.eu.trendnet.org (61-216-130-235.hinet-ip.hinet.net. [61.216.130.235])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e92fc0087asm12382645a91.47.2024.11.05.11.20.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 11:20:06 -0800 (PST)
-From: Matt Jan <zoo868e@gmail.com>
-To: syzbot+14c04e62ca58315571d1@syzkaller.appspotmail.com
-Cc: davem@davemloft.net,
-	dhowells@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	linux-afs@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	marc.dionne@auristor.com,
-	netdev@vger.kernel.org,
-	pabeni@redhat.com,
-	syzkaller-bugs@googlegroups.com,
-	skhan@linuxfoundation.org,
-	Matt Jan <zoo868e@gmail.com>
-Subject: [PATCH] rxrpc: Initialize sockaddr_rxrpc directly
-Date: Wed,  6 Nov 2024 03:19:59 +0800
-Message-Id: <20241105191959.2871-1-zoo868e@gmail.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <671acd8e.050a0220.381c35.0004.GAE@google.com>
-References: <671acd8e.050a0220.381c35.0004.GAE@google.com>
+	s=arc-20240116; t=1730834548; c=relaxed/simple;
+	bh=EK18a9GsAaNuMbsMBX+mlEU/2y8NCZMLplGvJ8fchqQ=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TDblYgIXKqHs0bvKQYzN79tl0mqJ3xVgaPuxGkjyThDLWhYM+I30R0mc86ctnhyVzM/zhluCuAG7TeZ75YtqqEIk0eRPgBOCZEtzl76vshzn+PbHZNke/mcF1o1xh0GRTSGLxoum1KNCp42+JUFqWKEhVQVRxXgOeBjc2jjBuJ8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=t0rDGiu4; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <f27ab4ce-02df-464e-90ed-852652fb7e3e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730834540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=e/lV56qOFekIpTJ0243xyhBPojpFxY1cI7kHvI1Dc0Y=;
+	b=t0rDGiu4kcbJWqqnIp1eA7/ABUJPfcWEp5oyLZuXDW+rbTi7nHHV/7C3fiWSJKBi/Kq0IC
+	NmpulbcAq4Kfkh+dheC5mcgNpNkf23CBbXtBl31wLa+ilqOZc026f7L7LKel4CbptMdDBd
+	fJLAtaj+9cbQBOtIubOmLtRx18mnDSA=
+Date: Tue, 5 Nov 2024 11:22:09 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, willemb@google.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
+ <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+ <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+ <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+ <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
+ <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev>
+ <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+ <1c8ebc16-f8e7-4a98-9518-865db3952f8f@linux.dev>
+ <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-In rxrpc_lookup_peer_local_rcu(), removed the redundant memset call
-that zeros out the sockaddr_rxrpc structure before setting its fields.
-Instead, initialize the sockaddr_rxrpc structure directly in
-rxrpc_input_error().
+On 11/4/24 10:22 PM, Jason Xing wrote:
+> On Tue, Nov 5, 2024 at 10:09 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 11/1/24 6:32 AM, Willem de Bruijn wrote:
+>>>> In udp/raw/..., I don't know how likely is the user space having "cork->tx_flags
+>>>> & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflags) &
+>>>> SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" set.
+>>> This is not something to rely on. OPT_ID was added relatively recently.
+>>> Older applications, or any that just use the most straightforward API,
+>>> will not set this.
+>>
+>> Good point that the OPT_ID per cmsg is very new.
+>>
+>> The datagram support on SOF_TIMESTAMPING_OPT_ID in sk->sk_tsflags had
+>> been there for quite some time now. Is it a safe assumption that
+>> most applications doing udp tx timestamping should have
+>> the SOF_TIMESTAMPING_OPT_ID set to be useful?
+>>
+>>>
+>>>> If it is
+>>>> unlikely, may be we can just disallow bpf prog from directly setting
+>>>> skb_shinfo(skb)->tskey for this particular skb.
+>>>>
+>>>> For all other cases, in __ip[6]_append_data, directly call a bpf prog and also
+>>>> pass the kernel decided tskey to the bpf prog.
+>>>>
+>>>> The kernel passed tskey could be 0 (meaning the user space has not used it). The
+>>>> bpf prog can give one for the kernel to use. The bpf prog can store the
+>>>> sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add one to the struct
+>>>> sock. The bpf prog does not have to start from 0 (e.g. start from U32_MAX
+>>>> instead) if it helps.
+>>>>
+>>>> If the kernel passed tskey is not 0, the bpf prog can just use that one
+>>>> (assuming the user space is doing something sane, like the value in
+>>>> SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_MAX). I hope this
+>>>> is very unlikely also (?) but the bpf prog can probably detect this and choose
+>>>> to ignore this sk.
+>>> If an applications uses OPT_ID, it is unlikely that they will toggle
+>>> the feature on and off on a per-packet basis. So in the common case
+>>> the program could use the user-set counter or use its own if userspace
+>>> does not enable the feature. In the rare case that an application does
+>>> intermittently set an OPT_ID, the numbering would be erratic. This
+>>> does mean that an actively malicious application could mess with admin
+>>> measurements.
+>>
+>> All make sense. Given it is reasonable to assume the user space should either
+>> has SOF_TIMESTAMPING_OPT_ID always on or always off. When it is off, the bpf
+>> prog can directly provide its own tskey to be used in shinfo->tskey. The bpf
+>> prog can generate the id itself without using the sk->sk_tskey, e.g. store an
+>> atomic int in the bpf_sk_storage.
+> 
+> I wonder, how can we correlate the key with each skb in the bpf
+> program for non-TCP type without implementing a bpf extension for
+> SCM_TS_OPT_ID? Every time the timestamp is reported, we cannot know
+> which sendmsg() the skb belongs to for non-TCP cases.
 
-This change simplifies the code and ensures that the sockaddr_rxrpc
-structure is properly zero-initialized.
+SCM_TS_OPT_ID is eventually setting the shinfo->tskey.
+If the shinfo->tskey is not set by the user space, the bpf prog can directly set 
+the shinfo->tskey. There is no need to use the sk->sk_tskey as the ID generator 
+also. The bpf prog can have its own id generator.
 
-Reported-by: syzbot+14c04e62ca58315571d1@syzkaller.appspotmail.com
-Signed-off-by: Matt Jan <zoo868e@gmail.com>
----
- net/rxrpc/peer_event.c | 3 +--
- 1 file changed, 1 insertion(+), 2 deletions(-)
+If the user space has already set the shinfo->tskey (either by sk->sk_tskey or 
+SCM_TS_OPT_ID), the bpf prog can just use the user space one.
 
-diff --git a/net/rxrpc/peer_event.c b/net/rxrpc/peer_event.c
-index 552ba84a255c..c86b432201fd 100644
---- a/net/rxrpc/peer_event.c
-+++ b/net/rxrpc/peer_event.c
-@@ -33,7 +33,6 @@ static struct rxrpc_peer *rxrpc_lookup_peer_local_rcu(struct rxrpc_local *local,
- 
- 	_enter("");
- 
--	memset(srx, 0, sizeof(*srx));
- 	srx->transport_type = local->srx.transport_type;
- 	srx->transport_len = local->srx.transport_len;
- 	srx->transport.family = local->srx.transport.family;
-@@ -134,7 +133,7 @@ static void rxrpc_adjust_mtu(struct rxrpc_peer *peer, unsigned int mtu)
- void rxrpc_input_error(struct rxrpc_local *local, struct sk_buff *skb)
- {
- 	struct sock_exterr_skb *serr = SKB_EXT_ERR(skb);
--	struct sockaddr_rxrpc srx;
-+	struct sockaddr_rxrpc srx = {};
- 	struct rxrpc_peer *peer = NULL;
- 
- 	_enter("L=%x", local->debug_id);
--- 
-2.25.1
+If there is a weird application that flips flops between OPT_ID on/off, the bpf 
+prog will get confused which is fine. The bpf prog can detect this and choose to 
+ignore measuring this sk/skb. The bpf prog can also choose to be on the very 
+safe side and ignore all skb with SKBTX_ANY_TSTAMP set in txflags but with no 
+OPT_ID. The bpf prog can look into the details of the sk and skb to decide what 
+makes the most sense for its deployment.
 
+I don't know whether it makes more sense to call the bpf prog to decide the 
+shinfo->{tx_flags,tskey} just before the "while (length > 0)" in 
+__ip[6]_append_data or it is better to call the bpf prog in ip[6]_setup_cork.
+I admittedly less familiar with this code path than the tcp one.
 
