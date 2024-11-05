@@ -1,129 +1,193 @@
-Return-Path: <netdev+bounces-141872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE8D29BC94F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:35:18 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DAD39BC95E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:36:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2A3B28496A
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:35:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CD0D284F00
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:36:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC3471D4329;
-	Tue,  5 Nov 2024 09:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A7C71C9B81;
+	Tue,  5 Nov 2024 09:35:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R2DH6s1R"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KKwS9yEI"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay8-d.mail.gandi.net (relay8-d.mail.gandi.net [217.70.183.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0721D1F7F;
-	Tue,  5 Nov 2024 09:33:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADB7118132A
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:35:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730799213; cv=none; b=DKzlX5V/6m3Miam0CMNyGI7ASV4ubPbX8KTjJkOlVCfYjycw9hYZKyFPMMqEzQtbQ5sgyC8CNcNw1ZbGqp2DsNbTgCNxw2rjoHfzmDO0r2hXK5wIZBNxpH0h/LTJ81ySGJFyp4J/o9rJzhbRJyf8lw4nI30y+InMZCd6SUWL6bg=
+	t=1730799359; cv=none; b=q4VjGpsV2lA6G8oFX4CQVb0+hssZ+EujvGnHrTjgkw5aIHEJzpm1bvJ7VJqAVxTO2ZgZMAYi6sfV/FscQGcMR2Q2HfazYahHKZO5EEo2wu5Vo5i9e4OtK6ye4q70DeKpGbt50VtTSeZ+Ac+nipBn5YqMDxIiV0KX3HzXEAoeUJQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730799213; c=relaxed/simple;
-	bh=ShZSBzlSJjGqReX5nZQtQ4Eh7QhJd/5jOt7l7Wr4Oxw=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=r+eI8773dRrrUDGbRFu4u3f17sS/gK3Zctn+phyc7YS3WL+y6q8HCQUleYq1WsWHpvPnM8qnDCd4cCkeq7+CoZAMhpbEYfNE7yfg6dyg7o//xRBvCxqIIIh7fwmrJg/pfhGtTgUE9XxZIzSYN2S2mncrdwXg1nSpnuJqyTUGS38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R2DH6s1R; arc=none smtp.client-ip=217.70.183.201
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 7BFFD1BF208;
-	Tue,  5 Nov 2024 09:33:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730799209;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/haLkH9+WBxFYlJ3qiO9MnhWkDDQb5uVYLN48k88xSA=;
-	b=R2DH6s1RJqFZDXYjEb/yreJzKC5RuOc+Mt8tof3Q41usSUk0slq8IcaNpm0T9qb0rYnVy2
-	igntyGhjXyQtrzZyuV/ViSBVRr0u4XycIkXjNZAKDyp97UThcoSTO85a7FBIJbKaqgt+v+
-	BZimi4sY//k5PA7+1+28QxjT7r2YcTNDkgpRDhnjacsoa1plaB4nwz7p7Vqbu5RWy9T4XU
-	Py+xiiRuV4ss4QQcofFBn8oJyr4MMILUofKcLfUvjY+CzaYwjNuKf7bnWrknLvRGNsG0aX
-	LJ2OZ7NDNd3OLuqh9NIl73E0LRPdNNm21lubSr3TviUoLokBDeqSdWPr72ZS7g==
-Date: Tue, 5 Nov 2024 10:33:26 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
- <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
- <broonie@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
- Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 05/18] net: pse-pd: Add support for PSE
- device index
-Message-ID: <20241105103326.0360641d@kmaincent-XPS-13-7390>
-In-Reply-To: <46d4b5be-60d3-4949-8eb9-9e8a036cb580@lunn.ch>
-References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
-	<20241030-feature_poe_port_prio-v2-5-9559622ee47a@bootlin.com>
-	<ZyMjbzK7SJq5nmYz@pengutronix.de>
-	<46d4b5be-60d3-4949-8eb9-9e8a036cb580@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	s=arc-20240116; t=1730799359; c=relaxed/simple;
+	bh=tbQ8e+LJhtkBO+9YK905UdN64gFIvP3xPnxXr6WGhl0=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=nVHU01H11dbUXJoStbM9HLjfsY7Ipkxtx2pwhEdKwJY9vuBM9jlJqosunt4kTvdISg8CxqD8K2Q1jpzk6zeHw81D4ze+IdAR4oJ6qp1w8vxG9Anb2FrJXOJGosX43hXlM6/FhgrxWGe54mEhqHkEc80vlcIxKDJCAArI0HR+YW4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KKwS9yEI; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a7aa086b077so664550566b.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 01:35:57 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730799356; x=1731404156; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=3/ZYeSjAdTOfVnR8IYq8OB5GB/55Seqk85tFKOQM57c=;
+        b=KKwS9yEIYclMh0lKZdmmCBjhMkuNNF1Nt7ZFNfgdA6qmPujwbVsfGFU8q6FEvx0LoI
+         Q4fQ1Hby1kvKmvnFU91Aj61n/MaXzOhoF0x07dou3AZTJ+4daMa5xIAphcwqGv255zUS
+         f4Mk/oDVrIXYdeDyVqPwNBbRjfwHDqyoegJ6/f7Z9NODrciGH2pUUchJYwB4K4JmhVy2
+         GEEGwH7ZIISC1ry1mOHUd8V2R+L0Dx+RB74AwShK9flHOm6wi+32prnOXG02whKtao7m
+         +87M5iuKzElRiI9OvPG86QuE3CgXBmBeL8Q/u/nra6CqDMb6fC82V6PIiDxhDixIrXNl
+         yYeg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730799356; x=1731404156;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=3/ZYeSjAdTOfVnR8IYq8OB5GB/55Seqk85tFKOQM57c=;
+        b=c4VeBS65c0XUvCdZWIov0O3RGmhXFUQsP+E9iA2t9wbIJKitcHQHk8DGxRb08ADo0d
+         CBrZV4HSG6Etwn1Q9OFICTdX+gM6gqi4SssGRw+ANqAjzFUL6Ku8e+pgzkKNlCIMYEGX
+         KhIy6OqPo4jbw8wCCQk191f1v3f5t6FaKomMNdDc2aLAE97rNG3yGt0rnQwh8jNd+IYI
+         WIxN88s+/1nUyWDR4TI/U01WVgxoOTCk0Z5MMv2tLpIuUuHdX+JFlD00TClKYJomVB3V
+         hzB+OydnY7TSKwRAJsNjMN2tfYkEDCgdD+t4LIAbd/IzK0/Zk/Eo3jk/L5QBIWqb2WrM
+         X7Yw==
+X-Forwarded-Encrypted: i=1; AJvYcCVc0AfCwUa+5+M9UCw4hYdiwpDBqnbgD5KjRMuMvu6ZphslcE5IX/1ouXUpxSY2g7ByawaJxeA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyt/ypP3DLb+Iw2U/ciffxJoQ8/oTAV4SnM52HU5yXawqCsFS4m
+	u/ispaTuDbIMr5trBl7vZ83esx9uEse75ctE630h60hGQ6x4m6pCWbDrmDCrHcYaiF0BfQ6hky3
+	/JBzuLoMxFK5edojtAMZVc/ISbEfSEG3XyqlJ
+X-Google-Smtp-Source: AGHT+IERmmP+85e5BT7fn4LYgOH++YsiaeYB0wX3nud7ma3CFQjMVEvcZ/He9RSgssAuy9uo3yr3V4Ft/v4rce+edbk=
+X-Received: by 2002:a17:907:7e8b:b0:a9a:3cec:b322 with SMTP id
+ a640c23a62f3a-a9e3a6c99e0mr2079740066b.45.1730799355759; Tue, 05 Nov 2024
+ 01:35:55 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
+ <20241105074916.75107-1-kuniyu@amazon.com> <CAL+tcoAgSBMtFcDx6MfCAhYMVKERCx2d7YUjquT6Pa8jm0bXWA@mail.gmail.com>
+In-Reply-To: <CAL+tcoAgSBMtFcDx6MfCAhYMVKERCx2d7YUjquT6Pa8jm0bXWA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 5 Nov 2024 10:35:44 +0100
+Message-ID: <CANn89iKhSnTJUadpEBpkKYoRVP2GEJZ1ftzH7AqF4oXMF3QEZA@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
+ failure in tcp_timewait_state_process
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, davem@davemloft.net, dsahern@kernel.org, 
+	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 31 Oct 2024 22:28:29 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+On Tue, Nov 5, 2024 at 10:08=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
+om> wrote:
+>
+> On Tue, Nov 5, 2024 at 3:49=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.c=
+om> wrote:
+> >
+> > From: Jason Xing <kerneljasonxing@gmail.com>
+> > Date: Tue,  5 Nov 2024 10:55:11 +0800
+> > > From: Jason Xing <kernelxing@tencent.com>
+> > >
+> > > We found there are rare chances that some RST packets appear during
+> > > the shakehands because the timewait socket cannot accept the SYN and
+> >
+> > s/shakehands/handshake/
+> >
+> > same in the subject.
+> >
+> > > doesn't return TCP_TW_SYN in tcp_timewait_state_process().
+> > >
+> > > Here is how things happen in production:
+> > > Time        Client(A)        Server(B)
+> > > 0s          SYN-->
+> > > ...
+> > > 132s                         <-- FIN
+> > > ...
+> > > 169s        FIN-->
+> > > 169s                         <-- ACK
+> > > 169s        SYN-->
+> > > 169s                         <-- ACK
+> > > 169s        RST-->
+> > > As above picture shows, the two flows have a start time difference
+> > > of 169 seconds. B starts to send FIN so it will finally enter into
+> > > TIMEWAIT state. Nearly at the same time A launches a new connection
+> > > that soon is reset by itself due to receiving a ACK.
+> > >
+> > > There are two key checks in tcp_timewait_state_process() when timewai=
+t
+> > > socket in B receives the SYN packet:
+> > > 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
+> > > 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
+> > >
+> > > Regarding the first rule, it fails as expected because in the first
+> > > connection the seq of SYN sent from A is 1892994276, then 169s have
+> > > passed, the second SYN has 239034613 (caused by overflow of s32).
+> > >
+> > > Then how about the second rule?
+> > > It fails again!
+> > > Let's take a look at how the tsval comes out:
+> > > __tcp_transmit_skb()
+> > >     -> tcp_syn_options()
+> > >         -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb)=
+ + tp->tsoffset;
+> > > The timestamp depends on two things, one is skb->skb_mstamp_ns, the
+> > > other is tp->tsoffset. The latter value is fixed, so we don't need
+> > > to care about it. If both operations (sending FIN and then starting
+> > > sending SYN) from A happen in 1ms, then the tsval would be the same.
+> > > It can be clearly seen in the tcpdump log. Notice that the tsval is
+> > > with millisecond precision.
+> > >
+> > > Based on the above analysis, I decided to make a small change to
+> > > the check in tcp_timewait_state_process() so that the second flow
+> > > would not fail.
+> > >
+> > > Signed-off-by: Jason Xing <kernelxing@tencent.com>
+> > > ---
+> > >  net/ipv4/tcp_minisocks.c | 2 +-
+> > >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > >
+> > > diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> > > index bb1fe1ba867a..2b29d1bf5ca0 100644
+> > > --- a/net/ipv4/tcp_minisocks.c
+> > > +++ b/net/ipv4/tcp_minisocks.c
+> > > @@ -234,7 +234,7 @@ tcp_timewait_state_process(struct inet_timewait_s=
+ock *tw, struct sk_buff *skb,
+> > >       if (th->syn && !th->rst && !th->ack && !paws_reject &&
+> > >           (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
+> > >            (tmp_opt.saw_tstamp &&
+> > > -           (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval)=
+ < 0))) {
+> >
+> > I think this follows RFC 6191 and such a change requires a formal
+> > discussion at IETF.
+> >
+> > https://datatracker.ietf.org/doc/html/rfc6191#section-2
+> >
+> > ---8<---
+> >       *  If TCP Timestamps would be enabled for the new incarnation of
+> >          the connection, and the timestamp contained in the incoming SY=
+N
+> >          segment is greater than the last timestamp seen on the previou=
+s
+>
+> The true thing is that the timestamp of the SYN packet is greater than
+> that of the last packet, but the kernel implementation uses ms
+> precision (please see tcp_skb_timestamp_ts()). That function makes
+> those two timestamps the same.
+>
+> This case happens as expected, so the second connection should be
+> established. My confusion just popped out of my mind: what rules
+> should we follow to stop the second flow?
 
-> On Thu, Oct 31, 2024 at 07:27:59AM +0100, Oleksij Rempel wrote:
-> > On Wed, Oct 30, 2024 at 05:53:07PM +0100, Kory Maincent wrote:
-> >=20
-> > ... =20
-> > >  /**
-> > >   * struct pse_control - a PSE control
-> > > @@ -440,18 +441,22 @@ int pse_controller_register(struct
-> > > pse_controller_dev *pcdev)=20
-> > >  	mutex_init(&pcdev->lock);
-> > >  	INIT_LIST_HEAD(&pcdev->pse_control_head);
-> > > +	ret =3D ida_alloc_max(&pse_ida, INT_MAX, GFP_KERNEL); =20
-> >=20
-> > s/INT_MAX/U32_MAX =20
->=20
->  * Return: The allocated ID, or %-ENOMEM if memory could not be allocated,
->  * or %-ENOSPC if there are no free IDs.
->=20
-> static inline int ida_alloc_max(struct ida *ida, unsigned int max, gfp_t =
-gfp)
->=20
-> We need to be careful here, at least theoretically. Assuming a 32 bit
-> system, and you pass it U32_MAX, how does it return values in the
-> range S32_MAX..U32_MAX when it also needs to be able to return
-> negative numbers as errors?
->=20
-> I think the correct value to pass is S32_MAX, because it will always
-> fit in a u32, and there is space left for negative values for errors.
->=20
-> But this is probably theoretical, no real system should have that many
-> controllers.
+Note that linux TCP stack can use usec resolution for TCP TS values.
 
-Indeed you are right we might have issue between S32_MAX and U32_MAX if we =
-want
-to return errors.
-Small question, is S32_MAX better than INT_MAX? Is there a point to limit i=
-t to
-32 bits?
-
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+You might adopt it, and no longer care about this ms granularity.
 
