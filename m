@@ -1,90 +1,182 @@
-Return-Path: <netdev+bounces-141739-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141740-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8126B9BC28B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:27:46 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8E2D9BC294
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:31:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43AD928339C
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:27:45 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 106BAB21B8B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:31:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF75211CA9;
-	Tue,  5 Nov 2024 01:27:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41ACF1CD02;
+	Tue,  5 Nov 2024 01:31:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="f2M+LW4V"
+	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="RXbq5GUX"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 998311C6BE
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 01:27:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ACBBE1CABA;
+	Tue,  5 Nov 2024 01:31:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730770062; cv=none; b=rM8wWR5TpZHr1r99wjXnTut2xNpTfV6p0CiIreN+UIdjIruyrK4K94+zPUT0ld3b3ULzA5yNXrmiCQvEosXLD9ytBgJKzXRa3Yn68WT7TVoZBdDnuu+7ILb/3tyY96DKH8R7NiUQ4GNKXgS82g10sHBNMSI9mkfs7sAeYFrQBbc=
+	t=1730770266; cv=none; b=DEC/HdOPlEMGEfRj/nOZy32Wqs/aUf8ogghXbs04wFMVEqZPEPUzzRGlgCWMXCoTJZ31LMb/dJbiEarP5Ej5TISL9cR8TUM6FLbViTdLO1eDJmv/oODIgXwNQtOVRqEf2FYZMGUkgXRZruDloKWPDmhBagPORU32sa4ZACT4CsA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730770062; c=relaxed/simple;
-	bh=TlgtJoP3hGa6lpGMhOlrhCOzmHqCdm6VdaQVmprRBv0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=u/Vbe1qTSx76NtdnW8TOxOxDcsnLRTil51fn8PvcTXDvrdMMxTVQjFF3dchlIXO7XHjR0mWR+OZE3tC1sUKbKvAURKiMMWIg4BFLPVW3Ksxr7jaKfxU4e+dFvnbLplgVrSYh4DDjUy+FrrEYsFo8FaShL6hx4Yb15nUlRXWtoTw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=f2M+LW4V; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id EDC69C4CECE;
-	Tue,  5 Nov 2024 01:27:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730770061;
-	bh=TlgtJoP3hGa6lpGMhOlrhCOzmHqCdm6VdaQVmprRBv0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=f2M+LW4VKwhog5UpEEGjBhy7WmVTAwYpOccqodYsLCnxvD20iQfW91407H6WYgR0n
-	 islV0ynw4MzBU36WFX7JyeAaZEUyQuj6FCs1qKPBi+sBr5G+WdRWvY+pgd/Q2IK4J5
-	 od8Vm2PFJMfUARUhEt2L5ngZIXmHt9uJgGcrb4GgiRkLt0B0CtQensPmlfTPbM0APv
-	 q6nZ6eFnPk/y6RIR15ldjAvKVoL0dc7taR1d5pHzwnk7JxPN5sRGEoPj+Av8yZ5Fwr
-	 zHzLturFg32gjhzZ1SD/iAzYJ/SXA6mn08tBfvkB3AqoAkQyrhTWwNSvxT20o2IEr3
-	 4du/obWQYzi6g==
-Date: Mon, 4 Nov 2024 17:27:39 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Feng Wang <wangfe@google.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
- antony.antony@secunet.com, leonro@nvidia.com
-Subject: Re: [PATCH 2/2] selftests: rtnetlink: add ipsec packet offload test
-Message-ID: <20241104172739.2993c325@kernel.org>
-In-Reply-To: <20241104172612.6e5c1a14@kernel.org>
-References: <20241104233315.3387982-1-wangfe@google.com>
-	<20241104172612.6e5c1a14@kernel.org>
+	s=arc-20240116; t=1730770266; c=relaxed/simple;
+	bh=HE0Z3PdKCdARQTSpQnr3tQHQ+p3SRWB8GBHMNvVTmWY=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-ID:To:CC; b=JlMNvgkKlxnEXzfnZtfBiocTD8VDFV5zkVy9uT02b196h82FYxhpJ/yHRXa5xi4kTYeBvH0IQcfOOUV72JGTxjMV1mLXZBdvo9Ry/J+e4WYSqqDeK4xTwZTDiHursAdCMtEF5HUrkMZQODN+Zy55TTEQH8ir6hDe9tknCnsVFfY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=RXbq5GUX; arc=none smtp.client-ip=205.220.180.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A4LIlvh009195;
+	Tue, 5 Nov 2024 01:30:27 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
+	cc:content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=qcppdkim1; bh=SGfY4xcVJjM84r0YsAPvG1
+	hVrTz+bA8oYOJiz362C8c=; b=RXbq5GUXs0e3ke+y14PG1gBZysIvdtWzkPrTGN
+	JHbHxyYKlzDl3LYi7y4dl7IEXQ/kYnodaYJazRKMvHrViuTzjDdojDSuwXhwBF2q
+	aaUzTKt89v5cc4/4yBfLLdHYh2YS7aUNZfv87/vOdEZQvykkixHcI30bqhCLmWGI
+	/73W9MWD1taoPYRELfERQWRD0DA9XyjGXWxalkfSHmHiGBEch0GOW4ratqb3GQS1
+	D6rBk781wFQf77Wci2Czpz9tHcla5ZpP3rrmY2hyUjsl9CWewxeGhlaJddnYo2Tz
+	mv//etZUjc2BC4YPIn3NpWx5CSFVXepWnJ13rxGf6F+ch/Cg==
+Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42nd4unye2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 05 Nov 2024 01:30:27 +0000 (GMT)
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+	by NALASPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A51UQcw014305
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 5 Nov 2024 01:30:26 GMT
+Received: from hu-clew-lv.qualcomm.com (10.49.16.6) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.9; Mon, 4 Nov 2024 17:30:25 -0800
+From: Chris Lew <quic_clew@quicinc.com>
+Date: Mon, 4 Nov 2024 17:29:37 -0800
+Subject: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-ID: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
+X-B4-Tracking: v=1; b=H4sIAAB1KWcC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDQwMT3cKikqL43IxM3ZS01GRjU2MDY4PENCWg8oKi1LTMCrBR0bG1tQB
+ RBdbMWgAAAA==
+To: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+        "David S.
+ Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        "Jakub
+ Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        Simon Horman
+	<horms@kernel.org>,
+        Hemant Kumar <quic_hemantk@quicinc.com>,
+        Loic Poulain
+	<loic.poulain@linaro.org>,
+        Maxim Kochetkov <fido_max@inbox.ru>
+CC: Manivannan Sadhasivam <mani@kernel.org>,
+        Bjorn Andersson
+	<bjorn.andersson@oss.qualcomm.com>,
+        <linux-arm-msm@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>, Bhaumik Bhatt
+	<bbhatt@codeaurora.org>,
+        Johan Hovold <johan@kernel.org>, Chris Lew
+	<quic_clew@quicinc.com>
+X-Mailer: b4 0.14.1
+X-Developer-Signature: v=1; a=ed25519-sha256; t=1730770225; l=2100;
+ i=quic_clew@quicinc.com; s=20240508; h=from:subject:message-id;
+ bh=l/2R1bFTH1P6r02ldFAB/Su/VVR10tVU+0qSK5qySvM=;
+ b=/79qRr0F+lIQoeAb9KFZVcP4ODBJoBFOJEnNVYG0fXfeumbmctYkOXfAuodPxupRM7paHl2H7
+ 3Vq79Y84drZDxrM+MFvjaLZYLCYgE7aUYfDedZWwxDQEI8oVSs9Ns+G
+X-Developer-Key: i=quic_clew@quicinc.com; a=ed25519;
+ pk=lEYKFaL1H5dMC33BEeOULLcHAwjKyHkTLdLZQRDTKV4=
+X-ClientProxiedBy: nalasex01a.na.qualcomm.com (10.47.209.196) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: wp-EMW0fy4hDk3Pfut9U-pAFgIahto6M
+X-Proofpoint-ORIG-GUID: wp-EMW0fy4hDk3Pfut9U-pAFgIahto6M
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
+ definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 malwarescore=0
+ lowpriorityscore=0 bulkscore=0 phishscore=0 priorityscore=1501
+ mlxlogscore=816 impostorscore=0 suspectscore=0 spamscore=0 mlxscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411050010
 
-On Mon, 4 Nov 2024 17:26:12 -0800 Jakub Kicinski wrote:
-> On Mon,  4 Nov 2024 15:33:15 -0800 Feng Wang wrote:
-> > From: wangfe <wangfe@google.com>
-> > 
-> > Duplicating kci_test_ipsec_offload to create a packet offload test.
-> > Using the netdevsim as a device for testing ipsec packet mode.
-> > Test the XFRM commands for setting up IPsec hardware packet offloads,
-> > especially configuring the XFRM interface ID.  
-> 
-> CI appears to not be on board:
-> 
-> # 26.29 [+0.07] RTNETLINK answers: Operation not supported
-> # 26.36 [+0.07] FAIL: ipsec_packet_offload can't create SA
-> 
-> https://netdev-3.bots.linux.dev/vmksft-net/results/846081/25-rtnetlink-sh/stdout
-> 
-> Maybe you need to add more options to tools/testing/selftests/net/config
-> 
-> But stepping back - I think it may be time to move the crypto tunnel
-> tests based on netdevsim to
-> tools/testing/selftests/drivers/net/netdevsim ? rtnetlink is our main
-> netlink family, likely half of all our tests could be called a
-> "rtnetlink test".
+From: Bhaumik Bhatt <bbhatt@codeaurora.org>
 
-PS. this wiki tells you how the CI builds the kernel, so it is useful
-for making sure the config options are chosen correctly:
-https://github.com/linux-netdev/nipa/wiki/How-to-run-netdev-selftests-CI-style
+The call to qrtr_endpoint_register() was moved before
+mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
+callback can occur before the qrtr endpoint is registered.
+
+Now the reverse can happen where qrtr will try to send a packet
+before the channels are prepared. Add a wait in the sending path to
+ensure the channels are prepared before trying to do a ul transfer.
+
+Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+Reported-by: Johan Hovold <johan@kernel.org>
+Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
+Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
+Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+---
+ net/qrtr/mhi.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/net/qrtr/mhi.c b/net/qrtr/mhi.c
+index 69f53625a049..5b7268868bbd 100644
+--- a/net/qrtr/mhi.c
++++ b/net/qrtr/mhi.c
+@@ -15,6 +15,7 @@ struct qrtr_mhi_dev {
+ 	struct qrtr_endpoint ep;
+ 	struct mhi_device *mhi_dev;
+ 	struct device *dev;
++	struct completion prepared;
+ };
+ 
+ /* From MHI to QRTR */
+@@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
+ 	if (skb->sk)
+ 		sock_hold(skb->sk);
+ 
++	rc = wait_for_completion_interruptible(&qdev->prepared);
++	if (rc)
++		goto free_skb;
++
+ 	rc = skb_linearize(skb);
+ 	if (rc)
+ 		goto free_skb;
+@@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+ 	qdev->mhi_dev = mhi_dev;
+ 	qdev->dev = &mhi_dev->dev;
+ 	qdev->ep.xmit = qcom_mhi_qrtr_send;
++	init_completion(&qdev->prepared);
+ 
+ 	dev_set_drvdata(&mhi_dev->dev, qdev);
+ 	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
+@@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+ 		qrtr_endpoint_unregister(&qdev->ep);
+ 		return rc;
+ 	}
++	complete_all(&qdev->prepared);
+ 
+ 	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
+ 
+
+---
+base-commit: 1ffec08567f426a1c593e038cadc61bdc38cb467
+change-id: 20241104-qrtr_mhi-dfec353030af
+
+Best regards,
+-- 
+Chris Lew <quic_clew@quicinc.com>
+
 
