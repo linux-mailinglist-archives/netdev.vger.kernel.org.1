@@ -1,117 +1,129 @@
-Return-Path: <netdev+bounces-141936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 18D4E9BCB6F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:16:50 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A740E9BCB94
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:22:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C352F1F21775
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:16:49 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5F2131F24400
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:22:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB76A1D278B;
-	Tue,  5 Nov 2024 11:16:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 529DB1D4329;
+	Tue,  5 Nov 2024 11:22:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LLV3piGj"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UxC3rNLZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D18716D30B
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:16:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E9E51D414E
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:22:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730805405; cv=none; b=lZVseWJJ3nOpS3LrnGr9bQF5qk33+AVQzJF3EFf1ui+sOs7a6GKlJUuLS0MWs/vW02iINMDOq3rl+uGPLgosYCgZIdVGe9RPkUcaRPzy3wNd5/hcnrlyDevbvfB/COjWNeGkImGSUE6dhualxYj+rwITWexhWatPL279Ovy5Sko=
+	t=1730805764; cv=none; b=PD4tz4uqZI5XWXAja2mg/rZ0aaMgPAhS0bHoK+b6/LC0V9jPlSKJ9SQhWPloLN/fP6kEb3soHWn6Kzw9Zmx7xPAaxZCRGQsU0nirzBNX7GQ20u2qZRAZM/vdFdl9FgIbWa4uu41kF+87qmrTO3wuGK7G1nVJ99UXMQuVozkFD7I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730805405; c=relaxed/simple;
-	bh=ercNxfvIrrmzNcNJCiDXtUSiO9lAFpCrkRRf543MveA=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=M8YbrQeTOO+vOoG/hCRk3UE167+aHakfBLYdF0FI6GbpmX5fsx08Jt0yjuRQ1GmFARUi23y2T69V1LTmvCCjrp8buFgKytFVoBptu2gM9eumMllZ4WVtTVvZRDa/UKs8GiC+WxcGcgz0MbbXzNzK2drQqft2fTm/yAojYpuJdrQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LLV3piGj; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-720be27db74so3545019b3a.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 03:16:44 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730805403; x=1731410203; darn=vger.kernel.org;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=7fjqAakzufIKFV0XekIaHdRyf9sQ1VsNPAuLRB07k9M=;
-        b=LLV3piGjdatM1krPP8wxD6Ngs0ZQ6iRdcGmg+ADXa8PlcXBgzSKyKJvh/K55cWvjH+
-         CPjOpzap1uOZkFM7WS0WO5Bo6Me2hIYzWFTXEnXzaU/7SOafn5CJQqrjfoZvf9ZIpl9U
-         wKH7N8hDWqFLX/jSW14nVvoKfnN0irPSWEX3HHWA/OluyffXW/5yFTtJ9TcpHii+Ng1J
-         pD/bTlXSQMYrcbEzKF1+tCNL0UIhmkcAfN06aal/X+73CFga45bySi9144qVLzxKAh1Y
-         SlkljmpbtD+4LfuaXfKnAyY8gH8JYZIpD1emWv7uvwCAIrspI45FmmVvZd0fTL5XkDPa
-         1emQ==
+	s=arc-20240116; t=1730805764; c=relaxed/simple;
+	bh=DREiJ3+9uPmoBRjO+WZh8yLPw0vGXk6MYVHENj4AzFs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=QxPIcqIkE7iOfSleirVD1F7e5iHTgJFqk+Su+LavUmQ8dm1c+tppgeq1TYRMlZmMKuJTz4gtlwK8zEGWeOVZ8HXiDA6E1auQu+Rkz2djgFTvNmVklIyheiwPoVZ4G5aUtwjBOkcU9H6ya1oP8zFloeolG3Vv23k16NUDRx1Smyo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UxC3rNLZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730805761;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0w4cqL75qypebxW4II7sYIZNVtJj6dqkjoh3JctPnZs=;
+	b=UxC3rNLZRLKbE/zRFbUlPXagAo0Fbzr+6/miF+wk/OowqzrCtsGKhBi4fZyo1KjwVmudot
+	ImObGztQpt/R/fretnrjSPwm2V8+ehJLIOIlAxiP1VuHxyOrjkwVOaqtncEJOiJGZOXOl6
+	jXJqMs0iWd5W2UY06pEVF5ikUBBXWDw=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-464-tPOPB4bXP32k1WPFsSyiGg-1; Tue, 05 Nov 2024 06:22:40 -0500
+X-MC-Unique: tPOPB4bXP32k1WPFsSyiGg-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-539eb3416cdso5582400e87.1
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 03:22:40 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730805403; x=1731410203;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1730805759; x=1731410559;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=7fjqAakzufIKFV0XekIaHdRyf9sQ1VsNPAuLRB07k9M=;
-        b=oNuqK+rYPQHehzWUFz2q21+hJQvAzUO0C4ayUJ95iMX0S0hH0Ndpt1V2Hi6MmbBC/t
-         FaMqVrIeiG+pQXtyWCPtZXjcnerv2VTAIgfrMP7SO8w+gWlorDyGGD8WNgLMX+j5Izvk
-         3qbW5HL9Yzb8bDIdWnyyCm7s0gWe4V8pPc2F7HdltLHL9cOrZWCnNebmx+m756ZfRqH7
-         pZ4NzaDAfKm2IQsMWrEJh1squCflHqqenwBZn+W3ac7R8WZvbw3fK/osdFNfICz9/SzQ
-         XNVaD7u8+Z4KQaZKgXmmYJpR1Gz49ydSJaJCcIP0FQ5gvmy1h+LLepPlyy3+I1l5Z4RU
-         O77A==
-X-Gm-Message-State: AOJu0YzP+QJ25/uFIXqKKhZ99epJrvBw0WQUc3eosGDU9exyHhQVsor3
-	WGSJoLBeM4PKXVQsSqyQ1S95Ol8PyjE98w6F4xjieNaFIz2CO3gpvQqlkXi96iY=
-X-Google-Smtp-Source: AGHT+IGSLNCFwXHNs0laHi/DUrirRyuMc68q0W4CLebKk58NZs1s/0Y5GCIjBARgEUcKUhqGI3Zdog==
-X-Received: by 2002:a05:6a20:49a7:b0:1d9:3acf:8bdd with SMTP id adf61e73a8af0-1db950872b0mr23477937637.22.1730805403254;
-        Tue, 05 Nov 2024 03:16:43 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee459f922dsm8707938a12.68.2024.11.05.03.16.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 03:16:42 -0800 (PST)
-Date: Tue, 5 Nov 2024 11:16:37 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Sam Edwards <cfsworks@gmail.com>
-Cc: netdev@vger.kernel.org
-Subject: [IPv6 Question] Should we remove or keep the temporary address if
- global address removed?
-Message-ID: <Zyn-lUmMbLYO64E_@fedora>
+        bh=0w4cqL75qypebxW4II7sYIZNVtJj6dqkjoh3JctPnZs=;
+        b=vzIp7I5QdAHXvzE0zFJ8hXO6UkyugXdjEXTxOCB4rXtDXjkj0xKEtGoxmWQSeitL8j
+         fUtIaecss9qjxOZUH0JlLgLHi0mOasWWRROh9Z0JyAjLdN5T2Cq0bXeyYvlmdXLir1YJ
+         UGj1JVrziu+kScbJOSpJBCyV3tltIC12rHhdqvTjJBizR8wKSJzL9NRAGB8tIa7t/6mm
+         m5Ca1EjIh0q46cHHABd5hUFbGKx6Y4dp6r5G57k15WKbtTdbyUIeG7hhQ60bfoArPkmQ
+         lIUk2xdAzD7qj7g6bbKKe73s/F0rAGRZpZytcm6JoUkl90IQHobweP4u+ZrkMFkEXjsI
+         6REA==
+X-Forwarded-Encrypted: i=1; AJvYcCVSdy12nLFavIKCrLMVvBgo51XEnC5143dZGsGhN2338w/Kiy5WIqrqy+qVSRrknNx/RwhpwCE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTBi04Bh2mc2/AGpyyc70YxMQJvhB+Yi8MEPHvtJ3/vdJkBkv5
+	wM6Xoq6d9o6AJCHF24Jv3LR6Sg9yZ8G3nLWAXEHHyXWKKSyvzWHGFDxCUt6eomEsIFSkmyjrC+4
+	NOXImw+924Qu5Gq5bVw2AYysAC09Huy/2yVn9wgd+4JkllC8VhdbfDg==
+X-Received: by 2002:a05:6512:1107:b0:539:f7ba:c982 with SMTP id 2adb3069b0e04-53b348ee5c3mr17252877e87.33.1730805758669;
+        Tue, 05 Nov 2024 03:22:38 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHkZhLSHmVvI05Xa7tNeYy4VrWo47n8S+oU5OPC7haYZemC98IoPNLINInGw/qiJ6rXUQ23dg==
+X-Received: by 2002:a05:6512:1107:b0:539:f7ba:c982 with SMTP id 2adb3069b0e04-53b348ee5c3mr17252853e87.33.1730805758231;
+        Tue, 05 Nov 2024 03:22:38 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10e7365sm15705047f8f.54.2024.11.05.03.22.36
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 03:22:37 -0800 (PST)
+Message-ID: <62773e8f-884c-4bfe-b412-97ad976f9cb8@redhat.com>
+Date: Tue, 5 Nov 2024 12:22:35 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RESEND net-next v4 6/9] net: ip: make
+ ip_route_input_noref() return drop reasons
+To: Menglong Dong <menglong8.dong@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ horms@kernel.org, dsahern@kernel.org, pablo@netfilter.org,
+ kadlec@netfilter.org, roopa@nvidia.com, razor@blackwall.org,
+ gnault@redhat.com, bigeasy@linutronix.de, hawk@kernel.org,
+ idosch@nvidia.com, dongml2@chinatelecom.cn, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netfilter-devel@vger.kernel.org,
+ coreteam@netfilter.org, bridge@lists.linux.dev, bpf@vger.kernel.org
+References: <20241030014145.1409628-1-dongml2@chinatelecom.cn>
+ <20241030014145.1409628-7-dongml2@chinatelecom.cn>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <20241030014145.1409628-7-dongml2@chinatelecom.cn>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Hi Sam,
+Hi,
 
-Our QE just find the latest upstream kernel behavior changed for temporary
-address. i.e. In the previous time, the kernel will also remove the temporary
-address if the related global address deleted. But now the kernel will keep
-the temporary there. e.g.
-```
-# sysctl -w net.ipv6.conf.enp59s0f0np0.use_tempaddr=1
-# ip add add 2003::4/64 dev enp59s0f0np0 mngtmpaddr
-# ip add show enp59s0f0np0
-6: enp59s0f0np0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-    link/ether b8:59:9f:06:56:6c brd ff:ff:ff:ff:ff:ff
-    inet6 2003::d280:ee50:d13e:a1b1/64 scope global temporary dynamic
-       valid_lft 604793sec preferred_lft 86393sec
-    inet6 2003::4/64 scope global mngtmpaddr
-       valid_lft forever preferred_lft forever
-# ip add del 2003::4/64 dev  enp59s0f0np0 mngtmpaddr
-# ip add show enp59s0f0np0
-6: enp59s0f0np0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq state UP group default qlen 1000
-    link/ether b8:59:9f:06:56:6c brd ff:ff:ff:ff:ff:ff
-    inet6 2003::d7c7:a239:2519:2491/64 scope global temporary dynamic
-       valid_lft 604782sec preferred_lft 86382sec
-```
-    ^^ previously this temporary address will also be removed.
+On 10/30/24 02:41, Menglong Dong wrote:
+> @@ -175,10 +175,12 @@ static void ip_expire(struct timer_list *t)
+>  
+>  	/* skb has no dst, perform route lookup again */
+>  	iph = ip_hdr(head);
+> -	err = ip_route_input_noref(head, iph->daddr, iph->saddr, ip4h_dscp(iph),
+> -				   head->dev);
+> -	if (err)
+> +	reason = ip_route_input_noref(head, iph->daddr, iph->saddr,
+> +				      ip4h_dscp(iph), head->dev);
+> +	if (reason)
+>  		goto out;
+> +	else
+> +		reason = SKB_DROP_REASON_FRAG_REASM_TIMEOUT;
 
-After checking the code, it looks commit 778964f2fdf0 ("ipv6/addrconf: fix
-timing bug in tempaddr regen") changes the behavior. I can't find what we should
-do when delete the related global address from RFC8981. So I'm not sure
-which way we should do. Keep or delete the temporary address.
+I think the else branch above is confusing - and unneeded.
 
-Do you have any idea?
+Please move the assignment after the comment below, so it's clear why we
+get a TIMEOUT drop reason.
 
-Thanks
-Hangbin
+Thanks,
+
+Paolo
+
 
