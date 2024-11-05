@@ -1,187 +1,222 @@
-Return-Path: <netdev+bounces-142021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142022-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AAA9BCF8E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:36:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 36F5E9BCF94
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:37:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20BB71C251EF
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:36:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A13B1C25577
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:37:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D8411D9A5D;
-	Tue,  5 Nov 2024 14:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DDE1D968A;
+	Tue,  5 Nov 2024 14:37:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b="ceTtK023"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AF751D9593
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 14:36:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E569F1D90B1
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 14:37:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730817389; cv=none; b=sbpQG9G6qNAb7hcGt4Q4RDaJlz8kisjfNS6LuDcxDP13EpI7AZZBjf5HYYwJG16LTUXxCXraJsz67nrx9D1DGnMTEN00kMFgyyM2sk8zorm+n9+AQm+Z1iJOHJz6y9ZHaWzCX7XHhhPyEyrd9xBzhgkPLVd0Yg1qFxbkQNARBtw=
+	t=1730817459; cv=none; b=Dfs9QHPL+NmtcJkH9OBu2kDjG6MJbWR75lIhBGcwS0bSeJKDfTeq6IWPpQ0aei2xT02sITlabWlqrNZL6OeYTcUhyz1yvs0WBfT5JHje2/rguwSprRmx80EgvrfvKhUBtnZ6YwUkMiDUOaAqmOv8evLrDcyGy88t6kzE/5Uayio=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730817389; c=relaxed/simple;
-	bh=gvda3/xY9bP1mILtrzwnkgGAhrN4G2kluGqpKX2yQnc=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Rd2vJRTyq5eaHugWhywZMCtN5Sb7XzYpze7NSUjA10cfsopzOoBqY5XoJN/bJAgXkxjJ1X84WCB5yXNA2i3+CdxmW1dLoWeJWjT0fPJRfqUSM/FHETJWmMObz9seMYUz/k+kYAP67CI9OM3EZXO097NqDub31mduvMmQjbSgR54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t8KfD-0008Lz-Ix; Tue, 05 Nov 2024 15:36:11 +0100
-Received: from pty.whiteo.stw.pengutronix.de ([2a0a:edc0:2:b01:1d::c5])
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t8KfD-0029sp-0B;
-	Tue, 05 Nov 2024 15:36:11 +0100
-Received: from ore by pty.whiteo.stw.pengutronix.de with local (Exim 4.96)
-	(envelope-from <ore@pengutronix.de>)
-	id 1t8KfC-00FPJz-31;
-	Tue, 05 Nov 2024 15:36:10 +0100
-Date: Tue, 5 Nov 2024 15:36:10 +0100
-From: Oleksij Rempel <o.rempel@pengutronix.de>
-To: Kory Maincent <kory.maincent@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Donald Hunter <donald.hunter@gmail.com>,
-	Rob Herring <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	Simon Horman <horms@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Liam Girdwood <lgirdwood@gmail.com>,
-	Mark Brown <broonie@kernel.org>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>,
-	Dent Project <dentproject@linuxfoundation.org>,
-	kernel@pengutronix.de,
-	Maxime Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 15/18] net: pse-pd: Add support for
- getting and setting port priority
-Message-ID: <ZyotWqt09diq-MqX@pengutronix.de>
-References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
- <20241030-feature_poe_port_prio-v2-15-9559622ee47a@bootlin.com>
- <ZyMpkJRHZWYsszh2@pengutronix.de>
- <20241031121104.6f7d669c@kmaincent-XPS-13-7390>
- <ZyO_N1EOTZCprgMJ@pengutronix.de>
- <20241105144913.3c25b476@kmaincent-XPS-13-7390>
+	s=arc-20240116; t=1730817459; c=relaxed/simple;
+	bh=UI80saSNGQyeENZwHXQ20TbdoevVCEFmRy69WMBcnh8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E5VbOBjHQapSTvwiTXvHW6v9pLk9vCtS8N3hVaMJ+Ke4i2Ny3ySHG2QqZzbVFwgX0z4FNgnSZt9XSqeLOHxqSnAdYVqbpp8xyM+h/8JAYh1tnRX5E0GjgrfDGXBhJ41/kQNbn3tNY+XBLdj7fMD5hNWE7b/Ql6/xlPHOb7vGF04=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com; spf=pass smtp.mailfrom=6wind.com; dkim=pass (2048-bit key) header.d=6wind.com header.i=@6wind.com header.b=ceTtK023; arc=none smtp.client-ip=209.85.218.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=6wind.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=6wind.com
+Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a9a68480e3eso98058766b.1
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 06:37:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=6wind.com; s=google; t=1730817455; x=1731422255; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=QPuUXaKIVWgxMoZDzRHV+Ij4osZDivWBSJCKiW/uKdM=;
+        b=ceTtK0234IYVNp/EIGkh++V05nPwxZ2IpTDcEx37waKxh6Wrz9KH1czC8g/KyJQueT
+         fAh3eLysjhKwQtZhCArJW0Mxcx903RqK6LyTDFKrIg+1weiVJxzyZLIqT8gcMjtyzcWz
+         IS9lDdBNcVZJzTo1BrrkXT0B4RjTlGEbQnLYIr32imjY1mV+QzjgA7miu4srhHTVWAGt
+         Q67uMOqnpGJfLXYV/Y47A0ni99CVEfqiuiuZDi4OW74zf6TsY52AbRzUNap+I6GJEeaF
+         5vgToOhS9ku0VjNcK4eTDx/9wBiWYcV7X1LPgps39BqQfhecFt1Fa/qTaXlVVOenfZ5e
+         Kytw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730817455; x=1731422255;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :from:references:cc:to:subject:reply-to:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QPuUXaKIVWgxMoZDzRHV+Ij4osZDivWBSJCKiW/uKdM=;
+        b=tbj1fH6LHesMYkjwWNQVzHo/jIHT2p4/PpsRVRj0wKgDrBoP5qS5RcHXo+oeTTWVoY
+         54IVoycv3xiFyQ0lBW7nPauBkF8aa6L9pjQ34nzWZ8iyVTCMldi4QShGVSoQj4G7Nkp8
+         qo9qSURbK28YdGbN+ZZ9Xb3NyULEjEgohadjMxFKdCSNP/D0mtsScBcEQvGpyQbgamVm
+         OTulA59H3NNbG9dfl59CHh0/cocXAvZCl0riXjzKhbGzCf6FGZwnxZzFRJ6BvFOJEkMA
+         NToTNOT3ZcECv3wX0ijGcItBvTDVFudHPOEn/Zxx1eVdOTv22tTePR9oh9BLfMB4aE/N
+         LDOQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXttqGGJpMvpVgSDrzM2kJomVjHFLdrJJXIZ3l5+sKSWD5vrAl8D8qf3Juy6vlu/RyKWguVTeY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwEoAg49a9cz0XhgnmGinZoNdTXZcV5hY6H/LtJP8zC8IRRewrR
+	Fd9WsT7BbF49WZEWvgL4lMpK6DrphwKzoyRVpLTvdPD/X6rI1JzBkvAbSj+gEIM=
+X-Google-Smtp-Source: AGHT+IG+eEaOxwwxnqnBi7IH4m8CimowCnFKODJk37Vb46MQue71WVSIC0ndfLwQiCJS/6/D5SZ7ig==
+X-Received: by 2002:a17:906:dc8f:b0:a99:f388:6f49 with SMTP id a640c23a62f3a-a9de61a0fc0mr1328330766b.9.1730817454689;
+        Tue, 05 Nov 2024 06:37:34 -0800 (PST)
+Received: from ?IPV6:2a01:e0a:b41:c160:5127:810a:3f6b:b00f? ([2a01:e0a:b41:c160:5127:810a:3f6b:b00f])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb17cf842sm142063366b.121.2024.11.05.06.37.33
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 06:37:34 -0800 (PST)
+Message-ID: <0a8d6565-fdc0-452f-b132-5d237a1b7dec@6wind.com>
+Date: Tue, 5 Nov 2024 15:37:32 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241105144913.3c25b476@kmaincent-XPS-13-7390>
-X-Sent-From: Pengutronix Hildesheim
-X-URL: http://www.pengutronix.de/
-X-Accept-Language: de,en
-X-Accept-Content-Type: text/plain
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: ore@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+User-Agent: Mozilla Thunderbird
+Reply-To: nicolas.dichtel@6wind.com
+Subject: Re: [PATCH net 1/1] net/ipv6: Netlink flag for new IPv6 Default
+ Routes
+To: Matt Muggeridge <Matt.Muggeridge@hpe.com>
+Cc: David Ahern <dsahern@kernel.org>, "David S . Miller"
+ <davem@davemloft.net>, linux-api@vger.kernel.org, stable@vger.kernel.org,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241105031841.10730-1-Matt.Muggeridge@hpe.com>
+ <20241105031841.10730-2-Matt.Muggeridge@hpe.com>
+From: Nicolas Dichtel <nicolas.dichtel@6wind.com>
+Content-Language: en-US
+Organization: 6WIND
+In-Reply-To: <20241105031841.10730-2-Matt.Muggeridge@hpe.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 05, 2024 at 02:49:13PM +0100, Kory Maincent wrote:
-> On Thu, 31 Oct 2024 18:32:39 +0100
-> Oleksij Rempel <o.rempel@pengutronix.de> wrote:
+Le 05/11/2024 à 04:18, Matt Muggeridge a écrit :
+> Add a Netlink rtm_flag, RTM_F_RA_ROUTER for the RTM_NEWROUTE message.
+> This allows an IPv6 Netlink client to indicate the default route came
+> from an RA. This results in the kernel creating individual default
+> routes, rather than coalescing multiple default routes into a single
+> ECMP route.
 > 
-> >  * @PSE_DISCON_STATIC_CLASS_BUDGET_MATCH: Disconnect based on static
-> > allocation
-> >  *   class, targeting devices that release enough allocated power to meet the
-> >  *   current power requirement.
-> >  *   - Relevant for: ETHTOOL_PSE_PORT_PRIO_STATIC
-> >  *   - Behavior: Searches for the lowest-priority device that can release
-> >  *     sufficient allocated power to meet the current budget requirement.
-> >  *     Ensures that disconnection occurs only when enough power is freed.
-> >  *   - Rationale: This strategy is useful when the goal is to balance power
-> >  *     budget requirements while minimizing the number of disconnected
-> > devices.
-> >  *     It ensures that the system does not needlessly disconnect multiple
-> >  *     devices if a single disconnection is sufficient to meet the power
-> > needs.
-> >  *   - Use Case: Ideal for systems where precise power budget management is
-> >  *     necessary, and disconnections must be efficient in terms of freeing
-> >  *     enough power with minimal impact on the system.
+> Details:
 > 
-> Not sure about this one. PSE_DISCON_STATIC_CLASS_HIGHEST_FIRST would be
-> sufficient for that case.
-
-ack
-
-> >  * @PSE_DISCON_LOWEST_AVG_POWER: Disconnect device with the lowest average
-> >  *   power draw, minimizing impact on dynamic power allocation.
-> >  *   - Relevant for: ETHTOOL_PSE_PORT_PRIO_DYNAMIC
-> >  *   - Behavior: Among devices with the same priority level, the system
-> >  *     disconnects the device with the lowest average power draw.
-> >  *   - If multiple devices have the same average power draw and priority,
-> >  *     further tie-breaking mechanisms can be applied, such as disconnecting
-> >  *     the least recently connected device.
-> >  *   - Rationale: Minimizes disruption across dynamic devices, keeping as many
-> >  *     active as possible by removing the lowest-power ones.
-> >  *   - Use Case: Suitable for dynamic-priority systems where maximizing the
-> >  *     number of connected devices is more important than individual device
-> >  *     power requirements.
-> > 
-> >  * @PSE_DISCON_LONGEST_IDLE: Disconnect device with the longest idle time
-> >  *   (low or no recent active power usage).
-> >  *   - Relevant for: ETHTOOL_PSE_PORT_PRIO_DYNAMIC
-> >  *   - Behavior: Disconnects the device with the longest period of inactivity,
-> >  *     where "idle" is defined as low current draw or absence of recent data
-> >  *     transmission.
-> >  *   - If multiple devices have the same idle time and priority, a
-> > tie-breaking
-> >  *     mechanism, such as round-robin based on port index, can be used.
-> >  *   - Rationale: Optimizes resource allocation in dynamic-priority setups by
-> >  *     maintaining active devices while deprioritizing those with minimal
-> >  *     recent usage.
-> >  *   - Use Case: Ideal for dynamic environments, like sensor networks, where
-> >  *     devices may be intermittently active and can be deprioritized during
-> >  *     idle periods.
-> >  *
-> >  * These disconnection policies provide flexibility in handling cases where
-> >  * multiple devices with the same priority exceed the PSE budget, aligning
-> >  * with either static or dynamic port priority modes:
-> >  *   - `ETHTOOL_PSE_PORT_PRIO_STATIC` benefits from policies that maintain
-> >  *     stable power allocation, favoring longer-standing or higher-class
-> >  *     devices (e.g., `PSE_DISCON_LRC`, `PSE_DISCON_ROUND_ROBIN_IDX`,
-> >  *     `PSE_DISCON_STATIC_CLASS_HIGHEST_FIRST`,
-> > `PSE_DISCON_STATIC_CLASS_LOWEST_FIRST`,
-> >  *     `PSE_DISCON_STATIC_CLASS_BUDGET_MATCH`).
-> >  *   - `ETHTOOL_PSE_PORT_PRIO_DYNAMIC` supports policies that dynamically
-> >  *     adjust based on real-time metrics (e.g., `PSE_DISCON_LOWEST_AVG_POWER`,
-> >  *     `PSE_DISCON_LONGEST_IDLE`), ideal for setups where usage fluctuates
-> >  *     frequently.
-> >  *   - Users can define an ordered array of disconnection policies, allowing
-> >  *     the system to apply each policy in sequence, providing nuanced control
-> >  *     over how power disconnections are handled.
-> >  */
+> For IPv6, a Netlink client is unable to create default routes in the
+> same manner as the kernel. This leads to failures when there are
+> multiple default routers, as they were being coalesced into a single
+> ECMP route. When one of the ECMP default routers becomes UNREACHABLE, it
+> was still being selected as the nexthop.
 > 
-> I think I can add support for one or two of these modes in this patch series.
-> Modes relevant for dynamic port priority can't be used for now as nothing
-> support them.
+> Meanwhile, when the kernel processes RAs from multiple default routers,
+> it sets the fib6_flags: RTF_ADDRCONF | RTF_DEFAULT. The RTF_ADDRCONF
+> flag is checked by rt6_qualify_for_ecmp(), which returns false when
+> ADDRCONF is set. As such, the kernel creates separate default routes.
+> 
+> E.g. compare the routing tables when RAs are processed by the kernel
+> versus a Netlink client (systemd-networkd, in my case).
+> 
+> 1) RA Processed by kernel (accept_ra = 2)
+> $ ip -6 route
+> 2001:2:0:1000::/64 dev enp0s9 proto kernel metric 256 expires ...
+> fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
+> default via fe80::200:10ff:fe10:1060 dev enp0s9 proto ra ...
+> default via fe80::200:10ff:fe10:1061 dev enp0s9 proto ra ...
+> 
+> 2) RA Processed by Netlink client (accept_ra = 0)
+> $ ip -6 route
+> 2001:2:0:1000::/64 dev enp0s9 proto ra metric 1024 expires ...
+> fe80::/64 dev enp0s3 proto kernel metric 256 pref medium
+> fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
+> default proto ra metric 1024 expires 595sec pref medium
+> 	nexthop via fe80::200:10ff:fe10:1060 dev enp0s9 weight 1
+> 	nexthop via fe80::200:10ff:fe10:1061 dev enp0s9 weight 1
+> 
+> IPv6 Netlink clients need a mechanism to identify a route as coming from
+> an RA. i.e. a Netlink client needs a method to set the kernel flags:
+> 
+>     RTF_ADDRCONF | RTF_DEFAULT
+> 
+> This is needed when there are multiple default routers that each send
+> an RA. Setting the RTF_ADDRCONF flag ensures their fib entries do not
+> qualify for ECMP routes, see rt6_qualify_for_ecmp().
+> 
+> To achieve this, introduce a user-level flag RTM_F_RA_ROUTER that a
+> Netlink client can pass to the kernel.
+> 
+> A Netlink user-level network manager, such as systemd-networkd, may set
+> the RTM_F_RA_ROUTER flag in the Netlink RTM_NEWROUTE rtmsg. When set,
+> the kernel sets RTF_RA_ROUTER in the fib6_config fc_flags. This causes a
+> default route to be created in the same way as if the kernel processed
+> the RA, via rt6add_dflt_router().
+> 
+> This is needed by user-level network managers, like systemd-networkd,
+> that prefer to do the RA processing themselves. ie. they disable the
+> kernel's RA processing by setting net.ipv6.conf.<intf>.accept_ra=0.
+> 
+> Without this flag, when there are mutliple default routers, the kernel
+> coalesces multiple default routes into an ECMP route. The ECMP route
+> ignores per-route REACHABILITY information. If one of the default
+> routers is unresponsive, with a Neighbor Cache entry of INCOMPLETE, then
+> it can still be selected as the nexthop for outgoing packets. This
+> results in an inability to communicate with remote hosts, even though
+> one of the default routers remains REACHABLE. This violates RFC4861
+> section 6.3.6, bullet 1.
+> 
+> Extract from RFC4861 6.3.6 bullet 1:
+>      1) Routers that are reachable or probably reachable (i.e., in any
+>         state other than INCOMPLETE) SHOULD be preferred over routers
+>         whose reachability is unknown or suspect (i.e., in the
+>         INCOMPLETE state, or for which no Neighbor Cache entry exists).
+> 
+> This fixes the IPv6 Logo conformance test v6LC_2_2_11, and others that
+> test with multiple default routers. Also see systemd issue #33470:
+> https://github.com/systemd/systemd/issues/33470.
+> 
+> Signed-off-by: Matt Muggeridge <Matt.Muggeridge@hpe.com>
+> Cc: David Ahern <dsahern@kernel.org>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: linux-api@vger.kernel.org
+> Cc: stable@vger.kernel.org
+> ---
+>  include/uapi/linux/rtnetlink.h | 9 +++++----
+>  net/ipv6/route.c               | 3 +++
+>  2 files changed, 8 insertions(+), 4 deletions(-)
+> 
+> diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
+> index 3b687d20c9ed..9f0259f6e4ed 100644
+> --- a/include/uapi/linux/rtnetlink.h
+> +++ b/include/uapi/linux/rtnetlink.h
+> @@ -202,7 +202,7 @@ enum {
+>  #define RTM_NR_FAMILIES	(RTM_NR_MSGTYPES >> 2)
+>  #define RTM_FAM(cmd)	(((cmd) - RTM_BASE) >> 2)
+>  
+> -/* 
+> +/*
+>     Generic structure for encapsulation of optional route information.
+>     It is reminiscent of sockaddr, but with sa_family replaced
+>     with attribute type.
+> @@ -242,7 +242,7 @@ struct rtmsg {
+>  
+>  	unsigned char		rtm_table;	/* Routing table id */
+>  	unsigned char		rtm_protocol;	/* Routing protocol; see below	*/
+> -	unsigned char		rtm_scope;	/* See below */	
+> +	unsigned char		rtm_scope;	/* See below */
+>  	unsigned char		rtm_type;	/* See below	*/
+>  
+>  	unsigned		rtm_flags;
+> @@ -336,6 +336,7 @@ enum rt_scope_t {
+>  #define RTM_F_FIB_MATCH	        0x2000	/* return full fib lookup match */
+>  #define RTM_F_OFFLOAD		0x4000	/* route is offloaded */
+>  #define RTM_F_TRAP		0x8000	/* route is trapping packets */
+> +#define RTM_F_RA_ROUTER		0x10000	/* route is a default route from RA */
+Please, don't mix whitespace changes with the changes related to the new flag.
 
-ack
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Documentation/process/submitting-patches.rst#n166
 
-> Do you think I should add this full enumeration in ethtool UAPI even if not all
-> of them are supported yet? 
 
-No, do not worry, it was just my brain dump. Care only about actually
-used variants. If some one will need something different, we will
-already know how to address it.
-
--- 
-Pengutronix e.K.                           |                             |
-Steuerwalder Str. 21                       | http://www.pengutronix.de/  |
-31137 Hildesheim, Germany                  | Phone: +49-5121-206917-0    |
-Amtsgericht Hildesheim, HRA 2686           | Fax:   +49-5121-206917-5555 |
+Regards,
+Nicolas
 
