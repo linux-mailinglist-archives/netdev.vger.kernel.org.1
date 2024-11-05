@@ -1,299 +1,444 @@
-Return-Path: <netdev+bounces-142096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEC0F9BD79E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:29:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 370139BD7A3
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:29:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1D3D1C22A5C
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:29:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BC83E1F2329F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:29:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C08216431;
-	Tue,  5 Nov 2024 21:29:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49ED0216209;
+	Tue,  5 Nov 2024 21:29:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="gR+NMJE9"
+	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="iwJJiudN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f173.google.com (mail-qt1-f173.google.com [209.85.160.173])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-out1-03.simnet.is (smtp-out1-03.simnet.is [194.105.232.31])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 092992161EF
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 21:29:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.173
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C9F216213
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 21:29:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.232.31
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730842143; cv=none; b=j6LLhYRTm/l2XGDTieHkb/QN/8cpUvKqAgTpiStYkk8Ls/xtZmQhLnkBX5q5ixt1W0zFejv2anfE9k/g4Ibi25bmWY0Ya/Q2zj0eZJP1VIzoT2ZTqgwtS9nIPEjmnZXFwP4utFP/IHVCbJSkKswu6dI6lEJj/Tx7uVRKb62N+5g=
+	t=1730842159; cv=none; b=VRGPC8a9xDDXs70cbW/mBqrYEIlZPW5//yA29yzRoyn4/dhpzB4lol70xKSkmKMzEeqcDW2EWKUUg7JpqLsBm/bZqMQ5AGhm6hgn2c/bF/2GcZGj8rygoKEPwIXjzpMQdprFKj1DGzFVBndfN8iVLihbYbjME0eu51jZidckqK4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730842143; c=relaxed/simple;
-	bh=0vlrR7m4wjvDiUOsNx/txRfIE+ymrJZzhXVyiDgB9BI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=nGl1jFoXL2m5D4faHlklcaVynnWwFx35d9Q8nRPM9ajwv2IUbBAgnoEQF+wGqS8vwdWAb5WbINB5Uhmfcmwonc6SWav/OOpb5eBrcvc/iXpF4UZfPYl4N+nmo/y2unBNMKhDv6a2r88q9weinm816RAWG7eq75ON+ci8hTDP/88=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=gR+NMJE9; arc=none smtp.client-ip=209.85.160.173
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f173.google.com with SMTP id d75a77b69052e-460b295b9eeso19871cf.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 13:29:01 -0800 (PST)
+	s=arc-20240116; t=1730842159; c=relaxed/simple;
+	bh=SS4GWu3FjZi/LDHHA73Ns2xau/GSKqqhwH/ReCgSd2g=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=KYZnqxtGVZe1EUsIDdlQel6vH3InteMGUT7Qx3F3/c9iZCARaT9tcLwz/AFqPkaMbIia7mG5Wkzu9KPhOHOD9rH/fJEXFIEqnmtX/mgwjlJJ5jsahX2fdvd6yqhcmMGNbYlC4png4NVIbXbqpj/JPeOiz9aJpDIOAoh7Nqrx3gk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=iwJJiudN; arc=none smtp.client-ip=194.105.232.31
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730842141; x=1731446941; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=h4h1iJYzcKiOZWJuU1HDZyOsv6VUMD/8hUZDwNyB5Yw=;
-        b=gR+NMJE98f8ZtMubbC4ZK29JywhAVqu7wCdR0bTEeLRApHUiDE/BGq0D8cu9G9LBR0
-         1NWzYWW245z/EAe4y2CDL1ch2Cppg5Jyxrw9QZWSuKUaduaHcLcnaQvitbYH+ZFuMrDo
-         ArNp7H139jpIaz+5YtgsbYiRHKN7+HV6QrenAzILqJSwNsHpShViEtKyhU9FzITa9VCi
-         r4meDKacRyzc5wSG3NwhJIDY1Hubuf+P2gWS+YREiGtSvu45Y/SkMIWA/qpz7Vw9Ains
-         u46HmXjHT+jDuYaItLsp2cqxouUAT/lDhNrru2fqJxq667I/6pPmE/SS9lFdRTNa4Z71
-         u5nQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730842141; x=1731446941;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=h4h1iJYzcKiOZWJuU1HDZyOsv6VUMD/8hUZDwNyB5Yw=;
-        b=lf0++SB3skVbGxq8ABOGLId8Q0vfcNBZDSn1OPsCqZiToS8seL2OSDqpZu0dFY/3Us
-         ySteuzM9xNjsNqP4ue4m1WKwNxbxZCyZInRvde2vKxKbCOalQstZewa9eKR0Mls1MgLk
-         GZHXGHe0z/kGaYy3+ocMgNrI6vuQcruauH+K6ErREwgwVpT3xR0POWzq1TKFqlkNX/Xk
-         WOUtMPTTYq/qxP2qpDsJyGh8KTztiZsug1vzt0hGenDstY2VjFru5obDO+Yam0LBc5F3
-         Ve5tIGQFiq3cidLfRHxjOV0nxlWLHfX05cjWprjoGrirg9reGJqtDKjFEOPElYq9Mo5R
-         XkPw==
-X-Gm-Message-State: AOJu0YwClAEmqU+B4P9zAtfe5ZAs0eMQAz19jvADk1fcAXESyTll0GzD
-	ZVhL7GQl7bug6qV3QBvuEW6ux7SS/Tkbz/yiebmRZr76qVx7hvUSz8D012SJbK/8D+IQ4T8SX3Q
-	A/tXywHcvxZEQRmwcjh4DEaMTSWdM11pGOCS4
-X-Gm-Gg: ASbGncu0WJGvmIAqwGUfBxkkWk9oE/UNgCHfWgeesxteBCQQoIE2nKXKJ/UDnY984mI
-	gffVpO6+2UcT59iC5EZZaPhgEjG+Nu/N5EE5YtOIEhIU5X9gs6KwYyV8zJ6z5HA==
-X-Google-Smtp-Source: AGHT+IEjSIel43idNBo3lwSTd9iu0fSJLfqvR0Aru+x0iW0YghL0qiYES/xu1qLkLznMBR9vBO3PhLQzAVjOfrFcDVg=
-X-Received: by 2002:a05:622a:189f:b0:462:b36f:294 with SMTP id
- d75a77b69052e-462f01e3099mr804661cf.24.1730842140683; Tue, 05 Nov 2024
- 13:29:00 -0800 (PST)
+  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
+  t=1730842155; x=1762378155;
+  h=date:from:to:subject:message-id:mime-version;
+  bh=Zsm9hF1pgzoXDov4MVSVszj/9n6sthpb/kAIa+uhIGI=;
+  b=iwJJiudN5BNqEbJM1WGVDOmIMMljX6eLBRixydMd4LLT6XSRYl/1TIw0
+   9b3jVvS7Yy5DaOUxA/0R7iG0cyFpk2BK632XKGnxXJiWIj1inSWn8qaqj
+   jimNbgXh459Qu2N9NMuzfaVuGRGD5qF/RxAEe/zueMcXqFJfrZijkMy2J
+   VU+BqOHXm8+k6R3x1R8mGxNFP5k/E6YSZCEMvhxbqQKIQjazZHcSyf8cK
+   4bbIVcLafrYkmw+xJC2s7FO4/9VtIJ3ZBbxOWKndQaBcyKYPThde7jEYz
+   OoKdTKmswHhlhPD9/hXAyVO+f8HfQ14/W0WcHkSl33yRV3GF4MMyFAobG
+   A==;
+X-CSE-ConnectionGUID: Ccxc5Ey/TWKC3TEzQwPa4Q==
+X-CSE-MsgGUID: sFh0U7KzSge5rYEVfbMD0Q==
+Authentication-Results: smtp-out-03.simnet.is; dkim=none (message not signed) header.i=none
+X-SBRS: 3.3
+X-IPAS-Result: =?us-ascii?q?A2HgEQA1iCpnhVjoacJaHAECDi8BBAQBEAEHAQqBUwKCG?=
+ =?us-ascii?q?ih9gWSIJY4CHYMonHYHAQEBDxQCAQIOChMEAQEEhVQBAQ+JVSg3Bg4BAgQBA?=
+ =?us-ascii?q?QEBAwIDAQEBAQEBAQEOAQEGAQEBAQEBBgcCEAEBAQFADjuFNUYNhSwsgntfg?=
+ =?us-ascii?q?wEBgmSvZoE0gQGDHNsXgV0QgUgBhWmCYgGFaYR3PAaCDYEVNYEGbYFAhBuGb?=
+ =?us-ascii?q?ASCSHyBegyCDhIlgi+BEIVWiCWPVIFpA1khEQFVExcLBwWBegODUoE5gVGDI?=
+ =?us-ascii?q?EqDWYFCRj83ghNpSzoCDQI2giR9gk6DGIIFhHCEaYEjHTYKAwttPTUUG58wA?=
+ =?us-ascii?q?UaCNy9DAhUnUYEEQAMwBgQJAh58kk5EE48xgUShXIQkhluDMIILlUMzhASTO?=
+ =?us-ascii?q?ww6kkiYd6NuGYUbgX2CACwHGggwO4JnCUkZD44qGYEMAQeHIr8JeDsCBwsBA?=
+ =?us-ascii?q?QMJjwWBfgEB?=
+IronPort-PHdr: A9a23:9TTKkBHEvPCWJaDtS/FHE51Gfg0Y04WdBeZ0woEil6oLdbm/usy5e
+ lfe4PNgkBnIRtaT5/FFjr/QtKbtESwF7I2auX8POJpLS1ceiMoQkgBhSM6IAEH2NrjrOio9G
+ skqaQ==
+IronPort-Data: A9a23:LvhfsatcAiLZBGr0Rqx5zk+FQefnVKFeMUV32f8akzHdYApBs4E2e
+ kKraxnVYqTlPzOrZYw0KpPiphgb7NKW0N5T/DEc/ntmF39DoJCfVIqScheuZy3Kc5aaE0k8s
+ 5oVNNLOcMxuEyOD9k6jPLO/pCMs2/DYG+KhAbadYHF8GF5uGSt/1nqP9wJBbqtA2LBVVCvQ4
+ oiryyGmBGKY5tJUDo41w6za8Bk2tf3/tmoV7gBkPf5FsVOCznRMVZwRKa/vdSD1a4QFReTSq
+ 8TrlergpjyDl/sO5nJJtp6hLyXml5aLZVDmZkJ+AvXk2l4a4HVqjs7XDdJEAW9PkTKFgttt/
+ 9tEsJ20WG8BM7bF8Agne0Aw/xpWY+sfodcrHVDl6ZbPlhSeLiOwqxlTJBhe0bMwq7cf7V5mr
+ ZT0GBhVBjifiuS/xq6MS+UErqzP++GyYevzElk5pd3oJa5OraLrGs0m1vcEtNsEvf2iKN6FD
+ yYvhZWDWzybC/FHEg9/5JvTB45EjFGnG9FTgAr9SabafwE/ZeG+uVTgGIO9RzCEeSlatm2Tt
+ mmb0nW+Pi45H4ej5Ci87Uql2taayEsXWKpKfFG53uBrm0HW1G0WEAcRRUr++aP/lE+lR5ReM
+ CT4+AJ3/PR0rRT2CIOmBVvo8BZovTZFMzZUO+c1wBqMz6zZ/0CYHQDoSxYbNIZ47p9nHFTG0
+ HeSsdOxOGNMooaaRC+Hx5qqozmXFXAseDpqiSgsFldVsoay/OnflCnnSNt/HKOrpsP6FCu2w
+ D2QqiU6wbIJgqY2O76T41Hcn3e+p53RVAkl90CPBCS77xhlIo++D2C11bTFxd1LPI3EY0jGg
+ EcnsJOiwfI3EqmEyBXYFY3hA4qVz/qCNTTdh3tmEJ8g6ymh9hafkWZ4vGEWyKBBbpZsRNP5X
+ HI/rz+987dyBxOXgUJffYOqF4E4zK34D9P1R7WMNJxQY4NtMg6clM2PWaJy9z63+KTPufhuU
+ Xt+TSpKJS1AYUiA5GHuL9rxKZdxmkgDKZr7HPgXNSiP37uEf2KyQrwYKlaIZe1RxPrb+12Kr
+ 4sHZpLbkE03vAjCjs//rd57wbcicCBTOHwKg5UNK4Zv3yI/RDp/UqG5LU0JIdw6wMy5adskD
+ lnmBh8Jlwuj7ZE2AQCLbnkraL2HYHqMhS9TAMDYBn7xgyJLSd/2sM83KcBtFZF5r7ML8BKBZ
+ 6JeEyl2Kq8UEmyfk9ncBLGhxLFfmOOD31/RZHH7PmFuIPaNhWXho7fZQ+cmzwFWZgLfiCf0i
+ +TIOt/zKXbbezlfMQ==
+IronPort-HdrOrdr: A9a23:t5KlUqxZQGZp4B2qVQ4wKrPwM71zdoMgy1knxilNoDhuA6qlfq
+ GV7ZMmPHDP6Qr5NEtBpTniAtjlfZq/z+8R3WB5B97LN2OK1ATHEGgI1/qB/9SPIVycytJg
+X-Talos-CUID: 9a23:KxdFkW/ovH4THpYTH8GVv2UfCst4X2ya8EjzCBSEJHRQV4WcFWbFrQ==
+X-Talos-MUID: 9a23:VUDQ/wkuMumEdPqSUIlqdnp5Gscw3vuNGnsCnMgciuS6OyZVF2+k2WE=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.11,261,1725321600"; 
+   d="8'?scan'208";a="24262891"
+Received: from vist-zimproxy-02.vist.is ([194.105.232.88])
+  by smtp-out-03.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 21:29:06 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-02.vist.is (Postfix) with ESMTP id 58BA8442865A
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 21:29:06 +0000 (GMT)
+Received: from vist-zimproxy-02.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-02.vist.is [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id bqJJPt50jLO6 for <netdev@vger.kernel.org>;
+ Tue,  5 Nov 2024 21:29:05 +0000 (GMT)
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-02.vist.is (Postfix) with ESMTP id C48EC442867D
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 21:29:05 +0000 (GMT)
+Received: from vist-zimproxy-02.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-02.vist.is [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id 2vfil6ix3491 for <netdev@vger.kernel.org>;
+ Tue,  5 Nov 2024 21:29:05 +0000 (GMT)
+Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
+	by vist-zimproxy-02.vist.is (Postfix) with ESMTPS id B0CCA442865A
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 21:29:05 +0000 (GMT)
+Received: from bg by kassi.invalid.is with local (Exim 4.98)
+	(envelope-from <bg@kassi.invalid.is>)
+	id 1t8R6p-000000001Qx-0CZP
+	for netdev@vger.kernel.org;
+	Tue, 05 Nov 2024 21:29:07 +0000
+Date: Tue, 5 Nov 2024 21:29:07 +0000
+From: Bjarni Ingi Gislason <bjarniig@simnet.is>
+To: netdev@vger.kernel.org
+Subject: dcb-ets.8: some remarks and editorial changes for this manual
+Message-ID: <ZyqOI3MK0ROapWU3@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029205524.1306364-1-almasrymina@google.com>
- <20241029205524.1306364-2-almasrymina@google.com> <ZyJDxK5stZ_RF71O@mini-arch>
- <CAHS8izNKbQHFAHm2Sz=bwwO_A0S_dOLNDff7GTSM=tJiJD2m0A@mail.gmail.com> <ZyJLkn3uM1Qz6NZn@mini-arch>
-In-Reply-To: <ZyJLkn3uM1Qz6NZn@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Tue, 5 Nov 2024 13:28:48 -0800
-Message-ID: <CAHS8izMWbcKSr3uOVWQDmo5=aQvFdcD6o_myz1bw=a1rzrJE_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v1 6/7] net: fix SO_DEVMEM_DONTNEED looping too long
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>, Shuah Khan <shuah@kernel.org>, 
-	Yi Lai <yi1.lai@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Wed, Oct 30, 2024 at 8:07=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 10/30, Mina Almasry wrote:
-> > On Wed, Oct 30, 2024 at 7:33=E2=80=AFAM Stanislav Fomichev <stfomichev@=
-gmail.com> wrote:
-> > >
-> > > On 10/29, Mina Almasry wrote:
-> > > > Check we're going to free a reasonable number of frags in token_cou=
-nt
-> > > > before starting the loop, to prevent looping too long.
-> > > >
-> > > > Also minor code cleanups:
-> > > > - Flip checks to reduce indentation.
-> > > > - Use sizeof(*tokens) everywhere for consistentcy.
-> > > >
-> > > > Cc: Yi Lai <yi1.lai@linux.intel.com>
-> > > >
-> > > > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > > >
-> > > > ---
-> > > >  net/core/sock.c | 46 ++++++++++++++++++++++++++++-----------------=
--
-> > > >  1 file changed, 28 insertions(+), 18 deletions(-)
-> > > >
-> > > > diff --git a/net/core/sock.c b/net/core/sock.c
-> > > > index 7f398bd07fb7..8603b8d87f2e 100644
-> > > > --- a/net/core/sock.c
-> > > > +++ b/net/core/sock.c
-> > > > @@ -1047,11 +1047,12 @@ static int sock_reserve_memory(struct sock =
-*sk, int bytes)
-> > > >
-> > > >  #ifdef CONFIG_PAGE_POOL
-> > > >
-> > > > -/* This is the number of tokens that the user can SO_DEVMEM_DONTNE=
-ED in
-> > > > +/* This is the number of frags that the user can SO_DEVMEM_DONTNEE=
-D in
-> > > >   * 1 syscall. The limit exists to limit the amount of memory the k=
-ernel
-> > > > - * allocates to copy these tokens.
-> > > > + * allocates to copy these tokens, and to prevent looping over the=
- frags for
-> > > > + * too long.
-> > > >   */
-> > > > -#define MAX_DONTNEED_TOKENS 128
-> > > > +#define MAX_DONTNEED_FRAGS 1024
-> > > >
-> > > >  static noinline_for_stack int
-> > > >  sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned i=
-nt optlen)
-> > > > @@ -1059,43 +1060,52 @@ sock_devmem_dontneed(struct sock *sk, sockp=
-tr_t optval, unsigned int optlen)
-> > > >       unsigned int num_tokens, i, j, k, netmem_num =3D 0;
-> > > >       struct dmabuf_token *tokens;
-> > > >       netmem_ref netmems[16];
-> > > > +     u64 num_frags =3D 0;
-> > > >       int ret =3D 0;
-> > > >
-> > > >       if (!sk_is_tcp(sk))
-> > > >               return -EBADF;
-> > > >
-> > > > -     if (optlen % sizeof(struct dmabuf_token) ||
-> > > > -         optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
-> > > > +     if (optlen % sizeof(*tokens) ||
-> > > > +         optlen > sizeof(*tokens) * MAX_DONTNEED_FRAGS)
-> > > >               return -EINVAL;
-> > > >
-> > > > -     tokens =3D kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL=
-);
-> > > > +     num_tokens =3D optlen / sizeof(*tokens);
-> > > > +     tokens =3D kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KE=
-RNEL);
-> > > >       if (!tokens)
-> > > >               return -ENOMEM;
-> > > >
-> > > > -     num_tokens =3D optlen / sizeof(struct dmabuf_token);
-> > > >       if (copy_from_sockptr(tokens, optval, optlen)) {
-> > > >               kvfree(tokens);
-> > > >               return -EFAULT;
-> > > >       }
-> > > >
-> > > > +     for (i =3D 0; i < num_tokens; i++) {
-> > > > +             num_frags +=3D tokens[i].token_count;
-> > > > +             if (num_frags > MAX_DONTNEED_FRAGS) {
-> > > > +                     kvfree(tokens);
-> > > > +                     return -E2BIG;
-> > > > +             }
-> > > > +     }
-> > > > +
-> > > >       xa_lock_bh(&sk->sk_user_frags);
-> > > >       for (i =3D 0; i < num_tokens; i++) {
-> > > >               for (j =3D 0; j < tokens[i].token_count; j++) {
-> > > >                       netmem_ref netmem =3D (__force netmem_ref)__x=
-a_erase(
-> > > >                               &sk->sk_user_frags, tokens[i].token_s=
-tart + j);
-> > > >
-> > > > -                     if (netmem &&
-> > > > -                         !WARN_ON_ONCE(!netmem_is_net_iov(netmem))=
-) {
-> > > > -                             netmems[netmem_num++] =3D netmem;
-> > > > -                             if (netmem_num =3D=3D ARRAY_SIZE(netm=
-ems)) {
-> > > > -                                     xa_unlock_bh(&sk->sk_user_fra=
-gs);
-> > > > -                                     for (k =3D 0; k < netmem_num;=
- k++)
-> > > > -                                             WARN_ON_ONCE(!napi_pp=
-_put_page(netmems[k]));
-> > > > -                                     netmem_num =3D 0;
-> > > > -                                     xa_lock_bh(&sk->sk_user_frags=
-);
-> > > > -                             }
-> > > > -                             ret++;
-> > >
-> > > [..]
-> > >
-> > > > +                     if (!netmem || WARN_ON_ONCE(!netmem_is_net_io=
-v(netmem)))
-> > > > +                             continue;
-> > >
-> > > Any reason we are not returning explicit error to the callers here?
-> > > That probably needs some mechanism to signal which particular one fai=
-led
-> > > so the users can restart?
-> >
-> > Only because I can't think of a simple way to return an array of frags
-> > failed to DONTNEED to the user.
->
-> I'd expect the call to return as soon as it hits the invalid frag
-> entry (plus the number of entries that it successfully refilled up to
-> the invalid one). But too late I guess.
->
-> > Also, this error should be extremely rare or never hit really. I don't
-> > know how we end up not finding a netmem here or the netmem is page.
-> > The only way is if the user is malicious (messing with the token ids
-> > passed to the kernel) or if a kernel bug is happening.
->
-> I do hit this error with 1500 mtu, so it would've been nice to
-> understand which particular token triggered that. It might be
-> something buggy on the driver side, I need to investigate. (it's
-> super low prio because 1500)
->
-
-Hmm, I've never seen this, in production (code is similar to
-upstreamed, but I guess not exactly the same), and in my ncdevmem
-upstream testing.
-
-FWIW leaked frags are extremely bad, because there is no opportunity
-to reap them until the entire dmabuf has been rebound. You will need
-to root cause this if you're seeing it and are interested in using
-devmem tcp in prod.
-
-sk_user_frags is only really touched in:
-- sock_devmem_dontneed(), where they are removed from the xarray.
-- tcp_recvmsg_dmabuf(), where they are added to the xarray.
-- tcp_v4_destroy_sock(), where they are freed (but not removed from
-the xarray?!).
-
-The only root causes for this bug I see are:
-
-1. You're racing tcp_v4_destroy_sock() with sock_devmem_dontneed(), so
-somehow you're trying to release a frag already released in that loop?
-Or,
-2. You're releasing a frag that was never added by
-tcp_recvmsg_dmabuf(). I.e. There is a bug in tcp_recvmsg_dmabuf() that
-it put_cmsg the frag_id to the userspace but never adds it to the
-sk_user_frags. That should be accompanied by a ncdevmem validation
-error.
-
-The way to debug #2 is really to test with the ncdevmem validation. I
-got the sense from reviewing the test series that you don't like to
-use it, but it's how I root cause such issues. You should familiarize
-yourself with it if you want to root cause such issues as well. To use
-it:
-
-client: yes $(echo -e \\x01\\x02\\x03\\x04\\x05\\x06) | tr \\n \\0 \
-          | head -c 1G | nc <server ip> -p 5224
- server: ncdevmem -s <server IP> -c <client IP> -f eth1 -l -p 5224 -v 7
-
-If you see a validation error with your missing frag, send me the
-logs, I may be able to guess what's wrong.
-
-> > Also, the information is useless to the user. If the user sees 'frag
-> > 128 failed to free'. There is nothing really the user can do to
-> > recover at runtime. Only usefulness that could come is for the user to
-> > log the error. We already WARN_ON_ONCE on the error the user would not
-> > be able to trigger.
->
-> I'm thinking from the pow of user application. It might have bugs as
-> well and try to refill something that should not have been refilled.
-> Having info about which particular token has failed (even just for
-> the logging purposes) might have been nice.
-
-Yeah, it may have been nice. On the flip side it complicates calling
-sock_devmem_dontneed(). The userspace need to count the freed frags in
-its input, remove them, skip the leaked one, and re-call the syscall.
-On the flipside the userspace gets to know the id of the frag that
-leaked but the usefulness of the information is slightly questionable
-for me. :shrug:
+Content-Type: multipart/mixed; boundary="vYJoJmLmrozs8FgY"
+Content-Disposition: inline
 
 
---=20
-Thanks,
-Mina
+--vYJoJmLmrozs8FgY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+  The man page is from Debian:
+
+Package: iproute2
+Version: 6.11.0-1
+Severity: minor
+Tags: patch
+
+  Improve the layout of the man page according to the "man-page(7)"
+guidelines, the output of "mandoc -lint T", the output of
+"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+conventions.
+
+-.-
+
+  Output from a script "chk_man" is in the attachment.
+
+-.-
+
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+
+
+
+diff --git a/dcb-ets.8 b/dcb-ets.8.new
+index 9c64b33..b90d2ca 100644
+--- a/dcb-ets.8
++++ b/dcb-ets.8.new
+@@ -3,20 +3,19 @@
+ dcb-ets \- show / manipulate ETS (Enhanced Transmission Selection) settings of
+ the DCB (Data Center Bridging) subsystem
+ .SH SYNOPSIS
+-.sp
+ .ad l
+ .in +8
+ 
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .B ets
+ .RI "{ " COMMAND " | " help " }"
+ .sp
+ 
+ .ti -8
+ .B dcb ets show dev
+-.RI DEV
++.I DEV
+ .RB "[ " willing " ]"
+ .RB "[ " ets-cap " ]"
+ .RB "[ " cbs " ]"
+@@ -30,7 +29,7 @@ the DCB (Data Center Bridging) subsystem
+ 
+ .ti -8
+ .B dcb ets set dev
+-.RI DEV
++.I DEV
+ .RB "[ " willing " { " on " | " off " } ]"
+ .RB "[ { " tc-tsa " | " reco-tc-tsa " } " \fITSA-MAP\fB " ]"
+ .RB "[ { " pg-bw " | " tc-bw " | " reco-tc-bw " } " \fIBW-MAP\fB " ]"
+@@ -40,7 +39,7 @@ the DCB (Data Center Bridging) subsystem
+ .IR TSA-MAP " := [ " TSA-MAP " ] " TSA-MAPPING
+ 
+ .ti -8
+-.IR TSA-MAPPING " := { " TC " | " \fBall " }" \fB: "{ " \fBstrict\fR " | "
++.IR TSA-MAPPING " := { " TC " | " \fBall " }" \fB: "{ " \fBstrict\fR " |"
+ .IR \fBcbs\fR " | " \fBets\fR " | " \fBvendor\fR " }"
+ 
+ .ti -8
+@@ -71,13 +70,13 @@ class, bandwidth allocation, etc.
+ 
+ Two DCB TLVs are related to the ETS feature: a configuration and recommendation
+ values. Recommendation values are named with a prefix
+-.B reco-,
++.BR reco- ,
+ while the configuration ones have plain names.
+ 
+ .SH PARAMETERS
+ 
+ For read-write parameters, the following describes only the write direction,
+-i.e. as used with the \fBset\fR command. For the \fBshow\fR command, the
++i.e., as used with the \fBset\fR command. For the \fBshow\fR command, the
+ parameter name is to be used as a simple keyword without further arguments. This
+ instructs the tool to show the value of a given parameter. When no parameters
+ are given, the tool shows the complete ETS configuration.
+@@ -115,23 +114,23 @@ keywords described below. For each TC sets an algorithm used for deciding how
+ traffic queued up at this TC is scheduled for transmission. Supported TSAs are:
+ 
+ .B strict
+-- for strict priority, where traffic in higher-numbered TCs always takes
++\(en for strict priority, where traffic in higher-numbered TCs always takes
+ precedence over traffic in lower-numbered TCs.
+-.br
++.sp 1v
+ .B ets
+-- for Enhanced Traffic Selection, where available bandwidth is distributed among
++\(en for Enhanced Traffic Selection, where available bandwidth is distributed among
+ the ETS-enabled TCs according to the weights set by
+ .B tc-bw
+ and
+-.B reco-tc-bw\fR,
++.BR reco-tc-bw ,
+ respectively.
+-.br
++.sp 1v
+ .B cbs
+-- for Credit Based Shaper, where traffic is scheduled in a strict manner up to
++\(en for Credit Based Shaper, where traffic is scheduled in a strict manner up to
+ the limit set by a shaper.
+-.br
++.sp 1v
+ .B vendor
+-- for vendor-specific traffic selection algorithm.
++\(en for vendor-specific traffic selection algorithm.
+ 
+ .TP
+ .B tc-bw \fIBW-MAP
+@@ -144,7 +143,6 @@ bandwidth given to the traffic class in question. The value should be 0 for TCs
+ whose TSA is not \fBets\fR, and the sum of all values shall be 100. As an
+ exception to the standard wording, a configuration with no \fBets\fR TCs is
+ permitted to sum up to 0 instead.
+-.br
+ 
+ .TP
+ .B pg-bw \fIBW-MAP
+@@ -164,7 +162,6 @@ Set TSA and transmit bandwidth configuration:
+ 
+ .P
+ # dcb ets set dev eth0 tc-tsa all:strict 0:ets 1:ets 2:ets \\
+-.br
+                        tc-bw all:0 0:33 1:33 2:34
+ 
+ Show what was set:
+
+--vYJoJmLmrozs8FgY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="chk_man.err.dcb-ets.8"
+
+  Any program (person), that produces man pages, should check the output
+for defects by using (both groff and nroff)
+
+[gn]roff -mandoc -t -ww -b -z -K utf8  <man page>
+
+  The same goes for man pages that are used as an input.
+
+  For a style guide use
+
+  mandoc -T lint
+
+-.-
+
+  So any 'generator' should check its products with the above mentioned
+'groff', 'mandoc',  and additionally with 'nroff ...'.
+
+  This is just a simple quality control measure.
+
+  The 'generator' may have to be corrected to get a better man page,
+the source file may, and any additional file may.
+
+  Common defects:
+
+  Input text line longer than 80 bytes.
+
+  Not removing trailing spaces (in in- and output).
+  The reason for these trailing spaces should be found and eliminated.
+
+  Not beginning each input sentence on a new line.
+Lines should thus be shorter.
+
+  See man-pages(7), item 'semantic newline'.
+
+-.-
+
+The difference between the formatted output of the original and patched file
+can be seen with:
+
+  nroff -mandoc <file1> > <out1>
+  nroff -mandoc <file2> > <out2>
+  diff -u <out1> <out2>
+
+and for groff, using
+
+"printf '%s\n%s\n' '.kern 0' '.ss 12 0' | groff -mandoc -Z - "
+
+instead of 'nroff -mandoc'
+
+  Add the option '-t', if the file contains a table.
+
+  Read the output of 'diff -u' with 'less -R' or similar.
+
+-.-.
+
+  If 'man' (man-db) is used to check the manual for warnings,
+the following must be set:
+
+  The option "-warnings=w"
+
+  The environmental variable:
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+  or
+
+  (produce only warnings):
+
+export MANROFFOPT="-ww -b -z"
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+-.-.
+
+Output from "mandoc -T lint dcb-ets.8": (possibly shortened list)
+
+mandoc: dcb-ets.8:6:2: WARNING: skipping paragraph macro: sp after SH
+mandoc: dcb-ets.8:147:2: WARNING: skipping paragraph macro: br before sp
+mandoc: dcb-ets.8:167:2: WARNING: skipping paragraph macro: br before text line with leading blank
+
+-.-.
+
+Use the correct macro for the font change of a single argument or
+split the argument into two.
+
+19:.RI DEV
+33:.RI DEV
+
+-.-.
+
+Add a comma (or \&) after "e.g." and "i.e.", or use English words
+(man-pages(7)).
+Abbreviation points should be protected against being interpreted as
+an end of sentence, if they are not, and that independent of the
+current place on the line.
+
+80:i.e. as used with the \fBset\fR command. For the \fBshow\fR command, the
+
+-.-.
+
+Wrong distance between sentences in the input file.
+
+  Separate the sentences and subordinate clauses; each begins on a new
+line.  See man-pages(7) ("Conventions for source file layout") and
+"info groff" ("Input Conventions").
+
+  The best procedure is to always start a new sentence on a new line,
+at least, if you are typing on a computer.
+
+Remember coding: Only one command ("sentence") on each (logical) line.
+
+E-mail: Easier to quote exactly the relevant lines.
+
+Generally: Easier to edit the sentence.
+
+Patches: Less unaffected text.
+
+Search for two adjacent words is easier, when they belong to the same line,
+and the same phrase.
+
+  The amount of space between sentences in the output can then be
+controlled with the ".ss" request.
+
+68:DCB (Data Center Bridging) interface. ETS permits configuration of mapping of
+73:values. Recommendation values are named with a prefix
+80:i.e. as used with the \fBset\fR command. For the \fBshow\fR command, the
+81:parameter name is to be used as a simple keyword without further arguments. This
+82:instructs the tool to show the value of a given parameter. When no parameters
+104:for details. Keys are priorities, values are traffic classes. For each priority
+113:for details. Keys are TCs, values are Transmission Selection Algorithm (TSA)
+114:keywords described below. For each TC sets an algorithm used for deciding how
+115:traffic queued up at this TC is scheduled for transmission. Supported TSAs are:
+142:for details. Keys are TCs, values are integers representing percent of available
+143:bandwidth given to the traffic class in question. The value should be 0 for TCs
+144:whose TSA is not \fBets\fR, and the sum of all values shall be 100. As an
+
+-.-.
+
+Use \(en (en-dash) for a dash between space characters,
+not a minus (\-) or a hyphen (-), except in the NAME section.
+
+dcb-ets.8:118:- for strict priority, where traffic in higher-numbered TCs always takes
+dcb-ets.8:122:- for Enhanced Traffic Selection, where available bandwidth is distributed among
+dcb-ets.8:130:- for Credit Based Shaper, where traffic is scheduled in a strict manner up to
+dcb-ets.8:134:- for vendor-specific traffic selection algorithm.
+
+-.-.
+
+Split a punctuation from a single argument, if a two-font macro is meant
+
+74:.B reco-,
+126:.B reco-tc-bw\fR,
+
+-.-.
+
+No space is needed before a quote (") at the end of a line
+
+12:.RI "[ " OPTIONS " ] "
+43:.IR TSA-MAPPING " := { " TC " | " \fBall " }" \fB: "{ " \fBstrict\fR " | "
+
+-.-.
+
+Output from "test-groff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
+
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
+troff: backtrace: file '<stdin>':12
+troff:<stdin>:12: warning: trailing space in the line
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':679: macro 'IR'
+troff: backtrace: file '<stdin>':43
+troff:<stdin>:43: warning: trailing space in the line
+
+-.-
+
+Additional changes:
+
+Add empty lines between "TSA-MAP" cases.
+
+--vYJoJmLmrozs8FgY--
 
