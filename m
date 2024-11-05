@@ -1,96 +1,134 @@
-Return-Path: <netdev+bounces-141730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77AA39BC211
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:37:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 532D69BC216
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 01:41:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 02CACB21815
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:37:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 07C271F22751
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 00:41:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98786BA53;
-	Tue,  5 Nov 2024 00:37:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 196A8F4FA;
+	Tue,  5 Nov 2024 00:41:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="4V+7reuY"
+	dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b="RbhQPJmK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from mail.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C610718622;
-	Tue,  5 Nov 2024 00:37:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B308B1FC3;
+	Tue,  5 Nov 2024 00:41:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=150.107.74.76
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730767045; cv=none; b=QKWX+Jl7B34CGrYZWXUB3P2QQl5hF730zu/K+bjSikRSTNu3pXM0hHDed7/hLMwMhBD4Osl0Dn7jF43//1jDz1drYCxfJn6kVFQU6q8m1WBcK1PZOYHCsCfEZokqbMrQqV6+/pa5TVt2KywDrZ19tKV4HJUyPOYJJhYozafJgzo=
+	t=1730767270; cv=none; b=YU1BRpWxrFbQcCgk8UCCSqYj0cSWHrJX5qefW6eXJM97jDsQ1k7PYqam//tGpGcCK7dcMROh6EdxruCD9a4gjGpV5MAxX68ctoeagJVy+gpaEppJIYwwVqjD0WO7hje5veyP24n1QrKSLURTU2PPZEW6D/VnIlmK0QfuiqtF7CU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730767045; c=relaxed/simple;
-	bh=pdvc4Wr2Sp+fgK5bx9hyGXDQxDTd8pbwOnlLFYC5LVk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=R6z1saQh8U4b5AtFbPWTwOzxgThIrhGBpTkCoLZQdFLnX/vtpdDPP38V7uUzYfMEcHgu7Vo1zT08Plc0JwgxyNzK7jf369+oSHLrDVVXXcHm97NN4/MNyTyeXjRj+OjEvBKj3h+qHKAMR1OJol2AdwrrmZz/CKwwcMQKsiaGtEY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=4V+7reuY; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Transfer-Encoding:Content-Disposition:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:From:
-	Sender:Reply-To:Subject:Date:Message-ID:To:Cc:MIME-Version:Content-Type:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Content-Disposition:
-	In-Reply-To:References; bh=wsCdaXVxhFLJ/19Yju+KPPKup4KE44LFd4V4VV/rTcM=; b=4V
-	+7reuYm4PlQ6QoNHuBv8joZNNODKeI9dEQt9dmTx7aPcSJzM4VqvrM4FAJGsEg0ZkAORbmDbNZGu8
-	iWzop4FPDk45DVN8C6NYoHGAs5Wh5DS88n6twCfeae873ifaFkp7tbdT/MtH582+3chN5ME1wmTwp
-	Q2qz6E59fJQUBIM=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t87ZI-00CA8S-WE; Tue, 05 Nov 2024 01:37:13 +0100
-Date: Tue, 5 Nov 2024 01:37:12 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, hkallweit1@gmail.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH] include: mdio: Guard inline function with CONFIG_MDIO
-Message-ID: <680bd06f-6a76-4a5c-b5d2-51dd172c8428@lunn.ch>
-References: <20241104070950.502719-1-alistair.francis@wdc.com>
- <9ae6af15-790a-4d34-901d-55fca0be9fd2@lunn.ch>
- <CAKmqyKOX8gcRT2dSOvJY2o4bpoF+VuPmhaygJj7pTb1KesrFOQ@mail.gmail.com>
+	s=arc-20240116; t=1730767270; c=relaxed/simple;
+	bh=mPdDfCpngc6bKRwCJVIyx84h/ef4rxx6rsJCP1SL5TA=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type; b=Byhl6D/c2xskJkc22r5aYHUInzR4rcnW9mrPitg/gjQC/Du+VTYb4JeIulN2jwPme0uYG9or5IAtNMtFlrFzRAoLmnI5JYt/mAvfSXsKq4D7uEvtgKo1x4wyEUR/dm4MHZ8W4CqWLw5q5NHNo67bdFgNsehPepgrHVdJUKz8QAA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au; spf=pass smtp.mailfrom=canb.auug.org.au; dkim=pass (2048-bit key) header.d=canb.auug.org.au header.i=@canb.auug.org.au header.b=RbhQPJmK; arc=none smtp.client-ip=150.107.74.76
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canb.auug.org.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canb.auug.org.au
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1730767260;
+	bh=rdYDPfkkpkH+F5nwG52ouQQ84vhjm/eoeUegPcCquPE=;
+	h=Date:From:To:Cc:Subject:From;
+	b=RbhQPJmKQjO5Bz6/K+GDAXr4lCxN9Tq38yKgb8DoeGh6Fk1I2LHrlLQ+IKgVtooBf
+	 YsU+Ft9v4TjzYwPTPKCmRnvNOEXgmUD3RpHOeagi8tGNSNF1Pdh+MApMxU3dWbgxCj
+	 C+AmzTwXvYV341Ve3KGWLoLWta89Rdf6flj4BlnMdenO9bgXIEzaWUxtfnG60q3QaC
+	 W0cGggJu5oeMkDUw4UCFjA8HvBX7ZnqW8ZEhtrByZ+9gvuIlCfDtm8X1Dlvq0HPcQG
+	 QXITr5lFZlqfnrTihjfifyClJH9VWVrLTXtgVIKf2WVh0F5aWJ+DG5sKz9nTaveliA
+	 H/VAUE/w9tyOQ==
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Xj8dl52MPz4x04;
+	Tue,  5 Nov 2024 11:40:59 +1100 (AEDT)
+Date: Tue, 5 Nov 2024 11:41:00 +1100
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Networking <netdev@vger.kernel.org>, Linux Kernel Mailing List
+ <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>, Wei Fang <wei.fang@nxp.com>
+Subject: linux-next: manual merge of the net-next tree with the net tree
+Message-ID: <20241105114100.118bd35e@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAKmqyKOX8gcRT2dSOvJY2o4bpoF+VuPmhaygJj7pTb1KesrFOQ@mail.gmail.com>
+Content-Type: multipart/signed; boundary="Sig_/gDQ=/C39ZeLwnHK+QSskU0+";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Tue, Nov 05, 2024 at 10:21:15AM +1000, Alistair Francis wrote:
-> On Mon, Nov 4, 2024 at 11:49 PM Andrew Lunn <andrew@lunn.ch> wrote:
-> >
-> > On Mon, Nov 04, 2024 at 05:09:50PM +1000, Alistair Francis wrote:
-> > > The static inline functions mdio45_ethtool_gset() and
-> > > mdio45_ethtool_ksettings_get() call mdio45_ethtool_gset_npage() and
-> > > mdio45_ethtool_ksettings_get_npage() which are both guarded by
-> > > CONFIG_MDIO. So let's only expose mdio45_ethtool_gset() and
-> > > mdio45_ethtool_ksettings_get() if CONFIG_MDIO is defined.
-> >
-> > Why? Are you fixing a linker error? A compiler error?
-> 
-> I'm investigating generating Rust bindings for static inline functions
-> (like mdio45_ethtool_gset() for example). But it fails to build when
-> there are functions defined in header files that call C functions that
-> aren't built due to Kconfig options.
+--Sig_/gDQ=/C39ZeLwnHK+QSskU0+
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-Since this does not appear to be an issue for C, i assume these
-functions are not actually used in that configuration. And this is
-probably not an issue specific to MDIO. It will probably appear all
-over the kernel. Adding lots of #ifdef in header files will probably
-not be liked.
+Hi all,
 
-Does Rust have the concept of inline functions? If it is never used,
-it never gets compiled? Or at least, it gets optimised out before it
-gets linked, which i think is your issue here.
+Today's linux-next merge of the net-next tree got a conflict in:
 
-	Andrew
+  drivers/net/ethernet/freescale/enetc/enetc_pf.c
+
+between commit:
+
+  e15c5506dd39 ("net: enetc: allocate vf_state during PF probes")
+
+from the net tree and commit:
+
+  3774409fd4c6 ("net: enetc: build enetc_pf_common.c as a separate module")
+
+from the net-next tree.
+
+I fixed it up (see below) and can carry the fix as necessary. This
+is now fixed as far as linux-next is concerned, but any non trivial
+conflicts should be mentioned to your upstream maintainer when your tree
+is submitted for merging.  You may also want to consider cooperating
+with the maintainer of the conflicting tree to minimise any particularly
+complex conflicts.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+diff --cc drivers/net/ethernet/freescale/enetc/enetc_pf.c
+index c95a7c083b0f,a76ce41eb197..000000000000
+--- a/drivers/net/ethernet/freescale/enetc/enetc_pf.c
++++ b/drivers/net/ethernet/freescale/enetc/enetc_pf.c
+@@@ -1277,12 -1024,7 +1015,13 @@@ static int enetc_pf_probe(struct pci_de
+  	pf =3D enetc_si_priv(si);
+  	pf->si =3D si;
+  	pf->total_vfs =3D pci_sriov_get_totalvfs(pdev);
+ +	if (pf->total_vfs) {
+ +		pf->vf_state =3D kcalloc(pf->total_vfs, sizeof(struct enetc_vf_state),
+ +				       GFP_KERNEL);
+ +		if (!pf->vf_state)
+ +			goto err_alloc_vf_state;
+ +	}
++ 	pf->ops =3D &enetc_pf_ops;
+ =20
+  	err =3D enetc_setup_mac_addresses(node, pf);
+  	if (err)
+
+--Sig_/gDQ=/C39ZeLwnHK+QSskU0+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmcpaZwACgkQAVBC80lX
+0GwOFQf+KU6hgL1u0134RRwL59L4v0RtCKHSTOter878kRyu5+Q3eSpNpiU1WWKg
+NTAXmTOHRDeWm4cmtYvRs5o3/vlTNWntKsyxuJylZr0tU/7QWhEaqBY+4swd4QJ/
+iYBjsOuxz/RyKYa5C7lBlGRNfSg3vxRBLmNsbyta5my1MBfbkixm/OFxU2t3JARz
+WBtDZ6BEpyexD0toPkgQqjcPT+/7iAPSDG0Jajg3LLqdxOeiJpIRMmKQknHOBcnF
+lUp9yBQ3IXhJlocn7+X1IU6n86i7JBE5c8nCEY+9xpNgkfKbdrxS2jOGNUcJTNuw
+UG6isrdHEDtcVN6J0ABrB3IN4b76gw==
+=vrAv
+-----END PGP SIGNATURE-----
+
+--Sig_/gDQ=/C39ZeLwnHK+QSskU0+--
 
