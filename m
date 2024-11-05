@@ -1,379 +1,140 @@
-Return-Path: <netdev+bounces-141929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AD449BCB16
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:57:19 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F7CE9BCB1F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:00:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEA411F22A9B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:57:18 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CAB0D1F23E68
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67B8E1D2F6D;
-	Tue,  5 Nov 2024 10:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15EA81D3184;
+	Tue,  5 Nov 2024 10:59:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="04nmS5FR"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EI1xhvXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lf1-f54.google.com (mail-lf1-f54.google.com [209.85.167.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7B571A08DB;
-	Tue,  5 Nov 2024 10:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57D0B1D2B22;
+	Tue,  5 Nov 2024 10:59:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730804233; cv=none; b=kk5yvUz765ncvRHwbivAXjyWSRtyc1w/oqaRyBBKggI+51/JrPFyxYtAGePskX9A/dizAU3m//70ej1cEZUhYKVFqBNHaqOPn+ceMWsPGORRQnc33INwqLnIkP9Q/T7Fu9T2+je8fx0kLCs5L1yl/G1ZEeE+uRDxF6N9jS64mMU=
+	t=1730804395; cv=none; b=X7i7152pnkwnI9wLmMyKk9vnGZuITSf8g1MhNz7eg32X6ohkoYZ4WUx3EPwGeV67nzupGB5ufwpuutcdofF07Znd96dn7NrhoHVxUnHgVZgX9gMFEBr/JYKrVQeHpFiCPBy+vyVv/p8B3ss8f7dUCfvfTvrh3iVUTpAlx9n3SDk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730804233; c=relaxed/simple;
-	bh=y+lPqjh/GIHR5UufXIzSTEnWNXMzwzt3TB30nfMKBfk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CWlKrgYfhgd9RVF7ZjFClhCmsBko7SsA7ne1oM4SbNgKoYY2qx/8bkmtFqamXuJNj4sKLrxDKp9PQ8sHpj3jABWSB6zv9X9zi3S/tsSIdczO6O2D3q6qJ0A6iyQAE26Oq0SGq2vDY0oYB1euFP7u2dL0nFKVqrRUDMcMT8bjeuQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=04nmS5FR; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
-	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID; bh=7qxOHEx8NwGIvVG7AtzRXGD9ioexpGa5ds6j8cVsFio=; b=04nmS5
-	FRYvLeETzLNzmob18KRgoPt+7yYgKBpKADK5X5EODm3LXWwI1rths1nuuNNLArhjkZLSq7cmqh5NH
-	xYOqH9pJs3bqHtSEWNbEDIi6AJae6xL10jCETQDxjFsUjQlksmcoS8a1w/0oLxO9XpQguo370ka4V
-	qDgGsH+QG1lI7w8gNc4TTmiaLOEEg2b0pjKElOBWYEFfPEd29JPy/oUKCmus39g6EOlDfy8+ll5jz
-	ASu4NBG3cXGTe5OmiMKXCoh+z3sBG4p+se/DzKWyTmb8s9aVenJTN5uOHIf6P1xdTOnpx7RvYnad0
-	SRsXq33d+d7W2u7B35kmzJ/U57/Q==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sean@geanix.com>)
-	id 1t8HFE-0003hG-3n; Tue, 05 Nov 2024 11:57:08 +0100
-Received: from [185.17.218.86] (helo=Seans-MacBook-Pro.local)
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <sean@geanix.com>)
-	id 1t8HFD-0009Gz-18;
-	Tue, 05 Nov 2024 11:57:07 +0100
-Date: Tue, 5 Nov 2024 11:57:06 +0100
-From: Sean Nyekjaer <sean@geanix.com>
-To: Krzysztof Kozlowski <krzk@kernel.org>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>, 
-	Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>, 
-	Krzysztof Kozlowski <krzk+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, linux-can@vger.kernel.org, 
-	netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] dt-bindings: can: convert tcan4x5x.txt to DT schema
-Message-ID: <k5czh4tugbps6fncqyqc4edd4plcrs7uapjo5idaw6lgmktlql@6hgibvhwsfwm>
-References: <20241104125342.1691516-1-sean@geanix.com>
- <dq36jlwfm7hz7dstrp3bkwd6r6jzcxqo57enta3n2kibu3e7jw@krwn5nsu6a4d>
- <wdn2rtfahf3iu6rsgxm6ctfgft7bawtp6vzhgn7dffd54i72lu@r4v5lizhae57>
+	s=arc-20240116; t=1730804395; c=relaxed/simple;
+	bh=X2aiaB2QLjmzxEz4BJTmcz5/caU1jLhjakEdzScTUNo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WgYgmL7Y7cEMDILS1/yOkE84PWZhMz/IaYCV5ccBlgHi4YbHr7N/VDEyvE3YBaJScbn3iGu73V4M6ORnC6xAQwAJ2G342X6KbkgHbCgGw7ClovQFVvfljBhvOsfGopZkawpfZfoQnOB2n462RYJn8e5S2c24DWqiMxLSNu5HelY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EI1xhvXi; arc=none smtp.client-ip=209.85.167.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-lf1-f54.google.com with SMTP id 2adb3069b0e04-539f1292a9bso6067725e87.2;
+        Tue, 05 Nov 2024 02:59:53 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730804391; x=1731409191; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Dxc2q9MRuwdMNmLTNPGQBcREWP4Y2xIFNTUX1iciaC4=;
+        b=EI1xhvXiq+qZH+OEBYJ3V1kR2lYkJfPbwqQu/TtWgcsEf+LPPWQIdONTvHtH6k+M9J
+         75f6HVODXmFoNZrLCNDGtHVbesVm3JxL2l27xrVIUKCKokvZjC6NzPvRkYuM1JbZ2hPX
+         pEtzQk51yjQS0TjdRlZWBtIfvMoQ+Dz+g5BYNkG86XWE1t+Cp4Ho8i54On4fRdKSZn5q
+         INi8AJnkQyST9hZ95WTZr+gWqcf0xbTWl37RFDXFV0W4pCMlxfd3PxK26iAGn6WzoOxn
+         5bTgsKJ4pBxn/Dm4rJGpw97PNtBw8+EuL0WQlzUi6vFZiUbDKJ3J8f4PfS3WftK3RFto
+         mVig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730804391; x=1731409191;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Dxc2q9MRuwdMNmLTNPGQBcREWP4Y2xIFNTUX1iciaC4=;
+        b=w3G+TiI01UFPk018ccXuiDUVOiB52IzSqxN4HLojKYdCxF8in4D6AvO7hJArikPOyi
+         iOq3oJcETA5zo4zBc3jtrIMBFkrQOBOg0O9w8dHC+VGYpiWhgnup4kSgnY1S8Iz8Ndo0
+         DpvW7vptks4saydCm+bSLTwB5nZgjCOcsvFUiVHLB5ajbmx3o/OZkeNsd7JnfBzeUhuW
+         87OwLBVRO9GfIyJdQT2TgFaWtGnmlP5MfwG9GYCd/v4CEm5zlZh7/PT+1GamDEHHHny2
+         lmcR7Dn1f34Fxp6SdXQIe96BoKWD3R9rol9k7n3066/B9av5Tvxsd8wxw3hzpH5rlbDf
+         hWCw==
+X-Forwarded-Encrypted: i=1; AJvYcCUr3ZtqsZ+XvFvPsf7EB15/V9D+Js5SNHDkgCK1QzfBiJ2/wtOA9RY3XRDJZDlRFgE24oE+Rgg1@vger.kernel.org, AJvYcCVKklOTX26mA4BGg62YIpT4Kfc2pqg2aDZkTq/3Go5YeyptdSR5gZZ9gH4kKfaCKHmHwuWfzfGJoJ3UN60XXJk=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+EQaXqKeY9rVnHOPnQnRbL3taVMYGPizkCYLyCV2MLcqi4HnH
+	bVcTDGPlfBQTe9mtS1SvGCQOXixx3rTdBYHrVHhp4q7u48WTg66y0Y/1dw==
+X-Google-Smtp-Source: AGHT+IGq9JvfEkZmwPMa2lZzGZKak8jTwKZkT3pCyrwQTV+HHuGBoCtanFcoeGc8mG4qdJKn8Yefwg==
+X-Received: by 2002:a05:6512:2341:b0:536:554a:24c2 with SMTP id 2adb3069b0e04-53b348c8978mr18599811e87.13.1730804391074;
+        Tue, 05 Nov 2024 02:59:51 -0800 (PST)
+Received: from [10.0.0.4] ([37.170.92.119])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-4327d5e7c8bsm188562115e9.26.2024.11.05.02.59.50
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 02:59:50 -0800 (PST)
+Message-ID: <7a2e5da2-5122-4c73-9a94-20e7f21a26f5@gmail.com>
+Date: Tue, 5 Nov 2024 11:59:49 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <wdn2rtfahf3iu6rsgxm6ctfgft7bawtp6vzhgn7dffd54i72lu@r4v5lizhae57>
-X-Authenticated-Sender: sean@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27449/Tue Nov  5 10:36:43 2024)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH RFC 3/5] rtnetlink: do_setlink: Use sockaddr_storage
+To: Kees Cook <kees@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ linux-hardening@vger.kernel.org
+References: <20241104221450.work.053-kees@kernel.org>
+ <20241104222513.3469025-3-kees@kernel.org>
+Content-Language: en-US
+From: Eric Dumazet <eric.dumazet@gmail.com>
+In-Reply-To: <20241104222513.3469025-3-kees@kernel.org>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 05, 2024 at 11:33:33AM +0100, Sean Nyekjaer wrote:
-> On Tue, Nov 05, 2024 at 10:16:30AM +0100, Krzysztof Kozlowski wrote:
-> > On Mon, Nov 04, 2024 at 01:53:40PM +0100, Sean Nyekjaer wrote:
-> > > Convert binding doc tcan4x5x.txt to yaml.
-> > > 
-> > > Signed-off-by: Sean Nyekjaer <sean@geanix.com>
-> > > ---
-> > > Changes since rfc:
-> > 
-> > That's a v2. RFC was v1. *ALWAYS*.
-> > Try by yourself:
-> > b4 diff 20241104125342.1691516-1-sean@geanix.com
-> > 
-> > Works? No. Should work? Yes.
-> > 
-> > 
-> 
-> Ok. Good to know RFC cannot be used...
-> Next version would need to be? In order to fix this?
-> 
-> I have enrolled my patch into b4, next verison will be v2 ;)
-> 
-> > >   - Tried to re-add ti,tcan4x5x wildcard
-> > >   - Removed xceiver and vdd supplies (copy paste error)
-> > >   - Corrected max SPI frequency
-> > >   - Copy pasted bosch,mram-cfg from bosch,m_can.yaml
-> > >   - device-state-gpios and device-wake-gpios only available for tcan4x5x
-> > 
-> > ...
-> > 
-> > > +properties:
-> > > +  compatible:
-> > > +    oneOf:
-> > > +      - items:
-> > > +          - enum:
-> > > +              - ti,tcan4552
-> > > +          - const: ti,tcan4x5x
-> > > +      - items:
-> > > +          - enum:
-> > > +              - ti,tcan4553
-> > 
-> > Odd syntax. Combine these two into one enum.
-> > 
-> > > +          - const: ti,tcan4x5x
-> > > +      - items:
-> > 
-> > Drop items.
-> > 
-> > > +          - enum:
-> > 
-> > ... and drop enum. That's just const or do you already plan to add here
-> > entries?
-> 
-> Honestly I'm struggling a bit with the syntax and I feel the feedback is containing
-> a lot of implicit terms :)
-> 
-> Something like:
-> properties:
->   compatible:
->     oneOf:
->       - items:
->           - enum:
->               - ti,tcan4552
->               - ti,tcan4x5x
->       - items:
->           - enum:
->               - ti,tcan4553
->               - ti,tcan4x5x
->       - const: ti,tcan4x5x
-> 
-> Gives:
-> /linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.example.dtb: can@0: compatible: ['ti,tcan4x5x'] is valid under each of {'items': [{'enum': ['ti,tcan4553', 'ti,tcan4x5x']}], 'type': 'array', 'minItems': 1, 'maxItems': 1}, {'items': [{'const': 'ti,tcan4x5x'}], 'type': 'array', 'minItems': 1, 'maxItems': 1}, {'items': [{'enum': ['ti,tcan4552', 'ti,tcan4x5x']}], 'type': 'array', 'minItems': 1, 'maxItems': 1}
->         from schema $id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-> /linux/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.example.dtb: can@0: compatible: 'oneOf' conditional failed, one must be fixed:
->         ['ti,tcan4552', 'ti,tcan4x5x'] is too long
->         'ti,tcan4552' is not one of ['ti,tcan4553', 'ti,tcan4x5x']
->         'ti,tcan4x5x' was expected
->         from schema $id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-> 
-> I can understand the original binding is broken.
-> I kinda agree with Marc that we cannot break things for users of this.
-> 
 
-Oh, did you mean something like:
+On 11/4/24 11:25 PM, Kees Cook wrote:
+> Instead of a heap allocation use a stack allocated sockaddr_storage to
+> support arbitrary length addr_len value (but bounds check it against the
+> maximum address length).
+>
+> Signed-off-by: Kees Cook <kees@kernel.org>
+> ---
+>   net/core/rtnetlink.c | 12 ++++--------
+>   1 file changed, 4 insertions(+), 8 deletions(-)
+>
+> diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+> index f0a520987085..eddd10b74f06 100644
+> --- a/net/core/rtnetlink.c
+> +++ b/net/core/rtnetlink.c
+> @@ -2839,21 +2839,17 @@ static int do_setlink(const struct sk_buff *skb,
+>   	}
+>   
+>   	if (tb[IFLA_ADDRESS]) {
+> -		struct sockaddr *sa;
+> -		int len;
+> +		struct sockaddr_storage addr;
+> +		struct sockaddr *sa = (struct sockaddr *)&addr;
 
-properties:
-  compatible:
-    oneOf:
-      - items:
-          - enum:
-              - ti,tcan4552
-              - ti,tcan4553
-          - const: ti,tcan4x5x
-      - const: ti,tcan4x5x
 
-> > 
-> > > +              - ti,tcan4x5x
-> > > +
-> > > +  reg:
-> > > +    maxItems: 1
-> > > +
-> > > +  interrupts:
-> > > +    maxItems: 1
-> > > +    description: The GPIO parent interrupt.
-> > > +
-> > > +  clocks:
-> > > +    maxItems: 1
-> > > +
-> > > +  reset-gpios:
-> > > +    description: Hardwired output GPIO. If not defined then software reset.
-> > > +    maxItems: 1
-> > > +
-> > > +  device-state-gpios:
-> > > +    description: |
-> > 
-> > Do not need '|' unless you need to preserve formatting.
-> > 
-> > Didn't you get this comment alerady?
-> > 
-> 
-> No, but I have removed the '|'
-> 
-> > > +      Input GPIO that indicates if the device is in a sleep state or if the
-> > > +      device is active. Not available with tcan4552/4553.
-> > > +    maxItems: 1
-> > > +
-> > > +  device-wake-gpios:
-> > > +    description: |
-> > > +      Wake up GPIO to wake up the TCAN device.
-> > > +      Not available with tcan4552/4553.
-> > > +    maxItems: 1
-> > > +
-> > > +  bosch,mram-cfg:
-> > > +    description: |
-> > > +      Message RAM configuration data.
-> > > +      Multiple M_CAN instances can share the same Message RAM
-> > > +      and each element(e.g Rx FIFO or Tx Buffer and etc) number
-> > > +      in Message RAM is also configurable, so this property is
-> > > +      telling driver how the shared or private Message RAM are
-> > > +      used by this M_CAN controller.
-> > > +
-> > > +      The format should be as follows:
-> > > +      <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
-> > > +      The 'offset' is an address offset of the Message RAM where
-> > > +      the following elements start from. This is usually set to
-> > > +      0x0 if you're using a private Message RAM. The remain cells
-> > > +      are used to specify how many elements are used for each FIFO/Buffer.
-> > > +
-> > > +      M_CAN includes the following elements according to user manual:
-> > > +      11-bit Filter	0-128 elements / 0-128 words
-> > > +      29-bit Filter	0-64 elements / 0-128 words
-> > > +      Rx FIFO 0		0-64 elements / 0-1152 words
-> > > +      Rx FIFO 1		0-64 elements / 0-1152 words
-> > > +      Rx Buffers	0-64 elements / 0-1152 words
-> > > +      Tx Event FIFO	0-32 elements / 0-64 words
-> > > +      Tx Buffers	0-32 elements / 0-576 words
-> > > +
-> > > +      Please refer to 2.4.1 Message RAM Configuration in Bosch
-> > > +      M_CAN user manual for details.
-> > > +    $ref: /schemas/types.yaml#/definitions/int32-array
-> > > +    items:
-> > > +      - description: The 'offset' is an address offset of the Message RAM where
-> > > +          the following elements start from. This is usually set to 0x0 if
-> > > +          you're using a private Message RAM.
-> > > +        default: 0
-> > > +      - description: 11-bit Filter 0-128 elements / 0-128 words
-> > > +        minimum: 0
-> > > +        maximum: 128
-> > > +      - description: 29-bit Filter 0-64 elements / 0-128 words
-> > > +        minimum: 0
-> > > +        maximum: 64
-> > > +      - description: Rx FIFO 0 0-64 elements / 0-1152 words
-> > > +        minimum: 0
-> > > +        maximum: 64
-> > > +      - description: Rx FIFO 1 0-64 elements / 0-1152 words
-> > > +        minimum: 0
-> > > +        maximum: 64
-> > > +      - description: Rx Buffers 0-64 elements / 0-1152 words
-> > > +        minimum: 0
-> > > +        maximum: 64
-> > > +      - description: Tx Event FIFO 0-32 elements / 0-64 words
-> > > +        minimum: 0
-> > > +        maximum: 32
-> > > +      - description: Tx Buffers 0-32 elements / 0-576 words
-> > > +        minimum: 0
-> > > +        maximum: 32
-> > > +    minItems: 1
-> > > +
-> > > +  spi-max-frequency:
-> > > +    description:
-> > > +      Must be half or less of "clocks" frequency.
-> > > +    maximum: 18000000
-> > > +
-> > > +  wakeup-source:
-> > > +    $ref: /schemas/types.yaml#/definitions/flag
-> > > +    description: |
-> > 
-> > Do not need '|' unless you need to preserve formatting.
-> > 
-> 
-> OK
-> 
-> > > +      Enable CAN remote wakeup.
-> > > +
-> > > +allOf:
-> > > +  - $ref: can-controller.yaml#
-> > > +  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-> > > +  - if:
-> > > +      properties:
-> > > +        compatible:
-> > > +          contains:
-> > > +            enum:
-> > > +              - ti,tcan4552
-> > > +              - ti,tcan4553
-> > > +    then:
-> > > +      properties:
-> > > +        device-state-gpios: false
-> > > +        device-wake-gpios: false
-> > 
-> > Heh, this is a weird binding. It should have specific compatibles for
-> > all other variants because above does not make sense. For 4552 one could
-> > skip front compatible and use only fallback, right? And then add these
-> > properties bypassing schema check. I commented on this already that
-> > original binding is flawed and should be fixed, but no one cares then I
-> > also don't care.
-> 
-> To me it looks like the example you linked:
-> https://elixir.bootlin.com/linux/v5.19/source/Documentation/devicetree/bindings/example-schema.yaml#L223
-> 
-> If you use fallback for a 4552 then it would enable the use of the
-> optional pins device-state-gpios and device-wake-gpios. But the chip
-> doesn't have those so the hw guys would connect them and they won't
-> be in the DT.
-> 
-> Honestly I'm confused :/
-> 
-> > 
-> > > +
-> > > +required:
-> > > +  - compatible
-> > > +  - reg
-> > > +  - interrupts
-> > > +  - clocks
-> > > +  - bosch,mram-cfg
-> > > +
-> > > +additionalProperties: false
-> > 
-> > Implement feedback. Nothing changed here.
-> > 
-> 
-> Uh? feedback?
-> 
-> > > +
-> > > +examples:
-> > > +  - |
-> > > +    #include <dt-bindings/gpio/gpio.h>
-> > > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > > +
-> > > +    spi {
-> > > +        #address-cells = <1>;
-> > > +        #size-cells = <0>;
-> > > +
-> > > +        can@0 {
-> > > +            compatible = "ti,tcan4x5x";
-> > > +            reg = <0>;
-> > > +            clocks = <&can0_osc>;
-> > > +            pinctrl-names = "default";
-> > > +            pinctrl-0 = <&can0_pins>;
-> > > +            spi-max-frequency = <10000000>;
-> > > +            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
-> > > +            interrupt-parent = <&gpio1>;
-> > > +            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
-> > > +            device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
-> > > +            device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
-> > > +            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
-> > > +            wakeup-source;
-> > > +        };
-> > > +    };
-> > > +  - |
-> > > +    #include <dt-bindings/gpio/gpio.h>
-> > > +    #include <dt-bindings/interrupt-controller/irq.h>
-> > > +
-> > > +    spi {
-> > > +        #address-cells = <1>;
-> > > +        #size-cells = <0>;
-> > > +
-> > > +        can@0 {
-> > > +            compatible = "ti,tcan4552","ti,tcan4x5x";
-> > 
-> > Missing space after ,.
-> > 
-> 
-> Added
-> 
-> Thanks for the review.
-> 
-> /Sean
-/Sean
+We already use too much stack space.
+
+
+Please move addr into struct rtnl_newlink_tbs ?
+
+
+>   
+> -		len = sizeof(sa_family_t) + max_t(size_t, dev->addr_len,
+> -						  sizeof(*sa));
+> -		sa = kmalloc(len, GFP_KERNEL);
+> -		if (!sa) {
+> +		if (dev->addr_len > sizeof(addr.__data)) {
+>   			err = -ENOMEM;
+>   			goto errout;
+>   		}
+>   		sa->sa_family = dev->type;
+> -		memcpy(sa->sa_data, nla_data(tb[IFLA_ADDRESS]),
+> +		memcpy(addr.__data, nla_data(tb[IFLA_ADDRESS]),
+>   		       dev->addr_len);
+>   		err = dev_set_mac_address_user(dev, sa, extack);
+> -		kfree(sa);
+>   		if (err)
+>   			goto errout;
+>   		status |= DO_SETLINK_MODIFIED;
 
