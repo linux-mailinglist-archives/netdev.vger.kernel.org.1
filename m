@@ -1,214 +1,146 @@
-Return-Path: <netdev+bounces-141786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C86DF9BC3D7
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:24:15 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57EAC9BC3DD
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:30:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED06B1C20DC4
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:24:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DE8DD281EAA
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:30:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F9AD185954;
-	Tue,  5 Nov 2024 03:24:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D3B818BC28;
+	Tue,  5 Nov 2024 03:30:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="gbJWNMzi"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="auM3yz62"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA41818454E
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 03:24:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4482189F39;
+	Tue,  5 Nov 2024 03:29:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730777049; cv=none; b=oi7/5alKyCZV4jUutzSxLtOMfOlHC3mkgnevEfTEG1Td+OF5h/UClLNcwtFkRY06+wi6DrpTvFke/vYk1gV1kCthiiMBr50nze7IeC5Sn2N/7mVWoXKkLFHW7BaEF7C+Y9GUO7UrfJ7nMajL6UA+Fn7eyuBfwewfqgc4Bwj9aWE=
+	t=1730777400; cv=none; b=ZfVu4g4/mfwZXN6NgEykjEUVwwvMFHYsx8gFSBDusguWP1FXBX+hCsjma/id1O3QgQ8qG8P7bVvDlL/KiJ1LbnhiWEZVGatPfuGuaxRxTy4VnejBVHf5TUMbxtVktLXgoc6Ikid4cdiX3oxjWic63fPHzBaXrtnJCF4E/Im/ZUk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730777049; c=relaxed/simple;
-	bh=5QUHgNsVFQlVu3u6ggbOA3TAqcHXnvWxj+mlox2vBQ4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=eDg56aX/lU4UhrR+W/ZGJ95dkPeo7wi6UgP4l1a9PfXzcaoZN52QzTzCtKGaePzDMXDT2r5G9gZaBTGX2zr9Upa07dltzCMgPv8jsPq4UlBR3KZ5HdrhpqgwRG8M9HBoTnOhOESTQb70M9pE9LkzsVDfFuARQ/fpx9zHYIrYCYg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=gbJWNMzi; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730777046;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=g5n1SqOXBxh35CLZ/E76FYksVvJeG9eAJd+Pgox1e9A=;
-	b=gbJWNMzind0czScYgworwnFQd0PDhUP/ar+OANv+n2WG2K+6Y0LkdUlXVB6e/V++mTfp6A
-	rqKVGMD/UlZ26c9Ro0OMcecFQwX/fRdb0tlTEIkwyhY7zJkval9NmW433/UFQePMRFzNRq
-	6DtWGGqt/ZAEOBKTKN6ZtjpQ+BzGW/E=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-60--i2awCr3Pp6kLiXxmPPtvg-1; Mon, 04 Nov 2024 22:24:03 -0500
-X-MC-Unique: -i2awCr3Pp6kLiXxmPPtvg-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-20c7ba2722fso49116075ad.1
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 19:24:03 -0800 (PST)
+	s=arc-20240116; t=1730777400; c=relaxed/simple;
+	bh=xy8eP0aKp8aFXIatWV6gD6j0hhk+fBHC4dHMl/3z7JA=;
+	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Ass/xqC12Vp0cv5PMPQlKhAxD+L+tHXYBfF4g6W/zce+n9KJcoTGlyOnTb+XH0YpZKk816OWE2o1nrl/N4jXuYu1f9xH2icPTsmxFtR9lDJ01mZbc87lvP5Dzw1paE61VXeMzq3RGRjHuwiyqKSD71l6kISImLBz6yQQC0O8qo4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=auM3yz62; arc=none smtp.client-ip=209.85.216.46
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e30fb8cb07so3578302a91.3;
+        Mon, 04 Nov 2024 19:29:58 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730777398; x=1731382198; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZoUg/GO9QPX5GyFZfYPI/Khp9nkGOAdmWMa/084j4c8=;
+        b=auM3yz62W6KsGW//BwoZiw/svpucplbEy7RacKGM8NBmRl0lEr0iVePYHpQW5bvlr9
+         oeLL5Pyc5xK2VocMcX60h3YrsyUbZzJXPRmt5ajJ2Ca7JVpoNn0kTt7FMFNFWqeYp/R/
+         LkBr/FyL2FVf1kvpLA/liHuXarsoirn5nMDgiwWQ+8Ts38D1vjpkBfS2o0iHVIa5Kh3k
+         VT7QjyFus4d9xvcpBSm3GsDWWNopznn20yevIWoEbBMgLkLKosqTExLsCZ5J3QXJ6toF
+         doEV/llNkwzQllj2R83IZSwsDC1EONcHOhuVjhUERUI1B4wzsf/BF9+s0HLZMdRx1j+c
+         cmwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730777042; x=1731381842;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=g5n1SqOXBxh35CLZ/E76FYksVvJeG9eAJd+Pgox1e9A=;
-        b=pCDjttuX0ekiRfEqD9Oeuctgs5CPCYJ/JjMNbIc0go1ACaIdUCXv+Zz5Kxee5l6Y3s
-         CzQCIh1wIxsod5btOxiFOkKRz9TE9AnXMO1u/7jntMxdMyJd/YIcwqJp7YR9M2DWM+jW
-         b3E06Q0ohuvoEukuKsaWtFYHPv4gSPd/PP8OaAgs81hknvFx6i3wtKP6XOu9qkzNFd5b
-         Ck+zA2fLnN28J3QYd0/c6WBE/E1/xF6GK60ELJsffP7JT/iMbo0iESAfgQl8R+30H+wr
-         MJv+A7Bn1CcaeK7ZqQ6pifmgD8VzpPhpuHDi4us2MLYSEVP8sIHZh2KF+KWzmUsnTPkm
-         tnkg==
-X-Gm-Message-State: AOJu0YyHhtxxakxqGqZJmwFtOvmTKV8YjWhsuUXNxAZM9jd8lMMx7JKn
-	XBEwNXfq9Sr4w9I8zNDW3gfQmHlDGQT0uh8NniYhuXs/T8vM12ta0Kgyw5IF/lKhiqv1KhdWl+y
-	g6+CaOa+J8+i5uMyeubtbxNVcHO/l1CDLcVo5l9ivmd9WndYZdgGgbBzOg5BDzTcq6jFEB/vSNO
-	lMrlB0tUKkkOZP0Nv3HPi1JbzUrASQ
-X-Received: by 2002:a17:903:2b06:b0:20c:d5d9:95dc with SMTP id d9443c01a7336-210f76d67cfmr268475935ad.40.1730777042671;
-        Mon, 04 Nov 2024 19:24:02 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEaIDVC9Qi5Y2fDkClwQoOViLbl1azvUa3CWlVG9p2ehPtLvN2mbt9WVC/NUU9tEoAThf431M26JAZ/sT5va9E=
-X-Received: by 2002:a17:903:2b06:b0:20c:d5d9:95dc with SMTP id
- d9443c01a7336-210f76d67cfmr268475545ad.40.1730777042172; Mon, 04 Nov 2024
- 19:24:02 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730777398; x=1731382198;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ZoUg/GO9QPX5GyFZfYPI/Khp9nkGOAdmWMa/084j4c8=;
+        b=FuZ35u/LnudsDgvSemVifIMsPrQ5wEycV1nMvWFUtorvlUFUWsZfLZ+pqmdxeeYJmU
+         b17qrIRrMSkDBzYlKWYW/LjqfngltmWrjItAq3K9hR1Pt9J7L+Mb5w49rJTWO8Ytqpw8
+         d+hcFYuEdcqqjdLy/RrUdXu3JKhonuAk5htZdu8DOIPrQm93OXBoJLmaY4ZvKjV3iUHy
+         Zba0lpW7GdFJB7xr7/ePXzQbrwscaNfYZ0CEINhpecZIuQiLFnmyBxx2GeD+iI/XOVrd
+         0FTzTP9yveIXFAw8qdJy8AI0uFen2t5BErpfFNbcbjpIbgrgqazG5NKNmcmc734RW+zk
+         adQw==
+X-Forwarded-Encrypted: i=1; AJvYcCVJ7td33uHXT2Lug18kO07BmPzygy4RKV2Yh3GpnuyjzFfu29MbjFTW2exb15octKHtx8TwD+xs2VFVhMQG/Bkr@vger.kernel.org, AJvYcCVWdd4UtNNqCtNfr4Zu2gr7vpZ5UmBS6WkEPVvEscpro+l4ewu0BAXETwkRiG5zk8jcFYQw8YRJ@vger.kernel.org, AJvYcCWzoOHh+MKODFFb+uY032LpgwR+TvGPSPbjyNj22RKxZx9VyXSbfED4jl0vx2eWtAJD7dzuZHlcsFvK+gE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzEZ5kb4jo108ZiGmEQ735YckGcnbbvEcLToXZKfvNG/kqYs6++
+	oZMU7POA0mhfb6h4lkRFwqaK9nr0r4hBHQQJDhsAhM6MEPaAHWQ=
+X-Google-Smtp-Source: AGHT+IEDBwJ8RzygDgb71vQZ5s/ZeolaoIa38xVDK/i+YXy/ZagMbg8uflAtuCr9mrfn1awDM9kjag==
+X-Received: by 2002:a17:90a:bc87:b0:2d3:da6d:8330 with SMTP id 98e67ed59e1d1-2e92ce32e36mr24870387a91.4.1730777397786;
+        Mon, 04 Nov 2024 19:29:57 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e98ca48187sm105107a91.1.2024.11.04.19.29.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 04 Nov 2024 19:29:57 -0800 (PST)
+Date: Mon, 4 Nov 2024 19:29:56 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Joe Damato <jdamato@fastly.com>, Stanislav Fomichev <sdf@fomichev.me>,
+	netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v7 03/12] selftests: ncdevmem: Unify error
+ handling
+Message-ID: <ZymRNJLLDLCqIYyq@mini-arch>
+References: <20241104181430.228682-1-sdf@fomichev.me>
+ <20241104181430.228682-4-sdf@fomichev.me>
+ <Zylc1dKzubaa0yWQ@LQ3V64L9R2>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com> <20241030082453.97310-7-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20241030082453.97310-7-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 5 Nov 2024 11:23:50 +0800
-Message-ID: <CACGkMEviCSEo4thkFo8gYnv+FCm-v65umJ65fdOwtxbAF_F2Ag@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 06/13] virtio-net: rq submits premapped per-buffer
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <Zylc1dKzubaa0yWQ@LQ3V64L9R2>
 
-On Wed, Oct 30, 2024 at 4:25=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
-om> wrote:
->
-> virtio-net rq submits premapped per-buffer by setting sg page to NULL;
->
-> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/net/virtio_net.c | 24 +++++++++++++-----------
->  1 file changed, 13 insertions(+), 11 deletions(-)
->
-> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> index 792e9eadbfc3..09757fa408bd 100644
-> --- a/drivers/net/virtio_net.c
-> +++ b/drivers/net/virtio_net.c
-> @@ -542,6 +542,12 @@ static struct sk_buff *ptr_to_skb(void *ptr)
->         return (struct sk_buff *)((unsigned long)ptr & ~VIRTIO_ORPHAN_FLA=
-G);
->  }
->
-> +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len=
-)
-> +{
-> +       sg->dma_address =3D addr;
-> +       sg->length =3D len;
+On 11/04, Joe Damato wrote:
+> On Mon, Nov 04, 2024 at 10:14:21AM -0800, Stanislav Fomichev wrote:
+> > There is a bunch of places where error() calls look out of place.
+> > Use the same error(1, errno, ...) pattern everywhere.
+> > 
+> > Reviewed-by: Mina Almasry <almasrymina@google.com>
+> > Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> > ---
+> >  tools/testing/selftests/net/ncdevmem.c | 16 ++++++++--------
+> >  1 file changed, 8 insertions(+), 8 deletions(-)
+> > 
+> > diff --git a/tools/testing/selftests/net/ncdevmem.c b/tools/testing/selftests/net/ncdevmem.c
+> > index 3e7ef2eedd60..4733d1a0aab5 100644
+> > --- a/tools/testing/selftests/net/ncdevmem.c
+> > +++ b/tools/testing/selftests/net/ncdevmem.c
+> > @@ -339,33 +339,33 @@ int do_server(struct memory_buffer *mem)
+> >  	server_sin.sin_port = htons(atoi(port));
+> >  
+> >  	ret = inet_pton(server_sin.sin_family, server_ip, &server_sin.sin_addr);
+> > -	if (socket < 0)
+> > -		error(79, 0, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+> > +	if (ret < 0)
+> > +		error(1, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+> >  
+> >  	socket_fd = socket(server_sin.sin_family, SOCK_STREAM, 0);
+> > -	if (socket < 0)
+> > -		error(errno, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+> > +	if (socket_fd < 0)
+> > +		error(1, errno, "%s: [FAIL, create socket]\n", TEST_PREFIX);
+> >  
+> >  	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEPORT, &opt,
+> >  			 sizeof(opt));
+> >  	if (ret)
+> > -		error(errno, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
+> > +		error(1, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
+> >  
+> >  	ret = setsockopt(socket_fd, SOL_SOCKET, SO_REUSEADDR, &opt,
+> >  			 sizeof(opt));
+> >  	if (ret)
+> > -		error(errno, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
+> > +		error(1, errno, "%s: [FAIL, set sock opt]\n", TEST_PREFIX);
+> 
+> A minor nit (definitely not worth re-sending for this on its own):
+> it might be helpful to add which of the sockopts failed to the error
+> message REUSEADDR or REUSEPORT.
+> 
+> Reviewed-by: Joe Damato <jdamato@fastly.com>
 
-This may work but I think it's better to reuse existing dma sg helpers like=
-:
+Thank you for the review!
 
-sg_dma_address(sg) =3D addr;
-sg_dma_length(sg) =3D len;
-
-And we probably need to fix the virtio core which only uses
-sg_dma_address() but not sg_dma_length().
-
-This helps us to avoid future issues when CONFIG_NEED_SG_DMA_LENGTH is set.
-
-Others look good.
-
-Thanks
-
-> +}
-> +
->  static void __free_old_xmit(struct send_queue *sq, struct netdev_queue *=
-txq,
->                             bool in_napi, struct virtnet_sq_free_stats *s=
-tats)
->  {
-> @@ -915,8 +921,7 @@ static void virtnet_rq_init_one_sg(struct receive_que=
-ue *rq, void *buf, u32 len)
->         addr =3D dma->addr - sizeof(*dma) + offset;
->
->         sg_init_table(rq->sg, 1);
-> -       rq->sg[0].dma_address =3D addr;
-> -       rq->sg[0].length =3D len;
-> +       sg_fill_dma(rq->sg, addr, len);
->  }
->
->  static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t =
-gfp)
-> @@ -1068,12 +1073,6 @@ static void check_sq_full_and_disable(struct virtn=
-et_info *vi,
->         }
->  }
->
-> -static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 len=
-)
-> -{
-> -       sg->dma_address =3D addr;
-> -       sg->length =3D len;
-> -}
-> -
->  static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
->                                    struct receive_queue *rq, void *buf, u=
-32 len)
->  {
-> @@ -1354,7 +1353,8 @@ static int virtnet_add_recvbuf_xsk(struct virtnet_i=
-nfo *vi, struct receive_queue
->                 sg_init_table(rq->sg, 1);
->                 sg_fill_dma(rq->sg, addr, len);
->
-> -               err =3D virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_buffs[=
-i], gfp);
-> +               err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, =
-xsk_buffs[i],
-> +                                                   NULL, true, gfp);
->                 if (err)
->                         goto err;
->         }
-> @@ -2431,7 +2431,8 @@ static int add_recvbuf_small(struct virtnet_info *v=
-i, struct receive_queue *rq,
->
->         virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
->
-> -       err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp)=
-;
-> +       err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx=
-,
-> +                                           rq->do_dma, gfp);
->         if (err < 0) {
->                 if (rq->do_dma)
->                         virtnet_rq_unmap(rq, buf, 0);
-> @@ -2546,7 +2547,8 @@ static int add_recvbuf_mergeable(struct virtnet_inf=
-o *vi,
->         virtnet_rq_init_one_sg(rq, buf, len);
->
->         ctx =3D mergeable_len_to_ctx(len + room, headroom);
-> -       err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp)=
-;
-> +       err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, ctx=
-,
-> +                                           rq->do_dma, gfp);
->         if (err < 0) {
->                 if (rq->do_dma)
->                         virtnet_rq_unmap(rq, buf, 0);
-> --
-> 2.32.0.3.g01195cf9f
->
-
+I later move these two under enable_reuseaddr and make it even less
+debuggable :-( Let me maybe keep the calls to error() inside the
+enable_reuseaddr.
 
