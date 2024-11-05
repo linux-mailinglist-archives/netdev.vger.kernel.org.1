@@ -1,148 +1,109 @@
-Return-Path: <netdev+bounces-141759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 782E89BC2F9
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:10:37 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 124389BC2FC
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:10:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03D591F22A84
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:10:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29D1D1C20C02
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 02:10:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4986364D6;
-	Tue,  5 Nov 2024 02:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A777151C4A;
+	Tue,  5 Nov 2024 02:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fOzX+5Tj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B33C18EB0
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 02:10:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DA784E1C4;
+	Tue,  5 Nov 2024 02:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730772622; cv=none; b=d6GfX4/I3YeOTVlOrqOv27ntAQUmNvzKl1cbuYNSDdx3xeTEG3cnv7fgBRCGxMXJqPmwHK+nkOJn0z1u5gjTH+KLBbV/CDsYq9NGO+rEpPpKshr/KxwbkjCZ/BpOCw1KylF4BHJ64jI4E8J3J3lTxK1QyO0VBlPp5+A3jFUxITg=
+	t=1730772623; cv=none; b=WANGkvtOUX+UxrlUhdhLFdaZZMqGQjwpstG2/+lAZifabcrBREmGnsI1LkqXH6jBezoDt5uB9kc//Bn4XCoq6MRdBP0KZlQcyCglz8uwu98cMDE+5UlBQWIa3hhhdSejBzexQILze0PBlikQ85A65xBXgGL/2RYwNnWVmg2oP8A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730772622; c=relaxed/simple;
-	bh=WOG2w6ROnRZSeXpBfdm1M5ozrfMG8hm2/mR6/2ljo78=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=S64jbHUzisJRFN2joRxgcaxBdIIhwu7rSYWT2mRIxMplFdUI40wFh4Sl4qhRuGNO/Rk9axwvadawA1Lp6AWGWSEgZJM0ksvW2iUECZe5226Vb1pmKfqTT9FQ9c/zyWt9MDnaksTMim9Rp4z7O178HWm5bSx/GBw0uDtEJDQp5iw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a6b37c6dd4so40853775ab.3
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 18:10:20 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730772620; x=1731377420;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=pOwK7LgCTCkhpBtnCmrshYoV78C7UhrxMFbq+MY09GY=;
-        b=DXCY3kMMpWPAT78B/Uw4M2rwMKQ+AO4fHeDRXC4s76IUGWCAeWRA7m2avP58JHq7jV
-         cDDY/Yj79+P3waK/XcoNWFjJUpSr6pCUTfCj7xUOI285h4/JWNqnKUJ7GxWecyn2a6AJ
-         d9jxaY5/CluoNKJcJB8Q9HPfZnVh2jiJ+kSrWvEZgnIamld1ecNjyuOPYLiGILpxNJDn
-         TyyQGF9jrDH/AYDJ74flcCYVigSAzfW9/kbIMt1YOQpVZyUbw2ixG7wuB1IrZCIDZ9UU
-         QLpuWoZaFl0PnE6jCwARCjeqpK0Uw8lDVMe7oNw4HT8sH02zSRQ2xkKg2RLoy6syAYZt
-         tP6g==
-X-Forwarded-Encrypted: i=1; AJvYcCXnZJGtSQ6nydawKb0c1TrRgiLy/y+Q0PjaiX3014eB78xIwu4xyEOOSU7zE/jGixIz0U9Mu/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzd38vKEaacCf7QSQTf0VW8Tm4qSO3VItidBwerBeL9EreazNrF
-	+jKjLH5JQsMZCWgdH4/o6dl22CbyLrvGtjXE6fzctXdLzBcZSzsR+ZzT90oeOXYUvdk4RF6uG3D
-	Yj1FstXPjfLEqBOnLWyJbMLMwDS5NOTqJBoYm9xJrDfCSNoKBKnnFPwg=
-X-Google-Smtp-Source: AGHT+IFmFAjJO8uzUsuCAVpvck1Ngr6POR2cxcKVMv7earv4Zm+aMtsG/f0rRxn1JsuyuBFlvcE+i4tJFgztvHW4mdoNEuXhCN4e
+	s=arc-20240116; t=1730772623; c=relaxed/simple;
+	bh=Po5MaKdUL6RYSi246eSx6gttyBF0y8NCd0d0fj15hts=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=MH7KHNRgDutdo6IdFiPAo3bFHJOlKjPqNcvUpK6x1G0nhcelgo+kVJmHBNaPzg/gbJHcfNcOSVsDTFCsWZIwn4hgLVmYvZUubnZY+gjxjn3Yx5P3MpmfuEcbN/72OtAGM67TL55gNhEuLFoSi4aoRGie1RlXOy7eLeUuV1SyKnY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fOzX+5Tj; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 08729C4CED2;
+	Tue,  5 Nov 2024 02:10:23 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730772623;
+	bh=Po5MaKdUL6RYSi246eSx6gttyBF0y8NCd0d0fj15hts=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=fOzX+5Tj1H8+F6RU2c6VnfKhPuvwzrG2JwN8ePvhidf1l+jF/w6JTmkVdYgdTJf/v
+	 bi8IGKqenFpZMMJiV4HyjRJVow++hnxLzoFQCnGh1hHGesiWoa7fbcm/6LN/EJt2d2
+	 T+QI4sJzXgCzUbyoc5C9PVU1o9l25hSt0GxjHG3brzDGxl9gn6hhjo8qQPjua06mEx
+	 +u81VlpJqGTyNe8DeSJsqaH2kBE5lF+17LIu9fvj/p3g1i7sC+idv1VmBoD/Ae0lLY
+	 hO/q9wqTyu+BFexTjZ3Fkzjz7+/5jxrEONySqaKRHl2YZX9PNQ7GbCb3N1p8VUfDga
+	 JKyEmc0JB9SRQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4053809A80;
+	Tue,  5 Nov 2024 02:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:1a4b:b0:39f:5e12:1dde with SMTP id
- e9e14a558f8ab-3a4ed2f2830mr327954935ab.21.1730772620239; Mon, 04 Nov 2024
- 18:10:20 -0800 (PST)
-Date: Mon, 04 Nov 2024 18:10:20 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <67297e8c.050a0220.2edce.14fe.GAE@google.com>
-Subject: [syzbot] [rdma?] WARNING in ib_uverbs_release_dev (2)
-From: syzbot <syzbot+a617d4c5ff27f35f8255@syzkaller.appspotmail.com>
-To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/8] can: j1939: fix error in J1939 documentation.
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173077263177.87562.17899880515746032832.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Nov 2024 02:10:31 +0000
+References: <20241104200120.393312-2-mkl@pengutronix.de>
+In-Reply-To: <20241104200120.393312-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, alexander.hoelzl@gmx.net,
+ o.rempel@pengutronix.de, mailhol.vincent@wanadoo.fr
 
-Hello,
+Hello:
 
-syzbot found the following issue on:
+This series was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-HEAD commit:    0fc810ae3ae1 x86/uaccess: Avoid barrier_nospec() in 64-bit..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=15ac9340580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=4aec7739e14231a7
-dashboard link: https://syzkaller.appspot.com/bug?extid=a617d4c5ff27f35f8255
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+On Mon,  4 Nov 2024 20:53:24 +0100 you wrote:
+> From: Alexander Hölzl <alexander.hoelzl@gmx.net>
+> 
+> The description of PDU1 format usage mistakenly referred to PDU2 format.
+> 
+> Signed-off-by: Alexander Hölzl <alexander.hoelzl@gmx.net>
+> Acked-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Acked-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
+> Link: https://patch.msgid.link/20241023145257.82709-1-alexander.hoelzl@gmx.net
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+> 
+> [...]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Here is the summary with links:
+  - [net,1/8] can: j1939: fix error in J1939 documentation.
+    https://git.kernel.org/netdev/net/c/b6ec62e01aa4
+  - [net,2/8] can: {cc770,sja1000}_isa: allow building on x86_64
+    https://git.kernel.org/netdev/net/c/7b22846f8af5
+  - [net,3/8] can: m_can: m_can_close(): don't call free_irq() for IRQ-less devices
+    https://git.kernel.org/netdev/net/c/e4de81f9e134
+  - [net,4/8] can: c_can: fix {rx,tx}_errors statistics
+    https://git.kernel.org/netdev/net/c/4d6d26537940
+  - [net,5/8] can: rockchip_canfd: CAN_ROCKCHIP_CANFD should depend on ARCH_ROCKCHIP
+    https://git.kernel.org/netdev/net/c/4384b8b6ec46
+  - [net,6/8] can: rockchip_canfd: Drop obsolete dependency on COMPILE_TEST
+    https://git.kernel.org/netdev/net/c/51e102ec23b2
+  - [net,7/8] can: mcp251xfd: mcp251xfd_ring_alloc(): fix coalescing configuration when switching CAN modes
+    https://git.kernel.org/netdev/net/c/eb9a839b3d8a
+  - [net,8/8] can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation
+    https://git.kernel.org/netdev/net/c/3c1c18551e6a
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/d7ec34ee152e/disk-0fc810ae.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/ba87040ccb6c/vmlinux-0fc810ae.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0e189a9b5a22/bzImage-0fc810ae.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+a617d4c5ff27f35f8255@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 8645 at kernel/rcu/srcutree.c:656 cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:656
-Modules linked in:
-CPU: 1 UID: 0 PID: 8645 Comm: kworker/u8:11 Not tainted 6.12.0-rc5-syzkaller-00063-g0fc810ae3ae1 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Workqueue: ib-unreg-wq ib_unregister_work
-RIP: 0010:cleanup_srcu_struct+0x404/0x4d0 kernel/rcu/srcutree.c:656
-Code: 4d 84 00 48 c7 03 00 00 00 00 48 83 c4 48 5b 41 5c 41 5d 41 5e 41 5f 5d e9 84 f4 75 0a 90 0f 0b 90 eb e7 90 0f 0b 90 eb e1 90 <0f> 0b 90 eb db 90 0f 0b 90 eb 0a 90 0f 0b 90 eb 04 90 0f 0b 90 48
-RSP: 0018:ffffc90003f07930 EFLAGS: 00010202
-RAX: 0000000000000001 RBX: ffff888079789980 RCX: 0000000000000002
-RDX: 0000000000000000 RSI: 0000000000000008 RDI: ffffe8ffffd59658
-RBP: 0000000000000001 R08: ffffe8ffffd5965f R09: 1ffffd1ffffab2cb
-R10: dffffc0000000000 R11: fffff91ffffab2cc R12: dffffc0000000000
-R13: ffff88805bab05e8 R14: ffff88805bab0000 R15: ffff888079789800
-FS:  0000000000000000(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f7b86306d58 CR3: 0000000060ea6000 CR4: 0000000000350ef0
-Call Trace:
- <TASK>
- ib_uverbs_release_dev+0x4e/0x80 drivers/infiniband/core/uverbs_main.c:136
- device_release+0x9b/0x1c0
- kobject_cleanup lib/kobject.c:689 [inline]
- kobject_release lib/kobject.c:720 [inline]
- kref_put include/linux/kref.h:65 [inline]
- kobject_put+0x231/0x480 lib/kobject.c:737
- remove_client_context+0xb9/0x1e0 drivers/infiniband/core/device.c:782
- disable_device+0x13b/0x360 drivers/infiniband/core/device.c:1288
- __ib_unregister_device+0x2ac/0x3d0 drivers/infiniband/core/device.c:1518
- ib_unregister_work+0x19/0x30 drivers/infiniband/core/device.c:1630
- process_one_work kernel/workqueue.c:3229 [inline]
- process_scheduled_works+0xa65/0x1850 kernel/workqueue.c:3310
- worker_thread+0x870/0xd30 kernel/workqueue.c:3391
- kthread+0x2f2/0x390 kernel/kthread.c:389
- ret_from_fork+0x4d/0x80 arch/x86/kernel/process.c:147
- ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
- </TASK>
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
