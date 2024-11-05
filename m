@@ -1,167 +1,168 @@
-Return-Path: <netdev+bounces-142026-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142027-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D17F9BD008
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:05:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EB7F9BD00D
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:06:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD56FB21580
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:05:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE5951C2119F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:06:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C60D51D86F1;
-	Tue,  5 Nov 2024 15:04:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689CF1D9350;
+	Tue,  5 Nov 2024 15:06:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="TuPVa2Yv"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mNM71KmF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f177.google.com (mail-yw1-f177.google.com [209.85.128.177])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36E0C33080;
-	Tue,  5 Nov 2024 15:04:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFD11D7E35
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 15:06:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730819097; cv=none; b=dlCba3sOzmIGGCBS/+D5cngk1nS3RDjy2Pjptfv3x0QBfQ4F+Eqa9csWEMvyqdbtPUYNQpNW3DOA9IlTXqp4u6ztcruLfQbtkcK1vYVEeISCxpvJZsVTiJfHDDSu3cGiUgrQkWiHzEafAjKLC10d0CB/KfAHY0oQyI53F3fU7CA=
+	t=1730819199; cv=none; b=BIduYafMaKClGppwE5I7Tw55RlLCzlpcyIUSXb86+cn1MFEtxsSKfDo09SZdC+4bLEOUffwUqxaJvopWngAr+sSFEe8nsAMhSmXdC+LEWkQvEHgo6/S0UfUewXfaAc6+a12dhy1nhfMZOzZyXoPgjnQ8rz+1CCw6Pjrx2pQlPU4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730819097; c=relaxed/simple;
-	bh=63apKU3oCK84jQYr9wI2Tor+Zn6BKoINp1mEwP9zZfI=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=DDjfc3uZVlJA/BsQkEIPhgsu2oND5XEmKTjsLKgbY1Sa3u1muPs5aXcJZX1LicyhCyZBQreJ85n2K5+4zjMh4ecPQI650ktxkAKWm4rgzfvzXMW7GbLcJDMKPAFBgD5Eku5uf3s5NfyKk9fiDd7W/eGN1nFRqJ8oPgiPTQY73QA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=TuPVa2Yv; arc=none smtp.client-ip=209.85.128.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yw1-f177.google.com with SMTP id 00721157ae682-6e5cec98cceso44338397b3.2;
-        Tue, 05 Nov 2024 07:04:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730819095; x=1731423895; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=63apKU3oCK84jQYr9wI2Tor+Zn6BKoINp1mEwP9zZfI=;
-        b=TuPVa2YvHZwrp3Y3AAhN5wosKUC9E5bKSm9K5nonakYwC+2vwzAwpMpiNdQp2vYT8R
-         vB1sA/WSlkk8c+w2iG2MK/ZPTCo4XHOca5ImJg2LYXfHAXaWeqTrFV1hf5lo5pfbJrDG
-         1nkA9aQeYS9WCh1zrQpH8pppzv/Y6YHY50kNwT3fvYFiJalUEb2HgGNdLMP3oxC1+kWQ
-         bz7hmdKLzwHH/YegTuGvO+4LtRE5lfVJZXudPlHcIBCYUSeNU+5h4ryMgVVwnyWT2EWM
-         8g7Km0i8r5v+6gMcZj9KeL3hTz9fqArE6EYNt0tNVbKuslJ/uNER5oHk44P2piEQRBKH
-         g7Iw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730819095; x=1731423895;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=63apKU3oCK84jQYr9wI2Tor+Zn6BKoINp1mEwP9zZfI=;
-        b=lTcH8bVWWgcWGDXpV9js/T3y5z3s2q6h1RHdupqwvI/L2ZJFtpm0hldN8XxXMYuT7b
-         IHFGoJAL0/LSc8k1dBgEP6VKyx5mCgzHhTDrFfFihjCqjQC763l+jeFPzSKBd1XvIHMp
-         nKJ6qVqxmEWGRIzadMEp30j5m2Rcb3q33P+yjuZrT53Qi97/J/KXELP5EQqJImsJ+4RW
-         o+DflTMf5SN67vRWSSZnpGtrAEy8fVmRITSEY7XzksREOnrvXF+AwMBBcTWz5Dm5lJuw
-         DXugH+iFCg31Y7vVDEZuvsFhEZ8duLh/MWjUqgTIZp2BdxwNYixa8cuGinVj+yJqma3E
-         pZ6g==
-X-Forwarded-Encrypted: i=1; AJvYcCVW6XpdA0RMOvbN6crWl0TuKz+cqJBIz9YjsR2M3m+n9HRDadDY6XHaReVSYgDam6Ka166xnYZz@vger.kernel.org, AJvYcCW+ps+lot2RWDkx4lTC6+rBhVv39FZDccMFjjH2g4IiLui0mhU1mzC8QokGLeC+/f4nRyBT9/sUGEFZ@vger.kernel.org, AJvYcCX/Ki4mx1F47oLqDJTRWZz2WGqJ570tpB1zauMxzVgUO4D+sOD+QExU6Ra078vq4xPUys7y8UNUI+/rEQE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YytoQYD+EkygFxSeiuI+8Sul/QES8e8v9C9sPtJ4nGKF19dWtEI
-	LcRk16EQwY0Xxq+8q5eofTodN5NONUcaKTWv6r4XjdowGe+NlRSW89Do0Do0YWHEkBBYOrz8SOM
-	16cc3JXHokjhJAA2vBgB7yOybaDkv9eRHCa4=
-X-Google-Smtp-Source: AGHT+IG9OEtgCqxYH2AGUXx+y9wCsQ2BKy/xHrqmG9IrH/j8u8vvE2+KgIidIE6DaWBTb75baRQbZmqsFfJmCge7nmI=
-X-Received: by 2002:a05:690c:6ac2:b0:6ea:4d3f:df7c with SMTP id
- 00721157ae682-6ea52329c6amr209250267b3.9.1730819095116; Tue, 05 Nov 2024
- 07:04:55 -0800 (PST)
+	s=arc-20240116; t=1730819199; c=relaxed/simple;
+	bh=9Q5dwSvyqgDmSwRGRw9zJGGnRrKN0YKi5hD81fpL2PA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=VRijx4jj07H392KURq5Y15kxysdxVDHPbWHVFLnDxQiCFP0UNZoGTkHq2XPgEZisso1fLp1UYBa4drX66gsGoZDJ4Bluc91ZeCzGyMb67jX61GcuDvsTq1Gxcf35cK8bbHJ2vnrbiFJH5JGNlMxLvI4pPTFkPbY10kkBzbBeAEM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mNM71KmF; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730819197; x=1762355197;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=9Q5dwSvyqgDmSwRGRw9zJGGnRrKN0YKi5hD81fpL2PA=;
+  b=mNM71KmFz5NCWvXR1DlOGYltm5382dcMHB36Jf+Y8tlGTCO2RphSGkMQ
+   BOENH8huieynCm5TOM1wFxPdhDU/lqFlI3L6SKIUSLolzyyzipKKg+kZi
+   2SvLsInY6VV/2pmZew0EQCsrfXHBF6ob2MO35v7GdUOTexW3hY0qNVGBm
+   O7BFshd5r/Xb54Ff9qThJ7p1pJ6FrZl5IukO296KrafE4H+2WuojuMFUv
+   kGDDBh8nZBflXDl1nykkEB7ZWhSr0mo2ygguAmUasbW88kLCeG/fSZyud
+   qDzfxEPvumeAk/EmjE4fggx3NKeUP7O1pGzaF7DwznZxE3Zu3Q7YVv5px
+   w==;
+X-CSE-ConnectionGUID: nbWv3PLnQJaISq38QVYCBQ==
+X-CSE-MsgGUID: etuYApOhRtGPbk4trzP3zw==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34262025"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="34262025"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 07:06:36 -0800
+X-CSE-ConnectionGUID: Bxi6eyQZTumAQ0kiqBBZuA==
+X-CSE-MsgGUID: PE7P5odZRUOt4qXTvgSRgQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
+   d="scan'208";a="84000033"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 05 Nov 2024 07:06:34 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t8L8Z-000mB1-2h;
+	Tue, 05 Nov 2024 15:06:31 +0000
+Date: Tue, 5 Nov 2024 23:06:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org
+Cc: oe-kbuild-all@lists.linux.dev,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>, Antony Antony <antony@phenome.org>,
+	Christian Hopps <chopps@chopps.org>
+Subject: Re: [PATCH ipsec-next v13 15/15] xfrm: iptfs: add tracepoint
+ functionality
+Message-ID: <202411052231.OM2TTHhn-lkp@intel.com>
+References: <20241105083759.2172771-16-chopps@chopps.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241029103656.2151-1-dqfext@gmail.com> <87msid98dc.fsf@toke.dk>
- <CALW65jbz=3JNTx-SWk21DT4yc+oD3Dsz49z__zgDXF7TjUV7Lw@mail.gmail.com> <87a5ed92ah.fsf@toke.dk>
-In-Reply-To: <87a5ed92ah.fsf@toke.dk>
-From: Qingfang Deng <dqfext@gmail.com>
-Date: Tue, 5 Nov 2024 23:04:44 +0800
-Message-ID: <CALW65jZtdy8xkNnMD2pCFKyf6JM4uwTHgt8v49M46GpCfS8cCw@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next] net: ppp: convert to IFF_NO_QUEUE
-To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105083759.2172771-16-chopps@chopps.org>
 
-On Tue, Nov 5, 2024 at 10:35=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <t=
-oke@redhat.com> wrote:
->
-> Qingfang Deng <dqfext@gmail.com> writes:
->
-> > Hi Toke,
-> >
-> > On Tue, Nov 5, 2024 at 8:24=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen=
- <toke@redhat.com> wrote:
-> >>
-> >> Qingfang Deng <dqfext@gmail.com> writes:
-> >>
-> >> > When testing the parallel TX performance of a single PPPoE interface
-> >> > over a 2.5GbE link with multiple hardware queues, the throughput cou=
-ld
-> >> > not exceed 1.9Gbps, even with low CPU usage.
-> >> >
-> >> > This issue arises because the PPP interface is registered with a sin=
-gle
-> >> > queue and a tx_queue_len of 3. This default behavior dates back to L=
-inux
-> >> > 2.3.13, which was suitable for slower serial ports. However, in mode=
-rn
-> >> > devices with multiple processors and hardware queues, this configura=
-tion
-> >> > can lead to congestion.
-> >> >
-> >> > For PPPoE/PPTP, the lower interface should handle qdisc, so we need =
-to
-> >> > set IFF_NO_QUEUE.
-> >>
-> >> This bit makes sense - the PPPoE and PPTP channel types call through t=
-o
-> >> the underlying network stack, and their start_xmit() ops never return
-> >> anything other than 1 (so there's no pushback against the upper PPP
-> >> device anyway). The same goes for the L2TP PPP channel driver.
-> >>
-> >> > For PPP over a serial port, we don't benefit from a qdisc with such =
-a
-> >> > short TX queue, so handling TX queueing in the driver and setting
-> >> > IFF_NO_QUEUE is more effective.
-> >>
-> >> However, this bit is certainly not true. For the channel drivers that
-> >> do push back (which is everything apart from the three mentioned above=
-,
-> >> AFAICT), we absolutely do want a qdisc to store the packets, instead o=
-f
-> >> this arbitrary 32-packet FIFO inside the driver. Your comment about th=
-e
-> >> short TX queue only holds for the pfifo_fast qdisc (that's the only on=
-e
-> >> that uses the tx_queue_len for anything), anything else will do its ow=
-n
-> >> thing.
-> >>
-> >> (Side note: don't use pfifo_fast!)
-> >>
-> >> I suppose one option here could be to set the IFF_NO_QUEUE flag
-> >> conditionally depending on whether the underlying channel driver does
-> >> pushback against the PPP device or not (add a channel flag to indicate
-> >> this, or something), and then call the netif_{wake,stop}_queue()
-> >> functions conditionally depending on this. But setting the noqueue fla=
-g
-> >> unconditionally like this patch does, is definitely not a good idea!
-> >
-> > I agree. Then the problem becomes how to test if a PPP device is a PPPo=
-E.
-> > It seems like PPPoE is the only one that implements
-> > ops->fill_forward_path, should I use that? Or is there a better way?
->
-> Just add a new field to struct ppp_channel and have the PPoE channel
-> driver set that? Could be a flags field, or even just a 'bool
-> direct_xmit' field...
+Hi Christian,
 
-Okay, I'll send a patch later.
+kernel test robot noticed the following build warnings:
 
->
-> -Toke
->
+[auto build test WARNING on klassert-ipsec-next/master]
+[also build test WARNING on next-20241105]
+[cannot apply to klassert-ipsec/master netfilter-nf/main linus/master nf-next/master v6.12-rc6]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Hopps/xfrm-config-add-CONFIG_XFRM_IPTFS/20241105-164740
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
+patch link:    https://lore.kernel.org/r/20241105083759.2172771-16-chopps%40chopps.org
+patch subject: [PATCH ipsec-next v13 15/15] xfrm: iptfs: add tracepoint functionality
+config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20241105/202411052231.OM2TTHhn-lkp@intel.com/config)
+compiler: m68k-linux-gcc (GCC) 14.1.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241105/202411052231.OM2TTHhn-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411052231.OM2TTHhn-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+>> net/xfrm/xfrm_iptfs.c:194:12: warning: '__trace_ip_proto_seq' defined but not used [-Wunused-function]
+     194 | static u32 __trace_ip_proto_seq(struct iphdr *iph)
+         |            ^~~~~~~~~~~~~~~~~~~~
+>> net/xfrm/xfrm_iptfs.c:187:12: warning: '__trace_ip_proto' defined but not used [-Wunused-function]
+     187 | static u32 __trace_ip_proto(struct iphdr *iph)
+         |            ^~~~~~~~~~~~~~~~
+
+Kconfig warnings: (for reference only)
+   WARNING: unmet direct dependencies detected for GET_FREE_REGION
+   Depends on [n]: SPARSEMEM [=n]
+   Selected by [y]:
+   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
+
+
+vim +/__trace_ip_proto_seq +194 net/xfrm/xfrm_iptfs.c
+
+   186	
+ > 187	static u32 __trace_ip_proto(struct iphdr *iph)
+   188	{
+   189		if (iph->version == 4)
+   190			return iph->protocol;
+   191		return ((struct ipv6hdr *)iph)->nexthdr;
+   192	}
+   193	
+ > 194	static u32 __trace_ip_proto_seq(struct iphdr *iph)
+   195	{
+   196		void *nexthdr;
+   197		u32 protocol = 0;
+   198	
+   199		if (iph->version == 4) {
+   200			nexthdr = (void *)(iph + 1);
+   201			protocol = iph->protocol;
+   202		} else if (iph->version == 6) {
+   203			nexthdr = (void *)(((struct ipv6hdr *)(iph)) + 1);
+   204			protocol = ((struct ipv6hdr *)(iph))->nexthdr;
+   205		}
+   206		switch (protocol) {
+   207		case IPPROTO_ICMP:
+   208			return ntohs(((struct icmphdr *)nexthdr)->un.echo.sequence);
+   209		case IPPROTO_ICMPV6:
+   210			return ntohs(((struct icmp6hdr *)nexthdr)->icmp6_sequence);
+   211		case IPPROTO_TCP:
+   212			return ntohl(((struct tcphdr *)nexthdr)->seq);
+   213		case IPPROTO_UDP:
+   214			return ntohs(((struct udphdr *)nexthdr)->source);
+   215		default:
+   216			return 0;
+   217		}
+   218	}
+   219	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
