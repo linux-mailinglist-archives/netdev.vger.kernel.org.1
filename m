@@ -1,139 +1,133 @@
-Return-Path: <netdev+bounces-141945-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141946-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBA599BCC16
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:46:50 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE5B39BCC1B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:47:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 242951C21F2B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:46:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 732FE282899
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:47:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C54941D3593;
-	Tue,  5 Nov 2024 11:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BE101D4607;
+	Tue,  5 Nov 2024 11:47:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b="XmK/AzQb"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hpPxMjfC"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay5.mymailcheap.com (relay5.mymailcheap.com [159.100.248.207])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18E0A1C07D9;
-	Tue,  5 Nov 2024 11:46:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.248.207
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF261D3590
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:47:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730807204; cv=none; b=hJFRsiocJLLiw7KEeSWx+Qa/XTVl77Zf5NarsF4R2hsHGDfE9fJUQSEm5LMAyiJO+/kqaGEMA0qoeNcuzzQOd2xeDvLMGjl5dlb5ZRqd43NQ631qAgpH4XdxkGe9nqOGfLQr22+tCK/FaUSL8XzbZfo0N9c61N6F8DHmy6PgW1Q=
+	t=1730807254; cv=none; b=SPCUr40HyAK3hlIrauLEXO3HsX/1M1aUlAQXyNgMJt8VOHKU4cu7AwTE26AmT53UPqMtmSLeN2tOWUmJVllna5uRxoYzDwGNO5yuoZ3KQiPD7MyIJSbVa3i2Hzz0lPo/p+A/iKCQcd18KCWi5am8N1JIuqS9ITcUjKmgVzgjS5k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730807204; c=relaxed/simple;
-	bh=CJiyeokDj6c9VIvYdrBd9CQEjiOeVmC3TfnoQ0s8ow4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=VGFhqKHlkEaVC/PmpLh0hTWXoDHnaspNc/hA02n7/DuK0ZT2zgA7V0SO4svMRLRm12szb27E9RxDLMiVTULWrdGS7EmvqKUv+GV4zUK7m9PUisoZK73jVdImNvcgywt8AVfEmniVXENyfX0D3254Glb0mPA4Frizf6p4oSs1TE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io; spf=pass smtp.mailfrom=aosc.io; dkim=pass (1024-bit key) header.d=aosc.io header.i=@aosc.io header.b=XmK/AzQb; arc=none smtp.client-ip=159.100.248.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=aosc.io
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aosc.io
-Received: from relay1.mymailcheap.com (relay1.mymailcheap.com [144.217.248.102])
-	by relay5.mymailcheap.com (Postfix) with ESMTPS id 44B3F26760;
-	Tue,  5 Nov 2024 11:46:38 +0000 (UTC)
-Received: from nf1.mymailcheap.com (nf1.mymailcheap.com [51.75.14.91])
-	by relay1.mymailcheap.com (Postfix) with ESMTPS id BDCD93E859;
-	Tue,  5 Nov 2024 11:46:29 +0000 (UTC)
-Received: from mail20.mymailcheap.com (mail20.mymailcheap.com [51.83.111.147])
-	by nf1.mymailcheap.com (Postfix) with ESMTPSA id F067140078;
-	Tue,  5 Nov 2024 11:46:27 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=aosc.io; s=default;
-	t=1730807187; bh=CJiyeokDj6c9VIvYdrBd9CQEjiOeVmC3TfnoQ0s8ow4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=XmK/AzQbLW3MPx5gEe4Pzv/y2uk/+okvNMd7CzxkK4V3C00d+9T9oFCs2GsFDG6UP
-	 mJDLoHy/yhq3GqOufIL9dYQ6sh+bqgZ2Wcyz5GkWmspOrzvKdUC2J5iwvGFubrilWl
-	 jrQnth5Eo9G3HIStdGHBua6Lx/dUCnnAMN3vgwuM=
-Received: from [198.18.0.1] (unknown [58.32.43.83])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail20.mymailcheap.com (Postfix) with ESMTPSA id 478E441500;
-	Tue,  5 Nov 2024 11:46:24 +0000 (UTC)
-Message-ID: <48a22231-89ec-460b-913b-54af18166da7@aosc.io>
-Date: Tue, 5 Nov 2024 19:46:21 +0800
+	s=arc-20240116; t=1730807254; c=relaxed/simple;
+	bh=+6/H/XDafrltzhOFfb+5FmSnOevGqRPMwlJKVVM64SI=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:Message-ID:
+	 MIME-Version:Content-Type; b=QJGasbnIBUjLf7TjP/Rr00yuz2gu4FJ4WAefIqppIAR0EW0xdElyZpK6006C6wd5fCPnJg8O3d6l/fg91em7mekZ5o+sEpW1B+DijL2l6U0SUPXhGJwkwOTsLZC2N2OWC7sIPN0EIXXNQMaByXt6idJ25VcOmh1sb+YfMOd9RDo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hpPxMjfC; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730807252;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AvEt+630bp2zTwkv8fB0BYAPpHvXTyBk/V9RY8sAZMo=;
+	b=hpPxMjfCU6k/05bR20OvwPFk8OfjksUn1oVllqyqRd8OLujg6PPZ4dzQlYCrA2KRXfKwEY
+	9pHDOD+i9jvA900JjXehgmZ9NRanGsMtkYj12+jTwUerUqfNdxJ1xpv0wHBjFEP04+oAye
+	o9czIwcu7j1YHHShKGdFx0hAd/yotUw=
+Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
+ [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-208-k02HyR-KO5KFVVEydfW5Qg-1; Tue, 05 Nov 2024 06:47:30 -0500
+X-MC-Unique: k02HyR-KO5KFVVEydfW5Qg-1
+Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a9a0c259715so427907366b.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 03:47:30 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730807249; x=1731412049;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=AvEt+630bp2zTwkv8fB0BYAPpHvXTyBk/V9RY8sAZMo=;
+        b=Tq9LLkwkUsojNbTSbdQTCzDj9SlD8Qt7EoHu52ctd3RcpXMPjLErTeAs+7CbiXBX6T
+         kFqDGBquKblCxiUpL7c47IKA4Prb0audOD+qbdBvCqASn2b970N3KNXEun9cSkt8wXnP
+         cd+KmKHyOy2yXNIpXj4MAUaaaMxQZDCt1kb6oD/19SwfUcCJO5n9VzUXCdaWVIILdBpJ
+         rGXd4dc96zUHe1vTwr+v5zMvFovCOas/hCy9T/ABA06g6WUtE6rrYNahHTvRnmIJUPC7
+         mNJNkOeufhF9lVzIptFXQfihjcy0pjy5A05op8Od8uo0odDJAGamk04lT3FVS2Eau5sP
+         igvA==
+X-Forwarded-Encrypted: i=1; AJvYcCXW1EObOP9K9qcgNFJ5R+iYrNhxTfM+4qghb+iAKWV/7Vpa/Cwvvc3XZs5cPui8teRYEbduVew=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyS8JPuNhErItDcGEewL81utWxBMhHu9rp7K4yFU7FzLo/MF1Hz
+	fpEZ24nxCwDkypCxfNEBX4XRZgX/TjatkyKhw1P0zdszfAz/KA1SAqHnKhtUBDYUgV7D9tZYmct
+	zIW3KTspLqSEqrUqeZlRfxAt4zQM9gHI4GAY7NZGKTIoRTyBphUMpvg==
+X-Received: by 2002:a17:906:c113:b0:a9a:5e3a:641d with SMTP id a640c23a62f3a-a9e50cb0401mr1967594966b.59.1730807249481;
+        Tue, 05 Nov 2024 03:47:29 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFXnL+6T8mGipW8cAyu0azUR7FlsedzWWDQr98e0c9nhVPjkKd8TbpT2mFnkD3c0nE8mjR0kQ==
+X-Received: by 2002:a17:906:c113:b0:a9a:5e3a:641d with SMTP id a640c23a62f3a-a9e50cb0401mr1967592966b.59.1730807249104;
+        Tue, 05 Nov 2024 03:47:29 -0800 (PST)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb17f964csm122895066b.159.2024.11.05.03.47.28
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 03:47:28 -0800 (PST)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 57ABF164C228; Tue, 05 Nov 2024 12:47:27 +0100 (CET)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Simon Horman <horms@kernel.org>
+Cc: Qingfang Deng <dqfext@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-ppp@vger.kernel.org
+Subject: Re: [RFC PATCH net-next] net: ppp: convert to IFF_NO_QUEUE
+In-Reply-To: <20241104115004.GC2118587@kernel.org>
+References: <20241029103656.2151-1-dqfext@gmail.com>
+ <20241104115004.GC2118587@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 05 Nov 2024 12:47:27 +0100
+Message-ID: <87pln99a28.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Thunderbird Daily
-Subject: Re: [PATCH bpf-next 1/2] libbpf: Add missing per-arch include path
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Eduard Zingerman <eddyz87@gmail.com>,
- Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org, Charlie Jenkins <charlie@rivosinc.com>
-References: <20240927131355.350918-1-bjorn@kernel.org>
-Content-Language: en-US
-From: Kexy Biscuit <kexybiscuit@aosc.io>
-In-Reply-To: <20240927131355.350918-1-bjorn@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Rspamd-Queue-Id: F067140078
-X-Rspamd-Server: nf1.mymailcheap.com
-X-Spamd-Result: default: False [-0.09 / 10.00];
-	MIME_GOOD(-0.10)[text/plain];
-	XM_UA_NO_VERSION(0.01)[];
-	FREEMAIL_TO(0.00)[kernel.org,gmail.com,fb.com,vger.kernel.org];
-	RCVD_TLS_ALL(0.00)[];
-	RCVD_VIA_SMTP_AUTH(0.00)[];
-	ASN(0.00)[asn:16276, ipnet:51.83.0.0/16, country:FR];
-	ARC_NA(0.00)[];
-	RCVD_COUNT_ONE(0.00)[1];
-	RCPT_COUNT_SEVEN(0.00)[11];
-	MID_RHS_MATCH_FROM(0.00)[];
-	FUZZY_BLOCKED(0.00)[rspamd.com];
-	FROM_HAS_DN(0.00)[];
-	MIME_TRACE(0.00)[0:+];
-	FROM_EQ_ENVFROM(0.00)[];
-	TO_MATCH_ENVRCPT_ALL(0.00)[];
-	FREEMAIL_ENVRCPT(0.00)[gmail.com];
-	TO_DN_SOME(0.00)[]
-X-Rspamd-Action: no action
+Content-Type: text/plain
 
-On 9/27/2024 9:13 PM, Björn Töpel wrote:
-> From: Björn Töpel <bjorn@rivosinc.com>
-> 
-> libbpf does not include the per-arch tools include path, e.g.
-> tools/arch/riscv/include. Some architectures depend those files to
-> build properly.
-> 
-> Include tools/arch/$(SUBARCH)/include in the libbpf build.
-> 
-> Fixes: 6d74d178fe6e ("tools: Add riscv barrier implementation")
-> Signed-off-by: Björn Töpel <bjorn@rivosinc.com>
-> ---
->   tools/lib/bpf/Makefile | 3 ++-
->   1 file changed, 2 insertions(+), 1 deletion(-)
-> 
-> diff --git a/tools/lib/bpf/Makefile b/tools/lib/bpf/Makefile
-> index 1b22f0f37288..857a5f7b413d 100644
-> --- a/tools/lib/bpf/Makefile
-> +++ b/tools/lib/bpf/Makefile
-> @@ -61,7 +61,8 @@ ifndef VERBOSE
->   endif
->   
->   INCLUDES = -I$(or $(OUTPUT),.) \
-> -	   -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi
-> +	   -I$(srctree)/tools/include -I$(srctree)/tools/include/uapi \
-> +	   -I$(srctree)/tools/arch/$(SRCARCH)/include
->   
->   export prefix libdir src obj
->   
-> 
-> base-commit: db5ca265e3334b48c4e3fa07eef79e8bc578c430
+Simon Horman <horms@kernel.org> writes:
 
-This fixes building of bpf tools, thanks! You can add the following tags...
+> + Toke
+>
+> On Tue, Oct 29, 2024 at 06:36:56PM +0800, Qingfang Deng wrote:
+>> When testing the parallel TX performance of a single PPPoE interface
+>> over a 2.5GbE link with multiple hardware queues, the throughput could
+>> not exceed 1.9Gbps, even with low CPU usage.
+>> 
+>> This issue arises because the PPP interface is registered with a single
+>> queue and a tx_queue_len of 3. This default behavior dates back to Linux
+>> 2.3.13, which was suitable for slower serial ports. However, in modern
+>> devices with multiple processors and hardware queues, this configuration
+>> can lead to congestion.
+>> 
+>> For PPPoE/PPTP, the lower interface should handle qdisc, so we need to
+>> set IFF_NO_QUEUE. For PPP over a serial port, we don't benefit from a
+>> qdisc with such a short TX queue, so handling TX queueing in the driver
+>> and setting IFF_NO_QUEUE is more effective.
+>> 
+>> With this change, PPPoE interfaces can now fully saturate a 2.5GbE link.
+>> 
+>> Signed-off-by: Qingfang Deng <dqfext@gmail.com>
+>
+> Hi Toke,
+>
+> I'm wondering if you could offer an opinion on this.
 
-Reported-by: Andreas Schwab <schwab@suse.de>
-Closes: https://lore.kernel.org/all/mvmo74441tr.fsf@suse.de/
-Tested-by: Kexy Biscuit <kexybiscuit@aosc.io>
--- 
-Best Regards,
-Kexy Biscuit
+Hi Simon
+
+Thanks for bringing this to my attention; I'll reply to the parent
+directly :)
+
+-Toke
+
 
