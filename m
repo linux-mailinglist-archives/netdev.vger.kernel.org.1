@@ -1,359 +1,144 @@
-Return-Path: <netdev+bounces-142012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142013-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5DF69BCF2E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:24:54 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id AFB5E9BCF34
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:25:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E958B1C24506
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:24:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 67A671F2383D
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BD021D86D2;
-	Tue,  5 Nov 2024 14:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6B101D8A16;
+	Tue,  5 Nov 2024 14:25:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b="fAbbvoRm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="I1lqxFFu"
 X-Original-To: netdev@vger.kernel.org
-Received: from www530.your-server.de (www530.your-server.de [188.40.30.78])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f182.google.com (mail-yw1-f182.google.com [209.85.128.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2BE71D5AB2;
-	Tue,  5 Nov 2024 14:24:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=188.40.30.78
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 226C61D86CE;
+	Tue,  5 Nov 2024 14:25:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730816690; cv=none; b=YYM74nDMhjk0ivrAnaDv/IUBT9IDuNTXQCDsCSoy/9RLXrrkSzFp0FFym3V56h8Qz2XOJ2HDreaP/8Ace9SCsq3v84onKwYvIM1IzH6ooUr4C3UiR+QhFTNOVmnWpzzNseTcfH3QbcfP2dZf5+GXxyNfTagyFfyzgpYwHaSIkso=
+	t=1730816736; cv=none; b=nDwSNQKg+Le/ELz/pNdS4urhueE4oI1u+PAfgaUQ35rWNkNw2OPMZT8kCZqCHpQ9dQ5zu08Hl5JTGrEcG7GwDByH2FiI+cBrHNBorjrJ+qH5wLCAS5jPp7gljTriuvGA3gf6XyGkRNjmHJGudlnXJJh/dlmfaipkZ4K5dn+6SNo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730816690; c=relaxed/simple;
-	bh=jloAkXqe5JFmFhB0Zv7JTbb7qpuv14n45ikCXl9nlLs=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=KuDupvfevSm0amaIjOT4/7Bk6EwzwKf/fCv0zdSxmhZz9AsgTo1Mzo3QHLtKrxm5EU7nlchr5jAA5l25Nq2utSJMQ04fQ1jD5v7/S5u/1S8smpG/mJ9TlESm58nhPo6TtPzQy9YU4PHFJywL8nNFcLxLIGQ4dmy4WqzZYAGTB9E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com; spf=pass smtp.mailfrom=geanix.com; dkim=pass (2048-bit key) header.d=geanix.com header.i=@geanix.com header.b=fAbbvoRm; arc=none smtp.client-ip=188.40.30.78
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=geanix.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=geanix.com
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=geanix.com;
-	s=default2211; h=Cc:To:Message-Id:Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Subject:Date:From:Sender:Reply-To:Content-ID:Content-Description
-	:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	In-Reply-To:References; bh=B2TbzasSipWhR1FdJvRQDldtLvGcjQd4ZD8ioLxtzsE=; b=fA
-	bbvoRmjaP4bmZlqD4aTmR0w/MeJz6Lu5k6iZBAWKUzdDbyUgLAaJ/9i/87CDuFqIRMJ89IS0L7GI2
-	TtvIIN7Wiv1i/8voY4lL2Beh8FEevw0vyoiOjxRMMCSj/nZCxsTLMYRyc/Q7gebIUVNuJX4JmrDwW
-	JXrgxYHeUBLXpoMt/CYhQWGnu4tAGJ/bNox/NTSxj386aeIJbMx6eG3w63jPCFuVxJw1Pb6pqsIR8
-	s85Unsr4f2PHOkqKhbF3DUHMvtOMdQfGR0R3xm7FI9Okfb4zf6QK761xPxn0TT7BdAckv8yyEFtK+
-	JzjsKuO/YpoeTMNhXBPDM7HGqj4GtMjA==;
-Received: from sslproxy01.your-server.de ([78.46.139.224])
-	by www530.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <sean@geanix.com>)
-	id 1t8KU7-000JBp-PN; Tue, 05 Nov 2024 15:24:43 +0100
-Received: from [185.17.218.86] (helo=zen.localdomain)
-	by sslproxy01.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <sean@geanix.com>)
-	id 1t8KU7-0002FW-08;
-	Tue, 05 Nov 2024 15:24:43 +0100
-From: Sean Nyekjaer <sean@geanix.com>
-Date: Tue, 05 Nov 2024 15:24:34 +0100
-Subject: [PATCH v2] dt-bindings: can: convert tcan4x5x.txt to DT schema
+	s=arc-20240116; t=1730816736; c=relaxed/simple;
+	bh=jKywvlASPOyLP8DRMjcTka1z7/AS3/LjEEQY5ja8zGY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=mlxrxR5E6ZnUD5JcABelg34iEDPabCLSSeC9YcF+kJ9fQepL6a47cRTR29t7gHKnhrUIsvi90R/zaeafms+6UgvHXWp9Qs2kVTFXdlgDcFPwRDWzBr5djLI9iZj+NvfNA/tDEJZCrQTNGRX4xQQqDYPXxX/7f5M5p9EacKrEg2Q=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=I1lqxFFu; arc=none smtp.client-ip=209.85.128.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f182.google.com with SMTP id 00721157ae682-6ea1407e978so51876017b3.1;
+        Tue, 05 Nov 2024 06:25:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730816734; x=1731421534; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=jKywvlASPOyLP8DRMjcTka1z7/AS3/LjEEQY5ja8zGY=;
+        b=I1lqxFFuDCfMHdYTyg+8yxfvNm7HXkPTT3cZ6cg6iaCRZJlQDZeZqY7pJC9L08KP+R
+         worx2hQJMyfD8dWl78dJAjzp9ZFqVbWUdSOS78Ru6QbwKdvqSw45gNbM2+8Zgyyl5vie
+         RRtQBJedOV0z3LZtdR40LqvxxPL0OMXjF9PvGS5h340pJlSraL+ws3of9aDLfqUsGgOE
+         1eFst8FrzhbQqXhcuTIfiBQqkVKu1JHVVYY0M1jHoAYshLPrSgpbJnpAPBpyLYmviX6u
+         p5aAhmD1Q4SDNYt3dEPDJeM8l6IssebY7883BoTCTkyOSMB0alfwa2+/aN5o7w64q3jZ
+         WscQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730816734; x=1731421534;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=jKywvlASPOyLP8DRMjcTka1z7/AS3/LjEEQY5ja8zGY=;
+        b=lztN0S/MLGn2ILqL5oFjm8WefWvXCaK39tqGiIRMfXNVYxOTFo3aQYk1tm88hI3aBY
+         dhTco+iecewFOm7BeKnmv0C3StniaDNDQtXuhw5ERSDqOIBGtI/i4tKpPrJmHWPk2q8i
+         J6qCQYrOlvoT0TqhErmVmY0AUHKil0RrbplPExmLTG1BlKUztuvlGOXSbI+MGIs9l7FL
+         +xPsT81GxZl5AqvPMS3sS+oT6GmF1z4xRaBgxQMN6SlPIP1GMucXfKKBWP0xN9pTk/7Y
+         mqYs1dXfbP1ImNr5OU3U9geamcrh+blLe8bIdPZyEXzSUUCVqe+wfFBuS/IaHv3ZZnHb
+         gtOA==
+X-Forwarded-Encrypted: i=1; AJvYcCWjsuA68CbOIKt37Y+oyYzmwTj5YfHbLljm5fVtb+3QjYBfVeTi7JsSWhWQ2GM7TIyGD7oE0Q9n@vger.kernel.org, AJvYcCXI1r2JGjyFiqvlKMMKehtEu8BwrrrZSLmGG4C3QBZd0qMSVpAjQ+S2rpYrqqiRnfyuJXSd53S4WMjn2Ew=@vger.kernel.org, AJvYcCXgSSb9POjfQkz7Vl6LmnUxkKDnKjH1vHW0ldaSjbMJRioyRSqq0UEMdJTAVYH2+MGQH2QfnXX4wpl+@vger.kernel.org
+X-Gm-Message-State: AOJu0YxSntAFe4vzIzbC5sK7/yhbEimoOKmkTw0t4UuTyeFZmswBVPMV
+	LLaFZqBqwqdptHwwwYXMB+pBZ5ifZbAkLOMB3RlpdYqi8IRfrCCU8ZTr8mrDzAiKWItD6uv5ws6
+	UbhYFmMhZDScmKf4cLi1NasujmWM+P3/t4iHzxA==
+X-Google-Smtp-Source: AGHT+IEDBM5Bvwz4//GIAc/5kSGLSMTJSY9VJft9ffmjTPVj9SD8qtX/F3jCktuGTe4ObCtClqmNucQY7xewGhz0eYc=
+X-Received: by 2002:a05:690c:360b:b0:6dd:d0fa:159e with SMTP id
+ 00721157ae682-6ea64bb1aa1mr166148317b3.30.1730816733948; Tue, 05 Nov 2024
+ 06:25:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241105-convert-tcan-v2-1-4b320f3fcf99@geanix.com>
-X-B4-Tracking: v=1; b=H4sIAKIqKmcC/zXMwQrCMAzG8VcZOdux1LSgJ99Ddqg123KwlbaUy
- di7WwdeAv/A99sgcxLOcO02SFwlSwwt9KkDv7gws5Jna9CDJsTBKB9D5VRU8S4oehi0pIn9ZKF
- N3oknWQ/uPrZeJJeYPode8ff9Q4TanEn3aC/YDIUqswu3uR1Zex9fMO77/gXTirQdnwAAAA==
-X-Change-ID: 20241105-convert-tcan-4b516424ecf6
-To: Marc Kleine-Budde <mkl@pengutronix.de>, 
- Vincent Mailhol <mailhol.vincent@wanadoo.fr>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Rob Herring <robh@kernel.org>, Krzysztof Kozlowski <krzk+dt@kernel.org>, 
- Conor Dooley <conor+dt@kernel.org>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org, 
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Sean Nyekjaer <sean@geanix.com>
-X-Mailer: b4 0.14.2
-X-Authenticated-Sender: sean@geanix.com
-X-Virus-Scanned: Clear (ClamAV 0.103.10/27449/Tue Nov  5 10:36:43 2024)
+References: <20241029103656.2151-1-dqfext@gmail.com> <87msid98dc.fsf@toke.dk>
+In-Reply-To: <87msid98dc.fsf@toke.dk>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Tue, 5 Nov 2024 22:25:23 +0800
+Message-ID: <CALW65jbz=3JNTx-SWk21DT4yc+oD3Dsz49z__zgDXF7TjUV7Lw@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next] net: ppp: convert to IFF_NO_QUEUE
+To: =?UTF-8?B?VG9rZSBIw7hpbGFuZC1Kw7hyZ2Vuc2Vu?= <toke@redhat.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-ppp@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Convert binding doc tcan4x5x.txt to yaml.
+Hi Toke,
 
-Signed-off-by: Sean Nyekjaer <sean@geanix.com>
----
-Changes since rfc:
-- Tried to re-add ti,tcan4x5x wildcard
-- Removed xceiver and vdd supplies (copy paste error)
-- Corrected max SPI frequency
-- Copy pasted bosch,mram-cfg from bosch,m_can.yaml
-- device-state-gpios and device-wake-gpios only available for tcan4x5x
+On Tue, Nov 5, 2024 at 8:24=E2=80=AFPM Toke H=C3=B8iland-J=C3=B8rgensen <to=
+ke@redhat.com> wrote:
+>
+> Qingfang Deng <dqfext@gmail.com> writes:
+>
+> > When testing the parallel TX performance of a single PPPoE interface
+> > over a 2.5GbE link with multiple hardware queues, the throughput could
+> > not exceed 1.9Gbps, even with low CPU usage.
+> >
+> > This issue arises because the PPP interface is registered with a single
+> > queue and a tx_queue_len of 3. This default behavior dates back to Linu=
+x
+> > 2.3.13, which was suitable for slower serial ports. However, in modern
+> > devices with multiple processors and hardware queues, this configuratio=
+n
+> > can lead to congestion.
+> >
+> > For PPPoE/PPTP, the lower interface should handle qdisc, so we need to
+> > set IFF_NO_QUEUE.
+>
+> This bit makes sense - the PPPoE and PPTP channel types call through to
+> the underlying network stack, and their start_xmit() ops never return
+> anything other than 1 (so there's no pushback against the upper PPP
+> device anyway). The same goes for the L2TP PPP channel driver.
+>
+> > For PPP over a serial port, we don't benefit from a qdisc with such a
+> > short TX queue, so handling TX queueing in the driver and setting
+> > IFF_NO_QUEUE is more effective.
+>
+> However, this bit is certainly not true. For the channel drivers that
+> do push back (which is everything apart from the three mentioned above,
+> AFAICT), we absolutely do want a qdisc to store the packets, instead of
+> this arbitrary 32-packet FIFO inside the driver. Your comment about the
+> short TX queue only holds for the pfifo_fast qdisc (that's the only one
+> that uses the tx_queue_len for anything), anything else will do its own
+> thing.
+>
+> (Side note: don't use pfifo_fast!)
+>
+> I suppose one option here could be to set the IFF_NO_QUEUE flag
+> conditionally depending on whether the underlying channel driver does
+> pushback against the PPP device or not (add a channel flag to indicate
+> this, or something), and then call the netif_{wake,stop}_queue()
+> functions conditionally depending on this. But setting the noqueue flag
+> unconditionally like this patch does, is definitely not a good idea!
 
-Changes in v2:
-- Removed unneeded "|"
-- Reworked properties, compatible
-- Removed additionalProperties: false
-- Added unevaluatedProperties: false
-- Added missing space in examples
-- Link to v1: https://lore.kernel.org/r/20241104125342.1691516-1-sean@geanix.com
----
- .../devicetree/bindings/net/can/tcan4x5x.txt       |  48 ------
- .../devicetree/bindings/net/can/ti,tcan4x5x.yaml   | 184 +++++++++++++++++++++
- 2 files changed, 184 insertions(+), 48 deletions(-)
+I agree. Then the problem becomes how to test if a PPP device is a PPPoE.
+It seems like PPPoE is the only one that implements
+ops->fill_forward_path, should I use that? Or is there a better way?
 
-diff --git a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt b/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
-deleted file mode 100644
-index 20c0572c9853424e1d104cbf75d02094a54836c3..0000000000000000000000000000000000000000
---- a/Documentation/devicetree/bindings/net/can/tcan4x5x.txt
-+++ /dev/null
-@@ -1,48 +0,0 @@
--Texas Instruments TCAN4x5x CAN Controller
--================================================
--
--This file provides device node information for the TCAN4x5x interface contains.
--
--Required properties:
--	- compatible:
--		"ti,tcan4552", "ti,tcan4x5x"
--		"ti,tcan4553", "ti,tcan4x5x" or
--		"ti,tcan4x5x"
--	- reg: 0
--	- #address-cells: 1
--	- #size-cells: 0
--	- spi-max-frequency: Maximum frequency of the SPI bus the chip can
--			     operate at should be less than or equal to 18 MHz.
--	- interrupt-parent: the phandle to the interrupt controller which provides
--                    the interrupt.
--	- interrupts: interrupt specification for data-ready.
--
--See Documentation/devicetree/bindings/net/can/bosch,m_can.yaml for additional
--required property details.
--
--Optional properties:
--	- reset-gpios: Hardwired output GPIO. If not defined then software
--		       reset.
--	- device-state-gpios: Input GPIO that indicates if the device is in
--			      a sleep state or if the device is active. Not
--			      available with tcan4552/4553.
--	- device-wake-gpios: Wake up GPIO to wake up the TCAN device. Not
--			     available with tcan4552/4553.
--	- wakeup-source: Leave the chip running when suspended, and configure
--			 the RX interrupt to wake up the device.
--
--Example:
--tcan4x5x: tcan4x5x@0 {
--		compatible = "ti,tcan4x5x";
--		reg = <0>;
--		#address-cells = <1>;
--		#size-cells = <1>;
--		spi-max-frequency = <10000000>;
--		bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
--		interrupt-parent = <&gpio1>;
--		interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
--		device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
--		device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
--		reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
--		wakeup-source;
--};
-diff --git a/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-new file mode 100644
-index 0000000000000000000000000000000000000000..f1d18a5461e05296998ae9bf09bdfa1226580131
---- /dev/null
-+++ b/Documentation/devicetree/bindings/net/can/ti,tcan4x5x.yaml
-@@ -0,0 +1,184 @@
-+# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-+%YAML 1.2
-+---
-+$id: http://devicetree.org/schemas/net/can/ti,tcan4x5x.yaml#
-+$schema: http://devicetree.org/meta-schemas/core.yaml#
-+
-+title: Texas Instruments TCAN4x5x CAN Controller
-+
-+maintainers:
-+  - Marc Kleine-Budde <mkl@pengutronix.de>
-+
-+properties:
-+  compatible:
-+    oneOf:
-+      - items:
-+          - enum:
-+              - ti,tcan4552
-+              - ti,tcan4553
-+          - const: ti,tcan4x5x
-+      - const: ti,tcan4x5x
-+
-+  reg:
-+    maxItems: 1
-+
-+  interrupts:
-+    maxItems: 1
-+    description: The GPIO parent interrupt.
-+
-+  clocks:
-+    maxItems: 1
-+
-+  reset-gpios:
-+    description: Hardwired output GPIO. If not defined then software reset.
-+    maxItems: 1
-+
-+  device-state-gpios:
-+    description:
-+      Input GPIO that indicates if the device is in a sleep state or if the
-+      device is active. Not available with tcan4552/4553.
-+    maxItems: 1
-+
-+  device-wake-gpios:
-+    description:
-+      Wake up GPIO to wake up the TCAN device.
-+      Not available with tcan4552/4553.
-+    maxItems: 1
-+
-+  bosch,mram-cfg:
-+    description: |
-+      Message RAM configuration data.
-+      Multiple M_CAN instances can share the same Message RAM
-+      and each element(e.g Rx FIFO or Tx Buffer and etc) number
-+      in Message RAM is also configurable, so this property is
-+      telling driver how the shared or private Message RAM are
-+      used by this M_CAN controller.
-+
-+      The format should be as follows:
-+      <offset sidf_elems xidf_elems rxf0_elems rxf1_elems rxb_elems txe_elems txb_elems>
-+      The 'offset' is an address offset of the Message RAM where
-+      the following elements start from. This is usually set to
-+      0x0 if you're using a private Message RAM. The remain cells
-+      are used to specify how many elements are used for each FIFO/Buffer.
-+
-+      M_CAN includes the following elements according to user manual:
-+      11-bit Filter	0-128 elements / 0-128 words
-+      29-bit Filter	0-64 elements / 0-128 words
-+      Rx FIFO 0		0-64 elements / 0-1152 words
-+      Rx FIFO 1		0-64 elements / 0-1152 words
-+      Rx Buffers	0-64 elements / 0-1152 words
-+      Tx Event FIFO	0-32 elements / 0-64 words
-+      Tx Buffers	0-32 elements / 0-576 words
-+
-+      Please refer to 2.4.1 Message RAM Configuration in Bosch
-+      M_CAN user manual for details.
-+    $ref: /schemas/types.yaml#/definitions/int32-array
-+    items:
-+      - description: The 'offset' is an address offset of the Message RAM where
-+          the following elements start from. This is usually set to 0x0 if
-+          you're using a private Message RAM.
-+        default: 0
-+      - description: 11-bit Filter 0-128 elements / 0-128 words
-+        minimum: 0
-+        maximum: 128
-+      - description: 29-bit Filter 0-64 elements / 0-128 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Rx FIFO 0 0-64 elements / 0-1152 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Rx FIFO 1 0-64 elements / 0-1152 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Rx Buffers 0-64 elements / 0-1152 words
-+        minimum: 0
-+        maximum: 64
-+      - description: Tx Event FIFO 0-32 elements / 0-64 words
-+        minimum: 0
-+        maximum: 32
-+      - description: Tx Buffers 0-32 elements / 0-576 words
-+        minimum: 0
-+        maximum: 32
-+    minItems: 1
-+
-+  spi-max-frequency:
-+    description:
-+      Must be half or less of "clocks" frequency.
-+    maximum: 18000000
-+
-+  wakeup-source:
-+    $ref: /schemas/types.yaml#/definitions/flag
-+    description:
-+      Enable CAN remote wakeup.
-+
-+allOf:
-+  - $ref: can-controller.yaml#
-+  - $ref: /schemas/spi/spi-peripheral-props.yaml#
-+  - if:
-+      properties:
-+        compatible:
-+          contains:
-+            enum:
-+              - ti,tcan4552
-+              - ti,tcan4553
-+    then:
-+      properties:
-+        device-state-gpios: false
-+        device-wake-gpios: false
-+
-+required:
-+  - compatible
-+  - reg
-+  - interrupts
-+  - clocks
-+  - bosch,mram-cfg
-+
-+unevaluatedProperties: false
-+
-+examples:
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        can@0 {
-+            compatible = "ti,tcan4x5x";
-+            reg = <0>;
-+            clocks = <&can0_osc>;
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&can0_pins>;
-+            spi-max-frequency = <10000000>;
-+            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
-+            interrupt-parent = <&gpio1>;
-+            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
-+            device-state-gpios = <&gpio3 21 GPIO_ACTIVE_HIGH>;
-+            device-wake-gpios = <&gpio1 15 GPIO_ACTIVE_HIGH>;
-+            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
-+            wakeup-source;
-+        };
-+    };
-+  - |
-+    #include <dt-bindings/gpio/gpio.h>
-+    #include <dt-bindings/interrupt-controller/irq.h>
-+
-+    spi {
-+        #address-cells = <1>;
-+        #size-cells = <0>;
-+
-+        can@0 {
-+            compatible = "ti,tcan4552", "ti,tcan4x5x";
-+            reg = <0>;
-+            clocks = <&can0_osc>;
-+            pinctrl-names = "default";
-+            pinctrl-0 = <&can0_pins>;
-+            spi-max-frequency = <10000000>;
-+            bosch,mram-cfg = <0x0 0 0 16 0 0 1 1>;
-+            interrupt-parent = <&gpio1>;
-+            interrupts = <14 IRQ_TYPE_LEVEL_LOW>;
-+            reset-gpios = <&gpio1 27 GPIO_ACTIVE_HIGH>;
-+            wakeup-source;
-+        };
-+    };
+- Qingfang
 
----
-base-commit: 2b2a9a08f8f0b904ea2bc61db3374421b0f944a6
-change-id: 20241105-convert-tcan-4b516424ecf6
-
-Best regards,
--- 
-Sean Nyekjaer <sean@geanix.com>
-
+>
+> -Toke
+>
 
