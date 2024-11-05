@@ -1,168 +1,100 @@
-Return-Path: <netdev+bounces-142027-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142028-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7EB7F9BD00D
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:06:43 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 66F329BD01F
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:10:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AE5951C2119F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:06:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 986121C21016
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 15:10:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 689CF1D9350;
-	Tue,  5 Nov 2024 15:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D27321D9A4B;
+	Tue,  5 Nov 2024 15:10:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="mNM71KmF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="drmVIaMt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCFD11D7E35
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 15:06:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A455E1D5CCC;
+	Tue,  5 Nov 2024 15:10:22 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730819199; cv=none; b=BIduYafMaKClGppwE5I7Tw55RlLCzlpcyIUSXb86+cn1MFEtxsSKfDo09SZdC+4bLEOUffwUqxaJvopWngAr+sSFEe8nsAMhSmXdC+LEWkQvEHgo6/S0UfUewXfaAc6+a12dhy1nhfMZOzZyXoPgjnQ8rz+1CCw6Pjrx2pQlPU4=
+	t=1730819422; cv=none; b=fm+wRqGMo3eq5o/9cTOLuDKavUaazpK0BgE2AHgtdh5Mxd0mS7bbtNpoipK2GtfBuCpOQtJy/2CtspYbxHIoS/tsDfVHEnCG+E2MnD81ieNoIFF/RHmwzojeZ42YPuWT0Ofa8Ka9JtkzCOtD6xXl58gSevlfXjMdf2f1X+Apet0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730819199; c=relaxed/simple;
-	bh=9Q5dwSvyqgDmSwRGRw9zJGGnRrKN0YKi5hD81fpL2PA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VRijx4jj07H392KURq5Y15kxysdxVDHPbWHVFLnDxQiCFP0UNZoGTkHq2XPgEZisso1fLp1UYBa4drX66gsGoZDJ4Bluc91ZeCzGyMb67jX61GcuDvsTq1Gxcf35cK8bbHJ2vnrbiFJH5JGNlMxLvI4pPTFkPbY10kkBzbBeAEM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=mNM71KmF; arc=none smtp.client-ip=198.175.65.15
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730819197; x=1762355197;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9Q5dwSvyqgDmSwRGRw9zJGGnRrKN0YKi5hD81fpL2PA=;
-  b=mNM71KmFz5NCWvXR1DlOGYltm5382dcMHB36Jf+Y8tlGTCO2RphSGkMQ
-   BOENH8huieynCm5TOM1wFxPdhDU/lqFlI3L6SKIUSLolzyyzipKKg+kZi
-   2SvLsInY6VV/2pmZew0EQCsrfXHBF6ob2MO35v7GdUOTexW3hY0qNVGBm
-   O7BFshd5r/Xb54Ff9qThJ7p1pJ6FrZl5IukO296KrafE4H+2WuojuMFUv
-   kGDDBh8nZBflXDl1nykkEB7ZWhSr0mo2ygguAmUasbW88kLCeG/fSZyud
-   qDzfxEPvumeAk/EmjE4fggx3NKeUP7O1pGzaF7DwznZxE3Zu3Q7YVv5px
-   w==;
-X-CSE-ConnectionGUID: nbWv3PLnQJaISq38QVYCBQ==
-X-CSE-MsgGUID: etuYApOhRtGPbk4trzP3zw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34262025"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="34262025"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 07:06:36 -0800
-X-CSE-ConnectionGUID: Bxi6eyQZTumAQ0kiqBBZuA==
-X-CSE-MsgGUID: PE7P5odZRUOt4qXTvgSRgQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
-   d="scan'208";a="84000033"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa010.jf.intel.com with ESMTP; 05 Nov 2024 07:06:34 -0800
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t8L8Z-000mB1-2h;
-	Tue, 05 Nov 2024 15:06:31 +0000
-Date: Tue, 5 Nov 2024 23:06:00 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Hopps <chopps@chopps.org>, devel@linux-ipsec.org
-Cc: oe-kbuild-all@lists.linux.dev,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	netdev@vger.kernel.org, Florian Westphal <fw@strlen.de>,
-	Sabrina Dubroca <sd@queasysnail.net>,
-	Simon Horman <horms@kernel.org>, Antony Antony <antony@phenome.org>,
-	Christian Hopps <chopps@chopps.org>
-Subject: Re: [PATCH ipsec-next v13 15/15] xfrm: iptfs: add tracepoint
- functionality
-Message-ID: <202411052231.OM2TTHhn-lkp@intel.com>
-References: <20241105083759.2172771-16-chopps@chopps.org>
+	s=arc-20240116; t=1730819422; c=relaxed/simple;
+	bh=o99dfV4SMS3XtqCdnRdfpVyfvsH8r6+Drt0G7+D2AOo=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=ALKc6JMiVxFTU76WSohP99FEtPGuPsR/0741eXflOOmV172OWPAR2+byFXHjZ9vpXTBQyo+mntJRz7jT1taJNqJ21FG35rzEVNnZaoC0ySIed+SismY8An8j/mjjzfhRiMtEakf1TtSv/NaLJ/Nq/ft9uPTR+KJj4iL2iya5fRA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=drmVIaMt; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42FFDC4CECF;
+	Tue,  5 Nov 2024 15:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730819422;
+	bh=o99dfV4SMS3XtqCdnRdfpVyfvsH8r6+Drt0G7+D2AOo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=drmVIaMtr4fU7FK8ZHZ6Q9CLlAOl+AHwp63zRSfw2XBzXp/zVkrmljBzJVyPcqLRa
+	 5POMJLoKiwoc6qSkLZRtQdN2hQrLiUfhN8r72IeVVFKO17eMx0XDsPPCfdDtrdzDd1
+	 qsS0QmmT2ECPcqhkEGE6Yl2rAQceCYcY9yzsqn7VmW8VP1I/AA1pN6Q4xaiWR92dkt
+	 DpUKK9OX7wiiH68kd7gX4amc8nb+FbqY9WVEVUwrumabi9uKYzSkT8BQr+ob3ertBe
+	 FVidrrFldjaxnzrMH+CuyxqcL728W0S4M0fRE0+UksaHu6IAtGGKz1ihil6mqzNoHi
+	 e5MGBuYnUDa+w==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33DC03809A80;
+	Tue,  5 Nov 2024 15:10:32 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241105083759.2172771-16-chopps@chopps.org>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3 0/2] net: ethernet: ti: am65-cpsw: Fixes to multi
+ queue RX feature
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173081943101.587715.9518854111392182116.git-patchwork-notify@kernel.org>
+Date: Tue, 05 Nov 2024 15:10:31 +0000
+References: <20241101-am65-cpsw-multi-rx-j7-fix-v3-0-338fdd6a55da@kernel.org>
+In-Reply-To: <20241101-am65-cpsw-multi-rx-j7-fix-v3-0-338fdd6a55da@kernel.org>
+To: Roger Quadros <rogerq@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
+ hawk@kernel.org, john.fastabend@gmail.com, horms@kernel.org, vigneshr@ti.com,
+ maxime.chevallier@bootlin.com, s-vadapalli@ti.com, danishanwar@ti.com,
+ srk@ti.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ bpf@vger.kernel.org
 
-Hi Christian,
+Hello:
 
-kernel test robot noticed the following build warnings:
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-[auto build test WARNING on klassert-ipsec-next/master]
-[also build test WARNING on next-20241105]
-[cannot apply to klassert-ipsec/master netfilter-nf/main linus/master nf-next/master v6.12-rc6]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
+On Fri, 01 Nov 2024 12:18:49 +0200 you wrote:
+> On J7 platforms, setting up multiple RX flows was failing
+> as the RX free descriptor ring 0 is shared among all flows
+> and we did not allocate enough elements in the RX free descriptor
+> ring 0 to accommodate for all RX flows. Patch 1 fixes this.
+> 
+> The second patch fixes a warning if there was any error in
+> am65_cpsw_nuss_init_rx_chns() and am65_cpsw_nuss_cleanup_rx_chns()
+> was called after that.
+> 
+> [...]
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Hopps/xfrm-config-add-CONFIG_XFRM_IPTFS/20241105-164740
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec-next.git master
-patch link:    https://lore.kernel.org/r/20241105083759.2172771-16-chopps%40chopps.org
-patch subject: [PATCH ipsec-next v13 15/15] xfrm: iptfs: add tracepoint functionality
-config: m68k-allyesconfig (https://download.01.org/0day-ci/archive/20241105/202411052231.OM2TTHhn-lkp@intel.com/config)
-compiler: m68k-linux-gcc (GCC) 14.1.0
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241105/202411052231.OM2TTHhn-lkp@intel.com/reproduce)
+Here is the summary with links:
+  - [net,v3,1/2] net: ethernet: ti: am65-cpsw: Fix multi queue Rx on J7
+    https://git.kernel.org/netdev/net/c/de794169cf17
+  - [net,v3,2/2] net: ethernet: ti: am65-cpsw: fix warning in am65_cpsw_nuss_remove_rx_chns()
+    https://git.kernel.org/netdev/net/c/ba3b7ac4f714
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411052231.OM2TTHhn-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> net/xfrm/xfrm_iptfs.c:194:12: warning: '__trace_ip_proto_seq' defined but not used [-Wunused-function]
-     194 | static u32 __trace_ip_proto_seq(struct iphdr *iph)
-         |            ^~~~~~~~~~~~~~~~~~~~
->> net/xfrm/xfrm_iptfs.c:187:12: warning: '__trace_ip_proto' defined but not used [-Wunused-function]
-     187 | static u32 __trace_ip_proto(struct iphdr *iph)
-         |            ^~~~~~~~~~~~~~~~
-
-Kconfig warnings: (for reference only)
-   WARNING: unmet direct dependencies detected for GET_FREE_REGION
-   Depends on [n]: SPARSEMEM [=n]
-   Selected by [y]:
-   - RESOURCE_KUNIT_TEST [=y] && RUNTIME_TESTING_MENU [=y] && KUNIT [=y]
-
-
-vim +/__trace_ip_proto_seq +194 net/xfrm/xfrm_iptfs.c
-
-   186	
- > 187	static u32 __trace_ip_proto(struct iphdr *iph)
-   188	{
-   189		if (iph->version == 4)
-   190			return iph->protocol;
-   191		return ((struct ipv6hdr *)iph)->nexthdr;
-   192	}
-   193	
- > 194	static u32 __trace_ip_proto_seq(struct iphdr *iph)
-   195	{
-   196		void *nexthdr;
-   197		u32 protocol = 0;
-   198	
-   199		if (iph->version == 4) {
-   200			nexthdr = (void *)(iph + 1);
-   201			protocol = iph->protocol;
-   202		} else if (iph->version == 6) {
-   203			nexthdr = (void *)(((struct ipv6hdr *)(iph)) + 1);
-   204			protocol = ((struct ipv6hdr *)(iph))->nexthdr;
-   205		}
-   206		switch (protocol) {
-   207		case IPPROTO_ICMP:
-   208			return ntohs(((struct icmphdr *)nexthdr)->un.echo.sequence);
-   209		case IPPROTO_ICMPV6:
-   210			return ntohs(((struct icmp6hdr *)nexthdr)->icmp6_sequence);
-   211		case IPPROTO_TCP:
-   212			return ntohl(((struct tcphdr *)nexthdr)->seq);
-   213		case IPPROTO_UDP:
-   214			return ntohs(((struct udphdr *)nexthdr)->source);
-   215		default:
-   216			return 0;
-   217		}
-   218	}
-   219	
-
+You are awesome, thank you!
 -- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
