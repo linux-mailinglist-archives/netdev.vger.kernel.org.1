@@ -1,87 +1,87 @@
-Return-Path: <netdev+bounces-141800-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E08AE9BC453
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 05:28:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B42ED9BC457
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 05:29:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 705EF1F22030
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:28:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5FBD1C210D5
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:29:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 865DE18E363;
-	Tue,  5 Nov 2024 04:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A18E11B0F02;
+	Tue,  5 Nov 2024 04:29:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="GPa7LcP4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eL1N5Mup"
 X-Original-To: netdev@vger.kernel.org
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ADA8A126BEE
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 04:28:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1447B18E363
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 04:29:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730780914; cv=none; b=C/61Pa8igi2hghqMOAcqwZCw66DRN62htskKwkvJU9XDwwM8EC9b/XPCCiCR5r0qZCpphSLGCd/OPt0rJu0SsTFb0Pi3kCkXYn5BG2Hip4Ptob8iSBCXcS0U2xIP0R2/JQ8I2FLggpTiKByOr+B52EK9ViRufOfsjG11foDFEvY=
+	t=1730780971; cv=none; b=pnguK+xF3Ts27j+/kJI2n6uAcHViy8gyqb7fpj6qOkMtDD7ce5686yXL9OpY1ltA7b5DDhc1rCIKaqHuM+SHAYjKI+jgrjwxnNd6azLj0kxJg9WTVPo6DyvRT16dktl8/Ch/1kmrsQ9rVMH74KsqgQD1tol+PV9b7NWzNwLukr0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730780914; c=relaxed/simple;
-	bh=jCOhmUK6IbEIRDl5mkQTmEZnPSs5BTtuXv8Ub6PBav4=;
+	s=arc-20240116; t=1730780971; c=relaxed/simple;
+	bh=IAFfMzzyrbRop/8uBKQSzdTM6VeUXaTo5Y0XtX+mIeY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Jp8RI79Ijtd0rmzJD043ufiYR2T3OtSW+06cwOcWFrb/J7BgJhJwhvVvLgSczPJ15ZopQgZAoaL6ZlqEAuUaMXgAXIl6BBXqrtEwzimEFhd+rSzcrG8X4UHkV6pU5ygvlvV+WsRiqckV5chSzu/r15UrC6sRUx7SIm7hx2Y2tBo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=GPa7LcP4; arc=none smtp.client-ip=170.10.133.124
+	 To:Cc:Content-Type; b=ndUEZ4lCqmnsx4G5Y68m7APXNdEEFshDLcZ9skajY/0vGbThSKqV2PkEDeOlbCX/ZzgvZ6OeN1qCM1em7sgjH0GKONTATwLzPPV7YDT5oAwj7JyeiZVejOJej1DEv/aj+L5fYIRusGrTtIez1Gr9MKrUTJ4BLe1Aec8vttrPZNs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eL1N5Mup; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730780911;
+	s=mimecast20190719; t=1730780969;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2WNP/eiwwlyjDkpO5BsHHqJGwhWGw0F0hz9Z4SjJmr0=;
-	b=GPa7LcP4Eb7V2qW4TX/LHanKbM/JtEYljVyxUXHtPMXy4ETvRLyvkrd+fTy906ZcyidehI
-	rFWgKR3sal3eF/WOwf8bD+JO54HE1sfJ5rBPukwRGweGsF3r2w0A2uKRfKlvL+MX7v0RtI
-	Ic2ZvfgR9v33BGUhb4uZDnl/+IcG8PI=
-Received: from mail-pj1-f72.google.com (mail-pj1-f72.google.com
- [209.85.216.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=IAFfMzzyrbRop/8uBKQSzdTM6VeUXaTo5Y0XtX+mIeY=;
+	b=eL1N5MupBUqLR2mUBaPjmOOXY60/u44uUVbmaZInG2FBjwMlZI5Gc+JFVRhyRMXnoiiOpM
+	46sXEMZMJ3UT06FrjnDTbscosYrw4Je4k3l2N1Ns/k0LmPL2dpVl5WKKTBREkRgJRXWDZ1
+	3iQtBqdlTu/yvflcmnTrJ6nibP0qtXE=
+Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
+ [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-196-MBJAJnm2Pk-rQYQsp0YSQw-1; Mon, 04 Nov 2024 23:28:30 -0500
-X-MC-Unique: MBJAJnm2Pk-rQYQsp0YSQw-1
-Received: by mail-pj1-f72.google.com with SMTP id 98e67ed59e1d1-2e2bac0c38aso6536792a91.2
-        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 20:28:30 -0800 (PST)
+ us-mta-68-IjAmo1vkMWWgnKyYmuH6Ew-1; Mon, 04 Nov 2024 23:29:28 -0500
+X-MC-Unique: IjAmo1vkMWWgnKyYmuH6Ew-1
+Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2e2ed2230fcso5205359a91.0
+        for <netdev@vger.kernel.org>; Mon, 04 Nov 2024 20:29:28 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730780909; x=1731385709;
+        d=1e100.net; s=20230601; t=1730780966; x=1731385766;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2WNP/eiwwlyjDkpO5BsHHqJGwhWGw0F0hz9Z4SjJmr0=;
-        b=WtfK4Y+W+c+6Gnns6CYBbqHtYmB0Nr2/joC8wAXGGhasrGsmV9lRCWrRtNl7FyZjO6
-         O/7ThgJaUCyl0taQSSJLunPHf3IxsNg996eCCwMFB9GudRnVPLxtk7TcYcSPqjbR6tDy
-         DPq4kIKuJarEIif1uXqlfEzWdvlaFDoWbIzs3hlM7mloL9imSG/zBpyyGGC3JCbkLt5Y
-         wJvF8TnRWOw3Ujil25VGNQO8vrrDSztq2I4vIzkaXV+Ehv2EuM9ibtTKNKojlHYWG+0d
-         g5ODNk99Zchxyl+oFxNYQbqEH/Rpy0CIwrp7AB4/rFs4fAhF3Ec4d0q/aNFPcP29h4ZK
-         8d7w==
-X-Gm-Message-State: AOJu0YxhbAHYmFaYFejPFelSpzIbeoWPQHSeGK8okHoeVPikFvG9Ghur
-	Aeh5I9EstkAtEHHy8zBC1mlQ4VEfHfni7Esz3fai+WKFKumxlSZaHyZ7NKUNhgzFRHi59mKUGg9
-	ztvyACEYGKJlzKFy/3TJWEfnU3XhMAw2a/9dVHy7cWWpeirpC5s6Er2QZiWY1HAU1M7gZ6nEns5
-	qvmlhP2wQbtEQprMJNFCAJ2u3V23U5
-X-Received: by 2002:a17:90b:2703:b0:2e2:bad3:e393 with SMTP id 98e67ed59e1d1-2e93c1239b8mr23888097a91.3.1730780909401;
-        Mon, 04 Nov 2024 20:28:29 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHCqHP1v9rviscFmYSIZGGEle1Y/T+Yx3tavSzj80nHe7tuCQVnZBAYxDS5nHUdLvz4jkM+KeZYvQfYErHiRy0=
-X-Received: by 2002:a17:90b:2703:b0:2e2:bad3:e393 with SMTP id
- 98e67ed59e1d1-2e93c1239b8mr23888074a91.3.1730780908928; Mon, 04 Nov 2024
- 20:28:28 -0800 (PST)
+        bh=IAFfMzzyrbRop/8uBKQSzdTM6VeUXaTo5Y0XtX+mIeY=;
+        b=vYf6vb8RaNemrzO9mP7vtFx+ujiNIGC4JakKkiDWxdEVoo8YvgOF4jiWHHiJnv3if7
+         y6K4LEEl+Wbc4buDJGpx4/BWamml73P50R8tnmWlkInKW8ASS7b2AQ78wgD7iuGzqOy2
+         7rhd9s+z0LeToNDKN7FCpWEr1Zq6mSBj4XJ22jI86clxDjtd1oV7gMH6zfT4rMEVpDq7
+         SVkzvndMnEcKovmrO42pouByoSfRUNdFpDgy5eEC8kRzwvbHP4A/E2zKZVVeXHB3Hpp3
+         yZKWe7JFttXLMk7ax39vbIz442dy+lsU83Zmkv7dOK9LtOV3zghFkie/asbA1gjSMHQW
+         nHFQ==
+X-Gm-Message-State: AOJu0Ywb+hAzLDw/PnZDdkNg+F4GpIMmAHfqtF2+qbe0Sm9+rbxmXhTi
+	2RxYlLdRTcTV9YIWZAPAGPbxcUpgwj2qw+B4sX91lrV2t/YollHlMoz5rlFk8URpViILmHGo7nz
+	GL4f5QqwlE1xrBgYdv/B17r2j0P3qGXFp5MF3PGAl5Z8XPFWWCkTXh3YGuH5aAGWyemPRh+7Yl2
+	db/u5k7os5NPYz/T7fByNOh1pgWmJJCridy0aNdjtRRQ==
+X-Received: by 2002:a17:90b:540d:b0:2e2:d15c:1a24 with SMTP id 98e67ed59e1d1-2e93c1a6cddmr26138140a91.23.1730780966376;
+        Mon, 04 Nov 2024 20:29:26 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHlfBcjEUwY0jgicXD/Etg/7eX+icEijhUmPf3OjO6dPGL41QsO7QKLssoh6xABfMz8aXhIphYCx3Xy3KfX3CY=
+X-Received: by 2002:a17:90b:540d:b0:2e2:d15c:1a24 with SMTP id
+ 98e67ed59e1d1-2e93c1a6cddmr26138115a91.23.1730780965914; Mon, 04 Nov 2024
+ 20:29:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com> <20241030082453.97310-6-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20241030082453.97310-6-xuanzhuo@linux.alibaba.com>
+References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com> <20241030082453.97310-8-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20241030082453.97310-8-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 5 Nov 2024 12:28:18 +0800
-Message-ID: <CACGkMEuO4Y04nLLJDXD_atHz8-yD=sk1QLYPidoJSPtAn+ycqQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 05/13] virtio_ring: introduce add api for premapped
+Date: Tue, 5 Nov 2024 12:29:14 +0800
+Message-ID: <CACGkMEvh=tFAp2gXmtCgaTGn9ZTL2z6oiA47TNysqkro3etZgQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 07/13] virtio_ring: remove API virtqueue_set_dma_premapped
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
 	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
@@ -96,136 +96,12 @@ Content-Transfer-Encoding: quoted-printable
 On Wed, Oct 30, 2024 at 4:25=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.c=
 om> wrote:
 >
-> Two APIs are introduced to submit premapped per-buffers.
->
-> int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
->                                  struct scatterlist *sg, unsigned int num=
-,
->                                  void *data,
->                                  void *ctx,
->                                  bool premapped,
->                                  gfp_t gfp);
->
-> int virtqueue_add_outbuf_premapped(struct virtqueue *vq,
->                                   struct scatterlist *sg, unsigned int nu=
-m,
->                                   void *data,
->                                   bool premapped,
->                                   gfp_t gfp);
+> Now, this API is useless. remove it.
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> ---
->  drivers/virtio/virtio_ring.c | 48 ++++++++++++++++++++++++++++++++++++
->  include/linux/virtio.h       | 13 ++++++++++
->  2 files changed, 61 insertions(+)
->
-> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index a89295b79e66..525308d82728 100644
-> --- a/drivers/virtio/virtio_ring.c
-> +++ b/drivers/virtio/virtio_ring.c
-> @@ -2272,6 +2272,29 @@ int virtqueue_add_outbuf(struct virtqueue *vq,
->  }
->  EXPORT_SYMBOL_GPL(virtqueue_add_outbuf);
->
-> +/**
-> + * virtqueue_add_outbuf_premapped - expose output buffers to other end
-> + * @vq: the struct virtqueue we're talking about.
-> + * @sg: scatterlist (must be well-formed and terminated!)
-> + * @num: the number of entries in @sg readable by other side
-> + * @data: the token identifying the buffer.
-> + * @gfp: how to do memory allocations (if necessary).
-> + *
-> + * Caller must ensure we don't call this with other virtqueue operations
-> + * at the same time (except where noted).
-> + *
-> + * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
-> + */
-> +int virtqueue_add_outbuf_premapped(struct virtqueue *vq,
-> +                                  struct scatterlist *sg, unsigned int n=
-um,
-> +                                  void *data,
-> +                                  bool premapped,
 
-We don't need this parameter consider:
-
-1) we've already had virtqueue_add_outbuf() which implies the buf has
-been mapped
-2) no explanation for "premapped" in the function doc
+Acked-by: Jason Wang <jasowang@redhat.com>
 
 Thanks
-
-> +                                  gfp_t gfp)
-> +{
-> +       return virtqueue_add(vq, &sg, num, 1, 0, data, NULL, premapped, g=
-fp);
-> +}
-> +EXPORT_SYMBOL_GPL(virtqueue_add_outbuf_premapped);
-> +
->  /**
->   * virtqueue_add_inbuf - expose input buffers to other end
->   * @vq: the struct virtqueue we're talking about.
-> @@ -2318,6 +2341,31 @@ int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
->  }
->  EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_ctx);
->
-> +/**
-> + * virtqueue_add_inbuf_premapped - expose input buffers to other end
-> + * @vq: the struct virtqueue we're talking about.
-> + * @sg: scatterlist (must be well-formed and terminated!)
-> + * @num: the number of entries in @sg writable by other side
-> + * @data: the token identifying the buffer.
-> + * @ctx: extra context for the token
-> + * @gfp: how to do memory allocations (if necessary).
-> + *
-> + * Caller must ensure we don't call this with other virtqueue operations
-> + * at the same time (except where noted).
-> + *
-> + * Returns zero or a negative error (ie. ENOSPC, ENOMEM, EIO).
-> + */
-> +int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
-> +                                 struct scatterlist *sg, unsigned int nu=
-m,
-> +                                 void *data,
-> +                                 void *ctx,
-> +                                 bool premapped,
-> +                                 gfp_t gfp)
-> +{
-> +       return virtqueue_add(vq, &sg, num, 0, 1, data, ctx, premapped, gf=
-p);
-> +}
-> +EXPORT_SYMBOL_GPL(virtqueue_add_inbuf_premapped);
-> +
->  /**
->   * virtqueue_dma_dev - get the dma dev
->   * @_vq: the struct virtqueue we're talking about.
-> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> index 306137a15d07..19afa49b92d0 100644
-> --- a/include/linux/virtio.h
-> +++ b/include/linux/virtio.h
-> @@ -56,6 +56,19 @@ int virtqueue_add_inbuf_ctx(struct virtqueue *vq,
->                             void *ctx,
->                             gfp_t gfp);
->
-> +int virtqueue_add_inbuf_premapped(struct virtqueue *vq,
-> +                                 struct scatterlist *sg, unsigned int nu=
-m,
-> +                                 void *data,
-> +                                 void *ctx,
-> +                                 bool premapped,
-> +                                 gfp_t gfp);
-> +
-> +int virtqueue_add_outbuf_premapped(struct virtqueue *vq,
-> +                                  struct scatterlist *sg, unsigned int n=
-um,
-> +                                  void *data,
-> +                                  bool premapped,
-> +                                  gfp_t gfp);
-> +
->  int virtqueue_add_sgs(struct virtqueue *vq,
->                       struct scatterlist *sgs[],
->                       unsigned int out_sgs,
-> --
-> 2.32.0.3.g01195cf9f
->
 
 
