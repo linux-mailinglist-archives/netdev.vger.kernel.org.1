@@ -1,106 +1,108 @@
-Return-Path: <netdev+bounces-141777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 112C29BC389
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:03:01 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 510EC9BC38E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 04:06:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3F04E1C21C8A
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:03:00 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0789B216F9
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 03:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3C984D9FE;
-	Tue,  5 Nov 2024 03:02:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9740153365;
+	Tue,  5 Nov 2024 03:06:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="pdc3cgtS"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="gGvKuaTB"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02A4F38DDB;
-	Tue,  5 Nov 2024 03:02:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7124B2A1CA
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 03:06:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730775775; cv=none; b=jUu0fC3H3cs4DLufcgVFvl7KA8S24wzB1+2BPYUIHOlrBM/bD8sM+Bqt9ojOYTuGVcA5kf+RhapsdgVR9pllKSgujtL3oXuxSqa9gm/98L+JSUROYF4XsFEzAGjy82FO2b6Qx4VgojlIj9Vb64utEeeZAfp/X+jvhBLLkHQ0x1s=
+	t=1730775972; cv=none; b=C415lVC4Tm9IIL0Be+DxvnzkrlGE4Ab8w00kmkgFW4EcLOlXbzHc/cQyVPhRXI8QZB5Lyx+xulot8CGGkFKzkuTwZl5ENNz9/2ltW2S/tOF7xYa7j9J3H+fWp1R/qVwzLH25AALTvjnvYSlv5U+wz5Oml0pPcsneSAG+InfFUi0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730775775; c=relaxed/simple;
-	bh=sQpNHZKSwsm9PuF+xXorp5UNtacEVOe8mMj/L81nvyU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=m5E0CO8f/68GsofAkQA/KwG/beaRnZzxVHSXuzd/YSi9sP3wbw7Vsm1MI2QuGzvAzVZR1s8IqelEkKfkVoEazIXgnctiK860BbTF96e6HZAPXr4lZrmsmN+PEdax3aNeBIIVajH1S/OVPg8atwN8WRCkNgrRVBOhm0ZxjmQ1YTU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=pdc3cgtS; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=hoFMWyq+iDCYAmm6oQjVciE92ijPEyH2UIFa3czySUg=; b=pdc3cgtSRw6I6BPGsED5u6EMoY
-	z5lSAxX20a4ZlT6VJmvrr4ZTsFlwpu9w0EaJm0Rp6TyP9NbZMxyEGXFEaZz3GI7lf0KOTLcqqEc+T
-	nDS6WFZXnBcaQ55qsPmGWVCs7UCzd8nFHFLG+ppCdaXx9Res56Q6Jj9uKfWZsYXpn2ro=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t89qE-00CAfH-2V; Tue, 05 Nov 2024 04:02:50 +0100
-Date: Tue, 5 Nov 2024 04:02:50 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Alistair Francis <alistair23@gmail.com>
-Cc: linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	linux@armlinux.org.uk, hkallweit1@gmail.com,
-	Alistair Francis <alistair.francis@wdc.com>
-Subject: Re: [PATCH] include: mdio: Guard inline function with CONFIG_MDIO
-Message-ID: <01d60932-f78f-4e4b-88e7-f331535b8076@lunn.ch>
-References: <20241104070950.502719-1-alistair.francis@wdc.com>
- <9ae6af15-790a-4d34-901d-55fca0be9fd2@lunn.ch>
- <CAKmqyKOX8gcRT2dSOvJY2o4bpoF+VuPmhaygJj7pTb1KesrFOQ@mail.gmail.com>
- <680bd06f-6a76-4a5c-b5d2-51dd172c8428@lunn.ch>
- <CAKmqyKNkPGPg8xsYDY9FtNvqJQsFmQ1o8KYHQXutrN1kHxsPww@mail.gmail.com>
+	s=arc-20240116; t=1730775972; c=relaxed/simple;
+	bh=IwVwwcT7penUTVRjdcAshziuwkH/Qw3PEYD8J4PgxOc=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=Iq8ykBeELFZgApyMfnBMjEvRO86sW8H3HqPz2PuN/YjyjijSgIMfEDFcSkdZTujsdyjNjrehMhKHzNnv+DA72vZ5BA3ZvMVWkn0ZINvq6bRCTVzVyPrN2J4ruN9KWXSiszGoxBFioqR9hqBg5SJtzPXV7t5WHkZUA5cuPCrYpdM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=gGvKuaTB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B148BC4CECE;
+	Tue,  5 Nov 2024 03:06:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730775972;
+	bh=IwVwwcT7penUTVRjdcAshziuwkH/Qw3PEYD8J4PgxOc=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=gGvKuaTBEfgUoZAHHvHQjZjyz5kVfIjcyVALMrHLwQ1tOsElODRqweGZJUJtDjmsE
+	 gaQUyQeZxcBH+P6azAg6TD4T+AZlQqdGR+fIW+ztCvuYxYapzXsp49zMM6Ek4aDZIz
+	 NhG51AtLRawbNlvEpb2e6uN69VqPPuowPkRI7cbupBiCDRuy+8s8YKPCQdGgv0LW4x
+	 1thnqcZD6/OQNRSFen7mIMR/LBBtRasLzBFVUEW0i5RBUnmV/hR5++dU0Tzop7REnx
+	 +WQrmVnSPpJwiK2NnAlUweaOSQXR0b0R6MElqH7ocffMQ9SIpME2C5bmcZjh6t+7ho
+	 LQkgb7TqCzjaw==
+Date: Mon, 4 Nov 2024 19:06:10 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Petr Machata <petrm@nvidia.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ <netdev@vger.kernel.org>, Ido Schimmel <idosch@nvidia.com>, Amit Cohen
+ <amcohen@nvidia.com>, Vladimir Oltean <vladimir.oltean@nxp.com>, "Andy
+ Roulin" <aroulin@nvidia.com>, <mlxsw@nvidia.com>
+Subject: Re: [PATCH net-next v2 0/8] net: Shift responsibility for FDB
+ notifications to drivers
+Message-ID: <20241104190610.391b784a@kernel.org>
+In-Reply-To: <87ldxzky77.fsf@nvidia.com>
+References: <cover.1729786087.git.petrm@nvidia.com>
+	<20241029121807.1a00ae7d@kernel.org>
+	<87ldxzky77.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAKmqyKNkPGPg8xsYDY9FtNvqJQsFmQ1o8KYHQXutrN1kHxsPww@mail.gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> Which comes from autogenerated C code like this
+On Mon, 4 Nov 2024 12:43:11 +0100 Petr Machata wrote:
+> > On Thu, 24 Oct 2024 18:57:35 +0200 Petr Machata wrote:  
+> >> Besides this approach, we considered just passing a boolean back from the
+> >> driver, which would indicate whether the notification was done. But the
+> >> approach presented here seems cleaner.  
+> >
+> > Oops, I missed the v2, same question:
+> >
+> >   What about adding a bit to the ops struct to indicate that 
+> >   the driver will generate the notification? Seems smaller in 
+> >   terms of LoC and shifts the responsibility of doing extra
+> >   work towards more complex users.
+> >
+> > https://lore.kernel.org/all/20241029121619.1a710601@kernel.org/  
 > 
-> ```
-> void mdio45_ethtool_gset__extern(const struct mdio_if_info *mdio,
-> struct ethtool_cmd *ecmd) { mdio45_ethtool_gset(mdio, ecmd); }
-> ```
+> Sorry for only responding now, I was out of office last week.
 > 
-> mdio45_ethtool_gset__extern() is never called, so I'm not clear why
-> it's not optimised out.
-
-I think you need to understand this first, before deciding on the path
-forward.
- 
-> It's not only MDIO that hits this, but so far there aren't too many
-> cases. That will obviously depend on the config used though.
+> The reason I went with outright responsibility shift is that the
+> alternatives are more complex.
 > 
-> There will be issues like this over the kernel. I'm not sure fixing
-> them all is the right approach as it might be too much work and too
-> hard to narrow down all occurance.
+> For the flag in particular, first there's no place to set the flag
+> currently, we'd need a field in struct net_device_ops. But mainly, then
+> you have a code that needs to corrently handle both states of the flag,
+> and new-style drivers need to remember to set the flag, which is done in
+> a different place from the fdb_add/del themselves. It might be fewer
+> LOCs, but it's a harder to understand system.
+> 
+> Responsibility shift is easy. "Thou shalt notify." Done, easy to
+> understand, easy to document. When cut'n'pasting, you won't miss it.
 
-Actually, that is mostly just CPU cycles. There are build bots which
-make builds with random configurations. Arnd Bergmann has one such
-bot, for example. Systems like that will find the issues for you.
+Makes sense for real proto drivers, but we also need to touch 4
+Ethernet drivers. While we can trust proto drivers to do the right
+thing, HW driver devs on average are average. And I can't think of
+another case where driver would send netlink notifications directly.
 
-> But to me it seems like the correct
-> fix as the current code is calling a function that might not exist,
-> hence the patch :)
+> Let me know what you think.
 
-As 0-day has shown, another build bot, your patch is not correct and
-causes problems. You can try again, but maybe first dig into the
-linker.
-
-Humm, interesting. I don't actually find anything calling
-mdio45_ethtool_gset(). So you might be able to just remove it.  And
-then i think you can remove mdio45_ethtool_gset_npage(). But i might
-be wrong...
-
-	Andrew
+Mild preference towards keeping the expectations from HW drivers as low
+as possible. But I don't feel strongly. Let me revive the series in PW
+so it is top of the list for Paolo tomorrow.. :)
 
