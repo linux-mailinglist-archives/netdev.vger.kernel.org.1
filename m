@@ -1,214 +1,225 @@
-Return-Path: <netdev+bounces-141832-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A57F39BC7A7
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:06:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 641789BC821
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:38:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 660FD282A46
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:06:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8730C1C22407
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:38:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BDBD1FEFB8;
-	Tue,  5 Nov 2024 08:05:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="fXZrQQzg"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C71F1CF7DB;
+	Tue,  5 Nov 2024 08:38:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82D111C57B2
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:05:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+Received: from smtp.chopps.org (smtp.chopps.org [54.88.81.56])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 860F413633F
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:38:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=54.88.81.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730793958; cv=none; b=vEUcw3Gluz8buphqTtW2uj+LcqoOowxQZjk2DHVjDb7m/b1CjleiE8aassGTW0olliNZQTsC4oP95TAA2LUsnD5/qkwIoIcEe3+MSjMYuvSJC39NZaMd9QkBj28B3K6yoZNkVpQmgRTXxDvPxL7Kidyqi1BSlU7tv7Ii2FtXcWU=
+	t=1730795911; cv=none; b=U0y2DQe8BafT7xiwsk6YAHNGxDHMECnOk+57BnNlyTkDaBWqratcF7Xo3d7mIWMt3H8mgPVjsWJixnROA4iBiH8Ae2IV8OM0TJB23lg5Xx0Qc7kWYAhHiRtKnORmqF2NphzxYU74dRSLtyrc3pCZb13gMjYmtOUkDlNpwYbkWZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730793958; c=relaxed/simple;
-	bh=YPaHXVAA/YI+D7uTy+xljhnWRnN8Gd/dLo79RfZ+upo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SrrzUyTHWsg8sma2wV1bWPlKLibkpS/C17udDY5PsFPlYxayNG1DwA9dRz5DDO7+ajjaBDBcswiBKJXdYihLZuw6PgWI+tHrB/ZdfwNK4Jsi9pkmxg2uzmBBZqNaQOvyGFVVzLc7VWfT4YiWbvdA3Ms3TQhOPHvurDjSFSJheE4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=fXZrQQzg; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com [209.85.128.72])
+	s=arc-20240116; t=1730795911; c=relaxed/simple;
+	bh=xesErViyi3xjC7jxBFte8NoyGGgvxSI+jxdpRC4R0a8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=pb/ehOtolPylLChg547UusvqoSri+kx5TJN/kzPDUgGCbw4HVY7R6+N4ocN4fW819NuGsnHIQ1d0el0M5tBSFA6glCvlC4Qx8hXvzh9WKI8lFy1FExJ0KY+9OXOmiCqA3c6YlMdjua/NXLayT52qH8XTlGqaX9ONU4WdoMUH+W0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org; spf=fail smtp.mailfrom=chopps.org; arc=none smtp.client-ip=54.88.81.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=chopps.org
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=chopps.org
+Received: from labnh.big (syn-172-222-091-149.res.spectrum.com [172.222.91.149])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 6554D3F18D
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 08:05:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1730793952;
-	bh=ZOwmbvypNY7SJx9qJfB/HL5HYlEP7KynRr9HfRBtRvU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type;
-	b=fXZrQQzgkHySctVkAWdpCi7tOIIAIHyqx8hzoB5gFE4BEhrqwtP/6n1P0Pn7KG8Ft
-	 IQTYZTaBtOUEN1YyOQif6lZqzP58uMwSVoFidR0v0/zs0dskCP3N6MdIglvNhVnWIe
-	 62IA/Ve8vSLy6rNRDNdPvKPxoQoL0V98KPf+TFO/gaaXXwiRjwkJVqxzDLs1L03uaN
-	 09qnhwdWOs0u/yWiIa7yzBr07jzYPQgXeeABkrC6u8G70ImGXdS1vI9eTaYmidu5FK
-	 dVacJBRkUOxkVECmW3vyTjEVdIFB5yPOPDQ7kPaxEnksf6V3qRp2BjB9SEyTt6naVE
-	 nbtE8UMUok94Q==
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4314c6ca114so38081265e9.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 00:05:52 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730793952; x=1731398752;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZOwmbvypNY7SJx9qJfB/HL5HYlEP7KynRr9HfRBtRvU=;
-        b=kFEFC3jeg/aORIptiTzttqauqHySmCITCLcG3OK3M/5pEOiT1nYymqJaJRmp10esyX
-         IzwI7T+dzixyWmgZZw4aj9f7XbHP3mV4mztTbts12KhGaMeZ1Sh4vrvAUkst1G+Tg/Wo
-         n88jV4bFAE3DuTIjQYe9pgwSSBeAsjag2P5ADHQ12GX+yR446DbBRkC2t/3fwqxWBmly
-         Dav3kZYTASnILW+TT5RxTw4WR77skzweS/j0oo6UbqdWm0k5U+tAmTbyQ4uKP79+vyGe
-         n+80IhnnmsZ7kva8CGoHeipu0wR1NEj9DxmK4X8394i7uf8zuMzTpp9rqYZa+BBJF9wc
-         ESrw==
-X-Forwarded-Encrypted: i=1; AJvYcCV15g7SJECqXhIpPSeDTP48awxwL47lYd74cz1RVt+dvae6y3EU4vJrQeCCkTD7B8hn0j6fuUk=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxv+aSaFNoMnyiHJS+lM5fcKrsb/vVmEVfQmPns+DchcC+0KWvq
-	lDWcum8CP/NuUah8dFrZYhw+/nIO8XmNEJfWQpPSEPRoaqA50rrSq9KapRQILKRsc3kKH3J+Kys
-	sw5F4FkRDooDHCipFHuFyhq9WrrG79L51kmN/TrS8NwRRfavxldBktK4NoKqvo0WDNKcgjEu7Ri
-	hIBk1uisw5A2eXua4bvZtDb8rwNzrfgKIFmXjtg08PsnfV
-X-Received: by 2002:a5d:6c68:0:b0:381:b68f:d14b with SMTP id ffacd0b85a97d-381bea1bfc4mr15826496f8f.45.1730793951682;
-        Tue, 05 Nov 2024 00:05:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHX/dSSZILHuK3uVDEXge5/gJUupfGp22dMkdum7U3ygcz4rT9yxy5cRYzjNB2z/aX/ElvjbgmclkkYIl4wslQ=
-X-Received: by 2002:a5d:6c68:0:b0:381:b68f:d14b with SMTP id
- ffacd0b85a97d-381bea1bfc4mr15826465f8f.45.1730793951234; Tue, 05 Nov 2024
- 00:05:51 -0800 (PST)
+	(Client did not present a certificate)
+	by smtp.chopps.org (Postfix) with ESMTPSA id 4333C7D0E5;
+	Tue,  5 Nov 2024 08:38:20 +0000 (UTC)
+From: Christian Hopps <chopps@chopps.org>
+To: devel@linux-ipsec.org
+Cc: Steffen Klassert <steffen.klassert@secunet.com>,
+	netdev@vger.kernel.org,
+	Florian Westphal <fw@strlen.de>,
+	Sabrina Dubroca <sd@queasysnail.net>,
+	Simon Horman <horms@kernel.org>,
+	Antony Antony <antony@phenome.org>,
+	Christian Hopps <chopps@chopps.org>
+Subject: [PATCH ipsec-next v13 00/15] Add IP-TFS mode to xfrm
+Date: Tue,  5 Nov 2024 03:37:44 -0500
+Message-ID: <20241105083759.2172771-1-chopps@chopps.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240912071702.221128-1-en-wei.wu@canonical.com>
- <20240912113518.5941b0cf@gmx.net> <CANn89iK31kn7QRcFydsH79Pm_FNUkJXdft=x81jvKD90Z5Y0xg@mail.gmail.com>
- <CAMqyJG1W1ER0Q_poS7HQhsogxr1cBo2inRmyz_y5zxPoMtRhrA@mail.gmail.com>
- <CANn89iJ+ijDsTebhKeviXYyB=NQxP2=srpZ99Jf677+xTe7wqg@mail.gmail.com>
- <CAMqyJG1aPBsRFz1XK2JvqY+QUg2HhxugVXG1ZaF8yKYg=KoP3Q@mail.gmail.com>
- <CANn89i+4c0iLXXjFpD1OWV7OBHr5w4S975MKRVB9VU2L-htm4w@mail.gmail.com>
- <CAMqyJG2MqU46jRC1NzYCUeJ45fiP5Z5nS78Mi0FLFjbKbLVrFg@mail.gmail.com> <CAMqyJG0DYVaTXHxjSH8G8ZPRc=2aDB0SZVhoPf2MXpiNT1OXxA@mail.gmail.com>
-In-Reply-To: <CAMqyJG0DYVaTXHxjSH8G8ZPRc=2aDB0SZVhoPf2MXpiNT1OXxA@mail.gmail.com>
-From: En-Wei WU <en-wei.wu@canonical.com>
-Date: Tue, 5 Nov 2024 16:05:40 +0800
-Message-ID: <CAMqyJG2UKG_P5Dbp6t=K98HAhBVHu-iuCrTjUx+NqzUJHTDA0w@mail.gmail.com>
-Subject: Re: [PATCH ipsec v2] xfrm: check MAC header is shown with both
- skb->mac_len and skb_mac_header_was_set()
-To: Eric Dumazet <edumazet@google.com>
-Cc: Peter Seiderer <ps.report@gmx.net>, steffen.klassert@secunet.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kai.heng.feng@canonical.com, chia-lin.kao@canonical.com, 
-	anthony.wong@canonical.com, kuan-ying.lee@canonical.com, 
-	chris.chiu@canonical.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-Hi,
+* Summary of Changes:
 
-Can I kindly ask if there is any progress?
+This patchset adds a new xfrm mode implementing on-demand IP-TFS. IP-TFS
+(AggFrag encapsulation) has been standardized in RFC9347.
 
-Thanks,
-Regards.
+  Link: https://www.rfc-editor.org/rfc/rfc9347.txt
 
-On Fri, 18 Oct 2024 at 21:21, En-Wei WU <en-wei.wu@canonical.com> wrote:
->
-> > Seems like the __netif_receive_skb_core() and dev_gro_receive() are
-> > the places where it calls skb_reset_mac_len() with skb->mac_header =3D
-> > ~0U.
-> I believe it's the root cause.
->
-> My concern is that if we put something like:
-> +       if (!skb_mac_header_was_set(skb)) {
-> +               DEBUG_NET_WARN_ON_ONCE(1);
-> +               skb->mac_len =3D 0;
-> in skb_reset_mac_len(), it may degrade the RX path a bit.
->
-> Catching the bug in xfrm4_remove_tunnel_encap() and
-> xfrm6_remove_tunnel_encap() (the original patch) is nice because it
-> won't affect the systems which are not using the xfrm.
->
-> Kind Regards,
-> En-Wei.
->
-> On Mon, 14 Oct 2024 at 22:06, En-Wei WU <en-wei.wu@canonical.com> wrote:
-> >
-> > Hi, sorry for the late reply.
-> >
-> > I've tested this debug patch (with CONFIG_DEBUG_NET=3Dy) on my machine,
-> > and the DEBUG_NET_WARN_ON_ONCE never got triggered.
-> >
-> > Thanks.
-> >
-> > On Wed, 2 Oct 2024 at 14:59, Eric Dumazet <edumazet@google.com> wrote:
-> > >
-> > > On Wed, Oct 2, 2024 at 12:40=E2=80=AFPM En-Wei WU <en-wei.wu@canonica=
-l.com> wrote:
-> > > >
-> > > > Hi,
-> > > >
-> > > > I would kindly ask if there is any progress :)
-> > >
-> > > Can you now try this debug patch (with CONFIG_DEBUG_NET=3Dy ) :
-> > >
-> > > diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> > > index 39f1d16f362887821caa022464695c4045461493..e0e4154cbeb90474d9263=
-4d505869526c566f132
-> > > 100644
-> > > --- a/include/linux/skbuff.h
-> > > +++ b/include/linux/skbuff.h
-> > > @@ -2909,9 +2909,19 @@ static inline void
-> > > skb_reset_inner_headers(struct sk_buff *skb)
-> > >         skb->inner_transport_header =3D skb->transport_header;
-> > >  }
-> > >
-> > > +static inline int skb_mac_header_was_set(const struct sk_buff *skb)
-> > > +{
-> > > +       return skb->mac_header !=3D (typeof(skb->mac_header))~0U;
-> > > +}
-> > > +
-> > >  static inline void skb_reset_mac_len(struct sk_buff *skb)
-> > >  {
-> > > -       skb->mac_len =3D skb->network_header - skb->mac_header;
-> > > +       if (!skb_mac_header_was_set(skb)) {
-> > > +               DEBUG_NET_WARN_ON_ONCE(1);
-> > > +               skb->mac_len =3D 0;
-> > > +       } else {
-> > > +               skb->mac_len =3D skb->network_header - skb->mac_heade=
-r;
-> > > +       }
-> > >  }
-> > >
-> > >  static inline unsigned char *skb_inner_transport_header(const struct=
- sk_buff
-> > > @@ -3014,11 +3024,6 @@ static inline void
-> > > skb_set_network_header(struct sk_buff *skb, const int offset)
-> > >         skb->network_header +=3D offset;
-> > >  }
-> > >
-> > > -static inline int skb_mac_header_was_set(const struct sk_buff *skb)
-> > > -{
-> > > -       return skb->mac_header !=3D (typeof(skb->mac_header))~0U;
-> > > -}
-> > > -
-> > >  static inline unsigned char *skb_mac_header(const struct sk_buff *sk=
-b)
-> > >  {
-> > >         DEBUG_NET_WARN_ON_ONCE(!skb_mac_header_was_set(skb));
-> > > @@ -3043,6 +3048,7 @@ static inline void skb_unset_mac_header(struct
-> > > sk_buff *skb)
-> > >
-> > >  static inline void skb_reset_mac_header(struct sk_buff *skb)
-> > >  {
-> > > +       DEBUG_NET_WARN_ON_ONCE(skb->data < skb->head);
-> > >         skb->mac_header =3D skb->data - skb->head;
-> > >  }
-> > >
-> > > @@ -3050,6 +3056,7 @@ static inline void skb_set_mac_header(struct
-> > > sk_buff *skb, const int offset)
-> > >  {
-> > >         skb_reset_mac_header(skb);
-> > >         skb->mac_header +=3D offset;
-> > > +       DEBUG_NET_WARN_ON_ONCE(skb_mac_header(skb) < skb->head);
-> > >  }
-> > >
-> > >  static inline void skb_pop_mac_header(struct sk_buff *skb)
+This feature supports demand driven (i.e., non-constant send rate)
+IP-TFS to take advantage of the AGGFRAG ESP payload encapsulation. This
+payload type supports aggregation and fragmentation of the inner IP
+packet stream which in turn yields higher small-packet bandwidth as well
+as reducing MTU/PMTU issues. Congestion control is unimplementated as
+the send rate is demand driven rather than constant.
+
+In order to allow loading this fucntionality as a module a set of
+callbacks xfrm_mode_cbs has been added to xfrm as well.
+
+Patchset Structure:
+-------------------
+
+The first 5 commits are changes to the net and xfrm infrastructure to
+support the callbacks as well as more generic IP-TFS additions that
+may be used outside the actual IP-TFS implementation.
+
+  - xfrm: config: add CONFIG_XFRM_IPTFS
+  - include: uapi: protocol number and packet structs for AGGFRAG in ESP
+  - xfrm: netlink: add config (netlink) options
+  - xfrm: add mode_cbs module functionality
+  - xfrm: add generic iptfs defines and functionality
+
+The last 10 commits constitute the IP-TFS implementation constructed in
+layers to make review easier. The first 9 commits all apply to a single
+file `net/xfrm/xfrm_iptfs.c`, the last commit adds a new tracepoint
+header file along with the use of these new tracepoint calls.
+
+  - xfrm: iptfs: add new iptfs xfrm mode impl
+  - xfrm: iptfs: add user packet (tunnel ingress) handling
+  - xfrm: iptfs: share page fragments of inner packets
+  - xfrm: iptfs: add fragmenting of larger than MTU user packets
+  - xfrm: iptfs: add basic receive packet (tunnel egress) handling
+  - xfrm: iptfs: handle received fragmented inner packets
+  - xfrm: iptfs: add reusing received skb for the tunnel egress packet
+  - xfrm: iptfs: add skb-fragment sharing code
+  - xfrm: iptfs: handle reordering of received packets
+  - xfrm: iptfs: add tracepoint functionality
+
+Patchset History:
+-----------------
+
+v12->v13 (11/5/2024)
+  - rebase on updated ipsec-next
+  - remove non-standard WARN_ON usages
+  - remove non-standard (void) prefix use which indicated ignored return value.
+  - move 2 structure fields to compact in-core layout
+  - refactor loop out of iptfs_input_ordered() to improve code readability
+  - a few format cleanup changes.
+
+v11->v12 (9/14/2024)
+  - fix for SA migration, dont alloc over top of newly cloned data 
+
+v10->v11 (9/6/2024)
+  - fix double init when xfrm_migrate_state (clone) is called.
+  - rename create_state, clone, and delete_state callbacks to
+    init_state, clone_state, and destroy_state.
+  - skb_orphan skbs prior to aggregation
+
+v9->v10 (8/23/2024)
+  - use relocated skb_copy_seq_read now in skbuff.[ch]
+  - be thoughtful about skb reserve space in new skbs, use existing #defines and
+    skb meta-data to calculate new skb reserve and alignment.
+  - only copy dst (on in/out) and dev, ext (on resume input) values from
+    existing skb header to new skb's -- drop use of rejected new
+    ___copy_skb_header() function.
+  - update other iptfs specific skb function names
+
+v8->v9 (8/7/2024)
+  - factor common code from skbuff.c:__copy_skb_header into
+    ___copy_skb_header and use in iptfs rather that copying any code.
+  - change all BUG_ON to WARN_ON_ONCE
+  - remove unwanted new NOSKB xfrm MIB error counter
+  - remove unneeded copy or share choice function
+  - ifdef CONFIG_IPV6 around IPv6 function
+
+v7->v8 (8/4/2024)
+  - Use lock and rcu to load iptfs module -- copy existing use pattern
+  - fix 2 warnings from the kernel bot
+
+v6->v7 (8/1/2024)
+  - Rebased on latest ipsec-next
+
+v5->v6 (7/31/2024)
+  * sysctl: removed IPTFS sysctl additions
+  - xfrm: use array of pointers vs structs for mode callbacks
+  - iptfs: eliminate a memleak during state alloc failure
+  - iptfs: free send queue content on SA delete
+  - add some kdoc and comments
+  - cleanup a couple formatting choices per Steffen
+
+v4->v5 (7/14/2024)
+  - uapi: add units to doc comments
+  - iptfs: add MODULE_DESCRIPTION()
+  - squash nl-direction-update commit
+
+v2->v4 (6/17/2024)
+
+  - iptfs: copy only the netlink attributes to user based on the
+    direction of the SA.
+
+  - xfrm: stats: in the output path check for skb->dev == NULL prior to
+    setting xfrm statistics on dev_net(skb->dev) as skb->dev may be NULL
+    for locally generated packets.
+
+  - xfrm: stats: fix an input use case where dev_net(skb->dev) is used
+    to inc stats after skb is possibly NULL'd earlier. Switch to using
+    existing saved `net` pointer.
+
+v2->v3
+  - Git User Glitch
+
+v1 -> v2 (5/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, Simon Horman, Antony.
+
+  o Add handling of new netlink SA direction attribute (Antony).
+  o Split single patch/commit of xfrm_iptfs.c (the actual IP-TFS impl)
+    into 9+1 distinct layered functionality commits for aiding review.
+  - xfrm: fix return check on clone() callback
+  - xfrm: add sa_len() callback in xfrm_mode_cbs for copy to user
+  - iptfs: remove unneeded skb free count variable
+  - iptfs: remove unused variable and "breadcrumb" for future code.
+  - iptfs: use do_div() to avoid "__udivd13 missing" link failure.
+  - iptfs: remove some BUG_ON() assertions questioned in review.
+
+RFCv2 -> v1 (2/19/2024)
+
+  Updates based on feedback from Sabrina Dubroca, kernel test robot
+
+RFCv1 -> RFCv2 (11/12/2023)
+
+  Updates based on feedback from Simon Horman, Antony,
+  Michael Richardson, and kernel test robot.
+
+RFCv1 (11/10/2023)
+
+Patchset Changes:
+-----------------
+
+ include/net/xfrm.h         |   44 +
+ include/uapi/linux/in.h    |    2 +
+ include/uapi/linux/ip.h    |   16 +
+ include/uapi/linux/ipsec.h |    3 +-
+ include/uapi/linux/snmp.h  |    2 +
+ include/uapi/linux/xfrm.h  |    9 +-
+ net/ipv4/esp4.c            |    3 +-
+ net/ipv6/esp6.c            |    3 +-
+ net/netfilter/nft_xfrm.c   |    3 +-
+ net/xfrm/Kconfig           |   16 +
+ net/xfrm/Makefile          |    1 +
+ net/xfrm/trace_iptfs.h     |  218 ++++
+ net/xfrm/xfrm_compat.c     |   10 +-
+ net/xfrm/xfrm_device.c     |    4 +-
+ net/xfrm/xfrm_input.c      |   18 +-
+ net/xfrm/xfrm_iptfs.c      | 2762 ++++++++++++++++++++++++++++++++++++++++++++
+ net/xfrm/xfrm_output.c     |    6 +
+ net/xfrm/xfrm_policy.c     |   26 +-
+ net/xfrm/xfrm_proc.c       |    2 +
+ net/xfrm/xfrm_state.c      |   84 ++
+ net/xfrm/xfrm_user.c       |   77 ++
+ 21 files changed, 3290 insertions(+), 19 deletions(-)
 
