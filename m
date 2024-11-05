@@ -1,124 +1,217 @@
-Return-Path: <netdev+bounces-141949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141950-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99F3F9BCC46
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:02:05 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22D4E9BCC53
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:05:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0636E28381F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:02:04 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A32001F2259C
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:05:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 577901D433C;
-	Tue,  5 Nov 2024 12:02:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9DB41D3590;
+	Tue,  5 Nov 2024 12:05:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="YJcOmrSq"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="R+58TR5e"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com [209.85.208.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301271420A8;
-	Tue,  5 Nov 2024 12:01:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E351A1420A8
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 12:05:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730808120; cv=none; b=msDuWli4yz0goDUnuxUlA4czdhlufQgAG/TNVArhrysGodX1t0vGR24wqkvvmxdhuOqNK523TT697+soFIbjnZ8dhsSSLxxboZMlLggXTzS2wRMLrUqWaYDiWuUn7vL56zVeawck1iZCW1do68OebG6JaWFy9+xRzNRA0bqqf0A=
+	t=1730808337; cv=none; b=Oze4x6+VVPyU96CiInlMAzyoq+NPyuZBKF/40a1KfgaBDRHbHD8xYJv3/bTntdd/Uy0ZVYh28DeOIKvQUlBr9qAYOuySfNlbcXQP6oNEJ82JqAbJ76sTN28NSN995j9VUn3jK8WCEjD0Ov5D2ZnUuD9zh6MIq6+7gvTbp1IEm6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730808120; c=relaxed/simple;
-	bh=TX6sX6x1up/HYFMnp1EPSdB0aCTeIScsn4RhiXQgfc4=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=RHJKVFr6Wih3AlvYwcaZB99KpLyg57CtqO9HEvxKWzRD+oswNMaGZwgclYcRDuKvKK7Ct0LoxcMqLSEQs4+8eVEGi0pKGw0yi6AhyB2Q501dOtQDoLF0dm/HqwkhbY6O6KE798rK/OKxZ6r9dnLCiMsmzCMgrfK/2HYlxA+V6Tg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=YJcOmrSq; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A5C1KxR073177;
-	Tue, 5 Nov 2024 06:01:20 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1730808080;
-	bh=I8Ot+L92FMNzAT/dVawQMY/gWiO3L4DG4uE/gA9uMU4=;
-	h=Date:Subject:To:CC:References:From:In-Reply-To;
-	b=YJcOmrSqnbVxJv3RZnS+O4a2zYBk1oirNEMArSbhYG+TopXlv7wUrfxEt2RI6JGKx
-	 OfLuH6P6fQ61TMuaGeuytiWNFJV0jOQlE1FZ7DlIwOgeUhcjacN1VKLJDl+AcI3rIB
-	 mEhgAIeNhybc3XEWtCGMyuTG/e6n3xW8GjFhIpvQ=
-Received: from DLEE115.ent.ti.com (dlee115.ent.ti.com [157.170.170.26])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A5C1KA1076249
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Tue, 5 Nov 2024 06:01:20 -0600
-Received: from DLEE114.ent.ti.com (157.170.170.25) by DLEE115.ent.ti.com
- (157.170.170.26) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Tue, 5
- Nov 2024 06:01:19 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE114.ent.ti.com
- (157.170.170.25) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Tue, 5 Nov 2024 06:01:20 -0600
-Received: from [10.249.139.24] ([10.249.139.24])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A5C1DuV010566;
-	Tue, 5 Nov 2024 06:01:14 -0600
-Message-ID: <e5c5c9ba-fca1-4fa3-a416-1fc972ebd258@ti.com>
-Date: Tue, 5 Nov 2024 17:31:13 +0530
+	s=arc-20240116; t=1730808337; c=relaxed/simple;
+	bh=1o1hL7u8t3knUwr6QN9CBxlQ7s8tpURff1KLnwqTZJA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UjuG/InJtW1Yr8JayX1q/SIOEyy/j+slyxBi+fDwirH3IhtOupXPurfLKar2DWrOxiBTV7UJRYMCWPUY/BXOrtVM8cBLMHubxKrPUXPy2c2ngz/4d+CrYXMzDTo2hj7IDJEbKzrIvxpJKdEhKE4rvVydOhiDXskJL4vcfJgpAP8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=R+58TR5e; arc=none smtp.client-ip=209.85.208.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5cb74434bc5so6407801a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 04:05:35 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730808334; x=1731413134; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=FF3hwYD23ug7VZfZqHJ0XCjhnmDAoHBN/jSAW6GSbDM=;
+        b=R+58TR5eh9QF3H+v7QplmrnGH3EzCdTotFBMe9hTQo8NuZgmfOvvOBm8zrwAkNJhZL
+         fzM1hF2eCrSwYaa4+s8kc0dR9qfOsECSulbni125mZUTfcoYKhs5tgTA+tN3F1ZTAOvs
+         NmhoxV4KrHjjphkNiamLh1sWEmRk1IKqdH5hOnkTY84IM3m0ZrlYtTK0j6bBcE2CM6+k
+         JleK11cYuVfUKiagjUteZC7QbQaadz29i3CDl0oGX+WZKWw/M+a5/8sg8jdWsN4stCEh
+         xhBEmoaMpkhZaQa0n4Jn829ImJ0JmXC5QzgWg2VK/YMLm/gOg5kF7dz3s46DJmzPgNdi
+         mSIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730808334; x=1731413134;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FF3hwYD23ug7VZfZqHJ0XCjhnmDAoHBN/jSAW6GSbDM=;
+        b=Uj0yUzIfwx+l01EWOvpGS+N7VdJyNQ0gQhgANYeHrdGaTEZRpl54ix321o7rgK5seQ
+         39irc621ZX0qCq1Y40ryy02XnCoKNASjZKohbKK8NE6tXKGe3VQafPCM1iU6g4CAuXUs
+         UPZDyntMWyhnwWE3E3y28vZpPTcysUZJrSjqhehsdK0+F0qVobZWjN1t6Y6PDJSnzUac
+         0Vp9zqIL7X2jZ2rxCsfVpVyeSUNGPE0yE0LIeX1r4ALL/6gMV2ItmDlLip055w/vgWG1
+         KsfRNYn2DKPul5rreBV7l+JLXWNENz+ZgQkPhFfTeTQ2EE0rbfvRlmgUVEvAaRf7vhW5
+         HXEQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX3Eg06wsg5PEWWE1omnAe6rcdowAA1kwz+UqcOJbZI6e/s92ZAiftwyPnd9pNOFY3yPdwRVLo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YweND8R/Gv82i4azgbzehHiTJyHKjrKpi6gX9K1HXYpDkaxCoSP
+	E56LFjm5FOYyZJ0wP2faM6NRAEzGm9Qhgv37DuGYEP5zO++a0t4XoZTmH96IYepKG0aXsZqYe8f
+	IYLkwvtPDR9roXLt3mTLF9b14CVn+aR6VSKZI
+X-Google-Smtp-Source: AGHT+IFLvNlim71LLo6Kdt/lnGcW1D2y5GJ9cztTDnAmK2US9BCsS5zEDvIOxpDKrBrzO0dVNMIj9a7RwqYpgU2f8XA=
+X-Received: by 2002:a05:6402:358f:b0:5ce:d6a0:be32 with SMTP id
+ 4fb4d7f45d1cf-5ced6a0c1bamr5035974a12.1.1730808333773; Tue, 05 Nov 2024
+ 04:05:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix 1 PPS sync
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <vigneshr@ti.com>, <horms@kernel.org>, <jan.kiszka@siemens.com>,
-        <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <edumazet@google.com>,
-        <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
-        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>,
-        Vadim Fedorenko
-	<vadim.fedorenko@linux.dev>
-References: <20241028111051.1546143-1-m-malladi@ti.com>
- <20241031185905.610c982f@kernel.org>
- <7c3318f4-a2d4-4cbf-8a93-33c6a8afd6c4@ti.com>
- <20241104185031.0c843951@kernel.org>
-Content-Language: en-US
-From: "Malladi, Meghana" <m-malladi@ti.com>
-In-Reply-To: <20241104185031.0c843951@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20241104152622.3580037-1-edumazet@google.com> <D2067CE4-F300-4DED-8012-9718FD6AB67F@remlab.net>
+In-Reply-To: <D2067CE4-F300-4DED-8012-9718FD6AB67F@remlab.net>
+From: Eric Dumazet <edumazet@google.com>
+Date: Tue, 5 Nov 2024 13:05:22 +0100
+Message-ID: <CANn89iKN2HsFRYiboWn38zfptAsFRiRo89p7EGHFQu90=-O+3w@mail.gmail.com>
+Subject: Re: [PATCH net-next] phonet: do not call synchronize_rcu() from phonet_route_del()
+To: =?UTF-8?Q?R=C3=A9mi_Denis=2DCourmont?= <remi@remlab.net>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot <syzkaller@googlegroups.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	Remi Denis-Courmont <courmisch@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+On Tue, Nov 5, 2024 at 12:05=E2=80=AFPM R=C3=A9mi Denis-Courmont <remi@reml=
+ab.net> wrote:
+>
+>
+>
+> Le 4 novembre 2024 17:26:22 GMT+02:00, Eric Dumazet <edumazet@google.com>=
+ a =C3=A9crit :
+> >Calling synchronize_rcu() while holding rcu_read_lock() is not
+> >permitted [1]
+> >
+> >Move the synchronize_rcu() to route_doit().
+> >
+> >[1]
+> >WARNING: suspicious RCU usage
+> >6.12.0-rc5-syzkaller-01056-gf07a6e6ceb05 #0 Not tainted
+> >-----------------------------
+> >kernel/rcu/tree.c:4092 Illegal synchronize_rcu() in RCU read-side critic=
+al section!
+> >
+> >other info that might help us debug this:
+> >
+> >rcu_scheduler_active =3D 2, debug_locks =3D 1
+> >1 lock held by syz-executor427/5840:
+> >  #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire=
+ include/linux/rcupdate.h:337 [inline]
+> >  #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock in=
+clude/linux/rcupdate.h:849 [inline]
+> >  #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: route_doit+0x3d6=
+/0x640 net/phonet/pn_netlink.c:264
+> >
+> >stack backtrace:
+> >CPU: 1 UID: 0 PID: 5840 Comm: syz-executor427 Not tainted 6.12.0-rc5-syz=
+kaller-01056-gf07a6e6ceb05 #0
+> >Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS =
+Google 09/13/2024
+> >Call Trace:
+> > <TASK>
+> >  __dump_stack lib/dump_stack.c:94 [inline]
+> >  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+> >  lockdep_rcu_suspicious+0x226/0x340 kernel/locking/lockdep.c:6821
+> >  synchronize_rcu+0xea/0x360 kernel/rcu/tree.c:4089
+> >  phonet_route_del+0xc6/0x140 net/phonet/pn_dev.c:409
+> >  route_doit+0x514/0x640 net/phonet/pn_netlink.c:275
+> >  rtnetlink_rcv_msg+0x791/0xcf0 net/core/rtnetlink.c:6790
+> >  netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+> >  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+> >  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+> >  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+> >  sock_sendmsg_nosec net/socket.c:729 [inline]
+> >  __sock_sendmsg+0x221/0x270 net/socket.c:744
+> >  sock_write_iter+0x2d7/0x3f0 net/socket.c:1165
+> >  new_sync_write fs/read_write.c:590 [inline]
+> >  vfs_write+0xaeb/0xd30 fs/read_write.c:683
+> >  ksys_write+0x183/0x2b0 fs/read_write.c:736
+> >  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> >  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+> > entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> >
+> >Fixes: 17a1ac0018ae ("phonet: Don't hold RTNL for route_doit().")
+> >Reported-by: syzbot <syzkaller@googlegroups.com>
+> >Signed-off-by: Eric Dumazet <edumazet@google.com>
+> >Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> >Cc: Remi Denis-Courmont <courmisch@gmail.com>
+> >---
+> > net/phonet/pn_dev.c     |  4 +++-
+> > net/phonet/pn_netlink.c | 10 ++++++++--
+> > 2 files changed, 11 insertions(+), 3 deletions(-)
+> >
+> >diff --git a/net/phonet/pn_dev.c b/net/phonet/pn_dev.c
+> >index 19234d664c4fb537eba0267266efbb226cf103c3..578d935f2b11694fd1004c5f=
+854ec344b846eeb2 100644
+> >--- a/net/phonet/pn_dev.c
+> >+++ b/net/phonet/pn_dev.c
+> >@@ -406,7 +406,9 @@ int phonet_route_del(struct net_device *dev, u8 dadd=
+r)
+> >
+> >       if (!dev)
+> >               return -ENOENT;
+> >-      synchronize_rcu();
+> >+
+> >+      /* Note : our caller must call synchronize_rcu() */
+> >+
+> >       dev_put(dev);
+> >       return 0;
+> > }
+> >diff --git a/net/phonet/pn_netlink.c b/net/phonet/pn_netlink.c
+> >index ca1f04e4a2d9eb3b2a6d6cc5b299aee28d569b08..24930733ac572ed3ec5fd142=
+d347c115346a28fa 100644
+> >--- a/net/phonet/pn_netlink.c
+> >+++ b/net/phonet/pn_netlink.c
+> >@@ -233,6 +233,7 @@ static int route_doit(struct sk_buff *skb, struct nl=
+msghdr *nlh,
+> > {
+> >       struct net *net =3D sock_net(skb->sk);
+> >       struct nlattr *tb[RTA_MAX+1];
+> >+      bool sync_needed =3D false;
+> >       struct net_device *dev;
+> >       struct rtmsg *rtm;
+> >       u32 ifindex;
+> >@@ -269,16 +270,21 @@ static int route_doit(struct sk_buff *skb, struct =
+nlmsghdr *nlh,
+> >               return -ENODEV;
+> >       }
+> >
+> >-      if (nlh->nlmsg_type =3D=3D RTM_NEWROUTE)
+> >+      if (nlh->nlmsg_type =3D=3D RTM_NEWROUTE) {
+> >               err =3D phonet_route_add(dev, dst);
+> >-      else
+> >+      } else {
+> >               err =3D phonet_route_del(dev, dst);
+> >+              if (!err)
+> >+                      sync_needed =3D true;
+> >+      }
+> >
+> >       rcu_read_unlock();
+> >
+> >       if (!err)
+> >               rtm_phonet_notify(net, nlh->nlmsg_type, ifindex, dst);
+> >
+> >+      if (sync_needed)
+> >+              synchronize_rcu();
+>
+> Synchronising after sending notifications sounds a bit iffy. Whatever a g=
+iven notification is about should be fully committed so we don't create a u=
+ser-visible race here.
+>
+> Can't we reorder here?
 
-
-On 11/5/2024 8:20 AM, Jakub Kicinski wrote:
-> On Mon, 4 Nov 2024 16:55:46 +0530 Malladi, Meghana wrote:
->> On 11/1/2024 7:29 AM, Jakub Kicinski wrote:
->>> On Mon, 28 Oct 2024 16:40:52 +0530 Meghana Malladi wrote:
->>>> The first PPS latch time needs to be calculated by the driver
->>>> (in rounded off seconds) and configured as the start time
->>>> offset for the cycle. After synchronizing two PTP clocks
->>>> running as master/slave, missing this would cause master
->>>> and slave to start immediately with some milliseconds
->>>> drift which causes the PPS signal to never synchronize with
->>>> the PTP master.
->>>
->>> You're reading a 64b value in chunks, is it not possible that it'd wrap
->>> in between reads? This can be usually detected by reading high twice and
->>> making sure it didn't change.
->>>
->>> Please fix or explain in the commit message why this is not a problem..
->> Yes I agree that there might be a wrap if the read isn't atomic. As
->> suggested by Andrew I am currently not using custom read where I can
->> implement the logic you suggested
-> 
-> Right but I think Andrew was commenting on a patch which contained pure
-> re-implementation of read low / hi with no extra bells or whistles.
-> 
->> (reading high twice and making sure if
->> didn't change). Can you share me some references where this logic is
->> implemented in the kernel, so I can directly use that instead of writing
->> custom functions.
-> 
-> I think you need to write a custom one. Example:
-> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/meta/fbnic/fbnic_time.c#n40
-Ok thank you. I will add custom function for this and update the patch.
+Fair enough, I will move dev_put() here in V2.
 
