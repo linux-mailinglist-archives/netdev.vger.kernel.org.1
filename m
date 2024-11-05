@@ -1,99 +1,141 @@
-Return-Path: <netdev+bounces-142050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 999979BD3A0
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:44:12 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0920D9BD3A1
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:44:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3EAE81F217AD
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:44:12 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80BCEB217A2
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1930F1E32DA;
-	Tue,  5 Nov 2024 17:44:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7BAD1E379F;
+	Tue,  5 Nov 2024 17:44:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="1uUrvyjJ"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="quomWo7L"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8FE2DEAD2
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:44:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A231E285D
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:44:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730828648; cv=none; b=ekUomWxo5LOpPIyf/3HneWT2qubiiWXa2zWO6Q4Ky1McMmnUzuVO5PavYdWSH921716Zq3lxkgfGOnqKXiIa936QNxG6rmq6PZslpDsiyw21pHwcfWy7LcbaX+lbv3qqwfiuvmMGYNdGbj5YNX2wT0baRpbUav4IOBCrpjSv7MM=
+	t=1730828649; cv=none; b=Zc57nfMR4oFtWKolAKQsq0CrSv/PZsNahCghOFtFAXR3KMsU4kFQVTfCunnaOAMfvadQZz7Y/pSUxclh2YT2foMgg2il7TjQw7TDHiLqeukXzGy+ZKNjovL8lHx9AKFkOuMgiEi0PkzTkZYn4X9bxqNkH8hfCpVSYOUDlS1eDEg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730828648; c=relaxed/simple;
-	bh=ksOTXSYoaR9xlSxSCAkG0D/FqVL6U/2z8XdO90I5CLY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=tesAMOBQLAqj0FdVX6YBItzJlrknF2enAWbNS7cyimiuQz175GeY/MHa/iNioizzTN0B/K1rqfRsn4s5F8Bh9JfyOqbLe/cGzTqNSphFmU/h0HN81JEONuzjRxKR8gvDh7XUtyjgxUz5QyvonFclfskv8sbdHOWZnG2IpJNukWo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=1uUrvyjJ; arc=none smtp.client-ip=209.85.219.201
+	s=arc-20240116; t=1730828649; c=relaxed/simple;
+	bh=MYxeUBg12QQsE/3txUBzXdQMGaMsWXh0F6QpPFKQ/V8=;
+	h=Date:In-Reply-To:Mime-Version:References:Message-ID:Subject:From:
+	 To:Cc:Content-Type; b=rXXvEGXzLpUDgPdikaGvTCakw7pEeBm0Bm95vDgF5PgEgzQnVRHp1x4B2mAFsT8FxPt3k5OSpIYR5laiL1ay7tIZqtwmngxFlg2Km5jSA09Y0+86LJMNMKE4xVlxBeeSvFLKq8rNGcafb0cU0Sz0pAE7ZcY5eyxGafY/TSyTBcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=quomWo7L; arc=none smtp.client-ip=209.85.219.202
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e29142c79d6so9297737276.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 09:44:06 -0800 (PST)
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e30b8fd4ca1so9498300276.3
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 09:44:07 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730828645; x=1731433445; darn=vger.kernel.org;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=G4pjQVLZDflRtCsfAy85d1P2cqYuherDvdptxN/0yZk=;
-        b=1uUrvyjJkuSXV6tVz7vjfCC2Di774wM0l8xLsBl5UVReWhJw0hSz75WUW1mbGCuuwN
-         eCr67fWuSsg8dAqyYiRcNMZb9zFca2FQ+2EYvmwrbJSq7qCYTOFazlBMmWug8Og0o+zc
-         J9WbKr9NDBAdJvvQdr5Ue04cTdla7P6XnmSRW2twQEbn64Aax+Gxb+NtF1PiGWRXHhKN
-         Y5JOIROxHbDvtEyIn0HBmYb4PC92ebDTHxNPf4GIVwfYq0KbPlPMN1SpclstM7ufmW9K
-         XyL+aLvt6+BszM1k7C462tI765/FcPVJYk2PNZ2oDuqTcWmXvZPCPABpn04zjjHvT27H
-         Tf0Q==
+        d=google.com; s=20230601; t=1730828647; x=1731433447; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=xw8/m+j84Aso/IIgICBQUZuuE4Ec8riP8LtcSlAhsws=;
+        b=quomWo7LOLRkVa79IeS3NCDv/aear5zRdzx0veIDXCEqpemc8CMpqjh3VMM+y5hMOi
+         5T5BNjZBopjB93WNj6AtZu7cOcBk+hsXd9zOJyFcgEE7UDu9lTqEFs1Cq5qwidcxBAz2
+         lLPOtMv+SvBggcYhvJMBIk4ON4WUmjJnzq5VEWlg+4DicoHPqH3F9RmB9T/asP+Dx/DJ
+         FaBr+rwEzWIQMjzLdHkkCPY13dKVcJn700WTn3n2Xz5be1shYdBvcWhU/q4rGeIqAfA/
+         HbccwZLhxRo0H6FQ3RDRkgaIj8eHzCiPONhIJCjKJ5rGq9XVDUdHFGHFKIKv7E/V6xEx
+         eCIg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730828645; x=1731433445;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G4pjQVLZDflRtCsfAy85d1P2cqYuherDvdptxN/0yZk=;
-        b=DKcyYPyxygVAIVsR0AvfIQYpNF4ric4Mm50DMKg8qyc6iuehECfZ2bYBgskP22Or+I
-         QEI2vF2zmLYDQcT5CNQWR6VuNsP9ha2BIgCDULpy1o9tNwdom7xpqFsCqLNeQS8PWXY6
-         k2yQfPy90iZYqQwPo5i+E9wMyxadmXO3NSYrMeH4t7QhG58xJlPo07vTkNw2AWjotUdj
-         vmt6eKbgPE0s49M/uc7GRI08jrgIm2qXROEqdoSN/7m1LKZEN73VMIQS1JaG0C7Cnf/G
-         o6LAkStdViIGpY+NIjQfA4r9YON1MOVFg8k/A/bpcFw8IY4BzLw88+pBWZas8ByWyatc
-         sKXg==
-X-Gm-Message-State: AOJu0YySqspNBAI0PKctKCJMJRVL8woUR4pUHS6xpYtZSwzOH7CX7YdE
-	BsEjswdO3YceHFSPaA9Z6gSFAesZlCtB65s+4dO68GUwsLwMdbruec6qEFa9p+N/u0ObbtRolbN
-	d8PY6gv9TzQ==
-X-Google-Smtp-Source: AGHT+IHHIm997GXfDe5xQdp4/Ku+gjomULDzEB54KlxntWbLwDhyk6PFCMGujWTlPUF5kGhvC+ZykWYDfdTC7g==
+        d=1e100.net; s=20230601; t=1730828647; x=1731433447;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=xw8/m+j84Aso/IIgICBQUZuuE4Ec8riP8LtcSlAhsws=;
+        b=P6oPSXg4Ac8prRTM66RzZsGt0fioeYcH2wTv9R7viDqoVI9eS4NlCh0eelucigQDBj
+         o0+p5vbDcjbYS0y/HDOs6zrBZ2Ac38+cPZMG+dJIq+W4rnLPC4V5N5bHR6QMNk3+J/UW
+         MJftF8zytEqVkUZKQw0uG9nPckW1KaXBt/CqufcqE/o+xdWvnIe+Jn36aAe3WKP5V7J4
+         z+LwoA8/wRqd+qHIofaJ7BKXmJexqWZ+zDn5KbC5ufy428Fv3AftNGNg5LwdacOs/PRa
+         HKg0nJChhJlb5VdZde/At09BdQagPej/RtU6ymvzUHoxGcQ9Q7kU7UwIPa4dFyQf7RMr
+         jlMQ==
+X-Gm-Message-State: AOJu0YwaD+VtrZOIMU7qC1N5HnAt9Ob1Sr/ko4BC4hu2/3wjzAl29EEu
+	aX9iKJPKjxIRs3+s4fqjpBl4s+kmttNjxV2+bqGJfTl6OTLUT+tniZTj00d5bZi8Jjyi052UYx0
+	SqqX2nAASLw==
+X-Google-Smtp-Source: AGHT+IF6+3GnYV4PmgUZ/Wk6hRPbw7wOB/pTGusSdwsgVVWER9yTlBqoGsIAriwFJ+thfacZ1P4q/oTYWX6Dtw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a05:6902:1d1:b0:e2e:3031:3f0c with SMTP
- id 3f1490d57ef6-e30e5b0ee45mr14049276.7.1730828644991; Tue, 05 Nov 2024
- 09:44:04 -0800 (PST)
-Date: Tue,  5 Nov 2024 17:43:56 +0000
+ (user=edumazet job=sendgmr) by 2002:a05:6902:181e:b0:e28:fdfc:b788 with SMTP
+ id 3f1490d57ef6-e30cf4d455bmr16596276.9.1730828647054; Tue, 05 Nov 2024
+ 09:44:07 -0800 (PST)
+Date: Tue,  5 Nov 2024 17:43:57 +0000
+In-Reply-To: <20241105174403.850330-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
+References: <20241105174403.850330-1-edumazet@google.com>
 X-Mailer: git-send-email 2.47.0.199.ga7371fff76-goog
-Message-ID: <20241105174403.850330-1-edumazet@google.com>
-Subject: [PATCH net-next 0/7] net: add debug checks to skb_reset_xxx_header()
+Message-ID: <20241105174403.850330-2-edumazet@google.com>
+Subject: [PATCH net-next 1/7] net: skb_reset_mac_len() must check if
+ mac_header was set
 From: Eric Dumazet <edumazet@google.com>
 To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
 	Paolo Abeni <pabeni@redhat.com>
 Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
+	Eric Dumazet <edumazet@google.com>, En-Wei Wu <en-wei.wu@canonical.com>
 Content-Type: text/plain; charset="UTF-8"
 
-Add debug checks (only enabled for CONFIG_DEBUG_NET=y builds),
-to catch bugs earlier.
+Recent discussions show that skb_reset_mac_len() should be more careful.
 
-Eric Dumazet (7):
-  net: skb_reset_mac_len() must check if mac_header was set
-  net: add debug check in skb_reset_inner_transport_header()
-  net: add debug check in skb_reset_inner_network_header()
-  net: add debug check in skb_reset_inner_mac_header()
-  net: add debug check in skb_reset_transport_header()
-  net: add debug check in skb_reset_network_header()
-  net: add debug check in skb_reset_mac_header()
+We expect the MAC header being set.
 
- include/linux/skbuff.h | 47 +++++++++++++++++++++++++++++++-----------
- 1 file changed, 35 insertions(+), 12 deletions(-)
+If not, clear skb->mac_len and fire a warning for CONFIG_DEBUG_NET=y builds.
 
+If after investigations we find that not having a MAC header was okay,
+we can remove the warning.
+
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Link: https://lore.kernel.org/netdev/CANn89iJZGH+yEfJxfPWa3Hm7jxb-aeY2Up4HufmLMnVuQXt38A@mail.gmail.com/T/
+Cc: En-Wei Wu <en-wei.wu@canonical.com>
+---
+ include/linux/skbuff.h | 17 +++++++++++------
+ 1 file changed, 11 insertions(+), 6 deletions(-)
+
+diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+index 48f1e0fa2a13619e41dfba40f2593dd61f9b9a06..5d8fefa71cac78d83b9565d9038c319112da1e2d 100644
+--- a/include/linux/skbuff.h
++++ b/include/linux/skbuff.h
+@@ -2909,9 +2909,19 @@ static inline void skb_reset_inner_headers(struct sk_buff *skb)
+ 	skb->inner_transport_header = skb->transport_header;
+ }
+ 
++static inline int skb_mac_header_was_set(const struct sk_buff *skb)
++{
++	return skb->mac_header != (typeof(skb->mac_header))~0U;
++}
++
+ static inline void skb_reset_mac_len(struct sk_buff *skb)
+ {
+-	skb->mac_len = skb->network_header - skb->mac_header;
++	if (!skb_mac_header_was_set(skb)) {
++		DEBUG_NET_WARN_ON_ONCE(1);
++		skb->mac_len = 0;
++	} else {
++		skb->mac_len = skb->network_header - skb->mac_header;
++	}
+ }
+ 
+ static inline unsigned char *skb_inner_transport_header(const struct sk_buff
+@@ -3014,11 +3024,6 @@ static inline void skb_set_network_header(struct sk_buff *skb, const int offset)
+ 	skb->network_header += offset;
+ }
+ 
+-static inline int skb_mac_header_was_set(const struct sk_buff *skb)
+-{
+-	return skb->mac_header != (typeof(skb->mac_header))~0U;
+-}
+-
+ static inline unsigned char *skb_mac_header(const struct sk_buff *skb)
+ {
+ 	DEBUG_NET_WARN_ON_ONCE(!skb_mac_header_was_set(skb));
 -- 
 2.47.0.199.ga7371fff76-goog
 
