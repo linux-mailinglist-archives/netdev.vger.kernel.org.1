@@ -1,126 +1,231 @@
-Return-Path: <netdev+bounces-141948-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3ED9C9BCC27
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:50:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6702B9BCBBA
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:25:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6278C1C208DD
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:50:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26CA8283461
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:25:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662451D3654;
-	Tue,  5 Nov 2024 11:50:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="sP0WG0k/"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35EFC1D45E0;
+	Tue,  5 Nov 2024 11:25:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from sonic314-13.consmr.mail.bf2.yahoo.com (sonic314-13.consmr.mail.bf2.yahoo.com [74.6.132.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96301D3590
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:50:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.132.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205D71D278B;
+	Tue,  5 Nov 2024 11:25:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730807413; cv=none; b=UrxV5KPTVHAYt9D9QTFk1mSgo98OId6Aghq+Qm48YxBhjZkh68O6BvHk0RmkTPuwILv1nDMcNgMj4P+2z/Db0v1lh6NqXtYupCczP1mBKDPkhyTztiggn/Ki69gYZTGVyFLBAlI32ykj+ypqE6EGU2WT+oKwOaobLbcBbUzHqKw=
+	t=1730805912; cv=none; b=rl4xDTgLNQ+ghBNKF4SzK/p4b0nGEKkEuRoWA+V5NSPE9yhdNqWnnnu0IgOWtJmdzr3d+gGHnSCXZB2SrxeQ0Uq5tEOjl8w2cODxB/Tx66cXllHBdoKWoNsIJwqVec0gk1Z80HTvcODfM94fYyXMyfdAVbI7L1hyJBFuHJI7GN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730807413; c=relaxed/simple;
-	bh=tS52rCBrcpWKiTeTm9uSHpHse+DERy5VYTWONFcwv6A=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zx3apsage0926ctRIm+0UELgdEDmv975ZJxni3oB8zhwWmx8Z9e+7rQXhUrVfp6tiBgqBgmQeFNAkxAwfCUoeHJ1ly48YLUiolzvBWGUx6Sbb8uZrMzZ/1uO7zq0FPKTzGW/eZPp2fvqcg7np73uS8IOKKB+WWaP6w0casPUYt4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=sP0WG0k/; arc=none smtp.client-ip=74.6.132.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1730807410; bh=bNr+bsCtJR4SIgIfMdfvQHVugZNrzCt1K5Rqs3mhcTo=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=sP0WG0k/7nqTMGQalF0han+aO87y1zT5y7MUJKrZplk5m/XwJKont5X4fTAuvKb26Xsz1Cq0tY8IMcWRXSO/6gJnyzNPPwqqca7LM2iF9ycPoN6vPvBsqpK6HNa3EooSs5PR7XfIqf1JY25g5g6JW3zLmSFxhC8oP7KMTdLZX0wDd1MjAg8At3G5DST0c/nU2Q086muqZfI0gvA8l8I0YYYu7YAMEh5ZJpFQiZamSKkPU5rKzNj9CnC32ahRNCxGRrZIaG/1RvwqNqLXUylGCYuPotzzhUbQb25TiMc9bJk/DqIMWottExyUx6tJdudRktxdHrwrocDgkq8UgKctXA==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1730807410; bh=W6KJRUUrEvtwqRfOAb61LJxRui90JiJrJTCwM3FHS3e=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=mBf/dekcvFfuP7Fj2663A22hxtOhcIKF3FDQJEY4KL7P1b/4II1zHikIh1KDPqCD/EdUVrnTobY8vakDJH4TyXV+wD8kQ+u7kEP1cHYc5iGqZnKw5m3wlKXssh0IcCNpsVfMMUtTwtZMSc96CCH90hgPFmcNLjD4P6ilpOfcuS0O4SOUh1Ttx/uY8mJcHAzdZtUPTwvzuGxtKNLPZswpu+ykVXYtggbOgxQ07D9QMC/AmQ5zum6dpoQyFc6cQGvbEN6i6tq4cFHZ9n5MtjxsX6qY6uEpGp90uV6s6RUtr9PJ7/lwTJc3IlsI7eWaXkEKNdEaKu+s7r58rvkBU+fLDA==
-X-YMail-OSG: .4bp9vYVM1mBG4ZRlN5fnnxXbf6lwfm.gADtuzMr38atsW58evNmxNvnJ5pDHCY
- RhwO6lYUL338upam1tP9LbW49ET0GiCXuhKVyiUMCygAXzShGIXEyutAY7u1XT0alEJV1itGNDrn
- Lwnlf8HJrbxC4ekUuR36UIntptC8WDH7aahsqayn_XUVQyyNIVvWqPbKBcB0WYHucI5j6rSy64_3
- vLZljeGzVFZayQ5.xPzlcZh3bmaZIb3qK6zFY2gZC.MpxM.Lod5gtrzHRyTrQW5R2tLlGfJktcI_
- YD2BopmWC9Dk7GVpirFhsVnIS_xGM.FnhGCTGbkwGli0IzGLhNoQ3fp1cPb6EhkjWBPi71tMMxbJ
- goEYmPMMWL0wx887jDMxDj5eh4DcO0rh7iWewMjjrh_6IX5bGsvHeQsJp3Ken_1zQjyGS33.c7ma
- lIAujE96T3XH0f66qSjWP9Ju0IjCSVMavMOKFnJtB2S9C0_UEklfwMElJDjrE31VYUzdLclsWXIT
- SjHWmn79Phxu3ne41XiznQT_4OOO6rQo_Oyfhv5HybnPfjEp42AuxrXCu1B_a3cxI1_zFGgvouFZ
- DYCi9aiUMqqaZLj9DiTzD9enir6.2oe2GRch8o7JV5oX.XzsiMdgZHxODsM8_tegj0uPQEwQ7EkP
- IedJNR4YZp7dzVTCbTBInsHqI5gqA4zqvN4la.mWv2ScEHyJCrUkhPW9TKwOClWcD9QBY64.IZ4Z
- 5x.6hji7GlorfXILzzDSKkCiZDTf__SZEjz5OOGyoQbh4PoyYdOyglX.B4VHsg38BS3HpSt27QfH
- sngZEyaWBuEB7D6yD99pnS_p08_clg4DiIV1PsPZ4KSa0j3BkoY9mhLK3Ame0Zde_drEYhwfmVPg
- yJa6hXtVuQvEwz3gG9XE7BYUsnkpZuyF7XG_.HptPGhMcSToSOK43RnTFAXyIEvHf6cYsiv_ZJSe
- Nl7.4F9Kj6WVcX_DAbLQChL1H_L_A77T2R.S6ZlvNmuYxrHg6bwqfcvxBRci7_Gmr1wywbmxHDCb
- NJtF2x3tFJEYCLbrNkzM5KODw.ONuxz6wD6x.85xZy9JAaP4MwmaiSwOJKR.tDXQ988E8JIHk6Fg
- KtpKHfoh6yH8YbX8zB6DjgOTWh320h7SGFexb2QSg9vjAqNHTfrKFjb999IQ1Gtz7AQHMl5VOqpm
- JEosbQxLkyv0NLMBtfgtzBM5ubPkKGrIx9RplLiZu6Z8MioUqGLPIQ0zujqFSyTztaf5.Xh2xotJ
- PbslYhg1rb53KO7KheaE3ae8Ot6th3EY.lMBcemuoaRG0IGiokyZqUAqXuUW1l7mrDQZyGFmZRSu
- bTRFmF8BHw6RgX.lJbILMeNpd2cqm2Rdmc6o.SF_Y_QKb8Sa7SIxL.Kt3opEvxVkr1XGK5fJ4KzF
- UaWKFhzw6_wcrXG8nHSsqGsbjCM_tJ9F5mB6_EAzxJ5pnL0gfnk4MkdrEIXh.lzILIx8gNch8wNr
- m7dc80m6Mpj8UD7mIFu.VOUsEu9KK_YHRghLZ9l.WfTO5kxpQs5gGeUCvmT6xeI7QqJPAW8b36vp
- v6vw4fuje30xvvsSoZf_wWgljI3LrJlbzROq0Ns02xGxvtUj9Nx8afUgkcILmKj63E5ptzSyEuKB
- Is02WRBY.iG3.s9LbYEOeGPV8i9PwmiyCJEgXLi76s3yH6Xg_sA58RrWwH8UWj.kZM0U4IDHmxnA
- aXbocrW7MItD6bP9rUNNHGIiRVQIx7CyUZuJ0aa5dqiEJRIPp8i5KU5oUVUaVSf2FQA1aHeLLucr
- oO5oCdQeEcLjkc0cATSqIimpfOjv_rCTYWprzXIqooKh3S..PbqyGTdrQywGBvKVe6LhPOv1kT32
- _SVz2mDffSYnQt_kJ4jimoqPwXkj.PMbqXPvWl.7OLz_NAU99ee8QIDBWXiUnG2Dc5ppxur0VZYK
- VT3N4Sl0HcXmFL95XZac_Ts2Mkg_RsTh73WrWwwFRLnzd2SfneBzGhK5ClUcYzuqD9JhM9wd.Rvw
- FxN2HDZ4yF3gWAelndaTlDG0Qu.j.0Ze4qELnPhNc2CVfHakP73YFsv4awK6poCbVWAntP4695ml
- yYEY.AHR1Yo80jk6rEl6srik2uFy1n_CMnlC2IriRMiP80Y_gZ6tk_eWsPdsNoRaZ_RLP99n89q1
- kzTvSGnpVzUyJ6Vd3t9JED6AFJMIoV.aUwlv.7q2Rx9bAodiM_rlaNWvTUyM8_qjpYSmhCXMfy_q
- MW1V6GIBFhJ9GZcP6NzcwPD6kQwFlDAHtsrB2dJlMOG._BQwsJ3K_ptCzzJ6_AclaQts-
-X-Sonic-MF: <dullfire@yahoo.com>
-X-Sonic-ID: 393d9c79-1674-40ac-9170-95035d8fe9f1
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.bf2.yahoo.com with HTTP; Tue, 5 Nov 2024 11:50:10 +0000
-Received: by hermes--production-ne1-bfc75c9cd-n46s2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 25849c82f1c1524deb6cfb87a0930b74;
-          Tue, 05 Nov 2024 11:40:02 +0000 (UTC)
-Message-ID: <02ec93d6-3cf6-410d-a887-1a625fb7be82@yahoo.com>
-Date: Tue, 5 Nov 2024 05:24:42 -0600
+	s=arc-20240116; t=1730805912; c=relaxed/simple;
+	bh=eVKFimwSrLBVPc0u9ggjPX9a1NYiYheddPFbojKnoCM=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=OG3BxrHtRc5vRhAbkkSWLxLbaSoJ6gtfIo2/SJa4abzE0A1VKRbL1VSZbNTRRdIUp7m/Rc182znFhed+12+z9an+1ywFYklT7/h5UzLDYJNGa3omor0ynHTVJIAR8VJC+eiR6Jg3wcK5LR3qB8bzfpbkwsZ8Z4bZunfct28boig=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
+Received: from [78.30.37.63] (port=54028 helo=gnumonks.org)
+	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <pablo@gnumonks.org>)
+	id 1t8HgD-004Mns-HQ; Tue, 05 Nov 2024 12:25:04 +0100
+Date: Tue, 5 Nov 2024 12:25:00 +0100
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Wen Gu <guwen@linux.alibaba.com>, linux-s390@vger.kernel.org
+Cc: syzbot <syzbot+e929093395ec65f969c7@syzkaller.appspotmail.com>,
+	coreteam@netfilter.org, davem@davemloft.net, edumazet@google.com,
+	horms@verge.net.au, ja@ssi.bg, kadlec@netfilter.org,
+	kuba@kernel.org, linux-kernel@vger.kernel.org,
+	lvs-devel@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, pabeni@redhat.com,
+	syzkaller-bugs@googlegroups.com
+Subject: Re: [syzbot] [lvs?] possible deadlock in start_sync_thread
+Message-ID: <ZyoAjPBjtQA6jE-8@calendula>
+References: <000000000000abf2f0061ba46a1a@google.com>
+ <6725704b.050a0220.35b515.0180.GAE@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: Kernel panic with niu module
-Content-Language: en-US
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: davem@davemloft.net, sparclinux@vger.kernel.org, netdev@vger.kernel.org,
- linux-pci@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
-References: <20241104234412.GA1446170@bhelgaas>
-From: Dullfire <dullfire@yahoo.com>
-In-Reply-To: <20241104234412.GA1446170@bhelgaas>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Mailer: WebService/1.1.22806 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <6725704b.050a0220.35b515.0180.GAE@google.com>
+X-Spam-Score: -1.7 (-)
 
-On 11/4/24 17:44, Bjorn Helgaas wrote:
-> [+cc Thomas, author of 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X
-> entries")]
+Hi,
+
+I am Cc'ing SHARED MEMORY COMMUNICATIONS (SMC) SOCKETS maintainers.
+
+Similar issue already reported by syzkaller here:
+
+https://lore.kernel.org/netdev/ZyIgRmJUbnZpzXNV@calendula/T/#mf1f03a65108226102d8567c9fb6bab98c072444c
+
+related to smc->clcsock_release_lock.
+
+I think this is a false possible lockdep considers smc->clcsock_release_lock
+is a lock of the same class sk_lock-AF_INET.
+
+Could you please advise?
+
+Thanks.
+
+On Fri, Nov 01, 2024 at 05:20:27PM -0700, syzbot wrote:
+> syzbot has found a reproducer for the following issue on:
 > 
-> On Mon, Nov 04, 2024 at 05:34:42AM -0600, Dullfire wrote:
->> I have also bisected the kernel, and determined that  upstream commit
->> 7d5ec3d3612396dc6d4b76366d20ab9fc06f399f revealed this issue. This commit
->> adds read to the mask status before any write to PCI_MSIX_ENTRY_DATA, thus
->> provoking the issue.
+> HEAD commit:    6c52d4da1c74 Merge tag 'for-linus' of git://git.kernel.org..
+> git tree:       upstream
+> console+strace: https://syzkaller.appspot.com/x/log.txt?x=12889630580000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=672325e7ab17fdf7
+> dashboard link: https://syzkaller.appspot.com/bug?extid=e929093395ec65f969c7
+> compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1788e187980000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=14a4f2a7980000
 > 
-> 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X entries") appeared in
-> v5.14 in 2021.  Surely other drivers use MSI-X and would have been
-> tested on sparcv9 since then?  Just based on the age of 7d5ec3d36123,
-> I would guess some kind of niu issue.  But Thomas will know much more.
-
-Yeah, I wasn't very clear: I believe this problem is specific to the niu
-module. My suspicion is hardware errata and/or an issue in the builtin
-hypervisor.
-
-My T5240 has several other PCIe devices, none of which exhibit this issue.
-I will have to check later if any use MSIX.
-
-Speaking of test cases: It is worth pointing out that any write to ENTRY_DATA
-appears to be sufficient to allow subsequent reads to that MSIX table entry
-to work. Notably, booting into a pre 7d5ec3d36123 kernel, and then rebooting
-into a newer kernel will succeed, because the registers were written to under
-the old kernel. I had to power off the unit to reproduce the issue if a
-kernel successfully initialized the device.
-
-
-Regards,
-Jonathan Currier
-
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/70526f6a5c28/disk-6c52d4da.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/8ca3cd20d331/vmlinux-6c52d4da.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/9c4393fc9a08/bzImage-6c52d4da.xz
+> 
+> IMPORTANT: if you fix the issue, please add the following tag to the commit:
+> Reported-by: syzbot+e929093395ec65f969c7@syzkaller.appspotmail.com
+> 
+> ======================================================
+> WARNING: possible circular locking dependency detected
+> 6.12.0-rc5-syzkaller-00181-g6c52d4da1c74 #0 Not tainted
+> ------------------------------------------------------
+> syz-executor158/5839 is trying to acquire lock:
+> ffffffff8fcd3448 (rtnl_mutex){+.+.}-{3:3}, at: start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
+> 
+> but task is already holding lock:
+> ffff888034ac8aa8 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3056
+> 
+> which lock already depends on the new lock.
+> 
+> 
+> the existing dependency chain (in reverse order) is:
+> 
+> -> #2 (&smc->clcsock_release_lock){+.+.}-{3:3}:
+>        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+>        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+>        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+>        smc_switch_to_fallback+0x35/0xdb0 net/smc/af_smc.c:902
+>        smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2771
+>        sock_sendmsg_nosec net/socket.c:729 [inline]
+>        __sock_sendmsg+0x221/0x270 net/socket.c:744
+>        __sys_sendto+0x39b/0x4f0 net/socket.c:2214
+>        __do_sys_sendto net/socket.c:2226 [inline]
+>        __se_sys_sendto net/socket.c:2222 [inline]
+>        __x64_sys_sendto+0xde/0x100 net/socket.c:2222
+>        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> -> #1 (sk_lock-AF_INET){+.+.}-{0:0}:
+>        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+>        lock_sock_nested+0x48/0x100 net/core/sock.c:3611
+>        do_ip_setsockopt+0x1a2d/0x3cd0 net/ipv4/ip_sockglue.c:1078
+>        ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
+>        do_sock_setsockopt+0x3af/0x720 net/socket.c:2334
+>        __sys_setsockopt+0x1a2/0x250 net/socket.c:2357
+>        __do_sys_setsockopt net/socket.c:2366 [inline]
+>        __se_sys_setsockopt net/socket.c:2363 [inline]
+>        __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2363
+>        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> -> #0 (rtnl_mutex){+.+.}-{3:3}:
+>        check_prev_add kernel/locking/lockdep.c:3161 [inline]
+>        check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+>        validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+>        __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
+>        lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+>        __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+>        __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+>        start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
+>        do_ip_vs_set_ctl+0x442/0x13d0 net/netfilter/ipvs/ip_vs_ctl.c:2732
+>        nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
+>        smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3064
+>        do_sock_setsockopt+0x3af/0x720 net/socket.c:2334
+>        __sys_setsockopt+0x1a2/0x250 net/socket.c:2357
+>        __do_sys_setsockopt net/socket.c:2366 [inline]
+>        __se_sys_setsockopt net/socket.c:2363 [inline]
+>        __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2363
+>        do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>        do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>        entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> 
+> other info that might help us debug this:
+> 
+> Chain exists of:
+>   rtnl_mutex --> sk_lock-AF_INET --> &smc->clcsock_release_lock
+> 
+>  Possible unsafe locking scenario:
+> 
+>        CPU0                    CPU1
+>        ----                    ----
+>   lock(&smc->clcsock_release_lock);
+>                                lock(sk_lock-AF_INET);
+>                                lock(&smc->clcsock_release_lock);
+>   lock(rtnl_mutex);
+> 
+>  *** DEADLOCK ***
+> 
+> 1 lock held by syz-executor158/5839:
+>  #0: ffff888034ac8aa8 (&smc->clcsock_release_lock){+.+.}-{3:3}, at: smc_setsockopt+0x1c3/0xe50 net/smc/af_smc.c:3056
+> 
+> stack backtrace:
+> CPU: 0 UID: 0 PID: 5839 Comm: syz-executor158 Not tainted 6.12.0-rc5-syzkaller-00181-g6c52d4da1c74 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:94 [inline]
+>  dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+>  print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
+>  check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
+>  check_prev_add kernel/locking/lockdep.c:3161 [inline]
+>  check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+>  validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+>  __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
+>  lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+>  __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+>  __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+>  start_sync_thread+0xdc/0x2dc0 net/netfilter/ipvs/ip_vs_sync.c:1761
+>  do_ip_vs_set_ctl+0x442/0x13d0 net/netfilter/ipvs/ip_vs_ctl.c:2732
+>  nf_setsockopt+0x295/0x2c0 net/netfilter/nf_sockopt.c:101
+>  smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3064
+>  do_sock_setsockopt+0x3af/0x720 net/socket.c:2334
+>  __sys_setsockopt+0x1a2/0x250 net/socket.c:2357
+>  __do_sys_setsockopt net/socket.c:2366 [inline]
+>  __se_sys_setsockopt net/socket.c:2363 [inline]
+>  __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2363
+>  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+>  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+>  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+> RIP: 0033:0x7f468bc1c369
+> Code: 48 83 c4 28 c3 e8 37 17 00 00 0f 1f 80 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007ffe79331b18 EFLAGS: 00000246 ORIG_RAX: 0000000000000036
+> RAX: ffffffffffffffda RBX: 00007ffe79331ce8 RCX: 00007f468bc1c369
+> RDX: 000000000000048b RSI: 0000000000000000 RDI: 0000000000000005
+> RBP: 00007f468bc8f610 R08: 0000000000000018 R09: 00007ffe79331ce8
+> R10: 0000000020000000 R11: 0000000000000246 R12: 0000000000000001
+> R13: 00007ffe79331cd8 R14: 0000000000000001 R15: 0000000000000001
+>  </TASK>
+> IPVS: Unkn
+> 
+> 
+> ---
+> If you want syzbot to run the reproducer, reply with:
+> #syz test: git://repo/address.git branch-or-commit-hash
+> If you attach or paste a git patch, syzbot will apply it before testing.
 
