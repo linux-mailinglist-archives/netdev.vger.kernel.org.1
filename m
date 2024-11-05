@@ -1,220 +1,212 @@
-Return-Path: <netdev+bounces-142085-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142086-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6019BD6D4
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:16:37 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F7CA9BD704
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 21:27:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AFC9BB20BB1
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:16:34 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C45971F23607
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 20:27:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F2F01FF7B2;
-	Tue,  5 Nov 2024 20:16:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B682214426;
+	Tue,  5 Nov 2024 20:27:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="7Hr+tHdg"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="UMEkyQfC"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2139.outbound.protection.outlook.com [40.107.237.139])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f170.google.com (mail-oi1-f170.google.com [209.85.167.170])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96CDA1EABD0;
-	Tue,  5 Nov 2024 20:16:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.237.139
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730837790; cv=fail; b=qW+3hriSh7mfGGiEptJRt2VV2n+TQXYg03YwQ17PK0frQNpyk3CZkaqfa0Z2TZ39LOa4ci5eAsmoPpKDiTMiZl5HbxL3wkDqHcwr71N3OX087E39Ma9NVTEWdpXZ8QwsTz49+cKyZEQe075BiV1QCjsNZNhvZJ/UA8jdmSunhbo=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730837790; c=relaxed/simple;
-	bh=QGRu8e7Q8cMWbxkUQKXJDLkF0a1GKISCgJEGmwDJRKM=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=Lj9a0c3KBHYaYyrxZqwRsrRGvBw0E+sqFpg2CA65DBnejguEW16VfFoIAKTFeIVAYp0yS2OZa/2m6yHaxEAIT43NK+v1u1+LMcwFHMHHf/slQTLOgxcZwsW6cgpMIVHF4B8Cus+tCDroxx1uBTC7K6nbRzYMo3CpEfIti8soGJI=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=7Hr+tHdg reason="key not found in DNS"; arc=fail smtp.client-ip=40.107.237.139
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=i1AxyS2wCF/ySXxSpHavrmmF95fgKZiqq1kVtVxFK0kpbUFTfmmWw7FLbIR004CzMUMbVYLTXpikA3pI0bjBR4V0pq94Ka5ToDUbaBiV0muWENYZIKUSznEuoDDwI6ViOaoXUc5hXozmjVjKpnpAE4RvFRCCBKr+z8kWdJiKGY8nOiiiQoIl7E/Z1q6iiHOfkJquAj8DQDMCH0yRoNhq01oZZ49K8zoxR+bEqh/VAN4a9o6dqeT/HtuTVM617YoJ3hYVmiPnAZLA4QzX/VeRGgfhv0sVu6oc2+1npgpd2ixDanzYDf6wFvdSYPHWA9XwTyIMUEwwK/9xbAxStpYCAA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Tv8QdFk2GF7o9Ljjm0s/1doZenir128EfTZatqIsACA=;
- b=nUZ6JnjMBoMWWXgAKdAsY2C78pJL/PzEF9vjlylPmj3MSQd2SKK+j76IeJv7oxkJ6TX0bPmkhmuyDBX6q8TZgOV1zMqpjWo1WSb3Hmah5+4uWom+9eRuSYCmmT6j+uqt02Q0R/EGYfE1tkTb8QzIXOIagbJPe5QMNHhXRUd75JEgceLDhLI28FetsrrHH0VWbz2iQGNd1TfTXD8oNolW5aud5XftJOmzn6tWAKX9bt9x5TjUg5tuCkoN/JOC56VnLNOGDi2UyE7zQiL6/KKhMUcPOqXsMluFZafcX2qEj5ljPmS1BE/c23Wf79ApAvvC3bjd9crPqBAs/KOwAz4Gow==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A4A517BEB7
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 20:27:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.170
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730838462; cv=none; b=snkyAVp0//do0HpmMO2depCk9dADrOlIr85R7iDiTfSKmo4f9INTJjAikNueNUgesDZ4Ibzrl+aeqqaotKuGB63Sp9Op/NQndl43sHy0cH0R01JpcACds7ahZL/VaurznRJA8xNJEc8VgeqP6bWk3d29z/oNpfLqEAgkKr/tlLo=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730838462; c=relaxed/simple;
+	bh=wUm3UIy+tb9KchoMWqBJeP61zH4wo25cypLXsNzjioI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Kqj1Ambfs6hsRlv0ysYE2sy/lIKp813L8LKaWlpkjwdCwGFJGvtedP9ZeyX3/BtUUKt9HecAQqybfV2Oy7cbzAL1D++v7GlhaTWq1dnVfjt6dH62793c/XsxFLHAYGdUaNQ6Ej4evA0yAbuDbGpnDIX2vlL5v1PYYdsF5JySkUg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=UMEkyQfC; arc=none smtp.client-ip=209.85.167.170
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-oi1-f170.google.com with SMTP id 5614622812f47-3e60f6ea262so2841669b6e.1
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 12:27:39 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Tv8QdFk2GF7o9Ljjm0s/1doZenir128EfTZatqIsACA=;
- b=7Hr+tHdgdJ+Frb7q/l8pFWkdZ9DYsNXWJh60xlOCVAYLCHWeJtaxyzD21TXsofHAwXbdarJRx/SyZCJQOtTRyqUVw3Q58DAhC/A6ybcAwYwYotLtazIxwGfbeTzGxL1rKn8CaPUjEBlGepVeIIjbuAp4HqKK5NozfzsVJhlSOmU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from SA0PR01MB6171.prod.exchangelabs.com (2603:10b6:806:e5::16) by
- LV8PR01MB8499.prod.exchangelabs.com (2603:10b6:408:187::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.18; Tue, 5 Nov 2024 20:16:25 +0000
-Received: from SA0PR01MB6171.prod.exchangelabs.com
- ([fe80::b0e5:c494:81a3:5e1d]) by SA0PR01MB6171.prod.exchangelabs.com
- ([fe80::b0e5:c494:81a3:5e1d%6]) with mapi id 15.20.8137.018; Tue, 5 Nov 2024
- 20:16:25 +0000
-Message-ID: <693f39f9-9505-4135-91db-a7280570fbc3@amperemail.onmicrosoft.com>
-Date: Tue, 5 Nov 2024 15:16:20 -0500
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
-To: Jeremy Kerr <jk@codeconstruct.com.au>, admiyo@os.amperecomputing.com,
- Matt Johnston <matt@codeconstruct.com.au>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Sudeep Holla <sudeep.holla@arm.com>,
- Jonathan Cameron <Jonathan.Cameron@huawei.com>,
- Huisong Li <lihuisong@huawei.com>
-References: <20241029165414.58746-1-admiyo@os.amperecomputing.com>
- <20241029165414.58746-3-admiyo@os.amperecomputing.com>
- <b614c56f007b2669f1a23bfe8a8bc6c273f81bba.camel@codeconstruct.com.au>
- <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
- <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
-Content-Language: en-US
-From: Adam Young <admiyo@amperemail.onmicrosoft.com>
-In-Reply-To: <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SJ0PR03CA0192.namprd03.prod.outlook.com
- (2603:10b6:a03:2ef::17) To SA0PR01MB6171.prod.exchangelabs.com
- (2603:10b6:806:e5::16)
+        d=fastly.com; s=google; t=1730838458; x=1731443258; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ORlEvUldMxLouCU0sT2UvkB9s0hh4uW8+652o/l7m7A=;
+        b=UMEkyQfCzl4rNxDzGseZhgEzOUKRrYpoyyLblLisonlImpWmBCRvHlfe/Y8QJFcAK0
+         WL9h2DIAbY3onUWKOs0SWHtGmU5e7fQY/mh7KikbxkYLc8WDEGlPjDSMIvfvhyH2l6Bz
+         N8pHdoEcB0xewcd0EpOCTQ6qOcyQOYOQGY7ZE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730838458; x=1731443258;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ORlEvUldMxLouCU0sT2UvkB9s0hh4uW8+652o/l7m7A=;
+        b=eVPiRbM/sdExqxbsD82wVCYSKI3ZJsDqZKKQ5eX37BNl17XftuOcL2DEVMVfzJpVj1
+         12Sln2ykFjlqrAm9eZpi+jSjHATb91laUg/CKktndBsU5IrtEb8ed3IXhUN/6IajjS+J
+         YYlsd4B4GTJxBF2sS8iSE3zOSRTvA9CU3MyrMYU9cim9K4IQoeHBbWFOcuoF6G1Sk9Bj
+         oLG5hih/y1oR0yV5B4yAKiB4uNPWezW1PRhHpheTieN4oPCFKxZ+1DpvQaaOMIUTHBis
+         ngyYYjOjQZEOt9xZ0Ic6LaGOWOgmx7cYkzGOYUM6VXlAXEdnwWao5alZiqMjZnRsdgkM
+         0SfQ==
+X-Gm-Message-State: AOJu0YyLASBFGIrQrUYC9Ii6B036Vi3CyPQ8lC3g+dhq+qOjyTATLO+t
+	g2+qZD/5rKl4+/Ik8vFTOnxA3uas6KvEHHGtVzLV8hBIWy4kfTXtiK9LCVm5gIQ=
+X-Google-Smtp-Source: AGHT+IEShTsCyJSAvD86FXXBmKQCs3d6LZCjo1Br7OeDr2YgRig+JvDpF4Rs+05Ny+7E45Wr4rrU9w==
+X-Received: by 2002:a05:6808:2385:b0:3e3:c446:e5ef with SMTP id 5614622812f47-3e6384c4e2cmr34149241b6e.37.1730838458685;
+        Tue, 05 Nov 2024 12:27:38 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee452ac4ffsm9444684a12.25.2024.11.05.12.27.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 12:27:38 -0800 (PST)
+Date: Tue, 5 Nov 2024 12:27:35 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Philo Lu <lulie@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
+	xuanzhuo@linux.alibaba.com, eperezma@redhat.com,
+	andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, andrew@daynix.com,
+	virtualization@lists.linux.dev, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 1/4] virtio_net: Support dynamic rss indirection
+ table size
+Message-ID: <Zyp_t9MqleySQR3K@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org,
+	mst@redhat.com, jasowang@redhat.com, xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com, andrew+netdev@lunn.ch, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	andrew@daynix.com, virtualization@lists.linux.dev,
+	linux-kernel@vger.kernel.org
+References: <20241104085706.13872-1-lulie@linux.alibaba.com>
+ <20241104085706.13872-2-lulie@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SA0PR01MB6171:EE_|LV8PR01MB8499:EE_
-X-MS-Office365-Filtering-Correlation-Id: 89cf5ff0-f4dc-445e-2b89-08dcfdd6b93a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|366016|376014|7416014|1800799024|10070799003;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?MFVuTCtVbUk0T0NhMk9hZTgvT3k3V0luRkd3aDh1MEJ0NkxYS0RzT3J5NVBj?=
- =?utf-8?B?enhteUkvRzYvNDFDNUMxclo3QkZXSFBicWdWaGlZWHZZSHliakZDaFFseHZP?=
- =?utf-8?B?bVJDWEJoNjdxcnBiOC9kbG5oQlArWmU5b3B3N1dlK3Z3S210NG1aU2Y5cCty?=
- =?utf-8?B?N1YxaHMxN3MxSHhScVY4cWRhYWJRODhsVFY5UVhIQ0dBQTZNWW9NVlZMM2NO?=
- =?utf-8?B?RUlteHBWMVlwUk0vQVFTYVFCWXlESmFLR2d6cnRiaXZNTjdsbllMVzQvNnEw?=
- =?utf-8?B?c3lWVk1hRzlybS9rK0lyQjJjazNCVi84RDBwWEpQcU95eWNYT1F2dm5BU25U?=
- =?utf-8?B?NDJjRzFkenVPblA5eG1uaS94NjJGWjNpQS9TWFVFWVVxVVhKWkRlNXJJQTJX?=
- =?utf-8?B?bDY4Y3Nxd214MCtrVEhFQjMwQUJsN3VKeXY3NEpreHRUK0dQOU4wRlQ0YjdH?=
- =?utf-8?B?WlFOTGs4Wk03eUdGTkU5cEY2UzFzeDNpcG9LRGoxNWl3NnlicEE3RU5ySUpF?=
- =?utf-8?B?OU8rblk3MnE0VzhqZzBJYmlFQzR2ZXVwblN4VGErcDE0cVpST0x5SXg5S1Ay?=
- =?utf-8?B?WFVWbDByTTdvLzhnTDA1aEtUNFloUit4UWdUb2l4SnNYWngwOFpaTWdKcVVZ?=
- =?utf-8?B?bytHWFd1QVhsNFprSUZ5NS9XSjN1WEhBanpYSkNOTGpKQlhXdmhGdk9tcmtQ?=
- =?utf-8?B?Wjdkdk9ZSU5RYUNSN2huWDJHajYzNEVxNjQvWjh4cmRHUmNud2o3ZVNwbGYx?=
- =?utf-8?B?T2tiNlA3UHN4cjBESHFxb2xXYnlyMUY3WWU5MGFzZHBUUDRNS1pUVEk3V2s2?=
- =?utf-8?B?U0RBVTQyTVFialhZSC9UVTNicWJCK3VTREswbGdvZ0crL0NSRUtyYmg5aWQ4?=
- =?utf-8?B?d3pLdHVhRTdkbzR0WUJTMGR3V0JINUlzVHVVbm9NbFpFb0c2V0J1U2l6WE5x?=
- =?utf-8?B?dGpqRlJTZGFhQkxhNnI1UUlGZ1NvSHRXYjNhb08xOTl0YzZEcHJQMnVwUUhT?=
- =?utf-8?B?eFBQWWhMVk9BQkpSbzN6ZFVzellKZUwvMU5kd2lTY2hibHFON25mNmhZNXBR?=
- =?utf-8?B?VlgvWmhncThpQmVNWUpadSthSzNUcHFhWU9CVzZ4UXZDT1FhYVJlUmFzZDJ0?=
- =?utf-8?B?S2ZTWld1MUhWK2JWOCtjZFpEMG8ybVNtRjlvNzB4bmZOZElRN1hnM1Fxd1B4?=
- =?utf-8?B?dXFNK2QzWndiQmNBZGxBdGtwcXdDYThpOUlEdTZ1YWV4S2ZaMjk3UFgzRWVN?=
- =?utf-8?B?Y2lNWlh0NjlRS1hCSEFBeDZ5VzdUeVhVbWZrSCtIVnVzU3B6NnVWUGt0My9r?=
- =?utf-8?B?eXJhenYwSUptbFRRQkRkNGh6aDIwWmdQcFpna3ltY3doU3hudzdLdGFhY1Na?=
- =?utf-8?B?a2loQkVUZm50SndtZlR0Z0hPTndVQnpXam9ybkZHMCt2VmxWY216SXMvc2ts?=
- =?utf-8?B?NHFFQ0R1TW1HVUE0Rk91eHpveG5XTUZ5YW8rQkRxT2ltRndDMVhQN1F3Ui9u?=
- =?utf-8?B?N1kzc1FIQVhEY0ZCN0VUVTZ3ODFKaE5WRU9ITnVTL1UxNjdidjRYc21oMnMv?=
- =?utf-8?B?MlVNeDlPbmM1cG9CeVdxWXliNk8xNURHTE0vQ2dYVmpNNXUwVlhNeDBrdHhn?=
- =?utf-8?B?eGtkdmRzc0p0YmlUV0VpZmFQdFdJQ0M0dlBJblMyWDhWTWFSNmMvNWNaMFZh?=
- =?utf-8?B?R3pXczYyRmU5cGVNVWJLbGJGd3kvOUFJWjNPVkg5NGVBVlp5L1FCU3ZmcXRS?=
- =?utf-8?Q?uEyf1P213tcn8/tqNys1UdIYcgkxe+JePKJIVY4?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA0PR01MB6171.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(7416014)(1800799024)(10070799003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?NWJVYlJGc2J1anV6UmtjanE3UVlwV3JrL3NURE5scjQ2RzVObDFpYlAvbkJS?=
- =?utf-8?B?SkREOThHVXU1cVVoaEdnYzZaQ3M0YVlSNHRFY3BMRkIzK0FJZm1YU29rSU96?=
- =?utf-8?B?ZkVWWVBINU5TRG15TSttQ3dpbTlhZWI2UmcycGYrQWJlWWdkdTI0eGJMOXpW?=
- =?utf-8?B?TzRyQzI0RU1rNEdCbkFpVWdmNHZqVm5RRUVsNENsS0ZxMHYxS1pXWlFiUi9I?=
- =?utf-8?B?SjN6cnNEeEpQNUUzNTBablBMNkxZMUhjVWhyQis1bWdmMkFzeFNwakNNUldW?=
- =?utf-8?B?UnEwZld1aHNySnhVSHcvMDFsTjY2SWFvcFFlbndGYnRHcWRuMDlxZkZ6Nmxr?=
- =?utf-8?B?OXVVVlEvdE9TWGpuc21RVHh0S2VFUU0zVE5oZnFqNUc5SzNGSEdwMi9YU0da?=
- =?utf-8?B?NVpDdndNRUxKemZVZG9HZDdhMXhoeE9QbVZibnh2Q2h0K3NxKzk0SjZYVXdq?=
- =?utf-8?B?Y3FyVU1LUExCQzJJbnpCVUdXUDRuMTQ5a0JHeDM3M0pkL0l2bHgrdWwveTZC?=
- =?utf-8?B?bnc2WDFsblJ1Zkpsc2kwOXlnVnRrZWVEeGh2YmVPc3VaWWwvcnlFNmtNK3NT?=
- =?utf-8?B?R2hYbm9uUVFpajFzQTA0KzRvV3dRcEE1RlVJbUYzemtSemlGN0poaUQrT29p?=
- =?utf-8?B?dGRlallDTjY2bHRNUXlkUzd6OUh3MFpjbHhIbVJJbFc4ZnlZSTYzRUNiZ1BX?=
- =?utf-8?B?RW5WdU1Md3lZMDdYdE5GS1J0Y0czZ1BoMStmdVA5NTdOM2g4OU5nMlhhN21y?=
- =?utf-8?B?dFhpUldtd2FsYzZrLzVtWldCUmFlVkdlTmI3b3FJRnlnNWVHQ3lTd1ZQV0s5?=
- =?utf-8?B?eWEvOW9saFJ2ZklxTDJJMGZZaTNNV0lHak16NkpzM25hQnluZk1BaHl2MG1i?=
- =?utf-8?B?emN5Y0dQR3pyUXI4elo1Sjh3SS95VnR0d1RTOVZEUjNOU3p5S21GcWRQMjVt?=
- =?utf-8?B?UGNpWUE0WnVpdzVYY2d5YTIvSW5JTHFqUGVIMEd2UGdhSjRaQzdZM1dSZkNp?=
- =?utf-8?B?QU9sY0J4ZXF2MjBEbFljSGdsaWhOa2NFdjg5ZGdxUmt6cUU5UjZMNFR5MmlC?=
- =?utf-8?B?ZDdNOUdIQk1pU2JkWk05U21LYXkvVWVTVHlRYXhGVTcyMThXdlRsZWN5OHVi?=
- =?utf-8?B?RUVBdjFnYnZNSnBkaTFaUStPVVpwNG41Vnd5WlFYSG5Ta2diakR2aTFtcXc0?=
- =?utf-8?B?aGFGUnUreG1KRzRydnh4R3V6MGRwVkY5ZnNyZHlBZGg0ekV5TDdaZnpneGVT?=
- =?utf-8?B?VWY5MlEwM3Q0eTN0aHFaSzBYZmZXNmZNZFZURGtNWndHbWpXSkZuQjJIRkJE?=
- =?utf-8?B?MUV2amhxd3Voby8rMERtL3VHdURPOVZoMk9nRUdERVRYcXZtaWlCbmMya3d0?=
- =?utf-8?B?bk42dzlKdGtvbnBYdU5LSzZBd1FXV1pyRWhjeU9ySHE3aGVDVE5NZVAwcjVy?=
- =?utf-8?B?SWJNV043QWR0cWc4RmxzaGsxcFEwQy9SNXdwNUZsaUl4djhYY1NPL2ZibGgv?=
- =?utf-8?B?cllDSWtHVFlWSTQzTG9ZUU44QUUxc1ZPK0lnb3QxN1NPQTdubEtCZkVaYm5Z?=
- =?utf-8?B?d3RUR2dnZllwR1kxM0tkVTZIT29PTENOamdrRHJTdmhZZW9YdHM5ZU14V1Ni?=
- =?utf-8?B?cnpJK2RONklHeklEWEMrVlpjVVd4T1NabGpQQ20rclJsYWxrYVdzU011eDli?=
- =?utf-8?B?QzBKbzBwVFZaeUF2ZXZNL2NtOFlyT2x0c29BZlBOWjFvREpmWFdmNkxEbkNH?=
- =?utf-8?B?dGFNdkxLV0tRZWNQUWgvZEVsVmY3dUovMk9nVWZubE1HTlNwSGdZNnY0TVNx?=
- =?utf-8?B?SzkreHduTEFaLzNEcG1yaEZvbXAyNjJIc2pWblh6aHp4dDdnVGQwTENFRUpW?=
- =?utf-8?B?QjFtN00yMWhDTlJmMjNzZlZCdFo3NnVMbmhKUFJGdXhNZ2pPcDZxTkwxVmgr?=
- =?utf-8?B?NERoM2MraHQvV0RpNXk5YjNmZFZKbXMzQk00VTNpWk1WenpEd3NVNW9FaERh?=
- =?utf-8?B?bUVwOU5reVFTa2NtWEZOUmhRVDRlSm9hUUxWMXh1SisxOEVxajg2RFV3bDdX?=
- =?utf-8?B?cmZyblN2ajFFa2lpRVQxSS94Qk5ubHRuNlROSGVMRE5wUTZKQmdjRXdDcjJl?=
- =?utf-8?B?Y1JjS04vVUFUR0ZFS1krYndKcXRGcW95S01YM01BdTU2aUlmekRSUUJpa3hq?=
- =?utf-8?B?VnIvdDF6WERibzdNUkJqZzdqUFFXY0hHNnFtWHNPcElzMHRSaklBcDNUNTFv?=
- =?utf-8?Q?fhJ67nPSjqezJ2IDthOEEr0qM333FhZsoY35Rzk+X0=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 89cf5ff0-f4dc-445e-2b89-08dcfdd6b93a
-X-MS-Exchange-CrossTenant-AuthSource: SA0PR01MB6171.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Nov 2024 20:16:25.3996
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: boxyklQSxJrlNjEfLodxKwkVBILFtdjN2b22OSsivnG/8BdlQeKGnjEtSq6WZL0pTiyi//gFLbyBT/IijEJZpOMGFDnE/HbH9lj67zetxUNYSaZcjmpO7HQowXX0kXhY
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR01MB8499
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104085706.13872-2-lulie@linux.alibaba.com>
 
-
-On 11/1/24 04:55, Jeremy Kerr wrote:
-> Just to clarify that: for physical (ie, null-EID) addressing, you don't
-> need the hardware address, you need:
+On Mon, Nov 04, 2024 at 04:57:03PM +0800, Philo Lu wrote:
+> When reading/writing virtio_net_ctrl_rss, we get the indirection table
+> size from vi->rss_indir_table_size, which is initialized in
+> virtnet_probe(). However, the actual size of indirection_table was set
+> as VIRTIO_NET_RSS_MAX_TABLE_LEN=128. This collision may cause issues if
+> the vi->rss_indir_table_size exceeds 128.
+> 
+> This patch instead uses dynamic indirection table, allocated with
+> vi->rss after vi->rss_indir_table_size initialized. And free it in
+> virtnet_remove().
+> 
+> In virtnet_commit_rss_command(), sgs for rss is initialized differently
+> with hash_report. So indirection_table is not used if !vi->has_rss, and
+> then we don't need to alloc indirection_table for hash_report only uses.
+> 
+> Fixes: c7114b1249fa ("drivers/net/virtio_net: Added basic RSS support.")
+> Signed-off-by: Philo Lu <lulie@linux.alibaba.com>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/net/virtio_net.c | 39 ++++++++++++++++++++++++++++++++++-----
+>  1 file changed, 34 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 869586c17ffd..75c1ff4efd13 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -368,15 +368,16 @@ struct receive_queue {
+>   * because table sizes may be differ according to the device configuration.
+>   */
+>  #define VIRTIO_NET_RSS_MAX_KEY_SIZE     40
+> -#define VIRTIO_NET_RSS_MAX_TABLE_LEN    128
+>  struct virtio_net_ctrl_rss {
+>  	u32 hash_types;
+>  	u16 indirection_table_mask;
+>  	u16 unclassified_queue;
+> -	u16 indirection_table[VIRTIO_NET_RSS_MAX_TABLE_LEN];
+> +	u16 hash_cfg_reserved; /* for HASH_CONFIG (see virtio_net_hash_config for details) */
+>  	u16 max_tx_vq;
+>  	u8 hash_key_length;
+>  	u8 key[VIRTIO_NET_RSS_MAX_KEY_SIZE];
+> +
+> +	u16 *indirection_table;
+>  };
+>  
+>  /* Control VQ buffers: protected by the rtnl lock */
+> @@ -512,6 +513,25 @@ static struct sk_buff *virtnet_skb_append_frag(struct sk_buff *head_skb,
+>  					       struct page *page, void *buf,
+>  					       int len, int truesize);
+>  
+> +static int rss_indirection_table_alloc(struct virtio_net_ctrl_rss *rss, u16 indir_table_size)
+> +{
+> +	if (!indir_table_size) {
+> +		rss->indirection_table = NULL;
+> +		return 0;
+> +	}
+> +
+> +	rss->indirection_table = kmalloc_array(indir_table_size, sizeof(u16), GFP_KERNEL);
+> +	if (!rss->indirection_table)
+> +		return -ENOMEM;
+> +
+> +	return 0;
+> +}
+> +
+> +static void rss_indirection_table_free(struct virtio_net_ctrl_rss *rss)
+> +{
+> +	kfree(rss->indirection_table);
+> +}
+> +
+>  static bool is_xdp_frame(void *ptr)
+>  {
+>  	return (unsigned long)ptr & VIRTIO_XDP_FLAG;
+> @@ -3828,11 +3848,15 @@ static bool virtnet_commit_rss_command(struct virtnet_info *vi)
+>  	/* prepare sgs */
+>  	sg_init_table(sgs, 4);
+>  
+> -	sg_buf_size = offsetof(struct virtio_net_ctrl_rss, indirection_table);
+> +	sg_buf_size = offsetof(struct virtio_net_ctrl_rss, hash_cfg_reserved);
+>  	sg_set_buf(&sgs[0], &vi->rss, sg_buf_size);
+>  
+> -	sg_buf_size = sizeof(uint16_t) * (vi->rss.indirection_table_mask + 1);
+> -	sg_set_buf(&sgs[1], vi->rss.indirection_table, sg_buf_size);
+> +	if (vi->has_rss) {
+> +		sg_buf_size = sizeof(uint16_t) * vi->rss_indir_table_size;
+> +		sg_set_buf(&sgs[1], vi->rss.indirection_table, sg_buf_size);
+> +	} else {
+> +		sg_set_buf(&sgs[1], &vi->rss.hash_cfg_reserved, sizeof(uint16_t));
+> +	}
+>  
+>  	sg_buf_size = offsetof(struct virtio_net_ctrl_rss, key)
+>  			- offsetof(struct virtio_net_ctrl_rss, max_tx_vq);
+> @@ -6420,6 +6444,9 @@ static int virtnet_probe(struct virtio_device *vdev)
+>  			virtio_cread16(vdev, offsetof(struct virtio_net_config,
+>  				rss_max_indirection_table_length));
+>  	}
+> +	err = rss_indirection_table_alloc(&vi->rss, vi->rss_indir_table_size);
+> +	if (err)
+> +		goto free;
+>  
+>  	if (vi->has_rss || vi->has_rss_hash_report) {
+>  		vi->rss_key_size =
+> @@ -6674,6 +6701,8 @@ static void virtnet_remove(struct virtio_device *vdev)
+>  
+>  	remove_vq_common(vi);
+>  
+> +	rss_indirection_table_free(&vi->rss);
+> +
+>  	free_netdev(vi->dev);
+>  }
 >
->   1) the outgoing interface's ifindex; and
->   2) the hardware address of the*remote*  endpoint, in whatever
->      format is appropriate for link type
 
+I'm not an expert on virtio, so I don't feel comfortable giving a
+Reviewed-by, but this does seem to fix a potential out of bounds
+access in virtnet_init_default_rss if rss_indir_table_size were
+larger than VIRTIO_NET_RSS_MAX_TABLE_LEN (128).
 
-So Here is what I was thinking:
-
-Lets ignore the namespace for now, as that is a future-proofing thing 
-and will be all 0.  If The OS listens on index 11 and the PLatform 
-listens index 22, the HW address for the OS would be
-
-00001122
-
-and for the Platform
-
-00002211
-
-This is all the info  for the calling application to know both the 
-ifindex and the remote endpoint.
-
-They can re-order the address to 00002211 for the remote endpoint.  If 
-they have the link they have the ifindex.  It seems like a clean solution.
-
-Adding the inbox id ( to the HW address does not harm anything, and it 
-makes things much more explicit.
-
-It seems like removing either the inbox or the outbox id from the HW 
-address is hiding information that should be exposed.  And the two 
-together make up the hardware addressing for the device, just not in 
-that exact format, but it maps directly.  That is what will be in the 
-upcoming version of the spec as well.
-
+Acked-by: Joe Damato <jdamato@fastly.com>
 
