@@ -1,85 +1,85 @@
-Return-Path: <netdev+bounces-142062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258C49BD3D4
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:57:18 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 895F19BD3D5
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:57:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEA4F28401F
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:57:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4D919283FFC
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:57:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79371E3DE6;
-	Tue,  5 Nov 2024 17:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A70121E3788;
+	Tue,  5 Nov 2024 17:57:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="o2Lx1fHu"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="byBUU10G"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f47.google.com (mail-pj1-f47.google.com [209.85.216.47])
+Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63BF41E3796
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:57:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.47
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43F8384D02
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:57:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730829433; cv=none; b=dXvF7YqZ41XXG0RJeWT23/pfOSxSiF8PI91lzEyEFiLLROSHpAPXoiWJ3bYwMcyYDqQtSYPZVmA53PpyJZSewsin3AYnutH44GShqDoohMB/VQw3pHGMDTDKZC2SmlQfvOk/epVQhQYZjxeRnIXd8gtLN+YM9hoaG5xwfipVvPQ=
+	t=1730829457; cv=none; b=FofCAO3nm83JgF6UIjUFDe7v31pRvVKNRgh5b5A9lifYyH80WLQN+rQ9SYihIIip+FuXvMa7aLVo+MBJTxFsywS5qQo/pFnBn2cz+Z2v3Eys58UjlyGK9n30mxFzSB/JrY1Qn+C/h3qlnk9aR5Mt8z9ACPdubKFcz6HtVJz22H4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730829433; c=relaxed/simple;
-	bh=lI6Cvmz35c+RRQPDM4nQbYhgF2mFm63vJTkHrvli67Q=;
+	s=arc-20240116; t=1730829457; c=relaxed/simple;
+	bh=AiOXyZlCFo09MoY4bmYJNlKAIJZcYQUDWFeLuSmA6bA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=HdrRT3xc9dQfdwVdr4WQSwa5xD9A4gAja2UVp5Nb3fI+ibTdcOXfK49/Ph0pGSvL+udkwFkBIPKQWxSNwVSXU54w5MbG13vLcq0qEhhTVwwl5v2dpLNWUssTq2oie2GheLBJ7CBzzsk9fw66HnRol5eCvzG/S8ugXNdprm+8hlA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=o2Lx1fHu; arc=none smtp.client-ip=209.85.216.47
+	 Content-Type:Content-Disposition:In-Reply-To; b=O3R6laK4o5AzjfoeJ1InNU+agDlHbCREWhk/7M2vNY5tCJWNpml6XjEcEk//z4K/FuMva4vLq2ZbX14dqqZN6WFywe/ZdJ+XZ01nbZv8dOBFAcThfmHUvKxhHGLr3OAQHKcglKBNIF1yODLl8Je1i1GEXNKGO3kMFhogE8tDDfs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=byBUU10G; arc=none smtp.client-ip=209.85.214.170
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pj1-f47.google.com with SMTP id 98e67ed59e1d1-2e2e050b1c3so49156a91.0
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 09:57:12 -0800 (PST)
+Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20cbcd71012so66580045ad.3
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 09:57:36 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730829432; x=1731434232; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1730829455; x=1731434255; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hq7q3zsR5CyhS7BrsMhgjqKSqADIzDIIYZpbrb/zwLA=;
-        b=o2Lx1fHuvXd2mBk1BOnmAIZEt2HQgV6bgxv6IhCyILhmwshUOLPu8/OQ1OH8u1OHXp
-         GQIum1rkGaspWgAQu/Oxm16PgQ9P7BtFUMBZBAoSCnSQ02SS20PVNmz+HNRoxYuksd4r
-         n83tbgHEGvDBZ7TWJ4+FGo5voani+sMhXzWEc=
+        bh=7a6aAXA9XPuBWb0DIySqP641SbdXE6PcUxBtLPMqpNU=;
+        b=byBUU10G/cqBiTkHzxnxAK50+FbN2Ez7s9U3SbhtonHYO/tsWMkD3VKESgiS4TCH3h
+         i0fFh76lZiPrRL05c58vOykJuUxxGDJ4gSFYF3nWWKgFzzjcPJS3yAMVJtzHgxdoriFt
+         dJ5R6WAXNrM+2nnobnqfjtjwrkaFIoGBB1dk4=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730829432; x=1731434232;
+        d=1e100.net; s=20230601; t=1730829455; x=1731434255;
         h=in-reply-to:content-disposition:mime-version:references
          :mail-followup-to:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=hq7q3zsR5CyhS7BrsMhgjqKSqADIzDIIYZpbrb/zwLA=;
-        b=Z/dZTUYcq61aqInKFQMK2phpxuCxQtzNwo19wbx+ImGhj03hMHzSP55rrRmjbuz7ma
-         cQzRhM2LHOv6BRMCEX7oD27N5F88JR9LvCQdaLwadzPZ34WRgox4kIjXj2f/+6G8v9uf
-         on0fZ4mIQPRH3rETgsq/T+8bK12xhxqRGbwkA4RmIgCdc7Y9vnbj/FN0OjeDjFjWXinP
-         TN/+/xYF386KGZqR9qvA4pYEfFwjDMu390GCNMzRptbQKifvwQw9vCyWp4JA983/8TDv
-         YDpgQ5zxOoEU6qulcV/vql09K+aEAXkike8yei6IW4ExROrGCFUuyvw3uTZsL6dBqcCZ
-         N2xg==
-X-Forwarded-Encrypted: i=1; AJvYcCXciT54/pFP9IAkDvDNyxsx0bkEgR6fHex0DfbA2h/0K1VNrSn9TKQ5SPCe3/DCtZgC2NJWGiE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzTdgmDMAQJmyUSJqxO61XqvhQbr8PYJpV9Ic9evl+ppwGm0BpS
-	49FSaRzENOMcnq1fj8GTou/Xub8BhD/hL/s3D4dJkCpp8FDmaSmRdv8Vcgty62w=
-X-Google-Smtp-Source: AGHT+IGL6n+BzG3xEpM6uM7RFwatUDWd9Th9mFOTVgSjl8wDMVahg6HBe83hLnzp6+zCgfXe+e3I+Q==
-X-Received: by 2002:a17:90b:3147:b0:2e2:b94a:b6a9 with SMTP id 98e67ed59e1d1-2e94b7c6439mr27425744a91.0.1730829431583;
-        Tue, 05 Nov 2024 09:57:11 -0800 (PST)
+        bh=7a6aAXA9XPuBWb0DIySqP641SbdXE6PcUxBtLPMqpNU=;
+        b=Jnl206tVMzC3V+dvRMkWa93ALvmWE1OIv/2BHa3TDYwjTQbNFYPIuFnHAgnQKq9vjS
+         OzkNuuh7xS3EVY5Gxc633WI4KhA0ESmenHyfZDQIrwEf3mWJrfENnQxF9TS4+66cB7Yp
+         kYiC5O5+rlfwJagDC89ivcT8jYewz3qFi+cYqzaFHHTIjDtYOaQEP6oHiwvftIWseFtv
+         7zbV1PHlTP4Kg8Bsd3l+BVIMPRnS+Ua37sa0p7MBxPTXPG0PKfOpEjY5qCIHAESw46qW
+         N5bl+9XgqBimH3g5k9IDTkpfr680VAIDOqJ5IagpXVzwvB4gmzCawGrtzefarEO6SQLc
+         +0Rg==
+X-Forwarded-Encrypted: i=1; AJvYcCWXCslF6mk0+9TU51jblPw+uSppI3ggbieex243b/QMQ+qNeoPFp7O8hJ2hyqxbyld4Fuj4dH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx+voxoeVJ0TuyiB2e/c67pRvzO9aSkkXc0+x61d4lY1uktTW12
+	nUN/pPQQH4UmHhLqL2kLrIpKq6vv+I8rZDAAlgL5OIfkEGonDo0U8eizdU/VxU0=
+X-Google-Smtp-Source: AGHT+IF/jY+AqeOBDLS78e7kdvnuO1KvFxGELOKyAWGA8/f+B53pJqGdV9x1i1gH+wZDcecXCW8JMg==
+X-Received: by 2002:a17:902:f545:b0:20b:6a57:bf25 with SMTP id d9443c01a7336-2111aee8a84mr242334625ad.20.1730829455642;
+        Tue, 05 Nov 2024 09:57:35 -0800 (PST)
 Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e93db17b0dsm10034272a91.42.2024.11.05.09.57.10
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e93db18128sm10050771a91.36.2024.11.05.09.57.34
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 09:57:11 -0800 (PST)
-Date: Tue, 5 Nov 2024 09:57:08 -0800
+        Tue, 05 Nov 2024 09:57:35 -0800 (PST)
+Date: Tue, 5 Nov 2024 09:57:33 -0800
 From: Joe Damato <jdamato@fastly.com>
 To: Eric Dumazet <edumazet@google.com>
 Cc: "David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, eric.dumazet@gmail.com
-Subject: Re: [PATCH net-next 2/7] net: add debug check in
- skb_reset_inner_transport_header()
-Message-ID: <ZypcdOZ63uDcn8I2@LQ3V64L9R2>
+Subject: Re: [PATCH net-next 3/7] net: add debug check in
+ skb_reset_inner_network_header()
+Message-ID: <ZypcjNG4z-gQ5-xw@LQ3V64L9R2>
 Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
 	Eric Dumazet <edumazet@google.com>,
 	"David S . Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	netdev@vger.kernel.org, eric.dumazet@gmail.com
 References: <20241105174403.850330-1-edumazet@google.com>
- <20241105174403.850330-3-edumazet@google.com>
+ <20241105174403.850330-4-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -88,10 +88,10 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241105174403.850330-3-edumazet@google.com>
+In-Reply-To: <20241105174403.850330-4-edumazet@google.com>
 
-On Tue, Nov 05, 2024 at 05:43:58PM +0000, Eric Dumazet wrote:
-> Make sure (skb->data - skb->head) can fit in skb->inner_transport_header
+On Tue, Nov 05, 2024 at 05:43:59PM +0000, Eric Dumazet wrote:
+> Make sure (skb->data - skb->head) can fit in skb->inner_network_header
 > 
 > This needs CONFIG_DEBUG_NET=y.
 > 
