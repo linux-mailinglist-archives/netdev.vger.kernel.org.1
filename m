@@ -1,128 +1,214 @@
-Return-Path: <netdev+bounces-141828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65FE09BC714
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:31:31 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 615209BC6D6
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:23:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 981331C22378
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 07:31:30 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E05A01F2362E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 07:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 40A3B1FEFA3;
-	Tue,  5 Nov 2024 07:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F4191FCC73;
+	Tue,  5 Nov 2024 07:23:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="kemL3JWl"
 X-Original-To: netdev@vger.kernel.org
-Received: from metis.whiteo.stw.pengutronix.de (metis.whiteo.stw.pengutronix.de [185.203.201.7])
+Received: from out30-119.freemail.mail.aliyun.com (out30-119.freemail.mail.aliyun.com [115.124.30.119])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 238951FDF96
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 07:29:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.203.201.7
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A9241CDA25;
+	Tue,  5 Nov 2024 07:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.119
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730791776; cv=none; b=cGn/zMTiMmFG/sk08zSSMmuiG002YwCnkiXP6YkMuc8e6it3EPweOSU/E50WRfIDiSM2SHR7ARDdRCVuUSOyJcSDcmgX46KiHM8+a08rTH3bCoYg3h3q2OJaWDkAcGNJhnoWtFFjhIIvA1rFN6prWS/dze+4XBgRXqkxdb6SEdk=
+	t=1730791391; cv=none; b=Z57JKWZrV2vLsmODyhopz4dUcEZ8iEtM2Cl2ayyTleqk3nW3By2O8V0q9bLWkLdP6+fQYVlEt/CRQMN+SO3RItxAJzDMRR+eTGb2xMcbMCxAjnNajRtEOaUQ5J1Sjo0xmRkUVfjyIJ5C6zCqdxv2DV01vu/aHNWSsOt7xOpOrMw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730791776; c=relaxed/simple;
-	bh=2DTOm74VCL3q3+8xZzASedg2vi0UOyqRKHEQI8llv6c=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TmVUISat0f5JsMRfYJdCTSHdW+voRvwsEC8P7wCPzLeF3CDr241lKSHZKrCgXCSvNnCDWKiSYWW/MPMLcE0Txix/SV4v7jw9R7Arurx/PSRZs1wF0a1t3FI8Bs3eLcQJ66mV2KYv9kPli8XzHXm5Ym9XILi1opZgbsFIDj886GA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de; spf=pass smtp.mailfrom=pengutronix.de; arc=none smtp.client-ip=185.203.201.7
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=pengutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=pengutronix.de
-Received: from drehscheibe.grey.stw.pengutronix.de ([2a0a:edc0:0:c01:1d::a2])
-	by metis.whiteo.stw.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t8E0C-0008Qr-BM; Tue, 05 Nov 2024 08:29:24 +0100
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by drehscheibe.grey.stw.pengutronix.de with esmtps  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1t8E0B-0026lk-0k;
-	Tue, 05 Nov 2024 08:29:23 +0100
-Received: from pengutronix.de (unknown [IPv6:2a01:4f8:1c1c:29e9:22:41ff:fe00:1400])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id D5626369E37;
-	Tue, 05 Nov 2024 05:29:05 +0000 (UTC)
-Date: Tue, 5 Nov 2024 06:29:04 +0100
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, linux-can@vger.kernel.org, 
-	kernel@pengutronix.de, stable@vger.kernel.org, Simon Horman <horms@kernel.org>
-Subject: Re: [PATCH net 7/8] can: mcp251xfd: mcp251xfd_ring_alloc(): fix
- coalescing configuration when switching CAN modes
-Message-ID: <20241105-jovial-unselfish-wombat-453fe9-mkl@pengutronix.de>
-References: <20241104200120.393312-1-mkl@pengutronix.de>
- <20241104200120.393312-8-mkl@pengutronix.de>
- <20241104174446.72a2d120@kernel.org>
+	s=arc-20240116; t=1730791391; c=relaxed/simple;
+	bh=AeJGD4KJEVdazyN4Pdjiu0NQ9DAMEFeg7bcV3R3MlDg=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To:
+	 Content-Type; b=V9MZTg90uILNyflITbIBqHTUjCkd7Q+R2GopK/N2mWHueZiV8ZY32XLfz985AbFuQS8Yt8YU9Wg8rYrLDx5DTo3keRzsnSepKosAg4Hd3Pzi6aI5rA1EuNrWhc6RPOp2CwRDT5OWd2l1nu1AX4EEzZPwnZxGoEqzOiKFjiuI3ys=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=kemL3JWl; arc=none smtp.client-ip=115.124.30.119
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730791386; h=Message-ID:Subject:Date:From:To:Content-Type;
+	bh=D69SUw05yAm2n9d1GD/p6LGTpeWo5LtoZWIPGmJDsiM=;
+	b=kemL3JWlRFikpzH5X4iVEmW6zVFBoV7/mEdCYr1HVYTLoN1IJwak0PxiuJtMu39ZG/6gKEbqTdEhIKYGVuSqXT74FHMtIfdW2LyZ0tJdsPG/Bn/N6oVFiTdpHzT86TBPs2Wt1qLpw8kt5yU6ZkUaIAP7o5tRVWCRHgPhzeBn6N4=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WIm0l4h_1730791384 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 05 Nov 2024 15:23:05 +0800
+Message-ID: <1730790584.4657414-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v2 06/13] virtio-net: rq submits premapped per-buffer
+Date: Tue, 5 Nov 2024 15:09:44 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ virtualization@lists.linux.dev,
+ bpf@vger.kernel.org
+References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com>
+ <20241030082453.97310-7-xuanzhuo@linux.alibaba.com>
+ <CACGkMEviCSEo4thkFo8gYnv+FCm-v65umJ65fdOwtxbAF_F2Ag@mail.gmail.com>
+In-Reply-To: <CACGkMEviCSEo4thkFo8gYnv+FCm-v65umJ65fdOwtxbAF_F2Ag@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="qryq5ucgmrporour"
-Content-Disposition: inline
-In-Reply-To: <20241104174446.72a2d120@kernel.org>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:c01:1d::a2
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.whiteo.stw.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
+
+On Tue, 5 Nov 2024 11:23:50 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Wed, Oct 30, 2024 at 4:25=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba=
+.com> wrote:
+> >
+> > virtio-net rq submits premapped per-buffer by setting sg page to NULL;
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/net/virtio_net.c | 24 +++++++++++++-----------
+> >  1 file changed, 13 insertions(+), 11 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 792e9eadbfc3..09757fa408bd 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -542,6 +542,12 @@ static struct sk_buff *ptr_to_skb(void *ptr)
+> >         return (struct sk_buff *)((unsigned long)ptr & ~VIRTIO_ORPHAN_F=
+LAG);
+> >  }
+> >
+> > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 l=
+en)
+> > +{
+> > +       sg->dma_address =3D addr;
+> > +       sg->length =3D len;
+>
+> This may work but I think it's better to reuse existing dma sg helpers li=
+ke:
+>
+> sg_dma_address(sg) =3D addr;
+> sg_dma_length(sg) =3D len;
+>
+> And we probably need to fix the virtio core which only uses
+> sg_dma_address() but not sg_dma_length().
+>
+> This helps us to avoid future issues when CONFIG_NEED_SG_DMA_LENGTH is se=
+t.
 
 
---qryq5ucgmrporour
-Content-Type: text/plain; protected-headers=v1; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-Subject: Re: [PATCH net 7/8] can: mcp251xfd: mcp251xfd_ring_alloc(): fix
- coalescing configuration when switching CAN modes
-MIME-Version: 1.0
+I don't think so.
 
-On 04.11.2024 17:44:46, Jakub Kicinski wrote:
-> On Mon,  4 Nov 2024 20:53:30 +0100 Marc Kleine-Budde wrote:
-> > Reported-by: https://github.com/vdh-robothania
->=20
-> Did you do this because of a checkpatch warning or to give the person
-> credit? If the former ignore the warning, if the latter I think it's
-> better to mention their user name in the commit message and that's it.
+For no-premapped mode, we pass the sg as no-dma sg to virtio core,
+so the virtio core uses the sg->length directly.
+If virtio core do dma map for sg, we do not use the dma_mag_sg_attrs(),
+so we must use sg->length directly.
 
-I added the link to their gh to credit them. Will @-mention github users
-without public email addresses in future commits.
+In this case, for the driver, we can not use sg_dma_length(),
+if CONFIG_NEED_SG_DMA_LENGTH is set, sg_dma_length() will set sg->dma_lengt=
+h,
+but virtio core use sg->length.
 
-> IMO Reported-by should be a machine readable email address, in case we
-> need to CC the person and ask for testing.
+For sg->dma_address, it is ok for me to use sg_dma_address or not.
+But for consistency to sg->length, I use the sg->dma_address directly.
 
-That makes sense.
+I noticed this is special, so I put them into an independent function.
 
-> That's just my $.02 for future cases.
+Thanks.
 
-regards,
-Marc
-
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
-
---qryq5ucgmrporour
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAABCgAdFiEEUEC6huC2BN0pvD5fKDiiPnotvG8FAmcprR0ACgkQKDiiPnot
-vG8qhAf/Rg6EYXIoAEJdQf6xmOHPL0M11ucskQNMBRPh0Tr6OjBxqImCBMs8EN0L
-np1bdyNZ25Wnf6QJMY5Fc5erPYrMvvbfTpwn99b60RCsWrC0e4tnsMFhrpnyheFc
-jnf2aoGe+e1R8yTqNn3rwDlibZHAywXvqOOdalLSDrdPMA3ADuKuINzHqVHGUt2t
-+hymZP7xvBk7pKdgW+eCwlQbKnt4gYbR5cFWIeE8atg2acyq0Hx9fyRvklfsX99P
-yyjpAqC3yU/CCqrVOQzV4ZFyNfVoEKtA0zVSzM2nZ6yCj1f/dWaLT64MKMqxKKkn
-HFW7xFk7xyhSh/4eYFqTKkJr+oj7wQ==
-=6tM2
------END PGP SIGNATURE-----
-
---qryq5ucgmrporour--
+>
+> Others look good.
+>
+> Thanks
+>
+> > +}
+> > +
+> >  static void __free_old_xmit(struct send_queue *sq, struct netdev_queue=
+ *txq,
+> >                             bool in_napi, struct virtnet_sq_free_stats =
+*stats)
+> >  {
+> > @@ -915,8 +921,7 @@ static void virtnet_rq_init_one_sg(struct receive_q=
+ueue *rq, void *buf, u32 len)
+> >         addr =3D dma->addr - sizeof(*dma) + offset;
+> >
+> >         sg_init_table(rq->sg, 1);
+> > -       rq->sg[0].dma_address =3D addr;
+> > -       rq->sg[0].length =3D len;
+> > +       sg_fill_dma(rq->sg, addr, len);
+> >  }
+> >
+> >  static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_=
+t gfp)
+> > @@ -1068,12 +1073,6 @@ static void check_sq_full_and_disable(struct vir=
+tnet_info *vi,
+> >         }
+> >  }
+> >
+> > -static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32 l=
+en)
+> > -{
+> > -       sg->dma_address =3D addr;
+> > -       sg->length =3D len;
+> > -}
+> > -
+> >  static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
+> >                                    struct receive_queue *rq, void *buf,=
+ u32 len)
+> >  {
+> > @@ -1354,7 +1353,8 @@ static int virtnet_add_recvbuf_xsk(struct virtnet=
+_info *vi, struct receive_queue
+> >                 sg_init_table(rq->sg, 1);
+> >                 sg_fill_dma(rq->sg, addr, len);
+> >
+> > -               err =3D virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_buff=
+s[i], gfp);
+> > +               err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1=
+, xsk_buffs[i],
+> > +                                                   NULL, true, gfp);
+> >                 if (err)
+> >                         goto err;
+> >         }
+> > @@ -2431,7 +2431,8 @@ static int add_recvbuf_small(struct virtnet_info =
+*vi, struct receive_queue *rq,
+> >
+> >         virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN);
+> >
+> > -       err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gf=
+p);
+> > +       err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, c=
+tx,
+> > +                                           rq->do_dma, gfp);
+> >         if (err < 0) {
+> >                 if (rq->do_dma)
+> >                         virtnet_rq_unmap(rq, buf, 0);
+> > @@ -2546,7 +2547,8 @@ static int add_recvbuf_mergeable(struct virtnet_i=
+nfo *vi,
+> >         virtnet_rq_init_one_sg(rq, buf, len);
+> >
+> >         ctx =3D mergeable_len_to_ctx(len + room, headroom);
+> > -       err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gf=
+p);
+> > +       err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf, c=
+tx,
+> > +                                           rq->do_dma, gfp);
+> >         if (err < 0) {
+> >                 if (rq->do_dma)
+> >                         virtnet_rq_unmap(rq, buf, 0);
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
