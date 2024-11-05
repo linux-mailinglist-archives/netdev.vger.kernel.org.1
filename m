@@ -1,103 +1,151 @@
-Return-Path: <netdev+bounces-141952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141953-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 516259BCC6A
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:11:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B3F89BCC6B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:12:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82F2E1C227CB
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:11:57 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 126071F23256
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:12:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A8031D54E1;
-	Tue,  5 Nov 2024 12:11:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E814C1D5143;
+	Tue,  5 Nov 2024 12:12:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="IzURaaWj"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="auV0FI6c"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f43.google.com (mail-lf1-f43.google.com [209.85.167.43])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out30-100.freemail.mail.aliyun.com (out30-100.freemail.mail.aliyun.com [115.124.30.100])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C6D51D516F
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 12:11:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.43
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86CD51420A8;
+	Tue,  5 Nov 2024 12:12:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.100
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730808704; cv=none; b=JyxkB0m+xlm0okbJSHOZfgK8IpOEzVn5IeBzd09vLkg4fJOqXbswkRF/2oZaViP83w7YrUQVE6UyjRaqShZaQyM4NDjmtpxJ6v9Q44//O9Z071FAlllanTsr/IEwtxGwNQq8IaU7l794EZeG7SYVGDQc1zL8FPos7qTFPV13KnA=
+	t=1730808752; cv=none; b=FFEK+IUgfewgeJkroD0oAWLDK1JS4v3bFuLckqhXFry1qLF71Wu8pGPknzPwFSgJP7M37md70s/WWik2sOB4o4vao5yKsSP/GKnBVpTh0o7Djif2zJpQRJ+8epQFKwDnu9pDeMdOZ3yuYJzpROb6FVLzLlaEHWK/06KgLQxzk9Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730808704; c=relaxed/simple;
-	bh=ABKvtoIrylTyJbj2YQxk7+vKPejF7GcDhjN+pvPyYgo=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=OqMDCIkh0njrJx1zDtczsd+mAQK8+vXBFWUy3ztL32eXFdRh1tNUMgiQ1I+GOAZRYUe3FD0kPv3rY8xJOOdRbavBW2vPoKkTaFpU3HTkDTNfWu8DCyyCVJSQUoOyvJ+JN8Q8wB+lqRaOo36kYqHOq4/I4OplF9LBzmSJa/4dMUk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=IzURaaWj; arc=none smtp.client-ip=209.85.167.43
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-lf1-f43.google.com with SMTP id 2adb3069b0e04-539ee1acb86so5367862e87.0
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 04:11:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730808701; x=1731413501; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ABKvtoIrylTyJbj2YQxk7+vKPejF7GcDhjN+pvPyYgo=;
-        b=IzURaaWjzh/QkXNrle2dBwjXfPaoZnIV5QTX4YRfRS5Gyx26NOLTM/O9eWuI9/yXo/
-         rvB9/zLjkyUKUzi+luy+ylUdCISL4WIBUnroRE1xJ0DpzSu+Vs5HNW5FacRpbmxbTk6q
-         NzXRMok/Kr9ASy2xK3pu+lCj++6NjTax1zwKUBmqDWIJlE0I0Gs44ZKpSKTyZ7n/ZhpV
-         1P8oGEwuqvT2iUZW3J5+rQVf4Psqdg4nYBoIj5GOQEk4jrVBNYclAN5fCfdXaKhMa2MJ
-         4X4HxtQeNr/f1RpptbhsOApYsnEGvmKW4WTCNYdtcVclNr0s62FhVFOGmluJ2RmI6ON6
-         k/jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730808701; x=1731413501;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ABKvtoIrylTyJbj2YQxk7+vKPejF7GcDhjN+pvPyYgo=;
-        b=JYYt0ZNWZnwzyNCzhnct9N9DdSxyPK1TsY+JHhMj5mLejlagzPo8yowKN8whFpOgXO
-         y2BEgvXjNoegWZfWUZqvtiahJIwHvTauVcv6oG2xwulWFiwiPj5hjdCZ/tWSyOtjmQhV
-         qyn4o04N7CEb3gwfqO3iCh0wQbjr7DlgcJ0dzeOWU2sQ9qU90ph6EZFIH9q0lxtoWaG4
-         GFZQcAGB8Fii3CTl1C8ewauolRS8x9mTts5/rdnaOJeqwVGqEpxjQQCZwhI8M2Qoh1Co
-         24LbxSQnA06usvN79ArloNfYRjUF/EQeOked98nI1ceeHPKwZpkw0up78uTKmHO3YwYP
-         Z7cA==
-X-Forwarded-Encrypted: i=1; AJvYcCWGK2+xcODXq5IvdS+WVfZR6Jl+gwHQ3wEg9chvt2J2vb07ViU3P/2qedZoJNnnqrYUzI6AI/A=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwmgjnNLP1x5BEhMBzqK6nu+Fgfs8lAc6riX/3Cp6asg7XuA2un
-	Mcvryn1lAhww31glfQUDXhfsPeJgB60uf8X0N/7gYXiAqCWmNkaYepdNkFJxg5+vDGEYPfJmj5k
-	h0slkiffQfx62bFDhWCiCKC3d/naJMfa4dHbItnmzTqDOqJqyaw==
-X-Google-Smtp-Source: AGHT+IEk7SJLNCqbiTZEIjw+CbrT094UAOk1ZikO5jhJoaKVLKivxtZeAzC9UoZnzU4vNlSplne3hvsdfINV9E7Y6cQ=
-X-Received: by 2002:a05:6512:1590:b0:539:f74b:62a5 with SMTP id
- 2adb3069b0e04-53d65df76aemr7078077e87.25.1730808700335; Tue, 05 Nov 2024
- 04:11:40 -0800 (PST)
+	s=arc-20240116; t=1730808752; c=relaxed/simple;
+	bh=dx5Uzu/K7lRZLazhG5uabV3QNjy5CjBhQEZFr4k/jrM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=sfmpXbQgfgNfLcMrljIPtN26WoMztfXcAw9H9Zl+40S6eDbkAJKItC3+f86vYMEEjddB7zhT8GiYOHOILe+QmXEq/PiuH5vK3IyrEGuT/9+SyHr4NTSU+R1hALXd8J8Ap3vsdUCHKaf5edtR7PdnoSFZ2ldV9dFVxnMylOIBryI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=auV0FI6c; arc=none smtp.client-ip=115.124.30.100
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730808747; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=Aw7cKbR7rHQWvHVFw+MGM3hfuFW9+t1ddKaNLpn9ENI=;
+	b=auV0FI6cvm6+iRAHqSxVK/UA9B3IB03SlpuuKCZl1IIqJsAenMJScz9FcPVffCsM/dER7OVmQkEvDEiR/XpbBiqBnjQhJJnshAuzQSwkoHC8510HkzcspXMJx32UqFbbu4lv4cfEUCEfx8nO93J4iJEQk5tUjRkmPm+XzRKbP9k=
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WImrjsa_1730808745 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Tue, 05 Nov 2024 20:12:26 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	antony.antony@secunet.com,
+	steffen.klassert@secunet.com,
+	linux-kernel@vger.kernel.org,
+	dust.li@linux.alibaba.com,
+	jakub@cloudflare.com,
+	fred.cc@alibaba-inc.com,
+	yubing.qiuyubing@alibaba-inc.com
+Subject: [PATCH v7 net-next 0/4] udp: Add 4-tuple hash for connected sockets
+Date: Tue,  5 Nov 2024 20:12:21 +0800
+Message-Id: <20241105121225.12513-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241104152622.3580037-1-edumazet@google.com> <D2067CE4-F300-4DED-8012-9718FD6AB67F@remlab.net>
-In-Reply-To: <D2067CE4-F300-4DED-8012-9718FD6AB67F@remlab.net>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 5 Nov 2024 13:11:29 +0100
-Message-ID: <CANn89iK0mAk__j32b6yOUJsDtM0EDgymgoKi0P8o+ZEf_YVbbg@mail.gmail.com>
-Subject: Re: [PATCH net-next] phonet: do not call synchronize_rcu() from phonet_route_del()
-To: =?UTF-8?Q?R=C3=A9mi_Denis=2DCourmont?= <remi@remlab.net>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, 
-	Remi Denis-Courmont <courmisch@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 5, 2024 at 12:05=E2=80=AFPM R=C3=A9mi Denis-Courmont <remi@reml=
-ab.net> wrote:
->
+This patchset introduces 4-tuple hash for connected udp sockets, to make
+connected udp lookup faster.
 
-> Synchronising after sending notifications sounds a bit iffy. Whatever a g=
-iven notification is about should be fully committed so we don't create a u=
-ser-visible race here.
+Stress test results (with 1 cpu fully used) are shown below, in pps:
+(1) _un-connected_ socket as server
+    [a] w/o hash4: 1,825176
+    [b] w/  hash4: 1,831750 (+0.36%)
 
-This is fine, the notification sends the ifindex, after the route is
-effectively removed.
+(2) 500 _connected_ sockets as server
+    [c] w/o hash4:   290860 (only 16% of [a])
+    [d] w/  hash4: 1,889658 (+3.1% compared with [b])
+With hash4, compute_score is skipped when lookup, so [d] is slightly
+better than [b].
 
-Fact that the device is held a bit longer than before should be an
-improvement, or just a nop.
+Patch1: Add a new counter for hslot2 named hash4_cnt, to avoid cache line
+        miss when lookup.
+Patch2: Add hslot/hlist_nulls for 4-tuple hash.
+Patch3 and 4: Implement 4-tuple hash for ipv4 and ipv6.
 
-However, doing the dev_put() after synchronize_rcu() is probably better.
+The detailed motivation is described in Patch 3.
+
+The 4-tuple hash increases the size of udp_sock and udp_hslot. Thus add it
+with CONFIG_BASE_SMALL, i.e., it's a no op with CONFIG_BASE_SMALL.
+
+changelogs:
+v6 -> v7 (Kuniyuki Iwashima):
+- export udp_ehashfn to be used by udpv6 rehash
+
+v5 -> v6 (Paolo Abeni):
+- move udp_table_hash4_init from patch2 to patch1
+- use hlist_nulls for lookup-rehash race
+- add test results in commit log
+- add more comment, e.g., for rehash4 used in hash4
+- add ipv6 support (Patch4), and refactor some functions for better
+  sharing, without functionality change
+
+v4 -> v5 (Paolo Abeni):
+- add CONFIG_BASE_SMALL with which udp hash4 does nothing
+
+v3 -> v4 (Willem de Bruijn):
+- fix mistakes in udp_pernet_table_alloc()
+
+RFCv2 -> v3 (Gur Stavi):
+- minor fix in udp_hashslot2() and udp_table_init()
+- add rcu sync in rehash4()
+
+RFCv1 -> RFCv2:
+- add a new struct for hslot2
+- remove the sockopt UDP_HASH4 because it has little side effect for
+  unconnected sockets
+- add rehash in connect()
+- re-organize the patch into 3 smaller ones
+- other minor fix
+
+v6:
+https://lore.kernel.org/all/20241031124550.20227-1-lulie@linux.alibaba.com/
+v5:
+https://lore.kernel.org/all/20241018114535.35712-1-lulie@linux.alibaba.com/
+v4:
+https://lore.kernel.org/all/20241012012918.70888-1-lulie@linux.alibaba.com/
+v3:
+https://lore.kernel.org/all/20241010090351.79698-1-lulie@linux.alibaba.com/
+RFCv2:
+https://lore.kernel.org/all/20240924110414.52618-1-lulie@linux.alibaba.com/
+RFCv1:
+https://lore.kernel.org/all/20240913100941.8565-1-lulie@linux.alibaba.com/
+
+Philo Lu (4):
+  net/udp: Add a new struct for hash2 slot
+  net/udp: Add 4-tuple hash list basis
+  ipv4/udp: Add 4-tuple hash for connected socket
+  ipv6/udp: Add 4-tuple hash for connected socket
+
+ include/linux/udp.h |  11 +++
+ include/net/udp.h   | 135 ++++++++++++++++++++++++--
+ net/ipv4/udp.c      | 232 +++++++++++++++++++++++++++++++++++++++-----
+ net/ipv6/udp.c      | 111 ++++++++++++++++++---
+ 4 files changed, 447 insertions(+), 42 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
