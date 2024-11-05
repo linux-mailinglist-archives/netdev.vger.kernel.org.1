@@ -1,229 +1,182 @@
-Return-Path: <netdev+bounces-141829-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141831-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D11949BC71A
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:33:00 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE3649BC74B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 08:49:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 626F91F21B34
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 07:33:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1FD01C22054
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 07:49:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE9206F06D;
-	Tue,  5 Nov 2024 07:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 550E11FCF41;
+	Tue,  5 Nov 2024 07:49:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kYgk54NN"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="CNzFl80+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-52003.amazon.com (smtp-fw-52003.amazon.com [52.119.213.152])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA775383
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 07:32:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92CE0282F1
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 07:49:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.152
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730791975; cv=none; b=l8/JBLNZXQuBGPk1GC/slsQb8l21NZ3OXCC0naPVNW1bLqPP4oyvnO52waGGGzIwDxSYebkr7r9RQUTzBg4XWcrkOMQsy4LEvBwg7D/B+tOMI1/8v/D8nVE5pNNsM8MxuaCU2NUrS3sdO+OYWl38dpU1CYj27u4rWU7VgXg/T4E=
+	t=1730792972; cv=none; b=Rjsgr8evtAoAOYVa+LHVhTA8Qnu0xsC0s0Zujwtk10zGsH7x3v69vkmhfX23JuHkfsXLQOagAYWmBI2ZptfzFgTZ0Ce+1Lrtdtdo/baFXcbA8ZcgJnHo8np8O5XrIJgQU/vIqh4S2DO3dKsvKQ405ngimJk/ZwmE1SP9hYOd1vc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730791975; c=relaxed/simple;
-	bh=iSnTcVv8xx3iW0J7hIovo2ZBrioU5ZLs6QaNG5MD98s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=cVMqjHCnrP8E584YGGx32wGYiTHmMFM10vS/9gRNw3Qp10nfz8UrBiUJ5KsW2+VfXTd1bZvehLwZPISlibQtnC+2FSwxFptAk1JVHAjEOyjbZ1Rnd4EAyIrd4akOKMvFaCv4Vh+mTBPwsWYgGCQThNmDyNQwMYv0wM0am3U4MUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kYgk54NN; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B7711C4CECF;
-	Tue,  5 Nov 2024 07:32:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730791975;
-	bh=iSnTcVv8xx3iW0J7hIovo2ZBrioU5ZLs6QaNG5MD98s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=kYgk54NNdgO518DErRKJpU7qDWCcfzn67Bgal8ZxuQKPqzCRhDeZbmexSfIeMS4C5
-	 SHQH2qyIF0TkDBU9GHKauS4Rpuhtsg0lKfWJQ0s0Wwx+sxEp5lutv8gban7vS4a/Zz
-	 xg4uvnhisWidGAPR+5zng+ZWRGRXZo3qD2Va+deSMcR5KmNqhTTVU3zZ/IGOw8kt7H
-	 /W31RZ8pCawb5YPwkQAY9eYzb5MQyw+WzKL+clOaBCpLUONao6cRsU+eGv0uAeCYkx
-	 yQf4gf72BhPPBa5HZRE2UoIwofSD6ui0/V2cJxzxzkgRaQeXLqlwAyMdsBir2q3hjt
-	 bwSgr1/ZKUo2A==
-Date: Tue, 5 Nov 2024 09:32:48 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Feng Wang <wangfe@google.com>
-Cc: netdev@vger.kernel.org, steffen.klassert@secunet.com,
-	antony.antony@secunet.com
-Subject: Re: [PATCH 1/2] xfrm: add SA information to the offloaded packet
-Message-ID: <20241105073248.GC311159@unreal>
-References: <20241104233251.3387719-1-wangfe@google.com>
+	s=arc-20240116; t=1730792972; c=relaxed/simple;
+	bh=qfqLpZeTQPswxkg9GLMZaMpmIincBUUUDXLdljDLi2k=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ER4Pe/JfA2BmlWrS20dAzfQ8ls+vfNHcRryRir3gIRpUVpXusmRImt2/ivKXfvhIfidWN+1Efl+8AKWxlcCBAydqcANCdzVZEuABZUE1rtuFTbuzO1FPUw1vTHjv1F8klu3VU0snUbkut7NoF4T6jgSnWySWfHa3/xBX1nR0zrQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=CNzFl80+; arc=none smtp.client-ip=52.119.213.152
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730792970; x=1762328970;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=buxtl97omJkJ9wNG5yilJBu27HtxpCMQCFIYaxJnDJw=;
+  b=CNzFl80+qP9aBPw3JTGC7oMH0vJt6ARXI3ZpC1HHYSz5JYpX6kaQZySO
+   zznV+UU6k6dal7BpSPv4Z88NLhRXhfpxPqJ8fZWOCHmvIYFaMqIa1Vs86
+   2Px9KREN4qQLqYUl234tXoD2GvIjULKPHaI+4QBojH4l+Vy+sh8QBNZAr
+   U=;
+X-IronPort-AV: E=Sophos;i="6.11,259,1725321600"; 
+   d="scan'208";a="39031355"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
+  by smtp-border-fw-52003.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 07:49:27 +0000
+Received: from EX19MTAUWA002.ant.amazon.com [10.0.38.20:47817]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.170:2525] with esmtp (Farcaster)
+ id 8c07c67d-a201-4b65-b151-3dac93b35ace; Tue, 5 Nov 2024 07:49:25 +0000 (UTC)
+X-Farcaster-Flow-ID: 8c07c67d-a201-4b65-b151-3dac93b35ace
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Tue, 5 Nov 2024 07:49:21 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.171.42) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Tue, 5 Nov 2024 07:49:18 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kerneljasonxing@gmail.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
+	<horms@kernel.org>, <kernelxing@tencent.com>, <kuba@kernel.org>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to failure in tcp_timewait_state_process
+Date: Mon, 4 Nov 2024 23:49:16 -0800
+Message-ID: <20241105074916.75107-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241105025511.42652-1-kerneljasonxing@gmail.com>
+References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104233251.3387719-1-wangfe@google.com>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Mon, Nov 04, 2024 at 03:32:51PM -0800, Feng Wang wrote:
-> From: wangfe <wangfe@google.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Tue,  5 Nov 2024 10:55:11 +0800
+> From: Jason Xing <kernelxing@tencent.com>
 > 
-> In packet offload mode, append Security Association (SA) information
-> to each packet, replicating the crypto offload implementation.
-> The XFRM_XMIT flag is set to enable packet to be returned immediately
-> from the validate_xmit_xfrm function, thus aligning with the existing
-> code path for packet offload mode.
-> 
-> This SA info helps HW offload match packets to their correct security
-> policies. The XFRM interface ID is included, which is used in setups
-> with multiple XFRM interfaces where source/destination addresses alone
-> can't pinpoint the right policy.
-> 
-> Enable packet offload mode on netdevsim and add code to check the XFRM
-> interface ID.
-> 
-> Signed-off-by: wangfe <wangfe@google.com>
+> We found there are rare chances that some RST packets appear during
+> the shakehands because the timewait socket cannot accept the SYN and
 
-Something wrong with your git setup, lore shows only one patch.
-https://lore.kernel.org/all/20241104233251.3387719-1-wangfe@google.com/
+s/shakehands/handshake/
 
+same in the subject.
+
+> doesn't return TCP_TW_SYN in tcp_timewait_state_process().
+> 
+> Here is how things happen in production:
+> Time        Client(A)        Server(B)
+> 0s          SYN-->
+> ...
+> 132s                         <-- FIN
+> ...
+> 169s        FIN-->
+> 169s                         <-- ACK
+> 169s        SYN-->
+> 169s                         <-- ACK
+> 169s        RST-->
+> As above picture shows, the two flows have a start time difference
+> of 169 seconds. B starts to send FIN so it will finally enter into
+> TIMEWAIT state. Nearly at the same time A launches a new connection
+> that soon is reset by itself due to receiving a ACK.
+> 
+> There are two key checks in tcp_timewait_state_process() when timewait
+> socket in B receives the SYN packet:
+> 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
+> 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
+> 
+> Regarding the first rule, it fails as expected because in the first
+> connection the seq of SYN sent from A is 1892994276, then 169s have
+> passed, the second SYN has 239034613 (caused by overflow of s32).
+> 
+> Then how about the second rule?
+> It fails again!
+> Let's take a look at how the tsval comes out:
+> __tcp_transmit_skb()
+>     -> tcp_syn_options()
+>         -> opts->tsval = tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) + tp->tsoffset;
+> The timestamp depends on two things, one is skb->skb_mstamp_ns, the
+> other is tp->tsoffset. The latter value is fixed, so we don't need
+> to care about it. If both operations (sending FIN and then starting
+> sending SYN) from A happen in 1ms, then the tsval would be the same.
+> It can be clearly seen in the tcpdump log. Notice that the tsval is
+> with millisecond precision.
+> 
+> Based on the above analysis, I decided to make a small change to
+> the check in tcp_timewait_state_process() so that the second flow
+> would not fail.
+> 
+> Signed-off-by: Jason Xing <kernelxing@tencent.com>
 > ---
-> v3: https://lore.kernel.org/all/20240822200252.472298-1-wangfe@google.com/
->   - Add XFRM interface ID checking on netdevsim in the packet offload
->     mode.
-> v2:
->   - Add why HW offload requires the SA info to the commit message
-> v1: https://lore.kernel.org/all/20240812182317.1962756-1-wangfe@google.com/
-> ---
-> ---
->  drivers/net/netdevsim/ipsec.c     | 24 +++++++++++++++++++++++-
->  drivers/net/netdevsim/netdevsim.h |  1 +
->  net/xfrm/xfrm_output.c            | 21 +++++++++++++++++++++
->  3 files changed, 45 insertions(+), 1 deletion(-)
-
-Don't you need to update current drivers who support packet offload with
-if(x->if_id) check in their SA/policy validator to return an error to
-the user? They don't support that flow.
-
+>  net/ipv4/tcp_minisocks.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/netdevsim/ipsec.c b/drivers/net/netdevsim/ipsec.c
-> index f0d58092e7e9..1ce7447dd269 100644
-> --- a/drivers/net/netdevsim/ipsec.c
-> +++ b/drivers/net/netdevsim/ipsec.c
-> @@ -149,7 +149,8 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
->  		return -EINVAL;
->  	}
->  
-> -	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO) {
-> +	if (xs->xso.type != XFRM_DEV_OFFLOAD_CRYPTO &&
-> +	    xs->xso.type != XFRM_DEV_OFFLOAD_PACKET) {
->  		NL_SET_ERR_MSG_MOD(extack, "Unsupported ipsec offload type");
->  		return -EINVAL;
->  	}
-> @@ -165,6 +166,7 @@ static int nsim_ipsec_add_sa(struct xfrm_state *xs,
->  	memset(&sa, 0, sizeof(sa));
->  	sa.used = true;
->  	sa.xs = xs;
-> +	sa.if_id = xs->if_id;
->  
->  	if (sa.xs->id.proto & IPPROTO_ESP)
->  		sa.crypt = xs->ealg || xs->aead;
-> @@ -224,10 +226,24 @@ static bool nsim_ipsec_offload_ok(struct sk_buff *skb, struct xfrm_state *xs)
->  	return true;
->  }
->  
-> +static int nsim_ipsec_add_policy(struct xfrm_policy *policy,
-> +				 struct netlink_ext_ack *extack)
-> +{
-> +	return 0;
-> +}
-> +
-> +static void nsim_ipsec_del_policy(struct xfrm_policy *policy)
-> +{
-> +}
-> +
->  static const struct xfrmdev_ops nsim_xfrmdev_ops = {
->  	.xdo_dev_state_add	= nsim_ipsec_add_sa,
->  	.xdo_dev_state_delete	= nsim_ipsec_del_sa,
->  	.xdo_dev_offload_ok	= nsim_ipsec_offload_ok,
-> +
-> +	.xdo_dev_policy_add     = nsim_ipsec_add_policy,
-> +	.xdo_dev_policy_delete  = nsim_ipsec_del_policy,
-> +
->  };
->  
->  bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
-> @@ -272,6 +288,12 @@ bool nsim_ipsec_tx(struct netdevsim *ns, struct sk_buff *skb)
->  		return false;
->  	}
->  
-> +	if (xs->if_id != tsa->if_id) {
+> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
+> index bb1fe1ba867a..2b29d1bf5ca0 100644
+> --- a/net/ipv4/tcp_minisocks.c
+> +++ b/net/ipv4/tcp_minisocks.c
+> @@ -234,7 +234,7 @@ tcp_timewait_state_process(struct inet_timewait_sock *tw, struct sk_buff *skb,
+>  	if (th->syn && !th->rst && !th->ack && !paws_reject &&
+>  	    (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
+>  	     (tmp_opt.saw_tstamp &&
+> -	      (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0))) {
 
-if_id exists in policy and state, but you are checking only state.
+I think this follows RFC 6191 and such a change requires a formal
+discussion at IETF.
 
-> +		netdev_err(ns->netdev, "unmatched if_id %d %d\n",
-> +			   xs->if_id, tsa->if_id);
-> +		return false;
-> +	}
+https://datatracker.ietf.org/doc/html/rfc6191#section-2
 
-It is worth to add check for having XFRM_XMIT flag here.
+---8<---
+      *  If TCP Timestamps would be enabled for the new incarnation of
+         the connection, and the timestamp contained in the incoming SYN
+         segment is greater than the last timestamp seen on the previous
+         incarnation of the connection (for that direction of the data
+         transfer), honor the connection request (creating a connection
+         in the SYN-RECEIVED state).
 
-> +
->  	ipsec->tx++;
->  
->  	return true;
-> diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netdevsim.h
-> index bf02efa10956..4941b6e46d0a 100644
-> --- a/drivers/net/netdevsim/netdevsim.h
-> +++ b/drivers/net/netdevsim/netdevsim.h
-> @@ -41,6 +41,7 @@ struct nsim_sa {
->  	__be32 ipaddr[4];
->  	u32 key[4];
->  	u32 salt;
-> +	u32 if_id;
->  	bool used;
->  	bool crypt;
->  	bool rx;
-> diff --git a/net/xfrm/xfrm_output.c b/net/xfrm/xfrm_output.c
-> index e5722c95b8bb..a12588e7b060 100644
-> --- a/net/xfrm/xfrm_output.c
-> +++ b/net/xfrm/xfrm_output.c
-> @@ -706,6 +706,8 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
->  	struct xfrm_state *x = skb_dst(skb)->xfrm;
->  	int family;
->  	int err;
-> +	struct xfrm_offload *xo;
-> +	struct sec_path *sp;
->  
->  	family = (x->xso.type != XFRM_DEV_OFFLOAD_PACKET) ? x->outer_mode.family
->  		: skb_dst(skb)->ops->family;
-> @@ -728,6 +730,25 @@ int xfrm_output(struct sock *sk, struct sk_buff *skb)
->  			kfree_skb(skb);
->  			return -EHOSTUNREACH;
->  		}
+      *  If TCP Timestamps would be enabled for the new incarnation of
+         the connection, the timestamp contained in the incoming SYN
+         segment is equal to the last timestamp seen on the previous
+         incarnation of the connection (for that direction of the data
+         transfer), and the Sequence Number of the incoming SYN segment
+         is greater than the last sequence number seen on the previous
+         incarnation of the connection (for that direction of the data
+         transfer), honor the connection request (creating a connection
+         in the SYN-RECEIVED state).
+---8<---
 
-I think that code below should be set under "if (x->if_id)".
-
-Thanks
-
-> +		sp = secpath_set(skb);
-> +		if (!sp) {
-> +			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-> +			kfree_skb(skb);
-> +			return -ENOMEM;
-> +		}
-> +
-> +		sp->olen++;
-> +		sp->xvec[sp->len++] = x;
-> +		xfrm_state_hold(x);
-> +
-> +		xo = xfrm_offload(skb);
-> +		if (!xo) {
-> +			secpath_reset(skb);
-> +			XFRM_INC_STATS(net, LINUX_MIB_XFRMOUTERROR);
-> +			kfree_skb(skb);
-> +			return -EINVAL;
-> +		}
-> +		xo->flags |= XFRM_XMIT;
->  
->  		return xfrm_output_resume(sk, skb, 0);
->  	}
+> +	      (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) <= 0))) {
+>  		u32 isn = tcptw->tw_snd_nxt + 65535 + 2;
+>  		if (isn == 0)
+>  			isn++;
 > -- 
-> 2.47.0.199.ga7371fff76-goog
-> 
-> 
+> 2.37.3
 
