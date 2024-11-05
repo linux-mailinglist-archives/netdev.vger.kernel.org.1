@@ -1,193 +1,280 @@
-Return-Path: <netdev+bounces-142031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 95C829BD1B1
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:07:55 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0B89BD1E8
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:13:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56BE028631E
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:07:54 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E7F61F22C7B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 16:13:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D9314C5BA;
-	Tue,  5 Nov 2024 16:06:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 404841684AC;
+	Tue,  5 Nov 2024 16:13:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="OvaeSaCR"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="LtEMrsEN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f46.google.com (mail-pj1-f46.google.com [209.85.216.46])
+Received: from mail-pg1-f177.google.com (mail-pg1-f177.google.com [209.85.215.177])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BE5514EC56
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 16:06:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A1C0215FA74
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 16:13:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730822799; cv=none; b=quRmaaGSLH0Fi/g0j8E3HIPsOUF5QvF4iOMgbV4uxpG1V2SFVyoOJfv08MvisaS1nt3i5r9TwWiaqDzFsGGcG1ia7k8DsI0CZfPxTyNOayGd7fQZhB4Bfcyx5rvfP+ec+aIPaiTAKePYVHYgo6BSaXIy3LgxUsfzfUTYGqJUWXU=
+	t=1730823190; cv=none; b=OJ/rdBSG+Z+LqXgU3dBdo13tf3GnE/6n9K9Zfe4bD8KNuJmRTcxTc0y1oMWz3rD+JxzrAhGymzN2WV6RYRKfLzayzt+8zC7adYSxqrU0gp0WXo97nULKGKLIGYNFJdXUpEI8Gsy9BfRaI64YzDB2T0ZA4alNfTuAQkxZZxqL2JI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730822799; c=relaxed/simple;
-	bh=YRiHww1+NhlFVyCrv9IfzoyKUfIeSR3WjAcec84h3z0=;
+	s=arc-20240116; t=1730823190; c=relaxed/simple;
+	bh=QcAHF2KA3PN8SfmCOvjV96QdZHXcl8wulzx5vEEyaY0=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=GOi0oN1AQZ30RNgFF1drlFPvwD2JDPbRurxSQNbnNlvzpb3V5H5v8NOXSMh9L75G8/0GzJn0x1A4KJDCoFV3HP2J8KxeAwkg8+LFKwAArrhRsPWq4JV+cEyyN0tiWbgNMaaqxxxm/0107gfGrcVPOEEdxVhVuMGqBYyAJ+lX/PI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=OvaeSaCR; arc=none smtp.client-ip=209.85.216.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pj1-f46.google.com with SMTP id 98e67ed59e1d1-2e2c2a17aa4so869294a91.0
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 08:06:37 -0800 (PST)
+	 To:Cc:Content-Type; b=XPppR9xgBKGS6dbLX3MXvSdApNTVFmc7JftsA25RCykX+Ad/+L76fj/smU71BKyRmfi9yzC5Y2P+Ty/KmyDiv8mqdfO88dGdGySkhzmRCxerQV8YeW3rl7bBB12JggajR339vwEN/E50pTwdy7IfVSCWpT44XLH6bBgYmX1ArG4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=LtEMrsEN; arc=none smtp.client-ip=209.85.215.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pg1-f177.google.com with SMTP id 41be03b00d2f7-7ee4c57b037so3559231a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 08:13:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1730822797; x=1731427597; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Pe6tzS7Jefr2wBTMmepj7J7ch7Fwi7LgaTG2DrXOEMs=;
-        b=OvaeSaCRQACEi+CdUZKNh+b5NywDO9h4uldWJOlonufc4UvO/TT11SJbIE9n24lfH3
-         UltYT2VUgdl5UA17HZjN0T+/ciBzzFtTRHUhg2u+RYw2FDrykZAWSaeBF0KDOOQHHCWj
-         FYb9tnGVCaZB/ocld80GdaD9Usi4jf+0FG7SWz3qmiWnCy3thoFEBVDqsjcIFYlCe228
-         mNdphrY1MB4PKzU2q9mv+8EomkGPT0uNLhvGaRUN4klO3odB//gxn4FQ68iyhfM7VkRr
-         kBcdTQ6ZQCHS031u9wqQNWnIH+G1WjFtNPSeFD36ubvmn1gUDYiHKmM0tGtXfbZIYPK7
-         X5OQ==
+        d=broadcom.com; s=google; t=1730823188; x=1731427988; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZzXCMdu20Upq4uxUg495hwGwvd1dpLHB6uiQupHm3w4=;
+        b=LtEMrsENhcMS5RrFQuUWcNqEQQBpMMzgp5qPyncXoiw+1DUOzx9b8WIe0zHlRLnt1i
+         0Ax3gLh5Z6UUKNisVTmQC4oHUF1qh1LF71H1sK1OgCyzZOjjTH50cZo20PgWbvJy2j8S
+         Pw95nvIvuhYKqxfJRSx8i3C0nkudVy3XKckEs=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730822797; x=1731427597;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Pe6tzS7Jefr2wBTMmepj7J7ch7Fwi7LgaTG2DrXOEMs=;
-        b=XmiXo6VF3E+k1P7hK3WJWZTEQne65seHSwHliwDS1X5ag1BxLKV1cLrgh/d741b0UP
-         04rGJ5+pHqj/9k8Gsj/V1YaD5lfYMhhb1v5ccH1gDTF8xyMPdb/aAONKLENQrIWMUahI
-         GSPCrt9IORpOQmVglqW5/i9S1coB1TyR8XnU263KsEPuw2vSyKufXfIXscKbHiJdiexK
-         1Q+fbam1brSOKzn76u4VCeRm3wQbPiZA8lnnC4Zb1dhmA4glxfWzWyNKThZO1wqP3vkw
-         0mliZiVJWQlGahssjoQE6L48TWOHg7jZbGXX4LzlckJpKbomoanZ2pjsjy4KcB6vigq+
-         C+MA==
-X-Forwarded-Encrypted: i=1; AJvYcCWpKlQdzIoNsVVuf/a1yWXGJ8T3kqQESPCtc6mR6X4BGJDzD0PpYY4qGmo6U/WRBfQMl7ZmNQ8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzBUpw5/YjgorD0xGp6QtG6l1Ets/5Um1WQm+nrSUF8OhTONrcX
-	qXxVShapeDKMQHhs/maPnKBPZIxlPCjqHGRVbdHXTM0hvyzG+Z9kPcHSUJkclLwbpktwJV8aO/T
-	W8qNQWrx1yPjxlzties9TWT6aEAILEgYB+dIqOA==
-X-Google-Smtp-Source: AGHT+IFzsqY6OWMTeowTywyKfQhYAOXP+M/+Yjr6GgpGfWTfSDkoFlv1jXVRkyP3zd7O8FLbk4JHiwux2suOsS1uRP4=
-X-Received: by 2002:a17:90b:1d84:b0:2e2:de92:2d52 with SMTP id
- 98e67ed59e1d1-2e8f11d607amr18357252a91.9.1730822796788; Tue, 05 Nov 2024
- 08:06:36 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730823188; x=1731427988;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZzXCMdu20Upq4uxUg495hwGwvd1dpLHB6uiQupHm3w4=;
+        b=OPobYcaescA286kcBmYJT362o+05fPxvSIIZt5bu+kVFLxbQUPg6ZaEK6J6TbpGFD/
+         wRwf27COVrC+xSSe31XVGn6ae5PjlNvKpAG5SRb3aKdrztMBQlobDey/tYig6mQx/8rS
+         4pMUd2AiSxc9O6jSgrJ0ffJEU2wx89yozZhGPdEAUUS8ki4sHjTm7m/YkCjSOKt2CLx3
+         JCteFwsGv2wAxvlFa97DJQiDblUTvobNprhwhN3Lw0Zs7m4w+VO8uddDo1sJbxoUwKAm
+         2pBMT4EqDNSBuvq5rfy/7Bbcp3y//SI034+UA0QxCrBuVhULCAPU1kiLuynLpUsS5K5P
+         U8IA==
+X-Gm-Message-State: AOJu0YwvrgU88azjxpDrLZ00S9SUkA3wdQe2kzObH62ffBjAMs+ueoNR
+	a65L5/mEY+a1X8vmUfcmreDUtH39O2ok32f1eKkXPTDPo78JgEBHQ3exYPl0AA+hNozuGGcc5Eg
+	1oQZNCzXjdCfcOgskcmu4eErmKs9EIAM3eOYBR4/8dIou98K6/ubb
+X-Google-Smtp-Source: AGHT+IHde2jWfZKo4b527P+bxrPq48kjXQ883BnY7q5T9OF7QNGh/SxwDZmyAQPi8olGSKZgsqdx815q7S447QPX74M=
+X-Received: by 2002:a17:90b:184e:b0:2e2:effb:618b with SMTP id
+ 98e67ed59e1d1-2e94c2bed76mr24169966a91.13.1730823187748; Tue, 05 Nov 2024
+ 08:13:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241101034647.51590-1-csander@purestorage.com>
- <20241101034647.51590-2-csander@purestorage.com> <CY8PR12MB71958512F168E2C172D0BE05DC502@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CADUfDZofFwy12oZYTmm3TE314RM79EGsxV6bKEBRMVFv8C3jNg@mail.gmail.com> <CY8PR12MB71953FD36C70ACACEBE3DBA1DC522@CY8PR12MB7195.namprd12.prod.outlook.com>
-In-Reply-To: <CY8PR12MB71953FD36C70ACACEBE3DBA1DC522@CY8PR12MB7195.namprd12.prod.outlook.com>
-From: Caleb Sander <csander@purestorage.com>
-Date: Tue, 5 Nov 2024 08:06:25 -0800
-Message-ID: <CADUfDZqanDo+v_jap7pQire86QkfaDQE4HvhvVBb64YqKNgRHg@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] mlx5/core: deduplicate {mlx5_,}eq_update_ci()
-To: Parav Pandit <parav@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+References: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+In-Reply-To: <20241018205332.525595-1-jitendra.vegiraju@broadcom.com>
+From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
+Date: Tue, 5 Nov 2024 08:12:58 -0800
+Message-ID: <CAMdnO-+FjsRX4fjbCE_RVNY4pEoArD68dAWoEM+oaEZNJiuA3g@mail.gmail.com>
+Subject: Re: [PATCH net-next v6 0/5] net: stmmac: Add PCI driver support for BCM8958x
+To: netdev@vger.kernel.org
+Cc: alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mcoquelin.stm32@gmail.com, bcm-kernel-feedback-list@broadcom.com, 
+	richardcochran@gmail.com, ast@kernel.org, daniel@iogearbox.net, 
+	hawk@kernel.org, john.fastabend@gmail.com, fancer.lancer@gmail.com, 
+	rmk+kernel@armlinux.org.uk, ahalaney@redhat.com, xiaolei.wang@windriver.com, 
+	rohan.g.thomas@intel.com, Jianheng.Zhang@synopsys.com, 
+	linux-kernel@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, bpf@vger.kernel.org, andrew@lunn.ch, 
+	linux@armlinux.org.uk, horms@kernel.org, florian.fainelli@broadcom.com, 
+	quic_abchauha@quicinc.com
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000004bbfae06262cad47"
+
+--0000000000004bbfae06262cad47
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 4, 2024 at 9:22=E2=80=AFPM Parav Pandit <parav@nvidia.com> wrot=
-e:
+Hi netdev team,
+
+On Fri, Oct 18, 2024 at 1:53=E2=80=AFPM <jitendra.vegiraju@broadcom.com> wr=
+ote:
 >
+> From: Jitendra Vegiraju <jitendra.vegiraju@broadcom.com>
 >
+> This patchset adds basic PCI ethernet device driver support for Broadcom
+> BCM8958x Automotive Ethernet switch SoC devices.
 >
-> > From: Caleb Sander <csander@purestorage.com>
-> > Sent: Monday, November 4, 2024 3:49 AM
-> >
-> > On Sat, Nov 2, 2024 at 8:55=E2=80=AFPM Parav Pandit <parav@nvidia.com> =
-wrote:
-> > >
-> > >
-> > >
-> > > > From: Caleb Sander Mateos <csander@purestorage.com>
-> > > > Sent: Friday, November 1, 2024 9:17 AM
-> > > >
-> > > > The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci().
-> > > > The only additional work done by mlx5_eq_update_ci() is to incremen=
-t
-> > > > eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to
-> > > > eq->avoid
-> > > > the duplication.
-> > > >
-> > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > ---
-> > > >  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
-> > > >  1 file changed, 1 insertion(+), 8 deletions(-)
-> > > >
-> > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > index 859dcf09b770..078029c81935 100644
-> > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > @@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct
-> > > > mlx5_eq *eq, u32 cc)  }  EXPORT_SYMBOL(mlx5_eq_get_eqe);
-> > > >
-> > > >  void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)  {
-> > > > -     __be32 __iomem *addr =3D eq->doorbell + (arm ? 0 : 2);
-> > > > -     u32 val;
-> > > > -
-> > > >       eq->cons_index +=3D cc;
-> > > > -     val =3D (eq->cons_index & 0xffffff) | (eq->eqn << 24);
-> > > > -
-> > > > -     __raw_writel((__force u32)cpu_to_be32(val), addr);
-> > > > -     /* We still want ordering, just not swabbing, so add a barrie=
-r */
-> > > > -     wmb();
-> > > > +     eq_update_ci(eq, arm);
-> > > Long ago I had similar rework patches to get rid of __raw_writel(),
-> > > which I never got chance to push,
-> > >
-> > > Eq_update_ci() is using full memory barrier.
-> > > While mlx5_eq_update_ci() is using only write memory barrier.
-> > >
-> > > So it is not 100% deduplication by this patch.
-> > > Please have a pre-patch improving eq_update_ci() to use wmb().
-> > > Followed by this patch.
-> >
-> > Right, patch 1/2 in this series is changing eq_update_ci() to use
-> > writel() instead of __raw_writel() and avoid the memory barrier:
-> > https://lore.kernel.org/lkml/20241101034647.51590-1-
-> > csander@purestorage.com/
-> This patch has two bugs.
-> 1. writel() writes the MMIO space in LE order. EQ updates are in BE order=
+> This SoC device has PCIe ethernet MAC attached to an integrated ethernet
+> switch using XGMII interface. The PCIe ethernet controller is presented t=
+o
+> the Linux host as PCI network device.
+>
+> The following block diagram gives an overview of the application.
+>              +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
+>              |       Host CPU/Linux            |
+>              +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
+>                         || PCIe
+>                         ||
+>         +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
+>         |           +--------------+               |
+>         |           | PCIE Endpoint|               |
+>         |           | Ethernet     |               |
+>         |           | Controller   |               |
+>         |           |   DMA        |               |
+>         |           +--------------+               |
+>         |           |   MAC        |   BCM8958X    |
+>         |           +--------------+   SoC         |
+>         |               || XGMII                   |
+>         |               ||                         |
+>         |           +--------------+               |
+>         |           | Ethernet     |               |
+>         |           | switch       |               |
+>         |           +--------------+               |
+>         |             || || || ||                  |
+>         +=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D+
+>                       || || || || More external interfaces
+>
+> The MAC block on BCM8958x is based on Synopsis XGMAC 4.00a core. This
+> MAC IP introduces new DMA architecture called Hyper-DMA for virtualizatio=
+n
+> scalability.
+>
+> Driver functionality specific to new MAC (DW25GMAC) is implemented in
+> new file dw25gmac.c.
+>
+> Management of integrated ethernet switch on this SoC is not handled by
+> the PCIe interface.
+> This SoC device has PCIe ethernet MAC directly attached to an integrated
+> ethernet switch using XGMII interface.
+>
+> v5->v6:
+>    Change summary to address comments/suggestions by Serge Semin.
+>    Patch1:
+>      Removed the comlexity of hdma mapping in previous patch series and
+>      use static DMA mapping.
+>      Renamed plat_stmmacenet_data::snps_dev_id as dev_id and moved to
+>      the beginning of the struct.
+>    Patch2:
+>      Added dw25gmac_get_hw_feature() for dw25gmac.
+>      Use static one-to-one VDMA-TC-PDMA mapping.
+>    Patch4:
+>      Remove usage of plat_stmmacenet_data::msi_*_vec variables for
+>      interrupt vector initialization.
+>      Change phy_interface type to XGMII.
+>      Cleanup unused macros.
+>
+
+I would like to seek your guidance on how to take this patch series forward=
 .
-> So this will break on ppc64 BE.
-
-Okay, so this should be writel(cpu_to_le32(val), addr)?
-
->
-> 2. writel() issues the barrier BEFORE the raw_writel().
-> As opposed to that eq update needs to have a barrier AFTER the writel().
-> Likely to synchronize with other CQ related pointers update.
-
-I was referencing this prior discussion about the memory barrier:
-https://lore.kernel.org/netdev/CALzJLG8af0SMfA1C8U8r_Fddb_ZQhvEZd6=3D2a97dO=
-oBcgLA0xg@mail.gmail.com/
-From Saeed's message, it sounds like the memory barrier is only used
-to ensure the ordering of writes to the doorbell register, not the
-ordering of the doorbell write relative to any other writes. If some
-other write needs to be ordered after the doorbell write, please
-explain what it is. As Gal Pressman pointed out, a wmb() at the end of
-a function doesn't make much sense, as there are no further writes in
-the function to order. If the doorbell write needs to be ordered
-before some other write in a caller function, the memory barrier
-should probably move to the caller.
-
->
-> > Are you suggesting something different? If so, it would be great if you=
- could
-> > clarify what you mean.
-> >
-> So I was suggesting to keep __raw_writel() as is and replace mb() with wm=
-b().
-
-wmb() would certainly be cheaper than mb(), but I would like to
-understand the requirement for the barrier in the first place. The
-fence instruction is very expensive.
-
+Thanks to your feedback and Serge's suggestions, we made some forward
+progress on this patch series.
+Please make any suggestions to enable us to upstream driver support
+for BCM8958x.
 Thanks,
-Caleb
+Jitendra
+
+--0000000000004bbfae06262cad47
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
+
+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
+tJVewHuOmXgWQxNWV7Oiszu1d9xAcqyj65s1PrEIIaHnxEM3eTK+teecLEy8QymZjjDTrCHg4x36
+2AczdlQAIiq5TSAucGja5VP8g1zTnfL/RAxEZvLS471GABptArolXY2hMVHdVEYcTduZlu8aHARc
+phXveOB5/l3bPqpMVf2aFalv4ab733Aw6cPuQkbtwpMFifp9Y3s/0HGBfADomK4OeDTDJfuvCp8g
+a907E48SjOJBGkh6c6B3ace2XH+CyB7+WBsoK6hsrV5twAXSe7frgP4lN/4Cm2isQl3D7vXM3PBQ
+ddI2aZzmewTfbgZptt4KCUhZh+t7FGB6ZKppQ++Rx0zsGN1s71MtjJnhXvJyPs9UyL1n7KQPTEX/
+07kwIwdMjxC/hpbZmVq0mVccpMy7FYlTuiwFD+TEnhmxGDTVTJ267fcfrySVBHioA7vugeXaX3yL
+SqGQdCWnsz5LyCxWvcfI7zjiXJLwefechLp0LWEBIH5+0fJPB1lfiy1DUutGDJTh9WZHeXfVVFsf
+rSQ3y0VaTqBESMjYsJnFFYQJ9tZJScBluOYacW6gqPGC6EU+bNYC1wpngwVayaQQMIIGbTCCBFWg
+AwIBAgIMGHX6KxYK3WW2YyprMA0GCSqGSIb3DQEBCwUAMFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9iYWxTaWduIEdDQyBSNiBTTUlNRSBDQSAy
+MDIzMB4XDTI0MDkyNTEzNTAzMVoXDTI2MDkyNjEzNTAzMVowgbMxCzAJBgNVBAYTAlVTMRMwEQYD
+VQQIEwpDYWxpZm9ybmlhMREwDwYDVQQHEwhTYW4gSm9zZTEZMBcGA1UEYRMQTlRSVVMrREUtNjYx
+MDExNzEWMBQGA1UEChMNQlJPQURDT00gSU5DLjEaMBgGA1UEAxMRSml0ZW5kcmEgVmVnaXJhanUx
+LTArBgkqhkiG9w0BCQEWHmppdGVuZHJhLnZlZ2lyYWp1QGJyb2FkY29tLmNvbTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBAKWV+9PYvG4njqRsbQas79f8Q46VL7b1ZxvWT6ik6VMbdRZx
+tfpfZalVXksqcb02/N1H7UA9V04cV2q97FkSr/KxeFLMetPb3cVJZICg23IRO2NTPdmgPFzwkPTo
+35h9h/OYLgh3/9a1nTsC2xqJa8GtohD5+42rsskGcI57U4n1r1L4R5IL9ypSqDxX/xVEAdGI5FTj
+VgvoZC6iuEbnez+yO8TT3wun9b/PQowOB5P0CwIFv7ERW0S1s6B8yrbsoaTrz0vQaEA786k1pZkg
+ykC1+zXq/iTyZuPP4B4RkzFd43Pw+GAH0Tt2nx5V4rNisJHeAVNU92Gj01cEg0I+FnsCAwEAAaOC
+Ad8wggHbMA4GA1UdDwEB/wQEAwIFoDCBkwYIKwYBBQUHAQEEgYYwgYMwRgYIKwYBBQUHMAKGOmh0
+dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjZzbWltZWNhMjAyMy5jcnQw
+OQYIKwYBBQUHMAGGLWh0dHA6Ly9vY3NwLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWltZWNhMjAy
+MzBlBgNVHSAEXjBcMAkGB2eBDAEFAwEwCwYJKwYBBAGgMgEoMEIGCisGAQQBoDIKAwIwNDAyBggr
+BgEFBQcCARYmaHR0cHM6Ly93d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIw
+ADBBBgNVHR8EOjA4MDagNKAyhjBodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjZzbWlt
+ZWNhMjAyMy5jcmwwKQYDVR0RBCIwIIEeaml0ZW5kcmEudmVnaXJhanVAYnJvYWRjb20uY29tMBMG
+A1UdJQQMMAoGCCsGAQUFBwMEMB8GA1UdIwQYMBaAFAApNp5ceroPry1QLdugI4UYsKCSMB0GA1Ud
+DgQWBBRq5Jlxz3MqC+zEgUxK566xEc2g3DANBgkqhkiG9w0BAQsFAAOCAgEARXrmeeWA31pp9Tr0
+M6mOlMv+Pr2raES4GzPSyftvxf6tBQCBNaqi6LSbyusDYOj3mG9bp6VeVn+68OxNY9iNAk+ujtId
+f3+30BlZOQ1v8z9u2peUOUtWI60y2MxhdH0X0n2H+BCGvUOFqs5z440jqqy1HsscZTXHB7FEZmVP
+fyD+0Z6cxyh7WNC6+BgLiFwf8iqmAbu7Yb1sGTUGyS5gfYEjJbF2PJfwNUcJDd7eS4w5Ju5mK5y7
+spgjH2/JmDgbkpSk9JyuWfjGZIg4ah/q2nb6UMd1XJb6gLQZuzPOI3SgXPvd8MHGjKZrX2BHOBSC
+bJJ8rp4w4a9QMS6dde2MFObusxkZAft4tUnwo+ProchHs7iA85sL7sWEZhAmjmKKCpECpEfZm0+/
+hpvKQV3AZp5vBstb4IVL8QmLj8beDVHYnNhEicsSiG1wW7zSYyBnmGbFRrFQIJnJDWPjTZOlVEyp
+T1ShrXRCtqJpOt6rgg+rFEY3D8j6/bAkJXnmKnE2LZ0YyrrKk7eC6UfNNimx38w3NWchtcGY8zJn
+Y/1/C9Jv/mWm/2lK8nvusOFxhKmbG83Hx8toQdZ5F1kYk6zAWjfB7lwXr/En9mCmLieJ18hen9EK
+qbYyUkmCmuoLi5GXFMJy+iQv6DgMVQ7CACagybU6FUrmL9lVa+A6caBEEh4xggJkMIICYAIBATBi
+MFIxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMSgwJgYDVQQDEx9HbG9i
+YWxTaWduIEdDQyBSNiBTTUlNRSBDQSAyMDIzAgwYdforFgrdZbZjKmswDQYJYIZIAWUDBAIBBQCg
+gdQwLwYJKoZIhvcNAQkEMSIEII3rOw58laui+rWvs76GedVwtLXgIyRFSEBn6bttKF59MBgGCSqG
+SIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEwNTE2MTMwOFowaQYJKoZI
+hvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG
+9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEF
+AASCAQAFC1ySAJNXpnJqPqaiVcvOTJAAMHok9W1BRV3zWCY64QbmORT2rnDJuEpsAabPKZoHEbSc
+s7ERWZfOcf53JiulF0xsrJTM2MqRSnjndSX9R5mAkIZRACzX3Ay/HRi41bx6SN6g/f1IAKJq91r7
+MnddNMEy/FzkWlMmA4kjb3T7Vuko0oe8byRNkrWuATVEu1ivGb8X8+0Hv2fYtl90nVQ4RHYLhAUK
+MbPj2/AAUKDc+pXtZA0vtYQKW0ddxlMGUxNyi+hEsFxFiE7TwxyT8jbLlxyODcIVq1JopU/B5s0w
+NsHVqJe+lMHfaF+QSiyh+w+NYnaf4HDYNm27LBJD8iRA
+--0000000000004bbfae06262cad47--
 
