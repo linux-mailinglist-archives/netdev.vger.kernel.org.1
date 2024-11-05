@@ -1,116 +1,150 @@
-Return-Path: <netdev+bounces-142043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142044-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDCE79BD321
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:12:11 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 508DA9BD35E
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 18:29:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A53301F232B8
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:12:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5D241F23014
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 17:29:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36FC91DF25F;
-	Tue,  5 Nov 2024 17:11:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1CDC1E1322;
+	Tue,  5 Nov 2024 17:29:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="USTvjIOd"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fj1ZA9RW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52002.amazon.com (smtp-fw-52002.amazon.com [52.119.213.150])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f47.google.com (mail-ed1-f47.google.com [209.85.208.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63FD61DD86F
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 17:11:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.150
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F19A1DAC97;
+	Tue,  5 Nov 2024 17:28:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730826707; cv=none; b=YgEFeWYeT/P/8kCf4uaAPJxDxvk5Ji59MiyfqZUcCOqwcfso8zAPuk6yNbvxKTNMyDekeMqTayfhExWl7gapSyab3ZZ4k27zp26FlVG+QYWNLPOPRMx66w0vA6nLx/SCSbaHq0O6XxaY8RlC6Mmh4S1IqtH4qiK56bjRLmr6loU=
+	t=1730827740; cv=none; b=f29UY6SHm1EzMwazD5F4jfm/Ya4KjCICyK2IFG5JmcwV8sVJSJH8SmW9lqRfEp4UHt7pFccNDEwRf/7a7Dkzf6DJ7Q7O7fIDLglvdtTLkj0XqIYd5/wK1c0qQORymyu6M9uAq0HuXD1Rdzfs6sGM9N0ZnDhgXZ9BbxwV1AuehKk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730826707; c=relaxed/simple;
-	bh=xStPE9cAbGNMgvEitsZocVXWtN5jBSPMoTgJZjhA8+o=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tyvvI9HS1/TB2mhZkUhxK/UXnFBXsHEEZUGAsJorfXo5dIA677VoTpgiMr6k86Ab79t8AxAE4DI6RtNJxTMQzejoWTh5t8k62SizR3rOYDtFozDafQyD9gKeM/xOepwhslPckFW0YsJdnP6b8PkaNunNg0H7nidxHtaOytRlzpA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=USTvjIOd; arc=none smtp.client-ip=52.119.213.150
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+	s=arc-20240116; t=1730827740; c=relaxed/simple;
+	bh=xzSJ54sE6j/Nzy/nl51Jz3ImdBg22sPxhfbET3yiB/g=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=tUPGHeZ6Sr2h6dg3kpejTRYS8HdYeGSc3LP9Jh2LSlVZagisYcPs/hflKjLy+SmiyYBRwqxwBBPH22KlTkooPt8NXe3tiHS6rkxsLEYv1j/Fv+JspABzCdfmS/pPB0ukzEpwJwZdhw9xIICXfm6nyeDYovV2RkYU3jtYahoy9mE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fj1ZA9RW; arc=none smtp.client-ip=209.85.208.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f47.google.com with SMTP id 4fb4d7f45d1cf-5cec9609303so4240615a12.1;
+        Tue, 05 Nov 2024 09:28:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730826705; x=1762362705;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Zhd9znDS72CmDGAp9x3PUyJGT5SrzywblKBrtATZ1pw=;
-  b=USTvjIOdonTTwigRoplXAl2vNCL0GX23x8YuavuGYJKA1cW4Qrg6amY5
-   pNCQRPTC9Kn5egEA1WIg9by/HU4ib6hIMDykodLW7arpZRSZpMgjIJr9C
-   EXmqspWw95QyWOFDLqFd5Hw3VvWh/0Ayhj5Sxxj56xNU96lzBlf/b9yc3
-   E=;
-X-IronPort-AV: E=Sophos;i="6.11,260,1725321600"; 
-   d="scan'208";a="671820085"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52002.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 17:11:42 +0000
-Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:41703]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.13.170:2525] with esmtp (Farcaster)
- id 6f8c8367-189c-4839-95bb-aedd53b9c2de; Tue, 5 Nov 2024 17:11:41 +0000 (UTC)
-X-Farcaster-Flow-ID: 6f8c8367-189c-4839-95bb-aedd53b9c2de
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Tue, 5 Nov 2024 17:11:40 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.17) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Tue, 5 Nov 2024 17:11:37 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <pabeni@redhat.com>
-CC: <andrew+netdev@lunn.ch>, <daniel@iogearbox.net>, <davem@davemloft.net>,
-	<edumazet@google.com>, <horms@kernel.org>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <mailhol.vincent@wanadoo.fr>,
-	<mkl@pengutronix.de>, <netdev@vger.kernel.org>, <razor@blackwall.org>
-Subject: Re: [PATCH v1 net-next 7/8] rtnetlink: Convert RTM_NEWLINK to per-netns RTNL.
-Date: Tue, 5 Nov 2024 09:11:35 -0800
-Message-ID: <20241105171135.41014-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <36a5e3a0-258e-4771-905b-227b74fbe5fe@redhat.com>
-References: <36a5e3a0-258e-4771-905b-227b74fbe5fe@redhat.com>
+        d=gmail.com; s=20230601; t=1730827737; x=1731432537; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=187RsLEuHvSyP/hnMpNWdmPF77wDCR9+I0JKJx3N5uU=;
+        b=fj1ZA9RWDcSFY9tGC8oWiy+w72nSpZMhyNfFDyQBnqOfdayfkwo4xtmv1beszNVXTH
+         ttMB7bgOI1r9fUXVv405wMw/xhFl8t/I3FMQm1LnvIr7eWARLr5NnyyNT0NfJqs09gHO
+         C8pmyWirWL+gScStA3WSdaU4Pptor44NytLfrW+xU/P2d1VKN5Rszrsr+phKqxrd/aqC
+         IWsTFE9Ewto6JKvjCtcB+YN4RTnO621RidWuZxhxeo65tfCDzsAU+sVQcCPbbHE9Ynly
+         qm9v5UtdC2sphGzImb964qlSGk/DgmM/JuCC6uFe0+ovIy6b73oORGSYf1hOfIOb9/9s
+         exFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730827737; x=1731432537;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=187RsLEuHvSyP/hnMpNWdmPF77wDCR9+I0JKJx3N5uU=;
+        b=UyDqwg2gkDy/9HLUvrd94S2ySIMUtr9i2JQnfKxy7Z3eEwcbO85aLuHB3Z7i3YD66k
+         dvNNXfT+UponSZQZKGk+OtHTSrY1UQDhx/dq4tpwR55VpfaDuv3lF/LjCt3N1u2MkrFM
+         bcQHva6Qq7ejYzTiv/YFLJDvSi5oGe9PTzWy9tEVdVSAgGC1XdqGMpzCWiaaMqNaFkvR
+         MpXOpAsMvbvYr8F/pKR2e/rCPwGGeCRur4+nE4zH4R6xmM+QbxqbVEq53XI0CZMu8BOo
+         E40P4ojgLSU4Es1EejTmQdtyBk/THPW/RRRhkUuXOQ8Wq25X+GeWOJOIP4RPDt8WBS4J
+         wFaw==
+X-Forwarded-Encrypted: i=1; AJvYcCWC8Pjx/4PkQzgNdrTF9xpKx8vFW4yonYJFS20SJiVutzgCSQLpDva/5C58R5XBpmFFKmkc7PmU@vger.kernel.org, AJvYcCWpoyZKV4JEMhCysnsaaoYoVdSwIK8vjfY2F41XT9t3p95i5+qiuo0sejZ3KSSbMwgcZU+gBS1X3FqQsA==@vger.kernel.org, AJvYcCX3OernXGiN6uNsGmU6tECm67FLVTIgSiv6eI/maHUh2CegC+B+haY7pfSzvzBzErr4B4c1DjtjRd5VotI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwIVObL1kA9g3sRlnrWhiRRawLFVdw/Je5+5opG2y/zgvqnu+7i
+	/ByMUQybTwxu8t7r2SuvSyFnxOI3/Qtyib4EJLy3Nm0rBnS+2e5DxDMH3g==
+X-Google-Smtp-Source: AGHT+IEIvG45n2lgxPAOStyj2awwAFHHMTvEpHdz1CjjOG9fIFBlluWe3TQQVa7qEikgAFu8rYM7hg==
+X-Received: by 2002:a17:907:7ba1:b0:a99:509b:f524 with SMTP id a640c23a62f3a-a9de6331190mr3271121366b.57.1730827735342;
+        Tue, 05 Nov 2024 09:28:55 -0800 (PST)
+Received: from [172.27.60.131] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb17ceb1dsm165616266b.101.2024.11.05.09.28.53
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 09:28:55 -0800 (PST)
+Message-ID: <e12067aa-9465-4c3f-a67e-e8e8dee14c8b@gmail.com>
+Date: Tue, 5 Nov 2024 19:28:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWB004.ant.amazon.com (10.13.139.150) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3] mlx5/core: Schedule EQ comp tasklet only if
+ necessary
+To: Paolo Abeni <pabeni@redhat.com>,
+ Caleb Sander Mateos <csander@purestorage.com>,
+ Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>,
+ Tariq Toukan <tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>
+Cc: Parav Pandit <parav@nvidia.com>, netdev@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <CY8PR12MB7195C97EB164CD3A0E9A99F9DC552@CY8PR12MB7195.namprd12.prod.outlook.com>
+ <20241031163436.3732948-1-csander@purestorage.com>
+ <cf2d112f-7888-4e36-8212-d8c632fd323d@redhat.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <cf2d112f-7888-4e36-8212-d8c632fd323d@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Paolo Abeni <pabeni@redhat.com>
-Date: Tue, 5 Nov 2024 17:22:54 +0100
-> On 11/5/24 03:05, Kuniyuki Iwashima wrote:
-> > @@ -6995,7 +7017,8 @@ static struct pernet_operations rtnetlink_net_ops = {
-> >  };
-> >  
-> >  static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst = {
-> > -	{.msgtype = RTM_NEWLINK, .doit = rtnl_newlink},
-> > +	{.msgtype = RTM_NEWLINK, .doit = rtnl_newlink,
-> > +	 .flags = RTNL_FLAG_DOIT_PERNET},
-> 
-> The above causes a lockdep splat in many selftests:
-> 
-> https://netdev-3.bots.linux.dev/vmksft-net-dbg/results/846801/12-bareudp-sh/stderr
-> 
-> the problem is in rtnl_newlink():
-> 
-> #ifdef CONFIG_MODULES
->                 if (!ops) {
->                         __rtnl_unlock();
-> // we no more under the rtnlock
->                         request_module("rtnl-link-%s", kind);
->                         rtnl_lock();
->                         ops = rtnl_link_ops_get(kind, &ops_srcu_index);
->                 }
-> #endif
 
-Oh, somehow I dropped this part of change while rebasing the RFC version...
-https://github.com/q2ven/linux/commit/fea4b46993e8802e6dd7341d6e7dd49396e378d1
 
-Will remove the unlock dance in v2.
+On 05/11/2024 14:21, Paolo Abeni wrote:
+> On 10/31/24 17:34, Caleb Sander Mateos wrote:
+>> Currently, the mlx5_eq_comp_int() interrupt handler schedules a tasklet
+>> to call mlx5_cq_tasklet_cb() if it processes any completions. For CQs
+>> whose completions don't need to be processed in tasklet context, this
+>> adds unnecessary overhead. In a heavy TCP workload, we see 4% of CPU
+>> time spent on the tasklet_trylock() in tasklet_action_common(), with a
+>> smaller amount spent on the atomic operations in tasklet_schedule(),
+>> tasklet_clear_sched(), and locking the spinlock in mlx5_cq_tasklet_cb().
+>> TCP completions are handled by mlx5e_completion_event(), which schedules
+>> NAPI to poll the queue, so they don't need tasklet processing.
+>>
+>> Schedule the tasklet in mlx5_add_cq_to_tasklet() instead to avoid this
+>> overhead. mlx5_add_cq_to_tasklet() is responsible for enqueuing the CQs
+>> to be processed in tasklet context, so it can schedule the tasklet. CQs
+>> that need tasklet processing have their interrupt comp handler set to
+>> mlx5_add_cq_to_tasklet(), so they will schedule the tasklet. CQs that
+>> don't need tasklet processing won't schedule the tasklet. To avoid
+>> scheduling the tasklet multiple times during the same interrupt, only
+>> schedule the tasklet in mlx5_add_cq_to_tasklet() if the tasklet work
+>> queue was empty before the new CQ was pushed to it.
+>>
+>> The additional branch in mlx5_add_cq_to_tasklet(), called for each EQE,
+>> may add a small cost for the userspace Infiniband CQs whose completions
+>> are processed in tasklet context. But this seems worth it to avoid the
+>> tasklet overhead for CQs that don't need it.
+>>
+>> Note that the mlx4 driver works the same way: it schedules the tasklet
+>> in mlx4_add_cq_to_tasklet() and only if the work queue was empty before.
+>>
+>> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+>> Reviewed-by: Parav Pandit <parav@nvidia.com>
+> 
+> @Saeed, @Leon, @Tariq: I assume you will apply this one and include in
+> the next mlx5 PR. please correct me if I'm wrong.
+> 
 
-Thanks!
+Hi Paolo,
+
+I am doing the mlx5 core/en maintainer work right now. I work 
+differently to Saeed, as I do not have a kernel.org branch of my own 
+(nor use Saeed's ofcourse),
+
+Please consider applying this one and any others once I acknowledge/review.
+
+Acked-by: Tariq Toukan <tariqt@nvidia.com>
+
+Regards,
+Tariq
+
 
