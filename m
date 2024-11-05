@@ -1,227 +1,140 @@
-Return-Path: <netdev+bounces-141986-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141987-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA6FA9BCD41
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:02:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AB469BCD99
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 14:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7DCE02830DB
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:02:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F73A281C36
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 13:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7311D5AD8;
-	Tue,  5 Nov 2024 13:02:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JIgRMbmv"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873B31D61BC;
+	Tue,  5 Nov 2024 13:13:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A44E71AA785;
-	Tue,  5 Nov 2024 13:01:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=192.198.163.10
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730811721; cv=fail; b=NaWUbZxCo1I7YbYCGFEgUObvfWxZZbCTPh3yhdAAoLVt8TJcWjpeLfUs5Wh3QJYNaFHFFYWykogicJqjx/Pm0rnKGdZrJnIzmAU3aNtkuyrIqDG2Y4C0pLVxChjpxZkzJJar0kKGbJA8xsKET2rGxmei7/TtwzA47Gj5ZGk/seY=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730811721; c=relaxed/simple;
-	bh=B1SYEblXvmfI+4bU7v9+FS+9ozXDMdqUW9UgZb/iTkA=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=TK7usHaby7Pg+iflc76ireQpD58KPS7aBCpXpE7MQDfcZfKEL7LOtDQ7y3Q4qbuCzfeCwV7ac6VqMULU/WbfZwhoHAB4cETQF+aHKYhmHkYC9A2Dxg69cALfV9l+69Up3djtL+raVmogVGfEPtclyh1cWV2+a5mj/3uGzIy9Xng=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JIgRMbmv; arc=fail smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730811719; x=1762347719;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=B1SYEblXvmfI+4bU7v9+FS+9ozXDMdqUW9UgZb/iTkA=;
-  b=JIgRMbmvyqVK91/gYJJjYJTT/4wD1aJYS9cRjJma1fm6+W6kcCId0rQX
-   +II3mcEbJsYsOV52+1DlspVQkxG0ooN49ern1KMGZg+CK1LwXrL9VrUSa
-   R/3KG6d7JBZvs6eKlL95zeRa95/ODbe5a7vWu8iPdfoFlMQtUjT845CoL
-   1dQLgfcnao8/sMwqCz4cB5Mc+gWtWhHHqjI9+ciwl3HG12MME0yM4YsFD
-   9HPtuK4yI+19lcvB+ZXSZh5LUAC7IZk0kJw80HvbQn0+wiONw8SMsSCOb
-   UsYH5F5Vsq9tk3aIqI3ub45KU+3SxfXr9YusxKhCtn2K78WNnP3gvHqnU
-   A==;
-X-CSE-ConnectionGUID: yLFVCoQvRm6DtAXq8ix+9Q==
-X-CSE-MsgGUID: gmh1kE9uSMOIHZNNmD7bjA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11246"; a="41928305"
-X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
-   d="scan'208";a="41928305"
-Received: from orviesa010.jf.intel.com ([10.64.159.150])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 05:01:58 -0800
-X-CSE-ConnectionGUID: poTC6hPgQbeld8kpowmb3A==
-X-CSE-MsgGUID: QzBBiFK1QJejJ9pd9y3t0A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,260,1725346800"; 
-   d="scan'208";a="83953471"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by orviesa010.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Nov 2024 05:01:58 -0800
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 5 Nov 2024 05:01:58 -0800
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 5 Nov 2024 05:01:58 -0800
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (104.47.57.168)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 5 Nov 2024 05:01:58 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=dZ1QbzGB5NIItle7baO7vz3Aw+LpSwvNie1Le81DVaijh9exTCYeI6LaLnNb5BlO41hyMUYK2rMA/sqwatd0A54pCcwt0RHhqWqm2Hd8Ka1Tw2I3gaSbVFBMsblKxfagrWO9mp7z6iJ2H8itMymbaS9jJmAJ7Eq4UF/lafOKRAKGbtlQlsvvXIfUAxG6dLhmkbSEpQJkZTcGV7rTxAvbnYu/DK5wyz8i8OqaJa94kC1RsaceQVJbcL2MaBkX3/X7p3VMXyVUsyMFvRpWqe74Z6dWRGFrkCgxyw1yJOH2QGbMt+BZUDTD8DHre6dcQ2REHHuxEZrOytj8v5gCpIKHKg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jJq682YHVl3k0g42GP8hnQc/ObxSfqL/R3vTTWG1eMU=;
- b=zGn+cKb2PE5ZMtNQIz5Y7yZV0NLIQ1EegNTbYj+lyI//Qk9f8GLVC99XEyNTmcZFeUY3S8JcjZQhulKb8fec31EUUvWDmQF25ElwCvgt6s7hFlrCU/bgQ+Ng0nLYDFYWwaMGC67a07AZ6kftIOvBri+Fg5hkTqgBNmdx3zDdauymKI419bEDrtNRIkSkyYB5/3cEwFnmgtWOPIXHrXOG3ss9aKt4sFus2/F/UmvkwYe/L5mcPMVfsB52flWgIO8bnyxONFVq1hfEYZ7M2dfN9dMrv478uykf25UfcXSivtOjaZ+71rn2uFaQgLSsE78P0RTTZoJtQqP2DwytuVLBzg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com (2603:10b6:930:c2::15)
- by PH0PR11MB5077.namprd11.prod.outlook.com (2603:10b6:510:3b::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8114.30; Tue, 5 Nov
- 2024 13:01:52 +0000
-Received: from CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f]) by CYYPR11MB8429.namprd11.prod.outlook.com
- ([fe80::4f97:ad9d:79a9:899f%5]) with mapi id 15.20.8114.028; Tue, 5 Nov 2024
- 13:01:52 +0000
-From: "Pucha, HimasekharX Reddy" <himasekharx.reddy.pucha@intel.com>
-To: "Knitter, Konrad" <konrad.knitter@intel.com>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
-CC: "Keller, Jacob E" <jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "jiri@resnulli.us" <jiri@resnulli.us>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "Nguyen, Anthony L"
-	<anthony.l.nguyen@intel.com>, "Kitszel, Przemyslaw"
-	<przemyslaw.kitszel@intel.com>, "Knitter, Konrad" <konrad.knitter@intel.com>,
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: RE: [Intel-wired-lan] [PATCH iwl-next v1 1/3] pldmfw: selected
- component update
-Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v1 1/3] pldmfw: selected
- component update
-Thread-Index: AQHbJTGgsZXWxNYqTUO3ZjXxx356k7KoumAw
-Date: Tue, 5 Nov 2024 13:01:52 +0000
-Message-ID: <CYYPR11MB8429A51A3A1D723632BE0644BD522@CYYPR11MB8429.namprd11.prod.outlook.com>
-References: <20241023100702.12606-1-konrad.knitter@intel.com>
- <20241023100702.12606-2-konrad.knitter@intel.com>
-In-Reply-To: <20241023100702.12606-2-konrad.knitter@intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CYYPR11MB8429:EE_|PH0PR11MB5077:EE_
-x-ms-office365-filtering-correlation-id: b3321a57-5e9a-4559-fc11-08dcfd9a046e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|376014|1800799024|366016|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?GTvzNgD6S1nWqRuqvZTc6wwAPR+rIjPLtY2eTNwiOsjL3kKrtE4q1/BN6wzl?=
- =?us-ascii?Q?OwUKtv3Kbia3n5sapjfawXhZ5vI95K3bmcXs6ZjSuSzU0uyvE9fOFm/mS7iv?=
- =?us-ascii?Q?dtsFHQzkmd18y/c5Ez899KpLcf4GrG0DSTaM4o87bOOXR5q1mxaUPEXFlWu1?=
- =?us-ascii?Q?VlrP3geYt1hLQQS7uNZtIISM7Iu02wGK1YLItY3c4QVjB355cOogMSv+VODz?=
- =?us-ascii?Q?kShOENoFqVGefzUTqpEpejEUN58awMzwzuQ2SScK6RLH5z6vAXgmcl/A/a0f?=
- =?us-ascii?Q?XaXdqJMdGKUMmZ6Qbhsa0TuaF4rc8f+PYoeyu/xfLnqZsWJJIZKDfbN8qLA2?=
- =?us-ascii?Q?AeCP5l23umWTjRm4IcNg9/qfxSyxhvBEYJhw/EY7xVJTY7NLHx7w3QmMG8kY?=
- =?us-ascii?Q?tvFaEsH2IcYEe+84/MaHbpju38IRgXxexuwI91xTgqvkIFp1SpZ2/D6L9M9z?=
- =?us-ascii?Q?Pa+DzPzT9ulRlw77qPppo25zitL358ZmsN9XGioYE7/XkpkYWcPXCy4NNnxP?=
- =?us-ascii?Q?zKtXw8kIGKh8CEED2aydBj1o4exQj/fl8c8jqfCCz4O8lJTdot47e0p/BfeV?=
- =?us-ascii?Q?aFPdAtD7W7g6dGVcy0KzRdUvL1NGMlv3P0CVhI2oSP5EBHYWa0LR/7x9wHgR?=
- =?us-ascii?Q?pgTSnWE1EncpDstPJKrSXF8lO2P588/c8cDgKy9JYqByAMpzaLqy8ppONeYd?=
- =?us-ascii?Q?PHmx6lOZ74oQlgfPUUYI0G+opXpM4Hl2cM008PlGobevvKOX94A+oESV30gl?=
- =?us-ascii?Q?wnwE2yBKPn/uy66URbHMJ0ZJ3Akbx2rMX4kesbi/sUYL//BLcmxMZnAb0jW6?=
- =?us-ascii?Q?oN8AvkPhMs9Czg/m4lzqdRQl4J+qb4o9E4e1xfVEsuFPOCJIJVIZT5JJQoiM?=
- =?us-ascii?Q?onVlarmdaV+ePyGG2YPzOMBrw8+7DR/VYRnhX4HstqMFTbL6A2jc/D3zvRSP?=
- =?us-ascii?Q?9bOz/Qe+y0qhiDXrrG/8deLgO1+tvhk1NuvooAxbfOytpsB6QJ6mhHjsoQDF?=
- =?us-ascii?Q?yGmBJNz0BXi7N6pc/PoscTs0q9AwIMkmYmQPeRxmHhzxvrfuRXsheD7RmRYe?=
- =?us-ascii?Q?6tz2o9Pvd6x4EpBs/jFx3l6WqKwm1TXyb1ENA/rZlYIDeE9EHr4Yvj58lyPI?=
- =?us-ascii?Q?LJmwzdDRil+KqdtH4Y8QyBhNfn9nHfixrMnEryjXyg8zkkm4cMPgMxKfgnhj?=
- =?us-ascii?Q?DMxAp3HVhGz021AVYuIWQoOVL/0uha+PipJShGrUBk41UPfNkh/WbKfxIjQa?=
- =?us-ascii?Q?3AIh3G0yteOnLukZr1rM1MomsQ6DNZ+0mIP0QtroBI4xEVWGtq2B7pDFiGfi?=
- =?us-ascii?Q?wezq7AEPSFVI7eQarQn1/X0g4iqvkrjC36c6MC54B+GChOd5WITC4tfsFhQm?=
- =?us-ascii?Q?q7d26co=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CYYPR11MB8429.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(376014)(1800799024)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?qWGzs/oqRGLi0a+YI97nOVSmfWnrGCtfCinYx0SmsH1CGK/yakIHW2IypS/V?=
- =?us-ascii?Q?HhjrCN0gSo18prqZUwZhAaiMaZqAzrC7OpSscjsvqZ4pVYR0eItRsiQbamSp?=
- =?us-ascii?Q?T6hwpOxaQYbE0k7h2C+VKRoAPRXfxr9+sldgCq19bGWCKGFrNv3iJzsNIutZ?=
- =?us-ascii?Q?N9/ZMCcEAV+XtKt4BAnLZLQ4ECFO3cQCZ+El3/kKYqoBqiol6kIFGECjIlA9?=
- =?us-ascii?Q?V+UkQnbfWto0llPUnUlLBwIbvg8khQt2zjY1jnRd9FhJJIeDQbHiF7U2J+GG?=
- =?us-ascii?Q?MH9rXzJCx4dNh3CID7Yk4SSQupKaxZSV3Crl/fDmoBGhfUoJmuGhMosJQKY3?=
- =?us-ascii?Q?lsQBB336JO/gwmEe01j+IHw6QYqKII0WL82L5DUoB/BgZFjMxzDgYKakORNX?=
- =?us-ascii?Q?li8T5A0kckM8QaJr0REkkpQBEKmWv8fKSjePKB4BR/6tzLujj+GGYaGXxngP?=
- =?us-ascii?Q?y+oUN8l3ntEjwYLMtr4VklLpth/ggZkH19GwCxHORDALbf80mMUm7caDcZE/?=
- =?us-ascii?Q?tBboyJHgWa/fAbfZnpGZ2uKEeATKbhoFuvbPK4c3rFnf4NOEG+gcbp/vT8QI?=
- =?us-ascii?Q?Iuk1VFh1lhx9KzyL16otgPzEYUPnklBtCeYq0bPntQUU+PIoXOcssxaazyFd?=
- =?us-ascii?Q?Py75H2pGQbpN9zHSs0HFctPBvjVFwKg97tnmUCSPzMfBVr3b10609vWYlUWC?=
- =?us-ascii?Q?YYjAQGvVQvZPWv58arJximjnHXVcYgwlwvcRpKKuWCdfr392WahRFAYJ4onx?=
- =?us-ascii?Q?ITfdxO8jMXFlSjLPlklYxAYL6lX713X1Rjteb8L80l5qT86nkOlH6lb5xU7O?=
- =?us-ascii?Q?8hqDU0Ofn7G2+uKldbIEvvA9r+CJDpsLVSoP/r0DYtqp79VjAv7QzU0ICvth?=
- =?us-ascii?Q?aLczdAY/GE7xP5i0K7eZM1I+R1y06mrx3Y6q6ksIFNOwf3I+VBTEIH4jAZti?=
- =?us-ascii?Q?CmgGBUu7xBjFcb581MT+iME3S4SwTb1uiJacjJielkm9Ge4lPYTiUjb1M4/J?=
- =?us-ascii?Q?lzJsZ1X0uZ6Pw89hHR9w9fmlROaCVOuo8g6W81aeEhIxbTDrshKtmKCeq5on?=
- =?us-ascii?Q?d1jY7XzOjoj70xxie+hD+xXFRbntVZYh3Bf6ERIURv3JvOFHFvQJqWLaULgy?=
- =?us-ascii?Q?1UEaNVlXc70Wov4Zs2KZTaT3jmzBamSqVl5dIDKLRIOYBOs1An0fzWAcRRky?=
- =?us-ascii?Q?OhXuzo75ZRDs7rkw+ASIA3z6hXduiEUJkZiSs1aqDNt8eEuUr610DKdhR0qI?=
- =?us-ascii?Q?lGVhV7WwejF/YrQK5yawPtaVPEjeke5cI+K06zdUBTSij7zTF/ku//DVoHO3?=
- =?us-ascii?Q?j9zLRC4jH4CWRRAkZYjUD1ghqiyBGee6VK4ZerWfN0aSX67B09XPHTcXX6ym?=
- =?us-ascii?Q?aqcMJKq7Wo+l4/IadVzaePq5YGhhNAFOQMHD9qMSjMO0qvTiSty5sjOFguXF?=
- =?us-ascii?Q?0coln7vbOta7X6H1YcREtFvGJ73uJbro8hfRCfzgY0q49KrIJw28OvwHmerB?=
- =?us-ascii?Q?PkoII78iOyEZg6wqpODX/9WVzzcpxIBAb91p46hlpz2iF4B0NtjD+7R1pPVw?=
- =?us-ascii?Q?zxNQg5EB4zZ/8di0z+XQT6zudz6/zQEOKyf1TNjWAd9YYeRdf3goMtEiiL2Q?=
- =?us-ascii?Q?Ow=3D=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B95431D5CE8
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 13:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.139.111.44
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730812437; cv=none; b=hdldJ8QHXBbEsdCagwGMinswiFUy8lnUeLgxDydHc7rT21ObZXn38ffOYal3zN+xLKemvaTfzIi6N2h9D/mhEkroI84m8RNSWfXBAfYIJEmEnr5vgYMw5xeAfMn1JcbcyHDc9ITqA/cnqb24p/HN2+PmMSUJq5wjb39s6OiOuo0=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730812437; c=relaxed/simple;
+	bh=cTKw4bucyHaUEfDvFtmmDk1lZHQhrQj0jGdKtcdjaqU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=rY18dvQOfDMCjI9Rfg0SrWsgxOoJQQduZ/ftQ5Pgixk5ZR4BwsFas3p4bhiHgI2jCOYJJj4h7gFzBhbHQ5Y9CTG70CFNthQaiVYdUa37zOvCr6UpNpRnilzxcBTQrjn/2s3ZiBEP72bpa8QPVHi0vyI5Ee7N+EBnTRDJOlT6EUo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=fail smtp.mailfrom=queasysnail.net; arc=none smtp.client-ip=205.139.111.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=queasysnail.net
+Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-370-faJWNgejM8q20QJChVO3XQ-1; Tue,
+ 05 Nov 2024 08:12:41 -0500
+X-MC-Unique: faJWNgejM8q20QJChVO3XQ-1
+Received: from mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.4])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 91DA51955F56;
+	Tue,  5 Nov 2024 13:12:39 +0000 (UTC)
+Received: from hog (unknown [10.39.192.7])
+	by mx-prod-int-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 29E92300018D;
+	Tue,  5 Nov 2024 13:12:34 +0000 (UTC)
+Date: Tue, 5 Nov 2024 14:12:32 +0100
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Antonio Quartulli <antonio@openvpn.net>
+Cc: Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Donald Hunter <donald.hunter@gmail.com>,
+	Shuah Khan <shuah@kernel.org>, ryazanov.s.a@gmail.com,
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org
+Subject: Re: [PATCH net-next v11 06/23] ovpn: introduce the ovpn_peer object
+Message-ID: <ZyoZwIOno_U_yMPF@hog>
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-6-de4698c73a25@openvpn.net>
+ <ZyJgs6Vrvzji8qvS@hog>
+ <4df15a91-4bcb-49d8-be78-28c71036ba8a@openvpn.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CYYPR11MB8429.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b3321a57-5e9a-4559-fc11-08dcfd9a046e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2024 13:01:52.0691
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: 0uvz0EvnAwfbeXo2sM2uPcmrdvJe5fp3SUVItftZT7bMgOIStD0n+uryrE6eBv5Vk3UlxwSdOaKzgVY2ko7b63ZWIgVhBdUcVfxDn0jE7N7Nixf41ekmlV2mtkIjVcDg
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB5077
-X-OriginatorOrg: intel.com
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+In-Reply-To: <4df15a91-4bcb-49d8-be78-28c71036ba8a@openvpn.net>
+X-Scanned-By: MIMEDefang 3.4.1 on 10.30.177.4
 
-> -----Original Message-----
-> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of K=
-onrad Knitter
-> Sent: 23 October 2024 15:37
-> To: intel-wired-lan@lists.osuosl.org
-> Cc: Keller, Jacob E <jacob.e.keller@intel.com>; netdev@vger.kernel.org; j=
-iri@resnulli.us; davem@davemloft.net; edumazet@google.com; kuba@kernel.org;=
- pabeni@redhat.com; linux-kernel@vger.kernel.org; Nguyen, Anthony L <anthon=
-y.l.nguyen@intel.com>; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>; =
-Knitter, Konrad <konrad.knitter@intel.com>; Marcin Szycik <marcin.szycik@li=
-nux.intel.com>
-> Subject: [Intel-wired-lan] [PATCH iwl-next v1 1/3] pldmfw: selected compo=
-nent update
->
-> Enable update of a selected component.
->
-> Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> Signed-off-by: Konrad Knitter <konrad.knitter@intel.com>
-> ---
->  include/linux/pldmfw.h | 8 ++++++++
->  lib/pldmfw/pldmfw.c    | 8 ++++++++
->  2 files changed, 16 insertions(+)
->
+2024-10-30, 21:47:58 +0100, Antonio Quartulli wrote:
+> On 30/10/2024 17:37, Sabrina Dubroca wrote:
+> > 2024-10-29, 11:47:19 +0100, Antonio Quartulli wrote:
+> > > +static void ovpn_peer_release(struct ovpn_peer *peer)
+> > > +{
+> > > +	ovpn_bind_reset(peer, NULL);
+> > > +
+> > > +	dst_cache_destroy(&peer->dst_cache);
+> > 
+> > Is it safe to destroy the cache at this time? In the same function, we
+> > use rcu to free the peer, but AFAICT the dst_cache will be freed
+> > immediately:
+> > 
+> > void dst_cache_destroy(struct dst_cache *dst_cache)
+> > {
+> > [...]
+> > 	free_percpu(dst_cache->cache);
+> > }
+> > 
+> > (probably no real issue because ovpn_udp_send_skb gets called while we
+> > hold a reference to the peer?)
+> 
+> Right.
+> That was my assumption: release happens on refcnt = 0 only, therefore no
+> field should be in use anymore.
+> Anything that may still be in use will have its own refcounter.
 
-Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Co=
-ntingent worker at Intel)
+My worry is that code changes over time, assumptions are forgotten,
+and we end up with code that was a bit odd but safe not being safe
+anymore.
+
+> > 
+> > > +	netdev_put(peer->ovpn->dev, &peer->ovpn->dev_tracker);
+> > > +	kfree_rcu(peer, rcu);
+> > > +}
+> > 
+> > 
+> > [...]
+> > > +static int ovpn_peer_del_p2p(struct ovpn_peer *peer,
+> > > +			     enum ovpn_del_peer_reason reason)
+> > > +	__must_hold(&peer->ovpn->lock)
+> > > +{
+> > > +	struct ovpn_peer *tmp;
+> > > +
+> > > +	tmp = rcu_dereference_protected(peer->ovpn->peer,
+> > > +					lockdep_is_held(&peer->ovpn->lock));
+> > > +	if (tmp != peer) {
+> > > +		DEBUG_NET_WARN_ON_ONCE(1);
+> > > +		if (tmp)
+> > > +			ovpn_peer_put(tmp);
+> > 
+> > Does peer->ovpn->peer need to be set to NULL here as well? Or is it
+> > going to survive this _put?
+> 
+> First of all consider that this is truly something that we don't expect to
+> happen (hence the WARN_ON).
+> If this is happening it's because we are trying to delete a peer that is not
+> the one we are connected to (unexplainable scenario in p2p mode).
+>
+> Still, should we hit this case (I truly can't see how), I'd say "leave
+> everything as is - maybe this call was just a mistake".
+
+Yeah, true, let's leave it. Thanks.
+
+-- 
+Sabrina
+
 
