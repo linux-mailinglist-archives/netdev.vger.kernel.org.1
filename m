@@ -1,260 +1,434 @@
-Return-Path: <netdev+bounces-142123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E9B669BD8D3
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 23:36:33 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB2059BD8F2
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 23:42:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 474E4B21EBC
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:36:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5571F283A17
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:42:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACAE72161E6;
-	Tue,  5 Nov 2024 22:36:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BA3E20D51E;
+	Tue,  5 Nov 2024 22:42:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="TGNHqSuj"
+	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="W7Zbl3gb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
+Received: from smtp-out1-05.simnet.is (smtp-out1-05.simnet.is [194.105.231.8])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05B6F20D51E
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:36:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.14
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730846187; cv=fail; b=aLakIfPpUgFf+fx3UNMl5GpgbRdsOR9Rx4iQV++Ah+8OK39VoMycalon0GNLvxSCfL/4Zo3li0jCRzAL+QDTgkgovpoQfttIGF++UThfLTpwSX9rED75eCeR0pHI+7Emic3kmoUmrqDO4UgUyHbxBjzVvCGk11ajtKgCxr7Aoq0=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730846187; c=relaxed/simple;
-	bh=FX7wb2/HLDNmuYognpUaRW3GwqsXzWo7/+kjxewRaMI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=AsxYLzLsvkdBJ6KcWIGEN774VJA9WxYUogEA/b1BLtSPVWzTp6VPv8OghWZu0ePL+IcQLXfZXCYIyFoxE15gjyWR8t6TOPvgzgeu9DbxslMEqjxxUaMT+gKsojPzVQt0SNkVSoKdyi/40sMtbEaGp5habHKQDqlHDuxR8cTCO8U=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=TGNHqSuj; arc=fail smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730846186; x=1762382186;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=FX7wb2/HLDNmuYognpUaRW3GwqsXzWo7/+kjxewRaMI=;
-  b=TGNHqSujYXZWGOXw2iU7HKGANM1FF9hvKcXmnXQSoTZ3XwjrkPpeUWRL
-   St04MgOMLbDuvfMNMfZv9JCk5pd1z7flV4D2TxOruEmwgwTtJg+6LnPYE
-   dyYvFZg9GrzOMrMjmzZ/7DRQ2Z5PYv+22Xz+s6hZATb8t8iHg1bVbG4Lb
-   wSplWSoWHO/H9UfEG9DjR9cFvi5J92VG2BV8PFW7uJn8/nd8H0wUoHpfv
-   ZjmHChSTC6+lY6SV6gMC0ROn0GOm0GRZa0ZeVRSylSrZ0re94w6CY/HnZ
-   NcL4+C+tROtOu/uVuy26Eva0SgqE2m3oMhGzdCQ/D6X5rd5BB3Z5+LiFa
-   g==;
-X-CSE-ConnectionGUID: SURCbpFjT46YmHVKKDdVwA==
-X-CSE-MsgGUID: m0I0txg4QEqGnxTdrG1xPA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="34405540"
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="34405540"
-Received: from fmviesa001.fm.intel.com ([10.60.135.141])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 14:36:26 -0800
-X-CSE-ConnectionGUID: jKBr/Vw7S7yvIPXco68ixA==
-X-CSE-MsgGUID: 2cYYFyUnTBKu8tV9/P0aFw==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="115000741"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmviesa001.fm.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 05 Nov 2024 14:36:25 -0800
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Tue, 5 Nov 2024 14:36:24 -0800
-Received: from FMSEDG603.ED.cps.intel.com (10.1.192.133) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Tue, 5 Nov 2024 14:36:24 -0800
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (192.55.55.68) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Tue, 5 Nov 2024 14:36:24 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=ixnKR3dA9IGqPn/leuqaonpOF5iJ2YgbJDxSNvfvAMQ4zYvtYqdRF/9/qR0V9jKI3U2mvDd+yw8i7iwy4ll3MRUOinJyjEEcRrh04EkE047GAcM/dv9Aqun7vp6k6ddh5zhAl3zL6g2sdzc8PtlUO6d8E/Y4u8Gz/PDsSNx2a+id+8Vtz9UgpHiOpWDdqS24R1m6EHJfw3lgWz3+XWwFOfmr3tZLog71G/TswPEzTdit7C1a9rHZy208yQzUrVg+s7yBmU8dAglLtT8tCVSzFEuNFSiH5EQV6V78qx/QVbQ1019Az1mm7PwovSC80Z/suyKDy7vHkq3Oapg995HIVQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=FX7wb2/HLDNmuYognpUaRW3GwqsXzWo7/+kjxewRaMI=;
- b=Aor2jF0rtgvNRYIYLgz9tSAfE28MVnMVv5V3cDFcJhSwBqgq6Umuru2YNLHG+BfBev1h9b62xP9Fzh+K63dvcg7GjMBaz41hYmop2cF6Lq/CzupfTARmAFVBqU12njKKoyI0zRJM02hIJoq8wSzgwroQ8LqUg5UDHuWGAMMX/uHhbGYudakoMq7l6wpMRtPHzJaLIszw7If3ZVcIOpNIrrYihO370fQHVze23kCSm61jvwZavJkPisOiaykHOM9tJBQhCW+xx9uQPd8fuPwwQF8ty4gW/Ix0ivOWKYVE73k90jcJHRWNcfr+F3GNi4AbGaU8xVDfrpV62YjcXOaiSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH8PR11MB6928.namprd11.prod.outlook.com (2603:10b6:510:224::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Tue, 5 Nov
- 2024 22:36:21 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::7de8:e1b1:a3b:b8a8%4]) with mapi id 15.20.8137.018; Tue, 5 Nov 2024
- 22:36:21 +0000
-From: "Keller, Jacob E" <jacob.e.keller@intel.com>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>, Paul Menzel
-	<pmenzel@molgen.mpg.de>
-CC: David Laight <David.Laight@aculab.com>, "Drewek, Wojciech"
-	<wojciech.drewek@intel.com>, "Szycik, Marcin" <marcin.szycik@intel.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "Knitter, Konrad"
-	<konrad.knitter@intel.com>, "Chmielewski, Pawel"
-	<pawel.chmielewski@intel.com>, "horms@kernel.org" <horms@kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"pio.raczynski@gmail.com" <pio.raczynski@gmail.com>, "Samudrala, Sridhar"
-	<sridhar.samudrala@intel.com>, "jiri@resnulli.us" <jiri@resnulli.us>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: RE: [Intel-wired-lan] Small Integers: Big Penalty
-Thread-Topic: [Intel-wired-lan] Small Integers: Big Penalty
-Thread-Index: AQHbLpmv9SR3uvlraEWqhSnU0f/rJ7Km+xAAgAJNybA=
-Date: Tue, 5 Nov 2024 22:36:21 +0000
-Message-ID: <CO1PR11MB50893FEBA44135EB812682C9D6522@CO1PR11MB5089.namprd11.prod.outlook.com>
-References: <20241028100341.16631-1-michal.swiatkowski@linux.intel.com>
- <20241028100341.16631-3-michal.swiatkowski@linux.intel.com>
- <CADEbmW0=G8u7Y8L2fFTzan8S+Uz04nAMC+-dkj-rQb_izK88pg@mail.gmail.com>
- <ZyhxmxnxPcLk2ZcX@mev-dev.igk.intel.com>
- <ad5bf0e312d44737a18c076ab2990924@AcuMS.aculab.com>
- <840b32a0-9346-4576-97ba-17af12eb4db4@molgen.mpg.de>
- <478248d8-559b-4324-a566-8ce691993018@molgen.mpg.de>
- <Zyiu9phq8/EchHxd@mev-dev.igk.intel.com>
-In-Reply-To: <Zyiu9phq8/EchHxd@mev-dev.igk.intel.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|PH8PR11MB6928:EE_
-x-ms-office365-filtering-correlation-id: ea23a185-b125-4d7b-a9a9-08dcfdea45bf
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;ARA:13230040|366016|376014|1800799024|38070700018;
-x-microsoft-antispam-message-info: =?us-ascii?Q?3aPP/AvIZpv9WsIK2c7CNpLDAesi7YA3NlsoXXyBLe6HUZ+xaTwht+mktfrk?=
- =?us-ascii?Q?yScw5SDQBAxBHlCx6Hz/ji6WU0jG+it4Q1roBJifJ0aNGSSkDrBbAYP7GCBs?=
- =?us-ascii?Q?Em09f0M+GJfS/wPX9PGni7uaeVzoypKwOOFP3fWFPdZJ4bgBDGS4lzRzeAai?=
- =?us-ascii?Q?g88dWDLHaEI32Eo9IrL6el58quAkKZZLddwh5kWZGgmGpYFTeMx6NeIjHLgM?=
- =?us-ascii?Q?39KBbrSB5awKjZPDC6dzy4/JFUW5GjOwcbFT865d/viBqBULHEV9WgB3plFV?=
- =?us-ascii?Q?Yx4vUNSW25sECcYB0uW+FIjD6pVmZLKAEkKGApMgFYLCjvnfD9cX09qBLTux?=
- =?us-ascii?Q?Qr3n1rt0A3866u3dGHDLKGQY5FyquzF+f3kNgItxdkLWPD9HgQsC1GBOOOhs?=
- =?us-ascii?Q?9AjtsplAkt1O7ObE36/vk1HWsZlcSxtB9qoazdDM6YygHEfK+kQ9z+sv7/P4?=
- =?us-ascii?Q?RVjtzyl7XuNPtgaEQUUb9ldUIsU7YPmM/muBv7VgcCjVQ2cl/3FiTyF12nbf?=
- =?us-ascii?Q?fzFFdv7V5Xc1xAqRTRk0FmFiMezdx2SmUUY7RYMpl3E2cUiOIgU9YX103aqF?=
- =?us-ascii?Q?jpAYLqqN5USeUmXbdwLMXBaEBaTCTEikP6oqTPFwtLSmWBmvuaikEK63PNbh?=
- =?us-ascii?Q?WdTm99wMKpGZFtDYIN3p5ldfx1h+pqORuzlhgJir7kxHBHLphnxGJWdqqPgI?=
- =?us-ascii?Q?/7eILaCw1ZcBT5niGTHmYkl9rnU+s2oUEVH1v1WPelQVsymVpcUsyPS7le7q?=
- =?us-ascii?Q?SfAqmpB4dweVQYzIXTrLCsRr+PamjKibr9n3X46wLxLxZ7l/nKzd4m5IYBu2?=
- =?us-ascii?Q?xBL3i5cQn+dMWw4944AnZ/Su3mWVNxLOKpAfLvSW+52YAhf0XQCSMw/H9Jjz?=
- =?us-ascii?Q?ky8HLX7SIDhnlZJW36zMvuJER3zUXyd+Ci74mR9q4l2ggCvr+aXBDvXM+w/x?=
- =?us-ascii?Q?saPovQS7eHWnHiGVnHSX4qWUVCtXMPNeQhXSh15CZM7jvqKynhc38rZOD9wh?=
- =?us-ascii?Q?rVmD61z8VfgRgoMMN1nr8Juj/ZUdTsaxIwaY0RywTJX/1YlxLgILGl1gNJSp?=
- =?us-ascii?Q?whnUmnvg56n4rNs6Tj+3YTGsxMFYAHeRFfK5wD63qmJqNMMFYLVFsBVskEFn?=
- =?us-ascii?Q?a+gJDTwHoAyVveGhQ4ofc5Exum0buCJHWfDNFPH5PUf1V4VyXAwHl4fLSvse?=
- =?us-ascii?Q?QtVebocTcF1cbjWICMEpMI7xZSzxLNSA+fGoLlsW+F9RuCcPTHWs2E6DzV4p?=
- =?us-ascii?Q?24EHNX6b3om1DWHgXJWKUEyZIKQxJXsg6QLl8xTTmpm8myQ0+J3GDekSwHyh?=
- =?us-ascii?Q?Vm6zxkzC67rrfHDlOROy8UTgjkzec+n1i3yrBASrjpgG4AfYtFN9HV2qyJaK?=
- =?us-ascii?Q?KAiLMHk=3D?=
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(376014)(1800799024)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?DVQ+fLV5OGZmPIXLqkjaB2X76PXRhnv8TqsmmG94iK9uy/fErkQ58TE2/Ze6?=
- =?us-ascii?Q?SDr4RqI6n1mkpue/DpuY6AMmzlbBM28HdbI7/zz2pP7kkyTEAU8+iwWINsX4?=
- =?us-ascii?Q?nMVBqnypjkDzPym3hGuhtU+FHJ7jm34eu57Fj/czKI1eF4zhzW6PfxnoIgLa?=
- =?us-ascii?Q?4hH7YbEcs7OtRyLx+V1weeyC6If0/lr9Zj8UfDlV+zMyafE60/oH3Leki99q?=
- =?us-ascii?Q?FgoW0O1PqYKE8I+O9vhZOhlkB4krs0k9FXvBeZkjfMYCjxsSgaVRV3FKFzCa?=
- =?us-ascii?Q?iSoxjllIW3f5QJA59GdURS0PZcznVYUh1MYUtngN/0CHouRi2SAaFmaQG9Nx?=
- =?us-ascii?Q?QOzKQrYx8uBxviorbxEYtaIwxrL3k8N1wbjUfI4xo0+w5LpdCwODv+3nlqvk?=
- =?us-ascii?Q?yX0yVL1JLb83LsU2U/KBN7tNN6u4kFutG4gZhjWaA75yBca25Z3gJhgOp9Y0?=
- =?us-ascii?Q?DlVf3JeRFn2LEN9EKes9OqT8ApxBRjpRUp3dL38kfj8k63mIgGBJmisjWBMM?=
- =?us-ascii?Q?jcCCUQ+xQ6YducJWXtcYz0Rbmn7lZf6URg8l2EbMEmkxw9yyeecXr7h0zblz?=
- =?us-ascii?Q?JMN0ChXLebEbiChG8RcdsOcAaT9PT+wVfry3UlmWEA92fENM7p+mrH8RdUyw?=
- =?us-ascii?Q?QXflaMhlEUJTfnto1nKGCtx93Mahoca5XWi/GBtVhoqON9oNrg2ighP1bcCo?=
- =?us-ascii?Q?ZYsG3C9ZVRUvUr4fLV/An7/z6QtREBjYfUvBIvFAKZ05ousiXOGlYZYy5DT3?=
- =?us-ascii?Q?/i+yOLgRgKEG4/Fqny4kNWT3bgwtzDuE7nSGlCj2wnI+DdQvUGSgvtC2+RG/?=
- =?us-ascii?Q?WEbTaNz9SbxB6HLrDkffwXYV/kps5Hlu6t5Pw8Yw6Wb6RNNgmtZ4KyH0qsDQ?=
- =?us-ascii?Q?bdxFpxr116j/c3yt811mANVO6k+W0IZ/AEemkUVd9p98u6/kqxXB53JnO1I6?=
- =?us-ascii?Q?A92PHblzkiFVTulHBAPVGvpSJAFE7leqz54vISB5sDaNudVtnsi3bKwihQKO?=
- =?us-ascii?Q?it0kat2AE1ZN6gE1+aRlHArQBEvEbOhG0FOY9BbMay6VbOWE7KDsTfx2l7WJ?=
- =?us-ascii?Q?EWKLLEB3aOyv9n4k56us//seHllYc/IR6sLZaj0Nnt7Qn23p0/3gnAegnjvP?=
- =?us-ascii?Q?q/d/pT2IpbZ0L4+44NDWg/9cK58MWDlihSd4MKMtXqb26NrjHZzWVXkUavgT?=
- =?us-ascii?Q?Ya32Hvd4UUnvGrFvW+2E/Sqb9kdnVyETQqoFF7qjojui4ph51TJDxISMFIU1?=
- =?us-ascii?Q?0/BOnpc08fNHGJoMzKgurIi+xYwt6aH3LNELbI+XVP5QpAB3jtEtZJtZZRYT?=
- =?us-ascii?Q?ZwdCIbkm/Y+ha+uErY2dMGbg1o6AGUXAxWUsVBqNyZOvYPzeNV0IufY3yXr3?=
- =?us-ascii?Q?iuUv9YcHda7JDYW18QzsO5/vOMkys0lgbIp/Enkrozusp4Qu27CRb+NcCeME?=
- =?us-ascii?Q?O64/fHarA10zzmR3USUn9WX4OvtYrK9zukqulnvd3pctNjUgbrqqUbw3DVD5?=
- =?us-ascii?Q?Qu0Imb6dFvtfNLSHjhlL9j9FMTP4TdfGmlNuCXs2hCJg8CEUgK55pk4mUn4i?=
- =?us-ascii?Q?S3DFlCcNH+AOIfYx0FfjxD2xpNoK8/OBdh+7qr3X?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A48B1CCB2D
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:42:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.231.8
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730846548; cv=none; b=p4Y7WvIRLDdyChmbK7jAku22Bl0uU63xkE4WKr+tmgNX9RXmTaIO/yrGpOzEoj8VOBNZ1eHIfARsUvvplKz1INEt+PKSfpNGd9+BXFsuS0b4ieBJEOPzveR6IRCfkCYP8u9aMjmrVbjQGy7ITKZbybF5b0gCbmYfELczZuB9z2Y=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730846548; c=relaxed/simple;
+	bh=/lmggkNSH+EAX3q9rMYp7NnJ2lI7QRU5q6uufm2koag=;
+	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=ferztnktTluIMAsnBrmgsgxEienG/aBGKSaZma2C8fZyttCJj6q6r5xcLjJONW2dQMePm/lMkUUrYvp/z0nmMb86+7rZzgcdgZw9u5zAtZL34teta9JZsnRgTSGIsj2C7pA64UDr5xlzGQgKOlCiFLIWHfHly4O01xmkAJZSEDk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=W7Zbl3gb; arc=none smtp.client-ip=194.105.231.8
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
+  t=1730846545; x=1762382545;
+  h=date:from:to:subject:message-id:mime-version;
+  bh=hwelBx+CBN8QFq5WZtPQqwbzHyJJJZ/1Rl5wdn9UIPY=;
+  b=W7Zbl3gbdQ3rFna2g1XDr3aIKDLdGu7rrF7dY9XJHi+KZQYGg8mlXhky
+   yeokAFhbmhWk/+8snQ4JqyWpB0vYXiORpzD8CUnemRDJ8iw8YnRNJUNHy
+   +xnheqGl0hiMLTbPRy3Rrn2p4lVGNPGJaBZWV7lrTQiy9Qj//6HgKg58V
+   WSKEMCd62aiGWC9EVbDlyXEd27TdtMlu97GwICXhZ06qV5qOFpL4BZGlD
+   mS+e5whfXB6sspsVounhPGPfZdR2bnzMuQWSIdwmgf7iyz9ETxV7XttNs
+   C8ldBgra73Q2weHEni99WHtw7cjDsokVA9APAvCkcpTgjrmgXC862UVe4
+   w==;
+X-CSE-ConnectionGUID: ux+dZ4FwRSmX+UnwYq3ghg==
+X-CSE-MsgGUID: CQJJTaweS7uCmbWlP1nhcg==
+Authentication-Results: smtp-out-05.simnet.is; dkim=none (message not signed) header.i=none
+X-SBRS: 3.3
+X-IPAS-Result: =?us-ascii?q?A2GvCQC/nSpnhVfoacJaHQIOLwUFEAkKgVWCQn2BZIgWD?=
+ =?us-ascii?q?44fgRaCEpx2BwEBAQ8UAgECDhILBAEBAwEDhVEBAQ+JVSg4EwECBAEBAQEDA?=
+ =?us-ascii?q?gMBAQEBAQEBAQ4BAQYBAQEBAQEGBwIQAQEBAUAOO4U1Rg2EB4ElAQEBAQEBA?=
+ =?us-ascii?q?QEBAQEBAR0CQSqCEF8JgngBgmQUr1mBNIEBgxzbF4FdEIFIAYVpgmIBhWmEd?=
+ =?us-ascii?q?zwGgg2BFTWBc0p2gmEBA4giBIJIfESBNgyCDhIlgi+BEIRJgQ2EAIQlhCWBI?=
+ =?us-ascii?q?4oMgWkDWSERAVUTFwsHBYF6A4NSgTmBUYMgSoNZgUJGPzeCE2lLOgINAjaCJ?=
+ =?us-ascii?q?H2CToMYggWEcIRpgSMdNgoDC209NRQbnzABRoI3LzESAQE8RwqBBC0TAzAGB?=
+ =?us-ascii?q?AseIVuSOhREj0SBRKFchCSGW4MwgguVQzOEBJM7DDqSSJh3o24ZhRuBfoF/L?=
+ =?us-ascii?q?AcaCDA7gmcJSRkPjioZiDY2vi94OwIHCwEBAwmRAwEB?=
+IronPort-PHdr: A9a23:ie0C0xLGfKydFt3yodmcuUoyDhhOgF2VFhUQ9oJijK9SN/z+uY/jO
+ UrS+bNslwyBUYba7qdCjOzb++DlVHcb6JmM+HYFbNRXVhADhMlX1wwtCcKIEwv6efjtaSFSI
+ Q==
+IronPort-Data: A9a23:qZ1oh6+c6hCGM4OPLStqDrUDKn6TJUtcMsCJ2f8bNWPdYAuW94E1v
+ jFHAgbba6GUNyC3ZY0lOpDrpAJE6NKA0N5T/DEcrSlnEXhG+ZrJWo7IcR2oYn7PcZLPHRI45
+ ptDYYCecZ0+F3HQ+Er8aOa+pyhxhPmGT+utBLafYy0gFQJuFCss1nqP9wJBbqtA2LBVVCvQ5
+ 46vyyGmBHe6xCEyOGMM7uSEshwosfK1oC4Sul01bOxKu1nF0GIUSZgFIqqxMmH1KrW4ZdVWE
+ tsvtpniuDuxwioQNz+FrlraWkYEGbeIbFHQ1ScNBPny2ENI9yFqj/4yavdMOBcK12XTtt0gk
+ 98lWb6YEFxwZvKW8Ag+v7i0NwkkYMWqLZeeeSDXXfS7lhCAKz20haw2UCnaBKVAks5vG2ZC6
+ PcEHz4EaxGHloqezamyIgVWrp1LwPLDYsVG4xmM8RmDVax6GMmbHv2WjTNl9G5Yav5mTKe2i
+ /UxMVKDXDyYCzVTN1EeDo4JnevArhETpBUB9Tp5DYJui4Ti5FQZPIrFabI5SfTWLSlhpXt0k
+ 0qdl4jP7r72A/TEodaN2irEauYiBkoXUqpKfFGz3qYCbFF+WgX/ofDZPLe2iaDRt6KwZz5QA
+ 1EEuSYc8YYtzneufprAWQKJuSWLvhFJDrK8E8VigO2M4rTV+BrcFGkBViRGeM1j7JZwWz0xy
+ hmIhLsFBxQ24eHTECrAsO3P93XiZkD5LkdbDcMAZQEKy8LipYc+klTOVb6PFYbv1YakRmGok
+ 1hmqgAVvpcxsccU2p7k4HvCiQ2onsHPTgU6s1C/smWNtV8pNdH0O+RE82Pz6/tcIIuHZkeOs
+ WJCmMWE6u0KS5aXm0SwrP4lArCy+7OXMTjEm1l/Dtx5rnKz+mW/O4FLiN1jGKt3GtsUOjPbP
+ GHMgzhU1NxuOmSbdPR4Y43kXqzG0pPcPdjiU/nVaP9HbZ5waBKL8UlSiai4gzCFfK8EzfFXB
+ HuLTftAG0r2HoxG91KLqwo1z74w2mUsxGbLX5fr3lH/iPyAZWWJD7YeWLdvUgzbxP3eyOk22
+ 48OXydv9/m5eLalCsUw2dVKRW3m1VBhWfjLRzV/L4Zv2DZOFmA7EOP2yrg8YYFjlKk9vr6Xp
+ SniBhIAmQOu3iWvxeC2hpZLNOOHsXFX8CpTAMDQFQ/yhhDPnK72sPxBLsVfkUcPrrw8kpaYs
+ MXpi+3bXqQeFWWbk9jsRZz8qIUqdBrDuO59F3fNXdTLRLY5H1ah0oa9ImPHqnJUZgLp7pRWn
+ lFV/liAKXb1b185VJ6OAB9upnvt1UUgdBVaBRaXeYINJhy9r+CH6UXZ15cKHi3FEj2brhPy6
+ upcKU1wSTXly2PtzOT0uA==
+IronPort-HdrOrdr: A9a23:q5W9GqMpn24zpcBcTt6jsMiBIKoaSvp037AO7TEWdfU1SL3+qy
+ nAppUmPHPP6Ar5O0tQ/exoWpPwJE80nKQdieJ6UNvMMjUO01HYTr2Kg7GSoAHdJw==
+X-Talos-CUID: 9a23:12gwHm6liMSS7fl/3dss6V5XFvJ5XGLn93LgYHK+FldwE7KVRgrF
+X-Talos-MUID: =?us-ascii?q?9a23=3Afaq8nQwvi6CrqWcLM4HE+jF1YruaqI+XKmIxmIo?=
+ =?us-ascii?q?LgJaZHil6BDOl1TK3SYByfw=3D=3D?=
+X-IronPort-Anti-Spam-Filtered: true
+X-IronPort-AV: E=Sophos;i="6.11,261,1725321600"; 
+   d="8'?scan'208";a="23397808"
+Received: from vist-zimproxy-01.vist.is ([194.105.232.87])
+  by smtp-out-05.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 22:42:21 +0000
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id C11164170FEA
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:42:21 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10032)
+ with ESMTP id iBbKX7lA3q_P for <netdev@vger.kernel.org>;
+ Tue,  5 Nov 2024 22:42:21 +0000 (GMT)
+Received: from localhost (localhost [127.0.0.1])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTP id 213D341A16AD
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:42:21 +0000 (GMT)
+Received: from vist-zimproxy-01.vist.is ([127.0.0.1])
+ by localhost (vist-zimproxy-01.vist.is [127.0.0.1]) (amavis, port 10026)
+ with ESMTP id e5pTaBlFGgb0 for <netdev@vger.kernel.org>;
+ Tue,  5 Nov 2024 22:42:21 +0000 (GMT)
+Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
+	by vist-zimproxy-01.vist.is (Postfix) with ESMTPS id F28334170FEA
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:42:20 +0000 (GMT)
+Received: from bg by kassi.invalid.is with local (Exim 4.98)
+	(envelope-from <bg@kassi.invalid.is>)
+	id 1t8SFh-000000001aP-3uM3
+	for netdev@vger.kernel.org;
+	Tue, 05 Nov 2024 22:42:21 +0000
+Date: Tue, 5 Nov 2024 22:42:21 +0000
+From: Bjarni Ingi Gislason <bjarniig@simnet.is>
+To: netdev@vger.kernel.org
+Subject: dcb-maxrate.8: some remarks and editorial changes for this manual
+Message-ID: <ZyqfTZWejPMsFQWz@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: ea23a185-b125-4d7b-a9a9-08dcfdea45bf
-X-MS-Exchange-CrossTenant-originalarrivaltime: 05 Nov 2024 22:36:21.3783
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: v6WSEnlV/Mpy263QB72gGr8SlRXcKVDEAm4iiNvw1Kd3bAVOBJjH4N7MPofuK8x0JkDT+gRed3LQihM6ca9nZbTvhzfMNgvOqeqRyQlmTIc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB6928
-X-OriginatorOrg: intel.com
+Content-Type: multipart/mixed; boundary="ABHQcWKZEZv8RwR2"
+Content-Disposition: inline
 
 
+--ABHQcWKZEZv8RwR2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-> -----Original Message-----
-> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Sent: Monday, November 4, 2024 3:25 AM
-> To: Paul Menzel <pmenzel@molgen.mpg.de>
-> Cc: David Laight <David.Laight@aculab.com>; Drewek, Wojciech
-> <wojciech.drewek@intel.com>; Szycik, Marcin <marcin.szycik@intel.com>;
-> netdev@vger.kernel.org; Knitter, Konrad <konrad.knitter@intel.com>;
-> Chmielewski, Pawel <pawel.chmielewski@intel.com>; horms@kernel.org; intel=
--
-> wired-lan@lists.osuosl.org; pio.raczynski@gmail.com; Samudrala, Sridhar
-> <sridhar.samudrala@intel.com>; Keller, Jacob E <jacob.e.keller@intel.com>=
-;
-> jiri@resnulli.us; Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> Subject: Re: [Intel-wired-lan] Small Integers: Big Penalty
->=20
-> On Mon, Nov 04, 2024 at 10:12:14AM +0100, Paul Menzel wrote:
-> > [Cc: -nex.sw.ncis.nat.hpm.dev@intel.com (550 #5.1.0 Address rejected.)]
-> >
-> > Am 04.11.24 um 10:09 schrieb Paul Menzel:
-> > > Dear David, dear Michal,
-> > >
-> > >
-> > > Am 04.11.24 um 09:51 schrieb David Laight:
-> > > > From: Michal Swiatkowski
-> > > > > Sent: 04 November 2024 07:03
-> > > > ...
-> > > > > > The type of the devlink parameters msix_vec_per_pf_{min,max} is
-> > > > > > specified as u32, so you must use value.vu32 everywhere you wor=
-k with
-> > > > > > them, not vu16.
-> > > > > >
-> > > > >
-> > > > > I will change it.
-> > > >
-> > > > You also need a pretty good reason to use u16 anywhere at all.
-> > > > Just because the domain of the value is small doesn't mean the
-> > > > best type isn't [unsigned] int.
-> > > >
-> > > > Any arithmetic (particularly on non x86) is likely to increase
-> > > > the code size above any perceived data saving.
-> > >
-> > > In 2012 Scott Duplichan wrote *Small Integers: Big Penalty* [1]. Of
-> > > course you always should measure yourself.
-> > >
->=20
-> Yeah, I chose it, because previously it was stored in u16. I will change
-> it to u32 too, as it is stored in structure that doesn't really need to
-> be small.
->=20
-> Thanks for comments and link to the article.
-> Michal
->=20
+  The man page is from Debian:
 
-Yea.. ice driver code has a bad habit of using smaller size values in struc=
-tures when its unnecessary.
+Package: iproute2
+Version: 6.11.0-1
+Severity: minor
+Tags: patch
+
+  Improve the layout of the man page according to the "man-page(7)"
+guidelines, the output of "mandoc -lint T", the output of
+"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+conventions.
+
+-.-
+
+  Output from a script "chk_man" is in the attachment.
+
+-.-
+
+Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+
+diff --git a/dcb-maxrate.8 b/dcb-maxrate.8.new
+index d03c215..cc415ef 100644
+--- a/dcb-maxrate.8
++++ b/dcb-maxrate.8.new
+@@ -3,25 +3,24 @@
+ dcb-maxrate \- show / manipulate port maxrate settings of
+ the DCB (Data Center Bridging) subsystem
+ .SH SYNOPSIS
+-.sp
+ .ad l
+ .in +8
+ 
+ .ti -8
+ .B dcb
+-.RI "[ " OPTIONS " ] "
++.RI "[ " OPTIONS " ]"
+ .B maxrate
+ .RI "{ " COMMAND " | " help " }"
+ .sp
+ 
+ .ti -8
+ .B dcb maxrate show dev
+-.RI DEV
++.I DEV
+ .RB "[ " tc-maxrate " ]"
+ 
+ .ti -8
+ .B dcb maxrate set dev
+-.RI DEV
++.I DEV
+ .RB "[ " tc-maxrate " " \fIRATE-MAP " ]"
+ 
+ .ti -8
+@@ -34,7 +33,7 @@ the DCB (Data Center Bridging) subsystem
+ .IR TC " := { " \fB0\fR " .. " \fB7\fR " }"
+ 
+ .ti -8
+-.IR RATE " := { " INTEGER "[" \fBbit\fR "] | " INTEGER\fBKbit\fR " | "
++.IR RATE " := { " INTEGER "[" \fBbit\fR "] | " INTEGER\fBKbit\fR " |"
+ .IR INTEGER\fBMib\fR " | " ... " }"
+ 
+ .SH DESCRIPTION
+@@ -45,7 +44,7 @@ egress from a given traffic class.
+ 
+ .SH PARAMETERS
+ 
+-The following describes only the write direction, i.e. as used with the
++The following describes only the write direction, i.e., as used with the
+ \fBset\fR command. For the \fBshow\fR command, the parameter name is to be used
+ as a simple keyword without further arguments. This instructs the tool to show
+ the value of a given parameter. When no parameters are given, the tool shows the
+@@ -60,13 +59,13 @@ The rates can use the notation documented in section PARAMETERS at
+ .BR tc (8).
+ Note that under that notation, "bit" stands for bits per second whereas "b"
+ stands for bytes per second. When showing, the command line option
+-.B -i
++.B \-i
+ toggles between using decadic and ISO/IEC prefixes.
+ 
+ .SH EXAMPLE & USAGE
+ 
+-Set rates of all traffic classes to 25Gbps, except for TC 6, which will
+-have the rate of 100Gbps:
++Set rates of all traffic classes to 25\~Gbit/s, except for TC 6,
++which will have the rate of 100\~Gbit/s:
+ 
+ .P
+ # dcb maxrate set dev eth0 tc-maxrate all:25Gbit 6:100Gbit
+@@ -76,7 +75,8 @@ Show what was set:
+ .P
+ # dcb maxrate show dev eth0
+ .br
+-tc-maxrate 0:25Gbit 1:25Gbit 2:25Gbit 3:25Gbit 4:25Gbit 5:25Gbit 6:100Gbit 7:25Gbit
++tc-maxrate 0:25Gbit 1:25Gbit 2:25Gbit 3:25Gbit 4:25Gbit 5:25Gbit 6:100Gbit \
++7:25Gbit
+ 
+ .SH EXIT STATUS
+ Exit status is 0 if command was successful or a positive integer upon failure.
+
+--ABHQcWKZEZv8RwR2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="chk_man.err.dcb-maxrate.8"
+
+  Any program (person), that produces man pages, should check the output
+for defects by using (both groff and nroff)
+
+[gn]roff -mandoc -t -ww -b -z -K utf8  <man page>
+
+  The same goes for man pages that are used as an input.
+
+  For a style guide use
+
+  mandoc -T lint
+
+-.-
+
+  So any 'generator' should check its products with the above mentioned
+'groff', 'mandoc',  and additionally with 'nroff ...'.
+
+  This is just a simple quality control measure.
+
+  The 'generator' may have to be corrected to get a better man page,
+the source file may, and any additional file may.
+
+  Common defects:
+
+  Input text line longer than 80 bytes.
+
+  Not removing trailing spaces (in in- and output).
+  The reason for these trailing spaces should be found and eliminated.
+
+  Not beginning each input sentence on a new line.
+Lines should thus be shorter.
+
+  See man-pages(7), item 'semantic newline'.
+
+-.-
+
+The difference between the formatted output of the original and patched file
+can be seen with:
+
+  nroff -mandoc <file1> > <out1>
+  nroff -mandoc <file2> > <out2>
+  diff -u <out1> <out2>
+
+and for groff, using
+
+"printf '%s\n%s\n' '.kern 0' '.ss 12 0' | groff -mandoc -Z - "
+
+instead of 'nroff -mandoc'
+
+  Add the option '-t', if the file contains a table.
+
+  Read the output of 'diff -u' with 'less -R' or similar.
+
+-.-.
+
+  If 'man' (man-db) is used to check the manual for warnings,
+the following must be set:
+
+  The option "-warnings=w"
+
+  The environmental variable:
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+  or
+
+  (produce only warnings):
+
+export MANROFFOPT="-ww -b -z"
+
+export MAN_KEEP_STDERR=yes (or any non-empty value)
+
+-.-.
+
+Output from "mandoc -T lint dcb-maxrate.8": (possibly shortened list)
+
+mandoc: dcb-maxrate.8:6:2: WARNING: skipping paragraph macro: sp after SH
+mandoc: dcb-maxrate.8:79:83: STYLE: input text line longer than 80 bytes: tc-maxrate 0:25Gbit ...
+
+-.-.
+
+Change (or include a "FIXME" paragraph about) misused SI (metric)
+numeric prefixes (or names) to the binary ones, like Ki (kibi), Mi
+(mebi), Gi (gibi), or Ti (tebi), if indicated.
+If the metric prefixes are correct, add the definitions or an
+explanation to avoid misunderstanding.
+
+68:Set rates of all traffic classes to 25Gbps, except for TC 6, which will
+69:have the rate of 100Gbps:
+72:# dcb maxrate set dev eth0 tc-maxrate all:25Gbit 6:100Gbit
+79:tc-maxrate 0:25Gbit 1:25Gbit 2:25Gbit 3:25Gbit 4:25Gbit 5:25Gbit 6:100Gbit 7:25Gbit
+
+-.-.
+
+Use the correct macro for the font change of a single argument or
+split the argument into two.
+
+19:.RI DEV
+24:.RI DEV
+
+-.-.
+
+Change a HYPHEN-MINUS (code 0x2D) to a minus(-dash) (\-),
+if it
+is in front of a name for an option,
+is a symbol for standard input,
+is a single character used to indicate an option,
+or is in the NAME section (man-pages(7)).
+N.B. - (0x2D), processed as a UTF-8 file, is changed to a hyphen
+(0x2010, groff \[u2010] or \[hy]) in the output.
+
+63:.B -i
+
+-.-.
+
+Add a comma (or \&) after "e.g." and "i.e.", or use English words
+(man-pages(7)).
+Abbreviation points should be protected against being interpreted as
+an end of sentence, if they are not, and that independent of the
+current place on the line.
+
+48:The following describes only the write direction, i.e. as used with the
+
+-.-.
+
+Wrong distance between sentences in the input file.
+
+  Separate the sentences and subordinate clauses; each begins on a new
+line.  See man-pages(7) ("Conventions for source file layout") and
+"info groff" ("Input Conventions").
+
+  The best procedure is to always start a new sentence on a new line,
+at least, if you are typing on a computer.
+
+Remember coding: Only one command ("sentence") on each (logical) line.
+
+E-mail: Easier to quote exactly the relevant lines.
+
+Generally: Easier to edit the sentence.
+
+Patches: Less unaffected text.
+
+Search for two adjacent words is easier, when they belong to the same line,
+and the same phrase.
+
+  The amount of space between sentences in the output can then be
+controlled with the ".ss" request.
+
+N.B.
+
+  The number of lines affected can be too large to be in a patch.
+
+48:The following describes only the write direction, i.e. as used with the
+49:\fBset\fR command. For the \fBshow\fR command, the parameter name is to be used
+50:as a simple keyword without further arguments. This instructs the tool to show
+51:the value of a given parameter. When no parameters are given, the tool shows the
+58:for details. Keys are TC indices, values are traffic rates in bits per second.
+62:stands for bytes per second. When showing, the command line option
+
+-.-.
+
+Split lines longer than 80 characters into two or more lines.
+Appropriate break points are the end of a sentence and a subordinate
+clause; after punctuation marks.
+
+Line 79, length 83
+
+tc-maxrate 0:25Gbit 1:25Gbit 2:25Gbit 3:25Gbit 4:25Gbit 5:25Gbit 6:100Gbit 7:25Gbit
+
+
+-.-.
+
+Use the name of units in text; use symbols in tables and
+calculations.
+The rule is to have a (no-break, \~) space between a number and
+its units (see "www.bipm.org/en/publications/si-brochure")
+
+68:Set rates of all traffic classes to 25Gbps, except for TC 6, which will
+
+-.-.
+
+No space is needed before a quote (") at the end of a line
+
+12:.RI "[ " OPTIONS " ] "
+37:.IR RATE " := { " INTEGER "[" \fBbit\fR "] | " INTEGER\fBKbit\fR " | "
+
+-.-.
+
+Output from "test-groff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
+
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
+troff: backtrace: file '<stdin>':12
+troff:<stdin>:12: warning: trailing space in the line
+troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':679: macro 'IR'
+troff: backtrace: file '<stdin>':37
+troff:<stdin>:37: warning: trailing space in the line
+
+
+--ABHQcWKZEZv8RwR2--
 
