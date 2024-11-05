@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-142117-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63EBC9BD87C
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 23:24:50 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 544EA9BD878
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 23:24:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24DF82843AE
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:24:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 858381C22432
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 22:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6BA216DF8;
-	Tue,  5 Nov 2024 22:24:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BED121644E;
+	Tue,  5 Nov 2024 22:24:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="MADADX2l"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="HGMNTEMo"
 X-Original-To: netdev@vger.kernel.org
 Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15A38216A31
-	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:24:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6094A216A07
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 22:24:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730845447; cv=none; b=EMhBqwu/nShoO6LoKb21kbWDOEoiJoHMMi0vKUnU5yWpB7H46qB/rg01xCdsTNN1P5ktcSf+Zk7ya/rBoPF1Igdgg8z7Sth5SyiUTLOC7c1nWEeH4LH1G/+i3YEon92Aw/C9MwKGMYaJo38VonhMRhXhaBp/N5K09GnD0ddHAas=
+	t=1730845445; cv=none; b=LdHkIB9dFQtH64g2+VnKR06cpQhyb6MqIJ9zzrv+CMYBiX/lOTmP+XBH+pkaSFj1Wss87uUyWi2DFKDBzV/OISsF31RqDyZztjfKh2emZ/YtkgUo3rOgIJnhO1xJUxJiDKess2IgmiFZllqINlPi3YOc5tr5QEVEuoRT6HTMF+4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730845447; c=relaxed/simple;
-	bh=lBj1cJu2ZEkFnLs2ep/9MrSyHrHCfVLTIlE0NVdEsYM=;
+	s=arc-20240116; t=1730845445; c=relaxed/simple;
+	bh=L9EaD1mXSy6ejHghcmSLw+ooOGvXJHcTlnffJFTLCWk=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=g3zeZ19yF7hGY9b8OVfd9Z1xjOWznkOUQlzfp6amxPbLGlojJE90014+kvWygWEEc4zCJn8WzdAIxG3+9T7clDFwYkbFqDCyanXnnaXh4BGFJWAw3oql4IMjfQXlGaixXdEfJElHqVxySzX1z9WovHByMQv6K+0pTsdaW22wdw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=MADADX2l; arc=none smtp.client-ip=198.175.65.15
+	 MIME-Version; b=XMnqaC66ZEVE7/J05UaGvbTYAbZe9nf4S/NrAw0LTCqJca9v9G3AWldeeG/kCTYJEXLBWTg3q9IaYiB+5v6Cj+IfqRJzAcDPp0BeRIgRXSMyRXAEIegf3SUN+s3piST9+8Bg74me8uujkxAhJdnTPoYY69NdAIDAppKpg5e3QTg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=HGMNTEMo; arc=none smtp.client-ip=198.175.65.15
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730845446; x=1762381446;
+  t=1730845444; x=1762381444;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=lBj1cJu2ZEkFnLs2ep/9MrSyHrHCfVLTIlE0NVdEsYM=;
-  b=MADADX2l32PHfy7I3d3QZBjpNayMYrAWireVc0KXn5T8UWSZ97Tm9G/V
-   bGl1OyftDrgiAOYU2Cb27yEqG61bxmcEhUbxRRPhqyWcC9+kVPH/1k0U4
-   TZNzGLHvl0o0uXQEFkeyksUjE8lqqfmdxqB7fzoJ5i1/ZVb9dd7vXlANR
-   WF7qEDDEvbC09OCXiilSma+QfdA92Ikaq2mmNTBpaFAsqCN8HG3Ja83p/
-   mLRDVzw8zRNNTaeWcf+uLfUDdldSlvOGxop+XNUbryvzx0qEv5mufUidQ
-   4h5f3uuIR3Pql74IfA6AMm5c/kCyw6t4Cwu/odUk/54tJUUgK6R7eXuXh
-   w==;
-X-CSE-ConnectionGUID: oABL8PK9QISLRjhJuiQoUA==
-X-CSE-MsgGUID: +fd4kz2aRL2FAV17jFEGKQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34314298"
+  bh=L9EaD1mXSy6ejHghcmSLw+ooOGvXJHcTlnffJFTLCWk=;
+  b=HGMNTEMohuJcA09d5V2ZOIsH9KIuTUu1L3yVuUY2B9dvdcETcL+A5lxS
+   vzDDqf01MMQ22ejRZYcnMQ8PWuHVm2ASs5MBcT5mnVDOkUBlYlfBR9qNt
+   uQ7W3TqJwDA2vRK47xyILu3CnLxCKrgXz3zWz+ZTPBhjbU2kIcCFO8f/1
+   HMWuQpvum0NGd7GlPMzP9THaLEJTLfOpMS+rAVmNfd01MEbcEnpbUh4N5
+   8GvH+ZrliVhQXKwby6UsO4QjXojYB/W7+IUjsx1jekdECusV2WMYrhwuM
+   kTA73fLYErWfIs9Erpa2bC/Le8vG9g6T0t+uYIiQTa6Q50qiKwCkkh6v8
+   Q==;
+X-CSE-ConnectionGUID: JMMRuKA8RP6TBxak2EeQ3w==
+X-CSE-MsgGUID: RH2RUi5nR7KkqW6Z9nxDYA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34314302"
 X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="34314298"
+   d="scan'208";a="34314302"
 Received: from fmviesa009.fm.intel.com ([10.60.135.149])
   by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 14:24:01 -0800
-X-CSE-ConnectionGUID: qrzW0Rl8SoudeIodxfK0eQ==
-X-CSE-MsgGUID: 1t9o1JcARZ6Xb878KK4f1Q==
+X-CSE-ConnectionGUID: lixNti0HQTOEUwKiqHxvig==
+X-CSE-MsgGUID: 1ASa+u/AQg2ngtpac0lzeA==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="84322457"
+   d="scan'208";a="84322460"
 Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
   by fmviesa009.fm.intel.com with ESMTP; 05 Nov 2024 14:24:00 -0800
 From: Tony Nguyen <anthony.l.nguyen@intel.com>
@@ -68,9 +68,9 @@ To: davem@davemloft.net,
 Cc: Jacob Keller <jacob.e.keller@intel.com>,
 	anthony.l.nguyen@intel.com,
 	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH net-next 08/15] ice: initialize pf->supported_rxdids immediately after loading DDP
-Date: Tue,  5 Nov 2024 14:23:42 -0800
-Message-ID: <20241105222351.3320587-9-anthony.l.nguyen@intel.com>
+Subject: [PATCH net-next 09/15] ice: use stack variable for virtchnl_supported_rxdids
+Date: Tue,  5 Nov 2024 14:23:43 -0800
+Message-ID: <20241105222351.3320587-10-anthony.l.nguyen@intel.com>
 X-Mailer: git-send-email 2.46.0.522.gc50d79eeffbf
 In-Reply-To: <20241105222351.3320587-1-anthony.l.nguyen@intel.com>
 References: <20241105222351.3320587-1-anthony.l.nguyen@intel.com>
@@ -84,132 +84,72 @@ Content-Transfer-Encoding: 8bit
 
 From: Jacob Keller <jacob.e.keller@intel.com>
 
-The pf->supported_rxdids field is used to populate the list of valid RXDIDs
-that a VF may use when negotiating VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC.
+The ice_vc_query_rxdid() function allocates memory to store the
+virtchnl_supported_rxdids structure used to communicate the bitmap of
+supported RXDIDs to a VF.
 
-The set of supported RXDIDs is dependent on the DDP, and can be read from
-the GLXFLXP_RXDID_FLAGS register. The PF needs to send this list to the
-VF upon receiving the VIRTCHNL_OP_GET_SUPPORTED_RXDIDs. It also needs to
-use this list to validate the requested descriptor ID from the VF when
-programming the Rx queues.
+This structure is only 8 bytes in size. The function must hold the
+allocated length on the stack as well as the pointer to the structure which
+itself is 8 bytes. Allocating this storage on the heap adds unnecessary
+overhead including a potential error path that must be handled in case
+kzalloc fails. Because this structure is so small, we're not saving stack
+space. Additionally, because we must ensure that we free the allocated
+memory, the return value from ice_vc_send_msg_to_vf() must also be saved in
+the stack ret variable. Depending on compiler optimization, this means
+allocating the 8-byte structure is requiring up to 16-bytes of stack
+memory!
 
-A future update to support VF live migration will also want to validate
-that the target VF can support the same descriptor ID when migrating.
-
-Currently, pf->supported_rxdids is initialized inside the
-ice_vc_query_rxdid() function. This means that it is only ever initialized
-if at least one VF actually tries to negotiate
-VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC. It is also unnecessarily re-initialized
-every time the VF loads and requests the descriptor list. This worked
-before because the PF only checks pf->suppported_rxdids when programming
-the Rx queue if the VF actually negotiates the
-VIRTCHNL_VF_OFFLOAD_RX_FLEX_DESC feature.
-
-This will be problematic for VF live migration. We need the list of
-supported Rx descriptor IDs when migrating. It is possible that no VF on
-the target PF has ever actually issued a VIRTCHNL_OP_GET_SUPPORTED_RXDIDs.
-
-Refactor the driver to initialize pf->supported_rxdids during driver
-initialization after the DDP is loaded. This is simpler, avoids unnecessary
-duplicate work, and avoids issues with the live migration process.
+Simplify this function to keep the rxdid variable on the stack, saving
+memory and removing a potential failure exit path from this function.
 
 Signed-off-by: Jacob Keller <jacob.e.keller@intel.com>
 Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
 Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 ---
- drivers/net/ethernet/intel/ice/ice_main.c     | 31 +++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_virtchnl.c | 20 ++----------
- 2 files changed, 33 insertions(+), 18 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c | 20 ++++---------------
+ 1 file changed, 4 insertions(+), 16 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index c96feb292f84..db463793d870 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4560,6 +4560,34 @@ ice_init_tx_topology(struct ice_hw *hw, const struct firmware *firmware)
- 	return 0;
- }
- 
-+/**
-+ * ice_init_supported_rxdids - Initialize supported Rx descriptor IDs
-+ * @hw: pointer to the hardware structure
-+ * @pf: pointer to pf structure
-+ *
-+ * The pf->supported_rxdids bitmap is used to indicate to VFs which descriptor
-+ * formats the PF hardware supports. The exact list of supported RXDIDs
-+ * depends on the loaded DDP package. The IDs can be determined by reading the
-+ * GLFLXP_RXDID_FLAGS register after the DDP package is loaded.
-+ *
-+ * Note that the legacy 32-byte RXDID 0 is always supported but is not listed
-+ * in the DDP package. The 16-byte legacy descriptor is never supported by
-+ * VFs.
-+ */
-+static void ice_init_supported_rxdids(struct ice_hw *hw, struct ice_pf *pf)
-+{
-+	pf->supported_rxdids = BIT(ICE_RXDID_LEGACY_1);
-+
-+	for (int i = ICE_RXDID_FLEX_NIC; i < ICE_FLEX_DESC_RXDID_MAX_NUM; i++) {
-+		u32 regval;
-+
-+		regval = rd32(hw, GLFLXP_RXDID_FLAGS(i, 0));
-+		if ((regval >> GLFLXP_RXDID_FLAGS_FLEXIFLAG_4N_S)
-+			& GLFLXP_RXDID_FLAGS_FLEXIFLAG_4N_M)
-+			pf->supported_rxdids |= BIT(i);
-+	}
-+}
-+
- /**
-  * ice_init_ddp_config - DDP related configuration
-  * @hw: pointer to the hardware structure
-@@ -4594,6 +4622,9 @@ static int ice_init_ddp_config(struct ice_hw *hw, struct ice_pf *pf)
- 	ice_load_pkg(firmware, pf);
- 	release_firmware(firmware);
- 
-+	/* Initialize the supported Rx descriptor IDs after loading DDP */
-+	ice_init_supported_rxdids(hw, pf);
-+
- 	return 0;
- }
- 
 diff --git a/drivers/net/ethernet/intel/ice/ice_virtchnl.c b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-index cc070c467fdd..bc9fadaccad0 100644
+index bc9fadaccad0..f445e33b2028 100644
 --- a/drivers/net/ethernet/intel/ice/ice_virtchnl.c
 +++ b/drivers/net/ethernet/intel/ice/ice_virtchnl.c
-@@ -3032,11 +3032,9 @@ static int ice_vc_query_rxdid(struct ice_vf *vf)
+@@ -3031,10 +3031,8 @@ static int ice_vc_set_rss_hena(struct ice_vf *vf, u8 *msg)
+ static int ice_vc_query_rxdid(struct ice_vf *vf)
  {
  	enum virtchnl_status_code v_ret = VIRTCHNL_STATUS_SUCCESS;
- 	struct virtchnl_supported_rxdids *rxdid = NULL;
--	struct ice_hw *hw = &vf->pf->hw;
+-	struct virtchnl_supported_rxdids *rxdid = NULL;
++	struct virtchnl_supported_rxdids rxdid = {};
  	struct ice_pf *pf = vf->pf;
- 	int len = 0;
--	int ret, i;
--	u32 regval;
-+	int ret;
+-	int len = 0;
+-	int ret;
  
  	if (!test_bit(ICE_VF_STATE_ACTIVE, vf->vf_states)) {
  		v_ret = VIRTCHNL_STATUS_ERR_PARAM;
-@@ -3056,21 +3054,7 @@ static int ice_vc_query_rxdid(struct ice_vf *vf)
+@@ -3046,21 +3044,11 @@ static int ice_vc_query_rxdid(struct ice_vf *vf)
  		goto err;
  	}
  
--	/* RXDIDs supported by DDP package can be read from the register
--	 * to get the supported RXDID bitmap. But the legacy 32byte RXDID
--	 * is not listed in DDP package, add it in the bitmap manually.
--	 * Legacy 16byte descriptor is not supported.
--	 */
--	rxdid->supported_rxdids |= BIT(ICE_RXDID_LEGACY_1);
--
--	for (i = ICE_RXDID_FLEX_NIC; i < ICE_FLEX_DESC_RXDID_MAX_NUM; i++) {
--		regval = rd32(hw, GLFLXP_RXDID_FLAGS(i, 0));
--		if ((regval >> GLFLXP_RXDID_FLAGS_FLEXIFLAG_4N_S)
--			& GLFLXP_RXDID_FLAGS_FLEXIFLAG_4N_M)
--			rxdid->supported_rxdids |= BIT(i);
+-	len = sizeof(struct virtchnl_supported_rxdids);
+-	rxdid = kzalloc(len, GFP_KERNEL);
+-	if (!rxdid) {
+-		v_ret = VIRTCHNL_STATUS_ERR_NO_MEMORY;
+-		len = 0;
+-		goto err;
 -	}
 -
--	pf->supported_rxdids = rxdid->supported_rxdids;
-+	rxdid->supported_rxdids = pf->supported_rxdids;
+-	rxdid->supported_rxdids = pf->supported_rxdids;
++	rxdid.supported_rxdids = pf->supported_rxdids;
  
  err:
- 	ret = ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_SUPPORTED_RXDIDS,
+-	ret = ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_SUPPORTED_RXDIDS,
+-				    v_ret, (u8 *)rxdid, len);
+-	kfree(rxdid);
+-	return ret;
++	return ice_vc_send_msg_to_vf(vf, VIRTCHNL_OP_GET_SUPPORTED_RXDIDS,
++				     v_ret, (u8 *)&rxdid, sizeof(rxdid));
+ }
+ 
+ /**
 -- 
 2.42.0
 
