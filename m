@@ -1,156 +1,126 @@
-Return-Path: <netdev+bounces-141938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CD549BCBA8
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:23:48 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3ED9C9BCC27
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 12:50:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D040F1F2454B
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:23:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6278C1C208DD
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 11:50:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB2901D432D;
-	Tue,  5 Nov 2024 11:23:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662451D3654;
+	Tue,  5 Nov 2024 11:50:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LvSqOd+F"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="sP0WG0k/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from sonic314-13.consmr.mail.bf2.yahoo.com (sonic314-13.consmr.mail.bf2.yahoo.com [74.6.132.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E8031C231D;
-	Tue,  5 Nov 2024 11:23:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B96301D3590
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 11:50:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.132.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730805800; cv=none; b=lqUVei4tEPoD1z36CZglAebRUBTeByvCbbofY4pWuqj5imV0t8UjebdRAQibLjvInUTuU+Fzv/p+3VYH5E0xI/zFXa87vrOCDho2OZJDG70vS464ViABAWjELb4QoF4ps52Y4qp/l/fv/VO1iA6muYNpApEfmhq4SYCZvWP5B8Q=
+	t=1730807413; cv=none; b=UrxV5KPTVHAYt9D9QTFk1mSgo98OId6Aghq+Qm48YxBhjZkh68O6BvHk0RmkTPuwILv1nDMcNgMj4P+2z/Db0v1lh6NqXtYupCczP1mBKDPkhyTztiggn/Ki69gYZTGVyFLBAlI32ykj+ypqE6EGU2WT+oKwOaobLbcBbUzHqKw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730805800; c=relaxed/simple;
-	bh=Q4eFHakxqG1dy0iztrcXVHW6AoWr7/YCu3Tso2wXTes=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SksMdnbddaq0QaW5FLPX2CVhVRFMoXN6IxxZRGOH467SXNxQZJceQ1S0G10c+cIdlssUC3/+wT/2DGSBMysIVBX4v6LUvSclGo3+dPh4EfOEmPmU9ONWMwoVOx3PEb9qVpdcLleRTJZ5JjNJwL+AbooVWgiR2fmOfUyNAnOXY0A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LvSqOd+F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37746C4CECF;
-	Tue,  5 Nov 2024 11:23:17 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730805799;
-	bh=Q4eFHakxqG1dy0iztrcXVHW6AoWr7/YCu3Tso2wXTes=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=LvSqOd+FpiQYVvwsnR9O/gyWLdcHj2QAEsch1GsCYnZEKsLfggk7QMRwPMWpqLXzb
-	 byx45L3BnNdxMjSd7VqPXJGMCGqbWkpdOuRnMplz9NK1Hj+gU7ttzixvdXnt6C2OPi
-	 HL5o47VMSW7FJ5uq0/jE/1inQFqTe0tPagqtRjYjJ0gUL6Z6ViA2PceFEsCgV6pS7Z
-	 ZAuEac/TpBfolAonnqg4Me+1LKmLQaH4D8nInbN09OdEEBEtebhJVvlpZTBSg6QeOE
-	 HShknlEUbyHR3o5w1TEePyclgcQcBMhOWZWVyY2Co7I0+u0j47D2Ez+1guGHSxrJvh
-	 xSAsuPuWQ4mSQ==
-Date: Tue, 5 Nov 2024 13:23:13 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: Wen Gu <guwen@linux.alibaba.com>,
-	"D. Wythe" <alibuda@linux.alibaba.com>,
-	Tony Lu <tonylu@linux.alibaba.com>,
-	David Miller <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Halil Pasic <pasic@linux.ibm.com>,
-	Nils Hoppmann <niho@linux.ibm.com>,
-	Niklas Schnell <schnelle@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-Message-ID: <20241105112313.GE311159@unreal>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
- <20241027201857.GA1615717@unreal>
- <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
+	s=arc-20240116; t=1730807413; c=relaxed/simple;
+	bh=tS52rCBrcpWKiTeTm9uSHpHse+DERy5VYTWONFcwv6A=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zx3apsage0926ctRIm+0UELgdEDmv975ZJxni3oB8zhwWmx8Z9e+7rQXhUrVfp6tiBgqBgmQeFNAkxAwfCUoeHJ1ly48YLUiolzvBWGUx6Sbb8uZrMzZ/1uO7zq0FPKTzGW/eZPp2fvqcg7np73uS8IOKKB+WWaP6w0casPUYt4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=sP0WG0k/; arc=none smtp.client-ip=74.6.132.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1730807410; bh=bNr+bsCtJR4SIgIfMdfvQHVugZNrzCt1K5Rqs3mhcTo=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=sP0WG0k/7nqTMGQalF0han+aO87y1zT5y7MUJKrZplk5m/XwJKont5X4fTAuvKb26Xsz1Cq0tY8IMcWRXSO/6gJnyzNPPwqqca7LM2iF9ycPoN6vPvBsqpK6HNa3EooSs5PR7XfIqf1JY25g5g6JW3zLmSFxhC8oP7KMTdLZX0wDd1MjAg8At3G5DST0c/nU2Q086muqZfI0gvA8l8I0YYYu7YAMEh5ZJpFQiZamSKkPU5rKzNj9CnC32ahRNCxGRrZIaG/1RvwqNqLXUylGCYuPotzzhUbQb25TiMc9bJk/DqIMWottExyUx6tJdudRktxdHrwrocDgkq8UgKctXA==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1730807410; bh=W6KJRUUrEvtwqRfOAb61LJxRui90JiJrJTCwM3FHS3e=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=mBf/dekcvFfuP7Fj2663A22hxtOhcIKF3FDQJEY4KL7P1b/4II1zHikIh1KDPqCD/EdUVrnTobY8vakDJH4TyXV+wD8kQ+u7kEP1cHYc5iGqZnKw5m3wlKXssh0IcCNpsVfMMUtTwtZMSc96CCH90hgPFmcNLjD4P6ilpOfcuS0O4SOUh1Ttx/uY8mJcHAzdZtUPTwvzuGxtKNLPZswpu+ykVXYtggbOgxQ07D9QMC/AmQ5zum6dpoQyFc6cQGvbEN6i6tq4cFHZ9n5MtjxsX6qY6uEpGp90uV6s6RUtr9PJ7/lwTJc3IlsI7eWaXkEKNdEaKu+s7r58rvkBU+fLDA==
+X-YMail-OSG: .4bp9vYVM1mBG4ZRlN5fnnxXbf6lwfm.gADtuzMr38atsW58evNmxNvnJ5pDHCY
+ RhwO6lYUL338upam1tP9LbW49ET0GiCXuhKVyiUMCygAXzShGIXEyutAY7u1XT0alEJV1itGNDrn
+ Lwnlf8HJrbxC4ekUuR36UIntptC8WDH7aahsqayn_XUVQyyNIVvWqPbKBcB0WYHucI5j6rSy64_3
+ vLZljeGzVFZayQ5.xPzlcZh3bmaZIb3qK6zFY2gZC.MpxM.Lod5gtrzHRyTrQW5R2tLlGfJktcI_
+ YD2BopmWC9Dk7GVpirFhsVnIS_xGM.FnhGCTGbkwGli0IzGLhNoQ3fp1cPb6EhkjWBPi71tMMxbJ
+ goEYmPMMWL0wx887jDMxDj5eh4DcO0rh7iWewMjjrh_6IX5bGsvHeQsJp3Ken_1zQjyGS33.c7ma
+ lIAujE96T3XH0f66qSjWP9Ju0IjCSVMavMOKFnJtB2S9C0_UEklfwMElJDjrE31VYUzdLclsWXIT
+ SjHWmn79Phxu3ne41XiznQT_4OOO6rQo_Oyfhv5HybnPfjEp42AuxrXCu1B_a3cxI1_zFGgvouFZ
+ DYCi9aiUMqqaZLj9DiTzD9enir6.2oe2GRch8o7JV5oX.XzsiMdgZHxODsM8_tegj0uPQEwQ7EkP
+ IedJNR4YZp7dzVTCbTBInsHqI5gqA4zqvN4la.mWv2ScEHyJCrUkhPW9TKwOClWcD9QBY64.IZ4Z
+ 5x.6hji7GlorfXILzzDSKkCiZDTf__SZEjz5OOGyoQbh4PoyYdOyglX.B4VHsg38BS3HpSt27QfH
+ sngZEyaWBuEB7D6yD99pnS_p08_clg4DiIV1PsPZ4KSa0j3BkoY9mhLK3Ame0Zde_drEYhwfmVPg
+ yJa6hXtVuQvEwz3gG9XE7BYUsnkpZuyF7XG_.HptPGhMcSToSOK43RnTFAXyIEvHf6cYsiv_ZJSe
+ Nl7.4F9Kj6WVcX_DAbLQChL1H_L_A77T2R.S6ZlvNmuYxrHg6bwqfcvxBRci7_Gmr1wywbmxHDCb
+ NJtF2x3tFJEYCLbrNkzM5KODw.ONuxz6wD6x.85xZy9JAaP4MwmaiSwOJKR.tDXQ988E8JIHk6Fg
+ KtpKHfoh6yH8YbX8zB6DjgOTWh320h7SGFexb2QSg9vjAqNHTfrKFjb999IQ1Gtz7AQHMl5VOqpm
+ JEosbQxLkyv0NLMBtfgtzBM5ubPkKGrIx9RplLiZu6Z8MioUqGLPIQ0zujqFSyTztaf5.Xh2xotJ
+ PbslYhg1rb53KO7KheaE3ae8Ot6th3EY.lMBcemuoaRG0IGiokyZqUAqXuUW1l7mrDQZyGFmZRSu
+ bTRFmF8BHw6RgX.lJbILMeNpd2cqm2Rdmc6o.SF_Y_QKb8Sa7SIxL.Kt3opEvxVkr1XGK5fJ4KzF
+ UaWKFhzw6_wcrXG8nHSsqGsbjCM_tJ9F5mB6_EAzxJ5pnL0gfnk4MkdrEIXh.lzILIx8gNch8wNr
+ m7dc80m6Mpj8UD7mIFu.VOUsEu9KK_YHRghLZ9l.WfTO5kxpQs5gGeUCvmT6xeI7QqJPAW8b36vp
+ v6vw4fuje30xvvsSoZf_wWgljI3LrJlbzROq0Ns02xGxvtUj9Nx8afUgkcILmKj63E5ptzSyEuKB
+ Is02WRBY.iG3.s9LbYEOeGPV8i9PwmiyCJEgXLi76s3yH6Xg_sA58RrWwH8UWj.kZM0U4IDHmxnA
+ aXbocrW7MItD6bP9rUNNHGIiRVQIx7CyUZuJ0aa5dqiEJRIPp8i5KU5oUVUaVSf2FQA1aHeLLucr
+ oO5oCdQeEcLjkc0cATSqIimpfOjv_rCTYWprzXIqooKh3S..PbqyGTdrQywGBvKVe6LhPOv1kT32
+ _SVz2mDffSYnQt_kJ4jimoqPwXkj.PMbqXPvWl.7OLz_NAU99ee8QIDBWXiUnG2Dc5ppxur0VZYK
+ VT3N4Sl0HcXmFL95XZac_Ts2Mkg_RsTh73WrWwwFRLnzd2SfneBzGhK5ClUcYzuqD9JhM9wd.Rvw
+ FxN2HDZ4yF3gWAelndaTlDG0Qu.j.0Ze4qELnPhNc2CVfHakP73YFsv4awK6poCbVWAntP4695ml
+ yYEY.AHR1Yo80jk6rEl6srik2uFy1n_CMnlC2IriRMiP80Y_gZ6tk_eWsPdsNoRaZ_RLP99n89q1
+ kzTvSGnpVzUyJ6Vd3t9JED6AFJMIoV.aUwlv.7q2Rx9bAodiM_rlaNWvTUyM8_qjpYSmhCXMfy_q
+ MW1V6GIBFhJ9GZcP6NzcwPD6kQwFlDAHtsrB2dJlMOG._BQwsJ3K_ptCzzJ6_AclaQts-
+X-Sonic-MF: <dullfire@yahoo.com>
+X-Sonic-ID: 393d9c79-1674-40ac-9170-95035d8fe9f1
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic314.consmr.mail.bf2.yahoo.com with HTTP; Tue, 5 Nov 2024 11:50:10 +0000
+Received: by hermes--production-ne1-bfc75c9cd-n46s2 (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 25849c82f1c1524deb6cfb87a0930b74;
+          Tue, 05 Nov 2024 11:40:02 +0000 (UTC)
+Message-ID: <02ec93d6-3cf6-410d-a887-1a625fb7be82@yahoo.com>
+Date: Tue, 5 Nov 2024 05:24:42 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel panic with niu module
+Content-Language: en-US
+To: Bjorn Helgaas <helgaas@kernel.org>
+Cc: davem@davemloft.net, sparclinux@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org, Thomas Gleixner <tglx@linutronix.de>
+References: <20241104234412.GA1446170@bhelgaas>
+From: Dullfire <dullfire@yahoo.com>
+In-Reply-To: <20241104234412.GA1446170@bhelgaas>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.22806 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On Tue, Nov 05, 2024 at 10:50:45AM +0100, Wenjia Zhang wrote:
+On 11/4/24 17:44, Bjorn Helgaas wrote:
+> [+cc Thomas, author of 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X
+> entries")]
 > 
+> On Mon, Nov 04, 2024 at 05:34:42AM -0600, Dullfire wrote:
+>> I have also bisected the kernel, and determined that  upstream commit
+>> 7d5ec3d3612396dc6d4b76366d20ab9fc06f399f revealed this issue. This commit
+>> adds read to the mask status before any write to PCI_MSIX_ENTRY_DATA, thus
+>> provoking the issue.
 > 
-> On 27.10.24 21:18, Leon Romanovsky wrote:
-> > On Fri, Oct 25, 2024 at 09:23:55AM +0200, Wenjia Zhang wrote:
-> > > Commit c2261dd76b54 ("RDMA/device: Add ib_device_set_netdev() as an
-> > > alternative to get_netdev") introduced an API ib_device_get_netdev.
-> > > The SMC-R variant of the SMC protocol continued to use the old API
-> > > ib_device_ops.get_netdev() to lookup netdev.
-> > 
-> > I would say that calls to ibdev ops from ULPs was never been right
-> > thing to do. The ib_device_set_netdev() was introduced for the drivers.
-> > 
-> > So the whole commit message is not accurate and better to be rewritten.
-> > 
-> > > As this commit 8d159eb2117b
-> > > ("RDMA/mlx5: Use IB set_netdev and get_netdev functions") removed the
-> > > get_netdev callback from mlx5_ib_dev_common_roce_ops, calling
-> > > ib_device_ops.get_netdev didn't work any more at least by using a mlx5
-> > > device driver.
-> > 
-> > It is not a correct statement too. All modern drivers (for last 5 years)
-> > don't have that .get_netdev() ops, so it is not mlx5 specific, but another
-> > justification to say that SMC-R was doing it wrong.
-> > 
-> > > Thus, using ib_device_set_netdev() now became mandatory.
-> > 
-> > ib_device_set_netdev() is mandatory for the drivers, it is nothing to do
-> > with ULPs.
-> > 
-> > > 
-> > > Replace ib_device_ops.get_netdev() with ib_device_get_netdev().
-> > 
-> > It is too late for me to do proper review for today, but I would say
-> > that it is worth to pay attention to multiple dev_put() calls in the
-> > functions around the ib_device_get_netdev().
-> > 
-> > > 
-> > > Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
-> > > Fixes: 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev functions")
-> > 
-> > It is not related to this change Fixes line.
-> > 
-> 
-> Hi Leon,
-> 
-> Thank you for the review! I agree that SMC could do better. However, we
-> should fix it and give enough information and reference on the changes,
-> since the code has already existed and didn't work with the old way. 
+> 7d5ec3d36123 ("PCI/MSI: Mask all unused MSI-X entries") appeared in
+> v5.14 in 2021.  Surely other drivers use MSI-X and would have been
+> tested on sparcv9 since then?  Just based on the age of 7d5ec3d36123,
+> I would guess some kind of niu issue.  But Thomas will know much more.
 
-The code which you change worked by chance and was wrong from day one.
+Yeah, I wasn't very clear: I believe this problem is specific to the niu
+module. My suspicion is hardware errata and/or an issue in the builtin
+hypervisor.
 
-> I can rewrite the commit message.
-> 
-> What about:
-> "
-> The SMC-R variant of the SMC protocol still called
-> ib_device_ops.get_netdev() to lookup netdev. As we used mlx5 device driver
-> to run SMC-R, it failed to find a device, because in mlx5_ib the internal
-> net device management for retrieving net devices was replaced by a common
-> interface ib_device_get_netdev() in commit 8d159eb2117b ("RDMA/mlx5: Use IB
-> set_netdev and get_netdev functions"). Thus, replace
-> ib_device_ops.get_netdev() with ib_device_get_netdev() in SMC.
-> "
+My T5240 has several other PCIe devices, none of which exhibit this issue.
+I will have to check later if any use MSIX.
 
- The SMC-R variant of the SMC protocol used direct call to ib_device_ops.get_netdev()
- function to lookup netdev. Such direct accesses are not correct for any
- usage outside of RDMA core code. 
+Speaking of test cases: It is worth pointing out that any write to ENTRY_DATA
+appears to be sufficient to allow subsequent reads to that MSIX table entry
+to work. Notably, booting into a pre 7d5ec3d36123 kernel, and then rebooting
+into a newer kernel will succeed, because the registers were written to under
+the old kernel. I had to power off the unit to reproduce the issue if a
+kernel successfully initialized the device.
 
- RDMA subsystem provides ib_device_get_netdev() function that works on
- all RDMA drivers returns valid netdev with proper locking an reference
- counting. The commit 8d159eb2117b ("RDMA/mlx5: Use IB set_netdev and get_netdev
- functions") exposed that SMC-R didn't use that function.
 
- So update the SMC-R to use proper API,
+Regards,
+Jonathan Currier
 
-Thanks
 
