@@ -1,125 +1,137 @@
-Return-Path: <netdev+bounces-141875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-141876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 53ACB9BC968
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:38:01 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B1729BC96B
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 10:38:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17E35281EC7
-	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:38:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E05871F23B53
+	for <lists+netdev@lfdr.de>; Tue,  5 Nov 2024 09:38:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B921CCED2;
-	Tue,  5 Nov 2024 09:37:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 588061CC159;
+	Tue,  5 Nov 2024 09:38:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="N/ciw9h6"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Ah4fEv1r"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E5D18132A;
-	Tue,  5 Nov 2024 09:37:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E6B31CDA26
+	for <netdev@vger.kernel.org>; Tue,  5 Nov 2024 09:38:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730799476; cv=none; b=UE48MG9Otw8hFPDr5FeiE6HiadqULfmMEZuOLwgdKtJi40a3ZRkYawCroj+elyYeiRUUKrYL0LG2xyRTpQsPEZxAXKu6G1IU6U6n+oLINwmHwAca17jTjwrRYxgbR0M0sUHZmG4Z2YFdZnjQrgbyRPh89sOisQ8+gB4ujwFYOfI=
+	t=1730799494; cv=none; b=ijRh4RqqS9ODG+P941Fyx6wZcei89nOBmx46SUAFH/y/hzHVlOsOAZRogY4z8cHHTdckkNY1qZmjlLg3cXx1AHxVxJTKi5G5sOgm0mBLFtdlKUyBRtwxjX7POJXyEW7dvVh4EHl2WLKtHvs9TAyvFQ0vLXBSp7rIU9vgrvHlMYg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730799476; c=relaxed/simple;
-	bh=OPMyPZ/nN+s/36X28r03Byw7nSGvegOONAt4v90nVYA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=m0GPcoECoznX6eUY72y4X2UUTWpUZLjGdSvTdZMR1UhzBs4Ouq+59QnlKwd34V03T0J68zjaBeCqtI56qvQTmdhO08KE51zUWCFpnMDTvdzq3ObrkB/Hs8f8OyBVUFZMJG8RCCPbIt8HxrsKZtADqhdK/NGs081c1hqLqScOpG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=N/ciw9h6; arc=none smtp.client-ip=217.70.183.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 28C266000C;
-	Tue,  5 Nov 2024 09:37:50 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730799471;
+	s=arc-20240116; t=1730799494; c=relaxed/simple;
+	bh=4p4VWrO8uF1H+WyvXfit2++bNDgDMcVv1cZ3lUw+ww4=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XUgtDxbBMCb/+jfA34B+gk4BF5fWfOowXgGidiwDDLda/8ioRX075JuAUFudIiGUR0BopjAto4F2dqgHUDsul0KeoHbgSfD0F9D6uGNHVfM4/IN3Z+RG96m/UdzCvkVJdqm2nt5CX0eMqx0WFR9zMhEZ60OBhVVRYttoQ+9bVfI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Ah4fEv1r; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730799491;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=VMZH9qjxYSsxGYOaVw8OePZ0Lknrw9sanV0iKJrFNwU=;
-	b=N/ciw9h6pX84ScQNMrK/isvQ2TwTUFjte9wypoRRhw0Wyhskw5Ul9BMwrMZ9n8YhYel/gU
-	1DwfodZTlMopWo6fZFXr3Hi4PV/33XZiAku+uSH06x2F3/pYr5n/gVzDsS+Fjv29PO3vur
-	pqxj/Tv+cCAL1OiBAKveJmly1L+kKZclytc4B+8rWbv8hMTILi0L+VgHRCJ9tiwO090au/
-	Lu2uRGLKaBoZE5497I+1v1F+viIS01EczaGmxln9llcqv/r/IRfuYxLo1MLP3DmMogbm+P
-	Ue3aVmZX0jOGVTU4lOKSEs5a3Wd4m616cfL/Se4FiKVQzM46VBxu+iWJwOW/fg==
-Date: Tue, 5 Nov 2024 10:37:49 +0100
-From: Kory Maincent <kory.maincent@bootlin.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Oleksij Rempel <o.rempel@pengutronix.de>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, Donald Hunter <donald.hunter@gmail.com>, Rob Herring
- <robh@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman
- <horms@kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, Liam Girdwood <lgirdwood@gmail.com>, Mark Brown
- <broonie@kernel.org>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, Kyle Swenson <kyle.swenson@est.tech>, Dent
- Project <dentproject@linuxfoundation.org>, kernel@pengutronix.de, Maxime
- Chevallier <maxime.chevallier@bootlin.com>
-Subject: Re: [PATCH RFC net-next v2 07/18] net: ethtool: Add support for
- ethnl_info_init_ntf helper function
-Message-ID: <20241105103749.0fe5a3a0@kmaincent-XPS-13-7390>
-In-Reply-To: <3a2a2b15-cbda-45b5-ab09-8a783e9f48aa@lunn.ch>
-References: <20241030-feature_poe_port_prio-v2-0-9559622ee47a@bootlin.com>
-	<20241030-feature_poe_port_prio-v2-7-9559622ee47a@bootlin.com>
-	<3a2a2b15-cbda-45b5-ab09-8a783e9f48aa@lunn.ch>
-Organization: bootlin
-X-Mailer: Claws Mail 4.0.0 (GTK+ 3.24.33; x86_64-pc-linux-gnu)
+	bh=Jt6NevPgsvI0U19HJM+9OIG7cBpWuW+de+wvjLoj4rw=;
+	b=Ah4fEv1rc1QYDJaVjqBTxabdLvmlLdB9akincqbaE9kgucGFtnh8Zu5a3B0btHthCeAb2Q
+	zNDIrWsoDMzpA6gO3f2UYbz6B2JZ2p8Gl32zaJv3YYZdVU6Jqm45SVf6t6J1Vb+ZRbjXwE
+	wSzbNpI3OZ8zOEg93vgGT7Meacx4PqE=
+Received: from mail-pg1-f198.google.com (mail-pg1-f198.google.com
+ [209.85.215.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-471-j3EfUnlHNxG4evfr7cmrPg-1; Tue, 05 Nov 2024 04:38:10 -0500
+X-MC-Unique: j3EfUnlHNxG4evfr7cmrPg-1
+Received: by mail-pg1-f198.google.com with SMTP id 41be03b00d2f7-7f3d8081c5cso1556432a12.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 01:38:10 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730799489; x=1731404289;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jt6NevPgsvI0U19HJM+9OIG7cBpWuW+de+wvjLoj4rw=;
+        b=J1qos3r82ee0nroZF+/kM4lNnIIMHI5ALy8BE8AnR6NcOlN3+RhUqqJWjC7kQqX2eU
+         pf5XyK1WxMOnTHvZ/7sE49v3Gh6Nqp3VsEEal80tz3fz75oEOdCxvSZEYyFCL2qkYcmv
+         MtJjl/stckCCLcn67EfbK/babCxltOq3IwKfQj4M6yq96xKuR2i5D+Yzh4B5cbeBfKh9
+         ZxZ7+oau+EPTiXiBglF76b4gvxG/ZtLAeXKWAQEBcnriiH0tPnw9XDiQ6LdKzxeuMrXn
+         QngIsjB69hxdeOM3wRv8HD8MZY30uhrPcjUOJq50KUZpKm2sPFCcZCFvmlbr6N43D3qY
+         +A3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCXrpvfFN39N500H8+NxtKuY3JQpNNu7x8I6iFt3NjGQa8Af+YWfKUzLJG7vW7cI4GXAPbLIAH4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwuYy6gKD0q8FuESSLpNhFMOiDEX8dPF9FvhoKl9w6FkPVTAdim
+	heDs+8DG8AGRfxRGKjHD97p0TdA/BqFtlpr9M79nizFM7X8dHseqZeip76hIMEM8lAz6VETyIty
+	eZ0e2QHtIrbpD1RsvTK8n7Wtc3kdqcrcNwWGzSMcVpCbvajLsW7wDkM1Io2LA9+6vK7RyiKBoNn
+	qbG+kiPAlSfSdjXLt2Gz3yA8rBSGSm
+X-Received: by 2002:a17:90b:17c6:b0:2e0:89f2:f60c with SMTP id 98e67ed59e1d1-2e93e0ac496mr28583111a91.11.1730799489142;
+        Tue, 05 Nov 2024 01:38:09 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEfBptF6b+UYP/PMKuCsLN5l+Hz/l7bBxZshwZZZaQhmYBx4WQ2HXBLxNHL7GTxTu95PAoJg9Ii6581pMoCwkU=
+X-Received: by 2002:a17:90b:17c6:b0:2e0:89f2:f60c with SMTP id
+ 98e67ed59e1d1-2e93e0ac496mr28583022a91.11.1730799487601; Tue, 05 Nov 2024
+ 01:38:07 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <20241105072642.898710-1-lulu@redhat.com> <20241105072642.898710-6-lulu@redhat.com>
+In-Reply-To: <20241105072642.898710-6-lulu@redhat.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Tue, 5 Nov 2024 17:37:55 +0800
+Message-ID: <CACGkMEt8XO6AvGp4i6PEoCyL=S5QrGvXhZnBdzjr6CvuxdQpYw@mail.gmail.com>
+Subject: Re: [PATCH v3 5/9] vhost: Add kthread support in function vhost_worker_queue()
+To: Cindy Lu <lulu@redhat.com>
+Cc: mst@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-GND-Sasl: kory.maincent@bootlin.com
 
-On Thu, 31 Oct 2024 22:44:51 +0100
-Andrew Lunn <andrew@lunn.ch> wrote:
+On Tue, Nov 5, 2024 at 3:27=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+>
+> The function vhost_worker_queue() uses vhost_task_fn and
+> selects the different mode based on the value of inherit_owner.
+>
+> Signed-off-by: Cindy Lu <lulu@redhat.com>
+> ---
+>  drivers/vhost/vhost.c | 7 ++++++-
+>  1 file changed, 6 insertions(+), 1 deletion(-)
+>
+> diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+> index 603b146fccc1..8b7ddfb33c61 100644
+> --- a/drivers/vhost/vhost.c
+> +++ b/drivers/vhost/vhost.c
+> @@ -238,13 +238,18 @@ EXPORT_SYMBOL_GPL(vhost_poll_stop);
+>  static void vhost_worker_queue(struct vhost_worker *worker,
+>                                struct vhost_work *work)
+>  {
+> +       if (!worker && !worker->fn)
+> +               return;
+> +
+>         if (!test_and_set_bit(VHOST_WORK_QUEUED, &work->flags)) {
+>                 /* We can only add the work to the list after we're
+>                  * sure it was not in the list.
+>                  * test_and_set_bit() implies a memory barrier.
+>                  */
+>                 llist_add(&work->node, &worker->work_list);
+> -               vhost_task_wake(worker->vtsk);
+> +               worker->fn->wakeup(worker->dev->inherit_owner ?
+> +                                          (void *)worker->vtsk :
+> +                                          (void *)worker->task);
 
-> On Wed, Oct 30, 2024 at 05:53:09PM +0100, Kory Maincent wrote:
-> > From: Kory Maincent (Dent Project) <kory.maincent@bootlin.com>
-> >=20
-> > Introduce support for the ethnl_info_init_ntf helper function to enable
-> > initialization of ethtool notifications outside of the netlink.c file.
-> > This change allows for more flexible notification handling.
-> >=20
-> > Signed-off-by: Kory Maincent <kory.maincent@bootlin.com>
-> > ---
-> >=20
-> > changes in v2:
-> > - new patch.
-> > ---
-> >  net/ethtool/netlink.c | 5 +++++
-> >  net/ethtool/netlink.h | 2 ++
-> >  2 files changed, 7 insertions(+)
-> >=20
-> > diff --git a/net/ethtool/netlink.c b/net/ethtool/netlink.c
-> > index e3f0ef6b851b..808cc8096f93 100644
-> > --- a/net/ethtool/netlink.c
-> > +++ b/net/ethtool/netlink.c
-> > @@ -805,6 +805,11 @@ static void ethnl_default_notify(struct net_device
-> > *dev, unsigned int cmd, typedef void (*ethnl_notify_handler_t)(struct
-> > net_device *dev, unsigned int cmd, const void *data);
-> > =20
-> > +void ethnl_info_init_ntf(struct genl_info *info, u8 cmd)
-> > +{
-> > +	genl_info_init_ntf(info, &ethtool_genl_family, cmd);
-> > +}
-> > + =20
->=20
-> I've not looked at the users yet. Does this need EXPORT_SYMBOL_GPL()?
+Logically, it looks better to introduce the ops before introducing
+back the kthread behaviour?
 
-No it doesn't as the user is net/ethtool/pse-pd.c
+Thanks
 
-Regards,
---=20
-K=C3=B6ry Maincent, Bootlin
-Embedded Linux and kernel engineering
-https://bootlin.com
+>         }
+>  }
+>
+> --
+> 2.45.0
+>
+
 
