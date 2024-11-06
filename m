@@ -1,265 +1,275 @@
-Return-Path: <netdev+bounces-142167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142164-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93FBE9BDB03
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:13:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A9D2E9BDAF7
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:11:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E8715B2159D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:13:23 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0E93FB20B46
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:11:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F13E01891AA;
-	Wed,  6 Nov 2024 01:12:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6678171658;
+	Wed,  6 Nov 2024 01:11:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="gOovRyxm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V2OBBoCM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.16])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f181.google.com (mail-qt1-f181.google.com [209.85.160.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2741F188737;
-	Wed,  6 Nov 2024 01:12:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.16
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA3F83D3B8;
+	Wed,  6 Nov 2024 01:11:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730855568; cv=none; b=V03p4Ag2GvXJRD8uWerBC5FKkMKhrGD/ukLHCpI+lQtsszAmfbJ1D6whSaezogUfi1J6UcAGZ8Qc0XlKwaZuXeWecTEh4RIjKC0BqcY0l8/KqVycwUJ1DRYmF39xe+hcYgFxrhAiUhc/ke8oIBmazqX5qNse0sOLUtdJDvh0eig=
+	t=1730855483; cv=none; b=jVY8n11DJKFG4UWWdWQtDHHQOp2wgYgXdIyFaS+2BwRUb1EQqzWHD084htMHsZ5mMHt7qK01ksgqcEeWMXiTgysui4ad03i3gl/0RLKJOSJ2efC3D1rCuwgMA38iQCN/shSSbd/qgD8zXRWabBj2XHXbySg8862Db5SrQXKK3zU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730855568; c=relaxed/simple;
-	bh=4HF3rwA/AvxO3Knhf+XcS3MMF6XDQAoU3kzYc67y7fw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=MElsk5tUoZNxRM4C9HwZaTeSxw7fdfjFlx8mDn0OdXIlnMYVcQMJk01etTPzaiXy2KJRUJ8MNa+/nlRlzZoQgZHUhOwTyJWxUKP1WoMkuXphE+AxjNxojw9k3qWEpzPUHyYHyK1nUn93oCYyjLm+C9py1jpo69fYDg5iVhRMkXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=gOovRyxm; arc=none smtp.client-ip=192.198.163.16
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730855567; x=1762391567;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=4HF3rwA/AvxO3Knhf+XcS3MMF6XDQAoU3kzYc67y7fw=;
-  b=gOovRyxmE0qQBXomfWWopldou2NQeFXPjdKtENpjyNxC3cyOlu+t7lDD
-   F4ElqBm2+jrbcSW3ZFQPtcFmtcYKwEffoxWegl6HXuIdgw587LU2cJqA1
-   kAzZ1HxL2yEX7jpGMZgnw68cWDHSgK6oLD0E8J50wr4V2nfTUfI4b+q+N
-   i6JqS7bMlaXp6V8SwrlPMPT9TVY0C0R3i3+OIOltmRobU8etM8iah50qm
-   aPmukA35bHWdeTs/KYNmfQvQmue/slf0rsrbPEHUBszoY6GZTw451kfV7
-   eVIULZfGA76WOcLjUcDq3McBLGwGqTy4uI06m+VMN6MMBHS9WvJAi6HCU
-   g==;
-X-CSE-ConnectionGUID: UCYtPL2nShyI+Sk5Ia2a1w==
-X-CSE-MsgGUID: xZ1H1HrfSYGNI8y/jAPaHg==
-X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="18254765"
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="18254765"
-Received: from fmviesa008.fm.intel.com ([10.60.135.148])
-  by fmvoesa110.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 17:12:46 -0800
-X-CSE-ConnectionGUID: xEOV3UogSKqou3OpRiUuqg==
-X-CSE-MsgGUID: 93TWSWv/Rb6U/eR9zWtyRA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
-   d="scan'208";a="84362797"
-Received: from amlin-018-114.igk.intel.com ([10.102.18.114])
-  by fmviesa008.fm.intel.com with ESMTP; 05 Nov 2024 17:12:43 -0800
-From: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-To: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org
-Cc: anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	richardcochran@gmail.com,
-	Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: [PATCH net-next v3 2/2] ice: ptp: add control over HW timestamp latch point
-Date: Wed,  6 Nov 2024 02:07:56 +0100
-Message-Id: <20241106010756.1588973-3-arkadiusz.kubalewski@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20241106010756.1588973-1-arkadiusz.kubalewski@intel.com>
-References: <20241106010756.1588973-1-arkadiusz.kubalewski@intel.com>
+	s=arc-20240116; t=1730855483; c=relaxed/simple;
+	bh=uqC2bBgqxV5XhCKmfL+iLF+uiVjaHkwIHftIBJVmDyw=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=TvYWxai3PUqC6lClfsr2/VeuFuIEYqSM86I1rHPz4NReKLjxPumzUzB7k1Szbj+o/q7DqWU5ggmvvfZLS3x+hnjzEaZbrWVzSTVgL+Wh3CAkWGtAJ6JhuSNP6mEw+4Pk3OkIq6v42syC4mn5OAoEresZ/5IK05eNMw7lsmTQCDw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V2OBBoCM; arc=none smtp.client-ip=209.85.160.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qt1-f181.google.com with SMTP id d75a77b69052e-46089a6849bso40179461cf.3;
+        Tue, 05 Nov 2024 17:11:21 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730855481; x=1731460281; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uqC2bBgqxV5XhCKmfL+iLF+uiVjaHkwIHftIBJVmDyw=;
+        b=V2OBBoCM9YkT2eRf80HqOQ3i1kkCOA5OQJLGsjSeD0FGOkRYWxbkAWIAKQIK9ELtSu
+         iyBOhfdXJ48kgzO4Utnf6FithiOUdvXsmGTeSfNqg6Iw1jBbNJzQt9Vb6/KaqTaA/C4/
+         icRFqES2RioOckRKSvxVjmUe7QdijNSqwrsraOyRRNfVcO62saXvRMfoHOiaCWtFn85K
+         nTJTcjD5IACylsGa0UPK5WWfLBamRSKBM73cep8fovg0nQZkiExq4IHmJgSBIRj9ojtw
+         5u4GrMBvxQMGfcpZydvQ4fb4C+6eWjeQ8uXbdCLUJjmkgwnwvbrw/PBFknYz+3JXcchX
+         7Oiw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730855481; x=1731460281;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=uqC2bBgqxV5XhCKmfL+iLF+uiVjaHkwIHftIBJVmDyw=;
+        b=tgZnNOMCw6+axEPWBs90sysEhVRz8uHICGmLezaeO4uVCDMc2rHAUbTqqZQq0//lYx
+         KOH7h6LJDqiyl4gCU9jC8a9Ir60tpW9ANKW44sVGLnukfW3mqsKWTwqIe8Thm1hGtM2B
+         BLwzck4Znqh8Hka/jTMw4rhgk91nP/n9eGJqiNmYBak/Zgrawvr/xOHlEVSHQR01byse
+         j1IPEAUhwOQa1ECOqEX/QAR72R/hLR2OlMYSpC/s95CojoLxYJG6Ea+i5mk9Hg2cM2tJ
+         6+1zQ1zbSZRoFma35H2taSo0SHaCTM+tyM8By/MOYXASFGyYsOQQrV0WBpEz55UdPrYD
+         povg==
+X-Forwarded-Encrypted: i=1; AJvYcCVVXvhWMzQE6R+2Fy/irT9iMyytq9lg2R9adrI7SExuxyNyo+xlo9zCXV4wYs1kKNGGcyo=@vger.kernel.org, AJvYcCXDu2ccrY1M5QXWSft6oOZzmX5CUcA7i7RBMGXhhET//Ws3iZ5giaZ0aZQ8DDFzIHLr83KHwCIj@vger.kernel.org
+X-Gm-Message-State: AOJu0YyuinzZ4gG4YIbYulgxcbyg8DXk/jf5ZK9USRrpKvF9UcYkcR5c
+	l/XYthWf3blxM5nQJFc+jnti9H8P1LC/x/NewWYV+aWKTK9ppm3O
+X-Google-Smtp-Source: AGHT+IGLEKp+Z0qeydk5XZG6T/8cgkkAHz55EUa45GbvNY1qoSHTihL8rhJQCRKuEadDLAvoDlLcfw==
+X-Received: by 2002:ac8:5996:0:b0:461:2150:d59c with SMTP id d75a77b69052e-462ab22baffmr330653421cf.9.1730855480628;
+        Tue, 05 Nov 2024 17:11:20 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ad19ebd9sm65456591cf.84.2024.11.05.17.11.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 17:11:19 -0800 (PST)
+Date: Tue, 05 Nov 2024 20:11:19 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Jason Xing <kerneljasonxing@gmail.com>, 
+ Martin KaFai Lau <martin.lau@linux.dev>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ willemb@google.com, 
+ davem@davemloft.net, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ dsahern@kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ eddyz87@gmail.com, 
+ song@kernel.org, 
+ yonghong.song@linux.dev, 
+ john.fastabend@gmail.com, 
+ kpsingh@kernel.org, 
+ sdf@fomichev.me, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ shuah@kernel.org, 
+ ykolal@fb.com, 
+ bpf@vger.kernel.org, 
+ netdev@vger.kernel.org, 
+ Jason Xing <kernelxing@tencent.com>
+Message-ID: <672ac23732699_cde4729460@willemb.c.googlers.com.notmuch>
+In-Reply-To: <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
+ <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
+ <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+ <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+ <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+ <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
+ <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev>
+ <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+ <1c8ebc16-f8e7-4a98-9518-865db3952f8f@linux.dev>
+ <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
+ <f27ab4ce-02df-464e-90ed-852652fb7e3e@linux.dev>
+ <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-Allow user to control the latch point of ptp HW timestamps in E825
-devices.
+Jason Xing wrote:
+> On Wed, Nov 6, 2024 at 3:22=E2=80=AFAM Martin KaFai Lau <martin.lau@lin=
+ux.dev> wrote:
+> >
+> > On 11/4/24 10:22 PM, Jason Xing wrote:
+> > > On Tue, Nov 5, 2024 at 10:09=E2=80=AFAM Martin KaFai Lau <martin.la=
+u@linux.dev> wrote:
+> > >>
+> > >> On 11/1/24 6:32 AM, Willem de Bruijn wrote:
+> > >>>> In udp/raw/..., I don't know how likely is the user space having=
+ "cork->tx_flags
+> > >>>> & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflag=
+s) &
+> > >>>> SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" se=
+t.
+> > >>> This is not something to rely on. OPT_ID was added relatively rec=
+ently.
+> > >>> Older applications, or any that just use the most straightforward=
+ API,
+> > >>> will not set this.
+> > >>
+> > >> Good point that the OPT_ID per cmsg is very new.
+> > >>
+> > >> The datagram support on SOF_TIMESTAMPING_OPT_ID in sk->sk_tsflags =
+had
+> > >> been there for quite some time now. Is it a safe assumption that
+> > >> most applications doing udp tx timestamping should have
+> > >> the SOF_TIMESTAMPING_OPT_ID set to be useful?
+> > >>
+> > >>>
+> > >>>> If it is
+> > >>>> unlikely, may be we can just disallow bpf prog from directly set=
+ting
+> > >>>> skb_shinfo(skb)->tskey for this particular skb.
+> > >>>>
+> > >>>> For all other cases, in __ip[6]_append_data, directly call a bpf=
+ prog and also
+> > >>>> pass the kernel decided tskey to the bpf prog.
+> > >>>>
+> > >>>> The kernel passed tskey could be 0 (meaning the user space has n=
+ot used it). The
+> > >>>> bpf prog can give one for the kernel to use. The bpf prog can st=
+ore the
+> > >>>> sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add o=
+ne to the struct
+> > >>>> sock. The bpf prog does not have to start from 0 (e.g. start fro=
+m U32_MAX
+> > >>>> instead) if it helps.
+> > >>>>
+> > >>>> If the kernel passed tskey is not 0, the bpf prog can just use t=
+hat one
+> > >>>> (assuming the user space is doing something sane, like the value=
+ in
+> > >>>> SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_M=
+AX). I hope this
+> > >>>> is very unlikely also (?) but the bpf prog can probably detect t=
+his and choose
+> > >>>> to ignore this sk.
+> > >>> If an applications uses OPT_ID, it is unlikely that they will tog=
+gle
+> > >>> the feature on and off on a per-packet basis. So in the common ca=
+se
+> > >>> the program could use the user-set counter or use its own if user=
+space
+> > >>> does not enable the feature. In the rare case that an application=
+ does
+> > >>> intermittently set an OPT_ID, the numbering would be erratic. Thi=
+s
+> > >>> does mean that an actively malicious application could mess with =
+admin
+> > >>> measurements.
+> > >>
+> > >> All make sense. Given it is reasonable to assume the user space sh=
+ould either
+> > >> has SOF_TIMESTAMPING_OPT_ID always on or always off. When it is of=
+f, the bpf
+> > >> prog can directly provide its own tskey to be used in shinfo->tske=
+y. The bpf
+> > >> prog can generate the id itself without using the sk->sk_tskey, e.=
+g. store an
+> > >> atomic int in the bpf_sk_storage.
+> > >
+> > > I wonder, how can we correlate the key with each skb in the bpf
+> > > program for non-TCP type without implementing a bpf extension for
+> > > SCM_TS_OPT_ID? Every time the timestamp is reported, we cannot know=
 
-Usage, examples:
+> > > which sendmsg() the skb belongs to for non-TCP cases.
+> >
+> > SCM_TS_OPT_ID is eventually setting the shinfo->tskey.
+> > If the shinfo->tskey is not set by the user space, the bpf prog can d=
+irectly set
+> > the shinfo->tskey. There is no need to use the sk->sk_tskey as the ID=
+ generator
+> > also. The bpf prog can have its own id generator.
+> >
+> > If the user space has already set the shinfo->tskey (either by sk->sk=
+_tskey or
+> > SCM_TS_OPT_ID), the bpf prog can just use the user space one.
+> >
+> > If there is a weird application that flips flops between OPT_ID on/of=
+f, the bpf
+> > prog will get confused which is fine. The bpf prog can detect this an=
+d choose to
+> > ignore measuring this sk/skb.
 
-** Obtain current state:
-$ cat /sys/class/net/eth<N>/device/ptp/ts_point
-Command returns enum/integer:
-* 1 - timestamp latched by PHY at the beginning of SFD,
-* 2 - timestamp latched by PHY after the SFD,
-* None - callback returns error to the user.
+That will skew measurement and is under control of the process.
 
-** Configure timestamp latch point at the beginning of SFD:
-$ echo 1 > /sys/class/net/eth<N>/device/ptp/ts_point
+I don't immediately foresee this being used to measure untrusted
+processes that would have an incentive to game this.
 
-** Configure timestamp latch point after the SFD:
-$ echo 2 > /sys/class/net/eth<N>/device/ptp/ts_point
+But the caveat should be stated explicitly.
 
-Reviewed-by: Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
----
-v3:
-- improve readability, for "nothing to do" logic
-- /s/PTP/ptp
-- remove 'tx' from docs description
----
- drivers/net/ethernet/intel/ice/ice_ptp.c    | 44 +++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 60 +++++++++++++++++++++
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h |  2 +
- 3 files changed, 106 insertions(+)
+> > The bpf prog can also choose to be on the very
+> > safe side and ignore all skb with SKBTX_ANY_TSTAMP set in txflags but=
+ with no
+> > OPT_ID. The bpf prog can look into the details of the sk and skb to d=
+ecide what
+> > makes the most sense for its deployment.
+> >
+> > I don't know whether it makes more sense to call the bpf prog to deci=
+de the
+> > shinfo->{tx_flags,tskey} just before the "while (length > 0)" in
+> > __ip[6]_append_data or it is better to call the bpf prog in ip[6]_set=
+up_cork.
+> > I admittedly less familiar with this code path than the tcp one.
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-index a999fface272..c351c9707394 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-@@ -2509,6 +2509,48 @@ static int ice_ptp_parse_sdp_entries(struct ice_pf *pf, __le16 *entries,
- 	return 0;
- }
- 
-+/**
-+ * ice_get_ts_point - get the timestamp latch point
-+ * @info: the driver's ptp info structure
-+ * @point: returns the configured timestamp latch point
-+ *
-+ * Return: 0 on success, negative on failure.
-+ */
-+static int ice_get_ts_point(struct ptp_clock_info *info,
-+			    enum ptp_ts_point *point)
-+{
-+	struct ice_pf *pf = ptp_info_to_pf(info);
-+	struct ice_hw *hw = &pf->hw;
-+	int ret;
-+
-+	ice_ptp_lock(hw);
-+	ret = ice_ptp_hw_ts_point_get(hw, point);
-+	ice_ptp_unlock(hw);
-+
-+	return ret;
-+}
-+
-+/**
-+ * ice_set_ts_point - set the timestamp latch point
-+ * @info: the driver's ptp info structure
-+ * @point: requested timestamp latch point
-+ *
-+ * Return: 0 on success, negative on failure.
-+ */
-+static int ice_set_ts_point(struct ptp_clock_info *info,
-+			    enum ptp_ts_point point)
-+{
-+	struct ice_pf *pf = ptp_info_to_pf(info);
-+	struct ice_hw *hw = &pf->hw;
-+	int ret;
-+
-+	ice_ptp_lock(hw);
-+	ret = ice_ptp_hw_ts_point_set(hw, point);
-+	ice_ptp_unlock(hw);
-+
-+	return ret;
-+}
-+
- /**
-  * ice_ptp_set_funcs_e82x - Set specialized functions for E82X support
-  * @pf: Board private structure
-@@ -2529,6 +2571,8 @@ static void ice_ptp_set_funcs_e82x(struct ice_pf *pf)
- 	if (ice_is_e825c(&pf->hw)) {
- 		pf->ptp.ice_pin_desc = ice_pin_desc_e825c;
- 		pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e825c);
-+		pf->ptp.info.set_ts_point = ice_set_ts_point;
-+		pf->ptp.info.get_ts_point = ice_get_ts_point;
- 	} else {
- 		pf->ptp.ice_pin_desc = ice_pin_desc_e82x;
- 		pf->ptp.info.n_pins = ICE_PIN_DESC_ARR_LEN(ice_pin_desc_e82x);
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index dfd49732bd5b..06c32f180932 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -6320,3 +6320,63 @@ int ice_cgu_get_output_pin_state_caps(struct ice_hw *hw, u8 pin_id,
- 
- 	return 0;
- }
-+
-+/**
-+ * ice_ptp_hw_ts_point_get - check if timestamps are latched on/post SFD
-+ * @hw: pointer to the HW struct
-+ * @point: return the configured timestamp latch point
-+ *
-+ * Verify if HW timestamping point is configured to latch at the beginning or
-+ * post of SFD (Start of Frame Delimiter)
-+ *
-+ * Return: 0 on success, negative on error
-+ */
-+int ice_ptp_hw_ts_point_get(struct ice_hw *hw, enum ptp_ts_point *point)
-+{
-+	u8 port = hw->port_info->lport;
-+	u32 val;
-+	int err;
-+
-+	err = ice_read_mac_reg_eth56g(hw, port, PHY_MAC_XIF_MODE, &val);
-+	if (err)
-+		return err;
-+	if (val & PHY_MAC_XIF_TS_SFD_ENA_M)
-+		*point = PTP_TS_POINT_SFD;
-+	else
-+		*point = PTP_TS_POINT_POST_SFD;
-+
-+	return err;
-+}
-+
-+/**
-+ * ice_ptp_hw_ts_point_set - configure timestamping on/post SFD
-+ * @hw: pointer to the HW struct
-+ * @point: requested timestamp latch point
-+ *
-+ * Configure timestamping to measure at the beginning/post SFD (Start of Frame
-+ * Delimiter)
-+ *
-+ * Return: 0 on success, negative on error
-+ */
-+int ice_ptp_hw_ts_point_set(struct ice_hw *hw, enum ptp_ts_point point)
-+{
-+	u8 port = hw->port_info->lport;
-+	int err, val;
-+
-+	err = ice_read_mac_reg_eth56g(hw, port, PHY_MAC_XIF_MODE, &val);
-+	if (err)
-+		return err;
-+	if ((val & PHY_MAC_XIF_TS_SFD_ENA_M) && point == PTP_TS_POINT_SFD)
-+		return -EINVAL;
-+	if (!(val & PHY_MAC_XIF_TS_SFD_ENA_M) &&
-+	    point == PTP_TS_POINT_POST_SFD)
-+		return -EINVAL;
-+	if (point == PTP_TS_POINT_SFD)
-+		val |= PHY_MAC_XIF_TS_SFD_ENA_M;
-+	else if (point == PTP_TS_POINT_POST_SFD)
-+		val &= ~PHY_MAC_XIF_TS_SFD_ENA_M;
-+	else
-+		return -EINVAL;
-+
-+	return ice_write_mac_reg_eth56g(hw, port, PHY_MAC_XIF_MODE, val);
-+}
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 47af7c5c79b8..5e4edaee063e 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -348,6 +348,8 @@ void ice_ptp_init_hw(struct ice_hw *hw);
- int ice_get_phy_tx_tstamp_ready(struct ice_hw *hw, u8 block, u64 *tstamp_ready);
- int ice_ptp_one_port_cmd(struct ice_hw *hw, u8 configured_port,
- 			 enum ice_ptp_tmr_cmd configured_cmd);
-+int ice_ptp_hw_ts_point_get(struct ice_hw *hw, enum ptp_ts_point *point);
-+int ice_ptp_hw_ts_point_set(struct ice_hw *hw, enum ptp_ts_point point);
- 
- /* E822 family functions */
- int ice_read_quad_reg_e82x(struct ice_hw *hw, u8 quad, u16 offset, u32 *val);
--- 
-2.38.1
+Probably the current spot, mainly because no skb exists yet in
+ip_setup_cork.
+ =
 
+> Now I feel it could be complicated for a software engineer to consider
+> how they will handle the key if they don't read the kernel code very
+> carefully. They are facing different situations. Being user-friendly
+> lets this feature have more chances to get widely used. As I insisted
+> before, I still would like to know if it is possible that we can try
+> to introduce sk_tskey_bpf_offset (like patch 10-12) to calculate a bpf
+> exclusive tskey for bpf use? Only exporting one key. It will be really
+> simple and easy-to-use :)
+
+That has complications of its own. It also has to deal with the user
+enabling/disabling/resetting its key, and with OPT_ID passed by cmsg.
+Multiple skbs may be in flight, derived from each of these sources.
+A single sk flag can only offset against one of them.
+
+I think Martin's approach is more workable. Use the tskey that is set,
+if any. Else, set one. =
 
