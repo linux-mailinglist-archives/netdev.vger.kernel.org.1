@@ -1,370 +1,134 @@
-Return-Path: <netdev+bounces-142286-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FD299BE1FA
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:11:47 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 641A49BE1FE
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:12:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C47DBB20B1E
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:11:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A0302845D7
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C151DA634;
-	Wed,  6 Nov 2024 09:07:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1FB1DE3C2;
+	Wed,  6 Nov 2024 09:07:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="W/+GcJEB"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CL3maVck"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F08041D90D7
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:07:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9451DE2DF
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:07:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730884049; cv=none; b=d/Jhg2fOHCAAMCYJTnSqZ2ZRNgRoRPSHLlKyVmwu+DINUZWDQQRQnRfr5n7HjplRDGufyt3q45hz4MVF/UTuol8puzrFRyFmyyo/ModJSDS7UOHd2Y3fuoWygrAPhuK72FrF49GfnRd0qB8DPfi/aZ15wm9Nkj+FMFp/W1p9UrY=
+	t=1730884075; cv=none; b=YmJXF7umPoaKZwdBk5DPBukn4g/u4RT3S3a7ZqJDNvWWbj0qAzbIiVgUu8w3JmeGbO1wlIpVsU8bx+Pk6Qb2rjZC3xVN5poDPRAJw6XBdCdYjFBIEdityCJRqtX7mvwG2zM+1BBZbhlNsWFcZdAHB/GIuX7zpvBRglFTv5twYxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730884049; c=relaxed/simple;
-	bh=8hZu6ohNjp15EWFWQ5dBsnlwHJ0z/7QDQngEEAGKaKU=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=uwzXX3qlaOHAGuhCdTED3paoNVXOpmDnrxwU1Frv9binB1V/C0u3vR4yqZHgbPwlVElU2YiHFSfkxiv+JZ8A1XEVkXmekxkW7iMJyS38mjFSTkOkWP3VPbOGUtANBebEgyF8w8C/ZgQhiq00g4mL0Q9Qtxsl0zg+R7RtkRoVQy4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=W/+GcJEB; arc=none smtp.client-ip=209.85.221.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-37d6a2aa748so3844873f8f.1
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:07:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730884046; x=1731488846; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1ZqcrXAZVfPDJx0zkaQw5Dqabv4/SxTySXjrEtQ1hHI=;
-        b=W/+GcJEBlH9i0MFmUh0DtuUdKlYGX+8GEP2p0AXZ0uD5kGWtmZzqhfOXX13Qe+EDRD
-         fKmpqqlRMFoXabycEkjy7eyreunM/EE2UeNdoZy/luQAJDBUA1VXfnrQ1tfZfJHtumN3
-         4kdF/jEVj/2zlTx6/UUKkWU/EHkEMQvDfWGKUnrlMERQMXPpOqgUJ1F2A51ZHzMVdrgs
-         EayilR9vYPaf3RIO/rbmLnF669HT7o/i4lLnyORf6DebR5jTMW/JPW4UZ9IdW05zc4SE
-         kz6AuZDqztHbbtwaqHeZBLM9+GvC9kZ5n9OCP9LFiXFO1m/7WrwmDBgJmbIHptG7HWJo
-         j6UA==
+	s=arc-20240116; t=1730884075; c=relaxed/simple;
+	bh=iRDvP6Fds9e6sAJFt7TFL1RE85f61k0qNzCwm6EI0ik=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=uUEqHxIIOnSSpnlk+xHKry1Z0OR3owxZ7ylXLNPzvYalpc8aS/JByDnti7MlHbUBonnk05jYqDnD2xffwHS/PxSnSVUZxUEHKt2Wj+6mG7o4nIFICMg215tf1EjW/Xej7sIOfEWytTovzIa61u89TaL/xaj0pliAzYd030WdhE8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CL3maVck; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730884073;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=stsh36U7LL9w1fGvl92BzQf3qg6o4uyL96zdePlIQ+M=;
+	b=CL3maVckSf1xgnX6jk3OjnzCSnANFFaUFaE8hiAwPIwv62wW7pyrN9r52U7hnhI3X5wu0j
+	dzaif0s6u7tVLCj+qXanP6jbyBAIelzOqhLpwMAX4DKTYuzEQ5o5ukCgveQex8UV2Svd+l
+	+1HE4/4TH31rpzc7BduCABxmbc608S8=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-653-liunK__lNQqBZ3LL9-ZeFA-1; Wed, 06 Nov 2024 04:07:49 -0500
+X-MC-Unique: liunK__lNQqBZ3LL9-ZeFA-1
+X-Mimecast-MFC-AGG-ID: liunK__lNQqBZ3LL9-ZeFA
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315c1b5befso40812595e9.1
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:07:49 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730884046; x=1731488846;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1ZqcrXAZVfPDJx0zkaQw5Dqabv4/SxTySXjrEtQ1hHI=;
-        b=vry+C9wEoRWC74ai3kyB90E9n5O5eRCwEtPLz6h5aKMrOG/Uxy85ctCzPrlGpJnnnS
-         0/u02Ov1oOrff2tzfOACv02Y9ZTaH+gRTwobIb4vwTNuR8lH1zXNYVen4YL+YExCToHJ
-         +VweLIYYf0BEtd0oi4jKd+hYK4bW98+MVYT9/XsK0L4LrxTeHxZr/tsawgzDqVi+B2WR
-         ia8UXy4Yyd5iPEJ6GlwlUAnG8smyQzd3KOqNHlgGYQwD8W3g3UndSZNzNPuHgRIFueNv
-         uFwUmtBxAOFTA1nIr0rOS2nE4t74cBM5SjwZ1k9R0k8vtacvaCbr9IJjQ7ozdpGfMz+O
-         +KNA==
-X-Gm-Message-State: AOJu0YwPaltbbnKKPGXxrVQOnwynyuqbehqF5sW+hr6KrDnBEsxgnOQ7
-	zO4Z2wqbvAj+/NThHdJUO9H852UZyxpWS84SJl9jSwUwDTqKcyKZJRovNReI
-X-Google-Smtp-Source: AGHT+IGAl4smlnp+PCuxTOvr06VTxaz0xy9rsnboaImWAnAyA9+sroqPRM/zpxgSBEc8v1SEwkszmQ==
-X-Received: by 2002:a5d:5c01:0:b0:37d:461d:b1ea with SMTP id ffacd0b85a97d-381c7ab30b1mr16425247f8f.48.1730884045816;
-        Wed, 06 Nov 2024 01:07:25 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:e89b:101d:ffaa:c8dd])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6c7530sm14933795e9.25.2024.11.06.01.07.24
+        d=1e100.net; s=20230601; t=1730884069; x=1731488869;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=stsh36U7LL9w1fGvl92BzQf3qg6o4uyL96zdePlIQ+M=;
+        b=IJ2cvS0cVxrp81lU/gspBu/BwMeLri8lmxkYtByOX0lPxy0xu4pde282kFeVWFt1ZH
+         CVkbO/QgQodCWn6FgpuWDy2+vb8DI/N44b4apANYFrsdGuiZX7iEzj+XN9pKEy+XBIaT
+         Qj4HHHJINvbtHY+F0/r1LI5psahdv1i2pLduWDLWFU3I/Knra7oFcu5CwJeYVbaa/sA7
+         PLy27XKeoe4E7FMzqpV7zerZQg28peBBPgiQzR6JvYFfXMF7/rGEKTC3nwsVCI/HzOnI
+         DkZJ3DSGLqZ07n35nezCk+YmFhAytTaV5e+XzSQ2+qUqUS9DmOLXkF6WCiybVLEjrU68
+         qYcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVCJjuJKK7hyr1uT2/BjfMwmrUaOBL3tHgW3i/wEfbGFHB2vT74hs/Y9aVZV+IgdSgK8k1C9mM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxuzKXWD9cZw2PKn4gKMbKboo9qrg9l1p2dkli0qFdAkmw38ilA
+	sVg/Kzw1Xr/ajPZds7Do2j4KNJAJdFyHq2nOXfTt82durZxhQKv1WGRn5J7wlIPHm4ET/ReQc48
+	qt6ScbCcR8Xn/bseKfnYybTInXUuiZMkRi2/pa/yBPyx0rgkHb0/hnw==
+X-Received: by 2002:a5d:6902:0:b0:37d:4ebe:164f with SMTP id ffacd0b85a97d-38061200d23mr24637617f8f.46.1730884068795;
+        Wed, 06 Nov 2024 01:07:48 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IE4QdCH0opectVmr8dgwxLSrIB+qc8WNu2CPVa8NB18xSiYf7L6K01+/errC2pGSWF3kucn/A==
+X-Received: by 2002:a5d:6902:0:b0:37d:4ebe:164f with SMTP id ffacd0b85a97d-38061200d23mr24637597f8f.46.1730884068451;
+        Wed, 06 Nov 2024 01:07:48 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7e1bsm18681481f8f.1.2024.11.06.01.07.46
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 01:07:25 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>
-Cc: donald.hunter@redhat.com,
-	Ido Schimmel <idosch@nvidia.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v3 2/2] netlink: specs: Add a spec for FIB rule management
-Date: Wed,  6 Nov 2024 09:07:18 +0000
-Message-ID: <20241106090718.64713-3-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241106090718.64713-1-donald.hunter@gmail.com>
-References: <20241106090718.64713-1-donald.hunter@gmail.com>
+        Wed, 06 Nov 2024 01:07:47 -0800 (PST)
+Date: Wed, 6 Nov 2024 04:07:44 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Stefano Garzarella <sgarzare@redhat.com>, stefanha@redhat.com,
+	Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	mcgrof@kernel.org
+Subject: Re: [PATCH v2] vhost/vsock: specify module version
+Message-ID: <20241106040705-mutt-send-email-mst@kernel.org>
+References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
+ <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
+ <CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
+ <ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
+ <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
+ <20241002071602.793d3e2d@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241002071602.793d3e2d@kernel.org>
 
-Add a YNL spec for FIB rules:
+On Wed, Oct 02, 2024 at 07:16:02AM -0700, Jakub Kicinski wrote:
+> On Mon, 30 Sep 2024 19:03:52 +0200 Aleksandr Mikhalitsyn wrote:
+> > > At this point my question is, should we solve the problem higher and
+> > > show all the modules in /sys/modules, either way?  
+> > 
+> > Probably, yes. We can ask Luis Chamberlain's opinion on this one.
+> > 
+> > +cc Luis Chamberlain <mcgrof@kernel.org>
+> > 
+> > >
+> > > Your use case makes sense to me, so that we could try something like
+> > > that, but obviously it requires more work I think.  
+> > 
+> > I personally am pretty happy to do more work on the generic side if
+> > it's really valuable
+> > for other use cases and folks support the idea.
+> 
+> IMHO a generic solution would be much better. I can't help but feel
+> like exposing an arbitrary version to get the module to show up in 
+> sysfs is a hack.
+> 
+> IIUC the list of built in modules is available in
+> /lib/modules/*/modules.builtin, the user space can't read that?
 
-./tools/net/ynl/cli.py \
-    --spec Documentation/netlink/specs/rt_rule.yaml \
-    --dump getrule --json '{"family": 2}'
 
-[{'action': 'to-tbl',
-  'dst-len': 0,
-  'family': 2,
-  'flags': 0,
-  'protocol': 2,
-  'src-len': 0,
-  'suppress-prefixlen': '0xffffffff',
-  'table': 255,
-  'tos': 0},
-  ... ]
+So what are we doing about this? Aleksandr?
 
-Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
----
- Documentation/netlink/specs/rt_rule.yaml | 242 +++++++++++++++++++++++
- 1 file changed, 242 insertions(+)
- create mode 100644 Documentation/netlink/specs/rt_rule.yaml
-
-diff --git a/Documentation/netlink/specs/rt_rule.yaml b/Documentation/netlink/specs/rt_rule.yaml
-new file mode 100644
-index 000000000000..03a8eef7952e
---- /dev/null
-+++ b/Documentation/netlink/specs/rt_rule.yaml
-@@ -0,0 +1,242 @@
-+# SPDX-License-Identifier: ((GPL-2.0 WITH Linux-syscall-note) OR BSD-3-Clause)
-+
-+name: rt-rule
-+protocol: netlink-raw
-+protonum: 0
-+
-+doc:
-+  FIB rule management over rtnetlink.
-+
-+definitions:
-+  -
-+    name: rtgenmsg
-+    type: struct
-+    members:
-+      -
-+        name: family
-+        type: u8
-+      -
-+        name: pad
-+        type: pad
-+        len: 3
-+  -
-+    name: fib-rule-hdr
-+    type: struct
-+    members:
-+      -
-+        name: family
-+        type: u8
-+      -
-+        name: dst-len
-+        type: u8
-+      -
-+        name: src-len
-+        type: u8
-+      -
-+        name: tos
-+        type: u8
-+      -
-+        name: table
-+        type: u8
-+      -
-+        name: res1
-+        type: pad
-+        len: 1
-+      -
-+        name: res2
-+        type: pad
-+        len: 1
-+      -
-+        name: action
-+        type: u8
-+        enum: fr-act
-+      -
-+        name: flags
-+        type: u32
-+  -
-+    name: fr-act
-+    type: enum
-+    entries:
-+      - unspec
-+      - to-tbl
-+      - goto
-+      - nop
-+      - res3
-+      - res4
-+      - blackhole
-+      - unreachable
-+      - prohibit
-+  -
-+    name: fib-rule-port-range
-+    type: struct
-+    members:
-+      -
-+        name: start
-+        type: u16
-+      -
-+        name: end
-+        type: u16
-+  -
-+    name: fib-rule-uid-range
-+    type: struct
-+    members:
-+      -
-+        name: start
-+        type: u32
-+      -
-+        name: end
-+        type: u32
-+
-+attribute-sets:
-+  -
-+    name: fib-rule-attrs
-+    attributes:
-+      -
-+        name: dst
-+        type: u32
-+      -
-+        name: src
-+        type: u32
-+      -
-+        name: iifname
-+        type: string
-+      -
-+        name: goto
-+        type: u32
-+      -
-+        name: unused2
-+        type: pad
-+      -
-+        name: priority
-+        type: u32
-+      -
-+        name: unused3
-+        type: pad
-+      -
-+        name: unused4
-+        type: pad
-+      -
-+        name: unused5
-+        type: pad
-+      -
-+        name: fwmark
-+        type: u32
-+        display-hint: hex
-+      -
-+        name: flow
-+        type: u32
-+      -
-+        name: tun-id
-+        type: u64
-+      -
-+        name: suppress-ifgroup
-+        type: u32
-+      -
-+        name: suppress-prefixlen
-+        type: u32
-+        display-hint: hex
-+      -
-+        name: table
-+        type: u32
-+      -
-+        name: fwmask
-+        type: u32
-+        display-hint: hex
-+      -
-+        name: oifname
-+        type: string
-+      -
-+        name: pad
-+        type: pad
-+      -
-+        name: l3mdev
-+        type: u8
-+      -
-+        name: uid-range
-+        type: binary
-+        struct: fib-rule-uid-range
-+      -
-+        name: protocol
-+        type: u8
-+      -
-+        name: ip-proto
-+        type: u8
-+      -
-+        name: sport-range
-+        type: binary
-+        struct: fib-rule-port-range
-+      -
-+        name: dport-range
-+        type: binary
-+        struct: fib-rule-port-range
-+      -
-+        name: dscp
-+        type: u8
-+
-+operations:
-+  enum-model: directional
-+  fixed-header: fib-rule-hdr
-+  list:
-+    -
-+      name: newrule
-+      doc: Add new FIB rule
-+      attribute-set: fib-rule-attrs
-+      do:
-+        request:
-+          value: 32
-+          attributes: &fib-rule-all
-+            - iifname
-+            - oifname
-+            - priority
-+            - fwmark
-+            - flow
-+            - tun-id
-+            - fwmask
-+            - table
-+            - suppress-prefixlen
-+            - suppress-ifgroup
-+            - goto
-+            - l3mdev
-+            - uid-range
-+            - protocol
-+            - ip-proto
-+            - sport-range
-+            - dport-range
-+            - dscp
-+    -
-+      name: newrule-ntf
-+      doc: Notify a rule creation
-+      value: 32
-+      notify: newrule
-+    -
-+      name: delrule
-+      doc: Remove an existing FIB rule
-+      attribute-set: fib-rule-attrs
-+      do:
-+        request:
-+          value: 33
-+          attributes: *fib-rule-all
-+    -
-+      name: delrule-ntf
-+      doc: Notify a rule deletion
-+      value: 33
-+      notify: delrule
-+    -
-+      name: getrule
-+      doc: Dump all FIB rules
-+      attribute-set: fib-rule-attrs
-+      dump:
-+        request:
-+          value: 34
-+        reply:
-+          value: 32
-+          attributes: *fib-rule-all
-+
-+mcast-groups:
-+  list:
-+    -
-+      name: rtnlgrp-ipv4-rule
-+      value: 8
-+    -
-+      name: rtnlgrp-ipv6-rule
-+      value: 19
 -- 
-2.47.0
+MST
 
 
