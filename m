@@ -1,74 +1,74 @@
-Return-Path: <netdev+bounces-142521-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142522-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C3349BF7EE
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 21:21:21 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 432469BF7F0
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 21:24:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9B88D1F210CD
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 20:21:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 710181C21787
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 20:24:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 590A620C003;
-	Wed,  6 Nov 2024 20:21:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B6520C039;
+	Wed,  6 Nov 2024 20:24:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eRJbCMw8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LBGxXMg1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f176.google.com (mail-lj1-f176.google.com [209.85.208.176])
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8E3A20A5CB
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 20:21:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1ECF20C035
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 20:24:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730924477; cv=none; b=oWPYqEWZkbntbpZnsadiWZ29PP9d5me1MyeMgFSrJ6N33zsqdNDDbRg8zNfiDDNmGh/8eXdtG2mA8JNhwABBOfifb0ScqBGaqozSfK22VHnIe99zsWkcM2uJav3R63hw0Df4g8zJR/NjtF2vSqkGsTq+xupKb/LcPdENLJ0I8KI=
+	t=1730924663; cv=none; b=av7v4W7QBzYG2oihI5uyo7nLvxXYK5Upv3EzU1Gjfz1iGtoC8uyBqNzbrAIdXyuoDRNY2Y2e4pN/02rA3a1itK2tXvNVpf7kZ5O33B4cSQxTUtzRaCuIkrHFNBXvyTIXLgSfZYI0ulDqstCu6QDgCMLm4ppYa97dxlwZRfa0IBM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730924477; c=relaxed/simple;
-	bh=Fs1n9gWUTTVqaVqpW+Y1cqqN96hhwJstxSEI++SCnRs=;
+	s=arc-20240116; t=1730924663; c=relaxed/simple;
+	bh=XP7gtWRmLC6IVaRKgKkFQPvGbgvZ/GcRBzSQ87UxztE=;
 	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=CELZVkezQ/eFAPWAyNqbSA/kqf3hCzUI01ib0HT0uBKX7mfR0FDTtbbwnaZOaKE83zZbgsy6Ws1C7zOLbUZaFAkhFbsFhCQQcAsOqlsasNjUnODf9flhvXjSoUN4OrmDLP7h9cU9hnCOVwaSbJayvd/PLFZa56fe/WfwjGIwksg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eRJbCMw8; arc=none smtp.client-ip=209.85.208.176
+	 In-Reply-To:Content-Type; b=YMI1np82TtY99sLjKExmULqsEBNgXR0Mbv6x7gvcrFV3gOSur31ZUnT485s7ybm2dnvbRAs8dy2m9Q1dk01LxbZ8j++WZjDb3ZvbnZpOVZcgJUReSFm2/OUC4y4hValgjfPomGiPzXoFVGaxqxvlbxox2Ba5o0sMrrgZDV/qF4c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LBGxXMg1; arc=none smtp.client-ip=209.85.218.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f176.google.com with SMTP id 38308e7fff4ca-2fb5fa911aaso2952071fa.2
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 12:21:15 -0800 (PST)
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a99f1fd20c4so24115066b.0
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 12:24:21 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730924474; x=1731529274; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730924660; x=1731529460; darn=vger.kernel.org;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=nPvGLhAV71crlXTG4ONozkYMrGf137ylqJ2UaZy4gnQ=;
-        b=eRJbCMw8basS4h33iN4GabxBlJjI8hpDYaGgbltNmVi1zCMMKCiLlC0J2L4uRbBsTr
-         oAjMWcUbdeFtKsCj1cK07dfn8ICHftHKyY0QLMWVHMcSrBUULwoBWkCF1ks3F/o44XPQ
-         qVLz++BejnJCvNl843hOhWqEXSXE6x2GGIM7Jx53wNyDfsJ2p9BeZQtAI5TTBMfy5y/z
-         h+lz92IdfAIDHmUhI+gBtFyFTZDBcO6WFrmOVfZnjMepimcfrlu5uFxvUVUzTOVHcp1L
-         xa3JfIfkZgx0aMY9r7LqF1DVTsu17kXBHi2rPYDzDEJL0QPBHS6TsBFd3wVcCIxyXft5
-         HyqQ==
+        bh=ZBGHeFLUrLAN4TC3i/0UDGuR4pzS24blFM2WCdSekck=;
+        b=LBGxXMg1zTUV92Jf0q/JolEsbq+i5Grbfk+vg1VIiT4hbHDvMr/ZiyvHorvlAK58HU
+         QKyM4zc8FtZudswKatvi8zw0v3marPggOnrvJQpUc8oK4l1YL4R3lkSif0FpTpdjSmdB
+         me6m70zffpL0pmYbPxeoRf4PAxqiAwjp7J9kEqQjibWJsyNYNqr1o3vjbRMu0Rbaz8Av
+         l5DkwRbhhjb2rMiG0uvQQ47GQytFkw5anLon1Jf4Cqg8mjTf7rLP2q5hsUzyl/HgFqwl
+         FUw2FrXiE/mvYM1ur2a700G2hhWHPGMYpiFGHR+iiWB/1TXkV29waLjKpMRSj4520Ij/
+         X5Iw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730924474; x=1731529274;
+        d=1e100.net; s=20230601; t=1730924660; x=1731529460;
         h=content-transfer-encoding:in-reply-to:autocrypt:content-language
          :references:cc:to:from:subject:user-agent:mime-version:date
          :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=nPvGLhAV71crlXTG4ONozkYMrGf137ylqJ2UaZy4gnQ=;
-        b=LXeb4YZMc2N+rZ7w1Cv1CInM2v0vHkIf90kxcKuzBYsQ5Q+QvP+LvdBY/dzHBWR+W2
-         KmE7g8KJLpXst3n6y6kF94pSvZnHc3O0RN4D7nvWkmDn4wOD56XZkvuXyuExZmn10snK
-         pAJfbmTEMFo0LPRxGqi4Cd68cQWfUGMUaPion8WaPk+f9O/u7Gi/QEOE2jYLwFhnm57M
-         yJ3aQbiP0treX8bS8sCoHdLEg5qBZ3Tpnjh/oASnE7oP9PrN1KTrt1aocizaENa1wyaK
-         wepjgEDD+gSAC23x710gccGbwIEW6EiAiAl3JumOi3K8BBzkf6YsEAOeGEjjlOh6DtXh
-         KUwA==
-X-Gm-Message-State: AOJu0YxLTAH8Upf7k8a8sxQiHbto9JXUYiQH7hWdqjgIaCuea3r1BPe5
-	l6r/ZV/+AvDTlOoG9sLkaJXLpL198DSP3rx7/lSxCEE1tLx+iOHd
-X-Google-Smtp-Source: AGHT+IGSclE64sWk+7Oyv/HvYs2KBmxfpimR9p8BOL53gv2jAN2eIR9vSoXdZY/04GL9fkYmy6UUhQ==
-X-Received: by 2002:a2e:a589:0:b0:2fb:3df8:6a8c with SMTP id 38308e7fff4ca-2fedb7c9c38mr157578691fa.23.1730924473564;
-        Wed, 06 Nov 2024 12:21:13 -0800 (PST)
+        bh=ZBGHeFLUrLAN4TC3i/0UDGuR4pzS24blFM2WCdSekck=;
+        b=RV2r9ek/ppD4W3u/mJc4j3HzsYeEdY9P4An0A9iinIGzjLm3PCCrJlkUndZoQ1HIFa
+         sD6EokoxDNqF8M1q9s5aVWWF63cpye/MY7lYYfCrz1ld3tyd4MbS5RIy+ZLp2BxdAnid
+         e+XoYCWFN7W5XR31eQd2Ftl9GFsmDqBu2fTC47aTBkCtkgsikvxkPw0bAQ/UAJ580uWC
+         5B7HqdB/z75Yp9aei6TOAU45Ero24XqVjqoA1d4w3WYQwgMbI/yrhYUW/qfxN7JWtoU3
+         mQlYlkN5SCck/TkohhN+scOpFcF9fvrNdq1O2KwOPCcGQUZBWwAm4CUGUtWtDZrSfyZ2
+         Sz2g==
+X-Gm-Message-State: AOJu0YwAZVf5o8jImVAk/qh+DtWwRL9l62fBaYyReHFzAMYJi+i5XlVY
+	n6CwZ3vtooSkYTedo2LZ5IiUiLcoNR5Y+g4Zz6GDxOpXLKw3bnts
+X-Google-Smtp-Source: AGHT+IEZw/j82ox7zD21W2T0dxsoRnimSIUy/KT8fvwhGr0R3BoEBt5CM5mS19HpRuQX0JjgEW63qQ==
+X-Received: by 2002:a17:907:8693:b0:a9a:e6:a031 with SMTP id a640c23a62f3a-a9e50ba22d9mr2146651066b.59.1730924659985;
+        Wed, 06 Nov 2024 12:24:19 -0800 (PST)
 Received: from ?IPV6:2a02:3100:a488:4700:cc12:ac39:a3b8:6ff6? (dynamic-2a02-3100-a488-4700-cc12-ac39-a3b8-6ff6.310.pool.telefonica.de. [2a02:3100:a488:4700:cc12:ac39:a3b8:6ff6])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9eb16dbd38sm327739766b.73.2024.11.06.12.21.11
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9eb16a324fsm336733866b.23.2024.11.06.12.24.18
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2024 12:21:12 -0800 (PST)
-Message-ID: <02bd7c39-7413-4433-bafc-a276089bd292@gmail.com>
-Date: Wed, 6 Nov 2024 21:21:11 +0100
+        Wed, 06 Nov 2024 12:24:19 -0800 (PST)
+Message-ID: <6e5cd4ab-28bb-4d82-b449-fec85f3d1e8a@gmail.com>
+Date: Wed, 6 Nov 2024 21:24:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,7 +76,8 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: [PATCH net-next 2/4] net: phy: export genphy_c45_an_config_eee_aneg
+Subject: [PATCH net-next 3/4] net: phy: broadcom: use
+ genphy_c45_an_config_eee_aneg in bcm_config_lre_aneg
 From: Heiner Kallweit <hkallweit1@gmail.com>
 To: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
  Eric Dumazet <edumazet@google.com>, Andrew Lunn <andrew@lunn.ch>,
@@ -134,25 +135,32 @@ In-Reply-To: <69d22b31-57d1-4b01-bfde-0c6a1df1e310@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-We'll use this function in bcm_config_lre_aneg(), therefore export it.
+bcm_config_lre_aneg() is the only user of genphy_config_eee_advert(),
+therefore use genphy_c45_an_config_eee_aneg() instead. The resulting
+functionality is equivalent, and bcm_config_lre_aneg() follows the
+structure of __genphy_config_aneg().
+In a follow-up step genphy_config_eee_advert() can be removed.
+
+Note: We preserve the current behavior to ignore errors.
 
 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 ---
- drivers/net/phy/phy-c45.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/phy/bcm-phy-lib.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/phy/phy-c45.c b/drivers/net/phy/phy-c45.c
-index 6e7198794..dabd90a3c 100644
---- a/drivers/net/phy/phy-c45.c
-+++ b/drivers/net/phy/phy-c45.c
-@@ -951,6 +951,7 @@ int genphy_c45_an_config_eee_aneg(struct phy_device *phydev)
+diff --git a/drivers/net/phy/bcm-phy-lib.c b/drivers/net/phy/bcm-phy-lib.c
+index 6c52f7dda..a923ccc52 100644
+--- a/drivers/net/phy/bcm-phy-lib.c
++++ b/drivers/net/phy/bcm-phy-lib.c
+@@ -1137,7 +1137,7 @@ int bcm_config_lre_aneg(struct phy_device *phydev, bool changed)
+ {
+ 	int err;
  
- 	return genphy_c45_write_eee_adv(phydev, phydev->advertising_eee);
- }
-+EXPORT_SYMBOL_GPL(genphy_c45_an_config_eee_aneg);
+-	if (genphy_config_eee_advert(phydev))
++	if (genphy_c45_an_config_eee_aneg(phydev) > 0)
+ 		changed = true;
  
- /**
-  * genphy_c45_pma_baset1_read_abilities - read supported baset1 link modes from PMA
+ 	err = bcm_setup_lre_master_slave(phydev);
 -- 
 2.47.0
 
