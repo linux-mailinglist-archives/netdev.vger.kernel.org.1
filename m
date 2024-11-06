@@ -1,186 +1,188 @@
-Return-Path: <netdev+bounces-142258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A789A9BE01F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:15:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B9609BE0ED
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:29:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAB7F1C21317
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:15:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BBC41F231C4
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:29:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2AB2C1D2B1A;
-	Wed,  6 Nov 2024 08:15:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D43731DA633;
+	Wed,  6 Nov 2024 08:26:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="fKItCMdS"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Vq3/ZVxg"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 325AE1922D8
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 08:15:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 284631D5151;
+	Wed,  6 Nov 2024 08:26:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730880943; cv=none; b=tJ1P/zZky+c5PrKAGp4qq+IWk/LPz3dX7eG3BRZvEVbUH7QmgHLK3GAr4137z4wLCweVL5Sam++q3ZtfbD8iwS2aN/GI+KhN5lzLdRicf1HCBXI9A5gTYCKQoHVQ7sSD0XelgdZSAduuEnrS+7VpeAN6RQSqT50aKAJBAV/3p0o=
+	t=1730881603; cv=none; b=fS/XyN4IVomIpQ1+1DRFjVQtDGh42SjtqfYsZa3s0c+tv65sv8wzi/3jYUc+n2EneA1mycImECrNcUUnJTVUcsl7McAgzvF78OhLHRAQAJPiL42k28z41DITcedRsV5AxgcpN/BiES4ljIPQ5rCo7B7v2Up1WPOGc1Gn27Uprks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730880943; c=relaxed/simple;
-	bh=HaLitbySmWv52naz4Gh5UROaphvNRd3TDJQH/NIJyyI=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=VkApY1VZ1RQsW7f53S1pGQuud+T0LF98s2Sks08ix6sSKhrvg0J1K+kARj2iRYdv3vfp5S0FutW08rvNOOZusp9fkeNQZjL0XufybF8Vh2oRmi2H0yf7Aicw8RV8s2ROxD6a09rBZNLJyPpDz29S0RdI5Zmr6UynBtYkiOpUWcI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=fKItCMdS; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730880940;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=M/QB2JpiIOVzjMGSwElOtuDo7l4UxpuwpHC7fYdy2eI=;
-	b=fKItCMdSzc3DIMFISLtGWAsf5zkhQVtd6+FkhG7hH1CDj96/a8HKDuc+jXmsmj8zuuUcfO
-	zT1kxsUcCJK6FwYYUuwNCZM80iZyFJnQbhKluC7kCX9O9vF+l71HP669np6N+/Oi+M4r4l
-	7NkQBNSh1ttp8/wFbmn1ceYgN19hIBo=
-Received: from mail-qt1-f197.google.com (mail-qt1-f197.google.com
- [209.85.160.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-392-ItUxTgVAMg6K3YRxaAokSA-1; Wed, 06 Nov 2024 03:15:38 -0500
-X-MC-Unique: ItUxTgVAMg6K3YRxaAokSA-1
-X-Mimecast-MFC-AGG-ID: ItUxTgVAMg6K3YRxaAokSA
-Received: by mail-qt1-f197.google.com with SMTP id d75a77b69052e-46089122a64so97141401cf.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 00:15:38 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730880938; x=1731485738;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M/QB2JpiIOVzjMGSwElOtuDo7l4UxpuwpHC7fYdy2eI=;
-        b=E+FyV6sNaNXFRPODvUtd6BzvPZqDVJWYcXucfXwoJdD3alQEkJDgp44fFEKOxLvOPr
-         x3Nlqxat9bGDOQBRrjm0Xf58tg5NVQtMbrEicRbvYUp+cBNvEr3jiuEQ36UCOlfTNZur
-         vVvUIZC440I6wPBO+yy+A/D9HuQW54hDDRL7HIPGye6j27oo0+sMxyBr2OtIsleBuZC9
-         ECkYDtPyj0ebpxP+QhUlGEBsz1JkO81f2yA+H9OVvq0puyk03q/S+Doby/cGz4ciECXX
-         BHrIyZ+Ojs5FjYrPkpHdbzNHDHBLAKGzuf5RlK3ZMiVgXtRtTSMxJ+iZKAuYcj+VdZdm
-         NQhg==
-X-Forwarded-Encrypted: i=1; AJvYcCV4FPKMlR2Za1qcRcDb+UyVHO4Ma6Beim+UfPZs6fExmwgeQ7wVk525UWfcJLr4qaVQLZx7SL0=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx5C6gbDvClVRdgsHFeprJu7d1vOCrDfdCH6besCEJUzB0sJurA
-	nSE1smbU7LkTFS06CH+QPuZ7Z6MoXa7jubD592hzxNMELgY+G6XBqCfmzAsgOzL0kz88ao4xNkk
-	9T5lDdR4Pv6KRmiLrd8WIrIl+gkAuunOsHyqQAClfBDp5jeJB+1t4Qg==
-X-Received: by 2002:ac8:7dcc:0:b0:460:fb75:1373 with SMTP id d75a77b69052e-461716d9f45mr375083381cf.23.1730880938231;
-        Wed, 06 Nov 2024 00:15:38 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE8y+RA0rP/0qUztbF1wH73I48ad4+rSRdfXPZ1zD+w1HkI70BiawYuwH9MXc6zIyFTJZuHXw==
-X-Received: by 2002:ac8:7dcc:0:b0:460:fb75:1373 with SMTP id d75a77b69052e-461716d9f45mr375083061cf.23.1730880937816;
-        Wed, 06 Nov 2024 00:15:37 -0800 (PST)
-Received: from sgarzare-redhat ([5.77.86.226])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462b32234ddsm64533201cf.89.2024.11.06.00.15.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 00:15:37 -0800 (PST)
-Date: Wed, 6 Nov 2024 09:15:28 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: zijianzhang@bytedance.com
-Cc: bpf@vger.kernel.org, martin.lau@linux.dev, borisp@nvidia.com, 
-	john.fastabend@gmail.com, kuba@kernel.org, davem@davemloft.net, edumazet@google.com, 
-	pabeni@redhat.com, horms@kernel.org, mst@redhat.com, bobby.eshleman@bytedance.com, 
-	jakub@cloudflare.com, andrii@kernel.org, cong.wang@bytedance.com, 
-	jiang.wang@bytedance.com, netdev@vger.kernel.org, Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH v3 bpf] bpf: Add sk_is_inet and IS_ICSK check in
- tls_sw_has_ctx_tx/rx
-Message-ID: <3e3tptbbmznkwhmvgrtbi7jtybxchqoes32i5ddyk2qa5i2lfv@zsxx7x6sbytd>
-References: <20241106003742.399240-1-zijianzhang@bytedance.com>
+	s=arc-20240116; t=1730881603; c=relaxed/simple;
+	bh=iUcT/gwGrRVy7MprbFBNOk3U6166YlFFOKSZnEBXUx0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mRJQUUkEywnM3uAnIxjYOOU1pGr0/sdijIY5QTnIomGYM9japRMUZ1BbKmvJ2qorzMsPXHSOOqFGcbCGtMiQFiwV/W2flOGzkexumhpEBz+PLdLfRN1ed+AcLl05pm5IP04oBtE3mHtUqsStJg2FZ9da6Qu5N0SSGyxrtHx0zQo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Vq3/ZVxg; arc=none smtp.client-ip=148.163.156.1
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A68BISL023384;
+	Wed, 6 Nov 2024 08:26:32 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:date:from:message-id:mime-version
+	:subject:to; s=pp1; bh=e52w3lhZtfHAPxbejgCls0YBeKYdmjEqpuUeEO/e9
+	Ng=; b=Vq3/ZVxg0iiGSXTQdZFL/84BtJzolkQLzzFKlHvZCGTnyrRkmBXyMnGJg
+	xqMtcx8FDWH7MOGd/W0LkGkKspC5t15LuY4HEfigXhq5W4/jJ38duq+5pAdd7JQ1
+	ZCdv4H3Xs8oSXULhJ6KvdqHF2EcEaT0f0sjoiqI3AB8Ej8aOXVq7YH5u+2+PMG8O
+	Y3A7JAuc0yo0D6p38+j1db/XcnJibBO14Mrzlh0jMshE80qgUj8drPUiGyVMMckn
+	hznRA+yLUxqKSF8/H5WvXmeXb+SPX108bQDTlOcVtZ9WLyN4oK7jMvgYj9xNIOh2
+	JFWmQASulNEWbZGZYxSDoHOskjZpQ==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42r4q0825j-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Nov 2024 08:26:32 +0000 (GMT)
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A68QW5A019713;
+	Wed, 6 Nov 2024 08:26:32 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42r4q0825g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Nov 2024 08:26:32 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A645qEs031854;
+	Wed, 6 Nov 2024 08:26:30 GMT
+Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nydmnsgx-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Nov 2024 08:26:30 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A68QQaH56099128
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Wed, 6 Nov 2024 08:26:26 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id AE9F320040;
+	Wed,  6 Nov 2024 08:26:26 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8E2A720043;
+	Wed,  6 Nov 2024 08:26:24 +0000 (GMT)
+Received: from MacBookPro.fritz.box.com (unknown [9.171.50.17])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Wed,  6 Nov 2024 08:26:24 +0000 (GMT)
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        linux-rdma@vger.kernel.org, Simon Horman <horms@kernel.org>,
+        Leon Romanovsky <leon@kernel.org>,
+        Michael Guralnik <michaelgur@nvidia.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Tony Lu <tonylu@linux.alibaba.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Gerd Bayer <gbayer@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Halil Pasic <pasic@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>,
+        Niklas Schnell <schnelle@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Karsten Graul <kgraul@linux.ibm.com>,
+        Stefan Raspl <raspl@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>,
+        Dust Li <dust.li@linux.alibaba.com>, Zhu Yanjun <yanjun.zhu@linux.dev>
+Subject: [PATCH net v2] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+Date: Wed,  6 Nov 2024 09:26:12 +0100
+Message-ID: <20241106082612.57803-1-wenjia@linux.ibm.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241106003742.399240-1-zijianzhang@bytedance.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: vVliH-_85x80HYY8j6ru-P5L6NRwzY_w
+X-Proofpoint-ORIG-GUID: FvfFRUqBOtmALvW4bUO29lKSWp4I1oQe
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 adultscore=0
+ bulkscore=0 mlxlogscore=936 mlxscore=0 suspectscore=0 phishscore=0
+ lowpriorityscore=0 priorityscore=1501 malwarescore=0 spamscore=0
+ impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411060065
 
-On Wed, Nov 06, 2024 at 12:37:42AM +0000, zijianzhang@bytedance.com wrote:
->From: Zijian Zhang <zijianzhang@bytedance.com>
->
->As the introduction of the support for vsock and unix sockets in sockmap,
->tls_sw_has_ctx_tx/rx cannot presume the socket passed in must be IS_ICSK.
->vsock and af_unix sockets have vsock_sock and unix_sock instead of
->inet_connection_sock. For these sockets, tls_get_ctx may return an invalid
->pointer and cause page fault in function tls_sw_ctx_rx.
->
->BUG: unable to handle page fault for address: 0000000000040030
->Workqueue: vsock-loopback vsock_loopback_work
->RIP: 0010:sk_psock_strp_data_ready+0x23/0x60
->Call Trace:
-> ? __die+0x81/0xc3
-> ? no_context+0x194/0x350
-> ? do_page_fault+0x30/0x110
-> ? async_page_fault+0x3e/0x50
-> ? sk_psock_strp_data_ready+0x23/0x60
-> virtio_transport_recv_pkt+0x750/0x800
-> ? update_load_avg+0x7e/0x620
-> vsock_loopback_work+0xd0/0x100
-> process_one_work+0x1a7/0x360
-> worker_thread+0x30/0x390
-> ? create_worker+0x1a0/0x1a0
-> kthread+0x112/0x130
-> ? __kthread_cancel_work+0x40/0x40
-> ret_from_fork+0x1f/0x40
->
->v2:
->  - Add IS_ICSK check
->v3:
->  - Update the commits in Fixes
->
->Fixes: 634f1a7110b4 ("vsock: support sockmap")
->Fixes: 94531cfcbe79 ("af_unix: Add unix_stream_proto for sockmap")
->
->Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
->Acked-by: Stanislav Fomichev <sdf@fomichev.me>
->Acked-by: Jakub Kicinski <kuba@kernel.org>
->Reviewed-by: Cong Wang <cong.wang@bytedance.com>
->---
-> include/net/tls.h | 12 ++++++++++--
-> 1 file changed, 10 insertions(+), 2 deletions(-)
+The SMC-R variant of the SMC protocol used direct call to function
+ib_device_ops.get_netdev() to lookup netdev. As we used mlx5 device
+driver to run SMC-R, it failed to find a device, because in mlx5_ib the
+internal net device management for retrieving net devices was replaced
+by a common interface ib_device_get_netdev() in commit 8d159eb2117b
+("RDMA/mlx5: Use IB set_netdev and get_netdev functions").
 
-For the vsock point of view LGTM:
+Since such direct accesses to the internal net device management is not
+recommended at all, update the SMC-R code to use proper API
+ib_device_get_netdev().
 
-Acked-by: Stefano Garzarella <sgarzare@redhat.com>
+Fixes: 54903572c23c ("net/smc: allow pnetid-less configuration")
+Reported-by: Aswin K <aswin@linux.ibm.com>
+Reviewed-by: Gerd Bayer <gbayer@linux.ibm.com>
+Reviewed-by: Halil Pasic <pasic@linux.ibm.com>
+Reviewed-by: Simon Horman <horms@kernel.org>
+Reviewed-by: Dust Li <dust.li@linux.alibaba.com>
+Reviewed-by: Wen Gu <guwen@linux.alibaba.com>
+Reviewed-by: Zhu Yanjun <yanjun.zhu@linux.dev>
+Reviewed-by: D. Wythe <alibuda@linux.alibaba.com>
+Signed-off-by: Wenjia Zhang <wenjia@linux.ibm.com>
+---
+ net/smc/smc_ib.c   | 8 ++------
+ net/smc/smc_pnet.c | 4 +---
+ 2 files changed, 3 insertions(+), 9 deletions(-)
 
-Thanks,
-Stefano
-
->
->diff --git a/include/net/tls.h b/include/net/tls.h
->index 3a33924db2bc..61fef2880114 100644
->--- a/include/net/tls.h
->+++ b/include/net/tls.h
->@@ -390,8 +390,12 @@ tls_offload_ctx_tx(const struct tls_context *tls_ctx)
->
-> static inline bool tls_sw_has_ctx_tx(const struct sock *sk)
-> {
->-	struct tls_context *ctx = tls_get_ctx(sk);
->+	struct tls_context *ctx;
->+
->+	if (!sk_is_inet(sk) || !inet_test_bit(IS_ICSK, sk))
->+		return false;
->
->+	ctx = tls_get_ctx(sk);
-> 	if (!ctx)
-> 		return false;
-> 	return !!tls_sw_ctx_tx(ctx);
->@@ -399,8 +403,12 @@ static inline bool tls_sw_has_ctx_tx(const struct sock *sk)
->
-> static inline bool tls_sw_has_ctx_rx(const struct sock *sk)
-> {
->-	struct tls_context *ctx = tls_get_ctx(sk);
->+	struct tls_context *ctx;
->+
->+	if (!sk_is_inet(sk) || !inet_test_bit(IS_ICSK, sk))
->+		return false;
->
->+	ctx = tls_get_ctx(sk);
-> 	if (!ctx)
-> 		return false;
-> 	return !!tls_sw_ctx_rx(ctx);
->-- 
->2.20.1
->
+diff --git a/net/smc/smc_ib.c b/net/smc/smc_ib.c
+index 9297dc20bfe2..9c563cdbea90 100644
+--- a/net/smc/smc_ib.c
++++ b/net/smc/smc_ib.c
+@@ -899,9 +899,7 @@ static void smc_copy_netdev_ifindex(struct smc_ib_device *smcibdev, int port)
+ 	struct ib_device *ibdev = smcibdev->ibdev;
+ 	struct net_device *ndev;
+ 
+-	if (!ibdev->ops.get_netdev)
+-		return;
+-	ndev = ibdev->ops.get_netdev(ibdev, port + 1);
++	ndev = ib_device_get_netdev(ibdev, port + 1);
+ 	if (ndev) {
+ 		smcibdev->ndev_ifidx[port] = ndev->ifindex;
+ 		dev_put(ndev);
+@@ -921,9 +919,7 @@ void smc_ib_ndev_change(struct net_device *ndev, unsigned long event)
+ 		port_cnt = smcibdev->ibdev->phys_port_cnt;
+ 		for (i = 0; i < min_t(size_t, port_cnt, SMC_MAX_PORTS); i++) {
+ 			libdev = smcibdev->ibdev;
+-			if (!libdev->ops.get_netdev)
+-				continue;
+-			lndev = libdev->ops.get_netdev(libdev, i + 1);
++			lndev = ib_device_get_netdev(libdev, i + 1);
+ 			dev_put(lndev);
+ 			if (lndev != ndev)
+ 				continue;
+diff --git a/net/smc/smc_pnet.c b/net/smc/smc_pnet.c
+index a04aa0e882f8..716808f374a8 100644
+--- a/net/smc/smc_pnet.c
++++ b/net/smc/smc_pnet.c
+@@ -1054,9 +1054,7 @@ static void smc_pnet_find_rdma_dev(struct net_device *netdev,
+ 		for (i = 1; i <= SMC_MAX_PORTS; i++) {
+ 			if (!rdma_is_port_valid(ibdev->ibdev, i))
+ 				continue;
+-			if (!ibdev->ibdev->ops.get_netdev)
+-				continue;
+-			ndev = ibdev->ibdev->ops.get_netdev(ibdev->ibdev, i);
++			ndev = ib_device_get_netdev(ibdev->ibdev, i);
+ 			if (!ndev)
+ 				continue;
+ 			dev_put(ndev);
+-- 
+2.43.0
 
 
