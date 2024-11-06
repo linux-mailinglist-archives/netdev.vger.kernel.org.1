@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-142201-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 641669BDCF6
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:35:25 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 706779BDCF9
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:35:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 279A8284F4B
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:35:24 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1FB251F24730
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178AD1A00FE;
-	Wed,  6 Nov 2024 02:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D18C1D9668;
+	Wed,  6 Nov 2024 02:20:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="EGc4CTVX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JrMPUMEr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1A24199243;
-	Wed,  6 Nov 2024 02:20:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04BE61D95AA;
+	Wed,  6 Nov 2024 02:20:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730859630; cv=none; b=f9uX530alsgXhgtJoCjUrebMpi+48r4MRlgsGuR8RE5O9sWQOqT8vPadElnbbKJH0U4+bCmI1/imJddyZZu7uCHNey3iCOtAPy0oHYYK2x6YnUDK36DdcEpgF7MmvMWMAPDdfERmU7QgHKDSqoQUvUKvHFKDBqPiylkBNjNpn6s=
+	t=1730859631; cv=none; b=LNT7fvjvbYD5tAdPsPT/WS0u0lG2etQ9YAJkNPepMEQg44bRJxRkPTMdHcAaoihHjx4mHrhAay5YJjP+PwTzu4pORHAKIAFVUEDGycSVTD+T+smmwGVpqEF1HNBMWsgJMjCXIwbpzTzBv5aoV59FB3ltxQRNdendX72IFZDQolc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730859630; c=relaxed/simple;
-	bh=Qt1zgFDEMv60yXO2yc/tU7kWdfS4qflcLxIkgOrXbKA=;
+	s=arc-20240116; t=1730859631; c=relaxed/simple;
+	bh=lpFvM7OZwrkLaZJSn+dHV7eCffsP/oorN980LuDH8Io=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=gONlmNHi7IfkIuvGBoYFjd3osfuO4X9kPTqKY88ZChg7TsPa4WrU2Rm/a1od3/0WoAzUci0Mvth/xJH3StBpNPKVEHjLbY6euiOzRFVRFzXSM4lZpOIjn7f2X/073Avja3zssbC6Zf2G04rxosr/xjDfLJy6xpajMac/jEoQRCI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=EGc4CTVX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5E51BC4CECF;
-	Wed,  6 Nov 2024 02:20:29 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=bImEhU6nRjdpTlkBOL/ze3oTDvAsSLTviBa18NwN6HSPH5T3x8JsVzg2O6bi/12m46+LQBBDkO5TA95SoIYn8tp+PnRD+4muH4c2CTmlBv7z+SURSdboCXI1/cj3i8vV32z/Bg4x8XINnLNrnllMsveqZiMDle/Yxm8/mWN8pLA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JrMPUMEr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 91EF2C4CECF;
+	Wed,  6 Nov 2024 02:20:30 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730859629;
-	bh=Qt1zgFDEMv60yXO2yc/tU7kWdfS4qflcLxIkgOrXbKA=;
+	s=k20201202; t=1730859630;
+	bh=lpFvM7OZwrkLaZJSn+dHV7eCffsP/oorN980LuDH8Io=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EGc4CTVX4VDNpZvRi010iT82jR2msDZrY2atjEpl21Yl0KwqkkrhjlxxnQ4syXi4C
-	 K8KHHHYNvRBNaOSIx4beIIPne3D/PfI51ndY6gVLBDz9UP9Tdzebil96XQwgecTv7y
-	 5HuCue11QIE7sDfkH4j2VDX/X92pjIsQdEE1MLYA3ay7hwh10TBVobM3/xPTzbpjSo
-	 V+Bp8LJSY8ecz86OiqN/pMuljBtMQMxQb7Rqi5V73dTqnpdI/Bds8CQnrqHflPIFbQ
-	 iw4UiBMdhRTzD9LUPJueuF8q4Xxojv9Dc9rqPYFMtSP4inS3nEJfZzXE9InJLAMKsF
-	 Whw4BfFiiNaqA==
+	b=JrMPUMErMh8a2pLqs55pnHEt8rNUjAHtRt/kSweik6nOIehepqcS0/+nY/9UK7Mgv
+	 kwOPJru++S/fCx1RU8DVbXSN+ywX1TRxDri1xc3zdFURNzC0dhf2nkIhF/zm9IW1lu
+	 JSyKzszC5P0mCJkPbVmj9hpRk/sgs89sc/6MTiXXXqqbI8Tr5X7nN/XFrKPsDW8loE
+	 7MldDaJW5MZ4DHMwR+J2Qng4Y6FX6T5Wk3npyugYWHiGXSZYDLV2Lbh3/aSGnwZfuo
+	 mO9hL96u9LhZ919fOeuX0j5TKeI+8cmIN0+huk6oTM3JQ37A0Csndj+OQ8OhDiIVKD
+	 0iOoZn85zIQuw==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70EB03809A80;
-	Wed,  6 Nov 2024 02:20:39 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADC953809A80;
+	Wed,  6 Nov 2024 02:20:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] mptcp: remove unneeded lock when listing
- scheds
+Subject: Re: [PATCH net-next] selftests: netfilter: run conntrack_dump_flush in
+ netns
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173085963799.771890.13823159671393094471.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Nov 2024 02:20:37 +0000
-References: <20241104-net-next-mptcp-sched-unneeded-lock-v2-1-2ccc1e0c750c@kernel.org>
-In-Reply-To: <20241104-net-next-mptcp-sched-unneeded-lock-v2-1-2ccc1e0c750c@kernel.org>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+ <173085963950.771890.5162812398917192565.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Nov 2024 02:20:39 +0000
+References: <20241104142529.2352-1-fw@strlen.de>
+In-Reply-To: <20241104142529.2352-1-fw@strlen.de>
+To: Florian Westphal <fw@strlen.de>
+Cc: netdev@vger.kernel.org, netfilter-devel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 04 Nov 2024 13:43:47 +0100 you wrote:
-> mptcp_get_available_schedulers() needs to iterate over the schedulers'
-> list only to read the names: it doesn't modify anything there.
+On Mon,  4 Nov 2024 15:25:24 +0100 you wrote:
+> This test will fail if the initial namespace has conntrack
+> active due to unexpected number of flows returned on dump:
 > 
-> In this case, it is enough to hold the RCU read lock, no need to combine
-> this with the associated spin lock as it was done since its introduction
-> in commit 73c900aa3660 ("mptcp: add net.mptcp.available_schedulers").
+>   conntrack_dump_flush.c:451:test_flush_by_zone:Expected ret (7) == 2 (2)
+>   test_flush_by_zone: Test failed
+>   FAIL  conntrack_dump_flush.test_flush_by_zone
+>   not ok 2 conntrack_dump_flush.test_flush_by_zone
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] mptcp: remove unneeded lock when listing scheds
-    https://git.kernel.org/netdev/net-next/c/f2c71c49da8f
+  - [net-next] selftests: netfilter: run conntrack_dump_flush in netns
+    https://git.kernel.org/netdev/net-next/c/fc49b804967e
 
 You are awesome, thank you!
 -- 
