@@ -1,288 +1,137 @@
-Return-Path: <netdev+bounces-142235-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142236-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24E979BDF2F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:14:28 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE6709BDF38
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:18:06 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D817E284C7F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:14:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1585C1C20EED
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:18:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E4731991C3;
-	Wed,  6 Nov 2024 07:14:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D71190662;
+	Wed,  6 Nov 2024 07:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="n16u35qQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA81198836
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:14:20 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BF751016
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:18:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730877262; cv=none; b=auE1RaDYOJe7Um3Ip1pbRQRqsVop4C5WAPAcMYQngHvL1/lHqyfxZ2LY2ktiPPm2QtzP/mz6uIczB0ht0UCsYbswA6kQ1J8/lfRWieYmg980/JzzVUhoUuDLk/TkomDXjLUVrnyhdiEiBYJiOSNmGjtGBFw6ol8+/D05AsdHKnQ=
+	t=1730877484; cv=none; b=ZVBhOZejWx/fzhMqorjFS8AXsm8PCBe8Qou04cGZR/xMuZmCFuQPPx1kdb8/QC+H5LPSbMOWAPbR2oQJH/yyfVktxR1VyPiB1aDCjOhyVWoov5bFBrKyJS9/gwKgfz9TChY57MtdXN+aoIijgMItd4L/j4a1iUss7R2hccqD/cA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730877262; c=relaxed/simple;
-	bh=HoPLCEtJ7iRS3AyzIkDN2qiB7qx/sArujfn/v7d2Gdw=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=L/eN2cdV2SaEP84JNPjUUcEXBmDGyff8YJvLOn3KBwxHVp1m2pdnR55EWHs8/IOEgExMSgwGLcp4HzahzBgsbkUj55HZeilJ7Jb5zfMuM9WO73ohKjWMQs4tciRtjP+8vNdW5ifx5IVxY5JTmY0A2+1nk4l0ORlYsjD063uDQKs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a3c5a6c5e1so82109765ab.2
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 23:14:20 -0800 (PST)
+	s=arc-20240116; t=1730877484; c=relaxed/simple;
+	bh=PKgfzheUyNSsrrjiPKIHYUoPhyE4D5A590Krsl4nkns=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=NbGsGhcfPFFSqDmZMKwhE7CMirrho4Tdv0ltkAWDG8B3/iUfyx44qBT1z/pMrxfxyVIJCcBfvXnOYAayT4vNjtuilkXLAPEP6gNtRGJqjxBLOGzUocJBU8jyWpcTbzLxHvR9PNR/03Tx8UyEs5CGcgBYTNUvvh/kQl0WIuvDoYw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=n16u35qQ; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
+Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 592853F2B1
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:17:57 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1730877477;
+	bh=G+MzOZXfDVvVfVLGNe8HGTPb9KTW95XMpmekn3Jk6sA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version;
+	b=n16u35qQLRWP0B+UfH7WSdGdBfAbPo2wKd09B73q36Q5No2dj3b1s8SjBdHkO5Tyn
+	 T/qnwXufRVaD2e4R7YqBSWGrj7dGQxySTzwc09GibRr+GTsuMfeTZNo605KQhwHtv0
+	 nLTmRBsmeBsORq6WBmff0JLqUxHlZp8x1oathNqviEDLNoeneJnaGSMNqBVWf1fCnQ
+	 kwa1kzRHFa8y8ApA63LX/e6AD0pMahG1bZGyYbnvflrPxcXbQFrbLFTqcfSh7Uk7tx
+	 8cbqgGWqYKYx3Q8pN0+uA4MuwWp1BIflEgJ/H7pU1WsVnB4QoiVn25p1zsKXC00TiA
+	 DHxVJ4Dfc6flQ==
+Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-7ee07d0f395so7260110a12.3
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 23:17:56 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730877260; x=1731482060;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=r/B+cWPxBeOxRe1pYJh/a6kS5ROuWiwCsQ/OVpWEc4w=;
-        b=N4reSHbajt/H2pPS18zwnRYVpwai23R9hK0bpw6UjBI86BUAf9ZTF1MTvssr+h52s3
-         nRQUn6NWjM32st4YEw+bSPurVFFp4d9bjeGp+/nlqaEVtUmX35XMhO/mXbTm4FktVDtD
-         zed7URhTdOUmz1QnV1NZZGKXUoKTQdAXDbyLF0UpKwF7N2XCBIoEIxxIp3LUo1BoGlkk
-         AW1yYxtZnfffUL2XkBmZF9abaJjy9lFtrKWSQpP70MHUDJqO7FMvpL5EwDyv4fur2HLJ
-         qepMsTPy4nPuPkW3ZR5sH/4M3LoJaNk+C54++XzAOeOBHmwsjTrmzRWrgdmIdnsVcEU6
-         96rQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXqUtSfikn8n4jPyZXgBL8h6B9iy5EaA3N0sIwj1dAYypvjBWq9VDRU4Ly7mW79CMLa3P+Y8z0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YysZpqYkIM97uXFlljt6AAyu44w0EJx+RNqRelcaq7vRzIPy4sP
-	F4Kbh+wbFTD3aE5e1RIL1/lMOJT2h7rZG390z6fIUMdoAdH/hErs4mXViN5irODb/5/If3AMCBG
-	/sTi8zHlb3DXFUBR1jB7bo+cNxxsA4HDFpaOeQAdksxkIuFlFZUAwrfc=
-X-Google-Smtp-Source: AGHT+IHI/AwK0O43azk2fddVpU0qbathXZO2wb4Gyw8n+wtQ9uBOMSUf+vVj9s5b7OyH8uWej9Py8BejLrhaypEr+7AwuGe9Fwxu
+        d=1e100.net; s=20230601; t=1730877475; x=1731482275;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G+MzOZXfDVvVfVLGNe8HGTPb9KTW95XMpmekn3Jk6sA=;
+        b=oeEePfnaWq/RKM1F7W4iX1uajtkh51zTeNof2QYFuzBlApnIhRhZ6wyr44fWjlgimu
+         nX7hrz8aolhBcg8gqm5FMm+Zzl4S6bB0YxN02Pbz88nlJwwdzBZeo7cKU2jolVR50CRN
+         kp20Rz0nNoPm6lOGxft8jDgVSHjwDA35Bkv6PsFk74nuqI508UyfsJFwes1lfAe32S96
+         CSsZDfq2CIbUcVOPkaz4ip7gF8v6+5yvIP4E2LuA2GjpqxICl+LaTTPd5b3kC65k9qik
+         gl21UTt0mABWc0A56Xg5UWP6y6plq2w+MjTs/D6Q7vcjk1kk9goe5O2772qx2aZoe31L
+         VPUg==
+X-Forwarded-Encrypted: i=1; AJvYcCUZJXQB9wHElXNzmaajs/dBDO4th7vqGiOW2lnxRNgdt2E/1Z4qjMQQiGz6QGsEange8XLB7EA=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzqnjkirTBE6glrjYaf6LPWcpwOHRxP69njFixpn8xoWXg7YGWI
+	sHjiV8/fCd1+HDyKZIVUk00AOT6Qext9UtF3uZP6Y7/AnbGvlB/4OjvKIYigVqoeyzgf/NYZMfV
+	b39JpMWdNEr27INjeVQmbWoZqTu1ETh2RJtP1mv0KCn6gD4bFaj/0FNfx0FdOjm46tw6W1Q==
+X-Received: by 2002:a05:6a20:72a7:b0:1db:ffb6:ff00 with SMTP id adf61e73a8af0-1dbffb6ff0emr2595883637.46.1730877475560;
+        Tue, 05 Nov 2024 23:17:55 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IG9tUelPVJWzdT9m3bKFH8hdeibtsRk1QiOwfHeBD4NMbCTVFMQ94vNoTPRLcM3wjmu2yzAJw==
+X-Received: by 2002:a05:6a20:72a7:b0:1db:ffb6:ff00 with SMTP id adf61e73a8af0-1dbffb6ff0emr2595872637.46.1730877475248;
+        Tue, 05 Nov 2024 23:17:55 -0800 (PST)
+Received: from localhost.localdomain (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc2c4b64sm10915365b3a.113.2024.11.05.23.17.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 23:17:54 -0800 (PST)
+From: Gerald Yang <gerald.yang@canonical.com>
+To: Jianbo Liu <jianbol@nvidia.com>,
+	Frode Nordahl <frode.nordahl@canonical.com>,
+	Saeed Mahameed <saeedm@nvidia.com>,
+	Ariel Levkovich <lariel@nvidia.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org,
+	Tariq Toukan <tariqt@nvidia.com>,
+	Saeed Mahameed <saeed@kernel.org>,
+	Jay Vosburgh <jay.vosburgh@canonical.com>,
+	Gerald Yang <gerald.yang@canonical.com>
+Subject: Re: [net 09/10] net/mlx5e: Don't offload internal port if filter device is out device
+Date: Wed,  6 Nov 2024 15:17:24 +0800
+Message-ID: <20241106071727.466252-1-gerald.yang@canonical.com>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <660b6c9f-137d-4ba4-94b9-4bcccc300f8d@nvidia.com>
+References: <660b6c9f-137d-4ba4-94b9-4bcccc300f8d@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:174e:b0:3a6:c1ef:f320 with SMTP id
- e9e14a558f8ab-3a6c1eff451mr140908855ab.18.1730877259726; Tue, 05 Nov 2024
- 23:14:19 -0800 (PST)
-Date: Tue, 05 Nov 2024 23:14:19 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672b174b.050a0220.2edce.151f.GAE@google.com>
-Subject: [syzbot] [bpf?] possible deadlock in work_grab_pending (2)
-From: syzbot <syzbot+ae3633ca70dce1eee4e1@syzkaller.appspotmail.com>
-To: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, eddyz87@gmail.com, haoluo@google.com, 
-	john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org, 
-	linux-kernel@vger.kernel.org, martin.lau@linux.dev, netdev@vger.kernel.org, 
-	sdf@fomichev.me, song@kernel.org, syzkaller-bugs@googlegroups.com, 
-	yonghong.song@linux.dev
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
 
-Hello,
+>>> From: Jianbo Liu <jianbol@nvidia.com>
+>>>
+>>> In the cited commit, if the routing device is ovs internal port, the
+>>> out device is set to uplink, and packets go out after encapsulation.
+>>>
+>>> If filter device is uplink, it can trigger the following syndrome:
+>>> mlx5_core 0000:08:00.0: mlx5_cmd_out_err:803:(pid 3966): SET_FLOW_TABLE_ENTRY(0x936) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0xcdb051), err(-22)
+>>>
+>>> Fix this issue by not offloading internal port if filter device is out
+>>> device. In this case, packets are not forwarded to the root table to
+>>> be processed, the termination table is used instead to forward them
+>>> from uplink to uplink.
+>> 
+>> This patch breaks forwarding for in production use cases with hardware
+>> offload enabled. In said environments, we do not see the above
+>> mentioned syndrome, so it appears the logic change in this patch hits
+>> too wide.
+>> 
+>
+>Thank you for the report. We'll send fix or maybe revert later.
+>
+>Jianbo
 
-syzbot found the following issue on:
+Hi Jianbo,
 
-HEAD commit:    dbb9a7ef3478 net: fjes: use ethtool string helpers
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1733c987980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=a9d1c42858837b59
-dashboard link: https://syzkaller.appspot.com/bug?extid=ae3633ca70dce1eee4e1
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+Thanks for checking this, since this issue affects our production environment,
+is it possible to revert this commit first, if it would take some time to fix it?
 
-Unfortunately, I don't have any reproducer for this issue yet.
+Thanks,
+Gerald
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/df61ec56738e/disk-dbb9a7ef.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/6ad9020b8df8/vmlinux-dbb9a7ef.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/d1b9e903e0c9/bzImage-dbb9a7ef.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ae3633ca70dce1eee4e1@syzkaller.appspotmail.com
-
-======================================================
-WARNING: possible circular locking dependency detected
-6.12.0-rc5-syzkaller-01053-gdbb9a7ef3478 #0 Not tainted
-------------------------------------------------------
-syz.4.2526/15232 is trying to acquire lock:
-ffff88801aca0018 (&pool->lock){-.-.}-{2:2}, at: try_to_grab_pending kernel/workqueue.c:2081 [inline]
-ffff88801aca0018 (&pool->lock){-.-.}-{2:2}, at: work_grab_pending+0x294/0xae0 kernel/workqueue.c:2157
-
-but task is already holding lock:
-ffff8880b8729430 (krc.lock){..-.}-{2:2}, at: krc_this_cpu_lock kernel/rcu/tree.c:3312 [inline]
-ffff8880b8729430 (krc.lock){..-.}-{2:2}, at: add_ptr_to_bulk_krc_lock kernel/rcu/tree.c:3725 [inline]
-ffff8880b8729430 (krc.lock){..-.}-{2:2}, at: kvfree_call_rcu+0x18a/0x790 kernel/rcu/tree.c:3811
-
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
-
--> #3 (krc.lock){..-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
-       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-       krc_this_cpu_lock kernel/rcu/tree.c:3312 [inline]
-       add_ptr_to_bulk_krc_lock kernel/rcu/tree.c:3725 [inline]
-       kvfree_call_rcu+0x18a/0x790 kernel/rcu/tree.c:3811
-       trie_delete_elem+0x546/0x6a0 kernel/bpf/lpm_trie.c:540
-       0xffffffffa000206f
-       bpf_dispatcher_nop_func include/linux/bpf.h:1265 [inline]
-       __bpf_prog_run include/linux/filter.h:701 [inline]
-       bpf_prog_run include/linux/filter.h:708 [inline]
-       __bpf_trace_run kernel/trace/bpf_trace.c:2316 [inline]
-       bpf_trace_run4+0x334/0x590 kernel/trace/bpf_trace.c:2359
-       __traceiter_sched_switch+0x98/0xd0 include/trace/events/sched.h:222
-       trace_sched_switch include/trace/events/sched.h:222 [inline]
-       __schedule+0x2340/0x4bd0 kernel/sched/core.c:6687
-       preempt_schedule_common+0x84/0xd0 kernel/sched/core.c:6869
-       preempt_schedule+0xe1/0xf0 kernel/sched/core.c:6893
-       preempt_schedule_thunk+0x1a/0x30 arch/x86/entry/thunk.S:12
-       class_preempt_destructor include/linux/preempt.h:480 [inline]
-       try_to_wake_up+0x9f3/0x14b0 kernel/sched/core.c:4288
-       wake_up_process kernel/sched/core.c:4414 [inline]
-       wake_up_q+0xc8/0x120 kernel/sched/core.c:1067
-       futex_wake+0x523/0x5c0 kernel/futex/waitwake.c:199
-       do_futex+0x392/0x560 kernel/futex/syscalls.c:107
-       __do_sys_futex kernel/futex/syscalls.c:179 [inline]
-       __se_sys_futex+0x3f9/0x480 kernel/futex/syscalls.c:160
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #2 (&rq->__lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
-       _raw_spin_lock_nested+0x31/0x40 kernel/locking/spinlock.c:378
-       raw_spin_rq_lock_nested+0x2a/0x140 kernel/sched/core.c:598
-       raw_spin_rq_lock kernel/sched/sched.h:1505 [inline]
-       task_rq_lock+0xc6/0x360 kernel/sched/core.c:700
-       cgroup_move_task+0x9b/0x5a0 kernel/sched/psi.c:1161
-       css_set_move_task+0x72e/0x950 kernel/cgroup/cgroup.c:898
-       cgroup_post_fork+0x256/0x880 kernel/cgroup/cgroup.c:6692
-       copy_process+0x39e9/0x3d50 kernel/fork.c:2598
-       kernel_clone+0x226/0x8f0 kernel/fork.c:2784
-       user_mode_thread+0x132/0x1a0 kernel/fork.c:2862
-       rest_init+0x23/0x300 init/main.c:712
-       start_kernel+0x47f/0x500 init/main.c:1105
-       x86_64_start_reservations+0x2a/0x30 arch/x86/kernel/head64.c:507
-       x86_64_start_kernel+0x9f/0xa0 arch/x86/kernel/head64.c:488
-       common_startup_64+0x13e/0x147
-
--> #1 (&p->pi_lock){-.-.}-{2:2}:
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
-       __raw_spin_lock_irqsave include/linux/spinlock_api_smp.h:110 [inline]
-       _raw_spin_lock_irqsave+0xd5/0x120 kernel/locking/spinlock.c:162
-       class_raw_spinlock_irqsave_constructor include/linux/spinlock.h:551 [inline]
-       try_to_wake_up+0xbe/0x14b0 kernel/sched/core.c:4165
-       create_worker+0x507/0x720 kernel/workqueue.c:2825
-       workqueue_init+0x520/0x8a0 kernel/workqueue.c:7902
-       kernel_init_freeable+0x3fe/0x5d0 init/main.c:1564
-       kernel_init+0x1d/0x2b0 init/main.c:1469
-       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
-       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
-
--> #0 (&pool->lock){-.-.}-{2:2}:
-       check_prev_add kernel/locking/lockdep.c:3161 [inline]
-       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
-       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
-       __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
-       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
-       __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
-       _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
-       try_to_grab_pending kernel/workqueue.c:2081 [inline]
-       work_grab_pending+0x294/0xae0 kernel/workqueue.c:2157
-       mod_delayed_work_on+0xd4/0x370 kernel/workqueue.c:2585
-       kvfree_call_rcu+0x47f/0x790 kernel/rcu/tree.c:3839
-       trie_update_elem+0x7e5/0xc00 kernel/bpf/lpm_trie.c:441
-       bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
-       generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1849
-       bpf_map_do_batch+0x39a/0x660 kernel/bpf/syscall.c:5162
-       __sys_bpf+0x377/0x810
-       __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
-       __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
-       __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5758
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
-other info that might help us debug this:
-
-Chain exists of:
-  &pool->lock --> &rq->__lock --> krc.lock
-
- Possible unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(krc.lock);
-                               lock(&rq->__lock);
-                               lock(krc.lock);
-  lock(&pool->lock);
-
- *** DEADLOCK ***
-
-3 locks held by syz.4.2526/15232:
- #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #0: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: bpf_map_update_value+0x3c4/0x540 kernel/bpf/syscall.c:202
- #1: ffff8880b8729430 (krc.lock){..-.}-{2:2}, at: krc_this_cpu_lock kernel/rcu/tree.c:3312 [inline]
- #1: ffff8880b8729430 (krc.lock){..-.}-{2:2}, at: add_ptr_to_bulk_krc_lock kernel/rcu/tree.c:3725 [inline]
- #1: ffff8880b8729430 (krc.lock){..-.}-{2:2}, at: kvfree_call_rcu+0x18a/0x790 kernel/rcu/tree.c:3811
- #2: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_lock_acquire include/linux/rcupdate.h:337 [inline]
- #2: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: rcu_read_lock include/linux/rcupdate.h:849 [inline]
- #2: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: try_to_grab_pending kernel/workqueue.c:2072 [inline]
- #2: ffffffff8e937da0 (rcu_read_lock){....}-{1:2}, at: work_grab_pending+0x1d3/0xae0 kernel/workqueue.c:2157
-
-stack backtrace:
-CPU: 1 UID: 0 PID: 15232 Comm: syz.4.2526 Not tainted 6.12.0-rc5-syzkaller-01053-gdbb9a7ef3478 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:94 [inline]
- dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
- print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
- check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
- check_prev_add kernel/locking/lockdep.c:3161 [inline]
- check_prevs_add kernel/locking/lockdep.c:3280 [inline]
- validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
- __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
- lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
- __raw_spin_lock include/linux/spinlock_api_smp.h:133 [inline]
- _raw_spin_lock+0x2e/0x40 kernel/locking/spinlock.c:154
- try_to_grab_pending kernel/workqueue.c:2081 [inline]
- work_grab_pending+0x294/0xae0 kernel/workqueue.c:2157
- mod_delayed_work_on+0xd4/0x370 kernel/workqueue.c:2585
- kvfree_call_rcu+0x47f/0x790 kernel/rcu/tree.c:3839
- trie_update_elem+0x7e5/0xc00 kernel/bpf/lpm_trie.c:441
- bpf_map_update_value+0x4d3/0x540 kernel/bpf/syscall.c:203
- generic_map_update_batch+0x60d/0x900 kernel/bpf/syscall.c:1849
- bpf_map_do_batch+0x39a/0x660 kernel/bpf/syscall.c:5162
- __sys_bpf+0x377/0x810
- __do_sys_bpf kernel/bpf/syscall.c:5760 [inline]
- __se_sys_bpf kernel/bpf/syscall.c:5758 [inline]
- __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5758
- do_syscall_x64 arch/x86/entry/common.c:52 [inline]
- do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
- entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7fdcb177e719
-Code: ff ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 40 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fdcb2645038 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-RAX: ffffffffffffffda RBX: 00007fdcb1935f80 RCX: 00007fdcb177e719
-RDX: 0000000000000038 RSI: 0000000020000000 RDI: 000000000000001a
-RBP: 00007fdcb17f132e R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: 0000000000000000 R14: 00007fdcb1935f80 R15: 00007ffe264ea148
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
 
