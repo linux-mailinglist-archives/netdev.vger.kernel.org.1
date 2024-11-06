@@ -1,113 +1,190 @@
-Return-Path: <netdev+bounces-142469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5889BF483
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:45:35 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id D13879BF486
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:45:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 04CDC1F2294F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:45:35 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 3A13DB2354D
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:45:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 321F1207A0F;
-	Wed,  6 Nov 2024 17:45:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13A7C2076B1;
+	Wed,  6 Nov 2024 17:45:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="bckz7RTN"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V1jmLuII"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-oi1-f181.google.com (mail-oi1-f181.google.com [209.85.167.181])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 887872076DD;
-	Wed,  6 Nov 2024 17:45:22 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78BC820651F;
+	Wed,  6 Nov 2024 17:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.181
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730915124; cv=none; b=PtsG/7zT9w4/cfytOqzp3vejIr9As7iKOF9Qf8Rqyzc2IjeH82OQ3ULqAV2+2D7JzPl7ASz1N84ItNdYZoT0hOEFEWqhXZgW9gj/H5xj1PuxL5QtQheT9uTew/M28+gPoBaIcvZT5dJ2PA/iacY86HmSoJWydSSKNYsKykoEFI0=
+	t=1730915139; cv=none; b=Ksdjdhs7fZP7jHtEmMvczk1F05wD8kRfe7vtoLAPyoz8ZqEM6hYNU8XrsSB7BZYTc9YOCUkmEAmhEjUHv0mPtfY3YBEn5zMEaomj9wxOj+/rlJxRazPZa+/wXDHjviT4WYBR+kgmqpGXcgrUOdtcTmGSVHzoCe60D+1OU4GSvm0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730915124; c=relaxed/simple;
-	bh=UlRfXX19qsv4mCDBgj85GQYkTz0EJiViPpEmRjDcL2Q=;
+	s=arc-20240116; t=1730915139; c=relaxed/simple;
+	bh=tyyezbJJ8YeMsfW3pt8EjL6DqDeOtHIryOTxi7I0F7U=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ji4uCSwjZ9Xb1ZEQfrIUV27tJzrA6L1HH1m1vZD3U1xYV50kDAIMiVecdG+/B2Sz01VeBK3F37Pnpgsne50tzDYl4FLJCre/aLrSFWS6f9dyyzzBrFI+kP8Xyp+UP4L6rrS/i9TTr4d/iTu+2A4RmR1MmZYjnYLfRhEatZFX2/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=bckz7RTN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=UxOA/rfjI1KE6q3W8gj1BUxMxZg7BxDAt4RAStM8cQA=; b=bckz7RTNCff3o2N0qC4BrW5JJU
-	t/NSlxrsd+A4IZiqBPho+pn1msHV/R9j4murPChVT9pvz2n/KWHwQPw9bbpmOHohQVi4yWa4W48Nx
-	Z+sC2x4pxCgPMEbO9uSl0nDw3qEeV+BB5OSFFMDDDOnoLm5P0txnjkLVwplDdMhfGPY4=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t8k5m-00CMZo-Fe; Wed, 06 Nov 2024 18:45:18 +0100
-Date: Wed, 6 Nov 2024 18:45:18 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	richardcochran@gmail.com,
-	Aleksandr Loktionov <aleksandr.loktionov@intel.com>
-Subject: Re: [PATCH net-next v3 1/2] ptp: add control over HW timestamp latch
- point
-Message-ID: <d20d8265-4263-4408-8448-4338a268d537@lunn.ch>
-References: <20241106010756.1588973-1-arkadiusz.kubalewski@intel.com>
- <20241106010756.1588973-2-arkadiusz.kubalewski@intel.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=VBtC5777iERfPVJJXwEgi58cKcz57gitiTabjnjbE/p9DuhlYJVd5J9w+N16sYhVKnhuHr9tdBlWfCQQBIoVEbJmiBwqgXM89K4dWuE3UKYKrErPLTeAxh+vHz8kPqzqJqe4gvvgZxvrJspkeGcUpLU2UClryhVFZ2ijtpHBLzM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V1jmLuII; arc=none smtp.client-ip=209.85.167.181
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f181.google.com with SMTP id 5614622812f47-3e5ffbc6acbso77159b6e.3;
+        Wed, 06 Nov 2024 09:45:36 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730915135; x=1731519935; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=czYyX+D7QcXGfphZenBSLNp7Hcs2H34lMjYNtBUMKQE=;
+        b=V1jmLuIICk9Qb+fp64YW2FAevYvW9P7ienrfeAx3vdmJKtOS8BZK5fFM9mak29j88j
+         s3UL5eNJABQs83fdVGqdrpMNIoExLobNqd5MIL2d8h/KiBGkF22eWHQfST9U5hMKRhgo
+         mOFX3E3I2PkWt84ZaKEPfKrb3wc5IY9NHdWV7u4cFoT2tf3oGhUakWOP1xuoOne+gCwf
+         BRPz+jaXOJ0rPofijoFnheUThIsgatY1U9oIykwadTWenW2sbhombW8p2dsgexPygOW/
+         Wc17En2KQYNBX1pVlTJjonSAu/qzf82XFMIS8oJ2FBlf0W++qxrcgiwXUK1AXLr3DKyc
+         wDzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730915135; x=1731519935;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=czYyX+D7QcXGfphZenBSLNp7Hcs2H34lMjYNtBUMKQE=;
+        b=dlFEkby/ZbOkP73mdhOKpxmfGlEEYdBfF5UK8yaIrEjqdRuTkAWlZyLLN5+OKAw8NG
+         ozAhNb3S4TPix7iyRiqrkzMtdxt2Wm8/Mqpi9SpOC/WUoy3+fZ+ZuIlqjb1smq+dcg+b
+         CiyQGYnEBA1ci8QptviPU+Cs/XT/pdUKjhsaBQECGzlHcNppAJT86YrTQNS+dOt33TUC
+         RjBl+NvLI9Kuo9ZZpolcRwIa0v/aeedAH0MMfuTT27g35euBJR6dp0eqw3sX4CvDouO2
+         HnIfAveT85Ah7IfOTtp+mpE0ZkUvMqgodXNhsW01TJ97f6sAUaCqRNWJ5yd+LUihO+HL
+         ArZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXQWceXg9Zp6cvanO5oOcpzUKytssXFejIIhXZOmF7maFA174DNM1jYwrcl7aqNiDs+X4R2dQEO@vger.kernel.org, AJvYcCXoECufAePeBMQsLgRhRxPI7krKa6ejY7+yrrhQpIEp/J9cCAI46qUwFgtHjqAQceMndNNmQ2/P86I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzNUZ6n1Indck9MoAzRCdLlVyGb5N7RMJnpEhhShDnDeQemNbMy
+	0eaw5JOUs013IdxWUi/4Owb/CAKtLQ5b4psfImnpi1HH+6sQLFP2Hwvv7A==
+X-Google-Smtp-Source: AGHT+IGiu9BFQ0o213+l7iI0bbhWOlpvoxQ5vrUhtsrEEz7OAaO2+Q7ATMSO+94QbFM7bjWgs9yGEw==
+X-Received: by 2002:a05:6808:1b12:b0:3e6:2d10:2392 with SMTP id 5614622812f47-3e758bfd94amr20976678b6e.7.1730915135503;
+        Wed, 06 Nov 2024 09:45:35 -0800 (PST)
+Received: from illithid ([2600:1700:957d:1d70::49])
+        by smtp.gmail.com with ESMTPSA id 5614622812f47-3e66123f363sm3091537b6e.37.2024.11.06.09.45.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 09:45:34 -0800 (PST)
+Date: Wed, 6 Nov 2024 11:45:31 -0600
+From: "G. Branden Robinson" <g.branden.robinson@gmail.com>
+To: Stephen Hemminger <stephen@networkplumber.org>
+Cc: Alejandro Colomar <alx@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>, alexhenrie24@gmail.com,
+	branden@debian.org, linux-man@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
+Message-ID: <20241106174531.crictruy4scop5q2@illithid>
+References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
+ <20241105055338.61082-1-kuniyu@amazon.com>
+ <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
+ <20241106091801.3e021842@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="k2fva7g3bwsdhk7a"
 Content-Disposition: inline
-In-Reply-To: <20241106010756.1588973-2-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <20241106091801.3e021842@hermes.local>
 
-On Wed, Nov 06, 2024 at 02:07:55AM +0100, Arkadiusz Kubalewski wrote:
-> Currently HW support of ptp/timesync solutions in network PHY chips can be
-> implemented with two different approaches, the timestamp maybe latched
-> either at the beginning or after the Start of Frame Delimiter (SFD) [1].
-> 
-> Allow ptp device drivers to provide user with control over the HW
-> timestamp latch point with ptp sysfs ABI. Provide a new file under sysfs
-> ptp device (/sys/class/ptp/ptp<N>/ts_point). The file is available for the
-> user, if the device driver implements at least one of newly provided
-> callbacks. If the file is not provided the user shall find a PHY timestamp
-> latch point within the HW vendor specification.
-> 
-> The file is designed for root user/group access only, as the read for
-> regular user could impact performance of the ptp device.
-> 
-> Usage, examples:
-> 
-> ** Obtain current state:
-> $ cat /sys/class/ptp/ptp<N>/ts_point
-> Command returns enum/integer:
-> * 1 - timestamp latched by PHY at the beginning of SFD,
-> * 2 - timestamp latched by PHY after the SFD,
-> * None - callback returns error to the user.
 
--EOPNOTSUPP would be more conventional, not None.
+--k2fva7g3bwsdhk7a
+Content-Type: text/plain; protected-headers=v1; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
+MIME-Version: 1.0
 
-> 
-> ** Configure timestamp latch point at the beginning of SFD:
-> $ echo 1 > /sys/class/ptp/ptp<N>/ts_point
-> 
-> ** Configure timestamp latch point after the SFD:
-> $ echo 2 > /sys/class/ptp/ptp<N>/ts_point
+Hi Stephen,
 
-and i assume these also return -EOPNOTSUPP if it is not supported.
+At 2024-11-06T09:18:01-0800, Stephen Hemminger wrote:
+> Alejandro Colomar <alx@kernel.org> wrote:
+> > We use two spaces after period (the correct amount).  :)
+>=20
+> Double spacing after period is a leftover from using typewriters.
 
-And a dumb question, why should i care where the latch point is? Why
-would i want to change it? Richard always says that you cannot trust
-the kernel to have the same latency from kernel to kernel version
-because driver developers like to tweak the latency, invalidating all
-measurements the user has done when setting up their ptp4l
-daemon. This just seems like yet another way to break my ptp4l
-configuration.
+No, it isn't.  See URL below.
 
-	Andrew
+> Modern usage is single space after period.
+[...]
+> 	These days most contemporary style guides also recommend using a
+> 	single space between sentences, including:
+>=20
+> 	The Chicago Manual of Style
+> 	The American Psychological Association (often referred to as =E2=80=9CAP=
+A=E2=80=9D)
+> 	Microsoft Manual of Style
+> 	The Gregg Reference Manual
+> 	The Associated Press Stylebook
+
+You're not bringing any new information to the table, and you don't
+appear to understand why the two-space rule is in place for _typesetting
+software_.  I don't just mean *roff, but TeX as well.
+
+Neither of these is a WYSIWYG system.  Neither of them is Markdown.
+
+The rule is not there so that people can argue over how many space
+widths should separate sentences.  The rule is there so that the
+formatter knows where the boundaries between sentences _are_.
+
+If you despise the use of two spaces between sentences in a *roff source
+document, there's an easy solution: use what Alex calls "semantic
+newlines".
+
+https://www.gnu.org/software/groff/manual/groff.html.node/Sentences.html#Se=
+ntences
+
+I furthermore remind the reader that, in GNU troff/man(7), the
+intersentence space width is configurable at _rendering_ time--if the
+author of the man(7) document honors one of the conventions that permits
+the formatter to detect sentence boundaries.
+
+For example...
+
+groff_man_style(7):
+
+Files
+
+=2E..
+
+     /usr/groff/site-tmac/man.local
+            Put site=E2=80=90local changes and customizations into this fil=
+e.
+
+                   .\" Put only one space after the end of a sentence.
+                   .ss 12 0 \" See groff(7).
+                   .\" Keep pages narrow even on wide terminals.
+                   .if n .if \n[LL]>80n .nr LL 80n
+
+Arguing about the number of spaces between sentences in a discussion of
+"semantic newlines" (or whatever you want to call them) is
+counterproductive and wasteful of time.
+
+Regards,
+Branden
+
+--k2fva7g3bwsdhk7a
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAABCAAdFiEEh3PWHWjjDgcrENwa0Z6cfXEmbc4FAmcrqzMACgkQ0Z6cfXEm
+bc4ohg//fjhkX7uJNSAuPmkHN+uo8lBeBVhrLEgMjHGJIiFoAg6ROtPppDQx4LyO
+bPIPMlv9JGYKEm/ZD3xI6g02dSrhc91XPWdn6vaRmSf3MjRh3ZeZMmZIzbMlQHxO
+nV1iDhZsLibEPGY7Sk/uwtAOPIKxKH9+j3tGOYpkwiiGxjb9rG3+2webWAfmi1qm
+AUFPenBahy4FOtHDrj52FOWxjhtL/ATJ52cLiHCI1aobIBqAROyappIFzDjLT9KL
+8JMGn+cvcMaB3fZqmrsu5c3tm3lL0y5NReYfypgtFGeW5YXzmtI8DI01J1bokm6F
+M4myJlxV9KnogxzRZyJnxVj/CiJBRVxAapLrdSRnjTwcp+3WY2jbVD2ViCJvmG9P
+80fZBfRkiomXfkgw8KIFgEaEXwD4vpd3p6mM+Hkk+TYo/5062WitmsukkmYAZNtg
+ks7DFbbfoAfOgk12nL637tslZ6tw5Ngjq4knnH6a3iVwnqvMz783tNQUac8LrWJ6
+iRuN2KiqWkvd0a5CGT4BeIltg+FYGoLN9ipBCiz55bftc6jvgVK7KCKfhQA3xo4I
+JbEav3WLy+N2jqpNm/GL/XxcipILKNMb1VUAjSj9url4DTki/yPsy2Od2Y+hN4IB
+H0yBIJtUPIIYY9saT2dbInzyWrYxGZ/ARd4l0WLF5Sk8bgrVimI=
+=g08U
+-----END PGP SIGNATURE-----
+
+--k2fva7g3bwsdhk7a--
 
