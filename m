@@ -1,185 +1,126 @@
-Return-Path: <netdev+bounces-142415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142417-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5001E9BEFF2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:17:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 690B79BEFF9
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:19:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4BB41F23757
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:17:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 20DCF1F222CC
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:19:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936A6201016;
-	Wed,  6 Nov 2024 14:17:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15CDE2010F2;
+	Wed,  6 Nov 2024 14:19:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="JgFBXw8x"
 X-Original-To: netdev@vger.kernel.org
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B0AF1DE4CA;
-	Wed,  6 Nov 2024 14:17:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.140.110.172
+Received: from mail-ed1-f41.google.com (mail-ed1-f41.google.com [209.85.208.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 456931CF2A0
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 14:19:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730902660; cv=none; b=rJxhrOnA5x2nr/8r5jSr2lE7PXpP0L2zOzN51hWn9B1fKiDvBS8+5GOkshwSU1EGlqkdHT5O5usIrHXg9L89UMmZmStqa/M0dMsKxYTWm3ZW2bQqWeiu4edKxjHalRTiviSqJ0r052GWeRA1lGExh2VEYhXbNqxsxUbu57FTjBs=
+	t=1730902772; cv=none; b=CCFOAPxnBf+LE3dxvcCR5MsMwErLs9pgm1ngfV1TDQPCuc10YzHfuPzxA01WxuexH9LqAhObEVwkSfAl35XXkoOY4+sM3joQnKveYglnRvBgg9lFVIqhuvoYAZv7TJCITZst9+3o1eoSFfQWV4pnFzc4RRGKBf9Ee11882D+mfw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730902660; c=relaxed/simple;
-	bh=h4cDEFZpluB0+iXtoSReBWWQxWLWC+hpea7ZJ0tuiZM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=OGTCkSLcI4/Z5r5pOmvuV5e9bKoNpYzGdwjFHcGVr5KiiQyb3b1llIPrUxJ2z+vpbL7myqbZPbMeAH5CdFStMD/iIKea8lT0AZTUCR3c+RM3TFWFsyROHqvJ1Ct2YgpBUPdKeVjL8X2XaNpPViE/7CznOXKiGabE24QrmgzW1Zc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com; spf=pass smtp.mailfrom=arm.com; arc=none smtp.client-ip=217.140.110.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=arm.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=arm.com
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id 9B508497;
-	Wed,  6 Nov 2024 06:18:06 -0800 (PST)
-Received: from [10.57.90.5] (unknown [10.57.90.5])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 875783F66E;
-	Wed,  6 Nov 2024 06:17:33 -0800 (PST)
-Message-ID: <caf31b5e-0e8f-4844-b7ba-ef59ed13b74e@arm.com>
-Date: Wed, 6 Nov 2024 14:17:31 +0000
+	s=arc-20240116; t=1730902772; c=relaxed/simple;
+	bh=oiZFuhIF4QoiUNWgqbOD3mWFkvRKU+gcd45dtB8AByk=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=MnufdCCB2brPbMBxrJF3hSeFB3wcj3Bz5uTQND58KELizSnJvMaaXRjKGAFHw8I9kGRvSLd14bHUOmdvrGgXeCfF3hwwLFS0f+99fdxb3CkmyaifQOB+VS1FqmLrGYvMAkp/pJ9FkSg8cELnnEA9577nHK3Vt7JweFfl6CEfAps=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=JgFBXw8x; arc=none smtp.client-ip=209.85.208.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f41.google.com with SMTP id 4fb4d7f45d1cf-5ced377447bso4926424a12.1
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 06:19:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730902769; x=1731507569; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yoVh6I+sgW0HCrktUilyDaZ92RmL1a324ePT2UFI6EI=;
+        b=JgFBXw8x9mF5/e6K+oxgHwi3o4wdM74FUZLFszm5J8Bt9t2ma1KidckzXZ62XDRURe
+         vD9d0AU57gF6cB55rIpyL36GX4lnSVUUp19Q/zyNVE6qNaPGQ9VXtjErgAVi4X/fbFfP
+         Exe4CDhLcdQ3SBYnx6UR5XnTOzM0d5GD7Ds6sR3MxIUtLW4d1tbQf3oA+xFsIoWh1O81
+         38qhcbBYwa+Mi+q0n9sJ6Sbla/qTLcBYVIzj3JgyimNSrRDqiDXrK8ueLSWWjvyn/ysC
+         8laWeE5K4VVXLYJJAQxrsRxWhLyBjMVTe4GMoKxMnWO+K1wv/T5xve76xiEBgZvFWTyA
+         Vq5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730902769; x=1731507569;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yoVh6I+sgW0HCrktUilyDaZ92RmL1a324ePT2UFI6EI=;
+        b=VaMZEPiMQPYvX8v+DLf3iBaP/SVqzkjoZnTIfZ1PRSB6xzfe8ICtdW124y/lclreMA
+         idjOhDh7tq6MnNyDYrb93lcgMac7QeL+L7yz64PP2aoORV2NrFytB/zPKS0Fjc+8I1Zu
+         tQ2YzFqw7DSrfkLJjj00829pQAdGkRSC+l2dQPBzlESQiwJqabfYOWK6x9HzB9IyNQ4Y
+         GGdYUwu0ctSfoeAANdTADFDqGLP39KQ4/5RgAcbKFkRIjiufsii0r4fzvRTQfpTlloXg
+         L2QnAM71nwaz0js+SgDb/852e1KeMKhPmultMmpC1gjRks8VwjmJ8YaJSxBulvEkXG3z
+         53qw==
+X-Forwarded-Encrypted: i=1; AJvYcCUJ0QX+kvgG1Asv+jCca1eDrRfzuo2MR89WDoKBso5SM/0Bwbb19fnjW0bcI1OyVuYfRpBM+r8=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yw88ZpQ+vIfYXXHEXSS+udSfE+2Afe3rOe6kwLvsz2N1V5lcgAq
+	G2fQ38uiRVqfr35xx/qjzuUNQMS0rm1Yv2f/9/MgGCR6GEs30gy2KzUi2iE8cH0UJdEjpx3GTw6
+	bwszCON08jCq2EVgUXOzkbQ/ohGEam48NtADd
+X-Google-Smtp-Source: AGHT+IELMvKRoMEathSk4KOTxObc01aIRc3ra1YOgb4K//tGX1ypzTzZjAVLCjuGJUG5SFy6NgXKdHxD+C4kM3oB2Jg=
+X-Received: by 2002:a05:6402:2187:b0:5cb:6718:7326 with SMTP id
+ 4fb4d7f45d1cf-5cd54a958f5mr18429867a12.21.1730902768471; Wed, 06 Nov 2024
+ 06:19:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
- has already unbound
-To: Yunsheng Lin <linyunsheng@huawei.com>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
-Cc: zhangkun09@huawei.com, fanghaiqing@huawei.com, liuyonglong@huawei.com,
- Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
- Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
- <edumazet@google.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- kernel-team <kernel-team@cloudflare.com>, Christoph Hellwig <hch@lst.de>,
- m.szyprowski@samsung.com
-References: <20241022032214.3915232-1-linyunsheng@huawei.com>
- <20241022032214.3915232-4-linyunsheng@huawei.com>
- <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
- <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
- <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
- <cf1911c5-622f-484c-9ee5-11e1ac83da24@huawei.com> <878qu7c8om.fsf@toke.dk>
- <1eac33ae-e8e1-4437-9403-57291ba4ced6@huawei.com> <87o731by64.fsf@toke.dk>
- <023fdee7-dbd4-4e78-b911-a7136ff81343@huawei.com> <874j4sb60w.fsf@toke.dk>
- <a50250bf-fe76-4324-96d7-b3acf087a18c@huawei.com>
- <a6cfba96-9164-4497-b075-9359c18a5eef@kernel.org>
- <2f256bce-0c37-4940-9218-9545daa46169@huawei.com>
-From: Robin Murphy <robin.murphy@arm.com>
-Content-Language: en-GB
-In-Reply-To: <2f256bce-0c37-4940-9218-9545daa46169@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+References: <20241106135357.280942-1-alexandre.ferrieux@orange.com>
+In-Reply-To: <20241106135357.280942-1-alexandre.ferrieux@orange.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed, 6 Nov 2024 15:19:17 +0100
+Message-ID: <CANn89i+Lu_2q7_onZcrZhqu6NY9=rxAi9jopZW053dRH_7qojQ@mail.gmail.com>
+Subject: Re: [PATCH net v2] Fix u32's systematic failure to free IDR entries
+ for hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	alexandre.ferrieux@orange.com, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 2024-11-06 10:56 am, Yunsheng Lin wrote:
-> +cc Christoph & Marek
-> 
-> On 2024/11/6 4:11, Jesper Dangaard Brouer wrote:
-> 
-> ...
-> 
->>>>
->>>>> I am not sure if I understand the reasoning behind the above suggestion to 'wait
->>>>> and see if this actually turns out to be a problem' when we already know that there
->>>>> are some cases which need cache kicking/flushing for the waiting to work and those
->>>>> kicking/flushing may not be easy and may take indefinite time too, not to mention
->>>>> there might be other cases that need kicking/flushing that we don't know yet.
->>>>>
->>>>> Is there any reason not to consider recording the inflight pages so that unmapping
->>>>> can be done for inflight pages before driver unbound supposing dynamic number of
->>>>> inflight pages can be supported?
->>>>>
->>>>> IOW, Is there any reason you and jesper taking it as axiomatic that recording the
->>>>> inflight pages is bad supposing the inflight pages can be unlimited and recording
->>>>> can be done with least performance overhead?
->>>>
->>>> Well, page pool is a memory allocator, and it already has a mechanism to
->>>> handle returning of memory to it. You're proposing to add a second,
->>>> orthogonal, mechanism to do this, one that adds both overhead and
->>>
->>> I would call it as a replacement/improvement for the old one instead of
->>> 'a second, orthogonal' as the old one doesn't really exist after this patch.
->>>
->>
->> Yes, are proposing doing a very radical change to the page_pool design.
->> And this is getting proposed as a fix patch for IOMMU.
->>
->> It is a very radical change that page_pool needs to keep track of *ALL* in-flight pages.
-> 
-> I am agreed that it is a radical change, that is why it is targetting net-next
-> tree instead of net tree even when there is a Fixes tag for it.
-> 
-> If there is a proper and non-radical way to fix that, I would prefer the
-> non-radical way too.
-> 
->>
->> The DMA issue is a life-time issue of DMA object associated with the
->> struct device.  Then, why are you not looking at extending the life-time
-> 
-> It seems it is not really about the life-time of DMA object associated with the
-> life-time of 'struct device', it seems to be the life-time of DMA API associated
-> with the life-time of the driver for the 'struct device' from the the opinion of
-> experts from IOMMU/DMA subsystem in [1] & [2].
+On Wed, Nov 6, 2024 at 2:54=E2=80=AFPM Alexandre Ferrieux
+<alexandre.ferrieux@gmail.com> wrote:
+>
+> To generate hnode handles (in gen_new_htid()), u32 uses IDR and
+> encodes the returned small integer into a structured 32-bit
+> word. Unfortunately, at disposal time, the needed decoding
+> is not done. As a result, idr_remove() fails, and the IDR
+> fills up. Since its size is 2048, the following script ends up
+> with "Filter already exists":
+>
+>   tc filter add dev myve $FILTER1
+>   tc filter add dev myve $FILTER2
+>   for i in {1..2048}
+>   do
+>     echo $i
+>     tc filter del dev myve $FILTER2
+>     tc filter add dev myve $FILTER2
+>   done
+>
+> This patch adds the missing decoding logic for handles that
+> deserve it.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+> ---
+> v2: use u32 type in handle encoder/decoder
 
-There is no "DMA object". The DMA API expects to be called with a valid 
-device bound to a driver. There are parts in many different places all 
-built around that expectation to varying degrees. Looking again, it 
-seems dma_debug_device_change() has existed for way longer than the 
-page_pool code, so frankly I'm a little surprised that this case is only 
-coming up now in this context...
+Note that the patch title should be more like
 
-Even if one tries to handwave past that with a bogus argument that 
-technically these DMA mappings belong to the subsystem rather than the 
-driver itself, it is clearly unrealistic to imagine that once a device 
-is torn down by device_del() it's still valid for anything. In fact, 
-before even that point, it is explicitly documented that a device which 
-is merely offlined prior to potential removal "cannot be used for any 
-purpose", per Documentation/ABI/testing/sysfs-devices-online.
+[PATCH v2 net] net: sched: cls_u32: Fix u32's systematic failure to
+free IDR entries for hnodes.
 
-Holding a refcount so that the memory backing the struct device can 
-still be accessed without a literal use-after-free does not represent 
-the device being conceptually valid in any API-level sense. Even if the 
-device isn't removed, as soon as its driver is unbound its DMA ops can 
-change; the driver could then be re-bound, and the device valid for 
-*new* DMA mappings again, but it's still bogus to attempt to unmap 
-outstanding old mappings through the new ops (which is just as likely to 
-throw an error/crash/corrupt memory/whatever). The page pool DMA mapping 
-design is just fundamentally incorrect with respect to the device/driver 
-model lifecycle.
+ie include some tags to identify the subsystem [1]
 
-> I am not sure what is reasoning behind the above, but the implementation seems
-> to be the case as mentioned in [3]:
-> __device_release_driver -> device_unbind_cleanup -> arch_teardown_dma_ops
-> 
-> 1. https://lkml.org/lkml/2024/8/6/632
-> 2. https://lore.kernel.org/all/20240923175226.GC9634@ziepe.ca/
-> 3. https://lkml.org/lkml/2024/10/15/686
-> 
->> of the DMA object, or at least detect when DMA object goes away, such
->> that we can change a setting in page_pool to stop calling DMA unmap for
->> the pages in-flight once they get returned (which we have en existing
->> mechanism for).
-> 
-> To be honest, I was mostly depending on the opinion of the experts from
-> IOMMU/DMA subsystem for the correct DMA API usage as mentioned above.
-> So I am not sure if skipping DMA unmapping for the inflight pages is the
-> correct DMA API usage?
-> If it is the correct DMA API usage, how to detect that if DMA unmapping
-> can be skipped?
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
-Once page_pool has allowed a driver to unbind from a device without 
-cleaning up all outstanding DMA mappings made via that device, then it 
-has already leaked those mappings and the damage is done, regardless of 
-whether the effects are visible yet. If you'd really rather play 
-whack-a-mole trying to paper over secondary symptoms of that issue than 
-actually fix it, then fine, but don't expect any driver core/DMA API 
-changes to be acceptable for that purpose. However, if people are 
-hitting those symptoms now, then I'd imagine they're eventually going to 
-come back asking about the ones which can't be papered over, like 
-dma-debug reporting the leaks, or just why their system ends up burning 
-gigabytes on IOMMU pagetables and IOVA kmem_caches.
+[1] One way to get some common patterns is to look at the output of
 
-Thanks,
-Robin.
+git log --oneline net/sched/cls_u32.c
 
