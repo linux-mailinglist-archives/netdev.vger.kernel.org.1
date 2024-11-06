@@ -1,141 +1,141 @@
-Return-Path: <netdev+bounces-142438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15C169BF1E1
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:40:11 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFC0C9BF1E6
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:41:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFB17284EBF
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:40:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B448228570F
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:41:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DB12036F0;
-	Wed,  6 Nov 2024 15:40:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2F5203703;
+	Wed,  6 Nov 2024 15:41:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="i7q170w1"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HInPBgBF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f50.google.com (mail-wr1-f50.google.com [209.85.221.50])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CA01202623
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 15:40:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484F9201273;
+	Wed,  6 Nov 2024 15:41:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730907602; cv=none; b=oOBLTBsQqEA+HBLFWzOOsIwXzS15/AVEqZGydnzt0vYXWrO9D+ZdEUK/Xlbzqq6b1J8XfnR9+dYEvx8cpp9rWdHpRqGUg3jZZXUYo8iM1NLMSyt2S1JDLqYnhy7z9KxgAu+tF/G50hU1P6Y3chUNkl16hDjTK8npHkgysEi0jiQ=
+	t=1730907682; cv=none; b=UzZNC8y08cio8x+af0JfLA3bRYogJoGZN3w+VctpjKQM43eN1Pc6yqIshFVV1MgKchmW1VIRAKdz+zRSRCd5MZjTbbLXbKocsgEVRmsHHJEuIIWI0oiQbBXBLSRlDcu185ji3tbWdg6s/3XweTsSuH5SDD25suE1NxLEEHu9cGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730907602; c=relaxed/simple;
-	bh=PLn+HGkBBwpOW7CICc2SyOy0BDrPR4BmKQAFCYmIWqM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sVKgOM3iP5ZlSiC+C1o8E4KVpkYyT4znOOizH6ZU8DMu2+jIGcdylMQ28r73/OmT9LA52hADnedJRrzr04+Syk7CqtdI6kntD/tNleL2M/dhODs3KB2KiJqj5aBOndXkEg/qyKbzjVhHHPKRuquW76uUhMrKXRQMfVGtPtZ5yuE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=i7q170w1; arc=none smtp.client-ip=209.85.221.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
-Received: by mail-wr1-f50.google.com with SMTP id ffacd0b85a97d-37d5aedd177so4346349f8f.1
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 07:40:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1730907599; x=1731512399; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=T+lke+kSJ/sHNhBrjG2QR3DbhnvDmE7dM4quD4X0oVI=;
-        b=i7q170w1oBFFo2ijcUpH0lB3v2ORF8xyY6czqMAPtMNiOz+YQ7T9BxfwERp1rZF5Yv
-         tLlEs98O1nQGDewYLnxBxZfbz6bEfavoBMlAoty7XVruSOEWKQYUmdqgF/X4iXfUlmCG
-         jWRUk5gAjZ0ydnut8JrbiGsIMxsnTEI2TMVr/qjX9KDjb8R4Iu1tge4speLCNG+6/ATl
-         ZInyIlapWbtEI/9qPHP1aJUexYoLS4Lbg943F4TUB9q7frR3IB4WkZzaU2O6PgZPOpYu
-         AHzCkKSw5EMOgtYA5fDfrQ0FVlq8xgoeSM9oRWzgF195VIBZcP34OznPUUjpWduRuZYh
-         nZhQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730907599; x=1731512399;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=T+lke+kSJ/sHNhBrjG2QR3DbhnvDmE7dM4quD4X0oVI=;
-        b=GxSfn97ZesyZN0xvFsXO9GirrYl/dBfmzOF03qiKblW9ET4d1D09Q3qQr9iB63rEdW
-         TCBeAIVHlq1ZbveeesMbq617MJHUAS88OvDFKbvx79ADWAO0J00RELwiE6+45boscqEx
-         8K7gTunw4J/UukiEGBP2QYVaCPzKNCvQyn4h2edm3+kNCR0l6BHjN/m0JQwR7L8MKyLE
-         aMgjQamh2uWUwQ/ggs0h/HXM36/kofTszujmZqQ25Umh3+MgXROPMuWTQ7czmFQwr7lE
-         zFY1Ov9a0O69e+kkkcGeC8z8g6u1+r5Eg6oK6HwHg3oEYDiMg1SsmN7zzoV0KnxaM9Vq
-         I6Xw==
-X-Forwarded-Encrypted: i=1; AJvYcCXtgZlg6+pwYu8Rx6fVwhfDfltNA3lcTBoZVBQ3whcsvUrhAQKjgtpv9IhQIzvKGz2WQ6WQKzQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwXEy0Ac3y7btkgLPFI1Mxo+xs11WhVUzqbiFklCSvWsKHBth3i
-	O/UZFlmqiagvUZaf2uuLcsgDAxzO9u3wbyRzKYbJVewXm5M6WExJ78PJG/8vkM4=
-X-Google-Smtp-Source: AGHT+IHaXpKkIZTp98WaTVKW8arf8yLJ6KlxXz0Ga7zfB6YCb98iODL5Q30kaHjC536zM+O/RrwHzA==
-X-Received: by 2002:a05:6000:4711:b0:37c:cc67:8b1f with SMTP id ffacd0b85a97d-381bea0ee17mr17133942f8f.48.1730907598706;
-        Wed, 06 Nov 2024 07:39:58 -0800 (PST)
-Received: from localhost ([193.47.165.251])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7b32sm19556510f8f.18.2024.11.06.07.39.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 07:39:58 -0800 (PST)
-Date: Wed, 6 Nov 2024 16:39:55 +0100
-From: Jiri Pirko <jiri@resnulli.us>
-To: MD Danish Anwar <danishanwar@ti.com>
-Cc: geliang@kernel.org, liuhangbin@gmail.com, w-kwok2@ti.com,
-	aleksander.lobakin@intel.com, lukma@denx.de, jan.kiszka@siemens.com,
-	diogo.ivo@siemens.com, shuah@kernel.org, horms@kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, andrew+netdev@lunn.ch,
-	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	srk@ti.com, Vignesh Raghavendra <vigneshr@ti.com>,
-	Roger Quadros <rogerq@kernel.org>
-Subject: Re: [PATCH net-next v3 0/4] Introduce VLAN support in HSR
-Message-ID: <ZyuNyzu0kv1_pemU@nanopsycho.orion>
-References: <20241106091710.3308519-1-danishanwar@ti.com>
+	s=arc-20240116; t=1730907682; c=relaxed/simple;
+	bh=bou6xWV3nj9LLXSPhsNdqJ6OEBSUvPCJ1pAIlguOgDs=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=bQhIaWTleffWyMGxCZSJ7P8doLhkW1yKkStLqXNhp+5C6SJ6f6ewlF2485DkQzGcFktzEyYbzeuW9s0HQfWhMPT+2lZE2BBFPmqBWnMkVYqdS9qTWyo2xg+6Bl0T+Sg1TVFntIyp0CjCB5k6LaL1HQ6BwF4tcn6urhenV313xWM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HInPBgBF; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 917A6C4CEC6;
+	Wed,  6 Nov 2024 15:41:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730907681;
+	bh=bou6xWV3nj9LLXSPhsNdqJ6OEBSUvPCJ1pAIlguOgDs=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=HInPBgBFKhjpuG5/UXIBDngUtno/HE2jpz+2gBl6zUUlPtVJ/C1X4nvNXHsVO6ggI
+	 9yiMsfMkin+Q39YBw8RoL1bpJY0wvWApMXSp6scyIGPhjeoyz+En0lOuAZNX8K8U30
+	 KF5YV/K3Jw6C6F90LZ3ZHS1L7RIrZAdbwCLpGR0G2EfFvpPlyo3Y6g7LzCxZ226Lwi
+	 OumA7eTwo4LuFcf3A+TehxohEmfQmbeuP1hllO1aUxJPMJ0o5ZVW1NSZ6xmM142NiO
+	 gafBwW1VqQpOjjCWMqzPbIY01Zyujx3Uu1ojVYaiVqFe1uOZTdxEwMutUbpvHxf+Ll
+	 AALYfYfIbybLw==
+Message-ID: <9b265c9b-f101-4ea3-83b6-7709e8f2ea47@kernel.org>
+Date: Wed, 6 Nov 2024 16:41:10 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106091710.3308519-1-danishanwar@ti.com>
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH] mptcp: remove the redundant assignment of
+ 'new_ctx->tcp_sock' in subflow_ulp_clone()
+Content-Language: en-GB
+To: MoYuanhao <moyuanhao3676@163.com>
+Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ linux-kernel@vger.kernel.org, martineau@kernel.org, geliang@kernel.org,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, horms@kernel.org
+References: <20241106071035.2591-1-moyuanhao3676@163.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <20241106071035.2591-1-moyuanhao3676@163.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Wed, Nov 06, 2024 at 10:17:06AM CET, danishanwar@ti.com wrote:
->This series adds VLAN support to HSR framework.
->This series also adds VLAN support to HSR mode of ICSSG Ethernet driver.
->
->Changes from v2 to v3:
->*) Modified hsr_ndo_vlan_rx_add_vid() to handle arbitrary HSR_PT_SLAVE_A,
->HSR_PT_SLAVE_B order and skip INTERLINK port in patch 2/4 as suggested by
->Paolo Abeni <pabeni@redhat.com>
->*) Removed handling of HSR_PT_MASTER in hsr_ndo_vlan_rx_kill_vid() as MASTER
->and INTERLINK port will be ignored anyway in the default switch case as
->suggested by Paolo Abeni <pabeni@redhat.com>
->*) Modified the selftest in patch 4/4 to use vlan by default. The test will
->check the exposed feature `vlan-challenged` and if vlan is not supported, skip
->the vlan test as suggested by Paolo Abeni <pabeni@redhat.com>. Test logs can be
->found at [1]
->
->Changes from v1 to v2:
->*) Added patch 4/4 to add test script related to VLAN in HSR as asked by
->Lukasz Majewski <lukma@denx.de>
->
->[1] https://gist.githubusercontent.com/danish-ti/d309f92c640134ccc4f2c0c442de5be1/raw/9cfb5f8bd12b374ae591f4bd9ba3e91ae509ed4f/hsr_vlan_logs
->v1 https://lore.kernel.org/all/20241004074715.791191-1-danishanwar@ti.com/
->v2 https://lore.kernel.org/all/20241024103056.3201071-1-danishanwar@ti.com/
->
->MD Danish Anwar (1):
->  selftests: hsr: Add test for VLAN
->
->Murali Karicheri (1):
->  net: hsr: Add VLAN CTAG filter support
->
->Ravi Gunasekaran (1):
->  net: ti: icssg-prueth: Add VLAN support for HSR mode
->
->WingMan Kwok (1):
->  net: hsr: Add VLAN support
->
-> drivers/net/ethernet/ti/icssg/icssg_prueth.c | 45 ++++++++-
-> net/hsr/hsr_device.c                         | 85 +++++++++++++++--
-> net/hsr/hsr_forward.c                        | 19 +++-
-> tools/testing/selftests/net/hsr/config       |  1 +
-> tools/testing/selftests/net/hsr/hsr_ping.sh  | 98 ++++++++++++++++++++
-> 5 files changed, 236 insertions(+), 12 deletions(-)
+Hi MoYuanhao, Netdev maintainers,
+
+On 06/11/2024 08:10, MoYuanhao wrote:
+> The variable has already been assigned in the subflow_create_ctx(),
+> So we don't need to reassign this variable in the subflow_ulp_clone().
+
+Good catch, no need to reassign it there.
+
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
 
-Looks fine to me.
-set-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+I guess this patch is for net-next. Please next time clearly indicate
+for which tree this patch is for, by adding this in the patch prefix:
+
+  [PATCH net-next]
+
+See: https://docs.kernel.org/process/maintainer-netdev.html
+
+Also, please try to keep the patch title under ~50 chars.
+
+
+@Netdev maintainers: is it OK for you to apply this small patch in
+net-next directly?
+
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
