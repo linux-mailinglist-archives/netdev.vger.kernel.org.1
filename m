@@ -1,116 +1,183 @@
-Return-Path: <netdev+bounces-142137-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142138-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFE309BDA07
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:01:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D1099BDA17
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:13:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7B44D2840CB
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:01:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17B9B1C2227B
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB59AA47;
-	Wed,  6 Nov 2024 00:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F39A7645;
+	Wed,  6 Nov 2024 00:13:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="DX7RVRYF"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nULiOJcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF1C636D
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 00:01:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64A8B173;
+	Wed,  6 Nov 2024 00:13:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730851311; cv=none; b=YKjvtERrre5Ftb5UyuWIJZ9eM6EgTG2MhgjJpTw6andEF5JRTR+GfhtT2X1IdXSRxfv2FqgRO/ePNlI5c/suap6KmUAchzv3YYclXyHqge8fhCLbDJCHK6PWzmm+g4Ic3STyfevOLClGqDUy4YaTOVTyDQFdjGgPA6oCxgJzPK8=
+	t=1730851995; cv=none; b=hS8jN/7A6B/WAJCR8ZbRV3V4kAUIgZ6t5dQvftZhupky4BnEhZg2Mt4huamVTZ/bg5jR/AQ1cvcEkPm6ge1sWyaGzHS7JzuD5oUkz2p97bAiONyfVz3EeK27asJ/c0D2GbirZxTScoHstlMg0Jf+3e21Q7W6X47Yun6kTzl7xXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730851311; c=relaxed/simple;
-	bh=sFxnz39WGedOqQ3vTENfHmBcp2jjrx/GR6vP8Y4591U=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=NciKFO7kghPiU8t4On925wpRWj+8r3lqwtvl4nRJ+ugBuY47HcWddjr2AzU3ZGx3l3gupTm0amPdg7m9yjwcriCy2pfV6SQiM0nQyjP2keBJaoJl1Hla8OVqMiO/EFgfvHrGHAmbCVFg8Fvmx3W3Wh4Frr8Qtgnq3Hbz1cE8pho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=DX7RVRYF; arc=none smtp.client-ip=202.36.163.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
-Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 497942C0452;
-	Wed,  6 Nov 2024 13:01:46 +1300 (NZDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1730851306;
-	bh=sFxnz39WGedOqQ3vTENfHmBcp2jjrx/GR6vP8Y4591U=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=DX7RVRYFkTYbTKl4UwFMGag5AG3TajsbgZVu3r3dXebQqr9LUTSZ3R9UyaOHUoM27
-	 k1iaaOz7t4O0/7DS4Ccf1ov7NPFjFzzb5M+vuZSCcZ73qF2mxRQLMWJXHBPjc7ybWO
-	 VKW4FVPvttIr5YEpaO/VjHQkSQLV1P4o/8AhHAe4iwLxChtMCsWPBAU3mLpwRtgiM0
-	 u7hDRlUeo4/DN6ZXl0ZnFr/dPA/3bmz2Mv1stEAGZgSNKbaKJ8jt8gcOVxBuJLMuNp
-	 cDhqJcvTJj4n3AXZiMgHf02xPSwGLM063GDTzIg2wc8ylkRxzSEYDIn+h21I+yl1bJ
-	 cz3u/aJ+VOw1A==
-Received: from svr-chch-ex2.atlnz.lc (Not Verified[2001:df5:b000:bc8::76]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B672ab1ea0001>; Wed, 06 Nov 2024 13:01:46 +1300
-Received: from svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) by
- svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8:f753:6de:11c0:a008) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
- 15.2.1544.11; Wed, 6 Nov 2024 13:01:46 +1300
-Received: from svr-chch-ex2.atlnz.lc (2001:df5:b000:bc8::76) by
- svr-chch-ex1.atlnz.lc (2001:df5:b000:bc8::77) with Microsoft SMTP Server
- (TLS) id 15.0.1497.48; Wed, 6 Nov 2024 13:01:33 +1300
-Received: from svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567]) by
- svr-chch-ex2.atlnz.lc ([fe80::a9eb:c9b7:8b52:9567%15]) with mapi id
- 15.02.1544.011; Wed, 6 Nov 2024 13:01:33 +1300
-From: Paul Davey <Paul.Davey@alliedtelesis.co.nz>
-To: "andrew@lunn.ch" <andrew@lunn.ch>
-CC: "daniel@makrotopia.org" <daniel@makrotopia.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] net: phy: aquantia: Add mdix config and
- reporting
-Thread-Topic: [PATCH net-next] net: phy: aquantia: Add mdix config and
- reporting
-Thread-Index: AQHbIDd1vnPqHtWCDUqpqXlBKr+obbKJ/EYAgADIhgCAAAeHgIAAKh8AgADzOQCAHLoMgA==
-Date: Wed, 6 Nov 2024 00:01:33 +0000
-Message-ID: <c69eb0c307346bce51ccb3f990a26d79e942c9e2.camel@alliedtelesis.co.nz>
-References: <20241017015407.256737-1-paul.davey@alliedtelesis.co.nz>
-	 <ZxD69GqiPcqOZK2w@makrotopia.org>
-	 <4e8d02f84d1ae996f6492f9c53bf90a6cc6ad32e.camel@alliedtelesis.co.nz>
-	 <ec453754-3474-4824-b4e3-e26603e2e1d8@lunn.ch>
-	 <858331af57bd1d9ab478c3ec6f5ecd19dcd205ef.camel@alliedtelesis.co.nz>
-	 <804d1825-8630-4421-925c-16e8f41f9a58@lunn.ch>
-In-Reply-To: <804d1825-8630-4421-925c-16e8f41f9a58@lunn.ch>
-Accept-Language: en-NZ, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <654828E68D8F704CB88BF6DE9867E615@atlnz.lc>
-Content-Transfer-Encoding: base64
+	s=arc-20240116; t=1730851995; c=relaxed/simple;
+	bh=CNR2huwrYRnkZkg1Y2KQ6f/0LqS79jl9D+/e9mWZXtI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=KHkb57SxCafphCvjSd20m/w/rW4zPfmfPXbjYUmt101P3gX5hA0eR2gVZCIIW3c73ryLThj01gVy5yF+fIHZGWSkMGzOMSlhrUf+ksTA8AYYs+IUeJg+Yn34sRyTITXEKKQQvZGWfTvRaQKvXNaOsGtK5wMos2aqan42eZs+wTE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nULiOJcC; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e4c2e36daso215566b3a.0;
+        Tue, 05 Nov 2024 16:13:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730851994; x=1731456794; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=hSHh/lcKGOgr8zxmK/zCU2mZe0FLf7CPP8bNcIOgH7Y=;
+        b=nULiOJcCd6MyTxBgXNLxKFc34c2sm1t9P8U19LbUJnn9R/6sn1jKlx0BCwWmWMBusK
+         aJ2icPgi0YWUFTyHKlT3ROR5/cTA+bgeCBPijh0/0q/7hA6bqDDQV/WmzZdt+Zyjnff0
+         b/ZA12sif5nC871dYPmT7T7yrym18C0Hu6KyONz3mumY2xiGuffeslgrvnH0H1klacss
+         PvdmFgKx7stDr8gg1fcgInoqzeW6Et6l0I2NYYaLOBft7TYoL38n89b1eVirR814J5QV
+         HBmMLjiFkbhMFT9mf5I15/M+4CVQH98inXcrjAf+66VUyHOZKoHHAGakX0gLGEz4EZRN
+         npZQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730851994; x=1731456794;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hSHh/lcKGOgr8zxmK/zCU2mZe0FLf7CPP8bNcIOgH7Y=;
+        b=j+qW76gTNGGEVVSvH6w0HVLp+KahTaapYu22831BOh69dOIB5IFSHnRnLoCMXBCFvk
+         8S39wWLedFFzv1d/WpiNf5M41GoGbkZHRItNKi+W5RiQsjJzKnZ7HubwMW6AMPCDw+BB
+         LprnzCoBdgBK7YP8znnJ1BQsapfuNNCtZsMqPHbbYrQz3IhGq431YSfgs1Z1CJz7v0Te
+         iAtDB93AZKDuYo+EDh9ZF8RfMo6Ji8cknw2g++q+nsV9yAN8yJH/6u59Slbh9L96vgKv
+         jNOfN7UHejWBnIu5ZPKvAO1KMObof5JMzLafCKcOu/bp+yxr0ctNE+8Z+n7BP6vNquuR
+         hjDg==
+X-Forwarded-Encrypted: i=1; AJvYcCUAf8jxo2XfqNMJzlaRXXyU0hWsaDgLU8Vu/DHd18zJ3xxIIEtLCa4WhzS10fP00QB9HihE+fwnAdVXW6k=@vger.kernel.org, AJvYcCWYprl9thrdL9E1CqLrASe7PFsdJ+NfYD1mWgZr8BbvysiigjSjSG6xdpxhczqRbBsuQ0AtiYoXyDt6et+O0T+6@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyb4MnXvYdFdB9C8TqegTSMo5pUWFVw14Nlw+yyvir9C0W7GphE
+	kBI8dAqfF/c4Z5fZH6luKyyDEJLaPdYk/boReREIpBZuKDqgCI0=
+X-Google-Smtp-Source: AGHT+IGmPWhJM7VO0SLjP2BiRkNrCtx9Le577yZKZryuMH4iFiui4HVC7vlqk2UJzw4Q2xl8R5JU7w==
+X-Received: by 2002:a05:6a20:4322:b0:1d9:dc8:b80d with SMTP id adf61e73a8af0-1dc03386112mr883285637.20.1730851993392;
+        Tue, 05 Nov 2024 16:13:13 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7ee452991f0sm9704517a12.13.2024.11.05.16.13.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 16:13:12 -0800 (PST)
+Date: Tue, 5 Nov 2024 16:13:12 -0800
+From: Stanislav Fomichev <stfomichev@gmail.com>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Shuah Khan <shuah@kernel.org>, Yi Lai <yi1.lai@linux.intel.com>
+Subject: Re: [PATCH net-next v1 6/7] net: fix SO_DEVMEM_DONTNEED looping too
+ long
+Message-ID: <Zyq0mBCJEBQ2s2Jm@mini-arch>
+References: <20241029205524.1306364-1-almasrymina@google.com>
+ <20241029205524.1306364-2-almasrymina@google.com>
+ <ZyJDxK5stZ_RF71O@mini-arch>
+ <CAHS8izNKbQHFAHm2Sz=bwwO_A0S_dOLNDff7GTSM=tJiJD2m0A@mail.gmail.com>
+ <ZyJLkn3uM1Qz6NZn@mini-arch>
+ <CAHS8izMWbcKSr3uOVWQDmo5=aQvFdcD6o_myz1bw=a1rzrJE_A@mail.gmail.com>
+ <ZyqSHic5hW_vi47l@mini-arch>
+ <CAHS8izOdqnXytOOyg+EATHg5ON+eBDn4qe=L3a3YKd5tzdqV0A@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=ca1xrWDM c=1 sm=1 tr=0 ts=672ab1ea a=Xf/6aR1Nyvzi7BryhOrcLQ==:117 a=xqWC_Br6kY4A:10 a=3pNRdvVr4ggA:10 a=IkcTkHD0fZMA:10 a=VlfZXiiP6vEA:10 a=odbzjE8n2zWvv2dw42YA:9 a=3ZKOabzyN94A:10 a=QEXdDO2ut3YA:10
-X-SEG-SpamProfiler-Score: 0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izOdqnXytOOyg+EATHg5ON+eBDn4qe=L3a3YKd5tzdqV0A@mail.gmail.com>
 
-T24gRnJpLCAyMDI0LTEwLTE4IGF0IDE5OjIwICswMjAwLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
-DQo+ID4gV2hlbiBJIHdhcyB3b25kZXJpbmcgaWYgbWRpeF9jdHJsIGJlaW5nIHNldCB0byBFVEhf
-VFBfTURJX0FVVE8NCj4gPiBzaG91bGQNCj4gPiBiZSByZWplY3RlZCBpZiBhdXRvLW5lZ290aWF0
-aW9uIGlzIGRpc2FibGVkIEkgbWVhbnQgZm9yIHRoaXMNCj4gPiBzcGVjaWZpYw0KPiA+IFBIWSBk
-cml2ZXIgYXMgaXQgZGVmaW5pdGVseSBkb2VzIG5vdCBhcHBlYXIgdG8gcGVyZm9ybSB0aGUgQXV0
-bw0KPiA+IE1ESS9NREktWCByZXNvbHV0aW9uIHNvIGlmIHRoZSB3aXJpbmcvY2FibGluZyBiZXR3
-ZWVuIGFuZC9vciBjb25maWcNCj4gPiBvbg0KPiA+IHRoZSBsaW5rIHBhcnRuZXIgZG9lcyBub3Qg
-bWF0Y2ggdGhlIGRlZmF1bHQgKE1ESSBJIHRoaW5rIGZvciB0aGUNCj4gPiBBUVIpDQo+ID4gdGhl
-biB0aGUgbGluayB3aWxsIG5vdCBlc3RhYmxpc2guDQo+IA0KPiBXZWxsLCBhcyB5b3Ugc2F5LCAx
-MDAwQmFzZS1UIG5lZWRzIGF1dG9uZWcsIHNvIHRoZXJlIGlzIG5vIG5lZWQgdG8NCj4gcmVqZWN0
-IEVUSF9UUF9NRElfQVVUTyBmb3IgdGhhdCBsaW5rIG1vZGUgYW5kIGFib3ZlLg0KPiANCj4gSXQg
-c2VlbXMgbGlrZSBmb3IgbG93ZXIgc3BlZWRzLCBFVEhfVFBfTURJX0FVVE8gY291bGQgd29yayB3
-aXRob3V0DQo+IGF1dG9uZWcuIFNvIHRvIG1lLCB0aGlzIHZhbGlkYXRpb24gaXMgbm90IGEgY29y
-ZSBmZWF0dXJlLCBidXQgcGVyDQo+IFBIWS4NCj4gUGxlYXNlIGZlZWwgZnJlZSB0byBpbXBsZW1l
-bnQgaXQgZm9yIHRoaXMgUEhZLg0KPiANCkhhdmluZyBicmllZmx5IHRyaWVkIGl0IHRoZSBfcGh5
-X3N0YXRlX21hY2hpbmUgY29kZSBkb2VzIG5vdCBsaWtlDQpwaHlfY29uZmlnX2FuZWcgcmV0dXJu
-aW5nIGVycm9ycywgc28gSSB3aWxsIGxlYXZlIHRoZSBjb2RlIGFzIGlzLg0KDQpJIHdpbGwgc3Vi
-bWl0IGEgdjIgcGF0Y2ggc29vbiB3aXRoIHRoZSBvdGhlciByZXF1ZXN0ZWQgY2hhbmdlcy4NCg0K
-VGhhbmtzLA0KUGF1bA0K
+On 11/05, Mina Almasry wrote:
+> On Tue, Nov 5, 2024 at 1:46 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
+> > > > > Also, the information is useless to the user. If the user sees 'frag
+> > > > > 128 failed to free'. There is nothing really the user can do to
+> > > > > recover at runtime. Only usefulness that could come is for the user to
+> > > > > log the error. We already WARN_ON_ONCE on the error the user would not
+> > > > > be able to trigger.
+> > > >
+> > > > I'm thinking from the pow of user application. It might have bugs as
+> > > > well and try to refill something that should not have been refilled.
+> > > > Having info about which particular token has failed (even just for
+> > > > the logging purposes) might have been nice.
+> > >
+> > > Yeah, it may have been nice. On the flip side it complicates calling
+> > > sock_devmem_dontneed(). The userspace need to count the freed frags in
+> > > its input, remove them, skip the leaked one, and re-call the syscall.
+> > > On the flipside the userspace gets to know the id of the frag that
+> > > leaked but the usefulness of the information is slightly questionable
+> > > for me. :shrug:
+> >
+> > Right, because I was gonna suggest for this patch, instead of having
+> > a separate extra loop that returns -E2BIG (since this loop is basically
+> > mostly cycles wasted assuming most of the calls are gonna be well behaved),
+> > can we keep num_frags freed as we go and stop and return once
+> > we reach MAX_DONTNEED_FRAGS?
+> >
+> > for (i = 0; i < num_tokens; i++) {
+> >         for (j ...) {
+> >                 netmem_ref netmem ...
+> >                 ...
+> >         }
+> >         num_frags += tokens[i].token_count;
+> >         if (num_frags > MAX_DONTNEED_FRAGS)
+> >                 return ret;
+> > }
+> >
+> > Or do you still find it confusing because userspace has to handle that?
+> 
+> Ah, I don't think this will work, because it creates this scenario:
+> 
+> - user calls SO_DEVMEM_DONTNEED passing 1030 tokens.
+> - Kernel returns 500 freed.
+> - User doesn't know whether:
+> (a)  The remaining 530 tokens are all attached to the last
+> tokens.count and that's why the kernel returned early, or
+> (b) the kernel leaked 530 tokens because it could not find any of them
+> in the sk_user_frags.
+> 
+> In (a) the user is supposed to recall SO_DEVMEM_DONTNEED on the
+> remaining 530 tokens, but in (b) the user is not supposed to do that
+> (the tokens have leaked and there is nothing the user can do to
+> recover).
+
+I kinda feel like people will still write code against internal limits anyway?
+At least that's what we did with the internal version of your code: you
+know that you can't return more than 128 tokens per call
+so you don't even try. If you get an error, or ret != the expected
+length, you kill the connection. It seems like there is no graceful
+recovery from that?
+
+Regarding your (a) vs (b) example, you can try to call DONTNEED another
+time for both cases and either get non-zero and make some progress
+or get 0 and give up?
+
+> The current interface is more simple. The kernel either returns an
+> error (nothing has been freed): recall SO_DEVMEM_DONTNEED on all the
+> tokens after resolving the error, or,
+> 
+> the kernel returns a positive value which means all the tokens have
+> been freed (or unrecoverably leaked), and the userspace must not call
+> SO_DEVMEM_DONTNEED on this batch again.
+
+Totally agree that it's more simple. But my worry is that we now
+essentially waste a bunch of cpu looping over and testing for the
+condition that's not gonna happed in a well-behaved applications.
+But maybe I'm over blowing it, idk.
+
+(I'm gonna wait for you to respin before formally sending acks because
+ it's not clear which series goes where...)
 
