@@ -1,154 +1,115 @@
-Return-Path: <netdev+bounces-142220-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142221-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CB8A9BDE22
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:03:51 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id F15AD9BDE39
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:14:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A2A81C21F56
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 05:03:50 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7324BB236DA
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 05:14:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3882191499;
-	Wed,  6 Nov 2024 05:03:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B8F419048D;
+	Wed,  6 Nov 2024 05:14:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCv2xM3K"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fv0XXUyS"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pg1-f175.google.com (mail-pg1-f175.google.com [209.85.215.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7924190696;
-	Wed,  6 Nov 2024 05:03:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 272E22F50;
+	Wed,  6 Nov 2024 05:14:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730869421; cv=none; b=lnvxwnLxQLTkWNmoRo1UhReNKoICi8s1EkRh92wg8YLm0Uf8zfM7GxVo3FD9vJqpXDp60YrVqqQGssLJbz8NJ4ln7+EJWja5Ltt5oPrOPnXpRy3y0akMuL5ZmcvwSXgJYJZlDEusEWYxbwZrbfN1KXZRMsFykRgiEhSdLJcCrJc=
+	t=1730870092; cv=none; b=d88HoKScG89AAYWVKHmJqPYMHC2808f87mtZBRtWLgcnRdi74rsSgQqMA10v1vDJQbo2KGcwnGsC5FJz7YdgeBjJECbWNwveojZj8gZaxytZO7QpCHzDp5CE4YaaD/2+/pXyMu2FG8VgwEAvXMD9AGStg+Y12LSf2kbUx5pIvPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730869421; c=relaxed/simple;
-	bh=Lz0dx6DXASIIdjcXuzaj6FZKZ861s3Djg0W7klVVcM0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D2nPQSotlbfGW3hFWreAmfOiyH1mrRqcvdM7PNsam/5rTYH/psSm0vAzCmMS6EQPRiTb8EJxKAJRt8Ddbzc/QLOg1S5cOmAVek6SRdzzGGi6jea+GrZMoB0pP1EQrU0B6ckchMAf+T2phgG1qIpiNx/UcvIPBtYyI/djDvCCZz0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCv2xM3K; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 172B3C4CECD;
-	Wed,  6 Nov 2024 05:03:40 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730869421;
-	bh=Lz0dx6DXASIIdjcXuzaj6FZKZ861s3Djg0W7klVVcM0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=DCv2xM3Ko0rBUz7+v+M5YnaAfixXYSPkHyWp+b8YOcScdtTpGc6pXObAIbdX00X0l
-	 x/iqEUUpJQhnp15nmKdtwkB5enb+o+kiP4X7UvRubBa71owQ8RsyAVZe1RQ//iy5Ls
-	 8T02g5OaYza+xdd/f8AWJNhcQxbfn64/EYUpaBc2+ZLgyyNxlnZzRiwV9mlRXPx/HJ
-	 +eJ9G7D2QKGCHkNKEGU9L/y3hoEFqlUSFgdc2qzNapbwFxYgtfAeXssuBoasHBKpAp
-	 Y0QDA/2jWKq71zRD7l8oI6U7bj6TlekaAtVNSNCrLbE7WK7GC86uXEwQf6FjXiq3Ar
-	 +BKAz8LovEaVQ==
-Date: Tue, 5 Nov 2024 21:03:38 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
- bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
- edumazet@google.com, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
- m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
- willy@infradead.org, willemdebruijn.kernel@gmail.com, skhawaja@google.com,
- Martin Karsten <mkarsten@uwaterloo.ca>, "David S. Miller"
- <davem@davemloft.net>, Simon Horman <horms@kernel.org>, David Ahern
- <dsahern@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH net-next v6 2/7] net: Suspend softirq when
- prefer_busy_poll is set
-Message-ID: <20241105210338.5364375d@kernel.org>
-In-Reply-To: <20241104215542.215919-3-jdamato@fastly.com>
-References: <20241104215542.215919-1-jdamato@fastly.com>
-	<20241104215542.215919-3-jdamato@fastly.com>
+	s=arc-20240116; t=1730870092; c=relaxed/simple;
+	bh=aOi00T4++Of1PkyHaGLAlfMIrUpqwxl1+VaBGZflApQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Cc8EqPzXWxgJ+pSQnIAXwQ3qRzdauO+Z5/I1nRtg2zQBngBJK+ZXnB4/I+TYOEceb5vXjVGpFvjLreQHiXT7Xj+sZM/T17qcCV8G1yv3ypwsv9f+6R3yeC3zXvtelpd2hrxxqda4wzw7zhXZMrSxADuBcmbBW1qX7OMw0ekvqOI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fv0XXUyS; arc=none smtp.client-ip=209.85.215.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pg1-f175.google.com with SMTP id 41be03b00d2f7-7ee11ff7210so4453406a12.1;
+        Tue, 05 Nov 2024 21:14:51 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730870090; x=1731474890; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MO2PJn9Xpr13NQes/KiEu9oCINUR98kGVv3+sk3Ibk4=;
+        b=fv0XXUySz78B+aLkNBBv/ywGqxeSFQMaqyceO5ERPcofGOGE4pu7uIckLkU4rbwTbg
+         rRLOYkEogKF4bcniHvSW8PMO8R6uZm+JAr3JoxamJTZxJzCb3FOJgBthRmkngwFFdKou
+         QhunG2G5HKyU2w+S92ssJBhrOucD3PO0jTXarxGQxU/DBhMv8lsWtA56QO1w1XgCFs3X
+         W2v1AdTGx36bgmdYKIRQCJNvTVU8EZ3qMcc3JZxfwZAcTPpmX0ZcIUZ5H3KjOe9cseL7
+         xYu306EHbBWYxsUJYtyM0zSsZ96Q3DuqG6xsQpSHRSMmYalYATCUIOQMsZ1+o9rkRX/2
+         SuXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730870090; x=1731474890;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MO2PJn9Xpr13NQes/KiEu9oCINUR98kGVv3+sk3Ibk4=;
+        b=BHyiWx5BUPO7fLROj+mEXVMqAYp/4RQHUYt/eylHpCSwCddWNpkvUyJWAjmP119Kz6
+         r6Iezp7j3z2ZYmOWMZ6UBfqznnN5w4ryiriZx9soA3A8cJJXLdBS8T0wI8941zlkldZD
+         Z8FW81siAUHluyETeMeA5FGnjPf531/xgdFvSQ0SqO2cYTWYCb5/3jjOceJCTeO8oVld
+         75b77+36IAgv2VmCHdQg95MWgfI5LHRCgcYkgQwp9oixzh/g8TPCGCvrziNzl7dNKvNY
+         vOeA+YF+A0xTUOQAqwhH8Vn8J8YWr9YiDpSQXGIp3DBbRJRlF++uywaY7+yEey/MHt1D
+         j/2A==
+X-Forwarded-Encrypted: i=1; AJvYcCV9zgxFC+/A8XWNB9JXYVbRi5u+3Wv1kksdGV/0l+k61n35kDibRA1UUDTDPZ6T51a1iJFukTp4pDzmyYE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY0cpDPxQWXYqtUyKCOZfegAaAfnzCJNK8SnQ2cXWc0t6RhONN
+	OltfCnmUlirpLOyr9Kqfs4AbCtMAp8rLTfp9BDw2JiRKnrGQJBx72ezvfaSsbCA=
+X-Google-Smtp-Source: AGHT+IEFZOFJF55lJ2hFw1E02SJoWAMuuNfZ/Ht9/kHayjriut68adNfkSl4k2DkoyOeFrtf8I6Ewg==
+X-Received: by 2002:a05:6a20:748d:b0:1db:f00e:2dfe with SMTP id adf61e73a8af0-1dbf00e2e10mr7570260637.39.1730870090122;
+        Tue, 05 Nov 2024 21:14:50 -0800 (PST)
+Received: from fedora.dns.podman ([43.228.180.230])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211056ee3e4sm87988945ad.3.2024.11.05.21.14.45
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 21:14:49 -0800 (PST)
+From: Hangbin Liu <liuhangbin@gmail.com>
+To: netdev@vger.kernel.org
+Cc: Jay Vosburgh <jv@jvosburgh.net>,
+	Andy Gospodarek <andy@greyhouse.net>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Simon Horman <horms@kernel.org>,
+	linux-kernel@vger.kernel.org,
+	Hangbin Liu <liuhangbin@gmail.com>
+Subject: [PATCHv3 net 0/2] bonding: fix ns targets not work on hardware NIC
+Date: Wed,  6 Nov 2024 05:14:40 +0000
+Message-ID: <20241106051442.75177-1-liuhangbin@gmail.com>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Mon,  4 Nov 2024 21:55:26 +0000 Joe Damato wrote:
-> From: Martin Karsten <mkarsten@uwaterloo.ca>
-> 
-> When NAPI_F_PREFER_BUSY_POLL is set during busy_poll_stop and the
-> irq_suspend_timeout is nonzero, this timeout is used to defer softirq
-> scheduling, potentially longer than gro_flush_timeout. This can be used
-> to effectively suspend softirq processing during the time it takes for
-> an application to process data and return to the next busy-poll.
-> 
-> The call to napi->poll in busy_poll_stop might lead to an invocation of
+The first patch fixed ns targets not work on hardware NIC when bonding
+set arp_validate.
 
-The call to napi->poll when we're arming the timer is counter
-productive, right? Maybe we can take this opportunity to add
-the seemingly missing logic to skip over it?
+The second patch add a related selftest for bonding.
 
-> napi_complete_done, but the prefer-busy flag is still set at that time,
-> so the same logic is used to defer softirq scheduling for
-> irq_suspend_timeout.
-> 
-> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Co-developed-by: Joe Damato <jdamato@fastly.com>
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Tested-by: Joe Damato <jdamato@fastly.com>
-> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> ---
->  v3:
->    - Removed reference to non-existent sysfs parameter from commit
->      message. No functional/code changes.
-> 
->  net/core/dev.c | 17 +++++++++++++----
->  1 file changed, 13 insertions(+), 4 deletions(-)
-> 
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 4d910872963f..51d88f758e2e 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -6239,7 +6239,12 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
->  			timeout = napi_get_gro_flush_timeout(n);
->  		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
->  	}
-> -	if (n->defer_hard_irqs_count > 0) {
-> +	if (napi_prefer_busy_poll(n)) {
-> +		timeout = napi_get_irq_suspend_timeout(n);
+v3: use ndisc_mc_map to convert the mcast mac address (Jay Vosburgh)
+v2: only add/del mcast group on backup slaves when arp_validate is set (Jay Vosburgh)
+    arp_validate doesn't support 3ad, tlb, alb. So let's only do it on ab mode.
 
-Why look at the suspend timeout in napi_complete_done()?
-We are unlikely to be exiting busy poll here.
-Is it because we need more time than gro_flush_timeout
-for the application to take over the polling?
+Hangbin Liu (2):
+  bonding: add ns target multicast address to slave device
+  selftests: bonding: add ns multicast group testing
 
-> +		if (timeout)
-> +			ret = false;
-> +	}
-> +	if (ret && n->defer_hard_irqs_count > 0) {
->  		n->defer_hard_irqs_count--;
->  		timeout = napi_get_gro_flush_timeout(n);
->  		if (timeout)
-> @@ -6375,9 +6380,13 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
->  	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
->  
->  	if (flags & NAPI_F_PREFER_BUSY_POLL) {
-> -		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
-> -		timeout = napi_get_gro_flush_timeout(napi);
-> -		if (napi->defer_hard_irqs_count && timeout) {
-> +		timeout = napi_get_irq_suspend_timeout(napi);
+ drivers/net/bonding/bond_main.c               | 18 +++-
+ drivers/net/bonding/bond_options.c            | 85 ++++++++++++++++++-
+ include/net/bond_options.h                    |  1 +
+ .../drivers/net/bonding/bond_options.sh       | 54 +++++++++++-
+ 4 files changed, 155 insertions(+), 3 deletions(-)
 
-Even here I'm not sure if we need to trigger suspend.
-I don't know the eventpoll code well but it seems like you suspend 
-and resume based on events when exiting epoll. Why also here?
-
-> +		if (!timeout) {
-> +			napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
-> +			if (napi->defer_hard_irqs_count)
-> +				timeout = napi_get_gro_flush_timeout(napi);
-> +		}
-> +		if (timeout) {
->  			hrtimer_start(&napi->timer, ns_to_ktime(timeout), HRTIMER_MODE_REL_PINNED);
->  			skip_schedule = true;
->  		}
+-- 
+2.46.0
 
 
