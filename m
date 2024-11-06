@@ -1,170 +1,77 @@
-Return-Path: <netdev+bounces-142485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 68E959BF513
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:18:12 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A679BF56C
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:37:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EF8F28826D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:18:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 37FF82881FE
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:37:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96586206E92;
-	Wed,  6 Nov 2024 18:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2698E20898F;
+	Wed,  6 Nov 2024 18:36:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ai2G6Qr+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="FO3X2hSM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f180.google.com (mail-qt1-f180.google.com [209.85.160.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D8F206E69;
-	Wed,  6 Nov 2024 18:18:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF9F4208989;
+	Wed,  6 Nov 2024 18:36:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730917088; cv=none; b=ov6kvdbXI+23g2eLA4Tk5LvL3ndl9oFiF/enNiD5C2ErFkbesCsM7xPIsYYEvMc4PeIZwFu/H+wfC0vFll0JMig9adC3G44Vb6mUmWY4OBjIQbkxiMHJ43Ap7+t7UKG0qZODRhPCQf8ChculkyrVOWvKSWzYyfMkoDd+nNppimM=
+	t=1730918200; cv=none; b=P8+WZsY1k/udjSlbwQhobNgDlLykVS/LPj1rdj/XkvakE/H8JCzR8UGrVj1uHZi+CPKG+tAWlUHp+M/OsXtvz9GpeshwgUNfMi4Y97JMM86DD85tTUWKgOojO7UjDFr/SPK68Ni4gfx+mjlydrSQQDLj/q38sozOfkJwPNmqZHk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730917088; c=relaxed/simple;
-	bh=JOqzxSLeHWD0n7cfTKM/sSVhPy5OUMMkSiGbDTUDwEg=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qi7G8oQYKqHmXpP15UFPQYMzZiGZAhMDSzBwLiv3dUutLkgpUTCbMKh14YIKzNSlqO7qWNtF1+W6tn2WqMtW0Z7zWCkXsR5PGz8krPJXUh7QtDr7pvZb2YzxOmiQMYA7G3+106HJOomVa6rb4/crsLBHVJWuX0PGAX1IX0n8ZdY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ai2G6Qr+; arc=none smtp.client-ip=209.85.160.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qt1-f180.google.com with SMTP id d75a77b69052e-460b2e4c50fso702781cf.0;
-        Wed, 06 Nov 2024 10:18:06 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730917085; x=1731521885; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wQwj/GWrTbMpB2h+csAzG3gf0YiNR+Wiy6DXEYYkKXY=;
-        b=ai2G6Qr+EAGWmaamyvc8iGjPbv7UaLcEg7apI6IJ2PceWcFN2BGiQRuzmtsUEcvEL8
-         gRwOF4g2FRNT1Dg3lpgfs5mbhYpCUHsT5eppefr5gzTjSVcJ1Vd/sUdkXnIKL67C49kZ
-         3THM3LY135EhMwOcKxcF/Yw09iIjk+puF4wP/JCk/PbOeIOfuau6kWfuFbeiaZEGv8vi
-         I2Q9ngnvAYGyA1AUkxk6vRH5gJZq4YdNucnein0Ug6sjtuHPOqdrrnbvJ/QKv+wxyHXA
-         7qW4ejhA662cCXK7Txi1vCtVa4rA4wyhubdrmELX0UYIbWPTl1yf4tG18nXmRYm1/JQV
-         jZVg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730917085; x=1731521885;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:feedback-id:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wQwj/GWrTbMpB2h+csAzG3gf0YiNR+Wiy6DXEYYkKXY=;
-        b=vy1BW9i1GxSdFvyYsxrWleXtxMfuxggpUrthm9abiQFXvRo3IVv5vj7N9ztEXkt9H4
-         ulJJl7HPJVpWElM9KbASS8X1YswOgHpcyHXMWV/f0h6gF1X5NDw35J/aml1U8ZG8upOC
-         yI1Cb5HSaM7sGNwXtMyGm2HYWFY+D5vaBMJhJ+d8KJ7eNjQxjTQFO59a0SHdx8yVUXko
-         RnxBYdOUhbRDwfmV0fUIpEgcXYOLmtXlRS3LldR2PboT9RgnHS0Dr7wysKzrjB5insHJ
-         ioJnSiJB2RAwLDvIlDcKHw6JFBWqrElboxQxvirz0OLI6v9eN5PNXjGbv0YOVJXNWHit
-         b+zg==
-X-Forwarded-Encrypted: i=1; AJvYcCVC6jN5MmDdhzxMg0Z3st9qxN0fG2FrRXDT8/09wW0P5CgTdEUp1uxO+h3YkFltfZH2QieOItg0jmEtkGrMHYk=@vger.kernel.org, AJvYcCWgu8r3CDf/KPmEGAHVvVFz+bxxPwdmskz/tSTo+VwpKDg6Qs7s2wGqvFXlV5nzsx2PYyqBL588@vger.kernel.org, AJvYcCXDWaO2MbjvjO6t0r8AAPyzgkjPbqLcEvD9k/o1TjG76REmvg6iGLBDFdaDzq3MfsnV2G20Ow94+kvBn+8=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKDzKAYmzN1zZPtKabax5ITE5+sSupUfYo7AtrhEzf3tSEKCwU
-	VzuM18hG93nH815dEizk31hpnIU3Wez9nfgcS5S5Tk+Yh2U0YwBl
-X-Google-Smtp-Source: AGHT+IHbd+iWdp0AZ8TZAWXa3c1ZwOS+r/2JbXndDVsoOY5g+73G1rcnWC8pcgBWuIsZYJpy7tWZaA==
-X-Received: by 2002:a05:622a:58d:b0:460:8e3b:6790 with SMTP id d75a77b69052e-4613c1a74d0mr605708961cf.48.1730917085472;
-        Wed, 06 Nov 2024 10:18:05 -0800 (PST)
-Received: from fauth-a2-smtp.messagingengine.com (fauth-a2-smtp.messagingengine.com. [103.168.172.201])
-        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462f18fd044sm10816751cf.10.2024.11.06.10.18.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 10:18:05 -0800 (PST)
-Received: from phl-compute-06.internal (phl-compute-06.phl.internal [10.202.2.46])
-	by mailfauth.phl.internal (Postfix) with ESMTP id 900D31200066;
-	Wed,  6 Nov 2024 13:18:04 -0500 (EST)
-Received: from phl-mailfrontend-01 ([10.202.2.162])
-  by phl-compute-06.internal (MEProxy); Wed, 06 Nov 2024 13:18:04 -0500
-X-ME-Sender: <xms:3LIrZ5iOrx11gTigcukRQ9RCdoyQ5QS-SUMptEgYY2SqHgf8L7yK_A>
-    <xme:3LIrZ-Bi8unVoVxdPGOUiydSiOZODHd6xhK2ITehAzXrgG6d0iYQuLjzzz10A2mpR
-    LJHpON45QmX5U54FQ>
-X-ME-Received: <xmr:3LIrZ5Gx6b7BZ6D4jaUhOg1QKwHvkEif7xgKZakAwmVOvr882lDxWocY4F0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrtddvgddutdelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
-    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnh
-    htshculddquddttddmnecujfgurhepfffhvfevuffkfhggtggujgesthdtredttddtvden
-    ucfhrhhomhepuehoqhhunhcuhfgvnhhguceosghoqhhunhdrfhgvnhhgsehgmhgrihhlrd
-    gtohhmqeenucggtffrrghtthgvrhhnpeehudfgudffffetuedtvdehueevledvhfelleei
-    vedtgeeuhfegueevieduffeivdenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
-    epmhgrihhlfhhrohhmpegsohhquhhnodhmvghsmhhtphgruhhthhhpvghrshhonhgrlhhi
-    thihqdeiledvgeehtdeigedqudejjeekheehhedvqdgsohhquhhnrdhfvghngheppehgmh
-    grihhlrdgtohhmsehfihigmhgvrdhnrghmvgdpnhgspghrtghpthhtohepvddupdhmohgu
-    vgepshhmthhpohhuthdprhgtphhtthhopehfuhhjihhtrgdrthhomhhonhhorhhisehgmh
-    grihhlrdgtohhmpdhrtghpthhtoheprghnnhgrqdhmrghrihgrsehlihhnuhhtrhhonhhi
-    gidruggvpdhrtghpthhtohepfhhrvgguvghrihgtsehkvghrnhgvlhdrohhrghdprhgtph
-    htthhopehtghhlgieslhhinhhuthhrohhnihigrdguvgdprhgtphhtthhopehjshhtuhhl
-    thiisehgohhoghhlvgdrtghomhdprhgtphhtthhopehssghohigusehkvghrnhgvlhdroh
-    hrghdprhgtphhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdr
-    ohhrghdprhgtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehruhhsthdqfhhorhdqlhhinhhugiesvhhgvghrrdhkvghrnhgvlhdrohhr
-    gh
-X-ME-Proxy: <xmx:3LIrZ-RMmPNreF3mQ-rm_liTbjo8K15_Ha_ng8vPkpcCnxDqxjlj_A>
-    <xmx:3LIrZ2xZYWPV9VsH7ErEuXbJe71BCIt_Rt7sVypp4JZddLcxj_5liw>
-    <xmx:3LIrZ063QF9vCZSMWjv3QVLsYSZnXYMdDOXWcsnk0PyKXsoa5DBzVg>
-    <xmx:3LIrZ7yxw8WgkFqywVN1zpxISPc7_sgTv93r1RO766Uxv648ZOZCKQ>
-    <xmx:3LIrZ-hhAvDFEDwuCXnVU61RZ_ke3YwDGwvkfoKWlIwAbl_434YbyEik>
-Feedback-ID: iad51458e:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 6 Nov 2024 13:18:04 -0500 (EST)
-Date: Wed, 6 Nov 2024 10:18:03 -0800
-From: Boqun Feng <boqun.feng@gmail.com>
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-Cc: anna-maria@linutronix.de, frederic@kernel.org, tglx@linutronix.de,
-	jstultz@google.com, sboyd@kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
-	andrew@lunn.ch, hkallweit1@gmail.com, tmgross@umich.edu,
-	ojeda@kernel.org, alex.gaynor@gmail.com, gary@garyguo.net,
-	bjorn3_gh@protonmail.com, benno.lossin@proton.me,
-	a.hindborg@samsung.com, aliceryhl@google.com, arnd@arndb.de
-Subject: Re: [PATCH v5 6/7] rust: Add read_poll_timeout functions
-Message-ID: <Zyuy25viG51DDRk7@Boquns-Mac-mini.local>
-References: <20241101010121.69221-1-fujita.tomonori@gmail.com>
- <20241101010121.69221-7-fujita.tomonori@gmail.com>
+	s=arc-20240116; t=1730918200; c=relaxed/simple;
+	bh=w1LGkQLJAkhFFIWWR2Rj+kYY6tXw++E2KX/1UqbMa2U=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=LB2bXF1ERbWmRc2kWh+kB3A5pMgHT+d2OTy7Tq+3DPZD5xsSIbahBF57rCfQPQ7a8ggu+EhOHaTYHV38BMCtkB8muP+mCfaLJn3pBSOnUSUG+NS1igI1Sl+BhhiVt9FgV1ITgTyv5bpXmgYmANakWPcCFLqxHYzUNT0x+DVW5Qs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=FO3X2hSM; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CD01C4CEC6;
+	Wed,  6 Nov 2024 18:36:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730918199;
+	bh=w1LGkQLJAkhFFIWWR2Rj+kYY6tXw++E2KX/1UqbMa2U=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=FO3X2hSM9mV40CF0N17r3ps/mo0IScu98QLTAEf6BDzVdY92YE7l9iqndAiyuwxFy
+	 zWezaEge0VhI4xTAtFBh0N+9AnNNah7cZpm2zaxY73SZatX+AUphq2yxnHPA9O/QHh
+	 FBsiTOPGWtJFrNTBP8ugEB1O7joUN/0kXO2ChfmGzwY/9NAFH4Rf+D042dolc5vdyc
+	 7wlKOteN320PM4RBFf6QZp9WOk70OgP/w0pwuXv1/q4Z5u5iFqsoS+VqSyfBzAd3m5
+	 juHnpf3zVulbElGANxgMTNQiWjX41thv6yAcRlcXZkDD0bYqQpqtyqoaLGDeTMptbp
+	 H9P3en/clcLjg==
+Date: Wed, 6 Nov 2024 10:36:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jason Wang
+ <jasowang@redhat.com>, netdev@vger.kernel.org, Eugenio =?UTF-8?B?UMOpcmV6?=
+ <eperezma@redhat.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, virtualization@lists.linux.dev
+Subject: Re: [PATCH net-next v1 0/4] virtio_net: enable premapped mode by
+ default
+Message-ID: <20241106103638.5844fe15@kernel.org>
+In-Reply-To: <20241106041545-mutt-send-email-mst@kernel.org>
+References: <20241029084615.91049-1-xuanzhuo@linux.alibaba.com>
+	<20241104184641.525f8cdf@kernel.org>
+	<20241106023803-mutt-send-email-mst@kernel.org>
+	<1730882783.399233-1-xuanzhuo@linux.alibaba.com>
+	<20241106041545-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101010121.69221-7-fujita.tomonori@gmail.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 01, 2024 at 10:01:20AM +0900, FUJITA Tomonori wrote:
-[...]
-> @@ -44,6 +45,7 @@
->  pub mod page;
->  pub mod prelude;
->  pub mod print;
-> +pub mod processor;
->  pub mod sizes;
->  pub mod rbtree;
->  mod static_assert;
-> diff --git a/rust/kernel/processor.rs b/rust/kernel/processor.rs
-> new file mode 100644
-> index 000000000000..eeeff4be84fa
-> --- /dev/null
-> +++ b/rust/kernel/processor.rs
+On Wed, 6 Nov 2024 04:16:07 -0500 Michael S. Tsirkin wrote:
+> I thought it can but can't remember why now. OK, nm then, thanks!
 
-What else would we put into this file? `smp_processor_id()` and IPI
-functionality? If so, I would probably want to rename this to cpu.rs.
-
-Regards,
-Boqun
-
-> @@ -0,0 +1,13 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +
-> +//! Processor related primitives.
-> +//!
-> +//! C header: [`include/linux/processor.h`](srctree/include/linux/processor.h).
-> +
-> +/// Lower CPU power consumption or yield to a hyperthreaded twin processor.
-> +///
-> +/// It also happens to serve as a compiler barrier.
-> +pub fn cpu_relax() {
-> +    // SAFETY: FFI call.
-> +    unsafe { bindings::cpu_relax() }
-> +}
-> -- 
-> 2.43.0
-> 
-> 
+FWIW (I think there was confusion in earlier discussions) we do merge
+net into net-next once a week. So we can always apply stuff to net,
+and then depending patches to net-next within a week. Just for future
+reference, this patch IIUC we just leave be.
 
