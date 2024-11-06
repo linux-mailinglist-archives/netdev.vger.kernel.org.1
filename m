@@ -1,115 +1,117 @@
-Return-Path: <netdev+bounces-142336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80C179BE52D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:05:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E11C69BE547
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:11:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28FCEB23EAC
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:05:51 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CB42B24A35
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:11:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65F851DE886;
-	Wed,  6 Nov 2024 11:05:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A571DE4D4;
+	Wed,  6 Nov 2024 11:11:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="qF341/Hk"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="drSOzEtd"
 X-Original-To: netdev@vger.kernel.org
-Received: from forward500b.mail.yandex.net (forward500b.mail.yandex.net [178.154.239.144])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BFD811DACBB;
-	Wed,  6 Nov 2024 11:05:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.144
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669631DE3C3
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 11:11:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730891136; cv=none; b=YlnnylvnGkxPDJd9yG0DSFrL/zHXEiY5odd3G5Xq3yfLhw+bwP1bUYaH8/dGXc/hl37nBwR/BS9Nr7Z8kH9uDBA1lMh2se+/84OzNDKCetsTMorDX41BeGFkSjqu6NNTeiz3NmZ0RE/mNDRBt191w0iC3ze1F4DBgIa8m05aqhw=
+	t=1730891461; cv=none; b=evR4JLWOdWcEGUBSW9O+3+cm0DLbAPULAQZV9skPGc6v0SxtUu9NB5GY1JVLsOaMN39yCm1BiVh/iiGalQ5JvhKGYGZAyKchy8EOeEYtXZdnMb7KevKILMzsuqg5y8RWEcv0hgSC8talhi2TyeJ628ZETSsbY4s/ydflU7YvX2E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730891136; c=relaxed/simple;
-	bh=B6S1bomOAKY+z5+R9WRl8rS6u0qIub9hlsk1Cj6m8Lg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hg/p/WLmsPuJN0xSVBeNgtjD51x9BHHNUQM0vlVT5Tg8BhzzvdLZFHPN31GPIxOoy/1YC1rvcUCcBVMG9JHZE1Icnu3RhB2X2q+eqihGraspJ7e2WyK9Qr8bWAz27UhL/9XwpwCgqAOiAz9c0G9is+jYc0iBNzXfc48xomg8Kso=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=qF341/Hk; arc=none smtp.client-ip=178.154.239.144
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
-Received: from mail-nwsmtp-smtp-production-main-31.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-31.sas.yp-c.yandex.net [IPv6:2a02:6b8:c08:de2c:0:640:e39b:0])
-	by forward500b.mail.yandex.net (Yandex) with ESMTPS id 4E282617BF;
-	Wed,  6 Nov 2024 14:05:25 +0300 (MSK)
-Received: by mail-nwsmtp-smtp-production-main-31.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id N5fsD12qAOs0-k2u4RpDK;
-	Wed, 06 Nov 2024 14:05:24 +0300
-X-Yandex-Fwd: 1
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
-	t=1730891124; bh=B6S1bomOAKY+z5+R9WRl8rS6u0qIub9hlsk1Cj6m8Lg=;
-	h=In-Reply-To:To:From:Cc:Date:References:Subject:Message-ID;
-	b=qF341/HkHzu/ppAB5D7Mw1Ollgylyowhknntncth+2FLWqAFM2V7n5kMvd+kYWsBR
-	 OJRec/vECHC1uPTk2bQJg7CF/jZis66WG7LZzfYxfFPMaVasfWCesKBS6yZ8DOkOrI
-	 ikzHod5wssXyNAsCwjgxsbYOIB3xvNq6KvxEhSXs=
-Authentication-Results: mail-nwsmtp-smtp-production-main-31.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
-Message-ID: <2c8a2598-6185-46b0-8869-186ea46a3325@yandex.ru>
-Date: Wed, 6 Nov 2024 14:05:23 +0300
+	s=arc-20240116; t=1730891461; c=relaxed/simple;
+	bh=rBtPz5gG0rZNJwXUgyLqZ4dCXI2IdSj8GTwcAnATtVA=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=dhW1t6zwGa36VMbfps2ytbkYGor7JNxM92wtBmiCH7+fz8hVap43W2gVeBUHBtCHyS8I0PtxSy1np9r4UfRGVgXTEQhciYC4bdGkggb0yhIwL2gabXqY3CEmVT3bJVRWKDjroou0J2zhv7DvqFrGtrmjzLZuM4uriQQHYHURAqY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=drSOzEtd; arc=none smtp.client-ip=209.85.219.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e28fe3b02ffso5788609276.3
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 03:11:00 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730891459; x=1731496259; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=l5+8CEF8PGrkpuoZv09AoSuECiDMudOpJZwqH9DLQBI=;
+        b=drSOzEtdIxeTSrX7HDaTExWznXs5M+LjYMlLF81564X2AQGyRhr0AH3qTYY1FonWCD
+         92gNh4YLL5G4YnPHB219qwJWUEDP4ikgFlSMnLKtcIgrYRdUNfwCKxYVbYQU7paXQq0D
+         X1QJvpJPXbBUbPc6McU8gFcpt07zlJDc8J3yaIVkgTbuach5b739mSK2KEeFvIDSVn4K
+         iMS4nkinX7if9AD+gZ4Aab2oKhOCTRm/aQgz2bx1RmLvmJuo80wLyHedcjYN8QNmzf9v
+         e7o7sWOzvejuiisWTJ3V/8zWXUo6gboLHEz9zq9aoNrQ3/Xk6BZmd1E4IwWINsEA+mOf
+         RS0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730891459; x=1731496259;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l5+8CEF8PGrkpuoZv09AoSuECiDMudOpJZwqH9DLQBI=;
+        b=JqQRl1ASlzmT+RQeOqX1EW5qNbXA8VVIeNhAJEZPcXgaOZEVqPme5U4JGmCc0q8hAI
+         2xtS2tE1OWoi+iLyU0VBbqow4yH42H7KvSbKqBU0mO7hePAHGF7R4rg1G6TlRwB0lLcw
+         rI/wvXLATbm0sB+Rzkca8vsOTqafcFDKho84beY1H6eYusMwWoimKGdh+KtafG9slUXK
+         VyOmdtKY0d66NDGNqTkAiqdhRo//RWUMPPOxhRBIq+0LkKwwhFa5hygs6Najoz0vCw4j
+         rASkYKmpo8AM5kh9xKRy0ahJzUy/hQYp9cL25BFR/mV3Pw9e+h4/CpcTTR4X5M7+HJYB
+         WlVQ==
+X-Gm-Message-State: AOJu0Ywrg0DbY0K0xIhdiYTDxHjNbcvUP4zcmRGgmjDQ3d4WGSec22yN
+	YwIFk4JdqxnOgu5UKdcAfzgfr6CP34SHE/7h1iV3uTHEBnlOqs7JIcUxYqN9WlMfErbzd0eCEtx
+	dOkjafKZjMqIGr+fqEyYrJBSTmwY=
+X-Google-Smtp-Source: AGHT+IE1sZpZbBwhB3vfOzE1oN0wLqnxcz1wrnDPvGC+Rpg+zy6pts2342ur4zYg+bx25KKddKleEKnBLApVYSKJgu8=
+X-Received: by 2002:a05:690c:dd2:b0:64b:5cc7:bcbc with SMTP id
+ 00721157ae682-6ea52520bb1mr244627657b3.32.1730891459226; Wed, 06 Nov 2024
+ 03:10:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2] can: fix skb reference counting in j1939_session_new()
-Content-Language: en-MW
-To: Oleksij Rempel <o.rempel@pengutronix.de>, Jiri Pirko <jiri@resnulli.us>
-Cc: Robin van der Gracht <robin@protonic.nl>,
- Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
- netdev@vger.kernel.org, lvc-project@linuxtesting.org,
- syzbot+d4e8dc385d9258220c31@syzkaller.appspotmail.com
-References: <20241105094823.2403806-1-dmantipov@yandex.ru>
- <ZypJ4ZnR0JkPedNz@nanopsycho.orion> <Zys6KGmEWVnwidLb@pengutronix.de>
-From: Dmitry Antipov <dmantipov@yandex.ru>
-Autocrypt: addr=dmantipov@yandex.ru; keydata=
- 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
- A/UwwXBRuvydGV0=
-In-Reply-To: <Zys6KGmEWVnwidLb@pengutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241028073015.692794-1-wojackbb@gmail.com> <20241031185150.6ef22ce0@kernel.org>
+In-Reply-To: <20241031185150.6ef22ce0@kernel.org>
+From: =?UTF-8?B?5ZCz6YC86YC8?= <wojackbb@gmail.com>
+Date: Wed, 6 Nov 2024 19:10:48 +0800
+Message-ID: <CAAQ7Y6an8ZkxYpJehd8cBRPHjqyQofc6A4QdPzM_dhh1Sn0nng@mail.gmail.com>
+Subject: Re: [PATCH] [net] net: wwan: t7xx: Change PM_AUTOSUSPEND_MS to 5000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com, 
+	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com, 
+	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com, 
+	loic.poulain@linaro.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	linux-arm-kernel@lists.infradead.org, angelogioacchino.delregno@collabora.com, 
+	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On 11/6/24 12:43 PM, Oleksij Rempel wrote:
+If the PCIE connection remains in the D0 state, It will consume more power.
 
-> Hm... looks the there is more then one refcounting problem at this
-> point. skb_queue is set from 3 different paths, with resulting 3 different
-> refcount states:
+Receiving or sending data will cause PCIE to change D3 Cold to D0 state.
 
-I'll take a look; anyway I would prefer "one patch per one problem" approach.
-
-Dmitry
-
+Jakub Kicinski <kuba@kernel.org> =E6=96=BC 2024=E5=B9=B411=E6=9C=881=E6=97=
+=A5 =E9=80=B1=E4=BA=94 =E4=B8=8A=E5=8D=889:51=E5=AF=AB=E9=81=93=EF=BC=9A
+>
+> On Mon, 28 Oct 2024 15:30:15 +0800 wojackbb@gmail.com wrote:
+> > Because optimizing the power consumption of t7XX,
+> > change auto suspend time to 5000.
+> >
+> > The Tests uses a script to loop through the power_state
+> > of t7XX.
+> > (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
+> >
+> > * If Auto suspend is 20 seconds,
+> >   test script show power_state have 0~5% of the time was in D3 state
+> >   when host don't have data packet transmission.
+> >
+> > * Changed auto suspend time to 5 seconds,
+> >   test script show power_state have 50%~80% of the time was in D3 state
+> >   when host don't have data packet transmission.
+>
+> I'm going to drop this from PW while we wait for your reply to Sergey
+> If the patch is still good after answering his questions please update
+> the commit message and resend with a [net-next] tag (we use [net] to
+> designate fixes for current release and stable)
 
