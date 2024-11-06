@@ -1,234 +1,183 @@
-Return-Path: <netdev+bounces-142405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 71A499BEEEE
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:22:28 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDD4C9BEEF8
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:25:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3178F286468
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:22:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A80E9286150
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:25:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 429991DE2CF;
-	Wed,  6 Nov 2024 13:22:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE2CC1DF97A;
+	Wed,  6 Nov 2024 13:25:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="je+W0iyN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="YUrGuBIJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.20])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0D791CCB5F;
-	Wed,  6 Nov 2024 13:22:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=198.175.65.20
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730899346; cv=fail; b=pwxC1n7wLuJ6fwyncMtFBQ4QNEKUGDQ8XS7rGyy4eP7iOqfQ2s9rhBH/fqQr2YDTGARiodBbWfcJrPL1QoCa/3VOIgrApNXqneTEPZG/k3s2v04fLkVbVfzR8cNTXrR6EziLjXCce77uiIqCtPRyQnJvM12oCV4MCvefV++i8uI=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730899346; c=relaxed/simple;
-	bh=ONsyEEdHNryYd8MO2+8s7WIU/hlOKt6LoEv7IlCf7Z0=;
-	h=Subject:To:CC:References:From:Message-ID:Date:In-Reply-To:
-	 Content-Type:MIME-Version; b=EckUgFPLA4kISag4LPmLdPweqk47PAX7BNY/Tj2Lzu+JwC+1WuMj2wy7mwAN4lG2XaLLLqMCbyQDB4m6zX+u97bOuUnU92FVQNah9AkSQ+9Tf/T71+PWl8TsCccMygg1/Lg9QFrILO0XXttabI4L0NsYV3ZsY1mK74NG4z5bLxU=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=je+W0iyN; arc=fail smtp.client-ip=198.175.65.20
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730899345; x=1762435345;
-  h=subject:to:cc:references:from:message-id:date:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ONsyEEdHNryYd8MO2+8s7WIU/hlOKt6LoEv7IlCf7Z0=;
-  b=je+W0iyNkkFc/sM8AuLjSXUVFKfyscpqF12aqcKC0SdrW7V6+M3CCu+b
-   TS0zEvQSQWaG9oUQ07EV0XlpedzY8iOU1Pt35xSNowAr9fNsvnO2WHNOv
-   WVRFa4uPhUxwYbKG9PcXB8IJYDXqRa31P+qqoLHhfMB1pNMGouK64NzbS
-   QKQeuCcHC9wlh0FfOgDvj9YKvFDLTHcd9G7ACuUDnzc7Kx2cqJmlVD+KG
-   10y0bpjSH5oZaTemplSYvY3jVrAXixrdGBeK4Yb7ZU4rwpJ5FK/vnSVB2
-   u75EtczCwpmN9dLGKPC6AfpPdG/+/8ejRr8teYuMTBdXEe4LaBR8YXNm5
-   Q==;
-X-CSE-ConnectionGUID: my/FB0h+RiGizsPu2i70vg==
-X-CSE-MsgGUID: Ji6A0EtiR8K8K21YnlqUZA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="30465940"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="30465940"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by orvoesa112.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 05:22:24 -0800
-X-CSE-ConnectionGUID: x4815wZfQ96ZUF2QCvobUA==
-X-CSE-MsgGUID: /9oqWVUrRwSQ6oMhjxPDrQ==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
-   d="scan'208";a="85373231"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orviesa008.jf.intel.com with ESMTP/TLS/AES256-GCM-SHA384; 06 Nov 2024 05:22:23 -0800
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Wed, 6 Nov 2024 05:22:22 -0800
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39 via Frontend Transport; Wed, 6 Nov 2024 05:22:22 -0800
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.47) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.39; Wed, 6 Nov 2024 05:22:22 -0800
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=X2WHwmN8maG29rdhu7x9sHX3wTFgCa1bdizkXlPojvwXT1B++Yy4nDDs+sBdMO3qw4b+Kh0cmqWvCLD8+TuOj7yidMMRs5GmAOiLnBHYDiR3fOUQebuhw2MSMOuQY5kWrPzOe2n3jWac/A60jEdClddH1zO94rTtRlqhgGE3mc0sfDOB0FUzlePeRXAnp0TwU66z9G7ixLVen3ErHBgkC1x7ruHbGozCbGLs4jWjx6nqT59pQD5B0CxQkLpf6aO/OBs/YQg24/De0yyjL7QLUS+VWlaZHdKv4Ojpwv+fCGolXEE4u8j26QVolGXAdxHWP1m2ZVYvH96Xv3Xl4dMlBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=bIYS6I+WWM1vVh1Tu4irMCfKv+43wJmJRstyWMlIryY=;
- b=jXHb/8GliRT+do1TKuwqSbMJ9nA4B4uIdySRlkjxk4ZoxI9a7oO8NVi2aOwnmTHgMSOI1NnlPooAm6DkhEOqzDsggvQfJ+X1pq7kymjZCaQu7gzyuOalVbgjdTzI8LOlI5cAUv+AQ/KDRdbLAqDUyZfkBfoWD+h3/vlaYMlBbjAfNnla1tPNYSh2X/FgQ8nRuhSpM7Bm+BQDh1QLmArhF2OOFifV2cEpFttXqWk9vtWWUO5WLkIxQ4nzspb+fkuxn2/I48epUG0K4onil3JLOhZB8GLXV5gQFd7pjESOiTO/2T1vpaipoIEmCHV0Vz9wkSWW/pjei98wRqoYYZquXw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BY5PR11MB4194.namprd11.prod.outlook.com (2603:10b6:a03:1c0::13)
- by CY5PR11MB6139.namprd11.prod.outlook.com (2603:10b6:930:29::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Wed, 6 Nov
- 2024 13:22:20 +0000
-Received: from BY5PR11MB4194.namprd11.prod.outlook.com
- ([fe80::9d17:67a6:4f83:ef61]) by BY5PR11MB4194.namprd11.prod.outlook.com
- ([fe80::9d17:67a6:4f83:ef61%6]) with mapi id 15.20.8114.015; Wed, 6 Nov 2024
- 13:22:19 +0000
-Subject: Re: [Intel-wired-lan] [PATCH v4 net-next 1/4] igc: Fix passing 0 to
- ERR_PTR in igc_xdp_run_prog()
-To: Yue Haibing <yuehaibing@huawei.com>, <anthony.l.nguyen@intel.com>,
-	<przemyslaw.kitszel@intel.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <hawk@kernel.org>, <john.fastabend@gmail.com>,
-	<maciej.fijalkowski@intel.com>, <vedang.patel@intel.com>,
-	<jithu.joseph@intel.com>, <andre.guedes@intel.com>, <horms@kernel.org>,
-	<jacob.e.keller@intel.com>, <sven.auhagen@voleatech.de>,
-	<alexander.h.duyck@intel.com>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20241026041249.1267664-1-yuehaibing@huawei.com>
- <20241026041249.1267664-2-yuehaibing@huawei.com>
-From: Avigail Dahan <Avigailx.dahan@intel.com>
-Message-ID: <bc46b503-df05-6c33-9246-870cff7ad233@intel.com>
-Date: Wed, 6 Nov 2024 15:22:09 +0200
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.7.1
-In-Reply-To: <20241026041249.1267664-2-yuehaibing@huawei.com>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: TL2P290CA0020.ISRP290.PROD.OUTLOOK.COM (2603:1096:950:3::9)
- To BY5PR11MB4194.namprd11.prod.outlook.com (2603:10b6:a03:1c0::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F55A646;
+	Wed,  6 Nov 2024 13:25:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730899507; cv=none; b=XDDZof6xvzVlfsDvv9m9AgyYE39uN9UB9uSCt6tvElmLfBDxUK3KSa7kxqkPXEm1/FhyRqd3gAEWMN9RQi5JKhRw9AuTLnJpON5kF1vlu0cgxcyebIFi0SK/cIBIvUXe2pB/R0lP5PU2M8IFCQg3LY8LfG79sraDpcP0TwYdOss=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730899507; c=relaxed/simple;
+	bh=116sGymRPGxitIATLh63Hu4bt7vFtHZYdaTU44MGasg=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Yug4kI16puH31boI/uUhUd5YeYNkx0HZQnmbFiryZd17AojrDA0Y479aIFyVfiIPWwjJmTFmtev7Fi+f6yr0zuAQ1GgpQ9vKeDh43hGltNch5gE7SvsiVuhBQvfxd3Qd1M5rj5RR/cqYyXfDgr8bTJdkTUl6gY9Ef8MAK+4Y86U=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=YUrGuBIJ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A80FC4CED3;
+	Wed,  6 Nov 2024 13:25:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730899507;
+	bh=116sGymRPGxitIATLh63Hu4bt7vFtHZYdaTU44MGasg=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=YUrGuBIJv1qi8hzM0QUpV/DuyXkCd2ksGSx6fggOz070whoF7aDf3hk4NyKamwJya
+	 DgoLj27XHpgNGbwBk+PV8DRnLSAy5btBnSSBvDD65Oi3IYhJvwIL0axKwBS7ui4iNR
+	 yE5r8ZDlsTGGRary7720MS/x7WG0P4Bw3SEKLWfHEOblNyXtN9O6Wy7nVW7BYyH/Kf
+	 6MUtKypDaBNjUoeOL9FdEniDj6xB1HiJSGqbZ2IzwXBSZ3W8ucCd0noTi3QH1cVu6i
+	 4Qe8Xd1k65bwKMvXXHVhN8IzWdJE2OwCii+u8KG1fmPGvrc2R7ms4rH3SbXIIJb1On
+	 lk12pztt8QeSw==
+Message-ID: <18ba4489-ad30-423e-9c54-d4025f74c193@kernel.org>
+Date: Wed, 6 Nov 2024 14:25:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BY5PR11MB4194:EE_|CY5PR11MB6139:EE_
-X-MS-Office365-Filtering-Correlation-Id: e9a42f31-449f-4270-882f-08dcfe660a80
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|376014|7416014|921020;
-X-Microsoft-Antispam-Message-Info: =?utf-8?B?VUlZTHpUOEVZU29BSUt1VnBOZXlnM3lKVjA5SWZ2UUljTFJyVVBLTUlFeklm?=
- =?utf-8?B?cFZISHBaZThTbVBHMWZ5NFExdk54NnBsTHNMUG5DWWVORWRMWHMxdUtYditO?=
- =?utf-8?B?S0tjd2VRUHlwY1NIaithS0FnTUkyQXhMa3RRSTNXOFdIbnpIZGJkRXlLRjI3?=
- =?utf-8?B?a0VYM254S0U0ekRxOGIzRDI1MXlnZGhiY2ZvZzdqMm5QbTY4RkhwNGErU2Na?=
- =?utf-8?B?SWZVYVo1SHR0NUtQNUZRcTFoNmV1MkZSRnRwU3B1azRsdlFSR0FtOWU4UlNa?=
- =?utf-8?B?Tm01QUt1YlBVV25BZm1LYkRBbmIxcit2Yzl3cEt5Vjd3MjRDUDIzcVArSkc4?=
- =?utf-8?B?SW5uU2xuUTUwbGRFcmlpb25ONjFPMHQ0Tm1MOCt5U1cxZ1hWemVxMkxabWor?=
- =?utf-8?B?Mmx5YjdEVWVJVExJVGJHbW1YUTFSQlFOdFl2M0FpM1VmMEwvRTZ1QXhCbnVL?=
- =?utf-8?B?bzNzazBjbHJaRjIrbUdPdmNJdDdxVkd2SXJobS9xb1VQeSs5Vjl3d25FWWZZ?=
- =?utf-8?B?SWRMVW1SWWlQdGU2M3JMRjd0MUNKQXA2RlJEeHhaNXhEQnlhVmVJakM3WEVm?=
- =?utf-8?B?Ylhxd2hmRjhrU2dZMEtpT090Q1VXSXE1M1hzWWg1WkpPVFlBSXlsSmJZZzdi?=
- =?utf-8?B?VmJWeC9xYnN6b21OMHdHRFJSbGpRNUd6R2RxUVlZWmFHMXY4SE1Pb3lYVHZw?=
- =?utf-8?B?V2hwMVcvMWx4eGFFQWJCMjB3M3NsTjZrd1FlalFlWklHdGFodXUrS0VMZlho?=
- =?utf-8?B?alZPSTRrK1BORlo2OWhJcXVTOVhKNytLM0hkaUdXV1VKZ3JsMFZwSDlVSHFy?=
- =?utf-8?B?YnNYQWxNMk13YkhoTWVUMmxkTSswUFE4YnZERXdwWVdxSytJcFArcC9yeEFG?=
- =?utf-8?B?OUlMNjZFZGZFNlVhQmRCZGVVbzhQL3M4QnlteWJ3Zk5BK2JJUW4xWHl1Wk56?=
- =?utf-8?B?N1RFQ0gwMG5sMy9GMS9BaHl3Qk1mNUNVU0JsL3NaS3RxU3JBWktZcFlHZDVX?=
- =?utf-8?B?MElzQTVxZGZMcDZVakJaRmZxYmNpNC9kSFVlby8wejNJOWsrZ0ZKSWxETFVP?=
- =?utf-8?B?b2U2YjNmWXRneThHbi81YVVsa2MwYUhqUkROTHdVVW5RWmNZV3lyUEg5N09a?=
- =?utf-8?B?YXpxK09UbGVXdkFUR0MwdkgrZTJTWTZmUTR3eVdiQWpOYXAvMDlLbmdkMUxQ?=
- =?utf-8?B?WEZiMmRjcGdmalU3TU9xS2l3ZEdMK3czb2RVeXBrODlUaUtZYW1UV0RSOHJk?=
- =?utf-8?B?am91eDJSVGQ1UWt2VUh2NnJBazhoZkVmZGRaM1hvVWo3d1d5L1kxQXZaWDgv?=
- =?utf-8?B?ZnJZUHo5VzY3RFZEWnlzakRqMWZyYlo3Q0J5RXBiQVhPODRxZkExdjVHMTJI?=
- =?utf-8?B?enhRU0N1UDdZT3BtMzhUSm1rRFh6M1IzSW85SW1ZVDBvOC9XRFpLSUIvMGwr?=
- =?utf-8?B?c3hISDZSTjNaZTExeDZPb0RBTDFaK29pQzR5TE1mVU5oN21xMWFCLzVKZGR2?=
- =?utf-8?B?U0JLUW5oQnRGaTBkWVdDYlpqQ3BhWEtGRFpwSTROU21RZ3ZjQjEyVU9aaWpk?=
- =?utf-8?B?YXRxaTBlbzlaTDdTNFlIZSthTWxqcXA1SFFhZzVVSU51ckwyZU51R2J6VU9K?=
- =?utf-8?B?MzJpc0hYNXY0VUwrSk9pa1VaS1dhYjhFaXlXZytGWTJBV2ttdkUyTVF6amxC?=
- =?utf-8?B?UUFjcVVVZTNVQXh3VG9ibGo2VkpSNjY2dDEvY0FqaUViMHE3dVlLUkU2bk15?=
- =?utf-8?B?UjRXS2txM1QzNm9BYXpsR2ljbnB1ZG4yYk94b0o5UzhxVk9rOEtmSGZQZmVm?=
- =?utf-8?Q?GnNw4kEW7YcEqfQ7sgP7hXEe1IDn7HiNUn5iA=3D?=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR11MB4194.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(376014)(7416014)(921020);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eFI1R2tOWXQ2VnJ5ZDlvb3A4aU0vWk1RNG9Yb0w5NStrU01FMkFEMEtEM0FC?=
- =?utf-8?B?TDVCcjh3UTVpVXV3bW1BSi9QYUtxK25mdnR4aXBUYldac2VKWlVGS1p4Uzhq?=
- =?utf-8?B?cDR0VmVrcFVNa3JZM2tlZ3FkZWdOUmZIL0JSWjRwSDJ6eDhnMGZQRkU4SWxr?=
- =?utf-8?B?ZGkwWjBET3RpVUVxNmlCdGF5RXdiYVRIbDdHTXVJQzZKTURlcHFZSnp1cnp4?=
- =?utf-8?B?MkJPbGttWmhJY3l0N1ErTTBvU0tDNW5KY3VBWlNCVExuaUVwZEhzL3VVS2xn?=
- =?utf-8?B?WkJuOFVJWnNBdXhBZnNiTVNSYlZza1J4UEYrMU5YYzdUaVpiaExzM3FHSDFu?=
- =?utf-8?B?TWt1emJkYXJrTklNSlpxSVd1eWo5cWYrZ2wrNXRjSXFkQWU2Sit1bktDdnVh?=
- =?utf-8?B?ZEd6ZlVFd2F4NlFMSlpXTGdRSnEra1ZNVzM2Q3RoRFhoemhtSC81SDgzcGhI?=
- =?utf-8?B?ZmFKNXphMnFDOTF4ZDhxQU9ERENRcThhaEVXU3FsTXNHdTJjbkltOVlZN1lU?=
- =?utf-8?B?ckxMbXZFdlBYTFU5VHI2eEtlZnRIbENFMys1ekd0TkNrZzAwMWNNc0lXT2Ew?=
- =?utf-8?B?cW1uUElhUHBYbndmNkg1YS91VFB1VExxUzdObEEzL2dyTnYyVmorOXpJY0N2?=
- =?utf-8?B?aEdtUFlTdSs4WU03MTFhWXRzMWQ5akJNMHZ6UXIvb1g5SUMxRWFIRVlLOHRa?=
- =?utf-8?B?R0RDQytQazQxMEJHVmJ0bzAwY1YvVUFobWFtbXRXdXB0RVlENVZjSFlDUHdk?=
- =?utf-8?B?K1pxSHFjSXBCU1lveHRnMEVDVDY1ZjhVYlhhbWhYc2xOU0E4ZGpHeUJ6RWZ4?=
- =?utf-8?B?Q04vTEN4bTlRdkluV1JxeDF1bWh3bDljazgwb1Zyb0pLOTdqNFZPQU9NckVX?=
- =?utf-8?B?STVldTF3MEx5ZVpLNkpRZTRKUFFtVXlTT3puSVp6NTk5a2Z5cmlQOUVyUGFE?=
- =?utf-8?B?V2d3L2FENS9hcVhuRE5uQ0RHdGVEdU1vVDJhbFZJOW81Z2NPZk9oa1BMa1c2?=
- =?utf-8?B?MndUSEFBbGo4dVAvcEV1U2s1MFRmVWtmdnF4dFdVb3NGTGw1bzZpS2tWSHV0?=
- =?utf-8?B?ZWpJRWpMMWYxY3FIRXlvQWZyUG4ycXBidmF1ZUtNa0tkQzBvTkRoTFdzTGF2?=
- =?utf-8?B?aEhFbnJpcUtSdjZtbVJKc3RYc0JxeGdpdWNSVktJelZZMGlxMzhiRlNUQXIv?=
- =?utf-8?B?b3lNcHFmSG00VzJLdFdQcTR5QlhReFRiWHFFWkpibEpGd1I1QlZSaW1XUWJu?=
- =?utf-8?B?M0pSamJPZnlmOEtZRTZaalloVlZHKzU1TDN2WStDamhkYXo5QnNvTzRnRkIz?=
- =?utf-8?B?OVdTNXp4cE0zQXdzSFkzNFhwaVpBUWpFMkZueGRIR2xVYURnVlloZnU3VGtH?=
- =?utf-8?B?ZCtDMVpZZ3FPTHRXV3ZoRFBkRlozV1pseFExS3RVVmNETWJwOGlKL3E0Y1dT?=
- =?utf-8?B?R3N4RkJxclNLMFd5Yms1b0hPZTZJWi92NWFUVGNUNTl6ODZZNE13Y20xSzIx?=
- =?utf-8?B?cmROM2c5Y2UyQk1WUk1CamdIMjZncENTZ2E4M1BReXpCSVFQV2VFOTVhOTM2?=
- =?utf-8?B?c0cyNG1wcUQxTWk5dElpdkdHV3RJNG8renNGbVZYYjJ1L1NrS05FK3M1MURS?=
- =?utf-8?B?MzNOQWhJd21JUTYvbXplY2tuVkUyVitRZVFvWWg5Nm13TjFqWU4zTk0yZ0Vx?=
- =?utf-8?B?Qy9aNkRGTTZUbEVRRndQVldGN3lZSFJLSGtNb0wzRDdOWUpXbUpZYUc3K1BR?=
- =?utf-8?B?eWQ1VGFrMVpQd1ZVeWhwN2xJWGplUjZHaExHMGlZMXBqRmZVTkZpcFlqSGxO?=
- =?utf-8?B?d21Qa0Z2aW55UVZpYmpwRlBQL1R6NUtyai9Dd3dtMVVtbVdPV0cxTmZEZHFI?=
- =?utf-8?B?alJoWjBNcDdrcFJac0pGcWQzSnhBOHpEVVl3ZTgzbU9lMm9FRkViR3FhNDgv?=
- =?utf-8?B?a3RBMFRiZ2VBZ2FFQTJrWXNiR0N6bTVVOWhBb2pISGZUNzIraUZab2Q1VWxQ?=
- =?utf-8?B?YU8yVXorUTQ0OTZzcHRZaFBjem9ReUppQXk5b0hEZzQwaEszUWFxZE1zRENT?=
- =?utf-8?B?WXZJbnppVnluaXE4K1hnSERNTnh2NjBSTXpIRFB5VmhWa1p6cFpQRGdRZ3hk?=
- =?utf-8?B?WnJQalR5NWhGc0R0cU5md3A1K09BREdPblg5TTVzZVhWc21ibUJOd2F1ZUYw?=
- =?utf-8?B?WWc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e9a42f31-449f-4270-882f-08dcfe660a80
-X-MS-Exchange-CrossTenant-AuthSource: BY5PR11MB4194.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Nov 2024 13:22:19.7871
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: SethL3s5wxT197o4exOfBvK/lDeWw6A3iDxXC3sNJhqd+zx6EJug/2WMNgxorogkVhi9kCt4KJO2XjlSiXNsyccgDTSoa6kC81SOC+sCFkc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6139
-X-OriginatorOrg: intel.com
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v3 3/3] page_pool: fix IOMMU crash when driver
+ has already unbound
+To: Yunsheng Lin <linyunsheng@huawei.com>,
+ =?UTF-8?Q?Toke_H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+ davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com
+Cc: zhangkun09@huawei.com, fanghaiqing@huawei.com, liuyonglong@huawei.com,
+ Robin Murphy <robin.murphy@arm.com>,
+ Alexander Duyck <alexander.duyck@gmail.com>, IOMMU <iommu@lists.linux.dev>,
+ Andrew Morton <akpm@linux-foundation.org>, Eric Dumazet
+ <edumazet@google.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ linux-mm@kvack.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+ kernel-team <kernel-team@cloudflare.com>, Viktor Malik <vmalik@redhat.com>
+References: <20241022032214.3915232-1-linyunsheng@huawei.com>
+ <20241022032214.3915232-4-linyunsheng@huawei.com>
+ <dbd7dca7-d144-4a0f-9261-e8373be6f8a1@kernel.org>
+ <113c9835-f170-46cf-92ba-df4ca5dfab3d@huawei.com> <878qudftsn.fsf@toke.dk>
+ <d8e0895b-dd37-44bf-ba19-75c93605fc5e@huawei.com> <87r084e8lc.fsf@toke.dk>
+ <0c146fb8-4c95-4832-941f-dfc3a465cf91@kernel.org>
+ <204272e7-82c3-4437-bb0d-2c3237275d1f@huawei.com>
+Content-Language: en-US
+From: Jesper Dangaard Brouer <hawk@kernel.org>
+In-Reply-To: <204272e7-82c3-4437-bb0d-2c3237275d1f@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
 
+On 26/10/2024 09.33, Yunsheng Lin wrote:
+> On 2024/10/25 22:07, Jesper Dangaard Brouer wrote:
+> 
+> ...
+> 
+>>
+>>>> You and Jesper seems to be mentioning a possible fact that there might
+>>>> be 'hundreds of gigs of memory' needed for inflight pages, it would be nice
+>>>> to provide more info or reasoning above why 'hundreds of gigs of memory' is
+>>>> needed here so that we don't do a over-designed thing to support recording
+>>>> unlimited in-flight pages if the driver unbound stalling turns out impossible
+>>>> and the inflight pages do need to be recorded.
+>>>
+>>> I don't have a concrete example of a use that will blow the limit you
+>>> are setting (but maybe Jesper does), I am simply objecting to the
+>>> arbitrary imposing of any limit at all. It smells a lot of "640k ought
+>>> to be enough for anyone".
+>>>
+>>
+>> As I wrote before. In *production* I'm seeing TCP memory reach 24 GiB
+>> (on machines with 384GiB memory). I have attached a grafana screenshot
+>> to prove what I'm saying.
+>>
+>> As my co-worker Mike Freemon, have explain to me (and more details in
+>> blogposts[1]). It is no coincident that graph have a strange "sealing"
+>> close to 24 GiB (on machines with 384GiB total memory).  This is because
+>> TCP network stack goes into a memory "under pressure" state when 6.25%
+>> of total memory is used by TCP-stack. (Detail: The system will stay in
+>> that mode until allocated TCP memory falls below 4.68% of total memory).
+>>
+>>   [1] https://blog.cloudflare.com/unbounded-memory-usage-by-tcp-for-receive-buffers-and-how-we-fixed-it/
+> 
+> Thanks for the info.
 
-On 26/10/2024 7:12, Yue Haibing wrote:
-> igc_xdp_run_prog() converts customed xdp action to a negative error code
-> with the sk_buff pointer type which be checked with IS_ERR in
-> igc_clean_rx_irq(). Remove this error pointer handing instead use plain
-> int return value to fix this smatch warnings:
-> 
-> drivers/net/ethernet/intel/igc/igc_main.c:2533
->   igc_xdp_run_prog() warn: passing zero to 'ERR_PTR'
-> 
-> Fixes: 26575105d6ed ("igc: Add initial XDP support")
-> Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-> Signed-off-by: Yue Haibing <yuehaibing@huawei.com>
-> Reviewed-by: Simon Horman <horms@kernel.org>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 20 +++++++-------------
->   1 file changed, 7 insertions(+), 13 deletions(-)
-> 
-Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
+Some more info from production servers.
+
+(I'm amazed what we can do with a simple bpftrace script, Cc Viktor)
+
+In below bpftrace script/oneliner I'm extracting the inflight count, for
+all page_pool's in the system, and storing that in a histogram hash.
+
+sudo bpftrace -e '
+  rawtracepoint:page_pool_state_release { @cnt[probe]=count();
+   @cnt_total[probe]=count();
+   $pool=(struct page_pool*)arg0;
+   $release_cnt=(uint32)arg2;
+   $hold_cnt=$pool->pages_state_hold_cnt;
+   $inflight_cnt=(int32)($hold_cnt - $release_cnt);
+   @inflight=hist($inflight_cnt);
+  }
+  interval:s:1 {time("\n%H:%M:%S\n");
+   print(@cnt); clear(@cnt);
+   print(@inflight);
+   print(@cnt_total);
+  }'
+
+The page_pool behavior depend on how NIC driver use it, so I've run this 
+on two prod servers with drivers bnxt and mlx5, on a 6.6.51 kernel.
+
+Driver: bnxt_en
+- kernel 6.6.51
+
+@cnt[rawtracepoint:page_pool_state_release]: 8447
+@inflight:
+[0]             507 |                                        |
+[1]             275 |                                        |
+[2, 4)          261 |                                        |
+[4, 8)          215 |                                        |
+[8, 16)         259 |                                        |
+[16, 32)        361 |                                        |
+[32, 64)        933 |                                        |
+[64, 128)      1966 |                                        |
+[128, 256)   937052 |@@@@@@@@@                               |
+[256, 512)  5178744 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+[512, 1K)     73908 |                                        |
+[1K, 2K)    1220128 |@@@@@@@@@@@@                            |
+[2K, 4K)    1532724 |@@@@@@@@@@@@@@@                         |
+[4K, 8K)    1849062 |@@@@@@@@@@@@@@@@@@                      |
+[8K, 16K)   1466424 |@@@@@@@@@@@@@@                          |
+[16K, 32K)   858585 |@@@@@@@@                                |
+[32K, 64K)   693893 |@@@@@@                                  |
+[64K, 128K)  170625 |@                                       |
+
+Driver: mlx5_core
+  - Kernel: 6.6.51
+
+@cnt[rawtracepoint:page_pool_state_release]: 1975
+@inflight:
+[128, 256)         28293 |@@@@                               |
+[256, 512)        184312 |@@@@@@@@@@@@@@@@@@@@@@@@@@@        |
+[512, 1K)              0 |                                   |
+[1K, 2K)            4671 |                                   |
+[2K, 4K)          342571 |@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@|
+[4K, 8K)          180520 |@@@@@@@@@@@@@@@@@@@@@@@@@@@        |
+[8K, 16K)          96483 |@@@@@@@@@@@@@@                     |
+[16K, 32K)         25133 |@@@                                |
+[32K, 64K)          8274 |@                                  |
+
+
+The key thing to notice that we have up-to 128,000 pages in flight on
+these random production servers. The NIC have 64 RX queue configured,
+thus also 64 page_pool objects.
+
+--Jesper
 
