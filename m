@@ -1,212 +1,100 @@
-Return-Path: <netdev+bounces-142504-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15CA09BF5DC
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:59:28 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7319F9BF5CB
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:57:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C55A3283F61
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:59:26 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 11380B21142
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:57:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 91CBB209F57;
-	Wed,  6 Nov 2024 18:58:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 355AA208219;
+	Wed,  6 Nov 2024 18:57:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="EfWCG2lT"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="l6mg0gNm"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D23D5209697
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 18:58:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 105F0207A1A
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 18:57:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730919537; cv=none; b=g1MjfS9cNoeptk+7aivM/2RXoArxrQR9jIGzUWI4pdSznc8USBc71uIOfmyTEHwnzGOe/AUXDEV9eE2UiB9gwAKMQOlRsBmjuu/xOigRX/QkM6L2gwsMPDJ2XL5i88X6vo4xQt+nO2hekaNO/fTZSX/01yEXM1xybKPlZ32zcfI=
+	t=1730919448; cv=none; b=GnMXzAw/Afa8JlJg0z85Jv9BOpT5VJTXrl0lEXJYdeoNSR4PUrIw1R/orPR2nMjksbKjzNruhUJl5EmJtG5ICWnx1G3Ifecec850yUgSYczIuUVplOMSNxUdiW8HfjjhcsG1eV5x1OAXCBWrnP38JVrDIhq2nIVMSqu0fzN1NFg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730919537; c=relaxed/simple;
-	bh=bt7XG36pg3234h1RpdS9ZPjF7IWhCP4yi40vlCJTGls=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=FYh8L+uh9TtJteFOHgFQI6HroAVEZANbS38C5fTlxNdCER4VXrdGRqDxmHArXCZSj5ck/coNqILAgPXsD2XsbJ3ML2g1nk0gxmOyRg9KiaIIzkR1IXZ/+uNdpAUZhI3h9ej4MaI9R5+55TZrXUZ9K75kyqWjSkglX2NUmhDFHgk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=EfWCG2lT; arc=none smtp.client-ip=192.198.163.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730919536; x=1762455536;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=bt7XG36pg3234h1RpdS9ZPjF7IWhCP4yi40vlCJTGls=;
-  b=EfWCG2lTRxdlbQzy7X8xFy6KB+FsFsa7gyCgMLDf9qPIBZYoyvDrrOS5
-   XAkbUetksPoa15fi1LRzuMTeZ4W1eZZbEX7D1UdSiAqHdpIRh+pARmZvX
-   fnb4976XlONMjZuGj71yF28uK7acu/EWIa82PxmkqcjPuIBldHj9Yk8ej
-   om6SFdEQ9Z4CYlxme06PthLeYscZiGOTjoVqWn7U9hn6OU0IdqM0/WY+c
-   NQJcBGpKGS2thNeVqW1BaQpSh8x6ljQMmvU1SK92i+0KU/O5FoPbu4tLV
-   gcx1i1dzYForV8nivzQbWY2ozvbXOmFqNDWi+6dcKXQbsFHlzjlg3wtU2
-   A==;
-X-CSE-ConnectionGUID: rWnzaxu4TQG64i0xrUZxvQ==
-X-CSE-MsgGUID: 0aUIYvv5Qze9S9UpHQZLSw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="30959485"
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="30959485"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 10:58:52 -0800
-X-CSE-ConnectionGUID: clNr92t9TmaCBl+JWltSiw==
-X-CSE-MsgGUID: ITsS1WUlQ0i0Ncor/HuHYA==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,263,1725346800"; 
-   d="scan'208";a="89813801"
-Received: from timelab-spr11.ch.intel.com ([143.182.136.151])
-  by orviesa004.jf.intel.com with ESMTP; 06 Nov 2024 10:56:42 -0800
-From: Christopher S M Hall <christopher.s.hall@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: david.zage@intel.com,
-	vinicius.gomes@intel.com,
-	netdev@vger.kernel.org,
-	rodrigo.cadore@l-acoustics.com,
-	vinschen@redhat.com
-Subject: [PATCH iwl-net v3 6/6] igc: Add lock preventing multiple simultaneous PTM transactions
-Date: Wed,  6 Nov 2024 18:47:22 +0000
-Message-Id: <20241106184722.17230-7-christopher.s.hall@intel.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241106184722.17230-1-christopher.s.hall@intel.com>
-References: <20241106184722.17230-1-christopher.s.hall@intel.com>
+	s=arc-20240116; t=1730919448; c=relaxed/simple;
+	bh=iaztL4lgaGUJOJlSqhcJDyDAEevvmS1wjxAiJLl1feE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Jq1We1Du3pc+8KvbKyp2aa4ljRUp2qLmBYl0400zCTn0StyEjHQhfJaQuthhb9guYmQYr8jaOuRpJDsyNO5Wo3CrzFxghRLGMqycANfNcdeAPIvfjaLg+QusSF49zX6A0FzwtkTyG2MZKXE1D3E95xefHdru9KnGjs2DXI4mTuI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=l6mg0gNm; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5FA44C4CEC6;
+	Wed,  6 Nov 2024 18:57:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730919446;
+	bh=iaztL4lgaGUJOJlSqhcJDyDAEevvmS1wjxAiJLl1feE=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=l6mg0gNm0iwKFxjL09lsAnrycoLjFHTcq5NyF6TtvTAhiJwMRhLSEIA9k96ejQ+TC
+	 0MFBC1BEjQ2K41XHcGO7tT/HHRPhxEV7LjH+Ljz2LDVHU8+hQyFtU6xJWnV7Gss4XI
+	 kshSOeGMyuPBo/EFbeXQgS19fSSIL9ici17qSH8MZ2GWBlREwKOowCXlfyyVvbP2K2
+	 lw6e2yeAlOUzlm3Ux3FSnC4TajinCTvWISLYGDCP80wtT7y6cMPpm8iiB9WLEiJCxk
+	 d5KFKAs7jLLTPttyEx/VFhzfHKmP8/CSYi2sFINAQXELNkZqf2rC1F9ZPtTst2NyI+
+	 Iwq59erSm2eFQ==
+Message-ID: <ad29493c-9e48-4a94-b327-e47af3a9d137@kernel.org>
+Date: Wed, 6 Nov 2024 11:57:25 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net: ipv4: Cache pmtu for all packet paths if multipath
+ enabled
+Content-Language: en-US
+To: Vladimir Vdovin <deliran@verdict.gg>, Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org, davem@davemloft.net
+References: <20241029152206.303004-1-deliran@verdict.gg>
+ <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+ <ZyJo1561ADF_e2GO@shredder.mtl.com> <D5BTVREQGREW.3RSUZQK6LDN60@verdict.gg>
+ <59b0acc7-196c-4ab8-9033-336136a47212@kernel.org>
+ <D5F9OJYSMFXS.2HOGXNFVKTOLL@verdict.gg>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <D5F9OJYSMFXS.2HOGXNFVKTOLL@verdict.gg>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-Add a mutex around the PTM transaction to prevent multiple transactors
+On 11/6/24 10:20 AM, Vladimir Vdovin wrote:
+> On Tue Nov 5, 2024 at 6:52 AM MSK, David Ahern wrote:
+>> On 11/2/24 10:20 AM, Vladimir Vdovin wrote:
+>>>>
+>>>> Doesn't IPv6 suffer from a similar problem?
+>>
+>> I believe the answer is yes, but do not have time to find a reproducer
+>> right now.
+>>
+>>>
+>>> I am not very familiar with ipv6,
+>>> but I tried to reproduce same problem with my tests with same topology.
+>>>
+>>> ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30003 dport 443
+>>> fc00:1001::2:2 via fc00:2::2 dev veth_A-R2 src fc00:1000::1:1 metric 1024 expires 495sec mtu 1500 pref medium
+>>>
+>>> ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30013 dport 443
+>>> fc00:1001::2:2 via fc00:1::2 dev veth_A-R1 src fc00:1000::1:1 metric 1024 expires 484sec mtu 1500 pref medium
 
-Multiple processes try to initiate a PTM transaction, one or all may
-fail. This can be reproduced by running two instances of the
-following:
+you should dump the cache to see the full exception list.
 
-$ sudo phc2sys -O 0 -i tsn0 -m
+>>>
+>>> It seems that there are no problems with ipv6. We have nhce entries for both paths.
+>>
+>> Does rt6_cache_allowed_for_pmtu return true or false for this test?
+> It returns true.
+> 
+> 
 
-PHC2SYS exits with:
-
-"ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
- fails
-
-Note: Normally two instance of PHC2SYS will not run, but one process
- should not break another.
-
-Fixes: a90ec8483732 ("igc: Add support for PTP getcrosststamp()")
-Signed-off-by: Christopher S M Hall <christopher.s.hall@intel.com>
----
- drivers/net/ethernet/intel/igc/igc.h     |  1 +
- drivers/net/ethernet/intel/igc/igc_ptp.c | 20 ++++++++++++++++++--
- 2 files changed, 19 insertions(+), 2 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/igc/igc.h b/drivers/net/ethernet/intel/igc/igc.h
-index eac0f966e0e4..323db1e2be38 100644
---- a/drivers/net/ethernet/intel/igc/igc.h
-+++ b/drivers/net/ethernet/intel/igc/igc.h
-@@ -319,6 +319,7 @@ struct igc_adapter {
- 	struct timespec64 prev_ptp_time; /* Pre-reset PTP clock */
- 	ktime_t ptp_reset_start; /* Reset time in clock mono */
- 	struct system_time_snapshot snapshot;
-+	struct mutex ptm_lock; /* Only allow one PTM transaction at a time */
- 
- 	char fw_version[32];
- 
-diff --git a/drivers/net/ethernet/intel/igc/igc_ptp.c b/drivers/net/ethernet/intel/igc/igc_ptp.c
-index 343205bffc35..612ed26a29c5 100644
---- a/drivers/net/ethernet/intel/igc/igc_ptp.c
-+++ b/drivers/net/ethernet/intel/igc/igc_ptp.c
-@@ -974,6 +974,7 @@ static void igc_ptm_log_error(struct igc_adapter *adapter, u32 ptm_stat)
- 	}
- }
- 
-+/* The PTM lock: adapter->ptm_lock must be held when calling igc_ptm_trigger() */
- static void igc_ptm_trigger(struct igc_hw *hw)
- {
- 	u32 ctrl;
-@@ -990,6 +991,7 @@ static void igc_ptm_trigger(struct igc_hw *hw)
- 	wrfl();
- }
- 
-+/* The PTM lock: adapter->ptm_lock must be held when calling igc_ptm_reset() */
- static void igc_ptm_reset(struct igc_hw *hw)
- {
- 	u32 ctrl;
-@@ -1068,9 +1070,16 @@ static int igc_ptp_getcrosststamp(struct ptp_clock_info *ptp,
- {
- 	struct igc_adapter *adapter = container_of(ptp, struct igc_adapter,
- 						   ptp_caps);
-+	int ret;
- 
--	return get_device_system_crosststamp(igc_phc_get_syncdevicetime,
--					     adapter, &adapter->snapshot, cts);
-+	/* This blocks until any in progress PTM transactions complete */
-+	mutex_lock(&adapter->ptm_lock);
-+
-+	ret = get_device_system_crosststamp(igc_phc_get_syncdevicetime,
-+					    adapter, &adapter->snapshot, cts);
-+	mutex_unlock(&adapter->ptm_lock);
-+
-+	return ret;
- }
- 
- static int igc_ptp_getcyclesx64(struct ptp_clock_info *ptp,
-@@ -1169,6 +1178,7 @@ void igc_ptp_init(struct igc_adapter *adapter)
- 	spin_lock_init(&adapter->ptp_tx_lock);
- 	spin_lock_init(&adapter->free_timer_lock);
- 	spin_lock_init(&adapter->tmreg_lock);
-+	mutex_init(&adapter->ptm_lock);
- 
- 	adapter->tstamp_config.rx_filter = HWTSTAMP_FILTER_NONE;
- 	adapter->tstamp_config.tx_type = HWTSTAMP_TX_OFF;
-@@ -1181,6 +1191,7 @@ void igc_ptp_init(struct igc_adapter *adapter)
- 	if (IS_ERR(adapter->ptp_clock)) {
- 		adapter->ptp_clock = NULL;
- 		netdev_err(netdev, "ptp_clock_register failed\n");
-+		mutex_destroy(&adapter->ptm_lock);
- 	} else if (adapter->ptp_clock) {
- 		netdev_info(netdev, "PHC added\n");
- 		adapter->ptp_flags |= IGC_PTP_ENABLED;
-@@ -1210,10 +1221,12 @@ static void igc_ptm_stop(struct igc_adapter *adapter)
- 	struct igc_hw *hw = &adapter->hw;
- 	u32 ctrl;
- 
-+	mutex_lock(&adapter->ptm_lock);
- 	ctrl = rd32(IGC_PTM_CTRL);
- 	ctrl &= ~IGC_PTM_CTRL_EN;
- 
- 	wr32(IGC_PTM_CTRL, ctrl);
-+	mutex_unlock(&adapter->ptm_lock);
- }
- 
- /**
-@@ -1255,6 +1268,7 @@ void igc_ptp_stop(struct igc_adapter *adapter)
- 		netdev_info(adapter->netdev, "PHC removed\n");
- 		adapter->ptp_flags &= ~IGC_PTP_ENABLED;
- 	}
-+	mutex_destroy(&adapter->ptm_lock);
- }
- 
- /**
-@@ -1294,6 +1308,7 @@ void igc_ptp_reset(struct igc_adapter *adapter)
- 		if (!igc_is_crosststamp_supported(adapter))
- 			break;
- 
-+		mutex_lock(&adapter->ptm_lock);
- 		wr32(IGC_PCIE_DIG_DELAY, IGC_PCIE_DIG_DELAY_DEFAULT);
- 		wr32(IGC_PCIE_PHY_DELAY, IGC_PCIE_PHY_DELAY_DEFAULT);
- 
-@@ -1317,6 +1332,7 @@ void igc_ptp_reset(struct igc_adapter *adapter)
- 			netdev_err(adapter->netdev, "Timeout reading IGC_PTM_STAT register\n");
- 
- 		igc_ptm_reset(hw);
-+		mutex_unlock(&adapter->ptm_lock);
- 		break;
- 	default:
- 		/* No work to do. */
--- 
-2.34.1
-
+Looking at the code, it is creating a single exception - not one per
+path. I am fine with deferring the ipv6 patch until someone with time
+and interest can work on it.
 
