@@ -1,107 +1,91 @@
-Return-Path: <netdev+bounces-142462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C49D9BF437
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:21:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BC609BF44C
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09923B230A2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:21:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A47EDB2122D
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:30:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C8A206941;
-	Wed,  6 Nov 2024 17:21:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17413206E87;
+	Wed,  6 Nov 2024 17:30:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="q5rXAI1I"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XlRbTOHW"
 X-Original-To: netdev@vger.kernel.org
-Received: from qs51p00im-qukt01080501.me.com (qs51p00im-qukt01080501.me.com [17.57.155.22])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91907206970
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:21:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.22
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCC1A206957
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:30:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730913666; cv=none; b=B9V8kO7c80zOdY1rz2XgYH+53x9X8kfsAYLf1bptqIdsY6J3+ZHD2DMoRXpj4Dnsb9PJBK4YV2ZncurnALku9J52dWyTMLApiajiEV70wdVE8D8n+A4ZVOg+UK3CbiFx5GIx5wZHnHvClWZgcds2jvFq7y9qQFLhxcWU4Jl/uPg=
+	t=1730914224; cv=none; b=CJtaNhuq4OCIzuh+TPoMkOPZSZEWOYWjKDEZn4cYIYOmCWClbdbHMWsPUHx0oGO1zobDO905JqvCyTIuR2yDZaoVU4EZrwQEa0aOp8vz96QUsEf4Nzg9ahggCaH2TGt53oJY1THzPJHJfV1+o9NiKNoVrymbZZdAATKqJ10xmDQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730913666; c=relaxed/simple;
-	bh=decvzeerzkx1LhgxPluavMUNdn95U1jEx/c/Rh6JuGI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
-	 References:In-Reply-To; b=Jz62+Q/qo5sAEcDfdN93qt3hMeeXLCekhrAIwzKY9VG5kL3ALgjDpqhVFNQYyjfUOHjDxPQ2RBCylMWjBRGpALZ01r64DZYaYFwu9kE9mwKBLxv8TYBfee5NzfrTm2HaypjgMYHPyrQ/bFj36oIz6LWLB16LwZVE9cOxNDqzUOc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=q5rXAI1I; arc=none smtp.client-ip=17.57.155.22
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
-	t=1730913661; bh=decvzeerzkx1LhgxPluavMUNdn95U1jEx/c/Rh6JuGI=;
-	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:
-	 x-icloud-hme;
-	b=q5rXAI1IrsAOVuxrIyGpGUgZwdQXBYGT67zX08lOvT1auz+XBOxcmhSLDO9Z9+BuR
-	 iCvx59E87rHVfRljsrzwj7c/t+1B8pVknANe+j3MuSDRK1CnNr6YTSv3woBK1JeLbe
-	 vsSuZ6Q/H3xjOcWMwUawSWxBRv2TY5VSWaJXrk/QarWixJCOck+53nKHf0k+/asNSP
-	 1EwhgutL+WmWLhvZQmSSVi3NRcO6ADGbpUBFwRILEnD5/gXHu7RdBSIHko9Gs5atc5
-	 tRemOnqZj2ZR2tlJTXo/xCfpxymW7zFFdQ1m6HrkQZhMivBZhQPb778e8cFqBmIBsX
-	 YtE84iSLQVvxg==
-Received: from localhost (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
-	by qs51p00im-qukt01080501.me.com (Postfix) with ESMTPSA id 766291980263;
-	Wed,  6 Nov 2024 17:20:58 +0000 (UTC)
+	s=arc-20240116; t=1730914224; c=relaxed/simple;
+	bh=6PO2Ca1A/vzU4wQCwF7I2kgXYYW7dV0ReS9gXG9j7RE=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=JNptA1ThQp1o176v+7CzntoFxAYTLESJgwdAD9q8pJHrNfLIDhJwfwtW/gOvneInoLZZ5RPset4yUvebIeTse4PLBeL4YuRE9iK8cVeKqsGIkrAnDDbsxy8pWctzUyqsEsond7tln85jK8n/y4aKR/HdF7PaPTH+kUuj8Wu07ZE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XlRbTOHW; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7EA84C4CEC6;
+	Wed,  6 Nov 2024 17:30:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730914224;
+	bh=6PO2Ca1A/vzU4wQCwF7I2kgXYYW7dV0ReS9gXG9j7RE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=XlRbTOHWwehry9SszKOH1ux+2L19eCrYdLzSyXBVekRUHzjfIO5jkjGmcCaHfMcU5
+	 ZoI9qhP+YvlBfbyN3BGFbphE6GkUkRqUksvtgIuraPYdewab8HcnQBqxvbIQPOw7sr
+	 YqEtAhyVYea6FJH1RCRZCnCA6wEWjyeXqonk1Xi/3Uvxc7WTB5PlDb7ShtdxwDQp50
+	 2BdYWaBb2gHKUTowdFZrVBhwQvTidj9a6SlUbr3y/FQFxJoMVufx/7RkKCudgLPYoa
+	 g7igNv1pQGxk1e87mT1hW1zHkPnjFuLFjLCIt2GE+Kh8lF4MxyE9Uw3y3Pu3mFzURm
+	 QHgs/9+mgjuaQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AF4DD3809A80;
+	Wed,  6 Nov 2024 17:30:34 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 06 Nov 2024 20:20:55 +0300
-Message-Id: <D5F9OJYSMFXS.2HOGXNFVKTOLL@verdict.gg>
-Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>
-Subject: Re: [PATCH] net: ipv4: Cache pmtu for all packet paths if multipath
- enabled
-From: "Vladimir Vdovin" <deliran@verdict.gg>
-To: "David Ahern" <dsahern@kernel.org>, "Ido Schimmel" <idosch@idosch.org>
-X-Mailer: aerc 0.18.2
-References: <20241029152206.303004-1-deliran@verdict.gg>
- <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
- <ZyJo1561ADF_e2GO@shredder.mtl.com> <D5BTVREQGREW.3RSUZQK6LDN60@verdict.gg>
- <59b0acc7-196c-4ab8-9033-336136a47212@kernel.org>
-In-Reply-To: <59b0acc7-196c-4ab8-9033-336136a47212@kernel.org>
-X-Proofpoint-ORIG-GUID: NFSgMl2UztetJD27Ot8E9PX1Fiig1IJ9
-X-Proofpoint-GUID: NFSgMl2UztetJD27Ot8E9PX1Fiig1IJ9
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-06_05,2024-11-05_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
- mlxlogscore=419 mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0
- clxscore=1030 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2308100000 definitions=main-2411060085
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next] bridge: add ip/iplink_bridge files to
+ MAINTAINERS
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173091423354.1355897.85598411385203122.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Nov 2024 17:30:33 +0000
+References: <20241031085143.878433-1-razor@blackwall.org>
+In-Reply-To: <20241031085143.878433-1-razor@blackwall.org>
+To: Nikolay Aleksandrov <razor@blackwall.org>
+Cc: netdev@vger.kernel.org, stephen@networkplumber.org, roopa@nvidia.com,
+ dsahern@gmail.com, bridge@lists.linux-foundation.org
 
-On Tue Nov 5, 2024 at 6:52 AM MSK, David Ahern wrote:
-> On 11/2/24 10:20 AM, Vladimir Vdovin wrote:
-> >>
-> >> Doesn't IPv6 suffer from a similar problem?
->
-> I believe the answer is yes, but do not have time to find a reproducer
-> right now.
->
-> >=20
-> > I am not very familiar with ipv6,
-> > but I tried to reproduce same problem with my tests with same topology.
-> >=20
-> > ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30003 dport 44=
-3
-> > fc00:1001::2:2 via fc00:2::2 dev veth_A-R2 src fc00:1000::1:1 metric 10=
-24 expires 495sec mtu 1500 pref medium
-> >=20
-> > ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30013 dport 44=
-3
-> > fc00:1001::2:2 via fc00:1::2 dev veth_A-R1 src fc00:1000::1:1 metric 10=
-24 expires 484sec mtu 1500 pref medium
-> >=20
-> > It seems that there are no problems with ipv6. We have nhce entries for=
- both paths.
->
-> Does rt6_cache_allowed_for_pmtu return true or false for this test?
-It returns true.
+Hello:
+
+This patch was applied to iproute2/iproute2.git (main)
+by Stephen Hemminger <stephen@networkplumber.org>:
+
+On Thu, 31 Oct 2024 10:51:43 +0200 you wrote:
+> Add F line for the ip/iplink_bridge* files to bridge's MAINTAINERS
+> entry.
+> 
+> Signed-off-by: Nikolay Aleksandrov <razor@blackwall.org>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
+
+Here is the summary with links:
+  - [iproute2-next] bridge: add ip/iplink_bridge files to MAINTAINERS
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=5da7e66992cc
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
 
