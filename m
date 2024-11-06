@@ -1,142 +1,193 @@
-Return-Path: <netdev+bounces-142162-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142163-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F32779BDAE8
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:08:27 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6532A9BDAEF
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:09:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABEDA1F21A14
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:08:27 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 861C3B220F8
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:09:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F78A17DFF2;
-	Wed,  6 Nov 2024 01:08:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A831165F11;
+	Wed,  6 Nov 2024 01:09:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZaHW7WW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="BFprcGKG"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700FD17AE1D;
-	Wed,  6 Nov 2024 01:08:13 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04F0D156960
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:09:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730855295; cv=none; b=Iywp2sLVAfHDhWJ+4RjbvAn5fg2P9yu3pMKZWY7Jy2eF9/rDBFF2+RXCfLkTmHRYxjCkGBwVTX3XbzK22LzPVHmAmmGZhCP88XjSn5/TohbbKgaC7vI+Rrd1xIN1Td+/GFwuBumP+s2NhLcZSe6dyiGaIReiGWTO/TRabAzyaHE=
+	t=1730855386; cv=none; b=A+/hkcYKt6eLF8oFOnSN2z2Ec0TSlyhUjy7s/5PtvNYzjg9uHdPk2HOMfUeFccWGNklZpFmKrKemPY7h76eZuzrdaL4r/mBlHYamWAwEnPYpGmqLOzFa2xAgJRasbhsCdEYm+l+Igg9qGU6NJfzvl6JBH8RS9wesG2FCDzSf7Dc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730855295; c=relaxed/simple;
-	bh=UPQb2stjWqGu//9tdKSpz4jsQe4UFL2Xq1BD47l8cjA=;
+	s=arc-20240116; t=1730855386; c=relaxed/simple;
+	bh=vLx4z4o+wNf/hGSip3FzcEPVbQ3gCzj8vCyFk+AlaVk=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Zo4L+FiypkpsC3LrfXa4PC0ghAVHHo/bGAe5wUW3usF5Je6hn361Udthz/NOnt77HDGT2X8P7erCXkirSLeY1q8quzq5Nlm6dfk30RnWKZSh6bWAt6YUJsfVf2IGiQ8XEAi9YpT8M0P864xediNCdOPtCxiMPWw3KD328m5Umdw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZaHW7WW; arc=none smtp.client-ip=209.85.218.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9e8522c10bso57465366b.1;
-        Tue, 05 Nov 2024 17:08:13 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730855292; x=1731460092; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=cCD7OgOV4Waq3xfPYg8bwHGrFRAJmhq4QJxhWdMpz1w=;
-        b=AZaHW7WWB9zRe03DKzAXWYb6b8zS1SelXGkseaSM/5xYMxLWoIKRCZUeEC08dNI+pW
-         2N2G32Hccj8JZUaYezWcVnH8J3StM8KxazTP2poa+ESjhFF+LYPP+M+CBhukzK7vhbBv
-         J2hUXkiO1Ix/xqB0bA2ukZgduSxLDdbco6jtei5m+R9cSbHAiY8R2SDLu3txIqrfBHV+
-         pnOk1rM4BmU4VtIxiUYPo5LfUDzHcXT2MX0Su8c1Hd33ISpbpvhIpT7rblw6puohTlGx
-         jbHopMyUU0UkldDF5qt5XLWlq34/DTjStn1uvEmq869V1s355I0a2UAGC9amLoyD5diE
-         E2ug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730855292; x=1731460092;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=cCD7OgOV4Waq3xfPYg8bwHGrFRAJmhq4QJxhWdMpz1w=;
-        b=U6FB9nfpe+4m+ID7gBeX9/x3M8SD29cvt/wfOQwmfUa/XnMjXIRw2T+RoKhJ4dUpmA
-         9uhQdteNospF9duUIe60KlPNCEakyoiNJHU9ytVc/8J6thRfNCFx6vMsRiL7rTH4Wtwb
-         +ENBfWS9tp+DRyPHs2+bLIvQxP18OQzpLFvNx5EqVPzCPXR8cLg3MfmAR7u/Tsnwrv0b
-         95mixnfnik0bK+sMQqen24tHy4evJldO+XZFyq+WEUMAJinC+bwv48VMFVZZKmVsantC
-         12bloPeJ+HH5j12mMGWEsEOJJb1em9D1d/JYmUj1QuzmN9fhxkx51mojVqejheMpscQn
-         e/lA==
-X-Forwarded-Encrypted: i=1; AJvYcCXpkgkJxjgHnq/Wnkf0G97osH8E05c7/bxCGTcsDwXI/VdlLd0sT/geX5Xj7lrdGWGVGKyUBOM=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz+MswQQMl6bAAWNxERzYb56fvWZXRI7ZtuRtZ6S+TtF/pqR+sH
-	pYP5m8O8/L9xmT6OtZ95WOWzFOQhdapCFe7Z7y2Jd6BqAhcqslCS
-X-Google-Smtp-Source: AGHT+IHp4lpDCtjBpUUkPfN0WxakfiJsZcT+GwZNsSu9dU1g5RmVmWnAQKScKAhJomplP91LaZfh1w==
-X-Received: by 2002:a17:907:97ca:b0:a9a:1ef0:837b with SMTP id a640c23a62f3a-a9ec66049b4mr74308866b.10.1730855291409;
-        Tue, 05 Nov 2024 17:08:11 -0800 (PST)
-Received: from [192.168.42.189] ([148.252.145.116])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16d67bfsm200265366b.56.2024.11.05.17.08.09
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2024 17:08:10 -0800 (PST)
-Message-ID: <99cf79b6-d056-4006-9d40-a1fc02169e82@gmail.com>
-Date: Wed, 6 Nov 2024 01:08:12 +0000
+	 In-Reply-To:Content-Type; b=XN2JIgSww0weCogSB3wxIBuYbLOFTWIx94ZKptEUCLL8jRqD3VPovOWYXu+QgifW1LXunAMTx/ZWxcy4gWtBObOTJTTDizo7crSJSLKKDyvFp5WnUoD5tScDaCZqyAmMQc9kjI8Bv50zSmNYidLJMictQeWhIyQ0YgivLDGWr44=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=BFprcGKG; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <97d8f9b3-9ae3-4146-a933-70dbe393132e@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730855381;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cBEgyhwhi0T7vfmj4Nu/ZwgKyLkYF7wOshnNzEe/MsQ=;
+	b=BFprcGKGETBdzxWWe8tvMjST+M1CH/Bqq823TnQYh2FRenQxpX+zoopV300aUTvf4bjyTZ
+	O/fdWi1jXtj3bd2p0rR+VK421nCFCfFU3mAWgsH8mzPZx+dMSR/G0Rg8pE9mrXrQRIRip5
+	3qNHFgNSeJ/kxRlBdwFDZ1wtFzg6k18=
+Date: Tue, 5 Nov 2024 17:09:29 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 03/15] net: page_pool: create hooks for custom page
- providers
-To: Alexander Lobakin <aleksander.lobakin@intel.com>,
- David Wei <dw@davidwei.uk>
-Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
- Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
- <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
- Mina Almasry <almasrymina@google.com>,
- Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
- Pedro Tammela <pctammela@mojatatu.com>
-References: <20241029230521.2385749-1-dw@davidwei.uk>
- <20241029230521.2385749-4-dw@davidwei.uk>
- <6d227ee7-68c9-4d81-8efa-c91bbfede750@intel.com>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, willemb@google.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev>
+ <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
+ <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
+ <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+ <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+ <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+ <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
+ <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev>
+ <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+ <1c8ebc16-f8e7-4a98-9518-865db3952f8f@linux.dev>
+ <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
+ <f27ab4ce-02df-464e-90ed-852652fb7e3e@linux.dev>
+ <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
 Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <6d227ee7-68c9-4d81-8efa-c91bbfede750@intel.com>
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
 
-On 11/5/24 16:28, Alexander Lobakin wrote:
-...
->> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
->> index a813d30d2135..c21c5b9edc68 100644
->> --- a/net/core/page_pool.c
->> +++ b/net/core/page_pool.c
->> @@ -284,10 +284,11 @@ static int page_pool_init(struct page_pool *pool,
->>   		rxq = __netif_get_rx_queue(pool->slow.netdev,
->>   					   pool->slow.queue_idx);
->>   		pool->mp_priv = rxq->mp_params.mp_priv;
->> +		pool->mp_ops = rxq->mp_params.mp_ops;
->>   	}
->>   
->> -	if (pool->mp_priv) {
->> -		err = mp_dmabuf_devmem_init(pool);
->> +	if (pool->mp_ops) {
->> +		err = pool->mp_ops->init(pool);
+On 11/5/24 4:17 PM, Jason Xing wrote:
+> On Wed, Nov 6, 2024 at 3:22 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>
+>> On 11/4/24 10:22 PM, Jason Xing wrote:
+>>> On Tue, Nov 5, 2024 at 10:09 AM Martin KaFai Lau <martin.lau@linux.dev> wrote:
+>>>>
+>>>> On 11/1/24 6:32 AM, Willem de Bruijn wrote:
+>>>>>> In udp/raw/..., I don't know how likely is the user space having "cork->tx_flags
+>>>>>> & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflags) &
+>>>>>> SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" set.
+>>>>> This is not something to rely on. OPT_ID was added relatively recently.
+>>>>> Older applications, or any that just use the most straightforward API,
+>>>>> will not set this.
+>>>>
+>>>> Good point that the OPT_ID per cmsg is very new.
+>>>>
+>>>> The datagram support on SOF_TIMESTAMPING_OPT_ID in sk->sk_tsflags had
+>>>> been there for quite some time now. Is it a safe assumption that
+>>>> most applications doing udp tx timestamping should have
+>>>> the SOF_TIMESTAMPING_OPT_ID set to be useful?
+>>>>
+>>>>>
+>>>>>> If it is
+>>>>>> unlikely, may be we can just disallow bpf prog from directly setting
+>>>>>> skb_shinfo(skb)->tskey for this particular skb.
+>>>>>>
+>>>>>> For all other cases, in __ip[6]_append_data, directly call a bpf prog and also
+>>>>>> pass the kernel decided tskey to the bpf prog.
+>>>>>>
+>>>>>> The kernel passed tskey could be 0 (meaning the user space has not used it). The
+>>>>>> bpf prog can give one for the kernel to use. The bpf prog can store the
+>>>>>> sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add one to the struct
+>>>>>> sock. The bpf prog does not have to start from 0 (e.g. start from U32_MAX
+>>>>>> instead) if it helps.
+>>>>>>
+>>>>>> If the kernel passed tskey is not 0, the bpf prog can just use that one
+>>>>>> (assuming the user space is doing something sane, like the value in
+>>>>>> SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_MAX). I hope this
+>>>>>> is very unlikely also (?) but the bpf prog can probably detect this and choose
+>>>>>> to ignore this sk.
+>>>>> If an applications uses OPT_ID, it is unlikely that they will toggle
+>>>>> the feature on and off on a per-packet basis. So in the common case
+>>>>> the program could use the user-set counter or use its own if userspace
+>>>>> does not enable the feature. In the rare case that an application does
+>>>>> intermittently set an OPT_ID, the numbering would be erratic. This
+>>>>> does mean that an actively malicious application could mess with admin
+>>>>> measurements.
+>>>>
+>>>> All make sense. Given it is reasonable to assume the user space should either
+>>>> has SOF_TIMESTAMPING_OPT_ID always on or always off. When it is off, the bpf
+>>>> prog can directly provide its own tskey to be used in shinfo->tskey. The bpf
+>>>> prog can generate the id itself without using the sk->sk_tskey, e.g. store an
+>>>> atomic int in the bpf_sk_storage.
+>>>
+>>> I wonder, how can we correlate the key with each skb in the bpf
+>>> program for non-TCP type without implementing a bpf extension for
+>>> SCM_TS_OPT_ID? Every time the timestamp is reported, we cannot know
+>>> which sendmsg() the skb belongs to for non-TCP cases.
+>>
+>> SCM_TS_OPT_ID is eventually setting the shinfo->tskey.
+>> If the shinfo->tskey is not set by the user space, the bpf prog can directly set
+>> the shinfo->tskey. There is no need to use the sk->sk_tskey as the ID generator
+>> also. The bpf prog can have its own id generator.
+>>
+>> If the user space has already set the shinfo->tskey (either by sk->sk_tskey or
+>> SCM_TS_OPT_ID), the bpf prog can just use the user space one.
+>>
+>> If there is a weird application that flips flops between OPT_ID on/off, the bpf
+>> prog will get confused which is fine. The bpf prog can detect this and choose to
+>> ignore measuring this sk/skb. The bpf prog can also choose to be on the very
+>> safe side and ignore all skb with SKBTX_ANY_TSTAMP set in txflags but with no
+>> OPT_ID. The bpf prog can look into the details of the sk and skb to decide what
+>> makes the most sense for its deployment.
+>>
+>> I don't know whether it makes more sense to call the bpf prog to decide the
+>> shinfo->{tx_flags,tskey} just before the "while (length > 0)" in
+>> __ip[6]_append_data or it is better to call the bpf prog in ip[6]_setup_cork.
+>> I admittedly less familiar with this code path than the tcp one.
 > 
-> Can't we just switch-case instead of indirect calls?
-> IO_URING is bool, it can't be a module, which means its functions will
-> be available here when it's enabled. These ops are easy to predict (no
-> ops, dmabuf, io_uring), so this really looks like an enum with 3 entries
-> + switch-case ("regular" path is out if this switch-case under likely etc).
+> Now I feel it could be complicated for a software engineer to consider
+> how they will handle the key if they don't read the kernel code very
+> carefully. They are facing different situations. Being user-friendly
+> lets this feature have more chances to get widely used. As I insisted
+> before, I still would like to know if it is possible that we can try
+> to introduce sk_tskey_bpf_offset (like patch 10-12) to calculate a bpf
+> exclusive tskey for bpf use? Only exporting one key. It will be really
+> simple and easy-to-use :)
 
-Because it better frames the provider api and doesn't require
-io_uring calls sticking off the net code, i.e. decouples subsystems
-better, that's while these calls are not in the hot path (in case of
-io_uring it's ammortised). But you're right that it can be turned into
-a switch, I just don't think it's better, and that's how it was done
-in the original patch.
+imo, there is no need for adding sk_tskey_bpf_offset to sk. just allow the bpf 
+prog to decide what is the tskey.
 
->>   		if (err) {
->>   			pr_warn("%s() mem-provider init failed %d\n", __func__,
->>   				err);
->> @@ -584,8 +585,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool *pool, gfp_t gfp)
->>   		return netmem;
-> 
-> Thanks,
-> Olek
+There is no usability issue in bpf prog. It is pretty normal for a bpf prog 
+author to look at the sk details to make decision.
 
--- 
-Pavel Begunkov
+Abstracting the sk/skb is not helping the bpf prog and not the right direction 
+to go. Over time, there has been case over case that the bpf prog wants to know 
+more instead of being abstracted away like running in the user space. e.g. The 
+"struct bpf_sock" abstraction in the uapi/linux/bpf.h does not scale and we have 
+stopped adding more abstraction this way. The btf (and PTR_TO_BTF_ID, 
+CO-RE...etc) has been added to allow the bpf prog to learn other details in sk 
+and skb.
+
+Instead, design a better bpf kfunc to help the bpf prog to set the bits/tskey in 
+the skb. I think this is more important. tcp tskey is easy. just need some care 
+on the udp tskey and need to check if the user space has already set one.
+A good designed bpf kfunc is all it needs.
 
