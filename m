@@ -1,184 +1,154 @@
-Return-Path: <netdev+bounces-142219-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142220-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E19109BDDC1
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 04:44:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0CB8A9BDE22
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:03:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 719E7B234A1
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:44:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2A2A81C21F56
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 05:03:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B01F0190493;
-	Wed,  6 Nov 2024 03:44:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3882191499;
+	Wed,  6 Nov 2024 05:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="eFjlg1jU"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DCv2xM3K"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7895190468;
-	Wed,  6 Nov 2024 03:44:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7924190696;
+	Wed,  6 Nov 2024 05:03:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730864643; cv=none; b=eN7+Age21KU/Dmg7aLVm+3oo/Ln73ZG13Ojc3v9ji23xH+BE81jioSSew/5SPda1FT0UgqOvUsp4/n6lOxzevoz97C3X8iN9FON/hSeIwCDkOJUXefg6cujBdQrnhPQ/wt4O997YrAiPulCIeldFr74iWSWTsr75ZgNDQABmCbY=
+	t=1730869421; cv=none; b=lnvxwnLxQLTkWNmoRo1UhReNKoICi8s1EkRh92wg8YLm0Uf8zfM7GxVo3FD9vJqpXDp60YrVqqQGssLJbz8NJ4ln7+EJWja5Ltt5oPrOPnXpRy3y0akMuL5ZmcvwSXgJYJZlDEusEWYxbwZrbfN1KXZRMsFykRgiEhSdLJcCrJc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730864643; c=relaxed/simple;
-	bh=ZncZUTSm22c5m24Ui4mJNMu57aMs6v/CYQsluLVrFuk=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EZmdJRI7FXjitjmtCeoVycWu/Z3Qr/8pCk5/Rzm1f0KBRd34TkIEWlEgKykmLZZH5tNy5qpaTjqGCy93grS2Ntu0avGJ/AojYHbeSuEBf/R/fxATXW/gYL1xg1p9sKhxmevH7/N2N1enpDIi+FmZSQf8PqBouh8f+HnMXmB4oTg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=eFjlg1jU; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=62ogp206Pt4nsQOJ/YCTzDbyZHE4u3VhsCNVD+OXsko=; b=eFjlg1jUgGFnIu6M17ETvJbH10
-	0UlXroM4BfY4a7JmOvPtV8NKwcf/Q9HJvl61tpwrsEi74go5PZ75k8UcK34eePWr9JjsvkV/YxsG/
-	OxkC1afjkZTVE+UTrhTCeTfLABPYwd4P7km5r/z+xWphQ75C7HWK7LJCEhR1j3y0eKjs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t8WxL-00CHsW-Mw; Wed, 06 Nov 2024 04:43:43 +0100
-Date: Wed, 6 Nov 2024 04:43:43 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
-	quic_pavir@quicinc.com, quic_linchen@quicinc.com,
-	quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
-	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com,
-	john@phrozen.org
-Subject: Re: [PATCH net-next 3/5] net: pcs: qcom-ipq: Add PCS create and
- phylink operations for IPQ9574
-Message-ID: <a0826aa8-703c-448d-8849-47808f847774@lunn.ch>
-References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
- <20241101-ipq_pcs_rc1-v1-3-fdef575620cf@quicinc.com>
- <d7782a5e-2f67-4f62-a594-0f52144a368f@lunn.ch>
- <9b3a4f00-59f2-48d1-8916-c7d7d65df063@quicinc.com>
+	s=arc-20240116; t=1730869421; c=relaxed/simple;
+	bh=Lz0dx6DXASIIdjcXuzaj6FZKZ861s3Djg0W7klVVcM0=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D2nPQSotlbfGW3hFWreAmfOiyH1mrRqcvdM7PNsam/5rTYH/psSm0vAzCmMS6EQPRiTb8EJxKAJRt8Ddbzc/QLOg1S5cOmAVek6SRdzzGGi6jea+GrZMoB0pP1EQrU0B6ckchMAf+T2phgG1qIpiNx/UcvIPBtYyI/djDvCCZz0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DCv2xM3K; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 172B3C4CECD;
+	Wed,  6 Nov 2024 05:03:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730869421;
+	bh=Lz0dx6DXASIIdjcXuzaj6FZKZ861s3Djg0W7klVVcM0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=DCv2xM3Ko0rBUz7+v+M5YnaAfixXYSPkHyWp+b8YOcScdtTpGc6pXObAIbdX00X0l
+	 x/iqEUUpJQhnp15nmKdtwkB5enb+o+kiP4X7UvRubBa71owQ8RsyAVZe1RQ//iy5Ls
+	 8T02g5OaYza+xdd/f8AWJNhcQxbfn64/EYUpaBc2+ZLgyyNxlnZzRiwV9mlRXPx/HJ
+	 +eJ9G7D2QKGCHkNKEGU9L/y3hoEFqlUSFgdc2qzNapbwFxYgtfAeXssuBoasHBKpAp
+	 Y0QDA/2jWKq71zRD7l8oI6U7bj6TlekaAtVNSNCrLbE7WK7GC86uXEwQf6FjXiq3Ar
+	 +BKAz8LovEaVQ==
+Date: Tue, 5 Nov 2024 21:03:38 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Joe Damato <jdamato@fastly.com>
+Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
+ bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
+ edumazet@google.com, amritha.nambiar@intel.com,
+ sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+ m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+ willy@infradead.org, willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+ Martin Karsten <mkarsten@uwaterloo.ca>, "David S. Miller"
+ <davem@davemloft.net>, Simon Horman <horms@kernel.org>, David Ahern
+ <dsahern@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+ Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Lobakin
+ <aleksander.lobakin@intel.com>, linux-kernel@vger.kernel.org (open list)
+Subject: Re: [PATCH net-next v6 2/7] net: Suspend softirq when
+ prefer_busy_poll is set
+Message-ID: <20241105210338.5364375d@kernel.org>
+In-Reply-To: <20241104215542.215919-3-jdamato@fastly.com>
+References: <20241104215542.215919-1-jdamato@fastly.com>
+	<20241104215542.215919-3-jdamato@fastly.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b3a4f00-59f2-48d1-8916-c7d7d65df063@quicinc.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 06, 2024 at 11:16:37AM +0800, Lei Wei wrote:
+On Mon,  4 Nov 2024 21:55:26 +0000 Joe Damato wrote:
+> From: Martin Karsten <mkarsten@uwaterloo.ca>
 > 
+> When NAPI_F_PREFER_BUSY_POLL is set during busy_poll_stop and the
+> irq_suspend_timeout is nonzero, this timeout is used to defer softirq
+> scheduling, potentially longer than gro_flush_timeout. This can be used
+> to effectively suspend softirq processing during the time it takes for
+> an application to process data and return to the next busy-poll.
 > 
-> On 11/1/2024 9:21 PM, Andrew Lunn wrote:
-> > > +static int ipq_pcs_config_mode(struct ipq_pcs *qpcs,
-> > > +			       phy_interface_t interface)
-> > > +{
-> > > +	unsigned int val;
-> > > +	int ret;
-> > > +
-> > > +	/* Configure PCS interface mode */
-> > > +	switch (interface) {
-> > > +	case PHY_INTERFACE_MODE_SGMII:
-> > > +		/* Select Qualcomm SGMII AN mode */
-> > > +		ret = regmap_update_bits(qpcs->regmap, PCS_MODE_CTRL,
-> > > +					 PCS_MODE_SEL_MASK | PCS_MODE_AN_MODE,
-> > > +					 PCS_MODE_SGMII);
-> > 
-> > How does Qualcomm SGMII AN mode differ from Cisco SGMII AN mode?
-> > 
+> The call to napi->poll in busy_poll_stop might lead to an invocation of
+
+The call to napi->poll when we're arming the timer is counter
+productive, right? Maybe we can take this opportunity to add
+the seemingly missing logic to skip over it?
+
+> napi_complete_done, but the prefer-busy flag is still set at that time,
+> so the same logic is used to defer softirq scheduling for
+> irq_suspend_timeout.
 > 
-> Qualcomm SGMII AN mode extends Cisco SGMII spec Revision 1.8 by adding pause
-> bit support in the SGMII word format. It re-uses two of the reserved bits
-> 1..9 for this purpose. The PCS supports both Qualcomm SGMII AN and Cisco
-> SGMII AN modes.
-
-Is Qualcomm SGMII AN actually needed? I assume it only works against a
-Qualcomm PHY? What interoperability testing have you do against
-non-Qualcomm PHYs?
-
-> > > +struct phylink_pcs *ipq_pcs_create(struct device_node *np)
-> > > +{
-> > > +	struct platform_device *pdev;
-> > > +	struct ipq_pcs_mii *qpcs_mii;
-> > > +	struct device_node *pcs_np;
-> > > +	struct ipq_pcs *qpcs;
-> > > +	int i, ret;
-> > > +	u32 index;
-> > > +
-> > > +	if (!of_device_is_available(np))
-> > > +		return ERR_PTR(-ENODEV);
-> > > +
-> > > +	if (of_property_read_u32(np, "reg", &index))
-> > > +		return ERR_PTR(-EINVAL);
-> > > +
-> > > +	if (index >= PCS_MAX_MII_NRS)
-> > > +		return ERR_PTR(-EINVAL);
-> > > +
-> > > +	pcs_np = of_get_parent(np);
-> > > +	if (!pcs_np)
-> > > +		return ERR_PTR(-ENODEV);
-> > > +
-> > > +	if (!of_device_is_available(pcs_np)) {
-> > > +		of_node_put(pcs_np);
-> > > +		return ERR_PTR(-ENODEV);
-> > > +	}
-> > 
-> > How have you got this far if the parent is not available?
-> > 
+> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Co-developed-by: Joe Damato <jdamato@fastly.com>
+> Signed-off-by: Joe Damato <jdamato@fastly.com>
+> Tested-by: Joe Damato <jdamato@fastly.com>
+> Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
+> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
+> ---
+>  v3:
+>    - Removed reference to non-existent sysfs parameter from commit
+>      message. No functional/code changes.
 > 
-> This check can fail only if the parent node is disabled in the board DTS. I
-> think this error situation may not be caught earlier than this point.
-> However I agree, the above check is redundant, since this check is
-> immediately followed by a validity check on the 'pdev' of the parent node,
-> which should be able cover any such errors as well.
-
-This was also because the driver does not work as i expected. I was
-expecting the PCS driver to walk its own DT and instantiate the PCS
-devices listed. If the parent is disabled, it is clearly not going to
-start its own children.  But it is in fact some other device which
-walks the PCS DT blob, and as a result the child/parent relationship
-is broken, a child could exist without its parent.
-
-> > > +	for (i = 0; i < PCS_MII_CLK_MAX; i++) {
-> > > +		qpcs_mii->clk[i] = of_clk_get_by_name(np, pcs_mii_clk_name[i]);
-> > > +		if (IS_ERR(qpcs_mii->clk[i])) {
-> > > +			dev_err(qpcs->dev,
-> > > +				"Failed to get MII %d interface clock %s\n",
-> > > +				index, pcs_mii_clk_name[i]);
-> > > +			goto err_clk_get;
-> > > +		}
-> > > +
-> > > +		ret = clk_prepare_enable(qpcs_mii->clk[i]);
-> > > +		if (ret) {
-> > > +			dev_err(qpcs->dev,
-> > > +				"Failed to enable MII %d interface clock %s\n",
-> > > +				index, pcs_mii_clk_name[i]);
-> > > +			goto err_clk_en;
-> > > +		}
-> > > +	}
-> > 
-> > Maybe devm_clk_bulk_get() etc will help you here? I've never actually
-> > used them, so i don't know for sure.
-> > 
+>  net/core/dev.c | 17 +++++++++++++----
+>  1 file changed, 13 insertions(+), 4 deletions(-)
 > 
-> We don't have a 'device' associated with the 'np', so we could not consider
-> using the "devm_clk_bulk_get()" API.
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 4d910872963f..51d88f758e2e 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -6239,7 +6239,12 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
+>  			timeout = napi_get_gro_flush_timeout(n);
+>  		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
+>  	}
+> -	if (n->defer_hard_irqs_count > 0) {
+> +	if (napi_prefer_busy_poll(n)) {
+> +		timeout = napi_get_irq_suspend_timeout(n);
 
-Another artefact of not have a child-parent relationship. I wounder if
-it makes sense to change the architecture. Have the PCS driver
-instantiate the PCS devices as its children. They then have a device
-structure for calls like clk_bulk_get(), and a more normal
-consumer/provider setup.
+Why look at the suspend timeout in napi_complete_done()?
+We are unlikely to be exiting busy poll here.
+Is it because we need more time than gro_flush_timeout
+for the application to take over the polling?
 
-	Andrew
+> +		if (timeout)
+> +			ret = false;
+> +	}
+> +	if (ret && n->defer_hard_irqs_count > 0) {
+>  		n->defer_hard_irqs_count--;
+>  		timeout = napi_get_gro_flush_timeout(n);
+>  		if (timeout)
+> @@ -6375,9 +6380,13 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
+>  	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+>  
+>  	if (flags & NAPI_F_PREFER_BUSY_POLL) {
+> -		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
+> -		timeout = napi_get_gro_flush_timeout(napi);
+> -		if (napi->defer_hard_irqs_count && timeout) {
+> +		timeout = napi_get_irq_suspend_timeout(napi);
+
+Even here I'm not sure if we need to trigger suspend.
+I don't know the eventpoll code well but it seems like you suspend 
+and resume based on events when exiting epoll. Why also here?
+
+> +		if (!timeout) {
+> +			napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
+> +			if (napi->defer_hard_irqs_count)
+> +				timeout = napi_get_gro_flush_timeout(napi);
+> +		}
+> +		if (timeout) {
+>  			hrtimer_start(&napi->timer, ns_to_ktime(timeout), HRTIMER_MODE_REL_PINNED);
+>  			skip_schedule = true;
+>  		}
+
 
