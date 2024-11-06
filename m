@@ -1,172 +1,102 @@
-Return-Path: <netdev+bounces-142263-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142269-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93F3C9BE14F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:51:21 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 742D19BE17C
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:00:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45D0D1F2340C
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:51:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 377B1284748
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:00:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C9B41D5171;
-	Wed,  6 Nov 2024 08:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y5rcLeh1"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84D01D6182;
+	Wed,  6 Nov 2024 09:00:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
+	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FF811D271D;
-	Wed,  6 Nov 2024 08:51:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B1C1D7E41;
+	Wed,  6 Nov 2024 09:00:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730883075; cv=none; b=Y9JddIZMA8/YY2WQYakLIxGRu6u/5+jda3FBvupTke98zraueueSLEHAG2LUWw0rTDWZA8QawNt/ACtBQU0Z4mZYOIv6Ws4NRuSoDwNrRdeb/WLE3qfsWMC5I1SVKilLVXnHqC25IgeC1Ld5mSUs4Up1otPnVHCDzH3VVB6GsXc=
+	t=1730883642; cv=none; b=KoK4qPbznYkvkCadCI4djIiJ2BtM2CA1V47GOCI3nve9ie6lrYSjcu8I+Ravl234tCMLDg76jMbzymzpNtO9gZrEIiPELMpeRPwI7qBdro4pjJ+8/l4r8oO7KIaMns2Tu9zZckzpOWPXp8He1wPBuOZzwbeizWS9fCZNf6xhSXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730883075; c=relaxed/simple;
-	bh=AmMnKMNVvrLd+CzlEWfi3Ve0O5gy3tXs+i6qPVfwU4U=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kbFnSPb+utTT4GVnr+lZcULEdjfN3PLaef/qKcJwzpJfG8FXKcAj5s+cDPGsNSin+N9p62YpDeAuFDlIED7KBEaEtsS7UjLHAH+LrbyFlgssJFr3rV2W+KAr8jVrDTA4UTSGYZ3EZ0X+78edIfoN/XLuSa6elUoDvGK7QEWg3vo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y5rcLeh1; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5188EC4CECD;
-	Wed,  6 Nov 2024 08:51:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730883075;
-	bh=AmMnKMNVvrLd+CzlEWfi3Ve0O5gy3tXs+i6qPVfwU4U=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Y5rcLeh1v+Ab3TX2T/lgTWn35m5g4EBjrA4T9QVCzMs7xAQIc92+m+G5CEJ/+OfBx
-	 hG5z8fXKNbhNPAN9OCjU2s+zWnoKq+2pTze+kDBiwOXbmEqACgH7NnIrhwA2WDZ0pG
-	 mspeFCaGkH8P6DY75PeVuFViL99gU4dszy0CZMABMSCvBvu4UAcvj06OfABLkKiTfv
-	 qB5GiwddMfQ5opv7UkD/oE+jZlqbLF2a7xI7ynrGUJK6TbFk/udzS1jqi8VJKBdHcu
-	 eiWAJVUN7rFvRIVryjvEUtpdls5JgsAAIe4HOewCC6EllPIEb7Vaa8Yl02ich5fSbC
-	 8L6p4Zxbvzd6A==
-Message-ID: <80df24bf-961e-49ea-845c-e824d0b6e0ff@kernel.org>
-Date: Wed, 6 Nov 2024 10:51:09 +0200
+	s=arc-20240116; t=1730883642; c=relaxed/simple;
+	bh=fDSS5Ot/nGR8QnyVF4ghfmLTy2d8XgfWck2llWDoaH4=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ricIpTrA5OOE7/CHNiLa0tJuTMw74xqXCd+1rJqEpay65xKVcO1THJq3/N8JnjZPJXkoJrYYNyAueuI1MzAF80rVxbvVS4Y1ivVWx3/8kCGTdPm9leRYhMEnqvC8jru/CU2GgXKsr5IjisJTaROMzA9fl4+ww3SjRDYTvZGJPUE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
+Received: from localhost.localdomain (unknown [124.16.141.247])
+	by APP-05 (Coremail) with SMTP id zQCowACHbrmkLitnyXFqAA--.1291S2;
+	Wed, 06 Nov 2024 16:53:58 +0800 (CST)
+From: Wentao Liang <liangwentao@iscas.ac.cn>
+To: shannon.nelson@amd.com,
+	brett.creeley@amd.com,
+	davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Wentao Liang <Wentao_liang_g@163.com>,
+	Wentao Liang <liangwentao@iscas.ac.cn>
+Subject: [PATCH v2] drivers: net: ionic: fix a memory leak bug
+Date: Wed,  6 Nov 2024 16:53:07 +0800
+Message-ID: <20241106085307.1783-1-liangwentao@iscas.ac.cn>
+X-Mailer: git-send-email 2.42.0.windows.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 1/2] net: ethernet: ti: am65-cpsw: update
- pri_thread_map as per IEEE802.1Q-2004
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
- Pekka Varis <p-varis@ti.com>
-References: <20241105-am65-cpsw-multi-rx-dscp-v1-0-38db85333c88@kernel.org>
- <20241105-am65-cpsw-multi-rx-dscp-v1-1-38db85333c88@kernel.org>
- <35a2550e-a422-4938-af3c-a1fb4682ac56@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <35a2550e-a422-4938-af3c-a1fb4682ac56@ti.com>
-Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:zQCowACHbrmkLitnyXFqAA--.1291S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7XFWkCw48tw1xCr4fXr1fJFb_yoW8JrW5pw
+	s8JFyYvrn5Xr4UGw1DAw18ZF98ZaySkrW8Grnru3yF9wsxAry8JF17ta47tr97WrWUJF1S
+	qr129w15XF98C37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
+	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
+	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
+	6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr
+	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
+	6r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
+	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
+	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
+	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
+	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfU5iihUU
+	UUU
+X-CM-SenderInfo: xold0wxzhq3t3r6l2u1dvotugofq/
 
+From: Wentao Liang <Wentao_liang_g@163.com>
 
+In line 334, the ionic_setup_one() creates a debugfs entry for
+ionic upon successful execution. However, the ionic_probe() does
+not release the dentry before returning, resulting in a memory
+leak. To fix this bug, we add the ionic_debugfs_del_dev() before
+line 397 to release the resources before the function returns.
 
-On 06/11/2024 07:22, Siddharth Vadapalli wrote:
-> On Tue, Nov 05, 2024 at 04:18:10PM +0200, Roger Quadros wrote:
-> 
-> Hello Roger,
-> 
->> IEEE802.1Q-2004 superseeds IEEE802.1D-2004. Now Priority Code Point (PCP)
-> 
-> nitpick: s/superseeds/supersedes
-ok
+Fixes: 0de38d9f1dba ("ionic: extract common bits from ionic_probe")
+Signed-off-by: Wentao Liang <liangwentao@iscas.ac.cn>
+---
+ drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-> 
-> Also, according to:
-> https://standards.ieee.org/ieee/802.1D/3387/
-> IEEE 802.1D-2004 is superseded by 802.1Q-2014, so:
-> s/IEEE802.1Q-2004/IEEE802.1Q-2014/g
-> 
->> 2 is no longer at a lower priority than PCP 0. PCP 1 (Background) is still
->> at a lower priority than PCP 0 (Best Effort).
->>
->> Reference:
->> IEEE802.1Q-2004, Standard for Local and metropolitan area networks
->>   Table G-2 - Traffic type acronyms
->>   Table G-3 - Defining traffic types
-> 
-> In IEEE802.1Q-2014, the tables are:
-> Table I-2—Traffic type acronyms
-> Table I-3—Defining traffic types
-
-Thanks!
-
-> 
->>
->> Signed-off-by: Roger Quadros <rogerq@kernel.org>
->> ---
->>  drivers/net/ethernet/ti/cpsw_ale.c | 25 ++++++++++++++-----------
->>  1 file changed, 14 insertions(+), 11 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/ti/cpsw_ale.c b/drivers/net/ethernet/ti/cpsw_ale.c
->> index 8d02d2b21429..7dadd95cadc5 100644
->> --- a/drivers/net/ethernet/ti/cpsw_ale.c
->> +++ b/drivers/net/ethernet/ti/cpsw_ale.c
->> @@ -1692,26 +1692,29 @@ static void cpsw_ale_policer_reset(struct cpsw_ale *ale)
->>  void cpsw_ale_classifier_setup_default(struct cpsw_ale *ale, int num_rx_ch)
->>  {
->>  	int pri, idx;
->> -	/* IEEE802.1D-2004, Standard for Local and metropolitan area networks
->> +	/* IEEE802.1Q-2004, Standard for Local and metropolitan area networks
->>  	 *    Table G-2 - Traffic type acronyms
->>  	 *    Table G-3 - Defining traffic types
->> -	 * User priority values 1 and 2 effectively communicate a lower
->> -	 * priority than 0. In the below table 0 is assigned to higher priority
->> -	 * thread than 1 and 2 wherever possible.
->> +	 * Also: https://en.wikipedia.org/wiki/IEEE_P802.1p#Priority_levels
-> 
-> Since links might change, it might be better to drop this and quote section
-> I.4 Traffic types and priority values of IEEE802.1Q-2014 which states:
-> 
-> "0 is thus used both for default priority and for Best Effort, and
-> Background is associated with a priority value of 1. This means that the
-> value 1 effectively communicates a lower priority than 0."
-
-I agree. Will update in v2. Thanks for review.
-
-> 
->> +	 * Priority Code Point (PCP) value 1 (Background) communicates a lower
->> +	 * priority than 0 (Best Effort). In the below table PCP 0 is assigned
->> +	 * to a higher priority thread than PCP 1 wherever possible.
->>  	 * The below table maps which thread the user priority needs to be
->>  	 * sent to for a given number of threads (RX channels). Upper threads
->>  	 * have higher priority.
->>  	 * e.g. if number of threads is 8 then user priority 0 will map to
->> -	 * pri_thread_map[8-1][0] i.e. thread 2
->> +	 * pri_thread_map[8-1][0] i.e. thread 1
->>  	 */
->> -	int pri_thread_map[8][8] = {	{ 0, 0, 0, 0, 0, 0, 0, 0, },
->> +
->> +	int pri_thread_map[8][8] = {   /* BK,BE,EE,CA,VI,VO,IC,NC */
->> +					{ 0, 0, 0, 0, 0, 0, 0, 0, },
->>  					{ 0, 0, 0, 0, 1, 1, 1, 1, },
->>  					{ 0, 0, 0, 0, 1, 1, 2, 2, },
->> -					{ 1, 0, 0, 1, 2, 2, 3, 3, },
->> -					{ 1, 0, 0, 1, 2, 3, 4, 4, },
->> -					{ 1, 0, 0, 2, 3, 4, 5, 5, },
->> -					{ 1, 0, 0, 2, 3, 4, 5, 6, },
->> -					{ 2, 0, 1, 3, 4, 5, 6, 7, } };
->> +					{ 0, 0, 1, 1, 2, 2, 3, 3, },
->> +					{ 0, 0, 1, 1, 2, 2, 3, 4, },
->> +					{ 1, 0, 2, 2, 3, 3, 4, 5, },
->> +					{ 1, 0, 2, 3, 4, 4, 5, 6, },
->> +					{ 1, 0, 2, 3, 4, 5, 6, 7 } };
->>  
->>  	cpsw_ale_policer_reset(ale);
-> 
-> Regards,
-> Siddharth.
-
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+index b93791d6b593..f5dc876eb500 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
+@@ -394,6 +394,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
+ err_out_pci:
+ 	ionic_dev_teardown(ionic);
+ 	ionic_clear_pci(ionic);
++	ionic_debugfs_del_dev(ionic);
+ err_out:
+ 	mutex_destroy(&ionic->dev_cmd_lock);
+ 	ionic_devlink_free(ionic);
 -- 
-cheers,
--roger
+2.42.0.windows.2
+
 
