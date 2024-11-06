@@ -1,211 +1,391 @@
-Return-Path: <netdev+bounces-142407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E4EB9BEF06
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:29:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 062739BEF0B
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:29:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 51D711C23DCE
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:29:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B263D286A96
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:29:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E980E1DE4CA;
-	Wed,  6 Nov 2024 13:28:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2C781E1036;
+	Wed,  6 Nov 2024 13:29:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jbAWCz1G"
+	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="Coc8RrTr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f46.google.com (mail-ej1-f46.google.com [209.85.218.46])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from qs51p00im-qukt01072101.me.com (qs51p00im-qukt01072101.me.com [17.57.155.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20C4D1DB37C
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 13:28:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.46
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6964C1DB37C
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 13:29:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730899738; cv=none; b=doRSyI1qXUUm5GkTOBPG8YO7FWrH34HE/R1tfGLOZR0lGbbcJ5xGOzNEEIf6whsj1jaz6Y8ARz2Xdp7yONufrMnrkQf6WywAbNV/uJkoGjeLApXhDDK3gsywH9nNxQYqSWiokBhv637B4JzG47OPjqEF9dfDAB6y8kzJpiCsdu4=
+	t=1730899774; cv=none; b=LaciLznud7ARtEAZl9w1GE51hwMdSVn0t8C3TJ8xXKvSiPAXVu/nHd8fReqbcNt9TgX9TzhymGelO5dJUugzoAyLRIdSboNpK2Grihi5oYLLHQuAW0hVUI2JB0l+3fzwMWa/+B2dl2S/k/j3JryhJ1Ymd2+bmu0CPId2Hl3ZmNw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730899738; c=relaxed/simple;
-	bh=JoYadWLQ10IyhNA2XF8ePAf1GGn7cehs2WGGbneeZhA=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=JCCa/GM0CxxhTdYryh3Hq8TJI+ia9vS920Wv9N8wNPB1S14NmzNBd1RapDB9uZTDjGKHpkX0nw/GZF73vFQDcc9YYsPenV907kK1qmu8BdtKFZ+dv/NpU4Zb3ws8Mkz5kepXq2v6YNvhrgprc+AbWlk8y05HfC64ca/W3ckuiKI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jbAWCz1G; arc=none smtp.client-ip=209.85.218.46
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f46.google.com with SMTP id a640c23a62f3a-a9a6acac4c3so1064608666b.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 05:28:56 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730899735; x=1731504535; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=pKAo4jT3Qn5tEmcocaS6s3DRuNu007xvdD3H8N/g4Uk=;
-        b=jbAWCz1G1AMrGQNTOkWHCSafQ4jLLrz65TL5r8Ao+0Iqh8JlIEvrC/OjWoF9ImvxOV
-         fNpYIz2mJvrPLElvYQ7FqZz0KznXkId/SagkNlSvPeHXAJFoq/qR4ALQ3A6gCUBt/6jb
-         PsXV92nirSNaiHlpomdpCy8hT3ASThOXwihlijSfNAZfJlXo5dUzC6x+7/rEkFjMucHg
-         kqMQrLz8J8BpW4bgXn6LIF3ERdIgxJIXvytQcSuydo1EYvzvSH4JbLS0oWrgx5F+7feV
-         ZVCa54EvJV8sBkZm6+Luwb/nGLjK+W4j2M491hIL16Dc+B7lHY2X5qpO/CIlWSofeHuS
-         fZjg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730899735; x=1731504535;
-        h=content-transfer-encoding:in-reply-to:autocrypt:from
-         :content-language:references:cc:to:subject:user-agent:mime-version
-         :date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pKAo4jT3Qn5tEmcocaS6s3DRuNu007xvdD3H8N/g4Uk=;
-        b=u3Ytj3KG+1fZypXfX8Y7zVE6gAFMA1bPAMYcAPkxmwllbjdBXMTFJtDPMaNfWRSxzS
-         iqy4RYvpB1DtABmWefyarsJzA64euRm+98gprkBXPfrCewczCgSGbc3QTrxs71liU2GE
-         0h7+1Z6DSZ7sIlcVhWSAB/9lWm0IQKmGIaM+W6CtC67cZE0tF+5p+fAhRHgCU2Qif8Hs
-         r4MgoE4Hrwlm6Pqqw9A8aNgIWU6k/1xJAoaPgd+3n5fVw9xqXaP05pE6/Tn121N2Z1ku
-         7cXsMxnsE1qYKg41qvHdcUW4h91G3z5RX45quVQDdbRKMD0u+mHhhujUDEbKji7K5zYS
-         1flw==
-X-Forwarded-Encrypted: i=1; AJvYcCWXMBPNpzkTW+hYnW91DIQMfk8P3zmVIUL9cpzWitTCPdIvmSCpYFxi6un9ZJpn/CpYLzr88lc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz30K/tUUSSG8BKlinBFONnPnTNaMiq2dpgKMPMQe5HFBMspQgw
-	n2o9V/fD0imZ0x4kVThi45Mh6uTO/dzueyYJJkOAMYY8Qt1zYvC0
-X-Google-Smtp-Source: AGHT+IHDSol3rNFnubcqMbIX6ud2LPW0F7Bh2/DHJikRFjytIXOS2U9aH4MgFAC5ONn94wLoZ/QAEA==
-X-Received: by 2002:a17:906:fd42:b0:a9e:211f:7dc6 with SMTP id a640c23a62f3a-a9e211f7ebemr1938860566b.8.1730899735005;
-        Wed, 06 Nov 2024 05:28:55 -0800 (PST)
-Received: from ?IPV6:2a02:3100:a488:4700:d86b:5868:db11:4eeb? (dynamic-2a02-3100-a488-4700-d86b-5868-db11-4eeb.310.pool.telefonica.de. [2a02:3100:a488:4700:d86b:5868:db11:4eeb])
-        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9eb16d67a6sm287551866b.60.2024.11.06.05.28.53
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2024 05:28:54 -0800 (PST)
-Message-ID: <3a27097f-f7d0-4cb2-8e43-9e53327dcd7a@gmail.com>
-Date: Wed, 6 Nov 2024 14:28:54 +0100
+	s=arc-20240116; t=1730899774; c=relaxed/simple;
+	bh=T+lUVe/eI0A/faFpF/5XVxIE74XZ633rTYTqvV9EHVg=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Cc:Subject:From:
+	 References:In-Reply-To; b=cJAvM/9md6JbrkdC9+S4Ydkxt7cR1D4fj6zK1OFKt60XiMpVKkaIR55IsVjWNQaAUpnWQryyzh6NqLkxiYXAsc1LxdmnlK0j3uIEXjhWpMwfjdNy9ExDfGq0h2ocdkC6sAbLYWG0Y46HOOyHAMq6CpVcMluCv4DxD3vLuySuZ1k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=Coc8RrTr; arc=none smtp.client-ip=17.57.155.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
+	t=1730899770; bh=nr3/YS3Py3MrrKnD6Hdl8Ca6gvfpive4hM5oqIP/Zr8=;
+	h=Mime-Version:Content-Type:Date:Message-Id:To:Subject:From:
+	 x-icloud-hme;
+	b=Coc8RrTrJnAD5c43qqCBUK43DD73Nz76sbd4x44MwbCAedIklwCoZKHlfZ7BDK5Re
+	 v7af1rUExPj03uKJyIoGKvFHV5qRfpritVSnSQzEo7Q/4SOAWeP59v8w1uFssRcZnA
+	 S0c54BM1IA0lKgpKJ9pG3a3DVbBbDYGPbQeTLgisbQgI0S7fy929XgYPpChaCbq2RT
+	 7oZEVg8hx8zYqh+f5wVZbPep2KMU7AFAcNORzwjXQRWn2Akfsmp+0qzPCjCW4jy+DU
+	 uPqH9IBilqDtCgicUFFapHNXMHcWe8JGCsK0N81V+M0hiAx7PrRfy4dIcnTKm/oceS
+	 Lzy2vJ8szgvbQ==
+Received: from localhost (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01072101.me.com (Postfix) with ESMTPSA id 81E66403CE;
+	Wed,  6 Nov 2024 13:29:26 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] r8169: copy vendor driver 2.5G/5G EEE
- advertisement constraints
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
- Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
- Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-References: <4677d3c4-60e2-4094-81a8-adae42ca46bb@gmail.com>
- <5cd6ccf1-8641-4bd5-9199-b250115b844c@lunn.ch>
-Content-Language: en-US
-From: Heiner Kallweit <hkallweit1@gmail.com>
-Autocrypt: addr=hkallweit1@gmail.com; keydata=
- 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
-In-Reply-To: <5cd6ccf1-8641-4bd5-9199-b250115b844c@lunn.ch>
+Mime-Version: 1.0
+Content-Transfer-Encoding: quoted-printable
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Date: Wed, 06 Nov 2024 16:29:23 +0300
+Message-Id: <D5F4RA6KPUIW.2UOHDT1G4Z6F@verdict.gg>
+To: "Ido Schimmel" <idosch@idosch.org>, <gnault@redhat.com>
+Cc: <netdev@vger.kernel.org>, <dsahern@kernel.org>, <davem@davemloft.net>,
+ <edumazet@google.com>, <linux-kselftest@vger.kernel.org>,
+ <kuba@kernel.org>, <pabeni@redhat.com>, <shuah@kernel.org>,
+ <horms@kernel.org>
+Subject: Re: [PATCH net-next v7] net: ipv4: Cache pmtu for all packet paths
+ if multipath enabled
+From: "Vladimir Vdovin" <deliran@verdict.gg>
+X-Mailer: aerc 0.18.2
+References: <20241104072753.77042-1-deliran@verdict.gg>
+ <ZykH_fdcMBdFgXix@shredder>
+In-Reply-To: <ZykH_fdcMBdFgXix@shredder>
+X-Proofpoint-GUID: pJ7eIthWh3rnfSLCCFQOOV5nak118080
+X-Proofpoint-ORIG-GUID: pJ7eIthWh3rnfSLCCFQOOV5nak118080
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-06_07,2024-11-06_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 phishscore=0 malwarescore=0
+ suspectscore=0 adultscore=0 clxscore=1030 mlxscore=0 bulkscore=0
+ mlxlogscore=722 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2411060109
 
-On 05.11.2024 22:06, Andrew Lunn wrote:
-> On Mon, Nov 04, 2024 at 11:07:20PM +0100, Heiner Kallweit wrote:
->> Vendor driver r8125 doesn't advertise 2.5G EEE on RTL8125A, and r8126
->> doesn't advertise 5G EEE. Likely there are compatibility issues,
->> therefore do the same in r8169.
->> With this change we don't have to disable 2.5G EEE advertisement in
->> rtl8125a_config_eee_phy() any longer.
->> Note: We don't remove the potentially problematic modes from the
->> supported modes, so users can re-enable advertisement of these modes
->> if they work fine in their setup.
->>
->> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
->> ---
->>  drivers/net/ethernet/realtek/r8169_main.c       |  7 +++++++
->>  drivers/net/ethernet/realtek/r8169_phy_config.c | 16 ++++------------
->>  2 files changed, 11 insertions(+), 12 deletions(-)
->>
->> diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
->> index e83c4841b..4f37d25e0 100644
->> --- a/drivers/net/ethernet/realtek/r8169_main.c
->> +++ b/drivers/net/ethernet/realtek/r8169_main.c
->> @@ -5318,6 +5318,13 @@ static int r8169_mdio_register(struct rtl8169_private *tp)
->>  		phy_support_eee(tp->phydev);
->>  	phy_support_asym_pause(tp->phydev);
->>  
->> +	/* mimic behavior of r8125/r8126 vendor drivers */
->> +	if (tp->mac_version == RTL_GIGA_MAC_VER_61)
->> +		linkmode_clear_bit(ETHTOOL_LINK_MODE_2500baseT_Full_BIT,
->> +				   tp->phydev->advertising_eee);
->> +	linkmode_clear_bit(ETHTOOL_LINK_MODE_5000baseT_Full_BIT,
->> +			   tp->phydev->advertising_eee);
-> 
-> Hi Heiner
-> 
-> phy_device.c has:
-> 
-> /**
->  * phy_remove_link_mode - Remove a supported link mode
->  * @phydev: phy_device structure to remove link mode from
->  * @link_mode: Link mode to be removed
->  *
->  * Description: Some MACs don't support all link modes which the PHY
->  * does.  e.g. a 1G MAC often does not support 1000Half. Add a helper
->  * to remove a link mode.
->  */
-> void phy_remove_link_mode(struct phy_device *phydev, u32 link_mode)
-> {
->         linkmode_clear_bit(link_mode, phydev->supported);
->         phy_advertise_supported(phydev);
-> }
-> EXPORT_SYMBOL(phy_remove_link_mode);
-> 
-> Maybe we need a phy_remove_eee_link_mode()? That could also remove it
-> from supported? At minimum, it would stop MAC drivers poking around
-> the insides of phylib.
-> 
-After checking eee_broken_modes in more detail:
-In general it does what I need, it prevents broken EEE modes from being
-advertised. Some challenges:
+Thanks for your detailed review, sending v8 patch to summerize all changes
 
-- eee_broken_modes currently represents eee_cap1 register bits.
-  So it's not possible to flag 2.5G or 5G EEE as broken.
-  - We would have to change eee_broken_modes to a linkmode bitmap.
+On Mon Nov 4, 2024 at 8:44 PM MSK, Ido Schimmel wrote:
+> + Guillaume:
+> please see comment below about route_get_dst_pmtu_from_exception())
+> Original patch:
+> https://lore.kernel.org/netdev/20241104072753.77042-1-deliran@verdict.gg/
+>
+> On Mon, Nov 04, 2024 at 07:27:50AM +0000, Vladimir Vdovin wrote:
+> > diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selfte=
+sts/net/pmtu.sh
+> > index 569bce8b6383..f24c84184c61 100755
+> > --- a/tools/testing/selftests/net/pmtu.sh
+> > +++ b/tools/testing/selftests/net/pmtu.sh
+> > @@ -197,6 +197,12 @@
+> >  #
+> >  # - pmtu_ipv6_route_change
+> >  #	Same as above but with IPv6
+> > +#
+> > +# - pmtu_ipv4_mp_exceptions
+> > +#	Use the same topology as in pmtu_ipv4, but add routeable "dummy"
+>
+> No need for "dummy" as these are regular addresses on the loopback
+> device
+>
+> > +#	addresses on host A and B on lo0 reachable via both routers.
+>
+> There is no "lo0" device. Only "lo". Run with "-v" and you will see a
+> lot of errors
+>
+> > +#	Host A and B "dummy" addresses have multipath routes to each other.
+> > +#	Check that PMTU exceptions are created for both paths.
+> > =20
+> >  source lib.sh
+> >  source net_helper.sh
+> > @@ -266,7 +272,8 @@ tests=3D"
+> >  	list_flush_ipv4_exception	ipv4: list and flush cached exceptions	1
+> >  	list_flush_ipv6_exception	ipv6: list and flush cached exceptions	1
+> >  	pmtu_ipv4_route_change		ipv4: PMTU exception w/route replace	1
+> > -	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1"
+> > +	pmtu_ipv6_route_change		ipv6: PMTU exception w/route replace	1
+> > +	pmtu_ipv4_mp_exceptions		ipv4: PMTU multipath nh exceptions	1"
+> > =20
+> >  # Addressing and routing for tests with routers: four network segments=
+, with
+> >  # index SEGMENT between 1 and 4, a common prefix (PREFIX4 or PREFIX6) =
+and an
+> > @@ -343,6 +350,9 @@ tunnel6_a_addr=3D"fd00:2::a"
+> >  tunnel6_b_addr=3D"fd00:2::b"
+> >  tunnel6_mask=3D"64"
+> > =20
+> > +dummy4_a_addr=3D"192.168.99.99"
+> > +dummy4_b_addr=3D"192.168.88.88"
+>
+> Let's change to "host4_a_addr" and "host4_b_addr" (or similar) as we are
+> no longer using a dummy device
+>
+> > +
+> >  dummy6_0_prefix=3D"fc00:1000::"
+> >  dummy6_1_prefix=3D"fc00:1001::"
+> >  dummy6_mask=3D"64"
+> > @@ -984,6 +994,50 @@ setup_ovs_bridge() {
+> >  	run_cmd ip route add ${prefix6}:${b_r1}::1 via ${prefix6}:${a_r1}::2
+> >  }
+> > =20
+> > +setup_multipath() {
+> > +	if [ "$USE_NH" =3D "yes" ]; then
+> > +		setup_multipath_new
+> > +	else
+> > +		setup_multipath_old
+> > +	fi
+>
+> Please move setup_multipath_{new,old}() before setup_multipath() like
+> setup_routing() and related functions
+>
+> > +
+> > +	# Set up routers with routes to dummies
+> > +	run_cmd ${ns_r1} ip route add ${dummy4_a_addr} via ${prefix4}.${a_r1}=
+.1
+> > +	run_cmd ${ns_r2} ip route add ${dummy4_a_addr} via ${prefix4}.${a_r2}=
+.1
+> > +	run_cmd ${ns_r1} ip route add ${dummy4_b_addr} via ${prefix4}.${b_r1}=
+.1
+> > +	run_cmd ${ns_r2} ip route add ${dummy4_b_addr} via ${prefix4}.${b_r2}=
+.1
+> > +}
+> > +
+> > +setup_multipath_new() {
+> > +	# Set up host A with multipath routes to host B dummy4_b_addr
+> > +	run_cmd ${ns_a} ip addr add ${dummy4_a_addr} dev lo0
+>
+> s/lo0/lo/ same in other places
+>
+> > +	run_cmd ${ns_a} ip nexthop add id 201 via ${prefix4}.${a_r1}.2 dev ve=
+th_A-R1
+> > +	run_cmd ${ns_a} ip nexthop add id 202 via ${prefix4}.${a_r2}.2 dev ve=
+th_A-R2
+> > +	run_cmd ${ns_a} ip nexthop add id 203 group 201/202
+> > +	run_cmd ${ns_a} ip route add ${dummy4_b_addr} nhid 203
+>
+> Maybe number the nexthops 401..403 so that we can later use 601..603 for
+> IPv6 like $routes_nh is doing
+>
+> > +
+> > +	# Set up host B with multipath routes to host A dummy4_a_addr
+> > +	run_cmd ${ns_b} ip addr add ${dummy4_b_addr} dev lo0
+> > +	run_cmd ${ns_b} ip nexthop add id 201 via ${prefix4}.${b_r1}.2 dev ve=
+th_A-R1
+>
+> s/veth_A-R1/veth_B-R1/
+>
+> > +	run_cmd ${ns_b} ip nexthop add id 202 via ${prefix4}.${b_r2}.2 dev ve=
+th_A-R2
+>
+> s/veth_A-R2/veth_B-R2/
+>
+> > +	run_cmd ${ns_b} ip nexthop add id 203 group 201/202
+> > +	run_cmd ${ns_b} ip route add ${dummy4_a_addr} nhid 203
+> > +}
+> > +
+> > +setup_multipath_old() {
+> > +	# Set up host A with multipath routes to host B dummy4_b_addr
+> > +	run_cmd ${ns_a} ip addr add ${dummy4_a_addr} dev lo0
+> > +	run_cmd ${ns_a} ip route add ${dummy4_b_addr} \
+> > +			nexthop via ${prefix4}.${a_r1}.2 weight 1 \
+> > +			nexthop via ${prefix4}.${a_r2}.2 weight 1
+> > +
+> > +	# Set up host B with multipath routes to host A dummy4_a_addr
+> > +	run_cmd ${ns_b} ip addr add ${dummy4_b_addr} dev lo0
+> > +	run_cmd ${ns_a} ip route add ${dummy4_a_addr} \
+>
+> s/ns_a/ns_b/
+>
+> > +			nexthop via ${prefix4}.${a_b1}.2 weight 1 \
+>
+> s/a_b1/b_r1/
+>
+> > +			nexthop via ${prefix4}.${a_b2}.2 weight 1
+>
+> s/a_b2/b_r2/
+>
+> > +}
+> > +
+> >  setup() {
+> >  	[ "$(id -u)" -ne 0 ] && echo "  need to run as root" && return $ksft_=
+skip
+> > =20
+> > @@ -2329,6 +2383,45 @@ test_pmtu_ipv6_route_change() {
+> >  	test_pmtu_ipvX_route_change 6
+> >  }
+> > =20
+> > +test_pmtu_ipv4_mp_exceptions() {
+> > +	setup namespaces routing multipath || return $ksft_skip
+> > +
+> > +	trace "${ns_a}"  veth_A-R1    "${ns_r1}" veth_R1-A \
+> > +	      "${ns_r1}" veth_R1-B    "${ns_b}"  veth_B-R1 \
+> > +	      "${ns_a}"  veth_A-R2    "${ns_r2}" veth_R2-A \
+> > +	      "${ns_r2}" veth_R2-B    "${ns_b}"  veth_B-R2
+> > +
+> > +	# Set up initial MTU values
+> > +	mtu "${ns_a}"  veth_A-R1 2000
+> > +	mtu "${ns_r1}" veth_R1-A 2000
+> > +	mtu "${ns_r1}" veth_R1-B 1400
+> > +	mtu "${ns_b}"  veth_B-R1 1400
+> > +
+> > +	mtu "${ns_a}"  veth_A-R2 2000
+> > +	mtu "${ns_r2}" veth_R2-A 2000
+> > +	mtu "${ns_r2}" veth_R2-B 1500
+> > +	mtu "${ns_b}"  veth_B-R2 1500
+> > +
+> > +	fail=3D0
+> > +
+> > +	# Ping and expect two nexthop exceptions for two routes in nh group
+> > +	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 1 -s 1800 "${dummy4_b_addr}=
+"
+> > +
+>
+> I looked more into pmtu.sh and this hunk from here ...
+>
+> > +	# Do route lookup before checking cached exceptions.
+> > +	# The following commands are needed for dst entries to be cached
+> > +	# in both paths exceptions and therefore dumped to user space
+> > +	run_cmd ${ns_a} ip route get ${dummy4_b_addr} oif veth_A-R1
+> > +	run_cmd ${ns_a} ip route get ${dummy4_b_addr} oif veth_A-R2
+> > +
+> > +	# Check cached exceptions
+> > +	if [ "$(${ns_a} ip -oneline route list cache | grep mtu | wc -l)" -ne=
+ 2 ]; then
+> > +		err "  there are not enough cached exceptions"
+> > +		fail=3D1
+> > +	fi
+>
+> ... until here can be replaced by route_get_dst_pmtu_from_exception() and
+> check_pmtu_value() like in other test cases. There are two
+> prerequisites:
+>
+> 1. We should set the same MTU in both paths as otherwise we don't know
+> which MTU will be cached and what to pass to check_pmtu_value() as the
+> expected value. I did see that check_pmtu_value() accepts "any", but I
+> think it's better to check for a specific value.
+>
+> 2. route_get_dst_pmtu_from_exception() is not very flexible in the
+> keywords it accepts for "ip route get" and we need to pass "oif". It can
+> be solved by [1] (please test), but Guillaume might have a better idea.
+> Then, the above hunk can be replaced by [2].
+>
+> [1]
+> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftest=
+s/net/pmtu.sh
+> index 569bce8b6383..6e790d38e5d9 100755
+> --- a/tools/testing/selftests/net/pmtu.sh
+> +++ b/tools/testing/selftests/net/pmtu.sh
+> @@ -1076,23 +1076,15 @@ link_get_mtu() {
+>  }
+> =20
+>  route_get_dst_exception() {
+> -	ns_cmd=3D"${1}"
+> -	dst=3D"${2}"
+> -	dsfield=3D"${3}"
+> -
+> -	if [ -z "${dsfield}" ]; then
+> -		dsfield=3D0
+> -	fi
+> +	ns_cmd=3D"${1}"; shift
+> =20
+> -	${ns_cmd} ip route get "${dst}" dsfield "${dsfield}"
+> +	${ns_cmd} ip route get "$@"
+>  }
+> =20
+>  route_get_dst_pmtu_from_exception() {
+> -	ns_cmd=3D"${1}"
+> -	dst=3D"${2}"
+> -	dsfield=3D"${3}"
+> +	ns_cmd=3D"${1}"; shift
+> =20
+> -	mtu_parse "$(route_get_dst_exception "${ns_cmd}" "${dst}" "${dsfield}")=
+"
+> +	mtu_parse "$(route_get_dst_exception "${ns_cmd}" "$@")"
+>  }
+> =20
+>  check_pmtu_value() {
+> @@ -1235,10 +1227,10 @@ test_pmtu_ipv4_dscp_icmp_exception() {
+>  	run_cmd "${ns_a}" ping -q -M want -Q "${dsfield}" -c 1 -w 1 -s "${len}"=
+ "${dst2}"
+> =20
+>  	# Check that exceptions have been created with the correct PMTU
+> -	pmtu_1=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst1}" "${po=
+licy_mark}")"
+> +	pmtu_1=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst1} dsfield=
+ ${policy_mark})"
+>  	check_pmtu_value "1400" "${pmtu_1}" "exceeding MTU" || return 1
+> =20
+> -	pmtu_2=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst2}" "${po=
+licy_mark}")"
+> +	pmtu_2=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst2} dsfield=
+ ${policy_mark})"
+>  	check_pmtu_value "1500" "${pmtu_2}" "exceeding MTU" || return 1
+>  }
+> =20
+> @@ -1285,9 +1277,9 @@ test_pmtu_ipv4_dscp_udp_exception() {
+>  		UDP:"${dst2}":50000,tos=3D"${dsfield}"
+> =20
+>  	# Check that exceptions have been created with the correct PMTU
+> -	pmtu_1=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst1}" "${po=
+licy_mark}")"
+> +	pmtu_1=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst1} dsfield=
+ ${policy_mark})"
+>  	check_pmtu_value "1400" "${pmtu_1}" "exceeding MTU" || return 1
+> -	pmtu_2=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" "${dst2}" "${po=
+licy_mark}")"
+> +	pmtu_2=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" ${dst2} dsfield=
+ ${policy_mark})"
+>  	check_pmtu_value "1500" "${pmtu_2}" "exceeding MTU" || return 1
+>  }
+>
+> [2]
+> diff --git a/tools/testing/selftests/net/pmtu.sh b/tools/testing/selftest=
+s/net/pmtu.sh
+> index a3c3f7f99e5b..10b8ac2d7f47 100755
+> --- a/tools/testing/selftests/net/pmtu.sh
+> +++ b/tools/testing/selftests/net/pmtu.sh
+> @@ -2399,19 +2399,11 @@ test_pmtu_ipv4_mp_exceptions() {
+>  	# Ping and expect two nexthop exceptions for two routes in nh group
+>  	run_cmd ${ns_a} ping -q -M want -i 0.1 -c 1 -s 1800 "${dummy4_b_addr}"
+> =20
+> -	# Do route lookup before checking cached exceptions.
+> -	# The following commands are needed for dst entries to be cached
+> -	# in both paths exceptions and therefore dumped to user space
+> -	run_cmd ${ns_a} ip route get ${dummy4_b_addr} oif veth_A-R1
+> -	run_cmd ${ns_a} ip route get ${dummy4_b_addr} oif veth_A-R2
+> -
+> -	# Check cached exceptions
+> -	if [ "$(${ns_a} ip -oneline route list cache | grep mtu | wc -l)" -ne 2=
+ ]; then
+> -		err "  there are not enough cached exceptions"
+> -		fail=3D1
+> -	fi
+> -
+> -	return ${fail}
+> +	# Check that exceptions have been created with the correct PMTU
+> +	pmtu=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" ${dummy4_b_addr} =
+oif veth_A-R1)"
+> +	check_pmtu_value "1500" "${pmtu}" "exceeding MTU (veth_A-R1)" || return=
+ 1
+> +	pmtu=3D"$(route_get_dst_pmtu_from_exception "${ns_a}" ${dummy4_b_addr} =
+oif veth_A-R2)"
+> +	check_pmtu_value "1500" "${pmtu}" "exceeding MTU (veth_A-R2)" || return=
+ 1
+>  }
+> =20
+>  usage() {
 
-- eee_broken_modes can be populated via DT only.
-  of_set_phy_eee_broken() would have to be changed to operate on
-  fwnodes. Then I may be able to "inject" the broken modes in my
-  case as swnode's.
-  Not the easiest solution, but maybe the cleanest. Feedback welcome.
-
-> 	Andrew
-Heiner
 
