@@ -1,246 +1,123 @@
-Return-Path: <netdev+bounces-142565-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142566-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 398459BFA19
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:31:07 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A06949BFA1D
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:31:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ED0A5284026
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:31:05 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 58C7C1F228E2
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:31:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C43618C03E;
-	Wed,  6 Nov 2024 23:31:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E72511DE4D3;
+	Wed,  6 Nov 2024 23:31:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="MltHYz4F"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Tr2WeeCm"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13789168BD;
-	Wed,  6 Nov 2024 23:31:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF9D1CDA36
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:31:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730935863; cv=none; b=tkHSaYa5K5xFY3Gs0sGat9fuGScy+zuq+LrDsDklAQT1CDOWyJeEtqPG8UVnlt7nWYCZyM3uTNdLhe09amBHsa7gJlmYH8jGZgMrqVgBuShVqjicbRg3YUwn3u8zNgPLB3N5CfHSewNQbjVULKbzpV/M8TTLRQcJJxq9inC5+vQ=
+	t=1730935900; cv=none; b=U9ud3lu74BBl6iD42rvtiRgxhofu/HZVKGxr5VlB3WR++pIShP+lLCZEPiuse/pBbgJUj91qBq/atdTy1LO8TBsOxcx3SvgzTHrKsiaptbYjc2f+TetNIfIbhM6ewhwuHPBVWlj2h65Nb43C7za9lopZ+IMy7mpe+62f/GAStyk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730935863; c=relaxed/simple;
-	bh=YlHn3IaBW1Py7gcTSxAUYqxrtEK4X1eXvgIaOf2+2p8=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fAf8odR4kSovmJVlcK8kFl8Q3WdPz4J+EI5bNcG7C02GvL9PgyCHDhBZYl4xWSIMGdtUVDpSGJGRx8d+9zZSp6tKPxTVfsd5SWJN6dlGZOi7p5BYXURXyb0Q75oCrQzw4FuDdJichxbH8AsIyECFRyN4xnZnRA85vfONbGq1ru4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=MltHYz4F; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 39CB5C4CEC6;
-	Wed,  6 Nov 2024 23:31:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730935862;
-	bh=YlHn3IaBW1Py7gcTSxAUYqxrtEK4X1eXvgIaOf2+2p8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MltHYz4FvxSBSLBpfVo9l9ZNyLJjDoUexxOh/hSvqakooROZEmQxdTlqf/39QHRDQ
-	 VGHbZuU7HNr4lhpTRFmXGErj0LZhFNjNNvuNCmibvve5dvkmfdM102NY2LALWoZz0V
-	 xw6lS7Su6+WynJreRpbJ8FYsSmY1GH2oC+/RkqNxK53TANl379muNBfj5rNzLworFh
-	 pLsiymcLZ7Kp2PuG+M8Awiq594aODIRyyE6no3gxK/ZlOWY89hMn3TzwExdr6lNjkZ
-	 i+cPFKA4eSGZ11FPS4uaW/KVuCsZBRrk5HA89C11yxFO1dJWKYaRhMRMwEPS4e08lT
-	 hBMzI4mb1oq9Q==
-Date: Wed, 6 Nov 2024 15:31:00 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Joe Damato <jdamato@fastly.com>
-Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
- bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
- edumazet@google.com, amritha.nambiar@intel.com,
- sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
- m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
- willy@infradead.org, willemdebruijn.kernel@gmail.com, skhawaja@google.com,
- Martin Karsten <mkarsten@uwaterloo.ca>, "David S. Miller"
- <davem@davemloft.net>, Simon Horman <horms@kernel.org>, David Ahern
- <dsahern@kernel.org>, Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
- Lorenzo Bianconi <lorenzo@kernel.org>, Alexander Lobakin
- <aleksander.lobakin@intel.com>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 2/7] net: Suspend softirq when
- prefer_busy_poll is set
-Message-ID: <20241106153100.45fbe646@kernel.org>
-In-Reply-To: <ZyuesOyJLI3U0C5e@LQ3V64L9R2>
-References: <20241104215542.215919-1-jdamato@fastly.com>
-	<20241104215542.215919-3-jdamato@fastly.com>
-	<20241105210338.5364375d@kernel.org>
-	<ZyuesOyJLI3U0C5e@LQ3V64L9R2>
+	s=arc-20240116; t=1730935900; c=relaxed/simple;
+	bh=mWpGlC8TT6iWzmjsw47bBeNFYVFDhrJZPLzBX1vQ7AI=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=X5qozToz8olpOTclIqSqvz3p2JMJSjto5ohLfFu/njejPhFz7cHZjoeOr3e0S5BpLogncKu+LXioC+XRRls6kxHfvjQD0GxR86icQS1MZdfNPcAkayT0782k/vWq9QvTW8SpdVhFDXMZaAJXDEsdb16U2odRB5veV5hl40pRF7I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Tr2WeeCm; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730935900; x=1762471900;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=kKZNDXo2qZJhLwGxCaLoNmADWHhHDnpG9mYI9Q1qvmo=;
+  b=Tr2WeeCmoLc/PQ9+IqzoMckmvp5xsElr7AyAAs92y6hUhLcCfzNixujj
+   ArHJAJDtYMJrFsPHHhUNpfCL0rvWu3ktPGpEVm/N0D6V2MtlXT2/iLXrW
+   cN9XZGUx+yiTmSEucRJk2v0mhBgCnKKgWxFqZXBUr9E2wYfHIQAnAxK6r
+   o=;
+X-IronPort-AV: E=Sophos;i="6.11,264,1725321600"; 
+   d="scan'208";a="383029804"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 23:31:32 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.7.35:36464]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.168:2525] with esmtp (Farcaster)
+ id 86745bf4-ced1-4688-a110-4a0a2aead905; Wed, 6 Nov 2024 23:31:31 +0000 (UTC)
+X-Farcaster-Flow-ID: 86745bf4-ced1-4688-a110-4a0a2aead905
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 6 Nov 2024 23:31:31 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 6 Nov 2024 23:31:28 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <alibuda@linux.alibaba.com>, <davem@davemloft.net>,
+	<dust.li@linux.alibaba.com>, <eric.dumazet@gmail.com>,
+	<ignat@cloudflare.com>, <kuba@kernel.org>, <kuniyu@amazon.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <wenjia@linux.ibm.com>
+Subject: Re: [PATCH net] net/smc: do not leave a dangling sk pointer in __smc_create()
+Date: Wed, 6 Nov 2024 15:31:24 -0800
+Message-ID: <20241106233124.51142-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241106221922.1544045-1-edumazet@google.com>
+References: <20241106221922.1544045-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D045UWA004.ant.amazon.com (10.13.139.91) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Wed, 6 Nov 2024 08:52:00 -0800 Joe Damato wrote:
-> On Tue, Nov 05, 2024 at 09:03:38PM -0800, Jakub Kicinski wrote:
-> > On Mon,  4 Nov 2024 21:55:26 +0000 Joe Damato wrote:  
-> > > From: Martin Karsten <mkarsten@uwaterloo.ca>
-> > > 
-> > > When NAPI_F_PREFER_BUSY_POLL is set during busy_poll_stop and the
-> > > irq_suspend_timeout is nonzero, this timeout is used to defer softirq
-> > > scheduling, potentially longer than gro_flush_timeout. This can be used
-> > > to effectively suspend softirq processing during the time it takes for
-> > > an application to process data and return to the next busy-poll.
-> > > 
-> > > The call to napi->poll in busy_poll_stop might lead to an invocation of  
-> > 
-> > The call to napi->poll when we're arming the timer is counter
-> > productive, right? Maybe we can take this opportunity to add
-> > the seemingly missing logic to skip over it?  
+From: Eric Dumazet <edumazet@google.com>
+Date: Wed,  6 Nov 2024 22:19:22 +0000
+> Thanks to commit 4bbd360a5084 ("socket: Print pf->create() when
+> it does not clear sock->sk on failure."), syzbot found an issue with AF_SMC:
 > 
-> It seems like the call to napi->poll in busy_poll_stop is counter
-> productive and we're not opposed to making an optimization like that
-> in the future.
+> smc_create must clear sock->sk on failure, family: 43, type: 1, protocol: 0
+>  WARNING: CPU: 0 PID: 5827 at net/socket.c:1565 __sock_create+0x96f/0xa30 net/socket.c:1563
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5827 Comm: syz-executor259 Not tainted 6.12.0-rc6-next-20241106-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>  RIP: 0010:__sock_create+0x96f/0xa30 net/socket.c:1563
+> Code: 03 00 74 08 4c 89 e7 e8 4f 3b 85 f8 49 8b 34 24 48 c7 c7 40 89 0c 8d 8b 54 24 04 8b 4c 24 0c 44 8b 44 24 08 e8 32 78 db f7 90 <0f> 0b 90 90 e9 d3 fd ff ff 89 e9 80 e1 07 fe c1 38 c1 0f 8c ee f7
+> RSP: 0018:ffffc90003e4fda0 EFLAGS: 00010246
+> RAX: 099c6f938c7f4700 RBX: 1ffffffff1a595fd RCX: ffff888034823c00
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: 00000000ffffffe9 R08: ffffffff81567052 R09: 1ffff920007c9f50
+> R10: dffffc0000000000 R11: fffff520007c9f51 R12: ffffffff8d2cafe8
+> R13: 1ffffffff1a595fe R14: ffffffff9a789c40 R15: ffff8880764298c0
+> FS:  000055557b518380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fa62ff43225 CR3: 0000000031628000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>  <TASK>
+>   sock_create net/socket.c:1616 [inline]
+>   __sys_socket_create net/socket.c:1653 [inline]
+>   __sys_socket+0x150/0x3c0 net/socket.c:1700
+>   __do_sys_socket net/socket.c:1714 [inline]
+>   __se_sys_socket net/socket.c:1712 [inline]
 > 
-> When we tried it, it triggered several bugs/system hangs, so we left
-> as much of the original code in place as possible.
-
-You don't happen to have the patch you used? Many ways to get the
-skipping wrong.
-
-> The existing patch works and streamlining busy_poll_stop to skip the
-> call to napi->poll is an optimization that can be added as a later
-> series that focuses solely on when/where/how napi->poll is called.
-
-The reason I brought it up is that it rearms the timer, if driver 
-ends up calling napi_complete_done(). So we arm the timer in
-napi_poll_stop(), then call the driver which may rearm again, 
-making the already complex code even harder to reason about.
-
-> Our focus was on:
->   - Not breaking any of the existing mechanisms
->   - Adding a new mechanism
+> For reference, see commit 2d859aff775d ("Merge branch
+> 'do-not-leave-dangling-sk-pointers-in-pf-create-functions'")
 > 
-> I think we should avoid pulling the optimization you suggest into
-> this particular series and save that for the future.
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I'm primarily worried about maintainability of this code.
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
-> > > diff --git a/net/core/dev.c b/net/core/dev.c
-> > > index 4d910872963f..51d88f758e2e 100644
-> > > --- a/net/core/dev.c
-> > > +++ b/net/core/dev.c
-> > > @@ -6239,7 +6239,12 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
-> > >  			timeout = napi_get_gro_flush_timeout(n);
-> > >  		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
-> > >  	}
-> > > -	if (n->defer_hard_irqs_count > 0) {
-> > > +	if (napi_prefer_busy_poll(n)) {
-> > > +		timeout = napi_get_irq_suspend_timeout(n);  
-> > 
-> > Why look at the suspend timeout in napi_complete_done()?
-> > We are unlikely to be exiting busy poll here.  
-> 
-> The idea is similar to commit 7fd3253a7de6 ("net: Introduce
-> preferred busy-polling"); continue to defer IRQs as long as forward
-> progress is being made. In this case, napi->poll ran, called
-> napi_complete_done -- the system is moving forward with processing
-> so prevent IRQs from interrupting us.
-
-We should clarify the mental models. You're describing IRQ deferal,
-but say prefer busy poll.
-
-Prefer busy poll has only one function - if we are at 100% busy
-and always see >= budget of packets on the ring, we never call
-napi_complete_done(). Drivers don't call napi_complete_done() if they
-consumed full budget. So we need a way to break that re-polling loop,
-release the NAPI ownership and give busy poll a chance to claim the
-NAPI instance ownership (the SCHED bit). We check for prefer
-busy poll in __napi_poll(), because, again, in the target scenario
-napi_complete_done() is never called.
-
-The IRQ deferal mechanism is necessary for prefer busy poll to work,
-but it's separate and used by some drivers without good IRQ coalescing,
-no user space polling involved.
-
-In your case, when machine is not melting under 100% load - prefer busy
-poll will be set once or not at all.
-
-> epoll_wait will re-enable IRQs (by calling napi_schedule) if
-> there are no events ready for processing.
-
-To be 100% precise calling napi_schedule will not reenable IRQs 
-if IRQ deferal is active. It only guarantees one NAPI run in 
-softirq (or thread if threaded).
-
-> > Is it because we need more time than gro_flush_timeout
-> > for the application to take over the polling?  
-> 
-> That's right; we want the application to retain control of packet
-> processing. That's why we connected this to the "prefer_busy_poll"
-> flag.
-> 
-> > > +		if (timeout)
-> > > +			ret = false;
-> > > +	}
-> > > +	if (ret && n->defer_hard_irqs_count > 0) {
-> > >  		n->defer_hard_irqs_count--;
-> > >  		timeout = napi_get_gro_flush_timeout(n);
-> > >  		if (timeout)
-> > > @@ -6375,9 +6380,13 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
-> > >  	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
-> > >  
-> > >  	if (flags & NAPI_F_PREFER_BUSY_POLL) {
-> > > -		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
-> > > -		timeout = napi_get_gro_flush_timeout(napi);
-> > > -		if (napi->defer_hard_irqs_count && timeout) {
-> > > +		timeout = napi_get_irq_suspend_timeout(napi);  
-> > 
-> > Even here I'm not sure if we need to trigger suspend.
-> > I don't know the eventpoll code well but it seems like you suspend 
-> > and resume based on events when exiting epoll. Why also here?  
-> 
-> There's two questions wrapped up here and an overall point to make:
-> 
-> 1. Suspend and resume based on events when exiting epoll - that's
->    right and as you'll see in those patches that happens by:
->      - arming the suspend timer (via a call to napi_suspend_irqs)
->        when a positive number of events are retrieved
->      - calling napi_schedule (via napi_resume_irqs) when there are
->        no events or the epoll context is being freed.
-> 
-> 2. Why defer the suspend timer here in busy_poll_stop? Note that the
->    original code would set the timer to gro_flush_timeout, which
->    would introduce the trade offs we mention in the cover letter
->    (latency for large values, IRQ interruption for small values).
-> 
->    We don't want the gro_flush_timeout to take over yet because we
->    want to avoid these tradeoffs up until the point where epoll_wait
->    finds no events for processing.
-> 
->    Does that make sense? If we skipped the IRQ suspend deferral
->    here, we'd be giving packet processing control back to
->    gro_flush_timeout and napi_defer_hard_irqs, but the system might
->    still have packets that can be processed in the next call to
->    epoll_wait.
-
-Let me tell you what I think happens and then you can correct me.
-
-0 epoll
-1   # ..does its magic..
-2   __napi_busy_loop() 
-3     # finds a waking packet
-4     busy_poll_stop()
-5       # arms the timer for long suspend
-6   # epoll sees events
-7     ep_suspend_napi_irqs()
-8       napi_suspend_irqs()
-9         # arms for long timer again
-
-The timer we arm here only has to survive from line 5 to line 9,
-because we will override the timeout on line 9.
-
-> The overall point to make is that: the suspend timer is used to
-> prevent misbehaving userland applications from taking too long. It's
-> essentially a backstop and, as long as the app is making forward
-> progress, allows the app to continue running its busy poll loop
-> undisturbed (via napi_complete_done preventing the driver from
-> enabling IRQs).
-> 
-> Does that make sense?
-
-My mental model put in yet another way is that only epoll knows if it
-has events, and therefore whether the timeout should be short or long.
-So the suspend timer should only be applied by epoll.
+Thanks!
 
