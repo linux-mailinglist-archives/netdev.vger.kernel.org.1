@@ -1,138 +1,127 @@
-Return-Path: <netdev+bounces-142248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142249-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F9499BDF9D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:42:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42FEA9BDFA0
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:42:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7D00284AD5
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:42:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7432B1C20E09
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:42:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03BAF1D2709;
-	Wed,  6 Nov 2024 07:41:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83611D043D;
+	Wed,  6 Nov 2024 07:42:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="hwqcRC9H"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y+hJUMs0"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC336190470;
-	Wed,  6 Nov 2024 07:41:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 489A7190470
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:42:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730878903; cv=none; b=b0rTY4Zh/Yv78ycBFHgPt3Zy8fKp6HsXj8LWJXvYQmlTvDovay/mV7LW1GLHxbr139ZaadaWkN35HfSjfMjxxYB6FPudb3vKYvZx0oZZ3cgwal1FnzqM54fVumAYUYSSs//B9Xkj+kq4kECJzBz6Nq69CyrG38d6hOy2SDtI8W4=
+	t=1730878959; cv=none; b=Nl7MnkI84t9CimqlmFpQYG847wVcfwBQo0BPQyhbyC8cpWbuRQCYDWe1TJtBBu4kQuA1YneHEw7ybQYZ/kJC3CEugTme7JhPZLjsH19vuhXZGE2CMXwfQOmuPmu78nOn/kL/uHz73HDVgJqrI1OSAPzRbxLTGoKZ2+Ll1Jh2jOU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730878903; c=relaxed/simple;
-	bh=FauuGZr/25wEWX1/MTNvKW0A20/su50USz7BG9Hd2gU=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=hLg4d4xqyLsM+goS4DiEtseOBoLCusqpTcqx4i+CIXCoGJov4jKwXeMBOtz7iujYuLgPWZfXQPxwFj0RqCT6VrUms3snHuYMcNq1WSOsfOR5LPnVOjbwRNc+r9MX6fBXd0PQiqeVcN72vLFnt8HWGJ0Vwt/FtzkLIbx3lLO+qXk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=hwqcRC9H; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0266.itg.ti.com ([10.180.67.225])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A67fRg1018043;
-	Wed, 6 Nov 2024 01:41:27 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1730878887;
-	bh=SEQBMpZUNFN1GW+nwD1YAozhMyyk0AV9Osd490Zj6Zo=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=hwqcRC9HUMJLbqtyzj+WAftG0w9BGPaCK7I47LdY83xYPXtqOGsh+JStMX5UvsWmQ
-	 CEhU93NQiS1/gcyuxlcNIF86NeuKT0JCibukP5fjM5nAFOpxl64iOBpPk2gy7wOLQZ
-	 FCj8cT0RXdJUN8Puv4zip7PF9yQZF9QLlD8iZd04=
-Received: from DLEE104.ent.ti.com (dlee104.ent.ti.com [157.170.170.34])
-	by lelv0266.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A67fRRb111576;
-	Wed, 6 Nov 2024 01:41:27 -0600
-Received: from DLEE109.ent.ti.com (157.170.170.41) by DLEE104.ent.ti.com
- (157.170.170.34) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 6
- Nov 2024 01:41:26 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE109.ent.ti.com
- (157.170.170.41) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Wed, 6 Nov 2024 01:41:26 -0600
-Received: from lelv0854.itg.ti.com (lelv0854.itg.ti.com [10.181.64.140])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A67fQht024993;
-	Wed, 6 Nov 2024 01:41:26 -0600
-Received: from localhost (meghana-pc.dhcp.ti.com [10.24.69.13] (may be forged))
-	by lelv0854.itg.ti.com (8.14.7/8.14.7) with ESMTP id 4A67fPV2014472;
-	Wed, 6 Nov 2024 01:41:26 -0600
-From: Meghana Malladi <m-malladi@ti.com>
-To: <vigneshr@ti.com>, <m-karicheri2@ti.com>, <m-malladi@ti.com>,
-        <jan.kiszka@siemens.com>, <javier.carrasco.cruz@gmail.com>,
-        <jacob.e.keller@intel.com>, <horms@kernel.org>,
-        <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <kuba@kernel.org>,
-        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>
-CC: <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
-        Roger Quadros
-	<rogerq@kernel.org>, <danishanwar@ti.com>
-Subject: [PATCH net 2/2] net: ti: icssg-prueth: Fix clearing of IEP_CMP_CFG registers during iep_init
-Date: Wed, 6 Nov 2024 13:10:40 +0530
-Message-ID: <20241106074040.3361730-3-m-malladi@ti.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20241106074040.3361730-1-m-malladi@ti.com>
-References: <20241106074040.3361730-1-m-malladi@ti.com>
+	s=arc-20240116; t=1730878959; c=relaxed/simple;
+	bh=87naFhcpflzvVNi4oKK41OMWqAcB7NuYDDSruv3y9lc=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=SikaDkVnBllH1SwVySjRknyUTws9/Tqef10v7UvSLBA8MkNtwFQfEGOPeOLPMkhyV7JAooNgKdn6WQfml1qyglZlxOxMGqLSylGyP3MZllpA/1Ol8zRUp4SqyMlHTr7VEhnq7+xWT0TY924TRd7B2YAyZlOFWKCLTudvOxeGmlU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y+hJUMs0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730878957;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=VWR9zcSGFhCX887b0B/GPsWncKD7+3L6Qhwgrepk+0M=;
+	b=Y+hJUMs0/xVR377H1SWJapVAkNDqjYRutHl8a37QvpW+rKpB56Ca5VacJDOLIoeUF8kQ+4
+	xJ+M8il/9Bm1bdgCUS7PIJPsBpDUjxyVJVdN3EzYmy3xFHfoqygVvLO5opEM3Ehx/Fhfhc
+	8TdNc9QNerIH2U2BelTbGk/3cIp97xM=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-533-Z-2QaSdUOEaI9LfuMWVkVw-1; Wed, 06 Nov 2024 02:42:36 -0500
+X-MC-Unique: Z-2QaSdUOEaI9LfuMWVkVw-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-381d0582ad3so3070968f8f.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 23:42:35 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730878955; x=1731483755;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VWR9zcSGFhCX887b0B/GPsWncKD7+3L6Qhwgrepk+0M=;
+        b=gZALn3UIpG1nSzfBW1/i0PYw0tgvhm1wTOWGtnaeedlX7xBRD3MYM0PpSyKYRquRtD
+         +sM105g+/MmzWkP8BD5K36L30MmsjnIQJM8gkbZDsQyKY6gv8e2h2dg0DeLzUu+Xj6OT
+         K2eleYxZzf/sm/n4mpghVDnaqJKMlLIClFGypvZLF0daefXtsaLmc7UqUrCjL3bnaFva
+         UFkA6VVuS6MVhxddeoEehJlFISvuxfscfAnpcUHbUiFzgO6z33kA55Asq2JHRJ0Nki5R
+         hioXSSilXG1ggkUVzp8nLCirt9tci6YtjDMgD67DvG5LzhKwlNMU1tqbc/vM38n13ZGq
+         rB7g==
+X-Forwarded-Encrypted: i=1; AJvYcCVuWiA4ZDMsriuxjCuHxMf/XAiu5yMdIfl1w/SUbzZVzx62wr31rPeIC38+iKAoLTz1Viz5FMw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyaW+M2SCFIwrW4seY15HIXgR/B7RydrboTw8cOv/wGyB4DdXnQ
+	QE4IXXcpY/+ImNh63Z2CLL8hxyWtExXpKdGGAEN4rfLUfCM+Rio6SVdFUit9cTKdB1KxG+b7n0i
+	OuomGKSSNrUsR64pBLdBVEo2QekzFsCdKQAirz5g6refK9jCx8W8Mhw==
+X-Received: by 2002:a05:6000:1885:b0:37d:332e:d6ab with SMTP id ffacd0b85a97d-381c7ac4120mr17584465f8f.43.1730878954814;
+        Tue, 05 Nov 2024 23:42:34 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEgNtqpF0tJni5pYGtoHDDU6pOi20AGMmYrQIEMtMqT7zuCSRaMIZpdZQj9fUZ5DU6Gb1R3xw==
+X-Received: by 2002:a05:6000:1885:b0:37d:332e:d6ab with SMTP id ffacd0b85a97d-381c7ac4120mr17584441f8f.43.1730878954464;
+        Tue, 05 Nov 2024 23:42:34 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d49dfsm18389413f8f.46.2024.11.05.23.42.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 05 Nov 2024 23:42:33 -0800 (PST)
+Date: Wed, 6 Nov 2024 02:42:30 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Xuan Zhuo <xuanzhuo@linux.alibaba.com>, netdev@vger.kernel.org,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	virtualization@lists.linux.dev, bpf@vger.kernel.org
+Subject: Re: [PATCH net-next v2 02/13] virtio_ring: split: record extras for
+ indirect buffers
+Message-ID: <20241106024153-mutt-send-email-mst@kernel.org>
+References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com>
+ <20241030082453.97310-3-xuanzhuo@linux.alibaba.com>
+ <CACGkMEtP7tdxxLOtDArNCqO5b=A=a7X2NimK8be2aWuaKG6Xfw@mail.gmail.com>
+ <1730789499.0809722-1-xuanzhuo@linux.alibaba.com>
+ <CACGkMEt4HfEAyUGe8CL3eLJmbrcz9Uz1rhCo7_j4aShzLa4iEQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CACGkMEt4HfEAyUGe8CL3eLJmbrcz9Uz1rhCo7_j4aShzLa4iEQ@mail.gmail.com>
 
-When ICSSG interfaces are brought down and brought up again, the
-pru cores are shut down and booted again, flushing out all the memories
-and start again in a clean state. Hence it is expected that the
-IEP_CMP_CFG register needs to be flushed during iep_init() to ensure
-that the existing residual configuration doesn't cause any unusual
-behavior. If the register is not cleared, existing IEP_CMP_CFG set for
-CMP1 will result in SYNC0_OUT signal based on the SYNC_OUT register values.
+On Wed, Nov 06, 2024 at 09:44:39AM +0800, Jason Wang wrote:
+> > > >         while (vq->split.vring.desc[i].flags & nextflag) {
+> > > > -               vring_unmap_one_split(vq, i);
+> > > > +               vring_unmap_one_split(vq, &extra[i]);
+> > >
+> > > Not sure if I've asked this before. But this part seems to deserve an
+> > > independent fix for -stable.
+> >
+> > What fix?
+> 
+> I meant for hardening we need to check the flags stored in the extra
+> instead of the descriptor itself as it could be mangled by the device.
+> 
+> Thanks
 
-After bringing the interface up, calling PPS enable doesn't work as
-the driver believes PPS is already enabled, (iep->pps_enabled is not
-cleared during interface bring down) and driver  will just return true
-even though there is no signal. Fix this by setting the iep->pps_enable
-and iep->perout_enable flags to false during the link down.
+Good point. Jason, want to cook up a patch?
 
-Fixes: c1e0230eeaab ("net: ti: icss-iep: Add IEP driver")
-Signed-off-by: Meghana Malladi <m-malladi@ti.com>
----
- drivers/net/ethernet/ti/icssg/icss_iep.c | 10 ++++++++++
- 1 file changed, 10 insertions(+)
-
-diff --git a/drivers/net/ethernet/ti/icssg/icss_iep.c b/drivers/net/ethernet/ti/icssg/icss_iep.c
-index 5d6d1cf78e93..03abc25ced12 100644
---- a/drivers/net/ethernet/ti/icssg/icss_iep.c
-+++ b/drivers/net/ethernet/ti/icssg/icss_iep.c
-@@ -195,6 +195,12 @@ static void icss_iep_enable_shadow_mode(struct icss_iep *iep)
- 
- 	icss_iep_disable(iep);
- 
-+	/* clear compare config */
-+	for (cmp = IEP_MIN_CMP; cmp < IEP_MAX_CMP; cmp++) {
-+		regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
-+				   IEP_CMP_CFG_CMP_EN(cmp), 0);
-+	}
-+
- 	/* disable shadow mode */
- 	regmap_update_bits(iep->map, ICSS_IEP_CMP_CFG_REG,
- 			   IEP_CMP_CFG_SHADOW_EN, 0);
-@@ -778,6 +784,10 @@ int icss_iep_exit(struct icss_iep *iep)
- 		ptp_clock_unregister(iep->ptp_clock);
- 		iep->ptp_clock = NULL;
- 	}
-+
-+	iep->pps_enabled = false;
-+	iep->perout_enabled = false;
-+
- 	icss_iep_disable(iep);
- 
- 	return 0;
 -- 
-2.25.1
+MST
 
 
