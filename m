@@ -1,87 +1,145 @@
-Return-Path: <netdev+bounces-142459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29C7D9BF418
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:13:25 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CC22C9BF427
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:18:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A64EEB256ED
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:13:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01DB11C2369D
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:18:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E452071FE;
-	Wed,  6 Nov 2024 17:12:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE32120400E;
+	Wed,  6 Nov 2024 17:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFXjOsN2"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="zoLzxBv/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2C320651A;
-	Wed,  6 Nov 2024 17:12:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16801DFDB3
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:18:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730913179; cv=none; b=nNWgtrjIokWvSdUnbujlVSm0tj9KxBK9gbDTwoBu6Yi3Bp2yK5AGUfflGk+K3zJrG09NbmOlmBQvVAxF/xIqtNpfITmlOBs9nLZCbfPE/gbPpAlqMncCXEw7XRn4YwTrCOEnjflddGaRcE2mOAlaIDLuZ3Lixpr/msBnOv36G0Q=
+	t=1730913486; cv=none; b=NMju2XdLqY7Cp7mZc7AvA19Aa3koSxod8UfZnqiBPq3iLlwLL8+IAfKv1z3RVgxj7+loEZxLl9EcNDZT7QTqjB22CnrueJI6RufwUkBigAhza/+OqsKsYURMbJ+UIZ/gKwkyn546ucyRPHwr2pixZnqxZ3pMcoVpVwd5X9rBc2M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730913179; c=relaxed/simple;
-	bh=TJ8k3mCggEOeNdf46pEjfuifIThabvQ7xAOUebYtnhQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition:In-Reply-To; b=Yl/5kAySkFR4y4ljEJKYv+zyPHDbDM+hAyrOsQtC/7oeorVY7LB0yJuXIIlF8Sbsmuvs3/ykxUilzoM0Jb+LgHmOBqOQOrRNXNNA//koEnqawPbzuzLuAuhHfut2MwMxFON5bYli4lXps7qiRos7K+ELJ6a03u4UXS+8f2AuK2s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFXjOsN2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F5F7C4CEC6;
-	Wed,  6 Nov 2024 17:12:58 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730913178;
-	bh=TJ8k3mCggEOeNdf46pEjfuifIThabvQ7xAOUebYtnhQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=GFXjOsN2J8icjY3vS2+wkJgieDisOOZ+NKfEGqjNgMoDZ6uKErMucXSzMAdDZIoaH
-	 YSVnIJi4oyz90j8KTq3hzpbLMso/IONUBj+qZJ03kq8UHdNNed6i+BaVFQBDECdrM+
-	 SDxmmbp3pe84qstIeftQTPKmAnHGVafhyXV5Iv6TpNBnpme04zLibSQCROwUSRDodA
-	 gcY/w26YP7tOEar+IkwwIDR9zyKuspBsKwLOJq68nn3SuTHsoe+wPt7ahtWrVjFNiC
-	 esJfImPYD4LsU8u3aWHxBcN43PgzIO6+vr8+5H5XPi4bB3ccu6Zhz+UoI0rVu/ZWuJ
-	 Znia/LLl84cZg==
-Date: Wed, 6 Nov 2024 11:12:57 -0600
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Sanman Pradhan <sanman.p211993@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, netdev@vger.kernel.org,
-	alexanderduyck@fb.com, kuba@kernel.org, kernel-team@meta.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, corbet@lwn.net, mohsin.bashr@gmail.com,
-	sanmanpradhan@meta.com, andrew+netdev@lunn.ch,
-	vadim.fedorenko@linux.dev, jdamato@fastly.com, sdf@fomichev.me,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next] eth: fbnic: Add PCIe hardware statistics
-Message-ID: <20241106171257.GA1529850@bhelgaas>
+	s=arc-20240116; t=1730913486; c=relaxed/simple;
+	bh=D3akWTzzrhH0TTwjTl32BYFaTzK8flwrj+FMP0QjcGs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ew6IjoHdtCl9+sD7Lrp0ubAqvee9AizHuh3i8NWCBkObeCjVSc+pzwVrs4ZDCBK5u7tvet1vHMGMxEmjqrR5UXr5wC8UehCxNSojHBsaRgBFsu/KtrxI5HJpp3y7VLrUFAirfwthz8ytza68K+XzhW/J46J2f01s7q7heUTGNho=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=zoLzxBv/; arc=none smtp.client-ip=209.85.210.195
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-720d01caa66so5256975b3a.2
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 09:18:04 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730913484; x=1731518284; darn=vger.kernel.org;
+        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4mS4bhbgWkrfNh/k8UQSZlBBclWCC8e/vq4LQXj0z0=;
+        b=zoLzxBv/YH0kzFG1rxemhN+0DCxlRlvoRIg6S/KeDkjTl7+cSREKIMLY/DCDVIyRcf
+         lD3ia28FXEyDEc8R3ezwOMSR2wrBA8xw081dn7nMhqoH0JGcvF+gZdGYz5U6JiCpoavc
+         8xariOQObCMxe2l9hLACSRdF1ycMZGQlkgMNmakoqE9bR0sZ0q9+RcyBJ+gTFfQ314nU
+         8+zAApvGejPHNqljQeBxekQTveT7DjfexVtqwD+XfPVE9U7B1qMpyOBEAz/Omtecn+k9
+         tyrN+zSWnaO5UcpEReCf/X1zBqyjLEb5hTBxQvQ4BIvHVm1zvuExctPB6Ck8Cgrcl1LR
+         7qcA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730913484; x=1731518284;
+        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z4mS4bhbgWkrfNh/k8UQSZlBBclWCC8e/vq4LQXj0z0=;
+        b=qRQjqLrkFIxc0M5i7awdZr+8wSeP9TxtNIl8QFS7h0b11QJ0ZYc/X4YZVqayWeidaS
+         YspghpOHJxBagA/jpZr/j97h/qJJVdOjZJ5KJFdCwcBo6CxrRNTJ0jcH/6aTXBLFAgAB
+         H5ne2/BhS6IYd45oiXZKB9vc8Mge87QAxpv/kTAxQN8Da3vQyk3cHwjsr5o9Imua0Tn9
+         Ow09OkDppJtO3HpS2jgNSNlri90WshxU5gsETD+vd68hRicmte416MEsf9FZmd6IWcIl
+         R7EoMeqGm3/7OgsXwIQdZomZnHcsN5tSNwqAk5MICvDw4HdBFuAnYzdF7GErc1SQJIyk
+         R4nw==
+X-Forwarded-Encrypted: i=1; AJvYcCXypsIYKBuUv4hU3r6GWnXuXp5e0dloEv6fcmALAPSn0Dn1yd5FYPcANqSmZKvdp2HItzk6K5Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yws2OReuEQxJx7y/34T58q3Mclebp8KbeDSCaRFJEMkoft34XrE
+	dsY0H2n4xNxt5U8Zdc3uqf0Iun4agZnGN9fDOvWr87WTfFoz4O5O/WuphCzgI/Q=
+X-Google-Smtp-Source: AGHT+IFAtTbMlzlYTZPpconsYstGTwm32F/0lmZYGv5EMIr8bwO59JKoYHo/OBN0fp3YFHP1pkdBDA==
+X-Received: by 2002:a05:6a00:a0a:b0:71e:581f:7d7e with SMTP id d2e1a72fcca58-720b9c29c4cmr31554907b3a.15.1730913484062;
+        Wed, 06 Nov 2024 09:18:04 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc2eb6a5sm12396869b3a.144.2024.11.06.09.18.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 09:18:03 -0800 (PST)
+Date: Wed, 6 Nov 2024 09:18:01 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Alejandro Colomar <alx@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexhenrie24@gmail.com,
+ branden@debian.org, linux-man@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
+Message-ID: <20241106091801.3e021842@hermes.local>
+In-Reply-To: <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
+References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
+	<20241105055338.61082-1-kuniyu@amazon.com>
+	<xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106122251.GC5006@unreal>
+Content-Type: multipart/signed; boundary="Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
 
-On Wed, Nov 06, 2024 at 02:22:51PM +0200, Leon Romanovsky wrote:
-> On Tue, Nov 05, 2024 at 04:26:25PM -0800, Sanman Pradhan wrote:
-> > Add PCIe hardware statistics support to the fbnic driver. These stats
-> > provide insight into PCIe transaction performance and error conditions,
-> > including, read/write and completion TLP counts and DWORD counts and
-> > debug counters for tag, completion credit and NP credit exhaustion
-> > 
-> > The stats are exposed via ethtool and can be used to monitor PCIe
-> > performance and debug PCIe issues.
-> 
-> And how does PCIe statistics belong to ethtool?
-> 
-> This PCIe statistics to debug PCIe errors and arguably should be part of
-> PCI core and not hidden in netdev tool.
+--Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-How would this be done in the PCI core?  As far as I can tell, all
-these registers are device-specific and live in some device BAR.
+On Tue, 5 Nov 2024 12:33:48 +0100
+Alejandro Colomar <alx@kernel.org> wrote:
 
-Bjorn
+> Hi Alex, Kuniyuki, Branden,
+>=20
+> On Mon, Nov 04, 2024 at 09:53:38PM GMT, Kuniyuki Iwashima wrote:
+> > From: Alex Henrie <alexhenrie24@gmail.com>
+> > Date: Mon,  4 Nov 2024 21:14:20 -0700 =20
+> > > struct ifa_cacheinfo contains the address's creation time, update tim=
+e,
+> > > preferred lifetime, and valid lifetime. See =20
+>=20
+> We use two spaces after period (the correct amount).  :)
+
+Double spacing after period is a leftover from using typewriters.
+Modern usage is single space after period.
+
+https://www.grammarly.com/blog/punctuation-capitalization/spaces-after-peri=
+od/
+
+	These days most contemporary style guides also recommend using a single sp=
+ace between sentences,
+	including:
+
+	The Chicago Manual of Style
+	The American Psychological Association (often referred to as =E2=80=9CAPA=
+=E2=80=9D)
+	Microsoft Manual of Style
+	The Gregg Reference Manual
+	The Associated Press Stylebook
+
+--Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCAAdFiEEn2/DRbBb5+dmuDyPgKd/YJXN5H4FAmcrpMkACgkQgKd/YJXN
+5H6lfQ/+LRJwkmcq2J21/EL8AISA6nKMzUO+T/V7TkkfTj+JkLz/XpL0s89A5to8
+zFE4afRF0b5F9cbZJK38WhfQZEEM62HX81scYtbkTlMq5VxxecdpHNOghbBaw3xQ
+00y1fvGb0wCJ4d3fp/onxa6Lv8H53OLjd/ZdqpNBPwv8eUecdUlI/JPOMYEPgwY+
+JLUAAgK4yPL1yMCkTdZZNITfJaNGSc+TGudVZFMIrSdA35NXdK3PuORIxv1oM/aG
+xMHwFJTzShpjl39MmwwYCBP7XNh17zZU/ugEyb9awv8wUziVE4i1tgCubrJFxcln
+iMyUYELb7WVGfpxR52cFECmMZrvUEjkrlfcVtPUatcZHYSAF45gsjHRXaFHwRii1
+zkXCXV28RFkqbjsFlZFNE8WGOXwEr3scGI9mPvzOCjg5wgobiYoumGA8DQ0W3GKF
+DwA7f6jaYsj6Xdt/sHfCcxokCEH0+ltce6KaE/CUDZjenJRSlBcXxkTnkGCWJizF
+PLYiCgsrAIeihMfyeNulYxu3d3q6VJOLjXZK0ta+HOzAntwC9qEr2NTi+kZUhT38
+Xh7F5SMden2bUBXje12pNAOXmsmycasN5bCDkznCOW767Ii6ivoFcTXeuDv3bd9b
+HSUwBDEbEJKimoozrzfpzoNSfG0PtK4EbSY3lI9KSPVOLd9biYg=
+=mUQo
+-----END PGP SIGNATURE-----
+
+--Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae--
 
