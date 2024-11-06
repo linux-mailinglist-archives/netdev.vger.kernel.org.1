@@ -1,223 +1,117 @@
-Return-Path: <netdev+bounces-142217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F6719BDD80
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 04:17:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE7A19BDD95
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 04:29:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F2B91C23280
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:17:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3F5031F2427E
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 89A05190056;
-	Wed,  6 Nov 2024 03:17:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 842F319066D;
+	Wed,  6 Nov 2024 03:29:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b="YfRrBN2M"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XjLkZ2Aj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F8318FDB1;
-	Wed,  6 Nov 2024 03:17:05 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.180.131
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF80419048A;
+	Wed,  6 Nov 2024 03:29:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730863027; cv=none; b=FpzBqaJ/r1hVNqSVA4CHBUX1q523NDrhAcnDtm5OZGjv4Nq6TAAGC8EAI1N3oze0Ut8WqISz3WDRAkOSa2CPk0M3mz8fJZt9Ltov9prUvBHuxmj7tBHTfoJnzTAo+zs5BePuEx6jrj15TqhL0pxFo7AxiCmBhVJB2Kd68riF+Aw=
+	t=1730863750; cv=none; b=Z4BGKBYMqAJW/bjByCxzWze4YQfbHFmwYjdCHWtBcOhD8Cn7P56BxRO1AeUeDGTpjKVAMYp0AJvvXFgRf9ROS79rH01X75RTjUtvu19oF6pY9MHoHOO/6QSoscwj8cLNbdaD1t6jthkdt7psOWThU5qt7/kT24faImruTBfN6GA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730863027; c=relaxed/simple;
-	bh=DACGt92rTFPfameQs8D2whJQLHsEhqs7UbOv2+TxXPQ=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=m0RdGi2wUgMh3meNJlkLGeGe0RiWFhX5Lbp5gppkVcZDclQlhpSqHRW9g/0YOidqTr51X92+rGLOx2DMpt3cK+/dYVbg6ZMZrSAuwD4Iu/gdKJuiEYHVgyhsGzEAvMhUlTLxxd8S5GWaL4MbJ9UJbmFUJb/2lqgL/bc31HdZTkM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com; spf=pass smtp.mailfrom=quicinc.com; dkim=pass (2048-bit key) header.d=quicinc.com header.i=@quicinc.com header.b=YfRrBN2M; arc=none smtp.client-ip=205.220.180.131
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=quicinc.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=quicinc.com
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A5KABKI009100;
-	Wed, 6 Nov 2024 03:16:46 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=
-	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=qcppdkim1; bh=
-	1J8mfxCbiCDTDsZI2fUKWhtK0rZUEtEtd+IltNnj4C0=; b=YfRrBN2MDCDDCErh
-	p2ZPkAtvYwpBILfpkXLweswe0uB9e56nEQ/Yr+issXriljA/FD37Q1evbfWNnmVj
-	CrZm67ZGpCRglTcMs91zHyChwV0bk4E5slNFwSBbOIHa+2N9wE10bRaX3JZISIRj
-	JbYIbQOvd0JXF9QUX4Ugzx8U0Cy0MbM095rrETD2uu72zUPEMw48hqC6CexNbEDA
-	s37/GY04QHHrIEAVhVA7YbhJdZMBGi8GBygH9RGr4w96ZGLvxv9frIrOo8rW4eNp
-	imIhf8vgWJ4F8wgVzqdjTjizeLIjzh952Sg7qws2HXxu4oS06oAYuP10AAjCsStD
-	Wb28Ig==
-Received: from nasanppmta01.qualcomm.com (i-global254.qualcomm.com [199.106.103.254])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 42nd4usrjx-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 06 Nov 2024 03:16:46 +0000 (GMT)
-Received: from nasanex01a.na.qualcomm.com (nasanex01a.na.qualcomm.com [10.52.223.231])
-	by NASANPPMTA01.qualcomm.com (8.18.1.2/8.18.1.2) with ESMTPS id 4A63Gjqh029314
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 6 Nov 2024 03:16:45 GMT
-Received: from [10.253.14.204] (10.80.80.8) by nasanex01a.na.qualcomm.com
- (10.52.223.231) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.9; Tue, 5 Nov 2024
- 19:16:40 -0800
-Message-ID: <9b3a4f00-59f2-48d1-8916-c7d7d65df063@quicinc.com>
-Date: Wed, 6 Nov 2024 11:16:37 +0800
+	s=arc-20240116; t=1730863750; c=relaxed/simple;
+	bh=qC1wnd1WwW47fQVNwxJjJihB3ApMLG2UMI1x7ljhGu8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RXQy2xiDYAwKQgwwLZRXKRFZqXlAyo0pG3GXpDY6Ss+Mr5bQvt5X5TVXoFI0wNx3VnJjo/3r0Z85SCJGMGJ0b5b3xv6/QHiYA2G8wPA7lkH0iaFamjuWwQslAKhTO2+VzkT1zMzo1bRkV1HcfAl2dq/qv4iNgkX1i98JRJnrbN0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XjLkZ2Aj; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730863749; x=1762399749;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=qC1wnd1WwW47fQVNwxJjJihB3ApMLG2UMI1x7ljhGu8=;
+  b=XjLkZ2Aj4cE77oDzieTyMXIV9Ae6bCYba8w9OZPJw3p5yyxkhSUNIC2f
+   pCZo5eZgFegHN8awXzQMWUSM15yFGcH4HI9BbfnmZ1GZhs6Zi64mwYY0h
+   KHixMcLKwDpOOKbQuWJ7E9ilto+BMmOI5ubXXKbhgFRMTQl5StsVBbOdg
+   K4YwqzGuLWHs2Lu1VnUy7LOzLSTjZ/JgVfUze49bt0iMH7Mpnpsz2czR4
+   e55qIwpeRW+DrmSb+F9XBEgYOUILVCYf2DJD7kWfJcRaMzzxxtQPjFeuA
+   YeElh/jQR7oMZhQrr9FB4tmKAFh63KVw+L7UW4ThsRW2ybIxKZ9N8AsCQ
+   Q==;
+X-CSE-ConnectionGUID: 7PHUuiICSBKAtQFukx4EGQ==
+X-CSE-MsgGUID: 7IkPjOfjSl2snCaxdJqsjA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="41269991"
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="41269991"
+Received: from orviesa007.jf.intel.com ([10.64.159.147])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 19:29:08 -0800
+X-CSE-ConnectionGUID: o4ttEnRoTteCZ5MHOpisWQ==
+X-CSE-MsgGUID: 0P0Yqix6TiK6L7VzCX4pjQ==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,261,1725346800"; 
+   d="scan'208";a="84694585"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa007.jf.intel.com with ESMTP; 05 Nov 2024 19:29:04 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t8Wj7-000mtG-0t;
+	Wed, 06 Nov 2024 03:29:01 +0000
+Date: Wed, 6 Nov 2024 11:29:00 +0800
+From: kernel test robot <lkp@intel.com>
+To: Philo Lu <lulie@linux.alibaba.com>, netdev@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org,
+	antony.antony@secunet.com, steffen.klassert@secunet.com,
+	linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
+	jakub@cloudflare.com, fred.cc@alibaba-inc.com,
+	yubing.qiuyubing@alibaba-inc.com
+Subject: Re: [PATCH v7 net-next 4/4] ipv6/udp: Add 4-tuple hash for connected
+ socket
+Message-ID: <202411061155.g9trZ6rZ-lkp@intel.com>
+References: <20241105121225.12513-5-lulie@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next 3/5] net: pcs: qcom-ipq: Add PCS create and
- phylink operations for IPQ9574
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>,
-        Heiner Kallweit
-	<hkallweit1@gmail.com>,
-        Russell King <linux@armlinux.org.uk>, <netdev@vger.kernel.org>,
-        <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_kkumarcs@quicinc.com>, <quic_suruchia@quicinc.com>,
-        <quic_pavir@quicinc.com>, <quic_linchen@quicinc.com>,
-        <quic_luoj@quicinc.com>, <srinivas.kandagatla@linaro.org>,
-        <bartosz.golaszewski@linaro.org>, <vsmuthu@qti.qualcomm.com>,
-        <john@phrozen.org>
-References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
- <20241101-ipq_pcs_rc1-v1-3-fdef575620cf@quicinc.com>
- <d7782a5e-2f67-4f62-a594-0f52144a368f@lunn.ch>
-Content-Language: en-US
-From: Lei Wei <quic_leiwei@quicinc.com>
-In-Reply-To: <d7782a5e-2f67-4f62-a594-0f52144a368f@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nasanex01a.na.qualcomm.com (10.52.223.231)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: xEBCrXy7c1m6E8BxoqRRcRdiq2ueaRo_
-X-Proofpoint-ORIG-GUID: xEBCrXy7c1m6E8BxoqRRcRdiq2ueaRo_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 malwarescore=0
- lowpriorityscore=0 bulkscore=0 phishscore=0 priorityscore=1501
- mlxlogscore=999 impostorscore=0 suspectscore=0 spamscore=0 mlxscore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411060024
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105121225.12513-5-lulie@linux.alibaba.com>
 
+Hi Philo,
 
+kernel test robot noticed the following build errors:
 
-On 11/1/2024 9:21 PM, Andrew Lunn wrote:
->> +static int ipq_pcs_config_mode(struct ipq_pcs *qpcs,
->> +			       phy_interface_t interface)
->> +{
->> +	unsigned int val;
->> +	int ret;
->> +
->> +	/* Configure PCS interface mode */
->> +	switch (interface) {
->> +	case PHY_INTERFACE_MODE_SGMII:
->> +		/* Select Qualcomm SGMII AN mode */
->> +		ret = regmap_update_bits(qpcs->regmap, PCS_MODE_CTRL,
->> +					 PCS_MODE_SEL_MASK | PCS_MODE_AN_MODE,
->> +					 PCS_MODE_SGMII);
-> 
-> How does Qualcomm SGMII AN mode differ from Cisco SGMII AN mode?
-> 
+[auto build test ERROR on net-next/main]
 
-Qualcomm SGMII AN mode extends Cisco SGMII spec Revision 1.8 by adding 
-pause bit support in the SGMII word format. It re-uses two of the 
-reserved bits 1..9 for this purpose. The PCS supports both Qualcomm 
-SGMII AN and Cisco SGMII AN modes.
+url:    https://github.com/intel-lab-lkp/linux/commits/Philo-Lu/net-udp-Add-a-new-struct-for-hash2-slot/20241105-201454
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241105121225.12513-5-lulie%40linux.alibaba.com
+patch subject: [PATCH v7 net-next 4/4] ipv6/udp: Add 4-tuple hash for connected socket
+config: arc-randconfig-002-20241106 (https://download.01.org/0day-ci/archive/20241106/202411061155.g9trZ6rZ-lkp@intel.com/config)
+compiler: arc-elf-gcc (GCC) 13.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241106/202411061155.g9trZ6rZ-lkp@intel.com/reproduce)
 
->> +static int ipq_pcs_config_sgmii(struct ipq_pcs *qpcs,
->> +				int index,
->> +				unsigned int neg_mode,
->> +				phy_interface_t interface)
->> +{
->> +	int ret;
->> +
->> +	/* Access to PCS registers such as PCS_MODE_CTRL which are
->> +	 * common to all MIIs, is lock protected and configured
->> +	 * only once. This is required only for interface modes
->> +	 * such as QSGMII.
->> +	 */
->> +	if (interface == PHY_INTERFACE_MODE_QSGMII)
->> +		mutex_lock(&qpcs->config_lock);
-> 
-> Is there a lot of contention on this lock? Why not take it for every
-> interface mode? It would make the code simpler.
-> 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411061155.g9trZ6rZ-lkp@intel.com/
 
-I agree, the contention should be minimal since the lock is common for 
-all MII ports in a PCS and is used only during configuration time. I 
-will remove the interface mode check.
+All errors (new ones prefixed by >>, old ones prefixed by <<):
 
->> +struct phylink_pcs *ipq_pcs_create(struct device_node *np)
->> +{
->> +	struct platform_device *pdev;
->> +	struct ipq_pcs_mii *qpcs_mii;
->> +	struct device_node *pcs_np;
->> +	struct ipq_pcs *qpcs;
->> +	int i, ret;
->> +	u32 index;
->> +
->> +	if (!of_device_is_available(np))
->> +		return ERR_PTR(-ENODEV);
->> +
->> +	if (of_property_read_u32(np, "reg", &index))
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	if (index >= PCS_MAX_MII_NRS)
->> +		return ERR_PTR(-EINVAL);
->> +
->> +	pcs_np = of_get_parent(np);
->> +	if (!pcs_np)
->> +		return ERR_PTR(-ENODEV);
->> +
->> +	if (!of_device_is_available(pcs_np)) {
->> +		of_node_put(pcs_np);
->> +		return ERR_PTR(-ENODEV);
->> +	}
-> 
-> How have you got this far if the parent is not available?
-> 
+>> ERROR: modpost: "udp_lib_hash4" [net/ipv6/ipv6.ko] undefined!
+>> ERROR: modpost: "udp_ehashfn" [net/ipv6/ipv6.ko] undefined!
+>> ERROR: modpost: "udp4_hash4" [net/ipv6/ipv6.ko] undefined!
 
-This check can fail only if the parent node is disabled in the board 
-DTS. I think this error situation may not be caught earlier than this 
-point.
-However I agree, the above check is redundant, since this check is 
-immediately followed by a validity check on the 'pdev' of the parent 
-node, which should be able cover any such errors as well.
-
->> +	for (i = 0; i < PCS_MII_CLK_MAX; i++) {
->> +		qpcs_mii->clk[i] = of_clk_get_by_name(np, pcs_mii_clk_name[i]);
->> +		if (IS_ERR(qpcs_mii->clk[i])) {
->> +			dev_err(qpcs->dev,
->> +				"Failed to get MII %d interface clock %s\n",
->> +				index, pcs_mii_clk_name[i]);
->> +			goto err_clk_get;
->> +		}
->> +
->> +		ret = clk_prepare_enable(qpcs_mii->clk[i]);
->> +		if (ret) {
->> +			dev_err(qpcs->dev,
->> +				"Failed to enable MII %d interface clock %s\n",
->> +				index, pcs_mii_clk_name[i]);
->> +			goto err_clk_en;
->> +		}
->> +	}
-> 
-> Maybe devm_clk_bulk_get() etc will help you here? I've never actually
-> used them, so i don't know for sure.
-> 
-
-We don't have a 'device' associated with the 'np', so we could not 
-consider using the "devm_clk_bulk_get()" API.
-
-> 	Andrew
-
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
