@@ -1,127 +1,135 @@
-Return-Path: <netdev+bounces-142331-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142332-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB6F49BE4AB
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:48:58 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A738E9BE4DF
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:54:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08FC31C235C8
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:48:58 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5EE5E1F27B25
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:54:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382D01DE4F9;
-	Wed,  6 Nov 2024 10:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D1551DD525;
+	Wed,  6 Nov 2024 10:54:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="XfMthEGW"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="wZmdVm6G"
 X-Original-To: netdev@vger.kernel.org
-Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 063101DF248;
-	Wed,  6 Nov 2024 10:47:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57C0E1D278C
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 10:54:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730890074; cv=none; b=CY+jl1abTjrFs6jXUAchzb0tJuY4WnrgX48oCjeRSNn2wGdd9HaRnG9sardB3z1QOR5cm1NZfhbPquTbyQ3IdC2Nn+J/buCPr79PhTVAvF+lbi7cJEuVApj5dteBGLJS0eETgI0LAujYJJSvcojbWrKjshCj0uNmDulUStTFJvM=
+	t=1730890472; cv=none; b=SvQBshoTFnXEBwIn/B0EKB2ktx6L/IWdLqOxAGYRC4q3DsPnhukoVOtsmkLhI99C4UQzTDjAmk0oL0c0yqtK9XLAtnmlRT0zEQdkxUgOCD/e99l/B1p1tJmAXnrMMtPpbwoGztDkdo5UiKauE2jf/2zGuccIIrPZqA8CkkTdBR8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730890074; c=relaxed/simple;
-	bh=NNbsvPnE+AlIc4GVWs6zHtak2Vihyn56/gz48YQUoWo=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=Zg31nudPpUbw7w21AheV2yAvPoQUCORsVPGqXYRimgbi6PTQO/n7pEXFi5vfx4JQqe7BZEu5m5+WJ4gH1J1YLNj64GDHDCWDqpI+hkJr0HttkVpBYmuZdTLNjokLwv0PqLK6qS1rCXJzMK3gpsIzTZFC97klAS26XbmZBAo7jSM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=XfMthEGW; arc=none smtp.client-ip=203.29.241.158
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=codeconstruct.com.au; s=2022a; t=1730890069;
-	bh=b8vIgaII3bhiClo4kBJSxp0N5aPBhPERAUgQvLm1waw=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=XfMthEGW47SsFcn6LBbF9D0wlypfVKz5IIKVJWWjlVmd2ZkKdaWcnp9VsqxIpgJ2n
-	 QPcxpWVAGEjb6Ip6jb3SJHF41SA99az7LTAGR32m7uKcCf61t8iAA9vQsoR5KYMHPT
-	 oozURhr7PBcIojXF9odPhB1lAvqL7dTVJ+k1Wc9KkoMqclZCljjipN53iaKXRqBXHz
-	 M+R37MKfeo4EGXahwMeC0bTvGOoSvs/kmYF3/TOkmEXnpsrSy+9ATgCG1HW5m1LdLC
-	 3CLxNmp+uObkOwnSr4XVOtW3vBOc9lhoxDisvqtwJYkzV4q/jeEDsYfJRjXgAMyNFk
-	 ClOJj/Ip8lG8A==
-Received: from pecola.lan (unknown [159.196.93.152])
-	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id 850F56B2BF;
-	Wed,  6 Nov 2024 18:47:47 +0800 (AWST)
-Message-ID: <f8454df795572983fb83c4ea78b64006a05ef79b.camel@codeconstruct.com.au>
-Subject: Re: [PATCH v6 2/2] mctp pcc: Implement MCTP over PCC Transport
-From: Jeremy Kerr <jk@codeconstruct.com.au>
-To: Adam Young <admiyo@amperemail.onmicrosoft.com>, 
- admiyo@os.amperecomputing.com, Matt Johnston <matt@codeconstruct.com.au>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Sudeep Holla
-	 <sudeep.holla@arm.com>, Jonathan Cameron <Jonathan.Cameron@huawei.com>, 
-	Huisong Li <lihuisong@huawei.com>
-Date: Wed, 06 Nov 2024 18:47:47 +0800
-In-Reply-To: <693f39f9-9505-4135-91db-a7280570fbc3@amperemail.onmicrosoft.com>
-References: <20241029165414.58746-1-admiyo@os.amperecomputing.com>
-	 <20241029165414.58746-3-admiyo@os.amperecomputing.com>
-	 <b614c56f007b2669f1a23bfe8a8bc6c273f81bba.camel@codeconstruct.com.au>
-	 <3e68ad61-8b21-4d15-bc4c-412dd2c7b53d@amperemail.onmicrosoft.com>
-	 <675c2760e1ed64ee8e8bcd82c74af764d48fea6c.camel@codeconstruct.com.au>
-	 <693f39f9-9505-4135-91db-a7280570fbc3@amperemail.onmicrosoft.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	s=arc-20240116; t=1730890472; c=relaxed/simple;
+	bh=2vJwLVuKi9QQ269rZIFWxx2Km1vebYt3WRKfcSlJ1Oc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=lHbztYOdgt3Lh4jfQ6c4TzbGDgh/4N5dvt89vwLf3LqHQBmzQq78AmnpFiWBkHl17fdyF+bioKfAoZKFcPr74g/KsZ6CevP8R0+2q5Oof0F266wK6gESVBOHjMlNQbJ2lfjvsabbaaBmlAg4aLoobMTpsOlmTURcQTLIyUhM/vk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=wZmdVm6G; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <bf6b5e0a-d44e-4923-93cb-edb41a2ff1a1@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730890466;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=1UR0EccXeXwgstd99Ae3BF8j0iwXN/SQQWCzA0aDvjw=;
+	b=wZmdVm6GYdB9cDxe5gad9iJ0bht6TfTtKlzjSQVyMavzd33OhmKGClU6X/V1G4bZzSxygl
+	ajvPdfMy2PngJ1vsaKaxabQgZmteQnalo+8ch1oHr42Tic/80WwpGStOY5fkP2dctxu1WC
+	8OYAqekXHp0qC2USn72kOxDJ4sTUPEA=
+Date: Wed, 6 Nov 2024 10:54:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
+ hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>,
+ Pedro Tammela <pctammela@mojatatu.com>, edumazet@google.com
+Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
+ netdev@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>
+References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
+ <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
+ <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
+ <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
+ <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
+ <9dbb815a-0137-4565-ad91-8ed92d53bced@gmail.com>
+ <771bd976-e68c-48d0-bfbd-1f1b73d7bb91@linux.dev>
+ <7cbd8419-2c74-4201-b5a3-7b88c3ec83fe@gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <7cbd8419-2c74-4201-b5a3-7b88c3ec83fe@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi Adam,
+On 06/11/2024 10:15, Alexandre Ferrieux wrote:
+> On 06/11/2024 00:42, Vadim Fedorenko wrote:
+>> On 05/11/2024 22:14, Alexandre Ferrieux wrote:
+>>>
+>>> Can you please explain *why* in the first place you're saying "'static inline'
+>>> is discouraged in .c files" ? I see no trace if this in coding-style.rst, and
+>>> the kernel contains hundreds of counter-examples.
+>>
+>> The biggest reason is because it will mask unused function warnings when
+>> "static inline" function will not be used because of some future
+>> patches. There is no big reason to refactor old code that's why there
+>> are counter-examples in the kernel, but the new code shouldn't have it.
+> 
+> A macro doesn't elicit unused function warnings either, so this looks like a
+> very weak motivation. While coding-style.rst explicitly encourages to use static
+> inline instead of macros, as they have better type checking and syntaxic isolation.
 
-> Adding the inbox id ( to the HW address does not harm anything, and
-> it makes things much more explicit.
+Unused macro will not generate any code and will not make build time
+longer. But don't get me wrong, I'm not encouraging you to use macro in
+this case.
 
-My issue is that these inbox/outbox/subspace IDs do not align with what
-the device lladdr represents.
+> Regarding old vs new code, below are the last two month's fresh commits of
+> "static inline" in *.c. So it looks like the motivation is not shared by other
+> maintainers. Do we expect to see "local styles" emerge ?
 
-From what you have said so far, and from what I can glean from the
-spec, what you have here is device *instance* information, not device
-*address* information.
+There are some "local styles" differences in different subsystems. If
+you filter out netdev related diffs from awk-magic below, you will find
+that is was mostly refactoring of already existing code.
 
-For an address, I would expect that to represent the address of the
-interface on whatever downstream bus protocol is being used. Because
-the packet formats do not define any addressing mechanism (ie, packets
-are point-to-point), there is no link-layer addressing performed by the
-device.
+Anyways, you can ignore this suggestion, it's always up to submitter
+how to use review feedback given by others.
 
-You mentioned that there may, in future, be shared resources between
-multiple PCC interfaces (eg, a shared interrupt), but that doesn't
-change the point-to-point nature of the packet format, and hence the
-lack of bus/device addresses.
+> 
+> $ git log --pretty='%h %as %ae'   -p | gawk
+> '/^[0-9a-f]{12}/{c=$0;next}/^diff/{f=$NF;next}/^[+].*static.inline/{if
+> (f~/[.]c$/){print c "\t"gensub(/.*\//,"","1",f)}}'
+> 
+> baa802d2aa5c 2024-10-21 daniel@iogearbox.net    verifier_const.c
+> baa802d2aa5c 2024-10-21 daniel@iogearbox.net    verifier_const.c
+> d1744a4c975b 2024-10-21 bp@alien8.de    amd.c
+> d1744a4c975b 2024-10-21 bp@alien8.de    amd.c
+> a6e0ceb7bf48 2024-10-11 sidhartha.kumar@oracle.com      maple.c
+> 78f636e82b22 2024-09-25 freude@linux.ibm.com    ap_queue.c
+> 19773ec99720 2024-10-07 kent.overstreet@linux.dev       disk_accounting.c
+> 9b23fdbd5d29 2024-09-29 kent.overstreet@linux.dev       inode.c
+> 9b23fdbd5d29 2024-09-29 kent.overstreet@linux.dev       inode.c
+> 3d5854d75e31 2024-09-30 agordeev@linux.ibm.com  kcore.c
+> 3d5854d75e31 2024-09-30 agordeev@linux.ibm.com  kcore.c
+> 38864eccf78b 2024-09-30 kent.overstreet@linux.dev       fsck.c
+> d278a9de5e18 2024-10-02 perex@perex.cz  init.c
+> f811b83879fb 2024-10-02 mpatocka@redhat.com     dm-verity-target.c
+> 4c411cca33cf 2024-09-13 artem.bityutskiy@linux.intel.com        intel_idle.c
+> 42268ad0eb41 2024-09-24 tj@kernel.org   ext.c
+> 56bcd0f07fdb 2024-09-05 snitzer@kernel.org      localio.c
+> 1b11c4d36548 2024-09-01 kent.overstreet@linux.dev       ec.c
+> 7a51608d0125 2024-09-04 kent.overstreet@linux.dev       btree_cache.c
+> 7a51608d0125 2024-09-04 kent.overstreet@linux.dev       btree_cache.c
+> 691f2cba2291 2024-09-05 kent.overstreet@linux.dev       btree_cache.c
+> 
 
-This is under my assumption that a PCC interface will always represent
-a pair of in/out channels, to a single remote endpoint. If that won't
-be the case in future, then two things will need to happen:
-
- - we will need a change in the packet format to specify the
-   source/destination addresses for a tx/rx-ed packet; and
-
- - we will *then* need to store a local address on the lladdr of the
-   device, and implement neighbour-table lookups to query remote
-   lladdrs.
-
-is that what the upcoming changes are intended to do? A change to the
-packet format seems like a fundamental rework to the design here.
-
-> It seems like removing either the inbox or the outbox id from the HW=20
-> address is hiding information that should be exposed.
-
-We can definitely expose all of the necessary instance data, but it
-sounds like the lladdr is not the correct facility for this.
-
-We already have examples of this instance information, like the
-persistent onboard-naming scheme of ethernet devices. These are
-separate from lladdr of those devices.
-
-Cheers,
-
-
-Jeremy
 
