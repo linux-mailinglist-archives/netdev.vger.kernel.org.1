@@ -1,137 +1,293 @@
-Return-Path: <netdev+bounces-142236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE6709BDF38
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:18:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 787749BDF39
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:18:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1585C1C20EED
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:18:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 977BA1C21ACE
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14D71190662;
-	Wed,  6 Nov 2024 07:18:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2C33E1AF0CF;
+	Wed,  6 Nov 2024 07:18:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b="n16u35qQ"
+	dkim=pass (2048-bit key) header.d=falix.de header.i=@falix.de header.b="rLagMVJe"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+Received: from mail.falix.de (mail.falix.de [37.120.163.83])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44BF751016
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F238D10E5
 	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:18:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.125.188.123
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=37.120.163.83
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730877484; cv=none; b=ZVBhOZejWx/fzhMqorjFS8AXsm8PCBe8Qou04cGZR/xMuZmCFuQPPx1kdb8/QC+H5LPSbMOWAPbR2oQJH/yyfVktxR1VyPiB1aDCjOhyVWoov5bFBrKyJS9/gwKgfz9TChY57MtdXN+aoIijgMItd4L/j4a1iUss7R2hccqD/cA=
+	t=1730877486; cv=none; b=GqkChLbGaTDdBWCSobdG7ezgcWHt7xbuHdHn0bO6yi+WGI19AutptaXvDG/a2gmSzGRyOwE5c1tP+k1uIUF6HfMJ0BUwseYxazXwKm7zFGNDLSb7F1zZRiob+kn9h5GyW3oQVTxHFKjjSnZNZXUDNA/LCPmfZ2FtGALRJC4pwXM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730877484; c=relaxed/simple;
-	bh=PKgfzheUyNSsrrjiPKIHYUoPhyE4D5A590Krsl4nkns=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=NbGsGhcfPFFSqDmZMKwhE7CMirrho4Tdv0ltkAWDG8B3/iUfyx44qBT1z/pMrxfxyVIJCcBfvXnOYAayT4vNjtuilkXLAPEP6gNtRGJqjxBLOGzUocJBU8jyWpcTbzLxHvR9PNR/03Tx8UyEs5CGcgBYTNUvvh/kQl0WIuvDoYw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com; spf=pass smtp.mailfrom=canonical.com; dkim=pass (2048-bit key) header.d=canonical.com header.i=@canonical.com header.b=n16u35qQ; arc=none smtp.client-ip=185.125.188.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=canonical.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=canonical.com
-Received: from mail-pg1-f200.google.com (mail-pg1-f200.google.com [209.85.215.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 592853F2B1
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:17:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1730877477;
-	bh=G+MzOZXfDVvVfVLGNe8HGTPb9KTW95XMpmekn3Jk6sA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version;
-	b=n16u35qQLRWP0B+UfH7WSdGdBfAbPo2wKd09B73q36Q5No2dj3b1s8SjBdHkO5Tyn
-	 T/qnwXufRVaD2e4R7YqBSWGrj7dGQxySTzwc09GibRr+GTsuMfeTZNo605KQhwHtv0
-	 nLTmRBsmeBsORq6WBmff0JLqUxHlZp8x1oathNqviEDLNoeneJnaGSMNqBVWf1fCnQ
-	 kwa1kzRHFa8y8ApA63LX/e6AD0pMahG1bZGyYbnvflrPxcXbQFrbLFTqcfSh7Uk7tx
-	 8cbqgGWqYKYx3Q8pN0+uA4MuwWp1BIflEgJ/H7pU1WsVnB4QoiVn25p1zsKXC00TiA
-	 DHxVJ4Dfc6flQ==
-Received: by mail-pg1-f200.google.com with SMTP id 41be03b00d2f7-7ee07d0f395so7260110a12.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 23:17:56 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730877475; x=1731482275;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G+MzOZXfDVvVfVLGNe8HGTPb9KTW95XMpmekn3Jk6sA=;
-        b=oeEePfnaWq/RKM1F7W4iX1uajtkh51zTeNof2QYFuzBlApnIhRhZ6wyr44fWjlgimu
-         nX7hrz8aolhBcg8gqm5FMm+Zzl4S6bB0YxN02Pbz88nlJwwdzBZeo7cKU2jolVR50CRN
-         kp20Rz0nNoPm6lOGxft8jDgVSHjwDA35Bkv6PsFk74nuqI508UyfsJFwes1lfAe32S96
-         CSsZDfq2CIbUcVOPkaz4ip7gF8v6+5yvIP4E2LuA2GjpqxICl+LaTTPd5b3kC65k9qik
-         gl21UTt0mABWc0A56Xg5UWP6y6plq2w+MjTs/D6Q7vcjk1kk9goe5O2772qx2aZoe31L
-         VPUg==
-X-Forwarded-Encrypted: i=1; AJvYcCUZJXQB9wHElXNzmaajs/dBDO4th7vqGiOW2lnxRNgdt2E/1Z4qjMQQiGz6QGsEange8XLB7EA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzqnjkirTBE6glrjYaf6LPWcpwOHRxP69njFixpn8xoWXg7YGWI
-	sHjiV8/fCd1+HDyKZIVUk00AOT6Qext9UtF3uZP6Y7/AnbGvlB/4OjvKIYigVqoeyzgf/NYZMfV
-	b39JpMWdNEr27INjeVQmbWoZqTu1ETh2RJtP1mv0KCn6gD4bFaj/0FNfx0FdOjm46tw6W1Q==
-X-Received: by 2002:a05:6a20:72a7:b0:1db:ffb6:ff00 with SMTP id adf61e73a8af0-1dbffb6ff0emr2595883637.46.1730877475560;
-        Tue, 05 Nov 2024 23:17:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG9tUelPVJWzdT9m3bKFH8hdeibtsRk1QiOwfHeBD4NMbCTVFMQ94vNoTPRLcM3wjmu2yzAJw==
-X-Received: by 2002:a05:6a20:72a7:b0:1db:ffb6:ff00 with SMTP id adf61e73a8af0-1dbffb6ff0emr2595872637.46.1730877475248;
-        Tue, 05 Nov 2024 23:17:55 -0800 (PST)
-Received: from localhost.localdomain (118-163-61-247.hinet-ip.hinet.net. [118.163.61.247])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc2c4b64sm10915365b3a.113.2024.11.05.23.17.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 23:17:54 -0800 (PST)
-From: Gerald Yang <gerald.yang@canonical.com>
-To: Jianbo Liu <jianbol@nvidia.com>,
-	Frode Nordahl <frode.nordahl@canonical.com>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Ariel Levkovich <lariel@nvidia.com>
-Cc: "David S . Miller" <davem@davemloft.net>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Saeed Mahameed <saeed@kernel.org>,
-	Jay Vosburgh <jay.vosburgh@canonical.com>,
-	Gerald Yang <gerald.yang@canonical.com>
-Subject: Re: [net 09/10] net/mlx5e: Don't offload internal port if filter device is out device
-Date: Wed,  6 Nov 2024 15:17:24 +0800
-Message-ID: <20241106071727.466252-1-gerald.yang@canonical.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <660b6c9f-137d-4ba4-94b9-4bcccc300f8d@nvidia.com>
-References: <660b6c9f-137d-4ba4-94b9-4bcccc300f8d@nvidia.com>
+	s=arc-20240116; t=1730877486; c=relaxed/simple;
+	bh=cCdsb0wTddsXLjFsuhpMlXU60N9dFrg6zPJdb0zBEbQ=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=dJ6hZhTlq/Oea8Le8Z0rZDdoPRY9W74u7ZcNfjXkUStVzzB4iu6v3ZeEOJkpTmMZwwYGl6i/Y1WNoeuPHWwvqLC3YHt1p7rcCxMpornBN88V6tdGAX2TwP5tEuMqKtKAJKggTcEuYErL+jHrBmwu6OFP5r33PmgtAa38Uv9GVUA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=falix.de; spf=pass smtp.mailfrom=falix.de; dkim=pass (2048-bit key) header.d=falix.de header.i=@falix.de header.b=rLagMVJe; arc=none smtp.client-ip=37.120.163.83
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=falix.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=falix.de
+Received: from [192.168.221.20] (ppp-82-135-66-21.dynamic.mnet-online.de [82.135.66.21])
+	by mail.falix.de (Postfix) with ESMTPSA id A7880611EA;
+	Wed, 06 Nov 2024 08:17:56 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=falix.de;
+	s=trustedmail; t=1730877476;
+	bh=cCdsb0wTddsXLjFsuhpMlXU60N9dFrg6zPJdb0zBEbQ=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=rLagMVJemnxQYy7NkbMq+eR9qG+rFfq/5B2VMZpKB8wqZJZp4bpMoSFwXJY7XGVfV
+	 mNFxnwRvQm/PC+0eEnTc3NhNoCW6CK0nER9IHYd1MEiZLJEAfHlDN/huuLW3eYeHJp
+	 iM+9yjC+HFJ4eejRF0mgEJreJYo9szfCQ0dzDICMROCxqgsIfLjUiHHTZ7GgXFYK5J
+	 7MRZqwmHbyO9PNWuru1FchD3oeyB1uLA6z2w1Z0yaq62ZRW9Zo9IWJqkuKbz+HkRf/
+	 6va8qiP6FdA2SQkihY5vTgdQw+Yg+IiClgc6o3pLMamCsOOhgaGXyuHuECg8YyrCzk
+	 BmUIQxX9reyGg==
+Message-ID: <bc3fcce37ca80eb5972a56185fcb499872781700.camel@falix.de>
+Subject: Re: r8169: regression in connection speed with kernels 6.2+
+ (interrupt coalescing)
+From: Felix Braun <f.braun@falix.de>
+To: Heiner Kallweit <hkallweit1@gmail.com>, nic_swsd@realtek.com
+Cc: netdev@vger.kernel.org
+Date: Wed, 06 Nov 2024 08:17:55 +0100
+In-Reply-To: <e6f8e86d-62ee-4fc8-a92d-3fc6e963433c@gmail.com>
+References: <ff6d9c69c2a09de5baf2f01f25e3faf487278dbb.camel@falix.de>
+	 <c224bee7-7056-4c2a-a234-b8cb79900d40@gmail.com>
+	 <a5bb19c7a363bef7e3a5f4abd69adb0c9fc666b5.camel@falix.de>
+	 <324136cf-80f5-4d3d-8583-85b603794187@gmail.com>
+	 <c1eb782d2fedbb0dbd2b249fac19faadf6c36857.camel@falix.de>
+	 <e6f8e86d-62ee-4fc8-a92d-3fc6e963433c@gmail.com>
+Organization: Vectrix -- Legal Dept.
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.54.1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
->>> From: Jianbo Liu <jianbol@nvidia.com>
->>>
->>> In the cited commit, if the routing device is ovs internal port, the
->>> out device is set to uplink, and packets go out after encapsulation.
->>>
->>> If filter device is uplink, it can trigger the following syndrome:
->>> mlx5_core 0000:08:00.0: mlx5_cmd_out_err:803:(pid 3966): SET_FLOW_TABLE_ENTRY(0x936) op_mod(0x0) failed, status bad parameter(0x3), syndrome (0xcdb051), err(-22)
->>>
->>> Fix this issue by not offloading internal port if filter device is out
->>> device. In this case, packets are not forwarded to the root table to
->>> be processed, the termination table is used instead to forward them
->>> from uplink to uplink.
->> 
->> This patch breaks forwarding for in production use cases with hardware
->> offload enabled. In said environments, we do not see the above
->> mentioned syndrome, so it appears the logic change in this patch hits
->> too wide.
->> 
->
->Thank you for the report. We'll send fix or maybe revert later.
->
->Jianbo
 
-Hi Jianbo,
+On 05.11.2024 22:28 +0100 Heiner Kallweit wrote:
+> On 05.11.2024 20:57, Felix Braun wrote:
+> >=20
+> > Measuring the performance with iperf3 I still see a difference in throu=
+ghput
+by
+> > a factor of 3:
+> >=20
+> > WITH napi_defer_hard_irqs=3D0
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> > [=C2=A0 5] local 2001:a61:11c6:9501:982a:b19f:94fc:71d1 port 41716 conn=
+ected to
+> > 2001:a61:11c6:9501:97a8:b80a:4317:435e port 5201
+> > [ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 Transfer=C2=A0=C2=A0=C2=A0=C2=A0 Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 Retr=C2=A0 Cwnd
+> > [=C2=A0 5]=C2=A0=C2=A0 0.00-1.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 112 MBytes=
+=C2=A0=C2=A0 941 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 315 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 1.00-2.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 110 MBytes=
+=C2=A0=C2=A0 927 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 340 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 2.00-3.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 111 MBytes=
+=C2=A0=C2=A0 930 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 3.00-4.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 111 MBytes=
+=C2=A0=C2=A0 930 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 4.00-5.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 110 MBytes=
+=C2=A0=C2=A0 926 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 5.00-6.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 111 MBytes=
+=C2=A0=C2=A0 929 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 6.00-7.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 110 MBytes=
+=C2=A0=C2=A0 924 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 7.00-8.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 111 MBytes=
+=C2=A0=C2=A0 932 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 8.00-9.00=C2=A0=C2=A0 sec=C2=A0=C2=A0 110 MBytes=
+=C2=A0=C2=A0 924 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 9.00-10.00=C2=A0 sec=C2=A0=C2=A0 111 MBytes=C2=
+=A0=C2=A0 928 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 372 KBytes
+> > - - - - - - - - - - - - - - - - - - - - - - - - -
+> > [ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 Transfer=C2=A0=C2=A0=C2=A0=C2=A0 Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 Retr
+> > [=C2=A0 5]=C2=A0=C2=A0 0.00-10.00=C2=A0 sec=C2=A0 1.08 GBytes=C2=A0=C2=
+=A0 929 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sender
+> > [=C2=A0 5]=C2=A0=C2=A0 0.00-10.00=C2=A0 sec=C2=A0 1.08 GBytes=C2=A0=C2=
+=A0 928 Mbits/sec=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+receiver
+> >=20
+> > WITH napi_defer_hard_irqs=3D1
+> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D
+> > Connecting to host leporello, port 5201
+> > [=C2=A0 5] local 2001:a61:11c6:9501:982a:b19f:94fc:71d1 port 42338 conn=
+ected to
+> > 2001:a61:11c6:9501:97a8:b80a:4317:435e port 5201
+> > [ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 Transfer=C2=A0=C2=A0=C2=A0=C2=A0 Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 Retr=C2=A0 Cwnd
+> > [=C2=A0 5]=C2=A0=C2=A0 0.00-1.00=C2=A0=C2=A0 sec=C2=A0 37.0 MBytes=C2=
+=A0=C2=A0 310 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 1.00-2.00=C2=A0=C2=A0 sec=C2=A0 35.0 MBytes=C2=
+=A0=C2=A0 294 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 2.00-3.00=C2=A0=C2=A0 sec=C2=A0 35.1 MBytes=C2=
+=A0=C2=A0 294 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 3.00-4.00=C2=A0=C2=A0 sec=C2=A0 35.0 MBytes=C2=
+=A0=C2=A0 294 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 4.00-5.00=C2=A0=C2=A0 sec=C2=A0 35.2 MBytes=C2=
+=A0=C2=A0 296 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 5.00-6.00=C2=A0=C2=A0 sec=C2=A0 35.0 MBytes=C2=
+=A0=C2=A0 294 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 6.00-7.00=C2=A0=C2=A0 sec=C2=A0 34.9 MBytes=C2=
+=A0=C2=A0 293 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 7.00-8.00=C2=A0=C2=A0 sec=C2=A0 34.9 MBytes=C2=
+=A0=C2=A0 293 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 8.00-9.00=C2=A0=C2=A0 sec=C2=A0 35.0 MBytes=C2=
+=A0=C2=A0 294 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > [=C2=A0 5]=C2=A0=C2=A0 9.00-10.00=C2=A0 sec=C2=A0 35.2 MBytes=C2=A0=C2=
+=A0 295 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0 806 KBytes
+> > - - - - - - - - - - - - - - - - - - - - - - - - -
+> > [ ID] Interval=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0 Transfer=C2=A0=C2=A0=C2=A0=C2=A0 Bitrate=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 Retr
+> > [=C2=A0 5]=C2=A0=C2=A0 0.00-10.00=C2=A0 sec=C2=A0=C2=A0 352 MBytes=C2=
+=A0=C2=A0 296 Mbits/sec=C2=A0=C2=A0=C2=A0 0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 sender
+> > [=C2=A0 5]=C2=A0=C2=A0 0.00-10.02=C2=A0 sec=C2=A0=C2=A0 349 MBytes=C2=
+=A0=C2=A0 292 Mbits/sec=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0
+receiver
+> >
+>=20
+> Could you please test also in the other direction (with option -R)?
+>=20
+WITH napi_defer_hard_irqs=3D0
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+Connecting to host leporello, port 5201
+[  5] local 2001:a61:11db:401:95c6:dca7:5be7:e7f0 port 33400 connected to
+2001:a61:11db:401:f969:3328:8a89:ebd2 port 5201
+[  7] local 2001:a61:11db:401:95c6:dca7:5be7:e7f0 port 33414 connected to
+2001:a61:11db:401:f969:3328:8a89:ebd2 port 5201
+[ ID][Role] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5][TX-C]   0.00-1.00   sec   112 MBytes   939 Mbits/sec    0    409 KByt=
+es
+[  7][RX-C]   0.00-1.00   sec   107 MBytes   893 Mbits/sec
+[  5][TX-C]   1.00-2.00   sec   110 MBytes   921 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   1.00-2.00   sec   107 MBytes   896 Mbits/sec
+[  5][TX-C]   2.00-3.00   sec   110 MBytes   925 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   2.00-3.00   sec   106 MBytes   892 Mbits/sec
+[  5][TX-C]   3.00-4.00   sec   110 MBytes   925 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   3.00-4.00   sec   107 MBytes   898 Mbits/sec
+[  5][TX-C]   4.00-5.00   sec   110 MBytes   925 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   4.00-5.00   sec   106 MBytes   892 Mbits/sec
+[  5][TX-C]   5.00-6.00   sec   110 MBytes   924 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   5.00-6.00   sec   107 MBytes   895 Mbits/sec
+[  5][TX-C]   6.00-7.00   sec   110 MBytes   926 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   6.00-7.00   sec   106 MBytes   892 Mbits/sec
+[  5][TX-C]   7.00-8.00   sec   110 MBytes   923 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   7.00-8.00   sec   107 MBytes   894 Mbits/sec
+[  5][TX-C]   8.00-9.00   sec   111 MBytes   930 Mbits/sec    0    430 KByt=
+es
+[  7][RX-C]   8.00-9.00   sec   107 MBytes   895 Mbits/sec
+[  5][TX-C]   9.00-10.00  sec   111 MBytes   932 Mbits/sec    0    526 KByt=
+es
+[  7][RX-C]   9.00-10.00  sec   107 MBytes   895 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID][Role] Interval           Transfer     Bitrate         Retr
+[  5][TX-C]   0.00-10.00  sec  1.08 GBytes   928 Mbits/sec    0           =
+=20
+sender
+[  5][TX-C]   0.00-10.00  sec  1.08 GBytes   925 Mbits/sec                =
+=20
+receiver
+[  7][RX-C]   0.00-10.00  sec  1.04 GBytes   895 Mbits/sec    0           =
+=20
+sender
+[  7][RX-C]   0.00-10.00  sec  1.04 GBytes   894 Mbits/sec                =
+=20
+receiver
 
-Thanks for checking this, since this issue affects our production environment,
-is it possible to revert this commit first, if it would take some time to fix it?
+WITH napi_defer_hard_irqs=3D1
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D
+Connecting to host leporello, port 5201
+[  5] local 2001:a61:11db:401:95c6:dca7:5be7:e7f0 port 50504 connected to
+2001:a61:11db:401:f969:3328:8a89:ebd2 port 5201
+[  7] local 2001:a61:11db:401:95c6:dca7:5be7:e7f0 port 50514 connected to
+2001:a61:11db:401:f969:3328:8a89:ebd2 port 5201
+[ ID][Role] Interval           Transfer     Bitrate         Retr  Cwnd
+[  5][TX-C]   0.00-1.00   sec  36.8 MBytes   308 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   0.00-1.00   sec  12.0 MBytes   101 Mbits/sec
+[  5][TX-C]   1.00-2.00   sec  34.6 MBytes   290 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   1.00-2.00   sec  12.6 MBytes   106 Mbits/sec
+[  5][TX-C]   2.00-3.00   sec  33.1 MBytes   278 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   2.00-3.00   sec  12.0 MBytes   101 Mbits/sec
+[  5][TX-C]   3.00-4.00   sec  36.1 MBytes   303 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   3.00-4.00   sec  12.5 MBytes   105 Mbits/sec
+[  5][TX-C]   4.00-5.00   sec  34.6 MBytes   290 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   4.00-5.00   sec  12.1 MBytes   102 Mbits/sec
+[  5][TX-C]   5.00-6.00   sec  34.6 MBytes   290 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   5.00-6.00   sec  12.1 MBytes   102 Mbits/sec
+[  5][TX-C]   6.00-7.00   sec  34.6 MBytes   290 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   6.00-7.00   sec  11.9 MBytes  99.6 Mbits/sec
+[  5][TX-C]   7.00-8.00   sec  34.8 MBytes   292 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   7.00-8.00   sec  12.0 MBytes   101 Mbits/sec
+[  5][TX-C]   8.00-9.00   sec  34.6 MBytes   290 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   8.00-9.00   sec  11.9 MBytes  99.6 Mbits/sec
+[  5][TX-C]   9.00-10.00  sec  33.6 MBytes   282 Mbits/sec    0    989 KByt=
+es
+[  7][RX-C]   9.00-10.00  sec  12.0 MBytes   101 Mbits/sec
+- - - - - - - - - - - - - - - - - - - - - - - - -
+[ ID][Role] Interval           Transfer     Bitrate         Retr
+[  5][TX-C]   0.00-10.00  sec   348 MBytes   291 Mbits/sec    0           =
+=20
+sender
+[  5][TX-C]   0.00-10.01  sec   345 MBytes   289 Mbits/sec                =
+=20
+receiver
+[  7][RX-C]   0.00-10.00  sec   122 MBytes   103 Mbits/sec    0           =
+=20
+sender
+[  7][RX-C]   0.00-10.01  sec   121 MBytes   102 Mbits/sec                =
+=20
+receiver
 
-Thanks,
-Gerald
+BTW the problematic machine is called leporello and it was the iperf _serve=
+r_ in
+all cases. The terminology in the iperf output is from the perspective of t=
+he
+client machine. So leporello's transmit performance suffers almost 9-fold w=
+ith
+interrupt coalescing (the drop I had been measuring with my GUI tests), whi=
+le
+its receive performance "only" drops 3-fold.
 
+Regarding ASPM I've now tried all possible settings in my BIOS. I can still=
+ not
+make the warning go away. The above measurements are with ASPM disabled in =
+my
+BIOS.
+
+Regards
+Felix
 
