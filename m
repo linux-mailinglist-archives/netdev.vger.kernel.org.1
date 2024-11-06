@@ -1,141 +1,175 @@
-Return-Path: <netdev+bounces-142439-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142440-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EFC0C9BF1E6
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:41:24 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96C029BF1F3
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:44:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B448228570F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:41:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C7EB41C2488B
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:44:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C2F5203703;
-	Wed,  6 Nov 2024 15:41:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38666202637;
+	Wed,  6 Nov 2024 15:44:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="HInPBgBF"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="i+yU+/IB"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484F9201273;
-	Wed,  6 Nov 2024 15:41:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E65E190075;
+	Wed,  6 Nov 2024 15:44:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730907682; cv=none; b=UzZNC8y08cio8x+af0JfLA3bRYogJoGZN3w+VctpjKQM43eN1Pc6yqIshFVV1MgKchmW1VIRAKdz+zRSRCd5MZjTbbLXbKocsgEVRmsHHJEuIIWI0oiQbBXBLSRlDcu185ji3tbWdg6s/3XweTsSuH5SDD25suE1NxLEEHu9cGs=
+	t=1730907857; cv=none; b=a7NsTpEYOwhC2W1fguOnrwAsdRcBHpzSVejl4QjGXwPXMHS9XcDQvY7d5c0N9FbarRIMTbiWbpbsr4PuEzWWwtUB+hkTTW7Qq5AvD+m8jt4Y8/jkK+D6U0TWRCQoYREGUJDloxDEOJXekGaT68gScn5HfyvEB5Ucc0YPVZ396rE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730907682; c=relaxed/simple;
-	bh=bou6xWV3nj9LLXSPhsNdqJ6OEBSUvPCJ1pAIlguOgDs=;
+	s=arc-20240116; t=1730907857; c=relaxed/simple;
+	bh=Bx4JkFHVZSmn8w135/s9Lbbn2e0M+Sl2v/1UF8aZwbs=;
 	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bQhIaWTleffWyMGxCZSJ7P8doLhkW1yKkStLqXNhp+5C6SJ6f6ewlF2485DkQzGcFktzEyYbzeuW9s0HQfWhMPT+2lZE2BBFPmqBWnMkVYqdS9qTWyo2xg+6Bl0T+Sg1TVFntIyp0CjCB5k6LaL1HQ6BwF4tcn6urhenV313xWM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=HInPBgBF; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 917A6C4CEC6;
-	Wed,  6 Nov 2024 15:41:19 +0000 (UTC)
+	 In-Reply-To:Content-Type; b=BXZQ5aKbeR8U22UsVMIHMUZbHe0FSgMAy7VhxCu9o24f3Pkxlg7StTk0RmH1McPrX3xUl2EGp7kfhvtZsqycjcFoIyQ9oxUZtY2T0XeWUoy/txFTSm+PJFhwnRMr4tPqj3Z+wdbMnOFopRvRodC/JSu3n8Eu2vicHsm6gK6gV5A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=i+yU+/IB; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1A32BC4CEC6;
+	Wed,  6 Nov 2024 15:44:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730907681;
-	bh=bou6xWV3nj9LLXSPhsNdqJ6OEBSUvPCJ1pAIlguOgDs=;
+	s=k20201202; t=1730907856;
+	bh=Bx4JkFHVZSmn8w135/s9Lbbn2e0M+Sl2v/1UF8aZwbs=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HInPBgBFKhjpuG5/UXIBDngUtno/HE2jpz+2gBl6zUUlPtVJ/C1X4nvNXHsVO6ggI
-	 9yiMsfMkin+Q39YBw8RoL1bpJY0wvWApMXSp6scyIGPhjeoyz+En0lOuAZNX8K8U30
-	 KF5YV/K3Jw6C6F90LZ3ZHS1L7RIrZAdbwCLpGR0G2EfFvpPlyo3Y6g7LzCxZ226Lwi
-	 OumA7eTwo4LuFcf3A+TehxohEmfQmbeuP1hllO1aUxJPMJ0o5ZVW1NSZ6xmM142NiO
-	 gafBwW1VqQpOjjCWMqzPbIY01Zyujx3Uu1ojVYaiVqFe1uOZTdxEwMutUbpvHxf+Ll
-	 AALYfYfIbybLw==
-Message-ID: <9b265c9b-f101-4ea3-83b6-7709e8f2ea47@kernel.org>
-Date: Wed, 6 Nov 2024 16:41:10 +0100
+	b=i+yU+/IBVwPw4XL+Pw0OVFG4Hf1tsRVAvA2R5xoY9JiAjKcKaR0FJDuswKRRLu02N
+	 sB88X7BPQbHC64PDQuMZhoDTvIFZFUlsBzUWB61l/cVmJOM6O8dwHLGG/6k5Raaljf
+	 wK2slo/i69vGaijJ1qb73fSKwPWyo3Fz1MUJbtu+O8iPmJp0L6GgZ8a0vkMUG6tWVG
+	 VT+XKGzyw1SVFjXuxEc4UYGQmBIhfZFYyKcuHhY9Wx1SoYCNvdDsuiN0nF++sT0jN5
+	 YNSGGyO1HbylbdGVIsgOIvCVtmKcVo/05mB4EZkpu8CpdsNO8e2goLRgH4kx2CK3eB
+	 9jNXVoLV/UZuA==
+Message-ID: <843b0fd9-0c71-423e-a1a3-bc10e6f987ec@kernel.org>
+Date: Wed, 6 Nov 2024 08:44:15 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH] mptcp: remove the redundant assignment of
- 'new_ctx->tcp_sock' in subflow_ulp_clone()
-Content-Language: en-GB
-To: MoYuanhao <moyuanhao3676@163.com>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, horms@kernel.org
-References: <20241106071035.2591-1-moyuanhao3676@163.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20241106071035.2591-1-moyuanhao3676@163.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v8] net: ipv4: Cache pmtu for all packet paths if
+ multipath enabled
+Content-Language: en-US
+To: Vladimir Vdovin <deliran@verdict.gg>, netdev@vger.kernel.org,
+ davem@davemloft.net, idosch@idosch.org
+Cc: edumazet@google.com, linux-kselftest@vger.kernel.org, kuba@kernel.org,
+ pabeni@redhat.com, shuah@kernel.org, horms@kernel.org, gnault@redhat.com
+References: <20241106133012.289861-1-deliran@verdict.gg>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20241106133012.289861-1-deliran@verdict.gg>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 
-Hi MoYuanhao, Netdev maintainers,
+On 11/6/24 6:30 AM, Vladimir Vdovin wrote:
+> Check number of paths by fib_info_num_path(),
+> and update_or_create_fnhe() for every path.
+> Problem is that pmtu is cached only for the oif
+> that has received icmp message "need to frag",
+> other oifs will still try to use "default" iface mtu.
+> 
+> An example topology showing the problem:
+> 
+>                     |  host1
+>                 +---------+
+>                 |  dummy0 | 10.179.20.18/32  mtu9000
+>                 +---------+
+>         +-----------+----------------+
+>     +---------+                     +---------+
+>     | ens17f0 |  10.179.2.141/31    | ens17f1 |  10.179.2.13/31
+>     +---------+                     +---------+
+>         |    (all here have mtu 9000)    |
+>     +------+                         +------+
+>     | ro1  |  10.179.2.140/31        | ro2  |  10.179.2.12/31
+>     +------+                         +------+
+>         |                                |
+> ---------+------------+-------------------+------
+>                         |
+>                     +-----+
+>                     | ro3 | 10.10.10.10  mtu1500
+>                     +-----+
+>                         |
+>     ========================================
+>                 some networks
+>     ========================================
+>                         |
+>                     +-----+
+>                     | eth0| 10.10.30.30  mtu9000
+>                     +-----+
+>                         |  host2
+> 
+> host1 have enabled multipath and
+> sysctl net.ipv4.fib_multipath_hash_policy = 1:
+> 
+> default proto static src 10.179.20.18
+>         nexthop via 10.179.2.12 dev ens17f1 weight 1
+>         nexthop via 10.179.2.140 dev ens17f0 weight 1
+> 
+> When host1 tries to do pmtud from 10.179.20.18/32 to host2,
+> host1 receives at ens17f1 iface an icmp packet from ro3 that ro3 mtu=1500.
+> And host1 caches it in nexthop exceptions cache.
+> 
+> Problem is that it is cached only for the iface that has received icmp,
+> and there is no way that ro3 will send icmp msg to host1 via another path.
+> 
+> Host1 now have this routes to host2:
+> 
+> ip r g 10.10.30.30 sport 30000 dport 443
+> 10.10.30.30 via 10.179.2.12 dev ens17f1 src 10.179.20.18 uid 0
+>     cache expires 521sec mtu 1500
+> 
+> ip r g 10.10.30.30 sport 30033 dport 443
+> 10.10.30.30 via 10.179.2.140 dev ens17f0 src 10.179.20.18 uid 0
+>     cache
+> 
+> So when host1 tries again to reach host2 with mtu>1500,
+> if packet flow is lucky enough to be hashed with oif=ens17f1 its ok,
+> if oif=ens17f0 it blackholes and still gets icmp msgs from ro3 to ens17f1,
+> until lucky day when ro3 will send it through another flow to ens17f0.
+> 
+> Signed-off-by: Vladimir Vdovin <deliran@verdict.gg>
+> ---
+> V8:
+>   selftests in pmtu.sh:
+>     - Change var names from "dummy" to "host"
+>     - Fix errors caused by incorrect iface arguments pass
+>     - Add src addr to setup_multipath_new
+>     - Change multipath* func order
+>     - Change route_get_dst_exception() && route_get_dst_pmtu_from_exception()
+>       and arguments pass where they are used
+>       as Ido suggested in https://lore.kernel.org/all/ZykH_fdcMBdFgXix@shredder/
+> 
+> V7:
+>   selftest in pmtu.sh:
+>     - add setup_multipath() with old and new nh tests
+>     - add global "dummy_v4" addr variables
+>     - add documentation
+>     - remove dummy netdev usage in mp nh test
+>     - remove useless sysctl opts in mp nh test
+> 
+> V6:
+>   - make commit message cleaner
+> 
+> V5:
+>   - make self test cleaner
+> 
+> V4:
+>   - fix selftest, do route lookup before checking cached exceptions
+> 
+> V3:
+>   - add selftest
+>   - fix compile error
+> 
+> V2:
+>   - fix fib_info_num_path parameter pass
+> ---
+>  net/ipv4/route.c                    |  13 +++
+>  tools/testing/selftests/net/pmtu.sh | 119 ++++++++++++++++++++++++----
+>  2 files changed, 115 insertions(+), 17 deletions(-)
+> 
 
-On 06/11/2024 08:10, MoYuanhao wrote:
-> The variable has already been assigned in the subflow_create_ctx(),
-> So we don't need to reassign this variable in the subflow_ulp_clone().
-
-Good catch, no need to reassign it there.
-
-Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
-
-
-I guess this patch is for net-next. Please next time clearly indicate
-for which tree this patch is for, by adding this in the patch prefix:
-
-  [PATCH net-next]
-
-See: https://docs.kernel.org/process/maintainer-netdev.html
-
-Also, please try to keep the patch title under ~50 chars.
-
-
-@Netdev maintainers: is it OK for you to apply this small patch in
-net-next directly?
-
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+Reviewed-by: David Ahern <dsahern@kernel.org>
 
 
