@@ -1,191 +1,193 @@
-Return-Path: <netdev+bounces-142399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8535E9BEB12
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:56:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F75B9BEA37
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:42:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0AC3C1F266DE
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:56:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 736FA1C240D6
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:42:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47D6E205E16;
-	Wed,  6 Nov 2024 12:40:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F051F76C9;
+	Wed,  6 Nov 2024 12:37:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="cy708ngA"
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FFeZj506"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FBF820514A
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 12:40:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9C01F76B7;
+	Wed,  6 Nov 2024 12:37:42 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730896826; cv=none; b=bzRbg25S1/lZ3X3vIUnXk3eY/AA38zWx/EiJgJk2IL+rEdRsNACAQFhHSGN85Bur2w/xUU7cgbdBJwr6DVQRgo8pfQQYPFsg8D7+ow5jF0ddXLve6DTLf/fW9X8pbXqbgkmaG1N3pAhxM4KjeR6ecJc62jl4iBGqJn3qao3JUvM=
+	t=1730896665; cv=none; b=ta4Rq4TBhzMV0mXglgxBTsL+UKqoyAN0LUnWVzL4GxBl8QAlcI2kxrHBlrnqeSwgyyR/TIbYmxyYJADok7PRGuxEIgerihEbQ4baVzF19jLrspoJ4YKbZN1oEhu23qAyQgVRbEv8hjBJW2wugrhjyMS8omXvZvC9GI1V/5zCgoQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730896826; c=relaxed/simple;
-	bh=YfHQHHklQqGthguUT+hofehz3Evx2ahQywNsAF+2OGI=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=bTBXaxq/mpQ9aMcDX9eFaTZ9p5tadyMKNkJ4oOXT8QnyfD6keL09u/gM3oIqwmz99aLy9DMl55ZxFDn4xIEC4IWBvujfNF0jyhr2URayB7gvv1FesHFyY0ab7WzTnpoJOF14JIV0hm/r4qgi9OhmFHgGc2Xiz4DUHP07I+3rSmo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=cy708ngA; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730896823;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jlfv2ApsSBgn//KdBsSlx8BkotK5+tCpg2808yZLllw=;
-	b=cy708ngAyFev1ZkX3fVLnC9M4FaUUhqfH4Z4pLe0++Rp4m5Gw8tfnf7Ylb/xoTaWwFb3uU
-	YuREZI/nsmsceCGXLjmEbE1yin+So5cNACCOnzvMBlcKpWxv8svb7g9og79TEdmFX6MYhA
-	GghtRFhu4Zfw3f3S3oxCc1oCwevbqAo=
-Received: from mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-330-gA0AskNvPJqluj550Slfjg-1; Wed,
- 06 Nov 2024 07:40:18 -0500
-X-MC-Unique: gA0AskNvPJqluj550Slfjg-1
-X-Mimecast-MFC-AGG-ID: gA0AskNvPJqluj550Slfjg
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1A730195608C;
-	Wed,  6 Nov 2024 12:40:15 +0000 (UTC)
-Received: from warthog.procyon.org.uk.com (unknown [10.42.28.231])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 3A3071955F40;
-	Wed,  6 Nov 2024 12:40:09 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-	Steve French <smfrench@gmail.com>,
-	Matthew Wilcox <willy@infradead.org>
-Cc: David Howells <dhowells@redhat.com>,
-	Jeff Layton <jlayton@kernel.org>,
-	Gao Xiang <hsiangkao@linux.alibaba.com>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	netfs@lists.linux.dev,
-	linux-afs@lists.infradead.org,
-	linux-cifs@vger.kernel.org,
-	linux-nfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-erofs@lists.ozlabs.org,
-	linux-fsdevel@vger.kernel.org,
-	linux-mm@kvack.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	syzbot+af5c06208fa71bf31b16@syzkaller.appspotmail.com,
-	Chang Yu <marcus.yu.56@gmail.com>
-Subject: [PATCH v3 33/33] netfs: Report on NULL folioq in netfs_writeback_unlock_folios()
-Date: Wed,  6 Nov 2024 12:35:57 +0000
-Message-ID: <20241106123559.724888-34-dhowells@redhat.com>
-In-Reply-To: <20241106123559.724888-1-dhowells@redhat.com>
-References: <20241106123559.724888-1-dhowells@redhat.com>
+	s=arc-20240116; t=1730896665; c=relaxed/simple;
+	bh=PK6WGWIzzUxygDZyxgAl8NGzW2USJnn+khK0DoMIIho=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=RoqiggxhkuBt4qJmebiAUQyEshrOtNJTpUauZoTHNZi01FjwOUQzIcmu0Y5mCZcMOGSaKIOy+QtVuSJuFdEfsiWEXZDK2L6axquiYyx0CDpxv+mVaLmoBrgMD8wfLfI60WPwKOFcnXfUxDeY2cK6Hns5g3nBA8ijmHIMEw1FRlI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FFeZj506; arc=none smtp.client-ip=202.12.124.147
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfout.stl.internal (Postfix) with ESMTP id 6B470114018D;
+	Wed,  6 Nov 2024 07:37:41 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-12.internal (MEProxy); Wed, 06 Nov 2024 07:37:41 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730896661; x=1730983061; bh=/jLOtRJkzelCEg/A2YxeNiDuCCzg/r1GPN8
+	Ngxasi5k=; b=FFeZj5063QyYvANJ4SJWcaaccy8A0bFk2OeCPZAtb39xWa5aOns
+	+cEa6SbJsOxnEPskn5onyWCbYpH5W7IVjtV66Uh02dq35Zc4Uwzwp+a6LaChdaNa
+	vjEq45pwoMreBFAU2kyLSt4vX0WWBxZ98mjqisGdnZGkETAAk4C0lQGNC6DhS4dQ
+	tByZ7oRPA+CVwzZwAB8oajs6SFQxYuXSUJVMe2X6ctCzrZPZ92Zwr0Qc2pwf5SYY
+	kPaEBW9a6u7dsBfqDee0IFgMGvYJ2tTc5NSR0Wru7AKp02/W+CMp+ww5xHeEk6Gd
+	WtT5sT/ky8hJgCEk9uIjDqinTLlqqeN+/PA==
+X-ME-Sender: <xms:FGMrZ4NFfZ6crfnV-B9ekqcuwkjQ8yrVSIlhRcpGRH5itQgw2y9JRA>
+    <xme:FGMrZ-9mhP4QXLq1v2NQt5KI2MqVNfIbdVmPuB03qMWw8Fs1tk88HfaEpcRFGfzCB
+    KonPhaJF_bGW6U>
+X-ME-Received: <xmr:FGMrZ_TljnC-Qc0vrGjE6VE5WDIW-QWDw2ixI0aQHpvU5DIlTR_Gs36tYqOedxhFVXEpDGBv4kCv5dsUtLut5R0wdMo>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrtddvgdegudcutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
+    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
+    hgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefg
+    leekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
+    grihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthho
+    peduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrthhtrdhmuhhgghgvrh
+    hiughgvgeshhhpvgdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhht
+    rdhnvghtpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpth
+    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhs
+    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
+    hrtghpthhtoheplhhinhhugidqrghpihesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
+    phhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
+    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
+X-ME-Proxy: <xmx:FGMrZwuNRCmqAIpboIuYM4JVhlJRXvM4DPmvtZcQeDjorxdF-ZT9RQ>
+    <xmx:FGMrZwe0T_WEWhy6cmI1Btx4gLkFG5pU7E29HW0dQJfJ9TpRfXs9lQ>
+    <xmx:FGMrZ02NCJhF4HGMFPPIbKN3sQcQzQW263kKfXeUoadTa--BxnVxqw>
+    <xmx:FGMrZ0_pMOapVd5zf7lFE_QlIN6UmH_1-Ztbqy-a7gRdWpeLa1ilzw>
+    <xmx:FWMrZxVWN6yUr9Fvec4ds_qFDMWUZ40di6V-w1thbEHbzxS8kXh8TcyX>
+Feedback-ID: i494840e7:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 6 Nov 2024 07:37:39 -0500 (EST)
+Date: Wed, 6 Nov 2024 14:37:36 +0200
+From: Ido Schimmel <idosch@idosch.org>
+To: Matt Muggeridge <Matt.Muggeridge@hpe.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
+	horms@kernel.org, kuba@kernel.org, linux-api@vger.kernel.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH net 1/1] net/ipv6: Netlink flag for new IPv6 Default
+ Routes
+Message-ID: <ZytjEINNRmtpadr_@shredder>
+References: <Zypgu5l7F1FpIpqo@shredder>
+ <20241106025056.11241-1-Matt.Muggeridge@hpe.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106025056.11241-1-Matt.Muggeridge@hpe.com>
 
-It seems that it's possible to get to netfs_writeback_unlock_folios() with
-an empty rolling buffer during buffered writes.  This should not be
-possible as the rolling buffer is initialised as the write request is set
-up and thereafter maintains at least one folio_queue struct therein until
-it gets destroyed.  This allows lockless addition and removal of
-folio_queue structs in the buffer because, unlike with a ring buffer, the
-producer and consumer each only need to look at and alter one pointer into
-the buffer.
+On Tue, Nov 05, 2024 at 09:50:56PM -0500, Matt Muggeridge wrote:
+> Thank you for your review and feedback, Ido.
+> 
+> >> Without this flag, when there are mutliple default routers, the kernel
+> >> coalesces multiple default routes into an ECMP route. The ECMP route
+> >> ignores per-route REACHABILITY information. If one of the default
+> >> routers is unresponsive, with a Neighbor Cache entry of INCOMPLETE, then
+> >> it can still be selected as the nexthop for outgoing packets. This
+> >> results in an inability to communicate with remote hosts, even though
+> >> one of the default routers remains REACHABLE. This violates RFC4861
+> >> section 6.3.6, bullet 1.
+> >
+> >Do you have forwarding disabled (it causes RT6_LOOKUP_F_REACHABLE to be
+> >set)?
+> 
+> Yes, forwarding is disabled on our embedded system. Though, this needs to
+> work on systems regardless of the state of forwarding.
+> 
+> >  Is the problem that fib6_table_lookup() chooses a reachable
+> >nexthop and then fib6_select_path() overrides it with an unreachable
+> >one?
+> 
+> I'm afraid I don't know.
 
-Now, the rolling buffer is only used for buffered I/O operations as
-netfs_collect_write_results() should only call
-netfs_writeback_unlock_folios() if the request is of origin type
-NETFS_WRITEBACK, NETFS_WRITETHROUGH or NETFS_PGPRIV2_COPY_TO_CACHE.
+We need to understand the current behavior before adding a new interface
+that we will never be able to remove. It is possible we can improve /
+fix the current code. I won't have time to look into it myself until
+next week.
 
-So it would seem that one of the following occurred: (1) I/O started before
-the request was fully initialised, (2) the origin got switched mid-flow or
-(3) the request has already been freed and this is a UAF error.  I think the
-last is the most likely.
+> 
+> The objective is to allow IPv6 Netlink clients to be able to create default
+> routes from RAs in the same way the kernel creates default routes from RAs.
+> Essentially, I'm trying to have Netlink and Kernel behaviors match.
 
-Make netfs_writeback_unlock_folios() report information about the request
-and subrequests if folioq is seen to be NULL to try and help debug this,
-throw a warning and return.
+I understand, but it's essentially an extension for the legacy IPv6
+multipath API which we are trying to move away from towards the nexthop
+API (see more below).
 
-Note that this does not try to fix the problem.
+> 
+> My analysis led me to the need for Netlink clients to set the kernel's
+> fib6_config flags RTF_RA_ROUTER, where:
+> 
+>     #define RTF_RA_ROUTER		(RTF_ADDRCONF | RTF_DEFAULT)
+> 
+> >> +	if (rtm->rtm_flags & RTM_F_RA_ROUTER)
+> >> +		cfg->fc_flags |= RTF_RA_ROUTER;
+> >> +
+> > 
+> > It is possible there are user space programs out there that set this bit
+> > (knowingly or not) when sending requests to the kernel and this change
+> > will result in a behavior change for them. So, if we were to continue in
+> > this path, this would need to be converted to a new netlink attribute to
+> > avoid such potential problems.
+> > 
+> 
+> Is this a mandated approach to implementing unspecified bits in a flag?
+> 
+> I'm a little surprised by this consideration. If we account for poorly
+> written buggy user-programs, doesn't this open any API to an explosion
+> of new attributes or other odd extensions? I'd imagine the same argument
+> would be applicable to ioctl flags, socket flags, and so on. Why would we
+> treat implementing unspecified Netlink bits differently to implementing
+> unspecified ioctl bits, etc.
+> 
+> Naturally, if this is the mandated approach, then I'll reimplement it with
+> a new Netlink attribute. I'm just trying to understand what is the
+> Linux-lore, here?
 
-Reported-by: syzbot+af5c06208fa71bf31b16@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?extid=af5c06208fa71bf31b16
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Chang Yu <marcus.yu.56@gmail.com>
-Link: https://lore.kernel.org/r/ZxshMEW4U7MTgQYa@gmail.com/
-cc: Jeff Layton <jlayton@kernel.org>
-cc: netfs@lists.linux.dev
-cc: linux-fsdevel@vger.kernel.org
----
- fs/netfs/write_collect.c | 34 ++++++++++++++++++++++++++++++++++
- 1 file changed, 34 insertions(+)
+Using this bit could have been valid if previously the kernel rejected
+requests with this bit set, but as evident by your patch the kernel does
+not do it. It is therefore possible that there are user space programs
+out there that are working perfectly fine right now and they will break
+/ misbehave after this change.
 
-diff --git a/fs/netfs/write_collect.c b/fs/netfs/write_collect.c
-index 3d8b87c8e6a6..4a1499167770 100644
---- a/fs/netfs/write_collect.c
-+++ b/fs/netfs/write_collect.c
-@@ -21,6 +21,34 @@
- #define NEED_RETRY		0x10	/* A front op requests retrying */
- #define SAW_FAILURE		0x20	/* One stream or hit a permanent failure */
- 
-+static void netfs_dump_request(const struct netfs_io_request *rreq)
-+{
-+	pr_err("Request R=%08x r=%d fl=%lx or=%x e=%ld\n",
-+	       rreq->debug_id, refcount_read(&rreq->ref), rreq->flags,
-+	       rreq->origin, rreq->error);
-+	pr_err("  st=%llx tsl=%zx/%llx/%llx\n",
-+	       rreq->start, rreq->transferred, rreq->submitted, rreq->len);
-+	pr_err("  cci=%llx/%llx/%llx\n",
-+	       rreq->cleaned_to, rreq->collected_to, atomic64_read(&rreq->issued_to));
-+	pr_err("  iw=%pSR\n", rreq->netfs_ops->issue_write);
-+	for (int i = 0; i < NR_IO_STREAMS; i++) {
-+		const struct netfs_io_subrequest *sreq;
-+		const struct netfs_io_stream *s = &rreq->io_streams[i];
-+
-+		pr_err("  str[%x] s=%x e=%d acnf=%u,%u,%u,%u\n",
-+		       s->stream_nr, s->source, s->error,
-+		       s->avail, s->active, s->need_retry, s->failed);
-+		pr_err("  str[%x] ct=%llx t=%zx\n",
-+		       s->stream_nr, s->collected_to, s->transferred);
-+		list_for_each_entry(sreq, &s->subrequests, rreq_link) {
-+			pr_err("  sreq[%x:%x] sc=%u s=%llx t=%zx/%zx r=%d f=%lx\n",
-+			       sreq->stream_nr, sreq->debug_index, sreq->source,
-+			       sreq->start, sreq->transferred, sreq->len,
-+			       refcount_read(&sreq->ref), sreq->flags);
-+		}
-+	}
-+}
-+
- /*
-  * Successful completion of write of a folio to the server and/or cache.  Note
-  * that we are not allowed to lock the folio here on pain of deadlocking with
-@@ -87,6 +115,12 @@ static void netfs_writeback_unlock_folios(struct netfs_io_request *wreq,
- 	unsigned long long collected_to = wreq->collected_to;
- 	unsigned int slot = wreq->buffer.first_tail_slot;
- 
-+	if (WARN_ON_ONCE(!folioq)) {
-+		pr_err("[!] Writeback unlock found empty rolling buffer!\n");
-+		netfs_dump_request(wreq);
-+		return;
-+	}
-+
- 	if (wreq->origin == NETFS_PGPRIV2_COPY_TO_CACHE) {
- 		if (netfs_pgpriv2_unlock_copied_folios(wreq))
- 			*notes |= MADE_PROGRESS;
+> 
+> > BTW, you can avoid the coalescing problem by using the nexthop API (man
+> > ip-nexthop).
+> 
+> I'm not sure how that would help in this case. We need the nexthop to be
+> determined according to its REACHABILITY and other considerations described
+> in RFC4861.
 
+Using your example:
+
+# ip nexthop add id 1 via fe80::200:10ff:fe10:1060 dev enp0s9
+# ip -6 route add default nhid 1 expires 600 proto ra
+# ip nexthop add id 2 via fe80::200:10ff:fe10:1061 dev enp0s9
+# ip -6 route append default nhid 2 expires 600 proto ra
+# ip -6 route
+fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
+default nhid 1 via fe80::200:10ff:fe10:1060 dev enp0s9 proto ra metric 1024 expires 563sec pref medium
+default nhid 2 via fe80::200:10ff:fe10:1061 dev enp0s9 proto ra metric 1024 expires 594sec pref medium
 
