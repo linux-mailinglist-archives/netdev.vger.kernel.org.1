@@ -1,84 +1,115 @@
-Return-Path: <netdev+bounces-142334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F6E49BE50E
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:00:52 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB1F19BE523
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:04:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 074F61F24FC2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:00:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 669871C209F2
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:04:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42FD61DDC30;
-	Wed,  6 Nov 2024 11:00:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF8C91DB377;
+	Wed,  6 Nov 2024 11:04:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fluKaB32"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="Lvx1rC6e"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from forward501a.mail.yandex.net (forward501a.mail.yandex.net [178.154.239.81])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193BB142E86;
-	Wed,  6 Nov 2024 11:00:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3D391D54D6;
+	Wed,  6 Nov 2024 11:04:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.81
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730890844; cv=none; b=jaJugPyCXZRzJK4MjDh+iuGF68+SNdZOJLOwPz7It/0ksXTseKuDmppc4KBdlYTqBlmkrdTP5mb3ufESoJGsquuJMNkNLvZn7Csl52TccF7Io7R/gkStWcp/STQ62BpUNFhp3usc3EbVk5NliQ7whr/ZsOCoDY0iiv9GBEgf4O0=
+	t=1730891050; cv=none; b=FF/L56PnNYS2BIA9BiXnK8YxTDjYvat5rQ+XQpwRhA137eAdOi0dWQsy42gnU7tHmcpXM2P9/00fDpQsMgiJGX29YXnBL5AB02/2t5942iEgEFk9KjdulPJctou7ekYnSJp/ZOWGHGZgdeWcznw3GEfzhXll3v3cgF06yayoanI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730890844; c=relaxed/simple;
-	bh=iIV7Yr0bdlyHCC81DwX4Zrc8Y06lx1+kkRFDjM5Xwto=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BJ7YNlEPZQHk1XZIv1MoWD1jmD/rOmvxSobtMZCvXVSX1CXMQugkX4nRQdzCWjSQ1gTOPjLk6N7dHp5QtOlhvkdVuXTrA7P5C0ey5+2JK8TQAO1fkJNiQ/cSNyVtVpMxrwpf206U6lxNbzBJeWrOXBdVh+9SIcafoEURx50q04A=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fluKaB32; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3542C4CED2;
-	Wed,  6 Nov 2024 11:00:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730890843;
-	bh=iIV7Yr0bdlyHCC81DwX4Zrc8Y06lx1+kkRFDjM5Xwto=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=fluKaB329vNJTNI9zO/jYxyQxleiQBtI3hKbWs0s2lRdk257564zui1vCDHtl7bRo
-	 uB6DyslqXkzRJkh7Uh0+/5IENbwqceE3vizLfiBT8q+hE3kqvLcUFJVL+XILS0196J
-	 g6R57UQ1g6u2rYpwp6KXjgGC4nRFip0fVAogwjC1acxNaYODBKLotQp1JpvPXAKwRE
-	 eMggPtQL0BehPSCWpReY1vNYEvjsUWGnO8q24WUBs949ASDp7FHhlPf0Mh1278yW7r
-	 UkjHp3qRTvUJ+Ayunm7ExLAsKwD1LujV35so92bkZAG+x+p0a52oaY/6xcwHo7XuRS
-	 grAVdrY8SNwXw==
-Date: Wed, 6 Nov 2024 11:00:39 +0000
-From: Simon Horman <horms@kernel.org>
-To: Gan Jie <ganjie182@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, trivial@kernel.org,
-	ganjie163@hust.edu.cn
-Subject: Re: [PATCH] Driver:net:fddi: Fix typo 'adderss'
-Message-ID: <20241106110039.GO4507@kernel.org>
-References: <20241101074551.943-1-ganjie182@gmail.com>
+	s=arc-20240116; t=1730891050; c=relaxed/simple;
+	bh=q4TFipn7rP5ZxRbG9ASHkp5pxcXEVeImBq/WXvCxCrU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=i7BLAirp8RVjmk0noulsIgsHnIM94suoZDK2kudq4OCymAf3/EY04PmYX5Bhe0UqgWlW1VqGgmNV6Nd1sdLlJXptZrVRpMvCQjGWOL0jAdtEMWv+wQtAJ2EOi0bhQySw3T18EXvKblk8iNFiXvZjvLqJ3Kjx5KcLm+svOdmAkMg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=Lvx1rC6e; arc=none smtp.client-ip=178.154.239.81
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net [IPv6:2a02:6b8:c15:2c8f:0:640:f9cc:0])
+	by forward501a.mail.yandex.net (Yandex) with ESMTPS id E461661786;
+	Wed,  6 Nov 2024 14:03:58 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id v3fYu22Vq8c0-7VZM6GHH;
+	Wed, 06 Nov 2024 14:03:57 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1730891037; bh=q4TFipn7rP5ZxRbG9ASHkp5pxcXEVeImBq/WXvCxCrU=;
+	h=In-Reply-To:To:From:Cc:Date:References:Subject:Message-ID;
+	b=Lvx1rC6eCZSAkno5UhCC39XeJZb8LHJQtPDzVegmdSwkwWNQweZmFiPGJvQQspLah
+	 IwCSFgXsD0kOuu22Xa/iA3qjby9P3SXmVBWr9CCCA+/bUpFPj1K/sMbZBhQxqmoiIV
+	 NU96VLUVR+t4xS7sNMnBZpWHALOfuVYhykewF8vs=
+Authentication-Results: mail-nwsmtp-smtp-production-main-54.vla.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+Message-ID: <9393e900-b85e-428e-a2b0-9e3650b86975@yandex.ru>
+Date: Wed, 6 Nov 2024 14:03:57 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101074551.943-1-ganjie182@gmail.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2] can: fix skb reference counting in j1939_session_new()
+Content-Language: en-MW
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Robin van der Gracht <robin@protonic.nl>,
+ Oleksij Rempel <o.rempel@pengutronix.de>,
+ Oliver Hartkopp <socketcan@hartkopp.net>,
+ Marc Kleine-Budde <mkl@pengutronix.de>, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, lvc-project@linuxtesting.org,
+ syzbot+d4e8dc385d9258220c31@syzkaller.appspotmail.com
+References: <20241105094823.2403806-1-dmantipov@yandex.ru>
+ <ZypJ4ZnR0JkPedNz@nanopsycho.orion>
+From: Dmitry Antipov <dmantipov@yandex.ru>
+Autocrypt: addr=dmantipov@yandex.ru; keydata=
+ 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
+ A/UwwXBRuvydGV0=
+In-Reply-To: <ZypJ4ZnR0JkPedNz@nanopsycho.orion>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Fri, Nov 01, 2024 at 03:45:51PM +0800, Gan Jie wrote:
-> Fix typo 'adderss' to 'address'.
-> 
-> Signed-off-by: Gan Jie <ganjie182@gmail.com>
+On 11/5/24 7:37 PM, Jiri Pirko wrote:
 
-Hi Gan Jie,
+> It is odd to write "I assume" for fix like this. You should know for
+> sure, don't you?
 
-While you are addressing spelling in this file, could you
-also look into the following which are flagged by codespell.
+Well, the final vote is up to the maintainer(s).
 
-drivers/net/fddi/skfp/h/supern_2.h:55: impementor ==> implementer
-drivers/net/fddi/skfp/h/supern_2.h:587: Implementor ==> Implementer
-drivers/net/fddi/skfp/h/supern_2.h:598: Implementor ==> Implementer
-drivers/net/fddi/skfp/h/supern_2.h:885: activ ==> active
-drivers/net/fddi/skfp/h/supern_2.h:927: activ ==> active
-drivers/net/fddi/skfp/h/supern_2.h:956: ACTIV ==> ACTIVE
-drivers/net/fddi/skfp/h/supern_2.h:959: ACTIV ==> ACTIVE
-drivers/net/fddi/skfp/h/supern_2.h:1028: recources ==> resources
+Dmitry
 
-Thanks!
 
