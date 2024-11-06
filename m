@@ -1,74 +1,83 @@
-Return-Path: <netdev+bounces-142192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192849BDB78
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:53:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60C969BDB7A
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:54:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 9CB14B22AA3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:53:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FED32849C7
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:54:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E20F618B470;
-	Wed,  6 Nov 2024 01:53:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DBD518C011;
+	Wed,  6 Nov 2024 01:54:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Cm7EV7wI"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="XzEDivC5"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-111.freemail.mail.aliyun.com (out30-111.freemail.mail.aliyun.com [115.124.30.111])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 194CB6BFCA;
-	Wed,  6 Nov 2024 01:53:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.111
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 124626BFCA;
+	Wed,  6 Nov 2024 01:54:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730858025; cv=none; b=ka+UafPUqbc9ry/ncZ8zT1LFzZyXDdSnsTK2EtU5W8AfvTsMytAwdOhX8J5LdkljOahotkypgO4lFLFf9hGk/LovN82AL5lzGQis3senGrY+H7YHI9+o1LTVUnvoH5If32fzYF7S9+ngHFkMBGPS1aojX2wb7YOMKMGUDpzcCMU=
+	t=1730858056; cv=none; b=MkhBc7qr7s1/ikcpTejMvb8dvjjMHX+56FhQgT/1ptZuE3jJjK8pw1c8E8bdArJXEPddB5wRa1ajzJgpGTBovp5tGZUwamULvSeCVjqDQWQiBN8EVrVmJUJPHVCe9lHy9vXC6xbFJR+Im1PcWSeRdX4naCc1UvK4P8VpIVepoeQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730858025; c=relaxed/simple;
-	bh=68+zslkMKSA5nGn3lh0DlfksOz2L6lczC3Bk6w4itAM=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=TK3xqZ0tEbTeqdzY7N7vfdhjUoHFNyHnim2l33fqymbitF3063D7G/34gMHYIWn5SSupAf/j/2P+L/hf7eM4td1YC6Gw/VjuR/gjUaiZibR/SI1G9ucYC8PE6jy/d0/QNwFhjqc/gJOzEA8xoZaYPSr0ceLyzpE7yD7kh0TaXJg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Cm7EV7wI; arc=none smtp.client-ip=115.124.30.111
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730858018; h=Message-ID:Date:MIME-Version:Subject:From:To:Content-Type;
-	bh=FVLThfaNjw2O2/L4P/vGneDLVGUi31T7fGTxCNOyGkY=;
-	b=Cm7EV7wIG/mQnov3YGooQDNgnQByq5zZa2ryJDu0AAjxFHxNDlzey6LgzA0N1CNnfWv70m/gVb8q1IA1NM8T/n4RixzwRx52iDonWh0yf3Jyy3cO276DqwmU4JK3SUrXI3rBRguoLB4W6jOJ3LEpz2+WDwhCy43ExE33tAHbrZk=
-Received: from 30.221.128.108(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WIoL2WC_1730858016 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Wed, 06 Nov 2024 09:53:37 +0800
-Message-ID: <72b93894-2728-48df-83b3-3b4773e7aae1@linux.alibaba.com>
-Date: Wed, 6 Nov 2024 09:53:35 +0800
+	s=arc-20240116; t=1730858056; c=relaxed/simple;
+	bh=rEl5+/OVz3kpLjNrN+e36IZX2U5ZNK+h6eVl+LZGakU=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=PLZlE/HC7m0I3sNnOFyojI+Go0Y4wTwTXsJnDvxID+xY7ONxq8IGDvo81mVyeSPxOiCFfDoP1PcobDD3btjOPSvU3YfTDXnkUeC0zSV38JgrYTxnyRPG0K+yVFsm+W3AInY67kBQtkHAM1bBpaskHJmYQyu463fReyRo+2njDXw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=XzEDivC5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C70B4C4CECF;
+	Wed,  6 Nov 2024 01:54:14 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730858055;
+	bh=rEl5+/OVz3kpLjNrN+e36IZX2U5ZNK+h6eVl+LZGakU=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=XzEDivC5rp/8TTRdZfv/Ci2uqPYaOVTIdD+l2cQEGcVRGceK3y0fLCaYvvmUDMfOe
+	 TpmH1wz4PQY17ZDfbopnVoz1Dt1TBkqhOUrvQiPWBhuHD6SDApSQawS9oY+dqStdiG
+	 M6HbXxdVg18DuowqALTjgGdECbMm1E9C5buoUIOWBTNJiCxLeQxLeLskRlgrZCfqB3
+	 MEgcLPOrR3Upqc/XVisZVSNn8jS7xU3imx7VC6yhquHet7PoJyuZgNBRGTVWiZ7Jjw
+	 I4r6u+erfinjjFCZiPDyPOQ7+NSwggrsaVeOLp3Rlx8rm1zdKQptbz93y6nugnm0/W
+	 3Rbyp1ydDoSrQ==
+Date: Tue, 5 Nov 2024 17:54:13 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Wander Lairson Costa <wander@redhat.com>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, Przemek Kitszel
+ <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David
+ S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
+ Abeni <pabeni@redhat.com>, Sebastian Andrzej Siewior
+ <bigeasy@linutronix.de>, Clark Williams <clrkwllms@kernel.org>, Steven
+ Rostedt <rostedt@goodmis.org>, intel-wired-lan@lists.osuosl.org (moderated
+ list:INTEL ETHERNET DRIVERS), netdev@vger.kernel.org (open list:NETWORKING
+ DRIVERS), linux-kernel@vger.kernel.org (open list),
+ linux-rt-devel@lists.linux.dev (open list:Real-time Linux
+ (PREEMPT_RT):Keyword:PREEMPT_RT), tglx@linutronix.de
+Subject: Re: [PATCH] Revert "igb: Disable threaded IRQ for igb_msix_other"
+Message-ID: <20241105175413.55ea58f2@kernel.org>
+In-Reply-To: <20241104124050.22290-1-wander@redhat.com>
+References: <20241104124050.22290-1-wander@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v7 net-next 4/4] ipv6/udp: Add 4-tuple hash for connected
- socket
-From: Philo Lu <lulie@linux.alibaba.com>
-To: netdev@vger.kernel.org
-Cc: willemdebruijn.kernel@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
- horms@kernel.org, antony.antony@secunet.com, steffen.klassert@secunet.com,
- linux-kernel@vger.kernel.org, dust.li@linux.alibaba.com,
- jakub@cloudflare.com, fred.cc@alibaba-inc.com,
- yubing.qiuyubing@alibaba-inc.com
-References: <20241105121225.12513-1-lulie@linux.alibaba.com>
- <20241105121225.12513-5-lulie@linux.alibaba.com>
-In-Reply-To: <20241105121225.12513-5-lulie@linux.alibaba.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-Sorry for missed EXPORT_SYMBOL()s that break ipv6.ko building. Will add 
-for the shared functions including udp_ehashfn(), udp_lib_hash4(), and 
-udp4_hash4().
+On Mon,  4 Nov 2024 09:40:50 -0300 Wander Lairson Costa wrote:
+> This reverts commit 338c4d3902feb5be49bfda530a72c7ab860e2c9f.
+> 
+> Sebastian noticed the ISR indirectly acquires spin_locks, which are
+> sleeping locks under PREEMPT_RT, which leads to kernel splats.
+> 
+> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
 
+Please resend with the reverted commit added as a Fixes tag.
+Also - your sign off should be the last tag.
 -- 
-Philo
-
+pw-bot: au
 
