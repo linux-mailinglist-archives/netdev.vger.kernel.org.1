@@ -1,111 +1,97 @@
-Return-Path: <netdev+bounces-142142-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142143-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 419DB9BDA4B
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:28:06 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 209629BDA53
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:30:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BF0FAB23319
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:28:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 527521C228A5
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:30:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7439110E3;
-	Wed,  6 Nov 2024 00:27:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BE47153800;
+	Wed,  6 Nov 2024 00:30:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="OP8ey3sN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GXvEEeO9"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f52.google.com (mail-qv1-f52.google.com [209.85.219.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24ADDCA5B
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 00:27:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3198D14A4FF;
+	Wed,  6 Nov 2024 00:30:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730852879; cv=none; b=kebOY+ETcTHrQVSYIG3GaNxpoPeDxS6/XXk6LWz0idASjXuco5XUaoSkApeFsip95foZUiJTunUX73GD/21U46Gi+fGv587CPUGIHfo2g7x8YCxiS9BNVrLjbitN3tbVYI8r3e+i0hSCMmmef3+yVDurQDsS4HuQXvB3VLvY0Fw=
+	t=1730853021; cv=none; b=lotPyFDJnumb/sm2gOEJelYGwdW4KA+ow4ufdIAep+H6E9fmH3I/cIziXBnz6kRrzlwNoUdQw52lbU+KF3J6XO2jQKRJA0lSd3v9aD/7Y1VSfRw+BqYgyaRPY8ugzjw4dBtDb4xzE0SO9hl0jm5cMZBpKKwEj4RVV6HYAKQ53i4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730852879; c=relaxed/simple;
-	bh=b6uK7llb5e36CA4wEXAAc0AxUMUzILjII6G0DIJYf6M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qoR2TELugxbHDCuWl9Nub3LKXrGHMANeewfkPWS7E5M9q/8f8FV+MFkfWTF4jsUUIF2HTbVp1rgs5aNJwXpWAiv1lx1SozipBGx/kKveaC2AH2FqaXlm/P893fWVW3DgOV3wUdoMSE15yDp4fnz0yJkNNkqBrwWYbxgqjPWcMRs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=OP8ey3sN; arc=none smtp.client-ip=209.85.219.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qv1-f52.google.com with SMTP id 6a1803df08f44-6d36f7cf765so27932466d6.0
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 16:27:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1730852875; x=1731457675; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=RPWQa+FTKYMBuDDcOKjxAgUcKitW+kesNp1QCv0e5R0=;
-        b=OP8ey3sNOnsjyUzu0634OhEBwtsA1Mijx1spL7BwL0urvph0Rn4KZ/and2vDjFyWBU
-         SMLBswJMXGEmpAPdeIElcKW9z50V4g3fmc+2I/u2mWbwtGl6uncw9TXig0p/BOyTSJpl
-         5msLR3zjAb5c4WrfjnIBoXIyAtLHLsSdgStDTNwH7FS79UnjAOJeso4729LLF9PbTiiS
-         MBkQY4i0GT+BHF102+DDgRqc3Y2RvlPi9L5cO2e6zMdXRU7Rib7dlJHlo2+ceNZu/E9Y
-         iTpwDIePfuMgXvBwMPWdgnsWNYz4Im0pcUbkAdqMW/BNj3LN774RN1/GMXDzsuQipocf
-         Xl5A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730852875; x=1731457675;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=RPWQa+FTKYMBuDDcOKjxAgUcKitW+kesNp1QCv0e5R0=;
-        b=cATllDPZLjIQoBkLI6yufXdtsuT7x3kaxPDVQ10I87syIE3eiFITsrIqfJTmkCfWy5
-         c6bNJxed+F/8NV/MBt8mrEtCwfTxXS//Hd2Po5QhiFjWoGaeJJTBUuwL+ew3uwnGjx01
-         56a58XbOdXT0hBg4qnPgSq2PzGYWs5FoKmuCzdlci4SKybnRxQ98om4k0YEyn6f7+oku
-         EInS0YbuIclsKrmHYOAZVQnGwFJUzHeonmaIIaILUn3z40klOSgNXtGktVs4eMDzMfGl
-         fnOjKq+LjFImTGEp9I5QR0UEGMfA4hY0Ye/2xS+rGpswUBf6c7ZLECHtvyAPGpuNUySn
-         UeMg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbnJ9WMfrGryexcPgHjyd3fjQJnZ7vHi8EBLSp5X65spM4m5yNnmIGI4szJFpzZwf9/pQjt2o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxcLx4am5LUBAxL4xJaHO1CWCtCiuZNPnWlHXS6yTYw5smY9J3o
-	2mg09NA7tjBI/ZUszmIcpFQg9ucUjBoRZIwL/lMI8a65CRpyKH4sw2VGsSreU18=
-X-Google-Smtp-Source: AGHT+IHkF61LIO7nneCgEwYCw4dCRD6xpNeXLJfFmTXxxf96FpcaIJmiMVnEV6PRFIp8IFBPbaPz/w==
-X-Received: by 2002:a05:6214:3bc5:b0:6ce:26d0:c7b4 with SMTP id 6a1803df08f44-6d35c19bf44mr260048106d6.44.1730852875016;
-        Tue, 05 Nov 2024 16:27:55 -0800 (PST)
-Received: from ?IPV6:2601:647:4200:9750:314c:a1fc:f04f:2b34? ([2601:647:4200:9750:314c:a1fc:f04f:2b34])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d35415b2e3sm66002826d6.81.2024.11.05.16.27.51
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 05 Nov 2024 16:27:54 -0800 (PST)
-Message-ID: <de982cf0-45f5-46bc-91a7-e0f1d7745686@bytedance.com>
-Date: Tue, 5 Nov 2024 16:27:49 -0800
+	s=arc-20240116; t=1730853021; c=relaxed/simple;
+	bh=c9V3aD4p8PP7Lw62hg1olACyeMbtZ7mnNz7niMzylDA=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=o9J6Fjy4/lknqHp7BaBho4KyN5KPj9IPHqakxhHSi1ccUMgA9zsTZ1R+Zn/la/PXCxha8zGIrODDJ27JZ1HTc/NHMCEYU/vXKgoFEvNDAfmodT4e0aHBDutCy/N2OnO3fCbS4+lNBXvNd+Ls2y7xA4tiV6zh9MaHRptF7YAsF8I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GXvEEeO9; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 977D9C4CECF;
+	Wed,  6 Nov 2024 00:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730853020;
+	bh=c9V3aD4p8PP7Lw62hg1olACyeMbtZ7mnNz7niMzylDA=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=GXvEEeO98FQQpmcFH6ySrf7wZ6CenyFfbgLd6blVYesJ3sCCuRkwxRBeUybvCugYN
+	 y2km8YI3f/+mDrTGWJIoSqYJ+nlfryc8Hptc/coWcBM/p+QNLFy8YE8LZSFlYQVNSb
+	 Cc7LMsU9sFyMEoXvFo4w1c4VHZo9JeFE5S88kj/VVLJtqdaSxdsemgmuLN6TwImvsC
+	 e/fmS0PQOr4O4Xj0jDvSeeau6BpMjyN2/Y0TuvnEEJGPkAA3Z0dpJcIyAlzvSgNbcO
+	 a1OozBIaNLI5+RX2J/TZdHnLJUgs3/rLNLWKiFukGzyvoOhD6tv5oQPd1qhJsr/uRB
+	 4jhRz+ZtGLi0g==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADF793809A80;
+	Wed,  6 Nov 2024 00:30:30 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH v2 bpf] bpf: Add sk_is_inet and IS_ICSK
- check in tls_sw_has_ctx_tx/rx
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: bpf@vger.kernel.org, borisp@nvidia.com, john.fastabend@gmail.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, daniel@iogearbox.net, ast@kernel.org,
- stfomichev@gmail.com, netdev@vger.kernel.org
-References: <20241030161855.149784-1-zijianzhang@bytedance.com>
- <20241103121546.4b9558aa@kernel.org>
-Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <20241103121546.4b9558aa@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH bpf-next/net v3] selftests/bpf: Drop netns helpers in mptcp
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173085302951.742987.15552199829339581477.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Nov 2024 00:30:29 +0000
+References: <c02fda3177b34f9e74a044833fda9761627f4d07.1730338692.git.tanggeliang@kylinos.cn>
+In-Reply-To: <c02fda3177b34f9e74a044833fda9761627f4d07.1730338692.git.tanggeliang@kylinos.cn>
+To: Geliang Tang <geliang@kernel.org>
+Cc: andrii@kernel.org, eddyz87@gmail.com, mykolal@fb.com, ast@kernel.org,
+ daniel@iogearbox.net, martin.lau@linux.dev, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ tanggeliang@kylinos.cn, netdev@vger.kernel.org, mptcp@lists.linux.dev,
+ bpf@vger.kernel.org, linux-kselftest@vger.kernel.org, matttbe@kernel.org
 
-On 11/3/24 12:15 PM, Jakub Kicinski wrote:
-> On Wed, 30 Oct 2024 16:18:55 +0000 zijianzhang@bytedance.com wrote:
->> As the introduction of the support for vsock and unix sockets in sockmap,
->> tls_sw_has_ctx_tx/rx cannot presume the socket passed in must be IS_ICSK.
->> vsock and af_unix sockets have vsock_sock and unix_sock instead of
->> inet_connection_sock. For these sockets, tls_get_ctx may return an invalid
->> pointer and cause page fault in function tls_sw_ctx_rx.
-> 
-> Since it's touching TLS code:
-> 
-> Acked-by: Jakub Kicinski <kuba@kernel.org>
-> 
-> I wonder if we should move these helpers to skmsg or such, since only
-> bpf uses them.
-> 
+Hello:
 
-Agree, skmsg.h seems a better place for these two helpers.
+This patch was applied to bpf/bpf-next.git (net)
+by Martin KaFai Lau <martin.lau@kernel.org>:
+
+On Thu, 31 Oct 2024 09:40:46 +0800 you wrote:
+> From: Geliang Tang <tanggeliang@kylinos.cn>
+> 
+> New netns selftest helpers netns_new() and netns_free() has been added
+> in network_helpers.c, let's use them in mptcp selftests too instead of
+> using MPTCP's own helpers create_netns() and cleanup_netns().
+> 
+> Signed-off-by: Geliang Tang <tanggeliang@kylinos.cn>
+> Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
+> 
+> [...]
+
+Here is the summary with links:
+  - [bpf-next/net,v3] selftests/bpf: Drop netns helpers in mptcp
+    https://git.kernel.org/bpf/bpf-next/c/ac1bd50164b7
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
