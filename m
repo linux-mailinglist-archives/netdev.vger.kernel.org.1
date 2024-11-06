@@ -1,161 +1,147 @@
-Return-Path: <netdev+bounces-142283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C62569BE1DF
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:09:20 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 706729BE1F8
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:11:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7873D1F25346
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:09:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EBBAFB21AD6
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 50CF91DDA0E;
-	Wed,  6 Nov 2024 09:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A07D91D7E43;
+	Wed,  6 Nov 2024 09:07:26 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="gpP+p9cm"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="EuwSZZHL"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pg1-f176.google.com (mail-pg1-f176.google.com [209.85.215.176])
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1F7E1DD880
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:05:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.215.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D6A1922EF
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:07:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730883944; cv=none; b=MZaoBqHJQU2iku6icci63MK0XAVQlOeR71hjFyiwOKXswzOiBCyl9GqbHGilxYcyNHWPj5BzR6QBnaSI58fEQHQ4DebfNwT5U/m+s1vs+nOjM+ggvSU6y39umtc1W9NJeSfhpr0sn2PQMvc8RT7iI/AMl+rY70zt/XsBexTqlCM=
+	t=1730884046; cv=none; b=U12MCDv3OD1Bbqw5uHmG0xQpsGV4jzuQTtK9F7fiuANuGMK4+GcObG+Oo08kv5SLW31nc+vuz6I9jsK4PHzcHRkUDxqe4L09a3n2H375fiKAxFvyyRqjXELPVxnOgWC7R17eCgiAhFrlV0RhVyZqVyhdgmuhEMySI52e0z+tq0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730883944; c=relaxed/simple;
-	bh=Paw3NHGBKcpYWKx6/8kixwuXZd4axLGz+zE8p3Aik4E=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References; b=JEeEP9+Ea5htuZTNpQTj1wPXkUJUvqU52c2jqEmw3hwjHA6BK6BKFO4hM/YsaP2B7cz4qKfLK1lYyRvk/GRekYnnYGu2Aw9DDdXl/KrNCDjFdHW94V1FOszWC4k9LyzId1WRl98HdOizQCeXQi3EBOgI2OxFa1mdXIEwmhpr8Jg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=gpP+p9cm; arc=none smtp.client-ip=209.85.215.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-pg1-f176.google.com with SMTP id 41be03b00d2f7-7ea9739647bso4626409a12.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:05:42 -0800 (PST)
+	s=arc-20240116; t=1730884046; c=relaxed/simple;
+	bh=2YSBw5d3ZzVauiy65E+3NLMuMYcYDqmmu0wA0QdlLG0=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=bCxCR9dpM68O9PwpneFAtKC5C3+0JhZOHPZGABdMH695rv+AjPpAcOxHchJ9J+TaSg5ranZSsOQVdmw20ag6eQuj0wWINj5dJX4Ro/ipML0Fe246LzfiSMe4qYlYilzPOMibEiOD8XImw39eYBA3o9m2cPnv5cG/gb1A96FLY0k=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=EuwSZZHL; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4315f24a6bbso50544335e9.1
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:07:24 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1730883942; x=1731488742; darn=vger.kernel.org;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=KpyF7OfeG3D1SjYyfRqhBhCivmBUEISeT2uU0LeHwvU=;
-        b=gpP+p9cmKNiWbEScfck4H+8B0FdENOMlK0Gdc0zbeWB+0QIzFoh5iNnqzoZJd2DleJ
-         Hx7gKsgOdk7WrajzW4xDqu1QA3qJr0xdX07H9UAwFPcFI0QwhqdXpfLRAoUYefmnhb81
-         illP8wwORUJ9dRvBSJT3Aaud8LTE4zjYHA8VI=
+        d=gmail.com; s=20230601; t=1730884043; x=1731488843; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=eg9B1rYqwEVpjwJ4zoMRU8WAB13tJ5jB7RC8OIC8iZI=;
+        b=EuwSZZHLgF8tVXGf2+TwYqQ9PnCts+HJjyBCL0Swx3V6EvqxDCZsNOos0A2bM27Ne4
+         Hom8y2Di4aUIKg3VzA1k/yjHL3Fj9cmkoCMiJBGTJl0iHKLj3f0+GTmmxxFvRdM06FmP
+         7/NASZjogEvJTK6JMiICBPYEsPFCoFr6KEb1ej77k3miCfa0VvaB7DafN9GII5vDtQvo
+         Tj60JxmeT4rUF3VQdq62R5vlKGiCD1PJFC4KCgC5wYD7/UH4Lw9y6/g8pJh/ubckYzVt
+         oghRvY0UscEq3id5H9lGbzhSf52FAJ0NfWBL6y+rZ1KGneP3i8mCbObtHT6biMqQ8Imt
+         +lig==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730883942; x=1731488742;
-        h=references:in-reply-to:message-id:date:subject:cc:to:from
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KpyF7OfeG3D1SjYyfRqhBhCivmBUEISeT2uU0LeHwvU=;
-        b=Ikkc9jtgf3FegE6epBvEBy2dgyl+6awI2aVI6I3im65PseDfN2rzeCKPIkR7jEDIN/
-         WwypoRgK15889L8Y40i8CC5IpVD0m/AxbInVgqHEiqOH/c9rgs9OiFfPo/HsL+Gp7rRW
-         /jjTB7+vchz0mCT4Xr0uEjh1dxPAshA/RKbojvdnK7eu9okf53i2a/HvkfSPvmLgbJUi
-         j3xvSyV1K6OBHkcKI8M1J8Zwtq4KTTqaEMLfaRw88YeKGLPzNjxCREPFPXhB/UoYnpGa
-         aiCfGMcldKKXvnSzzJ379oCxLGRqLJgHO/oeiEkkoFbRpXxeM7e1DBo/gl8/TdT95ygT
-         Iu0w==
-X-Forwarded-Encrypted: i=1; AJvYcCUjBHxHTAHErPp7OlFKV2QEg1wVjkHDo55fcoCdDr2gGJXC8q9pTNIr5xzCNRUBidNgiuqInY4=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywmel8/oh7qJNLOs8SbvKYvciQ2nbCUINakcg4Lm6W4OgBk0RiG
-	aY8INXCQeh5USCt7Sss3s/g9sLZ09oDEL2fIYo7tmtYPudRLko0IV7yIv6oKmQ==
-X-Google-Smtp-Source: AGHT+IE2DaJ2SRKntdWmojupvyRQ48n1fwCI4ZCg/P3nRIBrDbwGV5WYxIPHn57KcSlLclx78itmsA==
-X-Received: by 2002:a05:6a20:c6c1:b0:1cf:9a86:6cb7 with SMTP id adf61e73a8af0-1d9a83d5671mr52453452637.20.1730883941925;
-        Wed, 06 Nov 2024 01:05:41 -0800 (PST)
-Received: from sxavier-dev.dhcp.broadcom.net ([192.19.234.250])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057084casm91715395ad.92.2024.11.06.01.05.37
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Wed, 06 Nov 2024 01:05:40 -0800 (PST)
-From: Selvin Xavier <selvin.xavier@broadcom.com>
-To: leon@kernel.org,
-	jgg@ziepe.ca
-Cc: linux-rdma@vger.kernel.org,
-	netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	michael.chan@broadcom.com,
-	andrew.gospodarek@broadcom.com,
-	kalesh-anakkur.purayil@broadcom.com,
-	Selvin Xavier <selvin.xavier@broadcom.com>
-Subject: [PATCH rdma-next v2 3/3] RDMA/bnxt_re: Add set_func_resources support for P5/P7 adapters
-Date: Wed,  6 Nov 2024 00:44:36 -0800
-Message-Id: <1730882676-24434-4-git-send-email-selvin.xavier@broadcom.com>
-X-Mailer: git-send-email 2.5.5
-In-Reply-To: <1730882676-24434-1-git-send-email-selvin.xavier@broadcom.com>
-References: <1730882676-24434-1-git-send-email-selvin.xavier@broadcom.com>
+        d=1e100.net; s=20230601; t=1730884043; x=1731488843;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=eg9B1rYqwEVpjwJ4zoMRU8WAB13tJ5jB7RC8OIC8iZI=;
+        b=kQrnwesxigjOryJWa/JZdVaUupO6AKMXdi2++4RCppgy5ZMrQP5SbXNWVyofQujsfD
+         iBsh+Hqn6A4paK4Hc/bNw9FtfJKiHYKJpGYVXK2DvZ9rmQ79f+VJ6ih7ss+Nr7z9jsCY
+         xp8w23396BFw55ICU5PJjTAImO5DTVnEo9sYrnwjRp7+yXkQgxIrZa9dtPZo8Hvz0r9q
+         ElmWI4gjg7Kx/kBIYw2u3xlG9OyBil9DQ4qZhashS/FuWlZU1P8Wt6+eeVC9bNP4zRKy
+         cRaZ0Bt/nnZzR4eyFbpkdGGdkqvMlVURvBi6zj0HDc8B3j5GKvOnJ8f3pyjrs5eSSSWB
+         O7Gw==
+X-Gm-Message-State: AOJu0YyTv5nB+csT9nb/Sjv7rnhiXNR1VL0avsqQTGPpF5DRsmHnMCSp
+	aAgxES0v2dTnAJqzRdebY+Trz/BlNOuk0JAp4cn8+8iUV5vrjAxeR72ZkkVs
+X-Google-Smtp-Source: AGHT+IGWGLBGUWwgc0qoms9KYmzQA/Q4IL7OA3S5htxsVRpFAfac69faCEV8T2EuMWBL+VsyMMvgGw==
+X-Received: by 2002:a05:600c:1548:b0:42f:80f4:ab31 with SMTP id 5b1f17b1804b1-4319acadc1emr339143435e9.18.1730884042683;
+        Wed, 06 Nov 2024 01:07:22 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:e89b:101d:ffaa:c8dd])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6c7530sm14933795e9.25.2024.11.06.01.07.20
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 01:07:21 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>
+Cc: donald.hunter@redhat.com,
+	Ido Schimmel <idosch@nvidia.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v3 0/2] netlink: specs: Add neigh and rule YNL specs
+Date: Wed,  6 Nov 2024 09:07:16 +0000
+Message-ID: <20241106090718.64713-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
 
-From: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
+Add YNL specs for the FDB neighbour tables and FIB rules from the
+rtnelink families.
 
-Enable set_func_resources for P5 and P7 adapters to handle
-VF resource distribution. Remove setting max resources per VF
-during PF initialization. This change is required for firmwares
-which does not support RoCE VF resource management by NIC driver.
-The code is same for all adapters now.
+v2 -> v3:
+ - removed spurious dump parameter, thanks to Ido Schimmel
 
-Reviewed-by: Stephen Shi <stephen.shi@broadcom.com>
-Reviewed-by: Rukhsana Ansari <rukhsana.ansari@broadcom.com>
-Signed-off-by: Kalesh AP <kalesh-anakkur.purayil@broadcom.com>
-Signed-off-by: Selvin Xavier <selvin.xavier@broadcom.com>
----
- drivers/infiniband/hw/bnxt_re/main.c       | 11 ++++++-----
- drivers/infiniband/hw/bnxt_re/qplib_rcfw.c | 11 +----------
- 2 files changed, 7 insertions(+), 15 deletions(-)
+v1 -> v2:
+ - added 'dscp' attribute, thanks to Ido Schimmel
+ - fixed types in fib-rule-uid-range, thanks to Stanislav Fomichev
 
-diff --git a/drivers/infiniband/hw/bnxt_re/main.c b/drivers/infiniband/hw/bnxt_re/main.c
-index dd528dd..cb61941 100644
---- a/drivers/infiniband/hw/bnxt_re/main.c
-+++ b/drivers/infiniband/hw/bnxt_re/main.c
-@@ -291,11 +291,12 @@ static void bnxt_re_vf_res_config(struct bnxt_re_dev *rdev)
- 	 * available at this point.
- 	 */
- 	rdev->num_vfs = pci_sriov_get_totalvfs(rdev->en_dev->pdev);
--	if (!bnxt_qplib_is_chip_gen_p5_p7(rdev->chip_ctx)) {
--		bnxt_re_set_resource_limits(rdev);
--		bnxt_qplib_set_func_resources(&rdev->qplib_res, &rdev->rcfw,
--					      &rdev->qplib_ctx);
--	}
-+	if (!rdev->num_vfs)
-+		return;
-+
-+	bnxt_re_set_resource_limits(rdev);
-+	bnxt_qplib_set_func_resources(&rdev->qplib_res, &rdev->rcfw,
-+				      &rdev->qplib_ctx);
- }
- 
- static void bnxt_re_shutdown(struct auxiliary_device *adev)
-diff --git a/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c b/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
-index 005079b..7072991 100644
---- a/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
-+++ b/drivers/infiniband/hw/bnxt_re/qplib_rcfw.c
-@@ -851,10 +851,8 @@ int bnxt_qplib_init_rcfw(struct bnxt_qplib_rcfw *rcfw,
- 	 * shall setup this area for VF. Skipping the
- 	 * HW programming
- 	 */
--	if (is_virtfn)
-+	if (is_virtfn || bnxt_qplib_is_chip_gen_p5_p7(rcfw->res->cctx))
- 		goto skip_ctx_setup;
--	if (bnxt_qplib_is_chip_gen_p5_p7(rcfw->res->cctx))
--		goto config_vf_res;
- 
- 	lvl = ctx->qpc_tbl.level;
- 	pgsz = bnxt_qplib_base_pg_size(&ctx->qpc_tbl);
-@@ -898,13 +896,6 @@ int bnxt_qplib_init_rcfw(struct bnxt_qplib_rcfw *rcfw,
- 	req.number_of_srq = cpu_to_le32(ctx->srqc_tbl.max_elements);
- 	req.number_of_cq = cpu_to_le32(ctx->cq_tbl.max_elements);
- 
--config_vf_res:
--	req.max_qp_per_vf = cpu_to_le32(ctx->vf_res.max_qp_per_vf);
--	req.max_mrw_per_vf = cpu_to_le32(ctx->vf_res.max_mrw_per_vf);
--	req.max_srq_per_vf = cpu_to_le32(ctx->vf_res.max_srq_per_vf);
--	req.max_cq_per_vf = cpu_to_le32(ctx->vf_res.max_cq_per_vf);
--	req.max_gid_per_vf = cpu_to_le32(ctx->vf_res.max_gid_per_vf);
--
- skip_ctx_setup:
- 	if (BNXT_RE_HW_RETX(rcfw->res->dattr->dev_cap_flags))
- 		flags |= CMDQ_INITIALIZE_FW_FLAGS_HW_REQUESTER_RETX_SUPPORTED;
+Example usage:
+
+./tools/net/ynl/cli.py \
+    --spec Documentation/netlink/specs/rt_neigh.yaml \
+    --dump getneigh
+[{'cacheinfo': {'confirmed': 122664055,
+                'refcnt': 0,
+                'updated': 122658055,
+                'used': 122658055},
+  'dst': '0.0.0.0',
+  'family': 2,
+  'flags': set(),
+  'ifindex': 5,
+  'lladr': '',
+  'probes': 0,
+  'state': {'noarp'},
+  'type': 'broadcast'},
+  ...]
+
+./tools/net/ynl/cli.py \
+    --spec Documentation/netlink/specs/rt_rule.yaml \
+    --dump getrule --json '{"family": 2}'
+
+[{'action': 'to-tbl',
+  'dst-len': 0,
+  'family': 2,
+  'flags': 0,
+  'protocol': 2,
+  'src-len': 0,
+  'suppress-prefixlen': '0xffffffff',
+  'table': 255,
+  'tos': 0},
+  ... ]
+
+Donald Hunter (2):
+  netlink: specs: Add a spec for neighbor tables in rtnetlink
+  netlink: specs: Add a spec for FIB rule management
+
+ Documentation/netlink/specs/rt_neigh.yaml | 442 ++++++++++++++++++++++
+ Documentation/netlink/specs/rt_rule.yaml  | 242 ++++++++++++
+ 2 files changed, 684 insertions(+)
+ create mode 100644 Documentation/netlink/specs/rt_neigh.yaml
+ create mode 100644 Documentation/netlink/specs/rt_rule.yaml
+
 -- 
-2.5.5
+2.47.0
 
 
