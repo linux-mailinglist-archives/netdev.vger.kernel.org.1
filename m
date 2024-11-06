@@ -1,172 +1,94 @@
-Return-Path: <netdev+bounces-142430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 456219BF152
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:14:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0737F9BF162
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:17:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C9B251F22172
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:14:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B132B1F21D89
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:17:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 123972010F3;
-	Wed,  6 Nov 2024 15:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A4AA2036F7;
+	Wed,  6 Nov 2024 15:17:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="A8BfFYAe"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="UTiVV26D"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB4A81F80BC;
-	Wed,  6 Nov 2024 15:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E72622036E2;
+	Wed,  6 Nov 2024 15:17:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730906047; cv=none; b=hBP5qwx2ZJUfT5y3zB840QGMBXqc43cfUEBNT5e2aae0wFcXXDma6hoh1ALhkJ8S9H8IOuquQu+21vFK9g49Zi2aLfB4D0bD5HG6rm74jK2dhBYsjP6pFLKyklLqFJfAqr/0UuDhpWnPeQXIvCSyQuFqYibqSor1Om1vO16mUEA=
+	t=1730906239; cv=none; b=CFdOEOjhTBAEV1gRDmPT1GC+TEyb+wLwx2hNQAl8DTqj7YOPCNuvRZC/QnbgFtgRA22Y1WFwc7GN/A0kKBFHnXw16hL5pi3bjE1JzfTbRAk0y9sB7fKeBRAnuo8JzQD1Rc2BJPG4rjoCpU9pPdysHp98Mf6JjijXf00VyfuRqpU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730906047; c=relaxed/simple;
-	bh=mVxQe/tVIaRu/YtTwbGVU4Ca/MBahEgf0lv8WzpV33M=;
+	s=arc-20240116; t=1730906239; c=relaxed/simple;
+	bh=C83+cS1FmxFeYWO4grdtw/TcIlDardzYddF7qf2i1sY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XeOpFk6AE1HG9LNjG2hGCdfwUQPv8fdtOs+/JyrrXVLq2CvVex9804jJ/fnDl+k5NlcZ38tKMTNQGxEM1crpdgCbJvq/cS1sWTUtZJyG0/Moq1SUbqc7BrRRAWvok/h5WTmFc/4fsfg6FSwpOyXwwRklL8VUbnZZtD9KiH4LenU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=A8BfFYAe; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D2BC4C4CEC6;
-	Wed,  6 Nov 2024 15:14:03 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=dW3XnyJdThfXzRUXK5Capmz0Lr1302JqHdkWLKxMfqCeiglrOuZQsb5NKYLhDsqEzEVlycqRtJyQ/bNCGk1AOSDiwI9RhCno2AcitZM//GYJtbSJ3i2n5qnVhOwKB51m4lG4MDFuUCnCjWW7l4N/zA/Ox2KvBsZQ2pLu9wcH5cI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=UTiVV26D; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C63FFC4CEC6;
+	Wed,  6 Nov 2024 15:17:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730906046;
-	bh=mVxQe/tVIaRu/YtTwbGVU4Ca/MBahEgf0lv8WzpV33M=;
+	s=k20201202; t=1730906238;
+	bh=C83+cS1FmxFeYWO4grdtw/TcIlDardzYddF7qf2i1sY=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=A8BfFYAeVqdHNXgCJlMrCsqKuTR89c5gYdPczr192HFw9Ijq7qLKrSVDfkGYy4Oop
-	 h1L2hXcFCChyXtCz4ciF1WHrkFdI4G74XbzfmLpr/KVZjJULhFxy5sHwr0W/1W7px+
-	 BzxAzXf9cTLwEE1HwjVoZjGSQGGrdEB3EayWoXceChNXiIi8mGDbcALwIU+DkabcN7
-	 tW6KJO6Ziy9S/sHaILAr2z8PjmXKnps07Czo9nxbNDfOPSNfStADepJvRE0WFFU94J
-	 OsqZ2ewQ9NwPXLBkeT+CfPYuWaLV4y/6lcOvTtXkeobKpkTz/Mtr2Q4fRt2XQAAf/t
-	 jBMv2xKEFcxFQ==
-Date: Wed, 6 Nov 2024 15:14:01 +0000
+	b=UTiVV26DrXcC45caqLHhEMxU5TiEn317mvWJ7DfW+oTrT2FnLowY9e3jA8GcfJRFY
+	 dHBi4abr2dT5J8VsZRZxUoxLEz9kUEhgGxqT1iZ/wa0egKJZqQWLbOnN4cd4/52rmz
+	 7AfwUOaPUEHCV680Mx8SLb5as7x23TWPtPRVJ6CKFoL+FPtKpYrZvQH5guDp++/pbW
+	 myMU1fCXa9jcSWsAFRofcUdf3AZB5Fp72tBmBRcNCfUQNrTWeKHfypt4LUwb0GE4tt
+	 gma2EpI3KYVpQ6brHGU6U1awxLQLyco5HCZUdAP2cfNuqbEOMzUNit7Abafso4hIWm
+	 tf8zNAieC2xrw==
+Date: Wed, 6 Nov 2024 15:17:14 +0000
 From: Simon Horman <horms@kernel.org>
-To: Eric Dumazet <edumazet@google.com>
-Cc: Wang Liang <wangliang74@huawei.com>, davem@davemloft.net,
-	kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org,
-	kuniyu@amazon.com, luoxuanqiang@kylinos.cn, kernelxing@tencent.com,
-	kirjanov@gmail.com, yuehaibing@huawei.com,
-	zhangchangzhong@huawei.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH net v2] net: fix data-races around
- sk->sk_forward_alloc
-Message-ID: <20241106151401.GA120192@kernel.org>
-References: <20241105080305.717508-1-wangliang74@huawei.com>
- <CANn89iJ8mOqtOkMvrn6c892XrA_m3uf5FabmDWzA_pk-tTMCzw@mail.gmail.com>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
+	Thomas Kopp <thomas.kopp@microchip.com>,
+	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
+	Sven Schuchmann <schuchmann@schleissheimer.de>,
+	linux-can@vger.kernel.org, kernel@pengutronix.de,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH can v3] can: mcp251xfd: mcp251xfd_get_tef_len(): fix
+ length calculation
+Message-ID: <20241106151714.GR4507@kernel.org>
+References: <20241104-mcp251xfd-fix-length-calculation-v3-1-608b6e7e2197@pengutronix.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CANn89iJ8mOqtOkMvrn6c892XrA_m3uf5FabmDWzA_pk-tTMCzw@mail.gmail.com>
+In-Reply-To: <20241104-mcp251xfd-fix-length-calculation-v3-1-608b6e7e2197@pengutronix.de>
 
-On Tue, Nov 05, 2024 at 10:52:34AM +0100, Eric Dumazet wrote:
-> On Tue, Nov 5, 2024 at 8:46 AM Wang Liang <wangliang74@huawei.com> wrote:
-> >
-> > Syzkaller reported this warning:
-> >  ------------[ cut here ]------------
-> >  WARNING: CPU: 0 PID: 16 at net/ipv4/af_inet.c:156 inet_sock_destruct+0x1c5/0x1e0
-> >  Modules linked in:
-> >  CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.12.0-rc5 #26
-> >  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> >  RIP: 0010:inet_sock_destruct+0x1c5/0x1e0
-> >  Code: 24 12 4c 89 e2 5b 48 c7 c7 98 ec bb 82 41 5c e9 d1 18 17 ff 4c 89 e6 5b 48 c7 c7 d0 ec bb 82 41 5c e9 bf 18 17 ff 0f 0b eb 83 <0f> 0b eb 97 0f 0b eb 87 0f 0b e9 68 ff ff ff 66 66 2e 0f 1f 84 00
-> >  RSP: 0018:ffffc9000008bd90 EFLAGS: 00010206
-> >  RAX: 0000000000000300 RBX: ffff88810b172a90 RCX: 0000000000000007
-> >  RDX: 0000000000000002 RSI: 0000000000000300 RDI: ffff88810b172a00
-> >  RBP: ffff88810b172a00 R08: ffff888104273c00 R09: 0000000000100007
-> >  R10: 0000000000020000 R11: 0000000000000006 R12: ffff88810b172a00
-> >  R13: 0000000000000004 R14: 0000000000000000 R15: ffff888237c31f78
-> >  FS:  0000000000000000(0000) GS:ffff888237c00000(0000) knlGS:0000000000000000
-> >  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> >  CR2: 00007ffc63fecac8 CR3: 000000000342e000 CR4: 00000000000006f0
-> >  DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> >  DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> >  Call Trace:
-> >   <TASK>
-> >   ? __warn+0x88/0x130
-> >   ? inet_sock_destruct+0x1c5/0x1e0
-> >   ? report_bug+0x18e/0x1a0
-> >   ? handle_bug+0x53/0x90
-> >   ? exc_invalid_op+0x18/0x70
-> >   ? asm_exc_invalid_op+0x1a/0x20
-> >   ? inet_sock_destruct+0x1c5/0x1e0
-> >   __sk_destruct+0x2a/0x200
-> >   rcu_do_batch+0x1aa/0x530
-> >   ? rcu_do_batch+0x13b/0x530
-> >   rcu_core+0x159/0x2f0
-> >   handle_softirqs+0xd3/0x2b0
-> >   ? __pfx_smpboot_thread_fn+0x10/0x10
-> >   run_ksoftirqd+0x25/0x30
-> >   smpboot_thread_fn+0xdd/0x1d0
-> >   kthread+0xd3/0x100
-> >   ? __pfx_kthread+0x10/0x10
-> >   ret_from_fork+0x34/0x50
-> >   ? __pfx_kthread+0x10/0x10
-> >   ret_from_fork_asm+0x1a/0x30
-> >   </TASK>
-> >  ---[ end trace 0000000000000000 ]---
-> >
-> > Its possible that two threads call tcp_v6_do_rcv()/sk_forward_alloc_add()
-> > concurrently when sk->sk_state == TCP_LISTEN with sk->sk_lock unlocked,
-> > which triggers a data-race around sk->sk_forward_alloc:
-> > tcp_v6_rcv
-> >     tcp_v6_do_rcv
-> >         skb_clone_and_charge_r
-> >             sk_rmem_schedule
-> >                 __sk_mem_schedule
-> >                     sk_forward_alloc_add()
-> >             skb_set_owner_r
-> >                 sk_mem_charge
-> >                     sk_forward_alloc_add()
-> >         __kfree_skb
-> >             skb_release_all
-> >                 skb_release_head_state
-> >                     sock_rfree
-> >                         sk_mem_uncharge
-> >                             sk_forward_alloc_add()
-> >                             sk_mem_reclaim
-> >                                 // set local var reclaimable
-> >                                 __sk_mem_reclaim
-> >                                     sk_forward_alloc_add()
-> >
-> > In this syzkaller testcase, two threads call
-> > tcp_v6_do_rcv() with skb->truesize=768, the sk_forward_alloc changes like
-> > this:
-> >  (cpu 1)             | (cpu 2)             | sk_forward_alloc
-> >  ...                 | ...                 | 0
-> >  __sk_mem_schedule() |                     | +4096 = 4096
-> >                      | __sk_mem_schedule() | +4096 = 8192
-> >  sk_mem_charge()     |                     | -768  = 7424
-> >                      | sk_mem_charge()     | -768  = 6656
-> >  ...                 |    ...              |
-> >  sk_mem_uncharge()   |                     | +768  = 7424
-> >  reclaimable=7424    |                     |
-> >                      | sk_mem_uncharge()   | +768  = 8192
-> >                      | reclaimable=8192    |
-> >  __sk_mem_reclaim()  |                     | -4096 = 4096
-> >                      | __sk_mem_reclaim()  | -8192 = -4096 != 0
-> >
-> > The skb_clone_and_charge_r() should not be called in tcp_v6_do_rcv() when
-> > sk->sk_state is TCP_LISTEN, it happens later in tcp_v6_syn_recv_sock().
-> > Fix the same issue in dccp_v6_do_rcv().
-> >
-> > Suggested-by: Eric Dumazet <edumazet@google.com>
-> > Fixes: e994b2f0fb92 ("tcp: do not lock listener to process SYN packets")
-> > Signed-off-by: Wang Liang <wangliang74@huawei.com>
+On Mon, Nov 04, 2024 at 05:42:40PM +0100, Marc Kleine-Budde wrote:
+> Commit b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround
+> broken TEF FIFO tail index erratum") introduced
+> mcp251xfd_get_tef_len() to get the number of unhandled transmit events
+> from the Transmit Event FIFO (TEF).
 > 
-> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> As the TEF has no head pointer, the driver uses the TX FIFO's tail
+> pointer instead, assuming that send frames are completed. However the
+> check for the TEF being full was not correct. This leads to the driver
+> stop working if the TEF is full.
+> 
+> Fix the TEF full check by assuming that if, from the driver's point of
+> view, there are no free TX buffers in the chip and the TX FIFO is
+> empty, all messages must have been sent and the TEF must therefore be
+> full.
+> 
+> Reported-by: Sven Schuchmann <schuchmann@schleissheimer.de>
+> Closes: https://patch.msgid.link/FR3P281MB155216711EFF900AD9791B7ED9692@FR3P281MB1552.DEUP281.PROD.OUTLOOK.COM
+> Fixes: b8e0ddd36ce9 ("can: mcp251xfd: tef: prepare to workaround broken TEF FIFO tail index erratum")
+> Tested-by: Sven Schuchmann <schuchmann@schleissheimer.de>
+> Cc: stable@vger.kernel.org
+> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 
-Hi Wang Liang,
+Reviewed-by: Simon Horman <horms@kernel.org>
 
-Please post a non-RFC variant of this patch so it can be considered for
-inclusion in net. And please include Eric's Reviewed-by tag.
-
-Thanks!
+...
 
