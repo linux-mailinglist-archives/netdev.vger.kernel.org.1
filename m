@@ -1,145 +1,107 @@
-Return-Path: <netdev+bounces-142460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142462-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC22C9BF427
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:18:10 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C49D9BF437
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:21:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 01DB11C2369D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:18:10 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 09923B230A2
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:21:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE32120400E;
-	Wed,  6 Nov 2024 17:18:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60C8A206941;
+	Wed,  6 Nov 2024 17:21:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="zoLzxBv/"
+	dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b="q5rXAI1I"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f195.google.com (mail-pf1-f195.google.com [209.85.210.195])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from qs51p00im-qukt01080501.me.com (qs51p00im-qukt01080501.me.com [17.57.155.22])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F16801DFDB3
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:18:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.195
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91907206970
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:21:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=17.57.155.22
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730913486; cv=none; b=NMju2XdLqY7Cp7mZc7AvA19Aa3koSxod8UfZnqiBPq3iLlwLL8+IAfKv1z3RVgxj7+loEZxLl9EcNDZT7QTqjB22CnrueJI6RufwUkBigAhza/+OqsKsYURMbJ+UIZ/gKwkyn546ucyRPHwr2pixZnqxZ3pMcoVpVwd5X9rBc2M=
+	t=1730913666; cv=none; b=B9V8kO7c80zOdY1rz2XgYH+53x9X8kfsAYLf1bptqIdsY6J3+ZHD2DMoRXpj4Dnsb9PJBK4YV2ZncurnALku9J52dWyTMLApiajiEV70wdVE8D8n+A4ZVOg+UK3CbiFx5GIx5wZHnHvClWZgcds2jvFq7y9qQFLhxcWU4Jl/uPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730913486; c=relaxed/simple;
-	bh=D3akWTzzrhH0TTwjTl32BYFaTzK8flwrj+FMP0QjcGs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ew6IjoHdtCl9+sD7Lrp0ubAqvee9AizHuh3i8NWCBkObeCjVSc+pzwVrs4ZDCBK5u7tvet1vHMGMxEmjqrR5UXr5wC8UehCxNSojHBsaRgBFsu/KtrxI5HJpp3y7VLrUFAirfwthz8ytza68K+XzhW/J46J2f01s7q7heUTGNho=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=zoLzxBv/; arc=none smtp.client-ip=209.85.210.195
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f195.google.com with SMTP id d2e1a72fcca58-720d01caa66so5256975b3a.2
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 09:18:04 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730913484; x=1731518284; darn=vger.kernel.org;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4mS4bhbgWkrfNh/k8UQSZlBBclWCC8e/vq4LQXj0z0=;
-        b=zoLzxBv/YH0kzFG1rxemhN+0DCxlRlvoRIg6S/KeDkjTl7+cSREKIMLY/DCDVIyRcf
-         lD3ia28FXEyDEc8R3ezwOMSR2wrBA8xw081dn7nMhqoH0JGcvF+gZdGYz5U6JiCpoavc
-         8xariOQObCMxe2l9hLACSRdF1ycMZGQlkgMNmakoqE9bR0sZ0q9+RcyBJ+gTFfQ314nU
-         8+zAApvGejPHNqljQeBxekQTveT7DjfexVtqwD+XfPVE9U7B1qMpyOBEAz/Omtecn+k9
-         tyrN+zSWnaO5UcpEReCf/X1zBqyjLEb5hTBxQvQ4BIvHVm1zvuExctPB6Ck8Cgrcl1LR
-         7qcA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730913484; x=1731518284;
-        h=mime-version:references:in-reply-to:message-id:subject:cc:to:from
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Z4mS4bhbgWkrfNh/k8UQSZlBBclWCC8e/vq4LQXj0z0=;
-        b=qRQjqLrkFIxc0M5i7awdZr+8wSeP9TxtNIl8QFS7h0b11QJ0ZYc/X4YZVqayWeidaS
-         YspghpOHJxBagA/jpZr/j97h/qJJVdOjZJ5KJFdCwcBo6CxrRNTJ0jcH/6aTXBLFAgAB
-         H5ne2/BhS6IYd45oiXZKB9vc8Mge87QAxpv/kTAxQN8Da3vQyk3cHwjsr5o9Imua0Tn9
-         Ow09OkDppJtO3HpS2jgNSNlri90WshxU5gsETD+vd68hRicmte416MEsf9FZmd6IWcIl
-         R7EoMeqGm3/7OgsXwIQdZomZnHcsN5tSNwqAk5MICvDw4HdBFuAnYzdF7GErc1SQJIyk
-         R4nw==
-X-Forwarded-Encrypted: i=1; AJvYcCXypsIYKBuUv4hU3r6GWnXuXp5e0dloEv6fcmALAPSn0Dn1yd5FYPcANqSmZKvdp2HItzk6K5Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yws2OReuEQxJx7y/34T58q3Mclebp8KbeDSCaRFJEMkoft34XrE
-	dsY0H2n4xNxt5U8Zdc3uqf0Iun4agZnGN9fDOvWr87WTfFoz4O5O/WuphCzgI/Q=
-X-Google-Smtp-Source: AGHT+IFAtTbMlzlYTZPpconsYstGTwm32F/0lmZYGv5EMIr8bwO59JKoYHo/OBN0fp3YFHP1pkdBDA==
-X-Received: by 2002:a05:6a00:a0a:b0:71e:581f:7d7e with SMTP id d2e1a72fcca58-720b9c29c4cmr31554907b3a.15.1730913484062;
-        Wed, 06 Nov 2024 09:18:04 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc2eb6a5sm12396869b3a.144.2024.11.06.09.18.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 09:18:03 -0800 (PST)
-Date: Wed, 6 Nov 2024 09:18:01 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Alejandro Colomar <alx@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>, alexhenrie24@gmail.com,
- branden@debian.org, linux-man@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH] rtnetlink.7: Document struct ifa_cacheinfo
-Message-ID: <20241106091801.3e021842@hermes.local>
-In-Reply-To: <xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
-References: <20241105041507.1292595-1-alexhenrie24@gmail.com>
-	<20241105055338.61082-1-kuniyu@amazon.com>
-	<xfzcwmn6syhywvdcu6kn3mkuwqpo5usiwkssblvk6qrpoys5dp@hwgvspb43tdo>
+	s=arc-20240116; t=1730913666; c=relaxed/simple;
+	bh=decvzeerzkx1LhgxPluavMUNdn95U1jEx/c/Rh6JuGI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Cc:Subject:From:To:
+	 References:In-Reply-To; b=Jz62+Q/qo5sAEcDfdN93qt3hMeeXLCekhrAIwzKY9VG5kL3ALgjDpqhVFNQYyjfUOHjDxPQ2RBCylMWjBRGpALZ01r64DZYaYFwu9kE9mwKBLxv8TYBfee5NzfrTm2HaypjgMYHPyrQ/bFj36oIz6LWLB16LwZVE9cOxNDqzUOc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg; spf=pass smtp.mailfrom=verdict.gg; dkim=pass (2048-bit key) header.d=verdict.gg header.i=@verdict.gg header.b=q5rXAI1I; arc=none smtp.client-ip=17.57.155.22
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=verdict.gg
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=verdict.gg
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=verdict.gg; s=sig1;
+	t=1730913661; bh=decvzeerzkx1LhgxPluavMUNdn95U1jEx/c/Rh6JuGI=;
+	h=Mime-Version:Content-Type:Date:Message-Id:Subject:From:To:
+	 x-icloud-hme;
+	b=q5rXAI1IrsAOVuxrIyGpGUgZwdQXBYGT67zX08lOvT1auz+XBOxcmhSLDO9Z9+BuR
+	 iCvx59E87rHVfRljsrzwj7c/t+1B8pVknANe+j3MuSDRK1CnNr6YTSv3woBK1JeLbe
+	 vsSuZ6Q/H3xjOcWMwUawSWxBRv2TY5VSWaJXrk/QarWixJCOck+53nKHf0k+/asNSP
+	 1EwhgutL+WmWLhvZQmSSVi3NRcO6ADGbpUBFwRILEnD5/gXHu7RdBSIHko9Gs5atc5
+	 tRemOnqZj2ZR2tlJTXo/xCfpxymW7zFFdQ1m6HrkQZhMivBZhQPb778e8cFqBmIBsX
+	 YtE84iSLQVvxg==
+Received: from localhost (qs51p00im-dlb-asmtp-mailmevip.me.com [17.57.155.28])
+	by qs51p00im-qukt01080501.me.com (Postfix) with ESMTPSA id 766291980263;
+	Wed,  6 Nov 2024 17:20:58 +0000 (UTC)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-
---Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae
-Content-Type: text/plain; charset=UTF-8
+Mime-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=UTF-8
+Date: Wed, 06 Nov 2024 20:20:55 +0300
+Message-Id: <D5F9OJYSMFXS.2HOGXNFVKTOLL@verdict.gg>
+Cc: <netdev@vger.kernel.org>, <davem@davemloft.net>
+Subject: Re: [PATCH] net: ipv4: Cache pmtu for all packet paths if multipath
+ enabled
+From: "Vladimir Vdovin" <deliran@verdict.gg>
+To: "David Ahern" <dsahern@kernel.org>, "Ido Schimmel" <idosch@idosch.org>
+X-Mailer: aerc 0.18.2
+References: <20241029152206.303004-1-deliran@verdict.gg>
+ <736cdd43-4c4b-4341-bd77-c9a365dec2e5@kernel.org>
+ <ZyJo1561ADF_e2GO@shredder.mtl.com> <D5BTVREQGREW.3RSUZQK6LDN60@verdict.gg>
+ <59b0acc7-196c-4ab8-9033-336136a47212@kernel.org>
+In-Reply-To: <59b0acc7-196c-4ab8-9033-336136a47212@kernel.org>
+X-Proofpoint-ORIG-GUID: NFSgMl2UztetJD27Ot8E9PX1Fiig1IJ9
+X-Proofpoint-GUID: NFSgMl2UztetJD27Ot8E9PX1Fiig1IJ9
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.272,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-11-06_05,2024-11-05_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 adultscore=0 bulkscore=0 phishscore=0
+ mlxlogscore=419 mlxscore=0 spamscore=0 suspectscore=0 malwarescore=0
+ clxscore=1030 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2308100000 definitions=main-2411060085
 
-On Tue, 5 Nov 2024 12:33:48 +0100
-Alejandro Colomar <alx@kernel.org> wrote:
+On Tue Nov 5, 2024 at 6:52 AM MSK, David Ahern wrote:
+> On 11/2/24 10:20 AM, Vladimir Vdovin wrote:
+> >>
+> >> Doesn't IPv6 suffer from a similar problem?
+>
+> I believe the answer is yes, but do not have time to find a reproducer
+> right now.
+>
+> >=20
+> > I am not very familiar with ipv6,
+> > but I tried to reproduce same problem with my tests with same topology.
+> >=20
+> > ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30003 dport 44=
+3
+> > fc00:1001::2:2 via fc00:2::2 dev veth_A-R2 src fc00:1000::1:1 metric 10=
+24 expires 495sec mtu 1500 pref medium
+> >=20
+> > ip netns exec ns_a-AHtoRb ip -6 r g fc00:1001::2:2 sport 30013 dport 44=
+3
+> > fc00:1001::2:2 via fc00:1::2 dev veth_A-R1 src fc00:1000::1:1 metric 10=
+24 expires 484sec mtu 1500 pref medium
+> >=20
+> > It seems that there are no problems with ipv6. We have nhce entries for=
+ both paths.
+>
+> Does rt6_cache_allowed_for_pmtu return true or false for this test?
+It returns true.
 
-> Hi Alex, Kuniyuki, Branden,
->=20
-> On Mon, Nov 04, 2024 at 09:53:38PM GMT, Kuniyuki Iwashima wrote:
-> > From: Alex Henrie <alexhenrie24@gmail.com>
-> > Date: Mon,  4 Nov 2024 21:14:20 -0700 =20
-> > > struct ifa_cacheinfo contains the address's creation time, update tim=
-e,
-> > > preferred lifetime, and valid lifetime. See =20
->=20
-> We use two spaces after period (the correct amount).  :)
 
-Double spacing after period is a leftover from using typewriters.
-Modern usage is single space after period.
-
-https://www.grammarly.com/blog/punctuation-capitalization/spaces-after-peri=
-od/
-
-	These days most contemporary style guides also recommend using a single sp=
-ace between sentences,
-	including:
-
-	The Chicago Manual of Style
-	The American Psychological Association (often referred to as =E2=80=9CAPA=
-=E2=80=9D)
-	Microsoft Manual of Style
-	The Gregg Reference Manual
-	The Associated Press Stylebook
-
---Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQIzBAEBCAAdFiEEn2/DRbBb5+dmuDyPgKd/YJXN5H4FAmcrpMkACgkQgKd/YJXN
-5H6lfQ/+LRJwkmcq2J21/EL8AISA6nKMzUO+T/V7TkkfTj+JkLz/XpL0s89A5to8
-zFE4afRF0b5F9cbZJK38WhfQZEEM62HX81scYtbkTlMq5VxxecdpHNOghbBaw3xQ
-00y1fvGb0wCJ4d3fp/onxa6Lv8H53OLjd/ZdqpNBPwv8eUecdUlI/JPOMYEPgwY+
-JLUAAgK4yPL1yMCkTdZZNITfJaNGSc+TGudVZFMIrSdA35NXdK3PuORIxv1oM/aG
-xMHwFJTzShpjl39MmwwYCBP7XNh17zZU/ugEyb9awv8wUziVE4i1tgCubrJFxcln
-iMyUYELb7WVGfpxR52cFECmMZrvUEjkrlfcVtPUatcZHYSAF45gsjHRXaFHwRii1
-zkXCXV28RFkqbjsFlZFNE8WGOXwEr3scGI9mPvzOCjg5wgobiYoumGA8DQ0W3GKF
-DwA7f6jaYsj6Xdt/sHfCcxokCEH0+ltce6KaE/CUDZjenJRSlBcXxkTnkGCWJizF
-PLYiCgsrAIeihMfyeNulYxu3d3q6VJOLjXZK0ta+HOzAntwC9qEr2NTi+kZUhT38
-Xh7F5SMden2bUBXje12pNAOXmsmycasN5bCDkznCOW767Ii6ivoFcTXeuDv3bd9b
-HSUwBDEbEJKimoozrzfpzoNSfG0PtK4EbSY3lI9KSPVOLd9biYg=
-=mUQo
------END PGP SIGNATURE-----
-
---Sig_/yZ/6uzGj=Ivqbt8l7t7+7Ae--
 
