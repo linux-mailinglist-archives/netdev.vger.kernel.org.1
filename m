@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-142486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 315309BF533
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:25:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89AED9BF54B
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:32:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EA1DC282AB3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:25:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 40D941F25528
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E66F20721E;
-	Wed,  6 Nov 2024 18:25:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C55208972;
+	Wed,  6 Nov 2024 18:32:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="e8gIFCTn"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="e1cPY2Cj"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E62C813A26F;
-	Wed,  6 Nov 2024 18:25:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D657636D;
+	Wed,  6 Nov 2024 18:32:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730917510; cv=none; b=PBmni0q9TJu+MvTTNTcVhTV9xckVXx6qK0keP06YMf5Z1+dEZ+vpZMjaB01URPIbo/sVmqfGH1EOSJl6ieyG5ipWH0UqqYKAZ4xXrDkpPJJDBuKlQU+lJrvN5YFrsb8mRgx9G87tlL9DuYZEQZHY7rsxyXTem0gE1aorxUyjc9o=
+	t=1730917947; cv=none; b=deX/NPOhQX1f/i77cJwftpdBDs9nD81ZAhAOS/vlRYNjRgzyU68HYVPExwXmOD39VaeBk6NOr543tU5+slZNmJ5LTXZHlV8rv6mddF1K8DBX1Wo+bZYCCRaGlWhr8BGk0PB6loS3bV05FOV86uMrqUgeCBJc9lp6JeNHvH9+xig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730917510; c=relaxed/simple;
-	bh=KgA8I/V+Cve4q5UsJIo/GYuOhEw8GH4l1Hf73OoQ+hM=;
+	s=arc-20240116; t=1730917947; c=relaxed/simple;
+	bh=ToEirsG8hKSEVZWDFPtVwr+5Ss0cMfhCSoRUBD5F73Q=;
 	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=JKxAQlC+/uEyGPO74coYFBaUblDt2jYdNXC5aO0SRXE4dHsysygXu2Dy8njpo4htD0+HyC6Mw1EtXMlXImqpku1f8dL1Zh72LFvyaWBQdwDM7eEX3415NTe68hPvbID6vMKAZgKfIQAE7QY24Z7a7P9X/Dun6BhOwXKYgTXpWJ8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=e8gIFCTn; arc=none smtp.client-ip=185.226.149.38
+	 In-Reply-To:To:Cc; b=tHBQ32JndCLHVe3gNkriNsIxfIcHw9fGGomAoScJHZEZz+RDlsKlWnkyPAv3yGo6suLPYsx0IJ0qteZiHKbFugxecrVCx/9uChpvUtZfOwRBNuLO+UQ23Yc9xVLDyNE6AL7xp5UDublTPgYqI62RjgdyL7E+OHpt0fk+/9KRBCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=e1cPY2Cj; arc=none smtp.client-ip=185.226.149.37
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
 	(Exim 4.93)
 	(envelope-from <mhal@rbox.co>)
-	id 1t8kCW-00FDuq-UW; Wed, 06 Nov 2024 18:52:16 +0100
+	id 1t8kCQ-00GBeb-D7; Wed, 06 Nov 2024 18:52:10 +0100
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
 	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
 	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=Ct0XEhml4swkSlIdXGo4yYyMaDVehK1UNpjzCcF1yWA=; b=e8gIFCTn+IZ9UH49qs0POm0nfk
-	Py41sqFa3oVqYX64FBxeeFjO1FhlhOF+iD4Q+9qxmTbsu7td6OBDujxO1yRZqCTRjdqx9pa5slAgL
-	rktKT/vqwRkw1h6ANPh35CWt+1i1LJffRC0bg9KNYvAnyZGPabHZqBksok0qNO65CJPVKwrfy7ZaR
-	xuCcyHdCB7CFfT20M5SA33PBcXTNuRDA+NKx+hgE8p6KKq9GWfh8iwJeBjwhJ9eSDtx7iuzS37yT3
-	U4PpHrqByD2uptcSp6NWP71N3tsUAdqEJAPKgCgAqNJWV0vVYHAHj1Mi4fjyUy2WncgZ9zN6owQr/
-	9ck1ZsTg==;
+	bh=mgnddhxagPc/9l4dw5EI0uGjEiStoOzkIyViqtJTwlA=; b=e1cPY2Cjl7+QaeoW+GsgwldeX1
+	b4vSXmNlNtrn3vvRJkLtacNrl9mSpYni0TFSZfD3bIMtw9qAjCGncxANJEUzJjBxcY9Ne/noeAhgd
+	WJl+FJtkKasutqGtLM/d3Jn0qRIPYkr3tg7Pxfg18zmq+BfhY/WRE4FaaAt9b0zW7SxzkCPeEmVa8
+	ofj4D3AZHFLhwiKfDnXmtBF3ZE+R0DuWmCSXy6lI3jZlaKqkiN0QDsHorWj1S5Zod+f9BthuMdNdG
+	orGQ/LMs77P7ufShrxymANOyTPJSgTBg2ZLEUts9ZO7yrLd0iBAaBdtgXK291zmZ/fE8AIXx/C1r6
+	K7/BYlIA==;
 Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
 	(envelope-from <mhal@rbox.co>)
-	id 1t8kCW-0001oV-A0; Wed, 06 Nov 2024 18:52:16 +0100
+	id 1t8kCP-0001rN-PU; Wed, 06 Nov 2024 18:52:09 +0100
 Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
 	(Exim 4.93)
-	id 1t8kCJ-002ver-MP; Wed, 06 Nov 2024 18:52:03 +0100
+	id 1t8kCK-002ver-Ha; Wed, 06 Nov 2024 18:52:04 +0100
 From: Michal Luczaj <mhal@rbox.co>
-Date: Wed, 06 Nov 2024 18:51:20 +0100
-Subject: [PATCH net 3/4] virtio/vsock: Improve MSG_ZEROCOPY error handling
+Date: Wed, 06 Nov 2024 18:51:21 +0100
+Subject: [PATCH net 4/4] virtio/vsock: Put vsock_connected_sockets_vsk() to
+ use
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,7 +64,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
+Message-Id: <20241106-vsock-mem-leaks-v1-4-8f4ffc3099e6@rbox.co>
 References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
 In-Reply-To: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
 To: Stefan Hajnoczi <stefanha@redhat.com>, 
@@ -81,26 +82,32 @@ Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev,
  netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
 X-Mailer: b4 0.14.2
 
-Add a missing kfree_skb() to prevent memory leaks.
+Macro vsock_connected_sockets_vsk() has been unused since its introduction.
+Instead of removing it, utilise it in vsock_insert_connected() where it's
+been open-coded.
 
-Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
+No functional change intended.
+
+Fixes: d021c344051a ("VSOCK: Introduce VM Sockets")
 Signed-off-by: Michal Luczaj <mhal@rbox.co>
 ---
- net/vmw_vsock/virtio_transport_common.c | 1 +
- 1 file changed, 1 insertion(+)
+ net/vmw_vsock/af_vsock.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index cd075f608d4f6f48f894543e5e9c966d3e5f22df..e2e6a30b759bdc6371bb0d63ee2e77c0ba148fd2 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -400,6 +400,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 			if (virtio_transport_init_zcopy_skb(vsk, skb,
- 							    info->msg,
- 							    can_zcopy)) {
-+				kfree_skb(skb);
- 				ret = -ENOMEM;
- 				break;
- 			}
+diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+index dfd29160fe11c4675f872c1ee123d65b2da0dae6..c3a37c3d4bf3c8117fbc8bd020da8dc1c9212732 100644
+--- a/net/vmw_vsock/af_vsock.c
++++ b/net/vmw_vsock/af_vsock.c
+@@ -275,8 +275,7 @@ static void vsock_insert_unbound(struct vsock_sock *vsk)
+ 
+ void vsock_insert_connected(struct vsock_sock *vsk)
+ {
+-	struct list_head *list = vsock_connected_sockets(
+-		&vsk->remote_addr, &vsk->local_addr);
++	struct list_head *list = vsock_connected_sockets_vsk(vsk);
+ 
+ 	spin_lock_bh(&vsock_table_lock);
+ 	__vsock_insert_connected(list, vsk);
 
 -- 
 2.46.2
