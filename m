@@ -1,141 +1,134 @@
-Return-Path: <netdev+bounces-142535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142549-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 403509BF8D7
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:04:22 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 446279BF946
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:28:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0565C284447
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 22:04:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id CA9441F2249F
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 22:28:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BA10205AB4;
-	Wed,  6 Nov 2024 22:04:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D0C220C313;
+	Wed,  6 Nov 2024 22:28:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="MNPSqa5n"
+	dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b="SwVTNY+t"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f48.google.com (mail-pj1-f48.google.com [209.85.216.48])
+Received: from sonic317-27.consmr.mail.bf2.yahoo.com (sonic317-27.consmr.mail.bf2.yahoo.com [74.6.129.82])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42621D0E23;
-	Wed,  6 Nov 2024 22:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAA271D363D
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 22:28:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=74.6.129.82
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730930656; cv=none; b=YR2zAMSXvwGa7AK+RTELIKpCEaUIl188AKQuAIcRitHL10X+r1OJja/fN8gaiOcdgt6TN61If7vNg1dR55G9Upp/JDN/2fHIKUU8cZjEtEnmhhjp7i+Afb+tFsP/zSa7zpI1tI0FHxhUFJY0gcEmfx8oe4+bmqe3SGXmTfNSPnk=
+	t=1730932092; cv=none; b=YDqCDjTAGAce7sLRkXD3cXdnQLvpaITWqLLwk5YOmgA689a1BEXCj5B5MIX1RXj4ptlSeFGAui9t5FXSE1kVysWEHsLrmu46HaH/C+WpWHTt20TNiSxyNZJUoE0sKntXm/5GopybxszTVmjPMbn1mES45nVRJXNRAnNQNM1mzlE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730930656; c=relaxed/simple;
-	bh=XWlE48RqZQ5truz2JBDBGqsYLK+eKE8hxeJQAdnWLKw=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=B1BwLn8aNqV2xr1a75WhtL68vMjd0appGTPPxjDMFvlD1gCMpvn1cEynW+ErP16SQki03JY6uObJkB1s7ZpHeFXUkcjm5vil1QHiuHZ39L9BbrWw+6KRPEAQxnnDS6Z/2OzqsGhByItbMFqYL/7K/alsk6171Oqc1lWGy7uhhI0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=MNPSqa5n; arc=none smtp.client-ip=209.85.216.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f48.google.com with SMTP id 98e67ed59e1d1-2e2cc469c62so218563a91.2;
-        Wed, 06 Nov 2024 14:04:14 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730930653; x=1731535453; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PfGNi4Eab08D4rDIFJXSfdEQm138IE7MugUyEGUzqSg=;
-        b=MNPSqa5n7uio5spmm4M5r4BGlaadv+jD90XL8G1DjwCeWuiS0qzkOWDUplXPKwesf5
-         jvplQ5zkvDa+E9GLbAoKGgM6JbxqUKosoVnXp8P2qXINrN8EQzlD0+/FyDIrhk3fBcqt
-         z2JQb1Mcgv7y8/uLRa3CX7hS9ABCzRHr7oVTFwnfo8hH34mtKPkQPQRtAQoJTrkHM+Zm
-         DZpysl9y453gKuUmcAO7Uzc2tHNNTyqYiw1kmS5/YMzch2VgyLC/2HuyV4dr2Az5GPDc
-         eY/Jh46e2icruY4ZhKmK4biU/FHwkO9mFVRWegEXwtHZHGNxuPIO+IfZNDkbjZVh+zSG
-         8VtQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730930654; x=1731535454;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PfGNi4Eab08D4rDIFJXSfdEQm138IE7MugUyEGUzqSg=;
-        b=B+/VH5MloSnyyrngddiXckFYi65fdLc0RixQhIN6OIIZi5o82GpVej2Pw4hgyan+J1
-         cvPy3m9NF/yfShWf6mt4LHp5JF5xraVcDu2l//pf0rgUQnd3csHnetECZsJvJCEt2BP+
-         Ry2NrQeoeOO4wall9gel0szWmzQEiOsYLZz8AyRbGwwajaRWC+5gv0vNPF9Ct9eYtiF7
-         SrtXL/jlq9eQ7jn9ao3kbREqkzE2RxIer8RW00v6cmLhE/F6fq0jiXObq6o1AkLVQQXH
-         xRvZCOPH5eCPYzTDTx+5cTx3DyLZbsZ5C6jKtI/n9X6O1efZHpdb8iAByUIU2NJdcz7y
-         uYZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUoHb1z2D4FDIxUIYaIaVxIqXzmyCdBbFPFgrPg+Hfk/VJ/AXAeTvwFIo0CCh+/9PLUuMDlyHUUIKXFqpD3EPO2@vger.kernel.org, AJvYcCVrDZfBya1QPXrRxpeXtU/mGaPqJxSwJ8dJpQAxznNgxp78K2lPrbEdKdHVb9iNTV/hNmQ=@vger.kernel.org, AJvYcCWz3A5bKYnqMoM1JiPeZKVbdeZnlJ9/YZjIwvbuMFZqlU0cGbq7dxBiyQcoXk0xktgtXAWWC8cy@vger.kernel.org, AJvYcCX83aeFlDOFJq/pk595YTtyWRGZV9pXYnpQCFa6Cx/I8jN64mlmevYPGTbl6u8og+D3XN/j+XftPYAmudkZ@vger.kernel.org
-X-Gm-Message-State: AOJu0YyxiF16u5DZHjizrTwzM9G+bkkHNGWlghx8PNWQB8NcGrSB76XC
-	6IObvYVlYKMXcp/GbpzfCA45j6vMCyaDjWOZro2L/fuopoyFjjudmZA6TdR4zCIBZP52vhGzUBZ
-	mQJTFeuJWiIIaYrfgaQrgZrST/5I=
-X-Google-Smtp-Source: AGHT+IHiIFN3vV3i+lrEACl/mdE0HQWZtzx800XFbju733sBmVhjjP4bbDv2RZKt8j7XpLWja7xZVa0f8ftoFXrmJPw=
-X-Received: by 2002:a17:90b:4a49:b0:2e2:b64e:f506 with SMTP id
- 98e67ed59e1d1-2e94c2afe78mr30385346a91.13.1730930653594; Wed, 06 Nov 2024
- 14:04:13 -0800 (PST)
+	s=arc-20240116; t=1730932092; c=relaxed/simple;
+	bh=EA/lPnH9otYvl6FzA9VYaQsrRcEk6OlWnGxMmdvL1iw=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=WIZxTjLun3K7HdUh1YJ0P1pNSV4V9nZWwhyMiUqIJ5/BINChEp1K6Qb4I/1t9aCusKMoaTX87AbFhewTGlqhFh++NVhLnAapiWx1NI/ldqMq3xcdlOdRuBolB5BuwR3sLT6fvmtg72Vfwa32RfIKhnMvaopENuHz3gDeCh/vB5M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com; spf=pass smtp.mailfrom=yahoo.com; dkim=pass (2048-bit key) header.d=yahoo.com header.i=@yahoo.com header.b=SwVTNY+t; arc=none smtp.client-ip=74.6.129.82
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=yahoo.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yahoo.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1730932084; bh=DOcyxH1IqBNtp7YaPG/qJu/pI2g+2zU5YxvnVc7S7F4=; h=Date:Subject:To:Cc:References:From:In-Reply-To:From:Subject:Reply-To; b=SwVTNY+tuQEypjxDwyajrITEyORypK/7D1MsHvxEzW35/2mz1i7g9uM3RhU6fBQrOCAP16CLMU9teKGnu9IGm/KgZJ7nwXVHd1rQVxEfeFMiK8/bVCLyTMPNxRx6YRPwuzBnueGP/1Bir17hQnHyXrRB6BWQHdlEvCO/SBn/mXx7Q4DapBIcX3EfHH/oUYgcf1KqwZOkapSLdm9tXelFmYSyVFhNBWmKRcRiyrYtOUfYW9jZPyR5RhrEL5Jeuc337p6jAIliqQB6+wwpyDvcVe2J23E+2IrBJlOpZ9dRb/sdWQZfSFxZZ9tRG0yTYN9dFI5aYtjTsncsU9GRay0M5w==
+X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1730932084; bh=0k0gNQHepEzXS2AJpinzGANb3JwLvwujlOkmR8fiR9c=; h=X-Sonic-MF:Date:Subject:To:From:From:Subject; b=f1IPgPBLe6ulCmgGzN3F5BcI4COpxk8yzFVRRIeODXFX5FcipBfB7RDd6qlzWtY4pGDeso1A1XMH/kzIw5ffZ6l0f/2b2VToE86DtxJJTuiEyYrDGB9hz7b2S2J2dyc0G5l2H0PUeRkbREo9RUBE8H5VGBWqE7lOLL72lJGQZt9OMiVVYBO1rh1+fuzdp24bVBt4y+CzM64mPlVWYtz3gsjq03l/hRv4Nuo7TT6RYfp1MEo4NSjcwN5MNv8ByZLGvXDn+F8Ufai8KEkMSaEEnHApszXw6Gv8C5QL0Ylvk/uZ13oa7lu/aWw2CTeDbjePx2DHKF/K1/QGHLfPshb3iQ==
+X-YMail-OSG: QK3bPe8VM1nBD3IkcVqKcE1CeEqkoBbcQD_g2dlMLxvI3pEPFr_qgTEq6GKr8zI
+ njy2XlzfXG6Do.RT4iLWQAUNUIQcO660FpFaIIcmQaaheSJ8Uo29F72_BZrXFaPdc9cQYBLKCy2P
+ KIhhY4SDX2jI2dC.BK__OlNwCd7iC4KCg1xYZRrGsxK_yyHM_aElRBdu0vOL3AHxHWQ80xfyGr5t
+ AedjrCQ9lF4Qove.jnkzT544XUZXYkFM.uh0wVy4q59YtqcgQkNLR81YdJljXyVhE_U5XVgWEC.a
+ uA8D4PN1JgbnB7fwSktM06VRjWIjFIV4hNOv9bth848uHF4J7IOUyRqus4QrKcSQRKXxrgeXDRYB
+ vZtH13Fusz9.3s7aGtZsq1ubKFPcMFEeKfScQ5oRBJhTZvqYKUHlNgWZlgMrVWZ0DuXxqlpmHE55
+ tlNL6aejuyoFjpSza0R8f8VHPhLTrRXYx_vmE.8Wy4aIsweASHVnViLHNwHRZbt1kpuJieXhC40J
+ 8zPmW23XcgEjia9LX1.JHGjeGqF55NHpClzSKvtn.mS.UagBEDcrOMzclHIYTNX6l2EH0YQlWURE
+ PwdTsZfAIUZ7AChHR6J2JyTkZlPUk5A1CE9P6udd9PX.7SzOpDO6fPnP61no_yxXstWfaOY2cHIK
+ iYfT29l2m1Z9Sl3luokeN3drzN419QJKl1vd6oXkKDHraqBZpbABVqQSuVFYmW6Ehslq3ug5Z3UV
+ 7bAH4qBC9N0B8W801Rmsh4LxkUKJ8HoQYOP9Ls4LH6D.Bx6TQ_K1a6L7_S0azqDbtgiZbOJ.9HTO
+ V4GbNS7AAN.syhqah2o0hR_DAQ.zxX.6o9iF2nt0mUhJR5Wn7AgcHCUsci.jJDaAMWvdT6HHb5eP
+ mkUfQYpaf096ekIDcvEBv3p3Av2N_S3gDqvQOzXHUKnY92wKDoDR9ZcVoeiaNVqUa.QkVVUecVTU
+ peNrNGFXAYajjq9V17vtkUmbII_MG7MtQkgnd4QkBuQBPRiRcgmZ6Elz0VONitZtZ1oatKr7x5K1
+ ARcHSi82YDLwy4rSAAdn1I2sF1vMIA5UzOCzsS6uuQPos4GEAgm6uzVEXTfCaBgdC7GUrOnLawTS
+ gBJhsRzeuiyctoLQTatOxvPu9QdlbutSpy1ICqvAkWYLmg6ufFC4U.1fbSZ6IT66sd34gb2D0f39
+ qmxhNpTEYeu1LWCr8vaHmHCfu4jTMIZdXmXlhzNGoHNAApL2Q7s7icyJ3vYMQOZwyMNN7.SSQIwP
+ O2DYMnXw8mEcZq6HbkigHtRn.5kDYLTRZlrRoZd3LGFT52I8SwifchIGMt_cK1K0p4BDMVNMmxA0
+ 9_PcSb2aO2r8SOGZ2oIW_TikmX7BAbwp8qaA4qHTTnw3S9AC.00RjZD5VpBQpS7Q9Bx3NROiA3YX
+ 0s0gfMjodmRPlBWrAf09ZiLq0FFU_yx1TdSOPOhrGM20s6D4qAfjkO4.6YlRRxFHwO_y4Yd4v5rO
+ 0AbZk5SlQ9UD03gHvHiZul.Qoi9jjUEABx6ZibUCi50Udrimc.bI0A4L4_UYmx0HU4bOcHZU9WFc
+ x7xBjaShENG2Bk7U2ePgRt41DBn24hgKfIQoTqzw0SNmTtlkLRq2G9T_VQ1Qm3F_vcmh3mqBIsXG
+ A_KSwwHgg2YUGHZ7Jh217RrT7od_v0bMZdDm2sOS84M_nTpDjVqwHyhJrQ7V8K17HEAHmcmIgJCF
+ n.RJHTwvNFG3AUgsqgx_XPjUYP6AIYjxKeSg3N4sVKfaS_QyPZmAgO5LCb6NXi5Hk42SeaYKtZ5D
+ 8efjOjA70m962uLQengNIpvQTllkH3ji6YLEgXe8OAlnEhxLjXdaGvVA46.Xzb_hB7O9y038XRhx
+ fZbqmXVgp8TjhxHSe.iUMfOur79c1H1ixe2bYWVhJseDYVjTNPtgSSLNjq5la5BT2QJIS6gBxBDM
+ 5Aqwrh7DfX_nMyS5MyYXK0P187gIWY0DyoCcPCB_taBbfb6tYLRqpED1KMKn_Edo3Cd495rapaXp
+ 602OiOLKNdBnmMv9N8Cdoc6J0bybpI0PYNiIrLORQTCYDLbqnIhYt2DgDLwgsK3WZWPyDfic2KPU
+ IpF47J6DHuVc.rgg96CvowFYZHnjAF6kROS9zqK0B3k2YpsgjjfX7643H4jgH5jmJ9FRyeCsQuSH
+ dvAmqzX_huQF3WesQ1j3220hNFazYm5aG2EFeYkzql3A0XABUmHEdRLX4FRowQ.bTTpXgO5Z2RWm
+ P5o43Abd9viKjJ._TJqpQNojELUTwtB.h55KarLT5hBbHyjVaeGdJbTcciTEnzqbaxw--
+X-Sonic-MF: <dullfire@yahoo.com>
+X-Sonic-ID: cb7628ac-bc01-4a3e-b309-f3da2994350c
+Received: from sonic.gate.mail.ne1.yahoo.com by sonic317.consmr.mail.bf2.yahoo.com with HTTP; Wed, 6 Nov 2024 22:28:04 +0000
+Received: by hermes--production-ne1-bfc75c9cd-7d68l (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID 1b186cb4fb272125cf52ebbf6efc75e0;
+          Wed, 06 Nov 2024 22:28:03 +0000 (UTC)
+Message-ID: <7de14cca-e2fa-49f7-b83e-5f8322cc9e56@yahoo.com>
+Date: Wed, 6 Nov 2024 16:12:48 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927131355.350918-1-bjorn@kernel.org> <172835823300.66789.3704854116445399222.git-patchwork-notify@kernel.org>
- <87bjyvpa6h.fsf@all.your.base.are.belong.to.us>
-In-Reply-To: <87bjyvpa6h.fsf@all.your.base.are.belong.to.us>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Wed, 6 Nov 2024 14:04:01 -0800
-Message-ID: <CAEf4BzZbq9OwSGi4pdb5_q8YkErfFiQFKYXg3g1rjpdejafx+Q@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/2] libbpf: Add missing per-arch include path
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Cc: patchwork-bot+netdevbpf@kernel.org, andrii@kernel.org, eddyz87@gmail.com, 
-	mykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	bjorn@rivosinc.com, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	charlie@rivosinc.com, Andreas Schwab <schwab@suse.de>, Anand Moon <linux.amoon@gmail.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: Kernel panic with niu module
+Content-Language: en-US
+To: Thomas Gleixner <tglx@linutronix.de>, Bjorn Helgaas <helgaas@kernel.org>
+Cc: davem@davemloft.net, sparclinux@vger.kernel.org, netdev@vger.kernel.org,
+ linux-pci@vger.kernel.org
+References: <20241104234412.GA1446170@bhelgaas> <87fro4pe6i.ffs@tglx>
+ <973e2e20-51d9-4fe4-a361-0e07bcf95bab@yahoo.com> <87cyj8p8tq.ffs@tglx>
+From: Dullfire <dullfire@yahoo.com>
+In-Reply-To: <87cyj8p8tq.ffs@tglx>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Mailer: WebService/1.1.22806 mail.backend.jedi.jws.acl:role.jedi.acl.token.atz.jws.hermes.yahoo
 
-On Mon, Nov 4, 2024 at 2:26=E2=80=AFAM Bj=C3=B6rn T=C3=B6pel <bjorn@kernel.=
-org> wrote:
+On 11/6/24 11:32, Thomas Gleixner wrote:
+> On Wed, Nov 06 2024 at 10:04, dullfire@yahoo.com wrote:
+>>> 7d5ec3d36123 had the mask_all() invocation _before_ setting up the the
+>>> entries and reading back the descriptors. So that commit cannot break
+>>> the niu device when your problem analysis is correct.
+>>
+>> In 7d5ec3d36123 (and later) msix_mask_all() only writes to
+>> PCI_MSIX_ENTRY_VECTOR_CTRL. I have tried all the MSIX registers, and only
+>> writes to PCI_MSIX_ENTRY_DATA were able to prevent a fatal trap on a read.
+>> However the only write to PCI_MSIX_ENTRY_DATA I see is in
+>> __pci_write_msi_msg() for 7d5ec3d36123, or pci_write_msg_msix(), in 6.11.5.
 >
-> patchwork-bot+netdevbpf@kernel.org writes:
+> Yuck. They really went a great lenght to make this hard to handle.
 >
-> > Hello:
-> >
-> > This series was applied to bpf/bpf-next.git (master)
-> > by Andrii Nakryiko <andrii@kernel.org>:
-> >
-> > On Fri, 27 Sep 2024 15:13:52 +0200 you wrote:
-> >> From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
-> >>
-> >> libbpf does not include the per-arch tools include path, e.g.
-> >> tools/arch/riscv/include. Some architectures depend those files to
-> >> build properly.
-> >>
-> >> Include tools/arch/$(SUBARCH)/include in the libbpf build.
-> >>
-> >> [...]
-> >
-> > Here is the summary with links:
-> >   - [bpf-next,1/2] libbpf: Add missing per-arch include path
-> >     https://git.kernel.org/bpf/bpf-next/c/710fbca820c7
-> >   - [bpf-next,2/2] selftests: bpf: Add missing per-arch include path
-> >     https://git.kernel.org/bpf/bpf-next/c/19090f0306f1
+> Something like the obviously uncompiled below should work.
 >
-> Andrii, I just noted that this landed into bpf-next, and not bpf
-> (fixes).
+> Thanks,
+>
+>         tglx
+> ---
+> --- a/drivers/pci/msi/msi.c
+> +++ b/drivers/pci/msi/msi.c
+> @@ -611,6 +611,8 @@ void msix_prepare_msi_desc(struct pci_de
+>  	if (desc->pci.msi_attrib.can_mask) {
+>  		void __iomem *addr = pci_msix_desc_addr(desc);
+>
+> +		if (dev->dev_flags & PCI_MSIX_TOUCH_ENTRY_DATA_FIRST)
+> +			writel(0x0, addr + PCI_MSIX_ENTRY_DATA);
+>  		desc->pci.msix_ctrl = readl(addr + PCI_MSIX_ENTRY_VECTOR_CTRL);
+>  	}
+>  }
+>
+Great. Thanks for the recommendation. That is similar to my first patch
+approach. I had see struct pci_dev's bit field members, but missed the
+dev_flags member. I'll probably have a patch set out in the next few days,
+mostly pending my schedule, and reviewing the patch submission process.
 
-Hi Bjorn,
 
-Yes, libbpf and selftests fixes are generally applied through
-bpf-next, unless the issue is pretty bad and immediate.
-
-I'm sorry, but unfortunately it's too late now to move those patches
-as it's now been more than a month since they landed. For the future,
-please let us know ASAP if you think patches were misrouted. I think
-we are stuck with the need to do a stable backport for these, sorry.
-
->
-> RISC-V libbpf/perf needs this fix in 6.12 to properly build. Would it be
-> possible to have it in the bpf tree, and have it land in 6.12-rc7?
->
-> Andreas that has a similar fix [1].
->
->
-> Bj=C3=B6rn
->
-> [1] https://lore.kernel.org/linux-riscv/mvm5xq44bqh.fsf@suse.de/
+Regards,
+Jonathan Currier
 
