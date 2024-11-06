@@ -1,123 +1,89 @@
-Return-Path: <netdev+bounces-142561-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75FD89BF9CE
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:14:55 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A29F9BF9D3
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:15:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CB8B1F22633
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:14:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F7261C217E1
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:15:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDC9D20CCFE;
-	Wed,  6 Nov 2024 23:14:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD7871DFD83;
+	Wed,  6 Nov 2024 23:15:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="YAaiq/M6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D81020CCF8
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:14:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45B721917D7
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:15:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730934863; cv=none; b=GPq9Ekr2eag4iufEVS7ICyxBMYPYTqDtAAsdqJlNrQufZ6N8sE0y8TzAVJlGauriG13O6I0/DFaw9cDhOOHmLm9VjDhxiIYZFKDeFx7jnJLgdN82/gBtIU3gNqqxi4KSCDNj8wR/+TfArIzohToaCer16aTIwdtIrQOS5g5J7I0=
+	t=1730934955; cv=none; b=Vzh22wMgAFYng5cNWQfz9yc6Wt4At/Djog69pV7MbJefxKkAx+UmyoONPyGSQJnif2UwwonV4wro5JM3SPrP1yHwRaWKadRlFgD3vAy3ofjdm15xwjvOU5/i/cQW9R304IRHfAPqJVpMM+4bmqp6C2d+J/cUP3v0RPR/FFXvcNQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730934863; c=relaxed/simple;
-	bh=Ya0DjAkCKKvbbd2j7Brb4E7E3+8m7wJOPerH9jM9M34=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=dTjUhN7iRphOnLvKAKGLxhkY0PDdnTIzZGsJUCXInBHt7pvtq1CNQdWSOwI4fCw5a3Xet77taGRUsmw5U9uHRrWGTBk0p9kyX2BvRxxXKqSEaNq3690xDxrUNImGNeQTsDJCnZgwo6S6V2hpUXcw7l1fdPE5lFU7jK/LmTsyosI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.53] (ip5f5aedfa.dynamic.kabel-deutschland.de [95.90.237.250])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id F3EAB61E5FE05;
-	Thu, 07 Nov 2024 00:13:43 +0100 (CET)
-Message-ID: <4ee8f886-40ed-46bc-9d11-1619d64f7875@molgen.mpg.de>
-Date: Thu, 7 Nov 2024 00:13:43 +0100
+	s=arc-20240116; t=1730934955; c=relaxed/simple;
+	bh=h28pP+bl6J1vvSbb/bqsvafDcKj3uFGIb6YcbrPTz6Y=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=sWMfQOh26mU6yk0RnUH4hSx5gtAv1SGsfPlERbh6o9xm70Fy56jURzmkdqaK/EtMNfaJ6mIBRuTBhLweyXJhmYtjbe1ersCz5EMEqvaT33D4iZXMrOGwND4YTUwFtnOCtKAtUSItuNNOP+OZFem1xo3DRdexGMykuO28xc9uE08=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=YAaiq/M6; arc=none smtp.client-ip=207.171.188.206
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730934954; x=1762470954;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pcFcwoWcqzJsNFApYRR3u6dPxB17m2CYt3gH2zQ4+gs=;
+  b=YAaiq/M68+ibBauIY94shkYO4Hh3vuAPkpuUuxUiAmqpnKeQXq5dhBgj
+   0ULTy0ZUziAtNoU0NSBMbPNlBDkAgbHFMr+uxQ6HuFFKx1ZWEAUjQ+7jV
+   re65bQBsHc3g2NpKGIstc5Ikm8cR299vMfkmdDmHF/6prADzdmZRh9Qto
+   w=;
+X-IronPort-AV: E=Sophos;i="6.11,264,1725321600"; 
+   d="scan'208";a="773381994"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 23:15:48 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:17334]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.86:2525] with esmtp (Farcaster)
+ id 3620c940-a14b-4e60-af51-2db1f31a040a; Wed, 6 Nov 2024 23:15:47 +0000 (UTC)
+X-Farcaster-Flow-ID: 3620c940-a14b-4e60-af51-2db1f31a040a
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 6 Nov 2024 23:15:46 +0000
+Received: from 6c7e67c6786f.amazon.com (10.106.101.27) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 6 Nov 2024 23:15:44 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <gnaaman@drivenets.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH net-next v8 5/6] neighbour: Remove bare neighbour::next pointer
+Date: Wed, 6 Nov 2024 15:15:40 -0800
+Message-ID: <20241106231540.49433-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241104080437.103-6-gnaaman@drivenets.com>
+References: <20241104080437.103-6-gnaaman@drivenets.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v3 2/6] igc: Lengthen the
- hardware retry time to prevent timeouts
-To: Christopher S M Hall <christopher.s.hall@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, david.zage@intel.com,
- vinicius.gomes@intel.com, netdev@vger.kernel.org,
- rodrigo.cadore@l-acoustics.com, vinschen@redhat.com,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Mor Bar-Gabay <morx.bar.gabay@intel.com>,
- Avigail Dahan <avigailx.dahan@intel.com>
-References: <20241106184722.17230-1-christopher.s.hall@intel.com>
- <20241106184722.17230-3-christopher.s.hall@intel.com>
-Content-Language: en-US
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-In-Reply-To: <20241106184722.17230-3-christopher.s.hall@intel.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D039UWB004.ant.amazon.com (10.13.138.57) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-Dear Christopher,
-
-
-Thank you for the patch.
-
-I’d use the more specific summary/title below:
-
-igc: Lengthen hardware retry time to 4 μs to prevent timeouts
-
-Am 06.11.24 um 19:47 schrieb Christopher S M Hall:
-> Lengthen the hardware retry timer to four microseconds.
+From: Gilad Naaman <gnaaman@drivenets.com>
+Date: Mon,  4 Nov 2024 08:04:33 +0000
+> Remove the now-unused neighbour::next pointer, leaving struct neighbour
+> solely with the hlist_node implementation.
 > 
-> The i225/i226 hardware retries if it receives an inappropriate response
-> from the upstream device. If the device retries too quickly, the root
-> port does not respond.
+> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
 
-Any idea why? Is it documented somewhere?
-
-> The issue can be reproduced with the following:
-> 
-> $ sudo phc2sys -R 1000 -O 0 -i tsn0 -m
-> 
-> Note: 1000 Hz (-R 1000) is unrealistically large, but provides a way to
-> quickly reproduce the issue.
-> 
-> PHC2SYS exits with:
-> 
-> "ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
->    fails
-
-Why four microseconds, and not some other value?
-
-> Fixes: 6b8aa753a9f9 ("igc: Decrease PTM short interval from 10 us to 1 us")
-> Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Tested-by: Mor Bar-Gabay <morx.bar.gabay@intel.com>
-> Tested-by: Avigail Dahan <avigailx.dahan@intel.com>
-> Signed-off-by: Christopher S M Hall <christopher.s.hall@intel.com>
-> ---
->   drivers/net/ethernet/intel/igc/igc_defines.h | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/igc/igc_defines.h b/drivers/net/ethernet/intel/igc/igc_defines.h
-> index 2ff292f5f63b..84521a4c35b4 100644
-> --- a/drivers/net/ethernet/intel/igc/igc_defines.h
-> +++ b/drivers/net/ethernet/intel/igc/igc_defines.h
-> @@ -574,7 +574,7 @@
->   #define IGC_PTM_CTRL_SHRT_CYC(usec)	(((usec) & 0x3f) << 2)
->   #define IGC_PTM_CTRL_PTM_TO(usec)	(((usec) & 0xff) << 8)
->   
-> -#define IGC_PTM_SHORT_CYC_DEFAULT	1   /* Default short cycle interval */
-> +#define IGC_PTM_SHORT_CYC_DEFAULT	4   /* Default short cycle interval */
->   #define IGC_PTM_CYC_TIME_DEFAULT	5   /* Default PTM cycle time */
->   #define IGC_PTM_TIMEOUT_DEFAULT		255 /* Default timeout for PTM errors */
-
-
-Kind regards,
-
-Paul
+Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 
