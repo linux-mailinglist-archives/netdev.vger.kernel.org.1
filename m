@@ -1,141 +1,225 @@
-Return-Path: <netdev+bounces-142444-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 959249BF2F3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:13:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 034DF9BF2FD
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:15:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47EB61F213D2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:13:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 87EA21F24B41
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:15:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 047572038A1;
-	Wed,  6 Nov 2024 16:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63497205E09;
+	Wed,  6 Nov 2024 16:15:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="hU/YAvu3"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Rg69Z4SE"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f54.google.com (mail-ed1-f54.google.com [209.85.208.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 727841DEFC7
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 16:13:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DE781E0084;
+	Wed,  6 Nov 2024 16:15:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730909609; cv=none; b=u0BaeAzWuMnOEunSu2Zzt+T7dZy4IakZG5ZftzPH16hdKhlV9V+zoDaO07PIFoN/TJkhVieGaBhBpjlmv7vtdB4/DTJ+8hOeDEwVNLmn1Xp1o8AUrMo/8nKEO26EahTkC8A+NdJgu1f/64Ej1zj7bfzG2MdwUrkBRtPvXMy3uCA=
+	t=1730909706; cv=none; b=bcDXmsA4LsZlx3Ohxi2tA0g+b0iY2jnIb/gK2Pv5fsCfa/m8hDIDDGJEH6k7DkM5IiuLoJC/KaQyNZxGV6PYdIirgdfPOVlnBl1dUt9fAhsKdkCXwxo3SAtgunEW3Is7pBf3NX1OkI8W/qvjF+7y4xIPXTllopJGv7XRofkAV6U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730909609; c=relaxed/simple;
-	bh=bv3/rlPRDtLUJmWm0YAo7VqvOVpmHgyu+NFk1LMsekg=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=rE0BVBoDlZEum2w7fwwNxUDBBWB8CNSfgsJEVEyWPcIUPBN9jrLZ9qEUo5r1jTvotWeEHuzW2acrmVj8o2Ke7rY7yIUg1Ua3inT5L3P0b+2AWBucNxRIGsVj6s499IQ6LTyRc7JQ54Ox/Thj54i/bSZxmYUXwo1i40zYujsnJok=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=hU/YAvu3; arc=none smtp.client-ip=209.85.208.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f54.google.com with SMTP id 4fb4d7f45d1cf-5cece886771so44022a12.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 08:13:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730909606; x=1731514406; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bv3/rlPRDtLUJmWm0YAo7VqvOVpmHgyu+NFk1LMsekg=;
-        b=hU/YAvu3V3AKoCL0JQeAwrYpOeqIzwE1bk9WndnCxcDQe2rVvHAu/zO6xOHqI2MG2t
-         Kfu47KcbINiUWk3IyPoxp+gZy3KrpmhAQlowXZ90SnMGJVX+KmY30CPcJ5QFWJTunkM3
-         vHF+XmTFmUzmj8P6E0FS/AvQLkncgsBmdhMlhd+Nrog9r8LL2scepdGqSq2arA9MP6Te
-         HTXFficdROcgyNmHsi9jxq6NwwJUKTQwOeO863YzM3HjwgbI07KjkNHQ67WVR6DJ36GT
-         deJMWUfzWokpF1ZuxV+7jjJmCshTEVXeknkNnUWb0Ue4aK0S0Q8v3fiMFtYfijgpQ3UF
-         iG9w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730909606; x=1731514406;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bv3/rlPRDtLUJmWm0YAo7VqvOVpmHgyu+NFk1LMsekg=;
-        b=J0ffhVyDW1Yyyq5l+pEIgrO0W2rM4A6Yg3KPTcHqsMwJR8kaam9xKQkwabcOOyH1u/
-         47Y+HydBDHMDEzdXssshxllspj9t7UTBzlhAqFn1jQViXBBytUhs41xwXIjlPNIKD8ao
-         ZwRKkvhvZ/cvRjgN4N0B/WOhMZLoaC9/lVlP5IzP1OS4iAZ+qie3kxZWf/Iubh0QYDwv
-         puNnFUIhFpbzuxLW8r3r6I0xQeaBVp48ExqdPo3CkVRNZIpPA2PTiev1hW5VnpMw7Zsg
-         9eFV3VEMDsudGt7/3gg64hsUo95BH8723ssC8Z6zhkG4Hu6GTmfkk18mmVWvYKmwJE7U
-         xn0g==
-X-Forwarded-Encrypted: i=1; AJvYcCU+vlug+b9R8OfoRKcrPX684RajROGRF3KoySh2tJvyg8YEphuhGgGhbL7QhE1YAdqRqOnk8hE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwTcixgJ5ETTsoC223KDNCX7SYgknsWRwdDv+CMeYJ0RRSDn7nW
-	FtmDVHOOL1v2wl+EtkDSgf5vXHW/hY0oZXam/JMLOoeZ3C9eadcw90wniIy6KSZafo1aey1Xifn
-	ByAGDsiRvz9q444/dBPmZuwDzFtyn7FU7uPSX
-X-Google-Smtp-Source: AGHT+IG31oDzIcRRZTXFrc4mSbTzWqOQQfaIeoJMNJyfUTYdBMy9A+Bq3DpljUJqC6apMGKNF0ibhLvsqlER0Z4uNjo=
-X-Received: by 2002:a05:6402:280a:b0:5ce:dc71:5928 with SMTP id
- 4fb4d7f45d1cf-5cef54d1b5emr3165558a12.12.1730909605487; Wed, 06 Nov 2024
- 08:13:25 -0800 (PST)
+	s=arc-20240116; t=1730909706; c=relaxed/simple;
+	bh=L1fz5ifwL7RtYFeEDpd0ry1pl5RXPpuE7qAe8htztHs=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=nqLvCwsp2aCU0yMzlpUFKORYjuiqz2DjI09/1JgV5Z8Ds2zjthsmzHKrDicvYj3vK/VPCOl6MWris5ij45cC5APdsysZ8X4Twb3HeB1FP6SwGXG1z0bbx+HKmahwxv0YLkFhn5x4tDAUEr4tTTqe0NhMz+0elYrukCRZzs0TI9M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Rg69Z4SE; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4C388C4CECC;
+	Wed,  6 Nov 2024 16:15:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730909705;
+	bh=L1fz5ifwL7RtYFeEDpd0ry1pl5RXPpuE7qAe8htztHs=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Rg69Z4SEgjr14uUSm8raG4/pBqR96KcGJKeZyT1jCty/ybLeUUY9kVlJ9WxpuGvY2
+	 JVRAz0Ve5o8Nq/tPBv1cQl0geGUfCQuoUOrwYQBrrNuZb0yIgNnSKolkr54p0mp8U+
+	 8Mmk58lGjlXIssQ9vVRy2gYIkG7r+951nC1RDlfMVEwKE46+OyDmI+qoghj4KnyykC
+	 zTcOfB2jVEA1HfGxTCRhm04xEmDuh9sRBn+M0XWXlOGjF2L8iBNtGtUmNqjwO8cEd3
+	 QW5s5t+fzIbVXEELqgNo2T/VLiwWgZAOeO2smOMhC90WaFISTshS7lhTEl5JJ6KPW0
+	 imFjIcT+ySYeA==
+From: Masahiro Yamada <masahiroy@kernel.org>
+To: linux-kbuild@vger.kernel.org
+Cc: Nicholas Piggin <npiggin@gmail.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	Andi Kleen <ak@linux.intel.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Bill Wendling <morbo@google.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Justin Stitt <justinstitt@google.com>,
+	Kees Cook <kees@kernel.org>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Nick Desaulniers <ndesaulniers@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sami Tolvanen <samitolvanen@google.com>,
+	Simon Horman <horms@kernel.org>,
+	linux-arch@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-mm@kvack.org,
+	llvm@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: [PATCH 2/2] Rename .data.once to .data..once to fix resetting WARN*_ONCE
+Date: Thu,  7 Nov 2024 01:14:41 +0900
+Message-ID: <20241106161445.189399-2-masahiroy@kernel.org>
+X-Mailer: git-send-email 2.43.0
+In-Reply-To: <20241106161445.189399-1-masahiroy@kernel.org>
+References: <20241106161445.189399-1-masahiroy@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241106155509.1706965-1-omosnace@redhat.com>
-In-Reply-To: <20241106155509.1706965-1-omosnace@redhat.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 6 Nov 2024 17:13:14 +0100
-Message-ID: <CANn89iKag19EPvnQRthsG98pfjriRwtS+YND0359xFijGAoEYg@mail.gmail.com>
-Subject: Re: [PATCH] selinux,xfrm: fix dangling refcount on deferred skb free
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: Paul Moore <paul@paul-moore.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, selinux@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 6, 2024 at 4:55=E2=80=AFPM Ondrej Mosnacek <omosnace@redhat.com=
-> wrote:
->
-> SELinux tracks the number of allocated xfrm_state/xfrm_policy objects
-> (via the selinux_xfrm_refcount variable) as an input in deciding if peer
-> labeling should be used.
->
-> However, as a result of commits f35f821935d8 ("tcp: defer skb freeing
-> after socket lock is released") and 68822bdf76f1 ("net: generalize skb
-> freeing deferral to per-cpu lists"), freeing of a sk_buff object, which
-> may hold a reference to an xfrm_state object, can be deferred for
-> processing on another CPU core, so even after xfrm_state is deleted from
-> the configuration by userspace, the refcount isn't decremented until the
-> deferred freeing of relevant sk_buffs happens. On a system with many
-> cores this can take a very long time (even minutes or more if the system
-> is not very active), leading to peer labeling being enabled for much
-> longer than expected.
->
-> Fix this by moving the selinux_xfrm_refcount decrementing to just after
-> the actual deletion of the xfrm objects rather than waiting for the
-> freeing to happen. For xfrm_policy it currently doesn't seem to be
-> necessary, but let's do the same there for consistency and
-> future-proofing.
->
-> We hit this issue on a specific aarch64 256-core system, where the
-> sequence of unix_socket/test and inet_socket/tcp/test from
-> selinux-testsuite [1] would quite reliably trigger this scenario, and a
-> subsequent sctp/test run would then stumble because the policy for that
-> test misses some rules that would make it work under peer labeling
-> enabled (namely it was getting the netif::egress permission denied in
-> some of the test cases).
->
-> [1] https://github.com/SELinuxProject/selinux-testsuite/
->
-> Fixes: f35f821935d8 ("tcp: defer skb freeing after socket lock is release=
-d")
-> Fixes: 68822bdf76f1 ("net: generalize skb freeing deferral to per-cpu lis=
-ts")
-> Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> ---
+Commit b1fca27d384e ("kernel debug: support resetting WARN*_ONCE")
+added support for clearing the state of once warnings. However,
+it is not functional when CONFIG_LD_DEAD_CODE_DATA_ELIMINATION or
+CONFIG_LTO_CLANG is enabled, because .data.unlikely matches the
+.data.[0-9a-zA-Z_]* pattern in the DATA_MAIN macro.
 
-Can we explain why TCP packets sitting in TCP receive queues would
-need to keep xfrm_state around ?
+Commit cb87481ee89d ("kbuild: linker script do not match C names unless
+LD_DEAD_CODE_DATA_ELIMINATION is configured") was introduced to suppress
+the issue for the default CONFIG_LD_DEAD_CODE_DATA_ELIMINATION=n case,
+providing a minimal fix for stable backporting. We were aware this did
+not address the issue for CONFIG_LD_DEAD_CODE_DATA_ELIMINATION=y. The
+plan was to apply correct fixes and then revert cb87481ee89d. [1]
 
-With thousands of TCP sockets. I would imagine that a similar issue
-would be hit,
-regardless of f35f821935d8 ("tcp: defer skb freeing after socket lock
-is released") and 68822bdf76f1 ("net: generalize skb freeing deferral
-to per-cpu lists")
+Seven years have passed since then, yet the #ifdef workaround remains in
+place. Meanwhile, commit b1fca27d384e introduced the .data.once section,
+and commit dc5723b02e52 ("kbuild: add support for Clang LTO") extended
+the #ifdef.
 
-We remove the dst from these incoming packets (see skb_dst_drop() in
-tcp_data_queue() and tcp_add_backlog()),
-I do not see how XFRM state could be kept ?
+Using a ".." separator in the section name fixes the issue for
+CONFIG_LD_DEAD_CODE_DATA_ELIMINATION and CONFIG_LTO_CLANG.
+
+[1]: https://lore.kernel.org/linux-kbuild/CAK7LNASck6BfdLnESxXUeECYL26yUDm0cwRZuM4gmaWUkxjL5g@mail.gmail.com/
+
+Fixes: b1fca27d384e ("kernel debug: support resetting WARN*_ONCE")
+Fixes: dc5723b02e52 ("kbuild: add support for Clang LTO")
+Signed-off-by: Masahiro Yamada <masahiroy@kernel.org>
+---
+
+ include/asm-generic/vmlinux.lds.h | 2 +-
+ include/linux/mmdebug.h           | 6 +++---
+ include/linux/once.h              | 4 ++--
+ include/linux/once_lite.h         | 2 +-
+ include/net/net_debug.h           | 2 +-
+ mm/internal.h                     | 2 +-
+ 6 files changed, 9 insertions(+), 9 deletions(-)
+
+diff --git a/include/asm-generic/vmlinux.lds.h b/include/asm-generic/vmlinux.lds.h
+index 3c9dc1fd094d..54504013c749 100644
+--- a/include/asm-generic/vmlinux.lds.h
++++ b/include/asm-generic/vmlinux.lds.h
+@@ -359,7 +359,7 @@ defined(CONFIG_AUTOFDO_CLANG) || defined(CONFIG_PROPELLER_CLANG)
+ 	*(.data..shared_aligned) /* percpu related */			\
+ 	*(.data..unlikely)						\
+ 	__start_once = .;						\
+-	*(.data.once)							\
++	*(.data..once)							\
+ 	__end_once = .;							\
+ 	STRUCT_ALIGN();							\
+ 	*(__tracepoints)						\
+diff --git a/include/linux/mmdebug.h b/include/linux/mmdebug.h
+index 39a7714605a7..d7cb1e5ecbda 100644
+--- a/include/linux/mmdebug.h
++++ b/include/linux/mmdebug.h
+@@ -46,7 +46,7 @@ void vma_iter_dump_tree(const struct vma_iterator *vmi);
+ 		}							\
+ 	} while (0)
+ #define VM_WARN_ON_ONCE_PAGE(cond, page)	({			\
+-	static bool __section(".data.once") __warned;			\
++	static bool __section(".data..once") __warned;			\
+ 	int __ret_warn_once = !!(cond);					\
+ 									\
+ 	if (unlikely(__ret_warn_once && !__warned)) {			\
+@@ -66,7 +66,7 @@ void vma_iter_dump_tree(const struct vma_iterator *vmi);
+ 	unlikely(__ret_warn);						\
+ })
+ #define VM_WARN_ON_ONCE_FOLIO(cond, folio)	({			\
+-	static bool __section(".data.once") __warned;			\
++	static bool __section(".data..once") __warned;			\
+ 	int __ret_warn_once = !!(cond);					\
+ 									\
+ 	if (unlikely(__ret_warn_once && !__warned)) {			\
+@@ -77,7 +77,7 @@ void vma_iter_dump_tree(const struct vma_iterator *vmi);
+ 	unlikely(__ret_warn_once);					\
+ })
+ #define VM_WARN_ON_ONCE_MM(cond, mm)		({			\
+-	static bool __section(".data.once") __warned;			\
++	static bool __section(".data..once") __warned;			\
+ 	int __ret_warn_once = !!(cond);					\
+ 									\
+ 	if (unlikely(__ret_warn_once && !__warned)) {			\
+diff --git a/include/linux/once.h b/include/linux/once.h
+index bc714d414448..30346fcdc799 100644
+--- a/include/linux/once.h
++++ b/include/linux/once.h
+@@ -46,7 +46,7 @@ void __do_once_sleepable_done(bool *done, struct static_key_true *once_key,
+ #define DO_ONCE(func, ...)						     \
+ 	({								     \
+ 		bool ___ret = false;					     \
+-		static bool __section(".data.once") ___done = false;	     \
++		static bool __section(".data..once") ___done = false;	     \
+ 		static DEFINE_STATIC_KEY_TRUE(___once_key);		     \
+ 		if (static_branch_unlikely(&___once_key)) {		     \
+ 			unsigned long ___flags;				     \
+@@ -64,7 +64,7 @@ void __do_once_sleepable_done(bool *done, struct static_key_true *once_key,
+ #define DO_ONCE_SLEEPABLE(func, ...)						\
+ 	({									\
+ 		bool ___ret = false;						\
+-		static bool __section(".data.once") ___done = false;		\
++		static bool __section(".data..once") ___done = false;		\
+ 		static DEFINE_STATIC_KEY_TRUE(___once_key);			\
+ 		if (static_branch_unlikely(&___once_key)) {			\
+ 			___ret = __do_once_sleepable_start(&___done);		\
+diff --git a/include/linux/once_lite.h b/include/linux/once_lite.h
+index b7bce4983638..27de7bc32a06 100644
+--- a/include/linux/once_lite.h
++++ b/include/linux/once_lite.h
+@@ -12,7 +12,7 @@
+ 
+ #define __ONCE_LITE_IF(condition)					\
+ 	({								\
+-		static bool __section(".data.once") __already_done;	\
++		static bool __section(".data..once") __already_done;	\
+ 		bool __ret_cond = !!(condition);			\
+ 		bool __ret_once = false;				\
+ 									\
+diff --git a/include/net/net_debug.h b/include/net/net_debug.h
+index 1e74684cbbdb..4a79204c8d30 100644
+--- a/include/net/net_debug.h
++++ b/include/net/net_debug.h
+@@ -27,7 +27,7 @@ void netdev_info(const struct net_device *dev, const char *format, ...);
+ 
+ #define netdev_level_once(level, dev, fmt, ...)			\
+ do {								\
+-	static bool __section(".data.once") __print_once;	\
++	static bool __section(".data..once") __print_once;	\
+ 								\
+ 	if (!__print_once) {					\
+ 		__print_once = true;				\
+diff --git a/mm/internal.h b/mm/internal.h
+index 93083bbeeefa..a23f7b11b760 100644
+--- a/mm/internal.h
++++ b/mm/internal.h
+@@ -48,7 +48,7 @@ struct folio_batch;
+  * when we specify __GFP_NOWARN.
+  */
+ #define WARN_ON_ONCE_GFP(cond, gfp)	({				\
+-	static bool __section(".data.once") __warned;			\
++	static bool __section(".data..once") __warned;			\
+ 	int __ret_warn_once = !!(cond);					\
+ 									\
+ 	if (unlikely(!(gfp & __GFP_NOWARN) && __ret_warn_once && !__warned)) { \
+-- 
+2.43.0
+
 
