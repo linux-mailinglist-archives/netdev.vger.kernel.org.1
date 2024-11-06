@@ -1,105 +1,124 @@
-Return-Path: <netdev+bounces-142279-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142280-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC709BE1AD
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:05:56 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id CE1EB9BE1D9
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:08:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1D5C1C23712
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:05:55 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 795371F25121
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:08:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 012471DDC14;
-	Wed,  6 Nov 2024 09:03:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2F471DD0E7;
+	Wed,  6 Nov 2024 09:05:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="GzRhmvhD"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="WQWEifMZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from relay6-d.mail.gandi.net (relay6-d.mail.gandi.net [217.70.183.198])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 141C91DD0E1;
-	Wed,  6 Nov 2024 09:03:44 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 169591DD0C8
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:05:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730883826; cv=none; b=K8FcrO2c55LyHatyw9TuBUXXvWqH5XE4kZ5p0gd/XlW3qtiysBd+S6RYpA6GPKYd9zb50/F7zQvLTHJvkX4wrobFI+1wVoU83L8hzKqAknXnLOBI24lxRbLojrLVktdwcfWrKvg7sSmkAMfIgSvo8PZxFN5MxNNpvUqcs8iOYOs=
+	t=1730883930; cv=none; b=bbvDN0YflLtdFz1wpvzruXYdb2YDkb6CFJGu4N3LqXJFO/LGkwKqTfwnXOGbhxGHy5TARj0CkjrYE8tm4EHlppjQdnqzPcC6Dgl2jNTWf3502nzc87A5XR22lpavqf4SgCiNjM7Gb4Rv4PqM+UU+nR6nDzFl++R32x5SBMFMQ4M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730883826; c=relaxed/simple;
-	bh=HgpNPhPmBRsJWksj0+A8DbSRT3GIfHWeaZBQkwOcymk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=cKu3EnAJdLlLgmzlTgrfIByOpqby2GST+OoGmVP0faxIXMY7Wglk1WZN5pmgl5FOlFtyoKQ5JnxW5eIbcRglnO0UAF1YAEWpWD9GAYB3EQ7I3P1W+21sCcAxrwqnpZf8eZGQ4RUTxdv1wL6S7tKPckTNsvUL3eNnRCqhlwV/GNc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=GzRhmvhD; arc=none smtp.client-ip=217.70.183.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id E4815C000C;
-	Wed,  6 Nov 2024 09:03:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1730883823;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=E93S7Q8y++FOL3m/D0GbV+rHXdW8GgCuYU8lejTM1Gw=;
-	b=GzRhmvhDYab6e+aCvOAiscJ14yt1FYl8jh7MKLtr4A4vMqEZOHzd0P8TdQn6hOnAyQuYbf
-	hQnynd8cO05pDbs8uNL+GptssVm1mvRJbKcXtGWAEe7qmBqnymwkcCTPqNM2PDIa99+ZWO
-	uMs6xRvQnebX+7JxKrDlm6SHHRIECJJtO5Q9ePjtPjsaCA7d48br78MNm4j9w9cPKkTLzu
-	taNlpdcAE5Rxfs79B6Fae5yrpit0C7nurQMyDs2yPYhuTOswLbwzo3h2MZH5XAZXyFqXBk
-	wiSdvDBZp0SioSFlTzsKTCqGtkoiFXGIYLT1wGOzxi5D5yrh9mWqg5/h+LRy8Q==
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	davem@davemloft.net,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
-	=?UTF-8?q?Alexis=20Lothor=C3=A9?= <alexis.lothore@bootlin.com>,
-	Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+	s=arc-20240116; t=1730883930; c=relaxed/simple;
+	bh=nepz5ZEdo7U42poI3ekNVWSS3AoLSObBx0QSfv4+9SU=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=D7Wy+az9O+A5eTthZrKjPqgICA0571Dyk/8vJu1mtbsyKSRPkGiv04N7YFF1Bhmfa/7mB5WrVEa2EHPjAPxCQ4l4DWiQ0nu9jP5h3ONAX2LxlFUGin14dhamEhi9f5HfUWEXXKHPVvo/rSNRSjfVnYYJ3q79deHTC1wl62cPaG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=WQWEifMZ; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20c693b68f5so69308685ad.1
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:05:28 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1730883928; x=1731488728; darn=vger.kernel.org;
+        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=bbrUdx8AnWYClHmA8SZJJAgOkHFthT0yMRum0EFAWWU=;
+        b=WQWEifMZAyvr0fACziGJmvtBlXNJhAe641lf2Ek1wa/p+oBFScEHjQ/Nv1l2IHYj/u
+         5xQvSFBZMvAZlfhWIhh19Oup4uWjJv6zmBSoZAYwj/OvQeDg9F/3Q/N5jbku5nkPAYn6
+         f4L/Zc1EdLKXxHgGllWD/XO+8HKUwbKqGRV9Q=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730883928; x=1731488728;
+        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=bbrUdx8AnWYClHmA8SZJJAgOkHFthT0yMRum0EFAWWU=;
+        b=B03M4IhmNsoJXDmwNkkwHYKwTut9A9qgHkbatueq7eOEGHkClfc6NeG3uazQxwoTap
+         LCDfJ2kmCocbMnBafMkpDTd+1VSP6G4/+5fBQAKJy2Rpm/tAijx86Ryl73HcaxN6gghI
+         Gf32Xh1OkQckkbQDohRz1yRgjYmWhYFEyJu50ZvgyEy481jK/lvMY5PdvYGWAxNLTjBs
+         4LEXekLqjlrv79JL+LQf984QCxWY3wnaY3qjryyn5j80arH3ZaM55Uypm9mW/PQoZqG6
+         vsatT450gCNmBnC7oYTrMupiq6PuykVkwpSKLQTKQjVeudO8l/ClguHCJ2/wf/EK9/7h
+         U0VQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUlDVE5ossd4PISzr6yw+D3ReOoLaSbl6MtI8Lb/U5cZtqWSBCFMpjgr7dHfEKHgSBNUOG/jEE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yx3QhzvOUrtqJRGVj64/3X8dy83WevCfe0sGp9yCMKJsNxw58CU
+	0a0IuT8YHWtzR7ZX+sPJnXTL2w4XgzPVdSbAge+rKbiJJ8AEAaHcPm2N41HPrw==
+X-Google-Smtp-Source: AGHT+IHopMnnXO+cdpbLI9vGPVwp6EWwYiJV3p8sX3ArHhRCkLhHNOzjZV/7Zu/AZzSXud8pQ3wizw==
+X-Received: by 2002:a17:902:f707:b0:20c:f261:2516 with SMTP id d9443c01a7336-21103aaa000mr338769645ad.8.1730883928370;
+        Wed, 06 Nov 2024 01:05:28 -0800 (PST)
+Received: from sxavier-dev.dhcp.broadcom.net ([192.19.234.250])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057084casm91715395ad.92.2024.11.06.01.05.24
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Wed, 06 Nov 2024 01:05:27 -0800 (PST)
+From: Selvin Xavier <selvin.xavier@broadcom.com>
+To: leon@kernel.org,
+	jgg@ziepe.ca
+Cc: linux-rdma@vger.kernel.org,
 	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v3 9/9] net: stmmac: dwmac_socfpga: This platform has GMAC
-Date: Wed,  6 Nov 2024 10:03:30 +0100
-Message-ID: <20241106090331.56519-10-maxime.chevallier@bootlin.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241106090331.56519-1-maxime.chevallier@bootlin.com>
-References: <20241106090331.56519-1-maxime.chevallier@bootlin.com>
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	michael.chan@broadcom.com,
+	andrew.gospodarek@broadcom.com,
+	kalesh-anakkur.purayil@broadcom.com,
+	Selvin Xavier <selvin.xavier@broadcom.com>
+Subject: [PATCH rdma-next v2 0/3] bnxt: Enhance the resource distribution for RoCE VFs
+Date: Wed,  6 Nov 2024 00:44:33 -0800
+Message-Id: <1730882676-24434-1-git-send-email-selvin.xavier@broadcom.com>
+X-Mailer: git-send-email 2.5.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
 
-Indicate that dwmac_socfpga has a gmac. This will make sure that
-gmac-specific interrupt processing is done, including timestamp
-interrupt handling. Without this, the external snapshot interrupt is
-never ack'd and we have an interrupt storm on external snapshot event.
+Implements the mechanism to distribute the RoCE VF resource
+based on the active VFs. If the firmware support the feature,
+NIC driver will distribute the resources for Active VFs. For
+older Firmware, RoCE driver will continue to distribute the
+resources across the total number of VFs.
 
-Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
----
- drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c | 1 +
- 1 file changed, 1 insertion(+)
+Please review and apply.
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-index 0745117d5872..248b30d7b864 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-socfpga.c
-@@ -485,6 +485,7 @@ static int socfpga_dwmac_probe(struct platform_device *pdev)
- 	plat_dat->pcs_init = socfpga_dwmac_pcs_init;
- 	plat_dat->pcs_exit = socfpga_dwmac_pcs_exit;
- 	plat_dat->select_pcs = socfpga_dwmac_select_pcs;
-+	plat_dat->has_gmac = true;
- 
- 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
- 	if (ret)
+Thanks,
+Selvin Xavier
+
+v1 -> v2:
+	Updated the commit message of patch 1 of the series
+
+Bhargava Chenna Marreddy (1):
+  RDMA/bnxt_re: Enhance RoCE SRIOV resource configuration design
+
+Kalesh AP (1):
+  RDMA/bnxt_re: Add set_func_resources support for P5/P7 adapters
+
+Vikas Gupta (1):
+  bnxt_en: Add support for RoCE sriov configuration
+
+ drivers/infiniband/hw/bnxt_re/main.c            | 24 ++++++-----
+ drivers/infiniband/hw/bnxt_re/qplib_rcfw.c      | 13 ++----
+ drivers/infiniband/hw/bnxt_re/qplib_res.h       |  3 ++
+ drivers/infiniband/hw/bnxt_re/roce_hsi.h        |  1 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c       |  6 +++
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h       |  6 +++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_sriov.c | 53 +++++++++++++++++++++++++
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.c   |  2 +
+ drivers/net/ethernet/broadcom/bnxt/bnxt_ulp.h   |  1 +
+ 9 files changed, 89 insertions(+), 20 deletions(-)
+
 -- 
-2.47.0
+2.5.5
 
 
