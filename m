@@ -1,279 +1,103 @@
-Return-Path: <netdev+bounces-142194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E9389BDBAF
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:57:19 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 941B39BDBB5
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:00:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EBD1E1C22C76
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:57:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C09F283B91
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:00:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0E018C922;
-	Wed,  6 Nov 2024 01:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31A9A18D623;
+	Wed,  6 Nov 2024 02:00:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="MUsIgnHc"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="QPawd+Fx"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EC6218C335
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:57:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0677718C329;
+	Wed,  6 Nov 2024 02:00:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730858233; cv=none; b=CsBlMlEfyrJ821QaIhttbvvB4PRGAAx1Pn9IPHVijlerdk8Vr+BVsgnXQ0kFem3VCJrC2CcMKcedXnglRTeEmv+eqm3oxgditN+/sDR0IbrUvXYPr410WQvJvAG5+9Y3PqhSn65ssIeEdzgE795ea/dX41p2tA7ZTgJuvrod+Pw=
+	t=1730858422; cv=none; b=CJl0qi/d3GnEsJYACmvKpB7lxQSEkW3twriM0dIyBFl8tg5N4xMpeaan8LOxoHBYiPK2ne/VL5BSZzXl3OxCWIsJKfgdv3yDnuzn+pHQjdOS8qhyEKqOl8fc0pJatJk3Jqqc06RKpcY2tkqAgfIpDk3lHcveCxpi80nApcf1Imk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730858233; c=relaxed/simple;
-	bh=9JZwaZ7zkHSJiSW9v+UoIvfOxvxshGswHvo2Gf62gGQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=L+n1eiiiy3BCSlsaV2KMsq6y7PAvtTZKMM5AvfR1NbU22YGbn/Brgeu5TSws25ZDugWWw/KhDpqCZPQxOHYw+iu+fzQ+JqKwr6NgvC6WHRIitFMILTvBn3VI5Q1mBc1XIrs0JIxhrbXdUyG3gzyYcXDx6l2bB7NSSYjICtSkG3E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=MUsIgnHc; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730858230;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=vuUpBAQVSxZIog/ODTCDmE9tfS9Da4cYUZvnpvpzVCU=;
-	b=MUsIgnHcKlaNvn+8PUQdoQ9IgB55Yl7ZrJq8loKdp3NjvZH0HuJsyF+7EYsGNZQk4De9rV
-	WmIkUcq0HIJBGm0fJg9RncLD1D4JS2H7KBoDi8amqq6bLWvKA2pW8OPHMMqYHugiuvLfJd
-	EGmTYgM+qQfm28Hz0BS9To3e+eGtgwk=
-Received: from mail-pl1-f198.google.com (mail-pl1-f198.google.com
- [209.85.214.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-677-gZGbgHriO3aJB7oBMJrWGg-1; Tue, 05 Nov 2024 20:57:08 -0500
-X-MC-Unique: gZGbgHriO3aJB7oBMJrWGg-1
-Received: by mail-pl1-f198.google.com with SMTP id d9443c01a7336-20cb3d9f5eeso3546175ad.1
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 17:57:08 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730858228; x=1731463028;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vuUpBAQVSxZIog/ODTCDmE9tfS9Da4cYUZvnpvpzVCU=;
-        b=NZsH2DukKi3U4GiRujDu/d8PNG2XS1NWtCOItfHengOwUpMZfAR1IrxcThzGE+xnC8
-         qxwSsdc5bN7PSQtNvNb2y9nEVTrXue5PRZikGtVSZ1FZ2JFSvXpknMlKt/gcJb9vUZ8N
-         97YunXKoJPqjZfdCumvp1SyT1mUlOjUscDBtm0gF1DtE1NJa01TlHfu7CJE5ARLLZxmL
-         EppPvquZ75yoZEPWS1bfznnJijYT+Klo0EFaVcLNg+itKYNphVHKaq9cWlx/Gpt1XoRT
-         ZmuCBb4tfWWLgyZgproU1jDuwNn9ZdsPKSrs/9mPMinZyJGmlIbQVg9pPmoWMvrs1Woa
-         /5pg==
-X-Gm-Message-State: AOJu0YyX4kS/8+9FBAwpeLBLhk5olKjBm5lPmoV223bGvWDrbG8IfOKj
-	K0f0lrZt2EuhIFObKAMduza+fgyNgefk76P2B0j2L6zy5nZnJ4E65X4AxvYcB2b6U+mknm3I/jA
-	aXKh0qAW7p87epVURml6xrP7h8gxz3OnszIqzfHkEMLwtWEpIiGiYlDN4WgO2racbHT48wiY+4J
-	c7d/4d76PoACbVenMKvD9XygcKL/2J
-X-Received: by 2002:a17:902:cf0d:b0:20e:df57:db50 with SMTP id d9443c01a7336-2116c569f3bmr13581045ad.18.1730858227640;
-        Tue, 05 Nov 2024 17:57:07 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH/SxOv0GXjuaKPQB9a3NffmjYrbL2lrFoa/apw3iJzmURj0s3MgL9FUe/jZvPU3vfi7GHkYy4w3VytQKE1ua8=
-X-Received: by 2002:a17:902:cf0d:b0:20e:df57:db50 with SMTP id
- d9443c01a7336-2116c569f3bmr13580525ad.18.1730858227049; Tue, 05 Nov 2024
- 17:57:07 -0800 (PST)
+	s=arc-20240116; t=1730858422; c=relaxed/simple;
+	bh=iDGn6cF39S+5ch2f8pg8ENjGiBRJzy0HvH23scQjhcQ=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=e8X4E536GbaDYL/6gWMtGoivPleveb0DNwUkbM5SCbTku6rr7Sqh8g6VIFwtN9J7gGqtBrHbA0WfuGKB98eCWucWxFnwCESQXLDAUl4HxNcg1YW12pasLv/jY+N4k/YtvhuepdsK645J4RW/EgHfiP+bKEvnRXuwld4kbC6fYjg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=QPawd+Fx; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 97164C4CECF;
+	Wed,  6 Nov 2024 02:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730858421;
+	bh=iDGn6cF39S+5ch2f8pg8ENjGiBRJzy0HvH23scQjhcQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=QPawd+Fx9U769Oe0hH0VRncvrDRfzDHq5qBMs7pShUOKH+0Xrzmx7OoJrTTJhcUHC
+	 0IcO6mQpKWVUE/z//2UqZH8lE+UtMZ1hjJBN1Pr8lRj+IiNIQ09LKwmGie5eMkYDSJ
+	 81PsQJu7PSsylnThW2p8U557I2VQVL8yKTS6m0lSL8oFBLXwVLgu93t1bOHpPFvPkC
+	 tlaNXJONb9+I5Djpm7cB71PiAlh+EAQu/xrUCbKEvfsY+FXGBzEzxDJc1hCmtTUmKN
+	 VIJZrX09TUDyPoR6T7HA4PQHyQWAgAcNXVPM0wrUYf92G5ZXj5EGyvuCq9pJ3Hxlfp
+	 yNpo92C769Brg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE12A3809A80;
+	Wed,  6 Nov 2024 02:00:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com>
- <20241030082453.97310-7-xuanzhuo@linux.alibaba.com> <CACGkMEviCSEo4thkFo8gYnv+FCm-v65umJ65fdOwtxbAF_F2Ag@mail.gmail.com>
- <1730790584.4657414-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1730790584.4657414-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 6 Nov 2024 09:56:55 +0800
-Message-ID: <CACGkMEuqXWznXVR+e_gBuhybTSnEePxXqrmDYFsFGOcuWXbzRg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 06/13] virtio-net: rq submits premapped per-buffer
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v7 0/2] Add the dwmac driver support for T-HEAD
+ TH1520 SoC
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173085843050.764350.5609116722213276708.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Nov 2024 02:00:30 +0000
+References: <20241103-th1520-gmac-v7-0-ef094a30169c@tenstorrent.com>
+In-Reply-To: <20241103-th1520-gmac-v7-0-ef094a30169c@tenstorrent.com>
+To: Drew Fustini <dfustini@tenstorrent.com>
+Cc: andrew@lunn.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org, conor+dt@kernel.org,
+ alexandre.torgue@foss.st.com, peppe.cavallaro@st.com, joabreu@synopsys.com,
+ mcoquelin.stm32@gmail.com, emil.renner.berthing@canonical.com,
+ jszhang@kernel.org, guoren@kernel.org, wefu@redhat.com,
+ paul.walmsley@sifive.com, palmer@dabbelt.com, aou@eecs.berkeley.edu,
+ andrew+netdev@lunn.ch, drew@pdp7.com, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-riscv@lists.infradead.org,
+ linux-stm32@st-md-mailman.stormreply.com, krzysztof.kozlowski@linaro.org
 
-On Tue, Nov 5, 2024 at 3:23=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
-m> wrote:
->
-> On Tue, 5 Nov 2024 11:23:50 +0800, Jason Wang <jasowang@redhat.com> wrote=
-:
-> > On Wed, Oct 30, 2024 at 4:25=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > virtio-net rq submits premapped per-buffer by setting sg page to NULL=
-;
-> > >
-> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > ---
-> > >  drivers/net/virtio_net.c | 24 +++++++++++++-----------
-> > >  1 file changed, 13 insertions(+), 11 deletions(-)
-> > >
-> > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-> > > index 792e9eadbfc3..09757fa408bd 100644
-> > > --- a/drivers/net/virtio_net.c
-> > > +++ b/drivers/net/virtio_net.c
-> > > @@ -542,6 +542,12 @@ static struct sk_buff *ptr_to_skb(void *ptr)
-> > >         return (struct sk_buff *)((unsigned long)ptr & ~VIRTIO_ORPHAN=
-_FLAG);
-> > >  }
-> > >
-> > > +static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32=
- len)
-> > > +{
-> > > +       sg->dma_address =3D addr;
-> > > +       sg->length =3D len;
-> >
-> > This may work but I think it's better to reuse existing dma sg helpers =
-like:
-> >
-> > sg_dma_address(sg) =3D addr;
-> > sg_dma_length(sg) =3D len;
-> >
-> > And we probably need to fix the virtio core which only uses
-> > sg_dma_address() but not sg_dma_length().
-> >
-> > This helps us to avoid future issues when CONFIG_NEED_SG_DMA_LENGTH is =
-set.
->
->
-> I don't think so.
->
-> For no-premapped mode, we pass the sg as no-dma sg to virtio core,
-> so the virtio core uses the sg->length directly.
+Hello:
 
-This is fine.
+This series was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-> If virtio core do dma map for sg, we do not use the dma_mag_sg_attrs(),
-> so we must use sg->length directly.
+On Sun, 03 Nov 2024 08:57:58 -0800 you wrote:
+> This series adds support for dwmac gigabit ethernet in the T-Head TH1520
+> RISC-V SoC used on boards like BeagleV Ahead and the LicheePi 4A.
+> 
+> The gigabit ethernet on these boards does need pinctrl support to mux
+> the necessary pads. The pinctrl-th1520 driver, pinctrl binding, and
+> related dts patches are in linux-next. However, they are not yet in
+> net-next/main.
+> 
+> [...]
 
-I meant it's a hack. It may work now but will be a bug in the future.
+Here is the summary with links:
+  - [net-next,v7,1/2] dt-bindings: net: Add T-HEAD dwmac support
+    https://git.kernel.org/netdev/net-next/c/f920ce04c399
+  - [net-next,v7,2/2] net: stmmac: Add glue layer for T-HEAD TH1520 SoC
+    https://git.kernel.org/netdev/net-next/c/33a1a01e3afa
 
-For example, I'm playing a prototype to do pre mapping for virtio-blk,
-the idea is to move the expensive DMA mappings in the case of swiotlb
-etc to be done outside the pre virtqueue lock. In that case, the
-driver may want to use dma_map_sg() instead of dma_map_page().
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-I'd suppose we will finally go with the way where DMA mappings needs
-to be handled by the driver, and dma_map_sg() is faster than per sg
-dma_map_page() anyhow.
-
->
-> In this case, for the driver, we can not use sg_dma_length(),
-> if CONFIG_NEED_SG_DMA_LENGTH is set, sg_dma_length() will set sg->dma_len=
-gth,
-> but virtio core use sg->length.
-
-Well, we just need a minor tweak to get the length from
-vring_map_one_sg(), then everything should be fine?
-
-if (sg_is_premapped) {
-      *addr =3D sg_dma_address(sg);
-      *len =3D sg_dma_len(sg);
-}
-
->
-> For sg->dma_address, it is ok for me to use sg_dma_address or not.
-> But for consistency to sg->length, I use the sg->dma_address directly.
->
-> I noticed this is special, so I put them into an independent function.
->
-> Thanks.
-
-Actually, the code like sg_fill_dma() calls for a virtqueue dma
-mapping helper, I think we've agreed that core needs to hide DMA
-details from the driver.  That is something like
-virtqueue_dma_map_sg() etc.
-
-Thanks
-
->
-> >
-> > Others look good.
-> >
-> > Thanks
-> >
-> > > +}
-> > > +
-> > >  static void __free_old_xmit(struct send_queue *sq, struct netdev_que=
-ue *txq,
-> > >                             bool in_napi, struct virtnet_sq_free_stat=
-s *stats)
-> > >  {
-> > > @@ -915,8 +921,7 @@ static void virtnet_rq_init_one_sg(struct receive=
-_queue *rq, void *buf, u32 len)
-> > >         addr =3D dma->addr - sizeof(*dma) + offset;
-> > >
-> > >         sg_init_table(rq->sg, 1);
-> > > -       rq->sg[0].dma_address =3D addr;
-> > > -       rq->sg[0].length =3D len;
-> > > +       sg_fill_dma(rq->sg, addr, len);
-> > >  }
-> > >
-> > >  static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gf=
-p_t gfp)
-> > > @@ -1068,12 +1073,6 @@ static void check_sq_full_and_disable(struct v=
-irtnet_info *vi,
-> > >         }
-> > >  }
-> > >
-> > > -static void sg_fill_dma(struct scatterlist *sg, dma_addr_t addr, u32=
- len)
-> > > -{
-> > > -       sg->dma_address =3D addr;
-> > > -       sg->length =3D len;
-> > > -}
-> > > -
-> > >  static struct xdp_buff *buf_to_xdp(struct virtnet_info *vi,
-> > >                                    struct receive_queue *rq, void *bu=
-f, u32 len)
-> > >  {
-> > > @@ -1354,7 +1353,8 @@ static int virtnet_add_recvbuf_xsk(struct virtn=
-et_info *vi, struct receive_queue
-> > >                 sg_init_table(rq->sg, 1);
-> > >                 sg_fill_dma(rq->sg, addr, len);
-> > >
-> > > -               err =3D virtqueue_add_inbuf(rq->vq, rq->sg, 1, xsk_bu=
-ffs[i], gfp);
-> > > +               err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg,=
- 1, xsk_buffs[i],
-> > > +                                                   NULL, true, gfp);
-> > >                 if (err)
-> > >                         goto err;
-> > >         }
-> > > @@ -2431,7 +2431,8 @@ static int add_recvbuf_small(struct virtnet_inf=
-o *vi, struct receive_queue *rq,
-> > >
-> > >         virtnet_rq_init_one_sg(rq, buf, vi->hdr_len + GOOD_PACKET_LEN=
-);
-> > >
-> > > -       err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, =
-gfp);
-> > > +       err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf,=
- ctx,
-> > > +                                           rq->do_dma, gfp);
-> > >         if (err < 0) {
-> > >                 if (rq->do_dma)
-> > >                         virtnet_rq_unmap(rq, buf, 0);
-> > > @@ -2546,7 +2547,8 @@ static int add_recvbuf_mergeable(struct virtnet=
-_info *vi,
-> > >         virtnet_rq_init_one_sg(rq, buf, len);
-> > >
-> > >         ctx =3D mergeable_len_to_ctx(len + room, headroom);
-> > > -       err =3D virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, =
-gfp);
-> > > +       err =3D virtqueue_add_inbuf_premapped(rq->vq, rq->sg, 1, buf,=
- ctx,
-> > > +                                           rq->do_dma, gfp);
-> > >         if (err < 0) {
-> > >                 if (rq->do_dma)
-> > >                         virtnet_rq_unmap(rq, buf, 0);
-> > > --
-> > > 2.32.0.3.g01195cf9f
-> > >
-> >
->
 
 
