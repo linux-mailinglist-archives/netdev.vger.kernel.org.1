@@ -1,87 +1,92 @@
-Return-Path: <netdev+bounces-142242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8842D9BDF74
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:33:34 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30189BDF81
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:37:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A6800B23128
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:33:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77FED2851F1
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97EB9193073;
-	Wed,  6 Nov 2024 07:33:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2434B1CCEE6;
+	Wed,  6 Nov 2024 07:37:38 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bPCGUco4"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="d3pD076H"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4D73145B14
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:33:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C12901CF2A5
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 07:37:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730878408; cv=none; b=c4tIAwYo8cgcGhokFi30mnS2y+4fE92sfknXeXETFWxr0RZuVv4+lEr5wZvSYMSo8NwXWScpcAMEHzVaqr/BlTa68uFUGc+ijJ/YmSvSfGPm6DYsdqjaWsQ9SI7esXQCJx3Ydbyf54F+Ds5v6mHYBiLYRUcRmnbZYF8WCh+JVmo=
+	t=1730878658; cv=none; b=hklqpoUK1KRVLZNlArISaOHy5TcVhuq4mIW97sFwg2uxiSP8IOWyFn9D4+KOotfG6Z/DJRJ69G0mirgifhRfeXGLHfeuEf6xJ3y6+GiQILDMwbGTrrbntUUagNlg8jdhsGca0ysifo3fP80M690Ic3kMPEUh6QJg5IkEdoU/jN8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730878408; c=relaxed/simple;
-	bh=33aKOFG3TZuLLl1fcejK3AuJF9J2u973ZT6qcLpNFXE=;
+	s=arc-20240116; t=1730878658; c=relaxed/simple;
+	bh=+CtSBqOOwTGniuZBGFfMv5NkBJPfqlQQudSVQJ8OF1I=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oQccdTroxOQMKlNNyX1ZF0D44EhMIOc6seHQdyepppXfwkSZ4skhFyF6YIgyjFosSRcHk7nKyiZgTzauF52s/1SKkmzGgR3Ivs3nPib59quezeLv4gIK9AD24+cP+7OKk8IIWmE/2lIFqBIcw6qGbYJbfTZRzetDEhKCBwoPMbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bPCGUco4; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=rjA7gy0mXDzFN/8oQMV+TMik1gQTBP6rOhQakDBhSC6i0XUvDET8ow6oP/1jDFpGIqDYGnZ1rrfEw5ZLfhHpq2UsCNMPMVhEKqcC94+mz+ECBr9irdO+nhSxw16tVr5565fDzG55BtP3iw6yErHclqIuYaaFoPVQsv9wbphPc3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=d3pD076H; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730878406;
+	s=mimecast20190719; t=1730878653;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=tFJLAGQHtCF4YbMkyw4tzz7KxDHd+W5Q6WXk9sFF0eA=;
-	b=bPCGUco44BVSeCfRQF6t1EIxV6P3SOkr/t8Oidsg1L1Mas/i7IFa1cv0Q1l+qLzaZ1nqWS
-	oOu784iI+8nxpT2cSl6a9TcGyJc56l8GAdbuqQfCV8dkog4cJuc6RecC6nlub05dNgiOdC
-	BTrmqO/psuDT6kDm74OBvdKle+Co37I=
-Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
- [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=3b9DjNcKsvHggFiK5mPA65X9tuneBxWXZg7PBVA6jZ0=;
+	b=d3pD076H6w687dg91cEU9QJMSnzQ/XGdNGN/uzy3IW0CMcaW2LEX51l9zc8gzEX4+Ajeqe
+	vwfBtaBWPFZG8fIeAztMAtmNIKiZb/VTTm27bE21c9W9UrWPGJuWMnfzBC/IenP+RvLBUB
+	0VfkNrKW386OB10XzwzlCXeDp+4SaS0=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-541-0XHWnKhdNgqruPuZHu4nSQ-1; Wed, 06 Nov 2024 02:33:24 -0500
-X-MC-Unique: 0XHWnKhdNgqruPuZHu4nSQ-1
-Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-43157cff1d1so46692045e9.2
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 23:33:24 -0800 (PST)
+ us-mta-458-Arv-ypi_MwycA8rdcCyOQQ-1; Wed, 06 Nov 2024 02:37:32 -0500
+X-MC-Unique: Arv-ypi_MwycA8rdcCyOQQ-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-539e4cd976dso3951414e87.0
+        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 23:37:32 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730878403; x=1731483203;
+        d=1e100.net; s=20230601; t=1730878651; x=1731483451;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=tFJLAGQHtCF4YbMkyw4tzz7KxDHd+W5Q6WXk9sFF0eA=;
-        b=VTSpqyZloG8qTQpOwZd0HYQ2Tl/fNucjGyb+ZnSrcv9AHMkX/WNJGJ+9QnUwV4Ue3i
-         7Ig0BTZlHhmfcqbYbyIUF+yF6z46O8xI96sVXsGNdwAHtrThm5OPxXGfLEtjWgBCS5co
-         UV65xPBJF9zywZV7zHKvMjbfoL0ftSMAX8IDLzgZMM+1du+5Tdab1hxgwEDN7GQl0yYf
-         kxYRbAU86ptuv90IsdAE8AcIS8D6yVZdP/Ry/ldULD39xuTi3pShOfFw1+asyXuqop9q
-         jNFfCqLnvwnjP7GlE0IMfWzYRgdpRix3fbo42J12OnpriOX2O35dvnYPYVyq1wT1gnLA
-         3VRw==
-X-Forwarded-Encrypted: i=1; AJvYcCVRt+1Gd9nE0yoTBHEfvNXb1mgMDjpnJvYj0FsZ8sSYp/9NzV0wwjl+VZM9UFZZJYO50uS2udg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxNcyueySId7MQyXgojqn/4UTrnzzsH79WVNpIhLuHkcv6Az+86
-	r22a2E9eT40wueoEbr8yV1RidsQ1GEHX64CD3Qlkh0icHXecHmjD4GVPFOGZsDGgSk46Ly5SCzH
-	tBiQfFT2y2jVeHR5EDST+S3AwXlBenXbL+wFp7EZwILFcw4Ztd7aXIg==
-X-Received: by 2002:a05:600c:1f91:b0:426:66a2:b200 with SMTP id 5b1f17b1804b1-4327b6c79f7mr206065255e9.0.1730878403597;
-        Tue, 05 Nov 2024 23:33:23 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IG/ntsLATwJkkyCIm9/l8825ZGF3r9/sWcOfHZUV3jZ4XNMPDEncs1UxJK3Vl0G5wdr3PGgfQ==
-X-Received: by 2002:a05:600c:1f91:b0:426:66a2:b200 with SMTP id 5b1f17b1804b1-4327b6c79f7mr206065085e9.0.1730878403275;
-        Tue, 05 Nov 2024 23:33:23 -0800 (PST)
+        bh=3b9DjNcKsvHggFiK5mPA65X9tuneBxWXZg7PBVA6jZ0=;
+        b=oY0XeKtsM0QHZ5jVceDM3O980PaEnZsPwGwhWTdCECWr31+6kIkajxETREXbUZ60v+
+         NkjFIXWx6eiMDB6j/68X0thdMq2+gcmH4cQkKFrnlGZl662Sto4AJXjpsc4jSZ1Ua+Vo
+         vTBJ0XpwDU38ZHpM1YXbh+L7y5HErUWhC/Ag/WXpXAD4524dPuiGqm6OYUoG/RYidqRP
+         nXVCAetH0vDs1LPtKMZRoUDlrP9jzligvbMkqRqeiJFm9v9bzfN7O5fU+cQ9EV4vgGb/
+         nQkXuVo44IxJV0nzBPfz49IuXnDfTIh0esFyn4wOjiBduWOto8R4+MSx2rt+37Y4fIxR
+         7y3w==
+X-Gm-Message-State: AOJu0YxOIiI7NVmHs7uJmD4OjKdryVjsfYfHEFeYjFJJBldf8yDu+kQ6
+	Wj4GRdZOqW9B6/07TBzqTJdh7xf8WKxQynrA9n7k28ZNRCQQKgVUnRc2azS5scMEpsMiuc/FGgY
+	ZWC611kDXH1Z4xyCEGw52rGVK/T8WKm/5TXu+3J7qJ5n30/b3WBsD2w==
+X-Received: by 2002:a05:6512:3e1a:b0:539:ff5a:7ea5 with SMTP id 2adb3069b0e04-53b7ecdea88mr14128867e87.15.1730878650729;
+        Tue, 05 Nov 2024 23:37:30 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEwCBjxiu1G/SKVTKOlKOM1yVJqE1E31OlP/gMIsuEKkuBQuCgqbk1xFr6rvbgFnjhDdmMD3g==
+X-Received: by 2002:a05:6512:3e1a:b0:539:ff5a:7ea5 with SMTP id 2adb3069b0e04-53b7ecdea88mr14128840e87.15.1730878650209;
+        Tue, 05 Nov 2024 23:37:30 -0800 (PST)
 Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa52e658sm12280525e9.0.2024.11.05.23.33.21
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa5b5b7fsm12425795e9.4.2024.11.05.23.37.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 05 Nov 2024 23:33:22 -0800 (PST)
-Date: Wed, 6 Nov 2024 02:33:19 -0500
+        Tue, 05 Nov 2024 23:37:29 -0800 (PST)
+Date: Wed, 6 Nov 2024 02:37:24 -0500
 From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Cindy Lu <lulu@redhat.com>
-Cc: jasowang@redhat.com, michael.christie@oracle.com, sgarzare@redhat.com,
-	linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v3 7/9] vhost: Add new UAPI to support change to task mode
-Message-ID: <20241106023302-mutt-send-email-mst@kernel.org>
-References: <20241105072642.898710-1-lulu@redhat.com>
- <20241105072642.898710-8-lulu@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, Si-Wei Liu <si-wei.liu@oracle.com>,
+	Darren Kenny <darren.kenny@oracle.com>
+Subject: Re: [PATCH net-next v1 1/4] virtio-net: fix overflow inside
+ virtnet_rq_alloc
+Message-ID: <20241106023609-mutt-send-email-mst@kernel.org>
+References: <20241029084615.91049-1-xuanzhuo@linux.alibaba.com>
+ <20241029084615.91049-2-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -90,24 +95,82 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241105072642.898710-8-lulu@redhat.com>
+In-Reply-To: <20241029084615.91049-2-xuanzhuo@linux.alibaba.com>
 
-On Tue, Nov 05, 2024 at 03:25:26PM +0800, Cindy Lu wrote:
-> index b95dd84eef2d..1e192038633d 100644
-> --- a/include/uapi/linux/vhost.h
-> +++ b/include/uapi/linux/vhost.h
-> @@ -235,4 +235,6 @@
->   */
->  #define VHOST_VDPA_GET_VRING_SIZE	_IOWR(VHOST_VIRTIO, 0x82,	\
->  					      struct vhost_vring_state)
+On Tue, Oct 29, 2024 at 04:46:12PM +0800, Xuan Zhuo wrote:
+> When the frag just got a page, then may lead to regression on VM.
+> Specially if the sysctl net.core.high_order_alloc_disable value is 1,
+> then the frag always get a page when do refill.
+> 
+> Which could see reliable crashes or scp failure (scp a file 100M in size
+> to VM).
+> 
+> The issue is that the virtnet_rq_dma takes up 16 bytes at the beginning
+> of a new frag. When the frag size is larger than PAGE_SIZE,
+> everything is fine. However, if the frag is only one page and the
+> total size of the buffer and virtnet_rq_dma is larger than one page, an
+> overflow may occur.
+> 
+> The commit f9dac92ba908 ("virtio_ring: enable premapped mode whatever
+> use_dma_api") introduced this problem. And we reverted some commits to
+> fix this in last linux version. Now we try to enable it and fix this
+> bug directly.
+> 
+> Here, when the frag size is not enough, we reduce the buffer len to fix
+> this problem.
+> 
+> Reported-by: "Si-Wei Liu" <si-wei.liu@oracle.com>
+> Tested-by: Darren Kenny <darren.kenny@oracle.com>
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+
+This one belongs in net I feel. However, patches 2 and on
+depend on it not to cause regressions. So I suggest merging it
+on both branches, git will figure out the conflict I think.
+
+
+> ---
+>  drivers/net/virtio_net.c | 12 +++++++++---
+>  1 file changed, 9 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 792e9eadbfc3..d50c1940eb23 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -926,9 +926,6 @@ static void *virtnet_rq_alloc(struct receive_queue *rq, u32 size, gfp_t gfp)
+>  	void *buf, *head;
+>  	dma_addr_t addr;
+>  
+> -	if (unlikely(!skb_page_frag_refill(size, alloc_frag, gfp)))
+> -		return NULL;
+> -
+>  	head = page_address(alloc_frag->page);
+>  
+>  	if (rq->do_dma) {
+> @@ -2423,6 +2420,9 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+>  	len = SKB_DATA_ALIGN(len) +
+>  	      SKB_DATA_ALIGN(sizeof(struct skb_shared_info));
+>  
+> +	if (unlikely(!skb_page_frag_refill(len, &rq->alloc_frag, gfp)))
+> +		return -ENOMEM;
 > +
-> +#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, bool)
-
-
-set with no get is also not great.
-
->  #endif
+>  	buf = virtnet_rq_alloc(rq, len, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
+> @@ -2525,6 +2525,12 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+>  	 */
+>  	len = get_mergeable_buf_len(rq, &rq->mrg_avg_pkt_len, room);
+>  
+> +	if (unlikely(!skb_page_frag_refill(len + room, alloc_frag, gfp)))
+> +		return -ENOMEM;
+> +
+> +	if (!alloc_frag->offset && len + room + sizeof(struct virtnet_rq_dma) > alloc_frag->size)
+> +		len -= sizeof(struct virtnet_rq_dma);
+> +
+>  	buf = virtnet_rq_alloc(rq, len + room, gfp);
+>  	if (unlikely(!buf))
+>  		return -ENOMEM;
 > -- 
-> 2.45.0
+> 2.32.0.3.g01195cf9f
 
 
