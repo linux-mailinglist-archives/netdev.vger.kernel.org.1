@@ -1,110 +1,87 @@
-Return-Path: <netdev+bounces-142461-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B3E89BF436
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:21:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29C7D9BF418
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:13:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AB2D1C23956
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:21:14 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A64EEB256ED
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:13:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CCD206948;
-	Wed,  6 Nov 2024 17:21:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86E452071FE;
+	Wed,  6 Nov 2024 17:12:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Z2baZQ8X"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GFXjOsN2"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938A4204F96
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:20:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E2C320651A;
+	Wed,  6 Nov 2024 17:12:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730913660; cv=none; b=QT3KpOtIorwXKH4rxfBjfBdvtXNBmdHVbgEho+1vT3KoIwdxQgkXQdIm4uoA2RBA0Stez6t63OEeHyA5awP1gBAMYx4cS2GjIs9xjKTlP7I72LA6EJSVzJITc1C/qzTrEYCQQ5OO/GlrDtKRPWfyZYSxjFyxwaj/RAI/y+MVvJI=
+	t=1730913179; cv=none; b=nNWgtrjIokWvSdUnbujlVSm0tj9KxBK9gbDTwoBu6Yi3Bp2yK5AGUfflGk+K3zJrG09NbmOlmBQvVAxF/xIqtNpfITmlOBs9nLZCbfPE/gbPpAlqMncCXEw7XRn4YwTrCOEnjflddGaRcE2mOAlaIDLuZ3Lixpr/msBnOv36G0Q=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730913660; c=relaxed/simple;
-	bh=39Cga9ndd7E5bChWBJmBEX/nr1Ku5Bbk888NF34tLGY=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=D56yZYnYe4i0/RKLlR5suhIY5v2b66wg8/xVjPiMfcBDeV73PvdSx2FIo+sHCPv8LsLI9Y83qnAG+xyExUEZqPQ5u2HUsrCrIkutk+aSJY7x3a9EWnWz8N8+JycORmBP7xD5r+fs2KPnzLcQ5w1o1pri5O2tFPZWpgGREyVXxNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Z2baZQ8X; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e4244fdc6so5553903b3a.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 09:20:58 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730913658; x=1731518458; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VaY2V4yeJYV0Wgd27pMihOqHFdjjKIapxqVymzwPFp4=;
-        b=Z2baZQ8XEmUJjbQ3UkXF57XTfN91eNQEz5GzybWgg85fTkDuE+qExSxiQw+ilhn7Xf
-         huhos9uwxMlBHjzNxSE8Ce9MYsC3mK2NF8mCxg8Ikwfinj1fBUKcCiq8j3rHYLgZ89uh
-         Jm4271Aid7QEip/3GVOR+N7fgNyeBiSa9q4g5aOyH/jgHnvSJLadN1PuFd+cALBQ1eU9
-         9oozZ8KOz42q/bShm2uxAVp+thn/IUr+0yhjHoYiFqCFGxrfJ/jdMai2mWtHDYa2Iy7j
-         u0J2NgcWFtH695SY4yRtFpTe53PR+jzfTyU/1mxi1nt0iQUgsWl8uQhF2dgVJYQCOkjn
-         ANEA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730913658; x=1731518458;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VaY2V4yeJYV0Wgd27pMihOqHFdjjKIapxqVymzwPFp4=;
-        b=c/9bekPz9ytAUNXvphxWrJBXLscJ6GUV+xQP7BUfwhoidmQ/N08QUmv+PMH2B/Ow9L
-         6+0LYdlRJTs+M86tMkQ/RNCfg1f98HdVnP7u4Gn7jhnhX8l01iobU2b0I5mWIGCeZGQI
-         WezFYU6NIjyJ7yBSeVsnkYIkEsPvbSo4L8dBHY2faTVEI4bf+710+0CoeWrx/T3xz7H+
-         n0pyrTacrcFyFPKlNeUaBs9ADr2hie/nGObCwy+Rz7wER+DYhx1rQCAAqc08vPcykAVp
-         LtlI7qFAMnq+WYtMz6jn5h+IwPRATrH5OLwHTHlZ40usBwHnUwW2B/Mh2ybEK8H/XaBw
-         FcSw==
-X-Gm-Message-State: AOJu0Yz/SoEYP+QV3MMioYR3Pg8ozNEmytK0m46Ilq5IwUqKNbblS0dM
-	gKbKxvh/QOInonph95lqlRvytCfnjPwSZKt0gdcCebobBuATOOzCJXCJ4885Tf0=
-X-Google-Smtp-Source: AGHT+IGtmPB1rlYfNUE9uX639gAH+GE5QcXH9TVy24CybVQU6ZZZfxvmv3USg2O5+DV45mYUDS83Jg==
-X-Received: by 2002:aa7:88c8:0:b0:71d:fe5b:5eb9 with SMTP id d2e1a72fcca58-720c98d32d5mr29849705b3a.10.1730913656457;
-        Wed, 06 Nov 2024 09:20:56 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e5717sm12006191b3a.54.2024.11.06.09.20.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 09:20:56 -0800 (PST)
-Date: Wed, 6 Nov 2024 09:10:46 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Bjarni Ingi Gislason <bjarniig@simnet.is>
-Cc: netdev@vger.kernel.org
-Subject: Re: dcb-pfc.8: some remarks and editorial changes for this manual
-Message-ID: <20241106091046.2a62f196@hermes.local>
-In-Reply-To: <ZyrAxcsS04ppanYT@kassi.invalid.is>
-References: <ZyrAxcsS04ppanYT@kassi.invalid.is>
+	s=arc-20240116; t=1730913179; c=relaxed/simple;
+	bh=TJ8k3mCggEOeNdf46pEjfuifIThabvQ7xAOUebYtnhQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=Yl/5kAySkFR4y4ljEJKYv+zyPHDbDM+hAyrOsQtC/7oeorVY7LB0yJuXIIlF8Sbsmuvs3/ykxUilzoM0Jb+LgHmOBqOQOrRNXNNA//koEnqawPbzuzLuAuhHfut2MwMxFON5bYli4lXps7qiRos7K+ELJ6a03u4UXS+8f2AuK2s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GFXjOsN2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8F5F7C4CEC6;
+	Wed,  6 Nov 2024 17:12:58 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730913178;
+	bh=TJ8k3mCggEOeNdf46pEjfuifIThabvQ7xAOUebYtnhQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:From;
+	b=GFXjOsN2J8icjY3vS2+wkJgieDisOOZ+NKfEGqjNgMoDZ6uKErMucXSzMAdDZIoaH
+	 YSVnIJi4oyz90j8KTq3hzpbLMso/IONUBj+qZJ03kq8UHdNNed6i+BaVFQBDECdrM+
+	 SDxmmbp3pe84qstIeftQTPKmAnHGVafhyXV5Iv6TpNBnpme04zLibSQCROwUSRDodA
+	 gcY/w26YP7tOEar+IkwwIDR9zyKuspBsKwLOJq68nn3SuTHsoe+wPt7ahtWrVjFNiC
+	 esJfImPYD4LsU8u3aWHxBcN43PgzIO6+vr8+5H5XPi4bB3ccu6Zhz+UoI0rVu/ZWuJ
+	 Znia/LLl84cZg==
+Date: Wed, 6 Nov 2024 11:12:57 -0600
+From: Bjorn Helgaas <helgaas@kernel.org>
+To: Leon Romanovsky <leon@kernel.org>
+Cc: Sanman Pradhan <sanman.p211993@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>, netdev@vger.kernel.org,
+	alexanderduyck@fb.com, kuba@kernel.org, kernel-team@meta.com,
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+	horms@kernel.org, corbet@lwn.net, mohsin.bashr@gmail.com,
+	sanmanpradhan@meta.com, andrew+netdev@lunn.ch,
+	vadim.fedorenko@linux.dev, jdamato@fastly.com, sdf@fomichev.me,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-pci@vger.kernel.org
+Subject: Re: [PATCH net-next] eth: fbnic: Add PCIe hardware statistics
+Message-ID: <20241106171257.GA1529850@bhelgaas>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106122251.GC5006@unreal>
 
-On Wed, 6 Nov 2024 01:05:09 +0000
-Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
+On Wed, Nov 06, 2024 at 02:22:51PM +0200, Leon Romanovsky wrote:
+> On Tue, Nov 05, 2024 at 04:26:25PM -0800, Sanman Pradhan wrote:
+> > Add PCIe hardware statistics support to the fbnic driver. These stats
+> > provide insight into PCIe transaction performance and error conditions,
+> > including, read/write and completion TLP counts and DWORD counts and
+> > debug counters for tag, completion credit and NP credit exhaustion
+> > 
+> > The stats are exposed via ethtool and can be used to monitor PCIe
+> > performance and debug PCIe issues.
+> 
+> And how does PCIe statistics belong to ethtool?
+> 
+> This PCIe statistics to debug PCIe errors and arguably should be part of
+> PCI core and not hidden in netdev tool.
 
->   The man page is from Debian:
-> 
-> Package: iproute2
-> Version: 6.11.0-1
-> Severity: minor
-> Tags: patch
-> 
->   Improve the layout of the man page according to the "man-page(7)"
-> guidelines, the output of "mandoc -lint T", the output of
-> "groff -mandoc -t -ww -b -z", that of a shell script, and typographical
-> conventions.
-> 
-> -.-
-> 
->   Output from a script "chk_man" is in the attachment.
-> 
-> -.-
-> 
-> Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+How would this be done in the PCI core?  As far as I can tell, all
+these registers are device-specific and live in some device BAR.
 
-Is the last of the dcb man changes?
+Bjorn
 
