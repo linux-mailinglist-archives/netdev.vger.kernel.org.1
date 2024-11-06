@@ -1,188 +1,110 @@
-Return-Path: <netdev+bounces-142458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 48BB19BF3D2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:00:37 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3E89BF436
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:21:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39C361C235C3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:00:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AB2D1C23956
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:21:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 843EB1DEFE7;
-	Wed,  6 Nov 2024 17:00:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65CCD206948;
+	Wed,  6 Nov 2024 17:21:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Fv8908II"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Z2baZQ8X"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67FA3166307
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:00:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 938A4204F96
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:20:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730912431; cv=none; b=pcUsdsbzb/lenUmAKh1NXmxouYfZMG9z3UdMsVt3FGbwrQNS4DQdJIfyU1vGYpRXD3iEDRSs70xwUwYzVAtO+Jp4/SdvF9whRNkBBW1fSFYBgCi9TNPXws/TL8JG/FLp/ptFM5RxSPB9HTa8xKmJYo58N2vjHEu9OWsHIkkwGPo=
+	t=1730913660; cv=none; b=QT3KpOtIorwXKH4rxfBjfBdvtXNBmdHVbgEho+1vT3KoIwdxQgkXQdIm4uoA2RBA0Stez6t63OEeHyA5awP1gBAMYx4cS2GjIs9xjKTlP7I72LA6EJSVzJITc1C/qzTrEYCQQ5OO/GlrDtKRPWfyZYSxjFyxwaj/RAI/y+MVvJI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730912431; c=relaxed/simple;
-	bh=M0P7cs84jjZ9MZPgSMNMZ4jFY7gU+GyjBVnr9jmkpNE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Sv8t+j6Mh6LRI2/CLkDtWzJOK6aYQ0S/dRnn9mPE8Ln/52nTw4WRRhjDVXNw+yrzTgWzb4/DnpSJN4H7n08tswv6DV0YfmYmBMnTQOTak108q2+6Y5WezR/cQytheMxSoYACAAfokuQYzpApPkVi06Y/qrNalFzaqQINRTAvMRk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Fv8908II; arc=none smtp.client-ip=209.85.221.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-37d55f0cf85so4707466f8f.3
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 09:00:28 -0800 (PST)
+	s=arc-20240116; t=1730913660; c=relaxed/simple;
+	bh=39Cga9ndd7E5bChWBJmBEX/nr1Ku5Bbk888NF34tLGY=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=D56yZYnYe4i0/RKLlR5suhIY5v2b66wg8/xVjPiMfcBDeV73PvdSx2FIo+sHCPv8LsLI9Y83qnAG+xyExUEZqPQ5u2HUsrCrIkutk+aSJY7x3a9EWnWz8N8+JycORmBP7xD5r+fs2KPnzLcQ5w1o1pri5O2tFPZWpgGREyVXxNU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Z2baZQ8X; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e4244fdc6so5553903b3a.0
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 09:20:58 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730912427; x=1731517227; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730913658; x=1731518458; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=BLNouObUorCzJ6AkcXYcYQkgJBmZc32SGAGNMMbQIqo=;
-        b=Fv8908IIWKbmy2IzdZhM+rXLzKQDIh35Pyg+zUqFd1hp+8/KaQM0B/BbcvgEx0X9tb
-         LMrDs+HRM1Amudb7fo19JACipRDY0poa96ro0fZyNNgZUl8EzI8IO8b3oHkfH/4JLOFu
-         svnavBQ6kbRqydpZycJyzmaNY0FTehqW0ZUIfHb5MVGkTGag5O6p2Kq4/EGJgY0D1WjH
-         q19PSr9Sv6vPwr2QUsk6ew8yRPoKCaa8kRUTiwkHO2pmklPG9wL44uQcohz55pfjh6ep
-         GZpsJekj1kOGIIbrpALXxQiDqgd+oWVqh7WdHYTfdM+sj9PzZfWx7J5d0pMXpw1Y/Yku
-         tmpA==
+        bh=VaY2V4yeJYV0Wgd27pMihOqHFdjjKIapxqVymzwPFp4=;
+        b=Z2baZQ8XEmUJjbQ3UkXF57XTfN91eNQEz5GzybWgg85fTkDuE+qExSxiQw+ilhn7Xf
+         huhos9uwxMlBHjzNxSE8Ce9MYsC3mK2NF8mCxg8Ikwfinj1fBUKcCiq8j3rHYLgZ89uh
+         Jm4271Aid7QEip/3GVOR+N7fgNyeBiSa9q4g5aOyH/jgHnvSJLadN1PuFd+cALBQ1eU9
+         9oozZ8KOz42q/bShm2uxAVp+thn/IUr+0yhjHoYiFqCFGxrfJ/jdMai2mWtHDYa2Iy7j
+         u0J2NgcWFtH695SY4yRtFpTe53PR+jzfTyU/1mxi1nt0iQUgsWl8uQhF2dgVJYQCOkjn
+         ANEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730912427; x=1731517227;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1730913658; x=1731518458;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=BLNouObUorCzJ6AkcXYcYQkgJBmZc32SGAGNMMbQIqo=;
-        b=djBGo7axRPfH43tT8C2youoOi97QSG86qACKFnkkKoMNjkbSKwtrOTbMu1c9dpONdY
-         3AEvjGCA7/AHzWBNwypmsaPGUJi721HBkejSBkG2c/DMWlhaPCVsZK/bz7wfryk4yd6r
-         uhNjFrr6hJt6h2tL92htZE1ShNKB80Jfkbz53ro1zcvk9e2+YUyqzUGXLpV6B+Zoco+S
-         WYfPFgvqZtbA84Y2uQ1Ggu9cEedcWsjieRf3sF0qGkrUDjLIulIA7fwWcO1ok7WvG10U
-         xQwJD6/Pn1ldVbM3Xmp8MOcrd/J+H24JPtrm9Ok1KR1Yx8nCvbRH5f804Gh/CfA3in+p
-         h23A==
-X-Forwarded-Encrypted: i=1; AJvYcCUj4SS0RdkxQHsOwMKwQWc6bCi0Ch08H3v7RJrYLDzX7gJ94mIroYgBSRJkI4B2Vtps7ybw5IU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwQ4nrMGNsFdmNGrvyN23DLZzo2eEqi+DdS5xqxej/Tf2lmcnab
-	7Bh6GMcainIgynGgkvzKaV7KKc+exOPMXHahVDKDzQRNc9aSwG0TKZW/HmLRlW2Pqb0odgYueYi
-	DJrHdZNAAhIW22OF0K1bW+J93hfazUFYCaUOL
-X-Google-Smtp-Source: AGHT+IHrnx1TLzKwmMZlGwZeX1FBkou/Z8ONAtZQvMq43XEgpy8Y8EBDJpgktHzfFZkFyumWTNC5i3EASlSIUyX9odk=
-X-Received: by 2002:a5d:59a2:0:b0:37d:5129:f454 with SMTP id
- ffacd0b85a97d-381be776c81mr20504534f8f.15.1730912426398; Wed, 06 Nov 2024
- 09:00:26 -0800 (PST)
+        bh=VaY2V4yeJYV0Wgd27pMihOqHFdjjKIapxqVymzwPFp4=;
+        b=c/9bekPz9ytAUNXvphxWrJBXLscJ6GUV+xQP7BUfwhoidmQ/N08QUmv+PMH2B/Ow9L
+         6+0LYdlRJTs+M86tMkQ/RNCfg1f98HdVnP7u4Gn7jhnhX8l01iobU2b0I5mWIGCeZGQI
+         WezFYU6NIjyJ7yBSeVsnkYIkEsPvbSo4L8dBHY2faTVEI4bf+710+0CoeWrx/T3xz7H+
+         n0pyrTacrcFyFPKlNeUaBs9ADr2hie/nGObCwy+Rz7wER+DYhx1rQCAAqc08vPcykAVp
+         LtlI7qFAMnq+WYtMz6jn5h+IwPRATrH5OLwHTHlZ40usBwHnUwW2B/Mh2ybEK8H/XaBw
+         FcSw==
+X-Gm-Message-State: AOJu0Yz/SoEYP+QV3MMioYR3Pg8ozNEmytK0m46Ilq5IwUqKNbblS0dM
+	gKbKxvh/QOInonph95lqlRvytCfnjPwSZKt0gdcCebobBuATOOzCJXCJ4885Tf0=
+X-Google-Smtp-Source: AGHT+IGtmPB1rlYfNUE9uX639gAH+GE5QcXH9TVy24CybVQU6ZZZfxvmv3USg2O5+DV45mYUDS83Jg==
+X-Received: by 2002:aa7:88c8:0:b0:71d:fe5b:5eb9 with SMTP id d2e1a72fcca58-720c98d32d5mr29849705b3a.10.1730913656457;
+        Wed, 06 Nov 2024 09:20:56 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e5717sm12006191b3a.54.2024.11.06.09.20.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 09:20:56 -0800 (PST)
+Date: Wed, 6 Nov 2024 09:10:46 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Bjarni Ingi Gislason <bjarniig@simnet.is>
+Cc: netdev@vger.kernel.org
+Subject: Re: dcb-pfc.8: some remarks and editorial changes for this manual
+Message-ID: <20241106091046.2a62f196@hermes.local>
+In-Reply-To: <ZyrAxcsS04ppanYT@kassi.invalid.is>
+References: <ZyrAxcsS04ppanYT@kassi.invalid.is>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241106155509.1706965-1-omosnace@redhat.com> <CANn89iKag19EPvnQRthsG98pfjriRwtS+YND0359xFijGAoEYg@mail.gmail.com>
- <CAFqZXNumyhpRvrZ6mAK9OVxbte=_3MG195i_+Z1j79PsE=6k_g@mail.gmail.com>
-In-Reply-To: <CAFqZXNumyhpRvrZ6mAK9OVxbte=_3MG195i_+Z1j79PsE=6k_g@mail.gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Wed, 6 Nov 2024 18:00:14 +0100
-Message-ID: <CANn89iJj2sQX3rZvmbL0zQjX7K-OFwyautgAXqxNvk2M17++bw@mail.gmail.com>
-Subject: Re: [PATCH] selinux,xfrm: fix dangling refcount on deferred skb free
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: Paul Moore <paul@paul-moore.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, selinux@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 6, 2024 at 5:54=E2=80=AFPM Ondrej Mosnacek <omosnace@redhat.com=
-> wrote:
->
-> On Wed, Nov 6, 2024 at 5:13=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Wed, Nov 6, 2024 at 4:55=E2=80=AFPM Ondrej Mosnacek <omosnace@redhat=
-.com> wrote:
-> > >
-> > > SELinux tracks the number of allocated xfrm_state/xfrm_policy objects
-> > > (via the selinux_xfrm_refcount variable) as an input in deciding if p=
-eer
-> > > labeling should be used.
-> > >
-> > > However, as a result of commits f35f821935d8 ("tcp: defer skb freeing
-> > > after socket lock is released") and 68822bdf76f1 ("net: generalize sk=
-b
-> > > freeing deferral to per-cpu lists"), freeing of a sk_buff object, whi=
-ch
-> > > may hold a reference to an xfrm_state object, can be deferred for
-> > > processing on another CPU core, so even after xfrm_state is deleted f=
-rom
-> > > the configuration by userspace, the refcount isn't decremented until =
-the
-> > > deferred freeing of relevant sk_buffs happens. On a system with many
-> > > cores this can take a very long time (even minutes or more if the sys=
-tem
-> > > is not very active), leading to peer labeling being enabled for much
-> > > longer than expected.
-> > >
-> > > Fix this by moving the selinux_xfrm_refcount decrementing to just aft=
-er
-> > > the actual deletion of the xfrm objects rather than waiting for the
-> > > freeing to happen. For xfrm_policy it currently doesn't seem to be
-> > > necessary, but let's do the same there for consistency and
-> > > future-proofing.
-> > >
-> > > We hit this issue on a specific aarch64 256-core system, where the
-> > > sequence of unix_socket/test and inet_socket/tcp/test from
-> > > selinux-testsuite [1] would quite reliably trigger this scenario, and=
- a
-> > > subsequent sctp/test run would then stumble because the policy for th=
-at
-> > > test misses some rules that would make it work under peer labeling
-> > > enabled (namely it was getting the netif::egress permission denied in
-> > > some of the test cases).
-> > >
-> > > [1] https://github.com/SELinuxProject/selinux-testsuite/
-> > >
-> > > Fixes: f35f821935d8 ("tcp: defer skb freeing after socket lock is rel=
-eased")
-> > > Fixes: 68822bdf76f1 ("net: generalize skb freeing deferral to per-cpu=
- lists")
-> > > Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> > > ---
-> >
-> > Can we explain why TCP packets sitting in TCP receive queues would
-> > need to keep xfrm_state around ?
-> >
-> > With thousands of TCP sockets. I would imagine that a similar issue
-> > would be hit,
-> > regardless of f35f821935d8 ("tcp: defer skb freeing after socket lock
-> > is released") and 68822bdf76f1 ("net: generalize skb freeing deferral
-> > to per-cpu lists")
-> >
-> > We remove the dst from these incoming packets (see skb_dst_drop() in
-> > tcp_data_queue() and tcp_add_backlog()),
-> > I do not see how XFRM state could be kept ?
->
-> The problem is not with the xfrm_state reference via dst_entry, but
-> the one in skb_ext (skb->extensions) -> sec_path
-> (skb_ext_get_ptr(skb->extensions, SKB_EXT_SEC_PATH)) -> the xvec
-> array. But you have a point that I should say that in the commit
-> message...
->
+On Wed, 6 Nov 2024 01:05:09 +0000
+Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
 
-So some secpath_reset() calls should be added in various protocol handlers
-before packets are possibly queued for hours in a socket queue  ?
+>   The man page is from Debian:
+> 
+> Package: iproute2
+> Version: 6.11.0-1
+> Severity: minor
+> Tags: patch
+> 
+>   Improve the layout of the man page according to the "man-page(7)"
+> guidelines, the output of "mandoc -lint T", the output of
+> "groff -mandoc -t -ww -b -z", that of a shell script, and typographical
+> conventions.
+> 
+> -.-
+> 
+>   Output from a script "chk_man" is in the attachment.
+> 
+> -.-
+> 
+> Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
 
-I see one in l2tp_eth_dev_recv().
-
-> And I think you're right that even without those commits a delay in
-> processing the RCU free callbacks could cause a similar issue, it just
-> wouldn't be as easy to trigger. That made me look deeper into history
-> which commit actually added the decrement on free and it turns out it
-> was done intentionally as a bugfix - see commit e4e8536f65b5
-> ("selinux: fix the labeled xfrm/IPsec reference count handling").
-> Before that commit the logic was similar to what my patch is doing, so
-> I could be re-introducing another bug here :-/ The commit message is
-> not very helpful there - Paul, do you happen to remember what the
-> issue was that prompted it? I guess there can be some alloc's that
-> won't have a matching delete in the right circumstances? Or something
-> involving the selinux_xfrm_policy_clone() case?
->
-> --
-> Ondrej Mosnacek
-> Senior Software Engineer, Linux Security - SELinux kernel
-> Red Hat, Inc.
->
+Is the last of the dcb man changes?
 
