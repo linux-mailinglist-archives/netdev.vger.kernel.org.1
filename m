@@ -1,101 +1,108 @@
-Return-Path: <netdev+bounces-142472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21C969BF49A
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:51:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF48A9BF4A2
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:52:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C6B411F24372
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:51:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E6AA286D59
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 874D52071FD;
-	Wed,  6 Nov 2024 17:51:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4BE2076CD;
+	Wed,  6 Nov 2024 17:52:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="pHyA8XQo"
+	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Hg2S8iU/"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mailtransmit04.runbox.com (mailtransmit04.runbox.com [185.226.149.37])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A3B42036E2;
-	Wed,  6 Nov 2024 17:51:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3CF3420408D;
+	Wed,  6 Nov 2024 17:52:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.37
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730915461; cv=none; b=n2SnmmDtGGqa0iTtotDdZ8z0BRKSsz50QqvO3YQQr9bIM8Nlsn3lU4JvXQt7IIMJ8/Lq2pdlsZZP+OXU9RvkMv0eFrXi9PsBQT3qoLm6X9sqx+KNjgIkR0Q9iXj0Q+TePRQIZQM9ppkethi7obp5X6MUWan/fNnerZqSR7xLwf0=
+	t=1730915547; cv=none; b=kAVc4Yb6w/g3+0IjYFgQvBA8vDNCXY4fmAMQwtjpRzCWW7wklQwdEIfPJGyO9mOhv6JM9PUONzveG32UbQqSySZ2YBz7GqNwcDO4pqcuYF7zyeZFFZ0FmQsWG7mqPflfxRNrbiZr2GMa6d9vtBWYJi/WlBYedYv8fjLE/vZnTfM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730915461; c=relaxed/simple;
-	bh=eGE+JvjEAxRC3XXv8UCLb6VqT7OxpYjwPHHZhlH0s2s=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=fVGiamzPoJDu2OJ2gwphUHrLW+F+vvVMW/fvmReX+7z+G7/gVK22zzApdwjWpC7NYswzk45/C4MDq4tCsVRts1f+3p2AOOfkhSoF5UNd/6nKhPro6jaDbwq9sOUikTL0C5qTemPvgEbeUBqaxAQXPGOb6sUp8q3Mf5VZR4Du02g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=pHyA8XQo; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 101C6C4CED0;
-	Wed,  6 Nov 2024 17:50:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730915460;
-	bh=eGE+JvjEAxRC3XXv8UCLb6VqT7OxpYjwPHHZhlH0s2s=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pHyA8XQoMkIT6nDYTR4tSxHXWA160F57jbl6rLg0o95nxKlPKgKn/svyWJYzvM54y
-	 48JVbg4rtQbeUQN6/de/EIxk1gFquy03qwH0BglNNrw572JbcKk5ZD66T8vehqPwJe
-	 ucX4PSKLfiMy8DR+GFSivshfKXVU8NMqM+qreEFD/1QN7JmoTcnoM08NmFBMse4sq9
-	 EARL8AUb83hldPhpOnK01rfBQPBNd2z2S+ywjvKWrpE4FvkE+tz7bTKqwi0wt3Gmwz
-	 U6QVswTEzRiK44rVR/vmOVGcrOi7aZm0IthSICKttOHGb095Vyi7xwLHUtrSroWmM8
-	 Cwkcmxe97OOCg==
-Date: Wed, 6 Nov 2024 19:50:54 +0200
-From: Leon Romanovsky <leon@kernel.org>
-To: Bjorn Helgaas <helgaas@kernel.org>
-Cc: Sanman Pradhan <sanman.p211993@gmail.com>,
-	Bjorn Helgaas <bhelgaas@google.com>, netdev@vger.kernel.org,
-	alexanderduyck@fb.com, kuba@kernel.org, kernel-team@meta.com,
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
-	horms@kernel.org, corbet@lwn.net, mohsin.bashr@gmail.com,
-	sanmanpradhan@meta.com, andrew+netdev@lunn.ch,
-	vadim.fedorenko@linux.dev, jdamato@fastly.com, sdf@fomichev.me,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next] eth: fbnic: Add PCIe hardware statistics
-Message-ID: <20241106175054.GG5006@unreal>
-References: <20241106122251.GC5006@unreal>
- <20241106171257.GA1529850@bhelgaas>
+	s=arc-20240116; t=1730915547; c=relaxed/simple;
+	bh=KtPMXe1Kaoi+D+0zuVsHi/7XVFuHe7pLT3yUgBvsPWA=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=EL8hdsuglkZRwNifAAzMXMPDQqbrukWIaTVTCxSDcGOjuaow+q6QfvQ8i0FDaQQrRrromBAKAbcHvQnP9eLdpp6mUEgTbO3cFAMhm6XuKSzIBBEbsW3jcRuT7ZM7WGJSMTDn8cSigBHPFrL7bmQcPhRO3faqwpg7FkOYKALARbU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Hg2S8iU/; arc=none smtp.client-ip=185.226.149.37
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
+Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
+	by mailtransmit04.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+	(Exim 4.93)
+	(envelope-from <mhal@rbox.co>)
+	id 1t8kCZ-00GBfK-Fk; Wed, 06 Nov 2024 18:52:19 +0100
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
+	s=selector2; h=Cc:To:Content-Transfer-Encoding:Content-Type:MIME-Version:
+	Message-Id:Date:Subject:From; bh=wAYzmgNEdIPQcm7RdwInLHDyAgTWgXzUWExQ3LJunH4=
+	; b=Hg2S8iU/9HTIGKTP6qhlMJhACuhDz3iPyAC2mhkLZGzyyuzkLnylkxU1m0pz+rs06mPL7D2hq
+	9kaMKgwIpd4bQ90GDA3CUg7ZiCZM4vBqhZ2ofCNpsCkvAxQLhNivSEbgIUvaVVYI0oBIQo7ig4vvB
+	jIBJDy43PJXGh547KK9Fz/q+i2+mn4YnkL/EBc2tMmrFe/M4qYE2CR7YZo7Ajte46dF7kzB1n3zrL
+	GfJW9mKA0hgyX5qSPduC7wG6NBizoYPgzE+QuMNrQRxeUNyeU8OtvyiXO1AVjQ6Ja8XOvKCamZ3TC
+	saDK4FfLzCdVfBUzWKLEsoR5AO5P1AELM1jBqQ==;
+Received: from [10.9.9.73] (helo=submission02.runbox)
+	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
+	(envelope-from <mhal@rbox.co>)
+	id 1t8kCT-0001ra-VZ; Wed, 06 Nov 2024 18:52:14 +0100
+Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.93)
+	id 1t8kCH-002ver-47; Wed, 06 Nov 2024 18:52:01 +0100
+From: Michal Luczaj <mhal@rbox.co>
+Subject: [PATCH net 0/4] virtio/vsock: Fix memory leaks
+Date: Wed, 06 Nov 2024 18:51:17 +0100
+Message-Id: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106171257.GA1529850@bhelgaas>
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAJWsK2cC/6tWKk4tykwtVrJSqFYqSi3LLM7MzwNyDHUUlJIzE
+ vPSU3UzU4B8JSMDIxNDQwMz3bLi/ORs3dzUXN2c1MTsYl3LJDPjVEtDI1Mzg0QloK6CotS0zAq
+ widFKeaklSrG1tQDW+Q+8ZgAAAA==
+X-Change-ID: 20241106-vsock-mem-leaks-9b63e912560a
+To: Stefan Hajnoczi <stefanha@redhat.com>, 
+ Stefano Garzarella <sgarzare@redhat.com>, 
+ "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+ =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>, Jia He <justin.he@arm.com>, 
+ Arseniy Krasnov <avkrasnov@salutedevices.com>, 
+ Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
+ George Zhang <georgezhang@vmware.com>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
+ netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
+X-Mailer: b4 0.14.2
 
-On Wed, Nov 06, 2024 at 11:12:57AM -0600, Bjorn Helgaas wrote:
-> On Wed, Nov 06, 2024 at 02:22:51PM +0200, Leon Romanovsky wrote:
-> > On Tue, Nov 05, 2024 at 04:26:25PM -0800, Sanman Pradhan wrote:
-> > > Add PCIe hardware statistics support to the fbnic driver. These stats
-> > > provide insight into PCIe transaction performance and error conditions,
-> > > including, read/write and completion TLP counts and DWORD counts and
-> > > debug counters for tag, completion credit and NP credit exhaustion
-> > > 
-> > > The stats are exposed via ethtool and can be used to monitor PCIe
-> > > performance and debug PCIe issues.
-> > 
-> > And how does PCIe statistics belong to ethtool?
-> > 
-> > This PCIe statistics to debug PCIe errors and arguably should be part of
-> > PCI core and not hidden in netdev tool.
-> 
-> How would this be done in the PCI core?  As far as I can tell, all
-> these registers are device-specific and live in some device BAR.
+Short series fixing some memory leaks that I've stumbled upon while toying
+with the selftests.
 
-I would expect some sysfs file/directory exposed through PCI core.
-That sysfs needs to be connected to the relevant device through
-callback, like we are doing with .sriov_configure(). So every PCI
-device will be able to expose statistics without relation to netdev.
+The last patch is a refactoring.
 
-That interface should provide read access and write access with zero
-value to reset the counter/counters.
+Signed-off-by: Michal Luczaj <mhal@rbox.co>
+---
+Michal Luczaj (4):
+      virtio/vsock: Fix accept_queue memory leak
+      virtio/vsock: Fix sk_error_queue memory leak
+      virtio/vsock: Improve MSG_ZEROCOPY error handling
+      virtio/vsock: Put vsock_connected_sockets_vsk() to use
 
-Thanks
+ net/vmw_vsock/af_vsock.c                | 6 ++++--
+ net/vmw_vsock/virtio_transport_common.c | 9 +++++++++
+ 2 files changed, 13 insertions(+), 2 deletions(-)
+---
+base-commit: 372ea06d6187810351ed778faf683e93f16a5de4
+change-id: 20241106-vsock-mem-leaks-9b63e912560a
 
-> 
-> Bjorn
+Best regards,
+-- 
+Michal Luczaj <mhal@rbox.co>
+
 
