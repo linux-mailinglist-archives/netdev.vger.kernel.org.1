@@ -1,102 +1,106 @@
-Return-Path: <netdev+bounces-142318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 769D89BE40C
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:18:11 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id DD20B9BE420
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:20:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2CA581F229C2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:18:11 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6839EB23F6B
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:20:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95CFA1DD523;
-	Wed,  6 Nov 2024 10:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8C3F1DDC13;
+	Wed,  6 Nov 2024 10:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r7S+b6At"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ut/+8wcH"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 720661DC747
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 10:18:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A581F1DACAA;
+	Wed,  6 Nov 2024 10:20:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730888288; cv=none; b=n+5P3IygCFxKUluHBavBMEYhEolv3KJPRo6xDKPquCyx46K0KWh3Hy+VNoXR3EFNCBU6z0K9Vz886pGU3W9YelLzr/WzbHhKZUPKNFE/bLH+GE48jG1gW/ZYCsK+jLYEl51S69rgfxBNyYd4wlHIjv2nwaVajss0Zre77wj2E1E=
+	t=1730888415; cv=none; b=RfatBXdtdWlCrDxNll7OyNw9MmYL5cDVa4wyG0CU1t1bEmrQQ9qEYbnOEt8QyIk+ILWxoxS4Ny2Ap60sSF/Npb1iNBXsr3LW6cY8WFkamxWODHQqzUcbPzNxMuQSqOTUa/rjaX2NKJQStPYi2l6t21ws+h504OYUwBMenXGEny4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730888288; c=relaxed/simple;
-	bh=12HzFz08y1i2tWb3JlGpLFzmf7rRqgM2C9+E1f4r2qM=;
+	s=arc-20240116; t=1730888415; c=relaxed/simple;
+	bh=lXpB45YEiKcKgz5mKJKvT1SzNckif79TOWmyG/tgmZw=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=hkbLbHVZX0MJpCJFwG2rq6c46kmtGzXPbjDZWW48gYaSEeBxA6eS9bSTNCxROiMyn8tjNiDhxqU9sy0npWWTbY53gQjkHpTQQpP4Q2F84xeJAoETQssi4a7s17uwdlUeU9NyDZujJlBULzb7zlEzcEojdkSl+OCSHR3ncIRSAdQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r7S+b6At; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0F51BC4CED0;
-	Wed,  6 Nov 2024 10:18:06 +0000 (UTC)
+	 Content-Type:Content-Disposition:In-Reply-To; b=VnvX/RsHuudM36dCB5xARYo568rxcPNOzEObuhQkkEcR6sCjAkloUnw+Ly0sqORsq+WapDznOD7THE+5HsMkX+oMUkjY0AOfFmdxarPrGQ7/dgKKLoOw6Qia88O44qRRkITyhmRGv/hbdmWiGFb8Pze1O2uEphqSc7qmsOYUkfU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ut/+8wcH; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D91CCC4CECD;
+	Wed,  6 Nov 2024 10:20:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730888288;
-	bh=12HzFz08y1i2tWb3JlGpLFzmf7rRqgM2C9+E1f4r2qM=;
+	s=k20201202; t=1730888415;
+	bh=lXpB45YEiKcKgz5mKJKvT1SzNckif79TOWmyG/tgmZw=;
 	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=r7S+b6AtgouMqqZLOcjEXJ4ogF/Tzq8uSfWq6zt2LElVloeqCNoA5nFXj/Dr6walN
-	 3WraTn2aFbUGMHcSuLW0Sc8gMa7dH3Lg1SwuECcepfbhHmiFPUsvdL8X7lV8inrA79
-	 4kgp3DfcKr6+PuUj6J46BQ20i+f30mGX/3kAuhs5s7o+WSu15dAiPkU2L5JGMNDSQW
-	 lYBeSc6EmVenzCGYJlPUwIScss8UdevQ1zJRiax8l53ScbUbQYDvfM6tMxAzLmLDCN
-	 1Tm1D2CeINTJt/MmVQXAOahqg1VeEjiEOAIs0tXnnUfAo3BwwqF4o4bVLkde0EFIdY
-	 DClpF6V+XPCHA==
-Date: Wed, 6 Nov 2024 10:18:04 +0000
+	b=ut/+8wcHMoHlEah+z1uEA09kuKP1PPJjtCkUptqxPo+CPvuPAm71BTxkR945Ht+ZW
+	 xL7hMe364LooETN3T87cqFTEYhAL8mEJy3X+Ql4+i3yHPYN9FD5MrCTIb42tKHcBGV
+	 tIGJORhucoV8CjDu/K1VBOTn1RLjnBmjqghYD4PDVbYLx2XlewK2JoT1IqsM4xMF5T
+	 uccr0sQHILtsz9FpxP/WuMnI7K0FyMQ4+YmP1ClURfsom3qDTkCUUJyXYY7Zjxu4Bd
+	 PhdjzhpkKnDZ7DPAqU9ngWAX11qJaLd8t04UCZsF+YhBNjgNJvdgEtSPKrBl/A8qO9
+	 TDiZ3YgHQd4bw==
+Date: Wed, 6 Nov 2024 10:20:10 +0000
 From: Simon Horman <horms@kernel.org>
-To: Juraj =?utf-8?Q?=C5=A0arinay?= <juraj@sarinay.com>
-Cc: netdev@vger.kernel.org, krzk@kernel.org, kuba@kernel.org
-Subject: Re: [PATCH net-next v2] net: nfc: Propagate ISO14443 type A target
- ATS to userspace via netlink
-Message-ID: <20241106101804.GM4507@kernel.org>
-References: <20241103124525.8392-1-juraj@sarinay.com>
+To: "Nemanov, Michael" <michael.nemanov@ti.com>
+Cc: Kalle Valo <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Sabeeh Khan <sabeeh-khan@ti.com>
+Subject: Re: [PATCH v3 12/17] wifi: cc33xx: Add scan.c, scan.h
+Message-ID: <20241106102010.GN4507@kernel.org>
+References: <20240806170018.638585-1-michael.nemanov@ti.com>
+ <20240806170018.638585-13-michael.nemanov@ti.com>
+ <20240809160355.GD1951@kernel.org>
+ <33f3b6a4-f907-4374-90ac-d81a81700936@ti.com>
+ <20241102120030.GG1838431@kernel.org>
+ <d9640623-4b93-4fce-991f-f881a230b143@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241103124525.8392-1-juraj@sarinay.com>
+In-Reply-To: <d9640623-4b93-4fce-991f-f881a230b143@ti.com>
 
-On Sun, Nov 03, 2024 at 01:45:25PM +0100, Juraj Šarinay wrote:
-> Add a 20-byte field ats to struct nfc_target and expose it as
-> NFC_ATTR_TARGET_ATS via the netlink interface. The payload contains
-> 'historical bytes' that help to distinguish cards from one another.
-> The information is commonly used to assemble an emulated ATR similar
-> to that reported by smart cards with contacts.
+On Sun, Nov 03, 2024 at 03:09:22PM +0200, Nemanov, Michael wrote:
+> On 11/2/2024 2:00 PM, Simon Horman wrote:
 > 
-> Add a 20-byte field target_ats to struct nci_dev to hold the payload
-> obtained in nci_rf_intf_activated_ntf_packet() and copy it to over to
-> nfc_target.ats in nci_activate_target(). The approach is similar
-> to the handling of 'general bytes' within ATR_RES.
+> ...
+> 
+> > 
+> > I'm a but unsure why you see that, but what I was referring to is this:
+> > 
+> > $ ./scripts/kernel-doc -none drivers/net/wireless/ti/cc33xx/scan.h
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'scan_type' not described in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'n_ssids' not described in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'ssids' not described in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Excess struct member 'num_of_ssids' description in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:104: warning: Excess struct member 'ssid_list' description in 'cc33xx_cmd_ssid_list'
+> > drivers/net/wireless/ti/cc33xx/scan.h:149: warning: bad line:
+> > drivers/net/wireless/ti/cc33xx/scan.h:177: warning: cannot understand function prototype: 'struct sched_scan_plan_cmd '
+> > drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Function parameter or struct member 'u' not described in 'scan_param'
+> > drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Excess struct member 'one_shot' description in 'scan_param'
+> > drivers/net/wireless/ti/cc33xx/scan.h:227: warning: Excess struct member 'periodic' description in 'scan_param'
+> > drivers/net/wireless/ti/cc33xx/scan.h:269: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_scan_params'
+> > drivers/net/wireless/ti/cc33xx/scan.h:269: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_scan_params'
+> > drivers/net/wireless/ti/cc33xx/scan.h:295: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_set_ies'
+> > drivers/net/wireless/ti/cc33xx/scan.h:319: warning: Function parameter or struct member 'header' not described in 'cc33xx_cmd_scan_stop'
+> > drivers/net/wireless/ti/cc33xx/scan.h:319: warning: Function parameter or struct member 'padding' not described in 'cc33xx_cmd_scan_stop'
+> 
+> Right, fixed in v4, thanks.
+> 
+> In general, all of those structs are internal to scan.c and not part of an
+> interface so I think I'll move them there and drop the comments.
 
-Hi Juraj,
-
-Perhaps I misunderstand things, and perhaps there is precedence in relation
-to ATR_RES. But I am slightly concerned that this leans towards exposing
-internal details rather then semantics via netlink.
-
-> Replace the hard-coded size of rats_res within struct
-> activation_params_nfca_poll_iso_dep by the equal constant NFC_ATS_MAXSIZE
-> now defined in nfc.h
-> 
-> Within NCI, the information corresponds to the 'RATS Response' activation
-> parameter that omits the initial length byte TL. This loses no
-> information and is consistent with our handling of SENSB_RES that
-> also drops the first (constant) byte.
-> 
-> Tested with nxp_nci_i2c on a few type A targets including an
-> ICAO 9303 compliant passport.
-> 
-> I refrain from the corresponding change to digital_in_recv_ats()
-> to have the few drivers based on digital.h fill nfc_target.ats,
-> as I have no way to test it. That class of drivers appear not to set
-> NFC_ATTR_TARGET_SENSB_RES either. Consider a separate patch to propagate
-> (all) the parameters.
-> 
-> Signed-off-by: Juraj Šarinay <juraj@sarinay.com>
-
-...
+Thanks, I think that makes sense.
 
