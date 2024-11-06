@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-142178-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142179-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 03D009BDB4E
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:41:03 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 574B29BDB50
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:41:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3B6F284AAC
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:41:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D7D4BB22CC6
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:41:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7A2F18C92A;
-	Wed,  6 Nov 2024 01:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F121218CC1E;
+	Wed,  6 Nov 2024 01:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="blDqvl6b"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="nncemYS2"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BECF918C91B;
-	Wed,  6 Nov 2024 01:40:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC3C318CC0D
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:40:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730857230; cv=none; b=XIxna78D2Tpe3Y5blxTS94UALitGdnOj3VOGFU15c1MHAv9LO6w+hifHZNxCAyS690npYsG+gFwd8Bx4olcM+8OzwNUYoWc4upvvWEOyf2Sq3ELfZQcWYqEjKD9UWq9wIlDtBUSPi1iT09v6o7z24lpOXoiIeLKgBLXNRjwkg6o=
+	t=1730857231; cv=none; b=OlqoBuDZOJyG23G0kf4Xt4X4h8RQsMHCsn6NSudDCBFtnHHnOkq8XnUwZpZc4V57oEF4Uoft1IgFrJ2D9jFl9gh4GDOdZSrNvRqzZV7i+p92uW9vt0c2eInoJR5QuS0ow81roogAbw5+xUaz4bjJmgOe3NN2y5Am7F6RFI3GEf0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730857230; c=relaxed/simple;
-	bh=ltKju4GAlP9Gq8YfEV6X+ob93p7WotTATx4nxuTTo4Q=;
+	s=arc-20240116; t=1730857231; c=relaxed/simple;
+	bh=5y4cwKr1p+HuDmB+HG8AicP/6MRCT6256+Zef4jWG1A=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=AeAlO2IHr3O7BiY5a578XC3t/88BlXwxaIiBNqIjhberziMA+fRGFGDaRPyBK3QTGZonB0qBPl4UUKkTI2J47kJAArHVqbmvj/7G30u1GMCO8HtnUW+qbDLliaMGTQLEu4irr8Dhfh5BK5iYSJflHmrZVtOZ/Q79A9zWQ8/HP4c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=blDqvl6b; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 563BFC4CED4;
-	Wed,  6 Nov 2024 01:40:30 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=ETGXDqMH643Hz3bTTiqVhdJvvsZobuj2vhvZfMx2oKdKjZGdWdtd3nrcUn4vgczwNFS0H2SKwoPnbKq1F2TfPVOwmrLAe3LaSsyViL2E1NXuf/KMO++L5B1lOghJo0IkgVs+KN71zKyqcW/B6bHUfLpzyJIrC99QDE2w7FwQ7Co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=nncemYS2; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A42F2C4CECF;
+	Wed,  6 Nov 2024 01:40:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730857230;
-	bh=ltKju4GAlP9Gq8YfEV6X+ob93p7WotTATx4nxuTTo4Q=;
+	s=k20201202; t=1730857231;
+	bh=5y4cwKr1p+HuDmB+HG8AicP/6MRCT6256+Zef4jWG1A=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=blDqvl6bEqEmVPyAwhYvo3MoqVWHowXcZuI/fJlKaGuQHMAsjo1lSgUx6Z6RbCQuu
-	 Y9L31LMGn4O7zLBPza82T3AsZsVdTwf3+MITc1B6u8XRiDV8qf1sPqaXpyvhlz1KMy
-	 npWWY+LUytOVNF5LE8yAQH3xrf0WXCkxG10uXCB3UPhdR21OdbZg2S0gy73pX91P0z
-	 KXZ+VcCIz+rtI2AeykTU4uIKh2hAwbG5TI7EG1rdTOf6wdirvXendEDnvuavxbGAEG
-	 9msxuwcZiitcSicTnTwAvTb/OWYylZ+bj5tF/Ua1QorhtpG4nRnVdKd0AjZedC/FQM
-	 psBBoC4WQcPOA==
+	b=nncemYS2xHlQf6UaT5qPzLJKcDj3kSpAK0s5S263gROtSG44MXzrY0cP4mnVWcDJm
+	 hL/x7GwHwC47+8MJm+fHI2OZ+lHPlPvZNL+s8HAbzsSORrjrII2E3UM3YFH5v1suFf
+	 fYhPl1aVvhz0qjxz4uAi1Scn5NyCNso1E/Cthp3sdWtCeEarwr0VtO1TnCMCgXpuFa
+	 eni2u4LunwsATM0edEKhR5+L9FiBXNzzkmcbmGy4EfmWJjxfWc9g7nubt7dwpi7tKR
+	 XW+V++yLXuC9L4y1iiC7UkEOjAvJmUj6lvrAZC7DVHnkywwg43pyCfvF0aQhBSEbGV
+	 dKfcHWgkaDr2Q==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70C883809A80;
-	Wed,  6 Nov 2024 01:40:40 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id AE02D3809A80;
+	Wed,  6 Nov 2024 01:40:41 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,46 +52,33 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next 0/4] A pile of sfc deadcode
+Subject: Re: [PATCH] netlink: typographical error in nlmsg_type constants
+ definition
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173085723899.759302.4593884648959376210.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Nov 2024 01:40:38 +0000
-References: <20241102151625.39535-1-linux@treblig.org>
-In-Reply-To: <20241102151625.39535-1-linux@treblig.org>
-To: Dr. David Alan Gilbert <linux@treblig.org>
-Cc: ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-net-drivers@amd.com,
- linux-kernel@vger.kernel.org
+ <173085724049.759302.4261489097136624290.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Nov 2024 01:40:40 +0000
+References: <20241103223950.230300-1-mauricelambert434@gmail.com>
+In-Reply-To: <20241103223950.230300-1-mauricelambert434@gmail.com>
+To: Maurice Lambert <mauricelambert434@gmail.com>
+Cc: netdev@vger.kernel.org
 
 Hello:
 
-This series was applied to netdev/net-next.git (main)
+This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Sat,  2 Nov 2024 15:16:21 +0000 you wrote:
-> From: "Dr. David Alan Gilbert" <linux@treblig.org>
+On Sun,  3 Nov 2024 23:39:50 +0100 you wrote:
+> This commit fix a typographical error in netlink nlmsg_type constants definition in the include/uapi/linux/rtnetlink.h at line 177. The definition is RTM_NEWNVLAN RTM_NEWVLAN instead of RTM_NEWVLAN RTM_NEWVLAN.
 > 
-> This is a collection of deadcode removal in the sfc
-> drivers;  the split is vaguely where I found them in
-> the tree, with some left over.
-> 
-> This has been build tested and booted on an x86 VM,
-> but I fon't have the hardware to test; however
-> it's all full function removal.
-> 
-> [...]
+> Signed-off-by: Maurice Lambert <mauricelambert434@gmail.com>
+> ---
+>  include/uapi/linux/rtnetlink.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net-next,1/4] sfc: Remove falcon deadcode
-    https://git.kernel.org/netdev/net-next/c/cc4914d90479
-  - [net-next,2/4] sfc: Remove unused efx_mae_mport_vf
-    https://git.kernel.org/netdev/net-next/c/70e58249a646
-  - [net-next,3/4] sfc: Remove unused mcdi functions
-    https://git.kernel.org/netdev/net-next/c/5254fdfc746a
-  - [net-next,4/4] sfc: Remove more unused functions
-    https://git.kernel.org/netdev/net-next/c/d3e80070b5b4
+  - netlink: typographical error in nlmsg_type constants definition
+    https://git.kernel.org/netdev/net-next/c/84bfbfbbd32a
 
 You are awesome, thank you!
 -- 
