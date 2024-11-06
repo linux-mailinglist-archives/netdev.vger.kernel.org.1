@@ -1,72 +1,98 @@
-Return-Path: <netdev+bounces-142551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id E84339BF9B2
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:07:18 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23CF59BF9BB
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:14:02 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3E87D1F22546
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:07:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 555B21C217F8
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C88441DE2CD;
-	Wed,  6 Nov 2024 23:07:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD6C420CCF9;
+	Wed,  6 Nov 2024 23:13:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="HMmsmc4M"
+	dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b="hoY4B+mx";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="kYVLKA0m"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
+Received: from flow-b3-smtp.messagingengine.com (flow-b3-smtp.messagingengine.com [202.12.124.138])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144DD1D47B3
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:07:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8883B1D47B3;
+	Wed,  6 Nov 2024 23:13:55 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.138
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730934434; cv=none; b=ETtD3+vGz6p1Vq4lvBF5VEhBBDJS0mXSlZBGjtXSNh04XfVbU+KJR/cBeu7JuQBROiYuieutsurlXg1HwNRzg4SwRnjh3i3CVgLT7KUKx6XikDZo+Kg87aW8gy7bzh9OBTqVgdwIMHZQ5H9mNOTCyPawWH+BHiihWHn9PkF5tp4=
+	t=1730934838; cv=none; b=Hc1FGMmkUSI0OwVUywQCU5PRrhQtPI/Y4Wml2uJLI36O0R1v7OPFLkKExvOW/v9BAAkY6gdBQ492sCYA/2FJIxocfsVSgMxYe1kqt6NNWVs26q8HJNtMHru5LOeGqNoT4LzsPlyUzuW7fnpU0FYubJnjirwPPx2LrzTB73pFzJ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730934434; c=relaxed/simple;
-	bh=zTMT/kEaE4XiSOaMNn+JOiE4K1ManQ3vlBLgpjRBokY=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=fiZlcZvLAk3L+jjsNV/DGoLBqXxtL6LbvXa5UwpjUN9wKt5m7NFdgmfFDlIZJ7AtWu4KV+em7N6aOlmiDi5Wny/zzXR9n/52vP59ukjBKkBfLMcTD++wsLb7Fgq1GM0JIIR+/V30eiK63bFNyF/JmPy4ogvXNNubmeaGvmn7P2o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=HMmsmc4M; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730934434; x=1762470434;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=oBSN1684rpiXiZHz0jkCw1k6NUFOB5BKmIcU95ZeMUU=;
-  b=HMmsmc4Mir8dcLyvvESLVm6uByIHdh8eOpUlOoibvzxcHq7lNmqN5+yD
-   4ShZc1FbZREFkxR8mGg3EGhBQdQH+NWx9ia3gqTRYTb4hHlv/r6wyBsa4
-   294CEC9aPvP7nupaF0GBR6Gnr/WrDsRRh4PDi7B1FshDTJWaDxE6k7qZU
-   U=;
-X-IronPort-AV: E=Sophos;i="6.11,264,1725321600"; 
-   d="scan'208";a="440851489"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 23:07:10 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:47168]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.15:2525] with esmtp (Farcaster)
- id 4b089940-86e1-4e6d-a6e4-c788f75e71b1; Wed, 6 Nov 2024 23:07:09 +0000 (UTC)
-X-Farcaster-Flow-ID: 4b089940-86e1-4e6d-a6e4-c788f75e71b1
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Wed, 6 Nov 2024 23:07:09 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.27) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Wed, 6 Nov 2024 23:07:06 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <gnaaman@drivenets.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next v8 4/6] neighbour: Convert iteration to use hlist+macro
-Date: Wed, 6 Nov 2024 15:07:03 -0800
-Message-ID: <20241106230703.48870-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241104080437.103-5-gnaaman@drivenets.com>
-References: <20241104080437.103-5-gnaaman@drivenets.com>
+	s=arc-20240116; t=1730934838; c=relaxed/simple;
+	bh=B36VBDltIoRywAGblAfwutVOk3b/rxmBfwD8ZrH1yNo=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=O4Zbq7//kF3hYN1un5A3N4IzYUEtyG5KInTHVhIQKxdLYsSfunj/E0KBPM7wChnAnPjgyWUnMvqhDnljnnidOCh1YXO5stRaZWXDNUaBjVboFa2H2MPiYQaPxEWffyntDcJ6P9UUbL/fRM1Yy7YtcAnqp7kFVWxHVt1BxrwJvs8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net; spf=pass smtp.mailfrom=queasysnail.net; dkim=pass (2048-bit key) header.d=queasysnail.net header.i=@queasysnail.net header.b=hoY4B+mx; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=kYVLKA0m; arc=none smtp.client-ip=202.12.124.138
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=queasysnail.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=queasysnail.net
+Received: from phl-compute-08.internal (phl-compute-08.phl.internal [10.202.2.48])
+	by mailflow.stl.internal (Postfix) with ESMTP id 3A9C21D402D4;
+	Wed,  6 Nov 2024 18:13:54 -0500 (EST)
+Received: from phl-mailfrontend-02 ([10.202.2.163])
+  by phl-compute-08.internal (MEProxy); Wed, 06 Nov 2024 18:13:54 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=queasysnail.net;
+	 h=cc:cc:content-transfer-encoding:content-type:date:date:from
+	:from:in-reply-to:message-id:mime-version:reply-to:subject
+	:subject:to:to; s=fm1; t=1730934834; x=1730938434; bh=lEBOJhqz1R
+	S/g1V70UKSJGTy20U21lB2YXztTlSE8Vs=; b=hoY4B+mxiKdgfvtl1/AvUAh/Re
+	SqXPyc/3JHoSYk3iq/8eXro5i5BIi3N74qyyKDnn1uCNz0NiYCyXq3JqD7koH7tb
+	0fXRnIAa/CzBPbqLDyt97XeygEEdDQ0axsFvQtOC+kRTwVBNM70mXgRkFK/l4U8i
+	qHyN47s22Z29NvFF0HipTq34zkWLPSIX7AvrhwnKDFwgqFZpg3NOY8Z6FmuTH61R
+	oMvCvtcwiC/elSPRagIXCztgF9oVnww/p1CXkYV+WYCJXhwhO41JwGGDqp589DM/
+	Q+njjx2AteR/i4BVGpPUF2yMso/+2xRUuk6Hq6uJ3g4MDToSZvWT+/gr9JWA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1730934834; x=1730938434; bh=lEBOJhqz1RS/g1V70UKSJGTy20U21lB2YXz
+	tTlSE8Vs=; b=kYVLKA0m1JkPlC4MrJesPXIhAKe+t2xGCOMtT9eRorXzHD+oWgZ
+	Tkfj5r177GAX0SL45QVdzWKujHx8KgUtNoOdrk6cKtIfplsWtpuSaxe2fcyPbFzL
+	C9jyjZ7OVkcZy24d3zzvOdi0mXTTI7HRk5UzedCmZyoGSLUPJnZvoBhbf5SDk+iL
+	xvbdNkc6T/9kG0Id0FtrN7jFYLyQ2ErOsemCLC4vAGDJiWFnmXr7Lj7vxHCeWv5+
+	3d7/0hu4zXVmUuM5mGFFH8O70r8C26xLxIqIFmg6v2zwKyq8fjcAr9CfFj8CxmLx
+	pvbIK4NFl9jON52u/ZfPDSIXeeV6qmLbLxQ==
+X-ME-Sender: <xms:MfgrZ3kZU7xGh23nufvCPqyxwwKSULf1hdgTsAWlg4jgxbJ6k64yGw>
+    <xme:MfgrZ62qxolztG3KWUzn8_PhmXjquWol2boZIKfrKt_toAT7w5oycdFdy8C89EhYN
+    jLJ_QLvys-h44qIYY0>
+X-ME-Received: <xmr:MfgrZ9pxynsMVdp9Q2wIpKN3ix6KuYkneD3ww5d5R11uc34ztvP1K9w-CmHv>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrtdefgddtjecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
+    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
+    hsucdlqddutddtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhr
+    ohhmpefurggsrhhinhgrucffuhgsrhhotggruceoshgusehquhgvrghshihsnhgrihhlrd
+    hnvghtqeenucggtffrrghtthgvrhhnpeejtdeugfffkeejfeehkeeiiedvjeehvdduffev
+    feetueffheegteetvdfhffevffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmh
+    epmhgrihhlfhhrohhmpehsugesqhhuvggrshihshhnrghilhdrnhgvthdpnhgspghrtghp
+    thhtohephedpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepnhgvthguvghvsehvgh
+    gvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepshgusehquhgvrghshihsnhgrihhl
+    rdhnvghtpdhrtghpthhtohepkhhusggrsehkvghrnhgvlhdrohhrghdprhgtphhtthhope
+    hshhhurghhsehkvghrnhgvlhdrohhrghdprhgtphhtthhopehlihhnuhigqdhkshgvlhhf
+    thgvshhtsehvghgvrhdrkhgvrhhnvghlrdhorhhg
+X-ME-Proxy: <xmx:MfgrZ_nBV93zo1Np4N58l2i2hf2yb7xfMVOuHAK0gUWrhtQdizg3KQ>
+    <xmx:MfgrZ10RcxJO2Qw-5bn1YtcRORCrbBkzgloXtnr2pfFa3OTFd-XPcw>
+    <xmx:MfgrZ-uOOmU1Ep9K3bmgznPpUEGKsGC--6tKJ5LhR1-xxXxZDP0H1w>
+    <xmx:MfgrZ5WNl7OLpjCsQH6VVv6JvkoxY7SBezPOevxefGA_PUaAGWLtpg>
+    <xmx:MfgrZzAN2toOIwaFulVSpthJUO-lImBFQPy29H3FKlAWlBm7e6-KdL0u>
+Feedback-ID: i934648bf:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
+ 6 Nov 2024 18:13:52 -0500 (EST)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net-next 0/8] macsec: inherit lower device's features and TSO limits when offloading
+Date: Thu,  7 Nov 2024 00:13:26 +0100
+Message-ID: <cover.1730929545.git.sd@queasysnail.net>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,34 +100,42 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D040UWB002.ant.amazon.com (10.13.138.89) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Gilad Naaman <gnaaman@drivenets.com>
-Date: Mon,  4 Nov 2024 08:04:32 +0000
-> diff --git a/include/net/neighbour.h b/include/net/neighbour.h
-> index 69aaacd1419f..68b1970d9045 100644
-> --- a/include/net/neighbour.h
-> +++ b/include/net/neighbour.h
-> @@ -309,12 +309,9 @@ static inline struct neighbour *___neigh_lookup_noref(
->  	u32 hash_val;
->  
->  	hash_val = hash(pkey, dev, nht->hash_rnd) >> (32 - nht->hash_shift);
-> -	for (n = rcu_dereference(nht->hash_buckets[hash_val]);
-> -	     n != NULL;
-> -	     n = rcu_dereference(n->next)) {
-> +	neigh_for_each_in_bucket(n, &nht->hash_heads[hash_val])
+When macsec is offloaded to a NIC, we can take advantage of some of
+its features, mainly TSO and checksumming. This increases performance
+significantly. Some features cannot be inherited, because they require
+additional ops that aren't provided by the macsec netdevice.
 
-Sorry, I missed this part needs to be _rcu version.
+We also need to inherit TSO limits from the lower device, like
+VLAN/macvlan devices do.
 
-You can keep my Reviewed-by tag in v9.
+This series also moves the existing macsec offload selftest to the
+netdevsim selftests before adding tests for the new features. To allow
+this new selftest to work, netdevsim's hw_features are expanded.
 
+Sabrina Dubroca (8):
+  netdevsim: add more hw_features
+  selftests: netdevsim: add a test checking ethtool features
+  macsec: add some of the lower device's features when offloading
+  macsec: clean up local variables in macsec_notify
+  macsec: inherit lower device's TSO limits when offloading
+  selftests: move macsec offload tests from net/rtnetlink to
+    drivers/net/netdvesim
+  selftests: netdevsim: add test toggling macsec offload
+  selftests: netdevsim: add ethtool features to macsec offload tests
 
->  		if (n->dev == dev && key_eq(n, pkey))
->  			return n;
-> -	}
->  
->  	return NULL;
->  }
+ drivers/net/macsec.c                          |  64 +++++++---
+ drivers/net/netdevsim/netdev.c                |   6 +-
+ .../selftests/drivers/net/netdevsim/Makefile  |   2 +
+ .../selftests/drivers/net/netdevsim/config    |   1 +
+ .../drivers/net/netdevsim/ethtool-features.sh |  31 +++++
+ .../drivers/net/netdevsim/macsec-offload.sh   | 117 ++++++++++++++++++
+ tools/testing/selftests/net/rtnetlink.sh      |  68 ----------
+ 7 files changed, 200 insertions(+), 89 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/netdevsim/ethtool-features.sh
+ create mode 100755 tools/testing/selftests/drivers/net/netdevsim/macsec-offload.sh
+
+-- 
+2.47.0
+
 
