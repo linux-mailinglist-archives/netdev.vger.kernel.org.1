@@ -1,97 +1,63 @@
-Return-Path: <netdev+bounces-142477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A85309BF4C7
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:04:23 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F17219BF4CB
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:04:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AAF6284255
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:04:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2CA6A1C23889
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:04:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2AC92076C8;
-	Wed,  6 Nov 2024 18:04:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30F232076CD;
+	Wed,  6 Nov 2024 18:04:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="C80fcSta"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="fUOWUF6d"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7A4E8C11;
-	Wed,  6 Nov 2024 18:04:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F9A12076C8
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 18:04:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730916257; cv=none; b=M7qKWke2VcSJmVp1T51RJky0ZFHqjHPVoxildrjVrOjoPC+O4tpQdaLARvjQmmmEojK4iY8X1vO0aljUcznBQnzQrtcczqXOVQwRhM4IcVyntZHnSI5RRMh2zi5JlFHnuuYFUttsUtigYmOWj7UaiU43grs+e804B+eLHhRNpkw=
+	t=1730916271; cv=none; b=AKRI91pP9/deouvA2KWdykujnfzFNm9M9YLuKWafRsBgzoZJIHPA5OrYZBH6rLT/6i0Z9v32q+U4Scq9BWs3CRiIqTafX6HnZIPH8jxiHWu0DXyI4kCYPJqOz9FfkYxTeMUyNp7a0ot2N4rqYicU0wHIQj9jM9FyYXef7TbO3KM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730916257; c=relaxed/simple;
-	bh=Nv1nBQAiSxp9f8ngR1qR4rybkmihY6GwuRN50hS2zNw=;
-	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AqSOJLqWrAAHfyD9gyX4C19lM5CleqEYqgKBpqvzZZ3NvYaJpsyAuRZbVo+Y9N1obKh4kGoDjBnlKpDD5sgk1/SOOJRnr+egBdgTYVzRECkAZ3e0Hb2N1ojlcObqj/cOT84z9xwiK1T9bQ/A4VUPW7F2YPLtf0HWudeRRgy2Tw4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=C80fcSta; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-43158625112so755185e9.3;
-        Wed, 06 Nov 2024 10:04:15 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730916254; x=1731521054; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=jAgIf4p6278/YchMAjPlcn7XsnhPqNv2eFyDqelI99w=;
-        b=C80fcSta9MI02+qxKb9WQMhxxf03MNcyTQXMqFZxfJ0gPQUMRaCpJFOiI8rttnqJfa
-         M+WbVcz25aCD7zVzJ0eEPSNwGVIzEAxgXR+WxbC7Xc2jRZYJQNa8qyBfz4R9f1q2e8LY
-         8WISx1O4cLDPJ7iqqqBbJ+7aHXjCR7Y51Qbv4cwOusScN9R3a61IYgodMCW2YUr0dp8C
-         a1UB2nUI0pk+MQC3743vbmFuO4Bxe7v3qyHtRhTvPkp38UBZxR7LpkNDXPlTm+ZQZYxO
-         FITHo7Kzf+zrmDxbPejmzS7DMVTg2aJ+rbhxTlFZOzbBNbGWGmNfkAGvgRXdg3eg2Jwx
-         0wpg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730916254; x=1731521054;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=jAgIf4p6278/YchMAjPlcn7XsnhPqNv2eFyDqelI99w=;
-        b=tHBbtx+e3GsSAgABie1W03UyR67Q0VZYhFfLMk1rdT7oFyjgZTpEXCdaNdi+za18+W
-         M5/11SaOsqVz1HliBFiDXoU7G/V7HnuctcjB/MZ3/shXXZ6hIJE8cwq2V6xCGYvfA7ut
-         c/ORUd2n7sz/yROlf7A0hLENSPCDequY1bK8MzgZCeb3XT4ZniBUkppiAVuwqQ649pOa
-         Z4mZc0jjncLcLAuAcOGoF/ZBclG90/gR33+ruWWjrKsnxawkHoin2SvSvE3IpgWwMQ1N
-         PfpYQ71iO2s+mn3B2zM8FqpxAsrUrAbr84aDHZSClkYdHdrTf0C9AT6HTHmRuu7sjgrs
-         Yp5w==
-X-Forwarded-Encrypted: i=1; AJvYcCU4VC2q7G6SM6qIDRbVMEEJe1hj3TIf8wy6HG4Yl/f1lp0dLkGVQnLmxhI3hFE8o3Tj78zGRX/XiC/zQb43@vger.kernel.org, AJvYcCW5i+xcBxRwjjoXYydz3PsGbwwni4VqiQcx/qtGpEAMJ2bACYfVwPsxAnTqZ0J1ygSZvy7IOwnz@vger.kernel.org, AJvYcCXc2XTZpq/EzYD1BBIcmyZ8Bt5GTvsHN3S8G6v882f0NdCM91nbDP27ApCqRJV38DERMxnc2VbK/Dts@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxt+ZmB0ogZ5oPcCYyrQJB7RQ0oznsIilBRQwhfgyrDTiGitdFE
-	WCOKhowquqFVwGWyG6p6WB+UyOxY/UNT0bBEYyjHol+1jVPL8J1F
-X-Google-Smtp-Source: AGHT+IHWPx8gOIteq17zsIZ6IuYs4C2NhdtTeClqoAZ0Tqb/e3ajHoC9WAVLlhvh/OK0YcC6B4Ee6g==
-X-Received: by 2002:a05:6000:400d:b0:37c:fdc9:fc17 with SMTP id ffacd0b85a97d-381c7a4cea7mr16193774f8f.23.1730916253935;
-        Wed, 06 Nov 2024 10:04:13 -0800 (PST)
-Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa523a0esm31344865e9.0.2024.11.06.10.04.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 10:04:13 -0800 (PST)
-Message-ID: <672baf9d.050a0220.3c71f4.9bb6@mx.google.com>
-X-Google-Original-Message-ID: <ZyuvmSyxag6aJ34H@Ansuel-XPS.>
-Date: Wed, 6 Nov 2024 19:04:09 +0100
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	s=arc-20240116; t=1730916271; c=relaxed/simple;
+	bh=aPavd3k6m2hYDZ2vRxkB4CEqQM4/XeTkYOJpEGwW38M=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=A3AaLMR6M2PMQvfypx8tw9xj9mstYOvQSfGA93oiBoC0ZgI+rHFUufRi4k+OM4JsdpaT65u/2KEHXdwz9AZSfhGxKK/wdWk3wnYqkQT806ms7TFBkvslQ9NLKyoTIRTUkRgp/Cm+KjrXh9aH/5as1yHQ16TeUa1Er97h2pWmHF8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=fUOWUF6d; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=/BSemyVMGpWRmaclhSQib1OHQ2qqrpJSSSRuHRaY9Tg=; b=fUOWUF6dHNWVDwLgJ6CgXfzzJR
+	JAYPsmgTh+NvEfMz1y+4ppmx2ACqt6TcZ6GPSWhCvf70puDXwCCU9Axfm4yzh+04egG3piG88he7y
+	y4PhVZRtbugVm3Fz9YQhf98tK0vIcwiHiqDwbE/f/gAhEB96OfnV1YeF3hdJ0YDHMF9I=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t8kOH-00CMh5-A8; Wed, 06 Nov 2024 19:04:25 +0100
+Date: Wed, 6 Nov 2024 19:04:25 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: wojackbb@gmail.com
+Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
+	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
+	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
+	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com,
 	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v3 3/3] net: phy: Add Airoha AN8855 Internal
- Switch Gigabit PHY
-References: <20241106122254.13228-1-ansuelsmth@gmail.com>
- <20241106122254.13228-4-ansuelsmth@gmail.com>
- <20241106155458.3552cdda@fedora.home>
+	angelogioacchino.delregno@collabora.com,
+	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
+Subject: Re: [PATCH] [net-next] net: wwan: t7xx: Change PM_AUTOSUSPEND_MS to
+ 5000
+Message-ID: <d2f54fde-1d98-4925-866a-1d755956bbce@lunn.ch>
+References: <20241106104005.337968-1-wojackbb@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -100,60 +66,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241106155458.3552cdda@fedora.home>
+In-Reply-To: <20241106104005.337968-1-wojackbb@gmail.com>
 
-On Wed, Nov 06, 2024 at 03:54:58PM +0100, Maxime Chevallier wrote:
-> Hello Christian,
+On Wed, Nov 06, 2024 at 06:40:05PM +0800, wojackbb@gmail.com wrote:
+> From: Jack Wu <wojackbb@gmail.com>
 > 
-> On Wed,  6 Nov 2024 13:22:38 +0100
-> Christian Marangi <ansuelsmth@gmail.com> wrote:
+> Because optimizing the power consumption of t7XX,
+> change auto suspend time to 5000.
 > 
-> > Add support for Airoha AN8855 Internal Switch Gigabit PHY.
-> > 
-> > This is a simple PHY driver to configure and calibrate the PHY for the
-> > AN8855 Switch with the use of NVMEM cells.
-> > 
-> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> The Tests uses a script to loop through the power_state
+> of t7XX.
+> (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
 > 
-> [...]
+> * If Auto suspend is 20 seconds,
+>   test script show power_state have 0~5% of the time was in D3 state
+>   when host don't have data packet transmission.
 > 
-> > +static int an8855_get_downshift(struct phy_device *phydev, u8 *data)
-> > +{
-> > +	int saved_page;
-> > +	int val;
-> > +	int ret;
-> > +
-> > +	saved_page = phy_select_page(phydev, AN8855_PHY_PAGE_EXTENDED_1);
-> > +	if (saved_page >= 0)
-> > +		val = __phy_read(phydev, AN8855_PHY_EXT_REG_14);
-> > +	ret = phy_restore_page(phydev, saved_page, val);
-> 
-> I think this can be replaced with phy_read_paged()
-> 
-> [...]
-> 
-> > +static int an8855_set_downshift(struct phy_device *phydev, u8 cnt)
-> > +{
-> > +	int saved_page;
-> > +	int ret;
-> > +
-> > +	saved_page = phy_select_page(phydev, AN8855_PHY_PAGE_EXTENDED_1);
-> > +	if (saved_page >= 0) {
-> > +		if (cnt != DOWNSHIFT_DEV_DISABLE)
-> > +			ret = __phy_set_bits(phydev, AN8855_PHY_EXT_REG_14,
-> > +					     AN8855_PHY_EN_DOWN_SHFIT);
-> > +		else
-> > +			ret = __phy_clear_bits(phydev, AN8855_PHY_EXT_REG_14,
-> > +					       AN8855_PHY_EN_DOWN_SHFIT);
-> > +	}
-> > +
-> > +	return phy_restore_page(phydev, saved_page, ret);
-> 
-> And this by phy_modify_paged() :)
->
+> * Changed auto suspend time to 5 seconds,
+>   test script show power_state have 50%~80% of the time was in D3 state
+>   when host don't have data packet transmission.
 
-Didn't notice those, even better! Thanks!
+Please add the justification for changing this globally, that you
+tested a number of different machines using the t7xx and they all
+benefited from this.
 
--- 
-	Ansuel
+    Andrew
+
+---
+pw-bot: cr
 
