@@ -1,140 +1,141 @@
-Return-Path: <netdev+bounces-142563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F03A99BF9E7
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:22:58 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 774599BF9EB
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:24:28 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4E89284096
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:22:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 36545281DED
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:24:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BAB3A20CCED;
-	Wed,  6 Nov 2024 23:22:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CABB20D4E0;
+	Wed,  6 Nov 2024 23:24:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="Jj6iCG+w"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="bqyLoLId"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
+Received: from mail-qt1-f182.google.com (mail-qt1-f182.google.com [209.85.160.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C4D20E01B
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:22:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 721501DE2CD
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:24:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730935369; cv=none; b=uYqL1rJVse9sn1VTF3dhAmCE+G5xeqmoqygULMkFDcLf/nQx3VS6HsAMRNGXxNf8TPjEsWJ7l+dwQTS6b8MeG+bIYVzg9i+JCK2YeXWHJbf6s5I+409vo6ij5J3JHwiAXne4Ttk6TTQ251MLEi4JoVysju9iA/mN2Usp3qtfvao=
+	t=1730935465; cv=none; b=O4FO7RI/iVAu9WJuLiy7K+EL+bcRpeHP14D8RX4vtx4ZFH9ffcoa+NX+MIuj6kYxXyAIWgSmRGK1fWZNnBkOTw/FGDF6HmjK6tvcv1aemPiz59Ld5eRptvEPHi4rQm9U+9n9V471efEqMlBqXWz95hJ5u6uV12J1ZuV7e5mqiig=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730935369; c=relaxed/simple;
-	bh=jOfBxqENdSf1o1pW9AbEfiJ7ZTE7QI+vRP1ScfCbdPA=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=YZnJToX8ep4uDV/cfrxI7BEp9vBgRSaL/Jv1Q076LIIXNCHkogZ9YcypWqTfz8b4EV4O2shL6mZUcjqccDXHlyR3JJkYmevWyjVl+UqMk9t/1H1L4OfCSg7H2vmkw6s7NeATbN/dZKfW72z9QapB12KwqHO/+otmoXmQhCvCS/k=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=Jj6iCG+w; arc=none smtp.client-ip=209.85.210.179
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-720aa3dbda5so204398b3a.1
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 15:22:46 -0800 (PST)
+	s=arc-20240116; t=1730935465; c=relaxed/simple;
+	bh=1ElPWqQTpgh0MjxYAipqt0Rh6P9ozWBIBags1rw9Ulo=;
+	h=From:Date:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=n42qlc7QSxeuw4FIozzS1E7Qc0eAa9YgvCg/3j3oBbeWG77Wb4pVu2c03/MMRNAsxIKcUKxReD0XkO6WAyoL9Pkl5+y6nQlJuoPbg+0dI3SiXYS5MI8AUJjLRn7pgQxesZBzN3ZvcMIz6J4HmCMgRiBOhTzsBTELXdPlyr46Gu4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=bqyLoLId; arc=none smtp.client-ip=209.85.160.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-qt1-f182.google.com with SMTP id d75a77b69052e-460b16d4534so1981741cf.3
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 15:24:23 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730935366; x=1731540166; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ydMjaDBHGP4Lclf9xzXBO/5cdGNcVM/AKLksSI3sEJg=;
-        b=Jj6iCG+wmhpRWEaBi7iiyQ9Zpc4aRA1i/2nuxQ5a3Im9O0otcrQUUmFD+qkuxbGVua
-         3GPa9lq3xe4BsBtAld0ulncLO7/tWIDsrtlZCoW6a4WdsHdvpCAwJH98Y4k4bTYpPeVA
-         0k2pPkAVfFOPguDrp+Flri8J7nYsB5VqfmKuL5x+FgENJoyx11aWv8IiyX7OaniUxxyc
-         NUsNU05cUpgdA+FQKDYDfipjjGwLgJpSDK0NocSY/ONng+OyYuxYL1aTMkWjALBtjPgH
-         YHYRBTCLYtRSd7YDFSlAfPK5LP8J7I0xG5xt/CuDyDSGUkVlgZu2Ol3+FvTjyKo4yxgw
-         h/8Q==
+        d=broadcom.com; s=google; t=1730935462; x=1731540262; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=U8uxnrcOwKifkarVHZh48p269SqKXVupbsayYJfQgAA=;
+        b=bqyLoLId5UFb0fk036HnZnRpC56bO8gfjXVxBnfAoDibbSNg+F37TNG0zL1aw6zPqb
+         w2qnYM1BCWwKHuzgRzMc1ELkjd3zsiSQlM4cGXkX7xiZsjTLQW1e1BI2MfPH8j1g6e27
+         jpy4NCWhLSrGpIiV08AuBUWvnzCr6I8kLMzxg=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730935366; x=1731540166;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ydMjaDBHGP4Lclf9xzXBO/5cdGNcVM/AKLksSI3sEJg=;
-        b=WaxEH57ELaLdR9EVDA29Io0jadzaQqjaYV5CS1Pn1YVqGzRk/Yg6BBtR3+/GFkvL71
-         0+9LEcmAYBydozJt66/DbQwRe7+y6wp26VYRF7dBeqIA1evo3TnAi/4mA+2KC7LBgzZ2
-         i9/3+VbSwPhclKxiO8r/r946bQY7NCidHx+qNdz0wP4WqPPG68HHNPGCO9uLgroT0kqj
-         VUMHxZmjrq/toQ0FjuRZlxv+lbJXeDM0ioYGettzXnnfIBT0WjuD2N64xFDgjPJJXvpz
-         HXhfD/KZI/W79pTD+RLe7m74EPWWr7vIKuztKcZFE1jLrGiYjvoxzFJPwQI7zn7P/Lmi
-         XVpA==
-X-Gm-Message-State: AOJu0YzAwVf6aavBFvee4P+qtdz+SUvI+YFIbO4cXwqdeDpQ2zukMeUf
-	TrWBu9MU+2BF9+fm4yxVN9J0ndawu60A0Z87HcwUl3UkoMsV0okRQExuMTtWhEQCQtuDtRmD3VI
-	U
-X-Google-Smtp-Source: AGHT+IF/EhaMc7fzgDGnQqC9rGXvQ2RrvnawI/SmabYZLwWg1vQ4FFUedV1FQWsXM7FD+72xYFUSEQ==
-X-Received: by 2002:a05:6a00:14ca:b0:71e:7674:4cf6 with SMTP id d2e1a72fcca58-724080b6e40mr71119b3a.8.1730935366370;
-        Wed, 06 Nov 2024 15:22:46 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078a7ef5sm101396b3a.63.2024.11.06.15.22.46
+        d=1e100.net; s=20230601; t=1730935462; x=1731540262;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:date:from:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U8uxnrcOwKifkarVHZh48p269SqKXVupbsayYJfQgAA=;
+        b=BgiGKO2nTiQgauPWTglb1eZWykflMWKZn/u7yoSL9yAxmj9DBzuiTyjY8uBoR+WpYo
+         OFvct+ta2Rr+pX+cctwY6JuUhpNCY71xmg0dRJTlORjtpH3tnLgcCb0IMvu8FMM1DoRw
+         3QKVcTHKaTnq457gaUFJ9UXm29zffS2T0DwdQ3lESqfGEYFMc64Dft9BM5Yp1Gcpppbn
+         gcuA/6KDsWWZW3XRdsvStq1xFUf8Jj5G3b9WyDScr5JFc9WL9q61bfqtDlQToPE1udAw
+         5YR8Rt8bjnEGewInGT/QqG2yQQ1iZAxwqbDYQKRaTPARbYe2HA8z9XnaqxNn+FmOl2hH
+         d8Pg==
+X-Gm-Message-State: AOJu0Yz+a9vvBKyCPZyQZ7J5inK66cJFzF63J+n1QwhxGEprdTvn5NmI
+	KWF6mASxRRd5KRb9Lx0ZIOtoSzSqKVIb1ruDbIqfVabc1HZ1ZZ+pmtD9p8J1bw==
+X-Google-Smtp-Source: AGHT+IFXx00yL8MXEioceyI6AFnT20/LFsr0fhoMsjU1YFDXGYK5QfiOdSAFhXlqe4DyhmxMi/X1WQ==
+X-Received: by 2002:ac8:5f95:0:b0:454:ec22:dd79 with SMTP id d75a77b69052e-4613c046d49mr642303201cf.24.1730935462405;
+        Wed, 06 Nov 2024 15:24:22 -0800 (PST)
+Received: from JRM7P7Q02P ([136.56.190.61])
+        by smtp.gmail.com with ESMTPSA id d75a77b69052e-462ff3ef11esm323961cf.15.2024.11.06.15.24.20
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 15:22:46 -0800 (PST)
-Date: Wed, 6 Nov 2024 15:22:44 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Bjarni Ingi Gislason <bjarniig@simnet.is>
-Cc: netdev@vger.kernel.org
-Subject: Re: dcb.8: some remarks and editorial changes for this manual
-Message-ID: <20241106152244.21a1c384@hermes.local>
-In-Reply-To: <ZybRdNeIHWohpWYN@kassi.invalid.is>
-References: <ZybRdNeIHWohpWYN@kassi.invalid.is>
+        Wed, 06 Nov 2024 15:24:21 -0800 (PST)
+From: Andy Gospodarek <andrew.gospodarek@broadcom.com>
+X-Google-Original-From: Andy Gospodarek <gospo@broadcom.com>
+Date: Wed, 6 Nov 2024 18:24:13 -0500
+To: Mohammad Heib <mheib@redhat.com>
+Cc: netdev@vger.kernel.org, michael.chan@broadcom.com, skotur@broadcom.com
+Subject: Re: [PATCH net] bnxt_en: use irq_update_affinity_hint()
+Message-ID: <Zyv6ncZSVR5mohsF@JRM7P7Q02P>
+References: <20241106180811.385175-1-mheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106180811.385175-1-mheib@redhat.com>
 
-On Sun, 3 Nov 2024 01:27:16 +0000
-Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
-
->   The man page is from Debian:
+On Wed, Nov 06, 2024 at 08:08:11PM +0200, Mohammad Heib wrote:
+> irq_set_affinity_hint() is deprecated, Use irq_update_affinity_hint()
+> instead. This removes the side-effect of actually applying the affinity.
 > 
-> Package: iproute2
-> Version: 6.11.0-1
-> Severity: minor
-> Tags: patch
+> The driver does not really need to worry about spreading its IRQs across
+> CPUs. The core code already takes care of that. when the driver applies the
+> affinities by itself, it breaks the users' expectations:
 > 
->   Improve the layout of the man page according to the "man-page(7)"
-> guidelines, the output of "mandoc -lint T", the output of
-> "groff -mandoc -t -ww -b -z", that of a shell script, and typographical
-> conventions.
+>  1. The user configures irqbalance with IRQBALANCE_BANNED_CPULIST in
+>     order to prevent IRQs from being moved to certain CPUs that run a
+>     real-time workload.
 > 
-> -.-
+>  2. bnxt_en device reopening will resets the affinity
+>     in bnxt_open().
 > 
-> Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
+>  3. bnxt_en has no idea about irqbalance's config, so it may move an IRQ to
+>     a banned CPU. The real-time workload suffers unacceptable latency.
 > 
-> diff --git a/dcb.8 b/dcb.8.new
-> index a1d6505..2202224 100644
-> --- a/dcb.8
-> +++ b/dcb.8.new
-> @@ -2,74 +2,74 @@
 
-The format of these patches does not allow for simple application to
-the iproute tree. Patches should be on the same file. All your patches
-have .new which won't work.
+Thanks for the patch.  This seems inline with what have been done in other
+drivers.
 
-The simplest way to handle this would be:
- - take a git branch on your local repo
- - do the work there and commit each change
- - when ready to:
-     $ git send-email --subject-prefix 'PATCH v2 iproute' --cover-letter main
+> Signed-off-by: Mohammad Heib <mheib@redhat.com>
+Reviewed-by: Andy Gospodarek <gospo@broadcom.com>
 
-
-
-A normal patch looks like this one.
-
-
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1b49d69e..84931abd 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -30,6 +30,7 @@ M: Roopa Prabhu <roopa@nvidia.com>
- M: Nikolay Aleksandrov <razor@blackwall.org>
- L: bridge@lists.linux-foundation.org (moderated for non-subscribers)
- F: bridge/*
-+F: ip/iplink_bridge*
- 
- Data Center Bridging - dcb
- M: Petr Machata <me@pmachata.org>
--- 
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++---
+>  1 file changed, 3 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> index 99d025b69079..cd82f93b20a1 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+> @@ -10885,7 +10885,7 @@ static void bnxt_free_irq(struct bnxt *bp)
+>  		irq = &bp->irq_tbl[map_idx];
+>  		if (irq->requested) {
+>  			if (irq->have_cpumask) {
+> -				irq_set_affinity_hint(irq->vector, NULL);
+> +				irq_update_affinity_hint(irq->vector, NULL);
+>  				free_cpumask_var(irq->cpu_mask);
+>  				irq->have_cpumask = 0;
+>  			}
+> @@ -10940,10 +10940,10 @@ static int bnxt_request_irq(struct bnxt *bp)
+>  			irq->have_cpumask = 1;
+>  			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+>  					irq->cpu_mask);
+> -			rc = irq_set_affinity_hint(irq->vector, irq->cpu_mask);
+> +			rc = irq_update_affinity_hint(irq->vector, irq->cpu_mask);
+>  			if (rc) {
+>  				netdev_warn(bp->dev,
+> -					    "Set affinity failed, IRQ = %d\n",
+> +					    "Update affinity hint failed, IRQ = %d\n",
+>  					    irq->vector);
+>  				break;
+>  			}
+> -- 
+> 2.34.3
+> 
 
