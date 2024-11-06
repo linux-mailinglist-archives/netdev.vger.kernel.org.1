@@ -1,84 +1,125 @@
-Return-Path: <netdev+bounces-142479-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142480-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69DC09BF4D2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:07:54 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C6F49BF4D8
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 19:08:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B8281C2332F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:07:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4101A285496
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C47207A0F;
-	Wed,  6 Nov 2024 18:07:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 71CD6207A0F;
+	Wed,  6 Nov 2024 18:08:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rB2SFywN"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="e6eFwVd0"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 047AD2076C0
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 18:07:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6556207218
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 18:08:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730916470; cv=none; b=lVYFB8jPaumnXTI2CIo41CU4fDs8/ecNd+rFIYcusmAiAZcQncT3IvCCtxLjhYaK6zQyNejahexpkUW6iJdPiI+e8w2AxLi6CY4CXpDsTACK9ShpNhW1+304BwjiIKjP0BNQH6heGNe5a21TvNlJvLKPUx7ISiM+VFYTovFh/JU=
+	t=1730916510; cv=none; b=LxxAAil4+ftYkcJPUTDNbgAsO2wAjH0DS0c/Eb1S/IFBEib2O1asrMM8zrnA/bFzdSTj0lk2Uk5KuNncl0nSscFJPy+rWq1xPi91S0mFWSLMEijlWrUXwowHse3RXgImfqNjFh7vamKTPeXz70EOcAspdVQNFg+Rkg0Mdy8M4dY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730916470; c=relaxed/simple;
-	bh=1uN+lx6Q52xc7VqJJ2JnvkrNl+Bya2uyzQ2iOU/tpwU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=EGslC1NrfMswZlaa2ObMLCdwoDTUYvgBL/RjL2SpvrEs1zWvUCR6kNvMunLn5crYY8tt1C4r5RmCwOlHAJB1fgK8zN+PdeH9SsUI3kO14YJVUukO4Opgd7nrPsKDaFbH5W5anDSa0SbZxHfP3Cb98b8syxd8Ce41llN/fgevCsg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rB2SFywN; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=W7tawP5tFd6bBBJus73Bue8aXadO8vvB9NMfmf+dK8o=; b=rB2SFywN4JMuKFYll/FwXj3mIY
-	fq2ZXnziO9FwMuczpINddoJjLfqF+XfatPHQM4VAUVHmZhOTXljncGwDzreU/qOH5XDZbqrQM22Nn
-	hiW4uQ2Y1B6zmU2CK8vFQz/MsRNL/c2REW+z3KLlcCqSjU4QanMs01FqT8p0FpW1vKE8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t8kRV-00CMis-PJ; Wed, 06 Nov 2024 19:07:45 +0100
-Date: Wed, 6 Nov 2024 19:07:45 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: wojackbb@gmail.com
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com,
-	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com,
-	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com,
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com,
-	linux-arm-kernel@lists.infradead.org,
-	angelogioacchino.delregno@collabora.com,
-	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
-Subject: Re: [PATCH] [net-next] net: wwan: t7xx: Change PM_AUTOSUSPEND_MS to
- 5000
-Message-ID: <eff354db-0ba4-421b-8ecf-a285ea7aab36@lunn.ch>
-References: <20241106104005.337968-1-wojackbb@gmail.com>
+	s=arc-20240116; t=1730916510; c=relaxed/simple;
+	bh=Zx+mR+pJK4WCSJENoiqAN9qbUWT6nBlbFBny5lE9/8g=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=msZ0YPdviA/7bnnB6RCe+/cPoqAVD8lNXvjmRV5UcvuHLG3qLNUvzGSkBiPpQUbc8lVwYn2bZZVUm+2R6ZBOnJOMNoVPZ33WWFrZDJOrzUOBc57K4Z4cuStQl+/KmuD2e6tD1HnPnUzLidcoz/0StqE1+ZuQb1Q2OF//s46IuYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=e6eFwVd0; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730916507;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=qmFxe9cqWWazJeOBmapKJMGyScE7HeewCfktlCZvUIc=;
+	b=e6eFwVd0qFPWH7Kdih9FOSE6Q+/EeV2vG4ht6fBGQmwti3Vc9V0CNXAUf9wilEvNjifdx0
+	5rjCTxHWHVNLARU9+uenjtrR2KzN0Q49EyxxIVVVx2Ef7vxp9nH/1W/BdPqS+lVWUw9DEL
+	mxS9b5geucVkeMAKYMFWIu4AGM4DPjI=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-455-qrlFUO3yMLugGH-RUJkH8Q-1; Wed,
+ 06 Nov 2024 13:08:26 -0500
+X-MC-Unique: qrlFUO3yMLugGH-RUJkH8Q-1
+X-Mimecast-MFC-AGG-ID: qrlFUO3yMLugGH-RUJkH8Q
+Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 4E5901955F43;
+	Wed,  6 Nov 2024 18:08:25 +0000 (UTC)
+Received: from mheiblap.localdomain.com (unknown [10.47.238.66])
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 0D90619560AA;
+	Wed,  6 Nov 2024 18:08:22 +0000 (UTC)
+From: Mohammad Heib <mheib@redhat.com>
+To: netdev@vger.kernel.org,
+	michael.chan@broadcom.com
+Cc: Mohammad Heib <mheib@redhat.com>
+Subject: [PATCH net] bnxt_en: use irq_update_affinity_hint()
+Date: Wed,  6 Nov 2024 20:08:11 +0200
+Message-Id: <20241106180811.385175-1-mheib@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106104005.337968-1-wojackbb@gmail.com>
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-On Wed, Nov 06, 2024 at 06:40:05PM +0800, wojackbb@gmail.com wrote:
-> From: Jack Wu <wojackbb@gmail.com>
+irq_set_affinity_hint() is deprecated, Use irq_update_affinity_hint()
+instead. This removes the side-effect of actually applying the affinity.
 
-FYI: The net-next should be inside the [] with PATCH:
-[PATCH net-next]
+The driver does not really need to worry about spreading its IRQs across
+CPUs. The core code already takes care of that. when the driver applies the
+affinities by itself, it breaks the users' expectations:
 
-Use --subject-prefix= with git format-patch.
+ 1. The user configures irqbalance with IRQBALANCE_BANNED_CPULIST in
+    order to prevent IRQs from being moved to certain CPUs that run a
+    real-time workload.
 
-You should also put the patch version in there:
+ 2. bnxt_en device reopening will resets the affinity
+    in bnxt_open().
 
-[PATCH net-next v42]
+ 3. bnxt_en has no idea about irqbalance's config, so it may move an IRQ to
+    a banned CPU. The real-time workload suffers unacceptable latency.
 
-	Andrew
+Signed-off-by: Mohammad Heib <mheib@redhat.com>
+---
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+index 99d025b69079..cd82f93b20a1 100644
+--- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
++++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
+@@ -10885,7 +10885,7 @@ static void bnxt_free_irq(struct bnxt *bp)
+ 		irq = &bp->irq_tbl[map_idx];
+ 		if (irq->requested) {
+ 			if (irq->have_cpumask) {
+-				irq_set_affinity_hint(irq->vector, NULL);
++				irq_update_affinity_hint(irq->vector, NULL);
+ 				free_cpumask_var(irq->cpu_mask);
+ 				irq->have_cpumask = 0;
+ 			}
+@@ -10940,10 +10940,10 @@ static int bnxt_request_irq(struct bnxt *bp)
+ 			irq->have_cpumask = 1;
+ 			cpumask_set_cpu(cpumask_local_spread(i, numa_node),
+ 					irq->cpu_mask);
+-			rc = irq_set_affinity_hint(irq->vector, irq->cpu_mask);
++			rc = irq_update_affinity_hint(irq->vector, irq->cpu_mask);
+ 			if (rc) {
+ 				netdev_warn(bp->dev,
+-					    "Set affinity failed, IRQ = %d\n",
++					    "Update affinity hint failed, IRQ = %d\n",
+ 					    irq->vector);
+ 				break;
+ 			}
+-- 
+2.34.3
+
 
