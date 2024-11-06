@@ -1,108 +1,119 @@
-Return-Path: <netdev+bounces-142426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9079A9BF0F0
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:58:32 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A7FD9BF104
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:01:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id CA733B2273F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:58:29 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C44BEB2531E
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ABDC41E767B;
-	Wed,  6 Nov 2024 14:58:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6E2318FC91;
+	Wed,  6 Nov 2024 15:00:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b="m+tJtfR+"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NaryHrI6"
 X-Original-To: netdev@vger.kernel.org
-Received: from natrix.sarinay.com (natrix.sarinay.com [159.100.251.32])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C03EB202F74
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 14:58:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.100.251.32
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B203718C03F
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 15:00:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730905097; cv=none; b=DA5s/zsDa9Nr7eV+MMM+s2eihaUeVP5L3AqJWb5qRo9ymWaejNl3Harvj4vcuRlDvvnADOWdxHTN1qmsL+hhIDm2fJrNaj4K0Xuws6La5EBc3W7I1fqB873biUKYN4zADu6a7nJOY1uRwe7sfXGLexHD7uNSfck6SAzgyP5SGpQ=
+	t=1730905219; cv=none; b=RDs5VF4UWhjLCOk3/Ch+uTARw3F4rA22vac89CKcPX1Ny91rg6asTXzqGMnzSJMhtLYNv70MbtMMJP86t9zgFW1s7yePM5SuSnXmQbyc4wRHGk3279ZKRzSczCel7coZAWwW3TXGYRLuWzUvSyil339cO+Ow5xD5jGzlIAv7ekU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730905097; c=relaxed/simple;
-	bh=omvBOMsw8qm6Es20HBliwbCN7wg4thVyEJYyYQ3mDUM=;
-	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
-	 Content-Type:MIME-Version; b=AxkWx6l1MtLkeTS4Z49xANWY+6Kf4rgyQFdAQUoJF+japQ/DyexzyLACn/cgQjh6DUsEzebFLseULxpxUIc5qDHysrk7qZaWb5l7UHafCeqsx9xZrC8wjEhOrmakIAD+cdk8xtEoos+7c79F59N3knF3TjWFy4cOUAOqeTIBa38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com; spf=pass smtp.mailfrom=sarinay.com; dkim=pass (2048-bit key) header.d=sarinay.com header.i=@sarinay.com header.b=m+tJtfR+; arc=none smtp.client-ip=159.100.251.32
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=sarinay.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sarinay.com
-DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=sarinay.com; s=2023;
-	t=1730905088; bh=omvBOMsw8qm6Es20HBliwbCN7wg4thVyEJYyYQ3mDUM=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References;
-	b=m+tJtfR+KU17Jki270CqsRohjZKeBWs3OdzLuKM/LaHdpQ+nW/pPIs5zduQO/MJ2G
-	 4lmO5FNZYWB8lp2HYv0RRmAnmfPUwN+aL5ylI9BnYznsVvdueTll1KAt1I89KXGSz4
-	 i7Zj24oKONLFnx9yJkzB7lT/vcXahFCErZsNVrHyL3dpQtVmhSI9rpcR93ps3owiBp
-	 BKXjCJMUztJsOxNyYjL8oIojfAOFgywAG4tabPzJmRwKHqjEIthiEhqbZrGND4UPrB
-	 7SL64Xp822uk7PyOZb9N1qXGT61ZzyWYl1t7/q0YqpLQsHUMYgzNbs119l8K5G9TWJ
-	 gyOu4QABW9r7g==
-Message-ID: <a0d73e24863106f477abba75b996f4b9ff00d737.camel@sarinay.com>
-Subject: Re: [PATCH net-next v2] net: nfc: Propagate ISO14443 type A target
- ATS to userspace via netlink
-From: Juraj =?UTF-8?Q?=C5=A0arinay?= <juraj@sarinay.com>
-To: Simon Horman <horms@kernel.org>
-Cc: netdev@vger.kernel.org, krzk@kernel.org, kuba@kernel.org
-Date: Wed, 06 Nov 2024 15:58:08 +0100
-In-Reply-To: <20241106101804.GM4507@kernel.org>
-References: <20241103124525.8392-1-juraj@sarinay.com>
-	 <20241106101804.GM4507@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+	s=arc-20240116; t=1730905219; c=relaxed/simple;
+	bh=ZxhHGcVMGkOTmRlXHYf2j9fcy44PbxWGEr5K4E/whr0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CrU7+ZuXFIVZdnASfJZ3TNWfRHAysnjBoCITvuyX1XY7Q1fXu6z7OH49X5i3FbO5Lg8aTVANMAUrKi/ZfsP83AhG9uue8qvdllLg8XTFq2lW8DBb1NMBTHsjX93cyJ0S/e7Mo9DT4jZAEJxL9neEZGmxuazEd27TZKy/GEstT1Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NaryHrI6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 44FEAC4CEC6;
+	Wed,  6 Nov 2024 15:00:17 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730905218;
+	bh=ZxhHGcVMGkOTmRlXHYf2j9fcy44PbxWGEr5K4E/whr0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=NaryHrI6t/SKwyRhRkOiIJZWKINoEtt+Q9pO4Mnts9c3ze1EBKf9KgSz2/oYegdws
+	 KljaPXs2Q00MR6Ouxm8Hwy+HbaiNKnw7VIkrqNgH9NgdYgHRm01qDgGKmEqPlyZpmD
+	 9H5SGhzg+Dk8/hsPnZK+G99lrnN3KSL/ff24bhW8MpstCBr5d0gBCWolQDL0dsrxs7
+	 JEcfdaWp20Ow3+myi2l9umKlGs03m9i7b6oJrT++XLtCn98gsmfvWAmVH2HDzM6VGC
+	 pxQtf+MkSae7dvAqH/aRrYxFu8v6na+uHweNEbbNAMQYAdrFM9463hbpTeC/1ub/Xy
+	 9pYXeyMG/KDAw==
+Date: Wed, 6 Nov 2024 15:00:15 +0000
+From: Simon Horman <horms@kernel.org>
+To: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, david.m.ertman@intel.com,
+	netdev@vger.kernel.org,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: Re: [Intel-wired-lan] [PATCH iwl-net] ice: change q_index variable
+ type to s16 to store -1 value
+Message-ID: <20241106150015.GQ4507@kernel.org>
+References: <20241028165922.7188-1-mateusz.polchlopek@intel.com>
+ <20241102143818.GM1838431@kernel.org>
+ <748c0685-cd16-4f7e-b359-91b095fc3d26@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <748c0685-cd16-4f7e-b359-91b095fc3d26@intel.com>
 
-On Wed, 2024-11-06 at 10:18 +0000, Simon Horman wrote:
-> > Add a 20-byte field ats to struct nfc_target and expose it as
-> > NFC_ATTR_TARGET_ATS via the netlink interface. The payload contains
-> > 'historical bytes' that help to distinguish cards from one another.
-> > The information is commonly used to assemble an emulated ATR similar
-> > to that reported by smart cards with contacts.
->=20
-> Perhaps I misunderstand things, and perhaps there is precedence in relati=
-on
-> to ATR_RES. But I am slightly concerned that this leans towards exposing
-> internal details rather then semantics via netlink.
->=20
+On Mon, Nov 04, 2024 at 01:56:20PM +0100, Mateusz Polchlopek wrote:
+> 
+> 
+> On 11/2/2024 3:38 PM, Simon Horman wrote:
+> > On Mon, Oct 28, 2024 at 12:59:22PM -0400, Mateusz Polchlopek wrote:
+> > > Fix Flow Director not allowing to re-map traffic to 0th queue when action
+> > > is configured to drop (and vice versa).
+> > > 
+> > > The current implementation of ethtool callback in the ice driver forbids
+> > > change Flow Director action from 0 to -1 and from -1 to 0 with an error,
+> > > e.g:
+> > > 
+> > >   # ethtool -U eth2 flow-type tcp4 src-ip 1.1.1.1 loc 1 action 0
+> > >   # ethtool -U eth2 flow-type tcp4 src-ip 1.1.1.1 loc 1 action -1
+> > >   rmgr: Cannot insert RX class rule: Invalid argument
+> > > 
+> > > We set the value of `u16 q_index = 0` at the beginning of the function
+> > > ice_set_fdir_input_set(). In case of "drop traffic" action (which is
+> > > equal to -1 in ethtool) we store the 0 value. Later, when want to change
+> > > traffic rule to redirect to queue with index 0 it returns an error
+> > > caused by duplicate found.
+> > > 
+> > > Fix this behaviour by change of the type of field `q_index` from u16 to s16
+> > > in `struct ice_fdir_fltr`. This allows to store -1 in the field in case
+> > > of "drop traffic" action. What is more, change the variable type in the
+> > > function ice_set_fdir_input_set() and assign at the beginning the new
+> > > `#define ICE_FDIR_NO_QUEUE_IDX` which is -1. Later, if the action is set
+> > > to another value (point specific queue index) the variable value is
+> > > overwritten in the function.
+> > > 
+> > > Fixes: cac2a27cd9ab ("ice: Support IPv4 Flow Director filters")
+> > > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> > > Signed-off-by: Mateusz Polchlopek <mateusz.polchlopek@intel.com>
+> > 
+> > This looks good, although I am interested to know what the maximum value
+> > for q_index is. And, considering unsigned values are used elsewhere, if
+> > using 0xffff within this driver was considered instead of -1.
+> > 
+> > That notwithstanding,
+> > 
+> > Reviewed-by: Simon Horman <horms@kernel.org>
+> 
+> Hi Simon!
+> 
+> Thanks for Your review.
+> What is about q_index: it stores queue index which can be theoretically
+> up to few thousands. So in this case s16 should be enough and will be
+> able to hold all indexes. I didn't consider 0xffff as this may be
+> misleading, I decided to stay with -1.
 
-Hi Simon
-
-Thanks for the feedback. NFC_ATTR_TARGET_ATS would serve a similar
-purpose as the following attributes the kernel already exposes (see
-nfc.h):
-
- * @NFC_ATTR_TARGET_SENS_RES: NFC-A targets extra information such as NFCID
- * @NFC_ATTR_TARGET_SEL_RES: NFC-A targets extra information (useful if the
- *	target is not NFC-Forum compliant)
- * @NFC_ATTR_TARGET_NFCID1: NFC-A targets identifier, max 10 bytes
- * @NFC_ATTR_TARGET_SENSB_RES: NFC-B targets extra information, max 12 byte=
-s
- * @NFC_ATTR_TARGET_SENSF_RES: NFC-F targets extra information, max 18 byte=
-s
- * @NFC_ATTR_TARGET_ISO15693_DSFID: ISO 15693 Data Storage Format Identifie=
-r
- * @NFC_ATTR_TARGET_ISO15693_UID: ISO 15693 Unique Identifier
-
-The ATR I am after means "Answer To Reset" as defined in ISO 7816. It
-has little to do with ATR_RES :=3D "Attribute Request Response" defined
-in the NFC Digital specification. I only mentioned ATR_RES as the
-source of the information handled by nci_store_general_bytes_nfc_dep(),
-the function that motivated some of the code I propose to add.
-
-Part 3 of the PC/SC Specification, Section 3.1.3.2.3 on ATR may perhaps
-serve as a more authoritative source of motivation for the patch.
-
-https://pcscworkgroup.com/Download/Specifications/pcsc3_v2.01.09.pdf
-
-The goal is to access contactless identification cards via PC/SC.
-
-	Juraj
-
+Thanks. I agree that if we are expecting the maximum (positive) value
+to be a few thousand, then the s16-based approach you have taken is a good
+one.
 
