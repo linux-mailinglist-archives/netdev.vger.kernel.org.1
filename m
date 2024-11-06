@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-142546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2762B9BF93B
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:27:09 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A2A09BF93D
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:27:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7972FB22B2D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 22:27:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5779284703
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 22:27:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22A0320D4E1;
-	Wed,  6 Nov 2024 22:26:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0377B20D4F8;
+	Wed,  6 Nov 2024 22:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="U/tbhTFv"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="C2MQmZ9y"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f49.google.com (mail-ot1-f49.google.com [209.85.210.49])
+Received: from mail-ot1-f52.google.com (mail-ot1-f52.google.com [209.85.210.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F73820E30D
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 22:26:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69FEC20D4EC
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 22:26:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730931985; cv=none; b=m7uftuaDqlsGDknMeBSgApcyhceF7WDCX/jeXTJRsTEs3ZrenEHTJBO9Hy2sXW5HZN6rKf8yOYYzwoxCy/3HV6yr5oAWYEcwZGR/tFxh/ydHqRAoi8/VW6DGCgBZyb5JqRuxWkmLHkKvPTOyGF58zoLdz/WzLVxCzfhgf6AdLos=
+	t=1730931989; cv=none; b=qdYphlbGPuI8Quz3zmpHec4oU+zi/n996s6sNxba4XV+cIF6PI/jqW4YVBhLSBEMvJnxoSJFEtRno/B57XrZWCrtLo1Iy3QTtEHWUFPEdMw4bbauv/j3MSFavGp1dR5s55z/sRAHI2/YvdPZeEXNukiOfmUmDTkdb5+IwZWeWzU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730931985; c=relaxed/simple;
-	bh=xY3Iw8eGGcMBCG99o2KeIj7WYBk9LPCRvd2nwY/GJuE=;
+	s=arc-20240116; t=1730931989; c=relaxed/simple;
+	bh=/m+0uR0MlsRfpngmViBSR0nIX7YXBrTZrqLMMXQ606w=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=M5ZKLWO5KbPdgosSsNM+cw/0liud6YrCp1qa14Wf5ZyVgabVEdTiU8PFIuOyJUIKom071p/shO9qZ4SyzzbGqIId+c0P6VimPVjwraHV88XMmaNF9LatdRbQ9EWBI6q9Himk18xTX2BunrmQ6PWd6qlkQWcxOkyvwfdUdrwKwQA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=U/tbhTFv; arc=none smtp.client-ip=209.85.210.49
+	 MIME-Version; b=elWTtJRVb2api15pHXrOVxaqGO73ZL6YFL+v5OE3y3DwRG87z7y9JOHRY9Q9Ryb8rGx2eE/ABEP3vjYQkPQc+rGn9LSTf/GE52VWdvaW0yFYV7oLpPsav7IvC1mq9S2UEXDZpwKvmxSw9jWCseFUxBaT52qVg4qPXXxJgkP1VGE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=C2MQmZ9y; arc=none smtp.client-ip=209.85.210.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-ot1-f49.google.com with SMTP id 46e09a7af769-7181a8af549so228330a34.2
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 14:26:23 -0800 (PST)
+Received: by mail-ot1-f52.google.com with SMTP id 46e09a7af769-7181885ac34so253933a34.3
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 14:26:26 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1730931982; x=1731536782; darn=vger.kernel.org;
+        d=bytedance.com; s=google; t=1730931985; x=1731536785; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=h0HGA2syRN5y9s7R9m7dm5GeVLMrSiqb/s9x6nYldOs=;
-        b=U/tbhTFveNp1RcR9SvMSrC90TTdvNEMi+36WZNRFbppeuXhW4XJf2JykckqzWpngoA
-         /RvTV1YPLd7vfoJPa2hCExGiED8jo3qsAhWZmX7rokb0QT0D4eBcKkJbqvJxNbUTDPBO
-         d0jnHtRbD95ZYaD/qRWM+obhHhPXkqFk3dBDs0sZaI3W03V5iYNJbb2qoLCJxU8RTciA
-         Slbt309+CnMzRwFfBccxPszzV/b3J9gDA7xnK5F7uSxeQaXadAPqxznOEjErj/iuHbn5
-         1m1tEDcvxMnJhqCzs4cNkkK8lgNSZIxJCsqhFzvbHkh1PScuX52YtDNurDhdCNZIsVIB
-         Odxw==
+        bh=0TeP94uGFKCrHms83cSM4YiyobYdbFTOX87WRlt5MwE=;
+        b=C2MQmZ9ysH4LaYMsCpb4UYkomJ58e6HhRecTAObLnn+2p7Hg0rYlBEaobg/IBrwBSD
+         GXAHvSkPFVq4RxP8LMW86EC3GLQodabf4R/E6jshoDSJJ+bVhep2pW3hD65qBSL0v8MC
+         Jx3y3KMdN4dvfiLZv2djfYgDDmCtgnlrMAZeMi/KMRZFqmoRHYScrV91SX0pD1N/5bGF
+         82kZSoMhbedk+ThHWclFGtFD/WNPwk2HvCweXfDtb0qqdkDYk5AlexWrRqL2gmqu7e47
+         bxZIo1JJZpi5hvOEgnzetOgxb3G70UcFGma6eUPrl2u1MG0YFXJs/Zn6AyccEb6Yzki+
+         8pLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730931982; x=1731536782;
+        d=1e100.net; s=20230601; t=1730931985; x=1731536785;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=h0HGA2syRN5y9s7R9m7dm5GeVLMrSiqb/s9x6nYldOs=;
-        b=kxPzleyiFEvfZsR+FhcmtV59T611yjY5sf01nxcXwHUiWnR5zMd55++pxFaU5wFXJ7
-         qYHTf+P+ALJuqOSG72EfZbX/RJrqpi2A2cuYVYbhL27W+8KevcOAuBOEdp31EThQ0BMQ
-         049QL6LUHAYk2NeGAy3Wm1YrFmoF8OZXDdXVALhBDe7lzD6pvSj4PF+stvO27TlWC4D1
-         QoSnscxqFo3zBF/7B3OW0SDAYH97XK9Sq/qrknO6ItEooSwwGq7FIh6vLhz2oHFlVKOw
-         +G7ogimoi31sRwRCpPtlzHfFaep36cupfCgXwLa77k7aJCxzew3ys/wjVstzBX+HTkkD
-         zGUw==
-X-Forwarded-Encrypted: i=1; AJvYcCVuloEc7gRlcKwHkjYqyKt3SKefEQ6Yess5gbJPkVusrdalYljZ4LrHBQguRtcbWpaohZWX2v4=@vger.kernel.org
-X-Gm-Message-State: AOJu0YySvI6GQ+4xUltKH3Qeb+bi+cSPffPMuanBX8EP0NWXZntmOMOH
-	YA+rQzvmhBn7LmwId8LBwIMMUaD/ar0z5iqC68KDm2p1RYqLYSPiHELqYKHsqXk=
-X-Google-Smtp-Source: AGHT+IGWKofCI6TAOtgbyO7DqfjcexCEellUqbkcRY5XPUrYDGLq4TV/mfqzGtVhM5LJj4ZqL81z/g==
-X-Received: by 2002:a05:6830:907:b0:718:194d:8b1 with SMTP id 46e09a7af769-7186828191fmr38372850a34.23.1730931982401;
-        Wed, 06 Nov 2024 14:26:22 -0800 (PST)
+        bh=0TeP94uGFKCrHms83cSM4YiyobYdbFTOX87WRlt5MwE=;
+        b=KbrTVDhT7j+k0OUG765VlfKMODscw9WUM41J53JAcO3Cccndz6MRNZ6AZhCXer8ABZ
+         OCY/h329PhkHn1lBQHIVFcFsBwqy70bt+2nzCLeAGhkkHp2RrLpI1h66ospK3t2StqAY
+         7FLsnskuWK4ikPWb549AoFQsH8Wf9kD1wvWanajTb7VTcGTIRQwAq+YVybgzKjFm8Yq8
+         VCLgW4xGvd7skKLB61+aWzVWF3ECdn9pIho/XT3Y7gNoMZn+oMJhRx4WEiSg5CcBStAP
+         EF7CZ8Jlpz7M6zlg2fzQHMUYZ+XsCphDLTqGCD/IjnQG82CpoVfwy9KuDDb2XRs5YHeV
+         WZoA==
+X-Forwarded-Encrypted: i=1; AJvYcCWu8uYzBLgv/5mceEB+UhkeUaaYBICdTCoBax6ZO/bT8UNGUv/7ZBC/M4crcSZ7YUXX3KqEkIY=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNjTc40c5Hvp9tmGbJd0T3bzuiHRPW4WRtnlkHlUfMlqX74ud7
+	n8zfjHf6Lki/6XLHwnBl9qn/ZCDHZrXziZvgIPXDb8Zffp0ZlbVOiVCTxJC5etw=
+X-Google-Smtp-Source: AGHT+IEDbyL+ocJjaFcUDxCmW0bULbH4cOPxfLI9IqKQtRqet0QC05czQrSXaQEQ9wLVSuo/eOAQjw==
+X-Received: by 2002:a05:6830:6e82:b0:718:5a53:cc61 with SMTP id 46e09a7af769-718682964a8mr41678703a34.30.1730931985518;
+        Wed, 06 Nov 2024 14:26:25 -0800 (PST)
 Received: from n191-036-066.byted.org ([139.177.233.211])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32acf6c46sm2536585a.127.2024.11.06.14.26.21
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32acf6c46sm2536585a.127.2024.11.06.14.26.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 14:26:21 -0800 (PST)
+        Wed, 06 Nov 2024 14:26:24 -0800 (PST)
 From: zijianzhang@bytedance.com
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org,
@@ -92,9 +92,9 @@ Cc: ast@kernel.org,
 	cong.wang@bytedance.com,
 	netdev@vger.kernel.org,
 	Zijian Zhang <zijianzhang@bytedance.com>
-Subject: [PATCH v2 bpf-next 6/8] bpf, sockmap: Several fixes to bpf_msg_push_data
-Date: Wed,  6 Nov 2024 22:25:18 +0000
-Message-Id: <20241106222520.527076-7-zijianzhang@bytedance.com>
+Subject: [PATCH v2 bpf-next 7/8] bpf, sockmap: Several fixes to bpf_msg_pop_data
+Date: Wed,  6 Nov 2024 22:25:19 +0000
+Message-Id: <20241106222520.527076-8-zijianzhang@bytedance.com>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20241106222520.527076-1-zijianzhang@bytedance.com>
 References: <20241106222520.527076-1-zijianzhang@bytedance.com>
@@ -108,123 +108,95 @@ Content-Transfer-Encoding: 8bit
 
 From: Zijian Zhang <zijianzhang@bytedance.com>
 
-Several fixes to bpf_msg_push_data,
-1. test_sockmap has tests where bpf_msg_push_data is invoked to push some
-data at the end of a message, but -EINVAL is returned. In this case, in
-bpf_msg_push_data, after the first loop, i will be set to msg->sg.end, add
-the logic to handle it.
-2. In the code block of "if (start - offset)", it's possible that "i"
-points to the last of sk_msg_elem. In this case, "sk_msg_iter_next(msg,
-end)" might still be called twice, another invoking is in "if (!copy)"
-code block, but actually only one is needed. Add the logic to handle it,
-and reconstruct the code to make the logic more clear.
+Several fixes to bpf_msg_pop_data,
+1. In sk_msg_shift_left, we should put_page
+2. if (len == 0), return early is better
+3. pop the entire sk_msg (last == msg->sg.size) should be supported
+4. Fix for the value of variable "a"
+5. In sk_msg_shift_left, after shifting, i has already pointed to the next
+element. Addtional sk_msg_iter_var_next may result in BUG.
 
-Fixes: 6fff607e2f14 ("bpf: sk_msg program helper bpf_msg_push_data")
+Fixes: 7246d8ed4dcc ("bpf: helper to pop data from messages")
 Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+Reviewed-by: John Fastabend <john.fastabend@gmail.com>
 ---
- net/core/filter.c | 53 +++++++++++++++++++++++++++++------------------
- 1 file changed, 33 insertions(+), 20 deletions(-)
+ net/core/filter.c | 15 +++++++++------
+ 1 file changed, 9 insertions(+), 6 deletions(-)
 
 diff --git a/net/core/filter.c b/net/core/filter.c
-index a88e6924c4c0..4fae427aa5ca 100644
+index 4fae427aa5ca..fba445b96de8 100644
 --- a/net/core/filter.c
 +++ b/net/core/filter.c
-@@ -2793,7 +2793,7 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+@@ -2919,8 +2919,10 @@ static const struct bpf_func_proto bpf_msg_push_data_proto = {
+ 
+ static void sk_msg_shift_left(struct sk_msg *msg, int i)
+ {
++	struct scatterlist *sge = sk_msg_elem(msg, i);
+ 	int prev;
+ 
++	put_page(sg_page(sge));
+ 	do {
+ 		prev = i;
  		sk_msg_iter_var_next(i);
+@@ -2957,6 +2959,9 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 	if (unlikely(flags))
+ 		return -EINVAL;
+ 
++	if (unlikely(len == 0))
++		return 0;
++
+ 	/* First find the starting scatterlist element */
+ 	i = msg->sg.start;
+ 	do {
+@@ -2969,7 +2974,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
  	} while (i != msg->sg.end);
  
--	if (start >= offset + l)
-+	if (start > offset + l)
+ 	/* Bounds checks: start and pop must be inside message */
+-	if (start >= offset + l || last >= msg->sg.size)
++	if (start >= offset + l || last > msg->sg.size)
  		return -EINVAL;
  
  	space = MAX_MSG_FRAGS - sk_msg_elem_used(msg);
-@@ -2818,6 +2818,8 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
+@@ -2998,12 +3003,12 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 	 */
+ 	if (start != offset) {
+ 		struct scatterlist *nsge, *sge = sk_msg_elem(msg, i);
+-		int a = start;
++		int a = start - offset;
+ 		int b = sge->length - pop - a;
  
- 		raw = page_address(page);
- 
-+		if (i == msg->sg.end)
-+			sk_msg_iter_var_prev(i);
- 		psge = sk_msg_elem(msg, i);
- 		front = start - offset;
- 		back = psge->length - front;
-@@ -2834,7 +2836,13 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
- 		}
- 
- 		put_page(sg_page(psge));
--	} else if (start - offset) {
-+		new = i;
-+		goto place_new;
-+	}
-+
-+	if (start - offset) {
-+		if (i == msg->sg.end)
-+			sk_msg_iter_var_prev(i);
- 		psge = sk_msg_elem(msg, i);
- 		rsge = sk_msg_elem_cpy(msg, i);
- 
-@@ -2845,39 +2853,44 @@ BPF_CALL_4(bpf_msg_push_data, struct sk_msg *, msg, u32, start,
  		sk_msg_iter_var_next(i);
- 		sg_unmark_end(psge);
- 		sg_unmark_end(&rsge);
--		sk_msg_iter_next(msg, end);
- 	}
  
- 	/* Slot(s) to place newly allocated data */
-+	sk_msg_iter_next(msg, end);
- 	new = i;
-+	sk_msg_iter_var_next(i);
-+
-+	if (i == msg->sg.end) {
-+		if (!rsge.length)
-+			goto place_new;
-+		sk_msg_iter_next(msg, end);
-+		goto place_new;
-+	}
+-		if (pop < sge->length - a) {
++		if (b > 0) {
+ 			if (space) {
+ 				sge->length = a;
+ 				sk_msg_shift_right(msg, i);
+@@ -3022,7 +3027,6 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 				if (unlikely(!page))
+ 					return -ENOMEM;
  
- 	/* Shift one or two slots as needed */
--	if (!copy) {
--		sge = sk_msg_elem_cpy(msg, i);
-+	sge = sk_msg_elem_cpy(msg, new);
-+	sg_unmark_end(&sge);
- 
-+	nsge = sk_msg_elem_cpy(msg, i);
-+	if (rsge.length) {
- 		sk_msg_iter_var_next(i);
--		sg_unmark_end(&sge);
-+		nnsge = sk_msg_elem_cpy(msg, i);
- 		sk_msg_iter_next(msg, end);
-+	}
- 
--		nsge = sk_msg_elem_cpy(msg, i);
-+	while (i != msg->sg.end) {
-+		msg->sg.data[i] = sge;
-+		sge = nsge;
-+		sk_msg_iter_var_next(i);
- 		if (rsge.length) {
--			sk_msg_iter_var_next(i);
-+			nsge = nnsge;
- 			nnsge = sk_msg_elem_cpy(msg, i);
--		}
--
--		while (i != msg->sg.end) {
--			msg->sg.data[i] = sge;
--			sge = nsge;
--			sk_msg_iter_var_next(i);
--			if (rsge.length) {
--				nsge = nnsge;
--				nnsge = sk_msg_elem_cpy(msg, i);
--			} else {
--				nsge = sk_msg_elem_cpy(msg, i);
--			}
+-				sge->length = a;
+ 				orig = sg_page(sge);
+ 				from = sg_virt(sge);
+ 				to = page_address(page);
+@@ -3032,7 +3036,7 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 				put_page(orig);
+ 			}
+ 			pop = 0;
+-		} else if (pop >= sge->length - a) {
 +		} else {
-+			nsge = sk_msg_elem_cpy(msg, i);
+ 			pop -= (sge->length - a);
+ 			sge->length = a;
  		}
+@@ -3066,7 +3070,6 @@ BPF_CALL_4(bpf_msg_pop_data, struct sk_msg *, msg, u32, start,
+ 			pop -= sge->length;
+ 			sk_msg_shift_left(msg, i);
+ 		}
+-		sk_msg_iter_var_next(i);
  	}
  
-+place_new:
- 	/* Place newly allocated data buffer */
- 	sk_mem_charge(msg->sk, len);
- 	msg->sg.size += len;
+ 	sk_mem_uncharge(msg->sk, len - pop);
 -- 
 2.20.1
 
