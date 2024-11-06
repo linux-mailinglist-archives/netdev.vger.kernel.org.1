@@ -1,134 +1,168 @@
-Return-Path: <netdev+bounces-142287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 641A49BE1FE
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:12:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 05A0D9BE20C
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:13:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2A0302845D7
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:12:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 31BF11C22B46
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:13:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA1FB1DE3C2;
-	Wed,  6 Nov 2024 09:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BCF81DD0C0;
+	Wed,  6 Nov 2024 09:11:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="CL3maVck"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Y9aPS/Io"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C9451DE2DF
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:07:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BEC1D63D3
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:11:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730884075; cv=none; b=YmJXF7umPoaKZwdBk5DPBukn4g/u4RT3S3a7ZqJDNvWWbj0qAzbIiVgUu8w3JmeGbO1wlIpVsU8bx+Pk6Qb2rjZC3xVN5poDPRAJw6XBdCdYjFBIEdityCJRqtX7mvwG2zM+1BBZbhlNsWFcZdAHB/GIuX7zpvBRglFTv5twYxU=
+	t=1730884281; cv=none; b=qy7SyofvwLuRU+E3GxenxQgnGyHlHNEk2KEnnN/BwQmuttnnY6q6chfBUpl1c6IfwbdVaqNMLvpEygVLfhchOb/ETy7rryrZ8sxa8A5o1ocaQgE5qbPGfEsjMgmaatD4+PCJEBU7mVbCP1dmw2C843M6lnzuZynlnrwKCou/sP4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730884075; c=relaxed/simple;
-	bh=iRDvP6Fds9e6sAJFt7TFL1RE85f61k0qNzCwm6EI0ik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=uUEqHxIIOnSSpnlk+xHKry1Z0OR3owxZ7ylXLNPzvYalpc8aS/JByDnti7MlHbUBonnk05jYqDnD2xffwHS/PxSnSVUZxUEHKt2Wj+6mG7o4nIFICMg215tf1EjW/Xej7sIOfEWytTovzIa61u89TaL/xaj0pliAzYd030WdhE8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=CL3maVck; arc=none smtp.client-ip=170.10.129.124
+	s=arc-20240116; t=1730884281; c=relaxed/simple;
+	bh=q7SJcZmF11fUNIjvJGOzX6ykdvC1BruvADyGOTxpGys=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=d/DxUaCobHpNWYaNP+EN7nqUrcUAykxDdqWMwV8aCERC/a5i73q+FZJCYTsOEn2dXv0vqyPv1N50tC/3CqNAyF/QOtooYg+Qm4Di3KPq1zJqzGwsi37eAn7tIdjeJPO4yg8AalVTkyE8lv3QIuaoJODutRD6gqsmZ2PdavlxeZk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Y9aPS/Io; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730884073;
+	s=mimecast20190719; t=1730884278;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=stsh36U7LL9w1fGvl92BzQf3qg6o4uyL96zdePlIQ+M=;
-	b=CL3maVckSf1xgnX6jk3OjnzCSnANFFaUFaE8hiAwPIwv62wW7pyrN9r52U7hnhI3X5wu0j
-	dzaif0s6u7tVLCj+qXanP6jbyBAIelzOqhLpwMAX4DKTYuzEQ5o5ukCgveQex8UV2Svd+l
-	+1HE4/4TH31rpzc7BduCABxmbc608S8=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=KhphUlT0//AFWE/BWTlSiiQ4wKfg50gq57SuG58vcR8=;
+	b=Y9aPS/IowJ7xI+jrje8ZqR5YvjK1vSl3VLeoZU+BLRUSbmjUUaaVahSxUGhOaMzqsKPR9J
+	TRkbDoyyV4gDoo+QPm12L+kDrO288KtT52xvK3P3t8qkaAzeh4/mfyrIdOcL6rUj+pYuN9
+	/14/Vs5t3sBodar0fABbIXYL95Hu620=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-653-liunK__lNQqBZ3LL9-ZeFA-1; Wed, 06 Nov 2024 04:07:49 -0500
-X-MC-Unique: liunK__lNQqBZ3LL9-ZeFA-1
-X-Mimecast-MFC-AGG-ID: liunK__lNQqBZ3LL9-ZeFA
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-4315c1b5befso40812595e9.1
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:07:49 -0800 (PST)
+ us-mta-90-_uvrdp55MTacc74UL4RcGA-1; Wed, 06 Nov 2024 04:11:17 -0500
+X-MC-Unique: _uvrdp55MTacc74UL4RcGA-1
+X-Mimecast-MFC-AGG-ID: _uvrdp55MTacc74UL4RcGA
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d45de8bbfso4455636f8f.3
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:11:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730884069; x=1731488869;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=stsh36U7LL9w1fGvl92BzQf3qg6o4uyL96zdePlIQ+M=;
-        b=IJ2cvS0cVxrp81lU/gspBu/BwMeLri8lmxkYtByOX0lPxy0xu4pde282kFeVWFt1ZH
-         CVkbO/QgQodCWn6FgpuWDy2+vb8DI/N44b4apANYFrsdGuiZX7iEzj+XN9pKEy+XBIaT
-         Qj4HHHJINvbtHY+F0/r1LI5psahdv1i2pLduWDLWFU3I/Knra7oFcu5CwJeYVbaa/sA7
-         PLy27XKeoe4E7FMzqpV7zerZQg28peBBPgiQzR6JvYFfXMF7/rGEKTC3nwsVCI/HzOnI
-         DkZJ3DSGLqZ07n35nezCk+YmFhAytTaV5e+XzSQ2+qUqUS9DmOLXkF6WCiybVLEjrU68
-         qYcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVCJjuJKK7hyr1uT2/BjfMwmrUaOBL3tHgW3i/wEfbGFHB2vT74hs/Y9aVZV+IgdSgK8k1C9mM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxuzKXWD9cZw2PKn4gKMbKboo9qrg9l1p2dkli0qFdAkmw38ilA
-	sVg/Kzw1Xr/ajPZds7Do2j4KNJAJdFyHq2nOXfTt82durZxhQKv1WGRn5J7wlIPHm4ET/ReQc48
-	qt6ScbCcR8Xn/bseKfnYybTInXUuiZMkRi2/pa/yBPyx0rgkHb0/hnw==
-X-Received: by 2002:a5d:6902:0:b0:37d:4ebe:164f with SMTP id ffacd0b85a97d-38061200d23mr24637617f8f.46.1730884068795;
-        Wed, 06 Nov 2024 01:07:48 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IE4QdCH0opectVmr8dgwxLSrIB+qc8WNu2CPVa8NB18xSiYf7L6K01+/errC2pGSWF3kucn/A==
-X-Received: by 2002:a5d:6902:0:b0:37d:4ebe:164f with SMTP id ffacd0b85a97d-38061200d23mr24637597f8f.46.1730884068451;
-        Wed, 06 Nov 2024 01:07:48 -0800 (PST)
-Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7e1bsm18681481f8f.1.2024.11.06.01.07.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 01:07:47 -0800 (PST)
-Date: Wed, 6 Nov 2024 04:07:44 -0500
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Aleksandr Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	Stefano Garzarella <sgarzare@redhat.com>, stefanha@redhat.com,
-	Jason Wang <jasowang@redhat.com>,
-	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
-	kvm@vger.kernel.org, virtualization@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mcgrof@kernel.org
-Subject: Re: [PATCH v2] vhost/vsock: specify module version
-Message-ID: <20241106040705-mutt-send-email-mst@kernel.org>
-References: <20240929182103.21882-1-aleksandr.mikhalitsyn@canonical.com>
- <w3fc6fwdwaakygtoktjzavm4vsqq2ks3lnznyfcouesuu7cqog@uiq3y4gjj5m3>
- <CAEivzxe6MJWMPCYy1TEkp9fsvVMuoUu-k5XOt+hWg4rKR57qTw@mail.gmail.com>
- <ib52jo3gqsdmr23lpmsipytbxhecwvmjbjlgiw5ygwlbwletlu@rvuyibtxezwl>
- <CAEivzxdP+7q9vDk-0V8tPuCo1mFw92jVx0u3B8jkyYKv8sLcdA@mail.gmail.com>
- <20241002071602.793d3e2d@kernel.org>
+        d=1e100.net; s=20230601; t=1730884276; x=1731489076;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KhphUlT0//AFWE/BWTlSiiQ4wKfg50gq57SuG58vcR8=;
+        b=Yju4M13qcWDYJ5BPfLI+rXjvNWNIEiL28xF2ANhBt+JAV11G104hjN1rPZk+T3Y092
+         2Ql4Iq14rX+0foDMZ9j2QXc2RafKXGe6lTLkb0vCJ0foe1zzUuH/Ke+qz5UD9ysTpkre
+         50tdQ2/1J3AOOFc0qj/ajGRXTwvM9q6a9G/awBpS+1dc4CjfWdixjOf3lz4FQXgD+u9A
+         R1VCiPZ6ELzxCJe20dBPVIuv96jG8lqXARBl1YOO7y84FLTg8JRHXZksNLoAWOxbZVY1
+         tNlmMfmaMnuSlD197QtcNkTEs+Gc6b0SMR0m2vS+Vm+aJbdEOjPZpCzQzaLgfDu0ggwu
+         zpTQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUYkmEm/SrG2Df2TT69q+qkAJMKvYcct9GdSYtepkGIEw2daAIgF+8BbGz2ONYvTQb2BE5yme0=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy7WqrfUFT6Q0c8bjyNbx+a+9TBOaVW6n3f4DSe+d9PAeRLf7cg
+	3mWlhd2nUMpmzhs28oPOiMaihkMyFpdKpSxb6pH7txFxNlR4juQBlDDmUPcTk25CmS+kJhrSeMG
+	uiTPqJFTkvDNLyK/f47M3TrH2x72qWqoYt1Suacg+fKt36C26bVP6EQ==
+X-Received: by 2002:a05:6000:18a3:b0:374:c3e4:d6b1 with SMTP id ffacd0b85a97d-381c7ac41eamr17677492f8f.44.1730884275736;
+        Wed, 06 Nov 2024 01:11:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFLzHYI2BIeljzaiHEBHx+CtBhdAyO2CLbKJ8wxJbMqDl6oNHSvyKiDGGB2gz9wKtNBsoA3kg==
+X-Received: by 2002:a05:6000:18a3:b0:374:c3e4:d6b1 with SMTP id ffacd0b85a97d-381c7ac41eamr17677405f8f.44.1730884274708;
+        Wed, 06 Nov 2024 01:11:14 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6b35c0sm15348155e9.16.2024.11.06.01.11.13
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Nov 2024 01:11:14 -0800 (PST)
+Message-ID: <60999fc9-e1d6-4bb3-aa30-f959216a1b29@redhat.com>
+Date: Wed, 6 Nov 2024 10:11:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241002071602.793d3e2d@kernel.org>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v2 net-next 1/2] ipv6: release nexthop on device removal
+To: David Ahern <dsahern@kernel.org>, netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+ linux-kselftest@vger.kernel.org
+References: <cover.1730828007.git.pabeni@redhat.com>
+ <604c45c188c609b732286b47ac2a451a40f6cf6d.1730828007.git.pabeni@redhat.com>
+ <b5000fd7-c613-4d04-b8d7-53c193d36236@kernel.org>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <b5000fd7-c613-4d04-b8d7-53c193d36236@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Oct 02, 2024 at 07:16:02AM -0700, Jakub Kicinski wrote:
-> On Mon, 30 Sep 2024 19:03:52 +0200 Aleksandr Mikhalitsyn wrote:
-> > > At this point my question is, should we solve the problem higher and
-> > > show all the modules in /sys/modules, either way?  
-> > 
-> > Probably, yes. We can ask Luis Chamberlain's opinion on this one.
-> > 
-> > +cc Luis Chamberlain <mcgrof@kernel.org>
-> > 
-> > >
-> > > Your use case makes sense to me, so that we could try something like
-> > > that, but obviously it requires more work I think.  
-> > 
-> > I personally am pretty happy to do more work on the generic side if
-> > it's really valuable
-> > for other use cases and folks support the idea.
+On 11/5/24 22:40, David Ahern wrote:
+> On 11/5/24 11:23 AM, Paolo Abeni wrote:
+>> The CI is hitting some aperiodic hangup at device removal time in the
+>> pmtu.sh self-test:
+>>
+>> unregister_netdevice: waiting for veth_A-R1 to become free. Usage count = 6
+>> ref_tracker: veth_A-R1@ffff888013df15d8 has 1/5 users at
+>> 	dst_init+0x84/0x4a0
+>> 	dst_alloc+0x97/0x150
+>> 	ip6_dst_alloc+0x23/0x90
+>> 	ip6_rt_pcpu_alloc+0x1e6/0x520
+>> 	ip6_pol_route+0x56f/0x840
+>> 	fib6_rule_lookup+0x334/0x630
+>> 	ip6_route_output_flags+0x259/0x480
+>> 	ip6_dst_lookup_tail.constprop.0+0x5c2/0x940
+>> 	ip6_dst_lookup_flow+0x88/0x190
+>> 	udp_tunnel6_dst_lookup+0x2a7/0x4c0
+>> 	vxlan_xmit_one+0xbde/0x4a50 [vxlan]
+>> 	vxlan_xmit+0x9ad/0xf20 [vxlan]
+>> 	dev_hard_start_xmit+0x10e/0x360
+>> 	__dev_queue_xmit+0xf95/0x18c0
+>> 	arp_solicit+0x4a2/0xe00
+>> 	neigh_probe+0xaa/0xf0
+>>
+>> While the first suspect is the dst_cache, explicitly tracking the dst
+>> owing the last device reference via probes proved such dst is held by
+>> the nexthop in the originating fib6_info.
+>>
+>> Similar to commit f5b51fe804ec ("ipv6: route: purge exception on
+>> removal"), we need to explicitly release the originating fib info when
+>> disconnecting a to-be-removed device from a live ipv6 dst: move the
+>> fib6_info cleanup into ip6_dst_ifdown().
+>>
+>> Tested running:
+>>
+>> ./pmtu.sh cleanup_ipv6_exception
+>>
+>> in a tight loop for more than 400 iterations with no spat, running an
+>> unpatched kernel  I observed a splat every ~10 iterations.
+>>
+>> Fixes: f88d8ea67fbd ("ipv6: Plumb support for nexthop object in a fib6_info")
 > 
-> IMHO a generic solution would be much better. I can't help but feel
-> like exposing an arbitrary version to get the module to show up in 
-> sysfs is a hack.
+> are you sure that is the correct Fixes? That commit is June 2019 and
+> there have been stable periods since then without netdev release problems.
+
+"Sure" is a big word ;) AFAICS the mentioned commit let fib6_info store
+indirectly the extra dev reference via nexthop and does not clean it at
+device removal time.
+
+Note that the issue is not deterministic - I needed ~30 mptu.sh
+iterations in a row to see it, so it could go unnoticed for a long time.
+
+>> Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+>> ---
+>> v1 -> v2:
+>>  - dropped unintended whitespace change
+>> ---
+>>  net/ipv6/route.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
 > 
-> IIUC the list of built in modules is available in
-> /lib/modules/*/modules.builtin, the user space can't read that?
+> Reviewed-by: David Ahern <dsahern@kernel.org>
 
+Thanks!
 
-So what are we doing about this? Aleksandr?
-
--- 
-MST
+Paolo
 
 
