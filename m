@@ -1,174 +1,96 @@
-Return-Path: <netdev+bounces-142184-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142185-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 64F9D9BDB5E
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:45:02 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 304869BDB69
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:50:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C42CAB23076
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:44:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6F71284900
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E04F18A93A;
-	Wed,  6 Nov 2024 01:44:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B85B174EF0;
+	Wed,  6 Nov 2024 01:50:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="PSkp69mW"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T2KUKoGO"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8015318A6D5
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:44:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5F8433F3;
+	Wed,  6 Nov 2024 01:50:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730857496; cv=none; b=r/4oiQc6vcKxAKd+pLJuTnzv6feG8MK2lImgDw6P2NugPtM0uCe1dwkmI6lm8y7aUhQT/h7hdt0eXegpx9gYZkdR69C3Xk0LUsubftVNVWbCk33zHueaTOD1H2zZQ6ml6AG6LGkVcDBamJZqZV6N75O3muEQPHx7u1a9Fx+3G0E=
+	t=1730857821; cv=none; b=cX4tZembM5b1vmiw9gWVC8ELCd4HvGhVn42AKI71ees3gf1jLm0XshnU4Mldwg9V48DhJK93dcjfGM4PTvR/a4F58hZv4OvAhXlR/wfFF/2AwJKUzNk5Hxs7wytTbB0loFyh6ZWl1iiUNBlMW4Sz49uxgk5Tlg9pTnyg+1iBhqk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730857496; c=relaxed/simple;
-	bh=E1o8Ua9h3BFgcjzslon141C2gcQpUugr6Nu4DmF7QCc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SKZUnwUYsj9cucPcHqxZ3SIVv/EhJGIYYtIwNYD/n7BYdFuGEvI9Pmadpa+IwAzcmsXnM7CFuYEugQ+gqXYT25KeEHuHBSln1b44cSFj0CRJny6l7PhwXqrr6qwL1mT+G1w/IhQEsDUQXWADvrA5Mm83B6QYHEcImlmWwKHRYZk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=PSkp69mW; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730857493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=CuqCDJK08xmNhQoK0ZzL1tfWzPkTjCgzVUL2jilp0ik=;
-	b=PSkp69mWb/pYmxH/5sNqXKf2If+V1DLOHIDKfq84zPW410lWV454AC+oyiOvEjXRSF81hi
-	lKeXo1bm/4TcgB/fBvNptyDowPHfljEyNp90tEspwCZa4kOa/fxR7+XaYsHQmEx35HDLpS
-	35fPDX6q5RK8jjIDS3qAeQvo/WzrznE=
-Received: from mail-pj1-f69.google.com (mail-pj1-f69.google.com
- [209.85.216.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-127-radokH0iNiyHA7_8JnIrvQ-1; Tue, 05 Nov 2024 20:44:52 -0500
-X-MC-Unique: radokH0iNiyHA7_8JnIrvQ-1
-Received: by mail-pj1-f69.google.com with SMTP id 98e67ed59e1d1-2e2fb583e4cso7206377a91.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 17:44:51 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730857491; x=1731462291;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CuqCDJK08xmNhQoK0ZzL1tfWzPkTjCgzVUL2jilp0ik=;
-        b=h5SS8PKNjUiFl/cWe7qcMYC+VJ2LHimgJ+e6tpp8+aasvOpzUzO8UiRPb8BsCh1N4l
-         EBT8nSLIAblSHsxBxJCvDfr1/mXYx2sH9zYrZY6xlX0omdCSYnZJAcLcoVilDebyDkf0
-         4fqzKjxaMfBnJ2YhhBHeUi2oo8OgKjkb8KtkUmxTKGCsyC2Ip8pKjAsMt2clo5qkxFQl
-         5Yhq0qhl979pFRUvm30EwnXN+XvK6M6VKquWAAvBQ3fVja9OQERxkhlm4FcGLH41UHzG
-         sU1gFfxH0cGm+fCcJpgCO4fsNqjgovRB1fr1uCmvv1R3AJJf0qLa1GD3huWtlFf2fPPN
-         WBew==
-X-Gm-Message-State: AOJu0YzhNIBkDGGM7nqU8hyVenyAbO7pbqp0jI/Zwv9ggaUpbvuCJxut
-	otgWs49yC28JtAE6dFl0xSTWy2strNcJHOkE+wB0WNFJ6mRKaCEv+rxDoU4G0pmwJgxnbOWA8Ah
-	/vU5GKGkSbFrmD6L/whfRY3BqlYebvHz6JQ8YLo5sn1wG0wwkOHCnfPpCIfBdJ0Kb3IyoZmqvTa
-	/PlWjk8leYzLZNTuAeNkKJRgJ1s3zg
-X-Received: by 2002:a17:90a:f0d6:b0:2e2:b8d7:4bd1 with SMTP id 98e67ed59e1d1-2e8f10a6f4fmr43513453a91.30.1730857491171;
-        Tue, 05 Nov 2024 17:44:51 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFltoZqai1kHhior02L0euVIfli7uLwTGSJ/3R++Yo7PYyhfE0jArx6qWwJIob+A93gPHelnUhb05iNdklWF0w=
-X-Received: by 2002:a17:90a:f0d6:b0:2e2:b8d7:4bd1 with SMTP id
- 98e67ed59e1d1-2e8f10a6f4fmr43513434a91.30.1730857490766; Tue, 05 Nov 2024
- 17:44:50 -0800 (PST)
+	s=arc-20240116; t=1730857821; c=relaxed/simple;
+	bh=L6P3STORHXz/IlH6rKF7obNTMBxK6fdL5lQ/Pm2GVjU=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=anh97OkCArrLPPZU/XEr/0rCFmbIPeV0KISB6tnK4x2jok5PjHzzr0LTbSY0nmi5ViBjHpTtQZHQGo5Y1ey1+Z2FKxzhjfzWlLBZkxsz2LKinZ0UdPZnVtju1S1lv1d6BTbWvGg3052C4BBgMNpLtkBsWrw+2TkDYPRmsFJX5qc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T2KUKoGO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65E02C4CECF;
+	Wed,  6 Nov 2024 01:50:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730857821;
+	bh=L6P3STORHXz/IlH6rKF7obNTMBxK6fdL5lQ/Pm2GVjU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=T2KUKoGO5YU25JFYhcCdBnYk8DoFLQKtJ4+P2aG39F3I0KznOa+rA/drSProKPlsU
+	 1dCaisyfGpthrbIg0qZrr80+nDTUw1i8217Z9EY4m84ask47flrNjHuzo8P5h7IAkh
+	 i+jbY3lJOaX4NbZFmstDIh+9kSDkUq70dXrdkba9JWd3pE9WBXS9yBLCbAfpTH408c
+	 rRZobsHAbDyX2QkRHZJl/CcFji/AjcjNLpSg8lu+mDQzjbHZJYuvjyQ7MnecUHpgIw
+	 vZG8MEV8G4KhOWMkOrtfOOep7Z09UEew55c1q0aJ+N8Rs0qHee8Yt55AwShJzZXQa9
+	 MlMImzp5to2Sg==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 717AE3809A80;
+	Wed,  6 Nov 2024 01:50:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241030082453.97310-1-xuanzhuo@linux.alibaba.com>
- <20241030082453.97310-3-xuanzhuo@linux.alibaba.com> <CACGkMEtP7tdxxLOtDArNCqO5b=A=a7X2NimK8be2aWuaKG6Xfw@mail.gmail.com>
- <1730789499.0809722-1-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <1730789499.0809722-1-xuanzhuo@linux.alibaba.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 6 Nov 2024 09:44:39 +0800
-Message-ID: <CACGkMEt4HfEAyUGe8CL3eLJmbrcz9Uz1rhCo7_j4aShzLa4iEQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 02/13] virtio_ring: split: record extras for
- indirect buffers
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
-	=?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	virtualization@lists.linux.dev, bpf@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: phy: ti: add PHY_RST_AFTER_CLK_EN flag
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173085783025.762099.6107128022531561396.git-patchwork-notify@kernel.org>
+Date: Wed, 06 Nov 2024 01:50:30 +0000
+References: <20241102151504.811306-1-paissilva@ld-100007.ds1.internal>
+In-Reply-To: <20241102151504.811306-1-paissilva@ld-100007.ds1.internal>
+To: Diogo Silva <diogompaissilva@gmail.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, marex@denx.de,
+ tolvupostur@gmail.com
 
-On Tue, Nov 5, 2024 at 2:53=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.co=
-m> wrote:
->
-> On Tue, 5 Nov 2024 11:42:09 +0800, Jason Wang <jasowang@redhat.com> wrote=
-:
-> > On Wed, Oct 30, 2024 at 4:25=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.aliba=
-ba.com> wrote:
-> > >
-> > > The subsequent commit needs to know whether every indirect buffer is
-> > > premapped or not. So we need to introduce an extra struct for every
-> > > indirect buffer to record this info.
-> > >
-> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > ---
-> > >  drivers/virtio/virtio_ring.c | 112 ++++++++++++++++-----------------=
---
-> > >  1 file changed, 52 insertions(+), 60 deletions(-)
-> >
-> > Do we have a performance impact for this patch?
-> >
-> > >
-> > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_rin=
-g.c
-> > > index 97590c201aa2..dca093744fe1 100644
-> > > --- a/drivers/virtio/virtio_ring.c
-> > > +++ b/drivers/virtio/virtio_ring.c
-> > > @@ -69,7 +69,11 @@
-> > >
-> > >  struct vring_desc_state_split {
-> > >         void *data;                     /* Data for callback. */
-> > > -       struct vring_desc *indir_desc;  /* Indirect descriptor, if an=
-y. */
-> > > +
-> > > +       /* Indirect extra table and desc table, if any. These two wil=
-l be
-> > > +        * allocated together. So we won't stress more to the memory =
-allocator.
-> > > +        */
-> > > +       struct vring_desc *indir_desc;
-> >
-> > So it looks like we put a descriptor table after the extra table. Can
-> > this lead to more crossing page mappings for the indirect descriptors?
-> >
-> > If yes, it seems expensive so we probably need to make the descriptor
-> > table come first.
->
-> No, the descriptors are before extra table.
+Hello:
 
-Well, you need then tweak the above comment, it said
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-"Indirect extra table and desc table".
+On Sat,  2 Nov 2024 16:15:05 +0100 you wrote:
+> From: Diogo Silva <diogompaissilva@gmail.com>
+> 
+> DP83848	datasheet (section 4.7.2) indicates that the reset pin should be
+> toggled after the clocks are running. Add the PHY_RST_AFTER_CLK_EN to
+> make sure that this indication is respected.
+> 
+> In my experience not having this flag enabled would lead to, on some
+> boots, the wrong MII mode being selected if the PHY was initialized on
+> the bootloader and was receiving data during Linux boot.
+> 
+> [...]
 
-> So, there is not performance impact.
->
->
-> >
-> > >  };
-> > >
+Here is the summary with links:
+  - net: phy: ti: add PHY_RST_AFTER_CLK_EN flag
+    https://git.kernel.org/netdev/net/c/256748d5480b
 
-[...]
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-> > >         while (vq->split.vring.desc[i].flags & nextflag) {
-> > > -               vring_unmap_one_split(vq, i);
-> > > +               vring_unmap_one_split(vq, &extra[i]);
-> >
-> > Not sure if I've asked this before. But this part seems to deserve an
-> > independent fix for -stable.
->
-> What fix?
-
-I meant for hardening we need to check the flags stored in the extra
-instead of the descriptor itself as it could be mangled by the device.
-
-Thanks
 
 
