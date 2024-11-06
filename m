@@ -1,119 +1,126 @@
-Return-Path: <netdev+bounces-142289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F19E99BE218
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:15:34 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEC1F9BE222
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:16:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A30A728476D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:15:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DDCD51C20F04
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:16:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53B8C1D5CEE;
-	Wed,  6 Nov 2024 09:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 917051D61B9;
+	Wed,  6 Nov 2024 09:16:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=inbox.ru header.i=@inbox.ru header.b="o+YfR2t0";
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=inbox.ru header.i=@inbox.ru header.b="e0xD7+km"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="dDisDVqY"
 X-Original-To: netdev@vger.kernel.org
-Received: from fallback1.i.mail.ru (fallback1.i.mail.ru [79.137.243.67])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F14D1922EB;
-	Wed,  6 Nov 2024 09:15:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=79.137.243.67
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DACD71D88D7
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:16:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730884531; cv=none; b=Z3qqeABItxJx8clmHJtHso8tmY4Q/EE8EXjKCJLZ7zsM+SZO+cQOK1cD8U4rlz3RVyWXwj2V/QAwGztbjnrIFMLTM0O2L1QiQ4mXEALpC6XqZHDq/Jru2No/fiUfbRLMxUqYVLrrcTtQXZkk6JMiZxozeG1XgQD+XTh/QJbPn7A=
+	t=1730884577; cv=none; b=QZOApF2f/9kk4V0bYYhq9EYGpGnzypV1ZZ/XLCvqPCHnHvA3CCSmXG9MkDm9l2Ol4QGD75VUaZII72DhykIPUoQYP8d3/TOsYpral4qLgQ5x9aVdaViwlln3m0itndMu6EwhpOx7dlrCLsw6dbJM2GqvWoiLoXkIQ/TwT9ocD+A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730884531; c=relaxed/simple;
-	bh=U9Qhu3P5fXARAojVvmh+oO2fJp65PdJnqZhM34p3Adg=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=FxNlg3Tiag5+jscwULNHwuF+vbjnSTyhYYGQwslGzN0p89/0ahDoaLl8lg86tUViqzj6qHrH2qJ50wYzY+jP3G6/YSlnRBy2wqUbGXWko04AoAH6XLDto3+2ExO5sDxgUwjtc+Cx8kR76U1LWv2cZp5hS6zpqAQV8YWopZCQvgs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=inbox.ru; spf=pass smtp.mailfrom=inbox.ru; dkim=pass (2048-bit key) header.d=inbox.ru header.i=@inbox.ru header.b=o+YfR2t0; dkim=pass (2048-bit key) header.d=inbox.ru header.i=@inbox.ru header.b=e0xD7+km; arc=none smtp.client-ip=79.137.243.67
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=inbox.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=inbox.ru
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=inbox.ru; s=mail4;
-	h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:Message-ID:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=87CRU1qaw7POvQadpax6xnMCj8VvWy2fHabWKtP2IYg=;
-	t=1730884528;x=1730974528; 
-	b=o+YfR2t06WF2M39Z70PNTIcmzx9nG3ICp4509bdfeIqdWqab/OweIfVbaHCAL+5/paVZuWWM/4NH+Oube1EmtMZ8JiWWAVsWb4lV415V8KiLMTYWeNdzJSswjxqpHRmD485CvmyGIclIHZw3ykDtJ78mqeg8Dpp4lUwvgEMmPyHwkdrr/s7Qbuub6kYGwU+gV8sfaMcHbIAjMXFnQOX3xaRMCpCWDFBGzSVOsP4SiFugHFPHRyQd8UHc0nimZNzW/EMqjGmmCthmozX75F0dybYXyzQHBYemvm2y8TqTr5Y5uuKD+SJgiB9M+zJ7IrysiaLK0ct2l1OW4rC87WCfTA==;
-Received: from [10.113.3.254] (port=40104 helo=smtp42.i.mail.ru)
-	by fallback1.i.mail.ru with esmtp (envelope-from <fido_max@inbox.ru>)
-	id 1t8c8F-003suM-3h; Wed, 06 Nov 2024 12:15:19 +0300
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=inbox.ru;
-	s=mail4; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:References
-	:Cc:To:Subject:MIME-Version:Date:Message-ID:From:Sender:Reply-To:To:Cc:
-	Content-Type:Content-Transfer-Encoding:Content-ID:Content-Description:
-	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
-	List-Id:List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:
-	List-Archive:X-Cloud-Ids:Disposition-Notification-To;
-	bh=87CRU1qaw7POvQadpax6xnMCj8VvWy2fHabWKtP2IYg=; t=1730884519; x=1730974519; 
-	b=e0xD7+km8/EnomYI4ZpsZ0OScHavWzVyo8NLqzuOigiZDTiP0c9O1c4pbLECfaMfsG61LBqDiMz
-	NOXn0zEa4C2cZv0KO3X74TQJ0AcMd6qN/IVvhPIhUht94lda6fX2ie8WZJSjLXvDGS8Zj4I0BBFh6
-	n8TTbQJSGjicescAZv1ytOxwDXz/3vfnOsaEpxy0jymkva27nD63zgmNSRG7paLgsaMKPES6pjYHx
-	1EkwAN0Z6h0Moq2sVvTm/6G6nb5qIPejmx4G1rmAnUa/V9ZBufqamc+fT9n/5o8MhyNZ1YzG/J4lP
-	bJotn07m27lYAT+ljPdPgAFYv57Pa5Azmktg==;
-Received: by exim-smtp-6c5957b6dd-m4hm6 with esmtpa (envelope-from <fido_max@inbox.ru>)
-	id 1t8c7k-000000002HI-3hsp; Wed, 06 Nov 2024 12:14:49 +0300
-Message-ID: <1314b8d9-c0cb-4d48-b7a6-1ac56ab7193c@inbox.ru>
-Date: Wed, 6 Nov 2024 12:14:47 +0300
+	s=arc-20240116; t=1730884577; c=relaxed/simple;
+	bh=LiWfgtP3ccuFSeeihkum3Zsw2j+Q/tBTiOLrwo9T6sU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=O93r9t6VIbYD407zojpYPq0Mj9GFqtmXP/F3hSK0AM+8Y8dn3mrPNhwEOBBT5kwFS3XVc4HMJYMnYSuGQqBaxY8kLEbkzJt2xrIqXX4itrQJURuxr4HUUNGXZnGLFan4NuZn2Rg6Dr3mINnQp1b7biWLaQiZB9Tl43hqXcKfEUY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=dDisDVqY; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730884574;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=hpGds3rrLDrDyMfb6nHlArwXd7ub7kAc2WQ+kRP5Q+E=;
+	b=dDisDVqY4QlJ5QW4nhmmxaroLl4MTzN6F8FMCuFfAHe8bGIza5VvYAfVihlPzbHgP/gx2s
+	dAKkrTDfsavaO02Y9igr1+FX7do/BnAQFm9ighlotFToZgm9ga/mItEJ1JVXEWmroRVLja
+	N0afElM2KQmHeF2V5ftMo/Xmv8rHmDM=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-612-6rS7le-INSOcWpa2olwKEA-1; Wed, 06 Nov 2024 04:16:12 -0500
+X-MC-Unique: 6rS7le-INSOcWpa2olwKEA-1
+X-Mimecast-MFC-AGG-ID: 6rS7le-INSOcWpa2olwKEA
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-37d5ca5bfc8so3199920f8f.0
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 01:16:12 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730884571; x=1731489371;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=hpGds3rrLDrDyMfb6nHlArwXd7ub7kAc2WQ+kRP5Q+E=;
+        b=vb8f6qJTx0S511lX34yOF4iBGKszrYDYGLcAl3K4E2OM7YuOn3DV1jLeYzuUnqloUu
+         bVVJ7BIe6vgrTnyaMxMwtP3O/5fZKoDKpW3rI1ZzzRAwvQ/It1dRUIbQPycWKNEBWy9t
+         9cMfgqueDjNSbK9/WMg+F0qrMdyn7E32NN+8aS9XPlQqM6H+xafjNZCYExqGnKEVR9Sn
+         i15RclhLczNR4CN+Xb5O0nvQaHS9oOopwIdv6S/b0fLLbib5v3iqtpwe2nWiaAhPuLCP
+         8R7BHZ27eSh2E1ebFFdVfKZT872UhqXLeMBOWbBaVhyYj6BMunjZ9air9bCQ+vJLxHDm
+         MBKQ==
+X-Forwarded-Encrypted: i=1; AJvYcCXuYKNVVMeKdgT1LVv5bwS4lZj1T9KG1ElvXzYsGBv2uJTutQHaomO23h+kBglFe+pr6OO1rME=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy2ysa0naovRgedPbB2XEoe1xfBzSvM13AWsHJGUSAQPQarmNcY
+	JE4sZRe2iaNU3Bei29y+BYELPcnHKm8nlKbgAh2EdJd0Hn12CQFlX193DfVGGqc8/iJ1gPRMMic
+	mT9ev12BzLK3jOpAIP+7KamcRIE7oM3UMR//3kFA0d+6dYOT9J6Ceig==
+X-Received: by 2002:a05:6000:178a:b0:37c:d227:d193 with SMTP id ffacd0b85a97d-381be7654bbmr19918780f8f.10.1730884571477;
+        Wed, 06 Nov 2024 01:16:11 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IEzRwU2TOM2eQPF5E6Rf2mNxBpWaMzmZbkkznCCrfo7GyAOnLbimkewh0GmBs2JIyl8mHd0hQ==
+X-Received: by 2002:a05:6000:178a:b0:37c:d227:d193 with SMTP id ffacd0b85a97d-381be7654bbmr19918753f8f.10.1730884571022;
+        Wed, 06 Nov 2024 01:16:11 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa5b5e56sm15522815e9.2.2024.11.06.01.16.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 01:16:10 -0800 (PST)
+Date: Wed, 6 Nov 2024 04:16:07 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	virtualization@lists.linux.dev, Jakub Kicinski <kuba@kernel.org>
+Subject: Re: [PATCH net-next v1 0/4] virtio_net: enable premapped mode by
+ default
+Message-ID: <20241106041545-mutt-send-email-mst@kernel.org>
+References: <20241029084615.91049-1-xuanzhuo@linux.alibaba.com>
+ <20241104184641.525f8cdf@kernel.org>
+ <20241106023803-mutt-send-email-mst@kernel.org>
+ <1730882783.399233-1-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
-To: Chris Lew <quic_clew@quicinc.com>,
- Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, Hemant Kumar <quic_hemantk@quicinc.com>,
- Loic Poulain <loic.poulain@linaro.org>
-Cc: Manivannan Sadhasivam <mani@kernel.org>,
- Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
- linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, Bhaumik Bhatt <bbhatt@codeaurora.org>,
- Johan Hovold <johan@kernel.org>
-References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
-Content-Language: en-US
-From: Maxim Kochetkov <fido_max@inbox.ru>
-In-Reply-To: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Mailru-Src: smtp
-X-7564579A: 646B95376F6C166E
-X-77F55803: 4F1203BC0FB41BD9C47B42B23B2B45CB94400CBD9A05FE2C4D4AFFA14F9F7486182A05F5380850404D00FA800FA3F7553DE06ABAFEAF6705FD764840B112E70AF3E4F53D2EFF74AC3D433D207E322D29
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE792C68BF9CD4C0E9EEA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F7900637B28E90C11C329EF18638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D8044E6612FB3D68A3D96C05C9628ED4805E85E1FE50C2F9B520879F7C8C5043D14489FFFB0AA5F4BF176DF2183F8FC7C0AF05157F0BAFB9978941B15DA834481FA18204E546F3947C989FD0BDF65E50FBF6B57BC7E64490618DEB871D839B7333395957E7521B51C2DFABB839C843B9C08941B15DA834481F8AA50765F79006370BDD70ABAC747F53389733CBF5DBD5E9B5C8C57E37DE458B9E9CE733340B9D5F3BBE47FD9DD3FB595F5C1EE8F4F765FC72CEEB2601E22B093A03B725D353964B0B7D0EA88DDEDAC722CA9DD8327EE4930A3850AC1BE2E735D05AD665AB97B35DC4224003CC83647689D4C264860C145E
-X-C1DE0DAB: 0D63561A33F958A5CF7D1176C897A2C85002B1117B3ED696F6701FCE8763F6B68D59E407A97E9958823CB91A9FED034534781492E4B8EEAD37F46C620FF2CAEEBDAD6C7F3747799A
-X-C8649E89: 1C3962B70DF3F0ADE00A9FD3E00BEEDF77DD89D51EBB7742D3581295AF09D3DF87807E0823442EA2ED31085941D9CD0AF7F820E7B07EA4CFBEED6C95D013E12287200C99A5148F9877F09537FCC2D272EAE57E9619E3DF6DF62474FBACD619B026F3AF21BCC074C661E145A3C729F3586072CAF2D23F936E8498C3E08FE5BBF6F37A8DA3E9B01C3902C26D483E81D6BEEB84411BD425175970A7FB4ED9620804ADE12199CE9660BE
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojd5Cr5y48m5i6dSUI8UvmyA==
-X-Mailru-Sender: 689FA8AB762F739381B31377CF4CA219728464D9E07D7BD1C84B9A6E8DB39048D3ADC9166251157190DE4A6105A3658D481B2AED7BCCC0A49AE3A01A4DD0D55C6C99E19F044156F45FEEDEB644C299C0ED14614B50AE0675
-X-Mras: Ok
-X-7564579A: 646B95376F6C166E
-X-77F55803: 6242723A09DB00B462E89913BE0CC0C43039A186290B7F475CDE8AA8962E7B79049FFFDB7839CE9E5D6FAD96F5A9A44C82185538A547B28FA3E1803173EFDAAFE462B494412DBAB4
-X-7FA49CB5: 0D63561A33F958A5E461DB38A54415FA2C0ABF2C3A7EF85DCC55F97DC67B47F0CACD7DF95DA8FC8BD5E8D9A59859A8B64071617579528AACCC7F00164DA146DAFE8445B8C89999728AA50765F790063791665FFE12FCE6AD389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC86D3A1509E1113711F6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA775ECD9A6C639B01B78DA827A17800CE7888FFA144A8AE6D0731C566533BA786AA5CC5B56E945C8DA
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojd5Cr5y48m5iXhqAo/g8DbQ==
-X-Mailru-MI: 8000000000000800
-X-Mras: Ok
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1730882783.399233-1-xuanzhuo@linux.alibaba.com>
 
-05.11.2024 04:29, Chris Lew wrote:
-> From: Bhaumik Bhatt <bbhatt@codeaurora.org>
+On Wed, Nov 06, 2024 at 04:46:23PM +0800, Xuan Zhuo wrote:
+> On Wed, 6 Nov 2024 02:38:40 -0500, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> > On Mon, Nov 04, 2024 at 06:46:41PM -0800, Jakub Kicinski wrote:
+> > > On Tue, 29 Oct 2024 16:46:11 +0800 Xuan Zhuo wrote:
+> > > > In the last linux version, we disabled this feature to fix the
+> > > > regress[1].
+> > > >
+> > > > The patch set is try to fix the problem and re-enable it.
+> > > >
+> > > > More info: http://lore.kernel.org/all/20240820071913.68004-1-xuanzhuo@linux.alibaba.com
+> > >
+> > > Sorry to ping, Michael, Jason we're waiting to hear from you on
+> > > this one.
+> >
+> > Can patch 1 be applied on net as well? Or I can take it through
+> > my tree. It's a bugfix, just for an uncommon configuration.
 > 
-> The call to qrtr_endpoint_register() was moved before
-> mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
-> callback can occur before the qrtr endpoint is registered.
 > 
-> Now the reverse can happen where qrtr will try to send a packet
-> before the channels are prepared. Add a wait in the sending path to
-> ensure the channels are prepared before trying to do a ul transfer.
+> Why? That can not be triggered in net branch.
 > 
-> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
-> Reported-by: Johan Hovold <johan@kernel.org>
-> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
-> Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
-> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+> Thanks
 
-Reviewed-by: Maxim Kochetkov <fido_max@inbox.ru>
+I thought it can but can't remember why now. OK, nm then, thanks!
 
 
