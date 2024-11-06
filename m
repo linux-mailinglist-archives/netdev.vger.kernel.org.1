@@ -1,117 +1,124 @@
-Return-Path: <netdev+bounces-142337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E11C69BE547
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:11:07 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F579BE55A
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:15:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6CB42B24A35
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:11:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 794B6B2483E
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:15:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2A571DE4D4;
-	Wed,  6 Nov 2024 11:11:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6E9E1DED40;
+	Wed,  6 Nov 2024 11:14:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="drSOzEtd"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="QsLWH5KI"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f171.google.com (mail-yb1-f171.google.com [209.85.219.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 669631DE3C3
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 11:11:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F5F018C00E
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 11:14:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730891461; cv=none; b=evR4JLWOdWcEGUBSW9O+3+cm0DLbAPULAQZV9skPGc6v0SxtUu9NB5GY1JVLsOaMN39yCm1BiVh/iiGalQ5JvhKGYGZAyKchy8EOeEYtXZdnMb7KevKILMzsuqg5y8RWEcv0hgSC8talhi2TyeJ628ZETSsbY4s/ydflU7YvX2E=
+	t=1730891699; cv=none; b=HVqwC1OHnZajVSLwYQGi51Wo2EFs3BBCMmxE0XYNXa6G7e0dFwl+Y/ngNZhRjxW5VSSpiSgVe0k978x7HMAciU2A5Spv2momsCNs+cQr4FizcqjZEkbqDVUzvqzRRRX87Q6l4p1//yGk28QBNY3erTsSVuE/2b0MFIpGAuFCXZ0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730891461; c=relaxed/simple;
-	bh=rBtPz5gG0rZNJwXUgyLqZ4dCXI2IdSj8GTwcAnATtVA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=dhW1t6zwGa36VMbfps2ytbkYGor7JNxM92wtBmiCH7+fz8hVap43W2gVeBUHBtCHyS8I0PtxSy1np9r4UfRGVgXTEQhciYC4bdGkggb0yhIwL2gabXqY3CEmVT3bJVRWKDjroou0J2zhv7DvqFrGtrmjzLZuM4uriQQHYHURAqY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=drSOzEtd; arc=none smtp.client-ip=209.85.219.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-yb1-f171.google.com with SMTP id 3f1490d57ef6-e28fe3b02ffso5788609276.3
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 03:11:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730891459; x=1731496259; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=l5+8CEF8PGrkpuoZv09AoSuECiDMudOpJZwqH9DLQBI=;
-        b=drSOzEtdIxeTSrX7HDaTExWznXs5M+LjYMlLF81564X2AQGyRhr0AH3qTYY1FonWCD
-         92gNh4YLL5G4YnPHB219qwJWUEDP4ikgFlSMnLKtcIgrYRdUNfwCKxYVbYQU7paXQq0D
-         X1QJvpJPXbBUbPc6McU8gFcpt07zlJDc8J3yaIVkgTbuach5b739mSK2KEeFvIDSVn4K
-         iMS4nkinX7if9AD+gZ4Aab2oKhOCTRm/aQgz2bx1RmLvmJuo80wLyHedcjYN8QNmzf9v
-         e7o7sWOzvejuiisWTJ3V/8zWXUo6gboLHEz9zq9aoNrQ3/Xk6BZmd1E4IwWINsEA+mOf
-         RS0Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730891459; x=1731496259;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l5+8CEF8PGrkpuoZv09AoSuECiDMudOpJZwqH9DLQBI=;
-        b=JqQRl1ASlzmT+RQeOqX1EW5qNbXA8VVIeNhAJEZPcXgaOZEVqPme5U4JGmCc0q8hAI
-         2xtS2tE1OWoi+iLyU0VBbqow4yH42H7KvSbKqBU0mO7hePAHGF7R4rg1G6TlRwB0lLcw
-         rI/wvXLATbm0sB+Rzkca8vsOTqafcFDKho84beY1H6eYusMwWoimKGdh+KtafG9slUXK
-         VyOmdtKY0d66NDGNqTkAiqdhRo//RWUMPPOxhRBIq+0LkKwwhFa5hygs6Najoz0vCw4j
-         rASkYKmpo8AM5kh9xKRy0ahJzUy/hQYp9cL25BFR/mV3Pw9e+h4/CpcTTR4X5M7+HJYB
-         WlVQ==
-X-Gm-Message-State: AOJu0Ywrg0DbY0K0xIhdiYTDxHjNbcvUP4zcmRGgmjDQ3d4WGSec22yN
-	YwIFk4JdqxnOgu5UKdcAfzgfr6CP34SHE/7h1iV3uTHEBnlOqs7JIcUxYqN9WlMfErbzd0eCEtx
-	dOkjafKZjMqIGr+fqEyYrJBSTmwY=
-X-Google-Smtp-Source: AGHT+IE1sZpZbBwhB3vfOzE1oN0wLqnxcz1wrnDPvGC+Rpg+zy6pts2342ur4zYg+bx25KKddKleEKnBLApVYSKJgu8=
-X-Received: by 2002:a05:690c:dd2:b0:64b:5cc7:bcbc with SMTP id
- 00721157ae682-6ea52520bb1mr244627657b3.32.1730891459226; Wed, 06 Nov 2024
- 03:10:59 -0800 (PST)
+	s=arc-20240116; t=1730891699; c=relaxed/simple;
+	bh=w0uIJNp7DkoJvCA6I6hYVWnWQRy0FN8z4oGmjvTP7UA=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=WnUMnp5FBLsm134YSRUE4bBat9oBiz4UIaWCOdxNlIVXjpOlqKy1/UI/wAWeFavbfiTeUmNfnXVjwOJdbMqNOsyKzTnChMuBA3MrKGRoywZouQ3pTxWyFAoUJ+lg1RcytqbwSgkx8Q0kncuomznlHjiAxZ0CQMGHeaeGRuPKKz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=QsLWH5KI; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730891697;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=q/pUhWBxmCDgwQYzUjg0jWk3qPOCCQzEzMOB8Ax5AVQ=;
+	b=QsLWH5KIyrtU8qJ61PLGFYaX9m5oWE8bfhtRSnS7PtpCCVcn3fCgaunoMNVC7vhjubLo0l
+	IugeU/fwxul2trwWNYJRZAJG2q2ntWbBgniNtmF9hoCVo63p0gC1CZc6KuBJKfidJhyUke
+	1x+WZSm7XP/wVdtud16/FABL3tiYNSQ=
+Received: from mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-18-6LJtl8SbP8eoyf92emu2Kw-1; Wed,
+ 06 Nov 2024 06:14:52 -0500
+X-MC-Unique: 6LJtl8SbP8eoyf92emu2Kw-1
+X-Mimecast-MFC-AGG-ID: 6LJtl8SbP8eoyf92emu2Kw
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-01.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 51797196CE34;
+	Wed,  6 Nov 2024 11:14:42 +0000 (UTC)
+Received: from wcosta-thinkpadt14gen4.rmtbr.csb (unknown [10.22.80.50])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id C23FB1955F41;
+	Wed,  6 Nov 2024 11:14:33 +0000 (UTC)
+From: Wander Lairson Costa <wander@redhat.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Clark Williams <clrkwllms@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Simon Horman <horms@kernel.org>,
+	Wander Lairson Costa <wander@redhat.com>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	intel-wired-lan@lists.osuosl.org (moderated list:INTEL ETHERNET DRIVERS),
+	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+	linux-kernel@vger.kernel.org (open list),
+	linux-rt-devel@lists.linux.dev (open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT)
+Cc: tglx@linutronix.de
+Subject: [PATCH v2 1/4] Revert "igb: Disable threaded IRQ for igb_msix_other"
+Date: Wed,  6 Nov 2024 08:14:26 -0300
+Message-ID: <20241106111427.7272-1-wander@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028073015.692794-1-wojackbb@gmail.com> <20241031185150.6ef22ce0@kernel.org>
-In-Reply-To: <20241031185150.6ef22ce0@kernel.org>
-From: =?UTF-8?B?5ZCz6YC86YC8?= <wojackbb@gmail.com>
-Date: Wed, 6 Nov 2024 19:10:48 +0800
-Message-ID: <CAAQ7Y6an8ZkxYpJehd8cBRPHjqyQofc6A4QdPzM_dhh1Sn0nng@mail.gmail.com>
-Subject: Re: [PATCH] [net] net: wwan: t7xx: Change PM_AUTOSUSPEND_MS to 5000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, chandrashekar.devegowda@intel.com, 
-	chiranjeevi.rapolu@linux.intel.com, haijun.liu@mediatek.com, 
-	m.chetan.kumar@linux.intel.com, ricardo.martinez@linux.intel.com, 
-	loic.poulain@linaro.org, ryazanov.s.a@gmail.com, johannes@sipsolutions.net, 
-	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
-	linux-arm-kernel@lists.infradead.org, angelogioacchino.delregno@collabora.com, 
-	linux-mediatek@lists.infradead.org, matthias.bgg@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-If the PCIE connection remains in the D0 state, It will consume more power.
+This reverts commit 338c4d3902feb5be49bfda530a72c7ab860e2c9f.
 
-Receiving or sending data will cause PCIE to change D3 Cold to D0 state.
+Sebastian noticed the ISR indirectly acquires spin_locks, which are
+sleeping locks under PREEMPT_RT, which leads to kernel splats.
 
-Jakub Kicinski <kuba@kernel.org> =E6=96=BC 2024=E5=B9=B411=E6=9C=881=E6=97=
-=A5 =E9=80=B1=E4=BA=94 =E4=B8=8A=E5=8D=889:51=E5=AF=AB=E9=81=93=EF=BC=9A
->
-> On Mon, 28 Oct 2024 15:30:15 +0800 wojackbb@gmail.com wrote:
-> > Because optimizing the power consumption of t7XX,
-> > change auto suspend time to 5000.
-> >
-> > The Tests uses a script to loop through the power_state
-> > of t7XX.
-> > (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
-> >
-> > * If Auto suspend is 20 seconds,
-> >   test script show power_state have 0~5% of the time was in D3 state
-> >   when host don't have data packet transmission.
-> >
-> > * Changed auto suspend time to 5 seconds,
-> >   test script show power_state have 50%~80% of the time was in D3 state
-> >   when host don't have data packet transmission.
->
-> I'm going to drop this from PW while we wait for your reply to Sergey
-> If the patch is still good after answering his questions please update
-> the commit message and resend with a [net-next] tag (we use [net] to
-> designate fixes for current release and stable)
+Fixes: 338c4d3902feb ("igb: Disable threaded IRQ for igb_msix_other")
+Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+
+---
+
+Changelog:
+
+v2: Add the Fixes tag
+Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index b83df5f94b1f5..f1d0881687233 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -907,7 +907,7 @@ static int igb_request_msix(struct igb_adapter *adapter)
+ 	int i, err = 0, vector = 0, free_vector = 0;
+ 
+ 	err = request_irq(adapter->msix_entries[vector].vector,
+-			  igb_msix_other, IRQF_NO_THREAD, netdev->name, adapter);
++			  igb_msix_other, 0, netdev->name, adapter);
+ 	if (err)
+ 		goto err_out;
+ 
+-- 
+2.47.0
+
 
