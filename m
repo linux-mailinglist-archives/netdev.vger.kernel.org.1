@@ -1,269 +1,135 @@
-Return-Path: <netdev+bounces-142568-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67EC79BFA54
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:44:27 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF8139BFA5C
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 00:46:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 885D71C21F31
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:44:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5694284563
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDCE220E031;
-	Wed,  6 Nov 2024 23:44:19 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="XMm0UrpW"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72B5420C49C;
+	Wed,  6 Nov 2024 23:46:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f52.google.com (mail-pj1-f52.google.com [209.85.216.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B51391DD525
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 23:44:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.52
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33FF21917D7;
+	Wed,  6 Nov 2024 23:46:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730936659; cv=none; b=MKkGR387QRUFZUYop0tKecJn0DnlW5TDq4Tg1qBKnRUTrowx3kxjCvn8pZYDISfdeq7RHaNIsLluv9TDwVjGsffhIF4xo3SkC0oEBzTVqnTE0yORl++/utvZu0KF55xt/ZAqIKzvvFDM6u0jJOpLtqE6pkAG0JXx0I/mt/ciutQ=
+	t=1730936803; cv=none; b=cEuBfa2Ut5k1KBJZgo9oQXPYX0Gv7cOFiBKMCbEspeTEYpXTebAlT8roh8wupysPVR/y+nwwevsmPUSyd6ot4Oz44luAKuh6MqSJC9tvJZry44r6nFkeZxhLem/t/lJOOt7mhk/+d/IvU3QS9dGiDvc6+vMdq5ld5iur9nXPQRk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730936659; c=relaxed/simple;
-	bh=lSxaigboPLXHNcddz2sY56eN7f1c39zsSqkEN3I8a4A=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Ra9VKARD6xN41zsBj7qQDl9gGJBkUSP91rWbrruh4Of3s7PYv96YR82V0T13rYYmbAGtxaG2/3J2KbksfQOAOlw3nUljRrYiSU8IG/KYdQHYmWhwfalDwutYATmWSnYJpKW5/VSA+I3DR6gDiumQ+hTZQ95t6iGaHjEElm7Z3Nw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=XMm0UrpW; arc=none smtp.client-ip=209.85.216.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-pj1-f52.google.com with SMTP id 98e67ed59e1d1-2e2a96b242cso47963a91.3
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 15:44:16 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1730936656; x=1731541456; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QPXJsl8fLkTdJ5MrNMMlzw9z0f/yutenIKxxBRJC7Ks=;
-        b=XMm0UrpWuVqnuuAaqgGDs7cdITimrNeenLyZ0gwcKNTNrUzCyXielur17h5iwj3l5F
-         Tncul6SeOOPoFbu81xdkAJBAFmOLfGdkyqsWEMYtHcNnpvzKb+HkWuClvGANIZG3R8Mw
-         SNHOZ99fu0gr7Bop6SRDHmpN1s46bi0Eygj1ys5dUoRsbi1w+uKOJAN0qZ6OscuxaSqD
-         CR7mCbKG88bvdDYvMs8dG6IMDCz+y07GFnHigDsHG3T24KrlTPKOXQLqB5xT6ty1NLvV
-         2bFZMS+rcE4AaO5nGS/jjlK6qu7ebVqFyvei6AWqlLKgmmhtlCZw92/hbBqP8iBubbv4
-         2zRA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730936656; x=1731541456;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QPXJsl8fLkTdJ5MrNMMlzw9z0f/yutenIKxxBRJC7Ks=;
-        b=Ye0KjjQxj5KqPFOeBDc7qEZQZYrzGwpAqClCqsSnbMKian8PEpsuGzbdv0W6z53ZUn
-         i7ITtp6fn8l60rfwtXk0/lLZA9XSMgFHz0TywfBQiiqspTTnAJGgl5wSHwysfnwqATgk
-         BQjH4toVgEFcNBhXEBII09QFJdkdwhSNio/U9tCvdUD4yZMmINDOFie8TAOp1QtXlGPs
-         8eJvHwIV3H6vcyOGhT/iw5zUhLJNlrGIQXBdYmhyG58Nf/UshSa6ka0QRp//UfTUZ2Zi
-         mKBuwlqPIo8w1Hbymo63LN5x+IQJe7ExyY/ss260QD6dsy6NNlhS+PfwlflGI86K2Xub
-         fbKQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUjX9DjgO7Tp3P5+kXHOPSxrmpRq77CfOh1X/c6xWELJIYgoh9CnbKCGJ4Ecvkpe7mcSB1F/hA=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx+Yxm6rBd1bepypdhsC7xhcBPFoyjIQoO3AOHD8kZbquxCd49y
-	FIgWRJ/p9xukZQeB8eo2ywUofyHlheD3SHSyZZfvg1SzLPWH5/BYj01wRvZVMRR39XoKr0+qJp2
-	0L37rJP3ggCCQfs6QuLh/QQKcm6P2tDR5u+oTBg==
-X-Google-Smtp-Source: AGHT+IEfTLGxMRTgZVBrGwFKA9oioUe6XiP0kU3ZXwnrA2Gb+QVba1IpxfUk/kA/lH7d6J1l+V4TSFC0vo8qJ2jirVQ=
-X-Received: by 2002:a17:90a:e7c2:b0:2e2:ada8:2984 with SMTP id
- 98e67ed59e1d1-2e9a4b22b1bmr587838a91.4.1730936656020; Wed, 06 Nov 2024
- 15:44:16 -0800 (PST)
+	s=arc-20240116; t=1730936803; c=relaxed/simple;
+	bh=6/MVy899qQ45oLAPpA6Mm2wuDappAXUAZWnu+IVK5So=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=iVISeNmYAAlo/etKmydtQp7SnfjV3mWb9/TldZ0oNUoSYYQg0WnpajAeFveX0gcL0Ocaqo9Csgxr6zLpviB4H4LHADnwU6Hp9cgRGqN+iYiUAnxU88CocfFBe31NLnglR5GHRzle+W9X/dlAP29PzDbRQRg3NjLIyWCsQbmZUsI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: netfilter-devel@vger.kernel.org
+Cc: davem@davemloft.net,
+	netdev@vger.kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	fw@strlen.de
+Subject: [PATCH net-next 00/11] Netfilter updates for net-next
+Date: Thu,  7 Nov 2024 00:46:14 +0100
+Message-Id: <20241106234625.168468-1-pablo@netfilter.org>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241101034647.51590-1-csander@purestorage.com>
- <20241101034647.51590-2-csander@purestorage.com> <CY8PR12MB71958512F168E2C172D0BE05DC502@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CADUfDZofFwy12oZYTmm3TE314RM79EGsxV6bKEBRMVFv8C3jNg@mail.gmail.com>
- <CY8PR12MB71953FD36C70ACACEBE3DBA1DC522@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CADUfDZqanDo+v_jap7pQire86QkfaDQE4HvhvVBb64YqKNgRHg@mail.gmail.com> <CY8PR12MB7195FDC4A280F4CD7EA219ABDC532@CY8PR12MB7195.namprd12.prod.outlook.com>
-In-Reply-To: <CY8PR12MB7195FDC4A280F4CD7EA219ABDC532@CY8PR12MB7195.namprd12.prod.outlook.com>
-From: Caleb Sander <csander@purestorage.com>
-Date: Wed, 6 Nov 2024 15:44:04 -0800
-Message-ID: <CADUfDZon6QbURp7TqB6dvE4Ewb_To2EDyUTQ=spNCorXDy0DbQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/2] mlx5/core: deduplicate {mlx5_,}eq_update_ci()
-To: Parav Pandit <parav@nvidia.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Tue, Nov 5, 2024 at 9:44=E2=80=AFPM Parav Pandit <parav@nvidia.com> wrot=
-e:
->
->
-> > From: Caleb Sander <csander@purestorage.com>
-> > Sent: Tuesday, November 5, 2024 9:36 PM
-> >
-> > On Mon, Nov 4, 2024 at 9:22=E2=80=AFPM Parav Pandit <parav@nvidia.com> =
-wrote:
-> > >
-> > >
-> > >
-> > > > From: Caleb Sander <csander@purestorage.com>
-> > > > Sent: Monday, November 4, 2024 3:49 AM
-> > > >
-> > > > On Sat, Nov 2, 2024 at 8:55=E2=80=AFPM Parav Pandit <parav@nvidia.c=
-om> wrote:
-> > > > >
-> > > > >
-> > > > >
-> > > > > > From: Caleb Sander Mateos <csander@purestorage.com>
-> > > > > > Sent: Friday, November 1, 2024 9:17 AM
-> > > > > >
-> > > > > > The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci(=
-).
-> > > > > > The only additional work done by mlx5_eq_update_ci() is to
-> > > > > > increment
-> > > > > > eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to
-> > > > > > eq->avoid
-> > > > > > the duplication.
-> > > > > >
-> > > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> > > > > > ---
-> > > > > >  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
-> > > > > >  1 file changed, 1 insertion(+), 8 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > > > b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > > > index 859dcf09b770..078029c81935 100644
-> > > > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> > > > > > @@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct
-> > > > > > mlx5_eq *eq, u32 cc)  }  EXPORT_SYMBOL(mlx5_eq_get_eqe);
-> > > > > >
-> > > > > >  void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)  =
-{
-> > > > > > -     __be32 __iomem *addr =3D eq->doorbell + (arm ? 0 : 2);
-> > > > > > -     u32 val;
-> > > > > > -
-> > > > > >       eq->cons_index +=3D cc;
-> > > > > > -     val =3D (eq->cons_index & 0xffffff) | (eq->eqn << 24);
-> > > > > > -
-> > > > > > -     __raw_writel((__force u32)cpu_to_be32(val), addr);
-> > > > > > -     /* We still want ordering, just not swabbing, so add a ba=
-rrier */
-> > > > > > -     wmb();
-> > > > > > +     eq_update_ci(eq, arm);
-> > > > > Long ago I had similar rework patches to get rid of
-> > > > > __raw_writel(), which I never got chance to push,
-> > > > >
-> > > > > Eq_update_ci() is using full memory barrier.
-> > > > > While mlx5_eq_update_ci() is using only write memory barrier.
-> > > > >
-> > > > > So it is not 100% deduplication by this patch.
-> > > > > Please have a pre-patch improving eq_update_ci() to use wmb().
-> > > > > Followed by this patch.
-> > > >
-> > > > Right, patch 1/2 in this series is changing eq_update_ci() to use
-> > > > writel() instead of __raw_writel() and avoid the memory barrier:
-> > > > https://lore.kernel.org/lkml/20241101034647.51590-1-
-> > > > csander@purestorage.com/
-> > > This patch has two bugs.
-> > > 1. writel() writes the MMIO space in LE order. EQ updates are in BE o=
-rder.
-> > > So this will break on ppc64 BE.
-> >
-> > Okay, so this should be writel(cpu_to_le32(val), addr)?
-> >
-> That would break the x86 side because device should receive in BE format =
-regardless of cpu endianness.
-> Above code will write in the LE format.
->
-> So an API foo_writel() need which does
-> a. write memory barrier
-> b. write to MMIO space but without endineness conversion.
+Hi,
 
-Got it, thanks. writel(bswap_32(val, addr)) should work, then? I
-suppose it may introduce a second bswap on BE architectures, but
-that's probably worth it to avoid the memory barrier.
+The following series contains Netfilter updates for net-next:
 
->
-> > >
-> > > 2. writel() issues the barrier BEFORE the raw_writel().
-> > > As opposed to that eq update needs to have a barrier AFTER the writel=
-().
-> > > Likely to synchronize with other CQ related pointers update.
-> >
-> > I was referencing this prior discussion about the memory barrier:
-> > https://lore.kernel.org/netdev/CALzJLG8af0SMfA1C8U8r_Fddb_ZQhvEZd6=3D2
-> > a97dOoBcgLA0xg@mail.gmail.com/
-> > From Saeed's message, it sounds like the memory barrier is only used to
-> > ensure the ordering of writes to the doorbell register, not the orderin=
-g of the
-> > doorbell write relative to any other writes. If some other write needs =
-to be
-> > ordered after the doorbell write, please explain what it is.
-> Not write, reading of the CQE likely requires read barrier.
+1) Make legacy xtables configs user selectable, from Breno Leitao.
 
-But mlx5_eq_update_ci() is already using wmb(), which only imposes an
-ordering on writes. So if the existing code is correct, the memory
-barrier cannot be required to order the doorbell write with respect to
-a read of the CQE.
+2) Fix a few sparse warnings related to percpu, from Uros Bizjak.
 
->
-> > As Gal Pressman
-> > pointed out, a wmb() at the end of a function doesn't make much sense, =
-as
-> > there are no further writes in the function to order. If the doorbell w=
-rite needs
-> > to be ordered before some other write in a caller function, the memory =
-barrier
-> > should probably move to the caller.
-> It is the two EQ doorbell writes that needs to be ordered with respect to=
- each other.
-> So please audit the code for CQE processing ensure that there is read bar=
-rier after valid bit.
-> And removal of this read barrier does not affect there.
->
-> It would be best if you can test on ARM (non x86_64) platform for this ch=
-ange.
+3) Use strscpy_pad, from Justin Stitt.
 
-Unfortunately I don't have access to any platform besides x86_64 with
-ConnectX cards.
+4) Use nft_trans_elem_alloc() in catchall flush, from Florian Westphal.
 
->
-> >
-> > >
-> > > > Are you suggesting something different? If so, it would be great if
-> > > > you could clarify what you mean.
-> > > >
-> > > So I was suggesting to keep __raw_writel() as is and replace mb() wit=
-h
-> > wmb().
-> >
-> > wmb() would certainly be cheaper than mb(), but I would like to underst=
-and
-> > the requirement for the barrier in the first place. The fence instructi=
-on is very
-> > expensive.
-> >
-> To order two doorbell writes of the same EQ.
+5) A series of 7 patches to fix false positive with CONFIG_RCU_LIST=y.
+   Florian also sees possible issue with 10 while module load/removal
+   when requesting an expression that is available via module. As for
+   patch 11, object is being updated so reference on the module already
+   exists so I don't see any real issue.
 
-Right, I understand why the memory barrier is needed with the existing
-__raw_writel(), as it provides no ordering guarantees. But writel()
-seems to guarantee the necessary ordering of writes to the EQ's
-doorbell. This is the relevant documentation from memory-barriers.txt
-(I assume the mutual exclusion of interrupt handlers is equivalent to
-holding a spinlock):
+   Florian says:
 
-2. A writeX() issued by a CPU thread holding a spinlock is ordered
-   before a writeX() to the same peripheral from another CPU thread
-   issued after a later acquisition of the same spinlock. This ensures
-   that MMIO register writes to a particular device issued while holding
-   a spinlock will arrive in an order consistent with acquisitions of
-   the lock.
+   "Unfortunately there are many more errors, and not all are false positives.
 
-Do you still think the barrier is necessary if writel() is used instead?
+   First patches pass lockdep_commit_lock_is_held() to the rcu list traversal
+   macro so that those splats are avoided.
 
-If you feel strongly about keeping the wmb(), I can do that. It's
-certainly an improvement over the full memory barrier. But fences are
-quite expensive, so I would prefer to remove it if it's not necessary
-for correctness.
+   The last two patches are real code change as opposed to
+   'pass the transaction mutex to relax rcu check':
 
-Thanks,
-Caleb
+   Those two lists are not protected by transaction mutex so could be altered
+   in parallel.
+
+   This targets nf-next because these are long-standing issues."
+
+Please, pull these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-24-11-07
+
+Thanks.
+
+----------------------------------------------------------------
+
+The following changes since commit f66ebf37d69cc700ca884c6a18c2258caf8b151b:
+
+  Merge git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2024-10-03 10:05:55 -0700)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf-next.git nf-next-24-11-07
+
+for you to fetch changes up to cddc04275f95ca3b18da5c0fb111705ac173af89:
+
+  netfilter: nf_tables: must hold rcu read lock while iterating object type list (2024-11-05 22:07:12 +0100)
+
+----------------------------------------------------------------
+netfilter pull request 24-11-07
+
+----------------------------------------------------------------
+Breno Leitao (1):
+      netfilter: Make legacy configs user selectable
+
+Florian Westphal (8):
+      netfilter: nf_tables: prefer nft_trans_elem_alloc helper
+      netfilter: nf_tables: avoid false-positive lockdep splat on rule deletion
+      netfilter: nf_tables: avoid false-positive lockdep splats with sets
+      netfilter: nf_tables: avoid false-positive lockdep splats with flowtables
+      netfilter: nf_tables: avoid false-positive lockdep splats in set walker
+      netfilter: nf_tables: avoid false-positive lockdep splats with basechain hook
+      netfilter: nf_tables: must hold rcu read lock while iterating expression type list
+      netfilter: nf_tables: must hold rcu read lock while iterating object type list
+
+Justin Stitt (1):
+      netfilter: nf_tables: replace deprecated strncpy with strscpy_pad
+
+Uros Bizjak (1):
+      netfilter: nf_tables: Fix percpu address space issues in nf_tables_api.c
+
+ include/net/netfilter/nf_tables.h      |   3 +-
+ net/bridge/netfilter/Kconfig           |   8 +-
+ net/bridge/netfilter/nft_meta_bridge.c |   2 +-
+ net/ipv4/netfilter/Kconfig             |  16 +++-
+ net/ipv6/netfilter/Kconfig             |   9 ++-
+ net/netfilter/nf_tables_api.c          | 132 +++++++++++++++++++--------------
+ net/netfilter/nft_flow_offload.c       |   4 +-
+ net/netfilter/nft_set_bitmap.c         |  10 ++-
+ net/netfilter/nft_set_hash.c           |   3 +-
+ 9 files changed, 119 insertions(+), 68 deletions(-)
 
