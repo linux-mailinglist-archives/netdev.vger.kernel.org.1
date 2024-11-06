@@ -1,151 +1,91 @@
-Return-Path: <netdev+bounces-142536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 103A29BF8F3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:12:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 647229BF920
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 23:19:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BB26D1F22E32
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 22:12:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id E166FB22A29
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 22:19:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93C9209F3B;
-	Wed,  6 Nov 2024 22:12:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mSjQ3KnV"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2155B20C486;
+	Wed,  6 Nov 2024 22:19:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f42.google.com (mail-wm1-f42.google.com [209.85.128.42])
+Received: from mail-il1-f200.google.com (mail-il1-f200.google.com [209.85.166.200])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E44824A3
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 22:12:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.42
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9071A209F20
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 22:19:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.200
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730931153; cv=none; b=uCVJ5EWkfmb1mnMk58JWOmIbBlztQG5kZSPRE9T+p8RD8DCZDl3PfhEN/BhJ6aZsJD3T89fWjdeV+sFmdN/Ax5vcr5Ryz9QYlPOWpN3uJj6eXnWYgDhqdvoveyqnoxcaX28Nd1uqeS3LiTRDOJDa4WfkFqr0RxNNrQTW0EOmk0c=
+	t=1730931548; cv=none; b=BAikBtkoqQZw8MPxQgXrRTx+27MOgRzSPBGEXcMt6A0KnM36O+9njkD30c/k52EzirgwsUyREYfXN4jvUQQ8PPT51KAPV+TZbSY74lOJc/sbzAe0kb+gGkNMXg8QmGV07ndZS/ZKJcN6TJ83RlIiGBcB6+/jH5IGOczmyG4w0gA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730931153; c=relaxed/simple;
-	bh=NKbVcCCZIiM0sX+WdXRuDBBSQbhN5H6+3jGmAYxxA6s=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=p/9FmTonaEK1SMg4NFINyIu1ZPWmpDh6ZwTwon2qQuI1sF0BT4rEmdi81gvi+c6vGVdV8x1HCtW3bj+Ft2yHz6BU1l6kma2859iRT1T24lCip8bu8EEGDpWT8p/1xhTuitt5tjDocKhKhg6dV/xie945G8xNSWE+setkMJAUY5E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mSjQ3KnV; arc=none smtp.client-ip=209.85.128.42
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f42.google.com with SMTP id 5b1f17b1804b1-4315baec69eso2759475e9.2
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 14:12:31 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730931150; x=1731535950; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=YB3xeY071IgcEnEiq3AVPEiyG5ZVXfdzV1Ck//Skg7M=;
-        b=mSjQ3KnVWsFAxpSuOoszlwW0jBf1LlkN/Z3ShI4zXGlTkCfLvKHTHQYLP0cFOypwyK
-         cTYnaFQ9JyzNNA0iQ++TicCxNlmeMJGjlX9XqID+nPrCqMvXxlU3C1H9WPOHlVM337lE
-         4d9Yz4aIiX1GnKLfUYFisSld2xcgZ1L811roIGTInUFo1IsnCaL6bOGeW40Iq1RVugQ2
-         Z+CgXpN1sVNVghxu7i5PmWlZ7SwQ2mbK3n6g6XGPVUn7Po4Lgk6SpObClC0I/3ngSeMo
-         WoTng8h4vg6szHApDGpg0cDxAO2djM42x0vkbpfDaGswzfmEh0WbRSxCRT9OjaRWB/vU
-         mY/Q==
+	s=arc-20240116; t=1730931548; c=relaxed/simple;
+	bh=+gR57EeKwbw0Kwz6JIBh8JtZeP2pTiNAeaE8mY7cdLw=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=Sxi3LOP9/ncqA+DVNf6MzdcDmN3V2M5Don7dQkFVrUnCkYvlVDf39I/zFWZnagTYZlYbafdJ8yQI2z8KUcDOZD8rtgrNUA8VZJToV9MSln0xRXJYYVOfex15atGCzErkgELK+/3lU+MyEEJ5CBvhzzOTnaMgaKEfJvLHK+Rp8Pk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.200
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f200.google.com with SMTP id e9e14a558f8ab-3a6b9f3239dso4875275ab.0
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 14:19:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730931150; x=1731535950;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1730931546; x=1731536346;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=YB3xeY071IgcEnEiq3AVPEiyG5ZVXfdzV1Ck//Skg7M=;
-        b=Ab6sXmSVT4C72JTgRTkkpzAH/tIHZFaqyM3VCKjzJ84V/w+liF36WS0W/1jnvfTepA
-         +XJ9KaoCAPzwmRw1gBpztemkTzg5Fmk2lEUXf9trdCGS4/WuJzYsyfXrgydKpQWAj60l
-         7TiXM91KGLMJCBkIGHmUs+Fm9ZeuVBuJxNcvU397j/a9j7T1z5R/yY69k5Z1wJ7HwFQq
-         mO+WMZFH1HDALMEpSLtwtw2HNhHcDVnNekYwTqR5epNiKdmKiQ/TNvWJZM6XKlFqfDZF
-         LiuTBv6zfNvtlgr7qxJQHUe/aHpOmx2fe8x4Fdc3+F2hY/slbzRiOr/UVC2EXECarEi7
-         CNXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUqgwvBRgKPp4tQbD2AkuY2LqPT0/paI3JjTPeCr6nPF8cCZfzK+FAgGbLHaxgyBdov5w37+Lo=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yx4r1qVEQEsVec4vrjJsA/iI094I8/bTDfp4Uhl5W8u96X8UbBv
-	rtL3I1ZJ7NLXxRAvI9fs5LE5LhfMl9XjfcdxoalfO7Go3cbLW/6G
-X-Google-Smtp-Source: AGHT+IFfw5uAMtdU1Om11dpYAnWEuvswlrvP8MXiZx6I0NsIQwFcLiPX5mXS4Yxg1s/Iptb9rEr+Hw==
-X-Received: by 2002:a05:6000:4009:b0:37d:4e80:516 with SMTP id ffacd0b85a97d-381c7a5f773mr18655654f8f.34.1730931150127;
-        Wed, 06 Nov 2024 14:12:30 -0800 (PST)
-Received: from [192.168.0.2] ([69.6.8.124])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c113e771sm20526409f8f.81.2024.11.06.14.12.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2024 14:12:28 -0800 (PST)
-Message-ID: <3d17cd64-46c5-427f-b24f-9091546e2edf@gmail.com>
-Date: Thu, 7 Nov 2024 00:12:56 +0200
+        bh=Ko45KvLVsjg/SK8Ct5743fIEU/Eg1iBnoARTt6ua45s=;
+        b=D9dg9kij3M9ZSTo46QiGEBHIayMquTxGCfB+wpnlim55Kpx0O1QA/ekUJ9jsIe/lZR
+         sMNwoz+YJyj/5uGMDxymNiSI8nfsjlAGAtloOI4Cca5sIDna+gEJXNOSMBlkhkHlUvXh
+         QmmitgFl1JNSaipf+PsJw02pfx/DiVWeQfGOWzAOc8okr34TQQji26NW2FSYKPceRFPV
+         46hbgmW5swhy3yWmqyJKFqbeqDzJrx3kpPBYIaeemfOTSaSc1MFhk/OiMck361FXxtb8
+         xyBdmvVy8Cx4W2rgLQu8y70C5u3jdTLI83zWGb+t3g0WFu5cfglmgd0JeQeGILZj02n4
+         zKhg==
+X-Forwarded-Encrypted: i=1; AJvYcCX4MNPYGf2Scf8S5CBRBqgZzU3R2L0jRfp5pg265k8Z7HfAeHKWWPf0C/NQi/D4ZIVnJyqq8K4=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwbklZ27kKwzDGIbgizwbnq8KbZ3pP+LhrtjsuM1D1oX/n6MbH6
+	HNWHWRtby600By+bi9bGgSqwCi/8xqTQoxFOx/ZjgQ2L2De7Z68X24aRzGuCkilWe31XnIDSjUq
+	ASRjl1RBF03+dXIhXa7HB3uCCQzVA+PYjUkvuNz9t2dB2YUhtpnR0rZM=
+X-Google-Smtp-Source: AGHT+IGPQH134goapcSY9eT7NLw6Ji7rELvx0NPPbitKv/F44WvkYOx798kePlkHETZ9gxFEXBaI83nx6N4GYR6QJDZ+E7jq1KF7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH] [net] net: wwan: t7xx: Change PM_AUTOSUSPEND_MS to 5000
-To: =?UTF-8?B?5ZCz6YC86YC8?= <wojackbb@gmail.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
- chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
- ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, linux-arm-kernel@lists.infradead.org,
- angelogioacchino.delregno@collabora.com, linux-mediatek@lists.infradead.org,
- matthias.bgg@gmail.com
-References: <20241028073015.692794-1-wojackbb@gmail.com>
- <20241031185150.6ef22ce0@kernel.org>
- <CAAQ7Y6an8ZkxYpJehd8cBRPHjqyQofc6A4QdPzM_dhh1Sn0nng@mail.gmail.com>
-Content-Language: en-US
-From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
-In-Reply-To: <CAAQ7Y6an8ZkxYpJehd8cBRPHjqyQofc6A4QdPzM_dhh1Sn0nng@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+X-Received: by 2002:a05:6e02:1a48:b0:3a6:ad61:8006 with SMTP id
+ e9e14a558f8ab-3a6b034b0edmr214369125ab.15.1730931545807; Wed, 06 Nov 2024
+ 14:19:05 -0800 (PST)
+Date: Wed, 06 Nov 2024 14:19:05 -0800
+In-Reply-To: <CANn89iJptb2gackja+KocyPYwf855EgZM34GSO3km4Z8tcwq1w@mail.gmail.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672beb59.050a0220.350062.027d.GAE@google.com>
+Subject: Re: [syzbot] [net?] KMSAN: kernel-infoleak in __skb_datagram_iter (4)
+From: syzbot <syzbot+0c85cae3350b7d486aee@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, horms@kernel.org, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-Hello Jack,
+Hello,
 
-On 06.11.2024 13:10, 吳逼逼 wrote:
-> If the PCIE connection remains in the D0 state, It will consume more power.
+syzbot tried to test the proposed patch but the build/boot failed:
 
-True. Keeping device active causes battery drainage and the idea to put 
-inactive device into the power saving mode is clear. My question was not 
-about power consumption. I am trying to understand what other 
-consequences of keeping modem suspended. More specifically, how the 
-suspend mode influences user data communication?
-
-> Receiving or sending data will cause PCIE to change D3 Cold to D0 state.
-
-Am I understand it correctly that even receiving IP packets on downlink 
-will cause PCIe link re-activation?
+failed to apply patch:
+checking file include/uapi/linux/tc_act/tc_connmark.h
+patch: **** malformed patch at line 11: diff --git a/include/uapi/linux/tc_act/tc_ife.h
 
 
-I am concerned about a TCP connection that can be idle for a long period 
-of time. For example, an established SSH connection can stay idle for 
-minutes. If I connected to a server and execute something like this:
 
-user@host$ sleep 20 && echo "Done"
 
-Will I eventually see the "Done" message or will the autosuspended modem 
-effectively block any incoming traffic? And how long does it take for 
-the modem to wake up and deliver a downlink packet to the host? Have you 
-measured StDev change?
+Tested on:
 
-> Jakub Kicinski <kuba@kernel.org> 於 2024年11月1日 週五 上午9:51寫道：
->>
->> On Mon, 28 Oct 2024 15:30:15 +0800 wojackbb@gmail.com wrote:
->>> Because optimizing the power consumption of t7XX,
->>> change auto suspend time to 5000.
->>>
->>> The Tests uses a script to loop through the power_state
->>> of t7XX.
->>> (for example: /sys/bus/pci/devices/0000\:72\:00.0/power_state)
->>>
->>> * If Auto suspend is 20 seconds,
->>>    test script show power_state have 0~5% of the time was in D3 state
->>>    when host don't have data packet transmission.
->>>
->>> * Changed auto suspend time to 5 seconds,
->>>    test script show power_state have 50%~80% of the time was in D3 state
->>>    when host don't have data packet transmission.
->>
->> I'm going to drop this from PW while we wait for your reply to Sergey
->> If the patch is still good after answering his questions please update
->> the commit message and resend with a [net-next] tag (we use [net] to
->> designate fixes for current release and stable)
+commit:         f43b1569 Merge tag 'keys-next-6.12-rc7' of git://git.k..
+git tree:       upstream
+kernel config:  https://syzkaller.appspot.com/x/.config?x=6fdf74cce377223b
+dashboard link: https://syzkaller.appspot.com/bug?extid=0c85cae3350b7d486aee
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=14119f40580000
 
---
-Sergey
 
