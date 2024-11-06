@@ -1,122 +1,109 @@
-Return-Path: <netdev+bounces-142229-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F75E9BDEF2
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:40:39 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 137B59BDEFE
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:48:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E331328406B
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:40:37 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BAB651F23C44
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:48:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E300B1925BD;
-	Wed,  6 Nov 2024 06:40:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 17865191F9E;
+	Wed,  6 Nov 2024 06:48:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JOmJDlOW"
+	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="jgCf8X+K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f171.google.com (mail-pl1-f171.google.com [209.85.214.171])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CBFF191F9C;
-	Wed,  6 Nov 2024 06:40:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDF5617995E;
+	Wed,  6 Nov 2024 06:48:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730875234; cv=none; b=uRgTLiQWG63yOFFQkEzxbk/Jm7lmvnBD5tGH5s08qhoy4jtTDvkOOas1zO1IK5+QrAYDD+QfjVtJp1IIfM2aJqLIpPcDdx3dvVeyQOk/Je48ZgAkJr2G1ShaqzIeI0O1t6Jwg3lDM2VYZyNtRYUmebZgbf4HWTInPxW7gr7+yF8=
+	t=1730875697; cv=none; b=P/6W5BnAMA2KVDFPBavrqWVv1GN1kpacxYD/EdRNvhRuDYePip7ZHtk4j/5AwatV0lzoCsz1G/oJE/COZ7iSIFP3SsLZcy+0DfU3geoOC/ENmc7j3O13itkSvdAsoECBdWq9yOATH0h8YIo57tXQOJxvSI2Vp4jz/7fyibrLp5E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730875234; c=relaxed/simple;
-	bh=gFwfzORA7QIdPJqGaNFlmdM9gBpVtPLuuGp4SZlmDG0=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=huxyVExnrwNxZKFXDndVVAq5bqg57x1ide4U7gBGVd29RnEAKzCRxd4WUz+M/anrpMxgZbcXcy2SgGlPXTqPnmRDI0n7MzU6pj2/rkv3+5BTo5aDA5qsffgd1xBNyOJN8suLp+nsNXtD07Cm93P3htLLchs6CrQauB7pQ7cmj6o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JOmJDlOW; arc=none smtp.client-ip=209.85.214.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f171.google.com with SMTP id d9443c01a7336-20e576dbc42so66205685ad.0;
-        Tue, 05 Nov 2024 22:40:33 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730875232; x=1731480032; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PtfRze3iYz6UfzCjwXZxr0O4gWeVKGt5BH9cgehlegI=;
-        b=JOmJDlOWCcYLVqQ+f0ukJLBsJklDXg/TTKXfcNJP5B/dUM03+KRjtYN+5fxAZdM77k
-         sYQKWruGeNkEfuiPfIUkDKRWuPs64FKFtjMjyCb3hFbeUEMr26xpoVuHfN+qYGS2YdsG
-         51jHwGEB/eoWTEhff9u2ZZyw1JlrFI45BEX/zWeJH1y7dbUBuPP1XxPS9YTPqTyoZKmO
-         1G72WWfWBmpGowEwZQL2FX1OW+fztnIebvci01DipdFLxG2q8CBbmkE/9hN7y1lra8W5
-         enK8ZIIca/Ouf3gYnyo2vxkCdKdHoCec1AuKQ58vGHuKvtFWN3wMz69LOHpG/pOiLXAC
-         8oeQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730875232; x=1731480032;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PtfRze3iYz6UfzCjwXZxr0O4gWeVKGt5BH9cgehlegI=;
-        b=oMw2uwKqGyd6sL42NTWuHrcASudsp673k3r+5fhIUtcyz7Z8AzliDvFEuOK1sEIAsv
-         Hs2TE7IT2P+57/z/ZHGCmCbUTX0Xt0nUw0lqDrcLx26RbZCL45Ns1VopQngQz1bRSHqk
-         K3d40AqtUpb/FZlKoMwHiRJMDNVj0DVlU/jyANpPjflj+EQa76xnw1WJGA/8oZz9bnkr
-         NwDiN31cfK514hir0liBSTf9uDu9wlQDwioUSv01AkdKGc357Alq7H9OGg6b15v7V3SW
-         FF9jnFKbdZ8sTi0n8UINlyFut4ldyqSMpgPIPLv84SwUXmlNLxiqTzV77lQayPsO76UC
-         Anrw==
-X-Forwarded-Encrypted: i=1; AJvYcCVQy1d+SQUsK4C/Gey2YOei7I0FLdX6AIFWsBzKqY3m5LExpLlVkYuXuxXwoTaYz9tMrLiaSA1kYIfl@vger.kernel.org
-X-Gm-Message-State: AOJu0YzD2P+06U2Go/KnXxGf8zQNGfj0G5SW/lz8E/i3NP57liBkGW9i
-	v8vGPmtOCbqqGPwempoPOR/vDXocXhhYR9Xhi371y/QUPChVr5FJrGLnkA8AE5E=
-X-Google-Smtp-Source: AGHT+IGFFNK0IzTpckXh4aZJZ9diRc+kgc5Sb02KoEtP1tjKW4S+JxXxO/3mbb8KC0M7mMPcN2SWwA==
-X-Received: by 2002:a17:902:f605:b0:211:3275:3fe with SMTP id d9443c01a7336-2113275058fmr216764045ad.17.1730875232468;
-        Tue, 05 Nov 2024 22:40:32 -0800 (PST)
-Received: from localhost.localdomain ([39.144.44.137])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-211057c51e8sm88906155ad.210.2024.11.05.22.40.28
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Tue, 05 Nov 2024 22:40:31 -0800 (PST)
-From: Yafang Shao <laoar.shao@gmail.com>
-To: saeedm@nvidia.com,
-	tariqt@nvidia.com,
-	leon@kernel.org
-Cc: netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	Yafang Shao <laoar.shao@gmail.com>
-Subject: [PATCH] net/mlx5e: Report rx_discards_phy via rx_missed_errors
-Date: Wed,  6 Nov 2024 14:40:15 +0800
-Message-Id: <20241106064015.4118-1-laoar.shao@gmail.com>
-X-Mailer: git-send-email 2.30.1 (Apple Git-130)
+	s=arc-20240116; t=1730875697; c=relaxed/simple;
+	bh=4AlrWv5nTm8KmFK/RjSrqEmQrs/5JQspZ8iMgzP7uO0=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=gt6PJ35u5lS00S1dHcoxJxQTQRAZp511bC3nmaxqyxvA4QX2MDM9lTy3SLtRc0inabYGsNmUSjI3KG9//6zUKcmBBYv1McvQONdUl+XDHyznqF7zhLGK+Y7AilSTsJFO6yZOct+OvHC1mWLv2ODXihY3tmXb6kRJ+eemZDmUJqs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=jgCf8X+K; arc=none smtp.client-ip=198.47.23.249
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
+Received: from fllv0034.itg.ti.com ([10.64.40.246])
+	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A66ljZA101137;
+	Wed, 6 Nov 2024 00:47:45 -0600
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
+	s=ti-com-17Q1; t=1730875665;
+	bh=fCQZXkAS/Gp8UlJvk930Ptx2GDYmSbYH65zsCKiP7/U=;
+	h=Date:Subject:To:CC:References:From:In-Reply-To;
+	b=jgCf8X+KbnVPwoZYkCrJjbKjU7lomcVTTxf66Yr7vRmkCGENNVfycSCxXT1yUc+ST
+	 NvZt+GCYgIMGxG47fxRCplj3xaMuZsiZiSPofc59ArWpEBr9pHVK3ESw+yvYAEJFBT
+	 se28DcGXWZbxfaf/1gm1+9pTwptvKmDAaE7c+LLc=
+Received: from DLEE113.ent.ti.com (dlee113.ent.ti.com [157.170.170.24])
+	by fllv0034.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A66ljlM023491
+	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
+	Wed, 6 Nov 2024 00:47:45 -0600
+Received: from DLEE110.ent.ti.com (157.170.170.21) by DLEE113.ent.ti.com
+ (157.170.170.24) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Wed, 6
+ Nov 2024 00:47:45 -0600
+Received: from lelvsmtp5.itg.ti.com (10.180.75.250) by DLEE110.ent.ti.com
+ (157.170.170.21) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
+ Frontend Transport; Wed, 6 Nov 2024 00:47:45 -0600
+Received: from [10.249.139.24] ([10.249.139.24])
+	by lelvsmtp5.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A66lcBN008344;
+	Wed, 6 Nov 2024 00:47:39 -0600
+Message-ID: <8ccae9bb-8582-4c08-9dc3-f5608bb69aee@ti.com>
+Date: Wed, 6 Nov 2024 12:17:38 +0530
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net v3] net: ti: icssg-prueth: Fix 1 PPS sync
+To: Andrew Lunn <andrew@lunn.ch>
+CC: Jakub Kicinski <kuba@kernel.org>, <vigneshr@ti.com>, <horms@kernel.org>,
+        <jan.kiszka@siemens.com>, <diogo.ivo@siemens.com>, <pabeni@redhat.com>,
+        <edumazet@google.com>, <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+        <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+        <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>,
+        Roger Quadros
+	<rogerq@kernel.org>, <danishanwar@ti.com>,
+        Vadim Fedorenko
+	<vadim.fedorenko@linux.dev>
+References: <20241028111051.1546143-1-m-malladi@ti.com>
+ <20241031185905.610c982f@kernel.org>
+ <7c3318f4-a2d4-4cbf-8a93-33c6a8afd6c4@ti.com>
+ <20241104185031.0c843951@kernel.org>
+ <e5c5c9ba-fca1-4fa3-a416-1fc972ebd258@ti.com>
+ <6a230b28-9298-410b-b873-21000af4c0f3@lunn.ch>
+Content-Language: en-US
+From: "Malladi, Meghana" <m-malladi@ti.com>
+In-Reply-To: <6a230b28-9298-410b-b873-21000af4c0f3@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
 
-We observed a high number of rx_discards_phy events on some servers when
-running `ethtool -S`. However, this important counter is not currently
-reflected in the /proc/net/dev statistics file, making it challenging to
-monitor effectively.
 
-Since rx_missed_errors represents packets dropped due to buffer exhaustion,
-it makes sense to include rx_discards_phy in this counter to enhance
-monitoring visibility. This change will help administrators track these
-events more effectively through standard interfaces.
 
-Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
-Cc: Saeed Mahameed <saeedm@nvidia.com>
-Cc: Tariq Toukan <tariqt@nvidia.com>
-Cc: Leon Romanovsky <leon@kernel.org>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 ++-
- 1 file changed, 2 insertions(+), 1 deletion(-)
+On 11/6/2024 2:30 AM, Andrew Lunn wrote:
+>>> I think you need to write a custom one. Example:
+>>> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/tree/drivers/net/ethernet/meta/fbnic/fbnic_time.c#n40
+>> Ok thank you. I will add custom function for this and update the patch.
+> 
+> Maybe look around and see if they could be reused by other drivers. If
+> so, they should be put somewhere central.
+> 
+> 	Andrew
+I have looked into it, and seems like wherever this is getting used it 
+is written as a custom function for that driver. Seems like writing our 
+own is inevitable.
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-index 6f686fabed44..42c1b791a74c 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
-@@ -3903,7 +3903,8 @@ mlx5e_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
- 		mlx5e_fold_sw_stats64(priv, stats);
- 	}
- 
--	stats->rx_missed_errors = priv->stats.qcnt.rx_out_of_buffer;
-+	stats->rx_missed_errors = priv->stats.qcnt.rx_out_of_buffer +
-+				  PPORT_2863_GET(pstats, if_in_discards);
- 
- 	stats->rx_length_errors =
- 		PPORT_802_3_GET(pstats, a_in_range_length_errors) +
--- 
-2.30.1 (Apple Git-130)
+- Meghana.
 
 
