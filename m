@@ -1,426 +1,142 @@
-Return-Path: <netdev+bounces-142161-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142162-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52FBF9BDAE3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:05:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id F32779BDAE8
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:08:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 709861C20E3D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:05:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id ABEDA1F21A14
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:08:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D950F139D0A;
-	Wed,  6 Nov 2024 01:05:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F78A17DFF2;
+	Wed,  6 Nov 2024 01:08:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b="MM9mifa8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="AZaHW7WW"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-out1-04.simnet.is (smtp-out1-04.simnet.is [194.105.232.35])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f45.google.com (mail-ej1-f45.google.com [209.85.218.45])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96ACC3A1DB
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:05:12 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=194.105.232.35
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 700FD17AE1D;
+	Wed,  6 Nov 2024 01:08:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730855115; cv=none; b=lpN+jcx3UvcA3N4o8xe3bj+9FWYTeS1kKwULV2eYTXsHTcODyXosp9brJzrqbxlJtoBGUvLdY0XOsUFTy4ZWP8pb8UbJnU4f+qBYrMhzib87XSrc0+xptUBdjfYCJ2ZwIPh7vzXBEMB3ArKnPfrd9PmvsqgAwC1zvSFoXJTQihE=
+	t=1730855295; cv=none; b=Iywp2sLVAfHDhWJ+4RjbvAn5fg2P9yu3pMKZWY7Jy2eF9/rDBFF2+RXCfLkTmHRYxjCkGBwVTX3XbzK22LzPVHmAmmGZhCP88XjSn5/TohbbKgaC7vI+Rrd1xIN1Td+/GFwuBumP+s2NhLcZSe6dyiGaIReiGWTO/TRabAzyaHE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730855115; c=relaxed/simple;
-	bh=iED6R0ZwErvMgew881tE6M7BvBSH1LyTKvxR5yT715E=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=d3r+4L9pT4oJ16UtcT8tufHEvnZXTEE7qkFLPIQLJDUdL6avwAw/G4La8SmHvH6sXD2pozvWYKesiz+uZyMwGyk0wDry8DNQtFj4Y/v8QKc7MyeQnuXTuKaNxlu7LJjSs+bGgs4rzhf6BGqrg/6EiRS1gRs5NV7dzC91YFmt39E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is; spf=pass smtp.mailfrom=simnet.is; dkim=pass (2048-bit key) header.d=simnet.is header.i=@simnet.is header.b=MM9mifa8; arc=none smtp.client-ip=194.105.232.35
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=simnet.is
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=simnet.is
+	s=arc-20240116; t=1730855295; c=relaxed/simple;
+	bh=UPQb2stjWqGu//9tdKSpz4jsQe4UFL2Xq1BD47l8cjA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Zo4L+FiypkpsC3LrfXa4PC0ghAVHHo/bGAe5wUW3usF5Je6hn361Udthz/NOnt77HDGT2X8P7erCXkirSLeY1q8quzq5Nlm6dfk30RnWKZSh6bWAt6YUJsfVf2IGiQ8XEAi9YpT8M0P864xediNCdOPtCxiMPWw3KD328m5Umdw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=AZaHW7WW; arc=none smtp.client-ip=209.85.218.45
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f45.google.com with SMTP id a640c23a62f3a-a9e8522c10bso57465366b.1;
+        Tue, 05 Nov 2024 17:08:13 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
-  t=1730855112; x=1762391112;
-  h=date:from:to:subject:message-id:mime-version;
-  bh=X2ZlgwDHunUuJxa0KwoulzU4A+4WV04FrceCIRIXejo=;
-  b=MM9mifa8NRW6lKK0t5nmZ5nL7fjZ5AxWlW2LI2KGmLgJM0Ox1ZnBU0NZ
-   Qr1U1XkFM5/zHQgyoq8nmo/cY5HKrMh1AG3kszx27CvATpXYZum1dUh3C
-   B3aa3TPOo5uwrI4mggOYun2ABay/uUBEwvdcTFnGrK8uXJOojV0rR12i+
-   jbZwNe2dwGnenwXdkoAgdtd0ven59YT321PsmpBlb2W9iTK516fRxfvS9
-   yvb0phnwjpzMt3lIG14eLrlM+3uE7ShwOfClMCX3xGmmOqIEHxaqfLyUt
-   HyAA7PSWaQ93qWD56ohfxSDVo+B72yO7LzhNcppBQNlnz+1XzhuufxYMo
-   A==;
-X-CSE-ConnectionGUID: y5Jrlv0HTsqgKQC/JAzKbg==
-X-CSE-MsgGUID: GZbTjQCDQUiyKt/01rq0mQ==
-Authentication-Results: smtp-out-04.simnet.is; dkim=none (message not signed) header.i=none
-X-SBRS: 3.3
-X-IPAS-Result: =?us-ascii?q?A2G6CACZuSpnhVnoacJaHQIOLwUFEAkKgVWCGih9gWSIJ?=
- =?us-ascii?q?Y4CHYEWghKcdgcBAQEPFAIBAg4KEwQBAQSFVAEBD4lVKDgTAQIEAQEBAQMCA?=
- =?us-ascii?q?wEBAQEBAQEBDgEBBgEBAQEBAQYHAhABAQEBQA47hTVGDYUsLIJ7X4MBAYJkr?=
- =?us-ascii?q?2GBNIEBgxzbF4FdEIFIAYVpgmIBhWmEdzwGgg2BFTWBc0p2iwcEgkh8gXoMg?=
- =?us-ascii?q?g4SJYIvgRCFVoglhCWLL4FpA1khEQFVExcLBwWBegODUoE5gVGDIEqDWYFCR?=
- =?us-ascii?q?j83ghNpSzoCDQI2giR9gk6DGIIFhHCEaYEjHTYKAwttPTUUG58wAUaCNy9DA?=
- =?us-ascii?q?QEVJx00gQRAAzAGBAsePz2STkSPRIFEoVyEJIZbgzCCC5VDM4QEkzsMOpJIm?=
- =?us-ascii?q?HejbgEYhRuBfoF/LAcaCDA7gmcJSRkPjioZgQwBB4civld4OwIHCwEBAwmRA?=
- =?us-ascii?q?wEB?=
-IronPort-PHdr: A9a23:LuT3txN6H2qD1O34+3sl6ncoWUAX0o4cXyYO74Y/zrVTbuH7o9L5P
- UnZ6OkrjUSaFYnY6vcRje3QvuigXGEb+p+OvTgEd4AETB4Kj8ga3kQgDceJBFe9LavsaCo3d
- Pk=
-IronPort-Data: A9a23:q7xuvagzX9WBGvrCdX/fSZfWX161lBAKZh0ujC45NGQN5FlGYwSz7
- tYtKTreYZDXMzzrLps0dtnlp1dG78XLxubXe3Jp/ns1EX5DoJSZXN+VJEqtYn3LJJycRx9qv
- pxANdfMdZBrEXON+hn1arKw8XJxj//XF7egUL6danksHwVqEHd44f4Pd5bVp6Yx6TTuK1/Q4
- oiaT7TjBWKYNx5I3kM8tqmI9Rpm5q78sWoWtQVhPfwS4AaByilOXMMRKfvvcyXRT9gPFIZWZ
- c6al+jhoTmxEzTBqz+BuuymGqHfaueKZWBislIPBu76xEAE/3RuukoCHKJ0QV9NjDmUlMxGx
- txItJihIS8kJaSkdN41CnG0KAkge/QfkFP7CSLn65DKlhWbKyeEL8hGVSnaA6VJq46bPkkWn
- RAoAGhlRgyOgeuw3IW6RoFE7ij0BJC2VG+3kigIIQDxVZ7Kc7iaK0n5zYMwMAMLuyx7Na22i
- /z1xtZYRE+ojxVnYj/7AX+l9QuiriGXnzZw8Dp5qUerioR6IcMYPLXFabLoltK2qcp9jxu6v
- GbYp0TFGQgVF+W0jhis4FGmibqa9c/7cNp6+LyQ6P9xnBiBx2kLEhoGRB7j+r+ni1WiHdNEQ
- 6AW0nN/8e5rrBHtFIKnGU3pyJKHlkd0t954GeIS8wCIzKfIpQeCboQBZmQdM4d/6JNnLdAs/
- nC7le/rPBdDiYCUWFGBse/NtyrqPBFAeAfuYgdfEVtUvIi/yG0ptTrJQ8pvHbCdkNL4A3fzz
- iqMoSx4gK8c5fPnzI2l/EvbxiCto4DTSR4ko12MGHyk9R8/ZZXNi5GUBUbz/KtiNoKHFnm9p
- 2ELuPG1q8InH7KHm3nYKAkSJ42B6/GAOTzapFdgGZg96jigk0JPm6gMv1mSw281Yq45lS/VX
- aPFhe9GzL5oVEZGgIdpYpmtTtYryLD6EsT0E6iPKMRPeYQ3dRTvEMBSiay4gjCFfKsEyPBX1
- XKnnSCEVixy5UNPl2Peegvl+eV3rh3SPEuKLXwB8zyp0KCFeFmeQqofPV2FY4gRtfzf+FWOq
- ooPa5DVl32ztdEShAGLrub/ynhXdRAG6Wze+5A/mhOre1Y9Rjh/YxMv6elxJdENc1tpehfgp
- S3tCxAJlDITdFXCKAGDInBtAI4Drr4ixU/XyRcEZA7ys1B6ONrHxPlELfMfI+J4nNGPONYvF
- JHpje3bWawXElwqOl01MfHAkWCVXE/21V7Qbnf5OWNXklwJb1Whx+IItzDHrEEmZhdbf+Nny
- 1F8/ms3maY+ejk=
-IronPort-HdrOrdr: A9a23:M3Ho3qtWj19EsMXeZ6jcwxAl7skDX9V00zEX/kB9WHVpmvTyrb
- HKoB17726WtN91YhpLpTnuAsS9qAznhOZICOUqUYtKJTOW3ldAdbsSircKoAeBJ8SdzIBgPM
- 5bGsBD4bbLbGSS4/yU3OGeeOxQouVuy8uT9IPjJ04Hd3ASV0ho1XYDNjqm
-X-Talos-CUID: 9a23:qtIya2CwDulLNaH6Ezg61lQQBJgFTmbEw1TpCAiaIHRKQrLAHA==
-X-Talos-MUID: 9a23:BPBcZgTT0a9Q+IwYRXTDtjteNv5Dz52TCVEujdJe4tOdbSlJbmI=
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.11,261,1725321600"; 
-   d="8'?scan'208";a="24331449"
-Received: from vist-zimproxy-03.vist.is ([194.105.232.89])
-  by smtp-out-04.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 01:05:09 +0000
-Received: from localhost (localhost [127.0.0.1])
-	by vist-zimproxy-03.vist.is (Postfix) with ESMTP id 56488406C378
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:05:09 +0000 (GMT)
-Received: from vist-zimproxy-03.vist.is ([127.0.0.1])
- by localhost (vist-zimproxy-03.vist.is [127.0.0.1]) (amavis, port 10032)
- with ESMTP id daPuBKurps5d for <netdev@vger.kernel.org>;
- Wed,  6 Nov 2024 01:05:08 +0000 (GMT)
-Received: from localhost (localhost [127.0.0.1])
-	by vist-zimproxy-03.vist.is (Postfix) with ESMTP id C41E14077B08
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:05:08 +0000 (GMT)
-Received: from vist-zimproxy-03.vist.is ([127.0.0.1])
- by localhost (vist-zimproxy-03.vist.is [127.0.0.1]) (amavis, port 10026)
- with ESMTP id cS0acxarSGPI for <netdev@vger.kernel.org>;
- Wed,  6 Nov 2024 01:05:08 +0000 (GMT)
-Received: from kassi.invalid.is (85-220-33-163.dsl.dynamic.simnet.is [85.220.33.163])
-	by vist-zimproxy-03.vist.is (Postfix) with ESMTPS id AB10D406C378
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:05:08 +0000 (GMT)
-Received: from bg by kassi.invalid.is with local (Exim 4.98)
-	(envelope-from <bg@kassi.invalid.is>)
-	id 1t8UTt-000000000wE-2y99
-	for netdev@vger.kernel.org;
-	Wed, 06 Nov 2024 01:05:09 +0000
-Date: Wed, 6 Nov 2024 01:05:09 +0000
-From: Bjarni Ingi Gislason <bjarniig@simnet.is>
-To: netdev@vger.kernel.org
-Subject: dcb-pfc.8: some remarks and editorial changes for this manual
-Message-ID: <ZyrAxcsS04ppanYT@kassi.invalid.is>
+        d=gmail.com; s=20230601; t=1730855292; x=1731460092; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cCD7OgOV4Waq3xfPYg8bwHGrFRAJmhq4QJxhWdMpz1w=;
+        b=AZaHW7WWB9zRe03DKzAXWYb6b8zS1SelXGkseaSM/5xYMxLWoIKRCZUeEC08dNI+pW
+         2N2G32Hccj8JZUaYezWcVnH8J3StM8KxazTP2poa+ESjhFF+LYPP+M+CBhukzK7vhbBv
+         J2hUXkiO1Ix/xqB0bA2ukZgduSxLDdbco6jtei5m+R9cSbHAiY8R2SDLu3txIqrfBHV+
+         pnOk1rM4BmU4VtIxiUYPo5LfUDzHcXT2MX0Su8c1Hd33ISpbpvhIpT7rblw6puohTlGx
+         jbHopMyUU0UkldDF5qt5XLWlq34/DTjStn1uvEmq869V1s355I0a2UAGC9amLoyD5diE
+         E2ug==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730855292; x=1731460092;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cCD7OgOV4Waq3xfPYg8bwHGrFRAJmhq4QJxhWdMpz1w=;
+        b=U6FB9nfpe+4m+ID7gBeX9/x3M8SD29cvt/wfOQwmfUa/XnMjXIRw2T+RoKhJ4dUpmA
+         9uhQdteNospF9duUIe60KlPNCEakyoiNJHU9ytVc/8J6thRfNCFx6vMsRiL7rTH4Wtwb
+         +ENBfWS9tp+DRyPHs2+bLIvQxP18OQzpLFvNx5EqVPzCPXR8cLg3MfmAR7u/Tsnwrv0b
+         95mixnfnik0bK+sMQqen24tHy4evJldO+XZFyq+WEUMAJinC+bwv48VMFVZZKmVsantC
+         12bloPeJ+HH5j12mMGWEsEOJJb1em9D1d/JYmUj1QuzmN9fhxkx51mojVqejheMpscQn
+         e/lA==
+X-Forwarded-Encrypted: i=1; AJvYcCXpkgkJxjgHnq/Wnkf0G97osH8E05c7/bxCGTcsDwXI/VdlLd0sT/geX5Xj7lrdGWGVGKyUBOM=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz+MswQQMl6bAAWNxERzYb56fvWZXRI7ZtuRtZ6S+TtF/pqR+sH
+	pYP5m8O8/L9xmT6OtZ95WOWzFOQhdapCFe7Z7y2Jd6BqAhcqslCS
+X-Google-Smtp-Source: AGHT+IHp4lpDCtjBpUUkPfN0WxakfiJsZcT+GwZNsSu9dU1g5RmVmWnAQKScKAhJomplP91LaZfh1w==
+X-Received: by 2002:a17:907:97ca:b0:a9a:1ef0:837b with SMTP id a640c23a62f3a-a9ec66049b4mr74308866b.10.1730855291409;
+        Tue, 05 Nov 2024 17:08:11 -0800 (PST)
+Received: from [192.168.42.189] ([148.252.145.116])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb16d67bfsm200265366b.56.2024.11.05.17.08.09
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 05 Nov 2024 17:08:10 -0800 (PST)
+Message-ID: <99cf79b6-d056-4006-9d40-a1fc02169e82@gmail.com>
+Date: Wed, 6 Nov 2024 01:08:12 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/mixed; boundary="p5A1bFNqzksxKQea"
-Content-Disposition: inline
-
-
---p5A1bFNqzksxKQea
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-
-  The man page is from Debian:
-
-Package: iproute2
-Version: 6.11.0-1
-Severity: minor
-Tags: patch
-
-  Improve the layout of the man page according to the "man-page(7)"
-guidelines, the output of "mandoc -lint T", the output of
-"groff -mandoc -t -ww -b -z", that of a shell script, and typographical
-conventions.
-
--.-
-
-  Output from a script "chk_man" is in the attachment.
-
--.-
-
-Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
-
-
-diff --git a/dcb-pfc.8 b/dcb-pfc.8.new
-index 735c16e..01fdb34 100644
---- a/dcb-pfc.8
-+++ b/dcb-pfc.8.new
-@@ -3,20 +3,19 @@
- dcb-pfc \- show / manipulate PFC (Priority-based Flow Control) settings of
- the DCB (Data Center Bridging) subsystem
- .SH SYNOPSIS
--.sp
- .ad l
- .in +8
- 
- .ti -8
- .B dcb
--.RI "[ " OPTIONS " ] "
-+.RI "[ " OPTIONS " ]"
- .B pfc
- .RI "{ " COMMAND " | " help " }"
- .sp
- 
- .ti -8
- .B dcb pfc show dev
--.RI DEV
-+.I DEV
- .RB "[ " pfc-cap " ]"
- .RB "[ " prio-pfc " ]"
- .RB "[ " macsec-bypass " ]"
-@@ -26,7 +25,7 @@ the DCB (Data Center Bridging) subsystem
- 
- .ti -8
- .B dcb pfc set dev
--.RI DEV
-+.I DEV
- .RB "[ " prio-pfc " " \fIPFC-MAP " ]"
- .RB "[ " macsec-bypass " { " on " | " off " } ]"
- .RB "[ " delay " " \fIINTEGER\fR " ]"
-@@ -35,7 +34,7 @@ the DCB (Data Center Bridging) subsystem
- .IR PFC-MAP " := [ " PFC-MAP " ] " PFC-MAPPING
- 
- .ti -8
--.IR PFC-MAPPING " := { " PRIO " | " \fBall " }" \fB:\fR "{ "
-+.IR PFC-MAPPING " := { " PRIO " | " \fBall " }" \fB:\fR {
- .IR \fBon\fR " | " \fBoff\fR " }"
- 
- .ti -8
-@@ -45,17 +44,22 @@ the DCB (Data Center Bridging) subsystem
- 
- .B dcb pfc
- is used to configure Priority-based Flow Control attributes through Linux
--DCB (Data Center Bridging) interface. PFC permits marking flows with a
--certain priority as lossless, and holds related configuration, as well as
--PFC counters.
-+DCB (Data Center Bridging) interface.
-+PFC permits marking flows with a certain priority as lossless,
-+and holds related configuration,
-+as well as PFC counters.
- 
- .SH PARAMETERS
- 
--For read-write parameters, the following describes only the write direction,
--i.e. as used with the \fBset\fR command. For the \fBshow\fR command, the
--parameter name is to be used as a simple keyword without further arguments. This
--instructs the tool to show the value of a given parameter. When no parameters
--are given, the tool shows the complete PFC configuration.
-+For read-write parameters,
-+the following describes only the write direction,
-+i.e., as used with the \fBset\fR command.
-+For the \fBshow\fR command,
-+the parameter name is to be used as a simple keyword without further
-+arguments.
-+This instructs the tool to show the value of a given parameter.
-+When no parameters are given,
-+the tool shows the complete PFC configuration.
- 
- .TP
- .B pfc-cap
-@@ -64,13 +68,13 @@ simultaneously support PFC.
- 
- .TP
- .B requests
--A read-only count of the sent PFC frames per traffic class. Only shown when
---s is given, or when requested explicitly.
-+A read-only count of the sent PFC frames per traffic class.
-+Only shown when \-s is given, or when requested explicitly.
- 
- .TP
- .B indications
--A read-only count of the received PFC frames per traffic class. Only shown
--when -s is given, or when requested explicitly.
-+A read-only count of the received PFC frames per traffic class.
-+Only shown when \-s is given, or when requested explicitly.
- 
- .TP
- .B macsec-bypass \fR{ \fBon\fR | \fBoff\fR }
-@@ -81,8 +85,10 @@ MACsec is disabled.
- .B prio-pfc \fIPFC-MAP
- \fIPFC-MAP\fR uses the array parameter syntax, see
- .BR dcb (8)
--for details. Keys are priorities, values are on / off indicators of whether
--PFC is enabled for a given priority.
-+for details.
-+Keys are priorities,
-+values are on / off indicators of whether PFC is enabled for a given
-+priority.
- 
- .TP
- .B delay \fIINTEGER
-
---p5A1bFNqzksxKQea
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: attachment; filename="chk_man.err.dcb-pfc.8"
-
-  Any program (person), that produces man pages, should check the output
-for defects by using (both groff and nroff)
-
-[gn]roff -mandoc -t -ww -b -z -K utf8  <man page>
-
-  The same goes for man pages that are used as an input.
-
-  For a style guide use
-
-  mandoc -T lint
-
--.-
-
-  So any 'generator' should check its products with the above mentioned
-'groff', 'mandoc',  and additionally with 'nroff ...'.
-
-  This is just a simple quality control measure.
-
-  The 'generator' may have to be corrected to get a better man page,
-the source file may, and any additional file may.
-
-  Common defects:
-
-  Input text line longer than 80 bytes.
-
-  Not removing trailing spaces (in in- and output).
-  The reason for these trailing spaces should be found and eliminated.
-
-  Not beginning each input sentence on a new line.
-Lines should thus be shorter.
-
-  See man-pages(7), item 'semantic newline'.
-
--.-
-
-The difference between the formatted output of the original and patched file
-can be seen with:
-
-  nroff -mandoc <file1> > <out1>
-  nroff -mandoc <file2> > <out2>
-  diff -u <out1> <out2>
-
-and for groff, using
-
-"printf '%s\n%s\n' '.kern 0' '.ss 12 0' | groff -mandoc -Z - "
-
-instead of 'nroff -mandoc'
-
-  Add the option '-t', if the file contains a table.
-
-  Read the output of 'diff -u' with 'less -R' or similar.
-
--.-.
-
-  If 'man' (man-db) is used to check the manual for warnings,
-the following must be set:
-
-  The option "-warnings=w"
-
-  The environmental variable:
-
-export MAN_KEEP_STDERR=yes (or any non-empty value)
-
-  or
-
-  (produce only warnings):
-
-export MANROFFOPT="-ww -b -z"
-
-export MAN_KEEP_STDERR=yes (or any non-empty value)
-
--.-.
-
-Output from "mandoc -T lint dcb-pfc.8": (possibly shortened list)
-
-mandoc: dcb-pfc.8:6:2: WARNING: skipping paragraph macro: sp after SH
-
--.-.
-Use the correct macro for the font change of a single argument or
-split the argument into two.
-
-19:.RI DEV
-29:.RI DEV
-
--.-.
-
-Change a HYPHEN-MINUS (code 0x2D) to a minus(-dash) (\-),
-if it
-is in front of a name for an option,
-is a symbol for standard input,
-is a single character used to indicate an option,
-or is in the NAME section (man-pages(7)).
-N.B. - (0x2D), processed as a UTF-8 file, is changed to a hyphen
-(0x2010, groff \[u2010] or \[hy]) in the output.
-
-68:-s is given, or when requested explicitly.
-73:when -s is given, or when requested explicitly.
-
--.-.
-
-Add a comma (or \&) after "e.g." and "i.e.", or use English words
-(man-pages(7)).
-Abbreviation points should be protected against being interpreted as
-an end of sentence, if they are not, and that independent of the
-current place on the line.
-
-55:i.e. as used with the \fBset\fR command. For the \fBshow\fR command, the
-
--.-.
-
-Wrong distance between sentences in the input file.
-
-  Separate the sentences and subordinate clauses; each begins on a new
-line.  See man-pages(7) ("Conventions for source file layout") and
-"info groff" ("Input Conventions").
-
-  The best procedure is to always start a new sentence on a new line,
-at least, if you are typing on a computer.
-
-Remember coding: Only one command ("sentence") on each (logical) line.
-
-E-mail: Easier to quote exactly the relevant lines.
-
-Generally: Easier to edit the sentence.
-
-Patches: Less unaffected text.
-
-Search for two adjacent words is easier, when they belong to the same line,
-and the same phrase.
-
-  The amount of space between sentences in the output can then be
-controlled with the ".ss" request.
-
-48:DCB (Data Center Bridging) interface. PFC permits marking flows with a
-55:i.e. as used with the \fBset\fR command. For the \fBshow\fR command, the
-56:parameter name is to be used as a simple keyword without further arguments. This
-57:instructs the tool to show the value of a given parameter. When no parameters
-67:A read-only count of the sent PFC frames per traffic class. Only shown when
-72:A read-only count of the received PFC frames per traffic class. Only shown
-84:for details. Keys are priorities, values are on / off indicators of whether
-
--.-.
-
-No space is needed before a quote (") at the end of a line
-
-12:.RI "[ " OPTIONS " ] "
-38:.IR PFC-MAPPING " := { " PRIO " | " \fBall " }" \fB:\fR "{ "
-
--.-.
-
-Output from "test-groff  -mandoc -t -K utf8 -rF0 -rHY=0 -ww -b -z ":
-
-troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':709: macro 'RI'
-troff: backtrace: file '<stdin>':12
-troff:<stdin>:12: warning: trailing space in the line
-troff: backtrace: '/home/bg/git/groff/build/s-tmac/an.tmac':679: macro 'IR'
-troff: backtrace: file '<stdin>':38
-troff:<stdin>:38: warning: trailing space in the line
-
-
---p5A1bFNqzksxKQea--
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH v7 03/15] net: page_pool: create hooks for custom page
+ providers
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ David Wei <dw@davidwei.uk>
+Cc: io-uring@vger.kernel.org, netdev@vger.kernel.org,
+ Jens Axboe <axboe@kernel.dk>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, David Ahern <dsahern@kernel.org>,
+ Mina Almasry <almasrymina@google.com>,
+ Stanislav Fomichev <stfomichev@gmail.com>, Joe Damato <jdamato@fastly.com>,
+ Pedro Tammela <pctammela@mojatatu.com>
+References: <20241029230521.2385749-1-dw@davidwei.uk>
+ <20241029230521.2385749-4-dw@davidwei.uk>
+ <6d227ee7-68c9-4d81-8efa-c91bbfede750@intel.com>
+Content-Language: en-US
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <6d227ee7-68c9-4d81-8efa-c91bbfede750@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+
+On 11/5/24 16:28, Alexander Lobakin wrote:
+...
+>> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+>> index a813d30d2135..c21c5b9edc68 100644
+>> --- a/net/core/page_pool.c
+>> +++ b/net/core/page_pool.c
+>> @@ -284,10 +284,11 @@ static int page_pool_init(struct page_pool *pool,
+>>   		rxq = __netif_get_rx_queue(pool->slow.netdev,
+>>   					   pool->slow.queue_idx);
+>>   		pool->mp_priv = rxq->mp_params.mp_priv;
+>> +		pool->mp_ops = rxq->mp_params.mp_ops;
+>>   	}
+>>   
+>> -	if (pool->mp_priv) {
+>> -		err = mp_dmabuf_devmem_init(pool);
+>> +	if (pool->mp_ops) {
+>> +		err = pool->mp_ops->init(pool);
+> 
+> Can't we just switch-case instead of indirect calls?
+> IO_URING is bool, it can't be a module, which means its functions will
+> be available here when it's enabled. These ops are easy to predict (no
+> ops, dmabuf, io_uring), so this really looks like an enum with 3 entries
+> + switch-case ("regular" path is out if this switch-case under likely etc).
+
+Because it better frames the provider api and doesn't require
+io_uring calls sticking off the net code, i.e. decouples subsystems
+better, that's while these calls are not in the hot path (in case of
+io_uring it's ammortised). But you're right that it can be turned into
+a switch, I just don't think it's better, and that's how it was done
+in the original patch.
+
+>>   		if (err) {
+>>   			pr_warn("%s() mem-provider init failed %d\n", __func__,
+>>   				err);
+>> @@ -584,8 +585,8 @@ netmem_ref page_pool_alloc_netmem(struct page_pool *pool, gfp_t gfp)
+>>   		return netmem;
+> 
+> Thanks,
+> Olek
+
+-- 
+Pavel Begunkov
 
