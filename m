@@ -1,145 +1,185 @@
-Return-Path: <netdev+bounces-142317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142313-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E5719BE404
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:16:07 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E40269BE341
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:56:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B2D6F1F220A3
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:16:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A976528433A
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:56:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1B7D1DA622;
-	Wed,  6 Nov 2024 10:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="KlLr7ecB"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BF9E1D54D1;
+	Wed,  6 Nov 2024 09:56:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lj1-f174.google.com (mail-lj1-f174.google.com [209.85.208.174])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from bg1.exmail.qq.com (bg1.exmail.qq.com [114.132.65.219])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C7D91D0F44
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 10:16:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF34C1DB534
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:56:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=114.132.65.219
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730888162; cv=none; b=uwdkGxb+2UtOacuvRSjj7H+t1r4gcb4JtZavKNDQWcInFdnESuf51f4sVnSAEb6jOOzozOCEsHAsVtjXP8QCKRBaTdrGbpYSxwiWvzWZuhN9Y7Akj4zQWEl4pd2XJZDDE0rOoh4xUUBh+75885PBn/wz2FaOQrihi6v8ZSv1Gfc=
+	t=1730886966; cv=none; b=V4egHQz3aDit5pBAS4EF5VlzfNxrEOd8+gt6/u5E5SoV7ZtECy5jY62Xh1jpk8VU4QBZE3IOuSiqfWqkCD4avgVvkoDUDnQgIij58P6Wg60hk/4yKEK44dWCw4Xf8v0THK5W0DJhIdM+3wvl/hpMC8exL6N7xHZzgBA7FSqqm0g=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730888162; c=relaxed/simple;
-	bh=JBiKP71syN8Q643QFajEkYNhL/SmW4bQrOt/g1OYi2g=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qN55VAf77Ghm5BsXkh7roxWGbgb+KwjSKOznaVGhl8FJgbVZKQCWyDzaH0HZ4bZigWavgF72U20uUExtAl1hkiY2QPHDcbPLiuvUkeLQv7rKWs90IXw1ZVXsILYomxI0d6ml7MY82c5mdAytTGDGjaO7CBgH3fHuYPxJqiBY6Lc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=KlLr7ecB; arc=none smtp.client-ip=209.85.208.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lj1-f174.google.com with SMTP id 38308e7fff4ca-2fb587d0436so67498181fa.2
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 02:16:00 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730888159; x=1731492959; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=GoGUhWDfpMLjcCBvR2pPGqCoUKrtSns5tcHsprvL00c=;
-        b=KlLr7ecBwr5+3klTHL0UdN49ts41bqQQtHTYXrRnPCRWI1eF7nsPmUHOG/rQVj/KFL
-         9w2d1/UlpAu6O/UsMBqp5Ghi1+HGm6RJ+d5aK2PKkcnVsmRcsRSnarXDpDy3lARA6Z/O
-         z054FMCjQ/9S4p3kPJQYyBLda5DL3gna2T1tD3lX592w0Y0H734CjFm5W035rB8Qs5np
-         Nhcdk3FAzPotuxpmnyRSQFVJUoTmASOtmVERxMogeq5OPEd5A5Dxsv30pd/K+DkYckq5
-         fd6qhKRaI9ZliS074AklkOAXU+PxfqQZCRH60CLnNTwv2GXVhyOjQithBzh3Uy8o3aGf
-         jwdA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730888159; x=1731492959;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GoGUhWDfpMLjcCBvR2pPGqCoUKrtSns5tcHsprvL00c=;
-        b=w1LodKtl0yhW4Yl21LSHPZvvGs4o7s7XHUdcq8GQ8a7EDzq7VXaNNiyC4sqJT9f3Jp
-         aJ8N/K451aeL9Lp67pkXf6SsuNWlVmHGhfHuCQYGLiyZxqTi91J37Vx7gxGBRsdznRIJ
-         T3q/EZtKlJFJ7Zq5WEAoGgH6ZzfE87KdZzKLui7YpjkB0vBMBzVngPP4ci4VOjqTUlWz
-         rOiqCl+/Wq2eLJOYhG7OLyD+aVUYIcd8CoMtTNDtZ2y5yX6QRkUjtLepjJKZQE8tBUkJ
-         +iKR7KmmWx9CgcCd0a/gzGu+k6Bzec/VMKxYSS6bwXzppzurS3GL2Z4biPeHWv2idplx
-         5iLQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXGP6qCSumb9HYMtpT35H7Al5H9BNhbdgD7pr9I6YhHRoeUodXARMWqpAEIENEZ0Rwe3GBwGE0=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxHitt8rA5/VcxWUr0tWmy0h5ahsIs5YVzT+AnyD0WNOXjAK8xO
-	swdSRG0gKRQQjmgvwpVtnYjPXcwFwH1YOBLMKoABJYzzCGr6U6gm
-X-Google-Smtp-Source: AGHT+IEiy+ZrIxdk+HK/wiGnfvakwnzQY787xq3Wp4NqmUevec2YHWFvmOGM082u5ND5w8K1QKo8XQ==
-X-Received: by 2002:a2e:a88b:0:b0:2fa:d67a:ada7 with SMTP id 38308e7fff4ca-2fedb7ca0c0mr89867991fa.23.1730888158331;
-        Wed, 06 Nov 2024 02:15:58 -0800 (PST)
-Received: from [127.0.0.1] ([193.252.113.11])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cee6a9a410sm2519104a12.13.2024.11.06.02.15.57
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 06 Nov 2024 02:15:57 -0800 (PST)
-Message-ID: <7cbd8419-2c74-4201-b5a3-7b88c3ec83fe@gmail.com>
-Date: Wed, 6 Nov 2024 11:15:56 +0100
+	s=arc-20240116; t=1730886966; c=relaxed/simple;
+	bh=9dwQDhVzhLwWtbWg1gHR+oxrxdmUqKJz2JlkUlMcS6o=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=Ffwu6fPI8UAHK9keFNwO/fj1eDUTrpnpx4st5yrND1zRsW1XyUIQOUc2q8UmCAnnH7YBTzCzz56LbBVrlNWXoOAAlRvTiOFUy0njuGjqg36rDfC8Z+pf7SHcUvnY+HxMHqX9P+XR4pe/xzjW9HVNLPstNBLwskj067ZDekXP8TA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com; spf=pass smtp.mailfrom=trustnetic.com; arc=none smtp.client-ip=114.132.65.219
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=trustnetic.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=trustnetic.com
+X-QQ-mid: bizesmtpsz2t1730886853tmx0uz0
+X-QQ-Originating-IP: PVHHeg6ySFW9GMXm0ZVtjeL5F3taVW64Ez9qO2k7ZPc=
+Received: from wxdbg.localdomain.com ( [60.186.23.108])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 06 Nov 2024 17:54:04 +0800 (CST)
+X-QQ-SSF: 0000000000000000000000000000000
+X-QQ-GoodBg: 0
+X-BIZMAIL-ID: 2965427873250228838
+From: Jiawen Wu <jiawenwu@trustnetic.com>
+To: andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux@armlinux.org.uk,
+	horms@kernel.org,
+	netdev@vger.kernel.org
+Cc: mengyuanlou@net-swift.com,
+	duanqiangwen@net-swift.com,
+	Jiawen Wu <jiawenwu@trustnetic.com>
+Subject: [PATCH net] net: txgbe: fix lost GPIO interrupt
+Date: Wed,  6 Nov 2024 18:17:17 +0800
+Message-Id: <20241106101717.981850-1-jiawenwu@trustnetic.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net] Fix u32's systematic failure to free IDR entries for
- hnodes.
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>,
- Pedro Tammela <pctammela@mojatatu.com>, edumazet@google.com
-Cc: jhs@mojatatu.com, xiyou.wangcong@gmail.com, jiri@resnulli.us,
- netdev@vger.kernel.org
-References: <20241104102615.257784-1-alexandre.ferrieux@orange.com>
- <433f99bd-5f68-4f4a-87c4-f8fd22bea95f@mojatatu.com>
- <b08fb88f-129d-4e4a-8656-5f11334df300@gmail.com>
- <27042bd2-0b71-4001-acf8-19a0fa4a467b@linux.dev>
- <46ddc6aa-486e-4080-a89b-365340ef7c54@gmail.com>
- <9dbb815a-0137-4565-ad91-8ed92d53bced@gmail.com>
- <771bd976-e68c-48d0-bfbd-1f1b73d7bb91@linux.dev>
-Content-Language: en-US
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-In-Reply-To: <771bd976-e68c-48d0-bfbd-1f1b73d7bb91@linux.dev>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtpsz:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz8a-1
+X-QQ-XMAILINFO: M+0YV038q5N1AbEcloW9ueVHc9OFxNsCCw30+EW6id2Kl5eq/MBN+u6/
+	8uEZrpHYuqDN5pAZe+knJYpoyCCiyIKynHMdDJiLb4i8sOsPVX0qMedsLVJwjBWLNrjfKww
+	JvpTC2zaNAefK3c8xoCtuZEEkkWYqrxyqmNtl7jMUpluP1vJVWYxWQ9Igz5CxDr/Hddx3E+
+	Oicwb0WoNamY040khv3QSkpaG6l2xMrcPQQrZPG1Cds6cJvCYWLDmvrnN0pUVWLzRUP/PY2
+	IJWQxtM3lXnIx71czc5nx73t1IU2bb6Mu762ZvwcEsKW+UM7XR/sSr2c7tv6wpIsSlMFdTn
+	AVV3vRxI+UOiAMPjwONirmnmElFDLjR78FfKi5zYAJlDWzw5ReiJ32jfmA0bRKt+xHX7gZX
+	ZG7Nri2Sg4guBQ81VhWplzizjpY2RfUQgdgF+wGb4Y5/qJT/hFayI3X9biayDrdaoedRLJz
+	dUzpCZFT3zATfEDKEjbJeqSf2v0R6sp1LKJ8ZITJR9/oND3zQMfvFcqgw3IM1FO9x4pSG69
+	1rRURPojy0ndKLX4QKVA+uN055oZP0jUSfmFsoMkWJGEU7D9daQqBWwWPd1jWFjW7u35yuQ
+	VvIJJkXb2x5M7UwpfBaMy4w2Xzc85/Kx3QYpitbi0EYRdBZbK9rXCuhHpT87WrIYyUDyuDk
+	w77JwlEkvMlZMVHJIT+BH4hKAvHM+GbY+3mFxThrcOK5ffyZu87b5XrZ3GRFabnbELmzCDi
+	VTat1ww2aOlh+tPDUfcoTDWw1BPpv9JSPK1NJF9NueJWVA9R6W4IeWui7L/pxoFi495ZcRy
+	p2CSxHErHV2psh31nraKqKneLN5/zNHoeT20i16NhG9xA9gMtT0bPkTvPH92AHAUJ2dTxKB
+	SFlgOtn3No+NY5pvnkbb0Sqywo2YNoCf0thMOVOXhPmKya+26nlW0cTgxZISjfVXguIbWFY
+	HhIEZd0yX2Fel0LaAFcS3gnW5AkwVgpgOQwH5ReZ9+wC/TBXLLdTHFIooEqCeUJmQ7lk=
+X-QQ-XMRINFO: MPJ6Tf5t3I/ycC2BItcBVIA=
+X-QQ-RECHKSPAM: 0
 
-On 06/11/2024 00:42, Vadim Fedorenko wrote:
-> On 05/11/2024 22:14, Alexandre Ferrieux wrote:
->> 
->> Can you please explain *why* in the first place you're saying "'static inline'
->> is discouraged in .c files" ? I see no trace if this in coding-style.rst, and
->> the kernel contains hundreds of counter-examples.
-> 
-> The biggest reason is because it will mask unused function warnings when
-> "static inline" function will not be used because of some future
-> patches. There is no big reason to refactor old code that's why there
-> are counter-examples in the kernel, but the new code shouldn't have it.
+Sometimes when clearing interrupts for workaround in txgbe_up_complete(),
+the GPIO interrupt is lost once due to the interrupt polarity is
+consistent with the GPIO state. It causes the SFP state cannot be updated
+immediately. That is, SFP driver can only get into the correct state if
+the GPIO state changes again.
 
-A macro doesn't elicit unused function warnings either, so this looks like a
-very weak motivation. While coding-style.rst explicitly encourages to use static
-inline instead of macros, as they have better type checking and syntaxic isolation.
+So mannually trigger the GPIO interrupt while clearing it in
+txgbe_reinit_gpio_intr(), causing SFP driver to update to the correct
+state. And also clear GPIO interrupts in txgbe_down() to ensure that the
+interrupt polarity is consistent with the GPIO state.
 
-Regarding old vs new code, below are the last two month's fresh commits of
-"static inline" in *.c. So it looks like the motivation is not shared by other
-maintainers. Do we expect to see "local styles" emerge ?
+Fixes: b4a2496c17ed ("net: txgbe: fix GPIO interrupt blocking")
+Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+---
+ drivers/net/ethernet/wangxun/libwx/wx_type.h    |  1 +
+ drivers/net/ethernet/wangxun/txgbe/txgbe_main.c |  5 ++++-
+ drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c  | 15 ++++++++++-----
+ 3 files changed, 15 insertions(+), 6 deletions(-)
 
-
-$ git log --pretty='%h %as %ae'   -p | gawk
-'/^[0-9a-f]{12}/{c=$0;next}/^diff/{f=$NF;next}/^[+].*static.inline/{if
-(f~/[.]c$/){print c "\t"gensub(/.*\//,"","1",f)}}'
-
-baa802d2aa5c 2024-10-21 daniel@iogearbox.net    verifier_const.c
-baa802d2aa5c 2024-10-21 daniel@iogearbox.net    verifier_const.c
-d1744a4c975b 2024-10-21 bp@alien8.de    amd.c
-d1744a4c975b 2024-10-21 bp@alien8.de    amd.c
-a6e0ceb7bf48 2024-10-11 sidhartha.kumar@oracle.com      maple.c
-78f636e82b22 2024-09-25 freude@linux.ibm.com    ap_queue.c
-19773ec99720 2024-10-07 kent.overstreet@linux.dev       disk_accounting.c
-9b23fdbd5d29 2024-09-29 kent.overstreet@linux.dev       inode.c
-9b23fdbd5d29 2024-09-29 kent.overstreet@linux.dev       inode.c
-3d5854d75e31 2024-09-30 agordeev@linux.ibm.com  kcore.c
-3d5854d75e31 2024-09-30 agordeev@linux.ibm.com  kcore.c
-38864eccf78b 2024-09-30 kent.overstreet@linux.dev       fsck.c
-d278a9de5e18 2024-10-02 perex@perex.cz  init.c
-f811b83879fb 2024-10-02 mpatocka@redhat.com     dm-verity-target.c
-4c411cca33cf 2024-09-13 artem.bityutskiy@linux.intel.com        intel_idle.c
-42268ad0eb41 2024-09-24 tj@kernel.org   ext.c
-56bcd0f07fdb 2024-09-05 snitzer@kernel.org      localio.c
-1b11c4d36548 2024-09-01 kent.overstreet@linux.dev       ec.c
-7a51608d0125 2024-09-04 kent.overstreet@linux.dev       btree_cache.c
-7a51608d0125 2024-09-04 kent.overstreet@linux.dev       btree_cache.c
-691f2cba2291 2024-09-05 kent.overstreet@linux.dev       btree_cache.c
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index b54bffda027b..bf4285db605e 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -1078,6 +1078,7 @@ struct wx {
+ 	bool wol_hw_supported;
+ 	bool ncsi_enabled;
+ 	bool gpio_ctrl;
++	bool gpio_trigger;
+ 	raw_spinlock_t gpio_lock;
+ 
+ 	/* Tx fast path data */
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+index 93180225a6f1..0e6129dcff8f 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_main.c
+@@ -82,7 +82,6 @@ static void txgbe_up_complete(struct wx *wx)
+ {
+ 	struct net_device *netdev = wx->netdev;
+ 
+-	txgbe_reinit_gpio_intr(wx);
+ 	wx_control_hw(wx, true);
+ 	wx_configure_vectors(wx);
+ 
+@@ -97,6 +96,9 @@ static void txgbe_up_complete(struct wx *wx)
+ 	rd32(wx, WX_PX_IC(1));
+ 	rd32(wx, WX_PX_MISC_IC);
+ 	txgbe_irq_enable(wx, true);
++	wx->gpio_trigger = true;
++	txgbe_reinit_gpio_intr(wx);
++	wx->gpio_trigger = false;
+ 
+ 	/* enable transmits */
+ 	netif_tx_start_all_queues(netdev);
+@@ -169,6 +171,7 @@ void txgbe_down(struct wx *wx)
+ 	txgbe_disable_device(wx);
+ 	txgbe_reset(wx);
+ 	phylink_stop(wx->phylink);
++	txgbe_reinit_gpio_intr(wx);
+ 
+ 	wx_clean_all_tx_rings(wx);
+ 	wx_clean_all_rx_rings(wx);
+diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+index 67b61afdde96..361dcb362d42 100644
+--- a/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
++++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_phy.c
+@@ -401,17 +401,21 @@ static void txgbe_gpio_irq_unmask(struct irq_data *d)
+ static void txgbe_toggle_trigger(struct gpio_chip *gc, unsigned int offset)
+ {
+ 	struct wx *wx = gpiochip_get_data(gc);
+-	u32 pol, val;
++	u32 pol_r, pol_w, val;
+ 
+-	pol = rd32(wx, WX_GPIO_POLARITY);
++	pol_r = rd32(wx, WX_GPIO_POLARITY);
+ 	val = rd32(wx, WX_GPIO_EXT);
+ 
+ 	if (val & BIT(offset))
+-		pol &= ~BIT(offset);
++		pol_w = pol_r & ~BIT(offset);
+ 	else
+-		pol |= BIT(offset);
++		pol_w = pol_r | BIT(offset);
+ 
+-	wr32(wx, WX_GPIO_POLARITY, pol);
++	wr32(wx, WX_GPIO_POLARITY, pol_w);
++
++	/* manually trigger the lost inpterrupt */
++	if (wx->gpio_trigger)
++		wr32(wx, WX_GPIO_POLARITY, pol_r);
+ }
+ 
+ static int txgbe_gpio_set_type(struct irq_data *d, unsigned int type)
+@@ -560,6 +564,7 @@ static int txgbe_gpio_init(struct txgbe *txgbe)
+ 		return ret;
+ 
+ 	txgbe->gpio = gc;
++	wx->gpio_trigger = false;
+ 
+ 	return 0;
+ }
+-- 
+2.27.0
 
 
