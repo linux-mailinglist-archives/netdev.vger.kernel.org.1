@@ -1,171 +1,133 @@
-Return-Path: <netdev+bounces-142231-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142232-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D74309BDF04
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:52:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D18B9BDF08
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 07:56:40 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 605161F23B84
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:52:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id C83661F24051
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 06:56:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3FC7192D78;
-	Wed,  6 Nov 2024 06:52:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED4F4192B94;
+	Wed,  6 Nov 2024 06:56:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eiKQTj8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.9])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D50C5192D70
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 06:52:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22C1A192580;
+	Wed,  6 Nov 2024 06:56:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.9
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730875945; cv=none; b=OfXEI18JXO22t4ueRyd0bdlkdm+gCaFQBhykIkwPecKTEjZ2wqoC+Q4XlHRGtTDAesNm7qCqPX8Q6BX71MpM6zC8AsRpgTuHPYfUphPj9a/JtNi4K6bF5C4OUwnN4tFCOxmdRUu0ouIQDYC7u9H83HrQfByBXBWumWTxAToaPDc=
+	t=1730876193; cv=none; b=TvkOMpZqbs4bbRp4fNgNP4gBrkpSQ4oLt+C7Bc4zXxeLPRoR6BsMpYGN8PvRQS9VD3PezklIfqrIHp9FSwdMqxkQt9olzTqWNrWlm5L3cdboVhEgeHDOtKDvNBBOv9s31V8KxOvv8E4bnvdMdCBTwI0TgqbYkkPDIxb1LZ0yllg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730875945; c=relaxed/simple;
-	bh=c8wDQUjdvG2sqYrB9QE0P2TodiAtQlmbBFLA97WJrIA=;
-	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=OCsMRaPWtFzgLCpHwAYnaIakiGqYQRMKri3pVKpQyrPXL1lHtqUF7jxnWJoV4R2sJyE/pdy8E8/l3RBcjYjwkBkYVTm4AvGTXYDarfHc6OaKHK/3im90yK8AzoRvQ4bHJDPOKA1Sifs3wEnK8O5B/KvQsGGpkcRbKyDQYCbXemQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a6c48f1312so44985355ab.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 22:52:23 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730875943; x=1731480743;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=5IT6exZ/GN3jFcE8DkmEFeDjzbFdHy4iBdvg7NIR3+k=;
-        b=jeRWvOVwYaZBIGYQ1ctTUHpkLst3qhzjtkdkCkobHs8bV0GFr78Ej6g9OlgSAgm5Ak
-         TKuppgzHQcE/93NMCY39kAvPd7yv+EXEFpb2Usic8xNLUCTxI3/ahT7UmLRpDv/JdcmV
-         jKUY2qUKT/io5j9Ou8Q4nYFRsXZaurd9CINKLTUuQJHRkpX9i+/i7vpCKOqOMW7NEh7w
-         E1M4T7NGP6rN1Y6paOvmplAEhGuXYU1wIWDxuhT88qfQjn5fnCq8hhiqxKLYJnnw7B/T
-         hutAUda+MXiYcVpzMnRJUykgSCR5Vk6cmxyUOOVPfl8TLUo0OF/HmXd8jlu2dAV2Mf2Y
-         IQeg==
-X-Forwarded-Encrypted: i=1; AJvYcCXc/Q2nWq942A9Sk44SuX59o5i4r9gdOBFYLPCKsMF63yNDHG5Dlnf3IF1MPsol0Gdaug8NlmA=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxUoQwrLD3UJDJRk76i5yjdRlxuZ8iB7Wf7WOLydpnjxyQyOQ1W
-	SfVRgETFec5wj2CiKGM32lVBXKCa912si9pOgvRy4+gTcF+JRZubLLBYFDc5FRTfFB6exnknTzZ
-	1Nb1DFYVemX5BpXMGa6Ems712vKtrXWTRaZ95oTFkIWmxVuYVDttXEIY=
-X-Google-Smtp-Source: AGHT+IF7a24gCwxQg3G5iwyhFgO+EbzDRmjm30aG1lRKDZZRv3j2gOiFEPBVQIbo1GGiju+05fG6xJb9zyP6jfq4ae83Hsqi0IFt
+	s=arc-20240116; t=1730876193; c=relaxed/simple;
+	bh=7Blh7p02YI4RwiQup76IUOMLyinN3Qo+MpfCB2iFvv8=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZIFfq7WJMjHgzz4GYYOFFhqK5h/CDOcZWN+EFuRVCLNaLm1NxvBFMOjT2109BCpMTvGbGQvE/4/LLoL9M5sw72qO5vMOY9+jtYxLzlZlmcoex8SvvgIGydqM/fABtPIN9Cld+Gv3Xvz1ENdTiHYnPMYLX1FJsUHMPmO2X95ZfhI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eiKQTj8H; arc=none smtp.client-ip=192.198.163.9
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730876192; x=1762412192;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=7Blh7p02YI4RwiQup76IUOMLyinN3Qo+MpfCB2iFvv8=;
+  b=eiKQTj8He7m4DLB3sU9JC7vT5B8ICCmvbpboTZV0P77ju5rmHHoCKe2g
+   qCyIA7iUeKtwRHq9TyszLoXMo7/lU/NUGMqwVxdkntnM5L2Mf0WKZsAIQ
+   dUq4sD3mlDf/FfIs76lJSM22Ftl4U5/6nsnQmXoCkn3mRhdFb8VPv93b3
+   5THn6q1xhmpY9U+UEwroFpm0M4nrQbavh3T7vd4jSxiUilR+dRysdtqXr
+   P3t2wKPMefCnyFahFIuEX+642E/TGjLWvyKk2YjgVVX4K4Qhk4XynhDRG
+   Ro1EQgl3fjVYwOAwAY881G6OPDJDwZMwxQWFT0TgT6S8A6NiayyS07nyr
+   g==;
+X-CSE-ConnectionGUID: DGhQVQuhREyfEAFiZTVL5g==
+X-CSE-MsgGUID: krHSBKD/RCu0cIJvAilh2A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11247"; a="41285079"
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="41285079"
+Received: from orviesa010.jf.intel.com ([10.64.159.150])
+  by fmvoesa103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Nov 2024 22:56:31 -0800
+X-CSE-ConnectionGUID: suoCvPbpTgCv3vpY5bfu7w==
+X-CSE-MsgGUID: 79adoSYUTq+OVmjKJvESiw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,262,1725346800"; 
+   d="scan'208";a="84308090"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa010.jf.intel.com with ESMTP; 05 Nov 2024 22:56:12 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t8ZxZ-000n1a-2o;
+	Wed, 06 Nov 2024 06:56:09 +0000
+Date: Wed, 6 Nov 2024 14:55:39 +0800
+From: kernel test robot <lkp@intel.com>
+To: Sky Huang <SkyLake.Huang@mediatek.com>, Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Daniel Golle <daniel@makrotopia.org>,
+	Qingfang Deng <dqfext@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Simon Horman <horms@kernel.org>, linux-kernel@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, Steven Liu <Steven.Liu@mediatek.com>,
+	"SkyLake.Huang" <skylake.huang@mediatek.com>
+Subject: Re: [PATCH net-next v2 4/5] net: phy: mediatek: Integrate read/write
+ page helper functions
+Message-ID: <202411061420.eK9LoyP8-lkp@intel.com>
+References: <20241105141911.13326-5-SkyLake.Huang@mediatek.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:2401:b0:3a6:c24d:c2d4 with SMTP id
- e9e14a558f8ab-3a6c24dc619mr142579475ab.20.1730875943011; Tue, 05 Nov 2024
- 22:52:23 -0800 (PST)
-Date: Tue, 05 Nov 2024 22:52:22 -0800
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672b1226.050a0220.2a847.1b9f.GAE@google.com>
-Subject: [syzbot] [wireless?] possible deadlock in ieee80211_unregister_hw
-From: syzbot <syzbot+ec6009b644ee5b5c28c8@syzkaller.appspotmail.com>
-To: johannes@sipsolutions.net, linux-kernel@vger.kernel.org, 
-	linux-wireless@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105141911.13326-5-SkyLake.Huang@mediatek.com>
 
-Hello,
+Hi Sky,
 
-syzbot found the following issue on:
+kernel test robot noticed the following build errors:
 
-HEAD commit:    05b92660cdfe Merge tag 'pci-v6.12-fixes-2' of git://git.ke..
-git tree:       upstream
-console output: https://syzkaller.appspot.com/x/log.txt?x=16ceb55f980000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=728f7ffd25400452
-dashboard link: https://syzkaller.appspot.com/bug?extid=ec6009b644ee5b5c28c8
-compiler:       gcc (Debian 12.2.0-14) 12.2.0, GNU ld (GNU Binutils for Debian) 2.40
+[auto build test ERROR on net-next/main]
 
-Unfortunately, I don't have any reproducer for this issue yet.
+url:    https://github.com/intel-lab-lkp/linux/commits/Sky-Huang/net-phy-mediatek-Re-organize-MediaTek-ethernet-phy-drivers/20241105-222556
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241105141911.13326-5-SkyLake.Huang%40mediatek.com
+patch subject: [PATCH net-next v2 4/5] net: phy: mediatek: Integrate read/write page helper functions
+config: hexagon-randconfig-002-20241106 (https://download.01.org/0day-ci/archive/20241106/202411061420.eK9LoyP8-lkp@intel.com/config)
+compiler: clang version 16.0.6 (https://github.com/llvm/llvm-project 7cbf1a2591520c2491aa35339f227775f4d3adf6)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241106/202411061420.eK9LoyP8-lkp@intel.com/reproduce)
 
-Downloadable assets:
-disk image (non-bootable): https://storage.googleapis.com/syzbot-assets/7feb34a89c2a/non_bootable_disk-05b92660.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/240ba8a2a878/vmlinux-05b92660.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/fed8acdd322e/bzImage-05b92660.xz
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411061420.eK9LoyP8-lkp@intel.com/
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+ec6009b644ee5b5c28c8@syzkaller.appspotmail.com
+All errors (new ones prefixed by >>):
 
-======================================================
-WARNING: possible circular locking dependency detected
-6.12.0-rc5-syzkaller-00291-g05b92660cdfe #0 Not tainted
-------------------------------------------------------
-kworker/u32:4/77 is trying to acquire lock:
-but task is already holding lock:
+>> ld.lld: error: undefined symbol: mtk_phy_read_page
+   >>> referenced by mtk-ge.c
+   >>>               drivers/net/phy/mediatek/mtk-ge.o:(mtk_gephy_driver) in archive vmlinux.a
+   >>> referenced by mtk-ge.c
+   >>>               drivers/net/phy/mediatek/mtk-ge.o:(mtk_gephy_driver) in archive vmlinux.a
+--
+>> ld.lld: error: undefined symbol: mtk_phy_write_page
+   >>> referenced by mtk-ge.c
+   >>>               drivers/net/phy/mediatek/mtk-ge.o:(mtk_gephy_driver) in archive vmlinux.a
+   >>> referenced by mtk-ge.c
+   >>>               drivers/net/phy/mediatek/mtk-ge.o:(mtk_gephy_driver) in archive vmlinux.a
 
-which lock already depends on the new lock.
-
-
-the existing dependency chain (in reverse order) is:
--> #1 (&rdev->wiphy.mtx){+.+.}-{3:3}:
-       wiphy_lock include/net/cfg80211.h:6014 [inline]
-       ieee80211_open+0x12f/0x260 net/mac80211/iface.c:449
-       do_set_master+0x1bc/0x230 net/core/rtnetlink.c:2730
-       __rtnl_newlink+0xc35/0x1920 net/core/rtnetlink.c:3725
-       rtnetlink_rcv_msg+0x3c7/0xea0 net/core/rtnetlink.c:6675
-       netlink_rcv_skb+0x16b/0x440 net/netlink/af_netlink.c:2551
-       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-       do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-       entry_SYSCALL_64_after_hwframe+0x77/0x7f
-
--> #0 (team->team_lock_key#4){+.+.}-{3:3}:
-       notifier_call_chain+0xb9/0x410 kernel/notifier.c:93
-       unregister_netdevice include/linux/netdevice.h:3118 [inline]
-       _cfg80211_unregister_wdev+0x64b/0x830 net/wireless/core.c:1211
-       ieee80211_remove_interfaces+0x36d/0x760 net/mac80211/iface.c:2300
-       process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
-       kthread+0x2c1/0x3a0 kernel/kthread.c:389
-
-other info that might help us debug this:
-
-
-       CPU0                    CPU1
-  lock(&rdev->wiphy.mtx);
-                               lock(&rdev->wiphy.mtx);
-
- *** DEADLOCK ***
-
- #3: ffffffff8fee34a8 (rtnl_mutex){+.+.}-{3:3}, at: ieee80211_unregister_hw+0x4d/0x3a0 net/mac80211/main.c:1664
-stack backtrace:
-CPU: 2 UID: 0 PID: 77 Comm: kworker/u32:4 Not tainted 6.12.0-rc5-syzkaller-00291-g05b92660cdfe #0
-Call Trace:
- <TASK>
- print_circular_bug+0x41c/0x610 kernel/locking/lockdep.c:2074
- check_prev_add kernel/locking/lockdep.c:3161 [inline]
- check_prevs_add kernel/locking/lockdep.c:3280 [inline]
- validate_chain kernel/locking/lockdep.c:3904 [inline]
- __lock_acquire+0x250b/0x3ce0 kernel/locking/lockdep.c:5202
- __mutex_lock_common kernel/locking/mutex.c:608 [inline]
- __mutex_lock+0x175/0x9c0 kernel/locking/mutex.c:752
- team_del_slave+0x31/0x1b0 drivers/net/team/team_core.c:1990
- call_netdevice_notifiers_extack net/core/dev.c:2034 [inline]
- call_netdevice_notifiers net/core/dev.c:2048 [inline]
- unregister_netdevice_many_notify+0x8d5/0x1e50 net/core/dev.c:11407
- ieee80211_unregister_hw+0x55/0x3a0 net/mac80211/main.c:1671
- cleanup_net+0x5b7/0xb40 net/core/net_namespace.c:626
- process_one_work+0x9c5/0x1ba0 kernel/workqueue.c:3229
- ret_from_fork+0x45/0x80 arch/x86/kernel/process.c:147
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the report is already addressed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to overwrite report's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the report is a duplicate of another one, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
