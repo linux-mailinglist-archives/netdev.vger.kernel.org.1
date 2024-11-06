@@ -1,304 +1,135 @@
-Return-Path: <netdev+bounces-142339-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142355-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E056B9BE57A
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:25:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0AB69BE5E4
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:49:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F59E285AEA
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:25:31 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 47DB41F22CF6
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 11:49:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A5F1DE3AC;
-	Wed,  6 Nov 2024 11:25:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82BCC1DE4FD;
+	Wed,  6 Nov 2024 11:49:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nlSG3EDq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="czLTu5ek"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C27B646;
-	Wed,  6 Nov 2024 11:25:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 003F01DA61B;
+	Wed,  6 Nov 2024 11:49:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730892328; cv=none; b=uIQSzNf/kNcDgn+OdSATz7BpR2YLiGKY466dmECi4UcXDpSPZWt/r++Ia+CDTtlMfqZ5qHVqUOqpHZjs9egF643Mmt0YxY0y1ri+Lx/OS3gRLOcdg/hU79KfAS3PenLlpkNgh3ifB0AnHCHKhn4A8AKuMlevmkN8ppU43QqOu64=
+	t=1730893779; cv=none; b=qWtKNf1IiAj1RArZfF3LGkStUjFpBhMwByzUw1wXUUCd/cINukh47D6AthlQ8YJYKXSALY5TBOHMYEt0XykQH/0E60armeL1A0WlcrIGRqu3tTncNtYCM7/yIVgOJS7/Z/2hLLMgQkiBWcuPTSBz8YdOEVDUAGeoFq9y676+qrM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730892328; c=relaxed/simple;
-	bh=GVMNZrKHnqKRvmphZXkLgY/ueAMpsUn34Uncn1P0ILM=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Xf3TWr0CXVrYMtK2wP0OVqhyt5M98nv4HMNSfu/Bh7glBHULarKaYzehJYTD4s021456iJPlcNbWaG7GFl4QHUb/xw41IVEtFuV/DbAuxsDO7k6qMeJGy6nL9Kx5wbaRvQ8Bca1tAHc8t42a8CbXT3w7i/8DqLmY12dvmR7lsWs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nlSG3EDq; arc=none smtp.client-ip=209.85.221.51
+	s=arc-20240116; t=1730893779; c=relaxed/simple;
+	bh=WjqtbDpac/0/LCvJNk6uxCr2/EhL9jwSKroTBn7R87w=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=shsCHODkZG5o2vlAurMBD6MAJ2fg6/VfLzZ64matOy2WR9MLgkxGXdHW5PK3OVYenRcCG9nDnHGcrh0ec1PtJWKSPc/o89FIHIBvjWbgkAZix/z+UcHK/c51pMYXbBVbIihICxgcj7sinGn+NlJ98VgKbkT7K0g0CU34QZNFnPM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=czLTu5ek; arc=none smtp.client-ip=209.85.222.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-37d43a9bc03so4559174f8f.2;
-        Wed, 06 Nov 2024 03:25:26 -0800 (PST)
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b1511697a5so455211485a.2;
+        Wed, 06 Nov 2024 03:49:37 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730892325; x=1731497125; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20230601; t=1730893777; x=1731498577; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=91I/y3wjbBNWvrHPr3/8/6Qvv/qZ19kFsf+7A0QbbUc=;
-        b=nlSG3EDqZBArmIyqz2cXFxv+/ov26gtqHGiHRDp8vZ9MIqKfRJjSQvve9kVECISmEx
-         ayR9WjmbdbhB0husNg/mDi+hEjexCNGOtNg9bc1cqdf4DWmK9Pjdz0OBtLaKCwJKjdVW
-         UfLmSQEmb8bvqdQxKM5uKqzVhknNLvSIfBo0SaE/Pw9ksR7EcauF6tcSS5h/pafEM+cG
-         8OFThoTaoAz6GslemVyy4lGMxTfeUGnLt9zyWKFZ6nXRhrWao3y+lATio77O4gUjTgpl
-         sTY8sdudSjw+uB9sXcZn/0uHhHicc1S0pBZRJPc2EPoitD1uEkktTc3LP/IAqfkuhzTL
-         aMfw==
+        bh=WjqtbDpac/0/LCvJNk6uxCr2/EhL9jwSKroTBn7R87w=;
+        b=czLTu5ekI//IiZMwOmJz3AZIkHpQqMHEAWsO1kWvpNsiwj3Hva/thQT6ZUEGZkMDzV
+         EjKFGz/gvcGU+wTiFO6xt99S04f2FADrBDEFRCFbCc0DJAT7WudMJBIiulS8t83KHycN
+         gC01hLanRSlYvFmJfwuGsRlUz6vvS9cGcS0OEBzWkm9KHi8+nJJIoeGsW5ABfwwF0rSh
+         nqe+YWb6fwFOAfo+r6s+5ks4/wJdEgJQdNONpH1EMdCg3tBWwP7+SH57HRGqWqqkGIUR
+         6LIO3223JeB9DPCRYnxXitc1awtrTEfeuB0WedcmHsCSPw2E40XGw2JirhtQlhpdv8XN
+         AXPw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730892325; x=1731497125;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20230601; t=1730893777; x=1731498577;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=91I/y3wjbBNWvrHPr3/8/6Qvv/qZ19kFsf+7A0QbbUc=;
-        b=HjqM9X90hn1gX7u+GAKgGcoNEYhTgOWgTQbMZcCmJM9T7Tib9K83IyUQZsKEKacvr2
-         2cPaeCeNupXL/LgnPbHRi5E9dPL2jPb8fOP8yEKaHBP7TYdsb36aaFtT/M6QRyZZjwrt
-         QAfy6hxvJMMuHmJSCd3LcQZdCxUi2XQaTCyLiN5XwcUEse78xqyk+coPeNF9eEIZJjL8
-         g1r9/KRcwun8WYRM28FOQlhkwpgyEZ3GZoXcxBwerKzYK8VG7p2/KwsHwBQJTHZv+WqY
-         CeEMLbNTM9A97N7pO2euvrb4BmdgujyUZiZbYBxbymBJNpsI9FoXOenDa/jgMo0fIi6T
-         Kt9A==
-X-Forwarded-Encrypted: i=1; AJvYcCU8ygEJR+B0lbtVV7Eg7l16kmvjluAMh+qBvigeWzDYxNNwj4JcMLwCrKFfISKd6m4NfG8I/p9LqtjaNc78FSs=@vger.kernel.org, AJvYcCWNp9TIbYUqaNjkVWM4A2hG9p33flXT7GIEygDuen3PuQkW3WM7R9pv6la88ewgXdahOAGr2ZtfHmxCKrRD@vger.kernel.org
-X-Gm-Message-State: AOJu0YzyUo2zWu0dOAiay8fz7nyVNWaeyQnlpnd0Q+rg+5wa49swccIa
-	hgO4fQKm1KnRWO6cGNl/YWNnqdnHqqOQTxElsSYtLSI/XnxgtPOy
-X-Google-Smtp-Source: AGHT+IF+BajsbEorQUT96QOOZ7pdB5zvo3TNqjISc8k04NVfiqyVN0QicXWJNeNcuiC8p5fMg2piJg==
-X-Received: by 2002:a05:6000:4027:b0:37d:4ebe:164a with SMTP id ffacd0b85a97d-381c7ac7704mr17052032f8f.50.1730892324575;
-        Wed, 06 Nov 2024 03:25:24 -0800 (PST)
-Received: from void.void ([31.210.177.158])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10d40casm18816533f8f.27.2024.11.06.03.25.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 03:25:24 -0800 (PST)
-From: Andrew Kreimer <algonell@gmail.com>
-To: Karsten Keil <isdn@linux-pingi.de>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Jeff Johnson <quic_jjohnson@quicinc.com>,
-	Simon Horman <horms@kernel.org>,
-	Dan Carpenter <dan.carpenter@linaro.org>
-Cc: netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	Andrew Kreimer <algonell@gmail.com>
-Subject: [PATCH net-next v2] mISDN: Fix typos
-Date: Wed,  6 Nov 2024 13:24:20 +0200
-Message-ID: <20241106112513.9559-1-algonell@gmail.com>
-X-Mailer: git-send-email 2.47.0.229.g8f8d6eee53
-In-Reply-To: <20241102134856.11322-1-algonell@gmail.com>
-References: <20241102134856.11322-1-algonell@gmail.com>
+        bh=WjqtbDpac/0/LCvJNk6uxCr2/EhL9jwSKroTBn7R87w=;
+        b=DRJq9h4cZhj+/Odz5Vo0d9ilJVyzJDbi8DjDlHOrw8SVqe/GTy41m30+Pwff0MQuVv
+         z6jwZx4lAVVspj9ognEJzA5bg5OOlutCrkZBGk+ADzpkcGX82qMWIDF1SYVGtFN8BsdK
+         KHoZ8mbv80+G+zXD7TS5UZgAcSl80MZVe3SymaoyeRpnL3Y7yoYqT3lWdQtlOnzawDKT
+         r3vN5y+OZ45WSekRJd63uXEcHyKbS1kfZRbYMJh2KALuV6P6rBaY3/dkrCNUDytaDYOb
+         WX/kFQpGVVODG93Qt5AY/igV3DWYglAezf7RS480xQ6EvrtwHhYm3jzbp+4oO5NQFqeB
+         WYdw==
+X-Forwarded-Encrypted: i=1; AJvYcCUzquSx910xVzb0JRZiglMhSq8PS7pOi+Ws1mCbUM3rvnwRHZXK0tmCcAGZWNY+zj5UHV1fbxE+mSqI@vger.kernel.org, AJvYcCWyOZml/32JnboW5Rm6wqH9A3VUk6SUluLxcQMBZtpa5dysbwOInEzRTNbFdnkO7duvKOYTb2DS@vger.kernel.org
+X-Gm-Message-State: AOJu0YxWjMGiuHpYlI87P5VQiIfqDvllD4kZaDLJY2Kcyq2mOL0t2DWY
+	6Lks1eXripUs6D0le272Ts4nNQ1tLMDnDXZKgUq/lnzMGdboMMupfFFKV8ZewFjUkRxyGXhRIo4
+	V+D1pyN+PGwDWcuQcdQ+h6cu6yLg=
+X-Google-Smtp-Source: AGHT+IG9gcRN7JT83hHx7X7dn1Y6alNyOvua5X/keKaErem4BBIuW76vC3hsuzSVm4dm2QaIbOUCjNNTrapwxTmRaq4=
+X-Received: by 2002:a05:6214:2b8f:b0:6d1:726d:c903 with SMTP id
+ 6a1803df08f44-6d185706e43mr497329776d6.29.1730893776982; Wed, 06 Nov 2024
+ 03:49:36 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241106064015.4118-1-laoar.shao@gmail.com> <b3c6601b-9108-49cb-a090-247d2d56e64b@gmail.com>
+In-Reply-To: <b3c6601b-9108-49cb-a090-247d2d56e64b@gmail.com>
+From: Yafang Shao <laoar.shao@gmail.com>
+Date: Wed, 6 Nov 2024 19:49:00 +0800
+Message-ID: <CALOAHbDPbwH7vqV2_NAm=_YnN2KnmVLOe7avWOYG+Rynd295Vg@mail.gmail.com>
+Subject: Re: [PATCH] net/mlx5e: Report rx_discards_phy via rx_missed_errors
+To: Tariq Toukan <ttoukan.linux@gmail.com>
+Cc: saeedm@nvidia.com, tariqt@nvidia.com, leon@kernel.org, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Fix typos:
-  - syncronized -> synchronized
-  - interfacs -> interface
-  - otherwhise -> otherwise
-  - ony -> only
-  - busses -> buses
-  - maxinum -> maximum
+On Wed, Nov 6, 2024 at 5:56=E2=80=AFPM Tariq Toukan <ttoukan.linux@gmail.co=
+m> wrote:
+>
+>
+>
+> On 06/11/2024 8:40, Yafang Shao wrote:
+> > We observed a high number of rx_discards_phy events on some servers whe=
+n
+> > running `ethtool -S`. However, this important counter is not currently
+> > reflected in the /proc/net/dev statistics file, making it challenging t=
+o
+> > monitor effectively.
+> >
+> > Since rx_missed_errors represents packets dropped due to buffer exhaust=
+ion,
+> > it makes sense to include rx_discards_phy in this counter to enhance
+> > monitoring visibility. This change will help administrators track these
+> > events more effectively through standard interfaces.
+> >
+>
+> Hi,
+>
+> Thanks for your patch.
+>
+> It's a matter of interpretation...
+> The documentation in
+> Documentation/ABI/testing/sysfs-class-net-statistics refers to the
+> driver for the exact meaning.
+>
+> rx_discards_phy counts packet drops due to exhaustion of the physical
+> port memory (not in the host), this happen way before steering the
+> packet to any receive queue.
+> Today, rx_missed_errors counts SW/host memory buffer exhaustion of the
+> receive queues.
+> I don't think that rx_missed_errors should mix both.
 
-Via codespell.
+Thanks for your detailed explanation.
 
-Reported-by: Simon Horman <horms@kernel.org>
-Signed-off-by: Andrew Kreimer <algonell@gmail.com>
----
-v1:
-  - Fix typos in printk messages.
-  - https://lore.kernel.org/netdev/20241102134856.11322-1-algonell@gmail.com/
+>
+> Maybe some other counter can be used for rx_discards_phy, like
+> rx_fifo_errors?
 
-v2:
-  - Address all non-false-positive suggestions, including comments.
-  - The syncronized ==> synchronized suggestions for struct hfc_multi were skipped.
+It appears that rx_fifo_errors is a more appropriate counter for this purpo=
+se.
+I will submit a v2. Thanks for your suggestion.
 
- drivers/isdn/hardware/mISDN/hfcmulti.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/isdn/hardware/mISDN/hfcmulti.c b/drivers/isdn/hardware/mISDN/hfcmulti.c
-index e5a483fd9ad8..45ff0e198f8f 100644
---- a/drivers/isdn/hardware/mISDN/hfcmulti.c
-+++ b/drivers/isdn/hardware/mISDN/hfcmulti.c
-@@ -25,8 +25,8 @@
-  *	Bit 8     = 0x00100 = uLaw (instead of aLaw)
-  *	Bit 9     = 0x00200 = Disable DTMF detect on all B-channels via hardware
-  *	Bit 10    = spare
-- *	Bit 11    = 0x00800 = Force PCM bus into slave mode. (otherwhise auto)
-- * or   Bit 12    = 0x01000 = Force PCM bus into master mode. (otherwhise auto)
-+ *	Bit 11    = 0x00800 = Force PCM bus into slave mode. (otherwise auto)
-+ * or   Bit 12    = 0x01000 = Force PCM bus into master mode. (otherwise auto)
-  *	Bit 13	  = spare
-  *	Bit 14    = 0x04000 = Use external ram (128K)
-  *	Bit 15    = 0x08000 = Use external ram (512K)
-@@ -41,7 +41,7 @@
-  * port: (optional or required for all ports on all installed cards)
-  *	HFC-4S/HFC-8S only bits:
-  *	Bit 0	  = 0x001 = Use master clock for this S/T interface
-- *			    (ony once per chip).
-+ *			    (only once per chip).
-  *	Bit 1     = 0x002 = transmitter line setup (non capacitive mode)
-  *			    Don't use this unless you know what you are doing!
-  *	Bit 2     = 0x004 = Disable E-channel. (No E-channel processing)
-@@ -82,7 +82,7 @@
-  *	By default (0), the PCM bus id is 100 for the card that is PCM master.
-  *	If multiple cards are PCM master (because they are not interconnected),
-  *	each card with PCM master will have increasing PCM id.
-- *	All PCM busses with the same ID are expected to be connected and have
-+ *	All PCM buses with the same ID are expected to be connected and have
-  *	common time slots slots.
-  *	Only one chip of the PCM bus must be master, the others slave.
-  *	-1 means no support of PCM bus not even.
-@@ -930,7 +930,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
- 	if (newmaster) {
- 		hc = newmaster;
- 		if (debug & DEBUG_HFCMULTI_PLXSD)
--			printk(KERN_DEBUG "id=%d (0x%p) = syncronized with "
-+			printk(KERN_DEBUG "id=%d (0x%p) = synchronized with "
- 			       "interface.\n", hc->id, hc);
- 		/* Enable new sync master */
- 		plx_acc_32 = hc->plx_membase + PLX_GPIOC;
-@@ -949,7 +949,7 @@ hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
- 			hc = pcmmaster;
- 			if (debug & DEBUG_HFCMULTI_PLXSD)
- 				printk(KERN_DEBUG
--				       "id=%d (0x%p) = PCM master syncronized "
-+				       "id=%d (0x%p) = PCM master synchronized "
- 				       "with QUARTZ\n", hc->id, hc);
- 			if (hc->ctype == HFC_TYPE_E1) {
- 				/* Use the crystal clock for the PCM
-@@ -2001,7 +2001,7 @@ hfcmulti_tx(struct hfc_multi *hc, int ch)
- 	if (Zspace <= 0)
- 		Zspace += hc->Zlen;
- 	Zspace -= 4; /* keep not too full, so pointers will not overrun */
--	/* fill transparent data only to maxinum transparent load (minus 4) */
-+	/* fill transparent data only to maximum transparent load (minus 4) */
- 	if (bch && test_bit(FLG_TRANSPARENT, &bch->Flags))
- 		Zspace = Zspace - hc->Zlen + hc->max_trans;
- 	if (Zspace <= 0) /* no space of 4 bytes */
-@@ -4672,7 +4672,7 @@ init_e1_port_hw(struct hfc_multi *hc, struct hm_map *m)
- 			if (debug & DEBUG_HFCMULTI_INIT)
- 				printk(KERN_DEBUG
- 				       "%s: PORT set optical "
--				       "interfacs: card(%d) "
-+				       "interface: card(%d) "
- 				       "port(%d)\n",
- 				       __func__,
- 				       HFC_cnt + 1, 1);
-
-Interdiff against v1:
-  diff --git a/drivers/isdn/hardware/mISDN/hfcmulti.c b/drivers/isdn/hardware/mISDN/hfcmulti.c
-  index f3af73ea34ae..45ff0e198f8f 100644
-  --- a/drivers/isdn/hardware/mISDN/hfcmulti.c
-  +++ b/drivers/isdn/hardware/mISDN/hfcmulti.c
-  @@ -25,8 +25,8 @@
-    *	Bit 8     = 0x00100 = uLaw (instead of aLaw)
-    *	Bit 9     = 0x00200 = Disable DTMF detect on all B-channels via hardware
-    *	Bit 10    = spare
-  - *	Bit 11    = 0x00800 = Force PCM bus into slave mode. (otherwhise auto)
-  - * or   Bit 12    = 0x01000 = Force PCM bus into master mode. (otherwhise auto)
-  + *	Bit 11    = 0x00800 = Force PCM bus into slave mode. (otherwise auto)
-  + * or   Bit 12    = 0x01000 = Force PCM bus into master mode. (otherwise auto)
-    *	Bit 13	  = spare
-    *	Bit 14    = 0x04000 = Use external ram (128K)
-    *	Bit 15    = 0x08000 = Use external ram (512K)
-  @@ -41,7 +41,7 @@
-    * port: (optional or required for all ports on all installed cards)
-    *	HFC-4S/HFC-8S only bits:
-    *	Bit 0	  = 0x001 = Use master clock for this S/T interface
-  - *			    (ony once per chip).
-  + *			    (only once per chip).
-    *	Bit 1     = 0x002 = transmitter line setup (non capacitive mode)
-    *			    Don't use this unless you know what you are doing!
-    *	Bit 2     = 0x004 = Disable E-channel. (No E-channel processing)
-  @@ -82,7 +82,7 @@
-    *	By default (0), the PCM bus id is 100 for the card that is PCM master.
-    *	If multiple cards are PCM master (because they are not interconnected),
-    *	each card with PCM master will have increasing PCM id.
-  - *	All PCM busses with the same ID are expected to be connected and have
-  + *	All PCM buses with the same ID are expected to be connected and have
-    *	common time slots slots.
-    *	Only one chip of the PCM bus must be master, the others slave.
-    *	-1 means no support of PCM bus not even.
-  @@ -2001,7 +2001,7 @@ hfcmulti_tx(struct hfc_multi *hc, int ch)
-   	if (Zspace <= 0)
-   		Zspace += hc->Zlen;
-   	Zspace -= 4; /* keep not too full, so pointers will not overrun */
-  -	/* fill transparent data only to maxinum transparent load (minus 4) */
-  +	/* fill transparent data only to maximum transparent load (minus 4) */
-   	if (bch && test_bit(FLG_TRANSPARENT, &bch->Flags))
-   		Zspace = Zspace - hc->Zlen + hc->max_trans;
-   	if (Zspace <= 0) /* no space of 4 bytes */
-
-Range-diff against v1:
-1:  e27df5ca2655 ! 1:  69784b0d548a mISDN: Fix typos
-    @@ Commit message
-         mISDN: Fix typos
-     
-         Fix typos:
-    -      - syncronized -> synchronized.
-    -      - interfacs -> interface.
-    +      - syncronized -> synchronized
-    +      - interfacs -> interface
-    +      - otherwhise -> otherwise
-    +      - ony -> only
-    +      - busses -> buses
-    +      - maxinum -> maximum
-     
-    +    Via codespell.
-    +
-    +    Reported-by: Simon Horman <horms@kernel.org>
-         Signed-off-by: Andrew Kreimer <algonell@gmail.com>
-     
-      ## drivers/isdn/hardware/mISDN/hfcmulti.c ##
-    +@@
-    +  *	Bit 8     = 0x00100 = uLaw (instead of aLaw)
-    +  *	Bit 9     = 0x00200 = Disable DTMF detect on all B-channels via hardware
-    +  *	Bit 10    = spare
-    +- *	Bit 11    = 0x00800 = Force PCM bus into slave mode. (otherwhise auto)
-    +- * or   Bit 12    = 0x01000 = Force PCM bus into master mode. (otherwhise auto)
-    ++ *	Bit 11    = 0x00800 = Force PCM bus into slave mode. (otherwise auto)
-    ++ * or   Bit 12    = 0x01000 = Force PCM bus into master mode. (otherwise auto)
-    +  *	Bit 13	  = spare
-    +  *	Bit 14    = 0x04000 = Use external ram (128K)
-    +  *	Bit 15    = 0x08000 = Use external ram (512K)
-    +@@
-    +  * port: (optional or required for all ports on all installed cards)
-    +  *	HFC-4S/HFC-8S only bits:
-    +  *	Bit 0	  = 0x001 = Use master clock for this S/T interface
-    +- *			    (ony once per chip).
-    ++ *			    (only once per chip).
-    +  *	Bit 1     = 0x002 = transmitter line setup (non capacitive mode)
-    +  *			    Don't use this unless you know what you are doing!
-    +  *	Bit 2     = 0x004 = Disable E-channel. (No E-channel processing)
-    +@@
-    +  *	By default (0), the PCM bus id is 100 for the card that is PCM master.
-    +  *	If multiple cards are PCM master (because they are not interconnected),
-    +  *	each card with PCM master will have increasing PCM id.
-    +- *	All PCM busses with the same ID are expected to be connected and have
-    ++ *	All PCM buses with the same ID are expected to be connected and have
-    +  *	common time slots slots.
-    +  *	Only one chip of the PCM bus must be master, the others slave.
-    +  *	-1 means no support of PCM bus not even.
-     @@ drivers/isdn/hardware/mISDN/hfcmulti.c: hfcmulti_resync(struct hfc_multi *locked, struct hfc_multi *newmaster, int rm)
-      	if (newmaster) {
-      		hc = newmaster;
-    @@ drivers/isdn/hardware/mISDN/hfcmulti.c: hfcmulti_resync(struct hfc_multi *locked
-      				       "with QUARTZ\n", hc->id, hc);
-      			if (hc->ctype == HFC_TYPE_E1) {
-      				/* Use the crystal clock for the PCM
-    +@@ drivers/isdn/hardware/mISDN/hfcmulti.c: hfcmulti_tx(struct hfc_multi *hc, int ch)
-    + 	if (Zspace <= 0)
-    + 		Zspace += hc->Zlen;
-    + 	Zspace -= 4; /* keep not too full, so pointers will not overrun */
-    +-	/* fill transparent data only to maxinum transparent load (minus 4) */
-    ++	/* fill transparent data only to maximum transparent load (minus 4) */
-    + 	if (bch && test_bit(FLG_TRANSPARENT, &bch->Flags))
-    + 		Zspace = Zspace - hc->Zlen + hc->max_trans;
-    + 	if (Zspace <= 0) /* no space of 4 bytes */
-     @@ drivers/isdn/hardware/mISDN/hfcmulti.c: init_e1_port_hw(struct hfc_multi *hc, struct hm_map *m)
-      			if (debug & DEBUG_HFCMULTI_INIT)
-      				printk(KERN_DEBUG
--- 
-2.47.0.229.g8f8d6eee53
-
+--=20
+Regards
+Yafang
 
