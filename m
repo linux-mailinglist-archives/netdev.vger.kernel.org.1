@@ -1,127 +1,147 @@
-Return-Path: <netdev+bounces-142312-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142314-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FD609BE336
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:54:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 025619BE342
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:56:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id C8CF01F22891
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:54:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34F751C217DE
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:56:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7976F1DB360;
-	Wed,  6 Nov 2024 09:53:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11BE91DB520;
+	Wed,  6 Nov 2024 09:56:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JSfFNmNQ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jjDNpPeo"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 507271DC046
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 09:53:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BEBD188CAE;
+	Wed,  6 Nov 2024 09:56:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730886834; cv=none; b=je41mA+9NnLQ2InWAV6z4vPB6ftxi5GZECzrmcy4g9yk0VnqbMa9+IDQ5xj3FoC8Lg/6Mc152Qzs62pzm6yW+sl6pPSUxUa2gYot6adjbauZrtLjohSztLaafeEXp+jXXfufvUMKKwIIk5f4+mvB4gcm/ekE9LN0g8vOSPtX2+I=
+	t=1730886994; cv=none; b=s4ramVTZsCjLUlbclcmqxf2umxsUVyC9BoyodHk3R8OuSG9iAMeSIXcmjXQehPdE4zTprBKfrCLLpJS0xxlwI1SKj/ZnF9WnZmLG+TDS3AvLhTvpdDyMhn1xa7GTnrs4x+sWvAInuSFAxxB2EN13Q7SphWAGZJ/6OehNvVcyvXc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730886834; c=relaxed/simple;
-	bh=bPepb+/BgfiR6bYytxcaRaPssEkGU1xCaygb9x+TGik=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=qxOCDJRmJQekRBXKwQJkXYA9O0U4D/0dnYzA9u6sJrqcVW7E3lv4PU/PmBmw9/z39CTeJll7I1rQGPO+1cVpIOG7IHbZCM/7edKfVvUDwTw54WOrgxjIDAxqAd7ATJPGQ/4rT+3/afDU3lBafqYdH7zfWfuOt5bOzLxYjWJ/Kpg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JSfFNmNQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DDE18C4CECD;
-	Wed,  6 Nov 2024 09:53:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730886833;
-	bh=bPepb+/BgfiR6bYytxcaRaPssEkGU1xCaygb9x+TGik=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=JSfFNmNQN6bbBo3K1K4YytOYVWdAtrS2O0ewxrIUQ3317WiNL0A+gzKNNkoIsYSwJ
-	 OGpH6H0oGG9PXsjl/vj6sq3+iwLJKECncsGT5vgW4TWwmcjHrk4u6yjpY9ZWkJu3PC
-	 jYW4z5Jku1drRdlMqAwjgwVv2eRyTOyrVuojSK+2b8IXV+vbY43kjCzcu8C7FFlHCp
-	 YFetnctpz/B5n+V1RLKMV7DC/9/52CCkjI4Alj3Zq3Xpbyhdv96Ehf3p6Cg4PIet5e
-	 G0LCOFPTQfwu2igLqfty4Ad08YPP68QSzs1V13hkGq5oSJ+ks29BFl2lPiN9acC3Wu
-	 SvzOedS2KvHyA==
-Date: Wed, 6 Nov 2024 09:53:50 +0000
-From: Simon Horman <horms@kernel.org>
-To: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	sridhar.samudrala@intel.com
-Subject: Re: [iwl-next v1 1/3] ice: support max_io_eqs for subfunction
-Message-ID: <20241106095350.GJ4507@kernel.org>
-References: <20241031060009.38979-1-michal.swiatkowski@linux.intel.com>
- <20241031060009.38979-2-michal.swiatkowski@linux.intel.com>
+	s=arc-20240116; t=1730886994; c=relaxed/simple;
+	bh=HkVhGI4V+9ZYnzFk4gRhjN2tqhW0tCVvOg40yK2mBv4=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=JxfvFobgdAN7vNCfaPyYeT+0O1rmqpWQZT+c5VBEOiw500nBncXHfq97wUUx2/xw0v7RgaEvU8VKvMkrQUl6dLPOtvpSa3XsniG/FDTXKAFYRZss6fcQ9kJOaKxHSsJCMsKrSKafNOAcTxAofs9UvlfrX8mJpkmKACKMypJeh2c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jjDNpPeo; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-37d50fad249so4717377f8f.1;
+        Wed, 06 Nov 2024 01:56:31 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730886990; x=1731491790; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QNeN9v8gxmrlphcLSsXaboQE4lTekxQXl96Uo8SWbLY=;
+        b=jjDNpPeooPwiwhnvt9XNunGUVTBB3MsQg9NDs+VJ8k4BcTWrGqjS2qWTiLxCm6foDC
+         CYlVLdT+bhx9NE+SXbZb/Ie21IhyemYLYmUK/9DQxbC/WrSB5VNYl2W3gTLBF58iFXev
+         j4T2W6g5pS9pv/OLN3Y2Ft9F0NLDafA9OJn1Vh7CkvvbM7SiHkndc0gSra0E6Kta3ty8
+         AYyaqORGTt3aey2+McONCs/ff0SRIEvIo2zFwt6e3R8cXVqj5iYR7w8k+aUiCmO/O2LO
+         tEeSMUaqu0tM5T7mCn4f0Pr3lC7eO9xAsjDk2hrxNpFWPWtHtgNHS0npB4wEq5wvYN3h
+         vBXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730886990; x=1731491790;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=QNeN9v8gxmrlphcLSsXaboQE4lTekxQXl96Uo8SWbLY=;
+        b=E0XUaYuZ9vDaPpQhvOlNtt9pNBaFGBgInDtSa5KbmGq5BTWjg9WbwZS83aEYfJIeiY
+         TYhgSdmixpqlt3I6YfH5pslizZTCIVIxSN/cPJWSdU1jseH+5w2Mva+n5AjVyWoSGLqA
+         T+bUUpicDWBSnN3uOx+ZTvFc/zDBLY7vZ/Fwng0puRGIylUkMonk28Nucu5lzQyXbD55
+         2nNrj2u83lKNK0EX1Z6z3AFbwnq6aBSaSHS9SvzbhiK37W7BEj8Gu/yKdUrTD26RJiI0
+         xmKdVWoBLZDNZpuftkIFqQ90Nnndx9+y3xCARC2ohFA0AtAR+09KEru+vMNowqL8j5mD
+         OsZQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWYeMWt9oKVKFfUcH5BGV3bP1I+mK95c/34kiZDhZcwtoG59lpLJXiEhrxwAypp9sWgcNI78FNZb5Rg@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy6PACgmFZDZ3OZgGsMI0myQg9/RWx42Kbbvb8URZvW3rkjyXGu
+	HpNOZp3ON6Tl3rCrWBomAooQHYfF9PSjH97os4n9GPluSsKMND0R
+X-Google-Smtp-Source: AGHT+IGt4XIRJwi34wWyvZSpwtb0nT5zhPZsrRvgknnXzczX6WckHHcW037tfIzcV7RzQ9xstwj6qQ==
+X-Received: by 2002:a05:6000:e88:b0:374:c847:852 with SMTP id ffacd0b85a97d-3806115ac8fmr29281013f8f.29.1730886990174;
+        Wed, 06 Nov 2024 01:56:30 -0800 (PST)
+Received: from [172.27.60.131] ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c10b7e1bsm18792787f8f.1.2024.11.06.01.56.29
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Nov 2024 01:56:29 -0800 (PST)
+Message-ID: <b3c6601b-9108-49cb-a090-247d2d56e64b@gmail.com>
+Date: Wed, 6 Nov 2024 11:56:27 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241031060009.38979-2-michal.swiatkowski@linux.intel.com>
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] net/mlx5e: Report rx_discards_phy via rx_missed_errors
+To: Yafang Shao <laoar.shao@gmail.com>, saeedm@nvidia.com, tariqt@nvidia.com,
+ leon@kernel.org
+Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org
+References: <20241106064015.4118-1-laoar.shao@gmail.com>
+Content-Language: en-US
+From: Tariq Toukan <ttoukan.linux@gmail.com>
+In-Reply-To: <20241106064015.4118-1-laoar.shao@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 31, 2024 at 07:00:07AM +0100, Michal Swiatkowski wrote:
-> Implement get and set for the maximum IO event queues for SF.
-> It is used to derive the maximum number of Rx/Tx queues on subfunction
-> device.
+
+
+On 06/11/2024 8:40, Yafang Shao wrote:
+> We observed a high number of rx_discards_phy events on some servers when
+> running `ethtool -S`. However, this important counter is not currently
+> reflected in the /proc/net/dev statistics file, making it challenging to
+> monitor effectively.
 > 
-> If the value isn't set when activating set it to the low default value.
+> Since rx_missed_errors represents packets dropped due to buffer exhaustion,
+> it makes sense to include rx_discards_phy in this counter to enhance
+> monitoring visibility. This change will help administrators track these
+> events more effectively through standard interfaces.
 > 
-> Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+
+Hi,
+
+Thanks for your patch.
+
+It's a matter of interpretation...
+The documentation in 
+Documentation/ABI/testing/sysfs-class-net-statistics refers to the 
+driver for the exact meaning.
+
+rx_discards_phy counts packet drops due to exhaustion of the physical 
+port memory (not in the host), this happen way before steering the 
+packet to any receive queue.
+Today, rx_missed_errors counts SW/host memory buffer exhaustion of the 
+receive queues.
+I don't think that rx_missed_errors should mix both.
+
+Maybe some other counter can be used for rx_discards_phy, like 
+rx_fifo_errors?
+
+
+> Signed-off-by: Yafang Shao <laoar.shao@gmail.com>
+> Cc: Saeed Mahameed <saeedm@nvidia.com>
+> Cc: Tariq Toukan <tariqt@nvidia.com>
+> Cc: Leon Romanovsky <leon@kernel.org>
 > ---
->  drivers/net/ethernet/intel/ice/devlink/port.c | 37 +++++++++++++++++++
->  drivers/net/ethernet/intel/ice/ice.h          |  2 +
->  2 files changed, 39 insertions(+)
+>   drivers/net/ethernet/mellanox/mlx5/core/en_main.c | 3 ++-
+>   1 file changed, 2 insertions(+), 1 deletion(-)
 > 
-> diff --git a/drivers/net/ethernet/intel/ice/devlink/port.c b/drivers/net/ethernet/intel/ice/devlink/port.c
+> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> index 6f686fabed44..42c1b791a74c 100644
+> --- a/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en_main.c
+> @@ -3903,7 +3903,8 @@ mlx5e_get_stats(struct net_device *dev, struct rtnl_link_stats64 *stats)
+>   		mlx5e_fold_sw_stats64(priv, stats);
+>   	}
+>   
+> -	stats->rx_missed_errors = priv->stats.qcnt.rx_out_of_buffer;
+> +	stats->rx_missed_errors = priv->stats.qcnt.rx_out_of_buffer +
+> +				  PPORT_2863_GET(pstats, if_in_discards);
+>   
+>   	stats->rx_length_errors =
+>   		PPORT_802_3_GET(pstats, a_in_range_length_errors) +
 
-...
-
-> @@ -548,6 +575,14 @@ ice_activate_dynamic_port(struct ice_dynamic_port *dyn_port,
->  	if (dyn_port->active)
->  		return 0;
->  
-> +	if (!dyn_port->vsi->max_io_eqs) {
-> +		err = ice_devlink_port_fn_max_io_eqs_set(&dyn_port->devlink_port,
-> +							 ICE_SF_DEFAULT_EQS,
-> +							 extack);
-
-Hi Michal,
-
-I am a little confused about the relationship between this,
-where ICE_SF_DEFAULT_EQS is 8, and the following check in
-ice_devlink_port_fn_max_io_eqs_set().
-
-	if (max_io_eqs > num_online_cpus()) {
-		NL_SET_ERR_MSG_MOD(extack, "Supplied value out of range");
-		return -EINVAL;
-	}
-
-What is the behaviour on systems with more than 8 online CPUs?
-
-> +		if (err)
-> +			return err;
-> +	}
-> +
->  	err = ice_sf_eth_activate(dyn_port, extack);
->  	if (err)
->  		return err;
-
-...
-
-> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
-> index 70d5294a558c..ca0739625d3b 100644
-> --- a/drivers/net/ethernet/intel/ice/ice.h
-> +++ b/drivers/net/ethernet/intel/ice/ice.h
-> @@ -109,6 +109,7 @@
->  #define ICE_Q_WAIT_MAX_RETRY	(5 * ICE_Q_WAIT_RETRY_LIMIT)
->  #define ICE_MAX_LG_RSS_QS	256
->  #define ICE_INVAL_Q_INDEX	0xffff
-> +#define ICE_SF_DEFAULT_EQS	8
->  
->  #define ICE_MAX_RXQS_PER_TC		256	/* Used when setting VSI context per TC Rx queues */
->  
-
-...
 
