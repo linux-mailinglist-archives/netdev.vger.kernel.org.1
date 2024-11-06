@@ -1,102 +1,154 @@
-Return-Path: <netdev+bounces-142269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142264-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 742D19BE17C
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 10:00:57 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C7EA9BE15B
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:54:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 377B1284748
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 09:00:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 2529C1F244DC
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 08:54:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A84D01D6182;
-	Wed,  6 Nov 2024 09:00:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A3131D79B1;
+	Wed,  6 Nov 2024 08:54:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="B0rULdsM"
 X-Original-To: netdev@vger.kernel.org
-Received: from cstnet.cn (smtp84.cstnet.cn [159.226.251.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-SHA (256/256 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12B1C1D7E41;
-	Wed,  6 Nov 2024 09:00:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=159.226.251.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 663201D54F2
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 08:54:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730883642; cv=none; b=KoK4qPbznYkvkCadCI4djIiJ2BtM2CA1V47GOCI3nve9ie6lrYSjcu8I+Ravl234tCMLDg76jMbzymzpNtO9gZrEIiPELMpeRPwI7qBdro4pjJ+8/l4r8oO7KIaMns2Tu9zZckzpOWPXp8He1wPBuOZzwbeizWS9fCZNf6xhSXg=
+	t=1730883279; cv=none; b=tt9I3ZFoxCtS8YXVf7mom/F4NFFpbrheT3OlGF9QMwtNOcfpmp8LvhdXcgt60mSrsLND3CdJhVBJ0DU4hrM+HYKGebjSJHB8kZh/zqPQ9BMwF41fBttt8XwZuxUjjOXSQtg8RkfbG9h05VXPx4D/gNAYj5Xfgut+90IfRnUAMdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730883642; c=relaxed/simple;
-	bh=fDSS5Ot/nGR8QnyVF4ghfmLTy2d8XgfWck2llWDoaH4=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=ricIpTrA5OOE7/CHNiLa0tJuTMw74xqXCd+1rJqEpay65xKVcO1THJq3/N8JnjZPJXkoJrYYNyAueuI1MzAF80rVxbvVS4Y1ivVWx3/8kCGTdPm9leRYhMEnqvC8jru/CU2GgXKsr5IjisJTaROMzA9fl4+ww3SjRDYTvZGJPUE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn; spf=pass smtp.mailfrom=iscas.ac.cn; arc=none smtp.client-ip=159.226.251.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=iscas.ac.cn
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=iscas.ac.cn
-Received: from localhost.localdomain (unknown [124.16.141.247])
-	by APP-05 (Coremail) with SMTP id zQCowACHbrmkLitnyXFqAA--.1291S2;
-	Wed, 06 Nov 2024 16:53:58 +0800 (CST)
-From: Wentao Liang <liangwentao@iscas.ac.cn>
-To: shannon.nelson@amd.com,
-	brett.creeley@amd.com,
-	davem@davemloft.net,
-	kuba@kernel.org
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Wentao Liang <Wentao_liang_g@163.com>,
-	Wentao Liang <liangwentao@iscas.ac.cn>
-Subject: [PATCH v2] drivers: net: ionic: fix a memory leak bug
-Date: Wed,  6 Nov 2024 16:53:07 +0800
-Message-ID: <20241106085307.1783-1-liangwentao@iscas.ac.cn>
-X-Mailer: git-send-email 2.42.0.windows.2
+	s=arc-20240116; t=1730883279; c=relaxed/simple;
+	bh=UNYKLzF4r5hBnINqn9birE+zQ/11rAm97XqSomm41EU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=fGupLpMJtGqDlkDScjmWUWt7Ws0IX9bjJxSV6Zkn9gQaqsJZLwj0Y7DQte89NkI85rT2Tt6OyFNoPerkVzUk1bUWrcb9IKstrfk0vca9p0VkN5fAGxtcjXHSKOnE5lDArRcLLeR/6xo/rn0C9oH/LV7gbkm9EHpSKbTsP2Xe2c8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=B0rULdsM; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730883276;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=fmyYpFxsyQqqojb1lv2cOtlXLCoNWTfRHptpZLl1D5g=;
+	b=B0rULdsMtxkMBAhE8H1InLd8OlFhkl8F6FFtoMj4T84AcjT+mivW848GFZCdJVqmHDlz+a
+	DZ1HeBiBWSpW2i4IQbqqrYqGggpVuKD7UGuUJhFpSsNY8JNQEYLieuoOaE2Ry2T3SrIQr6
+	lU3zr56Z6++7b0JypPHZ+Zn7KjedAKw=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-407-m0Hzs00aPtSWYk6EQ2B2Qw-1; Wed, 06 Nov 2024 03:54:33 -0500
+X-MC-Unique: m0Hzs00aPtSWYk6EQ2B2Qw-1
+X-Mimecast-MFC-AGG-ID: m0Hzs00aPtSWYk6EQ2B2Qw
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d47fdbbd6so3595286f8f.3
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 00:54:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730883272; x=1731488072;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fmyYpFxsyQqqojb1lv2cOtlXLCoNWTfRHptpZLl1D5g=;
+        b=Ju13QofCl+MYhGnVJtjmw+DJojV0A4CJFqeALuneKaG9UAyZ8erZAyVi4kwkrFRhAg
+         hbZWobdx7t7OfIYtARqukk/lEwYndNc/Hj7ozNctoBb23RlXH4pORiMum32rlfrLuIh6
+         J9uKxur8o+hkOxUORH36/PJX7MWxI2j5uXVO5L5VU7Ois3STKUR8/3i8jihB0GJPbiAD
+         xruS4wpJQlnviHt8stjNETbviI11A2l9OtwfuG0AMpZWtUjFXj8pTR+lWIlMDyf5xzQ1
+         7qpjgVvP0n+o9uV+p18+NntDNfHAs3FjP+hI2iPyKkNsmMdDgTlezmXlHmAEqQxVjJm+
+         SLMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUUJIjoNxNjNyPFTklCqDq+mY3YhBJeRSdwj8tEI1ZSgQgVCn3wzlYV7f1aFn5czRqtqvxtSYw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdryFficgkG5FVx7B4aj8InX/vpRNW0Aa2rslRT3bdOqiFCatJ
+	hNfB+sY5Iz6nQkB5Vatc856qKLoDOTR12oULkzVJ8i0Knj9tgBTjv/thLlhXUqLJIfHELQXYiar
+	g/cYrLYj+Eo18bA73P8bkzrPpPYraw//e6M3xWznzp2DV4lRz8YU2Jg==
+X-Received: by 2002:a05:6000:4601:b0:381:e702:af15 with SMTP id ffacd0b85a97d-381e702b189mr2660252f8f.37.1730883271946;
+        Wed, 06 Nov 2024 00:54:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHEs4dAlZ/Ixnt7FpOJvTxE+WzTktExbu7DVSB0TSOaCg2HjETlp7pqbWm4LVa4ZdPMRcAZxg==
+X-Received: by 2002:a05:6000:4601:b0:381:e702:af15 with SMTP id ffacd0b85a97d-381e702b189mr2660237f8f.37.1730883271620;
+        Wed, 06 Nov 2024 00:54:31 -0800 (PST)
+Received: from redhat.com ([2a02:14f:178:e74:5fcf:8a69:659d:f2b2])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381c1168afcsm18469576f8f.91.2024.11.06.00.54.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 00:54:30 -0800 (PST)
+Date: Wed, 6 Nov 2024 03:54:26 -0500
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Akihiko Odaki <akihiko.odaki@daynix.com>
+Cc: Jason Wang <jasowang@redhat.com>,
+	Eugenio =?iso-8859-1?Q?P=E9rez?= <eperezma@redhat.com>,
+	kvm@vger.kernel.org, virtualization@lists.linux.dev,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] vhost/net: Set num_buffers for virtio 1.0
+Message-ID: <20241106035029-mutt-send-email-mst@kernel.org>
+References: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-CM-TRANSID:zQCowACHbrmkLitnyXFqAA--.1291S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7XFWkCw48tw1xCr4fXr1fJFb_yoW8JrW5pw
-	s8JFyYvrn5Xr4UGw1DAw18ZF98ZaySkrW8Grnru3yF9wsxAry8JF17ta47tr97WrWUJF1S
-	qr129w15XF98C37anT9S1TB71UUUUUDqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUkC14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
-	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
-	1l84ACjcxK6xIIjxv20xvE14v26ryj6F1UM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4j
-	6F4UM28EF7xvwVC2z280aVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Cr
-	1j6rxdM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40Ex7xfMcIj
-	6xIIjxv20xvE14v26r1Y6r17McIj6I8E87Iv67AKxVW8JVWxJwAm72CE4IkC6x0Yz7v_Jr
-	0_Gr1lF7xvr2IYc2Ij64vIr41lF7I21c0EjII2zVCS5cI20VAGYxC7MxkF7I0En4kS14v2
-	6r1q6r43MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4AY6r1j6r4UMI8I3I0E5I8CrV
-	AFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE17CEb7AF67AKxVWUtVW8ZwCI
-	c40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMIIF0xvE2Ix0cI8IcVCY1x0267
-	AKxVWUJVW8JwCI42IY6xAIw20EY4v20xvaj40_Jr0_JF4lIxAIcVC2z280aVAFwI0_Jr0_
-	Gr1lIxAIcVC2z280aVCY1x0267AKxVWUJVW8JbIYCTnIWIevJa73UjIFyTuYvjfU5iihUU
-	UUU
-X-CM-SenderInfo: xold0wxzhq3t3r6l2u1dvotugofq/
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20240915-v1-v1-1-f10d2cb5e759@daynix.com>
 
-From: Wentao Liang <Wentao_liang_g@163.com>
+On Sun, Sep 15, 2024 at 10:35:53AM +0900, Akihiko Odaki wrote:
+> The specification says the device MUST set num_buffers to 1 if
+> VIRTIO_NET_F_MRG_RXBUF has not been negotiated.
+> 
+> Fixes: 41e3e42108bc ("vhost/net: enable virtio 1.0")
+> Signed-off-by: Akihiko Odaki <akihiko.odaki@daynix.com>
 
-In line 334, the ionic_setup_one() creates a debugfs entry for
-ionic upon successful execution. However, the ionic_probe() does
-not release the dentry before returning, resulting in a memory
-leak. To fix this bug, we add the ionic_debugfs_del_dev() before
-line 397 to release the resources before the function returns.
+True, this is out of spec. But, qemu is also out of spec :(
 
-Fixes: 0de38d9f1dba ("ionic: extract common bits from ionic_probe")
-Signed-off-by: Wentao Liang <liangwentao@iscas.ac.cn>
----
- drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c | 1 +
- 1 file changed, 1 insertion(+)
+Given how many years this was out there, I wonder whether
+we should just fix the spec, instead of changing now.
 
-diff --git a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-index b93791d6b593..f5dc876eb500 100644
---- a/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-+++ b/drivers/net/ethernet/pensando/ionic/ionic_bus_pci.c
-@@ -394,6 +394,7 @@ static int ionic_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- err_out_pci:
- 	ionic_dev_teardown(ionic);
- 	ionic_clear_pci(ionic);
-+	ionic_debugfs_del_dev(ionic);
- err_out:
- 	mutex_destroy(&ionic->dev_cmd_lock);
- 	ionic_devlink_free(ionic);
--- 
-2.42.0.windows.2
+Jason, what's your take?
+
+
+> ---
+>  drivers/vhost/net.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/vhost/net.c b/drivers/vhost/net.c
+> index f16279351db5..d4d97fa9cc8f 100644
+> --- a/drivers/vhost/net.c
+> +++ b/drivers/vhost/net.c
+> @@ -1107,6 +1107,7 @@ static void handle_rx(struct vhost_net *net)
+>  	size_t vhost_hlen, sock_hlen;
+>  	size_t vhost_len, sock_len;
+>  	bool busyloop_intr = false;
+> +	bool set_num_buffers;
+>  	struct socket *sock;
+>  	struct iov_iter fixup;
+>  	__virtio16 num_buffers;
+> @@ -1129,6 +1130,8 @@ static void handle_rx(struct vhost_net *net)
+>  	vq_log = unlikely(vhost_has_feature(vq, VHOST_F_LOG_ALL)) ?
+>  		vq->log : NULL;
+>  	mergeable = vhost_has_feature(vq, VIRTIO_NET_F_MRG_RXBUF);
+> +	set_num_buffers = mergeable ||
+> +			  vhost_has_feature(vq, VIRTIO_F_VERSION_1);
+>  
+>  	do {
+>  		sock_len = vhost_net_rx_peek_head_len(net, sock->sk,
+> @@ -1205,7 +1208,7 @@ static void handle_rx(struct vhost_net *net)
+>  		/* TODO: Should check and handle checksum. */
+>  
+>  		num_buffers = cpu_to_vhost16(vq, headcount);
+> -		if (likely(mergeable) &&
+> +		if (likely(set_num_buffers) &&
+>  		    copy_to_iter(&num_buffers, sizeof num_buffers,
+>  				 &fixup) != sizeof num_buffers) {
+>  			vq_err(vq, "Failed num_buffers write");
+> 
+> ---
+> base-commit: 46a0057a5853cbdb58211c19e89ba7777dc6fd50
+> change-id: 20240908-v1-90fc83ff8b09
+> 
+> Best regards,
+> -- 
+> Akihiko Odaki <akihiko.odaki@daynix.com>
 
 
