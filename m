@@ -1,89 +1,77 @@
-Return-Path: <netdev+bounces-142464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7ADB59BF44D
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:30:33 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D8719BF452
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 18:32:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3ECC2282EAD
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:30:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3C4ED1F22ECC
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:32:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A06071DF995;
-	Wed,  6 Nov 2024 17:30:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6276D205E11;
+	Wed,  6 Nov 2024 17:32:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Y453Tv6R"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="gcNKZ7i0"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C5D4645
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 17:30:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 915AF26AFA;
+	Wed,  6 Nov 2024 17:32:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730914229; cv=none; b=iP68p+LdSpze6mt4n1rJRHRepsRXvEu6Y2ggpNfmBEmxliEHBNX/dokzTbeE7gfk8unyFqrgXmeLM2dMi+sE33z6sVidZlnONwwHgEviMRj5TYx8a79IkEF1ZE3rxJD6IFz64pe7A0go6R0CSeCbyWyOYKZm4IWv28KRXNcxmPU=
+	t=1730914342; cv=none; b=Uf2ktlWi0RJKHjBXa/b8eEk92zqTgLu7WPGmZhe8vvZsRF+Bra8aMf7TC3skvJ/Anxr9lkCbYIGkRho26QSjI8h9gN3gljmP0tVy3EbUQtpkH5bXB6Zz24Kg/HIDJSB2hmJWjqcqfINeYCSvRDzK8t26R6ty8lafjptREy4DKRI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730914229; c=relaxed/simple;
-	bh=gjWISwyjGmyqM/bx0jAZBoOOj29zgC6nP9V+6DoA5p0=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=F9UdmUDUh7FzdxTaQiOXI7FDq/jQOTrO+oZBiuwCNExblzVoLndYzQ4GQQmzTbj69BOB+bvb31JB29e7VW6CNW9UEGaDKfy5VXSYtTGIjmM7dXMymRlJlnDIRUZfGIwQDNwmI8tbz4nRO3CXRVxs53pCQc04QrK+N7YPczRZKzQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Y453Tv6R; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFDC8C4CECC;
-	Wed,  6 Nov 2024 17:30:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730914225;
-	bh=gjWISwyjGmyqM/bx0jAZBoOOj29zgC6nP9V+6DoA5p0=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Y453Tv6R3FZcUGHBUZP17ASobF07n9PAPc36T5E9J83CERNWAp3uzQ8Lwe6/2MHzO
-	 u2O7cIvwva5r6afdhTEIKQB0JcwFFAkTxmGEfp8kbRnmcMNmyB37XfGky4b5x6Rv32
-	 FEQIM/EJ78KILnEISD9ziu9KN8OcPMnyitWUksdfVDuDx2DsL91FrT09fW7gONoUPb
-	 EL6TkOSwMJK+YBYOM1ExU/1ieb7mAmX9dX+/LixuzVAFg/HCfNlibX5QZPSW8E/y+5
-	 nwp7JVko/RU09u6yN6GAbWgU8g9cF6Md+5IZfUSv50kutq2x2qCbD8H1iUiMbgnThA
-	 TH3GXWRW3Na3w==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB4733809A80;
-	Wed,  6 Nov 2024 17:30:35 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730914342; c=relaxed/simple;
+	bh=i+k9vjCFv3LU1RPAjVEeMMk8SXDWCo+j5ZaGAu7lfjA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=eeFM7WSeH5Lellpnkk9ayycpQcqmX1Vg5Ns5LhwM5RW0tGp/cYHYraiOpOcAdaWaQ+ZQ8rsxrH+Bf8ja3nKusqYbC/siq4mw0r2JoAoWSUd3OkNi1+kGC465GqsVPhhAXS8JjlDLb4bDckXiIdMmcDHnQo1m6kDTD5aFGcJgjSs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=gcNKZ7i0; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=yq9pHwwDX9h6c6DAIXavhiSq0K9iQ69fUsgE1qHT2I4=; b=gcNKZ7i0kN3GNPbf5drsTC3sgY
+	M8LVxx5MMrxE8ZOH4Swmw664vphhFS4HJ1DE1khsCAt8X1RCAGjPkqFF2RB7ierelWo7eduKcjm8i
+	Tul5WL+Gd8Xhh4gujqXAcaT84kGlm3d5H4FCVLAwAqrOcDygLnd7dSpoBcvo1JbYMPXc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t8jsv-00CMVl-QN; Wed, 06 Nov 2024 18:32:01 +0100
+Date: Wed, 6 Nov 2024 18:32:01 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Sanman Pradhan <sanman.p211993@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+	kernel-team@meta.com, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+	mohsin.bashr@gmail.com, sanmanpradhan@meta.com,
+	andrew+netdev@lunn.ch, vadim.fedorenko@linux.dev,
+	jdamato@fastly.com, sdf@fomichev.me, linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] eth: fbnic: Add PCIe hardware statistics
+Message-ID: <683c8ffd-6766-4ad3-8049-0defaff7295f@lunn.ch>
+References: <20241106002625.1857904-1-sanman.p211993@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [iproute2-next] lib: utils: close file handle on error
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173091423475.1355897.16499637098719370026.git-patchwork-notify@kernel.org>
-Date: Wed, 06 Nov 2024 17:30:34 +0000
-References: <20241031121411.20556-1-kirjanov@gmail.com>
-In-Reply-To: <20241031121411.20556-1-kirjanov@gmail.com>
-To: Denis Kirjanov <kirjanov@gmail.com>
-Cc: stephen@networkplumber.org, dsahern@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106002625.1857904-1-sanman.p211993@gmail.com>
 
-Hello:
+> +struct fbnic_hw_stat {
+> +	struct fbnic_stat_counter frames;
+> +	struct fbnic_stat_counter bytes;
+> +};
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+I don't think this belongs in this patch, since the PCIe counters
+don't seem to have anything to do with frames or bytes.
 
-On Thu, 31 Oct 2024 15:14:11 +0300 you wrote:
-> reap_prop() doesn't close the file descriptor
-> on some errors, fix it.
-> 
-> Signed-off-by: Denis Kirjanov <kirjanov@gmail.com>
-> ---
->  lib/utils.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-
-Here is the summary with links:
-  - [iproute2-next] lib: utils: close file handle on error
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=c009c955fdae
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+	Andrew
 
