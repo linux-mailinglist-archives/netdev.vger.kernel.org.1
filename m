@@ -1,260 +1,184 @@
-Return-Path: <netdev+bounces-142450-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142451-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1360C9BF39F
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:52:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC6A49BF3AA
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:53:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6EC26B242FC
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:52:21 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3A26F1F23C42
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:53:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3916C20605D;
-	Wed,  6 Nov 2024 16:52:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZciBo3XH"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28962205131;
+	Wed,  6 Nov 2024 16:53:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DC0204090
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 16:52:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A7111DFDAF
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 16:53:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730911930; cv=none; b=TXa/AlPAMIqJbctKLYSVJToZKrP7G2mHaTAvyNnSmOf8K80ZoNYdQJcjUr8M6p1/GZ8PbQJWiux07x9y4X9k0WNDgcWHvOGvSmv/5s3LCQx95FsqLgGT2Z/rmpdVIhJuS5+6bSmki5+mX6c/3njExeohvGNbXQnx0WwIbXBreIk=
+	t=1730912006; cv=none; b=utUPT0eEuVy/QAGMqwn3X0T5t9mGdy+6iwN18hklYpAKYzObKCbUuf01XbhZVnxwHkIP/n1bAdu8p9/7g8wi2jIc+JLDSQ7lkBymMR5u9vKwMkZnUUk+HDS1NtJqafloij9vYDpEmPQafVAw4kFeGzsoTG6ioxThp7afhYzvaYE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730911930; c=relaxed/simple;
-	bh=wfvrJkIJkD7cWTPVa799siSRv93sTETpAX8Yan9sDLE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=TVS6Gk8+msDKejI/RCFcfQ1s6ukTZayZNNkObPBlMeg2KcENsqgR7BAK9jekYQJCoIT3ol+olkvAw104wzqhqm9FHdn6psErsuw+P0dIYUXfJrLFcGrj4VjgsJQqDrOs5SQlYrXhTzB1P953JV0iWxXVMkjFSRjog88UuoV4+R8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZciBo3XH; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-720be27db74so31975b3a.1
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 08:52:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1730911927; x=1731516727; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IpR2iS5Wz9a7Ed3Yf5S3sZhuiwomMm725Dc8wDLmQig=;
-        b=ZciBo3XHU8KDEiiMj9vXfpu9GJ5m4ILrDzw/aA0jgQHZJZv5D1uXizKE08WSZpo1N6
-         E55ZSQ0q05110C1yvWPacl+86VCz/i6jheAwmsME27TwUrTZzYeC6QRIUXNCUNZW6IsD
-         wozl6CU9ch4CKMV4RpQxCgAvNxakeRZYMTDcw=
+	s=arc-20240116; t=1730912006; c=relaxed/simple;
+	bh=xnQ4Y5OkLDw7+kpBIjjDpj/d4KDArPXb58DSwWlk9/c=;
+	h=MIME-Version:Date:Message-ID:Subject:From:To:Content-Type; b=nNTfUauG4fBvhp5t20ZnXo+clazsXjWapIzAnmUMJYoWwGJjzrNGdgTKKOIts041WelLOJV69wJSMsHvcP3qfyD1GN8v7RuEiZNgIi9dH0ZIUampDB/HEbZoDFN5+hBOG4Fyhr7giFxsJZR8Hz2XdnLkhL9CKebNGw4dPbzDd3I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a3c90919a2so972135ab.0
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 08:53:24 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730911927; x=1731516727;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=IpR2iS5Wz9a7Ed3Yf5S3sZhuiwomMm725Dc8wDLmQig=;
-        b=WQ/NTzlEvyl/ConmSSRmqjow31Kw8VUKgKYGxHdGEMU8nynq4SGTHnxMmbdUubfWu3
-         IF1GfvTumpHl1LYjCkwhra/5r0NkDC7zwItJieLFbL74+GOXPwEtcMq2RyiB0ec6999p
-         Bk+RmrvdPQRpLNCkR1qqU+MrejkofSZ5asZEouzYp0t6mb7JtYIjZqWDC/RCdFRnyP8x
-         EkpZoi0v+lRT01A8wh6UfDnaVMrrhn9dnBblnjrC6uwCF9YPmxbMCGDAOckGzOebPrH+
-         oOg1xeD070k5yeHcscoGJ/2uyo+Hn9Z4p4ZFbEt6Qju5NIXy6zW7FiessjY/kABrAPNG
-         HrbA==
-X-Gm-Message-State: AOJu0Yz37a96Ie4DL4Rkw9c2LCAywe8xZy+lwjUgRh6FsKDytROmxNMV
-	v6nflXImwFZcZH8iBIEjZskJ/j6Rku2UoufZd0Q/ha+upMYWMPlFRbPKqcT6hao=
-X-Google-Smtp-Source: AGHT+IEgJZtJt0MJdxpZzlMUWg+AcH31AbtTn853kLwglpscmOgiFFT8TpjbpgMdNu5hs36kUNmLfA==
-X-Received: by 2002:a05:6a00:2da1:b0:720:3092:e75f with SMTP id d2e1a72fcca58-723f7aab6a0mr5333855b3a.8.1730911927432;
-        Wed, 06 Nov 2024 08:52:07 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-720bc1e591fsm11900829b3a.51.2024.11.06.08.52.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 08:52:06 -0800 (PST)
-Date: Wed, 6 Nov 2024 08:52:00 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
-	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
-	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 2/7] net: Suspend softirq when
- prefer_busy_poll is set
-Message-ID: <ZyuesOyJLI3U0C5e@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	corbet@lwn.net, hdanton@sina.com, bagasdotme@gmail.com,
-	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241104215542.215919-1-jdamato@fastly.com>
- <20241104215542.215919-3-jdamato@fastly.com>
- <20241105210338.5364375d@kernel.org>
+        d=1e100.net; s=20230601; t=1730912003; x=1731516803;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wAuJyuZyW3fwlKbDhzM6Z2xlWYFISeiwXKrwvgPNhqc=;
+        b=qwdKMqK8XFTxUaVauoAUV3GXKtydsJID6eYZiYq312EGyXYyUhtHII+nuCLXaCr+uG
+         tbbBLla/FOojwe3ryY7lshuLxb35sKN97zI9y/rGGvVuXDYVJhqg83zI0Cg4HSTcr6fk
+         Vj8GowTEb1bAvlYyKJZQDRIG2zdreC1Vmfxa2zjSP0DTYhPPfmL5jA+cU//yZnFDNUrq
+         3H9LSZnXpYg6QDjUVx1KTPEulzU+gyiLQfxgbx1ZG0obyYRWUZ0Bg3BDig3WJEWLcjkX
+         Z1GL8/pg047BddVsoVxzYHg3S1BHLD3oNuRxk3kVGpR0ioP9INOm4GQzMk4B/5eigR4W
+         aWrA==
+X-Forwarded-Encrypted: i=1; AJvYcCWVihIu+XYtRCKTr0aDw7BWUDWlGcfz+jjopavKFr3ZqQh+cy5sFMOuFa0wqBQ80fMaOeTxtjA=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yy5UXqY1CIxo2xCBJj/JoSKPrTZRbQ9od17O3rQwQIaJO+gHT/j
+	y9rn7+WLH3HtqLAL/jYu6TcOVy7RlhThA7Gj71YymdGiN4YfxEmxGrYz8YTGxwBvxKUbb24B+uV
+	q0xmMP2qltjz9ETI1CBxZrZ6qkv2IY2lW66QFFVmqun2efAHlakvzNJc=
+X-Google-Smtp-Source: AGHT+IHdPpKyWCNZXHoI1XBOWe8fIhCxF9cGjMgOMB/oUdi2ooOGWuK5QOMQ/He+FwMCTi3itzqPKo3pDdjNU1AKn8H67+g7mkQ1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241105210338.5364375d@kernel.org>
+X-Received: by 2002:a05:6e02:1b07:b0:3a5:e5cf:c5b6 with SMTP id
+ e9e14a558f8ab-3a5e5cfc68bmr286814735ab.10.1730912003663; Wed, 06 Nov 2024
+ 08:53:23 -0800 (PST)
+Date: Wed, 06 Nov 2024 08:53:23 -0800
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672b9f03.050a0220.350062.0276.GAE@google.com>
+Subject: [syzbot] [wpan?] [usb?] BUG: corrupted list in ieee802154_if_remove
+From: syzbot <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>
+To: alex.aring@gmail.com, davem@davemloft.net, edumazet@google.com, 
+	horms@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, linux-wpan@vger.kernel.org, 
+	miquel.raynal@bootlin.com, netdev@vger.kernel.org, pabeni@redhat.com, 
+	stefan@datenfreihafen.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-On Tue, Nov 05, 2024 at 09:03:38PM -0800, Jakub Kicinski wrote:
-> On Mon,  4 Nov 2024 21:55:26 +0000 Joe Damato wrote:
-> > From: Martin Karsten <mkarsten@uwaterloo.ca>
-> > 
-> > When NAPI_F_PREFER_BUSY_POLL is set during busy_poll_stop and the
-> > irq_suspend_timeout is nonzero, this timeout is used to defer softirq
-> > scheduling, potentially longer than gro_flush_timeout. This can be used
-> > to effectively suspend softirq processing during the time it takes for
-> > an application to process data and return to the next busy-poll.
-> > 
-> > The call to napi->poll in busy_poll_stop might lead to an invocation of
-> 
-> The call to napi->poll when we're arming the timer is counter
-> productive, right? Maybe we can take this opportunity to add
-> the seemingly missing logic to skip over it?
+Hello,
 
-It seems like the call to napi->poll in busy_poll_stop is counter
-productive and we're not opposed to making an optimization like that
-in the future.
+syzbot found the following issue on:
 
-When we tried it, it triggered several bugs/system hangs, so we left
-as much of the original code in place as possible.
+HEAD commit:    557329bcecc2 Merge tag 'mmc-v6.12-rc3' of git://git.kernel..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=14a9f740580000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=921b01cbfd887a9b
+dashboard link: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15d76d5f980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12a9f740580000
 
-The existing patch works and streamlining busy_poll_stop to skip the
-call to napi->poll is an optimization that can be added as a later
-series that focuses solely on when/where/how napi->poll is called.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/2b44e0081eb5/disk-557329bc.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/15b6a52c8e11/vmlinux-557329bc.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/ab40912bec45/bzImage-557329bc.xz
 
-Our focus was on:
-  - Not breaking any of the existing mechanisms
-  - Adding a new mechanism
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
 
-I think we should avoid pulling the optimization you suggest into
-this particular series and save that for the future.
+------------[ cut here ]------------
+kernel BUG at lib/list_debug.c:58!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
+RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
+R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
+FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del_rcu include/linux/rculist.h:157 [inline]
+ ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
+ rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
+ ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+ ___sys_sendmsg net/socket.c:2661 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd094c32309
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 71 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffec50063a8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fd094c32309
+RDX: 0000000004000000 RSI: 0000000020000b00 RDI: 0000000000000004
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 00000000000000a0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000161b7
+R13: 00007ffec50063bc R14: 00007ffec50063d0 R15: 00007ffec50063c0
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
+RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
+R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
+FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 
-> > napi_complete_done, but the prefer-busy flag is still set at that time,
-> > so the same logic is used to defer softirq scheduling for
-> > irq_suspend_timeout.
-> > 
-> > Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> > Co-developed-by: Joe Damato <jdamato@fastly.com>
-> > Signed-off-by: Joe Damato <jdamato@fastly.com>
-> > Tested-by: Joe Damato <jdamato@fastly.com>
-> > Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> > Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> > Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
-> > ---
-> >  v3:
-> >    - Removed reference to non-existent sysfs parameter from commit
-> >      message. No functional/code changes.
-> > 
-> >  net/core/dev.c | 17 +++++++++++++----
-> >  1 file changed, 13 insertions(+), 4 deletions(-)
-> > 
-> > diff --git a/net/core/dev.c b/net/core/dev.c
-> > index 4d910872963f..51d88f758e2e 100644
-> > --- a/net/core/dev.c
-> > +++ b/net/core/dev.c
-> > @@ -6239,7 +6239,12 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
-> >  			timeout = napi_get_gro_flush_timeout(n);
-> >  		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
-> >  	}
-> > -	if (n->defer_hard_irqs_count > 0) {
-> > +	if (napi_prefer_busy_poll(n)) {
-> > +		timeout = napi_get_irq_suspend_timeout(n);
-> 
-> Why look at the suspend timeout in napi_complete_done()?
-> We are unlikely to be exiting busy poll here.
 
-The idea is similar to commit 7fd3253a7de6 ("net: Introduce
-preferred busy-polling"); continue to defer IRQs as long as forward
-progress is being made. In this case, napi->poll ran, called
-napi_complete_done -- the system is moving forward with processing
-so prevent IRQs from interrupting us.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-epoll_wait will re-enable IRQs (by calling napi_schedule) if
-there are no events ready for processing.
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
-> Is it because we need more time than gro_flush_timeout
-> for the application to take over the polling?
+If the report is already addressed, let syzbot know by replying with:
+#syz fix: exact-commit-title
 
-That's right; we want the application to retain control of packet
-processing. That's why we connected this to the "prefer_busy_poll"
-flag.
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
-> > +		if (timeout)
-> > +			ret = false;
-> > +	}
-> > +	if (ret && n->defer_hard_irqs_count > 0) {
-> >  		n->defer_hard_irqs_count--;
-> >  		timeout = napi_get_gro_flush_timeout(n);
-> >  		if (timeout)
-> > @@ -6375,9 +6380,13 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
-> >  	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
-> >  
-> >  	if (flags & NAPI_F_PREFER_BUSY_POLL) {
-> > -		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
-> > -		timeout = napi_get_gro_flush_timeout(napi);
-> > -		if (napi->defer_hard_irqs_count && timeout) {
-> > +		timeout = napi_get_irq_suspend_timeout(napi);
-> 
-> Even here I'm not sure if we need to trigger suspend.
-> I don't know the eventpoll code well but it seems like you suspend 
-> and resume based on events when exiting epoll. Why also here?
+If you want to overwrite report's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
 
-There's two questions wrapped up here and an overall point to make:
+If the report is a duplicate of another one, reply with:
+#syz dup: exact-subject-of-another-report
 
-1. Suspend and resume based on events when exiting epoll - that's
-   right and as you'll see in those patches that happens by:
-     - arming the suspend timer (via a call to napi_suspend_irqs)
-       when a positive number of events are retrieved
-     - calling napi_schedule (via napi_resume_irqs) when there are
-       no events or the epoll context is being freed.
-
-2. Why defer the suspend timer here in busy_poll_stop? Note that the
-   original code would set the timer to gro_flush_timeout, which
-   would introduce the trade offs we mention in the cover letter
-   (latency for large values, IRQ interruption for small values).
-
-   We don't want the gro_flush_timeout to take over yet because we
-   want to avoid these tradeoffs up until the point where epoll_wait
-   finds no events for processing.
-
-   Does that make sense? If we skipped the IRQ suspend deferral
-   here, we'd be giving packet processing control back to
-   gro_flush_timeout and napi_defer_hard_irqs, but the system might
-   still have packets that can be processed in the next call to
-   epoll_wait.
-
-The overall point to make is that: the suspend timer is used to
-prevent misbehaving userland applications from taking too long. It's
-essentially a backstop and, as long as the app is making forward
-progress, allows the app to continue running its busy poll loop
-undisturbed (via napi_complete_done preventing the driver from
-enabling IRQs).
-
-Does that make sense?
-
-> > +		if (!timeout) {
-> > +			napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
-> > +			if (napi->defer_hard_irqs_count)
-> > +				timeout = napi_get_gro_flush_timeout(napi);
-> > +		}
-> > +		if (timeout) {
-> >  			hrtimer_start(&napi->timer, ns_to_ktime(timeout), HRTIMER_MODE_REL_PINNED);
-> >  			skip_schedule = true;
-> >  		}
-> 
+If you want to undo deduplication, reply with:
+#syz undup
 
