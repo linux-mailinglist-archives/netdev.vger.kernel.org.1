@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-142190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5300F9BDB76
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:52:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BD6E89BDB77
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:52:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 03A451F23948
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:52:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 775651F23E6F
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:52:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6743118B463;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F161618C036;
 	Wed,  6 Nov 2024 01:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="kIMniBq0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Ubjz7Z0R"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42E226BFCA
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:52:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CDB4D18C01D
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 01:52:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730857963; cv=none; b=UmoX9UNhLEZ8HvhhaGLEkRRA769HzFEuM3r4BSN43ylRh4FbUB3kqf75YrliVkqO7BNUNZ1UBsPMzUcV/gNqgm0epsR2Yu0sBFxSwWcF07qPi5VUNnXCHpo0maqYVeGas/9vsYZW0ES1HQ2fWkEUtfPRpggTiQ5oVScY5/6z5SM=
+	t=1730857963; cv=none; b=pkziKW9L/87Pqpk6FrINeKPlEjt7RvDe9ssqPfxoUQ2Q0HsLJhqu5ExPzi3axra/r9yENYKvbpYcxSKIG4YLDWA96R+HRutFXt2hoQnEYVZyOK1qBb6lk8EQlIHg5mC/BQPSWVY3XQLN4vtDkLFMokiK4lpJXXE8NlDiw6a3JdI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1730857963; c=relaxed/simple;
-	bh=aYYju73Ju1+FVIz0sAm0ETBgz8kJZeJQREO4Kj0isFs=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=CKt9++OCyjWvPBhYm42JVI2QimLe2lXi8E6ZmkF7nXsw/Tp8PXftU1wy5WfbrS4QP1rCgiANcEUXMCSCE5T8HH0iwpJIXZxnb4F1Uw6iSWdpyYLROghvOmf4VrMwuV4A0xNiQaoln7GBvIjcc+AbqKRcFFlIvw0VGJeucZCc7lo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=kIMniBq0; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6D484C4CECF;
-	Wed,  6 Nov 2024 01:52:42 +0000 (UTC)
+	bh=eWka6g86lV+wcHW+J32xIlMGPgLxGMi8jJLOOJ7LLuA=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=cOt3FCI+W/Sdq9zAc1yWZ3HyaN2jPaoZo2GEye9Y7UBF8HORd6IyvCyUnaH6k82tUYthzDm0xhRJHkR+v/ryqq4kI4E8c6h2OiYpjiVgA1nQfaSxMceChPrZ5OuxyXBFK2yvGpgB1GG/pAhg3HHLi2DZZJvmPyJQ4+EK5jS+kCg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Ubjz7Z0R; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CFECC4CED3;
+	Wed,  6 Nov 2024 01:52:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730857962;
-	bh=aYYju73Ju1+FVIz0sAm0ETBgz8kJZeJQREO4Kj0isFs=;
-	h=From:To:Cc:Subject:Date:From;
-	b=kIMniBq0IJv8F3b9zjbG3PDB6fdVXWkpgn3v5A4LNgdkmPnldbvFJR6WvGLVmquAK
-	 KMZhA/GYd4UIRCv/L2QueqWQ8qaHLifp0bn7eK8ektDkzgkX6DPt8bp4qK/ZB6/OxC
-	 hNJ2fjFr2/nSf5rKfu6Uxh5EKMgzqeeexj3Idnt7JZUbnzn2NQTFCVQlWLPFVprTc7
-	 Pl5HTNjS7aSdnZMdbUkPU/MgXO3i3ycRtwWgFaVh9sH43vb6Y6Od495nBGFKCVTK4v
-	 0VOw19TrRQp/xnzX6tdADbt910qx/Cgru9luwvi/aKoE8npy1cBpDb4mf2kslLvvmT
-	 p9hubcQz5COQA==
+	s=k20201202; t=1730857963;
+	bh=eWka6g86lV+wcHW+J32xIlMGPgLxGMi8jJLOOJ7LLuA=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=Ubjz7Z0R8NXTvTHMu4QVZzI4xr7obdw0V7YMN1GvT2QjfV6q13VnKhx3s/i5pkcc2
+	 0kgfm2j7ooQ85fdV02krVvDPgtwkKLXVifU38pQBQbrYR5UzXaZVYE/g1LJI+6QtRz
+	 LIX2Z5CXgZeJIBK3gqvU63+EsnCjXlc3l6oIlQGwEjiGt6Llc39WaCwwHvxEPTrr87
+	 1wZdDBo+BSjAnjiw3WCnK2RvZQXX67hjaMI/WOSVI6sQlb1wryuc5k9sxdenX17IP0
+	 SCyPZWjZ7QQQ8Ev76wsrGOkEMnwY1TTBAFwXG4By0tQSa14G/Y9zkRlvoPA0Senem3
+	 bRtxij1y4EIKQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: davem@davemloft.net
 Cc: netdev@vger.kernel.org,
@@ -48,12 +49,13 @@ Cc: netdev@vger.kernel.org,
 	johannes@sipsolutions.net,
 	pablo@netfilter.org,
 	Jakub Kicinski <kuba@kernel.org>,
-	syzkaller <syzkaller@googlegroups.com>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>
-Subject: [PATCH net v2 1/2] netlink: terminate outstanding dump on socket close
-Date: Tue,  5 Nov 2024 17:52:34 -0800
-Message-ID: <20241106015235.2458807-1-kuba@kernel.org>
+Subject: [PATCH net v2 2/2] selftests: net: add a test for closing a netlink socket ith dump in progress
+Date: Tue,  5 Nov 2024 17:52:35 -0800
+Message-ID: <20241106015235.2458807-2-kuba@kernel.org>
 X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241106015235.2458807-1-kuba@kernel.org>
+References: <20241106015235.2458807-1-kuba@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -62,138 +64,170 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Netlink supports iterative dumping of data. It provides the families
-the following ops:
- - start - (optional) kicks off the dumping process
- - dump  - actual dump helper, keeps getting called until it returns 0
- - done  - (optional) pairs with .start, can be used for cleanup
-The whole process is asynchronous and the repeated calls to .dump
-don't actually happen in a tight loop, but rather are triggered
-in response to recvmsg() on the socket.
+Close a socket with dump in progress. We need a dump which generates
+enough info not to fit into a single skb. Policy dump fits the bill.
 
-This gives the user full control over the dump, but also means that
-the user can close the socket without getting to the end of the dump.
-To make sure .start is always paired with .done we check if there
-is an ongoing dump before freeing the socket, and if so call .done.
+Use the trick discovered by syzbot for keeping a ref on the socket
+longer than just close, with mqueue.
 
-The complication is that sockets can get freed from BH and .done
-is allowed to sleep. So we use a workqueue to defer the call, when
-needed.
+  TAP version 13
+  1..3
+  # Starting 3 tests from 1 test cases.
+  #  RUN           global.test_sanity ...
+  #            OK  global.test_sanity
+  ok 1 global.test_sanity
+  #  RUN           global.close_in_progress ...
+  #            OK  global.close_in_progress
+  ok 2 global.close_in_progress
+  #  RUN           global.close_with_ref ...
+  #            OK  global.close_with_ref
+  ok 3 global.close_with_ref
+  # PASSED: 3 / 3 tests passed.
+  # Totals: pass:3 fail:0 xfail:0 xpass:0 skip:0 error:0
 
-Unfortunately this does not work correctly. What we defer is not
-the cleanup but rather releasing a reference on the socket.
-We have no guarantee that we own the last reference, if someone
-else holds the socket they may release it in BH and we're back
-to square one.
+Note that this test is not expected to fail but rather crash
+the kernel if we get the cleanup wrong.
 
-The whole dance, however, appears to be unnecessary. Only the user
-can interact with dumps, so we can clean up when socket is closed.
-And close always happens in process context. Some async code may
-still access the socket after close, queue notification skbs to it etc.
-but no dumps can start, end or otherwise make progress.
-
-Delete the workqueue and flush the dump state directly from the release
-handler. Note that further cleanup is possible in -next, for instance
-we now always call .done before releasing the main module reference,
-so dump doesn't have to take a reference of its own.
-
-Reported-by: syzkaller <syzkaller@googlegroups.com>
-Fixes: ed5d7788a934 ("netlink: Do not schedule work from sk_destruct")
 Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Eric Dumazet <edumazet@google.com>
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
 v2:
- - change reported tag
-v1: https://lore.kernel.org/20241105010347.2079981-1-kuba@kernel.org
+ - fix the Makefile inclusion
+v1: https://lore.kernel.org/20241105010347.2079981-2-kuba@kernel.org
 ---
- net/netlink/af_netlink.c | 31 ++++++++-----------------------
- net/netlink/af_netlink.h |  2 --
- 2 files changed, 8 insertions(+), 25 deletions(-)
+ tools/testing/selftests/net/Makefile        |   1 +
+ tools/testing/selftests/net/netlink-dumps.c | 110 ++++++++++++++++++++
+ 2 files changed, 111 insertions(+)
+ create mode 100644 tools/testing/selftests/net/netlink-dumps.c
 
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 0a9287fadb47..f84aad420d44 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -393,15 +393,6 @@ static void netlink_skb_set_owner_r(struct sk_buff *skb, struct sock *sk)
- 
- static void netlink_sock_destruct(struct sock *sk)
- {
--	struct netlink_sock *nlk = nlk_sk(sk);
--
--	if (nlk->cb_running) {
--		if (nlk->cb.done)
--			nlk->cb.done(&nlk->cb);
--		module_put(nlk->cb.module);
--		kfree_skb(nlk->cb.skb);
--	}
--
- 	skb_queue_purge(&sk->sk_receive_queue);
- 
- 	if (!sock_flag(sk, SOCK_DEAD)) {
-@@ -414,14 +405,6 @@ static void netlink_sock_destruct(struct sock *sk)
- 	WARN_ON(nlk_sk(sk)->groups);
- }
- 
--static void netlink_sock_destruct_work(struct work_struct *work)
--{
--	struct netlink_sock *nlk = container_of(work, struct netlink_sock,
--						work);
--
--	sk_free(&nlk->sk);
--}
--
- /* This lock without WQ_FLAG_EXCLUSIVE is good on UP and it is _very_ bad on
-  * SMP. Look, when several writers sleep and reader wakes them up, all but one
-  * immediately hit write lock and grab all the cpus. Exclusive sleep solves
-@@ -731,12 +714,6 @@ static void deferred_put_nlk_sk(struct rcu_head *head)
- 	if (!refcount_dec_and_test(&sk->sk_refcnt))
- 		return;
- 
--	if (nlk->cb_running && nlk->cb.done) {
--		INIT_WORK(&nlk->work, netlink_sock_destruct_work);
--		schedule_work(&nlk->work);
--		return;
--	}
--
- 	sk_free(sk);
- }
- 
-@@ -788,6 +765,14 @@ static int netlink_release(struct socket *sock)
- 				NETLINK_URELEASE, &n);
- 	}
- 
-+	/* Terminate any outstanding dump */
-+	if (nlk->cb_running) {
-+		if (nlk->cb.done)
-+			nlk->cb.done(&nlk->cb);
-+		module_put(nlk->cb.module);
-+		kfree_skb(nlk->cb.skb);
-+	}
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 649f1fe0dc46..5e86f7a51b43 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -78,6 +78,7 @@ TEST_PROGS += test_vxlan_vnifiltering.sh
+ TEST_GEN_FILES += io_uring_zerocopy_tx
+ TEST_PROGS += io_uring_zerocopy_tx.sh
+ TEST_GEN_FILES += bind_bhash
++TEST_GEN_PROGS += netlink-dumps
+ TEST_GEN_PROGS += sk_bind_sendto_listen
+ TEST_GEN_PROGS += sk_connect_zero_addr
+ TEST_GEN_PROGS += sk_so_peek_off
+diff --git a/tools/testing/selftests/net/netlink-dumps.c b/tools/testing/selftests/net/netlink-dumps.c
+new file mode 100644
+index 000000000000..7ee6dcd334df
+--- /dev/null
++++ b/tools/testing/selftests/net/netlink-dumps.c
+@@ -0,0 +1,110 @@
++// SPDX-License-Identifier: GPL-2.0
 +
- 	module_put(nlk->module);
- 
- 	if (netlink_is_kernel(sk)) {
-diff --git a/net/netlink/af_netlink.h b/net/netlink/af_netlink.h
-index 5b0e4e62ab8b..778a3809361f 100644
---- a/net/netlink/af_netlink.h
-+++ b/net/netlink/af_netlink.h
-@@ -4,7 +4,6 @@
- 
- #include <linux/rhashtable.h>
- #include <linux/atomic.h>
--#include <linux/workqueue.h>
- #include <net/sock.h>
- 
- /* flags */
-@@ -50,7 +49,6 @@ struct netlink_sock {
- 
- 	struct rhash_head	node;
- 	struct rcu_head		rcu;
--	struct work_struct	work;
- };
- 
- static inline struct netlink_sock *nlk_sk(struct sock *sk)
++#define _GNU_SOURCE
++
++#include <fcntl.h>
++#include <stdio.h>
++#include <string.h>
++#include <sys/socket.h>
++#include <sys/stat.h>
++#include <sys/syscall.h>
++#include <sys/types.h>
++#include <unistd.h>
++
++#include <linux/genetlink.h>
++#include <linux/netlink.h>
++#include <linux/mqueue.h>
++
++#include "../kselftest_harness.h"
++
++static const struct {
++	struct nlmsghdr nlhdr;
++	struct genlmsghdr genlhdr;
++	struct nlattr ahdr;
++	__u16 val;
++	__u16 pad;
++} dump_policies = {
++	.nlhdr = {
++		.nlmsg_len	= sizeof(dump_policies),
++		.nlmsg_type	= GENL_ID_CTRL,
++		.nlmsg_flags	= NLM_F_REQUEST | NLM_F_ACK | NLM_F_DUMP,
++		.nlmsg_seq	= 1,
++	},
++	.genlhdr = {
++		.cmd		= CTRL_CMD_GETPOLICY,
++		.version	= 2,
++	},
++	.ahdr = {
++		.nla_len	= 6,
++		.nla_type	= CTRL_ATTR_FAMILY_ID,
++	},
++	.val = GENL_ID_CTRL,
++	.pad = 0,
++};
++
++// Sanity check for the test itself, make sure the dump doesn't fit in one msg
++TEST(test_sanity)
++{
++	int netlink_sock;
++	char buf[8192];
++	ssize_t n;
++
++	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
++	ASSERT_GE(netlink_sock, 0);
++
++	n = send(netlink_sock, &dump_policies, sizeof(dump_policies), 0);
++	ASSERT_EQ(n, sizeof(dump_policies));
++
++	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
++	ASSERT_GE(n, sizeof(struct nlmsghdr));
++
++	n = recv(netlink_sock, buf, sizeof(buf), MSG_DONTWAIT);
++	ASSERT_GE(n, sizeof(struct nlmsghdr));
++
++	close(netlink_sock);
++}
++
++TEST(close_in_progress)
++{
++	int netlink_sock;
++	ssize_t n;
++
++	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
++	ASSERT_GE(netlink_sock, 0);
++
++	n = send(netlink_sock, &dump_policies, sizeof(dump_policies), 0);
++	ASSERT_EQ(n, sizeof(dump_policies));
++
++	close(netlink_sock);
++}
++
++TEST(close_with_ref)
++{
++	char cookie[NOTIFY_COOKIE_LEN] = {};
++	int netlink_sock, mq_fd;
++	struct sigevent sigev;
++	ssize_t n;
++
++	netlink_sock = socket(AF_NETLINK, SOCK_RAW, NETLINK_GENERIC);
++	ASSERT_GE(netlink_sock, 0);
++
++	n = send(netlink_sock, &dump_policies, sizeof(dump_policies), 0);
++	ASSERT_EQ(n, sizeof(dump_policies));
++
++	mq_fd = syscall(__NR_mq_open, "sed", O_CREAT | O_WRONLY, 0600, 0);
++	ASSERT_GE(mq_fd, 0);
++
++	memset(&sigev, 0, sizeof(sigev));
++	sigev.sigev_notify		= SIGEV_THREAD;
++	sigev.sigev_value.sival_ptr	= cookie;
++	sigev.sigev_signo		= netlink_sock;
++
++	syscall(__NR_mq_notify, mq_fd, &sigev);
++
++	close(netlink_sock);
++
++	// give mqueue time to fire
++	usleep(100 * 1000);
++}
++
++TEST_HARNESS_MAIN
 -- 
 2.47.0
 
