@@ -1,176 +1,115 @@
-Return-Path: <netdev+bounces-142421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142422-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A4329BF065
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:32:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6A859BF089
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 15:40:52 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 28E9DB21ADC
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:32:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E06051C210DB
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 14:40:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DB41DFE38;
-	Wed,  6 Nov 2024 14:32:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7377D1DE3DC;
+	Wed,  6 Nov 2024 14:40:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="JX4GnGCa"
+	dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b="w/u4ju9w"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f54.google.com (mail-ej1-f54.google.com [209.85.218.54])
+Received: from mail-wm1-f43.google.com (mail-wm1-f43.google.com [209.85.128.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258FD1DD871
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 14:32:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D95F98C11
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 14:40:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730903526; cv=none; b=AXRdyaqTHuhSFIsoHKprZ+OV+UPRtAA4INGTybJL33BfrmJykjptvCPkvysE0Pk5zrEqZU0VgaHRG6TeSuNajbS6C66c9Dbb5LgnbNDAR5uiyX/MBGLAaPM6H9wicy+6t1gMco28TsZc+Ce1fFxJBQPc1dryVmAMU7ZXIePgAYo=
+	t=1730904049; cv=none; b=B4AmQmslmeK7s8OqWFtEcDlMNMI2E+PLb/Z4IMfRfOg+4qIG6Ef+pwUNV9PSsjKi0bXwlP+yQjqA1tpc1eLhXpCYGZQl+KQTY+woqrmBuP1NoK4POLNrggGCr+zot6F5JMMBOiYucaS0KUHvE6Tr7FT5bAOxQaT9HyasN6bzCjY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730903526; c=relaxed/simple;
-	bh=lEn6q293PmWCygu2hkjMC7ZLwW+CV7lLkRNckv1tDFw=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rwPAKef2++vO71TzfOUgzB9Xwta+jLMWjIPmmArjLhV0v01rO2k3oKkNC8zGB/pq5ZtZdfUvWSvXtNBFmrykGGLzzEvs0zT6hH5bdVIVHdIGKJaP7SMY38GjRvYu2xoXhytYnKuYLL7/N/I1ioxQ9Z2xHXEv30wzfIPQumT5pgc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=JX4GnGCa; arc=none smtp.client-ip=209.85.218.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f54.google.com with SMTP id a640c23a62f3a-a93c1cc74fdso1061614066b.3
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 06:32:04 -0800 (PST)
+	s=arc-20240116; t=1730904049; c=relaxed/simple;
+	bh=99fCRKPid8lzY1gxZb7aplekWpsFLmLYAz/6VnB+cE4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=BNcRV3Uy5LUVYeeKdrMbTbyfpwiH+2tlLpsrRl6toBQFIs+NReAFLATWm38tFrhTIJeYlHnaseuJOgZRiAPzPFqh5FAkw0ZtA1SKiUOQs6B/JQF6TPw0pQ90z5lNHxkamXx1cOk2XDVTfRGjkValpM3EIr2fsTKFZqIjE8tlDbI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us; spf=none smtp.mailfrom=resnulli.us; dkim=pass (2048-bit key) header.d=resnulli-us.20230601.gappssmtp.com header.i=@resnulli-us.20230601.gappssmtp.com header.b=w/u4ju9w; arc=none smtp.client-ip=209.85.128.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=resnulli.us
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=resnulli.us
+Received: by mail-wm1-f43.google.com with SMTP id 5b1f17b1804b1-4315abed18aso57188945e9.2
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 06:40:45 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730903523; x=1731508323; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Q/kojHXY3Ebruk3mlegVR/jOLPLR7b9RJlssI4OX1Fg=;
-        b=JX4GnGCaTyi4pwt2SG6Da8Ie38KTanVViaeywhQpwUVPJMsjt4VoNFWDayBObQOr8V
-         /3MfxmueQSK7ZAxNM08t6zjRwB+uDP5n3+qHMXo7K32IIgiT+cQbuqZK4Mvn+HMoTdPV
-         C+IE2yon79SrdMQSqtW+7XMqarF8uRpvjvcZrnm1PYqOAMFoNqCa9b1kMiBypVFE9XWg
-         1MUvILa9e7lnPfMBhEQcacOcEWrgJMlO8knjK16RihAzt+uDr7MtuNXWrS+M/JBDNNA/
-         gvrV6umipVevP28iIW7vKsuz+im77TIo84Eo9QnaFxmH1N9iHb+5vlCUQcpNcvZW11ao
-         /UVg==
+        d=resnulli-us.20230601.gappssmtp.com; s=20230601; t=1730904044; x=1731508844; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=yH4Bg+CaY/B//+9hbGIsvk3Cq/q1sqWXGfdu8J6uLwE=;
+        b=w/u4ju9wEqfj7UT1Y6TQmuW8F8bywzy4ltWP5y3+KZiuwmqrfYywZ6Qyxzib7s1AbK
+         nzlj94JsIuThWAaLl4AEwKmIiwDT9zEOgLPLrMrA8UlwtOoTfKHRcrZs/90d1YZvzbde
+         RnHEiAuzJbPFSXzp8LLdQ5dB/yPAs6N7gZFgwGSo50Rs+Ogdkr8YdSkisoBec+4kHCQh
+         uZqxzDHKL7v+ZYP22bjsvkPP4soogLKLzJzmSQwYAlwA40MLr0sTKCQbNZk37pzR01hG
+         kmbbeFiU4SHSnCUsrdi+TFCwQM7Ri9AHy38xmr+kOQTseC/m6JyzLnzN4KBcgp6foinh
+         9p2w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730903523; x=1731508323;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Q/kojHXY3Ebruk3mlegVR/jOLPLR7b9RJlssI4OX1Fg=;
-        b=cQeTmKWC1JD3fD44pkMZGggwvabg5fokAoP3LrsIryqfRg2qnIxNNQRDEnm1QxBz0U
-         ejS9L6hHlHKwz3sT43gwAbTPTlpBwPsh9HR59Iix+RJVRn+8UqYCi0Uafj0FbFOFlmy2
-         2m7FLhQ2R7tK4Vf1P2TD55Od+KdIzOJmblhUa10/ri6XTDdNb8Z0PqMRdESKFYhBcGsv
-         zJt2F6a+tpaXLQbqhIxXdAbDS56jXn/2iV53usOWhpCqaqdCspqUvVkyhyizhVgFu3lU
-         YMycN8oUV7RvbmpTkCz83WT4qExuT4aydsNKsvJksw3W0lPBMI743LoHanm9bz23PxwY
-         Vr3A==
-X-Forwarded-Encrypted: i=1; AJvYcCXX5EbzuyBWW9FCammbl8mdZ7+Su2+qWZXLSPyHvGp/9iYF+g0+qVAXa+QX55vFW87Qo+O6Sew=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzSeTrmDFjliVB8ZQWmM3lKri+D+IjViVvX9gQ6OQpFR6XvbFCL
-	BRBq4GKPpYUVxaXnsz2lv/zatazOa16wUDg3oxU2CzBUpG4P9Kwo
-X-Google-Smtp-Source: AGHT+IGYSOubBJVWjZvxpLFa9vM6vT92sfCAHdRsUyeAPq56XLjYsrcStP3eJeNgdWiyvkj/gtS0LA==
-X-Received: by 2002:a17:907:608a:b0:a9a:ea4:2834 with SMTP id a640c23a62f3a-a9e655ab355mr1939471466b.33.1730903523097;
-        Wed, 06 Nov 2024 06:32:03 -0800 (PST)
-Received: from getafix.rd.francetelecom.fr ([193.252.113.11])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9eb17d7318sm284361266b.131.2024.11.06.06.32.02
+        d=1e100.net; s=20230601; t=1730904044; x=1731508844;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=yH4Bg+CaY/B//+9hbGIsvk3Cq/q1sqWXGfdu8J6uLwE=;
+        b=wJ9EyBFsg3kxmet/4tpPeXo2Lc8+pz7NQdyjHluH3AMtsL1AHvyMrawsKEcXSs2Ny9
+         ePYTbiFRoBSKH8gtjKKfeIIeZQGCWRHoRg8doALKWADMeRJdn2M+AiyPCWyNfCZxxOc0
+         6Q58Nb5KxfO73GAIlMI90kXzix7CDHf4Wi/1T5hImOJOHAz2oBwDj6Vs2jz4LvVcSFtd
+         j8Zb7o1K//c95ICmIfFKgEJ9FgZ9Pq/AOw7UR18as0ShgGwmmiWQv0SEmyM72/xSDQ8G
+         sm22tMPBuNc1n8SE7f96xGUzQ4u+Mlpmdm6KuNIpBU5jR3o8RMh/rI7h6AjKoG6sNoLH
+         taUw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOC69fyl4BXT1GLJCSfphUD2nMlW91qTs1yyILPV7CDWUueMp1Lr0rAA3lAdtl70mPQqYqbuM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzWHb4X1dWUnT+Y79fGEIwZy9yptA4Y9zTYSkWFqu+C40sCi7NJ
+	UKixp2kS0lnzKAGfBzwG6clBsCbjUb1ZOs9Asby+B39T/mk5CL+87c9klPh2ztQ=
+X-Google-Smtp-Source: AGHT+IG/epgpIGkPh0Q5EJMKbDGJ7yS1lgbQcl+Yh7JOLFvr/rm4jVhxbvS469EJQu8b8yLsCoq2/g==
+X-Received: by 2002:a05:600c:511c:b0:431:5533:8f0b with SMTP id 5b1f17b1804b1-432832972bbmr159644995e9.32.1730904043893;
+        Wed, 06 Nov 2024 06:40:43 -0800 (PST)
+Received: from localhost ([193.47.165.251])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6f34easm26531655e9.42.2024.11.06.06.40.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 06:32:02 -0800 (PST)
-From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
-X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
-To: edumazet@google.com
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	alexandre.ferrieux@orange.com,
-	netdev@vger.kernel.org
-Subject: [PATCH net v3] net: sched: cls_u32: Fix u32's systematic failure to free IDR entries for hnodes.
-Date: Wed,  6 Nov 2024 15:32:00 +0100
-Message-Id: <20241106143200.282082-1-alexandre.ferrieux@orange.com>
-X-Mailer: git-send-email 2.30.2
+        Wed, 06 Nov 2024 06:40:43 -0800 (PST)
+Date: Wed, 6 Nov 2024 15:40:39 +0100
+From: Jiri Pirko <jiri@resnulli.us>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: Jay Vosburgh <jv@jvosburgh.net>, netdev@vger.kernel.org
+Subject: Re: [Question]: should we consider arp missed max during
+ bond_ab_arp_probe()?
+Message-ID: <Zyt_58BFKnZvtsHx@nanopsycho.orion>
+References: <ZysdRHul2pWy44Rh@fedora>
+ <ZysqM_T8f5qDetmk@nanopsycho.orion>
+ <Zys2Clf0NGeVGl3D@fedora>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zys2Clf0NGeVGl3D@fedora>
 
-To generate hnode handles (in gen_new_htid()), u32 uses IDR and
-encodes the returned small integer into a structured 32-bit
-word. Unfortunately, at disposal time, the needed decoding
-is not done. As a result, idr_remove() fails, and the IDR
-fills up. Since its size is 2048, the following script ends up
-with "Filter already exists":
+Wed, Nov 06, 2024 at 10:25:30AM CET, liuhangbin@gmail.com wrote:
+>On Wed, Nov 06, 2024 at 09:34:59AM +0100, Jiri Pirko wrote:
+>> Wed, Nov 06, 2024 at 08:39:48AM CET, liuhangbin@gmail.com wrote:
+>> >Hi Jay,
+>> >
+>> >Our QE reported that, when there is no active slave during
+>> >bond_ab_arp_probe(), the slaves send the arp probe message one by one. This
+>> >will flap the switch's mac table quickly, sometimes even make the switch stop
+>> >learning mac address. So should we consider the arp missed max during
+>> >bond_ab_arp_probe()? i.e. each slave has more chances to send probe messages
+>> >before switch to another slave. What do you think?
+>> 
+>> Out of curiosity, is anyone still using AB mode in real life? And if
+>
+>Based on our analyse, in year 2024, there are 53.8% users using 802.3ad mode,
+>41.6% users using active-backup mode. 2.5% users using round-robin mode.
+>
+>> yes, any idea why exacly?
+>
+>I think they just want to make sure there is a backup for the link.
 
-  tc filter add dev myve $FILTER1
-  tc filter add dev myve $FILTER2
-  for i in {1..2048}
-  do
-    echo $i
-    tc filter del dev myve $FILTER2
-    tc filter add dev myve $FILTER2
-  done
+Why don't they use LACP? You can have backup there as well.
 
-This patch adds the missing decoding logic for handles that
-deserve it.
-
-Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
----
-v3: prepend title with subsystem ident
-v2: use u32 type in handle encoder/decoder
-
- net/sched/cls_u32.c | 18 ++++++++++++++----
- 1 file changed, 14 insertions(+), 4 deletions(-)
-
-diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
-index 9412d88a99bc..6da94b809926 100644
---- a/net/sched/cls_u32.c
-+++ b/net/sched/cls_u32.c
-@@ -41,6 +41,16 @@
- #include <linux/idr.h>
- #include <net/tc_wrapper.h>
- 
-+static inline u32 handle2id(u32 h)
-+{
-+	return ((h & 0x80000000) ? ((h >> 20) & 0x7FF) : h);
-+}
-+
-+static inline u32 id2handle(u32 id)
-+{
-+	return (id | 0x800U) << 20;
-+}
-+
- struct tc_u_knode {
- 	struct tc_u_knode __rcu	*next;
- 	u32			handle;
-@@ -310,7 +320,7 @@ static u32 gen_new_htid(struct tc_u_common *tp_c, struct tc_u_hnode *ptr)
- 	int id = idr_alloc_cyclic(&tp_c->handle_idr, ptr, 1, 0x7FF, GFP_KERNEL);
- 	if (id < 0)
- 		return 0;
--	return (id | 0x800U) << 20;
-+	return id2handle(id);
- }
- 
- static struct hlist_head *tc_u_common_hash;
-@@ -360,7 +370,7 @@ static int u32_init(struct tcf_proto *tp)
- 		return -ENOBUFS;
- 
- 	refcount_set(&root_ht->refcnt, 1);
--	root_ht->handle = tp_c ? gen_new_htid(tp_c, root_ht) : 0x80000000;
-+	root_ht->handle = tp_c ? gen_new_htid(tp_c, root_ht) : id2handle(0);
- 	root_ht->prio = tp->prio;
- 	root_ht->is_root = true;
- 	idr_init(&root_ht->handle_idr);
-@@ -612,7 +622,7 @@ static int u32_destroy_hnode(struct tcf_proto *tp, struct tc_u_hnode *ht,
- 		if (phn == ht) {
- 			u32_clear_hw_hnode(tp, ht, extack);
- 			idr_destroy(&ht->handle_idr);
--			idr_remove(&tp_c->handle_idr, ht->handle);
-+			idr_remove(&tp_c->handle_idr, handle2id(ht->handle));
- 			RCU_INIT_POINTER(*hn, ht->next);
- 			kfree_rcu(ht, rcu);
- 			return 0;
-@@ -989,7 +999,7 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
- 
- 		err = u32_replace_hw_hnode(tp, ht, userflags, extack);
- 		if (err) {
--			idr_remove(&tp_c->handle_idr, handle);
-+			idr_remove(&tp_c->handle_idr, handle2id(handle));
- 			kfree(ht);
- 			return err;
- 		}
--- 
-2.30.2
-
+>
+>Thanks
+>Hangbin
 
