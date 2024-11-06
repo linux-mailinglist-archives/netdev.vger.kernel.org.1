@@ -1,253 +1,149 @@
-Return-Path: <netdev+bounces-142214-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142215-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A6EBE9BDD15
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:39:17 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD37F9BDD47
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 03:51:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65CA4281F40
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:39:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9F6AC2812BC
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 02:51:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FA2618DF7C;
-	Wed,  6 Nov 2024 02:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D120E18FC84;
+	Wed,  6 Nov 2024 02:51:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="U8ARRX/j"
+	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="CPSIO1oh"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-002e3701.pphosted.com (mx0b-002e3701.pphosted.com [148.163.143.35])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C46BA18CBEC;
-	Wed,  6 Nov 2024 02:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F1CA18B47E;
+	Wed,  6 Nov 2024 02:51:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.143.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730860711; cv=none; b=Gslskg1L2w2aHvl3IwyQJrC7auiPKR+mm7UrKo2LQAfOaPhE5RZ6dEOuyp60AnpYGR0a4z19CQAVh+YWxGjzX/A3JgjCa/aLDS4jWcAIZlI8Ae5D/TiYpSc5xSUXfrZv7KpCRV09/3iiTma83PqmrY74LebX5RQuDomaDMUKVNw=
+	t=1730861497; cv=none; b=ROVQ/qtfrvNphFKiEHad7q6J+5sdrG+BTKSIcNg/kkmla7WuR1LVveTLnaodGRYhTornxW6gwxDpLZB0Fy/T2iFPi7U5fRfy/lZ0coWHtZfUBMR72jm4VuQT0sD/QSBoR0gDNVymAsmLUcdeNc+IkxCQrCUQhpqA2oAD9NO5OGs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730860711; c=relaxed/simple;
-	bh=qoJaqRb83sZPujyIsKU8q8MqSySsJCHzRVLvgis4QK4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=pcq/es2hscgJwwzc3WD0uxCHiOphTUpbHmadYIpen+rZv30rMgN4NXV+YZ5QHSq29Lrpy2XLZjRTbtbZ266uRtEComOvtP28Dn7tKHDQjnIPCoKyzjQw4H5wipzSxkpv80Sfpxw6LQgb8A/GGBu4KkyBE0fbDCwDfTRZsdzDjw0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=U8ARRX/j; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a6c7bede1aso10672235ab.0;
-        Tue, 05 Nov 2024 18:38:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730860709; x=1731465509; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qoJaqRb83sZPujyIsKU8q8MqSySsJCHzRVLvgis4QK4=;
-        b=U8ARRX/jw9QWSOTC98JmT229FVo02V0yIefg5FajNZZxZrKw0n4cVKrMJYYkiEfIeD
-         CCEH/ZHYk7NaMki606lo7eDAvdynKjCONzo135ekirw99+Ggj1sBPJmQcFtgQy/UEB0X
-         aCldd3cs9etPARrZfPJvXHLLawNdczf0QB7tnI/eA8XyTYHQTH4KUHvNm3YTAcVw8EfH
-         Qb0VAmkTABRpM9S6QwwpbSRACGJN98IwR4OzqOijy9rsMO/elIb3S586tZKTdYRRSswZ
-         Q6PKf/8qvLK4oz3jwzqERwjv4M71CdbKWE+2PEtyWj40t8B4WF4WCw8GB6+PBR34SBL3
-         WEoA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730860709; x=1731465509;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qoJaqRb83sZPujyIsKU8q8MqSySsJCHzRVLvgis4QK4=;
-        b=KFS8kcBwo3/WgPvyTqk3NojUcWctleI5lFac9WT/finLzrDoDZm6K9i/faxtO95Ie3
-         +lhTs7GLwyr97Lvw6SaOsHeUP+aCyZVjzKTBlGzYxSMnb8+ABNaUbCSim3sixlpOFkgl
-         LhzHqmLJHUaQJLc3SqbZR3Ih826e6yeq31f+1xCgTN0/eLUGxwdLRKRRwn42AgkOTlVD
-         1fZaTMDeekqjGECtgG6PPeA0hXToAU6aqJIjiBhsW9M0CrCHSZPu72lAc7w17JXvycsx
-         9I1fT3xKOzsIKGOgDSItZc19A3EeRgua9vHI6DdELPK3+YItOe+p8txvFu4AIU9Irpjv
-         x1iw==
-X-Forwarded-Encrypted: i=1; AJvYcCUdMqumNZa55mTwMdDn74Uc9q4XlKkjsqkroJkFauQDsAvTfc9E2aKn7T7wWxJW3HBJ+Hg=@vger.kernel.org, AJvYcCWIGy/5glBEZi/EabjvJe78mofYF/vCTqFp67bZF/RnWP9ytGcyLWR5v7NA+wk2B2NXYncNuQp9@vger.kernel.org
-X-Gm-Message-State: AOJu0YxoIhQ2EmU9SO/ZcjanFHfJDptJLCmOmYJ8VyVM8EwN/YCxPYoQ
-	UsbRs4Ret844nRcJ1VU6Bxc6xtlQBaNOUtmwEAXFbLVXSowjnJea4o7LwcqkmT3TEQEk7RX1aQl
-	BIIvdYHFoq1gT0QcVKmOQJYiygow=
-X-Google-Smtp-Source: AGHT+IHYXaazaAXzo0tq4MZvq28dE7OUoHGNkaMeZ8DIyRN+LzH8PAqDzM1up3FJxG3NJjLLKT8S1w1AZsAnuxtMFc4=
-X-Received: by 2002:a05:6e02:1988:b0:3a6:ca38:6862 with SMTP id
- e9e14a558f8ab-3a6ca386d1fmr120153425ab.19.1730860708780; Tue, 05 Nov 2024
- 18:38:28 -0800 (PST)
+	s=arc-20240116; t=1730861497; c=relaxed/simple;
+	bh=zGklckDW0yAzRpIHB36p0nroZKUlM400pZk1ZhfMExw=;
+	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
+	 MIME-Version; b=AbytIZeBm+umqHYNtfIA6gDoRzFsJt+lXzKrSvvLn55T3uKcAzUj0XsOj/9R0ck5mgLIr8t5W/2DDGpxDVkWkDTkabmO7pnj0ocCTJuFRxdJd661xaC7jCs93UwzqyLrMgx0dQpAPAbx1j7/dKiR4iaiivm6Wah2CaKTezUx50s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=CPSIO1oh; arc=none smtp.client-ip=148.163.143.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
+Received: from pps.filterd (m0150244.ppops.net [127.0.0.1])
+	by mx0b-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A61igiP017650;
+	Wed, 6 Nov 2024 02:51:05 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
+	:content-transfer-encoding:date:from:in-reply-to:message-id
+	:mime-version:references:subject:to; s=pps0720; bh=fIau/TGBK/Y6E
+	JZSH4sYAY5qCp0ClLkPwdbVUgJbvDw=; b=CPSIO1oh/jpKfndIGm14Np1CbjWQg
+	hyuP8zyjECZjObh4jNnoKW9STq4jgktvUNUridmLgkdl1T1XQUPF9J+pgOTelhtD
+	Jw0ceWFgjylRafJJ4RAhdzY+McmPuCf8aktwkiBrZrroObZLp4pH14eIeY9fyFac
+	CkNlF8txzjfXhAwGYE5RoWBzs1UFfAMCPlCP3Eiihth1zZk9o8HQ9zoGo9nCtB4g
+	F02PPqPE2L4DVX0pj4TpjGK9uPeubyfVLPILUP70O0Lko3B986J2jx382AJnnHOl
+	GRrygh/GJiiuPCSeAQSkanOEGcx+ixFNhEcKIMXUFqK+qne0OdYLMpZYg==
+Received: from p1lg14881.it.hpe.com ([16.230.97.202])
+	by mx0b-002e3701.pphosted.com (PPS) with ESMTPS id 42qqxw3nj1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 06 Nov 2024 02:51:04 +0000 (GMT)
+Received: from localhost (unknown [192.58.206.35])
+	by p1lg14881.it.hpe.com (Postfix) with ESMTP id A0FE0806B3F;
+	Wed,  6 Nov 2024 02:51:02 +0000 (UTC)
+From: Matt Muggeridge <Matt.Muggeridge@hpe.com>
+To: idosch@idosch.org
+Cc: Matt.Muggeridge@hpe.com, davem@davemloft.net, dsahern@kernel.org,
+        edumazet@google.com, horms@kernel.org, kuba@kernel.org,
+        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
+        netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org
+Subject: Re: [PATCH net 1/1] net/ipv6: Netlink flag for new IPv6 Default Routes
+Date: Tue,  5 Nov 2024 21:50:56 -0500
+Message-Id: <20241106025056.11241-1-Matt.Muggeridge@hpe.com>
+X-Mailer: git-send-email 2.35.3
+In-Reply-To: <Zypgu5l7F1FpIpqo@shredder>
+References: <Zypgu5l7F1FpIpqo@shredder>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <67219e5562f8c_37251929465@willemb.c.googlers.com.notmuch>
- <CAL+tcoDonudsr800HmhDir7f0B6cx0RPwmnrsRmQF=yDUJUszg@mail.gmail.com>
- <3c7c5f25-593f-4b48-9274-a18a9ea61e8f@linux.dev> <CAL+tcoAy2ryOpLi2am=T68GaFG1ACCtYmcJzDoEOan-0u3aaWw@mail.gmail.com>
- <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
- <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
- <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
- <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev> <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
- <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch> <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
- <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev> <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
- <1c8ebc16-f8e7-4a98-9518-865db3952f8f@linux.dev> <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
- <f27ab4ce-02df-464e-90ed-852652fb7e3e@linux.dev> <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
- <672ac23732699_cde4729460@willemb.c.googlers.com.notmuch>
-In-Reply-To: <672ac23732699_cde4729460@willemb.c.googlers.com.notmuch>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Wed, 6 Nov 2024 10:37:52 +0800
-Message-ID: <CAL+tcoAPYSkPW27nxr9_Xbc3oGToMZ=D=jyTr=x=XEWa8mKq3A@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
- work parallelly
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: Martin KaFai Lau <martin.lau@linux.dev>, willemb@google.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, dsahern@kernel.org, 
-	ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, eddyz87@gmail.com, 
-	song@kernel.org, yonghong.song@linux.dev, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, 
-	shuah@kernel.org, ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+X-Proofpoint-GUID: IQacsdKuxoAHBraaf122jx6QcKWt9S9_
+X-Proofpoint-ORIG-GUID: IQacsdKuxoAHBraaf122jx6QcKWt9S9_
+X-HPE-SCL: -1
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-05_02,2024-10-04_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 bulkscore=0
+ phishscore=0 malwarescore=0 lowpriorityscore=0 impostorscore=0
+ suspectscore=0 mlxscore=0 mlxlogscore=866 spamscore=0 priorityscore=1501
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411060020
 
-On Wed, Nov 6, 2024 at 9:11=E2=80=AFAM Willem de Bruijn
-<willemdebruijn.kernel@gmail.com> wrote:
->
-> Jason Xing wrote:
-> > On Wed, Nov 6, 2024 at 3:22=E2=80=AFAM Martin KaFai Lau <martin.lau@lin=
-ux.dev> wrote:
-> > >
-> > > On 11/4/24 10:22 PM, Jason Xing wrote:
-> > > > On Tue, Nov 5, 2024 at 10:09=E2=80=AFAM Martin KaFai Lau <martin.la=
-u@linux.dev> wrote:
-> > > >>
-> > > >> On 11/1/24 6:32 AM, Willem de Bruijn wrote:
-> > > >>>> In udp/raw/..., I don't know how likely is the user space having=
- "cork->tx_flags
-> > > >>>> & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflag=
-s) &
-> > > >>>> SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" se=
-t.
-> > > >>> This is not something to rely on. OPT_ID was added relatively rec=
-ently.
-> > > >>> Older applications, or any that just use the most straightforward=
- API,
-> > > >>> will not set this.
-> > > >>
-> > > >> Good point that the OPT_ID per cmsg is very new.
-> > > >>
-> > > >> The datagram support on SOF_TIMESTAMPING_OPT_ID in sk->sk_tsflags =
-had
-> > > >> been there for quite some time now. Is it a safe assumption that
-> > > >> most applications doing udp tx timestamping should have
-> > > >> the SOF_TIMESTAMPING_OPT_ID set to be useful?
-> > > >>
-> > > >>>
-> > > >>>> If it is
-> > > >>>> unlikely, may be we can just disallow bpf prog from directly set=
-ting
-> > > >>>> skb_shinfo(skb)->tskey for this particular skb.
-> > > >>>>
-> > > >>>> For all other cases, in __ip[6]_append_data, directly call a bpf=
- prog and also
-> > > >>>> pass the kernel decided tskey to the bpf prog.
-> > > >>>>
-> > > >>>> The kernel passed tskey could be 0 (meaning the user space has n=
-ot used it). The
-> > > >>>> bpf prog can give one for the kernel to use. The bpf prog can st=
-ore the
-> > > >>>> sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add o=
-ne to the struct
-> > > >>>> sock. The bpf prog does not have to start from 0 (e.g. start fro=
-m U32_MAX
-> > > >>>> instead) if it helps.
-> > > >>>>
-> > > >>>> If the kernel passed tskey is not 0, the bpf prog can just use t=
-hat one
-> > > >>>> (assuming the user space is doing something sane, like the value=
- in
-> > > >>>> SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_M=
-AX). I hope this
-> > > >>>> is very unlikely also (?) but the bpf prog can probably detect t=
-his and choose
-> > > >>>> to ignore this sk.
-> > > >>> If an applications uses OPT_ID, it is unlikely that they will tog=
-gle
-> > > >>> the feature on and off on a per-packet basis. So in the common ca=
-se
-> > > >>> the program could use the user-set counter or use its own if user=
-space
-> > > >>> does not enable the feature. In the rare case that an application=
- does
-> > > >>> intermittently set an OPT_ID, the numbering would be erratic. Thi=
-s
-> > > >>> does mean that an actively malicious application could mess with =
-admin
-> > > >>> measurements.
-> > > >>
-> > > >> All make sense. Given it is reasonable to assume the user space sh=
-ould either
-> > > >> has SOF_TIMESTAMPING_OPT_ID always on or always off. When it is of=
-f, the bpf
-> > > >> prog can directly provide its own tskey to be used in shinfo->tske=
-y. The bpf
-> > > >> prog can generate the id itself without using the sk->sk_tskey, e.=
-g. store an
-> > > >> atomic int in the bpf_sk_storage.
-> > > >
-> > > > I wonder, how can we correlate the key with each skb in the bpf
-> > > > program for non-TCP type without implementing a bpf extension for
-> > > > SCM_TS_OPT_ID? Every time the timestamp is reported, we cannot know
-> > > > which sendmsg() the skb belongs to for non-TCP cases.
-> > >
-> > > SCM_TS_OPT_ID is eventually setting the shinfo->tskey.
-> > > If the shinfo->tskey is not set by the user space, the bpf prog can d=
-irectly set
-> > > the shinfo->tskey. There is no need to use the sk->sk_tskey as the ID=
- generator
-> > > also. The bpf prog can have its own id generator.
-> > >
-> > > If the user space has already set the shinfo->tskey (either by sk->sk=
-_tskey or
-> > > SCM_TS_OPT_ID), the bpf prog can just use the user space one.
-> > >
-> > > If there is a weird application that flips flops between OPT_ID on/of=
-f, the bpf
-> > > prog will get confused which is fine. The bpf prog can detect this an=
-d choose to
-> > > ignore measuring this sk/skb.
->
-> That will skew measurement and is under control of the process.
->
-> I don't immediately foresee this being used to measure untrusted
-> processes that would have an incentive to game this.
->
-> But the caveat should be stated explicitly.
->
-> > > The bpf prog can also choose to be on the very
-> > > safe side and ignore all skb with SKBTX_ANY_TSTAMP set in txflags but=
- with no
-> > > OPT_ID. The bpf prog can look into the details of the sk and skb to d=
-ecide what
-> > > makes the most sense for its deployment.
-> > >
-> > > I don't know whether it makes more sense to call the bpf prog to deci=
-de the
-> > > shinfo->{tx_flags,tskey} just before the "while (length > 0)" in
-> > > __ip[6]_append_data or it is better to call the bpf prog in ip[6]_set=
-up_cork.
-> > > I admittedly less familiar with this code path than the tcp one.
->
-> Probably the current spot, mainly because no skb exists yet in
-> ip_setup_cork.
->
-> > Now I feel it could be complicated for a software engineer to consider
-> > how they will handle the key if they don't read the kernel code very
-> > carefully. They are facing different situations. Being user-friendly
-> > lets this feature have more chances to get widely used. As I insisted
-> > before, I still would like to know if it is possible that we can try
-> > to introduce sk_tskey_bpf_offset (like patch 10-12) to calculate a bpf
-> > exclusive tskey for bpf use? Only exporting one key. It will be really
-> > simple and easy-to-use :)
->
-> That has complications of its own. It also has to deal with the user
-> enabling/disabling/resetting its key, and with OPT_ID passed by cmsg.
-> Multiple skbs may be in flight, derived from each of these sources.
-> A single sk flag can only offset against one of them.
->
-> I think Martin's approach is more workable. Use the tskey that is set,
-> if any. Else, set one.
+Thank you for your review and feedback, Ido.
 
-Got it. Thanks!
+>> Without this flag, when there are mutliple default routers, the kernel
+>> coalesces multiple default routes into an ECMP route. The ECMP route
+>> ignores per-route REACHABILITY information. If one of the default
+>> routers is unresponsive, with a Neighbor Cache entry of INCOMPLETE, then
+>> it can still be selected as the nexthop for outgoing packets. This
+>> results in an inability to communicate with remote hosts, even though
+>> one of the default routers remains REACHABLE. This violates RFC4861
+>> section 6.3.6, bullet 1.
+>
+>Do you have forwarding disabled (it causes RT6_LOOKUP_F_REACHABLE to be
+>set)?
+
+Yes, forwarding is disabled on our embedded system. Though, this needs to
+work on systems regardless of the state of forwarding.
+
+>  Is the problem that fib6_table_lookup() chooses a reachable
+>nexthop and then fib6_select_path() overrides it with an unreachable
+>one?
+
+I'm afraid I don't know.
+
+The objective is to allow IPv6 Netlink clients to be able to create default
+routes from RAs in the same way the kernel creates default routes from RAs.
+Essentially, I'm trying to have Netlink and Kernel behaviors match.
+
+My analysis led me to the need for Netlink clients to set the kernel's
+fib6_config flags RTF_RA_ROUTER, where:
+
+    #define RTF_RA_ROUTER		(RTF_ADDRCONF | RTF_DEFAULT)
+
+>> +	if (rtm->rtm_flags & RTM_F_RA_ROUTER)
+>> +		cfg->fc_flags |= RTF_RA_ROUTER;
+>> +
+> 
+> It is possible there are user space programs out there that set this bit
+> (knowingly or not) when sending requests to the kernel and this change
+> will result in a behavior change for them. So, if we were to continue in
+> this path, this would need to be converted to a new netlink attribute to
+> avoid such potential problems.
+> 
+
+Is this a mandated approach to implementing unspecified bits in a flag?
+
+I'm a little surprised by this consideration. If we account for poorly
+written buggy user-programs, doesn't this open any API to an explosion
+of new attributes or other odd extensions? I'd imagine the same argument
+would be applicable to ioctl flags, socket flags, and so on. Why would we
+treat implementing unspecified Netlink bits differently to implementing
+unspecified ioctl bits, etc.
+
+Naturally, if this is the mandated approach, then I'll reimplement it with
+a new Netlink attribute. I'm just trying to understand what is the
+Linux-lore, here?
+
+> BTW, you can avoid the coalescing problem by using the nexthop API (man
+> ip-nexthop).
+
+I'm not sure how that would help in this case. We need the nexthop to be
+determined according to its REACHABILITY and other considerations described
+in RFC4861.
+
+Kind regards,
+Matt.
 
