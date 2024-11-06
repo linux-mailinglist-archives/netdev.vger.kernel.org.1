@@ -1,193 +1,124 @@
-Return-Path: <netdev+bounces-142376-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F75B9BEA37
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:42:22 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 794C39BEB87
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 13:59:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 736FA1C240D6
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:42:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F16F284F73
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 12:59:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56F051F76C9;
-	Wed,  6 Nov 2024 12:37:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DC831F80DF;
+	Wed,  6 Nov 2024 12:45:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="FFeZj506"
+	dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b="EP02+HXi"
 X-Original-To: netdev@vger.kernel.org
-Received: from fout-b4-smtp.messagingengine.com (fout-b4-smtp.messagingengine.com [202.12.124.147])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC9C01F76B7;
-	Wed,  6 Nov 2024 12:37:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.147
+Received: from m16.mail.163.com (m16.mail.163.com [220.197.31.3])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEB9D1E04BA;
+	Wed,  6 Nov 2024 12:45:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=220.197.31.3
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730896665; cv=none; b=ta4Rq4TBhzMV0mXglgxBTsL+UKqoyAN0LUnWVzL4GxBl8QAlcI2kxrHBlrnqeSwgyyR/TIbYmxyYJADok7PRGuxEIgerihEbQ4baVzF19jLrspoJ4YKbZN1oEhu23qAyQgVRbEv8hjBJW2wugrhjyMS8omXvZvC9GI1V/5zCgoQ=
+	t=1730897140; cv=none; b=isyyCPI7N2IzcWHO5MciA3pmHYMcbq+0zg3rXzLC4EapNRzlBnQVXuQT4K7klfvcVkZue3l7oi8bS3JlP15XY1LvJXhnTnaOqm8/9XNPnp7fUWerHO0GzrFzfJVIb+rz6LdGvH33nmvWIOVq+VS3pplXw1kfkIczArfl5xKhEKc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730896665; c=relaxed/simple;
-	bh=PK6WGWIzzUxygDZyxgAl8NGzW2USJnn+khK0DoMIIho=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RoqiggxhkuBt4qJmebiAUQyEshrOtNJTpUauZoTHNZi01FjwOUQzIcmu0Y5mCZcMOGSaKIOy+QtVuSJuFdEfsiWEXZDK2L6axquiYyx0CDpxv+mVaLmoBrgMD8wfLfI60WPwKOFcnXfUxDeY2cK6Hns5g3nBA8ijmHIMEw1FRlI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org; spf=none smtp.mailfrom=idosch.org; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=FFeZj506; arc=none smtp.client-ip=202.12.124.147
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=idosch.org
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=idosch.org
-Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
-	by mailfout.stl.internal (Postfix) with ESMTP id 6B470114018D;
-	Wed,  6 Nov 2024 07:37:41 -0500 (EST)
-Received: from phl-mailfrontend-02 ([10.202.2.163])
-  by phl-compute-12.internal (MEProxy); Wed, 06 Nov 2024 07:37:41 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:subject:subject:to
-	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
-	1730896661; x=1730983061; bh=/jLOtRJkzelCEg/A2YxeNiDuCCzg/r1GPN8
-	Ngxasi5k=; b=FFeZj5063QyYvANJ4SJWcaaccy8A0bFk2OeCPZAtb39xWa5aOns
-	+cEa6SbJsOxnEPskn5onyWCbYpH5W7IVjtV66Uh02dq35Zc4Uwzwp+a6LaChdaNa
-	vjEq45pwoMreBFAU2kyLSt4vX0WWBxZ98mjqisGdnZGkETAAk4C0lQGNC6DhS4dQ
-	tByZ7oRPA+CVwzZwAB8oajs6SFQxYuXSUJVMe2X6ctCzrZPZ92Zwr0Qc2pwf5SYY
-	kPaEBW9a6u7dsBfqDee0IFgMGvYJ2tTc5NSR0Wru7AKp02/W+CMp+ww5xHeEk6Gd
-	WtT5sT/ky8hJgCEk9uIjDqinTLlqqeN+/PA==
-X-ME-Sender: <xms:FGMrZ4NFfZ6crfnV-B9ekqcuwkjQ8yrVSIlhRcpGRH5itQgw2y9JRA>
-    <xme:FGMrZ-9mhP4QXLq1v2NQt5KI2MqVNfIbdVmPuB03qMWw8Fs1tk88HfaEpcRFGfzCB
-    KonPhaJF_bGW6U>
-X-ME-Received: <xmr:FGMrZ_TljnC-Qc0vrGjE6VE5WDIW-QWDw2ixI0aQHpvU5DIlTR_Gs36tYqOedxhFVXEpDGBv4kCv5dsUtLut5R0wdMo>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrtddvgdegudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpggftfghnshhusghstghrihgsvgdpuffr
-    tefokffrpgfnqfghnecuuegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnth
-    hsucdlqddutddtmdenucfjughrpeffhffvvefukfhfgggtuggjsehttdertddttddvnecu
-    hfhrohhmpefkughoucfutghhihhmmhgvlhcuoehiughoshgthhesihguohhstghhrdhorh
-    hgqeenucggtffrrghtthgvrhhnpedvudefveekheeugeeftddvveefgfduieefudeifefg
-    leekheegleegjeejgeeghfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmh
-    grihhlfhhrohhmpehiughoshgthhesihguohhstghhrdhorhhgpdhnsggprhgtphhtthho
-    peduuddpmhhouggvpehsmhhtphhouhhtpdhrtghpthhtohepmhgrthhtrdhmuhhgghgvrh
-    hiughgvgeshhhpvgdrtghomhdprhgtphhtthhopegurghvvghmsegurghvvghmlhhofhht
-    rdhnvghtpdhrtghpthhtohepughsrghhvghrnheskhgvrhhnvghlrdhorhhgpdhrtghpth
-    htohepvgguuhhmrgiivghtsehgohhoghhlvgdrtghomhdprhgtphhtthhopehhohhrmhhs
-    sehkvghrnhgvlhdrohhrghdprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhgpd
-    hrtghpthhtoheplhhinhhugidqrghpihesvhhgvghrrdhkvghrnhgvlhdrohhrghdprhgt
-    phhtthhopehlihhnuhigqdhkvghrnhgvlhesvhhgvghrrdhkvghrnhgvlhdrohhrghdprh
-    gtphhtthhopehnvghtuggvvhesvhhgvghrrdhkvghrnhgvlhdrohhrgh
-X-ME-Proxy: <xmx:FGMrZwuNRCmqAIpboIuYM4JVhlJRXvM4DPmvtZcQeDjorxdF-ZT9RQ>
-    <xmx:FGMrZwe0T_WEWhy6cmI1Btx4gLkFG5pU7E29HW0dQJfJ9TpRfXs9lQ>
-    <xmx:FGMrZ02NCJhF4HGMFPPIbKN3sQcQzQW263kKfXeUoadTa--BxnVxqw>
-    <xmx:FGMrZ0_pMOapVd5zf7lFE_QlIN6UmH_1-Ztbqy-a7gRdWpeLa1ilzw>
-    <xmx:FWMrZxVWN6yUr9Fvec4ds_qFDMWUZ40di6V-w1thbEHbzxS8kXh8TcyX>
-Feedback-ID: i494840e7:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Wed,
- 6 Nov 2024 07:37:39 -0500 (EST)
-Date: Wed, 6 Nov 2024 14:37:36 +0200
-From: Ido Schimmel <idosch@idosch.org>
-To: Matt Muggeridge <Matt.Muggeridge@hpe.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
-	horms@kernel.org, kuba@kernel.org, linux-api@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	pabeni@redhat.com, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/1] net/ipv6: Netlink flag for new IPv6 Default
- Routes
-Message-ID: <ZytjEINNRmtpadr_@shredder>
-References: <Zypgu5l7F1FpIpqo@shredder>
- <20241106025056.11241-1-Matt.Muggeridge@hpe.com>
+	s=arc-20240116; t=1730897140; c=relaxed/simple;
+	bh=s/HE862Ebjc4x9QSbLryT2tjzrtXi+x51IAifw3w0tQ=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=jGDPWqtiie2Wqb4bkDNxc1d9ejoySlBKNxCkxbGD8BtzGfxT4U+iFQYZm91zSFrNkLRfvwkvKNjKOHAjz+Lh++x0npdb9ps9ufv5TklSFmIMQEIFgZssBsUWUfrGeEmTO8+ywEEWmRfr+NMgIELWrphOnIsBJyDHSNHTs1KHtHQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com; spf=pass smtp.mailfrom=163.com; dkim=pass (1024-bit key) header.d=163.com header.i=@163.com header.b=EP02+HXi; arc=none smtp.client-ip=220.197.31.3
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=163.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=163.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=163.com;
+	s=s110527; h=From:Subject:Date:Message-ID:MIME-Version; bh=0mQMe
+	EqbIH1W/gwL+X7sQKXQSByBBidMVZJPmvHc5LI=; b=EP02+HXiPtv6PJ2JJf9iM
+	dhwANGW36VX8J1WcfU9LF9WabLtDLWh3MSiZX9u7GN3p6gDlB20rv6PH1D5Ha6GI
+	CV8k6CwnROQ6AS2SWK7nOugyhW2K7GmV8TtZG6psrG95wXTFldAHc2zaRXzMzKwn
+	WudKqkRAxVow3sgrejbhhE=
+Received: from localhost.localdomain (unknown [47.252.33.72])
+	by gzga-smtp-mtada-g1-0 (Coremail) with SMTP id _____wD3P43DZCtnPigDBA--.6575S2;
+	Wed, 06 Nov 2024 20:44:56 +0800 (CST)
+From: mrpre <mrpre@163.com>
+To: edumazet@google.com,
+	jakub@cloudflare.com,
+	davem@davemloft.net,
+	dsahern@kernel.org,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.orgc,
+	linux-kernel@vger.kernel.org
+Cc: mrpre <mrpre@163.com>,
+	Vincent Whitchurch <vincent.whitchurch@datadoghq.com>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: [PATCH bpf] bpf: fix recursive lock when verdict program return SK_PASS
+Date: Wed,  6 Nov 2024 20:44:31 +0800
+Message-ID: <20241106124431.5583-1-mrpre@163.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106025056.11241-1-Matt.Muggeridge@hpe.com>
+Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:_____wD3P43DZCtnPigDBA--.6575S2
+X-Coremail-Antispam: 1Uf129KBjvJXoW7KrWkAr1DXF4Duw48JF4fKrg_yoW8Aw1Dpa
+	4ku3y5GF9rZr18Z3s3KF97Xr1jgw1vgay2gr1ruw1fZrn0gry5urZ5KFy2vF4YvrsrKF98
+	Zr4jqFsrtw17XaUanT9S1TB71UUUUU7qnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDUYxBIdaVFxhVjvjDU0xZFpf9x0piX_-PUUUUU=
+X-CM-SenderInfo: xpus2vi6rwjhhfrp/1tbiWw2Pp2crYkExlAAAs0
 
-On Tue, Nov 05, 2024 at 09:50:56PM -0500, Matt Muggeridge wrote:
-> Thank you for your review and feedback, Ido.
-> 
-> >> Without this flag, when there are mutliple default routers, the kernel
-> >> coalesces multiple default routes into an ECMP route. The ECMP route
-> >> ignores per-route REACHABILITY information. If one of the default
-> >> routers is unresponsive, with a Neighbor Cache entry of INCOMPLETE, then
-> >> it can still be selected as the nexthop for outgoing packets. This
-> >> results in an inability to communicate with remote hosts, even though
-> >> one of the default routers remains REACHABLE. This violates RFC4861
-> >> section 6.3.6, bullet 1.
-> >
-> >Do you have forwarding disabled (it causes RT6_LOOKUP_F_REACHABLE to be
-> >set)?
-> 
-> Yes, forwarding is disabled on our embedded system. Though, this needs to
-> work on systems regardless of the state of forwarding.
-> 
-> >  Is the problem that fib6_table_lookup() chooses a reachable
-> >nexthop and then fib6_select_path() overrides it with an unreachable
-> >one?
-> 
-> I'm afraid I don't know.
+When the stream_verdict program returns SK_PASS, it places the received skb
+into its own receive queue, but a recursive lock eventually occurs, leading
+to an operating system deadlock. This issue has been present since v6.9.
 
-We need to understand the current behavior before adding a new interface
-that we will never be able to remove. It is possible we can improve /
-fix the current code. I won't have time to look into it myself until
-next week.
+'''
+sk_psock_strp_data_ready
+    write_lock_bh(&sk->sk_callback_lock)
+    strp_data_ready
+      strp_read_sock
+        read_sock -> tcp_read_sock
+          strp_recv
+            cb.rcv_msg -> sk_psock_strp_read
+              # now stream_verdict return SK_PASS without peer sock assign
+              __SK_PASS = sk_psock_map_verd(SK_PASS, NULL)
+              sk_psock_verdict_apply
+                sk_psock_skb_ingress_self
+                  sk_psock_skb_ingress_enqueue
+                    sk_psock_data_ready
+                      read_lock_bh(&sk->sk_callback_lock) <= dead lock
 
-> 
-> The objective is to allow IPv6 Netlink clients to be able to create default
-> routes from RAs in the same way the kernel creates default routes from RAs.
-> Essentially, I'm trying to have Netlink and Kernel behaviors match.
+'''
 
-I understand, but it's essentially an extension for the legacy IPv6
-multipath API which we are trying to move away from towards the nexthop
-API (see more below).
+This topic has been discussed before, but it has not been fixed.
+Previous discussion:
+https://lore.kernel.org/all/6684a5864ec86_403d20898@john.notmuch
 
-> 
-> My analysis led me to the need for Netlink clients to set the kernel's
-> fib6_config flags RTF_RA_ROUTER, where:
-> 
->     #define RTF_RA_ROUTER		(RTF_ADDRCONF | RTF_DEFAULT)
-> 
-> >> +	if (rtm->rtm_flags & RTM_F_RA_ROUTER)
-> >> +		cfg->fc_flags |= RTF_RA_ROUTER;
-> >> +
-> > 
-> > It is possible there are user space programs out there that set this bit
-> > (knowingly or not) when sending requests to the kernel and this change
-> > will result in a behavior change for them. So, if we were to continue in
-> > this path, this would need to be converted to a new netlink attribute to
-> > avoid such potential problems.
-> > 
-> 
-> Is this a mandated approach to implementing unspecified bits in a flag?
-> 
-> I'm a little surprised by this consideration. If we account for poorly
-> written buggy user-programs, doesn't this open any API to an explosion
-> of new attributes or other odd extensions? I'd imagine the same argument
-> would be applicable to ioctl flags, socket flags, and so on. Why would we
-> treat implementing unspecified Netlink bits differently to implementing
-> unspecified ioctl bits, etc.
-> 
-> Naturally, if this is the mandated approach, then I'll reimplement it with
-> a new Netlink attribute. I'm just trying to understand what is the
-> Linux-lore, here?
+Fixes: 6648e613226e ("bpf, skmsg: Fix NULL pointer dereference in sk_psock_skb_ingress_enqueue")
+Reported-by: Vincent Whitchurch <vincent.whitchurch@datadoghq.com>
+Signed-off-by: Jiayuan Chen <mrpre@163.com>
+Signed-off-by: John Fastabend <john.fastabend@gmail.com>
+---
+ net/core/skmsg.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Using this bit could have been valid if previously the kernel rejected
-requests with this bit set, but as evident by your patch the kernel does
-not do it. It is therefore possible that there are user space programs
-out there that are working perfectly fine right now and they will break
-/ misbehave after this change.
+diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+index b1dcbd3be89e..e90fbab703b2 100644
+--- a/net/core/skmsg.c
++++ b/net/core/skmsg.c
+@@ -1117,9 +1117,9 @@ static void sk_psock_strp_data_ready(struct sock *sk)
+ 		if (tls_sw_has_ctx_rx(sk)) {
+ 			psock->saved_data_ready(sk);
+ 		} else {
+-			write_lock_bh(&sk->sk_callback_lock);
++			read_lock_bh(&sk->sk_callback_lock);
+ 			strp_data_ready(&psock->strp);
+-			write_unlock_bh(&sk->sk_callback_lock);
++			read_unlock_bh(&sk->sk_callback_lock);
+ 		}
+ 	}
+ 	rcu_read_unlock();
+-- 
+2.43.5
 
-> 
-> > BTW, you can avoid the coalescing problem by using the nexthop API (man
-> > ip-nexthop).
-> 
-> I'm not sure how that would help in this case. We need the nexthop to be
-> determined according to its REACHABILITY and other considerations described
-> in RFC4861.
-
-Using your example:
-
-# ip nexthop add id 1 via fe80::200:10ff:fe10:1060 dev enp0s9
-# ip -6 route add default nhid 1 expires 600 proto ra
-# ip nexthop add id 2 via fe80::200:10ff:fe10:1061 dev enp0s9
-# ip -6 route append default nhid 2 expires 600 proto ra
-# ip -6 route
-fe80::/64 dev enp0s9 proto kernel metric 256 pref medium
-default nhid 1 via fe80::200:10ff:fe10:1060 dev enp0s9 proto ra metric 1024 expires 563sec pref medium
-default nhid 2 via fe80::200:10ff:fe10:1061 dev enp0s9 proto ra metric 1024 expires 594sec pref medium
 
