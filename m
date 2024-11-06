@@ -1,180 +1,241 @@
-Return-Path: <netdev+bounces-142454-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142455-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC1679BF3BD
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:55:15 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 676EE9BF3C0
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 17:55:56 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 386FBB23A74
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:55:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C0EC6B24046
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 16:55:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4BA5205E33;
-	Wed,  6 Nov 2024 16:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E635202640;
+	Wed,  6 Nov 2024 16:55:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="UNiBcHaq"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mfxZSn5i"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f51.google.com (mail-ej1-f51.google.com [209.85.218.51])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F39C84039
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 16:55:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77120204090
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 16:55:48 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730912102; cv=none; b=BHZYEnKZo6eGyJnLcQNuesPCkMpQ4bAbE025brIvg4+kDUp48s19Eyfa9lizeWQmROiXb0LsRYxa5p+Da01ccpnpn5BAr0majUFGBy4/knk8B33qgQbM4MGxAIjA9d40M1z4r2vNDtNz3WLbCw1AQV20kIgU2xVqSgGVNHu4E/w=
+	t=1730912150; cv=none; b=L501GmAHbnX4bpB1DM/Fd3L3lrkyMo1hiLuQzsolluZwO4meThuP3zvmMc0He3z44ohEFQsqTnnM1UWdQNu5lvqLsuDM1o2iE0lJwXDbezvYuhmFEaSRuuYTVVQLGMClUUDc/81XHc5YuDka/KC9wqC0HPNc6Y84ikwf8FUkBMc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730912102; c=relaxed/simple;
-	bh=++sxqV8Hz7TIg5CBIU3j35dxqS6QtS/JGqFQ2zsBG4w=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Mgn/xLv9XqwK+IiMMvyaXy8TR2r9JLfBr9fS5UsTbWVdRzVjaymLJLXexVi6QXtOIdmDWfOH9H5Esdk+r+iAerdDLtE5ZzNrAJf2e8ssqQEc02DO/FlWXoQex2womnaisB3+US5cZxZXZXG7KTp05YWC9pSPIYg2LlOgQLjHcvc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=UNiBcHaq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730912099;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=++sxqV8Hz7TIg5CBIU3j35dxqS6QtS/JGqFQ2zsBG4w=;
-	b=UNiBcHaqI+tDd4PmswS+ZvVXS2E8VbMFRXWYfS7DwZwJhItU0erLxeSp/iCiP3tNv8d6vu
-	Gx73a88My/KVH16Dx+hTU2VR3SFdlIs/v/Z4UZoRm1TZcIOiUTtUqtkXUH3WwUK5zx1/eV
-	NldCGpXjMZndYFt8aAEt0jEyp9A+sKY=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-118-v2LdhSXhOliU9qGHKxhHEQ-1; Wed, 06 Nov 2024 11:54:56 -0500
-X-MC-Unique: v2LdhSXhOliU9qGHKxhHEQ-1
-X-Mimecast-MFC-AGG-ID: v2LdhSXhOliU9qGHKxhHEQ
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2e5efb04da7so23003a91.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 08:54:56 -0800 (PST)
+	s=arc-20240116; t=1730912150; c=relaxed/simple;
+	bh=VPuEbgUuhm8Dtus7nZ5DTee8YK/6sZPuUDgMPMLQ3v0=;
+	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
+	 In-Reply-To:Content-Type; b=ZsQgQBe0Tr2EKGnUWff/nc8pKJBFI4Ex+rCWwKo8/mUtBEHT3ye2WlDIAm6aBi63W1LieISticRSSsexUJj6WwaC5AJwSavwWkvdZuANnfdEdmfqwr3IKGL1dgwiSNRIVKWtLvEzIh4W2ifwb+MXeHDbwkBDFWdjHP3puXv+ZQI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mfxZSn5i; arc=none smtp.client-ip=209.85.218.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f51.google.com with SMTP id a640c23a62f3a-a9ec86a67feso161238366b.1
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 08:55:48 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730912147; x=1731516947; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=SX+86z+Vfim8K/Jc1QS1oCuQE8Zm7X8/3uPP2PLlH0I=;
+        b=mfxZSn5iIVXfnjQ4yWDBsguRo2MdhPHglLLnk2wsAASglE8x7lMexyzN2PcPkvjqlu
+         AypETIvytTvuB0EYHNEJ6r5ArN5DWyIa9bU3qhzGj0JahoVY8zX9YUb9y1KUDEnBW2CZ
+         Q65cWgpGqnBeFB39fGC1HavTvCAl0lFOCnB/a3giVBMmdaBddS+L9jipYMQL5Pem4S33
+         3cW0O4g3WkYdIpMruoyssU/YyeBUPhy10vHks4uNwdl/QSldf5D5LngUnm9IH8jpS0zZ
+         PoAoFYdBe4ImHWOZAL9Bv18fJ6SBJKuLPG+5apKJX3MYrj0RG8TWvOL5YXRVlwln0J+J
+         5G7A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730912095; x=1731516895;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=++sxqV8Hz7TIg5CBIU3j35dxqS6QtS/JGqFQ2zsBG4w=;
-        b=YYdVLLwM4ZztLDjzwLGYvGjgm7c4p+rEBcEdo6Se+UnThGmLoyDH5JZyQ7V/FBvDgC
-         8J0As8df1KVBZquaCD+KC24Qr2yCNvOwH0j0/hCSwoCvIbzsMx150w6rOQSSM4WmGNV5
-         Fdj1gNjfIIt5q4M5XwmjeJWM9WA0haKn0K9GqzTNkBv1MEQa93XnT7OeQFEJrIgQcj1l
-         yEYJ08IoxkReRekxB6xF16rHSrNycPknRrg1L1zNNb8aL2IBK06TdW1eNtHyg72U7SDS
-         +sXkvifFZb/hybvMpKsE1+yb7+Pz4gyCWWZ1E5msils42otwI4U6hMYtxaK2TroYovj+
-         rMvg==
-X-Forwarded-Encrypted: i=1; AJvYcCVH1Z23E4RsqdSgnZipHrZjROr2s/fhHKpUjXSadVrgbRXK+ZDOl0GLm4ztGVgBJaKq/eR80Ak=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyv0OAdjv4fuH0cl5FvFPRy8ylWmze1ANqMDleSwq9ABvQb2J6x
-	t+43jh02Jibyv3aWLMxNyE599j1QVzLz+Sb9yvOFLVixk9x9a90yhZ8C9PdLxc2ybEcGPHyDl+W
-	yp96FOPJAYkmR+9ltvrfQhGaQW3OG74NKyokOvyUT8Tgd51vnCg3hVoaZAI1mmjfw5ipGpcP4MV
-	PaGSnRvC5tPMfMQLWW0VkKHkuJ1f1+
-X-Received: by 2002:a17:90a:d512:b0:2e0:8740:26d0 with SMTP id 98e67ed59e1d1-2e8f10580fcmr44145134a91.2.1730912095540;
-        Wed, 06 Nov 2024 08:54:55 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF/PAUsvw3T1cUDVzWsCFK0V8Wtzi4keS70YjhIVKI+WcftadE10roLRnwLb+Em7aqCvQXsxMh8oFs/OG2nVGs=
-X-Received: by 2002:a17:90a:d512:b0:2e0:8740:26d0 with SMTP id
- 98e67ed59e1d1-2e8f10580fcmr44145107a91.2.1730912095236; Wed, 06 Nov 2024
- 08:54:55 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730912147; x=1731516947;
+        h=content-transfer-encoding:in-reply-to:autocrypt:content-language
+         :references:cc:to:from:subject:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=SX+86z+Vfim8K/Jc1QS1oCuQE8Zm7X8/3uPP2PLlH0I=;
+        b=MvO8RJOiqXeXVSPCtETDhW3bjg+V66dhcW34nCb7XM8O8mOtXsPXv4B6CLMmfj1JL9
+         mvw7Ej3qEsuJ2VcJoDA8mtpDqO5QNWq8upD/MUK7f51u/45naiu5jUfSiJ9vuQ+d+kCy
+         GGwXGj1GSr1hpdmBWtEWeAooWbLG9Fx/rOARY7oBlzxn9M7H98CrS9kqBPmJvgW7Ffh+
+         ixnfRyzbKT0Omxq9Gg7PcIjDZUOvVe6KUMvgr/8iHXH9tnz3ex9cc65VwECEauhveOoe
+         HWdeaAuIbV03pGCZ+1E6vyfCxWcZpWPKWZOTjeKRkZN3l91Qqfe5FEkRQ8zDWXe+6TiC
+         ImQw==
+X-Gm-Message-State: AOJu0YxlmBoGR+nKFb/6NHom2z6pyqCglb39ohkVOBAd7EOXxb7TJ4hG
+	RC0NezZBGoYa+m53QEWhrxhsJOgWcoPN/A7IbyVDg3HwIVpJUybQ
+X-Google-Smtp-Source: AGHT+IEsQg9gGnzwIthQ0hn+A8tZsI0gAOrlTZbLdZTUx35oUEeVRZ8Yo8M+iecCDCZYuF8PR2McMQ==
+X-Received: by 2002:a17:907:60d6:b0:a99:fb10:1269 with SMTP id a640c23a62f3a-a9de5ce4ad3mr4257978666b.17.1730912146446;
+        Wed, 06 Nov 2024 08:55:46 -0800 (PST)
+Received: from ?IPV6:2a02:3100:a488:4700:cc12:ac39:a3b8:6ff6? (dynamic-2a02-3100-a488-4700-cc12-ac39-a3b8-6ff6.310.pool.telefonica.de. [2a02:3100:a488:4700:cc12:ac39:a3b8:6ff6])
+        by smtp.googlemail.com with ESMTPSA id a640c23a62f3a-a9eb16a2f86sm302718366b.5.2024.11.06.08.55.45
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 06 Nov 2024 08:55:46 -0800 (PST)
+Message-ID: <697b197a-8eac-40c6-8847-27093cacec36@gmail.com>
+Date: Wed, 6 Nov 2024 17:55:45 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241106155509.1706965-1-omosnace@redhat.com> <CANn89iKag19EPvnQRthsG98pfjriRwtS+YND0359xFijGAoEYg@mail.gmail.com>
-In-Reply-To: <CANn89iKag19EPvnQRthsG98pfjriRwtS+YND0359xFijGAoEYg@mail.gmail.com>
-From: Ondrej Mosnacek <omosnace@redhat.com>
-Date: Wed, 6 Nov 2024 17:54:43 +0100
-Message-ID: <CAFqZXNumyhpRvrZ6mAK9OVxbte=_3MG195i_+Z1j79PsE=6k_g@mail.gmail.com>
-Subject: Re: [PATCH] selinux,xfrm: fix dangling refcount on deferred skb free
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paul Moore <paul@paul-moore.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, selinux@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: [PATCH net-next 1/3] r8169: improve __rtl8169_set_wol
+From: Heiner Kallweit <hkallweit1@gmail.com>
+To: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>,
+ Jakub Kicinski <kuba@kernel.org>, David Miller <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+References: <be734d10-37f7-4830-b7c2-367c0a656c08@gmail.com>
+Content-Language: en-US
+Autocrypt: addr=hkallweit1@gmail.com; keydata=
+ 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
+In-Reply-To: <be734d10-37f7-4830-b7c2-367c0a656c08@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Wed, Nov 6, 2024 at 5:13=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Wed, Nov 6, 2024 at 4:55=E2=80=AFPM Ondrej Mosnacek <omosnace@redhat.c=
-om> wrote:
-> >
-> > SELinux tracks the number of allocated xfrm_state/xfrm_policy objects
-> > (via the selinux_xfrm_refcount variable) as an input in deciding if pee=
-r
-> > labeling should be used.
-> >
-> > However, as a result of commits f35f821935d8 ("tcp: defer skb freeing
-> > after socket lock is released") and 68822bdf76f1 ("net: generalize skb
-> > freeing deferral to per-cpu lists"), freeing of a sk_buff object, which
-> > may hold a reference to an xfrm_state object, can be deferred for
-> > processing on another CPU core, so even after xfrm_state is deleted fro=
-m
-> > the configuration by userspace, the refcount isn't decremented until th=
-e
-> > deferred freeing of relevant sk_buffs happens. On a system with many
-> > cores this can take a very long time (even minutes or more if the syste=
-m
-> > is not very active), leading to peer labeling being enabled for much
-> > longer than expected.
-> >
-> > Fix this by moving the selinux_xfrm_refcount decrementing to just after
-> > the actual deletion of the xfrm objects rather than waiting for the
-> > freeing to happen. For xfrm_policy it currently doesn't seem to be
-> > necessary, but let's do the same there for consistency and
-> > future-proofing.
-> >
-> > We hit this issue on a specific aarch64 256-core system, where the
-> > sequence of unix_socket/test and inet_socket/tcp/test from
-> > selinux-testsuite [1] would quite reliably trigger this scenario, and a
-> > subsequent sctp/test run would then stumble because the policy for that
-> > test misses some rules that would make it work under peer labeling
-> > enabled (namely it was getting the netif::egress permission denied in
-> > some of the test cases).
-> >
-> > [1] https://github.com/SELinuxProject/selinux-testsuite/
-> >
-> > Fixes: f35f821935d8 ("tcp: defer skb freeing after socket lock is relea=
-sed")
-> > Fixes: 68822bdf76f1 ("net: generalize skb freeing deferral to per-cpu l=
-ists")
-> > Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
-> > ---
->
-> Can we explain why TCP packets sitting in TCP receive queues would
-> need to keep xfrm_state around ?
->
-> With thousands of TCP sockets. I would imagine that a similar issue
-> would be hit,
-> regardless of f35f821935d8 ("tcp: defer skb freeing after socket lock
-> is released") and 68822bdf76f1 ("net: generalize skb freeing deferral
-> to per-cpu lists")
->
-> We remove the dst from these incoming packets (see skb_dst_drop() in
-> tcp_data_queue() and tcp_add_backlog()),
-> I do not see how XFRM state could be kept ?
+Add helper r8169_mod_reg8_cond() what allows to significantly simplify
+__rtl8169_set_wol().
 
-The problem is not with the xfrm_state reference via dst_entry, but
-the one in skb_ext (skb->extensions) -> sec_path
-(skb_ext_get_ptr(skb->extensions, SKB_EXT_SEC_PATH)) -> the xvec
-array. But you have a point that I should say that in the commit
-message...
+Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+---
+ drivers/net/ethernet/realtek/r8169_main.c | 55 ++++++++++-------------
+ 1 file changed, 24 insertions(+), 31 deletions(-)
 
-And I think you're right that even without those commits a delay in
-processing the RCU free callbacks could cause a similar issue, it just
-wouldn't be as easy to trigger. That made me look deeper into history
-which commit actually added the decrement on free and it turns out it
-was done intentionally as a bugfix - see commit e4e8536f65b5
-("selinux: fix the labeled xfrm/IPsec reference count handling").
-Before that commit the logic was similar to what my patch is doing, so
-I could be re-introducing another bug here :-/ The commit message is
-not very helpful there - Paul, do you happen to remember what the
-issue was that prompted it? I guess there can be some alloc's that
-won't have a matching delete in the right circumstances? Or something
-involving the selinux_xfrm_policy_clone() case?
+diff --git a/drivers/net/ethernet/realtek/r8169_main.c b/drivers/net/ethernet/realtek/r8169_main.c
+index c7dc8b539..2ff95fde4 100644
+--- a/drivers/net/ethernet/realtek/r8169_main.c
++++ b/drivers/net/ethernet/realtek/r8169_main.c
+@@ -748,6 +748,20 @@ static void rtl_mod_config5(struct rtl8169_private *tp, u8 clear, u8 set)
+ 	RTL_W8(tp, Config5, (val & ~clear) | set);
+ }
+ 
++static void r8169_mod_reg8_cond(struct rtl8169_private *tp, int reg,
++				u8 bits, bool cond)
++{
++	u8 val, old_val;
++
++	old_val = RTL_R8(tp, reg);
++	if (cond)
++		val = old_val | bits;
++	else
++		val = old_val & ~bits;
++	if (val != old_val)
++		RTL_W8(tp, reg, val);
++}
++
+ static bool rtl_is_8125(struct rtl8169_private *tp)
+ {
+ 	return tp->mac_version >= RTL_GIGA_MAC_VER_61;
+@@ -1538,58 +1552,37 @@ static void rtl8169_get_wol(struct net_device *dev, struct ethtool_wolinfo *wol)
+ 
+ static void __rtl8169_set_wol(struct rtl8169_private *tp, u32 wolopts)
+ {
+-	static const struct {
+-		u32 opt;
+-		u16 reg;
+-		u8  mask;
+-	} cfg[] = {
+-		{ WAKE_PHY,   Config3, LinkUp },
+-		{ WAKE_UCAST, Config5, UWF },
+-		{ WAKE_BCAST, Config5, BWF },
+-		{ WAKE_MCAST, Config5, MWF },
+-		{ WAKE_ANY,   Config5, LanWake },
+-		{ WAKE_MAGIC, Config3, MagicPacket }
+-	};
+-	unsigned int i, tmp = ARRAY_SIZE(cfg);
+-	u8 options;
+-
+ 	rtl_unlock_config_regs(tp);
+ 
+ 	if (rtl_is_8168evl_up(tp)) {
+-		tmp--;
+ 		if (wolopts & WAKE_MAGIC)
+ 			rtl_eri_set_bits(tp, 0x0dc, MagicPacket_v2);
+ 		else
+ 			rtl_eri_clear_bits(tp, 0x0dc, MagicPacket_v2);
+ 	} else if (rtl_is_8125(tp)) {
+-		tmp--;
+ 		if (wolopts & WAKE_MAGIC)
+ 			r8168_mac_ocp_modify(tp, 0xc0b6, 0, BIT(0));
+ 		else
+ 			r8168_mac_ocp_modify(tp, 0xc0b6, BIT(0), 0);
++	} else {
++		r8169_mod_reg8_cond(tp, Config3, MagicPacket,
++				    wolopts & WAKE_MAGIC);
+ 	}
+ 
+-	for (i = 0; i < tmp; i++) {
+-		options = RTL_R8(tp, cfg[i].reg) & ~cfg[i].mask;
+-		if (wolopts & cfg[i].opt)
+-			options |= cfg[i].mask;
+-		RTL_W8(tp, cfg[i].reg, options);
+-	}
++	r8169_mod_reg8_cond(tp, Config3, LinkUp, wolopts & WAKE_PHY);
++	r8169_mod_reg8_cond(tp, Config5, UWF, wolopts & WAKE_UCAST);
++	r8169_mod_reg8_cond(tp, Config5, BWF, wolopts & WAKE_BCAST);
++	r8169_mod_reg8_cond(tp, Config5, MWF, wolopts & WAKE_MCAST);
++	r8169_mod_reg8_cond(tp, Config5, LanWake, wolopts);
+ 
+ 	switch (tp->mac_version) {
+ 	case RTL_GIGA_MAC_VER_02 ... RTL_GIGA_MAC_VER_06:
+-		options = RTL_R8(tp, Config1) & ~PMEnable;
+-		if (wolopts)
+-			options |= PMEnable;
+-		RTL_W8(tp, Config1, options);
++		r8169_mod_reg8_cond(tp, Config1, PMEnable, wolopts);
+ 		break;
+ 	case RTL_GIGA_MAC_VER_34:
+ 	case RTL_GIGA_MAC_VER_37:
+ 	case RTL_GIGA_MAC_VER_39 ... RTL_GIGA_MAC_VER_66:
+-		if (wolopts)
+-			rtl_mod_config2(tp, 0, PME_SIGNAL);
+-		else
+-			rtl_mod_config2(tp, PME_SIGNAL, 0);
++		r8169_mod_reg8_cond(tp, Config2, PME_SIGNAL, wolopts);
+ 		break;
+ 	default:
+ 		break;
+-- 
+2.47.0
 
---=20
-Ondrej Mosnacek
-Senior Software Engineer, Linux Security - SELinux kernel
-Red Hat, Inc.
 
 
