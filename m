@@ -1,182 +1,100 @@
-Return-Path: <netdev+bounces-142155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5245E9BDA97
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:51:05 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CD249BDA98
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 01:52:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4EDE2840A0
-	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:51:03 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C865CB21BA7
+	for <lists+netdev@lfdr.de>; Wed,  6 Nov 2024 00:52:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BDAB57DA6A;
-	Wed,  6 Nov 2024 00:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F7F37DA9E;
+	Wed,  6 Nov 2024 00:52:52 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BdcSyGT7"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="r2YVcky3"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F181E43156
-	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 00:50:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD0EF2D613
+	for <netdev@vger.kernel.org>; Wed,  6 Nov 2024 00:52:50 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730854260; cv=none; b=hSswgrjmjM7BM4fRhCEXX6Z98DT8r4GysHfXW/t7kzUDFdHb4N2l8DZ6cWsodmghcYR/Fmj1R3xARyPR7/H4sxbd+TlMS0XSNhrf4TPrdnIZVUCm8DgU79YGX0n6Sv3oTmAnPLvg+BWdWLJIiDCzmVuAVxBkUus5toGFgx84WNg=
+	t=1730854372; cv=none; b=HuxZm/IHnamNoXMO4HAy3kZqw7m/BB9mWYkdUJLbxyU5UV+pK+jciYzA7AXEaMVHEIriGP0ds1aS2g87OCweZ7ZCkrfNopFDxp46OfVQh44B0ZeArFDhpO+tQQueQ8WSuMRiiu4CDAaYTmkHJG/+ZBBPj9POMaVQdBQQPHAdZl0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730854260; c=relaxed/simple;
-	bh=0s+CpSd1QrcdForydThmIdSTS/HLs/rCxJQl3ocmCWk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CVHHL6PQ/39FtkRBfBnJtpB5F8I6fK5zwZH80Qb+sdByTo6MWAm6LA7sxZCPk5Ijwm+uADgyIoAVR0cVByabw60OpDcpDJMT4jufzoq9/jAU/gZIfMNwX2WFTKE5i1R9m+2uA+EdA+FRc3ry5ENQxadPTkYCttJbQY2DrRr4lCs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BdcSyGT7; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c9693dc739so8128892a12.3
-        for <netdev@vger.kernel.org>; Tue, 05 Nov 2024 16:50:58 -0800 (PST)
+	s=arc-20240116; t=1730854372; c=relaxed/simple;
+	bh=+hTqxh2N7jZIcUQDjNbz/IAIJoQ1yIOH5tgA4NYW26w=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=nV+XHaXVNAuplv9IUbpzbDjSFcyLZB+mI0p2ewG5RlZuAjyJKd6enMQRbUl2vOfxx0CdWAIrcxydbAQEnrypdYxQuC/u9/qLa6oRimmXp0ZDSMC8jn5qCKshGmBUrKdOk7xlq4veFjdzgsYGzJHPde+qRGfa6HKA8rJOtwxkStI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=r2YVcky3; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730854257; x=1731459057; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=CTtoN8n/S+LNYT4i/oQ8XnBIyeDVEsR0uOP1WCwx/8k=;
-        b=BdcSyGT7aqQoZnz/txyYvfHBR6Qn8q5GrOSOKnxztwFpbB6xTNhS6bMu0CGlfVaDPG
-         2Sf/PpLBd1yMtH8qfnltFFJtI0h+1HUiG1YxUvRpgno8I/Z+fT2kD+JF8uIWh7QBSfkC
-         OAYO2WAmkc5dZB3wYk7cLRn2/MDQ+tQhpSU1uev8h9FaLCMtv7Sx8m34CAYmeD72rqiD
-         BWDB0+ms0fn2IUEMQVKlD3W2RI1TQFrrPcwZjjqrviGayeDtC6GAiA9uierVVSbiMsXr
-         JPLIDCrHjuyUNGPMiQqT5FHeqsMCY7cOn3DuT0d/qnCA4QJTsVpmLfL39jUYT0S5URv4
-         UclQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730854257; x=1731459057;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=CTtoN8n/S+LNYT4i/oQ8XnBIyeDVEsR0uOP1WCwx/8k=;
-        b=R/yrWTtEedQ3T4Jgmh/i67mcKVUenlIHyxN3jbNKKdYpUFp4LIroGVuBzjEnILZdVS
-         jKWCBfA/jIDHXl7daX3p9B4dkDLgvFSndATxM8rl2Q4JML2bNSSs1MJDBHjip3dp7mC2
-         bhWdlDPp/6d1W7oS2EOr0AqMlrNE3b34SFIEK6K/AchTqceNHtF4Ne5Y9QxYRoFyLtP8
-         guZE1+OUtgzoNCCgDrvINleg8g0tfl1O77fQLa4VkCHABmqxtm0ucxcgAmmsI94UpSsg
-         l5CduxwqEb8pcfkbP6Josp+URVVYCVnCqsiC/w+SIcIFS/7AtiSU5YRuSugMSvglVytB
-         kQWA==
-X-Gm-Message-State: AOJu0YyvE+Y9ayVjGZ7E4JSiJBQroy1JTMTZVag8xED93YkkXYBuigql
-	km9fy0NhwEy2FJ/+x2JdYImPeER/stI2nMK1+irIJEUfBhRcTL9l1v+cdnPTdfr5xUHH28ZK5Be
-	QUAiT5Oyr7hh5v5rWJ2wOnlfT4Y7dQg==
-X-Google-Smtp-Source: AGHT+IEIA1uZrPxrWJioaTSiX/KBH3TQNXEKhlh1yHJbqnXH+RYz+mBMAP9JCdev2+Wb3bLjzOzXy6ra0Pp+eb3NoFg=
-X-Received: by 2002:aa7:c6c7:0:b0:5c9:7d96:772d with SMTP id
- 4fb4d7f45d1cf-5ceb9343ac0mr12070886a12.22.1730854257024; Tue, 05 Nov 2024
- 16:50:57 -0800 (PST)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1730854371; x=1762390371;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=pgqmTSlP/0yy0qHCLhlKn9xFuQIgDBodKW2AN+Ie+QQ=;
+  b=r2YVcky3lQbQqNqOSyDlBHt0P+Hms8Cm5JaFcmGY1E4u71RTMkqs/Yxd
+   RO8uOlEW9HP8a5Qipeo3aj57cL8p1dhH8g6xmtUAi6mTDyUk+hdSUeM2+
+   5z8w03yH6EXx00cQ/NPy5iwX2L8/FtCkpl5okWd+xfnAhId+PKrp/qgH1
+   k=;
+X-IronPort-AV: E=Sophos;i="6.11,261,1725321600"; 
+   d="scan'208";a="382751523"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 00:52:45 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:18757]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.28.125:2525] with esmtp (Farcaster)
+ id 88c9a5bd-6e75-4e83-a8d9-a4c05af73cba; Wed, 6 Nov 2024 00:52:43 +0000 (UTC)
+X-Farcaster-Flow-ID: 88c9a5bd-6e75-4e83-a8d9-a4c05af73cba
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Wed, 6 Nov 2024 00:52:43 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.17) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Wed, 6 Nov 2024 00:52:40 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <andrew+netdev@lunn.ch>, <daniel@iogearbox.net>, <davem@davemloft.net>,
+	<edumazet@google.com>, <horms@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <mailhol.vincent@wanadoo.fr>, <mkl@pengutronix.de>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <razor@blackwall.org>
+Subject: Re: [PATCH v1 net-next 3/8] rtnetlink: Add peer_type in struct rtnl_link_ops.
+Date: Tue, 5 Nov 2024 16:52:37 -0800
+Message-ID: <20241106005237.2696-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <20241105163957.34e07588@kernel.org>
+References: <20241105163957.34e07588@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <Zyn-lUmMbLYO64E_@fedora>
-In-Reply-To: <Zyn-lUmMbLYO64E_@fedora>
-From: Sam Edwards <cfsworks@gmail.com>
-Date: Tue, 5 Nov 2024 16:50:46 -0800
-Message-ID: <CAH5Ym4hAz6xRnf-o32usHj8S5ESj0cpFBb7JypDVMkq2_v0x1w@mail.gmail.com>
-Subject: Re: [IPv6 Question] Should we remove or keep the temporary address if
- global address removed?
-To: Hangbin Liu <liuhangbin@gmail.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWB004.ant.amazon.com (10.13.139.170) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On Tue, Nov 5, 2024 at 3:16=E2=80=AFAM Hangbin Liu <liuhangbin@gmail.com> w=
-rote:
->
-> Hi Sam,
->
-> Our QE just find the latest upstream kernel behavior changed for temporar=
-y
-> address. i.e. In the previous time, the kernel will also remove the tempo=
-rary
-> address if the related global address deleted. But now the kernel will ke=
-ep
-> the temporary there. e.g.
-> ```
-> # sysctl -w net.ipv6.conf.enp59s0f0np0.use_tempaddr=3D1
-> # ip add add 2003::4/64 dev enp59s0f0np0 mngtmpaddr
-> # ip add show enp59s0f0np0
-> 6: enp59s0f0np0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq stat=
-e UP group default qlen 1000
->     link/ether b8:59:9f:06:56:6c brd ff:ff:ff:ff:ff:ff
->     inet6 2003::d280:ee50:d13e:a1b1/64 scope global temporary dynamic
->        valid_lft 604793sec preferred_lft 86393sec
->     inet6 2003::4/64 scope global mngtmpaddr
->        valid_lft forever preferred_lft forever
-> # ip add del 2003::4/64 dev  enp59s0f0np0 mngtmpaddr
-> # ip add show enp59s0f0np0
-> 6: enp59s0f0np0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc mq stat=
-e UP group default qlen 1000
->     link/ether b8:59:9f:06:56:6c brd ff:ff:ff:ff:ff:ff
->     inet6 2003::d7c7:a239:2519:2491/64 scope global temporary dynamic
->        valid_lft 604782sec preferred_lft 86382sec
-> ```
->     ^^ previously this temporary address will also be removed.
->
-> After checking the code, it looks commit 778964f2fdf0 ("ipv6/addrconf: fi=
-x
-> timing bug in tempaddr regen") changes the behavior. I can't find what we=
- should
-> do when delete the related global address from RFC8981. So I'm not sure
-> which way we should do. Keep or delete the temporary address.
->
-> Do you have any idea?
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Tue, 5 Nov 2024 16:39:57 -0800
+> On Tue, 5 Nov 2024 16:39:11 -0800 Jakub Kicinski wrote:
+> > On Mon, 4 Nov 2024 18:05:09 -0800 Kuniyuki Iwashima wrote:
+> > > +	const unsigned char	peer_type;  
+> > 
+> > technically netlink attr types are 14b wide or some such
+> 
+> I guess compiler will warn if someone tries to use < 255
 
-Hi Hangbin,
+I chose 1 just because all of the three peer attr types were 1.
+Should peer_type be u16 or extend when a future device use >255 for
+peer ifla ?
 
-RFC8981 section 3.4 does say that existing temporary addresses must
-have their lifetimes adjusted so that no temporary addresses should
-ever remain "valid" or "preferred" longer than the incoming SLAAC
-Prefix Information. This would strongly imply in Linux's case that if
-the "mngtmpaddr" address is deleted or un-flagged as such, its
-corresponding temporary addresses must be cleared out right away. That
-also makes intuitive sense to me, because if an administrator is
-deleting (or un-flagging) "mngtmpaddr" they very likely want no more
-temporary addresses within that prefix.
-
-So, I would say what you've found is a bug. Doubly so because the
-temporaries contain a pointer to the managing address, which is
-possibly now dangling.
-
-By the way, I don't think my patch from 2 years ago is still working
-correctly: I'm seeing that my (high-uptime) workstation has two
-mngtmpaddr addresses, one public address and one internal to my LAN,
-but currently only the "internal to my LAN" one has any
-still-preferred temporary addresses currently.
-
-Last time around, Paolo strongly suggested that I include a regression
-test with my patch. I now realize it's a good idea to write such a
-test:
-1. Create a dummy Ethernet interface, with temp_*_lft configured to be
-pretty short (10 and 35 seconds for prefer/valid respectively?)
-2. Create several (3-4) mngtmpaddr addresses on that interface.
-3. Confirm that temporary addresses are created immediately.
-4. Confirm that a preferred temporary address exists for each
-mngtmpaddr address at all times, polling once per second for at least
-10 minutes.
-5. Delete each mngtmpaddr address, one at a time (alternating between
-deleting and merely un-mngtmpaddr-ing), and confirm that the other
-mngtmpaddr addresses still have preferred temporaries.
-6. Within steps 3-5, also confirm that any temporaries that exist have
-a corresponding mngtmpaddr. (Basically the test should, at all steps,
-confirm that every existing mngtmpaddr has at least one preferred
-temporary, and that every existing temporary has a matching
-mngtmpaddr.)
-
-This test should fail, demonstrating both of these bugs, when run
-against the latest kernel. Then we can get to work on making the test
-pass.
-
-Are you interested in writing that test or should I? I have never
-contributed test cases to the kernel before, so there'd be a bit of a
-learning curve for me, but I'm happy to do it.
-
-Cheers,
-Sam
-
->
-> Thanks
-> Hangbin
+  VETH_INFO_PEER
+  VXCAN_INFO_PEER
+  IFLA_NETKIT_PEER_INFO
 
