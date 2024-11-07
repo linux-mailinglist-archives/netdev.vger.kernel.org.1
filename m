@@ -1,99 +1,97 @@
-Return-Path: <netdev+bounces-143025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8416B9C0F09
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:36:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC54A9C0F1F
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:40:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B60751C23B26
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:36:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F34601C244E7
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 421EC2178EC;
-	Thu,  7 Nov 2024 19:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6890A217F28;
+	Thu,  7 Nov 2024 19:40:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="LQU8o3dX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="Er5cwivK"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 112AC217469;
-	Thu,  7 Nov 2024 19:36:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B91E217F21;
+	Thu,  7 Nov 2024 19:40:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731008213; cv=none; b=U9cpAlFrVHY98lPh8wyGxt7PsB2Emt6+EEUqGQXSjoaxWD+dabdXFdpD6dk7aYqg9So00a8ptaTRit1hoIftC40apwLdAAGAT7WWCt6o+cslFs2tc7PhL4lnil15tPgn2XCBkYHk6XUlrwxdLyW2LmLWevttaiiMv6UoVL9OQxk=
+	t=1731008421; cv=none; b=FK0o1kVSGIpE1Lzcmi25xtZ0uTFlRA5d35aehEkOjp5o1EEmsXbR9Bv4pW8aACXCTAIP+DOm8QO5Rgl+I6F/lPCCBDs52dFVbEmn+rgshZDCmGb1oBRy+n52KQJjg6AMjTJk8luq7ifXQeJ/2ZDI8BxV6n8PTW7K5MtcYevQoZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731008213; c=relaxed/simple;
-	bh=LRu13LUEIwBKt09C9i/sLeEvb1X/GwTrlIXMlWJ3dnE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Nwu8DnwdYt8qez9yIg7oG7fRraFE5H2HovBsHHhDXquBK7rhYhG5PakNZvvcvk7XhdIc4nehqi7fBdM+mEUdp+m+LNpvtn8OoCN7330g2hnvupDv5Q7ZlezLRrE7JG7N0HuClbFW95lZqG1YZWbi3c3PTflNAjth2g+yuWaIMUQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=LQU8o3dX; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=Og9wlVgM0BRB/j4S7Y/C7oTbSr+qBDG27Kjm/ghy3Ok=; b=LQU8o3dXx5z9lZiPBXtlL/1gzl
-	yemHNPGMs6a+zViyFH+wxslUR8myQcH8aI0ArJ9yXMfMxtm39gQpQrmj1pDqErBqTrlvwnuyBnGCh
-	BZOBNb5stNeRXrEHkJGLcp++t1sGOcf8uta7/5YZ+tObpjrfGQxZtvjpOF5/R7mcNhrk=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t98J1-00CV5w-6i; Thu, 07 Nov 2024 20:36:35 +0100
-Date: Thu, 7 Nov 2024 20:36:35 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Cc: Christian Marangi <ansuelsmth@gmail.com>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Matthias Brugger <matthias.bgg@gmail.com>,
-	"AngeloGioacchino Del Regno," <angelogioacchino.delregno@collabora.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	upstream@airoha.com
-Subject: Re: [net-next PATCH v3 2/3] net: dsa: Add Airoha AN8855 5-Port
- Gigabit DSA Switch driver
-Message-ID: <75495b79-65fb-4a70-a937-36f969280ce6@lunn.ch>
-References: <20241106122254.13228-1-ansuelsmth@gmail.com>
- <20241106122254.13228-3-ansuelsmth@gmail.com>
- <4318897e-0f1a-42c7-8f20-065dc690a112@wanadoo.fr>
+	s=arc-20240116; t=1731008421; c=relaxed/simple;
+	bh=IWvqkmTISTARZW0y3rN5iLDc3lj9CpSikNJUn4V2T2A=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=jARD3Hf9ToMiWuEy23wdeZNpAM9fEHrxzqr4PGOlHdWy+YDjFjrs+qD0pERdAZ+sZbXmSdBXHnXAGLKHIEh4BbTPulnBblfM4nFgsIyhP0w1XlrUBaE1yy9Zrbbr/qYh3Y15Iq9pFrJFS3rl5Fp1ipP1WSL2Q+JVr8RdIDWv4gc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=Er5cwivK; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFBA1C4CED3;
+	Thu,  7 Nov 2024 19:40:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731008420;
+	bh=IWvqkmTISTARZW0y3rN5iLDc3lj9CpSikNJUn4V2T2A=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Er5cwivKMuEEAWYBP8V80Wo1Yk2uTHAiDvMF9sfrny17jJpVfK5siM5dNs2Jw5hFI
+	 tqpuMoT55ZfPIOSoSAnvK1dSJ1I7QvmSc3GEoNqGAGt5SZiRGPR8rteuUp5r9ErtXa
+	 gQfpBFB8MWhN+iDjg1paKniFzyDwhufAohWAdl6ye0OleUMG5TX3IPZMHHw9o8p2UJ
+	 x80ifmvyfY0HiyTgadV67oYRPwe8rah1TQ3FEC313JgtNKf0GADdwWkdg6bKNO7Mlp
+	 d0oauorayYPrOEeX/v/Z6KX8oedPuEjR9+y4Ohqhz3CTeM5ZrOpEvlCh1PxjXhXa41
+	 OfMaERBsreXGQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33D7D3809A80;
+	Thu,  7 Nov 2024 19:40:31 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4318897e-0f1a-42c7-8f20-065dc690a112@wanadoo.fr>
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net 1/1] netfilter: nf_tables: wait for rcu grace period on
+ net_device removal
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173100843000.2072933.7866260416336178549.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Nov 2024 19:40:30 +0000
+References: <20241107113212.116634-2-pablo@netfilter.org>
+In-Reply-To: <20241107113212.116634-2-pablo@netfilter.org>
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, fw@strlen.de
 
-> > +enum an8855_stp_state {
-> > +	AN8855_STP_DISABLED = 0,
-> > +	AN8855_STP_BLOCKING = 1,
-> > +	AN8855_STP_LISTENING = 1,
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Pablo Neira Ayuso <pablo@netfilter.org>:
+
+On Thu,  7 Nov 2024 12:32:12 +0100 you wrote:
+> 8c873e219970 ("netfilter: core: free hooks with call_rcu") removed
+> synchronize_net() call when unregistering basechain hook, however,
+> net_device removal event handler for the NFPROTO_NETDEV was not updated
+> to wait for RCU grace period.
 > 
-> Just wondering if this 0, 1, *1*, 2, 3 was intentional?
+> Note that 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks
+> on net_device removal") does not remove basechain rules on device
+> removal, I was hinted to remove rules on net_device removal later, see
+> 5ebe0b0eec9d ("netfilter: nf_tables: destroy basechain and rules on
+> netdevice removal").
+> 
+> [...]
 
-There are some devices which don't differentiate between blocking and
-listening.  If this is true, then maybe:
+Here is the summary with links:
+  - [net,1/1] netfilter: nf_tables: wait for rcu grace period on net_device removal
+    https://git.kernel.org/netdev/net/c/c03d278fdf35
 
-+enum an8855_stp_state {
-+	AN8855_STP_DISABLED = 0,
-+	AN8855_STP_BLOCKING = 1,
-+	AN8855_STP_LISTENING = AN8855_STP_BLOCKING,
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-Which saves a comment.
 
-	Andrew
 
