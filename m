@@ -1,126 +1,123 @@
-Return-Path: <netdev+bounces-143101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143102-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C23299C124E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:23:32 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A36B9C12A8
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:41:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 814571F237DB
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:23:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 274FD1F233B6
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:41:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFA99218D94;
-	Thu,  7 Nov 2024 23:23:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218BD218D88;
+	Thu,  7 Nov 2024 23:40:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="i0SIwRnj"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFztN0vO"
 X-Original-To: netdev@vger.kernel.org
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3839219B5B1;
-	Thu,  7 Nov 2024 23:23:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF18D21894F;
+	Thu,  7 Nov 2024 23:40:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731021806; cv=none; b=KiEluIopwk1szoSM+crD6MH9n4bUSQelLwgssZiVZWe90HJTkX2rPIEZ5Gf37VIN2RQiN/gKJKTNJ1amzx52wMRwL1w6gTtnfIEcDJ4rJKfpWTxVS/xl/Wzs4eY1ejnRjcRk+JgvHJiPQAqh88lrd2z0X2se83WiX8k62E1LlSw=
+	t=1731022853; cv=none; b=ZVgims8g1X8AiOjKLc5FLIApDDq2KFtgvDfkoTR3G/EgrCNCdWCFIT2za0GcmunWdbxZ81KIGtuIuAysxRDmyGHql7uiH2Jwjsnu0ympbuW7tNJMgV559csZOdbVDoAuCphObJ417qjPZd+dnu6uA5gonq0LSog56xwkFoTF71w=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731021806; c=relaxed/simple;
-	bh=d9A2xAkVd72dEAAGZonRfK1gqGU0jQS9H8dWTvkz83Q=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=AOrSM2agNde6lSrJuUWZjwGxo5NOTVNRBUqVgivn0VtMD+hZ8wDpokFzRIGCJLxSILxpo0kYDPlIN+ail1jtb69p72iEvs4K1Zc3suCB2VwIBRXNwGzsy2YApLMFrhz5/Z/2HF6TWIBTYtjU9jpPpC/0DetczHinkFmTJu2RhF8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=i0SIwRnj; arc=none smtp.client-ip=156.67.10.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=GmxmX7xrm7oMSRRjgOAZmJxS1krGg+CXbAgcKq/qc7Y=; b=i0SIwRnjFHYeaEkrNGftS41aij
-	E4KbxduoE9eNWAH+7Z2srxeidPu/rJu4P+XRYMd1rI3Wf090hiZIWCVCRpX2S0sx+PGQV+p9TpUT7
-	V11PSo9MC9SpLCfyhZNgJrqOQ/hF6evbFWa7SgGiOe3x4JH3PNBEdPo3M+SvlfU3YFwc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1t9BqH-00CWQL-9j; Fri, 08 Nov 2024 00:23:09 +0100
-Date: Fri, 8 Nov 2024 00:23:09 +0100
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, p.zabel@pengutronix.de,
-	ratbert@faraday-tech.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next 3/3] net: ftgmac100: Support for AST2700
-Message-ID: <1f8b0258-0d09-4a65-8e1c-46d9569765bf@lunn.ch>
-References: <20241107111500.4066517-1-jacky_chou@aspeedtech.com>
- <20241107111500.4066517-4-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1731022853; c=relaxed/simple;
+	bh=DU9V5JYhXP+PMdlObqy5XmJcfEODdIQrQccapJcPRGM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=uBqfRP+Onv15LR+UnmDNph9UTw7mI7WZ7KSACjwvtIoU/NSPEVRfXxnaP73rSMIPC7drYEdTK5z6LBybSbu9Xrhcg2KXclIxr0IsCXc6W5KeCRc9vg3Tj9UyQtekEMCO+b1jUGxxO7dW0P9rwfBrXhdaaFKizDW64LZFYnZ2zL8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFztN0vO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520CDC4CED3;
+	Thu,  7 Nov 2024 23:40:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731022852;
+	bh=DU9V5JYhXP+PMdlObqy5XmJcfEODdIQrQccapJcPRGM=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=ZFztN0vOaOSU/SRUgi3fmXi2XcjiJt33UXKGf1eFQb4o2O6sLIrkS6+1zAzeOKTnz
+	 JvEx3K2Xvd5mgw0vfFxYXx5ZVVpgZpk5VLkQ86MItoDv06AGZB4/JWrBaC50yJ4YW9
+	 CTH5kHW/ST2rdbVPvBtYrBPg3dxcyy3IeOAsDKYXk825LdAHcj0waE2JRY+Fopplf5
+	 upLUrak1OYR3irbS5sQMtNvaW/+5eynFwQDM6dN14yDjyiU2mXKoU8F+9mtEv/jdeT
+	 AjGuEE0BD0ErwoSrkWgUyszCsMsdy3XxLexKeuknhV/vT4Q9G3VSMXtO3gNlYVS4CG
+	 Y8mux/1O1KbIg==
+Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7181b86a749so856635a34.3;
+        Thu, 07 Nov 2024 15:40:52 -0800 (PST)
+X-Forwarded-Encrypted: i=1; AJvYcCVc20CmDnCCymDNcuZ2/pNHxvkW6tLiVQbBPi6gmMccxU1+iWm90Btb0J4vIl6hu9M+SfQe+t46@vger.kernel.org, AJvYcCVkVxuSJcpcl6wr+s+lA5vDUQJfv3cif43lx2pWbuxz1bXp+erQ9MdjFgRRw5CL8KADFl0UDK1ps405kw==@vger.kernel.org, AJvYcCWmg46jAsWBCyqKpEtyx2/BNLt7A9WFOsaouH7KaLWWtgbz7G1FZvfxAe/ocrYJAsBT1g6/KIQtn5m4@vger.kernel.org, AJvYcCXy0iWVMcfGXKn3LTB9U5p9UDM1pXYYwXM/dxXaaaoVSAbtw53xnNOSO5pPRz3CMgfqwbjeqrWdF/OXmg==@vger.kernel.org
+X-Gm-Message-State: AOJu0YzKVsjOOi7TiwxGPjpDn2QaZf7g1Zl6oSOO/yXfCcV8oSClUO9g
+	36KoXH4FQgFhykHY9Lbzzi+FEWO7/Cw4teDzbg5j8I9DNsdqv0ftiYn2SrPaercM03tfZsPiapl
+	7cpHfu1XnqICV5PMamyhb+Hi2UxI=
+X-Google-Smtp-Source: AGHT+IHKWuBlWup528YXRtoYDX3ha+KeikwAxO/glZHcWGp2+SJF85FWw3Rbw60HdVZKTtvogILp9/cn0Dmbxxn3nHo=
+X-Received: by 2002:a05:6870:96a4:b0:286:f74a:93cc with SMTP id
+ 586e51a60fabf-295600990eamr909683fac.2.1731022851213; Thu, 07 Nov 2024
+ 15:40:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241107111500.4066517-4-jacky_chou@aspeedtech.com>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com> <20241027201857.GA1615717@unreal>
+ <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com> <20241105112313.GE311159@unreal>
+ <20241106102439.4ca5effc.pasic@linux.ibm.com> <20241106135910.GF5006@unreal> <20241107125643.04f97394.pasic@linux.ibm.com>
+In-Reply-To: <20241107125643.04f97394.pasic@linux.ibm.com>
+From: Namjae Jeon <linkinjeon@kernel.org>
+Date: Fri, 8 Nov 2024 08:40:40 +0900
+X-Gmail-Original-Message-ID: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
+Message-ID: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+To: Halil Pasic <pasic@linux.ibm.com>
+Cc: Leon Romanovsky <leon@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, 
+	Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
+	Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>, 
+	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>, 
+	Alexandra Winter <wintera@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>, 
+	Niklas Schnell <schnelle@linux.ibm.com>, Thorsten Winkler <twinkler@linux.ibm.com>, 
+	Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>, 
+	Aswin K <aswin@linux.ibm.com>, linux-cifs@vger.kernel.org, 
+	Kangjing Huang <huangkangjing@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
->  	/* Setup RX ring buffer base */
-> -	iowrite32(priv->rxdes_dma, priv->base + FTGMAC100_OFFSET_RXR_BADR);
-> +	iowrite32(lower_32_bits(priv->rxdes_dma), priv->base + FTGMAC100_OFFSET_RXR_BADR);
-> +	iowrite32(upper_32_bits(priv->rxdes_dma), priv->base + FTGMAC100_OFFSET_RXR_BADDR_HIGH);
+On Thu, Nov 7, 2024 at 9:00=E2=80=AFPM Halil Pasic <pasic@linux.ibm.com> wr=
+ote:
+>
+> On Wed, 6 Nov 2024 15:59:10 +0200
+> Leon Romanovsky <leon@kernel.org> wrote:
+>
+> > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core c=
+ode?
+> >
+> > RDMA core code is drivers/infiniband/core/*.
+>
+> Understood. So this is a violation of the no direct access to the
+> callbacks rule.
+>
+> >
+> > > I would guess it is not, and I would not actually mind sending a patc=
+h
+> > > but I have trouble figuring out the logic behind  commit ecce70cf17d9
+> > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
+> > > ksmbd_rdma_capable_netdev()").
+> >
+> > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
+> > GID, netdev and fabric complexity.
+>
+> I'm not familiar enough with either of the subsystems. Based on your
+> answer my guess is that it ain't outright bugous but still a layering
+> violation. Copying linux-cifs@vger.kernel.org so that
+> the smb are aware.
+Could you please elaborate what the violation is ?
+I would also appreciate it if you could suggest to me how to fix this.
 
-This appears to write to registers which older generations do not
-have. Is this safe? Is it defined in the datasheet what happens when
-you write to reserved registers?
-
->  	/* Store DMA address into RX desc */
-> -	rxdes->rxdes3 = cpu_to_le32(map);
-> +	rxdes->rxdes2 = FIELD_PREP(FTGMAC100_RXDES2_RXBUF_BADR_HI, upper_32_bits(map));
-> +	rxdes->rxdes3 = lower_32_bits(map);
-
-Maybe update the comment:
-        unsigned int    rxdes3; /* not used by HW */
-
-Also, should its type be changed to __le32 ?
-
-> -	map = le32_to_cpu(rxdes->rxdes3);
-> +	map = le32_to_cpu(rxdes->rxdes3) | ((rxdes->rxdes2 & FTGMAC100_RXDES2_RXBUF_BADR_HI) << 16);
-
-Is this safe? You have to assume older generation of devices will
-return 42 in rxdes3, since it is not used by the hardware.
-
->  	/* Mark the end of the ring */
->  	rxdes->rxdes0 |= cpu_to_le32(priv->rxdes0_edorr_mask);
-> @@ -1249,7 +1266,6 @@ static int ftgmac100_poll(struct napi_struct *napi, int budget)
->  		more = ftgmac100_rx_packet(priv, &work_done);
->  	} while (more && work_done < budget);
->  
-> -
->  	/* The interrupt is telling us to kick the MAC back to life
->  	 * after an RX overflow
->  	 */
-> @@ -1339,7 +1355,6 @@ static void ftgmac100_reset(struct ftgmac100 *priv)
->  	if (priv->mii_bus)
->  		mutex_lock(&priv->mii_bus->mdio_lock);
->  
-> -
->  	/* Check if the interface is still up */
->  	if (!netif_running(netdev))
->  		goto bail;
-> @@ -1438,7 +1453,6 @@ static void ftgmac100_adjust_link(struct net_device *netdev)
->  
->  	if (netdev->phydev)
->  		mutex_lock(&netdev->phydev->lock);
-> -
->  }
-
-There are quite a few whitespace changes like this in this
-patch. Please remove them. If they are important, put them into a
-patch of there own.
-
-> +	dma_set_mask_and_coherent(&pdev->dev, DMA_BIT_MASK(64));
-
-This can fail, you should check the return value.
-
-	Andrew
+Thanks.
+>
+> Thank you very much for all the explanations!
+>
+> Regards,
+> Halil
+>
 
