@@ -1,106 +1,148 @@
-Return-Path: <netdev+bounces-142885-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142886-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D70E9C0A82
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:55:57 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 73AE89C0A88
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:57:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F3FD2833B9
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:55:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A53361C22212
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:57:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C241215C57;
-	Thu,  7 Nov 2024 15:55:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxlI0IiF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC092144C6;
+	Thu,  7 Nov 2024 15:57:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+Received: from mail-ej1-f48.google.com (mail-ej1-f48.google.com [209.85.218.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE9D21501F
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 15:55:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BB11F130F;
+	Thu,  7 Nov 2024 15:57:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730994942; cv=none; b=tZvET9ehypoHmZIDbuzXJdCOrRWUfSm37cUzXDQJcGxrGc8RTt4pa5OcDFMBYCwdUZGCctIGFOzjjwt1x6K5agXrq5VK+LOeRXzyLxUG4NKOEHtOW/KSNH9jJBBQOLfUV92rKQbl5+copcUUEV8SxUc0hT3g2esgp7nIX9n6ReE=
+	t=1730995038; cv=none; b=cvscqjsV0GSxr5W7zVEbzyYqvZhYM3ECfd6trl7Dzj8L3uC2ncARUA5PYl9+T/0OGYl4YSXSOQnwFwi8Jb74wtYQ7v9HmDSOucOju8TkFTm6BMq0edA//jCxVlimT8a3nHDVkW0USSpDR+FQlt5ArrCxHrfEN63SiDVK9lUa10M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730994942; c=relaxed/simple;
-	bh=ShTuINxYOIoo/TKbWX3wmEWt4t4zV/3pVZ0rVY4h0zs=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=FWuObkYQJUx2xpJW94e0fIqmxLsc7gkEvNkWBHEajuRX1h7z8Hnb0ZLpAiYRP0qiZWgn0K1gI7+FG8dPcaHgwKSSYsh20UuV8WKDXSJCGwhO/zaCiIyZaCEJ/lJso9AQAXLvHXOpdwArRuC8PsnwR6E/BkCjvIAB5H9qijRzcCc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dxlI0IiF; arc=none smtp.client-ip=209.85.219.41
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+	s=arc-20240116; t=1730995038; c=relaxed/simple;
+	bh=plb9JFmTBN0FNIGQmiAwC2U22FibctbGipsxBzn321g=;
+	h=From:Subject:Date:Message-Id:MIME-Version:Content-Type:To:Cc; b=mYFrZ4/qB6v2QpcDk/37Ad7i9jiedNFLAxk3F+FBDw+aLSizRFjLdyBOWhUF0Ksm+q8s6EXWrFEmOC3/UjZa/Xy8S8hrVb1jSBDKyb9JGoyNJPqF+/03EhiVBe9cJubo48zXRSyP2SlEYObe8765iszSROm9B7/3U9AFXJYY/Cs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6cbcc2bd7fcso6888076d6.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 07:55:40 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730994940; x=1731599740; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GP8fYSHagCP7r3rHGPjXvJuIYXAUEAFME8yg1XKacmE=;
-        b=dxlI0IiFlrrG3DsylI4gVo/DPf/6u3oK8tGROhtiRhRG/6M3beX2ASDrFxnQRxeYDH
-         FMnyBLxYo5kRjrECdW5gimyBwFrHw9l7mjiOCQIMVzMl6o8qfjA4tszKdvh4F4errwZt
-         dU05Yd/4fd4z8ID46Y8WiyzV6EcGHeLOWtWx5NPIR6DSox3b3Mx3PMLh0/fDc75Qa0XY
-         YUrKvwNyLLw+rf4mOY3rXx1qzrU9mkKQwTJPnqyx4rNZKYGrjYcijAI7p+Aby6LEY+b9
-         e94VsHOkPYt0y3wX55YH58zKtbn40Xf1eK3r/JHoXgEWu2kSDvGBkNjWF3mD/Dirg6ie
-         oMaA==
+Received: by mail-ej1-f48.google.com with SMTP id a640c23a62f3a-a9e8522445dso187121366b.1;
+        Thu, 07 Nov 2024 07:57:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730994940; x=1731599740;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=GP8fYSHagCP7r3rHGPjXvJuIYXAUEAFME8yg1XKacmE=;
-        b=r+vEq7/Z8D60oV1dr6MC253g+HMLGOz9wVRblW8Q9YEvSh4gB9vRl5oeUCnPm7mD+I
-         kFgBIFkP0rO1ZpHZu4vFUY79cmYcJ3jlRlOECVeID/GEwsztDpLwTN+SCFrAfmiovV/M
-         QcrxaBmZl9xKiAkDG9papz8p+9Hc6EDvHTqtk4NaqnzHUmR4B072E74zPARqnaYfBJIN
-         P6nmSeo2eMiC8aU4XrcGnJznsLPJjhd4C1zdC3Ym3ed26OMG3mdjRCcqmx5AhQmj5lHr
-         1LeWKs960pSf/nUZJiHP5azqsdGDpmjVRzEnM2yfUK1iI5NTTeoQzAd02u7i4ENXy0NA
-         vUcg==
-X-Forwarded-Encrypted: i=1; AJvYcCVDgMasfRJQxV41ylbTOPd1ExfDAvI/smWD2XEXczM0vqSoTeLd8MzTEmBGzqB24tq42wS29eU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxgMLwcYuYSxU1GFJwOdE0SqnbldqWWEA4aU5tJopQw9+MjUcJw
-	HfyWRqiLPmkQFSus2xYzUiA3Ac0HA2NDczfuf5C4efhR7ZNIMZ0Q
-X-Google-Smtp-Source: AGHT+IFRnr0T/GV8eaxA2T73krRhxy29bTVY69JEfpJEU0MiYNA1kZyZWufMxlc0b9QS9FfG1iJz3g==
-X-Received: by 2002:a05:6214:3290:b0:6cd:3a49:34e8 with SMTP id 6a1803df08f44-6d39cfc2485mr5124536d6.20.1730994939778;
-        Thu, 07 Nov 2024 07:55:39 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961df907sm8868986d6.9.2024.11.07.07.55.38
+        d=1e100.net; s=20230601; t=1730995035; x=1731599835;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=cB+1Lk1KYrovURjiEsZ02zjxNmeuUgpK4DPxqDkDrXo=;
+        b=Vi55YXH82gOR77NGgvkJ8hfh+sJ72ntYmioqTa59s1TQSNnxXTbMKYC7W28foCQ2+6
+         vfoXioDpf8RufubNGyIgLjoXzLlGyNtlmRy0Ivhn8eS3CkxidlYILkEpVB8e54GQ9MD/
+         6v6TazGuquxhRR/eXva1EXkR91kgpD7x+DBQmXP1EwRJipYp+j0YKdjSzZK8l1re6MFt
+         IVmhtYwudckteK/06Gzjfi0fkGGCdmDwPKtYLVBvQk5tukrTzTfzLgHUn/WvnU+Mqtym
+         LfP/Y1Xqzfdcjhmns+07jTGvgbAdvpwN4XJlXBRdsVARyBXNwVsZfOjD+R2TY/1NqKbF
+         HmDA==
+X-Forwarded-Encrypted: i=1; AJvYcCWEUWNV2Py7+jkVjoVCZsgQ6fkxJhkb3en2SuKK2V5cKTfyUqnSBJ1pFHXRxBrdpnI8BzWG8cRzDAAQfFo=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywu55fQuvqsn+8Xf80F0oUgbUy0XFy2lDeOS7gDJVcosjV0oR1B
+	al/vHNsRG9Qy8Pc6KDS0lJkiZ6rOYwUYUXn7tVVWJiLGmCiFWP4f64p68Q==
+X-Google-Smtp-Source: AGHT+IEvbvtaCI80kOHhLO0mNkfA6GUvJ6891C5LTf6pozIKtgBi+2akhp64+LMaoiIrzwBXIhfv1Q==
+X-Received: by 2002:a17:907:7207:b0:a99:e619:260e with SMTP id a640c23a62f3a-a9e655aa3d5mr2140112166b.28.1730995034894;
+        Thu, 07 Nov 2024 07:57:14 -0800 (PST)
+Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0abe6e3sm108695866b.84.2024.11.07.07.57.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 07:55:38 -0800 (PST)
-Date: Thu, 07 Nov 2024 10:55:38 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
- netdev@vger.kernel.org
-Cc: fejes@inf.elte.hu, 
- annaemesenyiri@gmail.com, 
- edumazet@google.com, 
- kuba@kernel.org, 
- pabeni@redhat.com, 
- willemdebruijn.kernel@gmail.com
-Message-ID: <672ce2fa6087c_1f2676294b6@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241107132231.9271-2-annaemesenyiri@gmail.com>
-References: <20241107132231.9271-1-annaemesenyiri@gmail.com>
- <20241107132231.9271-2-annaemesenyiri@gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] net: Introduce sk_set_prio_allowed helper
- function
+        Thu, 07 Nov 2024 07:57:14 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Subject: [PATCH net-next v2 0/2] net: netpoll: Improve SKB pool management
+Date: Thu, 07 Nov 2024 07:57:05 -0800
+Message-Id: <20241107-skb_buffers_v2-v2-0-288c6264ba4f@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAFLjLGcC/x3MUQrCMBAFwKss77uBZJUKuYpIae2LLkKUbC2F0
+ rsLzgFmh7MZHVl2NK7m9q7Iop3g/hzrg8FmZIFGPacUL8Ff0zB9S2HzYdVQTuy1TzFyHtEJPo3
+ Ftn94ReUSKrcFt+P4ARWkuEVqAAAA
+X-Change-ID: 20241107-skb_buffers_v2-f3e626100eda
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1863; i=leitao@debian.org;
+ h=from:subject:message-id; bh=plb9JFmTBN0FNIGQmiAwC2U22FibctbGipsxBzn321g=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnLONZoG1tga8yWCYjThrOp+DfUl846XJqotG/3
+ rBIkf6lQiOJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZyzjWQAKCRA1o5Of/Hh3
+ bV7GEACtqW//lg7CKeIU4EBoA0eI0p7URu4ztvwVGIARqsEIHQ6+unYfZ3mDJURA0GBzTeqPSGZ
+ Z9TrRLB8nFoeGeLchnz2jfpjM/Ez2OUTiPm/ld33b9a9TglEx2CcLipIzz68F78Ei/oh0LteVUV
+ uLWG/R9u+vmZGaOeCw2ujiqeJ03qMVTfAV9udWP48eTtRjtPHsqYSAFs1g4j+/gOEEJcqkUmXjC
+ 9EqmmYUFX2vnv2VQ6CIrOPWfltlevDMHpUlrz2SeWPazBl6/O4NWYqdyvo38UubYWZr91e844pK
+ JTj3chMbnLFJWfZ7iBX6cCo0sfDJS8DyjY2EO6E86sqkqx3e09IQqImRT+raWFJdfEt9RzTUiN2
+ XDsJ34DdYjsoyeppaX2AwB9WAjVM2pAfb1d2to2dHSz94Hvfwd0004diaCeaQ1MZwtlcMsqpoA/
+ mmXgoJ9CPSPmP+FWktKJeisVEHQr/JGKTnxsUPOPWftAnfml4ZYShn1J2md8nZlrSUAiMmNgf2h
+ BeWpjlNbhyA+PeCMskW6WJH+Hjf0Mp0vflaDl3O6b4dm2Q2BpUanTE2RBzNbnTDraROKdBqGVDL
+ uITPKbloVuflnnNrIB229VLh3taitJLM7PzrJ4MQYipwRrCjq/RWAim6h6JbwtgPKcVCVN9G4C2
+ DAjPYGSj2jifmLw==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Anna Emese Nyiri wrote:
-> Simplify priority setting permissions with the `sk_set_prio_allowed`
-> function, centralizing the validation logic. This change is made in
-> anticipation of a second caller in a following patch.
-> No functional changes.
-> 
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
+The netpoll subsystem pre-allocates 32 SKBs in a pool for emergency use
+during out-of-memory conditions. However, the current implementation has
+several inefficiencies:
 
-Reviewed-by: Willem de Bruijn <willemb@google.com>
+ * The SKB pool, once allocated, is never freed:
+	 * Resources remain allocated even after netpoll users are removed
+	 * Failed initialization can leave pool populated forever
+ * The global pool design makes resource tracking difficult
+
+This series addresses these issues through three patches:
+
+Patch 1 ("net: netpoll: Individualize the skb pool"):
+ - Replace global pool with per-user pools in netpoll struct
+
+Patch 2 ("net: netpoll: flush skb pool during cleanup"):
+- Properly free pool resources during netconsole cleanup
+
+These changes improve resource management and make the code more
+maintainable.  As a side benefit, the improved structure would allow
+netpoll to be modularized if desired in the future.
+
+What is coming next?
+
+Once this patch is integrated, I am planning to have the SKBs being
+refilled outside of hot (send) path, in a work thread.
+
+Changelog:
+
+v2:
+ * Drop the very first patch from v1 ("net: netpoll: Defer skb_pool
+   population until setup success") (Jakub)
+ * Move skb_queue_head_init() to the first patch, where it belongs to
+   (Jakub)
+
+v1:
+ * https://lore.kernel.org/all/20241025142025.3558051-1-leitao@debian.org/
+
+Signed-off-by: Breno Leitao <leitao@debian.org>
+---
+Breno Leitao (2):
+      net: netpoll: Individualize the skb pool
+      net: netpoll: flush skb pool during cleanup
+
+ include/linux/netpoll.h |  1 +
+ net/core/netpoll.c      | 53 +++++++++++++++++++++++++++++++------------------
+ 2 files changed, 35 insertions(+), 19 deletions(-)
+---
+base-commit: 2575897640328d218e4451d2c6f2741ae894ed27
+change-id: 20241107-skb_buffers_v2-f3e626100eda
+
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
+
 
