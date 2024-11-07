@@ -1,82 +1,61 @@
-Return-Path: <netdev+bounces-142942-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142943-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DC099C0B9D
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:28:29 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 538019C0BA1
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:28:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 32FD4282C97
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:28:28 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 97D03B24EAA
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:28:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47714216E01;
-	Thu,  7 Nov 2024 16:24:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D79A4215C57;
+	Thu,  7 Nov 2024 16:26:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="yLlJQshv"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dbvSHeD1"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DEC93216DE0
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 16:24:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7BF212D3A;
+	Thu,  7 Nov 2024 16:26:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730996670; cv=none; b=jCjlTwhItfUPpfPv5DPDa8x5IRyzJxVD2Mynf76/smR5OJPrdWKTA0a5vmdGk/EaqRQ5r69igjYnX1r33lEE74252J71R2EOFJlP8rW0hfUXCkQSUCE4lhsiMXh0ecfZt2cLQyYpmBbbR08H9h4HyST9o5EFp67JGdt8T9x2F6U=
+	t=1730996766; cv=none; b=t2apCdtZ6sig36MWgLikZKh0KFr+8ShqVFqMxNRiBlaJfX9GdKdFf7oA2XBm3PRm5XJO05mUUzzSGNPxj/RSQ/SE/jjxAjvLxYrZiYaSsAX+SNhxlYcWHALq2UkJZBo3bDeJzLr+BVrJ8f/VaTmIZM3zcaSy+R4nQGuwqc4KDLQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730996670; c=relaxed/simple;
-	bh=Wj4fOkQPXhbMAKih4r/Sld5wkvE3/LKYljfOua0Ngvo=;
+	s=arc-20240116; t=1730996766; c=relaxed/simple;
+	bh=ZGNeGv59giDSq2n3Qf1rhDUEiKsr68Gb0LrKfWT12ro=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=imQVEKmLEs1OSrF7BX2EHaudVoF1iz0o3WKCSDt5QM19T5tfKufiOrQ8D54/Wi9SSt8sufrym6YfjESJrhbCcXZxHrsOnOJvdgvwdT4PoZi/zl3/zSgIOgzbvDfcIY/Mq7EMLxJVuW3Hv4RXfICkoTcix6pXTy25yMVdN2zbGbg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=yLlJQshv; arc=none smtp.client-ip=209.85.210.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-71e52582cf8so911072b3a.2
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 08:24:27 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1730996667; x=1731601467; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=H8yOLzTUzlsG9KWjjsp8XyTHL3cnRzRcNsutj7MGbeA=;
-        b=yLlJQshvv+pa9pFYeZEvqoh06SJrOZowUSt6xDaZ3OUjwboAOpQOO9lqTl1h23UTDZ
-         W4jCAA9i0U2WapwQdkhkXZlc2C4Q2j13p2G0IHhPksiHiCiUZUAqPya9TtfAOwzB5i4k
-         HWlvELT2kZJnc26bnJwVo9gLS5F27zalnd+YZJJcbYpHH3tC1ycRd9Wfc1fbMF14XuwO
-         llJiRnNKtKGva8pyejrHZwD+zKLIoFBKIIm8kYTMNHL5cRPbe+vzTm9Hf5ambKenf8eZ
-         2cxDRx3A1zy0yv5mWqRsVJiIdSs9oTpxj4igqG6v4fEBlw+1DJw4N2tXvMvJDfalwRHZ
-         UGgg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730996667; x=1731601467;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=H8yOLzTUzlsG9KWjjsp8XyTHL3cnRzRcNsutj7MGbeA=;
-        b=DDMJBagHCE6dhLqWNaNsfjfKWpgCyPi28+Vrf02aVKESRxHjP0itX5fF3xg5KoiZQ5
-         tceQI/aKNl5lXmLg1C6Dxa+qwnEX3kCjLM6cTLJDaX0Zi32fI9iK97mRlBOv8Thd1uWY
-         /zBVJbdhCPiTWd3Vl6Jwt65nnuTCAfiVKpQxopDcBxXf77tWMVBT+EgEsMqww8cxNyyS
-         WYYq/CJK9wEWEF0rKrrtuZoIxT6MPAc4V4/2aEa33XAnNU8KuimvHphHuh5j/1GMcqVS
-         F77DsSk9LCA1DVGcf0e+mBrw4HpoLlzb2cNMFT0HH6JEzI5uMpB6dK4SOwcnN5Uc575t
-         g0JQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWqY0/cSdfgLMGwEIt08x8QxN1FZhSGYM8KxPzEIY+j1i6BZNAKrW/IPJAS8Eh1rjmbygEpEiI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKG7Y7XBLoELgYsy47o1/WLN16RKnuminwF8SC+2am6Qf0sUwh
-	69Xoqi2fibySsycpwHMCtXdk3QUwB3S3QX0rqiwhqH1ekdrvFMVVp8cjQwqzXFs=
-X-Google-Smtp-Source: AGHT+IHlyVELjNAj2aJjY2JaCe7i+zLzQHpoz9KmkrKWBUeqMW+AT55BigFJRiYbmuvbEeUxhzrhvw==
-X-Received: by 2002:a05:6a21:6d9f:b0:1db:e587:4c3d with SMTP id adf61e73a8af0-1dc2057719amr146642637.23.1730996667070;
-        Thu, 07 Nov 2024 08:24:27 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079aaa01sm1796761b3a.100.2024.11.07.08.24.26
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 08:24:26 -0800 (PST)
-Date: Thu, 7 Nov 2024 08:24:24 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Chiara Meiohas <cmeioahs@nvidia.com>
-Cc: <dsahern@gmail.com>, <leonro@nvidia.com>, <linux-rdma@vger.kernel.org>,
- <netdev@vger.kernel.org>, <jgg@nvidia.com>, Chiara Meiohas
- <cmeiohas@nvidia.com>
-Subject: Re: [PATCH v2 iproute2-next 0/5] Add RDMA monitor support
-Message-ID: <20241107082424.5fa1fa68@hermes.local>
-In-Reply-To: <20241107080248.2028680-1-cmeioahs@nvidia.com>
-References: <20241107080248.2028680-1-cmeioahs@nvidia.com>
+	 MIME-Version:Content-Type; b=BrgMAK075tUOtIee/PaAbTzSCTtbczgJKXze4lzR3bUapOcaKPEmrVUtQHNoSWB3junans+LUxqSRK+ZZ40RJKX+8/TN7u8dmQGEtUH5CUCY7pDLdZZKmCcvh9njp3dk6/GkHY8JQI40e6bGTqStcBxlZNSswFJvsZrjFGksY3A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dbvSHeD1; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AB564C4CECC;
+	Thu,  7 Nov 2024 16:26:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730996766;
+	bh=ZGNeGv59giDSq2n3Qf1rhDUEiKsr68Gb0LrKfWT12ro=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=dbvSHeD1gD7wOtH851djZvFSDmArgs+/zApmZXN5YfF53TGAntdkEY91+Lbk7N2F3
+	 ye6y5WRBykqRpBg3m8IJ6vWNf5LowZ4lyQjksZ3r6jZ7R5YdNtD6ywxok9P4pMXph4
+	 qCE5J/M8ZpxIABSU2vwtr2CZ1OBMptAfOaKWRU56KsPyx6MRMJQvCfhcwbtDzTJJDN
+	 IvMniAtNec9+TuCbb8NznZb08zto6EK3BKO+2hQdZaPtGs83mnhm6VlZuy3rtHd1ho
+	 YzUd2AEBuHgTaZQlel2NE2jrSZg9xtByyt64fu9dGPjnDxo18LAdy28bjaIYS4d9if
+	 24Kxrsp7XWKqQ==
+Date: Thu, 7 Nov 2024 08:26:04 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>
+Cc: Romain Gantois <romain.gantois@bootlin.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Dan Murphy <dmurphy@ti.com>, Florian Fainelli
+ <f.fainelli@gmail.com>, Thomas Petazzoni <thomas.petazzoni@bootlin.com>,
+ Maxime Chevallier <maxime.chevallier@bootlin.com>, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH net v2] net: phy: dp83869: fix status reporting for
+ 1000base-x autonegotiation
+Message-ID: <20241107082604.3cf95e9d@kernel.org>
+In-Reply-To: <20241104-dp83869-1000base-x-v2-1-f97e39a778bf@bootlin.com>
+References: <20241104-dp83869-1000base-x-v2-1-f97e39a778bf@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,22 +65,28 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 7 Nov 2024 10:02:43 +0200
-Chiara Meiohas <cmeioahs@nvidia.com> wrote:
+On Mon, 04 Nov 2024 09:52:32 +0100 Romain Gantois wrote:
+> The DP83869 PHY transceiver supports converting from RGMII to 1000base-x.
+> In this operation mode, autonegotiation can be performed, as described in
+> IEEE802.3.
+> 
+> The DP83869 has a set of fiber-specific registers located at offset 0xc00.
+> When the transceiver is configured in RGMII-to-1000base-x mode, these
+> registers are mapped onto offset 0, which should, in theory, make reading
+> the autonegotiation status transparent.
+> 
+> However, the fiber registers at offset 0xc04 and 0xc05 do not follow the
+> bit layout of their standard counterparts. Thus, genphy_read_status()
+> doesn't properly read the capabilities advertised by the link partner,
+> resulting in incorrect link parameters.
+> 
+> Similarly, genphy_config_aneg() doesn't properly write advertised
+> capabilities.
+> 
+> Fix the 1000base-x autonegotiation procedure by replacing
+> genphy_read_status() and genphy_config_aneg() with driver-specific
+> functions which take into account the nonstandard bit layout of the DP83869
+> registers in 1000base-x mode.
 
-> From: Chiara Meiohas <cmeiohas@nvidia.com>
-> 
-> This series adds support to a new command to monitor IB events
-> and expands the rdma-sys command to indicate whether this new
-> functionality is supported.
-> We've also included a fix for a typo in rdma-link man page.
-> 
-> Command usage and examples are in the commits and man pages.
-> 
-> These patches are complimentary to the kernel patches:
-> https://lore.kernel.org/linux-rdma/20240821051017.7730-1-michaelgur@nvidia.com/
-> https://lore.kernel.org/linux-rdma/093c978ef2766fd3ab4ff8798eeb68f2f11582f6.1730367038.git.leon@kernel.org/
-
-What happens if you run new iproute2 with these commands
-on an older kernel? What error is reported?
+Could we get an ack from PHY maintainers?
 
