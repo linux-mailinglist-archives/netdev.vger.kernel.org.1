@@ -1,107 +1,160 @@
-Return-Path: <netdev+bounces-142789-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142790-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D4AA9C05FA
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:40:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 882569C05FF
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934431C21372
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:40:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A63681C210EE
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D907A20C474;
-	Thu,  7 Nov 2024 12:40:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF2E720EA26;
+	Thu,  7 Nov 2024 12:41:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="RmtHNgc5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="CE9wZduG"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC3051DB534;
-	Thu,  7 Nov 2024 12:40:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 210741EF0AD
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 12:41:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730983228; cv=none; b=XS8RI0hKdKhik+2ZAjp7tjMLMY4JChwDlxOJVjoWel7JSZPJwaEL3RpeBmYNpYi6IbjcmC0MK/KVC2TDpEP4TtmrqhE+oey1ZzB9hKrK5BNAk9IXXssMYP/wy+xLuGoIS0LtCibEv96da2wKd4Yg/fOe9dvNOoERPsIikZWw24U=
+	t=1730983274; cv=none; b=PddwWj3gdJpjqFHKKSyxetU1OOJ17TRnP8CRSxQEa2mDdQ7KZ9BsGfxKAk4yzjH9x0rNNg7TlJdhBsLp7DMEiR8LxXIVH/EK2TKndMF7QmUit9I33duZ7ZQhdjobg9ou+2sBnRnAKldJx0S0E6Z+FJb51C0FEvTtITV5Pxp1RVs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730983228; c=relaxed/simple;
-	bh=VZ/R76eZ40KfZxIQM47Eo9NR0UwGvAKmLQ8wW76gHE8=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=q3vXZhR4Lhe6E//Sck0fS0SKfmdxiJysf6ker/PwNn4mfzBoAaNH5GPZvR6XbUAU8eTYhe44GIpRSaKLUBgNU0pOj/pdZd4BDBN5QgRVjD880YpMRHmZcTsVQw1ZxnvwtAh/Jsrbs9NRavrUIp7YziQcf4LW6tO4syRn8cncxZA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=RmtHNgc5; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1EF80C4CECC;
-	Thu,  7 Nov 2024 12:40:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730983226;
-	bh=VZ/R76eZ40KfZxIQM47Eo9NR0UwGvAKmLQ8wW76gHE8=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RmtHNgc5aEh2jxi4LKZXroPeeq47lr+t5xy/sjX88jCya+GqX/J23XpfTXiHkbo+P
-	 RkA8aL9tmby/TCWLNUuHku7wuB8l63MMBCBNrFM9wX0+3Ymg8fydtjGDkRIgzVX6Bs
-	 vtTE28ikWXgdpm4UILIzcRJ+/JYjeuX3+/r+CFtodst2X9BkJa/4/cYOlCgl/3nuRA
-	 AwcqX74NgvsR86bxTMveB+M1h+M5NmIk9+D7LGHotpxVd3EY36gpbiOP9OVqkOg2Wh
-	 IYM2FJN7T9qe5mjoTjKMgcgO82f1BhXBcVrVaHb8TJwEvm0CQ4uES1rNlZP1vHwC6v
-	 88HD52YJcLtBQ==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 70F763809A80;
-	Thu,  7 Nov 2024 12:40:36 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=arc-20240116; t=1730983274; c=relaxed/simple;
+	bh=0xOH2DwmBPvkKs25IRRpA5/+QjtzVAPgcJqdgeso+zw=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UJXrBgQQimW+X6lFrvb+KLhLu7DNscJP/yNk2g/S4d4pU/SQWhdPNgymbyX0eUNg0wLwy4v7Z1Khz4hGZvTLsKVCgyuDVstU6+2VmtpvTKAh5C0kh+s2zes/qXxIXbIaA18BF01ibtd0dl6Ns8dbJMrOYwFuH74P7adNSpqhS+s=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=CE9wZduG; arc=none smtp.client-ip=209.85.208.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5cefc36c5d4so1199530a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 04:41:11 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730983270; x=1731588070; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ivVKRH2yr9svH6beGCk8O17xcGU1F9I4JcusPh/IoEQ=;
+        b=CE9wZduG8m5Zt0621niAxhZce2FmkDv1QHP+PcgKVe0+KAtP4deykks/xFrAV/SFZt
+         pkiGu6AcvyaFS39IDEJ/mrqtK78lMN+dDQESxDCaiM5GhslHVROLR4Wy82gcIXhp1k3B
+         6qYzGIRekN3ulif17OSGRVK8HMzAWEMOj770jJOKFnpyj0hJxb+3S52zk4FZK1wx5tNP
+         0B/VMURqTTry6t8Kqse23o2+oe5irukxGBPvrp3BCrsaKMt3ZURUQFrB5z3lhhT7seGi
+         bn17QTOIIB0JQ1nMPDm0dnkndAnVwMbBj25ogm+IlYeSKTj3C7nuN1sk6A3sCH1ApK7J
+         K94A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730983270; x=1731588070;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=ivVKRH2yr9svH6beGCk8O17xcGU1F9I4JcusPh/IoEQ=;
+        b=WBicr/djuWe7cF5PhViB4rlNO68XzIzGYw34RLq0vAwjSpEx4XAL921ic0Y3ZxC8lC
+         jHSXO1ojQRa5DkIhbNzNIlKucbkq7w5lc3ac+81u94K+kL+sQbIsl0LUtraiq51Up6aX
+         aEX1Mrer8ZtJb4z7JbpdtuUd3qt7HQWI8Jn+2xJb+DXHCZm3l8lGKSSEewncHJaK33ch
+         Vl6120MlzwSHpyX7cGAL5A/GY9hriyep28ORfjdZRJ3LtoF8KBto4N7aWt8lT0UP/t5Z
+         BGzoOu2kyFS/QUicuKwK8A74br9QLRtajMP2ZJCsG9X/R+dF6XgpqMMSk9Q0WD6SGoK5
+         CxpA==
+X-Gm-Message-State: AOJu0Yz4DhrGWYPVT7G2Vwzb5guTReIsKctEhNUyLkSyjH3gCquhtPJZ
+	gzMSk4+6H0JssJcFWCo68zVawbqOTTjrc3eqXOWjEVa9DDj99r6VzVMsFAxs3BTtbieV3CqSkb+
+	qTuJNDkGghym2lRV1D0Afa85jC2L3SAPolblT
+X-Google-Smtp-Source: AGHT+IHJfRifTh/VChuwfeR/jbYQWJZwkubJtQhT0PzG7sH947f2RX0vvvURIGGKney4qTqvLB52PLKMjkyZqME6nf8=
+X-Received: by 2002:a05:6402:1d4a:b0:5cb:acdc:b245 with SMTP id
+ 4fb4d7f45d1cf-5ceb9282a67mr20231225a12.17.1730983270122; Thu, 07 Nov 2024
+ 04:41:10 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [net-next v8 0/3] net: wwan: t7xx: Add t7xx debug ports
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173098323525.1650074.3036692889717501713.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Nov 2024 12:40:35 +0000
-References: <20241104094436.466861-1-jinjian.song@fibocom.com>
-In-Reply-To: <20241104094436.466861-1-jinjian.song@fibocom.com>
-To: Jinjian Song <jinjian.song@fibocom.com>
-Cc: chandrashekar.devegowda@intel.com, chiranjeevi.rapolu@linux.intel.com,
- haijun.liu@mediatek.com, m.chetan.kumar@linux.intel.com,
- ricardo.martinez@linux.intel.com, loic.poulain@linaro.org,
- ryazanov.s.a@gmail.com, johannes@sipsolutions.net, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
- linux-doc@vger.kernel.org, angelogioacchino.delregno@collabora.com,
- linux-arm-kernel@lists.infradead.org, matthias.bgg@gmail.com, corbet@lwn.net,
- linux-mediatek@lists.infradead.org, helgaas@kernel.org,
- danielwinkler@google.com, korneld@google.com, andrew+netdev@lunn.ch,
- horms@kernel.org
+References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com> <20241105100647.117346-10-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20241105100647.117346-10-chia-yu.chang@nokia-bell-labs.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 Nov 2024 13:40:58 +0100
+Message-ID: <CANn89i+9USaOthY3yaJPT-cbfAcP0re2bbGbWU7SqOSYEW2CMw@mail.gmail.com>
+Subject: Re: [PATCH v5 net-next 09/13] gro: prevent ACE field corruption &
+ better AccECN handling
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, joel.granados@kernel.org, 
+	kuba@kernel.org, andrew+netdev@lunn.ch, horms@kernel.org, pablo@netfilter.org, 
+	kadlec@netfilter.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hello:
+On Tue, Nov 5, 2024 at 11:07=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
+>
+> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+>
+> There are important differences in how the CWR field behaves
+> in RFC3168 and AccECN. With AccECN, CWR flag is part of the
+> ACE counter and its changes are important so adjust the flags
+> changed mask accordingly.
+>
+> Also, if CWR is there, set the Accurate ECN GSO flag to avoid
+> corrupting CWR flag somewhere.
+>
+> Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> ---
+>  net/ipv4/tcp_offload.c | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> index 0b05f30e9e5f..f59762d88c38 100644
+> --- a/net/ipv4/tcp_offload.c
+> +++ b/net/ipv4/tcp_offload.c
+> @@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *hea=
+d, struct sk_buff *skb,
+>         th2 =3D tcp_hdr(p);
+>         flush =3D (__force int)(flags & TCP_FLAG_CWR);
+>         flush |=3D (__force int)((flags ^ tcp_flag_word(th2)) &
+> -                 ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> +                 ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
+>         flush |=3D (__force int)(th->ack_seq ^ th2->ack_seq);
+>         for (i =3D sizeof(*th); i < thlen; i +=3D 4)
+>                 flush |=3D *(u32 *)((u8 *)th + i) ^
+> @@ -405,7 +405,7 @@ void tcp_gro_complete(struct sk_buff *skb)
+>         shinfo->gso_segs =3D NAPI_GRO_CB(skb)->count;
+>
+>         if (th->cwr)
+> -               shinfo->gso_type |=3D SKB_GSO_TCP_ECN;
+> +               shinfo->gso_type |=3D SKB_GSO_TCP_ACCECN;
+>  }
+>  EXPORT_SYMBOL(tcp_gro_complete);
+>
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I do not really understand this patch. How a GRO engine can know which
+ECN variant the peers are using ?
 
-On Mon,  4 Nov 2024 17:44:33 +0800 you wrote:
-> Add support for t7xx WWAN device to debug by ADB (Android Debug Bridge)
-> port and MTK MIPCi (Modem Information Process Center) port.
-> 
-> Application can use ADB (Android Debug Bridge) port to implement
-> functions (shell, pull, push ...) by ADB protocol commands.
-> 
-> Application can use MIPC (Modem Information Process Center) port
-> to debug antenna tuner or noise profiling through this MTK modem
-> diagnostic interface.
-> 
-> [...]
+SKB_GSO_TCP_ECN is also used from other points, what is your plan ?
 
-Here is the summary with links:
-  - [net-next,v8,1/3] wwan: core: Add WWAN ADB and MIPC port type
-    https://git.kernel.org/netdev/net-next/c/495e7c8e9601
-  - [net-next,v8,2/3] net: wwan: t7xx: Add debug ports
-    https://git.kernel.org/netdev/net-next/c/61329a1152dd
-  - [net-next,v8,3/3] net: wwan: t7xx: Unify documentation column width
-    https://git.kernel.org/netdev/net-next/c/238f2ca1e61f
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+git grep -n SKB_GSO_TCP_ECN
+drivers/net/ethernet/hisilicon/hns3/hns3_enet.c:3888:
+skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+drivers/net/ethernet/mellanox/mlx5/core/en_rx.c:1291:
+skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+drivers/net/ethernet/mellanox/mlx5/core/en_rx.c:1312:
+skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+include/linux/netdevice.h:5061: BUILD_BUG_ON(SKB_GSO_TCP_ECN !=3D
+(NETIF_F_TSO_ECN >> NETIF_F_GSO_SHIFT));
+include/linux/skbuff.h:664:     SKB_GSO_TCP_ECN =3D 1 << 2,
+include/linux/virtio_net.h:88:                  gso_type |=3D SKB_GSO_TCP_E=
+CN;
+include/linux/virtio_net.h:161:         switch (gso_type & ~SKB_GSO_TCP_ECN=
+) {
+include/linux/virtio_net.h:226:         if (sinfo->gso_type & SKB_GSO_TCP_E=
+CN)
+net/ipv4/tcp_offload.c:404:             shinfo->gso_type |=3D SKB_GSO_TCP_E=
+CN;
+net/ipv4/tcp_output.c:389:
+skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
 
