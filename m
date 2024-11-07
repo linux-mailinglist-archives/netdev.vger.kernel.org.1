@@ -1,109 +1,215 @@
-Return-Path: <netdev+bounces-143098-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143099-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B4C99C123E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:04:38 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 975B99C123F
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:11:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 110F81F236D6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:04:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CBF31C2137B
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:11:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E392F2194AC;
-	Thu,  7 Nov 2024 23:04:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A86D02185BE;
+	Thu,  7 Nov 2024 23:11:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="dUdxFw1J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="gPjkm496"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f178.google.com (mail-yw1-f178.google.com [209.85.128.178])
+Received: from mail-ej1-f43.google.com (mail-ej1-f43.google.com [209.85.218.43])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33DCA21832A
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 23:04:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB72D2178FC
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 23:11:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731020655; cv=none; b=sc+Adcm4e54alHEJ9lHV0qDfXbNU7uXlHryz1qiM769zlMi6NLNZgoJUl34YRllL+88zm68gNweSx/F7V53RHbDseDOXvXVdZYjkbL05mR1aQdVKQVasl8ZycJ0D+xF+yJk3PCyfC6IoAatOo+i56MoSpdshJHSY+srdpXTgFOY=
+	t=1731021090; cv=none; b=b84jJcRJf236ylvwt6KfVwnsuSAOsgLFVBSgNQD8216BM+sroHzXk8uaUQ/pjt83tewpKEvVBL4abSckbe/qcCdCrsyF6v65oHOexjXmjdjb/M8lxJ1jM4uSOlEwBjNrVwLZOSKM4WdvCXPz9m9KXVzRVvy2+bDttrpB1ruP6Mc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731020655; c=relaxed/simple;
-	bh=BhxcMHtLLtHwPPWGtXd9fvcEeapSiu/a60i7ogxcNi0=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=qX0p3Aj7hAd0GubzPtzSPz+rhWbnJWPnjKNHqzr7ZJGR7A/rD6s32evz0h96ob1dIWCRjU5796+ZxSwrsjMvauV6R7g9jL+bdUS1WAVAGSRw6dMBFtkIBFD7UXsToCZKizCfJ3xAUo6w/ZdMIJYk9HbRyPGEldkG/hhulloMFXs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=dUdxFw1J; arc=none smtp.client-ip=209.85.128.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
-Received: by mail-yw1-f178.google.com with SMTP id 00721157ae682-6ea1407e978so14708477b3.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 15:04:13 -0800 (PST)
+	s=arc-20240116; t=1731021090; c=relaxed/simple;
+	bh=8C6vyWOYcgiE9RruRLgQDHDBZfJjrsTKwZT73zknrzk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=jZGDKAtprAlzrco4kudG9UCwMLBO3MEr4wrf6AJlwXoqMsjErvzF6s8xKPq4fsiljHg4w9XRwLpB78KicmErX/SS6csQx4zrf10ai1dfqqrs6oD//Mwn5T96bOnVXEFxGA8LsZQvZcBkYljdXRMnK1fo/ePqxJXAQfm/9chWKCE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=gPjkm496; arc=none smtp.client-ip=209.85.218.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f43.google.com with SMTP id a640c23a62f3a-a9aa8895facso269498466b.2
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 15:11:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=paul-moore.com; s=google; t=1731020653; x=1731625453; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QlntkSFiHNeZkBFtAn8m126DlC2mYBr54/x5PoDfpxA=;
-        b=dUdxFw1JDMG/3R2o1Pf1cCjtVoF8bUHifzwKWzNb/EcEa53q+dhrFlgp05wBedUweN
-         WG4qf47Csa2xa1GWvvdnSPQGmAVxqCJ97lzsnerijupoZ1A6ETj1wRoVjPYRetishazn
-         9YZjOqv/HCnMIhRGzgl01vNGVggdp/qJJ2WzqSAUZyYD3Ke22Pn44Uf7Z62801inPvYs
-         9WpYgkoT9ZGJSkLDPmM3G0r1bNsa41zc4uQUQUaAmwCmyueTaCRCegt2pRz/IUM7ebaY
-         ixaRKzvIQ6M7qvntf+Z6wfTnxagMNOklQlzjcNuQpE2il8d92BELvq6baEU3x6z+4hWl
-         OCGw==
+        d=gmail.com; s=20230601; t=1731021087; x=1731625887; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Fh1nj3q16SjAJPEM7S+l5jum3bYi5R42P7sSt3yF+b8=;
+        b=gPjkm4965Vjaimn7GtcpHZcTfLvRGJh4O+lPvUbxvFoa53tjVI7tr4rc6ltErGt/Mm
+         S4xFWHm6v9tgUW12vp4ldGcBBS6fiN/+0de+o9VrtPHCpwa9NH+xn9LbLbpkKF3/m+IA
+         UlFSL6xsPFj4G5VTGfaNtXk5Cgd3saWRjdus3ynG4qmIkmo6eO8ctLl+WmQa0N/BlpMG
+         lW2oN94vzcsSC7MMQ476BZ3gtL8gIthAE+U1McaNIyRQgX+faKnekHBYYxePYihBRuqj
+         f/7pN4zuZF4Z6JYE09ueNbufnShZCGOaw8m4+aqygDH0H7x8zNqOB0daFcO1ExmICKnp
+         zcIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731020653; x=1731625453;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QlntkSFiHNeZkBFtAn8m126DlC2mYBr54/x5PoDfpxA=;
-        b=ngR3tRM5vjjF8Ah3fk78OQO51RnVgRvztsxRKEqSruxgg3295B7lVFcqen3TaoQrKf
-         JCT/kaJByeHCw/mj4qeQrLslw0KoZ7td633yvCzFTZzASBrcuGpXaWSHZrIS4YJrD9yl
-         ruDJ35E1rdKXHRiN/kKRNbNU5FXY2J5qplNp96l6fm3ytB6GMuYIdLe+AINLw8Pl9j2l
-         cueenrIdHSej2epBJw4zsRtrDkzYpEpZv8b/BCYmFdvg5XOPV38mJ+MAjIS8p8cpJEC3
-         QYFIzuOcTlyLMRDanaj+HeywKnej9JsOYlo+cZSFqeEMtMvVHcu+VqWDkJn++snLH8/9
-         T2Pg==
-X-Forwarded-Encrypted: i=1; AJvYcCX6Jh+F2G4KAeeZmReFoFXHt7mpP/WrNMP9oyv+NST5nWKsKKuRkOtiUmh8+gXDmcoKOinkY4o=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwNMMGBJNBrATxgZC0Tho3jDOlhmXTcJhR2FRkp6j0Ot8an3GHX
-	F10+zlHWPQekNGK/32IJHbJrMH2bxAtdQ5DvQUJsN6LGL2BsnlkOYhD95Zr+8pbSAgK0UVJdUlE
-	9bymcod5bpVaxSz8tnSaDW/orbAjh794nBOWK
-X-Google-Smtp-Source: AGHT+IEb2Xaj5GrD2ejkS6S27Jg/4eqckXGxaD2HDeWP/WC9GDRcrkcjw/qpYzRH6bRDS4ZblgpGPOdYoz9Xo5Wte98=
-X-Received: by 2002:a05:690c:4d89:b0:6ea:4d3f:df9d with SMTP id
- 00721157ae682-6eaddd71c30mr9760277b3.4.1731020653185; Thu, 07 Nov 2024
- 15:04:13 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731021087; x=1731625887;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Fh1nj3q16SjAJPEM7S+l5jum3bYi5R42P7sSt3yF+b8=;
+        b=D05afH5DPKUYK5h5pleOkfHo76gjLFgmSz2s5/2G7VNbrtjGPV/Uv0ep8/bwkW2cKT
+         ge9tucuLb/ozFK8M63Pqj/oQHyhh0ruICFASRBz2iIhf2dYX8n7COhwZDWakJmpv7N0d
+         q37vVC0Ax/K4ijVd6lmPziaWi3MeDfVZ0iqMeyCKFdLT/9Sj9llAhkTBeFRdFoQ0KaZD
+         qz5qc3J8Do/QMqLtSpBC4AUHJpNykFy3E7m63zQzfPDZ8qBxuLntWPHtVGdmlr6wA5V5
+         tXy8ram9ysWRs2efA3gFxqSrGBDIZFxXByMXW6dplUO16sZzPqvCL+LftYe62nWIZZve
+         gzLQ==
+X-Forwarded-Encrypted: i=1; AJvYcCX/ZWZPC40Akg8VnoEi6uiOEU0w8o/UcOwD9FrxyCwE7UOkKCx1sA88hOwxfdQ/jz8fOK9PtNw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwCfNEMk7qBPTuqP3WIqe6UpX0jfFWZl0VO02vCnrZ+LbG3JSsl
+	NTHMWdJJFK6EvetdVQ3ZA8IgEWJUlgMoJvZpAEXzdKtO1RE/DKvA
+X-Google-Smtp-Source: AGHT+IGG1DYqwEG8zekd8ObAeTHaFMRdYpKOvahLsqVLP/QnEVDeR0d23FrlV54VHPkxXEERIrxh1A==
+X-Received: by 2002:a17:907:1c85:b0:a99:ffdb:6fef with SMTP id a640c23a62f3a-a9eeffda4dfmr48276866b.46.1731021086857;
+        Thu, 07 Nov 2024 15:11:26 -0800 (PST)
+Received: from getafix.rd.francetelecom.fr ([193.252.113.11])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a4a7d3sm155086666b.70.2024.11.07.15.11.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 15:11:26 -0800 (PST)
+From: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+X-Google-Original-From: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+To: edumazet@google.com
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	alexandre.ferrieux@orange.com,
+	netdev@vger.kernel.org
+Subject: [PATCH net v5] net: sched: cls_u32: Fix u32's systematic failure to free IDR entries for hnodes.
+Date: Fri,  8 Nov 2024 00:11:23 +0100
+Message-Id: <20241107231123.298299-1-alexandre.ferrieux@orange.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241106155509.1706965-1-omosnace@redhat.com> <CANn89iKag19EPvnQRthsG98pfjriRwtS+YND0359xFijGAoEYg@mail.gmail.com>
- <CAFqZXNumyhpRvrZ6mAK9OVxbte=_3MG195i_+Z1j79PsE=6k_g@mail.gmail.com>
-In-Reply-To: <CAFqZXNumyhpRvrZ6mAK9OVxbte=_3MG195i_+Z1j79PsE=6k_g@mail.gmail.com>
-From: Paul Moore <paul@paul-moore.com>
-Date: Thu, 7 Nov 2024 18:04:02 -0500
-Message-ID: <CAHC9VhSdC_EnMMu05UbcFAGa8y8OyufTra6kC5zhxDP_S6QucQ@mail.gmail.com>
-Subject: Re: [PATCH] selinux,xfrm: fix dangling refcount on deferred skb free
-To: Ondrej Mosnacek <omosnace@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
-	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
-	Stephen Smalley <stephen.smalley.work@gmail.com>, selinux@vger.kernel.org, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Wed, Nov 6, 2024 at 11:54=E2=80=AFAM Ondrej Mosnacek <omosnace@redhat.co=
-m> wrote:
->
-> ... That made me look deeper into history
-> which commit actually added the decrement on free and it turns out it
-> was done intentionally as a bugfix - see commit e4e8536f65b5
-> ("selinux: fix the labeled xfrm/IPsec reference count handling").
-> Before that commit the logic was similar to what my patch is doing, so
-> I could be re-introducing another bug here :-/ The commit message is
-> not very helpful there - Paul, do you happen to remember what the
-> issue was that prompted it?
+To generate hnode handles (in gen_new_htid()), u32 uses IDR and
+encodes the returned small integer into a structured 32-bit
+word. Unfortunately, at disposal time, the needed decoding
+is not done. As a result, idr_remove() fails, and the IDR
+fills up. Since its size is 2048, the following script ends up
+with "Filter already exists":
 
-With that commit being over 10 years old, I can't say I recall much
-about it.  I did try to sift through the SELinux archives, but I
-didn't see much from 2013.  It's possible there is an old RH bugzilla
-issue for this, but my RHBZ-fu isn't good enough to search that out -
-sorry.
+  tc filter add dev myve $FILTER1
+  tc filter add dev myve $FILTER2
+  for i in {1..2048}
+  do
+    echo $i
+    tc filter del dev myve $FILTER2
+    tc filter add dev myve $FILTER2
+  done
 
---=20
-paul-moore.com
+This patch adds the missing decoding logic for handles that
+deserve it, along with a corresponding tdc test.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+---
+v5: fix title - again
+v4: add tdc test
+v3: prepend title with subsystem ident
+v2: use u32 type in handle encoder/decoder
+
+
+ net/sched/cls_u32.c                           | 18 ++++++++++----
+ .../tc-testing/tc-tests/filters/u32.json      | 24 +++++++++++++++++++
+ 2 files changed, 38 insertions(+), 4 deletions(-)
+
+diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+index 9412d88a99bc..6da94b809926 100644
+--- a/net/sched/cls_u32.c
++++ b/net/sched/cls_u32.c
+@@ -41,6 +41,16 @@
+ #include <linux/idr.h>
+ #include <net/tc_wrapper.h>
+ 
++static inline u32 handle2id(u32 h)
++{
++	return ((h & 0x80000000) ? ((h >> 20) & 0x7FF) : h);
++}
++
++static inline u32 id2handle(u32 id)
++{
++	return (id | 0x800U) << 20;
++}
++
+ struct tc_u_knode {
+ 	struct tc_u_knode __rcu	*next;
+ 	u32			handle;
+@@ -310,7 +320,7 @@ static u32 gen_new_htid(struct tc_u_common *tp_c, struct tc_u_hnode *ptr)
+ 	int id = idr_alloc_cyclic(&tp_c->handle_idr, ptr, 1, 0x7FF, GFP_KERNEL);
+ 	if (id < 0)
+ 		return 0;
+-	return (id | 0x800U) << 20;
++	return id2handle(id);
+ }
+ 
+ static struct hlist_head *tc_u_common_hash;
+@@ -360,7 +370,7 @@ static int u32_init(struct tcf_proto *tp)
+ 		return -ENOBUFS;
+ 
+ 	refcount_set(&root_ht->refcnt, 1);
+-	root_ht->handle = tp_c ? gen_new_htid(tp_c, root_ht) : 0x80000000;
++	root_ht->handle = tp_c ? gen_new_htid(tp_c, root_ht) : id2handle(0);
+ 	root_ht->prio = tp->prio;
+ 	root_ht->is_root = true;
+ 	idr_init(&root_ht->handle_idr);
+@@ -612,7 +622,7 @@ static int u32_destroy_hnode(struct tcf_proto *tp, struct tc_u_hnode *ht,
+ 		if (phn == ht) {
+ 			u32_clear_hw_hnode(tp, ht, extack);
+ 			idr_destroy(&ht->handle_idr);
+-			idr_remove(&tp_c->handle_idr, ht->handle);
++			idr_remove(&tp_c->handle_idr, handle2id(ht->handle));
+ 			RCU_INIT_POINTER(*hn, ht->next);
+ 			kfree_rcu(ht, rcu);
+ 			return 0;
+@@ -989,7 +999,7 @@ static int u32_change(struct net *net, struct sk_buff *in_skb,
+ 
+ 		err = u32_replace_hw_hnode(tp, ht, userflags, extack);
+ 		if (err) {
+-			idr_remove(&tp_c->handle_idr, handle);
++			idr_remove(&tp_c->handle_idr, handle2id(handle));
+ 			kfree(ht);
+ 			return err;
+ 		}
+diff --git a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+index 24bd0c2a3014..2095baa19c6a 100644
+--- a/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
++++ b/tools/testing/selftests/tc-testing/tc-tests/filters/u32.json
+@@ -329,5 +329,29 @@
+         "teardown": [
+             "$TC qdisc del dev $DEV1 parent root drr"
+         ]
++    },
++    {
++        "id": "1234",
++        "name": "Exercise IDR leaks by creating/deleting a filter many (2048) times",
++        "category": [
++            "filter",
++            "u32"
++        ],
++        "plugins": {
++            "requires": "nsPlugin"
++        },
++        "setup": [
++            "$TC qdisc add dev $DEV1 parent root handle 10: drr",
++            "$TC filter add dev $DEV1 parent 10:0 protocol ip prio 2 u32 match ip src 0.0.0.2/32 action drop",
++            "$TC filter add dev $DEV1 parent 10:0 protocol ip prio 3 u32 match ip src 0.0.0.3/32 action drop"
++        ],
++        "cmdUnderTest": "bash -c 'for i in {1..2048} ;do $TC filter delete dev $DEV1 pref 3;$TC filter add dev $DEV1 parent 10:0 protocol ip prio 3 u32 match ip src 0.0.0.3/32 action drop || exit 1;i=`expr $i + 1`;done'",
++        "expExitCode": "0",
++        "verifyCmd": "$TC filter show dev $DEV1",
++        "matchPattern": "protocol ip pref 3 u32",
++        "matchCount": "3",
++        "teardown": [
++            "$TC qdisc del dev $DEV1 parent root drr"
++        ]
+     }
+ ]
+-- 
+2.30.2
+
 
