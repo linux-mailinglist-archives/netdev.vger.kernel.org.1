@@ -1,163 +1,95 @@
-Return-Path: <netdev+bounces-142740-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69C829C028C
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:39:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D9DE9C0290
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:40:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8E4A2843E6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:39:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB6DE2815A3
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 637611EF0A4;
-	Thu,  7 Nov 2024 10:39:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E76841EE011;
+	Thu,  7 Nov 2024 10:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ksOWxlV5"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f199.google.com (mail-il1-f199.google.com [209.85.166.199])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DBF91EE02E
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:39:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.199
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C09C21E1325
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:40:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730975970; cv=none; b=aKsohq2vgPijSOovnsy94e14+lr23fTLHvZn0FszK/nTuo3Rk6Qabl4Ab4qJ4hz7yBy2LezR75L8HbvboFH/iit53n5YBKMSO7svleb6DRGGqJ9yNIy9AyDIwML6S3E7Na5cB81hK1dfT/JU1nJ6tF80C7iC87VD5arqr9Rjb44=
+	t=1730976019; cv=none; b=aawqzU5HJXv6htBIqOGVh5zq886cvIfiutwlV2x8wVPrrsjhC4DmEk9oYBdAxevPy7X0zrrqzYO0hBK9WahsIB99aTgj+qVrk4KD+AS3QLfGWEEbXrFlJqS4wdVSWCyKBuTUVafRlrd/Jcz14qb1aLrzbQIl0trkkzVBH062gks=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730975970; c=relaxed/simple;
-	bh=MLzx+JeDnin4KjxS0XNHZkKWERWQzXA1Qplg6nmUjsA=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=UAc0RKkoMJTYpvB1Kyywj9s6IYASUncYxlrNIrI89+H325NQcNxnMD7pZ1cNDrLzQHdi/Urze00WuehrAM+2EYaGoLMfqi94XbzYvDUn6d7P1ghFdUWdFo9RrThYWvWn2f/QyMgfJn2H3sX2AVRqhQ/Of7oOMBoHLAfeXZ5XMqs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.199
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f199.google.com with SMTP id e9e14a558f8ab-3a6b3808522so9738275ab.3
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:39:28 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730975967; x=1731580767;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=GQN9lckoQb3NanDRzLgjFs/UoV1SQc1q4bFo9NwFNCY=;
-        b=tpVpMbvExa1QnfnkqliQ5APJWUFCkOtTI8PWZmaKXrgwb9u4LBYdt9et15kKbiOsM4
-         atpv/PDqSpqrY/DA9KeX3CV3dz9s6XvAz62NanACBmPjYPKChycrjsM/q/aT1trzAX3R
-         ZPoYyfCmlnxPsEeeSqYXm70xOrxKB6Ig8n/KHTbzACvYj7gIyIFjDYppyWpIq6sg1dI7
-         ul7m1T3AvWh4qQbGjp5ZkPs4fVARE5m0pB6N/vJ/klZ950/1IZ7fHV3bR+5B8ZzVFNKe
-         o+jLwVjhIyt3NWJg1XMpRlPTOlFWRVTJCHeYRU3YfpX0NzB/uRcyXzix1hLWIoqqRwvV
-         AXNA==
-X-Forwarded-Encrypted: i=1; AJvYcCU8HFLiTOyml/MhCbvzZMyYvc6mp5SE/y0PTlf8sNLban/xRG5e2b1+hhZHgeiAxU5Nv/ESv7Q=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwR9onpqZDqVoie2TtXmi0u4w5oaGB7tBaase4iV5TrvFQ4AgpH
-	5X7+THeWGFB59EJ47vSLwq6+FjigsPtmz9Wu7oF14juj2mcp49thLtE2QjuMo9TYpq+b0q4Bg5K
-	Y6wv3gj0XUMcxsuwJ91Fv7zqAhl4pqMZRiiekWIn9/vRVcy6ywbRXPVw=
-X-Google-Smtp-Source: AGHT+IHXaOZQZEvJJxDXNWHD5YbuTtZWS+RP0YvgGZ6VJKm9wcb0bTO22O92QApZGdYv2RmOVvM0xtff5GF2h4Fc5oGxnfdKznEd
+	s=arc-20240116; t=1730976019; c=relaxed/simple;
+	bh=6bOj2BpM5RsD1WuKpoA0ZkzcK16OmnkwrKr8QcWcAcY=;
+	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
+	 In-Reply-To:To:Cc; b=g8/1c0XBVVyX4TxHeRu4DRN3dHGdDEM+BrWOefeu2TIVhBIgJDzDvT8NPHGlS3SyXaVyh9ToBKDGshgSURDXqfROQ5kRG86/wQ/Yphxw7TbgASoI7yuR2HXFq/jZcHBTppcDemITVKgBcspb4X5U/Ehco7PkdeG3MclWdRriKG8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ksOWxlV5; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CACDC4CECC;
+	Thu,  7 Nov 2024 10:40:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1730976019;
+	bh=6bOj2BpM5RsD1WuKpoA0ZkzcK16OmnkwrKr8QcWcAcY=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=ksOWxlV5jU4eXfzjMzF5DoukO7vDii8E5kuZPLeG1uA286gTApbaiLi6P1gFlY8ir
+	 QbsI3B+FpNTomgAN/wdfRlV75d2DSUgWe4mHGNKQ1AI9Vt+GqaVWcgYoLFzFS/gzGQ
+	 ZUPWJ0vsB/MwBwmWRXNBosP5F3uRAmZkZ0HLDGQymuFfad18xGa1QOVnWFJnaeHrLe
+	 CkzZvw8bbwFm6zh5IWkM/Peve6VgzimoDWsBAcH8GsIao3h8g1QQSkL7vT4jY1+q83
+	 BgZxgz+ANMMDnDeNx+w0Mx8uUpGbutzk5zWrhxV8PUZRgRw3a8Nk00ogJf63FaAM0M
+	 We9pooh3rNHZQ==
+Received: from [10.30.226.235] (localhost [IPv6:::1])
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id ADE023809A80;
+	Thu,  7 Nov 2024 10:40:29 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:cd86:0:b0:3a3:a307:6851 with SMTP id
- e9e14a558f8ab-3a6b036d665mr261106185ab.22.1730975967624; Thu, 07 Nov 2024
- 02:39:27 -0800 (PST)
-Date: Thu, 07 Nov 2024 02:39:27 -0800
-In-Reply-To: <00000000000060ef65061f8cb3d4@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672c98df.050a0220.2dcd8c.0026.GAE@google.com>
-Subject: Re: [syzbot] [net?] [s390?] Unable to handle kernel execute from
- non-executable memory at virtual address ADDR
-From: syzbot <syzbot+8798e95c2e5511646dac@syzkaller.appspotmail.com>
-To: agordeev@linux.ibm.com, alibuda@linux.alibaba.com, bfoster@redhat.com, 
-	davem@davemloft.net, edumazet@google.com, guwen@linux.alibaba.com, 
-	horms@kernel.org, jaka@linux.ibm.com, kent.overstreet@linux.dev, 
-	kuba@kernel.org, linux-bcachefs@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-s390@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tonylu@linux.alibaba.com, 
-	wenjia@linux.ibm.com
-Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net-next v5] eth: fbnic: Add support to write TCE TCAM entries
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <173097602850.1604073.7669006872410044150.git-patchwork-notify@kernel.org>
+Date: Thu, 07 Nov 2024 10:40:28 +0000
+References: <20241104031300.1330657-1-mohsin.bashr@gmail.com>
+In-Reply-To: <20241104031300.1330657-1-mohsin.bashr@gmail.com>
+To: Mohsin Bashir <mohsin.bashr@gmail.com>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kuba@kernel.org,
+ andrew@lunn.ch, andrew+netdev@lunn.ch, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, kernel-team@meta.com,
+ sanmanpradhan@meta.com, sdf@fomichev.me, vadim.fedorenko@linux.dev,
+ horms@kernel.org, jdamato@fastly.com
 
-syzbot has found a reproducer for the following issue on:
+Hello:
 
-HEAD commit:    8936d33c1f69 Merge remote-tracking branch 'tip/irq/core' i..
-git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/arm64/linux.git for-kernelci
-console output: https://syzkaller.appspot.com/x/log.txt?x=16aaae30580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=163d7426d94ed7f
-dashboard link: https://syzkaller.appspot.com/bug?extid=8798e95c2e5511646dac
-compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
-userspace arch: arm64
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=11aaae30580000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1289cd87980000
+This patch was applied to netdev/net-next.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/c58cd818af34/disk-8936d33c.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c0e687204404/vmlinux-8936d33c.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/efc94fae8d41/Image-8936d33c.gz.xz
+On Sun,  3 Nov 2024 19:13:00 -0800 you wrote:
+> Add support to redirect host-to-BMC traffic by writing MACDA entries
+> from the RPC (RX Parser and Classifier) to TCE-TCAM. The TCE TCAM is a
+> small L2 destination TCAM which is placed at the end of the TX path (TCE).
+> 
+> Unlike other NICs, where BMC diversion is typically handled by firmware,
+> for fbnic, firmware does not touch anything related to the host; hence,
+> the host uses TCE TCAM to divert BMC traffic.
+> 
+> [...]
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+8798e95c2e5511646dac@syzkaller.appspotmail.com
+Here is the summary with links:
+  - [net-next,v5] eth: fbnic: Add support to write TCE TCAM entries
+    https://git.kernel.org/netdev/net-next/c/90c940ff1f74
 
-netdevsim netdevsim0 netdevsim1: set [1, 0] type 2 family 0 port 6081 - 0
-netdevsim netdevsim0 netdevsim2: set [1, 0] type 2 family 0 port 6081 - 0
-netdevsim netdevsim0 netdevsim3: set [1, 0] type 2 family 0 port 6081 - 0
-Unable to handle kernel execute from non-executable memory at virtual address ffff0000d1080b80
-KASAN: maybe wild-memory-access in range [0xfffc000688405c00-0xfffc000688405c07]
-Mem abort info:
-  ESR = 0x000000008600000f
-  EC = 0x21: IABT (current EL), IL = 32 bits
-  SET = 0, FnV = 0
-  EA = 0, S1PTW = 0
-  FSC = 0x0f: level 3 permission fault
-swapper pgtable: 4k pages, 48-bit VAs, pgdp=00000001bd31d000
-[ffff0000d1080b80] pgd=0000000000000000, p4d=180000023ffff403, pud=180000023f41b403, pmd=180000023f392403, pte=0068000111080707
-Internal error: Oops: 000000008600000f [#1] PREEMPT SMP
-Modules linked in:
-CPU: 1 UID: 0 PID: 6416 Comm: syz-executor278 Not tainted 6.12.0-rc6-syzkaller-g8936d33c1f69 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-pstate: 00400005 (nzcv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-pc : 0xffff0000d1080b80
-lr : smc_fback_forward_wakeup+0x1dc/0x514 net/smc/af_smc.c:822
-sp : ffff8000a3b97140
-x29: ffff8000a3b97210 x28: 1fffe00019a901c8 x27: ffff8000a3b97160
-x26: dfff800000000000 x25: ffff700014772e2c x24: ffff8000a3b97190
-x23: ffff0000cd480e40 x22: ffff0000cd480cc0 x21: ffff0000d1080b80
-x20: ffff8000a3b97180 x19: ffff0000dde73040 x18: ffff8000a3b96da0
-x17: 000000000000fc8e x16: ffff8000802ae4a0 x15: 0000000000000001
-x14: 1fffe0001bbce608 x13: ffff8000a3b98000 x12: 0000000000000003
-x11: 0000000000000202 x10: 0000000000000000 x9 : 1fffe000185b0001
-x8 : 0000000100000201 x7 : 0000000000000000 x6 : 0000000000000000
-x5 : 0000000000000020 x4 : 0000000000000000 x3 : 0000000000000000
-x2 : 0000000000000003 x1 : ffff80008b626000 x0 : ffff0000cd480cc0
-Call trace:
- 0xffff0000d1080b80 (P)
- smc_fback_forward_wakeup+0x1dc/0x514 net/smc/af_smc.c:822 (L)
- smc_fback_data_ready+0x88/0xac net/smc/af_smc.c:850
- tcp_data_ready+0x22c/0x44c net/ipv4/tcp_input.c:5220
- tcp_data_queue+0x18a4/0x4eb8 net/ipv4/tcp_input.c:5310
- tcp_rcv_established+0xe10/0x2018 net/ipv4/tcp_input.c:6264
- tcp_v4_do_rcv+0x3b8/0xc44 net/ipv4/tcp_ipv4.c:1915
- sk_backlog_rcv include/net/sock.h:1115 [inline]
- __release_sock+0x1a8/0x3d8 net/core/sock.c:3072
- __sk_flush_backlog+0x38/0xa4 net/core/sock.c:3092
- sk_flush_backlog include/net/sock.h:1178 [inline]
- tcp_sendmsg_locked+0x3118/0x3eb8 net/ipv4/tcp.c:1163
- tcp_sendmsg+0x40/0x64 net/ipv4/tcp.c:1357
- inet_sendmsg+0x15c/0x290 net/ipv4/af_inet.c:853
- sock_sendmsg_nosec net/socket.c:729 [inline]
- __sock_sendmsg net/socket.c:744 [inline]
- __sys_sendto+0x374/0x4f4 net/socket.c:2214
- __do_sys_sendto net/socket.c:2226 [inline]
- __se_sys_sendto net/socket.c:2222 [inline]
- __arm64_sys_sendto+0xd8/0xf8 net/socket.c:2222
- __invoke_syscall arch/arm64/kernel/syscall.c:35 [inline]
- invoke_syscall+0x98/0x2b8 arch/arm64/kernel/syscall.c:49
- el0_svc_common+0x130/0x23c arch/arm64/kernel/syscall.c:132
- do_el0_svc+0x48/0x58 arch/arm64/kernel/syscall.c:151
- el0_svc+0x54/0x168 arch/arm64/kernel/entry-common.c:744
- el0t_64_sync_handler+0x84/0x108 arch/arm64/kernel/entry-common.c:762
- el0t_64_sync+0x198/0x19c arch/arm64/kernel/entry.S:600
-Code: 00000000 00000000 00000000 00000000 (00000000) 
----[ end trace 0000000000000000 ]---
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
