@@ -1,160 +1,183 @@
-Return-Path: <netdev+bounces-142771-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142772-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EFCC9C04FC
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:57:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 191F99C04FE
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:57:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9159E1C23A87
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:57:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3BF4D1C23AB2
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:57:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BB4020B203;
-	Thu,  7 Nov 2024 11:56:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A31820B1E5;
+	Thu,  7 Nov 2024 11:57:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="No8l+H17"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="Af8b6sHD"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B6D718FDAF;
-	Thu,  7 Nov 2024 11:56:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778FB18FDAF
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 11:57:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.156.1
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730980619; cv=none; b=VembSVvZEIBl+OYMh3wLjIm0H+RgrcEQWoC+2IayFOAIEk5I4YtTZJALbeQSLo5mO+YvTTTW0qcW99/qckt+mTt366PrjQ/oHBzBH7AHD3NxQ8sQ7ysS1cQUZuWznJeG+2VYDRrkW+58zjVhR/9o5psq/AX+EZTc5VktSl80Sj4=
+	t=1730980629; cv=none; b=WE7CCpNvIor4t9NVb/VgQ9BC4iqXdLvNzRNum/HT1VsAwpAahVMUuKHCR8NEnifgRr1hiPR2rk5Ly6DXgBQmO2tYRumQOKy4KazfD2kBuAsSo40LJDhaSb8m609t7eaqwe2/ravjhRweJQhDlP2OPz7bkVcvl52asCQla1AMhVM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730980619; c=relaxed/simple;
-	bh=4pwJUW7QPMkOtc6HwpDYlGs/K22/GegT4OlM7GsMWGE=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=pjhSf+cJe52KH2po6XIigtOIu2xpKLASq/p2714aV7CGG88HRXsLzgRcM1va/RSL8lUDNKXwoDiGzdf0z+dou5Uim8E6Q36osmpTy9gyFFvUmew5t6iXzvgOi4DOQf9iCKIrZWb6Yqy6gRZ0EJFtYoixSbJAn/NWeZrYJqNx8SA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=No8l+H17; arc=none smtp.client-ip=148.163.158.5
+	s=arc-20240116; t=1730980629; c=relaxed/simple;
+	bh=sKpJaoccFoaeIQEtXafeByh74Hr9HEvp8y8KeDQ2x4c=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=mZGbvnxqfSYknzALJEIJF4woHoDwS9se05eg//tRyY2GwgAPIjN1scyuCwr5N27evyQ09vC55lK0KMZM8TF+n01mrfKlKY4JKeL+Bj7/VEaPbZuo7O06XkXYXhRSRW6fmFT3v6H7xAz9zRtX3A3mVUN/gW3hEhEc22r91jwcwAc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=Af8b6sHD; arc=none smtp.client-ip=148.163.156.1
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7BjSZJ002624;
-	Thu, 7 Nov 2024 11:56:52 GMT
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7B7SZJ023573;
+	Thu, 7 Nov 2024 11:57:00 GMT
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
 	:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pp1; bh=c+qNo6
-	yMcqwgT34P54tk473Xr4TkpvXiT2oLlxbaqSs=; b=No8l+H17lMoEA/y6O5PlJS
-	rC4PuGmalvx6wKMz//ol5rm2+dxKBL7Ib9Hlr3gg5zgiSY/UWhfwlL9RWTS7emBR
-	E7N9euDH6pACRlXzTg4Zfx5rnVhsH8HE1w10ys7Oj4Nbqbh0/Jhnrd5BLk7Yt5UI
-	ZpVHisCRmLQ7grxdpLr+hBtdcX7IpSZ3Y40ErmCdXBws/jEB1dUFqUpgK/C4HoGk
-	fAtDAb/r7bCar8VpET9KoAMgh78NAWR1DYPIX4n6eRuA+dvUrV15JaZeQBhDKs+6
-	UA0yBOU610IuCGhsqc/djEUpvu3BUts6/IKZQ6lsW/jw7DSxwowUQgjjF/PLFsQA
+	:message-id:mime-version:references:subject:to; s=pp1; bh=aHG36O
+	vafvRIm5i+1bq4lHBSYh6FEC/kFqBlJw0abFo=; b=Af8b6sHD9PNblS/nQFNf77
+	xvmUf5HTAy4wPP6LGIMxy+CHSkjjmEbe+tx0UaZmqn/w4V1Is9euAlyW4gFb/ty3
+	Z7+/TpY2R2KNATQ3fjOobsDHN6mKPc/I728+pZDTRyIXaLizjkQzmev3/m8B0J6W
+	0KZllYwuK/8ucBOtYDLf38ftMMUovtHOpew7zqTy5EnwvtR4k/n0pIMk3Wj+zA8t
+	4yM1dRCHsc7RDqy7rV7OgZSJKecTH49QCeFZlyhxSCTHlSzXfPrg8Nx+9nCR5u97
+	yURGkZ4Ids7N69z/zbY33IQrPxL5SbEKyCm7MKfl2P+XSH+eYDhK0J5L7xPAef7A
 	==
 Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rvy2815g-1
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rv09rb08-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 11:56:52 +0000 (GMT)
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A7BupCa027204;
-	Thu, 7 Nov 2024 11:56:51 GMT
-Received: from ppma23.wdc07v.mail.ibm.com (5d.69.3da9.ip4.static.sl-reverse.com [169.61.105.93])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rvy2815d-1
+	Thu, 07 Nov 2024 11:57:00 +0000 (GMT)
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A7BuxFm027169;
+	Thu, 7 Nov 2024 11:56:59 GMT
+Received: from ppma11.dal12v.mail.ibm.com (db.9e.1632.ip4.static.sl-reverse.com [50.22.158.219])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rv09rb06-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 11:56:51 +0000 (GMT)
-Received: from pps.filterd (ppma23.wdc07v.mail.ibm.com [127.0.0.1])
-	by ppma23.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7ADL5L008430;
-	Thu, 7 Nov 2024 11:56:50 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma23.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nywm5tn1-1
+	Thu, 07 Nov 2024 11:56:59 +0000 (GMT)
+Received: from pps.filterd (ppma11.dal12v.mail.ibm.com [127.0.0.1])
+	by ppma11.dal12v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A71XWMC012237;
+	Thu, 7 Nov 2024 11:56:58 GMT
+Received: from smtprelay06.dal12v.mail.ibm.com ([172.16.1.8])
+	by ppma11.dal12v.mail.ibm.com (PPS) with ESMTPS id 42p14102a9-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 11:56:50 +0000
-Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A7Bukwh54788376
+	Thu, 07 Nov 2024 11:56:58 +0000
+Received: from smtpav03.wdc07v.mail.ibm.com (smtpav03.wdc07v.mail.ibm.com [10.39.53.230])
+	by smtprelay06.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A7BuveC59638098
 	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 7 Nov 2024 11:56:46 GMT
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id C45A62004B;
-	Thu,  7 Nov 2024 11:56:46 +0000 (GMT)
-Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 4F46F20040;
-	Thu,  7 Nov 2024 11:56:45 +0000 (GMT)
-Received: from li-ce58cfcc-320b-11b2-a85c-85e19b5285e0 (unknown [9.179.13.246])
-	by smtpav05.fra02v.mail.ibm.com (Postfix) with SMTP;
-	Thu,  7 Nov 2024 11:56:45 +0000 (GMT)
-Date: Thu, 7 Nov 2024 12:56:43 +0100
-From: Halil Pasic <pasic@linux.ibm.com>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>, Wen Gu <guwen@linux.alibaba.com>,
-        "D. Wythe" <alibuda@linux.alibaba.com>,
-        Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
-        linux-rdma@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Jan Karcher
- <jaka@linux.ibm.com>,
-        Gerd Bayer <gbayer@linux.ibm.com>,
-        Alexandra Winter
- <wintera@linux.ibm.com>,
-        Nils Hoppmann <niho@linux.ibm.com>,
-        Niklas Schnell
- <schnelle@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Karsten Graul <kgraul@linux.ibm.com>,
-        Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>,
-        Halil Pasic <pasic@linux.ibm.com>, linux-cifs@vger.kernel.org
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
- ib_device_get_netdev()
-Message-ID: <20241107125643.04f97394.pasic@linux.ibm.com>
-In-Reply-To: <20241106135910.GF5006@unreal>
-References: <20241025072356.56093-1-wenjia@linux.ibm.com>
-	<20241027201857.GA1615717@unreal>
-	<8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
-	<20241105112313.GE311159@unreal>
-	<20241106102439.4ca5effc.pasic@linux.ibm.com>
-	<20241106135910.GF5006@unreal>
-Organization: IBM
-X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.32; x86_64-redhat-linux-gnu)
+	Thu, 7 Nov 2024 11:56:58 GMT
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D4BE45805C;
+	Thu,  7 Nov 2024 11:56:57 +0000 (GMT)
+Received: from smtpav03.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D1C0B58054;
+	Thu,  7 Nov 2024 11:56:55 +0000 (GMT)
+Received: from [9.171.9.213] (unknown [9.171.9.213])
+	by smtpav03.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Nov 2024 11:56:55 +0000 (GMT)
+Message-ID: <b5b668d4-a03f-449a-a0bb-0b8eb29126b3@linux.ibm.com>
+Date: Thu, 7 Nov 2024 12:56:54 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: do not leave a dangling sk pointer in
+ __smc_create()
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+        netdev@vger.kernel.org, eric.dumazet@gmail.com,
+        Kuniyuki Iwashima <kuniyu@amazon.com>,
+        Ignat Korchagin <ignat@cloudflare.com>,
+        "D. Wythe"
+ <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>
+References: <20241106221922.1544045-1-edumazet@google.com>
+ <ac3a7d28-0a0b-413e-8e9c-44b81fbe9121@linux.ibm.com>
+ <CANn89iJ382wPnWz11FdymoGvKgmXoKKF29_-ip3316U9puuTjg@mail.gmail.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <CANn89iJ382wPnWz11FdymoGvKgmXoKKF29_-ip3316U9puuTjg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: q-k8qkSNdHBA__T88Xb-YjymiaM95i7D
-X-Proofpoint-GUID: oPIbzZlpAq3pL_m2OVcWioYUNsMcK2h-
+X-Proofpoint-ORIG-GUID: xUDpyvgJ8VOtHNd2ItTA6ZXz2WkLnnTo
+X-Proofpoint-GUID: 20Dghsj3I_XrSqxIYsj6nzexmrTjPhk6
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
  definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 spamscore=0
- suspectscore=0 malwarescore=0 bulkscore=0 impostorscore=0
- priorityscore=1501 lowpriorityscore=0 mlxscore=0 clxscore=1011
- mlxlogscore=999 phishscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.19.0-2409260000 definitions=main-2411070086
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 priorityscore=1501
+ phishscore=0 impostorscore=0 lowpriorityscore=0 malwarescore=0
+ adultscore=0 suspectscore=0 mlxlogscore=604 clxscore=1015 bulkscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411070090
 
-On Wed, 6 Nov 2024 15:59:10 +0200
-Leon Romanovsky <leon@kernel.org> wrote:
 
-> > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core code?  
+
+On 07.11.24 09:32, Eric Dumazet wrote:
+> On Thu, Nov 7, 2024 at 9:28 AM Wenjia Zhang <wenjia@linux.ibm.com> wrote:
+>>
+>>
+>>
+>> On 06.11.24 23:19, Eric Dumazet wrote:
+>>> Thanks to commit 4bbd360a5084 ("socket: Print pf->create() when
+>>> it does not clear sock->sk on failure."), syzbot found an issue with AF_SMC:
+>>>
+>>> smc_create must clear sock->sk on failure, family: 43, type: 1, protocol: 0
+>>>    WARNING: CPU: 0 PID: 5827 at net/socket.c:1565 __sock_create+0x96f/0xa30 net/socket.c:1563
+>>> Modules linked in:
+>>> CPU: 0 UID: 0 PID: 5827 Comm: syz-executor259 Not tainted 6.12.0-rc6-next-20241106-syzkaller #0
+>>> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>>>    RIP: 0010:__sock_create+0x96f/0xa30 net/socket.c:1563
+>>> Code: 03 00 74 08 4c 89 e7 e8 4f 3b 85 f8 49 8b 34 24 48 c7 c7 40 89 0c 8d 8b 54 24 04 8b 4c 24 0c 44 8b 44 24 08 e8 32 78 db f7 90 <0f> 0b 90 90 e9 d3 fd ff ff 89 e9 80 e1 07 fe c1 38 c1 0f 8c ee f7
+>>> RSP: 0018:ffffc90003e4fda0 EFLAGS: 00010246
+>>> RAX: 099c6f938c7f4700 RBX: 1ffffffff1a595fd RCX: ffff888034823c00
+>>> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+>>> RBP: 00000000ffffffe9 R08: ffffffff81567052 R09: 1ffff920007c9f50
+>>> R10: dffffc0000000000 R11: fffff520007c9f51 R12: ffffffff8d2cafe8
+>>> R13: 1ffffffff1a595fe R14: ffffffff9a789c40 R15: ffff8880764298c0
+>>> FS:  000055557b518380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+>>> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>> CR2: 00007fa62ff43225 CR3: 0000000031628000 CR4: 00000000003526f0
+>>> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+>>> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+>>> Call Trace:
+>>>    <TASK>
+>>>     sock_create net/socket.c:1616 [inline]
+>>>     __sys_socket_create net/socket.c:1653 [inline]
+>>>     __sys_socket+0x150/0x3c0 net/socket.c:1700
+>>>     __do_sys_socket net/socket.c:1714 [inline]
+>>>     __se_sys_socket net/socket.c:1712 [inline]
+>>>
+>>> For reference, see commit 2d859aff775d ("Merge branch
+>>> 'do-not-leave-dangling-sk-pointers-in-pf-create-functions'")
+>>>
+>>> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+>>> Signed-off-by: Eric Dumazet <edumazet@google.com>
+>>> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+>>> Cc: Ignat Korchagin <ignat@cloudflare.com>
+>>> Cc: D. Wythe <alibuda@linux.alibaba.com>
+>>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+>>> Cc: Dust Li <dust.li@linux.alibaba.com>
+>>> ---
+>>
+>> Thank you, Eric, for fixing it! The code looks good to me.
+>> Should the fixed commit not be 2fe5273f149c instead of d25a92ccae6b?
+>>
 > 
-> RDMA core code is drivers/infiniband/core/*.
-
-Understood. So this is a violation of the no direct access to the
-callbacks rule.
-
+> The bug was there, even before 2fe5273f149c ("net/smc: prevent UAF in
+> inet_create()")
 > 
-> > I would guess it is not, and I would not actually mind sending a patch
-> > but I have trouble figuring out the logic behind  commit ecce70cf17d9
-> > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
-> > ksmbd_rdma_capable_netdev()").  
-> 
-> It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
-> GID, netdev and fabric complexity.
+> Thanks.
+ok, that sounds reasonable to me.
 
-I'm not familiar enough with either of the subsystems. Based on your
-answer my guess is that it ain't outright bugous but still a layering 
-violation. Copying linux-cifs@vger.kernel.org so that 
-the smb are aware.
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
 
-Thank you very much for all the explanations!
+Thanks,
+Wenjia
 
-Regards,
-Halil 
 
