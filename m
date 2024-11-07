@@ -1,195 +1,264 @@
-Return-Path: <netdev+bounces-142649-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142650-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B72F9BFD5D
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 05:22:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB91F9BFD62
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 05:30:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4238D28360A
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:22:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44854283B5A
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:30:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AACC518E762;
-	Thu,  7 Nov 2024 04:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E423126BE6;
+	Thu,  7 Nov 2024 04:30:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="nPn467A4"
+	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="hQww6Tlr"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.14])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pj1-f44.google.com (mail-pj1-f44.google.com [209.85.216.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BA24185B5F;
-	Thu,  7 Nov 2024 04:22:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.14
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62BA26EB4C
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 04:30:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730953322; cv=none; b=TfdeRt1+xyhL5yxdjgS4iY8p7R5nyNqkxvgw6447pGUxUgvXHJORd1XuPICTrmpVkCZr2PRGOcSAAUSVo9wm9Sr3PdT4J6WQbmqOLiCh6R5DFRYiXeH7DX0Kyp8JZHBt1DjwB2KdSzeJ8lWkD/lLPYuX/LguqrX+SgnIh/40Sog=
+	t=1730953828; cv=none; b=NHEr9B1/2wp40GnzypXG5+VC4uVxWelKj5U3L2J+l3q2ApHtg7okb5mVyWfGI1d7+sDkYDABjsSso0hDy8NsyORZXzYWDepukZ5rCpa1beR0pD+W52PrZU+Fep5rhOGfICse1U1OQt59NGK9S4lC0shPC10TG/aUPGWoOOzYfys=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730953322; c=relaxed/simple;
-	bh=x1GdMOh3arTXFvBx2uNVn2vtEdkSMO/HtDKxEyTy4g0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=tDap+vgIO8w83dZ8EzNtuvxAvozbnMiWPwzMDaEgYT73NJRha0EqM9TEJRkjKaVukQT9e5YICwp7ceYrREGnKnlQ+zbUXmBsORjgmetWTJckiIFuYuaFYifMtZ7zay4Vc1iiXTYOWu8J7WMrAd5IEbgZyAroFdYY0rmYYWQRX7Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=nPn467A4; arc=none smtp.client-ip=198.175.65.14
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730953321; x=1762489321;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=x1GdMOh3arTXFvBx2uNVn2vtEdkSMO/HtDKxEyTy4g0=;
-  b=nPn467A4HPRBmnxrZ99NEvfR3rGXYt/1b7qvS/rtw5YJRiGTr4yGshjQ
-   ATTeXaCt9ddmhuxSShTsaGB0kh9qavEKYsvhkLQ7DprBcF1x/xVTiEj3s
-   p5efX5vJijYPIRdmXAOVh5StYNf+QmWi2PpeGNF/W2bzdRicgbyUUK9ls
-   7nCjIMK+SARhUSHUHVCO5rpQWmwoxrhts4qMt5FrODh/QIv4E9LvGvSXG
-   v3RhKljLBhv65ayJnMjTdEyzE9b+9cLrD3uKevoGd1AG9YqEF3XC5TELi
-   /UR/ilhvC7/Bp9tJ6uBO5f+irEq4tat5n9teGp1t+CHJnTD0v/5OVcw+f
-   w==;
-X-CSE-ConnectionGUID: zZ6VmV8ETKWV6Dg51DftXw==
-X-CSE-MsgGUID: J/pOHhrCRmmZh8YFLUQYYA==
-X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="34557140"
-X-IronPort-AV: E=Sophos;i="6.11,264,1725346800"; 
-   d="scan'208";a="34557140"
-Received: from orviesa005.jf.intel.com ([10.64.159.145])
-  by orvoesa106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 20:22:00 -0800
-X-CSE-ConnectionGUID: VNw69FuVREWsBZMH8gQ3eQ==
-X-CSE-MsgGUID: I7THNe+oQu2XtDn3yfgL3g==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.11,264,1725346800"; 
-   d="scan'208";a="89750882"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa005.jf.intel.com with ESMTP; 06 Nov 2024 20:21:56 -0800
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t8u1p-000pow-0Q;
-	Thu, 07 Nov 2024 04:21:53 +0000
-Date: Thu, 7 Nov 2024 12:21:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Dmitry Safonov via B4 Relay <devnull+0x7f454c46.gmail.com@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Ivan Delalande <colona@arista.com>,
-	Matthieu Baerts <matttbe@kernel.org>,
-	Mat Martineau <martineau@kernel.org>,
-	Geliang Tang <geliang@kernel.org>,
-	Boris Pismenny <borisp@nvidia.com>,
-	John Fastabend <john.fastabend@gmail.com>
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	mptcp@lists.linux.dev, Dmitry Safonov <0x7f454c46@gmail.com>,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net 1/6] net/diag: Do not race on dumping MD5 keys with
- adding new MD5 keys
-Message-ID: <202411071218.G7g6a8JG-lkp@intel.com>
-References: <20241106-tcp-md5-diag-prep-v1-1-d62debf3dded@gmail.com>
+	s=arc-20240116; t=1730953828; c=relaxed/simple;
+	bh=BZXtxa0Dfv8tH4icL+MEZM4y86NQkmuRzJBNKnre61U=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=lSQ1zOShbfT+8Dr1Q6nmTX00JKe0p4EItgKOYJvQTJFC9YZbqFYLeCHNybZZ4M1zul0oNXhDyA6Lu7daby/sRyxfu2bv47Irk3jnHMZ81AubyeZoD3KQDeUv2X8Ln2zA/vsZH/Q1YyqOqguuN1Vcz7BmsANDhNfXJfefMix4uac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=hQww6Tlr; arc=none smtp.client-ip=209.85.216.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
+Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
+Received: by mail-pj1-f44.google.com with SMTP id 98e67ed59e1d1-2e3686088c3so423507a91.0
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 20:30:26 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=broadcom.com; s=google; t=1730953825; x=1731558625; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=ZB1Kti8jMEbpz9q7dtae9qJar9NnZZP7KH4oAtgDEOg=;
+        b=hQww6TlrHGcg08yeDAKo8npN4wrqDXJ3knZC3kT0Y/mzlCNdSuZqMuxz+ozissP9XB
+         8Hpa605YMEVpcDQ5lzHkG4apcj2FubEQ+hZqUWr+4P+mmQzhvRjNGhxVws+NWjkwRW2/
+         rGVy3h+IPkiFoouKBVerxkD8RLmBmWeFnZXl4=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730953825; x=1731558625;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ZB1Kti8jMEbpz9q7dtae9qJar9NnZZP7KH4oAtgDEOg=;
+        b=jDqxHX7Yx4pCxWnXjK7IMsguYZPdK4mFrjjBPn7MpSaRD0Qfk6yNVFtjAR5fAOFuFu
+         DjcD89mdahhRkNo/ejjb1XuKpDtJvj0ShDon6T2yy/Vh5bBDF9QRhbbil4tpf0V3WzYY
+         GASIVQY6+3Y1K94IyT1X9VAxmzdsACRMo9DJp1BvjHzUcCmrN4PxW4vdk7EbsoazsclE
+         aS38pE8lM2o5Ql4ge4hifIfEJuCX999Mgnr94DOHGNX5KqmAgFBkvzW7bUsTSr7YzRPF
+         0LTCXh4eCwOpsnpVhfniDy4TAYBwHvHmohNC2Ki+OriZsBk2F5QuQ8wRek577YfgejbC
+         womg==
+X-Forwarded-Encrypted: i=1; AJvYcCXRlTpymt1FhvSU/71h/gFn7/8vgk+QRY/widMhurqdGhlvDrW2XxaPzP9mHji0dOBPTKBixNk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyCEgb4pM3BVuPuO4uBiz/YdOG/tsiZWMa+i+m/KeL4thUlmkqI
+	C/hlD9na/iA+3FNVUdRz4VU3+GMDv+c9BfGxTM3Q+HNA548I8EHbdCB4LkNMbAFEL1EsWL6vYpv
+	dXqNTAsaSRIKlmgKAG72k3Re1RljQnIisA8Ro
+X-Google-Smtp-Source: AGHT+IH1slhJr1/HmfE4JEowe4xsCO5sJd+KTooyjkXWQP51iRfVq2bOT7u36kHzfpgtQgn6wS0b1eEJdnjHOoCDHiY=
+X-Received: by 2002:a17:90b:1dc8:b0:2e2:af0b:7169 with SMTP id
+ 98e67ed59e1d1-2e9a7556153mr596246a91.12.1730953825125; Wed, 06 Nov 2024
+ 20:30:25 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241106-tcp-md5-diag-prep-v1-1-d62debf3dded@gmail.com>
+References: <20241106213203.3997563-1-vadfed@meta.com>
+In-Reply-To: <20241106213203.3997563-1-vadfed@meta.com>
+From: Pavan Chebbi <pavan.chebbi@broadcom.com>
+Date: Thu, 7 Nov 2024 10:00:14 +0530
+Message-ID: <CALs4sv1VTT7L9t+BjuvW8naO7fm5Wq0qKgVkv2DW4nrNe1bucA@mail.gmail.com>
+Subject: Re: [PATCH net-next] bnxt_en: add unlocked version of bnxt_refclk_read
+To: Vadim Fedorenko <vadfed@meta.com>
+Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Michael Chan <michael.chan@broadcom.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Andrew Lunn <andrew+netdev@lunn.ch>, Paolo Abeni <pabeni@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, netdev@vger.kernel.org, 
+	Richard Cochran <richardcochran@gmail.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="000000000000ea797406264b1764"
 
-Hi Dmitry,
+--000000000000ea797406264b1764
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-kernel test robot noticed the following build warnings:
+On Thu, Nov 7, 2024 at 3:02=E2=80=AFAM Vadim Fedorenko <vadfed@meta.com> wr=
+ote:
+>
+> Serialization of PHC read with FW reset mechanism uses ptp_lock which
+> also protects timecounter updates. This means we cannot grab it when
+> called from bnxt_cc_read(). Let's move locking into different function.
+>
+> Fixes: 6c0828d00f07 ("bnxt_en: replace PTP spinlock with seqlock")
+> Signed-off-by: Vadim Fedorenko <vadfed@meta.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c | 29 ++++++++++++-------
+>  1 file changed, 19 insertions(+), 10 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c b/drivers/net/=
+ethernet/broadcom/bnxt/bnxt_ptp.c
+> index f74afdab4f7d..5395f125b601 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ptp.c
+> @@ -73,19 +73,15 @@ static int bnxt_ptp_settime(struct ptp_clock_info *pt=
+p_info,
+>         return 0;
+>  }
+>
+> -static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp=
+ *sts,
+> -                           u64 *ns)
+> +/* Caller holds ptp_lock */
+> +static int __bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timesta=
+mp *sts,
+> +                             u64 *ns)
+>  {
+>         struct bnxt_ptp_cfg *ptp =3D bp->ptp_cfg;
+>         u32 high_before, high_now, low;
+> -       unsigned long flags;
+>
+> -       /* We have to serialize reg access and FW reset */
+> -       read_seqlock_excl_irqsave(&ptp->ptp_lock, flags);
+> -       if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state)) {
+> -               read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
+> +       if (test_bit(BNXT_STATE_IN_FW_RESET, &bp->state))
+>                 return -EIO;
+> -       }
+>
+>         high_before =3D readl(bp->bar0 + ptp->refclk_mapped_regs[1]);
+>         ptp_read_system_prets(sts);
+> @@ -97,12 +93,25 @@ static int bnxt_refclk_read(struct bnxt *bp, struct p=
+tp_system_timestamp *sts,
+>                 low =3D readl(bp->bar0 + ptp->refclk_mapped_regs[0]);
+>                 ptp_read_system_postts(sts);
+>         }
+> -       read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
+>         *ns =3D ((u64)high_now << 32) | low;
+>
+>         return 0;
+>  }
+>
+> +static int bnxt_refclk_read(struct bnxt *bp, struct ptp_system_timestamp=
+ *sts,
+> +                           u64 *ns)
+> +{
+> +       struct bnxt_ptp_cfg *ptp =3D bp->ptp_cfg;
+> +       unsigned long flags;
+> +       int rc;
+> +
+> +       /* We have to serialize reg access and FW reset */
+> +       read_seqlock_excl_irqsave(&ptp->ptp_lock, flags);
+> +       rc =3D __bnxt_refclk_read(bp, sts, ns);
+> +       read_sequnlock_excl_irqrestore(&ptp->ptp_lock, flags);
+> +       return rc;
+> +}
+> +
+>  static void bnxt_ptp_get_current_time(struct bnxt *bp)
+>  {
+>         struct bnxt_ptp_cfg *ptp =3D bp->ptp_cfg;
+> @@ -674,7 +683,7 @@ static u64 bnxt_cc_read(const struct cyclecounter *cc=
+)
+>         struct bnxt_ptp_cfg *ptp =3D container_of(cc, struct bnxt_ptp_cfg=
+, cc);
+>         u64 ns =3D 0;
+>
+> -       bnxt_refclk_read(ptp->bp, NULL, &ns);
+> +       __bnxt_refclk_read(ptp->bp, NULL, &ns);
 
-[auto build test WARNING on 2e1b3cc9d7f790145a80cb705b168f05dab65df2]
+With this change, bnxt_cc_read() is executed without protection during
+timecounter_init(), right?
+I think we should hold the ptp_lock inside bnxt_ptp_timecounter_init()
+just like we do in bnxt_ptp_init_rtc()
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Dmitry-Safonov-via-B4-Relay/net-diag-Do-not-race-on-dumping-MD5-keys-with-adding-new-MD5-keys/20241107-025054
-base:   2e1b3cc9d7f790145a80cb705b168f05dab65df2
-patch link:    https://lore.kernel.org/r/20241106-tcp-md5-diag-prep-v1-1-d62debf3dded%40gmail.com
-patch subject: [PATCH net 1/6] net/diag: Do not race on dumping MD5 keys with adding new MD5 keys
-config: arm64-randconfig-003-20241107 (https://download.01.org/0day-ci/archive/20241107/202411071218.G7g6a8JG-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241107/202411071218.G7g6a8JG-lkp@intel.com/reproduce)
+>         return ns;
+>  }
+>
+> --
+> 2.43.5
+>
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411071218.G7g6a8JG-lkp@intel.com/
+--000000000000ea797406264b1764
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-All warnings (new ones prefixed by >>):
-
-   In file included from net/ipv4/tcp_diag.c:9:
-   In file included from include/linux/net.h:24:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
->> net/ipv4/tcp_diag.c:70:3: warning: variable 'md5sig_count' is uninitialized when used here [-Wuninitialized]
-      70 |                 md5sig_count++;
-         |                 ^~~~~~~~~~~~
-   net/ipv4/tcp_diag.c:60:36: note: initialize the variable 'md5sig_count' to silence this warning
-      60 |         unsigned int attrlen, md5sig_count;
-         |                                           ^
-         |                                            = 0
-   5 warnings generated.
-
-
-vim +/md5sig_count +70 net/ipv4/tcp_diag.c
-
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  54  
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  55  static int tcp_diag_put_md5sig(struct sk_buff *skb,
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  56  			       const struct tcp_md5sig_info *md5sig,
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  57  			       struct nlmsghdr *nlh)
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  58  {
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  59  	size_t key_size = sizeof(struct tcp_diag_md5sig);
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  60  	unsigned int attrlen, md5sig_count;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  61  	const struct tcp_md5sig_key *key;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  62  	struct tcp_diag_md5sig *info;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  63  	struct nlattr *attr;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  64  
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  65  	/*
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  66  	 * Userspace doesn't like to see zero-filled key-values, so
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  67  	 * allocating too large attribute is bad.
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  68  	 */
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  69  	hlist_for_each_entry_rcu(key, &md5sig->head, node)
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31 @70  		md5sig_count++;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  71  	if (md5sig_count == 0)
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  72  		return 0;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  73  
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  74  	attrlen = skb_availroom(skb) - NLA_HDRLEN;
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  75  	md5sig_count = min(md5sig_count, attrlen / key_size);
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  76  	attr = nla_reserve(skb, INET_DIAG_MD5SIG, md5sig_count * key_size);
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  77  	if (!attr)
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  78  		return -EMSGSIZE;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  79  
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  80  	info = nla_data(attr);
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  81  	memset(info, 0, md5sig_count * key_size);
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  82  	hlist_for_each_entry_rcu(key, &md5sig->head, node) {
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  83  		/* More keys on a socket than pre-allocated space available */
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  84  		if (md5sig_count-- == 0) {
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  85  			nlh->nlmsg_flags |= NLM_F_DUMP_INTR;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  86  			break;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  87  		}
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  88  		tcp_diag_md5sig_fill(info++, key);
-4a6144fbc706b3c Dmitry Safonov 2024-11-06  89  	}
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  90  
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  91  	return 0;
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  92  }
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  93  #endif
-c03fa9bcacd9ac0 Ivan Delalande 2017-08-31  94  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+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
+OltyqaGBuzv+bJTUL+bmV7E4QBLIqGt4jVr1R9hJdH6KxXwJdyfHZ9C6qXmoe2NQhiFUyBOJ0wgk
+dB9Z1IU7nCwvNKYg2JMoJs93tIgbhPJg/D7pqW8gabkCAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
+AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
+c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
+AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
+TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
+bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
+L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
+BB0wG4EZcGF2YW4uY2hlYmJpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
+HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUEV6y/89alKPoFbKUaJXsvWu5
+fdowDQYJKoZIhvcNAQELBQADggEBAEHSIB6g652wVb+r2YCmfHW47Jo+5TuCBD99Hla8PYhaWGkd
+9HIyD3NPhb6Vb6vtMWJW4MFGQF42xYRrAS4LZj072DuMotr79rI09pbOiWg0FlRRFt6R9vgUgebu
+pWSH7kmwVXcPtY94XSMMak4b7RSKig2mKbHDpD4bC7eGlwl5RxzYkgrHtMNRmHmQor5Nvqe52cFJ
+25Azqtwvjt5nbrEd81iBmboNTEnLaKuxbbCtLaMEP8xKeDjAKnNOqHUMps0AsQT8c0EGq39YHpjp
+Wn1l67VU0rMShbEFsiUf9WYgE677oinpdm0t2mdCjxr35tryxptoTZXKHDxr/Yy6l6ExggJtMIIC
+aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
+EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwV/XkICjVscn4SNZMw
+DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIINm3aZA09mov9MnSAtBz5CB1UPP9O33
+OO5qBJDZzjkLMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEw
+NzA0MzAyNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
+SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
+ATANBgkqhkiG9w0BAQEFAASCAQAHgYi+SPBBaa+5nYwFk28EhXLaRwtZF3Ic4yet/xT6ggOMFFml
+KLVMtCYcPimCaWUa8eTo+Fz1x+99jy0zu3YDJvPJ6Mscb73X/8nhCZ+0tj80TUclUIr2sPIoiGGH
+jfcF2n1Jd23GSXh0zikne/2ScNt0/C7NKEduUUoI08xEqFxAHwFcWVjss4MEgylya6xsnO0VaPXk
+NJwINE/yl8VyxUAm1gMi6YRa9Rx3vWbdcrNJJ0aZ/zRH9R1CALf51y1QqtxUw2Fy9FFnJcEBe6Zt
+ZaYTxnNnVfZQt/4mRinMkoVMFOHpDcNGlGRwG1pmsCdi+GD3HVMTdJXAFbcOdlqS
+--000000000000ea797406264b1764--
 
