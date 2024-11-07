@@ -1,229 +1,113 @@
-Return-Path: <netdev+bounces-142872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 930EF9C085E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:04:38 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63F359C0891
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:12:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 19EAF1F241DD
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:04:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27ED1283F83
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:12:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE77F200132;
-	Thu,  7 Nov 2024 14:04:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93BB5212621;
+	Thu,  7 Nov 2024 14:12:02 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="FxMof3HT"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fk8kwpiP"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-oi1-f175.google.com (mail-oi1-f175.google.com [209.85.167.175])
+Received: from mail-wr1-f52.google.com (mail-wr1-f52.google.com [209.85.221.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374E220EA3A
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 14:04:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB1328F1;
+	Thu,  7 Nov 2024 14:12:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730988274; cv=none; b=iwfKBhSmKR96EYaUmW/vVs5OaFqQXqN0G2UjE+teTX07XhdY0a8V3lizKoA2ay83tU8OoYp/k7jR9QFUk2ln3jkXTO5xJRi/O8yEpdOqiL5dR65vRjI1CC1vNxUljBwI2OBQ8XeZqzpSUmm0aZwtAnmUainHok9qi89z2vR+Bk4=
+	t=1730988722; cv=none; b=sDbBDxKtHU5U2Mx2cpgkyz34L2vLGYxtx0OIcualDBLab2Mu3nIuTweJ5nSGdqzYs6lpTAqXpRcWgJ0WxFMkIY/Y6pW18Uwx64T8s0+tkR1dnKSRg3Akm/T2mowhCNaM5zAtTqMQWnKVvVgNSJ2ONekNrkHf2zHxO7AAbvIkXdQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730988274; c=relaxed/simple;
-	bh=C7NhaOom9/WsjUcH4wqoeXZTRQ3idpOsoCb2z/IBJgA=;
+	s=arc-20240116; t=1730988722; c=relaxed/simple;
+	bh=uhbUtE9i1AyZBoS14bUm/Sz+IXR+OgXGcf4IyZU5vYQ=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LYpfhaLKFsgZq7Veos33QND7YkDLDfV4QVpRNvZKgLYfkOyJIk8Xvf8iRqc/xgSXXRnnu57ELW80GDJe889jphnGJKTmuIjsiEQ2BUOfk8c2rCG4wvX94CCQ4eNEeEBbi7pJ6OTEm2ywmfwaceXrDJoLzomyAdFxapXGixBrqmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=FxMof3HT; arc=none smtp.client-ip=209.85.167.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-oi1-f175.google.com with SMTP id 5614622812f47-3e607556c83so617796b6e.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 06:04:33 -0800 (PST)
+	 To:Cc:Content-Type; b=EPElYADhKDj0k87QyUg7OpJeGGvWj2knAaRq/oVtnQO9Z3yuSn1+CbAqPhcMY8Oy0nw1S+QDaDlXDibdY+PpRo933LQwGLFx50+PFMUPCJminrHUxjTRUeqH60fokJfHuxl06vu7zvCy9sw+KpqwniWwZ6yHtcSsUuqG7MImCQs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fk8kwpiP; arc=none smtp.client-ip=209.85.221.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f52.google.com with SMTP id ffacd0b85a97d-37d6a2aa748so620730f8f.1;
+        Thu, 07 Nov 2024 06:12:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730988272; x=1731593072; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730988719; x=1731593519; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=53j9ED75IGQgVRkvuqlQyL+C8W0jmLRjv9pQW7cB3N8=;
-        b=FxMof3HT3OGdZonPRuxVI8/RcShg+oXNyHS3jIf9LrWJiOF8b90CBOUFixGzILaFIm
-         K6MgDcd/KYNAqmNH8zpuS+6fSSOh+yY5Eayd/m/2wUiOFOdPaAZiePYZWsP6cgtSPHj3
-         AsM6aiiNGMC9TfeDVQfftrJt/MUbrhzRSN/uDYaCYk/ZwZTnKNWMgJ2EUIrUN3Fa8XYl
-         oPTmLqFTo5fZwLLuaNPeZsJSjtLDHN2Q/QQPLsQp7siJoaVfnsfG2iSaRFVL4Zhu7N0D
-         fUo+/Y59QnaCEBzo9TRzkx0wycEPRl2aRlsEM6iiDcLXvWQIHwVT8Yy/OaJNmsMycFae
-         eabA==
+        bh=uhbUtE9i1AyZBoS14bUm/Sz+IXR+OgXGcf4IyZU5vYQ=;
+        b=Fk8kwpiPC6MAV+tbVWJv8asz0H+lwNWkLRTykVDTTjeMhMHcL5FgaXqZB6CpOquucS
+         9c7a31bKTJra/4nlltt6JZpGSb+a8veIWObuu7kM2fkG8YDEWtYBjQnJ87hQsuBrzS0S
+         FKjA8w0ltff9FqcbxCmN9AfHYqw/jU6JLBfMq/dbp+rUg8Ut8bL3SFIaXRwHEiJmaYsH
+         IJWEcK8iQZDI2PS+5akpEi5+oRraMYeStIXBwZKmL1SzF3OwAYPU+3TIM3J0L4FreeaU
+         s/xArgnD4w4eqKBjtzyOlOyEOP5YHL4QPApr0oCwPWozhSmLa1ngY8fGamKEgEH0jOFr
+         LHxQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730988272; x=1731593072;
+        d=1e100.net; s=20230601; t=1730988719; x=1731593519;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=53j9ED75IGQgVRkvuqlQyL+C8W0jmLRjv9pQW7cB3N8=;
-        b=bG3p7yddWIbee9rEdORxWlkdSbLILBeLOA9f8nihtSFmydTBrD+qcBLReUWKJeBTU8
-         mHvIjICmtVvYgGRDl29USMnjJBzbmV3e4uzJV8HMBcl/G1vJ7UWaR3auQDehFVq4zBmx
-         DIz+qjsdekRUwX3lhn8EZN5b14zltgE1LrYqwyXoKdIUuuHop4cTE6nu7MMsxpcXAJxV
-         ajAmCZcOb4qXTSIv7otva7qTue4oSEOVPCaJ+h3x31wgOCDMGD7RyyO/26dQmFJBbmVW
-         t2ZAj2/j2328IGscpNYTQIgw8daaZFmzCKOsloiRKItKzruTWEdTPokLjbGE6gNlMVTi
-         acJA==
-X-Forwarded-Encrypted: i=1; AJvYcCV+by+4sN2GU5UEQeaOfsjRnGa/GpxLS/v1jBm8T3LTT2gatD22ayDlxOki74x4jMTAVrQffSg=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxdpKxKf77co2Rz054OaUeVTIdQ5b4m+pk0WDr8++aq4rfGcofd
-	TdzSQMhGZNr7fOEgYSpyFHqVXnYttVvGVKUNSDaxiSW2+Pb+RtzopBvU5s9CGh+XVdmL1XtzeNb
-	aX1hWktHkzRomzWLyQhjjfAQlRInuwRrCdUx6
-X-Google-Smtp-Source: AGHT+IGjMuvxYCpr+1bWUklI+YdHHi8Gei70pt9TxFi4MzxonrgpbIAok1BF5FB5/ntACaSjtavTJFWOdeuKac96C8Q=
-X-Received: by 2002:a05:6808:2383:b0:3e5:e72e:17c8 with SMTP id
- 5614622812f47-3e63845af51mr41657163b6e.21.1730988271998; Thu, 07 Nov 2024
- 06:04:31 -0800 (PST)
+        bh=uhbUtE9i1AyZBoS14bUm/Sz+IXR+OgXGcf4IyZU5vYQ=;
+        b=r8zgNf24RFftqXmVbzUx/ahqPBTuU4S8qZdP3qSeYnlC2DZ280Heuouj/AhMVnNO/c
+         oDE2hbVJLQlwU2Sip0Bkshngk2xwk/9gNmUXntmhXu0pmc/HLEeJ93YIDdh/C7BEljBv
+         Ovvz5+QI4tTo+2KbaShlK2V5V6ldtCjZCRueuyPSwrz+oJ6sB59f1qhyA9nbd4erbrZy
+         S2PQthSEtk/0fl4afGyNwbua4pgohOAGFNMWrDp8oiiGwJhUCTLRBsznskq2dds5vema
+         gEeDY918rSFwCYac3MYdw/Iq0f1EL+QkbX6kyFyzicTVI+cWLEyxLez4HwXb6PFI/eUW
+         sNaQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWktucdx5jRJ2aUGZNlOdHGyDMev/ZR186x75+rSkstY4JRlQKWJ/NG+EtT3a+6kOZqRumAF5chxUVrtOAYnvg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyTsYIIMlrTZ555nsjq6LnfTYnkl9uaE9/tDPFSLUtY6n+KikIN
+	8pzi/O800utmaOeTHMyn2SaNnUHpyPavoySCNYJmAe0IZF+JadRjVc81ksBke53JBf1gS37marx
+	0PpjYOHf2nQPyF7J5V981nXwHYs4=
+X-Google-Smtp-Source: AGHT+IEXCGr4lM7xLIA8M7+HqoyUFdYEzQ3DCLnst6/U6/FQQrrnZXD3oAiWu1HQXkAPeiRSqXxq/yamqJYBwTeu18w=
+X-Received: by 2002:a5d:64cc:0:b0:374:bd48:fae9 with SMTP id
+ ffacd0b85a97d-381c7a4c99bmr19286392f8f.20.1730988719073; Thu, 07 Nov 2024
+ 06:11:59 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107-ipmr_rcu-v1-1-ad0cba8dffed@debian.org>
- <CANn89iL-L8iBwp=rq-YwAeeoUY2MTjr5akWm=S=k7ckpkaEy+Q@mail.gmail.com> <20241107-invisible-skylark-of-attack-e44be1@leitao>
-In-Reply-To: <20241107-invisible-skylark-of-attack-e44be1@leitao>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Nov 2024 15:04:19 +0100
-Message-ID: <CANn89i+kYM_QRsqGXfbw-nzTe5K=sbVW3G+Nb2pCW3so5Tr-7w@mail.gmail.com>
-Subject: Re: [PATCH net] ipmr: Fix access to mfc_cache_list without lock held
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	kernel-team@meta.com
+References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-6-shaw.leon@gmail.com>
+ <CANn89iLvC0H+eb1q1c9X6M1Cr296oLTWYyBhqTAyGW_BusHA_A@mail.gmail.com>
+In-Reply-To: <CANn89iLvC0H+eb1q1c9X6M1Cr296oLTWYyBhqTAyGW_BusHA_A@mail.gmail.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Thu, 7 Nov 2024 22:11:24 +0800
+Message-ID: <CABAhCOS8WUqOsPCzQFcgeJbz-mkEV92OVXaH3E1tFe7=HRiuGg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/8] net: ip_gre: Add netns_atomic module parameter
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
+	Kuniyuki Iwashima <kuniyu@amazon.com>, Jakub Kicinski <kuba@kernel.org>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 7, 2024 at 2:51=E2=80=AFPM Breno Leitao <leitao@debian.org> wro=
-te:
+On Thu, Nov 7, 2024 at 9:37=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
+rote:
 >
-> Hello Eric,
->
-> On Thu, Nov 07, 2024 at 02:13:14PM +0100, Eric Dumazet wrote:
-> > On Thu, Nov 7, 2024 at 12:03=E2=80=AFPM Breno Leitao <leitao@debian.org=
-> wrote:
-> > >
-> > > Accessing `mr_table->mfc_cache_list` is protected by an RCU lock. In =
-the
-> > > following code flow, the lock is not held, causing the following erro=
-r
-> > > when `RCU_PROVE` is not held.
-> > >
-> > >         6.12.0-rc5-kbuilder-01145-gbac17284bdcb #33 Tainted: G       =
-     E    N
-> > >         -----------------------------
-> > >         net/ipv4/ipmr_base.c:313 RCU-list traversed in non-reader sec=
-tion!!
-> > >
-> > >         rcu_scheduler_active =3D 2, debug_locks =3D 1
-> > >                    2 locks held by RetransmitAggre/3519:
-> > >                     #0: ffff88816188c6c0 (nlk_cb_mutex-ROUTE){+.+.}-{=
-3:3}, at: __netlink_dump_start+0x8a/0x290
-> > >                     #1: ffffffff83fcf7a8 (rtnl_mutex){+.+.}-{3:3}, at=
-: rtnl_dumpit+0x6b/0x90
-> > >
-> > >         stack backtrace:
-> > >                     lockdep_rcu_suspicious
-> > >                     mr_table_dump
-> > >                     ipmr_rtm_dumproute
-> > >                     rtnl_dump_all
-> > >                     rtnl_dumpit
-> > >                     netlink_dump
-> > >                     __netlink_dump_start
-> > >                     rtnetlink_rcv_msg
-> > >                     netlink_rcv_skb
-> > >                     netlink_unicast
-> > >                     netlink_sendmsg
-> > >
-> > > Fix accessing `mfc_cache_list` without holding the RCU read lock. Add=
-s
-> > > `rcu_read_lock()` and `rcu_read_unlock()` around `mr_table_dump()` to
-> > > prevent RCU-list traversal in non-reader section.
-> > >
-> > > Since `mr_table_dump()` is the only function that touches the list, t=
-hat
-> > > might be the only critical section in `ipmr_rtm_dumproute()` that nee=
-ds
-> > > to be protected in ipmr_rtm_dumproute().
-> > >
-> > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > Fixes: cb167893f41e ("net: Plumb support for filtering ipv4 and ipv6 =
-multicast route dumps")
-> > > ---
-> > >  net/ipv4/ipmr.c | 2 ++
-> > >  1 file changed, 2 insertions(+)
-> > >
-> > > diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
-> > > index 089864c6a35eec146a1ba90c22d79245f8e48158..bb855f32f328024f384a2=
-fa58f42fc227705206e 100644
-> > > --- a/net/ipv4/ipmr.c
-> > > +++ b/net/ipv4/ipmr.c
-> > > @@ -2612,8 +2612,10 @@ static int ipmr_rtm_dumproute(struct sk_buff *=
-skb, struct netlink_callback *cb)
-> > >                         NL_SET_ERR_MSG(cb->extack, "ipv4: MR table do=
-es not exist");
-> > >                         return -ENOENT;
-> > >                 }
-> > > +               rcu_read_lock();
-> > >                 err =3D mr_table_dump(mrt, skb, cb, _ipmr_fill_mroute=
-,
-> > >                                     &mfc_unres_lock, &filter);
-> > > +               rcu_read_unlock();
-> > >                 return skb->len ? : err;
-> > >         }
-> > >
-> > >
+> On Thu, Nov 7, 2024 at 2:30=E2=80=AFPM Xiao Liang <shaw.leon@gmail.com> w=
+rote:
 > >
-> > What about net/ipv6/ip6mr.c ip6mr_rtm_dumproute() ?
->
-> That one might require as well.
->
-> > In my opinion, since we still hold RTNL in these paths, we should
-> > change the lockdep annotation.
->
-> I don't have much experience mixing locks like this. Is it safe to mix
-> and match rtnl and RCUs like this?
-
-If holding RTNL is preventing any updates, then surely holding RTNL is enou=
-gh
-to iterate through the list.
-
-
-
->
-> I have the impression that, when iterating a RCU protected list *without*=
- being in the read-side
-> critical sections, the RCU doesn't know that someone might be traversing
-> the list, and remove the element mid air (mroute_clean_tables()?). Is
-> this model incorrect?
->
-> > Then later we can remove RTNL from these dump operations.
->
-> Do you mean that, execute the dump operation without holding the RTNL,
-> thus, relying solely on RCU?
-
-Right, you might have seen patches adding RTNL_FLAG_DUMP_UNLOCKED in
-some places ?
-
-More patches are welcomed, in net-next.
-
->
-> > diff --git a/net/ipv4/ipmr_base.c b/net/ipv4/ipmr_base.c
-> > index 271dc03fc6dbd9b35db4d5782716679134f225e4..f0af12a2f70bcdf5ba54321=
-bf7ebebe798318abb
-> > 100644
-> > --- a/net/ipv4/ipmr_base.c
-> > +++ b/net/ipv4/ipmr_base.c
-> > @@ -310,7 +310,8 @@ int mr_table_dump(struct mr_table *mrt, struct sk_b=
-uff *skb,
-> >         if (filter->filter_set)
-> >                 flags |=3D NLM_F_DUMP_FILTERED;
+> > If set to true, create device in target netns (when different from
+> > link-netns) without netns change, and use current netns as link-netns
+> > if not specified explicitly.
 > >
-> > -       list_for_each_entry_rcu(mfc, &mrt->mfc_cache_list, list) {
-> > +       list_for_each_entry_rcu(mfc, &mrt->mfc_cache_list, list,
-> > +                               lockdep_rtnl_is_held()) {
-> >                 if (e < s_e)
-> >                         goto next_entry;
-> >                 if (filter->dev &&
 >
-> Clarifying next steps: Would you like me to review/test and submit, or
-> are you planning to send it officially?
+> Sorry, module parameters are not going to fly.
 
-For this kind of feedback, I am usually expecting you to send a new
-version (after waiting one day,
-maybe other reviewers have something to say)
+Sorry, I didn't know that.
 
-Thank you.
+> Instead, add new rtnetlink attributes ?
+
+It is to control driver behavior at rtnl_ops registration time. I
+think rtnetlink
+attributes are too late for that, maybe? Can't think of a way other than
+module parameters or register separate ops. Any suggestions?
 
