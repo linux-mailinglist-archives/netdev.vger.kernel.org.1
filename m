@@ -1,179 +1,195 @@
-Return-Path: <netdev+bounces-142877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B973A9C0914
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:38:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FACA9C0928
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E112819D5
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:38:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C33D8B2340E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:45:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF0721218E;
-	Thu,  7 Nov 2024 14:38:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C57DE2E3EB;
+	Thu,  7 Nov 2024 14:45:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzyM5AJr"
+	dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b="tkZBwGtU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D5B1F8EFF;
-	Thu,  7 Nov 2024 14:38:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F6EBD26D
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 14:45:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730990333; cv=none; b=NfOvI6P4L6HChT6qvsC9hNvBJuuIRKqKDBfDvOysHBLbR7G4HGr2Y+vcJcSDxCvd1mRvqaDp4dE9/6R3ZjdQNBJLBo9wYyJo62ir8SIDMI/hjenlcot7iI6stqslmhJyMg3MHrt2qga1nyIETH0qDQgZzBiTeOX39m5ijMpr76o=
+	t=1730990731; cv=none; b=gUrLdAsk2QgTPkknKhYmWk/ffnIzZkGnGFixTMNMixH0dSF35z/o5Q9/64RyBLTE0LWnvji2ad2lM3Eh1N0+O+tAeRLNWv8GYJFmDs4znA8B3ZGlkrUu6KOV88cEv0Wi/oqum5DmmaPgqN2MAC1eOC7oOZ+s8W/KJaIf7Q4ymIw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730990333; c=relaxed/simple;
-	bh=l7JvSxJBHZ38vac4UEzAmhJXOGtxKvkL40j9n0BIF7I=;
+	s=arc-20240116; t=1730990731; c=relaxed/simple;
+	bh=chBLKrASMPejZmSJaPCnzh94niroLYh2LAz5JIgdsoI=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=BEGFw+Dc9iqvLuyR51hql8p2Lk9jEZZcomRLh+/wKOt33hkmKbku65PO6rXKrNmhg2pGlNdLazFySeuYUaQq+efAe6SSzirnxHGpk8UOw8BBc5ZMNBo4kTmb7IsLZyWuH0xRdV6/Bo78YBEHwKzszfEQIp7r5IjLfKky0/WQ9Sw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzyM5AJr; arc=none smtp.client-ip=209.85.166.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a3aeb19ea2so3987085ab.0;
-        Thu, 07 Nov 2024 06:38:52 -0800 (PST)
+	 To:Cc:Content-Type; b=fROrPOCPwE+X+X0Or+Q45SFCVGpmHQL7aOxkV3mX+bzTlSkTDD2SGkHAOwAv4ZlO39qph9zy5LtMRuufVgjmS6FrM+X4sa5LNWuC/Apb7tGdfRYowR24qmPR3vJoVPcAG3aBWqyvJGJ1ghrXzim5KKOg96TzkRLeh80hoMGt188=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com; spf=none smtp.mailfrom=mojatatu.com; dkim=pass (2048-bit key) header.d=mojatatu-com.20230601.gappssmtp.com header.i=@mojatatu-com.20230601.gappssmtp.com header.b=tkZBwGtU; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=mojatatu.com
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=mojatatu.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-72097a5ca74so882534b3a.3
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 06:45:29 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730990331; x=1731595131; darn=vger.kernel.org;
+        d=mojatatu-com.20230601.gappssmtp.com; s=20230601; t=1730990729; x=1731595529; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I+8oT9nfItu+kQ69xKVVdOmaZDkdDh7Tg4sB6xTZL6w=;
-        b=UzyM5AJrkXarkCvAYiucWyn2ow0ZE2Jtx42bgI6kFrhPrkM+6hwVESblVXj1wb7kDx
-         qUq/90nLZo5J6VKnnpTbgpMR3ieE/TwsR0t8paiXbdyIDf/7zy3L/gaGR/t5WQOxCd2A
-         qKM8B4wgw9QsFWo/KaCL6Px3b1Ao3IovYVdEG4TQ1Ca/nAK1AF77EEdaWP90rZAK1YPC
-         4O6hhVb83kvsFI9defCqYnlMvpZh1naGnzMYmXT1ufRpPoJx1OU44bZfk3fjvvacRVLF
-         nfVSOw42MplgvAFBL67RUJFXqqcxmByGgvCaMEwCUThIcKRAI8Qr/uCDk6nOx59eEKyx
-         iHkQ==
+        bh=ha7AwQpqtSa6VcHWlGpf8bDvzGIRWSVR3vVfi4LAx44=;
+        b=tkZBwGtUnsVreWXs3nyPGIHksF8s2ngE8DURuawiAHBDmdVd5jdorE6JlzvAyKU2pB
+         RtNoSZb+ciBUGaV8g3Pz3vQgA6LBAgdTwZrPcAtBvstOINtEwx9vQxI1rUPVTzcgK47Z
+         XVP3ep75nmSgvTRtUtZQ9ulavz64C+W6Xc83czFWCUUlAMMbVO7MCL+DYUCPEj72gHN+
+         X6LuS9M+LgIfWzruTLf4elxnP/oGpoV3yPeo2xIpJ1vpZyl7aynVgj5XH359b1ec05fy
+         f/ueV/1kHYU9JxxiV1zLW6etVO9GPk92+ZTeLAN6895IKaix1X0tadZgSmvlWc/ByKXI
+         PH/w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730990331; x=1731595131;
+        d=1e100.net; s=20230601; t=1730990729; x=1731595529;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I+8oT9nfItu+kQ69xKVVdOmaZDkdDh7Tg4sB6xTZL6w=;
-        b=kE3nrxNYqaxInkgKiBPkuk4DE9KzefcqqnYZAgXBtkipEpSMc+U2nuM49v7SINXfvi
-         nhkMeeE5yV9jLS6M5FcAb5pnEIJOeOMgf2qqHsv3msYKTauP+4+Z1T8/qXoAsvzQPHcB
-         afzksEuootW7Zwx3bWKv3FkIuPBpOYp27evkcg3M9IU8zAspn9lBhd+ExEyvYnwAG+6S
-         nmFN7wTIzj9CB8ST8Sf5Pvfi2kl6F/IZ3yre/wr6wlxrDUGnEnM6IUdAhFsJLn1f6tl5
-         lK3uhuObFMWZZHauTmzreR0L2w+2fBSYaqym6rpNiP4d6H2qW23vX9be1Vm/pJj+2TYr
-         evcQ==
-X-Forwarded-Encrypted: i=1; AJvYcCUAQc5gyC21T1YqxuI+YUA8XmkgV6URKoOgTwjQgBziS/V1u/TgT30zgtA3ZxkHvvVMhSd1JJC6@vger.kernel.org, AJvYcCXWv3I0JubMdchaGAHJacCXg2lO6D63MNPkJ8/UIZ2R1Gb63f2tLP3I8IXYz+2J5MWNwfzaVr/168YC@vger.kernel.org
-X-Gm-Message-State: AOJu0YxYCSbfE0CQeVOTDdBdGZLvxjh2r9cs0ukijDP3dx6kKBWwxaG+
-	y5IoyO0lTI0thodJBwbSaIZ+DrsQ+93sJPEPaJTl3VnoC822C5bS0n5fL32bZanKjSlHSf1v4Bk
-	yTJZEQJiq0gm0aCtfzjmWwKQkvZc=
-X-Google-Smtp-Source: AGHT+IHaSLNq/a7u4BuDR3RQj0zHqkw3iqoefK+C5Iv838Wd9iujSSJDth0zXNgL7hbllUifbcwF7vP2bFgPqqcYQ6U=
-X-Received: by 2002:a05:6e02:220a:b0:3a6:c89d:4eb5 with SMTP id
- e9e14a558f8ab-3a6c89d50e2mr177221665ab.15.1730990331386; Thu, 07 Nov 2024
- 06:38:51 -0800 (PST)
+        bh=ha7AwQpqtSa6VcHWlGpf8bDvzGIRWSVR3vVfi4LAx44=;
+        b=K9sBf+cuG4E75mVjcHAfJhEwTFImHbM7KCULSSjdV29D+P9eUU9Umx2G4A5hTec2X6
+         qvGJYIzByD4KOsY/hCg4OvbHpPdQ35AZ/oSGq7S6MIYGQ0nADVtEU6vfxEyYs0NaiLly
+         Dk7oiqwAGPCRqlqSh3RRU0L5PSssbMSJtUcfqwM1inqfarMU16vtGDW1VlncHoVAChVG
+         NJEzmEWhk32IwzS/hGASPQYwrT50dUMxpjhJEieHJddCrhTGMXkot6VWHL90n6buU8yg
+         vNCllCqVvBu1xJk+uYpUemD0i/1UoPMWY85+SEHgqeDeDkC3BSC8i+QQ7fNyQSeJqfHg
+         2Z2Q==
+X-Forwarded-Encrypted: i=1; AJvYcCURPZX67I1cRCq3MY1J2ekL55Zo+lubLiscBg+0uao/HLeTWoxyUoPXuNTGteZAAj8TkKD+8mE=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxagCAJrk97hhNKd8XQBPQ6seoJFwau8mK//l3byVsuQHNBQCkX
+	VBeH61U49NApTecn0MKtJ/qYhE37MTVUoQBzQCjI5vvejxW+jxs2xSattxW8bBZAXbBrMOkNea7
+	bxe4UdvCotYiG9jvn821/kiaOwhMA3di+f1Uo
+X-Google-Smtp-Source: AGHT+IFdhs8F0OtVrGy7jYT7tTHk2JpA/IcD01wUWI70/tvR9MzN2HivjaBIKwrGzIGsQeohi9SYTsXlGSfgX6TwiBk=
+X-Received: by 2002:a05:6a20:7f86:b0:1db:eb82:b22f with SMTP id
+ adf61e73a8af0-1dbeb82b8b9mr17045607637.5.1730990728647; Thu, 07 Nov 2024
+ 06:45:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241104083545.114-1-gnaaman@drivenets.com>
-In-Reply-To: <20241104083545.114-1-gnaaman@drivenets.com>
-From: Xin Long <lucien.xin@gmail.com>
-Date: Thu, 7 Nov 2024 09:38:40 -0500
-Message-ID: <CADvbK_fV3t8Txh73gOVGh8NV401xb0dQDNJjc-YsW9kUeEkhEg@mail.gmail.com>
-Subject: Re: [PATCH net-next v2] sctp: Avoid enqueuing addr events redundantly
-To: Gilad Naaman <gnaaman@drivenets.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, linux-sctp@vger.kernel.org, netdev@vger.kernel.org
+References: <20241106143200.282082-1-alexandre.ferrieux@orange.com>
+In-Reply-To: <20241106143200.282082-1-alexandre.ferrieux@orange.com>
+From: Jamal Hadi Salim <jhs@mojatatu.com>
+Date: Thu, 7 Nov 2024 09:45:17 -0500
+Message-ID: <CAM0EoMmw3otVXGpFGXqYMb1A2KCGTdVTLS8LWfT=dPVTCYSghA@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: sched: cls_u32: Fix u32's systematic failure
+ to free IDR entries for hnodes.
+To: Alexandre Ferrieux <alexandre.ferrieux@gmail.com>
+Cc: edumazet@google.com, xiyou.wangcong@gmail.com, jiri@resnulli.us, 
+	alexandre.ferrieux@orange.com, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 4, 2024 at 3:36=E2=80=AFAM Gilad Naaman <gnaaman@drivenets.com>=
- wrote:
->
->
-> Avoid modifying or enqueuing new events if it's possible to tell that no
-> one will consume them.
->
-> Since enqueueing requires searching the current queue for opposite
-> events for the same address, adding addresses en-masse turns this
-> inetaddr_event into a bottle-neck, as it will get slower and slower
-> with each address added.
->
-> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
-Acked-by: Xin Long <lucien.xin@gmail.com>
+Hi,
 
-Thanks.
+On Wed, Nov 6, 2024 at 9:32=E2=80=AFAM Alexandre Ferrieux
+<alexandre.ferrieux@gmail.com> wrote:
+>
+> To generate hnode handles (in gen_new_htid()), u32 uses IDR and
+> encodes the returned small integer into a structured 32-bit
+> word. Unfortunately, at disposal time, the needed decoding
+> is not done. As a result, idr_remove() fails, and the IDR
+> fills up. Since its size is 2048, the following script ends up
+> with "Filter already exists":
+>
+>   tc filter add dev myve $FILTER1
+>   tc filter add dev myve $FILTER2
+>   for i in {1..2048}
+>   do
+>     echo $i
+>     tc filter del dev myve $FILTER2
+>     tc filter add dev myve $FILTER2
+>   done
+>
+> This patch adds the missing decoding logic for handles that
+> deserve it.
+>
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Signed-off-by: Alexandre Ferrieux <alexandre.ferrieux@orange.com>
+
+I'd like to take a closer look at this - just tied up with something
+at the moment. Give me a day or so.
+Did you run tdc tests after your patch?
+
+cheers,
+jamal
 
 > ---
-> Changes in v2:
->  - Reorder list removal to avoid race with new sessions
-> ---
->  net/sctp/ipv6.c     |  2 +-
->  net/sctp/protocol.c | 16 +++++++++++++++-
->  2 files changed, 16 insertions(+), 2 deletions(-)
+> v3: prepend title with subsystem ident
+> v2: use u32 type in handle encoder/decoder
 >
-> diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
-> index f7b809c0d142..b96c849545ae 100644
-> --- a/net/sctp/ipv6.c
-> +++ b/net/sctp/ipv6.c
-> @@ -103,10 +103,10 @@ static int sctp_inet6addr_event(struct notifier_blo=
-ck *this, unsigned long ev,
->                             ipv6_addr_equal(&addr->a.v6.sin6_addr,
->                                             &ifa->addr) &&
->                             addr->a.v6.sin6_scope_id =3D=3D ifa->idev->de=
-v->ifindex) {
-> -                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
-L);
->                                 found =3D 1;
->                                 addr->valid =3D 0;
->                                 list_del_rcu(&addr->list);
-> +                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
-L);
->                                 break;
->                         }
->                 }
-> diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
-> index 39ca5403d4d7..8b9a1b96695e 100644
-> --- a/net/sctp/protocol.c
-> +++ b/net/sctp/protocol.c
-> @@ -738,6 +738,20 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_=
-sockaddr_entry *addr, int cm
->          */
+>  net/sched/cls_u32.c | 18 ++++++++++++++----
+>  1 file changed, 14 insertions(+), 4 deletions(-)
 >
->         spin_lock_bh(&net->sctp.addr_wq_lock);
+> diff --git a/net/sched/cls_u32.c b/net/sched/cls_u32.c
+> index 9412d88a99bc..6da94b809926 100644
+> --- a/net/sched/cls_u32.c
+> +++ b/net/sched/cls_u32.c
+> @@ -41,6 +41,16 @@
+>  #include <linux/idr.h>
+>  #include <net/tc_wrapper.h>
+>
+> +static inline u32 handle2id(u32 h)
+> +{
+> +       return ((h & 0x80000000) ? ((h >> 20) & 0x7FF) : h);
+> +}
 > +
-> +       /* Avoid searching the queue or modifying it if there are no cons=
-umers,
-> +        * as it can lead to performance degradation if addresses are mod=
-ified
-> +        * en-masse.
-> +        *
-> +        * If the queue already contains some events, update it anyway to=
- avoid
-> +        * ugly races between new sessions and new address events.
-> +        */
-> +       if (list_empty(&net->sctp.auto_asconf_splist) &&
-> +           list_empty(&net->sctp.addr_waitq)) {
-> +               spin_unlock_bh(&net->sctp.addr_wq_lock);
-> +               return;
-> +       }
+> +static inline u32 id2handle(u32 id)
+> +{
+> +       return (id | 0x800U) << 20;
+> +}
 > +
->         /* Offsets existing events in addr_wq */
->         addrw =3D sctp_addr_wq_lookup(net, addr);
->         if (addrw) {
-> @@ -808,10 +822,10 @@ static int sctp_inetaddr_event(struct notifier_bloc=
-k *this, unsigned long ev,
->                         if (addr->a.sa.sa_family =3D=3D AF_INET &&
->                                         addr->a.v4.sin_addr.s_addr =3D=3D
->                                         ifa->ifa_local) {
-> -                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
-L);
->                                 found =3D 1;
->                                 addr->valid =3D 0;
->                                 list_del_rcu(&addr->list);
-> +                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
-L);
->                                 break;
->                         }
+>  struct tc_u_knode {
+>         struct tc_u_knode __rcu *next;
+>         u32                     handle;
+> @@ -310,7 +320,7 @@ static u32 gen_new_htid(struct tc_u_common *tp_c, str=
+uct tc_u_hnode *ptr)
+>         int id =3D idr_alloc_cyclic(&tp_c->handle_idr, ptr, 1, 0x7FF, GFP=
+_KERNEL);
+>         if (id < 0)
+>                 return 0;
+> -       return (id | 0x800U) << 20;
+> +       return id2handle(id);
+>  }
+>
+>  static struct hlist_head *tc_u_common_hash;
+> @@ -360,7 +370,7 @@ static int u32_init(struct tcf_proto *tp)
+>                 return -ENOBUFS;
+>
+>         refcount_set(&root_ht->refcnt, 1);
+> -       root_ht->handle =3D tp_c ? gen_new_htid(tp_c, root_ht) : 0x800000=
+00;
+> +       root_ht->handle =3D tp_c ? gen_new_htid(tp_c, root_ht) : id2handl=
+e(0);
+>         root_ht->prio =3D tp->prio;
+>         root_ht->is_root =3D true;
+>         idr_init(&root_ht->handle_idr);
+> @@ -612,7 +622,7 @@ static int u32_destroy_hnode(struct tcf_proto *tp, st=
+ruct tc_u_hnode *ht,
+>                 if (phn =3D=3D ht) {
+>                         u32_clear_hw_hnode(tp, ht, extack);
+>                         idr_destroy(&ht->handle_idr);
+> -                       idr_remove(&tp_c->handle_idr, ht->handle);
+> +                       idr_remove(&tp_c->handle_idr, handle2id(ht->handl=
+e));
+>                         RCU_INIT_POINTER(*hn, ht->next);
+>                         kfree_rcu(ht, rcu);
+>                         return 0;
+> @@ -989,7 +999,7 @@ static int u32_change(struct net *net, struct sk_buff=
+ *in_skb,
+>
+>                 err =3D u32_replace_hw_hnode(tp, ht, userflags, extack);
+>                 if (err) {
+> -                       idr_remove(&tp_c->handle_idr, handle);
+> +                       idr_remove(&tp_c->handle_idr, handle2id(handle));
+>                         kfree(ht);
+>                         return err;
 >                 }
 > --
-> 2.34.1
+> 2.30.2
 >
 
