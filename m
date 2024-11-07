@@ -1,115 +1,143 @@
-Return-Path: <netdev+bounces-142738-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142739-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EE2B19C027E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:37:15 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9614F9C0289
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:39:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 4F49CB226EA
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:37:13 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EB808B22649
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:39:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7124C1EE00F;
-	Thu,  7 Nov 2024 10:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7F11EF94F;
+	Thu,  7 Nov 2024 10:39:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grlZWmoI"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="HPmzia1j"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f48.google.com (mail-lf1-f48.google.com [209.85.167.48])
+Received: from mail-lf1-f41.google.com (mail-lf1-f41.google.com [209.85.167.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE6D128F5
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:37:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE561EF92A
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:39:01 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730975825; cv=none; b=WePfBIXeTHvWkjwh5l687WN/r5P//0GVnVugm+Q6vb9CqztL5pZUvd0i0D3RUFkHpv6vaWdImZ2qXOCTUldkSpOxX2Kx0VHX4gXjsRKoXlf0VsSlB3+lpzPDkkZYf7A+LEeY6QmAShG73hrMfZk6Wk6zNYI3ajfCkfJ3Xf4NAVk=
+	t=1730975943; cv=none; b=jBV0Whvws0qN4K+lPVOb6lAM6r4ookOUyJ4AykL63WPREqpzLQmyLAMvN0KCVHBX4TIdRCjSPyIiGqqyCPr8Qm3dvOGzEuNUbl7jmgH9QhART3nTf/5Yt1UKmETLTaIBJdDPoTayY3H9amJGzLRpFIHIsDKZG0rQfCZb98VeEAs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730975825; c=relaxed/simple;
-	bh=WODWf4kizp6Gb43EtRkQfRAQmJvFlX5SfA19hWLvooo=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Vzy5tRRewkq6nOHCKiDiFuWtUQ/esmEe6Mw9iPfCzTZSFM5qLTGh6wc8uG4n8eMUx8T3FocJFjUFJuZEP1NoKx2eK1ZJb18DF9AyiXn3sgC/alZfSZQ258hrsUfJPGxmxbPUYiUQXOicvR+EXbkbvvT8xhJ7fEUo7OZLvaQbY5Y=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grlZWmoI; arc=none smtp.client-ip=209.85.167.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f48.google.com with SMTP id 2adb3069b0e04-539e63c8678so782980e87.0
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:37:03 -0800 (PST)
+	s=arc-20240116; t=1730975943; c=relaxed/simple;
+	bh=lJMdumzOaAkNiNGo6zimgII+G/snXw0TvT8mnuAxvk8=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition:In-Reply-To; b=V37PQgUHDFgIZG/n5zSzSp0g1xWcYKWqd3UyYYuWjR4lzRjmq5AClyDFnJKtZ5UqHYAwMpDrUaNkXEEI4U8Xt11DIof8CDnJpNjpWffGxu15phaX0vVTt3OyghNvKWQKzjcp9wbTCaG3MjMGboJeHxBEacVHVzZYi9NUTUHUC6Y=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=HPmzia1j; arc=none smtp.client-ip=209.85.167.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-539f76a6f0dso656539e87.1
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:39:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730975822; x=1731580622; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=cfZVIGt8Rmy75o208RSK4hSdJkPI/4dSjeFGxBLdUh8=;
-        b=grlZWmoIgoHjm6M/cY96BnXRI3xLoiUW4/n8AwGR1Xv3QFRCySdko8N7KJ5r+cxvSN
-         PmxH+qqhxjsiKHCofnIbtxsyz29ujKTtcm4Gce6paPYwJhNzklzVoPD4bAJLlRIbHe18
-         qhKUmTvCbYs5L0x5SIkABYNwzy3hjLi5NhuSaeNloqMzaHTCdAettl4XyWfdCmVUX6Xu
-         oO7YYBDlHQIKFP0ETzkw50kKNXK1rmGZ0FusfwxxaH6ykOmk/3qaSEYVYq12hzBMI5Mf
-         HPXnFHV3h1OSNl9GLIbGVA0nIIZX0AAKYrWJETIbGyBzESgnTOSg6jEsSZnQLGYdtxRj
-         VtYQ==
+        d=linaro.org; s=google; t=1730975939; x=1731580739; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JH98gemjJTaUPfUlmHX1OFqIrt84z9GbUn53JGi6HVE=;
+        b=HPmzia1jgHLczLSaASNfJb3DDrmALDZaZB4r0L+3GbgI2yjYd62B1c3E+R+3vah9XN
+         UUo4ui/DojkXZ40D5tuNdaSMj3D2y00gyK+z15aGCjl8BfUZAkKlAGVBR5339+jd+MCp
+         MZn68wXXbYSp2BbDzRuPhXZEgXToU82w2575m70DucKVdcXFtqImLW2K2/mqbS05oskq
+         PtNvJvyjpQf+OohLOnRiALMs4G4yYJoAS3G3qCq/GbiyVevUWC5DsrO2sPP00siFCpXg
+         EUXVI4Vj5j961mcH8dapt7ESiKnH/YiyBJ1aE8gQB37XEdq3TaLD5Z0HfR6e3hX/Qf9d
+         C4vg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730975822; x=1731580622;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+        d=1e100.net; s=20230601; t=1730975939; x=1731580739;
+        h=in-reply-to:content-disposition:mime-version:message-id:subject:cc
+         :to:from:date:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=cfZVIGt8Rmy75o208RSK4hSdJkPI/4dSjeFGxBLdUh8=;
-        b=gDYgbhv3embtcJ8ZN9MKf+nOvFQCMQ/045kaCsTJczSdc1YkikqdDfEVqSTWnfT/oB
-         wuo0dTImEgCN84fAWSy5U0CdnNdvwgKCUxc3UKJl/fVx+9EtBUNkqVpBO9d3/NK8DjiC
-         hAY+hMfj3yBjBeF2DYWmbixHcmHIVLR42M2+uy3skVtyFU6ks+9vFD1DYrr5TmwCazhn
-         WloXJyCjqKcTOEf5UJqFECdBniKQRgPVmHojR0nkGu7H7xIW99SvLh2PxifZk7aSubWi
-         Ir9O8x2nc0uSEuvcCOVLz3CQv+bM7OPk5sBD5sml9gj3+yf8FE9sAASOK6BDl9+6sxrE
-         6uZQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVgUzpynzoyDHU7h6v3W308VRwAHkrZck/Zyq7LlNUzQ3hmoCAIPCkx9FIhBBajRrZouKAN7mE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxq3T4N4jeHII9VcP6NikguvS7RZaobCSuf9agj0wPFKNyC+ABo
-	oMD4sl1zqkph2y7HSRhOTUEh8OQyDkKkbzacPXuDIBPXICuj3qIt
-X-Google-Smtp-Source: AGHT+IHxkKwKzxkqB/vK0lp80N/+iOYb02NNcmbAQEHv3G4+1z49VyK7rPqMqOkEMoLHx00Q9mNkPQ==
-X-Received: by 2002:ac2:4e13:0:b0:539:9867:eed7 with SMTP id 2adb3069b0e04-53d65de94b5mr12747124e87.24.1730975821693;
-        Thu, 07 Nov 2024 02:37:01 -0800 (PST)
-Received: from localhost.localdomain ([178.219.168.100])
-        by smtp.gmail.com with ESMTPSA id 2adb3069b0e04-53d826a9e4fsm160025e87.221.2024.11.07.02.36.58
+        bh=JH98gemjJTaUPfUlmHX1OFqIrt84z9GbUn53JGi6HVE=;
+        b=VqxDh3zbaM4BPa2HTMl0VswVhHbGJo1XJECEgA6YZcM9MSarWdiOwBlDZn482JnAI8
+         KmkNIvMQ1ysV5e4ALPqnOFpX5wDxKB5Muxkm9dCerjrddtQPfyOs6oUKr8313dXcV10U
+         jOsVhZEd36sFYSYOzyy956AqWyuoTDdG0vA8YNTXnse8qiceFgP+Bc8TOyMGf6moleXb
+         uNQaYfqkyoADHFU57IHaAQICK/JbhIZl65zXbsHX+sH0/YhElP7PfGPDWn7/bingj/rD
+         +5eYift5o1yr2ypHptGkRpRsDJWbxZyD2VMNmbkPF/x0HGn8pPkap6KskbrTaJLFgk5H
+         vLTA==
+X-Forwarded-Encrypted: i=1; AJvYcCW6KMoFfGgW7Mo/WZ2zplPDtpxQyg+yfO9hUsvNte8Y3cSDUq6LOb+J0MfWbETJR5i2dv9BS/M=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzyHYsySBU5Sq9goCsqVyaymeitd8tREQqvrcpAWfwtyc0Rq7bK
+	boE4vVMyoKacOlVL8FIZMdDC5U1qkUcbIsssNhWFLf1FgIqMfSx5GVoPpn2+Jao=
+X-Google-Smtp-Source: AGHT+IGso3elzbiaDw8i00w0KjqQ5KFuPi/CIIkjajhtEha2FDZ5ZKCSRCL4vAbs4WzAVjhcuNJGcQ==
+X-Received: by 2002:a05:6512:158f:b0:539:8a7d:9fbf with SMTP id 2adb3069b0e04-53d8409e39bmr376911e87.46.1730975939310;
+        Thu, 07 Nov 2024 02:38:59 -0800 (PST)
+Received: from localhost ([89.101.134.25])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa70a2ccsm58130555e9.31.2024.11.07.02.38.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 02:37:00 -0800 (PST)
-From: Dmitry Kandybka <d.kandybka@gmail.com>
-To: Matthieu Baerts <matttbe@kernel.org>
-Cc: mptcp@lists.linux.dev,
-	netdev@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Dmitry Antipov <dmantipov@yandex.ru>,
-	Dmitry Kandybka <d.kandybka@gmail.com>
-Subject: [PATCH] mptcp: fix possible integer overflow in mptcp_reset_tout_timer
-Date: Thu,  7 Nov 2024 13:36:57 +0300
-Message-ID: <20241107103657.1560536-1-d.kandybka@gmail.com>
-X-Mailer: git-send-email 2.43.5
+        Thu, 07 Nov 2024 02:38:58 -0800 (PST)
+Date: Thu, 7 Nov 2024 13:38:56 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: oe-kbuild@lists.linux.dev, Cindy Lu <lulu@redhat.com>,
+	jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com,
+	sgarzare@redhat.com, linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev
+Subject: Re: [PATCH v3 5/9] vhost: Add kthread support in function
+ vhost_worker_queue()
+Message-ID: <247f4cd6-5653-4eef-9436-5699b44c4b82@suswa.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241105072642.898710-6-lulu@redhat.com>
 
-In 'mptcp_reset_tout_timer', promote 'probe_timestamp' to unsigned long
-to avoid possible integer overflow. Compile tested only.
+Hi Cindy,
 
-Found by Linux Verification Center (linuxtesting.org) with SVACE.
+kernel test robot noticed the following build warnings:
 
-Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
----
- net/mptcp/protocol.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index e978e05ec8d1..ff2b8a2bfe18 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2722,8 +2722,8 @@ void mptcp_reset_tout_timer(struct mptcp_sock *msk, unsigned long fail_tout)
- 	if (!fail_tout && !inet_csk(sk)->icsk_mtup.probe_timestamp)
- 		return;
- 
--	close_timeout = inet_csk(sk)->icsk_mtup.probe_timestamp - tcp_jiffies32 + jiffies +
--			mptcp_close_timeout(sk);
-+	close_timeout = (unsigned long)inet_csk(sk)->icsk_mtup.probe_timestamp -
-+			tcp_jiffies32 + jiffies + mptcp_close_timeout(sk);
- 
- 	/* the close timeout takes precedence on the fail one, and here at least one of
- 	 * them is active
+url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vhost-Add-a-new-parameter-to-allow-user-select-kthread/20241105-153254
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
+patch link:    https://lore.kernel.org/r/20241105072642.898710-6-lulu%40redhat.com
+patch subject: [PATCH v3 5/9] vhost: Add kthread support in function vhost_worker_queue()
+config: x86_64-randconfig-161-20241106 (https://download.01.org/0day-ci/archive/20241107/202411071251.tQLG8K6C-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+| Closes: https://lore.kernel.org/r/202411071251.tQLG8K6C-lkp@intel.com/
+
+New smatch warnings:
+drivers/vhost/vhost.c:241 vhost_worker_queue() error: we previously assumed 'worker' could be null (see line 241)
+
+Old smatch warnings:
+drivers/vhost/vhost.c:311 vhost_dev_flush() warn: iterator 'i' not incremented
+drivers/vhost/vhost.c:678 vhost_attach_cgroups() error: uninitialized symbol 'ret'.
+drivers/vhost/vhost.c:673 vhost_attach_cgroups() warn: iterator 'i' not incremented
+
+vim +/worker +241 drivers/vhost/vhost.c
+
+228a27cf78afc63 Mike Christie      2023-06-26  238  static void vhost_worker_queue(struct vhost_worker *worker,
+0921dddcb589803 Mike Christie      2023-06-26  239  			       struct vhost_work *work)
+3a4d5c94e959359 Michael S. Tsirkin 2010-01-14  240  {
+001268765c12bbf Cindy Lu           2024-11-05 @241  	if (!worker && !worker->fn)
+
+|| was intended instead of &&.
+
+001268765c12bbf Cindy Lu           2024-11-05  242  		return;
+001268765c12bbf Cindy Lu           2024-11-05  243  
+04b96e5528ca971 Jason Wang         2016-04-25  244  	if (!test_and_set_bit(VHOST_WORK_QUEUED, &work->flags)) {
+04b96e5528ca971 Jason Wang         2016-04-25  245  		/* We can only add the work to the list after we're
+04b96e5528ca971 Jason Wang         2016-04-25  246  		 * sure it was not in the list.
+635abf01918157e Peng Tao           2016-12-07  247  		 * test_and_set_bit() implies a memory barrier.
+04b96e5528ca971 Jason Wang         2016-04-25  248  		 */
+0921dddcb589803 Mike Christie      2023-06-26  249  		llist_add(&work->node, &worker->work_list);
+001268765c12bbf Cindy Lu           2024-11-05  250  		worker->fn->wakeup(worker->dev->inherit_owner ?
+001268765c12bbf Cindy Lu           2024-11-05  251  					   (void *)worker->vtsk :
+001268765c12bbf Cindy Lu           2024-11-05  252  					   (void *)worker->task);
+3a4d5c94e959359 Michael S. Tsirkin 2010-01-14  253  	}
+ac9fde2474d04bd Qin Chuanyu        2013-06-07  254  }
+
 -- 
-2.43.5
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
 
