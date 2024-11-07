@@ -1,51 +1,52 @@
-Return-Path: <netdev+bounces-142768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44D019C04DC
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:51:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 149E09C03EF
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:27:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A353286528
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:51:52 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF9631F236A1
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:27:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D7E1210191;
-	Thu,  7 Nov 2024 11:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F3E1F4FBF;
+	Thu,  7 Nov 2024 11:27:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from ganesha.gnumonks.org (ganesha.gnumonks.org [213.95.27.120])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0845921018C;
-	Thu,  7 Nov 2024 11:50:32 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=213.95.27.120
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982B91F4FAC;
+	Thu,  7 Nov 2024 11:27:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730980235; cv=none; b=toiyYcGTMaJP8BRSkkxlNckFB6wnGTAGwUNAuYTKLTBCtaTbWeU7PLSB9cax+NGn45ICAgUJ73ewRD3KA2888zcK+VDykGlsBQC/rivGGrmSbI9zTYBTjLLBcaiyLwA5Ku/yAvp3dImT/JrGsL1EkpMX33UcNZVqd5CHRICGKm0=
+	t=1730978860; cv=none; b=koikzLzG/O9Ms5E0a7WLHfep6Ou26pHpPQHGE63Y06CONOV54bL2uq9FP1AhFDtrdUBq74g/LYEsFB7y1VkXkApARS6u21tm202dCGHeNoBc5v5zPphoigUbj2FItpUzw46HRXFg/ybV+c9sBDtrJ0mRK8cjgUCjlZwZ/mRF/Vs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730980235; c=relaxed/simple;
-	bh=unrDUK7EuHXUPbfJ13rQqin9fhrr9yIkm6BHGuTqL9I=;
+	s=arc-20240116; t=1730978860; c=relaxed/simple;
+	bh=CiRRGlsT3dDhWyONtG/CZiwwSxcdju77JCm6fWfpbFE=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GT8zPcpl8uW7/48jk1zIxuUXN+UCAPQm3+SiAYZtHvuoc91XXJSlpN8/+ysZd8aw27WqM53Zx1DPZwMltHSELKTKssP6T7CaaXEc3LI9TMPHxq6/ieb2QMchSnvvwMF+Q7ccFcWeDF9HgwTrg9QPvxCcwVWahYZ1XcuZhrZ7SCM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=gnumonks.org; arc=none smtp.client-ip=213.95.27.120
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gnumonks.org
-Received: from [78.30.37.63] (port=42192 helo=gnumonks.org)
-	by ganesha.gnumonks.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <pablo@gnumonks.org>)
-	id 1t90eT-00ECKH-GN; Thu, 07 Nov 2024 12:26:15 +0100
-Date: Thu, 7 Nov 2024 12:26:12 +0100
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
-	netdev@vger.kernel.org, kuba@kernel.org, edumazet@google.com,
-	fw@strlen.de
-Subject: Re: [PATCH net 1/1] netfilter: nf_tables: wait for rcu grace period
- on net_device removal
-Message-ID: <Zyyj1KUDDJXEJjkd@calendula>
-References: <20241106235853.169747-1-pablo@netfilter.org>
- <20241106235853.169747-2-pablo@netfilter.org>
- <362a90d1-a331-4bcc-8f14-495baf5c2309@redhat.com>
+	 Content-Type:Content-Disposition:In-Reply-To; b=mRe/oLd+5ynKTxWX8lKKDbPIBUGOLFnvap8TGuCQMekbovGMKQi6w15DZGFzG/nguDnVKpfetBMTthZwbov+kUL5I7OQ3ywKxIPZdCRiGNWE/2xzeUmeQUC4Q+e0kdbS2oNtWdAIQMsPGM/m6RldmzcBaBIsmGxakJZvV+KQ5hE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB575C4CECC;
+	Thu,  7 Nov 2024 11:27:36 +0000 (UTC)
+Date: Thu, 7 Nov 2024 11:27:34 +0000
+From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
+To: Chris Lew <quic_clew@quicinc.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Hemant Kumar <quic_hemantk@quicinc.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Maxim Kochetkov <fido_max@inbox.ru>,
+	Manivannan Sadhasivam <mani@kernel.org>,
+	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
+	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Bhaumik Bhatt <bbhatt@codeaurora.org>,
+	Johan Hovold <johan@kernel.org>
+Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
+Message-ID: <20241107112734.v2ik6ipnebetjene@thinkpad>
+References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,107 +55,85 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <362a90d1-a331-4bcc-8f14-495baf5c2309@redhat.com>
-X-Spam-Score: -1.9 (-)
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
 
-On Thu, Nov 07, 2024 at 11:55:47AM +0100, Paolo Abeni wrote:
-> Hi,
-> On 11/7/24 00:58, Pablo Neira Ayuso wrote:
-> > 8c873e219970 ("netfilter: core: free hooks with call_rcu") removed
-> > synchronize_net() call when unregistering basechain hook, however,
-> > net_device removal event handler for the NFPROTO_NETDEV was not updated
-> > to wait for RCU grace period.
-> > 
-> > Note that 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks
-> > on net_device removal") does not remove basechain rules on device
-> > removal, I was hinted to remove rules on net_device removal later, see
-> > 5ebe0b0eec9d ("netfilter: nf_tables: destroy basechain and rules on
-> > netdevice removal").
-> > 
-> > Although NETDEV_UNREGISTER event is guaranteed to be handled after
-> > synchronize_net() call, this path needs to wait for rcu grace period via
-> > rcu callback to release basechain hooks if netns is alive because an
-> > ongoing netlink dump could be in progress (sockets hold a reference on
-> > the netns).
-> > 
-> > Note that nf_tables_pre_exit_net() unregisters and releases basechain
-> > hooks but it is possible to see NETDEV_UNREGISTER at a later stage in
-> > the netns exit path, eg. veth peer device in another netns:
-> > 
-> >  cleanup_net()
-> >   default_device_exit_batch()
-> >    unregister_netdevice_many_notify()
-> >     notifier_call_chain()
-> >      nf_tables_netdev_event()
-> >       __nft_release_basechain()
-> > 
-> > In this particular case, same rule of thumb applies: if netns is alive,
-> > then wait for rcu grace period because netlink dump in the other netns
-> > could be in progress. Otherwise, if the other netns is going away then
-> > no netlink dump can be in progress and basechain hooks can be released
-> > inmediately.
-> > 
-> > While at it, turn WARN_ON() into WARN_ON_ONCE() for the basechain
-> > validation, which should not ever happen.
-> > 
-> > Fixes: 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks on net_device removal")
-> > Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> > ---
-> >  include/net/netfilter/nf_tables.h |  2 ++
-> >  net/netfilter/nf_tables_api.c     | 41 +++++++++++++++++++++++++------
-> >  2 files changed, 36 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-> > index 91ae20cb7648..8dd8e278843d 100644
-> > --- a/include/net/netfilter/nf_tables.h
-> > +++ b/include/net/netfilter/nf_tables.h
-> > @@ -1120,6 +1120,7 @@ struct nft_chain {
-> >  	char				*name;
-> >  	u16				udlen;
-> >  	u8				*udata;
-> > +	struct rcu_head			rcu_head;
+On Mon, Nov 04, 2024 at 05:29:37PM -0800, Chris Lew wrote:
+> From: Bhaumik Bhatt <bbhatt@codeaurora.org>
 > 
-> I'm sorry to be pedantic but the CI is complaining about the lack of
-> kdoc for this field...
+> The call to qrtr_endpoint_register() was moved before
+> mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
+> callback can occur before the qrtr endpoint is registered.
 > 
-> >  
-> >  	/* Only used during control plane commit phase: */
-> >  	struct nft_rule_blob		*blob_next;
-> > @@ -1282,6 +1283,7 @@ struct nft_table {
-> >  	struct list_head		sets;
-> >  	struct list_head		objects;
-> >  	struct list_head		flowtables;
-> > +	possible_net_t			net;
+> Now the reverse can happen where qrtr will try to send a packet
+> before the channels are prepared. Add a wait in the sending path to
+> ensure the channels are prepared before trying to do a ul transfer.
 > 
-> ... and this one ...
-> 
-> >  	u64				hgenerator;
-> >  	u64				handle;
-> >  	u32				use;
-> 
-> [...]
-> > +static void nft_release_basechain_rcu(struct rcu_head *head)
-> > +{
-> > +	struct nft_chain *chain = container_of(head, struct nft_chain, rcu_head);
-> > +	struct nft_ctx ctx = {
-> > +		.family	= chain->table->family,
-> > +		.chain	= chain,
-> > +		.net	= read_pnet(&chain->table->net),
-> > +	};
-> > +
-> > +	__nft_release_basechain_now(&ctx);
-> > +	put_net(ctx.net);
-> 
-> ... and also about deprecated API usage here, the put_net_tracker()
-> version should be preferred.
->
-> Given this change will likely land on very old trees I guess the tracker
-> conversion is better handled as a follow-up net-next patch.
+> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
+> Reported-by: Johan Hovold <johan@kernel.org>
+> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
+> Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
+> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
 
-Agreed.
+I think we need to have the check in 'mhi_queue()' instead of waiting for the
+channels in client drivers. Would it be a problem if qrtr returns -EAGAIN from
+qcom_mhi_qrtr_send() instead of waiting for the channel?
 
-> Would you mind addressing the kdoc above? Today PR will be handled by
-> Jakub quite later, so there is a bit of time.
+- Mani
 
-I will fix kdoc and resubmit.
+> ---
+>  net/qrtr/mhi.c | 7 +++++++
+>  1 file changed, 7 insertions(+)
+> 
+> diff --git a/net/qrtr/mhi.c b/net/qrtr/mhi.c
+> index 69f53625a049..5b7268868bbd 100644
+> --- a/net/qrtr/mhi.c
+> +++ b/net/qrtr/mhi.c
+> @@ -15,6 +15,7 @@ struct qrtr_mhi_dev {
+>  	struct qrtr_endpoint ep;
+>  	struct mhi_device *mhi_dev;
+>  	struct device *dev;
+> +	struct completion prepared;
+>  };
+>  
+>  /* From MHI to QRTR */
+> @@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
+>  	if (skb->sk)
+>  		sock_hold(skb->sk);
+>  
+> +	rc = wait_for_completion_interruptible(&qdev->prepared);
+> +	if (rc)
+> +		goto free_skb;
+> +
+>  	rc = skb_linearize(skb);
+>  	if (rc)
+>  		goto free_skb;
+> @@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+>  	qdev->mhi_dev = mhi_dev;
+>  	qdev->dev = &mhi_dev->dev;
+>  	qdev->ep.xmit = qcom_mhi_qrtr_send;
+> +	init_completion(&qdev->prepared);
+>  
+>  	dev_set_drvdata(&mhi_dev->dev, qdev);
+>  	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
+> @@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
+>  		qrtr_endpoint_unregister(&qdev->ep);
+>  		return rc;
+>  	}
+> +	complete_all(&qdev->prepared);
+>  
+>  	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
+>  
+> 
+> ---
+> base-commit: 1ffec08567f426a1c593e038cadc61bdc38cb467
+> change-id: 20241104-qrtr_mhi-dfec353030af
+> 
+> Best regards,
+> -- 
+> Chris Lew <quic_clew@quicinc.com>
+> 
+
+-- 
+மணிவண்ணன் சதாசிவம்
 
