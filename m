@@ -1,249 +1,278 @@
-Return-Path: <netdev+bounces-142723-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3BA79C01A3
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:57:53 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2B799C01D4
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:03:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3AC8283BAD
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:57:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 62405283494
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:03:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E659C1DFE2C;
-	Thu,  7 Nov 2024 09:57:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAB21E3786;
+	Thu,  7 Nov 2024 10:03:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="O9hwvFh2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="M0xGBMPw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 437D5194A70
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 09:57:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 110811922C4
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:03:39 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730973469; cv=none; b=KnnivkPb4+zPxr4OVM8XM4l3lgShtC6MT5cJeIi94uZ8uZcZ32/wwZ9X+bh+FP3v5Z5QcnrfKxPwyNmaIR5HLCjxHHtq+F732RE6X8xKqtdIB9WBy48QSNvsODKu7hpqEKEeCxZgn4QMq3AE9i9atnh/aYH4MKTF4aXib2dQeD0=
+	t=1730973821; cv=none; b=lrJIODxsBPdRY4bi3xYaQDRTBQR0dAWKp2krZ0w4UbgccwrWYGvXNrxrtSA8iT+WfXFRliDml8bnEPEjyrm8FRxZk9h/jc6uXnJQA4qTHiyQqlge+oQ2D23c7Y1vgd/rkTw6YRudONr2GGov6WZ12+Ci+56kRVD1LVyaVaHckfY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730973469; c=relaxed/simple;
-	bh=MJU1EyCof9Q6U90P4+nrNn4gGCjvXirqP0hLCZl3LEc=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=cGjey+TtswHZ2M9k186Z+azhzV9+gy5aRQytrWbexnG1JKuFPVl2f3YAOIWEDGsi/Av49vxNVczD1uY9ORMMCOquC7bVzTbpNP3nmxGu+rCcrBGVrGmmYUFGsWttQXWS/80YBVcwMQLZRYmnhux9rVeWJcdSl28FDpKEX1mGhaE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=O9hwvFh2; arc=none smtp.client-ip=209.85.166.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3a4e30bffe3so2926015ab.3
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 01:57:47 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730973467; x=1731578267; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=swi250FUFP4UE+CjUFc6+pT3SaKHLSGJpryP19KHcDg=;
-        b=O9hwvFh25ULU2eRzgG77clLQBYM+JZ7p4HOAlwn5Ej5XqRrJ189NCWAACMETAH0OvV
-         0YzDTLN6pVohK5zCZXZMHyVdVxpVJ91dr6rRXVeOpKfZ8X0BXEaawilN077H5Y1hr+OU
-         jcdomd1HkYAzXxnpKJ0hUogBrOszglcBbi14h08J+BsstOqvklVIJiU+ti6LlOedwsFl
-         KfKrHCtHubDpyX6diIH77nrlIZOrPRuH08Mg5o6DaCnjjwbDS/8zBcfuhQRz7fGx1btq
-         TFpUb/mlUkkYLRKcGyOWdEC4fTCXq0/or9XAMFfA45mBmg2aUm7I9z/ZeXB1euVzI7qI
-         c67g==
+	s=arc-20240116; t=1730973821; c=relaxed/simple;
+	bh=2+Yutr5Xglcz8V8+xc221L3KYuAq5uCZTnAUQj8Hv0g=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=idH3ZXtMtsyt6WZm3MDlzaG3F7D2wJmVwm8Dq1wCxt7M5yTgygskq2D6XCaigyI4HhWC2Urk1dc59g2exJRT3+V8905Glo0Nymxiu15u8pN5f+juZ7waIRTAm+dtwyxYuPovICEbnqhYNsUlCW2yc2Haleofy6qnDWmOlhOCiYc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=M0xGBMPw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730973818;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=An3BH6XKuTAnMBgKcn0eA2Zh2Rap4I/isdV3TdHYfCA=;
+	b=M0xGBMPwHQ8rgoB1BGYctYNjh9L4+ZWVmLvz5xOyhbpGNcY+G0lgzm0bJdi4qfgbM5OYh2
+	LpPhvtSXd0KUi03qWCF1jCTqFbO1n7kPjqTmvredT0tgHP1IquYedpc5OHtqnHvfwSHIvV
+	S1e+q2JmfXC/IxqQx5I1UWmLzJ5vLUA=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-391-Nd1ksVcIPGGqs45Fdx9U2w-1; Thu, 07 Nov 2024 05:03:37 -0500
+X-MC-Unique: Nd1ksVcIPGGqs45Fdx9U2w-1
+X-Mimecast-MFC-AGG-ID: Nd1ksVcIPGGqs45Fdx9U2w
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-3e62ac54e9fso863235b6e.3
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:03:37 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730973467; x=1731578267;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=swi250FUFP4UE+CjUFc6+pT3SaKHLSGJpryP19KHcDg=;
-        b=v2aZE8hPr93WJBDwemD5hmGKUuiqPB9dw7zj/ci8GhS/e2N1cTi8i0bKHQ+NIIi5NM
-         U1jUshHQgAzz4PATC+TKcqT0EAcp/+QA1+iVGRcf7VJc5wMZRjE+tKrIA5KAlLAArHZ/
-         OJG8RMuKJ9ZGCUqqB+eqgQebZqD7Iet3XrWnpGJhUP1GTCYn4b8/1+SkTeORIMXzfcN2
-         bg46E70Dbkl7/fFqi9bKld3xYfyPuZRJSF+gunkKNdGjC7pZ+3PiEyGez25yyeQmk2tW
-         vYMH9B6iV/r20x/7F1o5Jo7R5jBtD0N9jebrejVr/tKj4CIXCc4zy9RtK3n1vgS5qDJk
-         dE2A==
-X-Forwarded-Encrypted: i=1; AJvYcCWF4e4whLCJNdWBWzaUkBKD53BTrSPl7UAtbxxN0FmQq1D1vBmXGzQ49DtDIn2MyR4OnX5VYdQ=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxQy6MfvF8F5Cqj8e0kzf8yigtpvPvmqTU1SAQ/AwsaBj+lCdzj
-	2TxAiq/+VUh7Rd2SZISYzFefJVxU7vVda04Ka5zNnwpqbEXmsqLIZQYaO2290NbDIQoFscdU129
-	G0wMH3pLBfrksFCd7EiIsycwmoQI=
-X-Google-Smtp-Source: AGHT+IE/Zbhf/dnKsTYCWz9k5hD1W5siJH9qEY7FXg339nOOb/ygHabUd8ELi88mgpWaqetjSndYfPAAf6f1IDOuUhA=
-X-Received: by 2002:a05:6e02:1746:b0:3a6:c724:2ec with SMTP id
- e9e14a558f8ab-3a6c724041emr182644065ab.2.1730973467238; Thu, 07 Nov 2024
- 01:57:47 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730973817; x=1731578617;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=An3BH6XKuTAnMBgKcn0eA2Zh2Rap4I/isdV3TdHYfCA=;
+        b=Jrejr3iwftj/GLGzukKTqL0kmtU+hreYg9ABeqGdjxJ4zhmZ0sikYLFeOFyRi7q+rC
+         1QRw1Atk+xHzbDkl6gEapj5O2p1N1OqowqjrPdy9qu2D8s2QWRUZCv7M8dXsa0Fk++nf
+         OJaqFE/BGGiol+ehYaw9S62yVQdrsUDtEuiSHCggp6B/RleJctEf2DP8MOFAAZfJrd/i
+         3jjHwx0PEa25DFCSmMc7NnLEFu72lGVoXVYrzYT9uKVNqL5xhn39kSEIpuNY2VYtY505
+         JZXMElLl9rocsdbIU4QPbdvKnoJqDN+bnZeN4Gr2xqNAOQBvRJzslon69nz9SJPJL5S9
+         fYTw==
+X-Forwarded-Encrypted: i=1; AJvYcCWQ6kcyDyA6rWzU9+kL3YGCu2DsQWVwmCcAWYLYZ6PJ6tP+KP6kj86Gl0OUDQl8avXAwoZ+V2Y=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwQHJvlcnsYidtQpObu/YiEZSMmmGSqI3Wwnxm38Q2WjeYnP6uO
+	lPdpLif/rmqrNjfprGV1zCVM3evZbJZvnAU5PVK4yRfz+3hdmMdMcbeikD84wOYQOtRtQg9vlLm
+	f9+MaB1VGDfNEJxq62fWVGH0FZpMp1Kj0SL48qP5d5Qj3jag9orWy7g==
+X-Received: by 2002:a05:6808:1587:b0:3e6:61ed:d62 with SMTP id 5614622812f47-3e78fc71ebfmr482172b6e.6.1730973816632;
+        Thu, 07 Nov 2024 02:03:36 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IGh9cwaUN0Ba6FgiawQwL1+eLsqHmCIJp1Eq590jb/9RX+uJ0m1Iu3AL2UUAklxiLKOlF6EEw==
+X-Received: by 2002:a05:6808:1587:b0:3e6:61ed:d62 with SMTP id 5614622812f47-3e78fc71ebfmr482139b6e.6.1730973816142;
+        Thu, 07 Nov 2024 02:03:36 -0800 (PST)
+Received: from sgarzare-redhat ([5.77.70.124])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d396637613sm5750286d6.116.2024.11.07.02.03.34
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 02:03:35 -0800 (PST)
+Date: Thu, 7 Nov 2024 11:03:28 +0100
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Cindy Lu <lulu@redhat.com>
+Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org
+Subject: Re: [PATCH v3 7/9] vhost: Add new UAPI to support change to task mode
+Message-ID: <zkamzruq5e3diahm7vyjansnaowkw42toh5evwgq6vqal7h4pk@3w4e47ggogyr>
+References: <20241105072642.898710-1-lulu@redhat.com>
+ <20241105072642.898710-8-lulu@redhat.com>
+ <6dtic6ld6p6kyzbjjewj4cxkc6h6r5t6y2ztazrgozdanz6gkm@vlj3ubpam6ih>
+ <CACLfguVNM_b9LdiMyj+pZH0WHu=-Nrit8-cr+QH9=f7tMLDd4w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
- <92c1d976-7bb6-49ff-9131-edba30623f76@linux.alibaba.com> <CAL+tcoBZaDhBuSKHzGEqgxkzOazX3K-Vo2=mCdOy+iLp4sPAhg@mail.gmail.com>
- <75708260-7eb4-42fe-9d9b-605f8eef488b@linux.alibaba.com> <CAL+tcoBA78svT_vTMOLV-pbwKM1o_SDbjs7AAZLhHOtrd8akBg@mail.gmail.com>
- <CANn89iL5df5_EiDX7JxaFbfmZ9gDo=8ZyLXhbZs+-yp8zVD=GA@mail.gmail.com>
- <CAL+tcoBCqXiQ33XZv61vCes7_XV83DC0HSPy_w6eCn4pzzJeqA@mail.gmail.com>
- <CAL+tcoBPj2aULt5G4qis0D78ke=dt2ws7KBg4Gn+s4FtzjMZfQ@mail.gmail.com> <CANn89iL7uBQQmQcZnbmX-23eyQn5GOecyp2ddcb-oqpJxK6G0w@mail.gmail.com>
-In-Reply-To: <CANn89iL7uBQQmQcZnbmX-23eyQn5GOecyp2ddcb-oqpJxK6G0w@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Nov 2024 17:57:10 +0800
-Message-ID: <CAL+tcoCzbLKV7xVRvQsYFAoZp1OrXQ1+-xn0rCgHfcTttT=-Uw@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: Eric Dumazet <edumazet@google.com>
-Cc: Philo Lu <lulie@linux.alibaba.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACLfguVNM_b9LdiMyj+pZH0WHu=-Nrit8-cr+QH9=f7tMLDd4w@mail.gmail.com>
 
-On Thu, Nov 7, 2024 at 5:45=E2=80=AFPM Eric Dumazet <edumazet@google.com> w=
-rote:
->
-> On Thu, Nov 7, 2024 at 10:30=E2=80=AFAM Jason Xing <kerneljasonxing@gmail=
-.com> wrote:
-> >
-> > On Thu, Nov 7, 2024 at 5:00=E2=80=AFPM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> > >
-> > > On Thu, Nov 7, 2024 at 4:37=E2=80=AFPM Eric Dumazet <edumazet@google.=
-com> wrote:
-> > > >
-> > > > On Thu, Nov 7, 2024 at 9:27=E2=80=AFAM Jason Xing <kerneljasonxing@=
-gmail.com> wrote:
-> > > > >
-> > > > > On Thu, Nov 7, 2024 at 4:22=E2=80=AFPM Philo Lu <lulie@linux.alib=
-aba.com> wrote:
-> > > > > >
-> > > > > >
-> > > > > >
-> > > > > > On 2024/11/7 16:01, Jason Xing wrote:
-> > > > > > > On Thu, Nov 7, 2024 at 3:51=E2=80=AFPM Philo Lu <lulie@linux.=
-alibaba.com> wrote:
-> > > > > > >>
-> > > > > > >> Hi Jason,
-> > > > > > >>
-> > > > > > >> On 2024/11/5 10:55, Jason Xing wrote:
-> > > > > > >>> From: Jason Xing <kernelxing@tencent.com>
-> > > > > > >>>
-> > > > > > >>> We found there are rare chances that some RST packets appea=
-r during
-> > > > > > >>> the shakehands because the timewait socket cannot accept th=
-e SYN and
-> > > > > > >>> doesn't return TCP_TW_SYN in tcp_timewait_state_process().
-> > > > > > >>>
-> > > > > > >>> Here is how things happen in production:
-> > > > > > >>> Time        Client(A)        Server(B)
-> > > > > > >>> 0s          SYN-->
-> > > > > > >>> ...
-> > > > > > >>> 132s                         <-- FIN
-> > > > > > >>> ...
-> > > > > > >>> 169s        FIN-->
-> > > > > > >>> 169s                         <-- ACK
-> > > > > > >>> 169s        SYN-->
-> > > > > > >>> 169s                         <-- ACK
-> > > > > > >>> 169s        RST-->
-> > > > > > >>> As above picture shows, the two flows have a start time dif=
-ference
-> > > > > > >>> of 169 seconds. B starts to send FIN so it will finally ent=
-er into
-> > > > > > >>> TIMEWAIT state. Nearly at the same time A launches a new co=
-nnection
-> > > > > > >>> that soon is reset by itself due to receiving a ACK.
-> > > > > > >>>
-> > > > > > >>> There are two key checks in tcp_timewait_state_process() wh=
-en timewait
-> > > > > > >>> socket in B receives the SYN packet:
-> > > > > > >>> 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
-> > > > > > >>> 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval=
-) < 0)
-> > > > > > >>>
-> > > > > > >>> Regarding the first rule, it fails as expected because in t=
-he first
-> > > > > > >>> connection the seq of SYN sent from A is 1892994276, then 1=
-69s have
-> > > > > > >>> passed, the second SYN has 239034613 (caused by overflow of=
- s32).
-> > > > > > >>>
-> > > > > > >>> Then how about the second rule?
-> > > > > > >>> It fails again!
-> > > > > > >>> Let's take a look at how the tsval comes out:
-> > > > > > >>> __tcp_transmit_skb()
-> > > > > > >>>       -> tcp_syn_options()
-> > > > > > >>>           -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_u=
-sec_ts, skb) + tp->tsoffset;
-> > > > > > >>> The timestamp depends on two things, one is skb->skb_mstamp=
-_ns, the
-> > > > > > >>> other is tp->tsoffset. The latter value is fixed, so we don=
-'t need
-> > > > > > >>> to care about it. If both operations (sending FIN and then =
-starting
-> > > > > > >>> sending SYN) from A happen in 1ms, then the tsval would be =
-the same.
-> > > > > > >>> It can be clearly seen in the tcpdump log. Notice that the =
-tsval is
-> > > > > > >>> with millisecond precision.
-> > > > > > >>>
-> > > > > > >>> Based on the above analysis, I decided to make a small chan=
-ge to
-> > > > > > >>> the check in tcp_timewait_state_process() so that the secon=
-d flow
-> > > > > > >>> would not fail.
-> > > > > > >>>
-> > > > > > >>
-> > > > > > >> I wonder what a bad result the RST causes. As far as I know,=
- the client
-> > > > > > >> will not close the connect and return. Instead, it re-sends =
-an SYN in
-> > > > > > >> TCP_TIMEOUT_MIN(2) jiffies (implemented in
-> > > > > > >> tcp_rcv_synsent_state_process). So the second connection cou=
-ld still be
-> > > > > > >> established successfully, at the cost of a bit more delay. L=
-ike:
-> > > > > > >>
-> > > > > > >>    Time        Client(A)        Server(B)
-> > > > > > >>    0s          SYN-->
-> > > > > > >>    ...
-> > > > > > >>    132s                         <-- FIN
-> > > > > > >>    ...
-> > > > > > >>    169s        FIN-->
-> > > > > > >>    169s                         <-- ACK
-> > > > > > >>    169s        SYN-->
-> > > > > > >>    169s                         <-- ACK
-> > > > > > >>    169s        RST-->
-> > > > > > >> ~2jiffies    SYN-->
-> > >
-> > > It doesn't happen. I dare to say the SYN will not be retransmitted
-> > > soon which I can tell from many tcpdump logs I captured.
-> >
-> > My mind went blank probably because of getting sick. Sorry. Why the
-> > tcpdump doesn't show the retransmitted SYN packet is our private
-> > kernel missed this following commit:
-> >
-> > commit 9603d47bad4642118fa19fd1562569663d9235f6
-> > Author: SeongJae Park <sjpark@amazon.de>
-> > Date:   Sun Feb 2 03:38:26 2020 +0000
-> >
-> >     tcp: Reduce SYN resend delay if a suspicous ACK is received
-> >
-> >     When closing a connection, the two acks that required to change clo=
-sing
-> >     socket's status to FIN_WAIT_2 and then TIME_WAIT could be processed=
- in
-> >     reverse order.  This is possible in RSS disabled environments such =
-as a
-> >     connection inside a host.
->
-> Not having a patch from linux-5.6 does not really give a good impression,
-> please next time make sure your patches are needed for upstream trees,
-> net or net-next.
+On Thu, Nov 07, 2024 at 03:12:49PM +0800, Cindy Lu wrote:
+>On Tue, Nov 5, 2024 at 6:32 PM Stefano Garzarella <sgarzare@redhat.com> wrote:
+>>
+>> On Tue, Nov 05, 2024 at 03:25:26PM +0800, Cindy Lu wrote:
+>> >Add a new UAPI to enable setting the vhost device to task mode.
+>> >The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
+>> >to configure the mode if necessary.
+>> >This setting must be applied before VHOST_SET_OWNER, as the worker
+>> >will be created in the VHOST_SET_OWNER function
+>> >
+>> >Signed-off-by: Cindy Lu <lulu@redhat.com>
+>> >---
+>> > drivers/vhost/vhost.c      | 15 ++++++++++++++-
+>> > include/uapi/linux/vhost.h |  2 ++
+>> > 2 files changed, 16 insertions(+), 1 deletion(-)
+>> >
+>> >diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
+>> >index c17dc01febcc..70c793b63905 100644
+>> >--- a/drivers/vhost/vhost.c
+>> >+++ b/drivers/vhost/vhost.c
+>> >@@ -2274,8 +2274,9 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+>> > {
+>> >       struct eventfd_ctx *ctx;
+>> >       u64 p;
+>> >-      long r;
+>> >+      long r = 0;
+>>
+>> I don't know if something is missing in this patch, but I am confused:
+>>
+>> `r` is set few lines below...
+>>
+>> >       int i, fd;
+>> >+      bool inherit_owner;
+>> >
+>> >       /* If you are not the owner, you can become one */
+>> >       if (ioctl == VHOST_SET_OWNER) {
+>> ...
+>>
+>>         /* You must be the owner to do anything else */
+>>         r = vhost_dev_check_owner(d);
+>>         if (r)
+>>                 goto done;
+>>
+>> So, why we are now initializing it to 0?
+>>
+>r = 0 mean return successfully here.
+>Therefore, in the case VHOST_SET_INHERIT_FROM_OWNER function, I don't
+>need to set it again and can simply return.
+>....
+>    if (vhost_dev_has_owner(d))
+>       break;
+>.....
 
-Sorry about this. Normally, I found an issue on those older kernels
-and then I will test it on the net-next tree. The issue this patch
-tried to fix can be reproduced, as we all see. But today regarding the
-topic about re-sending an SYN quickly, I didn't conduct the test, only
-analyzing the code :( Sorry for the noise.
+Okay, but vhost_dev_check_owner() already set it to 0, so we can avoid 
+that, no?
 
->
-> This also means you can write a packetdrill test to show the benefit
-> of this patch,
-> and send it as a new selftests ;)
->
-> Back to packetdrill, and everyone will be happy.
+>> >@@ -2332,6 +2333,18 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+>> >               if (ctx)
+>> >                       eventfd_ctx_put(ctx);
+>> >               break;
+>> >+      case VHOST_SET_INHERIT_FROM_OWNER:
+>> >+              /*inherit_owner can only be modified before owner is set*/
+>> >+              if (vhost_dev_has_owner(d))
+>>
+>> And here, how this check can be false, if at the beginning of the
+>> function we call vhost_dev_check_owner()?
+>>
+>> Maybe your intention was to add this code before the
+>> `vhost_dev_check_owner()` call, so this should explain why initialize
+>> `r` to 0, but I'm not sure.
+>>
+>Yes, in the function beginning, the code is
+>if (ioctl == VHOST_SET_OWNER) {
+>r = vhost_dev_set_owner(d);
+>goto done;
+>}
+>if the ioctl is not VHOST_SET_OWNER,  then the  code will not run the
+>function vhost_dev_set_owner.
 
-Thanks for reminding me. It's really necessary for me to get started
-to learn how to write various packetdrill tests.
+Sorry, I meant vhost_dev_check_owner(), not vhost_dev_set_owner().
+
+I'll try to explain again.
+
+After applying this series we have this code:
+
+long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user *argp)
+{
+	struct eventfd_ctx *ctx;
+	u64 p;
+	long r = 0;
+	int i, fd;
+	bool inherit_owner;
+
+	/* If you are not the owner, you can become one */
+	if (ioctl == VHOST_SET_OWNER) {
+		r = vhost_dev_set_owner(d);
+		goto done;
+	}
+
+	/* You must be the owner to do anything else */
+	r = vhost_dev_check_owner(d);
+	if (r)
+		goto done;
+
+	switch (ioctl) {
+	...
+     	case VHOST_SET_INHERIT_FROM_OWNER:
+		/*inherit_owner can only be modified before owner is 
+		 * set*/
+		if (vhost_dev_has_owner(d))
+			break;
+
+IIUC this check is always true, so we always call `break` because at
+the beginning of this function we call vhost_dev_check_owner() which
+if `dev->mm != current->mm` (so it can't be null I guess) jumps directly
+into `done`, returning an error.
+
+So I still don't understand in which condition we can run the code after
+this check.
+
+Thanks,
+Stefano
+
+		if (copy_from_user(&inherit_owner, argp,
+				   sizeof(inherit_owner))) {
+			r = -EFAULT;
+			break;
+		}
+		d->inherit_owner = inherit_owner;
+		break;
+
+
+>This ioctl is used by userspace applications, so we cannot be certain
+>of the type and sequence of their calls; therefore, I added this
+>check.
+>
+>> >+                      break;
+>>
+>> Should we return an error (e.g. -EPERM) in this case?
+>>
+>sure，will add this back
+>thanks
+>Cindy
+>> >+
+>> >+              if (copy_from_user(&inherit_owner, argp,
+>> >+                                 sizeof(inherit_owner))) {
+>> >+                      r = -EFAULT;
+>> >+                      break;
+>> >+              }
+>> >+              d->inherit_owner = inherit_owner;
+>> >+              break;
+>> >       default:
+>> >               r = -ENOIOCTLCMD;
+>> >               break;
+>> >diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
+>> >index b95dd84eef2d..1e192038633d 100644
+>> >--- a/include/uapi/linux/vhost.h
+>> >+++ b/include/uapi/linux/vhost.h
+>> >@@ -235,4 +235,6 @@
+>> >  */
+>> > #define VHOST_VDPA_GET_VRING_SIZE     _IOWR(VHOST_VIRTIO, 0x82,       \
+>> >                                             struct vhost_vring_state)
+>> >+
+>>
+>> Please add a documentation here, this is UAPI, so the user should
+>> know what this ioctl does based on the parameter.
+>>
+>> Thanks,
+>> Stefano
+>>
+>> >+#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, bool)
+>> > #endif
+>> >--
+>> >2.45.0
+>> >
+>>
+>
+
 
