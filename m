@@ -1,139 +1,114 @@
-Return-Path: <netdev+bounces-142756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 149E09C03EF
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:27:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FC329C0407
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:30:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id BF9631F236A1
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:27:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC275B2164F
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:30:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7F3E1F4FBF;
-	Thu,  7 Nov 2024 11:27:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFB222010FD;
+	Thu,  7 Nov 2024 11:30:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="M/2ZLnBI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from out-175.mta1.migadu.com (out-175.mta1.migadu.com [95.215.58.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982B91F4FAC;
-	Thu,  7 Nov 2024 11:27:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EE5972010E0
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 11:30:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730978860; cv=none; b=koikzLzG/O9Ms5E0a7WLHfep6Ou26pHpPQHGE63Y06CONOV54bL2uq9FP1AhFDtrdUBq74g/LYEsFB7y1VkXkApARS6u21tm202dCGHeNoBc5v5zPphoigUbj2FItpUzw46HRXFg/ybV+c9sBDtrJ0mRK8cjgUCjlZwZ/mRF/Vs=
+	t=1730979030; cv=none; b=RU0dszm0gfzQRPuCopBeYWOxfnlD3mEC5bVQkTEkEJdt7Sv3CuPgrQ5PP+GVMv1tdLiJ45UZxHcLupNR5thvCecQZXbEptrKxwRCjb1bSo61/BsVNEtob7Rcuo/3vgLD/CHHnV6WencXgIF3UFXLSpsyVbHSSKzV/U4fYdBYG9I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730978860; c=relaxed/simple;
-	bh=CiRRGlsT3dDhWyONtG/CZiwwSxcdju77JCm6fWfpbFE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=mRe/oLd+5ynKTxWX8lKKDbPIBUGOLFnvap8TGuCQMekbovGMKQi6w15DZGFzG/nguDnVKpfetBMTthZwbov+kUL5I7OQ3ywKxIPZdCRiGNWE/2xzeUmeQUC4Q+e0kdbS2oNtWdAIQMsPGM/m6RldmzcBaBIsmGxakJZvV+KQ5hE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB575C4CECC;
-	Thu,  7 Nov 2024 11:27:36 +0000 (UTC)
-Date: Thu, 7 Nov 2024 11:27:34 +0000
-From: Manivannan Sadhasivam <manivannan.sadhasivam@linaro.org>
-To: Chris Lew <quic_clew@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Hemant Kumar <quic_hemantk@quicinc.com>,
-	Loic Poulain <loic.poulain@linaro.org>,
-	Maxim Kochetkov <fido_max@inbox.ru>,
-	Manivannan Sadhasivam <mani@kernel.org>,
-	Bjorn Andersson <bjorn.andersson@oss.qualcomm.com>,
-	linux-arm-msm@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Bhaumik Bhatt <bbhatt@codeaurora.org>,
-	Johan Hovold <johan@kernel.org>
-Subject: Re: [PATCH] net: qrtr: mhi: synchronize qrtr and mhi preparation
-Message-ID: <20241107112734.v2ik6ipnebetjene@thinkpad>
-References: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
+	s=arc-20240116; t=1730979030; c=relaxed/simple;
+	bh=bnUvjVdiSft7WVIMlOpLml9wAklJpPbdK06oUWbZ4qU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=HDK+bnWq9kwSrejQZvKmpGPJHIshTETc/QC8iVJ/yB5QSr4oIQ2piiC2qPRF5zVeb+ScOVf7h11xwZNfZgUQCOrr/3GOL+deKsEuBQIU/p0fwnkW/5oQyrbueH9tf3mlPj0SFwLR4N6Z98etxJNjfpVFJKimmp+Jg+oN/YXM7y4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=M/2ZLnBI; arc=none smtp.client-ip=95.215.58.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <b35f536e-1eb0-4b7b-85f4-df94d76927d6@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1730979027;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=V6cUyGgnQgri70MMdhq/M7qPzahwKEUdSTflvW+Wn4g=;
+	b=M/2ZLnBIDrhL+/lhucMT8nzJZrssCQ/ZV1MxyZzlfLqdUXGb0zz42XgAG5WSle2VHkKygy
+	0+tk9AhPIb1M5jERCxv3kUr7cWCNWvXWtLuYtlT9XaUzIv1nZHUC0dNWJZCIQbL0Jm7KuE
+	jcFqLgc6TsH1OiD+zYNKfe2yFfaBf/E=
+Date: Thu, 7 Nov 2024 11:30:23 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241104-qrtr_mhi-v1-1-79adf7e3bba5@quicinc.com>
+Subject: Re: [PATCH net-next] eth: fbnic: Add PCIe hardware statistics
+To: Leon Romanovsky <leon@kernel.org>, Jakub Kicinski <kuba@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Bjorn Helgaas <helgaas@kernel.org>,
+ Sanman Pradhan <sanman.p211993@gmail.com>,
+ Bjorn Helgaas <bhelgaas@google.com>, netdev@vger.kernel.org,
+ alexanderduyck@fb.com, kernel-team@meta.com, davem@davemloft.net,
+ edumazet@google.com, pabeni@redhat.com, horms@kernel.org, corbet@lwn.net,
+ mohsin.bashr@gmail.com, sanmanpradhan@meta.com, andrew+netdev@lunn.ch,
+ jdamato@fastly.com, sdf@fomichev.me, linux-doc@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-pci@vger.kernel.org
+References: <20241106122251.GC5006@unreal> <20241106171257.GA1529850@bhelgaas>
+ <76fdd29a-c7fa-4b99-ae63-cce17c91dae9@lunn.ch>
+ <20241106160958.6d287fd8@kernel.org> <20241107082327.GI5006@unreal>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+In-Reply-To: <20241107082327.GI5006@unreal>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Mon, Nov 04, 2024 at 05:29:37PM -0800, Chris Lew wrote:
-> From: Bhaumik Bhatt <bbhatt@codeaurora.org>
+On 07/11/2024 08:23, Leon Romanovsky wrote:
+> On Wed, Nov 06, 2024 at 04:09:58PM -0800, Jakub Kicinski wrote:
+>> On Wed, 6 Nov 2024 18:36:16 +0100 Andrew Lunn wrote:
+>>>> How would this be done in the PCI core?  As far as I can tell, all
+>>>> these registers are device-specific and live in some device BAR.
+>>>
+>>> Is this a licences PCIe core?
+>>>
+>>> Could the same statistics appear in other devices which licence the
+>>> same core? Maybe this needs pulling out into a helper?
+>>
+>> The core is licensed but I believe the _USER in the defines names means
+>> the stats sit in the integration logic not the licensed IP. I could be
+>> wrong.
+>>
+>>> If this is true, other uses of this core might not be networking
+>>> hardware, so ethtool -S would not be the best interfaces. Then they
+>>> should appear in debugfs?
+>>
+>> I tried to push back on adding PCIe config to network tooling,
+>> and nobody listened. Look at all the PCI stuff in devlink params.
+>> Some vendors dump PCIe signal integrity into ethtool -S
 > 
-> The call to qrtr_endpoint_register() was moved before
-> mhi_prepare_for_transfer_autoqueue() to prevent a case where a dl
-> callback can occur before the qrtr endpoint is registered.
-> 
-> Now the reverse can happen where qrtr will try to send a packet
-> before the channels are prepared. Add a wait in the sending path to
-> ensure the channels are prepared before trying to do a ul transfer.
-> 
-> Fixes: 68a838b84eff ("net: qrtr: start MHI channel after endpoit creation")
-> Reported-by: Johan Hovold <johan@kernel.org>
-> Closes: https://lore.kernel.org/linux-arm-msm/ZyTtVdkCCES0lkl4@hovoldconsulting.com/
-> Signed-off-by: Bhaumik Bhatt <bbhatt@codeaurora.org>
-> Signed-off-by: Chris Lew <quic_clew@quicinc.com>
+> Can you please give an example? I grepped various keywords and didn't
+> find anything suspicious.
 
-I think we need to have the check in 'mhi_queue()' instead of waiting for the
-channels in client drivers. Would it be a problem if qrtr returns -EAGAIN from
-qcom_mhi_qrtr_send() instead of waiting for the channel?
+Hmm...
 
-- Mani
+[root@host ~]# ethtool -i eth0 | grep driver
+driver: mlx5_core
+[root@host ~]# ethtool -S eth0 | grep pci
+      rx_pci_signal_integrity: 1
+      tx_pci_signal_integrity: 1471
+      outbound_pci_stalled_rd: 0
+      outbound_pci_stalled_wr: 0
+      outbound_pci_stalled_rd_events: 0
+      outbound_pci_stalled_wr_events: 0
 
-> ---
->  net/qrtr/mhi.c | 7 +++++++
->  1 file changed, 7 insertions(+)
-> 
-> diff --git a/net/qrtr/mhi.c b/net/qrtr/mhi.c
-> index 69f53625a049..5b7268868bbd 100644
-> --- a/net/qrtr/mhi.c
-> +++ b/net/qrtr/mhi.c
-> @@ -15,6 +15,7 @@ struct qrtr_mhi_dev {
->  	struct qrtr_endpoint ep;
->  	struct mhi_device *mhi_dev;
->  	struct device *dev;
-> +	struct completion prepared;
->  };
->  
->  /* From MHI to QRTR */
-> @@ -53,6 +54,10 @@ static int qcom_mhi_qrtr_send(struct qrtr_endpoint *ep, struct sk_buff *skb)
->  	if (skb->sk)
->  		sock_hold(skb->sk);
->  
-> +	rc = wait_for_completion_interruptible(&qdev->prepared);
-> +	if (rc)
-> +		goto free_skb;
-> +
->  	rc = skb_linearize(skb);
->  	if (rc)
->  		goto free_skb;
-> @@ -85,6 +90,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
->  	qdev->mhi_dev = mhi_dev;
->  	qdev->dev = &mhi_dev->dev;
->  	qdev->ep.xmit = qcom_mhi_qrtr_send;
-> +	init_completion(&qdev->prepared);
->  
->  	dev_set_drvdata(&mhi_dev->dev, qdev);
->  	rc = qrtr_endpoint_register(&qdev->ep, QRTR_EP_NID_AUTO);
-> @@ -97,6 +103,7 @@ static int qcom_mhi_qrtr_probe(struct mhi_device *mhi_dev,
->  		qrtr_endpoint_unregister(&qdev->ep);
->  		return rc;
->  	}
-> +	complete_all(&qdev->prepared);
->  
->  	dev_dbg(qdev->dev, "Qualcomm MHI QRTR driver probed\n");
->  
-> 
-> ---
-> base-commit: 1ffec08567f426a1c593e038cadc61bdc38cb467
-> change-id: 20241104-qrtr_mhi-dfec353030af
-> 
-> Best regards,
-> -- 
-> Chris Lew <quic_clew@quicinc.com>
-> 
+Isn't it a PCIe statistics?
 
--- 
-மணிவண்ணன் சதாசிவம்
+
 
