@@ -1,77 +1,54 @@
-Return-Path: <netdev+bounces-142626-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142615-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C56459BFC94
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:32:47 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321379BFC7A
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:17:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 2964CB2128B
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:32:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id B749C1F23D8E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:17:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2183182BC;
-	Thu,  7 Nov 2024 02:32:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="cqEc+Q+j"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D0AFD53F;
+	Thu,  7 Nov 2024 02:17:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-52005.amazon.com (smtp-fw-52005.amazon.com [52.119.213.156])
+Received: from szxga07-in.huawei.com (szxga07-in.huawei.com [45.249.212.35])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED1023D64
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 02:32:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.119.213.156
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 982CB38FAD;
+	Thu,  7 Nov 2024 02:17:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.35
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730946760; cv=none; b=pOaGr7Zdmdv/Ptw7c7DVTABHv5DvxUhlkCwm0yKmGTpFbj8RuXjZAZNlt1FwTFQ0z6obcg22Qm43bBXcYDdlu9XfT1Q2D+zsaF2aMUbssAev9jg7NgeyYib+LnVfn8jGONOAtV3uXhVPWRY8qg75nPa6WdjhmNdkpf6q3KEqZrU=
+	t=1730945835; cv=none; b=nZ1aMoyFGMhEDakepWdPkRklZwxsB5ia6VSkiCceeDePhYWdjoLsqQ4QJts3pRuXwSdRsjpF+iHpPMnijAs/ZbUmh+QcZaRXUcFHtbaAi7lGU18ZnrSfy5siUc/Ae1hRnaeVi77aM0hurHX2ApFt1joXtdDtK8VUiokI3XoXWQ4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730946760; c=relaxed/simple;
-	bh=fTARUZ3ZILInUUsrkJBfuQhScBlFEd3RAb8zIlziWbM=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=HYpaDlu+rSPviZbJrZ7tSEVQCmzl5C3obf8ahEDhR9V2s2lb1xJo53XMTWun9CQbMyUJQt43sNFOBYUhYr88xjEIOzdk6itcsV+aMXutv9zDz+g3GNZZXT0PKXGOAN9ZVY8Pl7CabM8CeDc03QVs4ZzTJv6zTu20wxbefVk8p24=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=cqEc+Q+j; arc=none smtp.client-ip=52.119.213.156
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730946759; x=1762482759;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=mdE2xsovL/Gdzg41RfMTlIRQQ7jyDqdkbwXU5Oagrdc=;
-  b=cqEc+Q+jAxiVfmdHE+XclfitemNEV0WkY7gC73rId+/G0/9Q7gtBxeL+
-   b487RRtjnm7I0E33rIrWb8T3ydZZPgPgrhbQiK4iUxHlZOwpHg5nUzp7P
-   sMLeP/XfpY7GYpNWOK7e+yo3G2+4viF/W2brox5X5QzfWxp8LGS+CY7Pr
-   8=;
-X-IronPort-AV: E=Sophos;i="6.11,264,1725321600"; 
-   d="scan'208";a="693652351"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.43.8.6])
-  by smtp-border-fw-52005.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 02:32:37 +0000
-Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:8541]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.42:2525] with esmtp (Farcaster)
- id 9c89d4e0-5743-4ddd-893d-89bad01b7be2; Thu, 7 Nov 2024 02:32:36 +0000 (UTC)
-X-Farcaster-Flow-ID: 9c89d4e0-5743-4ddd-893d-89bad01b7be2
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 7 Nov 2024 02:32:36 +0000
-Received: from 6c7e67c6786f.amazon.com (10.106.101.27) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 7 Nov 2024 02:32:32 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>
-CC: Andrew Lunn <andrew+netdev@lunn.ch>, Marc Kleine-Budde
-	<mkl@pengutronix.de>, Vincent Mailhol <mailhol.vincent@wanadoo.fr>, "Daniel
- Borkmann" <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 10/10] rtnetlink: Register rtnl_dellink() and rtnl_setlink() with RTNL_FLAG_DOIT_PERNET_WIP.
-Date: Wed, 6 Nov 2024 18:29:00 -0800
-Message-ID: <20241107022900.70287-11-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241107022900.70287-1-kuniyu@amazon.com>
-References: <20241107022900.70287-1-kuniyu@amazon.com>
+	s=arc-20240116; t=1730945835; c=relaxed/simple;
+	bh=GrUUUrld2dOYlsaP0IYgGyBkPj2uqFFy1lOlGJihN1E=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=kc/9FEievIyLyBDUmqRFC1q3OrSGM0lCX+f9QXhVQNbGDsUJnQum1mwA3bezqU7zzPjNfRgP5d10nYqi7mVk8hHJj+RBLY6lTL4D0PXwXwu29GVbcqohRm8pq/1cGsmygKJDshaZMH9VPczZAVKZ7Drng07qSA3e/N7d8/1NWws=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.35
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.162.112])
+	by szxga07-in.huawei.com (SkyGuard) with ESMTP id 4XkQdq1z29z1SDfc;
+	Thu,  7 Nov 2024 10:15:27 +0800 (CST)
+Received: from kwepemg200005.china.huawei.com (unknown [7.202.181.32])
+	by mail.maildlp.com (Postfix) with ESMTPS id B71DE140136;
+	Thu,  7 Nov 2024 10:17:09 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by kwepemg200005.china.huawei.com
+ (7.202.181.32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.11; Thu, 7 Nov
+ 2024 10:17:08 +0800
+From: Wang Liang <wangliang74@huawei.com>
+To: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <horms@kernel.org>, <dsahern@kernel.org>,
+	<kuniyu@amazon.com>, <luoxuanqiang@kylinos.cn>, <kernelxing@tencent.com>,
+	<wangliang74@huawei.com>, <kirjanov@gmail.com>
+CC: <yuehaibing@huawei.com>, <zhangchangzhong@huawei.com>,
+	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH net] net: fix data-races around sk->sk_forward_alloc
+Date: Thu, 7 Nov 2024 10:34:05 +0800
+Message-ID: <20241107023405.889239-1-wangliang74@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,116 +57,142 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA002.ant.amazon.com (10.13.139.96) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ kwepemg200005.china.huawei.com (7.202.181.32)
 
-Currently, rtnl_setlink() and rtnl_dellink() cannot be fully converted
-to per-netns RTNL due to a lack of handling peer/lower/upper devices in
-different netns.
+Syzkaller reported this warning:
+ ------------[ cut here ]------------
+ WARNING: CPU: 0 PID: 16 at net/ipv4/af_inet.c:156 inet_sock_destruct+0x1c5/0x1e0
+ Modules linked in:
+ CPU: 0 UID: 0 PID: 16 Comm: ksoftirqd/0 Not tainted 6.12.0-rc5 #26
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+ RIP: 0010:inet_sock_destruct+0x1c5/0x1e0
+ Code: 24 12 4c 89 e2 5b 48 c7 c7 98 ec bb 82 41 5c e9 d1 18 17 ff 4c 89 e6 5b 48 c7 c7 d0 ec bb 82 41 5c e9 bf 18 17 ff 0f 0b eb 83 <0f> 0b eb 97 0f 0b eb 87 0f 0b e9 68 ff ff ff 66 66 2e 0f 1f 84 00
+ RSP: 0018:ffffc9000008bd90 EFLAGS: 00010206
+ RAX: 0000000000000300 RBX: ffff88810b172a90 RCX: 0000000000000007
+ RDX: 0000000000000002 RSI: 0000000000000300 RDI: ffff88810b172a00
+ RBP: ffff88810b172a00 R08: ffff888104273c00 R09: 0000000000100007
+ R10: 0000000000020000 R11: 0000000000000006 R12: ffff88810b172a00
+ R13: 0000000000000004 R14: 0000000000000000 R15: ffff888237c31f78
+ FS:  0000000000000000(0000) GS:ffff888237c00000(0000) knlGS:0000000000000000
+ CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+ CR2: 00007ffc63fecac8 CR3: 000000000342e000 CR4: 00000000000006f0
+ DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+ DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+ Call Trace:
+  <TASK>
+  ? __warn+0x88/0x130
+  ? inet_sock_destruct+0x1c5/0x1e0
+  ? report_bug+0x18e/0x1a0
+  ? handle_bug+0x53/0x90
+  ? exc_invalid_op+0x18/0x70
+  ? asm_exc_invalid_op+0x1a/0x20
+  ? inet_sock_destruct+0x1c5/0x1e0
+  __sk_destruct+0x2a/0x200
+  rcu_do_batch+0x1aa/0x530
+  ? rcu_do_batch+0x13b/0x530
+  rcu_core+0x159/0x2f0
+  handle_softirqs+0xd3/0x2b0
+  ? __pfx_smpboot_thread_fn+0x10/0x10
+  run_ksoftirqd+0x25/0x30
+  smpboot_thread_fn+0xdd/0x1d0
+  kthread+0xd3/0x100
+  ? __pfx_kthread+0x10/0x10
+  ret_from_fork+0x34/0x50
+  ? __pfx_kthread+0x10/0x10
+  ret_from_fork_asm+0x1a/0x30
+  </TASK>
+ ---[ end trace 0000000000000000 ]---
 
-For example, when we change a device in rtnl_setlink() and need to
-propagate that to its upper devices, we want to avoid acquiring all netns
-locks, for which we do not know the upper limit.
+Its possible that two threads call tcp_v6_do_rcv()/sk_forward_alloc_add()
+concurrently when sk->sk_state == TCP_LISTEN with sk->sk_lock unlocked,
+which triggers a data-race around sk->sk_forward_alloc:
+tcp_v6_rcv
+    tcp_v6_do_rcv
+        skb_clone_and_charge_r
+            sk_rmem_schedule
+                __sk_mem_schedule
+                    sk_forward_alloc_add()
+            skb_set_owner_r
+                sk_mem_charge
+                    sk_forward_alloc_add()
+        __kfree_skb
+            skb_release_all
+                skb_release_head_state
+                    sock_rfree
+                        sk_mem_uncharge
+                            sk_forward_alloc_add()
+                            sk_mem_reclaim
+                                // set local var reclaimable
+                                __sk_mem_reclaim
+                                    sk_forward_alloc_add()
 
-The same situation happens when we remove a device.
+In this syzkaller testcase, two threads call
+tcp_v6_do_rcv() with skb->truesize=768, the sk_forward_alloc changes like
+this:
+ (cpu 1)             | (cpu 2)             | sk_forward_alloc
+ ...                 | ...                 | 0
+ __sk_mem_schedule() |                     | +4096 = 4096
+                     | __sk_mem_schedule() | +4096 = 8192
+ sk_mem_charge()     |                     | -768  = 7424
+                     | sk_mem_charge()     | -768  = 6656
+ ...                 |    ...              |
+ sk_mem_uncharge()   |                     | +768  = 7424
+ reclaimable=7424    |                     |
+                     | sk_mem_uncharge()   | +768  = 8192
+                     | reclaimable=8192    |
+ __sk_mem_reclaim()  |                     | -4096 = 4096
+                     | __sk_mem_reclaim()  | -8192 = -4096 != 0
 
-rtnl_dellink() could be transformed to remove a single device in the
-requested netns and delegate other devices to per-netns work, and
-rtnl_setlink() might be ?
+The skb_clone_and_charge_r() should not be called in tcp_v6_do_rcv() when
+sk->sk_state is TCP_LISTEN, it happens later in tcp_v6_syn_recv_sock().
+Fix the same issue in dccp_v6_do_rcv().
 
-Until we come up with a better idea, let's use a new flag
-RTNL_FLAG_DOIT_PERNET_WIP for rtnl_dellink() and rtnl_setlink().
-
-This will unblock converting RTNL users where such devices are not related.
-
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
+Suggested-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
+Fixes: e994b2f0fb92 ("tcp: do not lock listener to process SYN packets")
+Signed-off-by: Wang Liang <wangliang74@huawei.com>
 ---
- include/net/rtnetlink.h |  1 +
- net/core/rtnetlink.c    | 19 ++++++++++++++++---
- 2 files changed, 17 insertions(+), 3 deletions(-)
+ net/dccp/ipv6.c     | 2 +-
+ net/ipv6/tcp_ipv6.c | 4 +---
+ 2 files changed, 2 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
-index bef76abcff8d..bc0069a8b6ea 100644
---- a/include/net/rtnetlink.h
-+++ b/include/net/rtnetlink.h
-@@ -13,6 +13,7 @@ typedef int (*rtnl_dumpit_func)(struct sk_buff *, struct netlink_callback *);
- enum rtnl_link_flags {
- 	RTNL_FLAG_DOIT_UNLOCKED		= BIT(0),
- #define RTNL_FLAG_DOIT_PERNET		RTNL_FLAG_DOIT_UNLOCKED
-+#define RTNL_FLAG_DOIT_PERNET_WIP	RTNL_FLAG_DOIT_UNLOCKED
- 	RTNL_FLAG_BULK_DEL_SUPPORTED	= BIT(1),
- 	RTNL_FLAG_DUMP_UNLOCKED		= BIT(2),
- 	RTNL_FLAG_DUMP_SPLIT_NLM_DONE	= BIT(3),	/* legacy behavior */
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index cac94fb4be18..5d13b39f884b 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -3382,6 +3382,7 @@ static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	struct net *net = sock_net(skb->sk);
- 	struct nlattr *tb[IFLA_MAX+1];
- 	struct net_device *dev = NULL;
-+	struct rtnl_nets rtnl_nets;
- 	struct net *tgt_net;
- 	int err;
+diff --git a/net/dccp/ipv6.c b/net/dccp/ipv6.c
+index da5dba120bc9..d6649246188d 100644
+--- a/net/dccp/ipv6.c
++++ b/net/dccp/ipv6.c
+@@ -618,7 +618,7 @@ static int dccp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	   by tcp. Feel free to propose better solution.
+ 					       --ANK (980728)
+ 	 */
+-	if (np->rxopt.all)
++	if (np->rxopt.all && sk->sk_state != DCCP_LISTEN)
+ 		opt_skb = skb_clone_and_charge_r(skb, sk);
  
-@@ -3400,6 +3401,12 @@ static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto errout;
- 	}
+ 	if (sk->sk_state == DCCP_OPEN) { /* Fast path */
+diff --git a/net/ipv6/tcp_ipv6.c b/net/ipv6/tcp_ipv6.c
+index d71ab4e1efe1..c9de5ef8f267 100644
+--- a/net/ipv6/tcp_ipv6.c
++++ b/net/ipv6/tcp_ipv6.c
+@@ -1618,7 +1618,7 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 	   by tcp. Feel free to propose better solution.
+ 					       --ANK (980728)
+ 	 */
+-	if (np->rxopt.all)
++	if (np->rxopt.all && sk->sk_state != TCP_LISTEN)
+ 		opt_skb = skb_clone_and_charge_r(skb, sk);
  
-+	rtnl_nets_init(&rtnl_nets);
-+	rtnl_nets_add(&rtnl_nets, get_net(net));
-+	rtnl_nets_add(&rtnl_nets, tgt_net);
-+
-+	rtnl_nets_lock(&rtnl_nets);
-+
- 	if (ifm->ifi_index > 0)
- 		dev = __dev_get_by_index(net, ifm->ifi_index);
- 	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
-@@ -3412,7 +3419,7 @@ static int rtnl_setlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	else if (!err)
- 		err = -ENODEV;
- 
--	put_net(tgt_net);
-+	rtnl_nets_unlock(&rtnl_nets);
- errout:
- 	return err;
- }
-@@ -3497,6 +3504,8 @@ static int rtnl_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			return PTR_ERR(tgt_net);
- 	}
- 
-+	rtnl_net_lock(tgt_net);
-+
- 	if (ifm->ifi_index > 0)
- 		dev = __dev_get_by_index(tgt_net, ifm->ifi_index);
- 	else if (tb[IFLA_IFNAME] || tb[IFLA_ALT_IFNAME])
-@@ -3511,6 +3520,8 @@ static int rtnl_dellink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	else
- 		err = -EINVAL;
- 
-+	rtnl_net_unlock(tgt_net);
-+
- 	if (netnsid >= 0)
- 		put_net(tgt_net);
- 
-@@ -6997,10 +7008,12 @@ static struct pernet_operations rtnetlink_net_ops = {
- static const struct rtnl_msg_handler rtnetlink_rtnl_msg_handlers[] __initconst = {
- 	{.msgtype = RTM_NEWLINK, .doit = rtnl_newlink,
- 	 .flags = RTNL_FLAG_DOIT_PERNET},
--	{.msgtype = RTM_DELLINK, .doit = rtnl_dellink},
-+	{.msgtype = RTM_DELLINK, .doit = rtnl_dellink,
-+	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETLINK, .doit = rtnl_getlink,
- 	 .dumpit = rtnl_dump_ifinfo, .flags = RTNL_FLAG_DUMP_SPLIT_NLM_DONE},
--	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink},
-+	{.msgtype = RTM_SETLINK, .doit = rtnl_setlink,
-+	 .flags = RTNL_FLAG_DOIT_PERNET_WIP},
- 	{.msgtype = RTM_GETADDR, .dumpit = rtnl_dump_all},
- 	{.msgtype = RTM_GETROUTE, .dumpit = rtnl_dump_all},
- 	{.msgtype = RTM_GETNETCONF, .dumpit = rtnl_dump_all},
+ 	if (sk->sk_state == TCP_ESTABLISHED) { /* Fast path */
+@@ -1656,8 +1656,6 @@ int tcp_v6_do_rcv(struct sock *sk, struct sk_buff *skb)
+ 				if (reason)
+ 					goto reset;
+ 			}
+-			if (opt_skb)
+-				__kfree_skb(opt_skb);
+ 			return 0;
+ 		}
+ 	} else
 -- 
-2.39.5 (Apple Git-154)
+2.34.1
 
 
