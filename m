@@ -1,100 +1,106 @@
-Return-Path: <netdev+bounces-142884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60FE69C0A3E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:40:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D70E9C0A82
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:55:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 189AC1F22FE5
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:40:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0F3FD2833B9
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:55:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 985CA2139A2;
-	Thu,  7 Nov 2024 15:40:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C241215C57;
+	Thu,  7 Nov 2024 15:55:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="r8OygeYW"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="dxlI0IiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qv1-f41.google.com (mail-qv1-f41.google.com [209.85.219.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6693D212D07;
-	Thu,  7 Nov 2024 15:40:11 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBE9D21501F
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 15:55:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730994011; cv=none; b=KnWWGVnSR0sqPVFCUWDTx3frKscrBcyUJvnTVeLn/aipQDttKPX8Vxtw69wLOnWCjW/aEMI7ymMukg94d3XA0yXu4QxeO/jzG3PrNhnVpw6Gkzz1FT5X05XRfrJM6Ekx4vONCW4eM2uCLJhLtd1XUjvxViu2d6GfDGSfgsUxddk=
+	t=1730994942; cv=none; b=tZvET9ehypoHmZIDbuzXJdCOrRWUfSm37cUzXDQJcGxrGc8RTt4pa5OcDFMBYCwdUZGCctIGFOzjjwt1x6K5agXrq5VK+LOeRXzyLxUG4NKOEHtOW/KSNH9jJBBQOLfUV92rKQbl5+copcUUEV8SxUc0hT3g2esgp7nIX9n6ReE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730994011; c=relaxed/simple;
-	bh=4mNcq5bxe/B1imMtBKo7PPWWV8oFe9lVfq2c+lrrWi0=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=BeWLguEmvX22gzUrI3+OW6iKihShQMlBH2kzlBRpWA7aMRHHQHZW5T87x8+dpEg4kyDyy2OIXL8HaN+YzRtcLoZT5ncbepyn3Hla1Kg+zyMukobmttx7Fkvwy4nJDDx1SaWkauEGi9JlY8fg+3FsmfQapYGgkWMtJmdb/uWx4F0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=r8OygeYW; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7DD9AC4CECC;
-	Thu,  7 Nov 2024 15:40:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730994011;
-	bh=4mNcq5bxe/B1imMtBKo7PPWWV8oFe9lVfq2c+lrrWi0=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=r8OygeYWHMa4jja8L56AsQoum+wZOfwW6xNLzomrXmGB8Iv91roEUdhxhcBxsNhtl
-	 ZFHMH9TIyLOk2CBOwSmmcoFzfmml7i26SpL+NxEedMo/YdKoHsiu11BKRDJTRnHzRD
-	 juE5kH72Nup/Ne64juga8TKK7nuIx8jx7kHhR6D4TycEQQWRKk1RcO3ZHhad0DnA5T
-	 jYBxLw42JCy4HHbT1U1Dcu+N10eU1ZPxeyj4R18O7+au0obnAVmX7cwOPlxgnJSRwW
-	 DGjydckI0HtAzEaQPqo+RgU066c7g2uSsdeh2Q5Kjc3x1W+DinA7ucLkU+y+h6bg+d
-	 XyPBfxHrm1b8g==
-Date: Thu, 7 Nov 2024 07:40:09 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Vadim Fedorenko <vadim.fedorenko@linux.dev>, Andrew Lunn
- <andrew@lunn.ch>, Bjorn Helgaas <helgaas@kernel.org>, Sanman Pradhan
- <sanman.p211993@gmail.com>, Bjorn Helgaas <bhelgaas@google.com>,
- netdev@vger.kernel.org, alexanderduyck@fb.com, kernel-team@meta.com,
- davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- horms@kernel.org, corbet@lwn.net, mohsin.bashr@gmail.com,
- sanmanpradhan@meta.com, andrew+netdev@lunn.ch, jdamato@fastly.com,
- sdf@fomichev.me, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-pci@vger.kernel.org
-Subject: Re: [PATCH net-next] eth: fbnic: Add PCIe hardware statistics
-Message-ID: <20241107074009.5712809a@kernel.org>
-In-Reply-To: <20241107120357.GL5006@unreal>
-References: <20241106122251.GC5006@unreal>
-	<20241106171257.GA1529850@bhelgaas>
-	<76fdd29a-c7fa-4b99-ae63-cce17c91dae9@lunn.ch>
-	<20241106160958.6d287fd8@kernel.org>
-	<20241107082327.GI5006@unreal>
-	<b35f536e-1eb0-4b7b-85f4-df94d76927d6@linux.dev>
-	<20241107120357.GL5006@unreal>
+	s=arc-20240116; t=1730994942; c=relaxed/simple;
+	bh=ShTuINxYOIoo/TKbWX3wmEWt4t4zV/3pVZ0rVY4h0zs=;
+	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
+	 Mime-Version:Content-Type; b=FWuObkYQJUx2xpJW94e0fIqmxLsc7gkEvNkWBHEajuRX1h7z8Hnb0ZLpAiYRP0qiZWgn0K1gI7+FG8dPcaHgwKSSYsh20UuV8WKDXSJCGwhO/zaCiIyZaCEJ/lJso9AQAXLvHXOpdwArRuC8PsnwR6E/BkCjvIAB5H9qijRzcCc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=dxlI0IiF; arc=none smtp.client-ip=209.85.219.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-qv1-f41.google.com with SMTP id 6a1803df08f44-6cbcc2bd7fcso6888076d6.1
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 07:55:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730994940; x=1731599740; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=GP8fYSHagCP7r3rHGPjXvJuIYXAUEAFME8yg1XKacmE=;
+        b=dxlI0IiFlrrG3DsylI4gVo/DPf/6u3oK8tGROhtiRhRG/6M3beX2ASDrFxnQRxeYDH
+         FMnyBLxYo5kRjrECdW5gimyBwFrHw9l7mjiOCQIMVzMl6o8qfjA4tszKdvh4F4errwZt
+         dU05Yd/4fd4z8ID46Y8WiyzV6EcGHeLOWtWx5NPIR6DSox3b3Mx3PMLh0/fDc75Qa0XY
+         YUrKvwNyLLw+rf4mOY3rXx1qzrU9mkKQwTJPnqyx4rNZKYGrjYcijAI7p+Aby6LEY+b9
+         e94VsHOkPYt0y3wX55YH58zKtbn40Xf1eK3r/JHoXgEWu2kSDvGBkNjWF3mD/Dirg6ie
+         oMaA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730994940; x=1731599740;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=GP8fYSHagCP7r3rHGPjXvJuIYXAUEAFME8yg1XKacmE=;
+        b=r+vEq7/Z8D60oV1dr6MC253g+HMLGOz9wVRblW8Q9YEvSh4gB9vRl5oeUCnPm7mD+I
+         kFgBIFkP0rO1ZpHZu4vFUY79cmYcJ3jlRlOECVeID/GEwsztDpLwTN+SCFrAfmiovV/M
+         QcrxaBmZl9xKiAkDG9papz8p+9Hc6EDvHTqtk4NaqnzHUmR4B072E74zPARqnaYfBJIN
+         P6nmSeo2eMiC8aU4XrcGnJznsLPJjhd4C1zdC3Ym3ed26OMG3mdjRCcqmx5AhQmj5lHr
+         1LeWKs960pSf/nUZJiHP5azqsdGDpmjVRzEnM2yfUK1iI5NTTeoQzAd02u7i4ENXy0NA
+         vUcg==
+X-Forwarded-Encrypted: i=1; AJvYcCVDgMasfRJQxV41ylbTOPd1ExfDAvI/smWD2XEXczM0vqSoTeLd8MzTEmBGzqB24tq42wS29eU=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxgMLwcYuYSxU1GFJwOdE0SqnbldqWWEA4aU5tJopQw9+MjUcJw
+	HfyWRqiLPmkQFSus2xYzUiA3Ac0HA2NDczfuf5C4efhR7ZNIMZ0Q
+X-Google-Smtp-Source: AGHT+IFRnr0T/GV8eaxA2T73krRhxy29bTVY69JEfpJEU0MiYNA1kZyZWufMxlc0b9QS9FfG1iJz3g==
+X-Received: by 2002:a05:6214:3290:b0:6cd:3a49:34e8 with SMTP id 6a1803df08f44-6d39cfc2485mr5124536d6.20.1730994939778;
+        Thu, 07 Nov 2024 07:55:39 -0800 (PST)
+Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
+        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961df907sm8868986d6.9.2024.11.07.07.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 07:55:38 -0800 (PST)
+Date: Thu, 07 Nov 2024 10:55:38 -0500
+From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+To: Anna Emese Nyiri <annaemesenyiri@gmail.com>, 
+ netdev@vger.kernel.org
+Cc: fejes@inf.elte.hu, 
+ annaemesenyiri@gmail.com, 
+ edumazet@google.com, 
+ kuba@kernel.org, 
+ pabeni@redhat.com, 
+ willemdebruijn.kernel@gmail.com
+Message-ID: <672ce2fa6087c_1f2676294b6@willemb.c.googlers.com.notmuch>
+In-Reply-To: <20241107132231.9271-2-annaemesenyiri@gmail.com>
+References: <20241107132231.9271-1-annaemesenyiri@gmail.com>
+ <20241107132231.9271-2-annaemesenyiri@gmail.com>
+Subject: Re: [PATCH net-next v3 1/3] net: Introduce sk_set_prio_allowed helper
+ function
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
 Content-Transfer-Encoding: 7bit
 
-On Thu, 7 Nov 2024 14:03:57 +0200 Leon Romanovsky wrote:
-> > [root@host ~]# ethtool -i eth0 | grep driver
-> > driver: mlx5_core
-> > [root@host ~]# ethtool -S eth0 | grep pci
-> >      rx_pci_signal_integrity: 1
-> >      tx_pci_signal_integrity: 1471
-> >      outbound_pci_stalled_rd: 0
-> >      outbound_pci_stalled_wr: 0
-> >      outbound_pci_stalled_rd_events: 0
-> >      outbound_pci_stalled_wr_events: 0
-> > 
-> > Isn't it a PCIe statistics?  
+Anna Emese Nyiri wrote:
+> Simplify priority setting permissions with the `sk_set_prio_allowed`
+> function, centralizing the validation logic. This change is made in
+> anticipation of a second caller in a following patch.
+> No functional changes.
 > 
-> I didn't do full archaeological research and stopped at 2017 there these
-> counters were updated to use new API, but it looks like they there from
-> stone age.
-> 
-> It was a mistake to put it there and they should be moved to PCI core
-> together with other hundreds debug counters which ConnectX devices have
-> but don't expose yet.
+> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
 
-Whatever hand-waving you do now, it's impossible to take you seriously
-where the device driver of which you are a maintainer does the same
-thing. And your direction going forward for PCIe debug, AFAIU, is the
-proprietary fwctl stuff. Please stop.
+Reviewed-by: Willem de Bruijn <willemb@google.com>
 
