@@ -1,333 +1,185 @@
-Return-Path: <netdev+bounces-142636-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142641-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F155E9BFCF9
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:32:33 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C50A9BFD15
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:54:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56FD5282F81
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:32:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FA241C21174
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 491A7364D6;
-	Thu,  7 Nov 2024 03:32:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D12A1885BD;
+	Thu,  7 Nov 2024 03:53:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eG31ZVCW"
+	dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b="LZOLiRhA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f180.google.com (mail-il1-f180.google.com [209.85.166.180])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from DB3PR0202CU003.outbound.protection.outlook.com (mail-northeuropeazon11011006.outbound.protection.outlook.com [52.101.65.6])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 811B236D;
-	Thu,  7 Nov 2024 03:32:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.180
-ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730950350; cv=none; b=K7+xUszMEN0PMOJquvcamb7L09/dIpr/awY7A540HOwAs0F0L7DJq7wOsRrkIxRk3Ia2VsePmP15Bq2QEqBPiN1SiEC+6Rfis5G6OsTxBx5cmnN13/PEjnvbaLF78CwOK/S1r/hbU72alPyuCBqZ5RrKSJlwDaebQhjkfBQHYsE=
-ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730950350; c=relaxed/simple;
-	bh=YRLGr0hL7V66KhpMSN4mwHtkNeiErpLUBy1OGXxi/MU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Rh1BLiUyLMcPyxov0SZgQiXWlDmt/2OyKB/5jVNgiiyehrVLo76K6h0SqTC2smdlA9fh/NoUecwpG/Goc/MShZYf8wk8NMuordLII6f5jJ6H51+l9WteRV4VglLdUPOB3Vj1UEClpnfemZ1Wh0SQJS1rUgdCxKi0vrcb8jeuuXU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eG31ZVCW; arc=none smtp.client-ip=209.85.166.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f180.google.com with SMTP id e9e14a558f8ab-3a394418442so2081785ab.0;
-        Wed, 06 Nov 2024 19:32:28 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730950347; x=1731555147; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aucnnQVRtCg8PKImMoQwKKHEDFzUo2OJNOLOBwVE5pw=;
-        b=eG31ZVCWhH4KZy7fgrdSbJHtxVv4r+zNRtYo/QVnW7BoZ8nquC+AQLoT+sohZqwFKU
-         KrPm10+rpqWL83MBUdkuV1RL9RIstF8gkOEeM0CfKLk+NrhsVRnj2nR7m5oIyoxZrkNY
-         HNK2C2GzhwfgpIhS1KdFR5vv5Zkbn4vV3ZaGYP+ymkiyIY6rD2Ops9rH19SWEdonD2W6
-         SudMWUI067E7suSbwE1MCYHd9uZVNC5r1tQIgvQSHgEtxUWRJlrCCU6jpbo+p90ceYn1
-         iDFDTAEFMt+Nim7lvnQPxWSA+JtdTdIJBOB2DPugez7UH2VmI8H5Zf5r9o1bKnt1v8jM
-         IlrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730950347; x=1731555147;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aucnnQVRtCg8PKImMoQwKKHEDFzUo2OJNOLOBwVE5pw=;
-        b=h1ot7eimq5WPzSrnbtt/ZARZyqDhFnZm3PCpkClfNdMjST5IPXV6gZLz5uENoFQr0j
-         tpWaPQr5YZgA4Yee0EM1ZL01uGCUolw6qUh2DtVY//sFBYVcCEycjdpD9n0hTqTuuXNl
-         2CWigksHtRhngVLLWsNMmBz7/eV8uMm7OtUVQ3QIaltrV4gLpzcGTnuOuTQxfFeL2UoQ
-         OnMyOiri77GqUhG4/fD89ReloJPz8RlWVrHZ320xiRMhqmhuRuCHopGS1x373cwfQMoU
-         lOVb7QsRaHvEp+b0NnYBGzAAx3uaO27ff0K+sQ/zpw71E6MuyNholFa7Ifj6MBKRM9Fv
-         FISg==
-X-Forwarded-Encrypted: i=1; AJvYcCVSQmQlT6O0vVF7IkZ6Ds/6uCW800sBrYhuNtdVfOtbOEOWwDkzKwnZBIZNm8kO4IwCMUQ=@vger.kernel.org, AJvYcCWwxocC/mjaQDwVDy+bZdp03Rt223rw2vLYxsPxThLXrhTi2TsRa6s/880o956WLRR6YI3rFvSd@vger.kernel.org
-X-Gm-Message-State: AOJu0YwD9Wov7v/tFO6PZ1UMjfLdK0xze5uRG0lx2r9me0PAGUbRZ8cP
-	xFe7deaq2nyqM/LWFo6YGXukhpvo5ZQt1KAUsvS9Gz2Ey9F4TvR1YvaRJ2UoGZK4XJBtdyJuuVr
-	BCLvBBhqoi7ySpJVpyv+F7wtmfC4=
-X-Google-Smtp-Source: AGHT+IGZ/mupGecy45nXAD4+cLwDQBg3z+0nBYdD3IBcljcC8v/XoumIQ3nCf8P6N8ypQ8ApFJ9VaMKg3OYMb/o74Do=
-X-Received: by 2002:a05:6e02:1d11:b0:3a5:e7a5:afc with SMTP id
- e9e14a558f8ab-3a6b028898dmr250024615ab.2.1730950347427; Wed, 06 Nov 2024
- 19:32:27 -0800 (PST)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87BED1119A;
+	Thu,  7 Nov 2024 03:53:53 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.65.6
+ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1730951635; cv=fail; b=AHSKIVoSrKnj3dro81Uj7B/WWIsukB70j3J/2GTbVWT2WXwaZuBiIXGMAVJIDK8F2d/TYgCPhkJiZ63+l+t5h5RC9TKQJJKdLA3sTDKYXJmTvForo+7+XQAKEVoMjBP2lv3mpcXVUf0ujA2nbcLKmdtGdvb2OSEWhQBKpy04MKc=
+ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1730951635; c=relaxed/simple;
+	bh=/J5/MNopf3E2AZ6qz2vnSDXeiqupNdD/WAcIuau6neQ=;
+	h=From:To:Cc:Subject:Date:Message-Id:Content-Type:MIME-Version; b=bUKoh2M2WQn5wt6xy3Rzmn2LdCQIgjcxol57Z0XYVwVFt0LCKYK92pVUoQhLKCf+4R43DFzCK4An7amdBlX7shwW/dz/HRKQ8OTPYP0SuzrrlV5bSaaFDLkpW7TLTDQm+rchkzEHlUNqsIrxZaVxoMMFO7dTcr+c1S+KjBwbMXk=
+ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com; spf=pass smtp.mailfrom=nxp.com; dkim=pass (2048-bit key) header.d=nxp.com header.i=@nxp.com header.b=LZOLiRhA; arc=fail smtp.client-ip=52.101.65.6
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=nxp.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nxp.com
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
+ b=GAAvMhZbXl6YNl9PIKJ6NRKBrqZ+o7wsFogGgkhZQbcFeR1sOLetAvUCckEAJlnJLWE502mQ4RQHFUTWfLdXhDxWVFd8HJ/OVI/A7L950LkfG5jRC5HivKuACSVwpfIb6JlFxyd003u2LTMaCAqYEbEVhMd4nIS8KapfztukMU45DB2+lz9S58HxjtUxMSer/bELRW/ee+TkC5LduQsF7OnzxfBt2+ggMFMGWhSvP9jlUVj9HN6D36ssBG9OFVDHhq5Tw/cY/SnEls910oiiYRPdJ+zZJyKmvq8kd/8Vks+qHneSSyV3vKP4TfZ2xgbBfTeCV8xVGFX0W/MIEcckjA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector10001;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2SAF/wao1tjfOgav6JGbS8bQHXEKbI3ddLCD8NQ9Nbc=;
+ b=hLAuU/oNuNKOKJPTRlr2dyQX/o4Qc5Wny/Lv8y22YEQoeSC5O3U64JkLIDpWliJb9mvXgjj6JpFj9PAjYxsHyvNwOlAwVX6v9k1BIfL+5HIJGS/+5zxtRXX51yvvIMv21/+YRxGnZfsR8yk2oHqDJTmtUTTb+LBtoI/QlPSGcBxvO2mHwMq/y2b3HY0wKeFav7CHI0+M81CAeUZpF8YLHByTGl6PDmCp/OSXFtuiBx6jy/2dY+coBZJyG7EdemMfxjdkaOT2dMnwHKhyhmfByq6Kf9aWtTfQ1gGI6vAJKK2k4PnmeSsm1OodAsWCVy3gU28NQp5wsXp77PdyR3e12A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2SAF/wao1tjfOgav6JGbS8bQHXEKbI3ddLCD8NQ9Nbc=;
+ b=LZOLiRhADBKTd63t4ePXt3IE4iWDwi1en6kU1/Wmf4zFP2sfM/8JpjrPXiLFMEqXr2kMleM5xMZWcwtcGZJJKOr3IPvA6VSTedhhC12a6p4fZGHG9c8gZIDAyRXzj0CQslP/kcznlu0gFusm31I3lnvARXHTKaHvlg9xMakZlT9o3CoqMHYLi3rvvbAH6z1pZSIwKhZOux9Ekpo2gEpdDmyuexh3UMgBUhFceQRsLemxIKBmIpGQAFqZYEOuhDzkbB8io/LGZssrdrfXNRRDJTcTR7RtFUPYCVqkWNR04ItAoV0zFGjoXvSgqbgmuqOX7RT2ZhwWwU/pMqbbzpK+WQ==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com (2603:10a6:102:211::7)
+ by DBBPR04MB7898.eurprd04.prod.outlook.com (2603:10a6:10:1ed::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.21; Thu, 7 Nov
+ 2024 03:53:50 +0000
+Received: from PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db]) by PAXPR04MB8510.eurprd04.prod.outlook.com
+ ([fe80::a7c2:e2fa:8e04:40db%7]) with mapi id 15.20.8137.018; Thu, 7 Nov 2024
+ 03:53:50 +0000
+From: Wei Fang <wei.fang@nxp.com>
+To: claudiu.manoil@nxp.com,
+	vladimir.oltean@nxp.com,
+	xiaoning.wang@nxp.com,
+	andrew+netdev@lunn.ch,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com
+Cc: netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	imx@lists.linux.dev
+Subject: [PATCH net-next 0/5] Add more feautues for ENETC v4 - round 1
+Date: Thu,  7 Nov 2024 11:38:12 +0800
+Message-Id: <20241107033817.1654163-1-wei.fang@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR01CA0154.apcprd01.prod.exchangelabs.com
+ (2603:1096:4:8f::34) To PAXPR04MB8510.eurprd04.prod.outlook.com
+ (2603:10a6:102:211::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
- <672269c08bcd5_3c834029423@willemb.c.googlers.com.notmuch>
- <CAL+tcoA7Uddjx3OJzTB3+kqmKRt6KQN4G1VDCbE+xwEhATQpQQ@mail.gmail.com>
- <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
- <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev> <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
- <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch> <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
- <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev> <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
- <1c8ebc16-f8e7-4a98-9518-865db3952f8f@linux.dev> <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
- <f27ab4ce-02df-464e-90ed-852652fb7e3e@linux.dev> <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
- <97d8f9b3-9ae3-4146-a933-70dbe393132e@linux.dev> <CAL+tcoBzces5_awOzZsyqpTWjk0moxkjj7kHjCtPcsU3kNJ4tg@mail.gmail.com>
- <49ad2b87-29af-429e-8acb-2bba13e2b2aa@linux.dev>
-In-Reply-To: <49ad2b87-29af-429e-8acb-2bba13e2b2aa@linux.dev>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Nov 2024 11:31:51 +0800
-Message-ID: <CAL+tcoAmajwBTkfrWez8sEsyHJUga5qbiOdpybjPPe44dyfYxw@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
- work parallelly
-To: Martin KaFai Lau <martin.lau@linux.dev>
-Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, willemb@google.com, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	eddyz87@gmail.com, song@kernel.org, yonghong.song@linux.dev, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, sdf@fomichev.me, 
-	haoluo@google.com, jolsa@kernel.org, shuah@kernel.org, ykolal@fb.com, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PAXPR04MB8510:EE_|DBBPR04MB7898:EE_
+X-MS-Office365-Filtering-Correlation-Id: 78d23b03-ada9-4006-d6fe-08dcfedfca1d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam:
+	BCL:0;ARA:13230040|52116014|376014|1800799024|366016|38350700014;
+X-Microsoft-Antispam-Message-Info:
+	=?us-ascii?Q?dFBaQfFNsBS/zoGyjK2yJc1XbNBQqOGq4xMQG6Qa6Ajya3JmoH+ClEsJTjbU?=
+ =?us-ascii?Q?vG0wiyVG18Xj2009A18ZulVzWcMpu/RhdEGbRABxjAItMxraIP9xdIIcgQnP?=
+ =?us-ascii?Q?pidq2p/e62VMEgKP9CaSg9FxPG5waY4UOa7FVBp+44mEYg+gP4kw6KruMIQ3?=
+ =?us-ascii?Q?+JKDmIA0p3U95zRzZNEleW4qokdFOv9S8VberWLo1KLsrP26uicIMC29RFP1?=
+ =?us-ascii?Q?G4HLH0c44IF24BNxQyj+GngQP9CEvkAz7BiyZYyab7U6ESa2czGx+yUg+sOQ?=
+ =?us-ascii?Q?D+Lyd0i6j97vv7Tyd+JyOpf3MMe2cBRckKcOBDfSAC65A34/KMg7lAY9pyqN?=
+ =?us-ascii?Q?OBBjZX6hbH8iB1UEo4GO8WCmYHlxdTESqf95mfW/RTtDxih0ApsTUiVKPaqO?=
+ =?us-ascii?Q?cBYpaOwBeEsFeduu+laZfDA5lWNLHGtmY+t8Xlha9hMRwKM9e6+DviEKKwaz?=
+ =?us-ascii?Q?i2NEAxRkE0qjv71j5Yuov/BKKiUVXxU+ksArP8gRDpxI+NqVIOeROxtxxcJa?=
+ =?us-ascii?Q?J1wswb1aMxNh3ir0uh5H0peklOJYv+NJJ3K8WkseCSKnSnSSpswsKXHJxvCs?=
+ =?us-ascii?Q?3bED8QMyR9Xi253k17j4Ty4FJv8rUOGFHFu44tyiVHSyXq6ZQhJ2BkJw11lj?=
+ =?us-ascii?Q?LZGxGLAOtLxCijyYbyWGsnfiISYwcEB7dwLv/VjsTVxxzgqQ8gjnqDHq5dCZ?=
+ =?us-ascii?Q?WJIRV9er9duGe8fLrtAIhNqx3qj8PfqjLKlSoe1183zMwJ8LxBZfH6RnQTsR?=
+ =?us-ascii?Q?+mD3FnilavnEbD2mvLIG9D5TcgaaiTEnHnOIVV3ZrpaeWKthDrlHL8REPYiC?=
+ =?us-ascii?Q?pLFufUEkBfLgHxNK/Gij7frhlsX9E9mKjL5/b/b/S77IBvf0kjK8NcemzEd0?=
+ =?us-ascii?Q?+OBOm+PkYf/SHzNWYgkFSBruV3WVG1Mx5qBfAdOBCwnOdSHc09Q/FF3Beffi?=
+ =?us-ascii?Q?PB9kneIp8MB12ujRXaCzVhcYkVmbSH3YCi7DHM1VG4kxqVKTt9wl48BkTR3T?=
+ =?us-ascii?Q?SAhfrQNY6SvsuT1B6U6NvsnHw22rWahtrU6Y7vCBknKeISAOrTY32Yeh4OcN?=
+ =?us-ascii?Q?7bJpZSzKsLH4PKA8exPiSozSDchVf7Q3kd5iXfvjUT+hLXbbb7S8D2iTfzG0?=
+ =?us-ascii?Q?SNXB2GIpsJiMJTr+n3dxLxvBqU/VTFJ3W6GNyKH1DrrmLQ+duNR/X1uTb2vS?=
+ =?us-ascii?Q?vIymdPKAshd999Wx0k0l+K2XxjGV/gLXuHzFIHyuGAJly90kSGo6di9kOMCZ?=
+ =?us-ascii?Q?YAXjWIePZy1AprGi62iJFTzOREKksSdi06Ucc48WV6VYfoptQvgJWVdiMlO3?=
+ =?us-ascii?Q?6IselkyhZZlHi6YTVsCZuieivsha3jBomYryFD0LH79/bww/UCfw7aelkO/I?=
+ =?us-ascii?Q?0p2kapQ=3D?=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR04MB8510.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(52116014)(376014)(1800799024)(366016)(38350700014);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?tz9RtEwV9Cv/DVZQU3RK6VE/4eRt4b7SSj+DNGdUeurwginHD4fIcH8j5UHa?=
+ =?us-ascii?Q?4VT+DkOx/b16Q+E2KiieR9wfZFgWlRGRi3XoOyf/HsDipWXVmwXEaYfyMU5m?=
+ =?us-ascii?Q?MQN5Ii2IVI7hOJc3NYk1N6D58wuUF/r0FWYQkSx+P915FsjLnD8btmHd7Ci7?=
+ =?us-ascii?Q?Pw+fhjxEqOOTKsle7lyWmhhtWlSQgP1rdpPzKAAi4YswWGtWx+BA4FwZQOlu?=
+ =?us-ascii?Q?uaw0YZh+AIJ1TtdxLzlcge2ggltjjb5pSSTS2pKdP7qrSiAOL68r8dXfyl5o?=
+ =?us-ascii?Q?rr2LXwjV2k3H/p/7C1poqKM+SVhEBRtRdTjRiSs7XjGuklX9ojj/3u821na0?=
+ =?us-ascii?Q?YiwutBaqFoDPtSGz5v3KzqpJnqM6Pf3VkrltSHqbw1gvjJ+I+pASQ957w9tg?=
+ =?us-ascii?Q?Ohppmc9alHcCGyaFCyn6iRNqeVU7zTNLYSM4uTTgXzpxTDz1n7IMNglncNhf?=
+ =?us-ascii?Q?VMLVBicCQd1M/lvyGCWLahBW/PbLQSkXjHunIkCVP0Hz8arlBaPMGBvSHZM5?=
+ =?us-ascii?Q?heiAeddveUc+Z/3h38VwzpkrKz5nrYT8ENhSXNiLjKgeNuIaGy1hEIR9ItX1?=
+ =?us-ascii?Q?cFPPe8yZGhq1MKiE67byTAPdgUOsod9FiyXZsRsoPuGDWlvDAPJjzsZgDMyI?=
+ =?us-ascii?Q?q3Q28p2Q8TrTNJGExo7/YKUwfAshFp7G/zhDWhkx/H6PIQmqD1K0R6qZTwaD?=
+ =?us-ascii?Q?QSdHQ3cFHeQXCb+y5xz8kqcjUF40C3tOi2C9pH/uKWMHGCjQE5lkPm5uW1GN?=
+ =?us-ascii?Q?o5G9KN53IO9vdwkPXLIxtroVOpRaIKHpOfIstUDVXq26R7ylPdEjdfYFjbq4?=
+ =?us-ascii?Q?FF3Egj80UQqbbxTKjJmxNb+YCFBdvYsV7dDmvUIxaBWTCJXiAxdxbp93XcI3?=
+ =?us-ascii?Q?uI+NPcEybTyjyBXuW8PhL/Sxt0jX6lp6/PSES/Dwgf6bGqzGVbJHiyO9C7FS?=
+ =?us-ascii?Q?tFFglNqO2CIZRa4gBfcZenkPaqiDPuymQRxmec4+mA/YENLd2iFCkGcYonL0?=
+ =?us-ascii?Q?STSn3fYMPL/iMwziumln50ka4wh2jcB/4rD45iUwGmjj7W3zil95D9e0lj3F?=
+ =?us-ascii?Q?LJVzJUnKSnVc3hVvzYtaxdwNHqMaOVPhDiy75m3PClttD930xr9XfTq/rK8b?=
+ =?us-ascii?Q?iJr5VYkMx+phSa0qbuxZ4wWQLQRkux0sb/0cOj9Wb1VkzqczSmoWR2IWRGvb?=
+ =?us-ascii?Q?CDuiC+tRXu0If95eVopj3+cEsJDNU7rXoRzxhcowd6D6MUKz+i/qGM/4sd1p?=
+ =?us-ascii?Q?nWJH0sFrB5h6m/RVRyAgoDx0KVcqzQX8n4zfMQsSa5s0fzTUvNlnv1q9xSAT?=
+ =?us-ascii?Q?PJA8FwHaFfWDPEcU6qE9+X6B2ikyYCZzUC7c8N8YF+fyfvNNU4ofNDjgtQU0?=
+ =?us-ascii?Q?O7De2tCCCR+tJNRCNS7Q8kpHQ9ZfyafssAkfo7Gy4UThcF19jt9wuHIHzG0Y?=
+ =?us-ascii?Q?r/MJLf33v18huZgytRxIOzIi1JeGNtPCinbAPZDpFIPvKKMbypueg0O7RTCu?=
+ =?us-ascii?Q?cjKgCTnkqf+2NW+EwShNq0Qcr0m5B20FlPWMIMT9JCexi1lAu/FfoOjk8szG?=
+ =?us-ascii?Q?65+nJqKg3Flf2+OAZnB5GByDYF+niwYNGVd3AV4X?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 78d23b03-ada9-4006-d6fe-08dcfedfca1d
+X-MS-Exchange-CrossTenant-AuthSource: PAXPR04MB8510.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2024 03:53:50.5054
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: +lXysbtEPn6MVOjtVVsET6OQtwjmuBHL+n2pLugO9fnfDQ1CSZ4n9R2vCV9KDLZlJsIm8pleIrbtCwNIU0SFlg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DBBPR04MB7898
 
-On Thu, Nov 7, 2024 at 9:19=E2=80=AFAM Martin KaFai Lau <martin.lau@linux.d=
-ev> wrote:
->
-> On 11/5/24 6:51 PM, Jason Xing wrote:
-> > On Wed, Nov 6, 2024 at 9:09=E2=80=AFAM Martin KaFai Lau <martin.lau@lin=
-ux.dev> wrote:
-> >>
-> >> On 11/5/24 4:17 PM, Jason Xing wrote:
-> >>> On Wed, Nov 6, 2024 at 3:22=E2=80=AFAM Martin KaFai Lau <martin.lau@l=
-inux.dev> wrote:
-> >>>>
-> >>>> On 11/4/24 10:22 PM, Jason Xing wrote:
-> >>>>> On Tue, Nov 5, 2024 at 10:09=E2=80=AFAM Martin KaFai Lau <martin.la=
-u@linux.dev> wrote:
-> >>>>>>
-> >>>>>> On 11/1/24 6:32 AM, Willem de Bruijn wrote:
-> >>>>>>>> In udp/raw/..., I don't know how likely is the user space having=
- "cork->tx_flags
-> >>>>>>>> & SKBTX_ANY_TSTAMP" set but has neither "READ_ONCE(sk->sk_tsflag=
-s) &
-> >>>>>>>> SOF_TIMESTAMPING_OPT_ID" nor "cork->flags & IPCORK_TS_OPT_ID" se=
-t.
-> >>>>>>> This is not something to rely on. OPT_ID was added relatively rec=
-ently.
-> >>>>>>> Older applications, or any that just use the most straightforward=
- API,
-> >>>>>>> will not set this.
-> >>>>>>
-> >>>>>> Good point that the OPT_ID per cmsg is very new.
-> >>>>>>
-> >>>>>> The datagram support on SOF_TIMESTAMPING_OPT_ID in sk->sk_tsflags =
-had
-> >>>>>> been there for quite some time now. Is it a safe assumption that
-> >>>>>> most applications doing udp tx timestamping should have
-> >>>>>> the SOF_TIMESTAMPING_OPT_ID set to be useful?
-> >>>>>>
-> >>>>>>>
-> >>>>>>>> If it is
-> >>>>>>>> unlikely, may be we can just disallow bpf prog from directly set=
-ting
-> >>>>>>>> skb_shinfo(skb)->tskey for this particular skb.
-> >>>>>>>>
-> >>>>>>>> For all other cases, in __ip[6]_append_data, directly call a bpf=
- prog and also
-> >>>>>>>> pass the kernel decided tskey to the bpf prog.
-> >>>>>>>>
-> >>>>>>>> The kernel passed tskey could be 0 (meaning the user space has n=
-ot used it). The
-> >>>>>>>> bpf prog can give one for the kernel to use. The bpf prog can st=
-ore the
-> >>>>>>>> sk_tskey_bpf in the bpf_sk_storage now. Meaning no need to add o=
-ne to the struct
-> >>>>>>>> sock. The bpf prog does not have to start from 0 (e.g. start fro=
-m U32_MAX
-> >>>>>>>> instead) if it helps.
-> >>>>>>>>
-> >>>>>>>> If the kernel passed tskey is not 0, the bpf prog can just use t=
-hat one
-> >>>>>>>> (assuming the user space is doing something sane, like the value=
- in
-> >>>>>>>> SCM_TS_OPT_ID won't be jumping back and front between 0 to U32_M=
-AX). I hope this
-> >>>>>>>> is very unlikely also (?) but the bpf prog can probably detect t=
-his and choose
-> >>>>>>>> to ignore this sk.
-> >>>>>>> If an applications uses OPT_ID, it is unlikely that they will tog=
-gle
-> >>>>>>> the feature on and off on a per-packet basis. So in the common ca=
-se
-> >>>>>>> the program could use the user-set counter or use its own if user=
-space
-> >>>>>>> does not enable the feature. In the rare case that an application=
- does
-> >>>>>>> intermittently set an OPT_ID, the numbering would be erratic. Thi=
-s
-> >>>>>>> does mean that an actively malicious application could mess with =
-admin
-> >>>>>>> measurements.
-> >>>>>>
-> >>>>>> All make sense. Given it is reasonable to assume the user space sh=
-ould either
-> >>>>>> has SOF_TIMESTAMPING_OPT_ID always on or always off. When it is of=
-f, the bpf
-> >>>>>> prog can directly provide its own tskey to be used in shinfo->tske=
-y. The bpf
-> >>>>>> prog can generate the id itself without using the sk->sk_tskey, e.=
-g. store an
-> >>>>>> atomic int in the bpf_sk_storage.
-> >>>>>
-> >>>>> I wonder, how can we correlate the key with each skb in the bpf
-> >>>>> program for non-TCP type without implementing a bpf extension for
-> >>>>> SCM_TS_OPT_ID? Every time the timestamp is reported, we cannot know
-> >>>>> which sendmsg() the skb belongs to for non-TCP cases.
-> >>>>
-> >>>> SCM_TS_OPT_ID is eventually setting the shinfo->tskey.
-> >>>> If the shinfo->tskey is not set by the user space, the bpf prog can =
-directly set
-> >>>> the shinfo->tskey. There is no need to use the sk->sk_tskey as the I=
-D generator
-> >>>> also. The bpf prog can have its own id generator.
-> >>>>
-> >>>> If the user space has already set the shinfo->tskey (either by sk->s=
-k_tskey or
-> >>>> SCM_TS_OPT_ID), the bpf prog can just use the user space one.
-> >>>>
-> >>>> If there is a weird application that flips flops between OPT_ID on/o=
-ff, the bpf
-> >>>> prog will get confused which is fine. The bpf prog can detect this a=
-nd choose to
-> >>>> ignore measuring this sk/skb. The bpf prog can also choose to be on =
-the very
-> >>>> safe side and ignore all skb with SKBTX_ANY_TSTAMP set in txflags bu=
-t with no
-> >>>> OPT_ID. The bpf prog can look into the details of the sk and skb to =
-decide what
-> >>>> makes the most sense for its deployment.
-> >>>>
-> >>>> I don't know whether it makes more sense to call the bpf prog to dec=
-ide the
-> >>>> shinfo->{tx_flags,tskey} just before the "while (length > 0)" in
-> >>>> __ip[6]_append_data or it is better to call the bpf prog in ip[6]_se=
-tup_cork.
-> >>>> I admittedly less familiar with this code path than the tcp one.
-> >>>
-> >>> Now I feel it could be complicated for a software engineer to conside=
-r
-> >>> how they will handle the key if they don't read the kernel code very
-> >>> carefully. They are facing different situations. Being user-friendly
-> >>> lets this feature have more chances to get widely used. As I insisted
-> >>> before, I still would like to know if it is possible that we can try
-> >>> to introduce sk_tskey_bpf_offset (like patch 10-12) to calculate a bp=
-f
-> >>> exclusive tskey for bpf use? Only exporting one key. It will be reall=
-y
-> >>> simple and easy-to-use :)
-> >>
-> >> imo, there is no need for adding sk_tskey_bpf_offset to sk. just allow=
- the bpf
-> >> prog to decide what is the tskey.
-> >>
-> >> There is no usability issue in bpf prog. It is pretty normal for a bpf=
- prog
-> >> author to look at the sk details to make decision.
-> >>
-> >> Abstracting the sk/skb is not helping the bpf prog and not the right d=
-irection
-> >> to go. Over time, there has been case over case that the bpf prog want=
-s to know
-> >> more instead of being abstracted away like running in the user space. =
-e.g. The
-> >> "struct bpf_sock" abstraction in the uapi/linux/bpf.h does not scale a=
-nd we have
-> >> stopped adding more abstraction this way. The btf (and PTR_TO_BTF_ID,
-> >> CO-RE...etc) has been added to allow the bpf prog to learn other detai=
-ls in sk
-> >> and skb.
-> >>
-> >> Instead, design a better bpf kfunc to help the bpf prog to set the bit=
-s/tskey in
-> >> the skb. I think this is more important. tcp tskey is easy. just need =
-some care
-> >> on the udp tskey and need to check if the user space has already set o=
-ne.
-> >> A good designed bpf kfunc is all it needs.
-> >
-> > Thanks!
-> >
-> > Let me confirm again in case I'm missing something important.
-> > 1) For tcp, as you said before, bpf prog can extract the seq from the
-> > exported skb, so I don't need to export any key in this case.
-> > 2) For udp, if the skb has skb_shinfo(skb)->tskey set, then export the
-> > key, else, export zero to the bpf program.
->
-> A follow up to myself on the earlier bpf kfunc comment. Something like th=
-is:
+Compared to ENETC v1 (LS1028A), ENETC v4 (i.MX95) adds more features, and
+some features are configured completely differently from v1. In order to
+more fully support ENETC v4, these features will be added through several
+rounds of patch sets. This round adds these features, such as Tx and Rx
+checksum offload, increase maximum chained Tx BD number and Large send
+offload (LSO).
 
-Thank you so much!
+Wei Fang (5):
+  net: enetc: add Rx checksum offload for i.MX95 ENETC
+  net: enetc: add Tx checksum offload for i.MX95 ENETC
+  net: enetc: update max chained Tx BD number for i.MX95 ENETC
+  net: enetc: add LSO support for i.MX95 ENETC PF
+  net: enetc: add UDP segmentation offload support
 
->
-> /* ack: request ACK timestamp (tcp only)
->   * req_tskey: bpf prog can request to use a particular tskey.
->   *            req_tskey should always be 0 for tcp.
->   * return: -ve for error. u32 for the tskey that the bpf prog should use=
-.
->   *        may be different from the req_tskey (e.g. the user space has
->   *         already set one).
->   */
-> __bpf_kfunc s64 bpf_skops_enable_tx_tstamp(struct bpf_sock_ops_kern *skop=
-s,
->                                            bool ack, u32 req_tskey);
->
-> /* "not sure" if this kfunc is needed. probably no. I think it is easier =
-to pass
->   * true/false in the args[0]. It seems tskey can be 0 in udp, so
+ drivers/net/ethernet/freescale/enetc/enetc.c  | 345 ++++++++++++++++--
+ drivers/net/ethernet/freescale/enetc/enetc.h  |  32 +-
+ .../net/ethernet/freescale/enetc/enetc4_hw.h  |  22 ++
+ .../net/ethernet/freescale/enetc/enetc_hw.h   |  31 +-
+ .../freescale/enetc/enetc_pf_common.c         |  16 +-
+ .../net/ethernet/freescale/enetc/enetc_vf.c   |   7 +-
+ 6 files changed, 419 insertions(+), 34 deletions(-)
 
-Good idea.
+-- 
+2.34.1
 
->   * passing tskey can't tell if the skb/cork/sockcm_cookie has the tskey.
->   */
-> __bpf_kfunc bool bpf_skops_has_tskey(struct bpf_sock_ops_kern *skops);
->
-> For udp, I don't know whether it will be easier to set the tskey in the '=
-cork'
-> or 'sockcm_cookie' or 'skb'. I guess it depends where the bpf prog is cal=
-led. If
-> skb, it seems the bpf prog may be called repetitively for doing the same =
-thing
-> in the while loop in __ip[6]_append_data. If it is better to set the 'cor=
-k' or
-> 'sockcm_cookie', the cork/sockcm_cookie pointer can be added to 'struct
-> bpf_sock_ops_kern'. The sizeof(struct bpf_sock_ops_kern) is at 64bytes. A=
-dding
-> one pointer is not ideal.... probably it can be union with syn_skb but wi=
-ll need
-> some code audit (so please check).
-
-Let me dig into it :)
-
->
->
-> > 3) extend SCM_TS_OPT_ID for the udp/bpf case.
->
-> I don't understand. What does it mean to extend SCM_TS_OPT_ID?
-
-Oh, I thought you expect to pass the key from the bpf program through
-using the interface of SCM_TS_OPT_ID feature which isn't supported by
-bpf. Let me think more about it first.
-
-Thanks,
-Jason
 
