@@ -1,170 +1,185 @@
-Return-Path: <netdev+bounces-143086-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143087-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7E8E9C11B0
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:31:03 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 69C1F9C11BB
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:33:07 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9B791C21D70
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:31:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B7212849E2
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:33:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30247192B73;
-	Thu,  7 Nov 2024 22:31:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35E37219C9C;
+	Thu,  7 Nov 2024 22:32:39 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="kCRkvYNy"
+	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="E85Vpx1X"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63155EC0
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 22:30:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=72.21.196.25
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34B832194A6;
+	Thu,  7 Nov 2024 22:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731018660; cv=none; b=lx/PrNjfpRu69U1wGbJPdDQCNsTzp7Evof51L5IlSQ8ZeGl2qig3P42JWQbY40Q5h6+AqWN9MVri4xBZOKVWAbyu/nL6HGeAUqUDq38wg/s0NuyHhHSr8Y/LDkDBiT+nYlK2dxt2qJ2eD2jPEKd9OEDIqv1n75NhgV09HNwvJqA=
+	t=1731018759; cv=none; b=HlLt9PNEcNkanV/ObtH5eiDtOtB8jt58aJkOof/Ohc1AoqIc6URtKUnM0UpIGzz5JOZOj7Y1HfeYbmwu49R0SJ5T/cKbfKYNrH7rwSvEpEctBqYUTyrS61zfC+g62WvuVN+R+KMN3/xl1t1SZyshsL0qqIkjyd8OiTfZKYHXnKg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731018660; c=relaxed/simple;
-	bh=H+00nN1+L12P/YEUMog2t8fgocJ/gblHIEJ2ETHqHK4=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=I0LFG878eZeWRe5LkAY/VHODPUZJ7bSVy/BI0Nr8e/YgbsyET86pOMZY04MfLThtbyAXhRMI/lYSUID/YFXEapxEiigDsQmuDy6KqhPO1moiwE8F20NsvfkV03qsMlsa6lowAT9piAOYwsf7mhZsxeIfHGTvb5QLUS69XG+QZLQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=kCRkvYNy; arc=none smtp.client-ip=72.21.196.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731018658; x=1762554658;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=3DjX391ST8sz8X0dFsWUzdE4yHewexYdyj849Sw1lK8=;
-  b=kCRkvYNy1uTc0vZWH0BX/r4Gn9BinqYjOlqCfPCVTwrvbfeswufbKCl4
-   wJ0/ArpThRFwFqeuqU369rbrq9dXgn/GuSwLIv36BR2Aj4gOaK7vCSr2V
-   yVLXCcfqiKvd7rPhJmsEAUZg/vjlb7HBQ74/ObIDJdoPT4o/klg/ombUF
-   0=;
-X-IronPort-AV: E=Sophos;i="6.12,136,1728950400"; 
-   d="scan'208";a="441130415"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 22:30:54 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.7.35:35395]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.6.147:2525] with esmtp (Farcaster)
- id e99f36b5-3ad3-4992-846a-d9153c618c6f; Thu, 7 Nov 2024 22:30:54 +0000 (UTC)
-X-Farcaster-Flow-ID: e99f36b5-3ad3-4992-846a-d9153c618c6f
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 7 Nov 2024 22:30:53 +0000
-Received: from 6c7e67c6786f.amazon.com (10.187.170.59) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 7 Nov 2024 22:30:51 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <gnaaman@drivenets.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kuba@kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH net-next] Avoid traversing addrconf hash on ifdown
-Date: Thu, 7 Nov 2024 14:30:48 -0800
-Message-ID: <20241107223048.17156-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <20241107161323.2921985-1-gnaaman@drivenets.com>
-References: <20241107161323.2921985-1-gnaaman@drivenets.com>
+	s=arc-20240116; t=1731018759; c=relaxed/simple;
+	bh=3axHTgWvPaJXU6x/HwYNyCImPTdzE7DJqPuDZ6F6AzE=;
+	h=From:To:Cc:Subject:Date:Message-Id; b=fXJr0IiAV0cpTIlsanSD2sh+/NW+SL9MLqf3Y+HxDssH74J2LWCiaq0vv7TojBwx3z0ZawPrjiuNjvxtEvd82K+HYPkDiPwETQ3tnfKnllAvu67wmRbpaiHjfH2t5CJLHbGnGo0rLKgQddLgYpdkT5hme3bowV+UjoX/8L64+Zo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=E85Vpx1X; arc=none smtp.client-ip=13.77.154.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
+Received: from linuxonhyperv3.guj3yctzbm1etfxqx2vob5hsef.xx.internal.cloudapp.net (linux.microsoft.com [13.77.154.182])
+	by linux.microsoft.com (Postfix) with ESMTPSA id A7369212C4BF;
+	Thu,  7 Nov 2024 14:32:30 -0800 (PST)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com A7369212C4BF
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1731018750;
+	bh=dXEOtZcKhs1OyrLOGbwwuM7yb0GGsFy0HJU2nlATJVM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=E85Vpx1XKF/7gIXBsoZOI6XnWD4pHDLIv62Hmm0sqgJpnOf8/Cgg8V/QCKee3Vppr
+	 ry4FPI40feJ1miQYl+Dx+/AvjsAcrxqUrJygt4jVjT3OJnYKE30CU4CoZ3KZny5GG9
+	 XD4lpSNQQEk/X8UUGLdqFqJ/fa8hg8d9V2jWrOLw=
+From: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+To: linux-hyperv@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	kvm@vger.kernel.org,
+	iommu@lists.linux.dev,
+	netdev@vger.kernel.org,
+	linux-pci@vger.kernel.org,
+	linux-arch@vger.kernel.org,
+	virtualization@lists.linux.dev
+Cc: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	mhklinux@outlook.com,
+	decui@microsoft.com,
+	catalin.marinas@arm.com,
+	will@kernel.org,
+	luto@kernel.org,
+	tglx@linutronix.de,
+	mingo@redhat.com,
+	bp@alien8.de,
+	dave.hansen@linux.intel.com,
+	x86@kernel.org,
+	hpa@zytor.com,
+	seanjc@google.com,
+	pbonzini@redhat.com,
+	peterz@infradead.org,
+	daniel.lezcano@linaro.org,
+	joro@8bytes.org,
+	robin.murphy@arm.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	lpieralisi@kernel.org,
+	kw@linux.com,
+	robh@kernel.org,
+	bhelgaas@google.com,
+	arnd@arndb.de,
+	sgarzare@redhat.com,
+	jinankjain@linux.microsoft.com,
+	muminulrussell@gmail.com,
+	skinsburskii@linux.microsoft.com,
+	mukeshrathor@microsoft.com,
+	vkuznets@redhat.com,
+	ssengar@linux.microsoft.com,
+	apais@linux.microsoft.com
+Subject: [PATCH v2 0/4] Add new headers for Hyper-V Dom0
+Date: Thu,  7 Nov 2024 14:32:22 -0800
+Message-Id: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: EX19D031UWA004.ant.amazon.com (10.13.139.19) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Gilad Naaman <gnaaman@drivenets.com>
-Date: Thu,  7 Nov 2024 16:13:23 +0000
-> struct inet6_dev already has a list of addresses owned by the device,
-> enabling us to traverse this much shorter list, instead of scanning
-> the entire hash-table.
-> 
-> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
-> ---
->  net/ipv6/addrconf.c | 36 ++++++++++++++++--------------------
->  1 file changed, 16 insertions(+), 20 deletions(-)
-> 
-> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
-> index d0a99710d65d..9c57c993e1ec 100644
-> --- a/net/ipv6/addrconf.c
-> +++ b/net/ipv6/addrconf.c
-> @@ -3846,12 +3846,12 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
->  {
->  	unsigned long event = unregister ? NETDEV_UNREGISTER : NETDEV_DOWN;
->  	struct net *net = dev_net(dev);
-> -	struct inet6_dev *idev;
->  	struct inet6_ifaddr *ifa;
->  	LIST_HEAD(tmp_addr_list);
-> +	struct inet6_dev *idev;
->  	bool keep_addr = false;
->  	bool was_ready;
-> -	int state, i;
-> +	int state;
->  
->  	ASSERT_RTNL();
->  
-> @@ -3890,28 +3890,24 @@ static int addrconf_ifdown(struct net_device *dev, bool unregister)
->  	}
->  
->  	/* Step 2: clear hash table */
-> -	for (i = 0; i < IN6_ADDR_HSIZE; i++) {
-> -		struct hlist_head *h = &net->ipv6.inet6_addr_lst[i];
-> +	read_lock_bh(&idev->lock);
-> +	spin_lock_bh(&net->ipv6.addrconf_hash_lock);
+To support Hyper-V Dom0 (aka Linux as root partition), many new
+definitions are required.
 
-No need to nest _bh.
+The plan going forward is to directly import definitions from
+Hyper-V code without waiting for them to land in the TLFS document.
+This is a quicker and more maintainable way to import definitions,
+and is a step toward the eventual goal of exporting headers directly
+from Hyper-V for use in Linux.
 
+This patch series introduces new headers (hvhdk.h, hvgdk.h, etc,
+see patch #3) derived directly from Hyper-V code. hyperv-tlfs.h is
+replaced with hvhdk.h (which includes the other new headers)
+everywhere.
 
->  
-> -		spin_lock_bh(&net->ipv6.addrconf_hash_lock);
-> -restart:
-> -		hlist_for_each_entry_rcu(ifa, h, addr_lst) {
-> -			if (ifa->idev == idev) {
-> -				addrconf_del_dad_work(ifa);
-> -				/* combined flag + permanent flag decide if
-> -				 * address is retained on a down event
-> -				 */
-> -				if (!keep_addr ||
-> -				    !(ifa->flags & IFA_F_PERMANENT) ||
-> -				    addr_is_local(&ifa->addr)) {
-> -					hlist_del_init_rcu(&ifa->addr_lst);
-> -					goto restart;
-> -				}
-> -			}
-> +	list_for_each_entry(ifa, &idev->addr_list, if_list) {
-> +		addrconf_del_dad_work(ifa);
+No functional change is expected.
 
-while at it, please add newline here
+Summary:
+Patch 1-2: Minor cleanup patches
+Patch 3: Add the new headers (hvhdk.h, etc..) in include/hyperv/
+Patch 4: Switch to the new headers
 
+Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
+---
+Changelog:
+v2:
+- Rework the series to simply use the new headers everywhere
+  instead of fiddling around to keep hyperv-tlfs.h used in some
+  places, suggested by Michael Kelley and Easwar Hariharan
+- Fix compilation errors with some configs by adding missing
+  definitions and changing some names, thanks to Simon Horman for
+  catching those
+- Add additional definitions to the new headers to support them now
+  replacing hyperv-tlfs.h everywhere
+- Add additional context in the commit messages for patches #3 and #4
+- In patch #2, don't remove indirect includes. Only remove includes
+  which truly aren't used, suggested by Michael Kelley
 
-> +		/* combined flag + permanent flag decide if
-> +		 * address is retained on a down event
-> +		 */
-> +		if (!keep_addr ||
-> +		    !(ifa->flags & IFA_F_PERMANENT) ||
-> +		    addr_is_local(&ifa->addr)) {
-> +			hlist_del_init_rcu(&ifa->addr_lst);
->  		}
+---
+Nuno Das Neves (4):
+  hyperv: Move hv_connection_id to hyperv-tlfs.h
+  hyperv: Clean up unnecessary #includes
+  hyperv: Add new Hyper-V headers in include/hyperv
+  hyperv: Switch from hyperv-tlfs.h to hyperv/hvhdk.h
 
-and remove unnecessary {}.
+ arch/arm64/hyperv/hv_core.c        |    3 +-
+ arch/arm64/hyperv/mshyperv.c       |    4 +-
+ arch/arm64/include/asm/mshyperv.h  |    2 +-
+ arch/x86/hyperv/hv_apic.c          |    1 -
+ arch/x86/hyperv/hv_init.c          |   21 +-
+ arch/x86/hyperv/hv_proc.c          |    3 +-
+ arch/x86/hyperv/ivm.c              |    1 -
+ arch/x86/hyperv/mmu.c              |    1 -
+ arch/x86/hyperv/nested.c           |    2 +-
+ arch/x86/include/asm/kvm_host.h    |    3 +-
+ arch/x86/include/asm/mshyperv.h    |    3 +-
+ arch/x86/include/asm/svm.h         |    2 +-
+ arch/x86/kernel/cpu/mshyperv.c     |    2 +-
+ arch/x86/kvm/vmx/hyperv_evmcs.h    |    2 +-
+ arch/x86/kvm/vmx/vmx_onhyperv.h    |    2 +-
+ arch/x86/mm/pat/set_memory.c       |    2 -
+ drivers/clocksource/hyperv_timer.c |    2 +-
+ drivers/hv/hv_balloon.c            |    4 +-
+ drivers/hv/hv_common.c             |    2 +-
+ drivers/hv/hv_kvp.c                |    2 +-
+ drivers/hv/hv_snapshot.c           |    2 +-
+ drivers/hv/hyperv_vmbus.h          |    2 +-
+ include/asm-generic/hyperv-tlfs.h  |    9 +
+ include/asm-generic/mshyperv.h     |    2 +-
+ include/clocksource/hyperv_timer.h |    2 +-
+ include/hyperv/hvgdk.h             |  303 +++++++
+ include/hyperv/hvgdk_ext.h         |   46 +
+ include/hyperv/hvgdk_mini.h        | 1295 ++++++++++++++++++++++++++++
+ include/hyperv/hvhdk.h             |  733 ++++++++++++++++
+ include/hyperv/hvhdk_mini.h        |  310 +++++++
+ include/linux/hyperv.h             |   11 +-
+ net/vmw_vsock/hyperv_transport.c   |    2 +-
+ 32 files changed, 2729 insertions(+), 52 deletions(-)
+ create mode 100644 include/hyperv/hvgdk.h
+ create mode 100644 include/hyperv/hvgdk_ext.h
+ create mode 100644 include/hyperv/hvgdk_mini.h
+ create mode 100644 include/hyperv/hvhdk.h
+ create mode 100644 include/hyperv/hvhdk_mini.h
 
+-- 
+2.34.1
 
-> -		spin_unlock_bh(&net->ipv6.addrconf_hash_lock);
->  	}
->  
-> +	spin_unlock_bh(&net->ipv6.addrconf_hash_lock);
-> +	read_unlock_bh(&idev->lock);
-> +
->  	write_lock_bh(&idev->lock);
->  
->  	addrconf_del_rs_timer(idev);
-> -- 
-> 2.34.1
-> 
 
