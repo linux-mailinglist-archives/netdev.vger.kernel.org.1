@@ -1,98 +1,205 @@
-Return-Path: <netdev+bounces-142913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69ECD9C0B0A
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:14:02 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8D2439C0B5B
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:21:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 699301C220C8
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:14:01 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1D8741F21000
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E723E216A35;
-	Thu,  7 Nov 2024 16:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E417721F4C9;
+	Thu,  7 Nov 2024 16:14:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="Hkvlh1P9"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="XW196hQq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f51.google.com (mail-ed1-f51.google.com [209.85.208.51])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 306A1216A3C
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 16:10:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.51
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DE8B21F4B7;
+	Thu,  7 Nov 2024 16:14:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730995838; cv=none; b=KgkGM+GpRjGnyywl3JX1w1ZT3uWnnuMoqT0U3k6cRPeLN7ZCC20CkmUEqKXQrYX4HVtrmtiKGdVRH+MqBFG50Njh5byj1upPklRICRktl7/MlymDOXJsiuKWwbwzToi7iX3cmKsphtPpDQUg0AOvQFM9mCHJzCP+niVTh/K4mGY=
+	t=1730996097; cv=none; b=D25E2MznEKPr8PKl8Rtq3XWbE01vj8qF2yM3XDiH6m1IUWE053E1UM6NTaHNRK8ET4nfefafjxSKPa8G8Wuh5bsWwpWRsJjhQldmsG3p3w4SGayInguRJG2lA7FSv/whPGm5deywMi7aZ2FD5NNTiHl+AWNyzTf9dvOkhHWrz5U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730995838; c=relaxed/simple;
-	bh=XKNgcHVttsvpl1Ue9HfRV0KR8zfIGidYyouwshSm/u4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=isgxF77uYG3ythuGDF2KfGOrxCdJ7x6fCuu+EDUF0WT3lHS3VpA6u6yS7u7EIK2+ucFEGUziOnaA5s/i6u8+EG7IKU1hU5TXg0lQHO7nAEqH96xFm4kR8EW4Dy5o3HAcfokvAu3SWeTVe7b3e/wh2/cjkT30yIksfflt+gMAm4s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=Hkvlh1P9; arc=none smtp.client-ip=209.85.208.51
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f51.google.com with SMTP id 4fb4d7f45d1cf-5c9404c0d50so1398462a12.3
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 08:10:36 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730995835; x=1731600635; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=XKNgcHVttsvpl1Ue9HfRV0KR8zfIGidYyouwshSm/u4=;
-        b=Hkvlh1P9gxeMo/6AolV5yK73Iw78/Xa7Umsp7zusxnRxMddKM1bjPZIskI5GCwkMRn
-         XQTKpqD57pg8VapZKyE7Ptu6F4UGkssXNQOA+KVRrX9Fp2GykoXxH9u+g6rrkd1jFcEa
-         rT5jsL35aDmGvElvqpnmK2p0q8EIoRnmwdOyHrrR/bXLt67GqQ3mdDQeJaI8l/ZZLMZk
-         qa7R5XJASbaHcJPuM2sPsjllioAZpUvWt5rI3mqXbYy0rFCHR8jK/WTmt/5q71yc0AyD
-         7VuatN325ubsIsqQjcSQpTB84k2D3DSVNb0kNl7fYf/RCFghtLqs3EUCUmrvAwbYnzNl
-         EiIQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730995835; x=1731600635;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=XKNgcHVttsvpl1Ue9HfRV0KR8zfIGidYyouwshSm/u4=;
-        b=lMGzPT9zgimdt/4dF607fO7s/jShwR6tEmNnK7mC8ynLt8JlmoBbxyjfq05DNzG6n0
-         LOBMB0FNpCcPoE+N2Weu8csvu2ujuPhLle5v9oynqOHfotUVF5TZn1x0B+ZJI8n07hgr
-         1ptzzGBB+LAclsFPZ9dmFyj+52OO2JY1MNldCrIJx9pn1nGOBriAdvtZzJT2yyjtAFxE
-         KKqHxRv4qhd95ZM8Kibe0Jec4jNwtFNv9kaqRrPqULJJffxeANcvQxL8iHM9JlfEnqsS
-         iur8Q75it/ytsAsafOt6EHO+TvlkxFIbK2LqPcI6DA40rZaR3TqDyoK3wLv4CQuGcHuO
-         wopw==
-X-Gm-Message-State: AOJu0YzsdtyrHVd5qRhga2fJvoUAvtI4FJZGq459ZFCEj5vJWa/qNBzp
-	dHRjeiuz4uPTolc4rw8xjLmZQnxJdKUWbw0WRb3luarGPeIhMmjFAxqPOU4Kuuf1uJhfdUBkUiK
-	Xea8DKwpO/F70dNRNimU9K/CHe8wxK9Ud+i00
-X-Google-Smtp-Source: AGHT+IHLqdhFXGqXqGv5zh75wClz5ygefiQb2bJpf9Rnm8K+rrpPwhADDE5qyAutUg0lojX8UsVP2jYQkgGYn197PNk=
-X-Received: by 2002:a05:6402:524f:b0:5cf:505:b75a with SMTP id
- 4fb4d7f45d1cf-5cf0505b83emr1828149a12.17.1730995835289; Thu, 07 Nov 2024
- 08:10:35 -0800 (PST)
+	s=arc-20240116; t=1730996097; c=relaxed/simple;
+	bh=9NVl3qC4o8Zw61QwjUR2G6eHRR94GLSptDSfljZygyU=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=i+5Zy6w2rhtFP/BMkzMULN0Zwpm0KalVa0swtABKwH1joc7w2cq9RiQ5o/6vHJqVlvenc69GKpSf8AtfMIm/d/Rn8QQyTnwlfqjbktSlgW9/LFHF5wU0X59U6FKQqv+6m+dKkNbvRbsH4zt7qcrloo000Sb73jMyt5xbUAORhLs=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=XW196hQq; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730996096; x=1762532096;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=9NVl3qC4o8Zw61QwjUR2G6eHRR94GLSptDSfljZygyU=;
+  b=XW196hQqjs4NrQrSoWr8DL5oVFLNlqsoTFApc4mVSc5jbg44sn6r8zG+
+   jSa9RpYN1FoIMQDLWXJhIQEu/jXCUs00vixwzhAR8Rx8/C4SYFsUX4Ojt
+   5/G37fkqargAg6ALykawFwX2hhdVUdoOuF0HUuWHfm1wtgD/VHTm4gcHp
+   8KOwjWtpWOgAs1IxCesozlmuoUfGcft91kRNP/uUykRf0jM/LhE45JDDr
+   2CUGhf2qpFdSSHVfawPKlloorI/tRbRjKc8CVkaFPMgzrZ8I68vnOIWsj
+   dE/ytuc9JiLHaFq5e7Gse4wNMZxFLhegVS08gudXwkQvwpDI3i2aLS5Nt
+   A==;
+X-CSE-ConnectionGUID: 8bSG11BXTa+hkfh1YFkoFg==
+X-CSE-MsgGUID: JAMC8UUCTIu07PDkaAhl6Q==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41956102"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="41956102"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 08:14:56 -0800
+X-CSE-ConnectionGUID: xmkejufBQTWus3kHwveUFw==
+X-CSE-MsgGUID: 3Vvl9jWjRXysX3Z9YNVfcw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
+   d="scan'208";a="90258256"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa004.jf.intel.com with ESMTP; 07 Nov 2024 08:14:52 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 18/19] libeth: support native XDP and register memory model
+Date: Thu,  7 Nov 2024 17:10:25 +0100
+Message-ID: <20241107161026.2903044-19-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.47.0
+In-Reply-To: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
+References: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107160444.2913124-1-gnaaman@drivenets.com> <20241107160444.2913124-4-gnaaman@drivenets.com>
-In-Reply-To: <20241107160444.2913124-4-gnaaman@drivenets.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Nov 2024 17:10:24 +0100
-Message-ID: <CANn89i+w=K8BRWrXV0sm=q8c8Fw3=uFc8N_5vLGidb6i7frztg@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 3/6] neighbour: Convert seq_file functions to
- use hlist
-To: Gilad Naaman <gnaaman@drivenets.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 7, 2024 at 5:05=E2=80=AFPM Gilad Naaman <gnaaman@drivenets.com>=
- wrote:
->
-> Convert seq_file-related neighbour functionality to use neighbour::hash
-> and the related for_each macro.
->
-> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
-> Reviewed-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
+Expand libeth's Page Pool functionality by adding native XDP support.
+This means picking the appropriate headroom and DMA direction.
+Also, register all the created &page_pools as XDP memory models.
+A driver then can call xdp_rxq_info_attach_page_pool() when registering
+its RxQ info.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+---
+ include/net/libeth/rx.h                |  6 +++++-
+ drivers/net/ethernet/intel/libeth/rx.c | 20 +++++++++++++++-----
+ 2 files changed, 20 insertions(+), 6 deletions(-)
+
+diff --git a/include/net/libeth/rx.h b/include/net/libeth/rx.h
+index 43574bd6612f..148be5cd822e 100644
+--- a/include/net/libeth/rx.h
++++ b/include/net/libeth/rx.h
+@@ -13,8 +13,10 @@
+ 
+ /* Space reserved in front of each frame */
+ #define LIBETH_SKB_HEADROOM	(NET_SKB_PAD + NET_IP_ALIGN)
++#define LIBETH_XDP_HEADROOM	(ALIGN(XDP_PACKET_HEADROOM, NET_SKB_PAD) + \
++				 NET_IP_ALIGN)
+ /* Maximum headroom for worst-case calculations */
+-#define LIBETH_MAX_HEADROOM	LIBETH_SKB_HEADROOM
++#define LIBETH_MAX_HEADROOM	LIBETH_XDP_HEADROOM
+ /* Link layer / L2 overhead: Ethernet, 2 VLAN tags (C + S), FCS */
+ #define LIBETH_RX_LL_LEN	(ETH_HLEN + 2 * VLAN_HLEN + ETH_FCS_LEN)
+ /* Maximum supported L2-L4 header length */
+@@ -66,6 +68,7 @@ enum libeth_fqe_type {
+  * @count: number of descriptors/buffers the queue has
+  * @type: type of the buffers this queue has
+  * @hsplit: flag whether header split is enabled
++ * @xdp: flag indicating whether XDP is enabled
+  * @buf_len: HW-writeable length per each buffer
+  * @nid: ID of the closest NUMA node with memory
+  */
+@@ -81,6 +84,7 @@ struct libeth_fq {
+ 	/* Cold fields */
+ 	enum libeth_fqe_type	type:2;
+ 	bool			hsplit:1;
++	bool			xdp:1;
+ 
+ 	u32			buf_len;
+ 	int			nid;
+diff --git a/drivers/net/ethernet/intel/libeth/rx.c b/drivers/net/ethernet/intel/libeth/rx.c
+index f20926669318..616426a2e363 100644
+--- a/drivers/net/ethernet/intel/libeth/rx.c
++++ b/drivers/net/ethernet/intel/libeth/rx.c
+@@ -68,7 +68,7 @@ static u32 libeth_rx_hw_len_truesize(const struct page_pool_params *pp,
+ static bool libeth_rx_page_pool_params(struct libeth_fq *fq,
+ 				       struct page_pool_params *pp)
+ {
+-	pp->offset = LIBETH_SKB_HEADROOM;
++	pp->offset = fq->xdp ? LIBETH_XDP_HEADROOM : LIBETH_SKB_HEADROOM;
+ 	/* HW-writeable / syncable length per one page */
+ 	pp->max_len = LIBETH_RX_PAGE_LEN(pp->offset);
+ 
+@@ -155,11 +155,12 @@ int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi)
+ 		.dev		= napi->dev->dev.parent,
+ 		.netdev		= napi->dev,
+ 		.napi		= napi,
+-		.dma_dir	= DMA_FROM_DEVICE,
+ 	};
+ 	struct libeth_fqe *fqes;
+ 	struct page_pool *pool;
+-	bool ret;
++	int ret;
++
++	pp.dma_dir = fq->xdp ? DMA_BIDIRECTIONAL : DMA_FROM_DEVICE;
+ 
+ 	if (!fq->hsplit)
+ 		ret = libeth_rx_page_pool_params(fq, &pp);
+@@ -173,18 +174,26 @@ int libeth_rx_fq_create(struct libeth_fq *fq, struct napi_struct *napi)
+ 		return PTR_ERR(pool);
+ 
+ 	fqes = kvcalloc_node(fq->count, sizeof(*fqes), GFP_KERNEL, fq->nid);
+-	if (!fqes)
++	if (!fqes) {
++		ret = -ENOMEM;
+ 		goto err_buf;
++	}
++
++	ret = xdp_reg_page_pool(pool);
++	if (ret)
++		goto err_mem;
+ 
+ 	fq->fqes = fqes;
+ 	fq->pp = pool;
+ 
+ 	return 0;
+ 
++err_mem:
++	kvfree(fqes);
+ err_buf:
+ 	page_pool_destroy(pool);
+ 
+-	return -ENOMEM;
++	return ret;
+ }
+ EXPORT_SYMBOL_NS_GPL(libeth_rx_fq_create, LIBETH);
+ 
+@@ -194,6 +203,7 @@ EXPORT_SYMBOL_NS_GPL(libeth_rx_fq_create, LIBETH);
+  */
+ void libeth_rx_fq_destroy(struct libeth_fq *fq)
+ {
++	xdp_unreg_page_pool(fq->pp);
+ 	kvfree(fq->fqes);
+ 	page_pool_destroy(fq->pp);
+ }
+-- 
+2.47.0
+
 
