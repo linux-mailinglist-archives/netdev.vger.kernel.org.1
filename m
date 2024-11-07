@@ -1,292 +1,124 @@
-Return-Path: <netdev+bounces-142770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142767-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 565C59C04DE
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:52:05 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id DB48F9C04D9
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:51:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7549B1C23A9E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:52:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E923B1C23241
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:51:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B219D20F5B7;
-	Thu,  7 Nov 2024 11:50:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="HAOhShBF"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19B5B20F5DB;
+	Thu,  7 Nov 2024 11:50:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f53.google.com (mail-ej1-f53.google.com [209.85.218.53])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD82F2101AE
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 11:50:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42A32200CA0;
+	Thu,  7 Nov 2024 11:50:20 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730980255; cv=none; b=VosvcV/vsguRlGZUzdu8sK+eVmc8gikaG36Dx6wRgXKnr2whs3i7XCeobeEspALg2aJXX/6cJDYPDNsa/e2vNs6opglYu19eNOWkcN1X6qJf1OZDk2mPrOEpSMdKO0Yp79jWRdiFr1wrrm9RSF91uJPIodsaK1vns3RABDJUNZs=
+	t=1730980222; cv=none; b=Hrvx6gDlOgxrFBDrDUbvregLXS306q/ooeVd7oQELFa2w5/CTrBp/tmnfDWs6HRbJYEGTX598re4oW1q9U7ng1JeIe1IfFqeVkJXwhfyao53YmJ3pfLE7LjBfRN1eyS88Y+g1dI0oB1KKP0FlIGPhU+z0N4DatCznopdvQD91vY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730980255; c=relaxed/simple;
-	bh=n0QCEHl2jaF3c2bkOmUtYZCm3S+xz14biBzyHvcU+EQ=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CSbHAR7hMWbvUqXnYsm1kVqRV/jTnGl85wCjEXJMpYetgYK3dPAr3hMHFuj94cB6T5vAgUF9DTBRon1RuRl4bzv5GiJq6iTOQunG71jehZy8kVfoNBYdNJx+SS0913ASXhgiwfgN/W7J5Ky4LFI6m3ghoipnZYi1fDe3aRhtmNU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=HAOhShBF; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730980252;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=648oAdh71ykdlsYI2PO1sVV/3rqyVjApi3Xls/dCZBk=;
-	b=HAOhShBF9rLeBZnIcvzXxb+R9JMwTMmHjPs1Ceus8dKLHYxmNSOJicEdmJxPCcl1nlXrIc
-	DZWKlfUbyhClynG1DUFWpYUxzAr1rp7SoQkCiQlV9roADMt99QJ81QdhTAqs0sBaBAqsMF
-	PakSyBfXcxqIz5kyEBqq76rH3V9cCGg=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-220-7nxohZpfPQGPiK8eEsEwYA-1; Thu, 07 Nov 2024 06:50:51 -0500
-X-MC-Unique: 7nxohZpfPQGPiK8eEsEwYA-1
-X-Mimecast-MFC-AGG-ID: 7nxohZpfPQGPiK8eEsEwYA
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-a99ea3e1448so73966766b.3
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 03:50:51 -0800 (PST)
+	s=arc-20240116; t=1730980222; c=relaxed/simple;
+	bh=LjR7RTOP3486ehrvrXHp3B5cS267t40opPrfmboYAc0=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Cs9VtwhCfaKZRUJQO799brOtRDMswf4wS+sdDS86HNmIHSM248qlCLdiun/bLjfYl4PRd3puS1oAxe0J5jgTTyM7VcGmaTq6vkWQ03nnHghl4nfxsBRLmPWmGIkiya6ufIu058X2upWk6WGLoDD+wswcqtmW/bmpGveMGQEm+GI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f53.google.com with SMTP id a640c23a62f3a-a99e3b3a411so338455466b.0;
+        Thu, 07 Nov 2024 03:50:19 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730980250; x=1731585050;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=648oAdh71ykdlsYI2PO1sVV/3rqyVjApi3Xls/dCZBk=;
-        b=WtUWQt0Qu1KX8XlZa1DtRbbY/Bc8SgwA/O9WBi+V+reTHXoCPl9E8cj0jSSKcJWj3h
-         AEFOipuWePYYzFUcdeY3GNoG/WltZqYIEy03QbR+RmbWs8rt+qBrKNhvZ/sVzXKlVwa9
-         PZeONomjQugJXfq2NWzJOteHJ8If7LJaUCL9hRGBkQeJ5L/UJS5bqlCnV9gv0aHj1341
-         d55rgghlv0jfnX5yAvKs0v5PVkWYZCS7gH+1IIQzbtx9uDen3obUz/se9N3f0/lwnNil
-         dmD4KlK19B3atg4m0NjtZaKioHblPnJ1pwX9NnCrOfpq8GGwkG2D2RORnU+/vS/5r4Nk
-         pKXA==
-X-Forwarded-Encrypted: i=1; AJvYcCUJMhncq9m7tPy2CnPK6xuYtQ4GR2Cxq690s3IUUtH+5z1GtrOrf6GYW9jVCsbr8Mu50hkbaVY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwgNJUPxJ/dXTiAgQ6xqhGAmod+blrhs4tXbZ4wAFSTYT189kQ5
-	6eAjYxyl7CyNmLtkNeG7eLRKSLw7govY0v+W8y1lWU0/hNiPSkAFPCPMCbL1iv9fhVQw58NTgdh
-	dQSsyvCthJe3be7UCaT3lTZlhoYw4QjelwzwM6OlwSB8vUBKwF2gA+BEFCgqYnrApVHD0dExrKE
-	c2+QfGjnDHb3mnEgmuhwv5iSQdxft8
-X-Received: by 2002:a17:907:728d:b0:a86:8e3d:86e2 with SMTP id a640c23a62f3a-a9de5d6e1f2mr4840613466b.11.1730980250168;
-        Thu, 07 Nov 2024 03:50:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IFPfRWKKC2Mmw7qsLwNWsUWk9YcB3oP04KpCrk49fXxZ1eFzL9rc53cMZIp1x03OUPvMyR3Ccw7QTwYX9l0OHc=
-X-Received: by 2002:a17:907:728d:b0:a86:8e3d:86e2 with SMTP id
- a640c23a62f3a-a9de5d6e1f2mr4840608566b.11.1730980249462; Thu, 07 Nov 2024
- 03:50:49 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730980218; x=1731585018;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qV2XuAhWZw+2BqCqnWE0dJxK5O/efvkvyQFZddPytP4=;
+        b=Pmu6ULcUcQwyuBhXqOJGYKZXub37zTl0jqic7Yqva0mb9kDbXb0vAztX+Og0iYRaS0
+         sCTfMf6ueJVd2m/eG6UXzNSwqdPWAevvuigQLIxEtLPDqNQdJsQiqCX0/zWNIxCiIpPw
+         R9FdfbVU7p2ZKyLaYeyM+xl/WNAwf+9H0sRgmC0jZ2M7XFH+SgX2T+EadSHRUuEXRiqj
+         GjMCw+myYfPT0UBPG36R5T/fiUb5h+LCwOWgxIlH7X+nrVBvvWC98UOoA5hHvSEG+7ii
+         ktv8W5edNXgsI/+uRzlHxK38bxp5dPQyEXkMn5DLN11Ohy+dZAvtnjekbAUpJUWviO2Y
+         e20w==
+X-Forwarded-Encrypted: i=1; AJvYcCUzstWDxXXAlaNU0IZ6/RZtypWKNsKOtqfT+yIHt+93YpzIKdpnlX+wvTRQ9ioJR7VnnS98r3SrZCFP1+A=@vger.kernel.org, AJvYcCWmGQT6WGXO3soMqx5oHsm4bPde+ewvdXCnnGvXGT53B8lK3N0tiiOPpMXkfZYNJjt4hxhWd+di@vger.kernel.org
+X-Gm-Message-State: AOJu0YxoxSsJLdApRaI98qbmkTYhTP+D4LPpPxGV74jylxByHXKrphZP
+	uPUV+GupTe3cFAGbLlL3VFgqutfhVIuQlpGGDWbYscIACJm8vgWL
+X-Google-Smtp-Source: AGHT+IGvD8q6JlwJ5GJ312xV1CwjVkICfx1Scc+L/B2EuwKSC6Q/H8VbT1jiSu+432bE+QpWFp2yag==
+X-Received: by 2002:a17:906:7309:b0:a9a:616c:459e with SMTP id a640c23a62f3a-a9ee6c615b5mr83356866b.27.1730980218458;
+        Thu, 07 Nov 2024 03:50:18 -0800 (PST)
+Received: from gmail.com (fwdproxy-lla-115.fbsv.net. [2a03:2880:30ff:73::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0a18854sm84646466b.29.2024.11.07.03.50.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 03:50:17 -0800 (PST)
+Date: Thu, 7 Nov 2024 03:50:15 -0800
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: horms@kernel.org, davem@davemloft.net, edumazet@google.com,
+	pabeni@redhat.com, thepacketgeek@gmail.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davej@codemonkey.org.uk,
+	vlad.wing@gmail.com, max@kutsevol.com, kernel-team@meta.com,
+	jiri@resnulli.us, jv@jvosburgh.net, andy@greyhouse.net,
+	aehkn@xenhub.one, Rik van Riel <riel@surriel.com>,
+	Al Viro <viro@zeniv.linux.org.uk>
+Subject: Re: [PATCH net-next 1/3] net: netpoll: Defer skb_pool population
+ until setup success
+Message-ID: <20241107-interesting-observant-manul-564fa2@leitao>
+References: <20241025142025.3558051-1-leitao@debian.org>
+ <20241025142025.3558051-2-leitao@debian.org>
+ <20241031182647.3fbb2ac4@kernel.org>
+ <20241101-cheerful-pretty-wapiti-d5f69e@leitao>
+ <20241101-prompt-carrot-hare-ff2aaa@leitao>
+ <20241101190101.4a2b765f@kernel.org>
+ <20241104-nimble-scallop-of-justice-4ab82f@leitao>
+ <20241105170029.719344e7@kernel.org>
+ <20241106-gecko-of-sheer-opposition-dde586@leitao>
+ <20241106154349.0ebca894@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105072642.898710-1-lulu@redhat.com> <20241105072642.898710-8-lulu@redhat.com>
- <6dtic6ld6p6kyzbjjewj4cxkc6h6r5t6y2ztazrgozdanz6gkm@vlj3ubpam6ih>
- <CACLfguVNM_b9LdiMyj+pZH0WHu=-Nrit8-cr+QH9=f7tMLDd4w@mail.gmail.com> <zkamzruq5e3diahm7vyjansnaowkw42toh5evwgq6vqal7h4pk@3w4e47ggogyr>
-In-Reply-To: <zkamzruq5e3diahm7vyjansnaowkw42toh5evwgq6vqal7h4pk@3w4e47ggogyr>
-From: Cindy Lu <lulu@redhat.com>
-Date: Thu, 7 Nov 2024 19:50:12 +0800
-Message-ID: <CACLfguXH7oEgjaOYWC05742n0dsUGaFWM-i7Fykuzbxv9xQ9HA@mail.gmail.com>
-Subject: Re: [PATCH v3 7/9] vhost: Add new UAPI to support change to task mode
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106154349.0ebca894@kernel.org>
 
-On Thu, Nov 7, 2024 at 6:03=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
-com> wrote:
->
-> On Thu, Nov 07, 2024 at 03:12:49PM +0800, Cindy Lu wrote:
-> >On Tue, Nov 5, 2024 at 6:32=E2=80=AFPM Stefano Garzarella <sgarzare@redh=
-at.com> wrote:
-> >>
-> >> On Tue, Nov 05, 2024 at 03:25:26PM +0800, Cindy Lu wrote:
-> >> >Add a new UAPI to enable setting the vhost device to task mode.
-> >> >The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
-> >> >to configure the mode if necessary.
-> >> >This setting must be applied before VHOST_SET_OWNER, as the worker
-> >> >will be created in the VHOST_SET_OWNER function
-> >> >
-> >> >Signed-off-by: Cindy Lu <lulu@redhat.com>
-> >> >---
-> >> > drivers/vhost/vhost.c      | 15 ++++++++++++++-
-> >> > include/uapi/linux/vhost.h |  2 ++
-> >> > 2 files changed, 16 insertions(+), 1 deletion(-)
-> >> >
-> >> >diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> >> >index c17dc01febcc..70c793b63905 100644
-> >> >--- a/drivers/vhost/vhost.c
-> >> >+++ b/drivers/vhost/vhost.c
-> >> >@@ -2274,8 +2274,9 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsig=
-ned int ioctl, void __user *argp)
-> >> > {
-> >> >       struct eventfd_ctx *ctx;
-> >> >       u64 p;
-> >> >-      long r;
-> >> >+      long r =3D 0;
-> >>
-> >> I don't know if something is missing in this patch, but I am confused:
-> >>
-> >> `r` is set few lines below...
-> >>
-> >> >       int i, fd;
-> >> >+      bool inherit_owner;
-> >> >
-> >> >       /* If you are not the owner, you can become one */
-> >> >       if (ioctl =3D=3D VHOST_SET_OWNER) {
-> >> ...
-> >>
-> >>         /* You must be the owner to do anything else */
-> >>         r =3D vhost_dev_check_owner(d);
-> >>         if (r)
-> >>                 goto done;
-> >>
-> >> So, why we are now initializing it to 0?
-> >>
-> >r =3D 0 mean return successfully here.
-> >Therefore, in the case VHOST_SET_INHERIT_FROM_OWNER function, I don't
-> >need to set it again and can simply return.
-> >....
-> >    if (vhost_dev_has_owner(d))
-> >       break;
-> >.....
->
-> Okay, but vhost_dev_check_owner() already set it to 0, so we can avoid
-> that, no?
->
-> >> >@@ -2332,6 +2333,18 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsi=
-gned int ioctl, void __user *argp)
-> >> >               if (ctx)
-> >> >                       eventfd_ctx_put(ctx);
-> >> >               break;
-> >> >+      case VHOST_SET_INHERIT_FROM_OWNER:
-> >> >+              /*inherit_owner can only be modified before owner is s=
-et*/
-> >> >+              if (vhost_dev_has_owner(d))
-> >>
-> >> And here, how this check can be false, if at the beginning of the
-> >> function we call vhost_dev_check_owner()?
-> >>
-> >> Maybe your intention was to add this code before the
-> >> `vhost_dev_check_owner()` call, so this should explain why initialize
-> >> `r` to 0, but I'm not sure.
-> >>
-> >Yes, in the function beginning, the code is
-> >if (ioctl =3D=3D VHOST_SET_OWNER) {
-> >r =3D vhost_dev_set_owner(d);
-> >goto done;
-> >}
-> >if the ioctl is not VHOST_SET_OWNER,  then the  code will not run the
-> >function vhost_dev_set_owner.
->
-> Sorry, I meant vhost_dev_check_owner(), not vhost_dev_set_owner().
->
-> I'll try to explain again.
->
-> After applying this series we have this code:
->
-> long vhost_dev_ioctl(struct vhost_dev *d, unsigned int ioctl, void __user=
- *argp)
-> {
->         struct eventfd_ctx *ctx;
->         u64 p;
->         long r =3D 0;
->         int i, fd;
->         bool inherit_owner;
->
->         /* If you are not the owner, you can become one */
->         if (ioctl =3D=3D VHOST_SET_OWNER) {
->                 r =3D vhost_dev_set_owner(d);
->                 goto done;
->         }
->
->         /* You must be the owner to do anything else */
->         r =3D vhost_dev_check_owner(d);
->         if (r)
->                 goto done;
->
->         switch (ioctl) {
->         ...
->         case VHOST_SET_INHERIT_FROM_OWNER:
->                 /*inherit_owner can only be modified before owner is
->                  * set*/
->                 if (vhost_dev_has_owner(d))
->                         break;
->
-> IIUC this check is always true, so we always call `break` because at
-> the beginning of this function we call vhost_dev_check_owner() which
-> if `dev->mm !=3D current->mm` (so it can't be null I guess) jumps directl=
-y
-> into `done`, returning an error.
->
-> So I still don't understand in which condition we can run the code after
-> this check.
->
-oh sorry I missed that check. I will move the new case back to the top
-of function,
-I didn't think it through before making this change; I just wanted to
-clean up the code but forgot about the status.
+Hello Jakub,
+
+On Wed, Nov 06, 2024 at 03:43:49PM -0800, Jakub Kicinski wrote:
+> On Wed, 6 Nov 2024 07:06:06 -0800 Breno Leitao wrote:
+> > To clarify, let me take a step back and outline what this patchset proposes:
+> > 
+> > The patchset enhances SKB pool management in three key ways:
+> > 
+> > 	a) It delays populating the skb pool until the target is active.
+> > 	b) It releases the skb pool when there are no more active users.
+> > 	c) It creates a separate pool for each target.
+> > 
+> > The third point (c) is the one that's open to discussion, as I
+> > understand.
+> > 
+> > I proposed that having an individualized skb pool that users can control
+> > would be beneficial. For example, users could define the number of skbs
+> > in the pool. This could lead to additional advantages, such as allowing
+> > netpoll to directly consume from the pool instead of relying on alloc()
+> > in the optimal scenario, thereby speeding up the critical path.
+> 
+> Patch 1 is the one I'm not completely convinced by. I understand 
+> the motivation but its rather unusual to activate partially initialized
+> objects. Maybe let's leave it out.
+> 
+> The rest is fine, although I'd invert the justification for the second
+> patch. We should in fact scale the number of pooled packets with the
+> number of consoles. Each message gets send to every console so system
+> with 2 netconsoles has effectively half the OOM cushion.
+
+That is fair. Thanks for the guidance. I will keep patch 1 out of it and
+send a v2.
+
 Thanks
-cindy
-> Thanks,
-> Stefano
->
->                 if (copy_from_user(&inherit_owner, argp,
->                                    sizeof(inherit_owner))) {
->                         r =3D -EFAULT;
->                         break;
->                 }
->                 d->inherit_owner =3D inherit_owner;
->                 break;
->
->
-> >This ioctl is used by userspace applications, so we cannot be certain
-> >of the type and sequence of their calls; therefore, I added this
-> >check.
-> >
-> >> >+                      break;
-> >>
-> >> Should we return an error (e.g. -EPERM) in this case?
-> >>
-> >sure=EF=BC=8Cwill add this back
-> >thanks
-> >Cindy
-> >> >+
-> >> >+              if (copy_from_user(&inherit_owner, argp,
-> >> >+                                 sizeof(inherit_owner))) {
-> >> >+                      r =3D -EFAULT;
-> >> >+                      break;
-> >> >+              }
-> >> >+              d->inherit_owner =3D inherit_owner;
-> >> >+              break;
-> >> >       default:
-> >> >               r =3D -ENOIOCTLCMD;
-> >> >               break;
-> >> >diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> >> >index b95dd84eef2d..1e192038633d 100644
-> >> >--- a/include/uapi/linux/vhost.h
-> >> >+++ b/include/uapi/linux/vhost.h
-> >> >@@ -235,4 +235,6 @@
-> >> >  */
-> >> > #define VHOST_VDPA_GET_VRING_SIZE     _IOWR(VHOST_VIRTIO, 0x82,     =
-  \
-> >> >                                             struct vhost_vring_state=
-)
-> >> >+
-> >>
-> >> Please add a documentation here, this is UAPI, so the user should
-> >> know what this ioctl does based on the parameter.
-> >>
-> >> Thanks,
-> >> Stefano
-> >>
-> >> >+#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, bool)
-> >> > #endif
-> >> >--
-> >> >2.45.0
-> >> >
-> >>
-> >
->
-
+--breno
 
