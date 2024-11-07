@@ -1,90 +1,217 @@
-Return-Path: <netdev+bounces-142875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2845C9C08EF
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:33:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D83519C08F9
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:34:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D4E421F24273
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:33:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FB811F240F6
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:34:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DF6D21262E;
-	Thu,  7 Nov 2024 14:32:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B530621219F;
+	Thu,  7 Nov 2024 14:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="U4CBsTDQ"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLs0+dJr"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA6B1168BD;
-	Thu,  7 Nov 2024 14:32:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3471E049C;
+	Thu,  7 Nov 2024 14:34:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730989975; cv=none; b=UdlsMG7vX+9ONPatAUcromAR5Lg3/KlaMfUrIR40eBSkK2C98KZgrHoEj2Btz2iXYyqPDpxe86+0xxI5KJqqyb0a8y78QKOU2OiowNioWayEwTr+bSytHvJ/3KSHNF3+m8rV3gje2EUn+hzzrEgytLHlHBnLOqei7de5yEpAG54=
+	t=1730990049; cv=none; b=AxYzwjzi7jvX4e0zDaINr+c/qaOX1730zKcnnQLiC0X9ttBdnNs/vWNAMm+DTa13GBldsmDmb2nIIYmde2lSfMBgnIpFWiITRN73ILjmgTihZhpXPUtlMMZ5jLnhq/9qHt4SbuxT6zreXz+BKatCPuYUkxGZ0yfrMARSXwr2uTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730989975; c=relaxed/simple;
-	bh=DvkB/sbaZRLhctzLM3g42ELdV1YVsM1roN6Nkn42Otk=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=CT2J3HmfQfN9boOX03eMFhez5H5Q9AEcFZH1WFhgAO9fpi2GG6ZQCZz2ElZfYcJlIXrtKfDdHJVuAOCpzOVB4j6XLpoBkvbKOzMDnqLWJTrqrWwnA6LZgRnfqU3qEznA6MfzpYW7f3rZpkE7UlICoiFydtJDRmD/ppWFqybwiLU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=U4CBsTDQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 741A2C4CED0;
-	Thu,  7 Nov 2024 14:32:54 +0000 (UTC)
+	s=arc-20240116; t=1730990049; c=relaxed/simple;
+	bh=PZ0qlphJcD8vX64gcDaorA5K5So48tJfKoWbNIH4d5A=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=CqT/2wrPFD5J45RXLUc4H3ileg4B1ycVvlFoiCDRZ7RVBvzTjAL3GyUp2BgI9fF8ajjeoQyeflpbY9rwcUIBLGOcaqY5SSs3M+TpL+aXOyDux/M5iwFQA29rg+InGx/R+c0e0HyeiVzKL8lZmRIlC72IyqMTOOeSAC8wv+EufcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLs0+dJr; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 935D0C4CECC;
+	Thu,  7 Nov 2024 14:34:06 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730989974;
-	bh=DvkB/sbaZRLhctzLM3g42ELdV1YVsM1roN6Nkn42Otk=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=U4CBsTDQ4hYvaI45hMbB3EXSH3dlqUr6xzbauezqLMIv2EjJw2wUIbhj3OxDDleYr
-	 hANQijAsuTpmNiWH6OgW5jL6xMn1sIIGSxnLpBEdkY3dxzZvNjNBomWPqWFTI+wm1y
-	 lVGfbDt9mGsg/gRd3glbvUvFxYiUMWbzPkLZ98Tc6j2IN4qi/FogRRbMFtsetjQkKY
-	 O5RDoiGnWCWbbvfoalTOWLG0oknV/MXE6lMXKBxa6HVXd6bibkTplyCbzJA2xcRea3
-	 jTwCbtezdRkCxiwGbT7KjQFWBfVgX4Le4KMAXouiFJnWo3cGFGmW71fFNmauzMoT7/
-	 m/voWpidyFxnQ==
-Received: by mail-qv1-f51.google.com with SMTP id 6a1803df08f44-6cbcc2bd7fcso6243596d6.1;
-        Thu, 07 Nov 2024 06:32:54 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCU2WwE8TvqjMEkBE2KymHyxhnjHg2IqdFXpXLPiuzeCntvs0tCe12k6PHiJvOXvlIJzU3o=@vger.kernel.org, AJvYcCUbAL/fGfNNpfLzNpuJMnvgDXSIQzYSJjhBKV8pg3dBapGNQY3wBYXcT74EXUfQi5JpDpWRuACCaP28omPxWWX2@vger.kernel.org, AJvYcCV+JFfC6b67m61OVK63G0o8unn/H4NctW+q7wNqrpzAdrKeduC1qax6LOyktIGkEvjpCQenrL4FrCqhubN1@vger.kernel.org, AJvYcCVjwANMpRBTJ03sB6q471BtfyENGcHhJRTUhRm1RGN5O2dE3wN23pOFhtJ2vB2mlNN11+JsAZ04@vger.kernel.org
-X-Gm-Message-State: AOJu0YwIQ+fkWgJZQmEoiRjzyDIGayE1v104RltmjHDACzH6xn8OE5bp
-	XpAEdcptU44iPPOBdnTFCG4bGQ3Iuxe0B3YonjyeuNDjVQPel50/eOmRM+RhQIQ/FFHT4Bu+c/o
-	p57gHUSqN1aL4sUSMh0eaWeqIGHU=
-X-Google-Smtp-Source: AGHT+IHUCLtFQ8IuQTRLh1fcgLhAN5eLbq9UIfP6whxl0V14vWJHVvz6l3hhBZU79uygYdnjqGmoYxDIzrGp2K4+w/k=
-X-Received: by 2002:a05:6214:4198:b0:6cb:ef22:6274 with SMTP id
- 6a1803df08f44-6d39cf9cdcemr1411926d6.3.1730989973620; Thu, 07 Nov 2024
- 06:32:53 -0800 (PST)
+	s=k20201202; t=1730990049;
+	bh=PZ0qlphJcD8vX64gcDaorA5K5So48tJfKoWbNIH4d5A=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=aLs0+dJrOkCwh+rGYeR+BNamanHu9Yy6X6Nr3eJEp8SwlcPvp5BGy/oVovkQzpdFh
+	 v14otvCmmY2CqP/Z9qC1yAUCFc+UFbLBP1jH481MZGzBBgd7sjI9E+Sg06rVN/2PVF
+	 UNYighYZmct23f2LtAd7/5KzI6OUY0pArTzJxNVC+TI6O7UEzLKm+XdzMltHQgBjzh
+	 DUe5+DRhEk5IyUyDjsRT/wkLiIz9jaC5wXFw8VX7T6qQb/3QgJaHq2/lvr/rGTYbq7
+	 UeML0mOZA8LdYdZnIHpKiUdPzTEURQokiB/qQtOF2tvp1EoPArLfdhxBMkwhDLsUJQ
+	 23W38BsTUXytQ==
+Date: Thu, 7 Nov 2024 14:34:04 +0000
+From: Simon Horman <horms@kernel.org>
+To: Divya Koppera <divya.koppera@microchip.com>
+Cc: andrew@lunn.ch, arun.ramadoss@microchip.com,
+	UNGLinuxDriver@microchip.com, hkallweit1@gmail.com,
+	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, richardcochran@gmail.com
+Subject: Re: [PATCH net-next 2/5] net: phy: microchip_ptp : Add ptp library
+ for Microchip phys
+Message-ID: <20241107143404.GV4507@kernel.org>
+References: <20241104090750.12942-1-divya.koppera@microchip.com>
+ <20241104090750.12942-3-divya.koppera@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20240927131355.350918-1-bjorn@kernel.org> <172835823300.66789.3704854116445399222.git-patchwork-notify@kernel.org>
- <87bjyvpa6h.fsf@all.your.base.are.belong.to.us> <CAEf4BzZbq9OwSGi4pdb5_q8YkErfFiQFKYXg3g1rjpdejafx+Q@mail.gmail.com>
-In-Reply-To: <CAEf4BzZbq9OwSGi4pdb5_q8YkErfFiQFKYXg3g1rjpdejafx+Q@mail.gmail.com>
-From: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-Date: Thu, 7 Nov 2024 15:32:42 +0100
-X-Gmail-Original-Message-ID: <CAJ+HfNjiuhOyw2r9+e=CRMXrq_NjP5Sq4oT1tc_vhTZ_HkY7zQ@mail.gmail.com>
-Message-ID: <CAJ+HfNjiuhOyw2r9+e=CRMXrq_NjP5Sq4oT1tc_vhTZ_HkY7zQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/2] libbpf: Add missing per-arch include path
-To: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Cc: patchwork-bot+netdevbpf@kernel.org, andrii@kernel.org, eddyz87@gmail.com, 
-	mykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org, 
-	bjorn@rivosinc.com, linux-kselftest@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org, 
-	charlie@rivosinc.com, Andreas Schwab <schwab@suse.de>, Anand Moon <linux.amoon@gmail.com>, 
-	Palmer Dabbelt <palmer@dabbelt.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241104090750.12942-3-divya.koppera@microchip.com>
 
-On Wed, 6 Nov 2024 at 23:04, Andrii Nakryiko <andrii.nakryiko@gmail.com> wr=
-ote:
-> I'm sorry, but unfortunately it's too late now to move those patches
-> as it's now been more than a month since they landed. For the future,
-> please let us know ASAP if you think patches were misrouted. I think
-> we are stuck with the need to do a stable backport for these, sorry.
+On Mon, Nov 04, 2024 at 02:37:47PM +0530, Divya Koppera wrote:
+> Add ptp library for Microchip phys
+> 1-step and 2-step modes are supported, over Ethernet and UDP(ipv4, ipv6)
+> 
+> Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+> ---
+>  drivers/net/phy/microchip_ptp.c | 990 ++++++++++++++++++++++++++++++++
+>  1 file changed, 990 insertions(+)
+>  create mode 100644 drivers/net/phy/microchip_ptp.c
+> 
+> diff --git a/drivers/net/phy/microchip_ptp.c b/drivers/net/phy/microchip_ptp.c
 
-Yeah, realize that it's really late. Thanks for getting back, and
-noted for the future.
+...
 
-Cheers,
-Bj=C3=B6rn
+> +static bool mchp_ptp_get_sig_tx(struct sk_buff *skb, u16 *sig)
+> +{
+> +	struct ptp_header *ptp_header;
+> +	int type;
+> +
+> +	type = ptp_classify_raw(skb);
+> +	if (type == PTP_CLASS_NONE)
+> +		return false;
+> +
+> +	ptp_header = ptp_parse_header(skb, type);
+> +	if (!ptp_header)
+> +		return false;
+> +
+> +	*sig = htons(ptp_header->sequence_id);
+
+Hi Divya,
+
+The type of *sig is u16, a host-byte order integer.
+But htons() returns __be16, a big-endian integer.
+This does not seem right.
+
+Likewise, in the caller, and beyond, if these are big-endian integers
+then appropriate types - probably __be16 - should be used.
+
+Flagged by Sparse.
+
+> +
+> +	return true;
+> +}
+
+...
+
+> +static struct mchp_ptp_rx_ts *mchp_ptp_get_rx_ts(struct mchp_ptp_clock *ptp_clock)
+> +{
+> +	struct phy_device *phydev = ptp_clock->phydev;
+> +	struct mchp_ptp_rx_ts *rx_ts = NULL;
+> +	u32 sec, nsec;
+> +	u16 seq;
+> +	int rc;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_RX_INGRESS_NS_HI(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		goto error;
+> +	if (!(rc & MCHP_PTP_RX_INGRESS_NS_HI_TS_VALID)) {
+> +		phydev_err(phydev, "RX Timestamp is not valid!\n");
+> +		goto error;
+> +	}
+> +	nsec = (rc & GENMASK(13, 0)) << 16;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_RX_INGRESS_NS_LO(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		goto error;
+> +	nsec |= rc;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_RX_INGRESS_SEC_HI(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		goto error;
+> +	sec = rc << 16;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_RX_INGRESS_SEC_LO(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		goto error;
+> +	sec |= rc;
+> +
+> +	seq = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			   MCHP_PTP_RX_MSG_HEADER2(BASE_PORT(ptp_clock)));
+> +	if (seq < 0)
+
+seq is unsigned; it can never be less than 0.
+
+Flagged by Smatch.
+
+> +		goto error;
+> +
+> +	rx_ts = kzalloc(sizeof(*rx_ts), GFP_KERNEL);
+> +	if (!rx_ts)
+> +		return NULL;
+> +
+> +	rx_ts->seconds = sec;
+> +	rx_ts->nsec = nsec;
+> +	rx_ts->seq_id = seq;
+> +
+> +error:
+> +	return rx_ts;
+> +}
+
+...
+
+> +static bool mchp_ptp_get_tx_ts(struct mchp_ptp_clock *ptp_clock,
+> +			       u32 *sec, u32 *nsec, u16 *seq)
+> +{
+> +	struct phy_device *phydev = ptp_clock->phydev;
+> +	int rc;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_TX_EGRESS_NS_HI(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		return false;
+> +	if (!(rc & MCHP_PTP_TX_EGRESS_NS_HI_TS_VALID))
+> +		return false;
+> +	*nsec = (rc & GENMASK(13, 0)) << 16;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_TX_EGRESS_NS_LO(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		return false;
+> +	*nsec = *nsec | rc;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_TX_EGRESS_SEC_HI(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		return false;
+> +	*sec = rc << 16;
+> +
+> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			  MCHP_PTP_TX_EGRESS_SEC_LO(BASE_PORT(ptp_clock)));
+> +	if (rc < 0)
+> +		return false;
+> +	*sec = *sec | rc;
+> +
+> +	*seq = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
+> +			    MCHP_PTP_TX_MSG_HEADER2(BASE_PORT(ptp_clock)));
+> +	if (*seq < 0)
+
+Likewise, *seq is unsigned; it can never be less than 0.
+
+> +		return false;
+> +
+> +	return true;
+> +}
+
+...
 
