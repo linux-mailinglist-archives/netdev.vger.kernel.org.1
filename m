@@ -1,230 +1,202 @@
-Return-Path: <netdev+bounces-143020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B92E9C0ECC
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:20:29 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 193A69C0ED9
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:28:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E8831C25F12
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:20:28 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9BC301F21E37
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:28:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264BD212F06;
-	Thu,  7 Nov 2024 19:20:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C4C7216447;
+	Thu,  7 Nov 2024 19:28:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LeEDIYcC"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="fx8Ea+O6"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60815125D6
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 19:20:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 716C9186E58;
+	Thu,  7 Nov 2024 19:28:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731007225; cv=none; b=QvFfD42RXxaGJQ3YMiJZUrB3hd1fOSFEYafj5vYLWJ2k+zlKg2kHkMRWIz9ExrDHJRG0gj/Tj585n0wnNVRtTDK5b9LwU+MEPh6i1Lp4ejSDq/4SnWVd3kg5GiXesOMTQAOXTCizVIz5DfjPEqR/2jTVgdW0qBSugFSVstFihv4=
+	t=1731007694; cv=none; b=JusanHsaXtbA0RGafg5CS5ys38O4wzAUbxRar8IzC8YAvaeeQpBEhtzpUpkZxLigW7nCxw3rD8jnEpU8DKRagrkXHscT96t+VsZ41govpDmsZI5R8li9okCEM2ra4oQf3RSG0pL2h0pkbP2sjA1I8xckDaVtMTYlSQ6uul9nUI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731007225; c=relaxed/simple;
-	bh=JBhz9+1uyurCdClWp+VUqnIwmDBE2nI+l6K/7/ZYbCY=;
-	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fslaTqXwuO7if7jyXhpJpOakVnoHciCYsb0IDnvriVuwqpagRNNVudynh402jBbgeTLgG2Yct31m3eKUf9uiMcuAShFxfjfKq7QKb/8aMlYOyt8ZU0I1lQ7adir9lYoAXal3Zd6LE5utKfr8k2ZLBwkxhY67MGcWXk7Ayu5QytY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LeEDIYcC; arc=none smtp.client-ip=209.85.128.202
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
-Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e9d6636498so26459227b3.2
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 11:20:23 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731007222; x=1731612022; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=D1J3twfkorfwpUBmVtrda8j5+TCmvF02e9OCKZWLR8Y=;
-        b=LeEDIYcC50akneXl251Z8eSrAtl8M4JtIUEUqNLa/5jKOLzya2cRxbikK9hhKddL7V
-         2HCYrRoWejtvHJNFg0PM1n2T/Nmhvnia6O+fdFxYYRHI6xsySw5yMe1+3Mf/LQYosBv7
-         w6j2NmPFVYuP5+zq3wnlzLbBp2jl6GKrmKz1Iyf4ACfjEEq1TVYPyYhBxM5tlt8F69Lf
-         s0L4SWkRrQzNe0WoPB9Vogv+s4RgnzD0jB8O88rtpKNvuuHm3wR7gDutZIAZK5XbZorX
-         4ouCCnlPnQujPJWx1CeyA+gYs7fNKdtpWhHrF8Y6Bhx4Q9lZwTrUumMYIoyhQtxil+Ad
-         WODA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731007222; x=1731612022;
-        h=content-transfer-encoding:cc:to:from:subject:message-id
-         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=D1J3twfkorfwpUBmVtrda8j5+TCmvF02e9OCKZWLR8Y=;
-        b=vCwCHNgSYRCbpz171bRlErTjFQtD4FTz7XN2WwNjecnjAcIL9o0QuHXC0YtK6WEAvx
-         iSFECbI4/k94zD/Muwj7+MyvjjVn/Lkt1Do5eSIUizu5JSZtwEvhS8+YfD/nTMEh4Qwm
-         1DqAIray9Dy6v6aWGutcZo7Vtld4CA9cJMVCjPUkHGktbinaqT5AG7NXegSjcw5HhgeB
-         eix4IoJ3QptfMxqmRo6JErxbEu1GcKWCV7D/nqpxoqKPCgvl5RlJ9152CHK7PU7fTi3W
-         gsnJhVHflWaSb9JI810ll53JYUchp2QPPJj121pJpgvw2OYiyNGJxSRSCU8pu9ZwPU9w
-         XscA==
-X-Gm-Message-State: AOJu0YxPIhfV6dhXVJDrD7Gcxp4eMk/W1aVhnGQgM9gXDG4MMmnbDJ+2
-	kMgn3hBqShGUenEaNzPA5V3JPqDuvFaGEbYEcvWyHp6qjNv+mVZDGq1RAyukJIyOx4skR43xVKW
-	mCGyf722o1Q==
-X-Google-Smtp-Source: AGHT+IE4FeSKIAPhscv3iZyXQnxMcv9sVC0X5oel6JHkpLqsHe4uA69i0Lz3NZTk7zKjlYhT/8riAa5L3N9Vvw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
- (user=edumazet job=sendgmr) by 2002:a25:a208:0:b0:e30:c235:d79f with SMTP id
- 3f1490d57ef6-e337f8d5415mr81276.8.1731007222321; Thu, 07 Nov 2024 11:20:22
- -0800 (PST)
-Date: Thu,  7 Nov 2024 19:20:21 +0000
+	s=arc-20240116; t=1731007694; c=relaxed/simple;
+	bh=gjKC0WrGDW+KN0KMiorOLOy1s/sDoGsYYTGztXkVg2o=;
+	h=From:Date:To:cc:Subject:In-Reply-To:Message-ID:References:
+	 MIME-Version:Content-Type; b=eCEevCIZmFBFJDJDdHwEYTJalCZsUsABQk556CuBWz6LgTevJS30+6bfmOltzFDIWHDCUN0xYdm/aC02+len9rONirCO0bUQdOZzl9JT3z2FjEETJWIizm73k5yAqSq2u5EQFiFoqS+n7RtFTZSN7agx18oRlo/nTYZ+TPuMOac=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=fx8Ea+O6; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B42AEC4CECC;
+	Thu,  7 Nov 2024 19:28:13 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731007694;
+	bh=gjKC0WrGDW+KN0KMiorOLOy1s/sDoGsYYTGztXkVg2o=;
+	h=From:Date:To:cc:Subject:In-Reply-To:References:From;
+	b=fx8Ea+O6OFcWwtSAz01uM72GKTBELMLFXNI3zDkOFC5HgIgradH13YdERHUfk9zOn
+	 aOXOaMo0mrtEDp9UmEUyaDH9QsviT/LzhVSKHvF0o5ZPlYaty1VriZPOP2IORmxMCd
+	 yCDi1aRSGkSKqH72QBPhH7v6eh6UgzX0MXfeNRzKz20pGWvzTd1lrTOF/V/PNGNsLG
+	 FOkfCj0dDT/lUmJXdQsRFrsd3Fbp0jAdcPZ3jT4X1bav5K/NraFBNCp5eMTeBezWgd
+	 FacaePiFHr/hDK9hfAVFridTxeV35XfuKMm/JNRlgAkAb6m82/8Y6RA67NocSQTLhQ
+	 E/pFUGsm3Fs1g==
+From: =?UTF-8?q?Ilpo=20J=C3=A4rvinen?= <ij@kernel.org>
+Date: Thu, 7 Nov 2024 21:28:08 +0200 (EET)
+To: Eric Dumazet <edumazet@google.com>
+cc: chia-yu.chang@nokia-bell-labs.com, netdev@vger.kernel.org, 
+    dsahern@gmail.com, davem@davemloft.net, dsahern@kernel.org, 
+    pabeni@redhat.com, joel.granados@kernel.org, kuba@kernel.org, 
+    andrew+netdev@lunn.ch, horms@kernel.org, pablo@netfilter.org, 
+    kadlec@netfilter.org, netfilter-devel@vger.kernel.org, 
+    coreteam@netfilter.org, ncardwell@google.com, 
+    koen.de_schepper@nokia-bell-labs.com, g.white@cablelabs.com, 
+    ingemar.s.johansson@ericsson.com, mirja.kuehlewind@ericsson.com, 
+    cheshire@apple.com, rs.ietf@gmx.at, Jason_Livingood@comcast.com, 
+    vidhi_goel@apple.com
+Subject: Re: [PATCH v5 net-next 09/13] gro: prevent ACE field corruption &
+ better AccECN handling
+In-Reply-To: <CANn89i+9USaOthY3yaJPT-cbfAcP0re2bbGbWU7SqOSYEW2CMw@mail.gmail.com>
+Message-ID: <37429ace-59c0-21d2-bcc8-54033794e789@kernel.org>
+References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com> <20241105100647.117346-10-chia-yu.chang@nokia-bell-labs.com> <CANn89i+9USaOthY3yaJPT-cbfAcP0re2bbGbWU7SqOSYEW2CMw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
-Message-ID: <20241107192021.2579789-1-edumazet@google.com>
-Subject: [PATCH net-next] sctp: fix possible UAF in sctp_v6_available()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, Xin Long <lucien.xin@gmail.com>, 
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: multipart/mixed; BOUNDARY="8323328-1269263136-1731006228=:1016"
+Content-ID: <5066e8e1-c21f-235d-ed7d-1d0e4fd9d6a4@kernel.org>
 
-A lockdep report [1] with CONFIG_PROVE_RCU_LIST=3Dy hints
-that sctp_v6_available() is calling dev_get_by_index_rcu()
-and ipv6_chk_addr() without holding rcu.
+  This message is in MIME format.  The first part should be readable text,
+  while the remaining parts are likely unreadable without MIME-aware tools.
 
-[1]
- =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D
- WARNING: suspicious RCU usage
- 6.12.0-rc5-virtme #1216 Tainted: G        W
- -----------------------------
- net/core/dev.c:876 RCU-list traversed in non-reader section!!
+--8323328-1269263136-1731006228=:1016
+Content-Type: text/plain; CHARSET=UTF-8
+Content-Transfer-Encoding: QUOTED-PRINTABLE
+Content-ID: <dc0d38c4-970a-d4b7-79ba-cbd99ef3e7ef@kernel.org>
 
-other info that might help us debug this:
+On Thu, 7 Nov 2024, Eric Dumazet wrote:
 
-rcu_scheduler_active =3D 2, debug_locks =3D 1
- 1 lock held by sctp_hello/31495:
- #0: ffff9f1ebbdb7418 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_bind (./arch=
-/x86/include/asm/jump_label.h:27 net/sctp/socket.c:315) sctp
+> On Tue, Nov 5, 2024 at 11:07=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.co=
+m> wrote:
+> >
+> > From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> >
+> > There are important differences in how the CWR field behaves
+> > in RFC3168 and AccECN. With AccECN, CWR flag is part of the
+> > ACE counter and its changes are important so adjust the flags
+> > changed mask accordingly.
+> >
+> > Also, if CWR is there, set the Accurate ECN GSO flag to avoid
+> > corrupting CWR flag somewhere.
+> >
+> > Signed-off-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> > Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> > ---
+> >  net/ipv4/tcp_offload.c | 4 ++--
+> >  1 file changed, 2 insertions(+), 2 deletions(-)
+> >
+> > diff --git a/net/ipv4/tcp_offload.c b/net/ipv4/tcp_offload.c
+> > index 0b05f30e9e5f..f59762d88c38 100644
+> > --- a/net/ipv4/tcp_offload.c
+> > +++ b/net/ipv4/tcp_offload.c
+> > @@ -329,7 +329,7 @@ struct sk_buff *tcp_gro_receive(struct list_head *h=
+ead, struct sk_buff *skb,
+> >         th2 =3D tcp_hdr(p);
+> >         flush =3D (__force int)(flags & TCP_FLAG_CWR);
+> >         flush |=3D (__force int)((flags ^ tcp_flag_word(th2)) &
+> > -                 ~(TCP_FLAG_CWR | TCP_FLAG_FIN | TCP_FLAG_PSH));
+> > +                 ~(TCP_FLAG_FIN | TCP_FLAG_PSH));
+> >         flush |=3D (__force int)(th->ack_seq ^ th2->ack_seq);
+> >         for (i =3D sizeof(*th); i < thlen; i +=3D 4)
+> >                 flush |=3D *(u32 *)((u8 *)th + i) ^
+> > @@ -405,7 +405,7 @@ void tcp_gro_complete(struct sk_buff *skb)
+> >         shinfo->gso_segs =3D NAPI_GRO_CB(skb)->count;
+> >
+> >         if (th->cwr)
+> > -               shinfo->gso_type |=3D SKB_GSO_TCP_ECN;
+> > +               shinfo->gso_type |=3D SKB_GSO_TCP_ACCECN;
+> >  }
+> >  EXPORT_SYMBOL(tcp_gro_complete);
+> >
+>=20
+> I do not really understand this patch. How a GRO engine can know which
+> ECN variant the peers are using ?
 
-stack backtrace:
- CPU: 7 UID: 0 PID: 31495 Comm: sctp_hello Tainted: G        W          6.1=
-2.0-rc5-virtme #1216
- Tainted: [W]=3DWARN
- Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-=
-1.16.3-2 04/01/2014
- Call Trace:
-  <TASK>
- dump_stack_lvl (lib/dump_stack.c:123)
- lockdep_rcu_suspicious (kernel/locking/lockdep.c:6822)
- dev_get_by_index_rcu (net/core/dev.c:876 (discriminator 7))
- sctp_v6_available (net/sctp/ipv6.c:701) sctp
- sctp_do_bind (net/sctp/socket.c:400 (discriminator 1)) sctp
- sctp_bind (net/sctp/socket.c:320) sctp
- inet6_bind_sk (net/ipv6/af_inet6.c:465)
- ? security_socket_bind (security/security.c:4581 (discriminator 1))
- __sys_bind (net/socket.c:1848 net/socket.c:1869)
- ? do_user_addr_fault (./include/linux/rcupdate.h:347 ./include/linux/rcupd=
-ate.h:880 ./include/linux/mm.h:729 arch/x86/mm/fault.c:1340)
- ? do_user_addr_fault (./arch/x86/include/asm/preempt.h:84 (discriminator 1=
-3) ./include/linux/rcupdate.h:98 (discriminator 13) ./include/linux/rcupdat=
-e.h:882 (discriminator 13) ./include/linux/mm.h:729 (discriminator 13) arch=
-/x86/mm/fault.c:1340 (discriminator 13))
- __x64_sys_bind (net/socket.c:1877 (discriminator 1) net/socket.c:1875 (dis=
-criminator 1) net/socket.c:1875 (discriminator 1))
- do_syscall_64 (arch/x86/entry/common.c:52 (discriminator 1) arch/x86/entry=
-/common.c:83 (discriminator 1))
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
- RIP: 0033:0x7f59b934a1e7
- Code: 44 00 00 48 8b 15 39 8c 0c 00 f7 d8 64 89 02 b8 ff ff ff ff eb bd 66=
- 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 b8 31 00 00 00 0f 05 <48> 3d 01 f0 ff =
-ff 73 01 c3 48 8b 0d 09 8c 0c 00 f7 d8 64 89 01 48
-All code
-=3D=3D=3D=3D=3D=3D=3D=3D
-   0:	44 00 00             	add    %r8b,(%rax)
-   3:	48 8b 15 39 8c 0c 00 	mov    0xc8c39(%rip),%rdx        # 0xc8c43
-   a:	f7 d8                	neg    %eax
-   c:	64 89 02             	mov    %eax,%fs:(%rdx)
-   f:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
-  14:	eb bd                	jmp    0xffffffffffffffd3
-  16:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
-  1d:	00 00 00
-  20:	0f 1f 00             	nopl   (%rax)
-  23:	b8 31 00 00 00       	mov    $0x31,%eax
-  28:	0f 05                	syscall
-  2a:*	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax		<-- trapping =
-instruction
-  30:	73 01                	jae    0x33
-  32:	c3                   	ret
-  33:	48 8b 0d 09 8c 0c 00 	mov    0xc8c09(%rip),%rcx        # 0xc8c43
-  3a:	f7 d8                	neg    %eax
-  3c:	64 89 01             	mov    %eax,%fs:(%rcx)
-  3f:	48                   	rex.W
+Hi Eric,
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0:	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax
-   6:	73 01                	jae    0x9
-   8:	c3                   	ret
-   9:	48 8b 0d 09 8c 0c 00 	mov    0xc8c09(%rip),%rcx        # 0xc8c19
-  10:	f7 d8                	neg    %eax
-  12:	64 89 01             	mov    %eax,%fs:(%rcx)
-  15:	48                   	rex.W
- RSP: 002b:00007ffe2d0ad398 EFLAGS: 00000202 ORIG_RAX: 0000000000000031
- RAX: ffffffffffffffda RBX: 00007ffe2d0ad3d0 RCX: 00007f59b934a1e7
- RDX: 000000000000001c RSI: 00007ffe2d0ad3d0 RDI: 0000000000000005
- RBP: 0000000000000005 R08: 1999999999999999 R09: 0000000000000000
- R10: 00007f59b9253298 R11: 0000000000000202 R12: 00007ffe2d0ada61
- R13: 0000000000000000 R14: 0000562926516dd8 R15: 00007f59b9479000
-  </TASK>
+Thanks for taking a look.
 
-Fixes: 6fe1e52490a9 ("sctp: check ipv6 addr with sk_bound_dev if set")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Xin Long <lucien.xin@gmail.com>
-Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
----
- net/sctp/ipv6.c | 19 +++++++++++++------
- 1 file changed, 13 insertions(+), 6 deletions(-)
-
-diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
-index f7b809c0d142c0e6c8e29c2badc4428648117f31..38e2fbdcbeac4bf3185d98f8aca=
-e4aea531ca140 100644
---- a/net/sctp/ipv6.c
-+++ b/net/sctp/ipv6.c
-@@ -683,7 +683,7 @@ static int sctp_v6_available(union sctp_addr *addr, str=
-uct sctp_sock *sp)
- 	struct sock *sk =3D &sp->inet.sk;
- 	struct net *net =3D sock_net(sk);
- 	struct net_device *dev =3D NULL;
--	int type;
-+	int type, res, bound_dev_if;
+GRO doesn't know. Setting SKB_GSO_TCP_ECN in case of not knowing can=20
+result in header change that corrupts ACE field. Thus, GRO has to assume=20
+the RFC3168 CWR offloading trick cannot be used anymore (unless it tracks=
 =20
- 	type =3D ipv6_addr_type(in6);
- 	if (IPV6_ADDR_ANY =3D=3D type)
-@@ -697,14 +697,21 @@ static int sctp_v6_available(union sctp_addr *addr, s=
-truct sctp_sock *sp)
- 	if (!(type & IPV6_ADDR_UNICAST))
- 		return 0;
+the connection and knows the bits are used for RFC3168 which is something=
 =20
--	if (sk->sk_bound_dev_if) {
--		dev =3D dev_get_by_index_rcu(net, sk->sk_bound_dev_if);
-+	rcu_read_lock();
-+	bound_dev_if =3D READ_ONCE(sk->sk_bound_dev_if);
-+	if (bound_dev_if) {
-+		res =3D 0;
-+		dev =3D dev_get_by_index_rcu(net, bound_dev_if);
- 		if (!dev)
--			return 0;
-+			goto out;
- 	}
+nobody is going to do).
+
+The main point of SKB_GSO_TCP_ACCECN is to prevent SKB_GSO_TCP_ECN or=20
+NETIF_F_TSO_ECN offloading to be used for the skb as it would corrupt ACE=
 =20
--	return ipv6_can_nonlocal_bind(net, &sp->inet) ||
--	       ipv6_chk_addr(net, in6, dev, 0);
-+	res =3D ipv6_can_nonlocal_bind(net, &sp->inet) ||
-+	      ipv6_chk_addr(net, in6, dev, 0);
-+
-+out:
-+	rcu_read_unlock();
-+	return res;
- }
+field value.
+
+SKB_GSO_TCP_ACCECN doesn't allow CWR bits change within a super-skb but=20
+the same CWR flag should be repeated for all segments. In a sense, it's=20
+simpler than RFC3168 offloading.
+
+> SKB_GSO_TCP_ECN is also used from other points, what is your plan ?
+>=20
+> git grep -n SKB_GSO_TCP_ECN
+> drivers/net/ethernet/hisilicon/hns3/hns3_enet.c:3888:
+> skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+> drivers/net/ethernet/mellanox/mlx5/core/en_rx.c:1291:
+> skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+> drivers/net/ethernet/mellanox/mlx5/core/en_rx.c:1312:
+> skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN;
+
+These looked like they should be just changed to set SKB_GSO_TCP_ACCECN=20
+instead.
+
+I don't anymore recall why I didn't change those when I made this patch=20
+long time ago, perhaps it was just an oversight or things have changed=20
+somehow since then.
+
+> include/linux/netdevice.h:5061: BUILD_BUG_ON(SKB_GSO_TCP_ECN !=3D
+> (NETIF_F_TSO_ECN >> NETIF_F_GSO_SHIFT));
+> include/linux/skbuff.h:664:     SKB_GSO_TCP_ECN =3D 1 << 2,
+
+Not relevant.
+
+> include/linux/virtio_net.h:88:                  gso_type |=3D SKB_GSO_TCP=
+_ECN;
+> include/linux/virtio_net.h:161:         switch (gso_type & ~SKB_GSO_TCP_E=
+CN) {
+> include/linux/virtio_net.h:226:         if (sinfo->gso_type & SKB_GSO_TCP=
+_ECN)
+
+These need to be looked further what's going on as UAPI is also involved=20
+here.
+
+> net/ipv4/tcp_offload.c:404:             shinfo->gso_type |=3D SKB_GSO_TCP=
+_ECN;
+
+This was changed above. :-)
+
+> net/ipv4/tcp_output.c:389: skb_shinfo(skb)->gso_type |=3D SKB_GSO_TCP_ECN=
+;
+
+I'm pretty sure this relates to sending side which will be taken care by=20
+a later patch in the full series (not among these preparatory patches).
+
+
+FYI, these TSO/GSO/GRO changes are what I was most unsure myself if I=20
+got everything right when I was working with this series a few years back=
 =20
- /* This function checks if the address is a valid address to be used for
+so please keep that in mind while reviewing so my lack of knowledge=20
+doesn't end up breaking something. :-)
+
 --=20
-2.47.0.277.g8800431eea-goog
-
+ i.
+--8323328-1269263136-1731006228=:1016--
 
