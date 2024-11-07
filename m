@@ -1,203 +1,133 @@
-Return-Path: <netdev+bounces-142759-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142760-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF9049C0417
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:32:57 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 646989C041E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:33:18 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AF433282FEE
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:32:56 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0737EB23336
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:33:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB7A20C498;
-	Thu,  7 Nov 2024 11:32:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E640F20ADEE;
+	Thu,  7 Nov 2024 11:33:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="eh45QVKo"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E14B20BB5C;
-	Thu,  7 Nov 2024 11:32:23 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.188.207
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.15])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A0591E1C37
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 11:33:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.15
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730979145; cv=none; b=LPXGESE8zIfgWUzr1Z4eY38OAqrvKPL3z74JKSTPSfl2bSFZuvfMkp9iLyl8oo/NOpz1LzZYzYBY5IwlPJx3F8DXlghlwlVBhWMKcw6lsDHOp3qYmuddlTBRm2SUbDNarXGEd5nf8jYsSfGZ9pnFB9AtVah9+tjOQq1KyeXO6OI=
+	t=1730979188; cv=none; b=gncamHOnsH9fhNhyqIKq4fqh60jZPfgjMZH/n+cSCcGt79lWi7lwHZtjuTIan3NnTKtN2GdFrTO/hhslcByrlIflVvsLyCaJaozoMKfpWLSfM4Zjp8ob2Ol52wLvERpJzB+VncbTG/4/ODUItEPwpecMNnbmKlQzLByL/GviLTw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730979145; c=relaxed/simple;
-	bh=7Lr4gVYkKMKzNkLWj0DuqGndQiaQvAxN9n20X68RiDw=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=dLes7vSa5eXnIgkWMStw4Hn7WvnbIH8ZYk6YNo1rA+3HPvf5p5zohn2gQ+SzyTtXt4aHR6obx+/lyqhppuB205AyFf3zKwnxgRy4wHr0uwocpte0DJsXLMj7WIv5xE9xRDDTxPMdmz9N4BsSRus7ZnmwRuzaQ9Kf20PecPm6LGE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=netfilter.org; arc=none smtp.client-ip=217.70.188.207
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=netfilter.org
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	fw@strlen.de
-Subject: [PATCH net 1/1] netfilter: nf_tables: wait for rcu grace period on net_device removal
-Date: Thu,  7 Nov 2024 12:32:12 +0100
-Message-Id: <20241107113212.116634-2-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20241107113212.116634-1-pablo@netfilter.org>
-References: <20241107113212.116634-1-pablo@netfilter.org>
+	s=arc-20240116; t=1730979188; c=relaxed/simple;
+	bh=KRVHB01OEq83mExTpA4ZzpE7Xo88aH3410IvN5uxHWk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=GKLGCHws/L3iw6o4LpB2b9JstYOFLpyk7fL9PBwrMbAbt/bCU4tp0M467tsp2DBQcj+ZIbdZBZ/4cnPIzrmddhc7MLZ05Szw9Tua3J8igezmwbnkQj9Ule2SnsvJglaradjJUPy9Nq2ZIR3KxhojLjw4vzcQET7Uh5TNzweUuwU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=eh45QVKo; arc=none smtp.client-ip=198.175.65.15
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730979187; x=1762515187;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KRVHB01OEq83mExTpA4ZzpE7Xo88aH3410IvN5uxHWk=;
+  b=eh45QVKocxp1A5sg47ATDFymIT+7a+gbO5N8iu4cBEr6h+VRxEMRsjNx
+   vh71Of8mBtVUsu+MmBB1oNSk79UOorf9aPk8ftDzeEnbNYNvRxUD+HmuQ
+   1JorbiwGfHTdTZvespp3TYzVNyGtq9XgFYRh+lvgiZNfeqvPzXbItKKoi
+   3SQnR+et3danCKn/a8mI4EVJraoV3mbgSMlSaDQpRdVFERqUigRbMy5jR
+   A7cEFjtJh88iDqgLOIQIir9Zf+iyNRzXYQMBAsHdKBY3IatOZHaxIXGVR
+   NYK16XLnDa1xBGLT6kNP5aFRpUF+QsFNYqlSTEeZ75JW9aXUcx8uWWKAy
+   g==;
+X-CSE-ConnectionGUID: NLmdq8eoT4S9TUlnKT4tig==
+X-CSE-MsgGUID: WBKP8gZeQcygcJuUcW0mmQ==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="34511376"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="34511376"
+Received: from orviesa006.jf.intel.com ([10.64.159.146])
+  by orvoesa107.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 03:33:06 -0800
+X-CSE-ConnectionGUID: tuil7a0rRwuwWD44FeHLTA==
+X-CSE-MsgGUID: 95ZP8vY2RkylPARCfeqhqg==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,265,1725346800"; 
+   d="scan'208";a="85146542"
+Received: from pae-dbg-r750-02-263.igk.intel.com ([172.28.191.215])
+  by orviesa006.jf.intel.com with ESMTP; 07 Nov 2024 03:33:04 -0800
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>
+Subject: [PATCH iwl-net] ice: fix PHY timestamp extraction for ETH56G
+Date: Thu,  7 Nov 2024 12:32:57 +0100
+Message-Id: <20241107113257.466286-1-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-8c873e219970 ("netfilter: core: free hooks with call_rcu") removed
-synchronize_net() call when unregistering basechain hook, however,
-net_device removal event handler for the NFPROTO_NETDEV was not updated
-to wait for RCU grace period.
+Fix incorrect PHY timestamp extraction for ETH56G.
+It's better to use FIELD_PREP() than manual shift.
 
-Note that 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks
-on net_device removal") does not remove basechain rules on device
-removal, I was hinted to remove rules on net_device removal later, see
-5ebe0b0eec9d ("netfilter: nf_tables: destroy basechain and rules on
-netdevice removal").
-
-Although NETDEV_UNREGISTER event is guaranteed to be handled after
-synchronize_net() call, this path needs to wait for rcu grace period via
-rcu callback to release basechain hooks if netns is alive because an
-ongoing netlink dump could be in progress (sockets hold a reference on
-the netns).
-
-Note that nf_tables_pre_exit_net() unregisters and releases basechain
-hooks but it is possible to see NETDEV_UNREGISTER at a later stage in
-the netns exit path, eg. veth peer device in another netns:
-
- cleanup_net()
-  default_device_exit_batch()
-   unregister_netdevice_many_notify()
-    notifier_call_chain()
-     nf_tables_netdev_event()
-      __nft_release_basechain()
-
-In this particular case, same rule of thumb applies: if netns is alive,
-then wait for rcu grace period because netlink dump in the other netns
-could be in progress. Otherwise, if the other netns is going away then
-no netlink dump can be in progress and basechain hooks can be released
-inmediately.
-
-While at it, turn WARN_ON() into WARN_ON_ONCE() for the basechain
-validation, which should not ever happen.
-
-Fixes: 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks on net_device removal")
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
+Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
 ---
- include/net/netfilter/nf_tables.h |  4 +++
- net/netfilter/nf_tables_api.c     | 41 +++++++++++++++++++++++++------
- 2 files changed, 38 insertions(+), 7 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 3 ++-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 5 ++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-index 91ae20cb7648..066a3ea33b12 100644
---- a/include/net/netfilter/nf_tables.h
-+++ b/include/net/netfilter/nf_tables.h
-@@ -1103,6 +1103,7 @@ struct nft_rule_blob {
-  *	@name: name of the chain
-  *	@udlen: user data length
-  *	@udata: user data in the chain
-+ *	@rcu_head: rcu head for deferred release
-  *	@blob_next: rule blob pointer to the next in the chain
-  */
- struct nft_chain {
-@@ -1120,6 +1121,7 @@ struct nft_chain {
- 	char				*name;
- 	u16				udlen;
- 	u8				*udata;
-+	struct rcu_head			rcu_head;
- 
- 	/* Only used during control plane commit phase: */
- 	struct nft_rule_blob		*blob_next;
-@@ -1263,6 +1265,7 @@ static inline void nft_use_inc_restore(u32 *use)
-  *	@sets: sets in the table
-  *	@objects: stateful objects in the table
-  *	@flowtables: flow tables in the table
-+ *	@net: netnamespace this table belongs to
-  *	@hgenerator: handle generator state
-  *	@handle: table handle
-  *	@use: number of chain references to this table
-@@ -1282,6 +1285,7 @@ struct nft_table {
- 	struct list_head		sets;
- 	struct list_head		objects;
- 	struct list_head		flowtables;
-+	possible_net_t			net;
- 	u64				hgenerator;
- 	u64				handle;
- 	u32				use;
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index a24fe62650a7..588a2757986c 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -1495,6 +1495,7 @@ static int nf_tables_newtable(struct sk_buff *skb, const struct nfnl_info *info,
- 	INIT_LIST_HEAD(&table->sets);
- 	INIT_LIST_HEAD(&table->objects);
- 	INIT_LIST_HEAD(&table->flowtables);
-+	write_pnet(&table->net, net);
- 	table->family = family;
- 	table->flags = flags;
- 	table->handle = ++nft_net->table_handle;
-@@ -11430,22 +11431,48 @@ int nft_data_dump(struct sk_buff *skb, int attr, const struct nft_data *data,
- }
- EXPORT_SYMBOL_GPL(nft_data_dump);
- 
--int __nft_release_basechain(struct nft_ctx *ctx)
-+static void __nft_release_basechain_now(struct nft_ctx *ctx)
- {
- 	struct nft_rule *rule, *nr;
- 
--	if (WARN_ON(!nft_is_base_chain(ctx->chain)))
--		return 0;
--
--	nf_tables_unregister_hook(ctx->net, ctx->chain->table, ctx->chain);
- 	list_for_each_entry_safe(rule, nr, &ctx->chain->rules, list) {
- 		list_del(&rule->list);
--		nft_use_dec(&ctx->chain->use);
- 		nf_tables_rule_release(ctx, rule);
- 	}
-+	nf_tables_chain_destroy(ctx->chain);
-+}
-+
-+static void nft_release_basechain_rcu(struct rcu_head *head)
-+{
-+	struct nft_chain *chain = container_of(head, struct nft_chain, rcu_head);
-+	struct nft_ctx ctx = {
-+		.family	= chain->table->family,
-+		.chain	= chain,
-+		.net	= read_pnet(&chain->table->net),
-+	};
-+
-+	__nft_release_basechain_now(&ctx);
-+	put_net(ctx.net);
-+}
-+
-+int __nft_release_basechain(struct nft_ctx *ctx)
-+{
-+	struct nft_rule *rule;
-+
-+	if (WARN_ON_ONCE(!nft_is_base_chain(ctx->chain)))
-+		return 0;
-+
-+	nf_tables_unregister_hook(ctx->net, ctx->chain->table, ctx->chain);
-+	list_for_each_entry(rule, &ctx->chain->rules, list)
-+		nft_use_dec(&ctx->chain->use);
-+
- 	nft_chain_del(ctx->chain);
- 	nft_use_dec(&ctx->table->use);
--	nf_tables_chain_destroy(ctx->chain);
-+
-+	if (maybe_get_net(ctx->net))
-+		call_rcu(&ctx->chain->rcu_head, nft_release_basechain_rcu);
-+	else
-+		__nft_release_basechain_now(ctx);
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index ec8db830ac73..3816e45b6ab4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -1495,7 +1495,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
+ 	 * lower 8 bits in the low register, and the upper 32 bits in the high
+ 	 * register.
+ 	 */
+-	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
++	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) |
++		  FIELD_PREP(TS_PHY_LOW_M, lo);
  
  	return 0;
  }
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 6cedc1a906af..4c8b84571344 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -663,9 +663,8 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
+ #define TS_HIGH_M			0xFF
+ #define TS_HIGH_S			32
+ 
+-#define TS_PHY_LOW_M			0xFF
+-#define TS_PHY_HIGH_M			0xFFFFFFFF
+-#define TS_PHY_HIGH_S			8
++#define TS_PHY_LOW_M			GENMASK(7, 0)
++#define TS_PHY_HIGH_M			GENMASK_ULL(39, 8)
+ 
+ #define BYTES_PER_IDX_ADDR_L_U		8
+ #define BYTES_PER_IDX_ADDR_L		4
+
+base-commit: 333b8b2188c495a2a1431b5e0d51826383271aad
 -- 
-2.30.2
+2.31.1
+
+---------------------------------------------------------------------
+Intel Technology Poland sp. z o.o.
+ul. Slowackiego 173 | 80-298 Gdansk | Sad Rejonowy Gdansk Polnoc | VII Wydzial Gospodarczy Krajowego Rejestru Sadowego - KRS 101882 | NIP 957-07-52-316 | Kapital zakladowy 200.000 PLN.
+Spolka oswiadcza, ze posiada status duzego przedsiebiorcy w rozumieniu ustawy z dnia 8 marca 2013 r. o przeciwdzialaniu nadmiernym opoznieniom w transakcjach handlowych.
+
+Ta wiadomosc wraz z zalacznikami jest przeznaczona dla okreslonego adresata i moze zawierac informacje poufne. W razie przypadkowego otrzymania tej wiadomosci, prosimy o powiadomienie nadawcy oraz trwale jej usuniecie; jakiekolwiek przegladanie lub rozpowszechnianie jest zabronione.
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). If you are not the intended recipient, please contact the sender and delete all copies; any review or distribution by others is strictly prohibited.
 
 
