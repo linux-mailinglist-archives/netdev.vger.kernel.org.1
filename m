@@ -1,192 +1,128 @@
-Return-Path: <netdev+bounces-143008-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE6909C0DEB
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:37:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B7669C0DED
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:38:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E1EE1C22A2B
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:37:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1FF0F28300B
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:38:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64FC12170C9;
-	Thu,  7 Nov 2024 18:36:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01C7A2170D3;
+	Thu,  7 Nov 2024 18:38:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="PmZ/6Zlx"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="LE6J9HCj"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2064.outbound.protection.outlook.com [40.107.223.64])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D378E216E10
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 18:36:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.223.64
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731004618; cv=fail; b=WlnYj6hRR16OJlffjNCMTjUwJV4dDYkFSRye3D5fa5CAjVkuGQHpZzTR+NWoM4BGF+UuLnL8HiJVazLNEfwD+6N8vCjxDFeOrZZt4R6xavC6hpOYTwZcgFzVRd3y4O+cnsL2q8SVipFbrmkThB/lR2EL71iRCf8DlFISwCMnlyU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731004618; c=relaxed/simple;
-	bh=2ljCapT0wevFtLD7AN17TOwH5A08sqTw7tujeJ1JiYs=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=E9LrsNmvtKi5PfNVxGv5Qc+XJx9e3hyFxR7f7nNek891H3QShh3nRgYGP//8s5ETPfyVMh8AuJjkHtFXq4gbTQX4gnjOaOYDId0hBQALvRS2J8Lsxa9Uty6tiNdvFuu3jn2jEvYplE/m5rMNH99luRas4XoyVeb6qsvOIquOGWA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=PmZ/6Zlx; arc=fail smtp.client-ip=40.107.223.64
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=XmqXzgRVSDJf6tBC0mpNxRudNyDQfDRwhFvDRh4yguqWu6vH9kmeF/GTMyMZVtZ9VR7YUBUGL7rouxCFajahU9yKjFVnIeXyTBOtoTTTZCST/CCMW/sph0CgLtzCpTbw/J03E8N8i9WIuYHzKKJyzXcuWlKjNUoF9y7dwRm5b9m4ixrHMuVNPmZNbNXO/fIG1TyMXwIuv6Qk9JJ871s3qmLj/HhxCe17cXQrleicfbFRklhwzCvo8gejXmmt8TIyiydGV/QyfAfahviECnsnsCG5B/HhL0QA/I2MFla6dcHDthNhQ31cvFPtjuRW6hwaKABaGxlk0aNkU5Du0LVPfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ha311tu2p6G8jatH66+b8Z4tfsFTgMsDgy5HdkTlIfU=;
- b=KvzW9bSIHqXZsCya113lXlMg5yZLkmxNuielgC46B/NXjwmW7ImIGWf5/Qoeaq2saMPS3N9n32oyFZ6CUB0YwfurnGuWgBcRdZsp40BRj4MHQCgf8c5ANCqbP0T8l0MhFBpl9K/u5OYIuToml4KNMGOM8VGLl4RPQ6++y4hQ5X1VaDKgLA8I5WzqBuSg8qmYwQJ2YE8rIeuu+ngQWcLtP2MryZ5E6mQNS2KmsBtNflJepSLGkjCuKKWXNwlCa4pLWd0Ep51IIapKhiF78WlTmYhaF01wk49LCAfqBx1rtBiVTXU5SgGRMuBoPDhTAc8EbKgM/fd2vrT8uLwOXjulCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 216.228.118.233) smtp.rcpttodomain=davemloft.net smtp.mailfrom=nvidia.com;
- dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
- dkim=none (message not signed); arc=none (0)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ha311tu2p6G8jatH66+b8Z4tfsFTgMsDgy5HdkTlIfU=;
- b=PmZ/6Zlx255FX9KjAqkEqnbd6mcSwtlSS+t8p4zYVTm+WAu9al1hX4RqE7WScgg8/xPujhYda3U6Q3vm6IN/ciEaEwkEA3FZ3lwGGuMGjD4MUsr5a3eocZfjSe/H2G5NFu4G63eCDNPX5FMxz6RznUEMrKHzCwZzf5pJtMA3JXLVkMVhb8WIsD+gebgk6rUc1Kn9MrxpfRdSwIWD298NVVex9dG6xfDR/xwzrCQFt379tbpp9MPH+fbEF1EwTfW/w00GlZy8WUUUUFiSey2+DB5wk+79Rm6AjNBqNh7Rd1PGtZItEFvtpG1j0efVtHh6KJgL3PfBZ56kZ+tnVYacwQ==
-Received: from CY5PR15CA0140.namprd15.prod.outlook.com (2603:10b6:930:67::10)
- by BL3PR12MB6593.namprd12.prod.outlook.com (2603:10b6:208:38c::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Thu, 7 Nov
- 2024 18:36:52 +0000
-Received: from CY4PEPF0000E9D6.namprd05.prod.outlook.com
- (2603:10b6:930:67:cafe::e8) by CY5PR15CA0140.outlook.office365.com
- (2603:10b6:930:67::10) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.20 via Frontend
- Transport; Thu, 7 Nov 2024 18:36:52 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.118.233)
- smtp.mailfrom=nvidia.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=nvidia.com;
-Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
- 216.228.118.233 as permitted sender) receiver=protection.outlook.com;
- client-ip=216.228.118.233; helo=mail.nvidia.com; pr=C
-Received: from mail.nvidia.com (216.228.118.233) by
- CY4PEPF0000E9D6.mail.protection.outlook.com (10.167.241.69) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.17 via Frontend Transport; Thu, 7 Nov 2024 18:36:51 +0000
-Received: from drhqmail201.nvidia.com (10.126.190.180) by mail.nvidia.com
- (10.127.129.6) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1544.4; Thu, 7 Nov 2024
- 10:36:32 -0800
-Received: from drhqmail202.nvidia.com (10.126.190.181) by
- drhqmail201.nvidia.com (10.126.190.180) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 7 Nov 2024 10:36:32 -0800
-Received: from vdi.nvidia.com (10.127.8.10) by mail.nvidia.com
- (10.126.190.181) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 7 Nov 2024 10:36:29 -0800
-From: Tariq Toukan <tariqt@nvidia.com>
-To: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>, "Andrew
- Lunn" <andrew+netdev@lunn.ch>
-CC: <netdev@vger.kernel.org>, Saeed Mahameed <saeedm@nvidia.com>, Gal Pressman
-	<gal@nvidia.com>, Leon Romanovsky <leonro@nvidia.com>, Carolina Jubran
-	<cjubran@nvidia.com>, Tariq Toukan <tariqt@nvidia.com>
-Subject: [PATCH net 7/7] net/mlx5e: Disable loopback self-test on multi-PF netdev
-Date: Thu, 7 Nov 2024 20:35:27 +0200
-Message-ID: <20241107183527.676877-8-tariqt@nvidia.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241107183527.676877-1-tariqt@nvidia.com>
-References: <20241107183527.676877-1-tariqt@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08519216A22
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 18:38:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731004685; cv=none; b=p33biSKWVreqsqrD2YuTFvo8id3RY4CfwUxZre06CKwK48WDjLUfySc3hdRR0jYqsvHdggQo0Biz5LBd6CJ/JSr3OTN0swrpP4FqYrfrxHpHNiP83bXXKnI8bmzURzc5tkGLg2WUiJtCBEiyTIaJ+E9/0FRZkwgMgH9FvquBUUg=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731004685; c=relaxed/simple;
+	bh=j4z+Fns8x9ZZVL7xS5DhZmq8fKl1pJ7ijpiGLozCkeo=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=ZhvYcut3q4ZHr/cG8khdw/kBQHDHEBAqRzb7zLa+5HAJzDxR21UAVK99T+k/W6WXLWVstAvNgeXf7ewSdWeVu2EGeOF7y7Wvai2Dk4QziMuKDzdrc1sydM9lFzmFhorEYhIGSS8PojRC58Y8tkXfks3j3HY1T4nTIgvqdU6SbSY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=LE6J9HCj; arc=none smtp.client-ip=209.85.210.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-71e3fce4a60so1024714b3a.0
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 10:38:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1731004682; x=1731609482; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+nx6djZ5SW0rcyyK+GjNT99EYEl5ledvAgIxQlMh88k=;
+        b=LE6J9HCjGqgHMMMvvo5aTblD2kOKBVuRYysJMvxtdrnt6kL+UHaxr81YrYzqMjChpB
+         8xapE8rXsz2FVP48aQtu6bN4k68feZUGKOR/6WnPy1CfmkgSZat0gwapjr0nabIdDTzv
+         cbwmOgUutnzIC8RnvMLdsY2YQ6d5N5IxXQMgs=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731004682; x=1731609482;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+nx6djZ5SW0rcyyK+GjNT99EYEl5ledvAgIxQlMh88k=;
+        b=iL0JxH6KpiPdhxjeXGrH2Iy9RMOFy0abwFGh8Jhv2YCwkAfZlu27Z61hSraIYSzG/w
+         N8Q0EsSIZ2eHZos+ZUXPRe35ErhZ6e+/toNukNAkCk7UWSB5hR+sY4bW6xKSa7qAjOWC
+         pHg6gjkRMO+oqlRrAxWLNnE6dcn/0G/2I3t9hBwcoxntmHa3ETeMPfM/XCcay0JHfc92
+         dhn00/gdhhOK3j/FXXfxMU974xRoYgaapj9RUWv8IrRw0Bu3cbiwZcFWCk2UvlQzke54
+         ZipcaCGWShHIU9Zpr7j0yllG2XUS+7+8CZWWpmIo4hBQ88TbvzFTi7nL7mmKV3kgNXTA
+         TM+A==
+X-Gm-Message-State: AOJu0YwF+qqAuDm6KKelsnYtTQxuo5Zw7RK7esk0fpQEpW1DyOlCCDKr
+	cg9cpeTsvk0DdcsIu07nxfYEwTwAkF0JLvQCcgM7XodJYoNZro9VpNYaMdhx6jA=
+X-Google-Smtp-Source: AGHT+IHhHxSSqRq54/0JItZrfLUArZzwi5lhSJ/n5p0OufOKDk5pu//5I6H8GvaQnvaUGwoH8n2MsA==
+X-Received: by 2002:a05:6a00:c96:b0:71e:3b8:666f with SMTP id d2e1a72fcca58-724132cc143mr119723b3a.11.1731004682204;
+        Thu, 07 Nov 2024 10:38:02 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078ab561sm1918711b3a.71.2024.11.07.10.38.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 10:38:01 -0800 (PST)
+Date: Thu, 7 Nov 2024 10:37:59 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Stanislav Fomichev <sdf@fomichev.me>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+Subject: Re: [PATCH net-next v8 12/12] selftests: ncdevmem: Add automated test
+Message-ID: <Zy0JB3UxBIm1FZa6@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Stanislav Fomichev <sdf@fomichev.me>, netdev@vger.kernel.org,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org, andrew+netdev@lunn.ch,
+	shuah@kernel.org, horms@kernel.org, almasrymina@google.com,
+	willemb@google.com, petrm@nvidia.com
+References: <20241107181211.3934153-1-sdf@fomichev.me>
+ <20241107181211.3934153-13-sdf@fomichev.me>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-NV-OnPremToCloud: ExternallySecured
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY4PEPF0000E9D6:EE_|BL3PR12MB6593:EE_
-X-MS-Office365-Filtering-Correlation-Id: ecaaa9df-e2e8-4fe1-2f26-08dcff5b258b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam:
-	BCL:0;ARA:13230040|36860700013|82310400026|1800799024|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?us-ascii?Q?0lsYioVimdzP3OeI6pPJYp6oOpfGuR6cRMrEY7gB+Jsg8/TdVUxHWMdxRCg/?=
- =?us-ascii?Q?Zi59c7fHa507Bzxr45Py82p/9ukqo6dB4NjHN0A6mqd2Bfk2HZMS0VHpJDKX?=
- =?us-ascii?Q?oUBYZOxJDK2qqOCX5yk2hdmQTZ2otnWUDb72YW3pqJKYebUNykLzxKUSYsUp?=
- =?us-ascii?Q?w6DqNvkvyStFymHy5dWu9G8tWhiFLd0jlepjISe+gk9daNgKCj3drp9a3gU6?=
- =?us-ascii?Q?5cUOqaVi9bz0LFASSL0hVc4B1Kk2asKtJn+LpRVgDAE7uCsWOUdZTO6doTwv?=
- =?us-ascii?Q?QbMWn36JZ1DpSKpOMeTXGBqvg0yPoDbzElsygqb++Y38gajzk5qHvrbkKdHG?=
- =?us-ascii?Q?0qAkn9N/KHcW8bysD18mPOdAe5RVYETw7ln4k0a6/7lxF9hoN0Nv9GvVMQUI?=
- =?us-ascii?Q?T+qwDH6PBfiSCgJULB3B4S/gBw87ENeAt3/vjOD2eBAptYdMjGjAAey3YKQC?=
- =?us-ascii?Q?NcbRwCCSfIU+9dQWH4SbngfhXCwDbm/QasPTZj8QCDQiub+TWg0n/ROhIlVM?=
- =?us-ascii?Q?r4jz4e2FYaOZZX2C6iQYo5Df5tXxSnuX1f05le33GoDb5zHAWUKNj9lc/cim?=
- =?us-ascii?Q?xUJpUNh89X6uVKc0sfop0qv1a6L4PZRqGkI7RyWX/XGBXGUMgRGcmfR3YQ7L?=
- =?us-ascii?Q?XAhogzeZxVGGbORSP0uBxqtZWjg9Li5DdjQXlH67mZQUx9fa1AUX8MoPWdy4?=
- =?us-ascii?Q?AfDuhkZCxzDjXnzuyHWJ4MlctylTQkz8rIMbKZXAJ64TtMxxdv8B1atp6sCx?=
- =?us-ascii?Q?zwtbPFILTXRwsgUU3arUeGyFER2VFkIT7awCXFtRR63G4denD+7AB+T00S0F?=
- =?us-ascii?Q?cDzVKOog/Tv8WhyScN6IgWfbPfeWhPPQabrouRqDXR6kehFYt1yH5RSaQJAD?=
- =?us-ascii?Q?lKdIwxzc9gFZ4Jx+CrXafiid+/HrXCR2GKcE2aEPUWXtOA7drcej6jgnkP7T?=
- =?us-ascii?Q?L4RWj2D1IuUYLMC8ypE0T91RWcYgXk79PabZsH+qxy/WjKfmGrFY5y9/bWEi?=
- =?us-ascii?Q?6axdMqJ3jpPXplcDi98yiwOkjPr41Lw/zPk8UoewX8CEO1t0xYUDAFBzuKVj?=
- =?us-ascii?Q?54BUxyB+uuHHujmAbtcK/ElE3gTOuGt5b2KSYWtP37+IaUT9VISr6jObZAou?=
- =?us-ascii?Q?SRvSZxxzCyZNIcx4h7AEhWUCZAvcUOQGSCOo4L7Q81RDMP9EWt1e7D+6JdWn?=
- =?us-ascii?Q?gKSkaMcl/UZojm/NWDsj3rsqNUaVX/fX2HtEuMbQG+UwWQXYRIWEzNlHekzm?=
- =?us-ascii?Q?RCULJghXFnZxNC9nId5OoMlwc6KVxNW5zrslc+06etuuX+DgiRd5bLnTLToz?=
- =?us-ascii?Q?+nd3O0SOPzxIpBz0B5AfW5GezUGlcpMo8blFHH6QJ/rqcuFb2h0mAcVK2Y44?=
- =?us-ascii?Q?9061u89b4x8JWo9ELqlnGA9Lre/N87s4Z6qpQJP/032utdYDGw=3D=3D?=
-X-Forefront-Antispam-Report:
-	CIP:216.228.118.233;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc7edge2.nvidia.com;CAT:NONE;SFS:(13230040)(36860700013)(82310400026)(1800799024)(376014);DIR:OUT;SFP:1101;
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Nov 2024 18:36:51.5659
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ecaaa9df-e2e8-4fe1-2f26-08dcff5b258b
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.118.233];Helo=[mail.nvidia.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	CY4PEPF0000E9D6.namprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR12MB6593
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107181211.3934153-13-sdf@fomichev.me>
 
-From: Carolina Jubran <cjubran@nvidia.com>
+On Thu, Nov 07, 2024 at 10:12:11AM -0800, Stanislav Fomichev wrote:
+> Only RX side for now and small message to test the setup.
+> In the future, we can extend it to TX side and to testing
+> both sides with a couple of megs of data.
+> 
+>   make \
+>   	-C tools/testing/selftests \
+>   	TARGETS="drivers/hw/net" \
+>   	install INSTALL_PATH=~/tmp/ksft
+> 
+>   scp ~/tmp/ksft ${HOST}:
+>   scp ~/tmp/ksft ${PEER}:
+> 
+>   cfg+="NETIF=${DEV}\n"
+>   cfg+="LOCAL_V6=${HOST_IP}\n"
+>   cfg+="REMOTE_V6=${PEER_IP}\n"
+>   cfg+="REMOTE_TYPE=ssh\n"
+>   cfg+="REMOTE_ARGS=root@${PEER}\n"
+> 
+>   echo -e "$cfg" | ssh root@${HOST} "cat > ksft/drivers/net/net.config"
+>   ssh root@${HOST} "cd ksft && ./run_kselftest.sh -t drivers/net:devmem.py"
+> 
+> Reviewed-by: Mina Almasry <almasrymina@google.com>
+> Signed-off-by: Stanislav Fomichev <sdf@fomichev.me>
+> ---
+>  .../testing/selftests/drivers/net/hw/Makefile |  1 +
+>  .../selftests/drivers/net/hw/devmem.py        | 45 +++++++++++++++++++
+>  2 files changed, 46 insertions(+)
+>  create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
 
-In Multi-PF (Socket Direct) configurations, when a loopback packet is
-sent through one of the secondary devices, it will always be received
-on the primary device. This causes the loopback layer to fail in
-identifying the loopback packet as the devices are different.
+I'm not a python expert, but the changes make sense to me.
 
-To avoid false test failures, disable the loopback self-test in
-Multi-PF configurations.
-
-Fixes: ed29705e4ed1 ("net/mlx5: Enable SD feature")
-Signed-off-by: Carolina Jubran <cjubran@nvidia.com>
-Signed-off-by: Tariq Toukan <tariqt@nvidia.com>
----
- drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c | 4 ++++
- 1 file changed, 4 insertions(+)
-
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c b/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
-index 5bf8318cc48b..1d60465cc2ca 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_selftest.c
-@@ -36,6 +36,7 @@
- #include "en.h"
- #include "en/port.h"
- #include "eswitch.h"
-+#include "lib/mlx5.h"
- 
- static int mlx5e_test_health_info(struct mlx5e_priv *priv)
- {
-@@ -247,6 +248,9 @@ static int mlx5e_cond_loopback(struct mlx5e_priv *priv)
- 	if (is_mdev_switchdev_mode(priv->mdev))
- 		return -EOPNOTSUPP;
- 
-+	if (mlx5_get_sd(priv->mdev))
-+		return -EOPNOTSUPP;
-+
- 	return 0;
- }
- 
--- 
-2.44.0
-
+Reviewed-by: Joe Damato <jdamato@fastly.com>
 
