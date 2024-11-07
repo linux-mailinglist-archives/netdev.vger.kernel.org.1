@@ -1,95 +1,121 @@
-Return-Path: <netdev+bounces-142949-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142951-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A6B89C0C01
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:54:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3EC9C0C06
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:54:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01ED61F226F3
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:54:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F374B283A38
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:54:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19C6A215F4D;
-	Thu,  7 Nov 2024 16:54:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5D8F21620D;
+	Thu,  7 Nov 2024 16:54:33 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="g1cRntnZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="guuUxMAb"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f50.google.com (mail-ed1-f50.google.com [209.85.208.50])
+Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634E01DF273
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 16:53:58 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.50
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 002351BD007;
+	Thu,  7 Nov 2024 16:54:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730998440; cv=none; b=JM7HDvrpPoucUGCY6gu8xDHL1+2X0K9fcniRMtte+QrJNbTfYYTBY6I/wjEi244ENS8wUYZXBXy8va+F5OSHgvMlN8IwtRSg6+vszB49QJk1Hqa+Y6e2tnOEsMcvomsMmEGr8tzGNpXTyULfL1w4VHjrfpvWy8pbt3Sx3Pejbe0=
+	t=1730998473; cv=none; b=mHYJ/q0jpu2ULc+PWJnOEWEwf44kaWdCSoMSUTFgMZOzT7UUVt63En6CPoSMOXAqlbE9gNZo2a2RSTBNNpcoHi9QhKkS8xABHcvtRM58qj1+vq5Hr8McgdnPp45VQju9cfMuxtStXc6vskv2Grdd+dW3rpd6AqgaljOgoIaQnhQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730998440; c=relaxed/simple;
-	bh=wk2nOWwbYWifXbTxbWhgnDz6Oorh/sA0zXKSsliwhg8=;
+	s=arc-20240116; t=1730998473; c=relaxed/simple;
+	bh=YjR9XgoTaD6j/UmnPPlZ7iV9/VGfZG8Hi/1ZKtVLbcw=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=SbE9UoqoFAuvx+prQj8cw23DATcKvWzuHDNRwI34cTGolq4yG774XwrbXGqWfBv39+qYIVuJGrNgntov9Ey3OnLDZyVhogfahBpBk9bEv0UV1W7rj4rmW64Tsx8i+pXhxdzhcgfsQVIM+t9TrnUjp6P5qKbIT3DV2/ZZV/BMOG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=g1cRntnZ; arc=none smtp.client-ip=209.85.208.50
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f50.google.com with SMTP id 4fb4d7f45d1cf-5cf0810f5f9so323550a12.0
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 08:53:58 -0800 (PST)
+	 To:Cc:Content-Type; b=ruR6krTRpO+zws58Cnow/vxXNYVqB6m1gthw+4wX2+p9/KTMMLqXvcUcu6ovSFcB1w4IkwSkvudKHosO+dGfajMYUhhMHlIXhL10WgR5w70B9jBQbODuK1uADszSI9ZeOXZwnCloTJSalg+49v2/Tl/BFoe1MmtiyCFU2baujc0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=guuUxMAb; arc=none smtp.client-ip=209.85.221.51
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-37d6a2aa748so725073f8f.1;
+        Thu, 07 Nov 2024 08:54:31 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730998437; x=1731603237; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1730998470; x=1731603270; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wk2nOWwbYWifXbTxbWhgnDz6Oorh/sA0zXKSsliwhg8=;
-        b=g1cRntnZfBFrlZ1qeDeSyidR3AZm6o2FUmHZK9mYskSxlrHNc4ZA4wLhsgg103sPOC
-         w35gIZzz2bvEZbhHe7B9B7WYg1xBnmhhHsyzwvfcN1zsrzFCM0s5L0Kt3bwGbrMBvkNr
-         FrAdM6RSGe83YzQdWaYVimYndJxsPvPhnoN/ureibQ1PXIxwaPim+EZU1AuUc/bF1djU
-         8VSrJgsBIcnFOaZKLOu1OufBA7wjjtOa8brfNfKdj9ANBFSNA9a3sn8X/Wcl+A7t/nTM
-         4VdhC007IWhbmVIHRSoziKfDV8dGRNUHcFhKnCPFYtCIaYJT8TjLJw2AiDiXokv3bn4H
-         KeYg==
+        bh=YjR9XgoTaD6j/UmnPPlZ7iV9/VGfZG8Hi/1ZKtVLbcw=;
+        b=guuUxMAbZ/fZBhVXjph1XsOVGgPFRLIunKP9beqA0Q9j7CyVvXw60LZYPYn/CtjHTt
+         XB1IjQSzo6eMIsAAF4XYJw07bCv/X+xr2JzmNUlAQ+lNI6EaZckXYouVByP0R0tnwUmI
+         9hYa0q7tovX4Ic03dwckue7oLgObLO1lP5JR7iQhFgn71JS4LNjpG2haFOqHXKM0ZByZ
+         hsfhEKFzguvw6VHwjHjwQA7TdxPpNMzr8K+JwJIrMfYstpj2rfNnbkNBZDg6DOiXxByB
+         wXqvi+vcD2/FZp5VDPOKfUV/jZUz4UFSu6UjCoZStbVixlBEMWeEx9bkS96Ass5iY+MG
+         UdvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730998437; x=1731603237;
+        d=1e100.net; s=20230601; t=1730998470; x=1731603270;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=wk2nOWwbYWifXbTxbWhgnDz6Oorh/sA0zXKSsliwhg8=;
-        b=s9pVuApOv9/EZwQtySdS55dRgsm7pryI3/+Fjo67w55aOzCEpXb+ZSYOquSMukZzsJ
-         J/sGlVvSbN9AvYxHRegN5LtpG4mNFV0hWibi1hQ8hhfNIa/ZRarpg5MG9FlO6Y6nWb1I
-         TpP2texPirjIUNAlYEhuDSh8Zj6xecLxCEFMWUMxhKstqtqRSZfYlFe8EyoifRU6y/rA
-         7nR57pdXI5bL9lTshlIixko+g+JoHBjQ3pw6igyPZxVqFwpnRGwpQKq9PHLtzPGh35Ap
-         XroWpe6E7fvtnZotPZLLxDeQul+2qoviCngRex0nW/Du5q6vEdRr4JP0n7u8TKUsx0Mr
-         EE1Q==
-X-Gm-Message-State: AOJu0YyADKdKfDLXJNa20VDNWiad7tjtXM3gM0fsPFzWW2NVsJ8H4/4f
-	SthYJ980J2DOd9G56SNTSI905NR0Ari5qXvNmrb8OJ47oWt+zNDDeM7JE9JrHM9ykDdxgIFnFyr
-	WCR0Tx+R2J0qhlpI6MEsSbDyHYFfCGMhFvmgn
-X-Google-Smtp-Source: AGHT+IFo8oy+eb/d0y+EGphpxXBEYlEvvrL19bBiLp1WZ/gTFgIw+AXiI160TZpqnYlzsXHsEXZXzoMMUCbgg4Uy+/o=
-X-Received: by 2002:a05:6402:1d56:b0:5ce:af08:a2cd with SMTP id
- 4fb4d7f45d1cf-5cf098d044amr83368a12.33.1730998436539; Thu, 07 Nov 2024
- 08:53:56 -0800 (PST)
+        bh=YjR9XgoTaD6j/UmnPPlZ7iV9/VGfZG8Hi/1ZKtVLbcw=;
+        b=Cad2kdeCPciIV7ECDZaaSnp0qDhf3ighY1W23oZnDRtZfO2vu/RztKXIZkgjp5/rwF
+         yfV5FzPpk2qU4QIyu5SfCGJfOrRqRnFnF3M5Y/7D0/kWfMjPhIAnhqxzAeICY2Jw/8qQ
+         EwAery/tihBZnOE5N5geJzEIkxTd3mbQBHCWtHqj24YS9s8ZJMICZu1oO/+kZlk5CUOQ
+         MO1pcObrMm8kBjg8GDZoJnZJ0ak0c9pKxkj2mmJi1YHMDHz70WKHWGcj6Ua22R+yXEQm
+         V0Kni3yL/8zCzJ4ItN7ygG9sjhkwrsapqtIf7W1APjWo5Yt8p4/NFW7INnEERuvWtN3g
+         atwQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUFJad/D8yNnhTaehmL0NXT/Jp036K6mXYoyZcLvpJvQ0sIpsQ+w39jPZk66EC9JEUx8tflAbdA+Kf292fKRxQ=@vger.kernel.org, AJvYcCWpiBV1CS/PXrCBlZm0f50KSDQNHW8oNmlnBhTTkP1cXn9W9MpemO4StgzuBkphiokp45m03JL6@vger.kernel.org
+X-Gm-Message-State: AOJu0YxdphoxSuwj9MAiehL2ScjrdYgyWJp0TGFYhsUj/uOcPW833Ri7
+	+akDrwZBcunMz6+0F4Sr19y0mh5++HpAR5h5bjBb1nmbELO+uIg5qjBINbLgZM7s1B2/xTrG5Rm
+	KF4exMg0i72w3drxtZPsznUL9k/0=
+X-Google-Smtp-Source: AGHT+IFbC+Sb2iP0XOwEMN7bNiSSUnyt16wp7V2RLOlj6Qx5ox4TKWGJWhoIHGCKICdvmlbDEjyuTeJwi+2y2XBLp20=
+X-Received: by 2002:a05:6000:1f8e:b0:37d:3301:9891 with SMTP id
+ ffacd0b85a97d-381c7a4c0e6mr17589877f8f.17.1730998470087; Thu, 07 Nov 2024
+ 08:54:30 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107160444.2913124-1-gnaaman@drivenets.com> <20241107160444.2913124-7-gnaaman@drivenets.com>
-In-Reply-To: <20241107160444.2913124-7-gnaaman@drivenets.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Nov 2024 17:53:45 +0100
-Message-ID: <CANn89i+T-10-CmXiZ4bZ7oUhTfTyB=9G8u4imTTMfpRRpJq3AQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v9 6/6] neighbour: Create netdev->neighbour association
-To: Gilad Naaman <gnaaman@drivenets.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>
+References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-6-shaw.leon@gmail.com>
+ <CANn89iLvC0H+eb1q1c9X6M1Cr296oLTWYyBhqTAyGW_BusHA_A@mail.gmail.com>
+ <CABAhCOS8WUqOsPCzQFcgeJbz-mkEV92OVXaH3E1tFe7=HRiuGg@mail.gmail.com> <20241107075943.78bb160c@kernel.org>
+In-Reply-To: <20241107075943.78bb160c@kernel.org>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Fri, 8 Nov 2024 00:53:55 +0800
+Message-ID: <CABAhCOSvhUZE_FE4xFsOimzVBQpQYLNk51uYNLw+46fibzfM2Q@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/8] net: ip_gre: Add netns_atomic module parameter
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 7, 2024 at 5:05=E2=80=AFPM Gilad Naaman <gnaaman@drivenets.com>=
- wrote:
+On Thu, Nov 7, 2024 at 11:59=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
 >
-> Create a mapping between a netdev and its neighoburs,
-> allowing for much cheaper flushes.
+> On Thu, 7 Nov 2024 22:11:24 +0800 Xiao Liang wrote:
+> > > Instead, add new rtnetlink attributes ?
+> >
+> > It is to control driver behavior at rtnl_ops registration time. I
+> > think rtnetlink
+> > attributes are too late for that, maybe? Can't think of a way other tha=
+n
+> > module parameters or register separate ops. Any suggestions?
 >
-> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
+> Step back from the implementation you have a little, forget that there
+> is a boolean in rtnl_link_ops. User makes a request to spawn an
+> interface, surely a flag inside that request can dictate how the netns
+> attrs are interpreted.
 
-Reviewed-by: Eric Dumazet <edumazet@google.com>
+IMO, this is about driver capability, not about user requests.
+As you've pointed out earlier, probably no one would actually want
+the old behavior whenever the driver supports the new one.
+I added the module parameter just for compatibility, because ip_tunnels
+was not implemented to support src_net properly. Yes it's possible to
+add an extra flag in user request, but I don't think it's a good approach.
+
+BTW, I didn't find what's going on with module parameters, is there
+any documentation?
+
+Thanks.
 
