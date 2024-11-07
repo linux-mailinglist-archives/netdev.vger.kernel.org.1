@@ -1,100 +1,140 @@
-Return-Path: <netdev+bounces-143083-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143084-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id EBBEB9C1152
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:53:16 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C4A99C1169
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:58:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 84899B22BA6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:53:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADA081C21E24
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:58:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 102FA21894E;
-	Thu,  7 Nov 2024 21:52:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423F721893F;
+	Thu,  7 Nov 2024 21:58:17 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="IplPLXIA"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="G6WDAP5x"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D9045218929;
-	Thu,  7 Nov 2024 21:52:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 817BC2170C2
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 21:58:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731016355; cv=none; b=uhVemMbeyDcmRk6ZgREw3bP8mN7GmGEMu27tRa8i3toeOqVq/fvjIIHUbtcxFaDLvrveldq8wjc3ZHl80LV1b+j3L7BcSTvQ7Z6CKNBZt6zrV2bINUyAPJbw8SXiIhUnMVCT5f+Wzgbm0Xpy+ED8L3d2W0WGYUlsOz9NVg1EZNE=
+	t=1731016697; cv=none; b=NINEKtogKkjRON+3+szxmL4IhT3oBBUxQdivSP57nxEW3WApW+fTIonc2cTXRLETqmBKcNE/kfiSXVPXQf6JXBR5/BQbKHTdKxtBJhU4tDE/di4yF+RM9gvTZIYYAn2a2+tr9Xuz9VAi+e7ehpcTsWbZhDGqJY6v9t2Bh9/HRTM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731016355; c=relaxed/simple;
-	bh=p4XepiPlWotLLCpbltRXA5eCLxtJn/9N8T34r+FpzmU=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tHKZctMBfbbsjUPdHdX9EDF5wNDgiknzviHD7RT4wDGJFNdybUF/xvy8dSHx4NQWfx3MUKTdYMf+VzFfstH/GBju0w1lq+m9RaFiH1Ud5Fm1Fg2dIjxAS/V3Cze+ZLvH4qj/s1yBbVUGXvRklue7iX5X+HKBFruDB9PHuL3RKZQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=IplPLXIA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 301A6C4CED2;
-	Thu,  7 Nov 2024 21:52:34 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731016354;
-	bh=p4XepiPlWotLLCpbltRXA5eCLxtJn/9N8T34r+FpzmU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=IplPLXIAkoGRbVp0WqClSi7wzLJybTD1WZvkCKK+N0pQMscqteCyK08P5A7u8ICQv
-	 uSDfpNqYhkPVpa2UpHYH5MUSzLK0nHnLRlw9Y/l0FWSxX7Iv973zyA0sGMpT7w2svW
-	 RQuI8VXnstH/Vuchbc5lcFUwCC8CLOHRYI7Wc+aBVs0vZE+ADtpo9cH0MCMeng0sU3
-	 M78SoXhyaUU7K/+JUOyfDAjw7vAA4LNUtGsG/QBt2iY499Ea6ISZkXpnnUhFptSs0m
-	 KimAJ5AHDB8rBBfyvveaPF6IjoAADigdyT4LzNTVE4/Civ20ip+UvtQkDL17zNRfwT
-	 e6hgqSFZqdx+w==
-Date: Thu, 7 Nov 2024 13:52:33 -0800
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Hyunwoo Kim <v4bel@theori.io>, "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Stefano Garzarella <sgarzare@redhat.com>,
- jasowang@redhat.com, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Simon Horman
- <horms@kernel.org>, linux-hyperv@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org,
- gregkh@linuxfoundation.org, imv4bel@gmail.com
-Subject: Re: [PATCH v2] hv_sock: Initializing vsk->trans to NULL to prevent
- a dangling pointer
-Message-ID: <20241107135233.225de6d6@kernel.org>
-In-Reply-To: <20241107163942-mutt-send-email-mst@kernel.org>
-References: <Zys4hCj61V+mQfX2@v4bel-B760M-AORUS-ELITE-AX>
-	<20241107112942.0921eb65@kernel.org>
-	<20241107163942-mutt-send-email-mst@kernel.org>
+	s=arc-20240116; t=1731016697; c=relaxed/simple;
+	bh=w7LuCUKhAlSmrS1esu0OQs9cG4s0Zn927CxWM/1sREg=;
+	h=Subject:To:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=QEnYGXPU702cAtl05w7t7vxVFrbH+rHcmWTsveXf5TPOptCsPZV5qpggCa24PLKDqRFF7oW0IfQjomke+eXow1f+KKyqsaErXZdN64nKb6DnKB9+M0WjLeuHJi9WfZv3cWUeQDL84kPZvZ7IjfnNchTEMxJrOpmjCfx5aco5/co=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=G6WDAP5x; arc=none smtp.client-ip=209.85.218.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9ec86a67feso244343766b.1
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 13:58:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731016694; x=1731621494; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=igeLCosjgtVuGegz404yihoGIh526FmKMS784SHNGyQ=;
+        b=G6WDAP5xMJ0MJmW7AwYb47K8MyR4SJ68oMAeAj8utFu//DOBDN00vqmI4cMfDydpkZ
+         2WJ1ZL0eWSyr2qNfvDPT0Q7t8WeG+3Kpfx0r3x+mnyS1OYH5S3MJjfEQqwrr7RSocJ+6
+         t9XHii2erDRDahv4CGfD4bMeYzfIXLOOLbvwB+Qw/6i1pAF4pRJNkLHjm5wbUaku1WVT
+         ugx402b0Zo8CK+XcrTmVPpxz8RlL7s57viDyMg/D/y2ZbA28GJJNN7TZqhQptd2kJ8dc
+         8SlQoJ+vz/IFWjBShGKD3lsjNfRvgKG+itB70lR3nFyeqz+72nPHzJYtw0Y+zbvwidWF
+         TaSA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731016694; x=1731621494;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=igeLCosjgtVuGegz404yihoGIh526FmKMS784SHNGyQ=;
+        b=qMLZf7B8/m5i0kXZjFDtYudfG2yL9Bl7CwcWRokDsygf1ljkzuQvn6AtH7uzmnDdPv
+         /WV53I1nLxnIqVT+qTxqULnBmhPMTOUNGjKZsKszfT++g4+8RMo8/3O09TnPj76u6Tbm
+         H3Q6RDTj+yKzlKbaAKwsafVJttxIDLoKWm2oKL7SF9ublxKP25CTkDMlcgREc0vCNPWs
+         VPLgZ9Qz6cp7g4tbBmmGz+SIiojnUzWTXTUGl2n6tQO4qisJ1ku/M7tdNpel6NSzchwO
+         tbui3fOQWCHM97P91soZD8FByVrpxT80mS/jBzOKlNpaYZxYvlk+281vhcBTeWfvts7P
+         0b+g==
+X-Forwarded-Encrypted: i=1; AJvYcCWwc+/jio4pfF8aK3pX09k/oEDs2r3Yic0a4oRNjzWRL2rp5RAQ4FMgAU2rMNqiThZ+KFYDcFs=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxv2mT+vSEtab58zRTxJznh0f4CVyZfFEHC1jo3hBLKwTxM8awN
+	kjnSXwf3TqbbFPg4uyIQRCmYQnHkeV9wq7zI4B6CS141HDjuMS/9Go6Zqg==
+X-Google-Smtp-Source: AGHT+IHNDJxtGlgK/48XOhosAT0vx1xxapOqB5fhaJs+q0CKIrcBCS3t89NvUmrpgU7XS1BSFaaDQw==
+X-Received: by 2002:a17:907:2d11:b0:a9a:161:8da4 with SMTP id a640c23a62f3a-a9ef004b241mr34569666b.55.1731016693505;
+        Thu, 07 Nov 2024 13:58:13 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0dc4c55sm147063466b.130.2024.11.07.13.58.11
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Nov 2024 13:58:12 -0800 (PST)
+Subject: Re: [PATCH net-next 01/12] net: homa: define user-visible API for
+ Homa
+To: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+References: <20241028213541.1529-1-ouster@cs.stanford.edu>
+ <20241028213541.1529-2-ouster@cs.stanford.edu>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <174d72f1-6636-538a-72d2-fd20f9c4cbd0@gmail.com>
+Date: Thu, 7 Nov 2024 21:58:11 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
+In-Reply-To: <20241028213541.1529-2-ouster@cs.stanford.edu>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
 
-On Thu, 7 Nov 2024 16:41:02 -0500 Michael S. Tsirkin wrote:
-> On Thu, Nov 07, 2024 at 11:29:42AM -0800, Jakub Kicinski wrote:
-> > On Wed, 6 Nov 2024 04:36:04 -0500 Hyunwoo Kim wrote:  
-> > > When hvs is released, there is a possibility that vsk->trans may not
-> > > be initialized to NULL, which could lead to a dangling pointer.
-> > > This issue is resolved by initializing vsk->trans to NULL.
-> > > 
-> > > Fixes: ae0078fcf0a5 ("hv_sock: implements Hyper-V transport for Virtual Sockets (AF_VSOCK)")
-> > > Cc: stable@vger.kernel.org  
-> > 
-> > I don't see the v1 on netdev@, nor a link to it in the change log
-> > so I may be missing the context, but the commit message is a bit
-> > sparse.
-> > 
-> > The stable and Fixes tags indicate this is a fix. But the commit
-> > message reads like currently no such crash is observed, quote:
-> > 
-> >                           which could lead to a dangling pointer.
-> >                                 ^^^^^
-> >                                      ?
-> > 
-> > Could someone clarify?  
+On 28/10/2024 21:35, John Ousterhout wrote:
+> Note: for man pages, see the Homa Wiki at:
+> https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
 > 
-> I think it's just an accent, in certain languages/cultures expressing
-> uncertainty is considered polite. Should be "can".
+> Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
+...
+> +/**
+> + * Holds either an IPv4 or IPv6 address (smaller and easier to use than
+> + * sockaddr_storage).
+> + */
+> +union sockaddr_in_union {
+> +	struct sockaddr sa;
+> +	struct sockaddr_in in4;
+> +	struct sockaddr_in6 in6;
+> +};
 
-You're probably right, the issue perhaps isn't the phrasing as much 
-as the lack of pointing out the code path in which the dangling pointer
-would be deferenced.  Hyunwoo Kim, can you provide one?
+Are there fundamental reasons why Homa can only run over IP and not
+ other L3 networks?  Or performance measurements showing that the
+ cost of using sockaddr_storage is excessive?
+Otherwise, baking this into the uAPI seems unwise.
+
+> +	/**
+> +	 * @error_addr: the address of the peer is stored here when available.
+> +	 * This field is different from the msg_name field in struct msghdr
+> +	 * in that the msg_name field isn't set after errors. This field will
+> +	 * always be set when peer information is available, which includes
+> +	 * some error cases.
+> +	 */
+> +	union sockaddr_in_union peer_addr;
+
+Member name (peer_addr) doesn't match the kerneldoc (@error_addr).
+
+> +int     homa_send(int sockfd, const void *message_buf,
+> +		  size_t length, const union sockaddr_in_union *dest_addr,
+> +		  uint64_t *id, uint64_t completion_cookie);
+> +int     homa_sendv(int sockfd, const struct iovec *iov,
+> +		   int iovcnt, const union sockaddr_in_union *dest_addr,
+> +		   uint64_t *id, uint64_t completion_cookie);
+> +ssize_t homa_reply(int sockfd, const void *message_buf,
+> +		   size_t length, const union sockaddr_in_union *dest_addr,
+> +		   uint64_t id);
+> +ssize_t homa_replyv(int sockfd, const struct iovec *iov,
+> +		    int iovcnt, const union sockaddr_in_union *dest_addr,
+> +		    uint64_t id);
+
+I don't think these belong in here.  They seem to be userland
+ library functions which wrap the sendmsg syscall, and as far as
+ I can tell the definitions corresponding to these prototypes do
+ not appear in the patch series.
 
