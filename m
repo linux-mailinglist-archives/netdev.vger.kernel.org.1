@@ -1,144 +1,118 @@
-Return-Path: <netdev+bounces-142999-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143000-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB9E19C0DD8
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:31:48 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 988BF9C0DDC
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:35:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DCF151C22FC9
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:31:47 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 18880B22BBF
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:35:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 851432170AD;
-	Thu,  7 Nov 2024 18:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE93E216443;
+	Thu,  7 Nov 2024 18:34:55 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b="I3mmtVAr"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="jSUkStWt"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-yb1-f226.google.com (mail-yb1-f226.google.com [209.85.219.226])
+Received: from mail-yb1-f202.google.com (mail-yb1-f202.google.com [209.85.219.202])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C62EB1DB350
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 18:31:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.226
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FB21194A52
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 18:34:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731004303; cv=none; b=ZcWW4kR6o41I5bc7ic/TT6HwhubaLWjsjiY8TXUsWKq2PugQzRUmr0dApbAeEdI3yNJKx6THx4+/O7TaNnMa89Wse2C1feY9eOSqElcYfI4omTfHwW5Rm6sgOZWLJnm1fbAlGg9+ILqLVQntdeD1McH2fJIv/zrdMFvlXjc7uKQ=
+	t=1731004495; cv=none; b=VRUo3oG0RvlNVcL+dZjm7aMyXYPmqMjqotQfBEI1odAVe3naprv6szwafsyWfWhCM6dMEjyjG22sjtmlVwIBkAzsiBKc1ml3cu28mmbbeLT8xlxAzv+iglD16XUQLlkYu42EIbN0w7jnnGsu20jQgxPqxxcM6em75rCjfaOcxN4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731004303; c=relaxed/simple;
-	bh=vb2oy9sCtacw/TXgOT7kaZXJblOW4SHOKBYJ4mHT4RA=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=M14msTHTy+UEMiWZ9bAkvOQzV+0drfAoJULbHi4rCkAZsJ85AD+pnWjUjiiy7HR/Tm0t696kXxe6IkFHwMR32GjQf7eQ27zlWY3a8y9DY8d4Xk6z5ea1/d6qMV2oHpxQf9f1p5k2qhzq9/uvuTOYuKiclS6nebWu3JrpYOq7KnY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com; spf=fail smtp.mailfrom=purestorage.com; dkim=pass (2048-bit key) header.d=purestorage.com header.i=@purestorage.com header.b=I3mmtVAr; arc=none smtp.client-ip=209.85.219.226
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=purestorage.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=purestorage.com
-Received: by mail-yb1-f226.google.com with SMTP id 3f1490d57ef6-e2bd1bbaf03so198323276.2
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 10:31:40 -0800 (PST)
+	s=arc-20240116; t=1731004495; c=relaxed/simple;
+	bh=x3Hue5Jr3BEWlql6LAsAjH+PurZFdaVhPDfK9DjOcEg=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=VTkd5KOC+AaQslg3alAMH4S1mFISfwO5EgpZuZKN+4KGH3wKFjHz1JNCCDLpGtQTFkfQTIwtIRwa7FSllEGPpkS4RuMcXnNGg3W53c3xnaM9fxjKQjUpbguPLJ3yyLaQoozl8DrhNqjns6csVPG1d4DHGsjExoKpVV1s0EsRYVc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=jSUkStWt; arc=none smtp.client-ip=209.85.219.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--jeroendb.bounces.google.com
+Received: by mail-yb1-f202.google.com with SMTP id 3f1490d57ef6-e30df8dbfd4so2663159276.0
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 10:34:54 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=purestorage.com; s=google2022; t=1731004300; x=1731609100; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Up78lUxvH9q9ucvQFWkY0ZlRiNJvCC25wLA/XPV5mzI=;
-        b=I3mmtVArg5JiIGWdM+enyHGpiKuFJDKGMIktw3AlQmIUH1S8IVBI/zgzShqmIqnOHz
-         1RBDam4e8K375p17dFf8xb2mdEu0nQ/CkWiaTtadnxqwNMD3+PWNkdvJfKKc6M1FY22L
-         JRAja/HNNfBvXMiAN3vWCx6/rrgatMmyaQVeHh03xA59lCMxMz4kNHu8YwQIUzRQSjhD
-         ZiDJYrq8pud9gvMGRjzYJsA+tAint2QByUDnPKblFesSaNGCVTv8RZenJQPDAsa59v4D
-         POVQyAVNJDuBrUiRkiVSVylpW/cT4wydGh6Uqf05+tLp7vQQM0dZbTIgj4mnAkXTsg2M
-         SC6g==
+        d=google.com; s=20230601; t=1731004493; x=1731609293; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nmEBU3YeKw/iHBk5W+DIb15XVTngg+/xscNH9lNBj4E=;
+        b=jSUkStWtiWeqigntVDDA9ZIoJiNzh2KggkaLnLFbujvIrmoRl3+zqLCFYE4wvUIVR6
+         /4SgcPUckrKsgqkG9xC8oWIZIZS4NlcOaYs+MvMGQLjnkuD3aJIeHqfZVhWT9ZpXtbny
+         zSSGL7j0wrcZpTCrWhmDh+4Mb5cwn8aWNoNeCba8nR3fKwsFRgo91n/hJtiH07WMQfXo
+         5+8EVfu71b/3qHfLSym94jraLEvCxrwCzOC2B1uh4OJIUYkLK+vWUvHg1OnJugrtagQb
+         MTXVeR5yyQnl3IWjYQB2FWumxpAu9CYm61PSCy6iXXCsM45TEZBZO9q52VQwx7R9DEOL
+         xv/A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731004300; x=1731609100;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Up78lUxvH9q9ucvQFWkY0ZlRiNJvCC25wLA/XPV5mzI=;
-        b=p/4SsZX9tejyoOZCR4rhtSpMN8m1iJgrH09J88oMhaEFS5cuy8TEZnsiB0tinvzGN3
-         hOeKREFiSv4L1H3q7MoxQ+8thCtcFEFar+BaQf9XKYcXriwYZvemZBHvXbu/XlHrdTkF
-         z/eQUtM8nyx8dabNtACqZawd9PnSAh/r1H7nbGEv8r2IynB3dNlrvH1oabldBenshSjP
-         4tKi59cUddh8Tfo9iLOoQWl44ieyhI5Wo8tXS9Qp8JZysduEQ0/4QInoqvrYVBu+HgKz
-         BKuN4eXKz9kWaR0cJb4yNTnusMCGblIrtlPn8Y2jnY4cpwmOxT9iO8+W7N6j6FNHMPww
-         ruIA==
-X-Forwarded-Encrypted: i=1; AJvYcCU1i30HSV+Wl479vkrFdZSWKii8b7ztOaPOHEbtPRMMv5sVO7FckjOzwkLgEi21MikSRLo1NtI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yzgi5wErWPwSX+EaUpPYmBCJox6C2y6OfwXnGPytYPo+rlXdbp/
-	7OkdTaIHqvTjYrEFLRJtzDgE02Kf7WE66AjnEaOplO39k6ypFRI+XKOJUl76jBKYlt4D28xDOyE
-	YRUafWbZx3MQSGSZwdhRCXZf8KVsj6VPG
-X-Google-Smtp-Source: AGHT+IHkNn1fUaPKRrk4GNrGShUQeVPPntfaW5wXlnQMhTdZSLEcd0EO6uh8H27y5Qp0Bw5n86Lhjh9hr0bz
-X-Received: by 2002:a05:690c:6f05:b0:6e7:32a5:6566 with SMTP id 00721157ae682-6eadae3316cmr5535257b3.4.1731004299727;
-        Thu, 07 Nov 2024 10:31:39 -0800 (PST)
-Received: from c7-smtp-2023.dev.purestorage.com ([208.88.159.128])
-        by smtp-relay.gmail.com with ESMTPS id 00721157ae682-6eace8f1da7sm1104997b3.19.2024.11.07.10.31.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 10:31:39 -0800 (PST)
-X-Relaying-Domain: purestorage.com
-Received: from dev-csander.dev.purestorage.com (dev-csander.dev.purestorage.com [10.7.70.37])
-	by c7-smtp-2023.dev.purestorage.com (Postfix) with ESMTP id 1FF783401E5;
-	Thu,  7 Nov 2024 11:31:38 -0700 (MST)
-Received: by dev-csander.dev.purestorage.com (Postfix, from userid 1557716354)
-	id 2D9ABE40DC8; Thu,  7 Nov 2024 11:31:08 -0700 (MST)
-From: Caleb Sander Mateos <csander@purestorage.com>
-To: Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Parav Pandit <parav@nvidia.com>,
-	Caleb Sander Mateos <csander@purestorage.com>,
-	netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v2 2/2] mlx5/core: deduplicate {mlx5_,}eq_update_ci()
-Date: Thu,  7 Nov 2024 11:30:52 -0700
-Message-ID: <20241107183054.2443218-2-csander@purestorage.com>
-X-Mailer: git-send-email 2.45.2
-In-Reply-To: <20241107183054.2443218-1-csander@purestorage.com>
-References: <ZyxMsx8o7NtTAWPp@x130>
- <20241107183054.2443218-1-csander@purestorage.com>
+        d=1e100.net; s=20230601; t=1731004493; x=1731609293;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nmEBU3YeKw/iHBk5W+DIb15XVTngg+/xscNH9lNBj4E=;
+        b=hxG09ziBiXdlrSHt8Z6SOhZ5kcPnL680CeQRGj4/J8r+Tly5+0NQ1ILV2GkoM7MZFE
+         Q3XHjX6Y8kUMsWtn5qvIlfALmjor8myWZg28/2ZqpZe6d6lcWFC19jq80MJGasGzPAHp
+         +pOlxI29bFdtbvrz7mRdQGvqZD+bKE0MbEubYNt/fbp6JJ48ROpMRasfkJq9s+LYes2G
+         aWfsauXxNv/DEtfQdqdc6vwk6K5oCUxyKdoxo2qEkl2yhW69Qi/r0hGgxEgAN83c7PA8
+         qY5q70Zry8Cj8LsN40TxuwgpCd/m4/hLrPyjiKIaY1p1CUqc+qXcUOAcJyzOf/iSkFoC
+         XDAw==
+X-Gm-Message-State: AOJu0YzB5md1UJBQkmLWkeiBENc74FeSftAQfKe/7e4Sy/JWG/WJ1jL8
+	zfTVw0v+B1gY8JrzZ/JdGF/7HOZMefJStKlonIoDyxFfkZc3FdkRO+BMqVH8PFcvwBzKe/NY4Eg
+	RG3NDPHY9mhH15wdMfVSMaVhHACeiE7TtRGQQuByktFOfGIVFTjgTOHpJSWD0bhobVVXidkPKoL
+	2rCEzoDQlRftQDc91FbqPz07L94RureJGGogm7ccnvNxg=
+X-Google-Smtp-Source: AGHT+IExrCnTsQKsIbR08ANldMywBPSMtSnN+oCe+Bx1qFn4EZcC5RZUqmu6l55CqDGF+uGcKLG+fyNVEXZ5Rg==
+X-Received: from jeroendb9128802.sea.corp.google.com ([2620:15c:11c:202:dbff:8920:eb2e:2484])
+ (user=jeroendb job=sendgmr) by 2002:a25:c705:0:b0:e03:53a4:1a7 with SMTP id
+ 3f1490d57ef6-e337e46b447mr372276.10.1731004492913; Thu, 07 Nov 2024 10:34:52
+ -0800 (PST)
+Date: Thu,  7 Nov 2024 10:34:31 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
+Message-ID: <20241107183431.1270772-1-jeroendb@google.com>
+Subject: [PATCH net] gve: Flow steering trigger reset only for timeout error
+From: Jeroen de Borst <jeroendb@google.com>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
+	stable@vger.kernel.org, pabeni@redhat.com, jeroendb@google.com, 
+	pkaligineedi@google.com, shailend@google.com, andrew+netdev@lunn.ch, 
+	willemb@google.com, hramamurthy@google.com, ziweixiao@google.com
+Content-Type: text/plain; charset="UTF-8"
 
-The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci(). The
-only additional work done by mlx5_eq_update_ci() is to increment
-eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to avoid
-the duplication.
+From: Ziwei Xiao <ziweixiao@google.com>
 
-Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
+When configuring flow steering rules, the driver is currently going
+through a reset for all errors from the device. Instead, the driver
+should only reset when there's a timeout error from the device.
+
+Fixes: 57718b60df9b ("gve: Add flow steering adminq commands")
+Cc: stable@vger.kernel.org
+Signed-off-by: Ziwei Xiao <ziweixiao@google.com>
+Reviewed-by: Harshitha Ramamurthy <hramamurthy@google.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
- 1 file changed, 1 insertion(+), 8 deletions(-)
+ drivers/net/ethernet/google/gve/gve_adminq.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-index 859dcf09b770..078029c81935 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-@@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct mlx5_eq *eq, u32 cc)
- }
- EXPORT_SYMBOL(mlx5_eq_get_eqe);
+diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
+index e44e8b139633..060e0e674938 100644
+--- a/drivers/net/ethernet/google/gve/gve_adminq.c
++++ b/drivers/net/ethernet/google/gve/gve_adminq.c
+@@ -1248,10 +1248,10 @@ gve_adminq_configure_flow_rule(struct gve_priv *priv,
+ 			sizeof(struct gve_adminq_configure_flow_rule),
+ 			flow_rule_cmd);
  
- void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)
- {
--	__be32 __iomem *addr = eq->doorbell + (arm ? 0 : 2);
--	u32 val;
--
- 	eq->cons_index += cc;
--	val = (eq->cons_index & 0xffffff) | (eq->eqn << 24);
--
--	__raw_writel((__force u32)cpu_to_be32(val), addr);
--	/* We still want ordering, just not swabbing, so add a barrier */
--	wmb();
-+	eq_update_ci(eq, arm);
- }
- EXPORT_SYMBOL(mlx5_eq_update_ci);
+-	if (err) {
++	if (err == -ETIME) {
+ 		dev_err(&priv->pdev->dev, "Timeout to configure the flow rule, trigger reset");
+ 		gve_reset(priv, true);
+-	} else {
++	} else if (!err) {
+ 		priv->flow_rules_cache.rules_cache_synced = false;
+ 	}
  
- static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx)
- {
 -- 
-2.45.2
+2.47.0.277.g8800431eea-goog
 
 
