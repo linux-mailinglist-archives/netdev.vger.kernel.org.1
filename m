@@ -1,188 +1,166 @@
-Return-Path: <netdev+bounces-142681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E6B8A9BFFEF
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:27:20 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id D28AE9BFFF1
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:28:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A61A7282614
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 08:27:19 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 5E6261F226EC
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 08:28:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C0DF1D95BE;
-	Thu,  7 Nov 2024 08:27:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE9241D63F1;
+	Thu,  7 Nov 2024 08:28:19 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WiJrm8mk"
+	dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b="RsVuYFJe"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA51D1D8E10
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 08:27:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.53
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19AFD17DE36
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 08:28:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.158.5
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730968030; cv=none; b=FemT0kHFCHOC+CJlSVbLXqhcwgoo3BCMHjbRtMb86qFPM9uYzTB5DA14ETm3hADon6zfIzFIXfnkZ0ZG3ysK6CUgZZvjRXEkNXdBDQGy2tCXABH/nadz5+JIxLiLKHpSV642l7iOC1NKTrEpgfyVePhtxJ5BfRLz8h8rtLVmy08=
+	t=1730968099; cv=none; b=YS9YFu3Erc9dneRaJiQ1mbV7ujP5o5zZjqJUYj7VGRHH0zzejkt/GZSkIxmmu0YueO284Py01SJQanQXIBJsMyUpmwecqTY1nmtUQth0V93VDCTyAgyb8Jt0wH1hzgI5KkeNjAWuA9/9JoY0FsZDVIjAWNdkhgte8I4VSFSx0AE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730968030; c=relaxed/simple;
-	bh=08nL/hljM++xTEbWQrvIOMYlj5ZnMPIJmkQdlu/fmvA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=TdNsqKN6J6ngGTZ5WE+dALXqpQbYdK6dSgxKsg45rrLVAhxoecmMjyrFD8l7w1M3r3TZlOLZ1CFpjOw6OMzgLs8DJH+fiokgQbaXMUH5Jb0ok5fe2NfkJ/Wn1V48RptlfMir9KR5DaONjDe5X9pROXI1JVkIqeDfPk6Hixzottw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WiJrm8mk; arc=none smtp.client-ip=209.85.166.53
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-83ac05206f6so25025239f.2
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 00:27:08 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730968028; x=1731572828; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1i27eoKmRGm1K6ciR9sekgV335uQNnSFdmjddLNOWP8=;
-        b=WiJrm8mkhBgMtwmWoK2aqvEoNESiRpeiLTxu5aSgaYsHA792wmFRdj5khdxDkN2AYd
-         cLCXzWJifPQLtd5eZZH6G3MX5stcO2QBF3/91u0KkURrl/9kfEe+uePrChTNA96xuBXX
-         +jfqCCJ/FVyAxkOxm8Zm3DFEOK9BMSWDjJjZVAXart4cOL4qDqeA5SVz6O3bwcIRBT0L
-         k4AdlszkjYD8hab64OBbrdEzRh0qtbiZ55B1vC9Hu/TwqkY1e3Ojx8rWF3/VXSATuQSh
-         /B+bsZog/HIgbZijskjcQg0bmECLnxGSYqINya7TC2+WHIfAkzIKnmYhS4Ss9GWGkkLG
-         yS+g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730968028; x=1731572828;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1i27eoKmRGm1K6ciR9sekgV335uQNnSFdmjddLNOWP8=;
-        b=FaucganH5QQhnopGZFHLc7oFM4cG6NIA3+JjG7iOF3Hcb2JiOtM4Sgub3vWOwsx1Ak
-         P82J+F+BX5nMBAAs6q+0Xr0vuBf4Tkf+oTSo81ppKNy6V3YzzTOMwROiA9Gp+MKOyOO3
-         xtpebpuTdvgtjhOEyjDCssb2t84s215CzuQ7kWFJAsbtXgJMhUn6LoOodFgyIDH/s7P+
-         2m10xdY3MOXldNP17N6rPnZdW5KS7a30g45kipHOEgnBntonAbdLd+3+ekfnxqakZKKk
-         D7MNnxeWP9QOAn1rmydBR/OQkqfK1DGhHP1rVnJksgQ6s0bSjcm25cJZMLhFMaHcXL1b
-         91bg==
-X-Forwarded-Encrypted: i=1; AJvYcCXKL48B5YZii036zQeT1jo+ZX353z3yXbrk/H5ZCl0kWCUUee3+rjPzqLrFy6dt6H3+245MsI8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywl1beXPR9NpaGCJDhujASWHlfXV142BvMRMbamr2Wn1/p5Avua
-	Z5r47rqqi3PtyaaIqt6rDfUdVs364uuW5HwcUzgeXOGtlB9ZHG+LsQ1JEH8tnWUYijzo9gO4K3G
-	o5G+sqBKZA3RhZUHOOUdZ8ZrJcrI=
-X-Google-Smtp-Source: AGHT+IGWjhwJ2svaWJWPAHN43+RE8qCY1BVhDLzpJu1gr2kL3gtb2hvHvsuc2ojmkKHSln8KMdnhQZP6z8N/FyZL7Jk=
-X-Received: by 2002:a92:cda4:0:b0:3a5:e250:bba1 with SMTP id
- e9e14a558f8ab-3a6ed11094bmr4191915ab.18.1730968027846; Thu, 07 Nov 2024
- 00:27:07 -0800 (PST)
+	s=arc-20240116; t=1730968099; c=relaxed/simple;
+	bh=vqH5zzpGAYZuQVUPfpKU7gijFnNsYyeu8zpRuaj92vE=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AMvuXHVNDALIS8Sw+ttcsUBQKnU8EZJfOzPwrzgSDj+lXFIf6n719IGcQIMXHX2JxstFPx8eG+DfpRyUFkSqaTfEg0kJICkzEMOfiwTJzkCx8rkXioxLE8YoDU59wDpw+i7tqzzgJOEFc0+ZU7A10CLAcgykmca7fHK5cP7Y6xU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com; spf=pass smtp.mailfrom=linux.ibm.com; dkim=pass (2048-bit key) header.d=ibm.com header.i=@ibm.com header.b=RsVuYFJe; arc=none smtp.client-ip=148.163.158.5
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.ibm.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.ibm.com
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A786p8u015222;
+	Thu, 7 Nov 2024 08:28:11 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=cc
+	:content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pp1; bh=sGWrJp
+	6pHKGOtRavLIm3HxEn4SJ8BT6oMPwwtEvFyJI=; b=RsVuYFJeIJhcswNnWVlkr7
+	uPuhiP4KbIVj9lECSLEi23PIMjn24XgXqPiMv1PBPTqhk6r9K7trHQYG0Y21c/9T
+	iZUIJV1B452i/xMoAo+M7Tniz6NsWormSlxRoB6jFS9+SRz4vrEXaFQN+mA6dFNL
+	XIjufPcKOTNzwztjVAsZRKTfxhbQVMbAQsYEykSOxoRQAMqENGgZPXd507Bm6sJA
+	YkMMaHphTB/pAERDyNJt8WTY46qjCbG8B7J6uJCUzcuEHtx7ogLquerVtNbQV9gb
+	dLv52qaTtnjSzZ7X4x7nVIxsZWiYOftTXHihVd85eR2RFliVXZXgQjCzOh96o0xg
+	==
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rsbx86ye-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 08:28:10 +0000 (GMT)
+Received: from m0356516.ppops.net (m0356516.ppops.net [127.0.0.1])
+	by pps.reinject (8.18.0.8/8.18.0.8) with ESMTP id 4A78SAOX030254;
+	Thu, 7 Nov 2024 08:28:10 GMT
+Received: from ppma21.wdc07v.mail.ibm.com (5b.69.3da9.ip4.static.sl-reverse.com [169.61.105.91])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 42rsbx86y7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 08:28:10 +0000 (GMT)
+Received: from pps.filterd (ppma21.wdc07v.mail.ibm.com [127.0.0.1])
+	by ppma21.wdc07v.mail.ibm.com (8.18.1.2/8.18.1.2) with ESMTP id 4A70d5X2031474;
+	Thu, 7 Nov 2024 08:28:09 GMT
+Received: from smtprelay02.wdc07v.mail.ibm.com ([172.16.1.69])
+	by ppma21.wdc07v.mail.ibm.com (PPS) with ESMTPS id 42nydmqvs6-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 08:28:09 +0000
+Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
+	by smtprelay02.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 4A78S9Nx18875118
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 7 Nov 2024 08:28:09 GMT
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EFDE358056;
+	Thu,  7 Nov 2024 08:28:08 +0000 (GMT)
+Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 646DC58060;
+	Thu,  7 Nov 2024 08:28:07 +0000 (GMT)
+Received: from [9.171.9.213] (unknown [9.171.9.213])
+	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  7 Nov 2024 08:28:07 +0000 (GMT)
+Message-ID: <ac3a7d28-0a0b-413e-8e9c-44b81fbe9121@linux.ibm.com>
+Date: Thu, 7 Nov 2024 09:28:06 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
- <92c1d976-7bb6-49ff-9131-edba30623f76@linux.alibaba.com> <CAL+tcoBZaDhBuSKHzGEqgxkzOazX3K-Vo2=mCdOy+iLp4sPAhg@mail.gmail.com>
- <75708260-7eb4-42fe-9d9b-605f8eef488b@linux.alibaba.com>
-In-Reply-To: <75708260-7eb4-42fe-9d9b-605f8eef488b@linux.alibaba.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Nov 2024 16:26:31 +0800
-Message-ID: <CAL+tcoBA78svT_vTMOLV-pbwKM1o_SDbjs7AAZLhHOtrd8akBg@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: Philo Lu <lulie@linux.alibaba.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net] net/smc: do not leave a dangling sk pointer in
+ __smc_create()
+To: Eric Dumazet <edumazet@google.com>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com,
+        Kuniyuki Iwashima <kuniyu@amazon.com>,
+        Ignat Korchagin
+ <ignat@cloudflare.com>,
+        "D. Wythe" <alibuda@linux.alibaba.com>,
+        Dust Li <dust.li@linux.alibaba.com>
+References: <20241106221922.1544045-1-edumazet@google.com>
+Content-Language: en-US
+From: Wenjia Zhang <wenjia@linux.ibm.com>
+In-Reply-To: <20241106221922.1544045-1-edumazet@google.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: RFs-ticGXD8Ty7gKgA0wqbj5fYxvcEmh
+X-Proofpoint-ORIG-GUID: KEdLEIHuqXf7rxWbChs0xK7nEu2XN5gj
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
+ definitions=2024-10-15_01,2024-10-11_01,2024-09-30_01
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
+ clxscore=1011 suspectscore=0 phishscore=0 spamscore=0 priorityscore=1501
+ impostorscore=0 mlxscore=0 malwarescore=0 bulkscore=0 adultscore=0
+ mlxlogscore=550 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.19.0-2409260000 definitions=main-2411070061
 
-On Thu, Nov 7, 2024 at 4:22=E2=80=AFPM Philo Lu <lulie@linux.alibaba.com> w=
-rote:
->
->
->
-> On 2024/11/7 16:01, Jason Xing wrote:
-> > On Thu, Nov 7, 2024 at 3:51=E2=80=AFPM Philo Lu <lulie@linux.alibaba.co=
-m> wrote:
-> >>
-> >> Hi Jason,
-> >>
-> >> On 2024/11/5 10:55, Jason Xing wrote:
-> >>> From: Jason Xing <kernelxing@tencent.com>
-> >>>
-> >>> We found there are rare chances that some RST packets appear during
-> >>> the shakehands because the timewait socket cannot accept the SYN and
-> >>> doesn't return TCP_TW_SYN in tcp_timewait_state_process().
-> >>>
-> >>> Here is how things happen in production:
-> >>> Time        Client(A)        Server(B)
-> >>> 0s          SYN-->
-> >>> ...
-> >>> 132s                         <-- FIN
-> >>> ...
-> >>> 169s        FIN-->
-> >>> 169s                         <-- ACK
-> >>> 169s        SYN-->
-> >>> 169s                         <-- ACK
-> >>> 169s        RST-->
-> >>> As above picture shows, the two flows have a start time difference
-> >>> of 169 seconds. B starts to send FIN so it will finally enter into
-> >>> TIMEWAIT state. Nearly at the same time A launches a new connection
-> >>> that soon is reset by itself due to receiving a ACK.
-> >>>
-> >>> There are two key checks in tcp_timewait_state_process() when timewai=
-t
-> >>> socket in B receives the SYN packet:
-> >>> 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
-> >>> 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
-> >>>
-> >>> Regarding the first rule, it fails as expected because in the first
-> >>> connection the seq of SYN sent from A is 1892994276, then 169s have
-> >>> passed, the second SYN has 239034613 (caused by overflow of s32).
-> >>>
-> >>> Then how about the second rule?
-> >>> It fails again!
-> >>> Let's take a look at how the tsval comes out:
-> >>> __tcp_transmit_skb()
-> >>>       -> tcp_syn_options()
-> >>>           -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_ts, sk=
-b) + tp->tsoffset;
-> >>> The timestamp depends on two things, one is skb->skb_mstamp_ns, the
-> >>> other is tp->tsoffset. The latter value is fixed, so we don't need
-> >>> to care about it. If both operations (sending FIN and then starting
-> >>> sending SYN) from A happen in 1ms, then the tsval would be the same.
-> >>> It can be clearly seen in the tcpdump log. Notice that the tsval is
-> >>> with millisecond precision.
-> >>>
-> >>> Based on the above analysis, I decided to make a small change to
-> >>> the check in tcp_timewait_state_process() so that the second flow
-> >>> would not fail.
-> >>>
-> >>
-> >> I wonder what a bad result the RST causes. As far as I know, the clien=
-t
-> >> will not close the connect and return. Instead, it re-sends an SYN in
-> >> TCP_TIMEOUT_MIN(2) jiffies (implemented in
-> >> tcp_rcv_synsent_state_process). So the second connection could still b=
-e
-> >> established successfully, at the cost of a bit more delay. Like:
-> >>
-> >>    Time        Client(A)        Server(B)
-> >>    0s          SYN-->
-> >>    ...
-> >>    132s                         <-- FIN
-> >>    ...
-> >>    169s        FIN-->
-> >>    169s                         <-- ACK
-> >>    169s        SYN-->
-> >>    169s                         <-- ACK
-> >>    169s        RST-->
-> >> ~2jiffies    SYN-->
-> >>                                 <-- SYN,ACK
-> >
-> > That's exactly what I meant here :) Originally I didn't expect the
-> > application to relaunch a connection in this case.
->
-> s/application/kernel/, right?
 
-No. Perhaps I didn't make myself clear. If the kernel doesn't silently
-drop the SYN and then send back an ACK, the application has to call
-the connect() syscall again.
 
-> Because the retry is transparent to user
-> applications except the additional latency. I think all of these are
-> finished in a single connect() :)
+On 06.11.24 23:19, Eric Dumazet wrote:
+> Thanks to commit 4bbd360a5084 ("socket: Print pf->create() when
+> it does not clear sock->sk on failure."), syzbot found an issue with AF_SMC:
+> 
+> smc_create must clear sock->sk on failure, family: 43, type: 1, protocol: 0
+>   WARNING: CPU: 0 PID: 5827 at net/socket.c:1565 __sock_create+0x96f/0xa30 net/socket.c:1563
+> Modules linked in:
+> CPU: 0 UID: 0 PID: 5827 Comm: syz-executor259 Not tainted 6.12.0-rc6-next-20241106-syzkaller #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+>   RIP: 0010:__sock_create+0x96f/0xa30 net/socket.c:1563
+> Code: 03 00 74 08 4c 89 e7 e8 4f 3b 85 f8 49 8b 34 24 48 c7 c7 40 89 0c 8d 8b 54 24 04 8b 4c 24 0c 44 8b 44 24 08 e8 32 78 db f7 90 <0f> 0b 90 90 e9 d3 fd ff ff 89 e9 80 e1 07 fe c1 38 c1 0f 8c ee f7
+> RSP: 0018:ffffc90003e4fda0 EFLAGS: 00010246
+> RAX: 099c6f938c7f4700 RBX: 1ffffffff1a595fd RCX: ffff888034823c00
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: 00000000ffffffe9 R08: ffffffff81567052 R09: 1ffff920007c9f50
+> R10: dffffc0000000000 R11: fffff520007c9f51 R12: ffffffff8d2cafe8
+> R13: 1ffffffff1a595fe R14: ffffffff9a789c40 R15: ffff8880764298c0
+> FS:  000055557b518380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+> CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 00007fa62ff43225 CR3: 0000000031628000 CR4: 00000000003526f0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+>   <TASK>
+>    sock_create net/socket.c:1616 [inline]
+>    __sys_socket_create net/socket.c:1653 [inline]
+>    __sys_socket+0x150/0x3c0 net/socket.c:1700
+>    __do_sys_socket net/socket.c:1714 [inline]
+>    __se_sys_socket net/socket.c:1712 [inline]
+> 
+> For reference, see commit 2d859aff775d ("Merge branch
+> 'do-not-leave-dangling-sk-pointers-in-pf-create-functions'")
+> 
+> Fixes: d25a92ccae6b ("net/smc: Introduce IPPROTO_SMC")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
+> Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Cc: Ignat Korchagin <ignat@cloudflare.com>
+> Cc: D. Wythe <alibuda@linux.alibaba.com>
+> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> Cc: Dust Li <dust.li@linux.alibaba.com>
+> ---
 
-Right.
+Thank you, Eric, for fixing it! The code looks good to me.
+Should the fixed commit not be 2fe5273f149c instead of d25a92ccae6b?
+
+Thanks,
+Wenjia
 
