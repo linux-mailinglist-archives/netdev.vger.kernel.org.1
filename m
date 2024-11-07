@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-142619-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142620-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D95B19BFC8D
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:30:00 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7DA689BFC8E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:30:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 044A01C20ADA
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:30:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A18751C20C15
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:30:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 125B42207A;
-	Thu,  7 Nov 2024 02:29:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57A20101F2;
+	Thu,  7 Nov 2024 02:30:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="u1klVLtF"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="SO1XLOZr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-80007.amazon.com (smtp-fw-80007.amazon.com [99.78.197.218])
+Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5FD8457C9F
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 02:29:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA07A3D64
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 02:30:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=99.78.197.220
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730946597; cv=none; b=c4C9n9l94xRSKKh4YtFoCu9H4d/KQ6JKdza02Vjtda18pv5j9YhCJbmGqTGyZG8BGZy6wDKGlSOWQLk9PqsRQpBbdjEtZVVDDZGM0d6hnZPO0akqkcEpPX35i1ReVnJeAp8amlKRDVhyfgwWoNRFhmBZGFk6bABS2nWQ5Yqrvoo=
+	t=1730946618; cv=none; b=QTQgy7qkos0HUQyBZlSxr9E+FpU+cv49dGhhd1icD8g3MGueIqLzzf7DZZKxWZcHfAzJUwTuhpxtJAjOpCum6qrsYCKiwfYG2DuTvmq/Ualyv7JggF161HmKrDTleUDW2Qk5fowCJNQeZtkLULudLal3+BzzOb8Oh2Iel56J4Wc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730946597; c=relaxed/simple;
-	bh=esqY7z68Id/YzL+/BHrNG/eiQA/HtkC1u5LtOoDsrZI=;
+	s=arc-20240116; t=1730946618; c=relaxed/simple;
+	bh=XSOnrtsCaK64Pb+d5voj4SXFSBXeLCaq1ypTtWsT2oQ=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=dbwi8JLcIfIdicgHNgR3nkjLdPwiVUa69B4ob/nmHqEOr1U9mRvira7Q4/m1GIeIbAdhVTGNSrDrQgpLjCK3LWwTwBkLbsSVYWkW4eo9qnwItQlUJO23CvrZE7JYNl1DBEFRecVD2cE92xjLaY3lm2HwhF48pFZjojmjZwKbRls=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=u1klVLtF; arc=none smtp.client-ip=99.78.197.218
+	 MIME-Version:Content-Type; b=oXpfx1UdwFpxes1Nep1g7HAb2vT2FcFlHsE/G/sJoLwBwENpkSL+QCpyIcuUAZWs8ueDndQtxBwHeshyhbdxrx3hyDozvpoCFQQhVcIjboXhEpH9NtANSKHlqATiNsS0vQiMBLM4JIE1ShWhd/uwYI6JVmEE9P8CdM7CfPW+osY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=SO1XLOZr; arc=none smtp.client-ip=99.78.197.220
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730946595; x=1762482595;
+  t=1730946616; x=1762482616;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=p8ORRkWw6Q48z7FqTmY32iLWcmfdA951jrfwoBPUJCs=;
-  b=u1klVLtFDgh4hhhg/SI5zzVxdHXAElgoxeKSzq7paPRdkkdB1xShwPIj
-   k9zvY0P0F/uzEagaeYT7h1rsi6SegBdWyDmPx5ZSZwU6gnLLasdUJCYeP
-   +rYvmYmmNuBcK4YrArkOB2TItEKDrQCmAVosWb0nVZ1wAphKzEyqAJGXG
-   M=;
+  bh=OyXAaoIylgoHdkd4qYGrncSlJdlOp4KDDXaNaR16NGI=;
+  b=SO1XLOZrKxVh1HOmhZ4OL4FMGfUR5okCSaiy5tgKbTFUX/4RAFPzj2cI
+   HmAjGV/qJV3N2783EYLqyGjLh9nrFS1nXUBpecDnMh41IS3HsV+Nip/09
+   CMU9s/an36aAz/JOF9pFO9hlrL0a0Ij0i8ZYE8c/1wdlcwgm6SKk+igbW
+   8=;
 X-IronPort-AV: E=Sophos;i="6.11,264,1725321600"; 
-   d="scan'208";a="350037288"
+   d="scan'208";a="145048066"
 Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-80007.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 02:29:54 +0000
-Received: from EX19MTAUWA001.ant.amazon.com [10.0.21.151:17980]
+  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 02:30:15 +0000
+Received: from EX19MTAUWB001.ant.amazon.com [10.0.21.151:21323]
  by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.86:2525] with esmtp (Farcaster)
- id 56bd46c8-1097-43d3-8799-58d3a6906051; Thu, 7 Nov 2024 02:29:53 +0000 (UTC)
-X-Farcaster-Flow-ID: 56bd46c8-1097-43d3-8799-58d3a6906051
+ id 4f4bd4d4-6926-4a1e-83e4-b8ec39c73cc2; Thu, 7 Nov 2024 02:30:14 +0000 (UTC)
+X-Farcaster-Flow-ID: 4f4bd4d4-6926-4a1e-83e4-b8ec39c73cc2
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA001.ant.amazon.com (10.250.64.218) with Microsoft SMTP Server
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 7 Nov 2024 02:29:52 +0000
+ Thu, 7 Nov 2024 02:30:12 +0000
 Received: from 6c7e67c6786f.amazon.com (10.106.101.27) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 7 Nov 2024 02:29:48 +0000
+ Thu, 7 Nov 2024 02:30:09 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -66,9 +66,9 @@ CC: Andrew Lunn <andrew+netdev@lunn.ch>, Marc Kleine-Budde
  Borkmann" <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH v3 net-next 02/10] rtnetlink: Protect link_ops by mutex.
-Date: Wed, 6 Nov 2024 18:28:52 -0800
-Message-ID: <20241107022900.70287-3-kuniyu@amazon.com>
+Subject: [PATCH v3 net-next 03/10] rtnetlink: Remove __rtnl_link_register()
+Date: Wed, 6 Nov 2024 18:28:53 -0800
+Message-ID: <20241107022900.70287-4-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241107022900.70287-1-kuniyu@amazon.com>
 References: <20241107022900.70287-1-kuniyu@amazon.com>
@@ -80,120 +80,189 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D042UWA002.ant.amazon.com (10.13.139.17) To
+X-ClientProxiedBy: EX19D041UWB003.ant.amazon.com (10.13.139.176) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-rtnl_link_unregister() holds RTNL and calls synchronize_srcu(),
-but rtnl_newlink() will acquire SRCU frist and then RTNL.
+link_ops is protected by link_ops_mutex and no longer needs RTNL,
+so we have no reason to have __rtnl_link_register() separately.
 
-Then, we need to unlink ops and call synchronize_srcu() outside
-of RTNL to avoid the deadlock.
+Let's remove it and call rtnl_link_register() from ifb.ko and
+dummy.ko.
 
-   rtnl_link_unregister()       rtnl_newlink()
-   ----                         ----
-   lock(rtnl_mutex);
-                                lock(&ops->srcu);
-                                lock(rtnl_mutex);
-   sync(&ops->srcu);
-
-Let's move as such and add a mutex to protect link_ops.
-
-Now, link_ops is protected by its dedicated mutex and
-rtnl_link_register() no longer needs to hold RTNL.
-
-While at it, we move the initialisation of ops->dellink and
-ops->srcu out of the mutex scope.
+Note that both modules' init() work on init_net only, so we need
+not export pernet_ops_rwsem and can use rtnl_net_lock() there.
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 ---
- include/net/rtnetlink.h |  2 +-
- net/core/rtnetlink.c    | 33 ++++++++++++++++++++-------------
- 2 files changed, 21 insertions(+), 14 deletions(-)
+ drivers/net/dummy.c      | 17 ++++++-----------
+ drivers/net/ifb.c        | 17 ++++++-----------
+ include/net/rtnetlink.h  |  2 --
+ net/core/net_namespace.c |  1 -
+ net/core/rtnetlink.c     | 35 +++++++----------------------------
+ 5 files changed, 19 insertions(+), 53 deletions(-)
 
+diff --git a/drivers/net/dummy.c b/drivers/net/dummy.c
+index 72618b6af44e..005d79975f3b 100644
+--- a/drivers/net/dummy.c
++++ b/drivers/net/dummy.c
+@@ -166,27 +166,22 @@ static int __init dummy_init_one(void)
+ 
+ static int __init dummy_init_module(void)
+ {
+-	bool need_unregister = false;
+ 	int i, err = 0;
+ 
+-	down_write(&pernet_ops_rwsem);
+-	rtnl_lock();
+-	err = __rtnl_link_register(&dummy_link_ops);
++	err = rtnl_link_register(&dummy_link_ops);
+ 	if (err < 0)
+-		goto out;
++		return err;
++
++	rtnl_net_lock(&init_net);
+ 
+ 	for (i = 0; i < numdummies && !err; i++) {
+ 		err = dummy_init_one();
+ 		cond_resched();
+ 	}
+-	if (err < 0)
+-		need_unregister = true;
+ 
+-out:
+-	rtnl_unlock();
+-	up_write(&pernet_ops_rwsem);
++	rtnl_net_unlock(&init_net);
+ 
+-	if (need_unregister)
++	if (err < 0)
+ 		rtnl_link_unregister(&dummy_link_ops);
+ 
+ 	return err;
+diff --git a/drivers/net/ifb.c b/drivers/net/ifb.c
+index a4b9ec4e8f30..67424888ff0a 100644
+--- a/drivers/net/ifb.c
++++ b/drivers/net/ifb.c
+@@ -424,27 +424,22 @@ static int __init ifb_init_one(int index)
+ 
+ static int __init ifb_init_module(void)
+ {
+-	bool need_unregister = false;
+ 	int i, err;
+ 
+-	down_write(&pernet_ops_rwsem);
+-	rtnl_lock();
+-	err = __rtnl_link_register(&ifb_link_ops);
++	err = rtnl_link_register(&ifb_link_ops);
+ 	if (err < 0)
+-		goto out;
++		return err;
++
++	rtnl_net_lock(&init_net);
+ 
+ 	for (i = 0; i < numifbs && !err; i++) {
+ 		err = ifb_init_one(i);
+ 		cond_resched();
+ 	}
+-	if (err)
+-		need_unregister = true;
+ 
+-out:
+-	rtnl_unlock();
+-	up_write(&pernet_ops_rwsem);
++	rtnl_net_unlock(&init_net);
+ 
+-	if (need_unregister)
++	if (err)
+ 		rtnl_link_unregister(&ifb_link_ops);
+ 
+ 	return err;
 diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
-index 3ebfcc6e56fd..7559020f760c 100644
+index 7559020f760c..ef7c11f0d74c 100644
 --- a/include/net/rtnetlink.h
 +++ b/include/net/rtnetlink.h
-@@ -71,7 +71,7 @@ static inline int rtnl_msg_family(const struct nlmsghdr *nlh)
- /**
-  *	struct rtnl_link_ops - rtnetlink link operations
-  *
-- *	@list: Used internally, protected by RTNL and SRCU
-+ *	@list: Used internally, protected by link_ops_mutex and SRCU
-  *	@srcu: Used internally
-  *	@kind: Identifier
-  *	@netns_refund: Physical device, move to init_net on netns exit
+@@ -164,8 +164,6 @@ struct rtnl_link_ops {
+ 						   int *prividx, int attr);
+ };
+ 
+-int __rtnl_link_register(struct rtnl_link_ops *ops);
+-
+ int rtnl_link_register(struct rtnl_link_ops *ops);
+ void rtnl_link_unregister(struct rtnl_link_ops *ops);
+ 
+diff --git a/net/core/net_namespace.c b/net/core/net_namespace.c
+index 809b48c0a528..157021ced442 100644
+--- a/net/core/net_namespace.c
++++ b/net/core/net_namespace.c
+@@ -56,7 +56,6 @@ static bool init_net_initialized;
+  * outside.
+  */
+ DECLARE_RWSEM(pernet_ops_rwsem);
+-EXPORT_SYMBOL_GPL(pernet_ops_rwsem);
+ 
+ #define MIN_PERNET_OPS_ID	\
+ 	((sizeof(struct net_generic) + sizeof(void *) - 1) / sizeof(void *))
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 634732fe4c64..fcccb916e468 100644
+index fcccb916e468..61bf710f97b8 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -466,6 +466,7 @@ void __rtnl_unregister_many(const struct rtnl_msg_handler *handlers, int n)
+@@ -495,20 +495,21 @@ static void rtnl_link_ops_put(struct rtnl_link_ops *ops, int srcu_index)
  }
- EXPORT_SYMBOL_GPL(__rtnl_unregister_many);
  
-+static DEFINE_MUTEX(link_ops_mutex);
- static LIST_HEAD(link_ops);
- 
- static struct rtnl_link_ops *rtnl_link_ops_get(const char *kind, int *srcu_index)
-@@ -508,14 +509,6 @@ int __rtnl_link_register(struct rtnl_link_ops *ops)
+ /**
+- * __rtnl_link_register - Register rtnl_link_ops with rtnetlink.
++ * rtnl_link_register - Register rtnl_link_ops with rtnetlink.
+  * @ops: struct rtnl_link_ops * to register
+  *
+- * The caller must hold the rtnl_mutex. This function should be used
+- * by drivers that create devices during module initialization. It
+- * must be called before registering the devices.
+- *
+  * Returns 0 on success or a negative error code.
+  */
+-int __rtnl_link_register(struct rtnl_link_ops *ops)
++int rtnl_link_register(struct rtnl_link_ops *ops)
+ {
  	struct rtnl_link_ops *tmp;
  	int err;
  
--	/* When RTNL is removed, add lock for link_ops. */
--	ASSERT_RTNL();
--
--	list_for_each_entry(tmp, &link_ops, list) {
--		if (!strcmp(ops->kind, tmp->kind))
--			return -EEXIST;
--	}
--
++	/* Sanity-check max sizes to avoid stack buffer overflow. */
++	if (WARN_ON(ops->maxtype > RTNL_MAX_TYPE ||
++		    ops->slave_maxtype > RTNL_SLAVE_MAX_TYPE))
++		return -EINVAL;
++
  	/* The check for alloc/setup is here because if ops
  	 * does not have that filled up, it is not possible
  	 * to use the ops for creating device. So do not
-@@ -528,9 +521,20 @@ int __rtnl_link_register(struct rtnl_link_ops *ops)
- 	if (err)
- 		return err;
+@@ -536,28 +537,6 @@ int __rtnl_link_register(struct rtnl_link_ops *ops)
  
-+	mutex_lock(&link_ops_mutex);
-+
-+	list_for_each_entry(tmp, &link_ops, list) {
-+		if (!strcmp(ops->kind, tmp->kind)) {
-+			err = -EEXIST;
-+			goto unlock;
-+		}
-+	}
-+
- 	list_add_tail_rcu(&ops->list, &link_ops);
-+unlock:
-+	mutex_unlock(&link_ops_mutex);
- 
--	return 0;
-+	return err;
+ 	return err;
  }
- EXPORT_SYMBOL_GPL(__rtnl_link_register);
- 
-@@ -598,14 +602,17 @@ void rtnl_link_unregister(struct rtnl_link_ops *ops)
- {
- 	struct net *net;
- 
--	/* Close the race with setup_net() and cleanup_net() */
--	down_write(&pernet_ops_rwsem);
--	rtnl_lock_unregistering_all();
+-EXPORT_SYMBOL_GPL(__rtnl_link_register);
 -
-+	mutex_lock(&link_ops_mutex);
- 	list_del_rcu(&ops->list);
-+	mutex_unlock(&link_ops_mutex);
-+
- 	synchronize_srcu(&ops->srcu);
- 	cleanup_srcu_struct(&ops->srcu);
+-/**
+- * rtnl_link_register - Register rtnl_link_ops with rtnetlink.
+- * @ops: struct rtnl_link_ops * to register
+- *
+- * Returns 0 on success or a negative error code.
+- */
+-int rtnl_link_register(struct rtnl_link_ops *ops)
+-{
+-	int err;
+-
+-	/* Sanity-check max sizes to avoid stack buffer overflow. */
+-	if (WARN_ON(ops->maxtype > RTNL_MAX_TYPE ||
+-		    ops->slave_maxtype > RTNL_SLAVE_MAX_TYPE))
+-		return -EINVAL;
+-
+-	rtnl_lock();
+-	err = __rtnl_link_register(ops);
+-	rtnl_unlock();
+-	return err;
+-}
+ EXPORT_SYMBOL_GPL(rtnl_link_register);
  
-+	/* Close the race with setup_net() and cleanup_net() */
-+	down_write(&pernet_ops_rwsem);
-+	rtnl_lock_unregistering_all();
-+
- 	for_each_net(net)
- 		__rtnl_kill_links(net, ops);
- 
+ static void __rtnl_kill_links(struct net *net, struct rtnl_link_ops *ops)
 -- 
 2.39.5 (Apple Git-154)
 
