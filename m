@@ -1,131 +1,109 @@
-Return-Path: <netdev+bounces-142729-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142730-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0981E9C021C
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:19:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 620139C0222
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:20:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1CE4283B74
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:19:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934B91C20A29
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:20:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 713BF1E909C;
-	Thu,  7 Nov 2024 10:19:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6867C1E25F5;
+	Thu,  7 Nov 2024 10:20:16 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="aTTvOKnu"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KDxG3uPC"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ed1-f42.google.com (mail-ed1-f42.google.com [209.85.208.42])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4B481E25F5
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:19:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0EE51E2019
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:20:14 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.42
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730974766; cv=none; b=U4FYQPIIp4THjVML6gGZ753Ko4oG7Ng9ZlPInntZytaTjph3EMpS+jvaCCUbAIn1vsEow0/lWycjBeav2mtcvF+obC2WoE0hPkluDl4J0QWLktF3fTqNElXort1vBJNb9iHdlw1QUY+3SrFHk5rPtSbVrpBZ6Op8VgdYQgb/UkA=
+	t=1730974816; cv=none; b=kmvq6JcqDhDJl70i4Pk/uq5wAV8COA3CekFXU95HZiaM/VUJaGephVVeI6Gz7v+Z6NH7pXolMmXClGicK79Ecbp0D144MrPR1qdB8ohhOTQw42Y45PE6xNdCs77Su3CAWVkN2ef4XvbYkTAVKH2Fy4jdz0E1fV87xHp0gYtFhqs=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730974766; c=relaxed/simple;
-	bh=MuNWhYrw8F/gSr00QNLIh4DtWvDQaY0ROHYlSaTNVt8=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=GQssaGYvhsJhB1ozsZL5mG2h2KynMootsJ9nVFtGu4X3BNpMsIVQzd1Uf3kdtC1+5S+pTi4q7vosUcSUFbCJseF1e/ujELvZmOnKAmcTtvjxKniMrOBCsEd/TZ0SG4D7YpM6PzN5WVptpZkErC3UothsT4Yhl21+WJzUIs9+3L8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=aTTvOKnu; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730974763;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eUPJBtFS5dfBIUKGBSTul1nLycqN5459o9xMHL54qwM=;
-	b=aTTvOKnuLxtFBIWnmn6mKojLTflhAwwG59qtbDHY9Z/F4em60HFarbLxWgyIbdg7x7Do+e
-	3pmyyGYL1HqFvsEuS3NNPDgGPKkJVPdp43ZZoFGVUkZ+UDHjoawAV7K6IY0tb3O4nlgFBH
-	HUFJsMH3UGPUlt/t+/3A5aiy41dA+vo=
-Received: from mail-oo1-f70.google.com (mail-oo1-f70.google.com
- [209.85.161.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-621-8u6susWzOvWrjMfnfaArVg-1; Thu, 07 Nov 2024 05:19:22 -0500
-X-MC-Unique: 8u6susWzOvWrjMfnfaArVg-1
-X-Mimecast-MFC-AGG-ID: 8u6susWzOvWrjMfnfaArVg
-Received: by mail-oo1-f70.google.com with SMTP id 006d021491bc7-5eb6275167dso625726eaf.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:19:22 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730974762; x=1731579562;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	s=arc-20240116; t=1730974816; c=relaxed/simple;
+	bh=bUxECVvtmUIJzXf5AGWp9FhEUdjGnW1lzOApTrKw1zo=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=AWCb5BjZ3zVOYFYiLux7sTV8IOJCgflUK2voApzqXmZ0Ec0CKvrR/W+Cm1OW3mA/8vQhWslvtzK1Lhy1OkKl1BkUQ6PvLJaRNmAAzYZmzU/l/RMRU3MQL3HqFYhE8qQaPhIq4vpa/SRPsmK+Q5yL+n2+PpYVjhR7DGcwAc7hUS8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KDxG3uPC; arc=none smtp.client-ip=209.85.208.42
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-ed1-f42.google.com with SMTP id 4fb4d7f45d1cf-5cacb76e924so1136319a12.0
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:20:14 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730974813; x=1731579613; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=eUPJBtFS5dfBIUKGBSTul1nLycqN5459o9xMHL54qwM=;
-        b=m/lgNtmpfCbsjfk0I80KW30/OonLkVHkZb0RQwi3SaOKvEkCeFvlalGPSpUayIQ1C/
-         xSgTA+78rVI0kD3Wa+mmMKUkWfG/fjp1mDg+GYBYvWRHA4FkYDn+Law7Np5U0YtcYOv6
-         RXVcedifoRVU8pIEC1TxiXzUoof55ETZsu88YN349NrHIRa0HUte5oAWEjQ944acWkBb
-         1ppT73dFDzPTVcnTPInGgB8iWh5khkQ8kXxdcio1r0X0gVABXdYhWmOvc1IfFqkCy5GF
-         sj+9Q2EivmQsvVSN5xnY2e80iVRo8q8Judq42hPgjhYfA59U90cVwK+zFKuUejY9+eAf
-         LtNA==
-X-Forwarded-Encrypted: i=1; AJvYcCX9FYdfr0izO4+jcHwhO6sLF9/1dClOcr2+RBzpIeg/7QMxx3YrXIlULNR5CGnClV4BxArhtes=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzAugG19/92UWjAJSiW6uhp7kODm0IRIQfH8hhh/qdHHM1s/Koo
-	QDMiIyvdRlZTWJYMVHyvIrEnFang6pViYd3pCV5Z3hHyQlCUiT2HLh0BX1ny/N+Vt/HAj6eHfJt
-	8HCTQN47eVpJ00+/kCXpCRcqi6AdJcLsu36bl+HZax0jEHvDoRp+XN1vk/AuqOTEL
-X-Received: by 2002:a05:6358:d595:b0:1c3:878d:286e with SMTP id e5c5f4694b2df-1c5f99f6192mr1267418055d.22.1730974761850;
-        Thu, 07 Nov 2024 02:19:21 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGb0h9WGNnQfHK+osDGOMOYjYkH7je/1Uc03OD4ourSiBQ1DFDDlBICtkFFZrGGHTcwY75ndw==
-X-Received: by 2002:a05:6358:d595:b0:1c3:878d:286e with SMTP id e5c5f4694b2df-1c5f99f6192mr1267417255d.22.1730974761369;
-        Thu, 07 Nov 2024 02:19:21 -0800 (PST)
-Received: from sgarzare-redhat ([5.77.70.124])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961df2desm5996176d6.21.2024.11.07.02.19.16
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 02:19:20 -0800 (PST)
-Date: Thu, 7 Nov 2024 11:19:11 +0100
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Michal Luczaj <mhal@rbox.co>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
-	Jia He <justin.he@arm.com>, Arseniy Krasnov <avkrasnov@salutedevices.com>, 
-	Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
-	George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org, virtualization@lists.linux.dev, 
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net 3/4] virtio/vsock: Improve MSG_ZEROCOPY error handling
-Message-ID: <5zv6gmfg45gu3km6srpjlby2z7th7pnosfeorixhgivb3cgfvw@to6bkzdjvkob>
-References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
- <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
+        bh=FYkYxsCTkmOBoiYKXh4ZEjpdsXpKEPnOsWN6My0/IN8=;
+        b=KDxG3uPCQBtQP6pyIiemjLfQFKi51+a9g45kJykQ1M7qqHDBz/LoDllMnRWp6uxUh7
+         wQmNH9/wAZIHCXhnchzmn1bVHWORSRZ+oHo6h6r/PvfQim5DYQM6/4GFJMb6tOOscX91
+         pkjoqa+An9CiAql8UETuclxiXpsTN1ZtSGQv8HeBzIlgsyvQL49Re6qL7Zsv2l9c7F7W
+         ynmPPC59VRe1SCavxIHB/PEM7hfMDRDU3GX7th75mMjDJm5zvg9+E0pnyypsibGETjur
+         uFdfpmJAUjKnCe7T/k2fxNcrF/Jo1t/PQOFSWJeyS41l+awUmfwTLrNdIfhNRfVGLAoa
+         xosQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730974813; x=1731579613;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FYkYxsCTkmOBoiYKXh4ZEjpdsXpKEPnOsWN6My0/IN8=;
+        b=qq8IRLmLV7lnByzhbg0YWxlGG1SXVEvY0RSk23l5PCbwEI4Y0nH3Ba551+UHg2FXLK
+         NdGvNkNEl/1L6xHy8rwJU3KhJyEDyC1N5vMRCcVPZcq8PiAsXvBMfJPt8PVypeBMuwDQ
+         jJInM3guqdl4ruVdQGrEqF2ayJoEqcO5UaGYaxSBCIOoTVnfmykhvOgrwRg0m6alvqEg
+         ExlC9X8Ed7UEuCrE4r1ORy66HKD4q2AQSkPVFofcXKfh31HZPbRKgljUcPSs4ys11+pr
+         FXIWJe0GYirsG+p05LFUTEhE81fEkC/svZaJhpaTX/MQlUIew17xh6iNT3pyfezBM8xU
+         lrrA==
+X-Gm-Message-State: AOJu0Yz2nbac0XQX3Mcr1OdDKBkTpTOd1lq6S+TnqU20IBeyor64UXqv
+	7YvECwbtUmWKL/Vw6reZpC+uON9GGIHxItuVHWnPJ3jov2GfxOaMoqhADYLnXS/4EzPfW5+b2gT
+	/7tO+H16f1GWLhKMMFHcvBFgtelq6q5XvBVX0
+X-Google-Smtp-Source: AGHT+IEU7BzKwJ7pIKK0HTYYkeJhG9pSpe6xSVtPpm7vbqKR9LQ1JnPQTbahhd3bffBAr5k3cN7r3J7YdMHmn1Qs1UE=
+X-Received: by 2002:a05:6402:84f:b0:5ce:c7ca:70ca with SMTP id
+ 4fb4d7f45d1cf-5cec7ca71a0mr14020115a12.34.1730974813080; Thu, 07 Nov 2024
+ 02:20:13 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20241106-vsock-mem-leaks-v1-3-8f4ffc3099e6@rbox.co>
+References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com> <20241105100647.117346-4-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20241105100647.117346-4-chia-yu.chang@nokia-bell-labs.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 Nov 2024 11:20:01 +0100
+Message-ID: <CANn89iJiaAuuHntM2j-FvtbM+g90GHft5BgaNxOZ58jkpzP3UQ@mail.gmail.com>
+Subject: Re: [PATCH v5 net-next 03/13] tcp: use BIT() macro in include/net/tcp.h
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, joel.granados@kernel.org, 
+	kuba@kernel.org, andrew+netdev@lunn.ch, horms@kernel.org, pablo@netfilter.org, 
+	kadlec@netfilter.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Wed, Nov 06, 2024 at 06:51:20PM +0100, Michal Luczaj wrote:
->Add a missing kfree_skb() to prevent memory leaks.
+On Tue, Nov 5, 2024 at 11:07=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
 >
->Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
->Signed-off-by: Michal Luczaj <mhal@rbox.co>
->---
-> net/vmw_vsock/virtio_transport_common.c | 1 +
-> 1 file changed, 1 insertion(+)
+> From: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+>
+> Use BIT() macro for TCP flags field and TCP congestion control
+> flags that will be used by the congestion control algorithm.
+>
+> No functional changes.
+>
+> Signed-off-by: Chia-Yu Chang <chia-yu.chang@nokia-bell-labs.com>
+> Reviewed-by: Ilpo J=C3=A4rvinen <ij@kernel.org>
+> ---
+>  include/net/tcp.h | 21 +++++++++++----------
+>  1 file changed, 11 insertions(+), 10 deletions(-)
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
->
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index cd075f608d4f6f48f894543e5e9c966d3e5f22df..e2e6a30b759bdc6371bb0d63ee2e77c0ba148fd2 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -400,6 +400,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
-> 			if (virtio_transport_init_zcopy_skb(vsk, skb,
-> 							    info->msg,
-> 							    can_zcopy)) {
->+				kfree_skb(skb);
-> 				ret = -ENOMEM;
-> 				break;
-> 			}
->
->-- 
->2.46.2
->
-
+Reviewed-by: Eric Dumazet <edumazet@google.com>
 
