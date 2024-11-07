@@ -1,168 +1,107 @@
-Return-Path: <netdev+bounces-142810-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6DCC9C0668
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:57:32 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE1E49C0689
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:01:47 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7E9691F21AF5
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:57:32 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 727341F233F3
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:01:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C9BF2101AD;
-	Thu,  7 Nov 2024 12:53:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EECB210193;
+	Thu,  7 Nov 2024 12:55:54 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Mg9vj6xl"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mTgeyjuH"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelv0142.ext.ti.com (lelv0142.ext.ti.com [198.47.23.249])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0BAB215F7D;
-	Thu,  7 Nov 2024 12:53:08 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.249
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B46C320FAB4
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 12:55:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.43
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730983990; cv=none; b=PxdZP5RGaEERW7gTWKQcPmWzGDn4TZCoLSJ5ZCvMXyedgqo6bFb9+awL5YCst/XyV/WsKaerkHfCn0h0Qz0msuxmTRY+nxw4CFE1XlE2P2iP+FE/9rn58j62uewEC+JbIcXEuwBuy77VVCW/JAl4BWHDqJenln/Y2xPy8mhP5Uk=
+	t=1730984154; cv=none; b=uvoYbPI7e4Ad/OH9RkH853gnD5MrnmQPDSV2BwkfuctVwLu7aE7ZXp9uB6SOndk9Ld6w1EXBbYFyJFP6v9r1TvzaURLZklMW91BKtXHMGBZCrXpqjeY04hkLpAuP4Py//pOqLgThphCfuhpHVKWBWAQEGzBQSELPGkO3K3k/Zg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730983990; c=relaxed/simple;
-	bh=O4JIEnkWMQ605+o0syIyHSWT27O1VQEtWWa9lopfQjk=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=Q8gvyfPUkDfYm4DWObWac81VcJIkj5fiRLhKkSxxefoUDlpGqG1B1G3ZMayucJ9NG3F26IK27OgyeSv/VgVpV6X0hpOU6elLnwMA/seViHH1ApkBd8Cfqrbd6MTAdcTj2ZIdF/afN75VGHS9CRm/tTtapVYtGPh8731vQKxetYA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Mg9vj6xl; arc=none smtp.client-ip=198.47.23.249
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelv0142.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A7Cr2kS041981;
-	Thu, 7 Nov 2024 06:53:02 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1730983982;
-	bh=3Bf1eq+WdZi+EdwuJ3Oe2U0adIIvW8vJSFGrZiaYIY4=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=Mg9vj6xlmDOvw+fcrSzarLS0aouuxdOSzzMtKPth3FVE6HDCH/MC+iGDpgQB40eHC
-	 pcRZkjItif7Z0BR9QOv5wBOsY+cKenMCFExi1HW8ss0bfu4NC2uPLK/B1eURnIOV+P
-	 DD7zvUyQrr7vXyaZX/9ChH/ZbITwjyLhzCKL0x40=
-Received: from DLEE100.ent.ti.com (dlee100.ent.ti.com [157.170.170.30])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A7Cr2f3116182
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Thu, 7 Nov 2024 06:53:02 -0600
-Received: from DLEE105.ent.ti.com (157.170.170.35) by DLEE100.ent.ti.com
- (157.170.170.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Thu, 7
- Nov 2024 06:53:02 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DLEE105.ent.ti.com
- (157.170.170.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Thu, 7 Nov 2024 06:53:02 -0600
-Received: from localhost (udb0389739.dhcp.ti.com [137.167.1.149])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A7Cr1vX038593;
-	Thu, 7 Nov 2024 06:53:01 -0600
-From: Michael Nemanov <michael.nemanov@ti.com>
-To: Kalle Valo <kvalo@kernel.org>, "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo
- Abeni <pabeni@redhat.com>, Rob Herring <robh@kernel.org>,
-        Krzysztof Kozlowski
-	<krzk+dt@kernel.org>,
-        Conor Dooley <conor+dt@kernel.org>, <linux-wireless@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Sabeeh Khan <sabeeh-khan@ti.com>, Michael Nemanov <michael.nemanov@ti.com>
-Subject: [PATCH v5 17/17] wifi: cc33xx: Add Kconfig, Makefile
-Date: Thu, 7 Nov 2024 14:52:09 +0200
-Message-ID: <20241107125209.1736277-18-michael.nemanov@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241107125209.1736277-1-michael.nemanov@ti.com>
-References: <20241107125209.1736277-1-michael.nemanov@ti.com>
+	s=arc-20240116; t=1730984154; c=relaxed/simple;
+	bh=MNGuxclNZEl8wDL9mnqdwaXSxv3EbzjWppbI5JuQjko=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=bF+OJ9QETQgZOj6qHX9jz9+E3yeCqpcs3k8YqX5hhPWYgrRW2XkuNvEMhG4JLH3ENT+q91eCumTLCezj1F22QidK1OdCz2Bxp56N4mN16jFv0EXW8N7ppT4HmWBUnfXWDkcaTb0QPrQbzh/QQ2NSrZAojZpn8siaLXbWtpKomto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mTgeyjuH; arc=none smtp.client-ip=209.85.166.43
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-83abe7fc77eso36913539f.0
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 04:55:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1730984152; x=1731588952; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=MNGuxclNZEl8wDL9mnqdwaXSxv3EbzjWppbI5JuQjko=;
+        b=mTgeyjuHYPIEnHh/8SsxDKAwXYop+nczr95YtrvJlldFgn/GqQpJG+pYqynSdJf790
+         LtDO3Aredb3UKsIVLt3yH/xbSDfTZTgJIZMOHnsNfTmOuebFlMLK6BrJesduUz4g1fW2
+         GdLns5j/CieAzcmOeMLY7Ew5iTCEX8pc/MsnAz6sbYaS1FeBCSmeVMnDwH0TUJzuZ35o
+         njZrl7Y7t8y/BKAqogkECoiuoMYvV0epmd7Q25szYDH2G/y5WvTi85isj43z2d8timT8
+         3h5727Hhu9/XjTa/69T13Hurh1WwkbcQz+d3KFUeawvfbKFdCVQkvnJ7AIsjnG0lzLRZ
+         JyeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730984152; x=1731588952;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=MNGuxclNZEl8wDL9mnqdwaXSxv3EbzjWppbI5JuQjko=;
+        b=HXitPTuwBCj8Y+b9NQR3r33HzuDhEMSQrLm+fuWgDhJ6qg8kUuJg/28tnOL/tFo0QX
+         63ffc+KrWvq5y/koI1xqzimth3TNXFJVIrLhUu5uTntmpnv+6hZzTMOkbwW9D1FhFqpC
+         Sg4ZuNQn/lFdWu7me1K5EI1ZEGDjXArpGN/KBjqVfV4fWIxFWPyWGmCEQw8S1ikaA1ZG
+         3CJ3P07BXQRJ0ZP94Zo9HZdqLeTq1WlRwb9e0CU3Gi2sPFDd153J5DreqDBzk8yRYDpW
+         0vlhgKYd8xB4sDjuFCk3nl4++qD5SDT9yNCX56aKq4NQRHzZQIJZVH2hn2ZrwIu6bNqq
+         ogoA==
+X-Gm-Message-State: AOJu0Yz7uPx/6YTauRjDwKt9qnZVNKVZKIuAPM1yC+E5cZmOhXM1mg7H
+	qg0XcDYWy1a9JYYky/JAiiLl86KSuGR9zNizfcCxVmi+UrXpH0KEPSU/jGglfuwRVbBiiJgNJ5j
+	EZxcWd9cQniDHH7los43/gNkO9g6Q2nF2H2Zd
+X-Google-Smtp-Source: AGHT+IEr2kqryj3CHwPojAnrjT77oI+p2eagCFy4Mf/8qI/k5/pCuHJHt5YAM3upHDoOFWeA2megF3ZaleOAMRi88yA=
+X-Received: by 2002:a05:6602:3fc5:b0:83a:db84:41a8 with SMTP id
+ ca18e2360f4ac-83b1c4b4febmr5159706739f.10.1730984151674; Thu, 07 Nov 2024
+ 04:55:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com> <20241105100647.117346-12-chia-yu.chang@nokia-bell-labs.com>
+In-Reply-To: <20241105100647.117346-12-chia-yu.chang@nokia-bell-labs.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 7 Nov 2024 13:55:39 +0100
+Message-ID: <CANn89i+yj5DGj=OF58Uez6m0xt1n-6bi=vnG7PX1frBPWm+eNw@mail.gmail.com>
+Subject: Re: [PATCH v5 net-next 11/13] tcp: allow ECN bits in TOS/traffic class
+To: chia-yu.chang@nokia-bell-labs.com
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, davem@davemloft.net, 
+	dsahern@kernel.org, pabeni@redhat.com, joel.granados@kernel.org, 
+	kuba@kernel.org, andrew+netdev@lunn.ch, horms@kernel.org, pablo@netfilter.org, 
+	kadlec@netfilter.org, netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	ij@kernel.org, ncardwell@google.com, koen.de_schepper@nokia-bell-labs.com, 
+	g.white@cablelabs.com, ingemar.s.johansson@ericsson.com, 
+	mirja.kuehlewind@ericsson.com, cheshire@apple.com, rs.ietf@gmx.at, 
+	Jason_Livingood@comcast.com, vidhi_goel@apple.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Integrate cc33xx into wireless/ti folder
+On Tue, Nov 5, 2024 at 11:07=E2=80=AFAM <chia-yu.chang@nokia-bell-labs.com>=
+ wrote:
+>
+> From: Ilpo J=C3=A4rvinen <ij@kernel.org>
+>
+> AccECN connection's last ACK cannot retain ECT(1) as the bits
+> are always cleared causing the packet to switch into another
+> service queue.
+>
+> This effectively adds a finer-grained filtering for ECN bits
+> so that acceptable TW ACKs can retain the bits.
 
-Signed-off-by: Michael Nemanov <michael.nemanov@ti.com>
----
- drivers/net/wireless/ti/Kconfig         |  1 +
- drivers/net/wireless/ti/Makefile        |  1 +
- drivers/net/wireless/ti/cc33xx/Kconfig  | 24 ++++++++++++++++++++++++
- drivers/net/wireless/ti/cc33xx/Makefile | 10 ++++++++++
- 4 files changed, 36 insertions(+)
- create mode 100644 drivers/net/wireless/ti/cc33xx/Kconfig
- create mode 100644 drivers/net/wireless/ti/cc33xx/Makefile
+Too cryptic changelog.
 
-diff --git a/drivers/net/wireless/ti/Kconfig b/drivers/net/wireless/ti/Kconfig
-index 3fcd9e395f72..fa7214d6018c 100644
---- a/drivers/net/wireless/ti/Kconfig
-+++ b/drivers/net/wireless/ti/Kconfig
-@@ -14,6 +14,7 @@ if WLAN_VENDOR_TI
- source "drivers/net/wireless/ti/wl1251/Kconfig"
- source "drivers/net/wireless/ti/wl12xx/Kconfig"
- source "drivers/net/wireless/ti/wl18xx/Kconfig"
-+source "drivers/net/wireless/ti/cc33xx/Kconfig"
- 
- # keep last for automatic dependencies
- source "drivers/net/wireless/ti/wlcore/Kconfig"
-diff --git a/drivers/net/wireless/ti/Makefile b/drivers/net/wireless/ti/Makefile
-index 05ee016594f8..4356f58b4b98 100644
---- a/drivers/net/wireless/ti/Makefile
-+++ b/drivers/net/wireless/ti/Makefile
-@@ -3,3 +3,4 @@ obj-$(CONFIG_WLCORE)			+= wlcore/
- obj-$(CONFIG_WL12XX)			+= wl12xx/
- obj-$(CONFIG_WL1251)			+= wl1251/
- obj-$(CONFIG_WL18XX)			+= wl18xx/
-+obj-$(CONFIG_CC33XX)			+= cc33xx/
-diff --git a/drivers/net/wireless/ti/cc33xx/Kconfig b/drivers/net/wireless/ti/cc33xx/Kconfig
-new file mode 100644
-index 000000000000..0c3ff97dacc7
---- /dev/null
-+++ b/drivers/net/wireless/ti/cc33xx/Kconfig
-@@ -0,0 +1,24 @@
-+# SPDX-License-Identifier: GPL-2.0-only
-+config CC33XX
-+	tristate "TI CC33XX support"
-+	depends on MAC80211
-+	select FW_LOADER
-+	help
-+	  This module contains the main code for TI CC33XX WLAN chips. It abstracts
-+	  hardware-specific differences among different chipset families.
-+	  Each chipset family needs to implement its own lower-level module
-+	  that will depend on this module for the common code.
-+
-+	  If you choose to build a module, it will be called cc33xx. Say N if
-+	  unsure.
-+
-+config CC33XX_SDIO
-+	tristate "TI CC33XX SDIO support"
-+	depends on CC33XX && MMC
-+	help
-+	  This module adds support for the SDIO interface of adapters using
-+	  TI CC33XX WLAN chipsets.  Select this if your platform is using
-+	  the SDIO bus.
-+
-+	  If you choose to build a module, it'll be called cc33xx_sdio.
-+	  Say N if unsure.
-diff --git a/drivers/net/wireless/ti/cc33xx/Makefile b/drivers/net/wireless/ti/cc33xx/Makefile
-new file mode 100644
-index 000000000000..6156f778edee
---- /dev/null
-+++ b/drivers/net/wireless/ti/cc33xx/Makefile
-@@ -0,0 +1,10 @@
-+# SPDX-License-Identifier: GPL-2.0
-+
-+cc33xx-objs		= main.o cmd.o io.o event.o tx.o rx.o ps.o acx.o \
-+					boot.o init.o scan.o
-+
-+cc33xx_sdio-objs	= sdio.o
-+
-+cc33xx-$(CONFIG_NL80211_TESTMODE)	+= testmode.o
-+obj-$(CONFIG_CC33XX)				+= cc33xx.o
-+obj-$(CONFIG_CC33XX_SDIO)			+= cc33xx_sdio.o
--- 
-2.34.1
-
+Please add more explanations, because I could not really understand
+the intent of this patch.
 
