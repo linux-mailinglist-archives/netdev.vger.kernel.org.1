@@ -1,192 +1,107 @@
-Return-Path: <netdev+bounces-142655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142656-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F4D39BFDC3
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 06:44:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 484819BFDDB
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 06:48:55 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 0B12AB22BA4
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 05:44:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A7F942824DB
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 05:48:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76764192D8C;
-	Thu,  7 Nov 2024 05:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B6FA155316;
+	Thu,  7 Nov 2024 05:48:51 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="Xcfzt1pU"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="A7phyTVn"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93244193419
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 05:43:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E86331373
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 05:48:49 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730958204; cv=none; b=nTPqUBtRNGg/WDQQq9qhit1eA78KF1adxFZlcstZOx8uz4rPbP6Db91OvWyQ11UBX2xgiAQmEGzwcYJ/4qkcWxHorSrtXduIhk510JtQ6EXEI6K14kDF84UjgPaVgFmGjscwdg72IlxxmQKGFkeaHa3H5uOH6NgXoim67UxbWV4=
+	t=1730958531; cv=none; b=Os+80Hkf2AVdLyeSqdhprNz2M8hauLmYRGdxy59p9JoDvaRNh2IMf8mM1KR73ACGlonF6kUkSup80q/EIL1ys5YA+Nyr8OYnUPsshjewvfQKWbfXdxkwD0hwuDJkGLrnX7L43QLWz8H8duZ2D+uU9/i77sKN0E+vgZgj/MuVDdg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730958204; c=relaxed/simple;
-	bh=5p1dKspAll9SyYC/V0x37TfjMVgWeTnU57lK5IQpqWM=;
+	s=arc-20240116; t=1730958531; c=relaxed/simple;
+	bh=+KcZU98rroca6VshJ8DZkeBPYfuhoi/V7WU/dcDLDss=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=lp2B1U8uRL7RMmbDQUtGo7/7NgV0lPfhbWSBeid94pqIEbHpMKLQUVScvlWKlzB0Vhdzkx0diRu/BSi7UvuOBcPpcwspgwBHlLkJ9knHwdqpmUD/6Qup2yrNoKx3f0Arfa+VvoFiCXHKRrZGczmIrLt40z17Hm/pOCj1L3TXww8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=Xcfzt1pU; arc=none smtp.client-ip=207.171.190.10
+	 MIME-Version:Content-Type; b=HK9DAzpAXPyPN+/5OxnAu7fnWpaFzpdHflyRSnSyUD0Lu0ivXRlo5yBLFSdB7t1HMh6gNAJximbuWTHlWTOZdPR90/+qgUHx5OQ4gtuoZbhpkCZ3yM+AS6A7QtilLK2DMhyXgPJ5klZBRpHSgnXru4Uv2jK0la7Kim+wqM+76io=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=A7phyTVn; arc=none smtp.client-ip=207.171.190.10
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1730958203; x=1762494203;
+  t=1730958530; x=1762494530;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=Dj+9M8Vg3wSm2WDVm774zZ+uKLJn/KcA2wUU+ExWLUI=;
-  b=Xcfzt1pU6S6LH59UT3xVOWmS6UFegkGuOeTK2Y/PQVVsRAIgF3ccK5wc
-   phJS03qt6frIpSskOlUo4TG+kHEXBBs2dl09V5UiwhXp7zs/jwjiiBHwn
-   z2/CCry8DBPu7t2hUIvHwjovVdiqsK8un5bp6/YC4Z8QbYWTanzIs99iQ
-   8=;
+  bh=7m419jNArPou3cjOU+7V+wOZ6yaWfKwgkl3jUghtUe4=;
+  b=A7phyTVnFWXFN3rfymzdatxZuFIZhPq4IRsH37iAmf7TrnrPcMW4hqEu
+   9cfQ8ista6wzJwuQbs/zrTGXD9+m0bhkrh0wzMrxfCMc5fb660SOXkfNV
+   5cdU9PVJSaX9rbTWAktNy6Xg4nFHJgqkC53RZi+Gt8Kubzr6/durZIbIL
+   0=;
 X-IronPort-AV: E=Sophos;i="6.11,265,1725321600"; 
-   d="scan'208";a="383092963"
+   d="scan'208";a="383093829"
 Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 05:43:17 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:47915]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.17.195:2525] with esmtp (Farcaster)
- id 4f22ddea-f999-41d1-9d75-11a1bb6a49f4; Thu, 7 Nov 2024 05:43:16 +0000 (UTC)
-X-Farcaster-Flow-ID: 4f22ddea-f999-41d1-9d75-11a1bb6a49f4
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 05:48:50 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.38.20:5157]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.44.86:2525] with esmtp (Farcaster)
+ id 437a2b31-aa2a-4ca5-b14d-5377034526e6; Thu, 7 Nov 2024 05:48:49 +0000 (UTC)
+X-Farcaster-Flow-ID: 437a2b31-aa2a-4ca5-b14d-5377034526e6
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Thu, 7 Nov 2024 05:43:15 +0000
+ Thu, 7 Nov 2024 05:48:46 +0000
 Received: from 6c7e67c6786f.amazon.com (10.106.101.27) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Thu, 7 Nov 2024 05:43:12 +0000
+ Thu, 7 Nov 2024 05:48:43 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kerneljasonxing@gmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<horms@kernel.org>, <kernelxing@tencent.com>, <kuba@kernel.org>,
+To: <gnaaman@drivenets.com>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
 	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to failure in tcp_timewait_state_process
-Date: Wed, 6 Nov 2024 21:43:09 -0800
-Message-ID: <20241107054309.91543-1-kuniyu@amazon.com>
+Subject: Re: [PATCH net-next v8 4/6] neighbour: Convert iteration to use hlist+macro
+Date: Wed, 6 Nov 2024 21:48:40 -0800
+Message-ID: <20241107054840.91923-1-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
-In-Reply-To: <CAL+tcoDW=VELoJoU6GOLQQNScdC+8+1s0aK4_YkiLog9eOcuFA@mail.gmail.com>
-References: <CAL+tcoDW=VELoJoU6GOLQQNScdC+8+1s0aK4_YkiLog9eOcuFA@mail.gmail.com>
+In-Reply-To: <20241107053946.1252382-1-gnaaman@drivenets.com>
+References: <20241107053946.1252382-1-gnaaman@drivenets.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: EX19D042UWA004.ant.amazon.com (10.13.139.16) To
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D042UWA001.ant.amazon.com (10.13.139.92) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Nov 2024 13:23:50 +0800
-> On Thu, Nov 7, 2024 at 12:15 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
-> >
-> > From: Jason Xing <kerneljasonxing@gmail.com>
-> > Date: Thu, 7 Nov 2024 11:16:04 +0800
-> > > > Here is how things happen in production:
-> > > > Time        Client(A)        Server(B)
-> > > > 0s          SYN-->
-> > > > ...
-> > > > 132s                         <-- FIN
-> > > > ...
-> > > > 169s        FIN-->
-> > > > 169s                         <-- ACK
-> > > > 169s        SYN-->
-> > > > 169s                         <-- ACK
-> > >
-> > > I noticed the above ACK doesn't adhere to RFC 6191. It says:
-> > > "If the previous incarnation of the connection used Timestamps, then:
-> > >      if ...
-> > >      ...
-> > >      * Otherwise, silently drop the incoming SYN segment, thus leaving
-> > >          the previous incarnation of the connection in the TIME-WAIT
-> > >          state.
-> > > "
-> > > But the timewait socket sends an ACK because of this code snippet:
-> > > tcp_timewait_state_process()
-> > >     -> // the checks of SYN packet failed.
-> > >     -> if (!th->rst) {
-> > >         -> return TCP_TW_ACK; // this line can be traced back to 2005
-> >
-> > This is a challenge ACK following RFC 5961.
+From: Gilad Naaman <gnaaman@drivenets.com>
+Date: Thu,  7 Nov 2024 05:39:46 +0000
+> > > diff --git a/include/net/neighbour.h b/include/net/neighbour.h
+> > > index 69aaacd1419f..68b1970d9045 100644
+> > > --- a/include/net/neighbour.h
+> > > +++ b/include/net/neighbour.h
+> > > @@ -309,12 +309,9 @@ static inline struct neighbour *___neigh_lookup_noref(
+> > >  	u32 hash_val;
+> > >  
+> > >  	hash_val = hash(pkey, dev, nht->hash_rnd) >> (32 - nht->hash_shift);
+> > > -	for (n = rcu_dereference(nht->hash_buckets[hash_val]);
+> > > -	     n != NULL;
+> > > -	     n = rcu_dereference(n->next)) {
+> > > +	neigh_for_each_in_bucket(n, &nht->hash_heads[hash_val])
+> > 
+> > Sorry, I missed this part needs to be _rcu version.
+> > 
+> > You can keep my Reviewed-by tag in v9.
+> > 
 > 
-> Please note the idea of challenge ack was proposed in 2010. But this
-> code snippet has already existed before 2005. If it is a challenge
-> ack, then at least we need to count it (by using NET_INC_STATS(net,
-> LINUX_MIB_TCPCHALLENGEACK);).
-
-The word was not accurate, the behaviour is compliant with RFC 5961.
-RFC is often formalised based on real implementations.
-
-Incrementing the count makes sense to me.
-
+> No problem at all, will do.
 > 
-> >
-> > If SYN is returned here, the client may lose the chance to RST the
-> > previous connection in TIME_WAIT.
-> >
-> > https://www.rfc-editor.org/rfc/rfc9293.html#section-3.10.7.4-2.4.1
-> > ---8<---
-> >       -  TIME-WAIT STATE
-> >
-> >          o  If the SYN bit is set in these synchronized states, it may
-> >             be either a legitimate new connection attempt (e.g., in the
-> >             case of TIME-WAIT), an error where the connection should be
-> >             reset, or the result of an attack attempt, as described in
-> >             RFC 5961 [9].  For the TIME-WAIT state, new connections can
-> >             be accepted if the Timestamp Option is used and meets
-> >             expectations (per [40]).  For all other cases, RFC 5961
-> >             provides a mitigation with applicability to some situations,
-> >             though there are also alternatives that offer cryptographic
-> >             protection (see Section 7).  RFC 5961 recommends that in
-> >             these synchronized states, if the SYN bit is set,
-> >             irrespective of the sequence number, TCP endpoints MUST send
-> >             a "challenge ACK" to the remote peer:
-> >
-> >             <SEQ=SND.NXT><ACK=RCV.NXT><CTL=ACK>
-> > ---8<---
-> >
-> > https://datatracker.ietf.org/doc/html/rfc5961#section-4
-> > ---8<---
-> >    1) If the SYN bit is set, irrespective of the sequence number, TCP
-> >       MUST send an ACK (also referred to as challenge ACK) to the remote
-> >       peer:
-> >
-> >       <SEQ=SND.NXT><ACK=RCV.NXT><CTL=ACK>
-> >
-> >       After sending the acknowledgment, TCP MUST drop the unacceptable
-> >       segment and stop processing further.
-> > ---8<---
-> 
-> The RFC 5961 4.2 was implemented in tcp_validate_incoming():
->         /* step 4: Check for a SYN
->          * RFC 5961 4.2 : Send a challenge ack
->          */
->         if (th->syn) {
->                 if (sk->sk_state == TCP_SYN_RECV && sk->sk_socket && th->ack &&
->                     TCP_SKB_CB(skb)->seq + 1 == TCP_SKB_CB(skb)->end_seq &&
->                     TCP_SKB_CB(skb)->seq + 1 == tp->rcv_nxt &&
->                     TCP_SKB_CB(skb)->ack_seq == tp->snd_nxt)
->                         goto pass;
-> syn_challenge:
->                 if (syn_inerr)
->                         TCP_INC_STATS(sock_net(sk), TCP_MIB_INERRS);
->                 NET_INC_STATS(sock_net(sk),
-> LINUX_MIB_TCPSYNCHALLENGE);
->                 tcp_send_challenge_ack(sk);
->                 SKB_DR_SET(reason, TCP_INVALID_SYN);
->                 goto discard;
->         }
-> 
-> Also, this quotation you mentioned obviously doesn't match the kernel
-> implementation:
-> "If the SYN bit is set, irrespective of the sequence number, TCP MUST
-> send an ACK"
-> The tcp_timewait_state_process() does care about the seq number, or
-> else timewait socket would refuse every SYN packet.
+> Is it possible that the `_rcu` version will also be needed in `neigh_dump_table`?
+> It is called from an `rcu_read_lock`ed section, and it doesn't hold the table-lock.
 
-That's why I pasted RFC 9293 first that clearly states that we
-should check seq number and then return ACK for all other cases.
+Right, there also should use _rcu one.
 
