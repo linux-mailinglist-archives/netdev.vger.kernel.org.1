@@ -1,220 +1,291 @@
-Return-Path: <netdev+bounces-142631-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142632-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B5C269BFCC7
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:54:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 067D49BFCD6
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:05:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 48A901F2280F
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:54:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B242728302D
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:05:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E63DA74E09;
-	Thu,  7 Nov 2024 02:54:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9ADD422071;
+	Thu,  7 Nov 2024 03:05:22 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="nolhQjdT"
+	dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b="fktRzNUH"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from codeconstruct.com.au (pi.codeconstruct.com.au [203.29.241.158])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4479F3FE4;
-	Thu,  7 Nov 2024 02:54:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31BD96FBF;
+	Thu,  7 Nov 2024 03:05:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=203.29.241.158
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730948094; cv=none; b=tl1Jiz439uHPjqqlXc1MBP1b62jvBqVNUdji3foZaugPacT9/uz14j1bdap6PhkY9oKWjBnRe0V0TBBDBqKLyg9/NDlo5l8YPccbGV7pmQaqDAb9dGETSBdoC1zypHqaFQbzXaYXq4F7LkRTAVgz/nP8yV2oVHQ/fB7/awwS5Qs=
+	t=1730948722; cv=none; b=HWPYfs0s/hTXYWLz08yT4lfT99Q41VjN8lqovzGtUc8DHI1qaMPbLqij4Zk6ngLa92+Op87/dYYcenMqzMLeqeecB9cul7cQr2ejMBlLMoeVOEKx0aq9gMgudTbWoK4hutg2XYYq5gMsaSEc2SPS+H23k1jLW2frGnAPos0NDg0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730948094; c=relaxed/simple;
-	bh=l/ocFLDpfyJVwQEoJDaHuZiPX6X5+43tiVrRMmQmtFM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=T43scGnAKjI90LyLOp2EKzYs4PuNJEbvIM8VO6UsN6j1ZEdOCN7EIttL0jeuEQSQU+18pAsWBFPR4899l75e4kHQYz5Rb9GygokvHkEGo48+Lg3J8Bs+1njTqPqTj5/As5xYnJfpbb0/SKqSKSIchUX4FBS7Wz/Phh20Nct7auM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=nolhQjdT; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-2110a622d76so3881995ad.3;
-        Wed, 06 Nov 2024 18:54:53 -0800 (PST)
+	s=arc-20240116; t=1730948722; c=relaxed/simple;
+	bh=IXAD+jCZLyYZRQRfmCNo0LCsdh7gD/znV7S26k0a1UU=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=LvC5U4jhze0h/TJvXYVgBnEp866AJug+NEjkHAQWj4BLQjHB/IgfZn+kxoMhsSMqLAfSQ7ljoJ2tPnrbdiuyIvE3cVwXxg62+JqMYUIgs8HjJP26H5of+c0pfeG8W1vNWV5CshvmJd67OGsekQr8Ia2iymLqWerkCvEKuaKMSh8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au; spf=pass smtp.mailfrom=codeconstruct.com.au; dkim=pass (2048-bit key) header.d=codeconstruct.com.au header.i=@codeconstruct.com.au header.b=fktRzNUH; arc=none smtp.client-ip=203.29.241.158
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=codeconstruct.com.au
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=codeconstruct.com.au
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730948092; x=1731552892; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=kXUgljRAh0gr52NTMyiqOJGETbvRr4tGYCjS3T7hbU4=;
-        b=nolhQjdTep9SvfunsHm+BoLovCO+q/k1Vauk9lu4cafIju8ZBQknHsi3689S8WmWPN
-         V6+B1jbHG0d23ODx32aZiOXDaPIkL+oyFg2y5cmbEAY/sUQIW1tGPgYdWUbdr5j+X50P
-         68ZfkmzRM63g7awdOMWFvXd2gPGuyDnka4D/APaj9hgSzIghm1o2bbJROb0LMgYURL11
-         wbvhJ+NXN6KpXnZF8sAELJ93pLImXyIncBNEeOlvfnkyz24VMup2O9U3crMZcN3t4fKA
-         coh9LetMqq9aXkRSz0otYX6gwgLVLpe8lfN5IyyfZKmpaEohyXasalwPCLsjO49uFerc
-         WbMA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730948092; x=1731552892;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=kXUgljRAh0gr52NTMyiqOJGETbvRr4tGYCjS3T7hbU4=;
-        b=txRr/My6sZalXdr+CwAkmaEo9I7IL629ZuDxrrW2fOsg5K4Es404oedjeQEQ6yUoPe
-         tY0biktpMyHrcXUQONIznE69gObJoexYXIil7Q0eO4N/D4vK9K42FjW/In2Arlome8D0
-         E0tLRFvO+Iw8W8ed40a4AW6JMeQzBQbhT0qGOUli5DhaIVM4iCKOj0toOwHX+uQ9ArVQ
-         FPNaHq/XQSlut26Gp2yc9lQrYMqs16t1jHTrmbYV64LnbG7fr90KbAlxXvA8LoBZoTx9
-         t20Bs1mIYq4cFF/Uv6piIlrgC1geTtoDj6wGQeISqqOhjc5xHUCtWpm9R11Zpm7GdRiO
-         VcJQ==
-X-Forwarded-Encrypted: i=1; AJvYcCVnA2D/IKMas3l5CgdIZ30vWP6tB5Qm8BdwMj8pNe4uL0L1invcE51heRgizN5meqLGBcNjWGxPPlKo8zM=@vger.kernel.org, AJvYcCWQDxowYl1r1oNwWctIaSrAgWP0FIdQXxZgmH7L8xs/5QBO9bLMQ+Z17EClBcizqW7s9aXQ9qHhVrXP5M9n3TvA@vger.kernel.org
-X-Gm-Message-State: AOJu0YzMtDSL0GlQhjO+ORmwiiYP+KpQHkdTAegBsi9plasPGUjevVTm
-	JlomnLVP5feOlq8j/8cQCDPbgTl3V9bxIxj5C3xW5RI5iOUGLkMkA73M24qnskQ=
-X-Google-Smtp-Source: AGHT+IHvh3IYq+Pk+cmQrRzRR2//8ZHBrqmgQAH00s2k4zSSPfdKFWQy6LEZZKd5gwHxfEhFKXPnUA==
-X-Received: by 2002:a17:903:189:b0:20f:c225:f28c with SMTP id d9443c01a7336-210c6c9417amr568555575ad.52.1730948092394;
-        Wed, 06 Nov 2024 18:54:52 -0800 (PST)
-Received: from fedora.dns.podman ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177de041dsm1910365ad.103.2024.11.06.18.54.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 06 Nov 2024 18:54:51 -0800 (PST)
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: netdev@vger.kernel.org
-Cc: "Jason A. Donenfeld" <Jason@zx2c4.com>,
-	Shuah Khan <shuah@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Florian Westphal <fw@strlen.de>,
-	Phil Sutter <phil@nwl.cc>,
-	wireguard@lists.zx2c4.com,
-	linux-kselftest@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Hangbin Liu <liuhangbin@gmail.com>
-Subject: [PATCH net-next] selftests: wireguards: use nft by default
-Date: Thu,  7 Nov 2024 02:54:38 +0000
-Message-ID: <20241107025438.3766-1-liuhangbin@gmail.com>
-X-Mailer: git-send-email 2.46.0
+	d=codeconstruct.com.au; s=2022a; t=1730948711;
+	bh=erZFG6Q0iFzHtXVVJZKWsaL8nS/sZz25HN4vZXCTXxw=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References;
+	b=fktRzNUHs4idIS1oslvsPvtGaZOaLFSukofrNnKtqjqeVdMPWMshQkEAVGD51IzSb
+	 ECZycc8Ck+ROhQyppNi97DpnsHsREsvFji5zNXjB0O0Ecq51z8nGTRZCR4i+TsIzo6
+	 3hWTpZ7uNZLssI3qfc/RcO9DbiArBtm4u1avvnhiBkzGlVC+gJ08A2D6MzY5pt+tM8
+	 bjGU5Ywm702tGgwSWUyvJjvY3/eUSxWav4QdI1zMZp4IDswPOh13wlGSarvU1SDX8E
+	 XiuM4AwfrmpzwoZG3bcXe7csWmi3nLM9rm5mOhdfJYxkcvrAkXHMA5lCMntpEWIx2J
+	 O4kUjRVQWsJMQ==
+Received: from [192.168.12.102] (unknown [159.196.94.230])
+	by mail.codeconstruct.com.au (Postfix) with ESMTPSA id CDE776B83E;
+	Thu,  7 Nov 2024 11:05:08 +0800 (AWST)
+Message-ID: <a5349550f7b66ff53c0875b6bcefd20dcd165711.camel@codeconstruct.com.au>
+Subject: Re: [PATCH net-next] net: mctp: Expose transport binding identifier
+ via IFLA attribute
+From: Matt Johnston <matt@codeconstruct.com.au>
+To: Khang Nguyen <khangng@os.amperecomputing.com>, Jeremy Kerr
+ <jk@codeconstruct.com.au>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>, Simon Horman
+ <horms@kernel.org>, netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Cc: ampere-linux-kernel@lists.amperecomputing.com, Phong Vo
+ <phong@os.amperecomputing.com>, Thang Nguyen
+ <thang@os.amperecomputing.com>,  Khanh Pham <khpham@amperecomputing.com>,
+ Phong Vo <pvo@amperecomputing.com>, Quan Nguyen
+ <quan@os.amperecomputing.com>, Chanh Nguyen <chanh@os.amperecomputing.com>,
+  Thu Nguyen <thu@os.amperecomputing.com>, Hieu Le
+ <hieul@amperecomputing.com>, openbmc@lists.ozlabs.org, 
+ patches@amperecomputing.com
+Date: Thu, 07 Nov 2024 11:05:08 +0800
+In-Reply-To: <20241105071915.821871-1-khangng@os.amperecomputing.com>
+References: <20241105071915.821871-1-khangng@os.amperecomputing.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.3-0ubuntu1 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
 
-Use nft by default if it's supported, as nft is the replacement for iptables,
-which is used by default in some releases. Additionally, iptables is dropped
-in some releases.
+Thanks Khang, this looks good.
 
-Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
----
-CC nft developers to see if there are any easier configurations,
-as I'm not very familiar with nft commands.
----
- tools/testing/selftests/wireguard/netns.sh | 63 ++++++++++++++++++----
- 1 file changed, 53 insertions(+), 10 deletions(-)
+On Tue, 2024-11-05 at 14:19 +0700, Khang Nguyen wrote:
+> MCTP control protocol implementations are transport binding dependent.
+> Endpoint discovery is mandatory based on transport binding.
+> Message timing requirements are specified in each respective transport
+> binding specification.
+>=20
+> However, we currently have no means to get this information from MCTP
+> links.
+>=20
+> Add a IFLA_MCTP_PHYS_BINDING netlink link attribute, which represents
+> the transport type using the DMTF DSP0239-defined type numbers, returned
+> as part of RTM_GETLINK data.
+>=20
+> We get an IFLA_MCTP_PHYS_BINDING attribute for each MCTP link, for
+> example:
+>=20
+> - 0x00 (unspec) for loopback interface;
+> - 0x01 (SMBus/I2C) for mctpi2c%d interfaces; and
+> - 0x05 (serial) for mctpserial%d interfaces.
+>=20
+> Signed-off-by: Khang Nguyen <khangng@os.amperecomputing.com>
+> ---
+>  drivers/net/mctp/mctp-i2c.c    |  3 ++-
+>  drivers/net/mctp/mctp-i3c.c    |  2 +-
+>  drivers/net/mctp/mctp-serial.c |  5 +++--
+>  include/net/mctp.h             | 18 ++++++++++++++++++
+>  include/net/mctpdevice.h       |  4 +++-
+>  include/uapi/linux/if_link.h   |  1 +
+>  net/mctp/device.c              | 12 +++++++++---
+>  7 files changed, 37 insertions(+), 8 deletions(-)
+>=20
+> diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
+> index 4dc057c121f5..86151a03570e 100644
+> --- a/drivers/net/mctp/mctp-i2c.c
+> +++ b/drivers/net/mctp/mctp-i2c.c
+> @@ -877,7 +877,8 @@ static int mctp_i2c_add_netdev(struct mctp_i2c_client=
+ *mcli,
+>  		goto err;
+>  	}
+> =20
+> -	rc =3D mctp_register_netdev(ndev, &mctp_i2c_mctp_ops);
+> +	rc =3D mctp_register_netdev(ndev, &mctp_i2c_mctp_ops,
+> +				  MCTP_PHYS_BINDING_SMBUS);
+>  	if (rc < 0) {
+>  		dev_err(&mcli->client->dev,
+>  			"register netdev \"%s\" failed %d\n",
+> diff --git a/drivers/net/mctp/mctp-i3c.c b/drivers/net/mctp/mctp-i3c.c
+> index 1bc87a062686..9adad59b8676 100644
+> --- a/drivers/net/mctp/mctp-i3c.c
+> +++ b/drivers/net/mctp/mctp-i3c.c
+> @@ -607,7 +607,7 @@ __must_hold(&busdevs_lock)
+>  		goto err_free_uninit;
+>  	}
+> =20
+> -	rc =3D mctp_register_netdev(ndev, NULL);
+> +	rc =3D mctp_register_netdev(ndev, NULL, MCTP_PHYS_BINDING_I3C);
+>  	if (rc < 0) {
+>  		dev_warn(&ndev->dev, "netdev register failed: %d\n", rc);
+>  		goto err_free_netdev;
+> diff --git a/drivers/net/mctp/mctp-serial.c b/drivers/net/mctp/mctp-seria=
+l.c
+> index e63720ec3238..26c9a33fd636 100644
+> --- a/drivers/net/mctp/mctp-serial.c
+> +++ b/drivers/net/mctp/mctp-serial.c
+> @@ -23,6 +23,7 @@
+> =20
+>  #include <linux/mctp.h>
+>  #include <net/mctp.h>
+> +#include <net/mctpdevice.h>
+>  #include <net/pkt_sched.h>
+> =20
+>  #define MCTP_SERIAL_MTU		68 /* base mtu (64) + mctp header */
+> @@ -470,7 +471,7 @@ static int mctp_serial_open(struct tty_struct *tty)
+>  	spin_lock_init(&dev->lock);
+>  	INIT_WORK(&dev->tx_work, mctp_serial_tx_work);
+> =20
+> -	rc =3D register_netdev(ndev);
+> +	rc =3D mctp_register_netdev(ndev, NULL, MCTP_PHYS_BINDING_SERIAL);
+>  	if (rc)
+>  		goto free_netdev;
+> =20
+> @@ -492,7 +493,7 @@ static void mctp_serial_close(struct tty_struct *tty)
+>  	struct mctp_serial *dev =3D tty->disc_data;
+>  	int idx =3D dev->idx;
+> =20
+> -	unregister_netdev(dev->netdev);
+> +	mctp_unregister_netdev(dev->netdev);
+>  	ida_free(&mctp_serial_ida, idx);
+>  }
+> =20
+> diff --git a/include/net/mctp.h b/include/net/mctp.h
+> index 28d59ae94ca3..1ecbff7116f6 100644
+> --- a/include/net/mctp.h
+> +++ b/include/net/mctp.h
+> @@ -298,4 +298,22 @@ void mctp_routes_exit(void);
+>  int mctp_device_init(void);
+>  void mctp_device_exit(void);
+> =20
+> +/* MCTP IDs and Codes from DMTF specification
+> + * "DSP0239 Management Component Transport Protocol (MCTP) IDs and Codes=
+"
+> + * https://www.dmtf.org/sites/default/files/standards/documents/DSP0239_=
+1.11.1.pdf
+> + */
+> +enum mctp_phys_binding {
+> +	MCTP_PHYS_BINDING_UNSPEC	=3D 0x00,
+> +	MCTP_PHYS_BINDING_SMBUS		=3D 0x01,
+> +	MCTP_PHYS_BINDING_PCIE_VDM	=3D 0x02,
+> +	MCTP_PHYS_BINDING_USB		=3D 0x03,
+> +	MCTP_PHYS_BINDING_KCS		=3D 0x04,
+> +	MCTP_PHYS_BINDING_SERIAL	=3D 0x05,
+> +	MCTP_PHYS_BINDING_I3C		=3D 0x06,
+> +	MCTP_PHYS_BINDING_MMBI		=3D 0x07,
+> +	MCTP_PHYS_BINDING_PCC		=3D 0x08,
+> +	MCTP_PHYS_BINDING_UCIE		=3D 0x09,
+> +	MCTP_PHYS_BINDING_VENDOR	=3D 0xFF,
+> +};
+> +
+>  #endif /* __NET_MCTP_H */
+> diff --git a/include/net/mctpdevice.h b/include/net/mctpdevice.h
+> index 5c0d04b5c12c..957d9ef924c5 100644
+> --- a/include/net/mctpdevice.h
+> +++ b/include/net/mctpdevice.h
+> @@ -22,6 +22,7 @@ struct mctp_dev {
+>  	refcount_t		refs;
+> =20
+>  	unsigned int		net;
+> +	enum mctp_phys_binding	binding;
+> =20
+>  	const struct mctp_netdev_ops *ops;
+> =20
+> @@ -44,7 +45,8 @@ struct mctp_dev *mctp_dev_get_rtnl(const struct net_dev=
+ice *dev);
+>  struct mctp_dev *__mctp_dev_get(const struct net_device *dev);
+> =20
+>  int mctp_register_netdev(struct net_device *dev,
+> -			 const struct mctp_netdev_ops *ops);
+> +			 const struct mctp_netdev_ops *ops,
+> +			 enum mctp_phys_binding binding);
+>  void mctp_unregister_netdev(struct net_device *dev);
+> =20
+>  void mctp_dev_hold(struct mctp_dev *mdev);
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index 8516c1ccd57a..2575e0cd9b48 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -1958,6 +1958,7 @@ struct ifla_rmnet_flags {
+>  enum {
+>  	IFLA_MCTP_UNSPEC,
+>  	IFLA_MCTP_NET,
+> +	IFLA_MCTP_PHYS_BINDING,
+>  	__IFLA_MCTP_MAX,
+>  };
+> =20
+> diff --git a/net/mctp/device.c b/net/mctp/device.c
+> index 3d75b919995d..26ce34b7e88e 100644
+> --- a/net/mctp/device.c
+> +++ b/net/mctp/device.c
+> @@ -371,6 +371,8 @@ static int mctp_fill_link_af(struct sk_buff *skb,
+>  		return -ENODATA;
+>  	if (nla_put_u32(skb, IFLA_MCTP_NET, mdev->net))
+>  		return -EMSGSIZE;
+> +	if (nla_put_u8(skb, IFLA_MCTP_PHYS_BINDING, mdev->binding))
+> +		return -EMSGSIZE;
+>  	return 0;
+>  }
+> =20
+> @@ -385,6 +387,7 @@ static size_t mctp_get_link_af_size(const struct net_=
+device *dev,
+>  	if (!mdev)
+>  		return 0;
+>  	ret =3D nla_total_size(4); /* IFLA_MCTP_NET */
+> +	ret +=3D nla_total_size(1); /* IFLA_MCTP_PHYS_BINDING */
+>  	mctp_dev_put(mdev);
+>  	return ret;
+>  }
+> @@ -480,7 +483,8 @@ static int mctp_dev_notify(struct notifier_block *thi=
+s, unsigned long event,
+>  }
+> =20
+>  static int mctp_register_netdevice(struct net_device *dev,
+> -				   const struct mctp_netdev_ops *ops)
+> +				   const struct mctp_netdev_ops *ops,
+> +				   enum mctp_phys_binding binding)
+>  {
+>  	struct mctp_dev *mdev;
+> =20
+> @@ -489,17 +493,19 @@ static int mctp_register_netdevice(struct net_devic=
+e *dev,
+>  		return PTR_ERR(mdev);
+> =20
+>  	mdev->ops =3D ops;
+> +	mdev->binding =3D binding;
+> =20
+>  	return register_netdevice(dev);
+>  }
+> =20
+>  int mctp_register_netdev(struct net_device *dev,
+> -			 const struct mctp_netdev_ops *ops)
+> +			 const struct mctp_netdev_ops *ops,
+> +			 enum mctp_phys_binding binding)
+>  {
+>  	int rc;
+> =20
+>  	rtnl_lock();
+> -	rc =3D mctp_register_netdevice(dev, ops);
+> +	rc =3D mctp_register_netdevice(dev, ops, binding);
+>  	rtnl_unlock();
+> =20
+>  	return rc;
 
-diff --git a/tools/testing/selftests/wireguard/netns.sh b/tools/testing/selftests/wireguard/netns.sh
-index 405ff262ca93..4e29c1a7003c 100755
---- a/tools/testing/selftests/wireguard/netns.sh
-+++ b/tools/testing/selftests/wireguard/netns.sh
-@@ -44,6 +44,7 @@ sleep() { read -t "$1" -N 1 || true; }
- waitiperf() { pretty "${1//*-}" "wait for iperf:${3:-5201} pid $2"; while [[ $(ss -N "$1" -tlpH "sport = ${3:-5201}") != *\"iperf3\",pid=$2,fd=* ]]; do sleep 0.1; done; }
- waitncatudp() { pretty "${1//*-}" "wait for udp:1111 pid $2"; while [[ $(ss -N "$1" -ulpH 'sport = 1111') != *\"ncat\",pid=$2,fd=* ]]; do sleep 0.1; done; }
- waitiface() { pretty "${1//*-}" "wait for $2 to come up"; ip netns exec "$1" bash -c "while [[ \$(< \"/sys/class/net/$2/operstate\") != up ]]; do read -t .1 -N 0 || true; done;"; }
-+use_nft() { nft --version &> /dev/null; }
- 
- cleanup() {
- 	set +e
-@@ -196,13 +197,23 @@ ip1 link set wg0 mtu 1300
- ip2 link set wg0 mtu 1300
- n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
- n2 wg set wg0 peer "$pub1" endpoint 127.0.0.1:1
--n0 iptables -A INPUT -m length --length 1360 -j DROP
-+if use_nft; then
-+	n0 nft add table inet filter
-+	n0 nft add chain inet filter INPUT { type filter hook input priority filter \; policy accept \; }
-+	n0 nft add rule inet filter INPUT meta length 1360 counter drop
-+else
-+	n0 iptables -A INPUT -m length --length 1360 -j DROP
-+fi
- n1 ip route add 192.168.241.2/32 dev wg0 mtu 1299
- n2 ip route add 192.168.241.1/32 dev wg0 mtu 1299
- n2 ping -c 1 -W 1 -s 1269 192.168.241.1
- n2 ip route delete 192.168.241.1/32 dev wg0 mtu 1299
- n1 ip route delete 192.168.241.2/32 dev wg0 mtu 1299
--n0 iptables -F INPUT
-+if use_nft; then
-+	n0 nft delete table inet filter
-+else
-+	n0 iptables -F INPUT
-+fi
- 
- ip1 link set wg0 mtu $orig_mtu
- ip2 link set wg0 mtu $orig_mtu
-@@ -334,7 +345,13 @@ waitiface $netns2 veths
- n0 bash -c 'printf 1 > /proc/sys/net/ipv4/ip_forward'
- n0 bash -c 'printf 2 > /proc/sys/net/netfilter/nf_conntrack_udp_timeout'
- n0 bash -c 'printf 2 > /proc/sys/net/netfilter/nf_conntrack_udp_timeout_stream'
--n0 iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -d 10.0.0.0/24 -j SNAT --to 10.0.0.1
-+if use_nft; then
-+	n0 nft add table inet nat
-+	n0 nft add chain inet nat POSTROUTING { type nat hook postrouting priority srcnat\; policy accept \; }
-+	n0 nft add rule inet nat POSTROUTING ip saddr 192.168.1.0/24 ip daddr 10.0.0.0/24 counter snat to 10.0.0.1
-+else
-+	n0 iptables -t nat -A POSTROUTING -s 192.168.1.0/24 -d 10.0.0.0/24 -j SNAT --to 10.0.0.1
-+fi
- 
- n1 wg set wg0 peer "$pub2" endpoint 10.0.0.100:2 persistent-keepalive 1
- n1 ping -W 1 -c 1 192.168.241.2
-@@ -348,10 +365,20 @@ n1 wg set wg0 peer "$pub2" persistent-keepalive 0
- # Test that sk_bound_dev_if works
- n1 ping -I wg0 -c 1 -W 1 192.168.241.2
- # What about when the mark changes and the packet must be rerouted?
--n1 iptables -t mangle -I OUTPUT -j MARK --set-xmark 1
-+if use_nft; then
-+	n1 nft add table inet mangle
-+	n1 nft add chain inet mangle OUTPUT { type route hook output priority mangle\; policy accept \; }
-+	n1 nft add rule inet mangle OUTPUT counter meta mark set 0x1
-+else
-+	n1 iptables -t mangle -I OUTPUT -j MARK --set-xmark 1
-+fi
- n1 ping -c 1 -W 1 192.168.241.2 # First the boring case
- n1 ping -I wg0 -c 1 -W 1 192.168.241.2 # Then the sk_bound_dev_if case
--n1 iptables -t mangle -D OUTPUT -j MARK --set-xmark 1
-+if use_nft; then
-+	n1 nft delete table inet mangle
-+else
-+	n1 iptables -t mangle -D OUTPUT -j MARK --set-xmark 1
-+fi
- 
- # Test that onion routing works, even when it loops
- n1 wg set wg0 peer "$pub3" allowed-ips 192.168.242.2/32 endpoint 192.168.241.2:5
-@@ -385,16 +412,32 @@ n1 ping -W 1 -c 100 -f 192.168.99.7
- n1 ping -W 1 -c 100 -f abab::1111
- 
- # Have ns2 NAT into wg0 packets from ns0, but return an icmp error along the right route.
--n2 iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -d 192.168.241.0/24 -j SNAT --to 192.168.241.2
--n0 iptables -t filter -A INPUT \! -s 10.0.0.0/24 -i vethrs -j DROP # Manual rpfilter just to be explicit.
-+if use_nft; then
-+	n2 nft add table inet nat
-+	n2 nft add chain inet nat POSTROUTING { type nat hook postrouting priority srcnat\; policy accept \; }
-+	n2 nft add rule inet nat POSTROUTING ip saddr 10.0.0.0/24 ip daddr 192.168.241.0/24 counter snat to 192.168.241.2
-+
-+	n0 nft add table inet filter
-+	n0 nft add chain inet filter INPUT { type filter hook input priority filter \; policy accept \; }
-+	n0 nft add rule inet filter INPUT iifname "vethrs" ip saddr != 10.0.0.0/24 counter drop
-+else
-+	n2 iptables -t nat -A POSTROUTING -s 10.0.0.0/24 -d 192.168.241.0/24 -j SNAT --to 192.168.241.2
-+	n0 iptables -t filter -A INPUT \! -s 10.0.0.0/24 -i vethrs -j DROP # Manual rpfilter just to be explicit.
-+fi
- n2 bash -c 'printf 1 > /proc/sys/net/ipv4/ip_forward'
- ip0 -4 route add 192.168.241.1 via 10.0.0.100
- n2 wg set wg0 peer "$pub1" remove
- [[ $(! n0 ping -W 1 -c 1 192.168.241.1 || false) == *"From 10.0.0.100 icmp_seq=1 Destination Host Unreachable"* ]]
- 
--n0 iptables -t nat -F
--n0 iptables -t filter -F
--n2 iptables -t nat -F
-+if use_nft; then
-+	n0 nft delete table inet nat
-+	n0 nft delete table inet filter
-+	n2 nft delete table inet nat
-+else
-+	n0 iptables -t nat -F
-+	n0 iptables -t filter -F
-+	n2 iptables -t nat -F
-+fi
- ip0 link del vethrc
- ip0 link del vethrs
- ip1 link del wg0
--- 
-2.46.0
-
+Reviewed-by: Matt Johnston <matt@codeconstruct.com.au>
 
