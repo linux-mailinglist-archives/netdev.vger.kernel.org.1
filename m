@@ -1,130 +1,230 @@
-Return-Path: <netdev+bounces-143019-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143020-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 700749C0EC7
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:19:59 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B92E9C0ECC
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:20:29 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05649B22EEC
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:19:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E8831C25F12
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E5AF194AD6;
-	Thu,  7 Nov 2024 19:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 264BD212F06;
+	Thu,  7 Nov 2024 19:20:25 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="gDtQIWDL"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="LeEDIYcC"
 X-Original-To: netdev@vger.kernel.org
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yw1-f202.google.com (mail-yw1-f202.google.com [209.85.128.202])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 644CC125D6;
-	Thu,  7 Nov 2024 19:19:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60815125D6
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 19:20:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.202
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731007192; cv=none; b=R88VpvXNMj4RjhvRrWkZVbq5OXOO+hLMIIqiUl2Q5MBJOf7xPISPq1H88eV83a5IySDN8EARsPPYnus8UlCibJHTZJJN6K89CZBVACoqC+PzQeMM2Hh9G/EFWLfZf3FT+c7EdYQAX6/Nal+kznjRxzzVkvmkAYoRnEezEYJDsqM=
+	t=1731007225; cv=none; b=QvFfD42RXxaGJQ3YMiJZUrB3hd1fOSFEYafj5vYLWJ2k+zlKg2kHkMRWIz9ExrDHJRG0gj/Tj585n0wnNVRtTDK5b9LwU+MEPh6i1Lp4ejSDq/4SnWVd3kg5GiXesOMTQAOXTCizVIz5DfjPEqR/2jTVgdW0qBSugFSVstFihv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731007192; c=relaxed/simple;
-	bh=eN0VRTCZM2WBAT9cgFw9DTUrSpwbJpwTFubfXheWoYM=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=a/51DJil1lM8PMUKMDBzWHspHQzgKRBfQcVQh4VZR+c40/ernYQUawKyhakNwEjdnvYAIHxDz5Yut/mMR+zKg6naw6c7mLbn2BsQH9BfuTkSK8q74q6kBCdYoIN/KeZLtDdIcN64vkz8nE2euBVKJcYh0QdwJ+yaVW2uwofgVCE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=gDtQIWDL; arc=none smtp.client-ip=68.232.154.123
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1731007190; x=1762543190;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:content-transfer-encoding:in-reply-to;
-  bh=eN0VRTCZM2WBAT9cgFw9DTUrSpwbJpwTFubfXheWoYM=;
-  b=gDtQIWDLMjJ/NAXUg/qRikxvG4HqzfhgG4r4dHvHws/40uaGZuxCQ/9t
-   sTSIQbUP6K/7C5E71dauPy19cjgAadtaMRF7bjAfwxWkKFilEAXdb4igA
-   FJZiFQFuPb2rsq+vrJiLS6unN/q9xofBi4zTENhSS+BdVxY9dHO6p/S2X
-   PypCitc64VGpdmIAjIvVelyRdmvGo1Z4uEuMuGbsc9IOphLdZ+RcVzchW
-   jCGsw8ucyej7zIpSxYJf23+2ro76EaYTTvVF/d352jwol6zfHv9Azkj+f
-   G2pCNbAIweBg2MKnkBs3l5Bs88oviLrGiIh3oU0Y/QIXJx9IIVGc7koz6
-   w==;
-X-CSE-ConnectionGUID: MDDVaqVhRqenuoSd1grXjg==
-X-CSE-MsgGUID: wGoZR4F7TSiOLGn00rOoNA==
-X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
-   d="scan'208";a="34539067"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 07 Nov 2024 12:19:43 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.35; Thu, 7 Nov 2024 12:19:22 -0700
-Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex04.mchp-main.com
- (10.10.85.152) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
- Transport; Thu, 7 Nov 2024 12:19:20 -0700
-Date: Thu, 7 Nov 2024 19:19:19 +0000
-From: Daniel Machon <daniel.machon@microchip.com>
-To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-CC: Alexandre Torgue <alexandre.torgue@foss.st.com>, Jose Abreu
-	<joabreu@synopsys.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, Richard Cochran <richardcochran@gmail.com>,
-	Alexis =?utf-8?Q?Lothor=C3=A9?= <alexis.lothore@bootlin.com>, Thomas
- Petazzoni <thomas.petazzoni@bootlin.com>, <netdev@vger.kernel.org>,
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	<linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v3 0/9] Support external snapshots on dwmac1000
-Message-ID: <20241107191919.sngc2x664lp7jeg2@DEN-DL-M70577>
-References: <20241106090331.56519-1-maxime.chevallier@bootlin.com>
+	s=arc-20240116; t=1731007225; c=relaxed/simple;
+	bh=JBhz9+1uyurCdClWp+VUqnIwmDBE2nI+l6K/7/ZYbCY=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=fslaTqXwuO7if7jyXhpJpOakVnoHciCYsb0IDnvriVuwqpagRNNVudynh402jBbgeTLgG2Yct31m3eKUf9uiMcuAShFxfjfKq7QKb/8aMlYOyt8ZU0I1lQ7adir9lYoAXal3Zd6LE5utKfr8k2ZLBwkxhY67MGcWXk7Ayu5QytY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=LeEDIYcC; arc=none smtp.client-ip=209.85.128.202
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--edumazet.bounces.google.com
+Received: by mail-yw1-f202.google.com with SMTP id 00721157ae682-6e9d6636498so26459227b3.2
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 11:20:23 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731007222; x=1731612022; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=D1J3twfkorfwpUBmVtrda8j5+TCmvF02e9OCKZWLR8Y=;
+        b=LeEDIYcC50akneXl251Z8eSrAtl8M4JtIUEUqNLa/5jKOLzya2cRxbikK9hhKddL7V
+         2HCYrRoWejtvHJNFg0PM1n2T/Nmhvnia6O+fdFxYYRHI6xsySw5yMe1+3Mf/LQYosBv7
+         w6j2NmPFVYuP5+zq3wnlzLbBp2jl6GKrmKz1Iyf4ACfjEEq1TVYPyYhBxM5tlt8F69Lf
+         s0L4SWkRrQzNe0WoPB9Vogv+s4RgnzD0jB8O88rtpKNvuuHm3wR7gDutZIAZK5XbZorX
+         4ouCCnlPnQujPJWx1CeyA+gYs7fNKdtpWhHrF8Y6Bhx4Q9lZwTrUumMYIoyhQtxil+Ad
+         WODA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731007222; x=1731612022;
+        h=content-transfer-encoding:cc:to:from:subject:message-id
+         :mime-version:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=D1J3twfkorfwpUBmVtrda8j5+TCmvF02e9OCKZWLR8Y=;
+        b=vCwCHNgSYRCbpz171bRlErTjFQtD4FTz7XN2WwNjecnjAcIL9o0QuHXC0YtK6WEAvx
+         iSFECbI4/k94zD/Muwj7+MyvjjVn/Lkt1Do5eSIUizu5JSZtwEvhS8+YfD/nTMEh4Qwm
+         1DqAIray9Dy6v6aWGutcZo7Vtld4CA9cJMVCjPUkHGktbinaqT5AG7NXegSjcw5HhgeB
+         eix4IoJ3QptfMxqmRo6JErxbEu1GcKWCV7D/nqpxoqKPCgvl5RlJ9152CHK7PU7fTi3W
+         gsnJhVHflWaSb9JI810ll53JYUchp2QPPJj121pJpgvw2OYiyNGJxSRSCU8pu9ZwPU9w
+         XscA==
+X-Gm-Message-State: AOJu0YxPIhfV6dhXVJDrD7Gcxp4eMk/W1aVhnGQgM9gXDG4MMmnbDJ+2
+	kMgn3hBqShGUenEaNzPA5V3JPqDuvFaGEbYEcvWyHp6qjNv+mVZDGq1RAyukJIyOx4skR43xVKW
+	mCGyf722o1Q==
+X-Google-Smtp-Source: AGHT+IE4FeSKIAPhscv3iZyXQnxMcv9sVC0X5oel6JHkpLqsHe4uA69i0Lz3NZTk7zKjlYhT/8riAa5L3N9Vvw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:f7:ea0b:ac12:11d6])
+ (user=edumazet job=sendgmr) by 2002:a25:a208:0:b0:e30:c235:d79f with SMTP id
+ 3f1490d57ef6-e337f8d5415mr81276.8.1731007222321; Thu, 07 Nov 2024 11:20:22
+ -0800 (PST)
+Date: Thu,  7 Nov 2024 19:20:21 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset="iso-8859-1"
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20241106090331.56519-1-maxime.chevallier@bootlin.com>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
+Message-ID: <20241107192021.2579789-1-edumazet@google.com>
+Subject: [PATCH net-next] sctp: fix possible UAF in sctp_v6_available()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, Xin Long <lucien.xin@gmail.com>, 
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-> Hi,
-> 
-> This V3 is just a rebase a V2 on top of net-next to address some minor
-> conflicts. No changes were made.
-> 
-> This series is another take on the pervious work [1] done by
-> Alexis Lothoré, that fixes the support for external snapshots
-> timestamping in GMAC3-based devices.
-> 
-> Details on why this is needed are mentionned on the cover [2] from V1.
-> 
-> This V2 addresses multiple issues found in V1 :
-> 
->  - The PTP_TCR register is configured from multiple places, as reported
->    by Alexis, so we need to make sure that the extts configuration
->    doesn't interfere with the hwtstamp configuration.
-> 
->  - The interrupt management in V1 was incomplete, as the interrupt
->    wasn't correctly acked.
-> 
->  - This series also makes so that we only enable the extts interrupt
->    when necessary.
-> 
-> [1]: https://lore.kernel.org/netdev/20230616100409.164583-1-alexis.lothore@bootlin.com/
-> [2]: https://lore.kernel.org/netdev/20241029115419.1160201-1-maxime.chevallier@bootlin.com/
-> 
-> Thanks Alexis for laying the groundwork for this,
-> 
-> Best regards,
-> 
-> Maxime
-> 
-> Link to V1: https://lore.kernel.org/netdev/20241029115419.1160201-1-maxime.chevallier@bootlin.com/
-> Link to V2: https://lore.kernel.org/netdev/20241104170251.2202270-1-maxime.chevallier@bootlin.com/
+A lockdep report [1] with CONFIG_PROVE_RCU_LIST=3Dy hints
+that sctp_v6_available() is calling dev_get_by_index_rcu()
+and ipv6_chk_addr() without holding rcu.
 
-Hi Maxime,
+[1]
+ =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D
+ WARNING: suspicious RCU usage
+ 6.12.0-rc5-virtme #1216 Tainted: G        W
+ -----------------------------
+ net/core/dev.c:876 RCU-list traversed in non-reader section!!
 
-Dont know much about this particular driver, but the patches looked good
-to me!
+other info that might help us debug this:
 
-For the series:
+rcu_scheduler_active =3D 2, debug_locks =3D 1
+ 1 lock held by sctp_hello/31495:
+ #0: ffff9f1ebbdb7418 (sk_lock-AF_INET6){+.+.}-{0:0}, at: sctp_bind (./arch=
+/x86/include/asm/jump_label.h:27 net/sctp/socket.c:315) sctp
 
-Reviewed-by: Daniel Machon <daniel.machon@microchip.com>
+stack backtrace:
+ CPU: 7 UID: 0 PID: 31495 Comm: sctp_hello Tainted: G        W          6.1=
+2.0-rc5-virtme #1216
+ Tainted: [W]=3DWARN
+ Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.3-debian-=
+1.16.3-2 04/01/2014
+ Call Trace:
+  <TASK>
+ dump_stack_lvl (lib/dump_stack.c:123)
+ lockdep_rcu_suspicious (kernel/locking/lockdep.c:6822)
+ dev_get_by_index_rcu (net/core/dev.c:876 (discriminator 7))
+ sctp_v6_available (net/sctp/ipv6.c:701) sctp
+ sctp_do_bind (net/sctp/socket.c:400 (discriminator 1)) sctp
+ sctp_bind (net/sctp/socket.c:320) sctp
+ inet6_bind_sk (net/ipv6/af_inet6.c:465)
+ ? security_socket_bind (security/security.c:4581 (discriminator 1))
+ __sys_bind (net/socket.c:1848 net/socket.c:1869)
+ ? do_user_addr_fault (./include/linux/rcupdate.h:347 ./include/linux/rcupd=
+ate.h:880 ./include/linux/mm.h:729 arch/x86/mm/fault.c:1340)
+ ? do_user_addr_fault (./arch/x86/include/asm/preempt.h:84 (discriminator 1=
+3) ./include/linux/rcupdate.h:98 (discriminator 13) ./include/linux/rcupdat=
+e.h:882 (discriminator 13) ./include/linux/mm.h:729 (discriminator 13) arch=
+/x86/mm/fault.c:1340 (discriminator 13))
+ __x64_sys_bind (net/socket.c:1877 (discriminator 1) net/socket.c:1875 (dis=
+criminator 1) net/socket.c:1875 (discriminator 1))
+ do_syscall_64 (arch/x86/entry/common.c:52 (discriminator 1) arch/x86/entry=
+/common.c:83 (discriminator 1))
+ entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:130)
+ RIP: 0033:0x7f59b934a1e7
+ Code: 44 00 00 48 8b 15 39 8c 0c 00 f7 d8 64 89 02 b8 ff ff ff ff eb bd 66=
+ 2e 0f 1f 84 00 00 00 00 00 0f 1f 00 b8 31 00 00 00 0f 05 <48> 3d 01 f0 ff =
+ff 73 01 c3 48 8b 0d 09 8c 0c 00 f7 d8 64 89 01 48
+All code
+=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	44 00 00             	add    %r8b,(%rax)
+   3:	48 8b 15 39 8c 0c 00 	mov    0xc8c39(%rip),%rdx        # 0xc8c43
+   a:	f7 d8                	neg    %eax
+   c:	64 89 02             	mov    %eax,%fs:(%rdx)
+   f:	b8 ff ff ff ff       	mov    $0xffffffff,%eax
+  14:	eb bd                	jmp    0xffffffffffffffd3
+  16:	66 2e 0f 1f 84 00 00 	cs nopw 0x0(%rax,%rax,1)
+  1d:	00 00 00
+  20:	0f 1f 00             	nopl   (%rax)
+  23:	b8 31 00 00 00       	mov    $0x31,%eax
+  28:	0f 05                	syscall
+  2a:*	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax		<-- trapping =
+instruction
+  30:	73 01                	jae    0x33
+  32:	c3                   	ret
+  33:	48 8b 0d 09 8c 0c 00 	mov    0xc8c09(%rip),%rcx        # 0xc8c43
+  3a:	f7 d8                	neg    %eax
+  3c:	64 89 01             	mov    %eax,%fs:(%rcx)
+  3f:	48                   	rex.W
+
+Code starting with the faulting instruction
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+   0:	48 3d 01 f0 ff ff    	cmp    $0xfffffffffffff001,%rax
+   6:	73 01                	jae    0x9
+   8:	c3                   	ret
+   9:	48 8b 0d 09 8c 0c 00 	mov    0xc8c09(%rip),%rcx        # 0xc8c19
+  10:	f7 d8                	neg    %eax
+  12:	64 89 01             	mov    %eax,%fs:(%rcx)
+  15:	48                   	rex.W
+ RSP: 002b:00007ffe2d0ad398 EFLAGS: 00000202 ORIG_RAX: 0000000000000031
+ RAX: ffffffffffffffda RBX: 00007ffe2d0ad3d0 RCX: 00007f59b934a1e7
+ RDX: 000000000000001c RSI: 00007ffe2d0ad3d0 RDI: 0000000000000005
+ RBP: 0000000000000005 R08: 1999999999999999 R09: 0000000000000000
+ R10: 00007f59b9253298 R11: 0000000000000202 R12: 00007ffe2d0ada61
+ R13: 0000000000000000 R14: 0000562926516dd8 R15: 00007f59b9479000
+  </TASK>
+
+Fixes: 6fe1e52490a9 ("sctp: check ipv6 addr with sk_bound_dev if set")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+Cc: Xin Long <lucien.xin@gmail.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>
+---
+ net/sctp/ipv6.c | 19 +++++++++++++------
+ 1 file changed, 13 insertions(+), 6 deletions(-)
+
+diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
+index f7b809c0d142c0e6c8e29c2badc4428648117f31..38e2fbdcbeac4bf3185d98f8aca=
+e4aea531ca140 100644
+--- a/net/sctp/ipv6.c
++++ b/net/sctp/ipv6.c
+@@ -683,7 +683,7 @@ static int sctp_v6_available(union sctp_addr *addr, str=
+uct sctp_sock *sp)
+ 	struct sock *sk =3D &sp->inet.sk;
+ 	struct net *net =3D sock_net(sk);
+ 	struct net_device *dev =3D NULL;
+-	int type;
++	int type, res, bound_dev_if;
+=20
+ 	type =3D ipv6_addr_type(in6);
+ 	if (IPV6_ADDR_ANY =3D=3D type)
+@@ -697,14 +697,21 @@ static int sctp_v6_available(union sctp_addr *addr, s=
+truct sctp_sock *sp)
+ 	if (!(type & IPV6_ADDR_UNICAST))
+ 		return 0;
+=20
+-	if (sk->sk_bound_dev_if) {
+-		dev =3D dev_get_by_index_rcu(net, sk->sk_bound_dev_if);
++	rcu_read_lock();
++	bound_dev_if =3D READ_ONCE(sk->sk_bound_dev_if);
++	if (bound_dev_if) {
++		res =3D 0;
++		dev =3D dev_get_by_index_rcu(net, bound_dev_if);
+ 		if (!dev)
+-			return 0;
++			goto out;
+ 	}
+=20
+-	return ipv6_can_nonlocal_bind(net, &sp->inet) ||
+-	       ipv6_chk_addr(net, in6, dev, 0);
++	res =3D ipv6_can_nonlocal_bind(net, &sp->inet) ||
++	      ipv6_chk_addr(net, in6, dev, 0);
++
++out:
++	rcu_read_unlock();
++	return res;
+ }
+=20
+ /* This function checks if the address is a valid address to be used for
+--=20
+2.47.0.277.g8800431eea-goog
+
 
