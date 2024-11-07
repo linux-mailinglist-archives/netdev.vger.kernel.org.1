@@ -1,217 +1,179 @@
-Return-Path: <netdev+bounces-142876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83519C08F9
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:34:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B973A9C0914
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 15:38:57 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8FB811F240F6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:34:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69E112819D5
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:38:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B530621219F;
-	Thu,  7 Nov 2024 14:34:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDF0721218E;
+	Thu,  7 Nov 2024 14:38:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="aLs0+dJr"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="UzyM5AJr"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f174.google.com (mail-il1-f174.google.com [209.85.166.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C3471E049C;
-	Thu,  7 Nov 2024 14:34:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D5B1F8EFF;
+	Thu,  7 Nov 2024 14:38:52 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730990049; cv=none; b=AxYzwjzi7jvX4e0zDaINr+c/qaOX1730zKcnnQLiC0X9ttBdnNs/vWNAMm+DTa13GBldsmDmb2nIIYmde2lSfMBgnIpFWiITRN73ILjmgTihZhpXPUtlMMZ5jLnhq/9qHt4SbuxT6zreXz+BKatCPuYUkxGZ0yfrMARSXwr2uTI=
+	t=1730990333; cv=none; b=NfOvI6P4L6HChT6qvsC9hNvBJuuIRKqKDBfDvOysHBLbR7G4HGr2Y+vcJcSDxCvd1mRvqaDp4dE9/6R3ZjdQNBJLBo9wYyJo62ir8SIDMI/hjenlcot7iI6stqslmhJyMg3MHrt2qga1nyIETH0qDQgZzBiTeOX39m5ijMpr76o=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730990049; c=relaxed/simple;
-	bh=PZ0qlphJcD8vX64gcDaorA5K5So48tJfKoWbNIH4d5A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=CqT/2wrPFD5J45RXLUc4H3ileg4B1ycVvlFoiCDRZ7RVBvzTjAL3GyUp2BgI9fF8ajjeoQyeflpbY9rwcUIBLGOcaqY5SSs3M+TpL+aXOyDux/M5iwFQA29rg+InGx/R+c0e0HyeiVzKL8lZmRIlC72IyqMTOOeSAC8wv+EufcE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=aLs0+dJr; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 935D0C4CECC;
-	Thu,  7 Nov 2024 14:34:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730990049;
-	bh=PZ0qlphJcD8vX64gcDaorA5K5So48tJfKoWbNIH4d5A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=aLs0+dJrOkCwh+rGYeR+BNamanHu9Yy6X6Nr3eJEp8SwlcPvp5BGy/oVovkQzpdFh
-	 v14otvCmmY2CqP/Z9qC1yAUCFc+UFbLBP1jH481MZGzBBgd7sjI9E+Sg06rVN/2PVF
-	 UNYighYZmct23f2LtAd7/5KzI6OUY0pArTzJxNVC+TI6O7UEzLKm+XdzMltHQgBjzh
-	 DUe5+DRhEk5IyUyDjsRT/wkLiIz9jaC5wXFw8VX7T6qQb/3QgJaHq2/lvr/rGTYbq7
-	 UeML0mOZA8LdYdZnIHpKiUdPzTEURQokiB/qQtOF2tvp1EoPArLfdhxBMkwhDLsUJQ
-	 23W38BsTUXytQ==
-Date: Thu, 7 Nov 2024 14:34:04 +0000
-From: Simon Horman <horms@kernel.org>
-To: Divya Koppera <divya.koppera@microchip.com>
-Cc: andrew@lunn.ch, arun.ramadoss@microchip.com,
-	UNGLinuxDriver@microchip.com, hkallweit1@gmail.com,
-	linux@armlinux.org.uk, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, richardcochran@gmail.com
-Subject: Re: [PATCH net-next 2/5] net: phy: microchip_ptp : Add ptp library
- for Microchip phys
-Message-ID: <20241107143404.GV4507@kernel.org>
-References: <20241104090750.12942-1-divya.koppera@microchip.com>
- <20241104090750.12942-3-divya.koppera@microchip.com>
+	s=arc-20240116; t=1730990333; c=relaxed/simple;
+	bh=l7JvSxJBHZ38vac4UEzAmhJXOGtxKvkL40j9n0BIF7I=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=BEGFw+Dc9iqvLuyR51hql8p2Lk9jEZZcomRLh+/wKOt33hkmKbku65PO6rXKrNmhg2pGlNdLazFySeuYUaQq+efAe6SSzirnxHGpk8UOw8BBc5ZMNBo4kTmb7IsLZyWuH0xRdV6/Bo78YBEHwKzszfEQIp7r5IjLfKky0/WQ9Sw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=UzyM5AJr; arc=none smtp.client-ip=209.85.166.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-il1-f174.google.com with SMTP id e9e14a558f8ab-3a3aeb19ea2so3987085ab.0;
+        Thu, 07 Nov 2024 06:38:52 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730990331; x=1731595131; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=I+8oT9nfItu+kQ69xKVVdOmaZDkdDh7Tg4sB6xTZL6w=;
+        b=UzyM5AJrkXarkCvAYiucWyn2ow0ZE2Jtx42bgI6kFrhPrkM+6hwVESblVXj1wb7kDx
+         qUq/90nLZo5J6VKnnpTbgpMR3ieE/TwsR0t8paiXbdyIDf/7zy3L/gaGR/t5WQOxCd2A
+         qKM8B4wgw9QsFWo/KaCL6Px3b1Ao3IovYVdEG4TQ1Ca/nAK1AF77EEdaWP90rZAK1YPC
+         4O6hhVb83kvsFI9defCqYnlMvpZh1naGnzMYmXT1ufRpPoJx1OU44bZfk3fjvvacRVLF
+         nfVSOw42MplgvAFBL67RUJFXqqcxmByGgvCaMEwCUThIcKRAI8Qr/uCDk6nOx59eEKyx
+         iHkQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730990331; x=1731595131;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=I+8oT9nfItu+kQ69xKVVdOmaZDkdDh7Tg4sB6xTZL6w=;
+        b=kE3nrxNYqaxInkgKiBPkuk4DE9KzefcqqnYZAgXBtkipEpSMc+U2nuM49v7SINXfvi
+         nhkMeeE5yV9jLS6M5FcAb5pnEIJOeOMgf2qqHsv3msYKTauP+4+Z1T8/qXoAsvzQPHcB
+         afzksEuootW7Zwx3bWKv3FkIuPBpOYp27evkcg3M9IU8zAspn9lBhd+ExEyvYnwAG+6S
+         nmFN7wTIzj9CB8ST8Sf5Pvfi2kl6F/IZ3yre/wr6wlxrDUGnEnM6IUdAhFsJLn1f6tl5
+         lK3uhuObFMWZZHauTmzreR0L2w+2fBSYaqym6rpNiP4d6H2qW23vX9be1Vm/pJj+2TYr
+         evcQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAQc5gyC21T1YqxuI+YUA8XmkgV6URKoOgTwjQgBziS/V1u/TgT30zgtA3ZxkHvvVMhSd1JJC6@vger.kernel.org, AJvYcCXWv3I0JubMdchaGAHJacCXg2lO6D63MNPkJ8/UIZ2R1Gb63f2tLP3I8IXYz+2J5MWNwfzaVr/168YC@vger.kernel.org
+X-Gm-Message-State: AOJu0YxYCSbfE0CQeVOTDdBdGZLvxjh2r9cs0ukijDP3dx6kKBWwxaG+
+	y5IoyO0lTI0thodJBwbSaIZ+DrsQ+93sJPEPaJTl3VnoC822C5bS0n5fL32bZanKjSlHSf1v4Bk
+	yTJZEQJiq0gm0aCtfzjmWwKQkvZc=
+X-Google-Smtp-Source: AGHT+IHaSLNq/a7u4BuDR3RQj0zHqkw3iqoefK+C5Iv838Wd9iujSSJDth0zXNgL7hbllUifbcwF7vP2bFgPqqcYQ6U=
+X-Received: by 2002:a05:6e02:220a:b0:3a6:c89d:4eb5 with SMTP id
+ e9e14a558f8ab-3a6c89d50e2mr177221665ab.15.1730990331386; Thu, 07 Nov 2024
+ 06:38:51 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241104090750.12942-3-divya.koppera@microchip.com>
+References: <20241104083545.114-1-gnaaman@drivenets.com>
+In-Reply-To: <20241104083545.114-1-gnaaman@drivenets.com>
+From: Xin Long <lucien.xin@gmail.com>
+Date: Thu, 7 Nov 2024 09:38:40 -0500
+Message-ID: <CADvbK_fV3t8Txh73gOVGh8NV401xb0dQDNJjc-YsW9kUeEkhEg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] sctp: Avoid enqueuing addr events redundantly
+To: Gilad Naaman <gnaaman@drivenets.com>
+Cc: Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Simon Horman <horms@kernel.org>, linux-sctp@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Mon, Nov 04, 2024 at 02:37:47PM +0530, Divya Koppera wrote:
-> Add ptp library for Microchip phys
-> 1-step and 2-step modes are supported, over Ethernet and UDP(ipv4, ipv6)
-> 
-> Signed-off-by: Divya Koppera <divya.koppera@microchip.com>
+On Mon, Nov 4, 2024 at 3:36=E2=80=AFAM Gilad Naaman <gnaaman@drivenets.com>=
+ wrote:
+>
+>
+> Avoid modifying or enqueuing new events if it's possible to tell that no
+> one will consume them.
+>
+> Since enqueueing requires searching the current queue for opposite
+> events for the same address, adding addresses en-masse turns this
+> inetaddr_event into a bottle-neck, as it will get slower and slower
+> with each address added.
+>
+> Signed-off-by: Gilad Naaman <gnaaman@drivenets.com>
+Acked-by: Xin Long <lucien.xin@gmail.com>
+
+Thanks.
+
 > ---
->  drivers/net/phy/microchip_ptp.c | 990 ++++++++++++++++++++++++++++++++
->  1 file changed, 990 insertions(+)
->  create mode 100644 drivers/net/phy/microchip_ptp.c
-> 
-> diff --git a/drivers/net/phy/microchip_ptp.c b/drivers/net/phy/microchip_ptp.c
-
-...
-
-> +static bool mchp_ptp_get_sig_tx(struct sk_buff *skb, u16 *sig)
-> +{
-> +	struct ptp_header *ptp_header;
-> +	int type;
+> Changes in v2:
+>  - Reorder list removal to avoid race with new sessions
+> ---
+>  net/sctp/ipv6.c     |  2 +-
+>  net/sctp/protocol.c | 16 +++++++++++++++-
+>  2 files changed, 16 insertions(+), 2 deletions(-)
+>
+> diff --git a/net/sctp/ipv6.c b/net/sctp/ipv6.c
+> index f7b809c0d142..b96c849545ae 100644
+> --- a/net/sctp/ipv6.c
+> +++ b/net/sctp/ipv6.c
+> @@ -103,10 +103,10 @@ static int sctp_inet6addr_event(struct notifier_blo=
+ck *this, unsigned long ev,
+>                             ipv6_addr_equal(&addr->a.v6.sin6_addr,
+>                                             &ifa->addr) &&
+>                             addr->a.v6.sin6_scope_id =3D=3D ifa->idev->de=
+v->ifindex) {
+> -                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
+L);
+>                                 found =3D 1;
+>                                 addr->valid =3D 0;
+>                                 list_del_rcu(&addr->list);
+> +                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
+L);
+>                                 break;
+>                         }
+>                 }
+> diff --git a/net/sctp/protocol.c b/net/sctp/protocol.c
+> index 39ca5403d4d7..8b9a1b96695e 100644
+> --- a/net/sctp/protocol.c
+> +++ b/net/sctp/protocol.c
+> @@ -738,6 +738,20 @@ void sctp_addr_wq_mgmt(struct net *net, struct sctp_=
+sockaddr_entry *addr, int cm
+>          */
+>
+>         spin_lock_bh(&net->sctp.addr_wq_lock);
 > +
-> +	type = ptp_classify_raw(skb);
-> +	if (type == PTP_CLASS_NONE)
-> +		return false;
+> +       /* Avoid searching the queue or modifying it if there are no cons=
+umers,
+> +        * as it can lead to performance degradation if addresses are mod=
+ified
+> +        * en-masse.
+> +        *
+> +        * If the queue already contains some events, update it anyway to=
+ avoid
+> +        * ugly races between new sessions and new address events.
+> +        */
+> +       if (list_empty(&net->sctp.auto_asconf_splist) &&
+> +           list_empty(&net->sctp.addr_waitq)) {
+> +               spin_unlock_bh(&net->sctp.addr_wq_lock);
+> +               return;
+> +       }
 > +
-> +	ptp_header = ptp_parse_header(skb, type);
-> +	if (!ptp_header)
-> +		return false;
-> +
-> +	*sig = htons(ptp_header->sequence_id);
-
-Hi Divya,
-
-The type of *sig is u16, a host-byte order integer.
-But htons() returns __be16, a big-endian integer.
-This does not seem right.
-
-Likewise, in the caller, and beyond, if these are big-endian integers
-then appropriate types - probably __be16 - should be used.
-
-Flagged by Sparse.
-
-> +
-> +	return true;
-> +}
-
-...
-
-> +static struct mchp_ptp_rx_ts *mchp_ptp_get_rx_ts(struct mchp_ptp_clock *ptp_clock)
-> +{
-> +	struct phy_device *phydev = ptp_clock->phydev;
-> +	struct mchp_ptp_rx_ts *rx_ts = NULL;
-> +	u32 sec, nsec;
-> +	u16 seq;
-> +	int rc;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_RX_INGRESS_NS_HI(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		goto error;
-> +	if (!(rc & MCHP_PTP_RX_INGRESS_NS_HI_TS_VALID)) {
-> +		phydev_err(phydev, "RX Timestamp is not valid!\n");
-> +		goto error;
-> +	}
-> +	nsec = (rc & GENMASK(13, 0)) << 16;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_RX_INGRESS_NS_LO(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		goto error;
-> +	nsec |= rc;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_RX_INGRESS_SEC_HI(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		goto error;
-> +	sec = rc << 16;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_RX_INGRESS_SEC_LO(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		goto error;
-> +	sec |= rc;
-> +
-> +	seq = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			   MCHP_PTP_RX_MSG_HEADER2(BASE_PORT(ptp_clock)));
-> +	if (seq < 0)
-
-seq is unsigned; it can never be less than 0.
-
-Flagged by Smatch.
-
-> +		goto error;
-> +
-> +	rx_ts = kzalloc(sizeof(*rx_ts), GFP_KERNEL);
-> +	if (!rx_ts)
-> +		return NULL;
-> +
-> +	rx_ts->seconds = sec;
-> +	rx_ts->nsec = nsec;
-> +	rx_ts->seq_id = seq;
-> +
-> +error:
-> +	return rx_ts;
-> +}
-
-...
-
-> +static bool mchp_ptp_get_tx_ts(struct mchp_ptp_clock *ptp_clock,
-> +			       u32 *sec, u32 *nsec, u16 *seq)
-> +{
-> +	struct phy_device *phydev = ptp_clock->phydev;
-> +	int rc;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_TX_EGRESS_NS_HI(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		return false;
-> +	if (!(rc & MCHP_PTP_TX_EGRESS_NS_HI_TS_VALID))
-> +		return false;
-> +	*nsec = (rc & GENMASK(13, 0)) << 16;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_TX_EGRESS_NS_LO(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		return false;
-> +	*nsec = *nsec | rc;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_TX_EGRESS_SEC_HI(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		return false;
-> +	*sec = rc << 16;
-> +
-> +	rc = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			  MCHP_PTP_TX_EGRESS_SEC_LO(BASE_PORT(ptp_clock)));
-> +	if (rc < 0)
-> +		return false;
-> +	*sec = *sec | rc;
-> +
-> +	*seq = phy_read_mmd(phydev, PTP_MMD(ptp_clock),
-> +			    MCHP_PTP_TX_MSG_HEADER2(BASE_PORT(ptp_clock)));
-> +	if (*seq < 0)
-
-Likewise, *seq is unsigned; it can never be less than 0.
-
-> +		return false;
-> +
-> +	return true;
-> +}
-
-...
+>         /* Offsets existing events in addr_wq */
+>         addrw =3D sctp_addr_wq_lookup(net, addr);
+>         if (addrw) {
+> @@ -808,10 +822,10 @@ static int sctp_inetaddr_event(struct notifier_bloc=
+k *this, unsigned long ev,
+>                         if (addr->a.sa.sa_family =3D=3D AF_INET &&
+>                                         addr->a.v4.sin_addr.s_addr =3D=3D
+>                                         ifa->ifa_local) {
+> -                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
+L);
+>                                 found =3D 1;
+>                                 addr->valid =3D 0;
+>                                 list_del_rcu(&addr->list);
+> +                               sctp_addr_wq_mgmt(net, addr, SCTP_ADDR_DE=
+L);
+>                                 break;
+>                         }
+>                 }
+> --
+> 2.34.1
+>
 
