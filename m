@@ -1,110 +1,85 @@
-Return-Path: <netdev+bounces-143059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143063-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id C19B39C0FFA
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:46:56 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 43B499C100B
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:48:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 787EA1F23DC2
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:46:56 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E8C841F24418
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:48:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0187C21791B;
-	Thu,  7 Nov 2024 20:46:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 599C1218584;
+	Thu,  7 Nov 2024 20:48:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="Dz6r7CR5"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BT1HdpCN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 747BE186E58
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 20:46:48 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33CEC218339;
+	Thu,  7 Nov 2024 20:48:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731012412; cv=none; b=KC4Gvyr4zxRaB0NWpYwrz/4b+TUXn+gkf2W88RJUTDCe3EbPtgaGwafU/B0YMXmqN8K/8Q7YXC2LGCCtq+SfzFQynz61j/7bcy/apuPgwcGPqTqP2YOIDlHBf/k7L3xbAqoBq2cwtscP8zy/z+YQ6GyMQO7jpZufJmMTDCpdHDI=
+	t=1731012484; cv=none; b=WHPTCgPnYxCTm7DtVPl9ilLPBdJ9mdtariszmAghJotmnqHvw9C4K7RnV80Wte5cJqKsjdR4+INN3jvcp3SCDnAuOQ30poVd4n/kHZrfKZk9HyShJyLWXtXUBN65josH+pK1x3OpVkiFRaDe5l9xfuC+zbUdtqamihMP4bT1K10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731012412; c=relaxed/simple;
-	bh=kLr7cOclroyf5zVvYnQrQ2CcjkVEuNICECl91R8pvZA=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=L7aQXKAoTvDd/N8qgWBYPyugqWhniKFD4l2DV0IpZP4IlSvycsYNk2oZVmBONNTIuCQlTMM9x+sRf1v/xHM26bmp533q0m2UUVxoJ9vqxlr1SldYkQYaMU9DCQPtJmeP5ufo7Ta0PqhbMfgcXQnvhoO0piyB9QevK4Yt0Irx4WM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=Dz6r7CR5; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit02.runbox ([10.9.9.162] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1t99Op-001amC-6z; Thu, 07 Nov 2024 21:46:39 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Cc:To:In-Reply-To:References:Message-Id:
-	Content-Transfer-Encoding:Content-Type:MIME-Version:Subject:Date:From;
-	bh=s52+eMLfek4vBrlWTawS+NMGo3ZdEqQlahGa6OYNJF4=; b=Dz6r7CR5wDT+ZtZF595bhaKEfu
-	kxWO6bfhAifZPleGJZEVQnhhTLbkv7BOBwxQR6uRRqGc0JiSNyC6rD0D9rPAZ+hQ0YQEM6cKgE6tA
-	Efh6l8A1R+UTDU2I3Gmm5smLxeHTy//+e7QI6LFYewxLd4ypnaT68Th8jnJNymp4Hh7WAZhze+MjE
-	F07BANiCiLO+Vp1ktYqX2WUcSBRYD3oBzrY7Cf8sznfXeZeSIjiXvDslUmB9xY1eoiMtf5qkHzviC
-	LWF14FB6SvpByieEJ1cA47rMERqKYxwTSa0QsVdn6H5LMcZkuumHSrgdMHeu/1B6h/psFTtbzK3IU
-	ct5REk3A==;
-Received: from [10.9.9.73] (helo=submission02.runbox)
-	by mailtransmit02.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1t99Oj-0003F0-T5; Thu, 07 Nov 2024 21:46:34 +0100
-Received: by submission02.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1t99Oi-00303e-3b; Thu, 07 Nov 2024 21:46:32 +0100
-From: Michal Luczaj <mhal@rbox.co>
-Date: Thu, 07 Nov 2024 21:46:14 +0100
-Subject: [PATCH net v2 3/3] virtio/vsock: Improve MSG_ZEROCOPY error
- handling
+	s=arc-20240116; t=1731012484; c=relaxed/simple;
+	bh=CkYOhQy63q7pImPZKagyugMZd1sNN57Pz9JKej/6hj8=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=T60ngjDQg7u7xU8M2D/g4iwfU3HDu4G/0z5ihmv25chIxQZV5ODxsDe1MRz49/nVwuP4CJFu8DYNz/KUCpdTO0dCPnP3YFEPju1CGUkHEPTGT5S0abEaZN9a1AzCv3tgVQihGh551Zf8/Y3OFkk+/Q4TZRXx4kiZV374JK8Io9o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BT1HdpCN; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 82019C4CECC;
+	Thu,  7 Nov 2024 20:48:03 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731012483;
+	bh=CkYOhQy63q7pImPZKagyugMZd1sNN57Pz9JKej/6hj8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=BT1HdpCNKhD9AcYUIPYyyaERtBXIgMAggRp/17ZfCfC1cJJYp0kdCUhP4bKfGjZE6
+	 kXJW4vmRzqqZ+N0VlwqXrQHvyPGho/xO4Y56hmt3KkG7B56rpsTJSNdrwZBTpsBny2
+	 3jbE951oUr0dZ7ANsxlBhox088HJDO5Dh7cCKVPbwGJ4xRF5KliEE2oYaRtBrcQxNJ
+	 hYnSF3RJaMIf0IuH0LyaMXv53323HVyLyPU1mBiR7AHW6hbcef9a9WN45uqNlYgJLb
+	 tyVw+YWCvplWQmHT8OnA2bqHCm0YaENQdol7q9gOY4OsZ7X50bPZ7meu5uQaHJqj5z
+	 pnxv4kyw1tXig==
+Date: Thu, 7 Nov 2024 12:48:02 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
+ netfilter-devel@vger.kernel.org, davem@davemloft.net,
+ netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com
+Subject: Re: [PATCH net-next 00/11] Netfilter updates for net-next
+Message-ID: <20241107124802.712e9746@kernel.org>
+In-Reply-To: <20241107070834.GA8542@breakpoint.cc>
+References: <20241106234625.168468-1-pablo@netfilter.org>
+	<20241106161939.1c628475@kernel.org>
+	<20241107070834.GA8542@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241107-vsock-mem-leaks-v2-3-4e21bfcfc818@rbox.co>
-References: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
-In-Reply-To: <20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co>
-To: Stefan Hajnoczi <stefanha@redhat.com>, 
- Stefano Garzarella <sgarzare@redhat.com>, 
- "Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
- =?utf-8?q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>, Jia He <justin.he@arm.com>, 
- Arseniy Krasnov <avkrasnov@salutedevices.com>, 
- Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>, 
- George Zhang <georgezhang@vmware.com>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux.dev, 
- netdev@vger.kernel.org, Michal Luczaj <mhal@rbox.co>
-X-Mailer: b4 0.14.2
 
-Add a missing kfree_skb() to prevent memory leaks.
+On Thu, 7 Nov 2024 08:08:34 +0100 Florian Westphal wrote:
+> Jakub Kicinski <kuba@kernel.org> wrote:
+> > On Thu,  7 Nov 2024 00:46:14 +0100 Pablo Neira Ayuso wrote:  
+> > > "Unfortunately there are many more errors, and not all are false positives.  
+> > 
+> > Thanks a lot for jumping on fixing the CONFIG_RCU_LIST=y splats!
+> > To clarify should the selftests be splat-free now or there is more
+> > work required to get there?  
+> 
+> I tried to repro last week on net-next (not nf-next!) + v2 of these patches
+> and I did not see splats, but I'll re-run everything later today to make
+> sure they've been fixed up.
 
-Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
-Signed-off-by: Michal Luczaj <mhal@rbox.co>
----
- net/vmw_vsock/virtio_transport_common.c | 1 +
- 1 file changed, 1 insertion(+)
+Great! I was double checking if you know of any selftest-triggered
+problems before I re-enable that config in our CI.
 
-diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-index cd075f608d4f6f48f894543e5e9c966d3e5f22df..e2e6a30b759bdc6371bb0d63ee2e77c0ba148fd2 100644
---- a/net/vmw_vsock/virtio_transport_common.c
-+++ b/net/vmw_vsock/virtio_transport_common.c
-@@ -400,6 +400,7 @@ static int virtio_transport_send_pkt_info(struct vsock_sock *vsk,
- 			if (virtio_transport_init_zcopy_skb(vsk, skb,
- 							    info->msg,
- 							    can_zcopy)) {
-+				kfree_skb(skb);
- 				ret = -ENOMEM;
- 				break;
- 			}
+I flipped it back on few hours ago and looks like it's only hitting
+mcast routing and sctp bugs we already know about, so all good :)
 
--- 
-2.46.2
-
+Thanks again!
 
