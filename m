@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-142866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77CC19C0802
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:49:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C3AC69C0816
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:51:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379B0288663
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:49:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EFFD21C22E5B
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:51:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26A26212D15;
-	Thu,  7 Nov 2024 13:48:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5051B2101B0;
+	Thu,  7 Nov 2024 13:51:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="dIBMQem5"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="mlolKiiF"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-io1-f45.google.com (mail-io1-f45.google.com [209.85.166.45])
+Received: from mail-io1-f50.google.com (mail-io1-f50.google.com [209.85.166.50])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 918AF212642
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 13:48:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C4DE2076A5
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 13:51:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.50
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730987320; cv=none; b=JvsryEqBHjif3RV/8jtt96+ec+tG1d0CCfvvE4ySgqjx1KRwU3WxFzYch2+XXgqCk8RQYabJidKcscOm3pfahOuCNjyWELLAYbrLKlcr1gEMw+ps3MSh+hRcYGOgl5VhIrWFK/ICOafQYir4Jm3YGmpP12UalN7mGQinOObRDcE=
+	t=1730987468; cv=none; b=NPzSb5V6Mf2UnNLPknatHA74KMwM0LRWO9+4PSJbyRabvX/L0fMU2f08FltNtcZSbf5eTtfE0uGrlarUif14neIvn73h2/jU8daMVv6aP7lnXmTs0vGW94VrxwPtddLVt1s1I+jtVhylSBzJYXHTUDP9tTxXUfxzEIhOMsvmyAE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730987320; c=relaxed/simple;
-	bh=laJEKeeEOXw6OEqyzWbtv83/H2n8AhPE5GsCE0/eU60=;
+	s=arc-20240116; t=1730987468; c=relaxed/simple;
+	bh=Joqmdgk42QEjwNvXeMHuSOgl4G7/+JS37DUtTPm2xes=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=oTjWv0BM0BpPCrSCrYEOld9EoVWdk5gUK1sjK+mnNcEXzSdCmWRmXiz3wuD59PXZbD58Y+Hsc6Wu1fhF+FWpCHupVsTuOFK1huBA9k6PyrgQ5ZxInxtIAKaL/nXgXQ4/RPZ3OqdoATC5Jd7TQKj8XQGp1rCl30K2JeBlNkT/aec=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=dIBMQem5; arc=none smtp.client-ip=209.85.166.45
+	 To:Cc:Content-Type; b=gg1gPtAz6vHnfR6IXNg92+lPNu41WgfxOYz5qdZnGscQY/FMWC9DMNLRqlRYoPzamBysZmo5RhRi5AuooCbLyRA6HiGL0FncwQghMfQQLKHMnC15QFG/j8NWoHfXMR98RtlQwgY24xvkkFupBqHGbamOooSbnpUfS2Vg6ld6IyM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=mlolKiiF; arc=none smtp.client-ip=209.85.166.50
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-io1-f45.google.com with SMTP id ca18e2360f4ac-83a9cd37a11so33393339f.3
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 05:48:38 -0800 (PST)
+Received: by mail-io1-f50.google.com with SMTP id ca18e2360f4ac-83ac4dacaf9so36277839f.2
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 05:51:06 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730987317; x=1731592117; darn=vger.kernel.org;
+        d=google.com; s=20230601; t=1730987465; x=1731592265; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=laJEKeeEOXw6OEqyzWbtv83/H2n8AhPE5GsCE0/eU60=;
-        b=dIBMQem5itfiGyGv4uMiA3zED529HIMbu8vPukHtJsRYdY2jXkDhbM/iQwobXtKMvW
-         +qU4+VX3cJ3pdBq0WCZZ0uQ5NKdS5ucYcIcgU7cYQlWjTI7qA8Gpy22nZuVAFDKZF2hu
-         O3rnP+/d7P6RMbiu0VMEDV+XlWK0hIJZgGKNIx2e69Ch6IbzXF6vE8IBmRo9r7p5G7rj
-         VjRDe8MlmY++PkGbgtd9QgxsOxDl5suI8pI7WAwWEtYFT7ihbnT9fYD0yARehWzTtP9r
-         BP7KRBoTXfJgJHYsOIA/kHL13R4xUlvWNH3KkNHF4PdO72wxJOJqB7CH8xDQk6eeH3YD
-         lCXg==
+        bh=Joqmdgk42QEjwNvXeMHuSOgl4G7/+JS37DUtTPm2xes=;
+        b=mlolKiiFC4CCOWwd1wvG+Me/ujH1CYWtWYfFN6InuYjrfTX0KT139JZSTXum1w/pV8
+         W3ZFxy5QlPBdUTyVR73j6UR+HpGSoU/qOa53a6T7N1vqtxmS9YgydWvVv18qBYfPaHU/
+         6/S06Bu655ig9pclr6QxSl8HfEdU3+SYV2XeNKLG4r4u1aeTR/Opfhs9KZnGNVQAoyi8
+         AvYdGUt0mS08LOzL3ZsQsCFFwRBS5nBAzNi1PRrsuuyUEkSitcSZTEf3nWcKFo7S0CWA
+         qdQbNUoOOxafpKiOmVwLdmNMzkV5RYP8DSVjxjBZChxAdwyOEYzuKd4dsM+kumhNyGX3
+         FcEA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730987317; x=1731592117;
+        d=1e100.net; s=20230601; t=1730987465; x=1731592265;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=laJEKeeEOXw6OEqyzWbtv83/H2n8AhPE5GsCE0/eU60=;
-        b=L4LqWZuB+ZAs8p0XQk9rxRNp1bXDQSDkIAvM9Ryn5IhruWsUpmQGCLqrNSDkL+JzQE
-         ZB28RYLLQFMuwy7ZE3pT2j7cM807Z17fspyOy8RDBiJ42SGolbtc7MJg9W2lJU6b5CQG
-         AdJLoRcN9gyMpTpKxe+oxmUOQ8JZcTQRDX0XgKLZtN0xPZLxKmKULut/4YB3hHJtKrHR
-         M2HEkEhygQHZP5Rus7W+nJjyOJLIf8qT/RiNVV21wRY3mrjFUvVbqEn9slg/jzaf2vDQ
-         SOV9nm1DS6zFU5KbCO/zFTAkUavnap2LEYbtgKM6Fzub9SJRuLzf4lVAtD4kA32v7jR9
-         TXOA==
-X-Gm-Message-State: AOJu0YywfkDc0qWwjetAmNIDS1EkNBf4FCOil1cwJCtfi6RTawu6k/6H
-	OoNcTyawWGohXNOmix1va1ydDHhsQzpsiHSM+r8505eie9VQcqN6LITA5SyInDclU1so/NrsoIB
-	N/lUHlx0YH54lrdjGRxICA6gltg1SZSQq0Hro
-X-Google-Smtp-Source: AGHT+IE9lVL6r92ov61s6WtwaIuY9wzLBxF6URxkqNSsgNlymuQETb1eBMN6V7cE3y3y35rIs9W9QHgksCCApHO2i7g=
-X-Received: by 2002:a05:6e02:188c:b0:39b:330b:bb25 with SMTP id
- e9e14a558f8ab-3a4ed2944dbmr457287935ab.12.1730987316050; Thu, 07 Nov 2024
- 05:48:36 -0800 (PST)
+        bh=Joqmdgk42QEjwNvXeMHuSOgl4G7/+JS37DUtTPm2xes=;
+        b=ENiBXofJY/1oU9EfdwBDq3WGxbwzzSD1nqd9NEo2hvFKzZMs6Y8athRhIRl8f+j9wt
+         w+33sKGr+EQzzIw7ryJ4FdDK+JvHwhGbFouH3S1f4Y2d9NhGrBK7gorEcED2v4z6WYMj
+         H419NXRNoTkyMZR2ET0ydIBxah3Uo8NJznnF11wRJmdFruWfyGb2IaF0WEwTGMBc2lRw
+         h8r1AplWaffH4zbCjDuF3j033rvLWDkav215h3tzJhoP3/tyjTakkVKMktNWJl/mG5bN
+         HSjJah3wtZlv1SrXEKvJcWbkNuGg6O6ags2W9k/tmYypfUjIIDhgQl0JLSDwon3zuWWU
+         TYew==
+X-Gm-Message-State: AOJu0YyFaJvbSEa7Y35o7aBAGaDHjqb1gpDsrJ4ZPatYk/Ai3UxBDTWK
+	QJwxS0grZcy4nTXIybRvfh9AZRp2bMyc0vZn4IzEBfa7KDPAhYiOEUXdPEAEcGzXxccULNhSi7K
+	v847loTbQiTrWV1xk2CYvJciX7RoIbzwUT9ND
+X-Google-Smtp-Source: AGHT+IGHaRnAKTGTiImSETVw/h4M6MR6nP/a9TCua8mEewdBvjHNTaETAaep2p2XGbgjcdZlx9P3Z1glBm48iSyalno=
+X-Received: by 2002:a05:6602:1352:b0:83a:a8c6:21ad with SMTP id
+ ca18e2360f4ac-83dff7cc661mr4022839f.7.1730987465417; Thu, 07 Nov 2024
+ 05:51:05 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107132231.9271-1-annaemesenyiri@gmail.com> <20241107132231.9271-2-annaemesenyiri@gmail.com>
-In-Reply-To: <20241107132231.9271-2-annaemesenyiri@gmail.com>
+References: <20241107132231.9271-1-annaemesenyiri@gmail.com> <20241107132231.9271-3-annaemesenyiri@gmail.com>
+In-Reply-To: <20241107132231.9271-3-annaemesenyiri@gmail.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Nov 2024 14:48:23 +0100
-Message-ID: <CANn89iJbw449hwA8zPy1B_auUq=fibc6B1rvn1BOwf6Hr08t2Q@mail.gmail.com>
-Subject: Re: [PATCH net-next v3 1/3] net: Introduce sk_set_prio_allowed helper function
+Date: Thu, 7 Nov 2024 14:50:53 +0100
+Message-ID: <CANn89i+FHaLLgk_WUg1AXXF3EwL3uVF_s5NdP3jwZj5-KAaekQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v3 2/3] net: support SO_PRIORITY cmsg
 To: Anna Emese Nyiri <annaemesenyiri@gmail.com>
 Cc: netdev@vger.kernel.org, fejes@inf.elte.hu, kuba@kernel.org, 
 	pabeni@redhat.com, willemdebruijn.kernel@gmail.com
@@ -85,14 +85,25 @@ Content-Transfer-Encoding: quoted-printable
 On Thu, Nov 7, 2024 at 2:23=E2=80=AFPM Anna Emese Nyiri
 <annaemesenyiri@gmail.com> wrote:
 >
-> Simplify priority setting permissions with the `sk_set_prio_allowed`
-> function, centralizing the validation logic. This change is made in
-> anticipation of a second caller in a following patch.
-> No functional changes.
+> The Linux socket API currently allows setting SO_PRIORITY at the
+> socket level, applying a uniform priority to all packets sent through
+> that socket. The exception to this is IP_TOS, when the priority value
+> is calculated during the handling of
+> ancillary data, as implemented in commit <f02db315b8d88>
+> ("ipv4: IP_TOS and IP_TTL can be specified as ancillary data").
+> However, this is a computed
+> value, and there is currently no mechanism to set a custom priority
+> via control messages prior to this patch.
 >
-> Suggested-by: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+> According to this pacth, if SO_PRIORITY is specified as ancillary data,
+> the packet is sent with the priority value set through
+> sockc->priority, overriding the socket-level values
+> set via the traditional setsockopt() method. This is analogous to
+> the existing support for SO_MARK, as implemented in commit
+> <c6af0c227a22> ("ip: support SO_MARK cmsg").
+>
+> Suggested-by: Ferenc Fejes <fejes@inf.elte.hu>
 > Signed-off-by: Anna Emese Nyiri <annaemesenyiri@gmail.com>
-> ---
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 
