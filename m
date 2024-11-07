@@ -1,273 +1,143 @@
-Return-Path: <netdev+bounces-142922-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D8929C0B30
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:17:23 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB03E9C0B0B
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:14:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7DD5FB2229E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:17:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 49B74B2326A
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:14:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CD6321858D;
-	Thu,  7 Nov 2024 16:14:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C10A216A3D;
+	Thu,  7 Nov 2024 16:10:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="INm6Erjv"
+	dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b="vqIW2SJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from phobos.denx.de (phobos.denx.de [85.214.62.61])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C1DA2170CF;
-	Thu,  7 Nov 2024 16:14:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 609E5215F78;
+	Thu,  7 Nov 2024 16:10:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=85.214.62.61
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730996049; cv=none; b=BUCZ9paQ0wtEAN77kbS+9hTACsEjL0VAYoPrcD2AjrVEXR1Cb1liTyLppb8kUa1cj3LK8Jd0LBHeu3Po6WzWJufZe1EHetEYW1j3ujdedzE/a1DMdHJqACEqkgcwcHbjaBqkwSJvjvgEBIzN6t6pItPVlwURtvDb2FFZHDqrP9M=
+	t=1730995859; cv=none; b=pcWTuPcFWFaH7u2HB/j/dMfEdAwPWvUXDOAXxK0kOoetXszO95cLGTR6qllc3Sn24cqZoFwU8Ddw0wblQC6ExC882DY36ORPmtfL854H0i2Owg8PB8eeuoQ1dZlM1gXp/TvFAvn7OVy4nINf/5LawcuokUatibnMcAsiwxnQU5I=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730996049; c=relaxed/simple;
-	bh=0qxT/iWPgC0Ok9rBiKIjoDJnPFrQv3pHHINa8ccSEZo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=ERpdY4Dii80JD83cr9DVrmbhAgKjBCGYOetMoenSeqrRDnyy1T+gCwPlqCxJL+++I8zs4hj0hO6Ey74RkeoADsFZjdxiioAR2Jhmtg/UASndcHhMFfhXtNy4o2FPySB9yXkB80md+OwVQ5L8Ee0T0+jQnLfE3bKboUqdkH3iwFo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=INm6Erjv; arc=none smtp.client-ip=198.175.65.13
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1730996047; x=1762532047;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=0qxT/iWPgC0Ok9rBiKIjoDJnPFrQv3pHHINa8ccSEZo=;
-  b=INm6Erjv/M5YtB23em+DbHBNOIsm3YvnJfLGFQt/eJ9xM6erSca5w6D2
-   8hHISqE1WxbcAB7NebY6Qg4v2desTK5NjRg6MKy3J9psdtsBIPvHecXaN
-   B9Psos1q0ZIvEsHAfZiAdUBLZL11t1fq/RErYK0p/9Yq6APEEqXBhgDrM
-   tCzqV7sI/c+l+r0pb65Ie/4cuUXrOp3D3Jjp1uTg7urp72jZlyqBeTL5s
-   a4kuGMdd2QWKv4EpfyyVibZgSoh0Raz3vNz01O0TdVidO1txV0V7/3N/W
-   VqzyT7zlgGlFZKwgFoyMoZggsq1E8EllOncYl867C8FUoCnpts07sxRZI
-   A==;
-X-CSE-ConnectionGUID: D7MTtgxFSJid2wQS46bnpg==
-X-CSE-MsgGUID: qBAcbHVSRIuYyQUHlexRyQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41955809"
-X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
-   d="scan'208";a="41955809"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 08:14:06 -0800
-X-CSE-ConnectionGUID: wpc9a+swQZuHiJRMdwjtmg==
-X-CSE-MsgGUID: CAZgUJEBSVmevT9AHf+OPg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
-   d="scan'208";a="90258174"
-Received: from newjersey.igk.intel.com ([10.102.20.203])
-  by orviesa004.jf.intel.com with ESMTP; 07 Nov 2024 08:14:01 -0800
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-To: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
-	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next v4 05/19] xdp, xsk: constify read-only arguments of some static inline helpers
-Date: Thu,  7 Nov 2024 17:10:12 +0100
-Message-ID: <20241107161026.2903044-6-aleksander.lobakin@intel.com>
-X-Mailer: git-send-email 2.47.0
-In-Reply-To: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
-References: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
+	s=arc-20240116; t=1730995859; c=relaxed/simple;
+	bh=A9w+u3CsqskKvuGeLw6D4GG/x+d1Y3h3vOx2YposhFU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=Xvl/hQOfrp60PSmQZIZFvGkCX3dhTAi0ll/mUlDPNznF5HiCuKFfJdanFtdB0ZVBkrBue2Lp/0xHmsLbtp0Tl3+vmkegmJEJ4eaIhrLOnTDqiSKntplnwdraYRht82aezrWFdfdACE0sL/1+gF3LPc3AVGIgVNnel00oU2wD2QM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de; spf=pass smtp.mailfrom=denx.de; dkim=pass (2048-bit key) header.d=denx.de header.i=@denx.de header.b=vqIW2SJA; arc=none smtp.client-ip=85.214.62.61
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=denx.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=denx.de
+Received: from [127.0.0.1] (p578adb1c.dip0.t-ipconnect.de [87.138.219.28])
+	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits))
+	(No client certificate requested)
+	(Authenticated sender: marex@denx.de)
+	by phobos.denx.de (Postfix) with ESMTPSA id BAF4188EFB;
+	Thu,  7 Nov 2024 17:10:48 +0100 (CET)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=denx.de;
+	s=phobos-20191101; t=1730995850;
+	bh=tc9Yi/GcN5ZUBUaiPp9JFPJV349+IorIcrOsLbesgS8=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=vqIW2SJAS1XrOUfrR8XNirugxJLH7+gWouXUwJl9bVpZrJQy9YYzigwMpePr5X97o
+	 oDxki4xEPXi0vtfT1HtB0x02X8yeWcLhMERGetNZDRUup9IRGKSYjWaV6hYRn/IEvD
+	 wkbj4RrKKFE9Ry2VKFORTi9X8G93oSLf+Ed6eHT77xHkuibQ+XNjpXq5D5yjcVkVlm
+	 Oymenkt/364BxAG2WsUXqDOFmWLGgW1cTEV/LXk8Az7My/Iul8T7H9lLWRWl2Y8CgG
+	 hEW9R/a06g6CM9WVIuR8qYL2TyUhFnbmpczB2p4DQ3OPzuMKFhZc12/ch8soGwXmyA
+	 uFue+xYdJHtPA==
+Message-ID: <fcdfa93a-2db4-49ad-8947-ca43be329250@denx.de>
+Date: Thu, 7 Nov 2024 17:10:13 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH] wifi: wilc1000: Rework bus locking
+To: Ajay.Kathat@microchip.com, alexis.lothore@bootlin.com,
+ linux-wireless@vger.kernel.org
+Cc: davem@davemloft.net, adham.abozaeid@microchip.com,
+ claudiu.beznea@tuxon.dev, conor+dt@kernel.org, edumazet@google.com,
+ kuba@kernel.org, kvalo@kernel.org, krzk+dt@kernel.org, pabeni@redhat.com,
+ robh@kernel.org, devicetree@vger.kernel.org, netdev@vger.kernel.org
+References: <20241022013855.284783-1-marex@denx.de>
+ <c9e98811-15f5-427a-82f7-2e7fff4a9873@bootlin.com>
+ <8e28ba76-ecfa-49b6-89b5-1edabb22129d@denx.de>
+ <a4c8c489-c6b9-4a38-84ab-f08409baccff@microchip.com>
+ <5e2a5056-78ac-4be0-83ca-4aa55f524535@denx.de>
+ <880baad9-be3d-41b2-bea3-620f915ca397@microchip.com>
+ <9d20b408-72a4-49f0-aca6-108dfdd65f99@denx.de>
+ <16e5c8d7-64ac-424e-9430-b683ae16a34e@denx.de>
+ <9888f605-ee68-4bd3-8d1d-aeef247d23d0@microchip.com>
+Content-Language: en-US
+From: Marek Vasut <marex@denx.de>
+In-Reply-To: <9888f605-ee68-4bd3-8d1d-aeef247d23d0@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
+X-Virus-Scanned: clamav-milter 0.103.8 at phobos.denx.de
+X-Virus-Status: Clean
 
-Lots of read-only helpers for &xdp_buff and &xdp_frame, such as getting
-the frame length, skb_shared_info etc., don't have their arguments
-marked with `const` for no reason. Add the missing annotations to leave
-less place for mistakes and more for optimization.
+On 11/7/24 2:28 AM, Ajay.Kathat@microchip.com wrote:
+> Hi Marek,
 
-Reviewed-by: Toke Høiland-Jørgensen <toke@redhat.com>
-Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
----
- include/net/xdp.h           | 29 +++++++++++++++++------------
- include/net/xdp_sock_drv.h  | 11 ++++++-----
- include/net/xsk_buff_pool.h |  2 +-
- 3 files changed, 24 insertions(+), 18 deletions(-)
+Hello Ajay,
 
-diff --git a/include/net/xdp.h b/include/net/xdp.h
-index e6770dd40c91..197808df1ee1 100644
---- a/include/net/xdp.h
-+++ b/include/net/xdp.h
-@@ -88,7 +88,7 @@ struct xdp_buff {
- 	u32 flags; /* supported values defined in xdp_buff_flags */
- };
- 
--static __always_inline bool xdp_buff_has_frags(struct xdp_buff *xdp)
-+static __always_inline bool xdp_buff_has_frags(const struct xdp_buff *xdp)
- {
- 	return !!(xdp->flags & XDP_FLAGS_HAS_FRAGS);
- }
-@@ -103,7 +103,8 @@ static __always_inline void xdp_buff_clear_frags_flag(struct xdp_buff *xdp)
- 	xdp->flags &= ~XDP_FLAGS_HAS_FRAGS;
- }
- 
--static __always_inline bool xdp_buff_is_frag_pfmemalloc(struct xdp_buff *xdp)
-+static __always_inline bool
-+xdp_buff_is_frag_pfmemalloc(const struct xdp_buff *xdp)
- {
- 	return !!(xdp->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
- }
-@@ -144,15 +145,16 @@ xdp_prepare_buff(struct xdp_buff *xdp, unsigned char *hard_start,
- 	 SKB_DATA_ALIGN(sizeof(struct skb_shared_info)))
- 
- static inline struct skb_shared_info *
--xdp_get_shared_info_from_buff(struct xdp_buff *xdp)
-+xdp_get_shared_info_from_buff(const struct xdp_buff *xdp)
- {
- 	return (struct skb_shared_info *)xdp_data_hard_end(xdp);
- }
- 
--static __always_inline unsigned int xdp_get_buff_len(struct xdp_buff *xdp)
-+static __always_inline unsigned int
-+xdp_get_buff_len(const struct xdp_buff *xdp)
- {
- 	unsigned int len = xdp->data_end - xdp->data;
--	struct skb_shared_info *sinfo;
-+	const struct skb_shared_info *sinfo;
- 
- 	if (likely(!xdp_buff_has_frags(xdp)))
- 		goto out;
-@@ -177,12 +179,13 @@ struct xdp_frame {
- 	u32 flags; /* supported values defined in xdp_buff_flags */
- };
- 
--static __always_inline bool xdp_frame_has_frags(struct xdp_frame *frame)
-+static __always_inline bool xdp_frame_has_frags(const struct xdp_frame *frame)
- {
- 	return !!(frame->flags & XDP_FLAGS_HAS_FRAGS);
- }
- 
--static __always_inline bool xdp_frame_is_frag_pfmemalloc(struct xdp_frame *frame)
-+static __always_inline bool
-+xdp_frame_is_frag_pfmemalloc(const struct xdp_frame *frame)
- {
- 	return !!(frame->flags & XDP_FLAGS_FRAGS_PF_MEMALLOC);
- }
-@@ -201,7 +204,7 @@ static __always_inline void xdp_frame_bulk_init(struct xdp_frame_bulk *bq)
- }
- 
- static inline struct skb_shared_info *
--xdp_get_shared_info_from_frame(struct xdp_frame *frame)
-+xdp_get_shared_info_from_frame(const struct xdp_frame *frame)
- {
- 	void *data_hard_start = frame->data - frame->headroom - sizeof(*frame);
- 
-@@ -249,7 +252,8 @@ int xdp_alloc_skb_bulk(void **skbs, int n_skb, gfp_t gfp);
- struct xdp_frame *xdpf_clone(struct xdp_frame *xdpf);
- 
- static inline
--void xdp_convert_frame_to_buff(struct xdp_frame *frame, struct xdp_buff *xdp)
-+void xdp_convert_frame_to_buff(const struct xdp_frame *frame,
-+			       struct xdp_buff *xdp)
- {
- 	xdp->data_hard_start = frame->data - frame->headroom - sizeof(*frame);
- 	xdp->data = frame->data;
-@@ -260,7 +264,7 @@ void xdp_convert_frame_to_buff(struct xdp_frame *frame, struct xdp_buff *xdp)
- }
- 
- static inline
--int xdp_update_frame_from_buff(struct xdp_buff *xdp,
-+int xdp_update_frame_from_buff(const struct xdp_buff *xdp,
- 			       struct xdp_frame *xdp_frame)
- {
- 	int metasize, headroom;
-@@ -317,9 +321,10 @@ void xdp_flush_frame_bulk(struct xdp_frame_bulk *bq);
- void xdp_return_frame_bulk(struct xdp_frame *xdpf,
- 			   struct xdp_frame_bulk *bq);
- 
--static __always_inline unsigned int xdp_get_frame_len(struct xdp_frame *xdpf)
-+static __always_inline unsigned int
-+xdp_get_frame_len(const struct xdp_frame *xdpf)
- {
--	struct skb_shared_info *sinfo;
-+	const struct skb_shared_info *sinfo;
- 	unsigned int len = xdpf->len;
- 
- 	if (likely(!xdp_frame_has_frags(xdpf)))
-diff --git a/include/net/xdp_sock_drv.h b/include/net/xdp_sock_drv.h
-index 40085afd9160..f3175a5d28f7 100644
---- a/include/net/xdp_sock_drv.h
-+++ b/include/net/xdp_sock_drv.h
-@@ -101,7 +101,7 @@ static inline struct xdp_buff *xsk_buff_alloc(struct xsk_buff_pool *pool)
- 	return xp_alloc(pool);
- }
- 
--static inline bool xsk_is_eop_desc(struct xdp_desc *desc)
-+static inline bool xsk_is_eop_desc(const struct xdp_desc *desc)
- {
- 	return !xp_mb_desc(desc);
- }
-@@ -143,7 +143,7 @@ static inline void xsk_buff_add_frag(struct xdp_buff *xdp)
- 	list_add_tail(&frag->list_node, &frag->pool->xskb_list);
- }
- 
--static inline struct xdp_buff *xsk_buff_get_frag(struct xdp_buff *first)
-+static inline struct xdp_buff *xsk_buff_get_frag(const struct xdp_buff *first)
- {
- 	struct xdp_buff_xsk *xskb = container_of(first, struct xdp_buff_xsk, xdp);
- 	struct xdp_buff *ret = NULL;
-@@ -200,7 +200,8 @@ static inline void *xsk_buff_raw_get_data(struct xsk_buff_pool *pool, u64 addr)
- 		XDP_TXMD_FLAGS_CHECKSUM | \
- 	0)
- 
--static inline bool xsk_buff_valid_tx_metadata(struct xsk_tx_metadata *meta)
-+static inline bool
-+xsk_buff_valid_tx_metadata(const struct xsk_tx_metadata *meta)
- {
- 	return !(meta->flags & ~XDP_TXMD_FLAGS_VALID);
- }
-@@ -337,7 +338,7 @@ static inline struct xdp_buff *xsk_buff_alloc(struct xsk_buff_pool *pool)
- 	return NULL;
- }
- 
--static inline bool xsk_is_eop_desc(struct xdp_desc *desc)
-+static inline bool xsk_is_eop_desc(const struct xdp_desc *desc)
- {
- 	return false;
- }
-@@ -360,7 +361,7 @@ static inline void xsk_buff_add_frag(struct xdp_buff *xdp)
- {
- }
- 
--static inline struct xdp_buff *xsk_buff_get_frag(struct xdp_buff *first)
-+static inline struct xdp_buff *xsk_buff_get_frag(const struct xdp_buff *first)
- {
- 	return NULL;
- }
-diff --git a/include/net/xsk_buff_pool.h b/include/net/xsk_buff_pool.h
-index bb03cee716b3..3832997cc605 100644
---- a/include/net/xsk_buff_pool.h
-+++ b/include/net/xsk_buff_pool.h
-@@ -183,7 +183,7 @@ static inline bool xp_desc_crosses_non_contig_pg(struct xsk_buff_pool *pool,
- 	       !(pool->dma_pages[addr >> PAGE_SHIFT] & XSK_NEXT_PG_CONTIG_MASK);
- }
- 
--static inline bool xp_mb_desc(struct xdp_desc *desc)
-+static inline bool xp_mb_desc(const struct xdp_desc *desc)
- {
- 	return desc->options & XDP_PKT_CONTD;
- }
--- 
-2.47.0
+> On 11/4/24 04:44, Marek Vasut wrote:
+>> EXTERNAL EMAIL: Do not click links or open attachments unless you know the
+>> content is safe
+>>
+>> On 10/23/24 8:47 PM, Marek Vasut wrote:
+>>
+>> Hello again,
+>>
+>>>> Is power-save enabled during the test. With PS enabled, The SDIO
+>>>> commands may
+>>>> fail momentarily but it should recover.
+>>>
+>>> It seems it gets enabled after first ifconfig up, that's a good hint,
+>>> I'll try to disable it and see if that makes them errors go away. Thanks!
+>>>
+>>> Do you have any details on WHY would such sporadic errors occur and how
+>>> to make those go away even with PS enabled ?
+>> Can you explain why does uAPSD (iw ...set power_save off) adversely
+>> affect SDIO bus stability ?
+>>
+> 
+> SDIO bus errors can occur for different reasons and those errors can be of
+> recoverable or non-recoverable type. For non-recoverable failures like
+> firmware crashes, the retry mechanism may not help to resolve the issue. If
+> the error is recoverable then driver should work with retry attempts.
+> I think you are observing the bus errors messages and it is recovering after
+> that. Is my understanding correct?
 
+I don't know. Is there any way to make the WILC firmware produce debug 
+output , so we can figure out what is going on "on the other side" ?
+
+Are you able to provide me (maybe off-list) some debug firmware build ?
+(or can I get firmware sources and build and debug my own WILC firmware 
+on the Cortus CPU?)
+
+> With the previous shared test procedure, which makes the interface up/down
+> continuously, the station may not go into the Doze/Awake sequence since that
+> mode switching gets activated after connection with AP.
+
+What does this mean ? I can trigger the SDIO errors even without being 
+connected to any AP , so this is something between the WILC and the SDIO 
+host, the radio is likely not involved , right ?
+
+>> Can you explain how to prevent that or shall we disable uAPSD altogether ?
+> 
+> Could you please share the test procedure and logs. I am occupied at the
+> moment but I shall make some time to look into it and get a better understanding.
+
+The simplest test procedure is this:
+
+$ while true ; do ifconfig wlan0 up ; ifconfig wlan0 down ; done
+
+As for the logs, MMCI controller sporadically reports either Command or 
+Data CRC error, so likely the SDIO response (from WILC to Host) is 
+corrupted.
 
