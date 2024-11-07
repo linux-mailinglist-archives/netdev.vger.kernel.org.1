@@ -1,65 +1,59 @@
-Return-Path: <netdev+bounces-143017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4DF29C0EA5
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:15:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A0C2A9C0EB4
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:17:03 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 69FD21F2734E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:15:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D2CD71C2580E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:17:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 157FF223A43;
-	Thu,  7 Nov 2024 19:09:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D73217F3A;
+	Thu,  7 Nov 2024 19:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="GWCDOtrX"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="dzEsujxi"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DED68223A40;
-	Thu,  7 Nov 2024 19:09:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD0FC217F28;
+	Thu,  7 Nov 2024 19:15:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731006592; cv=none; b=fDGgq97PLtr8YhplyuwOiQQsk9JhR4SyuAxmGPiLPWPZYa2/QEVaJEN9co6lvNoxatbSxXo7A3nVghjWXYsleI1VF6FExu2Kup8+aKBZZ1NoNLRPmiyVjVXvZgDVGbtfkJdEDDiS3okrfMSanOyxKcp7WLFWJVtOSDZAAd1LNJY=
+	t=1731006944; cv=none; b=kxCmuyoF1KFd6Y7LDu1Jl0wy8UoDLzL0K9RqlwdPAQyTvm9R6JMN32DJF7Dfvt4ZUJqVu1Vdc6tFdFYbd4yk/txQS7UzCrwAYG7+xwxtqOADgkMZ0wdeQLACxT6CNtAEFvopEGNUjEsmGvBEg/I5t28aRd0zTivphvOhWF8C/do=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731006592; c=relaxed/simple;
-	bh=rCxKhzIWnMatzzOprxB++//6KGsASl76HzpyqFpJU3w=;
+	s=arc-20240116; t=1731006944; c=relaxed/simple;
+	bh=AXeeQfete81ISpYgNwsN8kdIw/YYe8eDWp3sCIfbE68=;
 	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=cFJFP55loc4o/Hmi8M4lM0wSKT+U668R4uC6pg3xeDENIRRRll5kocTwAdbh9vUt/LKxF6s4Q3weFRFIs9yaZvnWAdzYRM6SQgpXeiFOEM29tAcV/IZuIMwgQrhRL+CZrig6jx0Or87sHD6cJ7pFHcearyjNAql6IYKPOQjSWac=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=GWCDOtrX; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C1E5FC4CECC;
-	Thu,  7 Nov 2024 19:09:50 +0000 (UTC)
+	 MIME-Version:Content-Type; b=h+YmXh/eX2YOAT3vi3nt9pWpz16OpFZ3ZrrQFRomuJ2ShsITkGIJoVshRwVQ2inxvYzLY7Zcp6SiJc0pqhh0fKuyeQ9wsSv8Iet+OXnCwpl+unBXwypml7jPblvuCxaDcj9J38gl0/j75hfw+bv8TAU59kOBM8dPzJXmnPXNUGw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=dzEsujxi; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 92B5DC4CECC;
+	Thu,  7 Nov 2024 19:15:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731006591;
-	bh=rCxKhzIWnMatzzOprxB++//6KGsASl76HzpyqFpJU3w=;
+	s=k20201202; t=1731006944;
+	bh=AXeeQfete81ISpYgNwsN8kdIw/YYe8eDWp3sCIfbE68=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GWCDOtrX/q8AzJ4i1Ez6dwUur3rBYfNe9daFcKvWG6Tyf6lfHEXiOPPssQ5o4iO5u
-	 36TPtGynrhpweqa9lc87mJGx8Khjrato/OrEakMevVTGaYB1TXs8w22R3cu5R649Mi
-	 z1B+HJuv8TvAwwwxvQpfOHfjUjHVlK5hc+ndEFsLFLqUce8HlKddcamgcc2kuV/Fyv
-	 KZfqO2tYTQbXVSZewEt5hRksoDRFri3lwFuPllcHIDsXSHfp3VPq8esExFKaPfRAZ9
-	 fYKzcAyeDcp1/XevEPnL79nWXFvoQ+WErCOlogWqpQbYEtpSQCK8gLm4kJwY5M6sOO
-	 QVG6AUFPrlOLA==
-Date: Thu, 7 Nov 2024 11:09:49 -0800
+	b=dzEsujxiLm9jgs5KenIALt1j57ZJaqU3WMguX/GXwrFC6V8Uw/IDuxM00h+yqs5zR
+	 Xk94+DsceskjHyO5WXJ6txnG5arhKh++b2ECRq1E62cDHuUwC7orSgrlfkCvUFkwXI
+	 ofEiio+pzHdsrLZwzDqO9vWn6gF2HhGk1pdWtSOqtnqe8bxAws+N9EFYGhr5lVmQIi
+	 TTwaEu2iQ2ZIdAmQtOemfZx+vNEO55Za+tVBxNGaD5sr614m9bIjnI+sZnR/jQyNHn
+	 tjMIalXYaORr4KumgXAcbTXMiFbMHkZILqxgiAuSA+Mf+kq1dm21ueOsFARt/jDP+n
+	 heKuYvUZLmaZw==
+Date: Thu, 7 Nov 2024 11:15:42 -0800
 From: Jakub Kicinski <kuba@kernel.org>
-To: Leon Romanovsky <leon@kernel.org>
-Cc: Bjorn Helgaas <helgaas@kernel.org>, Leon Romanovsky <leonro@nvidia.com>,
- Krzysztof =?UTF-8?B?V2lsY3p5xYRza2k=?= <kw@linux.com>,
- linux-pci@vger.kernel.org, "Ariel Almog" <ariela@nvidia.com>, "Aditya
- Prabhune" <aprabhune@nvidia.com>, "Hannes Reinecke" <hare@suse.de>, "Heiner
- Kallweit" <hkallweit1@gmail.com>, "Arun Easi" <aeasi@marvell.com>,
- "Jonathan Chocron" <jonnyc@amazon.com>, "Bert Kenward"
- <bkenward@solarflare.com>, "Matt Carlson" <mcarlson@broadcom.com>,
- "Kai-Heng Feng" <kai.heng.feng@canonical.com>, "Jean Delvare"
- <jdelvare@suse.de>, "Alex Williamson" <alex.williamson@redhat.com>,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v1 2/2] net/mlx5: Enable unprivileged read of PCI VPD
- file
-Message-ID: <20241107110949.717e3960@kernel.org>
-In-Reply-To: <f551f20b0649b4be3f4c9536e756986665366e46.1731005223.git.leonro@nvidia.com>
-References: <cover.1731005223.git.leonro@nvidia.com>
-	<f551f20b0649b4be3f4c9536e756986665366e46.1731005223.git.leonro@nvidia.com>
+To: Meghana Malladi <m-malladi@ti.com>
+Cc: <vigneshr@ti.com>, <horms@kernel.org>, <jan.kiszka@siemens.com>,
+ <diogo.ivo@siemens.com>, <pabeni@redhat.com>, <edumazet@google.com>,
+ <davem@davemloft.net>, <andrew+netdev@lunn.ch>,
+ <linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+ <linux-arm-kernel@lists.infradead.org>, <srk@ti.com>, Roger Quadros
+ <rogerq@kernel.org>, <danishanwar@ti.com>
+Subject: Re: [PATCH net v4] net: ti: icssg-prueth: Fix 1 PPS sync
+Message-ID: <20241107111542.19dc55e2@kernel.org>
+In-Reply-To: <20241106072314.3361048-1-m-malladi@ti.com>
+References: <20241106072314.3361048-1-m-malladi@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,12 +63,14 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu,  7 Nov 2024 20:56:57 +0200 Leon Romanovsky wrote:
-> From: Leon Romanovsky <leonro@nvidia.com>
-> 
-> mlx5 devices are PCIe spec compliant, doesn't expose any sensitive
-> information Vital Product Data (VPD) section. In addition, these devices
-> are capable to provide an unprivileged read access file exposed by PCI core.
+On Wed, 6 Nov 2024 12:53:14 +0530 Meghana Malladi wrote:
+> +static inline __u64 icssg_readq(const void __iomem *addr)
 
-Acked-by: Jakub Kicinski <kuba@kernel.org>
+two nit picks:
+ - since the function is now fairly special purpose I think a name less
+   generic than readq would be appropriate. Maybe icssg_read_time() ?
+ - __u64 is for uAPI, to avoid type name conflicts, in the kernel
+   please use u64 without the underscores
+-- 
+pw-bot: cr
 
