@@ -1,183 +1,115 @@
-Return-Path: <netdev+bounces-142787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F3D19C05D4
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:30:18 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE059C05F4
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:38:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82EC21C2243A
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:30:17 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id D6E02B21C6C
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:38:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2417B2101A8;
-	Thu,  7 Nov 2024 12:29:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87D6A20EA28;
+	Thu,  7 Nov 2024 12:38:24 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="JLt1LscA"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="R9HyUJpL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EC7062101A4;
-	Thu,  7 Nov 2024 12:29:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8045F20C474;
+	Thu,  7 Nov 2024 12:38:21 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730982588; cv=none; b=h1pbqmr/i7mfIXX6WF8Rh9+n8gz/BgVPxUS9Xd0DrMyIGNME1QVCrOgspCblw8sC95NjC1kd4cnxlwn+Ab+eaJxrcTpH6ACuupI43wT/9nRRvYKbCDUkHX9gc+YDe8eUveOvHQ0a4mXlSuRjNsycBOgABLmjc6X3vOpIUgABVBQ=
+	t=1730983104; cv=none; b=Ko0fl20lUZ3gAXY7suwdThc0745RjTK7/9MhDKko+e3GYe8z9E4B/SPcaapdAcXPsidBeUV4K0eYg/eXD8At4uuvDUeEagWIc7M2KDxpxX0KJ5aNP4M4eRoEEdDswVRM3x2mkRHIomU92Uja7xQjBD8EkvK/r0oa4umXK3/r62c=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730982588; c=relaxed/simple;
-	bh=NrEV4iAZN0aliHTzyP3alx8+mfS5kV8sLdO0OPZy9zY=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:References:
-	 In-Reply-To:To:Cc; b=Mk14a8Q2gSrfUrufhkRMLzQSIXCo+MS3uVprOX7R+kwH5v+uKPBqFNcpysI9PGn8/zr5SjugSq65kbELegiJLS13vhFv8pe9rMF7Jfi/XC2EKjFZNwZp3Zc7mx/1/SMPKHLsLvXO8KOUdTdBSfxOGRjEXtVJvvKyhOINFW9nLu4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=JLt1LscA; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id A5637C4CED2;
-	Thu,  7 Nov 2024 12:29:44 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730982587;
-	bh=NrEV4iAZN0aliHTzyP3alx8+mfS5kV8sLdO0OPZy9zY=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=JLt1LscAzbLbz4jXQOAxppFBWpowV+pDW2x6NkVQeFkEuPYugn8FIiwZhzdxfxFeW
-	 HzhR1KM8iT0OsAZ8BbgwYw/ANqTnGMCQOxVpeIDk8LuiMPA0k9D3uoSK9otgCquIHS
-	 30F90ArfTx/PdTokvY1DtOL9Du2bPgtKvpvQ/CaXJRSZQOKgBqpw7Bkd3inRLQ76tG
-	 1VZdWxGLrLAdrDcZY0UsdG/tE/NUb6TCbWcxyatIFWpHrb9JSCAquU9U+tePbFmXaB
-	 rCi3fBbFE2xFtwRp2hrvLug7fENjgzwXSlzjS3U/xaJpUZ115nA6/AgvCacVRveMEN
-	 /isp1nQRqCm1Q==
-From: Roger Quadros <rogerq@kernel.org>
-Date: Thu, 07 Nov 2024 14:29:30 +0200
-Subject: [PATCH net-next v2 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
- to priority map for RX
+	s=arc-20240116; t=1730983104; c=relaxed/simple;
+	bh=vFiERqnygHn3dr9TR3qxLRfo6JZ2UddHPaEnWrTKUfk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=mbs3WgXCa1k4bBLR6z68lv3U9afFN8Vxf9B3Y/Uun+4eST2+vpbSVosDmUbdjddmvYP4yR5ZkbhlqUTfhd9Pzly40vMOrhUJGpykesNhcYT17a1oPbU/DcJ8/gCBSwAJgyHFmbX6JG2kqhPA/W40VYvmFYnVtpp4wnFOTqXjZcY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=R9HyUJpL; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 46DEA24000C;
+	Thu,  7 Nov 2024 12:38:11 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730983093;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Tyx5a0QDkKjhE4rESQdw3bFYGMukiTeG8k9jhLmbkS8=;
+	b=R9HyUJpLWhc1mwO9J/AUA9d2qLiwIC3vp7jozhc3KUsJ/8YpKDLC+L9Afk5bG7CO83Oz2Y
+	P+ti95xNATjZ0+7tIL1Y3aHaYT0bavvMvg4WvYHkYjISbl0K5iQENtzyHdbdSR8F4ZrmJ+
+	a5hwXpFz5XNcSNOfrAfPtb47k3liaadkbC4aswhhUVmoov0w9f7ZQVsPTvz8SpOVo2IYia
+	ka3zUBot18dhUbV4IzX1Zvdrr6MtlvHybwIkc6w6Km5QrR1zsfOJW4W8PGzh1Rlt/iWZUr
+	ZOY9m7/LxmN8uRwQ3n+9yVk6iI3XYCju+0Hlme+QDoa0wsmJw8tJQ9KZvZm8fg==
+Date: Thu, 7 Nov 2024 13:38:11 +0100
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: Jacky Chou <jacky_chou@aspeedtech.com>
+Cc: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+ <kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+ <krzk+dt@kernel.org>, <conor+dt@kernel.org>, <p.zabel@pengutronix.de>,
+ <ratbert@faraday-tech.com>, <netdev@vger.kernel.org>,
+ <devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [net-next 3/3] net: ftgmac100: Support for AST2700
+Message-ID: <20241107133811.3109d98a@fedora.home>
+In-Reply-To: <20241107111500.4066517-4-jacky_chou@aspeedtech.com>
+References: <20241107111500.4066517-1-jacky_chou@aspeedtech.com>
+	<20241107111500.4066517-4-jacky_chou@aspeedtech.com>
+Organization: Bootlin
+X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-Message-Id: <20241107-am65-cpsw-multi-rx-dscp-v2-2-9e9cd1920035@kernel.org>
-References: <20241107-am65-cpsw-multi-rx-dscp-v2-0-9e9cd1920035@kernel.org>
-In-Reply-To: <20241107-am65-cpsw-multi-rx-dscp-v2-0-9e9cd1920035@kernel.org>
-To: Siddharth Vadapalli <s-vadapalli@ti.com>, 
- Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Simon Horman <horms@kernel.org>
-Cc: linux-omap@vger.kernel.org, netdev@vger.kernel.org, 
- linux-kernel@vger.kernel.org, srk@ti.com, Pekka Varis <p-varis@ti.com>, 
- Roger Quadros <rogerq@kernel.org>
-X-Mailer: b4 0.14.1
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3364; i=rogerq@kernel.org;
- h=from:subject:message-id; bh=NrEV4iAZN0aliHTzyP3alx8+mfS5kV8sLdO0OPZy9zY=;
- b=owEBbQKS/ZANAwAIAdJaa9O+djCTAcsmYgBnLLKx3sRmt/4x9giNnh1pnVhDarGvXWedi/5k8
- 0rxZdpLLpqJAjMEAAEIAB0WIQRBIWXUTJ9SeA+rEFjSWmvTvnYwkwUCZyyysQAKCRDSWmvTvnYw
- k0PbD/wJm+z+1i5O7IO8HfrlRGQ4ZkkgAXW387plEg2xN9CsLML5cFzsDJXuQSRfqm0DVmiB4B0
- 7fKvYwigtS6YxpK3DkhNGK6CYVXB85exGSE9ak9LT5M7dUjpkrUWxJdFFiFTnVkuA0lGd4IWM4y
- 2gwYCLvrj8hJSNsPjUUu3ZUGM/Bqfou3yMTH+Rhl9YnnIZaL9TEYxofsEMKWnvDcsu8DdwcmzWi
- XIMixFHVrGsVORaYq1l2zjXbS5fubFagQ2YPzJQWfkaZbYqdKHEpg8vlojv/tQC8HuHl8K6hpsl
- WhEPFL7dLpGLR1hLndYiqxjxc4mcoGzxR2t7lHskqBbFy8Sbf2J5o5d3x7ElfteBHuMl0IBh9XV
- v5HC4N5ThC1ctM/WSI3KNcw/Ly6z7PtwLctbJgFfqvj90kppvMStgkNrWLmy/xUhAocy4HVryiV
- V4IaUKrDJ4DhKuFUVMco4QwjEw+xndzEKx5wBi8ehjWXC19aZl6mz9r62uNjBMckBn9I6Q8sBy2
- uhyS5euhdTopmbG9Tzy9IZ/KuvKhfIhBY0fUnBjPnLob5eouP/4TWcWvtqRLOO3gCZ42b29xaIA
- YF4vUPiBL/9+qBCEDHM1GEWgUeHxpDbyXCiABiArmx+tqtw5yF1UyoV7Xgje14qoyDjEMaD+TvK
- idX50VQETRt8DNA==
-X-Developer-Key: i=rogerq@kernel.org; a=openpgp;
- fpr=412165D44C9F52780FAB1058D25A6BD3BE763093
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
-AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
-appropriate priority queue via DSCP to Priority mapping registers
-(CPSW_PN_RX_PRI_MAP_REG).
+Hi,
 
-We use the upper 3 bits of the DSCP field that indicate IP Precedence
-to map traffic to 8 priority queues.
+On Thu, 7 Nov 2024 19:15:00 +0800
+Jacky Chou <jacky_chou@aspeedtech.com> wrote:
 
-Signed-off-by: Roger Quadros <rogerq@kernel.org>
----
- drivers/net/ethernet/ti/am65-cpsw-nuss.c | 50 ++++++++++++++++++++++++++++++++
- 1 file changed, 50 insertions(+)
+> The AST2700 is the 7th generation SoC from Aspeed, featuring three GPIO
+> controllers that are support 64-bit DMA capability.
+> Adding features is shown in the following list.
+> 1.Support 64-bit DMA
+>   Add the high address (63:32) registers for description address and the
+>   description field for packet buffer with high address part.
+>   These registers and fields in legacy Aspeed SoC are reserved.
+>   This 64-bit DMA changing has verified on legacy Aspeed Soc, like
+>   AST2600.
 
-diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-index 0520e9f4bea7..65fbf6727e02 100644
---- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-+++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-@@ -71,6 +71,8 @@
- #define AM65_CPSW_PORT_REG_RX_PRI_MAP		0x020
- #define AM65_CPSW_PORT_REG_RX_MAXLEN		0x024
- 
-+#define AM65_CPSW_PORTN_REG_CTL			0x004
-+#define AM65_CPSW_PORTN_REG_DSCP_MAP		0x120
- #define AM65_CPSW_PORTN_REG_SA_L		0x308
- #define AM65_CPSW_PORTN_REG_SA_H		0x30c
- #define AM65_CPSW_PORTN_REG_TS_CTL              0x310
-@@ -94,6 +96,10 @@
- /* AM65_CPSW_PORT_REG_PRI_CTL */
- #define AM65_CPSW_PORT_REG_PRI_CTL_RX_PTYPE_RROBIN	BIT(8)
- 
-+/* AM65_CPSW_PN_REG_CTL */
-+#define AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN	BIT(1)
-+#define AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN	BIT(2)
-+
- /* AM65_CPSW_PN_TS_CTL register fields */
- #define AM65_CPSW_PN_TS_CTL_TX_ANX_F_EN		BIT(4)
- #define AM65_CPSW_PN_TS_CTL_TX_VLAN_LT1_EN	BIT(5)
-@@ -176,6 +182,49 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port *slave,
- 	writel(mac_lo, slave->port_base + AM65_CPSW_PORTN_REG_SA_L);
- }
- 
-+#define AM65_CPSW_DSCP_MAX	GENMASK(5, 0)
-+#define AM65_CPSW_PRI_MAX	GENMASK(2, 0)
-+static int am65_cpsw_port_set_dscp_map(struct am65_cpsw_port *slave, u8 dscp, u8 pri)
-+{
-+	int reg_ofs;
-+	int bit_ofs;
-+	u32 val;
-+
-+	if (dscp > AM65_CPSW_DSCP_MAX)
-+		return -EINVAL;
-+
-+	if (pri > AM65_CPSW_PRI_MAX)
-+		return -EINVAL;
-+
-+	reg_ofs = (dscp / 8) * 4;	/* reg offset to this dscp */
-+	bit_ofs = 4 * (dscp % 8);	/* bit offset to this dscp */
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+	val &= ~(AM65_CPSW_PRI_MAX << bit_ofs);	/* clear */
-+	val |= pri << bit_ofs;			/* set */
-+	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-+
-+	return 0;
-+}
-+
-+static void am65_cpsw_port_enable_dscp_map(struct am65_cpsw_port *slave)
-+{
-+	int dscp, pri;
-+	u32 val;
-+
-+	/* Map IP Precedence field to Priority */
-+	for (dscp = 0; dscp <= AM65_CPSW_DSCP_MAX; dscp++) {
-+		pri = dscp >> 3; /* Extract IP Precedence */
-+		am65_cpsw_port_set_dscp_map(slave, dscp, pri);
-+	}
-+
-+	/* enable port IPV4 and IPV6 DSCP for this port */
-+	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_CTL);
-+	val |= AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN |
-+		AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN;
-+	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_CTL);
-+}
-+
- static void am65_cpsw_sl_ctl_reset(struct am65_cpsw_port *port)
- {
- 	cpsw_sl_reset(port->slave.mac_sl, 100);
-@@ -921,6 +970,7 @@ static int am65_cpsw_nuss_ndo_slave_open(struct net_device *ndev)
- 	common->usage_count++;
- 
- 	am65_cpsw_port_set_sl_mac(port, ndev->dev_addr);
-+	am65_cpsw_port_enable_dscp_map(port);
- 
- 	if (common->is_emac_mode)
- 		am65_cpsw_init_port_emac_ale(port);
+Maybe each of these features should be in a dedicated patch ?
 
--- 
-2.34.1
+> 2.Set RMII pin strap in AST2700 compitable
+				  compatible
 
+>   Use bit 20 of MAC 0x50 to represent the pin strap of AST2700 RMII and
+>   RGMII. Set to 1 is RMII pin, otherwise is RGMII.
+>   This bis is also reserved in legacy Aspeed SoC.
+> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+
+[...]
+
+> @@ -349,6 +354,10 @@ static void ftgmac100_start_hw(struct ftgmac100 *priv)
+>  	if (priv->netdev->features & NETIF_F_HW_VLAN_CTAG_RX)
+>  		maccr |= FTGMAC100_MACCR_RM_VLAN;
+>  
+> +	if (of_device_is_compatible(priv->dev->of_node, "aspeed,ast2700-mac") &&
+> +	    priv->netdev->phydev->interface == PHY_INTERFACE_MODE_RMII)
+> +		maccr |= FTGMAC100_MACCR_RMII_ENABLE;
+
+The driver code takes the assumption that netdev->phydev might be NULL,
+I think you should therefore add an extra check here as well before
+getting the interface mode.
+
+Thanks,
+
+Maxime
 
