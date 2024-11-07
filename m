@@ -1,123 +1,189 @@
-Return-Path: <netdev+bounces-143102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A36B9C12A8
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:41:12 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 268FE9C12BB
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:51:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 274FD1F233B6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:41:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2EF831C22269
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 23:51:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 218BD218D88;
-	Thu,  7 Nov 2024 23:40:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D9DE1E5718;
+	Thu,  7 Nov 2024 23:51:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ZFztN0vO"
+	dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b="HBc4aorI"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-yb1-f180.google.com (mail-yb1-f180.google.com [209.85.219.180])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF18D21894F;
-	Thu,  7 Nov 2024 23:40:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48A4E1D8E01
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 23:51:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.180
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731022853; cv=none; b=ZVgims8g1X8AiOjKLc5FLIApDDq2KFtgvDfkoTR3G/EgrCNCdWCFIT2za0GcmunWdbxZ81KIGtuIuAysxRDmyGHql7uiH2Jwjsnu0ympbuW7tNJMgV559csZOdbVDoAuCphObJ417qjPZd+dnu6uA5gonq0LSog56xwkFoTF71w=
+	t=1731023464; cv=none; b=NxwZYF9wx7dcKPUEtLMIz7hMH17YEJYWYc0p0ZG2+EaOrBMdPagDTmals7CeZQlQFijRdqRNICiEDTj9nf0mrBqnvLihxZNjWX2yCz5ZuzCoFz/z1K1FYo5O4OkNY4EnboNxmTw0pTSDVNwSWbrbXtsP5aHPJMqyjccpPkRvVfc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731022853; c=relaxed/simple;
-	bh=DU9V5JYhXP+PMdlObqy5XmJcfEODdIQrQccapJcPRGM=;
+	s=arc-20240116; t=1731023464; c=relaxed/simple;
+	bh=VGQa/dfmMCi7k0Ero8n21PXo6Z224JQz/T5pDsCjwTg=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=uBqfRP+Onv15LR+UnmDNph9UTw7mI7WZ7KSACjwvtIoU/NSPEVRfXxnaP73rSMIPC7drYEdTK5z6LBybSbu9Xrhcg2KXclIxr0IsCXc6W5KeCRc9vg3Tj9UyQtekEMCO+b1jUGxxO7dW0P9rwfBrXhdaaFKizDW64LZFYnZ2zL8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ZFztN0vO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 520CDC4CED3;
-	Thu,  7 Nov 2024 23:40:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731022852;
-	bh=DU9V5JYhXP+PMdlObqy5XmJcfEODdIQrQccapJcPRGM=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=ZFztN0vOaOSU/SRUgi3fmXi2XcjiJt33UXKGf1eFQb4o2O6sLIrkS6+1zAzeOKTnz
-	 JvEx3K2Xvd5mgw0vfFxYXx5ZVVpgZpk5VLkQ86MItoDv06AGZB4/JWrBaC50yJ4YW9
-	 CTH5kHW/ST2rdbVPvBtYrBPg3dxcyy3IeOAsDKYXk825LdAHcj0waE2JRY+Fopplf5
-	 upLUrak1OYR3irbS5sQMtNvaW/+5eynFwQDM6dN14yDjyiU2mXKoU8F+9mtEv/jdeT
-	 AjGuEE0BD0ErwoSrkWgUyszCsMsdy3XxLexKeuknhV/vT4Q9G3VSMXtO3gNlYVS4CG
-	 Y8mux/1O1KbIg==
-Received: by mail-ot1-f42.google.com with SMTP id 46e09a7af769-7181b86a749so856635a34.3;
-        Thu, 07 Nov 2024 15:40:52 -0800 (PST)
-X-Forwarded-Encrypted: i=1; AJvYcCVc20CmDnCCymDNcuZ2/pNHxvkW6tLiVQbBPi6gmMccxU1+iWm90Btb0J4vIl6hu9M+SfQe+t46@vger.kernel.org, AJvYcCVkVxuSJcpcl6wr+s+lA5vDUQJfv3cif43lx2pWbuxz1bXp+erQ9MdjFgRRw5CL8KADFl0UDK1ps405kw==@vger.kernel.org, AJvYcCWmg46jAsWBCyqKpEtyx2/BNLt7A9WFOsaouH7KaLWWtgbz7G1FZvfxAe/ocrYJAsBT1g6/KIQtn5m4@vger.kernel.org, AJvYcCXy0iWVMcfGXKn3LTB9U5p9UDM1pXYYwXM/dxXaaaoVSAbtw53xnNOSO5pPRz3CMgfqwbjeqrWdF/OXmg==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzKVsjOOi7TiwxGPjpDn2QaZf7g1Zl6oSOO/yXfCcV8oSClUO9g
-	36KoXH4FQgFhykHY9Lbzzi+FEWO7/Cw4teDzbg5j8I9DNsdqv0ftiYn2SrPaercM03tfZsPiapl
-	7cpHfu1XnqICV5PMamyhb+Hi2UxI=
-X-Google-Smtp-Source: AGHT+IHKWuBlWup528YXRtoYDX3ha+KeikwAxO/glZHcWGp2+SJF85FWw3Rbw60HdVZKTtvogILp9/cn0Dmbxxn3nHo=
-X-Received: by 2002:a05:6870:96a4:b0:286:f74a:93cc with SMTP id
- 586e51a60fabf-295600990eamr909683fac.2.1731022851213; Thu, 07 Nov 2024
- 15:40:51 -0800 (PST)
+	 To:Cc:Content-Type; b=OTMvfjKv+pmmXqf4uJDGJNBjwQKpCJtZZ5FrW0bYnpFaGjoW8/6mbpUnUrb544xtFhgslOcSM9A/e3kPwegrZrfz5rNZKKvxxEBH9puX2EoK5qj3sXaKs9xSdt/KVroAvyZ4KP9wIBlc4kB/11WJxiGmPPTP1LTwEtqzdWuXnf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com; spf=pass smtp.mailfrom=paul-moore.com; dkim=pass (2048-bit key) header.d=paul-moore.com header.i=@paul-moore.com header.b=HBc4aorI; arc=none smtp.client-ip=209.85.219.180
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=paul-moore.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=paul-moore.com
+Received: by mail-yb1-f180.google.com with SMTP id 3f1490d57ef6-e291f1d659aso1541879276.3
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 15:51:02 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=paul-moore.com; s=google; t=1731023461; x=1731628261; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=1o2QdvUrmjtWvx1OaQyam1dECjHJOE9NkQJ80zYMUbI=;
+        b=HBc4aorIZXUVUO4LsJtCtlaLxoX4OcnUmFX6+qVS7xCBEU2i5FQHEnABs2cPYAj7cq
+         tT4X7/GkU+H1zvoUFEcuCGmK1Gy7gtkyxOloPQUar/ymjpK8hfRqgrcuRfb8bpOwfSSe
+         McwGwG5YJ45yulIBsn5T64spbJdVXgFLvOhH1dzBWFEwDZ8hzJeyVLh2khuEJyefZRbe
+         QmFSQvH/+D518fWt8S+C6kxepBdbY0C01/NMyHNy0SL2zcJGVEhBn9XdwtAgAlUYVQbo
+         iPGmtHTbklaA+DS+FdO9Ws812ObtuY57ggCuXxB1Nuba1XozYgBjsvhN6X8iMedmMbHf
+         3Dlg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731023461; x=1731628261;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=1o2QdvUrmjtWvx1OaQyam1dECjHJOE9NkQJ80zYMUbI=;
+        b=pboB3LEYjWQx868ufDI2dmGD0jpp4OP3c4plQs7p+PElP5uHAUXSBHEz2euA3Zhwf8
+         wBmNm3AHPcrXNp8kUzvtwufF4mKMVOGC4enu1YYQavBpxZv14Qcn1Ouq996f+3sepmDw
+         4OJUW2e2wmxMYoDWZohtSGXCdLba/mJcfKQbskw6dPn4pW5vx/v88g5tM5m8iJlN5Gud
+         ElE3r4MgsAXSfVFyR3/RDteR4hJRn/nBxmsf/ZRURI9u7p275c2K2lRsIgZBRnidbow0
+         UdveI8Uuxsxeumq8XlPK52Ke2rtS9Qb/ZnMSUwlN9Y/SUEW3nbz0qQGslU6KFbTzK64q
+         5yig==
+X-Forwarded-Encrypted: i=1; AJvYcCW9Qm0anDcVqbwgLYc0kb99OVUMwlwqo84W7fQq9EfzsZY0f4szMsJx5W5KlIXuHeDg+i1PLYU=@vger.kernel.org
+X-Gm-Message-State: AOJu0Ywqi5w8dBa+Cu/voXbNQy9lphIA0bAn9iT+YMyxzNqze4G5DfyI
+	fEJwy4UBDwEZG3mNGFYSCM1LFGNb61gN5z6i+qF6Yd+q/SoT/gn7YdideLAy2vmAan1785+CwC9
+	qDDhg2aUqsr/K4a4t3WtZngJoRYrlIoBNBlyC
+X-Google-Smtp-Source: AGHT+IGBMUSkXgES6Kte8jOJe/wokdN/D/ojyHVde+avcBK17qucFa9cz89V/ErnOqwmSAzAR1B9I5C0gq66/E0ugkM=
+X-Received: by 2002:a05:6902:20c7:b0:e30:cbde:1252 with SMTP id
+ 3f1490d57ef6-e337f8cef7bmr1103118276.36.1731023461324; Thu, 07 Nov 2024
+ 15:51:01 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241025072356.56093-1-wenjia@linux.ibm.com> <20241027201857.GA1615717@unreal>
- <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com> <20241105112313.GE311159@unreal>
- <20241106102439.4ca5effc.pasic@linux.ibm.com> <20241106135910.GF5006@unreal> <20241107125643.04f97394.pasic@linux.ibm.com>
-In-Reply-To: <20241107125643.04f97394.pasic@linux.ibm.com>
-From: Namjae Jeon <linkinjeon@kernel.org>
-Date: Fri, 8 Nov 2024 08:40:40 +0900
-X-Gmail-Original-Message-ID: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
-Message-ID: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
-Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using ib_device_get_netdev()
-To: Halil Pasic <pasic@linux.ibm.com>
-Cc: Leon Romanovsky <leon@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>, 
-	Wen Gu <guwen@linux.alibaba.com>, "D. Wythe" <alibuda@linux.alibaba.com>, 
-	Tony Lu <tonylu@linux.alibaba.com>, David Miller <davem@davemloft.net>, 
-	Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	netdev@vger.kernel.org, linux-rdma@vger.kernel.org, 
-	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>, 
-	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>, 
-	Alexandra Winter <wintera@linux.ibm.com>, Nils Hoppmann <niho@linux.ibm.com>, 
-	Niklas Schnell <schnelle@linux.ibm.com>, Thorsten Winkler <twinkler@linux.ibm.com>, 
-	Karsten Graul <kgraul@linux.ibm.com>, Stefan Raspl <raspl@linux.ibm.com>, 
-	Aswin K <aswin@linux.ibm.com>, linux-cifs@vger.kernel.org, 
-	Kangjing Huang <huangkangjing@gmail.com>
+References: <20241106155509.1706965-1-omosnace@redhat.com> <CANn89iKag19EPvnQRthsG98pfjriRwtS+YND0359xFijGAoEYg@mail.gmail.com>
+ <CAFqZXNumyhpRvrZ6mAK9OVxbte=_3MG195i_+Z1j79PsE=6k_g@mail.gmail.com> <CANn89iJj2sQX3rZvmbL0zQjX7K-OFwyautgAXqxNvk2M17++bw@mail.gmail.com>
+In-Reply-To: <CANn89iJj2sQX3rZvmbL0zQjX7K-OFwyautgAXqxNvk2M17++bw@mail.gmail.com>
+From: Paul Moore <paul@paul-moore.com>
+Date: Thu, 7 Nov 2024 18:50:50 -0500
+Message-ID: <CAHC9VhS3yuwrOPcH5_iRy50O_TtBCh_OVWHZgzfFTYqyfrw_zQ@mail.gmail.com>
+Subject: Re: [PATCH] selinux,xfrm: fix dangling refcount on deferred skb free
+To: Eric Dumazet <edumazet@google.com>
+Cc: Ondrej Mosnacek <omosnace@redhat.com>, Steffen Klassert <steffen.klassert@secunet.com>, 
+	Herbert Xu <herbert@gondor.apana.org.au>, "David S. Miller" <davem@davemloft.net>, 
+	Stephen Smalley <stephen.smalley.work@gmail.com>, selinux@vger.kernel.org, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 7, 2024 at 9:00=E2=80=AFPM Halil Pasic <pasic@linux.ibm.com> wr=
-ote:
->
-> On Wed, 6 Nov 2024 15:59:10 +0200
-> Leon Romanovsky <leon@kernel.org> wrote:
->
-> > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core c=
-ode?
-> >
-> > RDMA core code is drivers/infiniband/core/*.
->
-> Understood. So this is a violation of the no direct access to the
-> callbacks rule.
->
-> >
-> > > I would guess it is not, and I would not actually mind sending a patc=
+On Wed, Nov 6, 2024 at 12:00=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+> On Wed, Nov 6, 2024 at 5:54=E2=80=AFPM Ondrej Mosnacek <omosnace@redhat.c=
+om> wrote:
+> > On Wed, Nov 6, 2024 at 5:13=E2=80=AFPM Eric Dumazet <edumazet@google.co=
+m> wrote:
+> > >
+> > > On Wed, Nov 6, 2024 at 4:55=E2=80=AFPM Ondrej Mosnacek <omosnace@redh=
+at.com> wrote:
+> > > >
+> > > > SELinux tracks the number of allocated xfrm_state/xfrm_policy objec=
+ts
+> > > > (via the selinux_xfrm_refcount variable) as an input in deciding if=
+ peer
+> > > > labeling should be used.
+> > > >
+> > > > However, as a result of commits f35f821935d8 ("tcp: defer skb freei=
+ng
+> > > > after socket lock is released") and 68822bdf76f1 ("net: generalize =
+skb
+> > > > freeing deferral to per-cpu lists"), freeing of a sk_buff object, w=
+hich
+> > > > may hold a reference to an xfrm_state object, can be deferred for
+> > > > processing on another CPU core, so even after xfrm_state is deleted=
+ from
+> > > > the configuration by userspace, the refcount isn't decremented unti=
+l the
+> > > > deferred freeing of relevant sk_buffs happens. On a system with man=
+y
+> > > > cores this can take a very long time (even minutes or more if the s=
+ystem
+> > > > is not very active), leading to peer labeling being enabled for muc=
 h
-> > > but I have trouble figuring out the logic behind  commit ecce70cf17d9
-> > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
-> > > ksmbd_rdma_capable_netdev()").
+> > > > longer than expected.
+> > > >
+> > > > Fix this by moving the selinux_xfrm_refcount decrementing to just a=
+fter
+> > > > the actual deletion of the xfrm objects rather than waiting for the
+> > > > freeing to happen. For xfrm_policy it currently doesn't seem to be
+> > > > necessary, but let's do the same there for consistency and
+> > > > future-proofing.
+> > > >
+> > > > We hit this issue on a specific aarch64 256-core system, where the
+> > > > sequence of unix_socket/test and inet_socket/tcp/test from
+> > > > selinux-testsuite [1] would quite reliably trigger this scenario, a=
+nd a
+> > > > subsequent sctp/test run would then stumble because the policy for =
+that
+> > > > test misses some rules that would make it work under peer labeling
+> > > > enabled (namely it was getting the netif::egress permission denied =
+in
+> > > > some of the test cases).
+> > > >
+> > > > [1] https://github.com/SELinuxProject/selinux-testsuite/
+> > > >
+> > > > Fixes: f35f821935d8 ("tcp: defer skb freeing after socket lock is r=
+eleased")
+> > > > Fixes: 68822bdf76f1 ("net: generalize skb freeing deferral to per-c=
+pu lists")
+> > > > Signed-off-by: Ondrej Mosnacek <omosnace@redhat.com>
+> > > > ---
+> > >
+> > > Can we explain why TCP packets sitting in TCP receive queues would
+> > > need to keep xfrm_state around ?
+> > >
+> > > With thousands of TCP sockets. I would imagine that a similar issue
+> > > would be hit,
+> > > regardless of f35f821935d8 ("tcp: defer skb freeing after socket lock
+> > > is released") and 68822bdf76f1 ("net: generalize skb freeing deferral
+> > > to per-cpu lists")
+> > >
+> > > We remove the dst from these incoming packets (see skb_dst_drop() in
+> > > tcp_data_queue() and tcp_add_backlog()),
+> > > I do not see how XFRM state could be kept ?
 > >
-> > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
-> > GID, netdev and fabric complexity.
+> > The problem is not with the xfrm_state reference via dst_entry, but
+> > the one in skb_ext (skb->extensions) -> sec_path
+> > (skb_ext_get_ptr(skb->extensions, SKB_EXT_SEC_PATH)) -> the xvec
+> > array. But you have a point that I should say that in the commit
+> > message...
+> >
 >
-> I'm not familiar enough with either of the subsystems. Based on your
-> answer my guess is that it ain't outright bugous but still a layering
-> violation. Copying linux-cifs@vger.kernel.org so that
-> the smb are aware.
-Could you please elaborate what the violation is ?
-I would also appreciate it if you could suggest to me how to fix this.
+> So some secpath_reset() calls should be added in various protocol handler=
+s
+> before packets are possibly queued for hours in a socket queue  ?
+>
+> I see one in l2tp_eth_dev_recv().
 
-Thanks.
->
-> Thank you very much for all the explanations!
->
-> Regards,
-> Halil
->
+We just need to make sure that skb_sec_path()/SKB_EXT_SEC_PATH is
+still valid when the socket filter is run as that is currently where
+the LSM hooks into the stack and authorizes a packet to be received on
+a sock.
+
+If there are xfrm packets still alive somewhere in the system in a way
+that they could be sent or consumed by a task then the SELinux xfrm
+reference count should probably still be non-zero, unless of course
+we've already done all the access controls.
+
+--=20
+paul-moore.com
 
