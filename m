@@ -1,106 +1,161 @@
-Return-Path: <netdev+bounces-142982-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142983-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9F1B49C0D70
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:04:17 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7BE869C0D78
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:12:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id AC079B20DB8
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:04:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E32EF2835EE
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:12:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DB9D216443;
-	Thu,  7 Nov 2024 18:04:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="KB4eO8qI"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 179042170AB;
+	Thu,  7 Nov 2024 18:12:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from relay7-d.mail.gandi.net (relay7-d.mail.gandi.net [217.70.183.200])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f178.google.com (mail-pf1-f178.google.com [209.85.210.178])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FFB418C33B;
-	Thu,  7 Nov 2024 18:04:06 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 160642161E6;
+	Thu,  7 Nov 2024 18:12:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.178
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731002649; cv=none; b=iS3qd/QTvPDgjypEfXlKF89NZ0aSilGHXQtBMmVSsMurs5FHaXrvICKzv6Dz0/o7CSMBrYMjQVWClYGcm7B3ygUjwzz0Llu+ZO60y/It5BV6wrPU1GzEE1YNxyuueMxLN+JEbWHv7fDLzNnS+v+4xQPGNmbe6mKl85Ghr3Os9H0=
+	t=1731003137; cv=none; b=mg5ofUrpdxDBa0aYQ5NTFxUSbxzhh4DKXrA1K2km1zN0176siV4N3dTbRfIE9QJ0iPk4uJNhHXg+P6Y+vDhMnh65xgj+iEQOw7/kOf5SDTUReFXTEoUkEQhO/w7dr5Uy8kIROtxSwPz2pcbVeYzkJviF1lSTjDe8l7xq0bH9TxU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731002649; c=relaxed/simple;
-	bh=wG4g3Q0DH0DR3NZMvh0Nb97FxUYCyS196E49cYH7+WQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=bZLXO2aarZbYE27LlVnHQ1K3e47LZURk/Y/3YimZKeHepYm7WCjl9n45o/UxspTTdKy1KLdDL4P0zfgwjgtICKoAGL0vfCJ+GxTp6Dw77+Dt8EfGz6pXMBlNswVJ+AjFrBHzyEgLusrP7xEh0ioNInhghyA7My7Bl1vSzm2eHLI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=KB4eO8qI; arc=none smtp.client-ip=217.70.183.200
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
-Received: by mail.gandi.net (Postfix) with ESMTPSA id 06FB520007;
-	Thu,  7 Nov 2024 18:03:56 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
-	t=1731002638;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=v9XGExYP+FD5xVE83+PPloi9X/IUrzdreygul4BmLSg=;
-	b=KB4eO8qIa2MRgT2At0Bdgd+UcoRM2YYL9KjNKlbF8yXXtpwRizS70pLAYRkcXi8dLVomi+
-	3omDI4Zr3vVMcPvLVcYxQ8+dMMa5t10R8cBe9Yn9E7jBEFoH+5uLrgKqxowz/g08KGIVnq
-	WG8rbEYxIS1P/nD20TGfDGuNX8ghZ4kEzMUuPhar1AIPyH5h0vEn9QTWhc5QGh3Tm+Y43M
-	qTlgd9H7dMtGCTJIYWCpnh+zxOwoQNEUmgYqOP39Zs0ojXN3ofFZ2xvMsdQQEx1Buzpq7L
-	vUrs/k/aXYhmd/k4PtLr3lhYTjmzCbSD6QJNoWPQySRXM4U1YzbaMq8WATpgeQ==
-Date: Thu, 7 Nov 2024 19:03:55 +0100
-From: Maxime Chevallier <maxime.chevallier@bootlin.com>
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>, Jakub Kicinski
- <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, Heiner
- Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com, Herve Codina
- <herve.codina@bootlin.com>, Uwe =?UTF-8?B?S2xlaW5lLUvDtm5pZw==?=
- <u.kleine-koenig@baylibre.com>, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 2/7] net: freescale: ucc_geth: split
- adjust_link for phylink conversion
-Message-ID: <20241107190355.7daafc3d@fedora.home>
-In-Reply-To: <Zyz-CcO1inN06mtm@shell.armlinux.org.uk>
-References: <20241107170255.1058124-1-maxime.chevallier@bootlin.com>
-	<20241107170255.1058124-3-maxime.chevallier@bootlin.com>
-	<Zyz-CcO1inN06mtm@shell.armlinux.org.uk>
-Organization: Bootlin
-X-Mailer: Claws Mail 4.3.0 (GTK 3.24.43; x86_64-redhat-linux-gnu)
+	s=arc-20240116; t=1731003137; c=relaxed/simple;
+	bh=QYtEtlkBOrC1Ya90xDLzKFhDn87Z90gjyyAIkP1QK70=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=aUA2qMxVHUFzezDOoeRv2SWTUpd1BQ0ugzrQsQLBvrCUHDwwPuiKgUFOQ42JPAqgVZAAyWymto9M5o3II9nVsN0HQW2q7q58TcqKwAyBlDNk8tW6MwhSXE//WJsFr8hkGIpcfk7CqskoFvJgaMl8JPK48Aj8ysHDqNtZxphrVoY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.210.178
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=fomichev.me
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f178.google.com with SMTP id d2e1a72fcca58-720b2d8bb8dso909959b3a.1;
+        Thu, 07 Nov 2024 10:12:13 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731003133; x=1731607933;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K5/MXPQVWSfX56FbuibfqKs75bB8Xe6p/3/YF+lSl7s=;
+        b=QRZ9YjHtL2cBjbxSbCuG2SLMc8t9FlDuRS+ZZk0HX2B5MuQgqEUgs2f9l8xwXnQ3pZ
+         /kkSFEfdKyVgEKAVIfH53SgWRmTbd1A4MKW5ObbHRhioaxfukYE3aAYDAdBL+uwrR5XE
+         rhJp8kEHLyY93A7Z02ItlbhMQ+umemv7FQ+pKavEHvow5gLUtlnG/cnyGUc7jyz8WtWg
+         tg/XD7MJJgLmjTy33AF0NK7jAVxfDXSNnsKX96fItY4tRrEGhFiOo5tBGpK33zLQCZ5s
+         2n3uxZZyC9iOvpLY7BYyHx5YW/hgDHgd6loCyUdLmt1PaTdofxuqzxrqi5SWxesIPss9
+         c7YQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWB5wMKlWiota9bG6DEjfOddunvhxwyYwlYyssS1ntl0BgzFZL6Euj6+NmO2PAXKDn+7myN8Ah3jyjGHqDl7yaz@vger.kernel.org, AJvYcCWhSF5fxaeB2PniucXgOekDBHplErbi1zU9ENEZn0eWMF+oXnsgIoE0QOyDxlRd+7tuNbb0FSt7GW3DsGw=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxY3TN1kWg8074ghOEJGVLe2jjsVaqxHiZ+jJf66tpbuAu4+dZt
+	4hrs/I9PuNZMmckpotvy3caMPQ6BDHIpIS2moZJglsTJ1pUd6CW7qBpH
+X-Google-Smtp-Source: AGHT+IGdG/ADT//oanKKwvCNg9rKaGItUG2Tvl7gPeqKOty622zfsDSGIPKVY6X4mOOqSnUGaxK00w==
+X-Received: by 2002:a05:6a00:21cc:b0:71e:7a19:7d64 with SMTP id d2e1a72fcca58-72413279ea6mr6087b3a.5.1731003132906;
+        Thu, 07 Nov 2024 10:12:12 -0800 (PST)
+Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407a18f51sm1874832b3a.155.2024.11.07.10.12.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 10:12:12 -0800 (PST)
+From: Stanislav Fomichev <sdf@fomichev.me>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-kernel@vger.kernel.org,
+	linux-kselftest@vger.kernel.org,
+	andrew+netdev@lunn.ch,
+	shuah@kernel.org,
+	horms@kernel.org,
+	almasrymina@google.com,
+	sdf@fomichev.me,
+	willemb@google.com,
+	petrm@nvidia.com,
+	jdamato@fastly.com
+Subject: [PATCH net-next v8 00/12] selftests: ncdevmem: Add ncdevmem to ksft
+Date: Thu,  7 Nov 2024 10:11:59 -0800
+Message-ID: <20241107181211.3934153-1-sdf@fomichev.me>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-GND-Sasl: maxime.chevallier@bootlin.com
+Content-Transfer-Encoding: 8bit
 
-Hello Russell,
+The goal of the series is to simplify and make it possible to use
+ncdevmem in an automated way from the ksft python wrapper.
 
-On Thu, 7 Nov 2024 17:51:05 +0000
-"Russell King (Oracle)" <linux@armlinux.org.uk> wrote:
+ncdevmem is slowly mutated into a state where it uses stdout
+to print the payload and the python wrapper is added to
+make sure the arrived payload matches the expected one.
 
-> On Thu, Nov 07, 2024 at 06:02:49PM +0100, Maxime Chevallier wrote:
-> > Preparing the phylink conversion, split the adjust_link callbaclk, by
-> > clearly separating the mac configuration, link_up and link_down phases.  
-> 
-> I'm not entirely sure what the point of this patch is, given that in
-> patch 7, all this code gets deleted, or maybe moved?
-> 
-> If it's moved, it may be better in patch 7 to ensure that doesn't
-> happen, and move it in a separate patch - right now patch 7 is horrible
-> to review as there's no way to see what the changes are in these
-> link_up()/link_down() functions.
+v8:
+- move error() calls into enable_reuseaddr() (Joe)
+- bail out when number of queues is 1 (Joe)
+- use socat instead of nc (Joe)
+- fix warning about string truncation buf[256]->buf[40] (Jakub)
 
-I agree that it's hard to review indeed... I followed the documented
-approach of splitting-up the adjust_link callback then performing the
-conversion, but it's true that it doesn't really make patch 7 more
-readable.
+v7:
+- fix validation (Mina)
+- add support for working with non ::ffff-prefixed addresses (Mina)
 
-I can try to move things around and make patch 7 a bit more
-straightforward.
+v6:
+- fix compilation issue in 'Unify error handling' patch (Jakub)
 
-Thanks,
+v5:
+- properly handle errors from inet_pton() and socket() (Paolo)
+- remove unneeded import from python selftest (Paolo)
 
-Maxime
+v4:
+- keep usage example with validation (Mina)
+- fix compilation issue in one patch (s/start_queues/start_queue/)
+
+v3:
+- keep and refine the comment about ncdevmem invocation (Mina)
+- add the comment about not enforcing exit status for ntuple reset (Mina)
+- make configure_headersplit more robust (Mina)
+- use num_queues/2 in selftest and let the users override it (Mina)
+- remove memory_provider.memcpy_to_device (Mina)
+- keep ksft as is (don't use -v validate flags): we are gonna
+  need a --debug-disable flag to make it less chatty; otherwise
+  it times out when sending too much data; so leaving it as
+  a separate follow up
+
+v2:
+- don't remove validation (Mina)
+- keep 5-tuple flow steering but use it only when -c is provided (Mina)
+- remove separate flag for probing (Mina)
+- move ncdevmem under drivers/net/hw, not drivers/net (Jakub)
+
+Cc: Mina Almasry <almasrymina@google.com>
+
+Stanislav Fomichev (12):
+  selftests: ncdevmem: Redirect all non-payload output to stderr
+  selftests: ncdevmem: Separate out dmabuf provider
+  selftests: ncdevmem: Unify error handling
+  selftests: ncdevmem: Make client_ip optional
+  selftests: ncdevmem: Remove default arguments
+  selftests: ncdevmem: Switch to AF_INET6
+  selftests: ncdevmem: Properly reset flow steering
+  selftests: ncdevmem: Use YNL to enable TCP header split
+  selftests: ncdevmem: Remove hard-coded queue numbers
+  selftests: ncdevmem: Run selftest when none of the -s or -c has been
+    provided
+  selftests: ncdevmem: Move ncdevmem under drivers/net/hw
+  selftests: ncdevmem: Add automated test
+
+ .../selftests/drivers/net/hw/.gitignore       |   1 +
+ .../testing/selftests/drivers/net/hw/Makefile |   9 +
+ .../selftests/drivers/net/hw/devmem.py        |  45 +
+ .../selftests/drivers/net/hw/ncdevmem.c       | 789 ++++++++++++++++++
+ tools/testing/selftests/net/.gitignore        |   1 -
+ tools/testing/selftests/net/Makefile          |   8 -
+ tools/testing/selftests/net/ncdevmem.c        | 570 -------------
+ 7 files changed, 844 insertions(+), 579 deletions(-)
+ create mode 100644 tools/testing/selftests/drivers/net/hw/.gitignore
+ create mode 100755 tools/testing/selftests/drivers/net/hw/devmem.py
+ create mode 100644 tools/testing/selftests/drivers/net/hw/ncdevmem.c
+ delete mode 100644 tools/testing/selftests/net/ncdevmem.c
+
+-- 
+2.47.0
 
 
