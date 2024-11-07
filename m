@@ -1,223 +1,290 @@
-Return-Path: <netdev+bounces-143057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 45FF79C0FDC
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:38:38 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6FF7D9C0FF3
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:45:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0548B28341D
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:38:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F904282BDB
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:45:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6E821765A;
-	Thu,  7 Nov 2024 20:38:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4DFC21833C;
+	Thu,  7 Nov 2024 20:45:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b="WwFeP6uq"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="d1/NL0zA"
 X-Original-To: netdev@vger.kernel.org
-Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2077.outbound.protection.outlook.com [40.107.21.77])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F7EC210186;
-	Thu,  7 Nov 2024 20:38:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.21.77
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731011912; cv=fail; b=cg5Tw7gojnaLLJdA9PHfbITqlLqa419pVlSOf+lwth6nCTDGt3+BZUE77gw6Op2ajW0Oyt8EmqoLuPBbQKQOrGo546xaiIWM8+bIyNiZw5rXyLCKcmHTcbfwjnS02qSnf1Yzhq3Cs90f/uFLqxRGVStKsNK2x6iz0bbOK3phMIw=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731011912; c=relaxed/simple;
-	bh=kKUbk1vlorGjJ+WIjwQo3UB5ky+Fn1T4+4GP0xQcuYI=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=jp4Fck/Ruh0VuDwcn0r58R5GEkgDE1cl36F6e9ppye/S5RSZTNHwwosE9hMNTZ84LvU7jKoqKDl6qd4L6Nh7jP1BG23FIM3DM0gsD9Y9NKDSSAI4QvnVHXrslrmh8AdDktmpXTxcJj2tad/PhDeAzx2bs7Gibu7S88rYabOT1yQ=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com; spf=fail smtp.mailfrom=nokia-bell-labs.com; dkim=pass (2048-bit key) header.d=nokia-bell-labs.com header.i=@nokia-bell-labs.com header.b=WwFeP6uq; arc=fail smtp.client-ip=40.107.21.77
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nokia-bell-labs.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nokia-bell-labs.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=bZ8Ld1ZCDlTliwDHLRyjuyaiAFQ2Z0TbjriCa1VMdt8dpRVboAJrV36whGie3tzbNkCrPRh7C5GCaBDR2MQp8tVCtdYvspxF4g8NnogWrmPmq5fZT9ga8pNx9rX33O3Aos1L2wq+NtqZOqwcA+gCVDZMTulMaXjVp8/+TN4benjMQFdX/plsBZ0h0AHdCT8204hGb+JSPPEoF7W/ApKmxCjYXXVbvlMuGZSrCGf70yUF9tZ5D87mbJFNd8RFfdhVO6et5a5j2W/Dy4pDJ8OG3adPF8M8pI2oMGA83Y+loR0U+eUJj588GVgqFPJGmIlNRx0VYuTnWR+++Y814wD3TA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=kKUbk1vlorGjJ+WIjwQo3UB5ky+Fn1T4+4GP0xQcuYI=;
- b=C4KTl86XDtaKyhpu5VJy50oDz6iJ1fdBE4lx6pzhH2GfsnBefRp4xDE/2epUET+3ytV91PEjKAcraN7Lxr7Sc1nyjBntPDpgrdHV+7JiPu5PnhNCl5g/0mEF+rbWJ3+v+fZXfuNgb+HDMuekG2jXB045az8kH4LFKW/Jh8aAF+o1Th1o5b/vCbJw1ylH30n/kGV1QMRNOfSn61+/al4OdRSNXh80hUJMDP379rTmgrxRyQiYQA3kddPzgOj3BKheZ/zvnCrjLCWnoMRXv05lc6h/wSnnSqs0aIS19rJUdFLl0TBWVYK2skzypI85MFNDOwkPRs+T/FYXgUIXBg+QnA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nokia-bell-labs.com; dmarc=pass action=none
- header.from=nokia-bell-labs.com; dkim=pass header.d=nokia-bell-labs.com;
- arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nokia-bell-labs.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=kKUbk1vlorGjJ+WIjwQo3UB5ky+Fn1T4+4GP0xQcuYI=;
- b=WwFeP6uqOl+ipZsd4w5sp8EfQPrPhj9/YZHEmjdp6/2NhSDCWfG6BiQSr+u8HaHt+Sp8fmKhCVqJ4YjYeLW6T+oQlS4IXI0UkGdg60U09vHn2QsKf7wisJs5+LuaeqOUOu23xfzBPg9STyV0xjV7ZkuI/4QolyvxyQiYx2kD2CIEFDq6GZko9FGo6OTZaDevOkOmnKw56wv9izDaZuqmNAJVLU23rCo/vH1mFyYFwn6ecrZH0gHznO8qM6HEi3ePKz2X9Xt7j/r1L3Uo+cKSXJXadfgdX5sIOAnJBME9p2MdGIjf9hyTyqkqRPxBAymkc8w5Zru/fuK+PZm6o00Q+w==
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com (2603:10a6:102:133::12)
- by AS1PR07MB8712.eurprd07.prod.outlook.com (2603:10a6:20b:47b::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.19; Thu, 7 Nov
- 2024 20:38:25 +0000
-Received: from PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56]) by PAXPR07MB7984.eurprd07.prod.outlook.com
- ([fe80::b7f8:dc0a:7e8d:56%6]) with mapi id 15.20.8137.019; Thu, 7 Nov 2024
- 20:38:25 +0000
-From: "Chia-Yu Chang (Nokia)" <chia-yu.chang@nokia-bell-labs.com>
-To: Eric Dumazet <edumazet@google.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>, "dsahern@gmail.com"
-	<dsahern@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"dsahern@kernel.org" <dsahern@kernel.org>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "joel.granados@kernel.org" <joel.granados@kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "andrew+netdev@lunn.ch"
-	<andrew+netdev@lunn.ch>, "horms@kernel.org" <horms@kernel.org>,
-	"pablo@netfilter.org" <pablo@netfilter.org>, "kadlec@netfilter.org"
-	<kadlec@netfilter.org>, "netfilter-devel@vger.kernel.org"
-	<netfilter-devel@vger.kernel.org>, "coreteam@netfilter.org"
-	<coreteam@netfilter.org>, "ij@kernel.org" <ij@kernel.org>,
-	"ncardwell@google.com" <ncardwell@google.com>, "Koen De Schepper (Nokia)"
-	<koen.de_schepper@nokia-bell-labs.com>, "g.white@cablelabs.com"
-	<g.white@cablelabs.com>, "ingemar.s.johansson@ericsson.com"
-	<ingemar.s.johansson@ericsson.com>, "mirja.kuehlewind@ericsson.com"
-	<mirja.kuehlewind@ericsson.com>, "cheshire@apple.com" <cheshire@apple.com>,
-	"rs.ietf@gmx.at" <rs.ietf@gmx.at>, "Jason_Livingood@comcast.com"
-	<Jason_Livingood@comcast.com>, "vidhi_goel@apple.com" <vidhi_goel@apple.com>
-Subject: RE: [PATCH v5 net-next 13/13] tcp: fast path functions later
-Thread-Topic: [PATCH v5 net-next 13/13] tcp: fast path functions later
-Thread-Index: AQHbL2qBRhQl0rfQpUefXzlFQ/KWy7KryzyAgAB/c4A=
-Date: Thu, 7 Nov 2024 20:38:24 +0000
-Message-ID:
- <PAXPR07MB7984611FE916408B116692B2A35C2@PAXPR07MB7984.eurprd07.prod.outlook.com>
-References: <20241105100647.117346-1-chia-yu.chang@nokia-bell-labs.com>
- <20241105100647.117346-14-chia-yu.chang@nokia-bell-labs.com>
- <CANn89iL3Wc9FGBGB7s0jHm2MZ0i+xA38NqR31AJpL-4nnBHcJA@mail.gmail.com>
-In-Reply-To:
- <CANn89iL3Wc9FGBGB7s0jHm2MZ0i+xA38NqR31AJpL-4nnBHcJA@mail.gmail.com>
-Accept-Language: en-GB, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nokia-bell-labs.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: PAXPR07MB7984:EE_|AS1PR07MB8712:EE_
-x-ms-office365-filtering-correlation-id: 527ce375-193c-40e0-7b40-08dcff6c20b3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|366016|1800799024|376014|7416014|38070700018;
-x-microsoft-antispam-message-info:
- =?utf-8?B?SVB2NHBnWnUwZFRWYko0aWUrd291MUFjSGZES2tKYjdCZFBrMmdQVWVFbFlS?=
- =?utf-8?B?UytwcElYK0JWV2EvajUzMlROdE8wcmZHdFZJMnNlNXJKeHpRb1d0cU95eWlv?=
- =?utf-8?B?aHFMVXVyRXpLQWdUYkt0TzRYUm9qNlh3TjVPYWM0Yk5oK2lWR2MyL085RXlY?=
- =?utf-8?B?Sml6aWE2WEp1a2VkYkFyRTNVLzVZQUJYOURYMkdvMEFqS21zcElFd29wZU1j?=
- =?utf-8?B?bHBlT2N6TVVnL2NyN05ML1M0b0c0WWdyb3V0T3pyTS90RmJybmNlRGxTUG95?=
- =?utf-8?B?bEQ0UFgwdVArYTZ0a0dGck1McXc0dnYrelA2QndWUURCWis4WXlSS3lmOVN4?=
- =?utf-8?B?RGJQZkw2WFBWdFBoOHB1YzBTM1NXd1FOaWttbmRqV0VXZ3lPUWJ6aW1Baysv?=
- =?utf-8?B?YldIT0dxdXFrUDBzMWNOT1I0QVc5OXdQcjhOR2x0SDdzV1BoL3oydDNESnN4?=
- =?utf-8?B?TW01MWNMQ0lyZzVwK3RMZTRKaGF3dHJxRGdOSmxmVFIrQkwvNU1aRkVzZENL?=
- =?utf-8?B?UEhtL3JLMEtycmIreFNDRk43RkZ2VUNuNy9SLzR1b2J4ZzBRQlZzdW9hWmRn?=
- =?utf-8?B?Y2MySkNzMVp4NXI5UUd4QW5wMG1PNFRWM3J6M1FZNVg5Q2V6Nlc3cTBFOUtS?=
- =?utf-8?B?TjF2R2ZxTWRGM1d2bjBGRi9DUkdmbFRuOTZDdmMxVVk4QW55NkY1NWtsaWlP?=
- =?utf-8?B?NXhjZm81Y3pNellNWC85TGduam4zTDJmT3MvalFqZFJ6eDQzNE5qa3B5WXpw?=
- =?utf-8?B?YW0wL09QUG52ZkRjdXQvOXNRc3JoTmFRcTlNSlJMNFJEVTlrSDk4VXdTdmhF?=
- =?utf-8?B?MlZVWDJVd0FKcUR4K1NnSThHZ1ZsYWhZRnZpdjZRNjZWc09kOG1mNi9qN3Jj?=
- =?utf-8?B?RGZ2T0NWbjNrRHU5S2dVdVBvekgvSm8vSExyY2Z2aFp3aWZRekF0RWVhQkJo?=
- =?utf-8?B?YlpGQzBNVlRFQTBWVlpKYmpMTlNVb0IyQmI3UVg3bW92QmJkRkErQmpUNUVF?=
- =?utf-8?B?M3pydlFrZTlQWXlyMzBwa0ZqSjUxWVF1bUdIZU9iKzNiWXY0UkZiaG8vb1Zo?=
- =?utf-8?B?TG96VXNrUnkxTlpINGVubFc4ejEvdWVHMkVhQ1l2SEp4YnIxb0lZbHlCSEQ3?=
- =?utf-8?B?MHo0aHpnZGd6a3dxdXZ0TFRPU3RlT3lmQXA3NEcwaS9BOHlGUVZER1BYTHlK?=
- =?utf-8?B?UUx6bFJnYVFkSFVSQjJ1azFudWpxaGdyUE5aM0ZmNWRweFFQNGpvdHlkd0dW?=
- =?utf-8?B?K3RVeDdOVkVmcHZPcWJ3clRaUVZmbTFodXZ0QVpzTU1oUkRsMVVvVW8xYkxS?=
- =?utf-8?B?Vk85Nk5nMHFya1NtTUVpOUNQWkFnQzBmLzNFU0lreW5vVDlEZGlnTXppVnhs?=
- =?utf-8?B?NUpnT3cxRVA0U1hwV3MrbVJONlptbXBVQ0RVRG1ITW1XN3RBd1FlSkRrVUgz?=
- =?utf-8?B?VjJIL3g0WFhxQmtWUTVOUU1haWtMZnYwN3d6UnBKSkE0M0JFT2VucnJIUEZE?=
- =?utf-8?B?cVE4TUZIUDZQT1BtcGpvV0tKa0dGanc4a3F3VXFUWG91QUk2bjhJRzN6V3kv?=
- =?utf-8?B?a2tQWEVwbG9yS1VmSUVBUmJCWTlLei9manhYKy9NQW4wOGV2WWRjUm52dmZl?=
- =?utf-8?B?TEJJQTB3QlpPSUZtQnFGWDVNRC8yY1dVN0RXZWxkMm1vQVREcmhxRjZjZjBR?=
- =?utf-8?B?b1prYVRrelFMbUJTRE82Wnd6UkRoSHk1QmpzaUN6RlhDbCswaWpoNzlvMFZS?=
- =?utf-8?Q?l9ik1elAMxPjRiThzwGZgLI4ebD3V1r2Dfcy0Un?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PAXPR07MB7984.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(366016)(1800799024)(376014)(7416014)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?SHRZYllXbTVHMmNQN0t6MDFWQkVxT2hqZE5BMWF5TWZyUGYyWWRiR2lFbnJi?=
- =?utf-8?B?M1dqWk1DcXdRYzZGTjZ3N3M5Um11eTk0WFBVWnJHYlVTL1VHajhYUmdTUkNn?=
- =?utf-8?B?bXJ3UWdHajYvMlF3U0NJWGo1S1hvVkIwMStuSFFORGRBSUJwZHpHT1JlUG5J?=
- =?utf-8?B?Z0NWbXhZa09YVk9wSHVtQ0E0Y0w1SGl1M1FlYS9neFdiM2F0dndIQUV4azF4?=
- =?utf-8?B?eXprd0NuVVpFQ3VRbHhpckxYdDc0K2d5WDZCU0ZJRS9GVUxVWWMzUjJ5RERH?=
- =?utf-8?B?SEdISExrb01kQko2NHlxdVh5SUN1aDNSVlkwMCtmbS9UdGthbzVPZGQ3NVhr?=
- =?utf-8?B?ZWRrT09LQUZyN2hTV3BiWnB0WVNsMmZ1b01hSmJxdHdVbFQ1RVQwYUtKUUl5?=
- =?utf-8?B?MXNuaXhwbzhQblMrc2Q4RlJHWUNoMnVBcUVRVzE5N2dVbE1SN1RGQ3A3Mk9P?=
- =?utf-8?B?Y2twQWljei9pcWhjdGpyYTJUWjRBOEFmdGgzdW1oWXdZSXFvS0JHcy9ORDE4?=
- =?utf-8?B?d1JhRTBhNDBkSHplUVFDY1l1WHlvZHl3dDBXYjNEUm9JakhHemp6QUZpZU1p?=
- =?utf-8?B?Z09VUmhZcDdsNGRQbU44YlpEKzlyeVlDWW9VT2ZoNDNvVHV0NkViQ2c3dHNp?=
- =?utf-8?B?TCt2YW1YS0JGMU1BRllESldWZFl1NDVzUm13VStIMGVvajhwZmpMcFZ3V0h6?=
- =?utf-8?B?QXFvN0ptYUZqc3RHaldPQlVJNDRJSG92TGlESkdqU2VBaEdCc1JOamVDMDVE?=
- =?utf-8?B?MGNvbkZzNm1SRnNZTUVaeGtxTHg4cUdlVzVxSXJzYS9nbTVoV05iSmdXanMr?=
- =?utf-8?B?VWN5anJpc1NKZ1VBZXovNHNnc0JSUExpWmo3UW5NTFhqMlQwSStOYXMreUYv?=
- =?utf-8?B?dXFCbVhsTi9uOUVrUXpCUUFCMkNvdmJDdW1JVjlJS3hEdGQwTkkwaWhaUVhm?=
- =?utf-8?B?aHVwdnlxZjJzUDZLY2tRT2NxcWxSYVgzYWViZUZjYjQwYkpyL1diUjUwNy83?=
- =?utf-8?B?aWZOQmEvR2R3aGRKdUdmbllWRkI1ZGs4OGU0ZjladlhudnVmMmFKeEVkK1RT?=
- =?utf-8?B?alNuSUluQmh3aEl3dThaRU1xRW9DQlVhTnNGTG81U3Z3T1hHWFU5WnFrQWZz?=
- =?utf-8?B?NG1sUE83OHI2T0ZmZUowTEQzYnNWVWptTmRtUlNGVlpWQ0FIL2FTaXRnNmpq?=
- =?utf-8?B?VHZZU0piME9KMVpiSWJJVHhURElwUnlzY05nNXFUYmc1bThLaDB3ampFM2FD?=
- =?utf-8?B?NHp4YUpKc2E0OVlFTnJWc0Z5aXNOUUR6ekkrWmxrL0xISEk4THFVMWdITVM3?=
- =?utf-8?B?Q1FqVTBrZmdKRWd0ZW0wNFNCWVdnd1lUb01wTklCcnNaQlJERGFmSW1TWU5G?=
- =?utf-8?B?YlB1V1NrSEJ4MzBxd3RqNlU5ejUxcGZyZ2p0aWJVRTlQQk96QU1BbFBaNUp4?=
- =?utf-8?B?UXVBOW5VNWlXcG1CdkpGUmM0NFNYbXkxdFgvUnJLVm5LY1RlMHQyVFE0Qyts?=
- =?utf-8?B?TW83aTdzVVd5aktBeEJvTnlHbVA5elRsdTFnSVZkZzA2T2JXdExNZFY4d3pI?=
- =?utf-8?B?cytleVZEZlZ0TVNFSllWOXZNdnIzTGlqWXY5VkFhS1NkeUQrNldIMUFlTm9L?=
- =?utf-8?B?QU85NWpTRVNzb0FLMzQ0bEw4WUJDQURVSGVUaHlqM2llTHdXbGF2eVZTRDhJ?=
- =?utf-8?B?Tlp6SFd1RGNJNDZxTS9UeHQ5VkU5L00wSzg5UXVZRlYyZk11dVFOY0x4VnpB?=
- =?utf-8?B?N3Nla0Y1NGxxMDZwbzhrbi9IZVNncnBCZFFvQVlPUjZVeitNQXRoZEM4VEdM?=
- =?utf-8?B?amI4WEg5V3ExS3dsSDgyb05Nank3a1lkOXYwc2wrSGRGY053dWhBNFJZZ2hr?=
- =?utf-8?B?NlU1L1BZbHN6QVJXSWlJUk5mRUo0S0F0QUlFZjVjS3pTM2NvemQzVmdFaG00?=
- =?utf-8?B?UkZ6dlBiT1cxcUJHeWlqeFRUSTl3dGMzSm9WcXltTlIvMjZsOHVMbTA3Nmd1?=
- =?utf-8?B?b2RUV2JhNVNLUHJZckN2RFpTVkQ4NmVZd2hIeDY0Mi8zNGhDdnBoUERtWUUx?=
- =?utf-8?B?UW5QN05xMm4ySVgyQjFscnNWUGxBQW1FTUVpTDg3NXdzeHdyZlNvUXNlQlJK?=
- =?utf-8?B?YzBmOVFPQUpvVVRjRDVtOHhhejJMQ0oyTks2UzJTREl2akRWb08zamxvVCsx?=
- =?utf-8?B?ZVE9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB880218337;
+	Thu,  7 Nov 2024 20:45:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731012334; cv=none; b=I6Izh9piEommVpZxa5X056U/3DX5SC9Of4SUTqb9o/jvdnhhzUHWutaJlF+UvIl7DhC0UhyluCRVADE9BbfMydHLBE1/IXmfOz7dRiCVxDWmGKGdWV5pYB4sWv2exUl3iyIXpSv3ab3WUCM/XPJixDVOmA7AFTL4DNLJSWLpaPI=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731012334; c=relaxed/simple;
+	bh=eENU9Ew7xHw7MI0ZFn6qoyCmfwr99+4/gfV3NTtKtvs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=dydaw1m66bbDyoBfmBy699XIdu2kc1ObzK+0UuWjqqx9u+OZICy29ax3wNqZgeR2RT12UR9b49cYXnTAS8fGKgBtDxf09CK9UIJsWUB6dGk1/vXg/Fw/9YQ507/DbO/IceFyIOEnDzk/elMUoj+Whx+SYgiO3RtTyyHrtcfBgP0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=d1/NL0zA; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1096DC4CED7;
+	Thu,  7 Nov 2024 20:45:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731012334;
+	bh=eENU9Ew7xHw7MI0ZFn6qoyCmfwr99+4/gfV3NTtKtvs=;
+	h=From:To:Cc:Subject:Date:From;
+	b=d1/NL0zAqG1jNRWe/LlOWEt0C8qydEE1eN1mwJ0jgEx3DRx+Ef3XL6qLkAr2TxKfJ
+	 oaYw5RoGTeYQfvytDbYN+TeNFutE7BS0ep2jy5FswBHaI2lv0knFrrNM+h0Qq26Vfz
+	 ybw5YNN6bFGFtvRkHK7B9rzsCI3T+34f8OpqR5K4E8plEnJpLdcpu1EHKT78OVECnj
+	 cozih0sW5gG8KQ+Q/vtx200LG9EB+KgsV6j7tQBbtGcbKrvVbz+/62Y8Kyh6WkAJ/q
+	 msQcmUASu8jaDHnSSAcR9IcmKrYB2XxNFD9z5LKBBaexO30Or5E/J8yWSAJeqxsX6g
+	 4nZ6gyzYkokHw==
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	pabeni@redhat.com
+Subject: [GIT PULL] Networking for v6.12-rc7
+Date: Thu,  7 Nov 2024 12:45:33 -0800
+Message-ID: <20241107204533.2224043-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nokia-bell-labs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: PAXPR07MB7984.eurprd07.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 527ce375-193c-40e0-7b40-08dcff6c20b3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Nov 2024 20:38:24.9546
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 5d471751-9675-428d-917b-70f44f9630b0
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: H418LB4OVyTFJ2PYsBzxO1eEr+9tYMmrMZhVeHKT9jv3kMuar3KR9hgv0mpzQhf+Uz24FfkNdl9xCpahZHOPZsHsmWx5LdzyyUEMJOZEzQG7GzmcHbjo34GyJiexCcdu
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR07MB8712
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-PkZyb206IEVyaWMgRHVtYXpldCA8ZWR1bWF6ZXRAZ29vZ2xlLmNvbT4gDQo+U2VudDogVGh1cnNk
-YXksIE5vdmVtYmVyIDcsIDIwMjQgMjowMSBQTQ0KPlRvOiBDaGlhLVl1IENoYW5nIChOb2tpYSkg
-PGNoaWEteXUuY2hhbmdAbm9raWEtYmVsbC1sYWJzLmNvbT4NCj5DYzogbmV0ZGV2QHZnZXIua2Vy
-bmVsLm9yZzsgZHNhaGVybkBnbWFpbC5jb207IGRhdmVtQGRhdmVtbG9mdC5uZXQ7IGRzYWhlcm5A
-a2VybmVsLm9yZzsgcGFiZW5pQHJlZGhhdC5jb207IGpvZWwuZ3JhbmFkb3NAa2VybmVsLm9yZzsg
-a3ViYUBrZXJuZWwub3JnOyBhbmRyZXcrbmV0ZGV2QGx1bm4uY2g7IGhvcm1zQGtlcm5lbC5vcmc7
-IHBhYmxvQG5ldGZpbHRlci5vcmc7IGthZGxlY0BuZXRmaWx0ZXIub3JnOyBuZXRmaWx0ZXItZGV2
-ZWxAdmdlci5rZXJuZWwub3JnOyBjb3JldGVhbUBuZXRmaWx0ZXIub3JnOyBpakBrZXJuZWwub3Jn
-OyBuY2FyZHdlbGxAZ29vZ2xlLmNvbTsgS29lbiBEZSBTY2hlcHBlciAoTm9raWEpIDxrb2VuLmRl
-X3NjaGVwcGVyQG5va2lhLWJlbGwtbGFicy5jb20+OyBnLndoaXRlQGNhYmxlbGFicy5jb207IGlu
-Z2VtYXIucy5qb2hhbnNzb25AZXJpY3Nzb24uY29tOyBtaXJqYS5rdWVobGV3aW5kQGVyaWNzc29u
-LmNvbTsgY2hlc2hpcmVAYXBwbGUuY29tOyBycy5pZXRmQGdteC5hdDsgSmFzb25fTGl2aW5nb29k
-QGNvbWNhc3QuY29tOyB2aWRoaV9nb2VsQGFwcGxlLmNvbQ0KPlN1YmplY3Q6IFJlOiBbUEFUQ0gg
-djUgbmV0LW5leHQgMTMvMTNdIHRjcDogZmFzdCBwYXRoIGZ1bmN0aW9ucyBsYXRlcg0KPg0KPg0K
-PkNBVVRJT046IFRoaXMgaXMgYW4gZXh0ZXJuYWwgZW1haWwuIFBsZWFzZSBiZSB2ZXJ5IGNhcmVm
-dWwgd2hlbiBjbGlja2luZyBsaW5rcyBvciBvcGVuaW5nIGF0dGFjaG1lbnRzLiBTZWUgdGhlIFVS
-TCBub2suaXQvZXh0IGZvciBhZGRpdGlvbmFsIGluZm9ybWF0aW9uLg0KPg0KPg0KPg0KPk9uIFR1
-ZSwgTm92IDUsIDIwMjQgYXQgMTE6MDfigK9BTSA8Y2hpYS15dS5jaGFuZ0Bub2tpYS1iZWxsLWxh
-YnMuY29tPiB3cm90ZToNCj4+DQo+PiBGcm9tOiBJbHBvIErDpHJ2aW5lbiA8aWpAa2VybmVsLm9y
-Zz4NCj4+DQo+PiBUaGUgZm9sbG93aW5nIHBhdGNoIHdpbGwgdXNlIHRjcF9lY25fbW9kZV9hY2Nl
-Y24oKSwgDQo+PiBUQ1BfQUNDRUNOX0NFUF9JTklUX09GRlNFVCwgVENQX0FDQ0VDTl9DRVBfQUNF
-X01BU0sgaW4NCj4+IF9fdGNwX2Zhc3RfcGF0aF9vbigpIHRvIG1ha2UgbmV3IGZsYWcgZm9yIEFj
-Y0VDTi4NCj4+DQo+PiBObyBmdW5jdGlvbmFsIGNoYW5nZXMuDQo+Pg0KPj4gU2lnbmVkLW9mZi1i
-eTogSWxwbyBKw6RydmluZW4gPGlqQGtlcm5lbC5vcmc+DQo+PiBTaWduZWQtb2ZmLWJ5OiBDaGFp
-LVl1IENoYW5nIDxjaGlhLXl1LmNoYW5nQG5va2lhLWJlbGwtbGFicy5jb20+DQo+DQo+SSBndWVz
-cyB0aGlzIHBhdGNoIHNob3VsZCBub3QgbGFuZCBpbiB0aGlzIHNlcmllcywgYnV0IGluIHRoZSBm
-b2xsb3dpbmcgb25lLg0KDQpIaSBFcmljLA0KDQoJSW5kZWVkLCBJIHdpbGwgbW92ZSB0aGlzIHBh
-dGNoIHRvIHRoZSBmb2xsb3dpbmcgQWNjRUNOIHNlcmllcy4NCg0KQmVzdCByZWdhcmRzLA0KQ2hp
-YS1ZdQ0K
+Hi Linus!
+
+The following changes since commit 5635f189425e328097714c38341944fc40731f3d:
+
+  Merge tag 'bpf-fixes' of git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf (2024-10-31 14:56:19 -1000)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.12-rc7
+
+for you to fetch changes up to 71712cf519faeed529549a79559c06c7fc250a15:
+
+  drivers: net: ionic: add missed debugfs cleanup to ionic_probe() error path (2024-11-07 11:40:50 -0800)
+
+----------------------------------------------------------------
+Including fixes from can and netfilter.
+
+Things are slowing down quite a bit, mostly driver fixes here.
+No known ongoing investigations.
+
+Current release - new code bugs:
+
+ - eth: ti: am65-cpsw:
+   - fix multi queue Rx on J7
+   - fix warning in am65_cpsw_nuss_remove_rx_chns()
+
+Previous releases - regressions:
+
+ - mptcp: do not require admin perm to list endpoints, got missed
+   in a refactoring
+
+ - mptcp: use sock_kfree_s instead of kfree
+
+Previous releases - always broken:
+
+ - sctp: properly validate chunk size in sctp_sf_ootb() fix OOB access
+
+ - virtio_net: make RSS interact properly with queue number
+
+ - can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation
+
+ - can: mcp251xfd: mcp251xfd_ring_alloc(): fix coalescing configuration
+   when switching CAN modes
+
+Misc:
+
+ - revert earlier hns3 fixes, they were ignoring IOMMU abstractions
+   and need to be reworked
+
+ - can: {cc770,sja1000}_isa: allow building on x86_64
+
+Signed-off-by: Jakub Kicinski <kuba@kernel.org>
+
+----------------------------------------------------------------
+Aleksandr Loktionov (1):
+      i40e: fix race condition by adding filter's intermediate sync state
+
+Alexander Hölzl (1):
+      can: j1939: fix error in J1939 documentation.
+
+Dario Binacchi (1):
+      can: c_can: fix {rx,tx}_errors statistics
+
+David Howells (1):
+      rxrpc: Fix missing locking causing hanging calls
+
+Diogo Silva (1):
+      net: phy: ti: add PHY_RST_AFTER_CLK_EN flag
+
+Eric Dumazet (1):
+      net/smc: do not leave a dangling sk pointer in __smc_create()
+
+Florian Fainelli (1):
+      MAINTAINERS: Remove self from DSA entry
+
+Geert Uytterhoeven (1):
+      can: rockchip_canfd: CAN_ROCKCHIP_CANFD should depend on ARCH_ROCKCHIP
+
+Geliang Tang (1):
+      mptcp: use sock_kfree_s instead of kfree
+
+Jakub Kicinski (5):
+      Merge tag 'linux-can-fixes-for-6.12-20241104' of git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can
+      Revert "Merge branch 'there-are-some-bugfix-for-the-hns3-ethernet-driver'"
+      Merge branch 'mptcp-pm-fix-wrong-perm-and-sock-kfree'
+      Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue
+      Merge tag 'nf-24-11-07' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Jean Delvare (1):
+      can: rockchip_canfd: Drop obsolete dependency on COMPILE_TEST
+
+Jinjie Ruan (1):
+      net: wwan: t7xx: Fix off-by-one error in t7xx_dpmaif_rx_buf_alloc()
+
+Johan Jonker (2):
+      net: arc: fix the device for dma_map_single/dma_unmap_single
+      net: arc: rockchip: fix emac mdio node support
+
+Marc Kleine-Budde (3):
+      can: m_can: m_can_close(): don't call free_irq() for IRQ-less devices
+      can: mcp251xfd: mcp251xfd_ring_alloc(): fix coalescing configuration when switching CAN modes
+      can: mcp251xfd: mcp251xfd_get_tef_len(): fix length calculation
+
+Marcin Szycik (1):
+      ice: Fix use after free during unload with ports in bridge
+
+Mateusz Polchlopek (1):
+      ice: change q_index variable type to s16 to store -1 value
+
+Matthieu Baerts (NGI0) (1):
+      mptcp: no admin perm to list endpoints
+
+Nícolas F. R. A. Prado (1):
+      net: stmmac: Fix unbalanced IRQ wake disable warning on single irq case
+
+Pablo Neira Ayuso (1):
+      netfilter: nf_tables: wait for rcu grace period on net_device removal
+
+Paolo Abeni (3):
+      Merge branch 'net-ethernet-ti-am65-cpsw-fixes-to-multi-queue-rx-feature'
+      Merge branch 'virtio_net-make-rss-interact-properly-with-queue-number'
+      Merge branch 'fix-the-arc-emac-driver'
+
+Pavan Kumar Linga (2):
+      idpf: avoid vport access in idpf_get_link_ksettings
+      idpf: fix idpf_vc_core_init error path
+
+Peiyang Wang (1):
+      net: hns3: fix kernel crash when uninstalling driver
+
+Philo Lu (4):
+      virtio_net: Support dynamic rss indirection table size
+      virtio_net: Add hash_key_length check
+      virtio_net: Sync rss config to device when virtnet_probe
+      virtio_net: Update rss when set queue
+
+Roger Quadros (2):
+      net: ethernet: ti: am65-cpsw: Fix multi queue Rx on J7
+      net: ethernet: ti: am65-cpsw: fix warning in am65_cpsw_nuss_remove_rx_chns()
+
+Stefan Wahren (1):
+      net: vertexcom: mse102x: Fix possible double free of TX skb
+
+Suraj Gupta (2):
+      dt-bindings: net: xlnx,axi-ethernet: Correct phy-mode property value
+      net: xilinx: axienet: Enqueue Tx packets in dql before dmaengine starts
+
+Thomas Mühlbacher (1):
+      can: {cc770,sja1000}_isa: allow building on x86_64
+
+Vitaly Lifshits (1):
+      e1000e: Remove Meteor Lake SMBUS workarounds
+
+Vladimir Oltean (1):
+      net: dpaa_eth: print FD status in CPU endianness in dpaa_eth_fd tracepoint
+
+Wei Fang (2):
+      net: enetc: set MAC address to the VF net_device
+      net: enetc: allocate vf_state during PF probes
+
+Wenjia Zhang (1):
+      net/smc: Fix lookup of netdev by using ib_device_get_netdev()
+
+Wentao Liang (1):
+      drivers: net: ionic: add missed debugfs cleanup to ionic_probe() error path
+
+Xin Long (1):
+      sctp: properly validate chunk size in sctp_sf_ootb()
+
+ CREDITS                                            |   4 +
+ .../devicetree/bindings/net/xlnx,axi-ethernet.yaml |   2 +-
+ Documentation/netlink/specs/mptcp_pm.yaml          |   1 -
+ Documentation/networking/j1939.rst                 |   2 +-
+ MAINTAINERS                                        |   1 -
+ drivers/net/can/c_can/c_can_main.c                 |   7 +-
+ drivers/net/can/cc770/Kconfig                      |   2 +-
+ drivers/net/can/m_can/m_can.c                      |   3 +-
+ drivers/net/can/rockchip/Kconfig                   |   3 +-
+ drivers/net/can/sja1000/Kconfig                    |   2 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-ring.c     |   8 +-
+ drivers/net/can/spi/mcp251xfd/mcp251xfd-tef.c      |  10 +-
+ drivers/net/ethernet/arc/emac_main.c               |  27 +++--
+ drivers/net/ethernet/arc/emac_mdio.c               |   9 +-
+ .../net/ethernet/freescale/dpaa/dpaa_eth_trace.h   |   2 +-
+ drivers/net/ethernet/freescale/enetc/enetc_pf.c    |  18 ++--
+ drivers/net/ethernet/freescale/enetc/enetc_vf.c    |   9 +-
+ drivers/net/ethernet/hisilicon/hns3/hnae3.c        |   5 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_debugfs.c |   4 +-
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.c    |  59 +---------
+ drivers/net/ethernet/hisilicon/hns3/hns3_enet.h    |   2 -
+ drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c |  33 ------
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_main.c    |  45 ++------
+ .../net/ethernet/hisilicon/hns3/hns3pf/hclge_ptp.c |   3 -
+ .../ethernet/hisilicon/hns3/hns3pf/hclge_regs.c    |   9 +-
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_main.c  |  40 ++-----
+ .../ethernet/hisilicon/hns3/hns3vf/hclgevf_regs.c  |   9 +-
+ drivers/net/ethernet/intel/e1000e/ich8lan.c        |  17 +--
+ drivers/net/ethernet/intel/i40e/i40e.h             |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_debugfs.c     |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_main.c        |  12 ++-
+ drivers/net/ethernet/intel/ice/ice_eswitch.c       |   3 +-
+ drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c  |   3 +-
+ drivers/net/ethernet/intel/ice/ice_fdir.h          |   4 +-
+ drivers/net/ethernet/intel/idpf/idpf.h             |   4 +-
+ drivers/net/ethernet/intel/idpf/idpf_ethtool.c     |  11 +-
+ drivers/net/ethernet/intel/idpf/idpf_lib.c         |   5 +-
+ drivers/net/ethernet/intel/idpf/idpf_virtchnl.c    |   3 +-
+ .../net/ethernet/pensando/ionic/ionic_bus_pci.c    |   1 +
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c  |   1 +
+ drivers/net/ethernet/ti/am65-cpsw-nuss.c           |  75 ++++++-------
+ drivers/net/ethernet/ti/am65-cpsw-nuss.h           |   6 +-
+ drivers/net/ethernet/vertexcom/mse102x.c           |   5 +-
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c  |   4 +-
+ drivers/net/phy/dp83848.c                          |   2 +
+ drivers/net/virtio_net.c                           | 119 +++++++++++++++++----
+ drivers/net/wwan/t7xx/t7xx_hif_dpmaif_rx.c         |   2 +-
+ include/net/netfilter/nf_tables.h                  |   4 +
+ include/trace/events/rxrpc.h                       |   1 +
+ net/mptcp/mptcp_pm_gen.c                           |   1 -
+ net/mptcp/pm_userspace.c                           |   3 +-
+ net/netfilter/nf_tables_api.c                      |  41 +++++--
+ net/rxrpc/conn_client.c                            |   4 +
+ net/sctp/sm_statefuns.c                            |   2 +-
+ net/smc/af_smc.c                                   |   4 +-
+ net/smc/smc_ib.c                                   |   8 +-
+ net/smc/smc_pnet.c                                 |   4 +-
+ 57 files changed, 333 insertions(+), 337 deletions(-)
 
