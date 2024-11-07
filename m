@@ -1,217 +1,152 @@
-Return-Path: <netdev+bounces-142711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D4369C0123
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:30:48 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 032F09C0125
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:31:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 506AB1C20FE2
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:30:47 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A93151F22203
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64B361922D8;
-	Thu,  7 Nov 2024 09:30:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6511196D8F;
+	Thu,  7 Nov 2024 09:31:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ReRtWKv3"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="Nt4dsEdZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f172.google.com (mail-il1-f172.google.com [209.85.166.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A920318785B
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 09:30:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E3F9194AD8
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 09:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730971844; cv=none; b=UiL/U/L7ZyjxtlSnTs2fPCdhlEf/hNTKDSEy27095DZjp2RjMnBhjWL5tcGtvkpNS72hWqTHyO7KBKhjCVzQmp/DovsSMuRgMuzsZFtgJJY1sO8/UGXVuWTvvr9QZaQAl11eg8R3aohiy8LEwpG5sgK54EbUyJz9PxLt4fI2woA=
+	t=1730971870; cv=none; b=dRnxvVuh7SuBjjVj5lmHwbrg6a4fGkTXO4hwLhUdc/fqsOG1q9mDN2KrORnz62g6y4AW14OrHPrYDC861V/yRsB4UWhdv5e9XZ5mzg783azvlIheDxOP07EZjY2x5G7B0plMr5XJUV5bLoOKz/CZfwFxNLrvEZyIvmG3nIgPdS8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730971844; c=relaxed/simple;
-	bh=b2jPctcPSYjkVTZjWBiItB7ezCGeW343cdkavKNuja4=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=KblMUY0XV8l3wahDU1vCGZLNSNp8uVJYC1WQFFflXKvfQKCuEHKNt9gEaY9twiDd9lQeJErX3orMwXYYBzdblYYsE4GnkyZa1GKfL0tmKPn3B2MRKA0i/Btgt5wlmOaZIfGQVSjrP6Hxdn9IGMtNz1Hs5VvoHNiqVk5RWAqhKZg=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ReRtWKv3; arc=none smtp.client-ip=209.85.166.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f172.google.com with SMTP id e9e14a558f8ab-3a6c1cfcb91so3045435ab.0
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 01:30:42 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730971842; x=1731576642; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Lv5XSPQnrvcOoJF7ZJoyeH21MV+tMP+cswU63+DWigE=;
-        b=ReRtWKv3vFmnizf9oMjMa91/pQnjHerZCv5qvPSNdHWBR2hD+g6OG0SblQk/cVqIBv
-         UMRB2Aiy4QzCLkTNowAsn+qJWV+RDYEdKy3C145Xy6zHq7c1M/fQHpf4YZhMioumjzfi
-         Hurfysu2T14YAhpI/w6QfXw3EafThQ0mqBXIJHEtqzTiJSiSlmUbs9IiL/4EpLzop4Lc
-         5yfGQ1rW+7rcbvNyZKGcgizd5L0GUEfQ9+yoZ9a8igSbq4R9s8oAqVgRlqD4H3idsQu8
-         t7xklGIUfaPJpBgIxJUI6JjgqryFFZhDHr6CF3RJbTG7pZq54r1GtOsqskI8gO+fIVwf
-         yuoQ==
+	s=arc-20240116; t=1730971870; c=relaxed/simple;
+	bh=/D5syvUjOBxSlK8kvUXHUBJ8zR0FkgS2l+lKT19FiVo=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=q+GLiXyoSjXooozspsMEpOpZtoxznO2mTqQ6sANvCtZWfcrf3mt1gYHSMLIyeCMQibucpCU1wdn9iXr35yNmOndtOBaHHY/H8X0Eg2tHagYKaOiGiyR25thxOheIWP8NUZcmtvh8opuAleq/lg/rnxiGyCJR5hQ85p1jGB6EKD4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=Nt4dsEdZ; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1730971868;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ueiDthDFqxwLFYf7b3aDU9CVHTSeCEaca5mg+7dcvLk=;
+	b=Nt4dsEdZEvru3edeDTtCT+NEyzBjSZNh4FC7vWy0iMYi5kaCAo6CuYlf/k7/cWROqr4f35
+	a/+YWCW+csG2l6fu9Mocg8KW4b24FL1WicTwX8aTyPsbPdVrO8x1NE31YwcTp3eLLNqOJr
+	xNd+tg0JUSUmrLIM5gww7r+6EjE/7fw=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-133-hHtyXNzyOJufGWLzspKfWA-1; Thu, 07 Nov 2024 04:31:06 -0500
+X-MC-Unique: hHtyXNzyOJufGWLzspKfWA-1
+X-Mimecast-MFC-AGG-ID: hHtyXNzyOJufGWLzspKfWA
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-4315cefda02so5844305e9.0
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 01:31:06 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730971842; x=1731576642;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Lv5XSPQnrvcOoJF7ZJoyeH21MV+tMP+cswU63+DWigE=;
-        b=tncg4/dXjzZFKRBIYOHPAqUriGmAkGtcDxHi7JaAYl65cEDCKgQnP4jV90bWt1uBpp
-         Kk6LgKGI248af2PoFUpCX6Nf6gM7XZV7POf5Vz1nTrEaQo64LwJS5eS5nfJezwGqIRAI
-         5G61hP2dRs9IRfKItgRlPWdEP87Yu29x3L+OjPuhJHEvy2FDzQLJ07L0x8gtSNkG8ssN
-         zG3lUojQRPo+s9iiOHYl31VmrC4HVhPN7q9KFqpTRw9NFs9xaIGZor4HEToFtmXehwZ3
-         icXJq05rQyvL39iIytDfJrGPAP2jWLr0GLdFrmRkRSHpj4hzt1AtCs4LTJjqcL4Plt0l
-         rsng==
-X-Forwarded-Encrypted: i=1; AJvYcCXPJMBSukxVE/9ejEZRLSqnbbPvzuo6gXtsUbZA1liIMc3YpY80nZiKRL7ohp1mYO7CURgpX4M=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwZXn/ECQy+jgs8QYGIppHPGUxqSDFdbKOM7xouhd+Q6crmAG7x
-	alTnemrnbhPqhSS4EQctWRNDhrYbdVmWwoVJeUip1ZDX9aJBojJCoRgF/7ack0dEED1ui7qcvGF
-	J1ZHVTjNdG8DaC1Y3U+ylUgS4orE=
-X-Google-Smtp-Source: AGHT+IEBhDE3y+zqNtt6IFRtuu+lMnnu+vvIg4ECnm9DUJoeOpl8liLjYPI/idjN+1Q+hBPkpLqjE+4U7PHTdzPJ8+8=
-X-Received: by 2002:a05:6e02:1849:b0:3a6:b783:3c06 with SMTP id
- e9e14a558f8ab-3a6ed21aff8mr5559435ab.19.1730971841716; Thu, 07 Nov 2024
- 01:30:41 -0800 (PST)
+        d=1e100.net; s=20230601; t=1730971865; x=1731576665;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ueiDthDFqxwLFYf7b3aDU9CVHTSeCEaca5mg+7dcvLk=;
+        b=MUaF3Rb7gFWlcOuA3TozDzYPiGAs2CR1WKyV59Yp8Q+IkYjH2cR4SenL/9j4SSrsto
+         Dsx8W8lIifk1iwnHvbzBxAcQD+QZgnZuSyRfshebVZ4QEs5N+Mq6Ma4u0BIFoWtLFEL0
+         2kRC55XXEPq244RLPNGAFiIsLUrowKrnO8JnxpqC/TWTJbhkpv6xWCcKAC4jl8Im/4H2
+         mjzd/rtV4TD0+rr5Nwwo4jaHKWDkXjliTHk43FtU8Fz5iwmKMcVYNkcGwqw0k0gxogvK
+         NjmHdGtMHlMExKm8WCIcKc2+umrxXMNadOY9+9Aw9HUi3udi78/6741pti9sNTuwR3YC
+         goTg==
+X-Gm-Message-State: AOJu0YxdAqiSWEF+GLoQKnOmtsSZqu7eW1nf8uNVwBoO9zeBwtY+hQ2Z
+	+biIMq1aE+1PHzmKbrVMo3FK5/R8ZNGuRc4BRLjjWf4Cf2K9mwOzWjzW9zGCy+JyPXp5BntgnvH
+	MFcrf0TVeLnVLy2FRUpTTyxqBRnvExZhXGvVLtMlNTZIZu7hGfaGP9g==
+X-Received: by 2002:a05:600c:524b:b0:430:582f:3a9d with SMTP id 5b1f17b1804b1-432b307b364mr5977105e9.26.1730971865632;
+        Thu, 07 Nov 2024 01:31:05 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHkmBrArrmJMdgAUuLkOLXQwa+TQTVW4TaixXP6SkrXujKRv/htZAL0smZaX2Q4QCAQ5P+uVQ==
+X-Received: by 2002:a05:600c:524b:b0:430:582f:3a9d with SMTP id 5b1f17b1804b1-432b307b364mr5976915e9.26.1730971865284;
+        Thu, 07 Nov 2024 01:31:05 -0800 (PST)
+Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05673d0sm16540365e9.25.2024.11.07.01.31.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Nov 2024 01:31:04 -0800 (PST)
+Message-ID: <866ca6e3-1ea4-47ad-8df3-a8ab9604d48d@redhat.com>
+Date: Thu, 7 Nov 2024 10:31:03 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
- <92c1d976-7bb6-49ff-9131-edba30623f76@linux.alibaba.com> <CAL+tcoBZaDhBuSKHzGEqgxkzOazX3K-Vo2=mCdOy+iLp4sPAhg@mail.gmail.com>
- <75708260-7eb4-42fe-9d9b-605f8eef488b@linux.alibaba.com> <CAL+tcoBA78svT_vTMOLV-pbwKM1o_SDbjs7AAZLhHOtrd8akBg@mail.gmail.com>
- <CANn89iL5df5_EiDX7JxaFbfmZ9gDo=8ZyLXhbZs+-yp8zVD=GA@mail.gmail.com> <CAL+tcoBCqXiQ33XZv61vCes7_XV83DC0HSPy_w6eCn4pzzJeqA@mail.gmail.com>
-In-Reply-To: <CAL+tcoBCqXiQ33XZv61vCes7_XV83DC0HSPy_w6eCn4pzzJeqA@mail.gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Nov 2024 17:30:05 +0800
-Message-ID: <CAL+tcoBPj2aULt5G4qis0D78ke=dt2ws7KBg4Gn+s4FtzjMZfQ@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: Eric Dumazet <edumazet@google.com>
-Cc: Philo Lu <lulie@linux.alibaba.com>, davem@davemloft.net, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org, 
-	netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v2] net: nfc: Propagate ISO14443 type A target
+ ATS to userspace via netlink
+To: =?UTF-8?Q?Juraj_=C5=A0arinay?= <juraj@sarinay.com>,
+ Simon Horman <horms@kernel.org>
+Cc: netdev@vger.kernel.org, krzk@kernel.org, kuba@kernel.org
+References: <20241103124525.8392-1-juraj@sarinay.com>
+ <20241106101804.GM4507@kernel.org>
+ <a0d73e24863106f477abba75b996f4b9ff00d737.camel@sarinay.com>
+Content-Language: en-US
+From: Paolo Abeni <pabeni@redhat.com>
+In-Reply-To: <a0d73e24863106f477abba75b996f4b9ff00d737.camel@sarinay.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 7, 2024 at 5:00=E2=80=AFPM Jason Xing <kerneljasonxing@gmail.co=
-m> wrote:
->
-> On Thu, Nov 7, 2024 at 4:37=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
-> >
-> > On Thu, Nov 7, 2024 at 9:27=E2=80=AFAM Jason Xing <kerneljasonxing@gmai=
-l.com> wrote:
-> > >
-> > > On Thu, Nov 7, 2024 at 4:22=E2=80=AFPM Philo Lu <lulie@linux.alibaba.=
-com> wrote:
-> > > >
-> > > >
-> > > >
-> > > > On 2024/11/7 16:01, Jason Xing wrote:
-> > > > > On Thu, Nov 7, 2024 at 3:51=E2=80=AFPM Philo Lu <lulie@linux.alib=
-aba.com> wrote:
-> > > > >>
-> > > > >> Hi Jason,
-> > > > >>
-> > > > >> On 2024/11/5 10:55, Jason Xing wrote:
-> > > > >>> From: Jason Xing <kernelxing@tencent.com>
-> > > > >>>
-> > > > >>> We found there are rare chances that some RST packets appear du=
-ring
-> > > > >>> the shakehands because the timewait socket cannot accept the SY=
-N and
-> > > > >>> doesn't return TCP_TW_SYN in tcp_timewait_state_process().
-> > > > >>>
-> > > > >>> Here is how things happen in production:
-> > > > >>> Time        Client(A)        Server(B)
-> > > > >>> 0s          SYN-->
-> > > > >>> ...
-> > > > >>> 132s                         <-- FIN
-> > > > >>> ...
-> > > > >>> 169s        FIN-->
-> > > > >>> 169s                         <-- ACK
-> > > > >>> 169s        SYN-->
-> > > > >>> 169s                         <-- ACK
-> > > > >>> 169s        RST-->
-> > > > >>> As above picture shows, the two flows have a start time differe=
-nce
-> > > > >>> of 169 seconds. B starts to send FIN so it will finally enter i=
-nto
-> > > > >>> TIMEWAIT state. Nearly at the same time A launches a new connec=
-tion
-> > > > >>> that soon is reset by itself due to receiving a ACK.
-> > > > >>>
-> > > > >>> There are two key checks in tcp_timewait_state_process() when t=
-imewait
-> > > > >>> socket in B receives the SYN packet:
-> > > > >>> 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
-> > > > >>> 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < =
-0)
-> > > > >>>
-> > > > >>> Regarding the first rule, it fails as expected because in the f=
-irst
-> > > > >>> connection the seq of SYN sent from A is 1892994276, then 169s =
-have
-> > > > >>> passed, the second SYN has 239034613 (caused by overflow of s32=
-).
-> > > > >>>
-> > > > >>> Then how about the second rule?
-> > > > >>> It fails again!
-> > > > >>> Let's take a look at how the tsval comes out:
-> > > > >>> __tcp_transmit_skb()
-> > > > >>>       -> tcp_syn_options()
-> > > > >>>           -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_=
-ts, skb) + tp->tsoffset;
-> > > > >>> The timestamp depends on two things, one is skb->skb_mstamp_ns,=
- the
-> > > > >>> other is tp->tsoffset. The latter value is fixed, so we don't n=
-eed
-> > > > >>> to care about it. If both operations (sending FIN and then star=
-ting
-> > > > >>> sending SYN) from A happen in 1ms, then the tsval would be the =
-same.
-> > > > >>> It can be clearly seen in the tcpdump log. Notice that the tsva=
-l is
-> > > > >>> with millisecond precision.
-> > > > >>>
-> > > > >>> Based on the above analysis, I decided to make a small change t=
-o
-> > > > >>> the check in tcp_timewait_state_process() so that the second fl=
-ow
-> > > > >>> would not fail.
-> > > > >>>
-> > > > >>
-> > > > >> I wonder what a bad result the RST causes. As far as I know, the=
- client
-> > > > >> will not close the connect and return. Instead, it re-sends an S=
-YN in
-> > > > >> TCP_TIMEOUT_MIN(2) jiffies (implemented in
-> > > > >> tcp_rcv_synsent_state_process). So the second connection could s=
-till be
-> > > > >> established successfully, at the cost of a bit more delay. Like:
-> > > > >>
-> > > > >>    Time        Client(A)        Server(B)
-> > > > >>    0s          SYN-->
-> > > > >>    ...
-> > > > >>    132s                         <-- FIN
-> > > > >>    ...
-> > > > >>    169s        FIN-->
-> > > > >>    169s                         <-- ACK
-> > > > >>    169s        SYN-->
-> > > > >>    169s                         <-- ACK
-> > > > >>    169s        RST-->
-> > > > >> ~2jiffies    SYN-->
->
-> It doesn't happen. I dare to say the SYN will not be retransmitted
-> soon which I can tell from many tcpdump logs I captured.
 
-My mind went blank probably because of getting sick. Sorry. Why the
-tcpdump doesn't show the retransmitted SYN packet is our private
-kernel missed this following commit:
 
-commit 9603d47bad4642118fa19fd1562569663d9235f6
-Author: SeongJae Park <sjpark@amazon.de>
-Date:   Sun Feb 2 03:38:26 2020 +0000
+On 11/6/24 15:58, Juraj Šarinay wrote:
+> On Wed, 2024-11-06 at 10:18 +0000, Simon Horman wrote:
+>>> Add a 20-byte field ats to struct nfc_target and expose it as
+>>> NFC_ATTR_TARGET_ATS via the netlink interface. The payload contains
+>>> 'historical bytes' that help to distinguish cards from one another.
+>>> The information is commonly used to assemble an emulated ATR similar
+>>> to that reported by smart cards with contacts.
+>>
+>> Perhaps I misunderstand things, and perhaps there is precedence in relation
+>> to ATR_RES. But I am slightly concerned that this leans towards exposing
+>> internal details rather then semantics via netlink.
+>>
+> 
+> Hi Simon
+> 
+> Thanks for the feedback. NFC_ATTR_TARGET_ATS would serve a similar
+> purpose as the following attributes the kernel already exposes (see
+> nfc.h):
+> 
+>  * @NFC_ATTR_TARGET_SENS_RES: NFC-A targets extra information such as NFCID
+>  * @NFC_ATTR_TARGET_SEL_RES: NFC-A targets extra information (useful if the
+>  *	target is not NFC-Forum compliant)
+>  * @NFC_ATTR_TARGET_NFCID1: NFC-A targets identifier, max 10 bytes
+>  * @NFC_ATTR_TARGET_SENSB_RES: NFC-B targets extra information, max 12 bytes
+>  * @NFC_ATTR_TARGET_SENSF_RES: NFC-F targets extra information, max 18 bytes
+>  * @NFC_ATTR_TARGET_ISO15693_DSFID: ISO 15693 Data Storage Format Identifier
+>  * @NFC_ATTR_TARGET_ISO15693_UID: ISO 15693 Unique Identifier
+> 
+> The ATR I am after means "Answer To Reset" as defined in ISO 7816. It
+> has little to do with ATR_RES := "Attribute Request Response" defined
+> in the NFC Digital specification. I only mentioned ATR_RES as the
+> source of the information handled by nci_store_general_bytes_nfc_dep(),
+> the function that motivated some of the code I propose to add.
+> 
+> Part 3 of the PC/SC Specification, Section 3.1.3.2.3 on ATR may perhaps
+> serve as a more authoritative source of motivation for the patch.
+> 
+> https://pcscworkgroup.com/Download/Specifications/pcsc3_v2.01.09.pdf
+> 
+> The goal is to access contactless identification cards via PC/SC.
 
-    tcp: Reduce SYN resend delay if a suspicous ACK is received
+Makes sense, thanks for the additional details.
 
-    When closing a connection, the two acks that required to change closing
-    socket's status to FIN_WAIT_2 and then TIME_WAIT could be processed in
-    reverse order.  This is possible in RSS disabled environments such as a
-    connection inside a host.
+Small nit: you should have retained Krzysztof tag from from v1.
+
+No need to repost.
+
+Thanks,
+
+Paolo
+
 
