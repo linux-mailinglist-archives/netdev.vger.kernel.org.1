@@ -1,217 +1,292 @@
-Return-Path: <netdev+bounces-142666-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142667-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1337D9BFED2
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 08:13:42 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8B51C9BFF48
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 08:45:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D1551C234B8
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 07:13:41 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 182451F21D84
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 07:45:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 304CE197548;
-	Thu,  7 Nov 2024 07:13:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11A7517E473;
+	Thu,  7 Nov 2024 07:45:35 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="NiUkv4nw"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="J5WnQF/i"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-io1-f54.google.com (mail-io1-f54.google.com [209.85.166.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B190B193070
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 07:13:30 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F1E10F9
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 07:45:33 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730963614; cv=none; b=sdoKU/zwQHbWUhVEsL36VBOQnuvzOrS+kgKdExqawAJUZ3r/IK09ZPROBiPxE80A+znXa2H3x0NrnDoMgQeg34ijcDN5+FA6SNhF7nvRVAdlW4hSsbVvOLLpfz/zxQXnEZwnpHrNA35FTYmuMTC+KXwfNtpbYVYmQOaCVpN8SoM=
+	t=1730965535; cv=none; b=tU/ppi1XJc5Hvic9aayglxdwC/SQh2a7oNQiQmlcnJmjf0fiuhQt5klUxXKj75irOWbtsXtZw4GX5VoE4x5zqj2K/km28Y4k+z0SIAmojMmXYd2eOd2dC9bxHoA5yfuOub9A816o+OUyJQ7uJDZGfAZRAchPmQX5yPf+IlDWXCk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730963614; c=relaxed/simple;
-	bh=gel4ymvhzgfyphfkOQM0eCFG3ixHvrzXAL4yolb2Iuw=;
+	s=arc-20240116; t=1730965535; c=relaxed/simple;
+	bh=5uRGz46gy3g24ohwsQ4PrjGbpT9TIi9MCtrUESBtL/c=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=FvazDzBmjtTTzkG1vctJiOc8+RrYq/os4NdCltBgKXWEuuOH8DEnXLpGq8RjieZ0gBt0JDUFm2q+Rmp6Bku2jBR6Zgq9bSRuAvWtVzsu6PKUorpZVAT5Xy103w9lHDzH1qCISCfnurYDdZsyyHllk8KQEs93ndJ5AHm2uFDnXo8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=NiUkv4nw; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730963609;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=KNDSKfo81YRRY9Pw9UoRu7CnoYy3QfKptUrjTGh4Vds=;
-	b=NiUkv4nwFDxZBazoL+CtIahBTapjTutQJCPHeG40AX5Sj/t9odrSCKv8uPiiGrTDILXNkW
-	4jTDmdSjmt+T6bbuu2KOa5SQhWXXrqmORhet3s8Z823wkonmSmSudyhL49QAZ1m2Qj29u4
-	z2UgBwVSogypEK8u8OpHDYSVDDE4IQ0=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-372-AZrd-IIFM8KJ3MdcMqlG7g-1; Thu, 07 Nov 2024 02:13:28 -0500
-X-MC-Unique: AZrd-IIFM8KJ3MdcMqlG7g-1
-X-Mimecast-MFC-AGG-ID: AZrd-IIFM8KJ3MdcMqlG7g
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-a9e0574854dso43379266b.2
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 23:13:27 -0800 (PST)
+	 To:Cc:Content-Type; b=gVMHsXfJHAqGW1oGKWmQU2bP7IcDGa/zK7aSDe0f6LoQPtP5v8OFeJtDymDOc1AGd4PrH8LnFyYfY3FlfjmvXeIvMylBbbzNyXpN0VgG6mavIhAK6yM+YvGu7JkN7OkuvBmoX1gnZU1VJBaJfSde7GfPXcWZD6qDwSG4w98h3eU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=J5WnQF/i; arc=none smtp.client-ip=209.85.166.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-io1-f54.google.com with SMTP id ca18e2360f4ac-83abf71f244so24224939f.1
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 23:45:33 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730965532; x=1731570332; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=PGxE8YIzKeiPwvk8z5Vq+b4Zwn9C8kj/pt94M1PoIxk=;
+        b=J5WnQF/i6sgPHybenYclsbcDNvPIKqd8DgHae5PWzHe7ehkuc6bJeczqmb8+L6/jtU
+         xulvTkIX4Q0gw0NPLNtMdK4Ovog99kZ5aORkEU3GpDKeODyjMS5AeVzoNOqO/yMadbtv
+         9mC5oCyKVITJrOwxqILrR3TvP0FfA3UjEWoO/L4okglEI653sQEGw+r/BXhjgwP+C7hQ
+         ksIiEcuwea9uRvZh3UH/e7lMWl3McYZEsJaIBsHUwmnObYGwsJAM5PWEkID8KshwKj2c
+         PE2X8I0LDaW6QvcqOTW1/PQSId18AFbFq788rMJGaWLRn+fFxqzrDov5l5B5qKPUUaBf
+         RrDg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730963607; x=1731568407;
+        d=1e100.net; s=20230601; t=1730965532; x=1731570332;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KNDSKfo81YRRY9Pw9UoRu7CnoYy3QfKptUrjTGh4Vds=;
-        b=qxfAE1tyWjwa5OBwOTo3yRUfwXcZOgRXXi/tOEm4YayDwxlP1PZZMRWEpleHT3Qq25
-         /ZQOZNajqiqiD5yEpxkL0kolUL9u9qXjBwuErjp7CX8e+PRPwmFS9vnlhXxXIBBMKUxk
-         C7bH+kpPC9JJDjH/NyLrjLei2P/1wDFv1eIkOc8as2gbKD5t6S8AfR3kwH7H0VKk3IRb
-         AopEtGTlTD3ZNpzr13vG7CNdiiW+qO2Da9mVusLzaw+DZ46SyeZHjbB503fcYrIPe4Zn
-         05YsDJHdcrq20R6BKT+1qOaS+870e2rfo7lFkhrzX/3Fem3D1fQgdb6tQyxgclnAuSxp
-         PTCg==
-X-Forwarded-Encrypted: i=1; AJvYcCV9LtWJFgf+s8S/gfcgk1BsLcnFRYIRieAX6eZBvX3j+Nb1/4ofdmgWZd/jdmpQ0WhontWz6qw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkW3FEDMuxDGJCWeOSbjsN2C3q4Zuh/V83R1nSTJrQ6KC22cpB
-	6W3VsOvvdzI0jFou3ixF2GGMKt4vqt6jzW0DVKgZoy7LzuiUhBijOsrNVSqZW5iNFVP99ry1NsX
-	Vk2V8V0mU+t2aYeZ6HohcTh4lsbBvDFhkhIQIMIRh8SL/UB5K0ofTFMwraGkNSSUJGLydN0VD8S
-	PChT6aqZGSrtZxbvrZe/yV0hlnxRlB
-X-Received: by 2002:a17:906:fe41:b0:a9a:478:2ee3 with SMTP id a640c23a62f3a-a9ee2465a3dmr92173766b.40.1730963606920;
-        Wed, 06 Nov 2024 23:13:26 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IF9nOjZkrUMvsk+/S/SdzmWVcuWDW5P1sCd1k6qp08zxaqsUfPOHSxDgZIsk4urxkRouosnxeAyM0eHS+o9qqo=
-X-Received: by 2002:a17:906:fe41:b0:a9a:478:2ee3 with SMTP id
- a640c23a62f3a-a9ee2465a3dmr92170966b.40.1730963606570; Wed, 06 Nov 2024
- 23:13:26 -0800 (PST)
+        bh=PGxE8YIzKeiPwvk8z5Vq+b4Zwn9C8kj/pt94M1PoIxk=;
+        b=knwYmQnwRx2K48EBt5ixv/kZZIFH23YNcG+UWyEwjAlBcC5C8vcasogCHKzk7o3bon
+         TtJMgkafL6wr/rcAJnXRtp4AD4iNMEqJj5Lbv/PAGCQMiMEmS8X6kpfHkDkCGtx4VtRt
+         AovpNYstJrWTJhXt14UcER4uI7i9G8//HNL1pCCgfG0+8UoVvqECuqutQ1f/xBtZs95L
+         93tZI3ZwrDpE+VBLJznzI9hGfhynlz3MVQj41afZPcttwy5dgKwchqDV+lUkH93+ZNdO
+         /DPH8YQV+xQEkafG3CIJHy0TKbb1oJtJrhhQH/StWZck1W2Lo7Gls5zxBXjmMVwJg+F4
+         msMQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVlSreTM3kWVLSzX9t67y4CswDAJnFZZJjI4U5vB3964koQICL/EGFFisgd8tb6KGTsYNh1ELo=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxTtrPw73WanpC6DVT1LsoEqjyyVEPsLgakV/blDAC6Fx4D3o2Q
+	fqZZjVoUOSoVRINEeY7bJFaZ8RKb48RcQC85iacpVD3I/XCA9seGmgshGHUr0UUk4VHqyZsqU3l
+	WaNxvqV1ErEPuJcL1HnrFX4plQap5uqpM
+X-Google-Smtp-Source: AGHT+IG4qnmKY/H9prjo56iGO+PMiHweZiC8/yawp3YKDB5aZODOKH1+3aa9Hx5X1r22OVUXdiHiGvSXiLOmkUizD/Y=
+X-Received: by 2002:a05:6e02:1985:b0:3a4:eaae:f9f0 with SMTP id
+ e9e14a558f8ab-3a6ed0a40f4mr3775305ab.2.1730965532234; Wed, 06 Nov 2024
+ 23:45:32 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105072642.898710-1-lulu@redhat.com> <20241105072642.898710-8-lulu@redhat.com>
- <6dtic6ld6p6kyzbjjewj4cxkc6h6r5t6y2ztazrgozdanz6gkm@vlj3ubpam6ih>
-In-Reply-To: <6dtic6ld6p6kyzbjjewj4cxkc6h6r5t6y2ztazrgozdanz6gkm@vlj3ubpam6ih>
-From: Cindy Lu <lulu@redhat.com>
-Date: Thu, 7 Nov 2024 15:12:49 +0800
-Message-ID: <CACLfguVNM_b9LdiMyj+pZH0WHu=-Nrit8-cr+QH9=f7tMLDd4w@mail.gmail.com>
-Subject: Re: [PATCH v3 7/9] vhost: Add new UAPI to support change to task mode
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com, 
-	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org
+References: <CAL+tcoCzJWBN9-0F32a37Ljbx9XbA-in55K8sRjfSicZBGtqbA@mail.gmail.com>
+ <20241107071117.1022-1-kuniyu@amazon.com>
+In-Reply-To: <20241107071117.1022-1-kuniyu@amazon.com>
+From: Jason Xing <kerneljasonxing@gmail.com>
+Date: Thu, 7 Nov 2024 15:44:55 +0800
+Message-ID: <CAL+tcoCVS-thL79WjN5mSxnUFNVrp1bB+JF9MUcsGuodcETPFg@mail.gmail.com>
+Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
+ failure in tcp_timewait_state_process
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, dsahern@kernel.org, edumazet@google.com, 
+	horms@kernel.org, kernelxing@tencent.com, kuba@kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Tue, Nov 5, 2024 at 6:32=E2=80=AFPM Stefano Garzarella <sgarzare@redhat.=
-com> wrote:
+On Thu, Nov 7, 2024 at 3:11=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.com=
+> wrote:
 >
-> On Tue, Nov 05, 2024 at 03:25:26PM +0800, Cindy Lu wrote:
-> >Add a new UAPI to enable setting the vhost device to task mode.
-> >The userspace application can use VHOST_SET_INHERIT_FROM_OWNER
-> >to configure the mode if necessary.
-> >This setting must be applied before VHOST_SET_OWNER, as the worker
-> >will be created in the VHOST_SET_OWNER function
+> From: Jason Xing <kerneljasonxing@gmail.com>
+> Date: Thu, 7 Nov 2024 14:51:35 +0800
+> > On Thu, Nov 7, 2024 at 1:43=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon=
+.com> wrote:
+> > >
+> > > From: Jason Xing <kerneljasonxing@gmail.com>
+> > > Date: Thu, 7 Nov 2024 13:23:50 +0800
+> > > > On Thu, Nov 7, 2024 at 12:15=E2=80=AFPM Kuniyuki Iwashima <kuniyu@a=
+mazon.com> wrote:
+> > > > >
+> > > > > From: Jason Xing <kerneljasonxing@gmail.com>
+> > > > > Date: Thu, 7 Nov 2024 11:16:04 +0800
+> > > > > > > Here is how things happen in production:
+> > > > > > > Time        Client(A)        Server(B)
+> > > > > > > 0s          SYN-->
+> > > > > > > ...
+> > > > > > > 132s                         <-- FIN
+> > > > > > > ...
+> > > > > > > 169s        FIN-->
+> > > > > > > 169s                         <-- ACK
+> > > > > > > 169s        SYN-->
+> > > > > > > 169s                         <-- ACK
+> > > > > >
+> > > > > > I noticed the above ACK doesn't adhere to RFC 6191. It says:
+> > > > > > "If the previous incarnation of the connection used Timestamps,=
+ then:
+> > > > > >      if ...
+> > > > > >      ...
+> > > > > >      * Otherwise, silently drop the incoming SYN segment, thus =
+leaving
+> > > > > >          the previous incarnation of the connection in the TIME=
+-WAIT
+> > > > > >          state.
+> > > > > > "
+> > > > > > But the timewait socket sends an ACK because of this code snipp=
+et:
+> > > > > > tcp_timewait_state_process()
+> > > > > >     -> // the checks of SYN packet failed.
+> > > > > >     -> if (!th->rst) {
+> > > > > >         -> return TCP_TW_ACK; // this line can be traced back t=
+o 2005
+> > > > >
+> > > > > This is a challenge ACK following RFC 5961.
+> > > >
+> > > > Please note the idea of challenge ack was proposed in 2010. But thi=
+s
+> > > > code snippet has already existed before 2005. If it is a challenge
+> > > > ack, then at least we need to count it (by using NET_INC_STATS(net,
+> > > > LINUX_MIB_TCPCHALLENGEACK);).
+> > >
+> > > The word was not accurate, the behaviour is compliant with RFC 5961.
+> > > RFC is often formalised based on real implementations.
+> > >
+> > > Incrementing the count makes sense to me.
+> > >
+> > > >
+> > > > >
+> > > > > If SYN is returned here, the client may lose the chance to RST th=
+e
+> > > > > previous connection in TIME_WAIT.
+> > > > >
+> > > > > https://www.rfc-editor.org/rfc/rfc9293.html#section-3.10.7.4-2.4.=
+1
+> > > > > ---8<---
+> > > > >       -  TIME-WAIT STATE
+> > > > >
+> > > > >          o  If the SYN bit is set in these synchronized states, i=
+t may
+> > > > >             be either a legitimate new connection attempt (e.g., =
+in the
+> > > > >             case of TIME-WAIT), an error where the connection sho=
+uld be
+> > > > >             reset, or the result of an attack attempt, as describ=
+ed in
+> > > > >             RFC 5961 [9].  For the TIME-WAIT state, new connectio=
+ns can
+> > > > >             be accepted if the Timestamp Option is used and meets
+> > > > >             expectations (per [40]).  For all other cases, RFC 59=
+61
+> > > > >             provides a mitigation with applicability to some situ=
+ations,
+> > > > >             though there are also alternatives that offer cryptog=
+raphic
+> > > > >             protection (see Section 7).  RFC 5961 recommends that=
+ in
+> > > > >             these synchronized states, if the SYN bit is set,
+> > > > >             irrespective of the sequence number, TCP endpoints MU=
+ST send
+> > > > >             a "challenge ACK" to the remote peer:
+> > > > >
+> > > > >             <SEQ=3DSND.NXT><ACK=3DRCV.NXT><CTL=3DACK>
+> > > > > ---8<---
+> > > > >
+> > > > > https://datatracker.ietf.org/doc/html/rfc5961#section-4
+> > > > > ---8<---
+> > > > >    1) If the SYN bit is set, irrespective of the sequence number,=
+ TCP
+> > > > >       MUST send an ACK (also referred to as challenge ACK) to the=
+ remote
+> > > > >       peer:
+> > > > >
+> > > > >       <SEQ=3DSND.NXT><ACK=3DRCV.NXT><CTL=3DACK>
+> > > > >
+> > > > >       After sending the acknowledgment, TCP MUST drop the unaccep=
+table
+> > > > >       segment and stop processing further.
+> > > > > ---8<---
+> > > >
+> > > > The RFC 5961 4.2 was implemented in tcp_validate_incoming():
+> > > >         /* step 4: Check for a SYN
+> > > >          * RFC 5961 4.2 : Send a challenge ack
+> > > >          */
+> > > >         if (th->syn) {
+> > > >                 if (sk->sk_state =3D=3D TCP_SYN_RECV && sk->sk_sock=
+et && th->ack &&
+> > > >                     TCP_SKB_CB(skb)->seq + 1 =3D=3D TCP_SKB_CB(skb)=
+->end_seq &&
+> > > >                     TCP_SKB_CB(skb)->seq + 1 =3D=3D tp->rcv_nxt &&
+> > > >                     TCP_SKB_CB(skb)->ack_seq =3D=3D tp->snd_nxt)
+> > > >                         goto pass;
+> > > > syn_challenge:
+> > > >                 if (syn_inerr)
+> > > >                         TCP_INC_STATS(sock_net(sk), TCP_MIB_INERRS)=
+;
+> > > >                 NET_INC_STATS(sock_net(sk),
+> > > > LINUX_MIB_TCPSYNCHALLENGE);
+> > > >                 tcp_send_challenge_ack(sk);
+> > > >                 SKB_DR_SET(reason, TCP_INVALID_SYN);
+> > > >                 goto discard;
+> > > >         }
+> > > >
+> > > > Also, this quotation you mentioned obviously doesn't match the kern=
+el
+> > > > implementation:
+> > > > "If the SYN bit is set, irrespective of the sequence number, TCP MU=
+ST
+> > > > send an ACK"
+> > > > The tcp_timewait_state_process() does care about the seq number, or
+> > > > else timewait socket would refuse every SYN packet.
+> > >
+> > > That's why I pasted RFC 9293 first that clearly states that we
+> > > should check seq number and then return ACK for all other cases.
 > >
-> >Signed-off-by: Cindy Lu <lulu@redhat.com>
-> >---
-> > drivers/vhost/vhost.c      | 15 ++++++++++++++-
-> > include/uapi/linux/vhost.h |  2 ++
-> > 2 files changed, 16 insertions(+), 1 deletion(-)
+> > I don't think so.
 > >
-> >diff --git a/drivers/vhost/vhost.c b/drivers/vhost/vhost.c
-> >index c17dc01febcc..70c793b63905 100644
-> >--- a/drivers/vhost/vhost.c
-> >+++ b/drivers/vhost/vhost.c
-> >@@ -2274,8 +2274,9 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigned=
- int ioctl, void __user *argp)
-> > {
-> >       struct eventfd_ctx *ctx;
-> >       u64 p;
-> >-      long r;
-> >+      long r =3D 0;
+> > RFC 9293 only states that RFC 5691 provides an approach that mitigates
+> > the risk by rejecting all the SYN packets if the socket stays in
+> > synchronized state. It's "For all other cases" in RFC 9293.
 >
-> I don't know if something is missing in this patch, but I am confused:
+> RFC 9293 states which RFC to prioritise.  You will find the
+> link [40] is RFC 6191.
 >
-> `r` is set few lines below...
->
-> >       int i, fd;
-> >+      bool inherit_owner;
-> >
-> >       /* If you are not the owner, you can become one */
-> >       if (ioctl =3D=3D VHOST_SET_OWNER) {
+> ---8<---
+> For the TIME-WAIT state, new connections can
+> be accepted if the Timestamp Option is used and meets
+> expectations (per [40]).  For all other cases, RFC 5961
 > ...
+> ---8<---
 >
->         /* You must be the owner to do anything else */
->         r =3D vhost_dev_check_owner(d);
->         if (r)
->                 goto done;
+> > Please loot at "irrespective of the sequence number" in RFC 5691 4.2
+> > [1]. It means no matter what the seq is we MUST send back an ACK
+> > instead of establishing a new connection.
 >
-> So, why we are now initializing it to 0?
+> RFC 9293 mentions accepatble cases first, so this is only applied
+> to "all other cases"
 >
-r =3D 0 mean return successfully here.
-Therefore, in the case VHOST_SET_INHERIT_FROM_OWNER function, I don't
-need to set it again and can simply return.
-....
-    if (vhost_dev_has_owner(d))
-       break;
-.....
-> >@@ -2332,6 +2333,18 @@ long vhost_dev_ioctl(struct vhost_dev *d, unsigne=
-d int ioctl, void __user *argp)
-> >               if (ctx)
-> >                       eventfd_ctx_put(ctx);
-> >               break;
-> >+      case VHOST_SET_INHERIT_FROM_OWNER:
-> >+              /*inherit_owner can only be modified before owner is set*=
-/
-> >+              if (vhost_dev_has_owner(d))
 >
-> And here, how this check can be false, if at the beginning of the
-> function we call vhost_dev_check_owner()?
+> > Actually the tcp_timewait_state_process() checks the seq or timestamp
+> > in the SYN packet.
 >
-> Maybe your intention was to add this code before the
-> `vhost_dev_check_owner()` call, so this should explain why initialize
-> `r` to 0, but I'm not sure.
+> and this part takes precedence than "all other cases".
 >
-Yes, in the function beginning, the code is
-if (ioctl =3D=3D VHOST_SET_OWNER) {
-r =3D vhost_dev_set_owner(d);
-goto done;
-}
-if the ioctl is not VHOST_SET_OWNER,  then the  code will not run the
-function vhost_dev_set_owner.
-This ioctl is used by userspace applications, so we cannot be certain
-of the type and sequence of their calls; therefore, I added this
-check.
+> Also, you missed that the pasted part is the 4th step of incoming
+> segment processing.
+>
+> https://www.rfc-editor.org/rfc/rfc9293.html#section-3.10.7.4
+> ---8<---
+> First, check sequence number: ...
+> Second, check the RST bit: ...
+> Third, check security: ...
+> Fourth, check the SYN bit:
+> ...
+>   TIME-WAIT STATE
+>     If the SYN bit is set in these synchronized states...
+> ---8<---
+>
+> So, RFC 9293 says "check seq number, RST, security, then
+> if the connection is still accepatable for TIME_WAIT based on
+> RFC 6191, accept it, otherwise, return ACK based on RFC 5691".
 
-> >+                      break;
->
-> Should we return an error (e.g. -EPERM) in this case?
->
-sure=EF=BC=8Cwill add this back
-thanks
-Cindy
-> >+
-> >+              if (copy_from_user(&inherit_owner, argp,
-> >+                                 sizeof(inherit_owner))) {
-> >+                      r =3D -EFAULT;
-> >+                      break;
-> >+              }
-> >+              d->inherit_owner =3D inherit_owner;
-> >+              break;
-> >       default:
-> >               r =3D -ENOIOCTLCMD;
-> >               break;
-> >diff --git a/include/uapi/linux/vhost.h b/include/uapi/linux/vhost.h
-> >index b95dd84eef2d..1e192038633d 100644
-> >--- a/include/uapi/linux/vhost.h
-> >+++ b/include/uapi/linux/vhost.h
-> >@@ -235,4 +235,6 @@
-> >  */
-> > #define VHOST_VDPA_GET_VRING_SIZE     _IOWR(VHOST_VIRTIO, 0x82,       \
-> >                                             struct vhost_vring_state)
-> >+
->
-> Please add a documentation here, this is UAPI, so the user should
-> know what this ioctl does based on the parameter.
->
-> Thanks,
-> Stefano
->
-> >+#define VHOST_SET_INHERIT_FROM_OWNER _IOW(VHOST_VIRTIO, 0x83, bool)
-> > #endif
-> >--
-> >2.45.0
-> >
->
+I see what you mean here. If that is so, tcp_timewait_state_process()
+has already implemented the challenge ack even before the challenge
+ack showed up in 2010.
 
+Interesting. If this part refers to RFC 5691, then we need to copy
+part of tcp_send_challenge_ack() in this case to send the challenge
+ack, like testing sysctl_tcp_challenge_ack_limit, etc.
+
+Thanks,
+Jason
 
