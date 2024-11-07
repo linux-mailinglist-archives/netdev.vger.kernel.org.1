@@ -1,151 +1,149 @@
-Return-Path: <netdev+bounces-142685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142679-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 66AB39C0026
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:38:23 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4D29BFFDD
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 09:23:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1F4841F217D8
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 08:38:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 736411F22601
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 08:23:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A451A1D8DFE;
-	Thu,  7 Nov 2024 08:38:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395FC1D54C5;
+	Thu,  7 Nov 2024 08:23:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="vCMSK8Ij"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="FIcGb/bO"
 X-Original-To: netdev@vger.kernel.org
-Received: from out30-130.freemail.mail.aliyun.com (out30-130.freemail.mail.aliyun.com [115.124.30.130])
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1DF9198A19
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 08:38:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.130
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EAE118754F;
+	Thu,  7 Nov 2024 08:23:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730968690; cv=none; b=UINAkI7l8gOGsVFVGoFbPWSWVluEW0lq2seyittaSF9yyR5gIAWTVPM8SBOG7I5jT2GEozYcSArpbMnmyvVRjEc2ns/4DZG/kgA3GeChsQl0wUtnHfvjcrfZjosi9k23KZbetHL9VXmj8YqbYljvaBZVQtFmU9MkJ+Hw4Br6+IE=
+	t=1730967792; cv=none; b=ZzytUUwaKCJcIb0Ib3dufAgHy1b6V/DCNhvhwFGD9RfiuZXrlkFl8bhGP4BFVMKft6L7ZsWS28PiaaR9BhdlM7gLqX2pH+ZPvqsWLgu3tO+BCD21WB5r7+YN+LhCStHEbDBTDnciY8EJPSGt7MCbb6cvXcW6fNsCgSOPrtEld10=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730968690; c=relaxed/simple;
-	bh=wNDVS52YhF+6G3l4wOoxsHdU8x3toVQLtYF9saHltZE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=bNIiUZZz7CP3TDZacbTzLMaCgX6sICMCTIL5mUFnsSJe00pSrhLQiamlcei/wGfUHwiIkUX+2Z0Hu54uMmclJs524o7AsZbmZw0Pzd7FauBD9Epepgq2UqZ3uhf+sYTiKw828nsSiJiZYMJMJORZ5htXuW7EkKSuZWVf5tEwyuM=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=vCMSK8Ij; arc=none smtp.client-ip=115.124.30.130
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
-DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
-	d=linux.alibaba.com; s=default;
-	t=1730968680; h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
-	bh=94Xce1o7UQKdGO23tlbNrTTUEGnhP7t4W7fm9A3zuAw=;
-	b=vCMSK8Ij2oFCOrevCDWbgdxs0PdLjyRS86PhFioHFppI0bpZm73xDFjI2BD4q+Sd1wpFKFr35TcybrnfvytehdaP/UFwB0L8cHUIpWF+fSAj4pcApEkhzqZ9gI5XqnCbEuKmK8XmGfdxc37M33zjlvOgYQjMV5ZdPHxpHnOlIYE=
-Received: from 30.221.128.108(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WIuuZnl_1730967745 cluster:ay36)
-          by smtp.aliyun-inc.com;
-          Thu, 07 Nov 2024 16:22:26 +0800
-Message-ID: <75708260-7eb4-42fe-9d9b-605f8eef488b@linux.alibaba.com>
-Date: Thu, 7 Nov 2024 16:22:25 +0800
+	s=arc-20240116; t=1730967792; c=relaxed/simple;
+	bh=Q2GSmVIISTS2anK4abVbSWAkn8WydlilysNNoztLfTA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=edkHSa4D+kGmqOpROpbUzh0WqQ1jmrax9wyXXSxRSZ0fS6x5QuwcVun05RnJ0GEL1651rxt2fJPjArIkgh/2P0QJnvRms28HMbcDE9dxkAuNXSkozgDZW+gEFELgCh5t3bCOs+f/QR3zDTAewCt/Oui/unn/mSh+OnlIuonMsJM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=FIcGb/bO; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=nwl.cc
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=In-Reply-To:Content-Type:MIME-Version:References:Message-ID:
+	Subject:Cc:To:From:Date:Sender:Reply-To:Content-Transfer-Encoding:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=M/3rlViT9D+L9ncSWn/0ufpEXuzN61pptP4kPOAdcPw=; b=FIcGb/bOLHOj6ThuUTFYD8+Fqa
+	Vk9oPPYaWZ87+u6pui+N/daP9ZApO6BmSkH6KhvuOZH1++/hMzbVkLi7PM1J4vxOWXTwIEqPyMj8q
+	yJ9LDjIywQ9xEv+PN1cjIcuvwC4c8+Gp717OUrE/hbrNrS0HNgNwM7GNh5TJMpgjG6HAEKxuSOtgW
+	LnOa476D9WYCETQAV19j3Jtwc4UAh3GKIg9t+B2YlFyMpGTvwd+P8DV0qelR59o3S9LRDrsGr0xc1
+	FgOpQsBIbPU9iiXWLBtNjUI+XhLS6qxrrkKL9Avkz3ATLRV2ZyNzMq0v0nUwgMXGUui98qznHnlRJ
+	E3V08nCQ==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
+	(envelope-from <phil@nwl.cc>)
+	id 1t8xnE-000000003Lz-2FDx;
+	Thu, 07 Nov 2024 09:23:04 +0100
+Date: Thu, 7 Nov 2024 09:23:04 +0100
+From: Phil Sutter <phil@nwl.cc>
+To: Hangbin Liu <liuhangbin@gmail.com>
+Cc: netdev@vger.kernel.org, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Florian Westphal <fw@strlen.de>, wireguard@lists.zx2c4.com,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] selftests: wireguards: use nft by default
+Message-ID: <Zyx46O0qLtXAs80X@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@nwl.cc>,
+	Hangbin Liu <liuhangbin@gmail.com>, netdev@vger.kernel.org,
+	"Jason A. Donenfeld" <Jason@zx2c4.com>,
+	Shuah Khan <shuah@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Florian Westphal <fw@strlen.de>, wireguard@lists.zx2c4.com,
+	linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20241107025438.3766-1-liuhangbin@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: Jason Xing <kerneljasonxing@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org,
- netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
- <92c1d976-7bb6-49ff-9131-edba30623f76@linux.alibaba.com>
- <CAL+tcoBZaDhBuSKHzGEqgxkzOazX3K-Vo2=mCdOy+iLp4sPAhg@mail.gmail.com>
-From: Philo Lu <lulie@linux.alibaba.com>
-In-Reply-To: <CAL+tcoBZaDhBuSKHzGEqgxkzOazX3K-Vo2=mCdOy+iLp4sPAhg@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107025438.3766-1-liuhangbin@gmail.com>
 
+Hi Liu Hangbin,
 
-
-On 2024/11/7 16:01, Jason Xing wrote:
-> On Thu, Nov 7, 2024 at 3:51 PM Philo Lu <lulie@linux.alibaba.com> wrote:
->>
->> Hi Jason,
->>
->> On 2024/11/5 10:55, Jason Xing wrote:
->>> From: Jason Xing <kernelxing@tencent.com>
->>>
->>> We found there are rare chances that some RST packets appear during
->>> the shakehands because the timewait socket cannot accept the SYN and
->>> doesn't return TCP_TW_SYN in tcp_timewait_state_process().
->>>
->>> Here is how things happen in production:
->>> Time        Client(A)        Server(B)
->>> 0s          SYN-->
->>> ...
->>> 132s                         <-- FIN
->>> ...
->>> 169s        FIN-->
->>> 169s                         <-- ACK
->>> 169s        SYN-->
->>> 169s                         <-- ACK
->>> 169s        RST-->
->>> As above picture shows, the two flows have a start time difference
->>> of 169 seconds. B starts to send FIN so it will finally enter into
->>> TIMEWAIT state. Nearly at the same time A launches a new connection
->>> that soon is reset by itself due to receiving a ACK.
->>>
->>> There are two key checks in tcp_timewait_state_process() when timewait
->>> socket in B receives the SYN packet:
->>> 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
->>> 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
->>>
->>> Regarding the first rule, it fails as expected because in the first
->>> connection the seq of SYN sent from A is 1892994276, then 169s have
->>> passed, the second SYN has 239034613 (caused by overflow of s32).
->>>
->>> Then how about the second rule?
->>> It fails again!
->>> Let's take a look at how the tsval comes out:
->>> __tcp_transmit_skb()
->>>       -> tcp_syn_options()
->>>           -> opts->tsval = tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) + tp->tsoffset;
->>> The timestamp depends on two things, one is skb->skb_mstamp_ns, the
->>> other is tp->tsoffset. The latter value is fixed, so we don't need
->>> to care about it. If both operations (sending FIN and then starting
->>> sending SYN) from A happen in 1ms, then the tsval would be the same.
->>> It can be clearly seen in the tcpdump log. Notice that the tsval is
->>> with millisecond precision.
->>>
->>> Based on the above analysis, I decided to make a small change to
->>> the check in tcp_timewait_state_process() so that the second flow
->>> would not fail.
->>>
->>
->> I wonder what a bad result the RST causes. As far as I know, the client
->> will not close the connect and return. Instead, it re-sends an SYN in
->> TCP_TIMEOUT_MIN(2) jiffies (implemented in
->> tcp_rcv_synsent_state_process). So the second connection could still be
->> established successfully, at the cost of a bit more delay. Like:
->>
->>    Time        Client(A)        Server(B)
->>    0s          SYN-->
->>    ...
->>    132s                         <-- FIN
->>    ...
->>    169s        FIN-->
->>    169s                         <-- ACK
->>    169s        SYN-->
->>    169s                         <-- ACK
->>    169s        RST-->
->> ~2jiffies    SYN-->
->>                                 <-- SYN,ACK
+On Thu, Nov 07, 2024 at 02:54:38AM +0000, Hangbin Liu wrote:
+> Use nft by default if it's supported, as nft is the replacement for iptables,
+> which is used by default in some releases. Additionally, iptables is dropped
+> in some releases.
 > 
-> That's exactly what I meant here :) Originally I didn't expect the
-> application to relaunch a connection in this case.
+> Signed-off-by: Hangbin Liu <liuhangbin@gmail.com>
+> ---
+> CC nft developers to see if there are any easier configurations,
+> as I'm not very familiar with nft commands.
 
-s/application/kernel/, right? Because the retry is transparent to user 
-applications except the additional latency. I think all of these are 
-finished in a single connect() :)
+Basically looks good, just a few minor remarks:
 
--- 
-Philo
+> ---
+>  tools/testing/selftests/wireguard/netns.sh | 63 ++++++++++++++++++----
+>  1 file changed, 53 insertions(+), 10 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/wireguard/netns.sh b/tools/testing/selftests/wireguard/netns.sh
+> index 405ff262ca93..4e29c1a7003c 100755
+> --- a/tools/testing/selftests/wireguard/netns.sh
+> +++ b/tools/testing/selftests/wireguard/netns.sh
+> @@ -44,6 +44,7 @@ sleep() { read -t "$1" -N 1 || true; }
+>  waitiperf() { pretty "${1//*-}" "wait for iperf:${3:-5201} pid $2"; while [[ $(ss -N "$1" -tlpH "sport = ${3:-5201}") != *\"iperf3\",pid=$2,fd=* ]]; do sleep 0.1; done; }
+>  waitncatudp() { pretty "${1//*-}" "wait for udp:1111 pid $2"; while [[ $(ss -N "$1" -ulpH 'sport = 1111') != *\"ncat\",pid=$2,fd=* ]]; do sleep 0.1; done; }
+>  waitiface() { pretty "${1//*-}" "wait for $2 to come up"; ip netns exec "$1" bash -c "while [[ \$(< \"/sys/class/net/$2/operstate\") != up ]]; do read -t .1 -N 0 || true; done;"; }
+> +use_nft() { nft --version &> /dev/null; }
+>  
+>  cleanup() {
+>  	set +e
+> @@ -196,13 +197,23 @@ ip1 link set wg0 mtu 1300
+>  ip2 link set wg0 mtu 1300
+>  n1 wg set wg0 peer "$pub2" endpoint 127.0.0.1:2
+>  n2 wg set wg0 peer "$pub1" endpoint 127.0.0.1:1
+> -n0 iptables -A INPUT -m length --length 1360 -j DROP
+> +if use_nft; then
+> +	n0 nft add table inet filter
 
+Using inet family captures IPv6 traffic, too. You don't seem to
+explicitly configure it, but the usual auto-config traffic may offset
+rule counters. If you care about such side-effects, you may want to use
+ip family instead.
+
+Tables are family-specific, but generic otherwise. So you could add a
+table for testing in each netns up front:
+
+| if use_nft; then
+| 	n0 nft add table ip wgtest
+| 	n1 nft add table ip wgtest
+| 	n2 nft add table ip wgtest
+| fi
+
+> +	n0 nft add chain inet filter INPUT { type filter hook input priority filter \; policy accept \; }
+> +	n0 nft add rule inet filter INPUT meta length 1360 counter drop
+> +else
+> +	n0 iptables -A INPUT -m length --length 1360 -j DROP
+> +fi
+>  n1 ip route add 192.168.241.2/32 dev wg0 mtu 1299
+>  n2 ip route add 192.168.241.1/32 dev wg0 mtu 1299
+>  n2 ping -c 1 -W 1 -s 1269 192.168.241.1
+>  n2 ip route delete 192.168.241.1/32 dev wg0 mtu 1299
+>  n1 ip route delete 192.168.241.2/32 dev wg0 mtu 1299
+> -n0 iptables -F INPUT
+> +if use_nft; then
+> +	n0 nft delete table inet filter
+
+Here just flush the table (drops only the rules):
+
+| n0 nft flush table ip wgtest
+
+Cheers, Phil
 
