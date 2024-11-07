@@ -1,129 +1,78 @@
-Return-Path: <netdev+bounces-142748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 294DB9C038F
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:13:08 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9B7129C039A
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:15:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 990DDB219D2
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:13:05 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 32538B23C44
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:15:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3A61F428C;
-	Thu,  7 Nov 2024 11:13:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="Lex7c8kD"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA0731F4FCE;
+	Thu,  7 Nov 2024 11:15:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from TWMBX01.aspeed.com (mail.aspeedtech.com [211.20.114.72])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF73F1DF72F
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 11:12:59 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B06A41E2601;
+	Thu,  7 Nov 2024 11:15:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=211.20.114.72
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730977981; cv=none; b=szAAXAudDA2B/V5M7RKPZl18yTCJnEmmhGSA9elCVq3TgWD/OkHg23l/XrA2YH1SV3vKQpRA/4Bwc3r3Md+jLXQCJ0sWaq2TBxygjoHDKd0/76RBYqDuwR2Dcs782dt7bhrVqHE+7j7dncHNCvavYQmsAtIUJU7YzlgNZWWbYjw=
+	t=1730978111; cv=none; b=HLPR7HDc+TdvyLm2RYywfG1dSkk52zG3zDB7353ckUmy0s/esERe8e8Rx38iBp08I6SEwVqqvKmyyTR/gh1ZVqTs9MVt4Nd3yut0OVuf4nlmj6ZBMn7lFyVGzbcKMBuNWV6bL0mj0O5OHTVEJLDgLtDmiuzVBGZrKrnUx07OxSw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730977981; c=relaxed/simple;
-	bh=FAssYMuT3g1UCnr1f1768ULjkSWodEn3Mogao3a8VUY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=sb4vArjs/hZakp5cHf9fmhAcC/CHTkTJPT32Akd4UXiwD+3XIZandOnovcK2nlgGVgx+Lly7a3hk8Hy7qn7KuqxKp5rlc+qOp4rWiqgo+MW9cOYI/v4JKYbV2X/i18Qo1Yr+WKs03rR3uIIhB7DhwUPbsSSkKeiMrEhgp/KZrGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=Lex7c8kD; arc=none smtp.client-ip=209.85.218.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9ed49edd41so141937266b.0
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 03:12:59 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1730977978; x=1731582778; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=bxTnaansLsGwyX4X1dG26PErwNbDYPOXaZq2IphXvjY=;
-        b=Lex7c8kD3zYiRs4DGV0a3U+TV0ZBngibsHmu8H/sOuaKOmYJM9jLFDszlFkuHRE+ld
-         73BsE+ZVSB+RhTJZW8xW6cgolYAnlLCCBWY++bXYTJCpeEae2sX5xtYsSVSb2wiudeMC
-         3cOZnwh3QqvmdyDiOsq4ViHR7ip+1UfVcSQsrZ3OPOb20t0c/St70pC4Wgg4pi49JpYg
-         9fOvjfjPHHXwwr2Ey7pt/MV43rxvT5tGdoMXma9FUDaAYkq73TcOoovYCJBBVwVP2FMh
-         UEE5iX7t0UCLTxFTZH6NU36JgO7AwuwBN6OgOM8RaImxN4qmTZQPb7SZ9Sy3AOKzWPGb
-         2/qw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730977978; x=1731582778;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bxTnaansLsGwyX4X1dG26PErwNbDYPOXaZq2IphXvjY=;
-        b=tO2v1qPYSQO+gtQ3kSlCMIaQi/8twZSOrMQYkAhTBTscoe3Aqs10MMz5eGMviF/6KM
-         +eqL0rgctL5pPwKyWv/JkC7NAvdj7NR31RkcJUmnHxNb5HrnL3sndv52HgDcN1qOu9yh
-         WPIHKiblNy/atQt+BKqa6W5sX0b62g09pMDd2p6Hn9fdf0YK4Dm2wPcDsaWqDKj7o71E
-         NrRI1mPqrsHk8u7QGVgbrIg9tWJz8YZdlk01U9D6u0nFWKF0GoFWjKNkHhr8uWp2tpO0
-         eI9+qpQArbLwmJrMc4pZlNTTYjqMP2xXOmxUXtHBphub7EzlT+mCr5jlyvob5YicZkGX
-         tITw==
-X-Forwarded-Encrypted: i=1; AJvYcCUK/lQZC98cfOOQYi9AIbFpWqQbmUJoAB3yuM+Tyvv+tR4VDpEYOCRs3eYz7O96eMGqaDH/rYc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yyb9s5z9EnV8l1zi6jthPHa45NYdJaBIvr7rYYZAIu2o73OAn64
-	SGdIjD1WpJm9+2aW0Ju4vma1t5ba+HPaQzQCoktwKko8O79U0jlLT2Y+v/RyxM4=
-X-Google-Smtp-Source: AGHT+IFphj611143VdJsImYjeAH+pxPMUc82CFGVDH/4iqS20JWIIoXXYG/sr/hULPByHmo8QW5suw==
-X-Received: by 2002:a17:907:7d8d:b0:a9a:1e4d:856d with SMTP id a640c23a62f3a-a9de5edb084mr4352238366b.22.1730977978083;
-        Thu, 07 Nov 2024 03:12:58 -0800 (PST)
-Received: from localhost ([154.14.63.34])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0e0fabesm77450566b.174.2024.11.07.03.12.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 03:12:57 -0800 (PST)
-Date: Thu, 7 Nov 2024 14:12:56 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: oe-kbuild@lists.linux.dev, Cindy Lu <lulu@redhat.com>,
-	jasowang@redhat.com, mst@redhat.com, michael.christie@oracle.com,
-	sgarzare@redhat.com, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Cc: lkp@intel.com, oe-kbuild-all@lists.linux.dev
-Subject: Re: [PATCH v3 5/9] vhost: Add kthread support in function
- vhost_worker_queue()
-Message-ID: <e55d4e60-37ed-49ad-a8cc-f7b6adb03b09@suswa.mountain>
-References: <20241105072642.898710-6-lulu@redhat.com>
- <247f4cd6-5653-4eef-9436-5699b44c4b82@suswa.mountain>
+	s=arc-20240116; t=1730978111; c=relaxed/simple;
+	bh=2LlS07VGD01giKtgjCL9ae2DBifBD2gvXNjiUbKjUmg=;
+	h=From:To:CC:Subject:Date:Message-ID:MIME-Version:Content-Type; b=Y8vYWE9GtsSsbj7ZyHNkq1uMz+cBtsbEMkw9mAcZs2Iwg2hKL71qJCRlh0Qjfag6egfiB51jGAXv1dOH/hBq75isFoTrqHLoRbPb5lI1xovIilj9ShOAnlOr5H2z5chaf5TUgTU9htRalTGRN4kBhHOOozWqVRN6DB1TMovLv2g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com; spf=pass smtp.mailfrom=aspeedtech.com; arc=none smtp.client-ip=211.20.114.72
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=aspeedtech.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aspeedtech.com
+Received: from TWMBX01.aspeed.com (192.168.0.62) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1258.12; Thu, 7 Nov
+ 2024 19:15:00 +0800
+Received: from mail.aspeedtech.com (192.168.10.10) by TWMBX01.aspeed.com
+ (192.168.0.62) with Microsoft SMTP Server id 15.2.1258.12 via Frontend
+ Transport; Thu, 7 Nov 2024 19:15:00 +0800
+From: Jacky Chou <jacky_chou@aspeedtech.com>
+To: <andrew+netdev@lunn.ch>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <robh@kernel.org>,
+	<krzk+dt@kernel.org>, <conor+dt@kernel.org>, <p.zabel@pengutronix.de>,
+	<ratbert@faraday-tech.com>, <netdev@vger.kernel.org>,
+	<devicetree@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <jacky_chou@aspeedtech.com>
+Subject: [net-next 0/3] Add Aspeed G7 FTGMAC100 support
+Date: Thu, 7 Nov 2024 19:14:57 +0800
+Message-ID: <20241107111500.4066517-1-jacky_chou@aspeedtech.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <247f4cd6-5653-4eef-9436-5699b44c4b82@suswa.mountain>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
 
-On Thu, Nov 07, 2024 at 01:38:56PM +0300, Dan Carpenter wrote:
-> Hi Cindy,
-> 
-> kernel test robot noticed the following build warnings:
-> 
-> https://git-scm.com/docs/git-format-patch#_base_tree_information]
-> 
-> url:    https://github.com/intel-lab-lkp/linux/commits/Cindy-Lu/vhost-Add-a-new-parameter-to-allow-user-select-kthread/20241105-153254
-> base:   https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git linux-next
-> patch link:    https://lore.kernel.org/r/20241105072642.898710-6-lulu%40redhat.com
-> patch subject: [PATCH v3 5/9] vhost: Add kthread support in function vhost_worker_queue()
-> config: x86_64-randconfig-161-20241106 (https://download.01.org/0day-ci/archive/20241107/202411071251.tQLG8K6C-lkp@intel.com/config)
-> compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
-> 
-> If you fix the issue in a separate patch/commit (i.e. not just a new version of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
-> | Closes: https://lore.kernel.org/r/202411071251.tQLG8K6C-lkp@intel.com/
-> 
-> New smatch warnings:
-> drivers/vhost/vhost.c:241 vhost_worker_queue() error: we previously assumed 'worker' could be null (see line 241)
-> 
+The Aspeed 7th generation SoC features features three FTGMAC100.
+The main difference from the previous generation is that the 
+FTGMAC100 adds support for 64-bit DMA capability. Another change
+is that the RMII/RGMII pin strap configuration is changed to be set 
+in the bit 20 fo register 0x50.
 
-I only meant to send this warning.
+Jacky Chou (3):
+  dt-bindings: net: ftgmac100: support for AST2700
+  net: faraday: Add ARM64 in FTGMAC100 for AST2700
+  net: ftgmac100: Support for AST2700
 
-> Old smatch warnings:
-> drivers/vhost/vhost.c:311 vhost_dev_flush() warn: iterator 'i' not incremented
-> drivers/vhost/vhost.c:678 vhost_attach_cgroups() error: uninitialized symbol 'ret'.
-> drivers/vhost/vhost.c:673 vhost_attach_cgroups() warn: iterator 'i' not incremented
-> 
+ .../bindings/net/faraday,ftgmac100.yaml       |  3 +-
+ drivers/net/ethernet/faraday/Kconfig          |  5 +-
+ drivers/net/ethernet/faraday/ftgmac100.c      | 62 ++++++++++++++-----
+ drivers/net/ethernet/faraday/ftgmac100.h      | 10 +++
+ 4 files changed, 59 insertions(+), 21 deletions(-)
 
-Not these.  I need to fix these for systems without the cross function
-DB...  #embarassing.
-
-regards,
-dan carpenter
+-- 
+2.25.1
 
 
