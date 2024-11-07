@@ -1,146 +1,154 @@
-Return-Path: <netdev+bounces-142658-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C10FE9BFDE5
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 06:56:53 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5BD79BFE5C
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 07:18:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F19F01C20FBF
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 05:56:52 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 7F692B22CE6
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 06:18:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD444191F98;
-	Thu,  7 Nov 2024 05:56:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 889B3193071;
+	Thu,  7 Nov 2024 06:18:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="U4m49iHM"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx3.molgen.mpg.de (mx3.molgen.mpg.de [141.14.17.11])
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F3035D53F
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 05:56:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=141.14.17.11
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E31F193064;
+	Thu,  7 Nov 2024 06:18:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.131
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730959010; cv=none; b=GiaDBID8YzMn0E6hQmvYRo5PNhc/UTB8HVUEWpniDTI7usVdFkvqPCs70iz4V2tEnNqjZxpJEZXujED13aqfxJtv2LUfsnipNE0eOlzR2NV228Gk3NV/x49Yz2MM970CjAUTOpF4dJU7fbH4I1JcGsDT39odbwvQBltJBLbsUKs=
+	t=1730960287; cv=none; b=tszUEjrxK1e4FUcpJHY1hbL8a05bt6OTyTPwSbpqX3MZOQWOUaZsx3NPTH9gdR+kmftk5oKQkRKlDkik+xBm76hfI1/Z95J88T+5YEwqWkS4uoT0Kz641hEG3fN9YzU2IVOloDP0AoyxG0zupwdm/QoTy96ysJfvYhu/PToxIg8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730959010; c=relaxed/simple;
-	bh=+TDNA+J28mngmXjyZr8hVgDnPVZ4+DL/Q90E3Mk01fQ=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=vE7RxE8mAiVVY9sleUIwXjunN5FYpdGNgOoEsYVDkyCLY4c7D5wlF0urctaibJowUaYvGXLWT5PAbm4EFMGZdxG6l8y58wWNCNUCO6tSnOn9ORBygRfXR1TzjFlaLUMxa6dWse3XxZcJT+RKPcVRMQ0nXsqeBLDNeHjpPDuklbc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de; spf=pass smtp.mailfrom=molgen.mpg.de; arc=none smtp.client-ip=141.14.17.11
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=molgen.mpg.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=molgen.mpg.de
-Received: from [192.168.0.224] (ip5f5aedb4.dynamic.kabel-deutschland.de [95.90.237.180])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	(Authenticated sender: pmenzel)
-	by mx.molgen.mpg.de (Postfix) with ESMTPSA id 4337461E5FE05;
-	Thu, 07 Nov 2024 06:56:21 +0100 (CET)
-Message-ID: <dc4194a7-c4aa-4132-9ca3-1121530ba1bc@molgen.mpg.de>
-Date: Thu, 7 Nov 2024 06:56:19 +0100
+	s=arc-20240116; t=1730960287; c=relaxed/simple;
+	bh=pbOy6B0zVXHQyppymn+TRtOJRIrbaMtDXrTEp01RmMs=;
+	h=Message-ID:Subject:Date:From:To:Cc:References:In-Reply-To; b=lxrl8GT0Zs3A1cGhHavOKcFunbbhF4wTlV8YxK9EGg2Hnnf4CT2xF4ChmP9Hm9iSzBmdFfTSNuEvkgmNwdcKZgv74rRy8FtTLm+eSEnXEV6kZzCcWhviyktwdWLO2+n6QkbqscHBAt5bd9AFmUn8Z+FFHWB05cNCoEnOpVV2WxE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=U4m49iHM; arc=none smtp.client-ip=115.124.30.131
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1730960280; h=Message-ID:Subject:Date:From:To;
+	bh=Z/W8cDmcOSrXBQmIaTgj/+sEv3NHtLilDqKw6Sftrg0=;
+	b=U4m49iHMR2d2aw11FJsQm6rle1m9VfZcCVZufz8QqdOig7+jwVKTKPjLmzgspMZ53q47pOyAo1e8VK27A/ZUOZibLdgST/hpnEZ0ygkWRDpcbbNPfYphrlXW84toJyoc25/kJb6vFlsNtHM4cP+GWaniKBnqyi3dE18MRhskVuo=
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0WIuPSSH_1730960279 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Thu, 07 Nov 2024 14:18:00 +0800
+Message-ID: <1730960271.064656-1-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH net-next v3 2/3] page_pool: fix timing for checking and disabling napi_local
+Date: Thu, 7 Nov 2024 14:17:51 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: <zhangkun09@huawei.com>,
+ <fanghaiqing@huawei.com>,
+ <liuyonglong@huawei.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>,
+ Alexander  Lobakin <aleksander.lobakin@intel.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric  Dumazet <edumazet@google.com>,
+ <netdev@vger.kernel.org>,
+ <linux-kernel@vger.kernel.org>,
+ <davem@davemloft.net>,
+ <kuba@kernel.org>,
+ <pabeni@redhat.com>
+References: <20241022032214.3915232-1-linyunsheng@huawei.com>
+ <20241022032214.3915232-3-linyunsheng@huawei.com>
+In-Reply-To: <20241022032214.3915232-3-linyunsheng@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v3 2/6] igc: Lengthen the
- hardware retry time to prevent timeouts
-From: Paul Menzel <pmenzel@molgen.mpg.de>
-To: Christopher S Hall <christopher.s.hall@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, David Zage <david.zage@intel.com>,
- Vinicius Gomes <vinicius.gomes@intel.com>, netdev@vger.kernel.org,
- "Cadore Cataldo, Rodrigo" <rodrigo.cadore@l-acoustics.com>,
- Corinna Vinschen <vinschen@redhat.com>,
- Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
- Mor Bar Gabay <morx.bar.gabay@intel.com>,
- Avigail Dahan <avigailx.dahan@intel.com>
-References: <20241106184722.17230-1-christopher.s.hall@intel.com>
- <20241106184722.17230-3-christopher.s.hall@intel.com>
- <4ee8f886-40ed-46bc-9d11-1619d64f7875@molgen.mpg.de>
- <MW4PR11MB698491CB1DA8179D870F787FC2532@MW4PR11MB6984.namprd11.prod.outlook.com>
- <3383e090-2545-4a02-abab-f92d4cbaa357@molgen.mpg.de>
-Content-Language: en-US
-In-Reply-To: <3383e090-2545-4a02-abab-f92d4cbaa357@molgen.mpg.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
 
-[Cc: -Sasha, 550 #5.1.0 Address rejected.]
+On Tue, 22 Oct 2024 11:22:12 +0800, Yunsheng Lin <linyunsheng@huawei.com> wrote:
+> page_pool page may be freed from skb_defer_free_flush() in
+> softirq context without binding to any specific napi, it
+> may cause use-after-free problem due to the below time window,
+> as below, CPU1 may still access napi->list_owner after CPU0
+> free the napi memory:
+>
+>             CPU 0                           CPU1
+>       page_pool_destroy()          skb_defer_free_flush()
+>              .                               .
+>              .                napi = READ_ONCE(pool->p.napi);
+>              .                               .
+> page_pool_disable_direct_recycling()         .
+>    driver free napi memory                   .
+>              .                               .
+>              .       napi && READ_ONCE(napi->list_owner) == cpuid
+>              .                               .
+>
+> Use rcu mechanism to avoid the above problem.
+>
+> Note, the above was found during code reviewing on how to fix
+> the problem in [1].
+>
+> 1. https://lore.kernel.org/lkml/8067f204-1380-4d37-8ffd-007fc6f26738@kernel.org/T/
+>
+> Fixes: dd64b232deb8 ("page_pool: unlink from napi during destroy")
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
 
-Am 07.11.24 um 06:48 schrieb Paul Menzel:
-> [Cc: +Sasha]
-> 
-> Dear Christopher,
-> 
-> 
-> Am 07.11.24 um 00:53 schrieb Hall, Christopher S:
-> 
->>> From: Paul Menzel <pmenzel@molgen.mpg.de>
->>> Sent: Wednesday, November 06, 2024 3:14 PM
->>
->>> Subject: Re: [Intel-wired-lan] [PATCH iwl-net v3 2/6] igc: Lengthen the hardware retry time to prevent timeouts
-> 
->>> I’d use the more specific summary/title below:
->>
->> Will do.
->>
->>> igc: Lengthen hardware retry time to 4 μs to prevent timeouts
->>>
->>> Am 06.11.24 um 19:47 schrieb Christopher S M Hall:
->>>> Lengthen the hardware retry timer to four microseconds.
->>>>
->>>> The i225/i226 hardware retries if it receives an inappropriate response
->>>> from the upstream device. If the device retries too quickly, the root
->>>> port does not respond.
->>>
->>> Any idea why? Is it documented somewhere?
->>
->> I do not. Theoretically, 1 us should work, but it does not. It could be a root
->> port problem or an issue with i225/i226 NIC. I am not able to directly observe
->> the state of either. 4 us has worked in all my testing I am comfortable with
->> that value. 2 us also works, but given the limited hardware at my disposal
->> I doubled the value to 4 us to be safe. PTM is not time critical. Typically,
->> software initiates a transaction between 8 and 32 times per second. There
->> is no performance impact for PTM or any other function of the card. The
->> timeout occurs rarely, but if the retry time is too short the PTM state
->> machine does not recover.
-> 
-> Thank you for clearing this up. If it’s not time critical, why not 
-> revert the original patch and go back to 10 μs.
-> 
-> The referenced commit 6b8aa753a9f9 (igc: Decrease PTM short interval 
-> from 10 us to 1 us) also says, that 1 μs was suggested by the hardware 
-> team. Were you able to talk to them?
-> 
->>>> The issue can be reproduced with the following:
->>>>
->>>> $ sudo phc2sys -R 1000 -O 0 -i tsn0 -m
->>>>
->>>> Note: 1000 Hz (-R 1000) is unrealistically large, but provides a way to
->>>> quickly reproduce the issue.
->>>>
->>>> PHC2SYS exits with:
->>>>
->>>> "ioctl PTP_OFFSET_PRECISE: Connection timed out" when the PTM transaction
->>>>     fails
->>>
->>> Why four microseconds, and not some other value?
->>
->> See above.
-> 
-> It’d be great, if you extended the commit message.
-> 
->>>> Fixes: 6b8aa753a9f9 ("igc: Decrease PTM short interval from 10 us to 
->>>> 1 us")
->>>>
->>>> -#define IGC_PTM_SHORT_CYC_DEFAULT    1   /* Default short cycle interval */
->>>> +#define IGC_PTM_SHORT_CYC_DEFAULT    4   /* Default short cycle interval */
-> 
-> Maybe also add a comment, that 1 μs should work, but does not.
-> 
-> 
-> Kind regards,
-> 
-> Paul
+
+Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+
+> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+> As the IOMMU fix patch depends on synchronize_rcu() added in this
+> patch and the time window is so small that it doesn't seem to be
+> an urgent fix, so target the net-next as the IOMMU fix patch does.
+> ---
+>  net/core/page_pool.c | 15 ++++++++++++++-
+>  1 file changed, 14 insertions(+), 1 deletion(-)
+>
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index a813d30d2135..dd497f5c927d 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -795,6 +795,7 @@ __page_pool_put_page(struct page_pool *pool, netmem_ref netmem,
+>  static bool page_pool_napi_local(const struct page_pool *pool)
+>  {
+>  	const struct napi_struct *napi;
+> +	bool napi_local;
+>  	u32 cpuid;
+>
+>  	if (unlikely(!in_softirq()))
+> @@ -810,9 +811,15 @@ static bool page_pool_napi_local(const struct page_pool *pool)
+>  	if (READ_ONCE(pool->cpuid) == cpuid)
+>  		return true;
+>
+> +	/* Synchronizated with page_pool_destory() to avoid use-after-free
+> +	 * for 'napi'.
+> +	 */
+> +	rcu_read_lock();
+>  	napi = READ_ONCE(pool->p.napi);
+> +	napi_local = napi && READ_ONCE(napi->list_owner) == cpuid;
+> +	rcu_read_unlock();
+>
+> -	return napi && READ_ONCE(napi->list_owner) == cpuid;
+> +	return napi_local;
+>  }
+>
+>  void page_pool_put_unrefed_netmem(struct page_pool *pool, netmem_ref netmem,
+> @@ -1126,6 +1133,12 @@ void page_pool_destroy(struct page_pool *pool)
+>  	if (!page_pool_release(pool))
+>  		return;
+>
+> +	/* Paired with rcu lock in page_pool_napi_local() to enable clearing
+> +	 * of pool->p.napi in page_pool_disable_direct_recycling() is seen
+> +	 * before returning to driver to free the napi instance.
+> +	 */
+> +	synchronize_rcu();
+> +
+>  	page_pool_detached(pool);
+>  	pool->defer_start = jiffies;
+>  	pool->defer_warn  = jiffies + DEFER_WARN_INTERVAL;
+> --
+> 2.33.0
+>
+>
 
