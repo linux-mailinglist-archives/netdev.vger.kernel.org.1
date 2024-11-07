@@ -1,141 +1,162 @@
-Return-Path: <netdev+bounces-143064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC4579C1015
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:50:23 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2E0F99C1093
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:08:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F31071C2299E
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:50:22 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D9D531F218DE
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:08:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58C4821767A;
-	Thu,  7 Nov 2024 20:50:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3654B227B86;
+	Thu,  7 Nov 2024 21:00:08 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b="m1xESsL1"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="gjozJY8K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mailtransmit05.runbox.com (mailtransmit05.runbox.com [185.226.149.38])
+Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE9B918F2C3;
-	Thu,  7 Nov 2024 20:50:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.226.149.38
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09235219C87;
+	Thu,  7 Nov 2024 21:00:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.190.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731012619; cv=none; b=syz9Hz9vOBRVRO8nIUF9rZ124WV/y5buo1DV2cgBidvzME26pAYfNRJdz6zC5OYY7OwVxfQdMvjrz1b9SbrsFx23+1DrodhIvsNZPhD0hcDurW+dlV8Zd6YqEAsBPNrjJtcBDAqk/h+wiUnfk0DavRseskELhhzIyrk3Vw4z3iI=
+	t=1731013208; cv=none; b=JiHA4K5irRsJIKzTO5LZe2H7Wao/+6ZOiRm4kg7TycbNt5JKOGcyOpWxRsBEKg7tSVfJock8z2Y5P0Wcl04U+r2Zz2HW4YU51jyFMVjHuZ48pvRLG5jP8tksjSNLG8vEf1KpVSWlSNh5fIQWcd9kBV1VwTIh+tQTiIcGoDWC7kc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731012619; c=relaxed/simple;
-	bh=75CmgpEUiFxNaINSNyji5exhmMbinVN6FHw3Iqi0zKM=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=uZfWmrm3j4n4wiGOEByXVzXvBHeBizBuRKv89zrwize6CuvH6TR0S7brfB5v3YLfXKCamFc8GGEuXr1Gz/YWE5ih82l2LiCv3VmmW+3ZeFRFiTE6j0MxWYBLfMtf1SxOWLsrW4NfuREWlt13aM1tk8+dEPd1cX9Q3CLs/hE9vFU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co; spf=pass smtp.mailfrom=rbox.co; dkim=pass (2048-bit key) header.d=rbox.co header.i=@rbox.co header.b=m1xESsL1; arc=none smtp.client-ip=185.226.149.38
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=rbox.co
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=rbox.co
-Received: from mailtransmit03.runbox ([10.9.9.163] helo=aibo.runbox.com)
-	by mailtransmit05.runbox.com with esmtps  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.93)
-	(envelope-from <mhal@rbox.co>)
-	id 1t99SD-001b80-Lc; Thu, 07 Nov 2024 21:50:09 +0100
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=rbox.co;
-	s=selector2; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
-	References:Cc:To:Subject:MIME-Version:Date:Message-ID;
-	bh=IDOCcFgf0OUYloIAVth+wW23XWBOmQgJTVgWj1Hzoq4=; b=m1xESsL1AgLboIIcgv78T+RyD/
-	llCu1PywaSBL1BNO/rP0/MCtKPTLCIQ4QolF0qLzcrWeKXCFf8uiKQmKZvWyrv171Tw9A7xl0IlVj
-	0g6LLrdzxi6m4ggYqrp4zdJdkmQL4d62m7QD6Nope8uOB5USV/V6XKGlvydigW+c8mxe2h5wuT0B2
-	xnjxIMpSRWws952TtMBHSoy3sFOf4Wnyr6c4J0i2c/JuzmFqg4l6VpenNnVo17DizFEj6edbFfRe0
-	Bnw2mmamuIsyJYwTvHGPtXGlxcOUUtX5CJxukbWsgY2/eAKP2qwt8mVKw6RmMz6vm4SrgAZrz3FxJ
-	UabaJSPw==;
-Received: from [10.9.9.72] (helo=submission01.runbox)
-	by mailtransmit03.runbox with esmtp (Exim 4.86_2)
-	(envelope-from <mhal@rbox.co>)
-	id 1t99SB-0002sb-7z; Thu, 07 Nov 2024 21:50:07 +0100
-Received: by submission01.runbox with esmtpsa  [Authenticated ID (604044)]  (TLS1.2:ECDHE_SECP256R1__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
-	(Exim 4.93)
-	id 1t99S1-002t1L-OZ; Thu, 07 Nov 2024 21:49:57 +0100
-Message-ID: <a3c80efc-94b2-463a-ab2e-e7f87245fd09@rbox.co>
-Date: Thu, 7 Nov 2024 21:49:56 +0100
+	s=arc-20240116; t=1731013208; c=relaxed/simple;
+	bh=0Nny2UyaTu4go4AZWKLE7D5SP82bLLtiYPz+DNT/uEM=;
+	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=SOCV4U6rtXMRtWrhO5BhoKShS4NzCmQXUuq7O/p7io85qJFiY5LQd+Yxh62KU0nGDUvJsGZJmdL3lLtCAksJfwcMDTM+MxsruYm0bAy/iu4HSlDsGXaxxSfBBPs4hagSB9jx3M0coTwcIJtCSOid8IDrpY7cYhIQidUmT6vgWoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=gjozJY8K; arc=none smtp.client-ip=207.171.190.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1731013206; x=1762549206;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=+5yz4s/Oc0HMfpz3T57N6IiKL/vnshJ9HMzg1cmzBKE=;
+  b=gjozJY8KITHbzKoR2CHfbL9fkFq6Ua0IFER5yINnzhbSRK9Iqrjgfza/
+   QQ+3rcJyRLawJAJQ4ZEua023WrdgQfshh+eCsUkysodSlMNo9ynRSBnPJ
+   ekQAMnStMQp0o1e5Lhb4pas0PdO7oT61pQuE7JnFRG2fTBFuPwNugD0WQ
+   0=;
+X-IronPort-AV: E=Sophos;i="6.12,136,1728950400"; 
+   d="scan'208";a="383370609"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 21:00:00 +0000
+Received: from EX19MTAUWC001.ant.amazon.com [10.0.21.151:47518]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.54.53:2525] with esmtp (Farcaster)
+ id bf378411-21c2-41ff-aaa0-91736d3975b8; Thu, 7 Nov 2024 20:59:59 +0000 (UTC)
+X-Farcaster-Flow-ID: bf378411-21c2-41ff-aaa0-91736d3975b8
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
+ Thu, 7 Nov 2024 20:59:59 +0000
+Received: from 6c7e67c6786f.amazon.com (10.187.170.59) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
+ Thu, 7 Nov 2024 20:59:55 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <liujian56@huawei.com>
+CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
+	<geert+renesas@glider.be>, <jlayton@kernel.org>, <kuba@kernel.org>,
+	<kuniyu@amazon.com>, <linux-nfs@vger.kernel.org>, <neilb@suse.de>,
+	<netdev@vger.kernel.org>, <ofir.gal@volumez.com>, <okorniev@redhat.com>,
+	<pabeni@redhat.com>, <tom@talpey.com>, <trondmy@kernel.org>
+Subject: Re: [PATCH net v2] sunrpc: fix one UAF issue caused by sunrpc kernel tcp socket
+Date: Thu, 7 Nov 2024 12:59:52 -0800
+Message-ID: <20241107205952.7992-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.39.5 (Apple Git-154)
+In-Reply-To: <78efbd6e-31e5-4e67-a046-2736747b291d@huawei.com>
+References: <78efbd6e-31e5-4e67-a046-2736747b291d@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 2/4] virtio/vsock: Fix sk_error_queue memory leak
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?=
- <eperezma@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jia He <justin.he@arm.com>, Arseniy Krasnov <avkrasnov@salutedevices.com>,
- Dmitry Torokhov <dtor@vmware.com>, Andy King <acking@vmware.com>,
- George Zhang <georgezhang@vmware.com>, kvm@vger.kernel.org,
- virtualization@lists.linux.dev, netdev@vger.kernel.org
-References: <20241106-vsock-mem-leaks-v1-0-8f4ffc3099e6@rbox.co>
- <20241106-vsock-mem-leaks-v1-2-8f4ffc3099e6@rbox.co>
- <vxc6tv6433tnyfhdq2gsh7edhuskawwh4g6ehafvrt2ca3cqf2@q3kxjlygq366>
-Content-Language: pl-PL, en-GB
-From: Michal Luczaj <mhal@rbox.co>
-In-Reply-To: <vxc6tv6433tnyfhdq2gsh7edhuskawwh4g6ehafvrt2ca3cqf2@q3kxjlygq366>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: EX19D036UWC001.ant.amazon.com (10.13.139.233) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-On 11/7/24 11:17, Stefano Garzarella wrote:
-> On Wed, Nov 06, 2024 at 06:51:19PM +0100, Michal Luczaj wrote:
->> Kernel queues MSG_ZEROCOPY completion notifications on the error queue.
->> Where they remain, until explicitly recv()ed. To prevent memory leaks,
->> clean up the queue when the socket is destroyed.
->>
->> unreferenced object 0xffff8881028beb00 (size 224):
->>  comm "vsock_test", pid 1218, jiffies 4294694897
->>  hex dump (first 32 bytes):
->>    90 b0 21 17 81 88 ff ff 90 b0 21 17 81 88 ff ff  ..!.......!.....
->>    00 00 00 00 00 00 00 00 00 b0 21 17 81 88 ff ff  ..........!.....
->>  backtrace (crc 6c7031ca):
->>    [<ffffffff81418ef7>] kmem_cache_alloc_node_noprof+0x2f7/0x370
->>    [<ffffffff81d35882>] __alloc_skb+0x132/0x180
->>    [<ffffffff81d2d32b>] sock_omalloc+0x4b/0x80
->>    [<ffffffff81d3a8ae>] msg_zerocopy_realloc+0x9e/0x240
->>    [<ffffffff81fe5cb2>] virtio_transport_send_pkt_info+0x412/0x4c0
->>    [<ffffffff81fe6183>] virtio_transport_stream_enqueue+0x43/0x50
->>    [<ffffffff81fe0813>] vsock_connectible_sendmsg+0x373/0x450
->>    [<ffffffff81d233d5>] ____sys_sendmsg+0x365/0x3a0
->>    [<ffffffff81d246f4>] ___sys_sendmsg+0x84/0xd0
->>    [<ffffffff81d26f47>] __sys_sendmsg+0x47/0x80
->>    [<ffffffff820d3df3>] do_syscall_64+0x93/0x180
->>    [<ffffffff8220012b>] entry_SYSCALL_64_after_hwframe+0x76/0x7e
->>
->> Fixes: 581512a6dc93 ("vsock/virtio: MSG_ZEROCOPY flag support")
->> Signed-off-by: Michal Luczaj <mhal@rbox.co>
->> ---
->> net/vmw_vsock/af_vsock.c | 3 +++
->> 1 file changed, 3 insertions(+)
->>
->> diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> index 35681adedd9aaec3565495158f5342b8aa76c9bc..dfd29160fe11c4675f872c1ee123d65b2da0dae6 100644
->> --- a/net/vmw_vsock/af_vsock.c
->> +++ b/net/vmw_vsock/af_vsock.c
->> @@ -836,6 +836,9 @@ static void vsock_sk_destruct(struct sock *sk)
->> {
->> 	struct vsock_sock *vsk = vsock_sk(sk);
->>
->> +	/* Flush MSG_ZEROCOPY leftovers. */
->> +	__skb_queue_purge(&sk->sk_error_queue);
->> +
-> 
-> It is true that for now this is supported only in the virtio transport, 
-> but it's more related to the core, so please remove `virtio` from the 
-> commit title.
-> 
-> The rest LGTM.
-> ...
+From: "liujian (CE)" <liujian56@huawei.com>
+Date: Thu, 7 Nov 2024 20:03:40 +0800
+> >> diff --git a/net/socket.c b/net/socket.c
+> >> index 042451f01c65..e64a02445b1a 100644
+> >> --- a/net/socket.c
+> >> +++ b/net/socket.c
+> >> @@ -1651,6 +1651,34 @@ int sock_create_kern(struct net *net, int family, int type, int protocol, struct
+> >>   }
+> >>   EXPORT_SYMBOL(sock_create_kern);
+> >>   
+> >> +int sock_create_kern_getnet(struct net *net, int family, int type, int proto, struct socket **res)
+> >> +{
+> >> +	struct sock *sk;
+> >> +	int ret;
+> >> +
+> >> +	if (!maybe_get_net(net))
+> >> +		return -EINVAL;
+> > 
+> > Is this really safe ?
+> > 
+> > IIUC, maybe_get_net() is safe for a net only when it is fetched under
+> > RCU, then rcu_read_lock() prevents cleanup_net() from reusing the net
+> > by rcu_barrier().
+> > 
+> > Otherwise, there should be a small chance that the same slab object is
+> > reused for another netns between fetching the net and reaching here.
+> > 
+> > svc_create_socket() is called much later after the netns is fetched,
+> > and _svc_xprt_create() calls try_module_get() before ->xpo_create().
+> > So, it seems the path is not under RCU and maybe_get_net() must be
+> > called much earlier by each call site.
+> > 
+> > For this reason, when I write a patch for the same issue in CIFS,
+> > I delayed put_net() to cifsd kthread so that the netns refcnt taken
+> > for each CIFS server info lives until the last __sock_create() attempt
+> > from cifsd.
+> > 
+> > https://lore.kernel.org/linux-cifs/20241102212438.76691-1-kuniyu@amazon.com/
+> > 
+> Okay, got it. thank you.
+> Looking at the nfs and nfsd processing flow, it seems that the call to 
+> __sock_create() to create a TCP socket is always after the mount 
+> operation get_net(). So it should be fine to use get_net() directly.
 
-OK, done. Here's v2 of the series:
-https://lore.kernel.org/netdev/20241107-vsock-mem-leaks-v2-0-4e21bfcfc818@rbox.co/
+Is there any chance that a concurrent unmount releases the
+last refcount by put_net() while another thread trying to call
+__sock_create() ?
 
-Thanks for the reviews,
-Michal
+CIFS was the case.
 
+
+> So 
+> here I'm going to change may_get_net() to get_net(), move 
+> sock_create_kern_getnet() to the sunrpc module, and rename it to 
+> something more appropriate. Is that okay?
+
+Could you go without adding a helper and do the conversion in sunrpc
+code as CIFS did ?
+
+I plan to resurrect my patch and remove such socket conversion altogether
+in the next cycle after the CIFS fix lands on net-next.
+
+https://lore.kernel.org/netdev/20240227011041.97375-4-kuniyu@amazon.com/
+https://github.com/q2ven/linux/commits/427_2
+https://github.com/q2ven/linux/commit/2e54a8cc84f1e9ce60a0e4693c79a8e74c3dbeb9
+
+I inspected all the callers of __sock_create() and friends, and all
+__sock_create() can be replaced with sock_create_kern(), so I will
+unexport __sock_create() and then add a new parameter hold_net to it.
+
+Then, I'll rename sock_create_kern() to sock_create_net_noref() and add
+a fat comment to catch in-kernel users attention so that they no longer
+use _kern() API blindly without care about netns reference.  Also, I'll
+add sock_create_net() and use it for MPTCP, SMC, CIFS, (and sunrpc) etc.
+
+RDS uses maybe_net_get() but I think this is still buggy and I need
+to check more.
 
