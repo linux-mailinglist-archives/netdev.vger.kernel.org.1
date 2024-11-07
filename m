@@ -1,93 +1,131 @@
-Return-Path: <netdev+bounces-142950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4FC619C0C02
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:54:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 422FC9C0C46
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 14B07283C10
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:54:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 734D91C22655
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B487B2161EC;
-	Thu,  7 Nov 2024 16:54:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6349D218584;
+	Thu,  7 Nov 2024 17:03:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="T110jnrQ"
+	dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b="hCMAkpqu"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 883511DF273;
-	Thu,  7 Nov 2024 16:54:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C659217F2B;
+	Thu,  7 Nov 2024 17:03:06 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=217.70.183.193
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730998450; cv=none; b=MoiE5Mk5m3eCT+dEIkvV3G1+R6YTWyTldiz7/hrDGM4sPXCpZok8e2l2t66SGKk/Ez/KLX/RjlOkTifIUBQs5Wcf4LuUQOgkJqlJSC9hcuDRt4u/K1Fdd6sXhE0SPCK2UGyZIPODPNYtPGbJGTLGJJaiAD2ff5+28ZsBT+We9TI=
+	t=1730998989; cv=none; b=Wb802WhawrbLPj+4pahbZI0lkuKSt5KmXUaVWrG6rCpKK4//HqnN1AJFeaba9+ir43/VdyveqpNGf8OTl48sTyNW92kUionl2nWvBP15VfrFka9RQqSTcASAelttvKKj8Qa1aqECbSjtQhEcsISbO/wvYIkw913w/pEW+YFThLc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730998450; c=relaxed/simple;
-	bh=N7/+k8R1g/1cLd26Dqj9FwKPnuSvCR/4iZYQJXHKMjo=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jSzlMY/CrK8MXIWI2RY5fEz2ajue90zO8Xh8aVR4f05Klk0gJjoXTQTm40xYhqseuSFpP7v5jmxbCDaMghHqhS36W4QRKLLAMnu7RDkyXpapI6F/DVgLT0qHXOEfjJG6d9e2SvHJULg2GGCeYQurk0pJowttFxhXxYW7qkeWUZo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=T110jnrQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D5FAC4CECC;
-	Thu,  7 Nov 2024 16:54:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730998449;
-	bh=N7/+k8R1g/1cLd26Dqj9FwKPnuSvCR/4iZYQJXHKMjo=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=T110jnrQm8L454/7d1EKqbLTlIzbnivQzwxM8CIltTmKUK/WSdw+h3u0xfPxsl1vY
-	 bMo+eFDhsuHaBNnckYsaZNfw0Bm9yd/yfM94zhaxuM2bkoX70U7W9BzT4vBip7kvCn
-	 k6aL1K2W7oPxi6PCvjouG3yP5YOALYtqRPToeerrkF9a8gK0w7qthU8vr/LSchMjJn
-	 ZRvyO82MnJITMS0HevvmP09WRGnthFc9qkcpKoyZHK+GF2Z5OpHGx2r+Gircf2OFiM
-	 8b9RC5Kd0bDgqFKlktaXvfT7Ym2H8JSjkbQc15frbzdv+t5BAaJiIgyzv2UZI2nqgA
-	 9136QCbwzpO3A==
-Date: Thu, 7 Nov 2024 16:54:04 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Jacky Chou <jacky_chou@aspeedtech.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, p.zabel@pengutronix.de,
-	ratbert@faraday-tech.com, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [net-next 1/3] dt-bindings: net: ftgmac100: support for AST2700
-Message-ID: <20241107-tinwork-outlast-e01b02ba1c40@spud>
-References: <20241107111500.4066517-1-jacky_chou@aspeedtech.com>
- <20241107111500.4066517-2-jacky_chou@aspeedtech.com>
+	s=arc-20240116; t=1730998989; c=relaxed/simple;
+	bh=lnhfGsBPijdLmSTBoDTvyHj+rnR4uumf0PNicJs+/7A=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=sJDF+ldHR68yR87WiNg8XK9FCmOGLj/eEg0Jxr5TpeiLh/lcLUODaJHd2AuUhno0rDkBKgRH3ExhDeexwGwEolgIoNibTHdnvaQXD7NJA+NEiqZqmWIUzB+ApRrvFbTg19i/k0TnhXA36Pli88I/1oBsV8WzL0mGF0jRezMJ5Wk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com; spf=pass smtp.mailfrom=bootlin.com; dkim=pass (2048-bit key) header.d=bootlin.com header.i=@bootlin.com header.b=hCMAkpqu; arc=none smtp.client-ip=217.70.183.193
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=bootlin.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bootlin.com
+Received: by mail.gandi.net (Postfix) with ESMTPSA id BBB50240007;
+	Thu,  7 Nov 2024 17:03:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=bootlin.com; s=gm1;
+	t=1730998984;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Cp1IlwuXxuG3hVq1umEFzCMyS7Q+bM6rBW7jwZeMmgI=;
+	b=hCMAkpqulm8WFtwNz9p/rJ6c5xyIR6Yt5pwkQVIQEvKoehCjYKLmaI2KMeC5YScXVkGK/Y
+	4NYd/fMztQeBdkO9mv4nrEkULHwWlneZWnGmb9PGpDJ0GHxm/vRqIhCaYN6QTTjBG+X0Oj
+	scxVELlEWOUEAsaalcEBe20LsxUW+gEceXA/+6bUFog+C/GZ1AiewiiZc8AsktcgIKll/L
+	p9GURarjdeovSV44Sa/tJSDkksKWsLZNh4ZOZ+nghk9jhMxs2if4hbS9Z22nEoZX55hBYn
+	Sb2Ksun51D0DOfrVf2l7vp9dd/Zru8vA/krrQP8IK2yKFc8pJimj03R/QqWHIQ==
+From: Maxime Chevallier <maxime.chevallier@bootlin.com>
+To: davem@davemloft.net,
+	Andrew Lunn <andrew@lunn.ch>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	thomas.petazzoni@bootlin.com,
+	Herve Codina <herve.codina@bootlin.com>,
+	=?UTF-8?q?Uwe=20Kleine-K=C3=B6nig?= <u.kleine-koenig@baylibre.com>,
+	linuxppc-dev@lists.ozlabs.org
+Subject: [PATCH net-next 0/7] net: freescale: ucc_geth: Phylink conversion
+Date: Thu,  7 Nov 2024 18:02:47 +0100
+Message-ID: <20241107170255.1058124-1-maxime.chevallier@bootlin.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="PE4QUCYR82RbQ4ek"
-Content-Disposition: inline
-In-Reply-To: <20241107111500.4066517-2-jacky_chou@aspeedtech.com>
+Content-Transfer-Encoding: 8bit
+X-GND-Sasl: maxime.chevallier@bootlin.com
 
+Hello everyone,
 
---PE4QUCYR82RbQ4ek
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+This series aims at converting ucc_geth to phylink, one one part for
+better SFP handling, and on the other hand as a preparation for complex
+topology support with multiple PHYs being attached, which could involve
+phylink. Even without considering the multi-phy case, this series brings
+proper SFP support for that driver.
 
-On Thu, Nov 07, 2024 at 07:14:58PM +0800, Jacky Chou wrote:
-> The AST2700 is the 7th generation SoC from Aspeed.
-> Add compatible support for AST2700 in yaml.
->=20
-> Signed-off-by: Jacky Chou <jacky_chou@aspeedtech.com>
+This driver is pretty old, which shows in the coding style. I did not
+include a cleanup pass to get checkpatch happy, so a few patches will
+complain about the CamelCase used in some internal structure
+attrubutes...
 
-Acked-by: Conor Dooley <conor.dooley@microchip.com>
+The first 6 patches are preparation for the phylink conversion that's
+done in patch 7.
 
---PE4QUCYR82RbQ4ek
-Content-Type: application/pgp-signature; name="signature.asc"
+The first patch removes support for the "interface" DT property which
+has been deprecated for 17 years, allowing to simplify the phy mode
+parsing.
 
------BEGIN PGP SIGNATURE-----
+The second patch splits the adjust_link function, as advised in the
+phylink porting guide. This makes patch 7 easier to process.
 
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZyzwrAAKCRB4tDGHoIJi
-0jniAQDG+ZKFEkC0A4YtWW0cY8u2S8aQzuNpbWNhqNLiQc9bbgEAjr3QBoZt551w
-o3uGvBsvJnPKoUPcOGbblogPIWa72wk=
-=0rCc
------END PGP SIGNATURE-----
+Patches 3, 5 and 6 perform some cleanup on unsued or leftover constructs
+to again make patch 7 easier to process.
 
---PE4QUCYR82RbQ4ek--
+Patch 5 addresses the WoL configuration in that driver.
+
+Finally, patch 7 does the phylink conversion.
+
+Note that there are some things that I wasn't able to test, namely the
+TBI/RTBI handling. I did my best to replicate the existing logic, but I
+don't have the hardware to test it.
+
+Thanks,
+
+Maxime
+
+Maxime Chevallier (7):
+  net: freescale: ucc_geth: Drop support for the "interface" DT property
+  net: freescale: ucc_geth: split adjust_link for phylink conversion
+  net: freescale: ucc_geth: Use netdev->phydev to access the PHY
+  net: freescale: ucc_geth: Fix WOL configuration
+  net: freescale: ucc_geth: Simplify frame length check
+  net: freescale: ucc_geth: Hardcode the preamble length to 7 bytes
+  net: freescale: ucc_geth: phylink conversion
+
+ drivers/net/ethernet/freescale/Kconfig        |   3 +-
+ drivers/net/ethernet/freescale/ucc_geth.c     | 600 +++++++-----------
+ drivers/net/ethernet/freescale/ucc_geth.h     |  19 +-
+ .../net/ethernet/freescale/ucc_geth_ethtool.c |  57 +-
+ 4 files changed, 247 insertions(+), 432 deletions(-)
+
+-- 
+2.47.0
+
 
