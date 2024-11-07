@@ -1,327 +1,124 @@
-Return-Path: <netdev+bounces-143014-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 402919C0E34
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:02:41 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 706079C0E5D
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 20:07:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id B172B1F21849
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:02:40 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 27A021F234A6
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 19:07:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3A6216A0F;
-	Thu,  7 Nov 2024 19:02:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B5582178E5;
+	Thu,  7 Nov 2024 19:06:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="1RWJBjlJ"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="fmndRhbs"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from out-182.mta0.migadu.com (out-182.mta0.migadu.com [91.218.175.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 69EAD366;
-	Thu,  7 Nov 2024 19:02:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C781721744B
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 19:06:05 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731006156; cv=none; b=PUe0Py1r0doKwEHeHEAjTnLytDFE+gcQk62ULB4jCPeIB5BHY0kRmdfYcrR+9UcndTWpIU4NmhCZdsnfRhokoXnuCUP+0ZmOEn5MSXu08BILMj4OHFj6nCbIlHjT713JlyxOTXJ+g0W6lf5KSiCyfEtn5qTVQCBzSM31+ssvMos=
+	t=1731006367; cv=none; b=j4p86JysdtltIPdBm6vPY7pkw1onm+N4MBLB5Tu+IuerNKZoMps68TOulJY1MoPiolE42cdaZzzkndLDs5/3Uhcvv8NPkOCZ0wghme8D5vBLABlcTy3ot3Q6nb0SeXAOY8WKICl2N+ogDOch+aey9VoaEUflz+2Xs0K93e3qTkY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731006156; c=relaxed/simple;
-	bh=nZzW/WmHhbcFiTDTjmWVfg5PMyUrdYtAi+hApHDAZ50=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JzEbwjHrrd2auKK2o9QfUt6SsgkcOiikvZ1olu+Ds8fer3NTR0PWGYJstx1jiLO+jQpIn9qOeh/0O7gJmSGL3QxL0edMsrdgMyjV6NaWNhvU9IQlCbd3jr5GTkxhja8LzVGriFsQy137lF01XQqxbctbLUHfeD4adtdKBbYGvAo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=1RWJBjlJ; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=wbtR0ny7uZ7DabtPLCIyVCVQ9iNTWLvZH7ebTrF+ygk=; b=1RWJBjlJTPHRC1amVHb1o0wi2+
-	eCqS8BAENhcoHRKwrd+1PfB+BmF7j50imtp7xcYZGDX0v3+qWhfGZEka24/As618VaP15jSoP6jFL
-	KZ2Char2XLW+P1O7Sxpra4N9fhycQACVSh6Nah5IdXfdxH7Q80pEWvp2DIQf5kcCbeImNH845nrmb
-	LgOJg/3UAgAdngYjapBay2oTzseBkjxqY4Fo3PEVGhjGbKpMxefww2Ke2eFR9+6WuCtCYt+B+56R/
-	zO2Nu1+exYqS9QUNNFhpXQqgesGmcxVOCTk7agTeGu0Mn1sUDXixDWyJJ8aF3gx0ALSRoqUPQPYD0
-	Cj8hJdzQ==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43716)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t97ls-0003fj-0w;
-	Thu, 07 Nov 2024 19:02:20 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t97lp-0001WC-03;
-	Thu, 07 Nov 2024 19:02:17 +0000
-Date: Thu, 7 Nov 2024 19:02:16 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
-	quic_pavir@quicinc.com, quic_linchen@quicinc.com,
-	quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
-	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com,
-	john@phrozen.org
-Subject: Re: [PATCH net-next 3/5] net: pcs: qcom-ipq: Add PCS create and
- phylink operations for IPQ9574
-Message-ID: <Zy0OuPMbUaZtIosj@shell.armlinux.org.uk>
-References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
- <20241101-ipq_pcs_rc1-v1-3-fdef575620cf@quicinc.com>
+	s=arc-20240116; t=1731006367; c=relaxed/simple;
+	bh=426b7JryXM4stovdUBOyibOVt0RjfEdOJzStcbi1hkk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=eLnNCxoqpWQEspxVSAgXmgQwvkynLS0yu5JJ15p4OH9I/Qt7GBsejjRBffKhFbYgRgdlPdBayB/C+lqxW9HmGVrweWhRI5GytFdgIZClKkDEhpmswlBhRpy8QgaMDC26/4rMPmHYJUwWCPXJrJwT9167S+aSURTvhW8ofCCsomA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=fmndRhbs; arc=none smtp.client-ip=91.218.175.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <7934db76-db35-4cc7-a4d4-842f108fd0d3@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731006362;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=0rgBUS2CZnGMEGdt/TTd02cvYvgz+FrSnullT1PYHuI=;
+	b=fmndRhbsUauVlQ5xvj6r8V2Kz0+h3gT/VdxNfXuqxZTBlUKnGopf1m6EaS+VE/cSR/FDa0
+	TF8DSDXSlpFd/p7oWugY4GCIPlcgoel7azd/8S/sZ/WpyV0rroCCEKCcLf9roB2BpvcTa9
+	l0PeKllJyE/bCp5uVjr4RMfKsXYWO84=
+Date: Thu, 7 Nov 2024 11:05:52 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241101-ipq_pcs_rc1-v1-3-fdef575620cf@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Subject: Re: [PATCH net-next v3 02/14] net-timestamp: allow two features to
+ work parallelly
+To: Jason Xing <kerneljasonxing@gmail.com>
+Cc: Willem de Bruijn <willemdebruijn.kernel@gmail.com>, willemb@google.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, eddyz87@gmail.com, song@kernel.org,
+ yonghong.song@linux.dev, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@fomichev.me, haoluo@google.com, jolsa@kernel.org, shuah@kernel.org,
+ ykolal@fb.com, bpf@vger.kernel.org, netdev@vger.kernel.org,
+ Jason Xing <kernelxing@tencent.com>
+References: <20241028110535.82999-1-kerneljasonxing@gmail.com>
+ <CAL+tcoDL0by6epqExL0VVMqfveA_awZ3PE9mfwYi3OmovZf3JQ@mail.gmail.com>
+ <d138a81d-f9f5-4d51-bedd-3916d377699d@linux.dev>
+ <CAL+tcoBfuFL7-EOBY4RLMdDZJcUSyq20pJW13OqzNazUP7=gaw@mail.gmail.com>
+ <67237877cd08d_b246b2942b@willemb.c.googlers.com.notmuch>
+ <CAL+tcoBpdxtz5GHkTp6e52VDCtyZWvU7+1hTuEo1CnUemj=-eQ@mail.gmail.com>
+ <65968a5c-2c67-4b66-8fe0-0cebd2bf9c29@linux.dev>
+ <6724d85d8072_1a157829475@willemb.c.googlers.com.notmuch>
+ <1c8ebc16-f8e7-4a98-9518-865db3952f8f@linux.dev>
+ <CAL+tcoBf+kQ3_kc9x62KnHx9O+6c==_DN+6EheL82UKQ3xQN1A@mail.gmail.com>
+ <f27ab4ce-02df-464e-90ed-852652fb7e3e@linux.dev>
+ <CAL+tcoDEMJGYNw01QnEUZwtG5BMj3AyLwtp1m1_hJfY2bG=-dQ@mail.gmail.com>
+ <97d8f9b3-9ae3-4146-a933-70dbe393132e@linux.dev>
+ <CAL+tcoBzces5_awOzZsyqpTWjk0moxkjj7kHjCtPcsU3kNJ4tg@mail.gmail.com>
+ <49ad2b87-29af-429e-8acb-2bba13e2b2aa@linux.dev>
+ <CAL+tcoAmajwBTkfrWez8sEsyHJUga5qbiOdpybjPPe44dyfYxw@mail.gmail.com>
+Content-Language: en-US
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Martin KaFai Lau <martin.lau@linux.dev>
+In-Reply-To: <CAL+tcoAmajwBTkfrWez8sEsyHJUga5qbiOdpybjPPe44dyfYxw@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-Hi,
+On 11/6/24 7:31 PM, Jason Xing wrote:
+>> /* ack: request ACK timestamp (tcp only)
+>>    * req_tskey: bpf prog can request to use a particular tskey.
+>>    *            req_tskey should always be 0 for tcp.
+>>    * return: -ve for error. u32 for the tskey that the bpf prog should use.
+>>    *        may be different from the req_tskey (e.g. the user space has
+>>    *         already set one).
+>>    */
+>> __bpf_kfunc s64 bpf_skops_enable_tx_tstamp(struct bpf_sock_ops_kern *skops,
+>>                                             bool ack, u32 req_tskey);
+>>
 
-On Fri, Nov 01, 2024 at 06:32:51PM +0800, Lei Wei wrote:
-> +static int ipq_pcs_config_mode(struct ipq_pcs *qpcs,
-> +			       phy_interface_t interface)
-> +{
-> +	unsigned int val;
-> +	int ret;
-> +
-> +	/* Configure PCS interface mode */
-> +	switch (interface) {
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +		/* Select Qualcomm SGMII AN mode */
-> +		ret = regmap_update_bits(qpcs->regmap, PCS_MODE_CTRL,
-> +					 PCS_MODE_SEL_MASK | PCS_MODE_AN_MODE,
-> +					 PCS_MODE_SGMII);
-> +		if (ret)
-> +			return ret;
-> +		break;
-> +	case PHY_INTERFACE_MODE_QSGMII:
-> +		ret = regmap_update_bits(qpcs->regmap, PCS_MODE_CTRL,
-> +					 PCS_MODE_SEL_MASK | PCS_MODE_AN_MODE,
-> +					 PCS_MODE_QSGMII);
-> +		if (ret)
-> +			return ret;
-> +		break;
-> +	default:
-> +		dev_err(qpcs->dev,
-> +			"Unsupported interface %s\n", phy_modes(interface));
-> +		return -EOPNOTSUPP;
-> +	}
+>>
+>> For udp, I don't know whether it will be easier to set the tskey in the 'cork'
+>> or 'sockcm_cookie' or 'skb'. I guess it depends where the bpf prog is called. If
+>> skb, it seems the bpf prog may be called repetitively for doing the same thing
+>> in the while loop in __ip[6]_append_data. If it is better to set the 'cork' or
+>> 'sockcm_cookie', the cork/sockcm_cookie pointer can be added to 'struct
+>> bpf_sock_ops_kern'. The sizeof(struct bpf_sock_ops_kern) is at 64bytes. Adding
+>> one pointer is not ideal.... probably it can be union with syn_skb but will need
+>> some code audit (so please check).
 
-I think:
+>>
+>>
+>>> 3) extend SCM_TS_OPT_ID for the udp/bpf case.
+>>
+>> I don't understand. What does it mean to extend SCM_TS_OPT_ID?
+> 
+> Oh, I thought you expect to pass the key from the bpf program through
+> using the interface of SCM_TS_OPT_ID feature which isn't supported by
+> bpf. Let me think more about it first.
 
-	unsigned int mode;
+I still don't understand the SCM_TS_OPT_ID part but no I don't mean that.
 
-	switch (interface) {
-	case PHY_INTERFACE_MODE_SGMII:
-		/* Select Qualcomm SGMII AN mode */
-		mode = PCS_MODE_SGMII;
-		break;
-
-	case PHY_INTERFACE_MODE_QSGMII:
-		mode = PCS_MODE_QSGMII;
-		break;
-
-	default:
-		...
-	}
-
-	ret = regmap_update_bits(qpcs->regmap, PCS_MODE_CTRL,
-				 PCS_MODE_SEL_MASK | PCS_MODE_AN_MODE, mode);
-	if (ret)
-		return ret;
-
-might be easier to read? I notice that in patch 4, the USXGMII case
-drops PCS_MODE_AN_MODE from the mask, leaving this bit set to whatever
-value it previously was. Is that intentional?
-
-> +static int ipq_pcs_link_up_config_sgmii(struct ipq_pcs *qpcs,
-> +					int index,
-> +					unsigned int neg_mode,
-> +					int speed)
-> +{
-> +	int ret;
-> +
-> +	/* PCS speed need not be configured if in-band autoneg is enabled */
-> +	if (neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED)
-> +		goto pcs_adapter_reset;
-> +
-> +	/* PCS speed set for force mode */
-> +	switch (speed) {
-> +	case SPEED_1000:
-> +		ret = regmap_update_bits(qpcs->regmap, PCS_MII_CTRL(index),
-> +					 PCS_MII_SPEED_MASK,
-> +					 PCS_MII_SPEED_1000);
-> +		if (ret)
-> +			return ret;
-> +		break;
-> +	case SPEED_100:
-> +		ret = regmap_update_bits(qpcs->regmap, PCS_MII_CTRL(index),
-> +					 PCS_MII_SPEED_MASK, PCS_MII_SPEED_100);
-> +		if (ret)
-> +			return ret;
-> +		break;
-> +	case SPEED_10:
-> +		ret = regmap_update_bits(qpcs->regmap, PCS_MII_CTRL(index),
-> +					 PCS_MII_SPEED_MASK, PCS_MII_SPEED_10);
-> +		if (ret)
-> +			return ret;
-> +		break;
-> +	default:
-> +		dev_err(qpcs->dev, "Invalid SGMII speed %d\n", speed);
-> +		return -EINVAL;
-> +	}
-
-I think it's worth having the same structure here, and with fewer lines
-(and fewer long lines) maybe:
-
-	if (neg_mode != PHYLINK_PCS_NEG_INBAND_ENABLED) {
-		switch (speed) {
-		...
-		}
-
-		ret = regmap_update_bits(qpcs->regmap, PCS_MII_CTRL(index),
-					 PCS_MII_SPEED_MASK, ctrl);
-		if (ret)
-			return ret;
-	}
-
-means you don't need the pcs_adapter_reset label.
-
-> +
-> +pcs_adapter_reset:
-> +	/* PCS adapter reset */
-> +	ret = regmap_update_bits(qpcs->regmap, PCS_MII_CTRL(index),
-> +				 PCS_MII_ADPT_RESET, 0);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return regmap_update_bits(qpcs->regmap, PCS_MII_CTRL(index),
-> +				  PCS_MII_ADPT_RESET, PCS_MII_ADPT_RESET);
-> +}
-> +
-> +static void ipq_pcs_get_state(struct phylink_pcs *pcs,
-> +			      struct phylink_link_state *state)
-> +{
-> +	struct ipq_pcs_mii *qpcs_mii = phylink_pcs_to_qpcs_mii(pcs);
-> +	struct ipq_pcs *qpcs = qpcs_mii->qpcs;
-> +	int index = qpcs_mii->index;
-> +
-> +	switch (state->interface) {
-> +	case PHY_INTERFACE_MODE_SGMII:
-> +	case PHY_INTERFACE_MODE_QSGMII:
-> +		ipq_pcs_get_state_sgmii(qpcs, index, state);
-> +		break;
-> +	default:
-> +		break;
-> +	}
-> +
-> +	dev_dbg(qpcs->dev,
-> +		"mode=%s/%s/%s link=%u\n",
-> +		phy_modes(state->interface),
-> +		phy_speed_to_str(state->speed),
-> +		phy_duplex_to_str(state->duplex),
-> +		state->link);
-
-This will get very noisy given that in polling mode, phylink will call
-this once a second - and I see you are using polling mode.
-
-> +/**
-> + * ipq_pcs_create() - Create an IPQ PCS MII instance
-> + * @np: Device tree node to the PCS MII
-> + *
-> + * Description: Create a phylink PCS instance for the given PCS MII node @np
-> + * and enable the MII clocks. This instance is associated with the specific
-> + * MII of the PCS and the corresponding Ethernet netdevice.
-> + *
-> + * Return: A pointer to the phylink PCS instance or an error-pointer value.
-> + */
-> +struct phylink_pcs *ipq_pcs_create(struct device_node *np)
-> +{
-> +	struct platform_device *pdev;
-> +	struct ipq_pcs_mii *qpcs_mii;
-> +	struct device_node *pcs_np;
-> +	struct ipq_pcs *qpcs;
-> +	int i, ret;
-> +	u32 index;
-> +
-> +	if (!of_device_is_available(np))
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	if (of_property_read_u32(np, "reg", &index))
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	if (index >= PCS_MAX_MII_NRS)
-> +		return ERR_PTR(-EINVAL);
-> +
-> +	pcs_np = of_get_parent(np);
-> +	if (!pcs_np)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	if (!of_device_is_available(pcs_np)) {
-> +		of_node_put(pcs_np);
-> +		return ERR_PTR(-ENODEV);
-> +	}
-> +
-> +	pdev = of_find_device_by_node(pcs_np);
-> +	of_node_put(pcs_np);
-> +	if (!pdev)
-> +		return ERR_PTR(-ENODEV);
-> +
-> +	qpcs = platform_get_drvdata(pdev);
-> +	put_device(&pdev->dev);
-> +
-> +	/* If probe is not yet completed, return DEFER to
-> +	 * the dependent driver.
-> +	 */
-> +	if (!qpcs)
-> +		return ERR_PTR(-EPROBE_DEFER);
-> +
-> +	qpcs_mii = kzalloc(sizeof(*qpcs_mii), GFP_KERNEL);
-> +	if (!qpcs_mii)
-> +		return ERR_PTR(-ENOMEM);
-> +
-> +	qpcs_mii->qpcs = qpcs;
-> +	qpcs_mii->index = index;
-> +	qpcs_mii->pcs.ops = &ipq_pcs_phylink_ops;
-> +	qpcs_mii->pcs.neg_mode = true;
-> +	qpcs_mii->pcs.poll = true;
-> +
-> +	for (i = 0; i < PCS_MII_CLK_MAX; i++) {
-> +		qpcs_mii->clk[i] = of_clk_get_by_name(np, pcs_mii_clk_name[i]);
-> +		if (IS_ERR(qpcs_mii->clk[i])) {
-> +			dev_err(qpcs->dev,
-> +				"Failed to get MII %d interface clock %s\n",
-> +				index, pcs_mii_clk_name[i]);
-> +			goto err_clk_get;
-> +		}
-> +
-> +		ret = clk_prepare_enable(qpcs_mii->clk[i]);
-> +		if (ret) {
-> +			dev_err(qpcs->dev,
-> +				"Failed to enable MII %d interface clock %s\n",
-> +				index, pcs_mii_clk_name[i]);
-> +			goto err_clk_en;
-> +		}
-
-Do you always need the clock prepared and enabled? If not, you could
-do this in the pcs_enable() method, and turn it off in pcs_disable().
-
-I think phylink may need a tweak to "unuse" the current PCS when
-phylink_stop() is called to make that more effective at disabling the
-PCS, which is something that should be done - that's a subject for a
-separate patch which I may send.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+The bpf prog uses the kfunc to directly set the tskey (and tx_flags) in 
+skb/cork/sockcm_cookie. The name here for the tskey and tx_flags may be 
+different based on if it is skb/cork/sockcm_cookie..
 
