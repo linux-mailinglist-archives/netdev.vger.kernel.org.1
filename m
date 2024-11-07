@@ -1,200 +1,224 @@
-Return-Path: <netdev+bounces-142912-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142917-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80B999C0AFE
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:13:00 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 362409C0B1E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:15:41 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3CCD1C20B75
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:12:59 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id BA8451F223B0
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 16:15:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12A7A218584;
-	Thu,  7 Nov 2024 16:09:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D44217644;
+	Thu,  7 Nov 2024 16:13:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="GyswEzpa"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="U0UHJf1F"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.13])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A0B6215F58;
-	Thu,  7 Nov 2024 16:09:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897A8216E01;
+	Thu,  7 Nov 2024 16:13:45 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.13
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730995784; cv=none; b=K7kXFta5iYaY9MnLSSFs7KT0jGud53dWKsi/eAUsZMfT3b3pVu4k0FbMpmiQ3Zw4vqBXPhZfXjbbRwUdD2iLMTiV7EcBwo6OIP8t0t8Mi9nP/3VUd8lDDGyioiGRwnEQCwihw/PSPywwJ848Md6rMwSEjHy50Z9A2QHFu7XkAWo=
+	t=1730996027; cv=none; b=SQljbLt0+An862TeCkvlfo6z3MpiWgYDJ9FO8Eyhg1BHm6GSKZR+v4T3HecCgR+dERSy/FrIwu2ckXyjb9hdg7OyXjm9rTDNFjJj9lRk2m3i9bOhxkRpwDhyliNEQeXF5BNvMmLdqd3mR4oMzDxArtTvYrwM+Uk2MdqTVtwPg7E=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730995784; c=relaxed/simple;
-	bh=mVcg5Zlmse1S5SWLaXb3eWkRBh4cqZa0Xc/8eY8VLzg=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=T8TaKXjOqu4x3tvrdWwuAqdZIoIJQm3NaPTnXhYLthyFe5P+GDpGUm/dKaiuqoGk/wXRjsGE/x/JsvICY3ngGnaLe+/eN0TpdpiZxteS2LDjkMclHeT9tC9TQghLa5dOQC+ob5c9Ccmm5HJxVxogFWupBX2cZHbk/4ipXqtqsvI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=GyswEzpa; arc=none smtp.client-ip=67.231.148.174
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7DfH1j009809;
-	Thu, 7 Nov 2024 08:09:33 -0800
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	cc:content-type:date:from:in-reply-to:message-id:mime-version
-	:references:subject:to; s=pfpt0220; bh=yVp1qu6FAe8bUfCe0RbPkjfyV
-	LJGl8wEv7NgzvQxUfo=; b=GyswEzpaBiGhVItE9bzIbgMCr7izK879dZkE85y+p
-	R+3uwv/YAHCsaZzX+SZK47Zx6Nr2fcaq+caTASr8sRnh64owHZ9EjKeHVudSAkGr
-	TGBMwb3/1HwAHraASSBU/3Ey5NkmTyxWmPnwfdpEomqFgqDOxvOiLkGKHtjDtz0b
-	GP3NatJNW81LpGCOzYac5o5SjiNrDQyKMGwaA6x2tB2df7RN+L58DLS+haiRsX7t
-	HSDmG0Nt2X5DaOq2t2tTlHn8UKu7Kxg/77mKEN1CbiGdmZSwYoCLOJOz5sDLSiO6
-	tr3j/5dN+cB+575lAg3GatNqHNoIYcehI/CBPr1W9WoeA==
-Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 42rxn5gcdv-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 08:09:33 -0800 (PST)
-Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
- DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 7 Nov 2024 08:09:32 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
- (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 7 Nov 2024 08:09:32 -0800
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 67E433F7050;
-	Thu,  7 Nov 2024 08:09:28 -0800 (PST)
-From: Geetha sowjanya <gakula@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>, <pabeni@redhat.com>,
-        <jiri@resnulli.us>, <edumazet@google.com>, <sgoutham@marvell.com>,
-        <gakula@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>
-Subject: [net-next PATCH v12 12/12] Documentation: octeontx2: Add Documentation for RVU representors
-Date: Thu, 7 Nov 2024 21:38:39 +0530
-Message-ID: <20241107160839.23707-13-gakula@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20241107160839.23707-1-gakula@marvell.com>
-References: <20241107160839.23707-1-gakula@marvell.com>
+	s=arc-20240116; t=1730996027; c=relaxed/simple;
+	bh=2KVewH6gbI7QLh7PVS2aZtluQpiu+xwJYuj2THd+jEs=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version:Content-Type; b=SgqTlqXujj156i9L8rBwuPH1JqbhrXs8EqEFGtcKSiYnKoh9il6az22eY3OGyH2gLJmtThl8OQV4sbrGxh1zapiXB7piqF9e4lA8R15oddI0HES0P+TMYFOgorS6GlGK9h1jPoC/AHVlYtoEREHMuDXPNoLufKuEIubM3YMsEqQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=U0UHJf1F; arc=none smtp.client-ip=198.175.65.13
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730996026; x=1762532026;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=2KVewH6gbI7QLh7PVS2aZtluQpiu+xwJYuj2THd+jEs=;
+  b=U0UHJf1FehyvNyR4baVv3C2xtrQl88Wk828y0eRt1eYlEpIgxf9pJ/yM
+   w+XMQNK29M/45rY/CqnNoDupPQTwqJuix2+O/9tKfHYB7JsoZigysM7/+
+   hY07y82R5DRdq1kMx483lJNMBc+aQ2weHGhvsNoMyfvoc+lDhxO8nF8Xa
+   IPocP1V5SPUfCXJ4fR7yet3fNhb9rSd7acFbU8LpCvHNkX9il5Uz8dgFM
+   qPaUzlwW7owZxPTbBO3yHhqj79wnE649FND7n6/E2EV3+f2Yx1mhlKwZZ
+   BDcEf474hgLbMY/Zgeh02h0h2uIyS1bU76mAi0G82ttGvk0gkj4+plOLO
+   g==;
+X-CSE-ConnectionGUID: mxvHTS4iTk2q69c4t3Uhuw==
+X-CSE-MsgGUID: Q9axvU3rQDuUyTM0Ikh18A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11222"; a="41955674"
+X-IronPort-AV: E=Sophos;i="6.11,199,1725346800"; 
+   d="scan'208";a="41955674"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by orvoesa105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 08:13:45 -0800
+X-CSE-ConnectionGUID: Hskh+WlhRZWk5VW1fdVZYA==
+X-CSE-MsgGUID: zYG0p20DTfOrFToP1OQp0A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,135,1728975600"; 
+   d="scan'208";a="90258131"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by orviesa004.jf.intel.com with ESMTP; 07 Nov 2024 08:13:41 -0800
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	=?UTF-8?q?Toke=20H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Stanislav Fomichev <sdf@fomichev.me>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	nex.sw.ncis.osdt.itp.upstreaming@intel.com,
+	bpf@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v4 00/19] xdp: a fistful of generic changes (+libeth_xdp)
+Date: Thu,  7 Nov 2024 17:10:07 +0100
+Message-ID: <20241107161026.2903044-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: MhKRTfan-QLMpAFyvNjnbsIZmxD7unIy
-X-Proofpoint-ORIG-GUID: MhKRTfan-QLMpAFyvNjnbsIZmxD7unIy
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
 
-Adds documentation for creating and configuring rvu port representors
+XDP for idpf is currently 5 chapters:
+* convert Rx to libeth;
+* convert Tx and stats to libeth;
+* generic XDP and XSk code changes (this);
+* actual XDP for idpf via libeth_xdp;
+* XSk for idpf (^).
 
-Signed-off-by: Geetha sowjanya <gakula@marvell.com>
+Part III does the following:
+* does some cleanups with marking read-only bpf_prog and xdp_buff
+  arguments const for some generic functions;
+* allows attaching already registered XDP memory model to Rxq info;
+* allows mixing pages from several Page Pools within one XDP frame;
+* optimizes &xdp_frame structure and removes no-more-used field;
+* adds generic functions to build skbs from xdp_buffs (regular and
+  XSk) and attach frags to xdp_buffs (regular and XSk);
+* adds helper to optimize XSk xmit in drivers;
+* extends libeth Rx to support XDP requirements (headroom etc.) on Rx;
+* adds libeth_xdp -- libeth module with common XDP and XSk routines.
+
+They are implemented mostly as inlines with inline callback arguments.
+They will be then uninlined in the drivers with sane function sizes,
+but without any indirect calls.
+All those inlines and macros really removes tons of driver code, which
+is mostly the same across the drivers minus HW-specific part. You just
+basically need functions which read Rx descriptors and fill Tx
+descriptors, call a couple macros and that's it. The rest is written
+once in libeth_xdp.
+All exception and cold code are external. Error handling etc, anything
+that don't happen at line rates, are external. Only the hottest things
+are inlined ensuring driver code doesn't bloat for no gain and that
+cold code won't push hot code into more cachelines than wanted.
+
+Note on diffstat: don't be scared, almost 1500 lines are documentation
+explaining everything in details. The actual new code is around 2500.
+
+Alexander Lobakin (18):
+  jump_label: export static_key_slow_{inc,dec}_cpuslocked()
+  skbuff: allow 2-4-argument skb_frag_dma_map()
+  unroll: add generic loop unroll helpers
+  bpf, xdp: constify some bpf_prog * function arguments
+  xdp, xsk: constify read-only arguments of some static inline helpers
+  xdp: allow attaching already registered memory model to xdp_rxq_info
+  page_pool: make page_pool_put_page_bulk() actually handle array of
+    pages
+  page_pool: allow mixing PPs within one bulk
+  xdp: get rid of xdp_frame::mem.id
+  xdp: add generic xdp_buff_add_frag()
+  xdp: add generic xdp_build_skb_from_buff()
+  xsk: align &xdp_buff_xsk harder
+  xsk: allow attaching XSk pool via xdp_rxq_info_reg_mem_model()
+  xsk: make xsk_buff_add_frag really add a frag via
+    __xdp_buff_add_frag()
+  xsk: add generic XSk &xdp_buff -> skb conversion
+  xsk: add helper to get &xdp_desc's DMA and meta pointer in one go
+  libeth: support native XDP and register memory model
+  libeth: add a couple of XDP helpers (libeth_xdp)
+
+Toke Høiland-Jørgensen (1):
+  xdp: register system page pool as an XDP memory model
+
+ drivers/net/ethernet/intel/libeth/Kconfig     |    6 +
+ drivers/net/ethernet/intel/libeth/Makefile    |    6 +
+ include/net/libeth/types.h                    |  102 +-
+ include/net/page_pool/types.h                 |    6 +-
+ drivers/net/ethernet/intel/libeth/priv.h      |   37 +
+ include/linux/bpf.h                           |   12 +-
+ include/linux/filter.h                        |    9 +-
+ include/linux/netdevice.h                     |    7 +-
+ include/linux/skbuff.h                        |   49 +-
+ include/linux/unroll.h                        |   43 +
+ include/net/libeth/rx.h                       |    6 +-
+ include/net/libeth/tx.h                       |   34 +-
+ include/net/libeth/xdp.h                      | 1864 +++++++++++++++++
+ include/net/libeth/xsk.h                      |  684 ++++++
+ include/net/xdp.h                             |  185 +-
+ include/net/xdp_sock_drv.h                    |   52 +-
+ include/net/xsk_buff_pool.h                   |   12 +-
+ .../net/ethernet/freescale/dpaa/dpaa_eth.c    |    2 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c    |   30 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |   32 +-
+ drivers/net/ethernet/intel/libeth/rx.c        |   22 +-
+ drivers/net/ethernet/intel/libeth/tx.c        |   39 +
+ drivers/net/ethernet/intel/libeth/xdp.c       |  444 ++++
+ drivers/net/ethernet/intel/libeth/xsk.c       |  264 +++
+ drivers/net/veth.c                            |    4 +-
+ kernel/bpf/cpumap.c                           |    2 +-
+ kernel/bpf/devmap.c                           |    8 +-
+ kernel/jump_label.c                           |    2 +
+ net/bpf/test_run.c                            |    4 +-
+ net/core/dev.c                                |   20 +-
+ net/core/filter.c                             |   41 +-
+ net/core/page_pool.c                          |   60 +-
+ net/core/skbuff.c                             |    2 +-
+ net/core/xdp.c                                |  311 ++-
+ net/xdp/xsk_buff_pool.c                       |   40 +
+ 35 files changed, 4220 insertions(+), 221 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libeth/priv.h
+ create mode 100644 include/net/libeth/xdp.h
+ create mode 100644 include/net/libeth/xsk.h
+ create mode 100644 drivers/net/ethernet/intel/libeth/tx.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xdp.c
+ create mode 100644 drivers/net/ethernet/intel/libeth/xsk.c
+
 ---
- .../ethernet/marvell/octeontx2.rst            | 91 +++++++++++++++++++
- 1 file changed, 91 insertions(+)
+From v3[0]:
+* rebase on top of the latest net-next to solve conflict (Jakub);
+* 09: use iterative approach instead of recursive to not blow the stack
+  (Toke);
+* 12: rephrase the commitmsg since the functionality changed, so that
+  it's not actual anymore (Toke);
+* align &xdp_buff_xsk a bit harder since its alignment degraded
+  recently;
+* pick RBs from Toke.
 
-diff --git a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-index 1e196cb9ce25..af7db0e91f6b 100644
---- a/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-+++ b/Documentation/networking/device_drivers/ethernet/marvell/octeontx2.rst
-@@ -14,6 +14,7 @@ Contents
- - `Basic packet flow`_
- - `Devlink health reporters`_
- - `Quality of service`_
-+- `RVU representors`_
- 
- Overview
- ========
-@@ -340,3 +341,93 @@ Setup HTB offload
-         # tc class add dev <interface> parent 1: classid 1:2 htb rate 10Gbit prio 2 quantum 188416
- 
-         # tc class add dev <interface> parent 1: classid 1:3 htb rate 10Gbit prio 2 quantum 32768
-+
-+
-+RVU Representors
-+================
-+
-+RVU representor driver adds support for creation of representor devices for
-+RVU PFs' VFs in the system. Representor devices are created when user enables
-+the switchdev mode.
-+Switchdev mode can be enabled either before or after setting up SRIOV numVFs.
-+All representor devices share a single NIXLF but each has a dedicated Rx/Tx
-+queues. RVU PF representor driver registers a separate netdev for each
-+Rx/Tx queue pair.
-+
-+Current HW does not support built-in switch which can do L2 learning and
-+forwarding packets between representee and representor. Hence, packet path
-+between representee and it's representor is achieved by setting up appropriate
-+NPC MCAM filters.
-+Transmit packets matching these filters will be loopbacked through hardware
-+loopback channel/interface (i.e, instead of sending them out of MAC interface).
-+Which will again match the installed filters and will be forwarded.
-+This way representee => representor and representor => representee packet
-+path is achieved. These rules get installed when representors are created
-+and gets active/deactivate based on the representor/representee interface state.
-+
-+Usage example:
-+
-+ - Change device to switchdev mode::
-+
-+	# devlink dev eswitch set pci/0002:1c:00.0 mode switchdev
-+
-+ - List of representor devices on the system::
-+
-+	# ip link show
-+	Rpf1vf0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether f6:43:83:ee:26:21 brd ff:ff:ff:ff:ff:ff
-+	Rpf1vf1: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether 12:b2:54:0e:24:54 brd ff:ff:ff:ff:ff:ff
-+	Rpf1vf2: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether 4a:12:c4:4c:32:62 brd ff:ff:ff:ff:ff:ff
-+	Rpf1vf3: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether ca:cb:68:0e:e2:6e brd ff:ff:ff:ff:ff:ff
-+	Rpf2vf0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc pfifo_fast state DOWN mode DEFAULT group default qlen 1000 link/ether 06:cc:ad:b4:f0:93 brd ff:ff:ff:ff:ff:ff
-+
-+
-+To delete the representors devices from the system. Change the device to legacy mode.
-+
-+ - Change device to legacy mode::
-+
-+	# devlink dev eswitch set pci/0002:1c:00.0 mode legacy
-+
-+RVU representors can be managed using devlink ports
-+(see :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>`) interface.
-+
-+ - Show devlink ports of representors::
-+
-+	# devlink port
-+	pci/0002:1c:00.0/0: type eth netdev Rpf1vf0 flavour physical port 0 splittable false
-+	pci/0002:1c:00.0/1: type eth netdev Rpf1vf1 flavour pcivf controller 0 pfnum 1 vfnum 1 external false splittable false
-+	pci/0002:1c:00.0/2: type eth netdev Rpf1vf2 flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
-+	pci/0002:1c:00.0/3: type eth netdev Rpf1vf3 flavour pcivf controller 0 pfnum 1 vfnum 3 external false splittable false
-+
-+Function attributes
-+===================
-+
-+The RVU representor support function attributes for representors.
-+Port function configuration of the representors are supported through devlink eswitch port.
-+
-+MAC address setup
-+-----------------
-+
-+RVU representor driver support devlink port function attr mechanism to setup MAC
-+address. (refer to Documentation/networking/devlink/devlink-port.rst)
-+
-+ - To setup MAC address for port 2::
-+
-+	# devlink port function set pci/0002:1c:00.0/2 hw_addr 5c:a1:1b:5e:43:11
-+	# devlink port show pci/0002:1c:00.0/2
-+	pci/0002:1c:00.0/2: type eth netdev Rpf1vf2 flavour pcivf controller 0 pfnum 1 vfnum 2 external false splittable false
-+	function:
-+		hw_addr 5c:a1:1b:5e:43:11
-+
-+
-+TC offload
-+==========
-+
-+The rvu representor driver implements support for offloading tc rules using port representors.
-+
-+ - Drop packets with vlan id 3::
-+
-+	# tc filter add dev Rpf1vf0 protocol 802.1Q parent ffff: flower vlan_id 3 vlan_ethtype ipv4 skip_sw action drop
-+
-+ - Redirect packets with vlan id 5 and IPv4 packets to eth1, after stripping vlan header.::
-+
-+	# tc filter add dev Rpf1vf0 ingress protocol 802.1Q flower vlan_id 5 vlan_ethtype ipv4 skip_sw action vlan pop action mirred ingress redirect dev eth1
+From v2[1]:
+* cover: rename the series;
+* collect RBs and Acks from Maciej;
+* 007: reword the commitmsg;
+* 011: fix typos in the commitmsg (M);
+* 012: 'ts' -> 'tsize' (M; not 'truesize' to fit into 80 cols =\);
+* 016: fix the intro sentence (M);
+* no functional changes.
+
+From v1[2]:
+* rebase on top of the latest net-next;
+* no other changes.
+
+[0] https://lore.kernel.org/netdev/20241030165201.442301-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20241015145350.4077765-1-aleksander.lobakin@intel.com
+[2] https://lore.kernel.org/netdev/20241009152756.3113697-1-aleksander.lobakin@intel.com
 -- 
-2.25.1
+2.47.0
 
 
