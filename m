@@ -1,185 +1,197 @@
-Return-Path: <netdev+bounces-143066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5323E9C10A1
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:10:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB3BB9C10A7
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 22:10:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B32E1B21A51
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:10:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE0261C22AA2
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 21:10:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7144218319;
-	Thu,  7 Nov 2024 21:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC7A21859A;
+	Thu,  7 Nov 2024 21:03:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="ZyY1mETy"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="F4ZgETcx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f180.google.com (mail-pf1-f180.google.com [209.85.210.180])
+Received: from mail-yb1-f201.google.com (mail-yb1-f201.google.com [209.85.219.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49EA821892D
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 21:01:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E6A021791B
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 21:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731013311; cv=none; b=PCjaPdKiZchtXgURtylEf6ObcDUc54U6XhLOLUTRApu/YsxvF92EVn8IKcqrysTrvGRn/0/afrjRvo5jkYIpznzx3vXCWEGHh2EOXnFrDLiFRMT8WN3PrKgQPnRH7wuRvYTuEYsyYNEBsfASku6V4Wj+fsPE4+Q3vFNqvDPAsSU=
+	t=1731013422; cv=none; b=Wxw06DLtBOYvJHhqD3uv6uqU+gvgwrLk3js0Pqwn45WmzHf6aP0h0bmi4FW8ici6m3sHTviT2KT+3mnrnfPfJUkQaz4NfiGmsuZcXAHPCP0PfDuBsIlrRiXP91U7Q6GuAgIuMGlUnPZJGKxINWhLvCwzuRL8Xq/3P5MUDTwA0UE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731013311; c=relaxed/simple;
-	bh=9wRZoynUPM8fbLnLwOFiidjK1OGLqeKZSr/aHXazfQE=;
-	h=Date:From:To:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=SrOJVQnEjsDdNRfF0e2ASDvA1uGqZCwpeYw/Ktqx+PxWBp/HCNsm1oA6LGb35ay21v0EZL5NaE6Mt3hKl5ipk6gPGL56PYl1fhPbmzXHgOCGaWVpmj+GNPqAE+jI/7CVHCbx2tO7siQ0Tn56ScTQDurzyl+Kzjigt/X4PCzoNGk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=ZyY1mETy; arc=none smtp.client-ip=209.85.210.180
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f180.google.com with SMTP id d2e1a72fcca58-7205b6f51f3so1130972b3a.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 13:01:50 -0800 (PST)
+	s=arc-20240116; t=1731013422; c=relaxed/simple;
+	bh=civGn8AOLnkkItaTkVumLX3t2LIKqYvKfLEoz3kM/bU=;
+	h=Date:Mime-Version:Message-ID:Subject:From:To:Cc:Content-Type; b=szw6kMDVPQpJTic7E6Ez8DOiH+Nqyp3BXH9iyr6uDxzANsAkAWBuLvhlETemKaxZrx8FZ5W6Odtq+YeWdXpoqDZz21dpkqP1fQ27SBlD8j/zRm3K+5YJvKD/FxZSjYy9fpm61gep0fW0tmG6KcksFWJiJ3scWGeKbcayHsQrQl4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=F4ZgETcx; arc=none smtp.client-ip=209.85.219.201
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=flex--almasrymina.bounces.google.com
+Received: by mail-yb1-f201.google.com with SMTP id 3f1490d57ef6-e3313b47a95so2800179276.3
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 13:03:40 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1731013310; x=1731618110; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:from:to:cc:subject
+        d=google.com; s=20230601; t=1731013419; x=1731618219; darn=vger.kernel.org;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=jmSPwuvTvOYzYpkGsMG6lCTXPjS3Aw5E8puDPwXdxe4=;
-        b=ZyY1mETyjAvxJqiL2suDB65VSZqUEJP43qk9fGDJtFt2ycYR24rsxpK4p0L7+wUPSN
-         T3gRHD7J/8tSpVh27v7GtzOi6S0ceu3e5hInwDwxUqeHec4JEhXteAZaJzqpzdgLh1q6
-         qdqwu84abTKy9a/QxvaRr7no5RLqiK9zgrJ9M=
+        bh=5SJO6M4C9QFKKYkluqAfeLLMUm8DSpI0xGxHzKk7nR8=;
+        b=F4ZgETcxbSNaAfR7TLLlsCu7Vlz0Y8YRoP8niWAtNa/Y9u0Z5kiUoJ0s1dGst8RWxW
+         GjyyPCoEH1sSXRlw+COiQq/lqolqNyBIqZVX9tZF6GOr1OATvy6vdKp84B8cr1Pn9xrG
+         dRMXO3WSb4/laZM1Db0LNBwcE+NNPgCHwxCe48F92PEFZmZbmoAL2zqruJioWMp6pOgl
+         NO9TIsFAe7TsJ0Vcny4xhc3efVn82biUST0KJ/5fFtf8VHwY0Lu/Rk9Wrk/QOY9Tdb83
+         a8s5SAURyNaTcCd19NiqpsHvEI2uaCIt5ItSu/nyX70WIpIna+KxBwMhPk/sz++p4MHA
+         WcRw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731013310; x=1731618110;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:to:from:date:x-gm-message-state
+        d=1e100.net; s=20230601; t=1731013419; x=1731618219;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=jmSPwuvTvOYzYpkGsMG6lCTXPjS3Aw5E8puDPwXdxe4=;
-        b=nrUtGGnBj6//epK4qsC8/LMV0WMLWIWCn2lvq4SbWhowfrR/8OF7hg3wxOVZiNJZ8z
-         TQTeZPFCkIkNw0IrzCpJo7GH+uPjp6X1vnO867CRi/GAQ8w+6p+FT0qDvSVi83O8TQaH
-         FU7hWzgJqK/FVF8S09e1CSAknAL4vkAeq85h5VWiZGxXkMYRnqu8+wgUq7f1QFJx67PH
-         nA7asVWGczepfw4El3gbNdGhEi0cHszHiyvEk1W1Y0GnEz3Pon883GPlVMUsztZFALJ1
-         OEpwPYIudyBMvKr5BygRFa625wnpvdzXLlgsha22xmHsyfU3oInz534QWXZ+zmwQiAGF
-         rFvQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXpoFpkb3QKuPS/UNtV03BCB5O2HiQ1KNGaeUTpHC6a/Cl4wwbN9MTC6f4GTJcQKzD1s7r4lBE=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxGywZYZOuEHRrRmAMvWXvOq8+anIwqO8RrEQjrO9XkZaW/nTpi
-	2+nWGA11z2GdwXD1R1P2w/qV0huE+SHDjZCDGaqFRRv7b2HXVZs3/EJg29elIFU=
-X-Google-Smtp-Source: AGHT+IFMJshTG+iNZPsDMxuBGA6V144RXjcvM6NG6XOh9e0fnJCFlEIWwnL5FovwLiBSEfeP4EJpYg==
-X-Received: by 2002:a05:6a00:1744:b0:71d:f64d:ec60 with SMTP id d2e1a72fcca58-72413297242mr794945b3a.7.1731013309637;
-        Thu, 07 Nov 2024 13:01:49 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078646d2sm2132410b3a.16.2024.11.07.13.01.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 13:01:49 -0800 (PST)
-Date: Thu, 7 Nov 2024 13:01:45 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	corbet@lwn.net, hdanton@sina.com, bagasdotme@gmail.com,
-	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v6 2/7] net: Suspend softirq when
- prefer_busy_poll is set
-Message-ID: <Zy0quVx01Q02fRQw@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	corbet@lwn.net, hdanton@sina.com, bagasdotme@gmail.com,
-	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241104215542.215919-1-jdamato@fastly.com>
- <20241104215542.215919-3-jdamato@fastly.com>
- <20241105210338.5364375d@kernel.org>
- <ZyuesOyJLI3U0C5e@LQ3V64L9R2>
- <20241106153100.45fbe646@kernel.org>
- <Zywy8PQDljS5r_rX@LQ3V64L9R2>
+        bh=5SJO6M4C9QFKKYkluqAfeLLMUm8DSpI0xGxHzKk7nR8=;
+        b=DPuYKLvV/o/1wYJ+V0nWQ9GXg978gMQujLUFiKTFUlp+mbF1CvWKVfnp/s9H+K4/GY
+         yKONZw6fA4L4pmeWt0q6UfoD/CW/lQTcdwB4aovG6Lp+YXbIoYVRl/FMGVADTE/1VVhX
+         UNLxwhGqULNrnvyjDUSvENAoX7RbAXYj4dvWrDGdln3jTxQEZnzL4lDIwQcv54X8RsiH
+         9Y+zn04uv+Q50bNTuP68tIQQCH5qFKief1QP725tLYTDbIRvxgbt9N4Z4mwNaaIAUnqC
+         unj1aYGfcTt6ll8bIaLhqViqvCs5kgwfOlMpCLrVXKF0OBs4Bojk38RDLLVwpm6o6noz
+         J9PA==
+X-Gm-Message-State: AOJu0Yxc0s2q9mqlDWa8VlgqFzx52NcEZY2tobC7JU63orkKrAfO3ugv
+	TcuLJzgG/e22HobZVvbIdPZiRm4wRl2NNrKBmmuFhkQXX4n2Y3+Wx7aEhdmP0acLFDwE6CsC+Bd
+	Abv4LbbpsYn11qfmK+l1FL9OS0mnXeXjYyxqFuzX9JfG8MYpmvNyPt0L7BmtpZ3gDKz39haOGHS
+	jpvnKq6wuxOZCyQF9/8x20Ss8q5CbBugGWqMoo818g72xdcWFnBUXTKNLimPs=
+X-Google-Smtp-Source: AGHT+IHjwx7sH6wFSQU3Jtjhv7wdoD0ysl51bSGbhAjx0kaPpMRTbmj2GudU/nj89S1B95sa7RR3EZifPgYc9aTqMQ==
+X-Received: from almasrymina.c.googlers.com ([fda3:e722:ac3:cc00:20:ed76:c0a8:4bc5])
+ (user=almasrymina job=sendgmr) by 2002:a25:bc84:0:b0:e2b:d0e9:1cdc with SMTP
+ id 3f1490d57ef6-e337f908f8dmr505276.10.1731013418661; Thu, 07 Nov 2024
+ 13:03:38 -0800 (PST)
+Date: Thu,  7 Nov 2024 21:03:30 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zywy8PQDljS5r_rX@LQ3V64L9R2>
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.47.0.277.g8800431eea-goog
+Message-ID: <20241107210331.3044434-1-almasrymina@google.com>
+Subject: [PATCH net v2 1/2] net: fix SO_DEVMEM_DONTNEED looping too long
+From: Mina Almasry <almasrymina@google.com>
+To: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	"David S. Miller" <davem@davemloft.net>, Mina Almasry <almasrymina@google.com>, linux-doc@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jonathan Corbet <corbet@lwn.net>, Yi Lai <yi1.lai@linux.intel.com>, 
+	Stanislav Fomichev <sdf@fomichev.me>
+Content-Type: text/plain; charset="UTF-8"
 
-On Wed, Nov 06, 2024 at 07:24:32PM -0800, Joe Damato wrote:
-> On Wed, Nov 06, 2024 at 03:31:00PM -0800, Jakub Kicinski wrote:
-> > On Wed, 6 Nov 2024 08:52:00 -0800 Joe Damato wrote:
-> > > On Tue, Nov 05, 2024 at 09:03:38PM -0800, Jakub Kicinski wrote:
-> > > > On Mon,  4 Nov 2024 21:55:26 +0000 Joe Damato wrote:  
+Exit early if we're freeing more than 1024 frags, to prevent
+looping too long.
 
-[...]
+Also minor code cleanups:
+- Flip checks to reduce indentation.
+- Use sizeof(*tokens) everywhere for consistentcy.
 
-> > 0 epoll
-> > 1   # ..does its magic..
-> > 2   __napi_busy_loop() 
-> > 3     # finds a waking packet
-> > 4     busy_poll_stop()
-> > 5       # arms the timer for long suspend
-> > 6   # epoll sees events
-> > 7     ep_suspend_napi_irqs()
-> > 8       napi_suspend_irqs()
-> > 9         # arms for long timer again
-> > 
-> > The timer we arm here only has to survive from line 5 to line 9,
-> > because we will override the timeout on line 9.
-> 
-> Yes, you are right. Thanks for highlighting and catching this.
-> 
-> > > The overall point to make is that: the suspend timer is used to
-> > > prevent misbehaving userland applications from taking too long. It's
-> > > essentially a backstop and, as long as the app is making forward
-> > > progress, allows the app to continue running its busy poll loop
-> > > undisturbed (via napi_complete_done preventing the driver from
-> > > enabling IRQs).
-> > > 
-> > > Does that make sense?
-> > 
-> > My mental model put in yet another way is that only epoll knows if it
-> > has events, and therefore whether the timeout should be short or long.
-> > So the suspend timer should only be applied by epoll.
-> 
-> Here's what we are thinking, can you let me know if you agree with
-> this?
-> 
->   - We can drop patch 2 entirely
->   - Update the documentation about IRQ suspension as needed now
->     that patch 2 has been dropped
->   - Leave the rest of the series as is
->   - Re-run our tests to gather sufficient data for the test cases
->     outlined in the cover letter to ensure that the performance
->     numbers hold over several iterations
-> 
-> Does that seem reasonable for the v7 to you?
-> 
-> I am asking because generating the amount of data over the number of
-> scenarios we are testing takes a long time and I want to make sure
-> we are as aligned as we can be before I kick off another run :)
+Cc: Yi Lai <yi1.lai@linux.intel.com>
+Cc: Stanislav Fomichev <sdf@fomichev.me>
+Signed-off-by: Mina Almasry <almasrymina@google.com>
 
-I just noticed this was marked "changes requested". I re-ran the
-tests overnight and have the data to confirm results are the same
-even after dropping patch 2, which simplifies the code and removes
-the double arming of the timer.
+---
 
-I wasn't sure if you were asking for other changes other than
-dropping patch 2, but since I have the data I'm going to proceed as
-specified in my previous email above:
-  - Drop patch 2
-  - Update cover letter with new data
-  - Send that as v7
+v2:
+- Retain token check to prevent allocation of too much memory.
+- Exit early instead of pre-checking in a loop so that we don't penalize
+  well behaved applications (sdf)
 
-Unless you'd like me to hold off for some reason? Or if there was
-some other feedback I need to address that I am missing?
+---
+ net/core/sock.c | 42 ++++++++++++++++++++++++------------------
+ 1 file changed, 24 insertions(+), 18 deletions(-)
+
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 039be95c40cf..da50df485090 100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -1052,32 +1052,34 @@ static int sock_reserve_memory(struct sock *sk, int bytes)
+ 
+ #ifdef CONFIG_PAGE_POOL
+ 
+-/* This is the number of tokens that the user can SO_DEVMEM_DONTNEED in
+- * 1 syscall. The limit exists to limit the amount of memory the kernel
+- * allocates to copy these tokens.
++/* This is the number of tokens and frags that the user can SO_DEVMEM_DONTNEED
++ * in 1 syscall. The limit exists to limit the amount of memory the kernel
++ * allocates to copy these tokens, and to prevent looping over the frags for
++ * too long.
+  */
+ #define MAX_DONTNEED_TOKENS 128
++#define MAX_DONTNEED_FRAGS 1024
+ 
+ static noinline_for_stack int
+ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ {
+ 	unsigned int num_tokens, i, j, k, netmem_num = 0;
+ 	struct dmabuf_token *tokens;
++	int ret = 0, num_frags = 0;
+ 	netmem_ref netmems[16];
+-	int ret = 0;
+ 
+ 	if (!sk_is_tcp(sk))
+ 		return -EBADF;
+ 
+-	if (optlen % sizeof(struct dmabuf_token) ||
++	if (optlen % sizeof(*tokens) ||
+ 	    optlen > sizeof(*tokens) * MAX_DONTNEED_TOKENS)
+ 		return -EINVAL;
+ 
+-	tokens = kvmalloc_array(optlen, sizeof(*tokens), GFP_KERNEL);
++	num_tokens = optlen / sizeof(*tokens);
++	tokens = kvmalloc_array(num_tokens, sizeof(*tokens), GFP_KERNEL);
+ 	if (!tokens)
+ 		return -ENOMEM;
+ 
+-	num_tokens = optlen / sizeof(struct dmabuf_token);
+ 	if (copy_from_sockptr(tokens, optval, optlen)) {
+ 		kvfree(tokens);
+ 		return -EFAULT;
+@@ -1086,24 +1088,28 @@ sock_devmem_dontneed(struct sock *sk, sockptr_t optval, unsigned int optlen)
+ 	xa_lock_bh(&sk->sk_user_frags);
+ 	for (i = 0; i < num_tokens; i++) {
+ 		for (j = 0; j < tokens[i].token_count; j++) {
++			if (++num_frags > MAX_DONTNEED_FRAGS)
++				goto frag_limit_reached;
++
+ 			netmem_ref netmem = (__force netmem_ref)__xa_erase(
+ 				&sk->sk_user_frags, tokens[i].token_start + j);
+ 
+-			if (netmem &&
+-			    !WARN_ON_ONCE(!netmem_is_net_iov(netmem))) {
+-				netmems[netmem_num++] = netmem;
+-				if (netmem_num == ARRAY_SIZE(netmems)) {
+-					xa_unlock_bh(&sk->sk_user_frags);
+-					for (k = 0; k < netmem_num; k++)
+-						WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+-					netmem_num = 0;
+-					xa_lock_bh(&sk->sk_user_frags);
+-				}
+-				ret++;
++			if (!netmem || WARN_ON_ONCE(!netmem_is_net_iov(netmem)))
++				continue;
++
++			netmems[netmem_num++] = netmem;
++			if (netmem_num == ARRAY_SIZE(netmems)) {
++				xa_unlock_bh(&sk->sk_user_frags);
++				for (k = 0; k < netmem_num; k++)
++					WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
++				netmem_num = 0;
++				xa_lock_bh(&sk->sk_user_frags);
+ 			}
++			ret++;
+ 		}
+ 	}
+ 
++frag_limit_reached:
+ 	xa_unlock_bh(&sk->sk_user_frags);
+ 	for (k = 0; k < netmem_num; k++)
+ 		WARN_ON_ONCE(!napi_pp_put_page(netmems[k]));
+-- 
+2.47.0.277.g8800431eea-goog
+
 
