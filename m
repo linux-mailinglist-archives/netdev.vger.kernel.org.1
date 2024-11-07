@@ -1,220 +1,343 @@
-Return-Path: <netdev+bounces-142634-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EDF819BFCE6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:16:46 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A359D9BFCF3
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 04:24:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD20D281DCC
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:16:45 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 3446D1F22AE8
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:24:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88C4C1119A;
-	Thu,  7 Nov 2024 03:16:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28A8F78C6D;
+	Thu,  7 Nov 2024 03:24:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="a9WhlYKC"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="lpe2Uvtw"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f177.google.com (mail-il1-f177.google.com [209.85.166.177])
+Received: from mail-pj1-f41.google.com (mail-pj1-f41.google.com [209.85.216.41])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD2F736D
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 03:16:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.177
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 472A718E25
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 03:24:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730949403; cv=none; b=k3iLbLtphscCFv7wCWYNVQHRc+MNt03WHI2eM+WnrhITp43nMPdT1GOfrPuKfWTXCSkxcUOAd1+Z5yQcyJ+AqI2jI5KvJT8q2bhdNzXLZmHMmsxeK8liax6f8kzDAH4iL4FN+zODp4TDQqWL0klytMv0OXsJAzI+S5bPxKJ3zjU=
+	t=1730949880; cv=none; b=pG5tJD+yJFCfOjQQbYMhXQJlMJx65ahw9HwVy3UkOMr1oq35uN4Tb7MgcrStV3BPVHi8ykt5m3lVqAKZO+Tj+HUnxPb8cykF6mNbGtkCYcrZzLZd1ZGk+qiqvwbmzzxwG7LCDmqCEd9ixV6NjLuKzaWgmjXcx9fqzNjKaSTGwB8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730949403; c=relaxed/simple;
-	bh=Ykb4jUv44f+R6MN9HsZPTDNmGCQMWcnx2WmgI1buPbs=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=O5kz3CfyauTHOZHlk8ZMj05jGpYDfs6ST6XkCZ/PIRrJF4WOJG8DgNzcfcQjQFGy6bFduOVRVFnAUTeTmQPhWCpRXCjebEhTeBe17cqcfQqJZeZV3Ae5eoGQYCzK2qKh/hnhpOL5wsm7dQSkJdgsZtFzJsQ1W41WJz/CSfLuos0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=a9WhlYKC; arc=none smtp.client-ip=209.85.166.177
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-il1-f177.google.com with SMTP id e9e14a558f8ab-3a6c1cfcb91so2215605ab.0
-        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 19:16:41 -0800 (PST)
+	s=arc-20240116; t=1730949880; c=relaxed/simple;
+	bh=5LvJBHy1IjoGH1Q1S9hwUlDnCoNksFoXGeklM7/w/h4=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=bAgVAgF8Lc4ul1WpqKzcunzkPavhtACkjivglbXNbSu9iwSyYi9ObeorNAlPoEWtuTOYWJ8DZcI/JrMJftSthwKMUSgoN0xc+qYTKGOh166HaoI0W/xh2IKbyCW5nVduvGOdk9LJ1X1c9w7Eiw+BGGOR2Apc1V3FCI6Y63JXbjc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=lpe2Uvtw; arc=none smtp.client-ip=209.85.216.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pj1-f41.google.com with SMTP id 98e67ed59e1d1-2e31af47681so392756a91.2
+        for <netdev@vger.kernel.org>; Wed, 06 Nov 2024 19:24:38 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1730949401; x=1731554201; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aT5UyjjBCr2mcwbLMixn2ZQvNwv9VyDO5LZLAEbEVF8=;
-        b=a9WhlYKCsyciH/E5bxV9fhuejh3F3B2YwyAHZ6H5yenIE0otN5Gy76MXxFVhk1cvKY
-         rkkFCW9zeA8EDfn5SJreklcV9+6sT408Jci1/0/v11ZX2uc2bVQVQItU/7VPHRHkulYA
-         2fr611tUIVXs14p5ljEiiKxMUdGj/cI3zDS/5OIun5GCY7rybFyyGfW4BFU7Q1486JKY
-         F/mexrhsuJLZ28zyNeVSS2yk9MZIfkhwux115eoHO6VQZ6cFd3M4NIJKruubwvTStjGo
-         /iEiA709KuoLd9fwCCCLkhWByMYcLockBD6L2AkE7VwVvnU7Qzkydw0RosHiBI15i4xB
-         lLkA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730949401; x=1731554201;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+        d=fastly.com; s=google; t=1730949878; x=1731554678; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=aT5UyjjBCr2mcwbLMixn2ZQvNwv9VyDO5LZLAEbEVF8=;
-        b=okJ67kJhW4jJZl9D/HfowvRdcJ5fo9KMmMiXSojixjOPC7Tra/LI5XiOwAgAN0ffHc
-         dRbkhb32Wwc4+6zulrB90uApap6lNu/i17XOlKnFKXuJe9xOl2F2JZvn/cdjXemF8vPF
-         fPNDN+p+iCbvgCAZOhi+IjywX572XNuKZyOFjYWqFcISX492nJ3d2q3O/KPpXAy2W/Fl
-         Tv115pLX0EZ0+tXnh4WsMsvNRPVeOkfanCre1lP2AyeJzkHr6t8ncTkSawEgRZLejIg0
-         VKMKNFlKDMnKg3GeV3qhY6V7dCxr+C38BgjwXvpUBK3TOsEqUKC5u93ziomzxxgGqa74
-         zDMg==
-X-Gm-Message-State: AOJu0Yzmcvo9ie1Ipi7kwPbjZYm8B+iVHB+0U6Lt/QZD9z5TXcKaqIy1
-	am7m46Bt9Xjc8RIm6+uatujxvvgujt658KGEdE5h2A950ZCo7E+alPSYT0TgrEGd5Fh3H1vNhGA
-	EuLzSqtIac41nbtEAND9BFjjzfFfXU4IJ
-X-Google-Smtp-Source: AGHT+IGyhjy8yQSkIuZEhAXdEovoFowbze3UQqAndK1JpKZxXDp4mAwsyrHLWiC2FQqAjAk9MqVVsNtigMwOEwhEZQQ=
-X-Received: by 2002:a05:6e02:1a4a:b0:3a0:5642:c78 with SMTP id
- e9e14a558f8ab-3a6eb25585emr5149595ab.15.1730949400773; Wed, 06 Nov 2024
- 19:16:40 -0800 (PST)
+        bh=02OLQ9buslZ+/5j/tvhqeNeu0y+vKi9is2pBdh5g8cQ=;
+        b=lpe2Uvtwf4QAWlKfOIJfHDVevOmyt+7zBfGtNMwwxmcTVS4uQFmkn9h0P1smo7n6Im
+         bIHGx7ZDv1T+Izi4gppV+0dNxHnJymH1rAsMqrS1gF9EFjcCNaLGZAFAAM+qu7P0ai/s
+         yGwlTAUf8eMCI3PQEZGaI+zh3v4N/zCbsr1RY=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730949878; x=1731554678;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=02OLQ9buslZ+/5j/tvhqeNeu0y+vKi9is2pBdh5g8cQ=;
+        b=GUTIlEJARUijtR7VlDchNMpjy4mJWnnN/M9sEL5IUf7P5ROeUzvGF6/6a6rEhTyc8i
+         EKJ8kMFjcBbug1zzFvAyZtRIRU2Fekl3Uizj9PfdgU/hRxZxSbTlD/dbeSZiSc2vKE2a
+         RdQ/9077/mqJYgk6Luf+uzaqCitPNyUCngIrJf2y3NBwu5Rr41+7J/lteWB/cvJWe1Cz
+         qP6+00sqZFkQ/jKP2EkPQiHMjm5Qwvz8Nw76awsgrEHK2dD9HCA4Ln+GnwVpIPlPKSk3
+         i7C6h87y3YE6vzyZLkMdiwzMjqN4o7RY2truXmYbtHmq+idD4OI05J2grWjWdiclTl69
+         87QQ==
+X-Gm-Message-State: AOJu0YzfHMXftqSg5oYujvREcjV9ae3OJsgaOwRq0SxuOlIxZaq6d9aX
+	96LykZtwGxpuptDViKjwF1LFhfBNg4OO+IpW142727FNZg40nU/lLH3GDkRDGSE=
+X-Google-Smtp-Source: AGHT+IEf44o2XVLBvLYU0plZyPHGNow5aemrgjErbXpZzq7sSmWHMjHj0H5PvDyJStwFZ/t7LEuB9A==
+X-Received: by 2002:a17:90b:1a8c:b0:2e2:e8fc:e0dd with SMTP id 98e67ed59e1d1-2e9a766f188mr387997a91.35.1730949877578;
+        Wed, 06 Nov 2024 19:24:37 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e9a5f52b32sm345178a91.5.2024.11.06.19.24.33
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 06 Nov 2024 19:24:35 -0800 (PST)
+Date: Wed, 6 Nov 2024 19:24:32 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
+	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, willemdebruijn.kernel@gmail.com,
+	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next v6 2/7] net: Suspend softirq when
+ prefer_busy_poll is set
+Message-ID: <Zywy8PQDljS5r_rX@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	corbet@lwn.net, hdanton@sina.com, bagasdotme@gmail.com,
+	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
+	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
+	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
+	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
+	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
+	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
+	Lorenzo Bianconi <lorenzo@kernel.org>,
+	Alexander Lobakin <aleksander.lobakin@intel.com>,
+	open list <linux-kernel@vger.kernel.org>
+References: <20241104215542.215919-1-jdamato@fastly.com>
+ <20241104215542.215919-3-jdamato@fastly.com>
+ <20241105210338.5364375d@kernel.org>
+ <ZyuesOyJLI3U0C5e@LQ3V64L9R2>
+ <20241106153100.45fbe646@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241105025511.42652-1-kerneljasonxing@gmail.com>
-In-Reply-To: <20241105025511.42652-1-kerneljasonxing@gmail.com>
-From: Jason Xing <kerneljasonxing@gmail.com>
-Date: Thu, 7 Nov 2024 11:16:04 +0800
-Message-ID: <CAL+tcoB9a7eKzU9sz8AaY0sqeKn9fkK9ejDJkfh9EpdcG17k-w@mail.gmail.com>
-Subject: Re: [PATCH net-next] tcp: avoid RST in 3-way shakehands due to
- failure in tcp_timewait_state_process
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, dsahern@kernel.org, horms@kernel.org
-Cc: netdev@vger.kernel.org, Jason Xing <kernelxing@tencent.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106153100.45fbe646@kernel.org>
 
-Hello Eric,
+On Wed, Nov 06, 2024 at 03:31:00PM -0800, Jakub Kicinski wrote:
+> On Wed, 6 Nov 2024 08:52:00 -0800 Joe Damato wrote:
+> > On Tue, Nov 05, 2024 at 09:03:38PM -0800, Jakub Kicinski wrote:
+> > > On Mon,  4 Nov 2024 21:55:26 +0000 Joe Damato wrote:  
+> > > > From: Martin Karsten <mkarsten@uwaterloo.ca>
+> > > > 
+> > > > When NAPI_F_PREFER_BUSY_POLL is set during busy_poll_stop and the
+> > > > irq_suspend_timeout is nonzero, this timeout is used to defer softirq
+> > > > scheduling, potentially longer than gro_flush_timeout. This can be used
+> > > > to effectively suspend softirq processing during the time it takes for
+> > > > an application to process data and return to the next busy-poll.
+> > > > 
+> > > > The call to napi->poll in busy_poll_stop might lead to an invocation of  
+> > > 
+> > > The call to napi->poll when we're arming the timer is counter
+> > > productive, right? Maybe we can take this opportunity to add
+> > > the seemingly missing logic to skip over it?  
+> > 
+> > It seems like the call to napi->poll in busy_poll_stop is counter
+> > productive and we're not opposed to making an optimization like that
+> > in the future.
+> > 
+> > When we tried it, it triggered several bugs/system hangs, so we left
+> > as much of the original code in place as possible.
+> 
+> You don't happen to have the patch you used? Many ways to get the
+> skipping wrong.
 
-On Tue, Nov 5, 2024 at 10:55=E2=80=AFAM Jason Xing <kerneljasonxing@gmail.c=
-om> wrote:
->
-> From: Jason Xing <kernelxing@tencent.com>
->
-> We found there are rare chances that some RST packets appear during
-> the shakehands because the timewait socket cannot accept the SYN and
-> doesn't return TCP_TW_SYN in tcp_timewait_state_process().
->
-> Here is how things happen in production:
-> Time        Client(A)        Server(B)
-> 0s          SYN-->
-> ...
-> 132s                         <-- FIN
-> ...
-> 169s        FIN-->
-> 169s                         <-- ACK
-> 169s        SYN-->
-> 169s                         <-- ACK
+Please see below; I think we've found a solution.
+ 
+> > The existing patch works and streamlining busy_poll_stop to skip the
+> > call to napi->poll is an optimization that can be added as a later
+> > series that focuses solely on when/where/how napi->poll is called.
+> 
+> The reason I brought it up is that it rearms the timer, if driver 
+> ends up calling napi_complete_done(). So we arm the timer in
+> napi_poll_stop(), then call the driver which may rearm again, 
+> making the already complex code even harder to reason about.
 
-I noticed the above ACK doesn't adhere to RFC 6191. It says:
-"If the previous incarnation of the connection used Timestamps, then:
-     if ...
-     ...
-     * Otherwise, silently drop the incoming SYN segment, thus leaving
-         the previous incarnation of the connection in the TIME-WAIT
-         state.
-"
-But the timewait socket sends an ACK because of this code snippet:
-tcp_timewait_state_process()
-    -> // the checks of SYN packet failed.
-    -> if (!th->rst) {
-        -> return TCP_TW_ACK; // this line can be traced back to 2005
+Agreed that the timer is unnecessarily re-armed twice.
 
-I think the following patch follows the RFC:
-diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-index bb1fe1ba867a..cc22f0412f98 100644
---- a/net/ipv4/tcp_minisocks.c
-+++ b/net/ipv4/tcp_minisocks.c
-@@ -231,15 +231,17 @@ tcp_timewait_state_process(struct
-inet_timewait_sock *tw, struct sk_buff *skb,
-           but not fatal yet.
-         */
+Martin ran some initial tests of this series but with this patch
+(patch 2) dropped and the initial results from a small number of
+runs seem fine.
 
--       if (th->syn && !th->rst && !th->ack && !paws_reject &&
--           (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
--            (tmp_opt.saw_tstamp &&
--             (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0=
-))) {
--               u32 isn =3D tcptw->tw_snd_nxt + 65535 + 2;
--               if (isn =3D=3D 0)
--                       isn++;
--               *tw_isn =3D isn;
--               return TCP_TW_SYN;
-+       if (th->syn && !th->rst && !th->ack && !paws_reject) {
-+               if (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
-+                   (tmp_opt.saw_tstamp &&
-+                    (s32)(READ_ONCE(tcptw->tw_ts_recent) -
-tmp_opt.rcv_tsval) < 0)) {
-+                       u32 isn =3D tcptw->tw_snd_nxt + 65535 + 2;
-+                       if (isn =3D=3D 0)
-+                               isn++;
-+                       *tw_isn =3D isn;
-+                       return TCP_TW_SYN;
-+               }
-+               return TCP_TW_SUCCESS;
-        }
+In other words: I think we can simply drop this patch entirely,
+re-run our tests to regenerate the data, update the documentation,
+and send a v7.
 
-        if (paws_reject)
+But please continue reading below.
 
-Could you help me review this, Eric? Thanks in advance!
+> > Our focus was on:
+> >   - Not breaking any of the existing mechanisms
+> >   - Adding a new mechanism
+> > 
+> > I think we should avoid pulling the optimization you suggest into
+> > this particular series and save that for the future.
+> 
+> I'm primarily worried about maintainability of this code.
 
-Thanks,
-Jason
+Of course and we're open to figuring out how to help with that.
 
-> 169s        RST-->
-> As above picture shows, the two flows have a start time difference
-> of 169 seconds. B starts to send FIN so it will finally enter into
-> TIMEWAIT state. Nearly at the same time A launches a new connection
-> that soon is reset by itself due to receiving a ACK.
->
-> There are two key checks in tcp_timewait_state_process() when timewait
-> socket in B receives the SYN packet:
-> 1) after(TCP_SKB_CB(skb)->seq, rcv_nxt)
-> 2) (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) < 0)
->
-> Regarding the first rule, it fails as expected because in the first
-> connection the seq of SYN sent from A is 1892994276, then 169s have
-> passed, the second SYN has 239034613 (caused by overflow of s32).
->
-> Then how about the second rule?
-> It fails again!
-> Let's take a look at how the tsval comes out:
-> __tcp_transmit_skb()
->     -> tcp_syn_options()
->         -> opts->tsval =3D tcp_skb_timestamp_ts(tp->tcp_usec_ts, skb) + t=
-p->tsoffset;
-> The timestamp depends on two things, one is skb->skb_mstamp_ns, the
-> other is tp->tsoffset. The latter value is fixed, so we don't need
-> to care about it. If both operations (sending FIN and then starting
-> sending SYN) from A happen in 1ms, then the tsval would be the same.
-> It can be clearly seen in the tcpdump log. Notice that the tsval is
-> with millisecond precision.
->
-> Based on the above analysis, I decided to make a small change to
-> the check in tcp_timewait_state_process() so that the second flow
-> would not fail.
->
-> Signed-off-by: Jason Xing <kernelxing@tencent.com>
-> ---
->  net/ipv4/tcp_minisocks.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
->
-> diff --git a/net/ipv4/tcp_minisocks.c b/net/ipv4/tcp_minisocks.c
-> index bb1fe1ba867a..2b29d1bf5ca0 100644
-> --- a/net/ipv4/tcp_minisocks.c
-> +++ b/net/ipv4/tcp_minisocks.c
-> @@ -234,7 +234,7 @@ tcp_timewait_state_process(struct inet_timewait_sock =
-*tw, struct sk_buff *skb,
->         if (th->syn && !th->rst && !th->ack && !paws_reject &&
->             (after(TCP_SKB_CB(skb)->seq, rcv_nxt) ||
->              (tmp_opt.saw_tstamp &&
-> -             (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) <=
- 0))) {
-> +             (s32)(READ_ONCE(tcptw->tw_ts_recent) - tmp_opt.rcv_tsval) <=
-=3D 0))) {
->                 u32 isn =3D tcptw->tw_snd_nxt + 65535 + 2;
->                 if (isn =3D=3D 0)
->                         isn++;
-> --
-> 2.37.3
->
+> > > > diff --git a/net/core/dev.c b/net/core/dev.c
+> > > > index 4d910872963f..51d88f758e2e 100644
+> > > > --- a/net/core/dev.c
+> > > > +++ b/net/core/dev.c
+> > > > @@ -6239,7 +6239,12 @@ bool napi_complete_done(struct napi_struct *n, int work_done)
+> > > >  			timeout = napi_get_gro_flush_timeout(n);
+> > > >  		n->defer_hard_irqs_count = napi_get_defer_hard_irqs(n);
+> > > >  	}
+> > > > -	if (n->defer_hard_irqs_count > 0) {
+> > > > +	if (napi_prefer_busy_poll(n)) {
+> > > > +		timeout = napi_get_irq_suspend_timeout(n);  
+> > > 
+> > > Why look at the suspend timeout in napi_complete_done()?
+> > > We are unlikely to be exiting busy poll here.  
+> > 
+> > The idea is similar to commit 7fd3253a7de6 ("net: Introduce
+> > preferred busy-polling"); continue to defer IRQs as long as forward
+> > progress is being made. In this case, napi->poll ran, called
+> > napi_complete_done -- the system is moving forward with processing
+> > so prevent IRQs from interrupting us.
+> 
+> We should clarify the mental models. You're describing IRQ deferal,
+> but say prefer busy poll.
+
+OK; we're open to using different language if that would be helpful.
+
+> Prefer busy poll has only one function - if we are at 100% busy
+> and always see >= budget of packets on the ring, we never call
+> napi_complete_done(). Drivers don't call napi_complete_done() if they
+> consumed full budget. So we need a way to break that re-polling loop,
+> release the NAPI ownership and give busy poll a chance to claim the
+> NAPI instance ownership (the SCHED bit). We check for prefer
+> busy poll in __napi_poll(), because, again, in the target scenario
+> napi_complete_done() is never called.
+> 
+> The IRQ deferal mechanism is necessary for prefer busy poll to work,
+> but it's separate and used by some drivers without good IRQ coalescing,
+> no user space polling involved.
+
+Sure, we agree and are on the same page on the above about what
+prefer busy poll is and its interaction with IRQ deferral.
+
+> In your case, when machine is not melting under 100% load - prefer busy
+> poll will be set once or not at all.
+
+I am not sure what you mean by that last sentence, because the
+prefer busy poll flag is set by the application?
+
+Similar to prefer busy poll piggybacking on IRQ deferral, we
+piggyback on prefer busy polling by allowing the application to use
+an even larger timeout while it is processing incoming data, i.e.,
+deferring IRQs for a longer period, but only after a successful busy
+poll. This makes prefer busy poll + irq suspend useful when
+utilization is below 100%.
+
+> > epoll_wait will re-enable IRQs (by calling napi_schedule) if
+> > there are no events ready for processing.
+> 
+> To be 100% precise calling napi_schedule will not reenable IRQs 
+> if IRQ deferal is active. It only guarantees one NAPI run in 
+> softirq (or thread if threaded).
+
+Yes, I should have been more precise.
+
+Calling napi_schedule doesn't enable IRQs, but runs NAPI which sets
+about the process of *eventually* causing napi_complete_done to
+return true which triggers the re-arming of IRQs by the driver.
+
+> > > Is it because we need more time than gro_flush_timeout
+> > > for the application to take over the polling?  
+> > 
+> > That's right; we want the application to retain control of packet
+> > processing. That's why we connected this to the "prefer_busy_poll"
+> > flag.
+> > 
+> > > > +		if (timeout)
+> > > > +			ret = false;
+> > > > +	}
+> > > > +	if (ret && n->defer_hard_irqs_count > 0) {
+> > > >  		n->defer_hard_irqs_count--;
+> > > >  		timeout = napi_get_gro_flush_timeout(n);
+> > > >  		if (timeout)
+> > > > @@ -6375,9 +6380,13 @@ static void busy_poll_stop(struct napi_struct *napi, void *have_poll_lock,
+> > > >  	bpf_net_ctx = bpf_net_ctx_set(&__bpf_net_ctx);
+> > > >  
+> > > >  	if (flags & NAPI_F_PREFER_BUSY_POLL) {
+> > > > -		napi->defer_hard_irqs_count = napi_get_defer_hard_irqs(napi);
+> > > > -		timeout = napi_get_gro_flush_timeout(napi);
+> > > > -		if (napi->defer_hard_irqs_count && timeout) {
+> > > > +		timeout = napi_get_irq_suspend_timeout(napi);  
+> > > 
+> > > Even here I'm not sure if we need to trigger suspend.
+> > > I don't know the eventpoll code well but it seems like you suspend 
+> > > and resume based on events when exiting epoll. Why also here?  
+> > 
+> > There's two questions wrapped up here and an overall point to make:
+> > 
+> > 1. Suspend and resume based on events when exiting epoll - that's
+> >    right and as you'll see in those patches that happens by:
+> >      - arming the suspend timer (via a call to napi_suspend_irqs)
+> >        when a positive number of events are retrieved
+> >      - calling napi_schedule (via napi_resume_irqs) when there are
+> >        no events or the epoll context is being freed.
+> > 
+> > 2. Why defer the suspend timer here in busy_poll_stop? Note that the
+> >    original code would set the timer to gro_flush_timeout, which
+> >    would introduce the trade offs we mention in the cover letter
+> >    (latency for large values, IRQ interruption for small values).
+> > 
+> >    We don't want the gro_flush_timeout to take over yet because we
+> >    want to avoid these tradeoffs up until the point where epoll_wait
+> >    finds no events for processing.
+> > 
+> >    Does that make sense? If we skipped the IRQ suspend deferral
+> >    here, we'd be giving packet processing control back to
+> >    gro_flush_timeout and napi_defer_hard_irqs, but the system might
+> >    still have packets that can be processed in the next call to
+> >    epoll_wait.
+> 
+> Let me tell you what I think happens and then you can correct me.
+> 
+> 0 epoll
+> 1   # ..does its magic..
+> 2   __napi_busy_loop() 
+> 3     # finds a waking packet
+> 4     busy_poll_stop()
+> 5       # arms the timer for long suspend
+> 6   # epoll sees events
+> 7     ep_suspend_napi_irqs()
+> 8       napi_suspend_irqs()
+> 9         # arms for long timer again
+> 
+> The timer we arm here only has to survive from line 5 to line 9,
+> because we will override the timeout on line 9.
+
+Yes, you are right. Thanks for highlighting and catching this.
+
+> > The overall point to make is that: the suspend timer is used to
+> > prevent misbehaving userland applications from taking too long. It's
+> > essentially a backstop and, as long as the app is making forward
+> > progress, allows the app to continue running its busy poll loop
+> > undisturbed (via napi_complete_done preventing the driver from
+> > enabling IRQs).
+> > 
+> > Does that make sense?
+> 
+> My mental model put in yet another way is that only epoll knows if it
+> has events, and therefore whether the timeout should be short or long.
+> So the suspend timer should only be applied by epoll.
+
+Here's what we are thinking, can you let me know if you agree with
+this?
+
+  - We can drop patch 2 entirely
+  - Update the documentation about IRQ suspension as needed now
+    that patch 2 has been dropped
+  - Leave the rest of the series as is
+  - Re-run our tests to gather sufficient data for the test cases
+    outlined in the cover letter to ensure that the performance
+    numbers hold over several iterations
+
+Does that seem reasonable for the v7 to you?
+
+I am asking because generating the amount of data over the number of
+scenarios we are testing takes a long time and I want to make sure
+we are as aligned as we can be before I kick off another run :)
 
