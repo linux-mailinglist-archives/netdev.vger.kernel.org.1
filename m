@@ -1,129 +1,120 @@
-Return-Path: <netdev+bounces-142960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76A099C0C9B
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:11:08 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 45E439C0CAC
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:16:50 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BC2A2826AB
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:11:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B37B282AF4
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:16:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF05E216DE3;
-	Thu,  7 Nov 2024 17:09:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88B5212EF0;
+	Thu,  7 Nov 2024 17:16:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h1ceALmO"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Ssj7JSI+"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ot1-f44.google.com (mail-ot1-f44.google.com [209.85.210.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 823B42161F3;
-	Thu,  7 Nov 2024 17:09:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31C3A18DF62;
+	Thu,  7 Nov 2024 17:16:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.44
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730999369; cv=none; b=p5xY0whQGmlWSGy22E45TTcD1jawQIyGlK/nrkSALpzJLImuLTjhl1hBzZKXGgipqt8ztjkwPZCFF4mEnZmF0rnWjsen9F6ZdrAr0TdO1NWfYA1VaDBab23EWBhRr02+V5dni9Ck4FkLpAvN0mJTSHZ3ApWJb8yqgMYmeA8fzjE=
+	t=1730999802; cv=none; b=hRdfbiED6yzIQE7A8huzGqWPyOOsFFSKHihS3ZrymI/bhTnl4+EypZii9cf1htGMrcg9LrI9rD+8kvPLk2B5TZgOUh+uHYrBbsWKj7jCIstmqodmPfEUeNpwdLG9J+wCuv89mpu4bMkFjtrrW3NllElK6gmgqucmSRrNQ5ElOIU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730999369; c=relaxed/simple;
-	bh=9f54dxIl3eMwRNQ9RNH0nhNpQ6mFCD7DUPK+U+I+s2A=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WB5ItX5L7V23S3/X11N900WjspwUMig2NVYIniYFNVcHTkd6ScdQPzuAKCaUeoVNA7EEzmJa4HKtQWW7ia8a19PMX0WvwK9BidqLm3LYsFwjUAiJx5N0rHsc9ay0DSSy0pec1742QJH8pmozaHxeUjby/m+GbbQe7TqzqFyOvBU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h1ceALmO; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 243F8C4CECC;
-	Thu,  7 Nov 2024 17:09:24 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730999369;
-	bh=9f54dxIl3eMwRNQ9RNH0nhNpQ6mFCD7DUPK+U+I+s2A=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=h1ceALmOpXVDmMxRbzPEfjf44ktMb8IJIw5lCn4O2WlljA5gnCeFuqPvPRcu98S4V
-	 6HAILwGAs7kg8T56TOAySl75Sp1LxU3tBT53AkwaWgpikEnuuALLIP2KJZJwpXv6W0
-	 9Ghf5BuxO0K+n81/KZhb1PcxyiH6msIl3EWOog8mq1rYdc0o1rizGr+Kn5BdR+CKJh
-	 +H11tCH5HBVLIDlDemnlhdooj3Z8xdwOlQJdtkPLI6fgPxN8/TSnVpBXbmdzifW4MQ
-	 qAExp1IDuQTjDvnnukK3cn4UfHgedhjHz6g+pX4clyeJlf6w0mAtZu13eHXdULURBr
-	 2TkK3rA5gn+Gw==
-Date: Thu, 7 Nov 2024 17:09:23 +0000
-From: Conor Dooley <conor@kernel.org>
-To: Joey Lu <a0987203069@gmail.com>
-Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, robh@kernel.org,
-	krzk+dt@kernel.org, conor+dt@kernel.org, mcoquelin.stm32@gmail.com,
-	richardcochran@gmail.com, alexandre.torgue@foss.st.com,
-	joabreu@synopsys.com, ychuang3@nuvoton.com, schung@nuvoton.com,
-	yclu4@nuvoton.com, linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
-	linux-stm32@st-md-mailman.stormreply.com
-Subject: Re: [PATCH 1/3] dt-bindings: net: nuvoton: Add schema for Nuvoton
- MA35 family GMAC
-Message-ID: <20241107-slip-graceful-767507d20d1b@spud>
-References: <20241106111930.218825-1-a0987203069@gmail.com>
- <20241106111930.218825-2-a0987203069@gmail.com>
- <20241106-bloated-ranch-be94506d360c@spud>
- <7c2f6af3-5686-452a-8d8a-191899b3d225@gmail.com>
+	s=arc-20240116; t=1730999802; c=relaxed/simple;
+	bh=XZbkjuPx0RzD//u+DiwqR938wVtwAzNt9z4kO6M3ASY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=L5GPtcqu6M5bwNCukzS5jmcHX+HL2Jh8d4IYmGO5ngfF7nyictC4JZtBRMXndwYBIuPAhhN5HQ9OKS19UdaB3u60W6SKplp81CmKS7RtWyi4tr2IoO21kK37Td19I37ny6Ab0wEN8s5tDtpQoaXMDJIshz0d1CzuPid0QYYVgcM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Ssj7JSI+; arc=none smtp.client-ip=209.85.210.44
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ot1-f44.google.com with SMTP id 46e09a7af769-7181c0730ddso563331a34.2;
+        Thu, 07 Nov 2024 09:16:40 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1730999800; x=1731604600; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BTMKweedjZ75OhcudktNfD43GIulRnBzWZ+fUwSHgKM=;
+        b=Ssj7JSI+tyxBBXva2Z/OcDTXKOIsmzcMRWcXqDSWBb6E2cpOZphP8iP2W2yKXfNzVu
+         PxfNBI3/DN03anN56zsYeuY24Ifnfx3qswxYSkcjziONZR9Es3NzTHSe4ASVZLSofclC
+         C6Yit7fWJtBkODdNCz2BL7pUMNf0p3k2Y64aMhQIvX1+0R2QWvAG7hxEhMSePizjw+4p
+         mcmnHCZ1SkaH5hf52V1RtIP0OOAAU4IYJiTQmDkeFL1jSjQRWnEA7E6sKm6t2l4vAw+X
+         qAzJv1FNm2R7fIsUsEx8+4XbiJp8vwg/v27SW517bpzFOGec3xGeTOsIVq4K/z/gj7xH
+         aTrg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1730999800; x=1731604600;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BTMKweedjZ75OhcudktNfD43GIulRnBzWZ+fUwSHgKM=;
+        b=n+NQckmetXvC4MGRr/f4DCMBVjGu6OJ/D5J5MHROkEte+JJJiFESJbklheX00PFMbn
+         KpSJzz3zXDwgfpKv4o1XeQnDZiX/O333pdZAEMvoea6RdpkqbgY6a0/DD5G5trdLUBZj
+         J0HTBmjcBYCybpIOnmrXNtOIR2b0kE0XFr9wiHCIMYj/N/K7umsIv0FBaLrMkv/90Ivf
+         BxIjUOO3bVY1SXo5yAvaaadpCbO5n9SfKC0P/eXv7aYsiJvxTrq58MOONDHa6unuatWd
+         vMfwCCrSzBPl50lvfSm175+gSGSNFOV71OX/WKZxaztXWf4K0Mf0ElgXS2XhJG3HpJNy
+         fr0g==
+X-Forwarded-Encrypted: i=1; AJvYcCX5FxdJI9g96l8Xjt3xloTwjpPi4eWrgfSCeunS3iEZE5wu09NShCOgr2+Z4L1FXcF3QjTnkzGnHnz5Y2HVh4w=@vger.kernel.org, AJvYcCXOJIYUF4mZyZUUgN4wt8Y6HSuGXulOzU8xbAbhHHqN9KnmLYhbTL3fbo615FmxmSYeZvvKoXyp@vger.kernel.org
+X-Gm-Message-State: AOJu0Yynt3wWy4iybsoxXjXgMSV7crytmjb8Ss4VYAyeW+wqCz4Ma2hQ
+	IaPYJ6JdnKuYrGhOv9eV2SL2kcvmvLgFHOvX/wY1b9tWfACOYC/nn6wpqodDB8ErvFCTiJIUTuH
+	PXzXfrhZHfyCJLup3rCtrUeIUJME=
+X-Google-Smtp-Source: AGHT+IGtyHeUDDQ8/BFWFeMqSq8NaMTh98hsnESpBxWHLEm8HrqU+pnb2KK/P6JZfEkffd+YtKndmHcCOaM79cUEMR8=
+X-Received: by 2002:a05:6830:6389:b0:718:9ac7:27c4 with SMTP id
+ 46e09a7af769-71a1b3cdf34mr284743a34.5.1730999800048; Thu, 07 Nov 2024
+ 09:16:40 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha256;
-	protocol="application/pgp-signature"; boundary="yB3ZUxT4SMqLRowR"
-Content-Disposition: inline
-In-Reply-To: <7c2f6af3-5686-452a-8d8a-191899b3d225@gmail.com>
+References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-8-shaw.leon@gmail.com>
+ <20241107080420.6a5a5243@kernel.org>
+In-Reply-To: <20241107080420.6a5a5243@kernel.org>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Thu, 7 Nov 2024 17:16:28 +0000
+Message-ID: <CAD4GDZwOzLQd+FYd0AHr5AUcANWkf731Jgu6aeyix8EjRGXRag@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 7/8] tools/net/ynl: Add retry limit for async notification
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Xiao Liang <shaw.leon@gmail.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
+	Hangbin Liu <liuhangbin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 
+On Thu, 7 Nov 2024 at 16:04, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Thu,  7 Nov 2024 21:30:02 +0800 Xiao Liang wrote:
+> > Since commit 1bf70e6c3a53 ("tools/net/ynl: improve async notification
+> > handling"), check_ntf() would block indefinitely if there's no messages.
+> > In some cases we want to set a limit on waiting time. This patch adds
+> > max_reties parameter check_ntf(), and makes it stop when no message is
+> > recievied in that number of consecutive retries.
+>
+> Looking at 1bf70e6c3a53 again I wonder if we should revert it, sort of,
+> and add its logic back as a new function called poll_nft?
+>
+> The thing is C YNL has check_ntf too - ynl_ntf_check() and it has the
+> old semantics. Would be nice for similarly named functions to behave
+> the same across languages.
+>
+> WDYT Donald? Sorry for not thinking about this earlier.
 
---yB3ZUxT4SMqLRowR
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+Yes, that makes sense. I didn't realise the C lib had an equivalent.
+Adding a poll_ntf() that calls check_ntf() internally will actually be
+a bit cleaner overall.
 
-On Thu, Nov 07, 2024 at 06:15:51PM +0800, Joey Lu wrote:
-> Conor Dooley =E6=96=BC 11/6/2024 11:44 PM =E5=AF=AB=E9=81=93:
-> > On Wed, Nov 06, 2024 at 07:19:28PM +0800, Joey Lu wrote:
-> > > +  nuvoton,sys:
-> > > +    $ref: /schemas/types.yaml#/definitions/phandle
-> > > +    description: phandle to access GCR (Global Control Register) reg=
-isters.
-> > Why do you need a phandle to this? You appear to have multiple dwmacs on
-> > your device if the example is anything to go by, how come you don't need
-> > to access different portions of this depending on which dwmac instance
-> > you are?
-> On our platform, a system register is required to specify the TX/RX clock
-> path delay control, switch modes between RMII and RGMII, and configure ot=
-her
-> related settings.
-> > > +  resets:
-> > > +    maxItems: 1
-> > > +
-> > > +  reset-names:
-> > > +    items:
-> > > +      - const: stmmaceth
-> > > +
-> > > +  mac-id:
-> > > +    maxItems: 1
-> > > +    description:
-> > > +      The interface of MAC.
-> > A vendor prefix is required for custom properties, but I don't think you
-> > need this and actually it is a bandaid for some other information you're
-> > missing. Probably related to your nuvoton,sys property only being a
-> > phandle with no arguments.
-> This property will be removed.
+It's then a question of whether we need the repeat logic in poll_ntf()
+because it's always possible to use check_ntf() in your own repeat
+logic. Either way, I'd prefer not to call the parameter "max_retries"
+because semantically I don't think we are retrying - it is a count of
+how many times to repeat the poll. Thoughts? Should it be a "duration"
+parameter?
 
-I'm almost certain you can't just remove this property, because you need
-it to tell which portion of the GCR is applicable to the dwmac instance
-in question. Instead, you need to ad an argument to your phandle. The
-starfive dwmac binding/driver has an example of what you can do.
-
---yB3ZUxT4SMqLRowR
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZyz0QgAKCRB4tDGHoIJi
-0lP1AP97tmKwKt+UudFKraxNYO3cXznEar2+8w3QtbqK/bnqlwD9H1utLpv2RnF0
-zj3DwLQ3RnwTIwDLuyIHy2v/2FNbawI=
-=i7sq
------END PGP SIGNATURE-----
-
---yB3ZUxT4SMqLRowR--
+> Xiao, feel free to submit this separately from the series.
 
