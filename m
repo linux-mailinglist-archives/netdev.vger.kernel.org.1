@@ -1,185 +1,222 @@
-Return-Path: <netdev+bounces-142627-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142628-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0EFF09BFC97
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:36:16 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id A64BA9BFC9A
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 03:38:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3216281488
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:36:14 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 34B3F1F21594
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 02:38:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B13B2E62B;
-	Thu,  7 Nov 2024 02:36:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 004D539FD9;
+	Thu,  7 Nov 2024 02:37:58 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="O1IZXCle"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jg7vVZdL"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDEB06AA7;
-	Thu,  7 Nov 2024 02:36:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E45766AA7;
+	Thu,  7 Nov 2024 02:37:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730946971; cv=none; b=KWzT2cf7QwzwVG+vpwD0lU4xcbpCJg8KMlmhD0cfx2XBDMk1IG1Lep6roVqDoyVrpvNOZXF6oJDDYlkHbJ6xj5bgKoWcKm1ssSfa+LmdJrPVhn8B/+PWrtZeavNy/TnbxYXX4yqB9013WJQVc/0jeUCutAXPEaXB8Oj4Rnk28z8=
+	t=1730947077; cv=none; b=RB8KIvVxLp3KodJUdDUVPr3u4holTijRKuOK99byhLw4QS3bQMBYjctqsjsZuOsDh+lQkgnAehfnJbENuG6J/XKaLduN/+KZHjmKFVGIH1DHTdkPgI5nXNDp8ymWlDOTAhCYWmk/qUZPp5J3bJNNnrXxZWC+TsBR3I3OS9wec/8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730946971; c=relaxed/simple;
-	bh=UBme+orhLUevauWpsyoc1EM0CwPTJ74P0NEkliYWriw=;
+	s=arc-20240116; t=1730947077; c=relaxed/simple;
+	bh=0Rbco+fVVE+WKrntisQUqv4Xf3VKHufAddMWQTy1UOo=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=BA4LycZ7BJOuPlqcdQIF6EljxZiXkVFxCf5JoNyx8NLxdGza7j+Ih9o3HFO6qqhkdtn1iJqKEX70Q4rV9Hbgg8h2Gb3aur+Fp5aYjQajlhhc4hp690q/9KaG/jxpRnjHxkDg2OMP/yG+CYyTPuWU6cYjLjLtzMxYYaAGFk1AihE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=O1IZXCle; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4CE60C4CEC6;
-	Thu,  7 Nov 2024 02:36:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730946970;
-	bh=UBme+orhLUevauWpsyoc1EM0CwPTJ74P0NEkliYWriw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=O1IZXClefdkpwf8Md8xzzF/+fnNppyif1xvbl/7QoktK09DWU4jpK6jyP+i90SVPe
-	 2OS7wOvoUacIlwwsD9OSyXseqhIkjH42swr3Bs+HlkmIHiX/BARe6gegNTGHJVNNFT
-	 ABWllytXxlxLcv79/Pme/dRSOxFGgLLQ4afG7XELgxD7hMMLDHBegE9OLpSB8vjBVF
-	 Zj+bpjjHC+UdKwNQyDhILjzMA57XAukQlEOncvvsL24F9JCU9MfZN4L9Ikh+FIJJQ0
-	 Jw6mTwchst+Gedp5XfZXFC6QSpsRMiU6E554NmfWT3Nj4EFeZ9xNKxws3CGVtS1kZY
-	 WExYQbImBvSEw==
-Date: Wed, 6 Nov 2024 18:36:08 -0800
-From: Saeed Mahameed <saeed@kernel.org>
-To: Caleb Sander <csander@purestorage.com>
-Cc: Parav Pandit <parav@nvidia.com>, Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>, Tariq Toukan <tariqt@nvidia.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
+	 Content-Type:Content-Disposition:In-Reply-To; b=h+fHKjA2Y4nS0YZwPmA6u1aoXfHctzqskovQSIFIaSbPqY2JdSf/OjKY6ez1mR0OhG61q6wjo0kTsMfNwzsifVjxkYy0Un6ATH6lfoLpIPELMu6/SKoWXJFiNLQT43Ih+GRDyrI5ynhqcBpGxHSKl4H8TPsroIp4DbAyKbZPW34=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jg7vVZdL; arc=none smtp.client-ip=192.198.163.12
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1730947075; x=1762483075;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=0Rbco+fVVE+WKrntisQUqv4Xf3VKHufAddMWQTy1UOo=;
+  b=jg7vVZdLVtNmvYwDqmyD8evKoc3n7kK2dE7fqnRI/JcWBa4jdZBC9RTB
+   9PVYh+D8+CIQsgKiIDkg9S2yHtjSLns0S++PWXjgPTN/jdNYP+FQ9yxXG
+   xY9NmV8FYov9F0NZaMPvnuH3PA0ONsg0H50/88xAIX7UReaHlxHotv8gh
+   /kk96Kqs+1pSSD+vIEb1/+UBV3i1kYZrrP2Ft/qgsO0Cq41Wi9zJv4Wxx
+   9/xHr7A7WTcJvPm7mmfHkLOvk3scr9bvsi0Djf+s5IQ3TmJd6IcCNsHNG
+   sqVJvVanvvcaN1n3ZsSL6IqsbfFgrgjh3AIn6o8HJcuBeeGc5+DPTmh3p
+   g==;
+X-CSE-ConnectionGUID: SSMS/GE4Soi3K1O+a0W5eQ==
+X-CSE-MsgGUID: sf6UiSQCSfqzfq+Yyh4cqA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11248"; a="34695256"
+X-IronPort-AV: E=Sophos;i="6.11,264,1725346800"; 
+   d="scan'208";a="34695256"
+Received: from orviesa004.jf.intel.com ([10.64.159.144])
+  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Nov 2024 18:37:54 -0800
+X-CSE-ConnectionGUID: H0tfHc/KTCOBcpT2EROUpg==
+X-CSE-MsgGUID: Y25ZMZNcQteAno0NZmlSgw==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.11,264,1725346800"; 
+   d="scan'208";a="90004633"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by orviesa004.jf.intel.com with ESMTP; 06 Nov 2024 18:37:49 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t8sP4-000phm-2P;
+	Thu, 07 Nov 2024 02:37:46 +0000
+Date: Thu, 7 Nov 2024 10:37:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next 2/2] mlx5/core: deduplicate
- {mlx5_,}eq_update_ci()
-Message-ID: <ZywnmDQIxzgV3uJe@x130>
-References: <20241101034647.51590-1-csander@purestorage.com>
- <20241101034647.51590-2-csander@purestorage.com>
- <CY8PR12MB71958512F168E2C172D0BE05DC502@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CADUfDZofFwy12oZYTmm3TE314RM79EGsxV6bKEBRMVFv8C3jNg@mail.gmail.com>
- <CY8PR12MB71953FD36C70ACACEBE3DBA1DC522@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CADUfDZqanDo+v_jap7pQire86QkfaDQE4HvhvVBb64YqKNgRHg@mail.gmail.com>
- <CY8PR12MB7195FDC4A280F4CD7EA219ABDC532@CY8PR12MB7195.namprd12.prod.outlook.com>
- <CADUfDZon6QbURp7TqB6dvE4Ewb_To2EDyUTQ=spNCorXDy0DbQ@mail.gmail.com>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, upstream@airoha.com
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org
+Subject: Re: [net-next PATCH v3 3/3] net: phy: Add Airoha AN8855 Internal
+ Switch Gigabit PHY
+Message-ID: <202411071000.uL10bu3r-lkp@intel.com>
+References: <20241106122254.13228-4-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CADUfDZon6QbURp7TqB6dvE4Ewb_To2EDyUTQ=spNCorXDy0DbQ@mail.gmail.com>
+In-Reply-To: <20241106122254.13228-4-ansuelsmth@gmail.com>
 
-On 06 Nov 15:44, Caleb Sander wrote:
->On Tue, Nov 5, 2024 at 9:44 PM Parav Pandit <parav@nvidia.com> wrote:
->>
->>
->> > From: Caleb Sander <csander@purestorage.com>
->> > Sent: Tuesday, November 5, 2024 9:36 PM
->> >
->> > On Mon, Nov 4, 2024 at 9:22 PM Parav Pandit <parav@nvidia.com> wrote:
->> > >
->> > >
->> > >
->> > > > From: Caleb Sander <csander@purestorage.com>
->> > > > Sent: Monday, November 4, 2024 3:49 AM
->> > > >
->> > > > On Sat, Nov 2, 2024 at 8:55 PM Parav Pandit <parav@nvidia.com> wrote:
->> > > > >
->> > > > >
->> > > > >
->> > > > > > From: Caleb Sander Mateos <csander@purestorage.com>
->> > > > > > Sent: Friday, November 1, 2024 9:17 AM
->> > > > > >
->> > > > > > The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci().
->> > > > > > The only additional work done by mlx5_eq_update_ci() is to
->> > > > > > increment
->> > > > > > eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to
->> > > > > > eq->avoid
->> > > > > > the duplication.
->> > > > > >
->> > > > > > Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
->> > > > > > ---
->> > > > > >  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
->> > > > > >  1 file changed, 1 insertion(+), 8 deletions(-)
->> > > > > >
->> > > > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->> > > > > > b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->> > > > > > index 859dcf09b770..078029c81935 100644
->> > > > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->> > > > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
->> > > > > > @@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct
->> > > > > > mlx5_eq *eq, u32 cc)  }  EXPORT_SYMBOL(mlx5_eq_get_eqe);
->> > > > > >
->> > > > > >  void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)  {
->> > > > > > -     __be32 __iomem *addr = eq->doorbell + (arm ? 0 : 2);
->> > > > > > -     u32 val;
->> > > > > > -
->> > > > > >       eq->cons_index += cc;
->> > > > > > -     val = (eq->cons_index & 0xffffff) | (eq->eqn << 24);
->> > > > > > -
->> > > > > > -     __raw_writel((__force u32)cpu_to_be32(val), addr);
->> > > > > > -     /* We still want ordering, just not swabbing, so add a barrier */
->> > > > > > -     wmb();
->> > > > > > +     eq_update_ci(eq, arm);
->> > > > > Long ago I had similar rework patches to get rid of
->> > > > > __raw_writel(), which I never got chance to push,
->> > > > >
->> > > > > Eq_update_ci() is using full memory barrier.
->> > > > > While mlx5_eq_update_ci() is using only write memory barrier.
->> > > > >
->> > > > > So it is not 100% deduplication by this patch.
->> > > > > Please have a pre-patch improving eq_update_ci() to use wmb().
->> > > > > Followed by this patch.
->> > > >
->> > > > Right, patch 1/2 in this series is changing eq_update_ci() to use
->> > > > writel() instead of __raw_writel() and avoid the memory barrier:
->> > > > https://lore.kernel.org/lkml/20241101034647.51590-1-
->> > > > csander@purestorage.com/
->> > > This patch has two bugs.
->> > > 1. writel() writes the MMIO space in LE order. EQ updates are in BE order.
->> > > So this will break on ppc64 BE.
->> >
->> > Okay, so this should be writel(cpu_to_le32(val), addr)?
->> >
->> That would break the x86 side because device should receive in BE format regardless of cpu endianness.
->> Above code will write in the LE format.
->>
->> So an API foo_writel() need which does
->> a. write memory barrier
->> b. write to MMIO space but without endineness conversion.
->
->Got it, thanks. writel(bswap_32(val, addr)) should work, then? I
->suppose it may introduce a second bswap on BE architectures, but
->that's probably worth it to avoid the memory barrier.
->
+Hi Christian,
 
-The existing mb() needs to be changed to wmb(), this will provide a more
-efficient fence on most architectures.
+kernel test robot noticed the following build warnings:
 
-I don't understand why you are still discussing the use of writel(), yes
-it will work but you are introducing two unconditional swaps per doorbell
-write.
+[auto build test WARNING on net-next/main]
 
-Just replace the existing mb with wmb() in eq_update_ci()
+url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/dt-bindings-net-dsa-Add-Airoha-AN8855-Gigabit-Switch-documentation/20241106-203624
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241106122254.13228-4-ansuelsmth%40gmail.com
+patch subject: [net-next PATCH v3 3/3] net: phy: Add Airoha AN8855 Internal Switch Gigabit PHY
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20241107/202411071000.uL10bu3r-lkp@intel.com/config)
+compiler: clang version 19.1.3 (https://github.com/llvm/llvm-project ab51eccf88f5321e7c60591c5546b254b6afab99)
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241107/202411071000.uL10bu3r-lkp@intel.com/reproduce)
 
-And if you have time to write one extra patch, please reuse eq_update_ci() 
-inside mlx5_eq_update_ci(). 
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411071000.uL10bu3r-lkp@intel.com/
 
-mlx5_eq_update_ci(eq, cc, arm) {
-        eq->cons_index += cc;
-        eq_update_ci(eq, arm);
-}
+All warnings (new ones prefixed by >>):
 
-So we won't have two different implementations of EQ doorbell ringing
-anymore.
+   In file included from drivers/net/phy/air_an8855.c:6:
+   In file included from include/linux/phy.h:16:
+   In file included from include/linux/ethtool.h:18:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:8:
+   In file included from include/linux/cacheflush.h:5:
+   In file included from arch/x86/include/asm/cacheflush.h:5:
+   In file included from include/linux/mm.h:2213:
+   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     505 |                            item];
+         |                            ~~~~
+   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     512 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
+     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
+         |                               ~~~~~~~~~~~ ^ ~~~
+   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
+     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
+     525 |                            NR_VM_NUMA_EVENT_ITEMS +
+         |                            ~~~~~~~~~~~~~~~~~~~~~~
+>> drivers/net/phy/air_an8855.c:137:6: warning: variable 'val' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+     137 |         if (saved_page >= 0)
+         |             ^~~~~~~~~~~~~~~
+   drivers/net/phy/air_an8855.c:139:45: note: uninitialized use occurs here
+     139 |         ret = phy_restore_page(phydev, saved_page, val);
+         |                                                    ^~~
+   drivers/net/phy/air_an8855.c:137:2: note: remove the 'if' if its condition is always true
+     137 |         if (saved_page >= 0)
+         |         ^~~~~~~~~~~~~~~~~~~~
+     138 |                 val = __phy_read(phydev, AN8855_PHY_EXT_REG_14);
+   drivers/net/phy/air_an8855.c:133:9: note: initialize the variable 'val' to silence this warning
+     133 |         int val;
+         |                ^
+         |                 = 0
+>> drivers/net/phy/air_an8855.c:155:6: warning: variable 'ret' is used uninitialized whenever 'if' condition is false [-Wsometimes-uninitialized]
+     155 |         if (saved_page >= 0) {
+         |             ^~~~~~~~~~~~~~~
+   drivers/net/phy/air_an8855.c:164:46: note: uninitialized use occurs here
+     164 |         return phy_restore_page(phydev, saved_page, ret);
+         |                                                     ^~~
+   drivers/net/phy/air_an8855.c:155:2: note: remove the 'if' if its condition is always true
+     155 |         if (saved_page >= 0) {
+         |         ^~~~~~~~~~~~~~~~~~~~
+   drivers/net/phy/air_an8855.c:152:9: note: initialize the variable 'ret' to silence this warning
+     152 |         int ret;
+         |                ^
+         |                 = 0
+   6 warnings generated.
 
-Thanks,
-Saeed.
 
+vim +137 drivers/net/phy/air_an8855.c
+
+   129	
+   130	static int an8855_get_downshift(struct phy_device *phydev, u8 *data)
+   131	{
+   132		int saved_page;
+   133		int val;
+   134		int ret;
+   135	
+   136		saved_page = phy_select_page(phydev, AN8855_PHY_PAGE_EXTENDED_1);
+ > 137		if (saved_page >= 0)
+   138			val = __phy_read(phydev, AN8855_PHY_EXT_REG_14);
+   139		ret = phy_restore_page(phydev, saved_page, val);
+   140		if (ret)
+   141			return ret;
+   142	
+   143		*data = val & AN8855_PHY_EXT_REG_14 ? DOWNSHIFT_DEV_DEFAULT_COUNT :
+   144						      DOWNSHIFT_DEV_DISABLE;
+   145	
+   146		return 0;
+   147	}
+   148	
+   149	static int an8855_set_downshift(struct phy_device *phydev, u8 cnt)
+   150	{
+   151		int saved_page;
+   152		int ret;
+   153	
+   154		saved_page = phy_select_page(phydev, AN8855_PHY_PAGE_EXTENDED_1);
+ > 155		if (saved_page >= 0) {
+   156			if (cnt != DOWNSHIFT_DEV_DISABLE)
+   157				ret = __phy_set_bits(phydev, AN8855_PHY_EXT_REG_14,
+   158						     AN8855_PHY_EN_DOWN_SHFIT);
+   159			else
+   160				ret = __phy_clear_bits(phydev, AN8855_PHY_EXT_REG_14,
+   161						       AN8855_PHY_EN_DOWN_SHFIT);
+   162		}
+   163	
+   164		return phy_restore_page(phydev, saved_page, ret);
+   165	}
+   166	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
