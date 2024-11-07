@@ -1,101 +1,79 @@
-Return-Path: <netdev+bounces-142864-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142865-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 373B29C07B7
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:39:40 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320729C07EC
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 14:46:44 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4DD921C23A85
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:39:39 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id DEEBF1F21692
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 13:46:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F0C121262B;
-	Thu,  7 Nov 2024 13:37:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945B020FAB1;
+	Thu,  7 Nov 2024 13:46:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="U2CUzQ6v"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="HFXknFo8"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f49.google.com (mail-ed1-f49.google.com [209.85.208.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3EC7212179
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 13:37:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A663520F5C8
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 13:46:38 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730986677; cv=none; b=Vw7QEUsHEahJFGHqlbXnUVnqKW8W9X5yOEIfeYFAgs069bhxDg3LY8JovieK0wVMkSMNoaJyZXTJIL0btGT3Ev5HXngJQuHscifabC8Gzn6djYY8uFyJM3cBkxmoK2TYswMmwXiypcGBmHSxNB0k2x3kWblhV/qDS0/EeyrSNpA=
+	t=1730987200; cv=none; b=GcoBGMa2ujWxcpB9Yf90PDBJ6w9J6PIPrPy8qRYp/dSJPOBRs+LGcoSSaZIFHIKjOpKTRWNuStX0Q1+zt+BoTGpLHy4LqhrW6x7JFnlR1V0e1baUTZ+oXLA2A0tLiFv0UaeocLfrr5qyCne7mE8Ds6ZHiQd2tnu34Gfvst55/Xw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730986677; c=relaxed/simple;
-	bh=bYExxPs/zkT4nkC+V5hBiRXD91uP/lq+MGqhILYYYOU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=aD3EAdad8VL4OnL7Qsm+M7BWvr1cJcIbV5yX5dHPOscGFS678XqGzkM/RBRx8PQbQ4vYjsx19gdfMb15YsNCIquU7ILzKZjWFLf7vF3IlLfWKVRgdjTGvLGr22yhNUfvyAUjsSPdVFehxpxd3IsgK47SbwLndV7FrQHcfetdGG8=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=U2CUzQ6v; arc=none smtp.client-ip=209.85.208.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-ed1-f49.google.com with SMTP id 4fb4d7f45d1cf-5cb15b84544so1253467a12.2
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 05:37:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1730986674; x=1731591474; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=bYExxPs/zkT4nkC+V5hBiRXD91uP/lq+MGqhILYYYOU=;
-        b=U2CUzQ6vLI4uvJ4GGL1f0UEHaD2xWW9qkrvQmOw4tRYtb3RLtYt3B+0sVaR1sUUdMJ
-         UAiaZCnH1J7FX/RQonZpVlw4anyDX/FEchTaoYgWhuqaj2p+ansL2BdpJiMpld1ftyWU
-         C9dd+/+PiBZxwsoVDN+Ea3sv3ZIb2ZHpF7QYykFKEgsEkbzj2wfb+Wep7Bzq9RWtplUf
-         lvyFgaORQ1gdNoYTH7pPI7xyHQrMK7jr4PF3uKlU6CNmwh+IuAlkoUXdlRYfy8XGOvAa
-         oG8anTntjYCO+oSGXjGy/QcYvm/Yoi+8udWJc+Smkso3qCNzCoQhzxgxbWozDqaU2+Xr
-         BwFQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730986674; x=1731591474;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bYExxPs/zkT4nkC+V5hBiRXD91uP/lq+MGqhILYYYOU=;
-        b=YjKvDUk3Bned3lbDGPDd50SD9Wkc5UuBiKr6OiNCsR004i7J2cmGVmBlXd3d+TP7dw
-         BLHOa44KsEdSEv44i5Zj3seukZSMhhPaAs1r89VylheqNpCyqAsyr5apDSDXDRFde8Du
-         ar1bD/X/ikrhzB1LeD3bPC1bh8mMSLLd6WoROJZKWYKAu/IBNS2MsN1X/FiIjTKIRiyR
-         p0Afqzm+0AoupwC08yl41SYXPvTMMHUGLngiMaLEVkFEwP0aBM5KADFUzhei+fSRekfP
-         w8lg/k53h6V5U4FPibKX2xFxKiFiILrUGzp7vcmnggPA0n9iNehXYsc4cadnDS+U9Nx7
-         +h0w==
-X-Gm-Message-State: AOJu0YxdWHqs6EBu5EjJ9/sY+dF2kOUNRGsOFoNYUd1WmKL2NBiHVGVX
-	oNALfuOQCwi0W1la5H2TnapwYOcsTPgmYarAXU185V8cO7c+WvQy4C7kzSP5g5kfGATg+lK9lBw
-	9pKIGINjI+YDYIf9fWPsjmdeXhnuSYJXX0rjh3LcLamGwZ4Hh9Q==
-X-Google-Smtp-Source: AGHT+IFj/VoAYPwfj1qMXYn/keZw+BdB8CGX0gxPF/p+Y0NkDxp2Be9I3KxiQ0Bnuhcr/7xhhZgXPrcz0W3Y5Wu0t/0=
-X-Received: by 2002:a05:6402:1d4a:b0:5cb:acdc:b245 with SMTP id
- 4fb4d7f45d1cf-5ceb9282a67mr20397939a12.17.1730986674011; Thu, 07 Nov 2024
- 05:37:54 -0800 (PST)
+	s=arc-20240116; t=1730987200; c=relaxed/simple;
+	bh=if9jk2dSINoBzH18clA/Ys8T00nd8m33f8XjKwcmKzU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=lFyFQ9K6qNj5mbzvTZRviXHQqvHSNwxsnb3mOU3PpnJCSTkIPrLyJjbGopvID0g8ern4gin4RjieAWxJPlupKRMovd/UqhRx6wfbSySZkcigFJ+00cpyPSrYqjPSqksUNGrYr0Cm6PC58KCFRGrQiw6apCDRDBavGF/8EXtI8xA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=HFXknFo8; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9xKdMkn79d9dnT0G1cO0adRkZI6PucX/suKssJncjsg=; b=HFXknFo8GksUNKf1250xOEd8uY
+	LyikmqyjXzlTSRRYGeZP1+EPn3dILymah1Dqhx6qfJLQ2uGbqmSRtLFZqH6hkWXt7bCW7YLhvrEr/
+	TlROF3xvseQWUMIXFQGzzo0NoeUDe8HVUvDhTIXU9c9IuwbGo0gyY1nAWqT/WkDlo0Qw=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t92qC-00CT1q-UK; Thu, 07 Nov 2024 14:46:28 +0100
+Date: Thu, 7 Nov 2024 14:46:28 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	David Miller <davem@davemloft.net>,
+	Russell King - ARM Linux <linux@armlinux.org.uk>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>
+Subject: Re: [PATCH net-next 1/4] net: phy: make genphy_c45_write_eee_adv()
+ static
+Message-ID: <f67de48c-e21e-445a-b2e4-3bd182891640@lunn.ch>
+References: <69d22b31-57d1-4b01-bfde-0c6a1df1e310@gmail.com>
+ <d23bd784-44e6-4a15-af3a-b37379156521@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-6-shaw.leon@gmail.com>
-In-Reply-To: <20241107133004.7469-6-shaw.leon@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 7 Nov 2024 14:37:42 +0100
-Message-ID: <CANn89iLvC0H+eb1q1c9X6M1Cr296oLTWYyBhqTAyGW_BusHA_A@mail.gmail.com>
-Subject: Re: [PATCH net-next v2 5/8] net: ip_gre: Add netns_atomic module parameter
-To: Xiao Liang <shaw.leon@gmail.com>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
-	Kuniyuki Iwashima <kuniyu@amazon.com>, Jakub Kicinski <kuba@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
-	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d23bd784-44e6-4a15-af3a-b37379156521@gmail.com>
 
-On Thu, Nov 7, 2024 at 2:30=E2=80=AFPM Xiao Liang <shaw.leon@gmail.com> wro=
-te:
->
-> If set to true, create device in target netns (when different from
-> link-netns) without netns change, and use current netns as link-netns
-> if not specified explicitly.
->
+On Wed, Nov 06, 2024 at 09:19:59PM +0100, Heiner Kallweit wrote:
+61;7801;1c> genphy_c45_write_eee_adv() isn't used outside phy-c45.c,
+> so make it static.
+> 
+> Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
 
-Sorry, module parameters are not going to fly.
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-Instead, add new rtnetlink attributes ?
+    Andrew
 
