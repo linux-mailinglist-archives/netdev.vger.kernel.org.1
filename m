@@ -1,199 +1,160 @@
-Return-Path: <netdev+bounces-142744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2BC509C030A
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:56:12 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 772CC9C0343
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:03:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 81ADDB211B7
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 10:56:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 01DE91F237C8
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:03:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 225A71F4267;
-	Thu,  7 Nov 2024 10:55:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bCi4+OZK"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2111A1F12F4;
+	Thu,  7 Nov 2024 11:03:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09CAB1EF08E
-	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 10:55:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50B651EF923;
+	Thu,  7 Nov 2024 11:03:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730976956; cv=none; b=n8wKRBXkeb0FBo7Tpr7wgIeGMvupzhk149R3TBDSzV6gLWK4HRrLmkZxdykWkymfsrXhn8hjKj9J+vN+pvDAa8mGs9S3mYVGO7wDg7/Qj9NU7WT6lr24mEpvz0lGCEJZT2E6g08npiS+qxWsIQWv3o89BG8Muvr9IYoUxM4gxGY=
+	t=1730977394; cv=none; b=YTjw5R/bWgyul4ezDujNB3Ro0AEsybeoSfz1fN8hs3nL+N8pacamcrBNUWn8X+wJD1sy13aJJYIVIs7e7X3DJSJqC3ItCy0IhT8tua6/mUVrEZGBifZBP5WjgauoARmUAk0HTfTLdG1qQkqvYuGua3c8rbN5wBn570GYDI4GZPw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730976956; c=relaxed/simple;
-	bh=Ptg2YNRv84Ka/YjxoLsk2KHmK2F0sE89zVFLQauoKXs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HI8UcxGrnVAxaG9Y6yU9+S4ml4jStiYtcivixobeErXVSNwZXWwXyBRECLvs0CWpD2j1UmukE7RlE5jUIbPIIL7fHmPUuGQwbvH9gCQaDNEkaHkqlOY3CMlwEXKlRzRxJnLjQVwieFeDNlNxSCu/4Kk8bsQhCVtoUNRVyzS9Nj4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bCi4+OZK; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1730976953;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oAYdNfqYDY76D70Kko/7k/uzFJvDwWVIjYLWnlnNFVU=;
-	b=bCi4+OZKg+xYlglvl+8ckt0Fq81F8avYreyFQ+9xGf5m6vyudkOfUF1iijKW1TKw5tjJ5Q
-	ojhIdfwWjVHrsZxA6cm07C+nNz0YCsdgo7FExUdaVEj0yTIPcuKKUUsRNiJdts17MBw+QC
-	X1CoBSraY2K2CGJIkwKauQwufr6qUXM=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-423-RxCS-Wa9NsKYGxOMMVZ0Bg-1; Thu, 07 Nov 2024 05:55:51 -0500
-X-MC-Unique: RxCS-Wa9NsKYGxOMMVZ0Bg-1
-X-Mimecast-MFC-AGG-ID: RxCS-Wa9NsKYGxOMMVZ0Bg
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-4315d98a75fso5687615e9.2
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 02:55:51 -0800 (PST)
+	s=arc-20240116; t=1730977394; c=relaxed/simple;
+	bh=3ErXnkzPXHXYk1o/fqIsJm8Zuq6K3DTzluGq+w0yz4Q=;
+	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=S6bI8PJsQz8NeDtyKx9+QG/QwdiIyaeg9E0zRA6Aq/xNr5HhG/AziMGdGShywTKRx7j39QqZa9Wp/87JTtqu8XquZCgMLqRBcUnarX2cCFg3leDUD75ijMC/4plhtwxqBb1LUOh+23Y13QbLhUkYlToV2UJ9nBPkqhXDhFDJQBo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9acafdb745so178031066b.0;
+        Thu, 07 Nov 2024 03:03:12 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1730976950; x=1731581750;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=oAYdNfqYDY76D70Kko/7k/uzFJvDwWVIjYLWnlnNFVU=;
-        b=Ys/GdHBCfBujzzxIqjHQbfWVened6NQz00qUr5iASVFDdIzhGWeXVQMLU8dogK2ncJ
-         NeXw1w1WIwaqipAnl5/CyAlK7CqxwqzOggEUZLzMKUdaPyuvVX7+ho4NIBFtsj++AnmK
-         9EinWDghd3sfh9RBpALlWyK/UxXPkkbCDv1R9ogbstkhV/KVclSQx4mLlJMFO8X3HKtW
-         pRuY4F785JZU2P47ZWQbxVdyd15TSxWAEGXjVzd5t1HAAXbwNrqDPxeL4gauvB759YPw
-         93lrWziDN7yrEw3JKBrlL2YNgrLgYk737wy/3bVx15nh7jxbkXGzea06w7Xx/r4w9x/x
-         WA9A==
-X-Forwarded-Encrypted: i=1; AJvYcCX597zRCsKXbUXt82Epq7jxbYM+UJt9i+iP4ImVSmwoLXay+NMW5EsyrabMSPT5QcJPQacZIzw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxCPM3ZnJzDwQI49nKibj/Lzj+36db6KJNUKgs+DgBHtvFPtMgA
-	JoJrnFkcZ+byv+GSHJ8lDSjBvRwvkPbcAhdSEFUv1BplmIwXNUO7xyxQCQ/8MNSFrdjDBfIAcbf
-	cWc9f3RaB2f4Kk1umXfu+0b6ZNC0i+QXbTjAcZo0k59LDo6lfDFRItg==
-X-Received: by 2002:a05:600c:214d:b0:431:b42a:2978 with SMTP id 5b1f17b1804b1-431b42a2d0emr323338225e9.9.1730976950083;
-        Thu, 07 Nov 2024 02:55:50 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IGgM0/NIP9GnKSCaXLIZ3wcMjfxblKc/73rIIp2MQHCe9Kkfyj7lS7BGw7OtgMp+27yviafuA==
-X-Received: by 2002:a05:600c:214d:b0:431:b42a:2978 with SMTP id 5b1f17b1804b1-431b42a2d0emr323338015e9.9.1730976949737;
-        Thu, 07 Nov 2024 02:55:49 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c26e3sm19610585e9.33.2024.11.07.02.55.48
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 07 Nov 2024 02:55:49 -0800 (PST)
-Message-ID: <362a90d1-a331-4bcc-8f14-495baf5c2309@redhat.com>
-Date: Thu, 7 Nov 2024 11:55:47 +0100
+        d=1e100.net; s=20230601; t=1730977391; x=1731582191;
+        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
+         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=xwWoCBwVR8kG9o/zCItPBe6Zux0DZ6w5rjMAQQHp/eQ=;
+        b=tfy9/g+ONpKtQ1I+THLWnLBSgUJODBn0KQHgXMm8lCZ1Na5Bv/ZHt81mKG0Str6oeE
+         0oD/Q5czBAnfdpXsfGXrvzwMpC3kcfYiLi+RWwzTInaGK/ex8H6y7i4N4+v9TC/GkZQG
+         32/TIVmmdrpGxGRMV7j7H5Dir+JxOZ6f8pP3Zh0PfLjJWNyvv8pRlNbPcOkTwDCPEuap
+         4Ixux3tPLChVdrkUEioK4XxZN8WD0sHlY958T5q2yYOZeXpMp2haE3cmwoet1bh2ilYd
+         lOfG0sZ83LtVa0GBFkvh1tqKlFzOVStDcRVEYpVd42npEi5W68y4v6If75GbUfHYniiN
+         ZOgQ==
+X-Forwarded-Encrypted: i=1; AJvYcCVR7i0dzdQ3zSmtznxLeUQ+vf6OUB7xnGRplAUzV4u1xRKX4ywxaq4ovRbmfYSh8/lIOsQHkl9I@vger.kernel.org, AJvYcCXgCsMTRuk95QOEC4jNSiT3emNbbEulAQPKODoWddgKIHgpL+HbtxchjgrwzGOfGjLy4kvL7YP+K4hOuNc=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyF1tBArdLE7XtZS3XkvDIL6ZSmL8GnOVBUftLxhBNlYKdGNVKe
+	BHPHKe37uE5Ja4ExS7FZvn3FahbIYTMHJTpT3NhaORVjJ1O6K3Ac
+X-Google-Smtp-Source: AGHT+IF0Qkc1R64OCdjzgxELkwdGZYOG5tKXrgQSGfnLeYaE34acOHkan5W/vJL7fOnSw45FcxpKdg==
+X-Received: by 2002:a17:907:3f97:b0:a9a:170d:67b2 with SMTP id a640c23a62f3a-a9ee6c615famr75107066b.29.1730977390483;
+        Thu, 07 Nov 2024 03:03:10 -0800 (PST)
+Received: from localhost (fwdproxy-lla-004.fbsv.net. [2a03:2880:30ff:4::face:b00c])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0dc5db6sm76795966b.119.2024.11.07.03.03.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 03:03:09 -0800 (PST)
+From: Breno Leitao <leitao@debian.org>
+Date: Thu, 07 Nov 2024 03:02:55 -0800
+Subject: [PATCH net] ipmr: Fix access to mfc_cache_list without lock held
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net 1/1] netfilter: nf_tables: wait for rcu grace period
- on net_device removal
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org,
- edumazet@google.com, fw@strlen.de
-References: <20241106235853.169747-1-pablo@netfilter.org>
- <20241106235853.169747-2-pablo@netfilter.org>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <20241106235853.169747-2-pablo@netfilter.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
+Message-Id: <20241107-ipmr_rcu-v1-1-ad0cba8dffed@debian.org>
+X-B4-Tracking: v=1; b=H4sIAF+eLGcC/x3MWwqDMBAF0K0M99tAJtiq2UqR4mPU+TCViS2Cu
+ HehZwHnRBZTyYh0wuSnWT8JkbggDEuXZnE6IhKCDyWzr5xuq71t+LrQ8Fg/Su97fqIgbCaTHv/
+ qhSQ72uu6AbIhanxfAAAA
+X-Change-ID: 20241107-ipmr_rcu-291d85400b16
+To: "David S. Miller" <davem@davemloft.net>, 
+ David Ahern <dsahern@kernel.org>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Simon Horman <horms@kernel.org>
+Cc: David Ahern <dsahern@gmail.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, kernel-team@meta.com, 
+ Breno Leitao <leitao@debian.org>
+X-Mailer: b4 0.14.2
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2226; i=leitao@debian.org;
+ h=from:subject:message-id; bh=3ErXnkzPXHXYk1o/fqIsJm8Zuq6K3DTzluGq+w0yz4Q=;
+ b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnLJ5s2DLNLfVUR5XEhUtDtpUR0i8TR+SgzDIQh
+ rPcWOtAt/qJAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZyyebAAKCRA1o5Of/Hh3
+ bRTQEACMBDVbyND6f42JQfVgt2FLPK8ak5R8Dxg/QqrqDNjJcmVyRAVbAAbOPgMwGjae9KjHmPe
+ jaHUEuIPLmJcZ99SgtoIHknpOfaG/hz3qRIfMTZc8WPT1wKGWZAsdA3YG9RFEmMa1Ia5ZHb4Cxq
+ 7dT+1DMdKwUFoIbKHer5IBHoExsns6F5s2KdHnL8NzOF1b/HPjf8VcSFPIh9O10i4r/17FyYWS9
+ W2pt5kDxNs5CsBPuPNusJ6cES6b0qE16oGIxrJmmh3HpcMENiPhBDxZGj+M26YZZc9uGrzvX38Z
+ 6/DqPq3IGM7EMkHKc9IX4Wj0K3IyeuSsyJEm8ibs0iVUCXF3i4jid87xBxxklc3HmjuRzL+75Mk
+ 8ZReM5HAMiam7l1mAfbIlynATlRjogNM/Zja3aVFexoPyV0qIFD3rb8gDLJJN+Vo3dqg4COPD4N
+ WFVq0bd5qofmKLilMSCOfcYISBtjFYfY/BRJoPdIJ1TtJY7d5ks4tli2H9xU7fmScshtgAO4z0m
+ Je9j02WfL+DyOuK5isWSMV7mToQbAcAEHycVfZnqnnjH2oJH5W+0aT2uSFMtjNefSeBIODq36Lg
+ OgxmIv1WKlKvwJIRTMYUY3ujIAvvJTvnKhLewHUX4Cbs6vn30qFmuVcRhMFG7UdXtUSGlRNPg2W
+ rMTnORCueQ5AJWA==
+X-Developer-Key: i=leitao@debian.org; a=openpgp;
+ fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
 
-Hi,
-On 11/7/24 00:58, Pablo Neira Ayuso wrote:
-> 8c873e219970 ("netfilter: core: free hooks with call_rcu") removed
-> synchronize_net() call when unregistering basechain hook, however,
-> net_device removal event handler for the NFPROTO_NETDEV was not updated
-> to wait for RCU grace period.
-> 
-> Note that 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks
-> on net_device removal") does not remove basechain rules on device
-> removal, I was hinted to remove rules on net_device removal later, see
-> 5ebe0b0eec9d ("netfilter: nf_tables: destroy basechain and rules on
-> netdevice removal").
-> 
-> Although NETDEV_UNREGISTER event is guaranteed to be handled after
-> synchronize_net() call, this path needs to wait for rcu grace period via
-> rcu callback to release basechain hooks if netns is alive because an
-> ongoing netlink dump could be in progress (sockets hold a reference on
-> the netns).
-> 
-> Note that nf_tables_pre_exit_net() unregisters and releases basechain
-> hooks but it is possible to see NETDEV_UNREGISTER at a later stage in
-> the netns exit path, eg. veth peer device in another netns:
-> 
->  cleanup_net()
->   default_device_exit_batch()
->    unregister_netdevice_many_notify()
->     notifier_call_chain()
->      nf_tables_netdev_event()
->       __nft_release_basechain()
-> 
-> In this particular case, same rule of thumb applies: if netns is alive,
-> then wait for rcu grace period because netlink dump in the other netns
-> could be in progress. Otherwise, if the other netns is going away then
-> no netlink dump can be in progress and basechain hooks can be released
-> inmediately.
-> 
-> While at it, turn WARN_ON() into WARN_ON_ONCE() for the basechain
-> validation, which should not ever happen.
-> 
-> Fixes: 835b803377f5 ("netfilter: nf_tables_netdev: unregister hooks on net_device removal")
-> Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
-> ---
->  include/net/netfilter/nf_tables.h |  2 ++
->  net/netfilter/nf_tables_api.c     | 41 +++++++++++++++++++++++++------
->  2 files changed, 36 insertions(+), 7 deletions(-)
-> 
-> diff --git a/include/net/netfilter/nf_tables.h b/include/net/netfilter/nf_tables.h
-> index 91ae20cb7648..8dd8e278843d 100644
-> --- a/include/net/netfilter/nf_tables.h
-> +++ b/include/net/netfilter/nf_tables.h
-> @@ -1120,6 +1120,7 @@ struct nft_chain {
->  	char				*name;
->  	u16				udlen;
->  	u8				*udata;
-> +	struct rcu_head			rcu_head;
+Accessing `mr_table->mfc_cache_list` is protected by an RCU lock. In the
+following code flow, the lock is not held, causing the following error
+when `RCU_PROVE` is not held.
 
-I'm sorry to be pedantic but the CI is complaining about the lack of
-kdoc for this field...
+	6.12.0-rc5-kbuilder-01145-gbac17284bdcb #33 Tainted: G            E    N
+	-----------------------------
+	net/ipv4/ipmr_base.c:313 RCU-list traversed in non-reader section!!
 
->  
->  	/* Only used during control plane commit phase: */
->  	struct nft_rule_blob		*blob_next;
-> @@ -1282,6 +1283,7 @@ struct nft_table {
->  	struct list_head		sets;
->  	struct list_head		objects;
->  	struct list_head		flowtables;
-> +	possible_net_t			net;
+	rcu_scheduler_active = 2, debug_locks = 1
+		   2 locks held by RetransmitAggre/3519:
+		    #0: ffff88816188c6c0 (nlk_cb_mutex-ROUTE){+.+.}-{3:3}, at: __netlink_dump_start+0x8a/0x290
+		    #1: ffffffff83fcf7a8 (rtnl_mutex){+.+.}-{3:3}, at: rtnl_dumpit+0x6b/0x90
 
-... and this one ...
+	stack backtrace:
+		    lockdep_rcu_suspicious
+		    mr_table_dump
+		    ipmr_rtm_dumproute
+		    rtnl_dump_all
+		    rtnl_dumpit
+		    netlink_dump
+		    __netlink_dump_start
+		    rtnetlink_rcv_msg
+		    netlink_rcv_skb
+		    netlink_unicast
+		    netlink_sendmsg
 
->  	u64				hgenerator;
->  	u64				handle;
->  	u32				use;
+Fix accessing `mfc_cache_list` without holding the RCU read lock. Adds
+`rcu_read_lock()` and `rcu_read_unlock()` around `mr_table_dump()` to
+prevent RCU-list traversal in non-reader section.
 
-[...]
-> +static void nft_release_basechain_rcu(struct rcu_head *head)
-> +{
-> +	struct nft_chain *chain = container_of(head, struct nft_chain, rcu_head);
-> +	struct nft_ctx ctx = {
-> +		.family	= chain->table->family,
-> +		.chain	= chain,
-> +		.net	= read_pnet(&chain->table->net),
-> +	};
-> +
-> +	__nft_release_basechain_now(&ctx);
-> +	put_net(ctx.net);
+Since `mr_table_dump()` is the only function that touches the list, that
+might be the only critical section in `ipmr_rtm_dumproute()` that needs
+to be protected in ipmr_rtm_dumproute().
 
-... and also about deprecated API usage here, the put_net_tracker()
-version should be preferred.
+Signed-off-by: Breno Leitao <leitao@debian.org>
+Fixes: cb167893f41e ("net: Plumb support for filtering ipv4 and ipv6 multicast route dumps")
+---
+ net/ipv4/ipmr.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-Given this change will likely land on very old trees I guess the tracker
-conversion is better handled as a follow-up net-next patch.
+diff --git a/net/ipv4/ipmr.c b/net/ipv4/ipmr.c
+index 089864c6a35eec146a1ba90c22d79245f8e48158..bb855f32f328024f384a2fa58f42fc227705206e 100644
+--- a/net/ipv4/ipmr.c
++++ b/net/ipv4/ipmr.c
+@@ -2612,8 +2612,10 @@ static int ipmr_rtm_dumproute(struct sk_buff *skb, struct netlink_callback *cb)
+ 			NL_SET_ERR_MSG(cb->extack, "ipv4: MR table does not exist");
+ 			return -ENOENT;
+ 		}
++		rcu_read_lock();
+ 		err = mr_table_dump(mrt, skb, cb, _ipmr_fill_mroute,
+ 				    &mfc_unres_lock, &filter);
++		rcu_read_unlock();
+ 		return skb->len ? : err;
+ 	}
+ 
 
-Would you mind addressing the kdoc above? Today PR will be handled by
-Jakub quite later, so there is a bit of time.
+---
+base-commit: 25d70702142ac2115e75e01a0a985c6ea1d78033
+change-id: 20241107-ipmr_rcu-291d85400b16
 
-Thanks!
-
-Paolo
+Best regards,
+-- 
+Breno Leitao <leitao@debian.org>
 
 
