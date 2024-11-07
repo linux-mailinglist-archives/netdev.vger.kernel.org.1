@@ -1,101 +1,109 @@
-Return-Path: <netdev+bounces-142766-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142769-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id C0D3E9C04D6
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:51:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 786239C04DD
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 12:51:59 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 78B871F24B12
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:51:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA05A1C23A8A
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 11:51:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F93C20F5C9;
-	Thu,  7 Nov 2024 11:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FA6921018E;
+	Thu,  7 Nov 2024 11:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="ft1ItOfw"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="n1QHwT/x"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C42F20F5B7;
-	Thu,  7 Nov 2024 11:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A8DC20F5B7
+	for <netdev@vger.kernel.org>; Thu,  7 Nov 2024 11:50:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1730980221; cv=none; b=pKBXHa6r8eXkdgJ2KAoECfh+Ps/+J8zbMpBmLtS6FfRtO1B4a6hC+hg7I8rhzfmthqpC7IEhGyySNNIIR4iCHzEJc/oLGUHYpKKaXlXciWnIc8lfMGF1Z+y4y8m5SvnXF4J2Z+IocmNqvPF4KnBIMrcLZLmpIHmv3JR+WvAwiMA=
+	t=1730980237; cv=none; b=VFGMVMXV8bOMOXMFFEcNCy3V3tFNUQmI7aioJnvu2W7dxv9ZfPLnkWbHSsRmZtfNfelHBTPOUMEsdXGh0I97Z4iy+0VB8e3ud7X9UC58so7jf0+4JYct+/6y3Fx6zT10xIGPbxbIa4vcdqVqHCVG3Bqq0dBMO6xZ4gAKpN17l8U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1730980221; c=relaxed/simple;
-	bh=2UyNdy4qGbpUbTVMh2TIe9zeckWHBjwyMeyiAort2yU=;
-	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=kwRtj5LCVlyFRV2QfmRZ57KhyyUmpIAsHor4DIRDpAAwhFq0Cb2JfsPp12p7nezKV+6wZBnKsX/ByGKpL/XNdqLr56/4cMvbRTwnR5zZh007WgRY/XtlDhwRqinKuNORKiLF/TdPqzzC/jhouyNY5KDIDkHq2W3Q3OjDyjemGIc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=ft1ItOfw; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCC6CC4CECC;
-	Thu,  7 Nov 2024 11:50:20 +0000 (UTC)
+	s=arc-20240116; t=1730980237; c=relaxed/simple;
+	bh=1m5HdAq6sHmragQQ341Wnq6mMbOs5y6f0TYrU3HekcY=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=nAltg27Z2nvO7V8Rw4+TTbgvGSvC2UKVdIAWbk+wNMU3YbvDjkR8ZUsq5JUfHbHof/XbYITgqIogAeitM92peKb3JwoATPPe7n7sos/6YNK95oq+GWKj0hXo8eAFyy55STF5bFIsVtbIoYywi3cC9dygIA7LgUnx6jn5OCD0R7o=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=n1QHwT/x; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C23FC4CECE;
+	Thu,  7 Nov 2024 11:50:36 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1730980220;
-	bh=2UyNdy4qGbpUbTVMh2TIe9zeckWHBjwyMeyiAort2yU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ft1ItOfwxHkMQKyX70arcU/rXPkwfnXSyhbEgW/RMtmJ3FT2RwpvpPvj4V9vEz88H
-	 1Sd69JLNxeZq5q5ZylouwJv8dQGGD10jp6AF0wmBmZcAo0Sfsx60X0e7h1aU/3ACrj
-	 BRqIhHa5mD2G0MNbkVodhsYWQZ7QSU8wCuhqoPmjr1DQlZ1adTpK9Kb6IXt5GqQQ+q
-	 wr+GCl1mGGEOsCb3tcaowjiYXvZWiCEFiuDiSsUJBYkj7scgpz0MKlAWFflVULbc9k
-	 VL+RolwZSpsyFz2hKKmO4ck6HA9ikZOPQC1VJFcBDvewFhcp2gHKKNG9EMGy2D7bgI
-	 u/cI442my2eOg==
-Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 343863809A80;
-	Thu,  7 Nov 2024 11:50:31 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1730980237;
+	bh=1m5HdAq6sHmragQQ341Wnq6mMbOs5y6f0TYrU3HekcY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=n1QHwT/xvXw+JpDdumR7qN/tnlMAyvJHEkcOWybO2S3vzY8D/KNVAPuRzBC3pXY52
+	 aP9g2o7tV6+5yR1LsQczEZ460qNvs93PGWiohtwbyj2vOLCy9gKEjGOsLAWjwSa0rR
+	 DQI1q20+PVz7Xg7JUiAwU2WmnpU+0yagsp8kdsSmFvIqQ9xuTjge653R7dV/LzPfjy
+	 H0cNovd3Up8sbNcxrZ2WRwe4VoUlmf2V9YUTJD94Yja4+4C7o0AI8PHJUBKWA30T5D
+	 vCYnNTsBsQ3YRf97wO8pXBgne5cPeHAIedp33t2NzFuD8ugf7VmJrSybU/FtO0eJu7
+	 /lwiJsi9k5hPw==
+Date: Thu, 7 Nov 2024 13:50:31 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Antony Antony <antony.antony@secunet.com>
+Cc: Feng Wang <wangfe@google.com>, netdev@vger.kernel.org,
+	steffen.klassert@secunet.com
+Subject: Re: [PATCH 1/2] xfrm: add SA information to the offloaded packet
+Message-ID: <20241107115031.GK5006@unreal>
+References: <20241104233251.3387719-1-wangfe@google.com>
+ <20241105073248.GC311159@unreal>
+ <CADsK2K9seSq=OYXsgrqUGHKp+YJy5cDR1vqDCVBmF3-AV3obcg@mail.gmail.com>
+ <20241106121724.GB5006@unreal>
+ <Zytx9xmqgHQ7eMPa@moon.secunet.de>
+ <CADsK2K9mgZ=GSQQaNq_nBWCvGP41GQfwu2F0xUw48KWcCEaPEQ@mail.gmail.com>
+ <Zyx/ueeoeBdq/FXj@moon.secunet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/4] virtio_net: Make RSS interact properly with queue
- number
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <173098023002.1629022.1863004983853146136.git-patchwork-notify@kernel.org>
-Date: Thu, 07 Nov 2024 11:50:30 +0000
-References: <20241104085706.13872-1-lulie@linux.alibaba.com>
-In-Reply-To: <20241104085706.13872-1-lulie@linux.alibaba.com>
-To: Philo Lu <lulie@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, mst@redhat.com, jasowang@redhat.com,
- xuanzhuo@linux.alibaba.com, eperezma@redhat.com, andrew+netdev@lunn.ch,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- andrew@daynix.com, virtualization@lists.linux.dev,
- linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zyx/ueeoeBdq/FXj@moon.secunet.de>
 
-Hello:
-
-This series was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Mon,  4 Nov 2024 16:57:02 +0800 you wrote:
-> With this patch set, RSS updates with queue_pairs changing:
-> - When virtnet_probe, init default rss and commit
-> - When queue_pairs changes _without_ user rss configuration, update rss
->   with the new queue number
-> - When queue_pairs changes _with_ user rss configuration, keep rss as user
->   configured
+On Thu, Nov 07, 2024 at 09:52:09AM +0100, Antony Antony wrote:
+> On Wed, Nov 06, 2024 at 16:14:36 -0800, Feng Wang wrote:
+> > Antony brought out an important function xfrm_lookup_with_ifid(), this
+> > function returns the next dst_entry.
+> > 
+> > The xfrm_lookup_with_ifid() function utilizes xfrm_sk_policy_lookup()
 > 
-> [...]
+> would the output packet, looked up using xfrm_lookup_with_ifid ,
+> match xfrm policy with "offload packet" set?
 
-Here is the summary with links:
-  - [net,1/4] virtio_net: Support dynamic rss indirection table size
-    https://git.kernel.org/netdev/net/c/86a48a00efdf
-  - [net,2/4] virtio_net: Add hash_key_length check
-    https://git.kernel.org/netdev/net/c/3f7d9c1964fc
-  - [net,3/4] virtio_net: Sync rss config to device when virtnet_probe
-    https://git.kernel.org/netdev/net/c/dc749b7b0608
-  - [net,4/4] virtio_net: Update rss when set queue
-    https://git.kernel.org/netdev/net/c/50bfcaedd78e
+According to my understanding, no.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+> When lookup is in the xfrm device.
+> 
+> ip xfrm policy .... offload packet dev <if-name>
+> 
+> 
+> > to find a matching policy based on the given if_id. The if_id checking
+> > is handled in it.
+> > Once the policy is found, xfrm_resolve_and_create_bundle() determines
+> > the correct Security Association (SA) and associates it with the
+> > destination entry (dst->xfrm).
+> 
+> If the output packet got this far, dst is set in skb?
+> And when the packet reach the driver dst = skb_dst(skb);
+> dst->xfrm is the state?
+> If this is the case  why add state to skb as your patch proose?
+> May be I am missing something in the packet path.
+> 
+> > This SA information is then passed directly to the driver. Since the
+> > kernel has already performed the necessary if_id checks for policy,
+> > there's no need for the driver to duplicate this effort.
+> 
+> Is this how packet offload would work? My guess was in packet offload
+> policy look happens in the driver.
 
+You are right, this is not how packet offload works.
+The expectation is that HW sees and catches same selectors as SW.
+It ensures that if SW finds policy/SA, HW will find the same.
 
+Thanks
 
