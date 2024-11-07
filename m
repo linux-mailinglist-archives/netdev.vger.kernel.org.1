@@ -1,75 +1,64 @@
-Return-Path: <netdev+bounces-142977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-142978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9C119C0D44
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:51:27 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B469C0D50
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 18:52:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 6FC321F232E8
-	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:51:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55DD41C2208E
+	for <lists+netdev@lfdr.de>; Thu,  7 Nov 2024 17:52:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2FEC62170C9;
-	Thu,  7 Nov 2024 17:51:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32B29216DE6;
+	Thu,  7 Nov 2024 17:51:53 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="XLVZ4gSe"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Pallv/nJ"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AD13216E1B;
-	Thu,  7 Nov 2024 17:51:16 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2F7F216DE8;
+	Thu,  7 Nov 2024 17:51:51 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731001879; cv=none; b=JovFYJnbo8fSPmuK5OBiJCaEt9sQUBwyxShsGI+tG91UniW3VHVHTJIJT09yZ/DknaRI6Q1WoyztIim5wxIhVJ2tlgHwetqlDvbuvbAft6+sFWQL3bfwHNXa7llik9KTpBPxolx5cMLjaxDi+oaW0Fwxqwa7Hh8LhuWMJ5BI10k=
+	t=1731001913; cv=none; b=ivtBdraDGIGTxv8VPMtKvLb1WWMFhtl1Wse8GRV4TmC59JwXIzM4fSmYE3nEOXQr/ckEiW/99dB6Lm9Jj952ulmwzLSIh+xWEl5z1w0hgmmvL4sB9f4c6mg/+0pNXfCaLscQf+zoNa859PMhJwvY4ShZ4+8g3sb734fcZcnjICk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731001879; c=relaxed/simple;
-	bh=h09SlzBjsMOpNTxOjIGgJnsIz4PPHohRSdHWl7WjL2M=;
+	s=arc-20240116; t=1731001913; c=relaxed/simple;
+	bh=MJYbF1lfNlKUtgQ7aj8FENyIimX/V2VvFiWmS2+L6zY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=JcrlL+rlzoIxouNo9ecRqnRw6jnnE6xn1Ki5/VkekGl3SyxTjfBMEWAMEfc3pSPXLRQQMWBXl1pN9CcPVNts1Pa926wSyNGWqQU9Yf/7EWDAVDrDqOI2p/Q2816jFhW+xDwSJuxjex1B38tVVVqQbTGx1wr8ja4nJwltgFCrmMQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=XLVZ4gSe; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=3ZjI5bVISFgrCE/xP6ZKnp6e6AW65IJOtxsC7dqm3II=; b=XLVZ4gSeBQYGLf2fIefGLyZsDy
-	nqeGeXQpxeRgb1XHS3+SkVu8898FvRotg9X1lpbvV6SNqEC7qo9v/3uFy5IOGz5poFykhbQ1gMDHy
-	k7NTwhJwg+t0hztPbCGEA3Q27VOof4QFyh9JcCWWC1jKPkBeyoV6dZ0DFHEGgYX5msqaRADS0CbEi
-	MYna/+GKPnuA6CI/8d2P0En0pHPpQedYGEFytM08SJcRdVLRuHsE7BjdtD/h/hNH1HzuOd1W+LSAO
-	CvmAaVPrnKTgjgSgXhAYOBjihghvb5QEdKChyLgk+L+hAHWWf3XcKuHcAHbkuq3hfJYFaKdsQ5O2R
-	/xIkojSg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:48104)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t96ez-0003aF-08;
-	Thu, 07 Nov 2024 17:51:09 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t96ev-0001TM-1g;
-	Thu, 07 Nov 2024 17:51:05 +0000
-Date: Thu, 7 Nov 2024 17:51:05 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+	 Content-Type:Content-Disposition:In-Reply-To; b=pWY3eG8Rwo/yNJeq9lLRjos3PcrxCQiKhg5db5Udl/yIKQoCuvf/nfd14zaHT5ixMnopET7xrKWBK+nhZtFUX++b81v8cP3FT3mBZZs4AT8Q9+vxt+OWHS93yo2dvI3rmKw5rgpghnH4z20ECAycKeFlB9vc+PoB/2Klf5hcX+8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Pallv/nJ; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=VTX/qMfY3i1jVfedgdybn7RbAb/9rhIjtakkTYoriP8=; b=Pallv/nJMHV7iZux+Ob/roeq9X
+	/E2DpyqXe6D/fqUEme2NP5f/inf0Ze4v8P1V3BPjrdWJ0OMhZBkZ02WkQ/W2N00lRtzcvSyX2J22T
+	un2gub2wdSq3ZJxTgZ3CY2+Fx3od6i/baWCCy/S+G2597Kfx/w4Ptt1qhkSmuEEwPqPc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t96fY-00CUYV-67; Thu, 07 Nov 2024 18:51:44 +0100
+Date: Thu, 7 Nov 2024 18:51:44 +0100
+From: Andrew Lunn <andrew@lunn.ch>
 To: Maxime Chevallier <maxime.chevallier@bootlin.com>
-Cc: davem@davemloft.net, Andrew Lunn <andrew@lunn.ch>,
-	Jakub Kicinski <kuba@kernel.org>,
+Cc: davem@davemloft.net, Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
 	Christophe Leroy <christophe.leroy@csgroup.eu>,
 	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, thomas.petazzoni@bootlin.com,
 	Herve Codina <herve.codina@bootlin.com>,
 	Uwe =?iso-8859-1?Q?Kleine-K=F6nig?= <u.kleine-koenig@baylibre.com>,
 	linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net-next 2/7] net: freescale: ucc_geth: split adjust_link
- for phylink conversion
-Message-ID: <Zyz-CcO1inN06mtm@shell.armlinux.org.uk>
+Subject: Re: [PATCH net-next 6/7] net: freescale: ucc_geth: Hardcode the
+ preamble length to 7 bytes
+Message-ID: <7c8e1d44-cdcf-4d46-b9a8-b93e0cd39d43@lunn.ch>
 References: <20241107170255.1058124-1-maxime.chevallier@bootlin.com>
- <20241107170255.1058124-3-maxime.chevallier@bootlin.com>
+ <20241107170255.1058124-7-maxime.chevallier@bootlin.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,22 +67,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107170255.1058124-3-maxime.chevallier@bootlin.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+In-Reply-To: <20241107170255.1058124-7-maxime.chevallier@bootlin.com>
 
-On Thu, Nov 07, 2024 at 06:02:49PM +0100, Maxime Chevallier wrote:
-> Preparing the phylink conversion, split the adjust_link callbaclk, by
-> clearly separating the mac configuration, link_up and link_down phases.
+On Thu, Nov 07, 2024 at 06:02:53PM +0100, Maxime Chevallier wrote:
+> The preamble length can be configured in ucc_geth, however it just
+> ends-up always being configured to 7 bytes, as nothing ever changes the
+> default value of 7.
+> 
+> Make that value the default value when the MACCFG2 register gets
+> initialized, and remove the code to configure that value altogether.
+> 
+> Signed-off-by: Maxime Chevallier <maxime.chevallier@bootlin.com>
 
-I'm not entirely sure what the point of this patch is, given that in
-patch 7, all this code gets deleted, or maybe moved?
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-If it's moved, it may be better in patch 7 to ensure that doesn't
-happen, and move it in a separate patch - right now patch 7 is horrible
-to review as there's no way to see what the changes are in these
-link_up()/link_down() functions.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+    Andrew
 
