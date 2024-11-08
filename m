@@ -1,164 +1,169 @@
-Return-Path: <netdev+bounces-143170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40AA59C1512
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:04:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F02D89C1518
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:09:46 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id EC2A51F22229
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:04:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B453B285D66
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E11CF12F5A5;
-	Fri,  8 Nov 2024 04:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182341946DF;
+	Fri,  8 Nov 2024 04:09:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Fu2T0CLN"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="alwh7b0Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f172.google.com (mail-pf1-f172.google.com [209.85.210.172])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EAB3D528;
-	Fri,  8 Nov 2024 04:04:53 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.172
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E09473BBEA;
+	Fri,  8 Nov 2024 04:09:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731038694; cv=none; b=VlZdzANH1vbrhzc1CylSd0LIRzjG4HNPGXC/VF8eSmaBgnHn3Fsg0s8xQaUyyCfIxmJahx7LB8u8FbD/tETvQ7pdFUG0T36dz+UHIEohpE6k05/xhp9jXZAzcNX0/RR9lc0QFN1+DjRKt741qEjlcesruIfkArD9eiKBQbpTQnc=
+	t=1731038982; cv=none; b=n8Pptf+SisX0UYztuHrBtEoLQhrAVM6b1rj9tsAtAngsGtpo4gK1FIl9r1doUFh2eTRRVp/F/17tkCSO1oVRSTUYZi+IgbgbLO2B6xXpOfiOzkaAp+mfe+H+6t/0ixv30+o7iWgtduti3EeTg4e3HexofCABgViqYiO9SYHVy0k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731038694; c=relaxed/simple;
-	bh=/yloo3atEVaYveWLXvZYwTZ+TkL5nPz8okgTjlmuNkY=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=G/EQGJPxDiiVcWkKtFGDU9BI4x14MsKBWebfo1XBbTFOaKMGw3zJc+E316dSbYYiznjS+yFlNjzY4fhW0x13YkRaF1eWAiyqcY1EEJ+QsL8wC5x2A9aJf+anxwJ2k1/xN8rBtd9m9yztJ/OhBC/0V+eXT8LboTJ+E8PgVx93168=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Fu2T0CLN; arc=none smtp.client-ip=209.85.210.172
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f172.google.com with SMTP id d2e1a72fcca58-720d5ada03cso1636971b3a.1;
-        Thu, 07 Nov 2024 20:04:53 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731038693; x=1731643493; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=j6rzU0PyYikhQZwL7BWTrF2snRYX+I0s4f7tJfKjjjc=;
-        b=Fu2T0CLNDv89CGQS2KdfzchN0om6+U7Ps6mjh4HF6YbeArh8O5+KhFu5GvIMYvLRW/
-         upgcY3dBdZbJ3FYbOEeTbL301H4jxAdjpw5+ZpAM/rzFL/aa1Pj/FNEkYHs43+CgMAsN
-         yD7cp+JLJgsEjuuWq6s67HaXSyHD7gqaYRwalqQ/gKHy1QbkSe+2+853fFMFw4wUR6A6
-         /7vkXXZAaE2/iKBO5E/JdJaJSpBSRiXqqS9CXMCWHsiCiIDHIf3aM1olYTUfn1ZQNNrR
-         7t0YzIuKnjpUuY6Ue7lvfB/W5U9B4xR6F6TzNLwvS4AP4jAiNMTlKLRL4jLg023PhGAk
-         3n6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731038693; x=1731643493;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=j6rzU0PyYikhQZwL7BWTrF2snRYX+I0s4f7tJfKjjjc=;
-        b=FizqQylFLszLnT96hAUBZY5pZbSrco7RLQ95zbiTOOe1ht/ZcIS+OlJFTgML5FANqc
-         QbgpX9iquIfPI3A2w23WoUsvgxZfXBTkk6A2X+X6+5ecpPGK0/XoL+OkSaE8gYxBSj6R
-         5Gaxojh0IYYhjGRjJhg9rpJq9YgL1qqk7sR98bz/41P8M2Dby2osd7KuhF86wFYD5YUa
-         nHBiBi5oPRBOap4ImEvGOGwJfDwbT16Fwvpmj7/l/HFt4z0/1sEA5XwZ0EnHsV3jbU+n
-         tLzO8yBJ/9KH3i9lUcND9aKWRDYkpnS9At8POihEuCD4/IjEl+fyk/IHxTSMEjZsuhBK
-         edAA==
-X-Forwarded-Encrypted: i=1; AJvYcCXMuhU/RaoyNni0IgSo1MyOeR8Bj/qwBWdlZM4NEHzYCQgXZpO+rQtZMQGOHlCHJAl+Xrf22Qc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw9IOHaL7LUfKYKU9/M0mfiR6Tq0c7E+Sc9A48ysFrH+y66VBDy
-	4axePMZdq+WAiB+pD82uH3EL9T15KUzUKbPoi47qfIlODTRa2dFr
-X-Google-Smtp-Source: AGHT+IHIu7EabOU47a2yz3J3IYDGtKmcNQZbntekh3UyvpTjS8XxAN3WoNkVGDdq/BW50iwrLB3VTA==
-X-Received: by 2002:a05:6a00:2d29:b0:71e:7e8e:f684 with SMTP id d2e1a72fcca58-7241328f2b9mr2026996b3a.9.1731038692594;
-        Thu, 07 Nov 2024 20:04:52 -0800 (PST)
-Received: from localhost ([2601:647:6881:9060:7950:9609:53e9:c7fa])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079a404csm2664745b3a.126.2024.11.07.20.04.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 20:04:52 -0800 (PST)
-Date: Thu, 7 Nov 2024 20:04:51 -0800
-From: Cong Wang <xiyou.wangcong@gmail.com>
-To: zijianzhang@bytedance.com
-Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org,
-	cong.wang@bytedance.com
-Subject: Re: [PATCH bpf 2/2] tcp_bpf: add sk_rmem_alloc related logic for
- ingress redirection
-Message-ID: <Zy2N48atzfYYTY6X@pop-os.localdomain>
-References: <20241017005742.3374075-1-zijianzhang@bytedance.com>
- <20241017005742.3374075-3-zijianzhang@bytedance.com>
+	s=arc-20240116; t=1731038982; c=relaxed/simple;
+	bh=yf7JU5fBLWjEU8ccpkE6YuYyOOgPIIIfzkIiBJH0mFk=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ktJaHJHvMlPFsgOZEvMxg/HwbX3yayGE61AA0L5WhCO6refcX36KvFXON+nNgYRKgSNSbhqozhwVYNKuDsmH2lbSQzcIT5hON4TGgFLFLDuRJJUwUs5j2iYs1SeFcpomDvuCqyTYyjK8qOYWRORQ2i58Tj/uNPf387tzFSktPkY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=alwh7b0Z; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1BBB7C4CECE;
+	Fri,  8 Nov 2024 04:09:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731038981;
+	bh=yf7JU5fBLWjEU8ccpkE6YuYyOOgPIIIfzkIiBJH0mFk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=alwh7b0ZScHo44wGMYroZHNE/e0P7HNpp+fW0hjPjJA1AuvNlvMZnp28h2wJ8+MsA
+	 V+OBIjhlG50H0VCQLyUDaqT+BtmoFS8o6paG3PKvuB8b/o9c11NSo70V0vvQiSYOfj
+	 CuLiEJBLOHXmD12jDbZ6Y1pgRo+NHgEC8K/BW4ESCVcvCNJSBfldK6TSKNb8QGYZRt
+	 VJAdsCnNBpsmwp56CBycX4m8F+97/cAKiGfysQ0/ptAGYuqvbN0WcLmA3hQtBf5VNJ
+	 s0L7gchBPLlzo7pjirOXUh8ZwdLK2+pvxqUPQIhfqOYNGbQsq53a2ct4EnYmhmu4K3
+	 qbHxTi7no+yxQ==
+Date: Thu, 7 Nov 2024 20:09:40 -0800
+From: Jakub Kicinski <kuba@kernel.org>
+To: Moon Yeounsu <yyyynoom@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, andrew@lunn.ch
+Subject: Re: [PATCH net-next v2] net: dlink: add support for reporting stats
+ via `ethtool -S`
+Message-ID: <20241107200940.4dff026d@kernel.org>
+In-Reply-To: <20241107151929.37147-5-yyyynoom@gmail.com>
+References: <20241107151929.37147-5-yyyynoom@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241017005742.3374075-3-zijianzhang@bytedance.com>
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Oct 17, 2024 at 12:57:42AM +0000, zijianzhang@bytedance.com wrote:
-> From: Zijian Zhang <zijianzhang@bytedance.com>
-> 
-> Although we sk_rmem_schedule and add sk_msg to the ingress_msg of sk_redir
-> in bpf_tcp_ingress, we do not update sk_rmem_alloc. As a result, except
-> for the global memory limit, the rmem of sk_redir is nearly unlimited.
-> 
-> Thus, add sk_rmem_alloc related logic to limit the recv buffer.
-> 
-> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
-> ---
->  include/linux/skmsg.h | 11 ++++++++---
->  net/core/skmsg.c      |  6 +++++-
->  net/ipv4/tcp_bpf.c    |  4 +++-
->  3 files changed, 16 insertions(+), 5 deletions(-)
-> 
-> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
-> index d9b03e0746e7..2cbe0c22a32f 100644
-> --- a/include/linux/skmsg.h
-> +++ b/include/linux/skmsg.h
-> @@ -317,17 +317,22 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
->  	kfree_skb(skb);
->  }
->  
-> -static inline void sk_psock_queue_msg(struct sk_psock *psock,
-> +static inline bool sk_psock_queue_msg(struct sk_psock *psock,
->  				      struct sk_msg *msg)
->  {
-> +	bool ret;
+On Fri,  8 Nov 2024 00:19:33 +0900 Moon Yeounsu wrote:
+> +}, mac_stats[] = {
+> +	DEFINE_MAC_STATS(tx_packets, FramesXmtOk,
+> +			 u32, FramesTransmittedOK),
+> +	DEFINE_MAC_STATS(rx_packets, FramesRcvOk,
+> +			 u32, FramesReceivedOK),
+> +	DEFINE_MAC_STATS(tx_bytes, OctetXmtOk,
+> +			 u32, OctetsTransmittedOK),
+> +	DEFINE_MAC_STATS(rx_bytes, OctetRcvOk,
+> +			 u32, OctetsReceivedOK),
+> +	DEFINE_MAC_STATS(single_collisions, SingleColFrames,
+> +			 u32, SingleCollisionFrames),
+> +	DEFINE_MAC_STATS(multi_collisions, MultiColFrames,
+> +			 u32, MultipleCollisionFrames),
+> +	DEFINE_MAC_STATS(late_collisions, LateCollisions,
+> +			 u32, LateCollisions),
+> +	DEFINE_MAC_STATS(rx_frames_too_long_errors, FrameTooLongErrors,
+> +			 u16, FrameTooLongErrors),
+> +	DEFINE_MAC_STATS(rx_in_range_length_errors, InRangeLengthErrors,
+> +			 u16, InRangeLengthErrors),
+> +	DEFINE_MAC_STATS(rx_frames_check_seq_errors, FramesCheckSeqErrors,
+> +			 u16, FrameCheckSequenceErrors),
+> +	DEFINE_MAC_STATS(rx_frames_lost_errors, FramesLostRxErrors,
+> +			 u16, FramesLostDueToIntMACRcvError),
+> +	DEFINE_MAC_STATS(tx_frames_abort, FramesAbortXSColls,
+> +			 u16, FramesAbortedDueToXSColls),
+> +	DEFINE_MAC_STATS(tx_carrier_sense_errors, CarrierSenseErrors,
+> +			 u16, CarrierSenseErrors),
+> +	DEFINE_MAC_STATS(tx_multicast_frames, McstFramesXmtdOk,
+> +			 u32, MulticastFramesXmittedOK),
+> +	DEFINE_MAC_STATS(rx_multicast_frames, McstFramesRcvdOk,
+> +			 u32, MulticastFramesReceivedOK),
+> +	DEFINE_MAC_STATS(tx_broadcast_frames, BcstFramesXmtdOk,
+> +			 u16, BroadcastFramesXmittedOK),
+> +	DEFINE_MAC_STATS(rx_broadcast_frames, BcstFramesRcvdOk,
+> +			 u16, BroadcastFramesReceivedOK),
+> +	DEFINE_MAC_STATS(tx_frames_deferred, FramesWDeferredXmt,
+> +			 u32, FramesWithDeferredXmissions),
+> +	DEFINE_MAC_STATS(tx_frames_excessive_deferral, FramesWEXDeferal,
+> +			 u16, FramesWithExcessiveDeferral),
+> +}, rmon_stats[] = {
+> +	DEFINE_RMON_STATS(rmon_under_size_packets,
+> +			  EtherStatsUndersizePkts, undersize_pkts),
+> +	DEFINE_RMON_STATS(rmon_fragments,
+> +			  EtherStatsFragments, fragments),
+> +	DEFINE_RMON_STATS(rmon_jabbers,
+> +			  EtherStatsJabbers, jabbers),
+> +	DEFINE_RMON_STATS(rmon_tx_byte_64,
+> +			  EtherStatsPkts64OctetTransmit, hist_tx[0]),
+> +	DEFINE_RMON_STATS(rmon_rx_byte_64,
+> +			  EtherStats64Octets, hist[0]),
+> +	DEFINE_RMON_STATS(rmon_tx_byte_65to127,
+> +			  EtherStats65to127OctetsTransmit, hist_tx[1]),
+> +	DEFINE_RMON_STATS(rmon_rx_byte_64to127,
+> +			  EtherStatsPkts65to127Octets, hist[1]),
+> +	DEFINE_RMON_STATS(rmon_tx_byte_128to255,
+> +			  EtherStatsPkts128to255OctetsTransmit, hist_tx[2]),
+> +	DEFINE_RMON_STATS(rmon_rx_byte_128to255,
+> +			  EtherStatsPkts128to255Octets, hist[2]),
+> +	DEFINE_RMON_STATS(rmon_tx_byte_256to511,
+> +			  EtherStatsPkts256to511OctetsTransmit, hist_tx[3]),
+> +	DEFINE_RMON_STATS(rmon_rx_byte_256to511,
+> +			  EtherStatsPkts256to511Octets, hist[3]),
+> +	DEFINE_RMON_STATS(rmon_tx_byte_512to1023,
+> +			  EtherStatsPkts512to1023OctetsTransmit, hist_tx[4]),
+> +	DEFINE_RMON_STATS(rmon_rx_byte_512to1203,
+> +			  EtherStatsPkts512to1023Octets, hist[4]),
+> +	DEFINE_RMON_STATS(rmon_tx_byte_1204to1518,
+> +			  EtherStatsPkts1024to1518OctetsTransmit, hist_tx[5]),
+> +	DEFINE_RMON_STATS(rmon_rx_byte_1204to1518,
+> +			  EtherStatsPkts1024to1518Octets, hist[5])
+> +};
+
+Do these macro wrappers really buy you anything?
+They make the code a lot harder to follow :(
+
+> +static void get_ethtool_mac_stats(struct net_device *dev,
+> +				  struct ethtool_eth_mac_stats *mac_base)
+> +{
+> +	struct netdev_private *np = netdev_priv(dev);
 > +
->  	spin_lock_bh(&psock->ingress_lock);
-> -	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
-> +	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
->  		list_add_tail(&msg->list, &psock->ingress_msg);
-> -	else {
-> +		ret = true;
-> +	} else {
->  		sk_msg_free(psock->sk, msg);
->  		kfree(msg);
-> +		ret = false;
->  	}
->  	spin_unlock_bh(&psock->ingress_lock);
-> +	return ret;
->  }
->  
->  static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
-> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
-> index b1dcbd3be89e..110ee0abcfe0 100644
-> --- a/net/core/skmsg.c
-> +++ b/net/core/skmsg.c
-> @@ -445,8 +445,10 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
->  			if (likely(!peek)) {
->  				sge->offset += copy;
->  				sge->length -= copy;
-> -				if (!msg_rx->skb)
-> +				if (!msg_rx->skb) {
->  					sk_mem_uncharge(sk, copy);
-> +					atomic_sub(copy, &sk->sk_rmem_alloc);
-> +				}
->  				msg_rx->sg.size -= copy;
->  
->  				if (!sge->length) {
-> @@ -772,6 +774,8 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
->  
->  	list_for_each_entry_safe(msg, tmp, &psock->ingress_msg, list) {
->  		list_del(&msg->list);
-> +		if (!msg->skb)
-> +			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
->  		sk_msg_free(psock->sk, msg);
+> +	get_stats(dev);
+> +
+> +	if (mac_base->src != ETHTOOL_MAC_STATS_SRC_AGGREGATE)
+> +		return;
+> +
+> +	for (int i = 0; i < MAC_STATS_SIZE; i++)
+> +		READ_DATA(mac_stats, mac_base, i) = READ_STAT(mac_stats, np, i);
+> +}
+> +
+> +
 
-Why not calling this atomic_sub() in sk_msg_free_elem()?
+nit: multiple empty lines, checkpatch --strict should catch this
 
-Thanks.
+> +static void get_strings(struct net_device *dev, u32 stringset, u8 *data)
+> +{
+> +	switch (stringset) {
+> +	case ETH_SS_STATS:
+> +		for (int i = 0; i < STATS_SIZE; i++) {
+> +			memcpy(data, stats[i].string, ETH_GSTRING_LEN);
+> +			data += ETH_GSTRING_LEN;
+
+We've been getting conversion patches replacing such code with
+ethtool_puts() lately, let's use it from the start.
+-- 
+pw-bot: cr
 
