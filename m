@@ -1,48 +1,46 @@
-Return-Path: <netdev+bounces-143293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7D349C1D6C
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:57:20 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB4139C1D96
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:05:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B2BB1C21F6B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:57:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1742281005
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46C01E882F;
-	Fri,  8 Nov 2024 12:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="NTIGi00k"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C5E1E6DE1;
+	Fri,  8 Nov 2024 13:05:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 758E71D0F5C;
-	Fri,  8 Nov 2024 12:57:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E26137E;
+	Fri,  8 Nov 2024 13:04:56 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731070635; cv=none; b=Vba0Kzu86RsyYNZwKyeYw5/M7bXQmhds/z1w3XqYIzWetF0lIUKX/kZb09f7WlkkXZ2dzNcsZ+Du5kgLyN2eCUN/f8xlC6DMDGF51rId3sye16fhJEp5hAQIJPsG6WuwB0N+Mj9hWyTOdVuFLEcGGt6gTSF17icEgmN5Zq8/x6M=
+	t=1731071102; cv=none; b=KdqrfwOKkgMuYMKuGYKHgK/TaJJXUXdMkhf14hviFFD8WvkdwsKL05APHkE01YoNmBNf9ZYcQ/Dk2MYSUlw1qmPk+fq9Z4+2cYixpQ3wJx3py/uQzwrVC2C/5PLTIUZt3wWjXfBLMJj8BgnIj9nOHFmVS4Erto3GGstphoOfRco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731070635; c=relaxed/simple;
-	bh=75ffRzCysh6jS7kzWfREO207al7HC81GJpgcWXZDsF8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=Z0/EbctTNgFI6J795ABMLhB4LHRH216fUUCceSuJnJ2MWSopXRQrw2OS/2lkuy6xg5dzLZQM2thgGk17BlmLkFZNsW4Pm0W2zIFffHsh2+JLzarXMCqsOUe1fgfuZ4Iw5UvTvldu7UD8G/kdur7vpDIjtCdqdbYjSyeIPaFY16E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=NTIGi00k; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6C99FC4CECD;
-	Fri,  8 Nov 2024 12:57:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731070635;
-	bh=75ffRzCysh6jS7kzWfREO207al7HC81GJpgcWXZDsF8=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=NTIGi00kae4U0HFuyRWbUfecUh8OmI+d/dnMLjUrjzcReKiV2qHIlPyFJoRdZGbpc
-	 lpePIKjMt8UjmiHsBQhMR5xuZ1vWvfsGUWfhKYhcQ1FNV8juAgomEJL29PQrX3hMnO
-	 /zshIGiSdHkPt5kU2Y8j7ypkD9TuuwFJLG2Xq2crpIg8+9kDuQNjP9XY07TmAwwAPw
-	 6XBeAK/qZFGDzygiQI87lWEIOGFKhE1SufQa0/ow2SjpeTLbx/LNySmUCj866Onaeu
-	 xOpBWSIo/KNRaZMcn2jcZDpAUaPZe+T4bLC2NDkDlgtMghwinoA+J2dMqYlCfPh4DW
-	 N3ML9SfByt5UQ==
-Message-ID: <a5d6b72c-bbe5-46c2-ad98-a973a2623cb4@kernel.org>
-Date: Fri, 8 Nov 2024 14:57:10 +0200
+	s=arc-20240116; t=1731071102; c=relaxed/simple;
+	bh=2AOlYv8ayTsCQQtVAPbIcw2HzPkTXhqQUHLcby5hhMc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
+	 In-Reply-To:Content-Type; b=cG/NLHIJb9eBhRlJPXtphk+EwKYlRizcRuuEikIGFGDMS67tvP2vM6XwJ0dT1GWSiHPi06wyzbG/pC1c/AcG3X5cy5Fl0FiBMJXqD89CRIe5xBnWvdsR/gcQrTvcLqUtC9OwBH82DA7iJRmiP94551dE1GwppEYGjSkTBv+Sghc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
+Received: from mail.maildlp.com (unknown [172.19.163.17])
+	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XlJvM37d5z1JCHw;
+	Fri,  8 Nov 2024 21:00:15 +0800 (CST)
+Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
+	by mail.maildlp.com (Postfix) with ESMTPS id CB7B51A0188;
+	Fri,  8 Nov 2024 21:04:53 +0800 (CST)
+Received: from [10.174.176.93] (10.174.176.93) by
+ kwepemg200003.china.huawei.com (7.202.181.30) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.11; Fri, 8 Nov 2024 21:04:52 +0800
+Message-ID: <cc33931c-2821-4292-85db-86017de6afeb@huawei.com>
+Date: Fri, 8 Nov 2024 21:04:51 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,38 +48,106 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
- to priority map for RX
-To: Siddharth Vadapalli <s-vadapalli@ti.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Simon Horman <horms@kernel.org>, linux-omap@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, srk@ti.com,
- Pekka Varis <p-varis@ti.com>
-References: <20241107-am65-cpsw-multi-rx-dscp-v2-0-9e9cd1920035@kernel.org>
- <20241107-am65-cpsw-multi-rx-dscp-v2-2-9e9cd1920035@kernel.org>
- <908cc747-18a1-49c0-9b06-1c2f64e4c84e@ti.com>
-Content-Language: en-US
-From: Roger Quadros <rogerq@kernel.org>
-In-Reply-To: <908cc747-18a1-49c0-9b06-1c2f64e4c84e@ti.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Subject: Re: [PATCH net v2] sunrpc: fix one UAF issue caused by sunrpc kernel
+ tcp socket
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
+	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
+	<geert+renesas@glider.be>, <jlayton@kernel.org>, <kuba@kernel.org>,
+	<linux-nfs@vger.kernel.org>, <neilb@suse.de>, <netdev@vger.kernel.org>,
+	<ofir.gal@volumez.com>, <okorniev@redhat.com>, <pabeni@redhat.com>,
+	<tom@talpey.com>, <trondmy@kernel.org>
+References: <78efbd6e-31e5-4e67-a046-2736747b291d@huawei.com>
+ <20241107205952.7992-1-kuniyu@amazon.com>
+From: "liujian (CE)" <liujian56@huawei.com>
+In-Reply-To: <20241107205952.7992-1-kuniyu@amazon.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
+ kwepemg200003.china.huawei.com (7.202.181.30)
 
 
 
-On 08/11/2024 14:37, Siddharth Vadapalli wrote:
-> On Thu, Nov 07, 2024 at 02:29:30PM +0200, Roger Quadros wrote:
+在 2024/11/8 4:59, Kuniyuki Iwashima 写道:
+> From: "liujian (CE)" <liujian56@huawei.com>
+> Date: Thu, 7 Nov 2024 20:03:40 +0800
+>>>> diff --git a/net/socket.c b/net/socket.c
+>>>> index 042451f01c65..e64a02445b1a 100644
+>>>> --- a/net/socket.c
+>>>> +++ b/net/socket.c
+>>>> @@ -1651,6 +1651,34 @@ int sock_create_kern(struct net *net, int family, int type, int protocol, struct
+>>>>    }
+>>>>    EXPORT_SYMBOL(sock_create_kern);
+>>>>    
+>>>> +int sock_create_kern_getnet(struct net *net, int family, int type, int proto, struct socket **res)
+>>>> +{
+>>>> +	struct sock *sk;
+>>>> +	int ret;
+>>>> +
+>>>> +	if (!maybe_get_net(net))
+>>>> +		return -EINVAL;
+>>>
+>>> Is this really safe ?
+>>>
+>>> IIUC, maybe_get_net() is safe for a net only when it is fetched under
+>>> RCU, then rcu_read_lock() prevents cleanup_net() from reusing the net
+>>> by rcu_barrier().
+>>>
+>>> Otherwise, there should be a small chance that the same slab object is
+>>> reused for another netns between fetching the net and reaching here.
+>>>
+>>> svc_create_socket() is called much later after the netns is fetched,
+>>> and _svc_xprt_create() calls try_module_get() before ->xpo_create().
+>>> So, it seems the path is not under RCU and maybe_get_net() must be
+>>> called much earlier by each call site.
+>>>
+>>> For this reason, when I write a patch for the same issue in CIFS,
+>>> I delayed put_net() to cifsd kthread so that the netns refcnt taken
+>>> for each CIFS server info lives until the last __sock_create() attempt
+>>> from cifsd.
+>>>
+>>> https://lore.kernel.org/linux-cifs/20241102212438.76691-1-kuniyu@amazon.com/
+>>>
+>> Okay, got it. thank you.
+>> Looking at the nfs and nfsd processing flow, it seems that the call to
+>> __sock_create() to create a TCP socket is always after the mount
+>> operation get_net(). So it should be fine to use get_net() directly.
 > 
-> Hello Roger,
+> Is there any chance that a concurrent unmount releases the
+> last refcount by put_net() while another thread trying to call
+> __sock_create() ?
 > 
-> I accidentally reviewed and replied to the patch from the v1 series, but
-> the comments still hold for this patch. For the sake of convenience, I
-> am providing the same feedback as the v1 patch below.
+> CIFS was the case.
+> 
+> 
+>> So
+>> here I'm going to change may_get_net() to get_net(), move
+>> sock_create_kern_getnet() to the sunrpc module, and rename it to
+>> something more appropriate. Is that okay?
+> 
+> Could you go without adding a helper and do the conversion in sunrpc
+> code as CIFS did ?
+> 
+Ok, I will send v3 as you said.
+Looking forward to your changes as described below.
+Thank you.
 
-No problem, let's continue the discussion in v1 as I have already replied there.
-
--- 
-cheers,
--roger
+> I plan to resurrect my patch and remove such socket conversion altogether
+> in the next cycle after the CIFS fix lands on net-next.
+> 
+> https://lore.kernel.org/netdev/20240227011041.97375-4-kuniyu@amazon.com/
+> https://github.com/q2ven/linux/commits/427_2
+> https://github.com/q2ven/linux/commit/2e54a8cc84f1e9ce60a0e4693c79a8e74c3dbeb9
+> 
+> I inspected all the callers of __sock_create() and friends, and all
+> __sock_create() can be replaced with sock_create_kern(), so I will
+> unexport __sock_create() and then add a new parameter hold_net to it.
+> 
+> Then, I'll rename sock_create_kern() to sock_create_net_noref() and add
+> a fat comment to catch in-kernel users attention so that they no longer
+> use _kern() API blindly without care about netns reference.  Also, I'll
+> add sock_create_net() and use it for MPTCP, SMC, CIFS, (and sunrpc) etc.
+> 
+> RDS uses maybe_net_get() but I think this is still buggy and I need
+> to check more.
 
