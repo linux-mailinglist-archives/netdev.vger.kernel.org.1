@@ -1,533 +1,395 @@
-Return-Path: <netdev+bounces-143316-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143317-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F1AB9C1FCA
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:57:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 554CC9C1FCF
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:58:37 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id CDF991F229BC
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:57:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B627B2845AD
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:58:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7C4A01F471E;
-	Fri,  8 Nov 2024 14:57:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEDBC1F4FAD;
+	Fri,  8 Nov 2024 14:58:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="DPETAxfW"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b="qqroTN9K"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ot1-f54.google.com (mail-ot1-f54.google.com [209.85.210.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from orbyte.nwl.cc (orbyte.nwl.cc [151.80.46.58])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 706181803A;
-	Fri,  8 Nov 2024 14:57:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4EC1E3772;
+	Fri,  8 Nov 2024 14:58:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=151.80.46.58
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731077872; cv=none; b=IoHZuAD2kVtYmXgJDFPXH7Domcuz5LGWcvoImXit2uOByvWMeIUlmAgbUAgwM1T8TC29k0IZHEwATICxF72nWeTVrqbtaFJX/8zHNWs79TdZU6aKcJQPEO9Nb0uMaMkERHCfOEyClIp0AlYeeqNr/jKb/Q2rbQOrOeCmZJagiTU=
+	t=1731077903; cv=none; b=sbyxejXZftOE870XKNvCVhhMpTrnHmDW5mCNTO4lFTWSQzuwZwFvxOU9I2dU3PSy63nX7s7di0vpxjxu8EXmMIORYLI/5j+goUU1Mt2FXcyWCWS4XZl9j2qxMI/6NuJOUVWxGT4WlW9b7XvwhulWTLnh0qj2qxB8vxpXvu1ycg4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731077872; c=relaxed/simple;
-	bh=KFsMtWvVcL5ORkDax6nEFvWWhO+5xVJXV9oXDmAANwc=;
-	h=Date:From:To:Cc:Message-ID:In-Reply-To:References:Subject:
-	 Mime-Version:Content-Type; b=JLAc22cht080b7dBctycQ4hMAXYqyE/bkm49rs32ZYZ75bIjVrzUT1xvkLpM/Fuw5FTDS3BN+U16oVG6YC2LZIvcA7Dkozhr083evBOhUlnYzXeOTkHGRGGSRE9DcxuwUtmOHtPkk6glOwcqp2Q0SzcpzsnfztCVq3DJFGUETLo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=DPETAxfW; arc=none smtp.client-ip=209.85.210.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ot1-f54.google.com with SMTP id 46e09a7af769-7181eb9ad46so1380959a34.1;
-        Fri, 08 Nov 2024 06:57:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731077869; x=1731682669; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U6kKQp1IZmOzZhz0w6SDNx3vbcv3ERNjUVkGefuW3KM=;
-        b=DPETAxfWqpguaUIeQIBWAQNblzWtPhYZvKBpPfZdbim4rssc8e8d1sfTdFcK9vWG5l
-         77FJ+0z1S7n/VNbJT1NhftcC/A3mOSQ/j1bgRO2sWZxywQ5TLpumxEq6YVU78ZzUnXsh
-         7b87jgJaiMgFPPlPksoRypS/2ZLcinPbr5PXVxZY9kMFzVVcJBAvSrFzkx+v5bJ5vxZn
-         JrrqD1AfPmxntubsaYx6T4YndOOcuLV4+3I/aDgkvxcPH0i/9enckwyxS/HvJGP2R816
-         LcQv+wJWh/l7/qVl6ta4jGFkFGGDmKC0zL6CYKI3HDa7Vw4whBmWYEl0NUColNvsr4dG
-         FcDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731077869; x=1731682669;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=U6kKQp1IZmOzZhz0w6SDNx3vbcv3ERNjUVkGefuW3KM=;
-        b=VfxwhLywuAGhQSFOyOsGjy5HzDgrPOGdm9U31V9CC09hHd0XRPea6liiSqlbdrtkEt
-         +lxCuYMsEISGglie2ylkoowv3FpxKEZXN04bF7kT89wbQu9HwWlUeiT97J9/TKnT1htI
-         pcIp6lWiFk/MczlAqAYmWT8WOg95MS4Y9q34cQvYiSnupwUCxLiCYvWLx/QGWbZx1pXk
-         AHRNFWaiPV2jWVvEoTNOC2PEg50XJe5FIboK7ge4AOXvzNnSKQrikZjnkC+j4QlE770B
-         C9uWf51wfTMEgGBwun4/SqKtqIRyK5JgpSmYpF20s8owtIH1M6DO/C6BMHsLEUHvn5r5
-         QCuw==
-X-Forwarded-Encrypted: i=1; AJvYcCWepUdCy4S55X4kMHPKZ2qfim9A3iXDfOvp3WmheiIv5l4hJJbC4gVyUeCAyc1NJURNTg9egXlQ@vger.kernel.org, AJvYcCWjcQWB6EtfzPhXoFuWkdkaGqthdGbFBKmNqc2B+QgiMgzQaWWAOek7slaRlkO/7CTGiCfAVfLs0UrQczkPBl8G@vger.kernel.org, AJvYcCXnC1q/7K5Mw/Ol94QMIbgjKEEi0xEN2bIzlQzL5AhQuFYQ/fcpizz6qV6099TScvi8awgm6zLh76AYEJM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxkgUUPsEXPGEo6nFPopsa+Q++zsZthcqwBfWnYn14trZk6T5+W
-	gkTCtjS+VffqHZJpbmIDAyKPbwTN89y4p13GDR4Kshq0W3lfc4aB
-X-Google-Smtp-Source: AGHT+IHv95wMzrQG5uWT1c278mE+XXlbTq3E9qZnuh6pStT0pymS+Q/6nZbawdJXpaapG4d/8/r4mQ==
-X-Received: by 2002:a05:6358:9791:b0:1bc:45bc:81f0 with SMTP id e5c5f4694b2df-1c641ec9e88mr208591755d.11.1731077869192;
-        Fri, 08 Nov 2024 06:57:49 -0800 (PST)
-Received: from localhost (250.4.48.34.bc.googleusercontent.com. [34.48.4.250])
-        by smtp.gmail.com with ESMTPSA id 6a1803df08f44-6d3961ec8efsm20098936d6.28.2024.11.08.06.57.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 06:57:48 -0800 (PST)
-Date: Fri, 08 Nov 2024 09:57:48 -0500
-From: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-To: Joe Damato <jdamato@fastly.com>, 
- netdev@vger.kernel.org
-Cc: corbet@lwn.net, 
- hdanton@sina.com, 
- bagasdotme@gmail.com, 
- pabeni@redhat.com, 
- namangulati@google.com, 
- edumazet@google.com, 
- amritha.nambiar@intel.com, 
- sridhar.samudrala@intel.com, 
- sdf@fomichev.me, 
- peter@typeblog.net, 
- m2shafiei@uwaterloo.ca, 
- bjorn@rivosinc.com, 
- hch@infradead.org, 
- willy@infradead.org, 
- willemdebruijn.kernel@gmail.com, 
- skhawaja@google.com, 
- kuba@kernel.org, 
- Joe Damato <jdamato@fastly.com>, 
- Martin Karsten <mkarsten@uwaterloo.ca>, 
- "David S. Miller" <davem@davemloft.net>, 
- Simon Horman <horms@kernel.org>, 
- Shuah Khan <shuah@kernel.org>, 
- linux-kernel@vger.kernel.org (open list), 
- linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
-Message-ID: <672e26ec429be_2a4cd22944c@willemb.c.googlers.com.notmuch>
-In-Reply-To: <20241108045337.292905-6-jdamato@fastly.com>
-References: <20241108045337.292905-1-jdamato@fastly.com>
- <20241108045337.292905-6-jdamato@fastly.com>
-Subject: Re: [PATCH net-next v8 5/6] selftests: net: Add busy_poll_test
+	s=arc-20240116; t=1731077903; c=relaxed/simple;
+	bh=9PSeo9wh5Uxi7Cp0HgIdALrWitqTWtG5GR2LQjiWJnY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=UU/+G9hW7nzVpfseOJ7ed+JfwZE4aKD2za5mjYARnsrf3uGjlOde5MJAPD02IVzobm8bHQHN1JnY2KoGHv9ileRw0kBB4azL/+pEjfI3y0zXLm3YtgEVCKcHpld3LiEP5MJBLtWPYQowBAsviLbc+6VbLpBwHeb4e+ckUK8n0/4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org; spf=pass smtp.mailfrom=nwl.cc; dkim=pass (2048-bit key) header.d=nwl.cc header.i=@nwl.cc header.b=qqroTN9K; arc=none smtp.client-ip=151.80.46.58
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=netfilter.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=nwl.cc
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=nwl.cc;
+	s=mail2022; h=Content-Type:MIME-Version:Message-ID:Subject:Cc:To:From:Date:
+	Sender:Reply-To:Content-Transfer-Encoding:Content-ID:Content-Description:
+	Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:
+	In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:List-Subscribe:
+	List-Post:List-Owner:List-Archive;
+	bh=ukg+42Q0ORZnlaR0IQWuxwJDybb7eXLMjLuAN9oWdEc=; b=qqroTN9Kp1Nn2RGMAX1LyfyXWm
+	Lq50HmuKkiAqKBNoSzAIaklLuHBopcqGY5e83Lxl8cwEHJNC0PgMLUZiEI18sbxieqs2EC1LhR62f
+	yHdU18YgWz9T5nXW5NNov5YEF9rSPMZleFcOCPl7xXTOkmAMqehAGIE6wiz9QKNDIHa59v6cf9lZ/
+	M6Jgbr4pX0YHy118WOwoRvoYNrXcLZb6h1B9hEqpISdaYHKwuFrcVQPYLnB0XFcDZZJR3ZGnZ8gkg
+	QhpINdYir7g+nKUIl75mX0cQzOMCLtdMSbV+6HrhQTpyE5csk6iZjiGW80YJsm+8cofXY3c3lPjfg
+	dpF6TxtA==;
+Received: from n0-1 by orbyte.nwl.cc with local (Exim 4.97.1)
+	(envelope-from <phil@nwl.cc>)
+	id 1t9QRE-000000003as-28T5;
+	Fri, 08 Nov 2024 15:58:16 +0100
+Date: Fri, 8 Nov 2024 15:58:16 +0100
+From: Phil Sutter <phil@netfilter.org>
+To: netfilter <netfilter@vger.kernel.org>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>
+Cc: netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
+	lwn@lwn.net
+Subject: [ANNOUNCE] iptables 1.8.11 release
+Message-ID: <Zy4nCFxZvkkUrjj6@orbyte.nwl.cc>
+Mail-Followup-To: Phil Sutter <phil@netfilter.org>,
+	netfilter <netfilter@vger.kernel.org>,
+	netfilter-devel <netfilter-devel@vger.kernel.org>,
+	netdev@vger.kernel.org, netfilter-announce@lists.netfilter.org,
+	lwn@lwn.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: multipart/mixed; boundary="Z2jpFLa81REgb+x8"
+Content-Disposition: inline
 
-Joe Damato wrote:
-> Add an epoll busy poll test using netdevsim.
-> 
-> This test is comprised of:
->   - busy_poller (via busy_poller.c)
->   - busy_poll_test.sh which loads netdevsim, sets up network namespaces,
->     and runs busy_poller to receive data and socat to send data.
-> 
-> The selftest tests two different scenarios:
->   - busy poll (the pre-existing version in the kernel)
->   - busy poll with suspend enabled (what this series adds)
-> 
-> The data transmit is a 1MiB temporary file generated from /dev/urandom
-> and the test is considered passing if the md5sum of the input file to
-> socat matches the md5sum of the output file from busy_poller.
 
-Nice test.
+--Z2jpFLa81REgb+x8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-Busy polling does not affect data integrity. Is the goal of this test
-mainly to get coverage, maybe observe if the process would stall
-indefinitely?
- 
-> netdevsim was chosen instead of veth due to netdevsim's support for
-> netdev-genl.
-> 
-> For now, this test uses the functionality that netdevsim provides. In the
-> future, perhaps netdevsim can be extended to emulate device IRQs to more
-> thoroughly test all pre-existing kernel options (like defer_hard_irqs)
-> and suspend.
-> 
-> Signed-off-by: Joe Damato <jdamato@fastly.com>
-> Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-> Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-> ---
->  v5:
->    - Updated commit message to replace netcat with socat and fixed
->      misspelling of netdevsim. No functional/code changes.
-> 
->  v4:
->    - Updated busy_poll_test.sh:
->      - use socat instead of nc
->      - drop cli.py usage from the script
->      - removed check_ynl
->    - Updated busy_poller.c:
->      - use netlink to configure napi parameters
-> 
->  v3:
->    - New in v3
-> 
->  tools/testing/selftests/net/.gitignore        |   1 +
->  tools/testing/selftests/net/Makefile          |   3 +-
->  tools/testing/selftests/net/busy_poll_test.sh | 164 +++++++++
->  tools/testing/selftests/net/busy_poller.c     | 328 ++++++++++++++++++
->  4 files changed, 495 insertions(+), 1 deletion(-)
->  create mode 100755 tools/testing/selftests/net/busy_poll_test.sh
->  create mode 100644 tools/testing/selftests/net/busy_poller.c
-> 
-> diff --git a/tools/testing/selftests/net/busy_poll_test.sh b/tools/testing/selftests/net/busy_poll_test.sh
-> new file mode 100755
-> index 000000000000..ffc74bc62e5a
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/busy_poll_test.sh
-> @@ -0,0 +1,164 @@
-> +#!/bin/bash
-> +# SPDX-License-Identifier: GPL-2.0-only
+Hi!
 
-Why the different SPDX between the two files?
+The Netfilter project proudly presents:
 
-> +source net_helper.sh
-> +
-> +NSIM_DEV_1_ID=$((256 + RANDOM % 256))
-> +NSIM_DEV_1_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_1_ID
-> +NSIM_DEV_2_ID=$((512 + RANDOM % 256))
-> +NSIM_DEV_2_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_2_ID
-> +
-> +NSIM_DEV_SYS_NEW=/sys/bus/netdevsim/new_device
-> +NSIM_DEV_SYS_DEL=/sys/bus/netdevsim/del_device
-> +NSIM_DEV_SYS_LINK=/sys/bus/netdevsim/link_device
-> +NSIM_DEV_SYS_UNLINK=/sys/bus/netdevsim/unlink_device
-> +
-> +setup_ns()
-> +{
-> +	set -e
-> +	ip netns add nssv
-> +	ip netns add nscl
-> +
-> +	NSIM_DEV_1_NAME=$(find $NSIM_DEV_1_SYS/net -maxdepth 1 -type d ! \
-> +		-path $NSIM_DEV_1_SYS/net -exec basename {} \;)
-> +	NSIM_DEV_2_NAME=$(find $NSIM_DEV_2_SYS/net -maxdepth 1 -type d ! \
-> +		-path $NSIM_DEV_2_SYS/net -exec basename {} \;)
-> +
-> +	# ensure the server has 1 queue
-> +	ethtool -L $NSIM_DEV_1_NAME combined 1 2>/dev/null
-> +
-> +	ip link set $NSIM_DEV_1_NAME netns nssv
-> +	ip link set $NSIM_DEV_2_NAME netns nscl
-> +
-> +	ip netns exec nssv ip addr add '192.168.1.1/24' dev $NSIM_DEV_1_NAME
-> +	ip netns exec nscl ip addr add '192.168.1.2/24' dev $NSIM_DEV_2_NAME
-> +
-> +	ip netns exec nssv ip link set dev $NSIM_DEV_1_NAME up
-> +	ip netns exec nscl ip link set dev $NSIM_DEV_2_NAME up
-> +
-> +	set +e
-> +}
-> +
-> +cleanup_ns()
-> +{
-> +	ip netns del nscl
-> +	ip netns del nssv
-> +}
-> +
-> +test_busypoll()
-> +{
-> +	tmp_file=$(mktemp)
-> +	out_file=$(mktemp)
-> +
-> +	# fill a test file with random data
-> +	dd if=/dev/urandom of=${tmp_file} bs=1M count=1 2> /dev/null
-> +
-> +	timeout -k 1s 30s ip netns exec nssv ./busy_poller -p48675 -b192.168.1.1 -m8 -u0 -P1 -g16 -i${NSIM_DEV_1_IFIDX} -o${out_file}&
+        iptables 1.8.11
 
-nit: consider variables for all repeated constants, including IP addresses and ports
-> +
-> +	wait_local_port_listen nssv 48675 tcp
-> +
-> +	ip netns exec nscl socat -u $tmp_file TCP:192.168.1.1:48675
-> +
-> +	wait
-> +
-> +	tmp_file_md5sum=$(md5sum $tmp_file | cut -f1 -d' ')
-> +	out_file_md5sum=$(md5sum $out_file | cut -f1 -d' ')
-> +
-> +	if [ "$tmp_file_md5sum" = "$out_file_md5sum" ]; then
-> +		res=0
-> +	else
-> +		echo "md5sum mismatch"
-> +		echo "input file md5sum: ${tmp_file_md5sum}";
-> +		echo "output file md5sum: ${out_file_md5sum}";
-> +		res=1
-> +	fi
-> +
-> +	rm $out_file $tmp_file
+This release contains new features:
 
-Delete these in cleanup()?
+- New arptables-translate tool
+- ebtables-nft:
+  - Support for --change-counters command, albeit not atomic
+  - Specify rule counters using iptables' '-c N,M' syntax
+  - Support --replace and --list-rules commands
+  - Support zeroing individual rules
+  - Print negations (exclamation marks) extrapositioned (i.e., before
+    the match they invert) for consistency with iptables
+- iptables-translate:
+  - Align protocol name lookups with iptables
+  - iptables-translate: Support socket match and TPROXY target
+  - iptables-translate: Slightly improved avoidance of redundant 'ip
+    protocol'/'meta l4proto' matches
+- iptables:
+  - Undo numeric protocol printing of v1.8.9 for well-known protocols
+    for consistency with iptables-save
+  - Enable implicit extension lookup for dccp and ipcomp protocols (so
+    no extra '-m <proto>' is needed after '-p <proto>')
+- iptables-save: Avoid calls to getprotobynumber() for consistency and
+  improved performance with huge rule sets
+- libxtables: Support use of both xtables_ipaddr_to_numeric() and
+  xtables_ipmask_to_numeric() as parameters to the same function call
+- configure: Support disabling use of libnfnetlink
+- Prefix xtables-monitor rule events by a typical command (iptables,
+  ip6tables) instead of -4/-6 flags for consistency with ebtables and
+  arptables events
 
-> +
-> +	return $res
-> +}
-> +
-> +test_busypoll_with_suspend()
-> +{
+... and fixes:
 
-Main feedback: this function is practically a duplicate of the prev.
-Consider deduplicating them with one optional argument that enables
-suspend mode in busy_poller.
+- arptables-nft:
+  - Ineffective masks when specified in --h-type, --opcode and
+    --proto-type matches
+  - Wrong formatting of --h-type values and --proto-type masks causing
+    misinterpretation by  arptables-restore
+- iptables-nft:
+  - Wrong error messages in corner-case error conditions
+  - Zeroing single rule counters broken (again!)
+  - Incorrect combination of inverted payload matches
+  - Spurious error when zeroing a specific builtin chain which doesn't
+    exist - Calling -Z command with bogus rule number must fail
+- libiptc: Corner-case segfault upon renaming a chain
+- ebtables-restore:
+  - Corner-case bug with --noflush
+  - Spurious failures when deleting multiple rules with among matches
+- ebtables-nft:
+  - Different line number (--Ln) formatting than ebtables-legacy
+  - Off-by-one rule number when using -S command with rule number
+- iptables-legacy: Broken --wait without timeout
+- libxtables: Leak of matches' udata buffer
+- Some matches stripped full value ranges from output even if inverted
+- Illegal memory access when parsing '-c ""' (i.e., empty string
+  argument)
+- Inverted full interface wildcards (e.g. '! -i +') stripped from
+  iptables-save output
+- xtables-monitor:
+  - Incorrect output when not called with -4 or -6 options
+  - Flush stdout after each line to prevent buffers and help with
+    scripting
+  - Align output for builtin chains with that of tables
+  - Capture arptables chain events, too
+  - Empty 'EVENT:' lines printed for ebtables rule changes
+- Fix for compiling against musl libc
+- xtables-translate: Fix translation of TPROXY target
 
-> +	tmp_file=$(mktemp)
-> +	out_file=$(mktemp)
-> +
-> +	# fill a test file with random data
-> +	dd if=/dev/urandom of=${tmp_file} bs=1M count=1 2> /dev/null
-> +
-> +	timeout -k 1s 30s ip netns exec nssv ./busy_poller -p48675 -b192.168.1.1 -m8 -u0 -P1 -g16 -d100 -r50000 -s20000000 -i${NSIM_DEV_1_IFIDX} -o${out_file}&
-> +
-> +	wait_local_port_listen nssv 48675 tcp
-> +
-> +	ip netns exec nscl socat -u $tmp_file TCP:192.168.1.1:48675
-> +
-> +	wait
-> +
-> +	tmp_file_md5sum=$(md5sum $tmp_file | cut -f1 -d' ')
-> +	out_file_md5sum=$(md5sum $out_file | cut -f1 -d' ')
-> +
-> +	if [ "$tmp_file_md5sum" = "$out_file_md5sum" ]; then
-> +		res=0
-> +	else
-> +		echo "md5sum mismatch"
-> +		echo "input file md5sum: ${tmp_file_md5sum}";
-> +		echo "output file md5sum: ${out_file_md5sum}";
-> +		res=1
-> +	fi
-> +
-> +	rm $out_file $tmp_file
-> +
-> +	return $res
-> +}
-> +
-> +###
-> +### Code start
-> +###
-> +
-> +modprobe netdevsim
-> +
-> +# linking
-> +
-> +echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_NEW
-> +echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_NEW
-> +udevadm settle
+... and documentation updates:
 
-is this generally available on systems under test?
+- Extensions: string: Starting with linux-6.7, pattern matching no
+  longer extends past 'to' offset - update the man page accordingly
+- Extensions: recent: Clarify ip_list_hash_size default value and
+  obsoleted state of ip_pkt_list_tot
+- ebtables-nft.8: Note that --concurrent is a NOP
+- Misc. typesetting, spelling and grammar fixes in man pages
 
-> +
-> +setup_ns
-> +
-> +NSIM_DEV_1_FD=$((256 + RANDOM % 256))
+You can download the new release from:
 
-repeated magic constants
+https://netfilter.org/projects/iptables/downloads.html#iptables-1.8.11
 
-> +exec {NSIM_DEV_1_FD}</var/run/netns/nssv
-> +NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
-> +
-> +NSIM_DEV_2_FD=$((256 + RANDOM % 256))
-> +exec {NSIM_DEV_2_FD}</var/run/netns/nscl
-> +NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifindex)
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
-> +if [ $? -ne 0 ]; then
-> +	echo "linking netdevsim1 with netdevsim2 should succeed"
-> +	cleanup_ns
-> +	exit 1
-> +fi
-> +
-> +test_busypoll
-> +if [ $? -ne 0 ]; then
-> +	echo "test_busypoll failed"
-> +	cleanup_ns
-> +	exit 1
-> +fi
-> +
-> +test_busypoll_with_suspend
-> +if [ $? -ne 0 ]; then
-> +	echo "test_busypoll_with_suspend failed"
-> +	cleanup_ns
-> +	exit 1
-> +fi
-> +
-> +echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_UNLINK
-> +
-> +echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_DEL
-> +
-> +cleanup_ns
-> +
-> +modprobe -r netdevsim
-> +
-> +exit 0
-> diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
-> new file mode 100644
-> index 000000000000..8d8aa9e5939a
-> --- /dev/null
-> +++ b/tools/testing/selftests/net/busy_poller.c
-> @@ -0,0 +1,328 @@
-> +// SPDX-License-Identifier: GPL-2.0
-> +#include <assert.h>
-> +#include <errno.h>
-> +#include <error.h>
-> +#include <fcntl.h>
-> +#include <inttypes.h>
-> +#include <limits.h>
-> +#include <stdlib.h>
-> +#include <stdio.h>
-> +#include <string.h>
-> +#include <unistd.h>
-> +
-> +#include <arpa/inet.h>
-> +#include <netinet/in.h>
-> +
-> +#include <sys/ioctl.h>
-> +#include <sys/epoll.h>
-> +#include <sys/socket.h>
-> +#include <sys/types.h>
-> +
-> +#include <linux/netlink.h>
-> +#include <linux/genetlink.h>
-> +#include "netdev-user.h"
-> +#include <ynl.h>
-> +
-> +/* if the headers haven't been updated, we need to define some things */
+To build the code, libnftnl 1.2.6 is required:
 
-This should not be needed, as headers are taken from $KERNELSRC/usr after
-make headers_install.
+* http://netfilter.org/projects/libnftnl/downloads.html#libnftnl-1.2.6
 
-Generally discouraged for tests (else every new feature test for a new
-features is forced to adds such checks).
+In case of bugs, file them via:
 
-> +#if !defined(EPOLL_IOC_TYPE)
-> +struct epoll_params {
-> +	uint32_t busy_poll_usecs;
-> +	uint16_t busy_poll_budget;
-> +	uint8_t prefer_busy_poll;
-> +
-> +	/* pad the struct to a multiple of 64bits */
-> +	uint8_t __pad;
-> +};
-> +
-> +#define EPOLL_IOC_TYPE 0x8A
-> +#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
-> +#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
-> +#endif
-> +
-> +static uint32_t cfg_port = 8000;
-> +static struct in_addr cfg_bind_addr = { .s_addr = INADDR_ANY };
-> +static char *cfg_outfile;
-> +static int cfg_max_events = 8;
-> +static int cfg_ifindex;
-> +
-> +/* busy poll params */
-> +static uint32_t cfg_busy_poll_usecs;
-> +static uint16_t cfg_busy_poll_budget;
-> +static uint8_t cfg_prefer_busy_poll;
-> +
-> +/* IRQ params */
-> +static uint32_t cfg_defer_hard_irqs;
-> +static uint64_t cfg_gro_flush_timeout;
-> +static uint64_t cfg_irq_suspend_timeout;
-> +
-> +static void usage(const char *filepath)
-> +{
-> +	error(1, 0,
-> +	      "Usage: %s -p<port> -b<addr> -m<max_events> -u<busy_poll_usecs> -P<prefer_busy_poll> -g<busy_poll_budget> -o<outfile> -d<defer_hard_irqs> -r<gro_flush_timeout> -s<irq_suspend_timeout> -i<ifindex>",
-> +	      filepath);
-> +}
-> +
-> +static void parse_opts(int argc, char **argv)
-> +{
-> +	int ret;
-> +	int c;
-> +
-> +	if (argc <= 1)
-> +		usage(argv[0]);
-> +
-> +	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:")) != -1) {
-> +		switch (c) {
-> +		case 'u':
-> +			cfg_busy_poll_usecs = strtoul(optarg, NULL, 0);
-> +			if (cfg_busy_poll_usecs == ULONG_MAX ||
-> +			    cfg_busy_poll_usecs > UINT32_MAX)
-> +				error(1, ERANGE, "busy_poll_usecs too large");
-> +			break;
-> +		case 'P':
-> +			cfg_prefer_busy_poll = strtoul(optarg, NULL, 0);
-> +			if (cfg_prefer_busy_poll == ULONG_MAX ||
+* https://bugzilla.netfilter.org
 
-Here and elsewhere: not possible due to size of var (here: uint8_t)
-I'm surprised that the compiler does not mention this.
+Happy firewalling!
 
-> +			    cfg_prefer_busy_poll > 1)
-> +				error(1, ERANGE,
-> +				      "prefer busy poll should be 0 or 1");
-> +			break;
-> +		case 'g':
-> +			cfg_busy_poll_budget = strtoul(optarg, NULL, 0);
-> +			if (cfg_busy_poll_budget == ULONG_MAX ||
-> +			    cfg_busy_poll_budget > UINT16_MAX)
-> +				error(1, ERANGE,
-> +				      "busy poll budget must be [0, UINT16_MAX]");
-> +			break;
-> +		case 'p':
-> +			cfg_port = strtoul(optarg, NULL, 0);
-> +			if (cfg_port > UINT16_MAX)
-> +				error(1, ERANGE, "port must be <= 65535");
-> +			break;
-> +		case 'b':
-> +			ret = inet_aton(optarg, &cfg_bind_addr);
-> +			if (ret == 0)
-> +				error(1, errno,
-> +				      "bind address %s invalid", optarg);
-> +			break;
-> +		case 'o':
-> +			cfg_outfile = strdup(optarg);
-> +			if (!cfg_outfile)
-> +				error(1, 0, "outfile invalid");
-> +			break;
-> +		case 'm':
-> +			cfg_max_events = strtol(optarg, NULL, 0);
-> +
-> +			if (cfg_max_events == LONG_MIN ||
-> +			    cfg_max_events == LONG_MAX ||
-> +			    cfg_max_events <= 0)
-> +				error(1, ERANGE,
-> +				      "max events must be > 0 and < LONG_MAX");
-> +			break;
-> +		case 'd':
-> +			cfg_defer_hard_irqs = strtoul(optarg, NULL, 0);
-> +
-> +			if (cfg_defer_hard_irqs == ULONG_MAX ||
-> +			    cfg_defer_hard_irqs > INT32_MAX)
-> +				error(1, ERANGE,
-> +				      "defer_hard_irqs must be <= INT32_MAX");
-> +			break;
-> +		case 'r':
-> +			cfg_gro_flush_timeout = strtoull(optarg, NULL, 0);
-> +
-> +			if (cfg_gro_flush_timeout == ULLONG_MAX)
-> +				error(1, ERANGE,
-> +				      "gro_flush_timeout must be < ULLONG_MAX");
-> +			break;
-> +		case 's':
-> +			cfg_irq_suspend_timeout = strtoull(optarg, NULL, 0);
-> +
-> +			if (cfg_irq_suspend_timeout == ULLONG_MAX)
-> +				error(1, ERANGE,
-> +				      "irq_suspend_timeout must be < ULLONG_MAX");
-> +			break;
-> +		case 'i':
-> +			cfg_ifindex = strtoul(optarg, NULL, 0);
-> +			if (cfg_ifindex == ULONG_MAX)
-> +				error(1, ERANGE,
-> +				      "ifindex must be < ULONG_MAX");
-> +			break;
-> +		}
-> +	}
-> +
-> +	if (!cfg_ifindex)
-> +		usage(argv[0]);
-> +
-> +	if (optind != argc)
-> +		usage(argv[0]);
-> +}
+--Z2jpFLa81REgb+x8
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: attachment; filename="changes-iptables-1.8.11.txt"
+
+Florian Westphal (10):
+  arptables-nft: remove ARPT_INV flags usage
+  nft-arp: add missing mask support
+  nft-arp: add arptables-translate
+  arptables-txlate: add test cases
+  extensions: MARK: fix arptables support
+  extensions: libebt_stp: fix range checking
+  extensions: xt_socket: add txlate support for socket match
+  extensions: xt_TPROXY: add txlate support
+  iptables: tests: add missing make +x
+  iptables: tests: shell: use bash, not sh
+
+Jacek Tomasiak (1):
+  iptables: Add missing error codes
+
+Jan Engelhardt (15):
+  man: display number ranges with an en dash
+  man: encode minushyphen the way groff/man requires it
+  man: encode emdash the way groff/man requires it
+  man: encode hyphens the way groff/man requires it
+  man: consistent casing of "IPv[46]"
+  man: grammar fixes to some manpages
+  man: use native bullet point markup
+  man: consistent use of \(em in Name sections
+  man: remove lone .nh command
+  man: repeal manual hyphenation
+  man: stop putting non-terminals in italic
+  man: copy synopsis markup from iptables.8 to arptables-nft.8
+  man: limit targets for -P option synopsis
+  man: more backslash-encoding of characters
+  man: proper roff encoding for ~ and ^
+
+Jeremy Sowden (7):
+  Fix spelling mistakes
+  build: format `AM_CPPFLAGS` variables
+  build: remove obsolete `AM_LIBTOOL_SILENT` variable
+  build: remove unused `AM_VERBOSE_CXX*` variables
+  build: use standard automake verbosity variables
+  build: add an automake verbosity variable for `ln`
+  build: replace `echo -e` with `printf`
+
+Joshua Lant (2):
+  iptables: align xt_CONNMARK with current kernel headers
+  configure: Determine if musl is used for build
+
+Maxin B. John (1):
+  configure: Add option to enable/disable libnfnetlink
+
+Pablo Neira Ayuso (1):
+  tests: iptables-test: extend coverage for ip6tables
+
+Phil Sutter (158):
+  libiptc: Fix for another segfault due to chain index NULL pointer
+  extensions: string: Clarify description of --to
+  extensions: string: Adjust description of --to to recent kernel
+    changes
+  man: use .TP for lists in xt_osf man page
+  man: reveal rateest's combination categories
+  ebtables: Fix corner-case noflush restore bug
+  arptables: Fix formatting of numeric --h-type output
+  arptables: Fix --proto-type mask formatting
+  extensions: libarpt_standard.t: Add a rule with builtin option masks
+  Makefile: Install arptables-translate link and man page
+  nft-bridge: nft_bridge_add() uses wrong flags
+  xshared: struct xt_cmd_parse::xlate is unused
+  xshared: All variants support -v, update OPTSTRING_COMMON
+  xshared: Drop needless assignment in --help case
+  xshared: Drop pointless CMD_REPLACE check
+  tests: xlate: Print failing command line
+  ebtables: Drop append_entry() wrapper
+  ebtables: Make ebt_load_match_extensions() static
+  ebtables: Align line number formatting with legacy
+  xshared: do_parse: Ignore '-j CONTINUE'
+  ebtables: Implement --change-counters command
+  libxtables: Combine the two extension option mergers
+  libxtables: Fix guided option parser for use with arptables
+  libxtables: Introduce xtables_strtoul_base()
+  libxtables: Introduce struct xt_option_entry::base
+  extensions: libarpt_mangle: Use guided option parser
+  extensions: MARK: arptables: Use guided option parser
+  xshared: Introduce xt_cmd_parse_ops::option_name
+  xshared: Introduce xt_cmd_parse_ops::option_invert
+  xshared: Simplify generic_opt_check()
+  xshared: Entirely ignore interface masks when saving rules
+  xshared: Do not populate interface masks per default
+  nft: Leave interface masks alone when parsing from kernel
+  man: Do not escape exclamation marks
+  libxtables: xtoptions: Fix for garbage access in
+    xtables_options_xfrm()
+  libxtables: xtoptions: Fix for non-CIDR-compatible hostmasks
+  xshared: do_parse: Skip option checking for CMD_DELETE_NUM
+  xshared: Perform protocol value parsing in callback
+  xshared: Turn command_default() into a callback
+  xshared: Introduce print_help callback (again)
+  xshared: Support rule range deletion in do_parse()
+  xshared: Support for ebtables' --change-counters command
+  ebtables{,-translate}: Convert if-clause to switch()
+  ebtables: Change option values to avoid clashes
+  ebtables: Pass struct iptables_command_state to print_help()
+  ebtables: Make 'h' case just a call to print_help()
+  ebtables: Use struct xt_cmd_parse
+  xshared: Introduce option_test_and_reject()
+  ebtables: Use do_parse() from xshared
+  iptables-legacy: Fix for mandatory lock waiting
+  tests: iptables-test: Use difflib if dumps differ
+  libxtables: xtoptions: Prevent XTOPT_PUT with XTTYPE_HOSTMASK
+  libxtables: xtoptions: Support XTOPT_NBO with XTTYPE_UINT*
+  libxtables: xtoptions: Implement XTTYPE_ETHERMACMASK
+  libxtables: xtoptions: Treat NFPROTO_BRIDGE as IPv4
+  ebtables: Support for guided option parser
+  extensions: libebt_*: Drop some needless init callbacks
+  extensions: libebt_stp: Use guided option parser
+  extensions: libebt_arpreply: Use guided option parser
+  extensions: libebt_dnat: Use guided option parser
+  extensions: libebt_ip6: Use guided option parser
+  extensions: libebt_ip: Use guided option parser
+  extensions: libebt_log: Use guided option parser
+  extensions: libebt_mark: Use guided option parser
+  extensions: libebt_nflog: Use guided option parser
+  extensions: libebt_snat: Use guided option parser
+  extensions: libebt_redirect: Use guided option parser
+  extensions: libebt_802_3: Use guided option parser
+  extensions: libebt_vlan: Use guided option parser
+  extensions: libebt_arp: Use guided option parser
+  extensions: libxt_limit: Use guided option parser for NFPROTO_BRIDGE,
+    too
+  extensions: libebt_pkttype: Use guided option parser
+  extensions: libebt_mark_m: Use guided option parser
+  extensions: libxt_HMARK: Review HMARK_parse()
+  ebtables: Default to extrapositioned negations
+  tests: iptables-test: Increase non-fast mode strictness
+  nft: ruleparse: Add missing braces around ternary
+  libxtables: Fix memleak of matches' udata
+  xtables-eb: Eliminate 'opts' define
+  xshared: Fix for memleak in option merging with ebtables
+  xshared: Introduce xtables_clear_args()
+  ebtables: Fix for memleak with change counters command
+  extensions: *.t/*.txlate: Test range corner-cases
+  libxtables: xtoptions: Assert ranges are monotonic increasing
+  libxtables: Reject negative port ranges
+  extensions: ah: Save/xlate inverted full ranges
+  extensions: frag: Save/xlate inverted full ranges
+  extensions: mh: Save/xlate inverted full ranges
+  extensions: rt: Save/xlate inverted full ranges
+  extensions: esp: Save/xlate inverted full ranges
+  extensions: ipcomp: Save inverted full ranges
+  nft: Do not omit full ranges if inverted
+  extensions: tcp/udp: Save/xlate inverted full ranges
+  libxtables: xtoptions: Respect min/max values when completing ranges
+  Revert "xshared: Print protocol numbers if --numeric was given"
+  libxtables: Add dccp and ipcomp to xtables_chain_protos
+  iptables-save: Avoid /etc/protocols lookups
+  nft: Fix for broken recover_rule_compat()
+  xtables-translate: Leverage stored protocol names
+  xlate: Improve redundant l4proto match avoidance
+  xlate: libip6t_mh: Fix and simplify plain '-m mh' match
+  xshared: Fix parsing of empty string arg in '-c' option
+  libxtables: Attenuate effects of functions' internal static buffers
+  man: extensions: recent: Clarify default value of ip_list_hash_size
+  extensions: libxt_sctp: Add an extra assert()
+  ebtables: Include 'bitmask' value when comparing rules
+  man: recent: Adjust to changes around ip_pkt_list_tot parameter
+  xtables-monitor: Proper re-init for rule's family
+  xtables-monitor: Flush stdout after all lines of output
+  xtables-monitor: Align builtin chain and table output
+  xtables-monitor: Support arptables chain events
+  tests: shell: New xtables-monitor test
+  xtables-monitor: Fix for ebtables rule events
+  xtables-monitor: Ignore ebtables policy rules unless tracing
+  xtables-monitor: Print commands instead of -4/-6/-0 flags
+  nft: Fix for zeroing non-existent builtin chains
+  extensions: recent: New kernels support 999 hits
+  nft: cache: Annotate faked base chains as such
+  nft: Fix for zeroing existent builtin chains
+  extensions: recent: Fix format string for unsigned values
+  extensions: conntrack: Use the right callbacks
+  nft: cmd: Init struct nft_cmd::head early
+  nft: Add potentially missing init_cs calls
+  arptables: Fix conditional opcode/proto-type printing
+  xshared: Do not omit all-wildcard interface spec when inverted
+  extensions: conntrack: Reuse print_state() for old state match
+  xshared: Make save_iface() static
+  xshared: Move NULL pointer check into save_iface()
+  libxtables: Debug: Slightly improve extension ordering debugging
+  arptables: Introduce print_iface()
+  ebtables: Omit all-wildcard interface specs from output
+  ebtables: Zero freed pointers in ebt_cs_clean()
+  ebtables: Introduce nft_bridge_init_cs()
+  nft: Reduce overhead in nft_rule_find()
+  nft: ruleparse: Drop 'iter' variable in
+    nft_rule_to_iptables_command_state
+  extensions: TPROXY: Fix for translation being non-terminal
+  tests: shell: Adjust for recent changes in libnftnl
+  tests: iptables-test: Append stderr output to log file
+  man: xtables-legacy.8: Join two paragraphs
+  man: ebtables-nft.8: Note that --concurrent is a NOP
+  gitignore: Ignore generated arptables-translate.8
+  xshared: iptables does not support '-b'
+  ebtables: Fix for -S with rule number
+  nft: Fix for -Z with bogus rule number
+  tests: shell: Test some commands involving rule numbers
+  tests: iptables-test: Fix for duplicate supposed-to-fail errors
+  tests: shell: Fix for 'make distcheck'
+  ebtables: Clone extensions before modifying them
+  ebtables: Simplify ebt_add_{match,watcher}
+  tests: shell: Test ebtables-restore deleting among matches
+  tests: iptables-test: Properly assert rule deletion errors
+  tests: iptables-test: Extend fast mode docs a bit
+  tests: shell: iptables/0010-wait_0 is unreliable
+  tests: shell: Print escape sequences with terminals only
+  tests: iptables-test: Fix for 'make distcheck'
+  tests: xlate-test: Fix for 'make distcheck'
+  Makefile.am: Revert to old serial test harness
+  libxtables: Hide xtables_strtoul_base() symbol
+
+Sriram Rajagopalan (1):
+  nft: Do not combine inverted payload matches
+
+--Z2jpFLa81REgb+x8--
 
