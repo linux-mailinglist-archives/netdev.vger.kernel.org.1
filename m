@@ -1,209 +1,156 @@
-Return-Path: <netdev+bounces-143202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 20A509C161E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 06:48:04 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B75479C1620
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 06:48:48 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A245C28420E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:48:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D29221C22607
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:48:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69B91CEE81;
-	Fri,  8 Nov 2024 05:47:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E6DA1CF293;
+	Fri,  8 Nov 2024 05:48:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="key not found in DNS" (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b="yC+ZuF/I"
+	dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b="Yqqik/wl"
 X-Original-To: netdev@vger.kernel.org
-Received: from BL0PR05CU006.outbound.protection.outlook.com (mail-eastusazon11021101.outbound.protection.outlook.com [52.101.52.101])
+Received: from out30-101.freemail.mail.aliyun.com (out30-101.freemail.mail.aliyun.com [115.124.30.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12A8B7464;
-	Fri,  8 Nov 2024 05:47:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=52.101.52.101
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731044874; cv=fail; b=lW5LA7UhcQMaNVsrpn6bM82E5ut9ZK29bB8UKxhoPnNd5zY84vt5SN9mt4R6YZgSI4ttZQECSGL9yJpQIFGoRQf4B+QkpLko39iXDQ6gaKdD9fbijhDtDBycfGR3OKnqvML0/7WCIDai8QgHZPhpZJXDnYhFxmZOrGWWYhb+pDc=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731044874; c=relaxed/simple;
-	bh=VV/JiLnVMBU9MNqPjWqDB7vw6GwvETofXaLuGTIaZcc=;
-	h=Message-ID:Date:Subject:To:Cc:References:From:In-Reply-To:
-	 Content-Type:MIME-Version; b=VyMRu2269vykYd8x0LSPnj0ermDkOKfHk/N6DyKVRCOWSq5P2FY9cCXTINPe/PbSQG+86DA6DQVhDYwDlA1WB5B7iXssTLFXJLeUfF+6tu+XhdzaNYhGvedREr2DYJGXRwacewok7If3EOJ4liCeJrvzlAHCIm4sQ4xdF7SOpMA=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com; spf=pass smtp.mailfrom=os.amperecomputing.com; dkim=fail (0-bit key) header.d=amperemail.onmicrosoft.com header.i=@amperemail.onmicrosoft.com header.b=yC+ZuF/I reason="key not found in DNS"; arc=fail smtp.client-ip=52.101.52.101
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=amperemail.onmicrosoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=os.amperecomputing.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=onXlgV0ZLpyrylkfCJOWHJ1IsN3RzZXjaBQi1csnw7IO2JM1WNJ1CYN3aTl4OgTVzU5ZBfEeEXfYpFuFOXHkQSZ+XGdYEabd9feoV2yq6C/Yz0TSVKNvtO0623zTsLJ6XHI8jfwzCZNHSHt1XFna5Us/R3ZogookrbmVl8nzDMhRkg7T2ODg4ydETE5oiVHdExN2ogFV7q0LPDZVcuZJG9s0jQeCsIXKaXRE0Se0cpv5qD/BnXkA8zzzlsVqkiJDkXVJ0j0p7IMgurySKtlppMh0Z4FG6TvqUXJXQzaOtHwXigYgvms/io4mP5bBHmIryOEvm6kxA1OZFeAP06rbtw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=0g1risCGKK5h67zjiZTGrXuP7L9A3FHTwE5lntsLpUg=;
- b=cjQf7Low0lUYFqhzwgq5ld9p8qjCLfnr5CRLzADwMjcl6uDr5g8xDE0NN419Smasm0mlQtkTQN3lCHLRC52IRW6IwSjL9pq+2+mcwH9nCEF6tVrhbZhDNJyIz68vOLKxxMDQm5Ew+WqGHmSBvJ8vSTghwyLLHHCqOR2d8OGxPdwyOT/eWOO8spFcgcx3xkJ/bgFygR3ClRnBJfmdz/vVSXZKTfsmAP7MbeR1fNmaGp79l8fAwpdC/xenBqRzy5B6kBlhBU8Clk9Mfs03cQEygHMcJ99XL9+LbqgfIPwuX6xtutVDfUGqNYhXZ8TNl8MWbdqu2uzC/mJ6pGQ9Fjtg4A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=os.amperecomputing.com; dmarc=pass action=none
- header.from=amperemail.onmicrosoft.com; dkim=pass
- header.d=amperemail.onmicrosoft.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=amperemail.onmicrosoft.com; s=selector1-amperemail-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=0g1risCGKK5h67zjiZTGrXuP7L9A3FHTwE5lntsLpUg=;
- b=yC+ZuF/IJj39QITx1MFfietLkesKpVHwZTW75yLwHskbw5fRqVEM9nY2FRkfY7ObbsUm2rNUIUG4PX6ksyLai+CRuCsXj5VrCtoA38uI8e8FaWh/vVAeIRjIzwvzPsJrhjutokxhAXcxyfKTR3YxXGsG/YjxlSyBEg3qnGq7P10=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amperemail.onmicrosoft.com;
-Received: from SN4PR01MB7520.prod.exchangelabs.com (2603:10b6:806:207::19) by
- BY1PR01MB8801.prod.exchangelabs.com (2603:10b6:a03:5b1::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.8137.18; Fri, 8 Nov 2024 05:47:48 +0000
-Received: from SN4PR01MB7520.prod.exchangelabs.com
- ([fe80::3ad8:b11:de24:6087]) by SN4PR01MB7520.prod.exchangelabs.com
- ([fe80::3ad8:b11:de24:6087%4]) with mapi id 15.20.8137.018; Fri, 8 Nov 2024
- 05:47:48 +0000
-Message-ID: <4c5b08d2-e81e-4492-a1a7-7e1e6445ddc4@amperemail.onmicrosoft.com>
-Date: Fri, 8 Nov 2024 12:47:36 +0700
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: mctp: Expose transport binding identifier
- via IFLA attribute
-To: Jakub Kicinski <kuba@kernel.org>,
- Khang Nguyen <khangng@os.amperecomputing.com>
-Cc: Jeremy Kerr <jk@codeconstruct.com.au>,
- Matt Johnston <matt@codeconstruct.com.au>,
- Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- ampere-linux-kernel@lists.amperecomputing.com,
- Phong Vo <phong@os.amperecomputing.com>,
- Thang Nguyen <thang@os.amperecomputing.com>,
- Khanh Pham <khpham@amperecomputing.com>, Phong Vo <pvo@amperecomputing.com>,
- Quan Nguyen <quan@os.amperecomputing.com>,
- Chanh Nguyen <chanh@os.amperecomputing.com>,
- Thu Nguyen <thu@os.amperecomputing.com>, Hieu Le
- <hieul@amperecomputing.com>, openbmc@lists.ozlabs.org,
- patches@amperecomputing.com
-References: <20241105071915.821871-1-khangng@os.amperecomputing.com>
- <20241107204157.683bca11@kernel.org>
-Content-Language: en-US
-From: Khang D Nguyen <khangng@amperemail.onmicrosoft.com>
-In-Reply-To: <20241107204157.683bca11@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BYAPR06CA0003.namprd06.prod.outlook.com
- (2603:10b6:a03:d4::16) To SN4PR01MB7520.prod.exchangelabs.com
- (2603:10b6:806:207::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4E91C3F0B;
+	Fri,  8 Nov 2024 05:48:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=115.124.30.101
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731044924; cv=none; b=T0kU1f9p0D72da9l2+xOXGQ5bDXGZ1R66eN+3DwVFVk6Dmj1avj7Qsni2WV7AlqZqqSuERQCZf401DocOAu74zBsx4aLFRh4NDONMGadBeg4HO6pkTPJbfHyryV+c67Wb1Iy0fdiStITZLbVoJV0xfOBdWVXcBxhJnUPc0sWd0w=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731044924; c=relaxed/simple;
+	bh=BC2ckwWkVtQbg+crF3fb4Uz/bxIhCg6EwMU2xvSjZ9Q=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=aP2kZEoPnv4ZGcp+jGmEbzuIJUsdvRXhy7Qxmonn3a1VUrfIBZNkz6C9FMa69+VrIHkl0Jqgbz4iGUGHwEM9arrz3QIGvtty+gm6R9b7wTxY0KHx8o2MHH/W2KqB61kb39StzRoJm+NT+iEEUB8CSTkv/I3/4e+QJSnvDFGLguc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com; spf=pass smtp.mailfrom=linux.alibaba.com; dkim=pass (1024-bit key) header.d=linux.alibaba.com header.i=@linux.alibaba.com header.b=Yqqik/wl; arc=none smtp.client-ip=115.124.30.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.alibaba.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.alibaba.com
+DKIM-Signature:v=1; a=rsa-sha256; c=relaxed/relaxed;
+	d=linux.alibaba.com; s=default;
+	t=1731044917; h=From:To:Subject:Date:Message-Id:MIME-Version;
+	bh=R+XoQMp47jHzDCgNkX/MTBF2dU+HVLOQB0c6h9SrfAE=;
+	b=Yqqik/wlJAQiHR8PED1owHp5wQZ7IiaOcAA1piqyxBA5kNsugFbpmmfILBEqdNfzGcslqvMt4uOVGy9VaL3WUrksHdjg56RtJxURlcF4lGhpDu+Bp7E6CtlECv/EXwz10WbXLo4hxY8fge+s9W2Ls8Vns6LxUnqUM2xI//zft+g=
+Received: from localhost(mailfrom:lulie@linux.alibaba.com fp:SMTPD_---0WIxm7Pa_1731044916 cluster:ay36)
+          by smtp.aliyun-inc.com;
+          Fri, 08 Nov 2024 13:48:37 +0800
+From: Philo Lu <lulie@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: willemdebruijn.kernel@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	horms@kernel.org,
+	antony.antony@secunet.com,
+	steffen.klassert@secunet.com,
+	linux-kernel@vger.kernel.org,
+	dust.li@linux.alibaba.com,
+	jakub@cloudflare.com,
+	fred.cc@alibaba-inc.com,
+	yubing.qiuyubing@alibaba-inc.com
+Subject: [PATCH v8 net-next 0/4] udp: Add 4-tuple hash for connected sockets
+Date: Fri,  8 Nov 2024 13:48:32 +0800
+Message-Id: <20241108054836.123484-1-lulie@linux.alibaba.com>
+X-Mailer: git-send-email 2.32.0.3.g01195cf9f
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN4PR01MB7520:EE_|BY1PR01MB8801:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2de706d8-7044-4a05-d6d1-08dcffb8e014
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;ARA:13230040|1800799024|366016|7416014|376014;
-X-Microsoft-Antispam-Message-Info:
-	=?utf-8?B?YTZvV0I5Yk9zQWlXYWN5bmVwSjFrNTZLSmg0cEsvdm9SRWQzQ2FqejFkVFR1?=
- =?utf-8?B?WFdRTVNHcVpMdkYydzQzZ3BGWnc2Z2szMzZJakNsVzdLS0xOVlVPb1JuLzVh?=
- =?utf-8?B?djRiRlFXOU1WeUxudXg3THk4bVVJQ3R6enZqK0J3NkZHVFlYWmRjRElaSmth?=
- =?utf-8?B?eFFHWGlwWXozZ09Zdk1HSUxOb210NjVVaVY4cUMrNlo4Q0FwZ3RJY0d0M00r?=
- =?utf-8?B?cGk1cTFXUlYxMS83QklXc2NOanVsWm5kVFllY1JpMVYrK2JhdTlwbEx0dmoz?=
- =?utf-8?B?YkJ0cTZLMHozVzFSV0tXbDZmN3IwQU5TYW0vUmE4MjRIYzJqbTVzNWt3SXI2?=
- =?utf-8?B?b2s5dFFiVk9lVExOa1VMbzgrc0xpdXRNSjNZdW5ld3dkeVlzMm5kVmZHYTB0?=
- =?utf-8?B?d0sxcmVVMFF2dnRJVEVheElmQisrdm9vZW5HUFNxN2kyem9ZSE5wdm53MGl5?=
- =?utf-8?B?WUd3Z05va1FheHYzdGFCN3Ura3FEN0loc2lPTnFDZmxDSmVaMkpvb1JkVDFh?=
- =?utf-8?B?dU82bUM2Rll3MUZRWFZtWjBlblNFckx3ZEdoelVwTUFadEJJUnNMeWtkMUV6?=
- =?utf-8?B?elVKVC94bkFBT2xIaTNORU9rMWp4L0srQm83NEQ4N1NGZzdsS0hoWlE5ajUv?=
- =?utf-8?B?a3BzejFyU04wdXltaVFldGxzUlgreHhlMzBuWkU2elduZGd3UDlXZHFmRW5u?=
- =?utf-8?B?T0E1ZWtyeE53aytOZTU3SmNVVGF3cnpkbVVpb2gvWnZPMFpOZTVhOHN6K0xh?=
- =?utf-8?B?ek5TRUgvM1ZXeXFsLzljT1MwY2NUV1pXWVplOWFIeExveEtEbkNxSTBUY1Bu?=
- =?utf-8?B?NG9rekZRQlhsYWNDWG1oNXNrVlRhUXZLQzNDVFhDZENpTVAxRlVXZXh2V0Jo?=
- =?utf-8?B?Qi9aMDRJa1hreHlSTWJwc0FybE9JbFJ1SjNjRm9CamhOS2hobk14OWdUdjd5?=
- =?utf-8?B?aitaOE92Z0RwNHgvTFVOMER5THpjeFV1bmlPRWVuWGx1dE1nSlhNbWdIT2ND?=
- =?utf-8?B?RVZJOFh2dlRmMVBtQ3hkaStGVzAyUEUzSmxkemJJNmwzMld0U2dqWnNBcEh1?=
- =?utf-8?B?WURnK0xJZUJoQ3BsQzBacC82dTI2YjFTaTZPbUlKWVZqRklhUlBqUURNRkIz?=
- =?utf-8?B?RG5uU3lTWlB5MWlTaDFDS3U2dk5KY0JTUkk1eFFTZ2JkTU1OaTJlazFDbDJQ?=
- =?utf-8?B?L0FyWitoZW9aWXBIVklhY1ozbjdkMkw4enpMZ3VMRVBSRHl6YWNROFJWbFJM?=
- =?utf-8?B?czZwMUxxWElobDA2ZFFxVkhmZTk1TWJQVXhrbXVtZjJVUzl3UTFLTG9Dbms4?=
- =?utf-8?B?NHMvSkwvT3plWXlXaTlrMlpPV1pIUE9wWm9mdm52YytPWjBBc2cwcTJXckpH?=
- =?utf-8?B?L1JJZ3hseXFnZ2xXN0ZNdXVONlRBTk1xbUZJdmxZNzNIeWZXbnd5TkU1end3?=
- =?utf-8?B?bUNuY1o5ejM0RlNYczN5ak85aDJuSFptekpCUVlWMkRIOVY5bHBLNGdzenlV?=
- =?utf-8?B?QVl2MkM4TlcxMUU0ekxocU5sMURFOU9lVGlMVUp5c1N2akt4bEhmQnVJNFFK?=
- =?utf-8?B?QmpMUXBpa3FqODllQksvdzVVa3B3L1JiU2dqTU1ZRk5rbUJ2aHVIK24xdGZS?=
- =?utf-8?B?c0k1YjdqWHV5S2F0WDkzQjIzOE1sVUNrenpmMlk1NlN4NmxCZXVNN28yOTI2?=
- =?utf-8?B?bFJRSUlId1VWTndJeTRwVU9nUjUxVGVzR21panJQNTR5WHJKamZoUktCdEFl?=
- =?utf-8?Q?OiGpZfJgsq+Z91q5Oy+4M1RliIf5k3gNS2VbMfv?=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN4PR01MB7520.prod.exchangelabs.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(366016)(7416014)(376014);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?eDZobzBPUkZkbEZGazY2NkwyVGZWby9sbVBWNUlId0V4RnJKTzh5dWhmNWRK?=
- =?utf-8?B?b1VIUVIrR0lMMXBCM2NxaytVenI4TUpVaHl6SnZoWWVJVDNPTHhmb25oeEc5?=
- =?utf-8?B?d1p1WHZjRHBqNUhFQmwwTm1uc1dtbWVDR3I5T3NiSXU3N0RUWkFsZkN3VWpX?=
- =?utf-8?B?UytuS20wT2daOUFFQWFsbnB3MnFxaVhCdkV5Y1B0WUROZ0RUOEVrU3FnQlJs?=
- =?utf-8?B?cFhiMjlqalNtYVFMZjg1ZERUTk9TUytlc2FhZkZiV3pYRFlRT0JVRDBob2tt?=
- =?utf-8?B?VWlzREE1S0JRWDZ1K2RXMTVFaWplZkJpQlppNzk4YmNScENSSVV1RTZ3cDZw?=
- =?utf-8?B?cEpHamFBcitKb3FoUlBxM01qZnB2WTd2YkNTbkUraURoN29vejJFZDROOHpP?=
- =?utf-8?B?UFhPaE5XOTdzeFI0bEdwY2VHVjRFNGtGQ1c2WmdYcU1kZTV2bnV1K3BrUjFR?=
- =?utf-8?B?b2pLRE1xOC9GRWdvbnNNMUNiRGZkZHRPOFA0S1I4ZnFaU3RBZnh0RTN4Tmp0?=
- =?utf-8?B?VkVaWVFLVk5ITkhURU9RMDBMbldSZ0xvNHNObmVVdktXL2hocWg3VUxqcU9P?=
- =?utf-8?B?MXcvQ3NmRG5mZmpiQ1VrL1RtenRaSnArNmIvenVrRjNJQXN6Q3RBZ25INTc3?=
- =?utf-8?B?ZVJ3eW5IZGVXai9saVh4YzdTZ2srcitqUXkxZG5DcjJpSm1VVjdoT0ZsS25z?=
- =?utf-8?B?RUludHAzUmc1SndidVNJK0MrRkFsNzhiUXpNZHljZlpVYXBxdUpvWEZFd3Bo?=
- =?utf-8?B?cDE0SUMvWXZYamRWbm40OEJKU3k4SE5iaXpidmhybjRIeWQyRU9PZzg0eXZk?=
- =?utf-8?B?SGJVV2pPaGdra0lSZHBrcHMyQW1sSVZ2RTh4WWIxKzVxWDVjSEFIeTh1NnNL?=
- =?utf-8?B?UTF1R2kyVmY3eUtNbWJxdENRWkcyYzcwR3ZZQ25TY29ybGJxU2pBQUF0dkg0?=
- =?utf-8?B?TzdFaXB1cDMySDBmbzdLVlEwaFhlbzV0TjBKbjFZTzhPWGo3ZXNRdkhCazd1?=
- =?utf-8?B?aks3bFFsbC9vMkZjeTRZRG5odWNNTlE4RDAvUXdvUFBpeEdjeFBTTDFaSW5v?=
- =?utf-8?B?aXJ4UFZ1UlIvY1pmVS9SZWx2Y0gveDJnVmtLd0ROK2RLRWZicTZTTDdFQVhw?=
- =?utf-8?B?V05FZFI2UGRjTUU5Tk55Mmx3MGl1dEQrejl3NFk1b0t2S0RVK3lEdDZDVGFQ?=
- =?utf-8?B?a2VjeDVUN09uZGswV3RuY2JHUm1uOXNVTUwzQTFoVEZUN05RcGpJdmlocCs1?=
- =?utf-8?B?cUcvQjlhc3BnYXZpbm9IQnp4TnZyYmVpeTY1U2xSY0VTZkRVTVFDblhHVW4v?=
- =?utf-8?B?OHlVdXlNd3pzSGk1UFBsUmFrMDNlc0Fnc2JPN0JEWW9vTi9qVmI5V0FBWkFt?=
- =?utf-8?B?eW5zK29nYWUyNDlNUnZqbWU2SVcveDB3czhvQmg5NEtqd0RrZkg0UzJYaFBD?=
- =?utf-8?B?eDlHeksycnJ0bnZiQVoxN2pGc2d3aDFlZit2V0tiQWtGL2VUU2xqTXEwV0g0?=
- =?utf-8?B?UkVmL1o3MlZoMlZOcFNYc3o3REZSN3BodDVSK0dVSFIydUJibWFrUEx0UlZq?=
- =?utf-8?B?c2xNWks3MnVMR1FONjRBMzNlQ0ZmWGdZVWxUNk9aVVBBbHJKZ3JzUEVyRFd6?=
- =?utf-8?B?a3pmU082S2hiTVQ3SVB1L0FZQTJtU1VaOE9icXA5VU43V01Ndkd1d0J5MDRP?=
- =?utf-8?B?Z2RJOWFGK3ZBc2pMY0NQRm9xS2N1WnhqTVdZendXZVB1dGRiVXBGdTRMN25N?=
- =?utf-8?B?QUxaYlZ5Y0NLcnBpOUptKzFPZ1d4VGp4a1dQSDVUQ2VvK2tyYVJ2eDJpaHI5?=
- =?utf-8?B?OG03dFZCSi9oU1ozQ0NWd25YMkpPQlNLazFFNmh5bmtycmkyLzZhR0FienQ1?=
- =?utf-8?B?Q3I3SERDRnBPL0NmU3E2ZUprdWROV3RmSU1nbkJsTmp0NU10MVlTY1lmRENX?=
- =?utf-8?B?TXgyMDBHWWxaczkwVHQ3Ty85Z0R2V1RFZEYwckZER1RlRk5lUklyL29PZVE3?=
- =?utf-8?B?MGY2aGFRdE1rVGJzbTRoVHlNRFhvMzNpNzVCYWpXUEpVb2U3THNmQTNvNDIw?=
- =?utf-8?B?MXd3Wi9KWERCRlU0dWphK2JQVFR5a2FEL3dVNmd3K3BFN2JUczE1cUx6YUsw?=
- =?utf-8?B?UDNHZlFjTUwwc0U3UHdOenNvb2loM2ZicTNYRlJrV1RqTkZBR1JOZzh5NUFG?=
- =?utf-8?Q?NF5yIyASPHYFQ9T6SPKSGXM=3D?=
-X-OriginatorOrg: amperemail.onmicrosoft.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2de706d8-7044-4a05-d6d1-08dcffb8e014
-X-MS-Exchange-CrossTenant-AuthSource: SN4PR01MB7520.prod.exchangelabs.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Nov 2024 05:47:48.1173
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3bc2b170-fd94-476d-b0ce-4229bdc904a7
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: D4SfCG/m5zx4Jy2EFrcZ9bFE9nn/TM6Nd68RP3i8CSYEiEWB/EGWdgww4T+IBqTPZj4StWR+lyB8QfnqknufnIIiu+G9M9ECahpAQHwoZgL7eSNC7bPunR+uMA8MZ1qf
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY1PR01MB8801
+Content-Transfer-Encoding: 8bit
 
-On 08/11/2024 11:41, Jakub Kicinski wrote:
-> On Tue,  5 Nov 2024 14:19:15 +0700 Khang Nguyen wrote:
->> However, we currently have no means to get this information from MCTP
->> links.
-> 
-> I'm not opposed to the netlink attribute, but to be clear this info
-> is indirectly available in sysfs, right? We link the netdev to
-> the parent device so the type of /sys/class/net/$your_ifc/device
-> should reveal what the transport is?
+This patchset introduces 4-tuple hash for connected udp sockets, to make
+connected udp lookup faster.
 
-Good point, I did not think about using the parent device, that would be 
-a good workaround for the currently supported interfaces.
+Stress test results (with 1 cpu fully used) are shown below, in pps:
+(1) _un-connected_ socket as server
+    [a] w/o hash4: 1,825176
+    [b] w/  hash4: 1,831750 (+0.36%)
 
-For the long term, we should still need the attribute. For example, 
-vendor-defined transports need their 0xFF code, which cannot be derived 
-anywhere. Or binding implementations that have parent SoC platform 
-devices from the device tree, which do not always have a clear type 
-shown in the sysfs...
+(2) 500 _connected_ sockets as server
+    [c] w/o hash4:   290860 (only 16% of [a])
+    [d] w/  hash4: 1,889658 (+3.1% compared with [b])
+With hash4, compute_score is skipped when lookup, so [d] is slightly
+better than [b].
 
-(The MCTP-over-serial binding also does not have a parent device 
-currently, but I believe we can fix that if necessary)
+Patch1: Add a new counter for hslot2 named hash4_cnt, to avoid cache line
+        miss when lookup.
+Patch2: Add hslot/hlist_nulls for 4-tuple hash.
+Patch3 and 4: Implement 4-tuple hash for ipv4 and ipv6.
+
+The detailed motivation is described in Patch 3.
+
+The 4-tuple hash increases the size of udp_sock and udp_hslot. Thus add it
+with CONFIG_BASE_SMALL, i.e., it's a no op with CONFIG_BASE_SMALL.
+
+changelogs:
+v7 -> v8:
+- add EXPORT_SYMBOL for ipv6.ko build
+
+v6 -> v7 (Kuniyuki Iwashima):
+- export udp_ehashfn to be used by udpv6 rehash
+
+v5 -> v6 (Paolo Abeni):
+- move udp_table_hash4_init from patch2 to patch1
+- use hlist_nulls for lookup-rehash race
+- add test results in commit log
+- add more comment, e.g., for rehash4 used in hash4
+- add ipv6 support (Patch4), and refactor some functions for better
+  sharing, without functionality change
+
+v4 -> v5 (Paolo Abeni):
+- add CONFIG_BASE_SMALL with which udp hash4 does nothing
+
+v3 -> v4 (Willem de Bruijn):
+- fix mistakes in udp_pernet_table_alloc()
+
+RFCv2 -> v3 (Gur Stavi):
+- minor fix in udp_hashslot2() and udp_table_init()
+- add rcu sync in rehash4()
+
+RFCv1 -> RFCv2:
+- add a new struct for hslot2
+- remove the sockopt UDP_HASH4 because it has little side effect for
+  unconnected sockets
+- add rehash in connect()
+- re-organize the patch into 3 smaller ones
+- other minor fix
+
+v7:
+https://lore.kernel.org/all/20241105121225.12513-1-lulie@linux.alibaba.com/
+v6:
+https://lore.kernel.org/all/20241031124550.20227-1-lulie@linux.alibaba.com/
+v5:
+https://lore.kernel.org/all/20241018114535.35712-1-lulie@linux.alibaba.com/
+v4:
+https://lore.kernel.org/all/20241012012918.70888-1-lulie@linux.alibaba.com/
+v3:
+https://lore.kernel.org/all/20241010090351.79698-1-lulie@linux.alibaba.com/
+RFCv2:
+https://lore.kernel.org/all/20240924110414.52618-1-lulie@linux.alibaba.com/
+RFCv1:
+https://lore.kernel.org/all/20240913100941.8565-1-lulie@linux.alibaba.com/
+
+Philo Lu (4):
+  net/udp: Add a new struct for hash2 slot
+  net/udp: Add 4-tuple hash list basis
+  ipv4/udp: Add 4-tuple hash for connected socket
+  ipv6/udp: Add 4-tuple hash for connected socket
+
+ include/linux/udp.h |  11 ++
+ include/net/udp.h   | 137 +++++++++++++++++++++++--
+ net/ipv4/udp.c      | 245 +++++++++++++++++++++++++++++++++++++++-----
+ net/ipv6/udp.c      | 117 +++++++++++++++++++--
+ 4 files changed, 468 insertions(+), 42 deletions(-)
+
+--
+2.32.0.3.g01195cf9f
+
 
