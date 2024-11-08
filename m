@@ -1,72 +1,72 @@
-Return-Path: <netdev+bounces-143332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id E88769C213A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:54:57 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 215FE9C213C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:55:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 80309B25016
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:54:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D51A32838E8
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:55:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80C4B21B447;
-	Fri,  8 Nov 2024 15:53:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A658D21B446;
+	Fri,  8 Nov 2024 15:54:01 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="iwawSUR5"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Qvag/G/u"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
+Received: from mail-pf1-f171.google.com (mail-pf1-f171.google.com [209.85.210.171])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1750F21B442;
-	Fri,  8 Nov 2024 15:53:37 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4196A201270;
+	Fri,  8 Nov 2024 15:54:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731081219; cv=none; b=a4SxRjEEGlF5cpHtkSg5o3EJDcXYumlDuE+wi27DeigK6tVc3Xdfe5kHYLr2jj1JeMXsnlhzLQNWcxAG8ZAhBwPlJ1Z6vyGZm4GQC9iKjdTOdxOgM04PuQPXwJcQ0JDKrJvnTOEj+fiJzgeg3eHqyxD03W5Q45f98712i4PLwkQ=
+	t=1731081241; cv=none; b=GFVCmXlhUikeJyQG/4pwc3Ca0DsPvkNfe8BDyRfcjv9dih6ZiUbi5joIjjxoTJtWqZVDLtvXgNcyFJnjYxECOe6cyr3sZGYDNgcJrX4sJKJQOqz8sa5LRRGQlFPEkevkKOjsUnpbhAMLuP8QuHa8PTwMJvrFzmRZSpPusd7pPjQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731081219; c=relaxed/simple;
-	bh=yzQFD9LxKQktmG1yOpcFa0J1fmTZUR/FU0n85McMjso=;
+	s=arc-20240116; t=1731081241; c=relaxed/simple;
+	bh=ZOFRyTJVIkQXwSBOmbuynIp04rtOCxHeMR0TidFTQCA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WivWUlV62L5tE28s9rciwlmvzFJi50tnYaL2s4VlnIK22s/WezKuEQaiAtpCi9cX87ISdvh/+pbsQ27LEA6XmNSTXdeB6Bmr/DcDD7EdXrhAArZr4pPaGr+f1yrIOhIExAcIYOOiR59jW7jxDnfI1tVFbFHNZR3aDneWvGh96qs=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=iwawSUR5; arc=none smtp.client-ip=209.85.214.169
+	 Content-Type:Content-Disposition:In-Reply-To; b=DIaLBzhRZCdQDcaJTXhdh4kePqB62JZ9BIRdXUPIhEnBsISu6vbZZ/OQWj3AJeM+km83VrLJlCCoZ70DVfcrPXJ4KQxi3awIpYu+HpzRYqINDwannjkcKP4ZY9zxRJA+8ILpX31XS4H4AvZOhV+F/M+XFu1IXbfDsCabTnL9IiY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Qvag/G/u; arc=none smtp.client-ip=209.85.210.171
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20cdbe608b3so24943645ad.1;
-        Fri, 08 Nov 2024 07:53:37 -0800 (PST)
+Received: by mail-pf1-f171.google.com with SMTP id d2e1a72fcca58-7240d93fffdso1503629b3a.2;
+        Fri, 08 Nov 2024 07:54:00 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731081217; x=1731686017; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731081239; x=1731686039; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=04QN0bqnc/hIDNiSoE8wNnlUvenSZdQa91K0jk7Zr64=;
-        b=iwawSUR5x6Vf9CbNgwHXcmNzFnnEMEJO9U0nXuqi36PfWEZBzNi/Z3mVLQBrJpdCA2
-         fffpZV5DLCImB1kULDOwmo7KXOrQzzQ31YFzleSB0OAqs+YsT9Qq3LUBmXN0L+vZXgvh
-         YaaQ3goJx1Un/sGvn+kqy1OxL2ITh/wzQmqn/TNX3o3KrZBZosDwiL7qCDZichyTZTbF
-         Dc9TUP3HEvgIBoCczu6RAeaW8C8hOlXGuamGXRzBFtIfs+y/dsDG+1sK0QNlAgmC0zL+
-         rwrcjGvhSQ1nFFchjFtd41LmKfRBWgBnZVy0elteCWIVkwhnStbuAdpjB3GdlhUpeviG
-         DyTA==
+        bh=GhXDskMHNObuJeZQL+8/3H11+e/JKvNdkRoXa+j/oZw=;
+        b=Qvag/G/url0RcvdC3wko2pvUsVdycLipMHxZoTDsqXHrmRAFSgRh/k1p/Z2D27gvdu
+         5hRdWshVo67nNnuTTb92h5kf4+M4HImwdTVoM6oMpbds41w7WwNNTS28XxY89AANmp9R
+         dn1hr2zYrUNLkjCTcZhXRRRmuYMYDM7wLAURLcS8ZTBOPzR/k3UyWSDnIECNxZhXavMt
+         l/e38cYqghKhnG5YdVJXiYgZBsvxIZusLWsgxojDqRmF7EzOgCNEL3da+H3MA6+M2QOI
+         stMQy1Vr8WeD6klLUcRDRKCE67TISkiFdO+jWiw1EZlYzRp1sS+NDvpNHw89SvhCHmrV
+         ul8g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731081217; x=1731686017;
+        d=1e100.net; s=20230601; t=1731081239; x=1731686039;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=04QN0bqnc/hIDNiSoE8wNnlUvenSZdQa91K0jk7Zr64=;
-        b=pIJZBZI5u4U49MFozrFx52xrRfa6KBCJW2WNjjeXD8/N+fEJ6XV8XxjioVY7v41gxm
-         87nA9OCI0aZ/grsoHsEX6Xcqr67uWraQKsrHgha7+i0EYOi8Dx/Ih6xHcQd98k8scnhu
-         1+B3peDDMvSqbHMvUQtM0e8CSFb/RHKl59rE4b2ot+ZreMiaccaD8zmT/ISwA/eCv4Wl
-         XFD+6LHEQyAKFRisnb9RJFBuYfq8fpFX+geANYbGhrrMW6stk0k0pHDzeejknmhs5NlO
-         u1L2e2sfMA2w4tyW9QbnZB8itoAUOVV4+ki7hqsTKwUZ1MkEeFvYW/PXmsccaSeXqTY7
-         Q1Gw==
-X-Forwarded-Encrypted: i=1; AJvYcCVEgOMv5Utuix3fjOxrg0LiimoNGF5E5+FMaNZAYOSEPFQNq0uOFsdFAVO2XAY9F0Hum/xO1yl6R6FUGsc=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yz8s6GJDIwH1Yd2nMq5sZ1NRe87gkSrM/9+e+H0XREc/F+UE+kG
-	XuDiO7g15C3tvWS+wh6Tpz4hxl+vg1BXxOY/dY2i8aP9LJvtYz8=
-X-Google-Smtp-Source: AGHT+IEhC1160Q/9GmZ8EvBRalnxtSThLKL1KS6X1L8kelGP4DOoXCO1Lw5Er81k6RtIWqdXQFm6Zg==
-X-Received: by 2002:a17:902:e5d0:b0:20f:c225:f288 with SMTP id d9443c01a7336-2118355d37cmr39778015ad.23.1731081217292;
-        Fri, 08 Nov 2024 07:53:37 -0800 (PST)
+        bh=GhXDskMHNObuJeZQL+8/3H11+e/JKvNdkRoXa+j/oZw=;
+        b=nSD0dUzjJMI3ncyk+PbQuyMjmv6l5CreJMWdy0cdEi7Ps0Z+Oayjz6z32OTMQeithV
+         tkVvdI/78XoIZfakynBASs1wacd5q3Y/Q9DfaxQNTpd/T2s+xBc9q1e/3w4oDjIUM01H
+         fVeZz6JcnDwzXuIjZTIsAlQZPV7RlOMyw7i00vUFfROX/kS8jedlRBEsa84CHXxzu//R
+         ddA6h0slFw18rF/2IZ1dlU4XIyilRg3rEutHzmy1T1xwnllrhZ+CLwWAe3ruPIF4+N80
+         pIcKOXzJCm3BC2iFBtQN8eNjdFh6nZc8PN0TQZA7V7cvoU73pw+lSgOFCNt4T9RVfojx
+         4Yrw==
+X-Forwarded-Encrypted: i=1; AJvYcCVsST700wpVt5o9FCEbX7w3qofw/iixJ7jyZfjuxBBb2sWSh9tP7wnfbl2rTPCrlWo57f5jgAgHpHU31/I=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyDjMHKGqO9TcBvjKo7aCvDsuW0j3hsb+Ewdsbp0jHU8gnBxuZ4
+	U5U2A/gqjVw19qXTTcrCiIVmEx1tOe9SEeOE5RHwFk+L4WPymWU=
+X-Google-Smtp-Source: AGHT+IHICJG887c7stLG7bvJWJhNXVjlZl+XzcEQ2YYBgYFGyWwKo1mR65v+NY6JBoPcLMRALQAFAw==
+X-Received: by 2002:a05:6a21:3d88:b0:1d9:1971:bca9 with SMTP id adf61e73a8af0-1dc22a47884mr3085515637.24.1731081239379;
+        Fri, 08 Nov 2024 07:53:59 -0800 (PST)
 Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177e68cb0sm31707145ad.224.2024.11.08.07.53.36
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079aa83fsm3833632b3a.98.2024.11.08.07.53.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 07:53:36 -0800 (PST)
-Date: Fri, 8 Nov 2024 07:53:36 -0800
+        Fri, 08 Nov 2024 07:53:59 -0800 (PST)
+Date: Fri, 8 Nov 2024 07:53:58 -0800
 From: Stanislav Fomichev <stfomichev@gmail.com>
 To: Mina Almasry <almasrymina@google.com>
 Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
@@ -79,12 +79,13 @@ Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
 	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
 	Simon Horman <horms@kernel.org>,
 	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v2 2/5] net: page_pool: create
- page_pool_alloc_netmem
-Message-ID: <Zy40AFcVze4sak0E@mini-arch>
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>
+Subject: Re: [PATCH net-next v2 3/5] page_pool: Set `dma_sync` to false for
+ devmem memory provider
+Message-ID: <Zy40Fo8foRg_ECFU@mini-arch>
 References: <20241107212309.3097362-1-almasrymina@google.com>
- <20241107212309.3097362-3-almasrymina@google.com>
+ <20241107212309.3097362-4-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -93,15 +94,18 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <20241107212309.3097362-3-almasrymina@google.com>
+In-Reply-To: <20241107212309.3097362-4-almasrymina@google.com>
 
 On 11/07, Mina Almasry wrote:
-> Create page_pool_alloc_netmem to be the mirror of page_pool_alloc.
+> From: Samiullah Khawaja <skhawaja@google.com>
 > 
-> This enables drivers that want currently use page_pool_alloc to
-> transition to netmem by converting the call sites to
-> page_pool_alloc_netmem.
+> Move the `dma_map` and `dma_sync` checks to `page_pool_init` to make
+> them generic. Set dma_sync to false for devmem memory provider because
+> the dma_sync APIs should not be used for dma_buf backed devmem memory
+> provider.
 > 
+> Cc: Jason Gunthorpe <jgg@ziepe.ca>
+> Signed-off-by: Samiullah Khawaja <skhawaja@google.com>
 > Signed-off-by: Mina Almasry <almasrymina@google.com>
 
 Acked-by: Stanislav Fomichev <sdf@fomichev.me>
