@@ -1,176 +1,207 @@
-Return-Path: <netdev+bounces-143405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id B4A339C24A3
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:07:49 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 345589C24D3
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:22:11 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 45F621F2141F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:07:49 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F098B20C71
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:22:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF68233D7F;
-	Fri,  8 Nov 2024 18:07:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E56E192B6F;
+	Fri,  8 Nov 2024 18:22:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="V569nbY8"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNJXERGQ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pj1-f54.google.com (mail-pj1-f54.google.com [209.85.216.54])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEBE7233D64;
-	Fri,  8 Nov 2024 18:07:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.216.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD43233D60;
+	Fri,  8 Nov 2024 18:22:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731089263; cv=none; b=Oh3Qr/MPIs9KBir/vKBGBib4FZUiar6UpiYREfkwk14pkFyPdHX7skkU3gMDngSLsysNAvtcEotqMfe/gTvUTURtdXWbjJ3OQln6UkteMyrE6UrRIwH4qTEZdmR/w9QfIWQwmvYTP6m9UxA7qMFZTxHvD7D4o7KkgQ3Xp4uC5dQ=
+	t=1731090125; cv=none; b=fIQz4q6SX/wBKtMsnp6I5uC/6E9Qu29M/VbhrYNT2on+ZlKoDA7/ai1sBHLEepu6fWM30d2aP/CMk9pV6MrtgkdbAQRMq/zHpHLX9YYQq86j2d3bZBQ80zSv3BzaX9BhiSq/T2g269cgGCFwlp6u9zkWO8zV7RUWG8x1RFp1Ka4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731089263; c=relaxed/simple;
-	bh=XdUEhrjiBr8GA3ZORbMFZtmKhtOKS6QBlaBZ1x6dEas=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=XifB42aaAtrm6j/W/InaDCRi9dPsFpfharYvd/5pBan4A2DgUuvplHlg4SCiws+VprAi4kmaDQPkyIIaDqvjEw75vjZuMMg5dXu0TowZe+frmZxX8BqxREtH1AzMYWsdoMp4G7p0Gue9f2PxwzwX9BNlV4bVNmW+qUDFZtscMxE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=V569nbY8; arc=none smtp.client-ip=209.85.216.54
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pj1-f54.google.com with SMTP id 98e67ed59e1d1-2e2b549799eso2060714a91.3;
-        Fri, 08 Nov 2024 10:07:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731089261; x=1731694061; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=iWG253LXGIdckUNp7GPNkeMy7DZwES9JtBx+EINqA7g=;
-        b=V569nbY8EBxvMxbptzSfzHOBoFQgYnV+fhz4b25K01KRLaC+n7MyyWAbq5OzISP6GL
-         vfQb3hZ9EsmaxmSsLHF+CoD1/1b3dyvAdQmV5jnDqxgpbiyqsZCnX6LPv4hbQDOV+eAl
-         oI0aMeMRz91jBdOn6HOIOINaTOpd9cWwJmc3yqcxr1rGWSanwldGWtCEcwJVBbGhulDr
-         JQRr2IRrplZrTrlRXWW6vHa9cAmEMxbb2inmu3zA9E2l3Fnl1C55evbouglDK7zQFEJG
-         AIqbqt2BGp3y6bJX30ltBnyihQIsb/BeMVpmP8JjXC0sYy/BtYxy1klHXBUEjyJ0HbNs
-         JHCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731089261; x=1731694061;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=iWG253LXGIdckUNp7GPNkeMy7DZwES9JtBx+EINqA7g=;
-        b=kb1Ft7PGvHo1HyVilyOnDNBKBJ2qT2Hsbuj1HSxD1Ad98Re9PvoGnn1F7badfO9hNv
-         dSkfsIs0gajkGvCoXs7VlPN/hbxwceJ539sgnbZyp9mHLbOnvodCSJrLkiO1tonrP2SG
-         SlDzsWvYm76+t+8r+yDoYYJfFWlpfwZFLQqzlZzrlBlaEYdjOCVyI/EqVQXJzq7grqi8
-         1p1jAzj4m9xO3gPPrqd6oLQ908sQXcy/a52Hr26i9bDbND+UE7tdJnGJGiB2dIwKfVfh
-         4OlinpQYlwmxBMlPwQWJxNp9X8+EULc2X32o4JXAgEpPZV+fCJRqFGjAx4EcOFHjEd/q
-         M5Qg==
-X-Forwarded-Encrypted: i=1; AJvYcCVNADDD/jBe4PcGBKPQYk4wnSggTIIvtIVvX1JX/Ud+dE/LwxtR812PfCLst6hjuwfXtPFZSNFO23AvLxVJ@vger.kernel.org, AJvYcCXuC6Gu/oF+xb1MDsvAOyIeIGm/VASEDjHhkyqLou+f4OW3YkyJ5FUWavrSPYkFNPQXVJ4fjXV3KaU=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwYmv4ZD9lq/ChRUjR8nIrba9J/hcnG9Gn7qs1bzn2+04DjaQI1
-	l9R6SCcx1RFhb8dnHiSnkeHqSbcxSDF82nP0rgEJUd4XThxeieo=
-X-Google-Smtp-Source: AGHT+IGciwzK4siVd7UDmayJfNQ+szleBk1cUJkTGmipLn0sYGF96zPfDNcIcZst4NK7X7km5tCHvw==
-X-Received: by 2002:a17:90b:180d:b0:2e2:effb:618b with SMTP id 98e67ed59e1d1-2e9b1709a5emr5061658a91.13.1731089261140;
-        Fri, 08 Nov 2024 10:07:41 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id 98e67ed59e1d1-2e99a55bf2asm5877152a91.31.2024.11.08.10.07.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 10:07:40 -0800 (PST)
-Date: Fri, 8 Nov 2024 10:07:39 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Yi Lai <yi1.lai@linux.intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net v2 2/2] net: clarify SO_DEVMEM_DONTNEED behavior in
- documentation
-Message-ID: <Zy5Ta-M868VvBme2@mini-arch>
-References: <20241107210331.3044434-1-almasrymina@google.com>
- <20241107210331.3044434-2-almasrymina@google.com>
- <Zy1priZk_LjbJwVV@mini-arch>
- <CAHS8izOJSd2-hkOBkL0Cy40xt-=1k8YdvkKS98rp2yeys_eGzg@mail.gmail.com>
- <Zy1_IG9v1KK8u2X4@mini-arch>
- <CAHS8izP8UoGZXoFCEshYrL=o2+T6o4g-PDdgDG=Cfc0X=EXyVQ@mail.gmail.com>
+	s=arc-20240116; t=1731090125; c=relaxed/simple;
+	bh=uSbhMMNXHlsMSzCdJptCATaZ8Ww+L2KbwXDPpWyMELc=;
+	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nzFe4JCV18xYH+0EBnK0nO35QuI8tATJ0HI8rMrQhrwgNogS1AH56CVae21UdMfCOr4naclqJ5wYY4zXxvEQBbEk3H7Lp+2Ui8SaaoRveLrmtVEQqYYW8NnWrtlj+yTEfdHlnamQrNUt0GtS2LkQ2QcTyw9Yawm9zmrqgafclVo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNJXERGQ; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04088C4CECD;
+	Fri,  8 Nov 2024 18:22:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731090124;
+	bh=uSbhMMNXHlsMSzCdJptCATaZ8Ww+L2KbwXDPpWyMELc=;
+	h=Date:To:Cc:From:Subject:From;
+	b=BNJXERGQde9LzwMDtEYyxf4jQdMXY4FLQADYMkmnjpB/woYao/4OInEPnzSDezJxQ
+	 Q1NUbA6L6RVsVEiiQs48N2P9OYJN9oAf6+DZXwDybyvLX6TN6YZ06CJOje8bNfsS1b
+	 LUc7AtFr3JHDxVI3HnDGBuSnuZ/wZXpcf2BR8pHR9/lOhN7vupLtQEqkOBkNWbKd/M
+	 kviLEMcOkF7bY1xwd0litkU7qQe7qfnLB5CYFxNY5cDHHmWm3Q5xiyKfhFka16p2vt
+	 9LkbHeXlCRGMGxhC+CcMuAgOr7TnswGBg6xGLoQ0bNRyhDCuvuYQlMppGQ4KwhpH8h
+	 t4xXzhYeOPE9A==
+Message-ID: <ff870428-6375-4125-83bd-fc960b3c109b@kernel.org>
+Date: Fri, 8 Nov 2024 19:21:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izP8UoGZXoFCEshYrL=o2+T6o4g-PDdgDG=Cfc0X=EXyVQ@mail.gmail.com>
+User-Agent: Mozilla Thunderbird Beta
+Content-Language: en-GB
+To: Linux Kernel Functional Testing <lkft@linaro.org>
+Cc: Greg KH <gregkh@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
+ Kernel Selftests <linux-kselftest@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>, Linux Kernel
+ <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
+ Naresh Kamboju <naresh.kamboju@linaro.org>, Ido Schimmel
+ <idosch@nvidia.com>, stable@vger.kernel.org
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+Subject: LKFT CI: improving Networking selftests results when validating
+ stable kernels
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 11/08, Mina Almasry wrote:
-> On Thu, Nov 7, 2024 at 7:01 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> >
-> > On 11/07, Mina Almasry wrote:
-> > > On Thu, Nov 7, 2024 at 5:30 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> > > >
-> > > > On 11/07, Mina Almasry wrote:
-> > > > > Document new behavior when the number of frags passed is too big.
-> > > > >
-> > > > > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > > > > ---
-> > > > >  Documentation/networking/devmem.rst | 9 +++++++++
-> > > > >  1 file changed, 9 insertions(+)
-> > > > >
-> > > > > diff --git a/Documentation/networking/devmem.rst b/Documentation/networking/devmem.rst
-> > > > > index a55bf21f671c..d95363645331 100644
-> > > > > --- a/Documentation/networking/devmem.rst
-> > > > > +++ b/Documentation/networking/devmem.rst
-> > > > > @@ -225,6 +225,15 @@ The user must ensure the tokens are returned to the kernel in a timely manner.
-> > > > >  Failure to do so will exhaust the limited dmabuf that is bound to the RX queue
-> > > > >  and will lead to packet drops.
-> > > > >
-> > > > > +The user must pass no more than 128 tokens, with no more than 1024 total frags
-> > > > > +among the token->token_count across all the tokens. If the user provides more
-> > > > > +than 1024 frags, the kernel will free up to 1024 frags and return early.
-> > > > > +
-> > > > > +The kernel returns the number of actual frags freed. The number of frags freed
-> > > > > +can be less than the tokens provided by the user in case of:
-> > > > > +
-> > > >
-> > > > [..]
-> > > >
-> > > > > +(a) an internal kernel leak bug.
-> > > >
-> > > > If you're gonna respin, might be worth mentioning that the dmesg
-> > > > will contain a warning in case of a leak?
-> > >
-> > > We will not actually warn in the likely cases of leak.
-> > >
-> > > We warn when we find an entry in the xarray that is not a net_iov, or
-> > > if napi_pp_put_page fails on that net_iov. Both are very unlikely to
-> > > happen honestly.
-> > >
-> > > The likely 'leaks' are when we don't find the frag_id in the xarray.
-> > > We do not warn on that because the user can intentionally trigger the
-> > > warning with invalid input. If the user is actually giving valid input
-> > > and the warn still happens, likely a kernel bug like I mentioned in
-> > > another thread, but we still don't warn.
-> >
-> > In this case, maybe don't mention the leaks at all? If it's not
-> > actionable, not sure how it helps?
-> 
-> It's good to explain what the return code of the setsockopt means, and
-> when it would be less than the number of passed in tokens.
-> 
-> Also it's not really 'not actionable'. I expect serious users of
-> devmem tcp to log such leaks in metrics and try to root cause the
-> userspace or kernel bug causing them if they happen.
+Hello LKFT maintainers, CI operators,
 
-Right now it reads like both (a) and (b) have a similar probability. Maybe
-even (a) is more probable because you mention it first? In theory, any syscall
-can have a bug in it where it returns something bogus, so maybe at least
-downplay the 'leak' part a bit? "In the extremely rare cases, kernel
-might free less frags than requested .... "
+First, I would like to say thank you to the people behind the LKFT
+project for validating stable kernels (and more), and including some
+Network selftests in their tests suites.
 
-Imagine a situation where the user inadvertently tries to free the same token
-twice or something and gets the unexpected return value. Why? Might be
-the kernel leak, right?
+A lot of improvements around the networking kselftests have been done
+this year. At the last Netconf [1], we discussed how these tests were
+validated on stable kernels from CIs like the LKFT one, and we have some
+suggestions to improve the situation.
 
-From the POW of the kernel, the most probable cases where we return
-less tokens are:
-1. user gave us more than 1024
-2. user gave us incorrect tokens
-...
-99. kernel is full of bugs and we lost the frag
+
+KSelftests from the same version
+--------------------------------
+
+According to the doc [2], kselftests should support all previous kernel
+versions. The LKFT CI is then using the kselftests from the last stable
+release to validate all stable versions. Even if there are good reasons
+to do that, we would like to ask for an opt-out for this policy for the
+networking tests: this is hard to maintain with the increased
+complexity, hard to validate on all stable kernels before applying
+patches, and hard to put in place in some situations. As a result, many
+tests are failing on older kernels, and it looks like it is a lot of
+work to support older kernels, and to maintain this.
+
+Many networking tests are validating the internal behaviour that is not
+exposed to the userspace. A typical example: some tests look at the raw
+packets being exchanged during a test, and this behaviour can change
+without modifying how the userspace is interacting with the kernel. The
+kernel could expose capabilities, but that's not something that seems
+natural to put in place for internal behaviours that are not exposed to
+end users. Maybe workarounds could be used, e.g. looking at kernel
+symbols, etc. Nut that doesn't always work, increase the complexity, and
+often "false positive" issue will be noticed only after a patch hits
+stable, and will cause a bunch of tests to be ignored.
+
+Regarding fixes, ideally they will come with a new or modified test that
+can also be backported. So the coverage can continue to grow in stable
+versions too.
+
+Do you think that from the kernel v6.12 (or before?), the LKFT CI could
+run the networking kselftests from the version that is being validated,
+and not from a newer one? So validating the selftests from v6.12.1 on a
+v6.12.1, and not the ones from a future v6.16.y on a v6.12.42.
+
+
+Skipped tests
+-------------
+
+It looks like many tests are skipped:
+
+- Some have been in a skip file [3] for a while: maybe they can be removed?
+
+- Some are skipped because of missing tools: maybe they can be added?
+e.g. iputils, tshark, ipv6toolkit, etc.
+
+- Some tests are in 'net', but in subdirectories, and hence not tested,
+e.g. forwarding, packetdrill, netfilter, tcp_ao. Could they be tested too?
+
+How can we change this to increase the code coverage using existing tests?
+
+
+KVM
+---
+
+It looks like different VMs are being used to execute the different
+tests. Do these VMs benefit from any accelerations like KVM? If not,
+some tests might fail because the environment is too slow.
+
+The KSFT_MACHINE_SLOW=yes env var can be set to increase some
+tolerances, timeout or to skip some parts, but that might not be enough
+for some tests.
+
+
+Notifications
+-------------
+
+In case of new regressions, who is being notified? Are the people from
+the MAINTAINERS file, and linked to the corresponding selftests being
+notified or do they need to do the monitoring on their side?
+
+
+Looking forward to improving the networking selftests results when
+validating stable kernels!
+
+
+[1] https://netdev.bots.linux.dev/netconf/2024/
+[2] https://docs.kernel.org/dev-tools/kselftest.html
+[3]
+https://github.com/Linaro/test-definitions/blob/master/automated/linux/kselftest/skipfile-lkft.yaml
+
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
+
 
