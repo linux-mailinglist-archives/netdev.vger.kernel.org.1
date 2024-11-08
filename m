@@ -1,115 +1,100 @@
-Return-Path: <netdev+bounces-143335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id F39679C214E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:58:36 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8190B9C217B
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:03:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 7CB6E1F235C3
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:58:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 435AC286705
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:03:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFC4A21B438;
-	Fri,  8 Nov 2024 15:58:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2A190486;
+	Fri,  8 Nov 2024 16:01:37 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="m/tJclOB"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jiyse7sZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8866445023;
-	Fri,  8 Nov 2024 15:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2A5137750
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:01:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731081505; cv=none; b=XEDIbZ5jgA4i3VylOTJ881XNVBN5VhttNeyJJKOR4MeqXSVLStTfQmbbh7ZXqSAnhL5AxEzRaa3iY+i5oio5Wf+PAUbU9uPM729BOrfLcjhc+PfTeppiMh+OT2dDnuC6Q6iq+YTgiGFmdME7Zrh5/7GV5qQWEy6xVU8g1120JhE=
+	t=1731081697; cv=none; b=Wvz6abHIoqIuKi5aKEtUQFUUAt+dbFbeKJUpTsUktj46YCgBcrSefqmhgrZ0uz5t1KY9S8WdMG23gJisT56ZarBh5uKGMJL3wsNC2McWxOog1Qa59WRmuhY0px+M58KNtXvvIUBa6G4vzyqEjFPcqE1fzV6c1DAXGQIlrsVG+Eg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731081505; c=relaxed/simple;
-	bh=afozFiRkE7iEPjrWijZ2708D4/HZmkMXYMnhbTLwWMU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=oVcznnuF7t4Di3Uz9ewyJ7L3/K7fOYOIncx39pUCoE+LqnooDt9wP9yWPGWIYM8WVEwhGwvSQ74ISNj0Nzn8sMA1yY5pR2gEjjc3XPDwUoKm4xphCOxL27dnwD/uSocY3sIoNgfbf5KtRmclLFfoc7fJ91cQtoWysWxL2gMJ20E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=m/tJclOB; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20ce65c8e13so25838215ad.1;
-        Fri, 08 Nov 2024 07:58:24 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731081504; x=1731686304; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=itUxA9/J4nvQf93kLWnaD5cp88YiYORj9PPmK3mprgY=;
-        b=m/tJclOBSiSSqdZ9Ie84LdZLqEd36HavOvKChPmQFRH0DHq9nI2JKLVXVeUwgE7RjG
-         B6ZbBJiQfnfz83XI90MeY9H6K1e597IEKzfrVeffTGG38ewqNyNpbVaNo8X+SMKS7eTk
-         JO95hm7g9gQ44wWPJfpjkIl0nJEQzZUBaP528RyTVEHaNizLznnO7bVkNvceWs3CgQn0
-         b4aqp3oDEM9XcP7h7DCSZxgcTXKc1ji0QAUFMe6/cstvlEEc+cErilgy8u3ToSNRzvIx
-         tJLIu1BXSlvorW/o1kBwALuz4tfMWbvD1A/Y8APIqndhvpJfdk1nsb+HPUq9RT948H/x
-         oZOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731081504; x=1731686304;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=itUxA9/J4nvQf93kLWnaD5cp88YiYORj9PPmK3mprgY=;
-        b=kFsoEXN3a9ghTgGNOA8uw3x35/1drT82k+Oo/Bi/124gT5MPno/N1U2Ilk5DKJ6uFc
-         WLAIzsWbla7nU7/a4Yw9bD+0P0LUUuiol+7AphTyQmGlcZhWbeTHGPgsVu5eS1B+AKkk
-         dsu1b70isWhu+jJtQ1liZYoe7gVbXJ89zmu+Ls+xS5lCOh8Sfbxobu4bczh7Slu73zS2
-         T69Ti4cIqdEyGhh6aoPGI8WVzxn+3up8RpuAxeDshO3WiHfPaNT+BaJbviSCGblV3fcT
-         h/J3oPhF7QKINa0moz3Dd1X5P9M0gYh7qSVMb03Xj794e5bJoNVK2FjwB/kRId2g9WOr
-         YA5Q==
-X-Forwarded-Encrypted: i=1; AJvYcCVlNoyMCNMUGq0SXoBMA8RTAloA9Jruy88VSX0d+pbpMHsfuEhUYm0+dEt1vogu2SLRmeULXj+h55mCors=@vger.kernel.org, AJvYcCXfzy3RGg5YalO+TboOoiWiQIWT2/CT82qSizcnGyDPGNzaitWJsOL6CSLbuakkvPZLff+4My7q@vger.kernel.org
-X-Gm-Message-State: AOJu0YyLZxUS/4mL9UT2PUrYE3aPmL4mqzVrGyf9rbABCCtZRVedyyFL
-	2VLXveJpazjvQHksuZFzXiRXmQQb60fZNFMzZHLj48zSN81m1sw=
-X-Google-Smtp-Source: AGHT+IEyfC0g95d/JDeImgVis8VX1x1WtznA74VvzXF1brv3tF+QYl505poAyz4PgLcJIz6zx59chA==
-X-Received: by 2002:a17:902:f651:b0:20c:aed1:813a with SMTP id d9443c01a7336-211834fcd5bmr48680325ad.14.1731081503915;
-        Fri, 08 Nov 2024 07:58:23 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177e45e8fsm31138925ad.128.2024.11.08.07.58.23
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 07:58:23 -0800 (PST)
-Date: Fri, 8 Nov 2024 07:58:22 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
- dmabuf memory provider
-Message-ID: <Zy41HkR5dDmjVJwl@mini-arch>
-References: <20241107212309.3097362-1-almasrymina@google.com>
- <20241107212309.3097362-5-almasrymina@google.com>
- <20241108141812.GL35848@ziepe.ca>
+	s=arc-20240116; t=1731081697; c=relaxed/simple;
+	bh=Y3WfQRI9/NTbWxOwZRg38MqnjNoJXc9d1NSZl/NW6fg=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LNv1pkCGCe6rgKlI4ROOvgACUMtQSTHk5j4U6c3aMsESXSR3tpDcKmSU6OfnQs2A1Ab0bmpxNkWkZ5iK3mNwp+ZE7WcSoeQ0V8bkvUpy8BFVrHtMr4omJleDkZq8YP47os9tmtSEb4zuqayfT+ESXOq/AnDXgw0d6fqHON/xa4g=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jiyse7sZ; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
+	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=qLq4gyl3R5H1fAoTPOPvNw5zvvc0SyamtcSXC0jJ+Ho=; b=jiyse7sZwtv2rUERmEdmA1GImr
+	HKS4NbTbCQHEj2lqxLTlHpjSRktq/NTXn3wjCEvjGuMR4zyl2xDbxmQuHfXsChHPG0OAM5b4bX6BV
+	owMDvqUR+fEx/7LbjCgDy+f45PP6EuYryFlatUlj8dzrVR7kbv6jhAi90SD1Dl2tjQ6REvzUOfQpA
+	od4quGMsesrfrnhwWweuV9uWciAD/J9MvNXer73zkzrwmqJ5+laMCRsE9IaEMhysi2oB5pccQTst8
+	yKVb8vm2RP178DUDm9vhMn27a0HHafvkkmT+jky9MjQ1YkM26IX7OhkmBMtxJBBAOoLU1sEf7jrIw
+	8SfMgBpw==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51838)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1t9RQO-0005Ze-2N;
+	Fri, 08 Nov 2024 16:01:29 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1t9RQM-0002P5-29;
+	Fri, 08 Nov 2024 16:01:26 +0000
+Date: Fri, 8 Nov 2024 16:01:26 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net-next 0/5] net: phylink: phylink_resolve() cleanups
+Message-ID: <Zy411lVWe2SikuOs@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108141812.GL35848@ziepe.ca>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On 11/08, Jason Gunthorpe wrote:
-> On Thu, Nov 07, 2024 at 09:23:08PM +0000, Mina Almasry wrote:
-> > dmabuf dma-addresses should not be dma_sync'd for CPU/device. Typically
-> > its the driver responsibility to dma_sync for CPU, but the driver should
-> > not dma_sync for CPU if the netmem is actually coming from a dmabuf
-> > memory provider.
-> 
-> This is not completely true, it is not *all* dmabuf, just the parts of
-> the dmabuf that are actually MMIO.
-> 
-> If you do this you may want to block accepting dmabufs that have CPU
-> pages inside them.
+Hi,
 
-We still want udmabufs to work, so probably need some new helper to test
-whether a particular netmem is backed by the cpu memory?
+This series does a bit of clean-up in phylink_resolve() to make the code
+a little easier to follow.
+
+Patch 1 moves the manual flow control setting in two of the switch
+cases to after the switch().
+
+Patch 2 changes the MLO_AN_FIXED case to be a simple if() statement,
+reducing its indentation.
+
+Patch 3 changes the MLO_AN_PHY case to also be a simple if() statment,
+also reducing its indentation.
+
+Patch 4 does the same for the last case.
+
+Patch 5 reformats the code and comments for the reduced indentation,
+making it easier to read.
+
+ drivers/net/phy/phylink.c | 106 +++++++++++++++++++++-------------------------
+ 1 file changed, 48 insertions(+), 58 deletions(-)
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
