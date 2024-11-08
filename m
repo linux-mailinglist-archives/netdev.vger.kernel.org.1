@@ -1,253 +1,105 @@
-Return-Path: <netdev+bounces-143360-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143361-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 626A89C22A6
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:04:01 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3222C9C22C2
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:17:05 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id E26611F25558
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:04:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id D5A241F23363
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:17:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A1B1E9091;
-	Fri,  8 Nov 2024 17:03:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6qgXWuX"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD851946A1;
+	Fri,  8 Nov 2024 17:17:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.86.151])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47189198E74
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:03:40 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4450018E36D
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:16:59 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=185.58.86.151
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731085423; cv=none; b=FdIA0mD08e7KN4l56KJ3Cwm5CXizakeORjt+CXiR4/relkSwIiMYgamGRylAZKQEc5p44sUnor2Mw1vWJHs49OxbwjjPVxbQ4cMNfjlZur7FASyVzcUPwAI2k+0Xyf1M6Z2o6MitmEHAVwNyY7R6if+M0sp2v+PsXzZ4aeEj/98=
+	t=1731086221; cv=none; b=gqc0kHf0N2cHidRIf+h7Wky5t3hA7ApC1OmbYg+waychxtRkWjI7uywMNhUBnC2dSVpmGRTi9tIXe8jywyjRHh4OVS8Wj3u2Fsb94d857UH+5HvGwg8jstXD5Wz2+oG7uRrDPKy8NmxWtZVwYy87RmEXjjEsANh8T8Jm/k7sImc=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731085423; c=relaxed/simple;
-	bh=DkLkcpSACAPOkdSqpA50/En10RaBzQkMrlzGe67Uqfk=;
-	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
-	 Content-Type:Date:Message-ID; b=WmltL1EMZAq6eG2A5Fq4P2TtAJxB40Gah4yPMhDMWmAvHYIEYbsH11vchd4gxC91M6BNR67ijRlj8wHHRgXAgloaQx2EhJE9jsacICS10ONx6b4MjjQkIOoQ/EO9xZfKQyAhLvk8q678xjKG/NvOcL7CJs7CawpkaIWdHnniFa4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T6qgXWuX; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731085419;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=kTE7HN+soO/Za76tq6046j/ukmrXopkun1LVu89YTbU=;
-	b=T6qgXWuXIaXxnI2eW9WKV/AmKfOKS2YBliK/5XAu/N5yENxsHnR8Q1OD66feCJ7afKNNQ0
-	DHcbC6T2trSZVIP6SVywfNpWs9Gb3GjVtaKt31lrtK5teI+zww8NR4iMfFiXyI9VkA82Vv
-	bjYt2GOlUghFOa9Z6Whot8YmBwm3EJc=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
- (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
- relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-d2vfCBO4PnGWgeJI8QflhA-1; Fri,
- 08 Nov 2024 12:03:36 -0500
-X-MC-Unique: d2vfCBO4PnGWgeJI8QflhA-1
-X-Mimecast-MFC-AGG-ID: d2vfCBO4PnGWgeJI8QflhA
-Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE2041955EA1;
-	Fri,  8 Nov 2024 17:03:31 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.231])
-	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 03B2C1953880;
-	Fri,  8 Nov 2024 17:03:24 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <20241106123559.724888-29-dhowells@redhat.com>
-References: <20241106123559.724888-29-dhowells@redhat.com> <20241106123559.724888-1-dhowells@redhat.com>
-To: Christian Brauner <christian@brauner.io>,
-    Steve French <smfrench@gmail.com>,
-    Matthew Wilcox <willy@infradead.org>
-Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
-    Gao Xiang <hsiangkao@linux.alibaba.com>,
-    Dominique Martinet <asmadeus@codewreck.org>,
-    Marc Dionne <marc.dionne@auristor.com>,
-    Paulo Alcantara <pc@manguebit.com>,
-    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-    Eric Van Hensbergen <ericvh@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
-    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
-    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
-    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v3 28/33] netfs: Change the read result collector to only use one work item
+	s=arc-20240116; t=1731086221; c=relaxed/simple;
+	bh=3o/CgnvuqxB1cU56EknF1ysiJ7ooQ7MT5bXdMyiKBiA=;
+	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
+	 MIME-Version:Content-Type; b=iCmHr7ulFZvbZQpdud8QRsSH6pLuJM0Zj5qbOGGYuPUjyMjV60EI964WL73bhT7JsT1pK3hcs6Do2MVih3V9mdPkQ7VLIeOPZAs/qc+z1irLQP2xevZqlTaYJoMtqnmoEGOqstbb3c/G3OMlu2CS9I4h/wgU3fyWk0xsFUXbaec=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM; spf=pass smtp.mailfrom=aculab.com; arc=none smtp.client-ip=185.58.86.151
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ACULAB.COM
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=aculab.com
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-191-SiG0YL4AOpCoTeJ7l5iHpg-1; Fri, 08 Nov 2024 17:16:51 +0000
+X-MC-Unique: SiG0YL4AOpCoTeJ7l5iHpg-1
+X-Mimecast-MFC-AGG-ID: SiG0YL4AOpCoTeJ7l5iHpg
+Received: from AcuMS.Aculab.com (10.202.163.6) by AcuMS.aculab.com
+ (10.202.163.6) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Fri, 8 Nov
+ 2024 17:16:50 +0000
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Fri, 8 Nov 2024 17:16:50 +0000
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Mikhail Ivanov' <ivanov.mikhail1@huawei-partners.com>,
+	=?utf-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>, Matthieu Baerts
+	<matttbe@kernel.org>, "linux-sctp@vger.kernel.org"
+	<linux-sctp@vger.kernel.org>
+CC: "gnoack@google.com" <gnoack@google.com>, "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>, "matthieu@buffet.re" <matthieu@buffet.re>,
+	"linux-security-module@vger.kernel.org"
+	<linux-security-module@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "netfilter-devel@vger.kernel.org"
+	<netfilter-devel@vger.kernel.org>, "yusongping@huawei.com"
+	<yusongping@huawei.com>, "artem.kuzin@huawei.com" <artem.kuzin@huawei.com>,
+	"konstantin.meskhidze@huawei.com" <konstantin.meskhidze@huawei.com>, "MPTCP
+ Linux" <mptcp@lists.linux.dev>
+Subject: RE: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Thread-Topic: [RFC PATCH v2 1/8] landlock: Fix non-TCP sockets restriction
+Thread-Index: AQHbK7ERAltPFf8wxU+8YQqG109nhrKtq6zw
+Date: Fri, 8 Nov 2024 17:16:50 +0000
+Message-ID: <ed94e1e51c4545a7b4be6a756dcdc44d@AcuMS.aculab.com>
+References: <20241017110454.265818-1-ivanov.mikhail1@huawei-partners.com>
+ <20241017110454.265818-2-ivanov.mikhail1@huawei-partners.com>
+ <49bc2227-d8e1-4233-8bc4-4c2f0a191b7c@kernel.org>
+ <20241018.Kahdeik0aaCh@digikod.net>
+ <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+In-Reply-To: <62336067-18c2-3493-d0ec-6dd6a6d3a1b5@huawei-partners.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <1321311.1731085403.1@warthog.procyon.org.uk>
-Content-Transfer-Encoding: quoted-printable
-Date: Fri, 08 Nov 2024 17:03:23 +0000
-Message-ID: <1321312.1731085403@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
+X-Mimecast-Spam-Score: 0
+X-Mimecast-MFC-PROC-ID: V90qLbnv565sYySVS8akQu-g2ueLa0TBB2OviOZ78RU_1731086210
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
 
-This patch needs the attached adjustment folding in.
-
-David
----
-commit 2c0cccc7b29a051fadb6816d31f526e4dd45ddf5
-Author: David Howells <dhowells@redhat.com>
-Date:   Thu Nov 7 22:22:49 2024 +0000
-
-    netfs: Fix folio abandonment
-    =
-
-    The mechanism to handle the abandonment of a folio being read due to a=
-n
-    error occurring in a subrequest (such as if a signal occurs) will corr=
-ectly
-    abandon folios if they're entirely processed in one go; but if the
-    constituent subrequests aren't processed in the same scheduled work it=
-em,
-    the note that the first one failed will get lost if no folios are proc=
-essed
-    (the ABANDON_SREQ note isn't transferred to the NETFS_RREQ_FOLIO_ABAND=
-ON
-    flag unless we process a folio).
-    =
-
-    Fix this by simplifying the way the mechanism works.  Replace the flag=
- with
-    a variable that records the file position to which we should abandon
-    folios.  Any folio that overlaps this region at the time of unlocking =
-must
-    be abandoned (and reread).
-    =
-
-    This works because subrequests are processed in order of file position=
- and
-    each folio is processed as soon as enough subrequest transference is
-    available to cover it - so when the abandonment point is moved, it cov=
-ers
-    only folios that draw data from the dodgy region.
-    =
-
-    Also make sure that NETFS_SREQ_FAILED is set on failure and that
-    stream->failed is set when we cut the stream short.
-    =
-
-    Signed-off: David Howells <dhowells@redhat.com>
-    cc: Jeff Layton <jlayton@kernel.org>
-    cc: netfs@lists.linux.dev
-    cc: linux-fsdevel@vger.kernel.org
-
-diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
-index 73f51039c2fe..7f3a3c056c6e 100644
---- a/fs/netfs/read_collect.c
-+++ b/fs/netfs/read_collect.c
-@@ -46,7 +46,7 @@ static void netfs_unlock_read_folio(struct netfs_io_requ=
-est *rreq,
- 	struct netfs_folio *finfo;
- 	struct folio *folio =3D folioq_folio(folioq, slot);
- =
-
--	if (unlikely(test_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags))) {
-+	if (unlikely(folio_pos(folio) < rreq->abandon_to)) {
- 		trace_netfs_folio(folio, netfs_folio_trace_abandon);
- 		goto just_unlock;
- 	}
-@@ -126,8 +126,6 @@ static void netfs_read_unlock_folios(struct netfs_io_r=
-equest *rreq,
- =
-
- 		if (*notes & COPY_TO_CACHE)
- 			set_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
--		if (*notes & ABANDON_SREQ)
--			set_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags);
- =
-
- 		folio =3D folioq_folio(folioq, slot);
- 		if (WARN_ONCE(!folio_test_locked(folio),
-@@ -152,7 +150,6 @@ static void netfs_read_unlock_folios(struct netfs_io_r=
-equest *rreq,
- 		*notes |=3D MADE_PROGRESS;
- =
-
- 		clear_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
--		clear_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags);
- =
-
- 		/* Clean up the head folioq.  If we clear an entire folioq, then
- 		 * we can get rid of it provided it's not also the tail folioq
-@@ -251,6 +248,12 @@ static void netfs_collect_read_results(struct netfs_i=
-o_request *rreq)
- 			if (test_bit(NETFS_SREQ_COPY_TO_CACHE, &front->flags))
- 				notes |=3D COPY_TO_CACHE;
- =
-
-+			if (test_bit(NETFS_SREQ_FAILED, &front->flags)) {
-+				rreq->abandon_to =3D front->start + front->len;
-+				front->transferred =3D front->len;
-+				transferred =3D front->len;
-+				trace_netfs_rreq(rreq, netfs_rreq_trace_set_abandon);
-+			}
- 			if (front->start + transferred >=3D rreq->cleaned_to + fsize ||
- 			    test_bit(NETFS_SREQ_HIT_EOF, &front->flags))
- 				netfs_read_unlock_folios(rreq, &notes);
-@@ -268,6 +271,7 @@ static void netfs_collect_read_results(struct netfs_io=
-_request *rreq)
- 				stream->error =3D front->error;
- 				rreq->error =3D front->error;
- 				set_bit(NETFS_RREQ_FAILED, &rreq->flags);
-+				stream->failed =3D true;
- 			}
- 			notes |=3D MADE_PROGRESS | ABANDON_SREQ;
- 		} else if (test_bit(NETFS_SREQ_NEED_RETRY, &front->flags)) {
-@@ -566,6 +570,7 @@ void netfs_read_subreq_terminated(struct netfs_io_subr=
-equest *subreq)
- 			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
- 		} else {
- 			netfs_stat(&netfs_n_rh_download_failed);
-+			__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
- 		}
- 		trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
- 		set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
-diff --git a/include/linux/netfs.h b/include/linux/netfs.h
-index c00cffa1da13..4af7208e1360 100644
---- a/include/linux/netfs.h
-+++ b/include/linux/netfs.h
-@@ -260,6 +260,7 @@ struct netfs_io_request {
- 	atomic64_t		issued_to;	/* Write issuer folio cursor */
- 	unsigned long long	collected_to;	/* Point we've collected to */
- 	unsigned long long	cleaned_to;	/* Position we've cleaned folios to */
-+	unsigned long long	abandon_to;	/* Position to abandon folios to */
- 	pgoff_t			no_unlock_folio; /* Don't unlock this folio after read */
- 	unsigned char		front_folio_order; /* Order (size) of front folio */
- 	refcount_t		ref;
-@@ -271,7 +272,6 @@ struct netfs_io_request {
- #define NETFS_RREQ_FAILED		4	/* The request failed */
- #define NETFS_RREQ_IN_PROGRESS		5	/* Unlocked when the request completes =
-*/
- #define NETFS_RREQ_FOLIO_COPY_TO_CACHE	6	/* Copy current folio to cache f=
-rom read */
--#define NETFS_RREQ_FOLIO_ABANDON	7	/* Abandon failed folio from read */
- #define NETFS_RREQ_UPLOAD_TO_SERVER	8	/* Need to write to the server */
- #define NETFS_RREQ_NONBLOCK		9	/* Don't block if possible (O_NONBLOCK) */
- #define NETFS_RREQ_BLOCKED		10	/* We blocked */
-diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
-index cf14545ca2bd..22eb77b1f5e6 100644
---- a/include/trace/events/netfs.h
-+++ b/include/trace/events/netfs.h
-@@ -56,6 +56,7 @@
- 	EM(netfs_rreq_trace_free,		"FREE   ")	\
- 	EM(netfs_rreq_trace_redirty,		"REDIRTY")	\
- 	EM(netfs_rreq_trace_resubmit,		"RESUBMT")	\
-+	EM(netfs_rreq_trace_set_abandon,	"S-ABNDN")	\
- 	EM(netfs_rreq_trace_set_pause,		"PAUSE  ")	\
- 	EM(netfs_rreq_trace_unlock,		"UNLOCK ")	\
- 	EM(netfs_rreq_trace_unlock_pgpriv2,	"UNLCK-2")	\
+RnJvbTogTWlraGFpbCBJdmFub3YNCj4gU2VudDogMzEgT2N0b2JlciAyMDI0IDE2OjIyDQo+IA0K
+PiBPbiAxMC8xOC8yMDI0IDk6MDggUE0sIE1pY2thw6tsIFNhbGHDvG4gd3JvdGU6DQo+ID4gT24g
+VGh1LCBPY3QgMTcsIDIwMjQgYXQgMDI6NTk6NDhQTSArMDIwMCwgTWF0dGhpZXUgQmFlcnRzIHdy
+b3RlOg0KPiA+PiBIaSBNaWtoYWlsIGFuZCBMYW5kbG9jayBtYWludGFpbmVycywNCj4gPj4NCj4g
+Pj4gK2NjIE1QVENQIGxpc3QuDQo+ID4NCj4gPiBUaGFua3MsIHdlIHNob3VsZCBpbmNsdWRlIHRo
+aXMgbGlzdCBpbiB0aGUgbmV4dCBzZXJpZXMuDQo+ID4NCj4gPj4NCj4gPj4gT24gMTcvMTAvMjAy
+NCAxMzowNCwgTWlraGFpbCBJdmFub3Ygd3JvdGU6DQo+ID4+PiBEbyBub3QgY2hlY2sgVENQIGFj
+Y2VzcyByaWdodCBpZiBzb2NrZXQgcHJvdG9jb2wgaXMgbm90IElQUFJPVE9fVENQLg0KPiA+Pj4g
+TEFORExPQ0tfQUNDRVNTX05FVF9CSU5EX1RDUCBhbmQgTEFORExPQ0tfQUNDRVNTX05FVF9DT05O
+RUNUX1RDUA0KPiA+Pj4gc2hvdWxkIG5vdCByZXN0cmljdCBiaW5kKDIpIGFuZCBjb25uZWN0KDIp
+IGZvciBub24tVENQIHByb3RvY29scw0KPiA+Pj4gKFNDVFAsIE1QVENQLCBTTUMpLg0KDQpJIHN1
+c3BlY3QgeW91IHNob3VsZCBjaGVjayBhbGwgSVAgcHJvdG9jb2xzLg0KQWZ0ZXIgYWxsIGlmIFRD
+UCBpcyBiYW5uZWQgd2h5IHNob3VsZCBTQ1RQIGJlIGFsbG93ZWQ/DQpNYXliZSB5b3Ugc2hvdWxk
+IGhhdmUgYSBkaWZmZXJlbnQgKHByb2JhYmx5IG1vcmUgc2V2ZXJlKSByZXN0cmljdGlvbiBvbiBT
+Q1RQLg0KWW91J2QgYWxzbyBuZWVkIHRvIGxvb2sgYXQgdGhlIHNvY2tldCBvcHRpb25zIHVzZWQg
+dG8gYWRkIGFkZGl0aW9uYWwNCmxvY2FsIGFuZCByZW1vdGUgSVAgYWRkcmVzc2VzIHRvIGEgY29u
+bmVjdCBhdHRlbXB0Lg0KDQoJRGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRl
+LCBCcmFtbGV5IFJvYWQsIE1vdW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpS
+ZWdpc3RyYXRpb24gTm86IDEzOTczODYgKFdhbGVzKQ0K
 
 
