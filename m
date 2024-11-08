@@ -1,88 +1,64 @@
-Return-Path: <netdev+bounces-143289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143290-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C79D39C1D1C
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:38:41 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B8089C1D4D
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:48:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87022282A5F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:38:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A1CD1C22809
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:48:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D03A1E883E;
-	Fri,  8 Nov 2024 12:38:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE69E1E32D5;
+	Fri,  8 Nov 2024 12:48:40 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="cDf7yxqz"
+	dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b="JSY1eLGR"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from forward203b.mail.yandex.net (forward203b.mail.yandex.net [178.154.239.154])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 822E61E7C26
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 12:38:29 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 65F121E32B6;
+	Fri,  8 Nov 2024 12:48:35 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=178.154.239.154
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731069511; cv=none; b=fa+73rbD4Mgbv1Obz3vOLdTQbt1vzZVysFl4EQHhn83ArPpu9j7+ZHPup8ev2lNBnadbudvk2AL2bvZjuWXX3ZJCanySiRiw1Xkge7QJ+prH2GBBt7rYELdpVUorHg740ZnrU7bf95ITD47mCC3JOHlVNmOOb3qlb+wXS39K4mY=
+	t=1731070120; cv=none; b=BpshmlwcFlKMtEpbva287PFRZhnY1SgmCK5fensi5kCaauS7uv9le8IqJwoJeYKnNf7EuOXcKVClYMP19S2kl3EF4k5PqhGgFIoa8W41hkEa2roEpeOTNodnpdqBnsbLCvZAIeoo21O5fqdtTElQK1Yg8LkvLVWfECAA1O0LA+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731069511; c=relaxed/simple;
-	bh=6uhhLHdX8wI5DTj5B2dsks+AMNym2eCsT19vTsAyNOk=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=YHIYZYuN9/JkYS6KgfWBzBoPYENch3pV4gK+tRuFh+Ha1/OZEVQUoOOmu/9IAG7NimXkugP9U1Soz3sQW3wfbh/oLEFNZBFQQxXA2N2svFMPL1yhmxM4zPK+rpLOLKFHG7+xMwiQfwXqBncKqtlTVYc5+b0A0uo+PbGd6A5rFyo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=cDf7yxqz; arc=none smtp.client-ip=209.85.167.45
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-539fbe22ac0so2091617e87.2
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 04:38:29 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731069507; x=1731674307; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QX+5sFCdsUeVNERYlwF+hY0WGapUy1gc9BsqgVDvwUI=;
-        b=cDf7yxqzT/F74yspVFlUr7GwC65iUrLafu7p8uGFgG8eGFZSocb759Avyy3FNoPQHd
-         yWZoqvU2ptSqf5CCET13Jl2O3+4vzv/513iQUdKyqB0PMOrJ8YEWcznQCCQplWrzVnxg
-         LCPdhwy7BRut+CaVTRB0FHOQgf5hGM42KHSGQINFN0bmrsVYXkMXEairjixEaHyHBfGG
-         2Yub5d1kcIRePvljeAfmqoCcZVZmCX0AAc5M2+6ZsYlemw8diGC/eEaMIwKlX0SQWZbZ
-         mFRFnXKmypddtj9a/o68E/hukal/JqLgCRhBnMOuX3g8UEQGTei32u1b3BNRGogsBadE
-         lTBw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731069507; x=1731674307;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QX+5sFCdsUeVNERYlwF+hY0WGapUy1gc9BsqgVDvwUI=;
-        b=Kd8p5ZaEsajHuXn1VOJ8Dxt4xSqCOyKOfgTiHNuxJx6mYk+u2HsEg31WCuo6Y33oyN
-         4aDqPuii+S1VNV96yvaS7cA2jP+1rPb6/mgse8QNppvQYwNVl9ILUBgook87xrBsxHHI
-         IRaZ8T71r3jz4Y7HojniAepkAJbS3BWbAF+SK0aF2sU4Qj9GAcIpFb/lNGBW9aqvtgrH
-         Xxr1KzVKu1GIEN7qoP863gxDIM+yXFKLkkE7i2NZsFVVZ/aoaTT+KcyAKHpl1TLwZdNC
-         oFJk7dT6PggRpLZwj4Q7uhXuSMRTwfADBo5tePHay2RoFbuWlVzAp7zSvpnAKECBlxZp
-         yRMw==
-X-Gm-Message-State: AOJu0Yz5QHBI2yQ/dZYA8+Jmrm6sgjTOpcuV8vmB7yV37N6z+im7RPdZ
-	pD97ONwyw6X6GfMXgPmVwJgyl7M73zPbEcEaqNM85ZPPS8jb+6tRYOS/CMiK
-X-Google-Smtp-Source: AGHT+IEz93LRUd3hZfFM6zJ8CZ3Qjimd4S5FvAwVgsiR7hZ1DzpQ0rpz4yREViowo3+9sp70bgvbZQ==
-X-Received: by 2002:a05:6512:1046:b0:539:e5e9:2159 with SMTP id 2adb3069b0e04-53d862cd2b3mr1691806e87.31.1731069506628;
-        Fri, 08 Nov 2024 04:38:26 -0800 (PST)
-Received: from imac.lan ([2a02:8010:60a0:0:68e2:1bff:d8bf:7339])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c1f56sm62991365e9.34.2024.11.08.04.38.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 04:38:25 -0800 (PST)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: netdev@vger.kernel.org,
-	Jakub Kicinski <kuba@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Xiao Liang <shaw.leon@gmail.com>,
-	Jiri Pirko <jiri@resnulli.us>
-Cc: donald.hunter@redhat.com,
-	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 2/2] tools/net/ynl: add async notification handling
-Date: Fri,  8 Nov 2024 12:38:16 +0000
-Message-ID: <20241108123816.59521-3-donald.hunter@gmail.com>
-X-Mailer: git-send-email 2.44.0
-In-Reply-To: <20241108123816.59521-1-donald.hunter@gmail.com>
-References: <20241108123816.59521-1-donald.hunter@gmail.com>
+	s=arc-20240116; t=1731070120; c=relaxed/simple;
+	bh=BrM+QekzMB2T8860EPHWnK0U+ToiG8m9uCbPJhCJYXw=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=mupp99or/27a+/1U7i3mqONnLlnKLIr1DrBvL5MW1OQsxjkyQ7rShv1qa3nMPMKS8jzX0KwZj4F6RDCw9/XvT+33LQtSSe+3CptUmPfGr4CPOdmedpOfMPLzSL4dWHZ5AJWrSfSt0uOkZ9HTQUHno2S9EVrogJ4+gKToWO0oxcE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru; spf=pass smtp.mailfrom=yandex.ru; dkim=pass (1024-bit key) header.d=yandex.ru header.i=@yandex.ru header.b=JSY1eLGR; arc=none smtp.client-ip=178.154.239.154
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=yandex.ru
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=yandex.ru
+Received: from forward103b.mail.yandex.net (forward103b.mail.yandex.net [IPv6:2a02:6b8:c02:900:1:45:d181:d103])
+	by forward203b.mail.yandex.net (Yandex) with ESMTPS id 04C256B738;
+	Fri,  8 Nov 2024 15:42:28 +0300 (MSK)
+Received: from mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net [IPv6:2a02:6b8:c10:2d9f:0:640:f6ce:0])
+	by forward103b.mail.yandex.net (Yandex) with ESMTPS id EF63B60AA0;
+	Fri,  8 Nov 2024 15:42:18 +0300 (MSK)
+Received: by mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net (smtp/Yandex) with ESMTPSA id HgiwQ5RXpeA0-owJRxKUK;
+	Fri, 08 Nov 2024 15:42:18 +0300
+X-Yandex-Fwd: 1
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yandex.ru; s=mail;
+	t=1731069738; bh=1DnT2TQayxFeydxyvNIUVRqNEl2DB4hWlBNBuik8Qns=;
+	h=Message-ID:Date:Cc:Subject:To:From;
+	b=JSY1eLGR1rRtuO+2JScsHIjXXci90Rv07R4roaHf0fBhVUU/hbjRRQ7MYcFxBXwh2
+	 LX5l3Wdl80h8Mh9nVcRkW/f9R1aX7txXA2Qs2tnK2vz94qqZ0TxNORmp96i5N7x2LX
+	 cvTWFhoGMUbCRek2vIAYzAohe80MR1q71Y/4b39Q=
+Authentication-Results: mail-nwsmtp-smtp-production-main-91.sas.yp-c.yandex.net; dkim=pass header.i=@yandex.ru
+From: Dmitry Antipov <dmantipov@yandex.ru>
+To: Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>
+Cc: linux-wpan@vger.kernel.org,
+	netdev@vger.kernel.org,
+	lvc-project@linuxtesting.org,
+	Dmitry Antipov <dmantipov@yandex.ru>,
+	syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Subject: [PATCH] mac802154: fix interface deletion
+Date: Fri,  8 Nov 2024 15:40:51 +0300
+Message-ID: <20241108124051.415090-1-dmantipov@yandex.ru>
+X-Mailer: git-send-email 2.47.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,147 +67,143 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-The notification handling in ynl is currently very simple, using sleep()
-to wait a period of time and then handling all the buffered messages in
-a single batch.
+Syzbot has reported the following BUG:
+kernel BUG at lib/list_debug.c:58!
+Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
+CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
+Hardware name: Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
+RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
+Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
+RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
+RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
+RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
+RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
+R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
+R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
+FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ __list_del_entry_valid include/linux/list.h:124 [inline]
+ __list_del_entry include/linux/list.h:215 [inline]
+ list_del_rcu include/linux/rculist.h:157 [inline]
+ ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
+ rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
+ ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
+ genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
+ genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
+ genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
+ netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
+ genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+ netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+ netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+ sock_sendmsg_nosec net/socket.c:729 [inline]
+ __sock_sendmsg+0x221/0x270 net/socket.c:744
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
+ ___sys_sendmsg net/socket.c:2661 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+ do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+ entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7fd094c32309
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 71 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffec50063a8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fd094c32309
+RDX: 0000000004000000 RSI: 0000000020000b00 RDI: 0000000000000004
+RBP: 00000000000f4240 R08: 0000000000000000 R09: 00000000000000a0
+R10: 0000000000000000 R11: 0000000000000246 R12: 00000000000161b7
+R13: 00007ffec50063bc R14: 00007ffec50063d0 R15: 00007ffec50063c0
+ </TASK>
 
-This patch adds async notification handling so that messages can be
-processed as they are received. This makes it possible to use ynl as a
-library that supplies notifications in a timely manner.
+Since 'ieee802154_remove_interfaces()' and 'ieee802154_if_remove()' may try
+to process the same 'struct ieee802154_sub_if_data' object concurrently,
+there are two problems:
 
-- Add poll_ntf() to be a generator that yields 1 notification at a
-  time and blocks until a notification is available.
-- Add a --duration parameter to the CLI, with --sleep as an alias.
+1) list of 'struct ieee802154_sub_if_data' objects linked via 'interfaces'
+   field of 'struct ieee802154_local' should remain consistent;
+2) 'unregister_netdevice()' should not be called for the same
+   'struct net_device' concurrently.
 
-./tools/net/ynl/cli.py \
-    --spec <SPEC> --subscribe <TOPIC> [ --duration <SECS> ]
+IIUC RCU can guarantee 1) but not 2), so discard RCU quirks and prefer
+explicit SDATA_STATE_REMOVED flag used via atomic and fully-ordered
+'test_and_set_bit()' to mark 'struct ieee802154_sub_if_data' instance
+which has entered the reclamation.
 
-Here is an example python snippet that shows how to use ynl as a library
-for receiving notifications:
-
-    ynl = YnlFamily(f"{dir}/rt_route.yaml")
-    ynl.ntf_subscribe('rtnlgrp-ipv4-route')
-
-    for event in ynl.poll_ntf():
-        handle(event)
-
-Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+Reported-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
+Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
+Fixes: b210b18747cb ("mac802154: move interface del handling in iface")
+Signed-off-by: Dmitry Antipov <dmantipov@yandex.ru>
 ---
- tools/net/ynl/cli.py     | 14 ++++++--------
- tools/net/ynl/lib/ynl.py | 22 +++++++++++++++++++---
- 2 files changed, 25 insertions(+), 11 deletions(-)
+ net/mac802154/ieee802154_i.h |  6 +++---
+ net/mac802154/iface.c        | 10 +++++++---
+ 2 files changed, 10 insertions(+), 6 deletions(-)
 
-diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
-index b8481f401376..9853fd261ee4 100755
---- a/tools/net/ynl/cli.py
-+++ b/tools/net/ynl/cli.py
-@@ -4,7 +4,6 @@
- import argparse
- import json
- import pprint
--import time
+diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
+index 08dd521a51a5..7afcea3447c1 100644
+--- a/net/mac802154/ieee802154_i.h
++++ b/net/mac802154/ieee802154_i.h
+@@ -40,9 +40,8 @@ struct ieee802154_local {
+ 	int open_count;
  
- from lib import YnlFamily, Netlink, NlError
+ 	/* As in mac80211 slaves list is modified:
+-	 * 1) under the RTNL
+-	 * 2) protected by slaves_mtx;
+-	 * 3) in an RCU manner
++	 * 1) under the RTNL;
++	 * 2) protected by iflist_mtx.
+ 	 *
+ 	 * So atomic readers can use any of this protection methods.
+ 	 */
+@@ -101,6 +100,7 @@ enum {
  
-@@ -17,7 +16,6 @@ class YnlEncoder(json.JSONEncoder):
-             return list(obj)
-         return json.JSONEncoder.default(self, obj)
+ enum ieee802154_sdata_state_bits {
+ 	SDATA_STATE_RUNNING,
++	SDATA_STATE_REMOVED,
+ };
  
--
- def main():
-     description = """
-     YNL CLI utility - a general purpose netlink utility that uses YAML
-@@ -43,7 +41,10 @@ def main():
-     group.add_argument('--list-ops', action='store_true')
-     group.add_argument('--list-msgs', action='store_true')
+ /* Slave interface definition.
+diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
+index c0e2da5072be..700c80e94bb2 100644
+--- a/net/mac802154/iface.c
++++ b/net/mac802154/iface.c
+@@ -669,7 +669,7 @@ ieee802154_if_add(struct ieee802154_local *local, const char *name,
+ 		goto err;
  
--    parser.add_argument('--sleep', dest='sleep', type=int)
-+    parser.add_argument('--duration', dest='duration', type=int,
-+                        help='when subscribed, watch for DURATION seconds')
-+    parser.add_argument('--sleep', dest='duration', type=int,
-+                        help='alias for duration')
-     parser.add_argument('--subscribe', dest='ntf', type=str)
-     parser.add_argument('--replace', dest='flags', action='append_const',
-                         const=Netlink.NLM_F_REPLACE)
-@@ -80,9 +81,6 @@ def main():
-     if args.ntf:
-         ynl.ntf_subscribe(args.ntf)
+ 	mutex_lock(&local->iflist_mtx);
+-	list_add_tail_rcu(&sdata->list, &local->interfaces);
++	list_add_tail(&sdata->list, &local->interfaces);
+ 	mutex_unlock(&local->iflist_mtx);
  
--    if args.sleep:
--        time.sleep(args.sleep)
--
-     if args.list_ops:
-         for op_name, op in ynl.ops.items():
-             print(op_name, " [", ", ".join(op.modes), "]")
-@@ -106,8 +104,8 @@ def main():
-         exit(1)
+ 	return ndev;
+@@ -683,11 +683,13 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
+ {
+ 	ASSERT_RTNL();
  
-     if args.ntf:
--        ynl.check_ntf()
--        output(ynl.async_msg_queue)
-+        for msg in ynl.poll_ntf(duration=args.duration):
-+            output(msg)
- 
- 
- if __name__ == "__main__":
-diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
-index c22c22bf2cb7..3eca432f5d7b 100644
---- a/tools/net/ynl/lib/ynl.py
-+++ b/tools/net/ynl/lib/ynl.py
-@@ -12,6 +12,8 @@ import sys
- import yaml
- import ipaddress
- import uuid
-+import queue
-+import time
- 
- from .nlspec import SpecFamily
- 
-@@ -489,7 +491,7 @@ class YnlFamily(SpecFamily):
-         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_GET_STRICT_CHK, 1)
- 
-         self.async_msg_ids = set()
--        self.async_msg_queue = []
-+        self.async_msg_queue = queue.Queue()
- 
-         for msg in self.msgs.values():
-             if msg.is_async:
-@@ -903,7 +905,7 @@ class YnlFamily(SpecFamily):
- 
-         msg['name'] = op['name']
-         msg['msg'] = attrs
--        self.async_msg_queue.append(msg)
-+        self.async_msg_queue.put(msg)
- 
-     def check_ntf(self):
-         while True:
-@@ -925,11 +927,25 @@ class YnlFamily(SpecFamily):
- 
-                 decoded = self.nlproto.decode(self, nl_msg, None)
-                 if decoded.cmd() not in self.async_msg_ids:
--                    print("Unexpected msg id done while checking for ntf", decoded)
-+                    print("Unexpected msg id while checking for ntf", decoded)
-                     continue
- 
-                 self.handle_ntf(decoded)
- 
-+    def poll_ntf(self, interval=0.1, duration=None):
-+        endtime = time.time() + duration if duration else None
-+        while True:
-+            try:
-+                self.check_ntf()
-+                yield self.async_msg_queue.get_nowait()
-+            except queue.Empty:
-+                try:
-+                    time.sleep(interval)
-+                except KeyboardInterrupt:
-+                    return
-+            if endtime and endtime < time.time():
-+                return
++	if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
++		return;
 +
-     def operation_do_attributes(self, name):
-       """
-       For a given operation name, find and return a supported
+ 	mutex_lock(&sdata->local->iflist_mtx);
+-	list_del_rcu(&sdata->list);
++	list_del(&sdata->list);
+ 	mutex_unlock(&sdata->local->iflist_mtx);
+ 
+-	synchronize_rcu();
+ 	unregister_netdevice(sdata->dev);
+ }
+ 
+@@ -697,6 +699,8 @@ void ieee802154_remove_interfaces(struct ieee802154_local *local)
+ 
+ 	mutex_lock(&local->iflist_mtx);
+ 	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
++		if (test_and_set_bit(SDATA_STATE_REMOVED, &sdata->state))
++			continue;
+ 		list_del(&sdata->list);
+ 
+ 		unregister_netdevice(sdata->dev);
 -- 
 2.47.0
 
