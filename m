@@ -1,115 +1,135 @@
-Return-Path: <netdev+bounces-143441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143450-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B22669C272A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 22:48:34 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 564A89C2745
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 23:02:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E489E1C215ED
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 21:48:33 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id F19031F22359
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 22:02:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697AC1A9B38;
-	Fri,  8 Nov 2024 21:48:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 932AC1C1F18;
+	Fri,  8 Nov 2024 22:02:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="jTUxbY5J"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Cf2PK3wu"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f49.google.com (mail-ej1-f49.google.com [209.85.218.49])
+Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFA1219A28D;
-	Fri,  8 Nov 2024 21:48:28 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB7D71A9B51
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 22:02:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731102510; cv=none; b=Q5aDQd+Beyk43GExhevc1GwSCTbC6Cqwl4BEU0WuESWSV/WoyUDzrFNcF6Rc06AP+88MJ23YKzoTiBW+V7PqGU0dU7L/pN7FGJg0Z4za7hfhj1ZKzbwYWWUbosl506+gLzAeJgnsfHaCkM8Bdn1bvhpobDXiLAbdZsHDooZgyrs=
+	t=1731103352; cv=none; b=f7/GPcMksYoXHOB/h5O7z5AX5MY3hB6DrSlHJdQMttNy2WLKhTO5Yfn/yJxl5GCR7BOHunq1EqEljCeUAq37+4swwtJqcYq4sBNwE0gd/hcVu38yj14oxJvZIee5woVBZzn+9+xLRwssNdPhOApxwtIGWrGqZ9cRVH/4pOOtwDI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731102510; c=relaxed/simple;
-	bh=GP+aNFuzeZxf8AIUpmSRgChb1qq1acmXPgtRUgNJTSo=;
-	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=idtvi9xt9Mi/mDVIttRv6px/VvHTpWlSZLOtVAWBJdOyFhUu4b7F2CBp/pXbYmA/VOHKD7Lzzez1P12cLKX7dQxAOdbjWozcWBKIL3TXlcXeftUuOyXHu/HV8qquERg3WUKbAa4aGFTGI39LEW1v9VVxXZm7yH+B0vQLUa8iRdo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=jTUxbY5J; arc=none smtp.client-ip=209.85.218.49
+	s=arc-20240116; t=1731103352; c=relaxed/simple;
+	bh=CqZzq6qGMQ62OwbNDDKtIvbl3x1rPLFkba9apWi+DN0=;
+	h=Subject:To:Cc:References:From:Message-ID:Date:MIME-Version:
+	 In-Reply-To:Content-Type; b=qtQ3tSawrqNkpl0EGBkOrfYglGaLTbGAlus5gbZfdOV/jmdxRj2Hi491zOfB9ZjeGugjEFlbW6ITuGE06i45ob/8zWaiQ1Gb530UBRtlPtxyRpHzwbO4gNM2CTDOtFsaLy7JCkPGlTC7CLlsorkfa+UKQKoNNJiQO69SHciIfrk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Cf2PK3wu; arc=none smtp.client-ip=209.85.218.52
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f49.google.com with SMTP id a640c23a62f3a-a9a0ec0a94fso408771966b.1;
-        Fri, 08 Nov 2024 13:48:28 -0800 (PST)
+Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a99e3b3a411so627227766b.0
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 14:02:30 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731102507; x=1731707307; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=GP+aNFuzeZxf8AIUpmSRgChb1qq1acmXPgtRUgNJTSo=;
-        b=jTUxbY5Jpc9JO8+aH6vHXJNiB7qBFSsAcOWFBVKF1rPc0Y2g/+UWWqNzFvVcuJTK0H
-         wpoeKMLo8MntY6CFA5ZMYRC/7eERh9j1Fd63YNsGT1z7leQhBORRCoGUdZ4bPEsSmwc6
-         +NBOpy/rJNfRP+Zx3l5IPzHaunwgxcYbLZQ8mm5HN68zoGueWALKghF52aTcACIoyFfO
-         fL1qESOcI4rIRUSTSEFsXUXNY3LCpQOGdtbfRpq8IX1E0I3rVzucQHskyBXNyaImBqu2
-         GizHfjOzARUQwyut+HlHoi7bwGvRNxGkb5UruEaZH2SjD3W+QtF3RXhdJ15SscLgddl1
-         zFyQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731102507; x=1731707307;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20230601; t=1731103349; x=1731708149; darn=vger.kernel.org;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GP+aNFuzeZxf8AIUpmSRgChb1qq1acmXPgtRUgNJTSo=;
-        b=KN/gICodClwK0b3qrshNzo2fz+1aJPNIdwrIWw6vhnaaBMqRRXNtNoJZyAUQw38Kx+
-         A97txzVHsn+pqSEc5Cb/JB+zNa31xZT1g4LSIyIawIqZUWqJY31VSpkZzbpn7xY5gbtV
-         cvCf9qWPcw6xMFu8xLZJw+qbUcg/y+EUG2dlT40Kqd6IY0gKIVYRLBlamBJqquj/86pI
-         FLegvBRu4jwr3LyQXFR2k+OW3DcrcKNI9SF1ULyAefFuKPLA/psPwp7OCDoQEm7CwGFZ
-         yQsrPoQ8F8NxrdelQxXZAk+IDsTfUBiKzJm6/bS6CiHYpDlc8AZ6JtDO3Dy5Tie57ciO
-         2Prg==
-X-Forwarded-Encrypted: i=1; AJvYcCVt1z45x+mQe8FBZ5EnuVgrwGp19lPIkqtymSoERJ08qJj8dhebnLwg6TlVh/SJTXw7gwWOLvIG@vger.kernel.org, AJvYcCWjzc9ampzag9xQ4YkeuceHSJaqmi0I84qudyBC7m91HZmC6cGxbi0siRRdZlbXAlj0Usmv5PF8M0pXG68=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yxztw34TnNn0Mm+qA1EwPYCiyD1Udk0rEA9UXhWDxhaw1D+f8ir
-	9z3YMwwfz7wKc1GZqx/HlwNEoSHINQ2LKCxxuKPUM+WIBpVBMeJj
-X-Google-Smtp-Source: AGHT+IEG5cDvSOVCs9ynxIGvmmsbmKZSD3BMOea1HVHFXjaQycEqkxgoM52ODN/KzQHBiHEUGaf4Rw==
-X-Received: by 2002:a17:906:d551:b0:a99:61f7:8413 with SMTP id a640c23a62f3a-a9eefee66femr429507166b.23.1731102506644;
-        Fri, 08 Nov 2024 13:48:26 -0800 (PST)
-Received: from lapsy144.cern.ch (lapsy144.cern.ch. [2001:1458:202:99::100:4b])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0abe369sm280210066b.83.2024.11.08.13.48.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 13:48:26 -0800 (PST)
-From: vtpieter@gmail.com
-To: tharvey@gateworks.com,
-	o.rempel@pengutronix.de,
-	pabeni@redhat.com
-Cc: UNGLinuxDriver@microchip.com,
-	andrew@lunn.ch,
-	davem@davemloft.net,
-	edumazet@google.com,
-	f.fainelli@gmail.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	lukma@denx.de,
-	netdev@vger.kernel.org,
-	olteanv@gmail.com,
-	woojung.huh@microchip.com,
-	Pieter Van Trappen <pieter.van.trappen@cern.ch>
-Subject: [PATCH net v4] net: dsa: microchip: disable EEE for KSZ879x/KSZ877x/KSZ876x
-Date: Fri,  8 Nov 2024 22:48:15 +0100
-Message-ID: <20241108214815.3874964-1-vtpieter@gmail.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <20241018160658.781564-1-tharvey@gateworks.com>
-References: <20241018160658.781564-1-tharvey@gateworks.com>
+        bh=qJqbvMrSzSpX7WGFpcgBbgpm76Jh4m+xyczOFSVKpBM=;
+        b=Cf2PK3wuUe33cwV4TqbvHQ0ukCJHjxM/uGsbp+cU5WrZQAnRAz4F2o0FgH4+oyY5/7
+         8CXQ3fc3uH154CgnGB3l/mQHHZ4LBO1p0EAmTGtEvTA7XzuttvmLtsTs28mFkbFakJTO
+         MdMJfqSRNT+FfHl+tYgLuShju4ps1I6HZp7vo/PesmcALasbaqnRR9N10iCE8JU6OL8s
+         gQN/LSGJTEH89vEG50WJmk5BpM2R/KX88SUDWjjajNjCSb7r1DLywe8LeOVtoIAUQcec
+         CUKQVVBTMNep8eRHCT7PlI6DvJqo+1wfVQ0kKWuF6+skr0T1Boyk84BzUXff4goin24t
+         mr0Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731103349; x=1731708149;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qJqbvMrSzSpX7WGFpcgBbgpm76Jh4m+xyczOFSVKpBM=;
+        b=lVMK7KFU4dzv0Io3S2kzg+XaNoDgYoCrfMViUbx41cc2NG/rgMZgCLU3p6vHPY9meG
+         Uf3F3igJMsoU34j7daYMYtQoBCaGmkvNlHjLP0lKjaH+Bzp460freiHrAAfgQ0nGyhCb
+         2xAZdJCpWPpNwybZK6/oLQ9hewHO9XlWrFEs99ImszbBe34S9AbeLAK+tPG++Bhccww3
+         i8DzYFA6/a+4eTJuHoZ0msIQO1ikBFHULmBgupYZqhQvwAGbLLPowabM2opDonZjkpIe
+         SmgsjqgNofLIsYef84BrHrrUjYtDCYE3s+hV20hPKCltIwL0KF1yfn7xpyLz3c4GEuFB
+         s57A==
+X-Gm-Message-State: AOJu0YwkiN+KZ4zrb8JRUoGFO4NlF7VOA3n1XJdwlSOKZh2vY6FxYurL
+	/9URFi/HG3Xyq5AKN0pI43Ia0BHMdRbzeSFl8WrMU6+kFMf0XpCRWCw86Q==
+X-Google-Smtp-Source: AGHT+IE84vaQiVIkBVil8dCUmyFvRA0fApQqnFNkJCTMoHxGoplcgFDHFwhbFZ96b14W0fgs2yd7+A==
+X-Received: by 2002:a17:907:1c28:b0:a99:f209:cea3 with SMTP id a640c23a62f3a-a9eefeb2a17mr450008366b.11.1731103348965;
+        Fri, 08 Nov 2024 14:02:28 -0800 (PST)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0dc4c60sm288914066b.102.2024.11.08.14.02.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2024 14:02:28 -0800 (PST)
+Subject: Re: [PATCH net-next 01/12] net: homa: define user-visible API for
+ Homa
+To: John Ousterhout <ouster@cs.stanford.edu>
+Cc: netdev@vger.kernel.org
+References: <20241028213541.1529-1-ouster@cs.stanford.edu>
+ <20241028213541.1529-2-ouster@cs.stanford.edu>
+ <174d72f1-6636-538a-72d2-fd20f9c4cbd0@gmail.com>
+ <CAGXJAmxdRVm7jY7FZCNsvd8Kvd_p5FPUSHq8gbZvzn0GSK6=2w@mail.gmail.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <6467b078-4ee9-ecb2-6174-825c3a2d5007@gmail.com>
+Date: Fri, 8 Nov 2024 22:02:27 +0000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAGXJAmxdRVm7jY7FZCNsvd8Kvd_p5FPUSHq8gbZvzn0GSK6=2w@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
 
-From: Pieter Van Trappen <pieter.van.trappen@cern.ch>
+On 08/11/2024 17:55, John Ousterhout wrote:
+> This leaves open the question of where these
+> declarations should go once the userland library is upstreamed. Those
+> library methods are low-level wrappers that make it easier to use the
+> sendmsg kernel call for Homa; users will probably think of them as if
+> they were system calls. It feels awkward to require people to #include
+> 2 different header files in order to use Homa kernel calls; is it
+> considered bad form to mix declarations for very low-level methods
+> like these ("not much more than kernel calls") with those for "real"
+> kernel calls?
 
-Hi Tim, all,
+include/uapi/ does sometimes contain 'static inline' wrappers.  But
+ declarations for actual functions that need linkage are avoided AFAICT.
+The expectation normally is that userland application code will #include
+ a library header, which takes care of #including any necessary kernel
+ uAPI headers, ideally packaged separately from the kernel rather than
+ just taking the include/uapi/ directory of whatever kernel is currently
+ running.  (Back in the day there were some classic Linus rants[1]
+ warning against the latter.)
+Then both the helper functions and their declarations live in the
+ library, where they can be linked into the application, and not mixed
+ in with the kernel headers.
 
-Sorry I'm a bit late to the party but I think this patch is not doing
-much since most if not all KSZ8 switches don't have MMD
-registers. They do have EEE registers but these require indirect
-access that's not compatible with PHY MMD (indirect) registers as far
-as I understand. So your patch does no harm but is not doing anything
-useful either I reckon.
+> Do you know of other low-level kernel-call wrappers in
+> Linux that are analogous to these? If so, how are they handled?
 
-For the KSZ8 devices, the EEE errata is handled from the DSA switch
-driver ksz8.c, ksz8_handle_global_errata.
+The closest analogy that comes to mind is the bpf system call and libbpf.
+libbpf lives in the tools/lib/bpf/ directory of the kernel tree, but is
+ often packaged and distributed independently[2] of the kernel package.
+If there is a reason to tie the maintenance of your wrappers to the
+ kernel project/git repo then this can be suitable.
 
-Cheers, Pieter
+But I'm not an expert on this, so I hope someone with more experience
+ around uAPI stuff will chime in.  Might be worth CCing linux-api[3] on
+ the next version of this patch.
+
+HTH,
+-ed
+
+[1]: https://yarchive.net/comp/linux/kernel_headers.html#23
+[2]: https://github.com/libbpf/libbpf
+[3]: https://www.kernel.org/doc/man-pages/linux-api-ml.html
 
