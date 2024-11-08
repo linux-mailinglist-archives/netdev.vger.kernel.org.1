@@ -1,151 +1,124 @@
-Return-Path: <netdev+bounces-143318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143321-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C9509C1FE2
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:00:16 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id C38A49C2005
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:06:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF9141C21363
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:00:15 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6234DB2170C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:06:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7850F1F5820;
-	Fri,  8 Nov 2024 15:00:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D329E1F4726;
+	Fri,  8 Nov 2024 15:06:44 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="WMfNLYFx"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ej1-f52.google.com (mail-ej1-f52.google.com [209.85.218.52])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20F401F582D;
-	Fri,  8 Nov 2024 15:00:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.218.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 374CE1D0400;
+	Fri,  8 Nov 2024 15:06:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.4
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731078010; cv=none; b=NnbJJ48+aEq+vgHSrq4imA/kirAtXFzLW4E8a+UB5NiPqWi5OYlwJjohfLRavfILkb2PYKbcz8tzdNrzwORdCnsNetyp/XHzTZJVGVOILFxB5MNIOj2bjHM27IzFhA4SGw2LsAPqJRfaq7o07eUH7xzZ+4gzeTCnlEtXEoMrjWM=
+	t=1731078404; cv=none; b=i8icngcNAmh+uV/lqa1CmH3L4Zd4fRUqXCMsALJ+kfwg4g6WERTlzKLlCXvIMcqgXV7YFyuyLsI7n88DTRSeDt9ox9jfU2Ht/DpfsZeS3iRy3I0aX7zfkJZm6jQWYSqPFE9ClNZNbVTboW5vMRpsB+nwcF/9KfHZ7cXF0Ci9lv4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731078010; c=relaxed/simple;
-	bh=YVyjPtBUCXQML+mx+jc7/cYnCoF5ihFnuGgGv89CzPg=;
-	h=From:Date:Subject:MIME-Version:Content-Type:Message-Id:To:Cc; b=XES9g0XqX9H0axvUhbAxmtIn+Z4MMh1Z4ZFlJUhsmXyUTtrQz1KP7lrH9eIUr6SGRFEI8a1KfP/QUIKa8xvSUITroMS2AjMxc479512WiHurSn8K9xZllK/GPX2sr+0HBLqhSk0lp3zTQ2d7cwHfmgkAwPVAacRdxll8c258PRw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org; spf=pass smtp.mailfrom=gmail.com; arc=none smtp.client-ip=209.85.218.52
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=debian.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ej1-f52.google.com with SMTP id a640c23a62f3a-a9eb68e0bd1so308720566b.3;
-        Fri, 08 Nov 2024 07:00:07 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731078006; x=1731682806;
-        h=cc:to:message-id:content-transfer-encoding:mime-version:subject
-         :date:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Zo3vkaxuRrTU5x90V/3/Esan3LgS4AhbEUfNLjlfsag=;
-        b=Mbg6/Jx0CygdqAyhkmdTDyow4o95lpKLKfwT4kDiIrrf+3VWOikPssGYdh/kw6e5K5
-         /lMg3TjQbkD6pBnKND4N0yHFPuKqHw7iLFqkcnIY9zw+jDDIg1KdJD3figS1RjITkKLw
-         tVypbMvTfOp8LwaIJFK6nK7BNYKc34r5EeC6xq/kjP1bC787NlE3nLU1lejhYcA3FWgv
-         RMFYKq7rMPZkTtcBBFfwYpcGDvu+gckH++QXH9YJsaxblLQatJbakalKLTzuYeG2XUGd
-         eqI/Vx+0YOPuc/7OlmV4J4bwd5MMG4+FHMsFXZXYve+wJYFq6EwsPs/xsV+c8R0UHReh
-         oaQg==
-X-Forwarded-Encrypted: i=1; AJvYcCUr+PhI5xjt6dBZHsr96VG6no2qtj+1jIghxOhNvljluGsJVS3Fbtxp/NXtFeCzhZRG/aLJwSzph+zHHhRsqV9W@vger.kernel.org, AJvYcCUwhDZKqgO/3bQWliXGeSH6iJD6OvNwNi5qv94DO2iCOvW1cZZ61ZUYWeWLRzjyqJivdPJVWsCNAkxRFlE=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw54CdAX9KtmiGtOjXLEnwuR4ijnbjZY3mkwG/U4sJ0iHXfrBrb
-	q5LekWPH5mDPnGbYhhLzuRA/et72zw8K5J95yKhLN10ekTXO035p
-X-Google-Smtp-Source: AGHT+IGnMtUwEH2vwVLfN9QzL5kBneHKTNEQLBFh/PAg5G7H2dPhaje7iFo/5QgurB+GhveGRsrAZg==
-X-Received: by 2002:a17:907:9411:b0:a99:35eb:1301 with SMTP id a640c23a62f3a-a9eefeecb8bmr294193166b.18.1731078006299;
-        Fri, 08 Nov 2024 07:00:06 -0800 (PST)
-Received: from localhost (fwdproxy-lla-009.fbsv.net. [2a03:2880:30ff:9::face:b00c])
-        by smtp.gmail.com with ESMTPSA id a640c23a62f3a-a9ee0dedc3dsm241291166b.133.2024.11.08.07.00.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 07:00:05 -0800 (PST)
-From: Breno Leitao <leitao@debian.org>
-Date: Fri, 08 Nov 2024 06:59:25 -0800
-Subject: [PATCH net-next] net: netconsole: selftests: Check if netdevsim is
- available
+	s=arc-20240116; t=1731078404; c=relaxed/simple;
+	bh=vF2G2XyACIvsSkulftA7rR72gJvegVGLforyIY18JvQ=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=M27MEtyikZrnaOX4jrD/cfGiHbueZ6d4MUscm2P0c/v1EuGpYQSMk3ba6fmKuVnMJyYZr0Csk7bHXkvc8LPGAHep9mvMrt4l3JL+dKzjsdmZF/qz+LJf99jJxQgM9o/U9pLWsQJG+QRqRgZGFJYmAKZ8lvUuZ8ESF/wgn2XpsBU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=WMfNLYFx; arc=none smtp.client-ip=212.227.15.4
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1731078400; x=1731683200; i=markus.elfring@web.de;
+	bh=JOfARLVE38xdD4X7k3gE07eqaFjFkpilj720vzhEGcA=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=WMfNLYFxJt79OBg7HkwD9xCYTn7lv8QV5hpwi8JBH9mnCYTkGy/Nha5thIlnVow8
+	 fw8hg6aEa5OXrnRj6eJtKVSWGJFpBsgevFzWVZp5KzDx06eaE+3Hg1/gkNxFQ6hT7
+	 wyzFyjKM46E3/n+EnMJAJoBpqU2rI7HUTwyFtOX2i6+tdk5hNgAhH7nEKM2mrCEgh
+	 GU6q+2HLdEq6nwwydz2iqHw47Zh9y/6B9ga8hB+f0Z8fF07oGVQqrY1e1/tsStpf8
+	 yneLqv1cyKVC4rx60XjapTqw/+meNrM/uO5v/mABe5SLiVv3GK/M6OMyoeAYWXgiG
+	 ZUPrsuIleKKbc7Cjxw==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.80.95]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MI3ox-1t3cv40MOF-002hgR; Fri, 08
+ Nov 2024 16:00:37 +0100
+Message-ID: <55a08c90-df62-41cd-8ab9-89dc8199fbfb@web.de>
+Date: Fri, 8 Nov 2024 16:00:22 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20241108-netcon_selftest_deps-v1-1-1789cbf3adcd@debian.org>
-X-B4-Tracking: v=1; b=H4sIAEwnLmcC/x3MUQqDMBAFwKuE920gSVVsrlKKiL60gbJKNogg3
- l3oHGBOKEumIpoThXvWvAqi8Y3B/J3kQ5sXRIPgQuu9G6ywzquMyl+q1Dou3NQOjxT6tuuTe3Z
- oDLbClI9/+4KwWuFR8b6uG9Ef66VwAAAA
-X-Change-ID: 20241108-netcon_selftest_deps-83f26456f095
-To: Andrew Lunn <andrew+netdev@lunn.ch>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>
-Cc: netdev@vger.kernel.org, linux-kselftest@vger.kernel.org, 
- linux-kernel@vger.kernel.org, Breno Leitao <leitao@debian.org>
-X-Mailer: b4 0.14.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=2138; i=leitao@debian.org;
- h=from:subject:message-id; bh=YVyjPtBUCXQML+mx+jc7/cYnCoF5ihFnuGgGv89CzPg=;
- b=owEBbQKS/ZANAwAIATWjk5/8eHdtAcsmYgBnLid0vzygrmxBK+fLcNgwH4l/wfXUeKAQftRQH
- Lp0etORCH2JAjMEAAEIAB0WIQSshTmm6PRnAspKQ5s1o5Of/Hh3bQUCZy4ndAAKCRA1o5Of/Hh3
- bcWHD/4+fb0Xkj4iGsWHHdl+yPdrOofDpqiduyu32zNY1Z7Q50EG9vXwNlLU/o/+LNO5haNyhWP
- /CBjsFO7+21seIg25Xhnfx41JQV3Pu4V8F2zIaCW99H/j2v/juUZndBTzIba3zzJl+lsu/o6056
- PLHueA1YVnspRFramskgNyDyH3IFVig9Wbt7o3qHeybDAdRRlgzJ8FGxt7cQ9+zYzJjW+Z/79vv
- fhrWx4WSgP8l/dEe2l40otii2p9Gd+HCe2zGavUFZO1RSSaPfZAWo3DYRtwkw4bngVPYu9/J9DI
- tUNPHdHQk1AxShGHH4He8Oh43FY1ul8sKtjFXo4iEShDGAETCh1VwIvPWZ69gLXrH2eas4M445V
- QsoVV1SVANyReqXPPNuaF72vwVBx6quc1rc/31nOx/u2hWl2+CyxDx+NhT0vuDOHaDHsHM+jAMQ
- p6OTKoB5e07mI8r6G3aE71Xk5DDZuKR02ptdRwLgINHahfzmFOMbwhsB+uiur8/1YIpJuSLvPMZ
- l3aDDEE8cCYsdg/mztfj0MUmF2au/wJavFOZgD+H+IkFqCbZvuYIblcYToe86S1B03M9JZgVjvo
- HmtcRR0Z4YVeb4CY9Kp1fb15bF1WTS4Ie5s9WH5Wd2b19wDnV4GwxLuruHl/G2dpEe6t3hpQE63
- HAetmMLUdpA2VSw==
-X-Developer-Key: i=leitao@debian.org; a=openpgp;
- fpr=AC8539A6E8F46702CA4A439B35A3939FFC78776D
+User-Agent: Mozilla Thunderbird
+To: Tuo Li <islituo@gmail.com>, netdev@vger.kernel.org,
+ Andrew Lunn <andrew@lunn.ch>, Ayush Sawal <ayush.sawal@chelsio.com>,
+ "David S. Miller" <davem@davemloft.net>, Dragos Tatulea
+ <dtatulea@nvidia.com>, Eric Dumazet <edumazet@google.com>,
+ Jacob Keller <jacob.e.keller@intel.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Mina Almasry <almasrymina@google.com>,
+ Simon Horman <horms@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Jia-Ju Bai <baijiaju1990@gmail.com>
+References: <20241030132352.154488-1-islituo@gmail.com>
+Subject: Re: [PATCH] chcr_ktls: fix a possible null-pointer dereference in
+ chcr_ktls_dev_add()
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20241030132352.154488-1-islituo@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:kRizR2CE4fCzYtaFmdK6fWkzWaTNaKl5lETEg6b12oEuk2Qc7YX
+ zHg7YkYxYUEQaWnzrVwDHRYaChkBWMzsOkpJ2ZgP8tsas765caPMtTbVD0haqetVWJlndUr
+ GxtixE/xPVEWW1Jq56bxRroXjmvbbprn50/89r/e2U7cL9ZgUgfOUt36zIpGaBq9bacMUrb
+ FMeV0kvgi3G0cHAp2EIOg==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:p1ayU724K4s=;MI7hy6W1jp1yuzGTwEYRVY4vKga
+ AzQ09Bs+nlaJnb+4CgTdKZSSDE2pdqCi9fvCgT/RSv86UzRLOwlveKI3YdDCK5OigTT+i1M8a
+ UWCmi5708lmqigm+o8ISJ5bWpBQmLCSywKRXoBzJNckyldLWLACV6swOnTmZ2RusY6dMmb2Ma
+ ABlGDjW17Wf1X+mkkKOm2haj0wJtCvyZbwHxYct/d0nRw1BI8gRLsXjb75V7fTXCpAwna3x5u
+ 76cN4uGmZ2ItCc+3hVO6JShk5PnbW8tLhbnGcV58YqIkH7zHlIwhmwLKNJzkMwbYxF3oFlpOU
+ PDGbet6P5r3MRy0Hz9qnVogFeJZPHxZ9WfauwpYspFFL/a1Z2zWI0R7TEuqKhJvVEUyq6FOZV
+ Iesw9fwQIWyo942WRMXBDfEdqQao43jVlruM+5zqiKXL3QiJnoyrfp1aBOhGgenv37TN5uVgq
+ zj0VdC5uqX0dY3YzfqKdQqsx+nIdCwDlGgZfR1qniChUj5pryZBg/rGAa39o+2hVjG+HvOIhO
+ 7FeOu5kKpmwMtRHihQigc2Mf8rYelKPMoozjQJMQWWwY5AZ616Q9gnU1ZpsUMGmwfIpXJ8vod
+ waPmSZAwP0cECbMoM19WaJp3Veu5aQys67n5avnPWlAZAQ5gCdpnJrtzHTvQaAWRrTSZ3P6Xo
+ HDDqFzvShjPepU6hCv2XR/id3Beqg0GbzoTfSuqitXdU7yDzsljFVrX4vt6lDrtlfWXPN1sjr
+ tjON3rwZjsNu7y+dLBYEPHBtwOUNC7eaTOJVanCIbc/TndB5eo1ch8n8D8GcHyg16LcLrVU4V
+ P7XY7cfT4k5ZGYlAA4zvp/aw==
 
-The netconsole selftest relies on the availability of the netdevsim module.
-To ensure the test can run correctly, we need to check if the netdevsim
-module is either loaded or built-in before proceeding.
+=E2=80=A6
+> Consider the following execution scenario:
+>
+>   chcr_ktls_cpl_act_open_rpl()   //641
+>     u_ctx =3D adap->uld[CXGB4_ULD_KTLS].handle;   //686
+>     if (u_ctx) {  //687
+>     complete(&tx_info->completion);  //704
+>
+> The variable u_ctx is checked by an if statement at Line 687, which mean=
+s
+> it can be NULL. Then, complete() is called at Line 704, which will wake
+> up wait_for_completion_xxx().
+=E2=80=A6
 
-Update the netconsole selftest to check for the existence of
-the /sys/bus/netdevsim/new_device file before running the test. If the
-file is not found, the test is skipped with an explanation that the
-CONFIG_NETDEVSIM kernel config option may not be enabled.
+To which software revision would you like to refer here?
 
-Signed-off-by: Breno Leitao <leitao@debian.org>
----
- tools/testing/selftests/drivers/net/netcons_basic.sh | 7 ++++++-
- 1 file changed, 6 insertions(+), 1 deletion(-)
+How does the presented information fit to a statement like the following?
+https://elixir.bootlin.com/linux/v6.12-rc6/source/drivers/net/ethernet/che=
+lsio/inline_crypto/ch_ktls/chcr_ktls.c#L442
 
-diff --git a/tools/testing/selftests/drivers/net/netcons_basic.sh b/tools/testing/selftests/drivers/net/netcons_basic.sh
-index 182eb1a97e59f3b4c9eea0e5b9e64a7fff656e2b..b175f4d966e5056ddb62e335f212c03e55f50fb0 100755
---- a/tools/testing/selftests/drivers/net/netcons_basic.sh
-+++ b/tools/testing/selftests/drivers/net/netcons_basic.sh
-@@ -39,6 +39,7 @@ NAMESPACE=""
- # IDs for netdevsim
- NSIM_DEV_1_ID=$((256 + RANDOM % 256))
- NSIM_DEV_2_ID=$((512 + RANDOM % 256))
-+NSIM_DEV_SYS_NEW="/sys/bus/netdevsim/new_device"
- 
- # Used to create and delete namespaces
- source "${SCRIPTDIR}"/../../net/lib.sh
-@@ -46,7 +47,6 @@ source "${SCRIPTDIR}"/../../net/net_helper.sh
- 
- # Create netdevsim interfaces
- create_ifaces() {
--	local NSIM_DEV_SYS_NEW=/sys/bus/netdevsim/new_device
- 
- 	echo "$NSIM_DEV_2_ID" > "$NSIM_DEV_SYS_NEW"
- 	echo "$NSIM_DEV_1_ID" > "$NSIM_DEV_SYS_NEW"
-@@ -212,6 +212,11 @@ function check_for_dependencies() {
- 		exit "${ksft_skip}"
- 	fi
- 
-+	if [ ! -f "${NSIM_DEV_SYS_NEW}" ]; then
-+		echo "SKIP: file ${NSIM_DEV_SYS_NEW} does not exist. Check if CONFIG_NETDEVSIM is enabled" >&2
-+		exit "${ksft_skip}"
-+	fi
-+
- 	if [ ! -d "${NETCONS_CONFIGFS}" ]; then
- 		echo "SKIP: directory ${NETCONS_CONFIGFS} does not exist. Check if NETCONSOLE_DYNAMIC is enabled" >&2
- 		exit "${ksft_skip}"
+	if (u_ctx && u_ctx->detach)
+		goto out;
 
----
-base-commit: 4861333b42178fa3d8fd1bb4e2cfb2fedc968dba
-change-id: 20241108-netcon_selftest_deps-83f26456f095
 
-Best regards,
--- 
-Breno Leitao <leitao@debian.org>
+Would you eventually like to trace the control flow back any further
+for the data structure member =E2=80=9Chandle=E2=80=9D?
 
+Regards,
+Markus
 
