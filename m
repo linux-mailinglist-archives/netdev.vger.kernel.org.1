@@ -1,213 +1,133 @@
-Return-Path: <netdev+bounces-143251-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143252-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7577A9C1A07
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:11:44 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A0599C1A43
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:14:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 989F61C21E2E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:11:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AC271C22D6C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:14:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E7F51E0E15;
-	Fri,  8 Nov 2024 10:11:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E058C1E2303;
+	Fri,  8 Nov 2024 10:14:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="M/yN4eEN"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jFNAmN90"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [198.175.65.12])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 731181D3625
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 10:11:38 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.175.65.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4673F1E22F8
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 10:14:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731060700; cv=none; b=gI14zQtb1M4JOTtCi0AIq6gURt1pNSEMH/Fl3ZbeLDVHzlix0PGh+08swZNJLrHUacx2/GZJ3xTh1zsNDtNBc3HaGKsXtmm1g9cJbUeDRuJaxgWC6vuIOHNVYXh/wh6QlOmV/zXr4ufkeYFb2WgbU/wgaMnZ+hiVh2gWXBDBSjQ=
+	t=1731060867; cv=none; b=PHMppDrMPJbvVHlZDElKsa0tWEHKOm+plfU663d70fMvndvEpbWXMfmYTgP0rNa20qNF168pMG+jVWGWnkol4hfTy5Xi0at8/24k2siZuGhKnTsZf+2/o/jlPUJHGP9ovXC64N6QdEY0EAIGvN/+QCsqLX2AvubLe/BpQJj3e54=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731060700; c=relaxed/simple;
-	bh=2Y6XQh97IlEZAnUMaaCBRjgRl8DqV3hQ6hBhbo89D8k=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=jKml7YWqgMWb8jDqPLsUbxS9tNFFYupyKnh7IDKMk8ZJzNCcYon78C4YcXyjK3ah0XrsxvqS4hmP1OSronDqCgi0w4ZXxx3HWE6gnUvojJRo/vHqwv4DbIzaJ4q1J9R6Ph1N9v4YO9nM54b8ozokD6SDfQ8Liq7Y+4K3+zMJjXA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com; spf=none smtp.mailfrom=linux.intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=M/yN4eEN; arc=none smtp.client-ip=198.175.65.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=linux.intel.com
+	s=arc-20240116; t=1731060867; c=relaxed/simple;
+	bh=KRVHB01OEq83mExTpA4ZzpE7Xo88aH3410IvN5uxHWk=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nLC4aWeZ2X/mGhMAHG6MK6yRrMn7VgmLGKEh6JR0xktfLJbANTjSPpeHfPY3OjHWwCQyp1p/ETNH2MXT3hqsarKH6Dhtpu6DUL01zls1iQQdEbnWq/SPQzn0XrXDDvcKf4vaILV8UXyuYSFaFHifZevv25V6KsycLdNyMgY4sPY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jFNAmN90; arc=none smtp.client-ip=192.198.163.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731060698; x=1762596698;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=2Y6XQh97IlEZAnUMaaCBRjgRl8DqV3hQ6hBhbo89D8k=;
-  b=M/yN4eENCGwmtyRyz+vnq/Oo+2BRKHa6MTbEPE9aKc3nzvTolRYN9WJg
-   oMja6Ko5fSdAkiTPhLKBCzajRW+kNl+SeOKtvKer+Q/NGmvlsMcN/OjVs
-   r5nidHjKmTUBHT0VnM2E9qRh/cuBGwwwQ9RbGy6TW4UMN+mFZdmi+jWQc
-   FDTOZq6PtG2qh8qaTxxX+Yts+XBCqW8sNpkB+SzBaFljQzzkju7BHNsf8
-   2YaQRvAS53IJ5SeRPvD0k8n+3wB/74lcYrjda36DhjbhU8p9kygV6es5P
-   784uE8VepVBgfyBSOxmG+MO7sjjh4991XwTP2AnVZRu0+FsLcQPgOaBHv
-   A==;
-X-CSE-ConnectionGUID: x61Syf17QrSUNIhXaphEnA==
-X-CSE-MsgGUID: fIcSBDDWSg+tpQavX2Q7fw==
-X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="42337159"
+  t=1731060866; x=1762596866;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=KRVHB01OEq83mExTpA4ZzpE7Xo88aH3410IvN5uxHWk=;
+  b=jFNAmN905TUU1lontrzGONogzpYur48rqfUTI2+F1Q/7/TtQpNnlqTo/
+   8wKuYKSJKuWwVR+GC3SpXsD9fhmyUMUG4nAcdExtA1S44X463sYtQHvhS
+   tJhJJKpJQeamoFUTXkf1hwuIJfK39DLQjv+8Wz6yLO4VYb5FcpsSA83lo
+   wcqt8JbnkivFP4qaWzDj4HvCcLyuGtNG8hv6CwnzNi+zXFFlhn68g2HGH
+   EesAb+Eueav+UvoukvT1SJwtuixSN5mwYmmkXuO3GCUFBHSTDhhAOGpS7
+   INljbk54Kohw4EhqkYuTGU001qPxyTk+idQNj7OGgL9LpSGTBuB1XMR/d
+   Q==;
+X-CSE-ConnectionGUID: AUbDmGYsTFSk3x8MbXu6+g==
+X-CSE-MsgGUID: Kt6bvH4CTk2yYbf9dwHM5A==
+X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="42325333"
 X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="42337159"
-Received: from fmviesa004.fm.intel.com ([10.60.135.144])
-  by orvoesa104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 02:11:35 -0800
-X-CSE-ConnectionGUID: GoPS3B+tRh+SvriJNAGP1A==
-X-CSE-MsgGUID: belM6j1+TPK6T86HO2nXAg==
+   d="scan'208";a="42325333"
+Received: from orviesa008.jf.intel.com ([10.64.159.148])
+  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 02:14:26 -0800
+X-CSE-ConnectionGUID: jXuftAS4TxG03mCX4Ey3rQ==
+X-CSE-MsgGUID: HrTigdLPRmSy8m+J1iuT3A==
 X-ExtLoop1: 1
 X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="90133195"
-Received: from mev-dev.igk.intel.com ([10.237.112.144])
-  by fmviesa004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 02:11:34 -0800
-Date: Fri, 8 Nov 2024 11:08:50 +0100
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
-Cc: "intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"Szycik, Marcin" <marcin.szycik@intel.com>,
-	"Kitszel, Przemyslaw" <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [iwl-next v1] ice: add recipe priority check
- in search
-Message-ID: <Zy3jMhc4Bt1AYXod@mev-dev.igk.intel.com>
-References: <20241011070328.45874-1-michal.swiatkowski@linux.intel.com>
- <PH0PR11MB50136A29D7ED13173A313FC2965C2@PH0PR11MB5013.namprd11.prod.outlook.com>
+   d="scan'208";a="86296723"
+Received: from pae-dbg-r750-02-263.igk.intel.com ([172.28.191.215])
+  by orviesa008.jf.intel.com with ESMTP; 08 Nov 2024 02:14:25 -0800
+From: Przemyslaw Korba <przemyslaw.korba@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	przemyslaw.kitszel@intel.com,
+	Przemyslaw Korba <przemyslaw.korba@intel.com>
+Subject: [PATCH iwl-net] ice: fix PHY timestamp extraction for ETH56G
+Date: Fri,  8 Nov 2024 11:14:19 +0100
+Message-Id: <20241108101419.66920-1-przemyslaw.korba@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <PH0PR11MB50136A29D7ED13173A313FC2965C2@PH0PR11MB5013.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: 7bit
 
-On Thu, Nov 07, 2024 at 12:06:26PM +0000, Buvaneswaran, Sujai wrote:
-> > -----Original Message-----
-> > From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
-> > Michal Swiatkowski
-> > Sent: Friday, October 11, 2024 12:33 PM
-> > To: intel-wired-lan@lists.osuosl.org
-> > Cc: netdev@vger.kernel.org; Szycik, Marcin <marcin.szycik@intel.com>;
-> > Kitszel, Przemyslaw <przemyslaw.kitszel@intel.com>
-> > Subject: [Intel-wired-lan] [iwl-next v1] ice: add recipe priority check in search
-> > 
-> > The new recipe should be added even if exactly the same recipe already
-> > exists with different priority.
-> > 
-> > Example use case is when the rule is being added from TC tool context.
-> > It should has the highest priority, but if the recipe already exists the rule will
-> > inherit it priority. It can lead to the situation when the rule added from TC
-> > tool has lower priority than expected.
-> > 
-> > The solution is to check the recipe priority when trying to find existing one.
-> > 
-> > Previous recipe is still useful. Example:
-> > RID 8 -> priority 4
-> > RID 10 -> priority 7
-> > 
-> > The difference is only in priority rest is let's say eth + mac + direction.
-> > 
-> > Adding ARP + MAC_A + RX on RID 8, forward to VF0_VSI After that IP +
-> > MAC_B + RX on RID 10 (from TC tool), forward to PF0
-> > 
-> > Both will work.
-> > 
-> > In case of adding ARP + MAC_A + RX on RID 8, forward to VF0_VSI ARP +
-> > MAC_A + RX on RID 10, forward to PF0.
-> > 
-> > Only second one will match, but this is expected.
-> > 
-> > Reviewed-by: Marcin Szycik <marcin.szycik@linux.intel.com>
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > ---
-> >  drivers/net/ethernet/intel/ice/ice_switch.c | 3 ++-
-> >  1 file changed, 2 insertions(+), 1 deletion(-)
-> > 
-> 
-> Hi,
-> 
-> I tried configuring two rules with same match parameters but with different priorities. One rule redirecting the PF traffic to VF_PR1 and other one to VF_PR2.
-> 
-> In this case, I notice that both the VFs are able to receive the same packet from the PF. Can you please confirm if this is expected?
-> 
-> Below are the rules (1 and 3) used.
-> 
-> [root@cbl-mariner ~]# tc filter show dev ens5f0np0 root
-> filter ingress protocol ip pref 1 flower chain 0 
-> filter ingress protocol ip pref 1 flower chain 0 handle 0x1 
->   dst_mac 52:54:00:00:16:01
->   src_mac b4:96:91:9f:65:58
->   eth_type ipv4
->   skip_sw
->   in_hw in_hw_count 1
->         action order 1: mirred (Egress Redirect to device eth0) stolen
->         index 5 ref 1 bind 1
-> 
-> filter ingress protocol ip pref 1 flower chain 0 handle 0x2 
->   dst_mac 52:54:00:00:16:02
->   src_mac b4:96:91:9f:65:58
->   eth_type ipv4
->   skip_sw
->   in_hw in_hw_count 1
->         action order 1: mirred (Egress Redirect to device eth1) stolen
->         index 6 ref 1 bind 1
-> 
-> filter ingress protocol ip pref 7 flower chain 0 
-> filter ingress protocol ip pref 7 flower chain 0 handle 0x1 
->   dst_mac 52:54:00:00:16:01
->   src_mac b4:96:91:9f:65:58
->   eth_type ipv4
->   skip_sw
->   in_hw in_hw_count 1
->         action order 1: mirred (Egress Redirect to device eth1) stolen
->         index 7 ref 1 bind 1
-> 
-> Packet captures:
-> [root@cbl-mariner ~]# ip netns exec ns1 tcpdump -i ens5f0v0
-> dropped privs to tcpdump
-> tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
-> listening on ens5f0v0, link-type EN10MB (Ethernet), capture size 262144 bytes
-> 15:21:21.428973 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 8001.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.428986 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 8001.18:5a:58:a3:1c:e0.8060, length 43
-> 15:21:21.429001 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83e8.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.429012 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83e9.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.429016 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83ea.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.429029 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83eb.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.429039 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 80c8.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.944173 IP 1.1.1.100 > cbl-mariner: ICMP echo request, id 7, seq 4268, length 64
-> 15:21:21.944182 IP cbl-mariner > 1.1.1.100: ICMP echo reply, id 7, seq 4268, length 64
-> ^C
-> 9 packets captured
-> 9 packets received by filter
-> 0 packets dropped by kernel
-> 
-> [root@cbl-mariner ~]# ip netns exec ns2 tcpdump -i ens5f0v1
-> dropped privs to tcpdump
-> tcpdump: verbose output suppressed, use -v or -vv for full protocol decode
-> listening on ens5f0v1, link-type EN10MB (Ethernet), capture size 262144 bytes
-> 15:21:21.429028 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83eb.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.429040 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 80c8.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:21.944170 IP 1.1.1.100 > 1.1.1.1: ICMP echo request, id 7, seq 4268, length 64
-> 15:21:22.968162 IP 1.1.1.100 > 1.1.1.1: ICMP echo request, id 7, seq 4269, length 64
-> 15:21:23.432386 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 8001.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:23.432403 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 8001.18:5a:58:a3:1c:e0.8060, length 43
-> 15:21:23.432430 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83e8.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:23.432472 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83e9.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:23.432508 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83ea.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:23.432549 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 83eb.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:23.432588 STP 802.1w, Rapid STP, Flags [Proposal, Learn, Forward, Agreement], bridge-id 80c8.18:5a:58:a3:1c:e0.8060, length 42
-> 15:21:23.992156 IP 1.1.1.100 > 1.1.1.1: ICMP echo request, id 7, seq 4270, length 64
-> 
+Fix incorrect PHY timestamp extraction for ETH56G.
+It's better to use FIELD_PREP() than manual shift.
 
-Hi,
+Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
+---
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 3 ++-
+ drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 5 ++---
+ 2 files changed, 4 insertions(+), 4 deletions(-)
 
-Yes, it is expected. We don't support different priority from tc yet, so
-no matter what priority from tc you will choose it will be programmed
-with the same priority in hw.
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+index ec8db830ac73..3816e45b6ab4 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
+@@ -1495,7 +1495,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
+ 	 * lower 8 bits in the low register, and the upper 32 bits in the high
+ 	 * register.
+ 	 */
+-	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
++	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) |
++		  FIELD_PREP(TS_PHY_LOW_M, lo);
+ 
+ 	return 0;
+ }
+diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+index 6cedc1a906af..4c8b84571344 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
++++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
+@@ -663,9 +663,8 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
+ #define TS_HIGH_M			0xFF
+ #define TS_HIGH_S			32
+ 
+-#define TS_PHY_LOW_M			0xFF
+-#define TS_PHY_HIGH_M			0xFFFFFFFF
+-#define TS_PHY_HIGH_S			8
++#define TS_PHY_LOW_M			GENMASK(7, 0)
++#define TS_PHY_HIGH_M			GENMASK_ULL(39, 8)
+ 
+ #define BYTES_PER_IDX_ADDR_L_U		8
+ #define BYTES_PER_IDX_ADDR_L		4
 
-Thanks,
-Michal
+base-commit: 333b8b2188c495a2a1431b5e0d51826383271aad
+-- 
+2.31.1
 
-> Regards,
-> Sujai B
+---------------------------------------------------------------------
+Intel Technology Poland sp. z o.o.
+ul. Slowackiego 173 | 80-298 Gdansk | Sad Rejonowy Gdansk Polnoc | VII Wydzial Gospodarczy Krajowego Rejestru Sadowego - KRS 101882 | NIP 957-07-52-316 | Kapital zakladowy 200.000 PLN.
+Spolka oswiadcza, ze posiada status duzego przedsiebiorcy w rozumieniu ustawy z dnia 8 marca 2013 r. o przeciwdzialaniu nadmiernym opoznieniom w transakcjach handlowych.
+
+Ta wiadomosc wraz z zalacznikami jest przeznaczona dla okreslonego adresata i moze zawierac informacje poufne. W razie przypadkowego otrzymania tej wiadomosci, prosimy o powiadomienie nadawcy oraz trwale jej usuniecie; jakiekolwiek przegladanie lub rozpowszechnianie jest zabronione.
+This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). If you are not the intended recipient, please contact the sender and delete all copies; any review or distribution by others is strictly prohibited.
+
 
