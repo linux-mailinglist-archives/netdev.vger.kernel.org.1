@@ -1,153 +1,202 @@
-Return-Path: <netdev+bounces-143294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB4139C1D96
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:05:05 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68CD49C1DA3
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:09:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1742281005
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:05:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC5571C22B89
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:09:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75C5E1E6DE1;
-	Fri,  8 Nov 2024 13:05:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2ED531EABA9;
+	Fri,  8 Nov 2024 13:09:31 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="fmTlRMxy"
 X-Original-To: netdev@vger.kernel.org
-Received: from szxga05-in.huawei.com (szxga05-in.huawei.com [45.249.212.191])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6E26137E;
-	Fri,  8 Nov 2024 13:04:56 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.191
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58AD81E491C;
+	Fri,  8 Nov 2024 13:09:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.41
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731071102; cv=none; b=KdqrfwOKkgMuYMKuGYKHgK/TaJJXUXdMkhf14hviFFD8WvkdwsKL05APHkE01YoNmBNf9ZYcQ/Dk2MYSUlw1qmPk+fq9Z4+2cYixpQ3wJx3py/uQzwrVC2C/5PLTIUZt3wWjXfBLMJj8BgnIj9nOHFmVS4Erto3GGstphoOfRco=
+	t=1731071371; cv=none; b=md6B9PGnDZuv0Exo/aF6wJRGODEMiF66C2e6STxQh8yElGA2cE4LjCU0QtgRZypZcLzvKtZ7bG7sGoQO9Ioz6NjDkkt3PznVroUGTIhM8FBFhqEEL1plFp0KiM5PaNE7DpCCr0LIVbI94TQ7pBVl3JEbWlOHHki6z8WEfUaxPTU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731071102; c=relaxed/simple;
-	bh=2AOlYv8ayTsCQQtVAPbIcw2HzPkTXhqQUHLcby5hhMc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:CC:References:From:
-	 In-Reply-To:Content-Type; b=cG/NLHIJb9eBhRlJPXtphk+EwKYlRizcRuuEikIGFGDMS67tvP2vM6XwJ0dT1GWSiHPi06wyzbG/pC1c/AcG3X5cy5Fl0FiBMJXqD89CRIe5xBnWvdsR/gcQrTvcLqUtC9OwBH82DA7iJRmiP94551dE1GwppEYGjSkTBv+Sghc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com; spf=pass smtp.mailfrom=huawei.com; arc=none smtp.client-ip=45.249.212.191
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=huawei.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huawei.com
-Received: from mail.maildlp.com (unknown [172.19.163.17])
-	by szxga05-in.huawei.com (SkyGuard) with ESMTP id 4XlJvM37d5z1JCHw;
-	Fri,  8 Nov 2024 21:00:15 +0800 (CST)
-Received: from kwepemg200003.china.huawei.com (unknown [7.202.181.30])
-	by mail.maildlp.com (Postfix) with ESMTPS id CB7B51A0188;
-	Fri,  8 Nov 2024 21:04:53 +0800 (CST)
-Received: from [10.174.176.93] (10.174.176.93) by
- kwepemg200003.china.huawei.com (7.202.181.30) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.11; Fri, 8 Nov 2024 21:04:52 +0800
-Message-ID: <cc33931c-2821-4292-85db-86017de6afeb@huawei.com>
-Date: Fri, 8 Nov 2024 21:04:51 +0800
+	s=arc-20240116; t=1731071371; c=relaxed/simple;
+	bh=7wPSME1yvHU9R3fhuU7nAzygr3P2SjWow4X8OI/HRUc=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=tjrm3ZZyJLuRrCNlYjb/vbJp7mPWVgfB971191peho+16HBAQnGNqUAmXGoiDgOI64Qhoodw2oVdtQjLajUyV4vbhBZkYA6SePpPl/8+xe95CJo4usTUaizAwrXrBhq851EhZUgCEvQzMRJhvleGzmhk062RcGCwNyqsd1kzuN4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=fmTlRMxy; arc=none smtp.client-ip=209.85.221.41
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-37d4c482844so1326785f8f.0;
+        Fri, 08 Nov 2024 05:09:29 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731071368; x=1731676168; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=F9iLMWxrxAZ1l6R46sN9fOYiE6mHClhuivBfFEnygig=;
+        b=fmTlRMxyTJYahSGz8XKbrFIcP+lXsd0yGiakVpbEF2tD1IjGG1WUthfxXp4Tr8zH39
+         2/cxt14Pc8+ZOPREA3qJS59jgJ6ES8aDTTHUrPblAesBvO2IuHSauC6g1FRKK2KnBmXc
+         b0AxwG/l5JhJNzWKr+OuhmKZM79gQBIjOxUPkUmNC/01TY0r2iLKg2sHofiMmFAbxxlR
+         R/BYjE8VEJA6NYYp1XhZN44BAM/VT+WQwURwOXmPJHca7OvL50m9Ay8BDrWA+98127kn
+         8DOS3SGSNGpYEpkWY1EdaE71x+FZDaB4zlm9E5ElpYwE6iwK5hZ8d12C14VMzduwV4WR
+         Bfcw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731071368; x=1731676168;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=F9iLMWxrxAZ1l6R46sN9fOYiE6mHClhuivBfFEnygig=;
+        b=ZWdlNLUBwbmXiH1HVmcozu/x0b08IjmoK8b7gGBjKikQuhDqMX4BLUEJ7QA8d8K8Qd
+         ks0svptidh4/kxlks+3VpycIfdQWTNtgJFA+op92R44bpsItenN1yvexs7h4NkOpptJR
+         5LWJZabwKYrce4skLWC4Qv7i0bYuAyiXesfT/6iVDFiQswD82dbxKFIY1qI5ETqoe//+
+         2lxt6Q2W6aG0UwFWLCSSYgVzcw12PwAZlh8zd7xGg6UI7NnyeB9EQnlSQP8Lmti6ugLB
+         7UiFBvLVvBQBLFA7CA8pg7FHGErDtY6/C9pdWzarZ9Lpy9RtHbZj7VK1JTmLsFOKzbYp
+         yJkA==
+X-Forwarded-Encrypted: i=1; AJvYcCVH1V5vTysbeyS0sdoa5TPnV/OFJ3umsyhYZ76p+QlJWzhJx2UkTtQQZR4N1IKhaYeRc/sq1mE1@vger.kernel.org, AJvYcCWaZzRLjCqV9eQOEJNjDZXLxT7OQWp3E3WHtfNsRE4aDCzRUgS8HtUYMqEKTrAPe3adQ8vpOaJqLOJs@vger.kernel.org, AJvYcCWnLszoKhNVxskMo/+LkC/DxcIc8VNic+h45fk6N7FaVxtFEEYNDGJU6TBB5AVpgK/HEIS94gRx6zhao7ZF@vger.kernel.org
+X-Gm-Message-State: AOJu0YwxJ9Xi083Y7+DNzqxv20UO3wD4o7Y/DjgbFi5f5MfBzn/eWS+v
+	kV7+VI9gH4PXD+gNWvE/yg24IbZF9EphseTBpgW3zi3Ff723xXrE
+X-Google-Smtp-Source: AGHT+IGn8e7+hz9DFcsUdMnK7TZj6vrjAuQ+ZZHeOp4IPyI4ISngIYwwvEId7eCxCw595dz7+N8oSA==
+X-Received: by 2002:a05:6000:18a7:b0:37d:52d0:a59d with SMTP id ffacd0b85a97d-381f18672fdmr2224309f8f.10.1731071367308;
+        Fri, 08 Nov 2024 05:09:27 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381eda0517csm4724320f8f.96.2024.11.08.05.09.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 05:09:26 -0800 (PST)
+Message-ID: <672e0d86.050a0220.9eb0d.c3e1@mx.google.com>
+X-Google-Original-Message-ID: <Zy4Ngmvg2sE1SOJK@Ansuel-XPS.>
+Date: Fri, 8 Nov 2024 14:09:22 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v3 3/3] net: phy: Add Airoha AN8855 Internal
+ Switch Gigabit PHY
+References: <20241106122254.13228-1-ansuelsmth@gmail.com>
+ <20241106122254.13228-4-ansuelsmth@gmail.com>
+ <Zy3xaviqqT6X8Ows@shell.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] sunrpc: fix one UAF issue caused by sunrpc kernel
- tcp socket
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: <Dai.Ngo@oracle.com>, <anna@kernel.org>, <chuck.lever@oracle.com>,
-	<davem@davemloft.net>, <ebiederm@xmission.com>, <edumazet@google.com>,
-	<geert+renesas@glider.be>, <jlayton@kernel.org>, <kuba@kernel.org>,
-	<linux-nfs@vger.kernel.org>, <neilb@suse.de>, <netdev@vger.kernel.org>,
-	<ofir.gal@volumez.com>, <okorniev@redhat.com>, <pabeni@redhat.com>,
-	<tom@talpey.com>, <trondmy@kernel.org>
-References: <78efbd6e-31e5-4e67-a046-2736747b291d@huawei.com>
- <20241107205952.7992-1-kuniyu@amazon.com>
-From: "liujian (CE)" <liujian56@huawei.com>
-In-Reply-To: <20241107205952.7992-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- kwepemg200003.china.huawei.com (7.202.181.30)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <Zy3xaviqqT6X8Ows@shell.armlinux.org.uk>
 
+On Fri, Nov 08, 2024 at 11:09:30AM +0000, Russell King (Oracle) wrote:
+> On Wed, Nov 06, 2024 at 01:22:38PM +0100, Christian Marangi wrote:
+> > +/* MII Registers Page 1 */
+> > +#define AN8855_PHY_EXT_REG_14			0x14
+> > +#define   AN8855_PHY_EN_DOWN_SHFIT		BIT(4)
+> 
+> Shouldn't "AN8855_PHY_EN_DOWN_SHFIT" be "AN8855_PHY_EN_DOWN_SHIFT"
+> (notice the I and F are swapped) ?
+>
 
+Typo from SDK that I didn't notice fun.
 
-在 2024/11/8 4:59, Kuniyuki Iwashima 写道:
-> From: "liujian (CE)" <liujian56@huawei.com>
-> Date: Thu, 7 Nov 2024 20:03:40 +0800
->>>> diff --git a/net/socket.c b/net/socket.c
->>>> index 042451f01c65..e64a02445b1a 100644
->>>> --- a/net/socket.c
->>>> +++ b/net/socket.c
->>>> @@ -1651,6 +1651,34 @@ int sock_create_kern(struct net *net, int family, int type, int protocol, struct
->>>>    }
->>>>    EXPORT_SYMBOL(sock_create_kern);
->>>>    
->>>> +int sock_create_kern_getnet(struct net *net, int family, int type, int proto, struct socket **res)
->>>> +{
->>>> +	struct sock *sk;
->>>> +	int ret;
->>>> +
->>>> +	if (!maybe_get_net(net))
->>>> +		return -EINVAL;
->>>
->>> Is this really safe ?
->>>
->>> IIUC, maybe_get_net() is safe for a net only when it is fetched under
->>> RCU, then rcu_read_lock() prevents cleanup_net() from reusing the net
->>> by rcu_barrier().
->>>
->>> Otherwise, there should be a small chance that the same slab object is
->>> reused for another netns between fetching the net and reaching here.
->>>
->>> svc_create_socket() is called much later after the netns is fetched,
->>> and _svc_xprt_create() calls try_module_get() before ->xpo_create().
->>> So, it seems the path is not under RCU and maybe_get_net() must be
->>> called much earlier by each call site.
->>>
->>> For this reason, when I write a patch for the same issue in CIFS,
->>> I delayed put_net() to cifsd kthread so that the netns refcnt taken
->>> for each CIFS server info lives until the last __sock_create() attempt
->>> from cifsd.
->>>
->>> https://lore.kernel.org/linux-cifs/20241102212438.76691-1-kuniyu@amazon.com/
->>>
->> Okay, got it. thank you.
->> Looking at the nfs and nfsd processing flow, it seems that the call to
->> __sock_create() to create a TCP socket is always after the mount
->> operation get_net(). So it should be fine to use get_net() directly.
+> > +static int an8855_get_downshift(struct phy_device *phydev, u8 *data)
+> > +{
+> > +	int saved_page;
+> > +	int val;
+> > +	int ret;
+> > +
+> > +	saved_page = phy_select_page(phydev, AN8855_PHY_PAGE_EXTENDED_1);
+> > +	if (saved_page >= 0)
+> > +		val = __phy_read(phydev, AN8855_PHY_EXT_REG_14);
+> > +	ret = phy_restore_page(phydev, saved_page, val);
+> > +	if (ret)
+> > +		return ret;
 > 
-> Is there any chance that a concurrent unmount releases the
-> last refcount by put_net() while another thread trying to call
-> __sock_create() ?
+> This function is entirely broken.
 > 
-> CIFS was the case.
+> phy_restore_page() will return "val" if everything went successfully,
+> so here you end up returning "val" via this very return statement
+> without executing any further code in the function. The only time
+> further code will be executed is if "val" was successfully read as
+> zero.
 > 
+> Please use the helpers provided:
 > 
->> So
->> here I'm going to change may_get_net() to get_net(), move
->> sock_create_kern_getnet() to the sunrpc module, and rename it to
->> something more appropriate. Is that okay?
+> 	ret = phy_read_paged(phydev, AN8855_PHY_PAGE_EXTENDED_1,
+> 			     AN8855_PHY_EXT_REG_14);
+> 	if (ret < 0)
+> 		return ret;
 > 
-> Could you go without adding a helper and do the conversion in sunrpc
-> code as CIFS did ?
-> 
-Ok, I will send v3 as you said.
-Looking forward to your changes as described below.
-Thank you.
+> ret now contains what you're using as "val" below. No need to open code
+> phy_read_paged().
 
-> I plan to resurrect my patch and remove such socket conversion altogether
-> in the next cycle after the CIFS fix lands on net-next.
+Thanks for the explaination, totally got confused by reading the
+restore_page code. Anyway yes I will use the helper.
+
 > 
-> https://lore.kernel.org/netdev/20240227011041.97375-4-kuniyu@amazon.com/
-> https://github.com/q2ven/linux/commits/427_2
-> https://github.com/q2ven/linux/commit/2e54a8cc84f1e9ce60a0e4693c79a8e74c3dbeb9
+> > +
+> > +	*data = val & AN8855_PHY_EXT_REG_14 ? DOWNSHIFT_DEV_DEFAULT_COUNT :
+> > +					      DOWNSHIFT_DEV_DISABLE;
 > 
-> I inspected all the callers of __sock_create() and friends, and all
-> __sock_create() can be replaced with sock_create_kern(), so I will
-> unexport __sock_create() and then add a new parameter hold_net to it.
+> Here, the test is against the register number rather than the bit that
+> controls downshift. Shouldn't AN8855_PHY_EXT_REG_14 be
+> AN8855_PHY_EN_DOWN_SH(F)I(F)T ?
+
+Copy paste error, was already staged to fix, thanks for extra eye on
+this.
+
 > 
-> Then, I'll rename sock_create_kern() to sock_create_net_noref() and add
-> a fat comment to catch in-kernel users attention so that they no longer
-> use _kern() API blindly without care about netns reference.  Also, I'll
-> add sock_create_net() and use it for MPTCP, SMC, CIFS, (and sunrpc) etc.
+> > +static int an8855_set_downshift(struct phy_device *phydev, u8 cnt)
+> > +{
+> > +	int saved_page;
+> > +	int ret;
+> > +
+> > +	saved_page = phy_select_page(phydev, AN8855_PHY_PAGE_EXTENDED_1);
+> > +	if (saved_page >= 0) {
+> > +		if (cnt != DOWNSHIFT_DEV_DISABLE)
+> > +			ret = __phy_set_bits(phydev, AN8855_PHY_EXT_REG_14,
+> > +					     AN8855_PHY_EN_DOWN_SHFIT);
+> > +		else
+> > +			ret = __phy_clear_bits(phydev, AN8855_PHY_EXT_REG_14,
+> > +					       AN8855_PHY_EN_DOWN_SHFIT);
+> > +	}
+> > +
+> > +	return phy_restore_page(phydev, saved_page, ret);
 > 
-> RDS uses maybe_net_get() but I think this is still buggy and I need
-> to check more.
+> This entire thing can be simplified to:
+> 
+> 	u16 ds = cnt != DOWNSHIFT_DEV_DISABLE ? AN8855_PHY_EN_DOWN_SHFIT: 0;
+> 
+> 	return phy_modify_paged(phydev, AN8855_PHY_PAGE_EXTENDED_1,
+> 				AN8855_PHY_EXT_REG_14, AN8855_PHY_EN_DOWN_SHFIT,
+> 				ds);
+
+Funnly in rechecking I produced the same exact change.
+
+> 
+> Thanks.
+
+Thanks to you for the review.
+
+> 
+> -- 
+> RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+> FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
+-- 
+	Ansuel
 
