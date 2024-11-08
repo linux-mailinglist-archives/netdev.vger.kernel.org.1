@@ -1,122 +1,119 @@
-Return-Path: <netdev+bounces-143355-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 593DC9C2240
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:38:58 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A93F9C2267
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:48:34 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1CF65288171
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:38:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F4A1282F90
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:48:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0BDA192B71;
-	Fri,  8 Nov 2024 16:38:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514A5199FAD;
+	Fri,  8 Nov 2024 16:47:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IxXCSOX2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="LzXA8GiZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f48.google.com (mail-ed1-f48.google.com [209.85.208.48])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AB28187FE4;
-	Fri,  8 Nov 2024 16:38:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.48
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A24FD1990C2
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:47:16 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731083932; cv=none; b=pcOUkSbKhwyzi7X7Qb6zL1hg4U23E33MnGIYEj1NiDR5vgAYARaSdfoMalcO239xKTfjdPr1O9hhVIZznEdOdQLulkjPdC6oUDC526r6Se3gBXjleMKZ9M5YDqnFJxPjNei0ZF+hNQqdhENu4HCg1V5ULxIy5tZ7HPRULtXLfiA=
+	t=1731084438; cv=none; b=Y3J4lkoV48P5gZ9eiE/k4sjvq9p6VWINbZk4gRqffumHoZW+m4uLCEHBmsa8FEwbw3IJiM6T+JrZnENsZhFaohOaaqoTzsPI6lwBMohpK/mltzlcVxeIMAXboO4oC35x6snO2rwtixW6gz2kF/sIbBoyX6KcvhGngwOPXLZM1fE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731083932; c=relaxed/simple;
-	bh=7y4w4g6pgWRAHU+RtQvNlJKKobnxl/GwhamPedecqyE=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qHaq6+WZznIPl6deCmndkS3VKHqiIcAJ5RwyZc48UeVXlymZ8cE18+tiqMz8MSslkTCVFqz5pZv6nNSil9E7DvVaq+9hVqEIZAbtVwrdFI0K6SCywjwOEdk80cM+fmT/vR98Dfc5h8o9kwtI33gn4J8PbwDXkv41N7CLNvrhAuU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IxXCSOX2; arc=none smtp.client-ip=209.85.208.48
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-ed1-f48.google.com with SMTP id 4fb4d7f45d1cf-5c95a962c2bso3458878a12.2;
-        Fri, 08 Nov 2024 08:38:50 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731083929; x=1731688729; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=jlsZwZjrrzoO7w76Bo0+/+iTbPjQm3oJ8vaYxJX0b9M=;
-        b=IxXCSOX2ruTUyTu3ZV5Z9wn4+jxeElpvTwYjRIEZT2K4LLoNl6uqkvhx+Ai1NPl5Bw
-         2yP5SQfP4Eb8UQnctn7cxH4YJRXWtLPOb6tcxVjf0+mon83e50ZaPAvZUAHWQWojeW1N
-         /kNKV0OzpRmHLJA6Y6JfgCOHTuyWRl/9lA1RZcDw1gg/B/ValG4YO32EwBlKykccxwVj
-         fw4D0gWmJqZYSELKMmPX5XwoZ17x20mZkS9z+sAE3B5562ISETBeDHN3KOdaDYhXhRTa
-         jiw4lIcEJ+UytQ/ly+uvsg+T2KW3rHS5Yg4Nk5p+X27WW3cVA9wIID19hHCUH47oiZRW
-         IpAg==
+	s=arc-20240116; t=1731084438; c=relaxed/simple;
+	bh=0lLMdGizi93nijTSwK9kWAvMKhLEV+7wHUhXjPx6HlY=;
+	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
+	 Content-Disposition; b=LBhCaFakNskiT5Shm/cfX9Svvtahkm9iYXeDedHkta3XdgNy3l1mLiqweK6KjfNWExIPYwJ7RSwaxSiP+xhAl0YAEY966s3roGBi7VzX3jk7E11xfkE5EvQx9kL2Fe4FZBq66DNSKQl+ZqcG//1NO1NO1IUOx8soY0yEExgyUwY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=LzXA8GiZ; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731084435;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=9RDh7MpNoknOhG/SnT1LyEVJ9M4KJkBIbyiebXiQISA=;
+	b=LzXA8GiZggr2hfM+4qE2fM8bpU0IsPgRS+tmfxxIe2eshi5FlEMnWN046ZzCENECKiCoKs
+	h7+fq8zN0uVhUiTUaEpGYhQzMO/7ZawtB+c23HKaIb+/IPvm1ZkuoEYgzFYmSxHSbH3SOt
+	GFd2MC85rzRI2WtqHEgrlWM3wVgbvDk=
+Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
+ [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-52-_YFY3X98O1uDhkq7xzN0fA-1; Fri, 08 Nov 2024 11:47:14 -0500
+X-MC-Unique: _YFY3X98O1uDhkq7xzN0fA-1
+X-Mimecast-MFC-AGG-ID: _YFY3X98O1uDhkq7xzN0fA
+Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-43159603c92so16006465e9.2
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 08:47:13 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731083929; x=1731688729;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20230601; t=1731084432; x=1731689232;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=jlsZwZjrrzoO7w76Bo0+/+iTbPjQm3oJ8vaYxJX0b9M=;
-        b=BKs7cY17oOaPVoJuquTGG5i2hQyNSPY6ZPRl4xXAvahZmNJzJFMHMMo5NSAID1Pzbk
-         eeZBJxY59khS7iBT817OvciAl8VzRL7r9qYfcTvm+fv/9fGxZU4T5FK30mikwNO3cdWd
-         4HCJy0P9UewFfVA5ywNNBX/IpN2y44fmwhWsL2plbZQ8LHoqQoJIc/ypYlx8SU+Dg3XZ
-         e1hR1uEv7y4Y3WJ1m+rixKV2fVerZb9WrzZx1cfMcJ2J8L9ohRT7yfDgJjx8kup6ed1U
-         vhPRmbQu5AnWhsjH94950btemYLJ70kgAP8vr8mTvl4Zlayf19UHeZaPg84OTLJtGGMl
-         zFDg==
-X-Forwarded-Encrypted: i=1; AJvYcCV5Kcsqa5uVVkEz1TabfB0vq24LacfRbyCOPk8n6PjuRjZwb+iGbNaAteG5cuvhtLO3uru42yhb@vger.kernel.org, AJvYcCXoYNpg8TDk0Hpv/KeZDL5/dt1tgZDYCzsEpYRLwpCX4IpGR8RVIyk81pZBz6Zoa4MLpG5xYxDpTuFszaw=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzhnWIrjAXUbetOjkZiXpoyZzJf3c+VU4TLXzGAxIjKIwlkqqIJ
-	3nbHbuSrz/OArOB+/A4UPvZBc3pEZVjw/fwqctHs983oDuARORtV
-X-Google-Smtp-Source: AGHT+IET5sHmbMXQeci2ReHEWkG02ZQBs2HtSFnqm6Pl/jyBOM5N3GMLbQdvlK6FGBhPgQ34FisNiA==
-X-Received: by 2002:a50:d5c7:0:b0:5cf:f82:edfd with SMTP id 4fb4d7f45d1cf-5cf0f82eebdmr2490202a12.3.1731083929280;
-        Fri, 08 Nov 2024 08:38:49 -0800 (PST)
-Received: from [192.168.42.14] ([85.255.233.6])
-        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03c4ecaesm2141142a12.70.2024.11.08.08.38.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 08:38:48 -0800 (PST)
-Message-ID: <39597ca8-11e4-4c1d-9970-1c73f1f5c62d@gmail.com>
-Date: Fri, 8 Nov 2024 16:39:34 +0000
+        bh=9RDh7MpNoknOhG/SnT1LyEVJ9M4KJkBIbyiebXiQISA=;
+        b=WmTrGBXGZG/G2AqKIPj9+u7LO8p+aAz91FBBBEIq4V+lUjhyklYBOPCQFH/q0I4exJ
+         tu1gdV6uFuEoYGjypDAK0IZuVxRQN0PYH01/KdDQt4tu3ZnR+97U8ejBZOsVSFE9GNpw
+         NSPwXgprYq5Sr1REQyCapPKqg1Kw+5hkqVfG3rBzova9UynGJ8ARzdr4aPMQ/uYIGXvz
+         QDl+KB9MQtvM/t0vaCZ19i5smp0keYtGl6rTs5kUXhi3+djTMGXY0BXv94LHuy1m/tqn
+         UArbBFNhvsom79rTBLGsfSbTFXlRuWH0DhiW1s0RuVR3MZONPRLeV+eHJrrxYyEJXwMI
+         XbnQ==
+X-Gm-Message-State: AOJu0Yy4DLunCDIFKJyPoMTn1PNNo/wybggTAwumrpUEAQTzpYZ0wJPP
+	DDxw7JFa06v6wk48IyaFblSJ211bgzwhrgdrJ54TJ6rG9t6JGq6fmvVnsgz1Bfo/UCYYOqr/eQX
+	hGxzxpEejrU9W6T1srYiNjp9l92d9f7bYri8Ah40mcfkASbDjjlhrJg==
+X-Received: by 2002:a05:600c:1e03:b0:431:518a:683b with SMTP id 5b1f17b1804b1-432b7509b0emr31787265e9.18.1731084432319;
+        Fri, 08 Nov 2024 08:47:12 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IFfye8wQ+Ub3J2hSnZSk8IV9NqHWPlOvi2LP4ozJe+YluRNffApaKLtmgQ4CI8rzrfOsT+aFg==
+X-Received: by 2002:a05:600c:1e03:b0:431:518a:683b with SMTP id 5b1f17b1804b1-432b7509b0emr31787075e9.18.1731084432014;
+        Fri, 08 Nov 2024 08:47:12 -0800 (PST)
+Received: from debian (2a01cb058d23d60039a5c1e29a817dbe.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:39a5:c1e2:9a81:7dbe])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05e5d1bsm77791935e9.40.2024.11.08.08.47.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 08:47:11 -0800 (PST)
+Date: Fri, 8 Nov 2024 17:47:09 +0100
+From: Guillaume Nault <gnault@redhat.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, Simon Horman <horms@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Eduard Zingerman <eddyz87@gmail.com>, Song Liu <song@kernel.org>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@fomichev.me>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Ido Schimmel <idosch@nvidia.com>, bpf@vger.kernel.org
+Subject: [PATCH net-next 0/2] ipv4: Prepare bpf helpers to .flowi4_tos
+ conversion.
+Message-ID: <cover.1731064982.git.gnault@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
- dmabuf memory provider
-To: Stanislav Fomichev <stfomichev@gmail.com>, Jason Gunthorpe <jgg@ziepe.ca>
-Cc: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
- Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Kaiyuan Zhang <kaiyuanz@google.com>, Samiullah Khawaja
- <skhawaja@google.com>, linux-kernel@vger.kernel.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>
-References: <20241107212309.3097362-1-almasrymina@google.com>
- <20241107212309.3097362-5-almasrymina@google.com>
- <20241108141812.GL35848@ziepe.ca> <Zy41HkR5dDmjVJwl@mini-arch>
-Content-Language: en-US
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <Zy41HkR5dDmjVJwl@mini-arch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
-On 11/8/24 15:58, Stanislav Fomichev wrote:
-> On 11/08, Jason Gunthorpe wrote:
->> On Thu, Nov 07, 2024 at 09:23:08PM +0000, Mina Almasry wrote:
->>> dmabuf dma-addresses should not be dma_sync'd for CPU/device. Typically
->>> its the driver responsibility to dma_sync for CPU, but the driver should
->>> not dma_sync for CPU if the netmem is actually coming from a dmabuf
->>> memory provider.
->>
->> This is not completely true, it is not *all* dmabuf, just the parts of
->> the dmabuf that are actually MMIO.
->>
->> If you do this you may want to block accepting dmabufs that have CPU
->> pages inside them.
-> 
-> We still want udmabufs to work, so probably need some new helper to test
-> whether a particular netmem is backed by the cpu memory?
+Continue the process of making a dscp_t variable available when setting
+.flowi4_tos. This series focuses on the BPF helpers that initialise a
+struct flowi4 manually.
 
-Agree. I guess it's fair to assume that page pool is backed either
-by one or another, so could be a page pool flag that devmem.c can set
-on init.
+The objective is to eventually convert .flowi4_tos to dscp_t, (to get
+type annotation and prevent ECN bits from interfering with DSCP).
+
+Guillaume Nault (2):
+  ipv4: Prepare __bpf_redirect_neigh_v4() to future .flowi4_tos
+    conversion.
+  ipv4: Prepare bpf_lwt_xmit_reroute() to future .flowi4_tos conversion.
+
+ net/core/filter.c  | 2 +-
+ net/core/lwt_bpf.c | 2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
 -- 
-Pavel Begunkov
+2.39.2
+
 
