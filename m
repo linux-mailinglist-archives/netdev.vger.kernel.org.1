@@ -1,96 +1,125 @@
-Return-Path: <netdev+bounces-143210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA09E9C1667
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:16:30 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A1829C168E
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:45:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 9C6961F23CF5
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 06:16:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E435628312F
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 06:45:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 422001CF5DA;
-	Fri,  8 Nov 2024 06:16:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93351CFEA3;
+	Fri,  8 Nov 2024 06:45:17 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="mNihol4T"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-il1-f198.google.com (mail-il1-f198.google.com [209.85.166.198])
+Received: from mail-wr1-f53.google.com (mail-wr1-f53.google.com [209.85.221.53])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1ADB194A5A
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 06:16:02 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.198
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18BAA1CF7B1;
+	Fri,  8 Nov 2024 06:45:15 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.53
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731046564; cv=none; b=Is5UAJkiIOX08i65qGTj6SnTUpfncUWbZI/A65sXDM06bjQ1Urei9Ttx/a5sTXfPtRzcmg2QDoeWKMB8DqMqXL/U5sEPZQ9C/Y9PCB4ElhCto+kXLEUK+qJIvKOdydbhDwVQIbItPPGDyt6MHNw7+5R/Y2lKYAtcTbrOXJpqVrw=
+	t=1731048317; cv=none; b=ARGmUhl4VaMDKQdaugS3VUvY0/iWoDQuCHJ3/9vd1dMqPQVkvWDjK25yurR14Wy+P0bhr+bKTUqgViqcAWPyLpJikYIummG0u69nRCgORPzPqEDjABCXmz7Y+YyTAbqbbYsbup27ia6qCLEYuOZ/lcCCT+uoXLq/iNQ7aV62PE4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731046564; c=relaxed/simple;
-	bh=RqQv4WbQIDXLj2sNH9vALbQ1ytIJgGwZWi4pqnDoTb0=;
-	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
-	 Content-Type; b=YYijf6lo3JNhPOBTbMiCV4NamOFKRWruq3add0FNI0QahVFAdCQhqvbzcoeNoiNyrVNE4cGlpUjHs9UjYBDmDmA6ZLWpAjgSdQYKJ9v76MOkG5l1mC2gEAE+LuYvuEtq7BhjKmY0S46Oexn5Vk/gOBrsgqshFta/A1lC6aer25w=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.198
-Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
-Received: by mail-il1-f198.google.com with SMTP id e9e14a558f8ab-3a6add3a52eso17196895ab.0
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 22:16:02 -0800 (PST)
+	s=arc-20240116; t=1731048317; c=relaxed/simple;
+	bh=3twojJ5BunKyZY2Zya8PeRW8DN+uJqLzkli1KCsW3GY=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=XBbCXwqT6hZgRTj7Ci1J1q/hIT6pv6LM2Ad/2rf9rtqDUy63AKrGTr2DUpR8hIDoA4G47fkJcSKEGt0Dp+47PmMUjpBBOqRbsyAlnCe6V5fcN8ggnOt1J5n01FYfPXh0Gqo+9ZDaHo8TeuqVEqacumm1XWlVlNvJ1vooIIwmiiQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=mNihol4T; arc=none smtp.client-ip=209.85.221.53
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f53.google.com with SMTP id ffacd0b85a97d-37d6a2aa748so1073240f8f.1;
+        Thu, 07 Nov 2024 22:45:15 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731048314; x=1731653114; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=nRC0OujsL3tfRd9bjfGRlrRVMYS63P+agBwF3Xz23C8=;
+        b=mNihol4ToigJluIrfR6InRe3eypp6i8m/o0zuis5exphTP47kccHaWgRgQmoj0AskY
+         DNb1CLMhoSCv5ar1U94lcd/1EKlWp6zn/bdltKAHyAkyRUg63Aw0OyCI4aWnSa7XgLB6
+         XpfCyHL646o/UIWebyaH3BgxDIIiwghsPgQKuh32l4MzxyceOCMhubQ4FfPQdQVhc6KX
+         B1XB9sKIBv7Evo6uM9amgblxj6DwxXZyOpHrAk0DxL2rk4kDBgnY/6LATtSlXUKDS0QC
+         1cWgINvx3Dl1vqvbJ2gZp6mt+elmVfauAT8PaogVIrG/ksCfMvXsaSjpzdnRnJXtqetX
+         kVDQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731046562; x=1731651362;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1dkOBb3SQFXPdGZ4MSv67wsI4Fh7AbjyXh8AbjtZKa0=;
-        b=Wrn4Z1zbTQvYeljSinwY1UkLJCK3EFSRUvITTtM8WH/742Ad5++uz0d3rdHngZX2Pz
-         Q9+jY3yxspqSwZr5VE3zibzz4/b7m5UTpQGVS1CGuuJWQAX4WZn7vfhUqFzu2r02N72b
-         S9trw+5Jwit1pk7V6fBBB0RXwWoaG7Suw7tiwx7Mh8hxLaTFPACQcrT6301zLqiPAali
-         NCsZw4nTjq/5HDOc4I086yYdUi9uZyJYm+G/C6Eyy7ue2mS2m6FP38B0vyf7a1S30GXq
-         tplEzeGIGJVvMV3GSJODZnYz7D1pxzCZX0H7X9b2O3J1ADEzSpixfZ4y6IncuB1PJ6sM
-         prQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBmp+LD0NkpvOkVB/cI+VZrjV32HOap9V3pTY5H7j9upRaYE909+4V6egO258c5rXwgi7LywY=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxWQAD3Rgq2UPvaE5JCKGDF0FhqFX0WfihmNuMsYLE2cNaMbUHb
-	UZqihM+H+fo+nnO8mY6gi+Bu/zd5uAi+XzU497uxP4NOh1oawbNU9FRAMzNxA6TIH0eRRpLtsG8
-	qKGoS8tBOpVXZyRhKnuyfhvorkrFxtokU1FPaNor6EM3m7Y+nG58IQRk=
-X-Google-Smtp-Source: AGHT+IH7zdDwIblFzHkND/X2fTq2H+dE0aDfkmw2UPK2nlcDwZijZwh8JJxdtJ5qbwrVvbF3AnslsHUH7uN168EqXAwhEtJ/g/sC
+        d=1e100.net; s=20230601; t=1731048314; x=1731653114;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=nRC0OujsL3tfRd9bjfGRlrRVMYS63P+agBwF3Xz23C8=;
+        b=TCSyzS2DCIvOVta8zm5wO7PxH3JUH6c1iIQXfTXGMY1+Tq1kVRGJUgYdgvCox+gPLy
+         ktgZq+KwRdo/rG70dCd772LfLlcioIn2V9+e88cBVfiHrRXCwP8uwBUYtFG+cy3W2xVD
+         zqwX8OeFNxWIbe6azDdQE7AAcT1sdfovrN0aB2AOpvuRgi3MNCiOsotJGfhx0GhxA4ag
+         YIlpw9Hz+5CshZj7Y/U/5MkAeGwCoqCqMBPNEoop29HE91bFITcoT9EUGfzm2ync7kDY
+         EubVqVK9JZqyWDFHwdBAI1GYq6Nk//vPTRjp/0Sr90P4QMWjUkGS9agl2uG/EVsezrLE
+         RZ7A==
+X-Forwarded-Encrypted: i=1; AJvYcCUcTgaDELOxx6Mr5v6pBTpKwK+gDZBWBCQglO4JRhlmKqNOHhsk6J4+MoENsbEhf1rTUdasHn7+rkfJWb9mR6A=@vger.kernel.org, AJvYcCW27gGpotZaB9WFTLIwdjuRxShcPiECAWJQOXV5dleV40QIq8lYMk1m4ROLRClDj2lNq7s1nRB9@vger.kernel.org
+X-Gm-Message-State: AOJu0YwrRwHUvBNEhVOKjDtm3z/ZhvLP1oB+MrTl7Ks6xTs2IIC7g9jz
+	RBxZWCPN1Ufx/vZ+zZx/7NYWjQJMCBAberQiG5LcXJdGWkl41KPTlsql7o5ORq1BZlZxVrFpODa
+	Vok088tjvqNg2WbVzF52n367cmmc=
+X-Google-Smtp-Source: AGHT+IHCGvEMg37mLFTPnjYHHqnJxtAig9Up94JE3XMEEHF9HjeCGeiNZ9wm4Jsbn/hYGlzsjFMByBNs0IrZJzxaX5k=
+X-Received: by 2002:a5d:5f52:0:b0:374:ca16:e09b with SMTP id
+ ffacd0b85a97d-381f1863404mr1360391f8f.9.1731048314262; Thu, 07 Nov 2024
+ 22:45:14 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a92:ca85:0:b0:3a6:bafd:5650 with SMTP id
- e9e14a558f8ab-3a6f11d49f5mr20784055ab.10.1731046561872; Thu, 07 Nov 2024
- 22:16:01 -0800 (PST)
-Date: Thu, 07 Nov 2024 22:16:01 -0800
-In-Reply-To: <6706d42c.050a0220.1139e6.000b.GAE@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <672daca1.050a0220.0db4.01bf.GAE@google.com>
-Subject: Re: [syzbot] [nfs?] INFO: task hung in nfsd_nl_threads_set_doit
-From: syzbot <syzbot+e7baeb70aa00c22ed45e@syzkaller.appspotmail.com>
-To: Dai.Ngo@oracle.com, anna@kernel.org, chuck.lever@oracle.com, 
-	dai.ngo@oracle.com, davem@davemloft.net, edumazet@google.com, 
-	jlayton@kernel.org, kolga@netapp.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, linux-nfs@vger.kernel.org, neilb@suse.de, 
-	netdev@vger.kernel.org, okorniev@redhat.com, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tom@talpey.com, trondmy@kernel.org
+References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-6-shaw.leon@gmail.com>
+ <CANn89iLvC0H+eb1q1c9X6M1Cr296oLTWYyBhqTAyGW_BusHA_A@mail.gmail.com>
+ <CABAhCOS8WUqOsPCzQFcgeJbz-mkEV92OVXaH3E1tFe7=HRiuGg@mail.gmail.com>
+ <20241107075943.78bb160c@kernel.org> <CABAhCOSvhUZE_FE4xFsOimzVBQpQYLNk51uYNLw+46fibzfM2Q@mail.gmail.com>
+ <20241107200410.4126cf52@kernel.org>
+In-Reply-To: <20241107200410.4126cf52@kernel.org>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Fri, 8 Nov 2024 14:44:37 +0800
+Message-ID: <CABAhCOSyG6sTWfDfoYDCbiXesDbGiWYFrK4OGi+3zFgO-CZPxA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 5/8] net: ip_gre: Add netns_atomic module parameter
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Ido Schimmel <idosch@nvidia.com>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Simon Horman <horms@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, Shuah Khan <shuah@kernel.org>, 
+	Jiri Pirko <jiri@resnulli.us>, Hangbin Liu <liuhangbin@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-syzbot has bisected this issue to:
+On Fri, Nov 8, 2024 at 12:04=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> On Fri, 8 Nov 2024 00:53:55 +0800 Xiao Liang wrote:
+> > IMO, this is about driver capability, not about user requests.
+>
+> The bit is a driver capability, that's fine. But the question was how
+> to achieve backward compatibility. A flag in user request shifts the
+> responsibility of ensuring all services are compatible to whoever
+> spawns the interfaces. Which will probably be some network management
+> daemon.
 
-commit b4d8f228915f98f09974ef84ec028cbfe7a84273
-Author: Jeff Layton <jlayton@kernel.org>
-Date:   Thu Jun 13 18:34:31 2024 +0000
+OK. So I think we can change the driver capability indicator in rtnl_ops
+to a tristate field, say, "linkns_support".
+If it is
+  - not supported, then keep the old behavior
+  - supported (vlan, macvlan, etc.), then change to the new behavior
+  - compat-mode (ip_tunnel), default to old behavior and can be changed
+    via an IFLA flag.
+Is this reasonable?
 
-    nfsd: make nfsd_svc take an array of thread counts
+> > BTW, I didn't find what's going on with module parameters, is there
+> > any documentation?
+>
+> Not sure if there is documentation, but module params are quite painful
+> to work with. Main reason is that they are global and not namespace
+> aware. Plus developers usually default to making them read only, which
+> means they practically speaking have to be configured at boot.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=11b8c0c0580000
-start commit:   5ccdcdf186ae net: xilinx: axienet: Enqueue Tx packets in d..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=13b8c0c0580000
-console output: https://syzkaller.appspot.com/x/log.txt?x=15b8c0c0580000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=672325e7ab17fdf7
-dashboard link: https://syzkaller.appspot.com/bug?extid=e7baeb70aa00c22ed45e
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=13526d5f980000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1654a740580000
-
-Reported-by: syzbot+e7baeb70aa00c22ed45e@syzkaller.appspotmail.com
-Fixes: b4d8f228915f ("nfsd: make nfsd_svc take an array of thread counts")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+Understood, thanks.
 
