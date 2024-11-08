@@ -1,211 +1,196 @@
-Return-Path: <netdev+bounces-143259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A53BA9C1B16
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:50:10 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A256B9C1BA5
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:57:26 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E80A01C25158
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:50:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C48A61C249A9
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:57:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0800F1E3793;
-	Fri,  8 Nov 2024 10:49:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8038F1E47B0;
+	Fri,  8 Nov 2024 10:52:03 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b="Q0UjQfzQ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="davprMUw"
 X-Original-To: netdev@vger.kernel.org
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2088.outbound.protection.outlook.com [40.107.244.88])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E61C1E32C3;
-	Fri,  8 Nov 2024 10:49:50 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=fail smtp.client-ip=40.107.244.88
-ARC-Seal:i=2; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731062991; cv=fail; b=jYyFmciqqnmXKXysUi5kUtJDN1v5z1Q6gU82EmMXsD8bUUGN0mjBP850AF7Z98ocjbN3cGobi1LJheqg6/vOCHF2O6HyJ2/52tkArWu+2T4THEVb0S1+47mc5NkMGX43JD7/0BqTdGiByxPchCeDmUYqucoNuX5x1ptGpdxM4mU=
-ARC-Message-Signature:i=2; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731062991; c=relaxed/simple;
-	bh=qJOnAlHa3C0mS5sIav1MttGbFq3TTtKgPgMjcK+CXA4=;
-	h=From:To:CC:Subject:Date:Message-ID:References:In-Reply-To:
-	 Content-Type:MIME-Version; b=W1sg6S9h5Sv9NiF7552WpdkO9qqmGyHWP4spR6MHyVM2rPl/l1W0Z+2B90YVAJic/QtHDQK0CPuDVBl7O0gVLw94OLyLCghU6Ae6Ei3jhHr1jrA/q5dhvc7nVHVBnZ9VO9Kexd8F1FJwF667EVbp5iWLpjvuwXcHJ2KR1HH/CMs=
-ARC-Authentication-Results:i=2; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com; spf=fail smtp.mailfrom=nvidia.com; dkim=pass (2048-bit key) header.d=Nvidia.com header.i=@Nvidia.com header.b=Q0UjQfzQ; arc=fail smtp.client-ip=40.107.244.88
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=nvidia.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=nvidia.com
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector10001; d=microsoft.com; cv=none;
- b=k/p1vvy9Beh+2bpkX2DO4fDZ+Ye9KD9SyUk1rMmDydNwcZcS/UVNglChEQC8fbPN/8RrrAu6IeuOtFeTa3axU/0tFovUMeMy7zZk85iutsILXWpgFwE9Yl4s4lxZAAFM10oGsHKET7RCrEFklxC/LPzf2Wh6EFEPZ/qPxDUWrG80GRpsw3sVS2GU/CyphGJ/IvhSGv6TWFTRgfTtvk/ZNKGDdV1TaG2iZCBX9d2OtKTP9jB2LsFnP4+pqLAXb5FF1AYsqMADBNuP8Wn8lgjnI1hcQ5rbNg86d+F4z/2XRM7vKJ5c4Ve0LvcXULpg6XAGDmgJ96FYzUUYetbEIbLviA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector10001;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=6rR71MoMKH3VX16M7nMhTEzhnZp0s/EeSYWzoiRfneo=;
- b=floTCOLqfFJiIyX3/MDABo+Nus51ZLSjkit+80aD/iE5X7Bn90AjnuyPDnH5qg2wE6bYBHxgtswZypaKFScXCUmaDP7J3uCIWzrp4Z3ZBDeE7yI8FA699T0r7dI/kDY7FcEnlLNyloFkHTLd7iMFF+cBVegAdIaALXZGnmjeEoESVo1bG1Np6n8Sif4VUf/Sw/8/gNAMVsgiHEOX2ZnzhMiKMoQ2Eh0et56vzT1XJ6pUvU1VWX9Ktxf5kP4bRFAOUDXd5oLVBhulEKoRh5TyvVAfihsDt5cvPvQwDSzYM8rMP2IUrxvQNk3W8ttT898n2Q3sgHBBkADQ9zrgSyTUag==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=6rR71MoMKH3VX16M7nMhTEzhnZp0s/EeSYWzoiRfneo=;
- b=Q0UjQfzQvJOcqB2mviZRAurL+czsX3u5Ed+YGN7ID5lxA5BfFqlpy31C7vah/57xjIcahJ8NdRCZzGfNFbHS4kim9KMazz5X7p2cZYxvyHYru4SBFC2wMFtoJEtf2++gjKfoFASPn8XZpXmQ4m3cwO5+JKqYCnOi/4EvydpdWkSYQqCpU7qxkHsALtSbsdt9ptRQvwWQI01U32uDxH/8f6hJVGjjj01Jikap17HhPVSKNcsFP9QPaVB7RA+OorNn7Z5mncAYgWtuu4Xrmgo8xSRbbRIU/EgbXtEUsfmqc2/2GNITdAvTZyWpviiJNfGrkJIsvb23Rzrupr7cTOiO/w==
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com (2603:10b6:930:59::11)
- by IA0PR12MB8984.namprd12.prod.outlook.com (2603:10b6:208:492::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.8137.22; Fri, 8 Nov
- 2024 10:49:46 +0000
-Received: from CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::c06c:905a:63f8:9cd]) by CY8PR12MB7195.namprd12.prod.outlook.com
- ([fe80::c06c:905a:63f8:9cd%6]) with mapi id 15.20.8137.019; Fri, 8 Nov 2024
- 10:49:46 +0000
-From: Parav Pandit <parav@nvidia.com>
-To: Caleb Sander Mateos <csander@purestorage.com>, Saeed Mahameed
-	<saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Tariq Toukan
-	<tariqt@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-CC: "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net-next v2 2/2] mlx5/core: deduplicate
- {mlx5_,}eq_update_ci()
-Thread-Topic: [PATCH net-next v2 2/2] mlx5/core: deduplicate
- {mlx5_,}eq_update_ci()
-Thread-Index: AQHbMUNNUQUBUfLoW0mUeZiggSxqP7KtNTsw
-Date: Fri, 8 Nov 2024 10:49:46 +0000
-Message-ID:
- <CY8PR12MB71954BBB822554D67F08A1CBDC5D2@CY8PR12MB7195.namprd12.prod.outlook.com>
-References: <ZyxMsx8o7NtTAWPp@x130>
- <20241107183054.2443218-1-csander@purestorage.com>
- <20241107183054.2443218-2-csander@purestorage.com>
-In-Reply-To: <20241107183054.2443218-2-csander@purestorage.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: CY8PR12MB7195:EE_|IA0PR12MB8984:EE_
-x-ms-office365-filtering-correlation-id: 419e636b-9e28-4f98-44c2-08dcffe30fd2
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam:
- BCL:0;ARA:13230040|1800799024|7416014|376014|366016|38070700018;
-x-microsoft-antispam-message-info:
- =?us-ascii?Q?2uFQTr9DOXX4M+FkHn93HuQguqi9gR4P8Yun+eAUuLjcAE4mMb6X0KKQVq4B?=
- =?us-ascii?Q?MbKM4QHhmNLJqaTs/M79JP1xycxCX7/QFTGIxxWt08SkTh7giZLqwDJqByYE?=
- =?us-ascii?Q?zCC1K/1ZDahnQGcRNPY8tlMm0MhV91B9mIkCYTCpmWGgsz2xZrn74xlHeR46?=
- =?us-ascii?Q?c3nKIMwj8RUCJI82d5acRBhzMAPTOrutsCPR/x4Ox0T2qW+bRcg5AKBMyGo9?=
- =?us-ascii?Q?UPffDv1ruyjqQYOzCetN0F0CmW6RHEWc4DA5pDUH0ujbuMFrLGLV7E1t+hZN?=
- =?us-ascii?Q?3XAFUzpJHO6qFvp5zgqdO+KoSsLBAUBscqBRxUL0ayMv7u4dXPKqiceRmZCl?=
- =?us-ascii?Q?Ab6W4yb9orm+rKxB8IMhzFnuYP2QZQ94JjzPCiWxFNGObOkbKoFGa34cYvb4?=
- =?us-ascii?Q?U5m7AEhzUQomWxg7Ucc6pUEY/oCsmB2T9gX8xIWIQYeqbmNmtEU4ZNxLGpZZ?=
- =?us-ascii?Q?mWRWOsgP+Pr82sd+pH9wk6dDgyAGWmc+eWmYQVlo7q7aTXUcFOxBfYrXPlC/?=
- =?us-ascii?Q?3jvm7F8oaOJRsDjEJDV5NA4vqPG6VQYHMzSJ7wy7gbS9WMhHu0oW3yR019B6?=
- =?us-ascii?Q?X09jQ5/4pLiQ+8N+i1hIn458fyM5rF/w3d5qPjP7c04CNFPFNtBmEbx4/J0K?=
- =?us-ascii?Q?OrOTXLFDQaJRCkgWVurtfkVHhflpAXmXUzaSxemd21II/lzE0BRgrJbCmK7X?=
- =?us-ascii?Q?5WHEptKHqcjWBe2TKhxgPr7B9Xa+5WWXc6Ey/tNGJNPuggho4bg7p0i4WYDm?=
- =?us-ascii?Q?+BBVK3QHY6vML/cN8t+tHAT9T9lah6Rw14KLj6wHFKp91blGjwitOgIHZZvQ?=
- =?us-ascii?Q?5kkdFyzwI4g9TAPLUBYg0iYqjIdljMTFRk6el4wKa07PkfcrccPvXCfApKDh?=
- =?us-ascii?Q?UtRw5mEhocGM2cpYxB7LOIFHSLX7L6ZOLMOFYRse808QrR/e8JMtieaocUw8?=
- =?us-ascii?Q?AODfsjvMdHPBqmdhzkrB+84npWjb/UlttC8ODmDTh+JRz47wFw34O25ZwwXQ?=
- =?us-ascii?Q?fLN8twpwAGr6QT/Nh+QkZa+TNG7kFXG+EWv0aoiKLbwZ6S2ExaDrsbuqfmro?=
- =?us-ascii?Q?I5CXlUVIgig0HxgMznoG8jHG9OJuIjLz51y6+kbg9JdaaGRP2ZIEYxHQTdDG?=
- =?us-ascii?Q?3Hrgz90quAXrbUhgPZ6TxdsToHId5Tr7Vc1Be3E/XdxPPCpABdF+r1TIX+XH?=
- =?us-ascii?Q?NiTwGJCWdLjwFp0xdok0+DW8yU+93htqyBVnkNMcfPqATryskOM1uOKnu+ww?=
- =?us-ascii?Q?N7eP0c09s2wgh1qs5q7EPS1nLrgc5/j8KRMzk2FSBeRPmWeoBLOkLNGQZ1Uz?=
- =?us-ascii?Q?oUdzi4zc2b8ZP8aXfk8kl46nkhZHZ6O8ESlqIGUE/w7u3zey8OLVFEFtUzLP?=
- =?us-ascii?Q?nA72Qy4=3D?=
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY8PR12MB7195.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230040)(1800799024)(7416014)(376014)(366016)(38070700018);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uMQ7NanqrQy6mWeoj5EemgwWe1IZnk/WF/S5RCkhtVvB1Q6Ier0Dw/5hyTql?=
- =?us-ascii?Q?Z+Hd/XRbkxSmfxVoYx/Avz8CROwv2EVCi1Y4N1TDZ7HTRlRa71TorK8usroC?=
- =?us-ascii?Q?X9xHKjjAoFNHltXPaPWBwE+n6r+kZMvfNzw/Jrk5fZUJl7JV1mvtNaikzR20?=
- =?us-ascii?Q?XlpMdVxX6JCehTfQeJ0dY3ay7DUXVbgOd9CErE+1fyH1s0U5MqNAVyWhtlbA?=
- =?us-ascii?Q?iAfp7G6QhzI91T40oXOwSONIT5Th0k1ofzYWN+w8BP9cik3QsBV4Ff0ARzjh?=
- =?us-ascii?Q?lhfR0jLAbBhXpxU0HoIH7QNweYXJNQ1oXlRYqnAWJTw9aXP9vlOGAJTEx0wh?=
- =?us-ascii?Q?apJZJO/UiE1iNiQMazFGweYKuW0cLwC3AcP/N5O9LFH6ZHr0ayE5H1dNPVa6?=
- =?us-ascii?Q?qljPU8ZmO6bYTtq6VTm6pPjIT0heIoFWxQOd4kvigkUP9h72WkwSkywJMYYX?=
- =?us-ascii?Q?IUkYwsGkNYQ0/puLGvRN6bCBmwonpMnP5tYNW/KlID2RMUwp+6e/hv13b9oB?=
- =?us-ascii?Q?kBjX2htTWthWNpPmsKP9b5KFEMqkSlhw/xGhS7iJ0dmIUcD9pfGr+t96OyjO?=
- =?us-ascii?Q?/C/WwK1UWCPDiaelgkKGGt85bLLNb7DtepuabY6bd4+VUO6bO8iSeYUGIVRu?=
- =?us-ascii?Q?qowcO30BiidCwHrwnLYmYRloZ7l6fy3x8BXs/BHUsGPxeRvOjfCxYZtlnLxL?=
- =?us-ascii?Q?z2tlMOob6D32vcxFgKBYEdbKdw0H92X3UxPMe4qFYmsbbx2Pi5iwnwti+fIt?=
- =?us-ascii?Q?5zCcCv+QM+6Th6VTfDl9XzhoHKLlgSBmoUIBJ5sypFv23OSvjDGoZVAnPf+h?=
- =?us-ascii?Q?3XW2X9fO/aL1Vsv6jrlzEqFTi9taIkYnX45birQTK+/sn4N0P9Ef78+BNk05?=
- =?us-ascii?Q?klhN9Py+Ktfde8tcXQBk1Z/NSc+3oOASnESpmSXbgDztkK4VR0+snPx1046D?=
- =?us-ascii?Q?VmbwfJqvHO58tdpofAF5Pkhz6C9vXltrARsKxBc/3KtDBlYTpT+qmJtEwIvv?=
- =?us-ascii?Q?l8MXJawqLJ5UTL4CcMivZFeG2GTd3SVeDZB5wHbhw5wAFrOs0aKFuW3cIyMW?=
- =?us-ascii?Q?J40ulIu15PZJ6J1YlnY7xRrOblWqtOkHTKTDJiC+3Q1S7CPkqxNoCE+DbQwp?=
- =?us-ascii?Q?F7I5xBaZyXO4HHa8KyjbxIjLN8H7FUn+Z4O511j1C85akRKtLH0sFg6aeWrA?=
- =?us-ascii?Q?I1dddMo3dzT1Q8q0sGtZbNfHAijZPOk0ManrcpMfpw8+DHFbdm6LnZrWop/u?=
- =?us-ascii?Q?v34BLK1O7zl/ME8vd9Ysf/v4hsCb81BRkrCp7oCr4FfFy2CSR6oqUdeMlBjN?=
- =?us-ascii?Q?09ayL5+jQmkt4qLXPvf1VxpeUGdyIHHVpwzlOwYlFFDOhx+qS6BlHW/sLfMV?=
- =?us-ascii?Q?zVgYips64C+bVMSAxrpe7yu4LXNx6vzkKYRVLgA21EnYy6ED6LMnv8wqAejc?=
- =?us-ascii?Q?JvAkLPC7FwlO59mJKawEUDnrqLOdCTPkdOQM2sf4C2F36tHEf5BNLp99lCn1?=
- =?us-ascii?Q?UEsGMws4hqD7LxUbCjgVflKib3vf0HMtxFNTmRgN20VZNBWAoYZfh/DdZFbx?=
- =?us-ascii?Q?NvvS+rni6xAF2ahFWYE=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4990E29408;
+	Fri,  8 Nov 2024 10:52:00 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
+	t=1731063123; cv=none; b=n9n28xWIna6JfKBIAh1lYV3QEimiizHicW4KC/Owwviz5FaKShQHGZGojQ0vkWLBnxPfVDVGEuKtJTO64u6IH4/KcZsRD6Qkur1OOwiaXFnsCMZCynKlZtw8AiF5DUdzyk4/g35eUIo6cFPV1JS+3hpCoHI7M7yz4TpTBlNtuRY=
+ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
+	s=arc-20240116; t=1731063123; c=relaxed/simple;
+	bh=+1yrdmo6TvXud8UAPR4pFUoQ6w+MPs/h0Voko9KntfU=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=i+JE5//gJu0HZ64HMN5GQ5FYvxsS93aTj9y6b2pXPpnjnCvSOHlxRZhDDoBmeitdzz31ZqAxe1xiKVUfOvCziICaMMriE+PQT2Csqd5xj9XD+/ON21TolYCMRznrY+tDAYlW5ZBOXGLhfzJv/N0Gs4oQJb/5c6eYBZKXEYl64XA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=davprMUw; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZSxeVaPlRH4R/1jmcFUVY/CzYVAx0pe3ADP7c3aPo+8=; b=davprMUwoZuw9s1xZM2hywGQxR
+	icVbkLwClj9aguIEBU9TkSS33HOsACjshGeh4aC9gDW+QMwzd8LArSJGbeH2D/AlZBlRvFYo85/zg
+	iw6mu+jZk0Era68MYkpt4cB9kSM5Z2rIyMCB+uKivuGHFBoiUTZoKeujzGJnGdkTMl+voC+O2QQv+
+	q3g3OvvHEASdwLMGN0SLWIhAJEV89kOR86jIFH8cp37qNzz3HYnFxFdMa1CEGYEUuOVZX0CK3fzdz
+	g+Nzap66O20sc2E/4hWoiJHA+EenRc6hupDPl0B7r7PPVhAJV4s6ThatZndV8sLGfCZrN5c2pVLry
+	hMd3oVnQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:60982)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1t9Maf-0004wK-1a;
+	Fri, 08 Nov 2024 10:51:46 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1t9Mab-0002DN-1v;
+	Fri, 08 Nov 2024 10:51:41 +0000
+Date: Fri, 8 Nov 2024 10:51:41 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v3 2/3] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+Message-ID: <Zy3tPeWCHOH-CMoy@shell.armlinux.org.uk>
+References: <20241106122254.13228-1-ansuelsmth@gmail.com>
+ <20241106122254.13228-3-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: CY8PR12MB7195.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 419e636b-9e28-4f98-44c2-08dcffe30fd2
-X-MS-Exchange-CrossTenant-originalarrivaltime: 08 Nov 2024 10:49:46.7535
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: qt5h1UMOBDARYDy590DSNep5YbvyBRdEWq7Djnj5zfV+/Fe1ddL6aVR+r7rRVzZKZB543by296Y6+B/mUGwTMA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8984
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106122254.13228-3-ansuelsmth@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Nov 06, 2024 at 01:22:37PM +0100, Christian Marangi wrote:
+> +static int an8855_port_enable(struct dsa_switch *ds, int port,
+> +			      struct phy_device *phy)
+> +{
+> +	int ret;
+> +
+> +	ret = an8855_port_set_status(ds->priv, port, true);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (dsa_is_user_port(ds, port))
+> +		phy_support_asym_pause(phy);
 
-> From: Caleb Sander Mateos <csander@purestorage.com>
-> Sent: Friday, November 8, 2024 12:01 AM
->=20
-> The logic of eq_update_ci() is duplicated in mlx5_eq_update_ci(). The onl=
-y
-> additional work done by mlx5_eq_update_ci() is to increment
-> eq->cons_index. Call eq_update_ci() from mlx5_eq_update_ci() to avoid
-> the duplication.
->=20
-> Signed-off-by: Caleb Sander Mateos <csander@purestorage.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/eq.c | 9 +--------
->  1 file changed, 1 insertion(+), 8 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> index 859dcf09b770..078029c81935 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/eq.c
-> @@ -802,19 +802,12 @@ struct mlx5_eqe *mlx5_eq_get_eqe(struct mlx5_eq
-> *eq, u32 cc)  }  EXPORT_SYMBOL(mlx5_eq_get_eqe);
->=20
->  void mlx5_eq_update_ci(struct mlx5_eq *eq, u32 cc, bool arm)  {
-> -	__be32 __iomem *addr =3D eq->doorbell + (arm ? 0 : 2);
-> -	u32 val;
-> -
->  	eq->cons_index +=3D cc;
-> -	val =3D (eq->cons_index & 0xffffff) | (eq->eqn << 24);
-> -
-> -	__raw_writel((__force u32)cpu_to_be32(val), addr);
-> -	/* We still want ordering, just not swabbing, so add a barrier */
-> -	wmb();
-> +	eq_update_ci(eq, arm);
->  }
->  EXPORT_SYMBOL(mlx5_eq_update_ci);
->=20
->  static void comp_irq_release_pci(struct mlx5_core_dev *dev, u16 vecidx) =
- {
-> --
-> 2.45.2
+This is unnecessary if you've set the phylink capabilities correctly
+because phylink_bringup_phy() will setup the PHY accordingly.
 
-Reviewed-by: Parav Pandit <parav@nvidia.com>
+> +static u32 en8855_get_phy_flags(struct dsa_switch *ds, int port)
+> +{
+> +	struct an8855_priv *priv = ds->priv;
+> +
+> +	/* PHY doesn't need calibration */
+> +	if (!priv->phy_require_calib)
+> +		return 0;
+> +
+> +	/* Use BIT(0) to signal calibration needed */
+> +	return BIT(0);
+
+This should be a #define somewhere that preferably includes the PHY
+name so we have an idea in future which PHY driver is going to be
+making use of this random bit.
+
+> +static struct phylink_pcs *
+> +an8855_phylink_mac_select_pcs(struct phylink_config *config,
+> +			      phy_interface_t interface)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct an8855_priv *priv = dp->ds->priv;
+> +
+> +	switch (interface) {
+> +	case PHY_INTERFACE_MODE_SGMII:
+> +	case PHY_INTERFACE_MODE_2500BASEX:
+> +		return &priv->pcs;
+> +	default:
+> +		return NULL;
+> +	}
+> +}
+> +
+> +static void
+> +an8855_phylink_mac_config(struct phylink_config *config, unsigned int mode,
+> +			  const struct phylink_link_state *state)
+> +{
+> +	struct dsa_port *dp = dsa_phylink_to_port(config);
+> +	struct dsa_switch *ds = dp->ds;
+> +	struct an8855_priv *priv;
+> +	int port = dp->index;
+> +
+> +	priv = ds->priv;
+> +
+> +	switch (port) {
+> +	case 0:
+> +	case 1:
+> +	case 2:
+> +	case 3:
+> +	case 4:
+> +		return;
+> +	case 5:
+> +		break;
+> +	default:
+> +		dev_err(ds->dev, "unsupported port: %d", port);
+> +		return;
+> +	}
+
+	if (port != 5) {
+		if (port > 5)
+			dev_err(ds->dev, "unsupported port: %d", port);
+		return;
+	}
+
+is simpler, no?
+
+> +static int an8855_pcs_config(struct phylink_pcs *pcs, unsigned int neg_mode,
+> +			     phy_interface_t interface,
+> +			     const unsigned long *advertising,
+> +			     bool permit_pause_to_mac)
+> +{
+> +	struct an8855_priv *priv = container_of(pcs, struct an8855_priv, pcs);
+> +	u32 val;
+> +	int ret;
+> +
+> +	switch (interface) {
+> +	case PHY_INTERFACE_MODE_RGMII:
+> +		return 0;
+
+This shouldn't happen. First, in an8855_phylink_mac_select_pcs(), you
+don't return a PCS in this mode. Second, phylink is highly unlikely to
+switch from SGMII/2500baseX to RGMII mode. Third, in commit
+486dc391ef43 ("net: phylink: allow mac_select_pcs() to remove a PCS")
+will ensure that if phylink does do such a switch, because
+an8855_phylink_mac_select_pcs() returns NULL for RGMII, these PCS
+functions will never be called for RGMII modes.
+
+Thanks.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
