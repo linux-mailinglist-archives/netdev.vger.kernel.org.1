@@ -1,100 +1,118 @@
-Return-Path: <netdev+bounces-143336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8190B9C217B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:03:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 393199C217C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:03:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 435AC286705
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:03:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E46041F233C7
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2E2A190486;
-	Fri,  8 Nov 2024 16:01:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DA42187FE4;
+	Fri,  8 Nov 2024 16:01:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="jiyse7sZ"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="fnzh4tY/"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A2A5137750
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:01:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90A0C12CDA5
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:01:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731081697; cv=none; b=Wvz6abHIoqIuKi5aKEtUQFUUAt+dbFbeKJUpTsUktj46YCgBcrSefqmhgrZ0uz5t1KY9S8WdMG23gJisT56ZarBh5uKGMJL3wsNC2McWxOog1Qa59WRmuhY0px+M58KNtXvvIUBa6G4vzyqEjFPcqE1fzV6c1DAXGQIlrsVG+Eg=
+	t=1731081710; cv=none; b=dbrDrofhIWv6eYla5aiTHbNgMiilrIVKjL59O10eBF8PHEC5vAqLiXfVf0wVeCiYeHDXzCdLuEeHRPR+on0i/MgEdcxEihtjpJIx9/TVnsG2bftGUggZtYyWBLjiwjYyeDolV6yGDy/acri7IstMHdZzAuaVkSyTZ0O+d0a1otQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731081697; c=relaxed/simple;
-	bh=Y3WfQRI9/NTbWxOwZRg38MqnjNoJXc9d1NSZl/NW6fg=;
-	h=Date:From:To:Cc:Subject:Message-ID:MIME-Version:Content-Type:
-	 Content-Disposition; b=LNv1pkCGCe6rgKlI4ROOvgACUMtQSTHk5j4U6c3aMsESXSR3tpDcKmSU6OfnQs2A1Ab0bmpxNkWkZ5iK3mNwp+ZE7WcSoeQ0V8bkvUpy8BFVrHtMr4omJleDkZq8YP47os9tmtSEb4zuqayfT+ESXOq/AnDXgw0d6fqHON/xa4g=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=jiyse7sZ; arc=none smtp.client-ip=78.32.30.218
+	s=arc-20240116; t=1731081710; c=relaxed/simple;
+	bh=RkznWFHxz8lgA67vGEerxxBFBy5VCB2M/cvu8hVUuq4=;
+	h=In-Reply-To:References:From:To:Cc:Subject:MIME-Version:
+	 Content-Disposition:Content-Type:Message-Id:Date; b=N2w1fygbeTYYufes/c6/Eu5pOXHzdVIG3GSynXc7SHtfOYVyIxJJZ0G3edIY5x4NnKRuCbuf6fcFuAA3OiBGUoYG8z48XA6EQJT9bX2etCAdodWG3xK1n44mZjFMcQvNs9PS9t2AW2Ijj5ltrI1Fs5pIp9Ke3cI0yoiTIWvMKz4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=fnzh4tY/; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:Content-Type:MIME-Version:
-	Message-ID:Subject:Cc:To:From:Date:Reply-To:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
-	Resent-To:Resent-Cc:Resent-Message-ID:In-Reply-To:References:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=qLq4gyl3R5H1fAoTPOPvNw5zvvc0SyamtcSXC0jJ+Ho=; b=jiyse7sZwtv2rUERmEdmA1GImr
-	HKS4NbTbCQHEj2lqxLTlHpjSRktq/NTXn3wjCEvjGuMR4zyl2xDbxmQuHfXsChHPG0OAM5b4bX6BV
-	owMDvqUR+fEx/7LbjCgDy+f45PP6EuYryFlatUlj8dzrVR7kbv6jhAi90SD1Dl2tjQ6REvzUOfQpA
-	od4quGMsesrfrnhwWweuV9uWciAD/J9MvNXer73zkzrwmqJ5+laMCRsE9IaEMhysi2oB5pccQTst8
-	yKVb8vm2RP178DUDm9vhMn27a0HHafvkkmT+jky9MjQ1YkM26IX7OhkmBMtxJBBAOoLU1sEf7jrIw
-	8SfMgBpw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:51838)
+	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
+	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
+	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
+	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=IQoupKKIviQUlPSMME+Nbk7dTMUtyTJsz8Zkrc5NOJc=; b=fnzh4tY/yk6SyG3UFfoEBhfqoq
+	i2bpcIGbFsMJD4400dUXzV5pl2+XEVL8hlqeHWviqbdiVz/3ZqhizaVWjjJiW45fBcKZJ4Js7o7pR
+	07N+mdk8qf5GPUy1szG1Fvyhp9ltm+d5vfDJP62YbaKHLUExMC9CEt5vF7y3DP/DkoH1gZxGUmuAI
+	THuBtBG4lhkM9IulUyS71+BZIyLuT2iqdEuElrUR1uR4UGNRaJqe09t9OAQPQpEX5L2XOURLuuifg
+	9+lzvaBGKiVmr+W77OyV4gNXRh7txYJFc/luFNwRlKYr1XCjt6Y0sNs+k30fg/Ypq09I4RzGJ9cS3
+	B2XPRj5w==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:43254 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t9RQO-0005Ze-2N;
-	Fri, 08 Nov 2024 16:01:29 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t9RQM-0002P5-29;
-	Fri, 08 Nov 2024 16:01:26 +0000
-Date: Fri, 8 Nov 2024 16:01:26 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>
+	(envelope-from <rmk@armlinux.org.uk>)
+	id 1t9RQe-0005Zp-1D;
+	Fri, 08 Nov 2024 16:01:44 +0000
+Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
+	id 1t9RQe-002Feh-T1; Fri, 08 Nov 2024 16:01:44 +0000
+In-Reply-To: <Zy411lVWe2SikuOs@shell.armlinux.org.uk>
+References: <Zy411lVWe2SikuOs@shell.armlinux.org.uk>
+From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>
 Cc: "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH net-next 0/5] net: phylink: phylink_resolve() cleanups
-Message-ID: <Zy411lVWe2SikuOs@shell.armlinux.org.uk>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH net-next 1/5] net: phylink: move manual flow control setting
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="utf-8"
+Message-Id: <E1t9RQe-002Feh-T1@rmk-PC.armlinux.org.uk>
+Sender: Russell King <rmk@armlinux.org.uk>
+Date: Fri, 08 Nov 2024 16:01:44 +0000
 
-Hi,
+Move the handling of manual flow control configuration to a common
+location during resolve. We currently evaluate this for all but
+fixed links.
 
-This series does a bit of clean-up in phylink_resolve() to make the code
-a little easier to follow.
+Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
+---
+ drivers/net/phy/phylink.c | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
-Patch 1 moves the manual flow control setting in two of the switch
-cases to after the switch().
-
-Patch 2 changes the MLO_AN_FIXED case to be a simple if() statement,
-reducing its indentation.
-
-Patch 3 changes the MLO_AN_PHY case to also be a simple if() statment,
-also reducing its indentation.
-
-Patch 4 does the same for the last case.
-
-Patch 5 reformats the code and comments for the reduced indentation,
-making it easier to read.
-
- drivers/net/phy/phylink.c | 106 +++++++++++++++++++++-------------------------
- 1 file changed, 48 insertions(+), 58 deletions(-)
-
+diff --git a/drivers/net/phy/phylink.c b/drivers/net/phy/phylink.c
+index 6ca7ea970f51..65e81ef2225d 100644
+--- a/drivers/net/phy/phylink.c
++++ b/drivers/net/phy/phylink.c
+@@ -1467,7 +1467,6 @@ static void phylink_resolve(struct work_struct *w)
+ 		switch (pl->cur_link_an_mode) {
+ 		case MLO_AN_PHY:
+ 			link_state = pl->phy_state;
+-			phylink_apply_manual_flow(pl, &link_state);
+ 			mac_config = link_state.link;
+ 			break;
+ 
+@@ -1528,11 +1527,13 @@ static void phylink_resolve(struct work_struct *w)
+ 				link_state.pause = pl->phy_state.pause;
+ 				mac_config = true;
+ 			}
+-			phylink_apply_manual_flow(pl, &link_state);
+ 			break;
+ 		}
+ 	}
+ 
++	if (pl->cur_link_an_mode != MLO_AN_FIXED)
++		phylink_apply_manual_flow(pl, &link_state);
++
+ 	if (mac_config) {
+ 		if (link_state.interface != pl->link_config.interface) {
+ 			/* The interface has changed, force the link down and
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.30.2
+
 
