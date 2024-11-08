@@ -1,190 +1,389 @@
-Return-Path: <netdev+bounces-143253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 667E59C1AAB
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:34:53 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 852D79C1AAF
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:35:23 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD133B23660
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:34:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A91261C265D0
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:35:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BBA1E25EA;
-	Fri,  8 Nov 2024 10:30:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D0DAB1E2837;
+	Fri,  8 Nov 2024 10:32:37 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="HXj6ieDS"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f54.google.com (mail-wm1-f54.google.com [209.85.128.54])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393FB1F706D;
-	Fri,  8 Nov 2024 10:30:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C21B01E25E0;
+	Fri,  8 Nov 2024 10:32:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731061806; cv=none; b=Kzd5rDtzK7/ux8z8u+nmMKOrf5NL5P1IzxiRysyRiIKXowfxrQ4ni+R/KmJXa+XGQa3jcXlSmD4dX+KNiWvyPfxaI2qHUYOw5KwD3sQAumsTxp03eL5O1bAVK/H7pKhqxs+ClVwIlo9G0Mq/hAu+U5e9fSZIFBEJaghO28ukyug=
+	t=1731061957; cv=none; b=fdwjA9zJr7WyRHxof6dxEwMXBGFPj2Z3lDJY2tV5Mi7b37hSaxzMyFgjRP+aC8IQIRbf7j6+krckm+7r2WewmVyZGZ3GVvy5dowO5HBG4nTMwF+OvO2r0UIFlgEscHx502nBVzEavKDNSiEpEw+oWKqwXXGyQzx/sNbLj5Dds+M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731061806; c=relaxed/simple;
-	bh=0KEauaZdc7iNy8LfrhzAhwMnl4u2pDYZpJto3PxhWNk=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=E+Nm+TV3/co2k3UuqkqaJSomwo79a2hbmLQTdS5cjav5Z6XIt4+v6YlmpZvXqGEmsdHKcgRdiBY9XppLNvnv6q8iME+QZbFXjTfDvUTkm+veDzAc3KpMg1+dgJgE7qsg/PYdL5aTHJzvPUQZMppYAHkWZ1jPbTyumDM0QINzubE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4XlFZ20sT5z9sSR;
-	Fri,  8 Nov 2024 11:30:02 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id v0IgesT6yvwB; Fri,  8 Nov 2024 11:30:02 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4XlFZ14LVSz9rvV;
-	Fri,  8 Nov 2024 11:30:01 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 5B07E8B781;
-	Fri,  8 Nov 2024 11:30:01 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id ff_n68pslpCE; Fri,  8 Nov 2024 11:30:01 +0100 (CET)
-Received: from [192.168.232.253] (unknown [192.168.232.253])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id D7FE48B77A;
-	Fri,  8 Nov 2024 11:30:00 +0100 (CET)
-Message-ID: <2010cc7a-7f49-4c5b-b684-8e08ff8d17ed@csgroup.eu>
-Date: Fri, 8 Nov 2024 11:30:00 +0100
+	s=arc-20240116; t=1731061957; c=relaxed/simple;
+	bh=mCunzD2GzZxLBHtBS8wxeir4DFtR0x0xiGP+WpdkBc8=;
+	h=Message-ID:Date:From:To:Cc:Subject:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=P9so+DTSf0rP9/JO6x/XWuIyacUoWQ/tHpUVaRq505QmwTHIGEAWy0OB7MOevMoPFabsGdr+A7Ik5hXbjvfPTskbzsQfwR26q+LMzdakqmFy/U/B8MYcSdSTbR2fu2UWC223UL/pjIVLgHCZ2IsbXsisuvGQZQPAqT5iKqn6AMM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=HXj6ieDS; arc=none smtp.client-ip=209.85.128.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f54.google.com with SMTP id 5b1f17b1804b1-4319399a411so18115855e9.2;
+        Fri, 08 Nov 2024 02:32:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731061953; x=1731666753; darn=vger.kernel.org;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=+D8vZegrH9yIdYiz0FSD9MNRGwL9EkUqYzbNsOs/U7A=;
+        b=HXj6ieDS6p9Uw/+96I4cLSREMyUjgenO+dDvexl0FSVLPrazXooizxVafbkjKNpXXL
+         aP9f3j2oYfhGPos29hqqh24RHt2WS42hWHnkTADZjuLZ0TjtbPXbzQO2pD8yxqiW63bx
+         YfXv38wzMTqZBbR97xOHPZ+jWqOBrUeGSl8e4IuGkuTDJk3Yh5P6wMU7VbkJDRsYiaXS
+         Fi8ZLspZNqKhORL7i/BcjDk6ABOJDIoY7pVHn7ACkGhOPQ98ItUkUIjZtWNM5CBJsYrd
+         UGjTxclfeRmzQ39uDI5cTc1V8d5LG0J+Zwm4g1NmelKs64o+pLchi0YgB2YE2+m4wO9t
+         5DAw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731061953; x=1731666753;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:subject:cc:to:from:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=+D8vZegrH9yIdYiz0FSD9MNRGwL9EkUqYzbNsOs/U7A=;
+        b=e7l377ExWbw3Xv9HvY38uEdw+ua62xRFzpL0GP8lh7TUmOqkquNZbPime+YsqFvGHv
+         9u77Gb2tHeXn3rBFch8XnOCSuNgCUGFGFxn9xTYvy1N+lWWMzix8kTfTjs1HxyEV5W4/
+         fQd99gIFaJKWTO6hq8a1VgLU60CogSmv/7YbTTHGMv48fCajcYOEtXC4g4QHtBmUshj+
+         Lgf8Aj0ssps5FeaI4I8D55beu354fG7OK6biv00Cx0w1Cz99cM7wu+8mt4v3UDpjUY9H
+         CRybbruM0SP41xufFMpHVgUaARQR17+qCn5OgVTwBjPobORRvZ3R/cdHBm0/vuUmzTaB
+         EnOA==
+X-Forwarded-Encrypted: i=1; AJvYcCVByZ1Zmos9WMSEi2ko+B7hcs77Ix7EVfZt0pS4sWqBC0CkWzcRXjZmv+K0au0uFq2OGXI2ULAh83nV@vger.kernel.org, AJvYcCVbuJ5HUr3kife0yJPDv8fNqUhmMnBZc4X/ckbppdXRJDcr91QMg7ocUUKk8N5ixeyTeQQ3FU3g@vger.kernel.org, AJvYcCVmRDO3+qve65pR+bGj1PtQsdWqBWcuAyrfdXK/3yygL0ROqYZY4nTKV7eZk5nDSNybQ5H+0JM1a9irKOTe@vger.kernel.org
+X-Gm-Message-State: AOJu0Yxj2ewn2IAcCQrlmYSucWzMu5qONcXx3UVqyNJNO9tg+KMnt38j
+	j8j+qEFALU84LnwfjEIjRM1yUDUEI0cR8rMlZmcDoRsAgl+V4k75
+X-Google-Smtp-Source: AGHT+IE3C6MenK86u+gyHcdGWTkHdT9bSmorvzGgc5cR9/kKCrxrVGkOIgWKFRagg6d/LTdxX87eoA==
+X-Received: by 2002:a05:600c:5488:b0:431:9397:9ac9 with SMTP id 5b1f17b1804b1-432b7507c16mr15281755e9.15.1731061952869;
+        Fri, 08 Nov 2024 02:32:32 -0800 (PST)
+Received: from Ansuel-XPS. (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6b35c0sm97887395e9.16.2024.11.08.02.32.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 02:32:32 -0800 (PST)
+Message-ID: <672de8c0.050a0220.a7227.c2c7@mx.google.com>
+X-Google-Original-Message-ID: <Zy3ovEx0IELRttrI@Ansuel-XPS.>
+Date: Fri, 8 Nov 2024 11:32:28 +0100
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	"AngeloGioacchino Del Regno," <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: Re: [net-next PATCH v3 2/3] net: dsa: Add Airoha AN8855 5-Port
+ Gigabit DSA Switch driver
+References: <20241106122254.13228-1-ansuelsmth@gmail.com>
+ <20241106122254.13228-3-ansuelsmth@gmail.com>
+ <4318897e-0f1a-42c7-8f20-065dc690a112@wanadoo.fr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: drivers/net/ethernet/freescale/ucc_geth.c:2454:64: sparse:
- sparse: incorrect type in argument 1 (different address spaces)
-To: Linus Walleij <linus.walleij@linaro.org>,
- kernel test robot <lkp@intel.com>,
- "linuxppc-dev@lists.ozlabs.org list" <linuxppc-dev@lists.ozlabs.org>,
- netdev <netdev@vger.kernel.org>
-Cc: Stanislav Kinsburskii <stanislav.kinsburskii@gmail.com>,
- oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>
-References: <202410301531.7Vr9UkCn-lkp@intel.com>
- <CACRpkdbW5kheaWPzKip9ucEwK2uv+Cmf5SwT1necfa3Ynct6Ag@mail.gmail.com>
-Content-Language: fr-FR
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-In-Reply-To: <CACRpkdbW5kheaWPzKip9ucEwK2uv+Cmf5SwT1necfa3Ynct6Ag@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Type: text/plain; charset=iso-8859-1
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
+In-Reply-To: <4318897e-0f1a-42c7-8f20-065dc690a112@wanadoo.fr>
 
-
-
-Le 08/11/2024 Ã  09:18, Linus Walleij a Ã©critÂ :
-> On Wed, Oct 30, 2024 at 8:05â€¯AM kernel test robot <lkp@intel.com> wrote:
+On Thu, Nov 07, 2024 at 06:53:53PM +0100, Christophe JAILLET wrote:
+> Le 06/11/2024 à 13:22, Christian Marangi a écrit :
+> > Add Airoha AN8855 5-Port Gigabit DSA switch.
+> > 
+> > The switch is also a nvmem-provider as it does have EFUSE to calibrate
+> > the internal PHYs.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth-Re5JQEeQqe8AvxtiuMwx3w@public.gmane.org>
+> > ---
 > 
->> tree:   https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C5a1ff6cef1f642fba00a08dcffce0903%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638666507603442752%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=2dgpku3%2BPjovwZxpedYowAAB%2BR%2FeyxOc0Ys3kE0KK6E%3D&reserved=0 master
->> head:   c1e939a21eb111a6d6067b38e8e04b8809b64c4e
->> commit: b28d1ccf921a4333be14017d82066386d419e638 powerpc/io: Expect immutable pointer in virt_to_phys() prototype
+> Hi,
 > 
-> Ugh Stanislav do you have ideas around this one?
+> ...
 > 
->>     drivers/net/ethernet/freescale/ucc_geth.c:244:21: sparse:     got restricted __be32 [noderef] __iomem *
->>     drivers/net/ethernet/freescale/ucc_geth.c:405:22: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned short volatile [noderef] [usertype] __iomem *addr @@     got restricted __be16 [noderef] [usertype] __iomem * @@
+> > +#include <linux/bitfield.h>
+> > +#include <linux/ethtool.h>
+> > +#include <linux/etherdevice.h>
+> > +#include <linux/gpio/consumer.h>
+> > +#include <linux/if_bridge.h>
+> > +#include <linux/iopoll.h>
+> > +#include <linux/mdio.h>
+> > +#include <linux/netdevice.h>
+> > +#include <linux/of_mdio.h>
+> > +#include <linux/of_net.h>
+> > +#include <linux/of_platform.h>
+> > +#include <linux/nvmem-provider.h>
 > 
-> They all look the same, it's from this:
+> Could be moved a few lines above to keep order.
 > 
-> static void set_mac_addr(__be16 __iomem *reg, u8 *mac)
-> {
->      out_be16(&reg[0], ((u16)mac[5] << 8) | mac[4]);
->      out_be16(&reg[1], ((u16)mac[3] << 8) | mac[2]);
->      out_be16(&reg[2], ((u16)mac[1] << 8) | mac[0]);
-> }
+> > +#include <linux/phylink.h>
+> > +#include <linux/regmap.h>
+> > +#include <net/dsa.h>
+> ...
 > 
-> Is it simply that we need a paranthesis extra around the thing casted
-> to (u16) else it becomes u32?
+> > +static int an8855_port_fdb_dump(struct dsa_switch *ds, int port,
+> > +				dsa_fdb_dump_cb_t *cb, void *data)
+> > +{
+> > +	struct an8855_priv *priv = ds->priv;
+> > +	struct an8855_fdb _fdb = {  };
+> 
+> Should it but reseted in the do loop below, instead of only once here?
+>
 
-Not at all. The one you point here are:
+Common practice is to fill EVERY value in _fdb to not have to reset, but
+yes just as extra caution, I will move the define in the for loop.
 
-drivers/net/ethernet/freescale/ucc_geth.c:405:22: warning: incorrect 
-type in argument 1 (different base types)
-drivers/net/ethernet/freescale/ucc_geth.c:405:22:    expected unsigned 
-short volatile [noderef] [usertype] __iomem *addr
-drivers/net/ethernet/freescale/ucc_geth.c:405:22:    got restricted 
-__be16 [noderef] [usertype] __iomem *
-drivers/net/ethernet/freescale/ucc_geth.c:406:22: warning: incorrect 
-type in argument 1 (different base types)
-drivers/net/ethernet/freescale/ucc_geth.c:406:22:    expected unsigned 
-short volatile [noderef] [usertype] __iomem *addr
-drivers/net/ethernet/freescale/ucc_geth.c:406:22:    got restricted 
-__be16 [noderef] [usertype] __iomem *
-drivers/net/ethernet/freescale/ucc_geth.c:407:22: warning: incorrect 
-type in argument 1 (different base types)
-drivers/net/ethernet/freescale/ucc_geth.c:407:22:    expected unsigned 
-short volatile [noderef] [usertype] __iomem *addr
-drivers/net/ethernet/freescale/ucc_geth.c:407:22:    got restricted 
-__be16 [noderef] [usertype] __iomem *
-drivers/net/ethernet/freescale/ucc_geth.c:449:23: warning: incorrect 
-type in argument 1 (different base types)
-drivers/net/ethernet/freescale/ucc_geth.c:449:23:    expected restricted 
-__be16 [noderef] [usertype] __iomem *reg
-drivers/net/ethernet/freescale/ucc_geth.c:449:23:    got unsigned short 
-[noderef] __iomem *
+> > +	int banks, count = 0;
+> > +	u32 rsp;
+> > +	int ret;
+> > +	int i;
+> > +
+> > +	mutex_lock(&priv->reg_mutex);
+> > +
+> > +	/* Load search port */
+> > +	ret = regmap_write(priv->regmap, AN8855_ATWD2,
+> > +			   FIELD_PREP(AN8855_ATWD2_PORT, port));
+> > +	if (ret)
+> > +		goto exit;
+> > +	ret = an8855_fdb_cmd(priv, AN8855_ATC_MAT(AND8855_FDB_MAT_MAC_PORT) |
+> > +			     AN8855_FDB_START, &rsp);
+> > +	if (ret < 0)
+> > +		goto exit;
+> > +
+> > +	do {
+> > +		/* From response get the number of banks to read, exit if 0 */
+> > +		banks = FIELD_GET(AN8855_ATC_HIT, rsp);
+> > +		if (!banks)
+> > +			break;
+> > +
+> > +		/* Each banks have 4 entry */
+> > +		for (i = 0; i < 4; i++) {
+> > +			count++;
+> > +
+> > +			/* Check if bank is present */
+> > +			if (!(banks & BIT(i)))
+> > +				continue;
+> > +
+> > +			/* Select bank entry index */
+> > +			ret = regmap_write(priv->regmap, AN8855_ATRDS,
+> > +					   FIELD_PREP(AN8855_ATRD_SEL, i));
+> > +			if (ret)
+> > +				break;
+> > +			/* wait 1ms for the bank entry to be filled */
+> > +			usleep_range(1000, 1500);
+> > +			an8855_fdb_read(priv, &_fdb);
+> > +
+> > +			if (!_fdb.live)
+> > +				continue;
+> > +			ret = cb(_fdb.mac, _fdb.vid, _fdb.noarp, data);
+> > +			if (ret < 0)
+> > +				break;
+> > +		}
+> > +
+> > +		/* Stop if reached max FDB number */
+> > +		if (count >= AN8855_NUM_FDB_RECORDS)
+> > +			break;
+> > +
+> > +		/* Read next bank */
+> > +		ret = an8855_fdb_cmd(priv, AN8855_ATC_MAT(AND8855_FDB_MAT_MAC_PORT) |
+> > +				     AN8855_FDB_NEXT, &rsp);
+> > +		if (ret < 0)
+> > +			break;
+> > +	} while (true);
+> > +
+> > +exit:
+> > +	mutex_unlock(&priv->reg_mutex);
+> > +	return ret;
+> > +}
+> 
+> ...
+> 
+> > +	ret = regmap_set_bits(priv->regmap, AN8855_RG_RATE_ADAPT_CTRL_0,
+> > +			      AN8855_RG_RATE_ADAPT_RX_BYPASS |
+> > +			      AN8855_RG_RATE_ADAPT_TX_BYPASS |
+> > +			      AN8855_RG_RATE_ADAPT_RX_EN |
+> > +			      AN8855_RG_RATE_ADAPT_TX_EN);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	/* Disable AN if not in autoneg */
+> > +	ret = regmap_update_bits(priv->regmap, AN8855_SGMII_REG_AN0, BMCR_ANENABLE,
+> > +				 neg_mode == PHYLINK_PCS_NEG_INBAND_ENABLED ? BMCR_ANENABLE :
+> > +									      0);
+> 
+> Should 'ret' be tested here?
+> 
 
-The problem is the __be16 in the function prototype.
+Sorry forgot to add.
 
-	set_mac_addr(&p_82xx_addr_filt->taddr.h, p_enet_addr);
+> > +
+> > +	if (interface == PHY_INTERFACE_MODE_SGMII &&
+> > +	    neg_mode == PHYLINK_PCS_NEG_INBAND_DISABLED) {
+> > +		ret = regmap_set_bits(priv->regmap, AN8855_PHY_RX_FORCE_CTRL_0,
+> > +				      AN8855_RG_FORCE_TXC_SEL);
+> > +		if (ret)
+> > +			return ret;
+> > +	}
+> 
+> ...
+> 
+> > +	priv->ds = devm_kzalloc(&mdiodev->dev, sizeof(*priv->ds), GFP_KERNEL);
+> > +	if (!priv->ds)
+> > +		return -ENOMEM;
+> > +
+> > +	priv->ds->dev = &mdiodev->dev;
+> > +	priv->ds->num_ports = AN8855_NUM_PORTS;
+> > +	priv->ds->priv = priv;
+> > +	priv->ds->ops = &an8855_switch_ops;
+> > +	mutex_init(&priv->reg_mutex);
+> 
+> devm_mutex_init() to slightly simplify the remove function?
+> 
 
-p_82xx_addr_filt->taddr.h is a u16
-and out_be16() expects a u16*
+Wonder if there is a variant also for dsa_unregister_switch. That
+would effectively remove the need for a remove function.
 
-So the following fixes the above warnings:
+> > +	priv->ds->phylink_mac_ops = &an8855_phylink_mac_ops;
+> > +
+> > +	priv->pcs.ops = &an8855_pcs_ops;
+> > +	priv->pcs.neg_mode = true;
+> > +	priv->pcs.poll = true;
+> > +
+> > +	ret = an8855_sw_register_nvmem(priv);
+> > +	if (ret)
+> > +		return ret;
+> > +
+> > +	dev_set_drvdata(&mdiodev->dev, priv);
+> > +
+> > +	return dsa_register_switch(priv->ds);
+> > +}
+> > +
+> > +static void
+> > +an8855_sw_remove(struct mdio_device *mdiodev)
+> > +{
+> > +	struct an8855_priv *priv = dev_get_drvdata(&mdiodev->dev);
+> > +
+> > +	dsa_unregister_switch(priv->ds);
+> > +	mutex_destroy(&priv->reg_mutex);
+> > +}
+> > +
+> > +static const struct of_device_id an8855_of_match[] = {
+> > +	{ .compatible = "airoha,an8855" },
+> > +	{ /* sentinel */ },
+> 
+> Ending comma is usually not needed after a terminator.
+> 
+> > +};
+> > +
+> > +static struct mdio_driver an8855_mdio_driver = {
+> > +	.probe = an8855_sw_probe,
+> > +	.remove = an8855_sw_remove,
+> > +	.mdiodrv.driver = {
+> > +		.name = "an8855",
+> > +		.of_match_table = an8855_of_match,
+> > +	},
+> > +};
+> 
+> ...
+> 
+> > +#define	  AN8855_VA0_VTAG_EN		BIT(10) /* Per VLAN Egress Tag Control */
+> > +#define	  AN8855_VA0_IVL_MAC		BIT(5) /* Independent VLAN Learning */
+> > +#define	  AN8855_VA0_VLAN_VALID		BIT(0) /* VLAN Entry Valid */
+> > +#define AN8855_VAWD1			0x10200608
+> > +#define	  AN8855_VA1_PORT_STAG		BIT(1)
+> > +
+> > +/* Same register map of VAWD0 */
+> 
+> Not sure to follow. AN8855_VAWD0 above is 0x10200604, not 0x10200618
+> 
 
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c 
-b/drivers/net/ethernet/freescale/ucc_geth.c
-index ab421243a419..bbfc289dd73c 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -400,7 +400,7 @@ static void put_enet_addr_container(struct 
-enet_addr_container *enet_addr_cont)
-  	kfree(enet_addr_cont);
-  }
+Confusing comment. The meaning here is not "same register" but same
+register fields aka bits and mask for the register are the same of
+..604.
 
--static void set_mac_addr(__be16 __iomem *reg, u8 *mac)
-+static void set_mac_addr(u16 __iomem *reg, u8 *mac)
-  {
-  	out_be16(&reg[0], ((u16)mac[5] << 8) | mac[4]);
-  	out_be16(&reg[1], ((u16)mac[3] << 8) | mac[2]);
+> > +#define AN8855_VARD0			0x10200618
+> > +
+> > +enum an8855_vlan_egress_attr {
+> > +	AN8855_VLAN_EGRESS_UNTAG = 0,
+> > +	AN8855_VLAN_EGRESS_TAG = 2,
+> > +	AN8855_VLAN_EGRESS_STACK = 3,
+> > +};
+> > +
+> > +/* Register for port STP state control */
+> > +#define AN8855_SSP_P(x)			(0x10208000 + ((x) * 0x200))
+> > +#define	 AN8855_FID_PST			GENMASK(1, 0)
+> > +
+> > +enum an8855_stp_state {
+> > +	AN8855_STP_DISABLED = 0,
+> > +	AN8855_STP_BLOCKING = 1,
+> > +	AN8855_STP_LISTENING = 1,
+> 
+> Just wondering if this 0, 1, *1*, 2, 3 was intentional?
+> 
 
+Yes blocking and listening is the same, I will follow suggestion by
+Andrew and make blocking = listening.
 
+> > +	AN8855_STP_LEARNING = 2,
+> > +	AN8855_STP_FORWARDING = 3
+> > +};
+> > +
+> > +/* Register for port control */
+> > +#define AN8855_PCR_P(x)			(0x10208004 + ((x) * 0x200))
+> > +#define	  AN8855_EG_TAG			GENMASK(29, 28)
+> > +#define	  AN8855_PORT_PRI		GENMASK(26, 24)
+> > +#define	  AN8855_PORT_TX_MIR		BIT(20)
+> > +#define	  AN8855_PORT_RX_MIR		BIT(16)
+> > +#define	  AN8855_PORT_VLAN		GENMASK(1, 0)
+> > +
+> > +enum an8855_port_mode {
+> > +	/* Port Matrix Mode: Frames are forwarded by the PCR_MATRIX members. */
+> > +	AN8855_PORT_MATRIX_MODE = 0,
+> > +
+> > +	/* Fallback Mode: Forward received frames with ingress ports that do
+> > +	 * not belong to the VLAN member. Frames whose VID is not listed on
+> > +	 * the VLAN table are forwarded by the PCR_MATRIX members.
+> > +	 */
+> > +	AN8855_PORT_FALLBACK_MODE = 1,
+> > +
+> > +	/* Check Mode: Forward received frames whose ingress do not
+> > +	 * belong to the VLAN member. Discard frames if VID ismiddes on the
+> > +	 * VLAN table.
+> > +	 */
+> > +	AN8855_PORT_CHECK_MODE = 1,
+> 
+> Just wondering if this 0, 1, *1*, 3 was intentional?
+> 
 
-For the other ones, most of them are because out_beXX() expects uXX* not 
-__beXX *.
+Nope a typo. Thanks for noticing this.
 
-It looks like the warnings go away if you replace out_be32() by 
-iowrite32be(), which has been possible since commit 894fa235eb4c 
-("powerpc: inline iomap accessors") (out_beXX/in_beXX should anyway not 
-be used outside arch/powerpc/):
+> > +
+> > +	/* Security Mode: Discard any frame due to ingress membership
+> > +	 * violation or VID missed on the VLAN table.
+> > +	 */
+> > +	AN8855_PORT_SECURITY_MODE = 3,
+> > +};
+> ...
+> 
+> CJ
 
-diff --git a/drivers/net/ethernet/freescale/ucc_geth.c 
-b/drivers/net/ethernet/freescale/ucc_geth.c
-index ab421243a419..625b58b3efc8 100644
---- a/drivers/net/ethernet/freescale/ucc_geth.c
-+++ b/drivers/net/ethernet/freescale/ucc_geth.c
-@@ -241,12 +241,12 @@ static struct sk_buff *get_new_skb(struct 
-ucc_geth_private *ugeth,
-  		    (((unsigned)skb->data) & (UCC_GETH_RX_DATA_BUF_ALIGNMENT -
-  					      1)));
-
--	out_be32(&((struct qe_bd __iomem *)bd)->buf,
-+	iowrite32be(
-  		      dma_map_single(ugeth->dev,
-  				     skb->data,
-  				     ugeth->ug_info->uf_info.max_rx_buf_length +
-  				     UCC_GETH_RX_DATA_BUF_ALIGNMENT,
--				     DMA_FROM_DEVICE));
-+				     DMA_FROM_DEVICE), &((struct qe_bd __iomem *)bd)->buf);
-
-  	out_be32((u32 __iomem *)bd,
-  			(R_E | R_I | (in_be32((u32 __iomem*)bd) & R_W)));
-
-
-Christophe
+-- 
+	Ansuel
 
