@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-143222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E5C499C1734
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:46:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8E6D9C173C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:47:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 23DD11C2235B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:46:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1CA51C213BE
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:47:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 56E371DE4D9;
-	Fri,  8 Nov 2024 07:46:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72AB91E1023;
+	Fri,  8 Nov 2024 07:46:14 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="XzQesEUO"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="Lr9MuHFN"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C44211D8A14;
-	Fri,  8 Nov 2024 07:46:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.148.174
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE81B1D27B9;
+	Fri,  8 Nov 2024 07:46:12 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731051966; cv=none; b=JOQqIlw9c0jjo0WS8GlVezE49tyT7ht3dvcNd+ylfV5CauE0F66dRaBMAcqUfxpqNWe5oaId5woo3q82o7ZcTUZxlGEB+zMFXkthNLtm713IjAyZ1izJRrqWnRwg9GQI8alkxU/YkKfEKNzikYwVOy9E/jrMZeDDWzgQLGtkPf0=
+	t=1731051974; cv=none; b=h+xBZsTW0+yb6Ml8sNrUK4dMNlFTkGEo0ho+Qvjq28QarDHnTPe/WGNjA/BkIOe7ANARG44aknCdGDZomkRF/hR9LnOLOwhFQbmrFJYpcoTW1vQLy2yTlVYaXXr8n9fDXt4Rw7l/EWRbeJUbFHvMx8RlOqngPGQzLav7HwuEixI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731051966; c=relaxed/simple;
-	bh=lVgRJkTudVJcmdbS+x21u9mgJKISN8B89B7L8QPYRg0=;
+	s=arc-20240116; t=1731051974; c=relaxed/simple;
+	bh=nkxULcvJe6TBcUSBEXf9M0DtZuqy+0Qand37ThuOZv0=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=tUDXAWt2RFKdTmU7bs9e9zumEibHyj6azrf6SSNjSVz6TBxxh5hmaUSNRtReJ4NYEgBG1IMaTYiYYUjGRZv3GWb7gkdjsKpR36N+A4GzRaNVf/LlowQ57mP3w0sSIcaAgCOCu+uMat9aq23nVNqTMvEs94cWqd7lvHsCIBQpi38=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=XzQesEUO; arc=none smtp.client-ip=67.231.148.174
+	 MIME-Version:Content-Type; b=ZeQ/hhtJbriZvEo8Bc8aa7f2cSBWzEkI6UNsHircWvXzXaTHE37mrswPf0ZyIdQm/zJ7vF6dLf19Bj2kXGCxH6YB3O6668SMF9bchsuL7rki4UZ3k1AfVg7Xy945s9prZktByUFGHSM9/B0Pk9kXKKPo6smmxNDs/DELqHZWy68=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=Lr9MuHFN; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A84hSiT012266;
-	Thu, 7 Nov 2024 23:45:53 -0800
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A81ghb2019272;
+	Thu, 7 Nov 2024 23:45:55 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
 	cc:content-transfer-encoding:content-type:date:from:in-reply-to
-	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=S
-	fHYLDmgkFn6leQQOMqPeMPmCv0gBhR1b70rHi/lzto=; b=XzQesEUOEevlXwpkJ
-	qgiL7pYqs8F9MrQJJachEpo7QfckxQr0vj/16mUZbXpPkCgCxYlLQc/KWkXtT3NL
-	XKGZJJa8sZx+wbjxZ5qz/bpGeKtOwrLuMjL7SVtmybqak5Z0r9wTZ7kgMxty+GtI
-	Vtw8tUKPFaZIYsHUKyG7h9rnTu7QgUYcJnXGYuweauQVNLGTg1SYxJ2q23apo/98
-	sBx4sz798WsXyW/7IRzgFlEixZ1LKi3o85QujxC3Z050hWEPz1quQFauLVz6a3C6
-	cANJGX0LjnJCxWDsRCaHw6ojZnYk0zEz6QeQCd+MhTMC3XvhjhhOTtnndSBn9OFU
-	MTQNA==
-Received: from dc5-exch05.marvell.com ([199.233.59.128])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 42sbv68a4g-1
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=Z
+	46/52708qnB7GFWEYR2f+Qfh9tmbXsvJQ79iUGzw54=; b=Lr9MuHFNo4KKNffdl
+	U5N7TsBqgFyumhrY7FB+N5tvnN9Ri5pCejXI/eikbdfWJ7bTRISNgb2GeqJTGvoJ
+	8BKO0acvIfNKAkO4uSBDmgrxapNrB/hlm1hWTYqYx+pYOc2fkx52QnGxArrRpkwG
+	ZWBqaZyIsy6xiBiPSVWgdCrVicHC7iGJ1g83tE4u4WFyTmXdu/9qRTujCVcheGJj
+	v+ezMV/cCkWMmevhCS3JknCPFJtuTwJRD99NJwER6Rp7CwrHh5UPursHVqj8cvrE
+	+H2Lw+v3kNEOr+mUXZVeFrhVy+2cC1Afks9XrIsR63xuClXLX3b6IqqhAojwszJf
+	KKbNQ==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42s97hrkt5-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 23:45:53 -0800 (PST)
-Received: from DC5-EXCH05.marvell.com (10.69.176.209) by
- DC5-EXCH05.marvell.com (10.69.176.209) with Microsoft SMTP Server
+	Thu, 07 Nov 2024 23:45:55 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 7 Nov 2024 23:45:52 -0800
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH05.marvell.com
- (10.69.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 7 Nov 2024 23:45:52 -0800
+ 15.2.1544.4; Thu, 7 Nov 2024 23:45:54 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 7 Nov 2024 23:45:54 -0800
 Received: from ubuntu-PowerEdge-T110-II.sclab.marvell.com (unknown [10.106.27.86])
-	by maili.marvell.com (Postfix) with ESMTP id 1D3063F7082;
-	Thu,  7 Nov 2024 23:45:52 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id B892E3F7082;
+	Thu,  7 Nov 2024 23:45:53 -0800 (PST)
 From: Shinas Rasheed <srasheed@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
 CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
@@ -65,16 +65,17 @@ CC: <hgani@marvell.com>, <sedara@marvell.com>, <vimleshk@marvell.com>,
         <egallen@redhat.com>, <konguyen@redhat.com>, <horms@kernel.org>,
         <frank.feng@synaxg.com>, Shinas Rasheed <srasheed@marvell.com>,
         Veerasenareddy Burru <vburru@marvell.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        "Eric
- Dumazet" <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-Subject: [PATCH net v3 4/7] octeon_ep: add protective null checks in napi callbacks for cnxk cards
-Date: Thu, 7 Nov 2024 23:45:40 -0800
-Message-ID: <20241108074543.1123036-5-srasheed@marvell.com>
+        Satananda Burla
+	<sburla@marvell.com>,
+        Andrew Lunn <andrew+netdev@lunn.ch>,
+        "David S. Miller"
+	<davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH net v3 5/7] octeon_ep_vf: Fix null dereferences to IQ/OQ pointers
+Date: Thu, 7 Nov 2024 23:45:41 -0800
+Message-ID: <20241108074543.1123036-6-srasheed@marvell.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241108074543.1123036-1-srasheed@marvell.com>
 References: <20241108074543.1123036-1-srasheed@marvell.com>
@@ -86,51 +87,48 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-GUID: y8Ufng22z5mKSe7LkNWXUvD0OTUfL3QB
-X-Proofpoint-ORIG-GUID: y8Ufng22z5mKSe7LkNWXUvD0OTUfL3QB
+X-Proofpoint-ORIG-GUID: ysRrBnL08M9O4BQXBH62S6YY1PrPbWtg
+X-Proofpoint-GUID: ysRrBnL08M9O4BQXBH62S6YY1PrPbWtg
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1039,Hydra:6.0.680,FMLib:17.12.60.29
- definitions=2024-09-06_09,2024-09-06_01,2024-09-02_01
+ engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
 
-During unload, at times the OQ parsed in the napi callbacks
-have been observed to be null, causing system crash.
-Add protective checks to avoid the same, for cnxk cards.
+During unload, sometimes race scenarios are seen wherein
+the get stats callback proceeds to retrieve the IQ/OQ stats,
+but by then the IQ/OQ might have been already freed.
 
-Fixes: 0807dc76f3bf ("octeon_ep: support Octeon CN10K devices")
+Protect against such conditions by defensively checking if
+the IQ/OQ pointers are null before dereference.
+
+Fixes: cb7dd712189f ("octeon_ep_vf: Add driver framework and device initialization")
 Signed-off-by: Shinas Rasheed <srasheed@marvell.com>
 ---
 V3:
   - Added back "Fixes" to the changelist
 
-V2: https://lore.kernel.org/all/20241107132846.1118835-5-srasheed@marvell.com/
+V2: https://lore.kernel.org/all/20241107132846.1118835-6-srasheed@marvell.com/
   - Split into a separate patch
   - Added more context
 
-V1: https://lore.kernel.org/all/20241101103416.1064930-3-srasheed@marvell.com/
+V1: https://lore.kernel.org/all/20241101103416.1064930-4-srasheed@marvell.com/
 
- drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c | 9 ++++++++-
- 1 file changed, 8 insertions(+), 1 deletion(-)
+ drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c b/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
-index 5de0b5ecbc5f..65a8dc1d492b 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_cnxk_pf.c
-@@ -638,7 +638,14 @@ static irqreturn_t octep_rsvd_intr_handler_cnxk_pf(void *dev)
- static irqreturn_t octep_ioq_intr_handler_cnxk_pf(void *data)
- {
- 	struct octep_ioq_vector *vector = (struct octep_ioq_vector *)data;
--	struct octep_oq *oq = vector->oq;
-+	struct octep_oq *oq;
-+
-+	if (!vector)
-+		return IRQ_HANDLED;
-+	oq = vector->oq;
-+
-+	if (!oq || !(oq->napi))
-+		return IRQ_HANDLED;
+diff --git a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+index 7e6771c9cdbb..79d9ffd593eb 100644
+--- a/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
++++ b/drivers/net/ethernet/marvell/octeon_ep_vf/octep_vf_main.c
+@@ -790,6 +790,9 @@ static void octep_vf_get_stats64(struct net_device *netdev,
+ 		struct octep_vf_iq *iq = oct->iq[q];
+ 		struct octep_vf_oq *oq = oct->oq[q];
  
- 	napi_schedule_irqoff(oq->napi);
- 	return IRQ_HANDLED;
++		if (!iq || !oq)
++			return;
++
+ 		tx_packets += iq->stats.instr_completed;
+ 		tx_bytes += iq->stats.bytes_sent;
+ 		rx_packets += oq->stats.packets;
 -- 
 2.25.1
 
