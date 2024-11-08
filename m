@@ -1,141 +1,109 @@
-Return-Path: <netdev+bounces-143451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B8969C2774
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 23:22:58 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6AF779C2799
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 23:32:16 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 05201B2167F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 22:22:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C1591C2177F
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 22:32:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D03A1DE896;
-	Fri,  8 Nov 2024 22:22:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552831E00B6;
+	Fri,  8 Nov 2024 22:32:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b="OCr7evBA"
+	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0uUMcD2Z"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.smtpout.orange.fr (smtp-28.smtpout.orange.fr [80.12.242.28])
+Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 241D6233D8C;
-	Fri,  8 Nov 2024 22:22:47 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=80.12.242.28
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251121A9B5C
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 22:32:10 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731104571; cv=none; b=SfVQGKgATDGbGf+cU1w02UTY0PBunfXULNn8CjY2BF59De13n300vBDI4H2u+WGLVywqPSctE59US/7JSK1vXPjRaypn10zyi2eZDmVI6DuzFozNbMIEmsVql7H1L25i+9788i2sztWIicwiKIBoz1e7+7vT0CFbRspo92JX8g8=
+	t=1731105133; cv=none; b=uRCSnf50djo/f4pIo06OBCJwgJMJ9k6ipW2PmyRgD1TAfHrlamzOe0m0Tlz2Y4TRyXrJwcki9wammP7aFQ4fgJxoiOnckVDVRKF604Zq0dI3XCaFoFxFLC5QFWl+poxiKopnH2SUvUxPgS5JqWrKtNXjg9hcAX4bs9EAnNA0Fdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731104571; c=relaxed/simple;
-	bh=VUMNYqBqRk+bOB2rzDRhOy4I7Q2ptnmdSgkVoXxejhc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:References:From:
-	 In-Reply-To:Content-Type; b=TXvqqdRYAynTuRd5aQRjzYCnq9Z2wnBPBa88cckKE8RLrtcf8E3CUZJAhiIcicYAV6zG90+T1X0dcqORvXFeaiDEJKw+S5mvut8bioJ8QLAB+aqaPPvrbTxyvU3sViMgatLgCpSvSdf0OIXxz9KuiwU8920grJcXML0VTHSrOcU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr; spf=pass smtp.mailfrom=wanadoo.fr; dkim=pass (2048-bit key) header.d=wanadoo.fr header.i=@wanadoo.fr header.b=OCr7evBA; arc=none smtp.client-ip=80.12.242.28
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=wanadoo.fr
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=wanadoo.fr
-Received: from [192.168.1.37] ([90.11.132.44])
-	by smtp.orange.fr with ESMTPA
-	id 9XNFtMV3pFhC09XNFtsbar; Fri, 08 Nov 2024 23:22:40 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1731104560;
-	bh=xsrkrId2lIYJCFt7oB7Y6EgOkBTSbKIAh53Ak1OYI3Q=;
-	h=Message-ID:Date:MIME-Version:Subject:To:From;
-	b=OCr7evBAcLliDBH7JIO9KPXO4GVZDPVDjUgFQ9LlzM5RBLMwhuKMYawIHNoAxKCVq
-	 cMyopUJjii8GKWWvR06KKD5u3GhPD+jxh9S/7AV65E3byZCtMUuQ5zqXEycIcgvQhM
-	 JH45ITWtTzTg0lYCPt7KYOwVoCV0Q4V7qd6He13S571rsTIroeXFmcMpDgwOAA7yE2
-	 CinZpsO8TC3kN1gxSUB17xNqmuG1BYGeNsnJfNCX/pktLwCsYxr0WqgNi47YCfUreu
-	 LqiuSLBvqAKMdgexiPIkUCGTGNNzQ23PJliHTkBsLzuLzC15GXW4cdRwTrSUAz0kA7
-	 pH6ZiIeBx4KZQ==
-X-ME-Helo: [192.168.1.37]
-X-ME-Auth: bWFyaW9uLmphaWxsZXRAd2FuYWRvby5mcg==
-X-ME-Date: Fri, 08 Nov 2024 23:22:40 +0100
-X-ME-IP: 90.11.132.44
-Message-ID: <9ea17ec0-921f-4197-904e-52a91f6a5170@wanadoo.fr>
-Date: Fri, 8 Nov 2024 23:22:37 +0100
+	s=arc-20240116; t=1731105133; c=relaxed/simple;
+	bh=BV1DG2nZYDkYnerBJ8vgdCr1Rv0kBw5xvyNF5SYsqFs=;
+	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=uq5blagJwchAHXzpoQKhfvEgak5EjeyaMBPvu3g5+AdtvDAfgQZfBxK+IiVZv66oVz2ljmxnT/dleDfn69kCd4KpjodxTNQ6rXjaOZ7qp7dB/XVv4nRcaKabfpN3l9De/+M3M5bSOctIb86yyqY0Fov8CUVicPZ29sbMFOP3vfk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0uUMcD2Z; arc=none smtp.client-ip=209.85.214.175
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
+Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20cb47387ceso29896645ad.1
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 14:32:10 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731105130; x=1731709930; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iMFxAHevlzFNIrxGQ+K9VcftJHP16vdgP3TXcAXmVVA=;
+        b=0uUMcD2Zh8+a/uiKRXpYcFoe8LxueY6XNs0fERKtfC1Q25w29n8UgLpcaPntjJ3LzD
+         Rnj1qEw7K6HKGTvlomB4P45uhC+HqFPXpA0XQ0K5qTxP3jxTNEYJA7j17YviA0jqZPBJ
+         +L35UakllJgmyF65ZCf9oG/CTE0MAs0GOaQaiKHESEl5ynx++4Q5MpUe/aIAQ0MDT+o3
+         WGZ1Kfc/dKTQa2vcmXT9qHEunOuo98A8mDso/4WUyPt4oAQTrs7dz9n8wlnZmXLaNdkh
+         gFyctsuSU2bxnFFWWRB3RsgRt2A5I6H+2sdl0JvTEPBGPgOl4wAx1IkkEZqmrkNyH/jJ
+         bz6Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731105130; x=1731709930;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iMFxAHevlzFNIrxGQ+K9VcftJHP16vdgP3TXcAXmVVA=;
+        b=nGHJYQojQKQYaiWgYeTW9pFrMlZoPPfnvmDGm2EY08Eqnj5iuCqfFeiUa5dkQamOn5
+         L72fom/cb0manWZrF+oYDENoS7hAFDQqgFbBpuW3n2ex4FPNUGUtYN1XM1QsqWsRQ6H6
+         FqMLalMNAq7eHyN9ckS2mt30nXVJ7QQo36TyqtEqrxPbPiC+sMMNXfWWI9kAj3APktmc
+         3OjKUdEl6jrAmCFrPU/w9rsyDNDiU2/qmWiw3/jZndirShhr4YqQ4GBXTrMS0KcPB+U+
+         NN8Gn7cdm/1NBJ9mXA5+LxSATEIWoUn1VlRq/5Z7p/WJf+KLfFXE2CnvItjoH6dEBWvt
+         1Ieg==
+X-Forwarded-Encrypted: i=1; AJvYcCU9zkjZGk054WPXCKVI+tQr/b0QyAlVtwxJD+aFHULxreMxTbpdlEvLQB14NF3eLlDwXDbFCCM=@vger.kernel.org
+X-Gm-Message-State: AOJu0YziIDrXz+4eQGaLIu1uCMvvRwa83P73I00XWQd7zpvWQvC4GlPU
+	jruZK40T70fow3ROlonTl4NjyokEMCKmzRCBmy23vyDafcCWR3nA8Zb6PpGrpEHxwk2pchjdRF2
+	S
+X-Google-Smtp-Source: AGHT+IEvfUMRQu40BNgwv4zU+Ictx5fEGNli377jI/LInxc8xAl/zMaK9alWOyVlP7LkMtcHGhqpFw==
+X-Received: by 2002:a17:902:da8f:b0:20b:61c0:43ed with SMTP id d9443c01a7336-21183545842mr64191745ad.30.1731105130294;
+        Fri, 08 Nov 2024 14:32:10 -0800 (PST)
+Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
+        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177ddf7e1sm35951695ad.106.2024.11.08.14.32.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 14:32:10 -0800 (PST)
+Date: Fri, 8 Nov 2024 14:32:08 -0800
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Edward Cree <ecree.xilinx@gmail.com>
+Cc: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 01/12] net: homa: define user-visible API for
+ Homa
+Message-ID: <20241108143208.2a08d972@hermes.local>
+In-Reply-To: <6467b078-4ee9-ecb2-6174-825c3a2d5007@gmail.com>
+References: <20241028213541.1529-1-ouster@cs.stanford.edu>
+	<20241028213541.1529-2-ouster@cs.stanford.edu>
+	<174d72f1-6636-538a-72d2-fd20f9c4cbd0@gmail.com>
+	<CAGXJAmxdRVm7jY7FZCNsvd8Kvd_p5FPUSHq8gbZvzn0GSK6=2w@mail.gmail.com>
+	<6467b078-4ee9-ecb2-6174-825c3a2d5007@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [net-next PATCH] net: dsa: add devm_dsa_register_switch()
-To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
- Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean
- <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20241108200217.2761-1-ansuelsmth@gmail.com>
-Content-Language: en-US, fr-FR
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20241108200217.2761-1-ansuelsmth@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Fri, 8 Nov 2024 22:02:27 +0000
+Edward Cree <ecree.xilinx@gmail.com> wrote:
 
-Le 08/11/2024 à 21:02, Christian Marangi a écrit :
-> Some DSA driver can be simplified if devres takes care of unregistering
-> the DSA switch. This permits to effectively drop the remove OP from
-> driver that just execute the dsa_unregister_switch() and nothing else.
+> > Do you know of other low-level kernel-call wrappers in
+> > Linux that are analogous to these? If so, how are they handled?  
+> 
+> The closest analogy that comes to mind is the bpf system call and libbpf.
+> libbpf lives in the tools/lib/bpf/ directory of the kernel tree, but is
+>  often packaged and distributed independently[2] of the kernel package.
+> If there is a reason to tie the maintenance of your wrappers to the
+>  kernel project/git repo then this can be suitable.
 
-Nit: s/driver/drivers/
-
-> Suggested-by: Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-
-Please, remove the "Marion &"
-
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
->   include/net/dsa.h |  1 +
->   net/dsa/dsa.c     | 19 +++++++++++++++++++
->   2 files changed, 20 insertions(+)
->
-> diff --git a/include/net/dsa.h b/include/net/dsa.h
-> index 72ae65e7246a..c703d5dc3fb0 100644
-> --- a/include/net/dsa.h
-> +++ b/include/net/dsa.h
-> @@ -1355,6 +1355,7 @@ static inline void dsa_tag_generic_flow_dissect(const struct sk_buff *skb,
->   
->   void dsa_unregister_switch(struct dsa_switch *ds);
->   int dsa_register_switch(struct dsa_switch *ds);
-> +int devm_dsa_register_switch(struct device *dev, struct dsa_switch *ds);
->   void dsa_switch_shutdown(struct dsa_switch *ds);
->   struct dsa_switch *dsa_switch_find(int tree_index, int sw_index);
->   void dsa_flush_workqueue(void);
-> diff --git a/net/dsa/dsa.c b/net/dsa/dsa.c
-> index 5a7c0e565a89..5cf1bac367ca 100644
-> --- a/net/dsa/dsa.c
-> +++ b/net/dsa/dsa.c
-> @@ -1544,6 +1544,25 @@ int dsa_register_switch(struct dsa_switch *ds)
->   }
->   EXPORT_SYMBOL_GPL(dsa_register_switch);
->   
-> +static void devm_dsa_unregister_switch(void *data)
-
-I was also wondering if it would make sense to have callbacks used by 
-devm_add_action_or_reset() have the __cold annotation.
-(AFAIK, it is never used for that up to now)
-
-CJ
-
-> +{
-> +	struct dsa_switch *ds = data;
-> +
-> +	dsa_unregister_switch(ds);
-> +}
-> +
-> +int devm_dsa_register_switch(struct device *dev, struct dsa_switch *ds)
-> +{
-> +	int err;
-> +
-> +	err = dsa_register_switch(ds);
-> +	if (err)
-> +		return err;
-> +
-> +	return devm_add_action_or_reset(dev, devm_dsa_unregister_switch, ds);
-> +}
-> +EXPORT_SYMBOL_GPL(dsa_register_switch);
-> +
->   static void dsa_switch_remove(struct dsa_switch *ds)
->   {
->   	struct dsa_switch_tree *dst = ds->dst;
+liburing for ioring calls is a better example.
+There are lots of versioning issues in any API. It took several years
+for BPF to get to run anywhere status. Hopefully, you can learn from
+those problems.
 
