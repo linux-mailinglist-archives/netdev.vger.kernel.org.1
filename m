@@ -1,132 +1,184 @@
-Return-Path: <netdev+bounces-143296-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96BBB9C1DAC
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:11:53 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5847F9C1DD6
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:25:51 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 05DFB1C22F17
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:11:53 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 205B31F21B17
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:25:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB6371EABB1;
-	Fri,  8 Nov 2024 13:11:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2CA51EB9E6;
+	Fri,  8 Nov 2024 13:25:45 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="DyLcjKLL"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ZXLzyNWc"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F93C1EABA9;
-	Fri,  8 Nov 2024 13:11:49 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF551E7C19;
+	Fri,  8 Nov 2024 13:25:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.47
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731071509; cv=none; b=DRFcuwxfTeOjmguFNJ68oQO1kZeey6yxGgLfMhExS9o8jejJxjkGQNvcPhyEoCRvxpFYpxPhhaXn1l0gy/V434iO9NlCdoyj5U3HbSrafihfccr1l2+PnyzXwGpJgdjvV/Z95oCm8MOJ3jxILjClJdRSAmeI/5sIt/7KNj2K+As=
+	t=1731072345; cv=none; b=eEnwgEd93w65n8UsFO0h0WPCpeHx5/KfpTGTqF0UosGfB4Z7nwfA0TTrMdfVO4zhYi3KPSrOLti1y5BUNnKJcibs9orFQ0GBwLYjLECx8KYBEM/MrmLhw2W2/kYXMXXE2ygJdD6qdWWcK24zdfgmmcndYmIjINN2z/d5DMwIHjM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731071509; c=relaxed/simple;
-	bh=zK0GRqp/V3HoI4yu30aVffYgP16alBb/iJp52nxyaXc=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=HFa1NR4nWxBlcG2qcKa6hbIa3Zjhi9au2yvOZHxeXBeLs2UmEyJror8jzoARtxcoV+FbPfsY/FK1irP52V5tpWOtOVf5arfvNz3dmQPPHysgP37+nLaZ1aw6vzKyUWax4YvAh3nA+IBfDGtjMJPjwTOHA55OsdMavMBFmHH7F0E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=DyLcjKLL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3F0CAC4CECD;
-	Fri,  8 Nov 2024 13:11:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731071509;
-	bh=zK0GRqp/V3HoI4yu30aVffYgP16alBb/iJp52nxyaXc=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=DyLcjKLLq/dqNJkHXkzMFBK0EoQQqXkZypILttHc3BZu+/UrHNom00DprSYwwoNO9
-	 6D6ZesOOA4nN+dCP77wMpJ9cg8TgtIw7fiUcJ4KPQkXfbFA96okJEf0sSEVnqIMLcS
-	 DgMSnLpeyBLKsltzYLJriHP1lLxXyRfhK6m6+gChBTZVWQEhCqsGqk8Z0c7/aM6+d4
-	 ffzgG5FUSj48K5dBr7gbRqDvNkA41oNcVAWhooL7b5Gq/51mu/OoQSh+tmJ1CQNcWZ
-	 pnU/A3FP8JgGxsn1BWUU9nxvgyiSBiu/QfKCmnaYEGQwEoHKtGhvgd4Xe2JZgLucG4
-	 Zy8dIyBQW7m4Q==
-Message-ID: <c26abf19-782b-400c-9c06-c26edcb4c00b@kernel.org>
-Date: Fri, 8 Nov 2024 07:11:47 -0600
+	s=arc-20240116; t=1731072345; c=relaxed/simple;
+	bh=X7uTdUC8RCJEpiMuCTYdtAAWLiu+WQ7JoHtmxB/FEcM=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version; b=K9oZ/aeicfCExxx/duMqrjZW47apIaq31edFl7ru6XC1v6MZyTOpcDAu3eanFqiijkdgJDnU0myRxcXzTyVnuA/s9voCvLmDV8q1cpZzZvjBH2qlfP9oIm70FZJHYSRwlgFECZ7tMim7Om7Ba9QInt8pObnGGTUsXJrKO7V4qMo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ZXLzyNWc; arc=none smtp.client-ip=209.85.128.47
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-4314b316495so17812445e9.2;
+        Fri, 08 Nov 2024 05:25:43 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731072342; x=1731677142; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=g5rDU6VZuerI6+GmmjiOWykpHLX1KujOwsEgmoRFXlc=;
+        b=ZXLzyNWcLe8SWYIbrZ3LJjywwJbcprYmd3FjmxrC4+vwy/2Viac1byEZRpNaVSBgCh
+         UtfglXaXfijk18eHfKIb2/PczgEOWiHleay9yId4xyvVh/poZKvyBsdovG1gRlCnoHCU
+         XX4W8ZzVna386x27ZZQaO+/LWGp0W4uPTnOpMmVg64a1yg7w72eM3asLJ31l3z7N5+XH
+         eY42OP7CQg7yB+p5cCTpWqu8NBA75C/M7pqd3fBGR4bkBrCFbbdb1l5kqtsjpserEcC1
+         uW4tSOAkKmK1rBCkuzCuuOVjtHadL2P73FmIg0DWw74JyClzFGiJhC9upH7HmAmHRMBe
+         3D/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731072342; x=1731677142;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=g5rDU6VZuerI6+GmmjiOWykpHLX1KujOwsEgmoRFXlc=;
+        b=bQqe/iTvmz6DTsvR9Nc4O1xIVw7u6rDbHTDgAmO99IKviYjK4asPBI95zoxt/XxrPJ
+         nIRC+EH4R79wnjNjf4KNGtT1q2A7Eep38z85NFC/BjkelbwosOY+n0Al/43EULHXxHQm
+         3OQSc/9/ZBzk6IN4zbkR9c3GVcZbU0rsYvi95ZM4PII+YS32ng7JKD1rmOsVpBXWJ/PM
+         DPMaOoV7ac6DLjxIPcGOv1s8FUQcNTbWvMPJuEWoRJ/gr+ZeaLQInEhLdpHmraEkbq8D
+         EbBG8fTTxWvv9qH07vsKvbEwuWC4GKaKsWIDVuDBLXdO2XrxRLlLxG7JhcHzlomyAXX6
+         wpFQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUcg7MeShX7BI66oFJMUyXnyKFL7DWL9eA6thupZ/TcDCOth9vQm2+O6Q1LOW5Jy501lLgyQldm@vger.kernel.org, AJvYcCX1JWJ7NcM+NZKCIlKNMGaQOVr/QWpjpA2q8XPHG2KBpX5Zvb407zy6Qgx37KRlUfyOJJM24RENrY5a@vger.kernel.org, AJvYcCX4FhzlzX0/fFTKyRlLXGeKxLyxVhNhhWZ6u+pcGXzq7sU1oF/uYyBY+m8SrK+UMMSWKhTRWoo4v3xLIE8Q@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz6kZhRHE0qom3Jpl7jSINTPEFD3efqAjrT5QYeAGPl+aD9pE1L
+	VcuW9l+WI6zj7Ny1jrOwGP2rWo/klsPCyhtmzhfjOgHADwNM6Nwb
+X-Google-Smtp-Source: AGHT+IGKVneiDpqEWsTNmdvn/OrWcqsgiRdsDLQNHy+NjEyqjVUMx/4HlFOvPZs0rVxTDt3Hp0EB4w==
+X-Received: by 2002:a05:600c:138a:b0:431:5c17:d575 with SMTP id 5b1f17b1804b1-432b750274fmr20953615e9.11.1731072341963;
+        Fri, 08 Nov 2024 05:25:41 -0800 (PST)
+Received: from localhost.localdomain (93-34-91-161.ip49.fastwebnet.it. [93.34.91.161])
+        by smtp.googlemail.com with ESMTPSA id 5b1f17b1804b1-432b05c1f61sm69746705e9.35.2024.11.08.05.25.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 05:25:41 -0800 (PST)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	upstream@airoha.com
+Subject: [net-next PATCH v4 0/3] net: dsa: Add Airoha AN8855 support
+Date: Fri,  8 Nov 2024 14:24:13 +0100
+Message-ID: <20241108132511.18801-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.45.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net v2] arm: dts: socfpga: use reset-name "stmmaceth-ocp"
- instead of "ahb"
-To: Mamta Shukla <mamta.shukla@leica-geosystems.com>,
- alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- mcoquelin.stm32@gmail.com, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org, a.fatoum@pengutronix.de
-Cc: bsp-development.geo@leica-geosystems.com
-References: <20241028145907.1698960-1-mamta.shukla@leica-geosystems.com>
-Content-Language: en-US
-From: Dinh Nguyen <dinguyen@kernel.org>
-In-Reply-To: <20241028145907.1698960-1-mamta.shukla@leica-geosystems.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
+This small series add the initial support for the Airoha AN8855 Switch.
 
+It's a 5 port Gigabit Switch with SGMII/HSGMII upstream port.
 
-On 10/28/24 09:59, Mamta Shukla wrote:
-> The ahb reset is deasserted in probe before first register access, while the
-> stmmacheth-ocp reset needs to be asserted every time before changing the phy
-> mode in Arria10[1].
-> 
-> Changed in Upstream to "ahb"(331085a423b  arm64: dts: socfpga: change the
-> reset-name of "stmmaceth-ocp" to "ahb" ).This change was intended for arm64
-> socfpga and it is not applicable to Arria10.
-> 
-> Further with STMMAC-SELFTEST Driver enabled, ethtool test also FAILS.
-> $ ethtool -t eth0
-> [  322.946709] socfpga-dwmac ff800000.ethernet eth0: entered promiscuous mode
-> [  323.374558] socfpga-dwmac ff800000.ethernet eth0: left promiscuous mode
-> The test result is FAIL
-> The test extra info:
->   1. MAC Loopback                 0
->   2. PHY Loopback                 -110
->   3. MMC Counters                 -110
->   4. EEE                          -95
->   5. Hash Filter MC               0
->   6. Perfect Filter UC            -110
->   7. MC Filter                    -110
->   8. UC Filter                    0
->   9. Flow Control                 -110
-> 10. RSS                          -95
-> 11. VLAN Filtering               -95
-> 12. VLAN Filtering (perf)        -95
-> 13. Double VLAN Filter           -95
-> 14. Double VLAN Filter (perf)    -95
-> 15. Flexible RX Parser           -95
-> 16. SA Insertion (desc)          -95
-> 17. SA Replacement (desc)        -95
-> 18. SA Insertion (reg)           -95
-> 19. SA Replacement (reg)         -95
-> 20. VLAN TX Insertion            -95
-> 21. SVLAN TX Insertion           -95
-> 22. L3 DA Filtering              -95
-> 23. L3 SA Filtering              -95
-> 24. L4 DA TCP Filtering          -95
-> 25. L4 SA TCP Filtering          -95
-> 26. L4 DA UDP Filtering          -95
-> 27. L4 SA UDP Filtering          -95
-> 28. ARP Offload                  -95
-> 29. Jumbo Frame                  -110
-> 30. Multichannel Jumbo           -95
-> 31. Split Header                 -95
-> 32. TBS (ETF Scheduler)          -95
-> 
-> [  324.881327] socfpga-dwmac ff800000.ethernet eth0: Link is Down
-> [  327.995360] socfpga-dwmac ff800000.ethernet eth0: Link is Up - 1Gbps/Full - flow control rx/tx
-> 
-> Link:[1] https://www.intel.com/content/www/us/en/docs/programmable/683711/21-2/functional-description-of-the-emac.html
-> Fixes: 331085a423b ("arm64: dts: socfpga: change the reset-name of "stmmaceth-ocp" to "ahb")
-> Signed-off-by: Mamta Shukla <mamta.shukla@leica-geosystems.com>
-> Tested-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> Reviewed-by: Ahmad Fatoum <a.fatoum@pengutronix.de>
-> ---
->
+This is starting to get in the wild and there are already some router
+having this switch chip.
 
-Applied, thanks!
+It's conceptually similar to mediatek switch but register and bits
+are different. And there is that massive Hell that is the PCS
+configuration.
+Saddly for that part we have absolutely NO documentation currently.
 
-Dinh
+There is this special thing where PHY needs to be calibrated with values
+from the switch efuse. (the thing have a whole cpu timer and MCU)
+
+Changes v4:
+- Set regmap readable_table static (mute compilation warning)
+- Add support for port_bridge flags (LEARNING, FLOOD)
+- Reset fdb struct in fdb_dump
+- Drop support_asym_pause in port_enable
+- Add define for get_phy_flags
+- Fix bug for port not inititially part of a bridge
+  (in an8855_setup the port matrix was always cleared but
+   the CPU port was never initially added)
+- Disable learning and flood for user port by default
+- Set CPU port to flood and learning by default
+- Correctly AND force duplex and flow control in an8855_phylink_mac_link_up
+- Drop RGMII from pcs_config
+- Check ret in "Disable AN if not in autoneg"
+- Use devm_mutex_init
+- Fix typo for AN8855_PORT_CHECK_MODE
+- Better define AN8855_STP_LISTENING = AN8855_STP_BLOCKING
+- Fix typo in AN8855_PHY_EN_DOWN_SHIFT
+- Use paged helper for PHY
+- Skip calibration in config_init if priv not defined
+Changes v3:
+- Out of RFC
+- Switch PHY code to select_page API
+- Better describe masks and bits in PHY driver for ADC register
+- Drop raw values and use define for mii read/write
+- Switch to absolute PHY address
+- Replace raw values with mask and bits for pcs_config
+- Fix typo for ext-surge property name
+- Drop support for relocating Switch base PHY address on the bus
+Changes v2:
+- Drop mutex guard patch
+- Drop guard usage in DSA driver
+- Use __mdiobus_write/read
+- Check return condition and return errors for mii read/write
+- Fix wrong logic for EEE
+- Fix link_down (don't force link down with autoneg)
+- Fix forcing speed on sgmii autoneg
+- Better document link speed for sgmii reg
+- Use standard define for sgmii reg
+- Imlement nvmem support to expose switch EFUSE
+- Rework PHY calibration with the use of NVMEM producer/consumer
+- Update DT with new NVMEM property
+- Move aneg validation for 2500-basex in pcs_config
+- Move r50Ohm table and function to PHY driver
+
+Christian Marangi (3):
+  dt-bindings: net: dsa: Add Airoha AN8855 Gigabit Switch documentation
+  net: dsa: Add Airoha AN8855 5-Port Gigabit DSA Switch driver
+  net: phy: Add Airoha AN8855 Internal Switch Gigabit PHY
+
+ .../bindings/net/dsa/airoha,an8855.yaml       |  242 ++
+ MAINTAINERS                                   |   11 +
+ drivers/net/dsa/Kconfig                       |    9 +
+ drivers/net/dsa/Makefile                      |    1 +
+ drivers/net/dsa/an8855.c                      | 2138 +++++++++++++++++
+ drivers/net/dsa/an8855.h                      |  638 +++++
+ drivers/net/phy/Kconfig                       |    5 +
+ drivers/net/phy/Makefile                      |    1 +
+ drivers/net/phy/air_an8855.c                  |  268 +++
+ 9 files changed, 3313 insertions(+)
+ create mode 100644 Documentation/devicetree/bindings/net/dsa/airoha,an8855.yaml
+ create mode 100644 drivers/net/dsa/an8855.c
+ create mode 100644 drivers/net/dsa/an8855.h
+ create mode 100644 drivers/net/phy/air_an8855.c
+
+-- 
+2.45.2
+
 
