@@ -1,120 +1,107 @@
-Return-Path: <netdev+bounces-143236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38DE49C1837
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:40:40 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id C3C919C1847
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:46:22 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AEC51C230CB
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:40:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 017CD1C22B86
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:46:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D724B1DF739;
-	Fri,  8 Nov 2024 08:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29B791DE4D9;
+	Fri,  8 Nov 2024 08:46:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eYwheXCe"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="WGVYzKZ/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qv1-f54.google.com (mail-qv1-f54.google.com [209.85.219.54])
+Received: from mail-lf1-f51.google.com (mail-lf1-f51.google.com [209.85.167.51])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42D2D1401B;
-	Fri,  8 Nov 2024 08:40:35 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.219.54
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4971D2239;
+	Fri,  8 Nov 2024 08:46:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.51
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731055237; cv=none; b=iP8Mj3QNG0WCqdydGBvV/ylY3gTHNiEjHmTE8nTOdpeWfWtxFteyvS+ZLK5rJ/yw5xVYe1xCRHAT3B0Q5WYc1SthoTqHXSG+HUhQiRDsGswKr8qqRKaZWFVAdPkHBtWGUj5NofqtV2Ggo3Vsqsxyyf06cClSJANYzO+Dd4HCV1Y=
+	t=1731055573; cv=none; b=B4kFH50ljdDmdiRRMkBxgaM89UKKA0Q1mCHCCSn/xMM74mjbmFeV3r9qMqmUFhUqgFQOdw92b0cHZugwaAuDuEXkXM4DALUewYfBnXtCOCe1xFFF9Pe8oDhxLt4qFFdp9aRg9X+3hcbeMjKnCoLcBvGWNc35BP1aZY2xOHSbdfk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731055237; c=relaxed/simple;
-	bh=EM8Dh5tie9IEjjF8do6TDj51/7ihEIDXiOF4JLqHEzE=;
+	s=arc-20240116; t=1731055573; c=relaxed/simple;
+	bh=3YzZNl2Yft5zhNJiVn+O2Cxpjbv4+QOcHH/a9sEX7dY=;
 	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=tA5M4NXkSjRCPhoH0MR2ORuN4wJR4aF33lov+yvzyAstnre4U2aSz0QK7euv+emPwpl5JMnz3qFvHds0N680oJM8U7DtrK1o2kwIS/OF8wXZeA9FIhGKHrmJvTwRFXZ+OK2pSwNhXOsm6KPBIwx0LBUuyUpgDZ+k4msmkFor+y0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eYwheXCe; arc=none smtp.client-ip=209.85.219.54
+	 To:Cc:Content-Type; b=XNc4PuemW28hk9G2OZunlFW+MR/+nMurxr0gFBnJfBGFAO/c66EzrLPkmBaJlN+8q2mq+ENswnd8Ei0MD3VPjUEzhCZTcLKF6fizZI2SYN5tJoZuvr56zZwbK5JkrnddllGyyeh+O/Xk8VdNVLobf4pZQP5Yd/xzhe8IT7MtncE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=WGVYzKZ/; arc=none smtp.client-ip=209.85.167.51
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-qv1-f54.google.com with SMTP id 6a1803df08f44-6cbe3ea8e3fso11653816d6.0;
-        Fri, 08 Nov 2024 00:40:35 -0800 (PST)
+Received: by mail-lf1-f51.google.com with SMTP id 2adb3069b0e04-539f72c8fc1so2974655e87.1;
+        Fri, 08 Nov 2024 00:46:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731055235; x=1731660035; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731055569; x=1731660369; darn=vger.kernel.org;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=GL2lyjzT+FtKmh9gYSOJWQLwDI+A1zp6yGWbnO7Ggvk=;
-        b=eYwheXCeeQKZPaodpm440B/3Caod+2STJZKD22nKdQ2aD3KQIOv+tMwnd/YOz4uqYW
-         5/Dk/v8pfIz4CQPyzSxZ6ezt4UL+XcLQAcJLHkSgTnOguqVQqdHRYl6pfvQdYN1JXHSH
-         J3LzdodT+6GDpdPf0Ht+Y5gbpAv8dSyVwkgvP1E4k3VKFGUCAhmvft47phs5k45EWDWV
-         QHrRmF8GSfxifnA/LztxfjvkmSBtpjO0tfOVQ9B6irVGIRWecpHPT2ZlPtQVpIFHMGZi
-         DsaWVYnm95qTJ1J2HS5dA3nqzWBlBaLn932K8bBMFNYU8Ysf2FRS2d4lHprZvRJiSDYo
-         GrIg==
+        bh=3YzZNl2Yft5zhNJiVn+O2Cxpjbv4+QOcHH/a9sEX7dY=;
+        b=WGVYzKZ/lg89Oi2WYsud2LaeGYbyuO8+pBOq1tvnqnxLUr3Yq3kYahSBSMdqKPPdAy
+         YvIThChdUrZgWOPJ1qFbGXzJoRWwLScQ3SobFPRD5Uksu6RTNtzYh+Yf9/XJhx5Zqufq
+         Rmi7yJhpwrVdLleJYiowSEolozcD5QoqM2WCDAq0iffrf6YyTwZ9tUi9JJZIbTKarQ8m
+         biz5TEfvkf7Ix/DQwqpAbvPDu/g/8lP6Y8AAPyrBbKHvYDtu4IJaMn8nNndiE/rxZxxL
+         skoivqr6/SONVDXUxd52q55YxiJrfATVZmF4Ezp6eHbN5HPABaFSSBMyDSHRS5eSi3de
+         k4/Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731055235; x=1731660035;
+        d=1e100.net; s=20230601; t=1731055569; x=1731660369;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=GL2lyjzT+FtKmh9gYSOJWQLwDI+A1zp6yGWbnO7Ggvk=;
-        b=OgNagXL5ZDeuGyt7v2XEXMZYnUCz37Lg0Yn2aoNhSNdtamqxssKGcF5b8g+wnw/h6S
-         Ot8jw0QWoHB+e5nve00wQLnm3xwrwynvetk3/Pk4xYTMlH5Kcp9w6S9gVN/zHT4xE2yv
-         YuloDNJ6gTQ0r1RkCr1y5vMPgrA5kAvNtGO7+mGJN91/DDl3HcGW/ruCwdhCVtuLNvBa
-         A9axEVQKEmt03k0yGC+uZFK+tmW607NsqEueLlBA8BkMLEvr/sClyoHgRAbAzKeDvxbr
-         WO0LDV4xxoPbeSYUN/MF1OFNuDkyviiJ/CiOmc+Y5O0EBgVfBwEGQik/auejXnhCpU7N
-         f7zg==
-X-Forwarded-Encrypted: i=1; AJvYcCUbyd2dmk5yN3oLczch6qWt8BK7O/LP4N4++dMiLD8b0ZHA1aXR085oN6YClq0do2bY9ZhaOyiZ@vger.kernel.org, AJvYcCVlejGMbaJIG3N2zey5z+Kfw9LnlES0MU8+7AdJ7SB/yG9Wt3NtMPngi+yvAheXa9Em5x/DQc29QAWh@vger.kernel.org
-X-Gm-Message-State: AOJu0YyNzDTxCIzWNzBC6m1LxcZhrKt411H52Y4869JA4H/+y3kFhhwv
-	giBnegkkFbemiUoElgX/kS30WpVd3gju8QTZmj4tTq1QCG7yTbYImsN5se269ir7fenlMaSIQIo
-	EK/gc6ByOxY0RhWOuWTnYODvDv1c=
-X-Google-Smtp-Source: AGHT+IHZ9m+pYdCxXZGYug0M4ZN2U10Xit5mM96LDWUVDxWNPhA4yfTmGXUyjIwB3wWmfvdOeMJsIf9HI7EY/oaUyQ8=
-X-Received: by 2002:a05:6214:570a:b0:6cb:ec7e:4fba with SMTP id
- 6a1803df08f44-6d39e19782emr27465396d6.25.1731055235064; Fri, 08 Nov 2024
- 00:40:35 -0800 (PST)
+        bh=3YzZNl2Yft5zhNJiVn+O2Cxpjbv4+QOcHH/a9sEX7dY=;
+        b=pF5+u5QsW4vfXbycjLrk5TCs0ZkwjWjlLoQfRUHlV3PqwJNTKPx3PC8IPE0rhFcIdZ
+         QM22sIY29xlPmio8TAfIvccop/9ssn9ni7rPER/Oth2lRtS9QZqy1qXPNW3ynLmxVHSz
+         s7JH4awi2SR2Efy+f+fwV0OihbvBz0T1Dk2HNArgohgJhKUAkEE/DUTfbogQyfK0LPjo
+         y40I6z25o01N2cxAFC5fJBnnCGlCUQVWKPYcZvILT8AADf4KaN2QdhOUHNzrpnEQSb1t
+         iJb0QQ9vzdnT9h6ynQbODfmRLTkRm5eUCB4gNeJgnnwL2LzbkMi2T24NFKmslVGa89xR
+         kFZg==
+X-Forwarded-Encrypted: i=1; AJvYcCXVk+Q4CJYPX590m9Ju7X5In1k8RhZgJTzAlx6JDtwU7cJdnkOn3PIm5PI0RPE6mt+TayqsoMAt@vger.kernel.org, AJvYcCXY3fobQUUwi+oVYlLD4tfgEyIyRU1vOhdjjZQkTwS/izY2UqXmcWZVtcOGIua9WB7corjXPWUtsgy8YvzS6GQ=@vger.kernel.org
+X-Gm-Message-State: AOJu0YxNXyLLppuQzjI4hd1m7NfRZjNqLttPzL0b0z4dWfu9UYDAb+6u
+	0UjNeAo/WHHbzatSt87kUYr+fkMtB3gAntVzFfrRncf3Icn29fOre2dimxtv3+Ci5uZiPq5UHHB
+	sS8fEQkT9uHSAogvnnrU52ID/00pic1dJdSc=
+X-Google-Smtp-Source: AGHT+IGXwwX8LIC6sJPKuccOsOiezGZvGqyEhLUfO8Qx0SvcLmNa+H054POH2TlnIN50J2X2evmXa0CMl8NAr6WugM0=
+X-Received: by 2002:ac2:4c4d:0:b0:536:55ef:69e8 with SMTP id
+ 2adb3069b0e04-53d861a2bc2mr1004685e87.0.1731055569260; Fri, 08 Nov 2024
+ 00:46:09 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241106064015.4118-1-laoar.shao@gmail.com> <b3c6601b-9108-49cb-a090-247d2d56e64b@gmail.com>
- <CALOAHbDPbwH7vqV2_NAm=_YnN2KnmVLOe7avWOYG+Rynd295Vg@mail.gmail.com>
- <9b3af2dd-8b56-4817-b223-c6a85ba80562@nvidia.com> <20241106171717.1bf7331f@kernel.org>
-In-Reply-To: <20241106171717.1bf7331f@kernel.org>
-From: Yafang Shao <laoar.shao@gmail.com>
-Date: Fri, 8 Nov 2024 16:39:58 +0800
-Message-ID: <CALOAHbB0Ura366LyxH2Buy=11bezbqB+4DZVnZRRo-=q=tMgpg@mail.gmail.com>
-Subject: Re: [PATCH] net/mlx5e: Report rx_discards_phy via rx_missed_errors
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Gal Pressman <gal@nvidia.com>, Tariq Toukan <ttoukan.linux@gmail.com>, saeedm@nvidia.com, 
-	tariqt@nvidia.com, leon@kernel.org, netdev@vger.kernel.org, 
-	linux-rdma@vger.kernel.org
+References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-8-shaw.leon@gmail.com>
+ <20241107080420.6a5a5243@kernel.org> <CAD4GDZwOzLQd+FYd0AHr5AUcANWkf731Jgu6aeyix8EjRGXRag@mail.gmail.com>
+In-Reply-To: <CAD4GDZwOzLQd+FYd0AHr5AUcANWkf731Jgu6aeyix8EjRGXRag@mail.gmail.com>
+From: Xiao Liang <shaw.leon@gmail.com>
+Date: Fri, 8 Nov 2024 16:45:32 +0800
+Message-ID: <CABAhCOSvo4OemcevEnNmk3Jny_YEoCb3s9GPC6o217oj-t5FnQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 7/8] tools/net/ynl: Add retry limit for async notification
+To: Donald Hunter <donald.hunter@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
+	Hangbin Liu <liuhangbin@gmail.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 7, 2024 at 9:17=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
+On Fri, Nov 8, 2024 at 1:16=E2=80=AFAM Donald Hunter <donald.hunter@gmail.c=
+om> wrote:
 >
-> On Wed, 6 Nov 2024 21:23:47 +0200 Gal Pressman wrote:
-> > > It appears that rx_fifo_errors is a more appropriate counter for this=
- purpose.
-> > > I will submit a v2. Thanks for your suggestion.
-> >
-> > Probably not a good idea:
-> >  *   This statistics was used interchangeably with @rx_over_errors.
-> >  *   Not recommended for use in drivers for high speed interfaces.
->
-> FWIW we can change the definition. Let me copy paste below the commit
-> which added the docs because it has the background.
->
-> tl;dr is that I was trying to push drivers towards a single stat to
-> keep things simple. If we have a clear definition of how rx_fifo_errors
-> would differ - we can reuse it and update the doc. For example if
-> rx_discards_phy usually means that the adapter itself is overwhelmed
-> (too many rules etc) that would be a pretty clear, since rx_missed is
-> supposed to primarily indicate that the host rings are full or perhaps
-> the PCIe interface of the NIC is struggling. But not the packet
-> processing.
+> It's then a question of whether we need the repeat logic in poll_ntf()
+> because it's always possible to use check_ntf() in your own repeat
+> logic. Either way, I'd prefer not to call the parameter "max_retries"
+> because semantically I don't think we are retrying - it is a count of
+> how many times to repeat the poll. Thoughts? Should it be a "duration"
+> parameter?
 
-Thanks for providing the background.
-What do you suggest=E2=80=94should we report rx_discards_phy via
-rx_fifo_errors and update the documentation accordingly?
-
---=20
-Regards
-Yafang
+Yes, a "duration" is better. The meaning of "retry" or "count" is not clear=
+.
+The original check_ntf() is good enough for the test case in this
+series. Could you make the change, or do you prefer me to submit
+another patch?
 
