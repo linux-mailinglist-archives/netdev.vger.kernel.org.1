@@ -1,138 +1,113 @@
-Return-Path: <netdev+bounces-143208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50B519C1642
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:00:30 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCCF9C1659
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:10:17 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id EF36CB224D3
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 06:00:27 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1385D1F23CF2
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 06:10:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F821CF291;
-	Fri,  8 Nov 2024 06:00:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F40F71CF7B1;
+	Fri,  8 Nov 2024 06:10:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b="GaPry9vZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="hKHLiO6q"
 X-Original-To: netdev@vger.kernel.org
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EABA36126;
-	Fri,  8 Nov 2024 06:00:17 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=13.77.154.182
+Received: from mail-yw1-f172.google.com (mail-yw1-f172.google.com [209.85.128.172])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CEA1CEEB6;
+	Fri,  8 Nov 2024 06:10:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.172
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731045619; cv=none; b=oonvdCLqGUrOeMIGi9ZDJlhdf6ocVxZFLrbdpAogCAZ9i4l4RiXwLFEkVFUK4ndkELMD3sQ2ocKM+rSfaT5C5Jo3BNWnEVVaA/JqTjD0m2aWO74luxTYszvlbQuupJp97vV8X1A/bTqzE+5UiXehwk0ohUD59fupuJGdb9LY8IU=
+	t=1731046210; cv=none; b=qOX+RWdPpKqS8CKidUkKG3X+mVg5SCIq3C4rtmyn4qg+YDSV8aR17hT6TZLnCUm34mdiMgDH8/bNl2isv/nS9VUPUxQRE8BQSIWjBQ+Qwiu6xfY3LkWXn974Ihf1AZjUgsQ9noX7inDdJ2Uc/6kAUnpOEBogdc6pWQClP6M2TTI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731045619; c=relaxed/simple;
-	bh=tlDIU3BOR7aSM8SWyTBM7c5q3bd6KmFhcWps+K5/pgo=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=hLxzxBVT76bVv7IycxsvjSUXd6raJe4dNsAjMidCLfoLyRPvu2+PM1rQiWjybgnIbHh/YS7gheyZalkQxlDBKmkPwd2zZAKknmxUBLp088MRVIm8s83KfTsKRq+1J2c4xNgoQqylM/hyT3kPMoEBZ9n0IKHn2xbz1MjV2DAwTb0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com; spf=pass smtp.mailfrom=linux.microsoft.com; dkim=pass (1024-bit key) header.d=linux.microsoft.com header.i=@linux.microsoft.com header.b=GaPry9vZ; arc=none smtp.client-ip=13.77.154.182
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.microsoft.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.microsoft.com
-Received: from [192.168.0.103] (unknown [49.205.249.137])
-	by linux.microsoft.com (Postfix) with ESMTPSA id 47AD6212D516;
-	Thu,  7 Nov 2024 22:00:02 -0800 (PST)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 47AD6212D516
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1731045617;
-	bh=JfGAY+SgJN3XN/2DmcBwbwpAyE9Jg5zKh8nkpRpQOEw=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=GaPry9vZBpJ4Csbyy+XjXwBbb5PXQIRZpl+bL8WerrHnqdLQYdxQhcAh9bNdkoiwM
-	 0rtOyqxosSzCXDs5w7d73GHL8PjRX14neKuGkeHWuPXg+GnCsZEBRD6wNTJ4ThdvID
-	 VDRS5dHBu8xaBb7Hc7Vqtd1vOwq2eibskIz/48fs=
-Message-ID: <ef2686dc-ec9e-4efd-9c52-5ba9434b7ce8@linux.microsoft.com>
-Date: Fri, 8 Nov 2024 11:29:58 +0530
+	s=arc-20240116; t=1731046210; c=relaxed/simple;
+	bh=QNRHmkQNttL4XBC1OFrUpsQWNzgq+Jf7VcqAcf7oIns=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FeKgXsRrGWha8+WY03/XTrHT/nFhp+SxI/DJT/lSxLDiR3Ife9Bb7uSezAoTyWkFw38/w8yg283kF5X9LMAUqf4eULl5vELK8gJ404hlQTewZnl6qYltGvwbbhk2SGD0GY5mzyxFIx4901n2ZmuP7cQZPXvkPr0eRLfAafeVZvI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=hKHLiO6q; arc=none smtp.client-ip=209.85.128.172
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-yw1-f172.google.com with SMTP id 00721157ae682-6e9ed5e57a7so14853877b3.1;
+        Thu, 07 Nov 2024 22:10:09 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731046208; x=1731651008; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QNRHmkQNttL4XBC1OFrUpsQWNzgq+Jf7VcqAcf7oIns=;
+        b=hKHLiO6qIvV4X7pDmYH7jbZvupO+ApIEz/VKn8wmaUxK3oQzmBO2fgjFPMf0d9sVeM
+         s7xuRlL//KRtVR850/ZciHWrbKg+DJo8m47RvkUYpJV+DhS6vulGSp5E/C/myb9EKLxN
+         +B245Xi8vnx7Ivm2uuvMc0NvI09to1l7kHl29kmn5ssdzXr3dZznTWh4pHUWvUIbem45
+         DgU+CGd49zFw4UDxM+NN2hzBJ5ThUWYwWMX2eFdVAmVACIcQvoCIn+kZkH2IG/n4MnP+
+         ouY65Kn9esBW5je0JKtoSHrItQy+NoKKs8r8W5pMnuJUEFFFlD21zAMqbO2IheDT2O26
+         zQew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731046208; x=1731651008;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QNRHmkQNttL4XBC1OFrUpsQWNzgq+Jf7VcqAcf7oIns=;
+        b=swyN9Z6S5jaeNcBeIGUIsQnkOwydjAeIky2ybAkbBgkiph5YBK1V5X+tuT+Hva3Fu6
+         A6WJZHuHQNwcCXvqvzjlhlE1Q7SQZvhsd9dxW4U9qFcbQJGEHUNuu1gQbgyQP+L5sQjS
+         4N1oo84UbtHt0l71rCWevFD/53zRwo9DF4kK0ueJR3AAk9zHoN0dDPYPZmvMtZZRktpm
+         bm6JNY71PGAEnm7gaNygsmkGEpPdFilflSyIe1uvlHru6qqztTMTtDUSaD2V2NYngqO0
+         nVx675MOKmWvoOzoluCK4a8gcaTu8ISJDJEtG09rxXOxUeGwf/neMmPIhOKYwvpdxQAL
+         SMOg==
+X-Forwarded-Encrypted: i=1; AJvYcCUi6Jsh2vsldJsDp1Nq05FZxAK1Fe5axlA4Yui7R5PWvCWdxmwjMeIhqwfOhERWfnBinj2ppUIp/Om7S5M=@vger.kernel.org, AJvYcCUijrNVhA13IEZsxPaksq+lxII/CgOk7V3/SO9rdmeNsHdqjz5MyqWxgJcYLmbesN03PZmCE2y0oZlW@vger.kernel.org, AJvYcCX7RSAFyALU5Sc0lPzWGQ6Ts9oTYb3HBgayyB/MlPa348M9IP92u72fZNt2K/xxmgJ8CkW4URwR@vger.kernel.org
+X-Gm-Message-State: AOJu0YyVTNaY/+KTYth3AmgPJ6CXEMa2nQf9YfUqnmM9e6TN/04M2oQe
+	ES6GgbMrNfSDjxJy0xebnHS9JpQ8v04whERG8o1qSvJm1/BqxUjs0M9WW+k93Q3LG3Ezut4gTi4
+	SQZ/nAO2l2mVh3reLjLAoRnX2r+U=
+X-Google-Smtp-Source: AGHT+IHHn/w8b4Tg7Hd4Sr58w27FsTmfn+08/QY7kx6hk8l4BQYd7+PswpjPKal/gGm8RzZk8IrMXvQgoIbSuzppJkw=
+X-Received: by 2002:a05:690c:6302:b0:6e5:bf26:578 with SMTP id
+ 00721157ae682-6eaddd96d06mr19916317b3.17.1731046208488; Thu, 07 Nov 2024
+ 22:10:08 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH v2 3/4] hyperv: Add new Hyper-V headers in include/hyperv
-To: Nuno Das Neves <nunodasneves@linux.microsoft.com>,
- linux-hyperv@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org, kvm@vger.kernel.org, iommu@lists.linux.dev,
- netdev@vger.kernel.org, linux-pci@vger.kernel.org,
- linux-arch@vger.kernel.org, virtualization@lists.linux.dev
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
- mhklinux@outlook.com, decui@microsoft.com, catalin.marinas@arm.com,
- will@kernel.org, luto@kernel.org, tglx@linutronix.de, mingo@redhat.com,
- bp@alien8.de, dave.hansen@linux.intel.com, x86@kernel.org, hpa@zytor.com,
- seanjc@google.com, pbonzini@redhat.com, peterz@infradead.org,
- daniel.lezcano@linaro.org, joro@8bytes.org, robin.murphy@arm.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, lpieralisi@kernel.org, kw@linux.com, robh@kernel.org,
- bhelgaas@google.com, arnd@arndb.de, sgarzare@redhat.com,
- jinankjain@linux.microsoft.com, muminulrussell@gmail.com,
- skinsburskii@linux.microsoft.com, mukeshrathor@microsoft.com,
- vkuznets@redhat.com, ssengar@linux.microsoft.com, apais@linux.microsoft.com
-References: <1731018746-25914-1-git-send-email-nunodasneves@linux.microsoft.com>
- <1731018746-25914-4-git-send-email-nunodasneves@linux.microsoft.com>
-Content-Language: en-US
-From: Naman Jain <namjain@linux.microsoft.com>
-In-Reply-To: <1731018746-25914-4-git-send-email-nunodasneves@linux.microsoft.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+References: <20241104092434.2677-1-dqfext@gmail.com> <7e0df321-e297-4d32-aac5-a885de906ad5@redhat.com>
+In-Reply-To: <7e0df321-e297-4d32-aac5-a885de906ad5@redhat.com>
+From: Qingfang Deng <dqfext@gmail.com>
+Date: Fri, 8 Nov 2024 14:09:37 +0800
+Message-ID: <CALW65jaKn7HQth6oYYHWYvg7CTZJj2QH66nHyo41BNjAA15Y7g@mail.gmail.com>
+Subject: Re: [PATCH net-next] net: ppp: remove ppp->closing check
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, linux-ppp@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
+Hi Paolo,
 
+On Thu, Nov 7, 2024 at 8:08=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+>
+>
+> On 11/4/24 10:24, Qingfang Deng wrote:
+> > ppp->closing was used to test if an interface is closing down. But upon
+> > .ndo_uninit() where ppp->closing is set to 1, dev_close() is already
+> > called to bring down an interface and a synchronize_net() guarantees
+> > that no pending TX/RX can take place, so the check is unnecessary.
+> > Remove the check.
+>
+> I'm unsure we can remote such check. The TX callback can be triggered
+> even from a write on the controlling file, and it looks like such file
+> will be untouched by uninit.
 
-On 11/8/2024 4:02 AM, Nuno Das Neves wrote:
-> These headers contain definitions for regular Hyper-V guests (as in
-> hyperv-tlfs.h), as well as interfaces for more privileged guests like
-> Dom0.
-> 
-> These files are derived from headers exported from Hyper-V, rather than
-> being derived from the TLFS document. (Although, to preserve
-> compatibility with existing Linux code, some definitions are copied
-> directly from hyperv-tlfs.h too).
-> 
-> The new files follow a naming convention according to their original
-> use:
-> - hdk "host development kit"
-> - gdk "guest development kit"
-> With postfix "_mini" implying userspace-only headers, and "_ext" for
-> extended hypercalls.
+ppp_release (when the file is closed) calls unregister_netdevice, and
+no more writes can happen after that.
 
-Naming convention for mini (which may have come from HyperV code) is a 
-bit odd TBH. May be it has more to it than what is mentioned here or 
-what I know. If more information helps, or this can be changed, please see.
-
-> 
-> These names should be considered a rough guide only - since there are
-> many places already where both host and guest code are in the same
-> place, hvhdk.h (which includes everything) can be used most of the time.
-> 
-> The original names are kept intact primarily to keep the provenance of
-> exactly where they came from in Hyper-V code, which is helpful for
-> manual maintenance and extension of these definitions. Microsoft
-> maintainers importing new definitions should take care to put them in
-> the right file.
-> 
-> Note also that the files contain both arm64 and x86_64 code guarded by
-> \#ifdefs, which is how the definitions originally appear in Hyper-V.
-> Keeping this convention from Hyper-V code is another tactic for
-> simplying the process of importing new definitions.
-> 
-> These headers are a step toward importing headers directly from Hyper-V
-> in the future, similar to Xen public files in include/xen/interface/.
-> 
-> Signed-off-by: Nuno Das Neves <nunodasneves@linux.microsoft.com>
-
-While I understand the motivation behind this series that this is going 
-to ease out the process of updating the header files with respect to 
-HyperV, I think, we will need to pay attention to what we are bringing 
-in with these headers, whether there are any users of it or not, and 
-make sure that TLFS document is updated regularly, to avoid having bunch 
-of code with no information of it.
-The code comments in these files are one step forward towards that.
-And from your cover letter it seems that some changes which actually 
-make use of these additional interfaces are underway, so things will 
-make more sense later. For now, this looks good to me.
-
-
-Regards,
-Naman
-
-<snip>
+>
+> Cheers,
+>
+> Paolo
+>
 
