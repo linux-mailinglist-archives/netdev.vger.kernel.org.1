@@ -1,90 +1,167 @@
-Return-Path: <netdev+bounces-143413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143414-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E9B39C258D
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 20:29:31 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id D08F59C2598
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 20:33:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9F22284ADF
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:29:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 94AAC285A62
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:33:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 297421AA1F9;
-	Fri,  8 Nov 2024 19:29:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BABC81A9B23;
+	Fri,  8 Nov 2024 19:33:00 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="ED0EU0Mm"
+	dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b="K7MbjZGV";
+	dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b="Mw0UEkwm"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-189.mta0.migadu.com (out-189.mta0.migadu.com [91.218.175.189])
+Received: from fout-b6-smtp.messagingengine.com (fout-b6-smtp.messagingengine.com [202.12.124.149])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 180F81A9B58
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 19:29:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=91.218.175.189
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D695B233D79
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 19:32:58 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.12.124.149
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731094163; cv=none; b=DjbQXoPKZjs438pZTzn8AFno1amd5wbH45ion9DSIwozSbjFdPZUqZVRx51mAfRnGPDrzWKYnFXxhGhnCCdvezEWZNw1oIN1CNZGS9i7c4DRUlpn+NRdcFk69d9nnPerlrYuiboqUY4lGQFKzB+xI3sGTKX2DcFgnYoUyhBjBbA=
+	t=1731094380; cv=none; b=byw8uAipFBC1nTX9+zw7bCoTb/RAjyCab/CF9Si4HzRKBgjeZYUfGGXKTTPPy84mMJuXTPPl9FKd1TUnxgalU4VkKoikSDdCcEaVR0XSLoUXebm/BOXCo5xXzK5RG/bZjwcKqJ2zaLKCbRXekKj6tDO2WZnloenWHlV9CDiOoXg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731094163; c=relaxed/simple;
-	bh=EtRuuaWJP2fFK7jgl2zOWZpe/+b0yhTJHKDU8kdNXNU=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=fsF4p5U0u1lgXXiNYOSDXIk4qVR3fCUIfkvedA4P5Abn9L5QMuRekQNrvAvfUdK9NujibyYtqodBuxeIzI014fPz4aAzJg1rwrqbdw4Qy8H21ZL2wE9YO5/oW9gIGw7NU1XTDuX/5HidXqPVwR16zS82n5qvDvHaQWO/rYpazGI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=ED0EU0Mm; arc=none smtp.client-ip=91.218.175.189
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <ea4d87c5-ce13-43e3-8cec-b068055b0f58@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731094157;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=EtRuuaWJP2fFK7jgl2zOWZpe/+b0yhTJHKDU8kdNXNU=;
-	b=ED0EU0Mm2Ud6CX5BBMKugOxqt1lA76Z8CaFmKdfEm6nhmtixIbGkeZJpxZa12eyATXiUt3
-	QLBMK7w/sRGpyDQ/R9dWH6kngRe144grQPdaLVsywNYDUdFm/372OGc85Fd3gM8X1hyu8h
-	5bOO3joXWZaHISHUuLSOWDOwTkCP2cE=
-Date: Fri, 8 Nov 2024 11:29:10 -0800
+	s=arc-20240116; t=1731094380; c=relaxed/simple;
+	bh=0GdVltL3jaD6bStxPRTomunDRc3con7IchwrMsJMT/s=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=KGzrEVmBEkYwZqRk8sQigzKFuEWxn/QpgqVL7qSAbTmxMKCQoWjRXn3NzkhJ2rJb/kDUBhyUao1jOVrzUYOfla846HvpQSj3cud+smZ1lAwMGMlpuoFrU1P6uxzTaolgdMCbWO6T56wabOP8oWbEwq8OKyCnelhE7MXXsIWgN28=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz; spf=pass smtp.mailfrom=dxuuu.xyz; dkim=pass (2048-bit key) header.d=dxuuu.xyz header.i=@dxuuu.xyz header.b=K7MbjZGV; dkim=pass (2048-bit key) header.d=messagingengine.com header.i=@messagingengine.com header.b=Mw0UEkwm; arc=none smtp.client-ip=202.12.124.149
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=dxuuu.xyz
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=dxuuu.xyz
+Received: from phl-compute-12.internal (phl-compute-12.phl.internal [10.202.2.52])
+	by mailfout.stl.internal (Postfix) with ESMTP id DB16E11400B2;
+	Fri,  8 Nov 2024 14:32:57 -0500 (EST)
+Received: from phl-mailfrontend-01 ([10.202.2.162])
+  by phl-compute-12.internal (MEProxy); Fri, 08 Nov 2024 14:32:58 -0500
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to; s=fm2; t=1731094377; x=1731180777; bh=j8gO6i/ziwPrj//ac+Beg
+	sPerMSppQVNjiwokAT73KM=; b=K7MbjZGV6kJiUDO+MAOiptWLL8DGjMaXK2sNU
+	xAa/NEk9iWJv1rZJr4MRz2081V50cmIajAG4NTerEHpNRO7rkOoQ3Mb8cywsDnrD
+	hYTObHhQUji49mZ5NFFyLHGGgMoNLGwH22093PQs1DKyEe/1JSLuk1/v3iMloeBf
+	4bulR0C/xyxGdWzmSrRVxmUB7QPG6emgNNEezQNbWewGJY2zgJSuWVgnVw4URTur
+	X4/Jodf88jwwBTAobcNubcNN7Pzt6Yo6EpWyUhr5SbvdssI0dXnEA+P4sJrM3p31
+	DOp8PW4OfG1+rUtqPyzDXImeHzdAnH24DnoKGiMrfMlpw8yZw==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:message-id:mime-version:reply-to:subject:subject:to
+	:to:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm3; t=
+	1731094377; x=1731180777; bh=j8gO6i/ziwPrj//ac+BegsPerMSppQVNjiw
+	okAT73KM=; b=Mw0UEkwm7c2DaV8i15mirXzsqaYdtLkBGJcsJW3ytHLxlKlEx+N
+	apmnaSk7E9cT2GdQXZhV/WRK72WrWDmw+wNmq3R7N8roUGfoJcHpngsfzpgzl9vs
+	u9mXYssEshyAbBwhw1Du91OWhlI8ztwNEIJhaRBUCP/S6wePkmD0yLaWy8d+etHR
+	+EXI9jc+Nsoi1En36OMxvLw5ocFF7UyJ4R9Gg55msc007fISYF42Y4WGDFWO8QXT
+	TH9aBl6E/Uizwg0bofxxdVKnG+9owQ/3vK56nRoB2u63bZ8fWqYRBlxKO0MuqdPR
+	quNDmwA8qbQdvwSEzLTt0B8d7fi2V0enU1w==
+X-ME-Sender: <xms:aWcuZwZuonxn6iEi8slVCDKoA2pCpQUe0QwcR59xn-kFNdr8I5tkyg>
+    <xme:aWcuZ7ZYgOkZQz0HJbTZfmljCdNFw4zEgg9wPro4R-_clZCD8YnjSiskN1ffVun1M
+    JCO6UOmklvXVadWiQ>
+X-ME-Received: <xmr:aWcuZ6-hgU5SANB5JLZLa1J4kTOzqPR0BrGek7fQOhNHdnOoxFGDrnwUfgSWsi_eiO9EL7UzzsIdafzcTqnS77T_7TbzwUu8NUnkYnJCh8IwIQVKNHj8>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgeefuddrtdeigdduvddvucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdggtfgfnhhsuhgsshgtrhhisggvpdfu
+    rfetoffkrfgpnffqhgenuceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdlje
+    dtmdenucfjughrpefhvfevufffkffoggfgsedtkeertdertddtnecuhfhrohhmpeffrghn
+    ihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepvd
+    eggfetgfelhefhueefkeduvdfguedvhfegleejudduffffgfetueduieeikeejnecuvehl
+    uhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguh
+    huuhdrgiihiidpnhgspghrtghpthhtohepiedpmhhouggvpehsmhhtphhouhhtpdhrtghp
+    thhtohepuggrvhgvmhesuggrvhgvmhhlohhfthdrnhgvthdprhgtphhtthhopehmkhhusg
+    gvtggvkhesshhushgvrdgtiidprhgtphhtthhopehkuhgsrgeskhgvrhhnvghlrdhorhhg
+    pdhrtghpthhtohepmhgrrhhtihhnrdhlrghusehlihhnuhigrdguvghvpdhrtghpthhtoh
+    epnhgvthguvghvsehvghgvrhdrkhgvrhhnvghlrdhorhhgpdhrtghpthhtohepkhgvrhhn
+    vghlqdhtvggrmhesmhgvthgrrdgtohhm
+X-ME-Proxy: <xmx:aWcuZ6p9rPjgDRwvp6iQ3meVZAGHhxnOMKJ6qwEhBY5zjqLnSl-cKQ>
+    <xmx:aWcuZ7oBVFt9IKh60FCPlwT5bdu4vUyVVNl6U0qy6bnnulPPNTokEg>
+    <xmx:aWcuZ4R0sMCd4mfyDBAqx4pNAy-YvhUFb--_lPQXIXCY-dgHCY1VUw>
+    <xmx:aWcuZ7rFHehka24PiJAmB8mkosuuHMrWfuBBkkbgdDGWf2i72kHQIA>
+    <xmx:aWcuZ8dgP7Abh8-4c0BCIB5dGV_X5fJI-1vMI_1Hgjrv1gilitjvDPxd>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 8 Nov 2024 14:32:56 -0500 (EST)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: davem@davemloft.net,
+	mkubecek@suse.cz
+Cc: kuba@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	kernel-team@meta.com
+Subject: [PATCH ethtool-next] rxclass: Make output for RSS context action explicit
+Date: Fri,  8 Nov 2024 12:32:43 -0700
+Message-ID: <890cd515345f7c1ed6fba4bf0e43c53b34ccefaa.1731094323.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.46.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] bpf: Fix mismatched RCU unlock flavour in
- bpf_out_neigh_v6
-Content-Language: en-GB
-To: Jiawei Ye <jiawei.ye@foxmail.com>, martin.lau@linux.dev,
- daniel@iogearbox.net, edumazet@google.com, kuba@kernel.org
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <tencent_CFD3D1C3D68B45EA9F52D8EC76D2C4134306@qq.com>
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <tencent_CFD3D1C3D68B45EA9F52D8EC76D2C4134306@qq.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+Content-Transfer-Encoding: 8bit
 
+Currently, if the action for an ntuple rule is to redirect to an RSS
+context, the RSS context is printed as an attribute. At the same time,
+a wrong action is printed. For example:
 
+    # ethtool -X eth0 hfunc toeplitz context new start 24 equal 8
+    New RSS context is 1
 
+    # ethtool -N eth0 flow-type ip6 dst-ip $IP6 context 1
+    Added rule with ID 0
 
-On 11/8/24 12:18 AM, Jiawei Ye wrote:
-> In the bpf_out_neigh_v6 function, rcu_read_lock() is used to begin an RCU
-> read-side critical section. However, when unlocking, one branch
-> incorrectly uses a different RCU unlock flavour rcu_read_unlock_bh()
-> instead of rcu_read_unlock(). This mismatch in RCU locking flavours can
-> lead to unexpected behavior and potential concurrency issues.
->
-> This possible bug was identified using a static analysis tool developed
-> by myself, specifically designed to detect RCU-related issues.
->
-> This patch corrects the mismatched unlock flavour by replacing the
-> incorrect rcu_read_unlock_bh() with the appropriate rcu_read_unlock(),
-> ensuring that the RCU critical section is properly exited. This change
-> prevents potential synchronization issues and aligns with proper RCU
-> usage patterns.
->
-> Fixes: 09eed1192cec ("neighbour: switch to standard rcu, instead of rcu_bh")
-> Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
+    # ethtool -n eth0 rule 0
+    Filter: 0
+            Rule Type: Raw IPv6
+            Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+            Dest IP addr: <redacted> mask: ::
+            Traffic Class: 0x0 mask: 0xff
+            Protocol: 0 mask: 0xff
+            L4 bytes: 0x0 mask: 0xffffffff
+            RSS Context ID: 1
+            Action: Direct to queue 0
 
-Acked-by: Yonghong Song <yonghong.song@linux.dev>
+This is wrong and misleading. Fix by treating RSS context as a explicit
+action. The new output looks like this:
+
+    # ./ethtool -n eth0 rule 0
+    Filter: 0
+            Rule Type: Raw IPv6
+            Src IP addr: :: mask: ffff:ffff:ffff:ffff:ffff:ffff:ffff:ffff
+            Dest IP addr: <redacted> mask: ::
+            Traffic Class: 0x0 mask: 0xff
+            Protocol: 0 mask: 0xff
+            L4 bytes: 0x0 mask: 0xffffffff
+            Action: Direct to RSS context id 1
+
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+---
+ rxclass.c | 5 ++---
+ 1 file changed, 2 insertions(+), 3 deletions(-)
+
+diff --git a/rxclass.c b/rxclass.c
+index f17e3a5..80d6419 100644
+--- a/rxclass.c
++++ b/rxclass.c
+@@ -248,13 +248,12 @@ static void rxclass_print_nfc_rule(struct ethtool_rx_flow_spec *fsp,
+ 
+ 	rxclass_print_nfc_spec_ext(fsp);
+ 
+-	if (fsp->flow_type & FLOW_RSS)
+-		fprintf(stdout, "\tRSS Context ID: %u\n", rss_context);
+-
+ 	if (fsp->ring_cookie == RX_CLS_FLOW_DISC) {
+ 		fprintf(stdout, "\tAction: Drop\n");
+ 	} else if (fsp->ring_cookie == RX_CLS_FLOW_WAKE) {
+ 		fprintf(stdout, "\tAction: Wake-on-LAN\n");
++	} else if (fsp->flow_type & FLOW_RSS)
++		fprintf(stdout, "\tRSS context id %u\n", rss_context);
+ 	} else {
+ 		u64 vf = ethtool_get_flow_spec_ring_vf(fsp->ring_cookie);
+ 		u64 queue = ethtool_get_flow_spec_ring(fsp->ring_cookie);
+-- 
+2.46.0
 
 
