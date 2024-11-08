@@ -1,101 +1,102 @@
-Return-Path: <netdev+bounces-143217-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143218-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80DE89C16FA
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:20:14 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 177649C172C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:45:33 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 378441F22926
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:20:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE5912826B9
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 07:45:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FBA51D0E35;
-	Fri,  8 Nov 2024 07:20:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3358619755B;
+	Fri,  8 Nov 2024 07:45:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="AnhH4xgz";
-	dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b="7vyL7oQg"
+	dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b="SML2xXWw"
 X-Original-To: netdev@vger.kernel.org
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
+Received: from sipsolutions.net (s3.sipsolutions.net [168.119.38.16])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43D511D0E20;
-	Fri,  8 Nov 2024 07:20:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=193.142.43.55
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62B3DEBE;
+	Fri,  8 Nov 2024 07:45:26 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=168.119.38.16
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731050410; cv=none; b=mnyjow0zPhLgS94NvWQ4A3J14e9J5PmIhtDnbpaqWDte8CRZ8H7o40fLvsa2b/i4Iye9oyLI+PCd5A+XLWrbxVnSEo9crZxRHh4IRoKkFrBjF+KNddsfwbh6HTF0VgGKteHav5LPdQLsgWmSI3NZZlJ3ScTUcyXdxWGFb5hU84I=
+	t=1731051928; cv=none; b=pXkZF3/VneZKsMlZDMPKqzAWFbOlizXIrk54HCEMBRQSfOxildypd+F/4oM1RIXVrvSaakWcGOGhlTAkOmc+XdPKZFQgrArc0tmG2A+Ajim3z9gy5HnLqqJ8QYd2ptxeBR0xi/rh/dGOgBy0B2dlT0MLqFjTZj9AV75QC6sNVco=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731050410; c=relaxed/simple;
-	bh=gJCl7S0bqZVvnT9SEcnwOQgBUZX+WHAwroqDTxnJL+0=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Ck8QAkHxrDTflj9ooRVsuGKuOuzGJQLrx5sXb7tFPU4XkxxZ+sxT4AA9NrvZrkHfZr8OgOsuYXY0n3We19/FyPeE0Ffy8mIEasE3mbaGMDFENQpvQ6b+6Vxs3/Xzm9QGGRXeLfpPIESxtuJzG/j4o3slkYv+Abgk+5bsVmVmcAA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de; spf=pass smtp.mailfrom=linutronix.de; dkim=pass (2048-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=AnhH4xgz; dkim=permerror (0-bit key) header.d=linutronix.de header.i=@linutronix.de header.b=7vyL7oQg; arc=none smtp.client-ip=193.142.43.55
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linutronix.de
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linutronix.de
-Date: Fri, 8 Nov 2024 08:20:03 +0100
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1731050405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1XdvSNOuZouYbPrso1Npt+Pw3m9uE9gj44xGyrYmPaU=;
-	b=AnhH4xgzd7yEF5ZPSICzS90838h37rRz4QvNEoDVonGelJrNlW/RX0p/tso6Ybyy8ZK6QC
-	IKF14CkaWFbgOfceFNhxhb2QhxU+leLMGlXWdwDF/0kyPEtfQuvK0HJ8SP8pDeRiLN7i0O
-	6NuiWXP4gK480xVWEyFSwIoUb8z0dDZn24TyC13CyacDujoIGOCXZ8UcODpau7Cm+cEyPA
-	jQXSHbvAC2TaKddjxmK92ulR2sbpMF6CbgVmDlQbExPBeOzRtrnOU9jEC/Xk4FaRmCxoJz
-	bDY14JRtHUwtW0FUSfBtOlSeSOJTp1eLkovJ+ePNZrxJ6tyyCistLfdYhIyvaA==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1731050405;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=1XdvSNOuZouYbPrso1Npt+Pw3m9uE9gj44xGyrYmPaU=;
-	b=7vyL7oQgNV/EO92EBKAOkT+kUaIUcdDXypNUcpA/+SK2vhVxhAiIFnO5XGPi/PJFsdtepA
-	iw7VOGjOOY1FzNCg==
-From: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-To: Wander Lairson Costa <wander@redhat.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Clark Williams <clrkwllms@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Simon Horman <horms@kernel.org>,
-	Jacob Keller <jacob.e.keller@intel.com>,
-	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>,
-	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>,
-	tglx@linutronix.de
-Subject: Re: [PATCH v2 1/4] Revert "igb: Disable threaded IRQ for
- igb_msix_other"
-Message-ID: <20241108072003.jJDpdq9u@linutronix.de>
-References: <20241106111427.7272-1-wander@redhat.com>
+	s=arc-20240116; t=1731051928; c=relaxed/simple;
+	bh=OvF0qleoQJoKpbn0wuM7TLiHbXbO297Ng/DHJ06aK6o=;
+	h=Message-ID:Subject:From:To:Cc:Date:In-Reply-To:References:
+	 Content-Type:MIME-Version; b=oRxRo30A8P78H+ytJW2kR+Fy9VsoNJ1bN+zy3qC6DZB90nTapl/ihO/TNMZqqdGJk3UfDSveot8185EbPjwmxTAIIWuGtxiXvqCR0o0GcUJSFz+LIxIJnvtAtM5sP9IQAGnUFUp2CvivzB+w2OXfAEsnKGtlbs+GB6j9FD8FQwg=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net; spf=pass smtp.mailfrom=sipsolutions.net; dkim=pass (2048-bit key) header.d=sipsolutions.net header.i=@sipsolutions.net header.b=SML2xXWw; arc=none smtp.client-ip=168.119.38.16
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=sipsolutions.net
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=sipsolutions.net
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=K7uh4BH5+X3HtSl3iUq7LWgMAEO+9K5RNU4S03RbX14=;
+	t=1731051926; x=1732261526; b=SML2xXWwo849Jt3MjtC/rZ0PiTpoIEUBq34dYbxJ8aBO3zE
+	6xp5vWNKNxP0uaDN4dAQfDEnEjX/wZvDm4dxaT34j24A+uH2DjYkKKDNudIdrs40qj2o75j7ZrjvT
+	IroFBcb19trZg+sO19CfJyXuT5Xh3ZvJquqfxczfxo4xwmkoXH6SL4H17z7KOFgsCoBfQg4W26c5D
+	65GbREFQX/vF0SpSHpjDPlevFsvBlSCpJgek84b5FOekBe2l3eT70gT4/Cgv57wRkBc80nAqBByKh
+	94/YpvNLzCoVOh26/HlTpRe09idTyXhqa4b6qpzCjcXRN+LfsExISgoxy7MWT+ag==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.98)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1t9JgH-0000000HA2D-18Wy;
+	Fri, 08 Nov 2024 08:45:21 +0100
+Message-ID: <596b789eec8c6ffdfbd6a9073464a5f19a050336.camel@sipsolutions.net>
+Subject: Re: [PATCH] Fix: Ensure auth_data and ap_addr are properly set
+ before marking STA as authenticated
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Saru2003 <sarvesh20123@gmail.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com,  linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+  linux-kernel@vger.kernel.org
+Date: Fri, 08 Nov 2024 08:45:20 +0100
+In-Reply-To: <20241108022828.6571-1-sarvesh20123@gmail.com>
+References: <20241108022828.6571-1-sarvesh20123@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.52.4 (3.52.4-2.fc40) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <20241106111427.7272-1-wander@redhat.com>
+X-malware-bazaar: not-scanned
 
-On 2024-11-06 08:14:26 [-0300], Wander Lairson Costa wrote:
-> This reverts commit 338c4d3902feb5be49bfda530a72c7ab860e2c9f.
-> 
-> Sebastian noticed the ISR indirectly acquires spin_locks, which are
-> sleeping locks under PREEMPT_RT, which leads to kernel splats.
-> 
-> Fixes: 338c4d3902feb ("igb: Disable threaded IRQ for igb_msix_other")
-> Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
-> Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+On Fri, 2024-11-08 at 07:58 +0530, Saru2003 wrote:
+>=20
+> +++ b/net/mac80211/mlme.c
+> @@ -4247,8 +4247,15 @@ static void ieee80211_auth_challenge(struct ieee80=
+211_sub_if_data *sdata,
+>  static bool ieee80211_mark_sta_auth(struct ieee80211_sub_if_data *sdata)
+>  {
+>  	struct ieee80211_if_managed *ifmgd =3D &sdata->u.mgd;
+> -	const u8 *ap_addr =3D ifmgd->auth_data->ap_addr;
+> +	const u8 *ap_addr;
+>  	struct sta_info *sta;
+> +=09
+> +	if (!ifmgd->auth_data ||
 
-Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+That's ridiculous. By the argument behind this we could add probably
+hundreds of such checks all over the place.
 
-This is the only patch.
+>  !ifmgd->auth_data->ap_addr) {
 
-Sebastian
+and that's even a compiler warning.
+
+>  	sta =3D sta_info_get(sdata, ap_addr);
+>  	if (!sta) {
+> -		WARN_ONCE(1, "%s: STA %pM not found", sdata->name, ap_addr);
+> +	        sdata_info(sdata, "STA %pM not found, skipping authentication m=
+ark\n", ap_addr);
+>  		return false;
+
+That's also wrong, it doesn't just skip that part.
+
+johannes
 
