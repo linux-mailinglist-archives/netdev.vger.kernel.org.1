@@ -1,202 +1,143 @@
-Return-Path: <netdev+bounces-143409-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143410-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A06B29C2504
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:45:33 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E4699C253A
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:58:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAFF81C203A5
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:45:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF8EA1C21917
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:58:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C141AA1D0;
-	Fri,  8 Nov 2024 18:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0086C1AA1E1;
+	Fri,  8 Nov 2024 18:58:27 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="zmGUJLZ+"
+	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xq5j5PJA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qt1-f178.google.com (mail-qt1-f178.google.com [209.85.160.178])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 810F51AA1C8
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 18:45:21 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.178
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4FD1AA1D6
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 18:58:24 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731091523; cv=none; b=k4EH+qRTMOAA0lHIIxJraxsOKgo6eZjEv92NrMZdEFoli8YvPRTmSUNHAvdi+8DFO5w+pCk23BB7ApK9kkuQhyxuKYo4evR22gnb0CeyfpFyjY0LCTmVieasGkIFja0g47cShBgehx4jguRR4M8F8XTZE+3LSJq4XXfdyJbjRfI=
+	t=1731092306; cv=none; b=fMdOH4jb3D/5xCXz+XKwBOW0x9LqGELSrvDnC0xgc04qUFiBctpg7+ReBACUaAPM5n3DVx2ATcVGeYKR1YeGtECrw254zNncftGYmuM9ysvWifTWokEJfjzarAuNZ82JijiP0rb9d5WAtf/oVBenG0CvV+0/w0QPBvOT1IZvFYw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731091523; c=relaxed/simple;
-	bh=lcqVxarSnIw0Wfqck48GyQe2gVWyEkUqvNLjJFQRkik=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=bcn2aChaMhGTqFMFD+3kGWxLkcQDJwu8LjPVOlqWfGbJYqQmlL6tSP8+CBs4mpm6Uo+7R7Wiv6DRDwSekgZMwHIF2mBDxnD0CokJQRJfKcHhNojzpI1zxjSyQarzaWKltjRAwejN4oWwgIDsFMIA7912gB2WgibranZ9TNR9Coo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=zmGUJLZ+; arc=none smtp.client-ip=209.85.160.178
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
-Received: by mail-qt1-f178.google.com with SMTP id d75a77b69052e-460b295b9eeso16681cf.1
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 10:45:21 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20230601; t=1731091520; x=1731696320; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dQWXX3Y2NemA0Bkmo9oa5lzAWU2FAVxuxVlJNZmkK0g=;
-        b=zmGUJLZ+pcVZAPYmE5NQNZ1QyU+AVEmoHit7jYqG/Te+gUl8cPqXR+OqeVAJjyXem2
-         QS3vOswWcTAxLs2Ql/uZUJtNip1uB3dJLYOgT75dQJqgRAQutB2/8NQCctZQK8+ejFvM
-         WVXE/LD0fN2dbzV4LbY4ra8VsD8WXBjG0BEhlxTHfiCD5o/ZXeOlm0fGMDSCSlqxh5rH
-         h6/0Wu2e0n5q5M+it4GZUfqrh6nbsrGQG+Eje4VBy1Mj+pGK8ZkTi39aUBy236+DJTna
-         47T1FQ7OBTSKZ3yLslb8K1CPY4YrchjGXwWZszR6633+G0UNDoKRBhZVqOcV2c31sJC5
-         q80g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731091520; x=1731696320;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dQWXX3Y2NemA0Bkmo9oa5lzAWU2FAVxuxVlJNZmkK0g=;
-        b=IPk47/yg6cm9xHm0GTM4o/xf3WBG4nVwQLTAj1xWVhSSiDGSDqIjEy+RCZopkyOOyc
-         bqoXElLE91vmieCznzCvSi0S5nve2r1ZhlQk2uXpgHX1TtBjIdp9HzYBN9ZShY2K047K
-         106p+HpOXFklEWFRvHHCuKlb4ZmXOt9V9jm3SPhx3EvCe39E/iwqGR74haV5uEjf0NGZ
-         NHpHOdmYlLMTRhZX9J+FKf4puYcnBtpXRG8tGvDtTSmn0PyG+hd2ns4LGVOr4EfbxAAm
-         2rYop9gsQ2TWkBHSNr0OLcwzez4SwybT95oz28RlMSnc0UcfZcyL4Zz9f2pI0rKIXztL
-         1gLA==
-X-Gm-Message-State: AOJu0YzT/Mr/FV0TadIOsFVOwiKdvdGrnjVCoz6F93q5Rv9d/bt1/HM8
-	43akJfPMIEGdRnuqs8na87jym1MmSGX8OPYktGTXgLyo+UgOZxeZhl6M54PJteW2jzUDmJggD2i
-	3H7uC1wMogTXWDl1BDqUrwhF/YxIUJmnZI20F
-X-Gm-Gg: ASbGnctQgHCg4BhWjd+wVMgtlHZeHpnvdaunGgj6dEKFZAPEaK6UBe2z74HCfO2sLNY
-	hhu3G8fvTzd/VzSvowFYXhSpPIhRh9lk=
-X-Google-Smtp-Source: AGHT+IGvwPp9TjQSnwda6uC40OLtKbAEUpz4aO9CgT19b5ZFDtcU/z04H3hO5fbFjqfA/TFF1ZaKphANpOjVSAC2lfA=
-X-Received: by 2002:a05:622a:548a:b0:462:c4fe:ec19 with SMTP id
- d75a77b69052e-462fa619d7dmr8710451cf.21.1731091520108; Fri, 08 Nov 2024
- 10:45:20 -0800 (PST)
+	s=arc-20240116; t=1731092306; c=relaxed/simple;
+	bh=y5z+A9NupvZs4nnBpZrmvKCzP+8ZODrJ/XnKXmyBZO8=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=h+nWuuWWrzXg/0KEpxUMtnfyMr2BGwn8TfEmTNLFFb5mu+4/CF1DJmR8LyatFT+m+emQuZwtWTvRt1gLIGMZd89sAmf9mjLm0MriLGaub5BgU3yFQIsBtn/OeYRxCgBRPHZ1pv0SMIl+wRq6aRE2BQ7IpmLDVvUhUB/HJdBDAxI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xq5j5PJA; arc=none smtp.client-ip=95.215.58.187
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
+Message-ID: <e4833d40-31d9-4de6-94b2-964870671006@linux.dev>
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1731092297;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=uKOz2Ke3deWKx3LB9Ol2VggCwIo/TvK8NNumftjVwTM=;
+	b=Xq5j5PJA9CgtkmeafRikaDn8aGf9Tv9Nhpqunc9lWXEq7vCl1W4FWeC/HaS7GkGFr8Xf7k
+	eq7io/Hys8sHq5dO135k6r/GkvSNv0pAri6W735l6BrK387GeAuR7OuE/u8/1bh6HVTALi
+	KDwjsa00h6dPh+bKaEbi8c3yVT6f0Gk=
+Date: Fri, 8 Nov 2024 10:58:09 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241107210331.3044434-1-almasrymina@google.com>
- <20241107210331.3044434-2-almasrymina@google.com> <Zy1priZk_LjbJwVV@mini-arch>
- <CAHS8izOJSd2-hkOBkL0Cy40xt-=1k8YdvkKS98rp2yeys_eGzg@mail.gmail.com>
- <Zy1_IG9v1KK8u2X4@mini-arch> <CAHS8izP8UoGZXoFCEshYrL=o2+T6o4g-PDdgDG=Cfc0X=EXyVQ@mail.gmail.com>
- <Zy5Ta-M868VvBme2@mini-arch>
-In-Reply-To: <Zy5Ta-M868VvBme2@mini-arch>
-From: Mina Almasry <almasrymina@google.com>
-Date: Fri, 8 Nov 2024 10:45:07 -0800
-Message-ID: <CAHS8izNK6xJHDB+W80iCr2CEwbo=OecG-1UW5dB9X_0aowo8Bw@mail.gmail.com>
-Subject: Re: [PATCH net v2 2/2] net: clarify SO_DEVMEM_DONTNEED behavior in documentation
-To: Stanislav Fomichev <stfomichev@gmail.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, linux-doc@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>, 
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>, Yi Lai <yi1.lai@linux.intel.com>, 
-	Stanislav Fomichev <sdf@fomichev.me>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Subject: Re: [BUG] WARNING: at lib/vsprintf.c:2659 format_decode+0x121a/0x1c00
+To: Yeqi Fu <fufuyqqqqqq@gmail.com>,
+ "jakub@cloudflare.com" <jakub@cloudflare.com>,
+ "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
+ <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Cc: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
+ bonan.ruan@u.nus.edu
+References: <D47BDD2E-217F-4F16-A74C-ADE4DA025FED@gmail.com>
+Content-Language: en-GB
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+From: Yonghong Song <yonghong.song@linux.dev>
+In-Reply-To: <D47BDD2E-217F-4F16-A74C-ADE4DA025FED@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Migadu-Flow: FLOW_OUT
 
-On Fri, Nov 8, 2024 at 10:07=E2=80=AFAM Stanislav Fomichev <stfomichev@gmai=
-l.com> wrote:
->
-> On 11/08, Mina Almasry wrote:
-> > On Thu, Nov 7, 2024 at 7:01=E2=80=AFPM Stanislav Fomichev <stfomichev@g=
-mail.com> wrote:
-> > >
-> > > On 11/07, Mina Almasry wrote:
-> > > > On Thu, Nov 7, 2024 at 5:30=E2=80=AFPM Stanislav Fomichev <stfomich=
-ev@gmail.com> wrote:
-> > > > >
-> > > > > On 11/07, Mina Almasry wrote:
-> > > > > > Document new behavior when the number of frags passed is too bi=
-g.
-> > > > > >
-> > > > > > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > > > > > ---
-> > > > > >  Documentation/networking/devmem.rst | 9 +++++++++
-> > > > > >  1 file changed, 9 insertions(+)
-> > > > > >
-> > > > > > diff --git a/Documentation/networking/devmem.rst b/Documentatio=
-n/networking/devmem.rst
-> > > > > > index a55bf21f671c..d95363645331 100644
-> > > > > > --- a/Documentation/networking/devmem.rst
-> > > > > > +++ b/Documentation/networking/devmem.rst
-> > > > > > @@ -225,6 +225,15 @@ The user must ensure the tokens are return=
-ed to the kernel in a timely manner.
-> > > > > >  Failure to do so will exhaust the limited dmabuf that is bound=
- to the RX queue
-> > > > > >  and will lead to packet drops.
-> > > > > >
-> > > > > > +The user must pass no more than 128 tokens, with no more than =
-1024 total frags
-> > > > > > +among the token->token_count across all the tokens. If the use=
-r provides more
-> > > > > > +than 1024 frags, the kernel will free up to 1024 frags and ret=
-urn early.
-> > > > > > +
-> > > > > > +The kernel returns the number of actual frags freed. The numbe=
-r of frags freed
-> > > > > > +can be less than the tokens provided by the user in case of:
-> > > > > > +
-> > > > >
-> > > > > [..]
-> > > > >
-> > > > > > +(a) an internal kernel leak bug.
-> > > > >
-> > > > > If you're gonna respin, might be worth mentioning that the dmesg
-> > > > > will contain a warning in case of a leak?
-> > > >
-> > > > We will not actually warn in the likely cases of leak.
-> > > >
-> > > > We warn when we find an entry in the xarray that is not a net_iov, =
-or
-> > > > if napi_pp_put_page fails on that net_iov. Both are very unlikely t=
-o
-> > > > happen honestly.
-> > > >
-> > > > The likely 'leaks' are when we don't find the frag_id in the xarray=
-.
-> > > > We do not warn on that because the user can intentionally trigger t=
-he
-> > > > warning with invalid input. If the user is actually giving valid in=
-put
-> > > > and the warn still happens, likely a kernel bug like I mentioned in
-> > > > another thread, but we still don't warn.
-> > >
-> > > In this case, maybe don't mention the leaks at all? If it's not
-> > > actionable, not sure how it helps?
-> >
-> > It's good to explain what the return code of the setsockopt means, and
-> > when it would be less than the number of passed in tokens.
-> >
-> > Also it's not really 'not actionable'. I expect serious users of
-> > devmem tcp to log such leaks in metrics and try to root cause the
-> > userspace or kernel bug causing them if they happen.
->
-> Right now it reads like both (a) and (b) have a similar probability. Mayb=
-e
-> even (a) is more probable because you mention it first? In theory, any sy=
-scall
-> can have a bug in it where it returns something bogus, so maybe at least
-> downplay the 'leak' part a bit? "In the extremely rare cases, kernel
-> might free less frags than requested .... "
->
-> Imagine a situation where the user inadvertently tries to free the same t=
-oken
-> twice or something and gets the unexpected return value. Why? Might be
-> the kernel leak, right?
->
-> From the POW of the kernel, the most probable cases where we return
-> less tokens are:
-> 1. user gave us more than 1024
-> 2. user gave us incorrect tokens
-> ...
-> 99. kernel is full of bugs and we lost the frag
 
-The current wording doesn't make any comment about probability. More
-information is better than less. I don't see a strong reason to omit
-information. I think the docs are better now and will be improved
-further in the future. Lets not bike shed too much on docs wording.
-It's painfully obvious invalid input is more likely not subtle kernel
-bugs IMO without calling out.
 
---=20
-Thanks,
-Mina
+
+On 11/8/24 6:28 AM, Yeqi Fu wrote:
+> Hi there,
+> A warning is triggered in lib/vsprintf.c due to an unsupported '%' in a format string. This issue occurs in the function format_decode at line 2659 of kernel version 6.12.0-rc3-gb22db8b8befe. A proof-of-concept is available, and I have manually reproduced this bug.
+
+I think the below patch set (not merged yet)
+   https://lore.kernel.org/bpf/20241028195343.2104-1-rabbelkin@mail.ru/
+should fix this issue.
+
+>
+> Report:
+> ```
+> Please remove unsupported % in format string
+> WARNING: CPU: 1 PID: 29307 at lib/vsprintf.c:2659 format_decode+0x121a/0x1c00 lib/vsprintf.c:2659
+> Modules linked in:
+> CPU: 1 UID: 0 PID: 29307 Comm: syz.5.9298 Not tainted 6.12.0-rc3-gb22db8b8befe #2
+> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
+> RIP: 0010:format_decode+0x121a/0x1c00 lib/vsprintf.c:2659
+> Code: 8b 9c 24 80 00 00 00 48 89 d8 48 c1 e8 03 42 8a 04 30 84 c0 0f 85 d5 09 00 00 0f b6 33 48 c7 c7 00 bd eb 92 e8 b7 59 67 fc 90 <0f> 0b 90 90 4d 89 f7 48 8b 5c 24 18 e9 d7 fc ff ff 89 d1 80 e1 07
+> RSP: 0018:ffff888041197600 EFLAGS: 00010246
+> RAX: ea46d93351edcc00 RBX: ffff88804119792c RCX: ffff888009a78000
+> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+> RBP: ffff8880411976f0 R08: ffffffff8ebc8e3b R09: 1ffff1100d9e515a
+> R10: dffffc0000000000 R11: ffffed100d9e515b R12: ffff0000ffffff00
+> R13: ffff888041197700 R14: dffffc0000000000 R15: dffffc0000000000
+> FS: 00007fbe06321640(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
+> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> CR2: 0000000020a8c000 CR3: 00000000404b6005 CR4: 0000000000370ef0
+> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+> Call Trace:
+> <TASK>
+> bstr_printf+0x136/0x1260 lib/vsprintf.c:3232
+> ____bpf_trace_printk kernel/trace/bpf_trace.c:389 [inline]
+> bpf_trace_printk+0x1a1/0x220 kernel/trace/bpf_trace.c:374
+> bpf_prog_7ee8fe4dad0c4460+0x4e/0x50
+> bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
+> __bpf_prog_run include/linux/filter.h:692 [inline]
+> bpf_prog_run include/linux/filter.h:708 [inline]
+> bpf_test_run+0x7a9/0x910 net/bpf/test_run.c:433
+> bpf_prog_test_run_skb+0xc47/0x1750 net/bpf/test_run.c:1094
+> bpf_prog_test_run+0x2df/0x350 kernel/bpf/syscall.c:4247
+> __sys_bpf+0x484/0x850 kernel/bpf/syscall.c:5652
+> __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
+> __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
+> __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
+> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+> do_syscall_64+0xd8/0x1c0 arch/x86/entry/common.c:83
+> entry_SYSCALL_64_after_hwframe+0x67/0x6f
+> RIP: 0033:0x7fbe07ccd72d
+> Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fbe06320f98 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
+> RAX: ffffffffffffffda RBX: 00007fbe07ea5f80 RCX: 00007fbe07ccd72d
+> RDX: 0000000000000050 RSI: 0000000020000700 RDI: 000000000000000a
+> RBP: 00007fbe07d57584 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+> R13: 0000000000000000 R14: 00007fbe07ea5f80 R15: 00007fbe06301000
+> </TASK>
+> irq event stamp: 39314
+> hardirqs last enabled at (39324): [<ffffffff8ed766cb>] __up_console_sem kernel/printk/printk.c:344 [inline]
+> hardirqs last enabled at (39324): [<ffffffff8ed766cb>] __console_unlock+0xfb/0x130 kernel/printk/printk.c:2844
+> hardirqs last disabled at (39335): [<ffffffff8ed766b0>] __up_console_sem kernel/printk/printk.c:342 [inline]
+> hardirqs last disabled at (39335): [<ffffffff8ed766b0>] __console_unlock+0xe0/0x130 kernel/printk/printk.c:2844
+> softirqs last enabled at (38482): [<ffffffff9195aaea>] bpf_test_run+0x31a/0x910
+> softirqs last disabled at (38484): [<ffffffff9195aaea>] bpf_test_run+0x31a/0x910
+> ---[ end trace 0000000000000000 ]---
+> ```
+[...]
 
