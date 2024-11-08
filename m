@@ -1,124 +1,129 @@
-Return-Path: <netdev+bounces-143343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A54CD9C21CE
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:17:24 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id C4A9D9C2205
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:26:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672922818F6
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:17:23 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 534EC1F22E7C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:26:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07AA312EBE7;
-	Fri,  8 Nov 2024 16:17:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA4971885A4;
+	Fri,  8 Nov 2024 16:26:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6jgmmy8"
+	dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b="CP8IuocG"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mout.web.de (mout.web.de [212.227.15.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082201BD9DB
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:17:18 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 794AA18B09;
+	Fri,  8 Nov 2024 16:26:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731082640; cv=none; b=dMZVn5S2iOIug2e7YiYT7F10Ao1UHBJ7nQ0BivMnLrKg3bnS07HLkeyxovR3e2IV+Vz0/qzDjJdY8BA51nYSVDuwqXudcX4QpNurDLU9IpUwBV5Bb8e54ldel2cpJpNXJBbbbeeTEvWiLD+ZziisGUtpLCjKWtSZNwKCUhoZUWY=
+	t=1731083190; cv=none; b=prsL2q/EzxHG2ptznzPrypnMSBF1N24wP0XIkm7dfXc40eBm5sOg+NzU9XQ7wuXX63fLPdUeVeCH3J17W2gX6xzo3Rru+QTjxGEBiweaDHMaqUiV9CXDjGxxuhDUZs+uM4rq5bLH/n0Uk5J+FM9ySPXxwtIuUUt4pL3donk/m+U=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731082640; c=relaxed/simple;
-	bh=B1zb4s6wqjsaGu3zuICvGcflH0bTY7szGMgi0nhznoA=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=gzaNm8Tr+Z9a//6KtPUC4xZP7daiI66HAY6NHRD0LNFz+n0SVLcPb6W1bf1dunkGuY69U96SQWLvP5xsWYYMxBhqkqvDqq0h9qRhor//ugZy2K3mRdMNOtR7tG2Y7xewhn9TTuqUrZ8+mHigrS2kVgsqxqf1ylrn++1q5hmNs/I=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A6jgmmy8; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731082637;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=55SYXzHa2UmvdGOhPXnTiulxMYj6o7/RTIyRzF1sUas=;
-	b=A6jgmmy8Mx3xbaQEnV5qL2iC3+CGmttdbJ56JLvkv/KFLq9Eixz19HWcspNX+wjp+6ytQC
-	4mQWMiSfQgEj9+aE/+GJfc24ZZAU8jwXAWLRsLXDrul1UE0uZrqdlFbQtsltDRxQe0yRos
-	HYp7+OUHXMmLRC9rXfldlXYyXf/9R4Y=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-48-Sr3-ep3wNLumrZz4UcejYA-1; Fri, 08 Nov 2024 11:17:16 -0500
-X-MC-Unique: Sr3-ep3wNLumrZz4UcejYA-1
-X-Mimecast-MFC-AGG-ID: Sr3-ep3wNLumrZz4UcejYA
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d59ad50f3so1161386f8f.0
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 08:17:16 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731082635; x=1731687435;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=55SYXzHa2UmvdGOhPXnTiulxMYj6o7/RTIyRzF1sUas=;
-        b=mYX5jSCQM7SDCzNIN52AGredHHukixJ77jljSm2aRe/nghaPMZvKhiNX83dmoNYZJ9
-         nrzGeQlLOn4EZVz4h5Yqoka4iw2cNy6e0eFHsRfFk1Pb8CICSQXKzplf5DlKG21klKL3
-         abR0hY8vJ5XNr4xr+Vkiuj/953OMmrxHemyddoTAALL3G+A3fQP4ZCE00TK9Grx/qQXF
-         ORTNyZo+i7f8jLR2vpMYNJtRQfDWGtIP4Z+u/4YJlxSVs3o2XsCzGxENpfTUhVYybwqr
-         +PBU1nLzhs5nItND1WF2cNF0O8foseWWHRnsUVXGlZa55Cd642oLkcZfoMqPlYJzaWRN
-         IKjA==
-X-Gm-Message-State: AOJu0YydCQOLKOeza6U0MwWMJSAyJeZe4AI3755nBYQTjHJ1hEt5eXrg
-	tT3p3k9TmjMyf/8YbQDRNK2R6tmoHA4TmMcmCFkFFc64hjR8LLjHX7Kf7KIic1pTxOxtuIOQpYX
-	oiY4z/AXMy3deiZJ/5nOAUzBgknnGHDgLnYmsHVdOEq9lTDiklM1WiQ==
-X-Received: by 2002:a5d:59a2:0:b0:37d:476e:f110 with SMTP id ffacd0b85a97d-381f186fbcbmr2982087f8f.34.1731082635249;
-        Fri, 08 Nov 2024 08:17:15 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IH5c1xsqi+VlZFd6SLf2pUrRmo5UwEp/CkUWLb1XYJkNaKBKx4dRRJhLxAaO9hZslmTR+8T7g==
-X-Received: by 2002:a5d:59a2:0:b0:37d:476e:f110 with SMTP id ffacd0b85a97d-381f186fbcbmr2982066f8f.34.1731082634895;
-        Fri, 08 Nov 2024 08:17:14 -0800 (PST)
-Received: from debian (2a01cb058d23d60039a5c1e29a817dbe.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:39a5:c1e2:9a81:7dbe])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed9ea4f6sm5333198f8f.64.2024.11.08.08.17.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 08:17:14 -0800 (PST)
-Date: Fri, 8 Nov 2024 17:17:12 +0100
-From: Guillaume Nault <gnault@redhat.com>
-To: Emanuele Santini <emanuele.santini.88@gmail.com>
-Cc: netdev@vger.kernel.org, yoshfuji@linux-ipv6.org, friedrich@oslage.de,
-	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
-	dsahern@kernel.org
-Subject: Re: [PATCH] net: ipv6: fix the address length for net_device on a
- GRE tunnel
-Message-ID: <Zy45iLv7cL8OcYze@debian>
-References: <20241108092555.5714-1-emanuele.santini.88@gmail.com>
- <Zy3/TmyK7imjT348@debian>
- <Zy4fA07kgV3o4Xmn@emanuele-al>
+	s=arc-20240116; t=1731083190; c=relaxed/simple;
+	bh=3mqsLDsEJoqwjI9HvUfDwlPxiJr4yDQLDVMDWRt1DVI=;
+	h=Message-ID:Date:MIME-Version:To:Cc:References:Subject:From:
+	 In-Reply-To:Content-Type; b=LvrRUvfpG6mOZxrLjI23tcHaOrv4sDvum52BbhLeqrgFG+FXTe1c6+yjXGeO0a0uWufbFDY112vtYWcCNRwc4aJtNeDwvreUSE0/W5b3sevsc4jPU3SE9CWtUXyBFFsJqUQNhl2dYluF+Ipn4mzIjItzKQhTt+LZRHDqOdz93FM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de; spf=pass smtp.mailfrom=web.de; dkim=pass (2048-bit key) header.d=web.de header.i=markus.elfring@web.de header.b=CP8IuocG; arc=none smtp.client-ip=212.227.15.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=web.de
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=web.de
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=web.de;
+	s=s29768273; t=1731083160; x=1731687960; i=markus.elfring@web.de;
+	bh=VUWzv8LrvIWA8ImsvyiR/6cd2EOKf5wJRkCX4vH4NoA=;
+	h=X-UI-Sender-Class:Message-ID:Date:MIME-Version:To:Cc:References:
+	 Subject:From:In-Reply-To:Content-Type:Content-Transfer-Encoding:
+	 cc:content-transfer-encoding:content-type:date:from:message-id:
+	 mime-version:reply-to:subject:to;
+	b=CP8IuocGGHD5URq/63LeC/3fmDzoljQJO5d0AqkwBfNyM7jiu8PaqBeCZ2SdMJSy
+	 xZGjvMLCkdLO+M+fDP2mR21WMp1yQ8+NX4NO/N1ymAd2HfQLZmAthUMtrstcSQscE
+	 rVTu2i/ZinZOVHp8rNuuUvkVbJfn2bYLh3Sucl5+C3oQpOQtAJdoAWYqvNV+vxkFh
+	 Rgsa682UbDS9ykrjGSbSt5yiTcdLssDMLQzLitqgcWcMuopJLH95RoMXD6objVGNu
+	 0PGHmy0yrN2TIAen0hwkEbOnOBH+uKYvGQstSN+Z+abVDr/hBtYUPdUc3JGQyYAx5
+	 T2RKBN+bGWkhRhJnMg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.80.95]) by smtp.web.de (mrweb005
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MVaYi-1tHBbI0wMe-00Nvtn; Fri, 08
+ Nov 2024 17:26:00 +0100
+Message-ID: <5a707eb5-8695-4f0d-bb08-6de95017d2b1@web.de>
+Date: Fri, 8 Nov 2024 17:25:56 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <Zy4fA07kgV3o4Xmn@emanuele-al>
+User-Agent: Mozilla Thunderbird
+To: Michael Nemanov <michael.nemanov@ti.com>, linux-wireless@vger.kernel.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ Conor Dooley <conor+dt@kernel.org>, "David S. Miller" <davem@davemloft.net>,
+ Krzysztof Kozlowski <krzk+dt@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+ Kalle Valo <kvalo@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Rob Herring <robh@kernel.org>
+Cc: LKML <linux-kernel@vger.kernel.org>, Sabeeh Khan <sabeeh-khan@ti.com>,
+ Simon Horman <horms@kernel.org>
+References: <20241107125209.1736277-6-michael.nemanov@ti.com>
+Subject: Re: [PATCH v5 05/17] wifi: cc33xx: Add cmd.c, cmd.h
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20241107125209.1736277-6-michael.nemanov@ti.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:kCejPMohxqmb4402vvVYhccZ9wh2wv6TVh1jzzZXVxjdncvL2ET
+ 53vZwdWPFjuyS0q8f0oDfTe+LtQUk00Mv+sqUdvH+EjtzuSiAAidCgVhZQ5tqnvBITkjtsP
+ +aJcmAzFYk8n312MiU/eAxRfJaagHa23iqjTjt+zunmJCVgCyOuEf8p4l0yvBxSYNJz2VIx
+ CZMCPWzsfQoLQ0ZUUoeHA==
+X-Spam-Flag: NO
+UI-OutboundReport: notjunk:1;M01:P0:S6CwSfd+LOc=;P9Wg40faTP/Ttw0CrWOuNvN+G3O
+ rhLHdGT5u7OzXQelvdwgcrI1PUA/Huuyei/Nz4oNptn/AE8UpDeG8qc1D5klR+U+uU1SmuG0j
+ 0kB7lFau2y18CbZ+NAzYvGuYURA0ky1BTqwHsPBaogO38Hh2llhbLXblIjI8DXzYQHsHVWz1+
+ X6xbZVam9+2BYZ+EXv3VWXHFhH7BaMJm/I+XY+5ostG8fyZneehcZIB+I3tQbv7Mg4h1ymrWf
+ 6aU11MSBDUKs+5KFsq7UjjxJeCfeE0fJokUdnBhb7VDJBYkmD9y1h32Y/GvnVL8xQkU8ncHBN
+ zFFEzO+z2OsNiO3dhvCVCaaikVnlh/Yj8NG7rT1myAmOPB3fwvv12XsHKDZyfeP1LGP+T/XYK
+ iQjMaKrKx77JwsC27eAqvp146wIOntJl/SXNnBym3DcOHI+OcTO0VDuN0vj1pH8crglboiJ4Q
+ ktVissq+ZITbeVUKOlOXVf6tKLr4pC2BQnr3Vb59jJA7Rb0oBomZh1w15xzJ3w4OVIub+mFua
+ f5i31UDV9e+Bsd3qduNJQ4urgFZIFKqkLK0BQTPbMaVDnbLpcwPlZIpW5pjLEGQu1KPUOhUpH
+ mIEzozOM+SRGAG0gjatyi5a7JHz45jf9HRX2r2lLvvog2ixR7NcRqFchIMBqWE1WJbmBae9C7
+ nVWKrf5ZiSt3Du7M4fRXzwYcQFgFxx3lJk0JQGMFaY7uZ+T0AqIXfV2r8fopmO8n4T+Wnw3qs
+ xaz9/UARNiLOH8+5nPwej9l982t/lhQo7bTFWEi4rALqqvpcG8BVtCg8V8S9/ELpfdTgcOpmw
+ QAYKupqVKXr3F01tC2Arh7ZatclUivECKKMqNQvui2P7zyJQ0ffTC2ly1XlLqCCL2CX90u+CT
+ jjwKAyZNGisp3DWu5qXN3JxNHr8QxT51Mjgz1fPUcdkJrAvTFQKUKsNAQ
 
-On Fri, Nov 08, 2024 at 03:24:03PM +0100, Emanuele Santini wrote:
-> I'm talking about the ip6gre. I agree that setting the hardware address to 0 is appropriate.
-> However, in the ip6gre_tunnel_setup function, the perm_addr field of net_device is 
-> currently assigned a random Ethernet address:
-> 
->         dev->flags |= IFF_NOARP;
->        - dev->addr_len = sizeof(struct in6_addr);
->        + dev->addr_len = ETH_ALEN;
->         netif_keep_dst(dev);
->         /* This perm addr will be used as interface identifier by IPv6 */
->         dev->addr_assign_type = NET_ADDR_RANDOM;
->         eth_random_addr(dev->perm_addr);
-> 
-> maybe this is not a valid justification to set addr_len to ETH_ALEN.
+=E2=80=A6
+> Similar to wlcore, all commands eventually reach
+> __cc33xx_cmd_send which fills a generic command
+> header and send the buffer via the IO abstraction layer.
+=E2=80=A6
 
-I think that having a fake permanent address for the purpose of IPv6
-interface Id. generation isn't a correct justification for setting
-dev->addr_len.
+You may occasionally put more than 56 characters into text lines
+for an improved change description.
 
-If setting ->perm_addr and ->addr_assign_type have side effects on the
-acceptable values of ->addr_len, then the commit description should
-explain that in more details.
 
-> I will make a review setting addr_len to 0, and will resubmit the patch after successful testing.
+=E2=80=A6
+> +++ b/drivers/net/wireless/ti/cc33xx/cmd.c
+> @@ -0,0 +1,1920 @@
+=E2=80=A6
+> +int cc33xx_set_link(struct cc33xx *cc, struct cc33xx_vif *wlvif, u8 lin=
+k)
+> +{
+> +	unsigned long flags;
+> +
+> +	/* these bits are used by op_tx */
+> +	spin_lock_irqsave(&cc->cc_lock, flags);
+> +	__set_bit(link, cc->links_map);
+> +	__set_bit(link, wlvif->links_map);
+> +	spin_unlock_irqrestore(&cc->cc_lock, flags);
+=E2=80=A6
 
-Thanks.
+Under which circumstances would you become interested to apply a macro cal=
+l
+like =E2=80=9Cscoped_guard(spinlock_irqsave, &cc->cc_lock)=E2=80=9D?
+https://elixir.bootlin.com/linux/v6.12-rc6/source/include/linux/spinlock.h=
+#L572
 
+Regards,
+Markus
 
