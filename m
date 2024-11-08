@@ -1,124 +1,100 @@
-Return-Path: <netdev+bounces-143265-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143266-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 740719C1C07
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:17:40 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3F0929C1C0B
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:18:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 1CA1AB20F7D
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:17:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70E381C21F4E
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:18:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1255C1E32B3;
-	Fri,  8 Nov 2024 11:17:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F77F1E3DE4;
+	Fri,  8 Nov 2024 11:18:32 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org;
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="LxUG45Y3"
 X-Original-To: netdev@vger.kernel.org
-Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FBC01E0E0F;
-	Fri,  8 Nov 2024 11:17:31 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C3841E0E0F;
+	Fri,  8 Nov 2024 11:18:29 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731064653; cv=none; b=SWkeg52yz6EmAtjQwv8FsLeMZ9JkHMRBc86GF5Hfs6QBqW/CwnP0rhI87/Mj/KDP0HQbXtQEK1JGOwIXihD5wmQ+Guumyjy6DJwXcW6cWSHrIZJQL6eC8Ovz+zuxyu1ayN+hJ/+m0eC5KaCP/SPMevcFNe8Owz/kefi27/M6Ykk=
+	t=1731064712; cv=none; b=uab/Zh3Mm6nnXFU9kGhJGXZwyGX4JQnOp368ivvZKOuhQtT+yrVcWYG7MhskOqAMhhQeYJ+15rS6bpEV8GTe3XRAdH5OB74XnWmGEQstwmtkf0uXUraw2Fe685wZn74n+jN2AsxxR5uFIyBoymvjItnnwLDJI5IJU0IBKbAcSwI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731064653; c=relaxed/simple;
-	bh=IE3H64dNQq6c0bCyu50h6oFeZV+uAfBveuuEvTA6ZoI=;
-	h=Message-ID:Date:MIME-Version:Subject:From:To:Cc:References:
-	 In-Reply-To:Content-Type; b=UKIy2umeNkguhxzY+HH+/C/4+uuI2mydRdODZEmHqkumZ8M96UzKYE/VUT/J/0pZ0UCyvyXDPFYGeL1Sw8zuFJCziCetG45FvzU0Qt9Uea2v/U8UvhQOktzh7fLteSQog3s9mZ7LPdJLgaNg1nOC12amcvUAUllvmzIdX431c54=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
-Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
-	by localhost (Postfix) with ESMTP id 4XlGcn3jX0z9sSL;
-	Fri,  8 Nov 2024 12:17:29 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from pegase2.c-s.fr ([172.26.127.65])
-	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id jedhCAK4NTvb; Fri,  8 Nov 2024 12:17:29 +0100 (CET)
-Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
-	by pegase2.c-s.fr (Postfix) with ESMTP id 4XlGcn2v6Rz9rvV;
-	Fri,  8 Nov 2024 12:17:29 +0100 (CET)
-Received: from localhost (localhost [127.0.0.1])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id 4F1248B780;
-	Fri,  8 Nov 2024 12:17:29 +0100 (CET)
-X-Virus-Scanned: amavisd-new at c-s.fr
-Received: from messagerie.si.c-s.fr ([127.0.0.1])
-	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
-	with ESMTP id s51MEc62SJBS; Fri,  8 Nov 2024 12:17:29 +0100 (CET)
-Received: from [192.168.232.253] (PO25383.IDSI0.si.c-s.fr [192.168.232.253])
-	by messagerie.si.c-s.fr (Postfix) with ESMTP id DF8D88B77A;
-	Fri,  8 Nov 2024 12:17:28 +0100 (CET)
-Message-ID: <98b8084f-8f66-4e87-b182-dda6bf0c3d57@csgroup.eu>
-Date: Fri, 8 Nov 2024 12:17:28 +0100
+	s=arc-20240116; t=1731064712; c=relaxed/simple;
+	bh=o7n+bwD0RpsOsPJ/gpHm+G0z7G438qSoutWYaRtgFGA=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=Xhct7vwggozjpLGRlV145B3Gg1/5uPXU1lnZ7ATgHKrM7GH5ItY232Xd1SiRowu0yh2k92FXqF4WUnN+Inds24I1MJH+FyrYXrMjXvTnsxPCrBypDYFO6O+ZEtDXFFQ9TowplOXbq/696IY22sc3PDhayaDEuTKM8lMoeywUico=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=LxUG45Y3; arc=none smtp.client-ip=78.32.30.218
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
+Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=2cN7+fcpq3L63jt/AUpS+68YG4k7E+yUvX7PUc285Ew=; b=LxUG45Y3Ffi4l5fcCIrMKlrw3M
+	K9rdAx2D4MGTnQ5lkz3+bbl7gvCfHNo0TB362aYnbroGPD59UBkAML01r9y3iQm9YHmrxI4/wsG/U
+	S9r1FmljlDiTFw0E7YNDmNtJB7dQgDDCMDFMpLwoDgZ6e+ZgrFnGwumZRgiUm3cmzWcnyB/c2rCfz
+	/OMcWwjb8xdbv8BwjrCYLj3hsJBFm6cSJ7Lfj6XUhi/DCjGJmYTpjFmFNPEwYU0Js44CV4K7AGsPY
+	hbPcY0DLsMZVGSHgfdUmNrzz7WIeBH5mUKqkO2pQ41rlzrXvYvzDlaVsUiRrxGJOsHIAQEJLYDpvj
+	CAJMnrYQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43430)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1t9N0L-000501-1E;
+	Fri, 08 Nov 2024 11:18:17 +0000
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1t9N0J-0002Ed-2L;
+	Fri, 08 Nov 2024 11:18:15 +0000
+Date: Fri, 8 Nov 2024 11:18:15 +0000
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Daniel Machon <daniel.machon@microchip.com>
+Cc: UNGLinuxDriver@microchip.com, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lars Povlsen <lars.povlsen@microchip.com>,
+	Steen Hegelund <Steen.Hegelund@microchip.com>,
+	Horatiu Vultur <horatiu.vultur@microchip.com>,
+	jacob.e.keller@intel.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
+Subject: Re: [PATCH net-next 1/7] net: sparx5: do some preparation work
+Message-ID: <Zy3zd12CoUp6dC2q@shell.armlinux.org.uk>
+References: <20241106-sparx5-lan969x-switch-driver-4-v1-0-f7f7316436bd@microchip.com>
+ <20241106-sparx5-lan969x-switch-driver-4-v1-1-f7f7316436bd@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: drivers/net/ethernet/freescale/ucc_geth.c:2454:64: sparse:
- sparse: incorrect type in argument 1 (different address spaces)
-From: Christophe Leroy <christophe.leroy@csgroup.eu>
-To: Linus Walleij <linus.walleij@linaro.org>,
- kernel test robot <lkp@intel.com>,
- "linuxppc-dev@lists.ozlabs.org list" <linuxppc-dev@lists.ozlabs.org>,
- netdev <netdev@vger.kernel.org>
-Cc: Stanislav Kinsburskii <stanislav.kinsburskii@gmail.com>,
- oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
- Michael Ellerman <mpe@ellerman.id.au>
-References: <202410301531.7Vr9UkCn-lkp@intel.com>
- <CACRpkdbW5kheaWPzKip9ucEwK2uv+Cmf5SwT1necfa3Ynct6Ag@mail.gmail.com>
- <2010cc7a-7f49-4c5b-b684-8e08ff8d17ed@csgroup.eu>
-Content-Language: fr-FR
-In-Reply-To: <2010cc7a-7f49-4c5b-b684-8e08ff8d17ed@csgroup.eu>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241106-sparx5-lan969x-switch-driver-4-v1-1-f7f7316436bd@microchip.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
+On Wed, Nov 06, 2024 at 08:16:39PM +0100, Daniel Machon wrote:
+> @@ -134,6 +134,9 @@ enum sparx5_feature {
+>  
+>  #define SPARX5_MAX_PTP_ID	512
+>  
+> +#define SPX5_ETYPE_TAG_C     0x8100
 
+Maybe at some point consider using ETH_P_8021Q which is defined in
+uapi/linux/if_ether.h ?
 
-Le 08/11/2024 à 11:30, Christophe Leroy a écrit :
-> 
-> 
-> Le 08/11/2024 à 09:18, Linus Walleij a écrit :
->> On Wed, Oct 30, 2024 at 8:05 AM kernel test robot <lkp@intel.com> wrote:
->>
->>> tree:   
->>> https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C5a1ff6cef1f642fba00a08dcffce0903%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638666507603442752%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=2dgpku3%2BPjovwZxpedYowAAB%2BR%2FeyxOc0Ys3kE0KK6E%3D&reserved=0 master
->>> head:   c1e939a21eb111a6d6067b38e8e04b8809b64c4e
->>> commit: b28d1ccf921a4333be14017d82066386d419e638 powerpc/io: Expect 
->>> immutable pointer in virt_to_phys() prototype
->>
->> Ugh Stanislav do you have ideas around this one?
->>
->>>     drivers/net/ethernet/freescale/ucc_geth.c:244:21: sparse:     got 
->>> restricted __be32 [noderef] __iomem *
->>>     drivers/net/ethernet/freescale/ucc_geth.c:405:22: sparse: sparse: 
->>> incorrect type in argument 1 (different base types) @@     expected 
->>> unsigned short volatile [noderef] [usertype] __iomem *addr @@     got 
->>> restricted __be16 [noderef] [usertype] __iomem * @@
->>
->> They all look the same, it's from this:
->>
->> static void set_mac_addr(__be16 __iomem *reg, u8 *mac)
->> {
->>      out_be16(&reg[0], ((u16)mac[5] << 8) | mac[4]);
->>      out_be16(&reg[1], ((u16)mac[3] << 8) | mac[2]);
->>      out_be16(&reg[2], ((u16)mac[1] << 8) | mac[0]);
->> }
->>
->> Is it simply that we need a paranthesis extra around the thing casted
->> to (u16) else it becomes u32?
-> 
-> Not at all. The one you point here are:
-> 
+> +#define SPX5_ETYPE_TAG_S     0x88a8
 
-...
+Maybe also consider adding ETH_P_8021AD to uapi/linux/if_ether.h ?
 
-Note however that there is work in progress on this driver that will 
-impact hundreds of lines, so maybe wait until that is done ? See 
-https://patchwork.kernel.org/project/netdevbpf/cover/20241107170255.1058124-1-maxime.chevallier@bootlin.com/
-
-Christophe
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
