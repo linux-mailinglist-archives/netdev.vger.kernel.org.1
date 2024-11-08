@@ -1,93 +1,89 @@
-Return-Path: <netdev+bounces-143342-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143343-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id C418A9C2182
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:04:04 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A54CD9C21CE
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:17:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 6D21EB2618D
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:04:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 672922818F6
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7AEAB1974FE;
-	Fri,  8 Nov 2024 16:03:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07AA312EBE7;
+	Fri,  8 Nov 2024 16:17:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="bLSZ3bGR"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="A6jgmmy8"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4E76198832
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:03:01 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 082201BD9DB
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 16:17:18 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731081783; cv=none; b=UeRL0jw3rhcZIS2LN9ezEpr+UyS3EOmQgNIwJrk3HDi4LuhPnhKzcwoYfFWFxa9wrj9V/hn/zmgz9rGqbo7K6ONyqtCcNEWlh/SkWGEICC3r/CHK/CTOBkMVmJX6RhJjBPxL9lCzSzZJhEBA4KzAwhBxweKp2WO5HVM7tg2uAko=
+	t=1731082640; cv=none; b=dMZVn5S2iOIug2e7YiYT7F10Ao1UHBJ7nQ0BivMnLrKg3bnS07HLkeyxovR3e2IV+Vz0/qzDjJdY8BA51nYSVDuwqXudcX4QpNurDLU9IpUwBV5Bb8e54ldel2cpJpNXJBbbbeeTEvWiLD+ZziisGUtpLCjKWtSZNwKCUhoZUWY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731081783; c=relaxed/simple;
-	bh=Dkl1ieEc1BAg1ZDaYT7VtIs7itFlvZ0wDVhM9n7ovBY=;
+	s=arc-20240116; t=1731082640; c=relaxed/simple;
+	bh=B1zb4s6wqjsaGu3zuICvGcflH0bTY7szGMgi0nhznoA=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=MR0oI9XjVdx1TDi9tTvHZ4uQXRI+aZSnhBUii6d9LTFgY3sbVC1a/IknzuGtfbmWYEPWnU7+H3j9ejH6WkhfjY+ksl5bTMM54pDdjjehHJ3W/SizOkh/dRVNED/mP4o80/LYiX54g3j17o7XWRXMdkS13N96Wvsz6kpJkAp9SQc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=bLSZ3bGR; arc=none smtp.client-ip=170.10.129.124
+	 Content-Type:Content-Disposition:In-Reply-To; b=gzaNm8Tr+Z9a//6KtPUC4xZP7daiI66HAY6NHRD0LNFz+n0SVLcPb6W1bf1dunkGuY69U96SQWLvP5xsWYYMxBhqkqvDqq0h9qRhor//ugZy2K3mRdMNOtR7tG2Y7xewhn9TTuqUrZ8+mHigrS2kVgsqxqf1ylrn++1q5hmNs/I=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=A6jgmmy8; arc=none smtp.client-ip=170.10.133.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731081780;
+	s=mimecast20190719; t=1731082637;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=KodwbNUeuehD+z2uf2ly+jd4Lxh5FbYEBZu9aS+ypso=;
-	b=bLSZ3bGRt4cxNvVICOghx4IilkwPXaLOlFGpTxrz4bO3xRmB3NE+c06rJThdnwG4yg+9D1
-	o1e041V8cl1hiVd6fyvReMcYxwfiLxjnNRyl3JYYvahjwHMaIisB5j6YTU3rsWrsFZ4lmT
-	3S+rtsN1nGII2dl7YQuKFeOJLtcDhvU=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=55SYXzHa2UmvdGOhPXnTiulxMYj6o7/RTIyRzF1sUas=;
+	b=A6jgmmy8Mx3xbaQEnV5qL2iC3+CGmttdbJ56JLvkv/KFLq9Eixz19HWcspNX+wjp+6ytQC
+	4mQWMiSfQgEj9+aE/+GJfc24ZZAU8jwXAWLRsLXDrul1UE0uZrqdlFbQtsltDRxQe0yRos
+	HYp7+OUHXMmLRC9rXfldlXYyXf/9R4Y=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-185-2qcPiiI4NFCwlk3WhjY2Dg-1; Fri, 08 Nov 2024 11:02:59 -0500
-X-MC-Unique: 2qcPiiI4NFCwlk3WhjY2Dg-1
-X-Mimecast-MFC-AGG-ID: 2qcPiiI4NFCwlk3WhjY2Dg
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-53b1eddcf4aso1968954e87.3
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 08:02:58 -0800 (PST)
+ us-mta-48-Sr3-ep3wNLumrZz4UcejYA-1; Fri, 08 Nov 2024 11:17:16 -0500
+X-MC-Unique: Sr3-ep3wNLumrZz4UcejYA-1
+X-Mimecast-MFC-AGG-ID: Sr3-ep3wNLumrZz4UcejYA
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d59ad50f3so1161386f8f.0
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 08:17:16 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731081778; x=1731686578;
+        d=1e100.net; s=20230601; t=1731082635; x=1731687435;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KodwbNUeuehD+z2uf2ly+jd4Lxh5FbYEBZu9aS+ypso=;
-        b=dGWXFKy2giQKkEM96dH9ARRjQtg/Ftr/9uOcea6aCH2zpuM6cLbNpvw7MiSrqnDtCu
-         l9mahwRI2t8iATQMjLqvsmkLuY4AisVK8IAAdghk8cAsnYG7ENC4MGRzI3+b0/1YRyfc
-         RWyVuTbDcTRxomV43ze3hNQhUvrynTqovKsLJ/3+jsVffiR6MTWWBiX1hJt5lNZz3E0p
-         2ZNppOPCJIKU5DBQ1vNDMG6ncA4k53t0uY4X4hQOKrvlGHnoABYHTTvgudIJq0I+lOZi
-         lw3RfaUZoBY6qbUTmH8nYQYPq6xO1qRP1rsOy+FXAlsrlJju0XBSnszsZCbSuT054IAo
-         5+tQ==
-X-Forwarded-Encrypted: i=1; AJvYcCXugfTCUjXjG2k0SNVgSvhUUyc6LezxXop37YxmlH38TgqEE8scuOxhEOgRe+0PWeGxHZLc22U=@vger.kernel.org
-X-Gm-Message-State: AOJu0YxLrgjhg3jYgShLEd3TTF2Ah/AFGEsAc6GYANMczNePhiEfBytj
-	jgMRi1K/1vWkMT06AS+uMHjIBqoFpwx2p9m6y9fYDFH1Ai5tYu1ZJJJ+usfMjKy8lTsDxuGoVWj
-	Z3H1KVNmQiVAVWXrDrTNs070DxSR3xgeME+3WAN65PWn2Hm3Wdu+LqQ==
-X-Received: by 2002:a05:6512:3d0f:b0:53d:8274:a300 with SMTP id 2adb3069b0e04-53d862c5bbfmr1437135e87.34.1731081777513;
-        Fri, 08 Nov 2024 08:02:57 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHXUwhruY1WxPZM2lD15BwhIP8JhX3dp+oHUK/E9prDaGfWq7Kte9cKFc1RP7RvGorjuU5tSQ==
-X-Received: by 2002:a05:6512:3d0f:b0:53d:8274:a300 with SMTP id 2adb3069b0e04-53d862c5bbfmr1437063e87.34.1731081776647;
-        Fri, 08 Nov 2024 08:02:56 -0800 (PST)
+        bh=55SYXzHa2UmvdGOhPXnTiulxMYj6o7/RTIyRzF1sUas=;
+        b=mYX5jSCQM7SDCzNIN52AGredHHukixJ77jljSm2aRe/nghaPMZvKhiNX83dmoNYZJ9
+         nrzGeQlLOn4EZVz4h5Yqoka4iw2cNy6e0eFHsRfFk1Pb8CICSQXKzplf5DlKG21klKL3
+         abR0hY8vJ5XNr4xr+Vkiuj/953OMmrxHemyddoTAALL3G+A3fQP4ZCE00TK9Grx/qQXF
+         ORTNyZo+i7f8jLR2vpMYNJtRQfDWGtIP4Z+u/4YJlxSVs3o2XsCzGxENpfTUhVYybwqr
+         +PBU1nLzhs5nItND1WF2cNF0O8foseWWHRnsUVXGlZa55Cd642oLkcZfoMqPlYJzaWRN
+         IKjA==
+X-Gm-Message-State: AOJu0YydCQOLKOeza6U0MwWMJSAyJeZe4AI3755nBYQTjHJ1hEt5eXrg
+	tT3p3k9TmjMyf/8YbQDRNK2R6tmoHA4TmMcmCFkFFc64hjR8LLjHX7Kf7KIic1pTxOxtuIOQpYX
+	oiY4z/AXMy3deiZJ/5nOAUzBgknnGHDgLnYmsHVdOEq9lTDiklM1WiQ==
+X-Received: by 2002:a5d:59a2:0:b0:37d:476e:f110 with SMTP id ffacd0b85a97d-381f186fbcbmr2982087f8f.34.1731082635249;
+        Fri, 08 Nov 2024 08:17:15 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IH5c1xsqi+VlZFd6SLf2pUrRmo5UwEp/CkUWLb1XYJkNaKBKx4dRRJhLxAaO9hZslmTR+8T7g==
+X-Received: by 2002:a5d:59a2:0:b0:37d:476e:f110 with SMTP id ffacd0b85a97d-381f186fbcbmr2982066f8f.34.1731082634895;
+        Fri, 08 Nov 2024 08:17:14 -0800 (PST)
 Received: from debian (2a01cb058d23d60039a5c1e29a817dbe.ipv6.abo.wanadoo.fr. [2a01:cb05:8d23:d600:39a5:c1e2:9a81:7dbe])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b054b3fesm72642485e9.17.2024.11.08.08.02.55
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed9ea4f6sm5333198f8f.64.2024.11.08.08.17.14
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 08:02:56 -0800 (PST)
-Date: Fri, 8 Nov 2024 17:02:53 +0100
+        Fri, 08 Nov 2024 08:17:14 -0800 (PST)
+Date: Fri, 8 Nov 2024 17:17:12 +0100
 From: Guillaume Nault <gnault@redhat.com>
-To: Breno Leitao <leitao@debian.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Akinobu Mita <akinobu.mita@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH net-next v6] net: Implement fault injection forcing skb
- reallocation
-Message-ID: <Zy42LfWaiWHJ12Nw@debian>
-References: <20241107-fault_v6-v6-1-1b82cb6ecacd@debian.org>
+To: Emanuele Santini <emanuele.santini.88@gmail.com>
+Cc: netdev@vger.kernel.org, yoshfuji@linux-ipv6.org, friedrich@oslage.de,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	dsahern@kernel.org
+Subject: Re: [PATCH] net: ipv6: fix the address length for net_device on a
+ GRE tunnel
+Message-ID: <Zy45iLv7cL8OcYze@debian>
+References: <20241108092555.5714-1-emanuele.santini.88@gmail.com>
+ <Zy3/TmyK7imjT348@debian>
+ <Zy4fA07kgV3o4Xmn@emanuele-al>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -96,26 +92,33 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107-fault_v6-v6-1-1b82cb6ecacd@debian.org>
+In-Reply-To: <Zy4fA07kgV3o4Xmn@emanuele-al>
 
-On Thu, Nov 07, 2024 at 08:11:44AM -0800, Breno Leitao wrote:
-> Introduce a fault injection mechanism to force skb reallocation. The
-> primary goal is to catch bugs related to pointer invalidation after
-> potential skb reallocation.
+On Fri, Nov 08, 2024 at 03:24:03PM +0100, Emanuele Santini wrote:
+> I'm talking about the ip6gre. I agree that setting the hardware address to 0 is appropriate.
+> However, in the ip6gre_tunnel_setup function, the perm_addr field of net_device is 
+> currently assigned a random Ethernet address:
+> 
+>         dev->flags |= IFF_NOARP;
+>        - dev->addr_len = sizeof(struct in6_addr);
+>        + dev->addr_len = ETH_ALEN;
+>         netif_keep_dst(dev);
+>         /* This perm addr will be used as interface identifier by IPv6 */
+>         dev->addr_assign_type = NET_ADDR_RANDOM;
+>         eth_random_addr(dev->perm_addr);
+> 
+> maybe this is not a valid justification to set addr_len to ETH_ALEN.
 
-Nice to see this kind of debug option being worked on!
+I think that having a fake permanent address for the purpose of IPv6
+interface Id. generation isn't a correct justification for setting
+dev->addr_len.
 
-> +static bool should_fail_net_realloc_skb(struct sk_buff *skb)
-> +{
-> +	struct net_device *net = skb->dev;
+If setting ->perm_addr and ->addr_assign_type have side effects on the
+acceptable values of ->addr_len, then the commit description should
+explain that in more details.
 
-It's confusing to see a variable called "net" pointing to a struct
-net_device. "net" generally refers to struct net.
+> I will make a review setting addr_len to 0, and will resubmit the patch after successful testing.
 
-In case v7 is needed, it'd be nice to call this variable "dev".
-
-Looks good to me otherwise.
-
-Acked-by: Guillaume Nault <gnault@redhat.com>
+Thanks.
 
 
