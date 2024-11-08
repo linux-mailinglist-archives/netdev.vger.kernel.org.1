@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-143275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FEA09C1C65
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:44:45 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id B225D9C1C62
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:44:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 503C2286DE1
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:44:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 78151286D9E
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:44:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9447C1E5703;
-	Fri,  8 Nov 2024 11:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAADC1E47C1;
+	Fri,  8 Nov 2024 11:44:34 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="QjEFxrX5"
+	dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b="Y4scvopp"
 X-Original-To: netdev@vger.kernel.org
 Received: from mout.gmx.net (mout.gmx.net [212.227.15.18])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 565111E32B3;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64DC51E2833;
 	Fri,  8 Nov 2024 11:44:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=212.227.15.18
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731066275; cv=none; b=frwZsQCC9HaM4jZ8F3lRtzR3ob120yWzUlPafNiftKpCra9GalNhOOE6cqR6zorCohvBtrK++fQXeC4O++6uXuqNiw4aCgzdHtWPQapJAT4PJj+oS/+pLCVAUQjDb7FDW+ar0Yn5wpcCniySuqSx3DsORINH+Wipcs3k9E/2Ek8=
+	t=1731066274; cv=none; b=Imihh85Kw36sdrdOM5E7lfFKSykbDb3GQQ2ObCRMr4iBhveWbCIzvd/ALBrRXw8AmnUSgz/ujHtRd/Sy8F2FhB2dQTD+SteQiciVgG5vVCAgLU/E1z3Hmidshenx7P4C8achb/YYhzg1SH+NWOCdttiU26tE2s/yPZ2zt4sCAdw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731066275; c=relaxed/simple;
-	bh=MDmKggEi6kmApuIt6Yt8mPHClxb1p8lHzd+eGxHmbHI=;
+	s=arc-20240116; t=1731066274; c=relaxed/simple;
+	bh=oQVviN+5i+x05HgtVOFrDfC3HzwLDkP+iQb92BTx4og=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=LeVgl1bJqMUCgMSzpv4VIyAVehavufuiMHASxNeQjYcjQaipwNqLcb3Ph/OqR8QKf0v94bxepYlhdeJSCinMHrTf3kUuN10n6rJfbKkhw2cZLkMZOiWiA02g2D4Mj82HOTy9SEAycHJVZoPsQgOA9RxydEzpiXIhXr/RGn7h2wE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=QjEFxrX5; arc=none smtp.client-ip=212.227.15.18
+	 MIME-Version; b=MIBkao0xdb6zuUTj9z1UjnhR+EdmZQQw1oO+t9VrwAeo+5I0GN3r0awypHsFltV0sPRgIdlc5vW5OzrtjUyOJCRnZckkaUzLpHDL9jgn8hHAzglV5LfZpbPFoTwKNBpFB6jzW/JanKk058WNKQ0GfcrfrF6LeVmQvFqBaavkn1c=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net; spf=pass smtp.mailfrom=gmx.net; dkim=pass (2048-bit key) header.d=gmx.net header.i=wahrenst@gmx.net header.b=Y4scvopp; arc=none smtp.client-ip=212.227.15.18
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=gmx.net
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmx.net
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=gmx.net;
 	s=s31663417; t=1731066258; x=1731671058; i=wahrenst@gmx.net;
-	bh=uZMKt13pgpTh6sAh8BdybJCwC1878gT2xjYhwHNe3gA=;
+	bh=GxbX2oxaYRc6GmeF5zAbTlIW/0poPK+EYOQlprsP+sQ=;
 	h=X-UI-Sender-Class:From:To:Cc:Subject:Date:Message-Id:In-Reply-To:
 	 References:MIME-Version:Content-Transfer-Encoding:cc:
 	 content-transfer-encoding:content-type:date:from:message-id:
 	 mime-version:reply-to:subject:to;
-	b=QjEFxrX5FAcqKle00Mk6QvAy4zGYwSuvwG3a674lDsujhJssD5sSoF6e7fBQqRJc
-	 7zrFJ3O8Kvzhqkexm80TM63XXJ6NtNTgpKD3c7FWf3dqfpghMsGd1dO6Fq4LmCVTR
-	 LBrFYnV68fhy/fyMR/OLTr0NmKagbOvaHuAUDZ/iYw6mWoqCpea7+aBOVxiG7P5wh
-	 myC16ou4hpSzWiFHWlM6jKMSRLSeYhv1Mjvlk5ibsKLJZ9JSSUcgiNyIhoQHfrF5b
-	 EsaLvrt7DCCSDz69VJmOlpfjfHdZX95x5Ph6AgRMzxa6EBlY1hep/8xD4lwZp0G5f
-	 zmzI7dJgR5smTnKdyA==
+	b=Y4scvopp/F1hpDmqbVxGiCZ3tiQeiamk/dXKp9V9NdYfM7Ye6g87cNme3bQErJaa
+	 SZBzWFFWHDQTcApeMgQI+tDxY991CbvEE3eoqgKaXjMwHMRkNsGZzVjiA4vi1jzs0
+	 wYv7kWfJFGYxWPeLjIa20/yQ2QpIS947C9ZTR+7I/RX3fQE8P9TF1BKtDaAYjk1Oj
+	 V+ikv5UDjV0t7JRd6kHwbHFWMSpC9ifbid0pxs2efviUMYN1NdbgiGN4Pj/4FBXya
+	 zSWhFbst3xIdgeot4g5VNJtLWqogy69g6alSRJKZYEgAZbcWTzCbhemYhLRthQJxy
+	 xEJPDlnWfrUv+WUrwQ==
 X-UI-Sender-Class: 724b4f7f-cbec-4199-ad4e-598c01a50d3a
 Received: from stefanw-SCHENKER ([37.4.248.43]) by mail.gmx.net (mrgmx005
- [212.227.17.190]) with ESMTPSA (Nemesis) id 1MqJm5-1teGFl0YLL-00mD2y; Fri, 08
+ [212.227.17.190]) with ESMTPSA (Nemesis) id 1MDywo-1szRnK1yDM-00FbvH; Fri, 08
  Nov 2024 12:44:18 +0100
 From: Stefan Wahren <wahrenst@gmx.net>
 To: Andrew Lunn <andrew+netdev@lunn.ch>,
@@ -57,11 +57,10 @@ To: Andrew Lunn <andrew+netdev@lunn.ch>,
 Cc: Dan Carpenter <dan.carpenter@linaro.org>,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Stefan Wahren <wahrenst@gmx.net>,
-	stable@vger.kernel.org
-Subject: [PATCH 1/2 net V3] net: vertexcom: mse102x: Fix possible double free of TX skb
-Date: Fri,  8 Nov 2024 12:43:42 +0100
-Message-Id: <20241108114343.6174-2-wahrenst@gmx.net>
+	Stefan Wahren <wahrenst@gmx.net>
+Subject: [PATCH 2/2 net V3] net: vertexcom: mse102x: Fix tx_bytes calculation
+Date: Fri,  8 Nov 2024 12:43:43 +0100
+Message-Id: <20241108114343.6174-3-wahrenst@gmx.net>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20241108114343.6174-1-wahrenst@gmx.net>
 References: <20241108114343.6174-1-wahrenst@gmx.net>
@@ -72,100 +71,57 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:SO7gY4fbJ/cAlEVxUg0/CUTKIBsYiOPG7sQoNN/rLyZSJoibRhZ
- kGbPnudNZzHaD/S9tcgm0WOgovu3t96zeHZBXefQiC2PGO7Xx3O+5kT4PHSDN+/SHe/x4xm
- pwpJIycBsqxr/fJj1kyN7egZ0cOUT2t8/pGfelzHV+90f54/zs/1GgCB37pEXB8mT4yIti4
- 4JtrRzWuk988oipPCFf0A==
+X-Provags-ID: V03:K1:JiTjpa5mpNh/IquJkgXFVbPDF+YOAjJLzyr4w/Ndl2il9OlCurg
+ rb3muOMLHRPX+YCcpAQ59hYci2EIrumojV2f1U3+dWdnOQq6gnjSjEcIfRVWI0Ssf09S7x+
+ XaCzqzXZdsddQ7LpKqxtMARM+aI8SH29prZqwYYkpOaSk6/LP6BPQi1miheQOo6G55HoHXN
+ tTI50Lz3+zYz7dfxIty6g==
 X-Spam-Flag: NO
-UI-OutboundReport: notjunk:1;M01:P0:TZ+NoTfk9Wg=;gNBz0Oy+eb54xxV9QXmC3Z9cS35
- x8ojWD1vVfCec9YcxeixyyaiQrhcR8GrRM00z8Z47RVqCpwNJvlr0q4lIWqk3GFI7nFodxdXj
- 7zuX2p5+18rNB1L6MuMZkcd+9d07e+eN1gTYDlWOS82ZPCcfj6j/QVpvtEPaJNeRbUWeR2hNX
- SdjCSTsmjVDcH3PjLRB4E96vIgrJ2Ufq6JH8vWzkXvri+VNdForw+CVNvyGHyg5gUgZwZ48+c
- bWjCiRgcpwHms3IMkSNlN17xiek+JK8C5iPMi2U1dykAlHxAO48+mS/zaEf0Gih5pNEBPlVzA
- IRTrDs7NuSrLOyQYQQ/3/W6Fwyz44wz7x9ODr4P/32JngmmVcNfp9TazVuYvFetuQN1h0SRtk
- uhbk0iKYkwiyPyamkmnFpYsTdVyYWq0fJAiO57C560uu4fmQStgNi+dV83Fpqtl2T/wblxmqY
- bEi/9ROCSnU3B3W3PoJPF1wTVyYUnk89J/UxBms8SWwlUdjGaFTatYO+E4ZGhgCkzGkHTLWiK
- JbzdoAEeCZIGvUtVXJkSQjvuutvsaRRx+M5k4EEUqxn2JuecVHase9pgcsaE6kbOeOrJ/I8uc
- eLH77v+6sScSngwYeMXIpCAWHRFDuV1TPYGWEdoY7lK8iYEAY5pwozGtVDnhBQm6MYhXCyi7X
- ys1AKfdTyokiU2jG6NnAO7CdJah3xyAaJVCgAHQcD+60zudRdtFZhCql1B3kzMPc3GSwoB5eW
- lEnflMrTWS7Goy+ikRT713TmwUqx81hD9Xq/5sQfgspS8SnYC5FlilgvzvKh6Qbz2ArFMq5j/
- 2cZTvseOLFk8GJkDfMWcoHSA==
+UI-OutboundReport: notjunk:1;M01:P0:I/2NxXNH0Gs=;einkfVas8NSOs4mg0cIlDuoqhue
+ mrPKEBZN8Ylv4ng0SwBulYAB/l9V/B0FdqFX7RoZFmCJ1Fmm7fDdQifzGDzLVVIOnPeB31u8t
+ wEZRTgaE5GRJk8amtPr/5CE7j32CjDQuiyy97w98gk8x+WQV1HlPJlcRnovsO4pypZp2mlBSn
+ QhvJAtuz/7yBO0O3EWVKgoEpDnRjVCCYvHxHG/6I83Dyfgpt5GVwWNGoVZRK2X2x1CECDfKaB
+ S8wAHPeNG2ayAxvRwikAbY6kIOqy4zzIsqyeZbLDLW/JifjgSeGCkbo25FzOCEiwGPOnE3TgZ
+ Tq73MVNjyB3xAMtPtKURM8eTpIm5QrO/+WgKsVIkvLCBCEUHPGj/0vCaPVWdnW+xmt/sqlcke
+ xn9CyUv9UcdfZuMbgMg6n8Kkj7moXt8xbKCofj6Y90fT7zBgacOFW2CugSTdYbfS+j3awy9rO
+ y9mqGyEFVyfy2WMeWNvS09n03VpA16M93ghxJVxZymtb57HxtXxT5ngbU8hTYN+Ydbf6iQ3CP
+ paQ1aqmShFRO2PmwMn094lD6vlPkuPn5OTIqTECADT2Rf69D330Szu4RjAjs8zm7YTXUdgWtO
+ rcZre03iLct7q5p2i4dLa+aVzPaFxKH2OiIYM/af0hnTPeeoIlNSEaeaNRHdyAKW4GiYmB5/w
+ atrhC1Ppky7GOKMUvFSZTGvDSVlRkuaHMBZ4Ww979GtRhqZul9MHLeM+mQ48xJLUYqfJ35ukL
+ 2P5Il56KnsEkzlkRIF9j5WSDN5Y2CX0R8o4a1HtMncKFFUG1wt1paSRuZpO/8DmYAV3nQ08Jj
+ hPwDZdus8KAbcHGsEN+hjPHg==
 
-The scope of the TX skb is wider than just mse102x_tx_frame_spi(),
-so in case the TX skb room needs to be expanded, we should free the
-the temporary skb instead of the original skb. Otherwise the original
-TX skb pointer would be freed again in mse102x_tx_work(), which leads
-to crashes:
+The tx_bytes should consider the actual size of the Ethernet frames
+without the SPI encapsulation. But we still need to take care of
+Ethernet padding.
 
-  Internal error: Oops: 0000000096000004 [#2] PREEMPT SMP
-  CPU: 0 PID: 712 Comm: kworker/0:1 Tainted: G      D            6.6.23
-  Hardware name: chargebyte Charge SOM DC-ONE (DT)
-  Workqueue: events mse102x_tx_work [mse102x]
-  pstate: 20400009 (nzCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=3D--)
-  pc : skb_release_data+0xb8/0x1d8
-  lr : skb_release_data+0x1ac/0x1d8
-  sp : ffff8000819a3cc0
-  x29: ffff8000819a3cc0 x28: ffff0000046daa60 x27: ffff0000057f2dc0
-  x26: ffff000005386c00 x25: 0000000000000002 x24: 00000000ffffffff
-  x23: 0000000000000000 x22: 0000000000000001 x21: ffff0000057f2e50
-  x20: 0000000000000006 x19: 0000000000000000 x18: ffff00003fdacfcc
-  x17: e69ad452d0c49def x16: 84a005feff870102 x15: 0000000000000000
-  x14: 000000000000024a x13: 0000000000000002 x12: 0000000000000000
-  x11: 0000000000000400 x10: 0000000000000930 x9 : ffff00003fd913e8
-  x8 : fffffc00001bc008
-  x7 : 0000000000000000 x6 : 0000000000000008
-  x5 : ffff00003fd91340 x4 : 0000000000000000 x3 : 0000000000000009
-  x2 : 00000000fffffffe x1 : 0000000000000000 x0 : 0000000000000000
-  Call trace:
-   skb_release_data+0xb8/0x1d8
-   kfree_skb_reason+0x48/0xb0
-   mse102x_tx_work+0x164/0x35c [mse102x]
-   process_one_work+0x138/0x260
-   worker_thread+0x32c/0x438
-   kthread+0x118/0x11c
-   ret_from_fork+0x10/0x20
-  Code: aa1303e0 97fffab6 72001c1f 54000141 (f9400660)
-
-Cc: stable@vger.kernel.org
 Fixes: 2f207cbf0dd4 ("net: vertexcom: Add MSE102x SPI support")
 Signed-off-by: Stefan Wahren <wahrenst@gmx.net>
 =2D--
- drivers/net/ethernet/vertexcom/mse102x.c | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/vertexcom/mse102x.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/vertexcom/mse102x.c b/drivers/net/ethern=
 et/vertexcom/mse102x.c
-index a04d4073def9..2c37957478fb 100644
+index 2c37957478fb..89dc4c401a8d 100644
 =2D-- a/drivers/net/ethernet/vertexcom/mse102x.c
 +++ b/drivers/net/ethernet/vertexcom/mse102x.c
-@@ -222,7 +222,7 @@ static int mse102x_tx_frame_spi(struct mse102x_net *ms=
-e, struct sk_buff *txp,
- 	struct mse102x_net_spi *mses =3D to_mse102x_spi(mse);
- 	struct spi_transfer *xfer =3D &mses->spi_xfer;
- 	struct spi_message *msg =3D &mses->spi_msg;
--	struct sk_buff *tskb;
-+	struct sk_buff *tskb =3D NULL;
- 	int ret;
+@@ -437,13 +437,15 @@ static void mse102x_tx_work(struct work_struct *work=
+)
+ 	mse =3D &mses->mse102x;
 
- 	netif_dbg(mse, tx_queued, mse->ndev, "%s: skb %p, %d@%p\n",
-@@ -235,7 +235,6 @@ static int mse102x_tx_frame_spi(struct mse102x_net *ms=
-e, struct sk_buff *txp,
- 		if (!tskb)
- 			return -ENOMEM;
-
--		dev_kfree_skb(txp);
- 		txp =3D tskb;
- 	}
-
-@@ -257,6 +256,8 @@ static int mse102x_tx_frame_spi(struct mse102x_net *ms=
-e, struct sk_buff *txp,
- 		mse->stats.xfer_err++;
- 	}
-
-+	dev_kfree_skb(tskb);
+ 	while ((txb =3D skb_dequeue(&mse->txq))) {
++		unsigned int len =3D max_t(unsigned int, txb->len, ETH_ZLEN);
 +
- 	return ret;
- }
+ 		mutex_lock(&mses->lock);
+ 		ret =3D mse102x_tx_pkt_spi(mse, txb, work_timeout);
+ 		mutex_unlock(&mses->lock);
+ 		if (ret) {
+ 			mse->ndev->stats.tx_dropped++;
+ 		} else {
+-			mse->ndev->stats.tx_bytes +=3D txb->len;
++			mse->ndev->stats.tx_bytes +=3D len;
+ 			mse->ndev->stats.tx_packets++;
+ 		}
 
 =2D-
 2.34.1
