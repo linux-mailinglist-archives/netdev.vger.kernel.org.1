@@ -1,61 +1,63 @@
-Return-Path: <netdev+bounces-143195-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143192-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A29C9C15C8
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:58:15 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27E749C15C3
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:57:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127FB1F2406F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:58:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4A4E71C22477
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:57:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616191CFEC0;
-	Fri,  8 Nov 2024 04:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47DD51C460C;
+	Fri,  8 Nov 2024 04:57:44 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gO5wbtnq"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="EN+ORXgM"
 X-Original-To: netdev@vger.kernel.org
 Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BF413D278;
-	Fri,  8 Nov 2024 04:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A76DE2BB15;
+	Fri,  8 Nov 2024 04:57:42 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731041867; cv=none; b=QpcC6G8n+XS745ua86oaolMgVL7UL+kb4nJKYeJRIB2dhob6gppnV3M4Ycq2SnHdDRL3C/xXqx2JMyJlhuJWynlD3l5pyCgjf9igLT61/L1DSbHrYlyRqMO0iasN9cvPpTfHNxBsuyhtJ78GJXW3fpeHLA2Q6ghR6OnpC4ZlcjI=
+	t=1731041864; cv=none; b=C5iRLwMsxpJmrnjNgTYpgp1Q/vvaD5jSGh2H8ODmQrP0HwYhX5ag7zdCKdBZvnBc5hMF+E9798Q2+EW/qsl95Hq3pog2a295Dd8dnYxOJTHWbRUSKJjIApu1yqJ1dh4eF2ZMotBINBDMhfJpWRo0sGbry940hXevk4jzNWnlwZI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731041867; c=relaxed/simple;
-	bh=Hg22fkQelKa3qpC1mGlStPefCWQKFNdOFVRnTNGoWAc=;
-	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BatqorkylQ2+WerWEw/alpRAwj9yrPpK5LFNSlKQoKKZVFmupH/Oc9H/IZgDECfpOPsZAEk/ldOUjZoXZQdgYVBoUtNa1SFoTbcn9B9EVgGqaDhqKxPQDbkIUkKNdhbGFuwt0w7ENRNpAbQS2wD67m/x2lt+9XQYqCQuRX/qePw=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gO5wbtnq; arc=none smtp.client-ip=67.231.156.173
+	s=arc-20240116; t=1731041864; c=relaxed/simple;
+	bh=CgmbEOe7b3AX51Ivgp4ZdWo3olrU9H+EIj0YlBsUSU4=;
+	h=From:To:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version:Content-Type; b=ZC0m00TZGhhbp/049NE+l7Or0f4QhSNYUqrMjRWI1O1KLu1GlyelC8myGyBU4UDYHFIINqYuzTwaSNaNdXuigvMnQoCaGrkyIwIJETCQjRYAF0Y06cE6UjOG5N7qx0KUBE4yeDOLfDCHoj2/s9/q4bHHTWhtXh06qUMegm7cwzo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=EN+ORXgM; arc=none smtp.client-ip=67.231.156.173
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
 Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A81ghci019269;
-	Thu, 7 Nov 2024 20:57:32 -0800
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A81ghcm019269;
+	Thu, 7 Nov 2024 20:57:34 -0800
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
-	content-transfer-encoding:content-type:date:from:message-id
-	:mime-version:subject:to; s=pfpt0220; bh=bNYaP0x+p+WSCHBkbkZxjPH
-	OFpJk7SrK7FLkH1p3CV8=; b=gO5wbtnqMsrVn/KJ8RIOsrzW72W9CTes+I7u5G1
-	ObMvLNM0+UNP+0Pr3l8WjunsEXNKtSWY1MgJOVDjgt+jLfNjybLWUEVUsqoVl9Ah
-	ctgsQi+YYKyRI/2VPkBt9lkPYTlaGatdXsDy/rP7wQFUBCw9f2lkrVnpQBo733uc
-	zFqaHzKqokfObzWbPQd0GxFOUMNXY1d5oUr0UeEZSmO6AByZFqnXdkEOv6AwbO99
-	hBMiC/pIVy9HlrvwaTnKlJjKSM4R1BXRJUabwFn1JR3Q2pDYnrbhW2OnUR3zUoMw
-	70SAjqWfXUCVNtNswh6H3O9hLfV/ESspBe/tpsnM3spdHew==
+	content-transfer-encoding:content-type:date:from:in-reply-to
+	:message-id:mime-version:references:subject:to; s=pfpt0220; bh=K
+	BfLRKB3KPRWp1lnPfPGqpUnZQVYA37jDoWl/5xc9xI=; b=EN+ORXgML/xSm6Uui
+	e6Zk7wT+/bpWSMYCrhcmoazvAlk6ccx5F5Dnmk9GbnxKiQbvgRq6Px2BgzhEY28R
+	+JuN5y2w4U7/Jtu/T5ZhKJt1QMzUL4n5vMkOTQnJycmo/xbpVIHt0B2zyCRRkBpn
+	Prd6vZEw0rkozFIPhPgtM5Z5LAtsd3pCyUojJ6g/F3ovQ/7FTqhS+unbk5sY/JIn
+	lGmoUF7H19gM5BLwJVzNHEpENI9XAuA4v8js+HtghaU7ZCecM2wtdVAn8qglps5S
+	CAt0iDzSFEjEIELx19WUQpSYHGF2ab9KwGBwboe46Pfr4ES4zesBGXtBt3FRx4Kr
+	OoCjQ==
 Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42s97hra0y-1
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42s97hra0y-4
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 07 Nov 2024 20:57:32 -0800 (PST)
+	Thu, 07 Nov 2024 20:57:34 -0800 (PST)
 Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
  DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1544.4; Thu, 7 Nov 2024 20:57:15 -0800
+ 15.2.1544.4; Thu, 7 Nov 2024 20:57:20 -0800
 Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
  (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
- Transport; Thu, 7 Nov 2024 20:57:15 -0800
+ Transport; Thu, 7 Nov 2024 20:57:20 -0800
 Received: from bharat-OptiPlex-Tower-Plus-7020.. (unknown [10.28.34.254])
-	by maili.marvell.com (Postfix) with ESMTP id 7036C3F7044;
-	Thu,  7 Nov 2024 20:57:11 -0800 (PST)
+	by maili.marvell.com (Postfix) with ESMTP id 140973F7044;
+	Thu,  7 Nov 2024 20:57:15 -0800 (PST)
 From: Bharat Bhushan <bbhushan2@marvell.com>
 To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
@@ -63,10 +65,12 @@ To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
         <kuba@kernel.org>, <pabeni@redhat.com>, <jerinj@marvell.com>,
         <lcherian@marvell.com>, <ndabilpuram@marvell.com>,
         <sd@queasysnail.net>, <bbhushan2@marvell.com>
-Subject: [net-next PATCH v9 0/8] cn10k-ipsec: Add outbound inline ipsec support
-Date: Fri, 8 Nov 2024 10:27:00 +0530
-Message-ID: <20241108045708.1205994-1-bbhushan2@marvell.com>
+Subject: [net-next PATCH v9 1/8] octeontx2-pf: map skb data as device writeable
+Date: Fri, 8 Nov 2024 10:27:01 +0530
+Message-ID: <20241108045708.1205994-2-bbhushan2@marvell.com>
 X-Mailer: git-send-email 2.34.1
+In-Reply-To: <20241108045708.1205994-1-bbhushan2@marvell.com>
+References: <20241108045708.1205994-1-bbhushan2@marvell.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -75,92 +79,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-Proofpoint-ORIG-GUID: 9HhpoPWSHAEq19MTPs_36gpFimLLpBc3
-X-Proofpoint-GUID: 9HhpoPWSHAEq19MTPs_36gpFimLLpBc3
+X-Proofpoint-ORIG-GUID: zO1bbcXRAN6dJwOsACZKvH4v8J4GV4IN
+X-Proofpoint-GUID: zO1bbcXRAN6dJwOsACZKvH4v8J4GV4IN
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
  definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
 
-This patch series adds outbound inline ipsec support on Marvell
-cn10k series of platform. One crypto hardware logical function
-(cpt-lf) per netdev is required for inline ipsec outbound
-functionality. Software prepare and submit crypto hardware
-(CPT) instruction for outbound inline ipsec crypto mode offload.
-The CPT instruction have details for encryption and authentication
-Crypto hardware encrypt, authenticate and provide the ESP packet
-to network hardware logic to transmit ipsec packet.
+Crypto hardware need write permission for in-place encrypt
+or decrypt operation on skb-data to support IPsec crypto
+offload. That patch uses skb_unshare to make skb data writeable
+for ipsec crypto offload and map skb fragment memory as
+device read-write.
 
-First patch makes dma memory writable for in-place encryption,
-Second patch moves code to common file, Third patch disable
-backpressure on crypto (CPT) and network (NIX) hardware.
-Patch four onwards enables inline outbound ipsec.
-
-v8->v9:
- - Removed mutex lock to use hardware, now using hardware state
- - Previous versions were supporting only 64 SAs and a bitmap was
-   used for same. That limitation is removed from this version.
- - Replaced netdev_err with NL_SET_ERR_MSG_MOD in state add flow
-   as per comment in previous version 
-
+Signed-off-by: Bharat Bhushan <bbhushan2@marvell.com>
+---
 v7->v8:
- - spell correction in patch 1/8 (s/sdk/skb)
+ - spell correction (s/sdk/skb) in description
 
 v6->v7:
  - skb data was mapped as device writeable but it was not ensured
    that skb is writeable. This version calls skb_unshare() to make
-   skb data writeable (Thanks Jakub Kicinski for pointing out).
+   skb data writeable.
 
-v4->v5:
- - Fixed un-initialized warning and pointer check
-   (comment from Kalesh Anakkur Purayil)
+ .../ethernet/marvell/octeontx2/nic/otx2_txrx.c | 18 ++++++++++++++++--
+ 1 file changed, 16 insertions(+), 2 deletions(-)
 
-v3->v4:
- - Few error messages in data-path removed and some moved
-   under netif_msg_tx_err().
- - Added check for crypto offload (XFRM_DEV_OFFLOAD_CRYPTO)
-   Thanks "Leon Romanovsky" for pointing out
- - Fixed codespell error as per comment from Simon Horman
- - Added some other cleanup comment from Kalesh Anakkur Purayil
-
-v2->v3:
- - Fix smatch and sparse errors (Comment from Simon Horman)
- - Fix build error with W=1 (Comment from Simon Horman)
-   https://patchwork.kernel.org/project/netdevbpf/patch/20240513105446.297451-6-bbhushan2@marvell.com/
- - Some other minor cleanup as per comment
-   https://www.spinics.net/lists/netdev/msg997197.html
-
-v1->v2:
- - Fix compilation error to build driver a module
- - Use dma_wmb() instead of architecture specific barrier
- - Fix couple of other compilation warnings
-
-Bharat Bhushan (8):
-  octeontx2-pf: map skb data as device writeable
-  octeontx2-pf: Move skb fragment map/unmap to common code
-  octeontx2-af: Disable backpressure between CPT and NIX
-  cn10k-ipsec: Init hardware for outbound ipsec crypto offload
-  cn10k-ipsec: Add SA add/del support for outb ipsec crypto offload
-  cn10k-ipsec: Process outbound ipsec crypto offload
-  cn10k-ipsec: Allow ipsec crypto offload for skb with SA
-  cn10k-ipsec: Enable outbound ipsec crypto offload
-
- MAINTAINERS                                   |    1 +
- .../net/ethernet/marvell/octeontx2/af/mbox.h  |    4 +
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   68 +-
- .../ethernet/marvell/octeontx2/nic/Makefile   |    1 +
- .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1057 +++++++++++++++++
- .../marvell/octeontx2/nic/cn10k_ipsec.h       |  262 ++++
- .../marvell/octeontx2/nic/otx2_common.c       |  113 +-
- .../marvell/octeontx2/nic/otx2_common.h       |   25 +
- .../marvell/octeontx2/nic/otx2_dcbnl.c        |    3 +
- .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   19 +-
- .../marvell/octeontx2/nic/otx2_txrx.c         |   65 +-
- .../marvell/octeontx2/nic/otx2_txrx.h         |    3 +
- .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   10 +-
- 13 files changed, 1577 insertions(+), 54 deletions(-)
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
- create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+index 7aaf32e9aa95..49b6b091ba41 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_txrx.c
+@@ -11,6 +11,7 @@
+ #include <linux/bpf.h>
+ #include <linux/bpf_trace.h>
+ #include <net/ip6_checksum.h>
++#include <net/xfrm.h>
+ 
+ #include "otx2_reg.h"
+ #include "otx2_common.h"
+@@ -83,10 +84,17 @@ static unsigned int frag_num(unsigned int i)
+ static dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
+ 					struct sk_buff *skb, int seg, int *len)
+ {
++	enum dma_data_direction dir = DMA_TO_DEVICE;
+ 	const skb_frag_t *frag;
+ 	struct page *page;
+ 	int offset;
+ 
++	/* Crypto hardware need write permission for ipsec crypto offload */
++	if (unlikely(xfrm_offload(skb))) {
++		dir = DMA_BIDIRECTIONAL;
++		skb = skb_unshare(skb, GFP_ATOMIC);
++	}
++
+ 	/* First segment is always skb->data */
+ 	if (!seg) {
+ 		page = virt_to_page(skb->data);
+@@ -98,16 +106,22 @@ static dma_addr_t otx2_dma_map_skb_frag(struct otx2_nic *pfvf,
+ 		offset = skb_frag_off(frag);
+ 		*len = skb_frag_size(frag);
+ 	}
+-	return otx2_dma_map_page(pfvf, page, offset, *len, DMA_TO_DEVICE);
++	return otx2_dma_map_page(pfvf, page, offset, *len, dir);
+ }
+ 
+ static void otx2_dma_unmap_skb_frags(struct otx2_nic *pfvf, struct sg_list *sg)
+ {
++	enum dma_data_direction dir = DMA_TO_DEVICE;
++	struct sk_buff *skb = NULL;
+ 	int seg;
+ 
++	skb = (struct sk_buff *)sg->skb;
++	if (unlikely(xfrm_offload(skb)))
++		dir = DMA_BIDIRECTIONAL;
++
+ 	for (seg = 0; seg < sg->num_segs; seg++) {
+ 		otx2_dma_unmap_page(pfvf, sg->dma_addr[seg],
+-				    sg->size[seg], DMA_TO_DEVICE);
++				    sg->size[seg], dir);
+ 	}
+ 	sg->num_segs = 0;
+ }
 -- 
 2.34.1
 
