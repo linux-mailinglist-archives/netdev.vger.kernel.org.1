@@ -1,75 +1,56 @@
-Return-Path: <netdev+bounces-143234-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143230-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 628869C17B3
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:19:26 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id 170B79C1796
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:15:43 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26D0A283F52
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:19:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D01E5283841
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:15:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 014321DE896;
-	Fri,  8 Nov 2024 08:19:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b="smORHAsT"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C28FE1D0E30;
+	Fri,  8 Nov 2024 08:15:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from out162-62-57-137.mail.qq.com (out162-62-57-137.mail.qq.com [162.62.57.137])
+Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C4131DACA1;
-	Fri,  8 Nov 2024 08:19:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=162.62.57.137
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B141F5FA;
+	Fri,  8 Nov 2024 08:15:36 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=45.249.212.56
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731053950; cv=none; b=f5UGPk9jS0ohws4EX57QmrGDB4sZWCjjbXktly+kbAW8wVbHD+NEJGwZk51CK93ceqjBq88KjzVpkjFE8Ifo2d+1SHDSGrA7dmdYiB93EKDG/aZOSLfmQ6R9aLxM78z1cG/RktYdh8DjIUumxe5QBZugZ++gv0Vx/eIRNHiVng0=
+	t=1731053738; cv=none; b=WTIy7aDYECh++A9MnJiRlcsiiKp2R9z/tUjnSQ+Djixq1YAhD+9ZhPRoJElxhQyTwM7SnlZA4PhFyFgmZQPtaIhbZYIBeWGsRe35CAMa8q0ub6OGxR3n71P6w/i4x2urGBQjZ7Y8pXBvegAhxAtLnoC4huULJSOjF9iJWxQGs8k=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731053950; c=relaxed/simple;
-	bh=iXHrBL4LQP1zfCQw9hd4nGFRXBxeQitQM7MrOkznPzc=;
-	h=Message-ID:From:To:Cc:Subject:Date:MIME-Version; b=UsHfPaDE+xjH4Sd8KyYp8p7yQwvAr3bBIpcjxCDefjzLZP4zDjXIfOIgZX0yiNRXR9PaaVQT0yFx8skd12af5feueo0lFaiw8JPT8Ye4dyAPrF5mbK4YlQJJZ5AH7O3WcYK7j46RHBppaD7QFbtSBIpX4GF40WS3ddt2SdKnZGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com; spf=pass smtp.mailfrom=foxmail.com; dkim=pass (1024-bit key) header.d=foxmail.com header.i=@foxmail.com header.b=smORHAsT; arc=none smtp.client-ip=162.62.57.137
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=foxmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=foxmail.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foxmail.com;
-	s=s201512; t=1731053935;
-	bh=G5AasHwJUPIvWba5jjKssBCTEs7Viz1urDez9UtIGzc=;
-	h=From:To:Cc:Subject:Date;
-	b=smORHAsTdH+SaYHmUQE6XY8GXKLweSmecF3RMEPV+3Dw6wMLRHW3LU4hVjPtFkmns
-	 ouvugG75fFU1qt6xs3KcPEOgO6ieoP6UdWYqXybBMlQ5YEHCKaPICDZhnW1jsPDxnX
-	 8UIwpKHCoV/+jqWS/7riFW07/5XZViW5iettoZzI=
-Received: from localhost.localdomain ([114.246.200.160])
-	by newxmesmtplogicsvrszc25-0.qq.com (NewEsmtp) with SMTP
-	id 4B4A2013; Fri, 08 Nov 2024 16:18:52 +0800
-X-QQ-mid: xmsmtpt1731053932tsxe9qji1
-Message-ID: <tencent_CFD3D1C3D68B45EA9F52D8EC76D2C4134306@qq.com>
-X-QQ-XMAILINFO: MvTK+AXQ7a4FRRnkPllYZNdQ/lMUxf8qYP61N+F2M9eOeuDg+Aj2hJ9HXQwA+p
-	 gNx7R6MEjXFKeDh0fJ9SZ3e1PIvZf3SAhotqftLNRborP5RWDmdt+H3SPw6dvoGk5yniv+j2VQym
-	 yf6XWlLOfBDgueGwlt+T1p2ncskLXiY6bLp98czjmafHe4yLNRLqWzY7HQaW2d0khiYjNfBgTk13
-	 VQNoJ/QyFdzJWhcsLWjSJmtOVGX/cRzq3qkiGQnJQrcRymn2gTJDNLAULQkrWxwHX8R5DxD+xek6
-	 plyuNE093/ypGQotP4QrcqTIba3vsahKnKAdv+AdFV7KOLOptM8heC2rp8hu1NaSmhfTuX+Mndky
-	 RSuG5e+7XpjBxcBS8prgBSTUezTPPgRpCHh/VdSF7fGLBRKdAVTPwAMpRPa3wU5m8RLkBmoQ4S9Z
-	 VOeC2GuvJSHTQr21AG8rJlZ1YBPsbDS+zMAazYSB5oIfAXAIkmlKFiNlPjRLGNWRx4TeSMSjjjNS
-	 zTsLdfr2PZ1zd06BEl/BG5b5GpaSJoBObGjJ7cOXoauKO2TbfUlja1d2f8hyx2Ng8GR4aRdTVYCK
-	 No+1LvEp0foOqU0OM2CSPa11eKbCWh2ZTN7cQVc+nNqJJIjJ4vtIfvXfgqwHv9xGVMN1MfAOqHtb
-	 R2tUKk18MJf829paRMGMGGW9m+kC3rzRuZYMX/9KUbUCbAB0F7R/zHKVwmWNtRVHKimhxtiibZ5P
-	 GwtNAtycL6SU0R7cDubYNGrL/LR0jo1OHgLAvMJmAnKCtEbsamYwIIXWN6EGo0UZJQQVPp4ARO2C
-	 QBkjD8cYJ4xk++MvLUCN2LXVlgGLLElYcW2Rn85jgd5KGikxypShUyuWBd8Xtd+/9hp3zr54l/cJ
-	 Fb6+hoOAfi8GNf8DFq3TdH0MWFYdYxWcYiPVDSxxzHViZY/ZWENcq0B5WSVfNAk8CAMl+NXRg5JR
-	 k8bKpgnYEvdkLHLK0Bti4MUvirFOyLtHQFCt8PWUhRIHXO0lxIZkBpiZDh42deZ2+0Dz1CofWwk9
-	 0u17MGAzyCkMSr2sO/orLwcy1Og7D7qWXsVfvgtw==
-X-QQ-XMRINFO: MSVp+SPm3vtS1Vd6Y4Mggwc=
-From: Jiawei Ye <jiawei.ye@foxmail.com>
-To: martin.lau@linux.dev,
-	daniel@iogearbox.net,
-	edumazet@google.com,
-	kuba@kernel.org
-Cc: bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] bpf: Fix mismatched RCU unlock flavour in bpf_out_neigh_v6
-Date: Fri,  8 Nov 2024 08:18:52 +0000
-X-OQ-MSGID: <20241108081852.2188323-1-jiawei.ye@foxmail.com>
-X-Mailer: git-send-email 2.34.1
+	s=arc-20240116; t=1731053738; c=relaxed/simple;
+	bh=HHHyiUWdL+mT8XT8mOSl8Zd9IRBTVbg2Xlu2B1EnlZM=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=tzuTDkyW29VIMiKVMJgluWR9YkPpqmrOrQZVvhiFrsihLsBqZ+kfp3b5yJSI+2MtFkos3nUj+eGX72u6GDZmAB6hRtNqj1mpJhw7OhJ2Xs07cBLClnaxdhTWjFAZbSG2FsuNTJ7nKJai5URS0qkDSXhXnU08cky/ej7u5yu+Cik=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com; spf=pass smtp.mailfrom=huaweicloud.com; arc=none smtp.client-ip=45.249.212.56
+Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=huaweicloud.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=huaweicloud.com
+Received: from mail.maildlp.com (unknown [172.19.93.142])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4XlBZP31Qnz4f3jXc;
+	Fri,  8 Nov 2024 16:15:09 +0800 (CST)
+Received: from mail02.huawei.com (unknown [10.116.40.112])
+	by mail.maildlp.com (Postfix) with ESMTP id 77D8A1A07BA;
+	Fri,  8 Nov 2024 16:15:27 +0800 (CST)
+Received: from k01.huawei.com (unknown [10.67.174.197])
+	by APP1 (Coremail) with SMTP id cCh0CgAXDK6eyC1nOEOhBA--.5950S2;
+	Fri, 08 Nov 2024 16:15:27 +0800 (CST)
+From: Xu Kuohai <xukuohai@huaweicloud.com>
+To: bpf@vger.kernel.org,
+	netdev@vger.kernel.org
+Cc: Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>,
+	Eduard Zingerman <eddyz87@gmail.com>,
+	Yonghong Song <yonghong.song@linux.dev>,
+	Kui-Feng Lee <thinker.li@gmail.com>
+Subject: [PATCH bpf-next 0/2] Fix release of struct_ops map
+Date: Fri,  8 Nov 2024 16:26:31 +0800
+Message-Id: <20241108082633.2338543-1-xukuohai@huaweicloud.com>
+X-Mailer: git-send-email 2.39.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,42 +58,45 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
+X-CM-TRANSID:cCh0CgAXDK6eyC1nOEOhBA--.5950S2
+X-Coremail-Antispam: 1UD129KBjvdXoWruFy3tF43KF1kWr48Xw4DCFg_yoW3urbE9w
+	43KrykGw43G3WFyFW5Cr13WFZ2g39xKryUZF1DXasrXrn8trn8AF4kCrsxKa45ZrWfGFya
+	vw1kX34I9r1aqjkaLaAFLSUrUUUUjb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
+	9fnUUIcSsGvfJTRUUUbaxYFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
+	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
+	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW7JVWDJwA2z4x0Y4vE2Ix0cI8IcVCY1x02
+	67AKxVWxJVW8Jr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxV
+	AFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2
+	j2WlYx0E2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7x
+	kEbVWUJVW8JwACjcxG0xvY0x0EwIxGrwACI402YVCY1x02628vn2kIc2xKxwCY1x0262kK
+	e7AKxVWUtVW8ZwCY1x0264kExVAvwVAq07x20xyl42xK82IYc2Ij64vIr41l4I8I3I0E4I
+	kC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWU
+	WwC2zVAF1VAY17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr
+	0_JF4lIxAIcVC0I7IYx2IY6xkF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWU
+	JVWUCwCI42IY6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r1j6r4UYx
+	BIdaVFxhVjvjDU0xZFpf9x07jeLvtUUUUU=
+X-CM-SenderInfo: 50xn30hkdlqx5xdzvxpfor3voofrz/
 
-In the bpf_out_neigh_v6 function, rcu_read_lock() is used to begin an RCU
-read-side critical section. However, when unlocking, one branch
-incorrectly uses a different RCU unlock flavour rcu_read_unlock_bh()
-instead of rcu_read_unlock(). This mismatch in RCU locking flavours can
-lead to unexpected behavior and potential concurrency issues.
+From: Xu Kuohai <xukuohai@huawei.com>
 
-This possible bug was identified using a static analysis tool developed
-by myself, specifically designed to detect RCU-related issues.
+This series fix a bug I found when doing rcu waiting cleanup for struct_ops
+map. When there is sleepable prog in struct_ops map, the map risks being
+released while the prog is still running.
 
-This patch corrects the mismatched unlock flavour by replacing the
-incorrect rcu_read_unlock_bh() with the appropriate rcu_read_unlock(),
-ensuring that the RCU critical section is properly exited. This change
-prevents potential synchronization issues and aligns with proper RCU
-usage patterns.
+Xu Kuohai (2):
+  bpf: Fix release of struct_ops map
+  selftests/bpf: Add test for struct_ops map release
 
-Fixes: 09eed1192cec ("neighbour: switch to standard rcu, instead of rcu_bh")
-Signed-off-by: Jiawei Ye <jiawei.ye@foxmail.com>
----
- net/core/filter.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ kernel/bpf/bpf_struct_ops.c                   |  37 +++--
+ kernel/bpf/syscall.c                          |   7 +-
+ .../selftests/bpf/bpf_testmod/bpf_testmod.c   |  78 ++++++---
+ .../bpf/bpf_testmod/bpf_testmod_kfunc.h       |   2 +-
+ .../bpf/prog_tests/test_struct_ops_module.c   | 154 ++++++++++++++++++
+ .../bpf/progs/struct_ops_map_release.c        |  30 ++++
+ 6 files changed, 267 insertions(+), 41 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/progs/struct_ops_map_release.c
 
-diff --git a/net/core/filter.c b/net/core/filter.c
-index 64248d0ac4ad..44bbc1dbfb50 100644
---- a/net/core/filter.c
-+++ b/net/core/filter.c
-@@ -2232,7 +2232,7 @@ static int bpf_out_neigh_v6(struct net *net, struct sk_buff *skb,
- 		rcu_read_unlock();
- 		return ret;
- 	}
--	rcu_read_unlock_bh();
-+	rcu_read_unlock();
- 	if (dst)
- 		IP6_INC_STATS(net, ip6_dst_idev(dst), IPSTATS_MIB_OUTNOROUTES);
- out_drop:
 -- 
-2.34.1
+2.39.5
 
 
