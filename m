@@ -1,188 +1,129 @@
-Return-Path: <netdev+bounces-143402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143404-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79F749C247D
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:02:31 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63E949C2488
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:03:09 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5DF1F23DDD
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:02:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 965851C27A4D
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:03:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FED31AA1E2;
-	Fri,  8 Nov 2024 17:55:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 772B71A9B23;
+	Fri,  8 Nov 2024 17:59:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jnRzSjqs"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="o9xbZGPU"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653891AA1CF
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:55:41 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B247233D67;
+	Fri,  8 Nov 2024 17:59:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731088543; cv=none; b=tRG/fxt9Fli7P+DtAnrRDfK1HmXKlQHbqW/XYr99j9hDISazVruuZvINXn7zrUDJ2dP6DoGISdeOsrEpp0ng4cqH+0k43zqWm6ER87O9XCatovcXkxr4E7eQciIGaKz5MlUHldAaW2hzcY2VcgPPtgiSeRbPLVTDgMIRIMlSN2Y=
+	t=1731088753; cv=none; b=Xuxx5jn/+VLZkqsnlZFymsvCFlLFmvXqlOfT+UVoi37YtV/RbhR/IQAF4Mm+Fr8u7D81vOPoOgRgLeOefmp/zDvsQDGaFUaSxdXrgNiitHkCjg3s+xuIY6lessj5VtHDXM78GikhkKz5jcpNOzCXclbPktY+CW9YEGr92EGCN24=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731088543; c=relaxed/simple;
-	bh=3XEEjpzoyVVjrFa8qZSsaTMnvXE7mOW7qLd0g684tUQ=;
+	s=arc-20240116; t=1731088753; c=relaxed/simple;
+	bh=njRHL3LaliikKZctNZcbQmlhWG5PDd/sxP2CVB4KNl0=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=WxS9XYBQYu0W45s+liS/CHqp4MP2ApBnuJjP52QJlE2Xq4YZflR+Rx9VR5URt/5THmN5OlJA7PV7FPqLTX95mBPkd/FhMtcoI8Ha5QIjYvaNOH54egGt1dGpIDltGQQuJCaACN2RVeGQ7aLWfOVRNKgUGvFIiXGOpFHLuZ6nT/E=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jnRzSjqs; arc=none smtp.client-ip=209.85.210.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e8235f0b6so2107957b3a.3
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 09:55:41 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1731088541; x=1731693341; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=FiPDLfL5JTBKeeqjpJ5u/XBxPNvTKsH7Pcb34HC2tGE=;
-        b=jnRzSjqsfNVaVUDH5de4Ef18Vt94xLUiXdS/G53lVmdsJS4cWE6uBbVzkeU57hav/N
-         z+bKKDi4SIKhuj5geSc9ApUMRjgwGvbuy78q8fFfP2nFDk8LX+zOpddLExhxu+uMVEV6
-         1RwNdRfVWrgVhZ7e1VW8EKsVQgqdiwZ1Mk59g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731088541; x=1731693341;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FiPDLfL5JTBKeeqjpJ5u/XBxPNvTKsH7Pcb34HC2tGE=;
-        b=PBRb0HuK8mxyxGZAlEgdycX29BPXM8AGAXkfWpF15M00x5L3GuwZpfpiFVaiIv0io5
-         Uy18GafzJu+2NOCjoOwJ+WFPckARnIGEwNLRIXfLHH5rUFsFz6zcsBb2IImHZqd8MC/5
-         AfQRQc2sgf8n2rxIjqLM5wKYMYGCjfCIG7KyOtf7v9oNrRfj5MBDIn9HnloK9yOU03at
-         Q7yzMf9t6KeRKr+Mod0FEL/6VLGU5+kXULXhd0eG4qVPSt0yrWRLFftkCE/ZrRD4+dI2
-         1LWfazf1xddBT3j7ZUBrBD3yDf0VcUN1V39ASrD9kVjxFWPu2mlxC1Hsx3OTRggOeUeS
-         vaJQ==
-X-Gm-Message-State: AOJu0Ywt31BmjBPGTV9iCOYrZEqwU0n+n9HttvdGhJkeG/01G3JcGEUP
-	aJVqGkg42Czz5dy71HXiU9qbukqQ4vC9hwYyKFm2fw0nPFew1zMNbenC2DSzyXyuPQ89VE5LMVZ
-	e
-X-Google-Smtp-Source: AGHT+IERbFI+o+2LyayD4punr25StjJoWA4Jj2wzw5p0JjcDTHDRzT1/x7uQhWNXVNPsCLPYIGwlKQ==
-X-Received: by 2002:a05:6a20:158c:b0:1db:da5e:361f with SMTP id adf61e73a8af0-1dc22a1b4d3mr5454374637.25.1731088540720;
-        Fri, 08 Nov 2024 09:55:40 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078a7ef5sm4141017b3a.63.2024.11.08.09.55.38
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 09:55:40 -0800 (PST)
-Date: Fri, 8 Nov 2024 09:55:36 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
-Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
-	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
-	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, skhawaja@google.com, kuba@kernel.org,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-Subject: Re: [PATCH net-next v8 5/6] selftests: net: Add busy_poll_test
-Message-ID: <Zy5QmNT5XqZUJ3f8@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
-	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
-	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, skhawaja@google.com, kuba@kernel.org,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
-References: <20241108045337.292905-1-jdamato@fastly.com>
- <20241108045337.292905-6-jdamato@fastly.com>
- <672e26ec429be_2a4cd22944c@willemb.c.googlers.com.notmuch>
+	 Content-Type:Content-Disposition:In-Reply-To; b=FFUjp1ajSdus5ed4RSbm/X1QpJSHp/mJbYNQN1RJtM9O3o4EpVpNSV9GM7UEbi90sOzTI0kexluoWmpNqys/ogmeb3QhjLzBwDYWgEhZrJs6CuJkFJAw1GEXgyd/I2+Llm5K9FtEf1WvbL+kJ0GxvaYemXMX0bHigwzZZ56qAtM=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=o9xbZGPU; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10CCAC4CECD;
+	Fri,  8 Nov 2024 17:59:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731088752;
+	bh=njRHL3LaliikKZctNZcbQmlhWG5PDd/sxP2CVB4KNl0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=o9xbZGPUoEDjcljiuA04F7V2sPGjbnBqOHkxiJIqWEC8kQP3ScBiINGTeelI13nDE
+	 rOgX8Cb9wPFHBVq+tppbBl26ZQbrPs2+9XOZu+CpobBs0CSB7tCdCypWqxo4BfpqUj
+	 IGbdma8WYKUwdtwXoeIGIKFbR6/1CGUXlVfF5wrBL6Svn1aHNBonQosJgHbJVwcF9H
+	 32xT46rGOfSJs4enLRTS45FOOYLrl/yZRNmh88IRyc2UVezJR5thxLc93qXT+MbLbZ
+	 +c1i2XO4EDDewVeqxdYV6k35H+6ewPFbMJChCPBEbMvJM0IyWenSY0tsmNvF61w4ej
+	 LggrNLE0sJ5NQ==
+Date: Fri, 8 Nov 2024 19:59:06 +0200
+From: Leon Romanovsky <leon@kernel.org>
+To: Namjae Jeon <linkinjeon@kernel.org>
+Cc: Halil Pasic <pasic@linux.ibm.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+	Wen Gu <guwen@linux.alibaba.com>,
+	"D. Wythe" <alibuda@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	David Miller <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Gerd Bayer <gbayer@linux.ibm.com>,
+	Alexandra Winter <wintera@linux.ibm.com>,
+	Nils Hoppmann <niho@linux.ibm.com>,
+	Niklas Schnell <schnelle@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Stefan Raspl <raspl@linux.ibm.com>, Aswin K <aswin@linux.ibm.com>,
+	linux-cifs@vger.kernel.org,
+	Kangjing Huang <huangkangjing@gmail.com>
+Subject: Re: [PATCH net] net/smc: Fix lookup of netdev by using
+ ib_device_get_netdev()
+Message-ID: <20241108175906.GB189042@unreal>
+References: <20241025072356.56093-1-wenjia@linux.ibm.com>
+ <20241027201857.GA1615717@unreal>
+ <8d17b403-aefa-4f36-a913-7ace41cf2551@linux.ibm.com>
+ <20241105112313.GE311159@unreal>
+ <20241106102439.4ca5effc.pasic@linux.ibm.com>
+ <20241106135910.GF5006@unreal>
+ <20241107125643.04f97394.pasic@linux.ibm.com>
+ <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <672e26ec429be_2a4cd22944c@willemb.c.googlers.com.notmuch>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAKYAXd9QD5N-mYdGv5Sf1Bx6uBUwghCOWfvYC=_PC_2wDvao+w@mail.gmail.com>
 
-On Fri, Nov 08, 2024 at 09:57:48AM -0500, Willem de Bruijn wrote:
-> Joe Damato wrote:
+On Fri, Nov 08, 2024 at 08:40:40AM +0900, Namjae Jeon wrote:
+> On Thu, Nov 7, 2024 at 9:00 PM Halil Pasic <pasic@linux.ibm.com> wrote:
+> >
+> > On Wed, 6 Nov 2024 15:59:10 +0200
+> > Leon Romanovsky <leon@kernel.org> wrote:
+> >
+> > > > Does  fs/smb/server/transport_rdma.c qualify as inside of RDMA core code?
+> > >
+> > > RDMA core code is drivers/infiniband/core/*.
+> >
+> > Understood. So this is a violation of the no direct access to the
+> > callbacks rule.
+> >
+> > >
+> > > > I would guess it is not, and I would not actually mind sending a patch
+> > > > but I have trouble figuring out the logic behind  commit ecce70cf17d9
+> > > > ("ksmbd: fix missing RDMA-capable flag for IPoIB device in
+> > > > ksmbd_rdma_capable_netdev()").
+> > >
+> > > It is strange version of RDMA-CM. All other ULPs use RDMA-CM to avoid
+> > > GID, netdev and fabric complexity.
+> >
+> > I'm not familiar enough with either of the subsystems. Based on your
+> > answer my guess is that it ain't outright bugous but still a layering
+> > violation. Copying linux-cifs@vger.kernel.org so that
+> > the smb are aware.
+> Could you please elaborate what the violation is ?
 
-[...]
+There are many, but the most screaming is that ksmbd has logic to
+differentiate IPoIB devices. These devices are pure netdev devices
+and should be treated like that. ULPs should treat them exactly
+as they treat netdev devices.
 
-> > diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
-> > new file mode 100644
-> > index 000000000000..8d8aa9e5939a
-> > --- /dev/null
-> > +++ b/tools/testing/selftests/net/busy_poller.c
-> > @@ -0,0 +1,328 @@
-> > +// SPDX-License-Identifier: GPL-2.0
-> > +#include <assert.h>
-> > +#include <errno.h>
-> > +#include <error.h>
-> > +#include <fcntl.h>
-> > +#include <inttypes.h>
-> > +#include <limits.h>
-> > +#include <stdlib.h>
-> > +#include <stdio.h>
-> > +#include <string.h>
-> > +#include <unistd.h>
-> > +
-> > +#include <arpa/inet.h>
-> > +#include <netinet/in.h>
-> > +
-> > +#include <sys/ioctl.h>
-> > +#include <sys/epoll.h>
-> > +#include <sys/socket.h>
-> > +#include <sys/types.h>
-> > +
-> > +#include <linux/netlink.h>
-> > +#include <linux/genetlink.h>
-> > +#include "netdev-user.h"
-> > +#include <ynl.h>
-> > +
-> > +/* if the headers haven't been updated, we need to define some things */
+> I would also appreciate it if you could suggest to me how to fix this.
 > 
-> This should not be needed, as headers are taken from $KERNELSRC/usr after
-> make headers_install.
-> 
-> Generally discouraged for tests (else every new feature test for a new
-> features is forced to adds such checks).
-
-I get that, but the reason this is required is complex:
-
-- sys/epoll.h defines epoll_data, which is needed by the program to
-  access stuff like epoll_event.data.fd and linux/eventpoll.h does
-  not. At the same time, older glibcs do not have the ioctl yet
-  (I've sent a change to glibc to add it; I don't know which release
-  it'll be in or when CI will be updated to a distro with that
-  glibc).
-
-- linux/eventpoll.h does not define epoll_event's data field, it's
-  simply an opaque "__u64 data", but does include the ioctl
-  definitions.
-
-So, it'd seem I'd need parts of both headers... but of course you
-can't include both, because they redefine types found in the other.
-
-Maybe there's a solution I'm missing (please let me know), but it
-seems that the only workable solution is to include the #ifdef blob
-below, but perhaps with a comment explaining the above.
-
-> > +#if !defined(EPOLL_IOC_TYPE)
-> > +struct epoll_params {
-> > +	uint32_t busy_poll_usecs;
-> > +	uint16_t busy_poll_budget;
-> > +	uint8_t prefer_busy_poll;
-> > +
-> > +	/* pad the struct to a multiple of 64bits */
-> > +	uint8_t __pad;
-> > +};
-> > +
-> > +#define EPOLL_IOC_TYPE 0x8A
-> > +#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
-> > +#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
-> > +#endif
-
+> Thanks.
+> >
+> > Thank you very much for all the explanations!
+> >
+> > Regards,
+> > Halil
+> >
 
