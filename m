@@ -1,158 +1,84 @@
-Return-Path: <netdev+bounces-143371-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143375-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 217AC9C2349
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:36:27 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64E049C236B
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:38:45 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4F8CE1C2392C
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:36:26 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 1BF621F25351
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:38:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D28B3DABEA;
-	Fri,  8 Nov 2024 17:33:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DD7E2123C8;
+	Fri,  8 Nov 2024 17:34:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b="F5kOF/Oa"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="Yi9WEWRK"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail.ispras.ru (mail.ispras.ru [83.149.199.84])
-	(using TLSv1.2 with cipher DHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 899E53DABE4;
-	Fri,  8 Nov 2024 17:33:43 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=83.149.199.84
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C40E821F4A6
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:34:13 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731087228; cv=none; b=sIYZq7QARBdWcsH556cUYo223dKrlajZ4/HDqIywdl9COOxEFwQ8j/D2u8Pxl8aczg+B3VJGslsVZ/PI9o7jKegqRMXdMcoiODoKlejG6NNsJAGrG1BJdgQ6RJNwq5ycf+vvYzu6ZCmZfWbMlclfIJbH2rsbUwHtxPNG/VFVG8g=
+	t=1731087255; cv=none; b=k7Wlw+S9W4SkbwCyuA2WTl3BkZfsa9Z2qLKtGglAlsrCqg12OsNtMZFz0DWTlv3PW+h1J2BzXNSdfd6EimJ9zcwAudsueW77X0qkyiOpjOlllXLR7RVrbGT/WQC2tzixzJybWpFcHF8xyWz8kg3AtmUYTMruFmbs7G2aYOgLxFw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731087228; c=relaxed/simple;
-	bh=uRcRjz02RjtoR9Frpy86rs9dJ32/WD+uzrhERUyBgzM=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=IJCknYDWI8STkNPpBhNc8DWB7duZ0m4GO6E8b1Ut3T++RmXg4NDl+P+nG0b15yyIQnW/1Zz1bDfokJL2cjpmuYqhxJoIYctb5Sb+GBW5sSMw5UT/vfUGK1WIeq53IhN9Nxs8yFYC8O7z2maNUln2cBKx+A1YiHznA2TR88GZtG4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru; spf=pass smtp.mailfrom=ispras.ru; dkim=pass (1024-bit key) header.d=ispras.ru header.i=@ispras.ru header.b=F5kOF/Oa; arc=none smtp.client-ip=83.149.199.84
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=ispras.ru
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ispras.ru
-Received: from ldvnode.intra.ispras.ru (unknown [10.10.2.153])
-	by mail.ispras.ru (Postfix) with ESMTPSA id E969740B2274;
-	Fri,  8 Nov 2024 17:33:40 +0000 (UTC)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mail.ispras.ru E969740B2274
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ispras.ru;
-	s=default; t=1731087221;
-	bh=3QYrsrBPYW43jQDvfadZZ/SbvlgS981KQOnirhhBRvU=;
-	h=From:To:Cc:Subject:Date:From;
-	b=F5kOF/OaGdZSfFauj5TVSIstfJVU3lTPNTDHweGefjpPXpJ0XtnIpVTv1ULCVKRov
-	 PD1zkrsBF3jPlQfslBxcFO3SizMaSk+ggashI9VbDmg/EmGK1EJbDK9lz0pdeW5tyC
-	 jdFv4KDgaz8GCIsg5WJfS3SLQjxa0Lw0gdMSRuwE=
-From: Vitalii Mordan <mordan@ispras.ru>
-To: Alexandre Torgue <alexandre.torgue@foss.st.com>
-Cc: Vitalii Mordan <mordan@ispras.ru>,
-	Jose Abreu <joabreu@synopsys.com>,
+	s=arc-20240116; t=1731087255; c=relaxed/simple;
+	bh=dqK4MwWjAWyW2zbY3K9d5ITYDz5Sbxg4AB8gEu02CUI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=E3tsbX+sUII1vPaKCF5L/VvW8NA4h3iRtHf1yDNK7fmhIz4d6kdhY4VLJGHtAmCN+R9bKh6h4RQbuJvRR6GT6TfJOxPIegIU5fLvOXC2VztBH1vNh8l9d2ZtrNZj6aBrpZVz/dGKYYM3nmLP8neLh30WO+tI6e2quZT8Kck+g3M=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=Yi9WEWRK; arc=none smtp.client-ip=156.67.10.101
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=ID41ZcOX+zuIPoibJWQpMg8uqVaFplLeSyRJl+K5Lvg=; b=Yi9WEWRKcT69s1dxB7Zmsmjxol
+	Pmp+C+WFAQNOUtu7WbeDTxYLCITmCMnKb4wUD61BWb4AZ2OawM7bTKCZNGSEYakeaGq99RgZfmp8d
+	RnTqLcRv03Adara4EYLhGIjm2ae8I2yRWoiR9TVsA9P5FfwsowmfT8lesHZDzzk2VpLc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1t9Ss0-00Ccxi-0t; Fri, 08 Nov 2024 18:34:04 +0100
+Date: Fri, 8 Nov 2024 18:34:04 +0100
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org,
-	lvc-project@linuxtesting.org,
-	Fedor Pchelkin <pchelkin@ispras.ru>,
-	Alexey Khoroshilov <khoroshilov@ispras.ru>,
-	Vadim Mutilin <mutilin@ispras.ru>
-Subject: [PATCH net v2]: stmmac: dwmac-intel-plat: fix call balance of tx_clk handling routines
-Date: Fri,  8 Nov 2024 20:33:34 +0300
-Message-Id: <20241108173334.2973603-1-mordan@ispras.ru>
-X-Mailer: git-send-email 2.25.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH net-next 1/5] net: phylink: move manual flow control
+ setting
+Message-ID: <a31b965a-c9cd-4695-a7f1-9201a00e2dd4@lunn.ch>
+References: <Zy411lVWe2SikuOs@shell.armlinux.org.uk>
+ <E1t9RQe-002Feh-T1@rmk-PC.armlinux.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <E1t9RQe-002Feh-T1@rmk-PC.armlinux.org.uk>
 
-If the clock dwmac->tx_clk was not enabled in intel_eth_plat_probe,
-it should not be disabled in any path.
+On Fri, Nov 08, 2024 at 04:01:44PM +0000, Russell King (Oracle) wrote:
+> Move the handling of manual flow control configuration to a common
+> location during resolve. We currently evaluate this for all but
+> fixed links.
 
-Conversely, if it was enabled in intel_eth_plat_probe, it must be disabled
-in all error paths to ensure proper cleanup.
+I could be mis-remembering, but i thought somebody recently mentioned
+they wanted manual control for flow control for fixed links.
 
-Found by Linux Verification Center (linuxtesting.org) with Klever.
+Nothing comes to mind why it should not work. With manual control, it
+is purely a MAC problem. There is no negotiation involved which would
+require a PHY, which is missing in the case of fixed links.
 
-Fixes: 9efc9b2b04c7 ("net: stmmac: Add dwmac-intel-plat for GBE driver")
-Signed-off-by: Vitalii Mordan <mordan@ispras.ru>
----
-v2: Unwind using a goto label, as per Simon Horman's request.
+Am i missing something? Other than you want to keep the current
+behaviour.
 
- .../stmicro/stmmac/dwmac-intel-plat.c         | 25 +++++++++++++------
- 1 file changed, 17 insertions(+), 8 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-index d68f0c4e7835..9739bc9867c5 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel-plat.c
-@@ -108,7 +108,12 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
- 			if (IS_ERR(dwmac->tx_clk))
- 				return PTR_ERR(dwmac->tx_clk);
- 
--			clk_prepare_enable(dwmac->tx_clk);
-+			ret = clk_prepare_enable(dwmac->tx_clk);
-+			if (ret) {
-+				dev_err(&pdev->dev,
-+					"Failed to enable tx_clk\n");
-+				return ret;
-+			}
- 
- 			/* Check and configure TX clock rate */
- 			rate = clk_get_rate(dwmac->tx_clk);
-@@ -119,7 +124,7 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
- 				if (ret) {
- 					dev_err(&pdev->dev,
- 						"Failed to set tx_clk\n");
--					return ret;
-+					goto err_tx_clk_disable;
- 				}
- 			}
- 		}
-@@ -133,7 +138,7 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
- 			if (ret) {
- 				dev_err(&pdev->dev,
- 					"Failed to set clk_ptp_ref\n");
--				return ret;
-+				goto err_tx_clk_disable;
- 			}
- 		}
- 	}
-@@ -149,12 +154,15 @@ static int intel_eth_plat_probe(struct platform_device *pdev)
- 	}
- 
- 	ret = stmmac_dvr_probe(&pdev->dev, plat_dat, &stmmac_res);
--	if (ret) {
--		clk_disable_unprepare(dwmac->tx_clk);
--		return ret;
--	}
-+	if (ret)
-+		goto err_tx_clk_disable;
- 
- 	return 0;
-+
-+err_tx_clk_disable:
-+	if (dwmac->data->tx_clk_en)
-+		clk_disable_unprepare(dwmac->tx_clk);
-+	return ret;
- }
- 
- static void intel_eth_plat_remove(struct platform_device *pdev)
-@@ -162,7 +170,8 @@ static void intel_eth_plat_remove(struct platform_device *pdev)
- 	struct intel_dwmac *dwmac = get_stmmac_bsp_priv(&pdev->dev);
- 
- 	stmmac_pltfr_remove(pdev);
--	clk_disable_unprepare(dwmac->tx_clk);
-+	if (dwmac->data->tx_clk_en)
-+		clk_disable_unprepare(dwmac->tx_clk);
- }
- 
- static struct platform_driver intel_eth_plat_driver = {
--- 
-2.25.1
-
+	Andrew
 
