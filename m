@@ -1,109 +1,104 @@
-Return-Path: <netdev+bounces-143452-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AF779C2799
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 23:32:16 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A90D9C27A5
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 23:38:12 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9C1591C2177F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 22:32:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 112B7283066
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 22:38:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 552831E00B6;
-	Fri,  8 Nov 2024 22:32:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D4D7D1EBFEC;
+	Fri,  8 Nov 2024 22:38:05 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b="0uUMcD2Z"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="YC8fqG/R"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f175.google.com (mail-pl1-f175.google.com [209.85.214.175])
+Received: from mail-oo1-f48.google.com (mail-oo1-f48.google.com [209.85.161.48])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 251121A9B5C
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 22:32:10 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572851E0B67;
+	Fri,  8 Nov 2024 22:38:03 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.161.48
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731105133; cv=none; b=uRCSnf50djo/f4pIo06OBCJwgJMJ9k6ipW2PmyRgD1TAfHrlamzOe0m0Tlz2Y4TRyXrJwcki9wammP7aFQ4fgJxoiOnckVDVRKF604Zq0dI3XCaFoFxFLC5QFWl+poxiKopnH2SUvUxPgS5JqWrKtNXjg9hcAX4bs9EAnNA0Fdw=
+	t=1731105485; cv=none; b=kyynE7mpT6M5hxMutcex9zXyAHsA3vhIaRFYqUbfvRBsHEBt9lLJcEyE6YRYi7XOexo5g8bl+x6in77g01J52NmzbdBWqdwKq6VXqWayGJ31oRXeUcfz2Zyvt3qQbQFbByMoal4AFdt/OwL8FIR1r/6xq4/kWgeUf3reSmxezp8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731105133; c=relaxed/simple;
-	bh=BV1DG2nZYDkYnerBJ8vgdCr1Rv0kBw5xvyNF5SYsqFs=;
-	h=Date:From:To:Cc:Subject:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=uq5blagJwchAHXzpoQKhfvEgak5EjeyaMBPvu3g5+AdtvDAfgQZfBxK+IiVZv66oVz2ljmxnT/dleDfn69kCd4KpjodxTNQ6rXjaOZ7qp7dB/XVv4nRcaKabfpN3l9De/+M3M5bSOctIb86yyqY0Fov8CUVicPZ29sbMFOP3vfk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org; spf=pass smtp.mailfrom=networkplumber.org; dkim=pass (2048-bit key) header.d=networkplumber-org.20230601.gappssmtp.com header.i=@networkplumber-org.20230601.gappssmtp.com header.b=0uUMcD2Z; arc=none smtp.client-ip=209.85.214.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=networkplumber.org
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=networkplumber.org
-Received: by mail-pl1-f175.google.com with SMTP id d9443c01a7336-20cb47387ceso29896645ad.1
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 14:32:10 -0800 (PST)
+	s=arc-20240116; t=1731105485; c=relaxed/simple;
+	bh=HG/Z4aeyO39LhZI4pi8ETl903UTWXgOSj7cXHjFbK7M=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=FKlPlAbHF15VSwlZZotbI/adOwnvv+Ml2MWkiewGhmqIIwzQk90yjkZRzmC0j0Gcx4rnhNiCGKuIgr6kTPLZBhLaNPA2PGMsYJFYQOJl0cgpfY7TBGJ3AGJCmsI0RjejqFhR/r37AfG+Hg542l1e/52SjHSegjtmZSlfd6SVz6A=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=YC8fqG/R; arc=none smtp.client-ip=209.85.161.48
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oo1-f48.google.com with SMTP id 006d021491bc7-5ee53b30470so974026eaf.3;
+        Fri, 08 Nov 2024 14:38:03 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20230601.gappssmtp.com; s=20230601; t=1731105130; x=1731709930; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iMFxAHevlzFNIrxGQ+K9VcftJHP16vdgP3TXcAXmVVA=;
-        b=0uUMcD2Zh8+a/uiKRXpYcFoe8LxueY6XNs0fERKtfC1Q25w29n8UgLpcaPntjJ3LzD
-         Rnj1qEw7K6HKGTvlomB4P45uhC+HqFPXpA0XQ0K5qTxP3jxTNEYJA7j17YviA0jqZPBJ
-         +L35UakllJgmyF65ZCf9oG/CTE0MAs0GOaQaiKHESEl5ynx++4Q5MpUe/aIAQ0MDT+o3
-         WGZ1Kfc/dKTQa2vcmXT9qHEunOuo98A8mDso/4WUyPt4oAQTrs7dz9n8wlnZmXLaNdkh
-         gFyctsuSU2bxnFFWWRB3RsgRt2A5I6H+2sdl0JvTEPBGPgOl4wAx1IkkEZqmrkNyH/jJ
-         bz6Q==
+        d=gmail.com; s=20230601; t=1731105482; x=1731710282; darn=vger.kernel.org;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ef+nuKAweoLnQLtJWrC9nc5IytkziH8wSsoYPVks8Jo=;
+        b=YC8fqG/RtWfMD81sz7B6jIlUv81M+5V9zaW4Ch+/3tL3DGvjNIrtVDq+hx+A0FdwhW
+         uFfJU6LfUWRfQofDBH6IzEwX78q/vy6h06eLQ+J/l6ZrulDWCAOYqPY5iWcz4A0hQxfV
+         39ku1V6moK1WJPdu0AqpxcVPC46UYeaPzkYDYrppuTgv3KLfeTh/9a2jN8J05sqMnCA+
+         EyrV5eAEvR9F/oU8ymEhn/a4/Hc7kDcKorttYGxRXkM00mv+Pf84Vg+vkzXit/moWUE/
+         EusId5y+IY8NQ4UZ/t9HrYRQZJ5RxGED+5MSb32TftQO+82CQHL3DAqg/zPEMI3BwrJJ
+         cY0Q==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731105130; x=1731709930;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iMFxAHevlzFNIrxGQ+K9VcftJHP16vdgP3TXcAXmVVA=;
-        b=nGHJYQojQKQYaiWgYeTW9pFrMlZoPPfnvmDGm2EY08Eqnj5iuCqfFeiUa5dkQamOn5
-         L72fom/cb0manWZrF+oYDENoS7hAFDQqgFbBpuW3n2ex4FPNUGUtYN1XM1QsqWsRQ6H6
-         FqMLalMNAq7eHyN9ckS2mt30nXVJ7QQo36TyqtEqrxPbPiC+sMMNXfWWI9kAj3APktmc
-         3OjKUdEl6jrAmCFrPU/w9rsyDNDiU2/qmWiw3/jZndirShhr4YqQ4GBXTrMS0KcPB+U+
-         NN8Gn7cdm/1NBJ9mXA5+LxSATEIWoUn1VlRq/5Z7p/WJf+KLfFXE2CnvItjoH6dEBWvt
-         1Ieg==
-X-Forwarded-Encrypted: i=1; AJvYcCU9zkjZGk054WPXCKVI+tQr/b0QyAlVtwxJD+aFHULxreMxTbpdlEvLQB14NF3eLlDwXDbFCCM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YziIDrXz+4eQGaLIu1uCMvvRwa83P73I00XWQd7zpvWQvC4GlPU
-	jruZK40T70fow3ROlonTl4NjyokEMCKmzRCBmy23vyDafcCWR3nA8Zb6PpGrpEHxwk2pchjdRF2
-	S
-X-Google-Smtp-Source: AGHT+IEvfUMRQu40BNgwv4zU+Ictx5fEGNli377jI/LInxc8xAl/zMaK9alWOyVlP7LkMtcHGhqpFw==
-X-Received: by 2002:a17:902:da8f:b0:20b:61c0:43ed with SMTP id d9443c01a7336-21183545842mr64191745ad.30.1731105130294;
-        Fri, 08 Nov 2024 14:32:10 -0800 (PST)
-Received: from hermes.local (204-195-96-226.wavecable.com. [204.195.96.226])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177ddf7e1sm35951695ad.106.2024.11.08.14.32.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 14:32:10 -0800 (PST)
-Date: Fri, 8 Nov 2024 14:32:08 -0800
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: John Ousterhout <ouster@cs.stanford.edu>, netdev@vger.kernel.org
-Subject: Re: [PATCH net-next 01/12] net: homa: define user-visible API for
- Homa
-Message-ID: <20241108143208.2a08d972@hermes.local>
-In-Reply-To: <6467b078-4ee9-ecb2-6174-825c3a2d5007@gmail.com>
-References: <20241028213541.1529-1-ouster@cs.stanford.edu>
-	<20241028213541.1529-2-ouster@cs.stanford.edu>
-	<174d72f1-6636-538a-72d2-fd20f9c4cbd0@gmail.com>
-	<CAGXJAmxdRVm7jY7FZCNsvd8Kvd_p5FPUSHq8gbZvzn0GSK6=2w@mail.gmail.com>
-	<6467b078-4ee9-ecb2-6174-825c3a2d5007@gmail.com>
+        d=1e100.net; s=20230601; t=1731105482; x=1731710282;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ef+nuKAweoLnQLtJWrC9nc5IytkziH8wSsoYPVks8Jo=;
+        b=p4g5bkZOM+t7bGi71374dNpQ176RbgJMO5YSyf/3FYXthk0dLDeJVuiJbLjlvn58WI
+         PUhzCVfTuzc8hslwjxQ/aDfNLSPaxIJx50UnFNYZm1k/xa2cVVDTmfK3pMFPVKSd6TQx
+         b1mWRw/btDNwnJAiq1rqnx01avqZNeIXgLiEWaJOJKDu8Jr9Vh3cdmyUPhLwXBSUDWu2
+         uIsYh2DtcU3Jn+mM4CbLDb0qoD1AfBmN4NfKx2cYv06gbuQYZAqlD7wQQXUz1sSjNEbA
+         Ebtz1x5cVUZDWyjQ1nNmxB5PlJsl0aYx3Gj+aVsiZdu018dfIW2W7DM9I5k9Y6n60po/
+         ZcqQ==
+X-Forwarded-Encrypted: i=1; AJvYcCU7B+XNfuRd3Y1Ae7Mz4O3smf9TRpz2wM2Zg5IOdTIMf8EB02iWtPmG0y+k9Jkky8uQSr9NcEnA8HHz2y7G@vger.kernel.org, AJvYcCX8zjL7og2RKMpZtXNuOdkIT2ylPPX5gMYlORMe5F++WZKB/X9YTE+HNqhNuPjXjG4eOwpN1eiaAok=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwI7oEeM/I8pm5l39XJTNKopn3YVnWkDhmc6rWjoBsGHMa6VXJj
+	+lFv74s2OhX1kzq1hMcCW3xwaSVOgvHpo6HdJsQ3GrFT+223sCDyS1+DlEk6t9baoOhdefdsk5d
+	C9/NCWhy8nvaVLTxXz35zhKgJRA8=
+X-Google-Smtp-Source: AGHT+IFw6L6MwIPVpm5m/vqu5nv3hx0uQ5SgPG1RClTH3XyEoMn2m2/XX0pYOfOXJO+8xyxYfL3hQETyezKTEt3DEME=
+X-Received: by 2002:a05:6820:1e85:b0:5e1:d741:6f04 with SMTP id
+ 006d021491bc7-5ee57cbee48mr4056662eaf.3.1731105482352; Fri, 08 Nov 2024
+ 14:38:02 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20241107020555.321245-1-sanman.p211993@gmail.com> <20241107102044.4e5ba38f@kernel.org>
+In-Reply-To: <20241107102044.4e5ba38f@kernel.org>
+From: Sanman Pradhan <sanman.p211993@gmail.com>
+Date: Fri, 8 Nov 2024 14:37:26 -0800
+Message-ID: <CAG4C-OmPAqNe2RHwgBZ9+1MBq48bOOLgDdFnPiRyPz6Duy15nQ@mail.gmail.com>
+Subject: Re: [PATCH net-next v2] eth: fbnic: Add PCIe hardware statistics
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, alexanderduyck@fb.com, kernel-team@meta.com, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, horms@kernel.org, 
+	corbet@lwn.net, mohsin.bashr@gmail.com, sanmanpradhan@meta.com, 
+	andrew+netdev@lunn.ch, vadim.fedorenko@linux.dev, jdamato@fastly.com, 
+	sdf@fomichev.me, linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 
-On Fri, 8 Nov 2024 22:02:27 +0000
-Edward Cree <ecree.xilinx@gmail.com> wrote:
+On Thu, 7 Nov 2024 at 10:20, Jakub Kicinski <kuba@kernel.org> wrote:
+>
+> On Wed,  6 Nov 2024 18:05:55 -0800 Sanman Pradhan wrote:
+> > +     FBNIC_HW_STAT("pcie_ob_rd_tlp", pcie.ob_rd_tlp),
+> > +     FBNIC_HW_STAT("pcie_ob_rd_dword", pcie.ob_rd_dword),
+> > +     FBNIC_HW_STAT("pcie_ob_wr_tlp", pcie.ob_wr_tlp),
+> > +     FBNIC_HW_STAT("pcie_ob_wr_dword", pcie.ob_wr_dword),
+> > +     FBNIC_HW_STAT("pcie_ob_cpl_tlp", pcie.ob_cpl_tlp),
+> > +     FBNIC_HW_STAT("pcie_ob_cpl_dword", pcie.ob_cpl_dword),
+> > +     FBNIC_HW_STAT("pcie_ob_rd_no_tag", pcie.ob_rd_no_tag),
+> > +     FBNIC_HW_STAT("pcie_ob_rd_no_cpl_cred", pcie.ob_rd_no_cpl_cred),
+> > +     FBNIC_HW_STAT("pcie_ob_rd_no_np_cred", pcie.ob_rd_no_np_cred),
+>
+> Having thought about this a bit longer I think Andrew's point is valid.
+> Let's move these to a debugfs file. Sorry for the flip flop.
 
-> > Do you know of other low-level kernel-call wrappers in
-> > Linux that are analogous to these? If so, how are they handled?  
-> 
-> The closest analogy that comes to mind is the bpf system call and libbpf.
-> libbpf lives in the tools/lib/bpf/ directory of the kernel tree, but is
->  often packaged and distributed independently[2] of the kernel package.
-> If there is a reason to tie the maintenance of your wrappers to the
->  kernel project/git repo then this can be suitable.
-
-liburing for ioring calls is a better example.
-There are lots of versioning issues in any API. It took several years
-for BPF to get to run anywhere status. Hopefully, you can learn from
-those problems.
+Thanks for the review, I have submitted v3 with the necessary changes.
 
