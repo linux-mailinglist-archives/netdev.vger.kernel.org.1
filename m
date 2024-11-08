@@ -1,147 +1,143 @@
-Return-Path: <netdev+bounces-143155-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143156-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58C089C1463
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:01:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47D689C1485
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:24:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 897601C20A10
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:01:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D240285EFD
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:24:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2017C14012;
-	Fri,  8 Nov 2024 03:01:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BF3D7DA95;
+	Fri,  8 Nov 2024 03:24:13 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Xj+auV+8"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="LuaXZf2D"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f180.google.com (mail-pl1-f180.google.com [209.85.214.180])
+Received: from mail-pf1-f179.google.com (mail-pf1-f179.google.com [209.85.210.179])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C491BD9C2;
-	Fri,  8 Nov 2024 03:01:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.180
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D567014012;
+	Fri,  8 Nov 2024 03:24:11 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.179
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731034916; cv=none; b=Et765aAwmpAvjykARfWwg3zPC+JRgX6oy26CHXVFsnNVv/g3vhuwudZvitN4bWlkGzrBIHdhLvSQdV7I2DWoz3By7RbJxhcqzUUIYS+T8Ux0XRIP/avgUJfG/QpSbAOH2syNxDg3WpEZX4873BbB55wCabRiC/Exbe2nnCRcgpo=
+	t=1731036253; cv=none; b=uGtTx6L0Lv4r/VASmdm8h7o2NTX1iro8YqEB1SjAvtnB0AOAqDgbGtITsS8lgZYzcPvf+abx5oN5Cr/+rpBIqKXQiJP+zghqQiAChDyGvABI1yKAGp8dkERgFUs+AN5CIJb+TVCdHDIprLbcC9E0rgPW+ABGfN8FTc0Lwi7DlZM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731034916; c=relaxed/simple;
-	bh=jh5QLIklCuSffsX5HHrs2unmHbDfZrVTv4LkHr+NLfM=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Gus5AydZMWshXSddPE7F82ui8ZMbRtlsq9jZgdVfWN5AZln+x3AYlXO7g2zQSKTNqa0g/5CraKj2kTE+VnOWt8OK2+A3FuIK27PvdmK2oyJ7WpOsVPpCgcxeTnvVIRIWDUEsJn3ulLrP/TRsSq3g1dRbdUGRfZhC8pDsPnibJOY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Xj+auV+8; arc=none smtp.client-ip=209.85.214.180
+	s=arc-20240116; t=1731036253; c=relaxed/simple;
+	bh=IYaperpEdtSoZ06BR7dEbW6DPyyiwzWseXt2Fpea7Dc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=DJt3yKVYdhnSDGl9/JaCUGF2/AZlFjAdSXBdfOX/eLJ47sQcdNsigEE3zUltpyhj4m4wjRkDjXjR0V0xNaLKwL9rNLmEVY1S5SKXzXpwOsVY+TFgt/hhUVVT5213uGQKiKzlA3VAaeLJYLLXMXDk9dsrB4odziWVslVRy9SCqVE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=LuaXZf2D; arc=none smtp.client-ip=209.85.210.179
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pl1-f180.google.com with SMTP id d9443c01a7336-20ce65c8e13so18622615ad.1;
-        Thu, 07 Nov 2024 19:01:54 -0800 (PST)
+Received: by mail-pf1-f179.google.com with SMTP id d2e1a72fcca58-723db2798caso1870627b3a.0;
+        Thu, 07 Nov 2024 19:24:11 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731034914; x=1731639714; darn=vger.kernel.org;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=2AFkIv1SzzbZMo5JYC3sgbdI5jWNWjyyxyaxG1ONBas=;
-        b=Xj+auV+8XIovxNqcvhKoldS7Y5n3MfAv48k34QToSREWR8sML3jUr3833UPI8phvb9
-         sNbCkgfU1tcrK2j5dmO6RcxKjkLP6USpeBurfCPOWXNk8C1Fh59xrmKkh8aeWaUNgki/
-         S2y2VqCixpgT6M2TEAanjxpelXD6UHVrNXsBrZSwitBPxYQK1loRcyH4zcdPlNZpd3Xa
-         v4ulEPWA6TwMqcmYdUlKaxI6yt8UR7MqF+zA6r5yzmL5h+dg6J9BUeyWfb7Nz79rZ5hT
-         /jpLmNu9ylcNnGDX4EZYjPX2cPmsj6Yx6I0iTpcDzjcXC8TErlc2g5WRygOGFvhpsvbP
-         6FIQ==
+        d=gmail.com; s=20230601; t=1731036251; x=1731641051; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FiQi+zVrti/4lwYHeXMzDjh6Y9tSUZHidpZ6r5DzMFs=;
+        b=LuaXZf2DI1AyA3TscXf6GhthunB73JMfzDVO0hNfzx33AMwL7+O0cKDbgr7yRZaNOE
+         uMxpUs8zpnmbpDVp2O86+p/PCBKGwviWEfb+OsLJJ2J5Y+8PafFWKPwLTKuJ9OU5Uinp
+         wq8CInKynUsS7MQnk3RJFXmORnF1VZd7NzcXw7PrnuveHWB+IU8f4b0xp3kMUIIRkriW
+         ZFDaCNFPwr0t8NgGZiO2CYs7uTaMo7GbkpUlJbwHjJutsOqshuvKkhF04X44axJJv4QS
+         o01V0serPSkf6bwiVBMuXBZCCULEO+NFQKlW/u7r2WQRKKN1OIOF/CxI+6zKBojD1E0t
+         UTvw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731034914; x=1731639714;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
+        d=1e100.net; s=20230601; t=1731036251; x=1731641051;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2AFkIv1SzzbZMo5JYC3sgbdI5jWNWjyyxyaxG1ONBas=;
-        b=JiywJtlTpXEAcZagz4Atr1YMZTLgO9M2vBHH1vryF3w3TmVRhQwfhylP+c0aE7g79+
-         trhGg2j91qfOZQDfj4oAJELZJz2zkFLnTH3Gwwn142B0lLLKRgzFYcEljfQKy+kF/wKT
-         WMi3gVbMViQJoXoRoopFNqCHUiOXqJ2Pcpaibow/o2XK43bx8kx/0SA58lkWveS/OHoH
-         3hXbt4WlmHhtt2aFw0wUTVfJ7UM7As6faBzrCoeLf43X/LNRhAfSMK52TCha1xjW7i2G
-         KIQqghR7zPktdqB8ubV3MNGk/kp6KQCVSckvfU16A/EgK/7jitAbBTbLiL5lDuRvyl6p
-         ItzA==
-X-Forwarded-Encrypted: i=1; AJvYcCW0cJKHFJluuXVegUzlANKex0RK0PFHZ5mWOTdQuyUYOaJBioSBFnEJznNjCNKasJ/TfcyEbq0j6BQ=@vger.kernel.org, AJvYcCWmvzrQEYf2rONjGW1HMQedas06A/tnRb2VJgZo7xropvfCYowJbXSDzmoxi3y2rw2gHA8nbVRY+THR4w0X@vger.kernel.org
-X-Gm-Message-State: AOJu0Yw0gFizOHbC4a3wP+Lb5B6hmFFCjry3c8vxT9VS3YzAEGkuqo1v
-	wT7aQA4cFw433KJsI3GJSM8sRGVJdAXwJQupjg/taCFATxCHQOg=
-X-Google-Smtp-Source: AGHT+IHUqWILqJFNgB/xW1oz/3+eUiw2vIPL5tpyxz94DFjCJ6fiCYhx2hDJejDi2PBvvkZtB2NTaw==
-X-Received: by 2002:a17:902:e805:b0:20c:5c6b:2eac with SMTP id d9443c01a7336-211835ccb49mr14277365ad.49.1731034913729;
-        Thu, 07 Nov 2024 19:01:53 -0800 (PST)
-Received: from localhost ([2601:646:9e00:f56e:123b:cea3:439a:b3e3])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dc8264sm20525145ad.33.2024.11.07.19.01.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 19:01:53 -0800 (PST)
-Date: Thu, 7 Nov 2024 19:01:52 -0800
-From: Stanislav Fomichev <stfomichev@gmail.com>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Eric Dumazet <edumazet@google.com>,
-	Willem de Bruijn <willemb@google.com>,
-	"David S. Miller" <davem@davemloft.net>, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>, Jonathan Corbet <corbet@lwn.net>,
-	Yi Lai <yi1.lai@linux.intel.com>,
-	Stanislav Fomichev <sdf@fomichev.me>
-Subject: Re: [PATCH net v2 2/2] net: clarify SO_DEVMEM_DONTNEED behavior in
- documentation
-Message-ID: <Zy1_IG9v1KK8u2X4@mini-arch>
-References: <20241107210331.3044434-1-almasrymina@google.com>
- <20241107210331.3044434-2-almasrymina@google.com>
- <Zy1priZk_LjbJwVV@mini-arch>
- <CAHS8izOJSd2-hkOBkL0Cy40xt-=1k8YdvkKS98rp2yeys_eGzg@mail.gmail.com>
+        bh=FiQi+zVrti/4lwYHeXMzDjh6Y9tSUZHidpZ6r5DzMFs=;
+        b=DbFcNYqarDnf3AAmmeJ9sXJDh8Pvk6LuBEy3kNwYZI5uIKfMLWOcqFxI1Wdi9twt4u
+         2+bfFioybolyn1yw1gbbkoNiueOmtZ8La3Sx8+WgB7R+3lxD2Fc7OKbyw0rKZiKqal+F
+         oMHC/15ogL2rOOaXtcHP9EpIDcw7k5hflKgdhdv7OOhdIjDmcuQKCkhgbHHsG9IeByNq
+         7I3OttQyZIgbkKJs/la08GH4YabsqDAiYDMUpkKclnU5Qsw9u+xJGpA4NA/MWOHub7Nz
+         EvjiV8JSSKoewqV/fdlhalt/EA9cWmWiL6bdH8lc8BzPHw1ve6F85QUrYVl6+RoqZKTd
+         jm3Q==
+X-Forwarded-Encrypted: i=1; AJvYcCUV32pIPtYUrpRBM7Nz5ChdP6O0CmpNEUNH7DhzvxW92Xn7g4Chn0VYMt3Bjdfqmr1ewkfPutdGMyYHgPu4@vger.kernel.org, AJvYcCUo3Q6RohNRJiasNP++8KJetcF7S02SW2NTBwkIlwC48FJy6nYxQ7p3UbskS7zXuux5DYCPZbeb@vger.kernel.org, AJvYcCUpvwIbTxFIwe8tBlrF3fNtMa6Edk/etbngpzcSRJ5zmEEcn4qFhtElfECikhszK4ax9C4y6YPcGR5D@vger.kernel.org
+X-Gm-Message-State: AOJu0YyBwTimZFeoJcF3Gh34mjq+orNIOHzr0UM+XXOKt6Y8Ogq4tIyX
+	khhsfqLKEtBb/hyEWZAo4dnBajdOCR28DGSgPw4Chh7HlqnM67cy
+X-Google-Smtp-Source: AGHT+IEuCqDHEhTNFZCpyyg20d0b3Zu/p1XC6BTzBjuWov+1G8DqVUKH6K6wMKylQPRL5ggF5yB5RQ==
+X-Received: by 2002:a05:6a00:1a89:b0:71e:4ee1:6d78 with SMTP id d2e1a72fcca58-7241327a424mr1559577b3a.1.1731036250950;
+        Thu, 07 Nov 2024 19:24:10 -0800 (PST)
+Received: from [192.168.0.104] (60-250-192-107.hinet-ip.hinet.net. [60.250.192.107])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-7240785fbe9sm2556540b3a.37.2024.11.07.19.24.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 07 Nov 2024 19:24:10 -0800 (PST)
+Message-ID: <7a476087-9efc-4271-bd2c-d04a0c1d0dff@gmail.com>
+Date: Fri, 8 Nov 2024 11:24:04 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH 1/3] dt-bindings: net: nuvoton: Add schema for Nuvoton
+ MA35 family GMAC
+To: Conor Dooley <conor@kernel.org>
+Cc: andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, robh@kernel.org, krzk+dt@kernel.org,
+ conor+dt@kernel.org, mcoquelin.stm32@gmail.com, richardcochran@gmail.com,
+ alexandre.torgue@foss.st.com, joabreu@synopsys.com, ychuang3@nuvoton.com,
+ schung@nuvoton.com, yclu4@nuvoton.com, linux-arm-kernel@lists.infradead.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, openbmc@lists.ozlabs.org,
+ linux-stm32@st-md-mailman.stormreply.com
+References: <20241106111930.218825-1-a0987203069@gmail.com>
+ <20241106111930.218825-2-a0987203069@gmail.com>
+ <20241106-bloated-ranch-be94506d360c@spud>
+ <7c2f6af3-5686-452a-8d8a-191899b3d225@gmail.com>
+ <20241107-slip-graceful-767507d20d1b@spud>
+Content-Language: en-US
+From: Joey Lu <a0987203069@gmail.com>
+In-Reply-To: <20241107-slip-graceful-767507d20d1b@spud>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAHS8izOJSd2-hkOBkL0Cy40xt-=1k8YdvkKS98rp2yeys_eGzg@mail.gmail.com>
 
-On 11/07, Mina Almasry wrote:
-> On Thu, Nov 7, 2024 at 5:30 PM Stanislav Fomichev <stfomichev@gmail.com> wrote:
-> >
-> > On 11/07, Mina Almasry wrote:
-> > > Document new behavior when the number of frags passed is too big.
-> > >
-> > > Signed-off-by: Mina Almasry <almasrymina@google.com>
-> > > ---
-> > >  Documentation/networking/devmem.rst | 9 +++++++++
-> > >  1 file changed, 9 insertions(+)
-> > >
-> > > diff --git a/Documentation/networking/devmem.rst b/Documentation/networking/devmem.rst
-> > > index a55bf21f671c..d95363645331 100644
-> > > --- a/Documentation/networking/devmem.rst
-> > > +++ b/Documentation/networking/devmem.rst
-> > > @@ -225,6 +225,15 @@ The user must ensure the tokens are returned to the kernel in a timely manner.
-> > >  Failure to do so will exhaust the limited dmabuf that is bound to the RX queue
-> > >  and will lead to packet drops.
-> > >
-> > > +The user must pass no more than 128 tokens, with no more than 1024 total frags
-> > > +among the token->token_count across all the tokens. If the user provides more
-> > > +than 1024 frags, the kernel will free up to 1024 frags and return early.
-> > > +
-> > > +The kernel returns the number of actual frags freed. The number of frags freed
-> > > +can be less than the tokens provided by the user in case of:
-> > > +
-> >
-> > [..]
-> >
-> > > +(a) an internal kernel leak bug.
-> >
-> > If you're gonna respin, might be worth mentioning that the dmesg
-> > will contain a warning in case of a leak?
-> 
-> We will not actually warn in the likely cases of leak.
-> 
-> We warn when we find an entry in the xarray that is not a net_iov, or
-> if napi_pp_put_page fails on that net_iov. Both are very unlikely to
-> happen honestly.
-> 
-> The likely 'leaks' are when we don't find the frag_id in the xarray.
-> We do not warn on that because the user can intentionally trigger the
-> warning with invalid input. If the user is actually giving valid input
-> and the warn still happens, likely a kernel bug like I mentioned in
-> another thread, but we still don't warn.
 
-In this case, maybe don't mention the leaks at all? If it's not
-actionable, not sure how it helps?
+Conor Dooley 於 11/8/2024 1:09 AM 寫道:
+> On Thu, Nov 07, 2024 at 06:15:51PM +0800, Joey Lu wrote:
+>> Conor Dooley 於 11/6/2024 11:44 PM 寫道:
+>>> On Wed, Nov 06, 2024 at 07:19:28PM +0800, Joey Lu wrote:
+>>>> +  nuvoton,sys:
+>>>> +    $ref: /schemas/types.yaml#/definitions/phandle
+>>>> +    description: phandle to access GCR (Global Control Register) registers.
+>>> Why do you need a phandle to this? You appear to have multiple dwmacs on
+>>> your device if the example is anything to go by, how come you don't need
+>>> to access different portions of this depending on which dwmac instance
+>>> you are?
+>> On our platform, a system register is required to specify the TX/RX clock
+>> path delay control, switch modes between RMII and RGMII, and configure other
+>> related settings.
+>>>> +  resets:
+>>>> +    maxItems: 1
+>>>> +
+>>>> +  reset-names:
+>>>> +    items:
+>>>> +      - const: stmmaceth
+>>>> +
+>>>> +  mac-id:
+>>>> +    maxItems: 1
+>>>> +    description:
+>>>> +      The interface of MAC.
+>>> A vendor prefix is required for custom properties, but I don't think you
+>>> need this and actually it is a bandaid for some other information you're
+>>> missing. Probably related to your nuvoton,sys property only being a
+>>> phandle with no arguments.
+>> This property will be removed.
+> I'm almost certain you can't just remove this property, because you need
+> it to tell which portion of the GCR is applicable to the dwmac instance
+> in question. Instead, you need to ad an argument to your phandle. The
+> starfive dwmac binding/driver has an example of what you can do.
+
+Yes, I will use this method instead.🙂
+
+mac-id and tx/rx-delay will be arguments of syscon.
+
+Thanks!
+
 
