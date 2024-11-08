@@ -1,126 +1,192 @@
-Return-Path: <netdev+bounces-143238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6AB0A9C1857
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:48:52 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A002D9C1879
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:53:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id DACC0B23EE8
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:48:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5F70E287098
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 08:53:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06921DE4D9;
-	Fri,  8 Nov 2024 08:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2D001DEFEA;
+	Fri,  8 Nov 2024 08:53:50 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="eoDksDiT"
+	dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b="Kmng3OZF"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA491494D4
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 08:48:34 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 812A91494D4;
+	Fri,  8 Nov 2024 08:53:47 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=68.232.154.123
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731055716; cv=none; b=Z99DLohPGbIuGv0NAqOwIlN29+Esuen6TjZyWmeZjFYH4fomLqeX1Rso6e4CRt8pkWiaw5q7WZsXjxnLXMG7gQDXMormDMPT7FGcg6TohsDv/TXUXKXKtYmHoXAqK5xSe/5OZzrhbNVbdrbbTBy5oRIzEb68Dk3l5AXEPYFH5IU=
+	t=1731056030; cv=none; b=fgA7Z2cxMqZUjEnEZfWAQQI6vjPg/wRSfkYQhm6ueJxkXwjzbD/F9nTfjSoo0Br62GAaT+hHcmDz+JGMYtHQ1SfvOEtV2nMRiVpyEwpEA07gC963UE2Wrkkt4qlMEsh8ElYDB3rbCVLl5IYNDt5Znd/uzwt7PRH+fFVE5U7l2UM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731055716; c=relaxed/simple;
-	bh=QUMslSd5+7vmPhBvFqJFbLH0QvtylNmBG3Rd0BiAc18=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=qWaiF31Ce+m6BkKEiw/J70e1stKWdWYZZRogJXZvyKNA4UGIfn/Gn5Zaq12pbrijsGBMqdaIHKcmPV7+90mQtDY+3JQjtm27mHB1oz8DPn1+PNU+hpHYP3w9xAdqH7he9SF8k8QydbOiORnKOezsQTQMLUbl+LF5d7qm5KDAYNE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=eoDksDiT; arc=none smtp.client-ip=170.10.129.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731055713;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uYHTkptT6ou5l6p02xIsQwxrcvbgxf99D1myY1C6iho=;
-	b=eoDksDiTMrS+Y/EdWSDerGzEvHv4ZEuL3wz7WO0ZvjPNqeSPJitRJ8YGuHSUZYTFhm1HuZ
-	gfw+l4kP1EbIFpCsyRnbtklw8dCJ+3RaHA7gt3Jk9EkMwu9AcsvMiLf340yG+zma8zglAF
-	k+8SCK9UIZrB0LiH6atuz7xpHReeM1w=
-Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
- [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-407-MKjjXklsOfejzu4XP-XI1Q-1; Fri, 08 Nov 2024 03:48:31 -0500
-X-MC-Unique: MKjjXklsOfejzu4XP-XI1Q-1
-X-Mimecast-MFC-AGG-ID: MKjjXklsOfejzu4XP-XI1Q
-Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-37d462b64e3so977059f8f.3
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 00:48:31 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731055710; x=1731660510;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uYHTkptT6ou5l6p02xIsQwxrcvbgxf99D1myY1C6iho=;
-        b=LRE9pixBt3P91wx7G7QuU4pB2VvIyAeoE2nnBGIq6oN0AEJmhQXSXI0ch90yTx1pjr
-         SpU2V/CRnrtoFQ5VmX4gMuZ4Qxi2oqrhYwV96lok80CjgzDytqXaL5k+mtpBfQI43BAb
-         l+6KarXoE9Ol/vU9LFzEfcF1D7rS+bJNQry9phnZp7oFVC0t8/f/AR6tu7LJlbuHFHPO
-         /YZJrn+NbQji3R3ta/IdeOuX9D3NK8x8Fm1AmWfCL9bO/RO4jhbSHbskY0vsqEn7DXqw
-         bCQk17bJsb6cDLyAE8XisC6DwvUQO+2aQgJ9DrKgTlV3Sm0fj3VPp3oMkep5FgB5OQQR
-         vgmw==
-X-Forwarded-Encrypted: i=1; AJvYcCUtkMDalw+zZmJ3d5tbH4170gDdIUYw0/8ljgm2MY48wo35jIlv2rqsB5+dTA9Gd64nY/1WlIM=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwWL9nrKd2H2pbfOhTGIvwbc2TrVoM0ertGeOjIEIezfbZF8ma6
-	2LU1JhBMiS16dZsLMBaTheHd/YekWOcnzeonO9bVm7On49W6O/rTAmjPk2tRiTgnVitiMfCpD+t
-	1W/l/Zr4mhJAEaaFgf0PAnWgWWPsmcvTshJJQSHMkBpiAioJatI5ptw==
-X-Received: by 2002:a05:6000:1548:b0:381:eb8a:7ddd with SMTP id ffacd0b85a97d-381f1866989mr1759293f8f.15.1731055710715;
-        Fri, 08 Nov 2024 00:48:30 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IEIaAbzDhaCkwg/UVIfjicTfoiBdfShUzYxSOC6+qJlzAeZo1U91jzrukrCO0X0SBMgRzrjVg==
-X-Received: by 2002:a05:6000:1548:b0:381:eb8a:7ddd with SMTP id ffacd0b85a97d-381f1866989mr1759271f8f.15.1731055710387;
-        Fri, 08 Nov 2024 00:48:30 -0800 (PST)
-Received: from [192.168.88.24] (146-241-44-112.dyn.eolo.it. [146.241.44.112])
-        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed9f8f0asm4046400f8f.79.2024.11.08.00.48.29
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 00:48:29 -0800 (PST)
-Message-ID: <54bbccb2-6633-4638-9dce-14683b4e320b@redhat.com>
-Date: Fri, 8 Nov 2024 09:48:28 +0100
+	s=arc-20240116; t=1731056030; c=relaxed/simple;
+	bh=AcVXvw+r6ZLlMrJuixd3Dp/DLv/ioDFxkx3vejkhmOA=;
+	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=kiJWbdqx9ad3muKw16s64Ul4vGJ4Q3ysUvFKkKyD4acRRH1+xobzukOy97hdsBE9SFEJ68O3YtCWnbPeYodwqDLOk+W5/SQcHzBtdDKz3/qgw+6LxYbBY699r6CZkxIZ6o+WFsa0lEPSgtv0YPZ4T+PacfV3vThnegpd3xJ/Hto=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com; spf=pass smtp.mailfrom=microchip.com; dkim=pass (2048-bit key) header.d=microchip.com header.i=@microchip.com header.b=Kmng3OZF; arc=none smtp.client-ip=68.232.154.123
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=microchip.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=microchip.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1731056027; x=1762592027;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=AcVXvw+r6ZLlMrJuixd3Dp/DLv/ioDFxkx3vejkhmOA=;
+  b=Kmng3OZFb8XSd3dz3o/H+jFkRjNvkocstp8mMEnIXwMZa45WaxXZlOpS
+   EZm55sLm8RA4f4RH1roqA4/Pmn0uQ1rjRmahDdxwzmkRzw/HjFJ5UsOQY
+   2uWtl53OTbFUXuCCH6ngyU+92kQSjNuZBlDEcthqUHRSaEQnHW1nMQG9T
+   oJZqkVbiuHMaU5dHQV3zngh2pdU96nYlr1NIOB2feBdt7CFw22sIEbtqI
+   Pka7ReHS3hS/Uk1IxKkpD5qT+wHfQUs9ouAoVcoTpHtPFQ5SML2br9fhQ
+   /Tb6Qn1UPK3bT/9Lnzl5zEBLqhVdMcTT+Y9fZ7PVhd73TpF64DvzDe6g8
+   g==;
+X-CSE-ConnectionGUID: /fgcW3NtTnSPHHSCigru4g==
+X-CSE-MsgGUID: vj1XepvpRP2CPB/h/uuGDw==
+X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
+   d="scan'208";a="34564781"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 08 Nov 2024 01:53:46 -0700
+Received: from chn-vm-ex02.mchp-main.com (10.10.85.144) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.35; Fri, 8 Nov 2024 01:53:23 -0700
+Received: from DEN-DL-M70577 (10.10.85.11) by chn-vm-ex02.mchp-main.com
+ (10.10.85.144) with Microsoft SMTP Server id 15.1.2507.35 via Frontend
+ Transport; Fri, 8 Nov 2024 01:53:21 -0700
+Date: Fri, 8 Nov 2024 08:53:20 +0000
+From: Daniel Machon <daniel.machon@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <UNGLinuxDriver@microchip.com>, Andrew Lunn <andrew+netdev@lunn.ch>,
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Lars
+ Povlsen" <lars.povlsen@microchip.com>, Steen Hegelund
+	<Steen.Hegelund@microchip.com>, Horatiu Vultur
+	<horatiu.vultur@microchip.com>, Russell King <linux@armlinux.org.uk>,
+	<jacob.e.keller@intel.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>
+Subject: Re: [PATCH net-next 7/7] net: lan969x: add function for configuring
+ RGMII port devices
+Message-ID: <20241108085320.fqbell5bfx3roey4@DEN-DL-M70577>
+References: <20241106-sparx5-lan969x-switch-driver-4-v1-0-f7f7316436bd@microchip.com>
+ <20241106-sparx5-lan969x-switch-driver-4-v1-7-f7f7316436bd@microchip.com>
+ <6fee4db6-0085-4ce8-a6b5-050fddd0bc5a@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [PATCH net-next] net: ppp: remove ppp->closing check
-To: Qingfang Deng <dqfext@gmail.com>
-Cc: Andrew Lunn <andrew+netdev@lunn.ch>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, linux-ppp@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20241104092434.2677-1-dqfext@gmail.com>
- <7e0df321-e297-4d32-aac5-a885de906ad5@redhat.com>
- <CALW65jaKn7HQth6oYYHWYvg7CTZJj2QH66nHyo41BNjAA15Y7g@mail.gmail.com>
-Content-Language: en-US
-From: Paolo Abeni <pabeni@redhat.com>
-In-Reply-To: <CALW65jaKn7HQth6oYYHWYvg7CTZJj2QH66nHyo41BNjAA15Y7g@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <6fee4db6-0085-4ce8-a6b5-050fddd0bc5a@lunn.ch>
 
-On 11/8/24 07:09, Qingfang Deng wrote:
-> On Thu, Nov 7, 2024 at 8:08 PM Paolo Abeni <pabeni@redhat.com> wrote:
->> On 11/4/24 10:24, Qingfang Deng wrote:
->>> ppp->closing was used to test if an interface is closing down. But upon
->>> .ndo_uninit() where ppp->closing is set to 1, dev_close() is already
->>> called to bring down an interface and a synchronize_net() guarantees
->>> that no pending TX/RX can take place, so the check is unnecessary.
->>> Remove the check.
->>
->> I'm unsure we can remote such check. The TX callback can be triggered
->> even from a write on the controlling file, and it looks like such file
->> will be untouched by uninit.
+Hi Andrew,
+
+> > The lan969x switch device includes two RGMII interfaces (port 28 and 29)
+> > supporting data speeds of 1 Gbps, 100 Mbps and 10 Mbps.
+> >
+> > Add new function: rgmii_config() to the match data ops, and use it to
+> > configure RGMII port devices when doing a port config.  On Sparx5, the
+> > RGMII configuration will always be skipped, as the is_port_rgmii() will
+> > return false.
+> >
+> > Reviewed-by: Steen Hegelund <Steen.Hegelund@microchip.com>
+> > Reviewed-by: Horatiu Vultur <horatiu.vultur@microchip.com>
+> > Signed-off-by: Daniel Machon <daniel.machon@microchip.com>
+> > ---
+> >  drivers/net/ethernet/microchip/lan969x/lan969x.c   | 105 +++++++++++++++++++++
+> >  .../net/ethernet/microchip/sparx5/sparx5_main.h    |   2 +
+> >  .../net/ethernet/microchip/sparx5/sparx5_port.c    |   3 +
+> >  3 files changed, 110 insertions(+)
+> >
+> > diff --git a/drivers/net/ethernet/microchip/lan969x/lan969x.c b/drivers/net/ethernet/microchip/lan969x/lan969x.c
+> > index cfd57eb42c04..0681913a05d4 100644
+> > --- a/drivers/net/ethernet/microchip/lan969x/lan969x.c
+> > +++ b/drivers/net/ethernet/microchip/lan969x/lan969x.c
+> > @@ -9,6 +9,17 @@
+> >  #define LAN969X_SDLB_GRP_CNT 5
+> >  #define LAN969X_HSCH_LEAK_GRP_CNT 4
+> >
+> > +#define LAN969X_RGMII_TX_CLK_DISABLE 0  /* Disable TX clock generation*/
+> > +#define LAN969X_RGMII_TX_CLK_125MHZ 1   /* 1000Mbps */
+> > +#define LAN969X_RGMII_TX_CLK_25MHZ  2   /* 100Mbps */
+> > +#define LAN969X_RGMII_TX_CLK_2M5MHZ 3   /* 10Mbps */
+> > +#define LAN969X_RGMII_PORT_START_IDX 28 /* Index of the first RGMII port */
+> > +#define LAN969X_RGMII_PORT_RATE 2       /* 1000Mbps  */
+> > +#define LAN969X_RGMII_SHIFT_90DEG 3     /* Phase shift 90deg. (2 ns @ 125MHz) */
+> > +#define LAN969X_RGMII_IFG_TX 4          /* TX Inter Frame Gap value */
+> > +#define LAN969X_RGMII_IFG_RX1 5         /* RX1 Inter Frame Gap value */
+> > +#define LAN969X_RGMII_IFG_RX2 1         /* RX2 Inter Frame Gap value */
+> > +
+> >  static const struct sparx5_main_io_resource lan969x_main_iomap[] =  {
+> >       { TARGET_CPU,                   0xc0000, 0 }, /* 0xe00c0000 */
+> >       { TARGET_FDMA,                  0xc0400, 0 }, /* 0xe00c0400 */
+> > @@ -293,6 +304,99 @@ static irqreturn_t lan969x_ptp_irq_handler(int irq, void *args)
+> >       return IRQ_HANDLED;
+> >  }
+> >
+> > +static int lan969x_port_config_rgmii(struct sparx5 *sparx5,
+> > +                                  struct sparx5_port *port,
+> > +                                  struct sparx5_port_config *conf)
+> > +{
+> > +     int tx_clk_freq, idx = port->portno - LAN969X_RGMII_PORT_START_IDX;
+> > +     enum sparx5_port_max_tags max_tags = port->max_vlan_tags;
+> > +     enum sparx5_vlan_port_type vlan_type = port->vlan_type;
+> > +     bool dtag, dotag, tx_delay = false, rx_delay = false;
+> > +     u32 etype;
+> > +
+> > +     tx_clk_freq = (conf->speed == SPEED_10  ? LAN969X_RGMII_TX_CLK_2M5MHZ :
+> > +                    conf->speed == SPEED_100 ? LAN969X_RGMII_TX_CLK_25MHZ :
+> > +                                               LAN969X_RGMII_TX_CLK_125MHZ);
 > 
-> ppp_release (when the file is closed) calls unregister_netdevice, and
-> no more writes can happen after that.
+> https://www.spinics.net/lists/netdev/msg1040925.html
+> 
+> Once it is merged, i think this does what you want.
+>
 
-AFAICS the device can be deleted even without closing the file, via
-netlink or deleting the namespace. In such cases, AFAICS, the file is
-still alive.
+Nice! Thanks for letting me know.
 
-In any case we need a more solid explanation describing why the change
-is safe (and possibly a test-case deleting the device in different ways).
+> > +     if (conf->phy_mode == PHY_INTERFACE_MODE_RGMII ||
+> > +         conf->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
+> > +             rx_delay = true;
+> > +
+> > +     if (conf->phy_mode == PHY_INTERFACE_MODE_RGMII ||
+> > +         conf->phy_mode == PHY_INTERFACE_MODE_RGMII_RXID)
+> > +             tx_delay = true;
+> 
+> O.K, now warning bells are ringing in this reviews head.
+> 
+> What i don't see is the value you pass to the PHY? You obviously need
+> to mask out what the MAC is doing when talking to the PHY, otherwise
+> both ends will add delays.
+> 
 
-/P
+What value should be passed to the PHY?
 
+We (the MAC) add the delays based on the PHY modes - so does the PHY.
+
+RGMII, we add both delays.
+RGMII_ID, the PHY adds both delays.
+RGMII_TXID, we add the rx delay, the PHY adds the tx delay.
+RGMII_RXID, we add the tx delay, the PHY adds the rx delay.
+
+Am I missing something here? :-)
+
+> And in general in Linux, we have the PHY add the delays, not the
+> MAC. It is somewhat arbitrary, but the vast majority of systems do
+> that. The exception is systems where the PHY is too dumb/cheap to add
+> the delays and so the MAC has to do it. I'm don't know of any
+> Microchip PHYs which don't support RGMII delays.
+
+Ack.
+
+> 
+>         Andrew
+
+/Daniel
 
