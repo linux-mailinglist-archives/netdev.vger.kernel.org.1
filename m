@@ -1,207 +1,184 @@
-Return-Path: <netdev+bounces-143406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 345589C24D3
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:22:11 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DE21F9C24E2
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:28:36 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 8F098B20C71
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:22:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14CA91C23EA0
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:28:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E56E192B6F;
-	Fri,  8 Nov 2024 18:22:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BC8198E85;
+	Fri,  8 Nov 2024 18:28:31 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="BNJXERGQ"
+	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QiDGOCZZ"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0AD43233D60;
-	Fri,  8 Nov 2024 18:22:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E696C233D88
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 18:28:27 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731090125; cv=none; b=fIQz4q6SX/wBKtMsnp6I5uC/6E9Qu29M/VbhrYNT2on+ZlKoDA7/ai1sBHLEepu6fWM30d2aP/CMk9pV6MrtgkdbAQRMq/zHpHLX9YYQq86j2d3bZBQ80zSv3BzaX9BhiSq/T2g269cgGCFwlp6u9zkWO8zV7RUWG8x1RFp1Ka4=
+	t=1731090511; cv=none; b=kL1lGP2K/e5mXvaeT/MxLYU7stzCdpiyPXvTgy1WIlEf0ygmRshlo9IsA61ki37eVBDPBLvaCDkwCEymEyWhYXpTRerUvuDMGv1yVXJKX0Q77uvEo5C/IiBIg6EnqDeM6sHY9B1i3lfj8AKKGL0cXM5Jy1nIpw2DqWErK7QBCWE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731090125; c=relaxed/simple;
-	bh=uSbhMMNXHlsMSzCdJptCATaZ8Ww+L2KbwXDPpWyMELc=;
-	h=Message-ID:Date:MIME-Version:To:Cc:From:Subject:Content-Type; b=nzFe4JCV18xYH+0EBnK0nO35QuI8tATJ0HI8rMrQhrwgNogS1AH56CVae21UdMfCOr4naclqJ5wYY4zXxvEQBbEk3H7Lp+2Ui8SaaoRveLrmtVEQqYYW8NnWrtlj+yTEfdHlnamQrNUt0GtS2LkQ2QcTyw9Yawm9zmrqgafclVo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=BNJXERGQ; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 04088C4CECD;
-	Fri,  8 Nov 2024 18:22:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731090124;
-	bh=uSbhMMNXHlsMSzCdJptCATaZ8Ww+L2KbwXDPpWyMELc=;
-	h=Date:To:Cc:From:Subject:From;
-	b=BNJXERGQde9LzwMDtEYyxf4jQdMXY4FLQADYMkmnjpB/woYao/4OInEPnzSDezJxQ
-	 Q1NUbA6L6RVsVEiiQs48N2P9OYJN9oAf6+DZXwDybyvLX6TN6YZ06CJOje8bNfsS1b
-	 LUc7AtFr3JHDxVI3HnDGBuSnuZ/wZXpcf2BR8pHR9/lOhN7vupLtQEqkOBkNWbKd/M
-	 kviLEMcOkF7bY1xwd0litkU7qQe7qfnLB5CYFxNY5cDHHmWm3Q5xiyKfhFka16p2vt
-	 9LkbHeXlCRGMGxhC+CcMuAgOr7TnswGBg6xGLoQ0bNRyhDCuvuYQlMppGQ4KwhpH8h
-	 t4xXzhYeOPE9A==
-Message-ID: <ff870428-6375-4125-83bd-fc960b3c109b@kernel.org>
-Date: Fri, 8 Nov 2024 19:21:59 +0100
+	s=arc-20240116; t=1731090511; c=relaxed/simple;
+	bh=aomfWlwmh/DGJ3+fy8dkpzWlh+NgDtApGrsMDMYyB5M=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=kVNf6TCH4S9uAzqXMQC/Wz1fug54nUfoJI4SUQFwnZpzeNaY9XxTgw9ycZqi4TFkKBIc1RdGo1qCE/Z+ybjc238AOO95iV2LGm8Sq5JxpfQdqaSIhmp44wjffahp5vb1OivbGmvUrVtNrlfMTvl8AukaJuUyr1QGjkKj15sAzGU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QiDGOCZZ; arc=none smtp.client-ip=209.85.222.171
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
+Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b15eadee87so158235085a.2
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 10:28:27 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bytedance.com; s=google; t=1731090507; x=1731695307; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=wWt0QTmkUmV9Tp/JVuTsCK3jbXPMK6hXiV333qvXKtQ=;
+        b=QiDGOCZZxblNzWHL0id1BZtHqWX/RYbam7FWXoQ8HYTMK30u2TNVUPTQ8e0oby2XfL
+         SBtiVqnA+Y2XdSgfYMljZOYSH4muyWiKcGwC6wZ16bSXS5qQ4Ct7FlBXyEPE66o/L3/i
+         7LnUpOsfH4dTiLC8aWYKfdVG/K5y0/jY6F9WyQpNDso5F3DCp0IxdB52DmDcPwG/u1xF
+         tqVrv7I8aVWZBMPVJ4hUTQIH5Nvfct3AvATHR9w26V6hNfSCRgVahQ+fjEBngWriJwG7
+         5cLlvZ+MRX4u6bMCHei/pmXVyl7YsK16UTTx1W8luCk8Cf4Twhev/hCf2BXlJjMsneNs
+         ctsA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731090507; x=1731695307;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=wWt0QTmkUmV9Tp/JVuTsCK3jbXPMK6hXiV333qvXKtQ=;
+        b=f21ioP3Ct/wqJjuMMSWflqDShKhDQiE6qhAALEfviJ5yLIaVqsS5gRmbzw8wx1RgCP
+         HKAoyTKPf/4mVKdluAi+TY+1N2N0todKNGMLtgpSqGF7QF/SGYcDPenhXohJs87eADqm
+         O0mx3J/dkNLBAuuK1KiTMdxBDAdLGHVJLn8ocMxd0tvI3HVJT37VkCF2nAJ7vURFwUsC
+         GQzh2pqA7sC3eip92leFG63UPqpqfyz7K6sYMmKPQMZPvtJjEbeje9AP//42AePxfbc8
+         I6FUFL4ZuerHYFFBuUPzBdpgQni1hzPDPJE0jasvu8XV6wHgGWxUutVkbr9OXfRVt0+J
+         DsQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWkW/nrsZDXe4h1+0ygwOAAQF3ylbq4cmMlnT4eV2kBphi76XYlwebfrCObL0+DSMVgkzKpemI=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzXnK6zyR4HBH8jk/sPTCyYucwoYe4hZla3OpL0Gf5lduHtjsWO
+	XzdJa2efo+poxsdeE22UIijpqoxyoIPsjrd7IhY4IBaRiEk9NVUn/pbdPiuu4UY=
+X-Google-Smtp-Source: AGHT+IHmZYkgO0mMRiqiwCpCNOTh+1bYly26r67Tsj8ccO33Oezw4Rv/52fZCQXG3sX6Lf+gYpAjZg==
+X-Received: by 2002:a05:620a:4510:b0:7a7:dd3a:a699 with SMTP id af79cd13be357-7b331d81d49mr504881285a.11.1731090506810;
+        Fri, 08 Nov 2024 10:28:26 -0800 (PST)
+Received: from ?IPV6:2601:647:4200:9750:c471:fcfc:9a61:b786? ([2601:647:4200:9750:c471:fcfc:9a61:b786])
+        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32acb0496sm182379985a.89.2024.11.08.10.28.23
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2024 10:28:26 -0800 (PST)
+Message-ID: <1016b317-d521-4787-80dc-3b92320f2d19@bytedance.com>
+Date: Fri, 8 Nov 2024 10:28:22 -0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Content-Language: en-GB
-To: Linux Kernel Functional Testing <lkft@linaro.org>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Shuah Khan <shuah@kernel.org>,
- Kernel Selftests <linux-kselftest@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>, Linux Kernel
- <linux-kernel@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn <willemb@google.com>,
- Naresh Kamboju <naresh.kamboju@linaro.org>, Ido Schimmel
- <idosch@nvidia.com>, stable@vger.kernel.org
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-Subject: LKFT CI: improving Networking selftests results when validating
- stable kernels
-Content-Type: text/plain; charset=UTF-8
+User-Agent: Mozilla Thunderbird
+Subject: Re: [External] Re: [PATCH bpf 2/2] tcp_bpf: add sk_rmem_alloc related
+ logic for ingress redirection
+To: Cong Wang <xiyou.wangcong@gmail.com>
+Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org,
+ cong.wang@bytedance.com
+References: <20241017005742.3374075-1-zijianzhang@bytedance.com>
+ <20241017005742.3374075-3-zijianzhang@bytedance.com>
+ <Zy2N48atzfYYTY6X@pop-os.localdomain>
+Content-Language: en-US
+From: Zijian Zhang <zijianzhang@bytedance.com>
+In-Reply-To: <Zy2N48atzfYYTY6X@pop-os.localdomain>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 
-Hello LKFT maintainers, CI operators,
 
-First, I would like to say thank you to the people behind the LKFT
-project for validating stable kernels (and more), and including some
-Network selftests in their tests suites.
+On 11/7/24 8:04 PM, Cong Wang wrote:
+> On Thu, Oct 17, 2024 at 12:57:42AM +0000, zijianzhang@bytedance.com wrote:
+>> From: Zijian Zhang <zijianzhang@bytedance.com>
+>>
+>> Although we sk_rmem_schedule and add sk_msg to the ingress_msg of sk_redir
+>> in bpf_tcp_ingress, we do not update sk_rmem_alloc. As a result, except
+>> for the global memory limit, the rmem of sk_redir is nearly unlimited.
+>>
+>> Thus, add sk_rmem_alloc related logic to limit the recv buffer.
+>>
+>> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
+>> ---
+>>   include/linux/skmsg.h | 11 ++++++++---
+>>   net/core/skmsg.c      |  6 +++++-
+>>   net/ipv4/tcp_bpf.c    |  4 +++-
+>>   3 files changed, 16 insertions(+), 5 deletions(-)
+>>
+>> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
+>> index d9b03e0746e7..2cbe0c22a32f 100644
+>> --- a/include/linux/skmsg.h
+>> +++ b/include/linux/skmsg.h
+>> @@ -317,17 +317,22 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
+>>   	kfree_skb(skb);
+>>   }
+>>   
+>> -static inline void sk_psock_queue_msg(struct sk_psock *psock,
+>> +static inline bool sk_psock_queue_msg(struct sk_psock *psock,
+>>   				      struct sk_msg *msg)
+>>   {
+>> +	bool ret;
+>> +
+>>   	spin_lock_bh(&psock->ingress_lock);
+>> -	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
+>> +	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
+>>   		list_add_tail(&msg->list, &psock->ingress_msg);
+>> -	else {
+>> +		ret = true;
+>> +	} else {
+>>   		sk_msg_free(psock->sk, msg);
+>>   		kfree(msg);
+>> +		ret = false;
+>>   	}
+>>   	spin_unlock_bh(&psock->ingress_lock);
+>> +	return ret;
+>>   }
+>>   
+>>   static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
+>> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
+>> index b1dcbd3be89e..110ee0abcfe0 100644
+>> --- a/net/core/skmsg.c
+>> +++ b/net/core/skmsg.c
+>> @@ -445,8 +445,10 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
+>>   			if (likely(!peek)) {
+>>   				sge->offset += copy;
+>>   				sge->length -= copy;
+>> -				if (!msg_rx->skb)
+>> +				if (!msg_rx->skb) {
+>>   					sk_mem_uncharge(sk, copy);
+>> +					atomic_sub(copy, &sk->sk_rmem_alloc);
+>> +				}
+>>   				msg_rx->sg.size -= copy;
+>>   
+>>   				if (!sge->length) {
+>> @@ -772,6 +774,8 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
+>>   
+>>   	list_for_each_entry_safe(msg, tmp, &psock->ingress_msg, list) {
+>>   		list_del(&msg->list);
+>> +		if (!msg->skb)
+>> +			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
+>>   		sk_msg_free(psock->sk, msg);
+> 
+> Why not calling this atomic_sub() in sk_msg_free_elem()?
+> 
+> Thanks.
 
-A lot of improvements around the networking kselftests have been done
-this year. At the last Netconf [1], we discussed how these tests were
-validated on stable kernels from CIs like the LKFT one, and we have some
-suggestions to improve the situation.
+sk_msg_free_elem called by sk_msg_free or sk_msg_free_no_charge will
+be invoked in multiple locations including TX/RX/Error and etc.
 
+We should call atomic_sub(&sk->sk_rmem_alloc) for sk_msgs that have
+been atomic_add before. In other words, we need to call atomic_sub
+only for sk_msgs in ingress_msg.
 
-KSelftests from the same version
---------------------------------
+As for "!msg->skb" check here, I want to make sure the sk_msg is not
+from function sk_psock_skb_ingress_enqueue, because these sk_msgs'
+rmem accounting has already handled by skb_set_owner_r in function
+sk_psock_skb_ingress.
 
-According to the doc [2], kselftests should support all previous kernel
-versions. The LKFT CI is then using the kselftests from the last stable
-release to validate all stable versions. Even if there are good reasons
-to do that, we would like to ask for an opt-out for this policy for the
-networking tests: this is hard to maintain with the increased
-complexity, hard to validate on all stable kernels before applying
-patches, and hard to put in place in some situations. As a result, many
-tests are failing on older kernels, and it looks like it is a lot of
-work to support older kernels, and to maintain this.
-
-Many networking tests are validating the internal behaviour that is not
-exposed to the userspace. A typical example: some tests look at the raw
-packets being exchanged during a test, and this behaviour can change
-without modifying how the userspace is interacting with the kernel. The
-kernel could expose capabilities, but that's not something that seems
-natural to put in place for internal behaviours that are not exposed to
-end users. Maybe workarounds could be used, e.g. looking at kernel
-symbols, etc. Nut that doesn't always work, increase the complexity, and
-often "false positive" issue will be noticed only after a patch hits
-stable, and will cause a bunch of tests to be ignored.
-
-Regarding fixes, ideally they will come with a new or modified test that
-can also be backported. So the coverage can continue to grow in stable
-versions too.
-
-Do you think that from the kernel v6.12 (or before?), the LKFT CI could
-run the networking kselftests from the version that is being validated,
-and not from a newer one? So validating the selftests from v6.12.1 on a
-v6.12.1, and not the ones from a future v6.16.y on a v6.12.42.
-
-
-Skipped tests
--------------
-
-It looks like many tests are skipped:
-
-- Some have been in a skip file [3] for a while: maybe they can be removed?
-
-- Some are skipped because of missing tools: maybe they can be added?
-e.g. iputils, tshark, ipv6toolkit, etc.
-
-- Some tests are in 'net', but in subdirectories, and hence not tested,
-e.g. forwarding, packetdrill, netfilter, tcp_ao. Could they be tested too?
-
-How can we change this to increase the code coverage using existing tests?
-
-
-KVM
----
-
-It looks like different VMs are being used to execute the different
-tests. Do these VMs benefit from any accelerations like KVM? If not,
-some tests might fail because the environment is too slow.
-
-The KSFT_MACHINE_SLOW=yes env var can be set to increase some
-tolerances, timeout or to skip some parts, but that might not be enough
-for some tests.
-
-
-Notifications
--------------
-
-In case of new regressions, who is being notified? Are the people from
-the MAINTAINERS file, and linked to the corresponding selftests being
-notified or do they need to do the monitoring on their side?
-
-
-Looking forward to improving the networking selftests results when
-validating stable kernels!
-
-
-[1] https://netdev.bots.linux.dev/netconf/2024/
-[2] https://docs.kernel.org/dev-tools/kselftest.html
-[3]
-https://github.com/Linaro/test-definitions/blob/master/automated/linux/kselftest/skipfile-lkft.yaml
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
 
 
