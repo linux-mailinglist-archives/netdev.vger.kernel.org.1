@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-143262-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143263-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92D189C1BC5
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:00:33 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66DB89C1BC6
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:00:39 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 037EAB2543E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:00:31 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id C8893B24B52
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:00:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345ED1E3DF8;
-	Fri,  8 Nov 2024 10:59:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB831E47AB;
+	Fri,  8 Nov 2024 10:59:04 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVJNzxv1"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="YjvyN4G9"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718C51E3DF5
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 10:59:00 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012071E3DD8
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 10:59:02 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731063543; cv=none; b=ZIOtD1G5UTCrgaJgNMVmJur3OpK3EVLIKUzy/8PPA5r8KL5wAcP/x7AYTupZwLGpPI72fWBER33+tWE1W4vMmqZ6DutALXvj57gQrYqfdECuCw2Ym4BDGIvl7J9Qha38/bYcn0Ettue9DzoXGXFzU4+m+Ei75zmG3ZtULHmq5hw=
+	t=1731063544; cv=none; b=LC2aDu228BoSoCbPAskIL5+AI3le2KPMTva1saPw9JWJKZCp3EltK0j6jEMkDR0ymUDsmXxlcIBmjsh3HF1v5VpGwTfBA9PKvhvQHfdhVEexsT5xrCQ0EYOzS1NuC7Qb2EKqmHtasAI37N5j2XM0CxQQZG5ELQ0Mr5B338uWerY=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731063543; c=relaxed/simple;
-	bh=6VS9VnfuAk+K1Eyqmm/TKciO4GfKZaTxogfw7UAMIbo=;
+	s=arc-20240116; t=1731063544; c=relaxed/simple;
+	bh=HnlIv0shPYlrmFHUiRovfXGGOpfl3wKy7+j8e+K5FkI=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=a7Fw+IMiq+RjDvXz8iYlgcAAGl0YFGTQNNU7nIMg9L3RyQX1oTLg4yE00pWKNkZiz6nYipQTe0GZq5mIwab/qz6A7Ag/+fZ/4LXN0mrEKnz3Znwzb4Gcwm7Hpl1SQsR76cwtRIHWioQm+ThC2AKXJCUMadZUPpmgxt9DzCFgXoQ=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hVJNzxv1; arc=none smtp.client-ip=170.10.133.124
+	 MIME-Version; b=FVPVrtx0sLb266/ztG1CknmXtSQ/UNZrj7Y8CR/GAmcwP2l4vcg0IXLT3sKshZ/oX23h4+I0WnpZb/9FR/iIPleuYrWrYgbeUWXvtK3F5bNIjd8+69YTnDN0bnaJlIR9NXxyaDXHgI+4WpvcXGPT7e0JfpTWvB1567HhHX7nbgY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=YjvyN4G9; arc=none smtp.client-ip=170.10.129.124
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731063539;
+	s=mimecast20190719; t=1731063542;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=2+LpEpuygvE4o5DXZ4E6E2ItXbhagPjPDPiUxWLNwM4=;
-	b=hVJNzxv1WMnLEnHo8d+A30pSC9iTcW/NIsd1QSQwCoqDPTA6esrmTRTNXtLxzQRefjty2P
-	xBrRmm2/qFkD92yyxEvHCt9Me8A7ZeIJuJumFu0YuwgoBtAqL3UHBXnrddLHlDolqgX7ij
-	gMt/ly+iMSokss/aZKWzPzGDMYSN1KM=
-Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+	bh=iR/x+dH77F1MdZ4GlNiB8vuIlGOSlBv4jBLCMBeFDpU=;
+	b=YjvyN4G9Al0j89BFafS6hjE2DHfy6oAjBhI5Y+LEcELU0nfbqQOhepq4bc16mpi4vflZZ5
+	NSYqwd3K8B7sZQWD6evYuKBAYt+8P4W/RphZzbirJOJciZL+W5+7Wa2wISk8MQO8eokgL/
+	RZ5YutyBK4DEezDYszf8AL7CcHJNvAE=
+Received: from mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com
  (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
  relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
- cipher=TLS_AES_256_GCM_SHA384) id us-mta-156-SJ_edObnN1mfNy-JatN0xw-1; Fri,
- 08 Nov 2024 05:58:53 -0500
-X-MC-Unique: SJ_edObnN1mfNy-JatN0xw-1
-X-Mimecast-MFC-AGG-ID: SJ_edObnN1mfNy-JatN0xw
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-499-8HrvlfFJOmyBmB4juogIgw-1; Fri,
+ 08 Nov 2024 05:58:56 -0500
+X-MC-Unique: 8HrvlfFJOmyBmB4juogIgw-1
+X-Mimecast-MFC-AGG-ID: 8HrvlfFJOmyBmB4juogIgw
 Received: from mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.40])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
 	(No client certificate requested)
-	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id A4F931955EAC;
-	Fri,  8 Nov 2024 10:58:51 +0000 (UTC)
+	by mx-prod-mc-02.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id 1DFD21944DF3;
+	Fri,  8 Nov 2024 10:58:55 +0000 (UTC)
 Received: from gerbillo.redhat.com (unknown [10.39.193.90])
-	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id A9BD61956054;
-	Fri,  8 Nov 2024 10:58:48 +0000 (UTC)
+	by mx-prod-int-04.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 2B9641956054;
+	Fri,  8 Nov 2024 10:58:51 +0000 (UTC)
 From: Paolo Abeni <pabeni@redhat.com>
 To: netdev@vger.kernel.org
 Cc: Matthieu Baerts <matttbe@kernel.org>,
@@ -67,9 +67,9 @@ Cc: Matthieu Baerts <matttbe@kernel.org>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Simon Horman <horms@kernel.org>,
 	mptcp@lists.linux.dev
-Subject: [PATCH net 1/2] mptcp: error out earlier on disconnect
-Date: Fri,  8 Nov 2024 11:58:16 +0100
-Message-ID: <8c82ecf71662ecbc47bf390f9905de70884c9f2d.1731060874.git.pabeni@redhat.com>
+Subject: [PATCH net 2/2] mptcp: cope racing subflow creation in mptcp_rcv_space_adjust
+Date: Fri,  8 Nov 2024 11:58:17 +0100
+Message-ID: <02374660836e1b52afc91966b7535c8c5f7bafb0.1731060874.git.pabeni@redhat.com>
 In-Reply-To: <cover.1731060874.git.pabeni@redhat.com>
 References: <cover.1731060874.git.pabeni@redhat.com>
 Precedence: bulk
@@ -81,110 +81,38 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Scanned-By: MIMEDefang 3.0 on 10.30.177.40
 
-Eric reported a division by zero splat in the MPTCP protocol:
+Additional active subflows - i.e. created by the in kernel path
+manager - are included into the subflow list before starting the
+3whs.
 
-Oops: divide error: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 1 UID: 0 PID: 6094 Comm: syz-executor317 Not tainted
-6.12.0-rc5-syzkaller-00291-g05b92660cdfe #0
-Hardware name: Google Google Compute Engine/Google Compute Engine,
-BIOS Google 09/13/2024
-RIP: 0010:__tcp_select_window+0x5b4/0x1310 net/ipv4/tcp_output.c:3163
-Code: f6 44 01 e3 89 df e8 9b 75 09 f8 44 39 f3 0f 8d 11 ff ff ff e8
-0d 74 09 f8 45 89 f4 e9 04 ff ff ff e8 00 74 09 f8 44 89 f0 99 <f7> 7c
-24 14 41 29 d6 45 89 f4 e9 ec fe ff ff e8 e8 73 09 f8 48 89
-RSP: 0018:ffffc900041f7930 EFLAGS: 00010293
-RAX: 0000000000017e67 RBX: 0000000000017e67 RCX: ffffffff8983314b
-RDX: 0000000000000000 RSI: ffffffff898331b0 RDI: 0000000000000004
-RBP: 00000000005d6000 R08: 0000000000000004 R09: 0000000000017e67
-R10: 0000000000003e80 R11: 0000000000000000 R12: 0000000000003e80
-R13: ffff888031d9b440 R14: 0000000000017e67 R15: 00000000002eb000
-FS: 00007feb5d7f16c0(0000) GS:ffff8880b8700000(0000) knlGS:0000000000000000
-CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007feb5d8adbb8 CR3: 0000000074e4c000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
-<TASK>
-__tcp_cleanup_rbuf+0x3e7/0x4b0 net/ipv4/tcp.c:1493
-mptcp_rcv_space_adjust net/mptcp/protocol.c:2085 [inline]
-mptcp_recvmsg+0x2156/0x2600 net/mptcp/protocol.c:2289
-inet_recvmsg+0x469/0x6a0 net/ipv4/af_inet.c:885
-sock_recvmsg_nosec net/socket.c:1051 [inline]
-sock_recvmsg+0x1b2/0x250 net/socket.c:1073
-__sys_recvfrom+0x1a5/0x2e0 net/socket.c:2265
-__do_sys_recvfrom net/socket.c:2283 [inline]
-__se_sys_recvfrom net/socket.c:2279 [inline]
-__x64_sys_recvfrom+0xe0/0x1c0 net/socket.c:2279
-do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-do_syscall_64+0xcd/0x250 arch/x86/entry/common.c:83
-entry_SYSCALL_64_after_hwframe+0x77/0x7f
-RIP: 0033:0x7feb5d857559
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 51 18 00 00 90 48 89 f8 48
-89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d
-01 f0 ff ff 73 01 c3 48 c7 c1 b0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007feb5d7f1208 EFLAGS: 00000246 ORIG_RAX: 000000000000002d
-RAX: ffffffffffffffda RBX: 00007feb5d8e1318 RCX: 00007feb5d857559
-RDX: 000000800000000e RSI: 0000000000000000 RDI: 0000000000000003
-RBP: 00007feb5d8e1310 R08: 0000000000000000 R09: ffffffff81000000
-R10: 0000000000000100 R11: 0000000000000246 R12: 00007feb5d8e131c
-R13: 00007feb5d8ae074 R14: 000000800000000e R15: 00000000fffffdef
+A racing recvmsg() spooling data received on an already established
+subflow would unconditionally call tcp_cleanup_rbuf() on all the
+current subflows, potentially hitting a divide by zero error on
+the newly created ones.
 
-and provided a nice reproducer.
+Explicitly check that the subflow is in a suitable state before
+invoking tcp_cleanup_rbuf().
 
-The root cause is the current bad handling of racing disconnect.
-After the blamed commit below, sk_wait_data() can return (with
-error) with the underlying socket disconnected and a zero rcv_mss.
-
-Catch the error and return without performing any additional
-operations on the current socket.
-
-Reported-by: Eric Dumazet <edumazet@google.com>
-Fixes: 419ce133ab92 ("tcp: allow again tcp_disconnect() when threads are waiting")
+Fixes: c76c6956566f ("mptcp: call tcp_cleanup_rbuf on subflows")
 Signed-off-by: Paolo Abeni <pabeni@redhat.com>
 ---
- net/mptcp/protocol.c | 13 +++++++++----
- 1 file changed, 9 insertions(+), 4 deletions(-)
+ net/mptcp/protocol.c | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
 
 diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index d263091659e0..95a5a3da3944 100644
+index 95a5a3da3944..48d480982b78 100644
 --- a/net/mptcp/protocol.c
 +++ b/net/mptcp/protocol.c
-@@ -2205,7 +2205,7 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 		cmsg_flags = MPTCP_CMSG_INQ;
- 
- 	while (copied < len) {
--		int bytes_read;
-+		int err, bytes_read;
- 
- 		bytes_read = __mptcp_recvmsg_mskq(msk, msg, len - copied, flags, &tss, &cmsg_flags);
- 		if (unlikely(bytes_read < 0)) {
-@@ -2267,9 +2267,16 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
+@@ -2082,7 +2082,8 @@ static void mptcp_rcv_space_adjust(struct mptcp_sock *msk, int copied)
+ 				slow = lock_sock_fast(ssk);
+ 				WRITE_ONCE(ssk->sk_rcvbuf, rcvbuf);
+ 				WRITE_ONCE(tcp_sk(ssk)->window_clamp, window_clamp);
+-				tcp_cleanup_rbuf(ssk, 1);
++				if (tcp_can_send_ack(ssk))
++					tcp_cleanup_rbuf(ssk, 1);
+ 				unlock_sock_fast(ssk, slow);
+ 			}
  		}
- 
- 		pr_debug("block timeout %ld\n", timeo);
--		sk_wait_data(sk, &timeo, NULL);
-+		mptcp_rcv_space_adjust(msk, copied);
-+		err = sk_wait_data(sk, &timeo, NULL);
-+		if (err < 0) {
-+			err = copied ? : err;
-+			goto out_err;
-+		}
- 	}
- 
-+	mptcp_rcv_space_adjust(msk, copied);
-+
- out_err:
- 	if (cmsg_flags && copied >= 0) {
- 		if (cmsg_flags & MPTCP_CMSG_TS)
-@@ -2285,8 +2292,6 @@ static int mptcp_recvmsg(struct sock *sk, struct msghdr *msg, size_t len,
- 	pr_debug("msk=%p rx queue empty=%d:%d copied=%d\n",
- 		 msk, skb_queue_empty_lockless(&sk->sk_receive_queue),
- 		 skb_queue_empty(&msk->receive_queue), copied);
--	if (!(flags & MSG_PEEK))
--		mptcp_rcv_space_adjust(msk, copied);
- 
- 	release_sock(sk);
- 	return copied;
 -- 
 2.45.2
 
