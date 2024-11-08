@@ -1,143 +1,124 @@
-Return-Path: <netdev+bounces-143273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143277-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D2489C1C5C
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:43:55 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 06DA49C1C6A
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:45:08 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D86391F2420A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:43:54 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 95749B23196
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:45:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4B07B3E1;
-	Fri,  8 Nov 2024 11:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92AE51E7C13;
+	Fri,  8 Nov 2024 11:44:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="h2ARxgA2"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="hVSCtydw"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90C701E411C;
-	Fri,  8 Nov 2024 11:43:51 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E99951E47D1
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 11:44:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.129.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731066231; cv=none; b=NU9qPPokMouFlGHBOQ+D8YK6E6XhtqZjpAutt0i7DIEkcZJEPkBgBKUKWMCcWYkiaMmnnDg/cLw0R2o5VD99P+KYdqmubHtWgFsfR3CCRptlmAGiX/KmjVlbTBuqhVJKbhPISAdyLdLFcJNKx2EYyT0kUjJM61Ilr/rHiubVd6g=
+	t=1731066276; cv=none; b=KiCh32/2LSDt7m+PpCIHEL5f4ZMrpwrvxlYMAEpofhgOkrwGz3H7shpik3tRtI7+PRsMjVAvqN7SGSQDL+cXA+xawxAGgNdFHF1G4ZhjLM6uyeZ2DBVZ4p0/bHFzUeyawTnrKJOAYIoiGcul5ExGzjukNJ0rZGtH6Kpmb4k2idI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731066231; c=relaxed/simple;
-	bh=JQUIqj7nooElTnM9EZ/Be11iUqRgiyXsjlGK/d8/nzs=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=TTP60qBVlXQOi75H5kLqua4C7IGEySKHsa6b28YNxJlMg6q1tuQsbWu2Cvg0/embFz0d6Jgv7LTiiCJgaNutNy9k57+eetY0ync10sTW1/anHGUKcmlmRieh3u5pq33Cp3R2Ic5IIM/G6o5AFtFGBxiz/dV4uPbztiDijdzyyOU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=h2ARxgA2; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0DB36C4CECD;
-	Fri,  8 Nov 2024 11:43:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731066231;
-	bh=JQUIqj7nooElTnM9EZ/Be11iUqRgiyXsjlGK/d8/nzs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=h2ARxgA2KdOpK3hzJlzINNniiKpEDBTdXc0ptimed7Y+m73VNQbahiMfgVjE9dyl3
-	 071QpnXLyrjfqc0pTqjzk2Boifn5ei+RL2moI4pEHff2Fyw+lYuZGQ4g4ymkMQ6pqn
-	 265NynXgZ+BmGZjlTrZAYBpMck3V5OX7E2YgmGPqAHOVEdsWC53B6y5W0frfnF7whk
-	 R1nbac9ntwWzVLGtpgvSfCgranTXnA8lM4r/cIS6jXciO6x9f6nNVDvUVsfjDhpZ+V
-	 Ls55th0GgpDvhW8JZgja976yp8zmqMMP1WFu1rRMwMWocGSmB5wfKQwQC5i7wB/5Vt
-	 skrx4Wfy+K5wQ==
-Message-ID: <5f51673a-e19b-45e8-bb1c-a6d3427213c1@kernel.org>
-Date: Fri, 8 Nov 2024 12:43:48 +0100
+	s=arc-20240116; t=1731066276; c=relaxed/simple;
+	bh=+lU6GBkmCPFmCNwxSrgrgIkwiITyF6fl4wchytIL1fU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=jaBNq7hCVUg1d619vKwGsRu0Cv9dxWSdQjt+9L+aI2HltDo6slsxPpD9ti9Cc0Dyr8SyVE+oZDKCBOWwAeH6/r8qxmtgQtjhuJRa/7qoaXJipp6dM83AnqS1SekNQj7yo3/Ur8bhVhV3XaGR41BLcP49SDoIszBlHdXk2Q5bNOw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=hVSCtydw; arc=none smtp.client-ip=170.10.129.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731066274;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+lU6GBkmCPFmCNwxSrgrgIkwiITyF6fl4wchytIL1fU=;
+	b=hVSCtydwz50YxxfowPm7sHvuEl1gDU0HJpIJ/OmxOSVN5AA02m02JA9g/xdYSzWAfmzubl
+	/pgvHRMG6njOy9eUE0SIFcrYuFLaatUgXpzuusN7G/mfuZ3uEFRldynarQx9RoYsYPXSTT
+	BcFw4Mty8MqhbWh2aFEhLZcdRsu98WE=
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com
+ [209.85.216.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-377-rNTGkcTmNxmLmpDFfhWxRw-1; Fri, 08 Nov 2024 06:44:32 -0500
+X-MC-Unique: rNTGkcTmNxmLmpDFfhWxRw-1
+X-Mimecast-MFC-AGG-ID: rNTGkcTmNxmLmpDFfhWxRw
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-2e9b5209316so501450a91.1
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 03:44:32 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731066272; x=1731671072;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+lU6GBkmCPFmCNwxSrgrgIkwiITyF6fl4wchytIL1fU=;
+        b=shkdseaFFBLpmFLjn0cpPDOP08GMFNcJwEpejFJZaxoLvjWoN109zThpi/vWw9Jqz+
+         lx4V/FIGXc8ReLkEteoVwmoR0cpYBdDblfnadwHwJpc42t5XulXirPfsMgrHxkUZiuLQ
+         cNTUZ/PracMIvP6ECMJIO6zr/AHn2uvMvpzZr32qHWJFeta0v3TrhYt6RJbIy28jjyUM
+         2xUNGUwONylxUIIsFjlaywCwjbFgdY3ZYfu5j+hWi0SIq7GdmwegA5vV6Wo/KQhWb9kw
+         Fo6rIySk4nSR4jAH55fjNWCWl0i/y0PTRphnm5/imNp8tQQN9duxZW/X3peTqJfAHZ3Y
+         L6Gw==
+X-Forwarded-Encrypted: i=1; AJvYcCUmsHwMT5TVLZGlNaQwR11RgWYeQhP1l44D8kILXUmNi5v5n85sVl9xf16RKghRqjEz8lM+oSg=@vger.kernel.org
+X-Gm-Message-State: AOJu0YyddUbHWzwPrkLn3slNJs0Yv48nb1MszbBtDL1zuM0dpp9vKXOt
+	cIa6dsn7O/7YoyGVcAKnIrYrQvosIvO86BzjunogKydATJCFkIRRQWb0cTAfGvkTseoD1kbuQzK
+	ZbpYNU7+JIttfzEgE3f98cyq4EUy7xLeijelkVeyfHKU0euiZxAi/OVJWGR6DmWb3wSXD2EdLPq
+	3c68IQmwKL3wVbyLPSkoKd9rmkaOkl
+X-Received: by 2002:a17:90b:1f8f:b0:2e2:b02a:1229 with SMTP id 98e67ed59e1d1-2e9b178fe37mr2922941a91.35.1731066271837;
+        Fri, 08 Nov 2024 03:44:31 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHxIMFhFEJaXhMKyQro+WyOM48KyqyrmXQzVcAxRO+eiRvB7RVIYRHANvMBBHAupPuqRNnBIAp5H2+HfwwyoV0=
+X-Received: by 2002:a17:90b:1f8f:b0:2e2:b02a:1229 with SMTP id
+ 98e67ed59e1d1-2e9b178fe37mr2922923a91.35.1731066271591; Fri, 08 Nov 2024
+ 03:44:31 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird Beta
-Subject: Re: [PATCH] mptcp: fix possible integer overflow in
- mptcp_reset_tout_timer
-Content-Language: en-GB
-To: Dmitry Kandybka <d.kandybka@gmail.com>
-Cc: mptcp@lists.linux.dev, netdev@vger.kernel.org,
- lvc-project@linuxtesting.org, Dmitry Antipov <dmantipov@yandex.ru>
-References: <20241107103657.1560536-1-d.kandybka@gmail.com>
-From: Matthieu Baerts <matttbe@kernel.org>
-Autocrypt: addr=matttbe@kernel.org; keydata=
- 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
- lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
-Organization: NGI0 Core
-In-Reply-To: <20241107103657.1560536-1-d.kandybka@gmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20241106111427.7272-1-wander@redhat.com> <20241108072003.jJDpdq9u@linutronix.de>
+In-Reply-To: <20241108072003.jJDpdq9u@linutronix.de>
+From: Wander Lairson Costa <wander@redhat.com>
+Date: Fri, 8 Nov 2024 08:44:20 -0300
+Message-ID: <CAAq0SUnrtYadVZb=2G5PW0dBJxovzS2F2841-gCHqSp_5VgsPg@mail.gmail.com>
+Subject: Re: [PATCH v2 1/4] Revert "igb: Disable threaded IRQ for igb_msix_other"
+To: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, 
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Clark Williams <clrkwllms@kernel.org>, Steven Rostedt <rostedt@goodmis.org>, 
+	Simon Horman <horms@kernel.org>, Jacob Keller <jacob.e.keller@intel.com>, 
+	"moderated list:INTEL ETHERNET DRIVERS" <intel-wired-lan@lists.osuosl.org>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:Real-time Linux (PREEMPT_RT):Keyword:PREEMPT_RT" <linux-rt-devel@lists.linux.dev>, tglx@linutronix.de
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Hi Dmitry,
+On Fri, Nov 8, 2024 at 4:20=E2=80=AFAM Sebastian Andrzej Siewior
+<bigeasy@linutronix.de> wrote:
+>
+> On 2024-11-06 08:14:26 [-0300], Wander Lairson Costa wrote:
+> > This reverts commit 338c4d3902feb5be49bfda530a72c7ab860e2c9f.
+> >
+> > Sebastian noticed the ISR indirectly acquires spin_locks, which are
+> > sleeping locks under PREEMPT_RT, which leads to kernel splats.
+> >
+> > Fixes: 338c4d3902feb ("igb: Disable threaded IRQ for igb_msix_other")
+> > Reported-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+> > Signed-off-by: Wander Lairson Costa <wander@redhat.com>
+>
+> Reviewed-by: Sebastian Andrzej Siewior <bigeasy@linutronix.de>
+>
+> This is the only patch.
 
-On 07/11/2024 11:36, Dmitry Kandybka wrote:
-> In 'mptcp_reset_tout_timer', promote 'probe_timestamp' to unsigned long
-> to avoid possible integer overflow. Compile tested only.
-> 
-> Found by Linux Verification Center (linuxtesting.org) with SVACE.
-> 
-> Signed-off-by: Dmitry Kandybka <d.kandybka@gmail.com>
-> ---
->  net/mptcp/protocol.c | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> index e978e05ec8d1..ff2b8a2bfe18 100644
-> --- a/net/mptcp/protocol.c
-> +++ b/net/mptcp/protocol.c
-> @@ -2722,8 +2722,8 @@ void mptcp_reset_tout_timer(struct mptcp_sock *msk, unsigned long fail_tout)
->  	if (!fail_tout && !inet_csk(sk)->icsk_mtup.probe_timestamp)
->  		return;
->  
-> -	close_timeout = inet_csk(sk)->icsk_mtup.probe_timestamp - tcp_jiffies32 + jiffies +
-> -			mptcp_close_timeout(sk);
-> +	close_timeout = (unsigned long)inet_csk(sk)->icsk_mtup.probe_timestamp -
-> +			tcp_jiffies32 + jiffies + mptcp_close_timeout(sk);
+Hrm, I had other unrelated .patch files in my directory,
+git-send-email might have gotten confused because of that.
 
-If I'm not mistaken, "jiffies" is an "unsigned long", which makes this
-modification not necessary, no?
-
-Cheers,
-Matt
--- 
-Sponsored by the NGI0 Core fund.
+>
+> Sebastian
+>
 
 
