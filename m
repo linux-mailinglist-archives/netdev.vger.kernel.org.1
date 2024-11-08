@@ -1,168 +1,188 @@
-Return-Path: <netdev+bounces-143403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143402-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4109E9C2481
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:03:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79F749C247D
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:02:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B2567B25B70
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:03:00 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 0B5DF1F23DDD
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:02:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B7941C1F1D;
-	Fri,  8 Nov 2024 17:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1FED31AA1E2;
+	Fri,  8 Nov 2024 17:55:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b="gJDT1vcR"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="jnRzSjqs"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp1.cs.Stanford.EDU (smtp1.cs.stanford.edu [171.64.64.25])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B77321C1F09
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:56:07 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=171.64.64.25
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 653891AA1CF
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:55:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.169
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731088569; cv=none; b=TagjbFL+2JTrMzPOpHbIVy3BQkyCtzFlSN4RfPUx4SKJlcoeBwOA0p9GPclJ1eN4f9y3W2SsNTdQd1D+svmBxneP9Q5T2FoosrIR35lb3PI7g8L/XsY+EcCHz7at4gJw/36CLZ0h/d37HgXzkgC1rELQ62tVrp6Lx++1uvqEBkM=
+	t=1731088543; cv=none; b=tRG/fxt9Fli7P+DtAnrRDfK1HmXKlQHbqW/XYr99j9hDISazVruuZvINXn7zrUDJ2dP6DoGISdeOsrEpp0ng4cqH+0k43zqWm6ER87O9XCatovcXkxr4E7eQciIGaKz5MlUHldAaW2hzcY2VcgPPtgiSeRbPLVTDgMIRIMlSN2Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731088569; c=relaxed/simple;
-	bh=Oywapz89DB80jcfz1c3Dvs68o0LA4gBd2sRlp82SsXE=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=Kj7cHDmg46XihpuGpGTQuzdB4SLM1CLzQF3apLdZ8LDf5nHQL+k5LftQ9wr44m2ocfgzil3hxUeVet2ys5XlRrzQMsfpWI2I57SxT4bBXnjzjqhqqi8jBDH4dLAkYHKTKRbyposTbvTCRNdAiGwtWRcjObU0qywGvr/aM9JtLM4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu; spf=pass smtp.mailfrom=cs.stanford.edu; dkim=pass (2048-bit key) header.d=cs.stanford.edu header.i=@cs.stanford.edu header.b=gJDT1vcR; arc=none smtp.client-ip=171.64.64.25
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=cs.stanford.edu
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=cs.stanford.edu
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=cs.stanford.edu; s=cs2308; h=Content-Transfer-Encoding:Content-Type:Cc:To:
-	Subject:Message-ID:Date:From:In-Reply-To:References:MIME-Version:Sender:
-	Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender
-	:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=m6hMKYZTlVheBGXvBL9CWALGMKgO5oJCAA4y7y9HsOM=; t=1731088567; x=1731952567; 
-	b=gJDT1vcR22iAw95aGzO4EEP7N89bzyXk62Lo17bE+T2YsWF9OWwA9VMZRrFgXjJJvWws+ar8lna
-	mtQnDttmu3Te+iYS+n5aIVpHe36Syp3uWMaeEPqKCroyQF0J9Lm3kbi2FrEEazCeNokKsQTwxxPxo
-	fNfcpLXvCcxkXjwGoZFenwjHI/RSzC14QFwpkdBBo9anKw5+8VjXLWHKr4ooC2F+8DKoJJJy55Vpu
-	DsMywu5a9QqJ8nl0Cj1scIYm1YsVh8Wy2/XUyEOJppi9WMhbzX4uj+qDNKQ5lZjrsH/GB3mZhAT8x
-	F0uSmrAJAz1dp11psaUu9VLKmosVXcu0b+9A==;
-Received: from mail-oo1-f50.google.com ([209.85.161.50]:56395)
-	by smtp1.cs.Stanford.EDU with esmtpsa  (TLS1.2) tls TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
-	(Exim 4.94.2)
-	(envelope-from <ouster@cs.stanford.edu>)
-	id 1t9TDE-0005iU-NG
-	for netdev@vger.kernel.org; Fri, 08 Nov 2024 09:56:01 -0800
-Received: by mail-oo1-f50.google.com with SMTP id 006d021491bc7-5ebc0992560so1480209eaf.0
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 09:56:00 -0800 (PST)
-X-Gm-Message-State: AOJu0YzS9WisEUVu2GlOuE3gbTAG3SwDVQ1FI4Nr31lyskkkJCaPNaio
-	MgUaqyeiTiOITUs6NUgRLFHYG8SZ8AT8nZslm9wn/5ad+im3OGgBo+XTjWzX8IfBzRnoSHcScxn
-	474Uu9286cBJUC6Ow8N/SMW8PZco=
-X-Google-Smtp-Source: AGHT+IEGeXfZbCMZAbbjrVckKjT3+DS4HYpbTydyMeq5e1dbarRluELleXA5mx0CfKG6ekBevLcgJEmQYrgtqJ7iaQ4=
-X-Received: by 2002:a05:6820:1f08:b0:5eb:827b:9bbf with SMTP id
- 006d021491bc7-5ee57c6b6c8mr3320855eaf.7.1731088560123; Fri, 08 Nov 2024
- 09:56:00 -0800 (PST)
+	s=arc-20240116; t=1731088543; c=relaxed/simple;
+	bh=3XEEjpzoyVVjrFa8qZSsaTMnvXE7mOW7qLd0g684tUQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=WxS9XYBQYu0W45s+liS/CHqp4MP2ApBnuJjP52QJlE2Xq4YZflR+Rx9VR5URt/5THmN5OlJA7PV7FPqLTX95mBPkd/FhMtcoI8Ha5QIjYvaNOH54egGt1dGpIDltGQQuJCaACN2RVeGQ7aLWfOVRNKgUGvFIiXGOpFHLuZ6nT/E=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=jnRzSjqs; arc=none smtp.client-ip=209.85.210.169
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-71e8235f0b6so2107957b3a.3
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 09:55:41 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=fastly.com; s=google; t=1731088541; x=1731693341; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=FiPDLfL5JTBKeeqjpJ5u/XBxPNvTKsH7Pcb34HC2tGE=;
+        b=jnRzSjqsfNVaVUDH5de4Ef18Vt94xLUiXdS/G53lVmdsJS4cWE6uBbVzkeU57hav/N
+         z+bKKDi4SIKhuj5geSc9ApUMRjgwGvbuy78q8fFfP2nFDk8LX+zOpddLExhxu+uMVEV6
+         1RwNdRfVWrgVhZ7e1VW8EKsVQgqdiwZ1Mk59g=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731088541; x=1731693341;
+        h=in-reply-to:content-disposition:mime-version:references
+         :mail-followup-to:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=FiPDLfL5JTBKeeqjpJ5u/XBxPNvTKsH7Pcb34HC2tGE=;
+        b=PBRb0HuK8mxyxGZAlEgdycX29BPXM8AGAXkfWpF15M00x5L3GuwZpfpiFVaiIv0io5
+         Uy18GafzJu+2NOCjoOwJ+WFPckARnIGEwNLRIXfLHH5rUFsFz6zcsBb2IImHZqd8MC/5
+         AfQRQc2sgf8n2rxIjqLM5wKYMYGCjfCIG7KyOtf7v9oNrRfj5MBDIn9HnloK9yOU03at
+         Q7yzMf9t6KeRKr+Mod0FEL/6VLGU5+kXULXhd0eG4qVPSt0yrWRLFftkCE/ZrRD4+dI2
+         1LWfazf1xddBT3j7ZUBrBD3yDf0VcUN1V39ASrD9kVjxFWPu2mlxC1Hsx3OTRggOeUeS
+         vaJQ==
+X-Gm-Message-State: AOJu0Ywt31BmjBPGTV9iCOYrZEqwU0n+n9HttvdGhJkeG/01G3JcGEUP
+	aJVqGkg42Czz5dy71HXiU9qbukqQ4vC9hwYyKFm2fw0nPFew1zMNbenC2DSzyXyuPQ89VE5LMVZ
+	e
+X-Google-Smtp-Source: AGHT+IERbFI+o+2LyayD4punr25StjJoWA4Jj2wzw5p0JjcDTHDRzT1/x7uQhWNXVNPsCLPYIGwlKQ==
+X-Received: by 2002:a05:6a20:158c:b0:1db:da5e:361f with SMTP id adf61e73a8af0-1dc22a1b4d3mr5454374637.25.1731088540720;
+        Fri, 08 Nov 2024 09:55:40 -0800 (PST)
+Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078a7ef5sm4141017b3a.63.2024.11.08.09.55.38
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 09:55:40 -0800 (PST)
+Date: Fri, 8 Nov 2024 09:55:36 -0800
+From: Joe Damato <jdamato@fastly.com>
+To: Willem de Bruijn <willemdebruijn.kernel@gmail.com>
+Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
+	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+Subject: Re: [PATCH net-next v8 5/6] selftests: net: Add busy_poll_test
+Message-ID: <Zy5QmNT5XqZUJ3f8@LQ3V64L9R2>
+Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
+	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
+	edumazet@google.com, amritha.nambiar@intel.com,
+	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
+	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
+	willy@infradead.org, skhawaja@google.com, kuba@kernel.org,
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:KERNEL SELFTEST FRAMEWORK" <linux-kselftest@vger.kernel.org>
+References: <20241108045337.292905-1-jdamato@fastly.com>
+ <20241108045337.292905-6-jdamato@fastly.com>
+ <672e26ec429be_2a4cd22944c@willemb.c.googlers.com.notmuch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241028213541.1529-1-ouster@cs.stanford.edu> <20241028213541.1529-2-ouster@cs.stanford.edu>
- <174d72f1-6636-538a-72d2-fd20f9c4cbd0@gmail.com>
-In-Reply-To: <174d72f1-6636-538a-72d2-fd20f9c4cbd0@gmail.com>
-From: John Ousterhout <ouster@cs.stanford.edu>
-Date: Fri, 8 Nov 2024 09:55:24 -0800
-X-Gmail-Original-Message-ID: <CAGXJAmxdRVm7jY7FZCNsvd8Kvd_p5FPUSHq8gbZvzn0GSK6=2w@mail.gmail.com>
-Message-ID: <CAGXJAmxdRVm7jY7FZCNsvd8Kvd_p5FPUSHq8gbZvzn0GSK6=2w@mail.gmail.com>
-Subject: Re: [PATCH net-next 01/12] net: homa: define user-visible API for Homa
-To: Edward Cree <ecree.xilinx@gmail.com>
-Cc: netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Score: -1.0
-X-Spam-Level: 
-X-Scan-Signature: ee5a8a2ba51c5094c3d10c175eb088a4
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <672e26ec429be_2a4cd22944c@willemb.c.googlers.com.notmuch>
 
-On Thu, Nov 7, 2024 at 1:58=E2=80=AFPM Edward Cree <ecree.xilinx@gmail.com>=
- wrote:
->
-> On 28/10/2024 21:35, John Ousterhout wrote:
-> > Note: for man pages, see the Homa Wiki at:
-> > https://homa-transport.atlassian.net/wiki/spaces/HOMA/overview
-> >
-> > Signed-off-by: John Ousterhout <ouster@cs.stanford.edu>
-> ...
-> > +/**
-> > + * Holds either an IPv4 or IPv6 address (smaller and easier to use tha=
-n
-> > + * sockaddr_storage).
-> > + */
-> > +union sockaddr_in_union {
-> > +     struct sockaddr sa;
-> > +     struct sockaddr_in in4;
-> > +     struct sockaddr_in6 in6;
+On Fri, Nov 08, 2024 at 09:57:48AM -0500, Willem de Bruijn wrote:
+> Joe Damato wrote:
+
+[...]
+
+> > diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
+> > new file mode 100644
+> > index 000000000000..8d8aa9e5939a
+> > --- /dev/null
+> > +++ b/tools/testing/selftests/net/busy_poller.c
+> > @@ -0,0 +1,328 @@
+> > +// SPDX-License-Identifier: GPL-2.0
+> > +#include <assert.h>
+> > +#include <errno.h>
+> > +#include <error.h>
+> > +#include <fcntl.h>
+> > +#include <inttypes.h>
+> > +#include <limits.h>
+> > +#include <stdlib.h>
+> > +#include <stdio.h>
+> > +#include <string.h>
+> > +#include <unistd.h>
+> > +
+> > +#include <arpa/inet.h>
+> > +#include <netinet/in.h>
+> > +
+> > +#include <sys/ioctl.h>
+> > +#include <sys/epoll.h>
+> > +#include <sys/socket.h>
+> > +#include <sys/types.h>
+> > +
+> > +#include <linux/netlink.h>
+> > +#include <linux/genetlink.h>
+> > +#include "netdev-user.h"
+> > +#include <ynl.h>
+> > +
+> > +/* if the headers haven't been updated, we need to define some things */
+> 
+> This should not be needed, as headers are taken from $KERNELSRC/usr after
+> make headers_install.
+> 
+> Generally discouraged for tests (else every new feature test for a new
+> features is forced to adds such checks).
+
+I get that, but the reason this is required is complex:
+
+- sys/epoll.h defines epoll_data, which is needed by the program to
+  access stuff like epoll_event.data.fd and linux/eventpoll.h does
+  not. At the same time, older glibcs do not have the ioctl yet
+  (I've sent a change to glibc to add it; I don't know which release
+  it'll be in or when CI will be updated to a distro with that
+  glibc).
+
+- linux/eventpoll.h does not define epoll_event's data field, it's
+  simply an opaque "__u64 data", but does include the ioctl
+  definitions.
+
+So, it'd seem I'd need parts of both headers... but of course you
+can't include both, because they redefine types found in the other.
+
+Maybe there's a solution I'm missing (please let me know), but it
+seems that the only workable solution is to include the #ifdef blob
+below, but perhaps with a comment explaining the above.
+
+> > +#if !defined(EPOLL_IOC_TYPE)
+> > +struct epoll_params {
+> > +	uint32_t busy_poll_usecs;
+> > +	uint16_t busy_poll_budget;
+> > +	uint8_t prefer_busy_poll;
+> > +
+> > +	/* pad the struct to a multiple of 64bits */
+> > +	uint8_t __pad;
 > > +};
->
-> Are there fundamental reasons why Homa can only run over IP and not
->  other L3 networks?  Or performance measurements showing that the
->  cost of using sockaddr_storage is excessive?
-> Otherwise, baking this into the uAPI seems unwise.
+> > +
+> > +#define EPOLL_IOC_TYPE 0x8A
+> > +#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
+> > +#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
+> > +#endif
 
-This structure made it easier to write code that runs over both IPv4
-and IPv6. But, I see your point about the limitations it creates
-(there is no fundamental reason Homa couldn't run over other datagram
-protocols). In looking over the code, I don't think this structure is
-used anymore in the kernel code or the kernel-user interface (it
-appears in one structure, but I believe that field is now obsolete and
-can be eliminated); its remaining uses are in user-level code. I will
-remove sockaddr_in_union from this file.
-
-> > +     /**
-> > +      * @error_addr: the address of the peer is stored here when avail=
-able.
-> > +      * This field is different from the msg_name field in struct msgh=
-dr
-> > +      * in that the msg_name field isn't set after errors. This field =
-will
-> > +      * always be set when peer information is available, which includ=
-es
-> > +      * some error cases.
-> > +      */
-> > +     union sockaddr_in_union peer_addr;
->
-> Member name (peer_addr) doesn't match the kerneldoc (@error_addr).
-
-I will fix.
-
-> > +int     homa_send(int sockfd, const void *message_buf,
-> > +               size_t length, const union sockaddr_in_union *dest_addr=
-,
-> > +               uint64_t *id, uint64_t completion_cookie);
-> > +int     homa_sendv(int sockfd, const struct iovec *iov,
-> > +                int iovcnt, const union sockaddr_in_union *dest_addr,
-> > +                uint64_t *id, uint64_t completion_cookie);
-> > +ssize_t homa_reply(int sockfd, const void *message_buf,
-> > +                size_t length, const union sockaddr_in_union *dest_add=
-r,
-> > +                uint64_t id);
-> > +ssize_t homa_replyv(int sockfd, const struct iovec *iov,
-> > +                 int iovcnt, const union sockaddr_in_union *dest_addr,
-> > +                 uint64_t id);
->
-> I don't think these belong in here.  They seem to be userland
->  library functions which wrap the sendmsg syscall, and as far as
->  I can tell the definitions corresponding to these prototypes do
->  not appear in the patch series.
-
-I'll remove for now. This leaves open the question of where these
-declarations should go once the userland library is upstreamed. Those
-library methods are low-level wrappers that make it easier to use the
-sendmsg kernel call for Homa; users will probably think of them as if
-they were system calls. It feels awkward to require people to #include
-2 different header files in order to use Homa kernel calls; is it
-considered bad form to mix declarations for very low-level methods
-like these ("not much more than kernel calls") with those for "real"
-kernel calls? Do you know of other low-level kernel-call wrappers in
-Linux that are analogous to these? If so, how are they handled?
-
-Thanks for your comments.
-
--John-
 
