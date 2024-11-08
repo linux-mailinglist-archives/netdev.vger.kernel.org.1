@@ -1,133 +1,119 @@
-Return-Path: <netdev+bounces-143248-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143250-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7082A9C1963
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:42:19 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A17559C19C4
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:05:10 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A29B41C24590
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 09:42:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1D911C208E8
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:05:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E3821E1312;
-	Fri,  8 Nov 2024 09:42:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4370E1E1022;
+	Fri,  8 Nov 2024 10:05:07 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="L+UlUgr4"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="BCOyuUSV"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f170.google.com (mail-pl1-f170.google.com [209.85.214.170])
+Received: from mail-oi1-f182.google.com (mail-oi1-f182.google.com [209.85.167.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3724A1E0DE2
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 09:42:14 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.170
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC27D1DACA1;
+	Fri,  8 Nov 2024 10:05:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731058936; cv=none; b=dpBnEdoqDXy9ryf0fax14oGuaRq7YslD4qh7oQI2WUsn7YWSh48VifSKffMkhekBkTzWOx3NqeIE2UZZfKTWV4WA4Ggg7AwFu78kUo+7n9DN3d/xtbsQ2Fm6WvPJ8zc6sqgvDHiaO1rq5/QuY82l2ioJdZT16IKEM67q0G+RHiQ=
+	t=1731060307; cv=none; b=vCN/06NnKWYnJVL3bdXJA7cvvjLOBvh85W0dW6ueK852RYykyjJVjnVmp45RMGUOFTvhaQO82MHkaKynjjzh3tn2fAWujWk0IVdkEClaoMFoBP8Kt9SLPLBpvyX7mGhiEo2ZWGLiA9c2zsw3SGaFIWvYkP9NL2yTAY234TYXwYM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731058936; c=relaxed/simple;
-	bh=+eP/vcqaNzokUp6cjLnVBBHiJRRLVRpuYTF+IIIoO0U=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version; b=rMVS6vRlqumprdyor2Sc8xmg93Y07Hyj7Qmsrh7K+gd6wY259bQLVxm4zx2fxSy6GO4JUgQ7lWuGcdZk3Q3SO09ueNyQtALa48q9G0jBJnCEYwhlS6vjlIvG+f2pER74g3RL03FoteRt3YdozRLwSajGo7qFqh/26z4l/T13G/o=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=L+UlUgr4; arc=none smtp.client-ip=209.85.214.170
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-pl1-f170.google.com with SMTP id d9443c01a7336-20e6981ca77so22648935ad.2
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 01:42:14 -0800 (PST)
+	s=arc-20240116; t=1731060307; c=relaxed/simple;
+	bh=kOc9yUGznIb1qrqKk3pTDsR2QqT/9CMCrFMGkEQRBMU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=QVR7G1LaCls60dD14hKKF3qyivXouttzemcIJ1qdXfh9InhWEhMnd462BPF1qQprXRPt+Hpiwvlvres79atB9ABR5t+kAK4dTMTDndu6/8mdlaBaLpxI78Lw39bhPapDbmBmeMcXHN+LZzQDw/Sso3EUlke1qUdHV4STByf69BI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=BCOyuUSV; arc=none smtp.client-ip=209.85.167.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-oi1-f182.google.com with SMTP id 5614622812f47-3e602994635so1406286b6e.0;
+        Fri, 08 Nov 2024 02:05:04 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1731058933; x=1731663733; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Ca2TdIiKwWZF1eqEUaePHRgoBLNi1vfBOb48mxhddGY=;
-        b=L+UlUgr4g5bwZsMhn9i4YzmOTjQnhiASN7hIMfwWUwRZXlJTpKjZjocKRPcKtks5NI
-         8m70yGo8HTIvAwqBzAuzvosUWB+WH//AsjZcV1h84SkkNQGL+wTij648kQCn8W3Ik98F
-         /2xzEV/kTCnnfKV7tUPEh8OzFJWXQy2aoKdltxVLDEtm0RkWO9KXprcUOnGotwspYzwe
-         k4lRSIhioUbER9XV6F8kGYedIfZxOmNvhIUAOQSIH4qeq/CyxwsoeOr6yUJsWcN2/qOv
-         Xm9Zj9hkdXLVD/CZWIgqipnnGDsQoPlAAcAHVvazcj3eXuWsVQGIepDLy4Rvx/hNX9uP
-         vslA==
+        d=gmail.com; s=20230601; t=1731060304; x=1731665104; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=kOc9yUGznIb1qrqKk3pTDsR2QqT/9CMCrFMGkEQRBMU=;
+        b=BCOyuUSVZ3gaObhrlMfbxZhxwyKasorj1iZApiMOd63whsqrYshbSc7A0v5SQFmaHG
+         7XvTuKPlVzuNvwwXlIo78dvaLercJnkRJQtxwmHk372HR6WNi4M2XvNQI1Q2tMX1Ncxo
+         Hq7UteFkELZ/TtSwF7ifqHPoQR4uT421aWgjWEh/TmHhQXTGpgd0jxMucAD7r2SNgnzb
+         t8QfamMPsiWY9y1Hwdy4oG8YNj2Oq7zZM8QDRThpOyPb+rb+4IBbxzwsynMsWQNQ4cJT
+         SZ3DdGdRvLPI1Izf39EJC0rKsqW/CyMzSZBzF+xD0hKjlnlq4n+PbzqShHP/D7m9k6g8
+         kx7w==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731058933; x=1731663733;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Ca2TdIiKwWZF1eqEUaePHRgoBLNi1vfBOb48mxhddGY=;
-        b=rHGhvp/YmonIgWPq5id3DT8uuzqQrTl0KE2eQQwHSy1onog3sOxQrZxUIpEhOmUAxx
-         SW3Q1VaCyO6jgZiUn4+NrbpY0CFg6kJCEkhDxQkmziOih7sWkmsMMDFcH6AUNHjxKll3
-         1vxjSurFjVV9Ne5mk0dnMqWZb8HhpGYxlEiypyLhhjuj5qhQSgc//fTCzkrkv8gnCkA7
-         +RnE8KelmxrJVjE5MKeiO3l6HIhl5xLxStX1F1VWFXjRAtbMtJXdVB8YHINiwJyAvu+K
-         qGYm3MJ2mgxakNc0qj+ywV1lOy052F42i2rFjoRvU+YKip3pD26DIXu34eIVFZsYZDf4
-         jktw==
-X-Gm-Message-State: AOJu0YwLo3kccGhj/+LqFLRcy0aP58eSGgp/xNX5TjgOdY1Var2kz59V
-	3VxwzlvC6Q4IweakkKQ/n68jv1qwlFyWL2LsPNLfdUINH7eV6I6bbyqp4URXNAkh1o3cAnFG7lP
-	/OSo=
-X-Google-Smtp-Source: AGHT+IHJaqY7CpnOjmx21Vtn/dox+6VYyb5PPSRH/wKo8sslUsDpZCDMWRowhL4+E2s/DAq8UCWDeQ==
-X-Received: by 2002:a17:903:1d1:b0:20c:f261:2516 with SMTP id d9443c01a7336-211834f3842mr26435005ad.8.1731058933057;
-        Fri, 08 Nov 2024 01:42:13 -0800 (PST)
-Received: from localhost ([106.38.221.124])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177de041dsm26255915ad.103.2024.11.08.01.42.12
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 01:42:12 -0800 (PST)
-From: Jian Zhang <zhangjian.3032@bytedance.com>
-To: netdev@vger.kernel.org
-Cc: openbmc@lists.ozlabs.org,
-	Jeremy Kerr <jk@codeconstruct.com.au>,
-	Matt Johnston <matt@codeconstruct.com.au>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next] mctp i2c: notify user space on TX failure
-Date: Fri,  8 Nov 2024 17:42:06 +0800
-Message-Id: <20241108094206.2808293-1-zhangjian.3032@bytedance.com>
-X-Mailer: git-send-email 2.30.2
+        d=1e100.net; s=20230601; t=1731060304; x=1731665104;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=kOc9yUGznIb1qrqKk3pTDsR2QqT/9CMCrFMGkEQRBMU=;
+        b=HCJVnEBhiXyP4Ze8bOxzq3G8yM73P8TcGhIJWvyqEF++ndVNBblnhNYRVISA0IO5Qz
+         2icysFMOwVm3QIXsXVzvty0KVAG7Z57hSLYz0B+YOIqq6L/5g1lQQ4/97c0lrKWPLB0H
+         +Ngj9B0h64JsAB9aTcaEDYNEnPOFs7MiO62MPKthfV3u6/QsTGQLjeoSSm48NJMMXput
+         qt3gv8im6aGal47qg5KB1FK+HJFsphzkfTvpAq9iC0iPifwx/rR1VhdSmZA/AN/1GuHW
+         v2BKR1ZRpFSX0ouEWfHqrAMAnYcg/3ArZjDYF/Ol+Yfe4MGpMsBTeXHIKghHxeco+GEl
+         NBMg==
+X-Forwarded-Encrypted: i=1; AJvYcCUA6UBh/B8Ovt4ULgBDS8z45inXAzkXwBEyhx513k8X5xN7L17h94VsUkZZmaOKgjDE3C3dJQ/JrnWob9h1EsQ=@vger.kernel.org, AJvYcCXO0Fop2v3Z35hnU0+9/9IDR5CWeKR0fmzLx++DU49xUkD/pZgp2Ykid1LmmI5LMyiYpm34+7nt@vger.kernel.org
+X-Gm-Message-State: AOJu0Yyx72fcagO5Kn2L9sCAxFcQ4v1KA5stfS3YnGTcliHKm4uZqqG0
+	TaQoSYRxT0XF1yG3Nw7Iz4YerXYGtUHXvKjMOz6iKEoRZMx0PfqChit79WU6oPCbzd+pZZPFmmr
+	vn/2gFEM6ASNz1OCTfmNbnK3tn3s=
+X-Google-Smtp-Source: AGHT+IEBMZnlah/bbgec1wFpK6gV3dfc27LhLyONeUc0Upa3yapPbjlADYZoj27FRpdXMdMy2WO90g1EuHcUbutlaNA=
+X-Received: by 2002:a05:6808:23cb:b0:3e6:2620:2000 with SMTP id
+ 5614622812f47-3e7946ebccdmr2319155b6e.35.1731060303966; Fri, 08 Nov 2024
+ 02:05:03 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20241107133004.7469-1-shaw.leon@gmail.com> <20241107133004.7469-8-shaw.leon@gmail.com>
+ <20241107080420.6a5a5243@kernel.org> <CAD4GDZwOzLQd+FYd0AHr5AUcANWkf731Jgu6aeyix8EjRGXRag@mail.gmail.com>
+ <CABAhCOSvo4OemcevEnNmk3Jny_YEoCb3s9GPC6o217oj-t5FnQ@mail.gmail.com>
+In-Reply-To: <CABAhCOSvo4OemcevEnNmk3Jny_YEoCb3s9GPC6o217oj-t5FnQ@mail.gmail.com>
+From: Donald Hunter <donald.hunter@gmail.com>
+Date: Fri, 8 Nov 2024 10:04:52 +0000
+Message-ID: <CAD4GDZx2hEjJWJknS+x++dwPE_UYGiCTYxj2Ntt6BaS=UGZqyA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 7/8] tools/net/ynl: Add retry limit for async notification
+To: Xiao Liang <shaw.leon@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, Kuniyuki Iwashima <kuniyu@amazon.com>, 
+	"David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Ido Schimmel <idosch@nvidia.com>, Andrew Lunn <andrew+netdev@lunn.ch>, 
+	Simon Horman <horms@kernel.org>, Shuah Khan <shuah@kernel.org>, Jiri Pirko <jiri@resnulli.us>, 
+	Hangbin Liu <liuhangbin@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-Currently, there is no error handling mechanism for TX failures, causing
-user space to remain unaware of these failures until a timeout occurs.
-This leads to unnecessary waiting and delays.
+On Fri, 8 Nov 2024 at 08:46, Xiao Liang <shaw.leon@gmail.com> wrote:
+>
+> On Fri, Nov 8, 2024 at 1:16=E2=80=AFAM Donald Hunter <donald.hunter@gmail=
+.com> wrote:
+> >
+> > It's then a question of whether we need the repeat logic in poll_ntf()
+> > because it's always possible to use check_ntf() in your own repeat
+> > logic. Either way, I'd prefer not to call the parameter "max_retries"
+> > because semantically I don't think we are retrying - it is a count of
+> > how many times to repeat the poll. Thoughts? Should it be a "duration"
+> > parameter?
+>
+> Yes, a "duration" is better. The meaning of "retry" or "count" is not cle=
+ar.
+> The original check_ntf() is good enough for the test case in this
+> series. Could you make the change, or do you prefer me to submit
+> another patch?
 
-This update sends an immediate error notification to user space upon TX
-failure, reducing wait times and improving response handling for failed
-tx.
+I'm happy to make the change.
 
-Signed-off-by: Jian Zhang <zhangjian.3032@bytedance.com>
----
- drivers/net/mctp/mctp-i2c.c | 9 +++++++++
- 1 file changed, 9 insertions(+)
+I have prepared a patch which reverts most of 1bf70e6c3a53 and
+introduces poll_ntf(interval, duration).
 
-diff --git a/drivers/net/mctp/mctp-i2c.c b/drivers/net/mctp/mctp-i2c.c
-index 4dc057c121f5..e9a835606dfc 100644
---- a/drivers/net/mctp/mctp-i2c.c
-+++ b/drivers/net/mctp/mctp-i2c.c
-@@ -485,6 +485,7 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
- 	struct mctp_i2c_hdr *hdr;
- 	struct i2c_msg msg = {0};
- 	u8 *pecp;
-+	struct sock *sk;
- 	int rc;
- 
- 	fs = mctp_i2c_get_tx_flow_state(midev, skb);
-@@ -551,6 +552,14 @@ static void mctp_i2c_xmit(struct mctp_i2c_dev *midev, struct sk_buff *skb)
- 		dev_warn_ratelimited(&midev->adapter->dev,
- 				     "__i2c_transfer failed %d\n", rc);
- 		stats->tx_errors++;
-+
-+		sk = skb->sk;
-+		if (sk) {
-+			sk->sk_err = -rc;
-+			if (!sock_flag(sk, SOCK_DEAD))
-+				sk_error_report(sk);
-+		}
-+
- 	} else {
- 		stats->tx_bytes += skb->len;
- 		stats->tx_packets++;
--- 
-2.30.2
-
+Jakub, is it okay to submit this as a single patch, or would you
+prefer me to actually revert 1bf70e6c3a53? (there's about 5 lines
+retained from the original patch).
 
