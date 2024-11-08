@@ -1,69 +1,71 @@
-Return-Path: <netdev+bounces-143287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 79B399C1D1A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:38:32 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3FEE39C1D1B
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:38:38 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6AC28288A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:38:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 458661C22BD5
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:38:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906651E47D9;
-	Fri,  8 Nov 2024 12:38:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE611E8824;
+	Fri,  8 Nov 2024 12:38:30 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0FzW17C"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="F+T1S0iA"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+Received: from mail-lf1-f45.google.com (mail-lf1-f45.google.com [209.85.167.45])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58D8322E
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 12:38:25 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB2201E5000
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 12:38:28 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.167.45
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731069508; cv=none; b=W3J+H6rQ8Z+YShZETkBnV5qMTK+PlLocZtPdg+hr5fYidLiYzZBKdIb4LwhVlXjucv9znrrm4hm7jPkg4BXvAV6Fs8ES88OyWuczBJWR07Ookv2R6jBEvtqDhHM9aLyuYlUdvVBWmVn147u52fwkmQOudTX23mmWU5lr+AMvE6M=
+	t=1731069510; cv=none; b=WS8OyxOfAyl3qABDJ/reQY5XlTzmoI58gPSr0hqC/wjU6ZyzLrHc7+nuAxKYkyN1e0JJVhFZaG4wXdn6CHESWmZu5qMv5hJzLhKCB3e1dhp9aHCbStjqFKMaNyDNeZ35fX7Vqv/7tYBBobUpD9cp40lWOeKoi3uB/DpQ0nvmeOM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731069508; c=relaxed/simple;
-	bh=6wNOGXghybHRjd5Urfpl+TJMg6I0IjAKfX3B8lHzhZM=;
-	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oCdwkeoIzFSVClumrJSw1xNTRGg+pnTIgzK2Q1NtCxw8N13fBrXQF54wofFfeYOje3/YR4Bkgyi6GUpKtkJnMBxeLqk2PmdkNzVD6fIjpA9BszgHn/gQkiLUfi6NxUQj8kZWhduVIIWCZhd846HEPNan9VS9I9pd7f5NmGhwfvo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b0FzW17C; arc=none smtp.client-ip=209.85.128.52
+	s=arc-20240116; t=1731069510; c=relaxed/simple;
+	bh=ohjqzMpsu21GuDKSMl0u0Kku7h3y+NzZyYyujI8tG/E=;
+	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
+	 MIME-Version; b=eQoQVIpQiuCM8ctXUoHZCTco979Ebmro1/WM5o4McSloHSlkd7BG3312fm05gU8RbYBalh5jSZB1jPNk4sEFW4kJRAA14zDTEUZSJL7pRNr1dz6IrsZtFI5ylHFP9z6ExSMcdp5q/mEShFLXh4oVTXwoyj4VgoO8JQCHYMShqzc=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=F+T1S0iA; arc=none smtp.client-ip=209.85.167.45
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4315e62afe0so19339805e9.1
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 04:38:25 -0800 (PST)
+Received: by mail-lf1-f45.google.com with SMTP id 2adb3069b0e04-53a097aa3daso1795587e87.1
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 04:38:28 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731069503; x=1731674303; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=K3H5aaqvvUtm0M7z9v4ikRrSREN7F8COBwVfgaYY7Yk=;
-        b=b0FzW17Ch6p3WmhQvtrxBvACyUWobqh7bt4e8VH0yzfjcA8d0yfZPUSMpgpan+Th86
-         JkCgM3ruzLOCWCttVeyiaCP5GSEOxxX/SX/XlmBbix9mLTxzjasXGOiNUGW4b0gtnNZi
-         y3Kod8WPQsDjGWFnvIdFxuE6s/p2pdi++hX7IQHnJPOzV2vw9b3OLME7G5IfG3IrfX6y
-         7C/+FUJk287I8hSeROZiqskqHnqgSTBkVUbQrDSJy9M6RfHqA7pYhcYtGCuTWlYGcG2a
-         DbE6CCX1RPMNtlgt9S/D1YVsUgKaq8w9N2Vy8bnGTmffwScFpEg30kmK5elO0dIQclkr
-         LyVQ==
+        d=gmail.com; s=20230601; t=1731069506; x=1731674306; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=8NYGGqDNm/aoW1tOjWuU2CXuiumwETODf+xi+nymdIk=;
+        b=F+T1S0iAD0uwDaF460SkRXUQ+FPQvKJS8eVZCQbAJ+oP5pc2tjYFe5C/0XpkazxO6M
+         0R6shmsBPE+VF5nh0mz0MFJgh99jyyfacz2CQ99hlueqdJnKQHlIumz5N7VAGukJD66a
+         qsihxHqNdcVeQhkHcXrrL5nYyCIIoebBZPwBNlk0CmZGlvLFLbv3VZXvn/B4fosiB6Az
+         lc44UqrnkwN+rxr306KCBFxW02z4ZE5MEABFbJo6urp96TDI9oS42bebbnEUCYYFxGy0
+         ABnXFopcwTqBhtRR8+QQ/y4WscWZMYhkln9JdaTVL+zQ15ZnpjtDuEYn4/0sW6MZjcp/
+         DvwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731069503; x=1731674303;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=K3H5aaqvvUtm0M7z9v4ikRrSREN7F8COBwVfgaYY7Yk=;
-        b=J1MkvDmIlfBJscvtNMwaoFfOugO6/XYAC1xYqLbYTWGJ3Co6R4jYIae3GPwSCufJ1R
-         hrxUS6YRNcPXQYqpPtgxVrtlAIWOVFwpDwg/L+uGExZq3/N5l7fcCVL6IIsQJ21X8RAI
-         YoUP2wv1Iwn34VJWNdXy/7t9OdLjHkeC7soxHlAY2Qazjv74dxvkIL1P6k7L7Ay3AsSQ
-         oXJ+ftflTa38I27TtkeIt84QHdEiFf0upMlzMGxqQKpCAXErHOQ4UO9CD3pKyXrOBmY8
-         ALY5TzErKt+ZGahKXCctT7ti4MsYJVUjgCL5Nq0HaWYSoGvSZG759FcP9Es2FVGnQHSI
-         d/bg==
-X-Gm-Message-State: AOJu0Yx82p+TYbiOKe+HnVqG9vB3yczh18fH0sZTANzwnPqLSii192up
-	CkVU48ID+cjdtNqUrBBaIqJNd3cSsiaKiEPrnNaZr37j3TNRJ+TzZfnvlvBm
-X-Google-Smtp-Source: AGHT+IEJX5AqCpocuAEqrMyt8+XO5QnDsVSDbTHg40d9EF5RI6XpKnhQvPSNmgvHSXABYarE3LcHTw==
-X-Received: by 2002:a05:600c:35cc:b0:430:5356:ac8e with SMTP id 5b1f17b1804b1-432b74fcb49mr20560775e9.5.1731069503083;
-        Fri, 08 Nov 2024 04:38:23 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731069506; x=1731674306;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=8NYGGqDNm/aoW1tOjWuU2CXuiumwETODf+xi+nymdIk=;
+        b=hJlYRmFTKBEmf4bUMtcV48KxvLtjUCrtaUm+Y97SyORgtnLKOwE6KREEOT4OV74++H
+         byQ+ESkKXqTxtKUFxZIF38hUt4cu/skGa2AMs7PmA4/3O754GnAbzBBO8p/ZxWzX1G+X
+         RUnev6WuPWzbxBAi2aIxze3/BVT3Qh5/nVxPgv2ZwfK7/Jt6zyHV6NhFeRy3ywVykdtn
+         Py6ZTe56ipdvIy4HHLJwbWxy3lV54WncjNeZhcwCweqoeOy6cwBuS50RRpieHfYGJfWL
+         dToitpkB3cwjvwOVki6Z2SBVcwaB+Ii7KE/tVAV3m9HCBU40r7v8PL7xi0R6OzZH+FV1
+         gekQ==
+X-Gm-Message-State: AOJu0YxLN+0DYaAga8FIPOsLYilbu+IC0OAHz4D1Unn+Mk4Cz3i2E9gM
+	XM4M1eKBYU91DBJ1i7YWv2DRIHnzVh1a7Axy+JDksz7Cl4iEDnimAzAUY7pn
+X-Google-Smtp-Source: AGHT+IGSNHEicdPO/rNdWOqBFo3ypvyS+FBiaaVq6XeVINf76LDNHWFIFjma2E3Ww48sdKqp2GKaGw==
+X-Received: by 2002:a05:6512:4013:b0:536:55cf:3148 with SMTP id 2adb3069b0e04-53d862c578fmr1353414e87.31.1731069505208;
+        Fri, 08 Nov 2024 04:38:25 -0800 (PST)
 Received: from imac.lan ([2a02:8010:60a0:0:68e2:1bff:d8bf:7339])
-        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c1f56sm62991365e9.34.2024.11.08.04.38.21
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c1f56sm62991365e9.34.2024.11.08.04.38.23
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 04:38:22 -0800 (PST)
+        Fri, 08 Nov 2024 04:38:23 -0800 (PST)
 From: Donald Hunter <donald.hunter@gmail.com>
 To: netdev@vger.kernel.org,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -75,10 +77,12 @@ To: netdev@vger.kernel.org,
 	Jiri Pirko <jiri@resnulli.us>
 Cc: donald.hunter@redhat.com,
 	Donald Hunter <donald.hunter@gmail.com>
-Subject: [PATCH net-next v1 0/2] tools/net/ynl: rework async notification handling
-Date: Fri,  8 Nov 2024 12:38:14 +0000
-Message-ID: <20241108123816.59521-1-donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 1/2] Revert "tools/net/ynl: improve async notification handling"
+Date: Fri,  8 Nov 2024 12:38:15 +0000
+Message-ID: <20241108123816.59521-2-donald.hunter@gmail.com>
 X-Mailer: git-send-email 2.44.0
+In-Reply-To: <20241108123816.59521-1-donald.hunter@gmail.com>
+References: <20241108123816.59521-1-donald.hunter@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -87,19 +91,141 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Revert patch 1bf70e6c3a53 which modified check_ntf() and instead add a
-new poll_ntf() with async notification semantics.
+This reverts commit 1bf70e6c3a5346966c25e0a1ff492945b25d3f80.
 
-See patch 2 for the description.
+This modification to check_ntf() is being reverted so that its behaviour
+remains equivalent to ynl_ntf_check() in the C YNL. Instead a new
+poll_ntf() will be added in a separate patch.
 
-Donald Hunter (2):
-  Revert "tools/net/ynl: improve async notification handling"
-  tools/net/ynl: add async notification handling
+Signed-off-by: Donald Hunter <donald.hunter@gmail.com>
+---
+ tools/net/ynl/cli.py     | 10 +++-----
+ tools/net/ynl/lib/ynl.py | 49 ++++++++++++++++------------------------
+ 2 files changed, 23 insertions(+), 36 deletions(-)
 
- tools/net/ynl/cli.py     | 16 +++++----------
- tools/net/ynl/lib/ynl.py | 43 +++++++++++++++++++++++-----------------
- 2 files changed, 30 insertions(+), 29 deletions(-)
-
+diff --git a/tools/net/ynl/cli.py b/tools/net/ynl/cli.py
+index 9e95016b85b3..b8481f401376 100755
+--- a/tools/net/ynl/cli.py
++++ b/tools/net/ynl/cli.py
+@@ -5,7 +5,6 @@ import argparse
+ import json
+ import pprint
+ import time
+-import signal
+ 
+ from lib import YnlFamily, Netlink, NlError
+ 
+@@ -18,8 +17,6 @@ class YnlEncoder(json.JSONEncoder):
+             return list(obj)
+         return json.JSONEncoder.default(self, obj)
+ 
+-def handle_timeout(sig, frame):
+-    exit(0)
+ 
+ def main():
+     description = """
+@@ -84,8 +81,7 @@ def main():
+         ynl.ntf_subscribe(args.ntf)
+ 
+     if args.sleep:
+-        signal.signal(signal.SIGALRM, handle_timeout)
+-        signal.alarm(args.sleep)
++        time.sleep(args.sleep)
+ 
+     if args.list_ops:
+         for op_name, op in ynl.ops.items():
+@@ -110,8 +106,8 @@ def main():
+         exit(1)
+ 
+     if args.ntf:
+-        for msg in ynl.check_ntf():
+-            output(msg)
++        ynl.check_ntf()
++        output(ynl.async_msg_queue)
+ 
+ 
+ if __name__ == "__main__":
+diff --git a/tools/net/ynl/lib/ynl.py b/tools/net/ynl/lib/ynl.py
+index 92f85698c50e..c22c22bf2cb7 100644
+--- a/tools/net/ynl/lib/ynl.py
++++ b/tools/net/ynl/lib/ynl.py
+@@ -12,8 +12,6 @@ import sys
+ import yaml
+ import ipaddress
+ import uuid
+-import queue
+-import time
+ 
+ from .nlspec import SpecFamily
+ 
+@@ -491,7 +489,7 @@ class YnlFamily(SpecFamily):
+         self.sock.setsockopt(Netlink.SOL_NETLINK, Netlink.NETLINK_GET_STRICT_CHK, 1)
+ 
+         self.async_msg_ids = set()
+-        self.async_msg_queue = queue.Queue()
++        self.async_msg_queue = []
+ 
+         for msg in self.msgs.values():
+             if msg.is_async:
+@@ -905,39 +903,32 @@ class YnlFamily(SpecFamily):
+ 
+         msg['name'] = op['name']
+         msg['msg'] = attrs
+-        self.async_msg_queue.put(msg)
++        self.async_msg_queue.append(msg)
+ 
+-    def check_ntf(self, interval=0.1):
++    def check_ntf(self):
+         while True:
+             try:
+                 reply = self.sock.recv(self._recv_size, socket.MSG_DONTWAIT)
+-                nms = NlMsgs(reply)
+-                self._recv_dbg_print(reply, nms)
+-                for nl_msg in nms:
+-                    if nl_msg.error:
+-                        print("Netlink error in ntf!?", os.strerror(-nl_msg.error))
+-                        print(nl_msg)
+-                        continue
+-                    if nl_msg.done:
+-                        print("Netlink done while checking for ntf!?")
+-                        continue
++            except BlockingIOError:
++                return
+ 
+-                    decoded = self.nlproto.decode(self, nl_msg, None)
+-                    if decoded.cmd() not in self.async_msg_ids:
+-                        print("Unexpected msg id while checking for ntf", decoded)
+-                        continue
++            nms = NlMsgs(reply)
++            self._recv_dbg_print(reply, nms)
++            for nl_msg in nms:
++                if nl_msg.error:
++                    print("Netlink error in ntf!?", os.strerror(-nl_msg.error))
++                    print(nl_msg)
++                    continue
++                if nl_msg.done:
++                    print("Netlink done while checking for ntf!?")
++                    continue
+ 
+-                    self.handle_ntf(decoded)
+-            except BlockingIOError:
+-                pass
++                decoded = self.nlproto.decode(self, nl_msg, None)
++                if decoded.cmd() not in self.async_msg_ids:
++                    print("Unexpected msg id done while checking for ntf", decoded)
++                    continue
+ 
+-            try:
+-                yield self.async_msg_queue.get_nowait()
+-            except queue.Empty:
+-                try:
+-                    time.sleep(interval)
+-                except KeyboardInterrupt:
+-                    return
++                self.handle_ntf(decoded)
+ 
+     def operation_do_attributes(self, name):
+       """
 -- 
 2.47.0
 
