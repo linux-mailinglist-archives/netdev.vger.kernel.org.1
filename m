@@ -1,142 +1,72 @@
-Return-Path: <netdev+bounces-143426-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143427-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EA439C2683
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 21:26:40 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AE50A9C268F
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 21:28:21 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 95E041C22109
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 20:26:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 72842284623
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 20:28:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3426720B7E5;
-	Fri,  8 Nov 2024 20:25:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 345F91C1F3F;
+	Fri,  8 Nov 2024 20:27:41 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="eqgg0yN0"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="PFeVnsPO"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f181.google.com (mail-pf1-f181.google.com [209.85.210.181])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 84BF31F26D9;
-	Fri,  8 Nov 2024 20:25:55 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.181
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EB651C1F07
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 20:27:41 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731097557; cv=none; b=DclHSQOvn9AKWch8lbxH78y+LD1vAGUG6lBiYVMsoctMZ6uo1E7lwuQJXq+cddvm2F2jS+bU+d0FLWLEhatROMXK5e7hxndN3GcheUiUKF1JxRTTKCLdz6fdSEYNFWoep1ikLhpLMrcwM8twV5NmfNSHugtn8ExIYJCZO48suYI=
+	t=1731097661; cv=none; b=pZauKm2INi0ATdHzara3cCFIw9UCAW0zO3plk0dF1A1UeqyMRU2W6OGEy+QERFu54q5Jra+R0VDR18MIqJsgE2xATrRMGxJdMbGe06dti5VpIRKraiqt+wm6rKhyj8FweBL8vNWi5zSA1jSPzs6299eQ/Xn2246vaTJLwasTgF0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731097557; c=relaxed/simple;
-	bh=EwuR0aEZqAZbI/6IsUs5eyGt9WzC2ruGQlQLKWSC90Y=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=P3TanqqtkiLGwvWccU8MFxlZLL9T/RsmWcRPVHLnDgArAx2egh0vKaJgjsaxMeTJW8J2UBf2Dr9AoCxYtts6EtVYyx29hZMr7of5fBDw9WdBHgAYy9kaf8fvzy5a6IKlzhVt+D3EBnj4RkxsJ+pVO11f4uPXhPiKXyrnzpypQSI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=eqgg0yN0; arc=none smtp.client-ip=209.85.210.181
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f181.google.com with SMTP id d2e1a72fcca58-723f37dd76cso2738740b3a.0;
-        Fri, 08 Nov 2024 12:25:55 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731097555; x=1731702355; darn=vger.kernel.org;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ziC/Yq61LN2QkFiWm1kDqgTQsLk/e+GZCQ9Xzo2PVrg=;
-        b=eqgg0yN00miMkTGeuWVh+6utVnlHGb1ofEagTZzxcSdbJUh0ycvWUadbl9sEtQNfZU
-         xeVLiRNMYM0vlLAMk4WyDnlwY67h/wJVMSan1r3uPPiLWJ/3B9zLundQZOXyVjONCYY0
-         yjc7D+XPe5Y1BJBBThqq8UdfSxAxLH25vaU3ONyQAv50vifKaR1ycZ7os5dwOZqll9uu
-         3rlwLWG/aOMHDROJWyXGmoM5do8AySK6erAJhXe94MjouIRWgFEClhwHckcnbfIPJ+9h
-         OxVzIAJp+bp1MPan8foQ7WnqIwGmQOkRMjVp8wXmQFNwnaCng+wArNIEXI5XKIAIkqQW
-         YULQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731097555; x=1731702355;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ziC/Yq61LN2QkFiWm1kDqgTQsLk/e+GZCQ9Xzo2PVrg=;
-        b=onvGGl8RybmP+miQ6NRa4LJw4AAwk7OEp6SCnESSwEYqk0xP4MqJ72cqZCPIqz9yMZ
-         C1O9yR9qdTtKIp2kcu+3kSRVpW+Wvszvwj2RB4VLAPCp7FhCD7RYgSDbKYkU0jZ3v1TN
-         qK3+ClGmZeQHZ2b7gm2M0S1/P/3tymyixPP1/BxP6C+SrQEHRmhH8eD2JSCFzxk7NMmP
-         WnIF7Gij6gl7AmGNveOA8h3qTOppr4UrPNZYfLrsldPW6bds+NalnHZGVO/5U0bgLSW8
-         O2K/AXcfPSPS3yL6jTD8ozhy01TvDT+EakwqOV+OpSoGd1HFNX20PuT61QQMbJSIAWYA
-         LH3g==
-X-Forwarded-Encrypted: i=1; AJvYcCUrsUF7SvsoIlZQgkWH5NUcmDYpK4oVH3mjMKX+FAQeGV6cHJ9wY5HSqy5/Kl5pPybib+/Rg5/Vgf0=@vger.kernel.org, AJvYcCWFZ3m9gG5E+LlUILtOlZ+w9KNsYoAsGYF55PlKOmgusIs6ZDe8+uim+DMUdWZvfFStQUOeYn0r@vger.kernel.org, AJvYcCWhCGQoOu0Ai14IRdmbquqVBv0Jj3vk/IySiqM5wuDjMS7Y0DmvLliKR2OoHCWTY8OIhZCG3ENuUUC4DFDF@vger.kernel.org, AJvYcCXDtJEDk/UHeuc0Y9c/2ZHihDIPgF/lW6kCD1PsrkqvC0UpjJgu0rOagap9IHcXEK2AxuSQSyofnq1WfQ==@vger.kernel.org
-X-Gm-Message-State: AOJu0YzJ5HBi7g91VSmejDvaJS6yqxCVrjVIxjdMkpcn6eitLfqdAd1E
-	ik1b1CqjOrES6Rj65UheM8Vm1XmZ6IOUfUwv4SkUQYhkg+/jaTKK
-X-Google-Smtp-Source: AGHT+IFzz8Lbq/N+oEHpfPZUIZbcUUGi+YneJibJoBrUZTYSicjrrJP7xbTOlSK+DN7/o1E/TruelQ==
-X-Received: by 2002:a05:6a00:3399:b0:71e:7d52:fa8c with SMTP id d2e1a72fcca58-7241338b59fmr5742858b3a.22.1731097554716;
-        Fri, 08 Nov 2024 12:25:54 -0800 (PST)
-Received: from 1337.tail8aa098.ts.net (ms-studentunix-nat0.cs.ucalgary.ca. [136.159.16.20])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078a7ef5sm4342095b3a.63.2024.11.08.12.25.53
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 12:25:54 -0800 (PST)
-From: Abhinav Saxena <xandfury@gmail.com>
-To: linux-kernel-mentees@lists.linuxfoundation.org,
-	intel-wired-lan@lists.osuosl.org,
-	netdev@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	rds-devel@oss.oracle.com
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jonathan Corbet <corbet@lwn.net>,
-	Saeed Mahameed <saeedm@nvidia.com>,
-	Leon Romanovsky <leon@kernel.org>,
-	Tariq Toukan <tariqt@nvidia.com>,
-	Allison Henderson <allison.henderson@oracle.com>,
-	Russell King <linux@armlinux.org.uk>,
-	Dragos Tatulea <dtatulea@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Abhinav Saxena <xandfury@gmail.com>
-Subject: [PATCH 2/2] docs: net: Fix sfp-phylink whitespace
-Date: Fri,  8 Nov 2024 13:25:48 -0700
-Message-Id: <20241108202548.140511-2-xandfury@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20241108202548.140511-1-xandfury@gmail.com>
-References: <20241108202548.140511-1-xandfury@gmail.com>
+	s=arc-20240116; t=1731097661; c=relaxed/simple;
+	bh=Mtk4M7wTEghMQKho85bAKte8Qxs2DGGa6/kh9xByoZI=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=X6ppLxR/HwT3wpciWfvLq7Wh2nyfcZhFZzZlZqjJAdyHOrpfJaY5u04qj6BDS8NIVpJVSXTrAj+YuTcA6Jfc8OIqh2QybfDU52MLzqpLw/zT1sTUU/XXXl8M/sx4bRHFN5x9qbeU1XnLKkjxdrf0MixRq/+JyBzy5uhOeiqJHoQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=PFeVnsPO; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B8B9BC4CECD;
+	Fri,  8 Nov 2024 20:27:39 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731097660;
+	bh=Mtk4M7wTEghMQKho85bAKte8Qxs2DGGa6/kh9xByoZI=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=PFeVnsPOuTTMrtzHRehk5QDVPph7DwMryciEuYeeJGu1dZb0l0JFSw6iuyyHVtZu8
+	 yczsPl91Kr/Zzxekyc7cxlQJbkuEIcUj8C8EDUQBe+O83RMw6XrO3Z7UfY5JAkrnFw
+	 dGlAYlucPYLmO1BVHyudbiK4WNnqvZ6tDZm3HZJbnqfEN61RqcsNb/JQQDqbwloRT8
+	 19PQf6g6VrG/nKWIbtkiHr/RrsF64OC62eyHz86JpJw5tkpdSYYEf0whzjNybSs3nG
+	 YPVrOjBepTTL/WAdAF5KNGlddmAfPVjUXLoqy8IJLlApWCghd9IdywqPmy7dFEJM/U
+	 tm2ppA6nvfgPQ==
+Date: Fri, 8 Nov 2024 20:27:37 +0000
+From: Simon Horman <horms@kernel.org>
+To: Przemyslaw Korba <przemyslaw.korba@intel.com>
+Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com, przemyslaw.kitszel@intel.com
+Subject: Re: [PATCH iwl-net] ice: fix PHY timestamp extraction for ETH56G
+Message-ID: <20241108202737.GI4507@kernel.org>
+References: <20241107113257.466286-1-przemyslaw.korba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107113257.466286-1-przemyslaw.korba@intel.com>
 
-Remove trailing whitespace from sfp-phylink.rst documentation. Trailing
-whitespace can cause diff formatting issues and violate kernel coding style
-guidelines. This is a trivial cleanup with no content changes.
+On Thu, Nov 07, 2024 at 12:32:57PM +0100, Przemyslaw Korba wrote:
+> Fix incorrect PHY timestamp extraction for ETH56G.
+> It's better to use FIELD_PREP() than manual shift.
+> 
+> Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
+> Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+> Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
 
-Signed-off-by: Abhinav Saxena <xandfury@gmail.com>
----
- Documentation/networking/sfp-phylink.rst | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/Documentation/networking/sfp-phylink.rst b/Documentation/networking/sfp-phylink.rst
-index 5bf285d73e8a..4ce46aef6568 100644
---- a/Documentation/networking/sfp-phylink.rst
-+++ b/Documentation/networking/sfp-phylink.rst
-@@ -142,7 +142,7 @@ this documentation.
- 						  const struct ethtool_link_ksettings *cmd)
- 	{
- 		struct foo_priv *priv = netdev_priv(dev);
--	
-+
- 		return phylink_ethtool_ksettings_set(priv->phylink, cmd);
- 	}
- 
-@@ -150,7 +150,7 @@ this documentation.
- 						  struct ethtool_link_ksettings *cmd)
- 	{
- 		struct foo_priv *priv = netdev_priv(dev);
--	
-+
- 		return phylink_ethtool_ksettings_get(priv->phylink, cmd);
- 	}
- 
--- 
-2.34.1
+Reviewed-by: Simon Horman <horms@kernel.org>
 
 
