@@ -1,143 +1,139 @@
-Return-Path: <netdev+bounces-143410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E4699C253A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:58:43 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6C1B89C2547
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 20:01:49 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF8EA1C21917
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:58:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3374F284491
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:01:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0086C1AA1E1;
-	Fri,  8 Nov 2024 18:58:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5102B1AA1D2;
+	Fri,  8 Nov 2024 19:01:36 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b="Xq5j5PJA"
+	dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b="KD24XlpR"
 X-Original-To: netdev@vger.kernel.org
-Received: from out-187.mta1.migadu.com (out-187.mta1.migadu.com [95.215.58.187])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-qt1-f176.google.com (mail-qt1-f176.google.com [209.85.160.176])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE4FD1AA1D6
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 18:58:24 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=95.215.58.187
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B265D1A9B49
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 19:01:34 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.160.176
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731092306; cv=none; b=fMdOH4jb3D/5xCXz+XKwBOW0x9LqGELSrvDnC0xgc04qUFiBctpg7+ReBACUaAPM5n3DVx2ATcVGeYKR1YeGtECrw254zNncftGYmuM9ysvWifTWokEJfjzarAuNZ82JijiP0rb9d5WAtf/oVBenG0CvV+0/w0QPBvOT1IZvFYw=
+	t=1731092496; cv=none; b=jZhNMgRkIeEOdkgsP/xwrKpfWu3Hw+ULNWHSwqTkPKkGYith8ZlfvlgW91BLrYxTxgSPUsfPDw7Jn+M1UMSSmBqsCsquNZAwZXmg6FQbH612bGfRpcyS+Ij4nU8NemNLHSVjKn4T42kWBOKgIJ35LgvKVZxjU/oqYsYGacQOyvE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731092306; c=relaxed/simple;
-	bh=y5z+A9NupvZs4nnBpZrmvKCzP+8ZODrJ/XnKXmyBZO8=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=h+nWuuWWrzXg/0KEpxUMtnfyMr2BGwn8TfEmTNLFFb5mu+4/CF1DJmR8LyatFT+m+emQuZwtWTvRt1gLIGMZd89sAmf9mjLm0MriLGaub5BgU3yFQIsBtn/OeYRxCgBRPHZ1pv0SMIl+wRq6aRE2BQ7IpmLDVvUhUB/HJdBDAxI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev; spf=pass smtp.mailfrom=linux.dev; dkim=pass (1024-bit key) header.d=linux.dev header.i=@linux.dev header.b=Xq5j5PJA; arc=none smtp.client-ip=95.215.58.187
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linux.dev
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linux.dev
-Message-ID: <e4833d40-31d9-4de6-94b2-964870671006@linux.dev>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
-	t=1731092297;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uKOz2Ke3deWKx3LB9Ol2VggCwIo/TvK8NNumftjVwTM=;
-	b=Xq5j5PJA9CgtkmeafRikaDn8aGf9Tv9Nhpqunc9lWXEq7vCl1W4FWeC/HaS7GkGFr8Xf7k
-	eq7io/Hys8sHq5dO135k6r/GkvSNv0pAri6W735l6BrK387GeAuR7OuE/u8/1bh6HVTALi
-	KDwjsa00h6dPh+bKaEbi8c3yVT6f0Gk=
-Date: Fri, 8 Nov 2024 10:58:09 -0800
+	s=arc-20240116; t=1731092496; c=relaxed/simple;
+	bh=9YZfKkm5Xm6q9I83U7E2uBCjStEOALP97yzB7VUmGcM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=DkF+c0aombiNEIwTFD7duf3kCZ2uAnZD+lw18penL9a4FHPiR/AnR0MtYtQcGxV1mDhBJtzGxg3BaZYGxEAw5JdA5Foj3fPYLpZtCi8cLfxG4WJpzAVSP5gfbC7AkqJc/BCC5eH8i5k59sXmHapTRfewxqHqV/vqwwz5DrajsxU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com; spf=pass smtp.mailfrom=google.com; dkim=pass (2048-bit key) header.d=google.com header.i=@google.com header.b=KD24XlpR; arc=none smtp.client-ip=209.85.160.176
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=google.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=google.com
+Received: by mail-qt1-f176.google.com with SMTP id d75a77b69052e-460b295b9eeso20521cf.1
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 11:01:34 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20230601; t=1731092493; x=1731697293; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9YZfKkm5Xm6q9I83U7E2uBCjStEOALP97yzB7VUmGcM=;
+        b=KD24XlpRl3Pm7Dj4QP6974TPlX1Ar0QMz9wm4bEp7tRaeK2Wp6Wux69899rqa+g3o/
+         ESjbuw4ICbpih5El4EOwtDpQr/Mi2wYyUmiy/hKghsJI8AEyLO4wrSf9WRhVqRNSmtVC
+         sFONd9u3tEZTfYvLvpRiFvvEbTkzoalwBdg/DGa7tdm5z9qHEOqDY8UvaqhyMt2i23WH
+         1VHgDMHhytK02MsF/pHlNBX57rJUpiRHPRImky/kb9RSvn3U+K2S1jQPH50Ph4VpdPI5
+         rkVxedQYZVZzvbmm15/nW1NFUMFAkciaky3N390vSWsF6lZkdAJA8GYNXLp0O8++m09c
+         pgzw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731092493; x=1731697293;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9YZfKkm5Xm6q9I83U7E2uBCjStEOALP97yzB7VUmGcM=;
+        b=BFqDwL/gugq+xtoP4DVkRhDNzBg7qGxhWLi+AjhlYFszX5yzccBATZ1K4pPQcaK06V
+         AdKGhBAShVKfeFjJytheXmmo2+Wkcjto1N4o6ejk5dcA6L/vR4bpjXs7ixI9W3wpkNjv
+         kx+nCDX5W39+TvYuIe3Opz9wxCAxzBlOUxfy+wO81F+bfXF9Djst2nV99hcNDDkxBH11
+         Mps4j27WVH73v0XoNHqPALnfUfPbtj6z3Wxo6r1tHu14we17rUmt3a60eXfgIBB8tA1p
+         5UN/f3lZnt5l0fa/34zhJsOw+UBTmc9VTnkk2kPRRqXVbvk31Bh+0JRQHyDWnp3Ya6pL
+         3mow==
+X-Gm-Message-State: AOJu0YzSBxKVEPyltEPsJp94Yblm9jXyni4D4/heGpukj+Cawpbzh3Hl
+	V2T3Ze8IUG3zbbKkaLSWMS6stWyV0Qq0Yz1MMJdvE6mTGTv72NDe1O7audHURVuhRJsQz1yOIIw
+	K/nG1T1EreIPHhN9MSxyybPAmQCMV4VYmk6QR
+X-Gm-Gg: ASbGncs6KFiZNFrR2lgClanTGgp46lNBvDkudaAlB+qKvHnmCvzz4LJ7yNr7IsWSn1T
+	vOKQrCB/BPDtx3TRW2hQ9tHuTWA3Qy4Q=
+X-Google-Smtp-Source: AGHT+IGbCOeS+ZcoLeCOyqoYJYL1pCl2h+4gAy3C9to8d+om3vHCWullkz5bf7ktdN0S0DGx2SXYCBFb4aR0ASs0DRw=
+X-Received: by 2002:ac8:5e14:0:b0:462:c96a:bb30 with SMTP id
+ d75a77b69052e-4631695f5d9mr163721cf.2.1731092493297; Fri, 08 Nov 2024
+ 11:01:33 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [BUG] WARNING: at lib/vsprintf.c:2659 format_decode+0x121a/0x1c00
-To: Yeqi Fu <fufuyqqqqqq@gmail.com>,
- "jakub@cloudflare.com" <jakub@cloudflare.com>,
- "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
- "davem@davemloft.net" <davem@davemloft.net>,
- "edumazet@google.com" <edumazet@google.com>,
- "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com"
- <pabeni@redhat.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "bpf@vger.kernel.org" <bpf@vger.kernel.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Cc: "syzkaller@googlegroups.com" <syzkaller@googlegroups.com>,
- bonan.ruan@u.nus.edu
-References: <D47BDD2E-217F-4F16-A74C-ADE4DA025FED@gmail.com>
-Content-Language: en-GB
-X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
-From: Yonghong Song <yonghong.song@linux.dev>
-In-Reply-To: <D47BDD2E-217F-4F16-A74C-ADE4DA025FED@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Migadu-Flow: FLOW_OUT
+References: <20241107212309.3097362-1-almasrymina@google.com>
+ <20241107212309.3097362-5-almasrymina@google.com> <20241108141812.GL35848@ziepe.ca>
+In-Reply-To: <20241108141812.GL35848@ziepe.ca>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 8 Nov 2024 11:01:21 -0800
+Message-ID: <CAHS8izOVs+Tz2nFHMfiQ7=+hk6jKg46epO2f6Whfn07fNFOSRw@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
+ dmabuf memory provider
+To: Jason Gunthorpe <jgg@ziepe.ca>
+Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>, 
+	Pavel Begunkov <asml.silence@gmail.com>, Willem de Bruijn <willemb@google.com>, 
+	Kaiyuan Zhang <kaiyuanz@google.com>, Samiullah Khawaja <skhawaja@google.com>, linux-kernel@vger.kernel.org, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-
-
-
-On 11/8/24 6:28 AM, Yeqi Fu wrote:
-> Hi there,
-> A warning is triggered in lib/vsprintf.c due to an unsupported '%' in a format string. This issue occurs in the function format_decode at line 2659 of kernel version 6.12.0-rc3-gb22db8b8befe. A proof-of-concept is available, and I have manually reproduced this bug.
-
-I think the below patch set (not merged yet)
-   https://lore.kernel.org/bpf/20241028195343.2104-1-rabbelkin@mail.ru/
-should fix this issue.
-
+On Fri, Nov 8, 2024 at 6:18=E2=80=AFAM Jason Gunthorpe <jgg@ziepe.ca> wrote=
+:
 >
-> Report:
-> ```
-> Please remove unsupported % in format string
-> WARNING: CPU: 1 PID: 29307 at lib/vsprintf.c:2659 format_decode+0x121a/0x1c00 lib/vsprintf.c:2659
-> Modules linked in:
-> CPU: 1 UID: 0 PID: 29307 Comm: syz.5.9298 Not tainted 6.12.0-rc3-gb22db8b8befe #2
-> Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.15.0-1 04/01/2014
-> RIP: 0010:format_decode+0x121a/0x1c00 lib/vsprintf.c:2659
-> Code: 8b 9c 24 80 00 00 00 48 89 d8 48 c1 e8 03 42 8a 04 30 84 c0 0f 85 d5 09 00 00 0f b6 33 48 c7 c7 00 bd eb 92 e8 b7 59 67 fc 90 <0f> 0b 90 90 4d 89 f7 48 8b 5c 24 18 e9 d7 fc ff ff 89 d1 80 e1 07
-> RSP: 0018:ffff888041197600 EFLAGS: 00010246
-> RAX: ea46d93351edcc00 RBX: ffff88804119792c RCX: ffff888009a78000
-> RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
-> RBP: ffff8880411976f0 R08: ffffffff8ebc8e3b R09: 1ffff1100d9e515a
-> R10: dffffc0000000000 R11: ffffed100d9e515b R12: ffff0000ffffff00
-> R13: ffff888041197700 R14: dffffc0000000000 R15: dffffc0000000000
-> FS: 00007fbe06321640(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 0000000020a8c000 CR3: 00000000404b6005 CR4: 0000000000370ef0
-> DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> Call Trace:
-> <TASK>
-> bstr_printf+0x136/0x1260 lib/vsprintf.c:3232
-> ____bpf_trace_printk kernel/trace/bpf_trace.c:389 [inline]
-> bpf_trace_printk+0x1a1/0x220 kernel/trace/bpf_trace.c:374
-> bpf_prog_7ee8fe4dad0c4460+0x4e/0x50
-> bpf_dispatcher_nop_func include/linux/bpf.h:1257 [inline]
-> __bpf_prog_run include/linux/filter.h:692 [inline]
-> bpf_prog_run include/linux/filter.h:708 [inline]
-> bpf_test_run+0x7a9/0x910 net/bpf/test_run.c:433
-> bpf_prog_test_run_skb+0xc47/0x1750 net/bpf/test_run.c:1094
-> bpf_prog_test_run+0x2df/0x350 kernel/bpf/syscall.c:4247
-> __sys_bpf+0x484/0x850 kernel/bpf/syscall.c:5652
-> __do_sys_bpf kernel/bpf/syscall.c:5741 [inline]
-> __se_sys_bpf kernel/bpf/syscall.c:5739 [inline]
-> __x64_sys_bpf+0x7c/0x90 kernel/bpf/syscall.c:5739
-> do_syscall_x64 arch/x86/entry/common.c:52 [inline]
-> do_syscall_64+0xd8/0x1c0 arch/x86/entry/common.c:83
-> entry_SYSCALL_64_after_hwframe+0x67/0x6f
-> RIP: 0033:0x7fbe07ccd72d
-> Code: 02 b8 ff ff ff ff c3 66 0f 1f 44 00 00 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 a8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fbe06320f98 EFLAGS: 00000246 ORIG_RAX: 0000000000000141
-> RAX: ffffffffffffffda RBX: 00007fbe07ea5f80 RCX: 00007fbe07ccd72d
-> RDX: 0000000000000050 RSI: 0000000020000700 RDI: 000000000000000a
-> RBP: 00007fbe07d57584 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 0000000000000000 R14: 00007fbe07ea5f80 R15: 00007fbe06301000
-> </TASK>
-> irq event stamp: 39314
-> hardirqs last enabled at (39324): [<ffffffff8ed766cb>] __up_console_sem kernel/printk/printk.c:344 [inline]
-> hardirqs last enabled at (39324): [<ffffffff8ed766cb>] __console_unlock+0xfb/0x130 kernel/printk/printk.c:2844
-> hardirqs last disabled at (39335): [<ffffffff8ed766b0>] __up_console_sem kernel/printk/printk.c:342 [inline]
-> hardirqs last disabled at (39335): [<ffffffff8ed766b0>] __console_unlock+0xe0/0x130 kernel/printk/printk.c:2844
-> softirqs last enabled at (38482): [<ffffffff9195aaea>] bpf_test_run+0x31a/0x910
-> softirqs last disabled at (38484): [<ffffffff9195aaea>] bpf_test_run+0x31a/0x910
-> ---[ end trace 0000000000000000 ]---
-> ```
-[...]
+> On Thu, Nov 07, 2024 at 09:23:08PM +0000, Mina Almasry wrote:
+> > dmabuf dma-addresses should not be dma_sync'd for CPU/device. Typically
+> > its the driver responsibility to dma_sync for CPU, but the driver shoul=
+d
+> > not dma_sync for CPU if the netmem is actually coming from a dmabuf
+> > memory provider.
+>
+> This is not completely true, it is not *all* dmabuf, just the parts of
+> the dmabuf that are actually MMIO.
+>
+
+Thanks Jason, I can clarify the commit message when/if I send another itera=
+tion.
+
+> If you do this you may want to block accepting dmabufs that have CPU
+> pages inside them.
+>
+
+How do I check if the dmabuf has CPU pages inside of it? The only way
+I can think to do that is to sg_page a scatterlist entry, then
+!is_zone_device_page() the page. Or something like that, but I thought
+calling sg_page() on the dmabuf scatterlist was banned now.
+
+But as others mentioned, we've taken a dependency on using udmabuf for
+testing, so we'd like that to still work, we probably need to find
+another way than just blocking them entirely.
+
+I'm thinking, we already use the dmabuf sync APIs when we want to read
+the udmabuf from userspace. In ncdevmem.c, we do:
+
+sync.flags =3D DMA_BUF_SYNC_READ | DMA_BUF_SYNC_START;
+ioctl(buf, DMA_BUF_IOCTL_SYNC, &sync);
+
+Before we read the udmabuf data. Doesn't that do the same job as
+dma_sync_single_range_for_cpu? I'm thinking dmabufs with user pages
+would work as long as the user calls the dmabuf sync APIs, so we don't
+need to block them entirely from devmem tcp.
+
+
+
+--=20
+Thanks,
+Mina
 
