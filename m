@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-143148-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143149-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 142699C1439
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:40:54 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 026969C143D
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:41:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C4F55282FBE
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:40:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2675E1C227BE
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACE28193435;
-	Fri,  8 Nov 2024 02:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8851194AF3;
+	Fri,  8 Nov 2024 02:39:48 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="KBvVBaCy"
+	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="l2cbiD1Q"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
+Received: from mail-pf1-f182.google.com (mail-pf1-f182.google.com [209.85.210.182])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 16D211BD9FF
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 02:39:42 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7817194AEB
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 02:39:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731033584; cv=none; b=J+dxp8aOpAP6HS/MX0JsWAsfVQb6BfR0qrEqDK0unOLXZvUmhAsFgdALV3xLU0kBK2S+PlSCZjZ3PvscM+1cEv1xv5Kh0SShsYzLMyWyOJTF8PtwEyFCl7HPCdDjY9dBqLyHtHCkU1+HV+0SaNECaE37efQIulYGyx3nJkoFbqY=
+	t=1731033588; cv=none; b=RPOd+pWHPyi8+5aHb5i/DhCSfLdzLrJx24D8mFSnnvRbpeCjTF+EPQjiHF+SjijrmGfajYzlUEhU7m2fuI3qXJK4qCwOBMowLDMAxEKwsIm+PQAFMkDHqRfa9rKVpf57F8AfOYn5uEBkC97j6eq+6+Vj9t7gavXUB2NmGM4iucE=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731033584; c=relaxed/simple;
-	bh=ZvawQy978AWawDyo2L5Npe51s7GUMbBNxiumv6HwfAk=;
+	s=arc-20240116; t=1731033588; c=relaxed/simple;
+	bh=sDxd3c2F9ovwobGerKt2QqxX8fs+MFMu/wekNsO1RZs=;
 	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=r0RaCrZp5N2UFq5xRb+zfSsuUOosoMr6k/XSe4npAv1ySWVDXdLBU9tg3/Cq8xng09ZTZdyGDLrraYFgRS32uZlLwDnyTuqgqxrNa7hunLgrJE98hiu3KHvez22ooRGfRgI6t+ccWWGdvwLS/FtkOo9fPxTxoyoRrRGmhwv/dZU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=KBvVBaCy; arc=none smtp.client-ip=209.85.210.176
+	 MIME-Version; b=FH9HlVh6bNkoSZmH/a4fbjZR0e+u48jjDx3DWtrVlVEwYrjrgYQWcu4FCkxJUdc7fbywUcz9Anfv4zKnPPvsEWL3D3u5on1G5Kf35PVy6nWOFF85a4JpuR+ZLc72G08tBNlNal0gbGanb1J3YvsmMnM0kgCL96yxpg1Onlgt6PY=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=l2cbiD1Q; arc=none smtp.client-ip=209.85.210.182
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-723f37dd76cso1661205b3a.0
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 18:39:42 -0800 (PST)
+Received: by mail-pf1-f182.google.com with SMTP id d2e1a72fcca58-71e625b00bcso1240903b3a.3
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 18:39:46 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1731033582; x=1731638382; darn=vger.kernel.org;
+        d=fastly.com; s=google; t=1731033585; x=1731638385; darn=vger.kernel.org;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=U/mZBN4ImS6YyPeWvLF6rIBEjo5ZB0WxVpPyUomkuEI=;
-        b=KBvVBaCyMNQx2mjQ5WhjfdkZMkYXbv5kvyR7P5SZ/22bm6lViYArN135OfVlpV8CFi
-         LmUpU4YR0DNxiHi0+NopjPeTsy3DpH1Tbg6uzBLqyVmy26Ootx8o6TCzRcL8hu4IPArT
-         EdbGo84BS+gtncgw85ZBnoagMMrnXrxvSimZ8=
+        bh=JrclrIkE3qyTusw9ns/tUB+TQkHwUHaA1FNuNQ9aRes=;
+        b=l2cbiD1QbETO2ls3Cbsonuh1XA/nDRhwEXr5FE01FgEBLriZ10pw7pWhjT2xEehyG8
+         Mksq7kf5XBRPD/K+IaorhlmbnGk29YPTJEcPVqDfR91Awry/sMLyCMAChQe3R2RqZEtp
+         pXxUpab5c9qD2alSf7Zv8uLRexdruWHhOVuJY=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731033582; x=1731638382;
+        d=1e100.net; s=20230601; t=1731033585; x=1731638385;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=U/mZBN4ImS6YyPeWvLF6rIBEjo5ZB0WxVpPyUomkuEI=;
-        b=frQvmeHsDJB+jg74AdSe/JoI05gvpTer1jX3foKmXXxgQQKbJUNvlbXAjDdIoODRxE
-         bt12KQ1wAQBim0+/pTgGYZu1mUKk7LzePQpRB4DlhPSQNjHm5qubA9l0cRA4FI0fthfk
-         vpARMhanK57qw+4yRo3zadA+KDroi/KX2/kzmK88ksE3GzDTjqD7sFSiZ7i/tvj2KCiK
-         7IgI8dCwQi/cnyLBBvj/fDDVy1QAiyaRqD+HwyWtBcQIupyDuEE2Uj7Tt6Gmg1P8xXNf
-         MMJbldQ2aBxpFeE5R5oSKCVfu8ppPhrkyl66cQvdRH93NXxOJ5qd7xa0+YZC0xxabbow
-         W8ZA==
-X-Gm-Message-State: AOJu0YwadL2I9hvxlYf+AshOF0MwrBJy7S0Mo///fPmm48JlSMGC949/
-	0amA2sXlMx061ShO1ONX9By3RCZ1i2JUQjskTtAmAW5GptetJxFxRYkLseFoQrZcgJFs34EYQOE
-	PA75tKmJlbzKvmf1mBSBaxOg4B/WkNevS8C8jbJhxU9flBOhPXYhERskMIX4RSg+O8qu/lTmd2Y
-	GoyPFV4J5laEg1ks9GQd0Vqpt2ZqfdoU5eNsw=
-X-Google-Smtp-Source: AGHT+IFFd92Y6ex4UQGg5rD146kqSQq96391igpoD+qpK2xzPOHsxgd87+C9O4Dav8PDOj4pNOlRDw==
-X-Received: by 2002:a05:6a21:999f:b0:1db:d84f:c7d8 with SMTP id adf61e73a8af0-1dc228c6919mr1851329637.2.1731033581863;
-        Thu, 07 Nov 2024 18:39:41 -0800 (PST)
+        bh=JrclrIkE3qyTusw9ns/tUB+TQkHwUHaA1FNuNQ9aRes=;
+        b=aoQpfytjL3oA3w6MgB8qR9yVAz+1v8lojfAKTLTx+X/giCtg+2CdmbY/mo5vz6rXOx
+         WGmuiB2O8LNP+UuULiyTW63qFdnBnt/O9gdf9JV/+x0sNQlc2XcXfTa95dskZBE290Sr
+         3rmw7JKp6dcx4GE3WDSY2pi++7ZqGvPJcErgvB14SFScCYMdBtz0ZXDDkSF7vXL3z/8W
+         9uY7kontZKzAWJ4OEQw0ZlifsnPxHcCHCqdwb+y+OFY1upaR3Q4nB8CfEPP8+n4NKcBh
+         Ndi2n4DZ/RLlLJjXPDYl7UMFT38Q5o4CnMk8ifTYNaQSUAr0jyZXnHNRFXrgh/HtY4sJ
+         yfJg==
+X-Gm-Message-State: AOJu0Yyt9Bx1ThVXS8vaEfoEeeZk61jtodChKWoDwgiseTepnDKTXIvv
+	UFWvJaXEITMhwBR3Lm5vKhtqQ7rt8wew4e4D/s5yqjL0EAImP7HFTrq5gnBfo4V+rWyfemUwlNi
+	lWcM/ON1Fy5NX27bhj4vbl5dd1HbR7OrPUH9xTdXsZsUprU1QgJTGx2eC8A5pb7qZ03kcRxhxy3
+	mtfGEUoyBctDjTNSc4m4KUin2Kn4AaojdbX0s=
+X-Google-Smtp-Source: AGHT+IELPiYuPodgNqEUrqe0mm6AHYv0el8SqJpQ2pxGPMnNb+OEsQzuJEkSWMQxTloV3Zt7uHs96g==
+X-Received: by 2002:a05:6a00:2290:b0:71e:55e2:2c43 with SMTP id d2e1a72fcca58-724132c07ddmr1834712b3a.14.1731033585207;
+        Thu, 07 Nov 2024 18:39:45 -0800 (PST)
 Received: from localhost.localdomain ([2620:11a:c019:0:65e:3115:2f58:c5fd])
-        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079a403fsm2561208b3a.105.2024.11.07.18.39.40
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724079a403fsm2561208b3a.105.2024.11.07.18.39.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 18:39:41 -0800 (PST)
+        Thu, 07 Nov 2024 18:39:44 -0800 (PST)
 From: Joe Damato <jdamato@fastly.com>
 To: netdev@vger.kernel.org
 Cc: corbet@lwn.net,
@@ -84,16 +84,16 @@ Cc: corbet@lwn.net,
 	willemdebruijn.kernel@gmail.com,
 	skhawaja@google.com,
 	kuba@kernel.org,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
 	Joe Damato <jdamato@fastly.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Christian Brauner <brauner@kernel.org>,
-	Jan Kara <jack@suse.cz>,
-	linux-fsdevel@vger.kernel.org (open list:FILESYSTEMS (VFS and infrastructure)),
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net-next v7 4/6] eventpoll: Control irq suspension for prefer_busy_poll
-Date: Fri,  8 Nov 2024 02:39:00 +0000
-Message-Id: <20241108023912.98416-5-jdamato@fastly.com>
+	Martin Karsten <mkarsten@uwaterloo.ca>,
+	"David S. Miller" <davem@davemloft.net>,
+	Simon Horman <horms@kernel.org>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kernel@vger.kernel.org (open list),
+	linux-kselftest@vger.kernel.org (open list:KERNEL SELFTEST FRAMEWORK)
+Subject: [PATCH net-next v7 5/6] selftests: net: Add busy_poll_test
+Date: Fri,  8 Nov 2024 02:39:01 +0000
+Message-Id: <20241108023912.98416-6-jdamato@fastly.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20241108023912.98416-1-jdamato@fastly.com>
 References: <20241108023912.98416-1-jdamato@fastly.com>
@@ -105,106 +105,589 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Martin Karsten <mkarsten@uwaterloo.ca>
+Add an epoll busy poll test using netdevsim.
 
-When events are reported to userland and prefer_busy_poll is set, irqs
-are temporarily suspended using napi_suspend_irqs.
+This test is comprised of:
+  - busy_poller (via busy_poller.c)
+  - busy_poll_test.sh which loads netdevsim, sets up network namespaces,
+    and runs busy_poller to receive data and socat to send data.
 
-If no events are found and ep_poll would go to sleep, irq suspension is
-cancelled using napi_resume_irqs.
+The selftest tests two different scenarios:
+  - busy poll (the pre-existing version in the kernel)
+  - busy poll with suspend enabled (what this series adds)
 
-Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
-Co-developed-by: Joe Damato <jdamato@fastly.com>
+The data transmit is a 1MiB temporary file generated from /dev/urandom
+and the test is considered passing if the md5sum of the input file to
+socat matches the md5sum of the output file from busy_poller.
+
+netdevsim was chosen instead of veth due to netdevsim's support for
+netdev-genl.
+
+For now, this test uses the functionality that netdevsim provides. In the
+future, perhaps netdevsim can be extended to emulate device IRQs to more
+thoroughly test all pre-existing kernel options (like defer_hard_irqs)
+and suspend.
+
 Signed-off-by: Joe Damato <jdamato@fastly.com>
-Tested-by: Joe Damato <jdamato@fastly.com>
-Tested-by: Martin Karsten <mkarsten@uwaterloo.ca>
+Co-developed-by: Martin Karsten <mkarsten@uwaterloo.ca>
+Signed-off-by: Martin Karsten <mkarsten@uwaterloo.ca>
 Acked-by: Stanislav Fomichev <sdf@fomichev.me>
-Reviewed-by: Sridhar Samudrala <sridhar.samudrala@intel.com>
 ---
  v5:
-   - Only call ep_suspend_napi_irqs when ep_send_events returns a
-     positive value. IRQs are not suspended in error (e.g. EINTR)
-     cases. This issue was pointed out by Hillf Danton.
+   - Updated commit message to replace netcat with socat and fixed
+     misspelling of netdevsim. No functional/code changes.
 
- rfc -> v1:
-   - move irq resume code from ep_free to a helper which either resumes
-     IRQs or does nothing if !defined(CONFIG_NET_RX_BUSY_POLL).
+ v4:
+   - Updated busy_poll_test.sh:
+     - use socat instead of nc
+     - drop cli.py usage from the script
+     - removed check_ynl
+   - Updated busy_poller.c:
+     - use netlink to configure napi parameters
 
- fs/eventpoll.c | 32 +++++++++++++++++++++++++++++++-
- 1 file changed, 31 insertions(+), 1 deletion(-)
+ v3:
+   - New in v3
 
-diff --git a/fs/eventpoll.c b/fs/eventpoll.c
-index f9e0d9307dad..83bcb559b89f 100644
---- a/fs/eventpoll.c
-+++ b/fs/eventpoll.c
-@@ -457,6 +457,8 @@ static bool ep_busy_loop(struct eventpoll *ep, int nonblock)
- 		 * it back in when we have moved a socket with a valid NAPI
- 		 * ID onto the ready list.
- 		 */
-+		if (prefer_busy_poll)
-+			napi_resume_irqs(napi_id);
- 		ep->napi_id = 0;
- 		return false;
- 	}
-@@ -540,6 +542,22 @@ static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
- 	}
- }
+ tools/testing/selftests/net/.gitignore        |   1 +
+ tools/testing/selftests/net/Makefile          |   3 +-
+ tools/testing/selftests/net/busy_poll_test.sh | 164 +++++++++
+ tools/testing/selftests/net/busy_poller.c     | 328 ++++++++++++++++++
+ 4 files changed, 495 insertions(+), 1 deletion(-)
+ create mode 100755 tools/testing/selftests/net/busy_poll_test.sh
+ create mode 100644 tools/testing/selftests/net/busy_poller.c
+
+diff --git a/tools/testing/selftests/net/.gitignore b/tools/testing/selftests/net/.gitignore
+index 217d8b7a7365..85b0c4a2179f 100644
+--- a/tools/testing/selftests/net/.gitignore
++++ b/tools/testing/selftests/net/.gitignore
+@@ -2,6 +2,7 @@
+ bind_bhash
+ bind_timewait
+ bind_wildcard
++busy_poller
+ cmsg_sender
+ diag_uid
+ epoll_busy_poll
+diff --git a/tools/testing/selftests/net/Makefile b/tools/testing/selftests/net/Makefile
+index 26a4883a65c9..3ccfe454db1a 100644
+--- a/tools/testing/selftests/net/Makefile
++++ b/tools/testing/selftests/net/Makefile
+@@ -96,9 +96,10 @@ TEST_PROGS += fdb_flush.sh
+ TEST_PROGS += fq_band_pktlimit.sh
+ TEST_PROGS += vlan_hw_filter.sh
+ TEST_PROGS += bpf_offload.py
++TEST_PROGS += busy_poll_test.sh
  
-+static void ep_suspend_napi_irqs(struct eventpoll *ep)
-+{
-+	unsigned int napi_id = READ_ONCE(ep->napi_id);
+ # YNL files, must be before "include ..lib.mk"
+-YNL_GEN_FILES := ncdevmem
++YNL_GEN_FILES := ncdevmem busy_poller
+ TEST_GEN_FILES += $(YNL_GEN_FILES)
+ 
+ TEST_FILES := settings
+diff --git a/tools/testing/selftests/net/busy_poll_test.sh b/tools/testing/selftests/net/busy_poll_test.sh
+new file mode 100755
+index 000000000000..ffc74bc62e5a
+--- /dev/null
++++ b/tools/testing/selftests/net/busy_poll_test.sh
+@@ -0,0 +1,164 @@
++#!/bin/bash
++# SPDX-License-Identifier: GPL-2.0-only
++source net_helper.sh
 +
-+	if (napi_id >= MIN_NAPI_ID && READ_ONCE(ep->prefer_busy_poll))
-+		napi_suspend_irqs(napi_id);
++NSIM_DEV_1_ID=$((256 + RANDOM % 256))
++NSIM_DEV_1_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_1_ID
++NSIM_DEV_2_ID=$((512 + RANDOM % 256))
++NSIM_DEV_2_SYS=/sys/bus/netdevsim/devices/netdevsim$NSIM_DEV_2_ID
++
++NSIM_DEV_SYS_NEW=/sys/bus/netdevsim/new_device
++NSIM_DEV_SYS_DEL=/sys/bus/netdevsim/del_device
++NSIM_DEV_SYS_LINK=/sys/bus/netdevsim/link_device
++NSIM_DEV_SYS_UNLINK=/sys/bus/netdevsim/unlink_device
++
++setup_ns()
++{
++	set -e
++	ip netns add nssv
++	ip netns add nscl
++
++	NSIM_DEV_1_NAME=$(find $NSIM_DEV_1_SYS/net -maxdepth 1 -type d ! \
++		-path $NSIM_DEV_1_SYS/net -exec basename {} \;)
++	NSIM_DEV_2_NAME=$(find $NSIM_DEV_2_SYS/net -maxdepth 1 -type d ! \
++		-path $NSIM_DEV_2_SYS/net -exec basename {} \;)
++
++	# ensure the server has 1 queue
++	ethtool -L $NSIM_DEV_1_NAME combined 1 2>/dev/null
++
++	ip link set $NSIM_DEV_1_NAME netns nssv
++	ip link set $NSIM_DEV_2_NAME netns nscl
++
++	ip netns exec nssv ip addr add '192.168.1.1/24' dev $NSIM_DEV_1_NAME
++	ip netns exec nscl ip addr add '192.168.1.2/24' dev $NSIM_DEV_2_NAME
++
++	ip netns exec nssv ip link set dev $NSIM_DEV_1_NAME up
++	ip netns exec nscl ip link set dev $NSIM_DEV_2_NAME up
++
++	set +e
 +}
 +
-+static void ep_resume_napi_irqs(struct eventpoll *ep)
++cleanup_ns()
 +{
-+	unsigned int napi_id = READ_ONCE(ep->napi_id);
-+
-+	if (napi_id >= MIN_NAPI_ID && READ_ONCE(ep->prefer_busy_poll))
-+		napi_resume_irqs(napi_id);
++	ip netns del nscl
++	ip netns del nssv
 +}
 +
- #else
- 
- static inline bool ep_busy_loop(struct eventpoll *ep, int nonblock)
-@@ -557,6 +575,14 @@ static long ep_eventpoll_bp_ioctl(struct file *file, unsigned int cmd,
- 	return -EOPNOTSUPP;
- }
- 
-+static void ep_suspend_napi_irqs(struct eventpoll *ep)
++test_busypoll()
 +{
++	tmp_file=$(mktemp)
++	out_file=$(mktemp)
++
++	# fill a test file with random data
++	dd if=/dev/urandom of=${tmp_file} bs=1M count=1 2> /dev/null
++
++	timeout -k 1s 30s ip netns exec nssv ./busy_poller -p48675 -b192.168.1.1 -m8 -u0 -P1 -g16 -i${NSIM_DEV_1_IFIDX} -o${out_file}&
++
++	wait_local_port_listen nssv 48675 tcp
++
++	ip netns exec nscl socat -u $tmp_file TCP:192.168.1.1:48675
++
++	wait
++
++	tmp_file_md5sum=$(md5sum $tmp_file | cut -f1 -d' ')
++	out_file_md5sum=$(md5sum $out_file | cut -f1 -d' ')
++
++	if [ "$tmp_file_md5sum" = "$out_file_md5sum" ]; then
++		res=0
++	else
++		echo "md5sum mismatch"
++		echo "input file md5sum: ${tmp_file_md5sum}";
++		echo "output file md5sum: ${out_file_md5sum}";
++		res=1
++	fi
++
++	rm $out_file $tmp_file
++
++	return $res
 +}
 +
-+static void ep_resume_napi_irqs(struct eventpoll *ep)
++test_busypoll_with_suspend()
 +{
++	tmp_file=$(mktemp)
++	out_file=$(mktemp)
++
++	# fill a test file with random data
++	dd if=/dev/urandom of=${tmp_file} bs=1M count=1 2> /dev/null
++
++	timeout -k 1s 30s ip netns exec nssv ./busy_poller -p48675 -b192.168.1.1 -m8 -u0 -P1 -g16 -d100 -r50000 -s20000000 -i${NSIM_DEV_1_IFIDX} -o${out_file}&
++
++	wait_local_port_listen nssv 48675 tcp
++
++	ip netns exec nscl socat -u $tmp_file TCP:192.168.1.1:48675
++
++	wait
++
++	tmp_file_md5sum=$(md5sum $tmp_file | cut -f1 -d' ')
++	out_file_md5sum=$(md5sum $out_file | cut -f1 -d' ')
++
++	if [ "$tmp_file_md5sum" = "$out_file_md5sum" ]; then
++		res=0
++	else
++		echo "md5sum mismatch"
++		echo "input file md5sum: ${tmp_file_md5sum}";
++		echo "output file md5sum: ${out_file_md5sum}";
++		res=1
++	fi
++
++	rm $out_file $tmp_file
++
++	return $res
 +}
 +
- #endif /* CONFIG_NET_RX_BUSY_POLL */
- 
- /*
-@@ -788,6 +814,7 @@ static bool ep_refcount_dec_and_test(struct eventpoll *ep)
- 
- static void ep_free(struct eventpoll *ep)
- {
-+	ep_resume_napi_irqs(ep);
- 	mutex_destroy(&ep->mtx);
- 	free_uid(ep->user);
- 	wakeup_source_unregister(ep->ws);
-@@ -2005,8 +2032,11 @@ static int ep_poll(struct eventpoll *ep, struct epoll_event __user *events,
- 			 * trying again in search of more luck.
- 			 */
- 			res = ep_send_events(ep, events, maxevents);
--			if (res)
-+			if (res) {
-+				if (res > 0)
-+					ep_suspend_napi_irqs(ep);
- 				return res;
++###
++### Code start
++###
++
++modprobe netdevsim
++
++# linking
++
++echo $NSIM_DEV_1_ID > $NSIM_DEV_SYS_NEW
++echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_NEW
++udevadm settle
++
++setup_ns
++
++NSIM_DEV_1_FD=$((256 + RANDOM % 256))
++exec {NSIM_DEV_1_FD}</var/run/netns/nssv
++NSIM_DEV_1_IFIDX=$(ip netns exec nssv cat /sys/class/net/$NSIM_DEV_1_NAME/ifindex)
++
++NSIM_DEV_2_FD=$((256 + RANDOM % 256))
++exec {NSIM_DEV_2_FD}</var/run/netns/nscl
++NSIM_DEV_2_IFIDX=$(ip netns exec nscl cat /sys/class/net/$NSIM_DEV_2_NAME/ifindex)
++
++echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX $NSIM_DEV_2_FD:$NSIM_DEV_2_IFIDX" > $NSIM_DEV_SYS_LINK
++if [ $? -ne 0 ]; then
++	echo "linking netdevsim1 with netdevsim2 should succeed"
++	cleanup_ns
++	exit 1
++fi
++
++test_busypoll
++if [ $? -ne 0 ]; then
++	echo "test_busypoll failed"
++	cleanup_ns
++	exit 1
++fi
++
++test_busypoll_with_suspend
++if [ $? -ne 0 ]; then
++	echo "test_busypoll_with_suspend failed"
++	cleanup_ns
++	exit 1
++fi
++
++echo "$NSIM_DEV_1_FD:$NSIM_DEV_1_IFIDX" > $NSIM_DEV_SYS_UNLINK
++
++echo $NSIM_DEV_2_ID > $NSIM_DEV_SYS_DEL
++
++cleanup_ns
++
++modprobe -r netdevsim
++
++exit 0
+diff --git a/tools/testing/selftests/net/busy_poller.c b/tools/testing/selftests/net/busy_poller.c
+new file mode 100644
+index 000000000000..8d8aa9e5939a
+--- /dev/null
++++ b/tools/testing/selftests/net/busy_poller.c
+@@ -0,0 +1,328 @@
++// SPDX-License-Identifier: GPL-2.0
++#include <assert.h>
++#include <errno.h>
++#include <error.h>
++#include <fcntl.h>
++#include <inttypes.h>
++#include <limits.h>
++#include <stdlib.h>
++#include <stdio.h>
++#include <string.h>
++#include <unistd.h>
++
++#include <arpa/inet.h>
++#include <netinet/in.h>
++
++#include <sys/ioctl.h>
++#include <sys/epoll.h>
++#include <sys/socket.h>
++#include <sys/types.h>
++
++#include <linux/netlink.h>
++#include <linux/genetlink.h>
++#include "netdev-user.h"
++#include <ynl.h>
++
++/* if the headers haven't been updated, we need to define some things */
++#if !defined(EPOLL_IOC_TYPE)
++struct epoll_params {
++	uint32_t busy_poll_usecs;
++	uint16_t busy_poll_budget;
++	uint8_t prefer_busy_poll;
++
++	/* pad the struct to a multiple of 64bits */
++	uint8_t __pad;
++};
++
++#define EPOLL_IOC_TYPE 0x8A
++#define EPIOCSPARAMS _IOW(EPOLL_IOC_TYPE, 0x01, struct epoll_params)
++#define EPIOCGPARAMS _IOR(EPOLL_IOC_TYPE, 0x02, struct epoll_params)
++#endif
++
++static uint32_t cfg_port = 8000;
++static struct in_addr cfg_bind_addr = { .s_addr = INADDR_ANY };
++static char *cfg_outfile;
++static int cfg_max_events = 8;
++static int cfg_ifindex;
++
++/* busy poll params */
++static uint32_t cfg_busy_poll_usecs;
++static uint16_t cfg_busy_poll_budget;
++static uint8_t cfg_prefer_busy_poll;
++
++/* IRQ params */
++static uint32_t cfg_defer_hard_irqs;
++static uint64_t cfg_gro_flush_timeout;
++static uint64_t cfg_irq_suspend_timeout;
++
++static void usage(const char *filepath)
++{
++	error(1, 0,
++	      "Usage: %s -p<port> -b<addr> -m<max_events> -u<busy_poll_usecs> -P<prefer_busy_poll> -g<busy_poll_budget> -o<outfile> -d<defer_hard_irqs> -r<gro_flush_timeout> -s<irq_suspend_timeout> -i<ifindex>",
++	      filepath);
++}
++
++static void parse_opts(int argc, char **argv)
++{
++	int ret;
++	int c;
++
++	if (argc <= 1)
++		usage(argv[0]);
++
++	while ((c = getopt(argc, argv, "p:m:b:u:P:g:o:d:r:s:i:")) != -1) {
++		switch (c) {
++		case 'u':
++			cfg_busy_poll_usecs = strtoul(optarg, NULL, 0);
++			if (cfg_busy_poll_usecs == ULONG_MAX ||
++			    cfg_busy_poll_usecs > UINT32_MAX)
++				error(1, ERANGE, "busy_poll_usecs too large");
++			break;
++		case 'P':
++			cfg_prefer_busy_poll = strtoul(optarg, NULL, 0);
++			if (cfg_prefer_busy_poll == ULONG_MAX ||
++			    cfg_prefer_busy_poll > 1)
++				error(1, ERANGE,
++				      "prefer busy poll should be 0 or 1");
++			break;
++		case 'g':
++			cfg_busy_poll_budget = strtoul(optarg, NULL, 0);
++			if (cfg_busy_poll_budget == ULONG_MAX ||
++			    cfg_busy_poll_budget > UINT16_MAX)
++				error(1, ERANGE,
++				      "busy poll budget must be [0, UINT16_MAX]");
++			break;
++		case 'p':
++			cfg_port = strtoul(optarg, NULL, 0);
++			if (cfg_port > UINT16_MAX)
++				error(1, ERANGE, "port must be <= 65535");
++			break;
++		case 'b':
++			ret = inet_aton(optarg, &cfg_bind_addr);
++			if (ret == 0)
++				error(1, errno,
++				      "bind address %s invalid", optarg);
++			break;
++		case 'o':
++			cfg_outfile = strdup(optarg);
++			if (!cfg_outfile)
++				error(1, 0, "outfile invalid");
++			break;
++		case 'm':
++			cfg_max_events = strtol(optarg, NULL, 0);
++
++			if (cfg_max_events == LONG_MIN ||
++			    cfg_max_events == LONG_MAX ||
++			    cfg_max_events <= 0)
++				error(1, ERANGE,
++				      "max events must be > 0 and < LONG_MAX");
++			break;
++		case 'd':
++			cfg_defer_hard_irqs = strtoul(optarg, NULL, 0);
++
++			if (cfg_defer_hard_irqs == ULONG_MAX ||
++			    cfg_defer_hard_irqs > INT32_MAX)
++				error(1, ERANGE,
++				      "defer_hard_irqs must be <= INT32_MAX");
++			break;
++		case 'r':
++			cfg_gro_flush_timeout = strtoull(optarg, NULL, 0);
++
++			if (cfg_gro_flush_timeout == ULLONG_MAX)
++				error(1, ERANGE,
++				      "gro_flush_timeout must be < ULLONG_MAX");
++			break;
++		case 's':
++			cfg_irq_suspend_timeout = strtoull(optarg, NULL, 0);
++
++			if (cfg_irq_suspend_timeout == ULLONG_MAX)
++				error(1, ERANGE,
++				      "irq_suspend_timeout must be < ULLONG_MAX");
++			break;
++		case 'i':
++			cfg_ifindex = strtoul(optarg, NULL, 0);
++			if (cfg_ifindex == ULONG_MAX)
++				error(1, ERANGE,
++				      "ifindex must be < ULONG_MAX");
++			break;
++		}
++	}
++
++	if (!cfg_ifindex)
++		usage(argv[0]);
++
++	if (optind != argc)
++		usage(argv[0]);
++}
++
++static void epoll_ctl_add(int epfd, int fd, uint32_t events)
++{
++	struct epoll_event ev;
++
++	ev.events = events;
++	ev.data.fd = fd;
++	if (epoll_ctl(epfd, EPOLL_CTL_ADD, fd, &ev) == -1)
++		error(1, errno, "epoll_ctl add fd: %d", fd);
++}
++
++static void setnonblock(int sockfd)
++{
++	int flags;
++
++	flags = fcntl(sockfd, F_GETFL, 0);
++
++	if (fcntl(sockfd, F_SETFL, flags | O_NONBLOCK) == -1)
++		error(1, errno, "unable to set socket to nonblocking mode");
++}
++
++static void write_chunk(int fd, char *buf, ssize_t buflen)
++{
++	ssize_t remaining = buflen;
++	char *buf_offset = buf;
++	ssize_t writelen = 0;
++	ssize_t write_result;
++
++	while (writelen < buflen) {
++		write_result = write(fd, buf_offset, remaining);
++		if (write_result == -1)
++			error(1, errno, "unable to write data to outfile");
++
++		writelen += write_result;
++		remaining -= write_result;
++		buf_offset += write_result;
++	}
++}
++
++static void setup_queue(void)
++{
++	struct netdev_napi_get_list *napi_list = NULL;
++	struct netdev_napi_get_req_dump *req = NULL;
++	struct netdev_napi_set_req *set_req = NULL;
++	struct ynl_sock *ys;
++	struct ynl_error yerr;
++	uint32_t napi_id;
++
++	ys = ynl_sock_create(&ynl_netdev_family, &yerr);
++	if (!ys)
++		error(1, 0, "YNL: %s", yerr.msg);
++
++	req = netdev_napi_get_req_dump_alloc();
++	netdev_napi_get_req_dump_set_ifindex(req, cfg_ifindex);
++	napi_list = netdev_napi_get_dump(ys, req);
++
++	/* assume there is 1 NAPI configured and take the first */
++	if (napi_list->obj._present.id)
++		napi_id = napi_list->obj.id;
++	else
++		error(1, 0, "napi ID not present?");
++
++	set_req = netdev_napi_set_req_alloc();
++	netdev_napi_set_req_set_id(set_req, napi_id);
++	netdev_napi_set_req_set_defer_hard_irqs(set_req, cfg_defer_hard_irqs);
++	netdev_napi_set_req_set_gro_flush_timeout(set_req,
++						  cfg_gro_flush_timeout);
++	netdev_napi_set_req_set_irq_suspend_timeout(set_req,
++						    cfg_irq_suspend_timeout);
++
++	if (netdev_napi_set(ys, set_req))
++		error(1, 0, "can't set NAPI params: %s\n", yerr.msg);
++
++	netdev_napi_get_list_free(napi_list);
++	netdev_napi_get_req_dump_free(req);
++	netdev_napi_set_req_free(set_req);
++	ynl_sock_destroy(ys);
++}
++
++static void run_poller(void)
++{
++	struct epoll_event events[cfg_max_events];
++	struct epoll_params epoll_params = {0};
++	struct sockaddr_in server_addr;
++	int i, epfd, nfds;
++	ssize_t readlen;
++	int outfile_fd;
++	char buf[1024];
++	int sockfd;
++	int conn;
++	int val;
++
++	outfile_fd = open(cfg_outfile, O_WRONLY | O_CREAT, 0644);
++	if (outfile_fd == -1)
++		error(1, errno, "unable to open outfile: %s", cfg_outfile);
++
++	sockfd = socket(AF_INET, SOCK_STREAM, IPPROTO_TCP);
++	if (sockfd == -1)
++		error(1, errno, "unable to create listen socket");
++
++	server_addr.sin_family = AF_INET;
++	server_addr.sin_port = htons(cfg_port);
++	server_addr.sin_addr = cfg_bind_addr;
++
++	epoll_params.busy_poll_usecs = cfg_busy_poll_usecs;
++	epoll_params.busy_poll_budget = cfg_busy_poll_budget;
++	epoll_params.prefer_busy_poll = cfg_prefer_busy_poll;
++	epoll_params.__pad = 0;
++
++	val = 1;
++	if (setsockopt(sockfd, SOL_SOCKET, SO_REUSEADDR, &val, sizeof(val)))
++		error(1, errno, "poller setsockopt reuseaddr");
++
++	setnonblock(sockfd);
++
++	if (bind(sockfd, (struct sockaddr *)&server_addr,
++		 sizeof(struct sockaddr_in)))
++		error(0, errno, "poller bind to port: %d\n", cfg_port);
++
++	if (listen(sockfd, 1))
++		error(1, errno, "poller listen");
++
++	epfd = epoll_create1(0);
++	if (ioctl(epfd, EPIOCSPARAMS, &epoll_params) == -1)
++		error(1, errno, "unable to set busy poll params");
++
++	epoll_ctl_add(epfd, sockfd, EPOLLIN | EPOLLOUT | EPOLLET);
++
++	for (;;) {
++		nfds = epoll_wait(epfd, events, cfg_max_events, -1);
++		for (i = 0; i < nfds; i++) {
++			if (events[i].data.fd == sockfd) {
++				conn = accept(sockfd, NULL, NULL);
++				if (conn == -1)
++					error(1, errno,
++					      "accepting incoming connection failed");
++
++				setnonblock(conn);
++				epoll_ctl_add(epfd, conn,
++					      EPOLLIN | EPOLLET | EPOLLRDHUP |
++					      EPOLLHUP);
++			} else if (events[i].events & EPOLLIN) {
++				for (;;) {
++					readlen = read(events[i].data.fd, buf,
++						       sizeof(buf));
++					if (readlen > 0)
++						write_chunk(outfile_fd, buf,
++							    readlen);
++					else
++						break;
++				}
++			} else {
++				/* spurious event ? */
 +			}
- 		}
- 
- 		if (timed_out)
++			if (events[i].events & (EPOLLRDHUP | EPOLLHUP)) {
++				epoll_ctl(epfd, EPOLL_CTL_DEL,
++					  events[i].data.fd, NULL);
++				close(events[i].data.fd);
++				close(outfile_fd);
++				return;
++			}
++		}
++	}
++}
++
++int main(int argc, char *argv[])
++{
++	parse_opts(argc, argv);
++	setup_queue();
++	run_poller();
++	return 0;
++}
 -- 
 2.25.1
 
