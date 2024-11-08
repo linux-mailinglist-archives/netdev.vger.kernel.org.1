@@ -1,184 +1,517 @@
-Return-Path: <netdev+bounces-143407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE21F9C24E2
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:28:36 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 32DDE9C24E5
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 19:31:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 14CA91C23EA0
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:28:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 592C11C21379
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19BC8198E85;
-	Fri,  8 Nov 2024 18:28:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8513F233D9D;
+	Fri,  8 Nov 2024 18:31:11 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b="QiDGOCZZ"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="FblZq8f/"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f171.google.com (mail-qk1-f171.google.com [209.85.222.171])
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E696C233D88
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 18:28:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.171
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DC46233D93;
+	Fri,  8 Nov 2024 18:31:09 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.49
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731090511; cv=none; b=kL1lGP2K/e5mXvaeT/MxLYU7stzCdpiyPXvTgy1WIlEf0ygmRshlo9IsA61ki37eVBDPBLvaCDkwCEymEyWhYXpTRerUvuDMGv1yVXJKX0Q77uvEo5C/IiBIg6EnqDeM6sHY9B1i3lfj8AKKGL0cXM5Jy1nIpw2DqWErK7QBCWE=
+	t=1731090671; cv=none; b=ZrIHv9+bB8qTAhI2tDjHw/3qy243IzrwlqIShDFxHwBwg7PAVavv/ibntJOUCwzFssesN5kcLSJayB22xPY+aBEaHXK04KmKLcTEz2BdaRAF7w2/vWGjMS9TzDX8UvvWkD8GXr2YZLRswNEkQzbS+Q3RemHhxa+BWagXjtTJa9Y=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731090511; c=relaxed/simple;
-	bh=aomfWlwmh/DGJ3+fy8dkpzWlh+NgDtApGrsMDMYyB5M=;
-	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
-	 In-Reply-To:Content-Type; b=kVNf6TCH4S9uAzqXMQC/Wz1fug54nUfoJI4SUQFwnZpzeNaY9XxTgw9ycZqi4TFkKBIc1RdGo1qCE/Z+ybjc238AOO95iV2LGm8Sq5JxpfQdqaSIhmp44wjffahp5vb1OivbGmvUrVtNrlfMTvl8AukaJuUyr1QGjkKj15sAzGU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com; spf=pass smtp.mailfrom=bytedance.com; dkim=pass (2048-bit key) header.d=bytedance.com header.i=@bytedance.com header.b=QiDGOCZZ; arc=none smtp.client-ip=209.85.222.171
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=bytedance.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=bytedance.com
-Received: by mail-qk1-f171.google.com with SMTP id af79cd13be357-7b15eadee87so158235085a.2
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 10:28:27 -0800 (PST)
+	s=arc-20240116; t=1731090671; c=relaxed/simple;
+	bh=LZ7ljfeQMGMMWIqGTh65v9JsEy3c90QhUqhXvd28FJg=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=K6K84Qkx5CBc6YhkIB1L1Q4HpuIlN6hptzULjuT7EjLzEZIZ7oPgYmt4awsG/n7Jqi5URkd/APYEr6gmnm0c9UYV0BJWPIHyHg9lCGlOYOzTO+x867gWULQnPm2P6va5tYtWYwlKW3bf/6gJ2Bb1i8PBKNGs9XC2q0nijwclvIA=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=FblZq8f/; arc=none smtp.client-ip=209.85.128.49
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-43152fa76aaso2172585e9.1;
+        Fri, 08 Nov 2024 10:31:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bytedance.com; s=google; t=1731090507; x=1731695307; darn=vger.kernel.org;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wWt0QTmkUmV9Tp/JVuTsCK3jbXPMK6hXiV333qvXKtQ=;
-        b=QiDGOCZZxblNzWHL0id1BZtHqWX/RYbam7FWXoQ8HYTMK30u2TNVUPTQ8e0oby2XfL
-         SBtiVqnA+Y2XdSgfYMljZOYSH4muyWiKcGwC6wZ16bSXS5qQ4Ct7FlBXyEPE66o/L3/i
-         7LnUpOsfH4dTiLC8aWYKfdVG/K5y0/jY6F9WyQpNDso5F3DCp0IxdB52DmDcPwG/u1xF
-         tqVrv7I8aVWZBMPVJ4hUTQIH5Nvfct3AvATHR9w26V6hNfSCRgVahQ+fjEBngWriJwG7
-         5cLlvZ+MRX4u6bMCHei/pmXVyl7YsK16UTTx1W8luCk8Cf4Twhev/hCf2BXlJjMsneNs
-         ctsA==
+        d=gmail.com; s=20230601; t=1731090667; x=1731695467; darn=vger.kernel.org;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=+4uAWB2+qt2uLQC0gJQS7ShAnT+5jz6ssEiqshxsOsw=;
+        b=FblZq8f/AbAq0DkiVk0eh0se+OhnTT7gvGq7t2uM+wdj6goDR90iRVhAASQUN4sNnk
+         EVXcNZ/6AqOajJ/cWLqH6toLn1XjJ2C9LiBDRKUSxD9mSwkUO5DUhByj/wxQusPzOBiP
+         p03toVTz2y9W5d0pWp/qyIqVYPNp06Z/yxvAdKzRlV3y9di1Oz/ViUGoRkGwvwsAuCe2
+         cOGYBB57AMhi4jGrQl6Hzacx02A+ROTouf4ZqIIfEBbn+XIWgi0hyotroyYEQDoQGxSA
+         C+HGTGGgO7Oc7Nm0z5RYAdlfA4pwpnYWHp7Ot7ApsfthtzATOs7S39/+uMOg1OhoHbzJ
+         DrBg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731090507; x=1731695307;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=wWt0QTmkUmV9Tp/JVuTsCK3jbXPMK6hXiV333qvXKtQ=;
-        b=f21ioP3Ct/wqJjuMMSWflqDShKhDQiE6qhAALEfviJ5yLIaVqsS5gRmbzw8wx1RgCP
-         HKAoyTKPf/4mVKdluAi+TY+1N2N0todKNGMLtgpSqGF7QF/SGYcDPenhXohJs87eADqm
-         O0mx3J/dkNLBAuuK1KiTMdxBDAdLGHVJLn8ocMxd0tvI3HVJT37VkCF2nAJ7vURFwUsC
-         GQzh2pqA7sC3eip92leFG63UPqpqfyz7K6sYMmKPQMZPvtJjEbeje9AP//42AePxfbc8
-         I6FUFL4ZuerHYFFBuUPzBdpgQni1hzPDPJE0jasvu8XV6wHgGWxUutVkbr9OXfRVt0+J
-         DsQQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWkW/nrsZDXe4h1+0ygwOAAQF3ylbq4cmMlnT4eV2kBphi76XYlwebfrCObL0+DSMVgkzKpemI=@vger.kernel.org
-X-Gm-Message-State: AOJu0YzXnK6zyR4HBH8jk/sPTCyYucwoYe4hZla3OpL0Gf5lduHtjsWO
-	XzdJa2efo+poxsdeE22UIijpqoxyoIPsjrd7IhY4IBaRiEk9NVUn/pbdPiuu4UY=
-X-Google-Smtp-Source: AGHT+IHmZYkgO0mMRiqiwCpCNOTh+1bYly26r67Tsj8ccO33Oezw4Rv/52fZCQXG3sX6Lf+gYpAjZg==
-X-Received: by 2002:a05:620a:4510:b0:7a7:dd3a:a699 with SMTP id af79cd13be357-7b331d81d49mr504881285a.11.1731090506810;
-        Fri, 08 Nov 2024 10:28:26 -0800 (PST)
-Received: from ?IPV6:2601:647:4200:9750:c471:fcfc:9a61:b786? ([2601:647:4200:9750:c471:fcfc:9a61:b786])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32acb0496sm182379985a.89.2024.11.08.10.28.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 08 Nov 2024 10:28:26 -0800 (PST)
-Message-ID: <1016b317-d521-4787-80dc-3b92320f2d19@bytedance.com>
-Date: Fri, 8 Nov 2024 10:28:22 -0800
+        d=1e100.net; s=20230601; t=1731090667; x=1731695467;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+4uAWB2+qt2uLQC0gJQS7ShAnT+5jz6ssEiqshxsOsw=;
+        b=AvZeWWrITt8sRiiR6JAlKCsYWGtc46qxY3J7gXgm8X14876nkgJANwy7q9EbaM3RpW
+         QL7omysrT+1icWDA1XGHSp0BUzgLne+vaCvVzlNa7NmuKk8CAelh19446+ucQseHASa/
+         kzhVoLibML3mNqwu4h0D8yp/jx3kdjLQLTe0IIQOShIqkbBfr8Z1bENlXGs4mGSCi3UI
+         m6TO6defMHPeHWw/K0DxHS7aWF6TUNL/jXpSOPJURjCF+qulPTtwSB+qK7c/mvdNCzr7
+         bpJ0AXlbDC9ykwRqu/NzhXxv8RaTbaNHzH/oJzIf0bVfhtx8OJom2DRtQq/reOugbFNf
+         fUAg==
+X-Forwarded-Encrypted: i=1; AJvYcCVROP3kukhr6k5uA3VIlrOa+wyNL/kyyLw4LUB3Iyn4ovB0Hk8jV4kmWtn5IS0H25HXAB2Zz7Oy@vger.kernel.org, AJvYcCVh8f34nQpctv2EBCsjaZScj01dQGNTK7Q/05tRvbOlXqfVQdDUtgWpzL+YCRNBZpDMpr5zUvZpg1fGD4Q=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwkMOWF1K7iXk3CTrFPjwMx/jph2EWE32AolXSWw/8mVGljyCWX
+	m4haxPL9iSSWHxS8MydYENX1SHcaveaM+ZmwJcKA6W5K+m1ewWmw
+X-Google-Smtp-Source: AGHT+IH8J44AuBTs2/4IWBD2Rn1YwgNp0rKCOEWk0/kLTBifsZZupuHQWhkahp6jmBv2YZwR9Gapsw==
+X-Received: by 2002:a05:600c:3c99:b0:42c:bfd6:9d1f with SMTP id 5b1f17b1804b1-432b74feca1mr16463875e9.1.1731090667279;
+        Fri, 08 Nov 2024 10:31:07 -0800 (PST)
+Received: from skbuf ([188.25.106.17])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432aa6c1205sm119184535e9.26.2024.11.08.10.31.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 10:31:06 -0800 (PST)
+Date: Fri, 8 Nov 2024 20:31:04 +0200
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Jacob Keller <jacob.e.keller@intel.com>
+Cc: Andrew Morton <akpm@linux-foundation.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>,
+	Masahiro Yamada <masahiroy@kernel.org>,
+	netdev <netdev@vger.kernel.org>, linux-kbuild@vger.kernel.org,
+	Vladimir Oltean <vladimir.oltean@nxp.com>
+Subject: Re: [PATCH net-next v3 3/9] lib: packing: add pack_fields() and
+ unpack_fields()
+Message-ID: <20241108183104.wfzvav42zgslqofy@skbuf>
+References: <20241107-packing-pack-fields-and-ice-implementation-v3-0-27c566ac2436@intel.com>
+ <20241107-packing-pack-fields-and-ice-implementation-v3-3-27c566ac2436@intel.com>
+ <20241108112407.3mg2aspg5h2vas4c@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla Thunderbird
-Subject: Re: [External] Re: [PATCH bpf 2/2] tcp_bpf: add sk_rmem_alloc related
- logic for ingress redirection
-To: Cong Wang <xiyou.wangcong@gmail.com>
-Cc: bpf@vger.kernel.org, john.fastabend@gmail.com, jakub@cloudflare.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, dsahern@kernel.org, netdev@vger.kernel.org,
- cong.wang@bytedance.com
-References: <20241017005742.3374075-1-zijianzhang@bytedance.com>
- <20241017005742.3374075-3-zijianzhang@bytedance.com>
- <Zy2N48atzfYYTY6X@pop-os.localdomain>
-Content-Language: en-US
-From: Zijian Zhang <zijianzhang@bytedance.com>
-In-Reply-To: <Zy2N48atzfYYTY6X@pop-os.localdomain>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: multipart/mixed; boundary="fltu2m6lconhnghk"
+Content-Disposition: inline
+In-Reply-To: <20241108112407.3mg2aspg5h2vas4c@skbuf>
 
 
-On 11/7/24 8:04 PM, Cong Wang wrote:
-> On Thu, Oct 17, 2024 at 12:57:42AM +0000, zijianzhang@bytedance.com wrote:
->> From: Zijian Zhang <zijianzhang@bytedance.com>
->>
->> Although we sk_rmem_schedule and add sk_msg to the ingress_msg of sk_redir
->> in bpf_tcp_ingress, we do not update sk_rmem_alloc. As a result, except
->> for the global memory limit, the rmem of sk_redir is nearly unlimited.
->>
->> Thus, add sk_rmem_alloc related logic to limit the recv buffer.
->>
->> Signed-off-by: Zijian Zhang <zijianzhang@bytedance.com>
->> ---
->>   include/linux/skmsg.h | 11 ++++++++---
->>   net/core/skmsg.c      |  6 +++++-
->>   net/ipv4/tcp_bpf.c    |  4 +++-
->>   3 files changed, 16 insertions(+), 5 deletions(-)
->>
->> diff --git a/include/linux/skmsg.h b/include/linux/skmsg.h
->> index d9b03e0746e7..2cbe0c22a32f 100644
->> --- a/include/linux/skmsg.h
->> +++ b/include/linux/skmsg.h
->> @@ -317,17 +317,22 @@ static inline void sock_drop(struct sock *sk, struct sk_buff *skb)
->>   	kfree_skb(skb);
->>   }
->>   
->> -static inline void sk_psock_queue_msg(struct sk_psock *psock,
->> +static inline bool sk_psock_queue_msg(struct sk_psock *psock,
->>   				      struct sk_msg *msg)
->>   {
->> +	bool ret;
->> +
->>   	spin_lock_bh(&psock->ingress_lock);
->> -	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED))
->> +	if (sk_psock_test_state(psock, SK_PSOCK_TX_ENABLED)) {
->>   		list_add_tail(&msg->list, &psock->ingress_msg);
->> -	else {
->> +		ret = true;
->> +	} else {
->>   		sk_msg_free(psock->sk, msg);
->>   		kfree(msg);
->> +		ret = false;
->>   	}
->>   	spin_unlock_bh(&psock->ingress_lock);
->> +	return ret;
->>   }
->>   
->>   static inline struct sk_msg *sk_psock_dequeue_msg(struct sk_psock *psock)
->> diff --git a/net/core/skmsg.c b/net/core/skmsg.c
->> index b1dcbd3be89e..110ee0abcfe0 100644
->> --- a/net/core/skmsg.c
->> +++ b/net/core/skmsg.c
->> @@ -445,8 +445,10 @@ int sk_msg_recvmsg(struct sock *sk, struct sk_psock *psock, struct msghdr *msg,
->>   			if (likely(!peek)) {
->>   				sge->offset += copy;
->>   				sge->length -= copy;
->> -				if (!msg_rx->skb)
->> +				if (!msg_rx->skb) {
->>   					sk_mem_uncharge(sk, copy);
->> +					atomic_sub(copy, &sk->sk_rmem_alloc);
->> +				}
->>   				msg_rx->sg.size -= copy;
->>   
->>   				if (!sge->length) {
->> @@ -772,6 +774,8 @@ static void __sk_psock_purge_ingress_msg(struct sk_psock *psock)
->>   
->>   	list_for_each_entry_safe(msg, tmp, &psock->ingress_msg, list) {
->>   		list_del(&msg->list);
->> +		if (!msg->skb)
->> +			atomic_sub(msg->sg.size, &psock->sk->sk_rmem_alloc);
->>   		sk_msg_free(psock->sk, msg);
+--fltu2m6lconhnghk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+
+On Fri, Nov 08, 2024 at 01:24:07PM +0200, Vladimir Oltean wrote:
+> On Thu, Nov 07, 2024 at 11:50:34AM -0800, Jacob Keller wrote:
+> > +#define DECLARE_PACKED_FIELDS_S(name, buffer_sz) \
+> > +	const size_t __ ## name ## _buffer_sz __pf_section_s = buffer_sz; \
+> > +	const struct packed_field_s name[] __pf_section_s
 > 
-> Why not calling this atomic_sub() in sk_msg_free_elem()?
+> This will need sorting out - how to make this declaration macro
+> compatible with the "static" keyword. The obvious way (to group the
+> field array and the buffer size into a structure) doesn't work. It loses
+> the ARRAY_SIZE() of the fields, which is important to the pack_fields()
+> and unpack_fields() wrappers.
 > 
-> Thanks.
+> Maybe a different tool is needed for checking that no packed fields
+> exceed the buffer size? Forcing the buffer size be a symbol just because
+> that's what modpost works with seems unnatural.
+> 
+> If we knew the position of the largest field array element in C, and if
+> we enforced that all pack_fields() use a strong type (size included) for
+> the packed buffer, we'd have all information inside the pack_fields()
+> macro, because we only need to compare the largest field against the
+> buffer size. We could just have that part as a BUILD_BUG_ON() wrapped
+> inside the pack_fields() macro itself. And have the compile-time checks
+> spill over between C and modpost...
+> 
+> Not to mention, pack_fields() would have one argument less: pbuflen.
 
-sk_msg_free_elem called by sk_msg_free or sk_msg_free_no_charge will
-be invoked in multiple locations including TX/RX/Error and etc.
+I was thinking something like this (attached). I still don't like
+modpost more than the assertions in C code, because it imposes more
+constraints upon the library user which didn't exist before. Though
+without the extra restrictions added in this patch (just ascending order
+for packed fields + strong type for packed buffer), I don't think the
+modpost variant is going to work, or is going to become extremely complex.
 
-We should call atomic_sub(&sk->sk_rmem_alloc) for sk_msgs that have
-been atomic_add before. In other words, we need to call atomic_sub
-only for sk_msgs in ingress_msg.
+--fltu2m6lconhnghk
+Content-Type: text/x-diff; charset=us-ascii
+Content-Disposition: attachment; filename="0001-pack_fields-changes.patch"
 
-As for "!msg->skb" check here, I want to make sure the sk_msg is not
-from function sk_psock_skb_ingress_enqueue, because these sk_msgs'
-rmem accounting has already handled by skb_set_owner_r in function
-sk_psock_skb_ingress.
+From d9bf88a24518afa96fe55beda040a3605b81610a Mon Sep 17 00:00:00 2001
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+Date: Fri, 8 Nov 2024 17:07:16 +0200
+Subject: [PATCH] pack_fields() changes
+
+Remove ability to declare packed field array in ascending and descending
+order, over just ascending.
+
+Actually implement the overlap check in modpost. The simple check:
+"elem.endbit <= previous_elem.startbit" enforces both ascending order
+and non-overlapping checks.
+
+Move the check that fields don't exceed the buffer size inside the
+pack_fields() and unpack_fields() macro. With the assumption that the
+packed field array is sorted (enforced by modpost), we only need to
+check this for the last element of the array.
+
+Remove the packed buffer size from the DECLARE_PACKED_FIELDS_*() macros,
+and thus from the .rodata.packed_fields_* sections. Also remove the
+modpost code that looks for those sizes.
+
+Modify the pack_fields() API to always expect a strong type as the
+"pbuf" argument, because we take sizeof(*pbuf) as the packed buffer
+size. Remove the pbuflen from the required argument list, and adapt ice
+accordingly.
+
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ drivers/net/ethernet/intel/ice/ice_common.c |  16 +--
+ include/linux/packing.h                     |  32 +++--
+ include/linux/packing_types.h               |  15 +-
+ scripts/mod/packed_fields.c                 | 148 ++++++--------------
+ 4 files changed, 76 insertions(+), 135 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
+index 98845d790791..631963427082 100644
+--- a/drivers/net/ethernet/intel/ice/ice_common.c
++++ b/drivers/net/ethernet/intel/ice/ice_common.c
+@@ -1381,7 +1381,7 @@ static void ice_copy_rxq_ctx_to_hw(struct ice_hw *hw,
+ 	PACKED_FIELD((lsb) + (width) - 1, (lsb), struct struct_name, struct_field)
+ 
+ /* LAN Rx Queue Context */
+-DECLARE_PACKED_FIELDS_S(ice_rlan_ctx_fields, ICE_RXQ_CTX_SZ) = {
++static const DECLARE_PACKED_FIELDS_S(ice_rlan_ctx_fields) = {
+ 				 /* Field		Width	LSB */
+ 	ICE_CTX_STORE(ice_rlan_ctx, head,		13,	0),
+ 	ICE_CTX_STORE(ice_rlan_ctx, cpuid,		8,	13),
+@@ -1416,10 +1416,8 @@ DECLARE_PACKED_FIELDS_S(ice_rlan_ctx_fields, ICE_RXQ_CTX_SZ) = {
+ static void ice_pack_rxq_ctx(const struct ice_rlan_ctx *ctx,
+ 			     ice_rxq_ctx_buf_t *buf)
+ {
+-	BUILD_BUG_ON(sizeof(*buf) != ICE_RXQ_CTX_SZ);
+-
+-	pack_fields(buf, sizeof(*buf), ctx, ice_rlan_ctx_fields,
+-		    QUIRK_LITTLE_ENDIAN | QUIRK_LSW32_IS_FIRST);
++	pack_fields(buf, ctx, ice_rlan_ctx_fields, QUIRK_LITTLE_ENDIAN |
++		    QUIRK_LSW32_IS_FIRST);
+ }
+ 
+ /**
+@@ -1448,7 +1446,7 @@ int ice_write_rxq_ctx(struct ice_hw *hw, struct ice_rlan_ctx *rlan_ctx,
+ }
+ 
+ /* LAN Tx Queue Context */
+-DECLARE_PACKED_FIELDS_S(ice_tlan_ctx_fields, ICE_TXQ_CTX_SZ) = {
++static const DECLARE_PACKED_FIELDS_S(ice_tlan_ctx_fields) = {
+ 				    /* Field			Width	LSB */
+ 	ICE_CTX_STORE(ice_tlan_ctx, base,			57,	0),
+ 	ICE_CTX_STORE(ice_tlan_ctx, port_num,			3,	57),
+@@ -1489,10 +1487,8 @@ DECLARE_PACKED_FIELDS_S(ice_tlan_ctx_fields, ICE_TXQ_CTX_SZ) = {
+  */
+ void ice_pack_txq_ctx(const struct ice_tlan_ctx *ctx, ice_txq_ctx_buf_t *buf)
+ {
+-	BUILD_BUG_ON(sizeof(*buf) != ICE_TXQ_CTX_SZ);
+-
+-	pack_fields(buf, sizeof(*buf), ctx, ice_tlan_ctx_fields,
+-		    QUIRK_LITTLE_ENDIAN | QUIRK_LSW32_IS_FIRST);
++	pack_fields(buf, ctx, ice_tlan_ctx_fields, QUIRK_LITTLE_ENDIAN |
++		    QUIRK_LSW32_IS_FIRST);
+ }
+ 
+ /* Sideband Queue command wrappers */
+diff --git a/include/linux/packing.h b/include/linux/packing.h
+index b66c4809e121..d4988131e13a 100644
+--- a/include/linux/packing.h
++++ b/include/linux/packing.h
+@@ -35,16 +35,26 @@ void unpack_fields_m(const void *pbuf, size_t pbuflen, void *ustruct,
+ 		     const struct packed_field_m *fields, size_t num_fields,
+ 		     u8 quirks);
+ 
+-#define pack_fields(pbuf, pbuflen, ustruct, fields, quirks) \
+-	_Generic((fields), \
+-		 const struct packed_field_s * : pack_fields_s, \
+-		 const struct packed_field_m * : pack_fields_m \
+-		)(pbuf, pbuflen, ustruct, fields, ARRAY_SIZE(fields), quirks)
+-
+-#define unpack_fields(pbuf, pbuflen, ustruct, fields, quirks) \
+-	_Generic((fields), \
+-		 const struct packed_field_s * : unpack_fields_s, \
+-		 const struct packed_field_m * : unpack_fields_m \
+-		)(pbuf, pbuflen, ustruct, fields, ARRAY_SIZE(fields), quirks)
++#define pack_fields(pbuf, ustruct, fields, quirks) \
++	({ typeof(fields[0]) *__f = fields; \
++	   size_t pbuflen = sizeof(*pbuf); \
++	   size_t num_fields = ARRAY_SIZE(fields); \
++	   BUILD_BUG_ON(__f[num_fields - 1].startbit >= BITS_PER_BYTE * pbuflen); \
++	   _Generic(__f, \
++		    const struct packed_field_s * : pack_fields_s, \
++		    const struct packed_field_m * : pack_fields_m \
++		   )(pbuf, pbuflen, ustruct, __f, num_fields, quirks); \
++	})
++
++#define unpack_fields(pbuf, ustruct, fields, quirks) \
++	({ typeof(fields[0]) *__f = fields; \
++	   size_t pbuflen = sizeof(*pbuf); \
++	   size_t num_fields = ARRAY_SIZE(fields); \
++	   BUILD_BUG_ON(__f[num_fields - 1].startbit >= BITS_PER_BYTE * pbuflen); \
++	   _Generic(__f, \
++		    const struct packed_field_s * : unpack_fields_s, \
++		    const struct packed_field_m * : unpack_fields_m \
++		   )(pbuf, pbuflen, ustruct, __f, num_fields, quirks); \
++	})
+ 
+ #endif
+diff --git a/include/linux/packing_types.h b/include/linux/packing_types.h
+index 49ae4329a494..c761d93be235 100644
+--- a/include/linux/packing_types.h
++++ b/include/linux/packing_types.h
+@@ -24,12 +24,6 @@ struct packed_field_s {
+ 	GEN_PACKED_FIELD_MEMBERS(u8);
+ };
+ 
+-#define __pf_section_s __section(".rodata.packed_fields_s")
+-
+-#define DECLARE_PACKED_FIELDS_S(name, buffer_sz) \
+-	const size_t __ ## name ## _buffer_sz __pf_section_s = buffer_sz; \
+-	const struct packed_field_s name[] __pf_section_s
+-
+ /* Medium packed field. Use with bit offsets < 65536, buffers < 8KB and
+  * unpacked structures < 64KB.
+  */
+@@ -37,11 +31,10 @@ struct packed_field_m {
+ 	GEN_PACKED_FIELD_MEMBERS(u16);
+ };
+ 
+-#define __pf_section_m __section(".rodata.packed_fields_m")
+-
+-#define DECLARE_PACKED_FIELDS_M(name, buffer_sz) \
+-	const size_t __ ## name ## _buffer_sz __pf_section_m = buffer_sz; \
+-	const struct packed_field_m name[] __pf_section_m
++#define DECLARE_PACKED_FIELDS_S(name) \
++	struct packed_field_s name[] __section(".rodata.packed_fields_s")
++#define DECLARE_PACKED_FIELDS_M(name) \
++	struct packed_field_m name[] __section(".rodata.packed_fields_m")
+ 
+ #define PACKED_FIELD(start, end, struct_name, struct_field) \
+ { \
+diff --git a/scripts/mod/packed_fields.c b/scripts/mod/packed_fields.c
+index aa9dbd704e52..5927b0c7f404 100644
+--- a/scripts/mod/packed_fields.c
++++ b/scripts/mod/packed_fields.c
+@@ -87,18 +87,18 @@ struct field_symbol {
+ 	size_t data_size;
+ 	void *data;
+ 	struct module *mod;
+-	char *name;
++	const char *name;
+ };
+ 
+ static HASHTABLE_DEFINE(field_hashtable, 1U << 10);
+ 
+-static struct field_symbol *alloc_field(char *name, struct module *mod)
++static struct field_symbol *alloc_field(const char *name, struct module *mod)
+ {
+ 	struct field_symbol *f = xmalloc(sizeof(*f));
+ 
+ 	memset(f, 0, sizeof(*f));
+ 	f->mod = mod;
+-	f->name = name;
++	f->name = xstrdup(name);
+ 
+ 	return f;
+ }
+@@ -124,10 +124,8 @@ void handle_packed_field_symbol(struct module *mod, struct elf_info *info,
+ {
+ 	unsigned int secindex = get_secindex(info, sym);
+ 	enum field_type type = UNKNOWN_SECTION;
+-	bool is_size_symbol = false;
+ 	struct field_symbol *f;
+ 	const char *section;
+-	char *name;
+ 
+ 	/* Skip symbols without a name */
+ 	if (*symname == '\0')
+@@ -148,18 +146,9 @@ void handle_packed_field_symbol(struct module *mod, struct elf_info *info,
+ 	if (type == UNKNOWN_SECTION)
+ 		return;
+ 
+-	name = xstrdup(symname);
+-
+-	/* Extract original field name from the size symbol */
+-	if (!fnmatch("__*_buffer_sz", name, 0)) {
+-		name += strlen("__");
+-		name[strlen(name) - strlen("_buffer_sz")] = '\0';
+-		is_size_symbol = true;
+-	}
+-
+-	f = find_field(name, mod);
++	f = find_field(symname, mod);
+ 	if (!f) {
+-		f = alloc_field(name, mod);
++		f = alloc_field(symname, mod);
+ 		f->type = type;
+ 		hash_add_field(f);
+ 	}
+@@ -170,118 +159,71 @@ void handle_packed_field_symbol(struct module *mod, struct elf_info *info,
+ 		return;
+ 	}
+ 
+-	if (is_size_symbol) {
+-		size_t *size_data = sym_get_data(info, sym);
+-		size_t size = TO_NATIVE(*size_data);
+-
+-		if (f->buffer_size && f->buffer_size != size) {
+-			error("%s has buffer size %zu, but symbol %s says the size should be %zu\n",
+-			      f->name, f->buffer_size, symname, size);
+-		}
+-
+-		f->buffer_size = size;
+-	} else {
+-		if (f->data)
+-			error("%s has multiple data symbols???\n",
+-			      f->name);
+-
+-		f->data_size = sym->st_size;
+-		f->data = xmalloc(f->data_size);
+-		memcpy(f->data, sym_get_data(info, sym), f->data_size);
++	if (f->data) {
++		error("%s has multiple data symbols???\n",
++		      f->name);
+ 	}
+-}
+ 
+-enum element_order {
+-	FIRST_ELEMENT,
+-	SECOND_ELEMENT,
+-	ASCENDING_ORDER,
+-	DESCENDING_ORDER,
+-};
++	f->data_size = sym->st_size;
++	f->data = xmalloc(f->data_size);
++	memcpy(f->data, sym_get_data(info, sym), f->data_size);
++}
+ 
+ static void check_packed_field_array(const struct field_symbol *f)
+ {
+-	struct packed_field_elem previous_elem = {};
+ 	size_t field_size = field_type_to_size(f->type);
+-	enum element_order order = FIRST_ELEMENT;
++	struct packed_field_elem previous_elem = {};
+ 	void *data_ptr;
+-	int count;
++	size_t count;
+ 
+ 	/* check that the data is a multiple of the size */
+-	if (f->data_size % field_size != 0) {
+-		error("symbol %s of module %s has size %zu which is not a multiple of the field size (%zu)\n",
+-		      f->name, f->mod->name, f->data_size, field_size);
++	if (f->data_size % field_size) {
++		error("[%s] symbol %s has size %zu which is not a multiple of the field size (%zu)\n",
++		      f->mod->name, f->name, f->data_size, field_size);
+ 		return;
+ 	}
+ 
+-	data_ptr = f->data;
+-	count = 0;
+-
+-	while (data_ptr < f->data + f->data_size) {
++	for (data_ptr = f->data, count = 0;
++	     data_ptr < f->data + f->data_size;
++	     data_ptr += field_size, count++) {
+ 		struct packed_field_elem elem = {};
+ 
+ 		get_field_contents(data_ptr, f->type, &elem);
+ 
+-		if (elem.startbit < elem.endbit)
+-			error("\"%s\" [%s.ko] element %u startbit (%" PRIu64 ") must be larger than endbit (%" PRIu64 ")\n",
+-			      f->name, f->mod->name, count, elem.startbit,
+-			      elem.endbit);
++		if (elem.size != 1 && elem.size != 2 &&
++		    elem.size != 4 && elem.size != 8) {
++			error("[%s] \"%s\" field %zu unpacked size (%" PRIu64
++			      ") must be 1, 2, 4, or 8 bytes\n",
++			      f->mod->name, f->name, count, elem.size);
++		}
+ 
+-		if (elem.startbit >= BITS_PER_BYTE * f->buffer_size)
+-			error("\"%s\" [%s.ko] element %u startbit (%" PRIu64 ") puts field outsize of the packed buffer size (%" PRIu64 ")\n",
+-			      f->name, f->mod->name, count, elem.startbit,
+-			      f->buffer_size);
++		if (elem.startbit < elem.endbit) {
++			error("[%s] \"%s\" field %zu (%" PRIu64 "-%" PRIu64
++			      "): start bit must be >= end bit\n",
++			      f->mod->name, f->name, count, elem.startbit,
++			      elem.endbit);
++		}
+ 
+-		if (elem.startbit - elem.endbit >= BITS_PER_BYTE * elem.size)
+-			error("\"%s\" [%s.ko] element %u startbit (%" PRIu64 ") and endbit (%" PRIu64 ") indicate a field of width (%" PRIu64 ") which does not fit into the field size (%" PRIu64 ")\n",
+-			      f->name, f->mod->name, count, elem.startbit,
++		if (elem.startbit - elem.endbit >= BITS_PER_BYTE * elem.size) {
++			error("[%s] \"%s\" field %zu (%" PRIu64 "-%" PRIu64
++			      ") has a width of %" PRIu64
++			      " which does not fit into the unpacked structure field (%"
++			      PRIu64 " bytes)\n",
++			      f->mod->name, f->name, count, elem.startbit,
+ 			      elem.endbit, elem.startbit - elem.endbit,
+ 			      elem.size);
+-
+-		if (elem.size != 1 && elem.size != 2 && elem.size != 4 && elem.size != 8)
+-			error("\"%s\" [%s.ko] element %u size (%" PRIu64 ") must be 1, 2, 4, or 8\n",
+-			      f->name, f->mod->name, count, elem.size);
+-
+-		switch (order) {
+-		case FIRST_ELEMENT:
+-			order = SECOND_ELEMENT;
+-			break;
+-		case SECOND_ELEMENT:
+-			order = previous_elem.startbit < elem.startbit ?
+-				ASCENDING_ORDER : DESCENDING_ORDER;
+-			break;
+-		default:
+-			break;
+ 		}
+ 
+-		switch (order) {
+-		case ASCENDING_ORDER:
+-			if (previous_elem.startbit >= elem.startbit)
+-				error("\"%s\" [%s.ko] element %u startbit (%" PRIu64 ") expected to be arranged in ascending order, but previous element startbit is %" PRIu64 "\n",
+-				      f->name, f->mod->name, count,
+-				      elem.startbit, previous_elem.startbit);
+-			if (previous_elem.endbit >= elem.endbit)
+-				error("\"%s\" [%s.ko] element %u endbit (%" PRIu64 ") expected to be arranged in ascending order, but previous element endbit is %" PRIu64 "\n",
+-				      f->name, f->mod->name, count, elem.endbit,
+-				      previous_elem.endbit);
+-
+-			break;
+-		case DESCENDING_ORDER:
+-			if (previous_elem.startbit <= elem.startbit)
+-				error("\"%s\" [%s.ko] element %u startbit (%" PRIu64 ") expected to be arranged in descending order, but previous element startbit is %" PRIu64 "\n",
+-				      f->name, f->mod->name, count,
+-				      elem.startbit, previous_elem.startbit);
+-			if (previous_elem.endbit <= elem.endbit)
+-				error("\"%s\" [%s.ko] element %u endbit (%" PRIu64 ") expected to be arranged in descending order, but previous element endbit is %" PRIu64 "\n",
+-				      f->name, f->mod->name, count,
+-				      elem.endbit, previous_elem.endbit);
+-			break;
+-		default:
+-			break;
++		if (count && elem.endbit <= previous_elem.startbit) {
++			error("[%s] \"%s\" field %zu (%" PRIu64 "-%" PRIu64
++			      ") overlaps with previous field (%" PRIu64 "-%" PRIu64
++			      ") or array is not declared in ascending order\n",
++			      f->mod->name, f->name, count, elem.startbit,
++			      elem.endbit, previous_elem.startbit,
++			      previous_elem.endbit);
+ 		}
+ 
+ 		previous_elem = elem;
+-		data_ptr += field_size;
+-		count++;
+ 	}
+ }
+ 
+-- 
+2.43.0
 
 
+--fltu2m6lconhnghk--
 
