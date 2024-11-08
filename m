@@ -1,67 +1,84 @@
-Return-Path: <netdev+bounces-143140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id CA3DC9C13FB
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:21:02 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 20F8F9C140F
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:28:54 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id 8AD521F22F0A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:21:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 46FB21C2215A
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:28:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 996561BD9FF;
-	Fri,  8 Nov 2024 02:20:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E027D1EB56;
+	Fri,  8 Nov 2024 02:28:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b="EdMY6z8d"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="grR3Ei54"
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0a-002e3701.pphosted.com (mx0a-002e3701.pphosted.com [148.163.147.86])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f177.google.com (mail-pf1-f177.google.com [209.85.210.177])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB75FA41;
-	Fri,  8 Nov 2024 02:20:52 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=148.163.147.86
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C8239FD6;
+	Fri,  8 Nov 2024 02:28:46 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.177
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731032458; cv=none; b=BUGkOeCBrwU8H2iTyQP3AZdQI8Ze3SbDEK+hMOF7Pa6KpXuqHeS3eQ4kUZy2AKXjyAyZyAfDvdg1amT3HsOf99nac+4PPqT/gVUN76sJ20DMU3ezQHNIxdR1K+SuyteYA0xhb1nLMHjgH0BeEAzCYvLJ8XxuR7SjGpQty0WUdus=
+	t=1731032927; cv=none; b=DKc6NQdmLrYyvdLxYRvIQ/y+yqqbUf/tUEJ8BvUN9V/8s3VZqTVYNxL0r467MwR4SB4qxpXgapa10w/BovwE6q/rcGy1b7trlXAKQ0eGZzZUBw/xe6IlDtnu7ogoQaRu2MAWcT1c/ZQzvOe66V9PPQF4uD7stsMH+2XS9vQ8qgk=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731032458; c=relaxed/simple;
-	bh=CwnYD3eGDcHqYbgF65Xbn0OHrKz2s4QD6/hWNWb3Ch0=;
-	h=From:To:Cc:Subject:Date:Message-Id:In-Reply-To:References:
-	 MIME-Version; b=jiNShNOVb/BuOxEG/TDWGxnuhBNwl5QcoIikNWRxIne4Q+rV5Q6mhANFv132koWmeUARFdy9G3higdbPJZFHlUon0yjVbBUuyuCk0lDfnVqmU9BmS2p0cMNtwhXqnAzX3JWuRVA6LK6QWegM2lCzQIYeGE+NkYbxdiSof+/NCKc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com; spf=pass smtp.mailfrom=hpe.com; dkim=pass (2048-bit key) header.d=hpe.com header.i=@hpe.com header.b=EdMY6z8d; arc=none smtp.client-ip=148.163.147.86
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=hpe.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=hpe.com
-Received: from pps.filterd (m0150241.ppops.net [127.0.0.1])
-	by mx0a-002e3701.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A7MdPY8025702;
-	Fri, 8 Nov 2024 02:20:38 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hpe.com; h=cc
-	:content-transfer-encoding:date:from:in-reply-to:message-id
-	:mime-version:references:subject:to; s=pps0720; bh=Al+1eFcwD1Jl3
-	Gag56B47fYEjUBMMgK+F9iQqJ74Q5w=; b=EdMY6z8dVXWgQtkZjhk0eRRX/jLCq
-	Y+baaYel0c0ILdnDFuKUDK2dmGDNleSP5EUh7AImOKSSZon48chSXxLwHzz4De/8
-	hkx6faYmYsiJwrPebqrIchc+ah+HjR3fYYuvd8BrosVnGeFP5WgL88ZpwLMB8kdR
-	aOgj9g7juCan82A2UlG5Uja+fC3C8Vzen5Mcqw2zMEEHEKjs/7jr0uHkphPwIB+t
-	pctPo5zn8cV1nkkQyt2rdLMP+LHW9BA56ZQoFZo+z1+ktFc8uQD1b18MSEXs5TGN
-	LhL/maUZntlYJ+fgVfhtAATboKVX4ktcCMlLJGjGvAFLObP66HKmjqVOw==
-Received: from p1lg14878.it.hpe.com ([16.230.97.204])
-	by mx0a-002e3701.pphosted.com (PPS) with ESMTPS id 42s6h9sd36-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 08 Nov 2024 02:20:38 +0000 (GMT)
-Received: from localhost (unknown [192.58.206.38])
-	by p1lg14878.it.hpe.com (Postfix) with ESMTP id 3B4D2295E7;
-	Fri,  8 Nov 2024 02:20:36 +0000 (UTC)
-From: Matt Muggeridge <Matt.Muggeridge@hpe.com>
-To: idosch@idosch.org
-Cc: Matt.Muggeridge@hpe.com, davem@davemloft.net, dsahern@kernel.org,
-        edumazet@google.com, horms@kernel.org, kuba@kernel.org,
-        linux-api@vger.kernel.org, linux-kernel@vger.kernel.org,
-        netdev@vger.kernel.org, pabeni@redhat.com, stable@vger.kernel.org
-Subject: Re: [PATCH net 1/1] net/ipv6: Netlink flag for new IPv6 Default Routes
-Date: Thu,  7 Nov 2024 21:20:26 -0500
-Message-Id: <20241108022026.58907-1-Matt.Muggeridge@hpe.com>
-X-Mailer: git-send-email 2.35.3
-In-Reply-To: <ZyyN2bSgrpbhbkpp@shredder>
-References: <ZyyN2bSgrpbhbkpp@shredder>
+	s=arc-20240116; t=1731032927; c=relaxed/simple;
+	bh=hEQygF4m8DjrDBiR5+IO9YBL5x2uHYH3btJu+BhLG0E=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=BseYYQ/GYR2QDi9hLG5UHibiLvbBuV4x9k5zlmreTepm1YbRfzKQVA5djW3QGy8JyKjgbKTINAU9fPB+ZdJ3QXMFoezI2QdGJF5d960YyQkqRcdUoBDglLtQNHh3QSQYvu6YDKaP0hMpLgfMo+yiYDvzVXjjEjC3TO4wWcUkxTw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=grR3Ei54; arc=none smtp.client-ip=209.85.210.177
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f177.google.com with SMTP id d2e1a72fcca58-71e681bc315so1248120b3a.0;
+        Thu, 07 Nov 2024 18:28:46 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731032926; x=1731637726; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=BRhYlWrr+h7c7N/+/EIXt40Xsz1hnVz9xjst1BA0/tw=;
+        b=grR3Ei54VFpAt9n04ZCax2/R/AFIar+ZNbg2fLqpZk0CifgSbwOMiQGqJ4+gLu0fsB
+         LcYcJHf0DIsGty+DiC3RgIe7PymlYPYVqAD9wxEoc7aUwVolnTCg8O/1S6Y3nc3KgVj0
+         SyfMF0tKhgirY7bYMP8SQp1p5AaCAL+urd/dpzy2MTGFz6/xzAUAN4EvSiK9r0Vws+sq
+         ivI3aaM8SvjczCw7V0bQ3mCd5H5NSCADSrzFE2xQxWx4ogsJJOj40A0RErxgvwMOXSZk
+         I+srzB8UIHqwXgmnZ+nvytP6JGNkZUqBvU8V3cvDRJ92aVtHiXQRjIZqiR1caNSgoZGt
+         uLww==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731032926; x=1731637726;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BRhYlWrr+h7c7N/+/EIXt40Xsz1hnVz9xjst1BA0/tw=;
+        b=mkRQI1A/CtXM9PHcu0T4aTvXnkJWDir3R6d57SK9rVq9+zSq7dR11idY6TGfOO6d4g
+         iGB+vXufivGiwpOZ7XOFsGtwWhFj2NzbE7uiYuCmxYkVonWXi7jHqz75ui9GkR/UwFfs
+         nWdnB7UCAyI1TAGK93qR11SHa82e8wt2/JX1YJiXO7lgdH2Fk02gBmlaBRxq3eYja+Iq
+         R/UU+3VDrc57xUMM2qNs3LFn6Lewa277rqWx3fQY+zw6aTAnRtlQ0OQsFcs5PR7xIuzL
+         RNhVl3GFfIX7iaSfSlNrD46Xi7HdQ3RYUiJqSLZis/pEN8a2VeLUBYbdmr330cX7q0KC
+         Dvnw==
+X-Forwarded-Encrypted: i=1; AJvYcCUOP7wrjqZ6P3k97RHQeM0bx6tonKpqHjyqE/8+IUCYFV1XfkRmJpC4lPbE++T+gxrQCQgbkB8l7wXCuk0=@vger.kernel.org, AJvYcCUeGUgABaTe2JnAR10dyEHIZcDKCgFMwFWbVqn/Zywn5VLVziRKzddS46yO+d7h2ouTZdmp8xsbXe3gw1Lprow=@vger.kernel.org, AJvYcCXqYAtDhvmMvdUn0jb2u2xYFOBoZe3VTMRfj6Nei3EbWXiHR8jK2bqruvsjPj+YoKfqPzPKoMsF@vger.kernel.org
+X-Gm-Message-State: AOJu0Yz9FQf5e4UP9unMt2jBc8j0x2iIFrGjdcXXjjVpK1HpxdhL5zEf
+	n/Kp3xMKDw3k/eVzUQn8VHvI8qBF61OZG058s+V0y1NJQHyLZ6NO
+X-Google-Smtp-Source: AGHT+IEZDoZVjLwxmtQY0g554/k/EBW12ojyO61yIKTJ/8pjxKfSjIeFDjtlfjJkQIVnght6o7lz9A==
+X-Received: by 2002:a05:6a00:4b56:b0:71e:7174:3a6 with SMTP id d2e1a72fcca58-72413da856cmr1726998b3a.0.1731032925477;
+        Thu, 07 Nov 2024 18:28:45 -0800 (PST)
+Received: from sarvesh-ROG-Zephyrus-M15.. ([49.206.113.92])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-724078a9ad4sm2465304b3a.78.2024.11.07.18.28.42
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 07 Nov 2024 18:28:44 -0800 (PST)
+From: Saru2003 <sarvesh20123@gmail.com>
+To: johannes@sipsolutions.net
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Saru2003 <sarvesh20123@gmail.com>
+Subject: [PATCH] Fix: Ensure auth_data and ap_addr are properly set before marking STA as authenticated
+Date: Fri,  8 Nov 2024 07:58:28 +0530
+Message-ID: <20241108022828.6571-1-sarvesh20123@gmail.com>
+X-Mailer: git-send-email 2.43.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,69 +86,43 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Proofpoint-GUID: wL657nGIBtMxv2dhOrIYI__izIcFG8c7
-X-Proofpoint-ORIG-GUID: wL657nGIBtMxv2dhOrIYI__izIcFG8c7
-X-HPE-SCL: -1
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1051,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-10-05_02,2024-10-04_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 impostorscore=0
- mlxlogscore=999 lowpriorityscore=0 mlxscore=0 phishscore=0
- priorityscore=1501 spamscore=0 suspectscore=0 malwarescore=0 bulkscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.19.0-2409260000 definitions=main-2411080018
 
-> > You probably already know how to reproduce it, but in case it helps, I still
-> > have the packet captures and can share them with you. Let me know if you'd
-> > like me to share them (and how to share them).
-> 
-> It would be best if you could provide a reproducer using iproute2:
-> Configure a dummy device using ip-link, install the multipath route
-> using ip-route, configure the neighbour table using ip-neigh and then
-> perform route queries using "ip route get ..." showing the problem. We
-> can then use it as the basis for a new test case in
-> tools/testing/selftests/net/fib_tests.sh 
+Signed-off-by: Saru2003 <sarvesh20123@gmail.com>
+---
+ net/mac80211/mlme.c | 11 +++++++++--
+ 1 file changed, 9 insertions(+), 2 deletions(-)
 
-I'll try to do that next week.
+diff --git a/net/mac80211/mlme.c b/net/mac80211/mlme.c
+index 735e78adb0db..a1ca7385dc1b 100644
+--- a/net/mac80211/mlme.c
++++ b/net/mac80211/mlme.c
+@@ -4247,8 +4247,15 @@ static void ieee80211_auth_challenge(struct ieee80211_sub_if_data *sdata,
+ static bool ieee80211_mark_sta_auth(struct ieee80211_sub_if_data *sdata)
+ {
+ 	struct ieee80211_if_managed *ifmgd = &sdata->u.mgd;
+-	const u8 *ap_addr = ifmgd->auth_data->ap_addr;
++	const u8 *ap_addr;
+ 	struct sta_info *sta;
++	
++	if (!ifmgd->auth_data || !ifmgd->auth_data->ap_addr) {
++		sdata_info(sdata, "auth_data not set or ap_addr missing\n");
++		return false;
++	}
++
++	ap_addr = ifmgd->auth_data->ap_addr;
+ 
+ 	lockdep_assert_wiphy(sdata->local->hw.wiphy);
+ 
+@@ -4261,7 +4268,7 @@ static bool ieee80211_mark_sta_auth(struct ieee80211_sub_if_data *sdata)
+ 	/* move station state to auth */
+ 	sta = sta_info_get(sdata, ap_addr);
+ 	if (!sta) {
+-		WARN_ONCE(1, "%s: STA %pM not found", sdata->name, ap_addr);
++	        sdata_info(sdata, "STA %pM not found, skipping authentication mark\n", ap_addr);
+ 		return false;
+ 	}
+ 	if (sta_info_move_state(sta, IEEE80211_STA_AUTH)) {
+-- 
+2.43.0
 
-> BTW, do you have CONFIG_IPV6_ROUTER_PREF=y in your config?
-
-Yes.
-
-$ gunzip -c /proc/config.gz | grep ROUTER_PREF
-CONFIG_IPV6_ROUTER_PREF=y
-
-> > 
-> > As such, it still seems appropriate (to me) that this be implemented in the
-> > legacy API as well as ensuring it works with the NH API.
-> 
-> As I understand it you currently get different results because the
-> kernel installs two default routes whereas user space can only create
-> one default multipath route.
-
-Yes, that's the end result of an underlying problem.
-
-Perhaps more to the point, the fact that a coalesced, INCOMPLETE, multipath
-route is selected when a REACHABLE alternative exists, is what prevents us
-from using coalesced multipath routes. This seems like a bug, since it violates
-RFC4861 6.3.6, bullet 1.
-
-Imagine adding a 2nd router to an IPv6 network for added resiliency, but when
-one becomes unreachable, some network flows keep choosing the unreachable
-router. This is what is happening with ECMP routes. It doesn't happen with
-multiple default routes.
-
-I'll just reiterate earlier comments, this doesn't happen all of the time.
-It seems I have a 50/50 chance of the INCOMPLETE route being selected.
-
-> Before adding a new uAPI I want to
-> understand the source of the difference and see if we can improve / fix
-> the current multipath code so that the two behave the same. If we can
-> get them to behave the same then I don't think user space will care
-> about two default routes versus one default multipath route.
-
-Exactly, I totally support that approach.
-
-Regards,
-Matt.
 
