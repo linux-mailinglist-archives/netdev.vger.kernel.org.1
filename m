@@ -1,74 +1,73 @@
-Return-Path: <netdev+bounces-143159-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143160-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D5AC9C148F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:25:10 +0100 (CET)
+	by mail.lfdr.de (Postfix) with ESMTPS id A95F99C1491
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:25:20 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id D1BA71F20226
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:25:09 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 392F21F21B6D
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:25:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43B201865E0;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1BA0191F60;
 	Fri,  8 Nov 2024 03:24:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="GGpqly9N"
+	dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b="l01Clcoi"
 X-Original-To: netdev@vger.kernel.org
 Received: from gate2.alliedtelesis.co.nz (gate2.alliedtelesis.co.nz [202.36.163.20])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 509447E76D
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 03:24:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FD1B13A24A
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 03:24:46 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=202.36.163.20
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731036287; cv=none; b=mF1Z3Y9zkrH/jk4RpxBBvv7MzfPEWFfpflbKCGygumAv4DaswbOUnfnlWjs12CX/vH6/QDku1DOowSoTEKJFCscX9KyZfwHT+O9dL1g6l9pScNgMnsy6zej9OO+LTlN6ipimwu8eLp48cP9qmkiQInYkF/DUejhUVkXNoZZN63I=
+	t=1731036287; cv=none; b=PmoQ4hLPbouaou9izETvLBQBda5mg51TVzfjxVh6viiSo6nnzzOnIPsjViteN5RDDNVRt3vkhEp5GRZaNwBJfDQVHvHUjOBrY2pDWF2Pcu+n/+P4A7ojOGVw3wb7tQ//z6WkfsSA71HOHIiqoMiSTaCQjUOiK3PWsd0pM2/kUPg=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
 	s=arc-20240116; t=1731036287; c=relaxed/simple;
-	bh=rbqdFotREDfEBhyAZgmy6TN4n/PMKHOQvslonALnvfE=;
+	bh=eBgAq/qDGNP/dpK5Fb4HKu3Lz5EllCeHK+xKD73ije0=;
 	h=From:To:Cc:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version; b=Pz4RZVwxGK2op1w4duW94h8z7WU+cL4G9lqRryLKKuu212My4Tesz/4574O/OfgNICV1hC/IoB2znUem2Sj84gt49MnUMWlM04ezV3HmRet/aNwbjG7hAEvtF9j31gT99h9YOzSJzJ7a0UIUU4hIZEN4AMocOXPZ2Md/qsmfpBE=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=GGpqly9N; arc=none smtp.client-ip=202.36.163.20
+	 MIME-Version; b=qlp/anCbpEpVTHcGCQ/YvHWIxDAzlG2nMfPdpepf5J8wEWXJfvC31o3Suo0RqcJsdcxkNL4RPYxP1xxshRG1Duy8+itasy9sC0Fmkjm2vypw+Pqn7g2hVjt5yGq2Hn6VJwumNmjZyi5gPU1deJ7IvsexSD+T/tSepI156AUbLA8=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz; spf=pass smtp.mailfrom=alliedtelesis.co.nz; dkim=pass (2048-bit key) header.d=alliedtelesis.co.nz header.i=@alliedtelesis.co.nz header.b=l01Clcoi; arc=none smtp.client-ip=202.36.163.20
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=alliedtelesis.co.nz
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=alliedtelesis.co.nz
 Received: from svr-chch-seg1.atlnz.lc (mmarshal3.atlnz.lc [10.32.18.43])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id BF1F62C0540;
-	Fri,  8 Nov 2024 16:24:37 +1300 (NZDT)
+	by gate2.alliedtelesis.co.nz (Postfix) with ESMTPS id 019E32C054A;
+	Fri,  8 Nov 2024 16:24:39 +1300 (NZDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=alliedtelesis.co.nz;
-	s=mail181024; t=1731036277;
-	bh=6cWa61liB2w2TV338VOIAV95E585BXObvb8p5aUjLG8=;
+	s=mail181024; t=1731036279;
+	bh=ftrLcPlz9V3DRDChzBL87+QFEXscgHbCfuL/ZkuXTEY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=GGpqly9NjeBSo4XN6NmOIyWPHcuYOQdvZHkaQB2unPElK0fMZgzT09Af9f6ApmNC6
-	 r5xrWL6AHfujnz5MMaXjJ1RM3+478e2vdd7heDtvzLmofwzfRbHoQMSU0eaC8ARhqh
-	 88p29tJnFu8B0bKStC6xQNVf/D0ugN2sU759koeuHinf/tk7lh4wWgaWnVMjz9mB4H
-	 KlvcoZOiEOa0pMw5myYexY55mCIiwFCzkz8goHGhar3isTaILxcHLwUQB4FRI6AclE
-	 J2Cp8dbZ5MbLOhW1n9/GdOIRU2xOCg+8+9zGX+LSAI16rXoJWTCLDqzYzBtWpVCx04
-	 +6TQMjVGhFJug==
+	b=l01ClcoiD0J1gatlTFQWtSRXHQhTFmbpVL158v4OqN0PtOBkXhlrAzaJv3l/6PWYX
+	 Gp6LK8Zlj6AM5iMKtowrT7CN9CXcsKPUEY4ALkrfaveiqXxHvFXfNYRmSfmWS6gvG0
+	 djVoyrwjWmbqb9gYp6hbobUvUUOdLBJsNva/eC878nWZO5zLGRiAemanZlwlnsQU/R
+	 VleTRt+48r2fczO7i0sDrM6l+1mh9/hdFtCY4T9ZrCw5pmIoeUNE3sHcwBBpup7PLC
+	 AYlFi/W+rEdVKo9IrNpLGBrOYKPFCTg73q72dEeUKume/Uie2YY0cNhL06Eq+XDVbq
+	 cRS4qpByKh21g==
 Received: from pat.atlnz.lc (Not Verified[10.32.16.33]) by svr-chch-seg1.atlnz.lc with Trustwave SEG (v8,2,6,11305)
-	id <B672d84750000>; Fri, 08 Nov 2024 16:24:37 +1300
+	id <B672d84760000>; Fri, 08 Nov 2024 16:24:38 +1300
 Received: from elliota2-dl.ws.atlnz.lc (elliota-dl.ws.atlnz.lc [10.33.23.28])
-	by pat.atlnz.lc (Postfix) with ESMTP id 90FC913ECD2;
-	Fri,  8 Nov 2024 16:24:37 +1300 (NZDT)
+	by pat.atlnz.lc (Postfix) with ESMTP id 95A0213ECD2;
+	Fri,  8 Nov 2024 16:24:38 +1300 (NZDT)
 Received: by elliota2-dl.ws.atlnz.lc (Postfix, from userid 1775)
-	id 8F1C13C0261; Fri,  8 Nov 2024 16:24:37 +1300 (NZDT)
+	id 93ABB3C0261; Fri,  8 Nov 2024 16:24:38 +1300 (NZDT)
 From: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
 To: davem@davemloft.net
 Cc: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>,
-	Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	bridge@lists.linux.dev,
-	netdev@vger.kernel.org
-Subject: [RFC net-next 2/4] net: bridge: send notification for roaming hosts
-Date: Fri,  8 Nov 2024 16:24:19 +1300
-Message-ID: <20241108032422.2011802-3-elliot.ayrey@alliedtelesis.co.nz>
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [RFC net-next 3/4] net: dsa: mv88e6xxx: handle member-violations
+Date: Fri,  8 Nov 2024 16:24:20 +1300
+Message-ID: <20241108032422.2011802-4-elliot.ayrey@alliedtelesis.co.nz>
 X-Mailer: git-send-email 2.47.0
 In-Reply-To: <20241108032422.2011802-1-elliot.ayrey@alliedtelesis.co.nz>
 References: <20241108032422.2011802-1-elliot.ayrey@alliedtelesis.co.nz>
@@ -79,216 +78,154 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: quoted-printable
-X-SEG-SpamProfiler-Analysis: v=2.4 cv=ca1xrWDM c=1 sm=1 tr=0 ts=672d8475 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=VlfZXiiP6vEA:10 a=LYxsSh6Jf1NNSQcWqj0A:9 a=3ZKOabzyN94A:10
+X-SEG-SpamProfiler-Analysis: v=2.4 cv=ca1xrWDM c=1 sm=1 tr=0 ts=672d8476 a=KLBiSEs5mFS1a/PbTCJxuA==:117 a=VlfZXiiP6vEA:10 a=8i6-b8GgAAAA:8 a=WYMWzFLixRnFLzZ6b-kA:9 a=3ZKOabzyN94A:10 a=XAGLwFu5sp1jj7jejlXE:22
 X-SEG-SpamProfiler-Score: 0
 x-atlnz-ls: pat
 
-When an fdb entry is configured as static and sticky it should never
-roam. However there are times where it would be useful to know when
-this happens so a user application can act on it. For this reason,
-extend the fdb notification mechanism to send a notification when the
-bridge detects a host that is attempting to roam when it has been
-configured not to.
+Add a handler for servicing member-violations to the mv88e6xxx switch
+driver.
 
-This is achieved by temporarily updating the fdb entry with the new
-port, setting a new notify roaming bit, firing off a notification, and
-restoring the original port immediately afterwards. The port remains
-unchanged, respecting the sticky flag, but userspace is now notified
-of the new port the host was seen on.
+When we receive a member-violation from the hardware first check the
+ATU for the corresponding entry and only service the interrupt if the
+ATU entry has a non-zero DPV and the new port that raised the
+interrupt is not in the DPV.
 
-The roaming bit is cleared if the entry becomes inactive or if it is
-replaced by a user entry.
+Servicing this interrupt will send a switchdev notification for the
+new port.
 
 Signed-off-by: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
 ---
- include/uapi/linux/neighbour.h |  4 ++-
- net/bridge/br_fdb.c            | 64 +++++++++++++++++++++++-----------
- net/bridge/br_input.c          | 10 ++++--
- net/bridge/br_private.h        |  3 ++
- 4 files changed, 58 insertions(+), 23 deletions(-)
+ drivers/net/dsa/mv88e6xxx/global1_atu.c | 38 +++++++++++++++++++++++++
+ drivers/net/dsa/mv88e6xxx/switchdev.c   | 33 ++++++++++++++++++++-
+ drivers/net/dsa/mv88e6xxx/switchdev.h   |  2 ++
+ 3 files changed, 72 insertions(+), 1 deletion(-)
 
-diff --git a/include/uapi/linux/neighbour.h b/include/uapi/linux/neighbou=
-r.h
-index 5e67a7eaf4a7..e1c686268808 100644
---- a/include/uapi/linux/neighbour.h
-+++ b/include/uapi/linux/neighbour.h
-@@ -201,10 +201,12 @@ enum {
-  /* FDB activity notification bits used in NFEA_ACTIVITY_NOTIFY:
-   * - FDB_NOTIFY_BIT - notify on activity/expire for any entry
-   * - FDB_NOTIFY_INACTIVE_BIT - mark as inactive to avoid multiple notif=
-ications
-+  * - FDB_NOTIFY_ROAMING_BIT - mark as attempting to roam
-   */
- enum {
- 	FDB_NOTIFY_BIT		=3D (1 << 0),
--	FDB_NOTIFY_INACTIVE_BIT	=3D (1 << 1)
-+	FDB_NOTIFY_INACTIVE_BIT	=3D (1 << 1),
-+	FDB_NOTIFY_ROAMING_BIT	=3D (1 << 2)
- };
-=20
- /* embedded into NDA_FDB_EXT_ATTRS:
-diff --git a/net/bridge/br_fdb.c b/net/bridge/br_fdb.c
-index d0eeedc03390..a8b841e74e15 100644
---- a/net/bridge/br_fdb.c
-+++ b/net/bridge/br_fdb.c
-@@ -145,6 +145,8 @@ static int fdb_fill_info(struct sk_buff *skb, const s=
-truct net_bridge *br,
- 			goto nla_put_failure;
- 		if (test_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags))
- 			notify_bits |=3D FDB_NOTIFY_INACTIVE_BIT;
-+		if (test_bit(BR_FDB_NOTIFY_ROAMING, &fdb->flags))
-+			notify_bits |=3D FDB_NOTIFY_ROAMING_BIT;
-=20
- 		if (nla_put_u8(skb, NFEA_ACTIVITY_NOTIFY, notify_bits)) {
- 			nla_nest_cancel(skb, nest);
-@@ -554,8 +556,10 @@ void br_fdb_cleanup(struct work_struct *work)
- 					work_delay =3D min(work_delay,
- 							 this_timer - now);
- 				else if (!test_and_set_bit(BR_FDB_NOTIFY_INACTIVE,
--							   &f->flags))
-+							   &f->flags)) {
-+					clear_bit(BR_FDB_NOTIFY_ROAMING, &f->flags);
- 					fdb_notify(br, f, RTM_NEWNEIGH, false);
-+				}
- 			}
- 			continue;
- 		}
-@@ -880,6 +884,19 @@ static bool __fdb_mark_active(struct net_bridge_fdb_=
-entry *fdb)
- 		  test_and_clear_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags));
+diff --git a/drivers/net/dsa/mv88e6xxx/global1_atu.c b/drivers/net/dsa/mv=
+88e6xxx/global1_atu.c
+index c47f068f56b3..5c5c53cb2ad0 100644
+--- a/drivers/net/dsa/mv88e6xxx/global1_atu.c
++++ b/drivers/net/dsa/mv88e6xxx/global1_atu.c
+@@ -399,12 +399,36 @@ int mv88e6xxx_g1_atu_remove(struct mv88e6xxx_chip *=
+chip, u16 fid, int port,
+ 	return mv88e6xxx_g1_atu_move(chip, fid, from_port, to_port, all);
  }
 =20
-+void br_fdb_notify_roaming(struct net_bridge *br, struct net_bridge_port=
- *p,
-+			   struct net_bridge_fdb_entry *fdb)
++static int mv88e6xxx_g1_atu_entry_check(struct mv88e6xxx_chip *chip, u16=
+ fid, u8 mac[ETH_ALEN],
++					bool *in_atu, u16 *dpv)
 +{
-+	struct net_bridge_port *old_p =3D READ_ONCE(fdb->dst);
++	struct mv88e6xxx_atu_entry entry;
++	int err;
 +
-+	if (test_bit(BR_FDB_NOTIFY, &fdb->flags) &&
-+	    !test_and_set_bit(BR_FDB_NOTIFY_ROAMING, &fdb->flags)) {
-+		WRITE_ONCE(fdb->dst, p);
-+		fdb_notify(br, fdb, RTM_NEWNEIGH, false);
-+		WRITE_ONCE(fdb->dst, old_p);
-+	}
++	entry.state =3D 0;
++	ether_addr_copy(entry.mac, mac);
++	eth_addr_dec(entry.mac);
++
++	mv88e6xxx_reg_lock(chip);
++	err =3D mv88e6xxx_g1_atu_getnext(chip, fid, &entry);
++	mv88e6xxx_reg_unlock(chip);
++	if (err)
++		return err;
++
++	*in_atu =3D ether_addr_equal(entry.mac, mac);
++	if (dpv)
++		*dpv =3D entry.portvec;
++
++	return err;
 +}
 +
- void br_fdb_update(struct net_bridge *br, struct net_bridge_port *source=
-,
- 		   const unsigned char *addr, u16 vid, unsigned long flags)
+ static irqreturn_t mv88e6xxx_g1_atu_prob_irq_thread_fn(int irq, void *de=
+v_id)
  {
-@@ -906,21 +923,24 @@ void br_fdb_update(struct net_bridge *br, struct ne=
-t_bridge_port *source,
- 			}
+ 	struct mv88e6xxx_chip *chip =3D dev_id;
+ 	struct mv88e6xxx_atu_entry entry;
+ 	int err, spid;
+ 	u16 val, fid;
++	bool in_atu =3D false;
 =20
- 			/* fastpath: update of existing entry */
--			if (unlikely(source !=3D READ_ONCE(fdb->dst) &&
--				     !test_bit(BR_FDB_STICKY, &fdb->flags))) {
--				br_switchdev_fdb_notify(br, fdb, RTM_DELNEIGH);
--				WRITE_ONCE(fdb->dst, source);
--				fdb_modified =3D true;
--				/* Take over HW learned entry */
--				if (unlikely(test_bit(BR_FDB_ADDED_BY_EXT_LEARN,
--						      &fdb->flags)))
--					clear_bit(BR_FDB_ADDED_BY_EXT_LEARN,
--						  &fdb->flags);
--				/* Clear locked flag when roaming to an
--				 * unlocked port.
--				 */
--				if (unlikely(test_bit(BR_FDB_LOCKED, &fdb->flags)))
--					clear_bit(BR_FDB_LOCKED, &fdb->flags);
-+			if (unlikely(source !=3D READ_ONCE(fdb->dst))) {
-+				if (unlikely(test_bit(BR_FDB_STICKY, &fdb->flags))) {
-+					br_fdb_notify_roaming(br, source, fdb);
-+				} else {
-+					br_switchdev_fdb_notify(br, fdb, RTM_DELNEIGH);
-+					WRITE_ONCE(fdb->dst, source);
-+					fdb_modified =3D true;
-+					/* Take over HW learned entry */
-+					if (unlikely(test_bit(BR_FDB_ADDED_BY_EXT_LEARN,
-+							      &fdb->flags)))
-+						clear_bit(BR_FDB_ADDED_BY_EXT_LEARN,
-+							  &fdb->flags);
-+					/* Clear locked flag when roaming to an
-+					 * unlocked port.
-+					 */
-+					if (unlikely(test_bit(BR_FDB_LOCKED, &fdb->flags)))
-+						clear_bit(BR_FDB_LOCKED, &fdb->flags);
-+				}
- 			}
+ 	mv88e6xxx_reg_lock(chip);
 =20
- 			if (unlikely(test_bit(BR_FDB_ADDED_BY_USER, &flags))) {
-@@ -1045,6 +1065,7 @@ static bool fdb_handle_notify(struct net_bridge_fdb=
-_entry *fdb, u8 notify)
- 		   test_and_clear_bit(BR_FDB_NOTIFY, &fdb->flags)) {
- 		/* disabled activity tracking, clear notify state */
- 		clear_bit(BR_FDB_NOTIFY_INACTIVE, &fdb->flags);
-+		clear_bit(BR_FDB_NOTIFY_ROAMING, &fdb->flags);
- 		modified =3D true;
+@@ -437,6 +461,20 @@ static irqreturn_t mv88e6xxx_g1_atu_prob_irq_thread_=
+fn(int irq, void *dev_id)
+ 						     entry.portvec, entry.mac,
+ 						     fid);
+ 		chip->ports[spid].atu_member_violation++;
++
++		if (fid !=3D MV88E6XXX_FID_STANDALONE && chip->ports[spid].mab) {
++			u16 dpv =3D 0;
++
++			err =3D mv88e6xxx_g1_atu_entry_check(chip, fid, entry.mac, &in_atu, &=
+dpv);
++			if (err)
++				goto out;
++
++			if (in_atu && dpv !=3D 0 && !(dpv & BIT(spid))) {
++				err =3D mv88e6xxx_handle_member_violation(chip, spid, &entry, fid);
++				if (err)
++					goto out;
++			}
++		}
  	}
 =20
-@@ -1457,10 +1478,13 @@ int br_fdb_external_learn_add(struct net_bridge *=
-br, struct net_bridge_port *p,
+ 	if (val & MV88E6XXX_G1_ATU_OP_MISS_VIOLATION) {
+diff --git a/drivers/net/dsa/mv88e6xxx/switchdev.c b/drivers/net/dsa/mv88=
+e6xxx/switchdev.c
+index 4c346a884fb2..88761677ff10 100644
+--- a/drivers/net/dsa/mv88e6xxx/switchdev.c
++++ b/drivers/net/dsa/mv88e6xxx/switchdev.c
+@@ -79,5 +79,36 @@ int mv88e6xxx_handle_miss_violation(struct mv88e6xxx_c=
+hip *chip, int port,
+ 				       brport, &info.info, NULL);
+ 	rtnl_unlock();
 =20
- 		fdb->updated =3D jiffies;
+-	return err;
++	return notifier_to_errno(err);
++}
++
++int mv88e6xxx_handle_member_violation(struct mv88e6xxx_chip *chip, int p=
+ort,
++				      struct mv88e6xxx_atu_entry *entry, u16 fid)
++{
++	struct switchdev_notifier_fdb_info info =3D {
++		.addr =3D entry->mac,
++	};
++	struct net_device *brport;
++	struct dsa_port *dp;
++	u16 vid;
++	int err;
++
++	err =3D mv88e6xxx_find_vid(chip, fid, &vid);
++	if (err)
++		return err;
++
++	info.vid =3D vid;
++	dp =3D dsa_to_port(chip->ds, port);
++
++	rtnl_lock();
++	brport =3D dsa_port_to_bridge_port(dp);
++	if (!brport) {
++		rtnl_unlock();
++		return -ENODEV;
++	}
++	err =3D call_switchdev_notifiers(SWITCHDEV_FDB_ADD_TO_BRIDGE,
++				       brport, &info.info, NULL);
++	rtnl_unlock();
++
++	return notifier_to_errno(err);
+ }
+diff --git a/drivers/net/dsa/mv88e6xxx/switchdev.h b/drivers/net/dsa/mv88=
+e6xxx/switchdev.h
+index 62214f9d62b0..f718dbfaf45d 100644
+--- a/drivers/net/dsa/mv88e6xxx/switchdev.h
++++ b/drivers/net/dsa/mv88e6xxx/switchdev.h
+@@ -15,5 +15,7 @@
+ int mv88e6xxx_handle_miss_violation(struct mv88e6xxx_chip *chip, int por=
+t,
+ 				    struct mv88e6xxx_atu_entry *entry,
+ 				    u16 fid);
++int mv88e6xxx_handle_member_violation(struct mv88e6xxx_chip *chip, int p=
+ort,
++				      struct mv88e6xxx_atu_entry *entry, u16 fid);
 =20
--		if (READ_ONCE(fdb->dst) !=3D p &&
--		    !test_bit(BR_FDB_STICK, &fdb->flags)) {
--			WRITE_ONCE(fdb->dst, p);
--			modified =3D true;
-+		if (READ_ONCE(fdb->dst) !=3D p) {
-+			if (test_bit(BR_FDB_STICKY, &fdb->flags)) {
-+				br_fdb_notify_roaming(br, p, fdb);
-+			} else {
-+				WRITE_ONCE(fdb->dst, p);
-+				modified =3D true;
-+			}
- 		}
-=20
- 		if (test_and_set_bit(BR_FDB_ADDED_BY_EXT_LEARN, &fdb->flags)) {
-diff --git a/net/bridge/br_input.c b/net/bridge/br_input.c
-index ceaa5a89b947..512ffab16f5d 100644
---- a/net/bridge/br_input.c
-+++ b/net/bridge/br_input.c
-@@ -120,8 +120,14 @@ int br_handle_frame_finish(struct net *net, struct s=
-ock *sk, struct sk_buff *skb
- 				br_fdb_update(br, p, eth_hdr(skb)->h_source,
- 					      vid, BIT(BR_FDB_LOCKED));
- 			goto drop;
--		} else if (READ_ONCE(fdb_src->dst) !=3D p ||
--			   test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
-+		} else if (READ_ONCE(fdb_src->dst) !=3D p) {
-+			/* FDB is trying to roam. Notify userspace and drop
-+			 * the packet
-+			 */
-+			if (test_bit(BR_FDB_STICKY, &fdb_src->flags))
-+				br_fdb_notify_roaming(br, p, fdb_src);
-+			goto drop;
-+		} else if (test_bit(BR_FDB_LOCAL, &fdb_src->flags)) {
- 			/* FDB mismatch. Drop the packet without roaming. */
- 			goto drop;
- 		} else if (test_bit(BR_FDB_LOCKED, &fdb_src->flags)) {
-diff --git a/net/bridge/br_private.h b/net/bridge/br_private.h
-index 041f6e571a20..18d3cb5fec0e 100644
---- a/net/bridge/br_private.h
-+++ b/net/bridge/br_private.h
-@@ -277,6 +277,7 @@ enum {
- 	BR_FDB_NOTIFY_INACTIVE,
- 	BR_FDB_LOCKED,
- 	BR_FDB_DYNAMIC_LEARNED,
-+	BR_FDB_NOTIFY_ROAMING,
- };
-=20
- struct net_bridge_fdb_key {
-@@ -874,6 +875,8 @@ int br_fdb_external_learn_del(struct net_bridge *br, =
-struct net_bridge_port *p,
- 			      bool swdev_notify);
- void br_fdb_offloaded_set(struct net_bridge *br, struct net_bridge_port =
-*p,
- 			  const unsigned char *addr, u16 vid, bool offloaded);
-+void br_fdb_notify_roaming(struct net_bridge *br, struct net_bridge_port=
- *p,
-+			   struct net_bridge_fdb_entry *fdb);
-=20
- /* br_forward.c */
- enum br_pkt_type {
+ #endif /* _MV88E6XXX_SWITCHDEV_H_ */
 
