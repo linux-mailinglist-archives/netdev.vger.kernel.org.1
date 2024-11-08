@@ -1,137 +1,135 @@
-Return-Path: <netdev+bounces-143152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 652DF9C144E
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:54:14 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id 602249C1459
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:57:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA46CB20C8C
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:54:11 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 180C01F21F18
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:57:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF4B45023;
-	Fri,  8 Nov 2024 02:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B4694962C;
+	Fri,  8 Nov 2024 02:56:57 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FceFVNPq"
+	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="iRwbcJ4S"
 X-Original-To: netdev@vger.kernel.org
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.14])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF5B26296
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 02:54:04 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4329DEAD7;
+	Fri,  8 Nov 2024 02:56:54 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.14
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731034445; cv=none; b=lH2NB9CbUHTvMGcD7HBS4n0Qc3q1cT+zZmLuwRcwXtDjlMX9MbDh5ctGed5RzC2haCJyq7rO//ZuHbhSqAiln95sOyTzFglrUnynVAoh6bGLHhuQJeJkupD2tI+ppZJ59NFJVChZXTxuBKV8NWE8kiQqwxQPdABWmO2/HjdQMW4=
+	t=1731034616; cv=none; b=Pdi3LJdoyLpHHvFv7iKSihStU3K74vRpRF8LIvt/NP9s+cGUBPd6jG9pItbGnFzZz8dYTKXUKEfnZvGj7YXQvC4bApy1MuyDTf4YOmN/P/K0ntaWadKyaMtPpZbZuWRpBjz1w3q/gLuvrQGwhDx8gl6V8B6mFdBi6lH+NdpAJWM=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731034445; c=relaxed/simple;
-	bh=cwEqbnHj/TJxnIy+3o2VhKgoUs8GcxvB6wBbbqhMWAU=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=EABo0lloTFpztk1ZnMcItn32LmnQrAGaLsndGQlaoqxxRi3fNGXk+NYl/8zmunWKqrd4WMi6yQKz6CRuW4YAfpjasrmRSbnWNRzE09neTWDkgOmwKEPhAAlwzDz7ZWQMdBZs/vrwE0XeBepps+6yLFuTo2kczDxOGMHqdtgCQEU=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FceFVNPq; arc=none smtp.client-ip=170.10.133.124
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1731034443;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=cwEqbnHj/TJxnIy+3o2VhKgoUs8GcxvB6wBbbqhMWAU=;
-	b=FceFVNPq5l8l8Sdw4km5N5zUPFVPGe1D8/Z2oOrdlpoDmQ0bZiUbbNIpdymQ4+3F4i2cIA
-	4HQ5dxTU0TGp1gswhsHz0yZ76phoX/VnR8EkdIlIbRWWegVWLMY7GdxudKt6dpdY33lYnd
-	UdVrE+YvHccYkWWNv2OV0yY3RtgdJv8=
-Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
- [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-114-7xW6pHi8OdO4eWeGoRNK9w-1; Thu, 07 Nov 2024 21:54:02 -0500
-X-MC-Unique: 7xW6pHi8OdO4eWeGoRNK9w-1
-X-Mimecast-MFC-AGG-ID: 7xW6pHi8OdO4eWeGoRNK9w
-Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2e2eb765285so1895769a91.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 18:54:01 -0800 (PST)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731034441; x=1731639241;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cwEqbnHj/TJxnIy+3o2VhKgoUs8GcxvB6wBbbqhMWAU=;
-        b=IygEVeG1l30juqjSYnL4vEzJFMDlri59ubhFaKxkoBFoe+KODzHOkKxqdo1TVoFNpl
-         fZMnzc9QPpscGoBOviT6ts7shws4I/AUJXTuW1PSBE/we7KiKAMfb2rkJA12H1ToI3vN
-         rqk+oQEcW6L6imsMtyTT17JtkoRAPR6MdMk/x4LPqThbyi2l3pFlVXvC+4brWfPO97Qb
-         CBFTNFU6sZiN79yIT6ow5acHIfVG3rNd9q4TDAvOtvIJ+7Nc9GpoL6UcI+Lpxi1wEF2r
-         y71a6tQWxzoSauNvoSKnK+ho1PeYj44OVo6hgcKm8DVj8Pq8yIbK+ZBM0e1OMXUCf1zV
-         UURQ==
-X-Forwarded-Encrypted: i=1; AJvYcCWBugPcLvHR3FjR3u7HwQJlkmakBaDfLGk22txOwabMG9nE1I22NRpHQLQdchItsqz2AT/EhDs=@vger.kernel.org
-X-Gm-Message-State: AOJu0YwoSEwy080qaFZgeZB7jXNNURc3B5EvkuHfsdA81FGc50zhltbI
-	GVwGExWMIBnKKe6PYQQrJBKQJpd+x5Y3kDZzhESJFooSU1qC5vJweScR0/m1v8+3QGqWkkTB6cV
-	b7JgcIi6KpwRbju6FO6jwTZv4aW7YVqZQ93DN+vpjJffj+zcdEyiUyZ6T8V8PfAcjhwuMUAAu+H
-	LXj3lmrYBqwN9n8T+bzTywh8qBFtSo
-X-Received: by 2002:a17:90b:3d91:b0:2e2:a029:3b4b with SMTP id 98e67ed59e1d1-2e9b177632bmr1984107a91.28.1731034440898;
-        Thu, 07 Nov 2024 18:54:00 -0800 (PST)
-X-Google-Smtp-Source: AGHT+IHeAKu6FXOO8aouj3/WFxZQgxhtW8ocCUmDNXhuRcpuePvBO35pclspRsjXFn6dE+pdWYMrEjjMCT0rnXoNyZM=
-X-Received: by 2002:a17:90b:3d91:b0:2e2:a029:3b4b with SMTP id
- 98e67ed59e1d1-2e9b177632bmr1984080a91.28.1731034440508; Thu, 07 Nov 2024
- 18:54:00 -0800 (PST)
+	s=arc-20240116; t=1731034616; c=relaxed/simple;
+	bh=alNLUomFOrw/dXZvCeCRW/AHRkTVyrDOna3U5uTWQBQ=;
+	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
+	 Content-Type:Content-Disposition:In-Reply-To; b=XlopkrA/1n3r/usgNlONp3SXi2PNXIvPPHn/PFR1sZhHSS37h/I7diYs+8BW36y3MwF9M4Z3nfbpATy52RODEgY+WzcjjDHE9ONledRXIZxWzpyotYV75ofJC/5juSjWFP2vhpj3DfXQ2NsVy02Pe0lMfdrMcinPr29mJ051yLQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=iRwbcJ4S; arc=none smtp.client-ip=192.198.163.14
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1731034614; x=1762570614;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=alNLUomFOrw/dXZvCeCRW/AHRkTVyrDOna3U5uTWQBQ=;
+  b=iRwbcJ4SZt+wI7DcwsK/oAy54IGh+IoepR7sBB6EjdG7/Tj+djQ7rHP8
+   54PgrMhKXzwiMBXIVIHS3r/ahgv0DaxmOPGA8e9ZgZ72Sw3YUixgX7IOn
+   HvgrQQcUC4/BlXcEKZhNIgxT78XoEArXfUc0Uhx20JZ0tN9t6mUUcfJBL
+   DTMOe3bJhP12ogDpWS2mEZf98ljg/1yIDB7iqkz70ydpNPy0R9fLWELNH
+   4BHfN3cN9TKV0pp/oPTkPSWV/MiTjejdm1u4P3D+jtDaNseIrZxfMDPBO
+   pRZGXFDftYmE9+xqdSc3+QD9FzwGpbfg5LHqiIQtHX+h1SksbSQTBFniq
+   Q==;
+X-CSE-ConnectionGUID: V8K0JnqUSbiRtwezs5IvSQ==
+X-CSE-MsgGUID: tPkPp5KOT2+oYYMSaTD3oA==
+X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="31132180"
+X-IronPort-AV: E=Sophos;i="6.12,136,1728975600"; 
+   d="scan'208";a="31132180"
+Received: from fmviesa008.fm.intel.com ([10.60.135.148])
+  by fmvoesa108.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Nov 2024 18:56:54 -0800
+X-CSE-ConnectionGUID: 2z1C/yRsSBWGCgbO0A4C5g==
+X-CSE-MsgGUID: Nwl1tYVrSdam3UOxzimk7A==
+X-ExtLoop1: 1
+X-IronPort-AV: E=Sophos;i="6.12,136,1728975600"; 
+   d="scan'208";a="85503149"
+Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
+  by fmviesa008.fm.intel.com with ESMTP; 07 Nov 2024 18:56:45 -0800
+Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1t9FAx-000qx8-0J;
+	Fri, 08 Nov 2024 02:56:43 +0000
+Date: Fri, 8 Nov 2024 10:56:25 +0800
+From: kernel test robot <lkp@intel.com>
+To: Mina Almasry <almasrymina@google.com>, netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	Willem de Bruijn <willemb@google.com>,
+	Kaiyuan Zhang <kaiyuanz@google.com>,
+	Samiullah Khawaja <skhawaja@google.com>,
+	linux-kernel@vger.kernel.org
+Cc: oe-kbuild-all@lists.linux.dev, Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>
+Subject: Re: [PATCH net-next v2 5/5] netmem: add netmem_prefetch
+Message-ID: <202411081014.jmz4uf6C-lkp@intel.com>
+References: <20241107212309.3097362-6-almasrymina@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
- <20241101015101.98111-1-qiang4.zhang@linux.intel.com> <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
- <20241106042828-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20241106042828-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 8 Nov 2024 10:53:49 +0800
-Message-ID: <CACGkMEv4eq9Ej2d2vKp0S8UdTgf4tjXJ_SAtfZmKxQ3iPxfEOg@mail.gmail.com>
-Subject: Re: [PATCH v2] virtio: only reset device and restore status if needed
- in device resume
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: qiang4.zhang@linux.intel.com, Paolo Bonzini <pbonzini@redhat.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>, 
-	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
-	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <viresh.kumar@linaro.org>, 
-	"Chen, Jian Jun" <jian.jun.chen@intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
-	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
-	"Martin K. Petersen" <martin.petersen@oracle.com>, David Hildenbrand <david@redhat.com>, 
-	Gerd Hoffmann <kraxel@redhat.com>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
-	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Qiang Zhang <qiang4.zhang@intel.com>, 
-	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
-	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-scsi@vger.kernel.org, 
-	linux-sound@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20241107212309.3097362-6-almasrymina@google.com>
 
-On Wed, Nov 6, 2024 at 5:29=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
-> > On Fri, Nov 1, 2024 at 9:54=E2=80=AFAM <qiang4.zhang@linux.intel.com> w=
-rote:
-> > >
-> > > From: Qiang Zhang <qiang4.zhang@intel.com>
-> > >
-> > > Virtio core unconditionally reset and restore status for all virtio
-> > > devices before calling restore method. This breaks some virtio driver=
-s
-> > > which don't need to do anything in suspend and resume because they
-> > > just want to keep device state retained.
-> >
-> > The challenge is how can driver know device doesn't need rest.
->
-> I actually don't remember why do we do reset on restore. Do you?
->
+Hi Mina,
 
-Because the driver doesn't know if the device can keep its state, so
-it chooses to start from that.
+kernel test robot noticed the following build warnings:
 
-Thanks
+[auto build test WARNING on net-next/main]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Mina-Almasry/net-page_pool-rename-page_pool_alloc_netmem-to-_netmems/20241108-052530
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20241107212309.3097362-6-almasrymina%40google.com
+patch subject: [PATCH net-next v2 5/5] netmem: add netmem_prefetch
+config: parisc-allmodconfig (https://download.01.org/0day-ci/archive/20241108/202411081014.jmz4uf6C-lkp@intel.com/config)
+compiler: hppa-linux-gcc (GCC) 14.2.0
+reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241108/202411081014.jmz4uf6C-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202411081014.jmz4uf6C-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   In file included from include/linux/skbuff.h:40,
+                    from net/ipv4/tcp_vegas.c:37:
+   include/net/netmem.h: In function 'netmem_prefetch':
+   include/net/netmem.h:179:9: error: implicit declaration of function 'prefetch' [-Wimplicit-function-declaration]
+     179 |         prefetch(netmem_to_page(netmem));
+         |         ^~~~~~~~
+   net/ipv4/tcp_vegas.c: At top level:
+>> net/ipv4/tcp_vegas.c:46:12: warning: 'gamma' defined but not used [-Wunused-variable]
+      46 | static int gamma = 1;
+         |            ^~~~~
+
+
+vim +/gamma +46 net/ipv4/tcp_vegas.c
+
+7752237e9f07b3 Stephen Hemminger 2007-04-23  43  
+8d3a564da34e58 Doug Leith        2008-12-09  44  static int alpha = 2;
+8d3a564da34e58 Doug Leith        2008-12-09  45  static int beta  = 4;
+8d3a564da34e58 Doug Leith        2008-12-09 @46  static int gamma = 1;
+b87d8561d8667d Stephen Hemminger 2005-06-23  47  
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
