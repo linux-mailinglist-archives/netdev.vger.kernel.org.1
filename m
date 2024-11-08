@@ -1,133 +1,190 @@
-Return-Path: <netdev+bounces-143252-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143253-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A0599C1A43
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:14:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 667E59C1AAB
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:34:53 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9AC271C22D6C
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:14:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BD133B23660
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 10:34:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E058C1E2303;
-	Fri,  8 Nov 2024 10:14:27 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="jFNAmN90"
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 54BBA1E25EA;
+	Fri,  8 Nov 2024 10:30:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.10])
+Received: from pegase2.c-s.fr (pegase2.c-s.fr [93.17.235.10])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4673F1E22F8
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 10:14:26 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.10
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393FB1F706D;
+	Fri,  8 Nov 2024 10:30:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=93.17.235.10
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731060867; cv=none; b=PHMppDrMPJbvVHlZDElKsa0tWEHKOm+plfU663d70fMvndvEpbWXMfmYTgP0rNa20qNF168pMG+jVWGWnkol4hfTy5Xi0at8/24k2siZuGhKnTsZf+2/o/jlPUJHGP9ovXC64N6QdEY0EAIGvN/+QCsqLX2AvubLe/BpQJj3e54=
+	t=1731061806; cv=none; b=Kzd5rDtzK7/ux8z8u+nmMKOrf5NL5P1IzxiRysyRiIKXowfxrQ4ni+R/KmJXa+XGQa3jcXlSmD4dX+KNiWvyPfxaI2qHUYOw5KwD3sQAumsTxp03eL5O1bAVK/H7pKhqxs+ClVwIlo9G0Mq/hAu+U5e9fSZIFBEJaghO28ukyug=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731060867; c=relaxed/simple;
-	bh=KRVHB01OEq83mExTpA4ZzpE7Xo88aH3410IvN5uxHWk=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:Content-Type; b=nLC4aWeZ2X/mGhMAHG6MK6yRrMn7VgmLGKEh6JR0xktfLJbANTjSPpeHfPY3OjHWwCQyp1p/ETNH2MXT3hqsarKH6Dhtpu6DUL01zls1iQQdEbnWq/SPQzn0XrXDDvcKf4vaILV8UXyuYSFaFHifZevv25V6KsycLdNyMgY4sPY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=jFNAmN90; arc=none smtp.client-ip=192.198.163.10
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731060866; x=1762596866;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=KRVHB01OEq83mExTpA4ZzpE7Xo88aH3410IvN5uxHWk=;
-  b=jFNAmN905TUU1lontrzGONogzpYur48rqfUTI2+F1Q/7/TtQpNnlqTo/
-   8wKuYKSJKuWwVR+GC3SpXsD9fhmyUMUG4nAcdExtA1S44X463sYtQHvhS
-   tJhJJKpJQeamoFUTXkf1hwuIJfK39DLQjv+8Wz6yLO4VYb5FcpsSA83lo
-   wcqt8JbnkivFP4qaWzDj4HvCcLyuGtNG8hv6CwnzNi+zXFFlhn68g2HGH
-   EesAb+Eueav+UvoukvT1SJwtuixSN5mwYmmkXuO3GCUFBHSTDhhAOGpS7
-   INljbk54Kohw4EhqkYuTGU001qPxyTk+idQNj7OGgL9LpSGTBuB1XMR/d
-   Q==;
-X-CSE-ConnectionGUID: AUbDmGYsTFSk3x8MbXu6+g==
-X-CSE-MsgGUID: Kt6bvH4CTk2yYbf9dwHM5A==
-X-IronPort-AV: E=McAfee;i="6700,10204,11249"; a="42325333"
-X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="42325333"
-Received: from orviesa008.jf.intel.com ([10.64.159.148])
-  by fmvoesa104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 02:14:26 -0800
-X-CSE-ConnectionGUID: jXuftAS4TxG03mCX4Ey3rQ==
-X-CSE-MsgGUID: HrTigdLPRmSy8m+J1iuT3A==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,137,1728975600"; 
-   d="scan'208";a="86296723"
-Received: from pae-dbg-r750-02-263.igk.intel.com ([172.28.191.215])
-  by orviesa008.jf.intel.com with ESMTP; 08 Nov 2024 02:14:25 -0800
-From: Przemyslaw Korba <przemyslaw.korba@intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	anthony.l.nguyen@intel.com,
-	przemyslaw.kitszel@intel.com,
-	Przemyslaw Korba <przemyslaw.korba@intel.com>
-Subject: [PATCH iwl-net] ice: fix PHY timestamp extraction for ETH56G
-Date: Fri,  8 Nov 2024 11:14:19 +0100
-Message-Id: <20241108101419.66920-1-przemyslaw.korba@intel.com>
-X-Mailer: git-send-email 2.31.1
+	s=arc-20240116; t=1731061806; c=relaxed/simple;
+	bh=0KEauaZdc7iNy8LfrhzAhwMnl4u2pDYZpJto3PxhWNk=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=E+Nm+TV3/co2k3UuqkqaJSomwo79a2hbmLQTdS5cjav5Z6XIt4+v6YlmpZvXqGEmsdHKcgRdiBY9XppLNvnv6q8iME+QZbFXjTfDvUTkm+veDzAc3KpMg1+dgJgE7qsg/PYdL5aTHJzvPUQZMppYAHkWZ1jPbTyumDM0QINzubE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu; spf=pass smtp.mailfrom=csgroup.eu; arc=none smtp.client-ip=93.17.235.10
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=csgroup.eu
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=csgroup.eu
+Received: from localhost (mailhub3.si.c-s.fr [172.26.127.67])
+	by localhost (Postfix) with ESMTP id 4XlFZ20sT5z9sSR;
+	Fri,  8 Nov 2024 11:30:02 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from pegase2.c-s.fr ([172.26.127.65])
+	by localhost (pegase2.c-s.fr [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id v0IgesT6yvwB; Fri,  8 Nov 2024 11:30:02 +0100 (CET)
+Received: from messagerie.si.c-s.fr (messagerie.si.c-s.fr [192.168.25.192])
+	by pegase2.c-s.fr (Postfix) with ESMTP id 4XlFZ14LVSz9rvV;
+	Fri,  8 Nov 2024 11:30:01 +0100 (CET)
+Received: from localhost (localhost [127.0.0.1])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id 5B07E8B781;
+	Fri,  8 Nov 2024 11:30:01 +0100 (CET)
+X-Virus-Scanned: amavisd-new at c-s.fr
+Received: from messagerie.si.c-s.fr ([127.0.0.1])
+	by localhost (messagerie.si.c-s.fr [127.0.0.1]) (amavisd-new, port 10023)
+	with ESMTP id ff_n68pslpCE; Fri,  8 Nov 2024 11:30:01 +0100 (CET)
+Received: from [192.168.232.253] (unknown [192.168.232.253])
+	by messagerie.si.c-s.fr (Postfix) with ESMTP id D7FE48B77A;
+	Fri,  8 Nov 2024 11:30:00 +0100 (CET)
+Message-ID: <2010cc7a-7f49-4c5b-b684-8e08ff8d17ed@csgroup.eu>
+Date: Fri, 8 Nov 2024 11:30:00 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla Thunderbird
+Subject: Re: drivers/net/ethernet/freescale/ucc_geth.c:2454:64: sparse:
+ sparse: incorrect type in argument 1 (different address spaces)
+To: Linus Walleij <linus.walleij@linaro.org>,
+ kernel test robot <lkp@intel.com>,
+ "linuxppc-dev@lists.ozlabs.org list" <linuxppc-dev@lists.ozlabs.org>,
+ netdev <netdev@vger.kernel.org>
+Cc: Stanislav Kinsburskii <stanislav.kinsburskii@gmail.com>,
+ oe-kbuild-all@lists.linux.dev, linux-kernel@vger.kernel.org,
+ Michael Ellerman <mpe@ellerman.id.au>
+References: <202410301531.7Vr9UkCn-lkp@intel.com>
+ <CACRpkdbW5kheaWPzKip9ucEwK2uv+Cmf5SwT1necfa3Ynct6Ag@mail.gmail.com>
+Content-Language: fr-FR
+From: Christophe Leroy <christophe.leroy@csgroup.eu>
+In-Reply-To: <CACRpkdbW5kheaWPzKip9ucEwK2uv+Cmf5SwT1necfa3Ynct6Ag@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
 
-Fix incorrect PHY timestamp extraction for ETH56G.
-It's better to use FIELD_PREP() than manual shift.
 
-Fixes: 7cab44f1c35f ("ice: Introduce ETH56G PHY model for E825C products")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Przemyslaw Korba <przemyslaw.korba@intel.com>
----
- drivers/net/ethernet/intel/ice/ice_ptp_hw.c | 3 ++-
- drivers/net/ethernet/intel/ice/ice_ptp_hw.h | 5 ++---
- 2 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-index ec8db830ac73..3816e45b6ab4 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.c
-@@ -1495,7 +1495,8 @@ static int ice_read_ptp_tstamp_eth56g(struct ice_hw *hw, u8 port, u8 idx,
- 	 * lower 8 bits in the low register, and the upper 32 bits in the high
- 	 * register.
- 	 */
--	*tstamp = ((u64)hi) << TS_PHY_HIGH_S | ((u64)lo & TS_PHY_LOW_M);
-+	*tstamp = FIELD_PREP(TS_PHY_HIGH_M, hi) |
-+		  FIELD_PREP(TS_PHY_LOW_M, lo);
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-index 6cedc1a906af..4c8b84571344 100644
---- a/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-+++ b/drivers/net/ethernet/intel/ice/ice_ptp_hw.h
-@@ -663,9 +663,8 @@ static inline u64 ice_get_base_incval(struct ice_hw *hw)
- #define TS_HIGH_M			0xFF
- #define TS_HIGH_S			32
- 
--#define TS_PHY_LOW_M			0xFF
--#define TS_PHY_HIGH_M			0xFFFFFFFF
--#define TS_PHY_HIGH_S			8
-+#define TS_PHY_LOW_M			GENMASK(7, 0)
-+#define TS_PHY_HIGH_M			GENMASK_ULL(39, 8)
- 
- #define BYTES_PER_IDX_ADDR_L_U		8
- #define BYTES_PER_IDX_ADDR_L		4
+Le 08/11/2024 à 09:18, Linus Walleij a écrit :
+> On Wed, Oct 30, 2024 at 8:05 AM kernel test robot <lkp@intel.com> wrote:
+> 
+>> tree:   https://eur01.safelinks.protection.outlook.com/?url=https%3A%2F%2Fgit.kernel.org%2Fpub%2Fscm%2Flinux%2Fkernel%2Fgit%2Ftorvalds%2Flinux.git&data=05%7C02%7Cchristophe.leroy2%40cs-soprasteria.com%7C5a1ff6cef1f642fba00a08dcffce0903%7C8b87af7d86474dc78df45f69a2011bb5%7C0%7C0%7C638666507603442752%7CUnknown%7CTWFpbGZsb3d8eyJFbXB0eU1hcGkiOnRydWUsIlYiOiIwLjAuMDAwMCIsIlAiOiJXaW4zMiIsIkFOIjoiTWFpbCIsIldUIjoyfQ%3D%3D%7C0%7C%7C%7C&sdata=2dgpku3%2BPjovwZxpedYowAAB%2BR%2FeyxOc0Ys3kE0KK6E%3D&reserved=0 master
+>> head:   c1e939a21eb111a6d6067b38e8e04b8809b64c4e
+>> commit: b28d1ccf921a4333be14017d82066386d419e638 powerpc/io: Expect immutable pointer in virt_to_phys() prototype
+> 
+> Ugh Stanislav do you have ideas around this one?
+> 
+>>     drivers/net/ethernet/freescale/ucc_geth.c:244:21: sparse:     got restricted __be32 [noderef] __iomem *
+>>     drivers/net/ethernet/freescale/ucc_geth.c:405:22: sparse: sparse: incorrect type in argument 1 (different base types) @@     expected unsigned short volatile [noderef] [usertype] __iomem *addr @@     got restricted __be16 [noderef] [usertype] __iomem * @@
+> 
+> They all look the same, it's from this:
+> 
+> static void set_mac_addr(__be16 __iomem *reg, u8 *mac)
+> {
+>      out_be16(&reg[0], ((u16)mac[5] << 8) | mac[4]);
+>      out_be16(&reg[1], ((u16)mac[3] << 8) | mac[2]);
+>      out_be16(&reg[2], ((u16)mac[1] << 8) | mac[0]);
+> }
+> 
+> Is it simply that we need a paranthesis extra around the thing casted
+> to (u16) else it becomes u32?
 
-base-commit: 333b8b2188c495a2a1431b5e0d51826383271aad
--- 
-2.31.1
+Not at all. The one you point here are:
 
----------------------------------------------------------------------
-Intel Technology Poland sp. z o.o.
-ul. Slowackiego 173 | 80-298 Gdansk | Sad Rejonowy Gdansk Polnoc | VII Wydzial Gospodarczy Krajowego Rejestru Sadowego - KRS 101882 | NIP 957-07-52-316 | Kapital zakladowy 200.000 PLN.
-Spolka oswiadcza, ze posiada status duzego przedsiebiorcy w rozumieniu ustawy z dnia 8 marca 2013 r. o przeciwdzialaniu nadmiernym opoznieniom w transakcjach handlowych.
+drivers/net/ethernet/freescale/ucc_geth.c:405:22: warning: incorrect 
+type in argument 1 (different base types)
+drivers/net/ethernet/freescale/ucc_geth.c:405:22:    expected unsigned 
+short volatile [noderef] [usertype] __iomem *addr
+drivers/net/ethernet/freescale/ucc_geth.c:405:22:    got restricted 
+__be16 [noderef] [usertype] __iomem *
+drivers/net/ethernet/freescale/ucc_geth.c:406:22: warning: incorrect 
+type in argument 1 (different base types)
+drivers/net/ethernet/freescale/ucc_geth.c:406:22:    expected unsigned 
+short volatile [noderef] [usertype] __iomem *addr
+drivers/net/ethernet/freescale/ucc_geth.c:406:22:    got restricted 
+__be16 [noderef] [usertype] __iomem *
+drivers/net/ethernet/freescale/ucc_geth.c:407:22: warning: incorrect 
+type in argument 1 (different base types)
+drivers/net/ethernet/freescale/ucc_geth.c:407:22:    expected unsigned 
+short volatile [noderef] [usertype] __iomem *addr
+drivers/net/ethernet/freescale/ucc_geth.c:407:22:    got restricted 
+__be16 [noderef] [usertype] __iomem *
+drivers/net/ethernet/freescale/ucc_geth.c:449:23: warning: incorrect 
+type in argument 1 (different base types)
+drivers/net/ethernet/freescale/ucc_geth.c:449:23:    expected restricted 
+__be16 [noderef] [usertype] __iomem *reg
+drivers/net/ethernet/freescale/ucc_geth.c:449:23:    got unsigned short 
+[noderef] __iomem *
 
-Ta wiadomosc wraz z zalacznikami jest przeznaczona dla okreslonego adresata i moze zawierac informacje poufne. W razie przypadkowego otrzymania tej wiadomosci, prosimy o powiadomienie nadawcy oraz trwale jej usuniecie; jakiekolwiek przegladanie lub rozpowszechnianie jest zabronione.
-This e-mail and any attachments may contain confidential material for the sole use of the intended recipient(s). If you are not the intended recipient, please contact the sender and delete all copies; any review or distribution by others is strictly prohibited.
+The problem is the __be16 in the function prototype.
 
+	set_mac_addr(&p_82xx_addr_filt->taddr.h, p_enet_addr);
+
+p_82xx_addr_filt->taddr.h is a u16
+and out_be16() expects a u16*
+
+So the following fixes the above warnings:
+
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c 
+b/drivers/net/ethernet/freescale/ucc_geth.c
+index ab421243a419..bbfc289dd73c 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -400,7 +400,7 @@ static void put_enet_addr_container(struct 
+enet_addr_container *enet_addr_cont)
+  	kfree(enet_addr_cont);
+  }
+
+-static void set_mac_addr(__be16 __iomem *reg, u8 *mac)
++static void set_mac_addr(u16 __iomem *reg, u8 *mac)
+  {
+  	out_be16(&reg[0], ((u16)mac[5] << 8) | mac[4]);
+  	out_be16(&reg[1], ((u16)mac[3] << 8) | mac[2]);
+
+
+
+For the other ones, most of them are because out_beXX() expects uXX* not 
+__beXX *.
+
+It looks like the warnings go away if you replace out_be32() by 
+iowrite32be(), which has been possible since commit 894fa235eb4c 
+("powerpc: inline iomap accessors") (out_beXX/in_beXX should anyway not 
+be used outside arch/powerpc/):
+
+diff --git a/drivers/net/ethernet/freescale/ucc_geth.c 
+b/drivers/net/ethernet/freescale/ucc_geth.c
+index ab421243a419..625b58b3efc8 100644
+--- a/drivers/net/ethernet/freescale/ucc_geth.c
++++ b/drivers/net/ethernet/freescale/ucc_geth.c
+@@ -241,12 +241,12 @@ static struct sk_buff *get_new_skb(struct 
+ucc_geth_private *ugeth,
+  		    (((unsigned)skb->data) & (UCC_GETH_RX_DATA_BUF_ALIGNMENT -
+  					      1)));
+
+-	out_be32(&((struct qe_bd __iomem *)bd)->buf,
++	iowrite32be(
+  		      dma_map_single(ugeth->dev,
+  				     skb->data,
+  				     ugeth->ug_info->uf_info.max_rx_buf_length +
+  				     UCC_GETH_RX_DATA_BUF_ALIGNMENT,
+-				     DMA_FROM_DEVICE));
++				     DMA_FROM_DEVICE), &((struct qe_bd __iomem *)bd)->buf);
+
+  	out_be32((u32 __iomem *)bd,
+  			(R_E | R_I | (in_be32((u32 __iomem*)bd) & R_W)));
+
+
+Christophe
 
