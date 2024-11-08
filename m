@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-143305-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143306-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F4939C1E3B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:42:39 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3D3C79C1E80
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:51:31 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3C5C4282364
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:42:38 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id B61ABB25CA5
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 053E31E907A;
-	Fri,  8 Nov 2024 13:42:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63D771F7073;
+	Fri,  8 Nov 2024 13:50:12 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="rP0lj+JO"
+	dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b="mwnMarNk"
 X-Original-To: netdev@vger.kernel.org
 Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CBC58137E;
-	Fri,  8 Nov 2024 13:42:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A008F1F669E;
+	Fri,  8 Nov 2024 13:50:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=156.67.10.101
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731073354; cv=none; b=iEW0UZIWNvEu6g6vZMbUux4PZdL2AA/8/QpAAz0Ed7XakFAQxXG5N6a7evVY/cB7uxuecQb7W+X8kGY+CTRsW7lltWPXKyAncjShKOGmu5AhdVjB1rUYqiBxzE+pwfdowVFeyTe9/2Sk16KYUZag6TlIGQqbuemg1yGuj7Z3O0w=
+	t=1731073812; cv=none; b=QUkIU2NmbN8widFUbomdxHYm9ySuQa+oghSQHpnx37JhiXoD0DN8z7Xi2yMvhi28RZISJbdh5uolBdjCPZYToauvihNI6mm/bWsF2+ZlUEESYcCPOjyPHNLPVTC1lVeHiWq6VbhYc6Zq8EfpAu3q3Q77XTnCJWsnGQW1SATARgQ=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731073354; c=relaxed/simple;
-	bh=sPl0xH/rU5MR87CzD0UWeh48pO+XSsnrBK1DNGW4z80=;
+	s=arc-20240116; t=1731073812; c=relaxed/simple;
+	bh=i+vmzEYcWOuiGKlgGO074kb90Iqi1D6EiBcRfCbCF0c=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ba2AFD/+0XMuMkME8qTwYBwHCLdhpnebmsvoW4maNclb8Hw4CMRmWQFmiFbC9sy7X2Hm2LetYOAmxHJ69yLQjvB9V2Wg2kMulrliAGyzN3pil16dgteX3vlb5d0j+mTGtkLiZV8Hi3B5rhL2fNYVbmq/jMZc0C0k3Kpa/wL1L/c=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=rP0lj+JO; arc=none smtp.client-ip=156.67.10.101
+	 Content-Type:Content-Disposition:In-Reply-To; b=urGUZBz2zzOZl5vrlcM4MLQLMWXLlbHWn6EUfGbVzieAQM6MWcxajS0hiME8sCNacQ9Uk/gEjb5dY4BOgDFPbmNCHh1rFz6YYtTRMgWETZR4JO6LRhN2qWgSlm+rUYjtAb02ievjzgC8XH3pzAb/TNwk9nHDZEBezgTXrSfpPMI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch; spf=pass smtp.mailfrom=lunn.ch; dkim=pass (1024-bit key) header.d=lunn.ch header.i=@lunn.ch header.b=mwnMarNk; arc=none smtp.client-ip=156.67.10.101
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=lunn.ch
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=lunn.ch
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
@@ -36,13 +36,13 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
 	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
 	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
 	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2PsP6fH5txDMvDlc3c+WMtD2cJ/wi0SKqkHs3W/eFdE=; b=rP0lj+JOMDGwwHCIind6kgu2cS
-	AY3N7HyzPwY4bkVUhKzCuvNGjHaSFts3QbWZHVwAe4ekgbKG+vJwrG9bd4+ob6Sba8hBPNKi4Vf8s
-	bYCVmGtQO8GsCW6STmX0PYgMggGtz9Qe8gWTxum/IiGybTKkAV93OJIZ9a7gEcmFQEaM=;
+	bh=19X7EJF8fAMpXZhsGOypItPY81GzMBnZQshaGH2s4YU=; b=mwnMarNkJPP5BrkOT90tMZolXv
+	pwe3A/vCSQhnJWL0mTrvlxa8hlYOAkarIpL2Y5fNI1cX3g6BChR+mDmZvgrisLqJXZ9A87YOqBRNO
+	egH//T1oprUjYWWnyKZwXkO/kndLx/Cbl06dMnjmt7Mzwd69oyGAquottEMauTrF5MNo=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
 	(envelope-from <andrew@lunn.ch>)
-	id 1t9PFi-00CbHF-Cg; Fri, 08 Nov 2024 14:42:18 +0100
-Date: Fri, 8 Nov 2024 14:42:18 +0100
+	id 1t9PN8-00CbJx-T7; Fri, 08 Nov 2024 14:49:58 +0100
+Date: Fri, 8 Nov 2024 14:49:58 +0100
 From: Andrew Lunn <andrew@lunn.ch>
 To: Elliot Ayrey <elliot.ayrey@alliedtelesis.co.nz>
 Cc: "David S . Miller" <davem@davemloft.net>,
@@ -54,11 +54,11 @@ Cc: "David S . Miller" <davem@davemloft.net>,
 	Nikolay Aleksandrov <razor@blackwall.org>,
 	Simon Horman <horms@kernel.org>, netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org, bridge@lists.linux.dev
-Subject: Re: [RFC net-next (resend) 2/4] net: bridge: send notification for
- roaming hosts
-Message-ID: <93e02466-b4a0-48fd-beb0-c93b1008ff08@lunn.ch>
+Subject: Re: [RFC net-next (resend) 3/4] net: dsa: mv88e6xxx: handle
+ member-violations
+Message-ID: <e9829b58-664a-4bd1-bc07-5f80915a3eed@lunn.ch>
 References: <20241108035546.2055996-1-elliot.ayrey@alliedtelesis.co.nz>
- <20241108035546.2055996-3-elliot.ayrey@alliedtelesis.co.nz>
+ <20241108035546.2055996-4-elliot.ayrey@alliedtelesis.co.nz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,27 +67,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108035546.2055996-3-elliot.ayrey@alliedtelesis.co.nz>
+In-Reply-To: <20241108035546.2055996-4-elliot.ayrey@alliedtelesis.co.nz>
 
-> This is achieved by temporarily updating the fdb entry with the new
-> port, setting a new notify roaming bit, firing off a notification, and
-> restoring the original port immediately afterwards. The port remains
-> unchanged, respecting the sticky flag, but userspace is now notified
-> of the new port the host was seen on.
+> --- a/drivers/net/dsa/mv88e6xxx/switchdev.c
+> +++ b/drivers/net/dsa/mv88e6xxx/switchdev.c
+> @@ -79,5 +79,36 @@ int mv88e6xxx_handle_miss_violation(struct mv88e6xxx_chip *chip, int port,
+>  				       brport, &info.info, NULL);
+>  	rtnl_unlock();
+>  
+> -	return err;
+> +	return notifier_to_errno(err);
+> +}
 
-This sounds a bit hacky. Could you add a new optional attribute to the
-netlink message indicating the roam destination, so there is no need
-to play games with the actual port?
-
-I'm not too deep into how these all works, but i also wounder about
-backwards compatibility. Old code which does not look for
-FDB_NOTIFY_ROAMING_BIT is going to think it really has moved, with
-your code. By using a new attribute, and not changing the port, old
-code just sees a notification it is on the port it always was on,
-which is less likely to cause issues?
-
-And do we want to differentiate between it wants to roam, but the
-sticky bit has stopped that, and it really has roamed?
+This change does not look obviously correct to me. What has a miss
+violation got to do with member violation? Is the existing code wrong?
+What about the case when mv88e6xxx_find_vid() returns an error?
 
 	Andrew
 
