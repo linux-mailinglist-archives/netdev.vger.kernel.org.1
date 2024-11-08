@@ -1,140 +1,137 @@
-Return-Path: <netdev+bounces-143151-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143152-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF0479C144B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:52:02 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 652DF9C144E
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 03:54:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E24B28204A
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:52:01 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id BA46CB20C8C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 02:54:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3265A1AAD7;
-	Fri,  8 Nov 2024 02:51:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF4B45023;
+	Fri,  8 Nov 2024 02:54:06 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="IZf+KJs8"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="FceFVNPq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pf1-f175.google.com (mail-pf1-f175.google.com [209.85.210.175])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3CCB1BD9F3
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 02:51:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.175
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6BF5B26296
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 02:54:04 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731034319; cv=none; b=ZwStRAZmDQ9cUddhMZSPA8FSm3VTUtWdTDJN36wRVRUefdfc3YdVBPHRHDu0ScJmeDs6oS6gn1imdPjl9tqmC6F5mBqnws32zb1xFE9SG8a8ax0ZTMYnGSHVdaZT8m0UhXgbJXLg0/1UKT7Jdx9niMF8/I0eIal4a0w888ac3NE=
+	t=1731034445; cv=none; b=lH2NB9CbUHTvMGcD7HBS4n0Qc3q1cT+zZmLuwRcwXtDjlMX9MbDh5ctGed5RzC2haCJyq7rO//ZuHbhSqAiln95sOyTzFglrUnynVAoh6bGLHhuQJeJkupD2tI+ppZJ59NFJVChZXTxuBKV8NWE8kiQqwxQPdABWmO2/HjdQMW4=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731034319; c=relaxed/simple;
-	bh=Kh8VK9d5L/8CkEYUhAhexxkajqGGPWdrLsAZ7fXzlMQ=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NZDqRIXovLBLKDJsuBl/gD0SaSQHwXcR8d1ZkQVdTmYenmJWgh1Ig2kjJiAX2vpdKUqVJtsIiUTewACIcGm7PEyl+47p3LLHMXxZh49ewzaMBkluLEWAKy/dfr+uLlcWK8T9Y28E6jZLMY5IbWD4hSB4ZIjedx0mdKUUoJLLSsc=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=IZf+KJs8; arc=none smtp.client-ip=209.85.210.175
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-pf1-f175.google.com with SMTP id d2e1a72fcca58-720cb6ac25aso1444000b3a.3
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 18:51:57 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731034317; x=1731639117; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=PJipCN6wXPFIhpI/SOP48KL210/YED74etx7a47/vVs=;
-        b=IZf+KJs8CqOx8AF4QVGTdAxkOqYOnraxyJUVrnJMd9aL4w+HENhbK9O1OwwojOiWha
-         sgybPSCmPZjN1v6fuoMDLi/FzM9w0cxysxvYowStLK/pr6ZWtq6WVjgdX7OU6ajO1mNV
-         w4jld5NVIeZRvVJoqtZbhYxyFMjmWpxbF0K2ScynVa7xBeKr34krAzcrZOEab7Mn05Bb
-         qnjwP0gnZLeZdwedl87I/Op8WTOOgskjSVWA7UKAu/RR8SJ26JRJlnMfyDsDEg6fceZG
-         82rzpZn//5YuB6YtOCXdf0krp6AAPDKuTHhfRubG3O6yNW41GTx4f+YELcimIGfS+j+T
-         YfPA==
+	s=arc-20240116; t=1731034445; c=relaxed/simple;
+	bh=cwEqbnHj/TJxnIy+3o2VhKgoUs8GcxvB6wBbbqhMWAU=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=EABo0lloTFpztk1ZnMcItn32LmnQrAGaLsndGQlaoqxxRi3fNGXk+NYl/8zmunWKqrd4WMi6yQKz6CRuW4YAfpjasrmRSbnWNRzE09neTWDkgOmwKEPhAAlwzDz7ZWQMdBZs/vrwE0XeBepps+6yLFuTo2kczDxOGMHqdtgCQEU=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=FceFVNPq; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731034443;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=cwEqbnHj/TJxnIy+3o2VhKgoUs8GcxvB6wBbbqhMWAU=;
+	b=FceFVNPq5l8l8Sdw4km5N5zUPFVPGe1D8/Z2oOrdlpoDmQ0bZiUbbNIpdymQ4+3F4i2cIA
+	4HQ5dxTU0TGp1gswhsHz0yZ76phoX/VnR8EkdIlIbRWWegVWLMY7GdxudKt6dpdY33lYnd
+	UdVrE+YvHccYkWWNv2OV0yY3RtgdJv8=
+Received: from mail-pj1-f70.google.com (mail-pj1-f70.google.com
+ [209.85.216.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-114-7xW6pHi8OdO4eWeGoRNK9w-1; Thu, 07 Nov 2024 21:54:02 -0500
+X-MC-Unique: 7xW6pHi8OdO4eWeGoRNK9w-1
+X-Mimecast-MFC-AGG-ID: 7xW6pHi8OdO4eWeGoRNK9w
+Received: by mail-pj1-f70.google.com with SMTP id 98e67ed59e1d1-2e2eb765285so1895769a91.1
+        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 18:54:01 -0800 (PST)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731034317; x=1731639117;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PJipCN6wXPFIhpI/SOP48KL210/YED74etx7a47/vVs=;
-        b=JgYJRjlwWezpio794QJndY2Tsk9hc5W7+G8Pl39GG920W4l/gr2n2Eg0G2VMIManBl
-         kW7OEoQZE4LinCEPSpEzXiw6ETvrf3FANIiMCApdkWRNomi+vhsHYd5AR7TCfI1xNcCQ
-         YHYf19iQRtKw2O9LkuInovh/Wkh6Fg0cFP93UQWXhjWlPcewhB37oCmXeqWQdCFhYrYg
-         LDrrKbOCNhtdblYLEFU6WhvsaWuFfueanwUs/xpLqr1dX+HY99w1KcczYzSRpIJ2Xv4N
-         Zbr6Qh8uylUjbAvR2Von0HY16RJLQ09ohf5NTQNnzha/rVHTT58KBnL9PmpxbZziMpuf
-         nX0w==
-X-Gm-Message-State: AOJu0Yy7ENw+DopVW7rMxHIqm/7mcDc3Ze/FwgvcsgpTgLJ2WWZOFggD
-	HTOL1FGS4bYWEnrkOq44ntfMU/6IlptqWmhGSPpgWyq+megA90tXjR7RTrb7GJc=
-X-Google-Smtp-Source: AGHT+IGSZXocrKJWE/7eHyYb9y3j+y3LTNgtVDMnkw0eR7dwqd5il5N83ImmW+wXcsBXGln+9LatDA==
-X-Received: by 2002:a05:6a00:a87:b0:71e:4df3:b1d3 with SMTP id d2e1a72fcca58-7241325ff5fmr1913777b3a.4.1731034316965;
-        Thu, 07 Nov 2024 18:51:56 -0800 (PST)
-Received: from fedora ([43.228.180.230])
-        by smtp.gmail.com with ESMTPSA id 41be03b00d2f7-7f41f48abbdsm2307566a12.10.2024.11.07.18.51.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 18:51:56 -0800 (PST)
-Date: Fri, 8 Nov 2024 02:51:52 +0000
-From: Hangbin Liu <liuhangbin@gmail.com>
-To: Jay Vosburgh <jv@jvosburgh.net>
-Cc: netdev@vger.kernel.org
-Subject: Re: [Question]: should we consider arp missed max during
- bond_ab_arp_probe()?
-Message-ID: <Zy18yA6kNmlCl6eQ@fedora>
-References: <ZysdRHul2pWy44Rh@fedora>
- <316685.1731029549@famine>
+        d=1e100.net; s=20230601; t=1731034441; x=1731639241;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cwEqbnHj/TJxnIy+3o2VhKgoUs8GcxvB6wBbbqhMWAU=;
+        b=IygEVeG1l30juqjSYnL4vEzJFMDlri59ubhFaKxkoBFoe+KODzHOkKxqdo1TVoFNpl
+         fZMnzc9QPpscGoBOviT6ts7shws4I/AUJXTuW1PSBE/we7KiKAMfb2rkJA12H1ToI3vN
+         rqk+oQEcW6L6imsMtyTT17JtkoRAPR6MdMk/x4LPqThbyi2l3pFlVXvC+4brWfPO97Qb
+         CBFTNFU6sZiN79yIT6ow5acHIfVG3rNd9q4TDAvOtvIJ+7Nc9GpoL6UcI+Lpxi1wEF2r
+         y71a6tQWxzoSauNvoSKnK+ho1PeYj44OVo6hgcKm8DVj8Pq8yIbK+ZBM0e1OMXUCf1zV
+         UURQ==
+X-Forwarded-Encrypted: i=1; AJvYcCWBugPcLvHR3FjR3u7HwQJlkmakBaDfLGk22txOwabMG9nE1I22NRpHQLQdchItsqz2AT/EhDs=@vger.kernel.org
+X-Gm-Message-State: AOJu0YwoSEwy080qaFZgeZB7jXNNURc3B5EvkuHfsdA81FGc50zhltbI
+	GVwGExWMIBnKKe6PYQQrJBKQJpd+x5Y3kDZzhESJFooSU1qC5vJweScR0/m1v8+3QGqWkkTB6cV
+	b7JgcIi6KpwRbju6FO6jwTZv4aW7YVqZQ93DN+vpjJffj+zcdEyiUyZ6T8V8PfAcjhwuMUAAu+H
+	LXj3lmrYBqwN9n8T+bzTywh8qBFtSo
+X-Received: by 2002:a17:90b:3d91:b0:2e2:a029:3b4b with SMTP id 98e67ed59e1d1-2e9b177632bmr1984107a91.28.1731034440898;
+        Thu, 07 Nov 2024 18:54:00 -0800 (PST)
+X-Google-Smtp-Source: AGHT+IHeAKu6FXOO8aouj3/WFxZQgxhtW8ocCUmDNXhuRcpuePvBO35pclspRsjXFn6dE+pdWYMrEjjMCT0rnXoNyZM=
+X-Received: by 2002:a17:90b:3d91:b0:2e2:a029:3b4b with SMTP id
+ 98e67ed59e1d1-2e9b177632bmr1984080a91.28.1731034440508; Thu, 07 Nov 2024
+ 18:54:00 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <316685.1731029549@famine>
+References: <20241031030847.3253873-1-qiang4.zhang@linux.intel.com>
+ <20241101015101.98111-1-qiang4.zhang@linux.intel.com> <CACGkMEtvrBRd8BaeUiR6bm1xVX4KUGa83s03tPWPHB2U0mYfLA@mail.gmail.com>
+ <20241106042828-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20241106042828-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 8 Nov 2024 10:53:49 +0800
+Message-ID: <CACGkMEv4eq9Ej2d2vKp0S8UdTgf4tjXJ_SAtfZmKxQ3iPxfEOg@mail.gmail.com>
+Subject: Re: [PATCH v2] virtio: only reset device and restore status if needed
+ in device resume
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: qiang4.zhang@linux.intel.com, Paolo Bonzini <pbonzini@redhat.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, =?UTF-8?Q?Eugenio_P=C3=A9rez?= <eperezma@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, Jens Axboe <axboe@kernel.dk>, 
+	Olivia Mackall <olivia@selenic.com>, Herbert Xu <herbert@gondor.apana.org.au>, 
+	Amit Shah <amit@kernel.org>, Arnd Bergmann <arnd@arndb.de>, 
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>, Gonglei <arei.gonglei@huawei.com>, 
+	"David S. Miller" <davem@davemloft.net>, Viresh Kumar <viresh.kumar@linaro.org>, 
+	"Chen, Jian Jun" <jian.jun.chen@intel.com>, Andi Shyti <andi.shyti@kernel.org>, 
+	Andrew Lunn <andrew+netdev@lunn.ch>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"James E.J. Bottomley" <James.Bottomley@hansenpartnership.com>, 
+	"Martin K. Petersen" <martin.petersen@oracle.com>, David Hildenbrand <david@redhat.com>, 
+	Gerd Hoffmann <kraxel@redhat.com>, Anton Yakovlev <anton.yakovlev@opensynergy.com>, 
+	Jaroslav Kysela <perex@perex.cz>, Takashi Iwai <tiwai@suse.com>, Qiang Zhang <qiang4.zhang@intel.com>, 
+	virtualization@lists.linux.dev, linux-block@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-crypto@vger.kernel.org, 
+	linux-i2c@vger.kernel.org, netdev@vger.kernel.org, linux-scsi@vger.kernel.org, 
+	linux-sound@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Thu, Nov 07, 2024 at 05:32:29PM -0800, Jay Vosburgh wrote:
-> Hangbin Liu <liuhangbin@gmail.com> wrote:
-> 
-> >Hi Jay,
+On Wed, Nov 6, 2024 at 5:29=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Fri, Nov 01, 2024 at 10:11:11AM +0800, Jason Wang wrote:
+> > On Fri, Nov 1, 2024 at 9:54=E2=80=AFAM <qiang4.zhang@linux.intel.com> w=
+rote:
+> > >
+> > > From: Qiang Zhang <qiang4.zhang@intel.com>
+> > >
+> > > Virtio core unconditionally reset and restore status for all virtio
+> > > devices before calling restore method. This breaks some virtio driver=
+s
+> > > which don't need to do anything in suspend and resume because they
+> > > just want to keep device state retained.
 > >
-> >Our QE reported that, when there is no active slave during
-> >bond_ab_arp_probe(), the slaves send the arp probe message one by one. This
-> >will flap the switch's mac table quickly, sometimes even make the switch stop
-> >learning mac address. So should we consider the arp missed max during
-> >bond_ab_arp_probe()? i.e. each slave has more chances to send probe messages
-> >before switch to another slave. What do you think?
-> 
-> 	Well, "quickly" here depends entirely on what the value of
-> arp_interval is.  It's been quite a while since I looked into the
-> details of this particular behavior, but at the time I didn't see the
-> switches I had issue flap warnings.  If memory serves, I usually tested
-> with arp_interval in the realm of 100ms, with anywhere from 2 to 6
-> interfaces in the bond.
-> 
-> 	What settings are you using for the bond, and what model of
-> switch exhibits the behavior you describe?
+> > The challenge is how can driver know device doesn't need rest.
+>
+> I actually don't remember why do we do reset on restore. Do you?
+>
 
-In our network, we have a cisco 9364 switch. Which will disable mac learning
-for 120 seconds if 6 MAC moves in 30 seconds[1] by default.
-
-> 
-> 	That said, the intent of the current implementation is to cycle
-> through the interfaces in the bond relatively quickly when no interfaces
-> are up, under the theory that such behavior finds an available interface
-> in the minimum time.
-> 
-> 	I'm not necessarily opposed to having each probe "step," so to
-> speak, perform multiple ARP probe checks.  However, I wonder if this is
-> a complicated workaround for not wanting to change a configuration
-> setting on a switch, and it would only make things better by chance
-> (i.e., that the probes just happen to now take long enough to not run
-> afoul of the switch's time limit for some flap parameter).
-
-For Cisco Nexus 9300-X switches, the `mac-move policy` is supported since
-Cisco NX-OS Release 10.3(1)F, which is released August 19, 2022.
-
-So there do have an option to disable/modify the mac policy. But switches
-can't update to this version will be affected, unless the user change the
-arp_interval to an large number.
-
-As there is an workaround (either change the switch configure or
-arp_interval), I don't have a strong intend to change the bonding behavior.
-I will do it or ignore it based on your decision.
-
-[1] https://www.cisco.com/c/en/us/td/docs/switches/datacenter/nexus9000/sw/104x/config-guides/cisco-nexus-9000-series-nx-os-system-management-configuration-guide-release-104x/m-configuring-mac-move.html
+Because the driver doesn't know if the device can keep its state, so
+it chooses to start from that.
 
 Thanks
-Hangbin
+
 
