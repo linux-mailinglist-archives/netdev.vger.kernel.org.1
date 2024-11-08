@@ -1,94 +1,81 @@
-Return-Path: <netdev+bounces-143309-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143310-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D380C9C1EFE
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:18:21 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E2629C1F1E
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:24:13 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CC292854B9
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:18:20 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E06E11F23F76
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 14:24:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66FF91EB9E1;
-	Fri,  8 Nov 2024 14:18:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4479F1EF0A8;
+	Fri,  8 Nov 2024 14:24:10 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b="Hs4da6tp"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="Oxcpz5I4"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-qk1-f176.google.com (mail-qk1-f176.google.com [209.85.222.176])
+Received: from mail-wr1-f54.google.com (mail-wr1-f54.google.com [209.85.221.54])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4A7A1DEFC2
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 14:18:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.222.176
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5F91401C
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 14:24:08 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.54
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731075497; cv=none; b=O2B+w0dINOFO0TiBzXimYU8kxCvq/Jfr3eXQzAVtwzyuQB6XQu9749igf8sq1jP0SPwDSzD+10ycjwinAUTUh/nS4DTX0Mb6I+XTcm9wWEIxtbQn0AgCjmGjMlFaFpdNYFqgTDOocsukaHFb5Z0ncOUpI5DU+Eq84Qogh9uictU=
+	t=1731075850; cv=none; b=BgiX/RW+G0FRZCt86lXlRXPxKVTz7A3uG0wY1SMW+qkpXWC9G/w7FUapiLxU9H5JyJjoVR/khMAnLKxvcUw+teLmaJyrBQB/FCAvLQManlVHu9RzWuOdGGRXctN5wPnbJHMnjZsQsSUuyXrOtZZ/1dJQvpCEURtREaglx+GtG4A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731075497; c=relaxed/simple;
-	bh=VZ4x66RJI74iQ+5CMch5mxTEeYAqV/btvVSeLOMskSg=;
+	s=arc-20240116; t=1731075850; c=relaxed/simple;
+	bh=YuwBYsJq0KBCmnivhaWQ41aC/wglLxjBYIhQgEV67DY=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=ZFPX4+yO0nDmJVfErDJzdDWH5wa6twGT6YDa0Z2J/9oa5ULznGvnCu1cCpKFLBcoZiLXHCzYtgxJ4C/Req+BEvXjlag5tDkYQwpVAmDfUobvLXgQsa0GGIWD3cynHDfdIPOhFH6HPna+TMyUlo3zRsZNyMoLiYZ1ml3LwOCZC7U=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca; spf=pass smtp.mailfrom=ziepe.ca; dkim=pass (2048-bit key) header.d=ziepe.ca header.i=@ziepe.ca header.b=Hs4da6tp; arc=none smtp.client-ip=209.85.222.176
-Authentication-Results: smtp.subspace.kernel.org; dmarc=none (p=none dis=none) header.from=ziepe.ca
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ziepe.ca
-Received: by mail-qk1-f176.google.com with SMTP id af79cd13be357-7b13ff3141aso139791185a.1
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 06:18:15 -0800 (PST)
+	 Content-Type:Content-Disposition:In-Reply-To; b=jYN8XEaOVYjZWpmyURqsuY/PITr16Zn7cJGb1Q2iTlgEwjpL0WF2WZiTb3+1lZlGGFvXEL12OlMCRkK+ss5+/29fFkCAFDOp3RV0ZotBQUNtoXXhApIQLImN6mOvP9Viz/+9bKnLxv2aFCuNVPXHkKVtu/LRusrlQOl00fxkXOE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=Oxcpz5I4; arc=none smtp.client-ip=209.85.221.54
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wr1-f54.google.com with SMTP id ffacd0b85a97d-37d49a7207cso1544369f8f.0
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 06:24:08 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=ziepe.ca; s=google; t=1731075494; x=1731680294; darn=vger.kernel.org;
+        d=gmail.com; s=20230601; t=1731075847; x=1731680647; darn=vger.kernel.org;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VZ4x66RJI74iQ+5CMch5mxTEeYAqV/btvVSeLOMskSg=;
-        b=Hs4da6tpDCy2VIenghc+mnpcVM8JpttD5VuadFEmKj/iV6Q2RJpkSflTyZmmo0qaa+
-         EKeScbKoekx6KRuNefUAaPCuGcESzgaRSHBUoixcAaCPMSb2/PimXT93tOs6vKzyda+J
-         xnv04la/utB5fx3DRnKLKTVYfbibIxJml3wBzQ4i8gEogpM1gRUVSyYPZgDfgr++iZO2
-         IPKtw8QE/y9OGu3Ir3M2BD3qE8ZzpZPOCxVcTa1/6TPjUBxs1QPUwgMZ2rNytkmRpDtH
-         v4Vu3AHIoKb23YDhZu3A/X5RF/MUy7J5tR+Yqe2Q9DjXEUv19KJzEOX+sWmbNbeSsvKh
-         tIQA==
+        bh=H1WcPs+askfMMn22qUlGL2WJpTR9P2vP0G6/Ezh6Rfo=;
+        b=Oxcpz5I4CO19boDWMS/2HFpp/WDG2YJQXxAxbF0wQPb6F6t+fljaIQEhttfB05WeyG
+         QE+Tueqg5d52LcE4rITgOoNV7dhl4+M6LJ5i7egcJfqT/4VJay/jBmJjw+9eB/bo9zpT
+         lP8EWliHD0gN/6cXdmuFHAdkMr9ISQFDMDprswWopOPZuI3KIhOXCThLjCYs+D+4GoqB
+         EimGXuU2xiSDmtjz7fjYItKOpqjSwf750G0Ku4MXfeMP7QjAnJnRqCarhcjZRCU2Tpc5
+         6mNIWZ5Xhpslv86kz2lRpVODq5qIQ5YAr9kmXgJ/oWhkU7C98IK27RgbyD6IhOFHCE0B
+         q2AQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731075494; x=1731680294;
+        d=1e100.net; s=20230601; t=1731075847; x=1731680647;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VZ4x66RJI74iQ+5CMch5mxTEeYAqV/btvVSeLOMskSg=;
-        b=lIep2mxHWZIkNEDrj95oFTH9isK9QM3VTLSQHJx5kJQnwfkK4DDVQOnU+vjwXSAvEK
-         ItEs6bpXgiR5O/lIK7r7CGNFnru1zYkVRnPpPyzxyi3gCPvtlcQatZ13oTR8LGp/QLnn
-         8MQzQR9LJ0DlcL4sTN87ldhNH7SB3KmdqGbe4lGECLQLJqEp+A04wp9uJZx77+P/AR/p
-         vwJgj/t3tlgDsSrCwHIbyewO+p5TnvnL6/AeN6YTyBoVhDszDbns1/BKfNCuSfz4ECwq
-         COO3USrczKd81xwaL87x0MG1eCQVsaJ5vpe3i+K+jXgtMBX3wmYB7TfULMFXJfQq+xbP
-         xqyg==
-X-Gm-Message-State: AOJu0YyZftIDTBUBTrDPb6bqN1OIT2nn/e7iH4o2TrAFDtwAUMZFJzFN
-	q85P8T3TkLh4RQKfO5YITUsKpEdSJ4q0GbTVScnVkPnYTcGdaLymgliUVGG2bZrgrv28k7KJKLj
-	6
-X-Google-Smtp-Source: AGHT+IG3c3fEM8IzIPqRuYHdjK533ux2t/YAww987YAbZfjc2Mafi+5aXkrFHfn1tNjyvjE3jvlENA==
-X-Received: by 2002:a05:620a:254a:b0:7b1:4df0:5580 with SMTP id af79cd13be357-7b331e60d6amr354441885a.39.1731075494492;
-        Fri, 08 Nov 2024 06:18:14 -0800 (PST)
-Received: from ziepe.ca (hlfxns017vw-142-68-128-5.dhcp-dynamic.fibreop.ns.bellaliant.net. [142.68.128.5])
-        by smtp.gmail.com with ESMTPSA id af79cd13be357-7b32ac2dd40sm162560885a.10.2024.11.08.06.18.13
+        bh=H1WcPs+askfMMn22qUlGL2WJpTR9P2vP0G6/Ezh6Rfo=;
+        b=vjRVk4VR+5Ml+k7hEp9uXzNv4bkByXe906wNbJ5IjS/K65X8gInkvKpk+PnxhPM4G9
+         5UEwg/QL+G8Ws7+t1BAi59Bk9Ac4d6AXDpQ6hCim67IbAC43esK3PhRG5Jyj8qIUuxFz
+         1d6jsLIfkz/WRHTpMqftOe0UADD9fwJCYQqrS/Xi0zuuzb67wyfEWFzVFDJ4D5MjPOZQ
+         y/lgnyZr+PuiSHAyF1SmpwRMWfrn724j7L7aRLZzOR2ox16hMYrD2EKEKj/CpaaPseZH
+         OxyuW6GoroKP/EM+0iEq+O08oJ569+2KJKJiZmbpKKssTeh+VOzWsTWHrja/xAxWgSaL
+         jFng==
+X-Gm-Message-State: AOJu0YyZwQ1ndO7OEVk4/mudV0G3lvH8yZO/lrVLwtENMXZ93+66FdDc
+	vSdIcvyzV7sC8KhKUhhqTwSBroB5tDmFrPgUJoZacmQKsPzyzDtekygcYxKARG0=
+X-Google-Smtp-Source: AGHT+IE/fhyJQ1kJjmFXji3wVEvQSj7AuP83sN0Hd0Kwp7AZayjTJlXPZ622HLQrfANkkYE3tnueNA==
+X-Received: by 2002:a5d:5f52:0:b0:374:ca16:e09b with SMTP id ffacd0b85a97d-381f1863404mr2552602f8f.9.1731075846737;
+        Fri, 08 Nov 2024 06:24:06 -0800 (PST)
+Received: from emanuele-al (mob-109-118-131-100.net.vodafone.it. [109.118.131.100])
+        by smtp.gmail.com with ESMTPSA id ffacd0b85a97d-381ed97e4d2sm5090623f8f.32.2024.11.08.06.24.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 08 Nov 2024 06:18:13 -0800 (PST)
-Received: from jgg by wakko with local (Exim 4.97)
-	(envelope-from <jgg@ziepe.ca>)
-	id 1t9PoT-00000002ZMb-04i0;
-	Fri, 08 Nov 2024 10:18:13 -0400
-Date: Fri, 8 Nov 2024 10:18:12 -0400
-From: Jason Gunthorpe <jgg@ziepe.ca>
-To: Mina Almasry <almasrymina@google.com>
-Cc: netdev@vger.kernel.org, Jakub Kicinski <kuba@kernel.org>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Willem de Bruijn <willemb@google.com>,
-	Kaiyuan Zhang <kaiyuanz@google.com>,
-	Samiullah Khawaja <skhawaja@google.com>,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <horms@kernel.org>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	Ilias Apalodimas <ilias.apalodimas@linaro.org>
-Subject: Re: [PATCH net-next v2 4/5] page_pool: disable sync for cpu for
- dmabuf memory provider
-Message-ID: <20241108141812.GL35848@ziepe.ca>
-References: <20241107212309.3097362-1-almasrymina@google.com>
- <20241107212309.3097362-5-almasrymina@google.com>
+        Fri, 08 Nov 2024 06:24:06 -0800 (PST)
+Date: Fri, 8 Nov 2024 15:24:03 +0100
+From: Emanuele Santini <emanuele.santini.88@gmail.com>
+To: Guillaume Nault <gnault@redhat.com>
+Cc: netdev@vger.kernel.org, yoshfuji@linux-ipv6.org, friedrich@oslage.de,
+	kuba@kernel.org, davem@davemloft.net, pabeni@redhat.com,
+	dsahern@kernel.org
+Subject: Re: [PATCH] net: ipv6: fix the address length for net_device on a
+ GRE tunnel
+Message-ID: <Zy4fA07kgV3o4Xmn@emanuele-al>
+References: <20241108092555.5714-1-emanuele.santini.88@gmail.com>
+ <Zy3/TmyK7imjT348@debian>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -97,19 +84,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241107212309.3097362-5-almasrymina@google.com>
+In-Reply-To: <Zy3/TmyK7imjT348@debian>
 
-On Thu, Nov 07, 2024 at 09:23:08PM +0000, Mina Almasry wrote:
-> dmabuf dma-addresses should not be dma_sync'd for CPU/device. Typically
-> its the driver responsibility to dma_sync for CPU, but the driver should
-> not dma_sync for CPU if the netmem is actually coming from a dmabuf
-> memory provider.
+I'm talking about the ip6gre. I agree that setting the hardware address to 0 is appropriate.
+However, in the ip6gre_tunnel_setup function, the perm_addr field of net_device is 
+currently assigned a random Ethernet address:
 
-This is not completely true, it is not *all* dmabuf, just the parts of
-the dmabuf that are actually MMIO.
+        dev->flags |= IFF_NOARP;
+       - dev->addr_len = sizeof(struct in6_addr);
+       + dev->addr_len = ETH_ALEN;
+        netif_keep_dst(dev);
+        /* This perm addr will be used as interface identifier by IPv6 */
+        dev->addr_assign_type = NET_ADDR_RANDOM;
+        eth_random_addr(dev->perm_addr);
 
-If you do this you may want to block accepting dmabufs that have CPU
-pages inside them.
+maybe this is not a valid justification to set addr_len to ETH_ALEN.
 
-Jason
+I will make a review setting addr_len to 0, and will resubmit the patch after successful testing.
 
