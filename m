@@ -1,187 +1,268 @@
-Return-Path: <netdev+bounces-143324-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143322-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6BE8A9C2032
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:16:06 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 40DB89C2014
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 16:10:30 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 896771C24326
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:16:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC5E9281312
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 15:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0CDA1F4FC4;
-	Fri,  8 Nov 2024 15:16:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DF711F582A;
+	Fri,  8 Nov 2024 15:10:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from mx0b-0064b401.pphosted.com (mx0b-0064b401.pphosted.com [205.220.178.238])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-il1-f197.google.com (mail-il1-f197.google.com [209.85.166.197])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44EEE3BBF2;
-	Fri,  8 Nov 2024 15:15:57 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=205.220.178.238
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5424E1F4702
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 15:10:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.166.197
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731078960; cv=none; b=NqxQCWDwsX0tmciSPlDCnjUtsINkTDsLFT75nKni5XTyEq4+x/nQUAi3C/mtA89jYqfqh9no1XtT2V2jssu9D8reKJtYwB9JEMzgI/q6fkn3mWma39FsbOdn2C5H4oiRaiSd+NbRnJf8yHZfDOnsiQiQbM3BveeEK/j1hz4Rlvo=
+	t=1731078625; cv=none; b=r58dMr9oCcN/igwZylwhG0kybPsbtzRftack7C/ob7MBreawj1rEzZMjVYHt3VlBGcAZdhdxWsEXrUhBIcG/QpBZdykhAndtbWFz7wKpXlkWBZD6QRM6jkS5ePb7C8/2p1vsd0yNfi99icwb/nWrkA/JdfJbR5j9X7yXBkGeTpo=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731078960; c=relaxed/simple;
-	bh=QGfQlgMdHx/sKHVCjVmoWUa2gOQ4QNTeJSs7AzC1b/A=;
-	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=DNaDPKgFPYS5lotKMbe7xlly082vZpYLLM9aCwq48EdvUTTrUn9a4xJh7U7/NcURhkCdnAv1I2vc5fqPIKX/GssGEwZoUteyXQnsGIKuuOyW62QhTaG/BTXye3gXF13zjMajqoS4Vbc7aguSQe2mePeR8K3wiL1DQyWppmwG7XY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com; spf=pass smtp.mailfrom=windriver.com; arc=none smtp.client-ip=205.220.178.238
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=windriver.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=windriver.com
-Received: from pps.filterd (m0250812.ppops.net [127.0.0.1])
-	by mx0a-0064b401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A8Bo1Us004301;
-	Fri, 8 Nov 2024 14:54:26 GMT
-Received: from ala-exchng02.corp.ad.wrs.com (ala-exchng02.wrs.com [147.11.82.254])
-	by mx0a-0064b401.pphosted.com (PPS) with ESMTPS id 42s6g5gq9b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=NOT);
-	Fri, 08 Nov 2024 14:54:25 +0000 (GMT)
-Received: from ala-exchng01.corp.ad.wrs.com (147.11.82.252) by
- ALA-EXCHNG02.corp.ad.wrs.com (147.11.82.254) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.39; Fri, 8 Nov 2024 06:54:24 -0800
-Received: from pek-lpd-ccm6.wrs.com (147.11.136.210) by
- ala-exchng01.corp.ad.wrs.com (147.11.82.252) with Microsoft SMTP Server id
- 15.1.2507.39 via Frontend Transport; Fri, 8 Nov 2024 06:54:21 -0800
-From: Lizhi Xu <lizhi.xu@windriver.com>
-To: <syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <horms@kernel.org>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>, <linux-wpan@vger.kernel.org>,
-        <miquel.raynal@bootlin.com>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <stefan@datenfreihafen.org>,
-        <syzkaller-bugs@googlegroups.com>
-Subject: [PATCH] mac802154: add a check for slave data list before delete
-Date: Fri, 8 Nov 2024 22:54:20 +0800
-Message-ID: <20241108145420.2445641-1-lizhi.xu@windriver.com>
-X-Mailer: git-send-email 2.43.0
-In-Reply-To: <672b9f03.050a0220.350062.0276.GAE@google.com>
-References: <672b9f03.050a0220.350062.0276.GAE@google.com>
+	s=arc-20240116; t=1731078625; c=relaxed/simple;
+	bh=bH6FFgTxmqkn0hT9sBUQG8HCNVpGUO5eEIDp3xRX7EY=;
+	h=MIME-Version:Date:In-Reply-To:Message-ID:Subject:From:To:
+	 Content-Type; b=ZLrdD7/K6sqo+VEBw7fpEm9OZObn9K0gHggcY0SpzWXvRVavvjACmYwHhri8+j0r1fy+uVoNn+vn4fx4DCDcxd1D76X9zG3u7Ibt8djmOtnNli6LONYTAM3TgOluOCtO1tD3VRn/vpmDVcmWYNR3GDMaME2uWX1iB4BTPTZzkkE=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com; arc=none smtp.client-ip=209.85.166.197
+Authentication-Results: smtp.subspace.kernel.org; dmarc=fail (p=none dis=none) header.from=syzkaller.appspotmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=M3KW2WVRGUFZ5GODRSRYTGD7.apphosting.bounces.google.com
+Received: by mail-il1-f197.google.com with SMTP id e9e14a558f8ab-3a3fa97f09cso29006665ab.0
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 07:10:22 -0800 (PST)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731078622; x=1731683422;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Yb7jdZSha+BmQFM62PKABMMReWo6t+QSwbbNWs+C1mA=;
+        b=U+FbuxYbQs7tvUuzJ9THr5nGalAamEwzw5oVjitB5PvZLuEJAMWxsmdgtPzprHH4Ke
+         lWfLF0s5eVQm6QNMuiVFzWpgDp9aq5xP4xbeS/RLGolH0tqAuMjzglT7pCQ1wxfZIUKs
+         rEaVxibDUZ+gxM15IS3ihMRhJpVrDkZ+xk7Z79phOvgf0auv/J2AmwstIk1nnM7z/636
+         tj+2+T3TYYaOJw0AsFsJUDqmfRclI+2ukDXwCnuhPzGEyrQHaYrDd/P0MS0bPsP4E4PY
+         R1wyc/IzHfS3ZSoK3O9Tl9vAtBv/24cfWubB73PxpS8SIy5N7TGl0ielkZAaupz3Xqvy
+         WurQ==
+X-Forwarded-Encrypted: i=1; AJvYcCUAgOQBT5SQnnC8eucdc2a8Q7CpeVGzKVIQW/A62s2ExHskBkxPwpcu36BPtsH07GpV/qUx3fE=@vger.kernel.org
+X-Gm-Message-State: AOJu0Yze/lLZWXsEhYuv17R4W9YII9ppn8ZjKNaxzSPh4fsWhOdPObd2
+	sk+z4nS5AQIM+Nr28kMTTVp0VTwhldTqHAdIdiqMGm4mkpGnWfPZS+D9tqq8l+iIHmEgfEEItmL
+	tB06DawoIu6LIIlnabZAeEt+rErWd0jtrF5fgLfXzrxjDZSEN3vX4dto=
+X-Google-Smtp-Source: AGHT+IFeXEQBxvCHql7zgQ2f0c8TnJfEh+lA845yjuY0rpgm/pcZIyvcBlQU498eIYqSEWPKoFRBdN4rmHdbmyOYzKsOGayvtdAE
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: 91hp4j1d9HElIMzUHIlD19Q1Jegf0Vlw
-X-Authority-Analysis: v=2.4 cv=JoCjr94C c=1 sm=1 tr=0 ts=672e2622 cx=c_pps a=K4BcnWQioVPsTJd46EJO2w==:117 a=K4BcnWQioVPsTJd46EJO2w==:17 a=VlfZXiiP6vEA:10 a=hSkVLCK3AAAA:8 a=edf1wS77AAAA:8 a=t7CeM3EgAAAA:8 a=2YZDpE0dDemZ_0IDS0YA:9 a=cQPPKAXgyycSBL8etih5:22
- a=DcSpbTIhAlouE1Uv7lRv:22 a=FdTzh2GWekK77mhwV6Dw:22
-X-Proofpoint-ORIG-GUID: 91hp4j1d9HElIMzUHIlD19Q1Jegf0Vlw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.293,Aquarius:18.0.1057,Hydra:6.0.680,FMLib:17.12.62.30
- definitions=2024-11-08_12,2024-11-08_01,2024-09-30_01
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501 mlxscore=0
- mlxlogscore=576 spamscore=0 clxscore=1011 impostorscore=0
- lowpriorityscore=0 malwarescore=0 adultscore=0 bulkscore=0 suspectscore=0
- phishscore=0 classifier=spam authscore=0 adjust=0 reason=mlx scancount=1
- engine=8.21.0-2409260000 definitions=main-2411080124
+X-Received: by 2002:a05:6e02:1b07:b0:3a6:af3c:56ae with SMTP id
+ e9e14a558f8ab-3a6f1a09adamr43995055ab.11.1731078622275; Fri, 08 Nov 2024
+ 07:10:22 -0800 (PST)
+Date: Fri, 08 Nov 2024 07:10:22 -0800
+In-Reply-To: <000000000000e364c9061f621a56@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <672e29de.050a0220.69fce.0018.GAE@google.com>
+Subject: Re: [syzbot] [rdma?] possible deadlock in sock_set_reuseaddr
+From: syzbot <syzbot+af5682e4f50cd6bce838@syzkaller.appspotmail.com>
+To: jgg@ziepe.ca, leon@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-rdma@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
 
-syzkaller reported a corrupted list in ieee802154_if_remove. [1]
+syzbot has found a reproducer for the following issue on:
 
-Remove an IEEE 802.15.4 network interface after unregister an IEEE 802.15.4
-hardware device from the system.
+HEAD commit:    2696e451dfb0 Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       net-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=110a3d87980000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ea5200d154f868aa
+dashboard link: https://syzkaller.appspot.com/bug?extid=af5682e4f50cd6bce838
+compiler:       Debian clang version 15.0.6, GNU ld (GNU Binutils for Debian) 2.40
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=17f7cea7980000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13bbee30580000
 
-CPU0					CPU1
-====					====
-genl_family_rcv_msg_doit		ieee802154_unregister_hw
-ieee802154_del_iface			ieee802154_remove_interfaces
-rdev_del_virtual_intf_deprecated	list_del(&sdata->list)
-ieee802154_if_remove
-list_del_rcu
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/d35511e1cf15/disk-2696e451.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/a547f0432d8f/vmlinux-2696e451.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/9d3fb709c982/bzImage-2696e451.xz
 
-Avoid this issue, by adding slave data state bit SDATA_STATE_LISTDONE, set
-SDATA_STATE_LISTDONE when unregistering the hardware from the system, and
-add state bit SDATA_STATE_LISTDONE judgment before removing the interface
-to delete the list. 
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+af5682e4f50cd6bce838@syzkaller.appspotmail.com
 
-[1]
-kernel BUG at lib/list_debug.c:58!
-Oops: invalid opcode: 0000 [#1] PREEMPT SMP KASAN PTI
-CPU: 0 UID: 0 PID: 6277 Comm: syz-executor157 Not tainted 6.12.0-rc6-syzkaller-00005-g557329bcecc2 #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 09/13/2024
-RIP: 0010:__list_del_entry_valid_or_report+0xf4/0x140 lib/list_debug.c:56
-Code: e8 a1 7e 00 07 90 0f 0b 48 c7 c7 e0 37 60 8c 4c 89 fe e8 8f 7e 00 07 90 0f 0b 48 c7 c7 40 38 60 8c 4c 89 fe e8 7d 7e 00 07 90 <0f> 0b 48 c7 c7 a0 38 60 8c 4c 89 fe e8 6b 7e 00 07 90 0f 0b 48 c7
-RSP: 0018:ffffc9000490f3d0 EFLAGS: 00010246
-RAX: 000000000000004e RBX: dead000000000122 RCX: d211eee56bb28d00
-RDX: 0000000000000000 RSI: 0000000080000000 RDI: 0000000000000000
-RBP: ffff88805b278dd8 R08: ffffffff8174a12c R09: 1ffffffff2852f0d
-R10: dffffc0000000000 R11: fffffbfff2852f0e R12: dffffc0000000000
-R13: dffffc0000000000 R14: dead000000000100 R15: ffff88805b278cc0
-FS:  0000555572f94380(0000) GS:ffff8880b8600000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000056262e4a3000 CR3: 0000000078496000 CR4: 00000000003526f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+iwpm_register_pid: Unable to send a nlmsg (client = 2)
+======================================================
+WARNING: possible circular locking dependency detected
+6.12.0-rc6-syzkaller-01219-g2696e451dfb0 #0 Not tainted
+------------------------------------------------------
+syz-executor331/5847 is trying to acquire lock:
+ffff888024303558 (sk_lock-AF_INET){+.+.}-{0:0}, at: lock_sock include/net/sock.h:1617 [inline]
+ffff888024303558 (sk_lock-AF_INET){+.+.}-{0:0}, at: sock_set_reuseaddr+0x17/0x60 net/core/sock.c:781
+
+but task is already holding lock:
+ffffffff8fa64d48 (lock#7){+.+.}-{3:3}, at: cma_add_one+0x6bc/0xcd0 drivers/infiniband/core/cma.c:5354
+
+which lock already depends on the new lock.
+
+
+the existing dependency chain (in reverse order) is:
+
+-> #3 (lock#7){+.+.}-{3:3}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+       cma_init+0x1e/0x140 drivers/infiniband/core/cma.c:5438
+       do_one_initcall+0x248/0x880 init/main.c:1269
+       do_initcall_level+0x157/0x210 init/main.c:1331
+       do_initcalls+0x3f/0x80 init/main.c:1347
+       kernel_init_freeable+0x435/0x5d0 init/main.c:1580
+       kernel_init+0x1d/0x2b0 init/main.c:1469
+       ret_from_fork+0x4b/0x80 arch/x86/kernel/process.c:147
+       ret_from_fork_asm+0x1a/0x30 arch/x86/entry/entry_64.S:244
+
+-> #2 (rtnl_mutex){+.+.}-{3:3}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+       do_ip_setsockopt+0x127d/0x3cd0 net/ipv4/ip_sockglue.c:1077
+       ip_setsockopt+0x63/0x100 net/ipv4/ip_sockglue.c:1417
+       smc_setsockopt+0x275/0xe50 net/smc/af_smc.c:3064
+       do_sock_setsockopt+0x3af/0x720 net/socket.c:2336
+       __sys_setsockopt+0x1a2/0x250 net/socket.c:2359
+       __do_sys_setsockopt net/socket.c:2368 [inline]
+       __se_sys_setsockopt net/socket.c:2365 [inline]
+       __x64_sys_setsockopt+0xb5/0xd0 net/socket.c:2365
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #1 (&smc->clcsock_release_lock){+.+.}-{3:3}:
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+       __mutex_lock_common kernel/locking/mutex.c:608 [inline]
+       __mutex_lock+0x136/0xd70 kernel/locking/mutex.c:752
+       smc_switch_to_fallback+0x35/0xdb0 net/smc/af_smc.c:902
+       smc_sendmsg+0x11f/0x530 net/smc/af_smc.c:2771
+       sock_sendmsg_nosec net/socket.c:729 [inline]
+       __sock_sendmsg+0x221/0x270 net/socket.c:744
+       __sys_sendto+0x39b/0x4f0 net/socket.c:2216
+       __do_sys_sendto net/socket.c:2228 [inline]
+       __se_sys_sendto net/socket.c:2224 [inline]
+       __x64_sys_sendto+0xde/0x100 net/socket.c:2224
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+-> #0 (sk_lock-AF_INET){+.+.}-{0:0}:
+       check_prev_add kernel/locking/lockdep.c:3161 [inline]
+       check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+       validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+       __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
+       lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+       lock_sock_nested+0x48/0x100 net/core/sock.c:3616
+       lock_sock include/net/sock.h:1617 [inline]
+       sock_set_reuseaddr+0x17/0x60 net/core/sock.c:781
+       siw_create_listen+0x196/0xfe0 drivers/infiniband/sw/siw/siw_cm.c:1776
+       iw_cm_listen+0x15e/0x230 drivers/infiniband/core/iwcm.c:585
+       cma_iw_listen drivers/infiniband/core/cma.c:2668 [inline]
+       rdma_listen+0x941/0xd60 drivers/infiniband/core/cma.c:3953
+       cma_listen_on_dev+0x3e3/0x6f0 drivers/infiniband/core/cma.c:2727
+       cma_add_one+0x7d7/0xcd0 drivers/infiniband/core/cma.c:5357
+       add_client_context+0x536/0x8b0 drivers/infiniband/core/device.c:727
+       enable_device_and_get+0x1e6/0x440 drivers/infiniband/core/device.c:1338
+       ib_register_device+0x10d4/0x13e0 drivers/infiniband/core/device.c:1449
+       siw_device_register drivers/infiniband/sw/siw/siw_main.c:72 [inline]
+       siw_newlink+0x9d9/0xe50 drivers/infiniband/sw/siw/siw_main.c:452
+       nldev_newlink+0x5c0/0x640 drivers/infiniband/core/nldev.c:1795
+       rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+       rdma_nl_rcv+0x6dd/0x9e0 drivers/infiniband/core/netlink.c:259
+       netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
+       netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
+       netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
+       sock_sendmsg_nosec net/socket.c:729 [inline]
+       __sock_sendmsg+0x221/0x270 net/socket.c:744
+       ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2609
+       ___sys_sendmsg net/socket.c:2663 [inline]
+       __sys_sendmsg+0x292/0x380 net/socket.c:2692
+       do_syscall_x64 arch/x86/entry/common.c:52 [inline]
+       do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
+       entry_SYSCALL_64_after_hwframe+0x77/0x7f
+
+other info that might help us debug this:
+
+Chain exists of:
+  sk_lock-AF_INET --> rtnl_mutex --> lock#7
+
+ Possible unsafe locking scenario:
+
+       CPU0                    CPU1
+       ----                    ----
+  lock(lock#7);
+                               lock(rtnl_mutex);
+                               lock(lock#7);
+  lock(sk_lock-AF_INET);
+
+ *** DEADLOCK ***
+
+6 locks held by syz-executor331/5847:
+ #0: ffffffff9a7a1918 (&rdma_nl_types[idx].sem){.+.+}-{3:3}, at: rdma_nl_rcv_msg drivers/infiniband/core/netlink.c:164 [inline]
+ #0: ffffffff9a7a1918 (&rdma_nl_types[idx].sem){.+.+}-{3:3}, at: rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ #0: ffffffff9a7a1918 (&rdma_nl_types[idx].sem){.+.+}-{3:3}, at: rdma_nl_rcv+0x32d/0x9e0 drivers/infiniband/core/netlink.c:259
+ #1: ffffffff8fa50fb0 (link_ops_rwsem){++++}-{3:3}, at: nldev_newlink+0x42a/0x640 drivers/infiniband/core/nldev.c:1785
+ #2: ffffffff8fa43bd0 (devices_rwsem){++++}-{3:3}, at: enable_device_and_get+0x12e/0x440 drivers/infiniband/core/device.c:1328
+ #3: ffffffff8fa43ed0 (clients_rwsem){++++}-{3:3}, at: enable_device_and_get+0x196/0x440 drivers/infiniband/core/device.c:1336
+ #4: ffff88807fc405d0 (&device->client_data_rwsem){++++}-{3:3}, at: add_client_context+0x4f4/0x8b0 drivers/infiniband/core/device.c:725
+ #5: ffffffff8fa64d48 (lock#7){+.+.}-{3:3}, at: cma_add_one+0x6bc/0xcd0 drivers/infiniband/core/cma.c:5354
+
+stack backtrace:
+CPU: 0 UID: 0 PID: 5847 Comm: syz-executor331 Not tainted 6.12.0-rc6-syzkaller-01219-g2696e451dfb0 #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 10/30/2024
 Call Trace:
  <TASK>
- __list_del_entry_valid include/linux/list.h:124 [inline]
- __list_del_entry include/linux/list.h:215 [inline]
- list_del_rcu include/linux/rculist.h:157 [inline]
- ieee802154_if_remove+0x86/0x1e0 net/mac802154/iface.c:687
- rdev_del_virtual_intf_deprecated net/ieee802154/rdev-ops.h:24 [inline]
- ieee802154_del_iface+0x2c0/0x5c0 net/ieee802154/nl-phy.c:323
- genl_family_rcv_msg_doit net/netlink/genetlink.c:1115 [inline]
- genl_family_rcv_msg net/netlink/genetlink.c:1195 [inline]
- genl_rcv_msg+0xb14/0xec0 net/netlink/genetlink.c:1210
- netlink_rcv_skb+0x1e3/0x430 net/netlink/af_netlink.c:2551
- genl_rcv+0x28/0x40 net/netlink/genetlink.c:1219
+ __dump_stack lib/dump_stack.c:94 [inline]
+ dump_stack_lvl+0x241/0x360 lib/dump_stack.c:120
+ print_circular_bug+0x13a/0x1b0 kernel/locking/lockdep.c:2074
+ check_noncircular+0x36a/0x4a0 kernel/locking/lockdep.c:2206
+ check_prev_add kernel/locking/lockdep.c:3161 [inline]
+ check_prevs_add kernel/locking/lockdep.c:3280 [inline]
+ validate_chain+0x18ef/0x5920 kernel/locking/lockdep.c:3904
+ __lock_acquire+0x1384/0x2050 kernel/locking/lockdep.c:5202
+ lock_acquire+0x1ed/0x550 kernel/locking/lockdep.c:5825
+ lock_sock_nested+0x48/0x100 net/core/sock.c:3616
+ lock_sock include/net/sock.h:1617 [inline]
+ sock_set_reuseaddr+0x17/0x60 net/core/sock.c:781
+ siw_create_listen+0x196/0xfe0 drivers/infiniband/sw/siw/siw_cm.c:1776
+ iw_cm_listen+0x15e/0x230 drivers/infiniband/core/iwcm.c:585
+ cma_iw_listen drivers/infiniband/core/cma.c:2668 [inline]
+ rdma_listen+0x941/0xd60 drivers/infiniband/core/cma.c:3953
+ cma_listen_on_dev+0x3e3/0x6f0 drivers/infiniband/core/cma.c:2727
+ cma_add_one+0x7d7/0xcd0 drivers/infiniband/core/cma.c:5357
+ add_client_context+0x536/0x8b0 drivers/infiniband/core/device.c:727
+ enable_device_and_get+0x1e6/0x440 drivers/infiniband/core/device.c:1338
+ ib_register_device+0x10d4/0x13e0 drivers/infiniband/core/device.c:1449
+ siw_device_register drivers/infiniband/sw/siw/siw_main.c:72 [inline]
+ siw_newlink+0x9d9/0xe50 drivers/infiniband/sw/siw/siw_main.c:452
+ nldev_newlink+0x5c0/0x640 drivers/infiniband/core/nldev.c:1795
+ rdma_nl_rcv_skb drivers/infiniband/core/netlink.c:239 [inline]
+ rdma_nl_rcv+0x6dd/0x9e0 drivers/infiniband/core/netlink.c:259
  netlink_unicast_kernel net/netlink/af_netlink.c:1331 [inline]
  netlink_unicast+0x7f6/0x990 net/netlink/af_netlink.c:1357
  netlink_sendmsg+0x8e4/0xcb0 net/netlink/af_netlink.c:1901
  sock_sendmsg_nosec net/socket.c:729 [inline]
  __sock_sendmsg+0x221/0x270 net/socket.c:744
- ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2607
- ___sys_sendmsg net/socket.c:2661 [inline]
- __sys_sendmsg+0x292/0x380 net/socket.c:2690
+ ____sys_sendmsg+0x52a/0x7e0 net/socket.c:2609
+ ___sys_sendmsg net/socket.c:2663 [inline]
+ __sys_sendmsg+0x292/0x380 net/socket.c:2692
  do_syscall_x64 arch/x86/entry/common.c:52 [inline]
  do_syscall_64+0xf3/0x230 arch/x86/entry/common.c:83
  entry_SYSCALL_64_after_hwframe+0x77/0x7f
+RIP: 0033:0x7f6a537db819
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 0f 1f 44 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe43eb0c48 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+RAX: ffffffffffffffda RBX: 00007f6a53829482 RCX: 00007f6a537db819
+RDX: 00000000200040c0 RSI: 00000000200004c0 RDI: 0000000000000005
+RBP: 00007f6a53829460 R08: 0000555500000000 R09: 0000555500000000
+R10: 0000555500000000 R11: 000000
 
-Reported-and-tested-by: syzbot+985f827280dc3a6e7e92@syzkaller.appspotmail.com
-Closes: https://syzkaller.appspot.com/bug?extid=985f827280dc3a6e7e92
-Signed-off-by: Lizhi Xu <lizhi.xu@windriver.com>
+
 ---
- net/mac802154/ieee802154_i.h | 1 +
- net/mac802154/iface.c        | 4 ++++
- 2 files changed, 5 insertions(+)
-
-diff --git a/net/mac802154/ieee802154_i.h b/net/mac802154/ieee802154_i.h
-index 08dd521a51a5..6771c0569516 100644
---- a/net/mac802154/ieee802154_i.h
-+++ b/net/mac802154/ieee802154_i.h
-@@ -101,6 +101,7 @@ enum {
- 
- enum ieee802154_sdata_state_bits {
- 	SDATA_STATE_RUNNING,
-+	SDATA_STATE_LISTDONE,
- };
- 
- /* Slave interface definition.
-diff --git a/net/mac802154/iface.c b/net/mac802154/iface.c
-index c0e2da5072be..aed2fc63395d 100644
---- a/net/mac802154/iface.c
-+++ b/net/mac802154/iface.c
-@@ -683,6 +683,9 @@ void ieee802154_if_remove(struct ieee802154_sub_if_data *sdata)
- {
- 	ASSERT_RTNL();
- 
-+	if (test_bit(SDATA_STATE_LISTDONE, &sdata->state))
-+		return;
-+
- 	mutex_lock(&sdata->local->iflist_mtx);
- 	list_del_rcu(&sdata->list);
- 	mutex_unlock(&sdata->local->iflist_mtx);
-@@ -698,6 +701,7 @@ void ieee802154_remove_interfaces(struct ieee802154_local *local)
- 	mutex_lock(&local->iflist_mtx);
- 	list_for_each_entry_safe(sdata, tmp, &local->interfaces, list) {
- 		list_del(&sdata->list);
-+		set_bit(SDATA_STATE_LISTDONE, &sdata->state);
- 
- 		unregister_netdevice(sdata->dev);
- 	}
--- 
-2.43.0
-
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
