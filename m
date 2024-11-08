@@ -1,185 +1,106 @@
-Return-Path: <netdev+bounces-143291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B2E89C1D5F
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:53:45 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 79B399C1D1A
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:38:32 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C42221C22DFB
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:53:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E6AC28288A
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:38:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BCB01E7C38;
-	Fri,  8 Nov 2024 12:53:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 906651E47D9;
+	Fri,  8 Nov 2024 12:38:28 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="NbiyaICU"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="b0FzW17C"
 X-Original-To: netdev@vger.kernel.org
-Received: from lelvem-ot01.ext.ti.com (lelvem-ot01.ext.ti.com [198.47.23.234])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-wm1-f52.google.com (mail-wm1-f52.google.com [209.85.128.52])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 38E361D0F5C;
-	Fri,  8 Nov 2024 12:53:36 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.23.234
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D58D8322E
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 12:38:25 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.128.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731070420; cv=none; b=aHdDDI0ia4KuWNbXhb874xqKh1uEO0rjJG3H2rYmB8TIbknKSyMjVrv/62Wlb2k0JhDYTPUPCwPaO4MuXq/w1C9PSguWAY87+2yqmMgQ0R6NfSq4lAsLTiNYdRbBC9nnh7KNiwM4Z9mif8mG/L//vWwdfFySY3kGyTqgo2ndqWE=
+	t=1731069508; cv=none; b=W3J+H6rQ8Z+YShZETkBnV5qMTK+PlLocZtPdg+hr5fYidLiYzZBKdIb4LwhVlXjucv9znrrm4hm7jPkg4BXvAV6Fs8ES88OyWuczBJWR07Ookv2R6jBEvtqDhHM9aLyuYlUdvVBWmVn147u52fwkmQOudTX23mmWU5lr+AMvE6M=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731070420; c=relaxed/simple;
-	bh=rr/x3ww89sV9jqWghsW5iDpF0nmqWuGzXO+2uSnHi0g=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=aRqQERkzD1ZhFwXyWftNi14HHZ0CVPD1hYopEL8m+buITyw7dlCrAGOK7PshKMZA21pUggCaqxrms2mShUhf6fpVPOz66g3tMlK4UOGIQOfhXNTfqTk/2BbQruOudVTPSYZaEx/J10CbQjXMBMgHMUfwzJHbbT3maScyMVotixk=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=NbiyaICU; arc=none smtp.client-ip=198.47.23.234
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by lelvem-ot01.ext.ti.com (8.15.2/8.15.2) with ESMTPS id 4A8CbrOY2072987
-	(version=TLSv1.2 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 8 Nov 2024 06:37:53 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1731069473;
-	bh=+LZTSCJ82I2AofMnItCbVv3OHQLGWQAtNHwmmy7zLRs=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=NbiyaICU0pKnJSpnYAw+VgK/VAEfbDB6EmiwA+pZ4eDgtuV8MTi0sCS0MWy+HKsq/
-	 ISyc4vvHot5lJrGu3s7HsMYM/RyLPkZPvj1h8q1HcQpKWcHpkwr4FihL5o3p76dw3z
-	 UZB0YXjelxnYtUWJA5b4/z9kagjqt9+gAwrBuOyQ=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A8CbrpK039671
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 8 Nov 2024 06:37:53 -0600
-Received: from DFLE114.ent.ti.com (10.64.6.35) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 8
- Nov 2024 06:37:52 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE114.ent.ti.com
- (10.64.6.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 8 Nov 2024 06:37:52 -0600
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.81])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A8Cbpes012878;
-	Fri, 8 Nov 2024 06:37:52 -0600
-Date: Fri, 8 Nov 2024 18:07:51 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Roger Quadros <rogerq@kernel.org>
-CC: Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Pekka Varis <p-varis@ti.com>
-Subject: Re: [PATCH net-next v2 2/2] net: ethernet: ti: am65-cpsw: enable
- DSCP to priority map for RX
-Message-ID: <908cc747-18a1-49c0-9b06-1c2f64e4c84e@ti.com>
-References: <20241107-am65-cpsw-multi-rx-dscp-v2-0-9e9cd1920035@kernel.org>
- <20241107-am65-cpsw-multi-rx-dscp-v2-2-9e9cd1920035@kernel.org>
+	s=arc-20240116; t=1731069508; c=relaxed/simple;
+	bh=6wNOGXghybHRjd5Urfpl+TJMg6I0IjAKfX3B8lHzhZM=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=oCdwkeoIzFSVClumrJSw1xNTRGg+pnTIgzK2Q1NtCxw8N13fBrXQF54wofFfeYOje3/YR4Bkgyi6GUpKtkJnMBxeLqk2PmdkNzVD6fIjpA9BszgHn/gQkiLUfi6NxUQj8kZWhduVIIWCZhd846HEPNan9VS9I9pd7f5NmGhwfvo=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=b0FzW17C; arc=none smtp.client-ip=209.85.128.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-wm1-f52.google.com with SMTP id 5b1f17b1804b1-4315e62afe0so19339805e9.1
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 04:38:25 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731069503; x=1731674303; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=K3H5aaqvvUtm0M7z9v4ikRrSREN7F8COBwVfgaYY7Yk=;
+        b=b0FzW17Ch6p3WmhQvtrxBvACyUWobqh7bt4e8VH0yzfjcA8d0yfZPUSMpgpan+Th86
+         JkCgM3ruzLOCWCttVeyiaCP5GSEOxxX/SX/XlmBbix9mLTxzjasXGOiNUGW4b0gtnNZi
+         y3Kod8WPQsDjGWFnvIdFxuE6s/p2pdi++hX7IQHnJPOzV2vw9b3OLME7G5IfG3IrfX6y
+         7C/+FUJk287I8hSeROZiqskqHnqgSTBkVUbQrDSJy9M6RfHqA7pYhcYtGCuTWlYGcG2a
+         DbE6CCX1RPMNtlgt9S/D1YVsUgKaq8w9N2Vy8bnGTmffwScFpEg30kmK5elO0dIQclkr
+         LyVQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731069503; x=1731674303;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=K3H5aaqvvUtm0M7z9v4ikRrSREN7F8COBwVfgaYY7Yk=;
+        b=J1MkvDmIlfBJscvtNMwaoFfOugO6/XYAC1xYqLbYTWGJ3Co6R4jYIae3GPwSCufJ1R
+         hrxUS6YRNcPXQYqpPtgxVrtlAIWOVFwpDwg/L+uGExZq3/N5l7fcCVL6IIsQJ21X8RAI
+         YoUP2wv1Iwn34VJWNdXy/7t9OdLjHkeC7soxHlAY2Qazjv74dxvkIL1P6k7L7Ay3AsSQ
+         oXJ+ftflTa38I27TtkeIt84QHdEiFf0upMlzMGxqQKpCAXErHOQ4UO9CD3pKyXrOBmY8
+         ALY5TzErKt+ZGahKXCctT7ti4MsYJVUjgCL5Nq0HaWYSoGvSZG759FcP9Es2FVGnQHSI
+         d/bg==
+X-Gm-Message-State: AOJu0Yx82p+TYbiOKe+HnVqG9vB3yczh18fH0sZTANzwnPqLSii192up
+	CkVU48ID+cjdtNqUrBBaIqJNd3cSsiaKiEPrnNaZr37j3TNRJ+TzZfnvlvBm
+X-Google-Smtp-Source: AGHT+IEJX5AqCpocuAEqrMyt8+XO5QnDsVSDbTHg40d9EF5RI6XpKnhQvPSNmgvHSXABYarE3LcHTw==
+X-Received: by 2002:a05:600c:35cc:b0:430:5356:ac8e with SMTP id 5b1f17b1804b1-432b74fcb49mr20560775e9.5.1731069503083;
+        Fri, 08 Nov 2024 04:38:23 -0800 (PST)
+Received: from imac.lan ([2a02:8010:60a0:0:68e2:1bff:d8bf:7339])
+        by smtp.gmail.com with ESMTPSA id 5b1f17b1804b1-432b05c1f56sm62991365e9.34.2024.11.08.04.38.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 04:38:22 -0800 (PST)
+From: Donald Hunter <donald.hunter@gmail.com>
+To: netdev@vger.kernel.org,
+	Jakub Kicinski <kuba@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <horms@kernel.org>,
+	Xiao Liang <shaw.leon@gmail.com>,
+	Jiri Pirko <jiri@resnulli.us>
+Cc: donald.hunter@redhat.com,
+	Donald Hunter <donald.hunter@gmail.com>
+Subject: [PATCH net-next v1 0/2] tools/net/ynl: rework async notification handling
+Date: Fri,  8 Nov 2024 12:38:14 +0000
+Message-ID: <20241108123816.59521-1-donald.hunter@gmail.com>
+X-Mailer: git-send-email 2.44.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241107-am65-cpsw-multi-rx-dscp-v2-2-9e9cd1920035@kernel.org>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+Content-Transfer-Encoding: 8bit
 
-On Thu, Nov 07, 2024 at 02:29:30PM +0200, Roger Quadros wrote:
+Revert patch 1bf70e6c3a53 which modified check_ntf() and instead add a
+new poll_ntf() with async notification semantics.
 
-Hello Roger,
+See patch 2 for the description.
 
-I accidentally reviewed and replied to the patch from the v1 series, but
-the comments still hold for this patch. For the sake of convenience, I
-am providing the same feedback as the v1 patch below.
+Donald Hunter (2):
+  Revert "tools/net/ynl: improve async notification handling"
+  tools/net/ynl: add async notification handling
 
-> AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
-> appropriate priority queue via DSCP to Priority mapping registers
-> (CPSW_PN_RX_PRI_MAP_REG).
-> 
-> We use the upper 3 bits of the DSCP field that indicate IP Precedence
-> to map traffic to 8 priority queues.
-> 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 50 ++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 0520e9f4bea7..65fbf6727e02 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -71,6 +71,8 @@
->  #define AM65_CPSW_PORT_REG_RX_PRI_MAP		0x020
->  #define AM65_CPSW_PORT_REG_RX_MAXLEN		0x024
->  
-> +#define AM65_CPSW_PORTN_REG_CTL			0x004
+ tools/net/ynl/cli.py     | 16 +++++----------
+ tools/net/ynl/lib/ynl.py | 43 +++++++++++++++++++++++-----------------
+ 2 files changed, 30 insertions(+), 29 deletions(-)
 
-nitpick: indentation needs to be fixed here to align with the macros
-below.
+-- 
+2.47.0
 
-> +#define AM65_CPSW_PORTN_REG_DSCP_MAP		0x120
->  #define AM65_CPSW_PORTN_REG_SA_L		0x308
->  #define AM65_CPSW_PORTN_REG_SA_H		0x30c
->  #define AM65_CPSW_PORTN_REG_TS_CTL              0x310
-> @@ -94,6 +96,10 @@
->  /* AM65_CPSW_PORT_REG_PRI_CTL */
->  #define AM65_CPSW_PORT_REG_PRI_CTL_RX_PTYPE_RROBIN	BIT(8)
->  
-> +/* AM65_CPSW_PN_REG_CTL */
-> +#define AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN	BIT(1)
-> +#define AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN	BIT(2)
-> +
->  /* AM65_CPSW_PN_TS_CTL register fields */
->  #define AM65_CPSW_PN_TS_CTL_TX_ANX_F_EN		BIT(4)
->  #define AM65_CPSW_PN_TS_CTL_TX_VLAN_LT1_EN	BIT(5)
-> @@ -176,6 +182,49 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port *slave,
->  	writel(mac_lo, slave->port_base + AM65_CPSW_PORTN_REG_SA_L);
->  }
->  
-> +#define AM65_CPSW_DSCP_MAX	GENMASK(5, 0)
-> +#define AM65_CPSW_PRI_MAX	GENMASK(2, 0)
-> +static int am65_cpsw_port_set_dscp_map(struct am65_cpsw_port *slave, u8 dscp, u8 pri)
-> +{
-> +	int reg_ofs;
-> +	int bit_ofs;
-> +	u32 val;
-> +
-> +	if (dscp > AM65_CPSW_DSCP_MAX)
-> +		return -EINVAL;
-
-am65_cpsw_port_set_dscp_map() seems to be invoked by
-am65_cpsw_port_enable_dscp_map() below, where the above check is guaranteed
-to be satisfied. Is the check added for future-proofing this function?
-
-> +
-> +	if (pri > AM65_CPSW_PRI_MAX)
-> +		return -EINVAL;
-> +
-> +	reg_ofs = (dscp / 8) * 4;	/* reg offset to this dscp */
-> +	bit_ofs = 4 * (dscp % 8);	/* bit offset to this dscp */
-
-Maybe a macro can be used for the "4" since it is not clear what it
-corresponds to. Or maybe two macros can be used for "reg_ofs" and
-"bit_ofs".
-
-> +	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-> +	val &= ~(AM65_CPSW_PRI_MAX << bit_ofs);	/* clear */
-> +	val |= pri << bit_ofs;			/* set */
-> +	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-> +	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-
-The above readback seems to be just to flush the writel(). A comment of
-the form:
-/* flush */
-might help, considering that other drivers do the same. Also, assigning
-the returned value to "val" might not be required unless it is intended to
-be checked.
-
-[...]
-
-Regards,
-Siddharth.
 
