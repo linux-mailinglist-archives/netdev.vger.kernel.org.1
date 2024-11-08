@@ -1,121 +1,167 @@
-Return-Path: <netdev+bounces-143191-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 325EE9C15C1
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:57:15 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A29C9C15C8
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 05:58:15 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id A754EB238CD
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:57:12 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id 127FB1F2406F
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 04:58:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42ECF1CBEA7;
-	Fri,  8 Nov 2024 04:57:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 616191CFEC0;
+	Fri,  8 Nov 2024 04:57:47 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b="pgIRNKS4"
+	dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b="gO5wbtnq"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-pl1-f169.google.com (mail-pl1-f169.google.com [209.85.214.169])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C97D213D278
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 04:57:03 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.214.169
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32BF413D278;
+	Fri,  8 Nov 2024 04:57:43 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=67.231.156.173
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731041825; cv=none; b=ldnEPFVehc8Ly3OKoo3kWlQaUvjZr6p50sA0GtLQGlJC9CEh4UF+rl6G4lLr919LiwbKe8NAZGrO3UxCDmq6c8PN8uyQkPF5EpV+yr6A9uuhjdW1fIlxOjndR0nMo6YcSy5b3c8VF+ifoWnjDdulGDYcTtGqgUzwHcw+hLtM/jw=
+	t=1731041867; cv=none; b=QpcC6G8n+XS745ua86oaolMgVL7UL+kb4nJKYeJRIB2dhob6gppnV3M4Ycq2SnHdDRL3C/xXqx2JMyJlhuJWynlD3l5pyCgjf9igLT61/L1DSbHrYlyRqMO0iasN9cvPpTfHNxBsuyhtJ78GJXW3fpeHLA2Q6ghR6OnpC4ZlcjI=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731041825; c=relaxed/simple;
-	bh=Ab3HMO3eKLgARO53MMIiVeWUY/vd9IniSh9diIM+Mdw=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Busq8buG2YmkXOcGxnoviThdpXk9seEUBLfxgmt2ff9RPoAxAWQnPrh5CaSVN9fWtOwXI1rWLLLu6Y0TnBLdr43J1I+G3AjJi0LEm2onxgPvwKDMulHD9YdW7PS7yrUAuTXWpbHl6y2OfPXhRIcsc59ustmoEeiHP6scoP9616s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com; spf=pass smtp.mailfrom=fastly.com; dkim=pass (1024-bit key) header.d=fastly.com header.i=@fastly.com header.b=pgIRNKS4; arc=none smtp.client-ip=209.85.214.169
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=reject dis=none) header.from=fastly.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=fastly.com
-Received: by mail-pl1-f169.google.com with SMTP id d9443c01a7336-20cdbe608b3so18285825ad.1
-        for <netdev@vger.kernel.org>; Thu, 07 Nov 2024 20:57:03 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=fastly.com; s=google; t=1731041823; x=1731646623; darn=vger.kernel.org;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=BYxs/iAi9D4dvnBjz30eD6LEjanF6nsQbGyEsY5CVZU=;
-        b=pgIRNKS4DWeyFj+2b90+hmhe6s1K8XXOkNl4xkjcN2F+Fz1tIrelvarYFnCClu9mP1
-         o2S6W4g9eHMIsPK0PssaFXiDEnBx298qMwc4c6asvZx2MMCebD8UAH3LpNAD4qJsdy0E
-         9MReD98VogMc7x5kzL6mQfGGWjfch2mk41gD4=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731041823; x=1731646623;
-        h=in-reply-to:content-disposition:mime-version:references
-         :mail-followup-to:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=BYxs/iAi9D4dvnBjz30eD6LEjanF6nsQbGyEsY5CVZU=;
-        b=rP1q+MLb13uW+rqlU+jd4/WYYTjjrAjbvxUTNj+okMBRdwxpOZnQEHzKo/DqA35tN3
-         FA9i/10TfpwbyjK61sDORsBbUnMgRb2I4BkxfZjkRfJ9685QtZ/S24D8Gu/wHp9Mzodx
-         F2QhwH522MmBAWT9yc4lcyqcF6vgxrsDeIa5unrZKJfbL29YV2pMTvgjvdDPdmApJNoE
-         uWBVuuf52nqIxUbed+wuigyJmk/Oj+IT9ZthmIykGxHh4f5eFBvaHQkBKkv0BFGJ6UBN
-         G76zSz3a7wXDpC2p4WTUlen3lPFmRxoocc9A83o9oIIzuQ3sLnFpGlmSf+F7XoXOIXZo
-         yuMQ==
-X-Gm-Message-State: AOJu0YwhXEpmeDDREaR1JR4t99v1FmWOnniToLNenb09MQEXBXhVzslQ
-	5qHxyXCljKZPFgu5PfYXXGrDEBlWxA88QpjFoCvp49DjiQIfBGM15heSbIKexDE=
-X-Google-Smtp-Source: AGHT+IHSJD2nYvmtst0NABiKe+u1fp77FUf9fw5OcmO5zZDo1U9OgoqPCXRncmfsc4fru4WgRiaSKA==
-X-Received: by 2002:a17:902:e890:b0:20c:b0c7:92c9 with SMTP id d9443c01a7336-21183589b2dmr19384295ad.34.1731041823027;
-        Thu, 07 Nov 2024 20:57:03 -0800 (PST)
-Received: from LQ3V64L9R2 (c-24-6-151-244.hsd1.ca.comcast.net. [24.6.151.244])
-        by smtp.gmail.com with ESMTPSA id d9443c01a7336-21177dde2f7sm21743925ad.77.2024.11.07.20.57.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 07 Nov 2024 20:57:02 -0800 (PST)
-Date: Thu, 7 Nov 2024 20:56:59 -0800
-From: Joe Damato <jdamato@fastly.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, corbet@lwn.net, hdanton@sina.com,
-	bagasdotme@gmail.com, pabeni@redhat.com, namangulati@google.com,
-	edumazet@google.com, amritha.nambiar@intel.com,
-	sridhar.samudrala@intel.com, sdf@fomichev.me, peter@typeblog.net,
-	m2shafiei@uwaterloo.ca, bjorn@rivosinc.com, hch@infradead.org,
-	willy@infradead.org, willemdebruijn.kernel@gmail.com,
-	skhawaja@google.com, Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next v7 2/6] net: Add control functions for irq
- suspension
-Message-ID: <Zy2aG_ObPOIGKU0g@LQ3V64L9R2>
-Mail-Followup-To: Joe Damato <jdamato@fastly.com>,
-	Jakub Kicinski <kuba@kernel.org>, netdev@vger.kernel.org,
-	corbet@lwn.net, hdanton@sina.com, bagasdotme@gmail.com,
-	pabeni@redhat.com, namangulati@google.com, edumazet@google.com,
-	amritha.nambiar@intel.com, sridhar.samudrala@intel.com,
-	sdf@fomichev.me, peter@typeblog.net, m2shafiei@uwaterloo.ca,
-	bjorn@rivosinc.com, hch@infradead.org, willy@infradead.org,
-	willemdebruijn.kernel@gmail.com, skhawaja@google.com,
-	Martin Karsten <mkarsten@uwaterloo.ca>,
-	"David S. Miller" <davem@davemloft.net>,
-	Simon Horman <horms@kernel.org>, David Ahern <dsahern@kernel.org>,
-	Sebastian Andrzej Siewior <bigeasy@linutronix.de>,
-	Lorenzo Bianconi <lorenzo@kernel.org>,
-	Alexander Lobakin <aleksander.lobakin@intel.com>,
-	open list <linux-kernel@vger.kernel.org>
-References: <20241108023912.98416-1-jdamato@fastly.com>
- <20241108023912.98416-3-jdamato@fastly.com>
- <20241107202119.525a3b76@kernel.org>
+	s=arc-20240116; t=1731041867; c=relaxed/simple;
+	bh=Hg22fkQelKa3qpC1mGlStPefCWQKFNdOFVRnTNGoWAc=;
+	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type; b=BatqorkylQ2+WerWEw/alpRAwj9yrPpK5LFNSlKQoKKZVFmupH/Oc9H/IZgDECfpOPsZAEk/ldOUjZoXZQdgYVBoUtNa1SFoTbcn9B9EVgGqaDhqKxPQDbkIUkKNdhbGFuwt0w7ENRNpAbQS2wD67m/x2lt+9XQYqCQuRX/qePw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com; spf=pass smtp.mailfrom=marvell.com; dkim=pass (2048-bit key) header.d=marvell.com header.i=@marvell.com header.b=gO5wbtnq; arc=none smtp.client-ip=67.231.156.173
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=marvell.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=marvell.com
+Received: from pps.filterd (m0431383.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.18.1.2/8.18.1.2) with ESMTP id 4A81ghci019269;
+	Thu, 7 Nov 2024 20:57:32 -0800
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=
+	content-transfer-encoding:content-type:date:from:message-id
+	:mime-version:subject:to; s=pfpt0220; bh=bNYaP0x+p+WSCHBkbkZxjPH
+	OFpJk7SrK7FLkH1p3CV8=; b=gO5wbtnqMsrVn/KJ8RIOsrzW72W9CTes+I7u5G1
+	ObMvLNM0+UNP+0Pr3l8WjunsEXNKtSWY1MgJOVDjgt+jLfNjybLWUEVUsqoVl9Ah
+	ctgsQi+YYKyRI/2VPkBt9lkPYTlaGatdXsDy/rP7wQFUBCw9f2lkrVnpQBo733uc
+	zFqaHzKqokfObzWbPQd0GxFOUMNXY1d5oUr0UeEZSmO6AByZFqnXdkEOv6AwbO99
+	hBMiC/pIVy9HlrvwaTnKlJjKSM4R1BXRJUabwFn1JR3Q2pDYnrbhW2OnUR3zUoMw
+	70SAjqWfXUCVNtNswh6H3O9hLfV/ESspBe/tpsnM3spdHew==
+Received: from dc6wp-exch02.marvell.com ([4.21.29.225])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 42s97hra0y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 07 Nov 2024 20:57:32 -0800 (PST)
+Received: from DC6WP-EXCH02.marvell.com (10.76.176.209) by
+ DC6WP-EXCH02.marvell.com (10.76.176.209) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1544.4; Thu, 7 Nov 2024 20:57:15 -0800
+Received: from maili.marvell.com (10.69.176.80) by DC6WP-EXCH02.marvell.com
+ (10.76.176.209) with Microsoft SMTP Server id 15.2.1544.4 via Frontend
+ Transport; Thu, 7 Nov 2024 20:57:15 -0800
+Received: from bharat-OptiPlex-Tower-Plus-7020.. (unknown [10.28.34.254])
+	by maili.marvell.com (Postfix) with ESMTP id 7036C3F7044;
+	Thu,  7 Nov 2024 20:57:11 -0800 (PST)
+From: Bharat Bhushan <bbhushan2@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <jerinj@marvell.com>,
+        <lcherian@marvell.com>, <ndabilpuram@marvell.com>,
+        <sd@queasysnail.net>, <bbhushan2@marvell.com>
+Subject: [net-next PATCH v9 0/8] cn10k-ipsec: Add outbound inline ipsec support
+Date: Fri, 8 Nov 2024 10:27:00 +0530
+Message-ID: <20241108045708.1205994-1-bbhushan2@marvell.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241107202119.525a3b76@kernel.org>
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 9HhpoPWSHAEq19MTPs_36gpFimLLpBc3
+X-Proofpoint-GUID: 9HhpoPWSHAEq19MTPs_36gpFimLLpBc3
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.293,Aquarius:18.0.687,Hydra:6.0.235,FMLib:17.0.607.475
+ definitions=2020-10-13_15,2020-10-13_02,2020-04-07_01
 
-On Thu, Nov 07, 2024 at 08:21:19PM -0800, Jakub Kicinski wrote:
-> On Fri,  8 Nov 2024 02:38:58 +0000 Joe Damato wrote:
-> > +EXPORT_SYMBOL(napi_suspend_irqs);
-> 
-> One more nit after all.. please drop the exports, epoll code can't
-> be a module. Feel free to repost without the 24h wait.
+This patch series adds outbound inline ipsec support on Marvell
+cn10k series of platform. One crypto hardware logical function
+(cpt-lf) per netdev is required for inline ipsec outbound
+functionality. Software prepare and submit crypto hardware
+(CPT) instruction for outbound inline ipsec crypto mode offload.
+The CPT instruction have details for encryption and authentication
+Crypto hardware encrypt, authenticate and provide the ESP packet
+to network hardware logic to transmit ipsec packet.
 
-Done. Thanks for catching that and letting me re-send so quickly.
+First patch makes dma memory writable for in-place encryption,
+Second patch moves code to common file, Third patch disable
+backpressure on crypto (CPT) and network (NIX) hardware.
+Patch four onwards enables inline outbound ipsec.
+
+v8->v9:
+ - Removed mutex lock to use hardware, now using hardware state
+ - Previous versions were supporting only 64 SAs and a bitmap was
+   used for same. That limitation is removed from this version.
+ - Replaced netdev_err with NL_SET_ERR_MSG_MOD in state add flow
+   as per comment in previous version 
+
+v7->v8:
+ - spell correction in patch 1/8 (s/sdk/skb)
+
+v6->v7:
+ - skb data was mapped as device writeable but it was not ensured
+   that skb is writeable. This version calls skb_unshare() to make
+   skb data writeable (Thanks Jakub Kicinski for pointing out).
+
+v4->v5:
+ - Fixed un-initialized warning and pointer check
+   (comment from Kalesh Anakkur Purayil)
+
+v3->v4:
+ - Few error messages in data-path removed and some moved
+   under netif_msg_tx_err().
+ - Added check for crypto offload (XFRM_DEV_OFFLOAD_CRYPTO)
+   Thanks "Leon Romanovsky" for pointing out
+ - Fixed codespell error as per comment from Simon Horman
+ - Added some other cleanup comment from Kalesh Anakkur Purayil
+
+v2->v3:
+ - Fix smatch and sparse errors (Comment from Simon Horman)
+ - Fix build error with W=1 (Comment from Simon Horman)
+   https://patchwork.kernel.org/project/netdevbpf/patch/20240513105446.297451-6-bbhushan2@marvell.com/
+ - Some other minor cleanup as per comment
+   https://www.spinics.net/lists/netdev/msg997197.html
+
+v1->v2:
+ - Fix compilation error to build driver a module
+ - Use dma_wmb() instead of architecture specific barrier
+ - Fix couple of other compilation warnings
+
+Bharat Bhushan (8):
+  octeontx2-pf: map skb data as device writeable
+  octeontx2-pf: Move skb fragment map/unmap to common code
+  octeontx2-af: Disable backpressure between CPT and NIX
+  cn10k-ipsec: Init hardware for outbound ipsec crypto offload
+  cn10k-ipsec: Add SA add/del support for outb ipsec crypto offload
+  cn10k-ipsec: Process outbound ipsec crypto offload
+  cn10k-ipsec: Allow ipsec crypto offload for skb with SA
+  cn10k-ipsec: Enable outbound ipsec crypto offload
+
+ MAINTAINERS                                   |    1 +
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |    4 +
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   |   68 +-
+ .../ethernet/marvell/octeontx2/nic/Makefile   |    1 +
+ .../marvell/octeontx2/nic/cn10k_ipsec.c       | 1057 +++++++++++++++++
+ .../marvell/octeontx2/nic/cn10k_ipsec.h       |  262 ++++
+ .../marvell/octeontx2/nic/otx2_common.c       |  113 +-
+ .../marvell/octeontx2/nic/otx2_common.h       |   25 +
+ .../marvell/octeontx2/nic/otx2_dcbnl.c        |    3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |   19 +-
+ .../marvell/octeontx2/nic/otx2_txrx.c         |   65 +-
+ .../marvell/octeontx2/nic/otx2_txrx.h         |    3 +
+ .../ethernet/marvell/octeontx2/nic/otx2_vf.c  |   10 +-
+ 13 files changed, 1577 insertions(+), 54 deletions(-)
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.c
+ create mode 100644 drivers/net/ethernet/marvell/octeontx2/nic/cn10k_ipsec.h
+
+-- 
+2.34.1
+
 
