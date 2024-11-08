@@ -1,246 +1,253 @@
-Return-Path: <netdev+bounces-143359-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143360-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EA409C2299
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:01:17 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [IPv6:2604:1380:4601:e00::3])
+	by mail.lfdr.de (Postfix) with ESMTPS id 626A89C22A6
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 18:04:01 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4EA0B1C23530
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:01:16 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id E26611F25558
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 17:04:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E16491940B2;
-	Fri,  8 Nov 2024 17:01:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4A1B1E9091;
+	Fri,  8 Nov 2024 17:03:43 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="coQkwOZX"
+	dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b="T6qgXWuX"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-wr1-f49.google.com (mail-wr1-f49.google.com [209.85.221.49])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F36FA15B0F7;
-	Fri,  8 Nov 2024 17:01:09 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.221.49
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47189198E74
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 17:03:40 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=170.10.133.124
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731085271; cv=none; b=HLs6xQorooZWtoCzvPpSxrKmVTLDRlvCG/ENrIKzLpfoAHnpyCHp51yycwkG41mzZPyTuOs6JR89FXZnzmKzRXP0CaSDvoCDZV2kcIY6o3hZfsUWS8TKYkKFIhh2JpK4wzuxb17dyX6Ji28UaOxi2Y5qqgd56cYK2kRDzyZEdQ8=
+	t=1731085423; cv=none; b=FdIA0mD08e7KN4l56KJ3Cwm5CXizakeORjt+CXiR4/relkSwIiMYgamGRylAZKQEc5p44sUnor2Mw1vWJHs49OxbwjjPVxbQ4cMNfjlZur7FASyVzcUPwAI2k+0Xyf1M6Z2o6MitmEHAVwNyY7R6if+M0sp2v+PsXzZ4aeEj/98=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731085271; c=relaxed/simple;
-	bh=rqbcV9wCDCcws9DQ3oQkl1D+Um1gTDRf7z4Fru5EYXA=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=PS5J4H6dkq647Q135xyXRcytLLjLO5U8DvN6WUTSzFUp25Gi/jFyrxVdRLsKRoL9FxqNBrsNHU/Gb290MEUF/Hp55336mnVjO4H4zdu6NoHddHwwzHuyg1/Aw34T1pulr2r4ZvuN85EWKgjK5REqge9KC8MVdbaBZUnWpS+fY/s=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=coQkwOZX; arc=none smtp.client-ip=209.85.221.49
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
-Received: by mail-wr1-f49.google.com with SMTP id ffacd0b85a97d-37ed3bd6114so1375846f8f.2;
-        Fri, 08 Nov 2024 09:01:09 -0800 (PST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20230601; t=1731085268; x=1731690068; darn=vger.kernel.org;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gsGRiYY6lf+0akGelRB5lCT1VoZAE3gNHv64XWiHQUE=;
-        b=coQkwOZXccpdw5r2Oowt7ZMU+xGkPMNeuUYBed8QE7u8m7eOqxbrXcM7xVwriYG6Ti
-         YxW8d7VrLZEEgoT6TF3b9vaY+aOd5VQQ53Gby65jVCY8ImOAW3wnErrRUEHe/IZuX0qv
-         HTAB3LKtR0l/zsFZe7oGFqKVIJhC080ehEza+zRQn1xXGM1mMtp5tAA2KaLYb01O8eOX
-         j0TSKdjZNmcgNKfgiILngkOxZUJmJa7mgieqO7pOacOUZfzJk+zP79Q5rYueoDK5hlHr
-         31XvUhC5256FidKpbUjE4DuWzt4k1DXXi+OLBltnzJxHGBUugBA7w1Lb83duYhJuPStq
-         9bEQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731085268; x=1731690068;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=gsGRiYY6lf+0akGelRB5lCT1VoZAE3gNHv64XWiHQUE=;
-        b=QLiGpLUiFhJAfdqDA7yE7yCfAOtcJ9EpkLa9GT+HZK/5HzFwrmMKuIdpiJZ5PfwoHt
-         8LRriFsOBBd4nAdEDYJ99YvO5tDap3QA1cb+xXjglDA3/C3CB0w4zqj8lN1+7j+cnISD
-         vT1Hsj3VYOBuaePi69rhUjrr7XKM2F+Zf5u/akCqiG0LHVdl6aka0UkZp0r8Wxt1z+7i
-         5YQ//ETMSkN9rg1iuTmDSuLNniz7HUJvPos2Rhzn1rQBYwQm/K5f87+chXM6vIAe1J1Z
-         Hg9dJOlI65XrzKm90sa1gz54OE0nnUKqkqjb+rON5nwCFxaWrbnDk6RfZhnf/Mj7XP3A
-         9gCg==
-X-Forwarded-Encrypted: i=1; AJvYcCU7z74EVWpQTz/Nj79UF0fgTMKvnvv3fGqlGT2lC6gP1P6lECtSPmYB6FUgt8d+IUdgTf2O3rI=@vger.kernel.org
-X-Gm-Message-State: AOJu0Yy6eMG3kkn1W4AfGsDeYHuVzc2aruXY6cPeY4FtGOT+eUMD7K09
-	aGjlfCt+8ORi0vO3k9EGy1W3MFyio+c2qiS07HNWNlU0wJJ31wSQfYFQTxT+Ps4OVBTwbcPBt4c
-	DwubCdV2+IGEVWTO831TKgHXp7x1x/Q7f
-X-Google-Smtp-Source: AGHT+IGHUaX2fBueTeLGBtTHX1B63DrnHF5zxU19itBBpOwA572tdi+kPUev2cUnetWRBxmmpU2T52USh4eHQMwxrMw=
-X-Received: by 2002:a5d:59a9:0:b0:37c:d244:bdb1 with SMTP id
- ffacd0b85a97d-381f186c001mr2690059f8f.26.1731085267714; Fri, 08 Nov 2024
- 09:01:07 -0800 (PST)
+	s=arc-20240116; t=1731085423; c=relaxed/simple;
+	bh=DkLkcpSACAPOkdSqpA50/En10RaBzQkMrlzGe67Uqfk=;
+	h=From:In-Reply-To:References:To:Cc:Subject:MIME-Version:
+	 Content-Type:Date:Message-ID; b=WmltL1EMZAq6eG2A5Fq4P2TtAJxB40Gah4yPMhDMWmAvHYIEYbsH11vchd4gxC91M6BNR67ijRlj8wHHRgXAgloaQx2EhJE9jsacICS10ONx6b4MjjQkIOoQ/EO9xZfKQyAhLvk8q678xjKG/NvOcL7CJs7CawpkaIWdHnniFa4=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com; spf=pass smtp.mailfrom=redhat.com; dkim=pass (1024-bit key) header.d=redhat.com header.i=@redhat.com header.b=T6qgXWuX; arc=none smtp.client-ip=170.10.133.124
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=redhat.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=redhat.com
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1731085419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kTE7HN+soO/Za76tq6046j/ukmrXopkun1LVu89YTbU=;
+	b=T6qgXWuXIaXxnI2eW9WKV/AmKfOKS2YBliK/5XAu/N5yENxsHnR8Q1OD66feCJ7afKNNQ0
+	DHcbC6T2trSZVIP6SVywfNpWs9Gb3GjVtaKt31lrtK5teI+zww8NR4iMfFiXyI9VkA82Vv
+	bjYt2GOlUghFOa9Z6Whot8YmBwm3EJc=
+Received: from mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com
+ (ec2-54-186-198-63.us-west-2.compute.amazonaws.com [54.186.198.63]) by
+ relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.3,
+ cipher=TLS_AES_256_GCM_SHA384) id us-mta-686-d2vfCBO4PnGWgeJI8QflhA-1; Fri,
+ 08 Nov 2024 12:03:36 -0500
+X-MC-Unique: d2vfCBO4PnGWgeJI8QflhA-1
+X-Mimecast-MFC-AGG-ID: d2vfCBO4PnGWgeJI8QflhA
+Received: from mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com [10.30.177.17])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mx-prod-mc-03.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTPS id DE2041955EA1;
+	Fri,  8 Nov 2024 17:03:31 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.231])
+	by mx-prod-int-05.mail-002.prod.us-west-2.aws.redhat.com (Postfix) with ESMTP id 03B2C1953880;
+	Fri,  8 Nov 2024 17:03:24 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20241106123559.724888-29-dhowells@redhat.com>
+References: <20241106123559.724888-29-dhowells@redhat.com> <20241106123559.724888-1-dhowells@redhat.com>
+To: Christian Brauner <christian@brauner.io>,
+    Steve French <smfrench@gmail.com>,
+    Matthew Wilcox <willy@infradead.org>
+Cc: dhowells@redhat.com, Jeff Layton <jlayton@kernel.org>,
+    Gao Xiang <hsiangkao@linux.alibaba.com>,
+    Dominique Martinet <asmadeus@codewreck.org>,
+    Marc Dionne <marc.dionne@auristor.com>,
+    Paulo Alcantara <pc@manguebit.com>,
+    Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+    Eric Van Hensbergen <ericvh@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>, netfs@lists.linux.dev,
+    linux-afs@lists.infradead.org, linux-cifs@vger.kernel.org,
+    linux-nfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+    v9fs@lists.linux.dev, linux-erofs@lists.ozlabs.org,
+    linux-fsdevel@vger.kernel.org, linux-mm@kvack.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 28/33] netfs: Change the read result collector to only use one work item
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20241108082633.2338543-1-xukuohai@huaweicloud.com> <20241108082633.2338543-2-xukuohai@huaweicloud.com>
-In-Reply-To: <20241108082633.2338543-2-xukuohai@huaweicloud.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 8 Nov 2024 09:00:56 -0800
-Message-ID: <CAADnVQLFvTvg5nggOLMnV6BLpTp8K+b78ZyB3VNdV_T=Fhusmg@mail.gmail.com>
-Subject: Re: [PATCH bpf-next 1/2] bpf: Fix release of struct_ops map
-To: Xu Kuohai <xukuohai@huaweicloud.com>
-Cc: bpf <bpf@vger.kernel.org>, Network Development <netdev@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, 
-	Eduard Zingerman <eddyz87@gmail.com>, Yonghong Song <yonghong.song@linux.dev>, 
-	Kui-Feng Lee <thinker.li@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1321311.1731085403.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 08 Nov 2024 17:03:23 +0000
+Message-ID: <1321312.1731085403@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.0 on 10.30.177.17
 
-On Fri, Nov 8, 2024 at 12:15=E2=80=AFAM Xu Kuohai <xukuohai@huaweicloud.com=
-> wrote:
->
-> From: Xu Kuohai <xukuohai@huawei.com>
->
-> The test in the follow-up patch triggers the following kernel panic:
->
->  Oops: int3: 0000 [#1] PREEMPT SMP PTI
->  CPU: 0 UID: 0 PID: 465 Comm: test_progs Tainted: G           OE      6.1=
-2.0-rc4-gd1d187515
->  Tainted: [O]=3DOOT_MODULE, [E]=3DUNSIGNED_MODULE
->  Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.3-0=
--ga6ed6b701f0a-pr4
->  RIP: 0010:0xffffffffc0015041
->  Code: cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc cc =
-cc cc cc cc cc ccc
->  RSP: 0018:ffffc9000187fd20 EFLAGS: 00000246
->  RAX: 0000000000000000 RBX: 0000000000000001 RCX: 0000000000000000
->  RDX: 0000000000000000 RSI: ffffffff82c54639 RDI: 0000000000000000
->  RBP: ffffc9000187fd48 R08: 0000000000000001 R09: 0000000000000000
->  R10: 0000000000000001 R11: 000000004cba6383 R12: 0000000000000000
->  R13: 0000000000000002 R14: ffff88810438b7a0 R15: ffffffff8369d7a0
->  FS:  00007f05178006c0(0000) GS:ffff888236e00000(0000) knlGS:000000000000=
-0000
->  CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->  CR2: 00007f0508c94000 CR3: 0000000100d16003 CR4: 0000000000170ef0
->  Call Trace:
->   <TASK>
->   ? show_regs+0x68/0x80
->   ? die+0x3b/0x90
->   ? exc_int3+0xca/0xe0
->   ? asm_exc_int3+0x3e/0x50
->   run_struct_ops+0x58/0xb0 [bpf_testmod]
->   param_attr_store+0xa2/0x100
->   module_attr_store+0x25/0x40
->   sysfs_kf_write+0x50/0x70
->   kernfs_fop_write_iter+0x146/0x1f0
->   vfs_write+0x27e/0x530
->   ksys_write+0x75/0x100
->   __x64_sys_write+0x1d/0x30
->   x64_sys_call+0x1d30/0x1f30
->   do_syscall_64+0x68/0x140
->   entry_SYSCALL_64_after_hwframe+0x76/0x7e
->  RIP: 0033:0x7f051831727f
->  Code: 89 54 24 18 48 89 74 24 10 89 7c 24 08 e8 39 d5 f8 ff 48 8b 54 24 =
-18 48 8b 74 24 108
->  RSP: 002b:00007f05177ffdf0 EFLAGS: 00000293 ORIG_RAX: 0000000000000001
->  RAX: ffffffffffffffda RBX: 00007f05178006c0 RCX: 00007f051831727f
->  RDX: 0000000000000002 RSI: 00007f05177ffe30 RDI: 0000000000000004
->  RBP: 00007f05177ffe90 R08: 0000000000000000 R09: 000000000000000b
->  R10: 0000000000000000 R11: 0000000000000293 R12: ffffffffffffff30
->  R13: 0000000000000002 R14: 00007ffd926bfd50 R15: 00007f0517000000
->   </TASK>
->
-> It's because the sleepable prog is still running when the struct_ops
-> map is released.
->
-> To fix it, follow the approach used in bpf_tramp_image_put. First,
-> before release struct_ops map, wait a rcu_tasks_trace gp for sleepable
-> progs to finish. Then, wait a rcu_tasks gp for normal progs and the
-> rest trampoline insns to finish.
->
-> Additionally, switch to call_rcu to remove the synchronous waiting,
-> as suggested by Alexei and Martin.
->
-> Fixes: b671c2067a04 ("bpf: Retire the struct_ops map kvalue->refcnt.")
-> Suggested-by: Alexei Starovoitov <ast@kernel.org>
-> Suggested-by: Martin KaFai Lau <martin.lau@linux.dev>
-> Signed-off-by: Xu Kuohai <xukuohai@huawei.com>
-> ---
->  kernel/bpf/bpf_struct_ops.c | 37 +++++++++++++++++++------------------
->  kernel/bpf/syscall.c        |  7 ++++++-
->  2 files changed, 25 insertions(+), 19 deletions(-)
->
-> diff --git a/kernel/bpf/bpf_struct_ops.c b/kernel/bpf/bpf_struct_ops.c
-> index fda3dd2ee984..dd5f9bf12791 100644
-> --- a/kernel/bpf/bpf_struct_ops.c
-> +++ b/kernel/bpf/bpf_struct_ops.c
-> @@ -865,24 +865,6 @@ static void bpf_struct_ops_map_free(struct bpf_map *=
-map)
->          */
->         if (btf_is_module(st_map->btf))
->                 module_put(st_map->st_ops_desc->st_ops->owner);
-> -
-> -       /* The struct_ops's function may switch to another struct_ops.
-> -        *
-> -        * For example, bpf_tcp_cc_x->init() may switch to
-> -        * another tcp_cc_y by calling
-> -        * setsockopt(TCP_CONGESTION, "tcp_cc_y").
-> -        * During the switch,  bpf_struct_ops_put(tcp_cc_x) is called
-> -        * and its refcount may reach 0 which then free its
-> -        * trampoline image while tcp_cc_x is still running.
-> -        *
-> -        * A vanilla rcu gp is to wait for all bpf-tcp-cc prog
-> -        * to finish. bpf-tcp-cc prog is non sleepable.
-> -        * A rcu_tasks gp is to wait for the last few insn
-> -        * in the tramopline image to finish before releasing
-> -        * the trampoline image.
-> -        */
-> -       synchronize_rcu_mult(call_rcu, call_rcu_tasks);
-> -
->         __bpf_struct_ops_map_free(map);
->  }
->
-> @@ -974,6 +956,25 @@ static struct bpf_map *bpf_struct_ops_map_alloc(unio=
-n bpf_attr *attr)
->         mutex_init(&st_map->lock);
->         bpf_map_init_from_attr(map, attr);
->
-> +       /* The struct_ops's function may switch to another struct_ops.
-> +        *
-> +        * For example, bpf_tcp_cc_x->init() may switch to
-> +        * another tcp_cc_y by calling
-> +        * setsockopt(TCP_CONGESTION, "tcp_cc_y").
-> +        * During the switch,  bpf_struct_ops_put(tcp_cc_x) is called
-> +        * and its refcount may reach 0 which then free its
-> +        * trampoline image while tcp_cc_x is still running.
-> +        *
-> +        * Since struct_ops prog can be sleepable, a rcu_tasks_trace gp
-> +        * is to wait for sleepable progs in the map to finish. Then a
-> +        * rcu_tasks gp is to wait for the normal progs and the last few
-> +        * insns in the tramopline image to finish before releasing the
-> +        * trampoline image.
-> +        *
-> +        * Also see the comment in function bpf_tramp_image_put.
-> +        */
-> +       WRITE_ONCE(map->free_after_mult_rcu_gp, true);
-> +
->         return map;
->
->  errout_free:
-> diff --git a/kernel/bpf/syscall.c b/kernel/bpf/syscall.c
-> index 8254b2973157..ae927f087f04 100644
-> --- a/kernel/bpf/syscall.c
-> +++ b/kernel/bpf/syscall.c
-> @@ -886,7 +886,12 @@ static void bpf_map_free_rcu_gp(struct rcu_head *rcu=
-)
->
->  static void bpf_map_free_mult_rcu_gp(struct rcu_head *rcu)
->  {
-> -       if (rcu_trace_implies_rcu_gp())
-> +       struct bpf_map *map =3D container_of(rcu, struct bpf_map, rcu);
-> +
-> +       if (map->map_type =3D=3D BPF_MAP_TYPE_STRUCT_OPS)
-> +               /* See comment in the end of bpf_struct_ops_map_alloc */
+This patch needs the attached adjustment folding in.
 
-The fix makes sense, but pls copy paste a sentence here instead
-of the above comment. Like:
-"
-rcu_tasks gp is necessary to wait for struct_ops bpf trampoline to finish.
-Unlike all other bpf trampolines struct_ops trampoline is not
-protected by percpu_ref.
-"
-> +               call_rcu_tasks(rcu, bpf_map_free_rcu_gp);
-> +       else if (rcu_trace_implies_rcu_gp())
+David
+---
+commit 2c0cccc7b29a051fadb6816d31f526e4dd45ddf5
+Author: David Howells <dhowells@redhat.com>
+Date:   Thu Nov 7 22:22:49 2024 +0000
 
-pw-bot: cr
+    netfs: Fix folio abandonment
+    =
+
+    The mechanism to handle the abandonment of a folio being read due to a=
+n
+    error occurring in a subrequest (such as if a signal occurs) will corr=
+ectly
+    abandon folios if they're entirely processed in one go; but if the
+    constituent subrequests aren't processed in the same scheduled work it=
+em,
+    the note that the first one failed will get lost if no folios are proc=
+essed
+    (the ABANDON_SREQ note isn't transferred to the NETFS_RREQ_FOLIO_ABAND=
+ON
+    flag unless we process a folio).
+    =
+
+    Fix this by simplifying the way the mechanism works.  Replace the flag=
+ with
+    a variable that records the file position to which we should abandon
+    folios.  Any folio that overlaps this region at the time of unlocking =
+must
+    be abandoned (and reread).
+    =
+
+    This works because subrequests are processed in order of file position=
+ and
+    each folio is processed as soon as enough subrequest transference is
+    available to cover it - so when the abandonment point is moved, it cov=
+ers
+    only folios that draw data from the dodgy region.
+    =
+
+    Also make sure that NETFS_SREQ_FAILED is set on failure and that
+    stream->failed is set when we cut the stream short.
+    =
+
+    Signed-off: David Howells <dhowells@redhat.com>
+    cc: Jeff Layton <jlayton@kernel.org>
+    cc: netfs@lists.linux.dev
+    cc: linux-fsdevel@vger.kernel.org
+
+diff --git a/fs/netfs/read_collect.c b/fs/netfs/read_collect.c
+index 73f51039c2fe..7f3a3c056c6e 100644
+--- a/fs/netfs/read_collect.c
++++ b/fs/netfs/read_collect.c
+@@ -46,7 +46,7 @@ static void netfs_unlock_read_folio(struct netfs_io_requ=
+est *rreq,
+ 	struct netfs_folio *finfo;
+ 	struct folio *folio =3D folioq_folio(folioq, slot);
+ =
+
+-	if (unlikely(test_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags))) {
++	if (unlikely(folio_pos(folio) < rreq->abandon_to)) {
+ 		trace_netfs_folio(folio, netfs_folio_trace_abandon);
+ 		goto just_unlock;
+ 	}
+@@ -126,8 +126,6 @@ static void netfs_read_unlock_folios(struct netfs_io_r=
+equest *rreq,
+ =
+
+ 		if (*notes & COPY_TO_CACHE)
+ 			set_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
+-		if (*notes & ABANDON_SREQ)
+-			set_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags);
+ =
+
+ 		folio =3D folioq_folio(folioq, slot);
+ 		if (WARN_ONCE(!folio_test_locked(folio),
+@@ -152,7 +150,6 @@ static void netfs_read_unlock_folios(struct netfs_io_r=
+equest *rreq,
+ 		*notes |=3D MADE_PROGRESS;
+ =
+
+ 		clear_bit(NETFS_RREQ_FOLIO_COPY_TO_CACHE, &rreq->flags);
+-		clear_bit(NETFS_RREQ_FOLIO_ABANDON, &rreq->flags);
+ =
+
+ 		/* Clean up the head folioq.  If we clear an entire folioq, then
+ 		 * we can get rid of it provided it's not also the tail folioq
+@@ -251,6 +248,12 @@ static void netfs_collect_read_results(struct netfs_i=
+o_request *rreq)
+ 			if (test_bit(NETFS_SREQ_COPY_TO_CACHE, &front->flags))
+ 				notes |=3D COPY_TO_CACHE;
+ =
+
++			if (test_bit(NETFS_SREQ_FAILED, &front->flags)) {
++				rreq->abandon_to =3D front->start + front->len;
++				front->transferred =3D front->len;
++				transferred =3D front->len;
++				trace_netfs_rreq(rreq, netfs_rreq_trace_set_abandon);
++			}
+ 			if (front->start + transferred >=3D rreq->cleaned_to + fsize ||
+ 			    test_bit(NETFS_SREQ_HIT_EOF, &front->flags))
+ 				netfs_read_unlock_folios(rreq, &notes);
+@@ -268,6 +271,7 @@ static void netfs_collect_read_results(struct netfs_io=
+_request *rreq)
+ 				stream->error =3D front->error;
+ 				rreq->error =3D front->error;
+ 				set_bit(NETFS_RREQ_FAILED, &rreq->flags);
++				stream->failed =3D true;
+ 			}
+ 			notes |=3D MADE_PROGRESS | ABANDON_SREQ;
+ 		} else if (test_bit(NETFS_SREQ_NEED_RETRY, &front->flags)) {
+@@ -566,6 +570,7 @@ void netfs_read_subreq_terminated(struct netfs_io_subr=
+equest *subreq)
+ 			__set_bit(NETFS_SREQ_NEED_RETRY, &subreq->flags);
+ 		} else {
+ 			netfs_stat(&netfs_n_rh_download_failed);
++			__set_bit(NETFS_SREQ_FAILED, &subreq->flags);
+ 		}
+ 		trace_netfs_rreq(rreq, netfs_rreq_trace_set_pause);
+ 		set_bit(NETFS_RREQ_PAUSE, &rreq->flags);
+diff --git a/include/linux/netfs.h b/include/linux/netfs.h
+index c00cffa1da13..4af7208e1360 100644
+--- a/include/linux/netfs.h
++++ b/include/linux/netfs.h
+@@ -260,6 +260,7 @@ struct netfs_io_request {
+ 	atomic64_t		issued_to;	/* Write issuer folio cursor */
+ 	unsigned long long	collected_to;	/* Point we've collected to */
+ 	unsigned long long	cleaned_to;	/* Position we've cleaned folios to */
++	unsigned long long	abandon_to;	/* Position to abandon folios to */
+ 	pgoff_t			no_unlock_folio; /* Don't unlock this folio after read */
+ 	unsigned char		front_folio_order; /* Order (size) of front folio */
+ 	refcount_t		ref;
+@@ -271,7 +272,6 @@ struct netfs_io_request {
+ #define NETFS_RREQ_FAILED		4	/* The request failed */
+ #define NETFS_RREQ_IN_PROGRESS		5	/* Unlocked when the request completes =
+*/
+ #define NETFS_RREQ_FOLIO_COPY_TO_CACHE	6	/* Copy current folio to cache f=
+rom read */
+-#define NETFS_RREQ_FOLIO_ABANDON	7	/* Abandon failed folio from read */
+ #define NETFS_RREQ_UPLOAD_TO_SERVER	8	/* Need to write to the server */
+ #define NETFS_RREQ_NONBLOCK		9	/* Don't block if possible (O_NONBLOCK) */
+ #define NETFS_RREQ_BLOCKED		10	/* We blocked */
+diff --git a/include/trace/events/netfs.h b/include/trace/events/netfs.h
+index cf14545ca2bd..22eb77b1f5e6 100644
+--- a/include/trace/events/netfs.h
++++ b/include/trace/events/netfs.h
+@@ -56,6 +56,7 @@
+ 	EM(netfs_rreq_trace_free,		"FREE   ")	\
+ 	EM(netfs_rreq_trace_redirty,		"REDIRTY")	\
+ 	EM(netfs_rreq_trace_resubmit,		"RESUBMT")	\
++	EM(netfs_rreq_trace_set_abandon,	"S-ABNDN")	\
+ 	EM(netfs_rreq_trace_set_pause,		"PAUSE  ")	\
+ 	EM(netfs_rreq_trace_unlock,		"UNLOCK ")	\
+ 	EM(netfs_rreq_trace_unlock_pgpriv2,	"UNLCK-2")	\
+
 
