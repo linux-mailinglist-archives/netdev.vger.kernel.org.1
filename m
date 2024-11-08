@@ -1,119 +1,110 @@
-Return-Path: <netdev+bounces-143270-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143271-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
-	by mail.lfdr.de (Postfix) with ESMTPS id 126419C1C43
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:37:25 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 055189C1C4C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:41:35 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92AC3B21E39
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:37:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE8BF2812F0
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:41:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA9A1E47A1;
-	Fri,  8 Nov 2024 11:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 366261E3DFC;
+	Fri,  8 Nov 2024 11:41:32 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QUgJbql/"
+	dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b="N1/+YmRz"
 X-Original-To: netdev@vger.kernel.org
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-lj1-f182.google.com (mail-lj1-f182.google.com [209.85.208.182])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4191E22FA;
-	Fri,  8 Nov 2024 11:37:15 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A5CF7B3E1
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 11:41:30 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.182
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731065838; cv=none; b=NnudPMUky9XQZ5hwnBfJPN8wCi/SwvLlvr5jH6r+usu1UbZB2rRn5bdv24M/wxG0Z5kTVvoz2jZBc3mdpUYV30aH8rtXwYIW7Ur3OshdQbscA4/O1Zvr9qdcHeuNz+qv4dx6/gTLfotiHJtWispZ5fziXJytt0r5+J8Urkq2ZGU=
+	t=1731066092; cv=none; b=onYJygwS2BXQYgx905H3bEL+qFrEkvR9BkMQqjuN58IHH5slbsApMoj+xqdklsGcz01uub3ovk35X6ynYynY4XNJp9ZX1Ud17ZLVKorCmvsUMM3jqoYsYdontu21neDkk9R+eHaHAvh12FlhDmfL5WgVsif+k8uJCKDYriC9nMA=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731065838; c=relaxed/simple;
-	bh=9q9uVvLqHBGdEXJFJ+lqyHUhiXg3rvlAytAtHyinnIU=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=Orr3VQrmOwMN7N6P1ciYTyQHmu3xK6QkMYNnSGx4ENOZv9YPZ2bGefPO+0aqSx4jWn8wqo3Q5lIiibaXkIJh0sVo+FGmciJoHpBIAWRoB0jymwZtyjSuAbFTBl1gwqB/8VxcsuST3hTGVs5ydATZbQDUzT5lipzR9CC+9EpOjmI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QUgJbql/; arc=none smtp.client-ip=78.32.30.218
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
-Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=EejnXOL6AJ8kMqdm0i2xcZanHtQNUcxhRjUP4k55h+k=; b=QUgJbql/k5OgkEBg8SmAJYS29T
-	B6mTbk9y3xIYzklSnufSDRl0yZiHr+R5OIEdtAJm8KNe5foj8vcDyTX/h557sS+7qO1mAU9OU1yR+
-	AYjwEZlkYqTwgPrAbko+oLzaPb4AOSGh0wMGjZhgqLOIG0QWqJ/Piq1Y/i0PtHWiUNLSaBYP1MqJG
-	GOdYK0cPvk0/jOxShOwMoUIknQuS+sS5W52CY5BrkCWjIM6GQMiAnD+gd6keaTdCx+jwgsvn3+4d3
-	DW2ZtnZAW16GnVH+uEOAAg+b5j0P4MGT8A5rIo+VMZrAYYXQoKUO0LyC/atIlemBcbxM5R852Mr4e
-	TTDRlM9A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56186)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1t9NIW-000533-2q;
-	Fri, 08 Nov 2024 11:37:05 +0000
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t9NIU-0002Ez-2Z;
-	Fri, 08 Nov 2024 11:37:02 +0000
-Date: Fri, 8 Nov 2024 11:37:02 +0000
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Lei Wei <quic_leiwei@quicinc.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh@kernel.org>,
-	Krzysztof Kozlowski <krzk+dt@kernel.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
-	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
-	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
-	quic_pavir@quicinc.com, quic_linchen@quicinc.com,
-	quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
-	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com,
-	john@phrozen.org
-Subject: Re: [PATCH net-next 3/5] net: pcs: qcom-ipq: Add PCS create and
- phylink operations for IPQ9574
-Message-ID: <Zy333s8o77qE5F_-@shell.armlinux.org.uk>
-References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
- <20241101-ipq_pcs_rc1-v1-3-fdef575620cf@quicinc.com>
- <d7782a5e-2f67-4f62-a594-0f52144a368f@lunn.ch>
- <9b3a4f00-59f2-48d1-8916-c7d7d65df063@quicinc.com>
- <a0826aa8-703c-448d-8849-47808f847774@lunn.ch>
- <9b7def00-e900-4c5e-ba95-671bd1ef9240@quicinc.com>
+	s=arc-20240116; t=1731066092; c=relaxed/simple;
+	bh=uY/iMbf3Vk3sXbHtDhy0LKeHEHnsP2OiGaIvmYFRXgM=;
+	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
+	 To:Cc:Content-Type; b=UWmkGTSP4XE4Ls3ecqfnBo0gvtghcndo8F5FCcIGVkGXyqHpGBtAyR+Ib0X4rDQ9jTVn3JDK47BKcNEnyBbb2oG058rq/cghNKqKFgLkHgPOsVntbXXsFTOXkbtdlo4yHWc+x5tMDdnU2mDUQ8RIuJB9SaFDy3Ddhr1649qQKf0=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org; spf=pass smtp.mailfrom=linaro.org; dkim=pass (2048-bit key) header.d=linaro.org header.i=@linaro.org header.b=N1/+YmRz; arc=none smtp.client-ip=209.85.208.182
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=linaro.org
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=linaro.org
+Received: by mail-lj1-f182.google.com with SMTP id 38308e7fff4ca-2fb3da341c9so20057361fa.2
+        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 03:41:30 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1731066088; x=1731670888; darn=vger.kernel.org;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=CXSvbTMRrcj6fCxF0ufHCuWCloLz1hIjGxoKK8AG/+o=;
+        b=N1/+YmRzvTrpmzqpdwplm8fyhDyDjMHX3HdJUTzuz238fVLWX8v/m7m/tOSuhkkEUJ
+         8e5m+z+5heAtSJu7E+4im3tjSBZ3gvNCMSPQiSj+QVpWlFg22IuSKQsSwWAvIOIwsMXW
+         /LtwUPgw/MWCrkBGIos/OJN+E2hjBLzD3uM6x0KKvAL8KWTLvel2RRwNaT7vkckHcHrX
+         llp09Z09VWyYVLetgkW8wzaSxs1nIkUXV1wbu7b8ga/PjwpsoMrNolxzl+0UtLBD2oEb
+         30765U0Z6O1kdeD4s68n6abark3xzoc1162X1og0XcxrfTePrybuBZwyr5zCJO538ow2
+         C9Fg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731066088; x=1731670888;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=CXSvbTMRrcj6fCxF0ufHCuWCloLz1hIjGxoKK8AG/+o=;
+        b=gCWddXjglT2Vv7VNiInnsrkkGwfkpOGsEpEKCsrpiiuazYxV7wdXBPFgl7oChRlkmy
+         rfac8+R3mWxgPrnFc+vT/p8iahjEi587WrUJfRYR9N6pdARQowrlX08AH51U0/EQKgf+
+         VXBaz5REpKHKf5qPkyUpf93de32oksgKLcNyrlxKBWAp+iO1wbzH0sjiAP/khzmUvThp
+         wz/Bz+hrOEaySkOqPjT2jGT6AiYWVgKx+anVVL9GA9LcZaosVZAcM25whfjGkuUiHmYt
+         exI0+uIcFIn0iUcPJssXse0dlvBUbDbF8dKU+3MeNEl4YQiuoazN1PPZD8VaJFgnOkvZ
+         NvyA==
+X-Forwarded-Encrypted: i=1; AJvYcCVEiAujIfMkOr5jDIYFPtUBWZcWjgADeRxQcxRhGKwKBH9qBKy6SaCsNycGU0fV5opToQutVpk=@vger.kernel.org
+X-Gm-Message-State: AOJu0YznKEEPR9DSNe6saP+jCYvmheBYeQ1HrDFfXoDYEuIF2mTHvIin
+	hRosrm/aOYNKz9rvp3UNBycbjW3G9hwXn/aGhvly+94TI8yWK58CxpZDns9icgh0f4mH8mgiSzS
+	gRCudiQ4amElIe96ExCHOdi6RqrMikNWBsvAOeA==
+X-Google-Smtp-Source: AGHT+IG6dsbVHDy06kTkj5zAs70A2/MyWRJqE/mKAm1qvOYLwYQg1hL1cr+88CsDKtRlIRo2uCMtTHRVmKF8kaDiYQk=
+X-Received: by 2002:a05:651c:1515:b0:2ef:243b:6dce with SMTP id
+ 38308e7fff4ca-2ff20185abfmr11928261fa.10.1731066088370; Fri, 08 Nov 2024
+ 03:41:28 -0800 (PST)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <9b7def00-e900-4c5e-ba95-671bd1ef9240@quicinc.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+References: <202410301531.7Vr9UkCn-lkp@intel.com> <CACRpkdbW5kheaWPzKip9ucEwK2uv+Cmf5SwT1necfa3Ynct6Ag@mail.gmail.com>
+ <2010cc7a-7f49-4c5b-b684-8e08ff8d17ed@csgroup.eu>
+In-Reply-To: <2010cc7a-7f49-4c5b-b684-8e08ff8d17ed@csgroup.eu>
+From: Linus Walleij <linus.walleij@linaro.org>
+Date: Fri, 8 Nov 2024 12:41:17 +0100
+Message-ID: <CACRpkdYQ6Pfn_Y7FJh7MV2Mb8etDXFCJEUrgq=c3JDxkSPOndA@mail.gmail.com>
+Subject: Re: drivers/net/ethernet/freescale/ucc_geth.c:2454:64: sparse:
+ sparse: incorrect type in argument 1 (different address spaces)
+To: Christophe Leroy <christophe.leroy@csgroup.eu>
+Cc: kernel test robot <lkp@intel.com>, 
+	"linuxppc-dev@lists.ozlabs.org list" <linuxppc-dev@lists.ozlabs.org>, netdev <netdev@vger.kernel.org>, 
+	Stanislav Kinsburskii <stanislav.kinsburskii@gmail.com>, oe-kbuild-all@lists.linux.dev, 
+	linux-kernel@vger.kernel.org, Michael Ellerman <mpe@ellerman.id.au>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-On Fri, Nov 08, 2024 at 07:31:31PM +0800, Lei Wei wrote:
-> On 11/6/2024 11:43 AM, Andrew Lunn wrote:
-> > On Wed, Nov 06, 2024 at 11:16:37AM +0800, Lei Wei wrote:
-> > > On 11/1/2024 9:21 PM, Andrew Lunn wrote:
-> > > > How does Qualcomm SGMII AN mode differ from Cisco SGMII AN mode?
-> > > 
-> > > Qualcomm SGMII AN mode extends Cisco SGMII spec Revision 1.8 by adding pause
-> > > bit support in the SGMII word format. It re-uses two of the reserved bits
-> > > 1..9 for this purpose. The PCS supports both Qualcomm SGMII AN and Cisco
-> > > SGMII AN modes.
-> > 
-> > Is Qualcomm SGMII AN actually needed? I assume it only works against a
-> > Qualcomm PHY? What interoperability testing have you do against
-> > non-Qualcomm PHYs?
-> 
-> I agree that using Cisco SGMII AN mode as default is more appropriate,
-> since is more commonly used with PHYs. I will make this change.
-> 
-> Qualcomm SGMII AN is an extension of top of Cisco SGMII AN (only
-> pause bits difference). So it is expected to be compatible with
-> non-Qualcomm PHYs which use Cisco SGMII AN.
+On Fri, Nov 8, 2024 at 11:30=E2=80=AFAM Christophe Leroy
+<christophe.leroy@csgroup.eu> wrote:
 
-I believe Marvell have similar extensions.
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+> The problem is the __be16 in the function prototype.
+>
+>         set_mac_addr(&p_82xx_addr_filt->taddr.h, p_enet_addr);
+>
+> p_82xx_addr_filt->taddr.h is a u16
+> and out_be16() expects a u16*
+>
+> So the following fixes the above warnings:
+
+Ah you are right of course, thanks! :)
+
+Let's wait to the big rework you mentioned to land and I will try
+to remember to revisit this in the v6.13 kernel cycle.
+
+Yours,
+Linus Walleij
 
