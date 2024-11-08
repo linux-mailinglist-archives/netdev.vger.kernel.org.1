@@ -1,62 +1,62 @@
-Return-Path: <netdev+bounces-143115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85F6F9C134B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 01:49:59 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 837E89C134C
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 01:50:24 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4BFD22843B7
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:49:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42B30284707
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 00:50:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 268001BD9E7;
-	Fri,  8 Nov 2024 00:49:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C249EBE;
+	Fri,  8 Nov 2024 00:50:21 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="IyLRAyw6"
+	dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b="VeC+k7Uq"
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+Received: from smtp-fw-9106.amazon.com (smtp-fw-9106.amazon.com [207.171.188.206])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1B4EBE
-	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 00:49:54 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=52.95.49.90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7C15E46B5
+	for <netdev@vger.kernel.org>; Fri,  8 Nov 2024 00:50:19 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=207.171.188.206
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731026996; cv=none; b=p5jKplLNisAXdwRA52M2G9bPN0bmtzmPtlelUeMuzkCPgiuY7OIHCMbstB9Xu5rbMUil7/Vk5L/5V8DWni2INkV2efMRfLXac3z9HuVU2HlsxXXoWdjoQB+KWVDwepjyJto7iuDSD0l6vNEt5Gl56VJsxjAwiJEPBlIfKUIiZkc=
+	t=1731027021; cv=none; b=IIfdY8TGpjRjIlyx3JGKlpazio12lMxvIb/xw1vjNl8yCotfUKjn45vP574MnP4sHASh/d4vGzFOnlBK1KME5yPIbDby+Qnt7XcOwJHiBUvOvm9sMd3egioXkow/7nYj11h6AgayQB8wruwVt3zD4+RGBAHwnvUqdKmG8o/gLi8=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731026996; c=relaxed/simple;
-	bh=nafpWMOADu46APbiYMLK49H+PNnEV7EPjrgjthxHYHU=;
+	s=arc-20240116; t=1731027021; c=relaxed/simple;
+	bh=b9Ss0amDD5dbu+G9Ta3eQsJ6ZdK55BZEmmCg16lppuU=;
 	h=From:To:CC:Subject:Date:Message-ID:In-Reply-To:References:
-	 MIME-Version:Content-Type; b=qwvyDcy8g5s4l8R0jEuDmEw1YurpYPgck2Or0d/n1nhy8G+aaSu5tpTJVViIiRzomz5f3mq/8wVbEKvTCL2E601/dYI02IIlV7vFcOPAmz53ugWtwW4ScCr/MK1H5WMNNxWlTOCFztFaUMxk7G05D2DnFdT7FSHsoPoWUh29ffY=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=IyLRAyw6; arc=none smtp.client-ip=52.95.49.90
+	 MIME-Version:Content-Type; b=d14ZW4BvxW/0cRQW+tl198LwCwOaPra4OnlXMqRSqKhetDji8L1G07TF4YrldH0plQEKLV2erkBO4sDrQVuvpYJg0RHooJ6d/ZX+vPYX1JYLFTAVkmXdzji2Rbvc1pZ5SXbzoWfLs/R+KTaAgU3TYpYhF86SgwAMyKjrH26xCYk=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com; spf=pass smtp.mailfrom=amazon.co.jp; dkim=pass (1024-bit key) header.d=amazon.com header.i=@amazon.com header.b=VeC+k7Uq; arc=none smtp.client-ip=207.171.188.206
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=amazon.com
 Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=amazon.co.jp
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1731026995; x=1762562995;
+  t=1731027020; x=1762563020;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=YutrCQc7H5HpgQkl2/wLc8GD3cwpkKlIcjmp/z19VMo=;
-  b=IyLRAyw67gl1FEKZ70Q3wguGIJyquKBmv9PAmQsX3ILHXBkvytMFBHPh
-   4DAZs++GWz8rGjG2e5HsM/D/smgXs2t8lc8sif55OFolNpy63bVuZlyxu
-   SQSmXi2bS9CZkbC+Ce2SkH5ggBM+zPfwJnYl8q2x4wQslWjyWDBlefcrE
-   o=;
+  bh=UBM/WicWZIV4hc78DSuZmiP7ITOQkkcXD1F3saaowk0=;
+  b=VeC+k7UqALQzN3vJcqgqVN6XHuJBUAzfR+tOUV9Jw5/hn5M2y9XCOqU+
+   LVtupMiIxcMjCUCVtdhUNADR1tvicaSFG2UrOyxvPAHt7PhadRvn8de4h
+   A+j4XHgjPMQjfnrgUgaQXLLjY40UwkZ9BwPO7xgmWObubbR9yFYPerjry
+   I=;
 X-IronPort-AV: E=Sophos;i="6.12,136,1728950400"; 
-   d="scan'208";a="447263886"
-Received: from iad6-co-svc-p1-lb1-vlan3.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.124.125.6])
-  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 00:49:51 +0000
-Received: from EX19MTAUWC001.ant.amazon.com [10.0.38.20:42713]
- by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.1.168:2525] with esmtp (Farcaster)
- id bdbe0427-ee67-4350-ab6c-f9c50d3136f9; Fri, 8 Nov 2024 00:49:50 +0000 (UTC)
-X-Farcaster-Flow-ID: bdbe0427-ee67-4350-ab6c-f9c50d3136f9
+   d="scan'208";a="773777590"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO smtpout.prod.us-west-2.prod.farcaster.email.amazon.dev) ([10.25.36.210])
+  by smtp-border-fw-9106.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 00:50:12 +0000
+Received: from EX19MTAUWB002.ant.amazon.com [10.0.21.151:6764]
+ by smtpin.naws.us-west-2.prod.farcaster.email.amazon.dev [10.0.35.42:2525] with esmtp (Farcaster)
+ id ffe7cfe1-e981-4c85-b11d-b59b5b8030b9; Fri, 8 Nov 2024 00:50:11 +0000 (UTC)
+X-Farcaster-Flow-ID: ffe7cfe1-e981-4c85-b11d-b59b5b8030b9
 Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.34;
- Fri, 8 Nov 2024 00:49:49 +0000
+ Fri, 8 Nov 2024 00:50:09 +0000
 Received: from 6c7e67c6786f.amazon.com (10.187.170.59) by
  EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1258.35;
- Fri, 8 Nov 2024 00:49:46 +0000
+ Fri, 8 Nov 2024 00:50:06 +0000
 From: Kuniyuki Iwashima <kuniyu@amazon.com>
 To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
@@ -66,9 +66,9 @@ CC: Andrew Lunn <andrew+netdev@lunn.ch>, Marc Kleine-Budde
  Borkmann" <daniel@iogearbox.net>, Nikolay Aleksandrov <razor@blackwall.org>,
 	Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
 	<kuni1840@gmail.com>, <netdev@vger.kernel.org>
-Subject: [PATCH RESEND v3 net-next 04/10] rtnetlink: Introduce struct rtnl_nets and helpers.
-Date: Thu, 7 Nov 2024 16:48:17 -0800
-Message-ID: <20241108004823.29419-5-kuniyu@amazon.com>
+Subject: [PATCH RESEND v3 net-next 05/10] rtnetlink: Add peer_type in struct rtnl_link_ops.
+Date: Thu, 7 Nov 2024 16:48:18 -0800
+Message-ID: <20241108004823.29419-6-kuniyu@amazon.com>
 X-Mailer: git-send-email 2.39.5 (Apple Git-154)
 In-Reply-To: <20241108004823.29419-1-kuniyu@amazon.com>
 References: <20241108004823.29419-1-kuniyu@amazon.com>
@@ -80,157 +80,154 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
-X-ClientProxiedBy: EX19D044UWA002.ant.amazon.com (10.13.139.11) To
+X-ClientProxiedBy: EX19D036UWC004.ant.amazon.com (10.13.139.205) To
  EX19D004ANA001.ant.amazon.com (10.37.240.138)
 
-rtnl_newlink() needs to hold 3 per-netns RTNL: 2 for a new device
-and 1 for its peer.
+In ops->newlink(), veth, vxcan, and netkit call rtnl_link_get_net() with
+a net pointer, which is the first argument of ->newlink().
 
-We will add rtnl_nets_lock() later, which performs the nested locking
-based on struct rtnl_nets, which has an array of struct net pointers.
+rtnl_link_get_net() could return another netns based on IFLA_NET_NS_PID
+and IFLA_NET_NS_FD in the peer device's attributes.
 
-rtnl_nets_add() adds a net pointer to the array and sorts it so that
-rtnl_nets_lock() can simply acquire per-netns RTNL from array[0] to [2].
+We want to get it and fill rtnl_nets->nets[] in advance in rtnl_newlink()
+for per-netns RTNL.
 
-Before calling rtnl_nets_add(), get_net() must be called for the net,
-and rtnl_nets_destroy() will call put_net() for each.
+All of the three get the peer netns in the same way:
 
-Let's apply the helpers to rtnl_newlink().
+  1. Call rtnl_nla_parse_ifinfomsg()
+  2. Call ops->validate() (vxcan doesn't have)
+  3. Call rtnl_link_get_net_tb()
 
-When CONFIG_DEBUG_NET_SMALL_RTNL is disabled, we do not call
-rtnl_net_lock() thus do not care about the array order, so
-rtnl_net_cmp_locks() returns -1 so that the loop in rtnl_nets_add()
-can be optimised to NOP.
+Let's add a new field peer_type to struct rtnl_link_ops and prefetch
+netns in the peer ifla to add it to rtnl_nets in rtnl_newlink().
 
 Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 Reviewed-by: Eric Dumazet <edumazet@google.com>
 Reviewed-by: Nikolay Aleksandrov <razor@blackwall.org>
 ---
 v2:
-  * Move struct rtnl_nets to net/core/rtnetlink.c
-  * Unexport rtnl_nets_add()
+  * Unexport rtnl_link_get_net_tb() and made it static
+  * Change peer_type to u16
+  * squash patch 2 & 3 (due to static requires a user)
 ---
- net/core/rtnetlink.c | 70 ++++++++++++++++++++++++++++++++++++++++++--
- 1 file changed, 67 insertions(+), 3 deletions(-)
+ include/net/rtnetlink.h |  2 ++
+ net/core/rtnetlink.c    | 55 ++++++++++++++++++++++++++++++++++++++---
+ 2 files changed, 53 insertions(+), 4 deletions(-)
 
+diff --git a/include/net/rtnetlink.h b/include/net/rtnetlink.h
+index ef7c11f0d74c..bef76abcff8d 100644
+--- a/include/net/rtnetlink.h
++++ b/include/net/rtnetlink.h
+@@ -75,6 +75,7 @@ static inline int rtnl_msg_family(const struct nlmsghdr *nlh)
+  *	@srcu: Used internally
+  *	@kind: Identifier
+  *	@netns_refund: Physical device, move to init_net on netns exit
++ *	@peer_type: Peer device specific netlink attribute number (e.g. VETH_INFO_PEER)
+  *	@maxtype: Highest device specific netlink attribute number
+  *	@policy: Netlink policy for device specific attribute validation
+  *	@validate: Optional validation function for netlink/changelink parameters
+@@ -116,6 +117,7 @@ struct rtnl_link_ops {
+ 	void			(*setup)(struct net_device *dev);
+ 
+ 	bool			netns_refund;
++	const u16		peer_type;
+ 	unsigned int		maxtype;
+ 	const struct nla_policy	*policy;
+ 	int			(*validate)(struct nlattr *tb[],
 diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 61bf710f97b8..1879a46a9d7e 100644
+index 1879a46a9d7e..fe65dd6cde8d 100644
 --- a/net/core/rtnetlink.c
 +++ b/net/core/rtnetlink.c
-@@ -258,8 +258,67 @@ bool lockdep_rtnl_net_is_held(struct net *net)
- 	return lockdep_rtnl_is_held() && lockdep_is_held(&net->rtnl_mutex);
+@@ -2492,9 +2492,10 @@ int rtnl_nla_parse_ifinfomsg(struct nlattr **tb, const struct nlattr *nla_peer,
  }
- EXPORT_SYMBOL(lockdep_rtnl_net_is_held);
-+#else
-+static int rtnl_net_cmp_locks(const struct net *net_a, const struct net *net_b)
-+{
-+	/* No need to swap */
-+	return -1;
-+}
- #endif
+ EXPORT_SYMBOL(rtnl_nla_parse_ifinfomsg);
  
-+struct rtnl_nets {
-+	/* ->newlink() needs to freeze 3 netns at most;
-+	 * 2 for the new device, 1 for its peer.
-+	 */
-+	struct net *net[3];
-+	unsigned char len;
-+};
+-struct net *rtnl_link_get_net(struct net *src_net, struct nlattr *tb[])
++static struct net *rtnl_link_get_net_ifla(struct nlattr *tb[])
+ {
+-	struct net *net;
++	struct net *net = NULL;
 +
-+static void rtnl_nets_init(struct rtnl_nets *rtnl_nets)
-+{
-+	memset(rtnl_nets, 0, sizeof(*rtnl_nets));
+ 	/* Examine the link attributes and figure out which
+ 	 * network namespace we are talking about.
+ 	 */
+@@ -2502,8 +2503,17 @@ struct net *rtnl_link_get_net(struct net *src_net, struct nlattr *tb[])
+ 		net = get_net_ns_by_pid(nla_get_u32(tb[IFLA_NET_NS_PID]));
+ 	else if (tb[IFLA_NET_NS_FD])
+ 		net = get_net_ns_by_fd(nla_get_u32(tb[IFLA_NET_NS_FD]));
+-	else
++
++	return net;
 +}
 +
-+static void rtnl_nets_destroy(struct rtnl_nets *rtnl_nets)
++struct net *rtnl_link_get_net(struct net *src_net, struct nlattr *tb[])
 +{
-+	int i;
++	struct net *net = rtnl_link_get_net_ifla(tb);
 +
-+	for (i = 0; i < rtnl_nets->len; i++) {
-+		put_net(rtnl_nets->net[i]);
-+		rtnl_nets->net[i] = NULL;
++	if (!net)
+ 		net = get_net(src_net);
++
+ 	return net;
+ }
+ EXPORT_SYMBOL(rtnl_link_get_net);
+@@ -3768,6 +3778,37 @@ static int rtnl_newlink_create(struct sk_buff *skb, struct ifinfomsg *ifm,
+ 	goto out;
+ }
+ 
++static int rtnl_add_peer_net(struct rtnl_nets *rtnl_nets,
++			     const struct rtnl_link_ops *ops,
++			     struct nlattr *data[],
++			     struct netlink_ext_ack *extack)
++{
++	struct nlattr *tb[IFLA_MAX + 1];
++	struct net *net;
++	int err;
++
++	if (!data || !data[ops->peer_type])
++		return 0;
++
++	err = rtnl_nla_parse_ifinfomsg(tb, data[ops->peer_type], extack);
++	if (err < 0)
++		return err;
++
++	if (ops->validate) {
++		err = ops->validate(tb, NULL, extack);
++		if (err < 0)
++			return err;
 +	}
 +
-+	rtnl_nets->len = 0;
++	net = rtnl_link_get_net_ifla(tb);
++	if (IS_ERR(net))
++		return PTR_ERR(net);
++	if (net)
++		rtnl_nets_add(rtnl_nets, net);
++
++	return 0;
 +}
 +
-+/**
-+ * rtnl_nets_add - Add netns to be locked before ->newlink().
-+ *
-+ * @rtnl_nets: rtnl_nets pointer passed to ->get_peer_net().
-+ * @net: netns pointer with an extra refcnt held.
-+ *
-+ * The extra refcnt is released in rtnl_nets_destroy().
-+ */
-+static void rtnl_nets_add(struct rtnl_nets *rtnl_nets, struct net *net)
-+{
-+	int i;
-+
-+	DEBUG_NET_WARN_ON_ONCE(rtnl_nets->len == ARRAY_SIZE(rtnl_nets->net));
-+
-+	for (i = 0; i < rtnl_nets->len; i++) {
-+		switch (rtnl_net_cmp_locks(rtnl_nets->net[i], net)) {
-+		case 0:
-+			put_net(net);
-+			return;
-+		case 1:
-+			swap(rtnl_nets->net[i], net);
-+		}
-+	}
-+
-+	rtnl_nets->net[i] = net;
-+	rtnl_nets->len++;
-+}
-+
- static struct rtnl_link __rcu *__rcu *rtnl_msg_handlers[RTNL_FAMILY_MAX + 1];
- 
- static inline int rtm_msgindex(int msgtype)
-@@ -3770,6 +3829,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	struct net *tgt_net, *link_net = NULL;
- 	struct rtnl_link_ops *ops = NULL;
- 	struct rtnl_newlink_tbs *tbs;
-+	struct rtnl_nets rtnl_nets;
- 	int ops_srcu_index;
- 	int ret;
- 
-@@ -3813,6 +3873,8 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- #endif
- 	}
- 
-+	rtnl_nets_init(&rtnl_nets);
-+
- 	if (ops) {
- 		if (ops->maxtype > RTNL_MAX_TYPE) {
- 			ret = -EINVAL;
-@@ -3842,6 +3904,8 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 		goto put_ops;
- 	}
- 
-+	rtnl_nets_add(&rtnl_nets, tgt_net);
-+
- 	if (tb[IFLA_LINK_NETNSID]) {
- 		int id = nla_get_s32(tb[IFLA_LINK_NETNSID]);
- 
-@@ -3852,6 +3916,8 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 			goto put_net;
+ static int __rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			  const struct rtnl_link_ops *ops,
+ 			  struct net *tgt_net, struct net *link_net,
+@@ -3896,12 +3937,18 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
+ 			if (ret < 0)
+ 				goto put_ops;
  		}
- 
-+		rtnl_nets_add(&rtnl_nets, link_net);
 +
- 		if (!netlink_ns_capable(skb, link_net->user_ns, CAP_NET_ADMIN)) {
- 			ret = -EPERM;
- 			goto put_net;
-@@ -3861,9 +3927,7 @@ static int rtnl_newlink(struct sk_buff *skb, struct nlmsghdr *nlh,
- 	ret = __rtnl_newlink(skb, nlh, ops, tgt_net, link_net, tbs, data, extack);
++		if (ops->peer_type) {
++			ret = rtnl_add_peer_net(&rtnl_nets, ops, data, extack);
++			if (ret < 0)
++				goto put_ops;
++		}
+ 	}
  
- put_net:
--	if (link_net)
--		put_net(link_net);
--	put_net(tgt_net);
-+	rtnl_nets_destroy(&rtnl_nets);
- put_ops:
- 	if (ops)
- 		rtnl_link_ops_put(ops, ops_srcu_index);
+ 	tgt_net = rtnl_link_get_net_capable(skb, sock_net(skb->sk), tb, CAP_NET_ADMIN);
+ 	if (IS_ERR(tgt_net)) {
+ 		ret = PTR_ERR(tgt_net);
+-		goto put_ops;
++		goto put_net;
+ 	}
+ 
+ 	rtnl_nets_add(&rtnl_nets, tgt_net);
 -- 
 2.39.5 (Apple Git-154)
 
