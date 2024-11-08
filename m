@@ -1,180 +1,131 @@
-Return-Path: <netdev+bounces-143285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 257369C1D05
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:31:22 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [IPv6:2604:1380:40f1:3f00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AD9E9C1D14
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 13:35:27 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEABA28612B
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:31:20 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 31556B25D8D
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:35:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6546D1EB21;
-	Fri,  8 Nov 2024 12:30:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A88EC1E6DEE;
+	Fri,  8 Nov 2024 12:35:23 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b="Go7R970h"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="utyTxDlu"
 X-Original-To: netdev@vger.kernel.org
-Received: from fllv0015.ext.ti.com (fllv0015.ext.ti.com [198.47.19.141])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2B5E1E7C06;
-	Fri,  8 Nov 2024 12:30:46 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=198.47.19.141
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D4421E6DC2;
+	Fri,  8 Nov 2024 12:35:23 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731069049; cv=none; b=r/Auh+Fv/OjqiVRndwaoHV89DckrBWDRRQHPw0Jw0oF/ucZEDAe5WL0EMsitGkCADJce1HK3pW4Xzs85YDJE8CQMmowg2sdCUoIWGyzsSBC7t6sG15ru+wmKFNHaBiit36+HuB4I2C5xLilqyl59l7AJ905im644E+SkBw9nbcw=
+	t=1731069323; cv=none; b=fHxdZxQKGk49cnkbALFmYrYejCH0f+QbCcKkaZK/Pf4uq6RgPjor1J+XXxCoHOoJVKfovFjwyDdGbaYyBkjVA7+AT2gpcMLUEhs/SvERMeCJfZu6T6rX3rHkKhK66puLEArOtHJxZQuh2Mox/hHzYSUbbq3ndmRDrGZyeaviz5A=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731069049; c=relaxed/simple;
-	bh=Ldm4gOTIksb3nGyt0Pl1ll27PtjAelWbJrhBkyzYrrk=;
-	h=Date:From:To:CC:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=NZGPOzXR6iig9xiBZt5Lj66PAmUeM5ran3bVuIswNNoBVK6iYiCg4I/rFuGe2u8+KSSkenN1zJVVHkGvSQ5azRquvZYhTBVIui0YsjOg2d4HaY4uoxrj8LBRB8jY2/Cu6qNDGji1C2l0zFXvmioOpTDhYnUCcmsQUNnZDzxlIJo=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com; spf=pass smtp.mailfrom=ti.com; dkim=pass (1024-bit key) header.d=ti.com header.i=@ti.com header.b=Go7R970h; arc=none smtp.client-ip=198.47.19.141
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=ti.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=ti.com
-Received: from lelv0265.itg.ti.com ([10.180.67.224])
-	by fllv0015.ext.ti.com (8.15.2/8.15.2) with ESMTP id 4A8CUUUS067685;
-	Fri, 8 Nov 2024 06:30:30 -0600
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1731069030;
-	bh=mLJWNoZktoBO6v4MYX1aptzzDn/jCQdbA65IirP2CYs=;
-	h=Date:From:To:CC:Subject:References:In-Reply-To;
-	b=Go7R970hAZD8Dp0jhW+EXrGCw4u+TkKtu5SGWVhtOEFhcv/tZF0RY4alZanxMPVeP
-	 0X6bB/KR3pO48ikHRNatEbZU3QOCKGpBUw2mh22WpkkeCqt0VSAvfqnWTslVxkq9Lz
-	 +EQQ/p3pzVKxBVXetES6f7Lb40bar0fT+57qKNgk=
-Received: from DFLE100.ent.ti.com (dfle100.ent.ti.com [10.64.6.21])
-	by lelv0265.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 4A8CUUBC005948
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 8 Nov 2024 06:30:30 -0600
-Received: from DFLE109.ent.ti.com (10.64.6.30) by DFLE100.ent.ti.com
- (10.64.6.21) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 8
- Nov 2024 06:30:29 -0600
-Received: from lelvsmtp6.itg.ti.com (10.180.75.249) by DFLE109.ent.ti.com
- (10.64.6.30) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 8 Nov 2024 06:30:30 -0600
-Received: from localhost (uda0492258.dhcp.ti.com [10.24.72.81])
-	by lelvsmtp6.itg.ti.com (8.15.2/8.15.2) with ESMTP id 4A8CUSlk004575;
-	Fri, 8 Nov 2024 06:30:29 -0600
-Date: Fri, 8 Nov 2024 18:00:28 +0530
-From: Siddharth Vadapalli <s-vadapalli@ti.com>
-To: Roger Quadros <rogerq@kernel.org>
-CC: Siddharth Vadapalli <s-vadapalli@ti.com>,
-        Andrew Lunn
-	<andrew+netdev@lunn.ch>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni
-	<pabeni@redhat.com>, Simon Horman <horms@kernel.org>,
-        <linux-omap@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <srk@ti.com>,
-        Pekka Varis <p-varis@ti.com>
-Subject: Re: [PATCH net-next 2/2] net: ethernet: ti: am65-cpsw: enable DSCP
- to priority map for RX
-Message-ID: <8e6053ca-77fc-4f03-ae54-3f6af0addb88@ti.com>
-References: <20241105-am65-cpsw-multi-rx-dscp-v1-0-38db85333c88@kernel.org>
- <20241105-am65-cpsw-multi-rx-dscp-v1-2-38db85333c88@kernel.org>
+	s=arc-20240116; t=1731069323; c=relaxed/simple;
+	bh=4m2I6aeuCoEFLcGiO83TcAhndU+Pitbz1bmGr/HxeJU=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=TbDb0913uY5u4BzAmuA/vPBBY5jv0WTVJUDvq6DKj8BzBJ2NJg2ubfZUiAQVAH1ZEEVmDFZNIDLClXWczwh8BqDXRWmT7gt9OzNyLT5ClSIWi098EpzKnlxd9GFWvE+f91OxbBWK3poONtqA4axDnLsEV+4uSGneEX/UHQDT4Dw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=utyTxDlu; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 56C2BC4CECD;
+	Fri,  8 Nov 2024 12:35:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1731069323;
+	bh=4m2I6aeuCoEFLcGiO83TcAhndU+Pitbz1bmGr/HxeJU=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=utyTxDlu1runBGW33lTYzxxrPZE5mtfpchYPq884CBMZE93Vv7qV7fMzqEuSjUEGJ
+	 QMjxN6bmpf94vPi7E1/NGHjCShZ+f5ien1HNsDmBjzBNA6RuyKb3+sHfqZsCFpenWq
+	 hl2w0nvUx6m8y8oRrlgIpV1ieAIfzrJZN38SxCrvWJhkDIfSMiJ0XIcJlcJhMq0YbP
+	 X4V0mOyQXhCVCPnvpaiR4AfiVwpzq69GMAfVv4VLPt9IWbNWkpPvM4if4gWULZD+8N
+	 e1ftaJIor8Mfaz3tnF3bfXORoDMKL+oKwZSECJEGNYctTUH5mOa2A87ElIhFsyHimv
+	 ASygwu5UuyYRg==
+Message-ID: <4e134d6c-645c-4b2a-8f52-845c25e53de6@kernel.org>
+Date: Fri, 8 Nov 2024 13:35:18 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20241105-am65-cpsw-multi-rx-dscp-v1-2-38db85333c88@kernel.org>
-X-C2ProcessedOrg: 333ef613-75bf-4e12-a4b1-8e3623f5dcea
+User-Agent: Mozilla Thunderbird Beta
+Subject: Re: [PATCH net 0/2] mptcp: fix a couple of races
+Content-Language: en-GB
+To: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Cc: Mat Martineau <martineau@kernel.org>, Geliang Tang <geliang@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Simon Horman <horms@kernel.org>,
+ mptcp@lists.linux.dev
+References: <cover.1731060874.git.pabeni@redhat.com>
+From: Matthieu Baerts <matttbe@kernel.org>
+Autocrypt: addr=matttbe@kernel.org; keydata=
+ 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
+ lzVbFe7fduHbABmYz9cefQpO7wDE/Q==
+Organization: NGI0 Core
+In-Reply-To: <cover.1731060874.git.pabeni@redhat.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On Tue, Nov 05, 2024 at 04:18:11PM +0200, Roger Quadros wrote:
+Hi Paolo,
 
-Hello Roger,
-
-> AM65 CPSW hardware can map the 6-bit DSCP/TOS field to
-> appropriate priority queue via DSCP to Priority mapping registers
-> (CPSW_PN_RX_PRI_MAP_REG).
+On 08/11/2024 11:58, Paolo Abeni wrote:
+> The first patch addresses a division by zero issue reported by Eric,
+> the second one solves a similar issue found by code inspection while
+> investigating the former.
 > 
-> We use the upper 3 bits of the DSCP field that indicate IP Precedence
-> to map traffic to 8 priority queues.
-> 
-> Signed-off-by: Roger Quadros <rogerq@kernel.org>
-> ---
->  drivers/net/ethernet/ti/am65-cpsw-nuss.c | 50 ++++++++++++++++++++++++++++++++
->  1 file changed, 50 insertions(+)
-> 
-> diff --git a/drivers/net/ethernet/ti/am65-cpsw-nuss.c b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> index 0520e9f4bea7..65fbf6727e02 100644
-> --- a/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> +++ b/drivers/net/ethernet/ti/am65-cpsw-nuss.c
-> @@ -71,6 +71,8 @@
->  #define AM65_CPSW_PORT_REG_RX_PRI_MAP		0x020
->  #define AM65_CPSW_PORT_REG_RX_MAXLEN		0x024
->  
-> +#define AM65_CPSW_PORTN_REG_CTL			0x004
+> Paolo Abeni (2):
+>   mptcp: error out earlier on disconnect
+>   mptcp: cope racing subflow creation in mptcp_rcv_space_adjust
 
-nitpick: indentation needs to be fixed here to align with the macros
-below.
+Thank you for the patches! This looks good to me and can be applied in
+'net' directly.
 
-> +#define AM65_CPSW_PORTN_REG_DSCP_MAP		0x120
->  #define AM65_CPSW_PORTN_REG_SA_L		0x308
->  #define AM65_CPSW_PORTN_REG_SA_H		0x30c
->  #define AM65_CPSW_PORTN_REG_TS_CTL              0x310
-> @@ -94,6 +96,10 @@
->  /* AM65_CPSW_PORT_REG_PRI_CTL */
->  #define AM65_CPSW_PORT_REG_PRI_CTL_RX_PTYPE_RROBIN	BIT(8)
->  
-> +/* AM65_CPSW_PN_REG_CTL */
-> +#define AM65_CPSW_PN_REG_CTL_DSCP_IPV4_EN	BIT(1)
-> +#define AM65_CPSW_PN_REG_CTL_DSCP_IPV6_EN	BIT(2)
-> +
->  /* AM65_CPSW_PN_TS_CTL register fields */
->  #define AM65_CPSW_PN_TS_CTL_TX_ANX_F_EN		BIT(4)
->  #define AM65_CPSW_PN_TS_CTL_TX_VLAN_LT1_EN	BIT(5)
-> @@ -176,6 +182,49 @@ static void am65_cpsw_port_set_sl_mac(struct am65_cpsw_port *slave,
->  	writel(mac_lo, slave->port_base + AM65_CPSW_PORTN_REG_SA_L);
->  }
->  
-> +#define AM65_CPSW_DSCP_MAX	GENMASK(5, 0)
-> +#define AM65_CPSW_PRI_MAX	GENMASK(2, 0)
-> +static int am65_cpsw_port_set_dscp_map(struct am65_cpsw_port *slave, u8 dscp, u8 pri)
-> +{
-> +	int reg_ofs;
-> +	int bit_ofs;
-> +	u32 val;
-> +
-> +	if (dscp > AM65_CPSW_DSCP_MAX)
-> +		return -EINVAL;
+Reviewed-by: Matthieu Baerts (NGI0) <matttbe@kernel.org>
 
-am65_cpsw_port_set_dscp_map() seems to be invoked by
-am65_cpsw_port_enable_dscp_map() below, where the above check is guaranteed
-to be satisfied. Is the check added for future-proofing this function?
+Cheers,
+Matt
+-- 
+Sponsored by the NGI0 Core fund.
 
-> +
-> +	if (pri > AM65_CPSW_PRI_MAX)
-> +		return -EINVAL;
-> +
-> +	reg_ofs = (dscp / 8) * 4;	/* reg offset to this dscp */
-> +	bit_ofs = 4 * (dscp % 8);	/* bit offset to this dscp */
-
-Maybe a macro can be used for the "4" since it is not clear what it
-corresponds to. Or maybe two macros can be used for "reg_ofs" and
-"bit_ofs".
-
-> +	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-> +	val &= ~(AM65_CPSW_PRI_MAX << bit_ofs);	/* clear */
-> +	val |= pri << bit_ofs;			/* set */
-> +	writel(val, slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-> +	val = readl(slave->port_base + AM65_CPSW_PORTN_REG_DSCP_MAP + reg_ofs);
-
-The above readback seems to be just to flush the writel(). A comment of
-the form:
-/* flush */
-might help, considering that other drivers do the same. Also, assigning
-the returned value to "val" might not be required unless it is intended to
-be checked.
-
-[...]
-
-Regards,
-Siddharth.
 
