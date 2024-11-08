@@ -1,34 +1,34 @@
-Return-Path: <netdev+bounces-143269-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143270-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
-	by mail.lfdr.de (Postfix) with ESMTPS id 268429C1C37
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:33:38 +0100 (CET)
+Received: from sy.mirrors.kernel.org (sy.mirrors.kernel.org [147.75.48.161])
+	by mail.lfdr.de (Postfix) with ESMTPS id 126419C1C43
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 12:37:25 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by am.mirrors.kernel.org (Postfix) with ESMTPS id A3D211F237DF
-	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:33:37 +0000 (UTC)
+	by sy.mirrors.kernel.org (Postfix) with ESMTPS id 92AC3B21E39
+	for <lists+netdev@lfdr.de>; Fri,  8 Nov 2024 11:37:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66B31E378D;
-	Fri,  8 Nov 2024 11:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DA9A1E47A1;
+	Fri,  8 Nov 2024 11:37:18 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="A3n5ikA7"
+	dkim=fail reason="signature verification failed" (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b="QUgJbql/"
 X-Original-To: netdev@vger.kernel.org
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [78.32.30.218])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C17D1E2858;
-	Fri,  8 Nov 2024 11:33:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC4191E22FA;
+	Fri,  8 Nov 2024 11:37:15 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=78.32.30.218
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731065613; cv=none; b=RtdRdQ2j9SB3nJDEq5rEIMZQsVHJ7dccEwSAgGZKtBg8jQY14GPNGmzBNNOONww31knlpb2haJucumIKNI8psopAaLbdTMpNl4OfoNmOH5/Wr/8xxNq7Hp5WvdEqog8sPkpkHZXJJcBir8QtgkB8sY9fgCM9iNWzGRa+rD3Eqos=
+	t=1731065838; cv=none; b=NnudPMUky9XQZ5hwnBfJPN8wCi/SwvLlvr5jH6r+usu1UbZB2rRn5bdv24M/wxG0Z5kTVvoz2jZBc3mdpUYV30aH8rtXwYIW7Ur3OshdQbscA4/O1Zvr9qdcHeuNz+qv4dx6/gTLfotiHJtWispZ5fziXJytt0r5+J8Urkq2ZGU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731065613; c=relaxed/simple;
-	bh=LV7sIanrhOHm+4SGC8DkFx60M6wRG5hygFTvG7O7XJ4=;
+	s=arc-20240116; t=1731065838; c=relaxed/simple;
+	bh=9q9uVvLqHBGdEXJFJ+lqyHUhiXg3rvlAytAtHyinnIU=;
 	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=RbwAGE8kyb38rQPLJ82lQeC8fCp923qu4Ft0Mlqrz2mku7GacJGJUrVXkzN+bU3tUPswUa2fHHUiqXdXUjcj7kQJTX4d3x5BW0BxONia8pjIVgSdTJhtCOw579KCr7V4ZNTo+H7s1pWeMuHXtloM9AIeLAe71DrMMb3ABY89WM0=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=A3n5ikA7; arc=none smtp.client-ip=78.32.30.218
+	 Content-Type:Content-Disposition:In-Reply-To; b=Orr3VQrmOwMN7N6P1ciYTyQHmu3xK6QkMYNnSGx4ENOZv9YPZ2bGefPO+0aqSx4jWn8wqo3Q5lIiibaXkIJh0sVo+FGmciJoHpBIAWRoB0jymwZtyjSuAbFTBl1gwqB/8VxcsuST3hTGVs5ydATZbQDUzT5lipzR9CC+9EpOjmI=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk; spf=none smtp.mailfrom=armlinux.org.uk; dkim=pass (2048-bit key) header.d=armlinux.org.uk header.i=@armlinux.org.uk header.b=QUgJbql/; arc=none smtp.client-ip=78.32.30.218
 Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=armlinux.org.uk
 Authentication-Results: smtp.subspace.kernel.org; spf=none smtp.mailfrom=armlinux.org.uk
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
@@ -37,42 +37,47 @@ DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
 	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
 	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=tlHjCfRteXu58BjoW1uzXoJ5VXyhMAoQV0ggR8gszgQ=; b=A3n5ikA7/oGGqiqyRWg/SaNHGQ
-	J0PJD0HyKq4zi8avJAACBQwVr9L75+ExiNnp3oABWbBDl0yA4kFvTX6O8NsALAb3jc7iGG+IofYuK
-	wPKPMjU7WlgJzfODVFTTqXiq/7AipDF5vt5HcGlFbGbgSNzMg8irXJ0M9DLPXfSJgwPkmgBpnd01L
-	Z0nAomJk2RLHkEghje+xRZkIv9FksOQnSgljLZnpOSZQzI/+VHsywdiWk2ye558o977fob2RplxCZ
-	3pDso7dlFKFydGHlXcgpVpK2nkqFnxe0NhFd0zwiqSspKUqUUtUTFER1UwOnLIGjf8EpnhC752IGM
-	DrxuW80A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33240)
+	bh=EejnXOL6AJ8kMqdm0i2xcZanHtQNUcxhRjUP4k55h+k=; b=QUgJbql/k5OgkEBg8SmAJYS29T
+	B6mTbk9y3xIYzklSnufSDRl0yZiHr+R5OIEdtAJm8KNe5foj8vcDyTX/h557sS+7qO1mAU9OU1yR+
+	AYjwEZlkYqTwgPrAbko+oLzaPb4AOSGh0wMGjZhgqLOIG0QWqJ/Piq1Y/i0PtHWiUNLSaBYP1MqJG
+	GOdYK0cPvk0/jOxShOwMoUIknQuS+sS5W52CY5BrkCWjIM6GQMiAnD+gd6keaTdCx+jwgsvn3+4d3
+	DW2ZtnZAW16GnVH+uEOAAg+b5j0P4MGT8A5rIo+VMZrAYYXQoKUO0LyC/atIlemBcbxM5R852Mr4e
+	TTDRlM9A==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:56186)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.96)
 	(envelope-from <linux@armlinux.org.uk>)
-	id 1t9NEs-00052L-1F;
-	Fri, 08 Nov 2024 11:33:18 +0000
+	id 1t9NIW-000533-2q;
+	Fri, 08 Nov 2024 11:37:05 +0000
 Received: from linux by shell.armlinux.org.uk with local (Exim 4.96)
 	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1t9NEq-0002Ep-2F;
-	Fri, 08 Nov 2024 11:33:16 +0000
-Date: Fri, 8 Nov 2024 11:33:16 +0000
+	id 1t9NIU-0002Ez-2Z;
+	Fri, 08 Nov 2024 11:37:02 +0000
+Date: Fri, 8 Nov 2024 11:37:02 +0000
 From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Daniel Machon <daniel.machon@microchip.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, UNGLinuxDriver@microchip.com,
-	Andrew Lunn <andrew+netdev@lunn.ch>,
-	"David S. Miller" <davem@davemloft.net>,
+To: Lei Wei <quic_leiwei@quicinc.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lars Povlsen <lars.povlsen@microchip.com>,
-	Steen Hegelund <Steen.Hegelund@microchip.com>,
-	Horatiu Vultur <horatiu.vultur@microchip.com>,
-	jacob.e.keller@intel.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org
-Subject: Re: [PATCH net-next 7/7] net: lan969x: add function for configuring
- RGMII port devices
-Message-ID: <Zy32_Bs7gDAtay5V@shell.armlinux.org.uk>
-References: <20241106-sparx5-lan969x-switch-driver-4-v1-0-f7f7316436bd@microchip.com>
- <20241106-sparx5-lan969x-switch-driver-4-v1-7-f7f7316436bd@microchip.com>
- <6fee4db6-0085-4ce8-a6b5-050fddd0bc5a@lunn.ch>
- <20241108085320.fqbell5bfx3roey4@DEN-DL-M70577>
+	Rob Herring <robh@kernel.org>,
+	Krzysztof Kozlowski <krzk+dt@kernel.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, netdev@vger.kernel.org,
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+	quic_kkumarcs@quicinc.com, quic_suruchia@quicinc.com,
+	quic_pavir@quicinc.com, quic_linchen@quicinc.com,
+	quic_luoj@quicinc.com, srinivas.kandagatla@linaro.org,
+	bartosz.golaszewski@linaro.org, vsmuthu@qti.qualcomm.com,
+	john@phrozen.org
+Subject: Re: [PATCH net-next 3/5] net: pcs: qcom-ipq: Add PCS create and
+ phylink operations for IPQ9574
+Message-ID: <Zy333s8o77qE5F_-@shell.armlinux.org.uk>
+References: <20241101-ipq_pcs_rc1-v1-0-fdef575620cf@quicinc.com>
+ <20241101-ipq_pcs_rc1-v1-3-fdef575620cf@quicinc.com>
+ <d7782a5e-2f67-4f62-a594-0f52144a368f@lunn.ch>
+ <9b3a4f00-59f2-48d1-8916-c7d7d65df063@quicinc.com>
+ <a0826aa8-703c-448d-8849-47808f847774@lunn.ch>
+ <9b7def00-e900-4c5e-ba95-671bd1ef9240@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -81,75 +86,32 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20241108085320.fqbell5bfx3roey4@DEN-DL-M70577>
+In-Reply-To: <9b7def00-e900-4c5e-ba95-671bd1ef9240@quicinc.com>
 Sender: Russell King (Oracle) <linux@armlinux.org.uk>
 
-On Fri, Nov 08, 2024 at 08:53:20AM +0000, Daniel Machon wrote:
-> Hi Andrew,
-> 
-> > > +     if (conf->phy_mode == PHY_INTERFACE_MODE_RGMII ||
-> > > +         conf->phy_mode == PHY_INTERFACE_MODE_RGMII_TXID)
-> > > +             rx_delay = true;
-> > > +
-> > > +     if (conf->phy_mode == PHY_INTERFACE_MODE_RGMII ||
-> > > +         conf->phy_mode == PHY_INTERFACE_MODE_RGMII_RXID)
-> > > +             tx_delay = true;
+On Fri, Nov 08, 2024 at 07:31:31PM +0800, Lei Wei wrote:
+> On 11/6/2024 11:43 AM, Andrew Lunn wrote:
+> > On Wed, Nov 06, 2024 at 11:16:37AM +0800, Lei Wei wrote:
+> > > On 11/1/2024 9:21 PM, Andrew Lunn wrote:
+> > > > How does Qualcomm SGMII AN mode differ from Cisco SGMII AN mode?
+> > > 
+> > > Qualcomm SGMII AN mode extends Cisco SGMII spec Revision 1.8 by adding pause
+> > > bit support in the SGMII word format. It re-uses two of the reserved bits
+> > > 1..9 for this purpose. The PCS supports both Qualcomm SGMII AN and Cisco
+> > > SGMII AN modes.
 > > 
-> > O.K, now warning bells are ringing in this reviews head.
-> > 
-> > What i don't see is the value you pass to the PHY? You obviously need
-> > to mask out what the MAC is doing when talking to the PHY, otherwise
-> > both ends will add delays.
-> > 
+> > Is Qualcomm SGMII AN actually needed? I assume it only works against a
+> > Qualcomm PHY? What interoperability testing have you do against
+> > non-Qualcomm PHYs?
 > 
-> What value should be passed to the PHY?
+> I agree that using Cisco SGMII AN mode as default is more appropriate,
+> since is more commonly used with PHYs. I will make this change.
 > 
-> We (the MAC) add the delays based on the PHY modes - so does the PHY.
-> 
-> RGMII, we add both delays.
-> RGMII_ID, the PHY adds both delays.
-> RGMII_TXID, we add the rx delay, the PHY adds the tx delay.
-> RGMII_RXID, we add the tx delay, the PHY adds the rx delay.
-> 
-> Am I missing something here? :-)
+> Qualcomm SGMII AN is an extension of top of Cisco SGMII AN (only
+> pause bits difference). So it is expected to be compatible with
+> non-Qualcomm PHYs which use Cisco SGMII AN.
 
-What if the board routing adds the necessary delays?
-
-From Documentation/networking/phy.rst:
-"
-* PHY_INTERFACE_MODE_RGMII: the PHY is not responsible for inserting any
-  internal delay by itself, it assumes that either the Ethernet MAC (if capable)
-  or the PCB traces insert the correct 1.5-2ns delay
-...
-For cases where the PHY is not capable of providing this delay, but the
-Ethernet MAC driver is capable of doing so, the correct phy_interface_t value
-should be PHY_INTERFACE_MODE_RGMII, and the Ethernet MAC driver should be
-configured correctly in order to provide the required transmit and/or receive
-side delay from the perspective of the PHY device. Conversely, if the Ethernet
-MAC driver looks at the phy_interface_t value, for any other mode but
-PHY_INTERFACE_MODE_RGMII, it should make sure that the MAC-level delays are
-disabled."
-
-The point here is that you have three entities that can deal with the
-required delays - the PHY, the board, and the MAC.
-
-PHY_INTERFACE_MODE_RGMII* passed to phylink/phylib tells the PHY how it
-should program its delay capabilities.
-
-We're then down to dealing with the MAC and board induced delays. Many
-implementations use the rx-internal-delay-ps and tx-internal-delay-ps
-properties defined in the ethernet-controller.yaml DT binding to
-control the MAC delays.
-
-However, there are a few which use PHY_INTERFACE_MODE_RGMII* on the MAC
-end, but in this case, they always pass PHY_INTERFACE_MODE_RGMII to
-phylib to stop the PHY adding any delays.
-
-However, we don't have a way at present for DSA/phylink etc to handle a
-MAC that wants to ddd its delays with the PHY set to
-PHY_INTERFACE_MODE_RGMII.
-
-Thanks.
+I believe Marvell have similar extensions.
 
 -- 
 RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
