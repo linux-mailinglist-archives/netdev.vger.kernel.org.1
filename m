@@ -1,215 +1,479 @@
-Return-Path: <netdev+bounces-143464-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143465-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C84E9C28FD
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 01:49:51 +0100 (CET)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 630A49C2903
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 02:01:04 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2F760282CA7
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 00:49:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 686131C20FEF
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 01:01:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57D348836;
-	Sat,  9 Nov 2024 00:49:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65BCA13AD0;
+	Sat,  9 Nov 2024 01:00:59 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b="Hs9dZVgy"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="ie+2FbvS"
 X-Original-To: netdev@vger.kernel.org
-Received: from mail-ed1-f44.google.com (mail-ed1-f44.google.com [209.85.208.44])
+Received: from mail-ed1-f52.google.com (mail-ed1-f52.google.com [209.85.208.52])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 766CE3232
-	for <netdev@vger.kernel.org>; Sat,  9 Nov 2024 00:49:45 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.44
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487AB2907;
+	Sat,  9 Nov 2024 01:00:57 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.208.52
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731113387; cv=none; b=s+OIf8hJDYxUsuzgk6rqFgyzP1lfvHLTrYJDlX/RWixp6cIGFylS50elHeaOcQFy/H08XuKviFEHfZwZ4pA6ZRZf96ZLUtyS3Dihpx1sT8lTOwsDNMNHvnPMHKukb8akLxYQjIA+Yc+xMdPVq2xRtBvs1GjaBO6Wv7RPUPqNCxE=
+	t=1731114059; cv=none; b=Xbuh+A/ANZC5EEq4tWYO612bRvr7OEJZSbqt5PpedViLDyObJ6U2eyTrUjdfd8Xo1frBo209lWxlTwKCEYcKTPfsLYSL/b5ydMneNYKWAwjxEE1CDv+IbITFgeCBNVq6O84xPsxnTVbanBgB35gp86ap7bCrTIUB0gxiGb9NXpw=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731113387; c=relaxed/simple;
-	bh=ybJVNlmPgIpJzQvWMuwmN2tVBStGC70PA63DSCDmhLY=;
-	h=MIME-Version:References:In-Reply-To:From:Date:Message-ID:Subject:
-	 To:Cc:Content-Type; b=LQNDaVVnmh5a/UqhTFhM989HAKa8qQvsf0wqKJmUQuH1a35RjNVM5zwFD7gXH2oe0FXTlOInB/4Db7J5o2G4AqkWplJCCy8kBElCdI9v46HPCYs9zdKdIaeZz2DlS8oJaHsVjz5OU9iXoaV2AjRBlLu3Bo5rwfyEiZDx2SAZIR4=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com; spf=fail smtp.mailfrom=broadcom.com; dkim=pass (1024-bit key) header.d=broadcom.com header.i=@broadcom.com header.b=Hs9dZVgy; arc=none smtp.client-ip=209.85.208.44
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=quarantine dis=none) header.from=broadcom.com
-Authentication-Results: smtp.subspace.kernel.org; spf=fail smtp.mailfrom=broadcom.com
-Received: by mail-ed1-f44.google.com with SMTP id 4fb4d7f45d1cf-5cebcf96fabso3278977a12.3
-        for <netdev@vger.kernel.org>; Fri, 08 Nov 2024 16:49:45 -0800 (PST)
+	s=arc-20240116; t=1731114059; c=relaxed/simple;
+	bh=HiSWVutRq5BtnbCSfDyxJ1/7IRGzN//GfzMtw2lJxUc=;
+	h=Message-ID:Date:MIME-Version:Subject:To:Cc:References:From:
+	 In-Reply-To:Content-Type; b=AfRwaMNMZCqdlnEFyH+wC/0M0nU/vza/G/WC1Cc+TP+s9bOsDGiQjVOWwnkJsM/Wea+0sgotBPw1d4Bmwm7LoYdhy8ZNOr4vhkKXdZQJ2Zn01YNgHr4pp7KBbjVT4d+xpdZcOvU8P59xd0e6Pk/9ZOen9F6/cer9kDRFr0mUeDQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=ie+2FbvS; arc=none smtp.client-ip=209.85.208.52
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-ed1-f52.google.com with SMTP id 4fb4d7f45d1cf-5c9388a00cfso3281961a12.3;
+        Fri, 08 Nov 2024 17:00:56 -0800 (PST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1731113384; x=1731718184; darn=vger.kernel.org;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=P450+ninpK5BDT4JnR2mP2okQIE2SLPS+/x1Mp9j4j4=;
-        b=Hs9dZVgyJygDt1nuT9m8wLfjtGrvhHdnP9UWpxG/ePd33JSnL/GoqZETaQBO5DKvnZ
-         0zvi9o88xgdhjKilWhHwwOwBGLbsiIgB8S5v8ZD4FBg0JWjEW7YG0G2KF/EDWMZuUFaZ
-         DB7Jr5f0IIyWVVVj2SDgCPAKD4sZaTdPPNFTA=
+        d=gmail.com; s=20230601; t=1731114055; x=1731718855; darn=vger.kernel.org;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=n0xQhNZLtXtauDzznrpbqveqNXBK+PLKMn43IeaKpec=;
+        b=ie+2FbvSlcBrnKTjEWgreRA59AiELERw9o07npPMzNFP+/HpryfRHsfH2U58C2hhEh
+         L+hgJw0BnmuRYOocbo1b5+vujVdDSMLDtideJajMZz7sMsLWQbthgX+0sEAjnNH6gi3t
+         bYUyZ+RAehMSo877s+DPDATWmiFBkMq2qRhCZfCB7di2oB6jHC+urASrhVv7xgmI0fmi
+         W8HNFpArJxPAtm3lFVVsIkhwKpFeau9B3Lqnf5ybqXmlcDTocwvBUpXKiv3beD8+5THj
+         pHT12cGfIvp0RwywEtizyiARtfwu6QNsvgv+WzCpcqcBsRpYt1n+8bphXvF6/4CCvso2
+         yx3A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20230601; t=1731113384; x=1731718184;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=P450+ninpK5BDT4JnR2mP2okQIE2SLPS+/x1Mp9j4j4=;
-        b=ox+TwLLr1LXHFmj8OEk9mlrxE30M6se85cOKFZ2MIInfXIO61oh5ih3xgWjTGNMEx5
-         nCyV7HdMn4MvizX/doOrObKWVrmIkUwepwCQGwWavqBN7kgYUDfxSUQ2x7LytJ6mSsF4
-         Z8aIJZDIs69j4FUeKQuyipTnstN0/oUJ15HW1Harwag4YA2KE++/NtqzfN3j4WFplrTR
-         FXEpVqQplqbQdWlFfxtvMWePsG7g+qVM0Lzq9pndtoITXEpuGIOpxgW/wf05K2qWXQYw
-         m9M3Xbd8oISY6E8u0qf0jv4IK62h4Cap2WvEJcUoEvplEQdUZVMMdl/CfUY8igZPY//M
-         TX0A==
-X-Forwarded-Encrypted: i=1; AJvYcCUsOUdrHmhm0y32Tuvfib6WAOxFP9UXUKV3D79ySNsiqtCRFkQYkg70ef3pD+K89DO4SiMNBg8=@vger.kernel.org
-X-Gm-Message-State: AOJu0Ywjy/LP8npuApMhzZXMjNJCFjHvUOjwKCYnMPQlp3QwcD7JA9N6
-	0zX2FFcfnr4GzuwPi8syf1CaAZ7B7dnuHwCvNKbxCLYIQiuCVyrZqNog4+x0heQapolvw88QWXM
-	bGoYTN8XYF/Lh3rze/AzNNrKsLz0v/4QFwsDf
-X-Google-Smtp-Source: AGHT+IFWiX9T0IL17WPOrjqM9umRynyzmKKW8xayjCUGHCBHcEfPVS3fAtAVTtlJ0AEwsOJf5JyS/SZIVPuHwneOVP0=
-X-Received: by 2002:a05:6402:34cc:b0:5c9:7dd9:3eda with SMTP id
- 4fb4d7f45d1cf-5cf0a308759mr3027397a12.5.1731113383699; Fri, 08 Nov 2024
- 16:49:43 -0800 (PST)
+        d=1e100.net; s=20230601; t=1731114055; x=1731718855;
+        h=content-transfer-encoding:in-reply-to:content-language:from
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=n0xQhNZLtXtauDzznrpbqveqNXBK+PLKMn43IeaKpec=;
+        b=ekofYX62ssnPfMpX7x0zlEnnJvtWcad9cFenE5SvcXmqpKlOixITTtxn2mBA4aGkVT
+         sdKCUF3e7UpYzRHbqa+1sMZ/GTZMaomyFJ15Za7RKwihTedcXbcY7Jsoi+d70WrfKbKT
+         G7vPvGoQzuQpMqYFmFRsTN6tR1cZuZ+oPPjJLTkFq7ZyaSFv7jpMwiV59KuTIQ9xT78O
+         WjJTiTMIjAeFm6tWCTaF708dJKjUNk+cKzOz/MSqFRFeNq1lwXXgGwk7P5d10xYTnD1l
+         uu321BTmwUjRSru5NYrs/D9kmIqnN8jXykFhzlUX3AFJ2HBbA/4D0uXZAycFdQmZ5cSA
+         3Tfg==
+X-Forwarded-Encrypted: i=1; AJvYcCVVC29TKBHGgwz0vUAZ/BcltFRmSH1/x3qUixABl+rPf4zBNfaO3sVYeBmBQ1LrynZFkFUSDqbdgpYaF+K+/bDs@vger.kernel.org, AJvYcCVhR+jrVEK59oj9QJcs4yZKn6utsyLJtxr0zM1QOo5ngGOtTWIivZAcXrE7CifSc1+p/tngRFJYfs4Woss=@vger.kernel.org
+X-Gm-Message-State: AOJu0YzatwfZbrzL4u3EuHx7nNZ+r41RgxoFCKiiIr8StKz3XJ1a01C+
+	oe17c7EOj7FARPImZyfMCuPrA0/gRQUh7ckEgTgEr/TbVq8aOtOg
+X-Google-Smtp-Source: AGHT+IFhP3lcqOhRJbJketbysrUgPFFL2THMjO4OhFI2pTMBUVfezLmuTcCbHdqxwdIxM2Ewlx4aiQ==
+X-Received: by 2002:a05:6402:27c9:b0:5cf:f82:ea14 with SMTP id 4fb4d7f45d1cf-5cf0f82ebd0mr3366495a12.5.1731114055297;
+        Fri, 08 Nov 2024 17:00:55 -0800 (PST)
+Received: from [192.168.0.2] ([69.6.8.124])
+        by smtp.gmail.com with ESMTPSA id 4fb4d7f45d1cf-5cf03c5e382sm2502417a12.60.2024.11.08.17.00.51
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 08 Nov 2024 17:00:53 -0800 (PST)
+Message-ID: <2fd3dc9c-9d6a-494c-a4d8-a45221bf250d@gmail.com>
+Date: Sat, 9 Nov 2024 03:01:21 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <384c034c23d63dec14e0cc333b8b0b2a778edcf1.1731092818.git.dxu@dxuuu.xyz>
-In-Reply-To: <384c034c23d63dec14e0cc333b8b0b2a778edcf1.1731092818.git.dxu@dxuuu.xyz>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Fri, 8 Nov 2024 16:49:32 -0800
-Message-ID: <CACKFLimKe8Kp5f=RzvoDFmmjPv1ZvUjOG-8woEJ9XXLNSGtSmw@mail.gmail.com>
-Subject: Re: [PATCH net-next] bnxt_en: ethtool: Supply ntuple rss context action
-To: Daniel Xu <dxu@dxuuu.xyz>, Pavan Chebbi <pavan.chebbi@broadcom.com>
-Cc: kuba@kernel.org, edumazet@google.com, davem@davemloft.net, 
-	andrew+netdev@lunn.ch, pabeni@redhat.com, martin.lau@linux.dev, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel-team@meta.com
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="0000000000005440490626703e0d"
+User-Agent: Mozilla Thunderbird
+Subject: Re: [PATCH net-next v11 04/23] ovpn: add basic interface
+ creation/destruction/management routines
+To: Antonio Quartulli <antonio@openvpn.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Donald Hunter <donald.hunter@gmail.com>,
+ Shuah Khan <shuah@kernel.org>, sd@queasysnail.net,
+ Andrew Lunn <andrew@lunn.ch>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-kselftest@vger.kernel.org
+References: <20241029-b4-ovpn-v11-0-de4698c73a25@openvpn.net>
+ <20241029-b4-ovpn-v11-4-de4698c73a25@openvpn.net>
+From: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Content-Language: en-US
+In-Reply-To: <20241029-b4-ovpn-v11-4-de4698c73a25@openvpn.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
---0000000000005440490626703e0d
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-
-On Fri, Nov 8, 2024 at 11:07=E2=80=AFAM Daniel Xu <dxu@dxuuu.xyz> wrote:
->
-> Commit 2f4f9fe5bf5f ("bnxt_en: Support adding ntuple rules on RSS
-> contexts") added support for redirecting to an RSS context as an ntuple
-> rule action. However, it forgot to update the ETHTOOL_GRXCLSRULE
-> codepath. This caused `ethtool -n` to always report the action as
-> "Action: Direct to queue 0" which is wrong.
->
-> Fix by teaching bnxt driver to report the RSS context when applicable.
->
-> Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+On 29.10.2024 12:47, Antonio Quartulli wrote:
+> Add basic infrastructure for handling ovpn interfaces.
+> 
+> Signed-off-by: Antonio Quartulli <antonio@openvpn.net>
 > ---
->  drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c b/drivers/=
-net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> index cfd2c65b1c90..a218802befa8 100644
-> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_ethtool.c
-> @@ -1187,10 +1187,14 @@ static int bnxt_grxclsrule(struct bnxt *bp, struc=
-t ethtool_rxnfc *cmd)
->                 }
->         }
->
-> -       if (fltr->base.flags & BNXT_ACT_DROP)
-> +       if (fltr->base.flags & BNXT_ACT_DROP) {
->                 fs->ring_cookie =3D RX_CLS_FLOW_DISC;
-> -       else
-> +       } else if (fltr->base.flags & BNXT_ACT_RSS_CTX) {
-> +               fs->flow_type |=3D FLOW_RSS;
-> +               cmd->rss_context =3D fltr->base.fw_vnic_id;
+>   drivers/net/ovpn/main.c       | 115 ++++++++++++++++++++++++++++++++++++++++--
+>   drivers/net/ovpn/main.h       |   7 +++
+>   drivers/net/ovpn/ovpnstruct.h |   8 +++
+>   drivers/net/ovpn/packet.h     |  40 +++++++++++++++
+>   include/uapi/linux/if_link.h  |  15 ++++++
+>   5 files changed, 180 insertions(+), 5 deletions(-)
+> 
+> diff --git a/drivers/net/ovpn/main.c b/drivers/net/ovpn/main.c
+> index d5bdb0055f4dd3a6e32dc6e792bed1e7fd59e101..eead7677b8239eb3c48bb26ca95492d88512b8d4 100644
+> --- a/drivers/net/ovpn/main.c
+> +++ b/drivers/net/ovpn/main.c
+> @@ -10,18 +10,52 @@
+>   #include <linux/genetlink.h>
+>   #include <linux/module.h>
+>   #include <linux/netdevice.h>
+> +#include <linux/inetdevice.h>
+> +#include <net/ip.h>
+>   #include <net/rtnetlink.h>
+> -#include <uapi/linux/ovpn.h>
+> +#include <uapi/linux/if_arp.h>
+>   
+>   #include "ovpnstruct.h"
+>   #include "main.h"
+>   #include "netlink.h"
+>   #include "io.h"
+> +#include "packet.h"
+>   
+>   /* Driver info */
+>   #define DRV_DESCRIPTION	"OpenVPN data channel offload (ovpn)"
+>   #define DRV_COPYRIGHT	"(C) 2020-2024 OpenVPN, Inc."
+>   
+> +static void ovpn_struct_free(struct net_device *net)
+> +{
+> +}
 
-I think the rss_context should be the index and not the VNIC ID.
+nit: since this handler is not mandatory, its introduction can be moved 
+to the later patch, which actually fills it with meaningful operations.
 
-Pavan, please take a look.
+> +static int ovpn_net_open(struct net_device *dev)
+> +{
+> +	netif_tx_start_all_queues(dev);
+> +	return 0;
+> +}
+> +
+> +static int ovpn_net_stop(struct net_device *dev)
+> +{
+> +	netif_tx_stop_all_queues(dev);
+> +	return 0;
+> +}
+> +
+> +static const struct net_device_ops ovpn_netdev_ops = {
+> +	.ndo_open		= ovpn_net_open,
+> +	.ndo_stop		= ovpn_net_stop,
+> +	.ndo_start_xmit		= ovpn_net_xmit,
+> +};
+> +
+> +static const struct device_type ovpn_type = {
+> +	.name = OVPN_FAMILY_NAME,
 
-> +       } else {
->                 fs->ring_cookie =3D fltr->base.rxq;
-> +       }
->         rc =3D 0;
->
->  fltr_err:
-> --
-> 2.46.0
->
+nit: same question here regarding name deriviation. Are you sure that 
+the device type name is the same as the GENL family name?
 
---0000000000005440490626703e0d
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+> +};
+> +
+> +static const struct nla_policy ovpn_policy[IFLA_OVPN_MAX + 1] = {
+> +	[IFLA_OVPN_MODE] = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_P2P,
+> +					    OVPN_MODE_MP),
+> +};
+> +
+>   /**
+>    * ovpn_dev_is_valid - check if the netdevice is of type 'ovpn'
+>    * @dev: the interface to check
+> @@ -33,16 +67,76 @@ bool ovpn_dev_is_valid(const struct net_device *dev)
+>   	return dev->netdev_ops->ndo_start_xmit == ovpn_net_xmit;
+>   }
+>   
+> +static void ovpn_setup(struct net_device *dev)
+> +{
+> +	/* compute the overhead considering AEAD encryption */
+> +	const int overhead = sizeof(u32) + NONCE_WIRE_SIZE + 16 +
 
-MIIQbQYJKoZIhvcNAQcCoIIQXjCCEFoCAQExDzANBglghkgBZQMEAgEFADALBgkqhkiG9w0BBwGg
-gg3EMIIFDTCCA/WgAwIBAgIQeEqpED+lv77edQixNJMdADANBgkqhkiG9w0BAQsFADBMMSAwHgYD
-VQQLExdHbG9iYWxTaWduIFJvb3QgQ0EgLSBSMzETMBEGA1UEChMKR2xvYmFsU2lnbjETMBEGA1UE
-AxMKR2xvYmFsU2lnbjAeFw0yMDA5MTYwMDAwMDBaFw0yODA5MTYwMDAwMDBaMFsxCzAJBgNVBAYT
-AkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBS
-MyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwMIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA
-vbCmXCcsbZ/a0fRIQMBxp4gJnnyeneFYpEtNydrZZ+GeKSMdHiDgXD1UnRSIudKo+moQ6YlCOu4t
-rVWO/EiXfYnK7zeop26ry1RpKtogB7/O115zultAz64ydQYLe+a1e/czkALg3sgTcOOcFZTXk38e
-aqsXsipoX1vsNurqPtnC27TWsA7pk4uKXscFjkeUE8JZu9BDKaswZygxBOPBQBwrA5+20Wxlk6k1
-e6EKaaNaNZUy30q3ArEf30ZDpXyfCtiXnupjSK8WU2cK4qsEtj09JS4+mhi0CTCrCnXAzum3tgcH
-cHRg0prcSzzEUDQWoFxyuqwiwhHu3sPQNmFOMwIDAQABo4IB2jCCAdYwDgYDVR0PAQH/BAQDAgGG
-MGAGA1UdJQRZMFcGCCsGAQUFBwMCBggrBgEFBQcDBAYKKwYBBAGCNxQCAgYKKwYBBAGCNwoDBAYJ
-KwYBBAGCNxUGBgorBgEEAYI3CgMMBggrBgEFBQcDBwYIKwYBBQUHAxEwEgYDVR0TAQH/BAgwBgEB
-/wIBADAdBgNVHQ4EFgQUljPR5lgXWzR1ioFWZNW+SN6hj88wHwYDVR0jBBgwFoAUj/BLf6guRSSu
-TVD6Y5qL3uLdG7wwegYIKwYBBQUHAQEEbjBsMC0GCCsGAQUFBzABhiFodHRwOi8vb2NzcC5nbG9i
-YWxzaWduLmNvbS9yb290cjMwOwYIKwYBBQUHMAKGL2h0dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5j
-b20vY2FjZXJ0L3Jvb3QtcjMuY3J0MDYGA1UdHwQvMC0wK6ApoCeGJWh0dHA6Ly9jcmwuZ2xvYmFs
-c2lnbi5jb20vcm9vdC1yMy5jcmwwWgYDVR0gBFMwUTALBgkrBgEEAaAyASgwQgYKKwYBBAGgMgEo
-CjA0MDIGCCsGAQUFBwIBFiZodHRwczovL3d3dy5nbG9iYWxzaWduLmNvbS9yZXBvc2l0b3J5LzAN
-BgkqhkiG9w0BAQsFAAOCAQEAdAXk/XCnDeAOd9nNEUvWPxblOQ/5o/q6OIeTYvoEvUUi2qHUOtbf
-jBGdTptFsXXe4RgjVF9b6DuizgYfy+cILmvi5hfk3Iq8MAZsgtW+A/otQsJvK2wRatLE61RbzkX8
-9/OXEZ1zT7t/q2RiJqzpvV8NChxIj+P7WTtepPm9AIj0Keue+gS2qvzAZAY34ZZeRHgA7g5O4TPJ
-/oTd+4rgiU++wLDlcZYd/slFkaT3xg4qWDepEMjT4T1qFOQIL+ijUArYS4owpPg9NISTKa1qqKWJ
-jFoyms0d0GwOniIIbBvhI2MJ7BSY9MYtWVT5jJO3tsVHwj4cp92CSFuGwunFMzCCA18wggJHoAMC
-AQICCwQAAAAAASFYUwiiMA0GCSqGSIb3DQEBCwUAMEwxIDAeBgNVBAsTF0dsb2JhbFNpZ24gUm9v
-dCBDQSAtIFIzMRMwEQYDVQQKEwpHbG9iYWxTaWduMRMwEQYDVQQDEwpHbG9iYWxTaWduMB4XDTA5
-MDMxODEwMDAwMFoXDTI5MDMxODEwMDAwMFowTDEgMB4GA1UECxMXR2xvYmFsU2lnbiBSb290IENB
-IC0gUjMxEzARBgNVBAoTCkdsb2JhbFNpZ24xEzARBgNVBAMTCkdsb2JhbFNpZ24wggEiMA0GCSqG
-SIb3DQEBAQUAA4IBDwAwggEKAoIBAQDMJXaQeQZ4Ihb1wIO2hMoonv0FdhHFrYhy/EYCQ8eyip0E
-XyTLLkvhYIJG4VKrDIFHcGzdZNHr9SyjD4I9DCuul9e2FIYQebs7E4B3jAjhSdJqYi8fXvqWaN+J
-J5U4nwbXPsnLJlkNc96wyOkmDoMVxu9bi9IEYMpJpij2aTv2y8gokeWdimFXN6x0FNx04Druci8u
-nPvQu7/1PQDhBjPogiuuU6Y6FnOM3UEOIDrAtKeh6bJPkC4yYOlXy7kEkmho5TgmYHWyn3f/kRTv
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBUwwggQ0oAMCAQICDF5AaMOe0cZvaJpCQjANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODIxMzhaFw0yNTA5MTAwODIxMzhaMIGO
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xFTATBgNVBAMTDE1pY2hhZWwgQ2hhbjEoMCYGCSqGSIb3DQEJ
-ARYZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTCCASIwDQYJKoZIhvcNAQEBBQADggEPADCCAQoC
-ggEBALhEmG7egFWvPKcrDxuNhNcn2oHauIHc8AzGhPyJxU4S6ZUjHM/psoNo5XxlMSRpYE7g7vLx
-J4NBefU36XTEWVzbEkAuOSuJTuJkm98JE3+wjeO+aQTbNF3mG2iAe0AZbAWyqFxZulWitE8U2tIC
-9mttDjSN/wbltcwuti7P57RuR+WyZstDlPJqUMm1rJTbgDqkF2pnvufc4US2iexnfjGopunLvioc
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIPafMlHQEi8+u1ufr+4r+rmU2uIX68hM
-0yS/pUii4IegMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTI0MTEw
-OTAwNDk0NFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQCsf8ZM7GhH/wRDsLQx2BUeq+q7dxY0b1oART2USxNzuJQxLv0l
-LDwhKpKH+1hyIh58VHkRzwM17yMcdu4E4riyMksAyNyhjptS+Xeif3k3/6S41Mg/pcO2BhKeI4Pz
-wIgR1YjtsBkPFRjfnJTk5cAXg6cIpA5tJRcpxI4dkpBuDaeXStP9+CYTuX7OgRqRaCte4BdCF3cv
-gyK50yWYA1uJfRTe5dN1xzx+V3yndUV4HziHY98ztow/zdIMOJhmyQPmymrhhQpJgTnHCC6pWcTq
-UppeDesrBg+WI2HE9QMpcUSPeLvt+7IyhfW2ksdpvhribwak4CvMoRKGeqMnTJki
---0000000000005440490626703e0d--
+Where are these magic sizeof(u32) and '16' came from?
+
+> +			     sizeof(struct udphdr) +
+> +			     max(sizeof(struct ipv6hdr), sizeof(struct iphdr));
+> +
+> +	netdev_features_t feat = NETIF_F_SG | NETIF_F_HW_CSUM | NETIF_F_RXCSUM |
+> +				 NETIF_F_GSO | NETIF_F_GSO_SOFTWARE |
+> +				 NETIF_F_HIGHDMA;
+> +
+> +	dev->needs_free_netdev = true;
+> +
+> +	dev->pcpu_stat_type = NETDEV_PCPU_STAT_TSTATS;
+> +
+> +	dev->netdev_ops = &ovpn_netdev_ops;
+> +
+> +	dev->priv_destructor = ovpn_struct_free;
+> +
+> +	dev->hard_header_len = 0;
+> +	dev->addr_len = 0;
+> +	dev->mtu = ETH_DATA_LEN - overhead;
+> +	dev->min_mtu = IPV4_MIN_MTU;
+> +	dev->max_mtu = IP_MAX_MTU - overhead;
+> +
+> +	dev->type = ARPHRD_NONE;
+> +	dev->flags = IFF_POINTOPOINT | IFF_NOARP;
+> +	dev->priv_flags |= IFF_NO_QUEUE;
+> +
+> +	dev->lltx = true;
+> +	dev->features |= feat;
+> +	dev->hw_features |= feat;
+> +	dev->hw_enc_features |= feat;
+> +
+> +	dev->needed_headroom = OVPN_HEAD_ROOM;
+> +	dev->needed_tailroom = OVPN_MAX_PADDING;
+> +
+> +	SET_NETDEV_DEVTYPE(dev, &ovpn_type);
+> +}
+> +
+>   static int ovpn_newlink(struct net *src_net, struct net_device *dev,
+>   			struct nlattr *tb[], struct nlattr *data[],
+>   			struct netlink_ext_ack *extack)
+>   {
+> -	return -EOPNOTSUPP;
+> +	struct ovpn_struct *ovpn = netdev_priv(dev);
+> +	enum ovpn_mode mode = OVPN_MODE_P2P;
+> +
+> +	if (data && data[IFLA_OVPN_MODE]) {
+> +		mode = nla_get_u8(data[IFLA_OVPN_MODE]);
+> +		netdev_dbg(dev, "setting device mode: %u\n", mode);
+> +	}
+> +
+> +	ovpn->dev = dev;
+> +	ovpn->mode = mode;
+> +
+> +	/* turn carrier explicitly off after registration, this way state is
+> +	 * clearly defined
+> +	 */
+> +	netif_carrier_off(dev);
+> +
+> +	return register_netdevice(dev);
+>   }
+>   
+>   static struct rtnl_link_ops ovpn_link_ops = {
+>   	.kind = OVPN_FAMILY_NAME,
+>   	.netns_refund = false,
+> +	.priv_size = sizeof(struct ovpn_struct),
+> +	.setup = ovpn_setup,
+> +	.policy = ovpn_policy,
+> +	.maxtype = IFLA_OVPN_MAX,
+>   	.newlink = ovpn_newlink,
+>   	.dellink = unregister_netdevice_queue,
+>   };
+> @@ -51,26 +145,37 @@ static int ovpn_netdev_notifier_call(struct notifier_block *nb,
+>   				     unsigned long state, void *ptr)
+>   {
+>   	struct net_device *dev = netdev_notifier_info_to_dev(ptr);
+> +	struct ovpn_struct *ovpn;
+>   
+>   	if (!ovpn_dev_is_valid(dev))
+>   		return NOTIFY_DONE;
+>   
+> +	ovpn = netdev_priv(dev);
+
+nit: netdev_priv() returns only a pointer, it is safe to fetch the 
+pointer in advance, but do not dereference it until we are sure that an 
+event references the desired interface type. Takin this into 
+consideration, the assignment of private data pointer can be moved above 
+to the variable declaration. Just to make code couple of lines shorter.
+
+> +
+>   	switch (state) {
+>   	case NETDEV_REGISTER:
+> -		/* add device to internal list for later destruction upon
+> -		 * unregistration
+> -		 */
+> +		ovpn->registered = true;
+>   		break;
+>   	case NETDEV_UNREGISTER:
+> +		/* twiddle thumbs on netns device moves */
+> +		if (dev->reg_state != NETREG_UNREGISTERING)
+> +			break;
+> +
+>   		/* can be delivered multiple times, so check registered flag,
+>   		 * then destroy the interface
+>   		 */
+> +		if (!ovpn->registered)
+> +			return NOTIFY_DONE;
+> +
+> +		netif_carrier_off(dev);
+> +		ovpn->registered = false;
+>   		break;
+>   	case NETDEV_POST_INIT:
+>   	case NETDEV_GOING_DOWN:
+>   	case NETDEV_DOWN:
+>   	case NETDEV_UP:
+>   	case NETDEV_PRE_UP:
+> +		break;
+>   	default:
+>   		return NOTIFY_DONE;
+>   	}
+> diff --git a/drivers/net/ovpn/main.h b/drivers/net/ovpn/main.h
+> index a3215316c49bfcdf2496590bac878f145b8b27fd..0740a05070a817e0daea7b63a1f4fcebd274eb37 100644
+> --- a/drivers/net/ovpn/main.h
+> +++ b/drivers/net/ovpn/main.h
+> @@ -12,4 +12,11 @@
+>   
+>   bool ovpn_dev_is_valid(const struct net_device *dev);
+>   
+> +#define SKB_HEADER_LEN                                       \
+> +	(max(sizeof(struct iphdr), sizeof(struct ipv6hdr)) + \
+> +	 sizeof(struct udphdr) + NET_SKB_PAD)
+> +
+> +#define OVPN_HEAD_ROOM ALIGN(16 + SKB_HEADER_LEN, 4)
+
+Where is this magic '16' came from?
+
+> +#define OVPN_MAX_PADDING 16
+> +
+>   #endif /* _NET_OVPN_MAIN_H_ */
+> diff --git a/drivers/net/ovpn/ovpnstruct.h b/drivers/net/ovpn/ovpnstruct.h
+> index e3e4df6418b081436378fc51d98db5bd7b5d1fbe..211df871538d34fdff90d182f21a0b0fb11b28ad 100644
+> --- a/drivers/net/ovpn/ovpnstruct.h
+> +++ b/drivers/net/ovpn/ovpnstruct.h
+> @@ -11,15 +11,23 @@
+>   #define _NET_OVPN_OVPNSTRUCT_H_
+>   
+>   #include <net/net_trackers.h>
+> +#include <uapi/linux/if_link.h>
+> +#include <uapi/linux/ovpn.h>
+>   
+>   /**
+>    * struct ovpn_struct - per ovpn interface state
+>    * @dev: the actual netdev representing the tunnel
+>    * @dev_tracker: reference tracker for associated dev
+> + * @registered: whether dev is still registered with netdev or not
+> + * @mode: device operation mode (i.e. p2p, mp, ..)
+> + * @dev_list: entry for the module wide device list
+>    */
+>   struct ovpn_struct {
+>   	struct net_device *dev;
+>   	netdevice_tracker dev_tracker;
+> +	bool registered;
+> +	enum ovpn_mode mode;
+> +	struct list_head dev_list;
+
+dev_list is no more used and should be deleted.
+
+>   };
+>   
+>   #endif /* _NET_OVPN_OVPNSTRUCT_H_ */
+> diff --git a/drivers/net/ovpn/packet.h b/drivers/net/ovpn/packet.h
+> new file mode 100644
+> index 0000000000000000000000000000000000000000..7ed146f5932a25f448af6da58738a7eae81007fe
+> --- /dev/null
+> +++ b/drivers/net/ovpn/packet.h
+> @@ -0,0 +1,40 @@
+> +/* SPDX-License-Identifier: GPL-2.0-only */
+> +/*  OpenVPN data channel offload
+> + *
+> + *  Copyright (C) 2020-2024 OpenVPN, Inc.
+> + *
+> + *  Author:	Antonio Quartulli <antonio@openvpn.net>
+> + *		James Yonan <james@openvpn.net>
+> + */
+> +
+> +#ifndef _NET_OVPN_PACKET_H_
+> +#define _NET_OVPN_PACKET_H_
+> +
+> +/* When the OpenVPN protocol is ran in AEAD mode, use
+> + * the OpenVPN packet ID as the AEAD nonce:
+> + *
+> + *    00000005 521c3b01 4308c041
+> + *    [seq # ] [  nonce_tail   ]
+> + *    [     12-byte full IV    ] -> NONCE_SIZE
+> + *    [4-bytes                   -> NONCE_WIRE_SIZE
+> + *    on wire]
+> + */
+
+Nice diagram! Can we go futher and define the OpenVPN packet header as a 
+stucture? Referencing the structure instead of using magic sizes and 
+offsets can greatly improve the code readability. Especially when it 
+comes to header construction/parsing in the encryption/decryption code.
+
+E.g. define a structures like this:
+
+struct ovpn_pkt_hdr {
+   __be32 op;
+   __be32 pktid;
+   u8 auth[];
+} __attribute__((packed));
+
+struct ovpn_aead_iv {
+   __be32 pktid;
+   u8 nonce[OVPN_NONCE_TAIL_SIZE];
+} __attribute__((packed));
+
+> +
+> +/* OpenVPN nonce size */
+> +#define NONCE_SIZE 12
+
+nit: is using the common 'OVPN_' prefix here and for other constants any 
+good idea? E.g. OVPN_NONCE_SIZE. It can give some hints where it comes 
+from for a code reader.
+
+And another one question. Could you clarify in the comment to this 
+constant where it came from? AFAIU, these 12 bytes is the expectation of 
+the nonce size of AEAD crypto protocol, rigth?
+
+> +
+> +/* OpenVPN nonce size reduced by 8-byte nonce tail -- this is the
+> + * size of the AEAD Associated Data (AD) sent over the wire
+> + * and is normally the head of the IV
+> + */
+> +#define NONCE_WIRE_SIZE (NONCE_SIZE - sizeof(struct ovpn_nonce_tail))
+
+If the headers and IV are defined as structures, we no more need this 
+constant since the header construction will be done by a compiler 
+according to the structure layout.
+
+> +/* Last 8 bytes of AEAD nonce
+> + * Provided by userspace and usually derived from
+> + * key material generated during TLS handshake
+> + */
+> +struct ovpn_nonce_tail {
+> +	u8 u8[OVPN_NONCE_TAIL_SIZE];
+> +};
+
+Why do you need a dadicated structure for this array? Can we declare the 
+corresponding fields like this:
+
+u8 nonce_tail_xmit[OVPN_NONCE_TAIL_SIZE];
+u8 nonce_tail_recv[OVPN_NONCE_TAIL_SIZE];
+
+> +#endif /* _NET_OVPN_PACKET_H_ */
+> diff --git a/include/uapi/linux/if_link.h b/include/uapi/linux/if_link.h
+> index 8516c1ccd57a7c7634a538fe3ac16c858f647420..84d294aab20b79b8e9cb9b736a074105c99338f3 100644
+> --- a/include/uapi/linux/if_link.h
+> +++ b/include/uapi/linux/if_link.h
+> @@ -1975,4 +1975,19 @@ enum {
+>   
+>   #define IFLA_DSA_MAX	(__IFLA_DSA_MAX - 1)
+>   
+> +/* OVPN section */
+> +
+> +enum ovpn_mode {
+> +	OVPN_MODE_P2P,
+> +	OVPN_MODE_MP,
+> +};
+
+Mode min/max values can be defined here and the netlink policy can 
+reference these values:
+
+enum ovpn_mode {
+   OVPN_MODE_P2P,
+   OVPN_MODE_MP,
+   __OVPN_MODE_MAX
+};
+
+#define OVPN_MODE_MIN OVPN_MODE_P2P
+#define OVPN_MODE_MAX (__OVPN_MODE_MAX - 1)
+
+... = NLA_POLICY_RANGE(NLA_U8, OVPN_MODE_MIN, OVPN_MODE_MAX)
+
+> +
+> +enum {
+> +	IFLA_OVPN_UNSPEC,
+> +	IFLA_OVPN_MODE,
+> +	__IFLA_OVPN_MAX,
+> +};
+> +
+> +#define IFLA_OVPN_MAX	(__IFLA_OVPN_MAX - 1)
+> +
+>   #endif /* _UAPI_LINUX_IF_LINK_H */
+> 
+
+--
+Sergey
 
