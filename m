@@ -1,215 +1,439 @@
-Return-Path: <netdev+bounces-143485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E4FB9C298D
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 03:50:39 +0100 (CET)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49AAA9C299B
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 03:59:14 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D323F2844CA
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 02:50:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A748283F4E
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 02:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FCAD824AD;
-	Sat,  9 Nov 2024 02:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AC5B13A86A;
+	Sat,  9 Nov 2024 02:59:09 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b="JVqG6aze"
+	dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b="S6XJlF8H"
 X-Original-To: netdev@vger.kernel.org
-Received: from mgamail.intel.com (mgamail.intel.com [192.198.163.12])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+Received: from mail-pf1-f174.google.com (mail-pf1-f174.google.com [209.85.210.174])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES128-GCM-SHA256 (128/128 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51D24770FD;
-	Sat,  9 Nov 2024 02:50:33 +0000 (UTC)
-Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=192.198.163.12
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E7A3FB8B;
+	Sat,  9 Nov 2024 02:59:07 +0000 (UTC)
+Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=209.85.210.174
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731120635; cv=none; b=R1Fed4IxZlK3jpqUvxs9ASki8k0b3m0vuJE2jyynVHf2MWH6Q5aSaWpZ0EbkVdRG7L6+7smUptG/Oh7mAs9DwYcubmKDDb+9PpXMd8zmtnL87/27fDc0xHqy4ejMqwdT63BOpGv3NSTc4FX01p/iGTUi8Qf482R8ZGDiAiO2ic8=
+	t=1731121149; cv=none; b=c1Ju059Lm3Q7pD3FwZmtUUR+Ren/ddVB0fXf8y+T4OyDkzuGRxAY1undEuk0RfvNBT126RosSnZYNIB8tTO6BzCYRp81gjv838QNiJacWRqe7FvR/HISkotfSxDrjxiVf6LoYuIly80dvjxtC2jTvXVhTgIXqB0lr06Zce8leI0=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731120635; c=relaxed/simple;
-	bh=3weHMBmjR79ubky4BUixkDhmQ8AxVUiUmZip+KuDSds=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:Content-Disposition:In-Reply-To; b=E6g1XcVDpJe9PwzuiGNsSj42K2VwifcOWLkBvDn7BIaZJvPjtCNBn96RPYP1zdKvh90rUdjmVRVARDk44wL8NZpH8XfWcH4sofrzGub4HbLOJHKJrAF0HAc30vIl/7VPbzyty04Ey8Plcy7I14NsvEFBP6d9UESSAK/r2vIgJWI=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com; spf=pass smtp.mailfrom=intel.com; dkim=pass (2048-bit key) header.d=intel.com header.i=@intel.com header.b=JVqG6aze; arc=none smtp.client-ip=192.198.163.12
-Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=intel.com
-Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=intel.com
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1731120633; x=1762656633;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=3weHMBmjR79ubky4BUixkDhmQ8AxVUiUmZip+KuDSds=;
-  b=JVqG6azencj4PBNALK6wfRA3F899exIf9FEu5RFSh0DqajeZ1w3mgvjD
-   zTUuX0d/Yz316zK4my2Du31eolw1/84k0BaPoPfsOdVEh1fVWzDvHOfES
-   r58DDh0C0xcSjIP08I2W4twdGP5fRrKQTm3o5eQD9uZo6N8GbQqi+RLTn
-   tCE8Wa0DCjgZ9OgzJ0+1n8aoqZUTepTlUJsyF9EB9DPxLCOxOjgKHIGoW
-   78n9zshReBMKufIicEQoL/qSlbTM+3iHtjOOQkegjV1pSZFhLu9h0sal6
-   zBHsFFWEnS53JA45m/wxpEDwqtKdALHYutm6LhvDrt3FBpX6/QsteDH2y
-   A==;
-X-CSE-ConnectionGUID: iba4DVMQR/uuEoalPxFSMQ==
-X-CSE-MsgGUID: OYpJLgC0TkiHOhl2zVk2GQ==
-X-IronPort-AV: E=McAfee;i="6700,10204,11250"; a="34952516"
-X-IronPort-AV: E=Sophos;i="6.12,139,1728975600"; 
-   d="scan'208";a="34952516"
-Received: from orviesa004.jf.intel.com ([10.64.159.144])
-  by fmvoesa106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Nov 2024 18:50:33 -0800
-X-CSE-ConnectionGUID: HZz/4uUuT/eN8Td5QDAABA==
-X-CSE-MsgGUID: PG6Izi8tTWqs54X8eQqdcg==
-X-ExtLoop1: 1
-X-IronPort-AV: E=Sophos;i="6.12,139,1728975600"; 
-   d="scan'208";a="90945060"
-Received: from lkp-server01.sh.intel.com (HELO a48cf1aa22e8) ([10.239.97.150])
-  by orviesa004.jf.intel.com with ESMTP; 08 Nov 2024 18:50:29 -0800
-Received: from kbuild by a48cf1aa22e8 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1t9bYR-000s0w-0N;
-	Sat, 09 Nov 2024 02:50:27 +0000
-Date: Sat, 9 Nov 2024 10:50:23 +0800
-From: kernel test robot <lkp@intel.com>
-To: Christian Marangi <ansuelsmth@gmail.com>, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	s=arc-20240116; t=1731121149; c=relaxed/simple;
+	bh=kDQDpWAlwqhenDk+2KnXtbzpfIV1sZA1Qv7cylFp7d8=;
+	h=From:To:Cc:Subject:Date:Message-ID:MIME-Version; b=Q5xfl85OwHLDM0Ytdg4CqTwU2A+AIdvsevIpWuBBGdIWJQJ/r1Ub2HInK0Bcd4Hq606Jk4ZvYRK5PU4HmkYP3haDh4AmcYqpOSwbvIS+s2v9bC/krU1hZH79VmOrkZeC2ZMOvWI5ecSn4c5Pge5es3+5dXLaX8HIzpiNh9Lk+aw=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com; spf=pass smtp.mailfrom=gmail.com; dkim=pass (2048-bit key) header.d=gmail.com header.i=@gmail.com header.b=S6XJlF8H; arc=none smtp.client-ip=209.85.210.174
+Authentication-Results: smtp.subspace.kernel.org; dmarc=pass (p=none dis=none) header.from=gmail.com
+Authentication-Results: smtp.subspace.kernel.org; spf=pass smtp.mailfrom=gmail.com
+Received: by mail-pf1-f174.google.com with SMTP id d2e1a72fcca58-720cb6ac25aso2517808b3a.3;
+        Fri, 08 Nov 2024 18:59:07 -0800 (PST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20230601; t=1731121147; x=1731725947; darn=vger.kernel.org;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Jgzjvu2KFAIoDqaousuCkzou9PgVU9Gj9P4/pqvAl70=;
+        b=S6XJlF8H47OQ+NeOCvZQtOFKgQHyxRCUHigFD1sh5bpUQzrX9E9l7TYZvOs6B4lzqp
+         cQUmHlUevgRz2nsjIzlqOso2pE8I/UW/vrhKR/lNe9ivo4iWcg3kJ7mX86d7VJgGeAZO
+         WljPyFhiTQmgBy1Fkfo6U/UDGVg4N9ybHzNbKdVb21j1dZkBx4KcwD9iyo4bU8VYyO13
+         rAwh98rvc1pJXG15H5ufYYAFgxGxtZdncBi1Bk7Uqm6c2B+Ug682FokTrrKXib04zDDq
+         jYCzEHXYzc8iXdYw/g8LklUTfzwWgNGFGYkDWOJpgnO34DyUJmO5b0FOSx7mAbmr+IH5
+         Xxkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20230601; t=1731121147; x=1731725947;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Jgzjvu2KFAIoDqaousuCkzou9PgVU9Gj9P4/pqvAl70=;
+        b=eaRlsqN/Bh7kCWst6rrzHdM4xbv8qa2vN+2XGNHOsm4sCC5i2o6ysEkTSZWzVMHBEP
+         X61h1r1KSmp4Ndz2W++LCPV0pMK8FbzFb03wvZPqF8ybu5yOWG1/Yf0caqNfyfM136NT
+         yZjv8OnqeiiG/1XMZsX5q4RmmVWYkqgRZ/gbosymsw5Lk5dVfLMyI8xSInObl7wymqiw
+         AyZRb6hHpRqs2c/NkTi0Mn/yUlp72DHL9ovFufl2JvBjz4Bh6rLOm0OuClvwIjQbsUcL
+         vqSL93Z6t1ohaepAcS/MMlsXZLK9ZxMwd6fjByVM/7IU2rjNM7RpRKNE4CS6NHc8dCME
+         GmQQ==
+X-Forwarded-Encrypted: i=1; AJvYcCV/gx8U9wyPOHyLav0E9K8dR9Cz7z5wd5XFzRgEoHMj2ftsWhcDTvTd5Qy88Ys5ofi7qb5J+7Z0LSQ=@vger.kernel.org, AJvYcCXsMn0jdmHJgo/Ajr3IunlRGkq0sa0ZfFErFOB2RBEczgKXk5Z1X0UEynA7F0cYNOOB/sAM3cXJLQNYxq1Z@vger.kernel.org
+X-Gm-Message-State: AOJu0YyP9I7i7WONdcY79FQhQpYi9RGTes0S5qd+dMkDO0/BTzhOi1r4
+	tilvbP3nDBCn4WIZ7U2VOaY06/jPjn2YYTzZueOUcxyQR63+U5dCkO4F5h94
+X-Google-Smtp-Source: AGHT+IHvK3BLv1YH2YOmDBjcDpFxUSxglJM5l0441IzKnxx83Kl8a+R2UFAnIhoY3Q0BcRI0jH7RDw==
+X-Received: by 2002:a05:6a00:218d:b0:71e:5033:c5 with SMTP id d2e1a72fcca58-724132c211amr7009580b3a.14.1731121146727;
+        Fri, 08 Nov 2024 18:59:06 -0800 (PST)
+Received: from localhost (fwdproxy-prn-031.fbsv.net. [2a03:2880:ff:1f::face:b00c])
+        by smtp.gmail.com with ESMTPSA id d2e1a72fcca58-72407a134f0sm4572878b3a.131.2024.11.08.18.59.06
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 08 Nov 2024 18:59:06 -0800 (PST)
+From: Sanman Pradhan <sanman.p211993@gmail.com>
+To: netdev@vger.kernel.org
+Cc: alexanderduyck@fb.com,
+	kuba@kernel.org,
+	kernel-team@meta.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	pabeni@redhat.com,
+	horms@kernel.org,
+	corbet@lwn.net,
+	mohsin.bashr@gmail.com,
+	sanmanpradhan@meta.com,
+	andrew+netdev@lunn.ch,
+	vadim.fedorenko@linux.dev,
+	jdamato@fastly.com,
+	sdf@fomichev.me,
+	sanman.p211993@gmail.com,
+	linux-doc@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	netdev@vger.kernel.org, Christian Marangi <ansuelsmth@gmail.com>,
-	Marion & Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-Subject: Re: [net-next PATCH] net: dsa: add devm_dsa_register_switch()
-Message-ID: <202411091011.vIDu9Nhl-lkp@intel.com>
-References: <20241108200217.2761-1-ansuelsmth@gmail.com>
+Subject: [PATCH net-next v4] eth: fbnic: Add PCIe hardware statistics
+Date: Fri,  8 Nov 2024 18:59:05 -0800
+Message-ID: <20241109025905.1531196-1-sanman.p211993@gmail.com>
+X-Mailer: git-send-email 2.43.5
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20241108200217.2761-1-ansuelsmth@gmail.com>
+Content-Transfer-Encoding: 8bit
 
-Hi Christian,
+Add PCIe hardware statistics support to the fbnic driver. These stats
+provide insight into PCIe transaction performance and error conditions.
 
-kernel test robot noticed the following build errors:
+Which includes, read/write and completion TLP counts and DWORD counts and
+debug counters for tag, completion credit and NP credit exhaustion
 
-[auto build test ERROR on net-next/main]
+The stats are exposed via ethtool and can be used to monitor PCIe
+performance and debug PCIe issues.
 
-url:    https://github.com/intel-lab-lkp/linux/commits/Christian-Marangi/net-dsa-add-devm_dsa_register_switch/20241109-040405
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20241108200217.2761-1-ansuelsmth%40gmail.com
-patch subject: [net-next PATCH] net: dsa: add devm_dsa_register_switch()
-config: s390-allmodconfig (https://download.01.org/0day-ci/archive/20241109/202411091011.vIDu9Nhl-lkp@intel.com/config)
-compiler: clang version 20.0.0git (https://github.com/llvm/llvm-project 592c0fe55f6d9a811028b5f3507be91458ab2713)
-reproduce (this is a W=1 build): (https://download.01.org/0day-ci/archive/20241109/202411091011.vIDu9Nhl-lkp@intel.com/reproduce)
+Signed-off-by: Sanman Pradhan <sanman.p211993@gmail.com>
+---
+v4:
+	- Fix indentations
+	- Adding missing updates for previous versions
+v3:
+	- https://patchwork.kernel.org/project/netdevbpf/patch/20241108204640.3165724-1-sanman.p211993@gmail.com/
+	- Moved PCIe stats to debugfs
+v2:
+	- https://patchwork.kernel.org/project/netdevbpf/patch/20241107020555.321245-1-sanman.p211993@gmail.com/
+	- Removed unnecessary code blocks
+	- Rephrased the commit message
+v1:
+	- https://patchwork.kernel.org/project/netdevbpf/patch/20241106002625.1857904-1-sanman.p211993@gmail.com/
+---
+ .../device_drivers/ethernet/meta/fbnic.rst    |  26 ++++
+ drivers/net/ethernet/meta/fbnic/fbnic_csr.h   |  37 ++++++
+ .../net/ethernet/meta/fbnic/fbnic_debugfs.c   |  54 +++++++++
+ .../net/ethernet/meta/fbnic/fbnic_hw_stats.c  | 114 ++++++++++++++++++
+ .../net/ethernet/meta/fbnic/fbnic_hw_stats.h  |  12 ++
+ .../net/ethernet/meta/fbnic/fbnic_netdev.c    |   3 +
+ 6 files changed, 246 insertions(+)
+ create mode 100644 drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
 
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202411091011.vIDu9Nhl-lkp@intel.com/
+diff --git a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+index 32ff114f5c26..13ebcdbb5f22 100644
+--- a/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
++++ b/Documentation/networking/device_drivers/ethernet/meta/fbnic.rst
+@@ -27,3 +27,29 @@ driver takes over.
+ devlink dev info provides version information for all three components. In
+ addition to the version the hg commit hash of the build is included as a
+ separate entry.
++
++PCIe Statistics
++---------------
++
++The fbnic driver exposes PCIe hardware performance statistics through debugfs
++(``pcie_stats``). These statistics provide insights into PCIe transaction
++behavior and potential performance bottlenecks.
++
++Statistics Categories
++
++1. PCIe Transaction Counters:
++
++   These counters track PCIe transaction activity:
++        - pcie_ob_rd_tlp: Outbound read Transaction Layer Packets count
++        - pcie_ob_rd_dword: DWORDs transferred in outbound read transactions
++        - pcie_ob_wr_tlp: Outbound write Transaction Layer Packets count
++        - pcie_ob_wr_dword: DWORDs transferred in outbound write transactions
++        - pcie_ob_cpl_tlp: Outbound completion TLP count
++        - pcie_ob_cpl_dword: DWORDs transferred in outbound completion TLPs
++
++2. PCIe Resource Monitoring:
++
++   These counters indicate PCIe resource exhaustion events:
++        - pcie_ob_rd_no_tag: Read requests dropped due to tag unavailability
++        - pcie_ob_rd_no_cpl_cred: Read requests dropped due to completion credit exhaustion
++        - pcie_ob_rd_no_np_cred: Read requests dropped due to non-posted credit exhaustion
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+index e78745332d82..463fd5d54d35 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_csr.h
+@@ -917,6 +917,43 @@ enum {
+ #define FBNIC_MAX_QUEUES		128
+ #define FBNIC_CSR_END_QUEUE	(0x40000 + 0x400 * FBNIC_MAX_QUEUES - 1)
 
-All errors (new ones prefixed by >>):
++/* PUL User Registers*/
++#define FBNIC_PUL_USER_OB_RD_TLP_CNT_31_0 \
++					0x3106e		/* 0xc41b8 */
++#define FBNIC_PUL_USER_OB_RD_DWORD_CNT_31_0 \
++					0x31070		/* 0xc41c0 */
++#define FBNIC_PUL_USER_OB_RD_DWORD_CNT_63_32 \
++					0x31071		/* 0xc41c4 */
++#define FBNIC_PUL_USER_OB_WR_TLP_CNT_31_0 \
++					0x31072		/* 0xc41c8 */
++#define FBNIC_PUL_USER_OB_WR_TLP_CNT_63_32 \
++					0x31073		/* 0xc41cc */
++#define FBNIC_PUL_USER_OB_WR_DWORD_CNT_31_0 \
++					0x31074		/* 0xc41d0 */
++#define FBNIC_PUL_USER_OB_WR_DWORD_CNT_63_32 \
++					0x31075		/* 0xc41d4 */
++#define FBNIC_PUL_USER_OB_CPL_TLP_CNT_31_0 \
++					0x31076		/* 0xc41d8 */
++#define FBNIC_PUL_USER_OB_CPL_TLP_CNT_63_32 \
++					0x31077		/* 0xc41dc */
++#define FBNIC_PUL_USER_OB_CPL_DWORD_CNT_31_0 \
++					0x31078		/* 0xc41e0 */
++#define FBNIC_PUL_USER_OB_CPL_DWORD_CNT_63_32 \
++					0x31079		/* 0xc41e4 */
++#define FBNIC_PUL_USER_OB_RD_DBG_CNT_CPL_CRED_31_0 \
++					0x3107a		/* 0xc41e8 */
++#define FBNIC_PUL_USER_OB_RD_DBG_CNT_CPL_CRED_63_32 \
++					0x3107b		/* 0xc41ec */
++#define FBNIC_PUL_USER_OB_RD_DBG_CNT_TAG_31_0 \
++					0x3107c		/* 0xc41f0 */
++#define FBNIC_PUL_USER_OB_RD_DBG_CNT_TAG_63_32 \
++					0x3107d		/* 0xc41f4 */
++#define FBNIC_PUL_USER_OB_RD_DBG_CNT_NP_CRED_31_0 \
++					0x3107e		/* 0xc41f8 */
++#define FBNIC_PUL_USER_OB_RD_DBG_CNT_NP_CRED_63_32 \
++					0x3107f		/* 0xc41fc */
++#define FBNIC_CSR_END_PUL_USER	0x31080	/* CSR section delimiter */
++
+ /* BAR 4 CSRs */
 
-   In file included from net/dsa/dsa.c:10:
-   In file included from include/linux/device.h:32:
-   In file included from include/linux/device/driver.h:21:
-   In file included from include/linux/module.h:19:
-   In file included from include/linux/elf.h:6:
-   In file included from arch/s390/include/asm/elf.h:181:
-   In file included from arch/s390/include/asm/mmu_context.h:11:
-   In file included from arch/s390/include/asm/pgalloc.h:18:
-   In file included from include/linux/mm.h:2213:
-   include/linux/vmstat.h:504:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     504 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     505 |                            item];
-         |                            ~~~~
-   include/linux/vmstat.h:511:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     511 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     512 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   include/linux/vmstat.h:518:36: warning: arithmetic between different enumeration types ('enum node_stat_item' and 'enum lru_list') [-Wenum-enum-conversion]
-     518 |         return node_stat_name(NR_LRU_BASE + lru) + 3; // skip "nr_"
-         |                               ~~~~~~~~~~~ ^ ~~~
-   include/linux/vmstat.h:524:43: warning: arithmetic between different enumeration types ('enum zone_stat_item' and 'enum numa_stat_item') [-Wenum-enum-conversion]
-     524 |         return vmstat_text[NR_VM_ZONE_STAT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~ ^
-     525 |                            NR_VM_NUMA_EVENT_ITEMS +
-         |                            ~~~~~~~~~~~~~~~~~~~~~~
-   In file included from net/dsa/dsa.c:14:
-   In file included from include/linux/netdevice.h:38:
-   In file included from include/net/net_namespace.h:43:
-   In file included from include/linux/skbuff.h:28:
-   In file included from include/linux/dma-mapping.h:11:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/s390/include/asm/io.h:95:
-   include/asm-generic/io.h:548:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     548 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:561:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     561 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/big_endian.h:37:59: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) __swab16((__force __u16)(__le16)(x))
-         |                                                           ^
-   include/uapi/linux/swab.h:102:54: note: expanded from macro '__swab16'
-     102 | #define __swab16(x) (__u16)__builtin_bswap16((__u16)(x))
-         |                                                      ^
-   In file included from net/dsa/dsa.c:14:
-   In file included from include/linux/netdevice.h:38:
-   In file included from include/net/net_namespace.h:43:
-   In file included from include/linux/skbuff.h:28:
-   In file included from include/linux/dma-mapping.h:11:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/s390/include/asm/io.h:95:
-   include/asm-generic/io.h:574:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     574 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/big_endian.h:35:59: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) __swab32((__force __u32)(__le32)(x))
-         |                                                           ^
-   include/uapi/linux/swab.h:115:54: note: expanded from macro '__swab32'
-     115 | #define __swab32(x) (__u32)__builtin_bswap32((__u32)(x))
-         |                                                      ^
-   In file included from net/dsa/dsa.c:14:
-   In file included from include/linux/netdevice.h:38:
-   In file included from include/net/net_namespace.h:43:
-   In file included from include/linux/skbuff.h:28:
-   In file included from include/linux/dma-mapping.h:11:
-   In file included from include/linux/scatterlist.h:9:
-   In file included from arch/s390/include/asm/io.h:95:
-   include/asm-generic/io.h:585:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     585 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:595:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     595 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:605:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     605 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:693:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     693 |         readsb(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:701:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     701 |         readsw(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:709:20: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     709 |         readsl(PCI_IOBASE + addr, buffer, count);
-         |                ~~~~~~~~~~ ^
-   include/asm-generic/io.h:718:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     718 |         writesb(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:727:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     727 |         writesw(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
-   include/asm-generic/io.h:736:21: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     736 |         writesl(PCI_IOBASE + addr, buffer, count);
-         |                 ~~~~~~~~~~ ^
->> <inline asm>:4:33: error: symbol '__export_symbol_dsa_register_switch' is already defined
-       4 | .section ".export_symbol","a" ; __export_symbol_dsa_register_switch: ; .asciz "GPL" ; .asciz "" ; .balign 8 ; .quad dsa_register_switch ; .previous
-         |                                 ^
-   16 warnings and 1 error generated.
+ /* The IPC mailbox consists of 32 mailboxes, with each mailbox consisting
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c b/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
+new file mode 100644
+index 000000000000..1c865d5b7320
+--- /dev/null
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_debugfs.c
+@@ -0,0 +1,54 @@
++// SPDX-License-Identifier: GPL-2.0
++/* Copyright (c) Meta Platforms, Inc. and affiliates. */
++
++#include <linux/debugfs.h>
++#include <linux/pci.h>
++#include <linux/rtnetlink.h>
++#include <linux/seq_file.h>
++#include "fbnic.h"
++
++static struct dentry *fbnic_dbg_root;
++
++static int fbnic_dbg_pcie_stats_show(struct seq_file *s, void *v)
++{
++	struct fbnic_dev *fbd = s->private;
++
++	rtnl_lock();
++
++	fbnic_get_hw_stats(fbd);
++
++	seq_printf(s, "ob_rd_tlp: %llu\n", fbd->hw_stats.pcie.ob_rd_tlp.value);
++	seq_printf(s, "ob_rd_dword: %llu\n",
++		   fbd->hw_stats.pcie.ob_rd_dword.value);
++	seq_printf(s, "ob_wr_tlp: %llu\n", fbd->hw_stats.pcie.ob_wr_tlp.value);
++	seq_printf(s, "ob_wr_dword: %llu\n",
++		   fbd->hw_stats.pcie.ob_wr_dword.value);
++	seq_printf(s, "ob_cpl_tlp: %llu\n",
++		   fbd->hw_stats.pcie.ob_cpl_tlp.value);
++	seq_printf(s, "ob_cpl_dword: %llu\n",
++		   fbd->hw_stats.pcie.ob_cpl_dword.value);
++	seq_printf(s, "ob_rd_no_tag: %llu\n",
++		   fbd->hw_stats.pcie.ob_rd_no_tag.value);
++	seq_printf(s, "ob_rd_no_cpl_cred: %llu\n",
++		   fbd->hw_stats.pcie.ob_rd_no_cpl_cred.value);
++	seq_printf(s, "ob_rd_no_np_cred: %llu\n",
++		   fbd->hw_stats.pcie.ob_rd_no_np_cred.value);
++
++	rtnl_unlock();
++	return 0;
++}
++
++DEFINE_SHOW_ATTRIBUTE(fbnic_dbg_pcie_stats);
++
++void fbnic_dbg_init(void)
++{
++	fbnic_dbg_root = debugfs_create_dir(fbnic_driver_name, NULL);
++	debugfs_create_file("pcie_stats", 0400, fbnic_dbg_root, NULL,
++			    &fbnic_dbg_pcie_stats_fops);
++}
++
++void fbnic_dbg_exit(void)
++{
++	debugfs_remove_recursive(fbnic_dbg_root);
++	fbnic_dbg_root = NULL;
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
+index a0acc7606aa1..eb19b49fe306 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.c
+@@ -25,3 +25,117 @@ u64 fbnic_stat_rd64(struct fbnic_dev *fbd, u32 reg, u32 offset)
+ 	 */
+ 	return ((u64)upper << 32);
+ }
++
++static void fbnic_hw_stat_rst64(struct fbnic_dev *fbd, u32 reg, s32 offset,
++				struct fbnic_stat_counter *stat)
++{
++	/* Record initial counter values and compute deltas from there to ensure
++	 * stats start at 0 after reboot/reset. This avoids exposing absolute
++	 * hardware counter values to userspace.
++	 */
++	stat->u.old_reg_value_64 = fbnic_stat_rd64(fbd, reg, offset);
++}
++
++static void fbnic_hw_stat_rd64(struct fbnic_dev *fbd, u32 reg, s32 offset,
++			       struct fbnic_stat_counter *stat)
++{
++	u64 new_reg_value;
++
++	new_reg_value = fbnic_stat_rd64(fbd, reg, offset);
++	stat->value += new_reg_value - stat->u.old_reg_value_64;
++	stat->u.old_reg_value_64 = new_reg_value;
++}
++
++static void fbnic_reset_pcie_stats_asic(struct fbnic_dev *fbd,
++					struct fbnic_pcie_stats *pcie)
++{
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_RD_TLP_CNT_31_0,
++			    1,
++			    &pcie->ob_rd_tlp);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_RD_DWORD_CNT_31_0,
++			    1,
++			    &pcie->ob_rd_dword);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_CPL_TLP_CNT_31_0,
++			    1,
++			    &pcie->ob_cpl_tlp);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_CPL_DWORD_CNT_31_0,
++			    1,
++			    &pcie->ob_cpl_dword);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_WR_TLP_CNT_31_0,
++			    1,
++			    &pcie->ob_wr_tlp);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_WR_DWORD_CNT_31_0,
++			    1,
++			    &pcie->ob_wr_dword);
++
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_RD_DBG_CNT_TAG_31_0,
++			    1,
++			    &pcie->ob_rd_no_tag);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_RD_DBG_CNT_CPL_CRED_31_0,
++			    1,
++			    &pcie->ob_rd_no_cpl_cred);
++	fbnic_hw_stat_rst64(fbd,
++			    FBNIC_PUL_USER_OB_RD_DBG_CNT_NP_CRED_31_0,
++			    1,
++			    &pcie->ob_rd_no_np_cred);
++}
++
++static void fbnic_get_pcie_stats_asic64(struct fbnic_dev *fbd,
++					struct fbnic_pcie_stats *pcie)
++{
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_RD_TLP_CNT_31_0,
++			   1,
++			   &pcie->ob_rd_tlp);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_RD_DWORD_CNT_31_0,
++			   1,
++			   &pcie->ob_rd_dword);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_WR_TLP_CNT_31_0,
++			   1,
++			   &pcie->ob_wr_tlp);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_WR_DWORD_CNT_31_0,
++			   1,
++			   &pcie->ob_wr_dword);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_CPL_TLP_CNT_31_0,
++			   1,
++			   &pcie->ob_cpl_tlp);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_CPL_DWORD_CNT_31_0,
++			   1,
++			   &pcie->ob_cpl_dword);
++
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_RD_DBG_CNT_TAG_31_0,
++			   1,
++			   &pcie->ob_rd_no_tag);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_RD_DBG_CNT_CPL_CRED_31_0,
++			   1,
++			   &pcie->ob_rd_no_cpl_cred);
++	fbnic_hw_stat_rd64(fbd,
++			   FBNIC_PUL_USER_OB_RD_DBG_CNT_NP_CRED_31_0,
++			   1,
++			   &pcie->ob_rd_no_np_cred);
++}
++
++void fbnic_reset_hw_stats(struct fbnic_dev *fbd)
++{
++	fbnic_reset_pcie_stats_asic(fbd, &fbd->hw_stats.pcie);
++}
++
++void fbnic_get_hw_stats(struct fbnic_dev *fbd)
++{
++	fbnic_get_pcie_stats_asic64(fbd, &fbd->hw_stats.pcie);
++}
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
+index 30348904b510..036cc065a857 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_hw_stats.h
+@@ -31,10 +31,22 @@ struct fbnic_mac_stats {
+ 	struct fbnic_eth_mac_stats eth_mac;
+ };
 
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
++struct fbnic_pcie_stats {
++	struct fbnic_stat_counter ob_rd_tlp, ob_rd_dword;
++	struct fbnic_stat_counter ob_wr_tlp, ob_wr_dword;
++	struct fbnic_stat_counter ob_cpl_tlp, ob_cpl_dword;
++
++	struct fbnic_stat_counter ob_rd_no_tag;
++	struct fbnic_stat_counter ob_rd_no_cpl_cred;
++	struct fbnic_stat_counter ob_rd_no_np_cred;
++};
++
+ struct fbnic_hw_stats {
+ 	struct fbnic_mac_stats mac;
++	struct fbnic_pcie_stats pcie;
+ };
+
+ u64 fbnic_stat_rd64(struct fbnic_dev *fbd, u32 reg, u32 offset);
+
++void fbnic_reset_hw_stats(struct fbnic_dev *fbd);
+ void fbnic_get_hw_stats(struct fbnic_dev *fbd);
+diff --git a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+index fc7d80db5fa6..04077649161b 100644
+--- a/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
++++ b/drivers/net/ethernet/meta/fbnic/fbnic_netdev.c
+@@ -628,6 +628,9 @@ struct net_device *fbnic_netdev_alloc(struct fbnic_dev *fbd)
+
+ 	fbnic_reset_queues(fbn, default_queues, default_queues);
+
++	/* Capture snapshot of hardware stats so netdev can calculate delta */
++	fbnic_reset_hw_stats(fbd);
++
+ 	fbnic_reset_indir_tbl(fbn);
+ 	fbnic_rss_key_fill(fbn->rss_key);
+ 	fbnic_rss_init_en_mask(fbn);
+--
+2.43.5
 
