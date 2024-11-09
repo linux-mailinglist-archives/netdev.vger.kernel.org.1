@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-143545-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-143546-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5974D9C2EEF
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 18:51:03 +0100 (CET)
+Received: from am.mirrors.kernel.org (am.mirrors.kernel.org [147.75.80.249])
+	by mail.lfdr.de (Postfix) with ESMTPS id F07899C2EF2
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 18:51:19 +0100 (CET)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1790A282295
-	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 17:51:02 +0000 (UTC)
+	by am.mirrors.kernel.org (Postfix) with ESMTPS id A4FFC1F2186C
+	for <lists+netdev@lfdr.de>; Sat,  9 Nov 2024 17:51:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9BCF31A0BD1;
-	Sat,  9 Nov 2024 17:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC3E81A2C11;
+	Sat,  9 Nov 2024 17:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org;
-	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="LN92y7FL"
+	dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b="OPO5ihTT"
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3D61A0B05;
-	Sat,  9 Nov 2024 17:50:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E2B1A2645;
+	Sat,  9 Nov 2024 17:50:29 +0000 (UTC)
 Authentication-Results: smtp.subspace.kernel.org; arc=none smtp.client-ip=10.30.226.201
 ARC-Seal:i=1; a=rsa-sha256; d=subspace.kernel.org; s=arc-20240116;
-	t=1731174628; cv=none; b=uKAYJTgqEf/Tl2geqcTxXtlkodnHTeg9eiqaZ61bCbDn0+YjTgh4NNRMvxFAxCzmOutMKV+r+JDmTKchxq5RqjqsMRSnDO7eYhqoI0h+tSOrJ2fw8outN2wd7gXDWHxqNma2VGhmgdXcszOIvS3+fwnB25UIgbdB2NYBN42vyPM=
+	t=1731174629; cv=none; b=eRzGiAWGdfWvS5VEVw0bYSAjaZ+v/KKeqzIXpm/lzYjKg2AvMAhOIfaYb8OYUewoOXzjatIyVoRuvzB7S5FEtHjnwLhkpd0Tx/uoBwVjdfhmkriq8GgrmedWxdFrpOIokzmqlyqllqKef98nfi4XbYZhaUXTT86EoWcbANJa/SU=
 ARC-Message-Signature:i=1; a=rsa-sha256; d=subspace.kernel.org;
-	s=arc-20240116; t=1731174628; c=relaxed/simple;
-	bh=BqSDgx3rRRPUullizx1fW1wgjhzqtFXnN02Sl9o9nfo=;
+	s=arc-20240116; t=1731174629; c=relaxed/simple;
+	bh=pImSLBhfvjg4E1kN7zcmSAiZ5SUogAvv/DhtGeB/ZMM=;
 	h=Content-Type:MIME-Version:Subject:From:Message-Id:Date:References:
-	 In-Reply-To:To:Cc; b=dPOf6E/p/pjBbmzcFmG/go7Lgfq9IuiGyUeGEGOCMBia3Bc6bhtX4QdbJ/hJ+whdtfmysE9WWiNAEpKfw6CN67yufea10/6mwRgtGI4L4JvmqqTL9OcdPQ61BtNYCXElUL7GVsUbl1HUBl2gKFq8vdU//yjDBPsumQlkQE4GoFA=
-ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=LN92y7FL; arc=none smtp.client-ip=10.30.226.201
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E1E2C4CED3;
-	Sat,  9 Nov 2024 17:50:28 +0000 (UTC)
+	 In-Reply-To:To:Cc; b=G1rZf5EVBq+2D3YvmMs11Uc5DZbLpOYk/pUVmjl9gmge+GgYTY1J88/0s6ySNrCQIFMg/l9GcBd81sCdFvI1pyFDpLnb4kJigjjZmRZbgFy0G1pqM5sZwRNlnSpjJHehlm5wp9n2e1DyUFBYAMdOJGvSBxq2hpkyZTXO9q7ReKQ=
+ARC-Authentication-Results:i=1; smtp.subspace.kernel.org; dkim=pass (2048-bit key) header.d=kernel.org header.i=@kernel.org header.b=OPO5ihTT; arc=none smtp.client-ip=10.30.226.201
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 64406C4CECE;
+	Sat,  9 Nov 2024 17:50:29 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1731174628;
-	bh=BqSDgx3rRRPUullizx1fW1wgjhzqtFXnN02Sl9o9nfo=;
+	s=k20201202; t=1731174629;
+	bh=pImSLBhfvjg4E1kN7zcmSAiZ5SUogAvv/DhtGeB/ZMM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LN92y7FLw+9jg8BzPq2rNV/yMqyXsgyD1YqadLVeq2Ow99mNm9GV0lpJir4Ce74oQ
-	 dPrKxfbLYLLFByBoa45rq9wqlDAwWI5ut2dJgN7Zz9SNRlyctYQa2wGg5XaCAca48P
-	 pBe1uFkO72e6RxH+qo4JIRNkzkESkeh2aWwXT1FwK3dY9tHqOgU8InRjG5PU0zkqSb
-	 +JgTUQYNZK7BKCPOrYpmPsJiN272MxLHNuQxk7eIf0flDkXr54MvQr2tQn/pn63EuR
-	 wrGcuJ8IJZySf+hsMFf9HwNbCZvDiVG41N7SFtGUCsFZkt56x4tNJAaoUntrc+f7BZ
-	 0mqCVD9MNZksA==
+	b=OPO5ihTT8JCKa+vEpNPLPbYQpeMnX4B1DXQgA524mLM3jOxya9zebIr7mn07PI0mn
+	 mXXXGjDtNPkh8t6l3q/siubm2xX2rCP0oIG+M2PYc6l1uDkBB8XDAUWPXFOsa79wd4
+	 F5NLnMg8kYaJeV/DXvSBgQPRmtYWu24PK5ueScxN/HBmtdE00Nx9um5+cEJvkfpE7R
+	 738QuQAwtK/iCA/jMT9mAGgB7BA9iRti81rnEbpSNj09sak8ca03lrh3MIrEEPU5z0
+	 Worqo4W1qB6eLF+vR7PulMja8HVa4KvtTxYT+eDAk4U6k8PzMSRhc9xjR/pZqzT6Yq
+	 /IfJKewMUKV7A==
 Received: from [10.30.226.235] (localhost [IPv6:::1])
-	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id EB0353809A80;
-	Sat,  9 Nov 2024 17:50:38 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-rhel9-1.codeaurora.org (Postfix) with ESMTP id 33C983809A80;
+	Sat,  9 Nov 2024 17:50:40 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -52,37 +52,59 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] mptcp: remove the redundant assignment of 'new_ctx->tcp_sock'
- in subflow_ulp_clone()
+Subject: Re: [PATCHv2 net-next] net: sfc: use ethtool string helpers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <173117463774.2982634.14877671745218810649.git-patchwork-notify@kernel.org>
-Date: Sat, 09 Nov 2024 17:50:37 +0000
-References: <20241106071035.2591-1-moyuanhao3676@163.com>
-In-Reply-To: <20241106071035.2591-1-moyuanhao3676@163.com>
-To: MoYuanhao <moyuanhao3676@163.com>
-Cc: matttbe@kernel.org, martineau@kernel.org, geliang@kernel.org,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- horms@kernel.org, netdev@vger.kernel.org, mptcp@lists.linux.dev,
- linux-kernel@vger.kernel.org
+ <173117463900.2982634.15326215887669526386.git-patchwork-notify@kernel.org>
+Date: Sat, 09 Nov 2024 17:50:39 +0000
+References: <20241105231855.235894-1-rosenp@gmail.com>
+In-Reply-To: <20241105231855.235894-1-rosenp@gmail.com>
+To: Rosen Penev <rosenp@gmail.com>
+Cc: netdev@vger.kernel.org, ecree.xilinx@gmail.com, habetsm.xilinx@gmail.com,
+ andrew+netdev@lunn.ch, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, richardcochran@gmail.com, ast@kernel.org,
+ daniel@iogearbox.net, hawk@kernel.org, john.fastabend@gmail.com,
+ linux-net-drivers@amd.com, linux-kernel@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  6 Nov 2024 15:10:35 +0800 you wrote:
-> The variable has already been assigned in the subflow_create_ctx(),
-> So we don't need to reassign this variable in the subflow_ulp_clone().
+On Tue,  5 Nov 2024 15:18:55 -0800 you wrote:
+> The latter is the preferred way to copy ethtool strings.
 > 
-> Signed-off-by: MoYuanhao <moyuanhao3676@163.com>
+> Avoids manually incrementing the pointer. Cleans up the code quite well.
+> 
+> Signed-off-by: Rosen Penev <rosenp@gmail.com>
 > ---
->  net/mptcp/subflow.c | 1 -
->  1 file changed, 1 deletion(-)
+>  v2: cleaned up further with signature changes to make sure all
+>  increments get propagated.
+>  drivers/net/ethernet/sfc/ef10.c               |  2 +-
+>  drivers/net/ethernet/sfc/ef100_nic.c          |  2 +-
+>  drivers/net/ethernet/sfc/ethtool_common.c     | 46 ++++++++-----------
+>  drivers/net/ethernet/sfc/falcon/ethtool.c     | 34 ++++++--------
+>  drivers/net/ethernet/sfc/falcon/falcon.c      |  2 +-
+>  drivers/net/ethernet/sfc/falcon/net_driver.h  |  2 +-
+>  drivers/net/ethernet/sfc/falcon/nic.c         |  9 ++--
+>  drivers/net/ethernet/sfc/falcon/nic.h         |  2 +-
+>  drivers/net/ethernet/sfc/net_driver.h         |  2 +-
+>  drivers/net/ethernet/sfc/nic.c                |  9 ++--
+>  drivers/net/ethernet/sfc/nic_common.h         |  2 +-
+>  drivers/net/ethernet/sfc/ptp.c                |  2 +-
+>  drivers/net/ethernet/sfc/ptp.h                |  2 +-
+>  .../net/ethernet/sfc/siena/ethtool_common.c   | 46 ++++++++-----------
+>  drivers/net/ethernet/sfc/siena/net_driver.h   |  2 +-
+>  drivers/net/ethernet/sfc/siena/nic.c          | 14 +++---
+>  drivers/net/ethernet/sfc/siena/nic_common.h   |  5 +-
+>  drivers/net/ethernet/sfc/siena/ptp.c          |  2 +-
+>  drivers/net/ethernet/sfc/siena/ptp.h          |  2 +-
+>  drivers/net/ethernet/sfc/siena/siena.c        |  2 +-
+>  20 files changed, 83 insertions(+), 106 deletions(-)
 
 Here is the summary with links:
-  - mptcp: remove the redundant assignment of 'new_ctx->tcp_sock' in subflow_ulp_clone()
-    https://git.kernel.org/netdev/net-next/c/7d28f4fc868c
+  - [PATCHv2,net-next] net: sfc: use ethtool string helpers
+    https://git.kernel.org/netdev/net-next/c/9dae59210556
 
 You are awesome, thank you!
 -- 
